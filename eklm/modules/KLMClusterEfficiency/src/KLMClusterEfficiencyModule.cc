@@ -45,11 +45,10 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
   m_PartlyKL0Clusters = 0;
   m_OtherClusters = 0;
   m_NonreconstructedKL0 = 0;
-  for (i = 0; i < 2; i++) {
-    m_ReconstructedKL0EKLM[i] = 0;
-    m_ReconstructedKL0BKLM[i] = 0;
-  }
-  m_ReconstructedKL0EKLMBKLM = 0;
+  for (i = 0; i < 3; i++)
+    m_ReconstructedKL01Cluster[i] = 0;
+  for (i = 0; i < 6; i++)
+    m_ReconstructedKL02Clusters[i] = 0;
   m_ReconstructedKL03Clusters = 0;
 }
 
@@ -85,6 +84,7 @@ void KLMClusterEfficiencyModule::event()
   static int nevent = 0;
   char str[128];
   int i1, i2, i3, n1, n2, n3;
+  int bs1, bs2, es1, es2;
   TVector3 decayVertex, clusterPosition, hitPosition;
   float angle;
   bool haveKL0;
@@ -229,10 +229,15 @@ void KLMClusterEfficiencyModule::event()
         kl0Clusters[0]->getRelationsTo<BKLMHit2d>();
       RelationVector<EKLMHit2d> eklmHit2ds =
         kl0Clusters[0]->getRelationsTo<EKLMHit2d>();
-      if (bklmHit2ds.size() > 0)
-        m_ReconstructedKL0BKLM[0]++;
-      else if (eklmHit2ds.size() > 0)
-        m_ReconstructedKL0EKLM[0]++;
+      bs1 = bklmHit2ds.size();
+      es1 = eklmHit2ds.size();
+      if (bs1 > 0) {
+        if (es1 > 0)
+          m_ReconstructedKL01Cluster[1]++;
+        else
+          m_ReconstructedKL01Cluster[0]++;
+      } else if (es1 > 0)
+        m_ReconstructedKL01Cluster[2]++;
     } else if (n2 == 2) {
       RelationVector<BKLMHit2d> bklmHit2ds1 =
         kl0Clusters[0]->getRelationsTo<BKLMHit2d>();
@@ -242,13 +247,35 @@ void KLMClusterEfficiencyModule::event()
         kl0Clusters[0]->getRelationsTo<EKLMHit2d>();
       RelationVector<EKLMHit2d> eklmHit2ds2 =
         kl0Clusters[1]->getRelationsTo<EKLMHit2d>();
-      if (bklmHit2ds1.size() > 0 && bklmHit2ds2.size() > 0)
-        m_ReconstructedKL0BKLM[1]++;
-      else if ((bklmHit2ds1.size() > 0 && eklmHit2ds2.size() > 0) ||
-               (eklmHit2ds1.size() > 0 && bklmHit2ds2.size() > 0))
-        m_ReconstructedKL0EKLMBKLM++;
-      else if (eklmHit2ds1.size() > 0 && eklmHit2ds2.size() > 0)
-        m_ReconstructedKL0EKLM[1]++;
+      bs1 = bklmHit2ds1.size();
+      bs2 = bklmHit2ds2.size();
+      es1 = eklmHit2ds1.size();
+      es2 = eklmHit2ds2.size();
+      if (bs1 > 0 && bs2 > 0) {
+        if (es1 > 0 && es2 > 0) {
+          m_ReconstructedKL02Clusters[3]++;
+        } else if ((es1 > 0 && es2 == 0) || (es1 == 0 && es2 > 0)) {
+          m_ReconstructedKL02Clusters[1]++;
+        } else if (es1 == 0 && es2 == 0) {
+          m_ReconstructedKL02Clusters[0]++;
+        }
+      } else if (bs1 > 0 && bs2 == 0) {
+        if (es1 > 0 && es2 > 0) {
+          m_ReconstructedKL02Clusters[4]++;
+        } else if (es1 == 0 && es2 > 0) {
+          m_ReconstructedKL02Clusters[2]++;
+        }
+      } else if (bs1 == 0 && bs2 > 0) {
+        if (es1 > 0 && es2 > 0) {
+          m_ReconstructedKL02Clusters[4]++;
+        } else if (es1 > 0 && es2 == 0) {
+          m_ReconstructedKL02Clusters[2]++;
+        }
+      } else if (bs1 == 0 && bs2 == 0) {
+        if (es1 > 0 && es2 > 0) {
+          m_ReconstructedKL02Clusters[5]++;
+        }
+      }
     } else if (n2 >= 3)
       m_ReconstructedKL03Clusters++;
     for (i2 = 0; i2 < n2; i2++) {
@@ -286,31 +313,41 @@ void KLMClusterEfficiencyModule::endRun()
 
 void KLMClusterEfficiencyModule::terminate()
 {
+  int i, rec1Cluster, rec2Clusters;
+  rec1Cluster = 0;
+  rec2Clusters = 0;
+  for (i = 0; i < 3; i++)
+    rec1Cluster = rec1Cluster + m_ReconstructedKL01Cluster[i];
+  for (i = 0; i < 6; i++)
+    rec2Clusters = rec2Clusters + m_ReconstructedKL02Clusters[i];
   B2INFO("Total number of KLM clusters: " << m_KL0Clusters +
          m_PartlyKL0Clusters + m_OtherClusters);
   B2INFO("K_L0 clusters: " << m_KL0Clusters);
   B2INFO("(K_L0+other) clusters: " << m_PartlyKL0Clusters);
   B2INFO("Other clusters: " << m_OtherClusters);
   B2INFO("Total number of generated K_L0: " << m_NonreconstructedKL0 +
-         m_ReconstructedKL0BKLM[0] + m_ReconstructedKL0EKLM[0] +
-         m_ReconstructedKL0BKLM[1] + m_ReconstructedKL0EKLM[1] +
-         m_ReconstructedKL0EKLMBKLM + m_ReconstructedKL03Clusters);
+         rec1Cluster + rec2Clusters + m_ReconstructedKL03Clusters);
   B2INFO("Nonreconstructed K_L0: " << m_NonreconstructedKL0);
-  B2INFO("K_L0 reconstructed as 1 cluster (total): " <<
-         m_ReconstructedKL0BKLM[0] + m_ReconstructedKL0EKLM[0]);
+  B2INFO("K_L0 reconstructed as 1 cluster (total): " << rec1Cluster);
   B2INFO("K_L0 reconstructed as 1 cluster (BKLM): " <<
-         m_ReconstructedKL0BKLM[0]);
+         m_ReconstructedKL01Cluster[0]);
+  B2INFO("K_L0 reconstructed as 1 cluster (BKLM/EKLM): " <<
+         m_ReconstructedKL01Cluster[1]);
   B2INFO("K_L0 reconstructed as 1 cluster (EKLM): " <<
-         m_ReconstructedKL0EKLM[0]);
-  B2INFO("K_L0 reconstructed as 2 clusters (total): " <<
-         m_ReconstructedKL0BKLM[1] + m_ReconstructedKL0EKLM[1] +
-         m_ReconstructedKL0EKLMBKLM);
-  B2INFO("K_L0 reconstructed as 2 clusters (BKLM): " <<
-         m_ReconstructedKL0BKLM[1]);
+         m_ReconstructedKL01Cluster[2]);
+  B2INFO("K_L0 reconstructed as 2 clusters (total): " << rec2Clusters);
+  B2INFO("K_L0 reconstructed as 2 clusters (2 * BKLM): " <<
+         m_ReconstructedKL02Clusters[0]);
+  B2INFO("K_L0 reconstructed as 2 clusters (BKLM + BKLM/EKLM): " <<
+         m_ReconstructedKL02Clusters[1]);
   B2INFO("K_L0 reconstructed as 2 clusters (BKLM + EKLM): " <<
-         m_ReconstructedKL0EKLMBKLM);
-  B2INFO("K_L0 reconstructed as 2 clusters (EKLM): " <<
-         m_ReconstructedKL0EKLM[1]);
+         m_ReconstructedKL02Clusters[2]);
+  B2INFO("K_L0 reconstructed as 2 clusters (2 * BKLM/EKLM): " <<
+         m_ReconstructedKL02Clusters[3]);
+  B2INFO("K_L0 reconstructed as 2 clusters (BKLM/EKLM + EKLM): " <<
+         m_ReconstructedKL02Clusters[4]);
+  B2INFO("K_L0 reconstructed as 2 clusters (2 * EKLM): " <<
+         m_ReconstructedKL02Clusters[5]);
   B2INFO("K_L0 reconstructed as 3 or more clusters: " <<
          m_ReconstructedKL03Clusters);
   m_OutputFile->cd();

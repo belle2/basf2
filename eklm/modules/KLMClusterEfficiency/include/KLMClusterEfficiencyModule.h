@@ -112,14 +112,18 @@ namespace Belle2 {
     /** Number of nonreconstructed K_L0. */
     int m_NonreconstructedKL0;
 
-    /** Number of K_L0 reconstructed as 1, 2 clusters in EKLM. */
-    int m_ReconstructedKL0EKLM[2];
+    /**
+     * Number of K_L0 reconstructed as 1 cluster in
+     * (BKLM, BKLM/EKLM, EKLM).
+     */
+    int m_ReconstructedKL01Cluster[3];
 
-    /** Number of K_L0 reconstructed as 1, 2 clusters in BKLM. */
-    int m_ReconstructedKL0BKLM[2];
-
-    /** Number of K_L0 reconstructed as 2 clusters, 1 in EKLM and 1 in BKLM. */
-    int m_ReconstructedKL0EKLMBKLM;
+    /**
+     * Number of K_L0 reconstructed as 2 clusters in (2 * BKLM,
+     * BKLM + BKLM/EKLM, BKLM + EKLM, 2 * BKLM/EKLM,
+     * BKLM/EKLM + EKLM, 2 * EKLM).
+     */
+    int m_ReconstructedKL02Clusters[6];
 
     /** Number of K_L0 reconstructed as >= 2 clusters. */
     int m_ReconstructedKL03Clusters;

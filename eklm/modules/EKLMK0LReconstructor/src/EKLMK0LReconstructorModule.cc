@@ -208,7 +208,7 @@ static void findAssociatedHits(struct HitData* hit,
   int nInnermostLayer = 0;
   for (i = 13; i >= 0; i--)
     if (layerHits[i] > 0) {
-      nInnermostLayer = i;
+      nInnermostLayer = i + 1;
       nLayers++;
     }
   /* Get hit position as weighted average of cluster hit positions. */

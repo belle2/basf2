@@ -118,10 +118,7 @@ namespace Belle2 {
 
     /** Add a RecoTrack, to evaluate track finding. */
     void addTrackCandidate(const std::string& collectionName,
-                           const RecoTrack& recoTrack,
-                           const StoreArray<RecoHitInformation::UsedPXDHit>& pxdhits,
-                           const StoreArray<RecoHitInformation::UsedSVDHit>& svdhits,
-                           const StoreArray<RecoHitInformation::UsedCDCHit>& cdchits);
+                           const RecoTrack& recoTrack);
 
     /** Add VXDTF track candidate. */
     void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);

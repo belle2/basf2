@@ -165,10 +165,7 @@ EVEVisualization::~EVEVisualization()
 }
 
 void EVEVisualization::addTrackCandidate(const std::string& collectionName,
-                                         const RecoTrack& recoTrack,
-                                         const StoreArray<RecoHitInformation::UsedPXDHit>& pxdhits,
-                                         const StoreArray<RecoHitInformation::UsedSVDHit>& svdhits,
-                                         const StoreArray<RecoHitInformation::UsedCDCHit>& cdchits)
+                                         const RecoTrack& recoTrack)
 {
   const TString label = ObjectInfo::getIdentifier(&recoTrack);
   // parse the option string ------------------------------------------------------------------------

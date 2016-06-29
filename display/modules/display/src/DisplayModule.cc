@@ -168,9 +168,6 @@ void DisplayModule::event()
     m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
   }
 
-  StoreArray<RecoHitInformation::UsedPXDHit> pxdStoreArray;
-  StoreArray<RecoHitInformation::UsedSVDHit> svdStoreArray;
-  StoreArray<RecoHitInformation::UsedCDCHit> cdcStoreArray;
 
   if (m_showRecoTracks) {
     //add all possible track candidate arrays
@@ -179,10 +176,14 @@ void DisplayModule::event()
       StoreArray<RecoTrack> recoTracks(colName);
       for (const RecoTrack& recoTrack : recoTracks) {
 
-        m_visualizer->addTrackCandidate(colName, recoTrack, pxdStoreArray, svdStoreArray, cdcStoreArray);
+        m_visualizer->addTrackCandidate(colName, recoTrack);
 
       }
     }
+
+    StoreArray<RecoHitInformation::UsedPXDHit> pxdStoreArray;
+    StoreArray<RecoHitInformation::UsedSVDHit> svdStoreArray;
+    StoreArray<RecoHitInformation::UsedCDCHit> cdcStoreArray;
 
     //add remaining recohits
     m_visualizer->addUnassignedRecoHits(pxdStoreArray);

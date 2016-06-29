@@ -66,6 +66,11 @@ namespace Belle2 {
      */
     float getTime() const;
 
+    /**
+     * Get hit layer.
+     */
+    int getLayer() const;
+
   private:
 
     /** True if BKLM hit, false - EKLM. */

@@ -60,3 +60,10 @@ float KLMHit2d::getTime() const
   return m_eklmHit2d->getTime();
 }
 
+int KLMHit2d::getLayer() const
+{
+  if (m_bklmHit)
+    return m_bklmHit2d->getLayer();
+  return m_eklmHit2d->getLayer();
+}
+

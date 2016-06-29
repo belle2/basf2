@@ -12,6 +12,7 @@
 #include <algorithm>
 
 /* Belle2 headers. */
+#include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -45,6 +46,7 @@ void KLMK0LReconstructorModule::initialize()
   eklmHit2ds.isRequired();
   klmClusters.registerRelationTo(bklmHit2ds);
   klmClusters.registerRelationTo(eklmHit2ds);
+  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 void KLMK0LReconstructorModule::beginRun()
@@ -58,7 +60,9 @@ static bool compareDistance(KLMHit2d* hit1, KLMHit2d* hit2)
 
 void KLMK0LReconstructorModule::event()
 {
-  int i, n;
+  int i, n, nLayers;
+  int nLayersBKLM = NLAYER, nLayersEKLM;
+  int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
   StoreArray<KLMCluster> klmClusters;
   StoreArray<BKLMHit2d> bklmHit2ds;
@@ -68,6 +72,9 @@ void KLMK0LReconstructorModule::event()
   KLMHit2d* hit2d;
   KLMCluster* klmCluster;
   TVector3 hitPos;
+  nLayersEKLM = m_GeoDat->getNLayers();
+  layerHitsBKLM = new int[nLayersBKLM];
+  layerHitsEKLM = new int[nLayersEKLM];
   /* Fill vector of 2d hits. */
   n = bklmHit2ds.getEntries();
   for (i = 0; i < n; i++) {
@@ -106,14 +113,32 @@ clusterFound:;
     hitPos.SetX(0);
     hitPos.SetY(0);
     hitPos.SetZ(0);
+    for (i = 0; i < nLayersBKLM; i++)
+      layerHitsBKLM[i] = 0;
+    for (i = 0; i < nLayersEKLM; i++)
+      layerHitsEKLM[i] = 0;
+    nLayers = 0;
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       hitPos = hitPos + (*it)->getPosition();
       if (minTime < 0 || (*it)->getTime() < minTime)
         minTime = (*it)->getTime();
+      if ((*it)->inBKLM())
+        layerHitsBKLM[(*it)->getLayer() - 1]++;
+      else
+        layerHitsEKLM[(*it)->getLayer() - 1]++;
     }
     hitPos = hitPos * (1.0 / klmClusterHits.size());
+    for (i = 0; i < nLayersBKLM; i++) {
+      if (layerHitsBKLM[i] > 0)
+        nLayers++;
+    }
+    for (i = 0; i < nLayersEKLM; i++) {
+      if (layerHitsEKLM[i] > 0)
+        nLayers++;
+    }
     klmCluster = klmClusters.appendNew(
-                   hitPos.x(), hitPos.y(), hitPos.z(), minTime, 0, 0, 0, 0, 0);
+                   hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers, 0, 0,
+                   0, 0);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       if ((*it)->inBKLM())
         klmCluster->addRelationTo((*it)->getBKLMHit2d());
@@ -121,6 +146,8 @@ clusterFound:;
         klmCluster->addRelationTo((*it)->getEKLMHit2d());
     }
   }
+  delete layerHitsBKLM;
+  delete layerHitsEKLM;
 }
 
 void KLMK0LReconstructorModule::endRun()

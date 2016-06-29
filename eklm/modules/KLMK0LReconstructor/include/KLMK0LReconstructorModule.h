@@ -12,6 +12,7 @@
 #define KLMK0LRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
+#include <eklm/geometry/GeometryData.h>
 #include <framework/core/Module.h>
 
 namespace Belle2 {
@@ -61,6 +62,9 @@ namespace Belle2 {
     void terminate();
 
   private:
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
 
     /** Clustering angle. */
     double m_ClusteringAngle;

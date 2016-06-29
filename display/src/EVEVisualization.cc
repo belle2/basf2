@@ -164,17 +164,77 @@ EVEVisualization::~EVEVisualization()
   delete m_bfield;
 }
 
+void EVEVisualization::addTrackCandidate(const std::string& collectionName,
+                                         const RecoTrack& recoTrack,
+                                         const StoreArray<RecoHitInformation::UsedPXDHit>& pxdhits,
+                                         const StoreArray<RecoHitInformation::UsedSVDHit>& svdhits,
+                                         const StoreArray<RecoHitInformation::UsedCDCHit>& cdchits)
+{
+  const TString label = ObjectInfo::getIdentifier(&recoTrack);
+  // parse the option string ------------------------------------------------------------------------
+  bool drawHits = false;
+
+  if (m_options != "") {
+    for (size_t i = 0; i < m_options.length(); i++) {
+      if (m_options.at(i) == 'H') drawHits = true;
+    }
+  }
+  // finished parsing the option string -------------------------------------------------------------
+
+
+  //track seeds
+  TVector3 track_pos = recoTrack.getPositionSeed();
+  TVector3 track_mom = recoTrack.getMomentumSeed();
+
+  TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
+  lines->SetMainColor(c_recoTrackColor);
+  lines->SetMarkerColor(c_recoTrackColor);
+  lines->SetMarkerStyle(6);
+  lines->SetMainTransparency(60);
+
+  if (drawHits) {
+    // Loop over all hits in the track (three different types)
+    for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
+      addRecoHit(pxdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
+      addRecoHit(svdHit, lines);
+    }
+
+    for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
+      addRecoHit(cdcHit, lines);
+    }
+  }
+
+  TEveRecTrack rectrack;
+  rectrack.fP.Set(track_mom);
+  rectrack.fV.Set(track_pos);
+
+  TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
+  track_lines->SetName(label); //popup label set at end of function
+  track_lines->SetPropagator(m_gftrackpropagator);
+  track_lines->SetLineColor(c_recoTrackColor);
+  track_lines->SetLineWidth(1);
+  track_lines->SetTitle(ObjectInfo::getTitle(&recoTrack));
+
+  track_lines->SetCharge((int)recoTrack.getChargeSeed());
+
+
+  track_lines->AddElement(lines);
+  addToGroup(collectionName, track_lines);
+  addObject(&recoTrack, track_lines);
+}
+
 void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 {
-  using namespace genfit;
-  using genfit::Track;
-
   const TrackFitResult* fitResult = belle2Track->getTrackFitResult(Const::pion);
   if (!fitResult) {
     B2ERROR("Track without TrackFitResult skipped.");
     return;
   }
-  const Track* track = fitResult->getRelated<genfit::Track>();
+  const RecoTrack* track = belle2Track->getRelated<RecoTrack>();
+
   TString label = TString::Format("Track %d (FitResult: %d)", belle2Track->getArrayIndex(), fitResult->getArrayIndex());
 
   // parse the option string ------------------------------------------------------------------------
@@ -194,7 +254,6 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   // We loop over all points (scattering non-measurement points for GBL)
   // and for Kalman we skip those with no measurements, which should
   // not be there
-  const unsigned int numpoints = track ? track->getNumPoints() : 0;
   bool isPruned = (track == nullptr);
 
 
@@ -214,111 +273,52 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
 
   if (track) {
-    if (!track->checkConsistency()) {
-      B2ERROR("track is not consistent");
-      return;
-    }
-
-    boost::scoped_ptr<Track> refittedTrack(NULL);
-    if (m_refit) {
-
-      double dPVal_ = 1.E-3;
-      int nMaxIter_ = 4;
-      eFitterType fitterId_ = RefKalman;
-      eMultipleMeasurementHandling mmHandling_ = unweightedClosestToPrediction;
-
-      // We use AbsFitter because GBL does not inherit from AbsKalmanFitter.
-      boost::scoped_ptr<AbsFitter> fitter;
-      switch (fitterId_) {
-        case SimpleKalman:
-          fitter.reset(new KalmanFitter(nMaxIter_, dPVal_));
-          if (AbsKalmanFitter* abskalman = dynamic_cast<AbsKalmanFitter*>(fitter.get()))
-            abskalman->setMultipleMeasurementHandling(mmHandling_);
-          break;
-
-        case RefKalman:
-          fitter.reset(new KalmanFitterRefTrack(nMaxIter_, dPVal_));
-          if (AbsKalmanFitter* abskalman = dynamic_cast<AbsKalmanFitter*>(fitter.get()))
-            abskalman->setMultipleMeasurementHandling(mmHandling_);
-          break;
-
-        case DafSimple: {
-          genfit::AbsKalmanFitter* DafsKalman = new genfit::KalmanFitter();
-          fitter.reset(new DAF(DafsKalman));
-        }
-        break;
-
-        case DafRef:
-          fitter.reset(new DAF());
-          break;
-
-        case Gbl:
-          fitter.reset(new GblFitter());
-          break;
-
-      }
-      if (AbsKalmanFitter* abskalman = dynamic_cast<AbsKalmanFitter*>(fitter.get()))
-        abskalman->setMaxIterations(nMaxIter_);
-
-
-      refittedTrack.reset(new Track(*track));
-      refittedTrack->deleteFitterInfo();
-
-      try {
-        bool resort_ = true;
-        fitter->processTrack(refittedTrack.get(), resort_);
-      } catch (genfit::Exception& e) {
-        B2ERROR("Exception (" << e.what() << ") encountered, could not refit track");
-        return;
-      }
-
-      track = refittedTrack.get();
-    }
-
-
-    AbsTrackRep* rep;
+    const genfit::AbsTrackRep* representation;
 
     if (m_drawCardinalRep) {
-      rep = track->getCardinalRep();
+      representation = track->getCardinalRepresentation();
       B2DEBUG(100, "Draw cardinal rep");
     } else {
-      unsigned int repId_ = 0;
-      if (repId_ >= track->getNumReps())
-        repId_ = track->getNumReps() - 1;
-      rep = track->getTrackRep(repId_);
-      B2DEBUG(100, "Draw rep" << repId_);
+      const auto& representations = track->getRepresentations();
+      if (representations.empty()) {
+        B2ERROR("No representations found in the reco track!");
+        return;
+      }
+      B2DEBUG(100, "Draw representation number 0.");
+      representation = representations.front();
     }
 
-    const FitStatus* fitStatus = track->getFitStatus(rep);
-    //track->Print();
-    //track->Print("C");
-    //fitStatus->Print();
+    const genfit::FitStatus* fitStatus = track->getTrackFitStatus(representation);
 
     isPruned = fitStatus->isTrackPruned();
 
     // GBL and Kalman cannot mix in a track.
     // What is 0 after first loop will stay 0:
-    KalmanFitterInfo* fi = 0;
-    KalmanFitterInfo* prevFi = 0;
-    GblFitterInfo* gfi = 0;
-    GblFitterInfo* prevGFi = 0;
-    const MeasuredStateOnPlane* fittedState(NULL);
-    const MeasuredStateOnPlane* prevFittedState(NULL);
+    genfit::KalmanFitterInfo* fi = 0;
+    genfit::KalmanFitterInfo* prevFi = 0;
+    genfit::GblFitterInfo* gfi = 0;
+    genfit::GblFitterInfo* prevGFi = 0;
+    const genfit::MeasuredStateOnPlane* fittedState(NULL);
+    const genfit::MeasuredStateOnPlane* prevFittedState(NULL);
 
 
-    for (unsigned int j = 0; j < numpoints; j++) { // loop over all points in the track
+    const auto& hitPoints = track->getHitPointsWithMeasurement();
+    const unsigned int numpoints = hitPoints.size();
 
-      TrackPoint* tp = track->getPoint(j);
+    int hitCounter = -1;
+    for (genfit::TrackPoint* tp : hitPoints) { // loop over all points in the track
+      hitCounter++;
+
       // get the fitter infos ------------------------------------------------------------------
-      if (! tp->hasFitterInfo(rep)) {
+      if (! tp->hasFitterInfo(representation)) {
         B2ERROR("trackPoint has no fitterInfo for rep");
         continue;
       }
 
-      AbsFitterInfo* fitterInfo = tp->getFitterInfo(rep);
+      genfit::AbsFitterInfo* fitterInfo = tp->getFitterInfo(representation);
 
-      fi = dynamic_cast<KalmanFitterInfo*>(fitterInfo);
-      gfi = dynamic_cast<GblFitterInfo*>(fitterInfo);
+      fi = dynamic_cast<genfit::KalmanFitterInfo*>(fitterInfo);
+      gfi = dynamic_cast<genfit::GblFitterInfo*>(fitterInfo);
 
       if (!gfi && !fi) {
         B2ERROR("Can only display KalmanFitterInfo or GblFitterInfo");
@@ -344,48 +344,48 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           fittedState = &(gfi->getFittedState(true));
         if (fi)
           fittedState = &(fi->getFittedState(true));
-      } catch (Exception& e) {
+      } catch (genfit::Exception& e) {
         B2ERROR(e.what() << " - can not get fitted state");
         continue;
       }
 
-      TVector3 track_pos = rep->getPos(*fittedState);
+      TVector3 track_pos = representation->getPos(*fittedState);
 
       // draw track if corresponding option is set ------------------------------------------
       if (prevFittedState != NULL) {
 
         TEvePathMark::EType_e markType = TEvePathMark::kReference;
-        if (j + 1 == numpoints) //track should stop here.
+        if (hitCounter + 1 == numpoints) //track should stop here.
           markType = TEvePathMark::kDecay;
 
         // Kalman: non-null prevFi ensures that the previous fitter info was also KalmanFitterInfo
         if (fi && prevFi) {
-          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors);
+          makeLines(eveTrack, prevFittedState, fittedState, representation, markType, m_drawErrors);
           if (m_drawErrors) { // make sure to draw errors in both directions
-            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors, 0);
+            makeLines(eveTrack, prevFittedState, fittedState, representation, markType, m_drawErrors, 0);
           }
           //these are currently disabled.
           //TODO: if activated, I want to have a separate TEveStraightLineSet instead of eveTrack (different colors/options)
           if (m_drawForward)
-            makeLines(eveTrack, prevFi->getForwardUpdate(), fi->getForwardPrediction(), rep, markType, m_drawErrors, 0);
+            makeLines(eveTrack, prevFi->getForwardUpdate(), fi->getForwardPrediction(), representation, markType, m_drawErrors, 0);
           if (m_drawBackward)
-            makeLines(eveTrack, prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), rep, markType, m_drawErrors);
+            makeLines(eveTrack, prevFi->getBackwardPrediction(), fi->getBackwardUpdate(), representation, markType, m_drawErrors);
           // draw reference track if corresponding option is set ------------------------------------------
           if (m_drawRefTrack && fi->hasReferenceState() && prevFi->hasReferenceState())
-            makeLines(eveTrack, prevFi->getReferenceState(), fi->getReferenceState(), rep, markType, false);
+            makeLines(eveTrack, prevFi->getReferenceState(), fi->getReferenceState(), representation, markType, false);
         }
 
         // GBL: non-null prevGFi ensures that the previous fitter info was also GblFitterInfo
         if (gfi && prevGFi) {
-          makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors);
+          makeLines(eveTrack, prevFittedState, fittedState, representation, markType, m_drawErrors);
           if (m_drawErrors) {
-            makeLines(eveTrack, prevFittedState, fittedState, rep, markType, m_drawErrors, 0);
+            makeLines(eveTrack, prevFittedState, fittedState, representation, markType, m_drawErrors, 0);
           }
 
           if (m_drawRefTrack && gfi->hasReferenceState() && prevGFi->hasReferenceState()) {
-            StateOnPlane prevSop = prevGFi->getReferenceState();
-            StateOnPlane sop = gfi->getReferenceState();
-            makeLines(eveTrack, &prevSop, &sop, rep, markType, false);
+            genfit::StateOnPlane prevSop = prevGFi->getReferenceState();
+            genfit::StateOnPlane sop = gfi->getReferenceState();
+            makeLines(eveTrack, &prevSop, &sop, representation, markType, false);
           }
         }
 
@@ -398,14 +398,14 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
       //loop over all measurements for this point (e.g. u and v-type strips)
       const int numMeasurements = tp->getNumRawMeasurements();
       for (int iMeasurement = 0; iMeasurement < numMeasurements; iMeasurement++) {
-        const AbsMeasurement* m = tp->getRawMeasurement(iMeasurement);
+        const genfit::AbsMeasurement* m = tp->getRawMeasurement(iMeasurement);
 
         TVectorT<double> hit_coords;
         TMatrixTSym<double> hit_cov;
 
         if (fi) {
           // Kalman
-          MeasurementOnPlane* mop = fi->getMeasurementOnPlane(iMeasurement);
+          genfit::MeasurementOnPlane* mop = fi->getMeasurementOnPlane(iMeasurement);
           hit_coords.ResizeTo(mop->getState());
           hit_cov.ResizeTo(mop->getCov());
           hit_coords = mop->getState();
@@ -415,7 +415,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
           // GBL - has only one measurement (other should be already merged before the track is constructed)
           // That means tp->getNumRawMeasurements() returns 1 for tracks fitted by GBL, because GBLfit Module
           // merges all corresponding SVD strips to 2D combined clusters.
-          MeasurementOnPlane gblMeas = gfi->getMeasurement();
+          genfit::MeasurementOnPlane gblMeas = gfi->getMeasurement();
           hit_coords.ResizeTo(gblMeas.getState());
           hit_cov.ResizeTo(gblMeas.getCov());
           hit_coords = gblMeas.getState();
@@ -440,7 +440,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
         int hit_coords_dim = m->getDim();
 
-        if (dynamic_cast<const PlanarMeasurement*>(m) != NULL) {
+        if (dynamic_cast<const genfit::PlanarMeasurement*>(m) != NULL) {
           planar_hit = true;
           if (hit_coords_dim == 1) {
             hit_u = hit_coords(0);
@@ -449,22 +449,22 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
             hit_u = hit_coords(0);
             hit_v = hit_coords(1);
           }
-        } else if (dynamic_cast<const SpacepointMeasurement*>(m) != NULL) {
+        } else if (dynamic_cast<const genfit::SpacepointMeasurement*>(m) != NULL) {
           space_hit = true;
           plane_size = 4;
         } else if (dynamic_cast<const CDCRecoHit*>(m)
-                   || dynamic_cast<const WireMeasurement*>(m)
-                   || dynamic_cast<const WireMeasurementNew*>(m)) {
+                   || dynamic_cast<const genfit::WireMeasurement*>(m)
+                   || dynamic_cast<const genfit::WireMeasurementNew*>(m)) {
           wire_hit = true;
           hit_u = fabs(hit_coords(0));
           hit_v = v * (track_pos - o); // move the covariance tube so that the track goes through it
           plane_size = 4;
-          if (dynamic_cast<const WirePointMeasurement*>(m) != NULL) {
+          if (dynamic_cast<const genfit::WirePointMeasurement*>(m) != NULL) {
             wirepoint_hit = true;
             hit_v = hit_coords(1);
           }
         } else {
-          B2ERROR("Hit " << j << ", Measurement " << iMeasurement << ": Unknown measurement type: skipping hit!");
+          B2ERROR("Hit " << hitCounter << ", Measurement " << iMeasurement << ": Unknown measurement type: skipping hit!");
           break;
         }
 
@@ -657,11 +657,11 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
     }
   }
   eveTrack->SetTitle(TString::Format("%s\n"
-                                     "#points: %u %s\n"
+                                     "pruned: %s\n"
                                      "pT=%.3f, pZ=%.3f\n"
                                      "pVal: %e",
                                      label.Data(),
-                                     numpoints, (isPruned ? " (pruned)" : ""),
+                                     isPruned ? " yes" : "no",
                                      poca_momentum.Pt(), poca_momentum.Pz(),
                                      fitResult->getPValue()
                                     ));

@@ -28,7 +28,7 @@ namespace Belle2 {
    *
    * The DisplayModule itself is responsible for fetching data on hits, tracks and
    * relations from the data store, and passes them along to the EVEVisualization class,
-   * which is responsible for creating visualisations using the TEve classes.
+   * which is responsible for creating visualizations using the TEve classes.
    *
    * The viewers, projections and interactive elements are controlled by DisplayUI.
    *
@@ -36,12 +36,18 @@ namespace Belle2 {
    */
   class DisplayModule : public Module {
   public:
-    DisplayModule(); //< ctor
-    ~DisplayModule(); //< dtor
+    /// Constructor. Sets all the module parameters.
+    DisplayModule();
 
-    void initialize(); //< Sets up geometry if needed.
-    void event(); //< Show genfit::Tracks & hits in event viewer until next event is requested.
-    void terminate(); //< terminate gEve to avoid problems with root's cleanup
+    /// Sets up geometry if needed.
+    void initialize();
+
+    /// Show various reconstructed or simulated objects in the event viewer until the next event is requested.
+    void event();
+
+    /// Terminate gEve to avoid problems with root's cleanup.
+    void terminate();
+
   private:
     /** List of drawing options, see EVEVisualization::setOptions() */
     std::string m_options;
@@ -64,19 +70,16 @@ namespace Belle2 {
     /** If true, all neutral primary and secondary MCParticles will be shown, regardless of wether hits are produced. */
     bool m_showNeutrals;
 
-    /** If true, fitted genfit::Tracks, GFRave Vertices and ECLGamma objects will be shown in the display. */
+    /** If true, fitted RecoTracks, GFRave Vertices and ECLGamma objects will be shown in the display. */
     bool m_showTrackLevelObjects;
 
-    /** Wether to show genfit::TrackCands */
-    bool m_showTrackCandidates;
+    /** Whether to show RecoTracks */
+    bool m_showRecoTracks;
 
     /** If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero). */
     bool m_showCDCHits;
 
-    /** Wether to use cluster hits for track candidates */
-    bool m_useClusters;
-
-    /** Non-interactively save visualisations for each event. */
+    /** Non-interactively save visualizations for each event. */
     bool m_automatic;
 
     /** Show full geometry instead of simplified shapes. */

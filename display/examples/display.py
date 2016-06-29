@@ -62,10 +62,7 @@ display.param('showTrackLevelObjects', True)
 
 # show track candidates?
 # You most likely don't want this unless you are a tracking developer
-display.param('showTrackCandidates', False)
-# If showTrackCandidates is true, you can set this option to switch between
-# PXD/SVDClusters and PXD/SVDTrueHits
-display.param('useClusters', True)
+display.param('showRecoTracks', False)
 
 # save events non-interactively (without showing window)?
 display.param('automatic', False)

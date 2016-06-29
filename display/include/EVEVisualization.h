@@ -28,8 +28,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
 
-#include <genfit/Track.h>
-#include <genfit/TrackCand.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TEveStraightLineSet.h>
@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Color for reco hits. */
     const static int c_recoHitColor = kOrange;
     /** Color for TrackCandidates. */
-    const static int c_trackCandColor = kAzure - 2;
+    const static int c_recoTrackColor = kAzure - 2;
     /** Color for tracks. */
     const static int c_trackColor = kAzure;
     /** Color for track markers. */
@@ -116,9 +116,12 @@ namespace Belle2 {
      *  Adapted from GenfitDisplay, originally written by Karl Bicker. */
     void addTrack(const Belle2::Track* belle2Track);
 
-    /** Add a genfit::TrackCand, to evaluate track finding. */
-    template<class PXDType, class SVDType> void addTrackCandidate(const std::string& collectionName, const genfit::TrackCand* trackCand,
-        const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits);
+    /** Add a RecoTrack, to evaluate track finding. */
+    void addTrackCandidate(const std::string& collectionName,
+                           const RecoTrack& recoTrack,
+                           const StoreArray<RecoHitInformation::UsedPXDHit>& pxdhits,
+                           const StoreArray<RecoHitInformation::UsedSVDHit>& svdhits,
+                           const StoreArray<RecoHitInformation::UsedCDCHit>& cdchits);
 
     /** Add VXDTF track candidate. */
     void addTrackCandidateTFInfo(TrackCandidateTFInfo* info);
@@ -340,9 +343,6 @@ namespace Belle2 {
     /** don't show MCParticles with momentum below this cutoff. */
     static constexpr double c_minPCut = 0.00;
 
-    /** Do refit in addTrack */
-    bool m_refit = false;
-
     /** Draw cardinal representation in addTrack */
     bool m_drawCardinalRep = true;
 
@@ -358,95 +358,5 @@ namespace Belle2 {
     /** draw backward in addTrack */
     bool m_drawBackward = false;
   };
-
-  template<class PXDType, class SVDType> void EVEVisualization::addTrackCandidate(const std::string& collectionName,
-      const genfit::TrackCand* trackCand,
-      const StoreArray<PXDType>& pxdhits, const StoreArray<SVDType>& svdhits, const StoreArray<CDCHit>& cdchits)
-  {
-    const TString label = ObjectInfo::getIdentifier(trackCand);
-    // parse the option string ------------------------------------------------------------------------
-    bool drawHits = false;
-
-    if (m_options != "") {
-      for (size_t i = 0; i < m_options.length(); i++) {
-        if (m_options.at(i) == 'H') drawHits = true;
-      }
-    }
-    // finished parsing the option string -------------------------------------------------------------
-
-
-    //track seeds
-    TVector3 track_pos = trackCand->getPosSeed();
-    TVector3 track_mom = trackCand->getMomSeed();
-
-    TEveStraightLineSet* lines = new TEveStraightLineSet("RecoHits for " + label);
-    lines->SetMainColor(c_trackCandColor);
-    lines->SetMarkerColor(c_trackCandColor);
-    lines->SetMarkerStyle(6);
-    lines->SetMainTransparency(60);
-
-    const unsigned int numhits = trackCand->getNHits();
-    if (drawHits) {
-      for (unsigned int iHit = 0; iHit < numhits; iHit++) { // loop over all hits in the track
-
-        //get hit and detector indices from candidate
-        int detId;
-        int hitId;
-        trackCand->getHit(iHit, detId, hitId);
-
-        //get actual hit data from associated StoreArray
-        if (detId == Const::PXD) {
-          if (!pxdhits)
-            continue;
-          const PXDType* hit = pxdhits[hitId];
-          if (!hit) {
-            B2ERROR("No " << PXDType::Class_Name() << " found at index " << hitId << "!");
-            continue;
-          }
-          addRecoHit(hit, lines);
-        } else if (detId == Const::SVD) {
-          if (!svdhits)
-            continue;
-          const SVDType* hit = svdhits[hitId];
-          if (!hit) {
-            B2ERROR("No " << SVDType::Class_Name() << " found at index " << hitId << "!");
-            continue;
-          }
-          addRecoHit(hit, lines);
-        } else if (detId == Const::CDC) {
-          if (!cdchits)
-            continue;
-          const CDCHit* hit = cdchits[hitId];
-          if (!hit) {
-            B2ERROR("No " << CDCHit::Class_Name() << " found at index " << hitId << "!");
-            continue;
-          }
-          addRecoHit(hit, lines);
-        } else {
-          //might be a KLM hit or something. not necessarily bad
-          //B2ERROR("Got invalid detector ID " << detId << " from track candidate " << label << ", skipping hit!");
-          continue;
-        }
-      }
-    }
-
-    TEveRecTrack rectrack;
-    rectrack.fP.Set(track_mom);
-    rectrack.fV.Set(track_pos);
-
-    TEveTrack* track_lines = new TEveTrack(&rectrack, m_gftrackpropagator);
-    track_lines->SetName(label); //popup label set at end of function
-    track_lines->SetPropagator(m_gftrackpropagator);
-    track_lines->SetLineColor(c_trackCandColor);
-    track_lines->SetLineWidth(1);
-    track_lines->SetTitle(ObjectInfo::getTitle(trackCand));
-
-    track_lines->SetCharge((int)trackCand->getChargeSeed());
-
-
-    track_lines->AddElement(lines);
-    addToGroup(collectionName, track_lines);
-    addObject(trackCand, track_lines);
-  }
 }
 #endif

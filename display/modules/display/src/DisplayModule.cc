@@ -12,7 +12,8 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Gearbox.h>
 
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
+#include <tracking/dataobjects/RecoHitInformation.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TApplication.h>
@@ -25,10 +26,10 @@ REG_MODULE(Display)
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of MCParticles, genfit::Tracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay for detailed documentation.");
+  setDescription("Interactive visualisation of MCParticles, RecoTracks and various SimHits (plus geometry). See https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay for detailed documentation.");
 
   addParam("options", m_options,
-           "Drawing options for genfit::Tracks, a combination of DHMPS. See EVEVisualization::setOptions or the display.py example for an explanation.",
+           "Drawing options for RecoTracks, a combination of DHMP. See EVEVisualization::setOptions or the display.py example for an explanation.",
            std::string("MH"));
   addParam("showMCInfo", m_showMCInfo, "Show Monte Carlo information (MCParticles, SimHits)", true);
   addParam("assignHitsToPrimaries", m_assignToPrimaries,
@@ -45,12 +46,11 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, all neutral MCParticles will be shown, including secondaries (implies disabled assignHitsToPrimaries). May be slow.",
            true);
   addParam("showTrackLevelObjects", m_showTrackLevelObjects,
-           "If true, fitted Tracks (+genfit::Track), GFRave Vertices and ECLCluster objects will be shown in the display.", true);
-  addParam("showTrackCandidates", m_showTrackCandidates,
-           "If true, track candidates (genfit::TrackCand) and reconstructed hitso will be shown in the display.", false);
+           "If true, fitted Tracks, GFRave Vertices and ECLCluster objects will be shown in the display.", true);
+  addParam("showRecoTracks", m_showRecoTracks,
+           "If true, track candidates (RecoTracks) and reconstructed hits will be shown in the display.", false);
   addParam("showCDCHits", m_showCDCHits,
            "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
-  addParam("useClusters", m_useClusters, "Use PXD/SVD clusters for track candidate & hit visualisation (instead of TrueHits).", true);
   addParam("automatic", m_automatic,
            "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.",
            false);
@@ -64,11 +64,6 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
   if ((!gApplication) || (gApplication->TestBit(TApplication::kDefaultApplication))) {
     new TApplication("ROOT_application", 0, 0);
   }
-}
-
-
-DisplayModule::~DisplayModule()
-{
 }
 
 
@@ -86,8 +81,7 @@ void DisplayModule::initialize()
   StoreArray<KLMCluster>::optional();
   StoreArray<Track>::optional();
   StoreArray<TrackFitResult>::optional();
-  StoreArray<genfit::Track>::optional();
-  StoreArray<genfit::TrackCand>::optional();
+  StoreArray<RecoTrack>::optional();
   StoreArray<genfit::GFRaveVertex>::optional();
   StoreObjPtr<DisplayData>::optional();
   StoreArray<PXDCluster>::optional();
@@ -117,7 +111,7 @@ void DisplayModule::initialize()
     m_display->addParameter("Show all neutral particles", getParam<bool>("showNeutrals"), 1);
     m_display->addParameter("Hide secondaries", getParam<bool>("hideSecondaries"), 1);
   }
-  m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showTrackCandidates"), 0);
+  m_display->addParameter("Show candidates and rec. hits", getParam<bool>("showRecoTracks"), 0);
   m_display->addParameter("Show tracks, vertices, gammas", getParam<bool>("showTrackLevelObjects"), 0);
 
 
@@ -174,32 +168,26 @@ void DisplayModule::event()
     m_visualizer->addSimHits(StoreArray<BKLMSimHit>());
   }
 
-  if (m_showTrackCandidates) {
+  StoreArray<RecoHitInformation::UsedPXDHit> pxdStoreArray;
+  StoreArray<RecoHitInformation::UsedSVDHit> svdStoreArray;
+  StoreArray<RecoHitInformation::UsedCDCHit> cdcStoreArray;
+
+  if (m_showRecoTracks) {
     //add all possible track candidate arrays
-    const auto trackCandidateArrays = StoreArray<genfit::TrackCand>::getArrayList();
-    for (std::string colName : trackCandidateArrays) {
-      StoreArray<genfit::TrackCand> gftrackcands(colName);
-      const int nCands = gftrackcands.getEntries();
-      for (int i = 0; i < nCands; i++) {
-        if (m_useClusters) {
-          m_visualizer->addTrackCandidate(colName, gftrackcands[i],
-                                          StoreArray<PXDCluster>(), StoreArray<SVDCluster>(), StoreArray<CDCHit>());
-        } else {
-          m_visualizer->addTrackCandidate(colName, gftrackcands[i],
-                                          StoreArray<PXDTrueHit>(), StoreArray<SVDTrueHit>(), StoreArray<CDCHit>());
-        }
+    const auto recoTrackArrays = StoreArray<RecoTrack>::getArrayList();
+    for (std::string colName : recoTrackArrays) {
+      StoreArray<RecoTrack> recoTracks(colName);
+      for (const RecoTrack& recoTrack : recoTracks) {
+
+        m_visualizer->addTrackCandidate(colName, recoTrack, pxdStoreArray, svdStoreArray, cdcStoreArray);
+
       }
     }
 
     //add remaining recohits
-    if (m_useClusters) {
-      m_visualizer->addUnassignedRecoHits(StoreArray<PXDCluster>());
-      m_visualizer->addUnassignedRecoHits(StoreArray<SVDCluster>());
-    } else {
-      m_visualizer->addUnassignedRecoHits(StoreArray<PXDTrueHit>());
-      m_visualizer->addUnassignedRecoHits(StoreArray<SVDTrueHit>());
-    }
-    m_visualizer->addUnassignedRecoHits(StoreArray<CDCHit>());
+    m_visualizer->addUnassignedRecoHits(pxdStoreArray);
+    m_visualizer->addUnassignedRecoHits(svdStoreArray);
+    m_visualizer->addUnassignedRecoHits(cdcStoreArray);
 
     StoreArray<ROIid> ROIs;
     for (int i = 0 ; i < ROIs.getEntries(); i++)

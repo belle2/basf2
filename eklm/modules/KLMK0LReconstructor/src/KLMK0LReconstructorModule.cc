@@ -59,6 +59,7 @@ static bool compareDistance(KLMHit2d* hit1, KLMHit2d* hit2)
 void KLMK0LReconstructorModule::event()
 {
   int i, n;
+  float minTime = -1;
   StoreArray<KLMCluster> klmClusters;
   StoreArray<BKLMHit2d> bklmHit2ds;
   StoreArray<EKLMHit2d> eklmHit2ds;
@@ -107,10 +108,12 @@ clusterFound:;
     hitPos.SetZ(0);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       hitPos = hitPos + (*it)->getPosition();
+      if (minTime < 0 || (*it)->getTime() < minTime)
+        minTime = (*it)->getTime();
     }
     hitPos = hitPos * (1.0 / klmClusterHits.size());
     klmCluster = klmClusters.appendNew(
-                   hitPos.x(), hitPos.y(), hitPos.z(), 0, 0, 0, 0, 0, 0);
+                   hitPos.x(), hitPos.y(), hitPos.z(), minTime, 0, 0, 0, 0, 0);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       if ((*it)->inBKLM())
         klmCluster->addRelationTo((*it)->getBKLMHit2d());

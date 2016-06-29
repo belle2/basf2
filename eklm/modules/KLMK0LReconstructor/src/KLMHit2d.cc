@@ -53,3 +53,10 @@ TVector3 KLMHit2d::getPosition() const
   return m_eklmHit2d->getPosition();
 }
 
+float KLMHit2d::getTime() const
+{
+  if (m_bklmHit)
+    return m_bklmHit2d->getTime();
+  return m_eklmHit2d->getTime();
+}
+

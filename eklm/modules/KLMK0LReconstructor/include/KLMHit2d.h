@@ -61,6 +61,11 @@ namespace Belle2 {
      */
     TVector3 getPosition() const;
 
+    /**
+     * Get hit time.
+     */
+    float getTime() const;
+
   private:
 
     /** True if BKLM hit, false - EKLM. */

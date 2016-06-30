@@ -93,6 +93,11 @@ TVector3 Helix:: getMomentum(const double bZ) const
   return TVector3(getMomentumX(bZ), getMomentumY(bZ), getMomentumZ(bZ));
 }
 
+TVector3 Helix::getDirection() const
+{
+  return TVector3(getCosPhi0(), getSinPhi0(), getTanLambda());
+}
+
 double Helix::getTransverseMomentum(const double bZ) const
 {
   return 1 / std::fabs(getAlpha(bZ) * getOmega());

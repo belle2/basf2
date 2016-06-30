@@ -135,6 +135,12 @@ namespace Belle2 {
      */
     TVector3 getMomentum(const double bZ = 1.5) const;
 
+    /** Getter for unit vector of momentum at the perigee position
+     *
+     * This is mainly useful cases where curvature is zero (pT is infinite)
+     */
+    TVector3 getDirection() const;
+
     /** Getter for the absolute value of the transverse momentum at the perigee.
      *
      *  @param bZ            Magnetic field at the perigee

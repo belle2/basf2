@@ -73,4 +73,4 @@ display.param('fullGeometry', False)
 main.add_module(display)
 
 process(main)
-# print statistics(statistics.INIT)
+# print(statistics(statistics.INIT))

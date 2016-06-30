@@ -67,7 +67,6 @@ def run_test(argument):
         else:
             result = False
             message = "return code %d" % process.returncode
-            printOutput = True
 
     else:
         log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),

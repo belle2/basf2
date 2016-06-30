@@ -4,7 +4,6 @@
 #include <framework/datastore/RelationsObject.h>
 #include <framework/utilities/HTML.h>
 
-#include <genfit/TrackCand.h>
 #include <genfit/GFRaveVertex.h>
 
 #include <TString.h>
@@ -31,11 +30,6 @@ TString ObjectInfo::getInfo(const TObject* obj)
   } else if (auto vertex = dynamic_cast<const genfit::GFRaveVertex*>(obj)) {
     return "<b>V</b>=" + HTML::getString(vertex->getPos()) + "<br>" +
            TString::Format("pVal=%e", TMath::Prob(vertex->getChi2(), vertex->getNdf()));
-  } else if (auto trackCand = dynamic_cast<const genfit::TrackCand*>(obj)) {
-    TVector3 momentum = trackCand->getMomSeed();
-    return TString::Format("<b>#hits</b>=%u<br><b>pT</b>=%.3f, <b>pZ</b>=%.3f",
-                           trackCand->getNHits(),
-                           momentum.Pt(), momentum.Pz());
   }
   return "";
 }

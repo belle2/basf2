@@ -111,8 +111,11 @@ void RootInputModule::initialize()
   m_persistent = new TChain(c_treeNames[DataStore::c_Persistent].c_str());
   m_tree = new TChain(c_treeNames[DataStore::c_Event].c_str());
   for (const string& fileName : m_inputFileNames) {
-    m_persistent->AddFile(fileName.c_str());
-    m_tree->AddFile(fileName.c_str());
+    //nentries = -1 forces AddFile() to read headers
+    if (!m_tree->AddFile(fileName.c_str(), -1))
+      B2FATAL("Couldn't read header of TTree 'tree' in file '" << fileName << "'");
+    if (!m_persistent->AddFile(fileName.c_str(), -1))
+      B2FATAL("Couldn't read header of TTree 'persistent' in file '" << fileName << "'");
     B2INFO("Added file " + fileName);
   }
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
@@ -245,8 +248,8 @@ void RootInputModule::readTree()
   const bool fileChanged = (m_lastPersistentEntry != treeNum);
   if (fileChanged) {
     // file changed, read the FileMetaData object from the persistent tree and update the parent file metadata
+    B2INFO("New input file with LFN:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
     readPersistentEntry(treeNum);
-    B2INFO("New input file:" << FileCatalog::Instance().getPhysicalFileName(fileMetaData->getLfn()));
   }
 
   for (auto entry : m_storeEntries) {

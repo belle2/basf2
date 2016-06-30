@@ -3,16 +3,16 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Belle II Connected Region Finder (CRF). Starting with 'seed' cells     *
- * above a energy energyCut0. Add neighbouring crystals above energyCut2. *
+ * above an energy energyCut0. Add neighbouring crystals above energyCut2.*
  * If neighbouring crystal is above energyCut1, repeat this. Timing cuts  *
  * can be set for each digit type and the energy cuts can be made         *
  * background dependent using the event-by-event background measurements. *
- * Digits with failed time fits automatically pass timing cuts.           *
+ * Digits with failed time fits automatically pass timing cuts by default.*
  * The CRF must run once before the splitters and splitters must only use *
  * digits contained in a CR. Digits from different CRs must not be mixed. *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -119,11 +119,11 @@ void ECLCRFinderModule::initialize()
   }
 
   // Resize the vectors
-  m_cellIdToSeedPointerVec.resize(8737); /**< cellid -> seed digit (type 1). */
-  m_cellIdToGrowthPointerVec.resize(8737); /**< cellid -> growth digits. */
-  m_cellIdToDigitPointerVec.resize(8737); /**< cellid -> above threshold digits (type 2). */
-  m_cellIdToAllPointerVec.resize(8737); /**< cellid -> all digits (type 3). */
+  m_cellIdToSeedVec.resize(8737); /**< cellid -> seed digit (type 1). */
+  m_cellIdToGrowthVec.resize(8737); /**< cellid -> growth digits. */
+  m_cellIdToDigitVec.resize(8737); /**< cellid -> above threshold digits (type 2). */
   m_cellIdToTempCRIdVec.resize(8737); /**< cellid -> CR. */
+  m_calDigitStoreArrPosition.resize(8737);
 
 }
 
@@ -136,13 +136,17 @@ void ECLCRFinderModule::event()
 {
   B2DEBUG(200, "ECLCRFinderModule::event()");
 
-
   // Reset the vector(s).
-  memset(&m_cellIdToSeedPointerVec[0], 0, m_cellIdToSeedPointerVec.size() * sizeof m_cellIdToSeedPointerVec[0]);
-  memset(&m_cellIdToGrowthPointerVec[0], 0, m_cellIdToGrowthPointerVec.size() * sizeof m_cellIdToGrowthPointerVec[0]);
-  memset(&m_cellIdToDigitPointerVec[0], 0, m_cellIdToDigitPointerVec.size() * sizeof m_cellIdToDigitPointerVec[0]);
-  memset(&m_cellIdToAllPointerVec[0], 0, m_cellIdToAllPointerVec.size() * sizeof m_cellIdToAllPointerVec[0]);
+  memset(&m_cellIdToSeedVec[0], 0, m_cellIdToSeedVec.size() * sizeof m_cellIdToSeedVec[0]);
+  memset(&m_cellIdToGrowthVec[0], 0, m_cellIdToGrowthVec.size() * sizeof m_cellIdToGrowthVec[0]);
+  memset(&m_cellIdToDigitVec[0], 0, m_cellIdToDigitVec.size() * sizeof m_cellIdToDigitVec[0]);
   memset(&m_cellIdToTempCRIdVec[0], 0, m_cellIdToTempCRIdVec.size() * sizeof m_cellIdToTempCRIdVec[0]);
+
+  // Fill a vector that can be used to map cellid -> store array position
+  memset(&m_calDigitStoreArrPosition[0], -1, m_calDigitStoreArrPosition.size() * sizeof m_calDigitStoreArrPosition[0]);
+  for (int i = 0; i < m_eclCalDigits.getEntries(); i++) {
+    m_calDigitStoreArrPosition[m_eclCalDigits[i]->getCellId()] = i;
+  }
 
   // Clear the map(s).
   m_cellIdToTempCRIdMap.clear();
@@ -155,7 +159,7 @@ void ECLCRFinderModule::event()
   if (m_useBackgroundLevel > 0) {
     const int bkgdcount = m_eclEventInformation->getBackgroundECL();
 
-    // This scaling must probably more clever to be really efficienct.
+    // This scaling can probably be more clever to be really efficienct.
     // So far just scale linearly between 0 and 280 (release-07).
     double frac = 1.0;
     if (c_fullBkgdCount > 0) frac = static_cast<double>(bkgdcount) / static_cast<double>(c_fullBkgdCount);
@@ -174,11 +178,11 @@ void ECLCRFinderModule::event()
   //-------------------------------------------------------
   // fill digits into maps
   for (const auto& eclCalDigit : m_eclCalDigits) {
-    const double energy = eclCalDigit.getEnergy();
-    const double time = eclCalDigit.getTime();
+    const double energy         = eclCalDigit.getEnergy();
+    const double time           = eclCalDigit.getTime();
     const double timeresolution = eclCalDigit.getTimeResolution();
-    const int cellid = eclCalDigit.getCellId();
-    const bool fitfailed = eclCalDigit.isFailedFit();
+    const int cellid            = eclCalDigit.getCellId();
+    const bool fitfailed        = eclCalDigit.isFailedFit();
 
     double timeresidual = 999.;
     if (!fitfailed and fabs(timeresolution) > 1e-9) {
@@ -192,8 +196,8 @@ void ECLCRFinderModule::event()
       if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
       if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
 
-      m_cellIdToSeedPointerVec[cellid] = &eclCalDigit;
-      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed' with cellid = " << cellid);
+      m_cellIdToSeedVec[cellid] = 1;
+      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed digit' with cellid = " << cellid);
 
     }
 
@@ -203,8 +207,8 @@ void ECLCRFinderModule::event()
       if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
       if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
 
-      m_cellIdToGrowthPointerVec[cellid] = &eclCalDigit;
-      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth' with cellid = " << cellid);
+      m_cellIdToGrowthVec[cellid] = 1;
+      B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth digit' with cellid = " << cellid);
     }
 
     // Fill all crystals above threshold to a map (this must include growth and seed crystals!).
@@ -213,21 +217,17 @@ void ECLCRFinderModule::event()
       if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
       if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
 
-      m_cellIdToDigitPointerVec[cellid] = &eclCalDigit;
+      m_cellIdToDigitVec[cellid] = 1;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'digit' with cellid = " << cellid);
 
     }
-
-    // Fill all digits to a map
-    m_cellIdToAllPointerVec[cellid] = &eclCalDigit;
-
 
   } // done filling digit map
 
   //-------------------------------------------------------
   // 'find" in a map is faster if the number of seeds is not too large, can be replaced easily once we know what seed cuts we want.
-  for (unsigned int pos = 1; pos < m_cellIdToSeedPointerVec.size(); ++pos) {
-    if (m_cellIdToSeedPointerVec[pos] > NULL) {
+  for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
+    if (m_cellIdToSeedVec[pos] > 0) {
       checkNeighbours(pos, m_tempCRId, 0);
       ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module, starting at one
     }
@@ -267,11 +267,12 @@ void ECLCRFinderModule::event()
     // Add relations to all digits in this CR.
     for (unsigned int i = 1; i < m_cellIdToTempCRIdVec.size(); ++i) {
       if (tempCRIdToCRIdMap[m_cellIdToTempCRIdVec[i]] == connectedRegionID) {
-        aCR->addRelationTo(m_cellIdToAllPointerVec[i]);
+
+        const int pos = m_calDigitStoreArrPosition[i];
+        aCR->addRelationTo(m_eclCalDigits[pos], 1.0);
       }
     }
-  }
-
+  } // end m_cellIdToTempCRIdVec loop
 }
 
 
@@ -297,13 +298,13 @@ void ECLCRFinderModule::checkNeighbours(const int cellid, const int tempcrid, co
 
     // Check if this digit is above the lowest threshold (i.e. included in m_cellIdToDigitPointerVec) to be added.
     int isAdded = 0;
-    if (m_cellIdToDigitPointerVec[neighbour] > NULL) {
+    if (m_cellIdToDigitVec[neighbour] > 0) {
       updateCRs(neighbour, tempcrid);
       isAdded = 1;
     }
 
     // Check if we have to grow further.
-    if (m_cellIdToGrowthPointerVec[neighbour] > NULL) {
+    if (m_cellIdToGrowthVec[neighbour] > 0) {
 
       if (isAdded < 1) {
         updateCRs(neighbour, tempcrid); // it could be that this digit is not in the all digit list (eg. tight timing cuts for "all digits".
@@ -337,5 +338,4 @@ void ECLCRFinderModule::updateCRs(int cellid, int tempcr)
   } else { //not in a CR yet, add it!
     m_cellIdToTempCRIdVec[cellid] = tempcr;
   }
-
 }

@@ -3,16 +3,16 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Belle II Connected Region Finder (CRF). Starting with 'seed' cells     *
- * above a energy energyCut0. Add neighbouring crystals above energyCut2. *
+ * above an energy energyCut0. Add neighbouring crystals above energyCut2.*
  * If neighbouring crystal is above energyCut1, repeat this. Timing cuts  *
  * can be set for each digit type and the energy cuts can be made         *
  * background dependent using the event-by-event background measurements. *
- * Digits with failed time fits automatically pass timing cuts.           *
+ * Digits with failed time fits automatically pass timing cuts by default.*
  * The CRF must run once before the splitters and splitters must only use *
  * digits contained in a CR. Digits from different CRs must not be mixed. *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -92,15 +92,19 @@ namespace Belle2 {
       int m_skipFailedTimeFitDigits; /**< handling of digits with failed time fits.*/
 
       /** Other variables. */
-      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background. */
+      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background. TODO move to DB*/
       double m_energyCutMod[3]; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
       int m_tempCRId; /**< Temporary CR ID*/
 
       /** Digit vectors. */
-      std::vector <const ECLCalDigit*>  m_cellIdToSeedPointerVec; /**< cellid -> seed digit. */
-      std::vector <const ECLCalDigit*>  m_cellIdToGrowthPointerVec; /**< cellid -> growth digits. */
-      std::vector <const ECLCalDigit*>  m_cellIdToDigitPointerVec; /**< cellid -> above threshold digits. */
-      std::vector <const ECLCalDigit*>  m_cellIdToAllPointerVec; /**< cellid -> all digits. */
+      std::vector <int>  m_cellIdToSeedVec; /**< cellid -> seed digit. */
+      std::vector <int>  m_cellIdToGrowthVec; /**< cellid -> growth digits. */
+      std::vector <int>  m_cellIdToDigitVec; /**< cellid -> above threshold digits. */
+
+      /** vector (8736+1 entries) with cell id to store array positions */
+      std::vector< int > m_calDigitStoreArrPosition;
+
+      // USE POSITION IN STORE ARRAY!!!
 
       /** Connected Region map. */
       std::vector < int > m_cellIdToTempCRIdVec; /**< cellid -> temporary CR.*/

@@ -56,7 +56,7 @@ namespace Belle2 {
                    unsigned segmentASIC,
                    unsigned electronicType,
                    std::string electronicName,
-                   const std::vector<unsigned short>& data):
+                   const std::vector<short>& data):
       m_data(data),  m_electronicName(electronicName)
     {
       m_moduleID = moduleID;
@@ -221,7 +221,7 @@ namespace Belle2 {
      * Returns waveform
      * @return vector of ADC values
      */
-    const std::vector<unsigned short>& getWaveform() const
+    const std::vector<short>& getWaveform() const
     {
       return m_data;
     }
@@ -238,12 +238,12 @@ namespace Belle2 {
     unsigned short m_flags = 0;         /**< event flags (bits 0:7) */
     unsigned short m_referenceASIC = 0; /**< reference ASIC window */
     unsigned short m_segmentASIC = 0;   /**< segment ASIC window (storage window) */
-    std::vector<unsigned short> m_data;  /**< waveform ADC values */
+    std::vector<short> m_data;  /**< waveform ADC values */
     unsigned m_electronicType = 0;      /**< electronic type (see ChannelMapper::EType) */
     std::string m_electronicName;   /**< electronic name */
     bool m_pedestalSubtracted = false; /**< true, if pedestal already subtracted */
 
-    ClassDef(TOPRawWaveform, 4); /**< ClassDef */
+    ClassDef(TOPRawWaveform, 5); /**< ClassDef */
 
   };
 

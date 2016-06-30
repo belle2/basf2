@@ -282,12 +282,8 @@ namespace Belle2 {
 
     DataArray array(buffer, bufferSize, m_swapBytes);
 
-    const int numWindows = 4;
-    int hitSize = 22 + 32 * numWindows; //not clear: header repeates with every hit or not
-    int Nhits = bufferSize / hitSize;
-
     unsigned word = 0;
-    for (int hit = 0; hit < Nhits; hit++) {
+    while (array.getRemainingWords() > 21) {
 
       word = array.getWord(); // word 0 (header with Type/Version)
       if ((word & 0xFFFF) != 0xAAAA) {
@@ -352,8 +348,7 @@ namespace Belle2 {
       word = array.getWord(); // word 16
       word = array.getWord(); // word 17
       word = array.getWord(); // word 18
-      // int numPoints = (word >> 16) & 0xFFFF;
-      int numPoints = 32 * numWindows;
+      int numPoints = (word >> 16) & 0xFFFF;
       unsigned short carrier = (word >> 14) & 0x03;
       unsigned short asic = (word >> 12) & 0x03;
       unsigned short asicChannel = (word >> 9) & 0x07;
@@ -405,13 +400,20 @@ namespace Belle2 {
       word = array.getWord(); // word 20
       word = array.getWord(); // word 21
 
+      int numWords = (numPoints + 1) / 2;
+      if (array.getRemainingWords() < numWords) {
+        B2ERROR("TOPUnpacker: too few words for waveform data, needed " << numWords);
+        return array.getRemainingWords();
+      }
+
       // unpack waveforms
-      std::vector<unsigned short> adcData;
-      for (int i = 0; i < numPoints; i++) {
+      std::vector<short> adcData;
+      for (int i = 0; i < numWords; i++) {
         word = array.getWord();
         adcData.push_back(word & 0xFFFF);
         adcData.push_back((word >> 16) & 0xFFFF);
       }
+      if (numWords * 2 != numPoints) adcData.pop_back(); // numPoints is even
 
       // determine slot number (moduleID) and boardstack
       int moduleID = 0;
@@ -489,7 +491,7 @@ namespace Belle2 {
         int pixelID = mapper.getPixelID(channel);
 
         int numofPoints = array.getWord();
-        std::vector<unsigned short> wfdata;
+        std::vector<short> wfdata;
         for (int i = 0; i < numofPoints / 2; i++) {
           unsigned data = array.getWord();
           wfdata.push_back(data & 0xFFFF);
@@ -553,7 +555,7 @@ namespace Belle2 {
         unsigned carrier = (word >> 30) & 0x03; // used to be called asicRow
         for (unsigned chan = 0; chan < 8; chan++) {
           if ((trigPattern & (1 << (chan / 2))) == 0) continue;
-          std::vector<unsigned short> wfdata;
+          std::vector<short> wfdata;
           for (unsigned i = 0; i < 32; i++) {
             unsigned data = array.getWord();
             wfdata.push_back(data & 0xFFFF);

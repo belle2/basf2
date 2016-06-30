@@ -116,7 +116,7 @@ void RootOutputModule::initialize()
     m_tree[durability] = new TTree(c_treeNames[durability].c_str(), c_treeNames[durability].c_str());
     m_tree[durability]->SetAutoFlush(m_autoflush);
     m_tree[durability]->SetAutoSave(m_autosave);
-    for (DataStore::StoreEntryIter iter = map.begin(); iter != map.end(); ++iter) {
+    for (auto iter = map.begin(); iter != map.end(); ++iter) {
       const std::string& branchName = iter->first;
       //skip transient entries (allow overriding via branchNames)
       if (iter->second.dontWriteOut
@@ -164,6 +164,10 @@ void RootOutputModule::initialize()
       m_tree[durability]->SetBranchAddress(branchName.c_str(), &iter->second.object);
       m_entries[durability].push_back(&iter->second);
       B2DEBUG(150, "The branch " << branchName << " was created.");
+
+      //Tell DataStore that we are using this entry
+      DataStore::Instance().optionalInput(StoreAccessorBase(branchName, (DataStore::EDurability)durability, entryClass,
+                                                            iter->second.isArray));
     }
   }
 

@@ -135,7 +135,7 @@ void BKGClassifierDataWriterModule::event()
     const TVector3& cluster_pos = cluster.getClusterPosition();
 
     // get various KLMCluster vars
-    m_KLMglobalZ = cluster.getGlobalPosition().Z();
+    m_KLMglobalZ = cluster_pos.Z();
     m_KLMnCluster = klmClusters.getEntries();
     m_KLMnLayer = cluster.getLayers();
     m_KLMnInnermostLayer = cluster.getInnermostLayer();

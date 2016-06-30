@@ -352,7 +352,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
       if (prevFittedState != NULL) {
 
         TEvePathMark::EType_e markType = TEvePathMark::kReference;
-        if (hitCounter + 1 == numpoints) //track should stop here.
+        if (hitCounter + 1 == static_cast<int>(numpoints)) //track should stop here.
           markType = TEvePathMark::kDecay;
 
         // Kalman: non-null prevFi ensures that the previous fitter info was also KalmanFitterInfo

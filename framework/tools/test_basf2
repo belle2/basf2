@@ -127,7 +127,7 @@ def process_top_dir(release_dir, directories, processed_dirs):
     exclude_dirs = ['build', 'include', 'lib', 'bin', 'modules', 'data', 'externals']
     tests = []
     for entry in dirs:
-        if entry in processed_dirs or entry in processed_dirs:
+        if entry in processed_dirs or entry in exclude_dirs:
             continue
         dir_entry = os.path.join(release_dir, entry)
         if entry.find('.') > -1 or not os.path.isdir(dir_entry):

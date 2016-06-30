@@ -232,7 +232,7 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
   }
   const RecoTrack* track = belle2Track->getRelated<RecoTrack>();
 
-  TString label = TString::Format("Track %d (FitResult: %d)", belle2Track->getArrayIndex(), fitResult->getArrayIndex());
+  const TString label = ObjectInfo::getIdentifier(belle2Track) + " (" + ObjectInfo::getIdentifier(fitResult) + ")";
 
   // parse the option string ------------------------------------------------------------------------
   bool drawDetectors = false;
@@ -256,17 +256,17 @@ void EVEVisualization::addTrack(const Belle2::Track* belle2Track)
 
   TEveRecTrackD recTrack;
   const TVector3& poca = fitResult->getPosition();
-  const TVector3& poca_momentum = fitResult->getMomentum();
-
   recTrack.fV.Set(poca);
-  recTrack.fP.Set(poca_momentum);
+
+  const TVector3& poca_momentum = fitResult->getMomentum();
+  if (std::isfinite(poca_momentum.Mag()))
+    recTrack.fP.Set(poca_momentum);
+  else //use 1TeV momentum for tracks without curvature
+    recTrack.fP.Set(fitResult->getHelix().getDirection() * 1000);
+
   recTrack.fSign = fitResult->getChargeSign();
   TEveTrack* eveTrack = new TEveTrack(&recTrack, m_gftrackpropagator);
   eveTrack->SetName(label);
-
-  if (!std::isfinite(poca_momentum.Mag())) {
-    B2WARNING(label.Data() << " has infinite momentum!");
-  }
 
 
   if (track) {

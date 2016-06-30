@@ -25,12 +25,43 @@ rootinput = register_module('RootInput')
 # create geometry
 gearbox = register_module('Gearbox')
 geometry = register_module('Geometry')
+# Turn off B-field? (also greatly speeds up startup)
+# geometry.param('excludedComponents', ['MagneticField'])
 
 main.add_module(rootinput)
 main.add_module(gearbox)
 main.add_module(geometry)
 
 display = register_module('Display')
+# --- MC options ---
+# Should Monte Carlo info be shown? (MCParticles, SimHits)
+display.param('showMCInfo', True)
+
+# should hits always be assigned to a particle with c_PrimaryParticle flag?
+display.param('assignHitsToPrimaries', False)
+
+# show all primary MCParticles?
+display.param('showAllPrimaries', True)
+
+# show all charged MCParticles?
+display.param('showCharged', True)
+
+# show all neutral MCParticles?
+display.param('showNeutrals', True)
+
+
+# --- Intermediate options ---
+# show track candidates?
+# You most likely don't want this unless you are a tracking developer
+display.param('showRecoTracks', False)
+
+# directly show CDCHits as drift cylinders (shortened, z position = 0)
+display.param('showCDCHits', False)
+
+
+# --- Track options ---
+# show tracks, vertices, eclgammas?
+display.param('showTrackLevelObjects', True)
 
 # The options parameter is a combination of:
 # D draw detectors - draw simple detector representation (with different size)
@@ -45,30 +76,19 @@ display = register_module('Display')
 # only makes sense when showTrackLevelObjects/showTrackCandidates is used
 display.param('options', 'MH')  # default
 
-# should hits always be assigned to a particle with c_PrimaryParticle flag?
-display.param('assignHitsToPrimaries', False)
-
-# show all primary MCParticles?
-display.param('showAllPrimaries', True)
-
-# show all charged MCParticles?
-display.param('showCharged', True)
-
-# show all neutral MCParticles?
-display.param('showNeutrals', True)
-
-# show tracks, vertices, eclgammas?
-display.param('showTrackLevelObjects', True)
-
-# show track candidates?
-# You most likely don't want this unless you are a tracking developer
-display.param('showRecoTracks', False)
+# --- Other options ---
 
 # save events non-interactively (without showing window)?
 display.param('automatic', False)
 
 # change to True to show the full TGeo geometry instead of simplified extract
 display.param('fullGeometry', False)
+
+# Objects which are to be hidden (can be manually re-enabled in tree view).
+# Names correspond to the object names in the 'Event'. (Note that this won't
+# work for objects somewhere deep in the tree, only for those immediately
+# below 'Event'.
+display.param('hideObjects', [])
 
 main.add_module(display)
 

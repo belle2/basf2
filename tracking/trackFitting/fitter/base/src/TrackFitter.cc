@@ -10,6 +10,7 @@
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 #include <framework/dataobjects/Helix.h>
 
 #include <genfit/AbsTrackRep.h>
@@ -136,9 +137,10 @@ double TrackFitter::calculateTimeSeed(const RecoTrack& recoTrack,
   // obtaining this directly from the difference in z, as it
   // only provide arc-lengths in the transverse plane, so we do
   // it like this.
-  const TVector3& perigeePosition = recoTrack.getPositionSeed();
-  const Belle2::Helix h(perigeePosition, momentum, particleWithPDGCode->Charge() / 3, 1.5);
-  const double s2D = h.getArcLength2DAtCylindricalR(perigeePosition.Perp());
+  const TVector3& seedPosition = recoTrack.getPositionSeed();
+  const double bZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  const Belle2::Helix h(seedPosition, momentum, particleWithPDGCode->Charge() / 3, bZ);
+  const double s2D = h.getArcLength2DAtXY(seedPosition.X(), seedPosition.Y());
   const double s = s2D * hypot(1, h.getTanLambda());
 
   // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.

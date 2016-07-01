@@ -160,14 +160,10 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
 
   CDCTrajectorySZ trajectorySZ;
-  trajectorySZ.clear();
-
   update(trajectorySZ, stereoSegment, axialTrajectory2D);
 
   CDCTrajectory3D trajectory3D(axialTrajectory2D, trajectorySZ);
-
   segmentPair.setTrajectory3D(trajectory3D);
-
 }
 
 
@@ -188,14 +184,10 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
 
 }
 
-
-
-
-
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          CDCObservations2D& observations2D) const
 {
-  trajectorySZ.clear();
+  //trajectorySZ.clear();
   if (observations2D.size() < 3) {
     B2WARNING("Skipping sz fit.");
     return;

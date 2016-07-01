@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/geometry/ParameterVector.h>
 #include <tracking/trackFindingCDC/geometry/JacobianMatrix.h>
+#include <tracking/trackFindingCDC/geometry/PrecisionMatrix.h>
 
 
 #include <Eigen/Dense>
@@ -23,10 +24,6 @@ namespace Belle2 {
     /// The representation type of a covariance matrix
     template<int N>
     using CovarianceMatrix = Eigen::Matrix<double, N, N>;
-
-    /// The representation type of an inverse covariance matrix
-    template<int N>
-    using WeightMatrix = Eigen::Matrix<double, N, N>;
 
     /// Collection of functions related to covariance matrices
     struct CovarianceMatrixUtil {
@@ -131,18 +128,14 @@ namespace Belle2 {
                             ParameterVector<N>& par,
                             CovarianceMatrix<N>& cov)
       {
-        WeightMatrix<N> weight1 = cov1.inverse();
-        WeightMatrix<N> weight2 = cov2.inverse();
-        WeightMatrix<N> weight =  weight1 + weight2;
-        cov = weight.inverse();
-
-        par = cov * (weight1 * par1 + weight2 * par2);
-
-        ParameterVector<N> residual1 = par1 - par;
-        ParameterVector<N> residual2 = par2 - par;
-
-        Eigen::Matrix<double, 1, 1> chi2 = residual1.transpose() * weight1 * residual1 + residual2.transpose() * weight2 * residual2;
-        return chi2[0];
+        PrecisionMatrix<N> precision1 = cov1.inverse();
+        PrecisionMatrix<N> precision2 = cov2.inverse();
+        PrecisionMatrix<N> precision;
+        double chi2 = PrecisionMatrixUtil::average(par1, precision1,
+                                                   par2, precision2,
+                                                   par, precision);
+        cov = precision.colPivHouseholderQr().inverse();
+        return chi2;
       }
 
       /**
@@ -168,18 +161,15 @@ namespace Belle2 {
                             ParameterVector<M>& par,
                             CovarianceMatrix<M>& cov)
       {
-        WeightMatrix<N1> weight1 = cov1.inverse();
-        WeightMatrix<N2> weight2 = cov2.inverse();
+        PrecisionMatrix<N1> precision1 = cov1.inverse();
+        PrecisionMatrix<N2> precision2 = cov2.inverse();
+        PrecisionMatrix<M> precision;
 
-        WeightMatrix<M> weight = ambiguity1.transpose() * weight1 * ambiguity1 + ambiguity2.transpose() * weight2 * ambiguity2;
-        cov = weight.inverse();
-
-        par = cov * (ambiguity1.transpose() * weight1 * par1 + ambiguity2.transpose() * weight2 * par2);
-        ParameterVector<N1> residual1 = par1 - ambiguity1 * par;
-        ParameterVector<N2> residual2 = par2 - ambiguity2 * par;
-
-        Eigen::Matrix<double, 1, 1> chi2 = residual1.transpose() * weight1 * residual1 + residual2.transpose() * weight2 * residual2;
-        return chi2[0];
+        double chi2 = PrecisionMatrixUtil::average(par1, precision1, ambiguity1,
+                                                   par2, precision2, ambiguity2,
+                                                   par, precision);
+        cov = precision.colPivHouseholderQr().inverse();
+        return chi2;
       }
     };
 

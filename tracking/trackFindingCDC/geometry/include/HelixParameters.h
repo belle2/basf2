@@ -107,6 +107,9 @@ namespace Belle2 {
     /// Covariance matrix of the helix parameters
     using HelixCovariance = HelixUtil::CovarianceMatrix;
 
+    /// Precision matrix of the helix parameters
+    using HelixPrecision = HelixUtil::PrecisionMatrix;
+
     /// Jacobian matrix for the helix parameters
     using HelixJacobian = HelixUtil::JacobianMatrix;
 

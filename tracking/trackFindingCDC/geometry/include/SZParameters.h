@@ -52,6 +52,9 @@ namespace Belle2 {
     /// Covariance matrix of the sz parameters
     using SZCovariance = SZUtil::CovarianceMatrix;
 
+    /// Precision matrix of the sz parameters
+    using SZPrecision = SZUtil::PrecisionMatrix;
+
     /// Jacobian matrix for the sz parameters
     using SZJacobian = SZUtil::JacobianMatrix;
 

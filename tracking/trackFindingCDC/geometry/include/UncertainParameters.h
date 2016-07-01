@@ -32,6 +32,9 @@ namespace Belle2 {
       /// The matrix type implementing the representation of the covariance
       using CovarianceMatrix = TrackFindingCDC::CovarianceMatrix<c_N>;
 
+      /// The matrix type implementing the representation of the precision
+      using PrecisionMatrix = TrackFindingCDC::PrecisionMatrix<c_N>;
+
       /// The matrix type implementing the representation of a jacobian matrix used in the transport operations
       using JacobianMatrix = TrackFindingCDC::JacobianMatrix<c_N>;
 

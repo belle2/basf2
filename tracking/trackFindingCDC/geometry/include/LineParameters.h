@@ -49,6 +49,9 @@ namespace Belle2 {
     /// Covariance matrix of the line parameters
     using LineCovariance = LineUtil::CovarianceMatrix;
 
+    /// Precision matrix of the line parameters
+    using LinePrecision = LineUtil::PrecisionMatrix;
+
     /// Jacobian matrix for the line parameters
     using LineJacobian = LineUtil::JacobianMatrix;
 

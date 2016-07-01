@@ -53,6 +53,9 @@ namespace Belle2 {
     /// Covariance matrix of the perigee parameters
     using PerigeeCovariance = PerigeeUtil::CovarianceMatrix;
 
+    /// Precision matrix of the perigee parameters
+    using PerigeePrecision = PerigeeUtil::PrecisionMatrix;
+
     /// Jacobian matrix for the perigee parameters
     using PerigeeJacobian = PerigeeUtil::JacobianMatrix;
 

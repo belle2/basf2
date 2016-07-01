@@ -68,9 +68,9 @@ def peel_trajectory3d(trajectory3d, key="{part_name}"):
 
 
 @peelers.format_crop_keys
-def peel_segment_pair_relation(segment_pair_relation, key="{part_name}"):
-    from_segment = segment_pair_relation.getFromSegment()
-    to_segment = segment_pair_relation.getToSegment()
+def peel_segment_pair(segment_pair, key="{part_name}"):
+    from_segment = segment_pair.getFromSegment()
+    to_segment = segment_pair.getToSegment()
 
     from_segment_crops = peel_segment2d(from_segment, key="from_{part_name}")
     to_segment_crops = peel_segment2d(to_segment, key="to_{part_name}")
@@ -80,7 +80,7 @@ def peel_segment_pair_relation(segment_pair_relation, key="{part_name}"):
 
     superlayer_id_pair = 10.0 * sorted_superlayer_ids[1] + sorted_superlayer_ids[0]
 
-    trajectory3d = segment_pair_relation.getTrajectory3D()
+    trajectory3d = segment_pair.getTrajectory3D()
     trajectory3d_crops = peel_trajectory3d(trajectory3d, key="{part_name}")
 
     crops = dict(

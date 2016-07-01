@@ -176,21 +176,21 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
 
-    def pick(self, segment_pair_relation):
+    def pick(self, segment_pair):
         mc_segment_lookup = self.mc_segment_lookup
-        from_segment = segment_pair_relation.getFromSegment()
-        to_segment = segment_pair_relation.getToSegment()
+        from_segment = segment_pair.getFromSegment()
+        to_segment = segment_pair.getToSegment()
         mc_particle = mc_segment_lookup.getMCParticle(from_segment)
         return (mc_particle and
                 is_primary(mc_particle) and
                 from_segment.size() > 3 and
                 to_segment.size() > 3)
 
-    def peel(self, segment_pair_relation):
+    def peel(self, segment_pair):
         mc_segment_lookup = self.mc_segment_lookup
 
-        from_segment = segment_pair_relation.getFromSegment()
-        to_segment = segment_pair_relation.getToSegment()
+        from_segment = segment_pair.getFromSegment()
+        to_segment = segment_pair.getToSegment()
 
         mc_particle = mc_segment_lookup.getMCParticle(from_segment)
 
@@ -202,7 +202,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
             tan_lambda_truth=fit3d_truth.getTanLambda(),
         )
 
-        segment_pair_crops = cdc_peelers.peel_segment_pair_relation(segment_pair_relation)
+        segment_pair_crops = cdc_peelers.peel_segment_pair(segment_pair)
         segment_pair_crops.update(truth_crops)
         return segment_pair_crops
 

@@ -123,7 +123,6 @@ namespace {
     const double cosphi = vecPhi.x();
     const double sinphi = vecPhi.y();
 
-
     if (lineConstrained) {
       double chi2 = sw * (sinphi * sinphi * c(iX, iX) - 2. * sinphi * cosphi * c(iX, iY) + cosphi * cosphi * c(iY, iY));
       return chi2;
@@ -144,18 +143,17 @@ namespace {
 
 
 
-  Matrix<double, 3, 3> calcCovarianceKarimaki(const PerigeeCircle& parameters,
-                                              const Matrix< double, 4, 4 >& s,
-                                              bool lineConstrained = false)
+  PerigeePrecision calcPrecisionKarimaki(const PerigeeCircle& parameters,
+                                         const Matrix< double, 4, 4 >& s,
+                                         bool lineConstrained = false)
   {
-    Matrix<double, 3, 3> invV;
+    PerigeePrecision perigeePrecision;
 
     const double curv = parameters.curvature();
     const double I =  parameters.impact();
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     const Vector2D vecPhi = -parameters.tangential();
-
 
     // Ternminology Karimaki using in the paper
     const double cosphi = vecPhi.x();
@@ -170,21 +168,19 @@ namespace {
 
     const double u = 1. + rho * d;
 
+    using namespace NPerigeeParameterIndices;
     if (lineConstrained) {
-      invV(iCurv, iCurv) = 1.;
-      invV(iCurv, iPhi0) = 0.;
-      invV(iCurv, iI) = 0.;
-      invV(iPhi0, iCurv) = 0.;
-      invV(iI, iCurv) = 0.;
+      perigeePrecision(c_Curv, c_Curv) = 0.;
+      perigeePrecision(c_Curv, c_Phi0) = 0.;
+      perigeePrecision(c_Curv, c_I) = 0.;
+      perigeePrecision(c_Phi0, c_Curv) = 0.;
+      perigeePrecision(c_I, c_Curv) = 0.;
 
-      invV(iPhi0, iPhi0) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
-      invV(iPhi0, iI) = -(cosphi * s(iX) + sinphi * s(iY));
-      invV(iI, iPhi0) = invV(iPhi0, iI);
-      invV(iI, iI) = s(iW);
+      perigeePrecision(c_Phi0, c_Phi0) = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
+      perigeePrecision(c_Phi0, c_I) = -(cosphi * s(iX) + sinphi * s(iY));
+      perigeePrecision(c_I, c_Phi0) = perigeePrecision(c_Phi0, c_I);
+      perigeePrecision(c_I, c_I) = s(iW);
 
-      Matrix<double, 3, 3> V = invV.inverse();
-      V(iCurv, iCurv) = 0.;
-      return V;
     } else {
       double sa = sinphi * s(iX) - cosphi * s(iY);
       double sb = cosphi * s(iX) + sinphi * s(iY);
@@ -198,19 +194,18 @@ namespace {
       double se = cosphi * s(iX, iR2) + sinphi * s(iY, iR2);
       double sbb = ccphi * s(iX, iX) + 2. * scphi * s(iX, iY) + ssphi * s(iY, iY);
 
-      invV(iCurv, iCurv) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
-      invV(iCurv, iPhi0) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
-      invV(iPhi0, iCurv) = invV(iCurv, iPhi0);
-      invV(iPhi0, iPhi0) = u * u * sbb;
+      perigeePrecision(c_Curv, c_Curv) = 0.25 * s(iR2, iR2) - d * (sd - d * (saa + 0.5 * s(iR2) - d * (sa - 0.25 * d * s(iW))));
+      perigeePrecision(c_Curv, c_Phi0) = - u * (0.5 * se - d * (sc - 0.5 * d * sb));
+      perigeePrecision(c_Phi0, c_Curv) = perigeePrecision(c_Curv, c_Phi0);
+      perigeePrecision(c_Phi0, c_Phi0) = u * u * sbb;
 
-      invV(iCurv, iI) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
-      invV(iI, iCurv) = invV(iCurv, iI);
-      invV(iPhi0, iI) = u * (rho * sc - u * sb);
-      invV(iI, iPhi0) = invV(iPhi0, iI);
-      invV(iI, iI) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
-      return invV.inverse();
+      perigeePrecision(c_Curv, c_I) = rho * (-0.5 * sd + d * saa) + 0.5 * u * s(iR2) - 0.5 * d * ((2 * u + rho * d) * sa - u * d * s(iW));
+      perigeePrecision(c_I, c_Curv) = perigeePrecision(c_Curv, c_I);
+      perigeePrecision(c_Phi0, c_I) = u * (rho * sc - u * sb);
+      perigeePrecision(c_I, c_Phi0) = perigeePrecision(c_Phi0, c_I);
+      perigeePrecision(c_I, c_I) = rho * (rho * saa - 2 * u * sa) + u * u * s(iW);
     }
-
+    return perigeePrecision;
   }
 
 
@@ -240,24 +235,16 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   }
 
   // Parameters to be fitted
-  UncertainPerigeeCircle resultCircle;
-  double chi2;
-  Matrix< double, 3, 3> cov3;
+  UncertainPerigeeCircle resultCircle = fitKarimaki(sNoL(iW), meansNoL, cNoL, isLineConstrained());
+  double chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);
 
-  resultCircle = fitKarimaki(sNoL(iW), meansNoL, cNoL, isLineConstrained());
-  chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);
-  cov3 = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
+  PerigeePrecision perigeePrecision = calcPrecisionKarimaki(resultCircle, sNoL, isLineConstrained());
+
+  // Use in pivotingin caset the matrix is not full rank as is for the constrained cases-
+  PerigeeCovariance perigeeCovariance = perigeePrecision.colPivHouseholderQr().inverse();
 
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
-
-  PerigeeCovariance perigeeCovariance;
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      perigeeCovariance(i, j) = cov3(i, j);
-    }
-  }
-
   resultCircle.setPerigeeCovariance(perigeeCovariance);
   return resultCircle;
 }

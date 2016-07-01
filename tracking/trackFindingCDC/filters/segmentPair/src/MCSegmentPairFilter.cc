@@ -49,11 +49,13 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
     if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 1) return NAN;
 
     // Do fits
-    CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
-    if (pairFBInfo == EForwardBackward::c_Backward) {
-      mcTrajectory3D.reverse();
+    if (not segmentPair.getTrajectory3D().isFitted()) {
+      CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
+      if (pairFBInfo == EForwardBackward::c_Backward) {
+        mcTrajectory3D.reverse();
+      }
+      segmentPair.setTrajectory3D(mcTrajectory3D);
     }
-    segmentPair.setTrajectory3D(mcTrajectory3D);
 
     return pairFBInfo * static_cast<Weight>(startSegment.size() + endSegment.size());
   }

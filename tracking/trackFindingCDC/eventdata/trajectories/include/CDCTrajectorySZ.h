@@ -110,7 +110,7 @@ namespace Belle2 {
 
       /// Indicates if the line has been fitted
       bool isFitted() const
-      { return m_szLine.isInvalid(); }
+      { return not m_szLine.isInvalid(); }
 
       /// Clears all information from this trajectory line
       void clear()

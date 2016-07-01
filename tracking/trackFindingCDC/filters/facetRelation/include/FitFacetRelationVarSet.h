@@ -49,6 +49,18 @@ namespace Belle2 {
       "fit_phi0",
       "fit_cos_delta",
 
+      "phi0_from_sigma",
+      "phi0_to_sigma",
+
+      "phi0_ref_pull",
+      "phi0_ref_diff",
+      "phi0_ref_sigma",
+
+      "chi2_comb",
+      "phi0_comb_pull",
+      "phi0_comb_diff",
+      "phi0_comb_sigma",
+
       "chi2_kari_unit",
       "abs_curv_unit",
 

@@ -74,7 +74,6 @@ namespace Belle2 {
     {
 
       char name[80] = "";
-      m_DoOverlapCheck = content.getBool("DoOverlapCheck");
       m_DoBeamBackgroundStudy = content.getBool("BeamBackgroundStudy");
       m_Rotation = content.getAngle("Rotation");
       m_OffsetZ = content.getLength("OffsetZ");
@@ -242,7 +241,6 @@ namespace Belle2 {
     void GeometryPar::readFromDB(const BKLMGeometryPar& element)
     {
 
-      m_DoOverlapCheck = element.doOverlapCheck();
       m_DoBeamBackgroundStudy = element.doBeamBackgroundStudy();
       m_Rotation = element.getRotation();
       m_OffsetZ = element.getOffsetZ();

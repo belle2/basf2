@@ -44,9 +44,6 @@ namespace Belle2 {
       //! Static method to initialize and then get a reference to the singleton GeometryPar instance from database
       static GeometryPar* instance(const BKLMGeometryPar&);
 
-      //! Get the overlap-check flag for the geometry builder
-      bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
-
       //! Get the beam background study flag
       bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
 
@@ -379,9 +376,6 @@ namespace Belle2 {
 
       //! Calculate additional geometry parameters
       void calculate();
-
-      //! Flag for enabling overlap-check during geometry construction
-      bool m_DoOverlapCheck;
 
       //! Flag for enabling beam background study (=use bkg sensitive-detector function too)
       bool m_DoBeamBackgroundStudy;

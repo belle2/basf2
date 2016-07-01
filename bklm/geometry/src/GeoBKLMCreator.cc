@@ -134,7 +134,7 @@ namespace Belle2 {
                         &motherLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
 
     }
@@ -162,7 +162,7 @@ namespace Belle2 {
                         envelopeLogical,
                         false,
                         BKLM_FORWARD,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       G4LogicalVolume* backLogical =
         new G4LogicalVolume(endSolid,
@@ -177,7 +177,7 @@ namespace Belle2 {
                         envelopeLogical,
                         false,
                         BKLM_BACKWARD,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
 
     }
@@ -215,7 +215,7 @@ namespace Belle2 {
                           endLogical,
                           false,
                           sector,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
     }
@@ -266,7 +266,7 @@ namespace Belle2 {
                           m_CapLogical[newLvol],
                           false,
                           1,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
         new G4PVPlacement(G4Translate3D(0.5 * (ri + ro), +(0.5 * dyBrace + dy), 0.0),
                           cablesLogical,
@@ -274,7 +274,7 @@ namespace Belle2 {
                           m_CapLogical[newLvol],
                           false,
                           2,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
       new G4PVPlacement(G4TranslateZ3D(m_SectorDz - dz),
@@ -283,7 +283,7 @@ namespace Belle2 {
                         sectorLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -325,7 +325,7 @@ namespace Belle2 {
                         sectorLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -372,7 +372,7 @@ namespace Belle2 {
                         innerIronLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -403,7 +403,7 @@ namespace Belle2 {
                         innerAirLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -500,7 +500,7 @@ namespace Belle2 {
                           innerAirLogical,
                           false,
                           bracket,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
     }
@@ -549,7 +549,7 @@ namespace Belle2 {
                           sectorLogical,
                           false,
                           layer,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
 
       }
@@ -586,7 +586,7 @@ namespace Belle2 {
                         layerIronLogical,
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       sprintf(name, "BKLM.Layer%02dRightGapChimneyPhysical", layer);
       new G4PVPlacement(G4Translate3D(dx, +dy, dz),
@@ -595,7 +595,7 @@ namespace Belle2 {
                         layerIronLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       // Fill chimney with air
       sprintf(name, "BKLM.Layer%02dChimneyBox", layer);
@@ -633,7 +633,7 @@ namespace Belle2 {
                         chimneyLogical,
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       G4Tubs* shieldTube =
         new G4Tubs("BKLM.ChimneyShieldTube",
@@ -655,7 +655,7 @@ namespace Belle2 {
                         chimneyLogical,
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       G4Tubs* pipeTube =
         new G4Tubs("BKLM.ChimneyPipeTube",
@@ -679,7 +679,7 @@ namespace Belle2 {
                         chimneyLogical,
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       sprintf(name, "BKLM.Layer%02dChimneyPhysical", layer);
       new G4PVPlacement(G4Translate3D(chimneyPosition),
@@ -688,7 +688,7 @@ namespace Belle2 {
                         layerIronLogical,
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -745,7 +745,7 @@ namespace Belle2 {
                           m_LayerModuleLogical[newLvol],
                           false,
                           0,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
         sprintf(name, "BKLM.Layer%02d%sGapSolid", layer, (hasChimney ? "Chimney" : ""));
         m_LayerGapSolid[newLvol] =
@@ -771,7 +771,7 @@ namespace Belle2 {
                         m_LayerGapLogical[newLvolFlip],
                         false,
                         0,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       dz = gapHalfSize.z() - 0.5 * m_GeoPar->getGapLength() * CLHEP::cm;
       new G4PVPlacement(G4Translate3D(m_GeoPar->getGapMiddleRadius(layer) * CLHEP::cm, 0.0, dz),
@@ -780,7 +780,7 @@ namespace Belle2 {
                         layerIronLogical,
                         false,
                         layer,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -824,7 +824,7 @@ namespace Belle2 {
                         electrodeLogical,
                         false,
                         BKLM_INNER,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
 
       new G4PVPlacement(G4TranslateX3D(+0.5 * electrodeHalfSize.x()),
@@ -833,7 +833,7 @@ namespace Belle2 {
                         electrodeLogical,
                         false,
                         BKLM_OUTER,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         electrodeLogical,
@@ -841,7 +841,7 @@ namespace Belle2 {
                         interiorLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -890,7 +890,7 @@ namespace Belle2 {
                           innerEnvelopeLogical,
                           false,
                           scint,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
       G4LogicalVolume* outerEnvelopeLogical =
@@ -911,7 +911,7 @@ namespace Belle2 {
                           outerEnvelopeLogical,
                           false,
                           scint,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
       CLHEP::Hep3Vector envelopeOffset = m_GeoPar->getScintEnvelopeOffset(layer, hasChimney) * CLHEP::cm +
@@ -922,7 +922,7 @@ namespace Belle2 {
                         airLogical,
                         false,
                         BKLM_INNER,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4Translate3D(+envelopeHalfSize.x(), envelopeOffset.y() * envelopeOffsetSign, envelopeOffset.z()),
                         outerEnvelopeLogical,
@@ -930,7 +930,7 @@ namespace Belle2 {
                         airLogical,
                         false,
                         BKLM_OUTER,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
 
       // Place readout carriers and preamplifiers along module perimeter
@@ -955,7 +955,7 @@ namespace Belle2 {
                           airLogical,
                           false,
                           station,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
 
@@ -966,7 +966,7 @@ namespace Belle2 {
                         interiorLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
     }
 
@@ -1019,7 +1019,7 @@ namespace Belle2 {
                         scintBoreLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         scintBoreLogical,
@@ -1027,7 +1027,7 @@ namespace Belle2 {
                         activeLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4TranslateZ3D(-dzMPPC),
                         activeLogical,
@@ -1035,7 +1035,7 @@ namespace Belle2 {
                         scintLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4TranslateZ3D(0.0),
                         getMPPCHousingLogical(),
@@ -1043,7 +1043,7 @@ namespace Belle2 {
                         scintAirLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       new G4PVPlacement(G4TranslateZ3D(dz),
                         scintAirLogical,
@@ -1051,7 +1051,7 @@ namespace Belle2 {
                         scintLogical,
                         false,
                         1,
-                        m_GeoPar->doOverlapCheck()
+                        false
                        );
       return scintLogical;
     }
@@ -1095,7 +1095,7 @@ namespace Belle2 {
                           m_MPPCHousingLogical,
                           false,
                           1,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
       }
       return m_MPPCHousingLogical;
@@ -1159,7 +1159,7 @@ namespace Belle2 {
                           m_ReadoutContainerLogical,
                           false,
                           1,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
         new G4PVPlacement(G4Translate3D(0.0, m_GeoPar->getReadoutConnectorsPosition(), -carrierHalfSize.z()),
                           connectorsLogical,
@@ -1167,7 +1167,7 @@ namespace Belle2 {
                           m_ReadoutContainerLogical,
                           false,
                           1,
-                          m_GeoPar->doOverlapCheck()
+                          false
                          );
         for (int preamp = 1; preamp <= m_GeoPar->getNReadoutPreamplifierPosition(); ++preamp) {
           new G4PVPlacement(G4Translate3D(0.0,
@@ -1178,7 +1178,7 @@ namespace Belle2 {
                             m_ReadoutContainerLogical,
                             false,
                             1,
-                            m_GeoPar->doOverlapCheck()
+                            false
                            );
         }
       }

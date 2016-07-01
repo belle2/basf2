@@ -61,12 +61,6 @@ namespace Belle2 {
     //! Set BKLM geometry version
     void setVersion(int version) { m_version = version; }
 
-    //! Get the overlap-check flag for the geometry builder
-    bool doOverlapCheck(void) const { return m_DoOverlapCheck; }
-
-    //! Set the overlap-check flag for the geometry builder
-    void doOverlapCheck(bool flag) { m_DoOverlapCheck = flag; }
-
     //! Get the beam background study flag
     bool doBeamBackgroundStudy(void) const { return m_DoBeamBackgroundStudy; }
 
@@ -617,9 +611,6 @@ namespace Belle2 {
     //! Geometry version
     int m_version;
 
-    //! Flag for enabling overlap-check during geometry construction
-    bool m_DoOverlapCheck;
-
     //! Flag for enabling beam background study (=alternate sensitive-detector function)
     bool m_DoBeamBackgroundStudy;
 
@@ -924,7 +915,7 @@ namespace Belle2 {
     //! Optional comment
     std::string m_comment;
 
-    ClassDef(BKLMGeometryPar, 4);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

@@ -31,7 +31,6 @@ void BKLMGeometryPar::read(const GearDir& content)
 {
 
   char name[80] = "";
-  m_DoOverlapCheck = content.getBool("DoOverlapCheck");
   m_DoBeamBackgroundStudy = content.getBool("BeamBackgroundStudy");
   m_Rotation = content.getAngle("Rotation");
   m_OffsetZ = content.getLength("OffsetZ");

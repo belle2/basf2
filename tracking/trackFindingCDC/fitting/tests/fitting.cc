@@ -219,6 +219,6 @@ TEST(TrackFindingCDCTest, fitting_CDCSZFitter)
 
   const UncertainSZLine& fittedSZLine = trajectorySZ.getSZLine();
 
-  EXPECT_EQ(0.0, fittedSZLine.slope());
-  EXPECT_EQ(1.0, fittedSZLine.intercept());
+  EXPECT_NEAR(0.0, fittedSZLine.slope(), 10e-10);
+  EXPECT_NEAR(1.0, fittedSZLine.intercept(), 10e-10);
 }

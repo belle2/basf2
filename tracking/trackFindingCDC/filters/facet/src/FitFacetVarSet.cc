@@ -40,6 +40,7 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("chi2_0")>() = chi2_0;
     var<named("chi2_0_per_s")>() = chi2_0 / s;
     var<named("fit_0_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_0_phi0_sigma")>() = std::sqrt(fitLine.variance(ELineParameter::c_Phi0));
   }
 
   {
@@ -51,6 +52,7 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("chi2_1")>() = chi2_1;
     var<named("chi2_1_per_s")>() = chi2_1 / s;
     var<named("fit_1_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_1_phi0_sigma")>() = std::sqrt(fitLine.variance(ELineParameter::c_Phi0));
   }
 
   {
@@ -68,6 +70,7 @@ bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
     var<named("erf")>() = std::erf(chi2 / erfWidth);
     var<named("tanh")>() = std::tanh(chi2 / tanhWidth);
     var<named("fit_phi0")>() = fitLine->tangential().phi();
+    var<named("fit_phi0_sigma")>() = std::sqrt(fitLine.variance(ELineParameter::c_Phi0));
 
     const CDCRLWireHit& startRLWireHit = facet.getStartRLWireHit();
     const CDCRLWireHit& middleRLWireHit = facet.getMiddleRLWireHit();

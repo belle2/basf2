@@ -35,6 +35,13 @@ namespace Belle2 {
         return angle;
       }
 
+      /// Normalise an angle inplace to lie in the range from [-pi, pi]
+      static void normalise(double& angle)
+      {
+        if (angle > M_PI) angle -= 2 * M_PI;
+        if (angle < -M_PI) angle += 2 * M_PI;
+      }
+
       /// Normalise an angle to lie in the range from [-pi, pi]
       static double fullNormalised(const double angle)
       {

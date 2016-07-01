@@ -7,11 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCFitter2D.h>
-
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/fitting/RiemannsMethod.h>
@@ -19,7 +19,6 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
 
 #include <gtest/gtest.h>
 
@@ -206,3 +205,20 @@ TEST(TrackFindingCDCTest, fitting_CDCRiemannFitter_LineFit_WithDriftLength)
   testLineFitter(fitter);
 }
 
+TEST(TrackFindingCDCTest, fitting_CDCSZFitter)
+{
+  CDCSZFitter fitter;
+
+  CDCObservations2D observations2D;
+  observations2D.fill(Vector2D(0, 0), 0);
+  observations2D.fill(Vector2D(5, 3), 0);
+  observations2D.fill(Vector2D(10, 0), 0);
+
+  CDCTrajectorySZ trajectorySZ;
+  fitter.update(trajectorySZ, observations2D);
+
+  const UncertainSZLine& fittedSZLine = trajectorySZ.getSZLine();
+
+  EXPECT_EQ(0.0, fittedSZLine.slope());
+  EXPECT_EQ(1.0, fittedSZLine.intercept());
+}

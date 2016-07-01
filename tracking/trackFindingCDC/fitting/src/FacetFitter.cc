@@ -128,24 +128,17 @@ namespace {
     }
     chi2 *= w.sum();
 
-    LineCovariance lineCovariance;
-    {
-      double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
-      double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
-      double divisor = 1 / ((1 + varArcLength) * w.sum());
-      using namespace NLineParameterIndices;
-      lineCovariance(c_Phi0, c_Phi0) = divisor * 1;
-      lineCovariance(c_Phi0, c_I)    = -divisor * meanArcLength;
-      lineCovariance(c_I, c_Phi0)    = lineCovariance(c_Phi0, c_I);
-      lineCovariance(c_I, c_I)       = divisor * varArcLength;
-    }
+    double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
+    double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
+    double p = w.sum();
 
-    // Matrix<double, 2, 2> invLineCovariance;
-    // invLineCovariance(0, 0) = 1;
-    // invLineCovariance(0, 1) = meanArcLength;
-    // invLineCovariance(1, 0) = meanArcLength;
-    // invLineCovariance(1, 1) = varArcLength + meanArcLength * meanArcLength;
-    // LineCovariance lineCovariance(invLineCovariance.inverse());
+    using namespace NLineParameterIndices;
+    LinePrecision linePrecision;
+    linePrecision(c_Phi0, c_Phi0) = p * (varArcLength + meanArcLength * meanArcLength);
+    linePrecision(c_Phi0, c_I) = p * meanArcLength;
+    linePrecision(c_I, c_Phi0) = p * meanArcLength;
+    linePrecision(c_I, c_I) = p;
+    LineCovariance lineCovariance = linePrecision.inverse();
 
     Vector2D tangential(phiVec(0), phiVec(1));
     Vector2D n12 = tangential.orthogonal(ERotation::c_Clockwise);

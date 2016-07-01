@@ -162,6 +162,15 @@ namespace Belle2 {
         return SZUtil::transported(jacobian, szCovariance());
       }
 
+      /// Debug helper
+      friend std::ostream& operator<<(std::ostream& output, const UncertainSZLine& szLine)
+      {
+        return output <<
+               "SZLine(" <<
+               "tanL=" << szLine.slope() << "," <<
+               "z0=" << szLine.intercept() << ")" ;
+      }
+
 
     private:
       /// Memory for the 2x2 covariance matrix of sz slope (aka tan lambda) and z0.

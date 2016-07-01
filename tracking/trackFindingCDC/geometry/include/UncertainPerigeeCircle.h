@@ -9,13 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeCovariance.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
+#include <cmath>
 
 namespace Belle2 {
 
@@ -28,11 +26,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      UncertainPerigeeCircle() :
-        PerigeeCircle(),
-        m_perigeeCovariance(),
-        m_chi2(0.0),
-        m_ndf(0)
+      UncertainPerigeeCircle()
       {}
 
       /**
@@ -45,14 +39,12 @@ namespace Belle2 {
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0) :
-        PerigeeCircle(curvature, tangentialPhi, impact),
-        m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                             const size_t& ndf = 0)
+        : PerigeeCircle(curvature, tangentialPhi, impact),
+          m_perigeeCovariance(perigeeCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
-
-
 
       /**
        *  Composes an uncertain perigee circle from the perigee parameters
@@ -64,48 +56,45 @@ namespace Belle2 {
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0) :
-        PerigeeCircle(curvature, tangential, impact),
-        m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                             const size_t& ndf = 0)
+        : PerigeeCircle(curvature, tangential, impact),
+          m_perigeeCovariance(perigeeCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
-
-
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero.
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0) :
-        PerigeeCircle(perigeeCircle),
-        m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                             const size_t& ndf = 0)
+        : PerigeeCircle(perigeeCircle),
+          m_perigeeCovariance(perigeeCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
-
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero.
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0) :
-        PerigeeCircle(generalizedCircle),
-        m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                             const size_t& ndf = 0)
+        : PerigeeCircle(generalizedCircle),
+          m_perigeeCovariance(perigeeCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
 
       /// Constructor taking all stored parameters as a TVectorD. Depricated.
       explicit
-      UncertainPerigeeCircle(const TVectorD& parameters,
+      UncertainPerigeeCircle(const PerigeeParameters& parameters,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0) :
-        PerigeeCircle(parameters),
-        m_perigeeCovariance(perigeeCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                             const size_t& ndf = 0)
+        : PerigeeCircle(parameters),
+          m_perigeeCovariance(perigeeCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
 
 
@@ -148,7 +137,7 @@ namespace Belle2 {
       inline void invalidate()
       {
         PerigeeCircle::invalidate();
-        m_perigeeCovariance.invalidate();
+        m_perigeeCovariance = PerigeeUtil::identity();
         m_chi2 = 0.0;
       }
 
@@ -157,14 +146,14 @@ namespace Belle2 {
       inline void reverse()
       {
         PerigeeCircle::reverse();
-        m_perigeeCovariance.reverse();
+        PerigeeUtil::reverse(m_perigeeCovariance);
       }
 
       /// Returns a copy of the circle with opposite orientation.
       inline UncertainPerigeeCircle reversed() const
       {
         return UncertainPerigeeCircle(PerigeeCircle::reversed(),
-                                      perigeeCovariance().reversed(),
+                                      PerigeeUtil::reversed(perigeeCovariance()),
                                       chi2(),
                                       ndf());
       }
@@ -178,8 +167,8 @@ namespace Belle2 {
       void passiveMoveBy(const Vector2D& by)
       {
         // Move the covariance matrix first to have access to the original parameters
-        TMatrixD jacobian = passiveMoveByJacobian(by);
-        m_perigeeCovariance.similarityTransform(jacobian);
+        PerigeeJacobian jacobian = passiveMoveByJacobian(by);
+        PerigeeUtil::transport(jacobian, m_perigeeCovariance);
         PerigeeCircle::passiveMoveBy(by);
       }
 
@@ -189,10 +178,9 @@ namespace Belle2 {
        */
       PerigeeCovariance passiveMovedCovarianceBy(const Vector2D& by) const
       {
-        TMatrixD jacobian = passiveMoveByJacobian(by);
-        return PerigeeCovariance(perigeeCovariance().similarityTransformed(jacobian));
+        PerigeeJacobian jacobian = passiveMoveByJacobian(by);
+        return PerigeeUtil::transported(jacobian, perigeeCovariance());
       }
-
 
     public:
       /// Debug helper
@@ -209,13 +197,13 @@ namespace Belle2 {
 
     private:
       /// Memory for the 3x3 covariance matrix of the perigee parameters.
-      PerigeeCovariance m_perigeeCovariance;
+      PerigeeCovariance m_perigeeCovariance = PerigeeUtil::identity();
 
       /// Memory for the chi square value of the fit of this circle.
-      double m_chi2;
+      double m_chi2 = 0.0;
 
       /// Memory for the number of degrees of freedim of the fit of this circle.
-      size_t m_ndf;
+      size_t m_ndf = 0.0;
 
     }; //class
 

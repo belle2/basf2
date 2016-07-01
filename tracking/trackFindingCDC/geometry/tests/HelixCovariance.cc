@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/geometry/HelixCovariance.h>
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 
 #include <gtest/gtest.h>
 
@@ -18,39 +18,27 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-TEST(TrackFindingCDCTest, geometry_HelixCovariance_perigeeCovariance)
-{
-  HelixCovariance helixCovariance;
-  PerigeeCovariance perigeeCovariance = helixCovariance.perigeeCovariance();
-
-  EXPECT_EQ(3, perigeeCovariance.matrix().GetNrows());
-  EXPECT_EQ(3, perigeeCovariance.matrix().GetNcols());
-
-}
-
-
-
 TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
 {
-  PerigeeCovariance perigeeCovariance;
+  PerigeeCovariance perigeeCovariance = PerigeeCovariance::Zero();
   {
-    using namespace NPerigeeParameter;
+    using namespace NPerigeeParameterIndices;
     perigeeCovariance(c_Curv, c_Curv) = 1;
     perigeeCovariance(c_Curv, c_I) = 1;
     perigeeCovariance(c_I, c_Curv) = 1;
     perigeeCovariance(c_I, c_I) = 1;
   }
 
-  SZCovariance szCovariance;
+  SZCovariance szCovariance = SZCovariance::Zero();
   {
-    using namespace NHelixParameter;
+    using namespace NSZParameterIndices;
     szCovariance(c_TanL, c_TanL) = 1;
     szCovariance(c_Z0, c_Z0) = 1;
   }
 
-  HelixCovariance helixCovariance(perigeeCovariance, szCovariance);
+  HelixCovariance helixCovariance = HelixUtil::stackBlocks(perigeeCovariance, szCovariance);
   {
-    using namespace NHelixParameter;
+    using namespace NHelixParameterIndices;
     EXPECT_EQ(1, helixCovariance(c_Curv, c_Curv));
     EXPECT_EQ(1, helixCovariance(c_I, c_I));
     EXPECT_EQ(1, helixCovariance(c_Curv, c_I));

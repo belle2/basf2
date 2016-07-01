@@ -24,7 +24,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
   UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
 
-  TMatrixD moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
+  PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 1), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 2), 10e-7);
@@ -43,7 +43,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
   UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
 
-  TMatrixD moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(-1.0, 0.0));
+  PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(-1.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 1), 10e-7);
   EXPECT_NEAR(0.0, moveByOneJacobian(0, 2), 10e-7);
@@ -56,7 +56,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   EXPECT_NEAR(0.0, moveByOneJacobian(2, 1), 10e-7);
   EXPECT_NEAR(1.0, moveByOneJacobian(2, 2), 10e-7);
 
-  TMatrixD moveByTwoYJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, -2.0));
+  PerigeeJacobian moveByTwoYJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, -2.0));
 
   // Hand caluclated intermediate quantities;
   double deltaParallel = 2;
@@ -89,7 +89,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 {
-  TMatrixDSym perigeeVariance(3);
+  PerigeeCovariance perigeeVariance;
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.0;
   perigeeVariance(0, 2) = 0.0;
@@ -105,10 +105,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0.0, PerigeeCovariance(perigeeVariance));
 
   {
-    TMatrixDSym noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
-
-    EXPECT_EQ(3, noMoveVariance.GetNrows());
-    EXPECT_EQ(3, noMoveVariance.GetNcols());
+    PerigeeCovariance noMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(0.0, 0.0));
 
     EXPECT_NEAR(1.0, noMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noMoveVariance(0, 1), 10e-7);
@@ -124,10 +121,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
   }
 
   {
-    TMatrixDSym noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
-
-    EXPECT_EQ(3, noChangeMoveVariance.GetNrows());
-    EXPECT_EQ(3, noChangeMoveVariance.GetNcols());
+    PerigeeCovariance noChangeMoveVariance = circle.passiveMovedCovarianceBy(Vector2D(-1.0, 0.0));
 
     EXPECT_NEAR(1.0, noChangeMoveVariance(0, 0), 10e-7);
     EXPECT_NEAR(0.0, noChangeMoveVariance(0, 1), 10e-7);
@@ -144,10 +138,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 
 
   {
-    TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
-
-    EXPECT_EQ(3, transformedVariance.GetNrows());
-    EXPECT_EQ(3, transformedVariance.GetNcols());
+    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
 
     EXPECT_NEAR(1.0, transformedVariance(0, 0), 10e-7);
 
@@ -168,10 +159,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 
   {
     // Should be same as before
-    TMatrixDSym transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
-
-    EXPECT_EQ(3, transformedVariance.GetNrows());
-    EXPECT_EQ(3, transformedVariance.GetNcols());
+    PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.5, 0.0));
 
     EXPECT_NEAR(1, transformedVariance(0, 0), 10e-7);
 
@@ -197,7 +185,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
 {
 
-  TMatrixDSym perigeeVariance(3);
+  PerigeeCovariance perigeeVariance;
   perigeeVariance(0, 0) = 1.0;
   perigeeVariance(0, 1) = 0.3;
   perigeeVariance(0, 2) = 0.5;
@@ -223,7 +211,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
 
   //circle.perigeeCovariance().Print();
 
-  TMatrixDSym twiceMovedVariance  = circle.perigeeCovariance();
+  PerigeeCovariance twiceMovedVariance  = circle.perigeeCovariance();
 
   EXPECT_NEAR(perigeeVariance(0, 0), twiceMovedVariance(0, 0), 10e-7);
   EXPECT_NEAR(perigeeVariance(0, 1), twiceMovedVariance(0, 1), 10e-7);

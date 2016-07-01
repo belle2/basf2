@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/KarimakisMethod.h>
 
-#include <TMatrixDSym.h>
 #include <Eigen/Dense>
 
 using namespace std;
@@ -243,24 +242,22 @@ UncertainPerigeeCircle KarimakisMethod::fitInternal(CDCObservations2D& observati
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   double chi2;
-  Matrix< double, 3, 3> perigeeCovariance;
+  Matrix< double, 3, 3> cov3;
 
   resultCircle = fitKarimaki(sNoL(iW), meansNoL, cNoL, isLineConstrained());
   chi2 = calcChi2Karimaki(resultCircle, sNoL(iW), cNoL);
-  perigeeCovariance = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
-
-
+  cov3 = calcCovarianceKarimaki(resultCircle, sNoL, isLineConstrained());
 
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
 
-  TMatrixDSym tPerigeeCovariance(3);
+  PerigeeCovariance perigeeCovariance;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
+      perigeeCovariance(i, j) = cov3(i, j);
     }
   }
 
-  resultCircle.setPerigeeCovariance(PerigeeCovariance(tPerigeeCovariance));
+  resultCircle.setPerigeeCovariance(perigeeCovariance);
   return resultCircle;
 }

@@ -43,7 +43,7 @@ namespace {
 
     SZCovariance szCovariance;
 
-    using namespace NHelixParameter;
+    using namespace NSZParameterIndices;
     szCovariance(c_TanL, c_TanL) = invSumMatrixWS(1, 1);
     szCovariance(c_Z0, c_TanL) = invSumMatrixWS(0, 1); // Should be symmetric.
     szCovariance(c_TanL, c_Z0) = invSumMatrixWS(1, 0); // Should be symmetric.
@@ -101,7 +101,7 @@ namespace {
 
     SZCovariance szCovariance;
 
-    using namespace NHelixParameter;
+    using namespace NSZParameterIndices;
     szCovariance(c_TanL, c_TanL) = covInterceptSlope(1, 1);
     szCovariance(c_Z0, c_TanL) = covInterceptSlope(0, 1); // Should be symmetric.
     szCovariance(c_TanL, c_Z0) = covInterceptSlope(1, 0); // Should be symmetric.

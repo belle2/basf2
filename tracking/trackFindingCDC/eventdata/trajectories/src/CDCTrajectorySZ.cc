@@ -21,7 +21,7 @@ CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
 {
   // Dummy error estimates
   SZCovariance szCovariance;
-  using namespace NHelixParameter;
+  using namespace NSZParameterIndices;
   szCovariance(c_TanL, c_TanL) = 2.0; // Error in pz double the error in pt, good estimate?
   szCovariance(c_Z0, c_TanL) = 0.0;
   szCovariance(c_TanL, c_Z0) = 0.0;
@@ -33,7 +33,5 @@ CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
   UncertainSZLine uncertainSZLine(tanLambda, z0, szCovariance);
 
   CDCTrajectorySZ trajectorySZ(uncertainSZLine);
-
-
   return trajectorySZ;
 }

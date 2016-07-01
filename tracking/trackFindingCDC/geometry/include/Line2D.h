@@ -16,33 +16,35 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A two dimensional normal line
-    /** This class represents a line in two dimensional space by its normal definition\n
-     *  n0 + n1*x + n2*y = 0 subjected to n1*n1 + n2*n2 = 1 \n
+    /**
+     *  A two dimensional normal line
+     *
+     *  This class represents a line in two dimensional space by its normal definition
+     *  n0 + n1*x + n2*y = 0 subjected to n1*n1 + n2*n2 = 1.
      *  The vector (n1, n2) is called unit normal vector.
-     *  It has an orientation. It is defining a right half plane with all points having \n
-     *  n0 + n1*x + n2*y > 0 and a left half plane for point having n0 + n1*x + n2*y < 0 \n
-     *  This naturally corresponds to a direction of positiv advance being the tangential \n
-     *  to the line (-n2 ,n1) \n
-     *  This line is best suited for linear least square fits. */
+     *  It has an orientation. It is defining a right half plane with all points having
+     *  n0 + n1*x + n2*y > 0 and a left half plane for point having n0 + n1*x + n2*y < 0
+     *  This naturally corresponds to a direction of positiv advance being the tangential
+     *  to the line (-n2, n1).
+     *  This line is best suited for linear least square fits.
+     */
     class Line2D  {
 
     public:
-
-
       /// Default constructor for ROOT compatibility.
       Line2D(): m_n0(0.0), m_n12(0.0, 0.0) {}
 
-      ///Constructs taking all three line parameters
+      /// Constructs taking all three line parameters
       Line2D(const double n0, const double n1, const double n2):
         m_n0(n0), m_n12(n1, n2) { normalize(); }
 
-      ///Constructs taking the distance to the origin ( n0 ) and the normal vector
+      /// Constructs taking the distance to the origin ( n0 ) and the normal vector
       Line2D(const double n0, const Vector2D& n12):
         m_n0(n0), m_n12(n12) { normalize(); }
 
-      ///Constructs a line from its slope and intercept over the first coordinate (default forward orientation).
-      /** Constucts a line of the points fullfilling y = slope *x + intercept.
+      /**
+       *  Constructs a line from its slope and intercept over the first coordinate (default forward orientation).
+       *  Constucts a line of the points fullfilling y = slope *x + intercept.
        *  The Line2D has an additional orientation in contrast to y = slope *x + intercept.
        *  The default orientation for the line is forward with the positiv x axes.
        */
@@ -50,8 +52,9 @@ namespace Belle2 {
                                        const double intercept)
       { return Line2D(intercept, slope, -EForwardBackward::c_Forward); }
 
-      /// Constructs a line from its slope and intercept over the first coordinate with the given orientation.
-      /** Constucts a line of the points fullfilling y = slope *x + intercept.
+      /**
+       *  Constructs a line from its slope and intercept over the first coordinate with the given orientation.
+       *  Constucts a line of the points fullfilling y = slope *x + intercept.
        *  The Line2D has an additional orientation in contrast to y = slope *x + intercept.
        *  The forward backward info sets if the constructed line shall have the direction with increasing or \n
        *  decreasing x respectivly.
@@ -73,34 +76,40 @@ namespace Belle2 {
     public:
       /// Getter for the first line parameter
       double n0() const { return m_n0; }
+
       /// Getter for the second line parameter
       double n1() const { return m_n12.first(); }
+
       /// Getter for the third line parameter
       double n2() const { return m_n12.second(); }
+
       /// Getter for the unit normal vector to the line
       const Vector2D& n12() const { return m_n12; }
 
     public:
-      /// Setter for first line parameter
-      /** This sets the signed distance of the line to the origin.
-       *  Its not involved in the normalization hence it can be  \n
-       *  exported as a public function. */
+      /**
+       *  Setter for first line parameter
+       *  This sets the signed distance of the line to the origin.
+       *  Its not involved in the normalization hence it can be
+       *  exported as a public function.
+       */
       void setN0(const double n0) { m_n0 = n0; }
 
     private:
-      ///Setter for the second line parameter. May violate the normlization.
+      /// Setter for the second line parameter. May violate the normlization.
       void setN1(const double n1) { m_n12.setFirst(n1); }
-      ///Setter for the third line parameter. May violate the normlization.
+
+      /// Setter for the third line parameter. May violate the normlization.
       void setN2(const double n2) { m_n12.setSecond(n2); }
 
-      ///Setter for the normal vector by its coordinates.
+      /// Setter for the normal vector by its coordinates.
       void setN12(const double n1, const double n2) { m_n12.set(n1, n2);}
-      ///Setter for the normal vector.
+
+      /// Setter for the normal vector.
       void setN12(const Vector2D& n12) { m_n12.set(n12);  }
 
     public:
-      ///Setter for all line parameters. Normalizes correctly.
-      /** Setter the for the line parameters which takes care of the correct normalization of the normal vector. */
+      /// Setter the for the line parameters which takes care of the correct normalization of the normal vector.
       void setN(const double n0, const double n1, const double n2)
       { setN0(n0) ; setN12(n1, n2); normalize();}
 
@@ -108,17 +117,13 @@ namespace Belle2 {
       void invalidate()
       { setN(0.0, 0.0, 0.0); }
 
-      /// Setter for the intercept and slope.
-      /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
+      /// Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes.
       void setSlopeIntercept(const double slope, const double intercept)
       { setN0(intercept); setN1(slope); setN2(-1.0); normalize(); }
 
-
-      /// Setter for the intercept and slope with explicit orientation
-      /** Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes. */
+      /// Sets the new intercept and slope of the line the direction is set to be forward with the increasing x axes.
       void setSlopeIntercept(const double slope, const double intercept, const EForwardBackward orientation)
       { setN0(intercept * orientation); setN1(slope * orientation); setN2(-orientation); normalize(); }
-
 
       /// Updates the parameters to obey the normalization condition
       void normalize()
@@ -147,20 +152,26 @@ namespace Belle2 {
       { return sqrt(normalizationSquared()); }
 
     public:
-      /// Calculates the signed distance of the point to the line.
-      /** Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side. */
+      /**
+       *  Calculates the signed distance of the point to the line.
+       *  Returns the signed distance of the point to the line. The sign is positiv \n
+       *  for the right side of the line and negativ for the left side.
+       */
       double distance(const Vector2D& point) const
       { return n0() + point.dot(n12()); }
 
-      /// Calculates the signed distance of the point given by its to coordinates to the line.
-      /** Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side. */
+      /**
+       *  Calculates the signed distance of the point given by its to coordinates to the line.
+       *  Returns the signed distance of the point to the line. The sign is positiv \n
+       *  for the right side of the line and negativ for the left side.
+       */
       double distance(const double first, const double second) const
       { return n0() + first * n1() + second * n2(); }
 
-      /// Returns the distance to the origin
-      /** The distance to the origin is equivalent to the first line parameter*/
+      /**
+       *  Returns the distance to the origin
+       *  The distance to the origin is equivalent to the first line parameter
+       */
       double distanceToOrigin() const
       { return n0(); }
 
@@ -191,10 +202,13 @@ namespace Belle2 {
       /// Returns the point closest to the origin
       Vector2D closestToOrigin() const { return n12() * (-n0()); }
 
-      /// Calculates the length on the curve between two points
-      /** Takes to two point to their closest approach to the origin \n
-       *  and calculates the distance between them. The length is signed \n
-       *  take relativ to the direction of positiv advance. */
+      /**
+       *  Calculates the length on the curve between two points
+       *
+       *  Takes to two point to their closest approach to the origin
+       *  and calculates the distance between them. The length is signed
+       *  take relativ to the direction of positiv advance.
+       */
       double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
       { return to.unnormalizedOrthogonalComp(n12()) - from.unnormalizedOrthogonalComp(n12()); }
 
@@ -202,11 +216,6 @@ namespace Belle2 {
       /// Indicates if all circle parameters are zero
       inline bool isInvalid() const
       { return n0() == 0.0 and n12().isNull(); }
-
-
-      // Note : Maybe add the tangential ( Vector2D ) for homogenity to the circles
-
-
 
       /// Gives the tangential vector in the direction of positiv advance on the line
       Vector2D tangential() const { return normal().orthogonal(); }
@@ -216,7 +225,6 @@ namespace Belle2 {
 
       /// Getter for the gradient of the distance field
       const Vector2D& gradient() const { return n12(); }
-
 
       /// Getter for the support point of the line being the point closest to the origin
       Vector2D support() const { return closestToOrigin(); }
@@ -327,11 +335,12 @@ namespace Belle2 {
       Line2D inverted() const { return Line2D(-n0(), -n2(), -n1()); }
       /**@}*/
 
-
-
     private:
-      double m_n0; ///< Memory for the first line parameter
-      Vector2D  m_n12; ///< Memory for the second line parameter
+      /// Memory for the first line parameter
+      double m_n0;
+
+      /// Memory for the second line parameter
+      Vector2D  m_n12;
 
     }; //class
   } // namespace TrackFindingCDC

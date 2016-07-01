@@ -9,17 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
+#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
+
+#include <tracking/trackFindingCDC/geometry/HelixParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector3D.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 #include <TVectorD.h>
-
-
-#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -29,7 +27,6 @@ namespace Belle2 {
     class Helix  {
 
     public:
-
       /// Default constructor for ROOT compatibility.
       Helix() :
         m_circleXY(),
@@ -44,12 +41,10 @@ namespace Belle2 {
       {}
 
       /// Constructor taking all stored parameters for internal use.
-      explicit Helix(const TVectorD& parameters) :
-        m_circleXY(parameters(EHelixParameter::c_Curv),
-                   parameters(EHelixParameter::c_Phi0),
-                   parameters(EHelixParameter::c_I)),
-        m_lineSZ(Line2D::fromSlopeIntercept(parameters(EHelixParameter::c_TanL),
-                                            parameters(EHelixParameter::c_Z0)))
+      explicit Helix(const HelixParameters& parameters)
+        : m_circleXY(HelixUtil::getPerigeeParameters(parameters)),
+          m_lineSZ(Line2D::fromSlopeIntercept(parameters(EHelixParameter::c_TanL),
+                                              parameters(EHelixParameter::c_Z0)))
       {}
 
       /// Constructor from all helix parameter
@@ -137,9 +132,8 @@ namespace Belle2 {
         return byS;
       }
 
-
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      TMatrixD passiveMoveByJacobian(const Vector3D& by) const;
+      HelixJacobian passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
       void shiftTanLambdaZ0(const double tanLambdaShift, const double zShift)
@@ -238,10 +232,10 @@ namespace Belle2 {
       { return tangentialPhi(); }
 
       /// Getter for the five helix parameters in the order defined by EHelixParameter.h and EPerigeeParameter.h
-      TVectorD parameters() const
+      HelixParameters parameters() const
       {
-        using namespace NHelixParameter;
-        TVectorD result(c_Curv, c_Z0);
+        HelixParameters result;
+        using namespace NHelixParameterIndices;
         result(c_Curv) = curvatureXY();
         result(c_Phi0) = phi0();
         result(c_I) = impactXY();
@@ -276,7 +270,6 @@ namespace Belle2 {
 
       /// Memory of the of the linear relation between perpendicular travel distance and the z position.
       Line2D m_lineSZ;
-
 
     }; //class
 

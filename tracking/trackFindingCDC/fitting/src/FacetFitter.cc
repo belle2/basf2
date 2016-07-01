@@ -133,7 +133,7 @@ namespace {
       double meanArcLength = averages.topLeftCorner<1, 2>().matrix() * phiVec;
       double varArcLength = phiVec.transpose() * covariances.topLeftCorner<2, 2>() * phiVec;
       double divisor = 1 / ((1 + varArcLength) * w.sum());
-      using namespace NLineParameter;
+      using namespace NLineParameterIndices;
       lineCovariance(c_Phi0, c_Phi0) = divisor * 1;
       lineCovariance(c_Phi0, c_I)    = -divisor * meanArcLength;
       lineCovariance(c_I, c_Phi0)    = lineCovariance(c_Phi0, c_I);

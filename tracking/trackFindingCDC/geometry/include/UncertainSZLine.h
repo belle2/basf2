@@ -9,28 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/SZCovariance.h>
 
+#include <tracking/trackFindingCDC/geometry/SZParameters.h>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    ///A line in sz where s is the transverse travel distance as seen in the xy projection with uncertainties in the slope and intercept of the line.
+    /// A line in sz where s is the transverse travel distance as seen in the xy projection with uncertainties in the slope and intercept of the line.
     class UncertainSZLine : public Line2D {
 
     public:
       /// Default constructor for ROOT compatibility.
-      UncertainSZLine() :
-        Line2D(),
-        m_szCovariance(),
-        m_chi2(0.0),
-        m_ndf(0)
+      UncertainSZLine()
       {}
 
       /// Composes an uncertain sz line from the  perigee parameters and a 2x2 covariance matrix. Covariance matrix defaults to a zero matrix.
@@ -38,11 +31,11 @@ namespace Belle2 {
                       const double z0,
                       const SZCovariance& szCovariance = SZCovariance(),
                       const double chi2 = 0.0,
-                      const size_t ndf = 0) :
-        Line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
-        m_szCovariance(szCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                      const size_t ndf = 0)
+        : Line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
+          m_szCovariance(szCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
 
 
@@ -50,15 +43,12 @@ namespace Belle2 {
       UncertainSZLine(const Line2D& line2D,
                       const SZCovariance& szCovariance = SZCovariance(),
                       const double chi2 = 0.0,
-                      const size_t ndf = 0) :
-        Line2D(line2D),
-        m_szCovariance(szCovariance),
-        m_chi2(chi2),
-        m_ndf(ndf)
+                      const size_t ndf = 0)
+        : Line2D(line2D),
+          m_szCovariance(szCovariance),
+          m_chi2(chi2),
+          m_ndf(ndf)
       {}
-
-
-
 
 
     public:
@@ -71,11 +61,11 @@ namespace Belle2 {
       { return m_szCovariance; }
 
       /// Getter for individual elements of the covariance matrix
-      double covariance(const EHelixParameter& iRow, const EHelixParameter& iCol) const
+      double covariance(const ESZParameter& iRow, const ESZParameter& iCol) const
       { return szCovariance()(iRow, iCol); }
 
       /// Getter for individual diagonal elements of the covariance matrix
-      double variance(const EHelixParameter& i) const
+      double variance(const ESZParameter& i) const
       { return szCovariance()(i, i); }
 
       /// Getter for the chi square value of the line fit
@@ -99,7 +89,7 @@ namespace Belle2 {
       inline void invalidate()
       {
         Line2D::invalidate();
-        m_szCovariance.invalidate();
+        m_szCovariance = SZUtil::identity();
         m_chi2 = 0.0;
         m_ndf = 0;
       }
@@ -109,37 +99,34 @@ namespace Belle2 {
       inline void reverse()
       {
         Line2D::flipFirst();
-        m_szCovariance.reverse();
+        SZUtil::reverse(m_szCovariance);
       }
 
       /// Returns a copy of the line corresponding to the reverse direction of travel.
       inline UncertainSZLine reversed() const
       {
         return UncertainSZLine(Line2D::flippedFirst(),
-                               szCovariance().reversed(),
+                               SZUtil::reversed(szCovariance()),
                                chi2(),
                                ndf());
       }
 
     public:
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      TMatrixD passiveMoveByJacobian(const Vector2D& bySZ) const
+      SZJacobian passiveMoveByJacobian(const Vector2D& bySZ) const
       {
-        using namespace NHelixParameter;
-        TMatrixD result(c_TanL, c_Z0);
-        result.UnitMatrix();
+        using namespace NSZParameterIndices;
+        SZJacobian result = SZUtil::identity();
         result(c_Z0, c_TanL) = bySZ.first();
         return result;
       }
-
-
 
       /// Moves the coordinate system by the vector by and calculates the new sz line and its covariance matrix. Change is inplace.
       void passiveMoveBy(const Vector2D& bySZ)
       {
         // Move the covariance matrix first to have access to the original parameters
-        TMatrixD jacobian = passiveMoveByJacobian(bySZ);
-        m_szCovariance.similarityTransform(jacobian);
+        SZJacobian jacobian = passiveMoveByJacobian(bySZ);
+        SZUtil::transport(jacobian, m_szCovariance);
         Line2D::passiveMoveBy(bySZ);
       }
 
@@ -149,20 +136,20 @@ namespace Belle2 {
        */
       SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
       {
-        TMatrixD jacobian = passiveMoveByJacobian(bySZ);
-        return SZCovariance(szCovariance().similarityTransformed(jacobian));
+        SZJacobian jacobian = passiveMoveByJacobian(bySZ);
+        return SZUtil::transported(jacobian, szCovariance());
       }
 
 
     private:
       /// Memory for the 2x2 covariance matrix of sz slope (aka tan lambda) and z0.
-      SZCovariance m_szCovariance;
+      SZCovariance m_szCovariance = SZUtil::identity();
 
       /// Memory for the chi square value of the fit of this line.
-      double m_chi2;
+      double m_chi2 = 0.0;
 
       /// Memory for the number of degrees of freedim of the fit of this line.
-      size_t m_ndf;
+      size_t m_ndf = 0.0;
 
 
     }; //class

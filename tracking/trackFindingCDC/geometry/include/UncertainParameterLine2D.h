@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
-
-#include <tracking/trackFindingCDC/geometry/LineCovariance.h>
+#include <tracking/trackFindingCDC/geometry/LineParameters.h>
 #include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <cmath>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// A parameter line including including an line covariance matrix which is interpreted as located in the support point
@@ -25,10 +23,6 @@ namespace Belle2 {
     public:
       /// Default constructor for ROOT compatibility.
       UncertainParameterLine2D()
-        : m_parameterLine2D(),
-          m_lineCovariance(),
-          m_chi2(0.0),
-          m_ndf(0)
       {}
 
       /// Attaching a covariance matrix to a parameter line.
@@ -92,7 +86,7 @@ namespace Belle2 {
       inline void invalidate()
       {
         m_parameterLine2D.invalidate();
-        m_lineCovariance.invalidate();
+        m_lineCovariance = LineUtil::identity();
         m_chi2 = 0.0;
         m_ndf = 0;
       }
@@ -102,14 +96,14 @@ namespace Belle2 {
       inline void reverse()
       {
         m_parameterLine2D.reverse();
-        m_lineCovariance.reverse();
+        LineUtil::reverse(m_lineCovariance);
       }
 
       /// Returns a copy of the line corresponding to the reverse direction of travel.
       inline UncertainParameterLine2D reversed() const
       {
         return UncertainParameterLine2D(m_parameterLine2D.reversed(),
-                                        m_lineCovariance.reversed(),
+                                        LineUtil::reversed(lineCovariance()),
                                         m_chi2,
                                         m_ndf);
       }
@@ -124,10 +118,10 @@ namespace Belle2 {
       { m_parameterLine2D.passiveMoveBy(by); }
 
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      LineCovariance::JacobianMatrix moveSupportByJacobian(double byAt) const
+      LineJacobian moveSupportByJacobian(double byAt) const
       {
-        using namespace NLineParameter;
-        LineCovariance::JacobianMatrix result = ROOT::Math::SMatrixIdentity();
+        using namespace NLineParameterIndices;
+        LineJacobian result = LineUtil::identity();
         result(c_I, c_Phi0) = -byAt * m_parameterLine2D.tangential().norm();
         return result;
       }
@@ -136,18 +130,16 @@ namespace Belle2 {
       void moveSupportBy(double byAt)
       {
         // Move the covariance matrix first to have access to the original parameters
-        LineCovariance::JacobianMatrix jacobian = moveSupportByJacobian(byAt);
-        m_lineCovariance.similarityTransform(jacobian);
+        LineJacobian jacobian = moveSupportByJacobian(byAt);
+        LineUtil::transport(jacobian, m_lineCovariance);
         m_parameterLine2D.passiveMoveAtBy(byAt);
       }
 
       /// Getter for the covariance as if he coordinate system was moved by the given vector.
       LineCovariance movedSupportCovarianceBy(double byAt) const
       {
-        LineCovariance::JacobianMatrix jacobian = moveSupportByJacobian(byAt);
-        LineCovariance result = m_lineCovariance;
-        result.similarityTransform(jacobian);
-        return result;
+        LineJacobian jacobian = moveSupportByJacobian(byAt);
+        return LineUtil::transported(jacobian, lineCovariance());
       }
 
     private:
@@ -155,13 +147,13 @@ namespace Belle2 {
       ParameterLine2D m_parameterLine2D;
 
       /// Memory for the 2x2 covariance matrix of the line phi0 and impact parameter relative to the support point
-      LineCovariance m_lineCovariance;
+      LineCovariance m_lineCovariance = LineUtil::identity();
 
       /// Memory for the chi square value of the fit of this line.
-      double m_chi2;
+      double m_chi2 = 0.0;
 
       /// Memory for the number of degrees of freedim of the fit of this line.
-      size_t m_ndf;
+      size_t m_ndf = 0.0;
 
     }; // class
 

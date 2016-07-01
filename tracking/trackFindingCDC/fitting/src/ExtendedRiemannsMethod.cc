@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/ExtendedRiemannsMethod.h>
 
-#include <TMatrixDSym.h>
 #include <Eigen/Dense>
 
 using namespace std;
@@ -379,7 +378,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   double chi2;
-  Matrix< double, 3, 3> perigeeCovariance;
+  Matrix< double, 3, 3> cov3;
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
@@ -387,7 +386,7 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     chi2 = calcChi2(resultCircle, s);
 
     // Covariance calculation does not need the drift lengths, which is why we do not forward them
-    perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
+    cov3 = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
 
   } else {
     if (not isOriginConstrained()) {
@@ -405,19 +404,19 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
     }
 
     chi2 = calcChi2(resultCircle, sNoL);
-    perigeeCovariance = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
+    cov3 = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
   }
 
   resultCircle.setChi2(chi2);
   resultCircle.setNDF(ndf);
 
-  TMatrixDSym tPerigeeCovariance(3);
+  PerigeeCovariance perigeeCovariance;
   for (int i = 0; i < 3; ++i) {
     for (int j = 0; j < 3; ++j) {
-      tPerigeeCovariance(i, j) = perigeeCovariance(i, j);
+      perigeeCovariance(i, j) = cov3(i, j);
     }
   }
 
-  resultCircle.setPerigeeCovariance(PerigeeCovariance(tPerigeeCovariance));
+  resultCircle.setPerigeeCovariance(perigeeCovariance);
   return resultCircle;
 }

@@ -9,17 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <cmath>
+#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+#include <tracking/trackFindingCDC/geometry/Circle2D.h>
+#include <tracking/trackFindingCDC/geometry/Line2D.h>
 
-
-#include <TMatrixD.h>
-#include <TVectorD.h>
-#include <tracking/trackFindingCDC/geometry/EPerigeeParameter.h>
+#include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
-#include <tracking/trackFindingCDC/geometry/Circle2D.h>
-#include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+
+#include <TVectorD.h>
 
 namespace Belle2 {
 
@@ -44,7 +42,7 @@ namespace Belle2 {
                     const double impact);
 
       /// Constructor from the perigee parammeters.
-      explicit PerigeeCircle(const TVectorD& parameters);
+      explicit PerigeeCircle(const PerigeeParameters& par);
 
 
     private:
@@ -258,10 +256,10 @@ namespace Belle2 {
         receivePerigeeParameters();
       }
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      TMatrixD passiveMoveByJacobian(const Vector2D& by) const;
+      PerigeeJacobian passiveMoveByJacobian(const Vector2D& by) const;
 
       /// Puts the Jacobi matrix for a move of the coordinate system by the given vector in the given matrix as an output argument
-      void passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const;
+      void passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const;
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector2D atArcLength(const double arcLength) const;
@@ -305,16 +303,15 @@ namespace Belle2 {
       { return tangential().orthogonal() * impact(); }
 
       /// Getter for the three perigee parameters in the order defined by EPerigeeParameter.h
-      TVectorD parameters() const
+      PerigeeParameters parameters() const
       {
-        using namespace NPerigeeParameter;
-        TVectorD result(c_Curv, c_I);
+        using namespace NPerigeeParameterIndices;
+        PerigeeParameters result;
         result(c_Curv) = curvature();
         result(c_Phi0) = phi0();
         result(c_I) = impact();
         return result;
       }
-
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
       inline double minimalCylindricalR() const
@@ -338,11 +335,17 @@ namespace Belle2 {
 
 
     private:
-      double m_curvature; ///< Memory for the signed curvature
-      double m_tangentialPhi; ///< Memory for the azimuth angle of the direction of flight at the perigee
-      Vector2D m_tangential; ///< Cached unit direction of flight at the perigee
-      double m_impact; ///< Memory for the signed impact parameter
+      /// Memory for the signed curvature
+      double m_curvature;
 
+      /// Memory for the azimuth angle of the direction of flight at the perigee
+      double m_tangentialPhi;
+
+      /// Cached unit direction of flight at the perigee
+      Vector2D m_tangential;
+
+      /// Memory for the signed impact parameter
+      double m_impact;
 
     }; //class
 

@@ -14,9 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-#include <TMatrixD.h>
-#include <TVectorD.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,49 +21,32 @@ namespace Belle2 {
     class CDCAxialStereoFusion {
 
     public:
-      static double average(const TVectorD& startParameters,
-                            const TMatrixDSym& startCovMatrix,
-                            const TVectorD& endParameters,
-                            const TMatrixDSym& endCovMatrix,
-                            TVectorD& avgParameters,
-                            TMatrixDSym& avgCovMatrix);
-
-      static double average(const TVectorD& startParameters,
-                            const TMatrixDSym& startCovMatrix,
-                            const TMatrixD& startAmbiguityMatrix,
-                            const TVectorD& endParameters,
-                            const TMatrixDSym& endCovMatrix,
-                            const TMatrixD& endAmbiguityMatrix,
-                            TVectorD& avgParameters,
-                            TMatrixDSym& avgCovMatrix);
-
-    public:
       static UncertainPerigeeCircle fuse(const UncertainPerigeeCircle& startPerigeeCircle,
                                          const UncertainPerigeeCircle& endPerigeeCircle);
 
       static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
-                                 const TMatrixD& startAmbiguityMatrix,
+                                 const JacobianMatrix<3, 5>& startAmbiguityMatrix,
                                  const UncertainPerigeeCircle& endPerigeeCircle,
-                                 const TMatrixD& endAmbiguityMatrix);
+                                 const JacobianMatrix<3, 5>& endAmbiguityMatrix);
 
       static UncertainHelix fuse(const UncertainHelix& startHelix,
                                  const UncertainPerigeeCircle& endPerigeeCircle,
-                                 const TMatrixD& endAmbiguityMatrix)
+                                 const JacobianMatrix<3, 5>& endAmbiguityMatrix)
       { return fuse(endPerigeeCircle, endAmbiguityMatrix, startHelix); }
 
       static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
-                                 const TMatrixD& startAmbiguityMatrix,
+                                 const JacobianMatrix<3, 5>& startAmbiguityMatrix,
                                  const UncertainHelix& endHelix);
 
       static UncertainHelix fuse(const UncertainHelix& startHelix,
                                  const UncertainHelix& endHelix);
 
     public:
-      static TMatrixD calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
-                                    const CDCTrajectory2D& trajectory2D);
+      static JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
+                                                const CDCTrajectory2D& trajectory2D);
 
-      static TMatrixD calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
-                                    const CDCTrajectory2D& trajectory2D);
+      static JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+                                                const CDCTrajectory2D& trajectory2D);
 
 
     public:

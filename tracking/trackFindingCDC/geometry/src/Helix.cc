@@ -7,10 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/Helix.h>
-#include <tracking/trackFindingCDC/geometry/EHelixParameter.h>
-
 
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
 
@@ -100,27 +97,22 @@ double Helix::arcLength2DToClosest(const Vector3D& point) const
 
 }
 
-
-
-
-
-TMatrixD Helix::passiveMoveByJacobian(const Vector3D& by) const
+HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
 {
-  TMatrixD jacobian(5, 5);
-  jacobian.UnitMatrix();
-
   // Fills the upper left 3x3 corner.
-  circleXY().passiveMoveByJacobian(by.xy(), jacobian);
+  PerigeeJacobian perigeeJacobian = circleXY().passiveMoveByJacobian(by.xy());
+  SZJacobian szJacobian = SZUtil::identity();
+  HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
   double m = tanLambda();
   double sArc = circleXY().arcLengthTo(by.xy());
 
-  using namespace NHelixParameter;
+  using namespace NHelixParameterIndices;
   jacobian(c_Z0, c_Curv) = m * (jacobian(c_Phi0, c_Curv) - sArc) / curv;
   jacobian(c_Z0, c_Phi0) = m * (jacobian(c_Phi0, c_Phi0) - 1.) / curv;
   jacobian(c_Z0, c_I)    = m *  jacobian(c_Phi0, c_I) / curv;
-  jacobian(c_Z0, c_TanL)   = sArc;
+  jacobian(c_Z0, c_TanL) = sArc;
 
   return jacobian;
 }

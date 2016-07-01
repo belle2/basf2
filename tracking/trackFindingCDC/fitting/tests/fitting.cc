@@ -98,7 +98,7 @@ namespace {
     B2INFO("Chi2 " << chi2);
 
     B2INFO("Covariance matrix:");
-    fittedCircle.perigeeCovariance().matrix().Print();
+    B2INFO(fittedCircle.perigeeCovariance());
     return trajectory2D;
   }
 
@@ -142,7 +142,7 @@ TEST(TrackFindingCDCTest, fitting_ExtendedRiemannsMethod_GeneralCircleFit_NoDrif
 
   trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
   const UncertainPerigeeCircle& perigeeCircle = trajectory2D.getLocalCircle();
-  TMatrixDSym perigeeCovariance = perigeeCircle.perigeeCovariance();
+  PerigeeCovariance perigeeCovariance = perigeeCircle.perigeeCovariance();
 
   //EXPECT_NEAR(0.0003644, perigeeCovariance(0, 0), 10e-7);
   //EXPECT_NEAR(3.028e-20, perigeeCovariance(0, 1), 10e-7);

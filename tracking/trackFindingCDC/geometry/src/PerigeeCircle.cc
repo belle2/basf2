@@ -7,22 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 
 #include <framework/logging/Logger.h>
 
 #include <boost/math/tools/precision.hpp>
-#include <cmath>
 #include <boost/math/special_functions/sinc.hpp>
+#include <cmath>
 
 using namespace std;
 using namespace boost::math;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-
 
 
 PerigeeCircle::PerigeeCircle() : GeneralizedCircle()
@@ -53,7 +50,7 @@ PerigeeCircle::PerigeeCircle(const double curvature,
 }
 
 
-PerigeeCircle::PerigeeCircle(const TVectorD& parameters) :
+PerigeeCircle::PerigeeCircle(const PerigeeParameters& parameters) :
   PerigeeCircle(parameters(EPerigeeParameter::c_Curv),
                 parameters(EPerigeeParameter::c_Phi0),
                 parameters(EPerigeeParameter::c_I))
@@ -146,16 +143,17 @@ Vector2D PerigeeCircle::atArcLength(const double arcLength) const
 
 
 
-TMatrixD PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
+PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
 {
-  TMatrixD jacobian(3, 3);
+  PerigeeJacobian jacobian = PerigeeUtil::identity();
   passiveMoveByJacobian(by, jacobian);
   return jacobian;
 }
 
 
 
-void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian) const
+void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by,
+                                          PerigeeJacobian& jacobian) const
 {
 
   // In this frame of reference we have d=0,  phi= + or - M_PI
@@ -204,7 +202,7 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, TMatrixD& jacobian
 
   //B2INFO("zeta = " << zeta);
 
-  using namespace NPerigeeParameter;
+  using namespace NPerigeeParameterIndices;
   jacobian(c_Curv, c_Curv) = 1;
   jacobian(c_Curv, c_Phi0) = 0;
   jacobian(c_Curv, c_I) = 0;

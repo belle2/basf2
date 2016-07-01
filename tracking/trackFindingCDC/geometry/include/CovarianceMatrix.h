@@ -128,8 +128,8 @@ namespace Belle2 {
                             ParameterVector<N>& par,
                             CovarianceMatrix<N>& cov)
       {
-        PrecisionMatrix<N> precision1 = cov1.inverse();
-        PrecisionMatrix<N> precision2 = cov2.inverse();
+        PrecisionMatrix<N> precision1 = cov1.colPivHouseholderQr().inverse();
+        PrecisionMatrix<N> precision2 = cov2.colPivHouseholderQr().inverse();
         PrecisionMatrix<N> precision;
         double chi2 = PrecisionMatrixUtil::average(par1, precision1,
                                                    par2, precision2,
@@ -161,10 +161,9 @@ namespace Belle2 {
                             ParameterVector<M>& par,
                             CovarianceMatrix<M>& cov)
       {
-        PrecisionMatrix<N1> precision1 = cov1.inverse();
-        PrecisionMatrix<N2> precision2 = cov2.inverse();
+        PrecisionMatrix<N1> precision1 = cov1.colPivHouseholderQr().inverse();
+        PrecisionMatrix<N2> precision2 = cov2.colPivHouseholderQr().inverse();
         PrecisionMatrix<M> precision;
-
         double chi2 = PrecisionMatrixUtil::average(par1, precision1, ambiguity1,
                                                    par2, precision2, ambiguity2,
                                                    par, precision);

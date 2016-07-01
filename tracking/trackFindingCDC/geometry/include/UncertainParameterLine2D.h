@@ -27,7 +27,7 @@ namespace Belle2 {
 
       /// Attaching a covariance matrix to a parameter line.
       UncertainParameterLine2D(const ParameterLine2D& parameterLine2D,
-                               const LineCovariance& lineCovariance = LineCovariance(),
+                               const LineCovariance& lineCovariance = LineUtil::identity(),
                                const double chi2 = 0.0,
                                const size_t ndf = 0)
         : m_parameterLine2D(parameterLine2D),
@@ -50,6 +50,17 @@ namespace Belle2 {
       { return &m_parameterLine2D;}
 
     public:
+
+      /// Getter for the three perigee parameters in the order defined by EPerigeeParameter.h
+      LineParameters lineParameters() const
+      {
+        using namespace NLineParameterIndices;
+        LineParameters result;
+        result(c_Phi0) = m_parameterLine2D.tangential().phi();
+        result(c_I) = 0;
+        return result;
+      }
+
       /// Setter for the whole covariance matrix of the line parameters
       inline void setLineCovariance(const LineCovariance& lineCovariance)
       { m_lineCovariance = lineCovariance; }

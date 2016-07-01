@@ -37,7 +37,7 @@ namespace Belle2 {
       UncertainPerigeeCircle(const double curvature,
                              const double tangentialPhi,
                              const double impact,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
         : PerigeeCircle(curvature, tangentialPhi, impact),
@@ -54,7 +54,7 @@ namespace Belle2 {
       UncertainPerigeeCircle(const double curvature,
                              const Vector2D& tangential,
                              const double impact,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
         : PerigeeCircle(curvature, tangential, impact),
@@ -65,7 +65,7 @@ namespace Belle2 {
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero.
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
         : PerigeeCircle(perigeeCircle),
@@ -76,7 +76,7 @@ namespace Belle2 {
 
       /// Augments a plain perigee circle with a covariance matrix. Covariance defaults to zero.
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
         : PerigeeCircle(generalizedCircle),
@@ -88,7 +88,7 @@ namespace Belle2 {
       /// Constructor taking all stored parameters as a SVector.
       explicit
       UncertainPerigeeCircle(const PerigeeParameters& parameters,
-                             const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
+                             const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
         : PerigeeCircle(parameters),

@@ -35,7 +35,7 @@ namespace Belle2 {
                      const double impact,
                      const double tanLambda,
                      const double z0,
-                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
         : Helix(curvature, tangentialPhi, impact, tanLambda, z0),
@@ -47,7 +47,7 @@ namespace Belle2 {
 
       /// Constructor taking all stored parameters as a SVector.
       explicit UncertainHelix(const HelixParameters& parameters,
-                              const HelixCovariance& helixCovariance = HelixCovariance(),
+                              const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
                               const size_t& ndf = 0)
         : Helix(parameters),
@@ -62,7 +62,7 @@ namespace Belle2 {
                      const double impact,
                      const double tanLambda,
                      const double z0,
-                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
         : Helix(curvature, tangential, impact, tanLambda, z0),
@@ -73,7 +73,7 @@ namespace Belle2 {
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
-                     const HelixCovariance& helixCovariance = HelixCovariance(),
+                     const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
         : Helix(helix),

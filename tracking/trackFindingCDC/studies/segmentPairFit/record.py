@@ -43,7 +43,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     flight_time_reestimation = False
     use_alpha_in_drift_length = False
 
-    fit_method_name = "zreco"
+    fit_method_name = "fuse-sz"
     # Specification for BrowseTFileOnTerminateRunMixin
     output_file_name = "SegmentPairFitValidation.root"
 
@@ -93,7 +93,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
             def simple_segment_pair_fusion_fit(pair):
-                return CDCAxialStereoFusion.reconstructTrajectories(pair)
+                return CDCAxialStereoFusion.fuseTrajectories(pair)
             return simple_segment_pair_fusion_fit
 
         elif fit_method_name == 'fuse-xy':

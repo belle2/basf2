@@ -16,6 +16,7 @@
 #include <tracking/trackFindingCDC/geometry/PerigeeParameters.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/numerics/Angle.h>
 
 #include <TVectorD.h>
 
@@ -208,7 +209,7 @@ namespace Belle2 {
       {
         GeneralizedCircle::reverse();
         m_curvature = -m_curvature;
-        m_tangentialPhi = reversedPhi(m_tangentialPhi);
+        m_tangentialPhi = AngleUtil::reversed(m_tangentialPhi);
         m_tangential.reverse();
         m_impact = -m_impact;
       }
@@ -218,19 +219,13 @@ namespace Belle2 {
       {
         return PerigeeCircle(GeneralizedCircle::reversed(),
                              -m_curvature,
-                             reversedPhi(m_tangentialPhi),
+                             AngleUtil::reversed(m_tangentialPhi),
                              -m_tangential,
                              -m_impact
                             );
       }
 
-    private:
-      /// Returns the azimuth angle associated with the reverse vector
-      inline double reversedPhi(const double phi) const
-      { return phi > 0 ? phi - M_PI : phi + M_PI; }
-
     public:
-
       /// Transforms the generalized circle to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
        *  It works most easily by the exchange of the circle parameters n0 <-> n3 */

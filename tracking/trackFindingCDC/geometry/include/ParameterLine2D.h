@@ -125,6 +125,10 @@ namespace Belle2 {
       void invalidate()
       { m_support.set(0, 0); m_tangential.set(0, 0); }
 
+      /// Check it the line is in an invalid state.
+      bool isInvalid() const
+      { return m_tangential.isNull(); }
+
       /// Reverses the tangential vector inplace
       void reverse() { m_tangential.reverse(); }
 

@@ -290,6 +290,10 @@ namespace Belle2 {
       double getSignedRecoDriftLength() const
       { return getRLWireHit().getSignedRefDriftLength(); }
 
+      /// Settter to update the drift length of the hit
+      void setRecoDriftLength(double driftLength)
+      { m_rlWireHit.setRefDriftLength(driftLength); }
+
       /**
        *  Returns the drift length variance next to the reconstructed position.
        *  Dummy implemented as the reference drift length.

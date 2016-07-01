@@ -163,8 +163,7 @@ void RawInputModule::registerRawCOPPERs()
     //    int subsysid = ((RawCOPPER&)tempdblk).GetNodeID(cprid);
     //    int subsysid = tempcpr.GetNodeID(cprid);
     int subsysid = tempcpr.GetNodeID(0);
-    if (tempcpr.GetErrorBitFlag(0)) error_flag = 1;
-    //    if (tempcpr.GetErrorBitFlag(cprid)) error_flag = 1;
+    if (tempcpr.GetEventCRCError(0) != 0) error_flag = 1;
 
     // Switch to each detector and register RawXXX
     if ((subsysid & DETECTOR_MASK) == CDC_ID) {

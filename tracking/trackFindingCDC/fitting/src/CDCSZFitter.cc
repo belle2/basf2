@@ -187,9 +187,8 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          CDCObservations2D& observations2D) const
 {
-  //trajectorySZ.clear();
+  trajectorySZ.clear();
   if (observations2D.size() < 3) {
-    B2WARNING("Skipping sz fit.");
     return;
   }
 

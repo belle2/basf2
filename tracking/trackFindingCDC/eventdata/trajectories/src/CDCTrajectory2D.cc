@@ -94,7 +94,9 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
   // Take the solution with the smaller deviation from the reference position
   const double deltaZ = solutionsDeltaZ.second;
   const double z = deltaZ + wireLine.refZ();
-  return wireLine.pos3DAtZ(z);
+
+  Vector3D recoWirePos2D = wireLine.pos3DAtZ(z);
+  return Vector3D(getClosest(recoWirePos2D.xy()), z);
 }
 
 

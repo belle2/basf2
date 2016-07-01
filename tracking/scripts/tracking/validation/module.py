@@ -460,6 +460,10 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
         # Fit quality #
         ###############
         if self.pulls:
+            all_but_diagonal_plots = list(PullAnalysis.default_which_plots)
+            all_but_diagonal_plots.remove("diag_profile")
+            all_but_diagonal_plots.remove("diag_scatter")
+
             plot_name_prefix = name + self.plot_name_postfix
             if not self.fit:
                 plot_name_prefix += '_seed'
@@ -472,8 +476,12 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis = PullAnalysis('#omega', unit='1/cm',
                                                    plot_name_prefix=plot_name_prefix + '_omega',
                                                    plot_title_postfix=self.plot_title_postfix)
+
             curvature_pull_analysis.analyse(pr_omega_truths,
-                                            pr_omega_estimates, pr_omega_variances)
+                                            pr_omega_estimates,
+                                            pr_omega_variances,
+                                            which_plots=all_but_diagonal_plots)
+
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
@@ -485,8 +493,12 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis = PullAnalysis('tan #lambda',
                                                    plot_name_prefix=plot_name_prefix + '_tan_lambda',
                                                    plot_title_postfix=self.plot_title_postfix)
+
             curvature_pull_analysis.analyse(pr_tan_lambda_truths,
-                                            pr_tan_lambda_estimates, pr_tan_lambda_variances)
+                                            pr_tan_lambda_estimates,
+                                            pr_tan_lambda_variances,
+                                            which_plots=all_but_diagonal_plots)
+
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 
@@ -494,9 +506,12 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
             curvature_pull_analysis = PullAnalysis('d0',
                                                    plot_name_prefix=plot_name_prefix + '_d0',
                                                    plot_title_postfix=self.plot_title_postfix)
+
             curvature_pull_analysis.analyse(np.array(self.pr_d0_truths),
                                             np.array(self.pr_d0_estimates),
-                                            np.array(self.pr_d0_variances))
+                                            np.array(self.pr_d0_variances),
+                                            which_plots=all_but_diagonal_plots)
+
             curvature_pull_analysis.contact = contact
             pull_analyses.append(curvature_pull_analysis)
 

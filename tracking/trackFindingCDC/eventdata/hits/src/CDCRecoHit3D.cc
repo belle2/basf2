@@ -164,3 +164,16 @@ CDCRecoHit3D CDCRecoHit3D::reversed() const
 {
   return CDCRecoHit3D(getRLWireHit().reversed(), getRecoPos3D(), -getArcLength2D());
 }
+
+void CDCRecoHit3D::snapToDriftCircle()
+{
+  const CDCWire& wire = getWire();
+  const WireLine& wireLine = wire.getWireLine();
+  const double recoPosZ = getRecoPos3D().z();
+
+  Vector2D wirePos = wireLine.pos2DAtZ(recoPosZ);
+  Vector2D disp2D = getRecoPos3D().xy() - wirePos;
+
+  disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));
+  m_recoPos3D = Vector3D(wirePos + disp2D, recoPosZ);
+}

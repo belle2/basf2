@@ -280,6 +280,9 @@ namespace Belle2 {
       Vector2D getRecoWirePos2D() const
       { return getWire().getWirePos2DAtZ(getRecoZ()); }
 
+      /// Scales the displacement vector in place to lie on the dirft circle.
+      void snapToDriftCircle();
+
       /**
        *  Returns the drift length next to the reconstructed position.
        *  Dummy implemented as the reference drift length.

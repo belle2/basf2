@@ -15,6 +15,8 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 
+#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -22,10 +24,12 @@ using namespace TrackFindingCDC;
 namespace {
   const bool useResidualParameters = true;
 
-  template<class ARecoHit, class ARecoHitSegment>
+  template<class ARecoHitSegment>
   JacobianMatrix<3, 5> calcAmbiguityImpl(const ARecoHitSegment& segment,
                                          const CDCTrajectory2D& trajectory2D)
   {
+    using ARecoHit = GetValueType<ARecoHitSegment>;
+
     size_t nHits = segment.size();
 
     const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
@@ -54,10 +58,13 @@ namespace {
     return result;
   }
 
-  template<class AFromRecoHit, class AToRecoHit, class AFromRecoHitSegment, class AToRecoHitSegment>
+  template<class AFromRecoHitSegment, class AToRecoHitSegment>
   CDCTrajectory3D fuseTrajectoriesImpl(const AFromRecoHitSegment& fromSegment,
                                        const AToRecoHitSegment& toSegment)
   {
+    using AFromRecoHit = GetValueType<AFromRecoHitSegment>;
+    using AToRecoHit   = GetValueType<AToRecoHitSegment>;
+
     CDCTrajectory3D result;
     result.setChi2(NAN);
 
@@ -96,8 +103,8 @@ namespace {
     const UncertainPerigeeCircle& fromCircle = fromTrajectory2D.getLocalCircle();
     const UncertainPerigeeCircle& toCircle = toTrajectory2D.getLocalCircle();
 
-    JacobianMatrix<3, 5> fromH = calcAmbiguityImpl<AFromRecoHit>(fromSegment, fromTrajectory2D);
-    JacobianMatrix<3, 5> toH = calcAmbiguityImpl<AToRecoHit>(toSegment, toTrajectory2D);
+    JacobianMatrix<3, 5> fromH = calcAmbiguityImpl(fromSegment, fromTrajectory2D);
+    JacobianMatrix<3, 5> toH = calcAmbiguityImpl(toSegment, toTrajectory2D);
 
     UncertainHelix resultHelix = UncertainHelix::average(fromCircle, fromH, toCircle, toH);
     return CDCTrajectory3D(localOrigin3D, resultHelix);
@@ -107,19 +114,19 @@ namespace {
 JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
                                                          const CDCTrajectory2D& trajectory2D)
 {
-  return calcAmbiguityImpl<CDCRecoHit2D>(recoSegment2D, trajectory2D);
+  return calcAmbiguityImpl(recoSegment2D, trajectory2D);
 }
 
 JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
                                                          const CDCTrajectory2D& trajectory2D)
 {
-  return calcAmbiguityImpl<CDCRecoHit3D>(recoSegment3D, trajectory2D);
+  return calcAmbiguityImpl(recoSegment3D, trajectory2D);
 }
 
 CDCTrajectory3D CDCAxialStereoFusion::fuseTrajectories(const CDCRecoSegment2D& fromSegment,
                                                        const CDCRecoSegment2D& toSegment)
 {
-  return fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit2D>(fromSegment, toSegment);
+  return fuseTrajectoriesImpl(fromSegment, toSegment);
 }
 
 void CDCAxialStereoFusion::fuseTrajectories(const CDCSegmentPair& segmentPair)
@@ -228,8 +235,8 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   // Correct the values of tan lambda and z0
   CDCTrajectory3D fusedTrajectory3D =
     fromIsAxial ?
-    fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(fromSegment, stereoSegment3D) :
-    fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, toSegment);
+    fuseTrajectoriesImpl(fromSegment, stereoSegment3D) :
+    fuseTrajectoriesImpl(stereoSegment3D, toSegment);
 
   double tanLambdaShift = trajectorySZ.getTanLambda();
 

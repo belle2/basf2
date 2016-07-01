@@ -46,19 +46,19 @@ CDCObservations2D::EigenObservationMatrix CDCObservations2D::getObservationMatri
 
 Vector2D CDCObservations2D::getCentralPoint() const
 {
-  size_t nObservations = size();
-  if (nObservations == 0) return Vector2D(NAN, NAN);
+  size_t n = size();
+  if (n == 0) return Vector2D(NAN, NAN);
+  size_t i = n / 2;
 
-  size_t iCentralObservation = nObservations / 2;
-
-  double centralX = getX(iCentralObservation);
-  double centralY = getY(iCentralObservation);
-
-  return Vector2D(centralX, centralY);
-
-  // May refine somehow ?
-  // EigenObservationMatrix eigenObservations = getObservationMatrix();
-  // RowVector2f meanPoint = eigenObservations.leftCols<2>.colwise().mean();
+  if (isEven(n)) {
+    // For even number of observations use the middle one with the bigger distance from IP
+    Vector2D center1(getX(i), getY(i));
+    Vector2D center2(getX(i - 1), getY(i - 1));
+    return center1.normSquared() > center2.normSquared() ? center1 : center2;
+  } else {
+    Vector2D center1(getX(i), getY(i));
+    return center1;
+  }
 }
 
 

@@ -50,9 +50,12 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 
     // Do fits
     CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
+    if (pairFBInfo == EForwardBackward::c_Backward) {
+      mcTrajectory3D.reverse();
+    }
     segmentPair.setTrajectory3D(mcTrajectory3D);
 
-    return startSegment.size() + endSegment.size();
+    return pairFBInfo * static_cast<Weight>(startSegment.size() + endSegment.size());
   }
 
   return NAN;

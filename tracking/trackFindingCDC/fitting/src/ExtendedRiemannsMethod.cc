@@ -339,7 +339,7 @@ namespace {
     perigeeJ(iCurv, iReducedN3) = 2;
 
     perigeeJ(iPhi0, iReducedN0) = 0;
-    perigeeJ(iPhi0, iReducedN2) = -1 / normN12;
+    perigeeJ(iPhi0, iReducedN2) = 1 / normN12;
     perigeeJ(iPhi0, iReducedN3) = 0;
 
     perigeeJ(iI, iReducedN0) = 2 * (normN12 * (1 + 2 * normN12) - 1) / denominator;

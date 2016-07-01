@@ -37,8 +37,7 @@ import caf.backends
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
 
-collector_steering_file_path = os.environ.get('BELLE2_LOCAL_DIR')
-collector_steering_file_path = os.path.join(collector_steering_file_path, 'calibration/scripts/caf/run_collector_path.py')
+_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
 pp = PrettyPrinter()
 IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
@@ -80,6 +79,11 @@ class Calibration():
 
     # Change the input file list later on before running with CAF()
     >>> cal.input_files = ['path/to/file.root', 'other/path/to/file2.root']
+
+    You can also specify the dependencies of the calibration
+    >>> cal.depends_on(cal2)
+
+    The CAF should automatically register these dependencies and prune out any problems.
     """
 
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
@@ -111,7 +115,8 @@ class Calibration():
         self.pre_algorithm = None
         #: Output results of algorithms for each iteration
         self.results = {}
-
+        #: Output patterns of files produced by collector and which need to be saved in the output directory
+        self.output_patterns = ['RootOutput.root']
         #: List of calibration objects that will depend on this one.
         self.future_dependencies = []
         #: OrderedDictionary of dependencies of calibration objects, where value is the calibrations
@@ -300,15 +305,14 @@ class CAF():
         that $BELLE2_LOCAL_DIR is set and that it is the correct release directory to
         access the config file.
         """
-        config_file_path = os.environ.get('BELLE2_LOCAL_DIR')
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
         if config_file_path:
-            config_file_path = os.path.join(config_file_path, 'calibration/data/caf.cfg')
             import configparser
             #: Configuration object for CAF, can change the defaults through a single config file
             self.config = configparser.ConfigParser()
             self.config.read(config_file_path)
         else:
-            B2ERROR("Tried to use $BELLE2_LOCAL_DIR but it wasn't there. Is basf2 set up?")
+            B2ERROR("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
 
         #: Dictionary of calibrations for this CAF instance
         self.calibrations = {}
@@ -355,7 +359,11 @@ class CAF():
             """
             Quick function to use with filter() and check dependencies against calibrations known to CAF
             """
-            return dependency.name in calibration_names
+            dependency_in_caf = dependency.name in calibration_names
+            if not dependency_in_caf:
+                B2WARNING(("The calibration {0} is a required dependency but is not in the CAF."
+                           "It has been removed as a dependency.").format(dependency.name))
+            return dependency_in_caf
 
         # Check that there aren't dependencies on calibrations not added to the framework
         # Remove them from the calibration objects if there are.
@@ -366,7 +374,7 @@ class CAF():
             filtered_dependencies = list(filter(is_dependency_in_caf, calibration.dependencies))
             calibration.dependencies = filtered_dependencies
 
-    def order_calibrations(self):
+    def _order_calibrations(self):
         """
         - Uses dependency atrributes of calibrations to create a dependency dictionary and passes it
         to a sorting algorithm.
@@ -395,7 +403,7 @@ class CAF():
             order = ordered_full_dependencies
         return order
 
-    def configure_jobs(self, calibrations, iteration):
+    def _configure_jobs(self, calibrations, iteration):
         """
         Creates a Job object for each collector to pass to the Backend.
         """
@@ -406,7 +414,7 @@ class CAF():
             job.output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'output')
             job.working_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'input')
             job.cmd = ['basf2', 'run_collector_path.py']
-            job.input_sandbox_files.append(collector_steering_file_path)
+            job.input_sandbox_files.append(_collector_steering_file_path)
             job.input_sandbox_files.append(collector_path_file)
             if iteration > 0:
                 for algorithm in self.calibrations[calibration_name].algorithms:
@@ -414,7 +422,7 @@ class CAF():
                     database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration-1), 'output', 'localdb')
                     job.input_sandbox_files.append(database_dir)
             job.input_files = self.calibrations[calibration_name].input_files
-            job.output_files = ['*.mille', 'RootOutput.root']
+            job.output_patterns = self.calibrations[calibration_name].output_patterns
             jobs[calibration_name] = job
 
         return jobs
@@ -428,7 +436,7 @@ class CAF():
         """
         # Creates the ordering of calibrations, including any dependencies that we must wait for
         # before continuing.
-        self.order = self.order_calibrations()
+        self.order = self._order_calibrations()
         if not self.order:
             B2ERROR("Couldn't order the calibrations properly. Probably a cyclic dependency.")
 
@@ -454,7 +462,7 @@ class CAF():
                 for iteration in range(self.max_iterations):
                     iteration_needed = False
                     # Create job objects for collectors
-                    col_jobs = self.configure_jobs(col_to_submit, iteration)
+                    col_jobs = self._configure_jobs(col_to_submit, iteration)
                     # Submit collection jobs that have no dependencies
                     results = self.backend.submit(list(col_jobs.values()))
                     # Event loop waiting for results
@@ -727,7 +735,7 @@ class Job:
         #: Output directory (str), where we will download our output_files to. Default is '.'
         self.output_dir = '.'
         #: Files that we produce during the job and want to be returned. Can use wildcard (*)
-        self.output_files = []
+        self.output_patterns = []
         #: Command and arguments as a list that wil be run by the job on the backend
         self.cmd = []
         #: Input root files to basf2 job

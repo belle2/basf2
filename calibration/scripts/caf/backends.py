@@ -156,10 +156,11 @@ class Local(Backend):
 
         # Once the subprocess is done, move the requested output to the output directory
         # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
-        for pattern in job.output_files:
+        for pattern in job.output_patterns:
             output_files = glob.glob(os.path.join(job.working_dir, pattern))
-            for file in output_files:
-                shutil.move(file, job.output_dir)
+            for file_name in output_files:
+                shutil.move(file_name, job.output_dir)
+                print('moving', file_name, 'to', job.output_dir)
 
 
 class PBS(Backend):

@@ -24,69 +24,77 @@ using namespace TrackFindingCDC;
 UncertainHelix UncertainHelix::average(const UncertainHelix& fromHelix,
                                        const UncertainHelix& toHelix)
 {
-  ParameterVector<5> fromPar = fromHelix.parameters();
-  CovarianceMatrix<5> fromCov = fromHelix.helixCovariance();
+  HelixParameters fromPar = fromHelix.parameters();
+  HelixCovariance fromCov = fromHelix.helixCovariance();
 
-  ParameterVector<5> toPar = toHelix.parameters();
-  CovarianceMatrix<5> toCov = toHelix.helixCovariance();
+  HelixParameters toPar = toHelix.parameters();
+  HelixCovariance toCov = toHelix.helixCovariance();
 
-  CovarianceMatrix<5> commonCov;
-  ParameterVector<5> commonPar;
+  using namespace NHelixParameterIndices;
+  HelixParameters refPar = (fromPar + toPar) / 2.0;
+  refPar[c_Phi0] = AngleUtil::average(fromPar[c_Phi0], toPar[c_Phi0]);
 
-  double chi2 = CovarianceMatrixUtil::average(fromPar, fromCov,
-                                              toPar, toCov,
-                                              commonPar, commonCov);
+  HelixParameters relFromPar = fromPar - refPar;
+  AngleUtil::normalise(relFromPar[c_Phi0]);
+
+  HelixParameters relToPar = toPar - refPar;
+  AngleUtil::normalise(relToPar[c_Phi0]);
+
+  HelixParameters relAvgPar;
+  HelixCovariance avgCov;
+
+  double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov,
+                                              relToPar, toCov,
+                                              relAvgPar, avgCov);
+
+  HelixParameters avgPar = relAvgPar + refPar;
+  AngleUtil::normalise(avgPar[c_Phi0]);
 
   // Calculating 5 parameters from 10 input parameters. 5 NDF remaining.
   size_t ndf = 5;
 
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
+  return UncertainHelix(avgPar, avgCov, chi2, ndf);
 }
 
 UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigeeCircle,
                                        const JacobianMatrix<3, 5>& fromAmbiguity,
                                        const UncertainHelix& toHelix)
 {
-  ParameterVector<3> fromPar = fromPerigeeCircle.parameters();
-  CovarianceMatrix<3> fromCov = fromPerigeeCircle.perigeeCovariance();
+  PerigeeParameters fromPar = fromPerigeeCircle.parameters();
+  PerigeeCovariance fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  ParameterVector<5> toPar = toHelix.parameters();
-  CovarianceMatrix<5> toCov = toHelix.helixCovariance();
+  HelixParameters toPar = toHelix.parameters();
+  HelixCovariance toCov = toHelix.helixCovariance();
   JacobianMatrix<5, 5> toAmbiguity = JacobianMatrixUtil::identity<5>();
 
-  // Helix covariance
-  CovarianceMatrix<5> commonCov;
+  using namespace NPerigeeParameterIndices;
+  PerigeeParameters refPar = (fromPar + toPar.head<3>()) / 2.0;
+  refPar[c_Phi0] = AngleUtil::average(fromPar[c_Phi0], toPar[c_Phi0]);
 
-  // Helix parameters
-  ParameterVector<5> commonPar;
+  HelixParameters refHelixPar;
+  refHelixPar << refPar, toPar.tail<2>();
 
+  PerigeeParameters relFromPar = fromPar - refPar;
+  AngleUtil::normalise(relFromPar[c_Phi0]);
+
+  HelixParameters relToPar = toPar - refHelixPar;
+  AngleUtil::normalise(relToPar[c_Phi0]);
+
+  HelixParameters relAvgPar;
+  HelixCovariance avgCov;
+
+  // Chi2 value
+  double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
+                                              relToPar, toCov, toAmbiguity,
+                                              relAvgPar, avgCov);
+
+  HelixParameters avgPar = relAvgPar + refHelixPar;
+  AngleUtil::normalise(avgPar[c_Phi0]);
 
   // Calculating 5 parameters from 8 input parameters. 3 NDF remaining.
   size_t ndf = 3;
 
-  double chi2 = 0;
-
-  // Use the mean circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
-  ParameterVector<3> refPar = (fromPar + ParameterVectorUtil::getSub<ParameterVector<3>, 0 >(toPar)) / 2;
-
-  ParameterVector<3> relFromPar = fromPar - refPar;
-
-  // Only first three coordinates are effected by a change of the reference (expansion) point
-  ParameterVector<5> relToPar = toPar;
-  for (int i = 0; i < 3; ++i) {
-    relToPar(i) -= refPar(i);
-  }
-
-  // Chi2 value
-  chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
-                                       relToPar, toCov, toAmbiguity,
-                                       commonPar, commonCov);
-
-  for (int i = 0; i < 3; ++i) {
-    commonPar(i) += refPar(i);
-  }
-
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
+  return UncertainHelix(avgPar, avgCov, chi2, ndf);
 }
 
 UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigeeCircle,
@@ -95,38 +103,38 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
                                        const JacobianMatrix<3, 5>& toAmbiguity,
                                        const SZParameters& szParameters)
 {
-  const ParameterVector<3>&  fromPar = fromPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& fromCov = fromPerigeeCircle.perigeeCovariance();
+  const PerigeeParameters& fromPar = fromPerigeeCircle.parameters();
+  const PerigeeCovariance& fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  const ParameterVector<3>&  toPar = toPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& toCov = toPerigeeCircle.perigeeCovariance();
+  const PerigeeParameters& toPar = toPerigeeCircle.parameters();
+  const PerigeeCovariance& toCov = toPerigeeCircle.perigeeCovariance();
 
-  // Helix parameters
-  ParameterVector<5> commonPar;
+  using namespace NPerigeeParameterIndices;
+  PerigeeParameters refPar = (fromPar + toPar) / 2.0;
+  refPar[c_Phi0] = AngleUtil::average(fromPar[c_Phi0], toPar[c_Phi0]);
 
-  // Helix covariance
-  CovarianceMatrix<5> commonCov;
+  HelixParameters refHelixPar;
+  refHelixPar << refPar, szParameters;
+
+  PerigeeParameters relFromPar = fromPar - refPar;
+  AngleUtil::normalise(relFromPar[c_Phi0]);
+
+  PerigeeParameters relToPar = toPar - refPar;
+  AngleUtil::normalise(relToPar[c_Phi0]);
+
+  HelixParameters relAvgPar;
+  HelixCovariance avgCov;
+
+  // Chi2 value
+  double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
+                                              relToPar,   toCov,   toAmbiguity,
+                                              relAvgPar,  avgCov);
+
+  HelixParameters avgPar = relAvgPar + refHelixPar;
+  AngleUtil::normalise(avgPar[c_Phi0]);
 
   // Calculating 5 parameters from 6 input parameters. 1 NDF remaining.
   size_t ndf = 1;
-  double chi2 = 0;
 
-  // Use the mean circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
-  ParameterVector<3> refPar = (fromPar + toPar) / 2;
-
-  ParameterVector<3> relFromPar = fromPar - refPar;
-  ParameterVector<3> relToPar = toPar - refPar;
-
-  // Chi2 value
-  chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
-                                       relToPar,   toCov,   toAmbiguity,
-                                       commonPar,  commonCov);
-
-  commonPar(EHelixParameter::c_Curv) += refPar(EPerigeeParameter::c_Curv);
-  commonPar(EHelixParameter::c_Phi0) += refPar(EPerigeeParameter::c_Phi0);
-  commonPar(EHelixParameter::c_I)    += refPar(EPerigeeParameter::c_I);
-  commonPar(EHelixParameter::c_TanL) += szParameters(ESZParameter::c_TanL);
-  commonPar(EHelixParameter::c_Z0)   += szParameters(ESZParameter::c_Z0);
-
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
+  return UncertainHelix(avgPar, avgCov, chi2, ndf);
 }

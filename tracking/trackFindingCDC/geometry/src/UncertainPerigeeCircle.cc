@@ -7,8 +7,9 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/geometry/UncertainPerigeeCircle.h>
+
+#include <tracking/trackFindingCDC/numerics/Angle.h>
 
 #include <framework/logging/Logger.h>
 
@@ -24,26 +25,33 @@ using namespace TrackFindingCDC;
 UncertainPerigeeCircle UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
                                                        const UncertainPerigeeCircle& toPerigeeCircle)
 {
-  const ParameterVector<3>&  fromPar = fromPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& fromCov = fromPerigeeCircle.perigeeCovariance();
+  const PerigeeParameters& fromPar = fromPerigeeCircle.parameters();
+  const PerigeeCovariance& fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  const ParameterVector<3>&  toPar = toPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& toCov = toPerigeeCircle.perigeeCovariance();
+  const PerigeeParameters& toPar = toPerigeeCircle.parameters();
+  const PerigeeCovariance& toCov = toPerigeeCircle.perigeeCovariance();
 
-  const ParameterVector<3>&  refPar = (fromPar + toPar) / 2.0;
+  using namespace NPerigeeParameterIndices;
+  PerigeeParameters refPar = (fromPar + toPar) / 2.0;
+  refPar(c_Phi0) = AngleUtil::average(fromPar(c_Phi0), toPar(c_Phi0));
 
-  ParameterVector<3> relFromPar = fromPar - refPar;
-  ParameterVector<3> relToPar = toPar - refPar;
+  PerigeeParameters relFromPar = fromPar - refPar;
+  AngleUtil::normalise(relFromPar(c_Phi0));
 
-  ParameterVector<3> commonPar;
-  CovarianceMatrix<3> commonCov;
+  PerigeeParameters relToPar = toPar - refPar;
+  AngleUtil::normalise(relToPar(c_Phi0));
+
+  PerigeeParameters relAvgPar;
+  PerigeeCovariance avgCov;
   double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov,
                                               relToPar, toCov,
-                                              commonPar, commonCov);
+                                              relAvgPar, avgCov);
 
-  commonPar += refPar;
+  PerigeeParameters avgPar = relAvgPar + refPar;
+  AngleUtil::normalise(avgPar(c_Phi0));
 
   // Calculating 3 parameters from 6 input parameters. 3 NDF remaining.
   size_t ndf = 3;
-  return UncertainPerigeeCircle(commonPar, commonCov, chi2, ndf);
+
+  return UncertainPerigeeCircle(avgPar, avgCov, chi2, ndf);
 }

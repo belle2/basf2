@@ -231,9 +231,13 @@ namespace Belle2 {
 
 
 
-      /// Getter for the cirlce in local coordinates
+      /// Getter for the circle in local coordinates
       UncertainPerigeeCircle getLocalCircle() const
       { return getLocalHelix().uncertainCircleXY(); }
+
+      /// Getter for the sz line starting from the local origin
+      UncertainSZLine getLocalSZLine() const
+      { return getLocalHelix().lineSZ(); }
 
       ///  Getter for p-value
       double getPValue() const

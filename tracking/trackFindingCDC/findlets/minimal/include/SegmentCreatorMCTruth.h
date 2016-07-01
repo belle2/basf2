@@ -92,7 +92,7 @@ namespace Belle2 {
                                                            mcTrackStore.getMCSegmentsByMCParticleIdx();
 
       std::size_t nSegments = 0;
-      for (const std::pair<ITrackType, std::vector<CDCHitVector>>& mcSegmentsAndMCParticleIdx :  mcSegmentsByMCParticleIdx) {
+      for (const std::pair<ITrackType, std::vector<CDCHitVector>>& mcSegmentsAndMCParticleIdx : mcSegmentsByMCParticleIdx) {
         const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
         nSegments += mcSegments.size();
       }
@@ -113,8 +113,10 @@ namespace Belle2 {
 
       if (m_param_recostructedPositions) {
         for (CDCRecoSegment2D& segment : outputSegments) {
-          CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
-          segment = CDCRecoSegment2D::reconstructUsingFacets(rlWireHitSegment);
+          if (segment.size() > 1) {
+            CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
+            segment = CDCRecoSegment2D::reconstructUsingFacets(rlWireHitSegment);
+          }
         }
       }
     }

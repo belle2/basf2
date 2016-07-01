@@ -237,23 +237,29 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegme
   return result;
 }
 
-
 CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment)
 {
-  CDCTangentSegment tangentSegment;
-  createTangentSegment(rlWireHitSegment, tangentSegment);
-  return condense(tangentSegment);
+  if (rlWireHitSegment.size() == 1) {
+    CDCRecoSegment2D segment;
+    Vector2D zeroDisp2D(0.0, 0.0);
+    segment.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
+    return segment;
+  } else {
+    CDCTangentSegment tangentSegment;
+    createTangentSegment(rlWireHitSegment, tangentSegment);
+    return condense(tangentSegment);
+  }
 }
-
-
-
-
 
 CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment)
 {
-  CDCFacetSegment facetSegment;
-  createFacetSegment(rlWireHitSegment, facetSegment);
-  return condense(facetSegment);
+  if (rlWireHitSegment.size() < 3) {
+    return reconstructUsingTangents(rlWireHitSegment);
+  } else {
+    CDCFacetSegment facetSegment;
+    createFacetSegment(rlWireHitSegment, facetSegment);
+    return condense(facetSegment);
+  }
 }
 
 vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const

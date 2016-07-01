@@ -52,14 +52,16 @@ namespace Belle2 {
                          std::vector<CDCSegmentPair>& segmentPairs) override
       {
         // Group the segments by their super layer id
-        for (std::vector<const CDCRecoSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
-          segementsInSuperLayer.clear();
+        for (std::vector<const CDCRecoSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer) {
+          segmentsInSuperLayer.clear();
         }
 
         for (const CDCRecoSegment2D& segment : inputSegments) {
           ISuperLayer iSuperLayer = segment.getISuperLayer();
-          const CDCRecoSegment2D* ptrSegment = &segment;
-          m_segmentsBySuperLayer[iSuperLayer].push_back(ptrSegment);
+          if (not ISuperLayerUtil::isInvalid(iSuperLayer)) {
+            const CDCRecoSegment2D* ptrSegment = &segment;
+            m_segmentsBySuperLayer[iSuperLayer].push_back(ptrSegment);
+          }
         }
 
         // Make pairs of closeby superlayers

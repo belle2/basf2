@@ -593,7 +593,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
         cpr_num++;
 
         // Check Error bit flag
-        if (temp_rawcopper->GetErrorBitFlag(0))(*error_bit_flag)++;
+        if (temp_rawcopper->GetEventCRCError(0) != 0)(*error_bit_flag)++;
         delete temp_rawcopper;
       }
     }
@@ -795,13 +795,14 @@ void DeSerializerPCModule::event()
   m_eventMetaDataPtr.create();
   m_eventMetaDataPtr->setExperiment(exp_copper_0);
   m_eventMetaDataPtr->setRun(run_copper_0);
-  if (error_bit_flag == 0) {
-    m_eventMetaDataPtr->setSubrun(subrun_copper_0);
-  } else {
-    printf("[ERROR] error bit was detected. count = %d\n", error_bit_flag);
-    m_eventMetaDataPtr->setSubrun(0xFFFFFFFF);
-  }
+  m_eventMetaDataPtr->setSubrun(subrun_copper_0);
   m_eventMetaDataPtr->setEvent(eve_copper_0);
+  if (error_bit_flag != 0) {
+    m_eventMetaDataPtr->addErrorFlag(EventMetaData::c_B2LinkCRCError);
+    printf("[ERROR] error bit was detected. exp %d run %d eve %d count = %d\n",
+           exp_copper_0, run_copper_0, eve_copper_0, error_bit_flag);
+  }
+
 
   //
   // Run stop via NSM (Already obsolete. Need to ask Konno-san about implementation)

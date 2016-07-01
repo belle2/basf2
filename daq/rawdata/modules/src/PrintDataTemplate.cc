@@ -131,7 +131,9 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 2)),
          sizeof(int) * (raw_copper->GetDetectorNwords(i, 3))
         );
-  printf("SVD CTIME_TYPE %.8x EVE 0x %.8x\n", raw_copper->GetTTCtimeTRGType(i), raw_copper->GetEveNo(i));
+  printf("EventMetaData : exp %d run %d subrun %d eve %.8x\n", m_eventMetaDataPtr->getExperiment(),
+         m_eventMetaDataPtr->getRun(), m_eventMetaDataPtr->getSubrun(), m_eventMetaDataPtr->getEvent());
+
   if (m_eventMetaDataPtr->getErrorFlag()) {
     printf("!!!!!!!!! ERROR event !!!!!!!!!! : eve %d errflag %.8x\n", raw_copper->GetEveNo(i), m_eventMetaDataPtr->getErrorFlag());
   }

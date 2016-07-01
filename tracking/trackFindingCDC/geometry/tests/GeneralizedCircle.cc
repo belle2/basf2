@@ -280,6 +280,19 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
 }
 
 
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_perigeeConversion)
+{
+  float curvature = -0.5;
+  float phi0 = M_PI / 2;
+  float impact = -1;
+  GeneralizedCircle circle = GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact);
+
+  EXPECT_NEAR(impact, circle.impact(), 10e-7);
+  EXPECT_NEAR(phi0, circle.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(curvature, circle.curvature(), 10e-7);
+}
+
+
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_distance)
 {
   float absError = 10e-6;

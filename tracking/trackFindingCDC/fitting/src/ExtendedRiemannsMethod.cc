@@ -67,24 +67,6 @@ namespace {
   constexpr size_t iR2 = 3;
   constexpr size_t iL = 4;
 
-  /// Helper indices for meaningfull matrix access to the full generalized parameter covariance matrices
-  constexpr size_t iN0 = 0;
-  constexpr size_t iN1 = 1;
-  constexpr size_t iN2 = 2;
-  constexpr size_t iN3 = 3;
-
-  /// Helper indices for meaningfull matrix access to the reduced generalized parameter covariance matrices
-  constexpr size_t iReducedN0 = 0;
-  constexpr size_t iReducedN2 = 1;
-  constexpr size_t iReducedN3 = 2;
-
-  /// Helper indices for meaningfull matrix access to the perigee covariance matrices
-  constexpr size_t iCurv = 0;
-  constexpr size_t iPhi0 = 1;
-  constexpr size_t iI = 2;
-
-
-
   /// Variant with drift circles
   PerigeeCircle fit(const Matrix< double, 5, 5 >& sumMatrix,
                     bool lineConstrained = false,
@@ -227,7 +209,6 @@ namespace {
   double calcChi2(const PerigeeCircle& parameters,
                   const Matrix< double, 5, 5 >& s)
   {
-
     Matrix<double, 5, 1> n;
     n(0) = parameters.n0();
     n(1) = parameters.n1();
@@ -237,7 +218,6 @@ namespace {
 
     double chi2 = n.transpose() * s * n;
     return chi2;
-
   }
 
 
@@ -245,7 +225,6 @@ namespace {
   double calcChi2(const PerigeeCircle& parameters,
                   const Matrix< double, 4, 4 >& s)
   {
-
     Matrix<double, 4, 1> n;
     n(0) = parameters.n0();
     n(1) = parameters.n1();
@@ -253,103 +232,50 @@ namespace {
     n(3) = parameters.n3();
 
     double chi2 = n.transpose() * s * n;
-
     return chi2;
   }
 
 
-  Matrix<double, 3, 3> calcCovariance(const PerigeeCircle& parameters,
-                                      const Matrix< double, 4, 4 >& s,
-                                      bool lineConstrained = false,
-                                      bool originConstrained = false)
+  PerigeePrecision calcPrecision(const PerigeeCircle& parameters,
+                                 const Matrix< double, 4, 4 >& s,
+                                 bool lineConstrained = false,
+                                 bool originConstrained = false)
   {
-    const double n0 = parameters.n0();
+    const double impact = parameters.impact();
+    const Vector2D& phi0Vec = parameters.tangential();
+    const double curvature = parameters.curvature();
 
-    Vector2D n12 = parameters.n12();
-    const double n3 = parameters.n3();
+    using namespace NPerigeeParameterIndices;
+    Matrix<double, 4, 3> ambiguity = Matrix<double, 4, 3> ::Zero();
 
-    // 1. Passive rotation such that n12 = (n1, 0);
+    ambiguity(0, c_Curv) = impact * impact / 2;
+    ambiguity(1, c_Curv) = phi0Vec.y() * impact;
+    ambiguity(2, c_Curv) = -phi0Vec.x() * impact;
+    ambiguity(3, c_Curv) = 1.0 / 2.0;
 
-    // n12 in the rotated system will be:
-    const double rotN1 = n12.normalize();
-    const double rotN2 = 0.0;
+    ambiguity(0, c_Phi0) = 0;
+    ambiguity(1, c_Phi0) = phi0Vec.x() * (1 + curvature * impact);
+    ambiguity(2, c_Phi0) = phi0Vec.y() * (1 + curvature * impact);
+    ambiguity(3, c_Phi0) = 0;
 
-    // Setup passive rotation matrix.
-    Matrix< double, 4, 4 > rot = Matrix< double, 4, 4 >::Identity();
-    rot(iX, iX) = n12.x();
-    rot(iX, iY) = n12.y();
+    ambiguity(0, c_I) = 1 + curvature * impact;
+    ambiguity(1, c_I) = phi0Vec.y() * curvature;
+    ambiguity(2, c_I) = -phi0Vec.x() * curvature;
+    ambiguity(3, c_I) = 0;
 
-    rot(iY, iX) = -n12.y();
-    rot(iY, iY) = n12.x();
-
-    // 2. Reduce the four generalized parameters to three parameters lifting the normalization constraint
-    // n1 * n1 + n2 * n2 - 4 n0*n3 = 1
-    // in the rotated system
-    // The rotation is needed because to assure n1 != 0 at the point the constraint needs to be inverted.
-    // In case n12 = (0, 0) this breaks down.
-    // However this correspondes to the case when the circle is centered on the origin, where the perigee parameterization is ill conditioned in the first place.
-    Matrix< double, 3, 4 > reduce = Matrix< double, 3, 4 >::Zero();
-    reduce(iReducedN0, iN0) = 1.;
-    reduce(iReducedN2, iN2) = 1.;
-    reduce(iReducedN3, iN3) = 1.;
-
-    reduce(iReducedN0, iN1) = 2 * n3 / rotN1;
-    reduce(iReducedN2, iN1) = -rotN2 / rotN1;
-    reduce(iReducedN3, iN1) = 2 * n0 / rotN1;
-
-
-    // Instead of doing the two transformations seperatly we combine the matrices and apply a single transformation.
-    // This saves one matrix multiplication.
-    // Matrix<double, 4, 4> rotS = rot * s * rot.transpose();
-    // Matrix<double, 3, 3> reducedNInvV = reduce * rotS * reduce.transpose();
-
-    Matrix< double, 3, 4 > rotAndReduce = reduce * rot;
-    Matrix< double, 3, 3> reducedNInvCov = rotAndReduce * s * rotAndReduce.transpose();
-
-    //Zero out the unconsidered parameters before inversion. Keep one on the diagonal.
+    PerigeePrecision perigeePrecision = ambiguity.transpose() * s * ambiguity;
+    // Zero out the unfitted parameters from the precision matrix
     if (lineConstrained) {
-      reducedNInvCov.row(iReducedN3) = Matrix<double, 1, 3>::Zero();
-      reducedNInvCov.col(iReducedN3) = Matrix<double, 3, 1>::Zero();
-      reducedNInvCov(iReducedN3, iReducedN3) = 1.;
+      perigeePrecision.row(c_Curv) = Matrix<double, 1, 3>::Zero();
+      perigeePrecision.col(c_Curv) = Matrix<double, 3, 1>::Zero();
     }
 
     if (originConstrained) {
-      reducedNInvCov.row(iReducedN0) = Matrix<double, 1, 3>::Zero();
-      reducedNInvCov.col(iReducedN0) = Matrix<double, 3, 1>::Zero();
-      reducedNInvCov(iReducedN0, iReducedN0) = 1.;
+      perigeePrecision.row(c_I) = Matrix<double, 1, 3>::Zero();
+      perigeePrecision.col(c_I) = Matrix<double, 3, 1>::Zero();
     }
 
-    Matrix< double, 3, 3> reducedNCov = reducedNInvCov.inverse();
-
-    if (lineConstrained) {
-      reducedNCov(iReducedN3, iReducedN3) = 0.;
-    }
-
-    if (originConstrained) {
-      reducedNCov(iReducedN0, iReducedN0) = 0.;
-    }
-
-    // 3. Translate to perigee
-    Matrix< double, 3, 3 > perigeeJ;
-
-    double normN12 = fabs(rotN1); // = hypot(n1, n2);
-    double denominator = (1 + normN12) * (1 + normN12) * normN12;
-    perigeeJ(iCurv, iReducedN0) = 0;
-    perigeeJ(iCurv, iReducedN2) = 0;
-    perigeeJ(iCurv, iReducedN3) = 2;
-
-    perigeeJ(iPhi0, iReducedN0) = 0;
-    perigeeJ(iPhi0, iReducedN2) = 1 / normN12;
-    perigeeJ(iPhi0, iReducedN3) = 0;
-
-    perigeeJ(iI, iReducedN0) = 2 * (normN12 * (1 + 2 * normN12) - 1) / denominator;
-    perigeeJ(iI, iReducedN2) = 0;
-    perigeeJ(iI, iReducedN3) =  -4 * n0 * n0 /  denominator;
-
-    Matrix< double, 3, 3 > perigeeCov = perigeeJ * reducedNCov * perigeeJ.transpose();
-
-    return perigeeCov;
-
+    return perigeePrecision;
   }
 
 } // end anonymuous namespace
@@ -378,45 +304,43 @@ UncertainPerigeeCircle ExtendedRiemannsMethod::fitInternal(CDCObservations2D& ob
   // Parameters to be fitted
   UncertainPerigeeCircle resultCircle;
   double chi2;
-  Matrix< double, 3, 3> cov3;
 
   size_t nObservationsWithDriftRadius = observations2D.getNObservationsWithDriftRadius();
   if (nObservationsWithDriftRadius > 0) {
     resultCircle = ::fit(s, isLineConstrained(), isOriginConstrained());
     chi2 = calcChi2(resultCircle, s);
-
-    // Covariance calculation does not need the drift lengths, which is why we do not forward them
-    cov3 = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
-
   } else {
     if (not isOriginConstrained()) {
       // Alternative implementation for comparision
+
       // Matrix of averages
       Matrix< double, 4, 4> aNoL = sNoL / sNoL(iW);
+
       // Measurement means
       Matrix< double, 4, 1> meansNoL = aNoL.row(iW);
+
       // Covariance matrix
       Matrix< double, 4, 4> cNoL = aNoL - meansNoL * meansNoL.transpose();
+
       resultCircle = fitSeperateOffset(meansNoL, cNoL, isLineConstrained());
 
     } else {
       resultCircle = ::fit(sNoL, isLineConstrained(), isOriginConstrained());
     }
-
     chi2 = calcChi2(resultCircle, sNoL);
-    cov3 = calcCovariance(resultCircle, sNoL, isLineConstrained(), isOriginConstrained());
+
   }
 
-  resultCircle.setChi2(chi2);
+  // Covariance calculation does not need the drift lengths, which is why we do not forward them
+  PerigeePrecision perigeePrecision = calcPrecision(resultCircle, sNoL,
+                                                    isLineConstrained(),
+                                                    isOriginConstrained());
+
+  // Use in pivotingin caset the matrix is not full rank as is for the constrained cases-
+  PerigeeCovariance perigeeCovariance = perigeePrecision.colPivHouseholderQr().inverse();
+
   resultCircle.setNDF(ndf);
-
-  PerigeeCovariance perigeeCovariance;
-  for (int i = 0; i < 3; ++i) {
-    for (int j = 0; j < 3; ++j) {
-      perigeeCovariance(i, j) = cov3(i, j);
-    }
-  }
-
+  resultCircle.setChi2(chi2);
   resultCircle.setPerigeeCovariance(perigeeCovariance);
   return resultCircle;
 }

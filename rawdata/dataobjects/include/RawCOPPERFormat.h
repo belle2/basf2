@@ -189,6 +189,12 @@ namespace Belle2 {
     //! Add Detected Error bitflag
     virtual void AddErrorBitFlag(int n, unsigned int error_bit_flag) = 0;
 
+    //! check CRC packet Error
+    virtual int GetPacketCRCError(int n);
+
+    //! check CRC event Error
+    virtual int GetEventCRCError(int n);
+
     //! get node-ID from data
     virtual unsigned int GetNodeID(int n) = 0;
 

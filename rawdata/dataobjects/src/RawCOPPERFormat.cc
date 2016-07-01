@@ -202,4 +202,29 @@ unsigned int RawCOPPERFormat::GetB2LHeaderWord(int n, int finesse_buffer_pos)
 }
 
 
+// This function is available after RawCOPPER/Header ver.2
+int RawCOPPERFormat::GetPacketCRCError(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "This function is not supported in the version of  RawCOPPER format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+}
+
+// This function is available after RawCOPPER/Header ver.2
+int RawCOPPERFormat::GetEventCRCError(int n)
+{
+  char err_buf[500];
+  sprintf(err_buf,
+          "This function is not supported in the version of  RawCOPPER format that you're using. n=%d : %s %s %d: Exiting...\n",
+          n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+  printf("%s\n", err_buf); fflush(stdout);
+  string err_str = err_buf;
+  throw (err_str);
+  return -1;
+}
 

@@ -115,6 +115,12 @@ namespace Belle2 {
     //! Add Detected Error bitflag
     void AddErrorBitFlag(unsigned int error_bit_flag);
 
+    //! Get Packet CRC error flag
+    int GetPacketCRCError();
+
+    //! Get Detected Error bitflag
+    int GetEventCRCError();
+
     //! get contents of header
     int GetOffset1stFINESSE();
 
@@ -430,6 +436,28 @@ namespace Belle2 {
     CheckGetBuffer();
     m_buffer[ POS_TRUNC_MASK_DATATYPE ] |= (int)error_bit_flag;
     return;
+  }
+
+  inline int RawHeader_latest::GetPacketCRCError()
+  {
+    CheckGetBuffer();
+    unsigned int temp_err_flag = GetErrorBitFlag();
+    if ((temp_err_flag &
+         (0x1 <<  B2LINK_PACKET_CRC_ERROR)) == 0) {
+      return 0;
+    }
+    return 1;
+  }
+
+  inline int RawHeader_latest::GetEventCRCError()
+  {
+    CheckGetBuffer();
+    unsigned int temp_err_flag = GetErrorBitFlag();
+    if ((temp_err_flag &
+         (0x1 <<  B2LINK_EVENT_CRC_ERROR)) == 0) {
+      return 0;
+    }
+    return 1;
   }
 
   inline int RawHeader_latest::GetOffset1stFINESSE()

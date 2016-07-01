@@ -154,6 +154,12 @@ namespace Belle2 {
     //! Get Detected Error bitflag
     void AddErrorBitFlag(int n, unsigned int error_bit_flag);
 
+    //! check CRC packet Error
+    int GetPacketCRCError(int n);
+
+    //! check CRC event Error
+    int GetEventCRCError(int n);
+
     //! get node-ID from data
     unsigned int GetNodeID(int n);
 
@@ -400,6 +406,18 @@ namespace Belle2 {
   {
     CheckVersionSetBuffer();
     return m_access->AddErrorBitFlag(n, error_bit_flag);
+  }
+
+  inline int RawCOPPER::GetPacketCRCError(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetPacketCRCError(n);
+  }
+
+  inline int RawCOPPER::GetEventCRCError(int n)
+  {
+    CheckVersionSetBuffer();
+    return m_access->GetEventCRCError(n);
   }
 
 

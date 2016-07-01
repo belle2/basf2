@@ -45,7 +45,7 @@ namespace Belle2 {
       {}
 
 
-      /// Constructor taking all stored parameters as a TVectorD. Depricated.
+      /// Constructor taking all stored parameters as a SVector.
       explicit UncertainHelix(const HelixParameters& parameters,
                               const HelixCovariance& helixCovariance = HelixCovariance(),
                               const double chi2 = 0.0,
@@ -90,6 +90,67 @@ namespace Belle2 {
           m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2()),
           m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
       {}
+
+      /// Construct the averages of the two given helices by properly considering their covariance matrix.
+      static UncertainHelix average(const UncertainHelix& helix1,
+                                    const UncertainHelix& helix2);
+
+      /**
+       *  Construct the average helix including its covariance matrix from two different stereo angle projections.
+       *
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  is accomplished by considering the ambiguity matrix of the projections.
+       *  The average only succeeds when the projections are not parallel two each other which is generally the case
+       *  for two different super layers of different stereo kind.
+       *
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *
+       *  @param perigeeCircle1    First perigee circle
+       *  @param ambiguityMatrix1  Ambiguity matrix of the first perigee parameters with respect to the helix parameters
+       *  @param perigeeCircle2    Second perigee circle
+       *  @param ambiguityMatrix2  Ambiguity matrix of the second perigee parameters with respect to the helix parameters
+       *  @param szParameters      Reference sz parameters where the perigee circles have been fitted.
+       */
+      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle1,
+                                    const JacobianMatrix<3, 5>& ambiguityMatrix1,
+                                    const UncertainPerigeeCircle& perigeeCircle2,
+                                    const JacobianMatrix<3, 5>& ambiguityMatrix2,
+                                    const SZParameters& szParameters = SZParameters(0.0, 0.0));
+
+      /**
+       *  Construct the average helix including its covariance matrix incoorporating additional information from a stereo projection.
+       *
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  is accomplished by considering the ambiguity matrix of the projection.
+       *
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *  The circle is considered to be fitted in the sz space defined by the given helix.
+       *
+       *  @param helix            Second perigee circle
+       *  @param perigeeCircle    Perigee circle to be incoorporated
+       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the helix parameters
+       */
+      static UncertainHelix average(const UncertainHelix& helix,
+                                    const UncertainPerigeeCircle& perigeeCircle,
+                                    const JacobianMatrix<3, 5>& ambiguityMatrix)
+      { return average(perigeeCircle, ambiguityMatrix, helix); }
+
+      /**
+       *  Construct the average helix including its covariance matrix incoorporating additional information from a stereo projection.
+       *
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  is accomplished by considering the ambiguity matrix of the projection.
+       *
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *  The circle is considered to be fitted in the sz space defined by the given helix.
+       *
+       *  @param perigeeCircle    Perigee circle to be incoorporated
+       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the helix parameters
+       *  @param helix            Second perigee circle
+       */
+      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle,
+                                    const JacobianMatrix<3, 5>& ambiguityMatrix,
+                                    const UncertainHelix& helix);
 
     public:
       /// Projects the helix into the xy plain carrying over the relevant parts of the convariance matrix.

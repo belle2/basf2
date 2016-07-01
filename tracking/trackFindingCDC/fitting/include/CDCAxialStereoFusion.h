@@ -21,27 +21,6 @@ namespace Belle2 {
     class CDCAxialStereoFusion {
 
     public:
-      static UncertainPerigeeCircle fuse(const UncertainPerigeeCircle& startPerigeeCircle,
-                                         const UncertainPerigeeCircle& endPerigeeCircle);
-
-      static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
-                                 const JacobianMatrix<3, 5>& startAmbiguityMatrix,
-                                 const UncertainPerigeeCircle& endPerigeeCircle,
-                                 const JacobianMatrix<3, 5>& endAmbiguityMatrix);
-
-      static UncertainHelix fuse(const UncertainHelix& startHelix,
-                                 const UncertainPerigeeCircle& endPerigeeCircle,
-                                 const JacobianMatrix<3, 5>& endAmbiguityMatrix)
-      { return fuse(endPerigeeCircle, endAmbiguityMatrix, startHelix); }
-
-      static UncertainHelix fuse(const UncertainPerigeeCircle& startPerigeeCircle,
-                                 const JacobianMatrix<3, 5>& startAmbiguityMatrix,
-                                 const UncertainHelix& endHelix);
-
-      static UncertainHelix fuse(const UncertainHelix& startHelix,
-                                 const UncertainHelix& endHelix);
-
-    public:
       static JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
                                                 const CDCTrajectory2D& trajectory2D);
 

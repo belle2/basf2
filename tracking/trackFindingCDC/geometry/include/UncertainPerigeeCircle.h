@@ -85,7 +85,7 @@ namespace Belle2 {
           m_ndf(ndf)
       {}
 
-      /// Constructor taking all stored parameters as a TVectorD. Depricated.
+      /// Constructor taking all stored parameters as a SVector.
       explicit
       UncertainPerigeeCircle(const PerigeeParameters& parameters,
                              const PerigeeCovariance& perigeeCovariance = PerigeeCovariance(),
@@ -96,6 +96,10 @@ namespace Belle2 {
           m_chi2(chi2),
           m_ndf(ndf)
       {}
+
+      /// Average the parameters of the two given perigee circles properly considering their covariance matrix.
+      static UncertainPerigeeCircle average(const UncertainPerigeeCircle& startPerigeeCircle,
+                                            const UncertainPerigeeCircle& endPerigeeCircle);
 
 
     public:

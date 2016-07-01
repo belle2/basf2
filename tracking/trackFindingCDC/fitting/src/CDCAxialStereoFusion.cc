@@ -27,7 +27,6 @@ namespace {
                                          const CDCTrajectory2D& trajectory2D)
   {
     size_t nHits = segment.size();
-    // ISuperLayer iSuperLayer = segment.getISuperLayer();
 
     const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
     const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
@@ -100,163 +99,10 @@ namespace {
     JacobianMatrix<3, 5> fromH = calcAmbiguityImpl<AFromRecoHit>(fromSegment, fromTrajectory2D);
     JacobianMatrix<3, 5> toH = calcAmbiguityImpl<AToRecoHit>(toSegment, toTrajectory2D);
 
-    UncertainHelix resultHelix = CDCAxialStereoFusion::fuse(fromCircle, fromH, toCircle, toH);
+    UncertainHelix resultHelix = UncertainHelix::average(fromCircle, fromH, toCircle, toH);
     return CDCTrajectory3D(localOrigin3D, resultHelix);
   }
 }
-
-
-UncertainPerigeeCircle CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                                  const UncertainPerigeeCircle& toPerigeeCircle)
-{
-  const ParameterVector<3>&  fromPar = fromPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& fromCov = fromPerigeeCircle.perigeeCovariance();
-
-  const ParameterVector<3>&  toPar = toPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& toCov = toPerigeeCircle.perigeeCovariance();
-
-  const ParameterVector<3>&  refPar = (fromPar + toPar) / 2.0;
-
-  ParameterVector<3> relFromPar = fromPar - refPar;
-  ParameterVector<3> relToPar = toPar - refPar;
-
-  ParameterVector<3> commonPar;
-  CovarianceMatrix<3> commonCov;
-  double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov,
-                                              relToPar, toCov,
-                                              commonPar, commonCov);
-
-  commonPar += refPar;
-
-  // Calculating 3 parameters from 6 input parameters. 3 NDF remaining.
-  size_t ndf = 3;
-  return UncertainPerigeeCircle(commonPar, commonCov, chi2, ndf);
-}
-
-
-UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                          const JacobianMatrix<3, 5>& fromAmbiguity,
-                                          const UncertainPerigeeCircle& toPerigeeCircle,
-                                          const JacobianMatrix<3, 5>& toAmbiguity)
-{
-  const ParameterVector<3>&  fromPar = fromPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& fromCov = fromPerigeeCircle.perigeeCovariance();
-
-  const ParameterVector<3>&  toPar = toPerigeeCircle.parameters();
-  const CovarianceMatrix<3>& toCov = toPerigeeCircle.perigeeCovariance();
-
-  // Helix parameters
-  ParameterVector<5> commonPar;
-
-  // Helix covariance
-  CovarianceMatrix<5> commonCov;
-
-  // Calculating 5 parameters from 6 input parameters. 1 NDF remaining.
-  size_t ndf = 1;
-  double chi2 = 0;
-
-  if (useResidualParameters) {
-    // Use the mean circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
-    ParameterVector<3> refPar = (fromPar + toPar) / 2;
-
-    ParameterVector<3> relFromPar = fromPar - refPar;
-    ParameterVector<3> relToPar = toPar - refPar;
-    // Chi2 value
-    chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
-                                         relToPar,   toCov,   toAmbiguity,
-                                         commonPar,  commonCov);
-
-    for (int i = 0; i < 3; ++i) {
-      commonPar(i) += refPar(i);
-    }
-
-  } else {
-    // Chi2 value
-    chi2 = CovarianceMatrixUtil::average(fromPar, fromCov, fromAmbiguity,
-                                         toPar, toCov, toAmbiguity,
-                                         commonPar, commonCov);
-  }
-
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
-}
-
-UncertainHelix CDCAxialStereoFusion::fuse(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                          const JacobianMatrix<3, 5>& fromAmbiguity,
-                                          const UncertainHelix& toHelix)
-{
-  ParameterVector<3> fromPar = fromPerigeeCircle.parameters();
-  CovarianceMatrix<3> fromCov = fromPerigeeCircle.perigeeCovariance();
-
-  ParameterVector<5> toPar = toHelix.parameters();
-  CovarianceMatrix<5> toCov = toHelix.helixCovariance();
-  JacobianMatrix<5, 5> toAmbiguity = JacobianMatrixUtil::identity<5>();
-
-  // Helix covariance
-  CovarianceMatrix<5> commonCov;
-
-  // Helix parameters
-  ParameterVector<5> commonPar;
-
-
-  // Calculating 5 parameters from 8 input parameters. 3 NDF remaining.
-  size_t ndf = 3;
-
-  double chi2 = 0;
-
-
-  if (useResidualParameters) {
-    // Use the mean circle parameters as the reference, since the ambiguity matrix is a expansion around that point.
-    ParameterVector<3> refPar = (fromPar + ParameterVectorUtil::getSub<ParameterVector<3>, 0 >(toPar)) / 2;
-
-    ParameterVector<3> relFromPar = fromPar - refPar;
-    ParameterVector<5> relToPar = toPar;
-    // Only first three coordinates are effected by a change of the reference (expansion) point
-    for (int i = 0; i < 3; ++i) {
-      relToPar(i) -= refPar(i);
-    }
-
-    // Chi2 value
-    chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov, fromAmbiguity,
-                                         relToPar, toCov, toAmbiguity,
-                                         commonPar, commonCov);
-
-    for (int i = 0; i < 3; ++i) {
-      commonPar(i) += refPar(i);
-    }
-
-
-  } else {
-    // Chi2 value
-    chi2 = CovarianceMatrixUtil::average(fromPar, fromCov, fromAmbiguity,
-                                         toPar, toCov, toAmbiguity,
-                                         commonPar, commonCov);
-  }
-
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
-}
-
-UncertainHelix CDCAxialStereoFusion::fuse(const UncertainHelix& fromHelix,
-                                          const UncertainHelix& toHelix)
-{
-  ParameterVector<5> fromPar = fromHelix.parameters();
-  CovarianceMatrix<5> fromCov = fromHelix.helixCovariance();
-
-  ParameterVector<5> toPar = toHelix.parameters();
-  CovarianceMatrix<5> toCov = toHelix.helixCovariance();
-
-  CovarianceMatrix<5> commonCov;
-  ParameterVector<5> commonPar;
-
-  double chi2 = CovarianceMatrixUtil::average(fromPar, fromCov,
-                                              toPar, toCov,
-                                              commonPar, commonCov);
-
-  // Calculating 5 parameters from 10 input parameters. 5 NDF remaining.
-  size_t ndf = 5;
-
-  return UncertainHelix(commonPar, commonCov, chi2, ndf);
-}
-
 
 JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
                                                          const CDCTrajectory2D& trajectory2D)
@@ -264,16 +110,11 @@ JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment2D&
   return calcAmbiguityImpl<CDCRecoHit2D>(recoSegment2D, trajectory2D);
 }
 
-
-
 JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
                                                          const CDCTrajectory2D& trajectory2D)
 {
   return calcAmbiguityImpl<CDCRecoHit3D>(recoSegment3D, trajectory2D);
 }
-
-
-
 
 CDCTrajectory3D CDCAxialStereoFusion::fuseTrajectories(const CDCRecoSegment2D& fromSegment,
                                                        const CDCRecoSegment2D& toSegment)
@@ -384,11 +225,11 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
     return CDCTrajectory3D();
   }
 
-  // Correct the values of tanLambda and z0
+  // Correct the values of tan lambda and z0
   CDCTrajectory3D fusedTrajectory3D =
     fromIsAxial ?
     fuseTrajectoriesImpl<CDCRecoHit2D, CDCRecoHit3D>(fromSegment, stereoSegment3D) :
-    fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, toSegment) ;
+    fuseTrajectoriesImpl<CDCRecoHit3D, CDCRecoHit2D>(stereoSegment3D, toSegment);
 
   double tanLambdaShift = trajectorySZ.getTanLambda();
 

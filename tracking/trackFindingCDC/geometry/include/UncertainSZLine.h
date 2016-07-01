@@ -50,6 +50,15 @@ namespace Belle2 {
           m_ndf(ndf)
       {}
 
+      /// Getter for the sz parameters in the order defined by ESZParameter.h
+      SZParameters parameters() const
+      {
+        using namespace NSZParameterIndices;
+        SZParameters result;
+        result(c_TanL) = slope();
+        result(c_Z0) = intercept();
+        return result;
+      }
 
     public:
       /// Setter for the whole covariance matrix of the sz line parameters

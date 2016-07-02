@@ -14,6 +14,7 @@
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/GeoCDCCreator.h>
+#include <cdc/utilities/ClosestApproach.h>
 #include <framework/logging/Logger.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -1590,7 +1591,8 @@ line100:
     TVector3 thitPosition(0., 0., 0.);
     TVector3 twirePosition(0., 0., 0.);
 
-    G4double distance = m_cdcgp.ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
+    //    G4double distance = m_cdcgp.ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
+    G4double distance = CDC::ClosestApproach(tbwp, tfwp, tposIn, tposOut, thitPosition, twirePosition);
 
     hitPosition.setX(thitPosition.x());
     hitPosition.setY(thitPosition.y());
@@ -1603,70 +1605,4 @@ line100:
     return distance;
   }
 
-#if 0
-  G4double CDCSensitiveDetector::ClosestApproach(const G4ThreeVector bwp, const G4ThreeVector fwp, const G4ThreeVector posIn,
-                                                 const G4ThreeVector posOut, G4ThreeVector& hitPosition, G4ThreeVector& wirePosition)//,G4double& transferT)
-  {
-    //----------------------------------------------------------
-    /* For two lines r=r1+t1.v1 & r=r2+t2.v2
-       the closest approach is d=|(r2-r1).(v1 x v2)|/|v1 x v2|
-       the point where closest approach are
-       t1=(v1 x v2).[(r2-r1) x v2]/[(v1 x v2).(v1 x v2)]
-       t2=(v1 x v2).[(r2-r1) x v1]/[(v1 x v2).(v1 x v2)]
-       if v1 x v2=0 means two lines are parallel
-       d=|(r2-r1) x v1|/|v1|
-    */
-
-    G4double t1, t2, distance, dInOut, dHitIn, dHitOut;
-
-    //--------------------------
-    // Get wirepoint @ endplate
-    //--------------------------
-    /*    CDCGeometryPar& cdcgp = CDCGeometryPar::Instance();
-    TVector3 tfwp = cdcgp.wireForwardPosition(layerId, cellId);
-    G4ThreeVector fwp(tfwp.x(), tfwp.y(), tfwp.z());
-    TVector3 tbwp = cdcgp.wireBackwardPosition(layerId, cellId);
-    G4ThreeVector bwp(tbwp.x(), tbwp.y(), tbwp.z());
-    */
-    G4ThreeVector wireLine = fwp - bwp;
-    G4ThreeVector hitLine = posOut - posIn;
-
-    G4ThreeVector hitXwire = hitLine.cross(wireLine);
-    G4ThreeVector wire2hit = fwp - posOut;
-
-    //----------------------------------------------------------------
-    // Hitposition is the position on hit line where closest approach
-    // of two lines, but it may out the area from posIn to posOut
-    //----------------------------------------------------------------
-    if (hitXwire.mag() == 0) {
-      distance = wireLine.cross(wire2hit).mag() / wireLine.mag();
-      hitPosition = posIn;
-      t2 = (posIn - fwp).dot(wireLine) / wireLine.mag2();
-    } else {
-      t1 = hitXwire.dot(wire2hit.cross(wireLine)) / hitXwire.mag2();
-      hitPosition = posOut + t1 * hitLine;
-      t2 = hitXwire.dot(wire2hit.cross(hitLine)) / hitXwire.mag2();
-
-      dInOut = (posOut - posIn).mag();
-      dHitIn = (hitPosition - posIn).mag();
-      dHitOut = (hitPosition - posOut).mag();
-      if (dHitIn <= dInOut && dHitOut <= dInOut) { //Between point in & out
-        distance = fabs(wire2hit.dot(hitXwire) / hitXwire.mag());
-      } else if (dHitOut > dHitIn) { // out posIn
-        distance = wireLine.cross(posIn - fwp).mag() / wireLine.mag();
-        hitPosition = posIn;
-        t2 = (posIn - fwp).dot(wireLine) / wireLine.mag2();
-      } else { // out posOut
-        distance = wireLine.cross(posOut - fwp).mag() / wireLine.mag();
-        hitPosition = posOut;
-        t2 = (posOut - fwp).dot(wireLine) / wireLine.mag2();
-      }
-    }
-
-    wirePosition = fwp + t2 * wireLine;
-
-    return distance;
-
-  }
-#endif
 } // namespace Belle2

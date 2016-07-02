@@ -18,6 +18,7 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/utilities/ClosestApproach.h>
 
 #include <TRandom.h>
 
@@ -257,7 +258,8 @@ void CDCDigitizerModule::event()
       TVector3 posTrack = m_posTrack;
       TVector3 posWire = m_posWire;
 
-      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
+      //      m_driftLength = m_cdcgp->ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
+      m_driftLength = ClosestApproach(bwp, fwp, posIn, posOut, posTrack, posWire);
       //      std::cout << "base-dl, sag-dl, diff= " << m_aCDCSimHit->getDriftLength() <<" "<< m_driftLength <<" "<< m_driftLength - m_aCDCSimHit->getDriftLength() << std::endl;
       m_posTrack = posTrack;
       m_posWire  = posWire;

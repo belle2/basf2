@@ -795,21 +795,6 @@ namespace Belle2 {
        */
       void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
 
-
-      /**
-       * Returns a closest distance between a track and a wire.
-       * @param bwp[in] wire position at backward
-       * @param fwp[in] wire position at forward
-       * @param posIn[in] entrance position
-       * @param posOut[in] exit position
-       * @param hitPosition[out] track position corresp. to the closetst distance
-       * @param wirePosition[out] wire position corresp. to the closetst distance
-       */
-
-      double ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
-                             TVector3& hitPosition,
-                             TVector3& wirePosition) const;
-
       /**
        * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
        * @param[in] wireId wire-id. in question (reference)

@@ -88,31 +88,15 @@ timeDict = {'time2TDC': 1.0}
 timemodule.param(timeDict)
 timemodule.param('threshold', 50.)  # always
 timemodule.param('threshold_n', -300.)  # must be -150 for "small calpulse"
-# it shouldn't be anything else
-# if it, is the code will crash -- on purpose
 
 
 timecalibmodule = register_module('DoubleCalPulse')
-timecalibmodule.param('calibrationTimeMin', 200)   # laser
 timecalibmodule.param('calibrationWidthMax', 20)
-timecalibmodule.param('calibrationWidthMin', 6)
-timecalibmodule.param('calibrationADCThreshold', -300)  # must be -150 for "small calpulse"
-timecalibmodule.param('calibrationADCThreshold_max', -800)
-# if (args.inputRun).find("cosmic") != -1:
-#    timecalibmodule.param('calibrationWidthMax', 20)
-#    timecalibmodule.param('calibrationWidthMin', 6)
-#    timecalibmodule.param('calibrationADCThreshold', -300)
-#    timecalibmodule.param('calibrationADCThreshold_max', -800)
-
-# sampletimemodule = register_module('SampleTimeCalibrationV3')
-
-# sampletimeDict = {
-#    'inputFileName': args.timeCalibFile,
-#    'mode': 1,
-#    'writeFile': 0,
-#    'conditions': Conditions,
-# }
-# sampletimemodule.param(sampletimeDict)
+timecalibmodule.param('calibrationWidthMin', 8)
+timecalibmodule.param('calibrationADCThresholdMaxNeg', -300)  # must be -150 for "small calpulse"
+timecalibmodule.param('calibrationADCThresholdMinNeg', -800)
+timecalibmodule.param('calibrationADCThresholdMax', 850)
+timecalibmodule.param('calibrationADCThresholdMin', 450)
 
 
 main = create_path()

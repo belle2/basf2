@@ -19,6 +19,13 @@ input=/ghi/fs01/belle2/bdata/users/igal/output_phase1_nturn1000
 log=log_study_phase1_nturn1000                                                                                                                                           
 output=output_study_phase1_nturn1000
 
+#threshold in MeV
+THR=0.1
+#range in MeV
+RANGE=1000
+#Sample time in second
+ST=0.01
+
 for f in Touschek Coulomb Brems; do                                                                                                                                     
     for g in HER LER; do                                                                                                                                                
         RND=`od -An -N3 -l /dev/random |  sed 's/^ *\(.*\) *$/\1/'`

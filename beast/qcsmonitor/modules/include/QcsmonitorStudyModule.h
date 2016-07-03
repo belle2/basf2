@@ -84,6 +84,10 @@ namespace Belle2 {
       TH2F* h_qcsms_Evtof4[50];
       /** Energy deposited */
       TH1F* h_qcsms_edep[50];
+      /** Loss position in the IR */
+      TH1F* h_qcsms_s;
+      /** Loss position in the IR */
+      TH1F* h_qcsms_s_cut;
 
     };
 

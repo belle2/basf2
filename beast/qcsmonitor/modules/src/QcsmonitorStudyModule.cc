@@ -11,6 +11,7 @@
 #include <beast/qcsmonitor/modules/QcsmonitorStudyModule.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorSimHit.h>
 #include <beast/qcsmonitor/dataobjects/QcsmonitorHit.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -79,6 +80,8 @@ void QcsmonitorStudyModule::defineHisto()
                                  1000., 500, 0., 10.);
     h_qcsms_edep[i] = new TH1F(TString::Format("h_qcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
+  h_qcsms_s = new TH1F("h_qcsms_s", "", 4000, -200., 200.);
+  h_qcsms_s_cut = new TH1F("h_qcsms_s_cut", "", 4000, -200., 200.);
 }
 
 
@@ -102,6 +105,20 @@ void QcsmonitorStudyModule::event()
   //Here comes the actual event processing
 
   StoreArray<QcsmonitorSimHit>  SimHits;
+  StoreArray<SADMetaHit> SADtruth;
+
+  int nSAD = SADtruth.getEntries();
+  Bool_t Reject = false;
+  for (int i = 0; i < nSAD; i++) {
+    SADMetaHit* aHit = SADtruth[i];
+    double s = aHit->gets();
+    //double rate = aHit->getrate();
+    h_qcsms_s->Fill(-s);
+    if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
+      h_qcsms_s_cut->Fill(-s);
+      Reject = true;
+    }
+  }
 
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();

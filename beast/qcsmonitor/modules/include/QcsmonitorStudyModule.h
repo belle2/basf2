@@ -69,6 +69,10 @@ namespace Belle2 {
       virtual void getXMLData();
       /** Energy threshold */
       double m_Ethres;
+      /** Energy range */
+      double m_Erange;
+      /** Sample time */
+      double m_SampleTime;
 
       /** Energy deposited vs TOF */
       TH2F* h_qcsms_Evtof1[50];

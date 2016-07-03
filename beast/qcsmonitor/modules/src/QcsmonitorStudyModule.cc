@@ -57,6 +57,8 @@ QcsmonitorStudyModule::QcsmonitorStudyModule() : HistoModule()
   setDescription("Study module for Qcsmonitors (BEAST)");
 
   addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
+  addParam("Erange", m_Erange, "Energy range in MeV", 1000.0);
+  addParam("SampleTime", m_SampleTime, "Sample time in second", 1.0);
 }
 
 QcsmonitorStudyModule::~QcsmonitorStudyModule()
@@ -117,7 +119,7 @@ void QcsmonitorStudyModule::event()
     if (pdg == 22) h_qcsms_Evtof2[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
     else h_qcsms_Evtof4[detNB]->Fill(tof, Edep);
-    if (Edep > m_Ethres)h_qcsms_edep[detNB]->Fill(Edep);
+    if (m_Ethres < Edep && Edep < m_Erange)h_qcsms_edep[detNB]->Fill(Edep);
   }
 
 
@@ -136,7 +138,11 @@ void QcsmonitorStudyModule::getXMLData()
 void QcsmonitorStudyModule::endRun()
 {
 
-
+  for (int i = 0; i < 50; i ++) {
+    if (h_qcsms_edep[i]->GetEntries() > 0) {
+      h_qcsms_edep[i]->Scale(1. / m_SampleTime);
+    }
+  }
 
 }
 

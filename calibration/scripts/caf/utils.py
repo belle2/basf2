@@ -201,3 +201,45 @@ def temporary_workdir(path):
         yield
     finally:
         os.chdir(prev_cwd)
+
+
+class PathExtras():
+    """
+    Simple wrapper for basf2 paths to allow some extra python functionality directly on
+    them e.g. comparing whether or not a module is contained within a path with 'in' keyword.
+    """
+
+    def __init__(self, path=None):
+        """
+        Initialising with a path
+        """
+        if path:
+            #: Attribute to hold path object that this class wraps
+            self.path = path
+        else:
+            path = []
+        #: Holds a list of module names for the path in self.path
+        self._module_names = []
+        self._update_names()
+
+    def _update_names(self):
+        """
+        Takes the self.path attribute and uses the current state to recreate the
+        self.module_names list
+        """
+        for module in self.path.modules():
+            self._module_names.append(module.name())
+
+    def __contains__(self, module_name):
+        """
+        Special method to allow 'module_name in path' type comparisons. Returns
+        a boolean and compares by module name.
+        """
+        self._update_names()
+        return module_name in self._module_names
+
+    def index(self, module_name):
+        """
+        Returns the index of the first instance of a module in the contained path.
+        """
+        return self._module_names.index(module_name)

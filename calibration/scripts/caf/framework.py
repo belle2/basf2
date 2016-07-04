@@ -111,6 +111,10 @@ class Calibration():
         if input_files:
             #: Files used for collection procedure
             self.input_files = input_files
+        #: Since many collectors require some different setup, this is a path added before the collector and after the
+        #: default RootInput module setup. If this path contains RootInput then it's params are used instead, except for
+        #: the input_files.
+        self.pre_collector_path = None
         #: Since many algorithms require some different setup, this is a function object to run prior to alg.execute()
         self.pre_algorithm = None
         #: Output results of algorithms for each iteration
@@ -396,10 +400,11 @@ class CAF():
             # We want to put the most critical (most overall dependencies) near the start
             # First get an ordered dictionary of the sort order but including all implicit dependencies.
             ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
-            # Need to implement an ordering algorithm here, based on number of future dependents?
+            ####################################
             #
-            # TODO
+            # TODO: Need to implement an ordering algorithm here, based on number of future dependents?
             #
+            ####################################
             order = ordered_full_dependencies
         return order
 
@@ -410,17 +415,27 @@ class CAF():
         jobs = {}
         for calibration_name in calibrations:
             job = Job('_'.join([calibration_name, 'Collector', 'Iteration', str(iteration)]))
-            collector_path_file = self._make_collector_path(calibration_name, iteration)
             job.output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'output')
             job.working_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'input')
             job.cmd = ['basf2', 'run_collector_path.py']
             job.input_sandbox_files.append(_collector_steering_file_path)
+            collector_path_file = self._make_collector_path(calibration_name, iteration)
             job.input_sandbox_files.append(collector_path_file)
+            if self.calibrations[calibration_name].pre_collector_path:
+                pre_collector_path_file = self._make_pre_collector_path(calibration_name, iteration)
+                job.input_sandbox_files.append(pre_collector_path_file)
+            ###########################################
+            #
+            # TODO: Add dependent calibration databases
+            #
+            ###########################################
+            # Add previous iteration databases from this calibration
             if iteration > 0:
                 for algorithm in self.calibrations[calibration_name].algorithms:
                     algorithm_name = algorithm.Class_Name().replace('Belle2::', '')
                     database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration-1), 'output', 'localdb')
                     job.input_sandbox_files.append(database_dir)
+            # Define the input file list and output patterns to be returned from collector job
             job.input_files = self.calibrations[calibration_name].input_files
             job.output_patterns = self.calibrations[calibration_name].output_patterns
             jobs[calibration_name] = job
@@ -691,7 +706,8 @@ class CAF():
 
     def _make_collector_path(self, calibration_name, iteration):
         """
-        Creates a basf2 path for the correct collector and serializes it in the self.output_dir/<calibration_name>/paths directory
+        Creates a basf2 path for the correct collector and serializes it in the
+        self.output_dir/<calibration_name>/<iteration>/paths directory
         """
         path_output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'paths')
         # Should work fine as we previously make the other directories
@@ -700,8 +716,23 @@ class CAF():
         path = create_path()
         calibration = self.calibrations[calibration_name]
         path.add_module(calibration.collector)
-        # Dump the basf2 path to file and repeat
-        path_file_name = calibration.collector.name()+'.pickle'
+        # Dump the basf2 path to file
+        path_file_name = calibration.collector.name()+'.path'
+        path_file_name = os.path.join(path_output_dir, path_file_name)
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
+        # Return the pickle file path for addition to the input sandbox
+        return path_file_name
+
+    def _make_pre_collector_path(self, calibration_name, iteration):
+        """
+        Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
+        self.output_dir/<calibration_name>/<iteration>/paths directory
+        """
+        path_output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'paths')
+        path = self.calibrations[calibration_name].pre_collector_path
+        # Dump the basf2 path to file
+        path_file_name = 'pre_collector.path'
         path_file_name = os.path.join(path_output_dir, path_file_name)
         with open(path_file_name, 'bw') as serialized_path_file:
             pickle.dump(serialize_path(path), serialized_path_file)

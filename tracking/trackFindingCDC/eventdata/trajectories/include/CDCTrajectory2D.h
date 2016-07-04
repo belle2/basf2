@@ -95,6 +95,10 @@ namespace Belle2 {
                                                  toPoint - getLocalOrigin());
       }
 
+      /// Getter for the arc length for one round trip around the trajectory.
+      double getArcLength2DPeriod() const
+      { return m_localPerigeeCircle.arcLengthPeriod(); }
+
       /// Gives the three dimensional point which is on the wire line and has the given proper (signed) distance to the circle in the xy projection
       /** This method makes the reconstruction of the z coordinate possible by using the skewness \n
        *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n

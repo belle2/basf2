@@ -534,6 +534,10 @@ namespace Belle2 {
       { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
 
 
+      /// Getter for the arc length for a full round of the circle
+      double arcLengthPeriod() const
+      {return std::fabs(perimeter()); }
+
       /**
        *  Calculates the arc length between two points of closest approach on the circle.
        *  The arc length is signed positiv for travel in orientation direction.

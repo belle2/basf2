@@ -113,18 +113,16 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
     trajectory2D.reverse();
   }
 
+  double arcLength2DPeriod = trajectory2D.getArcLength2DPeriod();
   for (CDCRecoHit3D& recoHit : track) {
-    // Really ?
-    // The 0.1 is to prevent hits "before" the first hit to be sorted at the end of the track.
-    recoHit.setArcLength2D(trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) + 0.1);
+    double arcLength2D = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
+    if (arcLength2D < 0) {
+      arcLength2D += arcLength2DPeriod;
+    }
+    recoHit.setArcLength2D(arcLength2D);
     recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
-
-  // The first hit has - per definition of the trajectory2D - a perpS of 0. We want every other hit to have a perpS greater than 0,
-  // especially for curlers. For this, we go through all hits and look for negative perpS.
-  // If we have found one, we shift it to positive values
-  track.shiftToPositiveArcLengths2D(true);
 
   // We can now sort by perpS
   track.sortByArcLength2D();

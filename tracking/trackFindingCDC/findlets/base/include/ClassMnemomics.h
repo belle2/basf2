@@ -20,6 +20,7 @@ namespace Belle2 {
     class CDCFacet;
     class CDCRecoSegment2D;
     class CDCSegmentPair;
+    class CDCAxialSegmentPair;
     class CDCSegmentTriple;
     class CDCTrack;
 
@@ -75,6 +76,14 @@ namespace Belle2 {
 
       /// Returns a short description for class CDCSegmentPair to be used in descriptions of parameters.
       static std::string getParameterDescription(const CDCSegmentPair*) { return "segment pair"; }
+
+
+
+      /// Returns a short name for class CDCAxialSegmentPair to be used in names of parameters.
+      static std::string getParameterName(const CDCAxialSegmentPair*) { return "axialSegmentPair"; }
+
+      /// Returns a short description for class CDCAxialSegmentPair to be used in descriptions of parameters.
+      static std::string getParameterDescription(const CDCAxialSegmentPair*) { return "axial segment pair"; }
 
 
 

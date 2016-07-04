@@ -37,6 +37,7 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
 
   ModuleParamList moduleParamList = this->getParamList();
   m_trackOrienter.exposeParameters(&moduleParamList);
+  m_trackFlightTimeAdjuster.exposeParameters(&moduleParamList);
   m_trackExporter.exposeParameters(&moduleParamList);
   this->setParamList(moduleParamList);
 
@@ -56,6 +57,7 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
 void TrackFinderCDCBaseModule::initialize()
 {
   m_trackOrienter.initialize();
+  m_trackFlightTimeAdjuster.initialize();
   m_trackExporter.initialize();
 
   // Output StoreArray
@@ -69,6 +71,7 @@ void TrackFinderCDCBaseModule::initialize()
 void TrackFinderCDCBaseModule::event()
 {
   m_trackOrienter.beginEvent();
+  m_trackFlightTimeAdjuster.beginEvent();
   m_trackExporter.beginEvent();
 
   // Now aquire the store vector
@@ -87,6 +90,7 @@ void TrackFinderCDCBaseModule::event()
   m_trackOrienter.apply(outputTracks, orientedTracks);
   std::swap(outputTracks, orientedTracks);
 
+  m_trackFlightTimeAdjuster.apply(outputTracks);
   m_trackExporter.apply(outputTracks);
 }
 

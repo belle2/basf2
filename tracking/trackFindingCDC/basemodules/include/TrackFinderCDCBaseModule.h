@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <framework/core/Module.h>
@@ -62,6 +63,9 @@ namespace Belle2 {
     // Findlets
     /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
     TrackFindingCDC::TrackOrienter m_trackOrienter;
+
+    /// Adjusts the flight time to the start of the tracks relative to a trigger reference point
+    TrackFindingCDC::TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;
 
     /// Exports the generated CDCTracks as track candidates to be fitted by Genfit.
     TrackFindingCDC::TrackExporter m_trackExporter;

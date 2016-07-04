@@ -26,5 +26,20 @@ REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentExporter);
 REG_MODULE(SegmentCreatorMCTruth);
 
+REG_MODULE(AxialTrackCreatorSegmentHough)
+
+REG_MODULE(AxialSegmentPairCreator)
+REG_MODULE(SegmentPairCreator)
+REG_MODULE(SegmentTripleCreator)
+
+REG_MODULE(TrackCreatorSegmentPairAutomaton)
+REG_MODULE(TrackCreatorSegmentTripleAutomaton)
+REG_MODULE(TrackCreatorSingleSegments)
+
+REG_MODULE(TrackMerger)
+REG_MODULE(TrackOrienter)
+REG_MODULE(TrackFlightTimeAdjuster)
+REG_MODULE(TrackExporter)
+
 REG_MODULE(SegmentFinderFacetAutomaton);
 REG_MODULE(TrackFinderSegmentPairAutomaton);

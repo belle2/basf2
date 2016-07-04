@@ -25,11 +25,11 @@ namespace Belle2 {
      */
 
     class TrackExporter:
-      public Findlet<CDCTrack> {
+      public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCTrack> Super;
+      typedef Findlet<CDCTrack&> Super;
 
     public:
       /// Short description of the findlet

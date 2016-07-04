@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -103,7 +102,7 @@ void TrackExporter::apply(std::vector<CDCTrack>& tracks)
   if (m_param_exportTracks) {
     if (m_param_useRecoTracks) {
       StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-      for (CDCTrack& track : tracks) {
+      for (const CDCTrack& track : tracks) {
         track.storeInto(storedRecoTracks);
       }
     } else {

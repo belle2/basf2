@@ -205,7 +205,11 @@ namespace Belle2 {
       void shiftTanLambdaIntercept(const double tanLambdaShift, const double zShift)
       { m_localHelix.shiftTanLambdaZ0(tanLambdaShift, zShift); }
 
-
+      /**
+       *  Adjusts the z0 to the one that lies n periods forward
+       *  @returns The two dimensional arc length needed to travel from the old to the new support point.
+       */
+      double shiftPeriod(int nPeriods);
 
       /// Getter for the curvature as seen from the xy projection.
       double getCurvatureXY() const

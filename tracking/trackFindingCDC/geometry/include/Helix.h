@@ -143,6 +143,17 @@ namespace Belle2 {
         m_lineSZ.setSlopeIntercept(tanLambda + tanLambdaShift, z0 + zShift);
       }
 
+      /**
+       *  Adjust the arclength measure to start n periods later.
+       *  @return The arc length needed to travel n periods.
+       */
+      double shiftPeriod(int nPeriods)
+      {
+        double arcLength2D =  nPeriods * fabs(perimeterXY());
+        m_lineSZ.passiveMoveAlongFirst(arcLength2D);
+        return arcLength2D;
+      }
+
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector3D atArcLength2D(const double s) const
       { return Vector3D(circleXY().atArcLength(s), lineSZ().map(s)); }

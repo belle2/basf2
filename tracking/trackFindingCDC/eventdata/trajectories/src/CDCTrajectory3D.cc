@@ -354,3 +354,9 @@ double CDCTrajectory3D::getAbsMom3D() const
 
   return factor2DTo3D * absMom2D;
 }
+
+double CDCTrajectory3D::shiftPeriod(int nPeriods)
+{
+  double arcLength2D = m_localHelix.shiftPeriod(nPeriods);
+  return arcLength2D;
+}

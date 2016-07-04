@@ -232,17 +232,17 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_ShowCurlCurv)
   double outerCurlCurv = 1 / outerR;
 
   B2INFO("Maximal curvature reaching the CDC from IP : " << innerOriginCurv);
-  B2INFO("Minimal momentum reaching the CDC from IP : " << curvatureToAbsMom2D(innerOriginCurv, 1.5));
+  B2INFO("Minimal momentum reaching the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(innerOriginCurv, 1.5));
 
   B2INFO("Maximal curvature leaving the CDC from IP : " << outerOriginCurv);
-  B2INFO("Minimal momentum leaving the CDC from IP : " << curvatureToAbsMom2D(outerOriginCurv, 1.5));
+  B2INFO("Minimal momentum leaving the CDC from IP : " << CDCBFieldUtil::curvatureToAbsMom2D(outerOriginCurv, 1.5));
 
 
   B2INFO("Minimal curvature not reaching the CDC from VXD : " << innerCurlCurv);
-  B2INFO("Maximal momentum not reaching the CDC from VXD : " << curvatureToAbsMom2D(innerCurlCurv, 1.5));
+  B2INFO("Maximal momentum not reaching the CDC from VXD : " << CDCBFieldUtil::curvatureToAbsMom2D(innerCurlCurv, 1.5));
 
   B2INFO("Minimal curvature not leaving the CDC from inside the CDC : " << outerCurlCurv);
-  B2INFO("Maximal momentum not leaving the CDC from inside the CDC : " << curvatureToAbsMom2D(outerCurlCurv, 1.5));
+  B2INFO("Maximal momentum not leaving the CDC from inside the CDC : " << CDCBFieldUtil::curvatureToAbsMom2D(outerCurlCurv, 1.5));
 }
 
 

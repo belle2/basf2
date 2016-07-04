@@ -29,7 +29,9 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const double charge,
                                  const double bZ) :
   m_localOrigin(pos2D),
-  m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, bZ), mom2D.unit(), 0.0)
+  m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
+                       mom2D.unit(),
+                       0.0)
 
 {
 }
@@ -38,7 +40,9 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
                                  const Vector2D& mom2D,
                                  const double charge) :
   m_localOrigin(pos2D),
-  m_localPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0)
+  m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
+                       mom2D.unit(),
+                       0.0)
 
 {
 }
@@ -50,26 +54,29 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
                                   const double charge)
 {
   m_localOrigin = pos2D;
-  m_localPerigeeCircle = UncertainPerigeeCircle(absMom2DToCurvature(mom2D.norm(), charge, pos2D), mom2D.unit(), 0.0);
+  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D);
+  Vector2D phiVec = mom2D.unit();
+  double impact = 0.0;
+  m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
 }
 
 
 
 ESign CDCTrajectory2D::getChargeSign() const
 {
-  return ccwInfoToChargeSign(getLocalCircle().orientation());
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle().orientation());
 }
 
 
 double CDCTrajectory2D::getAbsMom2D(const double bZ) const
 {
-  return curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
 }
 
 double CDCTrajectory2D::getAbsMom2D() const
 {
   Vector2D position = getSupport();
-  return curvatureToAbsMom2D(getLocalCircle().curvature(), position);
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), position);
 }
 
 

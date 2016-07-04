@@ -112,7 +112,7 @@ void SegmentFitter::apply(std::vector<CDCRecoSegment2D>& outputSegments)
 
         if (not std::isnan(m_param_tofMassScale)) {
           double curvature = 2.0 * std::sin(alpha) / cylindricalR;
-          double pt = curvatureToAbsMom2D(curvature, recoPos);
+          double pt = CDCBFieldUtil::curvatureToAbsMom2D(curvature, recoPos);
           flightTimeEstimation = hypot(1, m_param_tofMassScale / pt);
         }
 

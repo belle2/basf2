@@ -60,7 +60,7 @@ namespace {
     // Jacobian matrix for the translation
     JacobianMatrix<6, 5> jacobianInflate = JacobianMatrixUtil::zero<6, 5>();
 
-    const double alpha = getAlphaFromBField(bZ);
+    const double alpha = CDCBFieldUtil::getAlphaFromBField(bZ);
     const double chargeAlphaCurv = charge * alpha * curvatureXY;
     const double chargeAlphaCurv2 = charge * alpha * std::pow(curvatureXY, 2);
 
@@ -118,7 +118,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const Vector3D& mom3D,
                                  const double charge) :
   m_localOrigin(pos3D),
-  m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
+  m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
                mom3D.xy().unit(),
                0.0,
                mom3D.cotTheta(),
@@ -132,7 +132,7 @@ CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
                                  const double charge,
                                  const double bZ) :
   m_localOrigin(pos3D),
-  m_localHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
+  m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
                mom3D.xy().unit(),
                0.0,
                mom3D.cotTheta(),
@@ -171,7 +171,7 @@ CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
 
 CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
   CDCTrajectory3D(gfTrackCand,
-                  getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
+                  CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
 {
 }
 
@@ -225,7 +225,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
   const double invPt = 1 / pt;
   const double invPtSquared = invPt * invPt;
   const double pz = gfTrackCand.getStateSeed()[iPz];
-  const double alpha = getAlphaFromBField(bZ);
+  const double alpha = CDCBFieldUtil::getAlphaFromBField(bZ);
   const double charge = gfTrackCand.getChargeSeed();
 
   using namespace NHelixParameterIndices;
@@ -251,7 +251,7 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
                                   const double charge)
 {
   m_localOrigin = pos3D;
-  m_localHelix = UncertainHelix(absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
+  m_localHelix = UncertainHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
                                 mom3D.xy().unit(),
                                 0.0,
                                 mom3D.cotTheta(),
@@ -261,7 +261,7 @@ void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
 {
   Vector3D position = getSupport();
-  return fillInto(trackCand, getBFieldZ(position));
+  return fillInto(trackCand, CDCBFieldUtil::getBFieldZ(position));
 }
 
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) const
@@ -289,7 +289,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   Vector3D position = getSupport();
-  return storeInto(recoTracks, getBFieldZ(position));
+  return storeInto(recoTracks, CDCBFieldUtil::getBFieldZ(position));
 }
 
 RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const double bZ) const
@@ -324,7 +324,7 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 
 ESign CDCTrajectory3D::getChargeSign() const
 {
-  return ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
 }
 
 double CDCTrajectory3D::getAbsMom3D(const double bZ) const
@@ -335,7 +335,7 @@ double CDCTrajectory3D::getAbsMom3D(const double bZ) const
 
   double curvatureXY = getLocalHelix().curvatureXY();
 
-  double absMom2D =  curvatureToAbsMom2D(curvatureXY, bZ);
+  double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, bZ);
 
   return factor2DTo3D * absMom2D;
 }
@@ -350,7 +350,7 @@ double CDCTrajectory3D::getAbsMom3D() const
 
   double curvatureXY = getLocalHelix().curvatureXY();
 
-  double absMom2D =  curvatureToAbsMom2D(curvatureXY, position);
+  double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, position);
 
   return factor2DTo3D * absMom2D;
 }

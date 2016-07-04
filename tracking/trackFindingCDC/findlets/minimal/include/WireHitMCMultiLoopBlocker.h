@@ -12,10 +12,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <vector>
 #include <algorithm>

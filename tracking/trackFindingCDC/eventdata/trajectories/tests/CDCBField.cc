@@ -26,9 +26,5 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCBField_getBFieldZSign)
   TVector3 bFieldAtOrigin = bFieldMap.getBField(origin);
   Double_t bZAtOrigin = bFieldAtOrigin.Z();
   ESign bZSignAtOrigin = sign(bZAtOrigin);
-  EXPECT_EQ(getBFieldZSign(), bZSignAtOrigin);
-
-  // EXPECT_NE(0.0, bZAtOrigin);
-  // EXPECT_EQ(getBFieldZ(), bZAtOrigin);
-
+  EXPECT_EQ(bZSignAtOrigin, CDCBFieldUtil::getBFieldZSign());
 }

@@ -409,13 +409,6 @@ void CDCTrack::forwardTakenFlag(bool takenFlag) const
   }
 }
 
-void CDCTrack::sortByRadius()
-{
-  std::stable_sort(begin(), end(), [](const CDCRecoHit3D & a, const CDCRecoHit3D & b) -> bool {
-    return a.getRefPos2D().norm() < b.getRefPos2D().norm();
-  });
-}
-
 void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {
   const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();

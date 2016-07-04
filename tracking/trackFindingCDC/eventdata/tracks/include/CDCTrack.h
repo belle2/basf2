@@ -141,9 +141,6 @@ namespace Belle2 {
       /// The flag can be used to do this for all tracks (default is to do this only for curlers)
       void shiftToPositiveArcLengths2D(bool doForAllTracks = false);
 
-      /// Sort the CDCRecoHits by their CDCWireHit.
-      void sortByRadius();
-
       /// Reverse the track inplace
       void reverse();
 

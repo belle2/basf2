@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
@@ -52,6 +53,7 @@ namespace Belle2 {
         addProcessingSignalListener(&m_wireHitTopologyPreparer);
         addProcessingSignalListener(&m_segmentFinderFacetAutomaton);
         addProcessingSignalListener(&m_trackFinderSegmentPairAutomaton);
+        addProcessingSignalListener(&m_trackFlightTimeAdjuster);
         addProcessingSignalListener(&m_trackExporter);
       }
 
@@ -72,6 +74,7 @@ namespace Belle2 {
         m_wireHitTopologyPreparer.exposeParameters(moduleParamList, prefix);
         m_segmentFinderFacetAutomaton.exposeParameters(moduleParamList, prefix);
         m_trackFinderSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
+        m_trackFlightTimeAdjuster.exposeParameters(moduleParamList, prefix);
         m_trackExporter.exposeParameters(moduleParamList, prefix);
 
         moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
@@ -104,6 +107,7 @@ namespace Belle2 {
         m_wireHitTopologyPreparer.apply(wireHits);
         m_segmentFinderFacetAutomaton.apply(wireHits, segments);
         m_trackFinderSegmentPairAutomaton.apply(segments, tracks);
+        m_trackFlightTimeAdjuster.apply(tracks);
         m_trackExporter.apply(tracks);
 
         // Put the segments and tracks on the DataStore
@@ -128,6 +132,10 @@ namespace Belle2 {
       TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
                                       ChooseableSegmentPairRelationFilter,
                                       ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
+
+      /// Adjusts the flight time of the tracks to a setable trigger point
+      TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;
+
       /// Exports the generated CDCTracks as track candidates to be fitted by Genfit.
       TrackExporter m_trackExporter;
 

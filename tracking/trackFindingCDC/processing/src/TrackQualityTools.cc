@@ -127,13 +127,17 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
   // We can now sort by perpS
   track.sortByArcLength2D();
 
+
   Vector3D frontPosition = track.front().getRecoPos3D();
-  trajectory3D.setLocalOrigin(frontPosition);
+  double arcLengthOffset = trajectory3D.setLocalOrigin(frontPosition);
   track.setStartTrajectory3D(trajectory3D);
+  for (CDCRecoHit3D& recoHit : track) {
+    recoHit.shiftArcLength2D(-arcLengthOffset);
+  }
 
   Vector3D backPosition = track.back().getRecoPos3D();
-  double arcLength2D = trajectory3D.setLocalOrigin(backPosition);
-  if (arcLength2D < 0) {
+  double backArcLength2D = trajectory3D.setLocalOrigin(backPosition);
+  if (backArcLength2D < 0) {
     trajectory3D.shiftPeriod(1);
   }
   track.setEndTrajectory3D(trajectory3D);

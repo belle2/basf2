@@ -159,7 +159,7 @@ CDCTrack CDCTrack::condense(const std::vector<const CDCTrack*>& trackPath)
     result.setEndTrajectory3D(endTrajectory3D);
 
     for (CDCRecoHit3D& recoHit3D : result) {
-      recoHit3D.shiftArcLength2D(resetPerpSOffset);
+      recoHit3D.shiftArcLength2D(-resetPerpSOffset);
     }
 
     return result;
@@ -227,7 +227,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentTriple>& segmentTriplePat
   track.setEndTrajectory3D(endTrajectory3D);
 
   for (CDCRecoHit3D& recoHit3D : track) {
-    recoHit3D.shiftArcLength2D(resetPerpSOffset);
+    recoHit3D.shiftArcLength2D(-resetPerpSOffset);
   }
 
   return track;
@@ -285,7 +285,7 @@ CDCTrack CDCTrack::condense(const Path<const CDCSegmentPair>& segmentPairPath)
   track.setEndTrajectory3D(endTrajectory3D);
 
   for (CDCRecoHit3D& recoHit3D : track) {
-    recoHit3D.shiftArcLength2D(resetPerpSOffset);
+    recoHit3D.shiftArcLength2D(-resetPerpSOffset);
   }
 
   return track;

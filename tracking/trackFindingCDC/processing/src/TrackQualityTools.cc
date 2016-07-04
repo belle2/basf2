@@ -89,15 +89,9 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 {
   if (track.empty()) return;
 
-  auto compareICLayer = [](const CDCRecoHit3D & one, const CDCRecoHit3D & two) {
-    return one.getWire().getICLayer() < two.getWire().getICLayer();
-  };
-  auto itInnerRecoHit3D = std::min_element(track.begin(), track.end(), compareICLayer);
-  const Vector3D& startPosition = itInnerRecoHit3D->getRecoPos3D();
-
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
 
-  // Why not kepp 0,0,0 as origin?
+  const Vector3D startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
 
   CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
@@ -111,10 +105,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
       numberOfPositiveHits++;
     }
   }
-  // ... or by looking at the arcLength of the origin
-  const double arcLength2DOfOrigin = trajectory2D.calcArcLength2D(Vector2D(0, 0));
-  // Really wouldn't one check be enough?
-  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size() or arcLength2DOfOrigin > 0;
+  const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size();
 
   // We reset the trajectory here to start at the newStartPosition of the first hit
   if (reverseTrajectory) {

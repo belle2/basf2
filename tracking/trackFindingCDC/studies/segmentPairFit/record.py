@@ -142,7 +142,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
             raise ValueError("Invalid degree of Monte Carlo information")
 
         path.add_module("SegmentFitter",
-                        segments="CDCRecoSegment2DVector",
+                        inputSegments="CDCRecoSegment2DVector",
                         updateDriftLength=True,
                         useAlphaInDriftLength=True)
 
@@ -209,6 +209,15 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     # Refiners to be executed at the end of the harvesting / termination of the module
     save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
     save_tree = refiners.save_tree()
+
+    save_curvature_pull_aux = refiners.save_pull_analysis(
+        part_name="curvature",
+        folder_name="aux",
+        unit="1/cm",
+        absolute=False,
+        aux_names=["superlayer_id_pair", "tan_lambda_truth"],
+        which_plots=["aux"],
+        outlier_z_score=3.0)
 
     save_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",

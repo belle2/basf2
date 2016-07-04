@@ -93,6 +93,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   const Vector3D startPosition(0, 0, 0);
   trajectory3D.setLocalOrigin(startPosition);
+  trajectory3D.setFlightTime(0);
 
   CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
 

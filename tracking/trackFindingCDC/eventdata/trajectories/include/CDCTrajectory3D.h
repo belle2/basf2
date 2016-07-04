@@ -39,35 +39,52 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCTrajectory3D() :
-        m_localOrigin(),
-        m_localHelix()
+      CDCTrajectory3D()
+        : m_localOrigin(),
+          m_localHelix()
       {}
 
       /// Constructs a trajectory from a helix with reference point equivalent to the origin.
-      explicit CDCTrajectory3D(const UncertainHelix& helix) :
-        m_localOrigin(0.0, 0.0, 0.0),
-        m_localHelix(helix)
+      explicit CDCTrajectory3D(const UncertainHelix& helix)
+        : m_localOrigin(0.0, 0.0, 0.0),
+          m_localHelix(helix),
+          m_flightTime(0.0)
       {}
 
       /// Constructs a trajectory from a local helix taken as relative to the given origin.
       CDCTrajectory3D(const Vector3D& localOrigin,
-                      const UncertainHelix& localHelix) :
-        m_localOrigin(localOrigin),
-        m_localHelix(localHelix)
+                      const UncertainHelix& localHelix,
+                      double flightTime = NAN)
+        : m_localOrigin(localOrigin),
+          m_localHelix(localHelix),
+          m_flightTime(flightTime)
       {}
 
-      /// Construct a trajectory with given start point, momentum at the start point and given charge.
-      CDCTrajectory3D(const Vector3D& startPoint,
-                      const Vector3D& startMomentum,
-                      const double charge);
+      /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
+      CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
+                      const CDCTrajectorySZ& trajectorySZ);
 
-      /// Construct a trajectory with given start point, momentum at the start point and given charge.
-      /// Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
+      /**
+       *  Construct a trajectory from a two dimensional circular trajectory
+       *  filling the remaining two parameters and covariance matrix with default values.
+       */
+      explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
+
+      /**
+       *  Construct a trajectory with given start point, momentum at the start point and given charge.
+       *  Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
+       */
       CDCTrajectory3D(const Vector3D& startPoint,
+                      const double startTime,
                       const Vector3D& startMomentum,
                       const double charge,
                       const double bZ);
+
+      /// Construct a trajectory with given start point, momentum at the start point and given charge.
+      CDCTrajectory3D(const Vector3D& startPoint,
+                      const double startTime,
+                      const Vector3D& startMomentum,
+                      const double charge);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       CDCTrajectory3D(const MCParticle& mcParticle, const double bZ);
@@ -75,23 +92,11 @@ namespace Belle2 {
       /// Construct a trajectory from the MCParticles vertex and momentum.
       explicit CDCTrajectory3D(const MCParticle& mcParticle);
 
-      /// Construct a three dimensional trajectory from a two dimensional circular trajectory and sz linear trajectory
-      CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
-                      const CDCTrajectorySZ& trajectorySZ);
-
-      /// Construct a trajectory from a two dimensional circular trajectory filling the remaining two parameters and covariance matrix with default values.
-      explicit CDCTrajectory3D(const CDCTrajectory2D& trajectory2D);
-
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
-
-
-
-
-
 
     public:
       /// Checks if the trajectory is already set to a valid value.
@@ -123,16 +128,15 @@ namespace Belle2 {
 
       /// Getter for the maximal distance from the origin
       double getMaximalCylindricalR() const
-      { return  getGlobalCircle().maximalCylindricalR(); }
+      { return getGlobalCircle().maximalCylindricalR(); }
 
       /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
       double getMinimalCylindricalR() const
-      { return  getGlobalCircle().minimalCylindricalR(); }
+      { return getGlobalCircle().minimalCylindricalR(); }
 
       /// Getter for the signed impact parameter of the trajectory
       double getGlobalImpact() const
-      { return  getGlobalCircle().impact(); }
-
+      { return getLocalCircle().distance(-m_localOrigin.xy()); }
 
     public:
       /// Gets the charge sign of the trajectory.
@@ -140,25 +144,32 @@ namespace Belle2 {
 
       /// Reverses the trajectory in place.
       void reverse()
-      { m_localHelix.reverse(); }
+      {
+        m_localHelix.reverse();
+        m_flightTime = -m_flightTime;
+      }
 
       /// Returns the reverse trajectory as a copy.
       CDCTrajectory3D reversed() const
-      { return CDCTrajectory3D(getLocalOrigin(), getLocalHelix().reversed()) ; }
+      {
+        return CDCTrajectory3D(getLocalOrigin(), getLocalHelix().reversed(), -getFlightTime());
+      }
 
-
-      /// Calculate the travel distance from the start position of the trajectory.
-      /** Returns the travel distance on the trajectory from the start point to \n
+      /**
+       *  Calculate the travel distance from the start position of the trajectory.
+       *  Returns the travel distance on the trajectory from the start point to \n
        *  the given point. This is subjected to a discontinuity at the far point \n
        *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
-       *  calculation. */
+       *  calculation.
+       */
       double calcArcLength2D(const Vector3D& point) const
       { return getLocalHelix().circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
 
-
-      /// Get unit momentum vector at a specific postion.
-      /** Return the unit travel direction at the closest approach to the position */
+      /*
+       *  Get unit momentum vector at a specific postion.
+       *  @return the unit travel direction at the closest approach to the position
+       */
       //Vector3D getUnitMom3D(const Vector3D& point) const
       //{ return getLocalCircle().tangential(point - getLocalOrigin().xy()); }
 
@@ -185,15 +196,12 @@ namespace Belle2 {
       Vector3D getSupport() const
       { return getLocalHelix().support() + getLocalOrigin(); }
 
-
-      /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom3D(const Vector3D& pos3D, const Vector3D& mom3D, const double charge);
-
       /// Clears all information from this trajectoy
       void clear()
       {
         m_localOrigin.set(0.0, 0.0, 0.0);
         m_localHelix.invalidate();
+        m_flightTime = NAN;
       }
 
     public:
@@ -265,7 +273,11 @@ namespace Belle2 {
 
       /// Getter for the two dimensional trajectory
       CDCTrajectory2D getTrajectory2D() const
-      { return CDCTrajectory2D(getLocalOrigin().xy(), getLocalHelix().uncertainCircleXY()); }
+      {
+        return CDCTrajectory2D(getLocalOrigin().xy(),
+                               getLocalHelix().uncertainCircleXY(),
+                               getFlightTime());
+      }
 
       /// Getter for the sz trajectory
       CDCTrajectorySZ getTrajectorySZ() const
@@ -283,16 +295,20 @@ namespace Belle2 {
       const Vector3D& getLocalOrigin() const
       { return m_localOrigin; }
 
-      /// Setter for the origin of the local coordinate system.
-      /** This sets the origin point the local helix representation is subjected.
-       *  The local helix is changed such that the set of points in global space is not changed.*/
-      double setLocalOrigin(const Vector3D& localOrigin)
-      {
-        double result = calcArcLength2D(localOrigin);
-        m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);
-        m_localOrigin = localOrigin;
-        return result;
-      }
+      /**
+       *  Setter for the origin of the local coordinate system.
+       *  This sets the origin point the local helix representation is subjected.
+       *  The local helix is changed such that the set of points in global space is not changed.
+       */
+      double setLocalOrigin(const Vector3D& localOrigin);
+
+      /// Getter for the time when the particle reached the support point position.
+      double getFlightTime() const
+      { return m_flightTime; }
+
+      /// Setter for the time when the particle reached the support point position.
+      void setFlightTime(double flightTime)
+      { m_flightTime = flightTime; }
 
       /// Output helper for debugging
       friend std::ostream& operator<<(std::ostream& output, const CDCTrajectory3D& trajectory3D)
@@ -308,6 +324,8 @@ namespace Belle2 {
       /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
       UncertainHelix m_localHelix;
 
+      /// Memory for the estimation of the time at which the particle arrived at the support point.
+      double m_flightTime = NAN;
 
     }; //class
 

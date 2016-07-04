@@ -28,39 +28,49 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      CDCTrajectory2D() :
-        m_localOrigin(),
-        m_localPerigeeCircle() {}
-
-      /// Constructs a trajectory from a generalized circle.
-      /** Constructs a trajectory which is described by the given line or circle.
-       *  The start point is set to the closest approach to the origin. */
-      explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle) :
-        m_localOrigin(0.0, 0.0),
-        m_localPerigeeCircle(perigeeCircle)
+      CDCTrajectory2D()
+        : m_localOrigin(),
+          m_localPerigeeCircle()
       {}
 
-      /// Constructs a trajectory from a generalized circle and a start point.
-      /** Constructs a trajectory which is described by the given line or circle and
+      /**
+       *  Constructs a trajectory from a generalized circle.
+       *  Constructs a trajectory which is described by the given line or circle.
+       *  The start point is set to the closest approach to the origin.
+       */
+      explicit CDCTrajectory2D(const UncertainPerigeeCircle& perigeeCircle)
+        : m_localOrigin(0.0, 0.0),
+          m_localPerigeeCircle(perigeeCircle)
+      {}
+
+      /**
+       *  Constructs a trajectory from a generalized circle and a start point.
+       *
+       *  Constructs a trajectory which is described by the given line or circle and
        *  starts in the given point. The point is taken to be the closest approach
-       *  to the circle. */
-      CDCTrajectory2D(
-        const Vector2D& localOrigin,
-        const UncertainPerigeeCircle& localPerigeeCircle
-      ) :
-        m_localOrigin(localOrigin),
-        m_localPerigeeCircle(localPerigeeCircle)
+       *  to the circle.
+       */
+      CDCTrajectory2D(const Vector2D& localOrigin,
+                      const UncertainPerigeeCircle& localPerigeeCircle,
+                      double flightTime = NAN)
+        : m_localOrigin(localOrigin),
+          m_localPerigeeCircle(localPerigeeCircle),
+          m_flightTime(flightTime)
       {}
 
-      /** Construct a trajectory with given start point, transverse momentum at the start point, the given charge and the
-       *  magnetic field value in z direction. */
+      /**
+       *  Construct a trajectory with given start point, transverse momentum at the start point,
+       *  the given charge and the magnetic field value in z direction.
+       */
       CDCTrajectory2D(const Vector2D& startPoint,
+                      const double startTime,
                       const Vector2D& startMomentum,
                       const double charge,
                       const double bZ);
 
       /// Construct a trajectory with given start point, transverse momentum at the start point and given charge.
       CDCTrajectory2D(const Vector2D& startPoint,
+                      const double startTime,
                       const Vector2D& startMomentum,
                       const double charge);
 
@@ -69,12 +79,15 @@ namespace Belle2 {
       bool isFitted() const
       { return not getLocalCircle().isInvalid(); }
 
-      /// Calculate the travel distance from the start position of the trajectory.
-      /** Returns the travel distance on the trajectory from the start point to \n
+      /**
+       *  Calculate the travel distance from the start position of the trajectory.
+       *
+       *  Returns the travel distance on the trajectory from the start point to \n
        *  the given point. This is subjected to a discontinuity at the far point \n
        *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
-       *  calculation. */
+       *  calculation.
+       */
       double calcArcLength2D(const Vector2D& point) const
       { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
@@ -83,12 +96,14 @@ namespace Belle2 {
       Vector2D getPos2DAtArcLength2D(double arcLength2D)
       { return getLocalOrigin() + getLocalCircle().atArcLength(arcLength2D); }
 
-      /// Calculate the travel distance between the two given positions
-      /** Returns the travel distance on the trajectory from the first given point to \n
+      /**
+       *  Calculate the travel distance between the two given positions
+       *  Returns the travel distance on the trajectory from the first given point to \n
        *  the second given point. This is subjected to a discontinuity at the far point \n
        *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
        *  If you have a heavily curling track you have care about the feasibility of this \n
-       *  calculation. */
+       *  calculation.
+       */
       double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
       {
         return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(),
@@ -99,10 +114,13 @@ namespace Belle2 {
       double getArcLength2DPeriod() const
       { return m_localPerigeeCircle.arcLengthPeriod(); }
 
-      /// Gives the three dimensional point which is on the wire line and has the given proper (signed) distance to the circle in the xy projection
-      /** This method makes the reconstruction of the z coordinate possible by using the skewness \n
-       *  stereo layer of the stereo wires.  The point is determined such that it is on the given \n
-       *  wire line and has the (signed) distance given as optional second parameter to the circular trajectory in the xy projection. */
+      /**
+       *  Gives the three dimensional point which is on the dirft circle away from the wire line.
+       *
+       *  This method makes the reconstruction of the z coordinate possible by using the skewness \n
+       *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
+       *  distance to  the wire line.
+       */
       Vector3D reconstruct3D(const WireLine& wireLine,
                              const double distance = 0.0) const;
 
@@ -115,15 +133,18 @@ namespace Belle2 {
       Vector2D getClosest(const Vector2D& point) const
       { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
-      /// Calculates the closest point with the same cylindricalR on the trajectory to the given point
-      /** This returns the point where the trajectory reaches as certain distance from the origin \n
+      /**
+       *  Calculates the closest point with the same cylindricalR on the trajectory to the given point
+       *  This returns the point where the trajectory reaches as certain distance from the origin \n
        *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
-       *  specific wire layer. */
+       *  specific wire layer.
+       */
       Vector2D getCloseSameCylindricalR(const Vector2D& point) const
       { return getGlobalCircle().sameCylindricalR(point); }
 
-      /// Calculates the point where the trajectory meets the outer wall of the CDC.
-      /** This method returns the first point in forward flight direction from the start
+      /**
+       *  Calculates the point where the trajectory meets the outer wall of the CDC.
+       *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the outer radius of the outer most layer.
        *  If the trajectory does not meet the CDC by the outer wall this will return Vector2D(nan,nan)
        *  The factor can be used to virtually resize the CDC.
@@ -131,20 +152,32 @@ namespace Belle2 {
       Vector2D getOuterExit(double factor = 1) const;
 
 
-      /// Calculates the point where the trajectory meets the inner wall of the CDC.
-      /** This method returns the first point in forward flight direction from the start
+      /**
+       *  Calculates the point where the trajectory meets the inner wall of the CDC.
+       *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the inner radius of the inner most layer.
        *  If the trajectory does not meet the CDC by the inner wall this will return Vector2D(nan,nan)
        */
       Vector2D getInnerExit() const;
 
-      /// Calculates the point where the trajectory leaves the CDC.
-      /** This method returns the first point in forward flight direction from the start
+      /**
+       *  Calculates the point where the trajectory leaves the CDC.
+       *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets either the radius of the inner most layer
        *  or the outer radius of the outer most wall.
        *  If the trajectory does not leave the CDC by the inner or outer wall this will return Vector2D(nan,nan).
        */
       Vector2D getExit() const;
+
+      /**
+       *  Checks if the trajectory describes a curler by looking at the outerExit of the trajectory.
+       *  If it contains a NaN, the trajectory is a curler.
+       */
+      bool isCurler(double factor = 1) const
+      {
+        const Vector2D& outerExit = getOuterExit(factor);
+        return outerExit.hasNAN();
+      }
 
       /// Calculates the distance from the point to the trajectory as seen from the xy projection.
       double getDist2D(const Vector2D& point) const
@@ -171,16 +204,28 @@ namespace Belle2 {
       { return getStartUnitMom2D().dot(getLocalOrigin()) > 0; }
 
     private:
-      /// Returns which superlayer is traversed after the current one following the trajectory outward or inward as indicated by the boolean input.
+      /**
+       * Returns which superlayer is traversed after the current one following
+       * the trajectory outward or inward as indicated by the boolean input.
+       */
       ISuperLayer getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const;
 
-      /// Returns which superlayer is traversed after the current one following the trajectory outward or inward as indicated by the boolean input.
+      /**
+       *  Returns which superlayer is traversed after the current one following
+       *  the trajectory outward or inward as indicated by the boolean input.
+       */
       ISuperLayer getISuperLayerAfterStart(bool movingOutward) const;
 
-      /// Indicates which superlayer is traversed after the current one following the trajectory forward or backward as indicated by the input.
+      /**
+       *  Indicates which superlayer is traversed after the current one following
+       *  the trajectory forward or backward as indicated by the input.
+       */
       ISuperLayer getISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
-      /// Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering, if you want to follow the trajectory in the forward or backward direction.
+      /**
+       *  Indicates which axial superlayer is traversed after the one, where the start point of the trajectory is located considering
+       *  if you want to follow the trajectory in the forward or backward direction.
+       */
       ISuperLayer getAxialISuperLayerAfterStart(const EForwardBackward forwardBackwardInfo) const;
 
     public:
@@ -208,8 +253,10 @@ namespace Belle2 {
       ISuperLayer getMinimalISuperLayer() const;
 
     public:
-      /** Calculates the perpendicular travel distance from the last position of the fromHits
-        * to the first position of the toHits. */
+      /**
+       *  Calculates the perpendicular travel distance from the last position of the fromHits
+       *  to the first position of the toHits.
+       */
       template<class AFromHits, class AToHits>
       double getArcLength2DGap(const AFromHits& fromHits, const AToHits& toHits) const
       {
@@ -218,9 +265,9 @@ namespace Belle2 {
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
-
-      /** Calculates the perpendicular travel distance from the first position
-       * of the fromHits to the first position of the toHits.
+      /**
+       *  Calculates the perpendicular travel distance from the first position
+       *  of the fromHits to the first position of the toHits.
        */
       template<class AFromHits, class AToHits>
       double getArcLength2DFrontOffset(const AFromHits& fromHits, const AToHits& toHits) const
@@ -230,7 +277,8 @@ namespace Belle2 {
         return calcArcLength2DBetween(fromRecoPos2D, toRecoPos2D);
       }
 
-      /** Calculates the perpendicular travel distance from the last position
+      /**
+       *  Calculates the perpendicular travel distance from the last position
        *  of the fromHits to the last position of the toHits.
        */
       template<class AFromHits, class AToHits>
@@ -250,7 +298,8 @@ namespace Belle2 {
         return calcArcLength2DBetween(frontRecoPos2D, backRecoPos2D);
       }
 
-      /** Calculates if this trajectory and the hits are coaligned
+      /**
+       *  Calculates if this trajectory and the hits are coaligned
        *  Returns:
        *  * EForwardBackward::c_Forward if the last entity lies behind the first.
        *  * EForwardBackward::c_Backward if the last entity lies before the first.
@@ -265,14 +314,21 @@ namespace Belle2 {
 
       /// Reverses the trajectory in place
       void reverse()
-      { m_localPerigeeCircle.reverse(); }
+      {
+        m_localPerigeeCircle.reverse();
+        m_flightTime = -m_flightTime;
+      }
 
       /// Returns the reverse trajectory as a copy
       CDCTrajectory2D reversed() const
-      { return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed()) ; }
+      {
+        return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed(), -getFlightTime());
+      }
 
-      /// Get unit momentum vector at a specific postion
-      /** Return the unit travel direction at the closest approach to the position */
+      /**
+       *  Get unit momentum vector at a specific postion.
+       *  @return The unit travel direction at the closest approach to the position
+       */
       inline Vector2D getUnitMom2D(const Vector2D& point) const
       { return getLocalCircle().tangential(point - getLocalOrigin()); }
 
@@ -311,9 +367,8 @@ namespace Belle2 {
       {
         m_localOrigin.set(0.0, 0.0);
         m_localPerigeeCircle.invalidate();
+        m_flightTime = NAN;
       }
-
-
 
     public:
       /// Getter for the curvature as seen from the xy projection.
@@ -333,7 +388,7 @@ namespace Belle2 {
       GeneralizedCircle getGlobalCircle() const
       {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        GeneralizedCircle result(m_localPerigeeCircle);
+        GeneralizedCircle result(getLocalCircle());
         result.passiveMoveBy(-getLocalOrigin());
         return result;
       }
@@ -374,36 +429,35 @@ namespace Belle2 {
       void setLocalCircle(const UncertainPerigeeCircle& localPerigeeCircle)
       { m_localPerigeeCircle = localPerigeeCircle; }
 
-
-
       /// Getter for the origin of the local coordinate system
       const Vector2D& getLocalOrigin() const
       { return m_localOrigin; }
 
-      /// Setter for the origin of the local coordinate system.
-      /** This sets the origin point the local circle representation is subjected. The local circle is also changed such that the set of points in global space is not changed on repositioning the local parameterisation.
+      /**
+       *  Setter for the origin of the local coordinate system.
+       *
+       *  This sets the origin point the local circle representation is subjected.
+       *  The local circle is also changed such that the set of points in global space
+       *  is not changed on repositioning the local parameterisation.
        *  It also implicitly sets up a new reference position for all travel distances. \n
        *  To be able to keep track how the travel distances have to be shifted by this change \n
        *  the setter returns the value by which the coordinate s parameter was moved ( passively ). \n
        *  The relation "old traveldistance - return value == new traveldistance" holds. \n
        *  (if they are not to far away from the reference points, up to the discontinuity at the \n
        *  far point on the circle) \n
-       *  @return Travel distance from the old to the new origin point */
-      double setLocalOrigin(const Vector2D& localOrigin)
-      {
-        double result = calcArcLength2D(localOrigin);
-        m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
-        m_localOrigin = localOrigin;
-        return result;
-      }
+       *
+       *  @param localOrigin  New local reference point in the global coordinate system
+       *  @return             Travel distance from the old to the new origin point
+       */
+      double setLocalOrigin(const Vector2D& localOrigin);
 
-      /// Checks if the trajectory describes a curler by looking at the outerExit of the trajectory.
-      /// If it contains a NaN, the trajectory is a curler.
-      bool isCurler(double factor = 1) const
-      {
-        const Vector2D& outerExit = getOuterExit(factor);
-        return outerExit.hasNAN();
-      }
+      /// Getter for the time when the particle reached the support point position.
+      double getFlightTime() const
+      { return m_flightTime; }
+
+      /// Setter for the time when the particle reached the support point position.
+      void setFlightTime(double flightTime)
+      { m_flightTime = flightTime; }
 
     public:
       /// Output helper for debugging
@@ -419,6 +473,10 @@ namespace Belle2 {
 
       /// Memory for the generalized circle describing the trajectory in coordinates from the local origin
       UncertainPerigeeCircle m_localPerigeeCircle;
+
+      /// Memory for the estimation of the time at which the particle arrived at the support point
+      double m_flightTime = NAN;
+
     }; //class
 
   } // namespace TrackFindingCDC

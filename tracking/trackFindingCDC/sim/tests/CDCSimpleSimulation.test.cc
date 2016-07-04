@@ -75,9 +75,10 @@ TEST_F(TrackFindingCDCTestWithSimpleSimulation, sim_CDCSimpleSimulation_photon_c
   // Should probably be placed at a vxd ladder
   Vector3D vertex(1.0, 0.0, 0.0);
   Vector3D momentum(1.0, 0.0, 0.0);
+  double time = 0.0;
 
-  CDCTrajectory3D electronTrajectory(vertex, momentum, -1, 1.5);
-  CDCTrajectory3D positronTrajectory(vertex, momentum, 1, 1.5);
+  CDCTrajectory3D electronTrajectory(vertex, time, momentum, -1, 1.5);
+  CDCTrajectory3D positronTrajectory(vertex, time, momentum, 1, 1.5);
 
   simulate({electronTrajectory, positronTrajectory});
   saveDisplay("photon_conversion.svg");

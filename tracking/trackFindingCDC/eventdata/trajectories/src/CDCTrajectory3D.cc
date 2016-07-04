@@ -28,8 +28,138 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+
+CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
+                                 const CDCTrajectorySZ& trajectorySZ) :
+  m_localOrigin(trajectory2D.getLocalOrigin()),
+  m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine()),
+  m_flightTime(trajectory2D.getFlightTime())
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
+  CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption())
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
+                                 const double time,
+                                 const Vector3D& mom3D,
+                                 const double charge,
+                                 const double bZ)
+  : m_localOrigin(pos3D),
+    m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
+                 mom3D.xy().unit(),
+                 0.0,
+                 mom3D.cotTheta(),
+                 0.0),
+    m_flightTime(time)
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
+                                 const double time,
+                                 const Vector3D& mom3D,
+                                 const double charge)
+  : CDCTrajectory3D(pos3D, time, mom3D, charge,
+                    CDCBFieldUtil::getBFieldZ(pos3D))
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const double bZ)
+  : CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+                    mcParticle.getProductionTime(),
+                    Vector3D{mcParticle.getMomentum()},
+                    mcParticle.getCharge(),
+                    bZ)
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle)
+  : CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
+                    mcParticle.getProductionTime(),
+                    Vector3D{mcParticle.getMomentum()},
+                    mcParticle.getCharge())
+{
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ) :
+  CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
+                  gfTrackCand.getTimeSeed(),
+                  Vector3D{gfTrackCand.getMomSeed()},
+                  gfTrackCand.getChargeSeed(),
+                  bZ)
+{
+  // Maybe push these out of this function:
+  // Indices of the cartesian coordinates
+  const int iX = 0;
+  const int iY = 1;
+  const int iZ = 2;
+  const int iPx = 3;
+  const int iPy = 4;
+  const int iPz = 5;
+
+  const TMatrixDSym& seedCov = gfTrackCand.getCovSeed();
+  CovarianceMatrix<6> cov6 = CovarianceMatrixUtil::fromTMatrix<6>(seedCov);
+
+  // 1. Rotate to a system where phi0 = 0
+  JacobianMatrix<6, 6> jacobianRot = JacobianMatrixUtil::zero<6, 6>();
+
+  const double px = gfTrackCand.getStateSeed()[iPx];
+  const double py = gfTrackCand.getStateSeed()[iPy];
+  const double pt = hypot(px, py);
+
+  const double cosPhi0 = px / pt;
+  const double sinPhi0 = py / pt;
+
+  // Passive rotation matrix by phi0:
+  jacobianRot(iX, iX) = cosPhi0;
+  jacobianRot(iX, iY) = sinPhi0;
+  jacobianRot(iY, iX) = -sinPhi0;
+  jacobianRot(iY, iY) = cosPhi0;
+  jacobianRot(iZ, iZ) = 1.0;
+
+  jacobianRot(iPx, iPx) = cosPhi0;
+  jacobianRot(iPx, iPy) = sinPhi0;
+  jacobianRot(iPy, iPx) = -sinPhi0;
+  jacobianRot(iPy, iPy) = cosPhi0;
+  jacobianRot(iPz, iPz) = 1.0;
+
+  // Apply transformation inplace
+  CovarianceMatrixUtil::transport(jacobianRot, cov6);
+
+  // 2. Translate to perigee parameters
+  JacobianMatrix<5, 6> jacobianReduce = JacobianMatrixUtil::zero<5, 6>();
+
+  const double invPt = 1 / pt;
+  const double invPtSquared = invPt * invPt;
+  const double pz = gfTrackCand.getStateSeed()[iPz];
+  const double alpha = CDCBFieldUtil::getAlphaFromBField(bZ);
+  const double charge = gfTrackCand.getChargeSeed();
+
+  using namespace NHelixParameterIndices;
+  jacobianReduce(c_Curv, iPx) = charge * invPtSquared / alpha ;
+  jacobianReduce(c_Phi0, iPy) = invPt;
+  jacobianReduce(c_I, iY) = 1;
+  jacobianReduce(c_TanL, iPx) = - pz * invPtSquared;
+  jacobianReduce(c_TanL, iPz) = invPt;
+  jacobianReduce(c_Z0, iZ) = 1;
+  // Note the column corresponding to iX is completely zero as expectable.
+
+  CovarianceMatrix<5> cov5 = CovarianceMatrixUtil::transported(jacobianReduce, cov6);
+  const HelixCovariance& helixCovariance = cov5;
+
+  // The covariance should now be the correct 5x5 covariance matrix.
+  m_localHelix.setHelixCovariance(helixCovariance);
+}
+
+CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
+  CDCTrajectory3D(gfTrackCand,
+                  CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
+{
+}
+
 namespace {
-  // Anonymous helper function
   CovarianceMatrix<6> calculateCovarianceMatrix(const UncertainHelix& localHelix,
                                                 const Vector3D& momentum,
                                                 const ESign charge,
@@ -114,150 +244,6 @@ namespace {
 }
 
 
-CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
-                                 const Vector3D& mom3D,
-                                 const double charge) :
-  m_localOrigin(pos3D),
-  m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
-               mom3D.xy().unit(),
-               0.0,
-               mom3D.cotTheta(),
-               0.0)
-{
-}
-
-
-CDCTrajectory3D::CDCTrajectory3D(const Vector3D& pos3D,
-                                 const Vector3D& mom3D,
-                                 const double charge,
-                                 const double bZ) :
-  m_localOrigin(pos3D),
-  m_localHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, bZ),
-               mom3D.xy().unit(),
-               0.0,
-               mom3D.cotTheta(),
-               0.0)
-{
-}
-
-CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle, const double bZ) :
-  CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
-                  Vector3D{mcParticle.getMomentum()},
-                  mcParticle.getCharge(),
-                  bZ)
-{
-}
-
-CDCTrajectory3D::CDCTrajectory3D(const MCParticle& mcParticle) :
-  CDCTrajectory3D(Vector3D{mcParticle.getProductionVertex()},
-                  Vector3D{mcParticle.getMomentum()},
-                  mcParticle.getCharge())
-{
-}
-
-
-
-CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D,
-                                 const CDCTrajectorySZ& trajectorySZ) :
-  m_localOrigin(trajectory2D.getLocalOrigin()),
-  m_localHelix(trajectory2D.getLocalCircle(), trajectorySZ.getSZLine())
-{
-}
-
-CDCTrajectory3D::CDCTrajectory3D(const CDCTrajectory2D& trajectory2D) :
-  CDCTrajectory3D(trajectory2D, CDCTrajectorySZ::basicAssumption())
-{
-}
-
-CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand) :
-  CDCTrajectory3D(gfTrackCand,
-                  CDCBFieldUtil::getBFieldZ(Vector3D{gfTrackCand.getPosSeed()}))
-{
-}
-
-CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ) :
-  CDCTrajectory3D(Vector3D{gfTrackCand.getPosSeed()},
-                  Vector3D{gfTrackCand.getMomSeed()},
-                  gfTrackCand.getChargeSeed(),
-                  bZ)
-{
-  // Maybe push these out of this function:
-  // Indices of the cartesian coordinates
-  const int iX = 0;
-  const int iY = 1;
-  const int iZ = 2;
-  const int iPx = 3;
-  const int iPy = 4;
-  const int iPz = 5;
-
-  const TMatrixDSym& seedCov = gfTrackCand.getCovSeed();
-  CovarianceMatrix<6> cov6 = CovarianceMatrixUtil::fromTMatrix<6>(seedCov);
-
-  // 1. Rotate to a system where phi0 = 0
-  JacobianMatrix<6, 6> jacobianRot = JacobianMatrixUtil::zero<6, 6>();
-
-  const double px = gfTrackCand.getStateSeed()[iPx];
-  const double py = gfTrackCand.getStateSeed()[iPy];
-  const double pt = hypot(px, py);
-
-  const double cosPhi0 = px / pt;
-  const double sinPhi0 = py / pt;
-
-  // Passive rotation matrix by phi0:
-  jacobianRot(iX, iX) = cosPhi0;
-  jacobianRot(iX, iY) = sinPhi0;
-  jacobianRot(iY, iX) = -sinPhi0;
-  jacobianRot(iY, iY) = cosPhi0;
-  jacobianRot(iZ, iZ) = 1.0;
-
-  jacobianRot(iPx, iPx) = cosPhi0;
-  jacobianRot(iPx, iPy) = sinPhi0;
-  jacobianRot(iPy, iPx) = -sinPhi0;
-  jacobianRot(iPy, iPy) = cosPhi0;
-  jacobianRot(iPz, iPz) = 1.0;
-
-  // Apply transformation inplace
-  CovarianceMatrixUtil::transport(jacobianRot, cov6);
-
-  // 2. Translate to perigee parameters
-  JacobianMatrix<5, 6> jacobianReduce = JacobianMatrixUtil::zero<5, 6>();
-
-  const double invPt = 1 / pt;
-  const double invPtSquared = invPt * invPt;
-  const double pz = gfTrackCand.getStateSeed()[iPz];
-  const double alpha = CDCBFieldUtil::getAlphaFromBField(bZ);
-  const double charge = gfTrackCand.getChargeSeed();
-
-  using namespace NHelixParameterIndices;
-  jacobianReduce(c_Curv, iPx) = charge * invPtSquared / alpha ;
-  jacobianReduce(c_Phi0, iPy) = invPt;
-  jacobianReduce(c_I, iY) = 1;
-  jacobianReduce(c_TanL, iPx) = - pz * invPtSquared;
-  jacobianReduce(c_TanL, iPz) = invPt;
-  jacobianReduce(c_Z0, iZ) = 1;
-  // Note the column corresponding to iX is completely zero as expectable.
-
-  CovarianceMatrix<5> cov5 = CovarianceMatrixUtil::transported(jacobianReduce, cov6);
-  const HelixCovariance& helixCovariance = cov5;
-
-  // The covariance should now be the correct 5x5 covariance matrix.
-  m_localHelix.setHelixCovariance(helixCovariance);
-}
-
-
-
-void CDCTrajectory3D::setPosMom3D(const Vector3D& pos3D,
-                                  const Vector3D& mom3D,
-                                  const double charge)
-{
-  m_localOrigin = pos3D;
-  m_localHelix = UncertainHelix(CDCBFieldUtil::absMom2DToCurvature(mom3D.xy().norm(), charge, pos3D),
-                                mom3D.xy().unit(),
-                                0.0,
-                                mom3D.cotTheta(),
-                                0.0);
-}
-
 bool CDCTrajectory3D::fillInto(genfit::TrackCand& trackCand) const
 {
   Vector3D position = getSupport();
@@ -305,8 +291,11 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
   }
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge);
+  if (std::isfinite(getFlightTime())) {
+    newRecoTrack->setTimeSeed(getFlightTime());
+  }
 
-  // TODO: Thixs does not work properly!
+  // TODO: This does not work properly!
   //const TMatrixDSym& cov6 = calculateCovarianceMatrix(getLocalHelix(), momentum, charge, bZ);
   TMatrixDSym covSeed(6);
   covSeed(0, 0) = 1e-3;
@@ -358,5 +347,17 @@ double CDCTrajectory3D::getAbsMom3D() const
 double CDCTrajectory3D::shiftPeriod(int nPeriods)
 {
   double arcLength2D = m_localHelix.shiftPeriod(nPeriods);
+  m_flightTime += arcLength2D / Const::speedOfLight;
+  return arcLength2D;
+}
+
+double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)
+{
+  double arcLength2D = calcArcLength2D(localOrigin);
+  double factor2DTo3D = hypot(1, getTanLambda());
+  double arcLength3D = arcLength2D * factor2DTo3D;
+  m_flightTime += arcLength3D / Const::speedOfLight;
+  m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);
+  m_localOrigin = localOrigin;
   return arcLength2D;
 }

@@ -27,10 +27,11 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory3D_constructorPosM
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
+  double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
   double bZ = 2.0;
 
-  CDCTrajectory3D trajectory(newPos3D, newMom3D, newChargeSign, bZ);;
+  CDCTrajectory3D trajectory(newPos3D, newTime, newMom3D, newChargeSign, bZ);;
 
   Vector3D mom3D = trajectory.getMom3DAtSupport(bZ);
   Vector3D pos3D = trajectory.getSupport();
@@ -54,9 +55,10 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
 {
   Vector3D newMom3D(1.0, 2.0, 1.0);
   Vector3D newPos3D(1.0, 2.0, 1.0);
+  double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
 
-  CDCTrajectory3D trajectory3D(newPos3D, newMom3D, newChargeSign);
+  CDCTrajectory3D trajectory3D(newPos3D, newTime, newMom3D, newChargeSign);
   UncertainHelix uncertainHelix = trajectory3D.getLocalHelix();
   Helix helix = uncertainHelix;
 

@@ -212,11 +212,9 @@ CDCTrajectory3D
 CDCMCHitCollectionLookUp<ACDCHitCollection>
 ::getTrajectory3D(const ACDCHitCollection* ptrHits) const
 {
-  CDCTrajectory3D trajectory3D;
-
   if (not ptrHits) {
     B2WARNING("Segment is nullptr. Could not get fit.");
-    return trajectory3D;
+    return CDCTrajectory3D();
   }
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
@@ -229,7 +227,7 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
     if (not ptrPrimarySimHit) {
       B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not get fit.");
-      return trajectory3D;
+      return CDCTrajectory3D();
     }
   }
 
@@ -237,13 +235,14 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
 
   Vector3D mom3D{primarySimHit.getMomentum()};
   Vector3D pos3D{primarySimHit.getPosTrack()};
+  double time{primarySimHit.getFlightTime()};
 
   int pdgCode = primarySimHit.getPDGCode();
   const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);
 
   if (not ptrTPDGParticle) {
     B2WARNING("No particle for PDG code " << pdgCode << ". Could not get fit");
-    return trajectory3D;
+    return CDCTrajectory3D();
   }
 
   const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
@@ -252,7 +251,7 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
 
   ESign chargeSign = sign(charge);
 
-  trajectory3D.setPosMom3D(pos3D, mom3D, charge);
+  CDCTrajectory3D trajectory3D(pos3D, time, mom3D, charge);
 
   ESign settedChargeSign = trajectory3D.getChargeSign();
 

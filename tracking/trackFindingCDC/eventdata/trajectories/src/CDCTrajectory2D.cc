@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
+#include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
 
 #include <cmath>
@@ -23,30 +24,30 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+                                 const double time,
                                  const Vector2D& mom2D,
                                  const double charge,
-                                 const double bZ) :
-  m_localOrigin(pos2D),
-  m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
-                       mom2D.unit(),
-                       0.0)
-
+                                 const double bZ)
+  : m_localOrigin(pos2D),
+    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, bZ),
+                         mom2D.unit(),
+                         0.0),
+    m_flightTime(time)
 {
 }
 
 CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
+                                 const double time,
                                  const Vector2D& mom2D,
-                                 const double charge) :
-  m_localOrigin(pos2D),
-  m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
-                       mom2D.unit(),
-                       0.0)
-
+                                 const double charge)
+  : m_localOrigin(pos2D),
+    m_localPerigeeCircle(CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D),
+                         mom2D.unit(),
+                         0.0),
+    m_flightTime(time)
 {
 }
-
 
 
 void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
@@ -60,13 +61,10 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
   m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
 }
 
-
-
 ESign CDCTrajectory2D::getChargeSign() const
 {
   return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle().orientation());
 }
-
 
 double CDCTrajectory2D::getAbsMom2D(const double bZ) const
 {
@@ -78,8 +76,6 @@ double CDCTrajectory2D::getAbsMom2D() const
   Vector2D position = getSupport();
   return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), position);
 }
-
-
 
 Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
                                         const double distance) const
@@ -224,13 +220,11 @@ ISuperLayer CDCTrajectory2D::getPreviousAxialISuperLayer() const
   return getAxialISuperLayerAfterStart(EForwardBackward::c_Backward);
 }
 
-
 ISuperLayer CDCTrajectory2D::getMaximalISuperLayer() const
 {
   double maximalCylindricalR = getMaximalCylindricalR();
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(maximalCylindricalR);
 }
-
 
 ISuperLayer CDCTrajectory2D::getStartISuperLayer() const
 {
@@ -238,10 +232,17 @@ ISuperLayer CDCTrajectory2D::getStartISuperLayer() const
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(startCylindricalR);
 }
 
-
-
 ISuperLayer CDCTrajectory2D::getMinimalISuperLayer() const
 {
   double minimalCylindricalR = getMinimalCylindricalR();
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(minimalCylindricalR);
+}
+
+double CDCTrajectory2D::setLocalOrigin(const Vector2D& localOrigin)
+{
+  double arcLength2D = calcArcLength2D(localOrigin);
+  m_flightTime += arcLength2D / Const::speedOfLight;
+  m_localPerigeeCircle.passiveMoveBy(localOrigin - m_localOrigin);
+  m_localOrigin = localOrigin;
+  return arcLength2D;
 }

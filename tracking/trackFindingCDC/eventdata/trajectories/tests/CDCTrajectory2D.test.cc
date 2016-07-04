@@ -22,10 +22,11 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_constructorPosM
 {
   Vector2D newMom2D(1.0, 2.0);
   Vector2D newPos2D(1.0, 2.0);
+  double newTime = 0.0;
   ESign newChargeSign = ESign::c_Plus;
   double bZ = 2.0;
 
-  CDCTrajectory2D trajectory(newPos2D, newMom2D, newChargeSign, bZ);
+  CDCTrajectory2D trajectory(newPos2D, newTime, newMom2D, newChargeSign, bZ);
 
   Vector2D mom2D = trajectory.getMom2DAtSupport(bZ);
   Vector2D pos2D = trajectory.getSupport();

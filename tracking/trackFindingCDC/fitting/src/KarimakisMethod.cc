@@ -63,11 +63,6 @@ namespace {
   constexpr size_t iY = 2;
   constexpr size_t iR2 = 3;
 
-  /// Helper indices for meaningfull matrix access to the perigee covariance matrices
-  constexpr size_t iCurv = 0;
-  constexpr size_t iPhi0 = 1;
-  constexpr size_t iI = 2;
-
   /// Variant implementing Karimakis method without drift circles.
   UncertainPerigeeCircle fitKarimaki(const double /*sw*/,
                                      const Matrix< double, 4, 1 >& a,

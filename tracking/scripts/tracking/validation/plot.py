@@ -392,9 +392,11 @@ class ValidationPlot(object):
                upper_bound=(None, None),
                outlier_z_score=(None, None),
                include_exceptionals=(True, True),
-               allow_discrete=(False, False)):
+               allow_discrete=(False, False),
+               is_expert=True):
         """Fill the plot with a two dimensional histogram"""
         name = self.name
+        is_expert = self.is_expert
 
         x_bins, y_bins = self.unpack_2d_param(bins)
         x_lower_bound, y_lower_bound = self.unpack_2d_param(lower_bound)

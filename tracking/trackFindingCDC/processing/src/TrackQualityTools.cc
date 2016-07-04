@@ -87,48 +87,45 @@ void TrackQualityTools::normalizeTrack(CDCTrack& track)
 
 void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 {
-  if (track.size() <= 1) {
-    return;
-  }
+  if (track.empty()) return;
 
-  // We start with the most inner hit
-  track.sortByRadius();
+  auto compareICLayer = [](const CDCRecoHit3D & one, const CDCRecoHit3D & two) {
+    return one.getWire().getICLayer() < two.getWire().getICLayer();
+  };
+  auto itInnerRecoHit3D = std::min_element(track.begin(), track.end(), compareICLayer);
+  const Vector3D& startPosition = itInnerRecoHit3D->getRecoPos3D();
 
-  // We then set the trajectory to start with this point
   CDCTrajectory3D trajectory3D = track.getStartTrajectory3D();
-  const Vector2D& startPosition = track.front().getRecoPos2D();
-  trajectory3D.setLocalOrigin(Vector3D(startPosition, 0.0));
-  trajectory3D.setLocalOrigin(trajectory3D.getSupport());
-  const CDCTrajectory2D currentTrajectory2D = trajectory3D.getTrajectory2D();
+
+  // Why not kepp 0,0,0 as origin?
+  trajectory3D.setLocalOrigin(startPosition);
+
+  CDCTrajectory2D trajectory2D = trajectory3D.getTrajectory2D();
 
   // Check if we have to reverse the trajectory. This is done by counting the number of hits
   // with positive an with negative perpS
   unsigned int numberOfPositiveHits = 0;
-  for (CDCRecoHit3D& recoHit : track) {
-    const double currentPerpS = currentTrajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
+  for (const CDCRecoHit3D& recoHit : track) {
+    const double currentPerpS = trajectory2D.calcArcLength2D(recoHit.getRecoPos2D());
     if (currentPerpS > 0) {
       numberOfPositiveHits++;
     }
   }
   // ... or by looking at the arcLength of the origin
-  const double arcLength2DOfOrigin = currentTrajectory2D.calcArcLength2D(Vector2D(0, 0));
+  const double arcLength2DOfOrigin = trajectory2D.calcArcLength2D(Vector2D(0, 0));
   // Really wouldn't one check be enough?
   const bool reverseTrajectory = 2 * numberOfPositiveHits < track.size() or arcLength2DOfOrigin > 0;
 
   // We reset the trajectory here to start at the newStartPosition of the first hit
   if (reverseTrajectory) {
     trajectory3D.reverse();
+    trajectory2D.reverse();
   }
-
-  track.setStartTrajectory3D(trajectory3D);
-  track.setEndTrajectory3D(trajectory3D);
-
-  const CDCTrajectory2D& startTrajectory = track.getStartTrajectory3D().getTrajectory2D();
 
   for (CDCRecoHit3D& recoHit : track) {
     // Really ?
     // The 0.1 is to prevent hits "before" the first hit to be sorted at the end of the track.
-    recoHit.setArcLength2D(startTrajectory.calcArcLength2D(recoHit.getRecoPos2D()) + 0.1);
+    recoHit.setArcLength2D(trajectory2D.calcArcLength2D(recoHit.getRecoPos2D()) + 0.1);
     recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag();
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
   }
@@ -140,6 +137,18 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
   // We can now sort by perpS
   track.sortByArcLength2D();
+
+  Vector3D frontPosition = track.front().getRecoPos3D();
+  trajectory3D.setLocalOrigin(frontPosition);
+  track.setStartTrajectory3D(trajectory3D);
+
+  Vector3D backPosition = track.back().getRecoPos3D();
+  double arcLength2D = trajectory3D.setLocalOrigin(backPosition);
+  if (arcLength2D < 0) {
+    trajectory3D.shiftPeriod(1);
+  }
+  track.setEndTrajectory3D(trajectory3D);
+
 }
 
 void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCylindricalRFactor)

@@ -524,6 +524,7 @@ class SavePullAnalysisRefiner(Refiner):
                  estimate_name=None,
                  variance_name=None,
                  quantity_name=None,
+                 aux_names=[],
                  unit=None,
                  outlier_z_score=None,
                  absolute=False,
@@ -546,6 +547,8 @@ class SavePullAnalysisRefiner(Refiner):
 
         self.quantity_name = quantity_name
         self.unit = unit
+
+        self.aux_names = aux_names
 
         self.outlier_z_score = outlier_z_score
         self.absolute = absolute
@@ -570,6 +573,8 @@ class SavePullAnalysisRefiner(Refiner):
         contact = formatter.format(contact, **replacement_dict)
 
         name = self.name or self.default_name
+
+        auxiliaries = {aux_name: crops[aux_name] for aux_name in self.aux_names}
 
         for part_name in self.part_names:
             name = formatter.format(name, part_name=part_name, **replacement_dict)
@@ -619,7 +624,11 @@ class SavePullAnalysisRefiner(Refiner):
                                          plot_name=plot_name,
                                          plot_title=plot_title)
 
-            pull_analysis.analyse(truths, estimates, variances, which_plots=which_plots)
+            pull_analysis.analyse(truths,
+                                  estimates,
+                                  variances,
+                                  auxiliaries=auxiliaries,
+                                  which_plots=which_plots)
 
             pull_analysis.contact = contact
 

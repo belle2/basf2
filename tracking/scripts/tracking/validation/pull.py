@@ -30,6 +30,10 @@ class PullAnalysis(object):
         "sigmas",
         "pulls",
         "p_values",
+        "aux_residual_hist2d",
+        "aux_residual_profile",
+        "aux_pull_hist2d",
+        "aux_pull_profile",
     ]
 
     default_is_expert = True
@@ -74,6 +78,7 @@ class PullAnalysis(object):
         truths,
         estimates,
         variances=None,
+        auxiliaries={},
         which_plots=None,
         is_expert=None
     ):
@@ -88,6 +93,8 @@ class PullAnalysis(object):
             Corresponding estimations
         variances : array_like(float), optional
             Corresponding variance estimations
+        auxiliaries : Dict[name, array_like(float)], optional
+            Auxiliary variable to show distribution of residuals and pull as function
         selected_plots : list(str), optional
             List of analysis plots to be generated. All if not given.
             Currently valid names are
@@ -268,6 +275,77 @@ class PullAnalysis(object):
             p_values_hist.fit_const()
 
             self.plots['p_values'] = p_values_hist
+
+        # Auxialliary variables #
+        # ##################### #
+        for aux_name, aux_values in auxiliaries.items():
+            if "aux_residual_hist2d" in which_plots or "aux" in which_plots:
+                # Distribution of the residuals over auxiliary variable
+                aux_residuals_hist2d_name = formatter.format(plot_name,
+                                                             subplot_name="residuals over {}".format(aux_name))
+                aux_residuals_hist2d = ValidationPlot(aux_residuals_hist2d_name)
+                aux_residuals_hist2d.hist2d(aux_values,
+                                            residuals,
+                                            outlier_z_score=outlier_z_score,
+                                            allow_discrete=True,
+                                            is_expert=is_expert)
+                aux_residuals_hist2d.xlabel = compose_axis_label(aux_name)
+                aux_residuals_hist2d.ylabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
+                aux_residuals_hist2d.title = formatter.format(plot_title,
+                                                              subplot_title='Residual distribution over {}'.format(aux_name))
+
+                self.plots['aux_residuals_hist2d_' + aux_name] = aux_residuals_hist2d
+
+            if "aux_residual_profile" in which_plots or "aux" in which_plots:
+                # Distribution of the residuals over auxiliary variable
+                aux_residuals_profile_name = formatter.format(plot_name,
+                                                              subplot_name="residuals profile over {}".format(aux_name))
+                aux_residuals_profile = ValidationPlot(aux_residuals_profile_name)
+                aux_residuals_profile.profile(aux_values,
+                                              residuals,
+                                              outlier_z_score=outlier_z_score,
+                                              allow_discrete=True,
+                                              is_expert=is_expert)
+                aux_residuals_profile.xlabel = compose_axis_label(aux_name)
+                aux_residuals_profile.ylabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
+                aux_residuals_profile.title = formatter.format(plot_title,
+                                                               subplot_title='Residual profile over {}'.format(aux_name))
+
+                self.plots['aux_residuals_profile_' + aux_name] = aux_residuals_profile
+
+            if variances is not None and ("aux_pull_hist2d" in which_plots or "aux" in which_plots):
+                # Distribution of the pulls over auxiliary variable
+                aux_pulls_hist2d_name = formatter.format(plot_name,
+                                                         subplot_name="pulls over {}".format(aux_name))
+                aux_pulls_hist2d = ValidationPlot(aux_pulls_hist2d_name)
+                aux_pulls_hist2d.hist2d(aux_values,
+                                        pulls,
+                                        outlier_z_score=outlier_z_score,
+                                        allow_discrete=True,
+                                        is_expert=is_expert)
+                aux_pulls_hist2d.xlabel = compose_axis_label(aux_name)
+                aux_pulls_hist2d.ylabel = "pull (" + quantity_name + ")"
+                aux_pulls_hist2d.title = formatter.format(plot_title,
+                                                          subplot_title='Pull scatter over {}'.format(aux_name))
+
+                self.plots['aux_pulls_hist2d_' + aux_name] = aux_pulls_hist2d
+
+            if variances is not None and ("aux_pull_profile" in which_plots or "aux" in which_plots):
+                # Distribution of the pulls over auxiliary variable
+                aux_pulls_profile_name = formatter.format(plot_name,
+                                                          subplot_name="pull profile over {}".format(aux_name))
+                aux_pulls_profile = ValidationPlot(aux_pulls_profile_name)
+                aux_pulls_profile.profile(aux_values,
+                                          pulls,
+                                          outlier_z_score=outlier_z_score,
+                                          allow_discrete=True,
+                                          is_expert=is_expert)
+                aux_pulls_profile.xlabel = compose_axis_label(aux_name)
+                aux_pulls_profile.ylabel = "pull (" + quantity_name + ")"
+                aux_pulls_profile.title = formatter.format(plot_title,
+                                                           subplot_title='Pull profile over {}'.format(aux_name))
+
+                self.plots['aux_pulls_profile_' + aux_name] = aux_pulls_profile
 
         # Forward the contract to all plots by reassigning the contact.
         self.contact = self.contact

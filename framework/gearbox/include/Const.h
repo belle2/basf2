@@ -232,6 +232,20 @@ namespace Belle2 {
     typedef RestrictedDetectorSet<PIDDetectors> PIDDetectorSet;
 
     /**
+     * A class that defines the valid set of Cluster detectors.
+     * To be used as a template argument for RestrictedDetectorSet.
+     */
+    class ClusterDetectors {
+    public:
+      static DetectorSet set() {return c_set;}  /**< Accessor function for the set of valid detectors */
+      static const DetectorSet c_set;           /**< The set of valid tracking detectors */
+      static const size_t c_size = 2;           /**< Number of PID detectors, temporary workaround */
+    };
+    /** Typedef for set of VXD detectors. */
+    typedef RestrictedDetectorSet<ClusterDetectors> ClusterDetectorSet;
+
+
+    /**
      * The set of all detectors.
      */
     static const DetectorSet allDetectors;
@@ -448,12 +462,55 @@ namespace Belle2 {
     static const ParticleSet chargedStableSet; /**< set of charged stable particles */
 
 
+    /** Provides a type-safe way to pass members of the clusterSet set.
+     *
+     * As the defined static members (Const::photon, etc. ) are members of this set,
+     * this also defines a fixed index from 0 to 4 for each particle.
+     */
+    class Cluster : public ParticleType {
+    public:
+      /** Constructor from the more general ParticleType.
+       *
+       * Throws a runtime_error if p is not in chargedStableSet.
+       */
+      // cppcheck-suppress noExplicitConstructor
+      Cluster(const ParticleType& p)
+        : ParticleType(clusterSet.find(p.getPDGCode()))
+      {
+        if ((*this) == invalidParticle) {
+          throw std::runtime_error("Given ParticleType is not a cluster particle!");
+        }
+      }
+
+      /** Constructor from PDG code
+       *
+       * Throws a runtime_error if pdg is not in chargedStableSet.
+       */
+      explicit Cluster(int pdg)
+        : ParticleType(clusterSet.find(pdg))
+      {
+        if ((*this) == invalidParticle) {
+          throw std::runtime_error("Given PDG code is not a cluster particle!");
+        }
+      }
+      static const unsigned int c_SetSize = 6; /**< Number of elements (for use in array bounds etc.) */
+    };
+
+    static const ParticleSet clusterSet; /**< set of cluster particles */
+
     static const ChargedStable electron;  /**< electron particle */
     static const ChargedStable muon;      /**< muon particle */
     static const ChargedStable pion;      /**< charged pion particle */
     static const ChargedStable kaon;      /**< charged kaon particle */
     static const ChargedStable proton;    /**< proton particle */
     static const ChargedStable deuteron;  /**< deuteron particle */
+
+    static const Cluster clusterphoton;   /**< electron cluster */
+    static const Cluster clusterKlong;    /**< K^0_L cluster */
+    static const Cluster clusterelectron; /**< electron cluster  */
+    static const Cluster clusterpion;     /**< charged hadron cluster */
+    static const Cluster clustermuon;     /**< muon cluster */
+    static const Cluster clusterjunk;     /**< junk cluster */
 
     static const ParticleType photon;    /**< photon particle */
     static const ParticleType pi0;       /**< neutral pion particle */

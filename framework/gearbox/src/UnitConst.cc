@@ -224,6 +224,7 @@ const Const::DetectorSet Const::allDetectors = Const::IR + Const::PXD + Const::S
                                                Const::TOP + Const::ARICH + Const::ECL + Const::KLM +
                                                Const::TRG + Const::DAQ + Const::BEAST + Const::TEST;
 
+const Const::DetectorSet Const::ClusterDetectors::c_set = Const::ECL + Const::KLM;
 
 bool Const::ParticleType::operator < (const Const::ParticleType& other) const
 {
@@ -262,12 +263,23 @@ const Const::ParticleSet Const::chargedStableSet =
   Const::ParticleType(11) + Const::ParticleType(13) + Const::ParticleType(211)
   + Const::ParticleType(321) + Const::ParticleType(2212) + Const::ParticleType(1000010020);
 
+const Const::ParticleSet Const::clusterSet =
+  Const::ParticleType(22) + Const::ParticleType(130) + Const::ParticleType(11)
+  + Const::ParticleType(211) + Const::ParticleType(13) + Const::ParticleType(9900001);
+
 const Const::ChargedStable Const::electron = Const::chargedStableSet.find(11);
 const Const::ChargedStable Const::muon = Const::chargedStableSet.find(13);
 const Const::ChargedStable Const::pion = Const::chargedStableSet.find(211);
 const Const::ChargedStable Const::kaon = Const::chargedStableSet.find(321);
 const Const::ChargedStable Const::proton = Const::chargedStableSet.find(2212);
 const Const::ChargedStable Const::deuteron = Const::chargedStableSet.find(1000010020);
+
+const Const::Cluster Const::clusterphoton = Const::clusterSet.find(22);
+const Const::Cluster Const::clusterKlong = Const::clusterSet.find(130);
+const Const::Cluster Const::clusterelectron = Const::clusterSet.find(11);
+const Const::Cluster Const::clusterpion = Const::clusterSet.find(211);
+const Const::Cluster Const::clustermuon = Const::clusterSet.find(13);
+const Const::Cluster Const::clusterjunk = Const::clusterSet.find(9900001);
 
 const Const::ParticleType Const::photon = Const::ParticleType(22);
 const Const::ParticleType Const::pi0 = Const::ParticleType(111);

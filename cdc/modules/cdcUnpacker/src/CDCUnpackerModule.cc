@@ -129,7 +129,7 @@ void CDCUnpackerModule::event()
   }
 
   // TDC count for the trigger scinti.
-  int tdcCountTrig = 0;
+  int tdcCountTrig = m_tdcOffset;
 
   // Create Data objects.
 

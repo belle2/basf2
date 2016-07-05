@@ -49,6 +49,8 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
            "Which PDG code to use for creating the time estimate. How this information is used"
            "depends on the implementation details of the child modules. Please only use the positive pdg code.",
            m_param_pdgCodeToUseForEstimation);
+  addParam("timeOffset", m_param_timeOffset, "If you want to subtract or add a certain time, you can use this variable.",
+           m_param_timeOffset);
 }
 
 void BaseTrackTimeEstimatorModule::initialize()
@@ -77,9 +79,12 @@ void BaseTrackTimeEstimatorModule::event()
       // Guard against NaN or just something silly.
       B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
       timeSeed = 0;
+    } else {
+      // Add the constant time offset only in non-silly cases.
+      timeSeed += m_param_timeOffset;
     }
 
-    B2INFO("Setting seed to " <<  timeSeed);
+    B2DEBUG(100, "Setting seed to " <<  timeSeed);
     recoTrack.setTimeSeed(timeSeed);
 
     // Delete all fitted information for all representations

@@ -46,6 +46,11 @@ namespace Belle2 {
     bool m_param_useFittedInformation = false;
 
     /**
+     * If you want to subtract or add a certain time, you can use this variable.
+     */
+    double m_param_timeOffset = 0;
+
+    /**
      * Which PDG code to use for creating the time estimate. How this information is used
      * depends on the implementation details of the child modules.
      * Please only use the positive pdg code.

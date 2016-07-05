@@ -119,6 +119,44 @@ namespace Belle2 {
       resetFitterToDefaultSettings();
     }
 
+    static int createCorrectPDGCodeForChargedStable(const Const::ChargedStable& particleType, const RecoTrack& recoTrack)
+    {
+      int currentPdgCode = particleType.getPDGCode();
+
+      const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
+      const auto& recoTrackCharge = recoTrack.getChargeSeed();
+
+      // Copy from GenfitterModule
+      B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
+               fabs(pdgParticleCharge) == fabs(recoTrackCharge * 3.0));
+
+      /*
+      * Because the charged stable particles do describe a positive as well as a negative particle,
+      * we have to correct the charge if needed.
+      */
+      if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
+        currentPdgCode *= -1;
+
+      return currentPdgCode;
+    }
+
+    static genfit::AbsTrackRep* getTrackRepresentationForPDG(const int pdgCode, const RecoTrack& recoTrack)
+    {
+      const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
+
+      for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
+        // Check if the track representation is a RKTrackRep.
+        const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
+        if (rkTrackRepresenation != nullptr) {
+          if (rkTrackRepresenation->getPDG() == pdgCode) {
+            return trackRepresentation;
+          }
+        }
+      }
+
+      return nullptr;
+    }
+
     /// Set the internal storage of the fitter to a provided one, if you want to use non-default settings.
     void resetFitter(const std::shared_ptr<genfit::AbsFitter>& fitter)
     {
@@ -236,9 +274,6 @@ namespace Belle2 {
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;
-
-    /// Helper function to calculate the time seed. The track representation needs to have the correct PDG code with the correct charge set.
-    double calculateTimeSeed(const RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const;
 
     /**
      * Helper function to do the fit.

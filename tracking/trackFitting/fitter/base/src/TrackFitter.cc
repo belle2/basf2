@@ -10,8 +10,6 @@
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
-#include <geometry/bfieldmap/BFieldMap.h>
-#include <framework/dataobjects/Helix.h>
 
 #include <genfit/AbsTrackRep.h>
 #include <genfit/FitStatus.h>
@@ -24,34 +22,8 @@ using namespace Belle2;
 
 bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particleType) const
 {
-  int currentPdgCode = particleType.getPDGCode();
-
-  const auto& pdgParticleCharge = particleType.getParticlePDG()->Charge();
-  const auto& recoTrackCharge = recoTrack.getChargeSeed();
-
-  // Copy from GenfitterModule
-  B2ASSERT("Charge of candidate and PDG particle don't match.  (Code assumes |q| = 1).",
-           fabs(pdgParticleCharge) == fabs(recoTrackCharge * 3.0));
-
-  /*
-   * Because the charged stable particles do describe a positive as well as a negative particle,
-   * we have to correct the charge if needed.
-   */
-  if (std::signbit(pdgParticleCharge) != std::signbit(recoTrackCharge))
-    currentPdgCode *= -1;
-
-  const std::vector<genfit::AbsTrackRep*>& trackRepresentations = recoTrack.getRepresentations();
-  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = nullptr;
-  for (genfit::AbsTrackRep* trackRepresentation : trackRepresentations) {
-    // Check if the track representation is a RKTrackRep.
-    const genfit::RKTrackRep* rkTrackRepresenation = dynamic_cast<const genfit::RKTrackRep*>(trackRepresentation);
-    if (rkTrackRepresenation != nullptr) {
-      if (rkTrackRepresenation->getPDG() == currentPdgCode) {
-        alreadyPresentTrackRepresentation = trackRepresentation;
-        break;
-      }
-    }
-  }
+  const int currentPdgCode = TrackFitter::createCorrectPDGCodeForChargedStable(particleType, recoTrack);
+  genfit::AbsTrackRep* alreadyPresentTrackRepresentation = TrackFitter::getTrackRepresentationForPDG(currentPdgCode, recoTrack);
 
   if (alreadyPresentTrackRepresentation) {
     B2DEBUG(100, "Reusing the already present track representation with the same PDG code.");
@@ -64,7 +36,6 @@ bool TrackFitter::fit(RecoTrack& recoTrack, const Const::ChargedStable& particle
 
 bool TrackFitter::fitWithoutCheck(RecoTrack& recoTrack, const genfit::AbsTrackRep& trackRepresentation) const
 {
-  recoTrack.setTimeSeed(calculateTimeSeed(recoTrack, trackRepresentation));
   // Fit the track
   m_fitter->processTrack(&RecoTrackGenfitAccess::getGenfitTrack(recoTrack), false);
   recoTrack.setDirtyFlag(false);
@@ -116,43 +87,6 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
   }
 
   return fitWithoutCheck(recoTrack, *trackRepresentation);
-}
-
-double TrackFitter::calculateTimeSeed(const RecoTrack& recoTrack,
-                                      const genfit::AbsTrackRep& trackRepresentation) const
-{
-  const int pdgCodeForFit = trackRepresentation.getPDG();
-  TParticlePDG* particleWithPDGCode = TDatabasePDG::Instance()->GetParticle(pdgCodeForFit);
-  const TVector3& momentum = recoTrack.getMomentumSeed();
-
-  // Particle velocity in cm / ns.
-  const double m = particleWithPDGCode->Mass();
-  const double p = momentum.Mag();
-  const double E = hypot(m, p);
-  const double beta = p / E;
-  const double v = beta * Const::speedOfLight;
-
-  // Arc length from IP to posSeed in cm.
-  // Calculate the arc-length.  Helix doesn't provide a way of
-  // obtaining this directly from the difference in z, as it
-  // only provide arc-lengths in the transverse plane, so we do
-  // it like this.
-  const TVector3& seedPosition = recoTrack.getPositionSeed();
-  const double bZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
-  const Belle2::Helix h(seedPosition, momentum, particleWithPDGCode->Charge() / 3, bZ);
-  const double s2D = h.getArcLength2DAtXY(seedPosition.X(), seedPosition.Y());
-  const double s = s2D * hypot(1, h.getTanLambda());
-
-  // Time (ns) from trigger (= 0 ns) to posSeed assuming constant velocity.
-  double timeSeed = s / v;
-
-  if (!(timeSeed > -1000)) {
-    // Guard against NaN or just something silly.
-    B2WARNING("Fixing calculated seed Time " << timeSeed << " to zero.");
-    timeSeed = 0;
-  }
-
-  return timeSeed;
 }
 
 void TrackFitter::resetFitterToDefaultSettings()

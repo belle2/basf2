@@ -73,6 +73,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, mcTrac
     mctrackmatcher.param('UseCDCHits', is_cdc_used(components))
     path.add_module(mctrackmatcher)
 
+    # Correct time seed
+    path.add_module("IPTrackTimeEstimator", useFittedInformation=False)
+
     # track fitting
     path.add_module("DAFRecoFitter").set_name("Combined_DAFRecoFitter")
 
@@ -228,6 +231,10 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
                     TracksStoreObjNameIsInput=True,
                     RecoTracksStoreArrayName=reco_tracks,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+
+    # Correct time seed (only necessary for the CDC tracks)
+    path.add_module("IPTrackTimeEstimator", useFittedInformation=False,
+                    recoTracksStoreArrayName=reco_tracks)
 
 
 def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):

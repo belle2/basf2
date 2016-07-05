@@ -334,10 +334,7 @@ bool DisplayUI::startDisplay()
   }
 
   updateUI(); //update button state
-
-  //update info if this is another event
-  if (!m_reshowCurrentEvent)
-    m_viewPane->getInfoWidget()->newEvent();
+  m_viewPane->getInfoWidget()->update();
 
   m_eventData->AddElement(getViewPane()->getRPhiMgr()->ImportElements(gEve->GetEventScene()));
   m_eventData->AddElement(getViewPane()->getRhoZMgr()->ImportElements(gEve->GetEventScene()));

@@ -19,8 +19,8 @@ namespace Belle2 {
     explicit InfoWidget(const TGWindow* p);
     ~InfoWidget();
 
-    /** reset for new event (called after new event is loaded). */
-    void newEvent();
+    /** reset for new event (try to show same object if it exists). */
+    void update();
 
     /** Navigate to given URI
      *

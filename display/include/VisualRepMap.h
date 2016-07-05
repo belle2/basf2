@@ -46,6 +46,9 @@ namespace Belle2 {
     /** Get (first) visual representation of given object. */
     TEveElement* getEveElement(const TObject* obj) const;
 
+    /** Does obj have a visualization? */
+    bool isVisualized(const TObject* obj) { return getEveElement(obj) != nullptr; }
+
     /** Remove all contents in map. (call this after each event) */
     void clear();
 

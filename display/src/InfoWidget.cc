@@ -46,7 +46,7 @@ int InfoWidget::IsVisited(const char* uri)
   return (bool)m_visited.count(uri);
 }
 
-void InfoWidget::newEvent()
+void InfoWidget::update()
 {
   TString lastURI = "";
   if (!m_history.empty()) {
@@ -205,13 +205,18 @@ TString InfoWidget::getHeader(const URI& uri) const
     numEntries = array.getEntries();
   }
 
+  TString col;
+  if (uri.object and VisualRepMap::getInstance()->isVisualized(uri.object))
+    col = "d2ede4";
+  else
+    col = "eeeeee";
   TString info;
-  info += "<table border=0 width=100% bgcolor=d2ede4><tr>";
+  info += "<table border=0 width=100% bgcolor=" + col + "><tr>";
   //breadcrumbs
   info += "<td>";
   info += "<a href='main:'>DataStore</a> / ";
   if (uri.arrayIndex != -1) {
-    info += "<a href='" + uri.scheme + ":" + uri.entryName + "/'>" + uri.entryName + "</a> / ";
+    info += "<a href='" + uri.scheme + ":" + uri.entryName + "/'>" + uri.entryName + "</a>";
     info += TString::Format("<b>[%d]</b>", uri.arrayIndex);
   } else {
     info += "<b>" + uri.entryName + "</b>";

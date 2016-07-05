@@ -22,9 +22,13 @@ double IPTrackTimeEstimatorModule::estimateFlightLengthUsingFittedInformation(ge
 const
 {
   const TVector3 ipPosition;
-  const double s = measuredStateOnPlane.extrapolateToPoint(ipPosition);
-
-  return s;
+  try {
+    const double s = measuredStateOnPlane.extrapolateToPoint(ipPosition);
+    return s;
+  } catch (const genfit::Exception& e) {
+    B2WARNING("Extrapolation failed: " << e.what());
+    return 0;
+  }
 }
 
 double IPTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInformation(const RecoTrack& recoTrack) const

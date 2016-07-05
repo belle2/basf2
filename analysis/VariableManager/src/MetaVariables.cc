@@ -638,7 +638,7 @@ namespace Belle2 {
                       "E.g. daughterSumOf(nDaughters) returns the number of grand-daughters.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
-                      "The extraInfo has to be set first by a module like TMVAExpert.\n"
+                      "The extraInfo has to be set first by a module like TMVAExpert. If nothing is set under this name, -999 is returned.\n"
                       "E.g. extraInfo(SignalProbability) returns the SignalProbability calculated by the TMVAExpert.");
     REGISTER_VARIABLE("eventExtraInfo(name)", eventExtraInfo,
                       "[eventbased] Returns extra info stored under the given name in the event extra info.\n"

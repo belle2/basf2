@@ -119,7 +119,7 @@ namespace Belle2 {
           (it->second)[i] += delta[i];
         }
       } else {
-        B2FATAL("Specified xt params not found in addXTParams !")
+        B2FATAL("Specified xt params not found in addXTParams !");
       }
     }
 
@@ -250,9 +250,9 @@ namespace Belle2 {
         }
         ++ibin;
       }
-      if (iAlpha == 999) B2FATAL("Alpha bin not found !")
+      if (iAlpha == 999) B2FATAL("Alpha bin not found !");
 
-        return getXtID(iCLayer, iLR, iAlpha, iTheta);
+      return getXtID(iCLayer, iLR, iAlpha, iTheta);
     }
 
     /**
@@ -264,7 +264,7 @@ namespace Belle2 {
       if (it != m_xts.end()) {
         return it->second;
       } else {
-        B2FATAL("Specified xt params. not found in getXtParams !")
+        B2FATAL("Specified xt params. not found in getXtParams !");
       }
     }
 

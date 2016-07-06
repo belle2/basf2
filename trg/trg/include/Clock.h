@@ -57,6 +57,9 @@ class TRGClock {
     /// returns clock position.
     int position(double timing) const;
 
+    /// returns clock position in the source clock.
+    int positionInSourceClock(double timing) const;
+
     /// returns absolute time of clock position
     double absoluteTime(int clockPosition) const;
 
@@ -115,7 +118,7 @@ class TRGClock {
     const unsigned _multi;
 
     /// Division factor.
-//  const unsigned _div;
+    const unsigned _div;
 
     /// Clock offset in nano second.
     const double _offset;
@@ -186,6 +189,12 @@ inline
 int
 TRGClock::max(void) const {
     return _max;
+}
+
+inline
+int
+TRGClock::positionInSourceClock(double a) const {
+    return _source->position(a);
 }
 
 } // namespace Belle2

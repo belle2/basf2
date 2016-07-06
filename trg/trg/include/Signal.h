@@ -155,8 +155,8 @@ namespace Belle2 {
 
   private:
 
-    /// And operation.
-    static std::vector<TRGTime> andOperation(const std::vector<TRGTime>&);
+    // /// And operation.
+    // static std::vector<TRGTime> andOperation(const std::vector<TRGTime>&);
 
     /// Or operation
     static std::vector<TRGTime> orOperation(const std::vector<TRGTime>&);

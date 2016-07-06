@@ -18,6 +18,7 @@
 
 #include <vector>
 #include "trg/trg/Clock.h"
+#include "trg/trg/Signal.h"
 
 class TFile;
 class TTree;
@@ -81,6 +82,8 @@ namespace Belle2 {
                              unsigned simulationMode = 0,
                              unsigned fastSimulationMode = 0,
                              unsigned firmwareSimulationMode = 0,
+                             int firmwareSimulationStart = 0,
+                             int firmwareSimulationStop = 32 * 32 - 1,
                              bool _makeRootFile = 0,
                              bool perfect2DFinder = false,
                              bool perfect3DFinder = false,
@@ -121,6 +124,8 @@ namespace Belle2 {
            unsigned simulationMode,
            unsigned fastSimulationMode,
            unsigned firmwareSimulationMode,
+           int firmwareSimulationStart,
+           int firmwareSimulationStop,
            bool makeRootFile,
            bool perfect2DFinder,
            bool perfect3DFinder,
@@ -431,6 +436,18 @@ namespace Belle2 {
     /// returns the data clock.
     const TRGClock& dataClock(void) const;
 
+    /// returns start clock of the firmware simulation in FE clock.
+    int firmwareSimulationStart(void) const;
+      
+    /// returns stop clock of the firmware simulation in FE clock.
+    int firmwareSimulationStop(void) const;
+      
+    /// returns start clock of the firmware simulation in data clock.
+    int firmwareSimulationStartDataClock(void) const;
+      
+    /// returns stop clock of the firmware simulation in data clock.
+    int firmwareSimulationStopDataClock(void) const;
+      
     /// returns the user clock for Aurora 3.125 Gbps.
     const TRGClock& userClock3125(void) const;
 
@@ -493,6 +510,21 @@ namespace Belle2 {
     /// bit5 : dump COE from Neuro-trackers
     /// bit6 : dump COE from ETF
     unsigned _firmwareSimulationMode;
+
+    /// Fimrware simulation start clock in FE.
+    int _firmwareSimulationStart;
+
+    /// Fimrware simulation stop clock in FE.
+    int _firmwareSimulationStop;
+
+    /// Firmware simulation time window in FE.
+    TRGSignal _firmwareSimulationWindow;
+
+    /// Firmware simulation start clock in CDCTRG data clock.
+    int _firmwareSimulationStartDataClock;
+
+    /// Firmware simulation stop clock in CDCTRG data clock.
+    int _firmwareSimulationStopDataClock;
 
     /// Return value for trg cdc module;
     int _returnValue;
@@ -756,7 +788,6 @@ namespace Belle2 {
     void saveTRGHitInformation(std::vector<std::vector<int > >&);
     void saveTRGRawInformation(std::vector<std::string >&);
     //void saveCDCTRGTimeMatchInformation(std::vector<std::vector<std::map<int, int > > >& );
-
 
     friend class TRGCDCModule;
   };
@@ -1067,6 +1098,30 @@ namespace Belle2 {
   void
   TRGCDC::setReturnValue(int returnValue) {
     _returnValue = returnValue;
+  }
+
+  inline
+  int
+  TRGCDC::firmwareSimulationStart(void) const {
+      return _firmwareSimulationStart;
+  }
+
+  inline
+  int
+  TRGCDC::firmwareSimulationStop(void) const {
+      return _firmwareSimulationStop;
+  }
+
+  inline
+  int
+  TRGCDC::firmwareSimulationStartDataClock(void) const {
+      return _firmwareSimulationStartDataClock;
+  }
+
+  inline
+  int
+  TRGCDC::firmwareSimulationStopDataClock(void) const {
+      return _firmwareSimulationStopDataClock;
   }
 
 } // namespace Belle2

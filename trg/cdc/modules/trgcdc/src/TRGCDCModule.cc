@@ -52,6 +52,8 @@ namespace Belle2 {
       _simulationMode(1),
       _fastSimulationMode(0),
       _firmwareSimulationMode(0),
+      _firmwareSimulationStart(0),
+      _firmwareSimulationStop(32 * 32 - 1),
       _fileTRGCDC(0),
       _perfect2DFinder(false),
       _perfect3DFinder(false),
@@ -122,6 +124,14 @@ namespace Belle2 {
              _firmwareSimulationMode,
              "TRGCDC firmware simulation mode",
              _firmwareSimulationMode);
+    addParam("FirmwareSimulationStart",
+             _firmwareSimulationStart,
+             "TRGCDC firmware simulation start clock of CDC FE",
+             _firmwareSimulationStart);
+    addParam("FirmwareSimulationStop",
+             _firmwareSimulationStop,
+             "TRGCDC firmware simulation stop clock of CDC FE",
+             _firmwareSimulationStop);
     addParam("TRGCDCRootFile",
              _fileTRGCDC,
              "Flag for making TRGCDC.root",
@@ -302,6 +312,8 @@ namespace Belle2 {
                                _simulationMode,
                                _fastSimulationMode,
                                _firmwareSimulationMode,
+                               _firmwareSimulationStart,
+                               _firmwareSimulationStop,
                                _fileTRGCDC,
                                _perfect2DFinder,
                                _perfect3DFinder,

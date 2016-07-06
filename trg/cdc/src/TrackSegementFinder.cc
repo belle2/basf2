@@ -1235,7 +1235,10 @@ TRGCDCTrackSegmentFinder::simulateOuter(void) {
         _toBeDeleted.push_back(tOut);
 
         if (TRGCDC::getTRGCDC()->firmwareSimulationMode() & 0x4)
-            b->dumpCOE();
+            b->dumpCOE("",
+                       TRGCDC::getTRGCDC()->firmwareSimulationStartDataClock(),
+                       TRGCDC::getTRGCDC()->firmwareSimulationStopDataClock());
+
         //      b->dump();
     }
 
@@ -1653,7 +1656,9 @@ TRGCDCTrackSegmentFinder::simulateInner(void) {
         _toBeDeleted.push_back(dummy);
 
         if (TRGCDC::getTRGCDC()->firmwareSimulationMode() & 0x4)
-            b->dumpCOE();
+            b->dumpCOE("",
+                       TRGCDC::getTRGCDC()->firmwareSimulationStartDataClock(),
+                       TRGCDC::getTRGCDC()->firmwareSimulationStopDataClock());
     }
 
     TRGDebug::leaveStage(sn);
@@ -2331,7 +2336,9 @@ TRGCDCTrackSegmentFinder::simulate2(void) {
         _toBeDeleted.push_back(tOut);
 
         if (TRGCDC::getTRGCDC()->firmwareSimulationMode() & 0x4)
-            b->dumpCOE();
+            b->dumpCOE("",
+                    TRGCDC::getTRGCDC()->firmwareSimulationStartDataClock(),
+                    TRGCDC::getTRGCDC()->firmwareSimulationStopDataClock());
         //      b->dump();
     }
 
@@ -2597,7 +2604,7 @@ TSFinder::packerForTracker(vector<TRGSignalVector *> & hitList,
                     }
                 }
                 if (TRGDebug::level()) {
-                    TRGState t = hitList[hi]->state(cList[ci]).subset(13, 9);
+                    TRGState t = hitList[hi]->state(cList[ci]).subset(13, 8);
                     cout << TRGDebug::tab() << " hit found : TSF out local ID="
                          << unsigned(t) << "(" << t << ")" << endl;
                 }

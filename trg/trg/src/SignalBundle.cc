@@ -289,7 +289,7 @@ TRGSignalBundle::ored(void) const {
 }
 
 void
-TRGSignalBundle::dumpCOE(const string & fnIn) const {
+TRGSignalBundle::dumpCOE(const string & fnIn, int start , int stop) const {
 
     string fn = fnIn;
 
@@ -303,36 +303,47 @@ TRGSignalBundle::dumpCOE(const string & fnIn) const {
         return;
     }
 
-    //...Determine start clock to output...
-    int clk0 = _clock->max();
-    vector<int> sc = stateChanges();
-    for (unsigned i = 0; i < sc.size(); i++) {
-        if (state(sc[i]).active()) {
-            clk0 = sc[i];
-            break;
-        }
-    }
+    // //...Determine start clock to output...
+    // int clk0 = _clock->max();
+    // vector<int> sc = stateChanges();
+    // for (unsigned i = 0; i < sc.size(); i++) {
+    //     if (state(sc[i]).active()) {
+    //         clk0 = sc[i];
+    //         break;
+    //     }
+    // }
 
-    //...Determine end clock to output...
-    int clk1 = _clock->min();
-    for (unsigned i = 0; i < sc.size(); i++) {
-        if (sc[i] < clk0)
-            continue;
+    // //...Determine end clock to output...
+    // int clk1 = _clock->min();
+    // for (unsigned i = 0; i < sc.size(); i++) {
+    //     if (sc[i] < clk0)
+    //         continue;
 
-        if (state(sc[i]).active()) {
-            clk1 = sc[i];
-        }
-    }
+    //     if (state(sc[i]).active()) {
+    //         clk1 = sc[i];
+    //     }
+    // }
 
-    //...No active case...
-    if (clk0 > clk1) {
-        clk0 = 0;
-        clk1 = 1;
-    }
+    // //...No active case...
+    // if (clk0 > clk1) {
+    //     clk0 = 0;
+    //     clk1 = 1;
+    // }
 
-    //...32 clocks as default : 2016/04...
-    clk0 = 0;
-    clk1 = 31;
+    // if (TRGDebug::level()) {
+    //     cout << TRGDebug::tab() << "SignalBundle::dumpCOE : " << name()
+    //          << endl;
+    //     cout << TRGDebug::tab() << "    clock region to output" << endl;
+    //     cout << TRGDebug::tab() << "    start=" << clk0 << endl;
+    //     cout << TRGDebug::tab() << "    end  =" << clk1 << endl;
+    // }
+    
+    // //...32 clocks as default : 2016/04...
+    // clk0 = 0;
+    // clk1 = 31;
+
+    int clk0 = start;
+    int clk1 = stop;
 
     TRGState tmp = state(0);
     const TRGSignalVector & cc = _clock->clockCounter();

@@ -226,7 +226,9 @@ TRGCDCMerger::simulate(void) {
   mosb = _mosb;
 
   if (TRGCDC::getTRGCDC()->firmwareSimulationMode() & 0x2)
-      mosb->dumpCOE();
+      mosb->dumpCOE("",
+                    TRGCDC::getTRGCDC()->firmwareSimulationStartDataClock(),
+                    TRGCDC::getTRGCDC()->firmwareSimulationStopDataClock());
 
   //...Output to a channel...
   output(0)->signal(_mosb);

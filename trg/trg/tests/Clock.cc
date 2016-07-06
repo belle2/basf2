@@ -29,4 +29,24 @@ namespace TRGTest {
       EXPECT_EQ(testClock.absoluteTime(clock), syncClock.absoluteTime(clock)) << "clock " << clock;
     }
   }
+
+  TEST(TRGClockTest, ClockConversions) {
+      const double tdcBinWidth = 1.0;
+      const TRGClock _clock("CDCTrigger system clock", 0, 125. / tdcBinWidth);
+      const TRGClock _clockFE("CDCFE TDC clock", _clock, 8);
+      const TRGClock _clockTDC("CDCTrigger TDC clock (after mergers)",
+                               _clock,
+                               4);
+      const TRGClock _clockD("CDCTrigger data clock", _clock, 1, 4);
+
+      const double tfe0 = 0.;
+      const double tfe255 = 255;
+
+      EXPECT_EQ(_clockFE.position(tfe0), _clockD.position(tfe0));
+      EXPECT_EQ(_clockFE.position(tfe255) / 8, _clock.position(tfe255));
+      EXPECT_EQ(_clockD.position(tfe255), _clockFE.position(tfe255) / 32);
+
+      EXPECT_EQ(_clockFE.positionInSourceClock(tfe0),
+                _clockD.positionInSourceClock(tfe0));
+  }
 }

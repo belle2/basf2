@@ -157,29 +157,55 @@ TRGSignal::dump(const string & msg,
 
 TRGSignal
 TRGSignal::operator&(const TRGSignal & left) const {
-    TRGSignal t(* this);
-    t._history.insert(t._history.end(),
-                      left._history.begin(),
-                      left._history.end());
-    t._name = "(" + t._name + ")&(" + left._name + ")";
-    std::sort(t._history.begin(), t._history.end(), TRGTime::sortByTime);
 
-    //...And operation...
-    t._history = andOperation(t._history);
+    //...Collect state changes...
+    vector<int> sc0 = stateChanges();
+    vector<int> sc1 = left.stateChanges();
+    sc0.insert(sc0.end(), sc1.begin(), sc1.end());
+
+    //...Sorting...
+    std::sort(sc0.begin(), sc0.end());
+
+    //...Remove multiple same clock...
+    vector<int> sc2;
+    int last = _clock->min();
+    for (unsigned i = 0; i < sc0.size(); i++) {
+	const int j = sc0[i];
+	if (j != last) {
+	    sc2.push_back(j);
+	    last = j;
+	}
+    }
+
+    //...Make a new signal...
+    string name = "(" + _name + ")&(" + left._name + ")";
+    TRGSignal t(name, * _clock);
+    bool active = false;
+    for (unsigned i = 0; i < sc2.size(); i++) {
+        const int j = sc2[i];
+        if ((! active) & state(j) & left.state(j)) {
+            active = true;
+            t._history.push_back(TRGTime(j, true, * _clock));
+        }
+        else if (active & ((! state(j)) | (! left.state(j)))) {
+            active = false;
+            t._history.push_back(TRGTime(j, false, * _clock));
+        }
+    }
+
+#if TRG_DEBUG
+    consistencyCheck();
+#endif
 
     return t;
 }
 
 TRGSignal &
 TRGSignal::operator&=(const TRGSignal & left) {
-    _history.insert(_history.end(),
-                    left._history.begin(),
-                    left._history.end());
-    this->_name = "(" + this->_name + ")&(" + left._name + ")";
-    std::sort(_history.begin(), _history.end(), TRGTime::sortByTime);
+    TRGSignal t = (* this) & left;
 
-    //...And operation...
-    _history = andOperation(_history);
+    _history.clear();
+    _history = t._history;
 
 #if TRG_DEBUG
     consistencyCheck();
@@ -188,37 +214,37 @@ TRGSignal::operator&=(const TRGSignal & left) {
     return * this;
 }
 
-vector<TRGTime>
-TRGSignal::andOperation(const vector<TRGTime> & history) {
+// vector<TRGTime>
+// TRGSignal::andOperation(const vector<TRGTime> & history) {
 
-    //...And operation...
-    const unsigned n = history.size();
-    unsigned riseC = 0;
-    bool signal = false;
-    vector<TRGTime> tmp;
-    for (unsigned i = 0; i < n; i++) {
-        const bool edge = history[i].edge();
+//     //...And operation...
+//     const unsigned n = history.size();
+//     unsigned riseC = 0;
+//     bool signal = false;
+//     vector<TRGTime> tmp;
+//     for (unsigned i = 0; i < n; i++) {
+//         const bool edge = history[i].edge();
 
-        if (edge)
-            ++riseC;
-        else
-            --riseC;
+//         if (edge)
+//             ++riseC;
+//         else
+//             --riseC;
 
- 	// cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
- 	//      << "," << history[i].time() << endl;
+//         // cout << "riseC,i,e,t=" << riseC << "," << i << "," << edge
+//         //      << "," << history[i].time() << endl;
 
-        if (riseC == 2) {
-            tmp.push_back(history[i]);
-            signal = true;
-        }
-        else if (signal && (riseC == 1)) {
-            tmp.push_back(history[i]);
-            signal = false;
-        }
-    }
+//         if (riseC == 2) {
+//             tmp.push_back(history[i]);
+//             signal = true;
+//         }
+//         else if (signal && (riseC == 1)) {
+//             tmp.push_back(history[i]);
+//             signal = false;
+//         }
+//     }
 
-    return tmp;
-}
+//     return tmp;
+// }
 
 TRGSignal
 TRGSignal::operator|(const TRGSignal & left) const {

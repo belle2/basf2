@@ -100,6 +100,8 @@ namespace Belle2 {
                     unsigned simulationMode,
                     unsigned fastSimulationMode,
                     unsigned firmwareSimulationMode,
+                    int firmwareSimulationStart,
+                    int firmwareSimulationStop,
                     bool makeRootFile,
                     bool perfect2DFinder,
                     bool perfect3DFinder,
@@ -139,6 +141,8 @@ namespace Belle2 {
                         simulationMode,
                         fastSimulationMode,
                         firmwareSimulationMode,
+                        firmwareSimulationStart,
+                        firmwareSimulationStop,
                         makeRootFile,
                         perfect2DFinder,
                         perfect3DFinder,
@@ -206,6 +210,8 @@ namespace Belle2 {
                  unsigned simulationMode,
                  unsigned fastSimulationMode,
                  unsigned firmwareSimulationMode,
+                 int firmwareSimulationStart,
+                 int firmwareSimulationStop,
                  bool makeRootFile,
                  bool perfect2DFinder,
                  bool perfect3DFinder,
@@ -239,6 +245,8 @@ namespace Belle2 {
     _simulationMode(simulationMode),
     _fastSimulationMode(fastSimulationMode),
     _firmwareSimulationMode(firmwareSimulationMode),
+    _firmwareSimulationStart(firmwareSimulationStart),
+    _firmwareSimulationStop(firmwareSimulationStop),
     _returnValue(0),
     _makeRootFile(makeRootFile),
     _perfect2DFinder(perfect2DFinder),
@@ -296,10 +304,48 @@ namespace Belle2 {
     cout << "TRGCDC ... GTK initialized" << endl;
 #endif
 
+    //...Clock summary...
+    _clock.dump();
+    _clockFE.dump();
+    _clockTDC.dump();
+    _clockD.dump();
+
+    //...Firmware simulation time window...
+    TRGTime rise = TRGTime(_firmwareSimulationStart, true, _clockFE);
+    TRGTime fall = rise;
+    fall.shift(_firmwareSimulationStop).reverse();
+    _firmwareSimulationWindow = TRGSignal(rise & fall);
+    _firmwareSimulationWindow.name("Firmware simulation window in FE clock");
+    _firmwareSimulationWindow.dump();
+    
+    //...Time window in other clocks...
+    _firmwareSimulationStartDataClock =
+        _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStart));
+    _firmwareSimulationStopDataClock =
+        _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStop));
+
+    cout << "In " << _clock.name() << endl;
+    cout << "    Start : "
+         << _clock.position(_clockFE.absoluteTime(_firmwareSimulationStart))
+         << endl;
+    cout << "    Stop  : "
+         << _clock.position(_clockFE.absoluteTime(_firmwareSimulationStop))
+         << endl;
+    cout << "In " << _clockTDC.name() << endl;
+    cout << "    Start : "
+         << _clockTDC.position(_clockFE.absoluteTime(_firmwareSimulationStart))
+         << endl;
+    cout << "    Stop  : "
+         << _clockTDC.position(_clockFE.absoluteTime(_firmwareSimulationStop))
+         << endl;
+    cout << "In " << _clockD.name() << endl;
+    cout << "    Start : " << _firmwareSimulationStartDataClock << endl;
+    cout << "    Stop  : " << _firmwareSimulationStopDataClock << endl;
+
     if (TRGDebug::level()) {
       cout << "TRGCDC ... TRGCDC initializing with " << _configFilename
            << endl
-           << " mode=0x" << hex << _simulationMode << dec << endl;
+           << "mode=0x" << hex << _simulationMode << dec << endl;
     }
 
     initialize(houghFinderPeakMin,
@@ -1044,7 +1090,8 @@ namespace Belle2 {
           rise.clock(_clockTDC);
         TRGTime fall = rise;
         fall.shift(1).reverse();
-        w._signal |= TRGSignal(rise & fall);
+        w._signal |= (TRGSignal(rise & fall) & _firmwareSimulationWindow);
+//      w._signal |=  TRGSignal(rise & fall);
         w._signal.name(w.name());
 
         //...Left/right...

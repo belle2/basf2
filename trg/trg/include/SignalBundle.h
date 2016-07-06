@@ -86,7 +86,9 @@ class TRGSignalBundle : public std::vector<TRGSignalVector *> {
               const std::string & pre = "") const;
 
     /// makes coe output.
-    void dumpCOE(const std::string & fileName = "") const;
+    void dumpCOE(const std::string & fileName = "",
+                 int start = 0,
+                 int stop = 0) const;
 
   public:// Operators
 

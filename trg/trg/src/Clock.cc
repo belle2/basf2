@@ -35,7 +35,7 @@ namespace Belle2 {
     : _name(name),
       _source(0),
       _multi(1),
-//   _div(1),
+      _div(1),
       _offset(offset),
       _frequency(frequency),
       _cycle(1000 / frequency),
@@ -65,7 +65,7 @@ namespace Belle2 {
     : _name(name),
       _source(& source),
       _multi(multiplicationFactor),
-//    _div(divisionFactor),
+      _div(divisionFactor),
       _offset(source._offset),
       _frequency(source._frequency *
                  double(multiplicationFactor) /
@@ -90,9 +90,15 @@ namespace Belle2 {
                  const string& pre) const
   {
     cout << pre << _name;
-    if (_source)
-      cout << ":sync'd to " << _source->name()
-           << ", multiplication factor=" << _multi << endl;
+    if (_source) {
+        cout << ":sync'd to " << _source->name() << endl;
+        cout << pre << "    multiplication factor=" << _multi << endl;
+        cout << pre << "    division factor      =" << _div << endl;
+    }
+    else {
+        cout << endl;
+    }
+
     cout << pre << "    offset   :" << _offset << endl
          << pre << "    freq(MHz):" << _frequency << endl
          << pre << "    cycle(ns):" << _cycle << endl

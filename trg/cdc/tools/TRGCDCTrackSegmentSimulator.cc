@@ -86,6 +86,8 @@ main(int argc, char* argv[])
   const unsigned simulationMode = 3; // fast and firm
   const unsigned fastSimulationMode = 0;
   const unsigned firmwareSimulationMode = 0;
+  const int firmwareSimulationStart = 0;
+  const int firmwareSimulationStop = 32 * 32 - 1;
   const unsigned makeRootFile = 0;
   const bool perfect2DFinder = false;
   const bool perfect3DFinder = false;
@@ -117,6 +119,8 @@ main(int argc, char* argv[])
                                   simulationMode,
                                   fastSimulationMode,
                                   firmwareSimulationMode,
+                                  firmwareSimulationStart,
+                                  firmwareSimulationStop,
                                   makeRootFile,
                                   perfect2DFinder,
                                   perfect3DFinder,

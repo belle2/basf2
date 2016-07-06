@@ -124,6 +124,12 @@ namespace Belle2 {
     /// Switch for the firmware simulation. 0:do nothing, 1:do everything
     int _firmwareSimulationMode;
 
+    /// Start clock for the firmware simultion. (clock=cdcfe)
+    int _firmwareSimulationStart;
+
+    /// Stop clock for the firmware simultion. (clock=cdcfe)
+    int _firmwareSimulationStop;
+
     /// Switch for TRGCDC.root file.
     bool _fileTRGCDC;
 

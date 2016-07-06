@@ -34,7 +34,7 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#include <cdc/dbobjects/CDCXTs.h>
+#include <cdc/dbobjects/CDCXtRelations.h>
 
 #include <iostream>
 #include <fstream>
@@ -229,170 +229,111 @@ void CDCDatabaseImporter::importTimeWalk(std::string fileName)
 
 void CDCDatabaseImporter::importXT(std::string fileName)
 {
+  DBImportObjPtr<CDCXtRelations> xt;
+  xt.construct();
+
+  //read alpha bins
   std::ifstream ifs;
+  ifs.open(fileName.c_str());
+  if (!ifs) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+  }
+  B2INFO(fileName << ": open for reading");
+
+  const double degrad = M_PI / 180.;
+  const double raddeg = 180. / M_PI;
+
+  unsigned short nAlphaBins = 0;
+  if (ifs >> nAlphaBins) {
+    if (nAlphaBins <= 0) B2FATAL("Fail to read alpha bins !");
+  } else {
+    B2FATAL("Fail to read alpha bins !");
+  }
+  std::array<float, 3> alpha3;
+  for (unsigned short i = 0; i < nAlphaBins; ++i) {
+    for (unsigned short j = 0; j < 3; ++j) {
+      ifs >> alpha3[j];
+      alpha3[j] *= degrad;
+    }
+    xt->setAlphaBin(alpha3);
+  }
+
+  //read theta bins
+  unsigned short nThetaBins = 0;
+  if (ifs >> nThetaBins) {
+    if (nThetaBins <= 0) B2FATAL("Fail to read theta bins !");
+  } else {
+    B2FATAL("Fail to read theta bins !");
+  }
+  std::array<float, 3> theta3;
+
+  for (unsigned short i = 0; i < nThetaBins; ++i) {
+    for (unsigned short j = 0; j < 3; ++j) {
+      ifs >> theta3[j];
+      theta3[j] *= degrad;
+    }
+    xt->setThetaBin(theta3);
+  }
+
+
+  //read xt params.
+  /*  std::ifstream ifs;
   ifs.open(fileName.c_str());
   if (!ifs) {
     B2FATAL("openFile: " << fileName << " *** failed to open");
     return;
   }
   B2INFO(fileName << ": open for reading");
-
-  DBImportObjPtr<CDCXTs> xt;
-  xt.construct();
-
-  int iL, lr;
-  const int np = 9; //to be moved to appropriate place...
-  double alpha, theta, dummy1, xtc[np];
-  double   oldTheta(-999), oldAlpha(-999);
-  unsigned noOfThetaPoints(0);
-  unsigned noOfAlphaPoints(1); //should start with one for alpha
-
-  //First read to check no.s of theta and alpha points
-  double alphaPoints[nAlphaPoints] = {0.};
-
-  int count = 0;
-  while (ifs >> iL) {
-    //    std::cout << count <<" "<<  ifs.eof() << std::endl;
-    ++count;
-    //    ifs >> iL >> theta >> alpha >> dummy1 >> lr;
-    ifs >> theta >> alpha >> dummy1 >> lr;
-    for (int i = 0; i < np - 1; ++i) {
-      ifs >> xtc[i];
-    }
-
-    if (theta != oldTheta) {
-      unsigned short iarg = std::min(noOfThetaPoints, nThetaPoints);
-      xt->setThetaPoint(iarg, theta);
-      ++noOfThetaPoints;
-      oldTheta = theta;
-    }
-
-    if (noOfThetaPoints == 1 && alpha != oldAlpha) {
-      unsigned short iarg = std::min(noOfAlphaPoints, nAlphaPoints);
-      alphaPoints[iarg] = alpha;
-      ++noOfAlphaPoints;
-      oldAlpha = alpha;
-    }
-  }
-
-  if (noOfThetaPoints != nThetaPoints) B2FATAL("importXT: Inconsistent no. of theta points ! real= " << noOfThetaPoints << " preset= "
-                                                 << nThetaPoints);
-  if (noOfAlphaPoints != nAlphaPoints) B2FATAL("importXT: Inconsistent no. of alpha points ! real in file= " << noOfAlphaPoints <<
-                                                 " preset= " << nAlphaPoints);
-
-  //set alpha for arg=0;
-  xt->setAlphaPoint(0, -90.);
-  //sort in order of magnitude
-  for (unsigned i = 1; i < nAlphaPoints; ++i) {
-    xt->setAlphaPoint(nAlphaPoints - i, alphaPoints[i]);
-  }
-
-  //Second read to set all the others
-  //  std::cout <<"before rewind" <<" "<< ifs.eof() << std::endl;
-  ifs.clear(); //necessary to make the next line work
-  ifs.seekg(0, ios_base::beg);
-  //  std::cout <<"after  rewind" <<" "<< ifs.eof() << std::endl;
+  */
+  short xtFitMode, np;
+  unsigned short iCL, iLR;
+  const unsigned short npx = nXTParams - 1;
+  double xtc[npx];
+  double theta, alpha, dummy1;
   unsigned nRead = 0;
 
-  while (ifs >> iL) {
-    ifs >> theta >> alpha >> dummy1 >> lr;
-    for (int i = 0; i < np - 1; ++i) {
+  ifs >> xtFitMode >> np;
+  if (xtFitMode < 0 || xtFitMode > 1) B2FATAL("Invalid xtfit mode read !");
+  if (np <= 0 || np > npx) B2FATAL("No. of xt-params. outside limits !");
+
+  xt->setXtParamMode(xtFitMode);
+
+  const double epsi = 0.1;
+
+  while (ifs >> iCL) {
+    ifs >> theta >> alpha >> dummy1 >> iLR;
+    for (int i = 0; i < np; ++i) {
       ifs >> xtc[i];
     }
     ++nRead;
 
-    int itheta = 0;
-    for (unsigned short i = 0; i < nThetaPoints; ++i) {
-      if (theta == xt->getThetaPoint(i)) itheta = i;
-    }
-
-    int ialpha = 0;
-    for (unsigned short i = 1; i < nAlphaPoints; ++i) {
-      if (alpha == xt->getAlphaPoint(i)) ialpha = i;
-    }
-
-    for (int i = 0; i < np - 1; ++i) {
-      xt->setXTParam(iL, lr, ialpha, itheta, i, xtc[i]);
-    }
-
-    if (xt->getXTParam(iL, lr, ialpha, itheta, 1) * xt->getXTParam(iL, lr, ialpha, itheta, 7) < 0.) {
-      //      B2WARNING("importXT: xtc[7] sign is inconsistent with xtc[1] sign -> set xtc[7]=0");
-      xt->setXTParam(iL, lr, ialpha, itheta, 7, 0.);
-    }
-
-    double bound = xt->getXTParam(iL, lr, ialpha, itheta, 6);
-    int i = np - 1;
-    xtc[i] = xt->getXTParam(iL, lr, ialpha, itheta, 0) + bound
-             * (xt->getXTParam(iL, lr, ialpha, itheta, 1) + bound
-                * (xt->getXTParam(iL, lr, ialpha, itheta, 2) + bound
-                   * (xt->getXTParam(iL, lr, ialpha, itheta, 3) + bound
-                      * (xt->getXTParam(iL, lr, ialpha, itheta, 4) + bound
-                         * (xt->getXTParam(iL, lr, ialpha, itheta, 5))))));
-    xt->setXTParam(iL, lr, ialpha, itheta, i, xtc[i]);
-
-    /*
-       cout << iL << " " << alpha << " " << theta << " " << dummy1 << " " << lr;
-       for (int i = 0; i < np; ++i) {
-       cout << " " << xtc[i];
-       }
-       cout << endl;
-    */
-  }
-
-  if (nRead != 2 * (nAlphaPoints - 1) * nThetaPoints * MAX_N_SLAYERS) B2FATAL("importXT: #lines read-in (=" << nRead <<
-        ") is inconsistent with 2*18*7 x total #layers (=" << 2 * (nAlphaPoints - 1) * nThetaPoints * MAX_N_SLAYERS << ") !");
-
-  ifs.close();
-
-  //set xt(L/R,alpha=-90deg) = xt(R/L,alpha=90deg)
-  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
-    for (int lr = 0; lr < 2; ++lr) {
-      int lrp = 0;
-      if (lr == 0) lrp = 1;
-      for (unsigned itheta = 0; itheta < nThetaPoints; ++itheta) {
-        for (int i = 0; i < np; ++i) {
-          double sgn = -1.;
-          if (i == 6) sgn = 1;
-          xt->setXTParam(iL, lr, 0, itheta, i, sgn * xt->getXTParam(iL, lrp, 18, itheta, i));
-        }
+    int ialpha = -99;
+    for (unsigned short i = 0; i < nAlphaBins; ++i) {
+      if (fabs(alpha - xt->getAlphaBin(i)[2]*raddeg) < epsi) {
+        ialpha = i;
+        break;
       }
     }
-  }
+    if (ialpha < 0) B2FATAL("alphas in xt.dat and bin.dat are inconsistent !");
 
-  //set xt(theta= 18) = xt(theta= 40) for the layers >= 20, since xt(theta=18) for these layers are unavailable
-  for (unsigned iL = 20; iL < MAX_N_SLAYERS; ++iL) {
-    for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
-        xt->copyXTParam(iL, lr, ialpha, 1, 0);
+    int itheta = -99;
+    for (unsigned short i = 0; i < nThetaBins; ++i) {
+      if (fabs(theta - xt->getThetaBin(i)[2]*raddeg) < epsi) {
+        itheta = i;
+        break;
       }
     }
-  }
+    if (itheta < 0) B2FATAL("thetas in xt.dat and bin.dat are inconsistent !");
 
-  //set xt(theta=130) = xt(theta=120) for the layers >= 37, since xt(theta=130) for these layers are unavailable
-  for (unsigned iL = 37; iL < MAX_N_SLAYERS; ++iL) {
-    for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
-        xt->copyXTParam(iL, lr, ialpha, 4, 5);
-      }
+    //    std::vector<float> xtbuff = std::vector<float>(np);
+    std::vector<float> xtbuff;
+    for (int i = 0; i < np; ++i) {
+      xtbuff.push_back(xtc[i]);
     }
+    //    std::cout <<"iCL,iLR,ialpha,itheta= " << iCL <<" "<< iLR <<" "<< ialpha <<" "<< itheta << std::endl;
+    xt->setXtParams(iCL, iLR, ialpha, itheta, xtbuff);
   }
 
-  //set xt(theta=149) = xt(theta=130) for the layers >= 13, since xt(theta=149) for these layers are unavailable
-  for (unsigned iL = 13; iL < MAX_N_SLAYERS; ++iL) {
-    for (int lr = 0; lr < 2; ++lr) {
-      for (unsigned ialpha = 0; ialpha < nAlphaPoints; ++ialpha) {
-        xt->copyXTParam(iL, lr, ialpha, 5, 6);
-      }
-    }
-  }
-
-  //convert unit
-  for (unsigned i = 0; i < nAlphaPoints; ++i) {
-    xt->setAlphaPoint(i, xt->getAlphaPoint(i) * M_PI / 180.);
-  }
-  for (unsigned i = 0; i < nThetaPoints; ++i) {
-    xt->setThetaPoint(i, xt->getThetaPoint(i) * M_PI / 180.);
-  }
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
@@ -501,7 +442,7 @@ void CDCDatabaseImporter::printTimeWalk()
 
 void CDCDatabaseImporter::printXT()
 {
-  DBObjPtr<CDCXTs> xt;
+  DBObjPtr<CDCXtRelations> xt;
   xt->dump();
 }
 

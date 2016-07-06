@@ -21,7 +21,12 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
+#if defined(CDC_XT_FROM_DB)
 #include <cdc/dbobjects/CDCXTs.h>
+#endif
+#if defined(CDC_XTREL_FROM_DB)
+#include <cdc/dbobjects/CDCXtRelations.h>
+#endif
 #include <cdc/dbobjects/CDCSigmas.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 
@@ -31,19 +36,33 @@
 
 #include "TVector3.h"
 
-const unsigned MAX_N_SLAYERS =    56;
-const unsigned MAX_N_SCELLS  =   384;
-const unsigned MAX_N_FLAYERS =    55;
-const unsigned nSenseWires   = 14336;
-const unsigned nSuperLayers  =     9;
-const unsigned nBoards       =   300;
-const unsigned nAlphaPoints  =    19;
-const unsigned nThetaPoints  =     7;
-const unsigned nXTParams     =     9;
-const unsigned nSigmaParams  =     7;
+const unsigned MAX_N_SLAYERS   =    56;
+const unsigned MAX_N_SCELLS    =   384;
+const unsigned MAX_N_FLAYERS   =    55;
+const unsigned nSenseWires     = 14336;
+const unsigned nSuperLayers    =     9;
+const unsigned nBoards         =   300;
+//const unsigned nAlphaPoints  =    19;
+const unsigned maxNAlphaPoints =    18;
+const unsigned maxNThetaPoints =     7;
+const unsigned nXTParams       =     9; //#fit params + 1
+const unsigned nSigmaParams    =     7;
 
 namespace Belle2 {
   namespace CDC {
+    /*
+    const unsigned MAX_N_SLAYERS   =    56;
+    const unsigned MAX_N_SCELLS    =   384;
+    const unsigned MAX_N_FLAYERS   =    55;
+    const unsigned nSenseWires     = 14336;
+    const unsigned nSuperLayers    =     9;
+    const unsigned nBoards         =   300;
+    const unsigned maxNAlphaPoints =    18;
+    const unsigned maxNThetaPoints =     7;
+    const unsigned nXTParams       =     9; //#fit params + 1
+    const unsigned nSigmaParams    =     7;
+    */
+
     //! The Class for CDC Geometry Parameters
     /*! This class provides CDC gemetry paramters for simulation, reconstruction and so on.
         These parameters are gotten from gearbox.
@@ -99,9 +118,28 @@ namespace Belle2 {
       void readXT(const GearDir, int mode = 0);
 
       /**
+       * Read XT-relation table with old format.
+       * @param[in] GearDir Gear Dir.
+       * @param[in] mode 0: read simulation file, 1: read reconstruction file.
+       */
+      void oldReadXT(const GearDir, int mode = 0);
+
+      /**
+       * Read XT-relation table with new format.
+       * @param[in] GearDir Gear Dir.
+       * @param[in] mode 0: read simulation file, 1: read reconstruction file.
+       */
+      void newReadXT(const GearDir, int mode = 0);
+
+      /**
        * Set XT-relation table (from DB).
        */
       void setXT();
+
+      /**
+       * Set XT-relation table (from DB) (new).
+       */
+      void setXtRel();
 
       /**
        * Read spatial resolution of Drift length.
@@ -786,7 +824,7 @@ namespace Belle2 {
        * Returns the two closest alpha points range for the input track incident angle (alpha).
        * @param alpha in rad.
        */
-      void getClosestAlphaPoints(const double alpha, double& wal, unsigned short points[2]) const;
+      void getClosestAlphaPoints(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
 
       /**
@@ -850,9 +888,13 @@ namespace Belle2 {
       std::string m_version; /*!< The version of geometry parameters. */
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
       int m_senseWireZposMode; /*!< Mode for sense wire z position corr. */
+      int m_xtFileFormat;      /*!< Format of xt input file */
+      int m_xtParamMode; /*!< Mode for xt parameterization */
       signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
+      unsigned short m_nAlphaPoints;  /*!< No. of alpha points. */
+      unsigned short m_nThetaPoints;  /*!< No. of theta points. */
       double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
       double m_zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
 
@@ -898,10 +940,10 @@ namespace Belle2 {
       float m_BWirPosAlign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. alignment at the backward endplate for each cell; ibid. */
       float m_WireSagCoefAlign[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient incl. alignment for each cell; ibid. */
 
-      float m_alphaPoints[nAlphaPoints]; /*!< alpha sampling points for xt (rad) */
-      float m_thetaPoints[nThetaPoints]; /*!< theta sampling points for xt (rad) */
+      float m_alphaPoints[maxNAlphaPoints]; /*!< max no. of alpha sampling points for xt (rad) */
+      float m_thetaPoints[maxNThetaPoints]; /*!< max no. of theta sampling points for xt (rad) */
 
-      float m_XT[MAX_N_SLAYERS][2][nAlphaPoints][nThetaPoints][9];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
+      float m_XT[MAX_N_SLAYERS][2][maxNAlphaPoints][maxNThetaPoints][nXTParams];  /*!< XT-relation coefficients for each layer, Left/Right, entrance angle and polar angle.  */
       float m_Sigma[MAX_N_SLAYERS][7];      /*!< position resulution for each layer. */
       float m_propSpeedInv[MAX_N_SLAYERS];  /*!< Inverse of propagation speed of the sense wire. */
       float m_t0[MAX_N_SLAYERS][MAX_N_SCELLS];  /*!< t0 for each sense-wire (in nsec). */
@@ -934,6 +976,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_XT_FROM_DB)
       DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
+#endif
+#if defined(CDC_XTREL_FROM_DB)
+      DBObjPtr<CDCXtRelations> m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
 #endif
 #if defined(CDC_SIGMA_FROM_DB)
       DBObjPtr<CDCSigmas> m_sigmaFromDB; /*!< sigma params. retrieved from DB. */

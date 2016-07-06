@@ -21,7 +21,7 @@ t0file = FileSystem.findFile('data/cdc/t0.dat')
 bwfile = FileSystem.findFile('data/cdc/badwire_off.dat')
 psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
 twfile = FileSystem.findFile('data/cdc/tw_off.dat')
-xtfile = FileSystem.findFile('data/cdc/xt_v2.2.dat')
+xtfile = FileSystem.findFile('data/cdc/xt_v3.dat')
 sgfile = FileSystem.findFile('data/cdc/sigma_v0.1.dat')
 use_local_database("cdc_crt/database.txt", "cdc_crt")
 

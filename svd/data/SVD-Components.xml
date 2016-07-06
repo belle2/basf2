@@ -67,8 +67,8 @@
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
                         <CouplingCapacitance unit="pF">120</CouplingCapacitance>
-                        <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -94,8 +94,8 @@
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
 			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
-                        <ElectronicNoiseU unit="e">650</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">1100</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">1100</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">650</ElectronicNoiseV>
 		</Active>
 	</SensorBase>
 
@@ -121,8 +121,8 @@
 			<BackplaneCapacitance unit="pF">0</BackplaneCapacitance>
 			<InterstripCapacitance unit="pF">6</InterstripCapacitance>
 			<CouplingCapacitance unit="pF">120</CouplingCapacitance>
-                        <ElectronicNoiseU unit="e">480</ElectronicNoiseU>
-                        <ElectronicNoiseV unit="e">850</ElectronicNoiseV>
+                        <ElectronicNoiseU unit="e">850</ElectronicNoiseU>
+                        <ElectronicNoiseV unit="e">480</ElectronicNoiseV>
 		</Active>
 		<!-- For now, layer 3 only has a flex on top -->
 		<Component name="KaptonLayer3">

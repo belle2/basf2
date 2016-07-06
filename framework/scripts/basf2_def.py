@@ -191,6 +191,36 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     return module
 
 
+def set_module_parameters(path, name, recursive=False, **kwargs):
+    """Set the given set of parameters for all modules in a path which have the given 'name'
+
+    path: The path to search for the modules
+    name: Then name of the module to set parameters for
+    recursive: if True also look in paths connected by conditions or :func:`Path.for_each() <basf2.Path.for_each>`
+    kwargs: Named parameters to be set for the module, see  :func:`register_module() <basf2.register_module>`
+    """
+    if not kwargs:
+        raise ValueError("no parameters given")
+
+    found = False
+    for module in path.modules():
+        if module.name() == name:
+            # use register_module as this automatically takes care of logLevel
+            # and debugLevel parameters
+            register_module(module, **kwargs)
+            found = True
+
+        if recursive:
+            if module.has_condition():
+                set_module_parameters(module.get_condition_path(), name, recursive, **kwargs)
+            if module.type() == "SubEvent":
+                for subpath in [p.values for p in module.available_params() if p.name == "path"]:
+                    set_module_parameters(subpath, name, recursive, **kwargs)
+
+    if not found:
+        raise KeyError("No module with given name found anywhere in the path")
+
+
 def create_path():
     """
     Creates a new path and returns it

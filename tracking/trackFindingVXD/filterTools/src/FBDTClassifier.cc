@@ -11,7 +11,11 @@
 #include <tracking/trackFindingVXD/filterTools/FBDTClassifier.h>
 #include <framework/logging/Logger.h>
 
+#if FastBDT_VERSION_MAJOR >= 3
+#include <FastBDT_IO.h>
+#else
 #include <IO.h>
+#endif
 
 using namespace Belle2;
 using namespace std;
@@ -23,7 +27,11 @@ void FBDTClassifier<Ndims>::readFromStream(std::istream& is)
   B2DEBUG(50, "Reading the FeatureBinnings");
   is >> m_featBins;
   B2DEBUG(50, "Reading the Forest");
+#if FastBDT_VERSION_MAJOR >= 3
+  m_forest = FastBDT::readForestFromStream<unsigned int>(is);
+#else
   m_forest = FastBDT::readForestFromStream(is);
+#endif
   B2DEBUG(50, "Reading the DecorrelationMatrix");
   if (!m_decorrMat.readFromStream(is)) { // for some reason this does not stop if there is no decor matrix
     B2ERROR("Reading in the decorrelation matrix did not work! The decorrelation matrix of this classifier will be set to identity!");
@@ -72,7 +80,11 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   std::vector<unsigned int> nBinningLevels;
   m_featBins.clear(); // clear the feature binnings (if present)
   for (auto featureVec : data) {
+#if FastBDT_VERSION_MAJOR >= 3
+    m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, featureVec));
+#else
     m_featBins.push_back(FastBDT::FeatureBinning<double>(nBinCuts, featureVec.begin(), featureVec.end()));
+#endif
     nBinningLevels.push_back(nBinCuts);
   }
 
@@ -91,7 +103,11 @@ void FBDTClassifier<Ndims>::train(const std::vector<Belle2::FBDTTrainSample<Ndim
   FastBDT::ForestBuilder fbdt(eventSample, nTrees, shrinkage, ratio, depth); // train FastBDT
 
   B2DEBUG(100, "FBDTClassifier::train(): getting FastBDT to internal member");
-  FastBDT::Forest forest(fbdt.GetF0(), fbdt.GetShrinkage());
+#if FastBDT_VERSION_MAJOR >= 3
+  FBDTForest forest(fbdt.GetF0(), fbdt.GetShrinkage(), true);
+#else
+  FBDTForest forest(fbdt.GetF0(), fbdt.GetShrinkage());
+#endif
   for (const auto& tree : fbdt.GetForest()) {
     forest.AddTree(tree);
   }

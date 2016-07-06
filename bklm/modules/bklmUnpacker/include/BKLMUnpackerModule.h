@@ -74,6 +74,9 @@ namespace Belle2 {
     //! @param axis the axis bit in the datapacket
     int electCooToInt(int copper, int finesse, int lane, int axis);
 
+    //! remap the channel ID for scitilators and RPCs
+    unsigned short getChannel(int layer,  unsigned short axis,  unsigned short channel);
+
     //    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
     //! to map hardware coordinates to logical coordinates
     map<int, int> m_electIdToModuleId;

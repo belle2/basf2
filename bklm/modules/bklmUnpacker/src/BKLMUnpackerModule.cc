@@ -213,12 +213,16 @@ void BKLMUnpackerModule::event()
           unsigned short axis = (bword1 >> 7) & 1;
           //lane is the slot in the crate
           unsigned short lane = (bword1 >> 8) & 0x1F;
+          unsigned short flag = (bword1 >> 14);
           unsigned short ctime = bword2 & 0xFFFF; //full bword
           unsigned short tdc = bword3 & 0x7FF;
           unsigned short charge = bword4 & 0xFFF;
+          int layer = lane;
+          if (flag == 1) layer = lane - 5;
+          channel = getChannel(layer, axis, channel);
 
 
-          if ((1 == lane || 2 == lane)  && fabs(charge - m_scintADCOffset) < m_scintThreshold)
+          if ((1 == layer || 2 == layer)  && fabs(charge - m_scintADCOffset) < m_scintThreshold)
             continue;
 
           //    cout <<"copperID: "<< copperId<<endl;
@@ -227,8 +231,7 @@ void BKLMUnpackerModule::event()
           ////          cout << "Unpacker channel: " << channel << ", axi: " << axis << " lane: " << lane << " ctime: " << ctime << " tdc: " << tdc <<
           ////               " charge: " << charge << endl;
 
-          int electId = electCooToInt(copperId, finesse_num + 1, lane, axis);
-          int layer = lane;
+          int electId = electCooToInt(copperId, finesse_num + 1, layer, axis);
           int moduleId = 0;
           if (m_electIdToModuleId.find(electId) == m_electIdToModuleId.end()) {
             if (!m_useDefaultModuleId) {
@@ -237,7 +240,7 @@ void BKLMUnpackerModule::event()
               continue;
             } else {
               //        cout <<"calling default with axis: " << axis <<endl;
-              moduleId = getDefaultModuleId(lane, axis);
+              moduleId = getDefaultModuleId(layer, axis);
               //        cout <<"could not find copperid %d, finesse %d, lane %d, axis %d in mapping " <<  copperId  <<" fin: "<<  finesse_num + 1 <<" lane: " <<  lane <<" axis: "<< axis <<endl;
               //      cout <<" Using lane: "<< lane <<" layer: "<< layer <<endl;
             }
@@ -262,6 +265,7 @@ void BKLMUnpackerModule::event()
           //(copperId,finesse_num,lane,channel,axis);
 
           BKLMDigit digit(moduleId, ctime, tdc, charge);
+          if (layer < 3) digit.isAboveThreshold(true);
           //  Digit.setModuleID();
           bklmDigits.appendNew(digit);
 
@@ -334,4 +338,44 @@ int BKLMUnpackerModule::getDefaultModuleId(int lane, int axis)
 
   return moduleId;
 
+}
+
+unsigned short BKLMUnpackerModule::getChannel(int layer, unsigned short axis, unsigned short channel)
+{
+
+  if (layer == 1) {
+    if (axis == 0) { //phi strips
+      if (channel > 0 && channel < 5) channel = 0;
+      //else channel = channel - 4;
+      if (channel > 4 && channel < 42) channel = channel - 4;
+      //if(channel>41) channel=0;
+      if (channel > 41) channel = channel - 4;
+    }
+
+    if (axis == 1) { //z strips
+      if (channel > 0 && channel < 10) channel = channel;
+      if (channel > 9 && channel < 16) channel = 0;
+      if (channel > 15 && channel < 61) channel = channel - 6;
+      if (channel > 60) channel = channel - 6;
+    }
+  }
+  if (layer == 2) {
+    if (axis == 0) { //phi
+      if (channel > 0 && channel < 3) channel = 0;
+      if (channel > 2 && channel < 45) channel = channel - 2;
+      if (channel > 44) channel = channel - 2;;
+    }
+    if (axis == 1) {
+      if (channel > 0 && channel < 10) channel = channel;
+      if (channel > 9 && channel < 16) channel = 0;
+      if (channel > 15 && channel < 61) channel = channel - 6;
+      if (channel > 60) channel = channel - 6;;
+    }
+
+  }
+
+
+  if (layer > 2) channel = channel + 1;
+
+  return channel;
 }

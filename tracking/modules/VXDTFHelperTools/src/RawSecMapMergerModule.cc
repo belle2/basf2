@@ -9,7 +9,7 @@
  **************************************************************************/
 
 #include <tracking/modules/VXDTFHelperTools/RawSecMapMergerModule.h>
-#include <tracking/trackFindingVXD/FilterTools/SelectionVariableType.h>
+#include <tracking/trackFindingVXD/filterTools/SelectionVariableType.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 

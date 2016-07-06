@@ -33,7 +33,7 @@ details = 'simpleClusters: ' + str(useSimpleClusterizer) + ', evtGen: ' + str(us
 
 # Important parameters:
 numEvents = 100000  # can be overridden by the parameters given via terminal
-initialValue = 14  # want random events, if set to 0
+initialValue = 12345  # want random events, if set to 0
 
 
 # flags for the pGun
@@ -116,7 +116,7 @@ if (numTracks != 0 and usePGun is True):
             thetaMin, thetaMax], phiParams=[
                 phiMin, phiMax], logLevel=LogLevel.WARNING)
     rootIOFileName += 'pGun1_' + str(numTracks) + 'T'
-    details += 'pGun1 with ' str(numTracks) ' tracks:\n'
+    details += 'pGun1 with ' + str(numTracks) + ' tracks:\n'
     details += 'pMin/Max: ' + str(momentumMin) + '/' + str(momentumMax) + ' , phiMin/Max: ' + \
         str(phiMin) + '/' + str(phiMax) + ' , thetaMin/Max: ' + str(thetaMin) + '/' + str(thetaMax) + '\n'
 
@@ -128,7 +128,7 @@ if (numTracks2 != 0 and usePGun is True):
             thetaMin2, thetaMax2], phiParams=[
                 phiMin2, phiMax2], logLevel=LogLevel.WARNING)
     rootIOFileName += 'pGun2_' + str(numTracks2) + 'T'
-    details += 'pGun2 with ' str(numTracks2) ' tracks:\n'
+    details += 'pGun2 with ' + str(numTracks2) + ' tracks:\n'
     details += 'pMin/Max: ' + str(momentumMin2) + '/' + str(momentumMax2) + ' , phiMin/Max: ' + str(phiMin2) + \
         '/' + str(phiMax2) + ' , thetaMin/Max: ' + str(thetaMin2) + '/' + str(thetaMax2) + '\n'
 

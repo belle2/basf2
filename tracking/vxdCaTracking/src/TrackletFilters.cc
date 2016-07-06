@@ -45,7 +45,7 @@ using boost::math::sign;
 bool TrackletFilters::ziggZaggXY()
 {
   if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggXY hits not set, therefore no calculation possible - please check that!");
-    list<int> chargeSigns;
+  list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   for (int i = 0; i < m_numHits - 2; ++i) {
     int signValue = m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition,
@@ -66,7 +66,7 @@ bool TrackletFilters::ziggZaggXYWithSigma()
 {
   if (m_hits == NULL)
     B2FATAL(" TrackletFilters::ziggZaggXYWithSigma: hits not set, therefore no calculation possible - please check that!");
-    list<int> chargeSigns;
+  list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   for (int i = 0; i < m_numHits - 2; ++i) {
     int signValue = m_3hitFilterBox.calcSign(m_hits->at(i)->hitPosition, m_hits->at(i + 1)->hitPosition, m_hits->at(i + 2)->hitPosition,
@@ -87,7 +87,7 @@ bool TrackletFilters::ziggZaggXYWithSigma()
 bool TrackletFilters::ziggZaggRZ()
 {
   if (m_hits == NULL) B2FATAL(" TrackletFilters::ziggZaggRZ: hits not set, therefore no calculation possible - please check that!");
-    list<int> chargeSigns;
+  list<int> chargeSigns;
   bool isZiggZagging = false; // good: not ziggZagging
   vector<TVector3> rzHits;
   TVector3 currentVector;
@@ -133,7 +133,6 @@ std::pair<TVector3, int> TrackletFilters::calcMomentumSeed(bool useBackwards, do
     B2DEBUG(1, "Exception caught: TrackletFilters::calcMomentumSeed - helixFit said: " << anException.what());
     try {
       fitResults = simpleLineFit3D(m_hits, useBackwards, setMomentumMagnitude);
-
       B2DEBUG(1, "After catching straight line case in Helix fit, the lineFit has chi2 of " << fitResults.first  <<
               "\nwhile using following hits:\n" << printHits(m_hits) << "with seed: " << fitResults.second.X() << " " << fitResults.second.Y() <<
               " " << fitResults.second.Z() << "\n");
@@ -199,6 +198,7 @@ double TrackletFilters::circleFit(double& pocaPhi, double& pocaD, double& curvat
 {
   if (m_hits == NULL) { B2FATAL(" TrackletFilters::circleFit hits not set, therefore no calculation possible - please check that!"); }
 
+  //thomas: WARNING this one throws uncaught execeptions
   bool clockwise =
     CalcCurvature(); // Calculates Curvature: True means clockwise, False means counterclockwise.TODO this is not an optimized approach; just to get things to work. CalcCurvature could be integrated into the looping over the hits which CircleFit does anyhow.
 
@@ -1125,8 +1125,9 @@ TVector3 pTVector = (pT / radiusInCm) * radialVector.Orthogonal();
 
 bool TrackletFilters::CalcCurvature()
 {
-  if (m_hits == NULL) B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!");
-    double sumOfCurvature = 0.;
+  if (m_hits == NULL)
+    B2FATAL(" TrackletFilters::CalcCurvature: hits not set, therefore no calculation possible - please check that!");
+  double sumOfCurvature = 0.;
   for (int i = 0; i < m_numHits - 2; ++i) {
     TVector3 ab = m_hits->at(i)->hitPosition - m_hits->at(i + 1)->hitPosition;
     ab.SetZ(0.);

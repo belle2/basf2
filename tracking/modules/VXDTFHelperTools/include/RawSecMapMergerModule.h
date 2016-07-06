@@ -13,7 +13,7 @@
 
 #include <framework/core/Module.h>
 
-#include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
+#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
@@ -208,7 +208,7 @@ namespace Belle2 {
         if (doY) divider++;
         if (doZ) divider++;
         if (divider == 0.) B2FATAL("RawSecMapMerger::testSegmentFilters::testDistanceFilter: was used in an illegal way!");
-          double outerX = 1., outerY = 2., outerZ = 3.;
+        double outerX = 1., outerY = 2., outerZ = 3.;
         if (doX) outerX += cut / divider;
         if (doY) outerY += cut / divider;
         if (doZ) outerZ += cut / divider;

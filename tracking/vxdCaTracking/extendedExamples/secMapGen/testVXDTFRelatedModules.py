@@ -27,7 +27,9 @@ from VXDTF.setup_modules_ml import *
 # rootInputFileName = "evtGenseed8nEv100000.root" #evtGenSinglePassTest-TrainSample. skipCluster = True (TODO)
 
 # rootInputFileName = "seed11nEv100pGun1_1T.root"  # test- and TrainSample
-rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+# rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+rootInputFileName = "rootfiles/seed14nEv100000pGun1_1T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+
 
 # file name into which the segNetAnalize stores its stuff
 segNetAnaRFN = 'SegNetAnalyzer_SM_train.root'
@@ -119,12 +121,15 @@ elif (initialValue == 12):
 elif (initialValue == 13):
     print("chosen initialvalue 13! (skipCluster-setting=True): 100k pGun events " + rootInputFileName)
     acceptedRawSecMapFiles = ['lowTestRedesign_1874442389.root']  # 28 - single track, single event raw data
-elif (initialValue == 14):
-    print("chosen initialvalue 14! (skipCluster-setting=True): 100k pGun events " + rootInputFileName)
-    acceptedRawSecMapFiles = ['lowTestRedesign_1054912153.root']  # 28 - single track, single event raw data
+# elif (initialValue == 14):
+#    print("chosen initialvalue 14! (skipCluster-setting=True): 100k pGun events " + rootInputFileName)
+#    acceptedRawSecMapFiles = ['lowTestRedesign_1054912153.root']  # 28 - single track, single event raw data
 elif (initialValue == 57):
     print("chosen initialvalue 57! setup remark: train: 10k events, 10 tracks per event, theta 60-85°, phi 0-360°, pT 100-145MeV.")
     acceptedRawSecMapFiles = ['lowTestRedesign_779994078.root']  # 55 - single track, single event raw data
+elif (initialValue == 14):
+    print("chosen initialvalue 12345! some dummy setup!")
+    acceptedRawSecMapFiles = ['lowTestRedesign_1942086555.root']
 else:
     print("ERROR! no valid initialvalue chosen!")
     acceptedRawSecMapFiles = [""]

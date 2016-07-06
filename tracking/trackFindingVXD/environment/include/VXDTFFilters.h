@@ -16,32 +16,32 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/TwoHitFilters/Distance3DSquared.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
+#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
+#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
 
-#include "tracking/trackFindingVXD/ThreeHitFilters/Angle3DSimple.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/AngleXYSimple.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/AngleRZSimple.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/CircleDist2IP.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeRZ.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSlopeZoverS.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/DeltaSoverZ.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/HelixParameterFit.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/Pt.h"
-#include "tracking/trackFindingVXD/ThreeHitFilters/CircleRadius.h"
+#include "tracking/trackFindingVXD/threeHitFilters/Angle3DSimple.h"
+#include "tracking/trackFindingVXD/threeHitFilters/AngleXYSimple.h"
+#include "tracking/trackFindingVXD/threeHitFilters/AngleRZSimple.h"
+#include "tracking/trackFindingVXD/threeHitFilters/CircleDist2IP.h"
+#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeRZ.h"
+#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeZoverS.h"
+#include "tracking/trackFindingVXD/threeHitFilters/DeltaSoverZ.h"
+#include "tracking/trackFindingVXD/threeHitFilters/HelixParameterFit.h"
+#include "tracking/trackFindingVXD/threeHitFilters/Pt.h"
+#include "tracking/trackFindingVXD/threeHitFilters/CircleRadius.h"
 
-#include "tracking/trackFindingVXD/FilterTools/Shortcuts.h"
-#include "tracking/trackFindingVXD/FilterTools/ObserverPrintResults.h"
-#include "tracking/trackFindingVXD/FilterTools/Observer.h" // empty observer
-#include "tracking/trackFindingVXD/FilterTools/VoidObserver.h" // empty observer
-#include "tracking/trackFindingVXD/FilterTools/ObserverCheckMCPurity.h"
+#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
+#include "tracking/trackFindingVXD/filterTools/Observer.h" // empty observer
+#include "tracking/trackFindingVXD/filterTools/VoidObserver.h" // empty observer
+#include "tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h"
 
-#include "tracking/trackFindingVXD/FilterTools/Observer3HitPrintResults.h"
+#include "tracking/trackFindingVXD/filterTools/Observer3HitPrintResults.h"
 
 #include <tracking/dataobjects/SectorMapConfig.h>
 

@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/trackFindingVXD/FilterTools/SelectionVariableFactory.h>
+#include <tracking/trackFindingVXD/filterTools/SelectionVariableFactory.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainer.h>
 #include <framework/core/Module.h>
 

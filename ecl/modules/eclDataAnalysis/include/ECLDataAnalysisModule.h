@@ -99,14 +99,19 @@ namespace Belle2 {
     std::vector<int>* m_eclCalDigitIdx; /**< ECLCalDigit index */
     //std::vector<int>* m_eclCalDigitToMc; /**< Index of MCParticle related to that ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMc1; /**< Index of first MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMc1PDG; /**< PDG code of first MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMcWeight1; /**< Energy contribution of first MCParticle related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMc2; /**< Index of second MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMc2PDG; /**< PDG code of second MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMcWeight2; /**< Energy contribution of second MCParticle related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMc3; /**< Index of third MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMc3PDG; /**< PDG code of third MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMcWeight3; /**< Energy contribution of third MCParticle related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMc4; /**< Index of fourth MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMc4PDG; /**< PDG code of fourth MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMcWeight4; /**< Energy contribution of fourth MCParticle related to ECLCalDigit */
     std::vector<int>* m_eclCalDigitToMc5; /**< Index of fifth MCParticle related to ECLCalDigit */
+    std::vector<int>* m_eclCalDigitToMc5PDG; /**< PDG code of fifth MCParticle related to ECLCalDigit */
     std::vector<double>* m_eclCalDigitToMcWeight5; /**< Energy contribution of fifth MCParticle related to ECLCalDigit */
     std::vector<double>*
     m_eclCalDigitToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLCalDigit */
@@ -117,6 +122,17 @@ namespace Belle2 {
     std::vector<double>* m_eclCalDigitAmp;  /**< ECLCalDigit amplitude */
     std::vector<double>* m_eclCalDigitTimeFit;  /**< ECLCalDigit timing */
     std::vector<int>* m_eclCalDigitFitQuality;  /**< ECLCalDigit fit quality */
+    std::vector<int>* m_eclCalDigitToCR; /**< Index of CR related to that ECLCalDigit */
+
+    std::vector<int>*    m_eclCRIdx;
+    std::vector<int>*    m_eclCRIsTrack;
+    std::vector<double>* m_eclCRLikelihoodMIPNGamma;
+    std::vector<double>*    m_eclCRLikelihoodChargedHadron;
+    std::vector<double>*    m_eclCRLikelihoodElectronNGamma;
+    std::vector<double>*    m_eclCRLikelihoodNGamma;
+    std::vector<double>*    m_eclCRLikelihoodNeutralHadron;
+    std::vector<double>*    m_eclCRLikelihoodMergedPi0;
+    //std::vector<double>*    m_eclCRToCalDigit;
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
     std::vector<int>* m_eclSimHitIdx;  /**< Index of ECLSimHit*/
@@ -300,6 +316,8 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerAbsZernike53;
     std::vector<double>* m_eclShowerSecondMoment;
     std::vector<double>*   m_eclShowerE1oE9;
+    std::vector<int>*   m_eclShowerIsTrack;
+    std::vector<bool>*   m_eclShowerIsCluster;
 
 
     int m_mcMultip; /**< Multiplicity of MCParticles */

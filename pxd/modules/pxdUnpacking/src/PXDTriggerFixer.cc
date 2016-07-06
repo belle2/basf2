@@ -57,7 +57,7 @@ void PXDTriggerFixerModule::event(void)
 
   unsigned int triggerNrEvt = evtPtr->getEvent();
 
-  // first, we have to find the trigger numbers from teh pxd data ...
+  // first, we have to find the trigger numbers from the pxd data ...
   TClonesArray* rawdata = m_storeRaw.getPtr();
   unsigned int triggerNrDHE = 0x10000, triggerNrDHC = 0x10000, triggerNrHLT = 0x10000;
   for (auto& it : m_storeRaw) {
@@ -118,7 +118,7 @@ bool PXDTriggerFixerModule::getTrigNr(RawPXD& px, unsigned int& innerDHE, unsign
   int datafullsize;
 
   if (px.size() <= 0 || px.size() > 16 * 1024 * 1024) {
-    B2ERROR("PXD Unpacker --> invalid packet size (32bit words) " << hex << px.size());
+    B2ERROR("PXD Trigger Fixer --> invalid packet size (32bit words) " << hex << px.size());
     return false;
   }
   std::vector<unsigned int> data(px.size());

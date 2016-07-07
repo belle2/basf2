@@ -320,7 +320,8 @@ namespace Belle2 {
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "rb");
         auto unpickled_object = pickle.attr("load")(file);
 
-        m_framework = boost::python::import((std::string("basf2_mva_") + m_specific_options.m_framework).c_str());
+        m_framework = boost::python::import((std::string("basf2_mva_python_interface.") + m_specific_options.m_framework).c_str());
+        //m_framework = boost::python::import((std::string("basf2_mva_") + m_specific_options.m_framework).c_str());
         m_state = m_framework.attr("load")(unpickled_object);
       } catch (...) {
         PyErr_Print();

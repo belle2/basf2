@@ -53,6 +53,11 @@ namespace Belle2 {
      * Called for each event.
      */
     virtual void event() override;
+    virtual void terminate() override
+    {
+      m_expert.reset();
+      m_dataset.reset();
+    }
 
   private:
     /**

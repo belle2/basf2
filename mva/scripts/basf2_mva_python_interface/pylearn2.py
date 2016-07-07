@@ -25,6 +25,7 @@ class State(object):
     """
     State class for proper handling of parameters and data during function calls.
     """
+
     def __init__(self, theano_function=None, flatten_parameters=None, sig_back_pdfs=None, signal_fraction=None):
         """
         Constructor of the State class
@@ -95,8 +96,8 @@ def load(obj):
 
 
 def apply(state, X):
-    # binning.transform_ndarray(X, state.flatten_parameters) # 11,3ms (1000 events)
-    binning.transform_variable_vector(X.reshape(-1), state.flatten_parameters)  # 7ms (1000 events), 6.56ms (opt)
+    binning.transform_ndarray(X, state.flatten_parameters)  # 11,3ms (1000 events)
+    # binning.transform_variable_vector(X.reshape(-1), state.flatten_parameters)  # 7ms (1000 events), 6.56ms (opt)
     # X = np.nan_to_num(X) # 2.7ms (1000 events), 2.0ms (opt)
 
     # return np.asarray([[.1]]) # 1.25ms (debug) .7ms (opt)

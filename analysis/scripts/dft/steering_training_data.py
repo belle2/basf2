@@ -6,14 +6,22 @@
 from dft.DeepFlavorTagger import *
 
 
-def create_train_data(working_dir, file_names, prefix, variable_list, target='qrCombined', overwrite=False, *args,
-                      **kwargs):
+def create_train_data(
+        working_dir,
+        file_names,
+        prefix,
+        variable_list,
+        environmentType='MC5',
+        target='qrCombined',
+        overwrite=False,
+        *args,
+        **kwargs):
     main = create_path()
 
     if not os.path.exists(working_dir) and working_dir is not '':
         os.makedirs(working_dir)
 
-    inputMdstList(file_names, path=main)
+    inputMdstList(environmentType, filelist=file_names, path=main)
 
     main.add_module('Gearbox')
     if 'Geometry' not in main:
@@ -34,10 +42,10 @@ def create_train_data(working_dir, file_names, prefix, variable_list, target='qr
     print(statistics)
 
 
-def test_expert(working_dir, file_names, prefix):
+def test_expert(working_dir, file_names, prefix, environmentType='MC5'):
     main = create_path()
 
-    inputMdstList(file_names, path=main)
+    inputMdstList(environmentType, file_names, path=main)
 
     if 'Geometry' not in main:
         main.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
@@ -61,10 +69,10 @@ def test_expert(working_dir, file_names, prefix):
     print(statistics)
 
 
-def test_expert_jpsi(working_dir, file_names, prefix):
+def test_expert_jpsi(working_dir, file_names, prefix, environmentType='MC5'):
     main = create_path()
 
-    inputMdstList(file_names, path=main)
+    inputMdstList(environmentType, file_names, path=main)
 
     if 'Geometry' not in main:
         main.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])

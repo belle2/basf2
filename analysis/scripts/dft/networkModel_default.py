@@ -128,15 +128,15 @@ def init_train(dataset_train, dataset_valid, save_path='mlp_standard.pkl', width
         learning_rate=learning_rate,
         learning_rule=learning_rule,
         monitoring_dataset=monitoring_set,
-        termination_criterion=pylearn2.termination_criteria.Or(
-            criteria=[
-                pylearn2.termination_criteria.MonitorBased(
-                    channel_name="valid_objective",
-                    prop_decrease=.00001,
-                    N=termination_step),
-                pylearn2.termination_criteria.EpochCounter(max_epochs=momentum_saturate)
-            ]),
-        # termination_criterion=pylearn2.termination_criteria.EpochCounter(2),
+        # termination_criterion=pylearn2.termination_criteria.Or(
+        #    criteria=[
+        #        pylearn2.termination_criteria.MonitorBased(
+        #            channel_name="valid_objective",
+        #            prop_decrease=.00001,
+        #            N=termination_step),
+        #        pylearn2.termination_criteria.EpochCounter(max_epochs=momentum_saturate)
+        #    ]),
+        termination_criterion=pylearn2.termination_criteria.EpochCounter(2),
         cost=pylearn2.costs.cost.SumOfCosts(
             costs=[
                 pylearn2.costs.mlp.Default(),

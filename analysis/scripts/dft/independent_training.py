@@ -8,6 +8,7 @@ from __future__ import division, print_function, generators
 import pickle
 import os
 import subprocess
+import re
 
 import theano as th
 
@@ -321,7 +322,10 @@ def convert_gpu_to_cpu_model(gpu_model_path, overwrite=False):
     # theano.config.device after initializiation
 
     theano_flags = os.environ['THEANO_FLAGS']
-    theano_flags = theano_flags.replace('device=gpu', 'device=cpu')
+    print(theano_flags)
+    theano_flags = re.sub("gpu\d", "cpu", theano_flags)
+    print(theano_flags)
+    # theano_flags = theano_flags.replace('device=gpu', 'device=cpu')
 
     os.environ['THEANO_FLAGS'] = theano_flags
 

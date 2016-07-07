@@ -86,16 +86,16 @@ mergemodule = register_module('WaveMerging')
 timemodule = register_module('WaveTimingFast')
 timeDict = {'time2TDC': 1.0}
 timemodule.param(timeDict)
-timemodule.param('threshold', 50.)  # always
-timemodule.param('threshold_n', -300.)  # must be -150 for "small calpulse"
+timemodule.param('threshold', 40.)  # always
+# timemodule.param('threshold_n', -300.)  # must be -150 for "small calpulse"
 
 
 timecalibmodule = register_module('DoubleCalPulse')
-timecalibmodule.param('calibrationWidthMax', 20)
-timecalibmodule.param('calibrationWidthMin', 8)
+timecalibmodule.param('calibrationWidthMax', 22)
+timecalibmodule.param('calibrationWidthMin', 4)
 timecalibmodule.param('calibrationADCThresholdMaxNeg', -300)  # must be -150 for "small calpulse"
 timecalibmodule.param('calibrationADCThresholdMinNeg', -800)
-timecalibmodule.param('calibrationADCThresholdMax', 850)
+timecalibmodule.param('calibrationADCThresholdMax', 900)
 timecalibmodule.param('calibrationADCThresholdMin', 450)
 
 

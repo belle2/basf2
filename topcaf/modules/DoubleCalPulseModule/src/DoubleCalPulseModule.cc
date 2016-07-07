@@ -40,6 +40,7 @@ DoubleCalPulseModule::DoubleCalPulseModule() : Module()
   addParam("calibrationADCThresholdMax", m_adcMax, "Max ADC count threshold for a positive calibration pulse", 1000.);
   addParam("calibrationADCThresholdMinNeg", m_adcMinNeg, "Min ADC count threshold for a negative calibration pulse", -1000.);
   addParam("calibrationADCThresholdMaxNeg", m_adcMaxNeg, "Max ADC count threshold for a negative calibration pulse", -400.);
+  addParam("forcePolarityConsistency", m_usePolarity, "Requires the two calibration pulses to have the same polarity", true);
 
 }
 
@@ -60,72 +61,82 @@ void DoubleCalPulseModule::beginRun()
 void  DoubleCalPulseModule::event()
 {
   //Get hits from datastore
-  StoreArray<TOPCAFDigit> digit_ptr;
-  digit_ptr.isRequired();
+  StoreArray<TOPCAFDigit> digitPtr;
+  digitPtr.isRequired();
 
-  StoreObjPtr<EventHeaderPacket> evtheader_ptr;
-  evtheader_ptr.isRequired();
+  StoreObjPtr<EventHeaderPacket> evtheaderPtr;
+  evtheaderPtr.isRequired();
 
-  double asic_ref_time[1000];
-  int asic_ref_calpulsenum[1000];
+  double asicRefTime[1000];
+  int asicRefCalpulseNum[1000];
+  int firstCalpulsePolarity = 1.;
 
+  // sets the number of calpulses to 0 at the beginning
   for (int k = 0; k < 1000; k++)
-    asic_ref_calpulsenum[k] = 0;
+    asicRefCalpulseNum[k] = 0;
 
 
-  if (digit_ptr) {
+  if (digitPtr) {
     cout << "new event" << endl;
     // first loop to look for the pulse candidates
-    for (int w = 0; w < digit_ptr.getEntries(); w++) {
+    for (int w = 0; w < digitPtr.getEntries(); w++) {
 
-      int asicKey = 100 * digit_ptr[w]->GetBoardstack() + 10 * digit_ptr[w]->GetCarrier() + digit_ptr[w]->GetASIC();
-      int asic_ch = digit_ptr[w]->GetASICChannel();
-      digit_ptr[w]->SetFlag(0); // unprocessed hit has flag = 0
+      int asicKey = 100 * digitPtr[w]->GetBoardstack() + 10 * digitPtr[w]->GetCarrier() + digitPtr[w]->GetASIC();
+      int asic_ch = digitPtr[w]->GetASICChannel();
+      digitPtr[w]->SetFlag(0); // unprocessed hit has flag = 0
       //First applies the width selection and the channel ID requirement
-      if (digit_ptr[w]->GetWidth() > m_wMin && digit_ptr[w]->GetWidth() < m_wMax && asic_ch == m_calCh) {
+      if (digitPtr[w]->GetWidth() > m_wMin && digitPtr[w]->GetWidth() < m_wMax && asic_ch == m_calCh) {
         // we don't distinguish bewteen positive and negative candidates, but we use different thresholds
-        if ((digit_ptr[w]->GetADCHeight() > m_adcMin && digit_ptr[w]->GetADCHeight() < m_adcMax)
-            || (digit_ptr[w]->GetADCHeight() > m_adcMinNeg && digit_ptr[w]->GetADCHeight() < m_adcMaxNeg)) {
+        if ((digitPtr[w]->GetADCHeight() > m_adcMin && digitPtr[w]->GetADCHeight() < m_adcMax)
+            || (digitPtr[w]->GetADCHeight() > m_adcMinNeg && digitPtr[w]->GetADCHeight() < m_adcMaxNeg)) {
           // if this is the first calpulse candidate, then use it as reference
-          if (asic_ref_calpulsenum[asicKey] == 0)
-            asic_ref_time[asicKey] = digit_ptr[w]->GetTDCBin();
-
-          asic_ref_calpulsenum[asicKey]++;
-
-          digit_ptr[w]->SetFlag(100 + asic_ref_calpulsenum[asicKey]);
+          if (asicRefCalpulseNum[asicKey] == 0) {
+            asicRefTime[asicKey] = digitPtr[w]->GetTDCBin();
+            firstCalpulsePolarity = digitPtr[w]->GetADCHeight();
+          }
+          // requires all the calpulses to have the same polarity
+          if (m_usePolarity) {
+            if (digitPtr[w]->GetADCHeight()*firstCalpulsePolarity > 0) {
+              asicRefCalpulseNum[asicKey]++;
+              digitPtr[w]->SetFlag(100 + asicRefCalpulseNum[asicKey]);
+            }
+          } else {
+            asicRefCalpulseNum[asicKey]++;
+            digitPtr[w]->SetFlag(100 + asicRefCalpulseNum[asicKey]);
+          }
         }
       }
     }
 
 
     //Loop again to apply calibration times
-    for (int w = 0; w < digit_ptr.getEntries(); w++) {
+    for (int w = 0; w < digitPtr.getEntries(); w++) {
 
-      int asicKey = 100 * digit_ptr[w]->GetBoardstack() + 10 * digit_ptr[w]->GetCarrier() + digit_ptr[w]->GetASIC();
+      int asicKey = 100 * digitPtr[w]->GetBoardstack() + 10 * digitPtr[w]->GetCarrier() + digitPtr[w]->GetASIC();
 
       // no calibration pulse has been found!
-      if (asic_ref_calpulsenum[asicKey] == 0) {
-        digit_ptr[w]->SetTime(0);
-        digit_ptr[w]->SetQuality(0);
-        digit_ptr[w]->SetFlag(-1000 - digit_ptr[w]->GetFlag()); // not calibrated hit
+      if (asicRefCalpulseNum[asicKey] == 0) {
+        digitPtr[w]->SetTime(0);
+        digitPtr[w]->SetQuality(0);
+        digitPtr[w]->SetFlag(-1000 - digitPtr[w]->GetFlag()); // not calibrated hit
       }
       // only one calpulse candidate found
-      if (asic_ref_calpulsenum[asicKey] == 1) {
-        digit_ptr[w]->SetTime(digit_ptr[w]->GetTDCBin() - asic_ref_time[asicKey]);
-        digit_ptr[w]->SetQuality(asic_ref_time[asicKey]);
-        digit_ptr[w]->SetFlag(1000 + digit_ptr[w]->GetFlag()); // possibly problematic hit
+      if (asicRefCalpulseNum[asicKey] == 1) {
+        digitPtr[w]->SetTime(digitPtr[w]->GetTDCBin() - asicRefTime[asicKey]);
+        digitPtr[w]->SetQuality(asicRefTime[asicKey]);
+        digitPtr[w]->SetFlag(1000 + digitPtr[w]->GetFlag()); // possibly problematic hit
       }
       // two calpulse found. Should be the correct situation
-      if (asic_ref_calpulsenum[asicKey] == 2) {
-        digit_ptr[w]->SetTime(digit_ptr[w]->GetTDCBin() - asic_ref_time[asicKey]);
-        digit_ptr[w]->SetQuality(asic_ref_time[asicKey]);
-        digit_ptr[w]->SetFlag(2000 + digit_ptr[w]->GetFlag()); // good hit
+      if (asicRefCalpulseNum[asicKey] == 2) {
+        digitPtr[w]->SetTime(digitPtr[w]->GetTDCBin() - asicRefTime[asicKey]);
+        digitPtr[w]->SetQuality(asicRefTime[asicKey]);
+        digitPtr[w]->SetFlag(2000 + digitPtr[w]->GetFlag()); // good hit
       }
       // more than two calpulse candidates found...
-      if (asic_ref_calpulsenum[asicKey] > 2) {
-        digit_ptr[w]->SetTime(digit_ptr[w]->GetTDCBin() - asic_ref_time[asicKey]);
-        digit_ptr[w]->SetQuality(asic_ref_time[asicKey]);
-        digit_ptr[w]->SetFlag(3000 + digit_ptr[w]->GetFlag()); // possibly problematic hit
+      if (asicRefCalpulseNum[asicKey] > 2) {
+        digitPtr[w]->SetTime(digitPtr[w]->GetTDCBin() - asicRefTime[asicKey]);
+        digitPtr[w]->SetQuality(asicRefTime[asicKey]);
+        digitPtr[w]->SetFlag(3000 + digitPtr[w]->GetFlag()); // possibly problematic hit
       }
     }
   }

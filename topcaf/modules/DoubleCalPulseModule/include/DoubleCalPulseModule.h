@@ -23,20 +23,20 @@
 namespace Belle2 {
 
   /**
-   * Module for the time aligniment of the photon hits  with the calibration pulse. The calibration pulse candidates are searched
-   * among the hits, either positive or negative, within specific width and amplitude boundaries, on a particular ASIC channel
-   * It superseds all the previous version of DobleCalPulse*Module, but stil uses the old version
+   * Module for the time alignment of the photon hits  with the calibration pulse. The calibration pulse candidates are searched
+   * among the hits, either positive or negative, within specific width and amplitude boundaries, on a particular ASIC channel.
+   * It superseds all the previous version of DobleCalPulseModule, but stil uses the old version
    * of TOPCAFDigits.
    *
    * The hit quality flag is assigned as a 4 decimal int in the form abcd,  with
-   * b: calpulse/photon discriminant: b = 1 calpulse candidate, b = 0 photon candidate
-   * cd: if b=1, this is the sequential number of the calpulses, as they appear on the trace: 01 is the first calpulse (used for calibration), 02 is the second one, etc...
-   *     if b = 0, then cd = 00
-   * a: time alignment flag
-   *    a = -1: no calpulsehas beend found. The this has not been aligned
-   *    a = 1: only one clapulse has been found and used for the alignment
-   *    a = 2: two calpulse candidates have been found. The first one has been used for the alignement
-   *    a = 2: more than two calpulse candidates have been found. The first one has been used for the alignement
+   * - b: calpulse/photon discriminant: b = 1 calpulse candidate, b = 0 photon candidate
+   * - cd: if b=1, this is the sequential number of the calpulses, as they appear on the trace: 01 is the first calpulse (used for calibration), 02 is the second one, etc...
+   *       if b = 0, then cd = 00
+   * - a: time alignment flag
+   *    - a = -1: no calpulsehas beend found. The this has not been aligned
+   *    - a = 1: only one clapulse has been found and used for the alignment
+   *    - a = 2: two calpulse candidates have been found. The first one has been used for the alignement
+   *    - a = 2: more than two calpulse candidates have been found. The first one has been used for the alignement
    *
    * In a good event with two calibration pulse being identified, the event should have:
    * - one hit with flag = 2101 (first calpulse, alignment done)
@@ -88,7 +88,7 @@ namespace Belle2 {
     double m_adcMax; /**< Maximum amplitude for a positive calibration pulse candidate, in adc counts */
     double m_adcMinNeg; /**< Minumum amplitude for a negative calibration pulse candidate, in adc counts */
     double m_adcMaxNeg; /**< Minumum amplitude for a negative calibration pulse candidate, in adc counts */
-
+    bool m_usePolarity; /**< If true, the calibrtion pulses are required to have the same polarity, either positive or negative*/
   };
 
 }

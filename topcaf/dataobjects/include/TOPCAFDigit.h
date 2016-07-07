@@ -88,7 +88,7 @@ namespace Belle2 {
     //! TDC bin
     void SetTDCBin(double tdc_bin) {m_tdc_bin = tdc_bin;}
     //! Width
-    void SetWidth(int width) {m_width = width;}
+    void SetWidth(double width) {m_width = width;}
     //! amplitude
     void SetAmplitude(double amp) {m_amp = amp;}
     //! sampling rate

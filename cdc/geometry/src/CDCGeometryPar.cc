@@ -530,7 +530,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins <= 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -544,7 +544,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   //read theta bin info.
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins <= 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
   } else {
     B2FATAL("CDCGeometryPar: fail to read theta bins !");
   }

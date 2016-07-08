@@ -245,7 +245,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
 
   unsigned short nAlphaBins = 0;
   if (ifs >> nAlphaBins) {
-    if (nAlphaBins <= 0) B2FATAL("Fail to read alpha bins !");
+    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
   } else {
     B2FATAL("Fail to read alpha bins !");
   }
@@ -261,7 +261,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   //read theta bins
   unsigned short nThetaBins = 0;
   if (ifs >> nThetaBins) {
-    if (nThetaBins <= 0) B2FATAL("Fail to read theta bins !");
+    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
   } else {
     B2FATAL("Fail to read theta bins !");
   }

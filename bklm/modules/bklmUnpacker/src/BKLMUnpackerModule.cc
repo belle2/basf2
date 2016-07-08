@@ -353,7 +353,7 @@ unsigned short BKLMUnpackerModule::getChannel(int layer, unsigned short axis, un
     }
 
     if (axis == 1) { //z strips
-      if (channel > 0 && channel < 10) channel = channel;
+      //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
       if (channel > 60) channel = channel - 6;
@@ -366,7 +366,7 @@ unsigned short BKLMUnpackerModule::getChannel(int layer, unsigned short axis, un
       if (channel > 44) channel = channel - 2;;
     }
     if (axis == 1) {
-      if (channel > 0 && channel < 10) channel = channel;
+      //if (channel > 0 && channel < 10) channel = channel;
       if (channel > 9 && channel < 16) channel = 0;
       if (channel > 15 && channel < 61) channel = channel - 6;
       if (channel > 60) channel = channel - 6;;

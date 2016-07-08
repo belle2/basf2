@@ -60,8 +60,10 @@ namespace Belle2 {
       bool m_ignoreDATCON;
       /** Only unpack, but Do Not Store anything to file */
       bool m_doNotStore;
-      //* Fix EventMeta - HLt Trigger Offset for DESY TB 2016 */
+      //* Fix EventMeta - HLT Trigger Offset for DESY TB 2016, only for error reporting, no data is modified */
       int m_DESY16_FixTrigOffset;
+      //* Fix Row Offset for DESY TB 2016 */
+      int m_DESY16_FixRowOffset;
 
       /** Event Number from MetaInfo */
       unsigned long m_meta_event_nr;

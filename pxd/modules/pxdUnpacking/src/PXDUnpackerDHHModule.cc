@@ -52,16 +52,16 @@ using namespace boost::spirit::endian;
 REG_MODULE(PXDUnpackerDHH)
 
 /// If you change this list, change the NAMEs in the terminate function, too
-#define ONSEN_ERR_FLAG_TB_IDS 0x00000001ul// unused
-#define ONSEN_ERR_FLAG_DHC_DHE_MM  0x00000002ul
-#define ONSEN_ERR_FLAG_DHC_META_MM  0x00000004ul
+#define ONSEN_ERR_FLAG_TB_IDS 0x00000001ul
+#define ONSEN_ERR_FLAG_FRAME_TNR_MM  0x00000002ul
+#define ONSEN_ERR_FLAG_META_MM  0x00000004ul
 #define ONSEN_ERR_FLAG_ONSEN_TRG_FIRST 0x00000008ul
 #define ONSEN_ERR_FLAG_DHC_END   0x00000010ul
 #define ONSEN_ERR_FLAG_DHE_START  0x00000020ul
 #define ONSEN_ERR_FLAG_DHC_FRAMECOUNT 0x00000040ul
 #define ONSEN_ERR_FLAG_DATA_OUTSIDE 0x00000080ul
 #define ONSEN_ERR_FLAG_DHC_START_SECOND  0x00000100ul
-#define ONSEN_ERR_FLAG_TB_ORDER  0x00000200ul// unused
+#define ONSEN_ERR_FLAG_DHE_WRONG_ID_SEQ  0x00000200ul
 #define ONSEN_ERR_FLAG_FIX_SIZE   0x00000400ul
 #define ONSEN_ERR_FLAG_DHE_CRC    0x00000800ul
 #define ONSEN_ERR_FLAG_DHC_UNKNOWN   0x00001000ul
@@ -90,6 +90,7 @@ REG_MODULE(PXDUnpackerDHH)
 #define ONSEN_ERR_FLAG_DHP_DBL_HEADER  0x400000000ull
 #define ONSEN_ERR_FLAG_HEADER_ERR          0x800000000ull
 #define ONSEN_ERR_FLAG_HEADER_ERR_GHOST   0x1000000000ull
+#define ONSEN_ERR_FLAG_SUSP_PADDING  0x2000000000ull
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -159,20 +160,10 @@ struct dhc_start_frame {
   const unsigned int crc32;
   /// fixed length, only for reading
 
-  unsigned short getRunSubrun(void) const
-  {
-    return run_subrun;
-  };
-
-  unsigned short getExp(void) const
-  {
-    return exp_run;
-  };
-
-  unsigned short getEventNrLo(void) const
-  {
-    return trigger_nr_lo;
-  };
+  inline unsigned short getRunSubrun(void) const { return run_subrun; };
+  inline unsigned short getExpRun(void) const { return exp_run;  };
+  inline unsigned short getEventNrLo(void) const { return trigger_nr_lo; };
+  inline unsigned short getEventNrHi(void) const {    return trigger_nr_hi;  };
 
   bool isFakedData(void) const
   {
@@ -217,22 +208,12 @@ struct dhc_dhe_start_frame {
   const unsigned int crc32;
   /// fixed length
 
-  inline unsigned short getEventNrLo(void) const
-  {
-    return trigger_nr_lo;
-  };
-  inline unsigned short getStartFrameNr(void) const  // last DHP frame before trigger
-  {
-    return (sfnr_offset & 0xFC00) >> 10;
-  };
-  inline unsigned short getTriggerOffsetRow(void) const  // and trigger row offset
-  {
-    return sfnr_offset & 0x03FF;
-  };
-  inline unsigned int getFixedSize(void) const
-  {
-    return 16;// 8 words
-  };
+  inline unsigned short getEventNrLo(void) const   {    return trigger_nr_lo;  };
+  inline unsigned short getEventNrHi(void) const  {    return trigger_nr_hi;  };
+  inline unsigned short getStartFrameNr(void) const  {    return (sfnr_offset & 0xFC00) >> 10;  };  // last DHP frame before trigger
+  inline unsigned short getTriggerOffsetRow(void) const   {    return sfnr_offset & 0x03FF;  }; // and trigger row offset
+  inline unsigned int getFixedSize(void) const  {    return 16; };// 8 words
+
   void print(void) const
   {
     word0.print();
@@ -255,14 +236,8 @@ struct dhc_commode_frame {
   const unsigned int crc32;
   /// fixed length
 
-  inline unsigned short getEventNrLo(void) const
-  {
-    return trigger_nr_lo;
-  };
-  inline unsigned int getFixedSize(void) const
-  {
-    return (4 + 96) * 2;// 100 words
-  };
+  inline unsigned short getEventNrLo(void) const  {    return trigger_nr_lo;  };
+  inline unsigned int getFixedSize(void) const  {    return (4 + 96) * 2; };// 100 words
   inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
 };
 
@@ -272,10 +247,7 @@ struct dhc_direct_readout_frame {
   /// an unbelievable amount of words may follow
   /// and finally a 32 bit checksum
 
-  inline unsigned short getEventNrLo(void) const
-  {
-    return trigger_nr_lo;
-  };
+  inline unsigned short getEventNrLo(void) const   {    return trigger_nr_lo;  };
   void print(void) const
   {
     word0.print();
@@ -306,22 +278,18 @@ struct dhc_onsen_trigger_frame {
   const ubig32_t trigtag2;/// redundant, DATCON Trigger/Tag part 2
   const unsigned int crc32;
 
-  inline unsigned int getFixedSize(void) const
-  {
-    return 32;//  8*4 bytes might still be changed
-  };
-  inline unsigned short get_trig_nr0(void) const
-  {
-    return trignr0;
-  };
-  inline unsigned int get_trig_nr1(void) const
-  {
-    return trignr1;
-  };
-  inline unsigned int get_trig_nr2(void) const
-  {
-    return trignr2;
-  };
+  inline unsigned int getFixedSize(void) const  {    return 32;  }; //  8*4 bytes might still be changed
+  inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
+  inline unsigned int get_trig_nr1(void) const  {    return trignr1;  };
+  inline unsigned int get_trig_nr2(void) const  {    return trignr2;  };
+  inline unsigned int get_trig_tag1(void) const  {    return trigtag1;  };
+  inline unsigned int get_trig_tag2(void) const  {    return trigtag2;  };
+  inline unsigned short get_subrun1(void) const {return trigtag1 & 0xFF;};
+  inline unsigned short get_run1(void) const {return ((trigtag1 & 0x003FFF00) >> 8);};
+  inline unsigned short get_experiment1(void) const {return (trigtag1 & 0xFFC00000) >> 22 ;};
+  inline unsigned short get_subrun2(void) const {return trigtag2 & 0xFF;};
+  inline unsigned short get_run2(void) const {return ((trigtag2 & 0x003FFF00) >> 8);};
+  inline unsigned short get_experiment2(void) const {return (trigtag2 & 0xFFC00000) >> 22 ;};
   void print(void) const
   {
     word0.print();
@@ -338,7 +306,7 @@ struct dhc_onsen_trigger_frame {
       B2ERROR("ONSEN Trigger Magic 2 error $" << hex << magic2);
       m_errorMask |= ONSEN_ERR_FLAG_HLTROI_MAGIC;
     }
-    if (magic2 == 0xCAFE0000 && trignr2 == 0x00000000) {
+    if (is_fake_datcon()) {
       if (!ignore_datcon_flag) B2WARNING("ONSEN Trigger Frame: No DATCON data " << hex << trignr1 << "!=$" << trignr2);
       m_errorMask |= ONSEN_ERR_FLAG_NO_DATCON;
     } else {
@@ -350,18 +318,10 @@ struct dhc_onsen_trigger_frame {
     return m_errorMask;
   };
 
-  inline bool is_Accepted(void) const
-  {
-    return (magic1 & 0x8000) != 0;
-  };
-  inline bool is_SendROIs(void) const
-  {
-    return (magic1 & 0x2000) != 0;
-  }
-  inline bool is_SendUnfiltered(void) const
-  {
-    return (magic1 & 0x4000) != 0;
-  };
+  inline bool is_fake_datcon(void) const { return (magic2 == 0xCAFE0000 && trignr2 == 0x00000000 && trigtag2 == 0x00000000);};
+  inline bool is_Accepted(void) const  {    return (magic1 & 0x8000) != 0;  };
+  inline bool is_SendROIs(void) const  {    return (magic1 & 0x2000) != 0;  }
+  inline bool is_SendUnfiltered(void) const  {    return (magic1 & 0x4000) != 0;  };
 };
 
 struct dhc_onsen_roi_frame {
@@ -370,10 +330,7 @@ struct dhc_onsen_roi_frame {
   /// plus n* ROIs (64 bit)
   /// plus checksum 32bit
 
-  inline unsigned short get_trig_nr0(void) const
-  {
-    return trignr0;
-  };
+  inline unsigned short get_trig_nr0(void) const   {    return trignr0;  };
   unsigned int check_error(void) const
   {
     unsigned int m_errorMask = 0;
@@ -413,10 +370,7 @@ struct dhc_ghost_frame {
   const unsigned int crc32;
   /// fixed length
 
-  inline unsigned int getFixedSize(void) const
-  {
-    return 8;
-  };
+  inline unsigned int getFixedSize(void) const  {    return 8;  };
   void print(void) const
   {
     word0.print();
@@ -434,14 +388,8 @@ struct dhc_end_frame {
   const unsigned int crc32;
   /// fixed length
 
-  unsigned int get_words(void) const
-  {
-    return wordsinevent;
-  }
-  inline unsigned int getFixedSize(void) const
-  {
-    return 16;
-  };
+  unsigned int get_words(void) const  {    return wordsinevent;  }
+  inline unsigned int getFixedSize(void) const  {    return 16;  };
   bool isFakedData(void) const
   {
     if (word0.data != 0x6000) return false;
@@ -468,14 +416,8 @@ struct dhc_dhe_end_frame {
   const unsigned int crc32;
   /// fixed length
 
-  unsigned int get_words(void) const
-  {
-    return wordsinevent;
-  }
-  inline unsigned int getFixedSize(void) const
-  {
-    return 16;
-  };
+  unsigned int get_words(void) const  {    return wordsinevent;  }
+  inline unsigned int getFixedSize(void) const  {    return 16;  };
   void print(void) const
   {
     word0.print();
@@ -539,10 +481,17 @@ public:
     type = ((dhc_frame_header_word0*)data)->getFrameType();
     length = 0;
   };
-  unsigned int getEventNrLo(void)
+  inline unsigned int getEventNrLo(void) const   {    return ((ubig16_t*)data)[1];  };
+  uint64_t check_padding(void)
   {
-    return ((ubig16_t*)data)[1];
+    unsigned int crc = *(ubig32_t*)(((unsigned char*)data) + length - 4);
+    if ((crc & 0xFFFF0000) == 0 || (crc & 0xFFFF) == 0) {
+      B2WARNING("Suspicioud Mapping $" << hex << crc);
+      return ONSEN_ERR_FLAG_SUSP_PADDING;
+    }
+    return 0;
   };
+
   unsigned int check_crc(void)
   {
     dhe_crc_32_type bocrc;
@@ -663,7 +612,9 @@ PXDUnpackerDHHModule::PXDUnpackerDHHModule() :
   addParam("IgnoreDATCON", m_ignoreDATCON, "Ignore missing DATCON ROIs", false);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
   addParam("ClusterName", m_RawClusterName, "The name of the StoreArray of PXD Clusters to be processed", std::string(""));
-  addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset, "Fix trigger offset between Meta Event and HLT", 0);
+  addParam("DESY16FixTrigOffset", m_DESY16_FixTrigOffset,
+           "Fix trigger offset (only trigger number, not data) between Meta Event and HLT", 0);
+  addParam("DESY16FixRowOffset", m_DESY16_FixRowOffset, "Fix row offset by shifting row by value (one gates is 4 pixel rows)", 0);
 }
 
 void PXDUnpackerDHHModule::initialize()
@@ -695,7 +646,7 @@ void PXDUnpackerDHHModule::initialize()
 void PXDUnpackerDHHModule::terminate()
 {
   const string error_name[ONSEN_MAX_TYPE_ERR] = {
-    "TB: Unknown DHE IDs", "DHC/DHE mismatch", "EvtMeta/DHC mismatch", "ONSEN Trigger is not first frame",
+    "TB: Unknown DHE IDs", "Frame TrigNr vs ONSEN Trigger Frame mismatch", "Frame TrigNr vs EvtMeta mismatch", "ONSEN Trigger is not first frame",
     "DHC_END missing", "DHE_START missing", "DHC Framecount mismatch", "DATA outside of DHE",
     "DHC_START is not second frame", "TB: Wrong DHE IDs order", "Fixed size frame wrong size", "DHE CRC Error:",
     "Unknown DHC type", "Merger CRC Error", "Event Header Full Packet Size Error", "Event Header Magic Error",
@@ -705,7 +656,7 @@ void PXDUnpackerDHHModule::terminate()
     "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch",
 
     "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "Error bit in frame header set",
-    "Error bit in GHOST frame header not set", "unused", "unused", "unused",
+    "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "unused", "unused",
     "unused", "unused", "unused", "unused",
     "unused", "unused", "unused", "unused",
 
@@ -1165,7 +1116,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   if ((eventNrOfThisFrame & 0xFFFF) != (m_meta_event_nr & 0xFFFF)) {
     B2ERROR("Event Numbers do not match for this frame $" << hex << eventNrOfThisFrame << "!=$" << m_meta_event_nr <<
             "(MetaInfo) mask");
-    m_errorMask |= ONSEN_ERR_FLAG_DHC_META_MM;
+    m_errorMask |= ONSEN_ERR_FLAG_META_MM;
   }
 
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
@@ -1227,6 +1178,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       m_errorMask |= dhc.check_crc();
       found_mask_active_dhp |= 1 << dhc.data_direct_readout_frame->getDHPPort();
 //       stat_zsd++;
+      m_errorMask |= dhc.check_padding();// isUnfiltered_event
+
 
       unpack_dhp(data, len - 4,
                  dhe_first_readout_frame_id_lo,
@@ -1308,7 +1261,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       dhe_first_offset = dhc.data_dhe_start_frame->getTriggerOffsetRow();
       if (currentDHEID != 0xFFFFFFFF && (currentDHEID & 0xFFFF) >= dhc.data_dhe_start_frame->getDHEId()) {
         B2WARNING("DHH IDs are not in expected order! " << (currentDHEID & 0xFFFF) << " >= " << dhc.data_dhe_start_frame->getDHEId());
-        m_errorMask |= ONSEN_ERR_FLAG_TB_ORDER;
+        m_errorMask |= ONSEN_ERR_FLAG_DHE_WRONG_ID_SEQ;
       }
       currentDHEID = dhc.data_dhe_start_frame->getDHEId();
       m_errorMask |= dhc.check_crc();
@@ -1583,6 +1536,7 @@ void PXDUnpackerDHHModule::remap_IF_OB(unsigned int& v_cellID, unsigned int& u_c
   Drain = LUT_IF_OB[DCD_channel]; //since LUT starts with one and array with zero
   u_cellID = Drain >> 2;// no negative values possible here
   row = (v_cellID & ~0x3)  + (Drain & 0x3); // no ~ bei drain
+  row = (row + m_DESY16_FixRowOffset) % 768;
   if ((dhe_ID & 0x20) == 0) {//if inner module
     v_cellID = 768 - 1 - row ;
 
@@ -1639,6 +1593,7 @@ void PXDUnpackerDHHModule::remap_IB_OF(unsigned int& v_cellID, unsigned int& u_c
   if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!! fix LUT above!
 //   row = (v_cellID / 4) * 4  + Drain % 4;
   row = (v_cellID & ~0x3)  + ((~Drain) & 0x3); // ~ bei drain
+  row = (row + m_DESY16_FixRowOffset) % 768;
   if ((dhe_ID  & 0x20) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;
   } else { //if outer module

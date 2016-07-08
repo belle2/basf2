@@ -65,10 +65,10 @@ void CheckErrorEventModule::checkCRCError(RawCOPPER* rawcpr, int i)
 
 void CheckErrorEventModule::terminate()
 {
-  printf("Packet CRC error %d CPRs %d Events\n",
-         m_packetCRCerr_cpr,
-         m_eventCRCerr_cpr);
-  printf("Event  CRC error %d CPRs %d Events\n",
+  // printf("Packet CRC error %d CPRs %d Events\n",
+  //        m_packetCRCerr_cpr,
+  //        m_eventCRCerr_cpr);
+  printf("Event CRC error %d CPRs %d Events\n",
          m_packetCRCerr_evt,
          m_eventCRCerr_evt
         );
@@ -119,7 +119,7 @@ void CheckErrorEventModule::event()
 
   StoreArray<RawTOP> raw_toparray;
   for (int i = 0; i < raw_toparray.getEntries(); i++) {
-    checkCRCError(raw_cprarray[ i ], i);
+    checkCRCError(raw_toparray[ i ], i);
   }
 
   StoreArray<RawARICH> raw_aricharray;

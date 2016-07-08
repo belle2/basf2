@@ -412,7 +412,7 @@ int* PostRawCOPPERFormat_latest::PackDetectorBuf(int* packed_buf_nwords,
     poswords_to += SIZE_B2LHSLB_HEADER;
 
     // Fill b2link FEE header
-    packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x1FFFFFF) << 4;
+    packed_buf[ poswords_to + POS_B2L_CTIME ] = (rawcpr_info.b2l_ctime & 0x7FFFFFF) << 4;
     poswords_to += SIZE_B2LFEE_HEADER;
 
     // copy the 1st Detector Buffer

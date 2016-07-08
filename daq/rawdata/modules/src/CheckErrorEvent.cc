@@ -42,6 +42,7 @@ void CheckErrorEventModule::initialize()
   m_eventCRCerr_cpr = 0;
   m_packetCRCerr_evt = 0;
   m_eventCRCerr_evt = 0;
+  m_eventCRCerr_evtmetadata = 0;
   B2INFO("CheckErrorEvent: initialize() done.");
 }
 
@@ -68,10 +69,12 @@ void CheckErrorEventModule::terminate()
   // printf("Packet CRC error %d CPRs %d Events\n",
   //        m_packetCRCerr_cpr,
   //        m_eventCRCerr_cpr);
-  printf("Event CRC error %d CPRs %d Events\n",
+  printf("Event  CRC error %d CPRs %d Events (obtained by checking each Raw*** header)\n",
          m_packetCRCerr_evt,
          m_eventCRCerr_evt
         );
+  printf("Event  CRC error %d Events (obtained by checking EventMetaData. it should be equal to the above value. )\n",
+         m_eventCRCerr_evtmetadata);
 }
 
 void CheckErrorEventModule::event()
@@ -151,6 +154,7 @@ void CheckErrorEventModule::event()
            evtmetadata->getErrorFlag(),
            evtmetadata->getExperiment(), evtmetadata->getRun(),
            evtmetadata->getSubrun(), evtmetadata->getEvent());
+    m_eventCRCerr_evtmetadata++;
 
   }
 

@@ -48,6 +48,8 @@ namespace Belle2 {
     int m_packetCRCerr_evt = 0;
     int m_eventCRCerr_evt = 0;
 
+    int m_eventCRCerr_evtmetadata = 0;
+
   };
 
 } // end namespace Belle2

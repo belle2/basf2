@@ -2,17 +2,19 @@
 # -*- coding: utf-8 -*-
 
 import os
+import tempfile
 from basf2 import *
-from ROOT import Belle2
 from modularAnalysis import *
+from ROOT import Belle2
+from ROOT import TFile
+from ROOT import TNtuple
 
+
+testFile = tempfile.NamedTemporaryFile()
 
 main = create_path()
 
-rootinput = register_module('RootInput')
-rootinput.param('inputFileName', Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root'))
-main.add_module(rootinput)
-main.add_module('Gearbox')
+inputMdst('MC5', Belle2.FileSystem.findFile('analysis/tests/mdst_r10142.root'), path=main)
 
 fillParticleList('K-', '', path=main)
 fillParticleList('pi+', '', path=main)
@@ -31,7 +33,7 @@ matchMCTruth('D0', path=main)
 fitVertex('D0', 0.0, '', 'rave', 'vertex', path=main)
 
 ntupler = register_module('VariablesToNtuple')
-ntupler.param('fileName', 'test_vertexfit.root')
+ntupler.param('fileName', testFile.name)
 ntupler.param('variables', ['M', 'isSignal', 'distance', 'dr', 'dz', 'significanceOfDistance', 'pValue'])
 ntupler.param('particleList', 'D0')
 main.add_module(ntupler)
@@ -40,17 +42,12 @@ process(main)
 
 print(statistics)
 
-#
-from ROOT import TFile
-from ROOT import TNtuple
-from ROOT import TH1F
-
 
 def check():
     """
     Verify results make sense.
     """
-    ntuplefile = TFile('test_vertexfit.root')
+    ntuplefile = TFile(testFile.name)
     ntuple = ntuplefile.Get('ntuple')
 
     if ntuple.GetEntries() == 0:
@@ -74,6 +71,3 @@ def check():
 check()
 
 print("Test passed, cleaning up.")
-
-# cleanup
-os.remove('test_vertexfit.root')

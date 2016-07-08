@@ -486,11 +486,11 @@ namespace {
 
     var = Manager::Instance().getVariable("ROE_deltae(mask1)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0 - roe4vecCMS.E());
+    EXPECT_FLOAT_EQ(var->function(part), roe4vecCMS.E() - E0);
 
     var = Manager::Instance().getVariable("ROE_deltae(mask2)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0);
+    EXPECT_FLOAT_EQ(var->function(part), -E0);
 
     var = Manager::Instance().getVariable("ROE_mbc(mask1)");
     ASSERT_NE(var, nullptr);
@@ -502,11 +502,11 @@ namespace {
 
     var = Manager::Instance().getVariable("correctedB_deltae(mask1,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0 - corrRec4vecCMS.E());
+    EXPECT_FLOAT_EQ(var->function(part), corrRec4vecCMS.E() - E0);
 
     var = Manager::Instance().getVariable("correctedB_deltae(mask2,0)");
     ASSERT_NE(var, nullptr);
-    EXPECT_FLOAT_EQ(var->function(part), E0 - rec4vecCMS.E() - rec4vecCMS.Vect().Mag());
+    EXPECT_FLOAT_EQ(var->function(part), rec4vecCMS.E() + rec4vecCMS.Vect().Mag() - E0);
 
     var = Manager::Instance().getVariable("correctedB_mbc(mask1,0)");
     ASSERT_NE(var, nullptr);

@@ -20,14 +20,14 @@ namespace Belle2 {
    */
   class CDCXtRelations: public TObject {
 
-    typedef std::array<float, 3> array3;
-    typedef unsigned short XtID;
+    typedef std::array<float, 3> array3; /**< angle bin info. */
+    typedef unsigned short XtID;         /**< id. for xt */
 
   public:
     /**
      * Constants
      */
-    enum {c_nSLayers       = 56, /**< no. of layers */
+    enum {c_nSLayers      = 56, /**< no. of layers */
           c_maxNAlphaBins = 18, /**< max. no. of alpha angle bins */
           c_maxNThetaBins =  7, /**< max. no. of theta angle bins */
           c_maxNXtParams  =  8  /**< max. no. of params. for xt */
@@ -36,7 +36,8 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    CDCXtRelations() {}
+    CDCXtRelations() : m_xtParamMode(0), m_nXtParams(0)
+    {}
 
     /**
      * Set alpha-angle bin (rad)

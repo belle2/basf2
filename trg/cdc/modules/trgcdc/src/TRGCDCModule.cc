@@ -25,6 +25,7 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/trg/dataobjects/TRGTiming.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
@@ -299,6 +300,7 @@ namespace Belle2 {
       tracks2Dfinder.registerRelationTo(tracks2Dfitter);
       tracks2Dfinder.registerRelationTo(tracks3Dfitter);
     }
+    StoreObjPtr<TRGTiming>::registerPersistent("CDCTriggerEventTime");
   }
 
   void

@@ -97,6 +97,7 @@ class TestModule(basf2.Module):
         print output values of the different stages in the CDC trigger
         """
         print("CDC trigger readout")
+        print("event time:", Belle2.PyStoreObj("CDCTriggerEventTime").obj().getTiming())
         tracks2Dfinder = Belle2.PyStoreArray("Trg2DFinderTracks")
         tracks2Dfitter = Belle2.PyStoreArray("Trg2DFitterTracks")
         tracks3Dfitter = Belle2.PyStoreArray("Trg3DFitterTracks")

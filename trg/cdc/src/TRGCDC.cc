@@ -33,6 +33,7 @@
 #include "trg/trg/Utilities.h"
 #include "trg/cdc/dataobjects/CDCTriggerSegmentHit.h"
 #include "trg/cdc/dataobjects/CDCTriggerTrack.h"
+#include "trg/trg/dataobjects/TRGTiming.h"
 #include "trg/cdc/TRGCDC.h"
 #include "trg/cdc/Wire.h"
 #include "trg/cdc/Layer.h"
@@ -56,6 +57,7 @@
 #include "trg/cdc/Link.h"
 #include "trg/cdc/Relation.h"
 #include "trg/cdc/EventTime.h"
+#include <framework/gearbox/Const.h>
 
 #define NOT_USE_SOCKETLIB
 //#define NOT_SEND
@@ -2241,6 +2243,9 @@ namespace Belle2 {
         }
       }
     }
+    // event time
+    StoreObjPtr<TRGTiming> eventTime("CDCTriggerEventTime");
+    eventTime.construct(Const::CDC, getEventTime());
     // 2D finder tracks
     StoreArray<CDCTriggerTrack> storeTracks2Dfinder(collection2Dfinder);
     for (unsigned itr = 0; itr < _trackList2D.size(); ++itr) {

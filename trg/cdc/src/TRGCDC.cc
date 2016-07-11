@@ -2065,9 +2065,28 @@ namespace Belle2 {
     if (_trackList2D.size() == 0) setReturnValue(find2D, 1);
     if (_trackList2DFitted.size() == 0) setReturnValue(fit2D, 1);
 
+    //cout<<"s3DTracker"<<endl;
+    //cout<<"Finder"<<endl;
     //...Stereo finder...
     _h3DFinder->doit(_trackList2D, _trackList3D);
-    if (_trackList3D.size() == 0) setReturnValue(find3D, 1);
+    //// Notify any errors. (When not enough TS are found)
+    //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+    //  unsigned nHitStSl = 0;
+    //  for(unsigned iSt=0; iSt<4; iSt++) {
+    //    if(_trackList3D[iTrack]->links(2*iSt+1).size() != 0) nHitStSl++;
+    //  }
+    //  if (nHitStSl < 2) setReturnValue(find3D, 1);
+    //  cout<<"nHitStSl:"<<nHitStSl<<endl;
+    //}
+    //// Notify if all tracks have errors.
+    //setReturnValue(find3D, 1);
+    //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+    //  unsigned nHitStSl = 0;
+    //  for(unsigned iSt=0; iSt<4; iSt++) {
+    //    if(_trackList3D[iTrack]->links(2*iSt+1).size() != 0) nHitStSl++;
+    //  }
+    //  if (nHitStSl > 1) setReturnValue(find3D, 0);
+    //}
 
     //...Check tracks...
     if (TRGDebug::level()) {
@@ -2092,10 +2111,43 @@ namespace Belle2 {
 
     //...3D tracker...
     _fitter3D->doit(_trackList3D);
+    //cout<<"Fitter"<<endl;
     //_fitter3D->doitComplex(_trackList3D);
-    for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
-      if (_trackList3D[iTrack]->fitted() == 0) setReturnValue(fit3D, 1);
+    //cout<<"e3DTracker"<<endl;
+    //// Notify any errors.
+    //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+    //  if (_trackList3D[iTrack]->fitted() == 0) setReturnValue(fit3D, 1);
+    //}
+    //// Notify if all tracks have errors.
+    //setReturnValue(fit3D, 1);
+    //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+    //  if (_trackList3D[iTrack]->fitted() == 1) setReturnValue(fit3D, 0);
+    //}
+
+    // Notify if track's debugValue is not 0
+    {
+      // For any track
+      int t_debugValue = 0;
+      for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+        t_debugValue |= _trackList3D[iTrack]->getDebugValue(TRGCDCTrack::EDebugValueType::any);
+      }
+      //// For all tracks
+      //int t_debugValue = TRGCDCTrack::EDebugValueType::any;
+      //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+      //  t_debugValue &= _trackList3D[iTrack]->getDebugValue(TRGCDCTrack::EDebugValueType::any);
+      //}
+      //setReturnValue(t_debugValue | getReturnValue());
     }
+
+    //// If 3D fit z0 is larger or smaller than expected.
+    //for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+    //    const TCTrack& aTrack = *_trackList3D[iTrack];
+    //    if (aTrack.fitted()) {
+    //      double fitZ0 = aTrack.helix().dz();
+    //      if(fitZ0>20 || fitZ0<-20) setReturnValue(fit3D, 1);
+    //    }
+    //}
+
 
     if (TRGDebug::level() > 1) {
       for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {

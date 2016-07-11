@@ -219,6 +219,9 @@ namespace Belle2 {
     t_actual = input.getMaxActual();
     m_inputMax = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1, t_commonData);
 
+    //cout<<"<<<m_inputMin>>>"<<endl; m_inputMin.dump();
+    //cout<<"<<<m_inputMax>>>"<<endl; m_inputMin.dump();
+
     // Calculates number of bits to shift for input.
     //int t_offsetNBits = m_inputMax.offset(m_inputMin, m_inputMax).getBitsize();
     int t_offsetNBits = m_inputMax.offset(m_inputMin).getBitsize();
@@ -230,8 +233,16 @@ namespace Belle2 {
     }
 
     // Calculates number of bits to shift for lut output bitwidth to be lutOutputBitwidth.
+    //cout<<"<<<minInv>>>"<<endl; minInv.dump();
+    //cout<<"<<<maxInv>>>"<<endl; maxInv.dump();
     double t_outputRealMinInt = function(minInv.getRealInt());
     double t_outputRealMaxInt = function(maxInv.getRealInt());
+    if (std::isnan(t_outputRealMinInt)) {
+      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMinInt is nan. Please change minInv signal so that function(minInv.getRealInt()) does not give nan." << endl;
+    }
+    if (std::isnan(t_outputRealMaxInt)) {
+      cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMaxInt is nan. Please change maxInv so that function(maxInv.getRealInt()) does not give nan" << endl;
+    }
     if (t_outputRealMaxInt < t_outputRealMinInt) {
       cout << "[Error] TRGCDCJLUT::setFloatFunction() => t_outputRealMaxInt is smaller than t_outputRealMinInt." << endl;
       return 0;
@@ -244,11 +255,15 @@ namespace Belle2 {
                            lutOutputBitwidth) - 0.5) * t_outputToReal)) / log(2);
     tt_factor = ceil(tt_factor);
     // Create outputMin.
+    //cout<<"t_outputRealMinInt:"<<t_outputRealMinInt<<" t_outputToReal:"<<t_outputToReal<<" tt_factor:"<<tt_factor<<endl;
+    //cout<<"rountInt:"<<t_outputRealMinInt / t_outputToReal / pow(2, tt_factor)<<endl;
     t_int = FpgaUtility::roundInt(t_outputRealMinInt / t_outputToReal / pow(2, tt_factor));
     t_toReal = t_outputToReal * pow(2, tt_factor);
     t_actual = t_outputMinActual;
+    //cout<<"t_int:"<<t_int<<" t_toReal:"<<t_toReal<<" t_actual:"<<t_actual<<endl;
     Belle2::TRGCDCJSignal t_shiftOutputMin = Belle2::TRGCDCJSignal(t_int, t_toReal, t_int, t_int, t_actual, t_actual, t_actual, -1,
                                              t_commonData);
+    //cout<<"<<<t_shiftOutputMin>>>"<<endl; t_shiftOutputMin.dump();
     //cout<<"minInvRealInt: "<<minInv.getRealInt()<<" RealMinInt: "<<t_outputRealMinInt<<" int: "<<t_int<<endl;
     //cout<<"minInvActual:  "<<minInv.getActual()<<" minActual: "<<t_outputMinActual<<endl;
     // Create outputMax.
@@ -259,6 +274,7 @@ namespace Belle2 {
                                                    -1, t_commonData);
     //cout<<"maxInv: "<<maxInv.getRealInt()<<" RealMaxInt: "<<t_outputRealMaxInt<<" int: "<<FpgaUtility::roundInt(t_outputRealMaxInt/t_shiftOutputMin.getToReal())<<endl;
     //cout<<"maxInvActual:  "<<maxInv.getActual()<<" maxActual: "<<t_outputMaxActual<<endl;
+    //cout<<"<<<t_shiftOffsetOutputMax>>>"<<endl; t_shiftOffsetOutputMax.dump();
 
     //// Compare between before and after.
     m_shiftOutputMin = t_shiftOutputMin;

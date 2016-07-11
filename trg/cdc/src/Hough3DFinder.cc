@@ -60,7 +60,7 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     m_mBool["fIsIntegerEffect"] = 1;
     m_mBool["fmcLR"] = 0;
     m_mBool["fLRLUT"] = 1;
-    m_mBool["f2DFitDrift"] = 0;
+    m_mBool["f2DFitDrift"] = 1;
     m_mBool["f2DFit"] = 1;
 
     m_mConstD["Trg_PI"] = 3.141592653589793;
@@ -68,11 +68,18 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
     m_mConstV["rr"] = vector<double> (9);
     m_mConstV["nWires"] = vector<double> (9);
+    m_mConstV["nTSs"] = vector<double> (9);
     for(unsigned iSL=0; iSL<9; iSL++){
       unsigned t_layerId = _cdc.segment(iSL,0).center().layerId();
       m_mConstV["rr"][iSL] = cdcp.senseWireR(t_layerId);
       m_mConstV["nWires"][iSL] = cdcp.nWiresInLayer(t_layerId)*2;
+      m_mConstV["nTSs"][iSL] = cdcp.nWiresInLayer(t_layerId);
     }
+    m_mConstV["nTSs2D"] = vector<double> (5);
+    for(unsigned iAx=0; iAx<5; iAx++) {
+      m_mConstV["nTSs2D"][iAx] = m_mConstV["nTSs"][2*iAx];
+    }
+
     m_mConstV["zToStraw"] = vector<double> (4);
     m_mConstV["zToOppositeStraw"] = vector<double> (4);
     m_mConstV["angleSt"] = vector<double> (4);
@@ -113,20 +120,47 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     m_mConstV["driftPhi2DError"][2] = 0.00025806;
     m_mConstV["driftPhi2DError"][3] = 0.00019084;
     m_mConstV["driftPhi2DError"][4] = 0.0001514;
-    // KT study
-    //m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
-    //m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
-    // Orginal study
-    m_mConstV["wireZError"] = vector<double> (4);
-    m_mConstV["wireZError"][0] = 3.19263;
-    m_mConstV["wireZError"][1] = 2.8765;
-    m_mConstV["wireZError"][2] = 2.90057;
-    m_mConstV["wireZError"][3] = 3.96206;
-    m_mConstV["driftZError"] = vector<double> (4);
-    m_mConstV["driftZError"][0] = 3.19263; 
-    m_mConstV["driftZError"][1] = 2.8765; 
-    m_mConstV["driftZError"][2] = 2.90057;
-    m_mConstV["driftZError"][3] = 3.96206;
+    //// KT study
+    ////m_mConstV["wireZError"] = vector<double>  ({0.0581, 0.0785, 0.0728, 0.0767});
+    ////m_mConstV["driftZError"] = vector<double>  ({0.00388, 0.00538, 0.00650, 0.00842});
+    //// Orginal study
+    //m_mConstV["wireZError"] = vector<double> (4);
+    //m_mConstV["wireZError"][0] = 3.19263;
+    //m_mConstV["wireZError"][1] = 2.8765;
+    //m_mConstV["wireZError"][2] = 2.90057;
+    //m_mConstV["wireZError"][3] = 3.96206;
+    //m_mConstV["driftZError"] = vector<double> (4);
+    //m_mConstV["driftZError"][0] = 3.19263; 
+    //m_mConstV["driftZError"][1] = 2.8765; 
+    //m_mConstV["driftZError"][2] = 2.90057;
+    //m_mConstV["driftZError"][3] = 3.96206;
+
+    // (2016.06.07) study
+    //m_mConstV["wireZError"] = vector<double> ({4.752, 6.393, 6.578, 6.418});
+    //m_mConstV["driftZError"] = vector<double> ({0.4701, 0.7203, 0.8058, 0.9382});
+    m_mConstV["driftZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+    m_mConstV["wireZError"] = vector<double> ({0.7676, 0.9753, 1.029, 1.372});
+
+    // Make driftLength table for each superlayer. Up to 511 clock ticks.
+    // driftLengthTableSLX[ tdcCount (~2ns unit) ] = drift length (cm)
+    for (unsigned iSl = 0; iSl < 9; iSl++) {
+      string tableName = "driftLengthTableSL" + to_string(iSl);
+      unsigned tableSize = 512;
+      m_mConstV[tableName] = vector<double> (tableSize);
+      unsigned t_layer = _cdc.segment(iSl,0).center().layerId();
+      for (unsigned iTick = 0; iTick < tableSize; iTick++) {
+        double t_driftTime = iTick * 2 * cdcp.getTdcBinWidth();
+        double avgDriftLength = 0;
+        if (m_mBool["fXtSimple"] == 1) {
+          avgDriftLength = cdcp.getNominalDriftV() * t_driftTime;
+        } else {
+          double driftLength_0 = cdcp.getDriftLength(t_driftTime, t_layer, 0);
+          double driftLength_1 = cdcp.getDriftLength(t_driftTime, t_layer, 1);
+          avgDriftLength = (driftLength_0 + driftLength_1)/2;
+        }
+        m_mConstV[tableName][iTick] = avgDriftLength;
+      }
+    }
     
     // Save geometry to root file.
     TVectorD geometryHough3D(16);
@@ -141,7 +175,8 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     // 1: Hough3DFinder 2: GeoFinder 3: VHDL GeoFinder
     m_Hough3DFinder->setMode(m_finderMode);
     // Set input file name for VHDL GeoFinder.
-    m_Hough3DFinder->setInputFileName("GeoFinder.input");
+    m_Hough3DFinder->setInputFileName(string(std::getenv("BELLE2_LOCAL_DIR"))+"/data/trg/cdc/GeoFinder.input");
+
     // For VHDL GEoFinder
     //m_Hough3DFinder->setInputFileName("GeoFinder.input");
     // cotStart, cotEnd, z0Start, z0End, cotSteps, z0Steps
@@ -162,7 +197,6 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
 }
 
 TRGCDCHough3DFinder::~TRGCDCHough3DFinder(){
-    m_Hough3DFinder->destruct();
 }
 
 void TRGCDCHough3DFinder::terminate(void){
@@ -171,6 +205,7 @@ void TRGCDCHough3DFinder::terminate(void){
         HandleRoot::terminateRoot(m_mRunTVectorD, m_mEventTVectorD, m_mTClonesArray);
         delete m_fileFinder3D;
     }
+    m_Hough3DFinder->destruct();
 }
 
 void TRGCDCHough3DFinder::doit(vector<TCTrack *> const & trackList2D, vector<TCTrack *> & trackList3D){
@@ -209,6 +244,7 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
 
     // Generate arrays for TS candidates.
     vector<vector<double> > stTSs(4);
+    vector<vector<int> > stTSDrift(4);
     vector<vector<const TCSHit *> > p_stTSs(4);
     for(unsigned iSL = 0; iSL < 4; iSL++) {
       vector<const TCSHit *> hits = _cdc.stereoSegmentHits(iSL);
@@ -217,21 +253,28 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
       m_mEventV[slName+"_hit"] = vector<double> ();
       m_mEventV[slName+"_driftHit"] = vector<double> ();
       stTSs[iSL] = vector<double> ();
+      stTSDrift[iSL] = vector<int> ();
       p_stTSs[iSL] = vector<const TCSHit *> ();
       // Fill vectors
       for(unsigned iHit= 0; iHit < hits.size(); iHit++) {
         if(hits[iHit] == 0) continue;
-        // Select only TSs that contain 1st priority.
-        if(hits[iHit]->segment().priorityPosition() != 3) {
-          continue;
-        }
+        //// Temporary solution. This should be done in the finder3D.
+        //// Select only TSs that contain 1st priority.
+        //if(hits[iHit]->segment().priorityPosition() != 3) {
+        //  continue;
+        //}
         double t_wirePhi = ((double)hits[iHit]->cell().localId())/m_mConstV["nWires"][2*iSL+1]*4*m_mConstD["Trg_PI"];
         m_mEventV[slName+"_hit"].push_back(t_wirePhi);
         m_mEventV[slName+"_driftHit"].push_back(TRGCDCFitter3D::calPhi(hits[iHit],_cdc.getEventTime()));
+        int t_tdc = hits[iHit]->segment().priorityTime();
+        int t_lr = hits[iHit]->segment().LUT()->getValue(hits[iHit]->segment().lutPattern());;
+        int t_priorityPosition = hits[iHit]->segment().priorityPosition();
+        int t_driftInfo = (t_tdc << 4) + (t_lr << 2) + t_priorityPosition;
         stTSs[iSL].push_back(t_wirePhi);
         p_stTSs[iSL].push_back(hits[iHit]);
+        stTSDrift[iSL].push_back(t_driftInfo);
+        //cout<<"iSL:"<<iSL<<" iHit:"<<iHit<<" t_tdc:"<<t_tdc<<" t_lr:"<<t_lr<<" t_priorityPosition:"<<t_priorityPosition<<" t_driftInfo:"<<t_driftInfo<<endl;
       }
-
     }
 
     // Get MC values related with finding
@@ -256,10 +299,11 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
       if (fit2DResult != 0) continue;
 
       // Set input of finder
-      vector<double > trackVariables = { m_mDouble["charge"], m_mDouble["rho"]/100, m_mDouble["phi0"] } ;
+      //vector<double > trackVariables = { m_mDouble["charge"], m_mDouble["rho"]/100, m_mDouble["phi0"] } ;
+      vector<double > trackVariables = { m_mDouble["charge2D"], m_mDouble["rho"]/100, m_mDouble["phi0"] } ;
 
       // Run finder
-      m_Hough3DFinder->runFinder(trackVariables, stTSs);
+      m_Hough3DFinder->runFinder(trackVariables, stTSs, stTSDrift);
 
       // Get results of finder
       m_Hough3DFinder->getValues("bestTSIndex",m_mVector["bestTSIndex"]);
@@ -269,6 +313,12 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         else p_bestTS[iSt] = p_stTSs[iSt][(int)m_mVector["bestTSIndex"][iSt]];
       }
       m_Hough3DFinder->getValues("bestTS",m_mVector["bestTS"]);
+      // Find and append TS to track.
+      for(unsigned iSt=0; iSt<4; iSt++){
+        if(m_mVector["bestTS"][iSt] != 999) aTrack.append(new TCLink(0,p_bestTS[iSt],p_bestTS[iSt]->cell().xyPosition()));
+      }
+      
+      // For saving values from finder.
       if(m_Hough3DFinder->getMode()==1){
         m_Hough3DFinder->getValues("bestZ0", m_mVector["bestZ0"]);
         m_Hough3DFinder->getValues("bestCot", m_mVector["bestCot"]);
@@ -285,11 +335,6 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         m_Hough3DFinder->getValues("st2GeoCandidatesDiffStWires", m_mVector["st2GeoCandidatesDiffStWires"]);
         m_Hough3DFinder->getValues("st3GeoCandidatesDiffStWires", m_mVector["st3GeoCandidatesDiffStWires"]);
         m_Hough3DFinder->getValues("stAxPhi", m_mVector["stAxPhi"]);
-      }
-
-      // Find and append TS to track.
-      for(unsigned iSt=0; iSt<4; iSt++){
-        if(m_mVector["bestTS"][iSt] != 999) aTrack.append(new TCLink(0,p_bestTS[iSt],p_bestTS[iSt]->cell().xyPosition()));
       }
 
       // Get MC values.
@@ -357,20 +402,41 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         //cout<<"----newEnd----"<<endl;
       }
 
-        if(m_makeRootFile) {
-          if(m_fileFinder3D==0) {
-            m_fileFinder3D = new TFile("Finder3D.root","RECREATE");
-            HandleRoot::initializeRoot("hough3D", &m_treeConstantsFinder3D, &m_treeTrackFinder3D,
-              m_mRunTVectorD, m_mEventTVectorD, m_mTClonesArray,
-              m_mConstD, m_mConstV,
-              m_mEventD, m_mEventV,
-              m_mDouble, m_mVector
-            );
-          }
-          HandleRoot::saveTrackValues("hough3D", 
-            m_mTClonesArray, m_mDouble, m_mVector
+      // Find number of super layers that have priority layer hit.
+      int nPriorityHitSL = 0;
+      for(unsigned iSt=0; iSt<4; iSt++){
+        int priorityHitSL = 0;
+        for(unsigned iTS=0; iTS<stTSDrift[iSt].size(); iTS++){
+          int t_priorityPosition = (stTSDrift[iSt][iTS] & 3);
+          if (t_priorityPosition == 3) priorityHitSL = 1;
+          //cout<<"iSt:"<<iSt<<" iTS:"<<iTS<<" priorityPosition:"<<t_priorityPosition<<" priorityHitSL:"<<priorityHitSL<<endl;
+        }
+        if (priorityHitSL) nPriorityHitSL++;
+      }
+      //cout<<"nPriorityHitSL:"<<nPriorityHitSL<<endl;
+      // Set debug values
+      if(m_mDouble["efficiency"] != 1) {
+        // Remove case when all hits are secondary priority.
+        if(m_mDouble["efficiency"] != nPriorityHitSL*1./4) {
+          aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::find3D,1);
+          //cout<<"[Find3D]debugValue:"<<aTrack.getDebugValue(TRGCDCTrack::EDebugValueType::find3D)<<endl;
+        }
+      }
+
+      if(m_makeRootFile) {
+        if(m_fileFinder3D==0) {
+          m_fileFinder3D = new TFile("Finder3D.root","RECREATE");
+          HandleRoot::initializeRoot("hough3D", &m_treeConstantsFinder3D, &m_treeTrackFinder3D,
+            m_mRunTVectorD, m_mEventTVectorD, m_mTClonesArray,
+            m_mConstD, m_mConstV,
+            m_mEventD, m_mEventV,
+            m_mDouble, m_mVector
           );
         }
+        HandleRoot::saveTrackValues("hough3D", 
+          m_mTClonesArray, m_mDouble, m_mVector
+        );
+      }
 
     } // End of loop over all the tracks.
 

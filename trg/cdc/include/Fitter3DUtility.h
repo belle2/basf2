@@ -33,8 +33,14 @@ class Fitter3DUtility{
     /// A circle fitter with invPhiError with fit chi2 output.
     static void rPhiFitter(double *rr, double *phi2, double *invphierror, double &rho, double &myphi0, double &chi2);
 
+    /// Charge finder using circle fitter output and axial TSs.
+    static void chargeFinder(double * nTSs, double *tsIds, double *tsHitmap, double phi0, double inCharge, double &outCharge);
+
     /// A circle fitter
     static void rPhiFit2(double *rr, double *phi2, double *phierror, double &rho, double &myphi0, int nTS);
+
+    /// Changes tdc and event time to unsigned value that has # bits.
+    static unsigned toUnsignedTdc(int tdc, int nBits);
 
     /// Pre 3D fitter functions. rr is in cm scale. driftLength is in cm scale.
     static double calPhi(double wirePhi, double driftLength, double rr, int lr);
@@ -68,6 +74,9 @@ class Fitter3DUtility{
 
     /// Calculates the phi difference between fitted axial phi and stereo phi.
     static double calDeltaPhi(int charge, double anglest, double ztostraw, double rr, double phi, double rho, double phi0);
+
+    /// Constrains R for each SL differently using JSignal and multiple constants. 
+    static void constrainRPerStSl(std::map<std::string, std::vector<double> > const & mConstV, std::map<std::string, Belle2::TRGCDCJSignal> & mSignalStorage);
 
     /// Calculates z.
     static double calZ(int charge, double anglest, double ztostraw, double rr, double phi, double rho, double phi0);

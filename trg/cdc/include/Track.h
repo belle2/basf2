@@ -36,6 +36,13 @@ class TRGCDCCircle;
 class TRGCDCTrack : public TRGCDCTrackBase {
 
   public:
+    /// Enum for returnValue types
+    enum EDebugValueType { fit2D = 1 << 3,
+                           find3D = 1 << 4,
+                           fit3D = 1 << 5,
+                           any = fit2D | find3D | fit3D
+                          };
+
 
     /// returns a list of TRGCDCTrack's.
     static std::vector<const TRGCDCTrack *> list(void);
@@ -80,10 +87,10 @@ class TRGCDCTrack : public TRGCDCTrackBase {
     double get3DFitChi2(void) const;
 
     /// Set debug value
-    void setDebugValue(int);
+    void setDebugValue(EDebugValueType const & moduleName, bool flag);
 
     /// Get debug value
-    int getDebugValue(void) const;
+    int getDebugValue(EDebugValueType const & moduleName) const;
 
   public:
 
@@ -183,13 +190,14 @@ double TRGCDCTrack::get3DFitChi2(void) const {
 }
 
 inline
-void TRGCDCTrack::setDebugValue(int debugValue) {
-     m_debugValue = debugValue;
+void TRGCDCTrack::setDebugValue(EDebugValueType const & moduleName, bool flag) {
+    if (flag) m_debugValue |= moduleName;
+    else m_debugValue &= ~moduleName;
 }
 
 inline
-int TRGCDCTrack::getDebugValue(void) const {
-     return m_debugValue;
+int TRGCDCTrack::getDebugValue(EDebugValueType const & moduleName) const {
+    return m_debugValue & moduleName;
 }
 
 

@@ -1,8 +1,13 @@
 #ifndef __CINT__
 #include "trg/cdc/Fitter3DUtility.h"
 #include "trg/cdc/Hough3DUtility.h"
+#include "trg/cdc/JSignal.h"
+#include "trg/cdc/JLUT.h"
+#include "trg/cdc/JSignalData.h"
+#include "trg/cdc/FpgaUtility.h"
 #include <cmath>
 #include <iostream>
+#include <tuple>
 #include <fstream>
 #include <sstream>
 #endif
@@ -25,14 +30,16 @@ Hough3DFinder::Hough3DFinder(void) :
     m_findPhiZMax(0), m_findPhiZMin(0), m_findPhiZIntMax(0), m_findPhiZIntMin(0), 
     m_rhoMax(0), m_rhoMin(0), m_rhoBit(0), m_phi0Max(0), m_phi0Min(0), m_phi0Bit(0), 
     m_stAxWireFactor(0), m_LUT(0), 
-    m_arcCosLUT(0), m_wireConvertLUT(0) {
+    m_arcCosLUT(0), m_wireConvertLUT(0), m_commonData(0) {
   m_mode = 2;
   m_Trg_PI = 3.141592653589793;
   m_inputFileName = "GeoFinder.input";
+  m_outputVhdlDirname = "./VHDL/finder3D";
+  m_outputLutDirname = m_outputVhdlDirname + "/" + "LutData";
 }
 
 Hough3DFinder::~Hough3DFinder(void){
-  destruct();
+  //destruct();
 }
 
 void Hough3DFinder::setMode(int mode){
@@ -106,7 +113,7 @@ void Hough3DFinder::destruct(void){
   }
 }
 
-void Hough3DFinder::runFinder(std::vector<double> &trackVariables, vector<vector<double> > &stTSs){
+void Hough3DFinder::runFinder(std::vector<double> &trackVariables, vector<vector<double> > &stTSs,  vector<vector<int> > &stTSDrift){
 
   // Clear best TS
   for(int iLayer=0; iLayer<4; iLayer++){
@@ -138,11 +145,11 @@ void Hough3DFinder::runFinder(std::vector<double> &trackVariables, vector<vector
       break;
     // Geo Finder
     case 2:
-      runFinderVersion2(trackVariables, stTSs);
+      runFinderVersion2(trackVariables, stTSs, stTSDrift);
       break;
     // FPGA Geo Finder (For LUT generator. Doesn't use LUTs)
     case 3:
-      runFinderVersion3(trackVariables, stTSs);
+      runFinderVersion3(trackVariables, stTSs, stTSDrift);
       break;
     default:
       break;
@@ -207,7 +214,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
   inputFile.open(m_inputFileName.c_str());
   if( inputFile ) {
     m_LUT = 1;
-    cout<<"Open File: "<< m_inputFileName <<endl;
+    //cout<<"Open File: "<< m_inputFileName <<endl;
     while( !inputFile.eof() ) {
       inputFile >> inName >> inMin >> inMax >> inNBit;
       if(inName == "rho") {
@@ -226,15 +233,15 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       }
     }
   } else {
-    cout<<"Could not open input file for GeoFinder."<<endl;
-    cout<<"Using default values for input."<<endl;
+    //cout<<"Could not open input file for GeoFinder."<<endl;
+    //cout<<"Using default values for input."<<endl;
     m_rhoMin = 0;
     m_rhoMax = 7.5;
-    m_rhoBit = 15;
+    m_rhoBit = 7;
     m_phi0Min = 0;
     m_phi0Max = 6.3;
-    m_phi0Bit = 15;
-    m_stAxWireFactor = 20;
+    m_phi0Bit = 9;
+    m_stAxWireFactor = 6;
     m_LUT = 0;
   }
   inputFile.close();
@@ -243,6 +250,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
   if(m_LUT) {
     // Make arccos LUT
     int rho_bitSize = Fitter3DUtility::bitSize(m_rhoBit,0);
+    //cout<<"rho_bitSize:"<<rho_bitSize<<endl;
     string first,second;
     ifstream inFileLUT;
     int iLUT;
@@ -252,12 +260,14 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       iLUT = 0;
       ostringstream strILayer;
       strILayer << iLayer + 1;
-      string fileName = "data/trg/GeoFinder.FPGA.ArcCosLayer" + strILayer.str() + ".coe";
+      string fileName = string(std::getenv("BELLE2_LOCAL_DIR"))+"/data/trg/cdc/GeoFinder.FPGA.ArcCosLayer" + strILayer.str() + ".coe";
       inFileLUT.open(fileName.c_str());
+      //cout<<"For "<<fileName<<endl;
       if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
       while(1) {
         if( iLUT == rho_bitSize + 1 ) break;
         inFileLUT >> first >> second;
+        //cout<<"first:"<<first<<" second:"<<second<<endl;
         istringstream isecond(second);
         if( iLUT != 0 ) {
           isecond >> m_arcCosLUT[iLayer][iLUT -1];
@@ -265,13 +275,14 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
         iLUT++;
       }
       inFileLUT.close();
-      //// Print LUT info
-      //for(int iLayer=0; iLayer<4; iLayer++){
-      //  for(int iLUT=0; iLUT<rho_bitSize; iLUT++){
-      //    cout<<"LUT[<<iLayer<<"][<<iLUT<<"]: "<<m_arcCosLUT[iLUT]<<endl;
-      //  }
-      //}
+      //cout<<"Done"<<endl;
     }
+    //// Print LUT info
+    //for(int iLayer=0; iLayer<4; iLayer++){
+    //  for(int iLUT=0; iLUT<rho_bitSize; iLUT++){
+    //    cout<<"LUT["<<iLayer<<"]["<<iLUT<<"]: "<<m_arcCosLUT[iLayer][iLUT]<<endl;
+    //  }
+    //}
     // Make wireSpaceConversion LUT
     int PI2_INT = int(m_Trg_PI * 2 * Fitter3DUtility::bitSize(m_phi0Bit,0)/(m_phi0Max - m_phi0Min));
     m_wireConvertLUT = new int*[4];
@@ -281,7 +292,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       iLUT = 0;
       ostringstream strILayer;
       strILayer << iLayer + 1;
-      string fileName = "data/trg/GeoFinder.FPGA.WireConvertLayer" + strILayer.str() + ".coe";
+      string fileName = string(std::getenv("BELLE2_LOCAL_DIR")) + "/data/trg/cdc/GeoFinder.FPGA.WireConvertLayer" + strILayer.str() + ".coe";
       inFileLUT.open(fileName.c_str());
       if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
       while(1) {
@@ -305,8 +316,6 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
 
   } // End if if m_LUT flag
 
-
-
   // Make hitMap
   m_hitMap = new bool*[4];
   for(int i=0; i<4; i++) {
@@ -315,7 +324,14 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
       m_hitMap[i][j] = 0;
     }
   }
-
+  // Make driftMap
+  m_driftMap = new int*[4];
+  for(int iSt=0; iSt<4; iSt++) {
+    m_driftMap[iSt] = new int[m_nWires[iSt]/2];
+    for(int iTS=0; iTS<m_nWires[iSt]/2; iTS++) {
+      m_driftMap[iSt][iTS] = 0;
+    }
+  }
 
   // index values of candidates.
   m_geoCandidatesIndex = new vector<vector<int > >;
@@ -327,6 +343,7 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
   m_geoCandidatesDiffStWires = new vector<vector<double > >;
   for(int iLayer=0; iLayer<4; iLayer++) m_geoCandidatesDiffStWires->push_back(vector<double> ());
 
+  m_mBool["fVHDLFile"] = 0;
 }
 
 void Hough3DFinder::setInputFileName( string inputFileName ) {
@@ -353,11 +370,15 @@ void Hough3DFinder::destVersion1(){
 }
 
 void Hough3DFinder::destVersion2(){
-  for(int iLayer=0; iLayer<4; iLayer++) {
-    delete m_geoCandidatesIndex;
-    delete m_geoCandidatesPhi;
-    delete m_geoCandidatesDiffStWires;
-  }
+
+  delete m_geoCandidatesIndex;
+  delete m_geoCandidatesPhi;
+  delete m_geoCandidatesDiffStWires;
+  //for(int iLayer=0; iLayer<4; iLayer++) {
+  //  delete m_geoCandidatesIndex;
+  //  delete m_geoCandidatesPhi;
+  //  delete m_geoCandidatesDiffStWires;
+  //}
 }
 
 void Hough3DFinder::destVersion3(){
@@ -366,12 +387,29 @@ void Hough3DFinder::destVersion3(){
     delete [] m_hitMap[i];
   }
   delete [] m_hitMap;
+  for(int iSt=0; iSt<4; iSt++){
+    delete [] m_driftMap[iSt];
+  }
+  delete [] m_driftMap;
   if(m_LUT) {
     for(int i=0; i<4; i++){
       delete [] m_arcCosLUT[i];
     }
     delete [] m_arcCosLUT;
   }
+
+  if(m_mBool["fVHDLFile"]) {
+    if(m_mSavedIoSignals.size()!=0) {
+      FpgaUtility::multipleWriteCoe(10, m_mSavedIoSignals, m_outputLutDirname+"/");
+    }
+    if(m_mSavedSignals.size()!=0) {
+      FpgaUtility::writeSignals(m_outputVhdlDirname+"/signals",m_mSavedSignals);
+    }
+    //if(m_mSavedIoSignals.size()!=0) FpgaUtility::multipleWriteCoe(10, m_mSavedIoSignals, "./");
+    //if(m_mSavedSignals.size()!=0) FpgaUtility::writeSignals("signalValues",m_mSavedSignals);
+  }
+
+  if(m_commonData) delete m_commonData;
 
 }
 
@@ -572,7 +610,7 @@ void Hough3DFinder::runFinderVersion1(vector<double> &trackVariables, vector<vec
 
 }
 
-void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vector<double> > &stTSs){
+void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vector<double> > &stTSs, std::vector<std::vector<int> > &stTSDrift){
 
   // Clear m_geoCandidatesIndex
   for(int iLayer=0; iLayer<4; iLayer++) {
@@ -586,16 +624,25 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
   double fitPhi0 = trackVariables[2];
   double tsDiffSt;
 
+  //cout<<"charge:"<<charge<<" rho:"<<rho<<" fitPhi0:"<<fitPhi0<<endl;
   for( int iLayer=0; iLayer<4; iLayer++){
     m_stAxPhi[iLayer] = Fitter3DUtility::calStAxPhi(charge, m_anglest[iLayer], m_ztostraw[iLayer],  m_rr[iLayer], rho, fitPhi0);
+    //cout<<"iSt:"<<iLayer<<" ztostraw:"<<m_ztostraw[iLayer]<<" m_rr:"<<m_rr[iLayer]<<" stAxPhi:"<<m_stAxPhi[iLayer]<<endl;
     //if(stTSs[iLayer].size()==0) cout<<"stTSs["<<iLayer<<"] is zero"<<endl;
     for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++){
+      //int t_tdc = (stTSDrift[iLayer][iTS] >> 4);
+      //int t_lr = ((stTSDrift[iLayer][iTS] >> 2) & 3);
+      int t_priorityPosition = (stTSDrift[iLayer][iTS] & 3);
+      //int t_tsId = int(stTSs[iLayer][iTS]*m_nWires[iLayer]/2/2/m_Trg_PI+0.5);
+      //cout<<"iSt:"<<iLayer<<" tsId:"<<t_tsId<<" pp:"<<t_priorityPosition<<endl;
+      // Reject second priority TSs.
+      if (t_priorityPosition != 3) continue;
       // Find number of wire difference
       tsDiffSt = m_stAxPhi[iLayer] - stTSs[iLayer][iTS];
       if(tsDiffSt > m_Trg_PI) tsDiffSt -= 2*m_Trg_PI;
       if(tsDiffSt < -m_Trg_PI) tsDiffSt += 2*m_Trg_PI;
       tsDiffSt = tsDiffSt/2/m_Trg_PI*m_nWires[iLayer]/2;
-      //cout<<"JB ["<<iLayer<<"]["<<iTS<<"] tsDiffSt: "<<tsDiffSt<<" stTSs:"<<stTSs[iLayer][iTS]<<"rho: "<<rho<<" phi0: "<<fitPhi0<<endl;
+      //cout<<"JB ["<<iLayer<<"]["<<iTS<<"] tsDiffSt: "<<tsDiffSt<<" stTSs:"<<stTSs[iLayer][iTS]<<" rho: "<<rho<<" phi0: "<<fitPhi0<<" m_stAxPhi:"<<m_stAxPhi[iLayer]<<endl;
       // Save index if condition is in 10 wires
       if(iLayer%2==0){
         if(tsDiffSt>0 && tsDiffSt<=10){
@@ -614,8 +661,9 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
     } // Candidate loop
   } // Layer loop
 
-  // Print all candidates.
+  //// Print all candidates.
   //for( int iLayer=0; iLayer<4; iLayer++){
+  //  cout<<"[geoFinder] iSt:"<<iLayer<<" nSegments:"<<(*m_geoCandidatesIndex)[iLayer].size()<<endl;
   //  for(unsigned iTS=0; iTS<(*m_geoCandidatesIndex)[iLayer].size(); iTS++){
   //    //cout<<"cand ["<<iLayer<<"]["<<iTS<<"]: "<<(*m_geoCandidatesIndex)[iLayer][iTS]<<endl;
   //    cout<<"cand ["<<iLayer<<"]["<<iTS<<"]: "<<(*m_geoCandidatesPhi)[iLayer][iTS]<<endl;
@@ -661,7 +709,12 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
 
 }
 
-void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vector<double> > &stTSs){
+void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vector<double> > &stTSs, vector<vector<int> > &stTSDrift){
+
+  // [TODO] Add to class. Add getters and setters.
+  int m_verboseFlag = 0;
+
+  if(m_verboseFlag) cout<<"####geoFinder start####"<<endl;
 
   // Clear m_geoCandidatesIndex
   for(int iLayer=0; iLayer<4; iLayer++) {
@@ -675,6 +728,13 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
       m_hitMap[iLayer][iTS] = 0;
     }
   }
+  // Clear drift map for track
+  for( int iSt=0; iSt<4; iSt++ ) {
+    for( int iTS=0; iTS<m_nWires[iSt]/2; iTS++ ){
+      m_driftMap[iSt][iTS] = 0;
+    }
+  }
+
   // Clear FPGA input and output values.
   m_FPGAInput.clear();
   m_FPGAOutput.clear();
@@ -684,15 +744,18 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   double rho = trackVariables[1];
   double fitPhi0 = trackVariables[2];
 
-  // Fill hitMap
+  // Fill hitMap and driftMap
   int iHitTS;
+  int driftInfo;
   for(unsigned iLayer=0; iLayer<4; iLayer++) {
     //cout<<"["<<iLayer<<"] size:"<<stTSs[iLayer].size()<<endl;
     for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++) {
       iHitTS = int(stTSs[iLayer][iTS]*m_nWires[iLayer]/2/2/m_Trg_PI+0.5);
-      //cout<<"["<<iLayer<<"] iHitTS: "<<iHitTS<<" stTSs: "<<stTSs[iLayer][iTS]<<endl;
+      driftInfo = stTSDrift[iLayer][iTS];
+      if(m_verboseFlag) cout<<"["<<iLayer<<"] TSId: "<<iHitTS<<" stTSs: "<<stTSs[iLayer][iTS]<<" driftInfo:"<<driftInfo<<" priorityPosition:"<<(driftInfo & 3)<<endl;
       //cout<<iHitTS*2*m_Trg_PI/m_nWires[iLayer]*2<<endl;
       m_hitMap[iLayer][iHitTS] = 1;
+      m_driftMap[iLayer][iHitTS] = driftInfo;
     } // End iTS
   } // End layer
 
@@ -701,6 +764,14 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   //  cout<<"["<<iLayer<<"]["<<m_nWires[iLayer]/2<<"]";
   //  for(int iTS=m_nWires[iLayer]/2-1; iTS>=0; iTS--) {
   //    cout<<m_hitMap[iLayer][iTS];
+  //  }
+  //  cout<<endl;
+  //} // End layer
+  //// Print driftMap
+  //for(int iLayer=0; iLayer<4; iLayer++) {
+  //  cout<<"["<<iLayer<<"]["<<m_nWires[iLayer]/2<<"]"<<endl;;
+  //  for(int iTS=m_nWires[iLayer]/2-1; iTS>=0; iTS--) {
+  //    cout<<"    ["<<iTS<<"]: "<<m_driftMap[iLayer][iTS]<<endl;;
   //  }
   //  cout<<endl;
   //} // End layer
@@ -714,6 +785,12 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   // Find 2*PI in integer space using phi0. phi0 min must be 0.
   // PI2_INT is the slightly smaller than 2*PI
   int PI2_INT = int(m_Trg_PI * 2 / m_phi0Max * fitPhi0_bitSize);
+  
+  // Limit R and phi0 to min and max values.
+  if(rho > m_rhoMax) rho = m_rhoMax;
+  if(rho < m_rhoMin) rho = m_rhoMin;
+  if(fitPhi0 > m_phi0Max) fitPhi0 = m_phi0Max;
+  if(fitPhi0 < m_phi0Min) fitPhi0 = m_phi0Min;
 
   // For integer space
   Fitter3DUtility::findExtreme(m_findRhoMax, m_findRhoMin, rho);
@@ -765,9 +842,11 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     Fitter3DUtility::changeInteger(arcCos_int, acos_real, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
     Fitter3DUtility::findExtreme(m_findArcCosIntMax, m_findArcCosIntMin, arcCos_int);
     m_FPGAOutput.push_back(arcCos_int);
-    if(arcCos_int != m_arcCosLUT[iLayer][rho_int]) {
-      cout<<"Error with arcCos LUT: "<<rho_int<<" "<<arcCos_int<<" "<<m_arcCosLUT[iLayer][rho_int]<<endl;
-    }
+    //if(arcCos_int != m_arcCosLUT[iLayer][rho_int]) {
+    //  cout<<"Error with arcCos LUT. rho_int:"<<rho_int<<" arcCos_int:"<<arcCos_int<<" m_arcCosLUT:"<<m_arcCosLUT[iLayer][rho_int]<<endl;
+    //  cout<<"  iLayer:"<<iLayer<<" rho:"<<rho<<" acos_real:"<<acos_real<<endl;
+    //  cout<<"  r:"<<m_rr[iLayer]<<endl;
+    //}
 
     if(charge==1){
       // Actual function
@@ -780,7 +859,9 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
       myphiz_int = -arcCos_int+fitPhi0_int;
     }
 
+
     Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+
     // Find extreme value
     Fitter3DUtility::findExtreme(m_findPhiZMax, m_findPhiZMin, myphiz);
     Fitter3DUtility::findExtreme(m_findPhiZIntMax, m_findPhiZIntMin, myphiz_int);
@@ -798,6 +879,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
     // For real space
     Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
+
 
     stAxPhi[iLayer] = myphiz;
 
@@ -820,6 +902,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     } else {
       stAxWire_int[iLayer] = (stAxWire_int[iLayer] >> m_stAxWireFactor) + 1;
     }
+    //cout<<"iSt:"<<iLayer<<" stAxWire_int:"<<stAxWire_int[iLayer]<<" stAxWire:"<<stAxWire[iLayer]<<" myphiz:"<<myphiz<<" stAxPhi:"<<stAxPhi[iLayer]<<endl;
     //cout<<"Conversion Factor["<<iLayer<<"]: "<<int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor))<<" "<<m_nWires[iLayer]/2<<endl;
     //// Check if something is different with multiply division method.
     //if(stAxWire[iLayer] != stAxWire_int[iLayer]) {
@@ -843,8 +926,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     //if(stAxWire[iLayer] != m_wireConvertLUT[iLayer][myphiz_int]) {
     //  cout<<"Error with wireConvert LUT: "<<myphiz_int<<" "<<stAxWire[iLayer]<<" "<<m_wireConvertLUT[iLayer][myphiz_int]<<endl;
     //}
-
-
 
     //cout<<"StAxWire["<<iLayer<<"]: "<<stAxWire[iLayer]<<endl;
     // Save stAxPhi
@@ -898,6 +979,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
   //// Print stCandHitMap
   //for(unsigned iLayer=0; iLayer<4; iLayer++){
+  //  cout<<"iSt:"<<iLayer<<" stAxWire:"<<stAxWire[iLayer]<<endl;
   //  cout<<"stCandHitMap["<<iLayer<<"]: ";
   //  for(int iTS=9; iTS>=0; iTS--){
   //    cout<<stCandHitMap[iLayer][iTS];
@@ -913,7 +995,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     }
     m_FPGAOutput.push_back(stCandHitMapInt);
   }
-
 
   // Find and save index of TS. For vector.
   for(unsigned iLayer=0; iLayer<4; iLayer++) {
@@ -941,43 +1022,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     } // End iCand
   } // End layer
 
-  
-  //// Find if candidates have a match.
-  //for( int iLayer=0; iLayer<4; iLayer++ ) {
-  //  int nCandidates = tempIndex[iLayer].size();
-  //  int nWCandidates = (*m_geoCandidatesPhi)[iLayer].size();
-  //  // Check if same number of candidates
-  //  if( nCandidates != nWCandidates ) {
-  //    cout<<"Candidates: "<<nCandidates<<" "<<nWCandidates<<endl;
-  //    for(int iTS=0; iTS<nCandidates; iTS++){
-  //      cout<<"cand1 ["<<iLayer<<"]["<<iTS<<"]: "<<tempPhi[iLayer][iTS]<<endl;
-  //    }
-  //    for(int iTS=0; iTS<nWCandidates; iTS++){
-  //      cout<<"cand2 ["<<iLayer<<"]["<<iTS<<"]: "<<(*m_geoCandidatesPhi)[iLayer][iTS]<<endl;
-  //    }
-  //  // Check if the candidates are the same
-  //  } else {
-  //    bool sameFlag = 1;
-  //    for(int iTS=0; iTS<nCandidates; iTS++){
-  //      bool sameFlagTS = 0;
-  //      for(int iTS2=0; iTS2<nCandidates; iTS2++){
-  //        if( fabs( tempPhi[iLayer][iTS] - (*m_geoCandidatesPhi)[iLayer][iTS2] ) < 0.001 ) sameFlagTS = 1;
-  //        //if( fabs( tempIndex[iLayer][iTS] - (*m_geoCandidatesIndex)[iLayer][iTS2] ) < 0.001 ) sameFlagTS = 1;
-  //      }
-  //      sameFlag = sameFlag * sameFlagTS;
-  //    }
-  //    if( sameFlag == 0 ) {
-  //      for(int iTS=0; iTS<nCandidates; iTS++){
-  //        cout<<"cand1 ["<<iLayer<<"]["<<iTS<<"]: "<<tempPhi[iLayer][iTS]<<endl;
-  //      }
-  //      for(int iTS=0; iTS<nWCandidates; iTS++){
-  //        cout<<"cand2 ["<<iLayer<<"]["<<iTS<<"]: "<<(*m_geoCandidatesPhi)[iLayer][iTS]<<endl;
-  //      }
-  //    }
-  //  }
-  //} // End layer loop
-
-  
   // Pick middle candidate if multiple candidates
   //double meanWireDiff[4] = { 5, 5, 5, 5 };
   // z=0 wireDiff
@@ -988,6 +1032,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   double meanWireDiff[4] = { 3.1826, 2.84745, 3.40936, 3.99266 };
 
   double bestTS[4] = {9999, 9999, 9999, 9999};
+  //double bestITS[4] = {9999, 9999, 9999, 9999};
   for(int iLayer=0; iLayer<4; iLayer++){
     double bestDiff=999;
     for(int iTS=0; iTS<10; iTS++) {
@@ -999,6 +1044,7 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
         //bestDiff = abs( fabs(stCandDiff[iLayer][iTS])-meanWireDiff[iLayer] );
         //cout<<"BestDiff["<<iLayer<<"]["<<iTS<<"]: "<<bestDiff<<" diffSt: "<<(*m_geoCandidatesDiffStWires)[iLayer][iTS]<<endl;
         bestTS[iLayer] = stCand[iLayer][iTS]; 
+        //bestITS[iLayer] = iTS;
 
         m_bestTS[iLayer] = stCand[iLayer][iTS];
         m_bestTSIndex[iLayer] = int(stCandIndex[iLayer][iTS]+0.5);
@@ -1021,8 +1067,443 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
 
   //// Print the best candidate
   //for( int iLayer=0; iLayer<4; iLayer++) {
-  //  cout<<"best["<<iLayer<<"]: "<<bestTS[iLayer]<<endl;
+  //  cout<<"best["<<iLayer<<"]: "<<bestTS[iLayer]<<" id:"<<int(bestTS[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2+0.5)<<" iTS:"<<bestITS[iLayer]<<endl;
   //}
+
+  //// Temp geoFinder
+  //for( int iLayer=0; iLayer<4; iLayer++) {
+  //  double t_phiAx = acos(m_rr[iLayer]/(2*rho));
+  //  double t_dPhiAx = 0;
+  //  double t_dPhiAx_c = 0;
+  //  if(charge==1) t_dPhiAx = t_phiAx+fitPhi0;
+  //  else t_dPhiAx = -t_phiAx+fitPhi0;
+  //  if(t_dPhiAx < 0) t_dPhiAx_c = t_dPhiAx + 2* m_Trg_PI;
+  //  else if (t_dPhiAx > 2*m_Trg_PI) t_dPhiAx_c = t_dPhiAx - 2*m_Trg_PI;
+  //  else t_dPhiAx_c = t_dPhiAx;
+  //  double t_dPhiAxWire = 0;
+  //  if( iLayer%2 == 0 ) t_dPhiAxWire = int(t_dPhiAx_c/2/m_Trg_PI*m_nWires[iLayer]/2);
+  //  else t_dPhiAxWire = int(t_dPhiAx_c/2/m_Trg_PI*m_nWires[iLayer]/2 + 1);
+  //  cout<<"iSt:"<<iLayer<<" phiAx:"<<t_phiAx<<" phi0:"<<fitPhi0<<" dPhiAx:"<<t_dPhiAx<<" charge:"<<charge<<endl;
+  //  cout<<"      dPhiAx_c:"<<t_dPhiAx_c<<" dPhiAxWire:"<<t_dPhiAxWire<<endl;
+  //}
+
+  //cout<<"####geoFinder start####"<<endl;
+  // Will use cm unit.
+  std::map<std::string, std::vector<double> > mConstV;
+  std::map<std::string, double > mConstD;
+  std::map<std::string, double > mDouble;
+
+  if(m_commonData==0){
+    m_commonData = new Belle2::TRGCDCJSignalData();
+  }
+  // Setup firmware parameters
+  double phiMax = m_Trg_PI;
+  double phiMin = -m_Trg_PI;
+  int phiBitSize = 13;
+  // pt = 0.3*1.5*rho*0.01;
+  double rhoMin = 20;
+  double rhoMax = 2500;
+  int rhoBitSize = 11;
+
+  // Constraints used in below code.
+  mConstV["rr"] = vector<double> (9);
+  mConstV["rr3D"] = vector<double> (4);
+  mConstV["nTSs"] = vector<double> (9);
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    // Convert unit to cm.
+    mConstV["rr"][2*iSt+1] = m_rr[iSt]*100;
+    mConstV["rr3D"][iSt] = m_rr[iSt]*100;
+    mConstV["nTSs"][2*iSt+1] = m_nWires[iSt]/2;
+  }
+  mConstD["acosLUTInBitSize"] = rhoBitSize;
+  mConstD["acosLUTOutBitSize"] = phiBitSize - 1;
+  mConstD["Trg_PI"] = m_Trg_PI;
+
+  // Constrain rho to rhoMax. For removing warnings when changing to signals.
+  {
+    mDouble["rho"] = rho*100;
+    if(mDouble["rho"] > rhoMax) {
+      mDouble["rho"] = rhoMax;
+      mDouble["pt"] = rhoMax * 0.3 * 1.5 * 0.01;
+    }
+  }
+  // Constrain phi0 to [-pi, pi]
+  {
+    mDouble["phi0"] = fitPhi0;
+    bool rangeFail = 1;
+    while(rangeFail) {
+      if (mDouble["phi0"] > mConstD["Trg_PI"]) mDouble["phi0"] -= 2 * mConstD["Trg_PI"];
+      else if (mDouble["phi0"] < -mConstD["Trg_PI"]) mDouble["phi0"] += 2 * mConstD["Trg_PI"];
+      else rangeFail = 0;
+    }
+  }
+
+  // Change to Signals. Convert rho to cm unit.
+  {
+    vector<tuple<string, double, int, double, double, int> > t_values = {
+      make_tuple("phi0", mDouble["phi0"], phiBitSize, phiMin, phiMax, 0),
+      make_tuple("rho", mDouble["rho"], rhoBitSize, rhoMin, rhoMax, 0),
+      make_tuple("charge",(int) (charge==1 ? 1 : 0), 1, 0, 1.5, 0),
+    };
+    Belle2::TRGCDCJSignal::valuesToMapSignals(t_values, m_commonData, m_mSignalStorage);
+  }
+  //cout<<"<<<phi0>>>"<<endl; m_mSignalStorage["phi0"].dump();
+  //cout<<"<<<rho>>>"<<endl; m_mSignalStorage["rho"].dump();
+  //cout<<"<<<charge>>>"<<endl; m_mSignalStorage["charge"].dump();
+
+  // Constrain rho
+  Fitter3DUtility::constrainRPerStSl(mConstV, m_mSignalStorage);
+  // phiAx = arcos(r/2R). 
+  // Make min max constants for lut.
+  if(m_mSignalStorage.find("invPhiAxMin_0")==m_mSignalStorage.end())
+  {
+    for(unsigned iSt=0; iSt<4; iSt++) {
+      string t_invMinName = "invPhiAxMin_" + to_string(iSt);
+      double t_actual = m_mSignalStorage["rho_c_"+to_string(iSt)].getMinActual();
+      double t_toReal = m_mSignalStorage["rho_c_"+to_string(iSt)].getToReal();
+      m_mSignalStorage[t_invMinName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, m_commonData);
+      string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
+      t_actual = m_mSignalStorage["rho_c_"+to_string(iSt)].getMaxActual();
+      m_mSignalStorage[t_invMaxName] = Belle2::TRGCDCJSignal(t_actual, t_toReal, m_commonData);
+    }
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invPhiAxMin_"<<iSt<<">>>"<<endl; m_mSignalStorage["invPhiAxMin_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<invPhiAxMax_"<<iSt<<">>>"<<endl; m_mSignalStorage["invPhiAxMax_"+to_string(iSt)].dump();}
+  // Generate LUT(phiAx[i]=acos(rr[i]/2/rho)). 
+  for(unsigned iSt=0; iSt<4; iSt++){
+    string t_valueName = "phiAx_" + to_string(iSt);
+    string t_minName = "phiAxMin_" + to_string(iSt);
+    string t_maxName = "phiAxMax_" + to_string(iSt);
+    string t_invMinName = "invPhiAxMin_" + to_string(iSt);
+    string t_invMaxName = "invPhiAxMax_" + to_string(iSt);
+    if(m_mLutStorage.find(t_valueName) == m_mLutStorage.end()) {
+      m_mLutStorage[t_valueName] = new Belle2::TRGCDCJLUT(t_valueName);
+      // Lambda can not copy maps.
+      double t_parameter = mConstV.at("rr3D")[iSt];
+      m_mLutStorage[t_valueName]->setFloatFunction(
+                        [=](double aValue) -> double{return acos(t_parameter/2/aValue);}, 
+                        m_mSignalStorage["rho_c_"+to_string(iSt)],
+                        m_mSignalStorage[t_invMinName], m_mSignalStorage[t_invMaxName], m_mSignalStorage["phi0"].getToReal(),
+                        (int)mConstD.at("acosLUTInBitSize"), (int)mConstD.at("acosLUTOutBitSize"));
+      //m_mLutStorage[t_valueName]->makeCOE("./LutData/geoFinder_"+t_valueName+".coe");
+    }
+  }
+  // phiAx[i] = acos(rr[i]/2/rho). 
+  // Operate using LUT(phiAx[i]).
+  for(unsigned iSt=0; iSt<4; iSt++){
+    // Set output name
+    string t_valueName =  "phiAx_" + to_string(iSt);
+    m_mLutStorage[t_valueName]->operate(m_mSignalStorage["rho_c_"+to_string(iSt)], m_mSignalStorage[t_valueName]);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<phiAx_"<<iSt<<">>>"<<endl; m_mSignalStorage["phiAx_"+to_string(iSt)].dump();}
+  // dPhiAx[i] = +-phiAx[i] + phi0
+  {
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(Belle2::TRGCDCJSignal(1,m_mSignalStorage["charge"].getToReal(), m_commonData), "=", m_mSignalStorage["charge"]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&m_mSignalStorage["dPhiAx_0"], m_mSignalStorage["phiAx_0"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_1"], m_mSignalStorage["phiAx_1"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_2"], m_mSignalStorage["phiAx_2"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_3"], m_mSignalStorage["phiAx_3"] + m_mSignalStorage["phi0"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&m_mSignalStorage["dPhiAx_0"], -m_mSignalStorage["phiAx_0"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_1"], -m_mSignalStorage["phiAx_1"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_2"], -m_mSignalStorage["phiAx_2"] + m_mSignalStorage["phi0"]),
+      make_pair(&m_mSignalStorage["dPhiAx_3"], -m_mSignalStorage["phiAx_3"] + m_mSignalStorage["phi0"])
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //cout<<"<<<phi0>>>"<<endl; m_mSignalStorage["phi0"].dump();
+  //cout<<"<<<charge>>>"<<endl; m_mSignalStorage["charge"].dump();
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_"+to_string(iSt)].dump();}
+  // Add two wire unit(rad) to widen start of window.
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    double wirePhiUnit = 2 * mConstD["Trg_PI"] / mConstV["nTSs"][2*iSt+1];
+    if (iSt%2 == 0) {
+      m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] + Belle2::TRGCDCJSignal(wirePhiUnit,m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
+    } else {
+      m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] - Belle2::TRGCDCJSignal(wirePhiUnit, m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
+    }
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_m_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_m_"+to_string(iSt)].dump();}
+  // Constrain dPhiAx[i] to [0, 2pi]
+  if(m_mSignalStorage.find("dPhiAxMax_0")==m_mSignalStorage.end())
+  {
+    for(unsigned iSt=0; iSt<4; iSt++){
+      string t_valueName = "dPhiAx_m_" + to_string(iSt);
+      string t_maxName = "dPhiAxMax_" + to_string(iSt);
+      string t_minName = "dPhiAxMin_" + to_string(iSt);
+      string t_2PiName = "dPhiAx2Pi_" + to_string(iSt);
+      m_mSignalStorage[t_maxName] = Belle2::TRGCDCJSignal(2*mConstD.at("Trg_PI"), m_mSignalStorage[t_valueName].getToReal(), m_commonData);
+      m_mSignalStorage[t_minName] = Belle2::TRGCDCJSignal(0, m_mSignalStorage[t_valueName].getToReal(), m_commonData);
+      m_mSignalStorage[t_2PiName] = Belle2::TRGCDCJSignal(2*mConstD.at("Trg_PI"), m_mSignalStorage[t_valueName].getToReal(), m_commonData);
+    }
+  }
+  for(unsigned iSt=0; iSt<4; iSt++){
+    string t_in1Name = "dPhiAx_m_" + to_string(iSt);
+    string t_valueName = "dPhiAx_c_" + to_string(iSt);
+    string t_maxName = "dPhiAxMax_" + to_string(iSt);
+    string t_minName = "dPhiAxMin_" + to_string(iSt);
+    string t_2PiName = "dPhiAx2Pi_" + to_string(iSt);
+    // Create data for ifElse
+    vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
+    // Compare
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">", m_mSignalStorage[t_maxName]);
+    // Assignments
+    vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
+      make_pair(&m_mSignalStorage[t_valueName], (m_mSignalStorage[t_in1Name]-m_mSignalStorage[t_2PiName]).limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">", m_mSignalStorage[t_minName]);
+    // Assignments
+    t_assigns = {
+      make_pair(&m_mSignalStorage[t_valueName], m_mSignalStorage[t_in1Name].limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Compare
+    t_compare = Belle2::TRGCDCJSignal();
+    // Assignments
+    t_assigns = {
+      make_pair(&m_mSignalStorage[t_valueName], (m_mSignalStorage[t_in1Name]+m_mSignalStorage[t_2PiName]).limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
+    };
+    // Push to data.
+    t_data.push_back(make_pair(t_compare, t_assigns));
+    // Process ifElse data.
+    Belle2::TRGCDCJSignal::ifElse(t_data);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_c_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_c_"+to_string(iSt)].dump();}
+  // Change to wire space
+  // Make wireFactor constants
+  if(m_mSignalStorage.find("wireFactor_0")==m_mSignalStorage.end())
+  {
+    for(unsigned iSt=0; iSt<4; iSt++) 
+    {
+      int nShiftBits = int(log(pow(2,24)*2*mConstD.at("Trg_PI")/mConstV.at("nTSs")[2*iSt+1]/m_mSignalStorage["phi0"].getToReal())/log(2));
+      string t_name;
+      t_name = "wireFactor_" + to_string(iSt);
+      m_mSignalStorage[t_name] = Belle2::TRGCDCJSignal(mConstV.at("nTSs")[2*iSt+1]/2/mConstD.at("Trg_PI"), 1/m_mSignalStorage["phi0"].getToReal()/pow(2,nShiftBits), m_commonData);
+    }
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<wireFactor_"<<iSt<<">>>"<<endl; m_mSignalStorage["wireFactor_"+to_string(iSt)].dump();}
+  // wireDPhiAx[i] <= dPhiAx_c[i] * wireFactor[i]
+  // Shift to find actual wire.
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    int nShiftBits = log(1/m_mSignalStorage["dPhiAx_c_"+to_string(iSt)].getToReal() / m_mSignalStorage["wireFactor_"+to_string(iSt)].getToReal())/log(2);
+    m_mSignalStorage["wireDPhiAx_"+to_string(iSt)] <= (m_mSignalStorage["dPhiAx_c_"+to_string(iSt)] * m_mSignalStorage["wireFactor_"+to_string(iSt)]).shift(nShiftBits,0);
+  }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<wireDPhiAx_"<<iSt<<">>>"<<endl; m_mSignalStorage["wireDPhiAx_"+to_string(iSt)].dump();}
+  // Select TS window from wireDPhiAx
+  vector< int > nCandidates = { 10, 10, 10, 13 };
+  // stCandHitmap[iSt][iTS]
+  vector<vector<bool> > t_stCandHitmap(4);
+  for(unsigned iSt=0; iSt<4; iSt++) t_stCandHitmap[iSt] = vector<bool> (nCandidates[iSt]);
+  // Last driftInfo is for showing no hit.
+  vector<vector<int> > t_stCandDriftmap(4);
+  for(unsigned iSt=0; iSt<4; iSt++) t_stCandDriftmap[iSt] = vector<int> (nCandidates[iSt]+1);
+  // resultValues = [name, value, bitwidth, min, max, clock]
+  vector<tuple<string, double, int, double, double, int> > resultValues;
+  {
+    vector<pair<string, int> > t_chooseSignals = {
+      make_pair("wireDPhiAx_0", 1), make_pair("wireDPhiAx_1",1), make_pair("wireDPhiAx_2",1), make_pair("wireDPhiAx_3",1)
+    };
+    Belle2::TRGCDCJSignal::mapSignalsToValues(m_mSignalStorage, t_chooseSignals, resultValues);
+  }
+  vector<double> t_wireDPhiAx = {std::get<1>(resultValues[0]), std::get<1>(resultValues[1]), std::get<1>(resultValues[2]), std::get<1>(resultValues[3])};
+  // Print wireDPhiAx
+  //for(unsigned iSt=0; iSt<4; iSt++) cout<<"iSt:"<<iSt<<" t_wireDPhiAx:"<<t_wireDPhiAx[iSt]<<endl;
+  for(int iSt=0; iSt<4; iSt++) {
+    int indexTS = t_wireDPhiAx[iSt];
+    for(int iTS=0; iTS<nCandidates[iSt]; iTS++) {
+      // Copy 10 TSs from hitmap and driftmap
+      t_stCandHitmap[iSt][iTS] = m_hitMap[iSt][indexTS];
+      t_stCandDriftmap[iSt][iTS] = m_driftMap[iSt][indexTS];
+      // Move indexTS
+      if(iSt%2 == 0) {
+        indexTS--;
+        // If index is below 0 deg goto 360-delta deg
+        if(indexTS < 0 ) indexTS =  m_nWires[iSt]/2-1;
+      }
+      else {
+        indexTS++;
+        // If index is 360 deg goto 0 deg
+        if(indexTS >= m_nWires[iSt]/2) indexTS = 0;
+      }
+    }
+  }
+  // Print stCandHitMap
+  if(m_verboseFlag) {
+    for(unsigned iLayer=0; iLayer<4; iLayer++){
+      cout<<"iSt:"<<iLayer<<" t_wireDPhiAx:"<<t_wireDPhiAx[iLayer];
+      int t_endTSId=0;
+      if(iLayer%2==0) t_endTSId = t_wireDPhiAx[iLayer]-(nCandidates[iLayer]-1);
+      else t_endTSId = t_wireDPhiAx[iLayer]+(nCandidates[iLayer]-1);
+      if(t_endTSId < 0) t_endTSId += mConstV["nTSs"][2*iLayer+1];
+      else if (t_endTSId >= mConstV["nTSs"][2*iLayer+1]) t_endTSId -= mConstV["nTSs"][2*iLayer+1];
+      //cout<<" endWindow:"<<t_endTSId<<endl;
+      cout<<" t_stCandHitmap["<<iLayer<<"]: "<<t_endTSId<<"=> ";
+      for(int iTS=nCandidates[iLayer]-1; iTS>=0; iTS--){
+        cout<<t_stCandHitmap[iLayer][iTS];
+      }
+      cout<<" <= "<<t_wireDPhiAx[iLayer]<<endl;
+    }
+    //// Print stCandDriftHitMap
+    //for(unsigned iSt=0; iSt<4; iSt++){
+    //  for(int iTS=0; iTS<nCandidates[iSt]; iTS++){
+    //    cout<<"iSt:"<<iSt<<" iTS:"<<iTS<<" stCandDriftMap:"<<t_stCandDriftmap[iSt][iTS]<<endl;
+    //  }
+    //}
+  }
+  vector<double> t_targetWirePosition = { 3, 2, 3, 3};
+  // When bestRelTsId is nCandidates, it means no hit.
+  vector<int> t_bestRelTSId(4);
+  for(unsigned iSt=0; iSt<4; iSt++) t_bestRelTSId[iSt] = nCandidates[iSt];
+  vector<int> t_bestDiff = {16, 16, 16, 16};
+  // Select best TS between 10 wires.
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    for( int iTS=0; iTS<nCandidates[iSt]; iTS++) {
+      int t_priorityPosition = (t_stCandDriftmap[iSt][iTS] & 3);
+      //cout<<"iSt:"<<iSt<<" iTS:"<<iTS<<" t_priorityPosition:"<<t_priorityPosition<<endl;
+      if( t_stCandHitmap[iSt][iTS] == 0 ) continue;
+      if( t_priorityPosition != 3) continue;
+      double tsDiffTarget = fabs(t_targetWirePosition[iSt] - iTS);
+      if(t_bestDiff[iSt] > tsDiffTarget) {
+        t_bestDiff[iSt] = tsDiffTarget;
+        t_bestRelTSId[iSt] = iTS;
+      }
+    }
+  }
+  // Print best relative output
+  if(m_verboseFlag) {
+    for(unsigned iSt=0; iSt<4; iSt++) cout<<"iSt:"<<iSt<<" bestRelTS:"<<t_bestRelTSId[iSt]<<" diff:"<<t_bestDiff[iSt]<<endl;
+  }
+  // Convert best relative TS id to best TS id
+  vector<double> t_bestTSId(4);
+  for(unsigned iSt=0; iSt<4; iSt++) {
+    if (iSt%2 == 0) t_bestTSId[iSt] = t_wireDPhiAx[iSt] - t_bestRelTSId[iSt];
+    else t_bestTSId[iSt] = t_wireDPhiAx[iSt] + t_bestRelTSId[iSt];
+  }
+  // Get bestDriftInfo
+  vector<double> t_bestDriftInfo(4);
+  for(unsigned iSt=0; iSt<4; iSt++) t_bestDriftInfo[iSt] = t_stCandDriftmap[iSt][t_bestRelTSId[iSt]];
+  //// Print best output
+  //for(unsigned iSt=0; iSt<4; iSt++) cout<<"iSt:"<<iSt<<" bestTS:"<<t_bestTSId[iSt]<<endl;
+  // Print best drift info
+  if(m_verboseFlag) {
+    for(unsigned iSt=0; iSt<4; iSt++)cout<<"iSt:"<<iSt<<" bestDriftInfo:"<<t_bestDriftInfo[iSt]<<endl;
+  }
+
+  // Constrain bestTS to [0, nTS-1]
+  vector<double> t_bestTSId_c(4);
+  for(unsigned iSt=0; iSt<4; iSt++){
+    if(t_bestTSId[iSt] >= mConstV["nTSs"][2*iSt+1]) t_bestTSId_c[iSt] = t_bestTSId[iSt] - mConstV["nTSs"][2*iSt+1];
+    else if(t_bestTSId[iSt] < 0) t_bestTSId_c[iSt] = t_bestTSId[iSt] + mConstV["nTSs"][2*iSt+1];
+    else t_bestTSId_c[iSt] = t_bestTSId[iSt];
+  }
+  // Print best constrained output 
+  if(m_verboseFlag) {
+    for(unsigned iSt=0; iSt<4; iSt++)cout<<"iSt:"<<iSt<<" bestTS_c:"<<t_bestTSId_c[iSt]<<endl;
+  }
+
+  // Save to m_bestTS
+  for(unsigned iSt=0; iSt<4; iSt++){
+    if(t_bestDriftInfo[iSt] != 0) m_bestTS[iSt] = t_bestTSId_c[iSt] * 2 * mConstD["Trg_PI"] / mConstV["nTSs"][2*iSt+1] ;
+    else m_bestTS[iSt] = 999;
+  }
+  //if(m_verboseFlag) {
+  //  for(unsigned iSt=0; iSt<4; iSt++)cout<<"iSt:"<<iSt<<" m_bestTS:"<<m_bestTS[iSt]<<endl;
+  //}
+  // Search and save to m_bestTSIndex
+  for(unsigned iSt=0; iSt<4; iSt++){
+    if(t_bestDriftInfo[iSt] == 0) {
+      m_bestTSIndex[iSt] = 999;
+    } else {
+      for(unsigned iTS=0; iTS<stTSs[iSt].size(); iTS++){
+        if( fabs(m_bestTS[iSt] - stTSs[iSt][iTS]) < 0.0001 ) {
+          m_bestTSIndex[iSt] = iTS;
+          break;
+        }
+      }
+    }
+  }
+  //if(m_verboseFlag) {
+  //  for(unsigned iSt=0; iSt<4; iSt++)cout<<"iSt:"<<iSt<<" m_bestTSIndex:"<<m_bestTSIndex[iSt]<<endl;
+  //}
+
+  // Post handling of signals.
+  // Name all signals.
+  if((*m_mSignalStorage.begin()).second.getName() == ""){
+    for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
+      (*it).second.setName((*it).first);
+    }
+  }
+  ////// Dump all signals.
+  ////bool done = 0;
+  ////if((*m_mSignalStorage.begin()).second.getName() != "" && done==0){
+  ////  for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
+  ////    (*it).second.dump();
+  ////  }
+  ////  done=1;
+  ////}
+
+  if(m_mBool["fVHDLFile"]) {
+    // Check if there is a name.
+    if((*m_mSignalStorage.begin()).second.getName() != ""){
+      // Saves to file only one time.
+      // Print Vhdl and Coe
+      if(m_commonData->getPrintedToFile()==0){
+        if(m_commonData->getPrintVhdl()==0){
+          m_commonData->setVhdlOutputFile(m_outputVhdlDirname+"/Finder3D.vhd");
+          m_commonData->setPrintVhdl(1);
+        } else {
+          m_commonData->setPrintVhdl(0);
+          m_commonData->entryVhdlCode();
+          m_commonData->signalsVhdlCode();
+          m_commonData->buffersVhdlCode();
+          m_commonData->printToFile();
+          // Print LUTs.
+          for(map<string,Belle2::TRGCDCJLUT*>::iterator it=m_mLutStorage.begin(); it!=m_mLutStorage.end(); ++it){
+            it->second->makeCOE(m_outputLutDirname+"/"+it->first+".coe");
+            //it->second->makeCOE(it->first+".coe");
+          }
+        }
+      }
+
+      // Saves values to memory. Wrote to file at terminate().
+      // Save all signals to m_mSavedSignals. Limit to 10 times.
+      if((*m_mSavedSignals.begin()).second.size() < 10 || m_mSavedSignals.empty()) {
+        for(auto it = m_mSignalStorage.begin(); it != m_mSignalStorage.end(); ++it){
+          m_mSavedSignals[(*it).first].push_back((*it).second.getInt()); 
+        }
+      }
+
+      // Saves values to memory. Wrote to file at terminate().
+      // Save input output signals. Limit to 1024.
+      if((*m_mSavedIoSignals.begin()).second.size() < 1025 || m_mSavedIoSignals.empty()) {
+        m_mSavedIoSignals["in_phi0"].push_back(m_mSignalStorage["phi0"].getInt());
+        m_mSavedIoSignals["in_rho"].push_back(m_mSignalStorage["rho"].getInt());
+        m_mSavedIoSignals["in_charge"].push_back(m_mSignalStorage["charge"].getInt());
+        for(unsigned iSt=0; iSt<4; iSt++) m_mSavedIoSignals["out_wireDPhiAx_"+to_string(iSt)].push_back(m_mSignalStorage["wireDPhiAx_"+to_string(iSt)].getInt());
+      }
+
+    }
+  }
+
+  if(m_verboseFlag) cout<<"####geoFinder end####"<<endl;
 
 }
 

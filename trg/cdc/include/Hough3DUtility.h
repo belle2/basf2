@@ -3,6 +3,11 @@
 #include <TVectorD.h>
 #define HOUGH3DUTILITY_H
 
+namespace Belle2 {
+  class TRGCDCJSignal;
+  class TRGCDCJLUT;
+  class TRGCDCJSignalData;
+}
 
 /// A class to finded stereo TS hits related to 2D tracks.
 class Hough3DFinder {
@@ -24,7 +29,7 @@ class Hough3DFinder {
     /// Track variables. [charge, rho, phi0]
     /// Stereo TS candidates[layer][TS ID]
     /// Uses the 3D finder.
-    void runFinder(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs);
+    void runFinder(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs, std::vector<std::vector<int> > &stTSDrift);
     /// Init variables. [cotStart, cotEnd, z0Start, z0Ent, nCotSteps, nZ0Steps]
     /// Initializes the 3D finder for mode 1.
     void initVersion1(std::vector<float > & initVariables);
@@ -43,9 +48,9 @@ class Hough3DFinder {
     /// Uses the 3D finder for mode 1.
     void runFinderVersion1(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs, std::vector<double> &tsArcS, std::vector<std::vector<double> > &tsZ);
     /// Uses the 3D finder for mode 2.
-    void runFinderVersion2(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs);
+    void runFinderVersion2(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs, std::vector<std::vector<int> > &stTSDrift);
     /// Uses the 3D finder for mode 3.
-    void runFinderVersion3(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs);
+    void runFinderVersion3(std::vector<double> &trackVariables, std::vector<std::vector<double> > &stTSs, std::vector<std::vector<int> > &stTSDrift);
     /// Gets results from the 3D finder.
     void getValues(const std::string& input, std::vector<double> &result);
     /// Gets the Hough plane for the 3D finder.
@@ -90,6 +95,8 @@ class Hough3DFinder {
     float **m_houghMeshDiff;
     /// Hit map for all streo superlayers.
     bool ** m_hitMap;
+    /// Drift map for all streo superlayers.
+    int ** m_driftMap;
     /// GeoFinder Variables.
     /// The index for stereo superlayer hits.
     std::vector< std::vector< int> > *m_geoCandidatesIndex;
@@ -177,6 +184,24 @@ class Hough3DFinder {
     int** m_arcCosLUT;
     /// Memory for wire convert LUT.
     int** m_wireConvertLUT;
+
+    /// Map to hold JSignals.
+    std::map<std::string, Belle2::TRGCDCJSignal> m_mSignalStorage;
+    /// Map to hold JLuts.
+    std::map<std::string, Belle2::TRGCDCJLUT*> m_mLutStorage;
+    /// For VHDL code.
+    Belle2::TRGCDCJSignalData* m_commonData;
+    /// Array of saved signals.
+    std::map<std::string, std::vector<signed long long> > m_mSavedSignals;
+    /// Array of I/O signals.
+    std::map<std::string, std::vector<signed long long> > m_mSavedIoSignals;
+    /// Map to hold input options.
+    std::map<std::string, bool> m_mBool;
+    /// Output directory for vhdl
+    std::string m_outputVhdlDirname;
+    /// Output directory for luts
+    std::string m_outputLutDirname;
+
 
 };
 

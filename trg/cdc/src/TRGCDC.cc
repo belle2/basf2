@@ -1090,8 +1090,10 @@ namespace Belle2 {
           rise.clock(_clockTDC);
         TRGTime fall = rise;
         fall.shift(1).reverse();
-        w._signal |= (TRGSignal(rise & fall) & _firmwareSimulationWindow);
-//      w._signal |=  TRGSignal(rise & fall);
+        if (_simulationMode & 1)
+            w._signal |=  TRGSignal(rise & fall);
+        else
+            w._signal |= (TRGSignal(rise & fall) & _firmwareSimulationWindow);
         w._signal.name(w.name());
 
         //...Left/right...

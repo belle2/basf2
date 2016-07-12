@@ -6,16 +6,24 @@ This module contains several functions that help the setting up of the
 analysis of the '16 DESY testbeam data, making use of the file
 testbeam/vxd/data/elog_tbdesy_apr2016.csv (rev 28640).
 
-More specifically, when providing a filename for a root file it gets:
+More specifically, when providing a filename for a root file it gets for you:
 - beam's energy
 - is magnet ON or OFF ?
 - telescope run number
 - telescope data filename
 - elog xml filename
+- masking file with noisy strips for the run
+
+This module also:
 - prints info about quality of run
 
-Giacomo Caria, 31/05/16
+
+Giacomo Caria, g.caria@student.unimelb.edu.au
 '''
+
+################################################################################
+# Imports
+################################################################################
 
 import os
 import sys
@@ -27,6 +35,8 @@ import re
 from os import listdir
 from os.path import isfile, join
 import codecs
+
+# #############  Helper tools to use this module's functions  #################
 
 
 def get_file_header(csvFilename):
@@ -54,24 +64,8 @@ def runNo_from_filename(s):
         return ""
 
 
-def get_elog_filename(csvFilename, runFilename, xmlpath):
-
-    line = find_runNo_line(csvFilename, runFilename)
-
-    with open(csvFilename, 'rt') as q:
-        reader = csv.reader(q, delimiter=',')
-
-        for i, row in enumerate(reader):
-            if i == line:
-
-                elogFilename = row[21]
-
-    print('xml elog file fount at: ' + xmlpath + elogFilename)
-    return xmlpath + elogFilename
-
-
 def find_runNo_line(csvFilename, runFilename):
-
+    """Find the line of the csv file that contains all info about this run"""
     runNo = runNo_from_filename(runFilename)
 
     with open(csvFilename, 'rt') as q:
@@ -83,12 +77,7 @@ def find_runNo_line(csvFilename, runFilename):
                 return i
 
 
-def find_telFilename(telFilename, path):
-
-    for root, dirs, files in os.walk(path):
-        if telFilename in files:
-            return os.path.join(root, telFilename)
-
+# #########################  Run info  #########################
 
 def print_run_info(csvFilename, runFilename):
 
@@ -116,28 +105,10 @@ def print_run_info(csvFilename, runFilename):
                 if run_quality[2] == 'Bad':
                     print(' WARNING: Bad quality for Tel run')
 
-                print('Run quality: PXD :' + run_quality[0] + ', SVD :' + run_quality[1] + ', Tel :' + run_quality[2])
+                print('Run quality: PXD: ' + run_quality[0] + ', SVD: ' + run_quality[1] + ', Tel: ' + run_quality[2])
 
 
-def get_telescope_run(csvFilename, runFilename, path):
-
-    line = find_runNo_line(csvFilename, runFilename)
-
-    with open(csvFilename, 'rt') as q:
-        reader = csv.reader(q, delimiter=',')
-
-        for i, row in enumerate(reader):
-            if i == line:
-
-                telRunNo = row[5]
-                # remove decimal part from telRunNo
-                if telRunNo.endswith('.0'):
-                    telRunNo = telRunNo[:-2]
-                    telFileName = 'run000' + telRunNo + '.raw'
-                print('tel runNo is: ' + telRunNo)
-                print('telFile fount at: ' + find_telFilename(telFileName, path))
-                return telFileName
-
+# #########################  Momentum info  #########################
 
 def get_momentum(csvFilename, runFilename):
 
@@ -149,9 +120,11 @@ def get_momentum(csvFilename, runFilename):
         for i, row in enumerate(reader):
             if i == line:
                 energy = row[10]
-                print('Beam energy is: ' + energy + ' GeV')
+                print('Beam energy is: ' + energy + ' GeV.')
                 return energy
 
+
+# #########################  Magnet info  #########################
 
 def is_magnet_on(csvFilename, runFilename):
 
@@ -169,5 +142,78 @@ def is_magnet_on(csvFilename, runFilename):
                     magnetBool = True
                 elif magnetOn == 'OFF':
                     magnetBool = False
-                print('magnet is On: ' + str(magnetBool))
+                print('Magnet is On: ' + str(magnetBool))
                 return magnetBool
+
+# #########################  Elog xml file #########################
+
+
+def get_elog_filename(csvFilename, runFilename, xmlPath):
+
+    line = find_runNo_line(csvFilename, runFilename)
+
+    with open(csvFilename, 'rt') as q:
+        reader = csv.reader(q, delimiter=',')
+
+        for i, row in enumerate(reader):
+            if i == line:
+                elogFilename = row[21]
+
+    for root, dirs, files in os.walk(xmlPath):
+        if elogFilename in files:
+            print('xmlFile fount at: ' + xmlPath + elogFilename)
+            return os.path.join(root, elogFilename)
+        else:
+            print("Couldn't find " + elogFilename + " in " + xmlPath)
+            return
+
+
+# #########################  Noisy strips file #########################
+
+def get_mask_filename(runFilename, maskPath, det="SVD"):
+
+    runNo = runNo_from_filename(runFilename)
+    maskFilename = det + "_MaskFired_Run" + runNo + ".xml"
+
+    for root, dirs, files in os.walk(maskPath):
+        if maskFilename in files:
+            print('maskFile fount at: ' + maskPath + maskFilename)
+            return os.path.join(root, maskFilename)
+        else:
+            print("Couldn't find " + maskFilename + " in " + maskPath)
+            return
+
+
+# #########################  Telescope file #########################
+
+def get_telRunNo(csvFilename, runFilename):
+
+    line = find_runNo_line(csvFilename, runFilename)
+
+    with open(csvFilename, 'rt') as q:
+        reader = csv.reader(q, delimiter=',')
+
+        for i, row in enumerate(reader):
+            if i == line:
+
+                telRunNo = row[5]
+                if telRunNo.endswith('.0'):
+                    telRunNo = telRunNo[:-2]
+                print('telRunNo is: ' + telRunNo)
+                return telRunNo
+
+
+def get_tel_filename(csvFilename, runFilename, telPath):
+
+    telRunNo = get_telRunNo(csvFilename, runFilename)
+
+    # remove decimal part from telRunNo
+    telFilename = 'run000' + telRunNo + '.raw'
+
+    for root, dirs, files in os.walk(telPath):
+        if telFilename in files:
+            print('telFile fount at: ' + telPath + telFilename)
+            return os.path.join(root, telFilename)
+        else:
+            print("Couldn't find " + telFilename + " in " + telPath)
+            return

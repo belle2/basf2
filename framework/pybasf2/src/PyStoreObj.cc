@@ -134,3 +134,8 @@ void PyStoreObj::attach() const
 {
   m_storeEntry = DataStore::Instance().getEntry(m_storeAccessor);
 }
+
+bool PyStoreObj::assign(TObject* object, bool replace)
+{
+  return m_storeAccessor.assign(object, replace);
+}

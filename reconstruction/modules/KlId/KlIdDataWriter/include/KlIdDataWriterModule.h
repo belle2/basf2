@@ -95,6 +95,14 @@ namespace Belle2 {
     /** angular distance from track separation object */
     Float_t m_KLMTrackSepAngle;
 
+    /** angular distance from track to cluster at track starting point */
+    Float_t m_KLMInitialTrackSepAngle;
+    /** angle between track at poca and trackbeginning */
+    Float_t m_KLMTrackRotationAngle;
+    /** angle between trach momentum and cluster (measured from ip) */
+    Float_t m_KLMTrackClusterSepAngle;
+
+
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */
@@ -142,6 +150,8 @@ namespace Belle2 {
     /** classifier output from bkg classification of ECL cluster */
     Float_t m_ECLBKGProb;
 
+    /** is MCparticle a nullptr?  */
+    Float_t m_isBeamBKG;
 
     /** default classifier name */
     std::string m_BKGClassifierName = "KLMBKGClassifierBDT_mod";
@@ -157,7 +167,7 @@ namespace Belle2 {
 
     /** path to training .xml file. */
     std::string m_BKGClassifierPath = FileSystem::findFile(
-                                        "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT_mod.weights.xml");
+                                        "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT.weights.xml");
 
     /** path to training .xml file. */
     std::string m_ECLClassifierPath = FileSystem::findFile(

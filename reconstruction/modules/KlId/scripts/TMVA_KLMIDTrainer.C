@@ -32,29 +32,37 @@ void TMVA_KLMIDTrainer(){
 	// OUTPUT ROOT FILE
 	// 
 
-	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBDT_mod.root" );
+ //TODO execute in reconstruction/data
+ //
+ //
+	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBDT.root" );
 	TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
 
 	TMVA::Factory *factory = new TMVA::Factory( "TMVAFactory", outputFile,
                                             "!V:!Silent:Color:DrawProgressBar:Transformations=:AnalysisType=Classification" );
 
-  factory -> AddVariable("KLMnCluster"        , "KLMnCluster"        , "F");
-  factory -> AddVariable("KLMnLayer"          , "KLMnLayer"          , "F");
-  factory -> AddVariable("KLMnInnermostlayer" , "KLMnInnermostlayer" , "F");
-  factory -> AddVariable("KLMglobalZ"         , "KLMglobalZ"         , "F");
-  factory -> AddVariable("KLMtime"            , "KLMtime"            , "F");
-  factory -> AddVariable("KLMinvM"            , "KLMinvM"            , "F");
-  factory -> AddVariable("KLMtrackDist"       , "KLMtrackDist"       , "F");
-  factory -> AddVariable("KLMdistToNextCl"    , "KLMdistToNextCl"    , "F");
+  factory -> AddVariable("KLMnCluster"        ,          "KLMnCluster"        ,          "F");
+  factory -> AddVariable("KLMnLayer"          ,          "KLMnLayer"          ,          "F");
+  factory -> AddVariable("KLMnInnermostlayer" ,          "KLMnInnermostlayer" ,          "F");
+  factory -> AddVariable("KLMglobalZ"         ,          "KLMglobalZ"         ,          "F");
+  factory -> AddVariable("KLMtime"            ,          "KLMtime"            ,          "F");
+  factory -> AddVariable("KLMinvM"            ,          "KLMinvM"            ,          "F");
+  factory -> AddVariable("KLMtrackDist"       ,          "KLMtrackDist"       ,          "F");
+  factory -> AddVariable("KLMdistToNextCl"    ,          "KLMdistToNextCl"    ,          "F");
 
-  factory -> AddVariable("KLMaverageInterClusterDist" , "KLMaverageInterClusterDist" , "F");
-  factory -> AddVariable("KLMhitDepth"                , "KLMhitDepth"                , "F");
-  factory   -> AddVariable("KLMBKGProb",      "KLMBKGProb" , "F");
-  factory   -> AddVariable("KLMECLBKGProb",   "KLMECLBKGProb", "F");
- 
-  factory -> AddVariable("KLMTrackSepDist"            , "KLMTrackSepDist"            , "F");
-  factory -> AddVariable("KLMTrackSepAngle"           , "KLMTrackSepAngle"           , "F");
+  factory -> AddVariable("KLMaverageInterClusterDist" ,  "KLMaverageInterClusterDist" ,  "F");
+  factory -> AddVariable("KLMhitDepth"                ,  "KLMhitDepth"                ,  "F");
+  factory -> AddVariable("KLMBKGProb",                   "KLMBKGProb" ,                  "F");
+  factory -> AddVariable("KLMECLBKGProb",                "KLMECLBKGProb",                "F");
+
+  factory -> AddVariable("KLMTrackSepDist"            ,  "KLMTrackSepDist"            ,  "F");
+  factory -> AddVariable("KLMTrackSepAngle"           ,  "KLMTrackSepAngle"           ,  "F");
+
+  factory -> AddVariable("KLMInitialtrackSepAngle",      "KLMInitialtrackSepAngle",      "F");
+  factory -> AddVariable("KLMTrackRotationAngle",        "KLMTrackRotationAngle",        "F");
+  factory -> AddVariable("KLMTrackClusterSepAngle",      "KLMTrackClusterSepAngle",      "F");
+
 
 
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
@@ -82,7 +90,7 @@ void TMVA_KLMIDTrainer(){
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>YOUR PATH HERE
 	//
 	//TODO your path here
-	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/leos_id/*.root");
+	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/more_new_vars_id/*.root");
 //----------------------------------------------------------------------------------------------
 
 
@@ -100,7 +108,7 @@ void TMVA_KLMIDTrainer(){
 
 
 	factory->BookMethod(TMVA::Types::kBDT, 
-				                "KLMBDT_mod",
+				                "KLMBDT",
                      "NTrees=1000:Shrinkage=0.1!H:!V:IgnoreNegWeightsInTraining:MaxDepth=3:nCuts=256");
 
 

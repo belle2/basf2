@@ -1,4 +1,3 @@
-
 /***************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
@@ -60,9 +59,32 @@ namespace Belle2 {
     /** klong id*/
     Float_t m_KlId;
     /** klong id*/
+    Float_t m_KlIdECL;
+    /** klong id*/
+    Float_t m_KlIdKLM;
+    /** klong id*/
     Float_t m_BKGId;
     /** pdg code */
     Float_t m_PDG;
+
+    /** phi */
+    Float_t m_Phi;
+    /** theta */
+    Float_t m_Theta;
+
+    /** z coordinate*/
+    Float_t m_Z;
+    /** is this a fake klong*/
+    Float_t m_faked;
+    /** reconstructed as klong */
+    Float_t m_reconstructed;
+    /** reconstructed as klong */
+    Float_t m_momentum;
+    /** n KLM cluster in event*/
+    Float_t m_nKLMCluster;
+    /** n ECL CLuster in event*/
+    Float_t m_nECLCluster;
+
 
     /** Out put path, has to be specified by the user.*/
     std::string m_outPath = "ROCData.root";
@@ -72,6 +94,8 @@ namespace Belle2 {
     TTree* m_treeKLM = nullptr;
     /** tree for ecl data */
     TTree* m_treeECL = nullptr;
+    /** tree for ecl data */
+    TTree* m_treeComb = nullptr;
 
 
   }; // end class

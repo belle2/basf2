@@ -84,6 +84,14 @@ namespace Belle2 {
     /** angular distance from track separation object */
     double m_KLMTrackSepAngle;
 
+    /** angular distance from track to cluster at track starting point */
+    double m_KLMInitialTrackSepAngle;
+    /** angle between track at poca and trackbeginning */
+    double m_KLMTrackRotationAngle;
+    /** angle between trach momentum and cluster (measured from ip) */
+    double m_KLMTrackClusterSepAngle;
+
+
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */
@@ -124,6 +132,9 @@ namespace Belle2 {
     double m_ECLtrackDist;
     /** ECL trarget variable */
     double m_ECLTruth;
+
+    /** used in both trees */
+    double m_isBeamBKG;
 
     /** root file */
     TFile* m_f = nullptr; //

@@ -84,6 +84,14 @@ namespace Belle2 {
      * angle between normal vector of track momentum and cluster position. */
     Float_t m_KLMTrackSepAngle;
 
+    /** angular distance from track to cluster at track starting point */
+    Float_t m_KLMInitialTrackSepAngle;
+    /** angle between track at poca and trackbeginning */
+    Float_t m_KLMTrackRotationAngle;
+    /** angle between trach momentum and cluster (measured from ip) */
+    Float_t m_KLMTrackClusterSepAngle;
+
+
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster, extrapolated by genfit */

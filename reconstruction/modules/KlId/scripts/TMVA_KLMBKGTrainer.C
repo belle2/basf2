@@ -31,8 +31,10 @@ void TMVA_KLMBKGTrainer(){
 	//  -------------------------------------------------------------------------------------
 	// OUTPUT ROOT FILE
 	// 
+ //TODO execute in reconstruction/data
 
-	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBKGClassifierBDT_mod.root" );
+
+	TString outfileName(std::string(std::getenv("BELLE2_LOCAL_DIR"))+"/reconstruction/data/KLMBKGClassifierBDT_single.root" );
 	TFile* outputFile = TFile::Open( outfileName, "RECREATE" );
 
 
@@ -48,12 +50,16 @@ void TMVA_KLMBKGTrainer(){
   factory -> AddVariable("KLMtrackDist"       , "KLMtrackDist"       , "F");
   factory -> AddVariable("KLMdistToNextCl"    , "KLMdistToNextCl"    , "F");
 
-//  factory->AddVariable("KLMenergy",                     &m_KLMenergy);
 
   factory -> AddVariable("KLMaverageInterClusterDist" , "KLMaverageInterClusterDist" , "F");
   factory -> AddVariable("KLMhitDepth"                , "KLMhitDepth"                , "F");
   factory -> AddVariable("KLMTrackSepDist"            , "KLMTrackSepDist"            , "F");
   factory -> AddVariable("KLMTrackSepAngle"           , "KLMTrackSepAngle"           , "F");
+
+  factory   -> AddVariable("KLMInitialtrackSepAngle","KLMInitialtrackSepAngle", "F");
+  factory   -> AddVariable("KLMTrackRotationAngle",   "KLMTrackRotationAngle",   "F");
+  factory   -> AddVariable("KLMTrackClusterSepAngle","KLMTrackClusterSepAngle", "F");
+
 
 
 
@@ -83,7 +89,7 @@ void TMVA_KLMBKGTrainer(){
 	//
 	//>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>  your path here
 	//TODO path to your tuples here
-	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/leo_bkg/*.root");
+	chain->Add("/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/more_new_vars_bkg/*.root");
 //----------------------------------------------------------------------------------------------
 
 
@@ -92,8 +98,11 @@ void TMVA_KLMBKGTrainer(){
 
 
 	// Apply additional cuts on the signal and background samples (can be different)
-	TCut mycutb = "KLMTruth > -2"; // for example: TCut mycuts = "abs(var1)<0.5 && abs(var2-0.5)<1";
-	TCut mycuts = "KLMTruth < -1"; // ugly but -2 is atm the value for beambkg //TODO change to nicer output
+	TCut mycutb = "KLMTruth < 1";
+	TCut mycuts = "KLMTruth > 0";
+//	TCut mycutb = "isBeamBKG < 1";
+//	TCut mycuts = "isBeamBKG > 0";
+
 
 
 	factory->PrepareTrainingAndTestTree( mycuts, mycutb,
@@ -101,7 +110,7 @@ void TMVA_KLMBKGTrainer(){
 
 
 	factory->BookMethod(TMVA::Types::kBDT, 
-				                "KLMBKGClassifierBDT_mod",
+				                "KLMBKGClassifierBDT_single",
                      "NTrees=1000:Shrinkage=0.1!H:!V:IgnoreNegWeightsInTraining:MaxDepth=3:nCuts=256");
 
 

@@ -15,15 +15,16 @@
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <genfit/Track.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
-
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
 #include <cstring>
 
 #include <TMVA/Reader.h>
 
+#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
 
+using namespace KlIdHelpers;
 using namespace Belle2;
 using namespace std;
 
@@ -90,7 +91,7 @@ void KlIdKLMTMVAExpertModule::initialize()
 {
   // require existence of necessary datastore obj
   StoreArray<KLMCluster>::required();
-  StoreArray<genfit::Track>::required();
+  StoreArray<RecoTrack>::required();
   StoreArray<ECLCluster>::required();
 
   StoreArray<ECLCluster> eclClusters;
@@ -118,6 +119,11 @@ void KlIdKLMTMVAExpertModule::initialize()
   m_readerBKG -> AddVariable("KLMTrackSepDist",          & m_KLMTrackSepDist);
   m_readerBKG -> AddVariable("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
 
+  m_readerBKG -> AddVariable("KLMInitialtrackSepAngle",  &m_KLMInitialTrackSepAngle);
+  m_readerBKG -> AddVariable("KLMTrackRotationAngle",    &m_KLMTrackRotationAngle);
+  m_readerBKG -> AddVariable("KLMTrackClusterSepAngle",  &m_KLMTrackClusterSepAngle);
+
+
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
   m_readerBKG -> AddVariable("KLMdistToNextECL",              &m_KLMECLDist);
   m_readerBKG -> AddVariable("KLMECLenergy",                  &m_KLMECLE);
@@ -144,6 +150,10 @@ void KlIdKLMTMVAExpertModule::initialize()
   m_readerID -> AddVariable("KLMECLBKGProb"                 , &m_KLMECLBKGProb);
   m_readerID -> AddVariable("KLMTrackSepDist",          & m_KLMTrackSepDist);
   m_readerID -> AddVariable("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
+
+  m_readerID -> AddVariable("KLMInitialtrackSepAngle",  &m_KLMInitialTrackSepAngle);
+  m_readerID -> AddVariable("KLMTrackRotationAngle",    &m_KLMTrackRotationAngle);
+  m_readerID -> AddVariable("KLMTrackClusterSepAngle",  &m_KLMTrackClusterSepAngle);
 
 
   // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
@@ -192,7 +202,7 @@ void KlIdKLMTMVAExpertModule::event()
   */
 
   StoreArray<KLMCluster> klmClusters;
-  StoreArray<genfit::Track> genfitTracks;
+  StoreArray<RecoTrack> genfitTracks;
   StoreArray<ECLCluster> eclClusters;
   StoreArray<KlId> KlIds;
 
@@ -203,10 +213,10 @@ void KlIdKLMTMVAExpertModule::event()
   // loop thru clusters in event and classify
   for (KLMCluster& cluster : klmClusters) {
 
-    const TVector3& cluster_pos = cluster.getClusterPosition();
+    const TVector3& clusterPos = cluster.getClusterPosition();
 
     // get various KLMCluster vars
-    m_KLMglobalZ         = cluster_pos.Z();
+    m_KLMglobalZ         = clusterPos.Z();
     m_KLMnCluster        = klmClusters.getEntries();
     m_KLMnLayer          = cluster.getLayers();
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
@@ -215,20 +225,10 @@ void KlIdKLMTMVAExpertModule::event()
     m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
 
     // find nearest ecl cluster and calculate distance
-    m_KLMECLDist =  9999999;
-    double closest_ecl_angle_dist = 99999999;
-    ECLCluster* closestECLCluster = nullptr;
-    for (ECLCluster& eclcluster : eclClusters) {
+    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+    ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
+    m_KLMECLDist = get<1>(closestECLAndDist);
 
-      const TVector3& eclcluster_pos = eclcluster.getclusterPosition();
-      closest_ecl_angle_dist         = eclcluster_pos.Angle(cluster_pos);
-
-      if (closest_ecl_angle_dist < m_KLMECLDist) {
-        m_KLMECLDist = closest_ecl_angle_dist;
-        //turn ref to pointer so you can check for null
-        closestECLCluster = &eclcluster;
-      }
-    }
 
     if (!(closestECLCluster == nullptr)) {
       m_KLMECLE      = closestECLCluster -> getEnergy();
@@ -239,7 +239,6 @@ void KlIdKLMTMVAExpertModule::event()
       m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();
       m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
 
-
       // m_KLMECLBKGProb = closestECLCluster->getBKGProb();
       // >> calculate BKG Classifier output for ECL <<
       m_KLMECLBKGProb = m_readerECLBKG -> EvaluateMVA(m_ECLClassifierName);
@@ -248,7 +247,6 @@ void KlIdKLMTMVAExpertModule::event()
       if (m_KLMECLBKGProb > -1.) {
         m_KLMECLBKGProb = (m_KLMECLBKGProb + 1) / 2.0;
       } else {m_KLMECLBKGProb = 0;}
-
 
       // the matched ecl cluster gets this relation to avoid double counting
       cluster.addRelationTo(closestECLCluster);
@@ -265,73 +263,33 @@ void KlIdKLMTMVAExpertModule::event()
     }
 
     // calculate distance to next cluster
-    m_KLMavInterClusterDist = 0;
-    m_KLMnextCluster        = 999999;
-    float new_next_cl_dist  = 999999;
-    for (const KLMCluster& next_cluster : klmClusters) {
+    tuple<const KLMCluster*, double, double> closestKLMAndDist = findClosestKLMCluster(clusterPos);
+    m_KLMnextCluster = get<1>(closestKLMAndDist);
+    m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
-      const TVector3& next_cluster_pos   = next_cluster.getClusterPosition();
-      const TVector3& clust_distance_vec = next_cluster_pos - cluster_pos;
-      new_next_cl_dist                   = clust_distance_vec.Mag2();
-      m_KLMavInterClusterDist            = m_KLMavInterClusterDist + new_next_cl_dist;
 
-      if ((new_next_cl_dist < m_KLMnextCluster) and not(new_next_cl_dist == 0)) {
-        m_KLMnextCluster = new_next_cl_dist ;
-      }
-    }// for next_cluster
+    // calculate eucl. distance klmcluster <-> nearest track
+    // extrapolate genfit trackfit result to their ends and find the
+    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
+      = findClosestTrack(clusterPos);
+    m_KLMtrackDist = get<1>(closestTrackAndDistance);
+    const TVector3* poca = get<2>(closestTrackAndDistance);
 
-    if (m_KLMnCluster) {
-      m_KLMavInterClusterDist = m_KLMavInterClusterDist / (1. * m_KLMnCluster);
+    if (poca and closestECLCluster) {
+      const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
+      m_KLMtrackToECL = trackECLClusterDist.Mag2();
     } else {
-      m_KLMavInterClusterDist = 0;
+      m_KLMtrackToECL = -999;
     }
 
 
-    // calculate distance cluster <-> nearest track
-    // extrapolate genfit trackfit result to their ends and find the
-    // closest one
-    m_KLMtrackDist       = 999999;
-    m_KLMtrackToECL      = 999999;
-    int       num_points = 0;
-    int id_of_last_point = 0;
-    for (const genfit::Track& track : genfitTracks) {
-
-      num_points       = track.getNumPoints();
-      id_of_last_point = num_points - 1;
-
-      // genfit throws an exception if track fit fails ...
-      try {
-
-        genfit::MeasuredStateOnPlane state;
-        state = track.getFittedState(id_of_last_point);
-        // copy: first state on plane is a const ...
-
-        state.extrapolateToPoint(cluster_pos);
-        const TVector3& track_pos_klm    = state.getPos();
-
-        const TVector3& distance_vec_klm = cluster_pos - track_pos_klm;
-        double new_dist_klm              = distance_vec_klm.Mag2();
-
-        // overwrite old distance
-        if (new_dist_klm < m_KLMtrackDist) {
-          m_KLMtrackDist = new_dist_klm;
-          // now calculate distance to the ecl cluster we associated by ecl. measure
-          state.extrapolateToPoint(closestECLCluster->getclusterPosition());
-          const TVector3& track_pos_ecl    = state.getPos();
-          const TVector3& distance_vec_ecl =
-            (closestECLCluster->getclusterPosition()) - track_pos_ecl;
-          m_KLMtrackToECL = distance_vec_ecl.Mag2();
-        }
-
-      } catch (genfit::Exception& e) {
-      }// try
-    }// for gftrack
-    //TODO check for null?
     TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
-    m_KLMTrackSepDist = trackSep->getDistance();
-    m_KLMTrackSepAngle = trackSep->getTrackClusterAngle();
+    m_KLMTrackSepDist         = trackSep->getDistance();
+    m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
 
-
+    m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
+    m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
+    m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
     // >> calculate BKG Classifier output for KLM <<
@@ -369,12 +327,6 @@ void KlIdKLMTMVAExpertModule::terminate()
   delete m_readerBKG;
   delete m_readerECLBKG;
 }
-
-
-
-
-
-
 
 
 

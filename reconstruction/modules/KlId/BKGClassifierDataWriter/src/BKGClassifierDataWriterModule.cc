@@ -17,16 +17,24 @@
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-#include <genfit/Track.h>
 #include <tracking/dataobjects/TrackClusterSeparation.h>
+#include <tracking/dataobjects/RecoTrack.h>
 
 #include <TTree.h>
 #include <TFile.h>
 #include <genfit/Exception.h>
 #include <cstring>
+#include <utility>
+
+#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
 
 using namespace Belle2;
 using namespace std;
+using namespace KlIdHelpers;
+
+
+// --------------------------------------Module----------------------------------------------
+
 
 REG_MODULE(BKGClassifierDataWriter);
 
@@ -44,13 +52,12 @@ BKGClassifierDataWriterModule::~BKGClassifierDataWriterModule()
 }
 
 
-// --------------------------------------Module----------------------------------------------
 void BKGClassifierDataWriterModule::initialize()
 {
   // require existence of necessary datastore obj
   StoreArray<KLMCluster>::required();
   StoreArray<MCParticle>::required();
-  StoreArray<genfit::Track>::required();
+  StoreArray<RecoTrack>::required();
   StoreArray<ECLCluster>::required();
 
   StoreArray<ECLCluster> eclClusters;
@@ -93,6 +100,12 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeKLM   -> Branch("KLMTrackSepDist",          & m_KLMTrackSepDist);
   m_treeKLM   -> Branch("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
 
+  m_treeKLM   -> Branch("KLMInitialtrackSepAngle",  & m_KLMInitialTrackSepAngle);
+  m_treeKLM   -> Branch("KLMTrackRotationAngle",    & m_KLMTrackRotationAngle);
+  m_treeKLM   -> Branch("KLMTrackClusterSepAngle",  & m_KLMTrackClusterSepAngle);
+  m_treeKLM   -> Branch("isBeamBKG",  & m_isBeamBKG);
+
+
   //ECL
   m_treeECL   -> Branch("ECLenergy",                & m_ECLE);
   m_treeECL   -> Branch("ECLE9oE25",                & m_ECLE9oE25);
@@ -105,7 +118,7 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
 
-
+  m_treeECL   -> Branch("isBeamBKG",  & m_isBeamBKG);
 
 }//init
 
@@ -123,7 +136,7 @@ void BKGClassifierDataWriterModule::event()
   // objects needed
   StoreArray<MCParticle> mcParticles;
   StoreArray<KLMCluster> klmClusters;
-  StoreArray<genfit::Track> genfitTracks;
+  StoreArray<RecoTrack> genfitTracks;
   StoreArray<ECLCluster> eclClusters;
   klmClusters.requireRelationTo(mcParticles);
 
@@ -132,10 +145,10 @@ void BKGClassifierDataWriterModule::event()
   for (const KLMCluster& cluster : klmClusters) {
 
     // needed later
-    const TVector3& cluster_pos = cluster.getClusterPosition();
+    const TVector3& clusterPos = cluster.getClusterPosition();
 
     // get various KLMCluster vars
-    m_KLMglobalZ = cluster_pos.Z();
+    m_KLMglobalZ = clusterPos.Z();
     m_KLMnCluster = klmClusters.getEntries();
     m_KLMnLayer = cluster.getLayers();
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
@@ -143,31 +156,24 @@ void BKGClassifierDataWriterModule::event()
     m_KLMinvM = cluster.getMomentum().M2();
     m_KLMenergy = cluster.getMomentum().E();
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
+
     TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
     m_KLMTrackSepDist = trackSep->getDistance();
     m_KLMTrackSepAngle = trackSep->getTrackClusterAngle();
 
+    m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
+    m_KLMTrackRotationAngle = trackSep->getTrackRotationAngle();
+    m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
+
 
     // find nearest ecl cluster and calculate angular distance
-    m_KLMECLDist =  9999999;
-    double closest_ecl_angle_dist = 99999999;
-    ECLCluster* closestECLCluster = nullptr;
-    for (ECLCluster& eclcluster : eclClusters) {
+    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+    ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
+    m_KLMECLDist = get<1>(closestECLAndDist);
 
-      const TVector3& eclcluster_pos = eclcluster.getclusterPosition();
-
-      //find nearest cluster by angle measure
-      closest_ecl_angle_dist = eclcluster_pos.Angle(cluster_pos);
-      if (closest_ecl_angle_dist < m_KLMECLDist) {
-        m_KLMECLDist = closest_ecl_angle_dist;
-        //turn ref to pointer so you can check for null
-        closestECLCluster = &eclcluster;
-      }
-    }
     // get vars from nearest ECL CLuster
     //TODO introduce cutoff to what is "nearest"
     if (!(closestECLCluster == nullptr)) {
-
       m_KLMECLE      = closestECLCluster->getEnergy();
       m_KLMECLE9oE25 = closestECLCluster->getE9oE25();
       m_KLMECLEerror = closestECLCluster->getErrorEnergy();
@@ -176,16 +182,13 @@ void BKGClassifierDataWriterModule::event()
       // names might change
       m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();;
       m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
-
       m_KLMECLTiming = closestECLCluster->getTiming();
       // needed to add those ecl clusters to KLM particles that have a high
       // kl probability and no relation
       cluster.addRelationTo(closestECLCluster);
     } else {
-
       m_KLMECLdeltaL = -999;
       m_KLMECLminTrackDist = -999;
-
       m_KLMECLE      = -999;
       m_KLMECLE9oE25 = -999;
       m_KLMECLTiming = -999;
@@ -194,91 +197,29 @@ void BKGClassifierDataWriterModule::event()
     }
 
     // calculate distance to next cluster and average inter cluster distance
-    m_KLMavInterClusterDist = 0;
-    m_KLMnextCluster = 999999;
-    float new_next_cl_dist = 999999;
-    for (const KLMCluster& next_cluster : klmClusters) {
-
-      const TVector3& next_cluster_pos = next_cluster.getClusterPosition();
-      const TVector3& clust_distance_vec = next_cluster_pos - cluster_pos;
-
-      new_next_cl_dist = clust_distance_vec.Mag2();
-      m_KLMavInterClusterDist = m_KLMavInterClusterDist + new_next_cl_dist;
-      if ((new_next_cl_dist < m_KLMnextCluster) and not(new_next_cl_dist == 0)) {
-        m_KLMnextCluster = new_next_cl_dist ;
-      }
-    }// for next_cluster
-    if (m_KLMnCluster) {
-      m_KLMavInterClusterDist = m_KLMavInterClusterDist / (1. * m_KLMnCluster);
-    } else {
-      m_KLMavInterClusterDist = 0;
-    }
-
+    tuple<const KLMCluster*, double, double> closestKLMAndDist = findClosestKLMCluster(clusterPos);
+    m_KLMnextCluster = get<1>(closestKLMAndDist);
+    m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
     // find mc truth
     // go thru all particles mothers up to Y4s and check if its a Klong
-    m_KLMTruth = 0;
-    MCParticle* particle = cluster.getRelatedTo<MCParticle>();
-    if (particle == nullptr) {
-      m_KLMTruth = -2; // this is the case for beambkg
-    } else {
-      while (!(particle -> getMother() == nullptr)) {
-        if (particle -> getPDG() == 130) {
-          m_KLMTruth = 1;
-          break;
-        }
-        particle = particle -> getMother();
-      }// while
-    }
+    MCParticle* part = cluster.getRelatedTo<MCParticle>();
+    m_KLMTruth = mcParticleIsKlong(part);
+    m_isBeamBKG = mcParticleIsBeamBKG(part);
 
     // calculate eucl. distance klmcluster <-> nearest track
     // extrapolate genfit trackfit result to their ends and find the
-    // closest one
-    m_KLMtrackDist = 999999;
-    m_KLMtrackToECL = 999999;
-    double trackToECL = 999999; // would have to get the vector twice otherwise
-    int       num_points = 0;
-    int id_of_last_point = 0;
-    for (const genfit::Track& track : genfitTracks) {
+    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
+      = findClosestTrack(clusterPos);
+    m_KLMtrackDist = get<1>(closestTrackAndDistance);
+    const TVector3* poca = get<2>(closestTrackAndDistance);
 
-      num_points = track.getNumPoints();
-      id_of_last_point = num_points - 1;
-
-      // genfit throws an exception if track fit fails ...
-      try {
-
-        genfit::MeasuredStateOnPlane state;
-        state = track.getFittedState(id_of_last_point);
-        // copy: first state on plane is a const ...
-
-        state.extrapolateToPoint(cluster_pos);
-        const TVector3& track_pos_klm = state.getPos();
-
-        const TVector3& distance_vec_klm = cluster_pos - track_pos_klm;
-        double new_dist_klm = distance_vec_klm.Mag2();
-
-        // overwrite old distance
-        if (new_dist_klm < m_KLMtrackDist) {
-          m_KLMtrackDist = new_dist_klm;
-          // now calculate distance to the ecl cluster we associated by ecl. measure
-          state.extrapolateToPoint(closestECLCluster->getclusterPosition());
-          const TVector3& track_pos_ecl = state.getPos();
-          const TVector3& distance_vec_ecl =
-            (closestECLCluster->getclusterPosition()) - track_pos_ecl;
-
-          //inf check
-          trackToECL =  distance_vec_ecl.Mag2();
-
-          if ((trackToECL < 999999) & (trackToECL > 0)) {
-            m_KLMtrackToECL = trackToECL;
-          }
-
-        }
-
-        //count number of failed fits in event
-      } catch (genfit::Exception& e) {
-      }// try
-    }// for gftrack
+    if (poca and closestECLCluster) {
+      const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
+      m_KLMtrackToECL = trackECLClusterDist.Mag2();
+    } else {
+      m_KLMtrackToECL = -999;
+    }
 
     m_treeKLM -> Fill();
   }// for klmcluster in klmclusters
@@ -294,75 +235,33 @@ void BKGClassifierDataWriterModule::event()
     m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
     m_ECLdeltaL = cluster.getTemporaryDeltaL();
 
-
     m_ECLE = cluster.getEnergy();
     m_ECLE9oE25 = cluster.getE9oE25();
     m_ECLTiming = cluster.getTiming();
     m_ECLR = cluster.getR();
     m_ECLEerror = cluster.getErrorEnergy();
 
-    const TVector3& cluster_pos = cluster.getclusterPosition();
-
+    const TVector3& clusterPos = cluster.getclusterPosition();
 
     // find mc truth
     // go thru all particles mothers up to Y4s and check if its a Klong
-    m_ECLTruth = 0;
-    MCParticle* particle = cluster.getRelatedTo<MCParticle>();
-    if (particle == nullptr) {
-      m_ECLTruth = -2; // this is the case for beambkg
-    } else {
-      while (!(particle -> getMother() == nullptr)) {
-        if (particle -> getPDG() == 130) {
-          m_ECLTruth = 1;
-          break;
-        }
-        particle = particle -> getMother();
-      }// while
-    }
+    MCParticle* part = cluster.getRelatedTo<MCParticle>();
+    m_isBeamBKG = mcParticleIsBeamBKG(part);
+    m_ECLTruth = mcParticleIsKlong(part);
 
-    m_ECLtrackDist = 999999;
-    int       num_points = 0;
-    int id_of_last_point = 0;
-    for (const genfit::Track& track : genfitTracks) {
+    //find closest track
+    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance = findClosestTrack(clusterPos);
 
-      num_points = track.getNumPoints();
-      id_of_last_point = num_points - 1;
-
-      // genfit throws an exception if track fit fails ...
-      try {
-
-        genfit::MeasuredStateOnPlane state;
-        state = track.getFittedState(id_of_last_point);
-        // copy: first state on plane is a const ...
-
-        state.extrapolateToPoint(cluster_pos);
-        const TVector3& track_pos_ecl = state.getPos();
-
-        const TVector3& distance_vec_ecl = cluster_pos - track_pos_ecl;
-        double new_dist_ecl = distance_vec_ecl.Mag2();
-
-        // overwrite old distance
-        if (new_dist_ecl < m_ECLtrackDist) {
-          m_ECLtrackDist = new_dist_ecl;
-        }
-
-      } catch (genfit::Exception& e) {
-      }// try
-    }// for gftrack
-
+    m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
     // finally fill tree
     m_treeECL -> Fill();
-
-
   }// for ecl cluster in clusters
-
 } // event
 
 
 void BKGClassifierDataWriterModule::terminate()
 {
-
   // close root files
   m_f    -> cd();
   m_treeKLM -> Write();

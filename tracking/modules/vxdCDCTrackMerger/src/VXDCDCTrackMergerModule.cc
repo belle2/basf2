@@ -55,6 +55,9 @@ void VXDCDCTrackMergerModule::initialize()
   // register all required relations to be able to use RecoTrack
   // and its relations
   RecoTrack::registerRequiredRelations(m_mergedRecoTracks);
+
+  m_CDCRecoTracks.registerRelationTo(m_VXDRecoTracks);
+  m_VXDRecoTracks.registerRelationTo(m_CDCRecoTracks);
 }
 
 void VXDCDCTrackMergerModule::event()
@@ -182,6 +185,8 @@ void VXDCDCTrackMergerModule::event()
                                                         vxdTrack->getChargeSeed());
     mergedRecoTrack->addHitsFromRecoTrack(vxdTrack);
     mergedRecoTrack->addHitsFromRecoTrack(cdcTrack, mergedRecoTrack->getNumberOfTotalHits());
+
+    m_VXDRecoTracks[match.first]->addRelationTo(m_CDCRecoTracks[match.second]);
   }
 
   auto mergedTracksCount = m_mergedRecoTracks.getEntries();

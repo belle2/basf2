@@ -39,11 +39,13 @@ sources = dict(
 )
 
 # make sure we build in build directory, ie. define an object file for each
-# source file in the correct place
+# source file in the correct place. And since this is complicated due to
+# central local release let's just use the build dir of the first item in the
+# auto generated SRC_FILES entry as base. This should always work as long as
+# there is as least one .f file in the current directory
+build_dir = os.path.dirname(env['SRC_FILES'][0])
 for key, files in sources.items():
-    builddir = os.path.join(env['BUILDDIR'], Dir(".").path)
-    sources[key] = [env.SharedObject(target=os.path.join(builddir, os.path.splitext(f)[0]), source=f)
-                    for f in files.split()]
+    sources[key] = [os.path.join(build_dir, f) for f in files.split()]
 
 dependencies = dict(
     qcdloop1=["gfortran"],
@@ -54,11 +56,10 @@ dependencies = dict(
     eemmgmix=["pjfry", "qcdloop1"],
 )
 
-base_dir = Dir(".").path
 all_libs = []
 for libname, files in sources.items():
     lib = env.SharedLibrary("$LIBDIR/" + libname, files, LIBS=dependencies[libname],
-                            LINKFLAGS=["-Wl,--version-script=" + os.path.join(base_dir, "lib%s.vers" % libname)])
+                            LINKFLAGS=["-Wl,--version-script=" + File("lib%s.vers" % libname).abspath])
     all_libs.append(lib)
 
 # add to generators package quick build and library build target

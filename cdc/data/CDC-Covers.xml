@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Covers desc="Parameters of CDC covers">
+  <Cover id="0" desc="Backward main cover">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">466.4</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">466.4</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1130.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1130.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
+    <PosZ desc="Z position near IP" unit="mm">-999.5</PosZ>
+  </Cover>
+  <Cover id="1" desc="Backward middle cover">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">290.5</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">442.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">442.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">3.5</Thickness>
+    <PosZ desc="Z position near IP" unit="mm">-925.0</PosZ>
+  </Cover>
+  <Cover id="2" desc="Backward outer ring">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">1125.6</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">1125.6</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1130.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1130.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">249.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-735.0</PosZ>
+  </Cover>
+  <Cover id="3" desc="Backward middle ring">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">458.25</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">458.25</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">463.75</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">463.75</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">380.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-615.5</PosZ>
+  </Cover>
+  <Cover id="4" desc="Backward inner ring 1">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">160.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">165.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">165.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-320.0</PosZ>
+  </Cover>
+  <Cover id="5" desc="Backward inner ring 2">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">160.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">175.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">175.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">28.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-382.0</PosZ>
+  </Cover>
+  <Cover id="6" desc="Backward inner cover 1">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">290.5</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">292.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">292.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">300.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-620.0</PosZ>
+  </Cover>
+  <Cover id="7" desc="Backward inner cover 2">
+    <Name>BackwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">290.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">174.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">292.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">175.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">204.38</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-415.62</PosZ>
+  </Cover>
+  <Cover id="8" desc="Forward main cover">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">466.4</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">466.4</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1130.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1130.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">0.5</Thickness>
+    <PosZ desc="Z position near IP" unit="mm">1650.0</PosZ>
+  </Cover>
+  <Cover id="9" desc="Forward outer ring">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">1127.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">1127.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1130.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1130.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">56.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">1646.5</PosZ>
+  </Cover>
+  <Cover id="10" desc="Forward inner cover 1">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">173.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">436.5</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">174.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">438.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">873.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">1547.0</PosZ>	
+  </Cover>
+  <Cover id="11" desc="Forward inner cover 2">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">436.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">436.5</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">438.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">438.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">103.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">1650.0</PosZ>
+  </Cover>
+  <Cover id="12" desc="Forward middle ring">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">467.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">467.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">472.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">472.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">176.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">1646.5</PosZ>
+  </Cover>
+  <Cover id="13" desc="Forward inner ring 1">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">160.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">174.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">174.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">28.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">670.0</PosZ>
+  </Cover>
+  <Cover id="14" desc="Forward inner ring 2">
+    <Name>ForwardCover</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">160.0</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">160.0</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">165.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">165.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">62.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">642.0</PosZ>
+  </Cover>
+  <Cover id="15" desc="Board mount 1">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">1017.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">1017.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1123.2</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1123.2</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-788.7</PosZ>
+  </Cover>
+  <Cover id="16" desc="Board mount 2">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">907.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">907.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">1016.8</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">1016.8</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-788.7</PosZ>
+  </Cover>
+  <Cover id="17" desc="Board mount 3">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">797.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">797.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">906.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">906.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-762.7</PosZ>
+  </Cover>
+  <Cover id="18" desc="Board mount 4">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">692.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">692.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">796.5</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">796.5</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-762.7</PosZ>
+  </Cover>
+  <Cover id="19" desc="Board mount 5">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">612.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">612.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">690.8</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">690.8</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-719.7</PosZ>
+  </Cover>
+  <Cover id="20" desc="Board mount 6">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">540.2</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">540.2</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">611.8</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">611.8</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-719.7</PosZ>
+  </Cover>
+  <Cover id="21" desc="Board mount 7">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">467.7</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">467.7</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">539.8</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">539.8</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-719.7</PosZ>
+  </Cover>
+  <Cover id="22" desc="Board mount 8">
+    <Name>BoardMount</Name>
+    <InnerR1 desc="Inner radius near IP" unit="mm">294.5</InnerR1>
+    <InnerR2 desc="Inner radius far from IP" unit="mm">294.5</InnerR2>
+    <OuterR1 desc="Outer radius near IP" unit="mm">456.0</OuterR1>
+    <OuterR2 desc="Outer radius far from IP" unit="mm">456.0</OuterR2>
+    <Thickness desc="The thickness of the cover" unit="mm">2.0</Thickness>
+    <Angle desc="The angle between the cover and z axis" unit="rad">0.0</Angle>
+    <PosZ desc="Z position near IP" unit="mm">-682.2</PosZ>
+  </Cover>
+  <Rib id="0" desc="Backward rib">
+    <Name>BackwardRib</Name>
+    <Length desc="Rib length (X)" unit="mm">663.0</Length>
+    <Width desc="rib width (Y)" unit="mm">90.0</Width>
+    <Thickness desc="Rib thickness (Z)" unit="mm">3.0</Thickness>
+    <PosX desc="X position" unit="mm">798.5</PosX>
+    <PosY desc="Y position" unit="mm">0.0</PosY>
+    <PosZ desc="Z position near IP" unit="mm">-996.5</PosZ>
+    <NDiv desc="Number of divisions" unit="mm">24</NDiv>
+  </Rib>
+  <Rib id="1" desc="Forward rib">
+    <Name>ForwardRib</Name>
+    <Length desc="Rib length (X)" unit="mm">663.0</Length>
+    <Width desc="rib Width (Y)" unit="mm">90.0</Width>
+    <Thickness desc="Rib thickness (Z)" unit="mm">3.0</Thickness>
+    <PosX desc="X position" unit="mm">798.5</PosX>
+    <PosY desc="Y position" unit="mm">0.0</PosY>
+    <PosZ desc="Z position near IP" unit="mm">1649.5</PosZ>
+    <NDiv desc="Number of divisions" unit="mm">24</NDiv>
+  </Rib>
+</Covers>
+
+

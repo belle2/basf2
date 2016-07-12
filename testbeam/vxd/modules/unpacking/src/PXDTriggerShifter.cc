@@ -49,21 +49,21 @@ void PXDTriggerShifterModule::event(void)
 {
   StoreObjPtr<EventMetaData> evtPtr;/// what will happen if it does not exist???
 
-  unsigned int triggerNrEvt = evtPtr->getEvent();
+  unsigned int triggerNrEvtMeta = evtPtr->getEvent();
 
   // first, we have to find the trigger numbers from the pxd data ...
   TClonesArray* rawdata = m_storeRaw.getPtr();
-  unsigned int pxdTriggerNr = 0x10000, triggerNr = 0x10000;
-// pxdTriggerNr is the DHC one
-// triggerNR the HLT/Onsen one
+  unsigned int triggerNrPxdDHC = 0x10000;// triggerNrPxdDHC is the DHC one
+  unsigned int triggerNrPxdHLT = 0x10000;// triggerNrPxdHLT the HLT/Onsen one
+
   for (auto& it : m_storeRaw) {
-    if (getTrigNr(it, pxdTriggerNr, triggerNr)) break; // only first (valid) one
+    if (getTrigNr(it, triggerNrPxdDHC, triggerNrPxdHLT)) break; // only first (valid) one
   }
 
-  triggerNr = triggerNrEvt & 0xFFFF; // Overwrite Onsen/HLT TrigNr with EvtMeta One
+  unsigned int triggerNr = triggerNrEvtMeta & 0xFFFF; // We match with TrigNr from EvtMeta
 
-  // Keep current raw data in MRU cache with its original pxd trigger number
-  if (pxdTriggerNr != 0x10000) m_previous_events.insert(pxdTriggerNr & 0xFFFF, *rawdata);
+  // Keep current raw data in MRU cache with its original pxd trigger number (the one from DHC)
+  if (triggerNrPxdDHC != 0x10000) m_previous_events.insert(triggerNrPxdDHC & 0xFFFF, *rawdata);
 
   if (triggerNr == 0x10000) { // invalid
     m_storeRaw.clear();// To be sure remove not fitting data
@@ -74,17 +74,17 @@ void PXDTriggerShifterModule::event(void)
   triggerNr = (triggerNr + m_offset) & 0xFFFF; /// including offset
 
   setReturnValue(true);
-  if (triggerNr != (pxdTriggerNr & 0xFFFF) || pxdTriggerNr == 0x10000) {
+  if (triggerNr != (triggerNrPxdDHC & 0xFFFF) || triggerNrPxdDHC == 0x10000) {
     // Now try to replace current raw data with raw data with current trigger number + offset
     // Main problem with this approach, if we do not find the correct data, the previous data
     // is still there ... thus checking the return value is mandatory!
     m_storeRaw.clear();// To be sure, remove not fitting data
     if (!m_previous_events.retrieve(triggerNr, *rawdata)) {
-      B2WARNING("Could not find data for offset for HLT $" << hex << triggerNr << " and DHH $" << hex << pxdTriggerNr);
+      B2WARNING("Could not find data for offset for HLT $" << hex << triggerNr << " and DHH $" << hex << triggerNrPxdDHC);
       setReturnValue(false);
       m_notfixed++;
     } else {
-      B2INFO("Fixed trigger offset for #$" << hex << triggerNr << " and " << hex << pxdTriggerNr);
+      B2INFO("Fixed trigger offset for #$" << hex << triggerNr << " and " << hex << triggerNrPxdDHC);
       m_fixed++;
     }
   } else {

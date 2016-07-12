@@ -150,7 +150,7 @@ void PXDOccupancyModule::event()
       m_vcell_fit = info.getVCellID(m_v_fit);
 
       //track quality indicators
-      m_charge_pdg = trackstate.getCharge();
+      m_charge_pdg = fitstatus->getCharge(); // not trackstate!
       m_fit_pValue = fitstatus->getPVal();
       m_fit_ndf = fitstatus->getNdf();
       TVector3 mom = trackstate.getMom();

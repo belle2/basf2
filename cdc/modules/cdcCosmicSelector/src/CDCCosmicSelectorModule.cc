@@ -70,7 +70,7 @@ void CDCCosmicSelectorModule::event()
 
     if (abs(m_P->getPDG()) != 13) B2FATAL("Not muon !");
 
-      const TVector3 vertex = m_P->getProductionVertex();
+    const TVector3 vertex = m_P->getProductionVertex();
     const double vX = vertex.X();
     const double vY = vertex.Y();
     const double vZ = vertex.Z();

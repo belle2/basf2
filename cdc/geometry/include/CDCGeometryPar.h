@@ -29,6 +29,7 @@
 #endif
 #include <cdc/dbobjects/CDCSigmas.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
 #include <string>
@@ -77,6 +78,8 @@ namespace Belle2 {
       //      //! Constructor
       //      CDCGeometryPar();
 
+      //! Constructor.
+      CDCGeometryPar(const CDCGeometry&);
       //! Destructor
       virtual ~CDCGeometryPar();
 
@@ -85,6 +88,12 @@ namespace Belle2 {
           \return A reference to an instance of this class.
       */
       static CDCGeometryPar& Instance();
+
+      /**
+       * Static method to get a reference to the CDCGeometryPar instance
+       * from database.
+       */
+      static CDCGeometryPar& Instance(const CDCGeometry&);
 
       //! Clears
       void clear();
@@ -95,11 +104,20 @@ namespace Belle2 {
       //! Gets geometry parameters from gearbox.
       void read();
 
+      //! Gets geometry parameters from database.
+      void readFromDB(const CDCGeometry&);
+
       /**
        * Read z-corrections.
        * @param GearDir Gear Dir.
        */
       void readDeltaz(const GearDir);
+
+      /**
+       * Read z-corrections from DB.
+       *
+       */
+      void readDeltaz(const CDCGeometry&);
 
       /**
        * Read (mis)alignment params.
@@ -110,6 +128,12 @@ namespace Belle2 {
       void readWirePositionParams(const GearDir, EWirePosition set);
 
 
+      /**
+       * Read (mis)alignment params from DB.
+       * @param[in] DB object of CDCGeometry.
+       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
+       */
+      void readWirePositionParams(const CDCGeometry&, EWirePosition set);
       /**
        * Read XT-relation table.
        * @param[in] GearDir Gear Dir.
@@ -833,6 +857,21 @@ namespace Belle2 {
        */
       void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
 
+
+      /**
+       * Returns a closest distance between a track and a wire.
+       * @param bwp[in] wire position at backward
+       * @param fwp[in] wire position at forward
+       * @param posIn[in] entrance position
+       * @param posOut[in] exit position
+       * @param hitPosition[out] track position corresp. to the closetst distance
+       * @param wirePosition[out] wire position corresp. to the closetst distance
+       */
+
+      double ClosestApproach(const TVector3& bwp, const TVector3& fwp, const TVector3& posIn, const TVector3& posOut,
+                             TVector3& hitPosition,
+                             TVector3& wirePosition) const;
+
       /**
        * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
        * @param[in] wireId wire-id. in question (reference)
@@ -918,10 +957,6 @@ namespace Belle2 {
 
       double m_globalPhiRotation;  /*!< Global ratation in phi (rad.); only for sence wires now. */
 
-      double m_motherInnerR;  /*!< The inner radius of cdc mother volume. */
-      double m_motherOuterR;  /*!< The outer radius of cdc mother volume. */
-      double m_motherLength;  /*!< The length of cdc mother volume. */
-
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
@@ -962,6 +997,7 @@ namespace Belle2 {
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
+
 #if defined(CDC_T0_FROM_DB)
       DBObjPtr<CDCTimeZeros> m_t0FromDB; /*!< t0s retrieved from DB. */
 #endif
@@ -999,19 +1035,9 @@ namespace Belle2 {
 //-----------------------------------------------------------------------------
 
 
-    inline double CDCGeometryPar::motherInnerR() const
+    inline std::string CDCGeometryPar::version() const
     {
-      return m_motherInnerR;
-    }
-
-    inline double CDCGeometryPar::motherOuterR() const
-    {
-      return m_motherOuterR;
-    }
-
-    inline double CDCGeometryPar::motherLength() const
-    {
-      return m_motherLength;
+      return m_version;
     }
 
     inline double CDCGeometryPar::momZ(int iBound) const
@@ -1024,10 +1050,6 @@ namespace Belle2 {
       return m_momRmin[iBound];
     }
 
-    inline std::string CDCGeometryPar::version() const
-    {
-      return m_version;
-    }
 
     inline int CDCGeometryPar::nShifts(int layerID) const
     {

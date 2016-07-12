@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Guofu Cao                                                *
+ * Contributors: Makoto Uchida                                            *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -15,13 +15,21 @@
 
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportObjPtr.h>
+
 
 #include <cdc/simulation/CDCSensitiveDetector.h>
+#include <cdc/dbobjects/CDCGeometry.h>
+#include <iostream>
 
 class G4LogicalVolume;
 class G4VPhysicalVolume;
 class G4VisAttributes;
 class G4UserLimits;
+
+using namespace std;
 
 namespace Belle2 {
 
@@ -49,11 +57,51 @@ namespace Belle2 {
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+      {
+        DBObjPtr<CDCGeometry> geo;
+        if (!geo) {
+          B2FATAL("No configuration for " << name << " found.");
+        }
+        createGeometry(*geo, topVolume, type);
+      }
+
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+      {
+        DBImportObjPtr<CDCGeometry> importObj;
+        importObj.construct(createConfiguration(content));
+        importObj.import(iov);
+      }
+
+      void createCovers(const GearDir& content);
+      void createCovers(const CDCGeometry& geom);
+      void createNeutronShields(const GearDir& content);
+      void createNeutronShields(const CDCGeometry& geom);
+      void createCone(const double rmin1, const double rmax1,
+                      const double rmin2, const double rmax2,
+                      const double thick, const double posz,
+                      const int id, G4Material* med, const string name);
+      void createBox(const double length, const double height,
+                     const double thick, const double x,
+                     const double y, const double z,
+                     const int id, G4Material* med,
+                     const string name);
+      void createTube(const double rmin, const double rmax,
+                      const double thick, const double posZ,
+                      const int id, G4Material* med,
+                      const string name);
 
     protected:
 
     private:
-
+      CDCGeometry createConfiguration(const GearDir& param)
+      {
+        CDCGeometry cdcGeometry;
+        cdcGeometry.read(param);
+        return cdcGeometry;
+      }
+      void createGeometry(const CDCGeometry& parameters, G4LogicalVolume& topVolume,
+                          geometry::GeometryTypes type);
       //! CDC G4 logical volume.
       G4LogicalVolume* logical_cdc;
 

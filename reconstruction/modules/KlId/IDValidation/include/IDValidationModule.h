@@ -94,8 +94,6 @@ namespace Belle2 {
     TTree* m_treeKLM = nullptr;
     /** tree for ecl data */
     TTree* m_treeECL = nullptr;
-    /** tree for ecl data */
-    TTree* m_treeComb = nullptr;
 
 
   }; // end class

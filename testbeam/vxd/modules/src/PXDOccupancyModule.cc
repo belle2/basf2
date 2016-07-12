@@ -150,6 +150,7 @@ void PXDOccupancyModule::event()
       m_vcell_fit = info.getVCellID(m_v_fit);
 
       //track quality indicators
+      m_charge_pdg = trackstate.getCharge();
       m_fit_pValue = fitstatus->getPVal();
       m_fit_ndf = fitstatus->getNdf();
       TVector3 mom = trackstate.getMom();
@@ -173,6 +174,7 @@ void PXDOccupancyModule::event()
 
       //track quality indicators
 
+      m_charge_pdg = -1;
       m_charge = -99;
       m_fit_pValue = -1;
       m_fit_ndf = -1;
@@ -275,6 +277,7 @@ void PXDOccupancyModule::defineHisto()
   m_run = -1;
   m_subrun = -1;
   m_charge = -99;
+  m_charge_pdg = -1;
   m_track_matched = 0;
   m_u_clus = -9999;
   m_v_clus = -9999;
@@ -314,6 +317,7 @@ void PXDOccupancyModule::defineHisto()
   m_tree->Branch("fit_ndf", &m_fit_ndf, "fit_ndf/I");
   m_tree->Branch("track_matched", &m_track_matched, "track_matched/I");
   m_tree->Branch("charge", &m_charge, "charge/D");
+  m_tree->Branch("charge_pdg", &m_charge_pdg, "charge_pdg/I");
 
 
   m_eventtree = new TTree("PXDEventTree", "Tree for calculating pxd efficiencies");

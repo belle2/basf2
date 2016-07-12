@@ -122,7 +122,7 @@ namespace Belle2 {
     int m_layernumber, m_laddernumber, m_sensornumber, m_badcluster, m_ucell_fit, m_vcell_fit;
 
     //track quality indicators
-    double m_fit_pValue, m_fit_mom, m_fit_theta, m_fit_phi, m_charge;
+    double m_fit_pValue, m_fit_mom, m_fit_theta, m_fit_phi, m_charge, m_charge_pdg;
     int m_fit_ndf, m_event, m_run, m_subrun, m_track_matched, m_nsvdtracks;
 
     // Cluster informatiom

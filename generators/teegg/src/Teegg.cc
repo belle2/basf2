@@ -199,7 +199,7 @@ void Teegg::term()
   int mode = 2;
   teeggm_(&mode, m_xpar, m_npar);
 
-  B2RESULT("Cross-section (nb)  = " << teeggresults_.rescross << " +/- " << teeggresults_.rescrosserr << "");
+  B2RESULT("Cross-section (nb)  = " << teeggresults_.rescross / 1.e3 << " +/- " << teeggresults_.rescrosserr / 1.e3 << "");
   B2RESULT("Events (unweighted) = " << teeggresults_.resngen);
   B2RESULT("Trials              = " << teeggresults_.resntrials);
   B2RESULT("Efficiency          = " << 100.*teeggresults_.reseff << " %");

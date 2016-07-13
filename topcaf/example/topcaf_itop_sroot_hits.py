@@ -97,7 +97,7 @@ timecalibmodule.param('calibrationADCThresholdMaxNeg', -300)  # must be -150 for
 timecalibmodule.param('calibrationADCThresholdMinNeg', -800)
 timecalibmodule.param('calibrationADCThresholdMax', 900)
 timecalibmodule.param('calibrationADCThresholdMin', 450)
-
+timecalibmodule.param('forcePolarityConsistency', True)
 
 main = create_path()
 main.add_module(SRootReader)

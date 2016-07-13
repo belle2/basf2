@@ -18,6 +18,8 @@
 #include <TTree.h>
 #include <TROOT.h>
 
+#include <string>
+
 namespace Belle2 {
   namespace MVA {
 
@@ -128,6 +130,45 @@ namespace Belle2 {
     };
 
     /**
+     * Wraps the data of a multiple event into a Dataset.
+     * Mostly useful if one wants to apply an Expert to a feature matrix
+     */
+    class MultiDataset : public Dataset {
+
+    public:
+      /**
+       * Constructs a new MultiDataset
+       * @param general_options which defines e.g. number of variables
+       * @param input feature values of the single event
+       * @param target target value of the single event (defaults to 1, because often this is not known if one wants to apply an expert)
+       */
+      MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& matrix,
+                   const std::vector<float>& targets = {}, const std::vector<float>& weights = {});
+
+      /**
+       * Returns the number of features in this dataset
+       */
+      virtual unsigned int getNumberOfFeatures() const override { return m_input.size(); }
+
+      /**
+       * Returns the number of events in this dataset which is always one
+       */
+      virtual unsigned int getNumberOfEvents() const override { return m_matrix.size(); }
+
+      /**
+       * Does nothing in the case of a single dataset, because the only event is already loaded
+       */
+      virtual void loadEvent(unsigned int iEvent) override;
+
+
+    private:
+      std::vector<std::vector<float>> m_matrix; /**< Feature matrix */
+      std::vector<float> m_targets; /**< target vector */
+      std::vector<float> m_weights; /**< weight vector */
+
+    };
+
+    /**
      * Wraps another Dataset and provides a view to a subset of its features and events.
      * Used by the Combination method which can combine multiple methods with possibly different variables
      */
@@ -221,6 +262,13 @@ namespace Belle2 {
        * Sets the branch addresses of all features, weight and target again
        */
       void setBranchAddresses();
+
+      /**
+       * Checks if the given branchname exists in the TTree
+       * @param tree
+       * @param branchname
+       */
+      bool checkForBranch(TTree*, const std::string&) const;
 
     protected:
       TTree* m_tree = nullptr; /**< Pointer to the TTree containing the data */

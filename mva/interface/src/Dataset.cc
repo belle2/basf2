@@ -99,6 +99,36 @@ namespace Belle2 {
       m_isSignal = std::lround(target) == m_general_options.m_signal_class;
     }
 
+    MultiDataset::MultiDataset(const GeneralOptions& general_options, const std::vector<std::vector<float>>& matrix,
+                               const std::vector<float>& targets, const std::vector<float>& weights) : Dataset(general_options),  m_matrix(matrix),
+      m_targets(targets), m_weights(weights)
+    {
+
+      if (m_targets.size() > 0 and m_matrix.size() != m_targets.size()) {
+        B2ERROR("Feature matrix and target vector need same number of elements in MultiDataset, got " << m_targets.size() << " and " <<
+                m_matrix.size());
+      }
+      if (m_weights.size() > 0 and m_matrix.size() != m_weights.size()) {
+        B2ERROR("Feature matrix and weight vector need same number of elements in MultiDataset, got " << m_weights.size() << " and " <<
+                m_matrix.size());
+      }
+    }
+
+
+    void MultiDataset::loadEvent(unsigned int iEvent)
+    {
+      m_input = m_matrix[iEvent];
+
+      if (m_targets.size() > 0) {
+        m_target = m_targets[iEvent];
+        m_isSignal = std::lround(m_target) == m_general_options.m_signal_class;
+      }
+
+      if (m_weights.size() > 0)
+        m_weight = m_weights[iEvent];
+
+    }
+
     SubDataset::SubDataset(const GeneralOptions& general_options, const std::vector<bool>& events,
                            Dataset& dataset) : Dataset(general_options), m_dataset(dataset)
     {
@@ -173,6 +203,12 @@ namespace Belle2 {
       }
       m_file->cd();
       m_file->GetObject(m_general_options.m_treename.c_str(), m_tree);
+      if (not m_tree) {
+        B2ERROR("Error during open of ROOT file named " << m_general_options.m_datafile << " cannot retreive tree named " <<
+                m_general_options.m_treename);
+        throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile + " cannot retreive tree named " +
+                                 m_general_options.m_treename);
+      }
       setBranchAddresses();
     }
 
@@ -215,18 +251,65 @@ namespace Belle2 {
       m_file = nullptr;
     }
 
+    bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname) const
+    {
+      auto branch = tree->GetListOfBranches()->FindObject(branchname.c_str());
+      return branch != nullptr;
+
+    }
+
     void ROOTDataset::setBranchAddresses()
     {
       if (m_general_options.m_weight_variable == "__weight__") {
-        m_tree->SetBranchAddress("__weight__", &m_weight);
+        if (checkForBranch(m_tree, "__weight__")) {
+          m_tree->SetBranchAddress("__weight__", &m_weight);
+        } else {
+          B2WARNING("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the weight variable to an empty string if you don't need it.");
+          m_weight = 1;
+        }
       } else if (not m_general_options.m_weight_variable.empty()) {
-        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), &m_weight);
+        if (checkForBranch(m_tree, m_general_options.m_weight_variable)) {
+          m_tree->SetBranchAddress(m_general_options.m_weight_variable.c_str(), &m_weight);
+        } else {
+          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_weight_variable))) {
+            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_weight_variable).c_str(), &m_weight);
+          } else {
+            B2ERROR("Couldn't find given weight variable named " << m_general_options.m_weight_variable <<
+                    " (I tried also using makeROOTCompatible)");
+            throw std::runtime_error("Couldn't find given weight variable named " + m_general_options.m_weight_variable +
+                                     " (I tried also using makeROOTCompatible)");
+          }
+        }
       }
+
       if (not m_general_options.m_target_variable.empty()) {
-        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(), &m_target);
+        if (checkForBranch(m_tree, m_general_options.m_target_variable)) {
+          m_tree->SetBranchAddress(m_general_options.m_target_variable.c_str(), &m_target);
+        } else {
+          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_target_variable))) {
+            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_target_variable).c_str(), &m_target);
+          } else {
+            B2ERROR("Couldn't find given target variable named " << m_general_options.m_target_variable <<
+                    " (I tried also using makeROOTCompatible)");
+            throw std::runtime_error("Couldn't find given target variable named " + m_general_options.m_target_variable +
+                                     " (I tried also using makeROOTCompatible)");
+          }
+        }
       }
+
       for (unsigned int i = 0; i < m_general_options.m_variables.size(); ++i)
-        m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), &m_input[i]);
+        if (checkForBranch(m_tree, m_general_options.m_variables[i])) {
+          m_tree->SetBranchAddress(m_general_options.m_variables[i].c_str(), &m_input[i]);
+        } else {
+          if (checkForBranch(m_tree, Belle2::makeROOTCompatible(m_general_options.m_variables[i]))) {
+            m_tree->SetBranchAddress(Belle2::makeROOTCompatible(m_general_options.m_variables[i]).c_str(), &m_input[i]);
+          } else {
+            B2ERROR("Couldn't find given feature variable named " << m_general_options.m_variables[i] <<
+                    " (I tried also using makeROOTCompatible)");
+            throw std::runtime_error("Couldn't find given feature variable named " + m_general_options.m_variables[i] +
+                                     " (I tried also using makeROOTCompatible)");
+          }
+        }
     }
 
   }

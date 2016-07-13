@@ -82,6 +82,72 @@ namespace {
 
   }
 
+  TEST(DatasetTest, MultiDataset)
+  {
+
+    MVA::GeneralOptions general_options;
+    general_options.m_variables = {"a", "b", "c"};
+    general_options.m_signal_class = 2;
+    std::vector<std::vector<float>> matrix = {{1.0, 2.0, 3.0}, {4.0, 5.0, 6.0}, {7.0, 8.0, 9.0}};
+    std::vector<float> targets = {2.0, 0.0, 2.0};
+    std::vector<float> weights = {1.0, 2.0, 3.0};
+
+    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, {1.0}, weights));
+
+    EXPECT_B2ERROR(MVA::MultiDataset(general_options, matrix, targets, {1.0}));
+
+    MVA::MultiDataset x(general_options, matrix, targets, weights);
+
+    EXPECT_EQ(x.getNumberOfFeatures(), 3);
+    EXPECT_EQ(x.getNumberOfEvents(), 3);
+
+    // Should just work
+    x.loadEvent(0);
+
+    EXPECT_EQ(x.m_input.size(), 3);
+    EXPECT_FLOAT_EQ(x.m_input[0], 1.0);
+    EXPECT_FLOAT_EQ(x.m_input[1], 2.0);
+    EXPECT_FLOAT_EQ(x.m_input[2], 3.0);
+
+    EXPECT_FLOAT_EQ(x.m_weight, 1.0);
+    EXPECT_FLOAT_EQ(x.m_target, 2.0);
+    EXPECT_EQ(x.m_isSignal, true);
+
+    // Should just work
+    x.loadEvent(1);
+
+    EXPECT_EQ(x.m_input.size(), 3);
+    EXPECT_FLOAT_EQ(x.m_input[0], 4.0);
+    EXPECT_FLOAT_EQ(x.m_input[1], 5.0);
+    EXPECT_FLOAT_EQ(x.m_input[2], 6.0);
+
+    EXPECT_FLOAT_EQ(x.m_weight, 2.0);
+    EXPECT_FLOAT_EQ(x.m_target, 0.0);
+    EXPECT_EQ(x.m_isSignal, false);
+
+    // Should just work
+    x.loadEvent(2);
+
+    EXPECT_EQ(x.m_input.size(), 3);
+    EXPECT_FLOAT_EQ(x.m_input[0], 7.0);
+    EXPECT_FLOAT_EQ(x.m_input[1], 8.0);
+    EXPECT_FLOAT_EQ(x.m_input[2], 9.0);
+
+    EXPECT_FLOAT_EQ(x.m_weight, 3.0);
+    EXPECT_FLOAT_EQ(x.m_target, 2.0);
+    EXPECT_EQ(x.m_isSignal, true);
+
+    EXPECT_FLOAT_EQ(x.getSignalFraction(), 4.0 / 6.0);
+
+    auto feature = x.getFeature(1);
+    EXPECT_EQ(feature.size(), 3);
+    EXPECT_FLOAT_EQ(feature[0], 2.0);
+    EXPECT_FLOAT_EQ(feature[1], 5.0);
+    EXPECT_FLOAT_EQ(feature[2], 8.0);
+
+
+  }
+
   TEST(DatasetTest, SubDataset)
   {
 
@@ -163,8 +229,8 @@ namespace {
     tree.Branch("b", &b);
     tree.Branch("c", &c);
     tree.Branch("d", &d);
-    tree.Branch("e", &e);
-    tree.Branch("f", &f);
+    tree.Branch("e__bo__bc", &e);
+    tree.Branch("f__bo__bc", &f);
     tree.Branch("g", &g);
     tree.Branch("__weight__", &c);
 
@@ -182,7 +248,8 @@ namespace {
     file.Write("tree");
 
     MVA::GeneralOptions general_options;
-    general_options.m_variables = {"a", "b", "e", "f"};
+    // Both names with and without makeROOTCompatible should work
+    general_options.m_variables = {"a", "b", "e__bo__bc", "f()"};
     general_options.m_signal_class = 1;
     general_options.m_datafile = "datafile.root";
     general_options.m_treename = "tree";
@@ -302,6 +369,26 @@ namespace {
     EXPECT_FLOAT_EQ(weights[3], 4.2);
     EXPECT_FLOAT_EQ(weights[4], 5.2);
 
+    // Check for missing tree
+    general_options.m_treename = "missing tree";
+    try {
+      EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
+
+    // Check for missing branch
+    general_options.m_treename = "tree";
+    general_options.m_variables = {"a", "b", "e", "f", "missing branch"};
+    try {
+      EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
+    } catch (...) {
+
+    }
+    EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
+
+    // Check for missing file
     general_options.m_datafile = "DOESNOTEXIST.root";
     general_options.m_treename = "tree";
     try {
@@ -311,6 +398,7 @@ namespace {
     }
     EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
 
+    // Check for invalid file
     general_options.m_datafile = "ISNotAValidROOTFile";
     general_options.m_treename = "tree";
 

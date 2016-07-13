@@ -15,5 +15,6 @@
 #pragma link C++ class Belle2::MVA::TMVAOptionsClassification-;
 #pragma link C++ class Belle2::MVA::TMVAOptionsRegression-;
 #pragma link C++ class Belle2::MVA::PythonOptions-;
+#pragma link C++ class Belle2::MVA::TrivialOptions-;
 
 #endif

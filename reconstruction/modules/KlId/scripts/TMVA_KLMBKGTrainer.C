@@ -41,39 +41,29 @@ void TMVA_KLMBKGTrainer(){
 	TMVA::Factory *factory = new TMVA::Factory( "TMVAFactory", outputFile,
                                             "!V:!Silent:Color:DrawProgressBar:Transformations=:AnalysisType=Classification" );
 
-  factory -> AddVariable("KLMnCluster"        , "KLMnCluster"        , "F");
-  factory -> AddVariable("KLMnLayer"          , "KLMnLayer"          , "F");
-  factory -> AddVariable("KLMnInnermostlayer" , "KLMnInnermostlayer" , "F");
-  factory -> AddVariable("KLMglobalZ"         , "KLMglobalZ"         , "F");
-  factory -> AddVariable("KLMtime"            , "KLMtime"            , "F");
-  factory -> AddVariable("KLMinvM"            , "KLMinvM"            , "F");
-  factory -> AddVariable("KLMtrackDist"       , "KLMtrackDist"       , "F");
-  factory -> AddVariable("KLMdistToNextCl"    , "KLMdistToNextCl"    , "F");
-
-
-  factory -> AddVariable("KLMaverageInterClusterDist" , "KLMaverageInterClusterDist" , "F");
-  factory -> AddVariable("KLMhitDepth"                , "KLMhitDepth"                , "F");
-  factory -> AddVariable("KLMTrackSepDist"            , "KLMTrackSepDist"            , "F");
-  factory -> AddVariable("KLMTrackSepAngle"           , "KLMTrackSepAngle"           , "F");
-
-  factory   -> AddVariable("KLMInitialtrackSepAngle","KLMInitialtrackSepAngle", "F");
-  factory   -> AddVariable("KLMTrackRotationAngle",   "KLMTrackRotationAngle",   "F");
-  factory   -> AddVariable("KLMTrackClusterSepAngle","KLMTrackClusterSepAngle", "F");
-
-
-
-
-  // KLM-ECL Vars (ECL clusters that are related to KLM clusters)
-
-  factory -> AddVariable("KLMdistToNextECL"   , "KLMdistToNextECL"   , "F");
-  factory -> AddVariable("KLMECLenergy"       , "KLMECLenergy"       , "F");
-  factory -> AddVariable("KLMECLE9oE25"       , "KLMECLE9oE25"       , "F");
-  factory -> AddVariable("KLMECLtiming"       , "KLMECLtiming"       , "F");
-  factory -> AddVariable("KLMECLEerror"       , "KLMECLEerror"       , "F");
-  factory -> AddVariable("KLMtrackToECL"      , "KLMtrackToECL"      , "F");
-
-  factory -> AddVariable("KLMECLdeltaL"       , "KLMECLdeltaL"       , "F");
-  factory -> AddVariable("KLMECLmintrackDist" , "KLMECLmintrackDist" , "F");
+  factory -> AddVariable("  KLMnCluster"                 ,  "  KLMnCluster"                 ,         "  F"  );
+  factory -> AddVariable("  KLMnLayer"                   ,  "         KLMnLayer"                   ,  "  F"  );
+  factory -> AddVariable("  KLMnInnermostlayer"          ,  "    KLMnInnermostlayer"          ,       "  F"  );
+  factory -> AddVariable("  KLMglobalZ"                  ,  "     KLMglobalZ"                  ,      "  F"  );
+  factory -> AddVariable("  KLMtime"                     ,  "      KLMtime"                     ,     "  F"  );
+  factory -> AddVariable("  KLMinvM"                     ,  "       KLMinvM"                     ,    "  F"  );
+  factory -> AddVariable("  KLMtrackDist"                ,  "       KLMtrackDist"                ,    "  F"  );
+  factory -> AddVariable("  KLMdistToNextCl"             ,  "      KLMdistToNextCl"             ,     "  F"  );
+  factory -> AddVariable("  KLMaverageInterClusterDist"  ,  "      KLMaverageInterClusterDist"  ,     "          F"  );
+  factory -> AddVariable("  KLMhitDepth"                 ,  "      KLMhitDepth"                 ,     "          F"  );
+  factory -> AddVariable("  KLMTrackSepDist"             ,  "      KLMTrackSepDist"             ,     "          F"  );
+  factory -> AddVariable("  KLMTrackSepAngle"            ,  "      KLMTrackSepAngle"            ,     "          F"  );
+  factory -> AddVariable("  KLMInitialtrackSepAngle"     ,  "   KLMInitialtrackSepAngle"     ,        "      F"  );
+  factory -> AddVariable("  KLMTrackRotationAngle"       ,  "        KLMTrackRotationAngle"       ,   "    F"  );
+  factory -> AddVariable("  KLMTrackClusterSepAngle"     ,  "        KLMTrackClusterSepAngle"     ,   "      F"  );
+  factory -> AddVariable("  KLMdistToNextECL"            ,  "   KLMdistToNextECL"            ,        "  F"  );
+  factory -> AddVariable("  KLMECLenergy"                ,  "   KLMECLenergy"                ,        "  F"  );
+  factory -> AddVariable("  KLMECLE9oE25"                ,  "    KLMECLE9oE25"                ,       "  F"  );
+  factory -> AddVariable("  KLMECLtiming"                ,  "    KLMECLtiming"                ,       "  F"  );
+  factory -> AddVariable("  KLMECLEerror"                ,  "       KLMECLEerror"                ,    "  F"  );
+  factory -> AddVariable("  KLMtrackToECL"               ,  "    KLMtrackToECL"               ,       "  F"  );
+  factory -> AddVariable("  KLMECLdeltaL"                ,  "     KLMECLdeltaL"                ,      "  F"  );
+  factory -> AddVariable("  KLMECLmintrackDist"          ,  "     KLMECLmintrackDist"          ,      "  F"  );
 
 
 

@@ -38,14 +38,12 @@ namespace Belle2 {
     /** process event */
     virtual void event();
 
-
+    /** cone angle for matching (whole cone) */
+    float m_coneInRad = 0.26;
 
   protected:
 
   private:
-
-
-    void matchClusterInCone(const ECLCluster& eclcluster, float coneInRad);
 
 
   }; // end class

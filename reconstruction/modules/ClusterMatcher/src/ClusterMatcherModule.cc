@@ -7,21 +7,20 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  * **************************************************************************/
-
-
-
 #include <reconstruction/modules/ClusterMatcher/ClusterMatcherModule.h>
 
 #include <framework/datastore/StoreArray.h>
+#include <framework/gearbox/Const.h>
+
 
 #include <mdst/dataobjects/KLMCluster.h>
 #include <mdst/dataobjects/ECLCluster.h>
-
+#include <mdst/dataobjects/Cluster.h>
+#include <reconstruction/dataobjects/KlId.h>
 
 
 using namespace Belle2;
 using namespace std;
-
 
 
 REG_MODULE(ClusterMatcher);
@@ -29,6 +28,12 @@ REG_MODULE(ClusterMatcher);
 ClusterMatcherModule::ClusterMatcherModule(): Module() // constructor kan nkeine argumente nehmen
 {
   setDescription("Match KLM cluster to ECL Clusters within a certain cone.");
+
+  /** Path were to find the .xml file containing the classifier trainings. */
+  addParam("coneInRad",
+           m_coneInRad,
+           "Cone angle in rad, will be devided by 2 for the matching",
+           m_coneInRad);
 }
 
 ClusterMatcherModule::~ClusterMatcherModule()
@@ -45,40 +50,56 @@ void ClusterMatcherModule::initialize()
   StoreArray<KLMCluster> klmClusters;
   eclClusters.registerRelationTo(klmClusters);
 
+  StoreArray<Cluster>::registerPersistent();//Transient
+  StoreArray<Cluster> Clusters;
+  klmClusters.registerRelationTo(Clusters);
+  eclClusters.registerRelationTo(Clusters);
+
 }//init
+
 
 void ClusterMatcherModule::event()
 {
   StoreArray<ECLCluster> eclClusters;
+  StoreArray<KLMCluster> klmClusters;
+  StoreArray<Cluster> Clusters;
 
-  for (const ECLCluster& cluster : eclClusters) {
+  float angleDist;
 
-    matchClusterInCone(cluster, 0.26);// cone angle in rad
+  for (const ECLCluster& eclCluster : eclClusters) {
+
+    const TVector3& eclClusterPos = eclCluster.getclusterPosition();
+
+    Cluster* clusterecl = Clusters.appendNew();
+    clusterecl->setLogLikelihood(
+      Const::ECL,
+      Const::clusterKlong,
+      eclCluster.getRelatedTo<KlId>()->getKlId()
+    );
+    eclCluster.addRelationTo(clusterecl);
+
+    for (KLMCluster& klmcluster : klmClusters) {
+
+      const TVector3& klmClusterPos = klmcluster.getClusterPosition();
+
+      angleDist = eclClusterPos.Angle(klmClusterPos);
+
+      if (angleDist < (m_coneInRad / 2.0)) {
+        eclCluster.addRelationTo(&klmcluster, angleDist);
+        klmcluster.addRelationTo(clusterecl);
+      } else {
+        Cluster* clusterklm = Clusters.appendNew();
+        clusterklm->setLogLikelihood(
+          Const::KLM,
+          Const::clusterKlong,
+          klmcluster.getRelatedTo<KlId>()->getKlId()
+        );
+        klmcluster.addRelationTo(clusterklm);
+      }
+    }//klmcluster loop
+
 
   }// for ecl cluster in clusters
 } // event
-
-
-/** find all KLM clusters within specified cone and match them (add a relation)*/
-void ClusterMatcherModule::matchClusterInCone(const ECLCluster& eclcluster, float coneInRad)
-{
-
-  const TVector3& eclClusterPos = eclcluster.getclusterPosition();
-  StoreArray<KLMCluster> klmClusters;
-  float angleDist;
-
-  for (KLMCluster& klmcluster : klmClusters) {
-
-    const TVector3& klmClusterPos = klmcluster.getClusterPosition();
-
-    angleDist = eclClusterPos.Angle(klmClusterPos);
-
-    if (angleDist < (coneInRad / 2.0)) {
-      // TODO add distance / 2 pi as weight??
-      eclcluster.addRelationTo(&klmcluster);
-    }
-  }
-}
-
 
 

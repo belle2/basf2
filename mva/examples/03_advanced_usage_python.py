@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     # Perform an sPlot training
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafile = "train.root"
+    general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_weightfile = "MVAFull"
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector('M', 'p', 'pz', 'daughter(0, Kid)')
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     # It requires an additional file with MC information from which it can extract the distribution
     # of the discriminating variable (in this case M).
     # Here we use the same file
-    meta_options.m_splot_mc_file = "train.root"
+    meta_options.m_splot_mc_files = basf2_mva.vector("train.root")
 
     # First we do an ordinary sPlot training
     general_options.m_weightfile = "MVASPlot"

@@ -114,11 +114,9 @@ namespace Belle2 {
         auto weightfile = Weightfile::load(filename, emd);
         weightfiles.push_back(weightfile);
 
-        for (const auto& datafile : datafiles) {
-          std::string branchname = Belle2::makeROOTCompatible(filename + "_" + datafile);
-          auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
-          branches.push_back(branch);
-        }
+        std::string branchname = Belle2::makeROOTCompatible(filename);
+        auto branch = tree.Branch(branchname.c_str(), &result, (branchname + "/F").c_str());
+        branches.push_back(branch);
       }
 
       AbstractInterface::initSupportedInterfaces();
@@ -133,36 +131,35 @@ namespace Belle2 {
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);
 
-        for (const auto& datafile : datafiles) {
-          general_options.m_datafile = datafile;
-          auto& branch = branches[i];
-          ROOTDataset data(general_options);
-          auto results = expert->apply(data);
-          for (auto& r : results) {
+        general_options.m_datafiles = datafiles;
+        auto& branch = branches[i];
+        ROOTDataset data(general_options);
+        auto results = expert->apply(data);
+        for (auto& r : results) {
+          // Suppress cppcheck false positive
+          // style: Variable 'result' is assigned a value that is never used.
+          // However, it is used, by branch->Fill() internally
+          // cppcheck-suppress *
+          result = r;
+          branch->Fill();
+        }
+
+
+        if (not general_options.m_target_variable.empty()) {
+          std::string branchname = Belle2::makeROOTCompatible(std::string(branch->GetName()) + "_" + general_options.m_target_variable);
+          float target = 0;
+          auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
+          auto targets = data.getTargets();
+          for (auto& t : targets) {
             // Suppress cppcheck false positive
             // style: Variable 'result' is assigned a value that is never used.
             // However, it is used, by branch->Fill() internally
             // cppcheck-suppress *
-            result = r;
-            branch->Fill();
-          }
-
-
-          if (not general_options.m_target_variable.empty()) {
-            std::string branchname = Belle2::makeROOTCompatible(std::string(branch->GetName()) + "_" + general_options.m_target_variable);
-            float target = 0;
-            auto target_branch = tree.Branch(branchname.c_str(), &target, (branchname + "/F").c_str());
-            auto targets = data.getTargets();
-            for (auto& t : targets) {
-              // Suppress cppcheck false positive
-              // style: Variable 'result' is assigned a value that is never used.
-              // However, it is used, by branch->Fill() internally
-              // cppcheck-suppress *
-              target = t;
-              target_branch->Fill();
-            }
+            target = t;
+            target_branch->Fill();
           }
         }
+
         ++i;
       }
 
@@ -224,7 +221,7 @@ namespace Belle2 {
       ROOTDataset discriminant_dataset(discriminant_general_options);
 
       GeneralOptions mc_general_options = general_options;
-      mc_general_options.m_datafile = meta_options.m_splot_mc_file;
+      mc_general_options.m_datafiles = meta_options.m_splot_mc_files;
       mc_general_options.m_variables = {meta_options.m_splot_variable};
       ROOTDataset mc_dataset(mc_general_options);
 

@@ -16,7 +16,7 @@ spectators = ['isSignal', 'M']
 
 def reconstruction_path(inputfiles):
     path = create_path()
-    inputMdstList(inputfiles, path=path)
+    inputMdstList('MC5', inputfiles, path=path)
     fillParticleLists([('K-', 'Kid > 0.5'), ('pi+', 'piid > 0.5')], path=path)
     reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
     fitVertex('D0', 0.1, path=path)

@@ -251,7 +251,7 @@ namespace {
     // Both names with and without makeROOTCompatible should work
     general_options.m_variables = {"a", "b", "e__bo__bc", "f()"};
     general_options.m_signal_class = 1;
-    general_options.m_datafile = "datafile.root";
+    general_options.m_datafiles = {"datafile.root"};
     general_options.m_treename = "tree";
     general_options.m_target_variable = "g";
     general_options.m_weight_variable = "c";
@@ -369,6 +369,23 @@ namespace {
     EXPECT_FLOAT_EQ(weights[3], 4.2);
     EXPECT_FLOAT_EQ(weights[4], 5.2);
 
+    // Check TChain expansion
+    general_options.m_datafiles = {"datafile*.root"};
+    {
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 5);
+    }
+    boost::filesystem::copy_file("datafile.root", "datafile2.root");
+    {
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
+    }
+    boost::filesystem::copy_file("datafile.root", "datafile3.root");
+    {
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
+    }
+
     // Check for missing tree
     general_options.m_treename = "missing tree";
     try {
@@ -389,7 +406,7 @@ namespace {
     EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
 
     // Check for missing file
-    general_options.m_datafile = "DOESNOTEXIST.root";
+    general_options.m_datafiles = {"DOESNOTEXIST.root"};
     general_options.m_treename = "tree";
     try {
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});
@@ -399,13 +416,13 @@ namespace {
     EXPECT_THROW(MVA::ROOTDataset{general_options}, std::runtime_error);
 
     // Check for invalid file
-    general_options.m_datafile = "ISNotAValidROOTFile";
+    general_options.m_datafiles = {"ISNotAValidROOTFile"};
     general_options.m_treename = "tree";
 
     {
-      std::ofstream(general_options.m_datafile);
+      std::ofstream(general_options.m_datafiles[0]);
     }
-    EXPECT_TRUE(boost::filesystem::exists(general_options.m_datafile));
+    EXPECT_TRUE(boost::filesystem::exists(general_options.m_datafiles[0]));
 
     try {
       EXPECT_B2ERROR(MVA::ROOTDataset{general_options});

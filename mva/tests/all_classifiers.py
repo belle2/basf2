@@ -12,7 +12,7 @@ import subprocess
 if __name__ == "__main__":
 
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafile = "train.root"
+    general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')
     general_options.m_target_variable = "isSignal"
@@ -26,7 +26,7 @@ if __name__ == "__main__":
 
     olddir = os.getcwd()
     tempdir = tempfile.mkdtemp()
-    os.symlink(os.path.abspath(general_options.m_datafile), tempdir + '/' + os.path.basename(general_options.m_datafile))
+    os.symlink(os.path.abspath(general_options.m_datafiles[0]), tempdir + '/' + os.path.basename(general_options.m_datafiles[0]))
     os.chdir(tempdir)
 
     for identifier, specific_options in methods:

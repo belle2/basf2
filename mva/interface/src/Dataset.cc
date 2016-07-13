@@ -12,6 +12,9 @@
 
 #include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/logging/Logger.h>
+#include <framework/io/RootIOUtilities.h>
+
+#include <TDirectory.h>
 
 #include <boost/filesystem/operations.hpp>
 
@@ -191,24 +194,40 @@ namespace Belle2 {
 
     ROOTDataset::ROOTDataset(const GeneralOptions& general_options) : Dataset(general_options)
     {
-      if (not boost::filesystem::exists(m_general_options.m_datafile)) {
-        B2ERROR("Error given ROOT file dies not exists " << m_general_options.m_datafile);
-        throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile);
+      auto filenames = RootIOUtilities::expandWordExpansions(m_general_options.m_datafiles);
+      if (filenames.empty()) {
+        B2ERROR("Found no valid filenames in GeneralOptions");
+        throw std::runtime_error("Found no valid filenames in GeneralOptions");
       }
 
-      m_file = TFile::Open(m_general_options.m_datafile.c_str(), "UPDATE");
-      if (not m_file or m_file->IsZombie() or not m_file->IsOpen()) {
-        B2ERROR("Error during open of ROOT file named " << m_general_options.m_datafile);
-        throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile);
+      //Open TFile
+      TDirectory* dir = gDirectory;
+      for (const auto& filename : filenames) {
+        if (not boost::filesystem::exists(filename)) {
+          B2ERROR("Error given ROOT file dies not exists " << filename);
+          throw std::runtime_error("Error during open of ROOT file named " + filename);
+        }
+
+        TFile* f = TFile::Open(filename.c_str(), "READ");
+        if (!f or f->IsZombie() or not f->IsOpen()) {
+          B2ERROR("Error during open of ROOT file named " << filename);
+          throw std::runtime_error("Error during open of ROOT file named " + filename);
+        }
+        delete f;
       }
-      m_file->cd();
-      m_file->GetObject(m_general_options.m_treename.c_str(), m_tree);
-      if (not m_tree) {
-        B2ERROR("Error during open of ROOT file named " << m_general_options.m_datafile << " cannot retreive tree named " <<
-                m_general_options.m_treename);
-        throw std::runtime_error("Error during open of ROOT file named " + m_general_options.m_datafile + " cannot retreive tree named " +
-                                 m_general_options.m_treename);
+      dir->cd();
+
+      m_tree = new TChain(m_general_options.m_treename.c_str());
+      for (const auto& filename : filenames) {
+        //nentries = -1 forces AddFile() to read headers
+        if (!m_tree->AddFile(filename.c_str(), -1)) {
+          B2ERROR("Error during open of ROOT file named " << filename << " cannot retreive tree named " <<
+                  m_general_options.m_treename);
+          throw std::runtime_error("Error during open of ROOT file named " + filename + " cannot retreive tree named " +
+                                   m_general_options.m_treename);
+        }
       }
+
       setBranchAddresses();
     }
 
@@ -239,16 +258,8 @@ namespace Belle2 {
 
     ROOTDataset::~ROOTDataset()
     {
-      /* This leads to a segmentation fault,
-       * it is not clear why.
-       * if(m_tree) {
-        m_tree->SetDirectory(nullptr);
-      }*/
-      if (m_file) {
-        m_file->Close();
-      }
+      delete m_tree;
       m_tree = nullptr;
-      m_file = nullptr;
     }
 
     bool ROOTDataset::checkForBranch(TTree* tree, const std::string& branchname) const

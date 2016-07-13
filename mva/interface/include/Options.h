@@ -78,7 +78,7 @@ namespace Belle2 {
 
       std::string m_method; /**< Name of the MVA method to use */
       std::string m_weightfile; /**< Name of the weightfile containing the finished training */
-      std::string m_datafile; /**< Name of the datafile containing the training data */
+      std::vector<std::string> m_datafiles; /**< Name of the datafiles containing the training data */
       std::string m_treename = "ntuple"; /**< Name of the TTree inside the datafile containing the training data */
       std::vector<std::string> m_variables; /**< Vector of all variables (branch names) used in the training */
       int m_signal_class = 1; /**< Signal class which is used as signal in a classification problem */
@@ -129,7 +129,7 @@ namespace Belle2 {
 
       bool m_use_splot = false; /**< Use splot training */
       std::string m_splot_variable = "M"; /**< Discriminating variable */
-      std::string m_splot_mc_file; /**< Monte carlo file used for the distribution of the discriminating variable */
+      std::vector<std::string> m_splot_mc_files; /**< Monte carlo files used for the distribution of the discriminating variable */
       bool m_splot_combined = false; /**< Combine sPlot training with PDF classifier for discriminating variable */
       bool m_splot_boosted = false; /**< Use boosted sPlot training (aPlot) */
     };

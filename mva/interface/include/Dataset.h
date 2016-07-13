@@ -16,6 +16,7 @@
 
 #include <TFile.h>
 #include <TTree.h>
+#include <TChain.h>
 #include <TROOT.h>
 
 #include <string>
@@ -271,8 +272,7 @@ namespace Belle2 {
       bool checkForBranch(TTree*, const std::string&) const;
 
     protected:
-      TTree* m_tree = nullptr; /**< Pointer to the TTree containing the data */
-      TFile* m_file = nullptr; /**< Pointer to the TFile containing the data */
+      TChain* m_tree = nullptr; /**< Pointer to the TChain containing the data */
 
     };
 

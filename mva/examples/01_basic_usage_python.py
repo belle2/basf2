@@ -9,7 +9,7 @@ if __name__ == "__main__":
 
     # Train a MVA method and directly upload it to the database
     general_options = basf2_mva.GeneralOptions()
-    general_options.m_datafile = "train.root"
+    general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
     general_options.m_weightfile = "MVADatabaseIdentifier"
     general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')

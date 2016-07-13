@@ -24,7 +24,7 @@ namespace {
 
     EXPECT_EQ(general_options.m_method, "");
     EXPECT_EQ(general_options.m_weightfile, "");
-    EXPECT_EQ(general_options.m_datafile, "");
+    EXPECT_EQ(general_options.m_datafiles.size(), 0);
     EXPECT_EQ(general_options.m_treename, "ntuple");
     EXPECT_EQ(general_options.m_variables.size(), 0);
     EXPECT_EQ(general_options.m_signal_class, 1);
@@ -33,7 +33,7 @@ namespace {
 
     general_options.m_method = "Method";
     general_options.m_weightfile = "Weightfile";
-    general_options.m_datafile = "Datafile";
+    general_options.m_datafiles = {"Datafile"};
     general_options.m_treename = "Tree";
     general_options.m_variables = {"v", "a", "r", "s"};
     general_options.m_signal_class = 2;
@@ -44,7 +44,8 @@ namespace {
     general_options.save(pt);
     EXPECT_EQ(pt.get<std::string>("method"), "Method");
     EXPECT_EQ(pt.get<std::string>("weightfile"), "Weightfile");
-    EXPECT_EQ(pt.get<std::string>("datafile"), "Datafile");
+    EXPECT_EQ(pt.get<unsigned int>("number_data_files"), 1);
+    EXPECT_EQ(pt.get<std::string>("datafile0"), "Datafile");
     EXPECT_EQ(pt.get<std::string>("treename"), "Tree");
     EXPECT_EQ(pt.get<std::string>("target_variable"), "Target");
     EXPECT_EQ(pt.get<std::string>("weight_variable"), "Weight");
@@ -60,7 +61,8 @@ namespace {
 
     EXPECT_EQ(general_options2.m_method, "Method");
     EXPECT_EQ(general_options2.m_weightfile, "Weightfile");
-    EXPECT_EQ(general_options2.m_datafile, "Datafile");
+    EXPECT_EQ(general_options2.m_datafiles.size(), 1);
+    EXPECT_EQ(general_options2.m_datafiles[0], "Datafile");
     EXPECT_EQ(general_options2.m_treename, "Tree");
     EXPECT_EQ(general_options2.m_variables.size(), 4);
     EXPECT_EQ(general_options2.m_variables[0], "v");
@@ -85,7 +87,7 @@ namespace {
     EXPECT_EQ(meta_options.m_hyperparameters.size(), 0);
     EXPECT_EQ(meta_options.m_hyperparameter_metric, "AUC");
     EXPECT_EQ(meta_options.m_splot_variable, "M");
-    EXPECT_EQ(meta_options.m_splot_mc_file, "");
+    EXPECT_EQ(meta_options.m_splot_mc_files.size(), 0);
     EXPECT_EQ(meta_options.m_splot_combined, false);
     EXPECT_EQ(meta_options.m_splot_boosted, false);
 
@@ -95,7 +97,7 @@ namespace {
     meta_options.m_hyperparameters = {"x", "y"};
     meta_options.m_hyperparameter_metric = "SEP";
     meta_options.m_splot_variable = "Q";
-    meta_options.m_splot_mc_file = "mc.root";
+    meta_options.m_splot_mc_files = {"mc.root"};
     meta_options.m_splot_combined = true;
     meta_options.m_splot_boosted = true;
 
@@ -110,7 +112,8 @@ namespace {
     EXPECT_EQ(pt.get<unsigned int>("number_of_hyperparameters"), 2);
     EXPECT_EQ(pt.get<std::string>("hyperparameter0"), "x");
     EXPECT_EQ(pt.get<std::string>("hyperparameter1"), "y");
-    EXPECT_EQ(pt.get<std::string>("splot_mc_file"), "mc.root");
+    EXPECT_EQ(pt.get<unsigned int>("number_of_mcfiles"), 1);
+    EXPECT_EQ(pt.get<std::string>("splot_mc_file0"), "mc.root");
     EXPECT_EQ(pt.get<std::string>("splot_variable"), "Q");
 
     MVA::MetaOptions meta_options2;
@@ -124,7 +127,8 @@ namespace {
     EXPECT_EQ(meta_options2.m_hyperparameters[0], "x");
     EXPECT_EQ(meta_options2.m_hyperparameters[1], "y");
     EXPECT_EQ(meta_options2.m_splot_variable, "Q");
-    EXPECT_EQ(meta_options2.m_splot_mc_file, "mc.root");
+    EXPECT_EQ(meta_options2.m_splot_mc_files.size(), 1);
+    EXPECT_EQ(meta_options2.m_splot_mc_files[0], "mc.root");
     EXPECT_EQ(meta_options2.m_splot_combined, true);
     EXPECT_EQ(meta_options2.m_splot_boosted, true);
 

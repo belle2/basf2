@@ -170,8 +170,12 @@ namespace Belle2 {
                                               unsigned id);
 
       /// Simulate TSF response (unified version)
-      vector<TRGSignalVector *> simulateTSF(TRGSignalVector * in,
+      vector<TRGSignalVector *> simulateTSFOld(TRGSignalVector * in,
                                             unsigned id);
+
+      /// Simulate TSF response (unified version, 2016/07/12)
+      vector<TRGSignalVector *> simulateTSF(TRGSignalVector * in,
+                                             unsigned id);
 
       /// Output packer for tracker
       TRGSignalVector * packerForTracker(vector<TRGSignalVector *> &,

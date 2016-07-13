@@ -2619,7 +2619,7 @@ TSFinder::packerForTracker(vector<TRGSignalVector *> & hitList,
 }
 
 vector <TRGSignalVector *>
-TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
+TSFinder::simulateTSFOld(TRGSignalVector * in, unsigned tsid) {
 
     //variables for common
     const string na = "TSF" + TRGUtilities::itostring(tsid) + " in " +
@@ -2681,6 +2681,10 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
 
     int * LUTValue = new int[changeTime.size()];
     if (changeTime.size()) {
+
+        const string fn = "TSF::simulateTSF:tsid=" + to_string(tsid);
+        TRGDebug::enterStage(fn);
+
         int hitPosition = 0;
         bool fTimeBool[10];
         int tmpPTime = 0 ;
@@ -2692,72 +2696,274 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
         //tmpFTime = mkint(fTime.state(changeTime[0]));
         bool eOUT = true;
         for (unsigned i = 0; i < changeTime.size(); i++) {
-            LUTValue[i] = tsi->LUT()->getValue(mkint(Hitmap->state(changeTime[i])));
+            int ct = changeTime[i];
+
+//          LUTValue[i] = tsi->LUT()->getValue(mkint(Hitmap->state(ct)));
+            LUTValue[i] = tsi->LUT()->getValue(unsigned(Hitmap->state(ct)));
 
             /// output for EvtTime & Low pT tracker module
             if ((LUTValue[i]) && (eOUT)) {
-                resultE->set(fTimeVect, changeTime[i]);
+                resultE->set(fTimeVect, ct);
                 eOUT = false;
             }
 
-            bool priority1rise = pri0->riseEdge(changeTime[i]);
-            bool priority2rise = pri1->riseEdge(changeTime[i]) |
-                                 pri2->riseEdge(changeTime[i]);
+            bool priority1rise = pri0->riseEdge(ct);
+            bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
 
             /// output for Tracker & N.N
             //ready for output
             if (priority1rise) {
                 hitPosition = 3;
-                tmpPTime = mkint(pTime.state(changeTime[i]));
-                tmpCTime = changeTime[i];
+//              tmpPTime = mkint(pTime.state(ct));
+                tmpPTime = unsigned(pTime.state(ct));
+                tmpCTime = ct;
             }
             else if (priority2rise) {
                 if (!hitPosition) {
-                    tmpPTime = mkint(pTime.state(changeTime[i]));
-                    tmpCTime = changeTime[i];
-                    if ((*Hitmap)[0].state(changeTime[i])) hitPosition = 2;
+//                  tmpPTime = mkint(pTime.state(ct));
+                    tmpPTime = unsigned(pTime.state(ct));
+                    tmpCTime = ct;
+                    if ((*Hitmap)[0].state(ct)) hitPosition = 2;
                     else hitPosition = 1;
                 }
             }
 
             // output selection
-            if ((hitPosition) && (LUTValue[i]) && ((changeTime[i] - tmpCTime) < 16)) {
-                //iw            tmpOutInt = tsid * pow(2, 13) + tmpPTime * pow(2, 4) +
-                //iw                LUTValue[i] * pow(2,2) + hitPosition;
+            if ((hitPosition) && (LUTValue[i]) && ((ct - tmpCTime) < 16)) {
                 tmpOutInt = tmpPTime * pow(2, 4) +
                             LUTValue[i] * pow(2, 2) + hitPosition;
                 tmpOutBool = mkbool(tmpOutInt, 13);  // ID removed : iw
+
                 if (hitPosition == 3) {
-                    if (priority1rise) resultT->set(tmpOutBool, changeTime[i]);
+                    if (priority1rise) {
+                        resultT->set(tmpOutBool, ct);
+                    }
                     else {
                         if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
                             if (! ((LUTValue[i - 1] == 1) |
                                    (LUTValue[i - 1] == 2)))
-                                resultT->set(tmpOutBool, changeTime[i]);
+                                resultT->set(tmpOutBool, ct);
                         }
                         else {
-                            if (!(LUTValue[i - 1])) resultT->set(tmpOutBool, changeTime[i]);
+                            if (!(LUTValue[i - 1])) resultT->set(tmpOutBool, ct);
                         }
                     }
                 }
                 else {
-                    if (priority2rise) resultT->set(tmpOutBool, changeTime[i]);
+                    if (priority2rise) resultT->set(tmpOutBool, ct);
                     else {
                         if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
                             if (! ((LUTValue[i - 1] == 1) |
                                    (LUTValue[i - 1] == 2)))
-                                resultT->set(tmpOutBool, changeTime[i]);
+                                resultT->set(tmpOutBool, ct);
                         }
                         else {
-                            if (!(LUTValue[i])) resultT->set(tmpOutBool, changeTime[i]);
+                            if (!(LUTValue[i])) resultT->set(tmpOutBool, ct);
                         }
                     }
                 }
             }
 
+            if (TRGDebug::level() > 1) {
+                cout << TRGDebug::tab() << "clk=" << ct
+                     << ", pattern=" << Hitmap->state(ct)
+                     << ", LUT=" << LUTValue[i]
+                     << ", pri=" << priority1rise
+                     << ", sec=" << priority2rise
+                     << ", hitPos=" << hitPosition
+                     << ", (clk-tmpCTime)=" << (ct - tmpCTime)
+                     << endl;
+            }            
         }
 
+        TRGDebug::leaveStage(fn);
     }
+
+    result.push_back(resultT);
+    result.push_back(resultE);
+
+    delete [] LUTValue;
+    delete Hitmap;
+
+    return result;
+}
+vector <TRGSignalVector *>
+TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
+
+    //variables for common
+    const string na = "TSF" + TRGUtilities::itostring(tsid) + " in " +
+                      name();
+    TCSegment * tsi = _tsSL[tsid];
+    vector <TRGSignalVector *> result;
+
+    //variables for EvtTime & Low pT
+    vector<bool> fTimeVect;
+    //  int tmpFTime = 0 ;
+
+    //variables for Tracker & N.N
+    vector <bool> tmpOutBool;
+
+    //iwTRGSignalVector* resultT = new TRGSignalVector(na, in->clock(),22);
+    TRGSignalVector * resultT = new TRGSignalVector(na, in->clock(), 13);
+    TRGSignalVector * resultE = new TRGSignalVector(na, in->clock(), 10);
+    TRGSignalVector * Hitmap = new TRGSignalVector(na + "HitMap", in->clock(), 0);
+    TRGSignalVector pTime(na + "PriorityTime", in->clock(), 0);
+    TRGSignalVector fTime(na + "FastestTime", in->clock(), 0);
+    TRGSignal * pri0 = 0;
+    TRGSignal * pri1 = 0;
+    TRGSignal * pri2 = 0;
+    if (_type == innerType) {
+        for (unsigned i = 0; i < 16; i++) {
+            Hitmap->push_back((* in)[i]);
+            (* Hitmap)[i].widen(16);
+        }
+        for (unsigned i = 0; i < 4; i++) {
+            pTime.push_back((* in)[i + 16]);
+            fTime.push_back((* in)[i + 20]);
+        }
+        pri0 = & (*Hitmap)[1];
+        pri1 = & (*Hitmap)[2];
+        pri2 = & (*Hitmap)[3];
+    }
+    else {
+        for (unsigned i = 0; i < 12; i++) {
+            Hitmap->push_back((* in)[i]);
+            (* Hitmap)[i].widen(16);
+        }
+        for (unsigned i = 0; i < 4; i++) {
+            pTime.push_back((* in)[i + 12]);
+            fTime.push_back((* in)[i + 16]);
+        }
+        pri0 = & (*Hitmap)[6];
+        pri1 = & (*Hitmap)[7];
+        pri2 = & (*Hitmap)[8];
+    }
+
+    //...Clock counter...
+    const TRGSignalVector & cc = in->clock().clockCounter();
+    for (unsigned i = 0; i < 5; i++) {
+        pTime.push_back(cc[i]);
+        fTime.push_back(cc[i]);
+    }
+
+    vector <int> changeTime = Hitmap->stateChanges();
+
+    int * LUTValue = new int[changeTime.size()];
+    int lastFastHit = in->clock().min();
+    if (changeTime.size()) {
+
+        const string fn = "TSF::simulateTSF:tsid=" + to_string(tsid);
+        TRGDebug::enterStage(fn);
+
+        int hitPosition = 0;
+        int tmpPTime = 0 ;
+        int tmpCTime = 0 ;
+        int tmpOutInt;
+        TRGState ft(10);
+        bool eOut = false;
+        for (unsigned i = 0; i < changeTime.size(); i++) {
+
+            int ct = changeTime[i];
+            TRGState st = Hitmap->state(ct);
+
+            //...LUT...
+            // 0:no hit, 1:right, 2:left, 3:LR unknown hit
+            LUTValue[i] = tsi->LUT()->getValue(unsigned(st));
+
+            //...Any wire hit (for the fastest timing)...
+            bool active = st.active();
+            if (active) {
+                const int timeCounter = ct - lastFastHit;
+
+                //...Record as the fastest timing hit...
+                if (timeCounter > 63) {
+                    lastFastHit = ct;
+                    TRGState ftnow = fTime.state(ct);
+                    ftnow += TRGState(1, 1);
+                    ft = ftnow;
+                    eOut = true;
+                }
+            }
+
+            /// output for EvtTime & Low pT tracker module
+            if ((LUTValue[i])) {
+                if (eOut) {
+                    resultE->set(fTimeVect, ct);
+                    eOut = false;
+                }
+            }
+
+            bool priority1rise = pri0->riseEdge(ct);
+            bool priority2rise = pri1->riseEdge(ct) | pri2->riseEdge(ct);
+
+            /// output for Tracker & N.N
+            //ready for output
+            if (priority1rise) {
+                hitPosition = 3;
+                tmpPTime = unsigned(pTime.state(ct));
+                tmpCTime = ct;
+            }
+            else if (priority2rise) {
+                if (!hitPosition) {
+                    tmpPTime = unsigned(pTime.state(ct));
+                    tmpCTime = ct;
+                    if ((*Hitmap)[0].state(ct)) hitPosition = 2;
+                    else hitPosition = 1;
+                }
+            }
+
+            // output selection
+            if ((hitPosition) && (LUTValue[i]) && ((ct - tmpCTime) < 16)) {
+                //iw            tmpOutInt = tsid * pow(2, 13) + tmpPTime * pow(2, 4) +
+                //iw                LUTValue[i] * pow(2,2) + hitPosition;
+                tmpOutInt = tmpPTime * pow(2, 4) +
+                            LUTValue[i] * pow(2, 2) + hitPosition;
+                tmpOutBool = mkbool(tmpOutInt, 13);  // ID removed : iw
+
+                if (hitPosition == 3) {
+                    if (priority1rise) {
+                        resultT->set(tmpOutBool, ct);
+                    }
+                    else {
+                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
+                            if (! ((LUTValue[i - 1] == 1) |
+                                   (LUTValue[i - 1] == 2)))
+                                resultT->set(tmpOutBool, ct);
+                        }
+                        else {
+                            if (!(LUTValue[i - 1])) resultT->set(tmpOutBool, ct);
+                        }
+                    }
+                }
+                else {
+                    if (priority2rise) resultT->set(tmpOutBool, ct);
+                    else {
+                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
+                            if (! ((LUTValue[i - 1] == 1) |
+                                   (LUTValue[i - 1] == 2)))
+                                resultT->set(tmpOutBool, ct);
+                        }
+                        else {
+                            if (!(LUTValue[i])) resultT->set(tmpOutBool, ct);
+                        }
+                    }
+                }
+            }
+
+            if (TRGDebug::level() > 1) {
+                cout << TRGDebug::tab() << "clk=" << ct
+                     << ", pattern=" << st
+                     << ", LUT=" << LUTValue[i]
+                     << ", pri=" << priority1rise
+                     << ", sec=" << priority2rise
+                     << ", hitPos=" << hitPosition
+                     << ", (clk-tmpCTime)=" << (ct - tmpCTime)
+                     << endl;
+            }            
+        }
+        TRGDebug::leaveStage(fn);
+    }
+
     result.push_back(resultT);
     result.push_back(resultE);
 

@@ -2380,9 +2380,6 @@ namespace Belle2 {
       _mergers[i]->simulate();
     }
 
-    unsigned oldLevel = TRGDebug::level();
-    TRGDebug::level(1);
-
     //...TSFs...
     const unsigned nTSFBoards = _tsfboards.size();
     for (unsigned i = 0; i < nTSFBoards; i++) {
@@ -2410,8 +2407,6 @@ namespace Belle2 {
     for (unsigned i = 0; i < nTracker2Ds; i++) {
       _tracker2Ds[i]->simulate();
     }
-
-    TRGDebug::level(oldLevel);
 
 #ifdef TRGCDC_DISPLAY
     dump("hits");

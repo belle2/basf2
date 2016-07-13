@@ -232,9 +232,11 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
 
   //
-  // Should be implemented ASAP.
+  // The DB version should be implemented ASAP.
   //
-  if (m_senseWireZposMode == 1)readDeltaz(geom);
+  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content/");
+  GearDir gbxParams(content);
+  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
 
 
   //
@@ -328,8 +330,6 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     readWirePositionParams(geom, c_Aligned);
   }
 
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content/");
-  GearDir gbxParams(content);
   m_XTetc = true;
   if (m_XTetc) {
 #if defined(CDC_XT_FROM_DB)
@@ -2682,6 +2682,3 @@ signed short CDCGeometryPar::getShiftInSuperLayer(unsigned short iSuperLayer, un
   return m_shiftInSuperLayer[iSuperLayer][iLayer];
 }
 
-void CDCGeometryPar::readDeltaz(const CDCGeometry& geom)
-{
-}

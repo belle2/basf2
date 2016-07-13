@@ -52,6 +52,17 @@ namespace Belle2 {
       ~Weightfile();
 
       /**
+       * Add variable importance
+       * @param importance
+       */
+      void addFeatureImportance(const std::map<std::string, float>& importance);
+
+      /**
+       * Get feature importance
+       */
+      std::map<std::string, float> getFeatureImportance() const;
+
+      /**
        * Add an Option object to the xml tree
        * @param options to add
        */

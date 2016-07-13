@@ -118,6 +118,12 @@ namespace Belle2 {
       weightfile.addFile("FastBDT_Weightfile", custom_weightfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
+      std::map<std::string, float> importance;
+      for (auto& pair : forest.GetVariableRanking()) {
+        importance[m_general_options.m_variables[pair.first]] = pair.second;
+      }
+      weightfile.addFeatureImportance(importance);
+
       return weightfile;
 
     }

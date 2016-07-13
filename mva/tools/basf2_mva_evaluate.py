@@ -44,11 +44,10 @@ def extract_names(identifiers, datafiles):
         general_options = basf2_mva.GeneralOptions()
         weightfile = basf2_mva.Weightfile.load(identifier)
         weightfile.getOptions(general_options)
-        for datafile in datafiles:
-            variables.append([Belle2.makeROOTCompatible(v) for v in general_options.m_variables])
-            probabilities.append(Belle2.makeROOTCompatible(identifier + '_' + datafile))
-            truths.append(Belle2.makeROOTCompatible(identifier + '_' + datafile + '_' + general_options.m_target_variable))
-            labels.append(identifier + " " + datafile)
+        variables.append([Belle2.makeROOTCompatible(v) for v in general_options.m_variables])
+        probabilities.append(Belle2.makeROOTCompatible(identifier))
+        truths.append(Belle2.makeROOTCompatible(identifier + '_' + general_options.m_target_variable))
+        labels.append(identifier)
     return probabilities, truths, variables, labels
 
 
@@ -62,7 +61,7 @@ if __name__ == '__main__':
 
     rootfilename = tempdir + '/expert.root'
     basf2_mva.expert(basf2_mva.vector(*identifiers), basf2_mva.vector(*datafiles), args.treename, rootfilename)
-    probabilities, truths, variables, labels = extract_names(identifiers, datafiles)
+    probabilities, truths, variables, labels = extract_names(identifiers)
 
     rootfile = ROOT.TFile(rootfilename, "UPDATE")
 

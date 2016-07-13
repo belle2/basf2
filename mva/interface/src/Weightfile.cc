@@ -46,6 +46,29 @@ namespace Belle2 {
       options.load(m_pt);
     }
 
+    void Weightfile::addFeatureImportance(const std::map<std::string, float>& importance)
+    {
+      m_pt.put("number_of_importance_vars", importance.size());
+      unsigned int i = 0;
+      for (auto& pair : importance) {
+        m_pt.put(std::string("importance_key") + std::to_string(i), pair.first);
+        m_pt.put(std::string("importance_value") + std::to_string(i), pair.second);
+        ++i;
+      }
+    }
+
+    std::map<std::string, float> Weightfile::getFeatureImportance() const
+    {
+      std::map<std::string, float> importance;
+      unsigned int numberOfImportanceVars = m_pt.get<unsigned int>("number_of_importance_vars", 0);
+      for (unsigned int i = 0; i < numberOfImportanceVars; ++i) {
+        std::string key = m_pt.get<std::string>(std::string("importance_key") + std::to_string(i));
+        float value = m_pt.get<float>(std::string("importance_value") + std::to_string(i));
+        importance[key] = value;
+      }
+      return importance;
+    }
+
     void Weightfile::addSignalFraction(float signal_fraction)
     {
       m_pt.put("signal_fraction", signal_fraction);

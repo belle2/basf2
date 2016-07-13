@@ -57,6 +57,28 @@ namespace {
     EXPECT_EQ(options3.y, "b");
   }
 
+  TEST(WeightfileTest, FeatureImportance)
+  {
+    std::map<std::string, float> importance;
+    importance["a"] = 1.0;
+    importance["b"] = 2.0;
+    importance["c"] = 3.0;
+    MVA::Weightfile weightfile;
+    weightfile.addFeatureImportance(importance);
+
+    EXPECT_EQ(weightfile.getElement<unsigned int>("number_of_importance_vars"), 3);
+    EXPECT_EQ(weightfile.getElement<std::string>("importance_key0"), "a");
+    EXPECT_EQ(weightfile.getElement<float>("importance_value0"), 1.0);
+
+    auto importance2 = weightfile.getFeatureImportance();
+
+    EXPECT_EQ(importance2.size(), 3);
+    EXPECT_EQ(importance2["a"], 1.0);
+    EXPECT_EQ(importance2["b"], 2.0);
+    EXPECT_EQ(importance2["c"], 3.0);
+
+  }
+
   TEST(WeightfileTest, SignalFraction)
   {
 

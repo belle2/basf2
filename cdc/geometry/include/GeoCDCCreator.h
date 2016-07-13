@@ -57,6 +57,9 @@ namespace Belle2 {
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
+      /**
+       * Create geometry from DB.
+       */
       virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
       {
         DBObjPtr<CDCGeometry> geo;
@@ -66,6 +69,9 @@ namespace Belle2 {
         createGeometry(*geo, topVolume, type);
       }
 
+      /**
+       * Create payloads.
+       */
       virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov)
       {
         DBImportObjPtr<CDCGeometry> importObj;
@@ -73,33 +79,65 @@ namespace Belle2 {
         importObj.import(iov);
       }
 
+      /**
+       * Create CDC covers from gear box.
+       */
       void createCovers(const GearDir& content);
+
+      /**
+       * Create CDC covers from DB.
+       */
       void createCovers(const CDCGeometry& geom);
+
+      /**
+       * Create neutron shield from gearbox.
+       */
       void createNeutronShields(const GearDir& content);
+
+
+      /*
+       * Create neutron shield from DB.
+       */
       void createNeutronShields(const CDCGeometry& geom);
+
+      /**
+       * Create G4Cone.
+       */
       void createCone(const double rmin1, const double rmax1,
                       const double rmin2, const double rmax2,
                       const double thick, const double posz,
-                      const int id, G4Material* med, const string name);
+                      const int id, G4Material* med, const string& name);
+      /**
+       * Create G4Box.
+       */
       void createBox(const double length, const double height,
                      const double thick, const double x,
                      const double y, const double z,
                      const int id, G4Material* med,
-                     const string name);
+                     const string& name);
+      /**
+       * Create G4Tube.
+       */
       void createTube(const double rmin, const double rmax,
                       const double thick, const double posZ,
                       const int id, G4Material* med,
-                      const string name);
+                      const string& name);
 
     protected:
 
     private:
+      /**
+       * Create DB object of CDC geometry from gearbox.
+       */
       CDCGeometry createConfiguration(const GearDir& param)
       {
         CDCGeometry cdcGeometry;
         cdcGeometry.read(param);
         return cdcGeometry;
       }
+      /**
+       * Create G4 geometry of CDC.
+       */
       void createGeometry(const CDCGeometry& parameters, G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
       //! CDC G4 logical volume.

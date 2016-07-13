@@ -62,15 +62,11 @@ void CDCGeometry::read(const GearDir& content)
     const double dzfwd = layerContent.getLength("FwdDeltaZ");
     const double dzbwd = layerContent.getLength("BwdDeltaZ");
     const double offset = atof((layerContent.getString("Offset")).c_str());
-    const int nShifts = atoi((layerContent.getString("NShift")).c_str());
     const int nWires = atoi((layerContent.getString("NHoles")).c_str()) / 2;
+    const double nShifts = atof((layerContent.getString("NShift")).c_str());
 
-    SenseLayer sense(iSLayer, r, zfwd, zbwd);
-    sense.setDZfwd(dzfwd);
-    sense.setDZbwd(dzbwd);
-    sense.setOffset(offset);
-    sense.setNShifts(nShifts);
-    sense.setNWires(nWires);
+    SenseLayer sense(iSLayer, r, zfwd, zbwd,
+                     dzfwd, dzbwd, offset, nWires, nShifts);
 
     m_senseLayers.push_back(sense);
   }

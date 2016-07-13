@@ -1,5 +1,5 @@
 /**************************************************************************
- * BASF2 (Belle Analysis Framework 2)                                     *
+ 1;2c* BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
@@ -63,29 +63,31 @@ namespace Belle2 {
       int getId() const {return m_id;}
 
 
-      /*
-       * Get the length of the rib./
+      /**
+       * Get the length of the rib.
        */
       double getLength() const { return m_length;}
-      /*
-       * Get the width of the rib./
+
+      /**
+       * Get the width of the rib.
        */
       double getWidth() const { return m_width;}
-      /*
-       * Get the thickness of the rib./
+
+      /**
+       * Get the thickness of the rib.
        */
       double getThick() const { return m_thick;}
 
-      /*
-       * Get the x-position of the rib./
+      /**
+       * Get the x-position of the rib.
        */
       double getX() const { return m_x;}
-      /*
-       * Get the y-position of the rib./
+      /**
+       * Get the y-position of the rib.
        */
       double getY() const { return m_y;}
-      /*
-       * Get the z-position of the rib./
+      /**
+       * Get the z-position of the rib.
        */
       double getZ() const { return m_z;}
 
@@ -98,12 +100,12 @@ namespace Belle2 {
     private:
       int m_id; //< rib id.
       double m_length; //< length of the rib.
-      double m_width; //< width of the rib.
-      double m_thick; //< thickness of the rib.
-      double m_x; //< the y-position of the rib.
-      double m_y;//< the y-position of the rib.
-      double m_z;//< the z-position of the rib.
-      int m_ndiv; //< Number of division.
+      double m_width; /**< width of the rib. */
+      double m_thick; /**< thickness of the rib. */
+      double m_x; /**< the y-position of the rib. */
+      double m_y;/**< the y-position of the rib. */
+      double m_z;/**< the z-position of the rib. */
+      int m_ndiv; /**< Number of division. */
 
 
       /** Makes objects storable. */
@@ -142,46 +144,46 @@ namespace Belle2 {
        * Get the cover Id.
        */
       int getId() const {return m_id;}
-      /*
-       * Get the minimum radius 1 of the cover./
+      /**
+       * Get the minimum radius 1 of the cover.
        */
       double getRmin1() const { return m_rmin1;}
 
-      /*
-       * Get the minimum radius 2 of the cover./
+      /**
+       * Get the minimum radius 2 of the cover.
        */
       double getRmin2() const { return m_rmin2;}
 
-      /*
-       * Get the maximum radius 1 of the cover./
+      /**
+       * Get the maximum radius 1 of the cover.
        */
       double getRmax1() const { return m_rmax1;}
 
-      /*
-       * Get the maximum radius 2 of the cover./
+      /**
+       * Get the maximum radius 2 of the cover.
        */
       double getRmax2() const { return m_rmax2;}
 
-      /*
-       * Get the thickness of the cover./
+      /**
+       * Get the thickness of the cover.
        */
       double getThick() const { return m_thick;}
 
-      /*
-       * Get the z-position of the cover./
+      /**
+       * Get the z-position of the cover.
        */
       double getZ() const { return m_z;}
 
 
 
     private:
-      int m_id; //< cover id.
-      double m_rmin1; //< the mimnum radius 1 of the cover.
-      double m_rmin2; //< the mimnum radius 2 of the cover.
-      double m_rmax1; //< the maximum radius 1 of the cover.
-      double m_rmax2; //< the maximum radius 2 of the cover.
-      double m_thick;//< the z-position of the cover.
-      double m_z;//< the thickness of the cover.
+      int m_id; /**< cover id. */
+      double m_rmin1; /**< the mimnum radius 1 of the cover. */
+      double m_rmin2; /**< the mimnum radius 2 of the cover. */
+      double m_rmax1; /**< the maximum radius 1 of the cover. */
+      double m_rmax2; /**< the maximum radius 2 of the cover. */
+      double m_thick;/**< the z-position of the cover. */
+      double m_z;/**< the thickness of the cover. */
 
 
       /** Makes objects storable. */
@@ -220,46 +222,46 @@ namespace Belle2 {
        * Get the shield Id.
        */
       int getId() const {return m_id;}
-      /*
-       * Get the minimum radius 1 of the shield./
+      /**
+       * Get the minimum radius 1 of the shield.
        */
       double getRmin1() const { return m_rmin1;}
 
-      /*
-       * Get the minimum radius 2 of the shield./
+      /**
+       * Get the minimum radius 2 of the shield.
        */
       double getRmin2() const { return m_rmin2;}
 
-      /*
-       * Get the maximum radius 1 of the shield./
+      /**
+       * Get the maximum radius 1 of the shield.
        */
       double getRmax1() const { return m_rmax1;}
 
-      /*
-       * Get the maximum radius 2 of the shield./
+      /**
+       * Get the maximum radius 2 of the shield.
        */
       double getRmax2() const { return m_rmax2;}
 
-      /*
-       * Get the thickness of the shield./
+      /**
+       * Get the thickness of the shield.
        */
       double getThick() const { return m_thick;}
 
-      /*
-       * Get the z-position of the shield./
+      /**
+       * Get the z-position of the shield.
        */
       double getZ() const { return m_z;}
 
 
 
     private:
-      int m_id; //< shield id.
-      double m_rmin1; //< the mimnum radius 1 of the shield.
-      double m_rmin2; //< the mimnum radius 2 of the shield.
-      double m_rmax1; //< the maximum radius 1 of the shield.
-      double m_rmax2; //< the maximum radius 2 of the shield.
-      double m_thick;//< the z-position of the shield.
-      double m_z;//< the thickness of the shield.
+      int m_id; /**< shield id. */
+      double m_rmin1; /**< the mimnum radius 1 of the shield. */
+      double m_rmin2; /**< the mimnum radius 2 of the shield. */
+      double m_rmax1; /**< the maximum radius 1 of the shield. */
+      double m_rmax2; /**< the maximum radius 2 of the shield. */
+      double m_thick;/**< the z-position of the shield. */
+      double m_z;/**< the thickness of the shield. */
 
 
       /** Makes objects storable. */
@@ -294,32 +296,32 @@ namespace Belle2 {
        * Get the frontend layer Id.
        */
       int getId() const {return m_id;}
-      /*
-       * Get the minimum radius of the frontend layer./
+      /**
+       * Get the minimum radius of the frontend layer.
        */
       double getRmin() const { return m_rmin;}
-      /*
-       * Get the maximum radius of the frontend layer./
+      /**
+       * Get the maximum radius of the frontend layer.
        */
       double getRmax() const { return m_rmax;}
 
-      /*
-       * Get the forward z-position of the frontend layer./
+      /**
+       * Get the forward z-position of the frontend layer.
        */
       double getZfwd() const { return m_zfwd;}
 
-      /*
-       * Get the backward z-position of the frontend layer./
+      /**
+       * Get the backward z-position of the frontend layer.
        */
       double getZbwd() const { return m_zbwd;}
 
 
     private:
-      int m_id; //< Frontend layer id.
-      double m_rmin; //< the mimnum radius of the frontend layer.
-      double m_rmax; //< the maximum radius of the frontend layer.
-      double m_zfwd;//< the forawrd z-position of the frontend layer.
-      double m_zbwd;//< the forawrd z-position of the frontend layer.
+      int m_id; /**< Frontend layer id. */
+      double m_rmin; /**< the mimnum radius of the frontend layer. */
+      double m_rmax; /**< the maximum radius of the frontend layer. */
+      double m_zfwd;/**< the forawrd z-position of the frontend layer. */
+      double m_zbwd;/**< the forawrd z-position of the frontend layer. */
 
       /** Makes objects storable. */
       ClassDef(Frontend, 1);
@@ -367,9 +369,9 @@ namespace Belle2 {
 
 
     private:
-      std::vector<double> m_rmin; //< Rmin list of the mother volume.
-      std::vector<double> m_rmax; //< Rmax list of the mother volume.
-      std::vector<double> m_z; //< Z-cordinates list of the mother volume.
+      std::vector<double> m_rmin; /**< Rmin list of the mother volume. */
+      std::vector<double> m_rmax; /**< Rmax list of the mother volume. */
+      std::vector<double> m_z; /**< Z-cordinates list of the mother volume. */
 
       /** Makes objects storable. */
       ClassDef(MotherVolume, 1);
@@ -385,15 +387,22 @@ namespace Belle2 {
       /**
        * Default constructor.
        */
-      SenseLayer() {}
+      SenseLayer()
+      {}
 
       /**
        * Constructor.
        */
       SenseLayer(int id,
-                 double r, double zfwd, double zbwd):
+                 double r, double zfwd, double zbwd,
+                 double dZfwd, double dZbwd,
+                 double offset, int nWires, double nShifts) :
         m_id(id), m_r(r),
-        m_zfwd(zfwd), m_zbwd(zbwd)
+        m_zfwd(zfwd), m_zbwd(zbwd),
+        m_dZfwd(dZfwd), m_dZbwd(dZbwd),
+        m_offset(offset),
+        m_nWires(nWires),
+        m_nShifts(nShifts)
       {
       }
 
@@ -475,15 +484,15 @@ namespace Belle2 {
 
     private:
 
-      int m_id; //< ID.
-      double m_r;     //< r min.
-      double m_zfwd;     //< z fwd.
-      double m_zbwd;     //< z bwd.
-      double m_dZfwd;   //< dz fwd.
-      double m_dZbwd;   //< dz fwd.
-      double m_offset;  //< offset.
-      int m_nWires; //< Number of wires.
-      double m_nShifts; //< shift.
+      int m_id; /**< ID. */
+      double m_r;     /**< r min. */
+      double m_zfwd;     /**< z fwd. */
+      double m_zbwd;     /**< z bwd. */
+      double m_dZfwd;   /**< dz fwd. */
+      double m_dZbwd;   /**< dz fwd. */
+      double m_offset;  /**< offset. */
+      int m_nWires; /**< Number of wires. */
+      double m_nShifts; /**< shift. */
 
       /** Makes objects storable. */
       ClassDef(SenseLayer, 1);
@@ -538,10 +547,10 @@ namespace Belle2 {
 
     private:
 
-      int m_id; //< ID.
-      double m_r;     //< r min.
-      double m_zfwd;     //< z fwd.
-      double m_zbwd;     //< z bwd.
+      int m_id; /**< ID. */
+      double m_r;     /**< r min. */
+      double m_zfwd;     /**< z fwd. */
+      double m_zbwd;     /**< z bwd. */
 
       /** Makes objects storable. */
       ClassDef(FieldLayer, 1);
@@ -606,12 +615,12 @@ namespace Belle2 {
 
     private:
 
-      std::string m_name; //< Name.
-      int m_id; //< ID.
-      double m_rmin;     //< r min.
-      double m_rmax;     //< r max.
-      double m_zfwd;     //< z fwd.
-      double m_zbwd;     //< z bwd.
+      std::string m_name; /**< Name. */
+      int m_id; /**< ID. */
+      double m_rmin;     /**< r min. */
+      double m_rmax;     /**< r max. */
+      double m_zfwd;     /**< z fwd. */
+      double m_zbwd;     /**< z bwd. */
 
 
       /** Makes objects storable. */
@@ -677,14 +686,13 @@ namespace Belle2 {
 
     private:
 
+      std::string m_name; /**< Name. */
+      int m_id; /**< ID. */
+      double m_rmin;     /**< r min. */
+      double m_rmax;     /**< r max. */
 
-      std::string m_name; //< Name.
-      int m_id; //< ID.
-      double m_rmin;     //< r min.
-      double m_rmax;     //< r max.
-
-      double m_zfwd;     //< z fwd.
-      double m_zbwd;     //< z bwd.
+      double m_zfwd;     /**< z fwd. */
+      double m_zbwd;     /**< z bwd. */
 
 
       /** Makes objects storable. */
@@ -750,12 +758,12 @@ namespace Belle2 {
 
     private:
 
-      std::string m_name; //< Name.
-      int m_layer; //< Layer.
-      double m_rmin;     //< r min.
-      double m_rmax;     //< r max.
-      double m_zfwd;     //< z fwd.
-      double m_zbwd;     //< z bwd.
+      std::string m_name; /**< Name. */
+      int m_layer; /**< Layer. */
+      double m_rmin;     /**< r min. */
+      double m_rmax;     /**< r max. */
+      double m_zfwd;     /**< z fwd. */
+      double m_zbwd;     /**< z bwd. */
 
       /** Makes objects storable. */
       ClassDef(EndPlateLayer, 1);
@@ -811,8 +819,8 @@ namespace Belle2 {
        */
       std::vector<EndPlateLayer> getEndPlateLayers() const {return m_endPlateLayers;}
     private:
-      int m_id; //< Layer ID.
-      std::vector<EndPlateLayer> m_endPlateLayers; //< Endplate layers.
+      int m_id; /**< Layer ID. */
+      std::vector<EndPlateLayer> m_endPlateLayers; /**< Endplate layers. */
 
       /** Makes objects storable. */
       ClassDef(EndPlate, 1);
@@ -1033,38 +1041,38 @@ namespace Belle2 {
 
   private:
 
-    double m_globalPhiRotation = 0.0; //< Global rotation in phi (degrees).
-    double m_globalOffsetZ = 0.0; //< The offset of the whole cdc in z with respect to the IP (mm).
-    double m_fiducialRmin; //< Minimum radius of the CDC fiducial volume.
-    double m_fiducialRmax; //< Maximum radius of the CDC fiducial volume.
-    MotherVolume m_mother;    //< CDC mother volume.
-    std::vector<SenseLayer> m_senseLayers; //< Sense layer.
-    std::vector<FieldLayer> m_fieldLayers; //< Field layer.
-    std::vector<InnerWall> m_innerWalls;//< Inner wall.
-    std::vector<OuterWall> m_outerWalls;//< Outer wall.
-    std::vector<EndPlate> m_endplates;//< Endplate.
-    std::vector<Frontend> m_frontends;//< Electronics board.
-    std::vector<NeutronShield> m_neutronShields;//< Neutron shields.
-    std::vector<Cover> m_covers;//< Covers.
-    std::vector<Rib> m_ribs;//< Ribs.
+    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
+    double m_globalOffsetZ = 0.0; /**< The offset of the whole cdc in z with respect to the IP (mm). */
+    double m_fiducialRmin; /**< Minimum radius of the CDC fiducial volume. */
+    double m_fiducialRmax; /**< Maximum radius of the CDC fiducial volume. */
+    MotherVolume m_mother;    /**< CDC mother volume. */
+    std::vector<SenseLayer> m_senseLayers; /**< Sense layer. */
+    std::vector<FieldLayer> m_fieldLayers; /**< Field layer. */
+    std::vector<InnerWall> m_innerWalls;/**< Inner wall. */
+    std::vector<OuterWall> m_outerWalls;/**< Outer wall. */
+    std::vector<EndPlate> m_endplates;/**< Endplate. */
+    std::vector<Frontend> m_frontends;/**< Electronics board. */
+    std::vector<NeutronShield> m_neutronShields;/**< Neutron shields. */
+    std::vector<Cover> m_covers;/**< Covers. */
+    std::vector<Rib> m_ribs;/**< Ribs. */
 
-    double m_senseWireDiameter = 0.030; //< Sense wire diameter (mm).
-    int m_senseWireNumbers = 14336;//< Number of sense wires.
-    double m_senseWireTension = 50.0; //< Sense wire tension.
-    double m_senseSpaceResolution = 0.0130; //< Nominal space resolution (cm).
-    double m_fieldWireDiameter = 0.126; //< Field wire diameter (mm).
-    int m_fieldWireNumbers = 42240; //< Number of field wires.
-    double m_feedThroughLength = 15.0; //< Feedthrough length (mm).
-    bool m_debug;//< Debug mode.
-    int m_materialDefinitionMode;//< Material definition mode.
-    int m_senseWireZposMode; //< Sense wire z-position definition mode.
-    double m_clockFrequency; //< Clock frequency.
-    double m_nominalSpaceResolution;//< Nominal space resolution.
+    double m_senseWireDiameter = 0.030; /**< Sense wire diameter (mm). */
+    int m_senseWireNumbers = 14336;/**< Number of sense wires. */
+    double m_senseWireTension = 50.0; /**< Sense wire tension. */
+    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
+    double m_fieldWireDiameter = 0.126; /**< Field wire diameter (mm). */
+    int m_fieldWireNumbers = 42240; /**< Number of field wires. */
+    double m_feedThroughLength = 15.0; /**< Feedthrough length (mm). */
+    bool m_debug;/**< Debug mode. */
+    int m_materialDefinitionMode;/**< Material definition mode. */
+    int m_senseWireZposMode; /**< Sense wire z-position definition mode. */
+    double m_clockFrequency; /**< Clock frequency. */
+    double m_nominalSpaceResolution;/**< Nominal space resolution. */
 
-    bool m_misalignment; //< Misalignment mode.
-    bool m_alignment; //< Alignment mode.
-    std::string m_misalignmentFile; //< Misalignment file.
-    std::string m_alignmentFile; //< Alignment file.
+    bool m_misalignment; /**< Misalignment mode. */
+    bool m_alignment; /**< Alignment mode. */
+    std::string m_misalignmentFile; /**< Misalignment file. */
+    std::string m_alignmentFile; /**< Alignment file. */
 
     ClassDef(CDCGeometry, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

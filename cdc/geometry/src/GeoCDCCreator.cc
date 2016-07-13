@@ -1817,7 +1817,7 @@ namespace Belle2 {
         shieldContent.append((format("/Shields/Shield[%1%]/") % (iShield + 1)).str());
         const string sShieldID = shieldContent.getString("@id");
         const int shieldID = atoi(sShieldID.c_str());
-        const string shieldName = shieldContent.getString("Name");
+        //        const string shieldName = shieldContent.getString("Name");
         const double shieldInnerR1 = shieldContent.getLength("InnerR1");
         const double shieldInnerR2 = shieldContent.getLength("InnerR2");
         const double shieldOuterR1 = shieldContent.getLength("OuterR1");
@@ -1912,7 +1912,7 @@ namespace Belle2 {
         ribContent.append((format("/Covers/Rib[%1%]/") % (iRib + 1)).str());
         const string sribID = ribContent.getString("@id");
         const int ribID = atoi(sribID.c_str());
-        const string ribName = ribContent.getString("Name");
+        //        const string ribName = ribContent.getString("Name");
         const double length = ribContent.getLength("Length");
         const double width = ribContent.getLength("Width");
         const double thick = ribContent.getLength("Thickness");
@@ -1975,7 +1975,7 @@ namespace Belle2 {
                                    const double rmin2, const double rmax2,
                                    const double thick, const double posZ,
                                    const int id, G4Material* med,
-                                   const string name)
+                                   const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -1993,7 +1993,7 @@ namespace Belle2 {
     void GeoCDCCreator::createTube(const double rmin, const double rmax,
                                    const double thick, const double posZ,
                                    const int id, G4Material* med,
-                                   const string name)
+                                   const string& name)
     {
       const string solidName = "solid" + name;
       const string logicalName = "logical" + name;
@@ -2012,7 +2012,7 @@ namespace Belle2 {
                                   const double thick, const double x,
                                   const double y, const double z,
                                   const int id, G4Material* med,
-                                  const string name)
+                                  const string& name)
     {
       const string solidName = (format("solid%1%%2%") % name % id).str();
       const string logicalName = (format("logical%1%%2%") % name % id).str();

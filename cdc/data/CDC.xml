@@ -56,7 +56,7 @@
     <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v3.dat</xt4ReconFileName>
     <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v0.1.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
-    <t04ReconFileName desc="file which contains t0 for reconstruction">t0_CDCTOP.dat</t04ReconFileName>
+    <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
     <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName>
 
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>

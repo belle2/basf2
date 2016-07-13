@@ -2944,7 +2944,8 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
                                 resultT->set(tmpOutBool, ct);
                         }
                         else {
-                            if (!(LUTValue[i])) resultT->set(tmpOutBool, ct);
+                            if (! (LUTValue[i - 1]))
+                                resultT->set(tmpOutBool, ct);
                         }
                     }
                 }

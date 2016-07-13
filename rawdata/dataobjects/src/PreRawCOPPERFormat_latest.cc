@@ -12,7 +12,6 @@
 using namespace std;
 using namespace Belle2;
 
-//#define DESY
 //#define NO_ERROR_STOP
 //#define WO_FIRST_EVENUM_CHECK
 
@@ -106,6 +105,14 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
             "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
+
+    for (int i = 0; i < 4; i++) {
+      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
+      if (GetFINESSENwords(n, i) > 0) {
+        CheckCRC16(n, i);
+      }
+    }
+    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
     string err_str = err_buf;
     throw (err_str);
   }
@@ -173,6 +180,14 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("[DEBUG] [ERROR] %s\n", err_buf);
+
+    for (int i = 0; i < 4; i++) {
+      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
+      if (GetFINESSENwords(n, i) > 0) {
+        CheckCRC16(n, i);
+      }
+    }
+    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
 #ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
 #endif //NO_ERROR_STOP
@@ -243,14 +258,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
       sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-#ifdef DESY
-      //
-      // In DESY test, we ignore this error
-      //
-      printf("[DEBUG] [INFO] %s", err_buf);
-#else
       err_flag = 1;
-#endif
     }
 
     //
@@ -335,9 +343,16 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
 #endif
 
   if (err_flag == 1) {
+    printf("%s", err_buf); fflush(stdout);
     printf("[DEBUG] ========== dump a data blcok : block # %d==========\n", n);
     PrintData(GetBuffer(n), GetBlockNwords(n));
-    printf("%s", err_buf); fflush(stdout);
+    for (int i = 0; i < 4; i++) {
+      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
+      if (GetFINESSENwords(n, i) > 0) {
+        CheckCRC16(n, i);
+      }
+    }
+    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
     string err_str = err_buf;
     throw (err_str);
 
@@ -411,10 +426,17 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
           char err_buf[500];
           sprintf(err_buf,
                   "CORRUPTED DATA: mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
-                  i,  temp_ctime_trgtype, temp_ctime_trgtype_footer, temp_eve, temp_eve_footer,
+                  i,  temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 
+          for (int j = 0; j < 4; j++) {
+            printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, j);
+            if (GetFINESSENwords(n, j) > 0) {
+              CheckCRC16(n, j);
+            }
+          }
+          printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
 #ifndef NO_ERROR_STOP
           string err_str = err_buf; throw (err_str);
 #endif
@@ -433,6 +455,13 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
 
+    for (int i = 0; i < 4; i++) {
+      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
+      if (GetFINESSENwords(n, i) > 0) {
+        CheckCRC16(n, i);
+      }
+    }
+    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
 #ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
 #endif
@@ -641,6 +670,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
+
     string err_str = err_buf; throw (err_str);
     //     sleep(12345678);
     //     exit(-1);
@@ -719,6 +749,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
       PrintData(GetBuffer(datablock_id), TotalBufNwords());
 
+      for (int i = 0; i < 4; i++) {
+        printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", datablock_id, i);
+        if (GetFINESSENwords(datablock_id, i) > 0) {
+          CheckCRC16(datablock_id, i);
+        }
+      }
+      printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", datablock_id);
       throw (err_str);
       //      exit(-1);
 #endif
@@ -849,12 +886,8 @@ void PreRawCOPPERFormat_latest::CopyReducedData(int* bufin, int nwords, int num_
     }
   }
 
-  //   raw_datablk->SetBuffer(buf_to, pos_nwords_to, 0,
-  //                          raw_datablk->GetNumEvents(), raw_datablk->GetNumNodes());
-  //  int* buf_from = raw_datablk->GetWholeBuffer();
-  //  if (delete_flag_from == 1) { delete[] buf_from;}
-
   *nwords_to = pos_nwords_to;
+
   return ;
 }
 

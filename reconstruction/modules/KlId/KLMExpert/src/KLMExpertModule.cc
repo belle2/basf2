@@ -36,15 +36,6 @@ KLMExpertModule::KLMExpertModule(): Module()
 {
   setDescription("Use to calculate KlId for each KLMCluster.");
 
-
-  // classifier paths
-
-//  /** Path were to find the .xml file containing the classifier trainings. */
-//  addParam("ID ClassifierPath",
-//           m_IDClassifierPath,
-//           "Path to the .xml weight file containing the fitted classifier.",
-//           m_IDClassifierPath);
-//
 }
 
 
@@ -71,39 +62,15 @@ void KLMExpertModule::initialize()
   StoreArray<KlId> klids;
   klmClusters.registerRelationTo(klids);
 
-
-  // the whole vector will be classified for all cluster each
-  m_feature_variables.push_back(m_KLMnCluster);
-  m_feature_variables.push_back(m_KLMnLayer);
-  m_feature_variables.push_back(m_KLMnInnermostLayer);
-  m_feature_variables.push_back(m_KLMglobalZ);
-  m_feature_variables.push_back(m_KLMtime);
-  m_feature_variables.push_back(m_KLMinvM);
-  m_feature_variables.push_back(m_KLMtrackDist);
-  m_feature_variables.push_back(m_KLMnextCluster);
-  m_feature_variables.push_back(m_KLMavInterClusterDist);
-
-  m_feature_variables.push_back(m_KLMTrackSepDist);
-  m_feature_variables.push_back(m_KLMTrackSepAngle);
-  m_feature_variables.push_back(m_KLMInitialTrackSepAngle);
-  m_feature_variables.push_back(m_KLMECLDist);
-  m_feature_variables.push_back(m_KLMECLE);
-  m_feature_variables.push_back(m_KLMECLE9oE25);
-  m_feature_variables.push_back(m_KLMECLTiming);
-  m_feature_variables.push_back(m_KLMECLEerror);
-  m_feature_variables.push_back(m_KLMtrackToECL);
-  m_feature_variables.push_back(m_KLMECLdeltaL);
-  m_feature_variables.push_back(m_KLMECLminTrackDist);
-
-
+  // reserve n variables in the vector !!:w
+  m_feature_variables.reserve(23);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
                                   DBObjPtr<DatabaseRepresentationOfWeightfile>(m_identifier));
   }
+
   MVA::AbstractInterface::initSupportedInterfaces();
-
-
 
 }
 
@@ -121,8 +88,6 @@ void KLMExpertModule::beginRun()
     auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
     init_mva(weightfile);
   }
-
-
 
 }
 
@@ -228,11 +193,31 @@ void KLMExpertModule::event()
     m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
+    m_feature_variables.push_back(m_KLMnCluster);
+    m_feature_variables.push_back(m_KLMnLayer);
+    m_feature_variables.push_back(m_KLMnInnermostLayer);
+    m_feature_variables.push_back(m_KLMglobalZ);
+    m_feature_variables.push_back(m_KLMtime);
+    m_feature_variables.push_back(m_KLMinvM);
+    m_feature_variables.push_back(m_KLMtrackDist);
+    m_feature_variables.push_back(m_KLMnextCluster);
+    m_feature_variables.push_back(m_KLMavInterClusterDist);
+    m_feature_variables.push_back(m_KLMTrackSepDist);
+    m_feature_variables.push_back(m_KLMTrackSepAngle);
+    m_feature_variables.push_back(m_KLMInitialTrackSepAngle);
+    m_feature_variables.push_back(m_KLMECLDist);
+    m_feature_variables.push_back(m_KLMECLE);
+    m_feature_variables.push_back(m_KLMECLE9oE25);
+    m_feature_variables.push_back(m_KLMECLTiming);
+    m_feature_variables.push_back(m_KLMECLEerror);
+    m_feature_variables.push_back(m_KLMtrackToECL);
+    m_feature_variables.push_back(m_KLMECLdeltaL);
+    m_feature_variables.push_back(m_KLMECLminTrackDist);
+
+
     // rewrite dataset
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
       m_dataset->m_input[i] = m_feature_variables[i];
-
-      cout << "KLM dataset member: " << i << " " << m_dataset->m_input[i]  << endl;
     }
 
     //classify dartaset
@@ -244,10 +229,12 @@ void KLMExpertModule::event()
       IDMVAOut = (IDMVAOut + 1) / 2.0;
     }
 
-    cout << "mva KLMExpert: " << IDMVAOut << endl;
     // KlId, bkg prob, KLM, ECL
     klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
     cluster.addRelationTo(klid);
+
+    m_feature_variables.clear();
+
 
   }// for cluster in clusters
 } // event

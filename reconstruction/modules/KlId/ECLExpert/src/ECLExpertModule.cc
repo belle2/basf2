@@ -54,13 +54,7 @@ void ECLExpertModule::initialize()
   eclClusters.registerRelationTo(klids);
   //run KLMTMVA Expert first
 
-  m_feature_variables.push_back(m_ECLE);
-  m_feature_variables.push_back(m_ECLE9oE25);
-  m_feature_variables.push_back(m_ECLTiming);
-  m_feature_variables.push_back(m_ECLEerror);
-  m_feature_variables.push_back(m_ECLtrackDist);
-  m_feature_variables.push_back(m_ECLdeltaL);
-  m_feature_variables.push_back(m_ECLminTrkDistance);
+  m_feature_variables.reserve(7);
 
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
@@ -136,10 +130,20 @@ void ECLExpertModule::event()
     tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance = findClosestTrack(clusterPos);
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
+
+    m_feature_variables.push_back(m_ECLE);
+    m_feature_variables.push_back(m_ECLE9oE25);
+    m_feature_variables.push_back(m_ECLTiming);
+    m_feature_variables.push_back(m_ECLEerror);
+    m_feature_variables.push_back(m_ECLtrackDist);
+    m_feature_variables.push_back(m_ECLdeltaL);
+    m_feature_variables.push_back(m_ECLminTrkDistance);
+
+
+
     // rewrite dataset
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
       m_dataset->m_input[i] = m_feature_variables[i];
-      cout << "ECL dataset member: " << i << " " << m_dataset->m_input[i]  << endl;
     }
 
     //classify dartaset
@@ -150,11 +154,11 @@ void ECLExpertModule::event()
       MVAOut = (MVAOut + 1) / 2.0;
     }
 
-    cout << "mva KLMExpert: " << MVAOut << endl;
     // KlId, bkg prob, KLM, ECL
     klid = klids.appendNew(MVAOut, -1 , 0, 1);
     cluster.addRelationTo(klid);
 
+    m_feature_variables.clear();
   }// for cluster in clusters
 } // event
 

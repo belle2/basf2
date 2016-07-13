@@ -116,9 +116,10 @@ namespace Belle2 {
 
     std::vector<float> m_feature_variables;
     float m_signal_fraction_override; /** true means use signal fraction from training  */
+
     //TODO set to something that makes sense
     std::string m_identifier = FileSystem::findFile(
-                                 "reconstruction/data/weights/TMVAFactory_KLMBKGClassifierBDT.weights.xml") ; /** weight file  */
+                                 "reconstruction/data/weights/KLMExpert.xml") ; /** weight file  */
 
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
                                                                m_weightfile_representation; /**< Database pointer to the Database representation of the weightfile */

@@ -10,6 +10,7 @@
 
 #include <analysis/NtupleTools/NtupleCustomFloatsTool.h>
 #include <analysis/VariableManager/Utility.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 #include <framework/logging/Logger.h>
 #include <TBranch.h>
 #include <boost/algorithm/string.hpp>

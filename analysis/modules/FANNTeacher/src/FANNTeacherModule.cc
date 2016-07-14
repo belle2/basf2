@@ -19,6 +19,7 @@
 #include <framework/gearbox/Const.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/utilities/FileSystem.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <memory>
 #include <fstream>
@@ -224,7 +225,7 @@ namespace Belle2 {
         m_MLPs.push_back(FANNMLP(arrayname, m_variableNames, m_targetName, nNodes, neuronType, trainingMethod, nCycles,
                                  validationFraction, randomSeeds, testRate, nThreads, epochMonitoring));
       } else B2ERROR("FANN Method " << arrayname << " already trained in File " << m_filename << ".");
-      }
+    }
   }
 
   void FANNTeacherModule::event()

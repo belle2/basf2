@@ -24,6 +24,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/utilities/Conversion.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/MCParticle.h>

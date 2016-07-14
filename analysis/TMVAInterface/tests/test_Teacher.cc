@@ -18,6 +18,7 @@
 #include <analysis/dataobjects/ParticleExtraInfoMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <analysis/VariableManager/Utility.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <gtest/gtest.h>
 

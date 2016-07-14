@@ -94,6 +94,8 @@ namespace Belle2 {
       typedef std::function<double(const Particle*, const std::vector<double>&)> ParameterFunctionPtr;
       /** meta functions stored take a const std::vector<std::string>& and return a FunctionPtr. */
       typedef std::function<FunctionPtr(const std::vector<std::string>&)> MetaFunctionPtr;
+      /** Typedef for the cut, that we use Particles as outr base objects. */
+      typedef Particle Object;
 
       /** Base class for information common to all types of variables. */
       struct VarBase {

@@ -15,6 +15,7 @@
 #include <analysis/dataobjects/Particle.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <map>
 

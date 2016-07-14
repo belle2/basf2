@@ -16,6 +16,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/pcore/ProcHandler.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <memory>
 

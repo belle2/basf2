@@ -14,6 +14,7 @@
 
 #include <framework/utilities/WorkingDirectoryManager.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <TSystem.h>
 #include <TMVA/Tools.h>

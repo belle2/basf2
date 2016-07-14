@@ -17,6 +17,7 @@
 #include <analysis/VariableManager/Utility.h>
 
 #include <framework/logging/LogSystem.h>
+#include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/program_options.hpp>
 #include <iostream>

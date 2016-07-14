@@ -14,6 +14,8 @@
 #include <framework/pcore/RootMergeable.h>
 #include <framework/utilities/Utils.h>
 #include <framework/utilities/WorkingDirectoryManager.h>
+#include <framework/utilities/MakeROOTCompatible.h>
+
 #include <analysis/TMVAInterface/Config.h>
 #include <analysis/TMVAInterface/SPlot.h>
 #include <analysis/TMVAInterface/Expert.h>

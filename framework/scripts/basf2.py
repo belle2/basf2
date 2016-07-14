@@ -54,6 +54,8 @@ basf2copyright = 'Copyright(C) 2010-2016  Belle II Collaboration'
 # to be stopped with Ctrl-c (Python installs own handler)
 # This will again be replaced once process() is called.
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+# avoid root bug
+signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 
 # Create default framework, also initialises environment
 fw = Framework()

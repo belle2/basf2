@@ -253,8 +253,8 @@ namespace Belle2 {
     bool loadedNext = false;
     while (true) {
       switch (m_iParticleType) {
-        case 0: loadedNext = loadNextParticle(true); break; //Anti-Particles
-        case 1: loadedNext = loadNextParticle(false); break; //Particles
+        case 0: loadedNext = loadNextParticle(false); break; //Particles
+        case 1: loadedNext = loadNextParticle(true); break; //Anti-Particles
         case 2: loadedNext = loadNextSelfConjugatedParticle(); break;
         default: return false;
       }
@@ -352,9 +352,9 @@ namespace Belle2 {
     const TLorentzVector vec(px, py, pz, E);
 
     switch (m_iParticleType) {
-      case 0: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
+      case 0: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
                                 m_particleArray.getPtr());
-      case 1: return Particle(vec, m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
+      case 1: return Particle(vec, -m_pdgCode, m_isSelfConjugated ? Particle::c_Unflavored : Particle::c_Flavored, m_indices,
                                 m_particleArray.getPtr());
       case 2: return Particle(vec, m_pdgCode, Particle::c_Unflavored, m_indices, m_particleArray.getPtr());
       default: B2FATAL("You called getCurrentParticle although loadNext should have returned false!");

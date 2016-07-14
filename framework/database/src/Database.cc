@@ -216,9 +216,8 @@ be mapped to the same name or vice versa.
 Example:
     >>> set_experiment_name(4, "BELLE_exp4")
 
-Args:
-    experiment (int): Experiment number from EventMetaData
-    name (str): name of the experiment when looking up payloads
+:param int experiment: Experiment number from EventMetaData
+:param str name: name of the experiment when looking up payloads
 )DOCSTRING");
   def("reset_database", &Database::reset, "Reset the database setup to have no database sources");
   def("use_database_chain", &DatabaseChain::createInstance, chain_createInstance_overloads(args("resetIoVs", "loglevel"), R"DOCSTRING(
@@ -230,32 +229,29 @@ will add these sources to the chain instead of replacing the current source.
 If there was an exisiting single source setup the one source is kept in the
 chain. If there was already a DatabaseChain nothing changes.
 
-Args:
-    resetIoVs (bool): A flag to indicate whether IoVs from non-primary
+:param bool resetIoVs: A flag to indicate whether IoVs from non-primary
         databases should be set to only the current run and rechecked for the
         next run.
-    loglevel (basf2.LogLevel): The LogLevel of messages from the database
+:param basf2.LogLevel loglevel: The LogLevel of messages from the database
         chain, defaults to LogLevel.WARNING
 )DOCSTRING"));
   def("use_local_database", &LocalDatabase::createInstance, local_createInstance_overloads(args("filename", "directory", "readonly", "loglevel"), R"DOCSTRING(
 Use a local database backend: a single file containing the payload information in plain text.
 
-Args:
-    filename (str): filename containing the payload information, defaults to
+:param str filename: filename containing the payload information, defaults to
         "database.txt"
-    directory (str): directory containing the payloads, defaults to current
+:param str directory: directory containing the payloads, defaults to current
         directory
-    readonly (bool): if True the database will refuse to create new payloads
-    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+:param bool readonly: if True the database will refuse to create new payloads
+:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
 )DOCSTRING"));
   def("use_central_database", &ConditionsDatabase::createDefaultInstance, condition_createDefaultInstance_overloads(
               args("globalTag", "loglevel"), R"DOCSTRING(
 Use the central database via REST api and the default connection parameters.
 
-Args:
-    globalTag (str): name of the global tag to use for payload lookup
-    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+:param str globalTag: name of the global tag to use for payload lookup
+:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
 )DOCSTRING"));
   def("use_central_database", &ConditionsDatabase::createInstance, condition_createInstance_overloads(
@@ -264,12 +260,11 @@ Use the central database via REST api and the custom connection parameters.
 This version should only used by experts to debug the conditions database or
 use a different database.
 
-Args:
-    globalTag (str): name of the global tag to use for payload lookup
-    restBaseName: base URL for the REST api
-    fileBaseName: base URL for the payload download
-    fileBaseLocal: directory where to save downloaded payloads
-    loglevel (basf2.LogLevel): The LogLevel of messages from this backend when
+:param str globalTag: name of the global tag to use for payload lookup
+:param restBaseName: base URL for the REST api
+:param fileBaseName: base URL for the payload download
+:param fileBaseLocal: directory where to save downloaded payloads
+:param basf2.LogLevel loglevel: The LogLevel of messages from this backend when
         payloads cannot be found, defaults to LogLevel.WARNING
 )DOCSTRING"));
 }

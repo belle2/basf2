@@ -237,8 +237,8 @@ class Graphics(LatexObject):
     def add(self, filename, width=0.7):
         """
         Include a image file.
-            @filename containing the image
-            @width texwidth argument of includegraphics
+            @param filename containing the image
+            @param width texwidth argument of includegraphics
         """
         self.output += r"\includegraphics[width=" + str(width) + r"\textwidth]"
         self.output += r"{" + str(filename) + r"}" + '\n'

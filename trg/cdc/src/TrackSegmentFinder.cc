@@ -2803,10 +2803,11 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
     //variables for Tracker & N.N
     vector <bool> tmpOutBool;
 
-    //iwTRGSignalVector* resultT = new TRGSignalVector(na, in->clock(),22);
     TRGSignalVector * resultT = new TRGSignalVector(na, in->clock(), 13);
     TRGSignalVector * resultE = new TRGSignalVector(na, in->clock(), 10);
-    TRGSignalVector * Hitmap = new TRGSignalVector(na + "HitMap", in->clock(), 0);
+    TRGSignalVector * Hitmap = new TRGSignalVector(na + "HitMap",
+                                                   in->clock(),
+                                                   0);
     TRGSignalVector pTime(na + "PriorityTime", in->clock(), 0);
     TRGSignalVector fTime(na + "FastestTime", in->clock(), 0);
     TRGSignal * pri0 = 0;
@@ -2846,7 +2847,7 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
         fTime.push_back(cc[i]);
     }
 
-    vector <int> changeTime = Hitmap->stateChanges();
+    vector<int> changeTime = Hitmap->stateChanges();
 
     int * LUTValue = new int[changeTime.size()];
     int lastFastHit = in->clock().min();
@@ -2931,7 +2932,8 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
                                 resultT->set(tmpOutBool, ct);
                         }
                         else {
-                            if (!(LUTValue[i - 1])) resultT->set(tmpOutBool, ct);
+                            if (!(LUTValue[i - 1]))
+                                resultT->set(tmpOutBool, ct);
                         }
                     }
                 }
@@ -2963,6 +2965,30 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
             }            
         }
         TRGDebug::leaveStage(fn);
+    }
+
+    if (TRGDebug::level()) {
+        vector<int> sc = resultT->stateChanges();
+        vector<unsigned> lv;
+        for (unsigned i = 0; i < sc.size(); i++) {
+            //...LUT value...
+            unsigned l = unsigned(resultT->state(sc[i]).subset(2, 2));
+            lv.push_back(l);
+            cout << "clk=" << sc[i] << " LUT output[" << i << "]=" << l << endl;
+        }
+        bool found1or2 = false;
+        bool found3 = false;
+        for (unsigned i = 0; i < lv.size(); i++) {
+            if (found1or2 && (lv[i] > 0))
+                cout << "!!! simulateTSF something wrong(found1or2)" << endl;
+            if (found3 && (lv[i] == 3))
+                cout << "!!! simulateTSF something wrong(found3)" << endl;
+
+            if ((lv[i] == 1) & (lv[i] == 2))
+                found1or2 = true;
+            else if (lv[i] == 3)
+                found3 = true;
+        }
     }
 
     result.push_back(resultT);

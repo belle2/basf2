@@ -20,7 +20,7 @@ assert len(particles_all) == len(particles_withextracut)
 
 path = create_path()
 path.add_module('RootInput')
-feistate = fullEventInterpretation(None, path, particles_all)
+feistate = fullEventInterpretation(None, path, particles_all, databasePrefix='FEI_TEST')
 
 # show constructed path
 print(feistate.path)

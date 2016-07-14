@@ -15,7 +15,7 @@ def variable(variable_string):
     """
     Adds hyphenations after brackets, and for common variables.
         @param variable_string variable name
-        @param string with hyphenation hints for latex
+        @return string with hyphenation hints for latex
     """
     substitutes = {
         '=': r'=\allowbreak ',
@@ -32,7 +32,7 @@ def variable(variable_string):
 def decayDescriptor(decay_string):
     """
     Prettifies the given decay string by using latex-symbols instead of plain-text
-        @param decay_string string containing an decay descriptor
+        @param decay_string string containing a decay descriptor
         @return string latex version of the decay descriptor
     """
     decay_string = decay_string.replace(':generic', '')

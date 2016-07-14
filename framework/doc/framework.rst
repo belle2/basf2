@@ -54,6 +54,8 @@ Logging in basf2 from within Python is quite similar to C++, and mainly consists
 Module Statistics
 -----------------
 
+.. currentmodule:: basf2.ProcessStatisticsPython
+
 .. autoclass:: basf2.ProcessStatisticsPython
    :members:
    :undoc-members:
@@ -100,6 +102,13 @@ Utilities
    :members:
    :imported-members:
 
-.. no useful doc
-  .. automodule:: B2Tools
-     :members:
+
+B2Tools
+-------
+.. automodule:: B2Tools.b2latex
+   :members:
+   :show-inheritance:
+
+.. automodule:: B2Tools.format
+   :members:
+   :show-inheritance:

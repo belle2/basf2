@@ -84,15 +84,17 @@ def pretty_print_table(table, column_widths, first_row_is_heading=True):
     Pretty print a given table, by using available terminal size and
     word wrapping fields as needed.
 
-    *table*: A 2d list of table fields. Each row must have the same length.
+    :param table: A 2d list of table fields. Each row must have the same length.
 
-    *column_width*: list of column widths, needs to be of same length as rows
-    in 'table'. Available fields are::
-        -n  as needed, up to n characters, word wrap if longer
-        n   n characters (fixed)
-        *   use all available space, good for description fields
-            (can only be used ONCE)
-    *first_row_is_heading*: header specifies if we should take the first row
+    :param column_width: list of column widths, needs to be of same length as rows
+        in 'table'. Available fields are::
+
+            -n  as needed, up to n characters, word wrap if longer
+            n   n characters (fixed)
+            *   use all available space, good for description fields
+                (can only be used ONCE)
+
+    :param first_row_is_heading: header specifies if we should take the first row
                           as table header and offset it a bit
     """
 
@@ -217,12 +219,12 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     """
     Register the module 'name' and return it (e.g. for adding to a path)
 
-    name_or_module: The name of the module type, may also be a module instance which parameters should be set
-    shared_lib_path: An optional path to a shared library from which the
+    :param name_or_module: The name of the module type, may also be a module instance which parameters should be set
+    :param shared_lib_path: An optional path to a shared library from which the
                      module should be loaded
-    logLevel: indicates the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
-    debugLevel : Number indicating the detail of debug messages, default 100
-    kwargs: Additional parameters of the module to be set.
+    :param logLevel: indicates the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
+    :param debugLevel: Number indicating the detail of debug messages, default 100
+    :param kwargs: Additional parameters of the module to be set.
 
     You can also use :func:`Path.add_module() <basf2.Path.add_module>` directly,
     which accepts the same name, logging and module parameter arguments.
@@ -253,10 +255,10 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
 def set_module_parameters(path, name, recursive=False, **kwargs):
     """Set the given set of parameters for all modules in a path which have the given 'name'
 
-    path: The path to search for the modules
-    name: Then name of the module to set parameters for
-    recursive: if True also look in paths connected by conditions or :func:`Path.for_each() <basf2.Path.for_each>`
-    kwargs: Named parameters to be set for the module, see  :func:`register_module() <basf2.register_module>`
+    :param path: The path to search for the modules
+    :param name: Then name of the module to set parameters for
+    :param recursive: if True also look in paths connected by conditions or :func:`Path.for_each() <basf2.Path.for_each>`
+    :param kwargs: Named parameters to be set for the module, see  :func:`register_module() <basf2.register_module>`
     """
     if not kwargs:
         raise ValueError("no parameters given")
@@ -296,8 +298,8 @@ def process(path, max_event=0):
     modules need to perform proper cleanup & reinitialisation, if Geometry is
     involved this might be difficult to achieve.)
 
-    path: The path with which the processing starts
-    max_event:  The maximal number of events which will be processed,
+    :param path: The path with which the processing starts
+    :param max_event:  The maximal number of events which will be processed,
                 0 for no limit
     """
 
@@ -328,7 +330,7 @@ def set_nprocesses(nproc):
 
     Can be overridden using the ``-p`` argument to basf2.
 
-    nproc: number of worker processes. 0 to disable parallel processing.
+    :param nproc: number of worker processes. 0 to disable parallel processing.
     """
 
     fw.set_nprocesses(nproc)
@@ -389,9 +391,9 @@ def print_params(module, print_values=True, shared_lib_path=None):
     """
     This function prints parameter information
 
-    module: Print the parameter information of this module
-    print_values: Set it to True to print the current values of the parameters
-    shared_lib_path: The path of the shared library from which the module was
+    :param module: Print the parameter information of this module
+    :param print_values: Set it to True to print the current values of the parameters
+    :param shared_lib_path: The path of the shared library from which the module was
                      loaded
     """
 
@@ -455,9 +457,9 @@ def print_path(path, defaults=False, description=False):
     parameters.
     Parameters that are not set by the user are suppressed by default.
 
-    defaults: Set it to True to print also the parameters with default values
-    description: Set to True to print the descriptions of modules and
-    parameters
+    :param defaults: Set it to True to print also the parameters with default values
+    :param description: Set to True to print the descriptions of modules and
+        parameters
     """
 
     B2INFO('Modules and parameter settings in the path:')
@@ -482,7 +484,7 @@ def set_log_level(level):
     Sets the global log level which specifies up to which level the
     logging messages will be shown
 
-    level: LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
+    :param level: LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
     """
 
     logging.log_level = level
@@ -493,7 +495,7 @@ def set_debug_level(level):
     Sets the global debug level which specifies up to which level the
     debug messages should be shown
 
-    level: The debug level. The default value is 100
+    :param level: The debug level. The default value is 100
     """
 
     logging.debug_level = level
@@ -513,10 +515,10 @@ def log_to_file(filename, append=False):
     """
     Adds a text file to the list of logging destinations.
 
-    filename: The path and filename of the text file
-    append: Should the logging system append the messages to the end of the
-    file (True) or create a new file for each event processing session (False).
-    Default is False.
+    :param filename: The path and filename of the text file
+    :param append: Should the logging system append the messages to the end of the
+         file (True) or create a new file for each event processing session (False).
+         Default is False.
     """
 
     logging.add_file(filename, append)

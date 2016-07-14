@@ -15,6 +15,7 @@
 
 import sys
 import os
+import re
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -292,3 +293,41 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 # texinfo_no_detailmenu = False
+
+
+def process_sig(app, what, name, obj, options, signature, return_annotation):
+    """
+    remove unhelpful 'self' arguments from methods.
+    """
+    if what == 'method' and signature:
+        reg = re.compile('^\( \(.*\)arg1')
+        signature = reg.sub('(', signature)
+        return (signature, return_annotation)
+
+
+def process_docstring(app, what, name, obj, options, lines):
+    """
+    convert doxygen syntax to sphinx
+    """
+    substitutions = {
+        re.compile(r'^( *)@param (.*?) '): r':param \2: ',
+        re.compile(r'^( *)@returns? '): r':return: ',
+    }
+    newlines = []
+    for l in lines:
+        new = l
+        for reg, sub in substitutions.items():
+            new = reg.sub(sub, new)
+        if new != l:
+            # Sphinx wants a new paragraph before these, so let's add one
+            newlines += ['']
+        newlines += [new]
+    lines[:] = newlines
+
+
+def setup(app):
+    """
+    Install some event handlers to improve output.
+    """
+    app.connect('autodoc-process-signature', process_sig)
+    app.connect('autodoc-process-docstring', process_docstring)

@@ -82,7 +82,8 @@ namespace Belle2 {
       m_generateLER.reset();
       m_generateVertex.reset();
     }
-    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
+
+    m_event->setGenerationFlags(0);
     TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
     TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
@@ -93,6 +94,7 @@ namespace Belle2 {
       ler = m_event->getLabToCMS() * ler;
       m_event->set(her, ler, vtx);
     }
+    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     return *m_event;
   }
 

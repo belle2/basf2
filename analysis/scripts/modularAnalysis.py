@@ -580,7 +580,7 @@ def reconstructDecay(
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
-    @oaram dmID        user specified decay mode identifier
+    @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     """
@@ -614,7 +614,7 @@ def reconstructRecoil(
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
-    @oaram dmID        user specified decay mode identifier
+    @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     """
@@ -649,7 +649,7 @@ def reconstructRecoilDaughter(
                        (from the DecayString the mother and daughter ParticleLists are determined)
     @param cut         created (mother) Particles are added to the mother ParticleList if they
                        pass give cuts (in VariableManager style) and rejected otherwise
-    @oaram dmID        user specified decay mode identifier
+    @param dmID        user specified decay mode identifier
     @param writeOut    wether RootOutput module should save the created ParticleList
     @param path        modules are added to this path
     """

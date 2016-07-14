@@ -18,7 +18,6 @@
 #include <bklm/dataobjects/BKLMHit2d.h>
 
 #include <mdst/dataobjects/KLMCluster.h>
-#include <mdst/dataobjects/ECLCluster.h>
 
 #include <cmath>
 
@@ -43,13 +42,9 @@ BKLMK0LReconstructorModule::BKLMK0LReconstructorModule() : Module(), m_KaonMassS
   setDescription("BKLM K0L reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("KLMClustersColName", m_KLMClustersColName, "Name of collection holding the KLMClusters", string(""));
-  addParam("ECLClustersColName", m_ECLClustersColName, "Name of collection holding the ECLClusters", string(""));
   addParam("Clustering cone-angle window (degrees)", m_MaxHitConeAngle,
            "Hits within this cone angle (from IP) belong to the same cluster",
            double(15.0));
-  addParam("KLM-ECL cluster-matching cone-angle window (degrees)", m_MaxKLMECLConeAngle,
-           "ECL cluster within this cone angle (from IP) matches the KLM cluster",
-           double(20.0));
 }
 
 BKLMK0LReconstructorModule::~BKLMK0LReconstructorModule()
@@ -65,12 +60,9 @@ void BKLMK0LReconstructorModule::initialize()
   klmCluster.registerInDataStore();
   StoreArray<BKLMHit2d> bklmHit2d;
   klmCluster.registerRelationTo(bklmHit2d);
-  StoreArray<ECLCluster> eclCluster;
-  klmCluster.registerRelationTo(eclCluster);
 
   m_KaonMassSq = Const::Klong.getMass() * Const::Klong.getMass();
   m_MaxHitConeAngle = m_MaxHitConeAngle * M_PI / 180.0;
-  m_MaxKLMECLConeAngle = m_MaxKLMECLConeAngle * M_PI / 180.0;
 
 }
 
@@ -105,7 +97,6 @@ AddedToExistingCluster: ;
   // Fill StoreArray<KLMCluster> and find matching ECLClusters
 
   StoreArray<KLMCluster> klmClusters;
-  StoreArray<ECLCluster> eclClusters;
   for (unsigned int j = 0; j < clusterIndices.size(); ++j) {
     int layers[NLAYER + 1] = { 0 };
     unsigned int nHits = clusterIndices[j].size();
@@ -132,19 +123,6 @@ AddedToExistingCluster: ;
                             mom.x(), mom.y(), mom.z());
     for (unsigned int k = 0; k < nHits; ++k) {
       cluster->addRelationTo(hit2ds[clusterIndices[j][k]]);
-    }
-    ECLCluster* bestECLCluster = NULL;
-    double bestOpeningAngle = M_PI;
-    for (int m = 0; m < eclClusters.getEntries(); ++m) {
-      double openingAngle = mom.Angle(eclClusters[m]->getMomentum());
-      if (openingAngle < bestOpeningAngle) {
-        bestOpeningAngle = openingAngle;
-        bestECLCluster = eclClusters[m];
-      }
-    }
-    if (bestOpeningAngle < m_MaxKLMECLConeAngle) {
-      cluster->setAssociatedEclClusterFlag();
-      cluster->addRelationTo(bestECLCluster);
     }
   }
 

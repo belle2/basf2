@@ -15,7 +15,7 @@
 
 namespace Belle2 {
 
-  // Reconstruct K0L-meson clusters; add relation to collinear ECL cluster.
+  // Reconstruct K0L-meson clusters
   class BKLMK0LReconstructorModule : public Module {
 
   public:
@@ -49,15 +49,8 @@ namespace Belle2 {
     //! maximum cone angle (from IP) separating two hits in a cluster
     double m_MaxHitConeAngle;
 
-    //! maximum cone angle (radians) between matching ECL and KLM clusters
-    double m_MaxKLMECLConeAngle;
-
     //! Name of the KLMCluster collection
     std::string m_KLMClustersColName;
-
-    //! Name of the ECLCluster collection
-    std::string m_ECLClustersColName;
-
 
   };
 

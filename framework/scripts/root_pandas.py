@@ -1,6 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+root_pandas
+-----------
+
+Provides a simple interface to convert between ROOT trees and panda data frames
+"""
+
 from root_numpy import root2array, list_trees, list_branches, list_structures, array2root, tree2array
 import os
 import pandas as pd

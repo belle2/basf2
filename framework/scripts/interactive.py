@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 """
-interactive.py
---------------
+interactive
+-----------
 
 Defines a function embed() that can be used to drop into an interactive python
 shell from within a steering file or python module. If available, IPython will

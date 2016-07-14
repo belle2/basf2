@@ -57,6 +57,7 @@ signal.signal(signal.SIGINT, signal.SIG_DFL)
 
 # Create default framework, also initialises environment
 fw = Framework()
+logging = LogPythonInterface()
 
 # -----------------------------------------------
 #      Global basf2 function definitions
@@ -217,7 +218,7 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     name_or_module: The name of the module type, may also be a module instance which parameters should be set
     shared_lib_path: An optional path to a shared library from which the
                      module should be loaded
-    logLevel: Number indicating the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
+    logLevel: indicates the log level, e.g. LogLevel.DEBUG/INFO/RESULT/WARNING/ERROR/FATAL
     debugLevel : Number indicating the detail of debug messages, default 100
     kwargs: Additional parameters of the module to be set.
 
@@ -287,7 +288,11 @@ def create_path():
 
 def process(path, max_event=0):
     """
-    This function processes the events
+    Start processing events using the modules in the given :class:`basf2.Path` object.
+
+    Can be called multiple times in one steering file (some restrictions apply:
+    modules need to perform proper cleanup & reinitialisation, if Geometry is
+    involved this might be difficult to achieve.)
 
     path: The path with which the processing starts
     max_event:  The maximal number of events which will be processed,
@@ -317,20 +322,23 @@ def process(path, max_event=0):
 
 def set_nprocesses(nproc):
     """
-    Sets number of worker processes for parallel processing
+    Sets number of worker processes for parallel processing.
 
-    nproc: number of worker processes
+    Can be overridden using the ``-p`` argument to basf2.
+
+    nproc: number of worker processes. 0 to disable parallel processing.
     """
 
     fw.set_nprocesses(nproc)
 
 
-def set_streamobjs(objs):
+def set_streamobjs(obj_list):
     """
-    Sets objects to be streamed. To be used to limit objects for the improvement of
-    parallel processing performance
+    When using parallel processing, limits the objects/arrays streamed between
+    processes to those in the provided list. Can be used to improve performance
+    in some workloads.
     """
-    fw.set_streamobjs(objs)
+    fw.set_streamobjs(obj_list)
 
 
 def print_all_modules(moduleList, package=''):

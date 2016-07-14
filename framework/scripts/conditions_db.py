@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
+conditions_db
+-------------
+
 Python interface to the ConditionsDB
 """
 

@@ -291,7 +291,13 @@ void Module::exposePythonAPI()
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
   void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
 
-  enum_<Module::EAfterConditionPath>("AfterConditionPath")
+  enum_<Module::EAfterConditionPath>("AfterConditionPath",
+                                     R"(Determines execution behaviour after a conditional path has been executed:
+
+END
+  End current event after the conditional path.
+CONTINUE
+  After the conditional path, resume execution after this module.)")
   .value("END", Module::EAfterConditionPath::c_End)
   .value("CONTINUE", Module::EAfterConditionPath::c_Continue)
   ;
@@ -306,7 +312,16 @@ void Module::exposePythonAPI()
   .value("!=", Belle2::ModuleCondition::EConditionOperators::c_NE)
   ;
 
-  enum_<Module::EModulePropFlags>("ModulePropFlags")
+  enum_<Module::EModulePropFlags>("ModulePropFlags",
+                                  R"(Flags to indicate certain low-level features of modules, see :func:`basf2.Module.set_property_flags()`, :func:`basf2.Module.has_properties()`. Most useful flags are:
+
+PARALLELPROCESSINGCERTIFIED
+  This module can be run in parallel processing mode safely (All I/O must be done through the data store, in particular, the module must not write any files.)
+HISTOGRAMMANAGER
+  This module is used to manage histograms accumulated by other modules
+TERMINATEINALLPROCESSES
+  When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process.
+)")
   .value("INPUT", Module::EModulePropFlags::c_Input)
   .value("OUTPUT", Module::EModulePropFlags::c_Output)
   .value("PARALLELPROCESSINGCERTIFIED", Module::EModulePropFlags::c_ParallelProcessingCertified)
@@ -324,12 +339,14 @@ A typical event processing chain consists of a Path containing
 modules. By inheriting from this base class, various types of
 modules can be created.
 
-Each module is identified by its unique name, and should end in ...Module.
-To make the module 'SomeRecoModule' known to the framework, use REG_MODULE(SomeReco).
-It will then show up in the module list as 'SomeReco'.
+
+To use a module, please refer to :func:`basf2.Path.add_module()`.
+A list of modules is available by running ``basf2 -m`` or ``basf2 -m package``,
+detailed information on parameters is given by e.g. ``basf2 -m RootInput``.
 
 Modules can also define a return value (int or bool) using setReturnValue(),
 which can be used in the steering file to split the Path based on the set value:
+
     >>> module_with_condition.if_value("<1", another_path)
 
 In case the module condition for a given event is less than 1, the execution
@@ -343,15 +360,23 @@ on how to create modules, setting parameters, or using return values/conditions:
 https://belle2.cc.kek.jp/~twiki/bin/view/Software/Basf2manual#Module_Development)")
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>(),
-       "Returns the name of the module. Can be changed via set_name(), use type() for identifying a particular module class.")
+       "Returns the name of the module. Can be changed via :func:`set_name() <basf2.Module.set_name()>`, use :func:`type() <basf2.Module.type()>` for identifying a particular module class.")
   .def("type", &Module::getType, return_value_policy<copy_const_reference>(),
        "Returns the type of the module (i.e. class name minus 'Module')")
-  .def("set_name", &Module::setName)
-  .def("description", &Module::getDescription, return_value_policy<copy_const_reference>())
-  .def("package", &Module::getPackage, return_value_policy<copy_const_reference>())
+  .def("set_name", &Module::setName, R"(Set custom name, e.g. to distinguish multiple modules of the same type.
+
+>>> path.add_module('EventInfoSetter')
+>>> ro = path.add_module('RootOutput', branchNames=['EventMetaData'])
+>>> ro.set_name('RootOutput_metadata_only')
+>>> print(path)
+[EventInfoSetter -> RootOutput_metadata_only]
+
+)")
+  .def("description", &Module::getDescription, return_value_policy<copy_const_reference>(), "Returns a description of this module.")
+  .def("package", &Module::getPackage, return_value_policy<copy_const_reference>(), "Returns package this module belongs to.")
   .def("available_params", &_getParamInfoListPython, "Return list of all module parameters")
   .def("has_properties", &Module::hasProperties)
-  .def("set_property_flags", &Module::setPropertyFlags)
+  .def("set_property_flags", &Module::setPropertyFlags, "Set module properties in the form of an ORed set of :class:`basf2.ModulePropFlags`.")
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())

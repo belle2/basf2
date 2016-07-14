@@ -73,7 +73,7 @@ main.add_module(RandomTestModule("test2"))
 
 # now the libraries are loaded so we can set the loglevel to debug, set the seed
 # and start processing
-logging_framework = logging.get_package("framework")
+logging_framework = logging.package("framework")
 logging_framework.set_log_level(LogLevel.DEBUG)
 logging_framework.set_debug_level(100)
 logging_framework.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)

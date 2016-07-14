@@ -192,15 +192,19 @@ void Path::exposePythonAPI()
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   class_<Path>("Path",
-               "Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use create_path() to create a new object.",
+               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use :func:`basf2.create_path()` to create a new object.
+
+.. seealso:: :func:`basf2.process`)",
                no_init)
   .def("__str__", &Path::getPathString)
   .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2.py
   .def("add_path", &Path::addPath, R"(Insert another path at the end of this one.
 For example,
+
     >>> path.add_module('A')
     >>> path.add_path(otherPath)
     >>> path.add_module('B')
+
 would create a path [ A -> [ contents of otherPath ] -> B ].)")
   .def("modules", &_getModulesPython, "Returns an ordered list of all modules in this path.")
   .def("for_each", &Path::forEach, R"(Similar to add_path(), this will execute path at the current position, but

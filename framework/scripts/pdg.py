@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
+pdg
+---
+
 Small wrapper module to ease access to pdg codes for particle gun or similar
 usage in the steering file
 """

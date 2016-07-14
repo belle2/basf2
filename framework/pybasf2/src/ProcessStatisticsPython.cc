@@ -119,25 +119,63 @@ void ProcessStatisticsPython::exposePythonAPI()
   //Reference to global scope
   scope global;
 
+  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+
   //Wrap ProcessStatisticsPython as non-copy and non-instantiable in python
-  class_<ProcessStatisticsPython, boost::noncopyable> stats("ProcessStatisticsPython", no_init);
+  class_<ProcessStatisticsPython, boost::noncopyable> stats("ProcessStatisticsPython",
+                                                            R"(Interface for retrieving statistics about modules at runtime or after basf2.process() returns, through a global instance ``basf2.statistics``.
+
+Statistics for event() calls are available as a string representation of the object:
+
+>>> from basf2 import statistics
+>>> print(statistics)
+=================================================================================
+Name                  |      Calls | VMemory(MB) |    Time(s) |     Time(ms)/Call
+=================================================================================
+RootInput             |        101 |          0 |       0.01 |    0.05 +-   0.02
+RootOutput            |        100 |          0 |       0.02 |    0.20 +-   0.87
+ProgressBar           |        100 |          0 |       0.00 |    0.00 +-   0.00
+=================================================================================
+Total                 |        101 |          0 |       0.03 |    0.26 +-   0.86
+=================================================================================
+
+This provides information on the number of calls, elapsed time, and the average
+difference in virtual memory before and after the event() call.
+Note that the module responsible for reading (or generating) events usually
+has one additional event() call which is used to determine whether event
+processing should stop.
+
+Information on other calls like initialize(), terminate(), etc. are also available:
+
+>>> print statistics(statistics.INIT)
+>>> print statistics(statistics.BEGIN_RUN)
+>>> print statistics(statistics.END_RUN)
+>>> print statistics(statistics.TERM)
+)", no_init);
 
   stats
-  .def("set_name", &ProcessStatisticsPython::setModuleName)
+  .def("set_name", &ProcessStatisticsPython::setModuleName, R"(Set name for module in statistics.
+
+Normally, all modules get assigned their default name which is
+used to register them. If multiple instances of the same module
+are present at the same time, this can be used to distuingish
+between them.)")
   .def("__str__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
   .def("__call__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
   .def("__call__", &ProcessStatisticsPython::getModuleStatistics, getModuleStatistics_overloads())
-  .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>())
-  .def("getGlobal", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>())
-  .def("clear", &ProcessStatisticsPython::clear)
-  .def_readonly("modules", &ProcessStatisticsPython::getAll)
+  .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>(),
+       "Get :class:`ModuleStatistics` for given Module.")
+  .def("getGlobal", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>(),
+       "Get global :class:`ModuleStatistics` containing total elapsed time etc.")
+  .def("clear", &ProcessStatisticsPython::clear, "Clear collected statistics but keep names of modules")
+  .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all :class:`ModuleStatistics` objects.")
   ;
 
   //Set scope to current class
   scope statistics = stats;
 
   //Define enum for all the counter types in scope of class
-  enum_<ModuleStatistics::EStatisticCounters>("EStatisticCounters")
+  enum_<ModuleStatistics::EStatisticCounters>("_EStatisticCounters", "Select type of statistics (corresponds to Module functions)")
   .value("INIT", ModuleStatistics::c_Init)
   .value("BEGIN_RUN", ModuleStatistics::c_BeginRun)
   .value("EVENT", ModuleStatistics::c_Event)
@@ -155,7 +193,7 @@ void ProcessStatisticsPython::exposePythonAPI()
   stats.attr("TOTAL") = ModuleStatistics::c_Total;
 
   //Wrap statistics class
-  class_<ModuleStatistics>("ModuleStatistics")
+  class_<ModuleStatistics>("ModuleStatistics", "Statistics for a single module.")
   .add_property("name", make_function(&ModuleStatistics::getName, return_value_policy<copy_const_reference>()),
                 &ModuleStatistics::setName)
   .add_property("index", &ModuleStatistics::getIndex, &ModuleStatistics::setIndex)

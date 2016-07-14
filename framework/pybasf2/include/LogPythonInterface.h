@@ -42,6 +42,8 @@ namespace Belle2 {
    */
   class LogPythonInterface {
   public:
+    /** ctor*/
+    LogPythonInterface() {};
 
     /**
      * Set the log level.
@@ -195,8 +197,6 @@ namespace Belle2 {
     /** expose python API */
     static void exposePythonAPI();
   protected:
-    /** protected constructor since this class is purely meant to be used by python */
-    LogPythonInterface() {};
   };
 
 } // end namespace Belle2

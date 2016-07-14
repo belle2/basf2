@@ -132,9 +132,6 @@ BOOST_PYTHON_MEMBER_FUNCTION_OVERLOADS(addLogConsole_overloads, addLogConsole, 0
 /** Expose python api */
 void LogPythonInterface::exposePythonAPI()
 {
-  //Create a static instance which will serve as proxy between python and LogSystem calls
-  static LogPythonInterface interface;
-
   scope global;
 
   //Interface LogLevel enum
@@ -161,7 +158,10 @@ void LogPythonInterface::exposePythonAPI()
   ;
 
   //Interface LogConfig class
-  class_<LogConfig>("LogConfig", "Class providing configuration interface for the logging system")
+  class_<LogConfig>("LogConfig",
+                    R"(Defines logging settings (log levels and items included in each message) for a certain context, e.g. a module or package.
+
+.. seealso:: :func:`logging.package(str) <basf2.LogPythonInterface.package>`)")
   .def(init<optional<LogConfig::ELogLevel, int> >())
   .add_property("log_level",  &LogConfig::getLogLevel,  &LogConfig::setLogLevel, "set or get the current log level")
   .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
@@ -174,38 +174,68 @@ void LogPythonInterface::exposePythonAPI()
   .def("get_info", &LogConfig::getLogInfo, "get the current bitmask of which parts of the log message will be printed")
   ;
 
+  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+
   //Interface the Interface class :)
-  class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface", no_init)
-  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel)
-  .add_property("debug_level", &LogPythonInterface::getDebugLevel, &LogPythonInterface::setDebugLevel)
-  .add_property("abort_level", &LogPythonInterface::getAbortLevel, &LogPythonInterface::setAbortLevel)
-  .def("set_package", &LogPythonInterface::setPackageLogConfig)
-  .def("get_package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>())
-  .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>())
-  .def("set_info", &LogPythonInterface::setLogInfo)
-  .def("get_info", &LogPythonInterface::getLogInfo)
-  .def("add_file", &LogPythonInterface::addLogFile, addLogFile_overloads())
-  .def("add_console", &LogPythonInterface::addLogConsole, addLogConsole_overloads())
+  class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
+                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global `logging` object in Python. See also :func:`basf2.set_log_level()` and :func:`basf2.set_debug_level()`.
+
+This class exposes a object called ``logging`` to the python interface. With
+this object it is possible to set all properties of the logging system
+directly in the steering file in a consistent manner This class also
+exposes the :class:`basf2.LogConfig` class as well as the :class:`basf2.LogLevel`
+and :class:`basf2.LogInfo` enums to make setting of properties more transparent
+by using the names and not just the values.  To set or get the log level,
+one can simply do:
+
+>>> logging.log_level = LogLevel.FATAL
+>>> print "Logging level set to", logging.log_level
+FATAL
+
+This module also allows to send log messages directly from python to ease
+consistent error reporting througout the framework
+
+>>> B2WARNING("This is a warning message")
+
+For all features, see b2logging.py in the framework/examples folder)")
+  .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel,
+                "Attribute for setting/getting the current log level (:class:`basf2.LogLevel`). Messages with a lower level are ignored.")
+  .add_property("debug_level", &LogPythonInterface::getDebugLevel, &LogPythonInterface::setDebugLevel,
+                "Attribute for getting/setting the debug log level. If debug messages are enabled, their level needs to be at least this high to be printed. Defaults to 100.")
+  .add_property("abort_level", &LogPythonInterface::getAbortLevel, &LogPythonInterface::setAbortLevel,
+                "Attribute for setting/getting the log level (:class:`basf2.LogLevel`) at which to abort processing. Defaults to FATAL.")
+  .def("set_package", &LogPythonInterface::setPackageLogConfig,
+       "Set :class:`basf2.LogConfig` for given package, see also :func:`package() <basf2.LogPythonInterface.package>`.")
+  .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>(),
+       R"(Get :class:`basf2.LogConfig` for given package.
+
+  >>> logging.package('svd').debug_level = 10
+  >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)
+      )")
+  .def("set_info", &LogPythonInterface::setLogInfo,
+       "Set info to print for given log level. Should be ORed combination of :class:`basf2.LogInfo`.")
+  .def("get_info", &LogPythonInterface::getLogInfo, "Get info to print for given log level.")
+  .def("add_file", &LogPythonInterface::addLogFile,
+       addLogFile_overloads("Write log output to given file. (In addition to existing outputs)"))
+  .def("add_console", &LogPythonInterface::addLogConsole,
+       addLogConsole_overloads("Write log output to console. (In addition to existing outputs)"))
   .def("terminal_supports_colors", &LogConnectionIOStream::terminalSupportsColors)
   .staticmethod("terminal_supports_colors")
-  .def("reset", &LogPythonInterface::reset)
-  .def("zero_counters", &LogPythonInterface::zeroCounters)
-  .def_readonly("log_stats", &LogPythonInterface::getLogStatistics)
+  .def("reset", &LogPythonInterface::reset,
+       "Remove all configured logging outputs. You can then configure your own via :func:`add_file() <basf2.LogPythonInterface.add_file>` or :func:`add_console() <basf2.LogPythonInterface.add_console>`")
+  .def("zero_counters", &LogPythonInterface::zeroCounters, "Reset the per-level message counters.")
+  .def_readonly("log_stats", &LogPythonInterface::getLogStatistics, "Returns dictionary with message counters.")
   .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),
        "Enable or disable the error summary printed at the end of processing. "
        "Expects one argument wether or not the summary should be shown")
   ;
 
-  docstring_options doc_options(true, true, false);
   def("B2DEBUG", &LogPythonInterface::logDebug, args("debuglevel", "message"), "create a debug message with the given debug level");
   def("B2INFO", &LogPythonInterface::logInfo, args("message"), "create an info message");
   def("B2RESULT", &LogPythonInterface::logResult, args("message"), "create an info message");
   def("B2WARNING", &LogPythonInterface::logWarning, args("message"), "create a warning message");
   def("B2ERROR", &LogPythonInterface::logError, args("message"), "create an error message");
   def("B2FATAL", &LogPythonInterface::logFatal, args("message"), "create a fatal error message");
-
-  //Create instance of interface class in pybasf2 module scope
-  global.attr("logging") = object(ptr(&interface));
 }
 
 //

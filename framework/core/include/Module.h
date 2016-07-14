@@ -49,7 +49,7 @@ namespace Belle2 {
    * modules. By inheriting from this base class, various types of
    * modules can be created.
    *
-   * Each module is identified by its unique name, and should end in ...Module.
+   * Each module class is identified by its unique name, and should end in ...Module.
    * To make the module 'SomeRecoModule' known to the framework, use REG_MODULE(SomeReco).
    * It will then show up in the module list as 'SomeReco'.
    *

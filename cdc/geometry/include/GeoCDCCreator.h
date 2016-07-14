@@ -95,7 +95,7 @@ namespace Belle2 {
       void createNeutronShields(const GearDir& content);
 
 
-      /*
+      /**
        * Create neutron shield from DB.
        */
       void createNeutronShields(const CDCGeometry& geom);

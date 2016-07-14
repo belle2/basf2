@@ -98,8 +98,8 @@ namespace Belle2 {
 
 
     private:
-      int m_id; //< rib id.
-      double m_length; //< length of the rib.
+      int m_id; /**< rib id. */
+      double m_length; /**< length of the rib. */
       double m_width; /**< width of the rib. */
       double m_thick; /**< thickness of the rib. */
       double m_x; /**< the y-position of the rib. */
@@ -783,7 +783,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EndPlate(int i) :  m_id(i) {};
+      explicit EndPlate(int i) :  m_id(i) {};
 
       /**
        * Destructor.

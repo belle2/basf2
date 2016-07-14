@@ -79,7 +79,7 @@ namespace Belle2 {
       //      CDCGeometryPar();
 
       //! Constructor.
-      CDCGeometryPar(const CDCGeometry&);
+      explicit CDCGeometryPar(const CDCGeometry&);
       //! Destructor
       virtual ~CDCGeometryPar();
 

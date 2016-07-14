@@ -24,3 +24,12 @@ assert 0 == os.system('check_basf2_file -n 5 -s 10 1 ' + rootfile)
 assert 0 == os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile)
 assert 0 != os.system('check_basf2_file -n 5 -s 10 0.2 ' + rootfile)
 assert 0 != os.system('check_basf2_file -n 5 -s 10 0.05 ' + rootfile)
+
+assert 0 == os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' EventMetaData')
+allbranches = 'EventMetaData PXDClusters PXDClustersToPXDDigits PXDClustersToPXDTrueHits PXDDigits PXDTrueHits'
+assert 0 == os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' ' + allbranches)
+
+assert 0 != os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' NotThere')
+assert 0 != os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' EventMetaData NotThere')
+assert 0 != os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' NotThere EventMetaData')
+assert 0 != os.system('check_basf2_file -n 5 -s 10 0.5 ' + rootfile + ' FileMetaData')

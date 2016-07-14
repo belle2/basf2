@@ -11,11 +11,11 @@ PERFORMED CHECKS:
 - Persistent tree contains file metadata (filemetadata_readable)
 - Number of entries in event tree == number of events in file metadata == expected_no_of_events (entries_eq_filemetedata)
 - If the expected size is given: abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty (eventsize_eq_expectation)
+- If branches are given: Event tree contains the given branches
 RETURN CODE:
-    0 if all checks succeeded, 1 otherwise. Details about about check failures are printed on standard output.
+    0 if all checks succeeded, 1 otherwise. Details about check failures are printed on standard output.
 """
-#TODO:
-#- If branches are given: Event tree contains the given branches
+#TODO: (check_basf2_log?)
 #- If log is give: Grep for suspicious messages like Fatal, segmentation
 #fault, etc. [although this should be caught by the basf2 return code.]
 
@@ -33,9 +33,10 @@ parser.add_argument("-s", "--size", type=float, dest='expected_event_size', meta
                     help="Expected size per event (kiB), with maximal relative uncertainty. Check is passed when abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty")
 parser.add_argument("--json", action='store_true', dest='json_output', default=False, help="Provide dictionary of passed checks and file statistics in JSON format on standard output. Checks are only included when actually run, and receive a boolean value indicating success.")
 parser.add_argument("FILE", type=str, help="The basf2 .root file to check. http:// and root:// URLs are also supported.")
+parser.add_argument("BRANCH", type=str, nargs='*', help="Branches that should exist in the event durability tree.")
 
 
-def checkFile(filename, expected_no_of_events, expected_event_size):
+def checkFile(filename, expected_no_of_events, expected_event_size, expected_branches):
     """
     Runs checks on given filename, returns dictionaries with passed checks
     and file statistics.
@@ -81,6 +82,9 @@ def checkFile(filename, expected_no_of_events, expected_event_size):
             eventmetadata.getEvent()
             checks_passed['eventmetadata_readable'] = True
 
+        if expected_branches:
+            checks_passed['branches_present'] = all([tree.GetBranch(b) for b in expected_branches])
+
         size_kib = root_file.GetSize() / 1024.0
         size_kib_per_event = size_kib / nevents
         stats['filesize_kib'] = size_kib
@@ -103,10 +107,10 @@ if __name__ == "__main__":
     if args.json_output:
         # suppress other things on standard output
         with redirect_stdout(os.devnull):
-            checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size)
+            checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size, args.BRANCH)
         print(json.dumps({'checks_passed': checks_passed, 'stats': stats}, sort_keys=True, indent=2))
     else:
-        checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size)
+        checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size, args.BRANCH)
 
     checks_failed = [c for (c, ok) in checks_passed.items() if not ok]
     if not args.json_output:

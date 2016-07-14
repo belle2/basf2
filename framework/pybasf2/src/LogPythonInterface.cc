@@ -25,11 +25,6 @@ using namespace std;
 using namespace Belle2;
 using namespace boost::python;
 
-namespace {
-  /** dictionary of 'inspect' module. */
-  static object inspectDict = object();
-}
-
 void LogPythonInterface::setLogLevel(LogConfig::ELogLevel level)
 {
   LogConfig::ELogLevel overrideLevel = (LogConfig::ELogLevel)Environment::Instance().getLogLevelOverride();
@@ -211,9 +206,6 @@ void LogPythonInterface::exposePythonAPI()
 
   //Create instance of interface class in pybasf2 module scope
   global.attr("logging") = object(ptr(&interface));
-
-  //needed to get line numbers etc. when using B2INFO() and friends in Python
-  inspectDict = import("inspect").attr("__dict__");
 }
 
 //
@@ -222,17 +214,20 @@ void LogPythonInterface::exposePythonAPI()
 //used by the log* Messages of the LogPythonInterface to show meaningful log
 //message information for messages sent from the steering file
 //
+//inspect is needed to get line numbers etc. when using B2INFO() and friends in Python
 #define PYTHON_LOG(loglevel, debuglevel, text) \
+  object inspectDict = import("inspect").attr("__dict__"); \
   _B2LOGMESSAGE(loglevel, debuglevel, text, "steering", \
-               extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
-               extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
-               extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
+                extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
+                extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
+                extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
 
 #define PYTHON_LOG_IFENABLED(loglevel, debuglevel, text) \
+  object inspectDict = import("inspect").attr("__dict__"); \
   _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, text, "steering", \
-                         extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
-                         extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
-                         extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
+                          extract<std::string>(eval("currentframe().f_back.f_code.co_name", inspectDict)), \
+                          extract<std::string>(eval("currentframe().f_back.f_code.co_filename", inspectDict)), \
+                          extract<int>(eval("currentframe().f_back.f_lineno", inspectDict)))
 
 
 void LogPythonInterface::logDebug(int level, const std::string& msg)

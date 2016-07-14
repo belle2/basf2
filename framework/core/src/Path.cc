@@ -195,7 +195,7 @@ void Path::exposePythonAPI()
                "Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use create_path() to create a new object.",
                no_init)
   .def("__str__", &Path::getPathString)
-  .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2_def.py
+  .def("_add_module_object", &Path::addModule) // actual add_module() is found in basf2.py
   .def("add_path", &Path::addPath, R"(Insert another path at the end of this one.
 For example,
     >>> path.add_module('A')

@@ -20,7 +20,6 @@ namespace po = boost::program_options;
 int main(int argc, char* argv[])
 {
 
-  std::string filename;
   std::string identifier;
 
   int event = 0;

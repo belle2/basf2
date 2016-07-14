@@ -38,51 +38,49 @@ namespace Belle2 {
   bool almostEqualFloat(const float& a, const float& b);
 
   /**
-   * This class implements a common way to implement cut/selection functionality for particle lists.
+   * This class implements a common way to implement cut/selection functionality for arbitrary objects.
    * Every module which wants to perform cuts should use this object.
-   * As a parameter the module has to require std::string.
+   * As a parameter the module requires a std::string with the written cut.
    * This std::string has to be passed as an argument to the static Compile method of the Cut class, which returns a unique_ptr to the Cut object.
    * Cuts can be performed via the check method.
-   * In detail:
-   *
-   * private section of the module:
-   *   std::string m_cutParameter;
-   *   std::unique_ptr<Variable::Cut> m_cut;
-   *
-   * constructor of the module:
-   *   addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
-   *
-   * initialize method of the module:
-   *   m_cut = Variable::Cut::Compile(m_cutParameter);
-   *
-   * event function of the module:
-   *   if(m_cut->check(particlePointer)) {
-   *     do something
-   *   }
    *
    * Valid cuts can contain:
    * 1. Logic conditions: and, or
    * 2. Numeric conditions: <, <=, >, >=, ==, !=
    * 3. Parenthesis []
    * 4. Floats
-   * 5. Variables registered in the VariableManager
+   * 5. Variables registered in the general "Variable Manager" which are used as a template argument to this class.
    *
-   * Therefore valid cuts are:
+   * For example when using the analysis VariableManager for particles, valid cuts are:
    * 1.2 < M < 1.5
    * daughter0(M) < daughter1(M)
    * [M > 1.5 or M < 0.5] and 0.2 < getExtraInfo(SignalProbability) < 0.7
    *
    * == and != conditions are evaluated not exactly because we deal with floating point values
    * instead two floating point number are equal if their distance in their integral ordering is less than 3.
+   *
+   * The general "Variable Manager" passed as a template argument to this class has to have some properties:
+   *  * public typedef Object: Which objects can be handled by the variable manager - a pointer on this type ob objects will
+   *    be required by the check method of the cut.
+   *  * public typedef Var: The type of objects, that are returned by the variable manager, when you ask it for a variable (by giving a name to getVariable)
+   *  * public static function getInstance: so the variable manager has to be a singleton.
+   *  * public function getVariable(const std::string& name): which should return a pointer to an object of type AVariableManager::Var which are used to get
+   *    the value corresponding to this name. Whenever this value is needed, the function called "function" is called with a pointer to a Object, that is
+   *    given in the check function of this cut.
+   *
+   *  The best example for a VariableManager, that has all these parameters, is probably the analysis VariableManager with VariableManager::var equals
+   *  to the analysis variable and the VariableManager::Object equal to a Particle.
    */
   template <class AVariableManager>
   class GeneralCut {
+    /// Object, that can be checked. This depends on the VariableManager, as the returned variables from the manager must calculate their values on pointers of these objects.
     typedef typename AVariableManager::Object Object;
+    /// Variable returned by the variable manager.
     typedef typename AVariableManager::Var Var;
 
   public:
     /**
-     * Creates an instance of a cut and returns a unique_ptr to it, if you need a copy-able oject instead
+     * Creates an instance of a cut and returns a unique_ptr to it, if you need a copy-able object instead
      * you can cast it to a shared_ptr using std::shared_ptr<Variable::Cut>(Cut::Compile(cutString))
      * @param cut the string defining the cut
      * @return std::unique_ptr<Cut>
@@ -92,8 +90,9 @@ namespace Belle2 {
       return std::unique_ptr<GeneralCut>(new GeneralCut(cut));
     }
     /**
-     * Check if the current cuts are passed by the given particle
-     * @param p pointer to the particle object
+     * Check if the current cuts are passed by the given object
+     * @param p pointer to the object, that should be checked. All formerly received variables from the variable manager
+     * (from the type Var), are asked for their value using var->function(p).
      */
     bool check(const Object* p) const
     {
@@ -312,6 +311,10 @@ namespace Belle2 {
       return false;
     }
 
+    /**
+     * Get a variable with the given name from the variable manager using
+     * its getVariable(name) function.
+     */
     void processVariable(const std::string& str)
     {
       AVariableManager& manager = AVariableManager::Instance();
@@ -323,7 +326,7 @@ namespace Belle2 {
     }
 
     /**
-     * Returns stored number or Variable value for the given particle
+     * Returns stored number or Variable value for the given object.
      */
     float get(const Object* p) const
     {
@@ -351,7 +354,7 @@ namespace Belle2 {
       EQ,
       NE,
     } m_operation; /**< Operation which connects left and right cut */
-    const Var* var;
+    const Var* var; /**< set if there was a valid variable in this cut */
     float m_number; /**< literal number contained in the cut */
     bool m_isNumeric; /**< if there was a literal number in this cut */
     std::unique_ptr<GeneralCut> m_left; /**< Left-side cut */

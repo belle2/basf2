@@ -1,10 +1,9 @@
 #ifndef SPLITGLVIEW_H
 #define SPLITGLVIEW_H
 
-#include "TEveProjectionManager.h"
-#include "TQObject.h"
-
-#include "TGLEmbeddedViewer.h"
+#include <TQObject.h>
+#include <TEveProjectionManager.h>
+#include <TGLEmbeddedViewer.h>
 
 class TEveWindow;
 class TGPopupMenu;

@@ -72,6 +72,9 @@ DisplayUI::DisplayUI(bool automatic):
   m_viewPane = new SplitGLView();
   browser->StopEmbedding();
 
+  //Without this, our own menu bar entries are not drawn (might appear later)
+  browser->Resize(TGDimension(1200, 1000));
+
   m_eventData = new TEveElementList();
 }
 

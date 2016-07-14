@@ -283,7 +283,7 @@ boot_fpga(mgt_t mgt, char *file, int verbose, int forced, int m012)
   if (verbose) putchar('\n');
   if (ch == EOF) {
     printf("immature EOF for %s\n", file);
-    return -1;
+      fclose(fp);    return -1;
   }
 
   /* -- main part -- */

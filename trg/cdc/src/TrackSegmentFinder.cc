@@ -2266,7 +2266,22 @@ TRGCDCTrackSegmentFinder::simulate2(void) {
 
         //...Simulate TSF...
         vector<TRGSignalVector *> result = simulateTSF(s, t);
+        vector<TRGSignalVector *> result2 = simulateTSF2(s, t);
         _toBeDeleted.push_back(result[1]); // Event timing omitted now
+
+        if (TRGDebug::level()) {
+            if (result.size() != result2.size()) {
+                cout << "TSF::simulateTSF2 has different response(size)"
+                     << endl;
+            }
+            else {
+                for (unsigned i = 0; i < result.size(); i++) {
+                    if ((* result[i]) != (* result2[i]))
+                        cout << "TSF::simulateTSF2 has different response"
+                             << "(contents)" << endl;
+                }
+            }
+        }
 
         TRGSignalVector * forTracker0 = result[0];
         TRGSignalVector * forTracker1 = new TRGSignalVector(* forTracker0);
@@ -2787,6 +2802,7 @@ TSFinder::simulateTSFOld(TRGSignalVector * in, unsigned tsid) {
 
     return result;
 }
+
 vector <TRGSignalVector *>
 TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
 
@@ -2995,6 +3011,262 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
     result.push_back(resultE);
 
     delete [] LUTValue;
+    delete Hitmap;
+
+    return result;
+}
+vector <TRGSignalVector *>
+TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
+
+    //variables for common
+    const string na = "TSF" + TRGUtilities::itostring(tsid) + " in " +
+                      name();
+    TCSegment * tsi = _tsSL[tsid];
+    vector <TRGSignalVector *> result;
+
+    //variables for EvtTime & Low pT
+    vector<bool> fTimeVect;
+    //  int tmpFTime = 0 ;
+
+    //variables for Tracker & N.N
+    vector <bool> tmpOutBool;
+
+    TRGSignalVector * resultT = new TRGSignalVector(na, in->clock(), 13);
+    TRGSignalVector * resultE = new TRGSignalVector(na, in->clock(), 10);
+    TRGSignalVector * Hitmap = new TRGSignalVector(na + "HitMap",
+                                                   in->clock(),
+                                                   0);
+    TRGSignalVector pTime(na + "PriorityTime", in->clock(), 0);
+    TRGSignalVector fTime(na + "FastestTime", in->clock(), 0);
+    TRGSignal * pri0 = 0;
+    TRGSignal * pri1 = 0;
+    TRGSignal * pri2 = 0;
+
+    if (_type == innerType) {
+        for (unsigned i = 0; i < 16; i++) {
+            Hitmap->push_back((* in)[i]);
+            (* Hitmap)[i].widen(16);
+        }
+        for (unsigned i = 0; i < 4; i++) {
+            pTime.push_back((* in)[i + 16]);
+            fTime.push_back((* in)[i + 20]);
+        }
+        pri0 = & (*Hitmap)[1];
+        pri1 = & (*Hitmap)[2];
+        pri2 = & (*Hitmap)[3];
+    }
+    else {
+        for (unsigned i = 0; i < 12; i++) {
+            Hitmap->push_back((* in)[i]);
+            (* Hitmap)[i].widen(16);
+        }
+        for (unsigned i = 0; i < 4; i++) {
+            pTime.push_back((* in)[i + 12]);
+            fTime.push_back((* in)[i + 16]);
+        }
+        pri0 = & (*Hitmap)[6];
+        pri1 = & (*Hitmap)[7];
+        pri2 = & (*Hitmap)[8];
+    }
+
+    //...Clock counter...
+    const TRGSignalVector & cc = in->clock().clockCounter();
+    for (unsigned i = 0; i < 5; i++) {
+        pTime.push_back(cc[i]);
+        fTime.push_back(cc[i]);
+    }
+
+    vector<int> changeTime = Hitmap->stateChanges();
+
+    vector<unsigned> luts;
+    int lastFastHit = in->clock().min();
+
+    if (changeTime.size()) {
+
+        const string fn = "TSF::simulateTSF2:tsid=" + to_string(tsid);
+        TRGDebug::enterStage(fn);
+
+        TRGState ft(10);
+        bool eOut = false;
+
+        unsigned stateHitPos = 0; // 0:wait, 1:active1st, 2:active2nd
+        unsigned hitPos = 0;
+        unsigned timing = 0;
+        int timePosFound = 0;
+        int counterPos = 0;
+
+        unsigned stateLR = 0; // 0:wait, 1:LUT12, 2:LUT3
+        int timeLRFound = 0;
+        int counterLR = 0;
+
+        for (unsigned i = 0; i < changeTime.size(); i++) {
+
+            const int ct = changeTime[i];
+            const TRGState st = Hitmap->state(ct);
+
+            //...LUT...
+            // 0:no hit, 1:right, 2:left, 3:LR unknown hit
+            const unsigned lut = tsi->LUT()->getValue(unsigned(st));
+            luts.push_back(lut);
+
+            //...Any wire hit (for the fastest timing)...
+            const bool active = st.active();
+            if (active) {
+                const int timeCounter = ct - lastFastHit;
+
+                //...Record as the fastest timing hit...
+                if (timeCounter > 63) {
+                    lastFastHit = ct;
+                    TRGState ftnow = fTime.state(ct);
+                    ftnow += TRGState(1, 1);
+                    ft = ftnow;
+                    eOut = true;
+                }
+            }
+
+            // output for EvtTime & Low pT tracker module
+            if (lut) {
+                if (eOut) {
+                    resultE->set(fTimeVect, ct);
+                    eOut = false;
+                }
+            }
+
+            //...Hit position...
+            const bool hit1st = pri0->riseEdge(ct);
+            const bool hit2nd0 = pri1->riseEdge(ct);
+            const bool hit2nd1 = pri2->riseEdge(ct);
+            const bool hit2nd = hit2nd0 | hit2nd1;
+
+            //...Hit position state machine...
+
+            //...State : wait...
+            if (stateHitPos == 0) {
+                hitPos = 0;
+                timing = 0;
+                timePosFound = 0;
+                if (hit1st) {
+                    hitPos = 3;
+                    timing = unsigned(pTime.state(ct));
+                    timePosFound = ct;
+                    stateHitPos = 1;
+                }
+                else if (hit2nd) {
+                    if ((* Hitmap)[0].state(ct))
+                        hitPos = 2;
+                    else
+                        hitPos = 1;
+                    timing = unsigned(pTime.state(ct));
+                    timePosFound = ct;
+                    stateHitPos = 2;
+                }
+            }
+
+            //...State : active1st...
+            else if (stateHitPos == 1) {
+                counterPos = ct - timePosFound;
+                if (counterPos > 63)
+                    stateHitPos = 0;
+            }
+
+            //...State : active2nd...
+            else if (stateHitPos == 2) {
+                if (hit1st) {
+                    hitPos = 3;
+                    timing = unsigned(pTime.state(ct));
+                    timePosFound = ct;
+                    stateHitPos = 1;
+                }
+                else {
+                    counterPos = ct - timePosFound;
+                    if (counterPos > 63)
+                        stateHitPos = 0;
+                }
+            }
+
+            //...State unknown...
+            else {
+                cout << "TSF::simulateTSF2 !!! strange state in hit position"
+                     << endl;
+            }
+
+            //...L/R decision state machine...
+
+            //...State : wait...
+            if (stateLR == 0) {
+                if (lut != 0) {
+                    const unsigned val = (timing << 4) | (lut << 2) | hitPos;
+                    const TRGState output(13, val);
+                    resultT->set(output, ct);
+                    timeLRFound = ct;
+                    if ((lut == 1) || (lut ==2))
+                        stateLR = 1;
+                    else
+                        stateLR = 2;
+                }
+            }
+
+            //...State : LUT12...
+            else if (stateLR == 1) {
+                counterLR = ct - timeLRFound;
+                if (counterLR > 63)
+                    stateLR = 0;
+            }
+
+            //...State : LUT3...
+            else if (stateLR == 2) {
+                if (lut) {
+                    if ((lut == 1) || (lut == 2)) {
+                        const unsigned val = (timing << 4) | (lut << 2) |
+                            hitPos;
+                        const TRGState output(13, val);
+                        resultT->set(output, ct);
+                        timeLRFound = ct;
+                        stateLR = 1;
+                    }
+                    else {
+                        counterLR = ct - timeLRFound;
+                        if (counterLR > 63)
+                            stateLR = 0;
+                    }
+                }
+            }
+
+            //...State unknown...
+            else {
+                cout << "TSF::simulateTSF2 !!! strange state in L/R decision"
+                     << endl;
+            }
+
+            if (TRGDebug::level() > 1) {
+                cout << TRGDebug::tab() << "clk=" << ct
+                     << ", ptn=" << st
+                     << ", LUT=" << lut
+                     << ", pri=" << hit1st
+                     << ", sec=" << hit2nd
+                     << ", hitPos=" << hitPos
+                     << ", cntrPos=" << counterPos
+                     << ", cntrRL=" << counterLR
+                     << endl;
+            }            
+        }
+        TRGDebug::leaveStage(fn);
+    }
+
+    if (TRGDebug::level()) {
+        vector<int> sc = resultT->stateChanges();
+        vector<unsigned> lv;
+        for (unsigned i = 0; i < sc.size(); i++) {
+            //...LUT value...
+            unsigned l = unsigned(resultT->state(sc[i]).subset(2, 2));
+            lv.push_back(l);
+            cout << "clk=" << sc[i] << " LUT output[" << i << "]=" << l << endl;
+        }
+    }
+
+    result.push_back(resultT);
+    result.push_back(resultE);
+
     delete Hitmap;
 
     return result;

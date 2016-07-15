@@ -180,12 +180,19 @@ TRGSignalVector::set(const TRGState & s, int cp) {
 
 bool
 TRGSignalVector::operator==(const TRGSignalVector & a) const {
-    if (size() != a.size())
+    if (size() != a.size()) {
+        // cout << "TRGSignalVector::operator== : different size:"
+        //      << size() << "," << a.size() << endl;
         return false;
-
+    }
     for (unsigned i = 0; i < size(); i++) {
-        if ((* this)[i] != a[i])
+        if ((* this)[i] != a[i]) {
+            // cout << "TRGSignalVector::operator== : different signal:i="
+            //      << i << endl;
+            // (* this)[i].dump();
+            // a[i].dump();
             return false;
+        }
     }
 
     return true;

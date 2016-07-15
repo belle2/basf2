@@ -9,8 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
-#include <analysis/VariableManager/Manager.h>
 #include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
 

@@ -135,60 +135,10 @@ namespace {
 
   TEST(VariableTest, Cut)
   {
-
     Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
     Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah");
 
-    std::unique_ptr<Cut> a = Cut::Compile("1.2 < 1.5 ");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile(" 1.5<1.2");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile(" 12.3 >1.5 ");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("12 > 15");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("1.2 == 1.2");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile(" 1.5!=1.2");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1.2 == 1.2 == 1.2");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile(" 1.5 == 1.5!=1.2");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile(" 1.5 == 1.5!=1.5");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("1.0 < 1.2 == 1.2");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile(" 1.5 < 1.6 != 1.6");
-    EXPECT_FALSE(a->check(nullptr));
-    a = Cut::Compile(" 1.5 < 1.6 != 1.7");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile(" [12 >= 12 ]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("[ 15>= 16 ]");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile(" [12 <= 12 ]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("  [ 17<= 16.7 ]");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile(" [12 <= 12 < 13]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("  [ 17<= 16.7 < 18 ]");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile(" [12 >= 12 < 13]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("  [ 15> 16.7 <= 18 ]");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("dummyvar > 1.0");
+    std::unique_ptr<Cut> a = Cut::compile("dummyvar > 1.0");
     EXPECT_TRUE(a->check(nullptr));
     a = Cut::Compile("1.0 < dummyvar <= dummyvar");
     EXPECT_TRUE(a->check(nullptr));
@@ -202,82 +152,6 @@ namespace {
     EXPECT_TRUE(a->check(nullptr));
     a = Cut::Compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
     EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1 < 2 and 3 < 4");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 and 4 < 3");
-    EXPECT_FALSE(a->check(nullptr));
-    a = Cut::Compile("2 < 1 and 4 < 3");
-    EXPECT_FALSE(a->check(nullptr));
-    a = Cut::Compile("2 < 1 and 3 < 4");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("1 < 2 or 3 < 4");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 or 4 < 3");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("2 < 1 or 4 < 3");
-    EXPECT_FALSE(a->check(nullptr));
-    a = Cut::Compile("2 < 1 or 3 < 4");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1 < 2 and 3 < 4 and [ 5 < 6 or 7 > 6 ]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("[1 < 2 < 3 or 3 > 4 ] and [ 5 < 6 or 7 > 6 ]");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("[1 < 2 < 3 or 3 > 4 ] or [ 5 < 6 and 7 > 6 ]");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1 < 2 and 3 < 4 or 5 > 6");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 or 3 < 4 and 5 > 6");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 and 4 < 3 or 6 > 5");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 or 4 < 3 and 6 > 5");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1 != 2 and 3 < 4 or 5 > 6");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 or 3 != 4 and 5 > 6");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1 != 2 and 3 == 4 or 5 > 6");
-    EXPECT_FALSE(a->check(nullptr));
-    a = Cut::Compile("1 < 2 or 3 == 4 and 5 > 6");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("15 != 0x15");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("15 == 0xF");
-    EXPECT_TRUE(a->check(nullptr));
-
-    // Should throw an exception
-    EXPECT_THROW(a = Cut::Compile("15 == 15.0 bla"), std::runtime_error);
-    EXPECT_TRUE(a->check(nullptr));
-    EXPECT_THROW(a = Cut::Compile("15 == 15e1000"), std::out_of_range);
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1e-3 < 1e3");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1e-3 == 0.001");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1000 < infinity");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("1000 > infinity");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("1000 < nan");
-    EXPECT_FALSE(a->check(nullptr));
-
-    a = Cut::Compile("1000 > nan");
-    EXPECT_FALSE(a->check(nullptr));
-
-
   }
 
 

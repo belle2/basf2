@@ -5,6 +5,7 @@ using namespace Belle2;
 namespace {
   /// Class to mock objects for out variable manager.
   struct MockObjectType {
+    /// Stupid singlevalued object.
     double value = 4.2;
   };
 
@@ -15,11 +16,13 @@ namespace {
    */
   class MockVariableType {
   public:
+    /// Function of the variable which always returns the value of the object.
     double function(const MockObjectType* object) const
     {
       return object->value;
     }
 
+    /// Name of the variable.
     const std::string name = "mocking_variable";
   };
 
@@ -29,15 +32,19 @@ namespace {
    */
   class MockVariableManager {
   public:
+    /// Use MockObjectType as Objects.
     typedef MockObjectType Object;
+    /// Use MockvariableType as Variables.
     typedef MockVariableType Var;
 
+    /// Singleton.
     static MockVariableManager& Instance()
     {
       static MockVariableManager instance;
       return instance;
     }
 
+    /// Return the single mocking variable we have in cases the correct name is given.
     Var* getVariable(const std::string& name)
     {
       if (name == "mocking_variable") {
@@ -47,14 +54,14 @@ namespace {
       }
     }
 
+    /// The only variable we have in this test.
     Var m_mocking_variable;
   };
 
   /// Type of a mocked general cut.
   typedef GeneralCut<MockVariableManager> MockGeneralCut;
 
-  /// Test for the general cut: Try to compile some cuts and check their result
-  // using a mocked variable manager.
+  /// Test for the general cut: Try to compile some cuts and check their result using a mocked variable manager.
   TEST(GeneralCutTest, cutCheck)
   {
     MockObjectType testObject;
@@ -171,6 +178,8 @@ namespace {
     // Should throw an exception
     EXPECT_THROW(a = MockGeneralCut::Compile("15 == 15.0 bla"), std::runtime_error);
     EXPECT_TRUE(a->check(&testObject));
+    EXPECT_THROW(a = MockGeneralCut::Compile("15 == other_var"), std::runtime_error);
+    EXPECT_TRUE(a->check(&testObject));
     EXPECT_THROW(a = MockGeneralCut::Compile("15 == 15e1000"), std::out_of_range);
     EXPECT_TRUE(a->check(&testObject));
 
@@ -193,6 +202,7 @@ namespace {
     EXPECT_FALSE(a->check(&testObject));
   }
 
+  /// Test for the general cut: Try to compile some cuts and check if decompiling gives back more or less the same string (except for [ and ]).
   TEST(GeneralCutTest, CompileAndDecompile)
   {
 

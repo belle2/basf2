@@ -15,6 +15,8 @@ import os
 import random
 from basf2 import *
 from ROOT import Belle2
+from simulation import *
+from reconstruction import *
 
 
 class PyTrigger(Module):
@@ -43,36 +45,16 @@ class PyTrigger(Module):
                 break
 
 
-# register necessary modules
-eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('evtNumList', [20])
-
-eventinfoprinter = register_module('EventInfoPrinter')
-
-# create geometry
-gearbox = register_module('Gearbox')
-geometry = register_module('Geometry')
-
-# EvtGen to provide generic BB events
-evtgeninput = register_module('EvtGenInput')
-
-
-# simulation
-g4sim = register_module('FullSim')
-# make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
-
-# create paths
 main = create_path()
+eventinfosetter = main.add_module('EventInfoSetter')
+eventinfosetter.param('evtNumList', [2000])
 
-# add modules to paths
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
+eventinfoprinter = main.add_module('EventInfoPrinter')
 
-main.add_module(gearbox)
-main.add_module(geometry)
-main.add_module(evtgeninput)
-main.add_module(g4sim)
+evtgeninput = main.add_module('EvtGenInput')
+
+components = []
+add_simulation(main, components)
 
 ########################################
 # simulation is done now, so we'll put the PyTrigger module here
@@ -85,25 +67,10 @@ emptypath = create_path()
 kltrigger.if_false(emptypath)
 ########################################
 
-cdcdigi = register_module('CDCDigitizer')
-main.add_module(cdcdigi)
-
-pxd_digi = register_module('PXDDigitizer')
-main.add_module(pxd_digi)
-
-main.add_module(register_module('PXDClusterizer'))
-
-mctrackfinder = register_module('TrackFinderMCTruth')
-mctrackfinder.param('UsePXDHits', True)
-mctrackfinder.param('UseSVDHits', True)
-mctrackfinder.param('UseCDCHits', True)
-main.add_module(mctrackfinder)
-
-genfit = register_module('GenFitter')
-main.add_module(genfit)
+add_reconstruction(main, components)
 
 # default parameters
-display = register_module('Display')
-main.add_module(display)
+display = main.add_module('Display')
 
 process(main)
+print(statistics)

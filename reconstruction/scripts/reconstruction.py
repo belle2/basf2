@@ -123,6 +123,18 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
         mdstPID = register_module('MdstPID')
         path.add_module(mdstPID)
 
+    # cluster clussifying, matching and building of super cluster "cluster"
+    if components is None or 'BKLM' in components and 'EKLM' in components and 'ECL' in components:
+
+        tmvaexpert_klm = register_module('KLMExpert')
+        path.add_module(tmvaexpert_klm)
+
+        tmvaexpert_ecl = register_module('ECLExpert')
+        path.add_module(tmvaexpert_ecl)
+
+        clusterMatcher = register_module('ClusterMatcher')
+        path.add_module(clusterMatcher)
+
 
 def add_reconstruction(path, components=None, pruneTracks=True):
     """

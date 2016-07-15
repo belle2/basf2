@@ -70,6 +70,7 @@ void ClusterMatcherModule::event()
 
     const TVector3& eclClusterPos = eclCluster.getclusterPosition();
 
+
     Cluster* clusterecl = Clusters.appendNew();
     clusterecl->setLogLikelihood(
       Const::ECL,
@@ -85,6 +86,7 @@ void ClusterMatcherModule::event()
       angleDist = eclClusterPos.Angle(klmClusterPos);
 
       if (angleDist < (m_coneInRad / 2.0)) {
+
         eclCluster.addRelationTo(&klmcluster, angleDist);
         klmcluster.addRelationTo(clusterecl);
       } else {

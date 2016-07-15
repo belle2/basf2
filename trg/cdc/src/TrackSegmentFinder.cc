@@ -3115,7 +3115,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                 const int timeCounter = ct - lastFastHit;
 
                 //...Record as the fastest timing hit...
-                if (timeCounter > 63) {
+                if (timeCounter > 15) {
                     lastFastHit = ct;
                     TRGState ftnow = fTime.state(ct);
                     ftnow += TRGState(1, 1);
@@ -3165,7 +3165,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
             //...State : active1st...
             else if (stateHitPos == 1) {
                 counterPos = ct - timePosFound;
-                if (counterPos > 63)
+                if (counterPos > 15)
                     stateHitPos = 0;
             }
 
@@ -3179,7 +3179,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                 }
                 else {
                     counterPos = ct - timePosFound;
-                    if (counterPos > 63)
+                    if (counterPos > 15)
                         stateHitPos = 0;
                 }
             }
@@ -3209,7 +3209,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
             //...State : LUT12...
             else if (stateLR == 1) {
                 counterLR = ct - timeLRFound;
-                if (counterLR > 63)
+                if (counterLR > 15)
                     stateLR = 0;
             }
 
@@ -3226,7 +3226,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                     }
                     else {
                         counterLR = ct - timeLRFound;
-                        if (counterLR > 63)
+                        if (counterLR > 15)
                             stateLR = 0;
                     }
                 }
@@ -3244,9 +3244,9 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                      << ", LUT=" << lut
                      << ", pri=" << hit1st
                      << ", sec=" << hit2nd
-                     << ", hitPos=" << hitPos
-                     << ", cntrPos=" << counterPos
-                     << ", cntrRL=" << counterLR
+                     << ", hPos=" << hitPos
+                     << ", ctrs=" << counterPos << "," << counterLR
+                     << ", states=" << stateHitPos << "," << stateLR
                      << endl;
             }            
         }

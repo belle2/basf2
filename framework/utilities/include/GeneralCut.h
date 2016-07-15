@@ -161,6 +161,47 @@ namespace Belle2 {
       }
     }
 
+    /**
+     * Do the compilation from a string in return. In principle, compile(decompile()) should give the same result again.
+     */
+    std::string decompile() const
+    {
+      std::stringstream stringstream;
+      if (m_left != nullptr and m_right != nullptr) {
+        stringstream << "(";
+        stringstream << m_left->decompile();
+
+        switch (m_operation) {
+          case AND: stringstream << " and "; break;
+          case OR: stringstream << " or "; break;
+          case LT: stringstream << " < "; break;
+          case LE: stringstream << " <= "; break;
+          case GT: stringstream << " > "; break;
+          case GE: stringstream << " >= "; break;
+          case EQ: stringstream << " == "; break;
+          case NE: stringstream << " != "; break;
+          default: throw std::runtime_error("Cut string has an invalid format: Operator does not support left and right!"); break;
+        }
+      } else if (m_left == nullptr and m_right == nullptr) {
+        switch (m_operation) {
+          case NONE:
+            if (m_isNumeric) {
+              stringstream << m_number;
+            } else if (m_var != nullptr) {
+              stringstream << m_var->name;
+            } else {
+              throw std::runtime_error("Cut string has an invalid format: Variable is empty!");
+            }
+            break;
+          default: throw std::runtime_error("Cut string has an invalid format: Invalid operator without left and right!"); break;
+        }
+      } else {
+        throw std::runtime_error("Cut string has an invalid format: invalid combination of left and right!");
+      }
+
+      return stringstream.str();
+    }
+
 
   private:
     /**
@@ -328,8 +369,8 @@ namespace Belle2 {
     void processVariable(const std::string& str)
     {
       AVariableManager& manager = AVariableManager::Instance();
-      var = manager.getVariable(str);
-      if (var == nullptr) {
+      m_var = manager.getVariable(str);
+      if (m_var == nullptr) {
         throw std::runtime_error(
           "Cut string has an invalid format: Variable not found: " + str);
       }
@@ -342,8 +383,8 @@ namespace Belle2 {
     {
       if (m_isNumeric) {
         return m_number;
-      } else if (var != nullptr) {
-        return var->function(p);
+      } else if (m_var != nullptr) {
+        return m_var->function(p);
       } else {
         throw std::runtime_error("Cut string has an invalid format: Neither number nor variable name");
       }
@@ -364,7 +405,7 @@ namespace Belle2 {
       EQ,
       NE,
     } m_operation; /**< Operation which connects left and right cut */
-    const Var* var; /**< set if there was a valid variable in this cut */
+    const Var* m_var; /**< set if there was a valid variable in this cut */
     float m_number; /**< literal number contained in the cut */
     bool m_isNumeric; /**< if there was a literal number in this cut */
     std::unique_ptr<GeneralCut> m_left; /**< Left-side cut */

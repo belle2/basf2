@@ -167,8 +167,11 @@ namespace Belle2 {
     std::string decompile() const
     {
       std::stringstream stringstream;
-      if (m_left != nullptr and m_right != nullptr) {
-        stringstream << "(";
+      if (m_operation == EMPTY) {
+        return "";
+      } else if (m_left != nullptr and m_right != nullptr) {
+
+        stringstream << "[";
         stringstream << m_left->decompile();
 
         switch (m_operation) {
@@ -182,6 +185,10 @@ namespace Belle2 {
           case NE: stringstream << " != "; break;
           default: throw std::runtime_error("Cut string has an invalid format: Operator does not support left and right!"); break;
         }
+
+        stringstream << m_right->decompile();
+        stringstream << "]";
+
       } else if (m_left == nullptr and m_right == nullptr) {
         switch (m_operation) {
           case NONE:
@@ -246,7 +253,7 @@ namespace Belle2 {
     /**
      * Preprocess cut string. Trim string and delete global parenthesis
      */
-    std::string preprocess(std::string str)
+    std::string preprocess(std::string str) const
     {
       boost::algorithm::trim(str);
       if (str.empty())

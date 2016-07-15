@@ -138,7 +138,7 @@ namespace {
     Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
     Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah");
 
-    std::unique_ptr<Cut> a = Cut::compile("dummyvar > 1.0");
+    std::unique_ptr<Cut> a = Cut::Compile("dummyvar > 1.0");
     EXPECT_TRUE(a->check(nullptr));
     a = Cut::Compile("1.0 < dummyvar <= dummyvar");
     EXPECT_TRUE(a->check(nullptr));

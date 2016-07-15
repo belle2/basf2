@@ -31,8 +31,8 @@ ttbtrack->Draw(" vcell_fit_1_1_2 >> hmatch_vcell_1_1_2(100,0,768)" , "ucell_fit_
 ttbtrack->Draw(" vcell_fit_1_1_2 >> htotal_roi_vcell_1_1_2(100,0,768)" , "ucell_fit_1_1_2 < 150 " );
 ttbtrack->Draw(" vcell_fit_1_1_2 >> hmatch_roi_vcell_1_1_2(100,0,768)" , "ucell_fit_1_1_2 < 150 && cluster_matched_1_1_2==0 " );
 
-TGraphAsymmErrors * effi_vcell_1_1_2 = new TGraphAsymmErrors ( hmatch_vcell_1_1_2, htotal_vcell_1_1_2, "w" ); 
-TGraphAsymmErrors * ROIeffi_vcell_1_1_2 = new TGraphAsymmErrors ( hmatch_roi_vcell_1_1_2, htotal_roi_vcell_1_1_2, "w" ); 
+TGraphAsymmErrors * effi_vcell_1_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_vcell_1_1_2,(TH1*) htotal_vcell_1_1_2, "w" ); 
+TGraphAsymmErrors * ROIeffi_vcell_1_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_roi_vcell_1_1_2,(TH1*) htotal_roi_vcell_1_1_2, "w" ); 
 
 effi_vcell_1_1_2->SetTitle("");
 effi_vcell_1_1_2->GetXaxis()->SetTitle("vCell Sensor 1.1.2");
@@ -62,8 +62,8 @@ ttbtrack->Draw(" ucell_fit_1_1_2 >> hmatch_ucell_1_1_2(25,0,250)" , "vcell_fit_1
 ttbtrack->Draw(" ucell_fit_1_1_2 >> htotal_roi_ucell_1_1_2(25,0,250)" , "vcell_fit_1_1_2 > 300 " );
 ttbtrack->Draw(" ucell_fit_1_1_2 >> hmatch_roi_ucell_1_1_2(25,0,250)" , "vcell_fit_1_1_2 > 300 && cluster_matched_1_1_2==0 " );
 
-TGraphAsymmErrors * effi_ucell_1_1_2 = new TGraphAsymmErrors ( hmatch_ucell_1_1_2, htotal_ucell_1_1_2, "w" ); 
-TGraphAsymmErrors * ROIeffi_ucell_1_1_2 = new TGraphAsymmErrors ( hmatch_roi_ucell_1_1_2, htotal_roi_ucell_1_1_2, "w" ); 
+TGraphAsymmErrors * effi_ucell_1_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_ucell_1_1_2,(TH1*) htotal_ucell_1_1_2, "w" ); 
+TGraphAsymmErrors * ROIeffi_ucell_1_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_roi_ucell_1_1_2,(TH1*) htotal_roi_ucell_1_1_2, "w" ); 
 
 effi_ucell_1_1_2->SetTitle("");
 effi_ucell_1_1_2->GetXaxis()->SetTitle("uCell Sensor 1.1.2");
@@ -93,8 +93,8 @@ ttbtrack->Draw(" vcell_fit_2_1_2 >> hmatch_vcell_2_1_2(100,0,768)" , "ucell_fit_
 ttbtrack->Draw(" vcell_fit_2_1_2 >> htotal_roi_vcell_2_1_2(100,0,768)" , "ucell_fit_2_1_2 < 150 " );
 ttbtrack->Draw(" vcell_fit_2_1_2 >> hmatch_roi_vcell_2_1_2(100,0,768)" , "ucell_fit_2_1_2 < 150 && cluster_matched_2_1_2==0 " );
 
-TGraphAsymmErrors * effi_vcell_2_1_2 = new TGraphAsymmErrors ( hmatch_vcell_2_1_2, htotal_vcell_2_1_2, "w" ); 
-TGraphAsymmErrors * ROIeffi_vcell_2_1_2 = new TGraphAsymmErrors ( hmatch_roi_vcell_2_1_2, htotal_roi_vcell_2_1_2, "w" ); 
+TGraphAsymmErrors * effi_vcell_2_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_vcell_2_1_2,(TH1*) htotal_vcell_2_1_2, "w" ); 
+TGraphAsymmErrors * ROIeffi_vcell_2_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_roi_vcell_2_1_2,(TH1*) htotal_roi_vcell_2_1_2, "w" ); 
 
 effi_vcell_2_1_2->SetTitle("");
 effi_vcell_2_1_2->GetXaxis()->SetTitle("vCell Sensor 2.1.2");
@@ -124,8 +124,8 @@ ttbtrack->Draw(" ucell_fit_2_1_2 >> hmatch_ucell_2_1_2(25,0,250)" , "vcell_fit_2
 ttbtrack->Draw(" ucell_fit_2_1_2 >> htotal_roi_ucell_2_1_2(25,0,250)" , "vcell_fit_2_1_2 > 300 " );
 ttbtrack->Draw(" ucell_fit_2_1_2 >> hmatch_roi_ucell_2_1_2(25,0,250)" , "vcell_fit_2_1_2 > 300 && cluster_matched_2_1_2==0 " );
 
-TGraphAsymmErrors * effi_ucell_2_1_2 = new TGraphAsymmErrors ( hmatch_ucell_2_1_2, htotal_ucell_2_1_2, "w" ); 
-TGraphAsymmErrors * ROIeffi_ucell_2_1_2 = new TGraphAsymmErrors ( hmatch_roi_ucell_2_1_2, htotal_roi_ucell_2_1_2, "w" ); 
+TGraphAsymmErrors * effi_ucell_2_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_ucell_2_1_2,(TH1*) htotal_ucell_2_1_2, "w" ); 
+TGraphAsymmErrors * ROIeffi_ucell_2_1_2 = new TGraphAsymmErrors ((TH1*) hmatch_roi_ucell_2_1_2,(TH1*) htotal_roi_ucell_2_1_2, "w" ); 
 
 effi_ucell_2_1_2->SetTitle("");
 effi_ucell_2_1_2->GetXaxis()->SetTitle("uCell Sensor 2.1.2");

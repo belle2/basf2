@@ -20,7 +20,11 @@ LIBDIR=$(BELLE2_LOCAL_DIR)/lib
 TARGET1=des_ser_ROPC_main
 TARGET2=des_ser_COPPER_main
 
-all: clean link ${LOCALLIB} ${TARGET1} ${TARGET2} cleanobj
+all: clean link ${TARGET1} ${TARGET2} cleanobj
+
+ropc: clean_ropc link ${TARGET1} cleanobj
+
+copper: clean_copper link ${TARGET2} cleanobj
 
 ${TARGET1}: ${TARGET1}.cc ${OBJS}
 	$(CXX) $(CFLAGS) ${LIBFLAG} -L./ $^ -o $@ 
@@ -64,6 +68,18 @@ link:
 clean:
 	@ echo "<< clearing directry >>"
 	@ rm -rf ${TARGET1} ${TARGET2} $(OBJS) lib${LOCALLIB}.so *~ .*~ \#*~
+	@ rm -rf ${INCDIR}
+
+.PHONY:	clean_ropc
+clean_ropc:
+	@ echo "<< clearing directry >>"
+	@ rm -rf ${TARGET1} $(OBJS) lib${LOCALLIB}.so *~ .*~ \#*~
+	@ rm -rf ${INCDIR}
+
+.PHONY:	clean_copper
+clean_copper:
+	@ echo "<< clearing directry >>"
+	@ rm -rf ${TARGET2} $(OBJS) lib${LOCALLIB}.so *~ .*~ \#*~
 	@ rm -rf ${INCDIR}
 
 .PHONY:	cleanobj

@@ -808,6 +808,33 @@ namespace Belle2 {
       return mcparticle->getMomentum().Pz();
     }
 
+    double particleMCMatchDX(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getDecayVertex().Px();
+    }
+
+    double particleMCMatchDY(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getDecayVertex().Py();
+    }
+
+    double particleMCMatchDZ(const Particle* part)
+    {
+      const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
+      if (mcparticle == nullptr)
+        return -999.0;
+
+      return mcparticle->getDecayVertex().Pz();
+    }
+
     double particleMCMatchE(const Particle* part)
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
@@ -1433,7 +1460,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("dz", particleDZ, "z in respect to IP");
     REGISTER_VARIABLE("x", particleDX, "x coordinate of vertex");
     REGISTER_VARIABLE("y", particleDY, "y coordinate of vertex");
-    REGISTER_VARIABLE("z", particleDZ, "z coordinate of veretx");
+    REGISTER_VARIABLE("z", particleDZ, "z coordinate of vertex");
     REGISTER_VARIABLE("dr", particleDRho, "transverse distance in respect to IP");
 
     REGISTER_VARIABLE("M", particleMass,
@@ -1494,6 +1521,12 @@ namespace Belle2 {
                       "The py of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcPZ", particleMCMatchPZ,
                       "The pz of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcDX", particleMCMatchDX,
+                      "The decay x-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcDY", particleMCMatchDY,
+                      "The decay y-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
+    REGISTER_VARIABLE("mcDZ", particleMCMatchDZ,
+                      "The decay z-Vertex of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcE", particleMCMatchE,
                       "The energy of matched MCParticle, -999 if no match. Requires running matchMCTruth() on the particles first.");
     REGISTER_VARIABLE("mcP", particleMCMatchP,

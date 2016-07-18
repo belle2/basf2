@@ -118,7 +118,7 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
     if (flavorTaggerInfo != nullptr) {
       if (flavorTaggerInfo->getUseModeFlavorTagger() != "Expert") continue;
 //       method[iProduct] = flavTag->getMethod();
-      if (Variable::isRestOfEventEmpty(selparticles[iProduct]) != -2) {
+      if (Variable::hasRestOfEventTracks(selparticles[iProduct]) > 0) {
 
         if (m_useTMVA == true) qrCombinedTMVA[iProduct] = flavorTaggerInfo->getMethodMap("TMVA")->getQrCombined();
         if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();

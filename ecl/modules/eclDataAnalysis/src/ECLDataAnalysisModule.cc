@@ -970,11 +970,11 @@ void ECLDataAnalysisModule::event()
     for (int i = 0; i < ECLCalDigitToMC.getEntries(); i++) {
       mc_idx++;
       const RelationElement re = ECLCalDigitToMC[i];
-      if (re.getFromIndex() == icaldigits) {
+      if ((re.getFromIndex() == icaldigits) && (ii < 10)) {
         idx[ii] = i;
-        ii++;
-        cout << "Digit: " << icaldigits << " Index: " << idx[i] << endl;
+        cout << "Digit: " << icaldigits << " Index: " << idx[ii] << endl;
         sumHit = sumHit + re.getWeight();
+        ii++;
         //  cout << "Energy: " << sumHit << endl;
       }
     }
@@ -1001,8 +1001,7 @@ void ECLDataAnalysisModule::event()
       m_eclCalDigitToMc1->push_back(ECLCalDigitToMC[idx[0]].getToIndex());
       MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[0]].getToIndex()];
       m_eclCalDigitToMc1PDG->push_back(amcParticle->getPDG());
-      cout << "Index: " << ECLCalDigitToMC[idx[0]].getToIndex() << " PDG: " << amcParticle->getPDG() << " Energy: " <<
-           ECLCalDigitToMC[idx[0]].getWeight() << endl;
+      //cout << "Index: " << ECLCalDigitToMC[idx[0]].getToIndex() << " PDG: " << amcParticle->getPDG() << " Energy: " << ECLCalDigitToMC[idx[0]].getWeight() << endl;
     } else {
       m_eclCalDigitToMcWeight1->push_back(-1);
       m_eclCalDigitToMc1->push_back(-1);
@@ -1190,7 +1189,7 @@ void ECLDataAnalysisModule::event()
     for (int i = 0; i < ECLClusterToMC.getEntries(); i++) {
       mc_idx++;
       const RelationElement re = ECLClusterToMC[i];
-      if (re.getFromIndex() == iclusters) {
+      if ((re.getFromIndex() == iclusters) && (ii < 10)) {
         idx[ii] = i;
         ii++;
         sumHit = sumHit + re.getWeight();
@@ -1388,7 +1387,7 @@ void ECLDataAnalysisModule::event()
     for (int i = 0; i < ECLShowerToMC.getEntries(); i++) {
       mc_idx++;
       const RelationElement re = ECLShowerToMC[i];
-      if (re.getFromIndex() == ishowers) {
+      if ((re.getFromIndex() == ishowers) && (ii < 10)) {
         idx[ii] = i;
         ii++;
         sumHit = sumHit + re.getWeight();

@@ -9,7 +9,7 @@
 # ********************************************
 
 from basf2 import *
-from FlavorTagger import *
+from flavorTagger import *
 import ROOT
 import pdg
 
@@ -188,7 +188,7 @@ if Belle2.FileSystem.findFile(workingFile):
 
         tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0', 'B0_qrMC>0')
         tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0')
-        tree.Draw('B0_' + method + '_qrCombined>>BellePlot_NoCut', 'B0_qrMC>-2')
+        tree.Draw('B0_' + method + '_qrCombined>>BellePlot_NoCut', 'B0_qrMC!=0')
 
         tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0', 'B0_qrMC>0')
         tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0')
@@ -355,6 +355,12 @@ if Belle2.FileSystem.findFile(workingFile):
         # histo_calib_B0.Write('', ROOT.TObject.kOverwrite)
         # histo_calib_B0bar.Write('', ROOT.TObject.kOverwrite)
 
+        maxB0 = histo_belleplotB0.GetBinContent(histo_belleplotB0.GetMaximumBin())
+        maxB0bar = histo_belleplotB0bar.GetBinContent(histo_belleplotB0bar.GetMaximumBin())
+
+        Ymax = max(maxB0, maxB0bar)
+        Ymax = Ymax + Ymax / 12
+
         # produce a pdf
         ROOT.gStyle.SetOptStat(0)
         Canvas1 = ROOT.TCanvas('Bla', 'Final Output', 1200, 800)
@@ -362,6 +368,7 @@ if Belle2.FileSystem.findFile(workingFile):
         histo_belleplotB0.SetFillColorAlpha(ROOT.kBlue, 0.2)
         histo_belleplotB0.SetFillStyle(1001)
         histo_belleplotB0.GetYaxis().SetLabelSize(0.03)
+        histo_belleplotB0.GetYaxis().SetLimits(0, Ymax)
         histo_belleplotB0.GetYaxis().SetTitleOffset(1.2)
         histo_belleplotB0.SetLineColor(ROOT.kBlue)
         histo_belleplotB0bar.SetFillColorAlpha(ROOT.kRed, 1.0)
@@ -372,7 +379,7 @@ if Belle2.FileSystem.findFile(workingFile):
         histo_belleplotB0.SetTitle('Final Flavor Tagger Output; (qr)-output ; Events'
                                    )
         histo_belleplotB0.SetMinimum(0)
-        histo_belleplotB0.SetMaximum(10000)
+        histo_belleplotB0.SetMaximum(Ymax)
         histo_belleplotB0.Draw('hist')
         histo_belleplotB0bar.Draw('hist same')
 
@@ -437,7 +444,7 @@ if Belle2.FileSystem.findFile(workingFile):
     # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
     # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
-    for (particleList, category) in EventLevelParticleLists:
+    for (particleList, category) in eventLevelParticleLists:
         # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
         hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
                                 category + ' (binning 50)', 50, -1.0, 1.0)
@@ -475,13 +482,13 @@ if Belle2.FileSystem.findFile(workingFile):
         tree.Draw('B0_qr' + category + '>>All_' + category, 'B0_qrMC!=0')
         hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category, 'Calibration Plot for true B0' +
                                   category + ' (binning 50)', 50, 0.0, 1.0)
-        tree.Draw('B0_qr' + category + '>>Calib_B0_' + category, 'B0_qrMC>0.5')
+        tree.Draw('B0_qr' + category + '>>Calib_B0_' + category, 'B0_qrMC>0')
         hist_calib_B0.Divide(hist_all)
 
         # fill signal
-        tree.Draw('B0_qr' + category + '>>Signal_' + category, 'B0_qrMC>0.5')
+        tree.Draw('B0_qr' + category + '>>Signal_' + category, 'B0_qrMC>0')
         # fill background
-        tree.Draw('B0_qr' + category + '>>Background_' + category, 'B0_qrMC<0.5'
+        tree.Draw('B0_qr' + category + '>>Background_' + category, 'B0_qrMC<0'
                   )
 
         # ****** produce the input plots from combiner level ******

@@ -33,7 +33,7 @@
 
 from basf2 import *
 # The FlavorTagger already imports  modularAnalysis
-from FlavorTagger import *
+from flavorTagger import *
 from b2biiConversion import convertBelleMdstToBelleIIMdst, setupB2BIIDatabase, setupBelleMagneticField
 from b2biiMonitors import addBeamParamsConversionMonitors
 from b2biiMonitors import addTrackConversionMonitors
@@ -138,7 +138,8 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 # FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
-FlavorTagger(
+flavorTagger(
+    particleList='B0:jspiks',
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],

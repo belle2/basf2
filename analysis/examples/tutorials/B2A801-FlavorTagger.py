@@ -28,7 +28,7 @@
 
 from basf2 import *
 # The FlavorTagger already imports  modularAnalysis
-from FlavorTagger import *
+from flavorTagger import *
 from stdFSParticles import *
 from stdLooseFSParticles import *
 
@@ -84,7 +84,8 @@ buildRestOfEvent('B0:jspiks')
 #
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
 # FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
-FlavorTagger(
+flavorTagger(
+    particleList='B0:jspiks',
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],

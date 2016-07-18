@@ -87,9 +87,9 @@ namespace Belle2 {
     double isMajorityInRestOfEventFromB0bar(const Particle*);
 
     /**
-     * -1 (1) if current RestOfEvent is related to a B0bar (B0) and -2 if empty - used for cuts
+     * -1 (1) if current RestOfEvent is related to a B0bar (B0) has tracks. Used for cuts
      */
-    double isRestOfEventEmpty(const Particle* part);
+    double hasRestOfEventTracks(const Particle* part);
 
     /**
      * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.

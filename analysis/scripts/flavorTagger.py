@@ -11,16 +11,17 @@
 
 from basf2 import *
 from modularAnalysis import *
+import basf2_mva
 import variables as mc_variables
 from ROOT import Belle2
 import os
 
 
-class FlavorTaggerInfoFiller(Module):
+class flavorTaggerInfoFiller(Module):
 
     """
-    Creates a new FlavorTaggerInfoMap DataObject for a specific method. Saves there all the relevant information of the
-    FlavorTagger:
+    Creates a new flavorTaggerInfoMap DataObject for a specific method. Saves there all the relevant information of the
+    flavorTagger:
     -The pointer to the track with highest target probability in Track Level for each category*/
     -The highest target track probability in Track Level for each category*/
     -The pointer to the track with highest category probability in Event Level*/
@@ -40,15 +41,15 @@ class FlavorTaggerInfoFiller(Module):
         weightFiles = 'B2JpsiKs_mu'
 
         roe = Belle2.PyStoreObj('RestOfEvent')
-        FlavorTaggerInfo = roe.obj().getRelated('FlavorTaggerInfos')
+        flavorTaggerInfo = roe.obj().getRelated('FlavorTaggerInfos')
 
-        FlavorTaggerInfo.setUseModeFlavorTagger("Expert")
+        flavorTaggerInfo.setUseModeFlavorTagger("Expert")
 
         infoMaps = dict()
 
         if TMVAfbdt:
-            FlavorTaggerInfo.addMethodMap("TMVA")
-            infoMaps["TMVA"] = FlavorTaggerInfo.getMethodMap("TMVA")
+            flavorTaggerInfo.addMethodMap("TMVA")
+            infoMaps["TMVA"] = flavorTaggerInfo.getMethodMap("TMVA")
 
             qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedTMVA') - 0.5)
             B0Probability = info.obj().getExtraInfo('qrCombinedTMVA')
@@ -58,8 +59,8 @@ class FlavorTaggerInfoFiller(Module):
             infoMaps["TMVA"].setB0barProbability(B0barProbability)
 
         if FANNmlp:
-            FlavorTaggerInfo.addMethodMap("FANN")
-            infoMaps["FANN"] = FlavorTaggerInfo.getMethodMap("FANN")
+            flavorTaggerInfo.addMethodMap("FANN")
+            infoMaps["FANN"] = flavorTaggerInfo.getMethodMap("FANN")
 
             qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedFANN') - 0.5)
             B0Probability = info.obj().getExtraInfo('qrCombinedFANN')
@@ -68,11 +69,11 @@ class FlavorTaggerInfoFiller(Module):
             infoMaps["FANN"].setB0Probability(B0Probability)
             infoMaps["FANN"].setB0barProbability(B0barProbability)
 
-        if not FlavorTaggerInfo:
-            B2ERROR('FlavorTaggerInfoFiller: FlavorTaggerInfo does not exist')
+        if not flavorTaggerInfo:
+            B2ERROR('flavorTaggerInfoFiller: FlavorTaggerInfo does not exist')
             return
 
-        for (particleList, category) in TrackLevelParticleLists:
+        for (particleList, category) in trackLevelParticleLists:
             # Load the Particle list in Python after the cuts in Track Level
             plist = Belle2.PyStoreObj(particleList)
 
@@ -93,7 +94,7 @@ class FlavorTaggerInfoFiller(Module):
                     infoMaps["TMVA"].setProbTrackLevel(category, targetProb)
                     break
 
-        for (particleList, category) in EventLevelParticleLists:
+        for (particleList, category) in eventLevelParticleLists:
             # Load the Particle list in Python after the cuts in Event Level
             plist = Belle2.PyStoreObj(particleList)
 
@@ -131,8 +132,8 @@ class RemoveEmptyROEModule(Module):
         self.return_value(0)
         roe = Belle2.PyStoreObj('RestOfEvent')
         B0 = roe.obj().getRelated('Particles')
-        if mc_variables.variables.evaluate('isRestOfEventEmpty', B0) == -2:
-            B2INFO('FlavorTagger: FOUND NO TRACKS IN ROE! COMBINER OUTPUT IS THE DEFAULT -2.'
+        if mc_variables.variables.evaluate('hasRestOfEventTracks', B0) == 0:
+            B2INFO('flavorTagger: FOUND NO TRACKS IN ROE! COMBINER OUTPUT IS THE DEFAULT -2.'
                    )
             self.return_value(1)
 
@@ -149,7 +150,7 @@ class RemoveWrongMCMatchedROEs(Module):
         self.return_value(0)
         someParticle = Belle2.Particle(None)
         if mc_variables.variables.evaluate('qrCombined', someParticle) < 0:
-            B2INFO('FlavorTagger: FOUND NO B-MESON IN ROE! EVENT WILL BE DISCARDED FOR TRAINING!'
+            B2INFO('flavorTagger: FOUND NO B-MESON IN ROE! EVENT WILL BE DISCARDED FOR TRAINING!'
                    )
             self.return_value(1)
 
@@ -157,13 +158,13 @@ class RemoveWrongMCMatchedROEs(Module):
 class RemoveExtraInfoModule(Module):
 
     """
-    Deletes the Extrainfo saved in the used TrackLevelParticle lists.
+    Deletes the Extrainfo saved in the used trackLevelParticle lists.
     """
 
     def event(self):
         """ Process for each event """
         ModeCode = getModeCode()
-        for particleList in EventLevelParticleLists:
+        for particleList in eventLevelParticleLists:
             plist = Belle2.PyStoreObj(particleList[0])
             for i in range(0, plist.obj().getListSize()):
                 particle = plist.obj().getParticle(i)
@@ -213,6 +214,21 @@ def getBelleOrBelle2():
 
 
 # Methods for Track and Event Levels
+fastBDTCategories = basf2_mva.FastBDTOptions()
+fastBDTCategories.m_nTrees = 400  # Before 100
+fastBDTCategories.m_nCuts = 8
+fastBDTCategories.m_nLevels = 3
+fastBDTCategories.m_shrinkage = 0.10
+fastBDTCategories.m_randRatio = 0.5
+
+fastBDTCombiner = basf2_mva.FastBDTOptions()
+fastBDTCombiner.m_nTrees = 400  # Before 300
+fastBDTCombiner.m_nCuts = 8
+fastBDTCombiner.m_nLevels = 3
+fastBDTCombiner.m_shrinkage = 0.10
+fastBDTCombiner.m_randRatio = 0.5
+
+
 methods = [
     ('FastBDT', 'Plugin', 'CreateMVAPdfs:NbinsMVAPdf=100:!H:!V:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3')
 ]
@@ -231,8 +247,8 @@ methodsCombinerFANN = [('MLP', 'FANN', 'NCycles=10000:HiddenLayers=3*N:NeuronTyp
 signalFraction = -2
 
 # Definition of all available categories, 'standard category name':
-# ['ParticleList', 'TrackLevel category name', 'EventLevel category name',
-# 'CombinerLevel variable name', 'category code']
+# ['ParticleList', 'trackLevel category name', 'eventLevel category name',
+# 'combinerLevel variable name', 'category code']
 AvailableCategories = {
     'Electron': [
         'e+:ElectronROE',
@@ -315,8 +331,8 @@ AvailableCategories = {
 }
 
 # Lists for each Step.
-TrackLevelParticleLists = []
-EventLevelParticleLists = []
+trackLevelParticleLists = []
+eventLevelParticleLists = []
 variablesCombinerLevel = []
 categoriesCombinationCode = 'CatCode'
 
@@ -349,13 +365,13 @@ def WhichCategories(categories=[
         if category in AvailableCategories:
             if category != 'MaximumPstar' and (AvailableCategories[category][0],
                                                AvailableCategories[category][1]) \
-                    not in TrackLevelParticleLists:
-                TrackLevelParticleLists.append((AvailableCategories[category][0],
+                    not in trackLevelParticleLists:
+                trackLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][1]))
             if (AvailableCategories[category][0],
                     AvailableCategories[category][2]) \
-                    not in EventLevelParticleLists:
-                EventLevelParticleLists.append((AvailableCategories[category][0],
+                    not in eventLevelParticleLists:
+                eventLevelParticleLists.append((AvailableCategories[category][0],
                                                 AvailableCategories[category][2]))
                 variablesCombinerLevel.append(AvailableCategories[category][3])
                 categoriesCombination.append(AvailableCategories[category][4])
@@ -514,7 +530,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
     Fills the particle Lists for each category.
     """
 
-    for (particleList, category) in TrackLevelParticleLists:
+    for (particleList, category) in trackLevelParticleLists:
 
         # Select particles in ROE for different categories of flavour tagging.
         if particleList != 'Lambda0:LambdaROE':
@@ -551,37 +567,37 @@ def FillParticleLists(mode='Expert', path=analysis_main):
     return True
 
 
-def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
+def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
     """
     Trains or tests all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
     """
 
     B2INFO('TRACK LEVEL')
     if not Belle2.FileSystem.findFile(workingDirectory):
-        B2FATAL('FlavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     ReadyMethods = 0
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-    TrackLevelPathsList = dict()
+    trackLevelPathsList = dict()
 
-    for (particleList, category) in TrackLevelParticleLists:
+    for (particleList, category) in trackLevelParticleLists:
 
-        TrackLevelPath = category + "TrackLevelPath"
+        trackLevelPath = category + "TrackLevelPath"
 
-        exec('%s = %s' % (TrackLevelPath, 'create_path()'))
-        exec('TrackLevelPathsList["' + category + '"]=%s' % TrackLevelPath)
+        exec('%s = %s' % (trackLevelPath, 'create_path()'))
+        exec('trackLevelPathsList["' + category + '"]=%s' % trackLevelPath)
 
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.param('particleLists', particleList)
-        SkipEmptyParticleList.if_true(TrackLevelPathsList[category], AfterConditionPath.CONTINUE)
+        SkipEmptyParticleList.if_true(trackLevelPathsList[category], AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
         methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
         targetVariable = 'isRightTrack(' + category + ')'
 
-        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixTrackLevel):
-            if mode == 'Expert':
+        if mode == 'Expert':
+            if not os.path.isfile(workingDirectory + '/' + methodPrefixTrackLevel + '_1.root'):
                 B2FATAL(
                     'Flavor Tagger: ' +
                     particleList +
@@ -589,106 +605,223 @@ def TrackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./Fla
                     methodPrefixTrackLevel +
                     '_1.config not found. Stopped')
             else:
-                B2INFO('PROCESSING: trainTMVAMethod ' + methodPrefixTrackLevel + ' on track level')
-                trainTMVAMethod(
-                    particleList,
-                    variables=variables[category],
-                    target=targetVariable,
-                    methods=methods,
-                    prefix=methodPrefixTrackLevel,
-                    workingDirectory=workingDirectory,
-                    path=TrackLevelPathsList[category],
-                )
-        else:
-            B2INFO('PROCESSING: applyTMVAMethod ' + methodPrefixTrackLevel + ' on track level')
-            applyTMVAMethod(
-                particleList,
-                prefix=methodPrefixTrackLevel,
-                expertOutputName=targetVariable,
-                method=methods[0][0],
-                signalFraction=signalFraction,
-                workingDirectory=workingDirectory,
-                path=TrackLevelPathsList[category],
-            )
-            ReadyMethods += 1
+                B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixTrackLevel + ' .')
 
-    if ReadyMethods != len(TrackLevelParticleLists):
+                trackLevelPathsList[category].add_module(
+                    'MVAExpert',
+                    listNames=[particleList],
+                    extraInfoName=targetVariable,
+                    signalFraction=signalFraction,
+                    identifier=workingDirectory +
+                    '/' +
+                    methodPrefixTrackLevel +
+                    "_1.root")
+
+                ReadyMethods += 1
+
+        if mode == 'Sampler':
+            if not os.path.isfile(workingDirectory + '/' + methodPrefixTrackLevel + ".root"):
+
+                B2INFO('flavorTagger: file ' + workingDirectory + '/' + methodPrefixTrackLevel + ".root" + ' will be saved.')
+
+                ntuple = register_module('VariablesToNtuple')
+                ntuple.param('fileName', workingDirectory + '/' + methodPrefixTrackLevel + ".root")
+                ntuple.param('treeName', methodPrefixTrackLevel + "_tree")
+                ntuple.param('variables', variables[category] + [targetVariable])
+                ntuple.param('particleList', particleList)
+                trackLevelPathsList[category].add_module(ntuple)
+            else:
+                trackLevelPathsList[category].add_module(
+                    'MVAExpert',
+                    listNames=[particleList],
+                    extraInfoName=targetVariable,
+                    signalFraction=signalFraction,
+                    identifier=workingDirectory +
+                    '/' +
+                    methodPrefixTrackLevel +
+                    "_1.root")
+                ReadyMethods += 1
+
+    if ReadyMethods != len(trackLevelParticleLists):
         return False
     else:
         return True
 
 
-def EventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
+def trackLevelTeacher(weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods'):
+    """
+    Trains or tests all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
+    """
+
+    B2INFO('TRACK LEVEL TEACHER')
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
+    ReadyMethods = 0
+
+    for (particleList, category) in trackLevelParticleLists:
+
+        methodPrefixTrackLevel = weightFiles + 'TrackLevel' + category + 'TMVA'
+        targetVariable = 'isRightTrack(' + category + ')'
+
+        if not os.path.isfile(workingDirectory + '/' + methodPrefixTrackLevel + '_1.root'):
+
+            if os.path.isfile(workingDirectory + '/' + methodPrefixTrackLevel + ".root"):
+
+                B2INFO('flavorTagger: MVA Teacher training' + methodPrefixTrackLevel + ' .')
+
+                trainingOptionsTrackLevel = basf2_mva.GeneralOptions()
+                trainingOptionsTrackLevel.m_datafiles = basf2_mva.vector(workingDirectory + '/' + methodPrefixTrackLevel + ".root")
+                trainingOptionsTrackLevel.m_treename = methodPrefixTrackLevel + "_tree"
+                trainingOptionsTrackLevel.m_weightfile = workingDirectory + '/' + methodPrefixTrackLevel + "_1.root"
+                trainingOptionsTrackLevel.m_variables = basf2_mva.vector(*variables[category])
+                trainingOptionsTrackLevel.m_target_variable = targetVariable
+
+                basf2_mva.teacher(trainingOptionsTrackLevel, fastBDTCategories)
+                basf2_mva.upload(workingDirectory + '/' + methodPrefixTrackLevel + "_1.root", methodPrefixTrackLevel)
+
+            else:
+
+                B2INFO('flavorTagger: trackLevelTeacher did not find ' + workingDirectory + '/' +
+                       methodPrefixTrackLevel + ".root" + ' . Please run the flavorTagger in "Sampler" mode.')
+        else:
+
+            ReadyMethods += 1
+
+    if ReadyMethods != len(trackLevelParticleLists):
+        return False
+    else:
+        return True
+
+
+def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
     """
     Trains or tests all categories at event level.
     """
 
     B2INFO('EVENT LEVEL')
-
     if not Belle2.FileSystem.findFile(workingDirectory):
-        B2FATAL('FlavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     ReadyMethods = 0
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-    EventLevelPathsList = dict()
+    eventLevelPathsList = dict()
 
-    for (particleList, category) in EventLevelParticleLists:
+    for (particleList, category) in eventLevelParticleLists:
 
-        EventLevelPath = category + "EventLevelPath"
-        exec('%s = %s' % (EventLevelPath, 'create_path()'))
-        exec('EventLevelPathsList["' + category + '"]=%s' % EventLevelPath)
+        eventLevelPath = category + "EventLevelPath"
+
+        exec('%s = %s' % (eventLevelPath, 'create_path()'))
+        exec('eventLevelPathsList["' + category + '"]=%s' % eventLevelPath)
 
         SkipEmptyParticleList = register_module("SkimFilter")
         SkipEmptyParticleList.param('particleLists', particleList)
-        SkipEmptyParticleList.if_true(EventLevelPathsList[category], AfterConditionPath.CONTINUE)
+        SkipEmptyParticleList.if_true(eventLevelPathsList[category], AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
         methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
         targetVariable = 'isRightCategory(' + category + ')'
 
-        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixEventLevel):
-            if mode == 'Expert':
+        if mode == 'Expert':
+            if not os.path.isfile(workingDirectory + '/' + methodPrefixEventLevel + '_1.root'):
                 B2FATAL(
                     'Flavor Tagger: ' +
                     particleList +
-                    ' Eventlevel was not trained. Weight file ' +
+                    ' Tracklevel was not trained. Weight file ' +
                     methodPrefixEventLevel +
                     '_1.config not found. Stopped')
             else:
-                B2INFO('PROCESSING: trainTMVAMethod ' + methodPrefixEventLevel + ' on event level')
-                trainTMVAMethod(
-                    particleList,
-                    variables=variables[category],
-                    target=targetVariable,
-                    prefix=methodPrefixEventLevel,
-                    methods=methods,
-                    workingDirectory=workingDirectory,
-                    path=EventLevelPathsList[category],
-                )
-        else:
-            # if category == 'KinLepton':
-                # applyCuts(particleList, 'isInElectronOrMuonCat < 0.5', path=path)
-            B2INFO('PROCESSING: applyTMVAMethod ' + methodPrefixEventLevel + ' on event level')
-            applyTMVAMethod(
-                particleList,
-                prefix=methodPrefixEventLevel,
-                expertOutputName=targetVariable,
-                method=methods[0][0],
-                signalFraction=signalFraction,
-                workingDirectory=workingDirectory,
-                path=EventLevelPathsList[category],
-            )
+                B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + ' .')
 
-            ReadyMethods += 1
+                eventLevelPathsList[category].add_module(
+                    'MVAExpert',
+                    listNames=[particleList],
+                    extraInfoName=targetVariable,
+                    signalFraction=signalFraction,
+                    identifier=workingDirectory +
+                    '/' +
+                    methodPrefixEventLevel +
+                    "_1.root")
 
-    if ReadyMethods != len(EventLevelParticleLists):
+                ReadyMethods += 1
+
+        if mode == 'Sampler':
+            if not os.path.isfile(workingDirectory + '/' + methodPrefixEventLevel + ".root"):
+                B2INFO('flavorTagger: file ' + methodPrefixEventLevel + ".root" + ' will be saved.')
+
+                ntuple = register_module('VariablesToNtuple')
+                ntuple.param('fileName', workingDirectory + '/' + methodPrefixEventLevel + ".root")
+                ntuple.param('treeName', methodPrefixEventLevel + "_tree")
+                ntuple.param('variables', variables[category] + [targetVariable])
+                ntuple.param('particleList', particleList)
+                eventLevelPathsList[category].add_module(ntuple)
+            else:
+
+                eventLevelPathsList[category].add_module(
+                    'MVAExpert',
+                    listNames=[particleList],
+                    extraInfoName=targetVariable,
+                    signalFraction=signalFraction,
+                    identifier=workingDirectory +
+                    '/' +
+                    methodPrefixEventLevel +
+                    "_1.root")
+                ReadyMethods += 1
+
+    if ReadyMethods != len(eventLevelParticleLists):
         return False
     else:
         return True
 
 
-def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods',
+def eventLevelTeacher(weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods', path=analysis_main):
+    """
+    Trains or tests all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
+    """
+
+    B2INFO('EVENT LEVEL TEACHER')
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
+    ReadyMethods = 0
+
+    for (particleList, category) in eventLevelParticleLists:
+
+        methodPrefixEventLevel = weightFiles + 'EventLevel' + category + 'TMVA'
+        targetVariable = 'isRightCategory(' + category + ')'
+
+        if not os.path.isfile(workingDirectory + '/' + methodPrefixEventLevel + '_1.root'):
+
+            if os.path.isfile(workingDirectory + '/' + methodPrefixEventLevel + ".root"):
+
+                B2INFO('flavorTagger: MVA Teacher training' + methodPrefixEventLevel + ' .')
+
+                trainingOptionsEventLevel = basf2_mva.GeneralOptions()
+                trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(workingDirectory + '/' + methodPrefixEventLevel + ".root")
+                trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
+                trainingOptionsEventLevel.m_weightfile = workingDirectory + '/' + methodPrefixEventLevel + "_1.root"
+                trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
+                trainingOptionsEventLevel.m_target_variable = targetVariable
+
+                basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
+                basf2_mva.upload(workingDirectory + '/' + methodPrefixEventLevel + "_1.root", methodPrefixEventLevel)
+
+            else:
+
+                B2INFO('flavorTagger: eventLevelTeacher did not find ' + methodPrefixEventLevel +
+                       ".root" + ' . Please run the flavorTagger in "Sampler" mode.')
+        else:
+
+            ReadyMethods += 1
+
+    if ReadyMethods != len(eventLevelParticleLists):
+        return False
+    else:
+        return True
+
+
+def combinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods',
                   path=analysis_main):
     """
     Trains or tests the combiner according to the selected categories.
@@ -697,7 +830,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
     B2INFO('COMBINER LEVEL')
 
     if not Belle2.FileSystem.findFile(workingDirectory):
-        B2FATAL('FlavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
 
     methodPrefixCombinerLevel = weightFiles + 'CombinerLevel' \
         + categoriesCombinationCode
@@ -705,48 +838,38 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
     ReadyTMVAfbdt = False
     ReadyFANNmlp = False
 
+    if mode == 'Sampler':
+
+        B2INFO('flavorTagger: Sampling Data on Combiner Level. File' +
+               methodPrefixCombinerLevel + 'TMVA' + ".root" + 'will be saved')
+
+        ntuple = register_module('VariablesToNtuple')
+        ntuple.param('fileName', workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + ".root")
+        ntuple.param('treeName', methodPrefixCombinerLevel + 'TMVA' + "_tree")
+        ntuple.param('variables', variablesCombinerLevel + ['qrCombined'])
+        ntuple.param('particleList', "")
+        path.add_module(ntuple)
+
     if TMVAfbdt:
-        if not isTMVAMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA'):
-            if mode == 'Expert':
-                B2FATAL('FlavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
+
+        if mode == 'Expert':
+            if not os.path.isfile(workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + '_1.root'):
+
+                B2FATAL('flavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
                         methodPrefixCombinerLevel + 'TMVA' + '_1.config not found. Stopped')
             else:
-                B2INFO('Train TMVAMethod on combiner level')
-                trainTMVAMethod(
-                    [],
-                    variables=variablesCombinerLevel,
-                    target='qrCombined',
-                    prefix=methodPrefixCombinerLevel + 'TMVA',
-                    methods=methodsCombinerTMVA,
-                    workingDirectory=workingDirectory,
-                    path=path,
-                )
-        else:
-            B2INFO('FlavorTagger: Ready to be used with weightFiles ' +
-                   weightFiles + '. The training process has been finished.')
-            if mode == 'Expert' or (mode == 'Teacher' and FANNmlp):
-                B2INFO('Apply TMVAMethod on combiner level')
-                applyTMVAMethod(
-                    [],
-                    expertOutputName='qrCombined' + 'TMVA',
-                    prefix=methodPrefixCombinerLevel + 'TMVA',
-                    signalClass=1,
-                    method=methodsCombinerTMVA[0][0],
-                    signalFraction=-1,
-                    transformToProbability=False,
-                    workingDirectory=workingDirectory,
-                    path=path,
-                )
-                ReadyTMVAfbdt = True
-
-            else:
-                B2FATAL('FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
-                        methodPrefixCombinerLevel + 'TMVA' + '_1.config has been found. Please use the "Expert" mode')
+                B2INFO('flavorTagger: Ready to be used with weightFiles ' +
+                       weightFiles + '. The training process has been finished.')
+                if mode == 'Expert':
+                    B2INFO('flavorTagger: Apply TMVAMethod ' + methodPrefixCombinerLevel + 'TMVA')
+                    path.add_module('MVAExpert', listNames=[], extraInfoName='qrCombined' + 'TMVA', signalFraction=signalFraction,
+                                    identifier=workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + "_1.root")
+                    ReadyTMVAfbdt = True
 
     if FANNmlp:
         if not isFANNMethodAvailable(workingDirectory + '/' + methodPrefixCombinerLevel + 'FANN'):
             if mode == 'Expert':
-                B2FATAL('FlavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
+                B2FATAL('flavorTagger: Combinerlevel was not trained with this combination of categories. Weight file ' +
                         methodPrefixCombinerLevel + 'FANN' + '_WeightFile.root not found. Stopped')
             else:
                 B2INFO('Train FANNMethod on combiner level')
@@ -761,7 +884,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
                 )
 
         else:
-            B2INFO('FlavorTagger: Ready to be used with weightFiles ' +
+            B2INFO('flavorTagger: Ready to be used with weightFiles ' +
                    weightFiles + '. The training process has been finished.')
             if mode == 'Expert' or (mode == 'Teacher' and TMVAfbdt):
                 B2INFO('Apply FANNMethod on combiner level')
@@ -777,7 +900,7 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
 
             else:
                 B2FATAL(
-                    'FlavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
+                    'flavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
                     methodPrefixCombinerLevel +
                     'TMVA' +
                     '_1.config or ' +
@@ -795,7 +918,52 @@ def CombinerLevel(mode='Expert', weightFiles='B2JpsiKs_mu', workingDirectory='./
                 return True
 
 
-def FlavorTagger(
+def combinerLevelTeacher(weightFiles='B2JpsiKs_mu', workingDirectory='./FlavorTagging/TrainedMethods',
+                         path=analysis_main):
+    """
+    Trains or tests the combiner according to the selected categories.
+    """
+
+    B2INFO('COMBINER LEVEL')
+
+    if not Belle2.FileSystem.findFile(workingDirectory):
+        B2FATAL('flavorTagger: THE NEEDED DIRECTORY "./FlavorTagging/TrainedMethods" DOES NOT EXIST!')
+
+    methodPrefixCombinerLevel = weightFiles + 'CombinerLevel' \
+        + categoriesCombinationCode
+
+    ReadyTMVAfbdt = False
+    ReadyFANNmlp = False
+
+    if not os.path.isfile(workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + '_1.root'):
+        if os.path.isfile(workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + '.root'):
+
+            B2INFO('flavorTagger: MVA Teacher training FBDT on Combiner Level')
+
+            trainingOptionsTrackLevel = basf2_mva.GeneralOptions()
+            trainingOptionsTrackLevel.m_datafiles = basf2_mva.vector(
+                workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + ".root")
+            trainingOptionsTrackLevel.m_treename = methodPrefixCombinerLevel + 'TMVA' + "_tree"
+            trainingOptionsTrackLevel.m_weightfile = workingDirectory + '/' + methodPrefixCombinerLevel + 'TMVA' + "_1.root"
+            trainingOptionsTrackLevel.m_variables = basf2_mva.vector(*variablesCombinerLevel)
+            trainingOptionsTrackLevel.m_target_variable = 'qrCombined'
+            basf2_mva.teacher(trainingOptionsTrackLevel, fastBDTCombiner)
+
+            basf2_mva.upload(workingDirectory + '/' + methodPrefixCombinerLevel +
+                             'TMVA' + "_1.root", methodPrefixCombinerLevel + 'TMVA')
+
+        else:
+
+            B2FATAL('FlavorTagger: combinerLevelTeacher did not find' +
+                    methodPrefixCombinerLevel + 'TMVA' + '.root . Please run the flavorTagger in "Sampler" mode.')
+
+    else:
+        B2FATAL('flavorTagger: Combinerlevel was already trained with this combination of categories. Weight file ' +
+                methodPrefixCombinerLevel + 'TMVA' + '_1.config has been found. Please use the "Expert" mode')
+
+
+def flavorTagger(
+    particleList,
     mode='Expert',
     weightFiles='B2JpsiKs_mu',
     workingDirectory='.',
@@ -822,19 +990,19 @@ def FlavorTagger(
       For each Rest of Event built in the steering file.
       The flavor is predicted by Multivariate Methods trained with Variables and MetaVariables which use
       Tracks, ECL- and KLMClusters from the corresponding RestOfEvent dataobject.
-      This function can be used to train or to test the FlavorTagger: The available modes are "Teacher" or "Expert".
+      This function can be used to train or to test the flavorTagger: The available modes are "Teacher" or "Expert".
     """
 
-    if mode != 'Teacher' and mode != 'Expert':
-        B2FATAL('FlavorTagger: Wrong mode given: The available modes are "Teacher" or "Expert"')
+    if mode != 'Sampler' and mode != 'Teacher' and mode != 'Expert':
+        B2FATAL('flavorTagger: Wrong mode given: The available modes are "Sampler", "Teacher" or "Expert"')
 
     # Directory where the weights of the trained Methods are saved
     # workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'
 
     if not Belle2.FileSystem.findFile(workingDirectory):
-        B2FATAL('FlavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
+        B2FATAL('flavorTagger: THE GIVEN WORKING DIRECTORY "' + workingDirectory + '" DOES NOT EXIST! PLEASE SPECIFY A VALID PATH.')
 
-    if mode == 'Teacher':
+    if mode == 'Sampler':
         if not Belle2.FileSystem.findFile(workingDirectory + '/FlavorTagging'):
             os.mkdir(workingDirectory + '/FlavorTagging')
             os.mkdir(workingDirectory + '/FlavorTagging/TrainedMethods')
@@ -844,14 +1012,14 @@ def FlavorTagger(
     workingDirectory = workingDirectory + '/FlavorTagging/TrainedMethods'
 
     if len(combinerMethods) < 1 or len(combinerMethods) > 2:
-        B2FATAL('FlavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
+        B2FATAL('flavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
     global belleOrBelle2Flag
 
     if belleOrBelle2 == 'Belle2' or belleOrBelle2 == 'Belle':
         belleOrBelle2Flag = belleOrBelle2
     else:
-        B2FATAL('FlavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
+        B2FATAL('flavorTagger: Wrong argument for belleOrBelle2 given: The available modes are "Belle2" or "Belle"')
 
     global FANNmlp
     global TMVAfbdt
@@ -865,7 +1033,7 @@ def FlavorTagger(
         elif method == 'FANN-MLP':
             FANNmlp = True
         else:
-            B2FATAL('FlavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
+            B2FATAL('flavorTagger: Invalid list of combinerMethods. The available methods are "TMVA-FBDT" and "FANN-MLP"')
 
     B2INFO('*** FLAVOR TAGGING ***')
     B2INFO(' ')
@@ -877,33 +1045,34 @@ def FlavorTagger(
     setVariables()
 
     roe_path = create_path()
-    emptypath = create_path()
-
-    # If trigger returns 1 jump into empty path skipping further modules in roe_path
-    ROEEmptyTrigger = RemoveEmptyROEModule()
-    roe_path.add_module(ROEEmptyTrigger)
-    ROEEmptyTrigger.if_true(emptypath)
+    deadEndPath = create_path()
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
-    if mode == 'Teacher':
-        RemoveWrongROEs = RemoveWrongMCMatchedROEs()
-        roe_path.add_module(RemoveWrongROEs)
-        RemoveWrongROEs.if_true(emptypath)
+    if mode == 'Sampler':
+        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and qrCombined > -2', roe_path, deadEndPath)
 
-    # track training or expert
-    if WhichCategories(categories):
-        if FillParticleLists(mode, roe_path):
-            if TrackLevel(mode, weightFiles, workingDirectory, roe_path):
-                if EventLevel(mode, weightFiles, workingDirectory, roe_path):
-                    CombinerLevel(mode, weightFiles, workingDirectory, roe_path)
-
+    # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
-            # Initialation of FlavorTaggerInfo dataObject needs to be done in the main path
-        FlavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
-        path.add_module(FlavorTaggerInfoBuilder)
-        roe_path.add_module(FlavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
+        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
 
-    # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
-    roe_path.add_module(RemoveExtraInfoModule())
+    # sampler or expert
+    if mode == 'Sampler' or mode == 'Expert':
+        if WhichCategories(categories):
+            if FillParticleLists(mode, roe_path):
+                if trackLevel(mode, weightFiles, workingDirectory, roe_path):
+                    if eventLevel(mode, weightFiles, workingDirectory, roe_path):
+                        combinerLevel(mode, weightFiles, workingDirectory, roe_path)
+                        if mode == 'Expert':
+                                # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
+                            flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
+                            path.add_module(flavorTaggerInfoBuilder)
+                            roe_path.add_module(flavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
 
-    path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+        roe_path.add_module(RemoveExtraInfoModule())
+        path.for_each('RestOfEvent', 'RestOfEvents', roe_path)
+
+    if mode == 'Teacher':
+        if trackLevelTeacher(weightFiles, workingDirectory):
+            if eventLevelTeacher(weightFiles, workingDirectory, path):
+                combinerLevelTeacher(weightFiles, workingDirectory, path)

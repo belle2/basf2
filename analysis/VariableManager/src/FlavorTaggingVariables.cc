@@ -324,7 +324,7 @@ namespace Belle2 {
       return vote < 0;
     }
 
-    double isRestOfEventEmpty(const Particle* part)
+    double hasRestOfEventTracks(const Particle* part)
     {
       const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
       float ObjectsInROE = 0; //Flavor of B
@@ -338,8 +338,8 @@ namespace Belle2 {
         }
       }
       if (ObjectsInROE > 0) {
-        return ObjectsInROE;
-      } else return -2;
+        return 1;
+      } else return 0;
     }
 
     double isRelatedRestOfEventB0Flavor(const Particle* part)
@@ -401,7 +401,7 @@ namespace Belle2 {
 
               if (newMother != nullptr) {
                 if (newMother == Y4S &&  newParticle != BcpMC) {
-                  if (newParticle -> getPDG() == 511) OutputB0tagQ = 1;
+                  if (newParticle -> getPDG() == 511 || newParticle -> getPDG() == 521) OutputB0tagQ = 1;
                   else OutputB0tagQ = 0;
                 }
               }
@@ -1454,7 +1454,7 @@ namespace Belle2 {
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0.");
     REGISTER_VARIABLE("isMajorityInRestOfEventFromB0bar", isMajorityInRestOfEventFromB0bar,
                       "[Eventbased] Check if the majority of the tracks in the current RestOfEvent are from a B0bar.");
-    REGISTER_VARIABLE("isRestOfEventEmpty", isRestOfEventEmpty,
+    REGISTER_VARIABLE("hasRestOfEventTracks", hasRestOfEventTracks,
                       "Returns the amount of tracks in the RestOfEvent related to the given Particle. -2 If ROE is empty.");
     REGISTER_VARIABLE("isRelatedRestOfEventB0Flavor", isRelatedRestOfEventB0Flavor,
                       "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");

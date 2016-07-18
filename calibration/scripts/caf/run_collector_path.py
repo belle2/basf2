@@ -11,8 +11,11 @@ def run_collectors():
     import sys
     import pickle
 
-    # Create the database chain to use a passed in localdb if one exists
+    # Create the database chain to use a passed in localdb if one exists and fall back to central
+    # if not
+    reset_database()
     use_database_chain(True)
+    use_central_database('production')
     use_local_database('localdb/database.txt', 'localdb', True, LogLevel.INFO)
 
     # create a path with all modules needed before calibration path is run.
@@ -56,15 +59,15 @@ def run_collectors():
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
         root_input_mod.param('inputFileNames', input_files)
-        for param in root_input_mod.available_params():
-            print(param.name, param.values)
+#        for param in root_input_mod.available_params():
+#            print(param.name(), param.values())
     else:
         main.add_module('RootInput', inputFileNames=input_files)
 
     main.add_path(collector_path)
     main.add_module('RootOutput')
-    for module in main.modules():
-        print(module.name)
+#    for module in main.modules():
+#        print(module.name())
     process(main)
 
 if __name__ == '__main__':

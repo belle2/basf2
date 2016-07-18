@@ -16,7 +16,6 @@ from pprint import PrettyPrinter
 from datetime import datetime
 from collections import OrderedDict
 from collections import deque
-from collections import namedtuple
 import pickle
 from time import sleep
 import multiprocessing
@@ -27,9 +26,11 @@ from .utils import all_dependencies
 from .utils import decode_json_string
 from .utils import method_dispatch
 from .utils import find_sources
-from .utils import algorithm_result_names
+from .utils import AlgResult
 from .utils import temporary_workdir
 from .utils import iov_from_vector
+from .utils import IoV
+from .utils import IoV_Result
 
 import caf.utils
 import caf.backends
@@ -40,7 +41,6 @@ from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
 _collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
 pp = PrettyPrinter()
-IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
 class Calibration():
@@ -115,8 +115,6 @@ class Calibration():
         #: default RootInput module setup. If this path contains RootInput then it's params are used instead, except for
         #: the input_files.
         self.pre_collector_path = None
-        #: Since many algorithms require some different setup, this is a function object to run prior to alg.execute()
-        self.pre_algorithm = None
         #: Output results of algorithms for each iteration
         self.results = {}
         #: Output patterns of files produced by collector and which need to be saved in the output directory
@@ -134,10 +132,10 @@ class Calibration():
             return False
         else:
             for alg in self.algorithms:
-                alg_type = type(alg).__name__
-                if self.collector.type() != alg.getCollectorName():
+                alg_type = type(alg.algorithm).__name__
+                if self.collector.name() != alg.algorithm.getCollectorName():
                     B2WARNING(("Algorithm '%s' requested collector '%s' but got '%s'"
-                               % (alg_type, alg.getCollectorName(), self.collector.type())))
+                               % (alg_type, alg.algorithm.getCollectorName(), self.collector.name())))
                     return False
             else:
                 return True
@@ -221,7 +219,7 @@ class Calibration():
         Setter for the algorithms property, checks if single or list of algorithms passed in.
         """
         if isinstance(value, CalibrationAlgorithm):
-            self._algorithms = [value]
+            self._algorithms = [Algorithm(value)]
         else:
             B2ERROR(("Something other than CalibrationAlgorithm instance passed in ({0})."
                      "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
@@ -236,7 +234,7 @@ class Calibration():
             self._algorithms = []
             for alg in value:
                 if isinstance(alg, CalibrationAlgorithm):
-                    self._algorithms.append(alg)
+                    self._algorithms.append(Algorithm(alg))
                 else:
                     B2ERROR(("Something other than CalibrationAlgorithm instance passed in {0}."
                              "Algorithm needs to inherit from Belle2::CalibrationAlgorithm".format(type(value))))
@@ -274,11 +272,79 @@ class Calibration():
                 else:
                     B2ERROR("Something other than string passed in as an input file.")
 
+    @property
+    def pre_algorithms(self):
+        """
+        Getter for the pre_algorithm attribute. Notice how we avoid the user needing to know about the
+        Algorithm wrapper class.
+        """
+        return [alg.pre_algorithm for alg in self.algorithms]
+
+    @pre_algorithms.setter
+    @method_dispatch
+    def pre_algorithms(self, func):
+        """
+        Setter for the pre_algorithms attribute.
+        """
+        if func:
+            for alg in self.algorithms:
+                alg.pre_algorithm = func
+        else:
+            B2ERROR("Something evaluated as False passed in as pre_algorithm function.")
+
+    @pre_algorithms.fset.register(tuple)
+    @pre_algorithms.fset.register(list)
+    def _(self, values):
+        """
+        Alternate pre_algorithms setter for lists and tuples of functions, should be one per algorithm.
+        """
+        if values:
+            if len(values) == len(self.algorithms):
+                for func, alg in zip(values, self.algorithms):
+                    alg.pre_algorithm = func
+            else:
+                B2ERROR("Number of functions and number of algorithms doesn't match.")
+        else:
+            B2ERROR("Empty container passed in for pre_algorithm functions")
+
     def __repr__(self):
         """
         Representation of Calibration class (what happens when you print a Calibration() instance)
         """
         return self.name
+
+
+class Algorithm():
+    """
+    Simple wrapper class around the C++ CalibrationAlgorithm class. Helps to add
+    functionality to algorithms for use by the Calibration and CAF classes rather
+    than separating the logic into those classes directly.
+
+    This is NOT currently a class that a user should interact with much during CAF
+    setup. The Calibration class should be doing the creation of the defaults for
+    these objects.
+    """
+    def __init__(self, algorithm, data_input=None, pre_algorithm=None):
+        #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
+        self.algorithm = algorithm
+        #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
+        self.data_input = data_input
+        if not self.data_input:
+            self.data_input = self.default_rootinput_setup
+        #: Function called after input_func but before algorithm.execute to do any remaining setup
+        #: IT MUST ONLY HAVE TWO ARGUMENTS pre_algorithm(algorithm, iteration)  where algorithm can be
+        #: assumed to be the CalibrationAlgorithm instance, and iteration is an int e.g. 0, 1, 2...
+        self.pre_algorithm = pre_algorithm
+
+    @staticmethod
+    def default_rootinput_setup():
+        """
+        Simple RootInput setup and initilise bound up in a method. Applied to the input_func
+        by default.
+        """
+        root_input = register_module('RootInput')
+        root_input.param('inputFileName', 'RootOutput.root')
+        root_input.initialize()
 
 
 class CAF():
@@ -334,6 +400,8 @@ class CAF():
         self.max_iterations = decode_json_string(self.config['CAF_DEFAULTS']['MaxIterations'])
         #: The ordering and explicit future dependencies of calibrations. Will be filled during self.run()
         self.order = None
+        #: Private backend attribute
+        self._backend = None
 
     def add_calibration(self, calibration):
         """
@@ -366,7 +434,7 @@ class CAF():
             dependency_in_caf = dependency.name in calibration_names
             if not dependency_in_caf:
                 B2WARNING(("The calibration {0} is a required dependency but is not in the CAF."
-                           "It has been removed as a dependency.").format(dependency.name))
+                           " It has been removed as a dependency.").format(dependency.name))
             return dependency_in_caf
 
         # Check that there aren't dependencies on calibrations not added to the framework
@@ -414,6 +482,8 @@ class CAF():
         """
         jobs = {}
         for calibration_name in calibrations:
+            calibration = self.calibrations[calibration_name]
+
             job = Job('_'.join([calibration_name, 'Collector', 'Iteration', str(iteration)]))
             job.output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'output')
             job.working_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'input')
@@ -421,26 +491,48 @@ class CAF():
             job.input_sandbox_files.append(_collector_steering_file_path)
             collector_path_file = self._make_collector_path(calibration_name, iteration)
             job.input_sandbox_files.append(collector_path_file)
-            if self.calibrations[calibration_name].pre_collector_path:
+            if calibration.pre_collector_path:
                 pre_collector_path_file = self._make_pre_collector_path(calibration_name, iteration)
                 job.input_sandbox_files.append(pre_collector_path_file)
-            ###########################################
-            #
-            # TODO: Add dependent calibration databases
-            #
-            ###########################################
+
+            # Want to figure out which local databases are required for this job and their paths
+            list_dependent_databases = []
             # Add previous iteration databases from this calibration
             if iteration > 0:
-                for algorithm in self.calibrations[calibration_name].algorithms:
-                    algorithm_name = algorithm.Class_Name().replace('Belle2::', '')
+                for algorithm in calibration.algorithms:
+                    algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
                     database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration-1), 'output', 'localdb')
-                    job.input_sandbox_files.append(database_dir)
+                    list_dependent_databases.append(database_dir)
+                    B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
+                           calibration_name))
+
+            # Here we add the finished databases of previous calibrations that we depend on.
+            # We can assume that the databases exist as we can't be here until they have returned
+            # with OK status (THIS MAY CHANGE!)
+            for cal_name in self.order:
+                if cal_name in self.dependencies[calibration_name]:
+                    database_dir = os.path.join(self.output_dir, cal_name, 'localdb')
+                    B2INFO('Adding local database from {0} for use by {1}'.format(database_dir, calibration_name))
+
+            # Set the location where we will store the merged set of databases.
+            dependent_database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'localdb')
+            # Merge all of the local databases that are required for this calibration into a single directory
+            caf.utils.merge_local_databases(list_dependent_databases, dependent_database_dir)
+            job.input_sandbox_files.append(dependent_database_dir)
             # Define the input file list and output patterns to be returned from collector job
-            job.input_files = self.calibrations[calibration_name].input_files
-            job.output_patterns = self.calibrations[calibration_name].output_patterns
+            job.input_files = calibration.input_files
+            job.output_patterns = calibration.output_patterns
             jobs[calibration_name] = job
 
         return jobs
+
+    def check_backend(self):
+        """
+        Makes sure that the CAF has a valid backend setup. If one isn't set by the user (or if the
+        one that is stored isn't a valid Backend object) we should create a default Local backend.
+        """
+        if not isinstance(self._backend, caf.backends.Backend):
+            self.backend = caf.backends.Local()
 
     def run(self):
         """
@@ -449,6 +541,7 @@ class CAF():
         - Upload may be moved to another method or function entirely to give the option of
         monitoring output before committing to database.
         """
+        self.check_backend()
         # Creates the ordering of calibrations, including any dependencies that we must wait for
         # before continuing.
         self.order = self._order_calibrations()
@@ -475,7 +568,6 @@ class CAF():
             # Main running loop, continues until we're completely finished or we fail
             while col_to_submit:
                 for iteration in range(self.max_iterations):
-                    iteration_needed = False
                     # Create job objects for collectors
                     col_jobs = self._configure_jobs(col_to_submit, iteration)
                     # Submit collection jobs that have no dependencies
@@ -487,33 +579,39 @@ class CAF():
                         sleep(self.heartbeat)
                         # loop to check which results are finished and remove from waiting list
                         # Iterates over a copy as we're editing it.
-                        for calibration_name, result in zip(waiting_on_results[:], results):
+                        for calibration_name, result in zip(waiting_on_results[:], results[:]):
                             ready = result.ready()
                             B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
                             if ready:
                                 waiting_on_results.remove(calibration_name)
+                                results.remove(result)
 
                     # Once the collectors are all done, run the algorithms for them
                     # We pass in the col_jobs dictionary as it contains the calibration names
                     # and job objects (output directories) that we need.
                     self._run_algorithms(col_jobs, iteration)
 
+                    iteration_needed = {}
                     for calibration_name in col_to_submit:
-                        iteration_needed = False
-                        results = self.calibrations[calibration_name].results[iteration]
-                        for algorithm_name, iov_results in results.items():
+                        iteration_needed[calibration_name] = False
+                        cal_results = self.calibrations[calibration_name].results[iteration]
+                        for algorithm_name, iov_results in cal_results.items():
                             for iov_result in iov_results:
-                                if CalibrationAlgorithm.c_Iterate == iov_result.result:
-                                    iteration_needed = True
-                                    print('Iteration called for by {0} on IoV {1}'.format(algorithm_name, iov_result.iov))
-                        if not iteration_needed:
+                                if iov_result.result == CalibrationAlgorithm.c_Iterate:
+                                    iteration_needed[calibration_name] = True
+                                    B2INFO('Iteration called for by {0} on IoV {1}'.format(calibration_name+'_'+algorithm_name,
+                                           iov_result.iov))
+
+                    for calibration_name in col_to_submit[:]:
+                        if not iteration_needed[calibration_name]:
                             database_location = os.path.join(self.output_dir, calibration_name, str(iteration), 'output', 'localdb')
                             final_database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
                             shutil.copytree(database_location, final_database_location)
+                            B2INFO('No Iteration required for {0}'.format(calibration_name+'_'+algorithm_name))
                             col_to_submit.remove(calibration_name)
 
                     # Once all the algorithms have returned c_OK we can move on to the next collectors
-                    if not iteration_needed:
+                    if not col_to_submit:
                         # Find new sources if they exist
                         col_to_submit = list(find_sources(order))
                         # Remove new sources from order
@@ -523,12 +621,28 @@ class CAF():
                         break
 
                 else:
-                    if iteration_needed:
-                        print('Max iterations reached but algorithms still requesting more!')
-                        break
+                    for calibration_name in col_to_submit[:]:
+                        if iteration_needed[calibration_name]:
+                            database_location = os.path.join(self.output_dir, calibration_name,
+                                                             str(self.max_iterations-1), 'output', 'localdb')
+                            final_database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
+                            shutil.copytree(database_location, final_database_location)
+                            B2WARNING(("Max iterations reached for {0} but algorithms still "
+                                       "requesting more!".format(calibration_name)))
+                            col_to_submit.remove(calibration_name)
 
-        print('Results of all calibrations')
+                    # We'll continue on even if the algorithms reach max iterations. But we'll grumble about it
+                    if not col_to_submit:
+                        # Find new sources if they exist
+                        col_to_submit = list(find_sources(order))
+                        # Remove new sources from order
+                        for calibration_name in col_to_submit:
+                            order.pop(calibration_name)
+                        # Round we go again for collector submission
+
+        B2INFO('Results of all calibrations, NOT IN ORDER!')
         for calibration in self.calibrations.values():
+            print("Results of {}".format(calibration.name))
             pp.pprint(calibration.results)
 
         # Close down our processing pool nicely if we used one
@@ -562,10 +676,10 @@ class CAF():
                 # wait for it to finish
                 child.join()
                 # Get a nicer version of the algorithm name
-                algorithm_name = algorithm.Class_Name().replace('Belle2::', '')
+                algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
                 # Get the return codes of the algorithm for the IoVs found by the Process
                 calibration.results[iteration][algorithm_name] = parent_conn.recv()
-                print("Exit code was {0}".format(child.exitcode))
+#                B2INFO("Exit code of {0} was {1}".format(algorithm_name, child.exitcode))
 
     def _run_algorithm(self, calibration, algorithm, working_dir, iteration, child_conn):
         """
@@ -573,11 +687,12 @@ class CAF():
         and first runs a setup function passed in.
         """
         logging.reset()
+        set_log_level(LogLevel.INFO)
         # Now that we're in a subprocess we can change working directory without affecting
         # the main process.
         os.chdir(working_dir)
         # Get a nicer version of the algorithm name
-        algorithm_name = algorithm.Class_Name().replace('Belle2::', '')
+        algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
 
         # Create a directory to store the payloads of this algorithm
         os.mkdir('localdb')
@@ -585,10 +700,12 @@ class CAF():
         # add logfile for output
         logging.add_file(algorithm_name+'_b2log')
 
+        # Clean everything out just in case
         reset_database()
         # Fall back to previous databases if no payloads are found
         use_database_chain(True)
-
+        # Use the central database with production global tag as the ultimate fallback
+        use_central_database('production')
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
@@ -596,7 +713,7 @@ class CAF():
             if calibration_name in self.dependencies[calibration.name]:
                 database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
                 use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
-                print('Adding local database from {0} for use by {1}'.format(calibration_name, algorithm_name))
+                B2INFO('Adding local database from {0} for use by {1}'.format(calibration_name, algorithm_name))
 
         # Here we add the previous iteration's database
         if iteration > 0:
@@ -608,13 +725,17 @@ class CAF():
 
         B2INFO("Running {0} in working directory {1}".format(algorithm_name, working_dir))
         B2INFO("Output folder contents of collector was"+str(glob.glob('./*')))
-        if calibration.pre_algorithm:
-            calibration.pre_algorithm(iteration)
+
+        algorithm.data_input()
+        if algorithm.pre_algorithm:
+            # We have to re-pass in the algorithm here because an outside user has created this method.
+            # So the method isn't bound to the instance properly.
+            algorithm.pre_algorithm(algorithm.algorithm, iteration)
 
         # Sorting the run list should not be necessary as the CalibrationAlgorithm does this during
         # the getRunListFromAllData() function.
         # Get a vector of all the experiments and runs passed into the algorithm via the output of the collector
-        exprun_vector = algorithm.getRunListFromAllData()
+        exprun_vector = algorithm.algorithm.getRunListFromAllData()
         # Create empty IoV vector to execute
         iov_to_execute = ROOT.vector("std::pair<int,int>")()
         # Create list of result codes and IoVs
@@ -624,47 +745,63 @@ class CAF():
         last_payloads = None
         for exprun in exprun_vector:
             # Add each exprun to the vector in turn
-            print("Adding Exp:Run = {0}:{1} to execution request".format(exprun.first, exprun.second))
+            B2INFO("Adding Exp:Run = {0}:{1} to execution request".format(exprun.first, exprun.second))
             iov_to_execute.push_back(exprun)
             # Perform the algorithm over the requested IoVs
-            alg_result = algorithm.execute(iov_to_execute, iteration)
+            B2INFO("Performing execution on IoV {0}".format(iov_from_vector(iov_to_execute)))
+            alg_result = algorithm.algorithm.execute(iov_to_execute, iteration)
             # Commit to the local database if we've got a success or iteration requested
             if alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate:
-                print("Finished execution of {0} with highest Exp:Run = {1}:{2} ".format(algorithm_name,
-                      exprun.first, exprun.second))
+                B2INFO("Finished execution of {0} with highest Exp:Run = {1}:{2} ".format(algorithm_name,
+                       exprun.first, exprun.second))
+                # Only commit old payload if there was a new successful calibration
                 if last_payloads:
-                    algorithm.commit(last_payloads)
-                last_payloads = algorithm.getPayloads()
+                    B2INFO("Committing payload to local database for IoV {0}".format(iov))
+                    algorithm.algorithm.commit(last_payloads)
+                # These new payloads for this execution will be committed later when we know if we need to merge
+                last_payloads = algorithm.algorithm.getPayloadValues()
                 # Get readable iov for this one and create a result entry. We can always pop the entry if we'll be merging.
                 # Can't do that with the database as easily.
                 iov = iov_from_vector(iov_to_execute)
                 result = IoV_Result(iov, alg_result)
-                print('Result was {0}'.format(result))
+                B2INFO('Result was {0}'.format(result))
                 results.append(result)
                 iov_to_execute.clear()
-            print("Execution of {0} finished with exit code {1} = {2}".format(algorithm_name, alg_result,
-                  algorithm_result_names[alg_result]))
+            B2INFO("Execution of {0} finished with exit code {1} = {2}".format(algorithm_name, alg_result,
+                   AlgResult(alg_result).name))
 
         else:
             # Final IoV will probably have returned c_NotEnoughData so we need to merge it with the previous successful
             # IoV if one exists.
             if iov_to_execute.size() and results:
                 iov = iov_from_vector(iov_to_execute)
-                print('Merging IoV for {0} onto end of previous IoV'.format(iov))
+                B2INFO('Merging IoV for {0} onto end of previous IoV'.format(iov))
                 last_successful_result = results.pop(-1)
+                B2INFO('Last successful result was {0}'.format(last_successful_result))
                 iov_to_execute.clear()
                 exprun = ROOT.pair('int, int')
                 for exp in range(last_successful_result.iov[0][0], iov[1][0]+1):
-                    for run in range(last_successful_result.iov[1][0], iov[1][1]+1):
+                    for run in range(last_successful_result.iov[0][1], iov[1][1]+1):
                         iov_to_execute.push_back(exprun(exp, run))
 
-                alg_result = algorithm.execute(iov_to_execute, iteration)
-                algorithm.commit()
+                B2INFO('Merged IoV for execution is {0}'.format(iov_from_vector(iov_to_execute)))
+                alg_result = algorithm.algorithm.execute(iov_to_execute, iteration)
                 # Get readable iov for this one and create a result entry.
                 iov = iov_from_vector(iov_to_execute)
                 result = IoV_Result(iov, alg_result)
-                print('Result was {0}'.format(result))
+                if alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate:
+                    B2INFO("Committing payload to local database for Merged IoV {0}".format(iov))
+                    algorithm.algorithm.commit()
+                B2INFO('Result was {0}'.format(result))
                 results.append(result)
+                B2INFO("Execution of {0} finished with exit code {1} = {2}".format(algorithm_name, alg_result,
+                       AlgResult(alg_result).name))
+
+            # If there isn't any more data to calibrate then we have dangling payloads to commit from the last execution
+            elif not iov_to_execute.size():
+                if (alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate):
+                    B2INFO("Committing final payload to local database for IoV {0}".format(iov))
+                    algorithm.algorithm.commit(last_payloads)
 
         logging.reset()
         child_conn.send(results)
@@ -683,7 +820,6 @@ class CAF():
         Setter for the backend property. Checks that a Backend instance was passed in.
         """
         if isinstance(backend, caf.backends.Backend):
-            #: Private backend attribute
             self._backend = backend
         else:
             B2ERROR('backend property must inherit from Backend class')

@@ -160,7 +160,7 @@ class Local(Backend):
             output_files = glob.glob(os.path.join(job.working_dir, pattern))
             for file_name in output_files:
                 shutil.move(file_name, job.output_dir)
-                print('moving', file_name, 'to', job.output_dir)
+                # print('moving', file_name, 'to', job.output_dir)
 
 
 class PBS(Backend):

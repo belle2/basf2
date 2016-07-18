@@ -39,7 +39,7 @@ CalibrationAlgorithm::EResult TestCalibrationAlgorithm::calibrate()
   nameDistinguisher++;
   correction->Fill((int)mean);
 
-  saveCalibration(correction, "test_constant");
+  saveCalibration(correction, getPrefix());
 
   // Iterate until we find answer to the most fundamental question...
   B2INFO("mean: " << mean);

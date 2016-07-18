@@ -75,6 +75,9 @@ namespace Belle2 {
     /// Get constants (in TObjects) for database update from last calibration
     const std::list<Database::DBQuery>& getPayloads() const { return m_payloads; }
 
+    /// Get constants (in TObjects) for database update from last calibration but passed by VALUE
+    const std::list<Database::DBQuery> getPayloadValues() const { return m_payloads; }
+
     /// Submit constants from last calibration into database
     bool commit();
 

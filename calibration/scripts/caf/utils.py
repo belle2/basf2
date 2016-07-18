@@ -1,22 +1,31 @@
 from basf2 import *
 from collections import deque
 from collections import OrderedDict
+from collections import namedtuple
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
 
-
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
 
+import enum
 
-#: Get friendly names for the return values
-algorithm_result_names = {
-    CalibrationAlgorithm.c_OK: "OK",
-    CalibrationAlgorithm.c_NotEnoughData: "NotEnoughData",
-    CalibrationAlgorithm.c_Iterate: "Iterate",
-    CalibrationAlgorithm.c_Failure: "Failure",
-}
+
+@enum.unique
+class AlgResult(enum.Enum):
+    """
+    Enum of Calibration results. Shouldn't be very necessary to use this
+    over the direct CalibrationAlgorithm members but it's nice to have
+    something pythonic ready to go.
+    """
+    ok = CalibrationAlgorithm.c_OK
+    not_enough_data = CalibrationAlgorithm.c_NotEnoughData
+    iterate = CalibrationAlgorithm.c_Iterate
+    failure = CalibrationAlgorithm.c_Failure
+
+IoV = namedtuple('IoV', ['exp_low', 'run_low', 'exp_high', 'run_high'])
+IoV_Result = namedtuple('IoV_Result', ['iov', 'result'])
 
 
 def iov_from_vector(iov_vector):
@@ -243,3 +252,23 @@ class PathExtras():
         Returns the index of the first instance of a module in the contained path.
         """
         return self._module_names.index(module_name)
+
+
+def merge_local_databases(list_database_dirs, output_database_dir):
+    """
+    Takes a list of database directories and merges them into one new directory,
+    defined by the output_database_dir.
+    It assumes that each of the database directories is of the standard form:
+
+    directory_name
+        -> database.txt
+        -> <payload file name>
+        -> <payload file name>
+        -> ...
+    """
+    import shutil
+    for directory in list_database_dirs:
+        if not os.path.exists(directory):
+            B2WARNING("Database directory {0} requested by collector but it doesn't exist!".format(directory))
+            continue
+        shutil.copytree(directory, output_database_dir)

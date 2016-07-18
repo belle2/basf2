@@ -180,9 +180,9 @@ void MCRecoTracksMatcherModule::initialize()
   StoreArray<MCParticle> storeMCParticles;
 
   // Require both GFTrackCand arrays and the MCParticles to be present in the DataStore
-  storePRRecoTracks.required();
-  storeMCRecoTracks.required();
-  storeMCParticles.required();
+  storePRRecoTracks.isRequired();
+  storeMCRecoTracks.isRequired();
+  storeMCParticles.isRequired();
 
   // Extract the default names for the case empty stings were given
   m_param_prRecoTracksStoreArrayName = storePRRecoTracks.getName();

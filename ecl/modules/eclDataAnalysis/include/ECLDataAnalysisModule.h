@@ -289,6 +289,7 @@ namespace Belle2 {
     std::vector<int>* m_eclShowerToMc5PDG; /**< PDG code of fifth MCParticle related to ECLShower */
     std::vector<double>*
     m_eclShowerToBkgWeight; /**< Remaining energy contribution not associated to first five MCParticles related to ECLShower */
+    std::vector<double>* m_eclShowerSimHitSum; /**< Full energy contribution related to ECLShower */
     std::vector<double>* m_eclShowerUncEnergy; /**< Shower bare energy */
     std::vector<double>* m_eclShowerEnergy; /**< Shower Energy */
     std::vector<double>* m_eclShowerTheta; /**< Shower Theta */

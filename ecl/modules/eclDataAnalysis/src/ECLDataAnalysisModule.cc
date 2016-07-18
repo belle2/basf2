@@ -219,6 +219,7 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerToMcWeight4(0),
     m_eclShowerToMc5(0),
     m_eclShowerToMcWeight5(0),
+    m_eclShowerSimHitSum(0),
     m_eclShowerUncEnergy(0),
     m_eclShowerEnergy(0),
     m_eclShowerTheta(0),
@@ -675,6 +676,7 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclShowerToMcWeight5",      "std::vector<double>",       &m_eclShowerToMcWeight5);
   m_tree->Branch("eclShowerToMc5PDG",      "std::vector<int>",       &m_eclShowerToMc5PDG);
   m_tree->Branch("eclShowerToBkgWeight",      "std::vector<double>",       &m_eclShowerToBkgWeight);
+  m_tree->Branch("eclShowerSimHitSum",      "std::vector<double>",       &m_eclShowerSimHitSum);
   m_tree->Branch("eclShowerEnergy",     "std::vector<double>",    &m_eclShowerEnergy);
   m_tree->Branch("eclShowerUncEnergy",  "std::vector<double>",    &m_eclShowerUncEnergy);
   m_tree->Branch("eclShowerTheta",      "std::vector<double>",    &m_eclShowerTheta);
@@ -825,6 +827,7 @@ void ECLDataAnalysisModule::event()
   m_eclShowerToMcWeight2->clear(); m_eclShowerToMc2PDG->clear(); m_eclShowerToMc3->clear(); m_eclShowerToMcWeight3->clear();
   m_eclShowerToMc3PDG->clear(); m_eclShowerToMc4->clear(); m_eclShowerToMcWeight4->clear(); m_eclShowerToMc4PDG->clear();
   m_eclShowerToMc5->clear(); m_eclShowerToMcWeight5->clear(); m_eclShowerToMc5PDG->clear(); m_eclShowerToBkgWeight->clear();
+  m_eclShowerSimHitSum->clear();
   m_eclShowerUncEnergy->clear(); m_eclShowerEnergy->clear();
   m_eclShowerTheta->clear(); m_eclShowerPhi->clear(); m_eclShowerR->clear(); m_eclShowerNHits->clear(); m_eclShowerE9oE25->clear();
   m_eclShowerTime->clear();  m_eclShowerConnectedRegionId->clear();
@@ -955,121 +958,95 @@ void ECLDataAnalysisModule::event()
     m_eclCalDigitTimeFit->push_back(aECLCalDigits->getTime());
     m_eclCalDigitFitQuality->push_back(aECLCalDigits->isFailedFit());
 
-    //if (aECLCalDigits->getRelated<MCParticle>() != (nullptr)) {
-    //  const MCParticle* mc_caldigit = aECLCalDigits->getRelated<MCParticle>();
-    //  m_eclCalDigitToMc->push_back(mc_caldigit->getArrayIndex());
-    //} else
-    //  m_eclCalDigitToMc->push_back(-1);
-
     double sumHit = 0;
     int idx[10];
     for (int i = 0; i < 10; i++)
       idx[i] = -1;
 
-    if (aECLCalDigits->getRelated<MCParticle>() != (nullptr)) {
-      int ii = 0;
-      for (int rel = 0; rel < (int)ECLCalDigitToMC.getEntries(); rel++) {
-        if (ECLCalDigitToMC[rel].getFromIndex() == icaldigits) {
-          if ((ECLCalDigitToMC[rel].getWeight() > 0) && (rel < 10)) {
-            //cout << "Contribution from Mc particle: " << ECLCalDigitToMC[rel].getToIndex() << " with weight " << ECLCalDigitToMC[rel].getWeight() << endl;
-            idx[ii] = rel;
-            ii++;
-          }
-          sumHit = sumHit + (double)ECLCalDigitToMC[rel].getWeight();
-        }
-      }
-      int max = 0;
-      if ((int)ECLCalDigitToMC.getEntries() > 9)
-        max = 9;
-      else
-        max = (int)ECLCalDigitToMC.getEntries();
+    int ii = 0;
+    sumHit = 0;
+    int mc_idx = 0;
 
-      //Re-ordering based on contribution
-      int y = 0;
-      while (y < max) {
-        for (int i = 0; i < max; i++) {
-          if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
-            if (ECLCalDigitToMC[idx[i]].getWeight() < ECLCalDigitToMC[idx[i + 1]].getWeight()) {
-              int temp = idx[i];
-              idx[i] = idx[i + 1];
-              idx[i + 1] = temp;
-              //cout << "Ordered contribution from Mc particle: " << ECLCalDigitToMC[i].getToIndex() << " with weight " << ECLCalDigitToMC[i].getWeight() << endl;
-            }
+    for (int i = 0; i < ECLCalDigitToMC.getEntries(); i++) {
+      mc_idx++;
+      const RelationElement re = ECLCalDigitToMC[i];
+      if (re.getFromIndex() == icaldigits) {
+        idx[ii] = i;
+        ii++;
+        cout << "Digit: " << icaldigits << " Index: " << idx[i] << endl;
+        sumHit = sumHit + re.getWeight();
+        //  cout << "Energy: " << sumHit << endl;
+      }
+    }
+
+    //Re-ordering based on contribution
+    int y = 0;
+    while (y < 10) {
+      for (int i = 0; i < 10; i++) {
+        if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
+          if (ECLCalDigitToMC[idx[i]].getWeight() < ECLCalDigitToMC[idx[i + 1]].getWeight()) {
+            int temp = idx[i];
+            idx[i] = idx[i + 1];
+            idx[i + 1] = temp;
           }
         }
-        y++;
       }
-      m_eclCalDigitToBkgWeight->push_back(aECLCalDigits->getEnergy() - sumHit);
-      m_eclCalDigitSimHitSum->push_back(sumHit);
-      if (idx[0] > -1) {
-        //cout << "Dumped -> MC particle: " << ECLCalDigitToMC[idx[0]].getToIndex() << " with weight " << ECLCalDigitToMC[idx[0]].getWeight() << endl;
-        m_eclCalDigitToMcWeight1->push_back(ECLCalDigitToMC[idx[0]].getWeight());
-        m_eclCalDigitToMc1->push_back(ECLCalDigitToMC[idx[0]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[0]].getToIndex()];
-        m_eclCalDigitToMc1PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclCalDigitToMcWeight1->push_back(-1);
-        m_eclCalDigitToMc1->push_back(-1);
-        m_eclCalDigitToMc1PDG->push_back(-1);
-      }
-      if (idx[1] > -1) {
-        m_eclCalDigitToMcWeight2->push_back(ECLCalDigitToMC[idx[1]].getWeight());
-        m_eclCalDigitToMc2->push_back(ECLCalDigitToMC[idx[1]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[1]].getToIndex()];
-        m_eclCalDigitToMc2PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclCalDigitToMcWeight2->push_back(-1);
-        m_eclCalDigitToMc2->push_back(-1);
-        m_eclCalDigitToMc2PDG->push_back(-1);
-      }
-      if (idx[2] > -1) {
-        m_eclCalDigitToMcWeight3->push_back(ECLCalDigitToMC[idx[2]].getWeight());
-        m_eclCalDigitToMc3->push_back(ECLCalDigitToMC[idx[2]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[2]].getToIndex()];
-        m_eclCalDigitToMc3PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclCalDigitToMcWeight3->push_back(-1);
-        m_eclCalDigitToMc3->push_back(-1);
-        m_eclCalDigitToMc3PDG->push_back(-1);
-      }
-      if (idx[3] > -1) {
-        m_eclCalDigitToMcWeight4->push_back(ECLCalDigitToMC[idx[3]].getWeight());
-        m_eclCalDigitToMc4->push_back(ECLCalDigitToMC[idx[3]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[3]].getToIndex()];
-        m_eclCalDigitToMc4PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclCalDigitToMcWeight4->push_back(-1);
-        m_eclCalDigitToMc4->push_back(-1);
-        m_eclCalDigitToMc4PDG->push_back(-1);
-      }
-      if (idx[4] > -1) {
-        m_eclCalDigitToMcWeight5->push_back(ECLCalDigitToMC[idx[4]].getWeight());
-        m_eclCalDigitToMc5->push_back(ECLCalDigitToMC[idx[4]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[4]].getToIndex()];
-        m_eclCalDigitToMc5PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclCalDigitToMcWeight5->push_back(-1);
-        m_eclCalDigitToMc5->push_back(-1);
-        m_eclCalDigitToMc5PDG->push_back(-1);
-      }
+      y++;
+    }
+
+    m_eclCalDigitToBkgWeight->push_back(aECLCalDigits->getEnergy() - sumHit);
+    m_eclCalDigitSimHitSum->push_back(sumHit);
+    if (idx[0] > -1) {
+      m_eclCalDigitToMcWeight1->push_back(ECLCalDigitToMC[idx[0]].getWeight());
+      m_eclCalDigitToMc1->push_back(ECLCalDigitToMC[idx[0]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[0]].getToIndex()];
+      m_eclCalDigitToMc1PDG->push_back(amcParticle->getPDG());
+      cout << "Index: " << ECLCalDigitToMC[idx[0]].getToIndex() << " PDG: " << amcParticle->getPDG() << " Energy: " <<
+           ECLCalDigitToMC[idx[0]].getWeight() << endl;
     } else {
-      m_eclCalDigitToMc1->push_back(-1);
       m_eclCalDigitToMcWeight1->push_back(-1);
+      m_eclCalDigitToMc1->push_back(-1);
       m_eclCalDigitToMc1PDG->push_back(-1);
-      m_eclCalDigitToMc2->push_back(-1);
+    }
+    if (idx[1] > -1) {
+      m_eclCalDigitToMcWeight2->push_back(ECLCalDigitToMC[idx[1]].getWeight());
+      m_eclCalDigitToMc2->push_back(ECLCalDigitToMC[idx[1]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[1]].getToIndex()];
+      m_eclCalDigitToMc2PDG->push_back(amcParticle->getPDG());
+    } else {
       m_eclCalDigitToMcWeight2->push_back(-1);
+      m_eclCalDigitToMc2->push_back(-1);
       m_eclCalDigitToMc2PDG->push_back(-1);
-      m_eclCalDigitToMc3->push_back(-1);
+    }
+    if (idx[2] > -1) {
+      m_eclCalDigitToMcWeight3->push_back(ECLCalDigitToMC[idx[2]].getWeight());
+      m_eclCalDigitToMc3->push_back(ECLCalDigitToMC[idx[2]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[2]].getToIndex()];
+      m_eclCalDigitToMc3PDG->push_back(amcParticle->getPDG());
+    } else {
       m_eclCalDigitToMcWeight3->push_back(-1);
+      m_eclCalDigitToMc3->push_back(-1);
       m_eclCalDigitToMc3PDG->push_back(-1);
-      m_eclCalDigitToMc4->push_back(-1);
+    }
+    if (idx[3] > -1) {
+      m_eclCalDigitToMcWeight4->push_back(ECLCalDigitToMC[idx[3]].getWeight());
+      m_eclCalDigitToMc4->push_back(ECLCalDigitToMC[idx[3]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[3]].getToIndex()];
+      m_eclCalDigitToMc4PDG->push_back(amcParticle->getPDG());
+    } else {
       m_eclCalDigitToMcWeight4->push_back(-1);
+      m_eclCalDigitToMc4->push_back(-1);
       m_eclCalDigitToMc4PDG->push_back(-1);
-      m_eclCalDigitToMc5->push_back(-1);
+    }
+    if (idx[4] > -1) {
+      m_eclCalDigitToMcWeight5->push_back(ECLCalDigitToMC[idx[4]].getWeight());
+      m_eclCalDigitToMc5->push_back(ECLCalDigitToMC[idx[4]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLCalDigitToMC[idx[4]].getToIndex()];
+      m_eclCalDigitToMc5PDG->push_back(amcParticle->getPDG());
+    } else {
       m_eclCalDigitToMcWeight5->push_back(-1);
+      m_eclCalDigitToMc5->push_back(-1);
       m_eclCalDigitToMc5PDG->push_back(-1);
-      m_eclCalDigitToBkgWeight->push_back(aECLCalDigits->getEnergy() - sumHit);
-      m_eclCalDigitSimHitSum->push_back(-1);
     }
 
     if (aECLCalDigits->getRelated<ECLShower>() != (nullptr)) {
@@ -1200,118 +1177,93 @@ void ECLDataAnalysisModule::event()
     } else
       m_eclClusterToShower->push_back(-1);
 
-    //Dump MC Info (Multiple Matching, save up to 5 contrbutors for each cluster)
+
+    //Dump MC Info - Multiple Matching
     double sumHit = 0;
     int idx[10];
     for (int i = 0; i < 10; i++)
       idx[i] = -1;
 
-    //if (aECLHits->getRelated<MCParticle>() != (nullptr)) {
-    //  const MCParticle* mc_hit = aECLHits->getRelated<MCParticle>();
-    //  m_eclHitToMc->push_back(mc_hit->getArrayIndex());
-    //} else
-    //  m_eclHitToMc->push_back(-1);
-
-    if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
-      int ii = 0;
-      for (int rel = 0; rel < (int)ECLClusterToMC.getEntries(); rel++) {
-        if (ECLClusterToMC[rel].getFromIndex() == iclusters) {
-          if ((ECLClusterToMC[rel].getWeight() > 0) && (rel < 10)) {
-            //cout << "Contribution from Mc particle: " << ECLClusterToMC[rel].getToIndex() << " with weight " << ECLClusterToMC[rel].getWeight() << endl;
-            idx[ii] = rel;
-            ii++;
-          }
-          sumHit = sumHit + (double)ECLClusterToMC[rel].getWeight();
-        }
+    int ii = 0;
+    sumHit = 0;
+    int mc_idx = 0;
+    for (int i = 0; i < ECLClusterToMC.getEntries(); i++) {
+      mc_idx++;
+      const RelationElement re = ECLClusterToMC[i];
+      if (re.getFromIndex() == iclusters) {
+        idx[ii] = i;
+        ii++;
+        sumHit = sumHit + re.getWeight();
       }
-      int max = 0;
-      if ((int)ECLClusterToMC.getEntries() > 9)
-        max = 9;
-      else
-        max = (int)ECLClusterToMC.getEntries();
-
-      //Re-ordering based on contribution
-      int y = 0;
-      while (y < max) {
-        for (int i = 0; i < max; i++) {
-          if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
-            if (ECLClusterToMC[idx[i]].getWeight() < ECLClusterToMC[idx[i + 1]].getWeight()) {
-              int temp = idx[i];
-              idx[i] = idx[i + 1];
-              idx[i + 1] = temp;
-              //cout << "Ordered contribution from Mc particle: " << ECLClusterToMC[i].getToIndex() << " with weight " << ECLClusterToMC[i].getWeight() << endl;
-            }
-          }
-        }
-        y++;
-      }
-      m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
-      m_eclClusterSimHitSum->push_back(sumHit);
-      if (idx[0] > -1) {
-        //cout << "Dumped -> MC particle: " << ECLClusterToMC[idx[0]].getToIndex() << " with weight " << ECLClusterToMC[idx[0]].getWeight() << endl;
-        m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx[0]].getWeight());
-        m_eclClusterToMc1->push_back(ECLClusterToMC[idx[0]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[0]].getToIndex()];
-        m_eclClusterToMc1PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclClusterToMcWeight1->push_back(-1);
-        m_eclClusterToMc1->push_back(-1);
-        m_eclClusterToMc1PDG->push_back(-1);
-      }
-      if (idx[1] > -1) {
-        m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx[1]].getWeight());
-        m_eclClusterToMc2->push_back(ECLClusterToMC[idx[1]].getToIndex());
-        MCParticle* amcParticle2 = mcParticles[ECLClusterToMC[idx[1]].getToIndex()];
-        m_eclClusterToMc2PDG->push_back(amcParticle2->getPDG());
-      } else {
-        m_eclClusterToMcWeight2->push_back(-1);
-        m_eclClusterToMc2->push_back(-1);
-        m_eclClusterToMc2PDG->push_back(-1);
-      }
-      if (idx[2] > -1) {
-        m_eclClusterToMcWeight3->push_back(ECLClusterToMC[idx[2]].getWeight());
-        m_eclClusterToMc3->push_back(ECLClusterToMC[idx[2]].getToIndex());
-        MCParticle* amcParticle3 = mcParticles[ECLClusterToMC[idx[2]].getToIndex()];
-        m_eclClusterToMc3PDG->push_back(amcParticle3->getPDG());
-      } else {
-        m_eclClusterToMcWeight3->push_back(-1);
-        m_eclClusterToMc3->push_back(-1);
-        m_eclClusterToMc3PDG->push_back(-1);
-      }
-      if (idx[3] > -1) {
-        m_eclClusterToMcWeight4->push_back(ECLClusterToMC[idx[3]].getWeight());
-        m_eclClusterToMc4->push_back(ECLClusterToMC[idx[3]].getToIndex());
-        MCParticle* amcParticle4 = mcParticles[ECLClusterToMC[idx[3]].getToIndex()];
-        m_eclClusterToMc4PDG->push_back(amcParticle4->getPDG());
-      } else {
-        m_eclClusterToMcWeight4->push_back(-1);
-        m_eclClusterToMc4->push_back(-1);
-        m_eclClusterToMc4PDG->push_back(-1);
-      }
-      if (idx[4] > -1) {
-        m_eclClusterToMcWeight5->push_back(ECLClusterToMC[idx[4]].getWeight());
-        m_eclClusterToMc5->push_back(ECLClusterToMC[idx[4]].getToIndex());
-        MCParticle* amcParticle5 = mcParticles[ECLClusterToMC[idx[4]].getToIndex()];
-        m_eclClusterToMc5PDG->push_back(amcParticle5->getPDG());
-      } else {
-        m_eclClusterToMcWeight5->push_back(-1);
-        m_eclClusterToMc5->push_back(-1);
-        m_eclClusterToMc5PDG->push_back(-1);
-      }
-    } else {
-      m_eclClusterToMc1->push_back(-1);
-      m_eclClusterToMcWeight1->push_back(-1);
-      m_eclClusterToMc2->push_back(-1);
-      m_eclClusterToMcWeight2->push_back(-1);
-      m_eclClusterToMc3->push_back(-1);
-      m_eclClusterToMcWeight3->push_back(-1);
-      m_eclClusterToMc4->push_back(-1);
-      m_eclClusterToMcWeight4->push_back(-1);
-      m_eclClusterToMc5->push_back(-1);
-      m_eclClusterToMcWeight5->push_back(-1);
-      m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
-      m_eclClusterSimHitSum->push_back(-1);
     }
+
+    //Re-ordering based on contribution
+    int y = 0;
+    while (y < 10) {
+      for (int i = 0; i < 10; i++) {
+        if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
+          if (ECLClusterToMC[idx[i]].getWeight() < ECLClusterToMC[idx[i + 1]].getWeight()) {
+            int temp = idx[i];
+            idx[i] = idx[i + 1];
+            idx[i + 1] = temp;
+          }
+        }
+      }
+      y++;
+    }
+    m_eclClusterToBkgWeight->push_back(aECLClusters->getEnergy() - sumHit);
+    m_eclClusterSimHitSum->push_back(sumHit);
+    if (idx[0] > -1) {
+      m_eclClusterToMcWeight1->push_back(ECLClusterToMC[idx[0]].getWeight());
+      m_eclClusterToMc1->push_back(ECLClusterToMC[idx[0]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[0]].getToIndex()];
+      m_eclClusterToMc1PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclClusterToMcWeight1->push_back(-1);
+      m_eclClusterToMc1->push_back(-1);
+      m_eclClusterToMc1PDG->push_back(-1);
+    }
+    if (idx[1] > -1) {
+      m_eclClusterToMcWeight2->push_back(ECLClusterToMC[idx[1]].getWeight());
+      m_eclClusterToMc2->push_back(ECLClusterToMC[idx[1]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[1]].getToIndex()];
+      m_eclClusterToMc2PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclClusterToMcWeight2->push_back(-1);
+      m_eclClusterToMc2->push_back(-1);
+      m_eclClusterToMc2PDG->push_back(-1);
+    }
+    if (idx[2] > -1) {
+      m_eclClusterToMcWeight3->push_back(ECLClusterToMC[idx[2]].getWeight());
+      m_eclClusterToMc3->push_back(ECLClusterToMC[idx[2]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[2]].getToIndex()];
+      m_eclClusterToMc3PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclClusterToMcWeight3->push_back(-1);
+      m_eclClusterToMc3->push_back(-1);
+      m_eclClusterToMc3PDG->push_back(-1);
+    }
+    if (idx[3] > -1) {
+      m_eclClusterToMcWeight4->push_back(ECLClusterToMC[idx[3]].getWeight());
+      m_eclClusterToMc4->push_back(ECLClusterToMC[idx[3]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[3]].getToIndex()];
+      m_eclClusterToMc4PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclClusterToMcWeight4->push_back(-1);
+      m_eclClusterToMc4->push_back(-1);
+      m_eclClusterToMc4PDG->push_back(-1);
+    }
+    if (idx[4] > -1) {
+      m_eclClusterToMcWeight5->push_back(ECLClusterToMC[idx[4]].getWeight());
+      m_eclClusterToMc5->push_back(ECLClusterToMC[idx[4]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLClusterToMC[idx[4]].getToIndex()];
+      m_eclClusterToMc5PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclClusterToMcWeight5->push_back(-1);
+      m_eclClusterToMc5->push_back(-1);
+      m_eclClusterToMc5PDG->push_back(-1);
+    }
+
   }
 
   if (m_doPureCsIStudy == true) {
@@ -1330,8 +1282,6 @@ void ECLDataAnalysisModule::event()
     m_eclPureDigitMultip = pure_digits.getEntries();
     for (int idigits = 0; idigits < pure_digits.getEntries() ; idigits++) {
       ECLDigit* aECLPureDigits = pure_digits[idigits];
-
-      //cout << "Rel Array:" << idigits << " points to " << ECLPureDigitToMc[idigits].getToIndex() << endl;
 
       m_eclPureDigitIdx->push_back(idigits);
       m_eclPureDigitCellId->push_back(aECLPureDigits->getCellId());
@@ -1397,156 +1347,130 @@ void ECLDataAnalysisModule::event()
 
   m_eclShowerMultip = showers.getEntries();
   for (uint ishowers = 0; ishowers < (uint)showers.getEntries() ; ishowers++) {
-    ECLShower* aECLshowers = showers[ishowers];
+    ECLShower* aECLShowers = showers[ishowers];
     m_eclShowerIdx->push_back(ishowers);
-    m_eclShowerEnergy->push_back(aECLshowers->getEnergy());
-    m_eclShowerTheta->push_back(aECLshowers->getTheta());
-    m_eclShowerPhi->push_back(aECLshowers->getPhi());
-    m_eclShowerR->push_back(aECLshowers->getR());
-    m_eclShowerNHits->push_back(aECLshowers->getNofCrystals());
-    m_eclShowerE9oE25->push_back(aECLshowers->getE9oE25());
-    m_eclShowerUncEnergy->push_back(aECLshowers->getEnedepSum());
-    m_eclShowerTime->push_back(aECLshowers->getTime());
-    m_eclShowerConnectedRegionId->push_back(aECLshowers->getConnectedRegionId());
-    m_eclShowerHypothesisId->push_back(aECLshowers->getHypothesisId());
-    m_eclShowerCentralCellId->push_back(aECLshowers->getCentralCellId());
-    m_eclShowerEnergyError->push_back(aECLshowers->getEnergyError());
-    m_eclShowerThetaError->push_back(aECLshowers->getThetaError());
-    m_eclShowerPhiError->push_back(aECLshowers->getPhiError());
-    m_eclShowerTimeResolution->push_back(aECLshowers->getTimeResolution());
-    m_eclShowerHighestEnergy->push_back(aECLshowers->getHighestEnergy());
-    m_eclShowerLateralEnergy->push_back(aECLshowers->getLateralEnergy());
-    m_eclShowerMinTrkDistance->push_back(aECLshowers->getMinTrkDistance());
-    m_eclShowerTrkDepth->push_back(aECLshowers->getTrkDepth());
-    m_eclShowerShowerDepth->push_back(aECLshowers->getShowerDepth());
-    m_eclShowerAbsZernike20->push_back(aECLshowers->getAbsZernike20());
-    m_eclShowerAbsZernike40->push_back(aECLshowers->getAbsZernike40());
-    m_eclShowerAbsZernike42->push_back(aECLshowers->getAbsZernike42());
-    m_eclShowerAbsZernike51->push_back(aECLshowers->getAbsZernike51());
-    m_eclShowerAbsZernike53->push_back(aECLshowers->getAbsZernike53());
-    m_eclShowerSecondMoment->push_back(aECLshowers->getSecondMoment());
-    m_eclShowerE1oE9->push_back(aECLshowers->getE1oE9());
+    m_eclShowerEnergy->push_back(aECLShowers->getEnergy());
+    m_eclShowerTheta->push_back(aECLShowers->getTheta());
+    m_eclShowerPhi->push_back(aECLShowers->getPhi());
+    m_eclShowerR->push_back(aECLShowers->getR());
+    m_eclShowerNHits->push_back(aECLShowers->getNofCrystals());
+    m_eclShowerE9oE25->push_back(aECLShowers->getE9oE25());
+    m_eclShowerUncEnergy->push_back(aECLShowers->getEnedepSum());
+    m_eclShowerTime->push_back(aECLShowers->getTime());
+    m_eclShowerConnectedRegionId->push_back(aECLShowers->getConnectedRegionId());
+    m_eclShowerHypothesisId->push_back(aECLShowers->getHypothesisId());
+    m_eclShowerCentralCellId->push_back(aECLShowers->getCentralCellId());
+    m_eclShowerEnergyError->push_back(aECLShowers->getEnergyError());
+    m_eclShowerThetaError->push_back(aECLShowers->getThetaError());
+    m_eclShowerPhiError->push_back(aECLShowers->getPhiError());
+    m_eclShowerTimeResolution->push_back(aECLShowers->getTimeResolution());
+    m_eclShowerHighestEnergy->push_back(aECLShowers->getHighestEnergy());
+    m_eclShowerLateralEnergy->push_back(aECLShowers->getLateralEnergy());
+    m_eclShowerMinTrkDistance->push_back(aECLShowers->getMinTrkDistance());
+    m_eclShowerTrkDepth->push_back(aECLShowers->getTrkDepth());
+    m_eclShowerShowerDepth->push_back(aECLShowers->getShowerDepth());
+    m_eclShowerAbsZernike20->push_back(aECLShowers->getAbsZernike20());
+    m_eclShowerAbsZernike40->push_back(aECLShowers->getAbsZernike40());
+    m_eclShowerAbsZernike42->push_back(aECLShowers->getAbsZernike42());
+    m_eclShowerAbsZernike51->push_back(aECLShowers->getAbsZernike51());
+    m_eclShowerAbsZernike53->push_back(aECLShowers->getAbsZernike53());
+    m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
+    m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
 
     double sumHit = 0;
     int idx[10];
     for (int i = 0; i < 10; i++)
       idx[i] = -1;
 
-    if (aECLshowers->getRelated<MCParticle>() != (nullptr)) {
-      int ii = 0;
-      for (int rel = 0; rel < (int)ECLShowerToMC.getEntries(); rel++) {
-        if (ECLShowerToMC[rel].getFromIndex() == ishowers) {
-          if ((ECLShowerToMC[rel].getWeight() > 0) && (rel < 10)) {
-            //cout << "Contribution from Mc particle: " << ECLShowerToMC[rel].getToIndex() << " with weight " << ECLShowerToMC[rel].getWeight() << endl;
-            idx[ii] = rel;
-            ii++;
-          }
-          sumHit = sumHit + (double)ECLShowerToMC[rel].getWeight();
-        }
+    int ii = 0;
+    sumHit = 0;
+    int mc_idx = 0;
+    for (int i = 0; i < ECLShowerToMC.getEntries(); i++) {
+      mc_idx++;
+      const RelationElement re = ECLShowerToMC[i];
+      if (re.getFromIndex() == ishowers) {
+        idx[ii] = i;
+        ii++;
+        sumHit = sumHit + re.getWeight();
       }
-      int max = 0;
-      if ((int)ECLShowerToMC.getEntries() > 9)
-        max = 9;
-      else
-        max = (int)ECLShowerToMC.getEntries();
-
-      //Re-ordering based on contribution
-      int y = 0;
-      while (y < max) {
-        for (int i = 0; i < max; i++) {
-          if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
-            if (ECLShowerToMC[idx[i]].getWeight() < ECLShowerToMC[idx[i + 1]].getWeight()) {
-              int temp = idx[i];
-              idx[i] = idx[i + 1];
-              idx[i + 1] = temp;
-              //cout << "Ordered contribution from Mc particle: " << ECLShowerToMC[i].getToIndex() << " with weight " << ECLShowerToMC[i].getWeight() << endl;
-            }
-          }
-        }
-        y++;
-      }
-      m_eclShowerToBkgWeight->push_back(aECLshowers->getEnergy() - sumHit);
-      //m_eclShowerSimHitSum->push_back(sumHit);
-      if (idx[0] > -1) {
-        //cout << "Dumped -> MC particle: " << ECLShowerToMC[idx[0]].getToIndex() << " with weight " << ECLShowerToMC[idx[0]].getWeight() << endl;
-        m_eclShowerToMcWeight1->push_back(ECLShowerToMC[idx[0]].getWeight());
-        m_eclShowerToMc1->push_back(ECLShowerToMC[idx[0]].getToIndex());
-        MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[0]].getToIndex()];
-        m_eclShowerToMc1PDG->push_back(amcParticle->getPDG());
-      } else {
-        m_eclShowerToMcWeight1->push_back(-1);
-        m_eclShowerToMc1->push_back(-1);
-        m_eclShowerToMc1PDG->push_back(-1);
-      }
-      if (idx[1] > -1) {
-        m_eclShowerToMcWeight2->push_back(ECLShowerToMC[idx[1]].getWeight());
-        m_eclShowerToMc2->push_back(ECLShowerToMC[idx[1]].getToIndex());
-        MCParticle* amcParticle2 = mcParticles[ECLShowerToMC[idx[1]].getToIndex()];
-        m_eclShowerToMc2PDG->push_back(amcParticle2->getPDG());
-      } else {
-        m_eclShowerToMcWeight2->push_back(-1);
-        m_eclShowerToMc2->push_back(-1);
-        m_eclShowerToMc2PDG->push_back(-1);
-      }
-      if (idx[2] > -1) {
-        m_eclShowerToMcWeight3->push_back(ECLShowerToMC[idx[2]].getWeight());
-        m_eclShowerToMc3->push_back(ECLShowerToMC[idx[2]].getToIndex());
-        MCParticle* amcParticle3 = mcParticles[ECLShowerToMC[idx[2]].getToIndex()];
-        m_eclShowerToMc3PDG->push_back(amcParticle3->getPDG());
-      } else {
-        m_eclShowerToMcWeight3->push_back(-1);
-        m_eclShowerToMc3->push_back(-1);
-        m_eclShowerToMc3PDG->push_back(-1);
-      }
-      if (idx[3] > -1) {
-        m_eclShowerToMcWeight4->push_back(ECLShowerToMC[idx[3]].getWeight());
-        m_eclShowerToMc4->push_back(ECLShowerToMC[idx[3]].getToIndex());
-        MCParticle* amcParticle4 = mcParticles[ECLShowerToMC[idx[3]].getToIndex()];
-        m_eclShowerToMc4PDG->push_back(amcParticle4->getPDG());
-      } else {
-        m_eclShowerToMcWeight4->push_back(-1);
-        m_eclShowerToMc4->push_back(-1);
-        m_eclShowerToMc4PDG->push_back(-1);
-      }
-      if (idx[4] > -1) {
-        m_eclShowerToMcWeight5->push_back(ECLShowerToMC[idx[4]].getWeight());
-        m_eclShowerToMc5->push_back(ECLShowerToMC[idx[4]].getToIndex());
-        MCParticle* amcParticle5 = mcParticles[ECLShowerToMC[idx[4]].getToIndex()];
-        m_eclShowerToMc5PDG->push_back(amcParticle5->getPDG());
-      } else {
-        m_eclShowerToMcWeight5->push_back(-1);
-        m_eclShowerToMc5->push_back(-1);
-        m_eclShowerToMc5PDG->push_back(-1);
-      }
-    } else {
-      m_eclShowerToMc1->push_back(-1);
-      m_eclShowerToMcWeight1->push_back(-1);
-      m_eclShowerToMc2->push_back(-1);
-      m_eclShowerToMcWeight2->push_back(-1);
-      m_eclShowerToMc3->push_back(-1);
-      m_eclShowerToMcWeight3->push_back(-1);
-      m_eclShowerToMc4->push_back(-1);
-      m_eclShowerToMcWeight4->push_back(-1);
-      m_eclShowerToMc5->push_back(-1);
-      m_eclShowerToMcWeight5->push_back(-1);
-      m_eclShowerToBkgWeight->push_back(aECLshowers->getEnergy() - sumHit);
-      //m_eclShowerSimHitSum->push_back(-1);
     }
 
-    if (aECLshowers->getRelated<ECLCluster>() != (nullptr)) {
+    //Re-ordering based on contribution
+    int y = 0;
+    while (y < 10) {
+      for (int i = 0; i < 10; i++) {
+        if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
+          if (ECLShowerToMC[idx[i]].getWeight() < ECLShowerToMC[idx[i + 1]].getWeight()) {
+            int temp = idx[i];
+            idx[i] = idx[i + 1];
+            idx[i + 1] = temp;
+          }
+        }
+      }
+      y++;
+    }
+    m_eclShowerToBkgWeight->push_back(aECLShowers->getEnergy() - sumHit);
+    m_eclShowerSimHitSum->push_back(sumHit);
+    if (idx[0] > -1) {
+      m_eclShowerToMcWeight1->push_back(ECLShowerToMC[idx[0]].getWeight());
+      m_eclShowerToMc1->push_back(ECLShowerToMC[idx[0]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[0]].getToIndex()];
+      m_eclShowerToMc1PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclShowerToMcWeight1->push_back(-1);
+      m_eclShowerToMc1->push_back(-1);
+      m_eclShowerToMc1PDG->push_back(-1);
+    }
+    if (idx[1] > -1) {
+      m_eclShowerToMcWeight2->push_back(ECLShowerToMC[idx[1]].getWeight());
+      m_eclShowerToMc2->push_back(ECLShowerToMC[idx[1]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[1]].getToIndex()];
+      m_eclShowerToMc2PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclShowerToMcWeight2->push_back(-1);
+      m_eclShowerToMc2->push_back(-1);
+      m_eclShowerToMc2PDG->push_back(-1);
+    }
+    if (idx[2] > -1) {
+      m_eclShowerToMcWeight3->push_back(ECLShowerToMC[idx[2]].getWeight());
+      m_eclShowerToMc3->push_back(ECLShowerToMC[idx[2]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[2]].getToIndex()];
+      m_eclShowerToMc3PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclShowerToMcWeight3->push_back(-1);
+      m_eclShowerToMc3->push_back(-1);
+      m_eclShowerToMc3PDG->push_back(-1);
+    }
+    if (idx[3] > -1) {
+      m_eclShowerToMcWeight4->push_back(ECLShowerToMC[idx[3]].getWeight());
+      m_eclShowerToMc4->push_back(ECLShowerToMC[idx[3]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[3]].getToIndex()];
+      m_eclShowerToMc4PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclShowerToMcWeight4->push_back(-1);
+      m_eclShowerToMc4->push_back(-1);
+      m_eclShowerToMc4PDG->push_back(-1);
+    }
+    if (idx[4] > -1) {
+      m_eclShowerToMcWeight5->push_back(ECLShowerToMC[idx[4]].getWeight());
+      m_eclShowerToMc5->push_back(ECLShowerToMC[idx[4]].getToIndex());
+      MCParticle* amcParticle = mcParticles[ECLShowerToMC[idx[4]].getToIndex()];
+      m_eclShowerToMc5PDG->push_back(amcParticle->getPDG());
+    } else {
+      m_eclShowerToMcWeight5->push_back(-1);
+      m_eclShowerToMc5->push_back(-1);
+      m_eclShowerToMc5PDG->push_back(-1);
+    }
+
+    if (aECLShowers->getRelated<ECLCluster>() != (nullptr)) {
       m_eclShowerIsCluster->push_back(1);
-      const ECLCluster* cluster_shower = aECLshowers->getRelated<ECLCluster>();
+      const ECLCluster* cluster_shower = aECLShowers->getRelated<ECLCluster>();
       m_eclShowerIsTrack->push_back(cluster_shower->getisTrack());
     } else {
       m_eclShowerIsCluster->push_back(0);
       m_eclShowerIsTrack->push_back(-1);
     }
 
-    //if (aECLshowers->getRelated<MCParticle>() != (nullptr)) {
-    //  const MCParticle* mc_shower = aECLshowers->getRelated<MCParticle>();
-    //  m_eclShowerToMc->push_back(mc_shower->getArrayIndex());
-    //} else
-    //  m_eclShowerToMc->push_back(-1);
   }
 
   m_mcMultip = mcParticles.getEntries();
@@ -1645,5 +1569,10 @@ void ECLDataAnalysisModule::terminate()
     m_tree->Write();
   }
 
+}
+
+int factorial(int n)
+{
+  return (n == 1 || n == 0) ? 1 : factorial(n - 1) * n;
 }
 

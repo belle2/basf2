@@ -107,8 +107,8 @@ namespace Belle2 {
     void SetCorrTime(double time) {m_corr_time = time;}
     //! set Board Stack
     void SetBoardstack(double bs) {m_boardstack = bs;}
-    //void SetAdcVal(int ibin, int val) {m_adc_values[ibin] = val;}
-    //void SetTdcVal(int ibin, int val) {m_tdc_values[ibin] = val;}
+    void SetAdcVal(int ibin, int val) {m_adc_values[ibin] = val;}
+    void SetTdcVal(int ibin, int val) {m_tdc_values[ibin] = val;}
 
     ///--- Setters ---///
     //! set ID
@@ -164,8 +164,8 @@ namespace Belle2 {
     double m_boardstack;
     int m_flag;
     double m_q;
-    //int m_adc_values[128];
-    //int m_tdc_values[128];
+    int m_adc_values[3000];
+    int m_tdc_values[3000];
     int m_id;
     double m_int_before;
     double m_int_after;

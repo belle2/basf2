@@ -31,6 +31,7 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
   addParam("xOfCounter", m_xOfCounter, "x-position of trigger counter (cm)",  -0.6);
   addParam("yOfCounter", m_yOfCounter, "y-position of trigger counter (cm)", -13.25);
   addParam("zOfCounter", m_zOfCounter, "z-position of trigger counter (cm)",  17.3);
+  addParam("phiOfCounter", m_phiOfCounter, "phi-angle of trigger counter (deg)", 0.);
   addParam("wOfCounter", m_wOfCounter, "full-width  of trigger counter (cm)",  7.0);
   addParam("lOfCounter", m_lOfCounter, "full-length of trigger counter (cm)", 12.5);
   addParam("TOF", m_tof, "Tof=1(2): TOF from production point to trigger counter (IP) is subtracted", 1);
@@ -71,17 +72,22 @@ void CDCCosmicSelectorModule::event()
     if (abs(m_P->getPDG()) != 13) B2FATAL("Not muon !");
 
     const TVector3 vertex = m_P->getProductionVertex();
-    const double vX = vertex.X();
-    const double vY = vertex.Y();
+    const double vX0 = vertex.X();
+    const double vY0 = vertex.Y();
+    const double cosphi =  cos(m_phiOfCounter * M_PI / 180.);
+    const double sinphi =  sin(m_phiOfCounter * M_PI / 180.);
+    const double vX =  cosphi * vX0 + sinphi * vY0;
+    const double vY = -sinphi * vX0 + cosphi * vY0;
     const double vZ = vertex.Z();
 
     //    std::cout <<" "<< std::endl;
     //    std::cout <<"vr,vx,vy,yz= "<< sqrt(vX*vX + vY*vY) <<" "<<vX <<" "<< vY <<" "<< vZ << std::endl;
 
     const TVector3 momentum = m_P->getMomentum();
-    const TVector3 zeromom(0., 0., 0.);
-    const double pX = momentum.X();
-    const double pY = momentum.Y();
+    const double pX0 = momentum.X();
+    const double pY0 = momentum.Y();
+    const double pX =  cosphi * pX0 + sinphi * pY0;
+    const double pY = -sinphi * pX0 + cosphi * pY0;
     const double pZ = momentum.Z();
 
     double xi = -999.;
@@ -131,15 +137,15 @@ void CDCCosmicSelectorModule::event()
         double xi4cry = -999.;
         double yi4cry =    0.;
         double zi4cry = -999.;
-        if (pY != 0.) {
-          xi4cry = (0. - vY) * (pX / pY) + vX;
-          zi4cry = (0. - vY) * (pZ / pY) + vZ;
+        if (pY0 != 0.) {
+          xi4cry = (0. - vY0) * (pX0 / pY0) + vX0;
+          zi4cry = (0. - vY0) * (pZ  / pY0) + vZ;
         } else {
           xi4cry = 0.;
-          zi4cry = -vX * (pZ / pX) + vZ;
+          zi4cry = -vX0 * (pZ / pX0) + vZ;
         }
 
-        const double fl4cry = sqrt((xi4cry - vX) * (xi4cry - vX) + (yi4cry - vY) * (yi4cry - vY) + (zi4cry - vZ) *
+        const double fl4cry = sqrt((xi4cry - vX0) * (xi4cry - vX0) + (yi4cry - vY0) * (yi4cry - vY0) + (zi4cry - vZ) *
                                    (zi4cry - vZ)); // fl to y=0 plane
 
         //reset production time (to the time which old CRY set) once
@@ -153,7 +159,7 @@ void CDCCosmicSelectorModule::event()
       //better to use condition in basf2...
     } else {
       m_P->setMomentum(-1. * momentum);
-      //      m_P->setMomentum(zeromom);
+      setReturnValue(false);
     }
 
   } // end loop over SimHits.

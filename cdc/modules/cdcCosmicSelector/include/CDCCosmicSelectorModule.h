@@ -41,6 +41,7 @@ namespace Belle2 {
     double m_xOfCounter;   /**< x-pos. of counter (cm) */
     double m_yOfCounter;   /**< y-pos. of counter (cm) */
     double m_zOfCounter;   /**< z-pos. of counter (cm) */
+    double m_phiOfCounter; /**< phi-angle of counter (deg) */
     double m_wOfCounter;   /**< full-width  of counter (cm) */
     double m_lOfCounter;   /**< full-length of counter (cm) */
     int    m_tof;          /**< tof option */

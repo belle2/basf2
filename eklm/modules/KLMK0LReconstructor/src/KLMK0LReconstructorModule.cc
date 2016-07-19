@@ -36,6 +36,9 @@ KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module()
   addParam("PositionMode", m_PositionModeString,
            "Vertex position calculation mode ('FullAverage' or 'FirstLayer').",
            std::string("FullAverage"));
+  addParam("ClusterMode", m_ClusterModeString,
+           "Clusterization mode ('AnyHit' or 'FirstHit').",
+           std::string("AnyHit"));
 }
 
 KLMK0LReconstructorModule::~KLMK0LReconstructorModule()
@@ -58,7 +61,13 @@ void KLMK0LReconstructorModule::initialize()
   else if (m_PositionModeString == "FirstLayer")
     m_PositionMode = c_FirstLayer;
   else
-    B2FATAL("Incorrect PositionMode agrument.");
+    B2FATAL("Incorrect PositionMode argument.");
+  if (m_ClusterModeString == "AnyHit")
+    m_ClusterMode = c_AnyHit;
+  else if (m_ClusterModeString == "FirstHit")
+    m_ClusterMode = c_FirstHit;
+  else
+    B2FATAL("Incorrect ClusterMode argument.");
 }
 
 void KLMK0LReconstructorModule::beginRun()
@@ -112,14 +121,26 @@ void KLMK0LReconstructorModule::event()
     it = klmHit2ds.erase(it);
     while (it != klmHit2ds.end()) {
       it2 = klmClusterHits.begin();
-      while (it2 != klmClusterHits.end()) {
-        if ((*it)->getPosition().Angle((*it2)->getPosition()) <
-            m_ClusteringAngle) {
-          klmClusterHits.push_back(*it);
-          it = klmHit2ds.erase(it);
-          goto clusterFound;
-        } else
-          ++it2;
+      switch (m_ClusterMode) {
+        case c_AnyHit:
+          while (it2 != klmClusterHits.end()) {
+            if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+                m_ClusteringAngle) {
+              klmClusterHits.push_back(*it);
+              it = klmHit2ds.erase(it);
+              goto clusterFound;
+            } else
+              ++it2;
+          }
+          break;
+        case c_FirstHit:
+          if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+              m_ClusteringAngle) {
+            klmClusterHits.push_back(*it);
+            it = klmHit2ds.erase(it);
+            goto clusterFound;
+          }
+          break;
       }
       ++it;
 clusterFound:;

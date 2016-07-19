@@ -32,6 +32,14 @@ namespace Belle2 {
       c_FirstLayer,  /**< First layer only. */
     };
 
+    /**
+     * Clusterization mode.
+     */
+    enum ClusterMode {
+      c_AnyHit,   /**< Angle from any hit. */
+      c_FirstHit, /**< Angle from first hit. */
+    };
+
   public:
 
     /**
@@ -82,6 +90,12 @@ namespace Belle2 {
 
     /** Vertex position calculation mode. */
     enum PositionMode m_PositionMode;
+
+    /** Clusterization mode. */
+    std::string m_ClusterModeString;
+
+    /** Clusterization mode. */
+    enum ClusterMode m_ClusterMode;
 
   };
 

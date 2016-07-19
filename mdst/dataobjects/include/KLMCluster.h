@@ -181,7 +181,7 @@ namespace Belle2 {
     float m_errorP;
 
     /** Needed to make objects storable. */
-    ClassDef(Belle2::KLMCluster, 1);
+    ClassDef(Belle2::KLMCluster, 2);
 
   };
 

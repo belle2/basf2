@@ -268,8 +268,10 @@ void KLMClusterEfficiencyModule::event()
         m_ReconstructedKL01Cluster[2]++;
       RelationVector<MCParticle> mcParticles2 =
         kl0Clusters[0]->getRelationsTo<MCParticle>();
-      if (mcParticles2.size() == 1)
-        m_ExactlyReconstructedKL0++;
+      if (mcParticles2.size() == 1) {
+        if (mcParticles2.weight(0) == 1)
+          m_ExactlyReconstructedKL0++;
+      }
     } else if (n2 == 2) {
       RelationVector<BKLMHit2d> bklmHit2ds1 =
         kl0Clusters[0]->getRelationsTo<BKLMHit2d>();

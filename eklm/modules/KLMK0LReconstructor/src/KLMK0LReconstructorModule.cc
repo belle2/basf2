@@ -11,6 +11,9 @@
 /* C++ headers. */
 #include <algorithm>
 
+/* External headers. */
+#include <TDatabasePDG.h>
+
 /* Belle2 headers. */
 #include <bklm/dbobjects/BKLMGeometryPar.h>
 #include <framework/datastore/RelationArray.h>
@@ -60,10 +63,12 @@ static bool compareDistance(KLMHit2d* hit1, KLMHit2d* hit2)
 
 void KLMK0LReconstructorModule::event()
 {
+  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
   int i, n, nLayers, innermostLayer;
   int nLayersBKLM = NLAYER, nLayersEKLM;
   int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
+  double p, e, v;
   StoreArray<KLMCluster> klmClusters;
   StoreArray<BKLMHit2d> bklmHit2ds;
   StoreArray<EKLMHit2d> eklmHit2ds;
@@ -119,6 +124,7 @@ clusterFound:;
       layerHitsEKLM[i] = 0;
     nLayers = 0;
     innermostLayer = -1;
+    /* Find minimal time, fill layer array, find hit position. */
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       hitPos = hitPos + (*it)->getPosition();
       if (minTime < 0 || (*it)->getTime() < minTime)
@@ -129,6 +135,7 @@ clusterFound:;
         layerHitsEKLM[(*it)->getLayer() - 1]++;
     }
     hitPos = hitPos * (1.0 / klmClusterHits.size());
+    /* Find innermost layer. */
     for (i = 0; i < nLayersBKLM; i++) {
       if (layerHitsBKLM[i] > 0) {
         nLayers++;
@@ -143,9 +150,25 @@ clusterFound:;
           innermostLayer = i + 1;
       }
     }
+    /* Calculate energy. */
+    it = klmClusterHits.begin();
+    if ((*it)->inBKLM()) {
+      /*
+       * TODO: The constant is from BKLM K0L reconstructor,
+       * it must be recalculated.
+       */
+      p = klmClusterHits.size() * 0.215;
+      e = sqrt(p * p + mass * mass);
+    } else {
+      v = hitPos.Mag() / minTime / Const::speedOfLight;
+      if (v < 0.999999)
+        e = mass / sqrt(1.0 - v * v);
+      else
+        e = 0;
+    }
     klmCluster = klmClusters.appendNew(
                    hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
-                   innermostLayer, 0);
+                   innermostLayer, e);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       if ((*it)->inBKLM())
         klmCluster->addRelationTo((*it)->getBKLMHit2d());

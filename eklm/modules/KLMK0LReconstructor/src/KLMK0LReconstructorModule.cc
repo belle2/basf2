@@ -35,7 +35,7 @@ KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module()
            0.26);
   addParam("PositionMode", m_PositionModeString,
            "Vertex position calculation mode ('FullAverage' or 'FirstLayer').",
-           std::string("FullAverage"));
+           std::string("FirstLayer"));
   addParam("ClusterMode", m_ClusterModeString,
            "Clusterization mode ('AnyHit' or 'FirstHit').",
            std::string("AnyHit"));

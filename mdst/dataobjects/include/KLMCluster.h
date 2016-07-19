@@ -99,13 +99,6 @@ namespace Belle2 {
     { return TLorentzVector(m_pX, m_pY, m_pZ, m_e);}
 
     /**
-     * Get ECL flag.
-     * @return ECL flag.
-     */
-    bool getAssociatedEclClusterFlag() const
-    {return m_eclClusterFound;}
-
-    /**
      * Get KLM cluster momentum error matrix.
      * @return 7x7 KLM cluster momentum error matrix.
      */
@@ -113,23 +106,16 @@ namespace Belle2 {
     {return m_momentumErrorMatrix;}
 
     /**
-     * Get track flag.
-     * @return Track flag.
+     * Check for associated ECL clusters.
+     * @return True if associated ECL clusters exist.
      */
-    bool getAssociatedTrackFlag() const
-    {return m_trackFound;}
+    bool getAssociatedEclClusterFlag() const;
 
     /**
-     * Set ecl connected cluster flag.
+     * Check for associated tracks.
+     * @return True if associated tracks exist.
      */
-    inline void setAssociatedEclClusterFlag()
-    {m_eclClusterFound = true;}
-
-    /**
-     * Set connected track flag.
-     */
-    inline void setAssociatedTrackFlag()
-    {m_trackFound = true;}
+    bool getAssociatedTrackFlag() const;
 
   private:
 
@@ -169,12 +155,6 @@ namespace Belle2 {
 
     /** error matrix 7x7 for KL momentum */
     TMatrixFSym m_momentumErrorMatrix;
-
-    /** True if associated track is found */
-    bool m_trackFound;
-
-    /** True if associated ECL cluster is found */
-    bool m_eclClusterFound;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::KLMCluster, 1);

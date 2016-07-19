@@ -295,7 +295,7 @@ void MuidModule::initialize()
       }
     }
     if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation");
-    }
+  }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
     B2INFO("Muid hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
@@ -464,7 +464,6 @@ void MuidModule::event()
                                    klmClusters[c]->getClusterPosition().Z());
         if (position.angle(clusterDirection) < m_MaxClusterTrackConeAngle) {
           if (trackClusterSeparations[c]->getTrackIndex() == int(trackIndex)) {
-            klmClusters[c]->setAssociatedTrackFlag();
             b2track.addRelationTo(klmClusters[c]);
             break;
           }
@@ -623,7 +622,8 @@ void MuidModule::getStartPoint(RecoTrack* recoTrack, const genfit::AbsTrackRep* 
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what());
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " <<
+              e.what());
     // Do not extrapolate this track by forcing minPt cut to fail in caller
     momentum.setX(0.0);
     momentum.setY(0.0);

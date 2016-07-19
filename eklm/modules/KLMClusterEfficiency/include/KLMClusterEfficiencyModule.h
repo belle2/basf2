@@ -128,6 +128,12 @@ namespace Belle2 {
     int m_ReconstructedKL01Cluster[3];
 
     /**
+     * Number of K_L0 reconstructed as 1 cluster, and this cluster should be
+     * related only to 1 (K_L0 ) MCParticle.
+     */
+    int m_ExactlyReconstructedKL0;
+
+    /**
      * Number of K_L0 reconstructed as 2 clusters in (2 * BKLM,
      * BKLM + BKLM/EKLM, BKLM + EKLM, 2 * BKLM/EKLM,
      * BKLM/EKLM + EKLM, 2 * EKLM).

@@ -51,6 +51,7 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
   m_NonreconstructedKL0 = 0;
   for (i = 0; i < 3; i++)
     m_ReconstructedKL01Cluster[i] = 0;
+  m_ExactlyReconstructedKL0 = 0;
   for (i = 0; i < 6; i++)
     m_ReconstructedKL02Clusters[i] = 0;
   m_ReconstructedKL03Clusters = 0;
@@ -265,6 +266,10 @@ void KLMClusterEfficiencyModule::event()
           m_ReconstructedKL01Cluster[0]++;
       } else if (es1 > 0)
         m_ReconstructedKL01Cluster[2]++;
+      RelationVector<MCParticle> mcParticles2 =
+        kl0Clusters[0]->getRelationsTo<MCParticle>();
+      if (mcParticles2.size() == 1)
+        m_ExactlyReconstructedKL0++;
     } else if (n2 == 2) {
       RelationVector<BKLMHit2d> bklmHit2ds1 =
         kl0Clusters[0]->getRelationsTo<BKLMHit2d>();
@@ -364,6 +369,8 @@ void KLMClusterEfficiencyModule::terminate()
          m_ReconstructedKL01Cluster[1]);
   B2INFO("K_L0 reconstructed as 1 cluster (EKLM): " <<
          m_ReconstructedKL01Cluster[2]);
+  B2INFO("K_L0 reconstructed as 1 cluster (exact reconstruction): " <<
+         m_ExactlyReconstructedKL0);
   B2INFO("K_L0 reconstructed as 2 clusters (total): " << rec2Clusters);
   B2INFO("K_L0 reconstructed as 2 clusters (2 * BKLM): " <<
          m_ReconstructedKL02Clusters[0]);

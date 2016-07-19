@@ -19,7 +19,7 @@ REG_MODULE(DoubleCalPulseCalib);
 
 DoubleCalPulseCalibModule::DoubleCalPulseCalibModule() : Module()
 {
-  setDescription("This module adjusts the timing of itop hits by searhing for a double calibration pulse in channel 7 of each asic.");
+  setDescription("This module adjusts the timing of itop hits by searching for a double calibration pulse in channel 7 of each asic.");
 
   addParam("calibrationChannel", m_cal_ch, "Channel in each ASIC that holds the calibration pulse", 7);
   addParam("calibrationTimeMin", m_tmin, "Earliest time to look for a calibration pulse", 0.);

@@ -163,7 +163,7 @@ static void findAssociatedHits(struct HitData* hit,
   static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
   int i, n;
   int layerHits[14], nLayers;
-  float e, de;
+  float e, de, p;
   std::vector<struct HitData*> cluster;
   std::vector<struct HitData*>::iterator itClust;
   std::vector<EKLMHit2d*>::iterator itHit;
@@ -227,9 +227,9 @@ static void findAssociatedHits(struct HitData* hit,
   /* Calculate energy. */
   v = hitPos.mag() / mt / Const::speedOfLight;
   if (v < 0.999999)
-    e = mass / sqrt(1.0 - v * v);
+    p = mass * v / sqrt(1.0 - v * v);
   else
-    e = 0;
+    p = 0;
   /* Set the status of hit. */
   if (cluster.size() == 1) {
     hit->stat = c_Isolated;
@@ -240,7 +240,7 @@ static void findAssociatedHits(struct HitData* hit,
   StoreArray<KLMCluster> klmClusters;
   klmCluster = klmClusters.appendNew(
                  hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers,
-                 nInnermostLayer, e);
+                 nInnermostLayer, p);
   /* Fill cluster-hit relation array */
   StoreArray<EKLMHit2d> hits2d;
   for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust) {

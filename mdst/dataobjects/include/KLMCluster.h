@@ -57,10 +57,10 @@ namespace Belle2 {
      * @param[in] time            Decay (interaction) time.
      * @param[in] nLayers         Number of layers with signal.
      * @param[in] nInnermostLayer First layer.
-     * @param[in] e               Energy.
+     * @param[in] p               Absolute value of 3-momentum.
      */
     KLMCluster(float x, float y, float z, float time, int nLayers,
-               int nInnermostLayer, float e);
+               int nInnermostLayer, float p);
 
     /**
      * Destructor.
@@ -105,11 +105,16 @@ namespace Belle2 {
     {return TVector3(0, 0, 0);}
 
     /**
+     * Get momentum magnitude.
+     * @return Absolute value of 3-momentum.
+     */
+    float getMomentumMag() const;
+
+    /**
      * Get energy.
      * @return Full energy.
      */
-    inline float getEnergy() const
-    {return m_e;}
+    float getEnergy() const;
 
     /**
      * Get momentum.
@@ -156,8 +161,8 @@ namespace Belle2 {
     /** Global position Z coordinate. */
     float m_globalZ;
 
-    /** Energy. */
-    float m_e;
+    /** Absolute value of momentum, 0 means unknown. */
+    float m_p;
 
     /** error matrix 7x7 for KL momentum */
     TMatrixFSym m_momentumErrorMatrix;

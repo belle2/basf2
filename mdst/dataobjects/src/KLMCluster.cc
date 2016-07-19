@@ -19,7 +19,7 @@
 using namespace Belle2;
 
 KLMCluster::KLMCluster() : m_time(0), m_layers(0), m_innermostLayer(0),
-  m_globalX(0), m_globalY(0), m_globalZ(0), m_e(0),
+  m_globalX(0), m_globalY(0), m_globalZ(0), m_p(0),
   m_momentumErrorMatrix(7)
 {
 }
@@ -27,17 +27,16 @@ KLMCluster::KLMCluster() : m_time(0), m_layers(0), m_innermostLayer(0),
 KLMCluster::KLMCluster(float x, float y, float z, float time, int nLayers,
                        int nInnermostLayer, float px, float py, float pz) :
   m_time(time), m_layers(nLayers), m_innermostLayer(nInnermostLayer),
-  m_globalX(x), m_globalY(y), m_globalZ(z), m_e(0),
+  m_globalX(x), m_globalY(y), m_globalZ(z),
   m_momentumErrorMatrix(7)
 {
-  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
-  m_e = sqrt(px * px + py * py + pz * pz + mass * mass);
+  m_p = sqrt(px * px + py * py + pz * pz);
 }
 
 KLMCluster::KLMCluster(float x, float y, float z, float time, int nLayers,
-                       int nInnermostLayer, float e) :
+                       int nInnermostLayer, float p) :
   m_time(time), m_layers(nLayers), m_innermostLayer(nInnermostLayer),
-  m_globalX(x), m_globalY(y), m_globalZ(z), m_e(e),
+  m_globalX(x), m_globalY(y), m_globalZ(z), m_p(p),
   m_momentumErrorMatrix(7)
 {
 }
@@ -46,17 +45,23 @@ KLMCluster::~KLMCluster()
 {
 }
 
+float KLMCluster::getMomentumMag() const
+{
+  return m_p;
+}
+
+float KLMCluster::getEnergy() const
+{
+  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
+  return sqrt(mass * mass + m_p * m_p);
+}
+
 TLorentzVector KLMCluster::getMomentum() const
 {
   static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
-  double pMag;
   TVector3 p3(m_globalX, m_globalY, m_globalZ);
-  if (m_e > mass)
-    pMag = sqrt(m_e * m_e - mass * mass);
-  else
-    pMag = 0;
-  p3 = p3.Unit() * pMag;
-  return TLorentzVector(p3, m_e);
+  p3 = p3.Unit() * m_p;
+  return TLorentzVector(p3, getEnergy());
 }
 
 bool KLMCluster::getAssociatedEclClusterFlag() const

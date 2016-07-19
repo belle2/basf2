@@ -32,7 +32,7 @@ KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module()
   setDescription("EKLM K0L reconstruction module.");
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("ClusteringAngle", m_ClusteringAngle, "Clustering angle (rad).",
-           0.1);
+           0.26);
 }
 
 KLMK0LReconstructorModule::~KLMK0LReconstructorModule()

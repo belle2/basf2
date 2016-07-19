@@ -111,8 +111,6 @@ AddedToExistingCluster: ;
       pos += hit2ds[clusterIndices[j][k]]->getGlobalPosition();
     }
     pos *= (1.0 / nHits);
-    TVector3 mom = hit2ds[clusterIndices[j][innermost]]->getGlobalPosition().Unit()
-                   * nHits * HITS_TO_GEV;
     int nlayers = 0;
     for (int layer = 1; layer <= NLAYER; ++layer) { nlayers += layers[layer]; }
     KLMCluster* cluster =
@@ -120,7 +118,7 @@ AddedToExistingCluster: ;
                             hit2ds[clusterIndices[j][innermost]]->getTime(),
                             nlayers,
                             hit2ds[clusterIndices[j][innermost]]->getLayer(),
-                            mom.x(), mom.y(), mom.z());
+                            nHits * HITS_TO_GEV);
     for (unsigned int k = 0; k < nHits; ++k) {
       cluster->addRelationTo(hit2ds[clusterIndices[j][k]]);
     }

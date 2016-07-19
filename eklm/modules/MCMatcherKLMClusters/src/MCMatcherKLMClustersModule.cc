@@ -62,9 +62,10 @@ void MCMatcherKLMClustersModule::beginRun()
 void MCMatcherKLMClustersModule::event()
 {
   StoreArray<KLMCluster> klmClusters;
+  double weightSum;
   int i1, i2, i3, i4, i5, i6, n1, n2, n3, n4, n5, n6;
-  std::set<MCParticle*> mcParticles, mcParticlesHit;
-  std::set<MCParticle*>::iterator it;
+  std::map<MCParticle*, double> mcParticles, mcParticlesHit;
+  std::map<MCParticle*, double>::iterator it;
   n1 = klmClusters.getEntries();
   for (i1 = 0; i1 < n1; i1++) {
     mcParticles.clear();
@@ -90,16 +91,34 @@ void MCMatcherKLMClustersModule::event()
               bklmSimHits[i5]->getRelationsFrom<MCParticle>();
             n6 = bklmMCParticles.size();
             for (i6 = 0; i6 < n6; i6++) {
-              mcParticles.insert(bklmMCParticles[i6]);
-              if (m_Hit2dRelations)
-                mcParticlesHit.insert(bklmMCParticles[i6]);
+              it = mcParticles.find(bklmMCParticles[i6]);
+              if (it == mcParticles.end()) {
+                mcParticles.insert(std::pair<MCParticle*, double>(
+                                     bklmMCParticles[i6],
+                                     bklmSimHits[i5]->getEDep()));
+              } else {
+                it->second = it->second + bklmSimHits[i5]->getEDep();
+              }
+              if (m_Hit2dRelations) {
+                it = mcParticlesHit.find(bklmMCParticles[i6]);
+                if (it == mcParticlesHit.end()) {
+                  mcParticlesHit.insert(std::pair<MCParticle*, double>(
+                                          bklmMCParticles[i6],
+                                          bklmSimHits[i5]->getEDep()));
+                } else {
+                  it->second = it->second + bklmSimHits[i5]->getEDep();
+                }
+              }
             }
           }
         }
       }
       if (m_Hit2dRelations) {
+        weightSum = 0;
         for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          bklmHit2ds[i2]->addRelationTo(*it);
+          weightSum = weightSum + it->second;
+        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
+          bklmHit2ds[i2]->addRelationTo(it->first, it->second / weightSum);
       }
     }
     RelationVector<EKLMHit2d> eklmHit2ds =
@@ -120,19 +139,40 @@ void MCMatcherKLMClustersModule::event()
             eklmSimHits[i4]->getRelationsFrom<MCParticle>();
           n5 = eklmMCParticles.size();
           for (i5 = 0; i5 < n5; i5++) {
-            mcParticles.insert(eklmMCParticles[i5]);
-            if (m_Hit2dRelations)
-              mcParticlesHit.insert(eklmMCParticles[i5]);
+            it = mcParticles.find(eklmMCParticles[i5]);
+            if (it == mcParticles.end()) {
+              mcParticles.insert(std::pair<MCParticle*, double>(
+                                   eklmMCParticles[i5],
+                                   eklmSimHits[i4]->getEDep()));
+            } else {
+              it->second = it->second + eklmSimHits[i4]->getEDep();
+            }
+            if (m_Hit2dRelations) {
+              it = mcParticlesHit.find(eklmMCParticles[i5]);
+              if (it == mcParticlesHit.end()) {
+                mcParticlesHit.insert(std::pair<MCParticle*, double>(
+                                        eklmMCParticles[i5],
+                                        eklmSimHits[i4]->getEDep()));
+              } else {
+                it->second = it->second + eklmSimHits[i4]->getEDep();
+              }
+            }
           }
         }
       }
       if (m_Hit2dRelations) {
+        weightSum = 0;
         for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
-          eklmHit2ds[i2]->addRelationTo(*it);
+          weightSum = weightSum + it->second;
+        for (it = mcParticlesHit.begin(); it != mcParticlesHit.end(); ++it)
+          eklmHit2ds[i2]->addRelationTo(it->first, it->second / weightSum);
       }
     }
+    weightSum = 0;
     for (it = mcParticles.begin(); it != mcParticles.end(); ++it)
-      klmClusters[i1]->addRelationTo(*it);
+      weightSum = weightSum + it->second;
+    for (it = mcParticles.begin(); it != mcParticles.end(); ++it)
+      klmClusters[i1]->addRelationTo(it->first, it->second / weightSum);
   }
 }
 

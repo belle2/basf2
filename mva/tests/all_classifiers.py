@@ -8,8 +8,14 @@ import basf2_mva
 import os
 import tempfile
 import subprocess
+import sys
+
 
 if __name__ == "__main__":
+
+    # Skip test if files are not available
+    if not (os.path.isfile('train.root') and os.path.isfile('test.root')):
+        sys.exit(0)
 
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
@@ -26,7 +32,8 @@ if __name__ == "__main__":
 
     olddir = os.getcwd()
     tempdir = tempfile.mkdtemp()
-    os.symlink(os.path.abspath(general_options.m_datafiles[0]), tempdir + '/' + os.path.basename(general_options.m_datafiles[0]))
+    os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
+    os.symlink(os.path.abspath('test.root'), tempdir + '/' + os.path.basename('test.root'))
     os.chdir(tempdir)
 
     for identifier, specific_options in methods:
@@ -36,4 +43,4 @@ if __name__ == "__main__":
     basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
                      basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
-    subprocess.call('basf2_mva_evaluate.py -d train.root -i ' + ' '.join([i for i, _ in methods]), shell=True)
+    subprocess.call('basf2_mva_evaluate.py -train train.root -test test.root -i ' + ' '.join([i for i, _ in methods]), shell=True)

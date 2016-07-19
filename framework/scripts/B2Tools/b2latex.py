@@ -311,13 +311,14 @@ class LongTable(LatexObject):
         #: python-style format-string used to generate a new row out of a given dictionary.
         self.format_string = format_string
 
-    def add(self, **kwargs):
+    def add(self, *args, **kwargs):
         """
         Add a new row to the longtable by generating the row using the format_string given in init
         and the provided dictionary.
+            @param args positional arguments used to generate the row using the python-style format string.
             @param kwargs dictionary used to generate the row using the python-style format-string.
         """
-        self.output += self.format_string.format(**kwargs) + r"\\" + '\n'
+        self.output += self.format_string.format(*args, **kwargs) + r"\\" + '\n'
         return self
 
     def finish(self, tail=''):

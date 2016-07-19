@@ -18,6 +18,8 @@ def _from_ntuple(ntuple, probability, truth, nbins=100):
     ntuple.Project('ROCbackground', probability, '!' + truth)
     ntuple.Project('ROCsignal', probability, truth)
     _from_hists(signalHist, bckgrdHist)
+    signalHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = signalHist
+    bckgrdHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = bckgrdHist
     return signalHist, bckgrdHist
 
 

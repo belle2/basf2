@@ -27,6 +27,7 @@ def _from_hists(signalHist, bckgrdHist):
         yerr.append(utility.purityError(nSignal, nBckgrd) * 100)
 
     rocgraph = ROOT.TGraphErrors(len(x), x, y, xerr, yerr)
+    rocgraph.ROOT_OBJECT_OWNERSHIP_WORKAROUND = rocgraph
     return rocgraph
 
 
@@ -46,6 +47,7 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
 
     legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
 
+    mg = ROOT.TMultiGraph()
     color = 1
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         rocgraph = _from_ntuple(ntuple, probability, truth, nbins)
@@ -60,8 +62,10 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
         rocgraph.GetXaxis().SetLabelSize(0.05)
         rocgraph.GetYaxis().SetTitleSize(0.05)
         rocgraph.GetYaxis().SetLabelSize(0.05)
-        rocgraph.Draw('ALPZ')
+        mg.Add(rocgraph)
         legend.AddEntry(rocgraph, label, "lep")
+
+    mg.Draw('ALPZ')
     legend.Draw()
 
     canvas.SaveAs(outputfilename)

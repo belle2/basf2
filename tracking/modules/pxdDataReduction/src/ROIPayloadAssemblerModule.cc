@@ -195,27 +195,6 @@ void ROIPayloadAssemblerModule::event()
 
   }
 
-  tmpDHHID = -1;
-
-  for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw) {
-
-    if ((int) itOrderedROIraw->getDHHID() == tmpDHHID)
-      countROIs ++;
-    else
-      countROIs = 0;
-
-    if (countROIs < 32) {
-      //      payload->addROIraw(*itOrderedROIraw);
-      payload->addROIraw(itOrderedROIraw->getBigEndian());
-      addROI++;
-    } else
-      B2ERROR("A ROI on DHHID " << itOrderedROIraw->getDHHID() << endl <<
-              " is rejected because the max number of ROIs per pxd sensor per event (32) was exceeded.");
-
-    tmpDHHID = itOrderedROIraw->getDHHID();
-
-  }
-
   for (itOrderedROIraw = orderedROIraw.begin(); itOrderedROIraw != orderedROIraw.end(); ++itOrderedROIraw)
     B2DEBUG(1, "ordered DHHID: " << itOrderedROIraw->getDHHID());
 

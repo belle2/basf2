@@ -35,12 +35,16 @@ KLMClusterEfficiencyModule::KLMClusterEfficiencyModule() : Module()
 {
   int i;
   setDescription("Module for KLM cluster reconstruction efficiency studies.");
+  addParam("SaveClusterData", m_SaveClusterData,
+           "Whether to save cluster data or not.", false);
+  addParam("SaveReconstructionData", m_SaveReconstructionData,
+           "Whether to save reconstruction data or not.", true);
   addParam("OutputFile", m_OutputFileName, "Output file.",
            std::string("KLMClusterEfficiency.root"));
   addParam("EventsClusterHistograms", m_EventsClusterHistograms,
            "Draw cluster histograms for this number of events.", 0);
   m_OutputFile = NULL;
-  m_OutputTree = NULL;
+  m_ClusterTree = NULL;
   m_KL0Clusters = 0;
   m_PartlyKL0Clusters = 0;
   m_OtherClusters = 0;
@@ -58,18 +62,41 @@ KLMClusterEfficiencyModule::~KLMClusterEfficiencyModule()
 
 void KLMClusterEfficiencyModule::initialize()
 {
-  m_OutputFile = new TFile(m_OutputFileName.c_str(), "recreate");
-  m_OutputTree = new TTree("klm_cluster", "");
-  m_OutputTree->Branch("DecayVertexX", &m_DecayVertexX, "DecayVertexX/F");
-  m_OutputTree->Branch("DecayVertexY", &m_DecayVertexY, "DecayVertexY/F");
-  m_OutputTree->Branch("DecayVertexZ", &m_DecayVertexZ, "DecayVertexZ/F");
-  m_OutputTree->Branch("MaxDecayVertexHitAngle", &m_MaxDecayVertexHitAngle,
-                       "MaxDecayVertexHitAngle/F");
-  m_OutputTree->Branch("ClusterX", &m_ClusterX, "ClusterX/F");
-  m_OutputTree->Branch("ClusterY", &m_ClusterY, "ClusterY/F");
-  m_OutputTree->Branch("ClusterZ", &m_ClusterZ, "ClusterZ/F");
-  m_OutputTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
-                       "MaxClusterHitAngle/F");
+  if (m_SaveClusterData || m_SaveReconstructionData)
+    m_OutputFile = new TFile(m_OutputFileName.c_str(), "recreate");
+  if (m_SaveClusterData) {
+    m_ClusterTree = new TTree("klm_cluster", "");
+    m_ClusterTree->Branch("DecayVertexX", &m_DecayVertexX, "DecayVertexX/F");
+    m_ClusterTree->Branch("DecayVertexY", &m_DecayVertexY, "DecayVertexY/F");
+    m_ClusterTree->Branch("DecayVertexZ", &m_DecayVertexZ, "DecayVertexZ/F");
+    m_ClusterTree->Branch("MaxDecayVertexHitAngle", &m_MaxDecayVertexHitAngle,
+                          "MaxDecayVertexHitAngle/F");
+    m_ClusterTree->Branch("ClusterX", &m_ClusterX, "ClusterX/F");
+    m_ClusterTree->Branch("ClusterY", &m_ClusterY, "ClusterY/F");
+    m_ClusterTree->Branch("ClusterZ", &m_ClusterZ, "ClusterZ/F");
+    m_ClusterTree->Branch("MaxClusterHitAngle", &m_MaxClusterHitAngle,
+                          "MaxClusterHitAngle/F");
+  }
+  if (m_SaveReconstructionData) {
+    m_ReconstructionTree = new TTree("klm_reconstruction", "");
+    m_ReconstructionTree->Branch("KL0Clusters", &m_KL0Clusters,
+                                 "KL0Clusters/I");
+    m_ReconstructionTree->Branch("PartlyKL0Clusters", &m_PartlyKL0Clusters,
+                                 "PartlyKL0Clusters/I");
+    m_ReconstructionTree->Branch("OtherClusters", &m_OtherClusters,
+                                 "OtherClusters/I");
+    m_ReconstructionTree->Branch("NonreconstructedKL0", &m_NonreconstructedKL0,
+                                 "NonreconstructedKL0/I");
+    m_ReconstructionTree->Branch("ReconstructedKL01Cluster",
+                                 &m_ReconstructedKL01Cluster,
+                                 "ReconstructedKL01Cluster[3]/I");
+    m_ReconstructionTree->Branch("ReconstructedKL02Clusters",
+                                 &m_ReconstructedKL02Clusters,
+                                 "ReconstructedKL02Clusters[6]/I");
+    m_ReconstructionTree->Branch("ReconstructedKL03Clusters",
+                                 &m_ReconstructedKL03Clusters,
+                                 "ReconstructedKL03Clusters/I");
+  }
   gStyle->SetOptStat(0);
 }
 
@@ -278,31 +305,33 @@ void KLMClusterEfficiencyModule::event()
       }
     } else if (n2 >= 3)
       m_ReconstructedKL03Clusters++;
-    for (i2 = 0; i2 < n2; i2++) {
-      clusterPosition = kl0Clusters[i2]->getClusterPosition();
-      m_ClusterX = clusterPosition.X();
-      m_ClusterY = clusterPosition.Y();
-      m_ClusterZ = clusterPosition.Z();
-      m_MaxClusterHitAngle = 0;
-      RelationVector<BKLMHit2d> bklmHit2ds =
-        kl0Clusters[i2]->getRelationsTo<BKLMHit2d>();
-      n3 = bklmHit2ds.size();
-      for (i3 = 0; i3 < n3; i3++) {
-        hitPosition = bklmHit2ds[i3]->getGlobalPosition();
-        angle = clusterPosition.Angle(hitPosition);
-        if (angle > m_MaxClusterHitAngle)
-          m_MaxClusterHitAngle = angle;
+    if (m_SaveClusterData) {
+      for (i2 = 0; i2 < n2; i2++) {
+        clusterPosition = kl0Clusters[i2]->getClusterPosition();
+        m_ClusterX = clusterPosition.X();
+        m_ClusterY = clusterPosition.Y();
+        m_ClusterZ = clusterPosition.Z();
+        m_MaxClusterHitAngle = 0;
+        RelationVector<BKLMHit2d> bklmHit2ds =
+          kl0Clusters[i2]->getRelationsTo<BKLMHit2d>();
+        n3 = bklmHit2ds.size();
+        for (i3 = 0; i3 < n3; i3++) {
+          hitPosition = bklmHit2ds[i3]->getGlobalPosition();
+          angle = clusterPosition.Angle(hitPosition);
+          if (angle > m_MaxClusterHitAngle)
+            m_MaxClusterHitAngle = angle;
+        }
+        RelationVector<EKLMHit2d> eklmHit2ds =
+          kl0Clusters[i2]->getRelationsTo<EKLMHit2d>();
+        n3 = eklmHit2ds.size();
+        for (i3 = 0; i3 < n3; i3++) {
+          hitPosition = eklmHit2ds[i3]->getPosition();
+          angle = clusterPosition.Angle(hitPosition);
+          if (angle > m_MaxClusterHitAngle)
+            m_MaxClusterHitAngle = angle;
+        }
+        m_ClusterTree->Fill();
       }
-      RelationVector<EKLMHit2d> eklmHit2ds =
-        kl0Clusters[i2]->getRelationsTo<EKLMHit2d>();
-      n3 = eklmHit2ds.size();
-      for (i3 = 0; i3 < n3; i3++) {
-        hitPosition = eklmHit2ds[i3]->getPosition();
-        angle = clusterPosition.Angle(hitPosition);
-        if (angle > m_MaxClusterHitAngle)
-          m_MaxClusterHitAngle = angle;
-      }
-      m_OutputTree->Fill();
     }
   }
 }
@@ -350,9 +379,18 @@ void KLMClusterEfficiencyModule::terminate()
          m_ReconstructedKL02Clusters[5]);
   B2INFO("K_L0 reconstructed as 3 or more clusters: " <<
          m_ReconstructedKL03Clusters);
-  m_OutputFile->cd();
-  m_OutputTree->Write();
-  delete m_OutputTree;
-  delete m_OutputFile;
+  if (m_SaveReconstructionData) {
+    m_ReconstructionTree->Fill();
+    m_OutputFile->cd();
+    m_ReconstructionTree->Write();
+    delete m_ReconstructionTree;
+  }
+  if (m_SaveClusterData) {
+    m_OutputFile->cd();
+    m_ClusterTree->Write();
+    delete m_ClusterTree;
+  }
+  if (m_SaveClusterData || m_SaveReconstructionData)
+    delete m_OutputFile;
 }
 

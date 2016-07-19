@@ -64,6 +64,12 @@ namespace Belle2 {
 
   private:
 
+    /** Whether to save cluster data or not. */
+    bool m_SaveClusterData;
+
+    /** Whether to save reconstruction data or not. */
+    bool m_SaveReconstructionData;
+
     /** Output file name. */
     std::string m_OutputFileName;
 
@@ -73,8 +79,11 @@ namespace Belle2 {
     /** Output file. */
     TFile* m_OutputFile;
 
-    /** Output tree. */
-    TTree* m_OutputTree;
+    /** Cluster data tree. */
+    TTree* m_ClusterTree;
+
+    /** Reconstruction tree. */
+    TTree* m_ReconstructionTree;
 
     /** MCParticle decay vertex X coordinate. */
     float m_DecayVertexX;

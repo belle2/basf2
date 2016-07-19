@@ -249,11 +249,12 @@ CDCTriggerHoughtrackingModule::addNeighbors(const CDCTriggerHoughCand& center,
       B2DEBUG(120, "  " << candidates[icand].getID() << " already in list");
       continue;
     }
+    bool reject = inList(center, rejected);
     if (connected(center, candidates[icand])) {
       if (m_onlyLocalMax && candidates[icand].getSLcount() < nSLmax) {
         B2DEBUG(100, "  lower than highest SLcount, rejected");
         rejected.push_back(candidates[icand]);
-      } else if (m_onlyLocalMax && candidates[icand].getSLcount() > nSLmax) {
+      } else if (m_onlyLocalMax && !reject && candidates[icand].getSLcount() > nSLmax) {
         B2DEBUG(100, "  new highest SLcount, clearing list");
         nSLmax = candidates[icand].getSLcount();
         for (unsigned imerged = 0; imerged < merged.size(); ++imerged) {
@@ -264,6 +265,9 @@ CDCTriggerHoughtrackingModule::addNeighbors(const CDCTriggerHoughCand& center,
       } else if (m_onlyLocalMax && candidates[icand].getSLcount() > center.getSLcount()) {
         B2DEBUG(100, "  connected to rejected cell, skip");
         continue;
+      } else if (m_onlyLocalMax && reject) {
+        B2DEBUG(100, "  connected to rejected cell, rejected");
+        rejected.push_back(candidates[icand]);
       } else {
         B2DEBUG(100, "  connected");
         merged.push_back(candidates[icand]);

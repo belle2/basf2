@@ -25,15 +25,6 @@ KLMCluster::KLMCluster() : m_time(0), m_layers(0), m_innermostLayer(0),
 }
 
 KLMCluster::KLMCluster(float x, float y, float z, float time, int nLayers,
-                       int nInnermostLayer, float px, float py, float pz) :
-  m_time(time), m_layers(nLayers), m_innermostLayer(nInnermostLayer),
-  m_globalX(x), m_globalY(y), m_globalZ(z),
-  m_errorX(0), m_errorY(0), m_errorZ(0), m_errorP(0)
-{
-  m_p = sqrt(px * px + py * py + pz * pz);
-}
-
-KLMCluster::KLMCluster(float x, float y, float z, float time, int nLayers,
                        int nInnermostLayer, float p) :
   m_time(time), m_layers(nLayers), m_innermostLayer(nInnermostLayer),
   m_globalX(x), m_globalY(y), m_globalZ(z), m_p(p),

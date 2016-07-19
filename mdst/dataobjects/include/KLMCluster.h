@@ -41,21 +41,6 @@ namespace Belle2 {
      * @param[in] time            Decay (interaction) time.
      * @param[in] nLayers         Number of layers with signal.
      * @param[in] nInnermostLayer First layer.
-     * @param[in] px              Momentum X component.
-     * @param[in] py              Momentum Y component.
-     * @param[in] pz              Momentum Z component.
-     */
-    KLMCluster(float x, float y, float z, float time, int nLayers,
-               int nInnermostLayer, float px, float py, float pz);
-
-    /**
-     * Constructor.
-     * @param[in] x               Vertex X coordinate.
-     * @param[in] y               Vertex Y coordinate.
-     * @param[in] z               Vertex Z coordinate.
-     * @param[in] time            Decay (interaction) time.
-     * @param[in] nLayers         Number of layers with signal.
-     * @param[in] nInnermostLayer First layer.
      * @param[in] p               Absolute value of 3-momentum.
      */
     KLMCluster(float x, float y, float z, float time, int nLayers,

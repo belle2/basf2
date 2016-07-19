@@ -12,9 +12,8 @@
 #define KLMCLUSTER_H
 
 /* External headers. */
-#include <Math/Point3D.h>
 #include <TLorentzVector.h>
-#include <TMatrixFSym.h>
+#include <TMatrixDSym.h>
 #include <TVector3.h>
 
 /* Belle2 headers. */
@@ -124,10 +123,15 @@ namespace Belle2 {
 
     /**
      * Get KLM cluster momentum error matrix.
+     * @return 4x4 KLM cluster momentum error matrix.
+     */
+    TMatrixDSym getError4x4() const;
+
+    /**
+     * Get KLM cluster momentum error matrix.
      * @return 7x7 KLM cluster momentum error matrix.
      */
-    TMatrixFSym getErrorMatrix() const
-    {return m_momentumErrorMatrix;}
+    TMatrixDSym getError7x7() const;
 
     /**
      * Check for associated ECL clusters.
@@ -164,8 +168,17 @@ namespace Belle2 {
     /** Absolute value of momentum, 0 means unknown. */
     float m_p;
 
-    /** error matrix 7x7 for KL momentum */
-    TMatrixFSym m_momentumErrorMatrix;
+    /** Error of vertex X coordinate. */
+    float m_errorX;
+
+    /** Error of vertex Y coordinate. */
+    float m_errorY;
+
+    /** Error of vertex Z coordinate. */
+    float m_errorZ;
+
+    /** Error of momentum absolute value. */
+    float m_errorP;
 
     /** Needed to make objects storable. */
     ClassDef(Belle2::KLMCluster, 1);

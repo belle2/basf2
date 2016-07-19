@@ -37,13 +37,19 @@ particlegun.param('phiParams', [0, 360])
 # Geometry and Geant simulation
 paramloader = register_module('Gearbox')
 geometry = register_module('Geometry')
-geometry.param('components', ['EKLM'])
+geometry.param('components', ['BKLM', 'EKLM'])
 g4sim = register_module('FullSim')
 
-# EKLM Modules
+# BKLM modules.
+bklmDigitizer = register_module('BKLMDigitizer')
+bklmReconstructor = register_module('BKLMReconstructor')
+
+# EKLM modules.
 eklmDigitizer = register_module('EKLMDigitizer')
 eklmReconstructor = register_module('EKLMReconstructor')
-eklmK0LReconstructor = register_module('EKLMK0LReconstructor')
+
+# Common KLM modules.
+klmK0LReconstructor = register_module('KLMK0LReconstructor')
 mc_matcher = register_module('MCMatcherKLMClusters')
 
 # Output
@@ -60,9 +66,11 @@ main.add_module(paramloader)
 main.add_module(geometry)
 main.add_module(g4sim)
 
+main.add_module(bklmDigitizer)
 main.add_module(eklmDigitizer)
+main.add_module(bklmReconstructor)
 main.add_module(eklmReconstructor)
-main.add_module(eklmK0LReconstructor)
+main.add_module(klmK0LReconstructor)
 main.add_module(mc_matcher)
 
 main.add_module(output)

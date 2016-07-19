@@ -50,6 +50,19 @@ namespace Belle2 {
                int nInnermostLayer, float px, float py, float pz);
 
     /**
+     * Constructor.
+     * @param[in] x               Vertex X coordinate.
+     * @param[in] y               Vertex Y coordinate.
+     * @param[in] z               Vertex Z coordinate.
+     * @param[in] time            Decay (interaction) time.
+     * @param[in] nLayers         Number of layers with signal.
+     * @param[in] nInnermostLayer First layer.
+     * @param[in] e               Energy.
+     */
+    KLMCluster(float x, float y, float z, float time, int nLayers,
+               int nInnermostLayer, float e);
+
+    /**
      * Destructor.
      */
     ~KLMCluster();
@@ -95,8 +108,7 @@ namespace Belle2 {
      * Get momentum.
      * @return 4-Momentum.
      */
-    inline TLorentzVector getMomentum() const
-    { return TLorentzVector(m_pX, m_pY, m_pZ, m_e);}
+    TLorentzVector getMomentum() const;
 
     /**
      * Get KLM cluster momentum error matrix.
@@ -128,8 +140,6 @@ namespace Belle2 {
     /** Number of the innermost layer with hits. */
     int m_innermostLayer;
 
-    //the following is copied from  EKLMHitGlobalCoord.h
-
     /** Global position X coordinate. */
     float m_globalX;
 
@@ -139,19 +149,8 @@ namespace Belle2 {
     /** Global position Z coordinate. */
     float m_globalZ;
 
-    // the following is taken from EKLMHitMomentum.h
-
     /** Energy. */
     float m_e;
-
-    /** Momentum X component. */
-    float m_pX;
-
-    /** Momentum Y component. */
-    float m_pY;
-
-    /** Momentum Z component. */
-    float m_pZ;
 
     /** error matrix 7x7 for KL momentum */
     TMatrixFSym m_momentumErrorMatrix;

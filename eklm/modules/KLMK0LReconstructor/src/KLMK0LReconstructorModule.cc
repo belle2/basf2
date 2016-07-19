@@ -145,7 +145,7 @@ clusterFound:;
     }
     klmCluster = klmClusters.appendNew(
                    hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
-                   innermostLayer, 0, 0, 0);
+                   innermostLayer, 0);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
       if ((*it)->inBKLM())
         klmCluster->addRelationTo((*it)->getBKLMHit2d());

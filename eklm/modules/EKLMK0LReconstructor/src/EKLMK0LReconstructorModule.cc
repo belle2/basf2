@@ -14,9 +14,9 @@
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Vector/LorentzVector.h>
+#include <TDatabasePDG.h>
 
 /* Belle2 headers. */
-
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/gearbox/Const.h>
@@ -160,6 +160,7 @@ static void merge2dClusters(std::vector<struct HitData>& hits,
 static void findAssociatedHits(struct HitData* hit,
                                std::vector<struct HitData>& hits)
 {
+  static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
   int i, n;
   int layerHits[14], nLayers;
   float e, de;
@@ -167,8 +168,7 @@ static void findAssociatedHits(struct HitData* hit,
   std::vector<struct HitData*>::iterator itClust;
   std::vector<EKLMHit2d*>::iterator itHit;
   HepGeom::Point3D<double> hitPos, hitPos2;
-  CLHEP::Hep3Vector p;
-  float mt, t, m;
+  float mt, t;
   double v;
   KLMCluster* klmCluster;
   /* Initially fill the cluster with the hit in question. */
@@ -224,17 +224,12 @@ static void findAssociatedHits(struct HitData* hit,
     hitPos.setZ(hitPos.z() + de * (*itClust)->hit->getPositionZ());
   }
   hitPos = hitPos / e;
-  /* Calculate momentum. */
-  m = 0.497614;
-  p.setX(hitPos.x());
-  p.setY(hitPos.y());
-  p.setZ(hitPos.z());
-  p = p / mt;
-  v = p.mag() / Const::speedOfLight;
+  /* Calculate energy. */
+  v = hitPos.mag() / mt / Const::speedOfLight;
   if (v < 0.999999)
-    p = p.unit() * m * v / sqrt(1.0 - v * v);
+    e = mass / sqrt(1.0 - v * v);
   else
-    p = CLHEP::Hep3Vector(0, 0, 0);
+    e = 0;
   /* Set the status of hit. */
   if (cluster.size() == 1) {
     hit->stat = c_Isolated;
@@ -245,7 +240,7 @@ static void findAssociatedHits(struct HitData* hit,
   StoreArray<KLMCluster> klmClusters;
   klmCluster = klmClusters.appendNew(
                  hitPos.x(), hitPos.y(), hitPos.z(), mt, nLayers,
-                 nInnermostLayer, p.x(), p.y(), p.z());
+                 nInnermostLayer, e);
   /* Fill cluster-hit relation array */
   StoreArray<EKLMHit2d> hits2d;
   for (itClust = cluster.begin(); itClust != cluster.end(); ++itClust) {

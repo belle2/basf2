@@ -29,7 +29,7 @@ def rootcling_generator(source, target, env, for_signature):
     # this variable will be set by the process_dir function
     rootmap_libname = env["ROOTCLING_ROOTMAP_LIB"]
     # use the .cc-dict file name (in target[0]) to generate the .rootmap file
-    cmd = 'rootcling -f $TARGET $CLINGFLAGS -rmf "{}.rootmap" -rml lib{}.so $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES' \
+    cmd = 'rootcling -f $TARGET $CLINGFLAGS -rmf "{0}.rootmap" -rml lib{1}.so $_CPPDEFFLAGS $_CPPINCFLAGS $SOURCES' \
         .format(str(target[0]).replace(".cc", ""), rootmap_libname)
     return cmd
 

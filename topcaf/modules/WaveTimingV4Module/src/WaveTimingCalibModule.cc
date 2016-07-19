@@ -471,23 +471,26 @@ void WaveTimingCalibModule::event()
             this_topcafdigit->SetPedRMS(hits[c].ped_rms);
 
             this_topcafdigit->SetID(c);
+
+            int firstbin = hits[c].tdc_bin - 64;
+            if (firstbin < 0) firstbin = 0;
+            int ibin = 0;
+            for (int isetzero = 0; isetzero < 128; isetzero ++)
+              this_topcafdigit->SetAdcVal(isetzero, 0);
+
+            while (ibin < 128 && ibin + firstbin  < (int)v_samples.size()) {
+              this_topcafdigit->SetAdcVal(ibin, v_samples[ibin + firstbin]);
+              this_topcafdigit->SetTdcVal(ibin, ibin + firstbin);
+              ibin++;
+            }
+
+
+
           }
 
           // fill the waveforms
-          /*
-            int firstbin = hits[c].tdc_bin -64;
-            if(firstbin < 0) firstbin = 0;
-            int ibin = 0;
-            for(int isetzero = 0; isetzero < 128; isetzero ++ )
-                  this_topcafdigit->SetAdcVal(isetzero, 0);
 
-            while( ibin < 128 && ibin +firstbin  < v_samples.size()  )
-            {
-            this_topcafdigit->SetAdcVal(ibin, v_samples[ibin+firstbin]);
-            this_topcafdigit->SetTdcVal(ibin, ibin+firstbin);
-            ibin++;
-            }
-          */
+
 
         }
       }

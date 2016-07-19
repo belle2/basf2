@@ -13,12 +13,13 @@ import ROOT
 from ROOT import Belle2
 from ROOT import TFile, TH1F, TNamed
 import math
+import numpy
 
 
 class KLMK0LPlotModule(Module):
     """ Class for creation of KLM K0L validation plots. """
 
-    def __init__(self, evtgen, check_eklm):
+    def __init__(self, output_file, evtgen, check_eklm):
         """Initialization."""
         super(KLMK0LPlotModule, self).__init__()
         #: True for evtgen events, false for particle gun.
@@ -26,7 +27,7 @@ class KLMK0LPlotModule(Module):
         #: Whether to check if cluster is in EKLM.
         self.check_eklm = check_eklm
         #: Output file.
-        self.output_file = ROOT.TFile('KLMK0L.root', 'recreate')
+        self.output_file = ROOT.TFile(output_file, 'recreate')
         contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
         #: Number of K0L histogram.
         self.hist_nkl = ROOT.TH1F('k0l_number',
@@ -109,6 +110,48 @@ class KLMK0LPlotModule(Module):
         l.Add(TNamed('Description', 'Momentum phi resolution'))
         l.Add(TNamed('Check', 'No bias, resolution ~ 0.07'))
         l.Add(TNamed('Contact', contact))
+        #: Covariance matrix histogram.
+        self.hist_covmat = ROOT.TH1F('k0l_covmat',
+                                     'KLM K0L coordinates covariance matrix',
+                                     6, 0, 1)
+        self.hist_covmat.GetXaxis().SetBinLabel(1, 'xx')
+        self.hist_covmat.GetXaxis().SetBinLabel(2, 'xy')
+        self.hist_covmat.GetXaxis().SetBinLabel(3, 'xz')
+        self.hist_covmat.GetXaxis().SetBinLabel(4, 'yy')
+        self.hist_covmat.GetXaxis().SetBinLabel(5, 'yz')
+        self.hist_covmat.GetXaxis().SetBinLabel(6, 'zz')
+        self.hist_covmat.SetYTitle('Covariance, cm^{2}')
+        l = self.hist_covmat.GetListOfFunctions()
+        l.Add(TNamed('Description', 'Momentum phi resolution'))
+        l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
+        l.Add(TNamed('Contact', contact))
+        #: Correlation matrix histogram.
+        self.hist_corrmat = ROOT.TH1F('k0l_corrmat',
+                                      'KLM K0L correlation matrix',
+                                      10, 0, 1)
+        self.hist_corrmat.GetXaxis().SetBinLabel(1, 'xx')
+        self.hist_corrmat.GetXaxis().SetBinLabel(2, 'xy')
+        self.hist_corrmat.GetXaxis().SetBinLabel(3, 'xz')
+        self.hist_corrmat.GetXaxis().SetBinLabel(4, 'xe')
+        self.hist_corrmat.GetXaxis().SetBinLabel(5, 'yy')
+        self.hist_corrmat.GetXaxis().SetBinLabel(6, 'yz')
+        self.hist_corrmat.GetXaxis().SetBinLabel(7, 'ye')
+        self.hist_corrmat.GetXaxis().SetBinLabel(8, 'zz')
+        self.hist_corrmat.GetXaxis().SetBinLabel(9, 'ze')
+        self.hist_corrmat.GetXaxis().SetBinLabel(10, 'ee')
+        self.hist_corrmat.SetYTitle('Correlation coefficient')
+        l = self.hist_corrmat.GetListOfFunctions()
+        l.Add(TNamed('Description', 'Momentum phi resolution'))
+        l.Add(TNamed('Check', 'No lagre nondiagonal elements.'))
+        l.Add(TNamed('Contact', contact))
+        #: Average vertex.
+        self.vertex_k_av = ROOT.TVector3(0, 0, 0)
+        #: Vertex list.
+        self.vertex = []
+        #: Average energy.
+        self.energy_av = 0
+        #: Energy list.
+        self.energy = []
 
     def event(self):
         """ Event function. """
@@ -144,6 +187,10 @@ class KLMK0LPlotModule(Module):
             self.hist_nkl.Fill(len(klm_clusters))
             for klm_cluster in klm_clusters:
                 vertex_k = klm_cluster.getClusterPosition() - vertex
+                self.vertex.append(vertex_k)
+                self.vertex_k_av = self.vertex_k_av + vertex_k
+                self.energy.append(klm_cluster.getEnergy())
+                self.energy_av = self.energy_av + klm_cluster.getEnergy()
                 time_k = klm_cluster.getTime()
                 momentum_k = klm_cluster.getMomentum().Vect()
                 self.hist_xres.Fill(vertex_k.x())
@@ -153,9 +200,68 @@ class KLMK0LPlotModule(Module):
                 self.hist_pres.Fill(momentum_k.Mag() - momentum.Mag())
                 self.hist_ptres.Fill(momentum_k.Theta() - momentum.Theta())
                 self.hist_ppres.Fill(momentum_k.Phi() - momentum.Phi())
+        self.vertex_k_av = self.vertex_k_av * (1.0 / len(self.vertex))
+        self.energy_av = self.energy_av * (1.0 / len(self.vertex))
 
     def terminate(self):
         """ Termination function. """
+        # x, y, z, e
+        cov_mat = numpy.zeros((4, 4))
+        corr_mat = numpy.zeros((4, 4))
+        for i in range(len(self.vertex)):
+            cov_mat[0][0] = cov_mat[0][0] + \
+                (self.vertex[i].x() - self.vertex_k_av.x()) * \
+                (self.vertex[i].x() - self.vertex_k_av.x())
+            cov_mat[0][1] = cov_mat[0][1] + \
+                (self.vertex[i].x() - self.vertex_k_av.x()) * \
+                (self.vertex[i].y() - self.vertex_k_av.y())
+            cov_mat[0][2] = cov_mat[0][2] + \
+                (self.vertex[i].x() - self.vertex_k_av.x()) * \
+                (self.vertex[i].z() - self.vertex_k_av.z())
+            cov_mat[0][3] = cov_mat[0][3] + \
+                (self.vertex[i].x() - self.vertex_k_av.x()) * \
+                (self.energy[i] - self.energy_av)
+            cov_mat[1][1] = cov_mat[1][1] + \
+                (self.vertex[i].y() - self.vertex_k_av.y()) * \
+                (self.vertex[i].y() - self.vertex_k_av.y())
+            cov_mat[1][2] = cov_mat[1][2] + \
+                (self.vertex[i].y() - self.vertex_k_av.y()) * \
+                (self.vertex[i].z() - self.vertex_k_av.z())
+            cov_mat[1][3] = cov_mat[1][3] + \
+                (self.vertex[i].y() - self.vertex_k_av.y()) * \
+                (self.energy[i] - self.energy_av)
+            cov_mat[2][2] = cov_mat[2][2] + \
+                (self.vertex[i].z() - self.vertex_k_av.z()) * \
+                (self.vertex[i].z() - self.vertex_k_av.z())
+            cov_mat[2][3] = cov_mat[2][3] + \
+                (self.vertex[i].z() - self.vertex_k_av.z()) * \
+                (self.energy[i] - self.energy_av)
+            cov_mat[3][3] = cov_mat[3][3] + \
+                (self.energy[i] - self.energy_av) * \
+                (self.energy[i] - self.energy_av)
+        for i in range(0, 4):
+            for j in range(i, 4):
+                cov_mat[i][j] = cov_mat[i][j] / (len(self.vertex) - 1)
+        self.hist_covmat.SetBinContent(1, cov_mat[0][0])
+        self.hist_covmat.SetBinContent(2, cov_mat[0][1])
+        self.hist_covmat.SetBinContent(3, cov_mat[0][2])
+        self.hist_covmat.SetBinContent(4, cov_mat[1][1])
+        self.hist_covmat.SetBinContent(5, cov_mat[1][2])
+        self.hist_covmat.SetBinContent(6, cov_mat[2][2])
+        for i in range(0, 4):
+            for j in range(i, 4):
+                corr_mat[i][j] = cov_mat[i][j] / \
+                    math.sqrt(cov_mat[i][i]) / math.sqrt(cov_mat[j][j])
+        self.hist_corrmat.SetBinContent(1, corr_mat[0][0])
+        self.hist_corrmat.SetBinContent(2, corr_mat[0][1])
+        self.hist_corrmat.SetBinContent(3, corr_mat[0][2])
+        self.hist_corrmat.SetBinContent(4, corr_mat[0][3])
+        self.hist_corrmat.SetBinContent(5, corr_mat[1][1])
+        self.hist_corrmat.SetBinContent(6, corr_mat[1][2])
+        self.hist_corrmat.SetBinContent(7, corr_mat[1][3])
+        self.hist_corrmat.SetBinContent(8, corr_mat[2][2])
+        self.hist_corrmat.SetBinContent(9, corr_mat[2][3])
+        self.hist_corrmat.SetBinContent(10, corr_mat[3][3])
         self.output_file.cd()
         self.hist_nkl.Write()
         self.hist_xres.Write()
@@ -165,4 +271,6 @@ class KLMK0LPlotModule(Module):
         self.hist_pres.Write()
         self.hist_ptres.Write()
         self.hist_ppres.Write()
+        self.hist_covmat.Write()
+        self.hist_corrmat.Write()
         self.output_file.Close()

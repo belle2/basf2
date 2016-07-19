@@ -17,7 +17,7 @@ root_input = register_module('RootInput')
 root_input.param('inputFileName', '../KLMK0LOutput.root')
 
 # Plotting.
-klmk0lplot = KLMK0LPlotModule(True, False)
+klmk0lplot = KLMK0LPlotModule('KLMK0L.root', True, False)
 
 # Create main path.
 main = create_path()

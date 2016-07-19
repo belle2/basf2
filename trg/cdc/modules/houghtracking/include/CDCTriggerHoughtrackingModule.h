@@ -144,6 +144,32 @@ namespace Belle2 {
     /** Merge lists a and b and put the result in merged. */
     void mergeIdList(std::vector<unsigned>& merged, std::vector<unsigned>& a, std::vector<unsigned>& b);
 
+    /** Combine Hough candidates to tracks by a fixed pattern algorithm.
+     *  The Hough plane is first divided in 2 x 2 squares, then squares are combined. */
+    void patternClustering();
+    /** Check for left/right connection of patterns in 2 x 2 squares */
+    bool connectedLR(unsigned patternL, unsigned patternR);
+    /** Check for up/down connection of patterns in 2 x 2 squares */
+    bool connectedUD(unsigned patternD, unsigned patternU);
+    /** Check for diagonal connected of patterns in 2 x 2 squares */
+    bool connectedDiag(unsigned patternLD, unsigned patternRU);
+    /** Find the top right square within a cluster of 2 x 2 squares
+     *  In case of ambiguity, top is favored over right
+     *  @ return   index of corner within pattern vector */
+    unsigned topRightSquare(std::vector<unsigned>& pattern);
+    /** Find the top right corner within 2 x 2 square.
+     *  In case of ambiguity right corner is returned.
+     *  x .
+     *  . x   -> return this one
+     *  @ return   index of corner within pattern */
+    unsigned topRightCorner(unsigned pattern);
+    /** Find the bottom left corner within 2 x 2 square.
+     *  In case of ambiguity left corner is returned.
+     *  x .   -> return this one
+     *  . x
+     *  @ return   index of corner within pattern */
+    unsigned bottomLeftCorner(unsigned pattern);
+
   protected:
 
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */
@@ -181,6 +207,12 @@ namespace Belle2 {
     /** switch to save the Hough plane in DataStore
      *  (0: don't save, 1: save only peaks, 2: save full plane) */
     unsigned m_storePlane;
+    /** switch for clustering algorithm (if true use nested patterns) */
+    bool m_clusterPattern;
+    /** maximum cluster size for pattern algorithm */
+    unsigned m_clusterSizeX;
+    /** maximum cluster size for pattern algorithm */
+    unsigned m_clusterSizeY;
 
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray

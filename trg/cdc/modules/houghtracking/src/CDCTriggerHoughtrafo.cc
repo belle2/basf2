@@ -360,3 +360,284 @@ CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
     }
   }
 }
+
+/*
+* Alternative peak finding with nested patterns
+*/
+void
+CDCTriggerHoughtrackingModule::patternClustering()
+{
+  // fill a matrix of 2 x 2 squares
+  TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
+  for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
+    double x = (houghCand[icand].getCoord().first.X() +
+                houghCand[icand].getCoord().second.X()) / 2.;
+    unsigned ix = floor((x + M_PI) / 2. / M_PI * m_nCellsPhi);
+    double y = (houghCand[icand].getCoord().first.Y() +
+                houghCand[icand].getCoord().second.Y()) / 2.;
+    unsigned iy = floor((y + maxR) / 2. / maxR * m_nCellsR);
+    plane2[ix / 2][iy / 2] += 1 << ((ix % 2) + 2 * (iy % 2));
+  }
+  // look for clusters of 2 x 2 squares in a (rX x rY) region
+  unsigned nX = m_nCellsPhi / 2;
+  unsigned nY = m_nCellsR / 2;
+  unsigned rX = m_clusterSizeX;
+  unsigned rY = m_clusterSizeY;
+  for (unsigned ix = 0; ix < nX; ++ix) {
+    for (unsigned iy = 0; iy < nY; ++iy) {
+      if (!plane2[ix][iy]) continue;
+      // check if we are in a lower left corner
+      unsigned ileft = (ix - 1 + nX) % nX;
+      B2DEBUG(100, "ix " << ix << " ileft " << ileft << " nX " << nX);
+      if (connectedLR(plane2[ileft][iy], plane2[ix][iy]) ||
+          (iy > 0 && connectedUD(plane2[ix][iy - 1], plane2[ix][iy])) ||
+          (iy > 0 && connectedDiag(plane2[ileft][iy - 1], plane2[ix][iy]))) {
+        B2DEBUG(100, "skip connected square at " << ix << " " << iy);
+        continue;
+      }
+      // form cluster
+      vector<unsigned> pattern(rX * rY, 0);
+      pattern[0] = plane2[ix][iy];
+      for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
+        for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
+          if (iy + iy2 >= nY) continue;
+          unsigned ip = ix2 + rX * iy2;
+          unsigned iright = (ix + ix2 + nX) % nX;
+          ileft = (iright - 1 + nX) % nX;
+          B2DEBUG(100, "ix2 " << ix2 << " ileft " << ileft << " iright " << iright);
+          if ((ix2 > 0 && // check left/right connection
+               pattern[ip - 1] &&
+               connectedLR(plane2[ileft][iy + iy2], plane2[iright][iy + iy2])) ||
+              (iy2 > 0 && // check up/down connection
+               pattern[ip - rX] &&
+               connectedUD(plane2[iright][iy + iy2 - 1], plane2[iright][iy + iy2])) ||
+              (ix2 > 0 && iy2 > 0 && // check diagonal connection
+               pattern[ip - rX - 1] &&
+               connectedDiag(plane2[ileft][iy + iy2 - 1], plane2[iright][iy + iy2]))) {
+            pattern[ip] = plane2[iright][iy + iy2];
+            B2DEBUG(100, "connect cell " << iright << " " << iy + iy2);
+          }
+        }
+      }
+      B2DEBUG(100, "cluster starting at " << ix << " " << iy);
+      // check if cluster continues beyond defined area
+      bool overflowRight = false;
+      bool overflowTop = false;
+      for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
+        unsigned ip = rX - 1 + rX * iy2;
+        if (!pattern[ip]) continue;
+        unsigned iright = (ix + rX + nX) % nX;
+        ileft = (iright - 1 + nX) % nX;
+        if (connectedLR(plane2[ileft][iy + iy2], plane2[iright][iy + iy2]) ||
+            ((iy + iy2 + 1 < nY) &&
+             connectedDiag(plane2[ileft][iy + iy2], plane2[iright][iy + iy2 + 1]))) {
+          setReturnValue(false);
+          overflowRight = true;
+        }
+      }
+      if (iy + rY < nY) {
+        for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
+          unsigned ip = ix2 + rX * (rY - 1);
+          if (!pattern[ip]) continue;
+          unsigned iright = (ix + ix2 + 1 + nX) % nX;
+          ileft = (iright - 1 + nX) % nX;
+          if (connectedUD(plane2[ileft][iy + rY - 1], plane2[ileft][iy + rY]) ||
+              connectedDiag(plane2[ileft][iy + rY - 1], plane2[iright][iy + rY])) {
+            setReturnValue(false);
+            overflowTop = true;
+          }
+        }
+      }
+      if (overflowRight && !overflowTop) {
+        B2WARNING("cluster extends right of " << rX << " x " << rY << " area");
+      } else if (overflowTop && !overflowRight) {
+        B2WARNING("cluster extends above " << rX << " x " << rY << " area");
+      } else if (overflowRight && overflowTop) {
+        B2WARNING("cluster extends right and above " << rX << " x " << rY << " area");
+      }
+      // find corners of cluster
+      unsigned topRight2 = topRightSquare(pattern);
+      unsigned topRight = topRightCorner(pattern[topRight2]);
+      unsigned bottomLeft = bottomLeftCorner(pattern[0]);
+      B2DEBUG(100, "topRight2 " << topRight2 << " topRight " << topRight << " bottomLeft " << bottomLeft);
+      // average over corners to find cluster center
+      unsigned ixTR = 2 * (topRight2 % m_clusterSizeX) + (topRight % 2);
+      unsigned ixBL = bottomLeft % 2;
+      unsigned iyTR = 2 * (topRight2 / m_clusterSizeX) + (topRight / 2);
+      unsigned iyBL = bottomLeft / 2;
+      // skip size 1 clusters
+      if (m_minCells > 1 && ixTR == ixBL && iyTR == iyBL) {
+        B2DEBUG(100, "skipping cluster of size 1");
+        continue;
+      }
+      float centerX = 2 * ix + (ixTR + ixBL) / 2.;
+      float centerY = 2 * iy + (iyTR + iyBL) / 2.;
+      B2DEBUG(100, "center at cell (" << centerX << ", " << centerY << ")");
+      // convert to coordinates
+      double x = -M_PI + (centerX + 0.5) * 2. * M_PI / m_nCellsPhi;
+      double y = -maxR + (centerY + 0.5) * 2. * maxR / m_nCellsR;
+      B2DEBUG(100, "center coordinates (" << x << ", " << y << ")");
+      // find cells around center to get hit IDs
+      vector<unsigned> idList = {};
+      double dx = 0.1 * M_PI / m_nCellsPhi;
+      double dy = 0.1 * maxR / m_nCellsR;
+      for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
+        if (((houghCand[icand].getCoord().first.X() <= x + dx &&
+              houghCand[icand].getCoord().second.X() >= x - dx) ||
+             (houghCand[icand].getCoord().first.X() <= x + dx - 2 * M_PI &&
+              houghCand[icand].getCoord().second.X() >= x - dx - 2 * M_PI) ||
+             (houghCand[icand].getCoord().first.X() <= x + dx + 2 * M_PI &&
+              houghCand[icand].getCoord().second.X() >= x - dx + 2 * M_PI)) &&
+            houghCand[icand].getCoord().first.Y() <= y + dy &&
+            houghCand[icand].getCoord().second.Y() >= y - dy) {
+          vector<unsigned> candIdList = houghCand[icand].getIdList();
+          mergeIdList(idList, idList, candIdList);
+          B2DEBUG(100, "merge id list from candidate " << icand);
+        }
+      }
+      if (idList.size() == 0) {
+        setReturnValue(false);
+        B2WARNING("id list empty");
+      }
+      houghTrack.push_back(CDCTriggerHoughTrack(idList, TVector2(x, y)));
+    }
+  }
+}
+
+/*
+* connection definitions for 2 x 2 squares
+*/
+bool
+CDCTriggerHoughtrackingModule::connectedLR(unsigned patternL, unsigned patternR)
+{
+  // unconnected if
+  // x x | . x  or  x . | x x
+  // x x | . x      x . | x x
+  bool unconnectDirect = ((!((patternR >> 0) & 1) && !((patternR >> 2) & 1)) ||
+                          (!((patternL >> 1) & 1) && !((patternL >> 3) & 1)));
+  // unconnected if
+  // x x | . x
+  // x . | x x
+  bool unconnectRise = (!((patternL >> 1) & 1) && !((patternR >> 2) & 1));
+  // unconnected if
+  // x . | x x
+  // x x | . x
+  bool unconnectFall = (!((patternL >> 3) & 1) && !((patternR >> 0) & 1));
+
+  if (m_connect == 4) return !(unconnectDirect || unconnectRise || unconnectFall);
+  else if (m_connect == 6) return !(unconnectDirect || unconnectRise);
+  else if (m_connect == 8) return !unconnectDirect;
+  else B2WARNING("Unknown option for connect " << m_connect << ", using default.");
+  return !(unconnectDirect || unconnectRise);
+}
+
+bool
+CDCTriggerHoughtrackingModule::connectedUD(unsigned patternD, unsigned patternU)
+{
+  // unconnected if
+  // x x      x x
+  // . .      x x
+  // ---  or  ---
+  // x x      . .
+  // x x      x x
+  bool unconnectDirect = ((!((patternU >> 0) & 1) && !((patternU >> 1) & 1)) ||
+                          (!((patternD >> 1) & 2) && !((patternD >> 3) & 1)));
+  // unconnected if
+  // x x
+  // x .
+  // ---
+  // . x
+  // x x
+  bool unconnectRise = (!((patternD >> 1) & 2) && !((patternU >> 1) & 1));
+  // unconnected if
+  // x x
+  // . x
+  // ---
+  // x .
+  // x x
+  bool unconnectFall = (!((patternD >> 3) & 1) && !((patternU >> 0) & 1));
+
+  if (m_connect == 4) return !(unconnectDirect || unconnectRise || unconnectFall);
+  else if (m_connect == 6) return !(unconnectDirect || unconnectRise);
+  else if (m_connect == 8) return !unconnectDirect;
+  else B2WARNING("Unknown option for connect " << m_connect << ", using default.");
+  return !(unconnectDirect || unconnectRise);
+}
+
+bool
+CDCTriggerHoughtrackingModule::connectedDiag(unsigned patternLD, unsigned patternRU)
+{
+  if (m_connect == 4) return false;
+  // unconnected if
+  //    x x         x x
+  //    . x         x x
+  // x x     or  x .
+  // x x         x x
+  return !(!((patternRU >> 0) & 1) || !((patternLD >> 3) & 1));
+}
+
+unsigned
+CDCTriggerHoughtrackingModule::topRightSquare(vector<unsigned>& pattern)
+{
+  // scan from top right corner until an active square is found
+  for (unsigned index = pattern.size() - 1; index > 0; --index) {
+    if (!pattern[index]) continue;
+    // check for ambiguity
+    unsigned ix = index % m_clusterSizeX;
+    unsigned iy = index / m_clusterSizeX;
+    if (ix < m_clusterSizeX - 1 && iy > 0) {
+      bool unique = true;
+      for (unsigned index2 = index - 1; index2 > 0; --index2) {
+        if (!pattern[index2]) continue;
+        unsigned ix2 = index2 % m_clusterSizeX;
+        unsigned iy2 = index2 / m_clusterSizeX;
+        if (iy2 < iy && ix2 > ix) {
+          unique = false;
+          break;
+        }
+      }
+      if (!unique) {
+        setReturnValue(false);
+        B2WARNING("topRightSquare not unique");
+      }
+    }
+    return index;
+  }
+  return 0;
+}
+
+unsigned
+CDCTriggerHoughtrackingModule::topRightCorner(unsigned pattern)
+{
+  // scan pattern from right to left:
+  // 2 3
+  // 0 1
+  if ((pattern >> 3) & 1) return 3;
+  if ((pattern >> 1) & 1) {
+    if ((pattern >> 2) & 1) {
+      setReturnValue(false);
+      B2WARNING("topRightCorner not unique");
+    }
+    return 1;
+  }
+  if ((pattern >> 2) & 1) return 2;
+  return 0;
+}
+
+unsigned
+CDCTriggerHoughtrackingModule::bottomLeftCorner(unsigned pattern)
+{
+  // scan pattern from left to right:
+  // 2 3
+  // 0 1
+  if (pattern & 1) return 0;
+  if ((pattern >> 2) & 1) {
+    if ((pattern >> 1) & 1) {
+      setReturnValue(false);
+      B2WARNING("bottomLeftCorner not unique");
+    }
+    return 2;
+  }
+  if ((pattern >> 1) & 1) return 1;
+  return 3;
+}

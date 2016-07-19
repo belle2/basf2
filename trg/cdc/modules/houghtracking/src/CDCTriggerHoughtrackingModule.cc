@@ -75,6 +75,14 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            "Switch for saving Hough plane as TMatrix in DataStore. "
            "0: don't store anything, 1: store only peaks, 2: store full plane "
            "(will increase runtime).", (unsigned)(0));
+  addParam("clusterPattern", m_clusterPattern,
+           "use nested pattern algorithm to find clusters", false);
+  addParam("clusterSizeX", m_clusterSizeX,
+           "maximum number of 2 x 2 squares in cluster for pattenr algorithm",
+           (unsigned)(3));
+  addParam("clusterSizeY", m_clusterSizeY,
+           "maximum number of 2 x 2 squares in cluster for pattenr algorithm",
+           (unsigned)(3));
 }
 
 void
@@ -115,8 +123,11 @@ CDCTriggerHoughtrackingModule::event()
   houghCand.clear();
   houghTrack.clear();
 
+  /* set default return value */
+  setReturnValue(true);
+
   if (tsHits.getEntries() == 0) {
-    B2WARNING("CDCTracking: tsHitsCollection is empty!");
+    //B2WARNING("CDCTracking: tsHitsCollection is empty!");
     return;
   }
 
@@ -161,7 +172,10 @@ CDCTriggerHoughtrackingModule::event()
   fastInterceptFinder(hitMap, -rectX, rectX, -rectY, rectY, 0, 0, 0);
 
   /* merge track candidates */
-  connectedRegions();
+  if (m_clusterPattern)
+    patternClustering();
+  else
+    connectedRegions();
 
   /* write tracks to datastore */
   vector<unsigned> idList;

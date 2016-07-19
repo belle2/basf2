@@ -3,9 +3,9 @@
 
 """
 <header>
-    <input>EKLMK0LOutput.root</input>
+    <input>KLMK0LOutput.root</input>
     <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
-    <description>Creation of EKLM K0L validation plots.</description>
+    <description>Creation of KLM K0L validation plots.</description>
 </header>
 """
 
@@ -14,10 +14,10 @@ from KLMK0LPlotModule import *
 
 # Input.
 root_input = register_module('RootInput')
-root_input.param('inputFileName', '../EKLMK0LOutput.root')
+root_input.param('inputFileName', '../KLMK0LOutput.root')
 
 # Plotting.
-klmk0lplot = KLMK0LPlotModule(False, True)
+klmk0lplot = KLMK0LPlotModule(True, False)
 
 # Create main path.
 main = create_path()

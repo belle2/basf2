@@ -4,7 +4,7 @@
 """
 <header>
     <contact>Kirill Chilikin (chilikin@lebedev.ru)</contact>
-    <description>Creation of EKLM K0L validation plots.</description>
+    <description>Creation of KLM K0L validation plots.</description>
 </header>
 """
 
@@ -15,14 +15,18 @@ from ROOT import TFile, TH1F, TNamed
 import math
 
 
-class EKLMK0LPlotModule(Module):
-    """ Class for creation of EKLM K0L validation plots. """
+class KLMK0LPlotModule(Module):
+    """ Class for creation of KLM K0L validation plots. """
 
-    def __init__(self):
+    def __init__(self, evtgen, check_eklm):
         """Initialization."""
-        super(EKLMK0LPlotModule, self).__init__()
+        super(KLMK0LPlotModule, self).__init__()
+        #: True for evtgen events, false for particle gun.
+        self.evtgen = evtgen
+        #: Whether to check if cluster is in EKLM.
+        self.check_eklm = check_eklm
         #: Output file.
-        self.output_file = ROOT.TFile('EKLMK0L.root', 'recreate')
+        self.output_file = ROOT.TFile('KLMK0L.root', 'recreate')
         contact = 'Kirill Chilikin (chilikin@lebedev.ru)'
         #: Number of K0L histogram.
         self.hist_nkl = ROOT.TH1F('k0l_number',
@@ -37,38 +41,38 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Contact', contact))
         #: X resolution histogram.
         self.hist_xres = ROOT.TH1F('k0l_xres',
-                                   'EKLM K0L decay vertex X resolution',
+                                   'KLM K0L decay vertex X resolution',
                                    100, -50, 50)
         self.hist_xres.SetXTitle('cm')
         self.hist_xres.SetYTitle('Events')
         l = self.hist_xres.GetListOfFunctions()
         l.Add(TNamed('Description', 'X resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
+        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
         #: Y resolution histogram.
         self.hist_yres = ROOT.TH1F('k0l_yres',
-                                   'EKLM K0L decay vertex Y resolution',
+                                   'KLM K0L decay vertex Y resolution',
                                    100, -50, 50)
         self.hist_yres.SetXTitle('cm')
         self.hist_yres.SetYTitle('Events')
         l = self.hist_yres.GetListOfFunctions()
         l.Add(TNamed('Description', 'Y resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
+        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
         #: Z resolution histogram.
         self.hist_zres = ROOT.TH1F('k0l_zres',
-                                   'EKLM K0L decay vertex Z resolution',
+                                   'KLM K0L decay vertex Z resolution',
                                    100, -50, 50)
         self.hist_zres.SetXTitle('cm')
         self.hist_zres.SetYTitle('Events')
         l = self.hist_zres.GetListOfFunctions()
         l.Add(TNamed('Description', 'Z resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 10 cm.'))
+        l.Add(TNamed('Check', 'No bias, resolution ~ 16 cm.'))
         l.Add(TNamed('Contact', contact))
         #: Time resolution histogram.
         self.hist_tres = ROOT.TH1F('k0l_tres',
-                                   'EKLM K0L decay time resolution',
-                                   100, -10., 10.)
+                                   'KLM K0L decay time resolution',
+                                   100, -20., 10.)
         self.hist_tres.SetXTitle('ns')
         self.hist_tres.SetYTitle('Events')
         l = self.hist_tres.GetListOfFunctions()
@@ -77,8 +81,8 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Contact', contact))
         #: Momentum resolution histogram.
         self.hist_pres = ROOT.TH1F('k0l_pres',
-                                   'EKLM K0L momentum resolution',
-                                   100, -1., 1.)
+                                   'KLM K0L momentum resolution',
+                                   100, -3., 3.)
         self.hist_pres.SetXTitle('GeV')
         self.hist_pres.SetYTitle('Events')
         l = self.hist_pres.GetListOfFunctions()
@@ -87,23 +91,23 @@ class EKLMK0LPlotModule(Module):
         l.Add(TNamed('Contact', contact))
         #: Momentum theta resolution histogram.
         self.hist_ptres = ROOT.TH1F('k0l_ptres',
-                                    'EKLM K0L momentum theta resolution',
+                                    'KLM K0L momentum theta resolution',
                                     100, -0.2, 0.2)
         self.hist_ptres.SetXTitle('rad')
         self.hist_ptres.SetYTitle('Events')
         l = self.hist_ptres.GetListOfFunctions()
         l.Add(TNamed('Description', 'Momentum theta resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 0.03'))
+        l.Add(TNamed('Check', 'No bias, resolution ~ 0.06'))
         l.Add(TNamed('Contact', contact))
         #: Momentum phi resolution histogram.
         self.hist_ppres = ROOT.TH1F('k0l_ppres',
-                                    'EKLM K0L momentum phi resolution',
+                                    'KLM K0L momentum phi resolution',
                                     100, -0.2, 0.2)
         self.hist_ppres.SetXTitle('rad')
         self.hist_ppres.SetYTitle('Events')
         l = self.hist_ppres.GetListOfFunctions()
         l.Add(TNamed('Description', 'Momentum phi resolution'))
-        l.Add(TNamed('Check', 'No bias, resolution ~ 0.05'))
+        l.Add(TNamed('Check', 'No bias, resolution ~ 0.07'))
         l.Add(TNamed('Contact', contact))
 
     def event(self):
@@ -114,22 +118,28 @@ class EKLMK0LPlotModule(Module):
             if (mc_particle.getPDG() != 130):
                 continue
             # Select primary K_L0.
-            if (mc_particle.getProductionTime() > 0):
-                continue
-            # Select K_L0 with decay point in EKLM.
+            if (self.evtgen):
+                b_pdg = abs(mc_particle.getMother().getPDG())
+                if (not(b_pdg == 511)):
+                    continue
+            else:
+                if (mc_particle.getProductionTime() > 0):
+                    continue
             vertex = mc_particle.getDecayVertex()
             time = mc_particle.getDecayTime()
             momentum = mc_particle.getMomentum()
-            x = vertex.x()
-            y = vertex.y()
-            z = vertex.z()
-            r = math.sqrt(x * x + y * y)
-            if (r < 132.5 or r > 329.0):
-                continue
-            if (abs(x) < 8.2 or abs(y) < 8.2):
-                continue
-            if (not((z > -315.1 and z < -183.0) or (z > 277.0 and z < 409.1))):
-                continue
+            if (self.check_eklm):
+                x = vertex.x()
+                y = vertex.y()
+                z = vertex.z()
+                r = math.sqrt(x * x + y * y)
+                if (r < 132.5 or r > 329.0):
+                    continue
+                if (abs(x) < 8.2 or abs(y) < 8.2):
+                    continue
+                if (not((z > -315.1 and z < -183.0) or
+                        (z > 277.0 and z < 409.1))):
+                    continue
             klm_clusters = mc_particle.getRelationsFrom('KLMClusters')
             self.hist_nkl.Fill(len(klm_clusters))
             for klm_cluster in klm_clusters:

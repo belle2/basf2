@@ -105,6 +105,13 @@ namespace Belle2 {
     {return TVector3(0, 0, 0);}
 
     /**
+     * Get energy.
+     * @return Full energy.
+     */
+    inline float getEnergy() const
+    {return m_e;}
+
+    /**
      * Get momentum.
      * @return 4-Momentum.
      */

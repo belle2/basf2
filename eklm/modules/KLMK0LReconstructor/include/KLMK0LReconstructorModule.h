@@ -24,6 +24,14 @@ namespace Belle2 {
    */
   class KLMK0LReconstructorModule : public Module {
 
+    /**
+     * Vertex position calculation mode.
+     */
+    enum PositionMode {
+      c_FullAverage, /**< Full average. */
+      c_FirstLayer,  /**< First layer only. */
+    };
+
   public:
 
     /**
@@ -68,6 +76,12 @@ namespace Belle2 {
 
     /** Clustering angle. */
     double m_ClusteringAngle;
+
+    /** Vertex position calculation mode. */
+    std::string m_PositionModeString;
+
+    /** Vertex position calculation mode. */
+    enum PositionMode m_PositionMode;
 
   };
 

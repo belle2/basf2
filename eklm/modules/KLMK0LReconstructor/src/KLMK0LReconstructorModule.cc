@@ -33,6 +33,9 @@ KLMK0LReconstructorModule::KLMK0LReconstructorModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("ClusteringAngle", m_ClusteringAngle, "Clustering angle (rad).",
            0.26);
+  addParam("PositionMode", m_PositionModeString,
+           "Vertex position calculation mode ('FullAverage' or 'FirstLayer').",
+           std::string("FullAverage"));
 }
 
 KLMK0LReconstructorModule::~KLMK0LReconstructorModule()
@@ -50,6 +53,12 @@ void KLMK0LReconstructorModule::initialize()
   klmClusters.registerRelationTo(bklmHit2ds);
   klmClusters.registerRelationTo(eklmHit2ds);
   m_GeoDat = &(EKLM::GeometryData::Instance());
+  if (m_PositionModeString == "FullAverage")
+    m_PositionMode = c_FullAverage;
+  else if (m_PositionModeString == "FirstLayer")
+    m_PositionMode = c_FirstLayer;
+  else
+    B2FATAL("Incorrect PositionMode agrument.");
 }
 
 void KLMK0LReconstructorModule::beginRun()
@@ -64,7 +73,7 @@ static bool compareDistance(KLMHit2d* hit1, KLMHit2d* hit2)
 void KLMK0LReconstructorModule::event()
 {
   static double mass = TDatabasePDG::Instance()->GetParticle(130)->Mass();
-  int i, n, nLayers, innermostLayer;
+  int i, n, nLayers, innermostLayer, nHits;
   int nLayersBKLM = NLAYER, nLayersEKLM;
   int* layerHitsBKLM, *layerHitsEKLM;
   float minTime = -1;
@@ -73,7 +82,7 @@ void KLMK0LReconstructorModule::event()
   StoreArray<BKLMHit2d> bklmHit2ds;
   StoreArray<EKLMHit2d> eklmHit2ds;
   std::vector<KLMHit2d*> klmHit2ds, klmClusterHits;
-  std::vector<KLMHit2d*>::iterator it, it2;
+  std::vector<KLMHit2d*>::iterator it, it0, it2;
   KLMHit2d* hit2d;
   KLMCluster* klmCluster;
   TVector3 hitPos;
@@ -122,11 +131,16 @@ clusterFound:;
       layerHitsBKLM[i] = 0;
     for (i = 0; i < nLayersEKLM; i++)
       layerHitsEKLM[i] = 0;
-    nLayers = 0;
-    innermostLayer = -1;
     /* Find minimal time, fill layer array, find hit position. */
+    it0 = klmClusterHits.begin();
+    nHits = 0;
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
-      hitPos = hitPos + (*it)->getPosition();
+      if (((*it)->getLayer() == (*it0)->getLayer() &&
+           (*it)->inBKLM() == (*it0)->inBKLM()) ||
+          m_PositionMode == c_FullAverage) {
+        hitPos = hitPos + (*it)->getPosition();
+        nHits++;
+      }
       if (minTime < 0 || (*it)->getTime() < minTime)
         minTime = (*it)->getTime();
       if ((*it)->inBKLM())
@@ -134,8 +148,10 @@ clusterFound:;
       else
         layerHitsEKLM[(*it)->getLayer() - 1]++;
     }
-    hitPos = hitPos * (1.0 / klmClusterHits.size());
+    hitPos = hitPos * (1.0 / nHits);
     /* Find innermost layer. */
+    nLayers = 0;
+    innermostLayer = -1;
     for (i = 0; i < nLayersBKLM; i++) {
       if (layerHitsBKLM[i] > 0) {
         nLayers++;
@@ -151,8 +167,7 @@ clusterFound:;
       }
     }
     /* Calculate energy. */
-    it = klmClusterHits.begin();
-    if ((*it)->inBKLM()) {
+    if ((*it0)->inBKLM()) {
       /*
        * TODO: The constant is from BKLM K0L reconstructor,
        * it must be recalculated.

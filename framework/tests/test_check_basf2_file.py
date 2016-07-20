@@ -16,6 +16,10 @@ assert 0 == os.system('check_basf2_file -n 5 ' + rootfile)
 assert 0 == os.system('check_basf2_file --events 5 ' + rootfile)
 assert 0 != os.system('check_basf2_file -n 10 ' + rootfile)
 
+# sadly, our input file doesn't have mcEvents stored (==0)
+assert 0 == os.system('check_basf2_file --mcevents 0 ' + rootfile)
+assert 0 != os.system('check_basf2_file --mcevents 123 ' + rootfile)
+
 assert 0 == os.system('check_basf2_file -n 5 -s 12.4 1 ' + rootfile)
 assert 0 == os.system('check_basf2_file -n 5 -s 12.4 0.05 ' + rootfile)
 assert 0 != os.system('check_basf2_file -n 5 -s 12.4 0 ' + rootfile)

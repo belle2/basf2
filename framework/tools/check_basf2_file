@@ -9,7 +9,9 @@ PERFORMED CHECKS:
 - File contains event and persistent tree (contains_tree, contains_persistent)
 - Event tree contains event meta data (eventmetadata_readable)
 - Persistent tree contains file metadata (filemetadata_readable)
-- Number of entries in event tree == number of events in file metadata == expected_no_of_events (entries_eq_filemetedata)
+- Number of entries in event tree == number of events in file metadata (entries_eq_filemetedata)
+- Number of entries in event tree == expected_no_of_events, if given (entries_eq_expectation)
+- Number of MC events generated == expected_no_of_mcevents, if given (mcevents_eq_expectation)
 - If the expected size is given: abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty (eventsize_eq_expectation)
 - If branches are given: Event tree contains the given branches
 RETURN CODE:
@@ -29,6 +31,7 @@ import ROOT
 
 parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("-n", "--events", type=int, dest='expected_no_of_events', default=None, help="Expected number of events")
+parser.add_argument("--mcevents", type=int, dest='expected_no_of_mcevents', default=None, help="Expected number of generated events")
 parser.add_argument("-s", "--size", type=float, dest='expected_event_size', metavar=('EXPECTED_EVENT_SIZE_KIB', 'RELATIVE_UNCERTAINTY'), default=None, nargs=2,
                     help="Expected size per event (kiB), with maximal relative uncertainty. Check is passed when abs(total_file_size/(#events*expected_event_size) - 1) < relative_uncertainty")
 parser.add_argument("--json", action='store_true', dest='json_output', default=False, help="Provide dictionary of passed checks and file statistics in JSON format on standard output. Checks are only included when actually run, and receive a boolean value indicating success.")
@@ -36,14 +39,14 @@ parser.add_argument("FILE", type=str, help="The basf2 .root file to check. http:
 parser.add_argument("BRANCH", type=str, nargs='*', help="Branches that should exist in the event durability tree.")
 
 
-def checkFile(filename, expected_no_of_events, expected_event_size, expected_branches):
+def checkFile(args):
     """
     Runs checks on given filename, returns dictionaries with passed checks
     and file statistics.
     """
     checks_passed = dict()
     stats = dict()
-    root_file = ROOT.TFile.Open(filename)
+    root_file = ROOT.TFile.Open(args.FILE)
 
     checks_passed['file_readable'] = bool(root_file) and root_file.IsOpen()
     if not checks_passed['file_readable']:
@@ -71,10 +74,18 @@ def checkFile(filename, expected_no_of_events, expected_event_size, expected_bra
 
             checks_passed['entries_eq_filemetedata'] = nevents_metadata == nevents
 
-        if expected_no_of_events is not None:
-            checks_passed['entries_eq_expectation'] = nevents == expected_no_of_events
+            mcevents = filemetadata.getMcEvents()
+            stats['mcevents'] = mcevents
+            if args.expected_no_of_mcevents is not None:
+                checks_passed['mcevents_eq_expectation'] = mcevents == args.expected_no_of_mcevents
+                if not checks_passed['mcevents_eq_expectation']:
+                    print ('expected %d MC events, but file contains %d!' % (args.expected_no_of_mcevents, mcevents))
+
+
+        if args.expected_no_of_events is not None:
+            checks_passed['entries_eq_expectation'] = nevents == args.expected_no_of_events
             if not checks_passed['entries_eq_expectation']:
-                print ('expected %d events, but file contains %d!' % (expected_no_of_events, nevents))
+                print ('expected %d events, but file contains %d!' % (args.expected_no_of_events, nevents))
 
         checks_passed['eventmetadata_readable'] = False
         if tree.GetEntry(0) > 0:
@@ -82,15 +93,15 @@ def checkFile(filename, expected_no_of_events, expected_event_size, expected_bra
             eventmetadata.getEvent()
             checks_passed['eventmetadata_readable'] = True
 
-        if expected_branches:
-            checks_passed['branches_present'] = all([tree.GetBranch(b) for b in expected_branches])
+        if args.BRANCH:
+            checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
 
         size_kib = root_file.GetSize() / 1024.0
         size_kib_per_event = size_kib / nevents
         stats['filesize_kib'] = size_kib
         stats['size_per_event_kib'] = size_kib_per_event
-        if expected_event_size is not None:
-            exp_size_kib, rel_uncertainty = expected_event_size
+        if args.expected_event_size is not None:
+            exp_size_kib, rel_uncertainty = args.expected_event_size
             dev = abs(size_kib_per_event / exp_size_kib - 1)
             checks_passed['eventsize_eq_expectation'] = dev < rel_uncertainty
             if not checks_passed['eventsize_eq_expectation']:
@@ -107,10 +118,10 @@ if __name__ == "__main__":
     if args.json_output:
         # suppress other things on standard output
         with redirect_stdout(os.devnull):
-            checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size, args.BRANCH)
+            checks_passed, stats = checkFile(args)
         print(json.dumps({'checks_passed': checks_passed, 'stats': stats}, sort_keys=True, indent=2))
     else:
-        checks_passed, stats = checkFile(args.FILE, args.expected_no_of_events, args.expected_event_size, args.BRANCH)
+        checks_passed, stats = checkFile(args)
 
     checks_failed = [c for (c, ok) in checks_passed.items() if not ok]
     if not args.json_output:

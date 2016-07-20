@@ -37,6 +37,10 @@ namespace Belle2 {
     inline float getBkgProb() const
     {return m_bkgProb;}
 
+    inline float setBkgProb(float val)
+    {return m_bkgProb = val;}
+
+
     /** is this ID originally a KLM Cluster ?*/
     inline bool isKLM() const
     {return m_isKLM;}

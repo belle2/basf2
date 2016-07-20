@@ -9,7 +9,9 @@
  * **************************************************************************/
 
 
-
+#include <analysis/utility/PCmsLabTransform.h>
+#include <analysis/utility/ReferenceFrame.h>
+#include <reconstruction/dataobjects/KlId.h>
 #include <framework/datastore/StoreArray.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <mdst/dataobjects/KLMCluster.h>
@@ -17,6 +19,8 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
 #include <utility>
+
+#include <TLorentzVector.h>
 
 using namespace Belle2;
 using namespace std;
@@ -147,5 +151,31 @@ namespace KlIdHelpers {
 
     return make_tuple(closestTrack, oldDistance, poca);
   }
+
+
+  TVector3 calculateMissEVector(float cut = 0.5)
+  {
+
+    StoreArray<ECLCluster> eclClusters;
+
+    TLorentzVector summedVector;
+    for (ECLCluster& eclcluster : eclClusters) {
+
+      cout << " id: " << eclcluster.getRelatedTo<KlId>() << " wert: " << eclcluster.getRelatedTo<KlId>()->getBkgProb() << endl;
+
+      if (eclcluster.getRelatedTo<KlId>()->getBkgProb() < cut) {
+        summedVector += eclcluster.get4Vector() ;
+      }
+    }
+
+    PCmsLabTransform T;
+    TLorentzVector boost = T.getBoostVector();
+    TLorentzVector missE = boost - summedVector;
+
+    return  missE.Vect();
+  }
+
+
+
 
 }//end namespace

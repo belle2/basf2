@@ -26,7 +26,8 @@
 #include <cstring>
 #include <utility>
 
-#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
+//#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
 
 using namespace Belle2;
 using namespace std;
@@ -117,6 +118,12 @@ void BKGClassifierDataWriterModule::initialize()
 
   m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
+  m_treeECL   -> Branch("ECLangleToMissE",          & m_ECLangleTomissE);
+  m_treeECL   -> Branch("ECLPDG",          & m_ECLPDG);
+  m_treeECL   -> Branch("ECLKLMPDG",          & m_ECLKLMPDG);
+  m_treeECL   -> Branch("ECLangleToClosestKLM",          & m_ECLangleToClosestKLM);
+  m_treeECL   -> Branch("ECKKLMTime",          & m_ECLKLMTime);
+  m_treeECL   -> Branch("ECLbkgProb",          & m_ECLbkgProb);
 
   m_treeECL   -> Branch("isBeamBKG",  & m_isBeamBKG);
 
@@ -226,7 +233,8 @@ void BKGClassifierDataWriterModule::event()
 
 // ---------------   ECL CLUSTERS
 
-  // loop thru eclclusters in event and calculate vars
+  TVector3 missE = calculateMissEVector(0.5);
+
   for (const ECLCluster& cluster : eclClusters) {
 
     // get various ECLCluster vars from getters
@@ -241,19 +249,48 @@ void BKGClassifierDataWriterModule::event()
     m_ECLR = cluster.getR();
     m_ECLEerror = cluster.getErrorEnergy();
 
+
     const TVector3& clusterPos = cluster.getclusterPosition();
+
+    m_ECLangleTomissE = missE.Angle(clusterPos);
 
     // find mc truth
     // go thru all particles mothers up to Y4s and check if its a Klong
     MCParticle* part = cluster.getRelatedTo<MCParticle>();
     m_isBeamBKG = mcParticleIsBeamBKG(part);
     m_ECLTruth = mcParticleIsKlong(part);
-
+    if (cluster.getRelatedTo<KlId>()) {
+      m_ECLbkgProb = cluster.getRelatedTo<KlId>()->getBkgProb();
+    } else {
+      cout << " no klid " << endl;
+      m_ECLbkgProb = 0;
+    }
     //find closest track
     tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance = findClosestTrack(clusterPos);
-
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
+    tuple<const KLMCluster*, double, double> nextKLM = findClosestKLMCluster(clusterPos);
+
+
+    if (cluster.getRelatedTo<MCParticle>()) {
+      m_ECLPDG = cluster.getRelatedTo<MCParticle>()->getPDG();
+      if (get<0>(nextKLM)  and get<0>(nextKLM)->getRelatedTo<MCParticle>()) {
+        m_ECLKLMPDG = get<0>(nextKLM)->getRelatedTo<MCParticle>()->getPDG();
+      } else {
+        m_ECLKLMPDG = 0;
+      }
+    } else {
+      m_ECLPDG = 0;
+      m_ECLKLMPDG = 0;
+    }
+
+    if (get<0>(nextKLM)) {
+      m_ECLKLMTime = get<0>(nextKLM)->getTime();
+      m_ECLangleToClosestKLM = get<0>(nextKLM)->getClusterPosition().Angle(clusterPos);
+    } else {
+      m_ECLangleToClosestKLM = 0;
+      m_ECLKLMTime = 0;
+    }
     // finally fill tree
     m_treeECL -> Fill();
   }// for ecl cluster in clusters

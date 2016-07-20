@@ -56,86 +56,100 @@ namespace Belle2 {
     /** varibales to write out. used for classification of clusters  */
     // KLM cluster variables for pure KLM and KLM+ECL Klongs
     /**  number of clusters */
-    int    m_KLMnCluster;
+    Float_t    m_KLMnCluster;
     /**  number of layers hit in KLM cluster */
-    int    m_KLMnLayer;
+    Float_t    m_KLMnLayer;
     /** number of innermost layers hit */
-    int    m_KLMnInnermostLayer;
+    Float_t    m_KLMnInnermostLayer;
     /** global Z position in KLM  */
-    double m_KLMglobalZ;
+    Float_t m_KLMglobalZ;
     /** timing of KLM Cluster */
-    double m_KLMtime;
+    Float_t m_KLMtime;
     /**  average distance between all KLM clusters */
-    double m_KLMavInterClusterDist;
+    Float_t m_KLMavInterClusterDist;
     /** hit depth in KLM, distance to IP */
-    double m_KLMhitDepth;
+    Float_t m_KLMhitDepth;
     /** Energy deposit in KLM (0.2 GeV * nHitCells) */
-    double m_KLMenergy;
+    Float_t m_KLMenergy;
     /**  invariant mass calculated from root vector */
-    double m_KLMinvM;
+    Float_t m_KLMinvM;
     /** distance KLM Cluster <-> track extrapolated into KLM */
-    double m_KLMtrackDist;
+    Float_t m_KLMtrackDist;
     /** target variable for KLM classification */
-    int    m_KLMTruth;
+    Float_t m_KLMTruth;
     /** distance to next KLM cluster */
-    double m_KLMnextCluster;
+    Float_t m_KLMnextCluster;
     /** distance from track separation object  */
-    double m_KLMTrackSepDist;
+    Float_t m_KLMTrackSepDist;
     /** angular distance from track separation object */
-    double m_KLMTrackSepAngle;
+    Float_t m_KLMTrackSepAngle;
 
     /** angular distance from track to cluster at track starting point */
-    double m_KLMInitialTrackSepAngle;
+    Float_t m_KLMInitialTrackSepAngle;
     /** angle between track at poca and trackbeginning */
-    double m_KLMTrackRotationAngle;
+    Float_t m_KLMTrackRotationAngle;
     /** angle between trach momentum and cluster (measured from ip) */
-    double m_KLMTrackClusterSepAngle;
+    Float_t m_KLMTrackClusterSepAngle;
 
 
 
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster */
-    double m_KLMECLDist;
+    Float_t m_KLMECLDist;
     /** energy measured in associated ECL cluster */
-    double m_KLMECLE;
+    Float_t m_KLMECLE;
     /** distance between track entry point and cluster center, might be removed */
-    double m_KLMECLdeltaL;   // new
+    Float_t m_KLMECLdeltaL;   // new
     /** track distance between associated ECL cluster and track extrapolated into ECL */
-    double m_KLMECLminTrackDist; //new
+    Float_t m_KLMECLminTrackDist; //new
     /** E in surrounding 9 crystals divided by surrounding 25 crydtalls */
-    double m_KLMECLE9oE25;
+    Float_t m_KLMECLE9oE25;
     /** timing of associated ECL cluster */
-    double m_KLMECLTiming;
+    Float_t m_KLMECLTiming;
     /** uncertainty on time in associated ECL cluster */
-    double m_KLMECLTerror;
+    Float_t m_KLMECLTerror;
     /** uncertainty on E in associated ECL cluster */
-    double m_KLMECLEerror;
+    Float_t m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
-    double m_KLMtrackToECL;
+    Float_t m_KLMtrackToECL;
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
-    double m_ECLE;
+    Float_t m_ECLE;
     /** energy of 9/25 chrystall rings (E dispersion shape) */
-    double m_ECLE9oE25;
+    Float_t m_ECLE9oE25;
     /** timing of ECL */
-    double m_ECLTiming;
+    Float_t m_ECLTiming;
     /** distance of cluster to IP */
-    double m_ECLR;
+    Float_t m_ECLR;
     /** uncertainty on E measurement in ECL */
-    double m_ECLEerror;
+    Float_t m_ECLEerror;
     /** more sophisticated distaqnce to track in ECL, might be removed */
-    double m_ECLminTrkDistance; // new
+    Float_t m_ECLminTrkDistance; // new
     /** disatance between track entrace into cluster and cluster center */
-    double m_ECLdeltaL; // new
+    Float_t m_ECLdeltaL; // new
     /** distance cluster to next track in ECL */
-    double m_ECLtrackDist;
+    Float_t m_ECLtrackDist;
     /** ECL trarget variable */
-    double m_ECLTruth;
+    Float_t m_ECLTruth;
 
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE;
+    /** ECL angle to miss e vector */
+
+    Float_t m_ECLbkgProb;
+
+
+    /** Angle to closest KLM */
+    Float_t m_ECLangleToClosestKLM;
+    /** PDG of ECLcluster */
+    Float_t m_ECLPDG;
+    /**pdg of closest cluster */
+    Float_t m_ECLKLMPDG;
     /** used in both trees */
-    double m_isBeamBKG;
-
+    Float_t m_isBeamBKG;
+    /**timeing of closest ECL */
+    Float_t m_ECLKLMTime;
     /** root file */
     TFile* m_f = nullptr; //
     /** tree for klm data */

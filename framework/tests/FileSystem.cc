@@ -3,6 +3,9 @@
 
 #include <gtest/gtest.h>
 
+#include <sys/types.h>
+#include <sys/wait.h>
+
 using namespace std;
 using namespace Belle2;
 namespace fs = boost::filesystem;
@@ -43,7 +46,27 @@ namespace {
     //check 0-timeout locks work
     FileSystem::Lock lk(filename);
     EXPECT_TRUE(lk.lock(0));
-    //NOTE: in same process, the lock is NOT exclusive!
-    EXPECT_TRUE(lk.lock(0));
+
+    if (pid_t pid = fork()) {
+      //mother process
+
+      //NOTE: in same process, the lock is NOT exclusive!
+      EXPECT_TRUE(lk.lock(0));
+      int status = 0;
+      waitpid(pid, &status, 0);
+      EXPECT_TRUE(WIFEXITED(status));
+      EXPECT_EQ(0, WEXITSTATUS(status));
+    } else {
+      //child process
+      //do not use an ASSERT_TRUE or something here, or we'll run tests twice
+      if (lk.lock(0))
+        exit(1);
+
+      FileSystem::Lock lk2(filename);
+      if (lk2.lock(0))
+        exit(1);
+
+      exit(0);
+    }
   }
 }  // namespace

@@ -20,6 +20,7 @@
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
+#include <string.h>
 
 using namespace std;
 using namespace Belle2;
@@ -120,13 +121,15 @@ bool FileSystem::Lock::lock(int timeout)
   fl.l_start = 0;
   fl.l_len = 0;
 
-  do {
+  while (true) {
     int lock = fcntl(m_file, F_SETLK, &fl);
     if (lock == 0)
       return true;
+    else if (std::chrono::steady_clock::now() > maxtime)
+      break;
     usleep(uniform(random) * 1000);
-  } while (std::chrono::steady_clock::now() < maxtime);
-
+  }
+  B2ERROR("Locking failed: " << strerror(errno));
   return false;
 }
 

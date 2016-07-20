@@ -29,6 +29,7 @@ ClusterMatcherModule::ClusterMatcherModule(): Module() // constructor kan nkeine
 {
   setDescription("Match KLM cluster to ECL Clusters within a certain cone.");
 
+  setPropertyFlags(c_ParallelProcessingCertified);
   /** Path were to find the .xml file containing the classifier trainings. */
   addParam("coneInRad",
            m_coneInRad,

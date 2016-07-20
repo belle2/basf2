@@ -34,6 +34,7 @@ REG_MODULE(ECLBKGExpert);
 ECLBKGExpertModule::ECLBKGExpertModule(): Module()
 {
   setDescription("Use to calculate KlId for each ECLCluster.");
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 

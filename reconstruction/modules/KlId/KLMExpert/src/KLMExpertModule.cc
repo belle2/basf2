@@ -35,7 +35,7 @@ REG_MODULE(KLMExpert);
 KLMExpertModule::KLMExpertModule(): Module()
 {
   setDescription("Use to calculate KlId for each KLMCluster.");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
 }
 
 

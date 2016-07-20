@@ -118,6 +118,8 @@ void BKGClassifierDataWriterModule::initialize()
 
   m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
+  m_treeECL   -> Branch("ECLangleToMissE03",          & m_ECLangleTomissE03);
+  m_treeECL   -> Branch("ECLangleToMissE04",          & m_ECLangleTomissE04);
   m_treeECL   -> Branch("ECLangleToMissE05",          & m_ECLangleTomissE05);
   m_treeECL   -> Branch("ECLangleToMissE06",          & m_ECLangleTomissE06);
   m_treeECL   -> Branch("ECLangleToMissE07",          & m_ECLangleTomissE07);

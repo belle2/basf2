@@ -310,7 +310,7 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
             gearbox = register_module('Gearbox')
             gearbox.param('fileName', 'b2bii/Belle.xml')
             path.add_module(gearbox)
-            path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticField'])
+            path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticFieldConstantBelle'])
         else:
             path.add_module('Gearbox')
             path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])

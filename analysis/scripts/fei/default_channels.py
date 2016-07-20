@@ -29,7 +29,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
         # TODO Check how the respective *_dEdx, *_TOP, *_ARICH and *_ECL should be treated
         chargedVariables = ['eIDBelle', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
-                            'atcPIDBelle(3,2)', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH',
+                            'atcPIDBelle(3,2)', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', 'Kid_belle',
                             'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
                             'muIDBelle', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
@@ -86,7 +86,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                      MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
                                                  'clusterE9E25', 'pt', 'E', 'pz', 'goodGamma'],
                                       target='isPrimarySignal'),
-                     PreCutConfiguration(userCut='',
+                     PreCutConfiguration(userCut='goodBelleGamma == 1' if convertedFromBelle else '',
                                          bestCandidateMode='highest',
                                          bestCandidateVariable='E',
                                          bestCandidateCut=40),

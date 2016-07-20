@@ -36,7 +36,7 @@ class TestModule(Module):
 
 subeventpath = create_path()
 subeventpath.add_module('EventInfoPrinter')
-subeventpath.add_module(TestModule())
+testmod = subeventpath.add_module(TestModule())
 # read: for each  $objName   in $arrayName   run over $path
 path.for_each('MCParticle', 'MCParticles', subeventpath)
 
@@ -44,14 +44,21 @@ path.add_module('PrintCollections')
 
 print(path)
 process(path)
+
+# initialize/terminate once
+assert statistics.get(pgun).calls(statistics.INIT) == 1
+assert statistics.get(testmod).calls(statistics.INIT) == 1
+assert statistics.get(pgun).calls(statistics.TERM) == 1
+assert statistics.get(testmod).calls(statistics.TERM) == 1
+# 2 runs
+assert statistics.get(pgun).calls(statistics.BEGIN_RUN) == 2
+assert statistics.get(testmod).calls(statistics.BEGIN_RUN) == 2
+assert statistics.get(pgun).calls(statistics.END_RUN) == 2
+assert statistics.get(testmod).calls(statistics.END_RUN) == 2
+# 6 events, a 3 particles
+assert statistics.get(pgun).calls(statistics.EVENT) == 6
+assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
+
 #
 # print "event"
-# print statistics
-# print "init"
-# print statistics(statistics.INIT)
-# print "beginRun"
-# print statistics(statistics.BEGIN_RUN)
-# print "endRun"
-# print statistics(statistics.END_RUN)
-# print "terminate"
-# print statistics(statistics.TERM)
+# print(statistics)

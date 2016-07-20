@@ -26,7 +26,7 @@ REG_MODULE(Display)
 
 DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
 {
-  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/EventDisplay for detailed documentation.");
+  setDescription("Interactive visualisation of Monte Carlo, intermediate and reconstructed objects, plus geometry. See https://confluence.desy.de/display/BI/Software+/EventDisplay for detailed documentation.");
 
   addParam("options", m_options,
            "Drawing options for RecoTracks, a combination of DHMP. See EVEVisualization::setOptions or the display.py example for an explanation.",

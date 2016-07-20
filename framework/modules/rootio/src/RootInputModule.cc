@@ -68,7 +68,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "Names of persistent durability branches NOT to be read. Takes precedence over branchNamesPersistent.", excludePersistent);
 
   addParam("parentLevel", m_parentLevel,
-           "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://belle2.cc.kek.jp/~twiki/bin/view/Software/ParentFiles for details.",
+           "Number of generations of parent files (files used as input when creating a file) to be read. This can be useful if a file is missing some information available in its parent. See https://confluence.desy.de/display/BI/Software+ParentFiles for details.",
            0);
 }
 

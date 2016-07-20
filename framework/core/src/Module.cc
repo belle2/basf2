@@ -357,7 +357,7 @@ produced by the error.
 
 The 'Module Development' section in the manual provides detailed information
 on how to create modules, setting parameters, or using return values/conditions:
-https://belle2.cc.kek.jp/~twiki/bin/view/Software/Basf2manual#Module_Development)")
+https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("__str__", &Module::getPathString)
   .def("name", &Module::getName, return_value_policy<copy_const_reference>(),
        "Returns the name of the module. Can be changed via :func:`set_name() <basf2.Module.set_name()>`, use :func:`type() <basf2.Module.type()>` for identifying a particular module class.")

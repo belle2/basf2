@@ -33,7 +33,7 @@ REG_MODULE(SeqRootOutput)
 SeqRootOutputModule::SeqRootOutputModule() : Module(), m_nevt(0), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
-  setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://belle2.cc.kek.jp/~twiki/bin/view/Software/PersistencyModules for further information and a comparison with the .root format.");
+  setDescription("Save a sequential ROOT file (non-standard I/O format used in DAQ). See https://confluence.desy.de/display/BI/Software+PersistencyModules for further information and a comparison with the .root format.");
   m_file = 0;
   m_msghandler = 0;
 

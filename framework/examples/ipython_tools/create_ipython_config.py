@@ -50,8 +50,8 @@ def main():
                 print("Could not start jupyter notebook. There are many possible reasons for this.\n"
                       "\t1) Have you installed jupyter properly?\n"
                       "\t2) Is there something like \"ImportError: No module named '_sqlite3'\" in the error message?"
-                      "Then please see https://belle2.cc.kek.jp/~twiki/bin/view/Software/IPython for help on that.\n"
-                      "\t3) For every other errors not listed on https://belle2.cc.kek.jp/~twiki/bin/view/Software/IPython,"
+                      "Then please see https://confluence.desy.de/display/BI/Software+IPython for help on that.\n"
+                      "\t3) For every other errors not listed on https://confluence.desy.de/display/BI/Software+IPython,"
                       "please feel free to contact nils.braun@kit.edu.")
 
         config_file = template.render(port=port, password=password)

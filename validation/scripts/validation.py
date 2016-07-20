@@ -88,8 +88,8 @@ def statistics_plots(
             + str(method).lower()[1:].replace('_r', 'R')
         if index == 5:
             break
-        hGlobalTiming.SetBinContent(index + 1, statistics.getGlobal().time_mean(method) * 1e-6)
-        hGlobalTiming.SetBinError(index + 1, statistics.getGlobal().time_stddev(method) * 1e-6)
+        hGlobalTiming.SetBinContent(index + 1, statistics.get_global().time_mean(method) * 1e-6)
+        hGlobalTiming.SetBinError(index + 1, statistics.get_global().time_stddev(method) * 1e-6)
         hGlobalTiming.GetXaxis().SetBinLabel(index + 1, methodName[method])
     hGlobalTiming.Write()
 
@@ -162,7 +162,7 @@ def statistics_plots(
         memoryProfile.obj().Write(prefix + 'RssMemoryProfile')
 
     # Memory usage per module for the different methods
-    sqrtN = 1 / math.sqrt(statistics.getGlobal().calls() - 1)
+    sqrtN = 1 / math.sqrt(statistics.get_global().calls() - 1)
     hModuleMemory = ROOT.TH1D(prefix + 'ModuleMemory', 'Virtual Module Memory',
                               len(modules), 0, len(modules))
     hModuleMemory.SetStats(0)

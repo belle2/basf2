@@ -189,7 +189,7 @@ by using the names and not just the values.  To set or get the log level,
 one can simply do:
 
 >>> logging.log_level = LogLevel.FATAL
->>> print "Logging level set to", logging.log_level
+>>> print("Logging level set to", logging.log_level)
 FATAL
 
 This module also allows to send log messages directly from python to ease

@@ -972,17 +972,17 @@ void ECLDataAnalysisModule::event()
       const RelationElement re = ECLCalDigitToMC[i];
       if ((re.getFromIndex() == icaldigits) && (ii < 10)) {
         idx[ii] = i;
-        cout << "Digit: " << icaldigits << " Index: " << idx[ii] << endl;
+        //cout << "Digit: " << icaldigits << " Index: " << idx[ii] << endl;
         sumHit = sumHit + re.getWeight();
         ii++;
-        //  cout << "Energy: " << sumHit << endl;
       }
     }
+
 
     //Re-ordering based on contribution
     int y = 0;
     while (y < 10) {
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 9; i++) {
         if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
           if (ECLCalDigitToMC[idx[i]].getWeight() < ECLCalDigitToMC[idx[i + 1]].getWeight()) {
             int temp = idx[i];
@@ -1199,7 +1199,7 @@ void ECLDataAnalysisModule::event()
     //Re-ordering based on contribution
     int y = 0;
     while (y < 10) {
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 9; i++) {
         if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
           if (ECLClusterToMC[idx[i]].getWeight() < ECLClusterToMC[idx[i + 1]].getWeight()) {
             int temp = idx[i];
@@ -1397,7 +1397,7 @@ void ECLDataAnalysisModule::event()
     //Re-ordering based on contribution
     int y = 0;
     while (y < 10) {
-      for (int i = 0; i < 10; i++) {
+      for (int i = 0; i < 9; i++) {
         if (((idx[i]) > -1) && ((idx[i + 1]) > -1)) {
           if (ECLShowerToMC[idx[i]].getWeight() < ECLShowerToMC[idx[i + 1]].getWeight()) {
             int temp = idx[i];

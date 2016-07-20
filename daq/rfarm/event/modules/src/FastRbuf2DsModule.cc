@@ -10,9 +10,6 @@
 #include <TSystem.h>
 #include <stdlib.h>
 
-#include "framework/datastore/StoreObjPtr.h"
-#include "framework/dataobjects/EventMetaData.h"
-
 using namespace std;
 using namespace Belle2;
 
@@ -74,7 +71,7 @@ void FastRbuf2DsModule::initialize()
 
   // Initialize DataStoreStreamer, use Instance to use threads
   //  m_streamer = &(DataStoreStreamer::Instance());
-  m_streamer = new DataStoreStreamer(m_compressionLevel, m_numThread);
+  m_streamer = new DataStoreStreamer(m_compressionLevel, true, m_numThread);
 
   // Read the first event in FastSeqRoot file and restore in DataStore.
   // This is necessary to create object tables before TTree initialization

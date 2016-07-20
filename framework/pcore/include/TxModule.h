@@ -39,13 +39,15 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    /** Wether to block until we can insert data into the ring buffer in event().
+    /** Whether to block until we can insert data into the ring buffer in event().
      *
      * If this is turned off, some previous data will be removed until enough
      * space is available.
      */
     void setBlockingInsert(bool block) { m_blockingInsert = block; }
 
+    /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */
+    void disableMergeableHandling(bool disable = true) { m_handleMergeable = !disable; }
   private:
 
     //!Compression parameter
@@ -60,8 +62,10 @@ namespace Belle2 {
     //! No. of sent events
     int m_nsent;
 
-    /** Wether to block until we can insert data into the ring buffer in event(). */
+    /** Whether to block until we can insert data into the ring buffer in event(). */
     bool m_blockingInsert;
+
+    bool m_handleMergeable = true; /**< Whether to handle Mergeable objects. */
 
     /** Random Generator object to pass to RxModule */
     StoreObjPtr<RandomGenerator> m_randomgenerator;

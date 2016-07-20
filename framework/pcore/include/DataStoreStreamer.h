@@ -32,9 +32,11 @@ namespace Belle2 {
     static const unsigned int c_maxQueueDepth = 64;
 
     /** Constructor
-     *  @param complevel  Compression level of streaming
+     *  @param complevel  Compression level of streaming, 0 to disable
+     *  @param handleMergeable perform special handling for Mergeable objects?
+     *  @param maxthread  maximal number of threads, 0 to disable
      */
-    DataStoreStreamer(int complevel = 0, int maxthread = 0);
+    explicit DataStoreStreamer(int complevel = 0, bool handleMergeable = true, int maxthread = 0);
 
     /** destructor */
     ~DataStoreStreamer();
@@ -126,6 +128,8 @@ namespace Belle2 {
 
     /** Compression level in streaming */
     int m_compressionLevel;
+
+    bool m_handleMergeable; /**< Whether to handle Mergeable objects. */
 
     /** first event flag.
      *

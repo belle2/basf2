@@ -65,7 +65,7 @@ void RxModule::initialize()
   m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 
   // Initialize DataStoreStreamer
-  m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization

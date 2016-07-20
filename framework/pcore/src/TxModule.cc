@@ -42,7 +42,7 @@ void TxModule::initialize()
   m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 
   m_rbuf->txAttached();
-  m_streamer = new DataStoreStreamer(m_compressionLevel);
+  m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
 
   if ((Environment::Instance().getStreamingObjects()).size() > 0) {
     m_streamer->registerStreamObjs(Environment::Instance().getStreamingObjects());

@@ -37,6 +37,9 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
+    /** Disable handling of Mergeable objects. Useful for special applications like AsyncWrapper. */
+    void disableMergeableHandling(bool disable = true) { m_handleMergeable = !disable; }
+
   private:
     /** Gets data from m_rbuf and puts it into the data store. */
     void readEvent();
@@ -52,6 +55,8 @@ namespace Belle2 {
 
     /** Current event number. */
     int m_nrecv;
+
+    bool m_handleMergeable = true; /**< Whether to handle Mergeable objects. */
 
     /** Random Generator object to receive from TxModule */
     StoreObjPtr<RandomGenerator> m_randomgenerator;

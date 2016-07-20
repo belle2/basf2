@@ -76,8 +76,9 @@ void AsyncWrapper::initialize()
   m_ringBuffer = new RingBuffer(bufferSizeInts);
   rbList.push_back(m_ringBuffer);
   m_rx = new RxModule(m_ringBuffer);
-  m_rx->setLogLevel(LogConfig::c_Error); //suppress warnings about failed statistics merge in receiving process
+  m_rx->disableMergeableHandling();
   m_tx = new TxModule(m_ringBuffer);
+  m_tx->disableMergeableHandling();
   m_tx->setBlockingInsert(!m_discardOldEvents); //actually decouple this process
 
   //fork out one extra process

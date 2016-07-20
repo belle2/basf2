@@ -64,7 +64,10 @@ DataStoreStreamer& DataStoreStreamer::Instance()
 }
 
 // Constructor
-DataStoreStreamer::DataStoreStreamer(int complevel, int maxthread) : m_compressionLevel(complevel), m_initStatus(0),
+DataStoreStreamer::DataStoreStreamer(int complevel, bool handleMergeable, int maxthread):
+  m_compressionLevel(complevel),
+  m_handleMergeable(handleMergeable),
+  m_initStatus(0),
   m_maxthread(maxthread),
   m_threadin(0)
   //, m_threadout(0)
@@ -198,7 +201,7 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       entry->object->SetBit(c_IsNull, false);
       entry->object->SetBit(c_PersistentDurability, false);
 
-      bool merge = entry->ptr != NULL and isMergeable(entry->object);
+      bool merge = m_handleMergeable and entry->ptr != NULL and isMergeable(entry->object);
       if (merge)
         clearMergeable(entry->object);
     }
@@ -268,7 +271,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         bool ptrIsNULL = obj->TestBit(c_IsNull);
         if (!ptrIsNULL) {
           DataStore::StoreEntry* entry = DataStore::Instance().getEntry(StoreAccessorBase(namelist.at(i), durability, cl, array));
-          bool merge = !array and entry->ptr != NULL and isMergeable(obj);
+          bool merge = m_handleMergeable and !array and entry->ptr != NULL and isMergeable(obj);
           if (merge) {
             B2DEBUG(100, "Will now merge " << namelist.at(i));
 

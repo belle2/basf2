@@ -68,11 +68,6 @@ namespace Belle2 {
     addParam("useCommonT0Calibration", m_useCommonT0Calibration,
              "if true, use common T0 calibration (needs DB)", true);
 
-    if (m_useSampleTimeCalibration) m_timebase = new DBObjPtr<TOPCalTimebase>;
-    if (m_useChannelT0Calibration) m_channelT0 = new DBObjPtr<TOPCalChannelT0>;
-    if (m_useModuleT0Calibration) m_moduleT0 = new DBObjPtr<TOPCalModuleT0>;
-    if (m_useCommonT0Calibration) m_commonT0 = new DBObjPtr<TOPCalCommonT0>;
-
   }
 
 
@@ -99,6 +94,12 @@ namespace Belle2 {
     const auto* geo = TOPGeometryPar::Instance()->getGeometry();
     m_sampleTimes.setTimeAxis(geo->getNominalTDC().getSyncTimeBase());
     m_sampleDivisions = (0x1 << geo->getNominalTDC().getSubBits());
+
+    // alocate DB objects (steering values passed from py after constructor is called!)
+    if (m_useSampleTimeCalibration) m_timebase = new DBObjPtr<TOPCalTimebase>;
+    if (m_useChannelT0Calibration) m_channelT0 = new DBObjPtr<TOPCalChannelT0>;
+    if (m_useModuleT0Calibration) m_moduleT0 = new DBObjPtr<TOPCalModuleT0>;
+    if (m_useCommonT0Calibration) m_commonT0 = new DBObjPtr<TOPCalCommonT0>;
 
   }
 
@@ -180,8 +181,8 @@ namespace Belle2 {
       if (m_useChannelT0Calibration) time -= (*m_channelT0)->getT0(moduleID, channel);
       if (m_useModuleT0Calibration) time -= (*m_moduleT0)->getT0(moduleID);
       if (m_useCommonT0Calibration) time -= (*m_commonT0)->getT0();
-      double width = sampleTimes->getDeltaTime(window, rawTime,
-                                               rawDigit.getCFDFallingTime()); // in [ns]
+      double width = sampleTimes->getDeltaTime(window, rawDigit.getCFDFallingTime(),
+                                               rawDigit.getCFDLeadingTime()); // in [ns]
       auto* digit = digits.appendNew(moduleID, pixelID, tdc);
       digit->setTime(time);
       // digit->setTimeError(timeError); TODO!

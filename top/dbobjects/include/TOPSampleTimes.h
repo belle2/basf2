@@ -132,11 +132,11 @@ namespace Belle2 {
      * Note: sample is float - digits that follow the decimal point are used to
      * interpolate the time  btw. two samples
      * @param window ASIC window number
-     * @param sample1 sample counted from the first one in the specified ASIC window
-     * @param sample2 sample counted from the first one in the specified ASIC window
+     * @param sample2 sample counted from the first sample of the specified ASIC window
+     * @param sample1 sample counted from the first sample of the specified ASIC window
      * @return time difference in [ns]
      */
-    double getDeltaTime(unsigned window, double sample1, double sample2) const
+    double getDeltaTime(unsigned window, double sample2, double sample1) const
     {
       return getTime(window, sample2) - getTime(window, sample1);
     }

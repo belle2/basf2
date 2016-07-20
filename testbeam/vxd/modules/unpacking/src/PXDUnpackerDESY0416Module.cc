@@ -358,7 +358,7 @@ struct dhc_onsen_roi_frame {
     }
     if ((length - 4 - 4 - 4) % 8 != 0) {
       B2ERROR("DHC ONSEN HLT/ROI Frame holds fractional ROIs, last ROI might not be saved!");
-      PXDUnpackerDESY0416Module::dump_roi(data, length - 4); // minus CRC
+      // PXDUnpackerDESY0416Module::dump_roi(data, length - 4); // minus CRC
     }
     unsigned int l;
     l = (length - 4 - 4 - 4) / 8;
@@ -1631,7 +1631,7 @@ void PXDUnpackerDESY0416Module::remap_IF_OB(unsigned int& v_cellID, unsigned int
 
   // B2INFO("Remapped :: From COL $" << u_cellID << " ROW $" << v_cellID);
   DCD_channel = (u_cellID << 2) + (v_cellID & 0x3) + 256 * dhp_id;
-  Drain = LUT_IF_OB[DCD_channel]; //since LUT starts with one and array with zero
+  Drain = LUT_IF_OB[DCD_channel];
   u_cellID = Drain >> 2;
   row = (v_cellID & ~0x3)  + (Drain & 0x3); // no ~ bei drain
   row = (row + m_DESY16_FixRowOffset) % 768;
@@ -1691,7 +1691,7 @@ void PXDUnpackerDESY0416Module::remap_IB_OF(unsigned int& v_cellID, unsigned int
   u_cellID = 250 - 1 - (Drain >> 2);
   if (u_cellID >= 250) u_cellID = 255; // workaround for negative values!!!
 //   row = (v_cellID / 4) * 4  + Drain % 4;
-  row = (v_cellID & ~0x3)  + (~(Drain & 0x3)); // ~ bei drain
+  row = (v_cellID & ~0x3)  + ((~Drain) & 0x3); // ~ bei drain
   row = (row + m_DESY16_FixRowOffset) % 768;
   if ((dhe_ID  & 0x20) == 0) { //if inner module
     v_cellID = 768 - 1 - row ;

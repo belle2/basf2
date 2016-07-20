@@ -4,7 +4,7 @@
  *                                                                        *
  * A local maximum is defined by its energy and the number and energy of  *
  * its neighbours. It holds a relation to to an ECLConnectedRegion and    *
- * an ECLCalDigit.                                                        *
+ * an ECLCalDigit. It has a type (photon, electron, mergedpi0, ...).      *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -28,11 +28,21 @@ namespace Belle2 {
   class ECLLocalMaximum : public RelationsObject {
   public:
 
+    /** Enumerator for LM types */
+    enum {
+      c_photon = 1, /**< photon */
+      c_electron = 2, /**< electron */
+      c_mergedpi0 = 3, /**< merged pi0 */
+    };
+    static const size_t c_nTypes = 3;
+
+
     /** default constructor for ROOT */
     ECLLocalMaximum()
     {
-      m_LMId                    = -1;     /**< LM identifier */
+      m_LMId                    = -1; /**< LM identifier */
       m_NNeighbours             = -1; /**< Number of neighbours with energy > cut */
+      m_Type                    = -1; /** LM type  (photon, electron, merged pi0...)*/
       m_MaximumEnergyNeighbours = 0.0;  /**< Maximum energy among neighbours */
       m_ListOfNeighbourEnergies.clear(); /**< Clear the neighbour list */
     }
@@ -45,6 +55,10 @@ namespace Belle2 {
     /*! Set number of neighbours above cut.
      */
     void setNNeighbours(int NoN) { m_NNeighbours = NoN; }
+
+    /*! Set type.
+     */
+    void setType(int type) { m_Type = type; }
 
     /*! Set maximum energiy of neighbours.
      */
@@ -73,6 +87,11 @@ namespace Belle2 {
      */
     int getNNeighbours() const { return m_NNeighbours; }
 
+    /*! Get type.
+     * @return type
+     */
+    int getType() const { return m_Type; }
+
     /*! Get number of neighbours above cut.
      * @return number of neighbours
      */
@@ -86,11 +105,13 @@ namespace Belle2 {
   private:
     int m_LMId;  /**< LM ID */
     int m_NNeighbours; /**< Number of neighbours. */
+    int m_Type; /** LM type  (photon, electron, merged pi0...)*/
     double m_MaximumEnergyNeighbours; /**< Maximum energy of neighbours. */
     std::vector<double> m_ListOfNeighbourEnergies;  /**< List of neighbour energies. */
 
     // 1: initial version
-    ClassDef(ECLLocalMaximum, 1); /**< ClassDef */
+    // 2: added identifier for LM type (photon, electron, merged pi0...)
+    ClassDef(ECLLocalMaximum, 2); /**< ClassDef */
 
   };
 

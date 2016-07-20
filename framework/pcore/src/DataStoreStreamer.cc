@@ -56,14 +56,6 @@ void* RunDecodeEvtMessage(void* targ)
   return NULL;
 }
 
-// Instance
-DataStoreStreamer& DataStoreStreamer::Instance()
-{
-  static DataStoreStreamer instance;
-  return instance;
-}
-
-// Constructor
 DataStoreStreamer::DataStoreStreamer(int complevel, bool handleMergeable, int maxthread):
   m_compressionLevel(complevel),
   m_handleMergeable(handleMergeable),

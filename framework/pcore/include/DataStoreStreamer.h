@@ -41,9 +41,6 @@ namespace Belle2 {
     /** destructor */
     ~DataStoreStreamer();
 
-    /** Return singleton instance. */
-    static DataStoreStreamer& Instance();
-
     // DataStore->EvtMessage
     /** Store DataStore objects in EvtMessage
      *

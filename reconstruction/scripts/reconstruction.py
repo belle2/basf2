@@ -123,6 +123,17 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
         mdstPID = register_module('MdstPID')
         path.add_module(mdstPID)
 
+    # klong id and cluster matcher, whcih also builds "cluster"
+    if components is None or 'EKLM' and 'BKLM' and 'ECL' in components:
+        KLMClassifier = register_module('KLMExpert')
+        path.add_module(KLMClassifier)
+
+        ECLClassifier = register_module('ECLExpert')
+        path.add_module(ECLClassifier)
+
+        ClusterMatcher = register_module('ClusterMatcher')
+        path.add_module(ClusterMatcher)
+
 
 def add_reconstruction(path, components=None, pruneTracks=True):
     """

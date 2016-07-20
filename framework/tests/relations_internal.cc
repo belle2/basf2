@@ -473,4 +473,23 @@ namespace {
     EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData2).at(0));
     EXPECT_EQ(evtData.getName(), DataStore::Instance().getListOfRelatedArrays(profileData).at(0));
   }
+
+  TEST_F(RelationsInternal, StoreArray_clear_cleans_relations)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    evtData.registerRelationTo(relObjData);
+    relObjData.registerRelationTo(profileData);
+    evtData.registerRelationTo(profileData);
+    DataStore::Instance().setInitializeActive(false);
+
+    DataStore::Instance().addRelationFromTo((evtData)[0], (relObjData)[0], 1.0);
+    DataStore::Instance().addRelationFromTo((relObjData)[1], (profileData)[9], 1.0);
+    DataStore::Instance().addRelationFromTo((evtData)[1], (profileData)[1], 2.0);
+
+    evtData.clear();
+    profileData.clear();
+
+    EXPECT_EQ(DataStore::getRelationsFromObj<ProfileInfo>(relObjData[1]).size(), 0u);
+    EXPECT_EQ(DataStore::getRelationsToObj<EventMetaData>(relObjData[0]).size(), 0u);
+  }
 }  // namespace

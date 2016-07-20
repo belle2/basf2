@@ -20,6 +20,11 @@
 #include <stdexcept>
 
 namespace Belle2 {
+  /** hide some implementation details. */
+  namespace _StoreArrayImpl {
+    /** clear all relations touching the given array. */
+    void clearRelations(const StoreAccessorBase& array);
+  };
   /** Accessor to arrays stored in the data store.
    *
    *  StoreArrays (like StoreObjPtrs) are uniquely identified by their name
@@ -231,12 +236,14 @@ namespace Belle2 {
 
     /** Delete all entries in this array.
      *
-     * TODO: currently produces dangling relations if any were created
+     * Any relations to objects in this array are also removed.
      */
     void clear() override
     {
       if (isValid())
         (*m_storeArray)->Delete();
+
+      _StoreArrayImpl::clearRelations(*this);
     }
 
     /** Check whether the array was created.

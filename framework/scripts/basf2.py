@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+The core module of the Belle II Analysis Software Framework.
+"""
+
 # now let's make sure we actually run in python 3
 import sys
 if sys.version_info[0] < 3:
@@ -284,10 +288,9 @@ def set_module_parameters(path, name, recursive=False, **kwargs):
 
 def create_path():
     """
-    Creates a new path and returns it
+    Creates a new path and returns it. You can also instantiate :class:`basf2.Path` directly.
     """
-
-    return fw.create_path()
+    return Path()
 
 
 def process(path, max_event=0):
@@ -629,7 +632,7 @@ def serialize_path(path):
 
 
 def deserialize_path(path_state):
-    path = fw.create_path()
+    path = Path()
     for module_state in path_state['modules']:
         module = deserialize_module(module_state)
         path.add_module(module)

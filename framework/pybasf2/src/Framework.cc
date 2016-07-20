@@ -79,12 +79,6 @@ ModulePtr Framework::registerModule(const string& moduleName, const string& shar
 }
 
 
-PathPtr Framework::createPath()
-{
-  return PathPtr(new Path);
-}
-
-
 void Framework::process(PathPtr startPath, long maxEvent)
 {
   if (Environment::Instance().getDryRun()) {
@@ -225,7 +219,6 @@ void Framework::exposePythonAPI()
   .def("register_module", registerModule1)
   .def("register_module", registerModule2)
   .def("list_registered_modules", &Framework::getRegisteredModulesPython)
-  .def("create_path", &Framework::createPath)
   .def("process", &Framework::process, process_overloads())
   .def("get_pickle_path", &Framework::getPicklePath)
   .def("set_pickle_path", &Framework::setPicklePath)

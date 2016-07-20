@@ -85,11 +85,6 @@ namespace Belle2 {
     ModulePtr registerModule(const std::string& moduleName, const std::string& sharedLibPath);
 
     /**
-     * Creates a new path and returns a shared pointer.
-     */
-    PathPtr createPath();
-
-    /**
      * Processes up to maxEvent events by starting with the first module in the specified path.
      *
      * This method starts processing events only if there is a module in the path

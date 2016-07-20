@@ -66,6 +66,7 @@ if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
 set_nprocesses(5)
 process(main)
 
+assert statistics.get(simulation).calls(statistics.EVENT) == 5
 print(statistics)
 
 # check wether output file contains correct number of events

@@ -34,29 +34,42 @@ class TestModule(Module):
         B2INFO("TestModule: beginRun()")
 
 
-subeventpath = create_path()
-subeventpath.add_module('EventInfoPrinter')
-testmod = subeventpath.add_module(TestModule())
-# read: for each  $objName   in $arrayName   run over $path
-path.for_each('MCParticle', 'MCParticles', subeventpath)
+for use_pp in [False, True]:
+    if os.fork() == 0:
+        subeventpath = create_path()
+        testmod = TestModule()
+        if use_pp:
+            testmod.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+        else:
+            subeventpath.add_module('EventInfoPrinter')
+        subeventpath.add_module(testmod)
+        # read: for each  $objName   in $arrayName   run over $path
+        path.for_each('MCParticle', 'MCParticles', subeventpath)
+        path.add_module('PrintCollections')
+        if use_pp:
+            set_nprocesses(2)
+            logging.log_level = LogLevel.WARNING  # suppress output
+            process(path)
+        else:
+            print(path)
+            process(path)
+        # print(statistics)
+        # initialize/terminate once
+        assert statistics.get(pgun).calls(statistics.INIT) == 1
+        assert statistics.get(testmod).calls(statistics.INIT) == 1
+        if not use_pp:
+            # for pp, term statistics are wrong, begin/end run are complicated
+            assert statistics.get(pgun).calls(statistics.TERM) == 1
+            assert statistics.get(testmod).calls(statistics.TERM) == 1
+            # 2 runs
+            assert statistics.get(pgun).calls(statistics.BEGIN_RUN) == 2
+            assert statistics.get(testmod).calls(statistics.BEGIN_RUN) == 2
+            assert statistics.get(pgun).calls(statistics.END_RUN) == 2
+            assert statistics.get(testmod).calls(statistics.END_RUN) == 2
+        # 6 events, a 3 particles
+        assert statistics.get(pgun).calls(statistics.EVENT) == 6
+        assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
 
-path.add_module('PrintCollections')
-
-print(path)
-process(path)
-
-# initialize/terminate once
-assert statistics.get(pgun).calls(statistics.INIT) == 1
-assert statistics.get(testmod).calls(statistics.INIT) == 1
-assert statistics.get(pgun).calls(statistics.TERM) == 1
-assert statistics.get(testmod).calls(statistics.TERM) == 1
-# 2 runs
-assert statistics.get(pgun).calls(statistics.BEGIN_RUN) == 2
-assert statistics.get(testmod).calls(statistics.BEGIN_RUN) == 2
-assert statistics.get(pgun).calls(statistics.END_RUN) == 2
-assert statistics.get(testmod).calls(statistics.END_RUN) == 2
-# 6 events, a 3 particles
-assert statistics.get(pgun).calls(statistics.EVENT) == 6
-assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
-
-# print(statistics)
+        sys.exit(0)
+    retbytes = os.wait()[1]
+    assert retbytes == 0

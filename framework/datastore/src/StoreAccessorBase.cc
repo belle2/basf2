@@ -12,6 +12,7 @@
 #include <framework/logging/Logger.h>
 
 #include <TClass.h>
+#include <TClonesArray.h>
 #include <TObject.h>
 
 using namespace Belle2;
@@ -33,11 +34,17 @@ std::string StoreAccessorBase::readableName() const
 
 bool StoreAccessorBase::assign(TObject* object, bool replace)
 {
-  bool success;
-  if (object != nullptr and object->IsA() != getClass()) {
-    B2ERROR("Cannot assign() an object of type '" << object->IsA()->GetName() << "' to " << readableName() << " of type '" <<
+  if (not object)
+    return false;
+
+  bool success = false;
+  const bool objIsArray = (object->IsA() == TClonesArray::Class());
+  TClass* objClass = objIsArray ? (static_cast<TClonesArray*>(object))->GetClass() : object->IsA();
+  if (objIsArray != isArray()) {
+    B2ERROR("Cannot assign an object to an array (or vice versa); while assigning to " << readableName());
+  } else if (objClass != getClass()) {
+    B2ERROR("Cannot assign() an object of type '" << objClass->GetName() << "' to " << readableName() << " of type '" <<
             getClass()->GetName() << "'!");
-    success = false;
   } else {
     success = DataStore::Instance().createObject(object, replace, *this);
   }

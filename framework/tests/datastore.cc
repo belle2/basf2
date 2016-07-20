@@ -74,6 +74,7 @@ namespace {
     static void verifyContents()
     {
       StoreObjPtr<EventMetaData> evtPtr;
+      EXPECT_TRUE(evtPtr.isValid());
       EXPECT_EQ(evtPtr->getEvent(), (unsigned long)42);
 
       StoreArray<EventMetaData> evtData;
@@ -225,6 +226,11 @@ namespace {
     evtData.clear();
     EXPECT_TRUE(evtData.isValid());
     EXPECT_EQ(evtData.getEntries(), 0);
+
+    StoreObjPtr<EventMetaData> evtPtr;
+    evtPtr.clear(); //resets to default-constructed object
+    EXPECT_TRUE(evtPtr.isValid());
+    EXPECT_EQ(evtPtr->getEvent(), 1);
   }
   TEST_F(DataStoreTest, RawAccess)
   {
@@ -701,5 +707,51 @@ namespace {
 
     //searching for nullptr is allowed
     EXPECT_FALSE(DataStore::Instance().findStoreEntry(nullptr, entry, index));
+  }
+
+  TEST_F(DataStoreTest, ListEntries)
+  {
+    StoreArray<EventMetaData> evtData;
+    EXPECT_EQ(0, DataStore::Instance().getListOfRelatedArrays(evtData).size());
+
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<ProfileInfo> profileInfo;
+    evtData.registerRelationTo(profileInfo);
+    DataStore::Instance().setInitializeActive(false);
+
+    EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(evtData).size());
+    EXPECT_EQ(1, DataStore::Instance().getListOfRelatedArrays(profileInfo).size());
+
+    EXPECT_EQ(1, DataStore::Instance().getListOfArrays(ProfileInfo::Class(), DataStore::c_Event).size());
+    EXPECT_EQ(0, DataStore::Instance().getListOfArrays(ProfileInfo::Class(), DataStore::c_Persistent).size());
+    EXPECT_EQ(1, DataStore::Instance().getListOfArrays(EventMetaData::Class(), DataStore::c_Persistent).size());
+    EXPECT_EQ(3, DataStore::Instance().getListOfArrays(EventMetaData::Class(), DataStore::c_Event).size());
+
+    EXPECT_EQ(1, DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::c_Persistent).size());
+    EXPECT_EQ(4, DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::c_Event).size());
+
+    EXPECT_EQ(1, DataStore::Instance().getListOfObjects(EventMetaData::Class(), DataStore::c_Event).size());
+    EXPECT_EQ(0, DataStore::Instance().getListOfObjects(EventMetaData::Class(), DataStore::c_Persistent).size());
+    EXPECT_EQ(1, DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::c_Event).size());
+    EXPECT_EQ(0, DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::c_Persistent).size());
+  }
+
+  TEST_F(DataStoreTest, Assign)
+  {
+    StoreArray<EventMetaData> evtData;
+    EXPECT_FALSE(evtData.assign(new EventMetaData(), true));
+    EXPECT_FALSE(evtData.assign(new EventMetaData(), false));
+
+    EXPECT_TRUE(evtData.isValid());
+    EXPECT_EQ(evtData.getEntries(), 10);
+
+    StoreObjPtr<EventMetaData> evtPtr;
+    EventMetaData* newobj = new EventMetaData();
+    newobj->setEvent(123);
+    EXPECT_FALSE(evtPtr.assign(new EventMetaData(), false));
+    EXPECT_FALSE(evtPtr.assign(new ProfileInfo(), true));
+    EXPECT_EQ(evtPtr->getEvent(), 42);
+    EXPECT_TRUE(evtPtr.assign(newobj, true));
+    EXPECT_EQ(evtPtr->getEvent(), 123);
   }
 }  // namespace

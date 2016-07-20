@@ -18,4 +18,5 @@ reconstruction.add_reconstruction(path)
 # Assert that all modules have a parallel processing certified flag.
 modules = path.modules()
 for m in modules:
-    assert m.has_properties(basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED)
+    assert m.has_properties(
+        basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED), '%s is missing c_ParallelProcessingCertified flag!' % (m)

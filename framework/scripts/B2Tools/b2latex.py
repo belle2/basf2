@@ -51,6 +51,7 @@ class LatexObject(object):
             \usepackage{amsfonts}
             \usepackage{amssymb}
             \usepackage{graphicx}
+            \usepackage{caption}
             \usepackage{subcaption}
             \usepackage{lmodern}
             \usepackage{placeins}
@@ -61,7 +62,6 @@ class LatexObject(object):
             \usepackage[left=2cm,right=2cm,top=2cm,bottom=2cm]{geometry}
             \usepackage{microtype} %optimises spacing, needs to go after fonts
             \usepackage{hyperref} %adds links (also in TOC), should be loaded at the very end
-            \usepackage{caption}
             \usepackage{longtable}
             \usepackage{color}
             \usepackage[load-configurations=abbreviations]{siunitx}

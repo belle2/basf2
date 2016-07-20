@@ -112,6 +112,8 @@ namespace Belle2 {
     Float_t m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
     Float_t m_KLMtrackToECL;
+    /** angle cluster to its mc particle  */
+    Float_t m_KLMangleToMC;
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
@@ -136,7 +138,23 @@ namespace Belle2 {
     /** ECL angle to miss e vector */
     Float_t m_ECLangleTomissE;
     /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE03;
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE04;
 
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE05;
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE06;
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE07;
+    /** ECL angle to miss e vector */
+    Float_t m_ECLangleTomissE08;
+    /** ECL angle cluster to mc particle*/
+    Float_t m_ECLangleToMC;
+
+
+    /** ecl bkg probability */
     Float_t m_ECLbkgProb;
 
 

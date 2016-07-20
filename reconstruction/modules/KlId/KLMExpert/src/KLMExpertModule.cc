@@ -57,13 +57,13 @@ void KLMExpertModule::initialize()
   StoreArray<KLMCluster> klmClusters;
   klmClusters.registerRelationTo(eclClusters);
 
-  StoreArray<KlId>::registerTransient();//Transient
+  StoreArray<KlId>::registerPersistent();//Transient
 
   StoreArray<KlId> klids;
   klmClusters.registerRelationTo(klids);
 
-  // reserve n variables in the vector !!:w
-  m_feature_variables.reserve(23);
+  // resize n variables in the vector !!:w
+  m_feature_variables.resize(m_nVars);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -193,26 +193,26 @@ void KLMExpertModule::event()
     m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
-    m_feature_variables.push_back(m_KLMnCluster);
-    m_feature_variables.push_back(m_KLMnLayer);
-    m_feature_variables.push_back(m_KLMnInnermostLayer);
-    m_feature_variables.push_back(m_KLMglobalZ);
-    m_feature_variables.push_back(m_KLMtime);
-    m_feature_variables.push_back(m_KLMinvM);
-    m_feature_variables.push_back(m_KLMtrackDist);
-    m_feature_variables.push_back(m_KLMnextCluster);
-    m_feature_variables.push_back(m_KLMavInterClusterDist);
-    m_feature_variables.push_back(m_KLMTrackSepDist);
-    m_feature_variables.push_back(m_KLMTrackSepAngle);
-    m_feature_variables.push_back(m_KLMInitialTrackSepAngle);
-    m_feature_variables.push_back(m_KLMECLDist);
-    m_feature_variables.push_back(m_KLMECLE);
-    m_feature_variables.push_back(m_KLMECLE9oE25);
-    m_feature_variables.push_back(m_KLMECLTiming);
-    m_feature_variables.push_back(m_KLMECLEerror);
-    m_feature_variables.push_back(m_KLMtrackToECL);
-    m_feature_variables.push_back(m_KLMECLdeltaL);
-    m_feature_variables.push_back(m_KLMECLminTrackDist);
+    m_feature_variables[0] = m_KLMnCluster;
+    m_feature_variables[1] = m_KLMnLayer;
+    m_feature_variables[2] = m_KLMnInnermostLayer;
+    m_feature_variables[3] = m_KLMglobalZ;
+    m_feature_variables[4] = m_KLMtime;
+    m_feature_variables[5] = m_KLMinvM;
+    m_feature_variables[6] = m_KLMtrackDist;
+    m_feature_variables[7] = m_KLMnextCluster;
+    m_feature_variables[8] = m_KLMavInterClusterDist;
+    m_feature_variables[9] = m_KLMTrackSepDist;
+    m_feature_variables[10] = m_KLMTrackSepAngle;
+    m_feature_variables[11] = m_KLMInitialTrackSepAngle;
+    m_feature_variables[12] = m_KLMECLDist;
+    m_feature_variables[13] = m_KLMECLE;
+    m_feature_variables[14] = m_KLMECLE9oE25;
+    m_feature_variables[15] = m_KLMECLTiming;
+    m_feature_variables[16] = m_KLMECLEerror;
+    m_feature_variables[17] = m_KLMtrackToECL;
+    m_feature_variables[18] = m_KLMECLdeltaL;
+    m_feature_variables[19] = m_KLMECLminTrackDist;
 
 
     // rewrite dataset
@@ -223,17 +223,9 @@ void KLMExpertModule::event()
     //classify dartaset
     IDMVAOut = m_expert->apply(*m_dataset)[0];
 
-
-    // normalize if not errorcode
-    if (IDMVAOut > -1.) {
-      IDMVAOut = (IDMVAOut + 1) / 2.0;
-    }
-
     // KlId, bkg prob, KLM, ECL
     klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
     cluster.addRelationTo(klid);
-
-    m_feature_variables.clear();
 
 
   }// for cluster in clusters

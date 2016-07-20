@@ -113,6 +113,9 @@ namespace Belle2 {
     float m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
     float m_KLMtrackToECL;
+    /** number of variables. used to resize the variable vector.  */
+    float m_nVars = 20;
+
 
     std::vector<float> m_feature_variables;
     float m_signal_fraction_override; /** true means use signal fraction from training  */

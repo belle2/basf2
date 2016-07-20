@@ -70,6 +70,10 @@ namespace Belle2 {
     float m_ECLdeltaL; // new
     /** distance cluster to next track in ECL */
     float m_ECLtrackDist;
+    /** number of variables. used to resize the variable vector.  */
+    float m_nVars = 7;
+
+
 
     std::vector<float> m_feature_variables;
     float m_signal_fraction_override; /** true means use signal fraction from training  */

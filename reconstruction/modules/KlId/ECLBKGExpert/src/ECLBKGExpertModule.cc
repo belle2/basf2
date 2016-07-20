@@ -48,13 +48,13 @@ void ECLBKGExpertModule::initialize()
 {
   StoreArray<ECLCluster>::required();
 
+  StoreArray<KlId>::required();
+
   StoreArray<KlId> klids;
 
-  StoreArray<ECLCluster> eclClusters;
-  eclClusters.registerRelationTo(klids);
   //run KLMTMVA Expert first
 
-  m_feature_variables.reserve(7);
+  m_feature_variables.resize(m_nVars);
 
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
@@ -131,14 +131,13 @@ void ECLBKGExpertModule::event()
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
 
-    m_feature_variables.push_back(m_ECLE);
-    m_feature_variables.push_back(m_ECLE9oE25);
-    m_feature_variables.push_back(m_ECLTiming);
-    m_feature_variables.push_back(m_ECLEerror);
-    m_feature_variables.push_back(m_ECLtrackDist);
-    m_feature_variables.push_back(m_ECLdeltaL);
-    m_feature_variables.push_back(m_ECLminTrkDistance);
-
+    m_feature_variables[0] = m_ECLE;
+    m_feature_variables[1] = m_ECLE9oE25;
+    m_feature_variables[2] = m_ECLTiming;
+    m_feature_variables[3] = m_ECLEerror;
+    m_feature_variables[4] = m_ECLtrackDist;
+    m_feature_variables[5] = m_ECLdeltaL;
+    m_feature_variables[6] = m_ECLminTrkDistance;
 
 
     // rewrite dataset
@@ -149,16 +148,11 @@ void ECLBKGExpertModule::event()
     //classify dartaset
     MVAOut = m_expert->apply(*m_dataset)[0];
 
-    // normalize if not errorcode
-    if (MVAOut > -1.) {
-      MVAOut = (MVAOut + 1) / 2.0;
-    }
     // KlId, bkg prob, KLM, ECL
     klid = cluster.getRelatedTo<KlId>();
     klid->setBkgProb(MVAOut);
     cluster.addRelationTo(klid);
 
-    m_feature_variables.clear();
   }// for cluster in clusters
 } // event
 

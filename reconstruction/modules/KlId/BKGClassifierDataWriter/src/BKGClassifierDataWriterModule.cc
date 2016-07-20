@@ -118,7 +118,10 @@ void BKGClassifierDataWriterModule::initialize()
 
   m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
-  m_treeECL   -> Branch("ECLangleToMissE",          & m_ECLangleTomissE);
+  m_treeECL   -> Branch("ECLangleToMissE05",          & m_ECLangleTomissE05);
+  m_treeECL   -> Branch("ECLangleToMissE06",          & m_ECLangleTomissE06);
+  m_treeECL   -> Branch("ECLangleToMissE07",          & m_ECLangleTomissE07);
+  m_treeECL   -> Branch("ECLangleToMissE08",          & m_ECLangleTomissE08);
   m_treeECL   -> Branch("ECLPDG",          & m_ECLPDG);
   m_treeECL   -> Branch("ECLKLMPDG",          & m_ECLKLMPDG);
   m_treeECL   -> Branch("ECLangleToClosestKLM",          & m_ECLangleToClosestKLM);
@@ -233,7 +236,12 @@ void BKGClassifierDataWriterModule::event()
 
 // ---------------   ECL CLUSTERS
 
-  TVector3 missE = calculateMissEVector(0.5);
+  TVector3 missE03 = calculateMissEVector(0.3);
+  TVector3 missE04 = calculateMissEVector(0.4);
+  TVector3 missE05 = calculateMissEVector(0.5);
+  TVector3 missE06 = calculateMissEVector(0.6);
+  TVector3 missE07 = calculateMissEVector(0.7);
+  TVector3 missE08 = calculateMissEVector(0.8);
 
   for (const ECLCluster& cluster : eclClusters) {
 
@@ -252,7 +260,12 @@ void BKGClassifierDataWriterModule::event()
 
     const TVector3& clusterPos = cluster.getclusterPosition();
 
-    m_ECLangleTomissE = missE.Angle(clusterPos);
+    m_ECLangleTomissE03 = missE03.Angle(clusterPos);
+    m_ECLangleTomissE04 = missE04.Angle(clusterPos);
+    m_ECLangleTomissE05 = missE05.Angle(clusterPos);
+    m_ECLangleTomissE06 = missE06.Angle(clusterPos);
+    m_ECLangleTomissE07 = missE07.Angle(clusterPos);
+    m_ECLangleTomissE08 = missE08.Angle(clusterPos);
 
     // find mc truth
     // go thru all particles mothers up to Y4s and check if its a Klong
@@ -305,14 +318,4 @@ void BKGClassifierDataWriterModule::terminate()
   m_treeECL -> Write();
   m_f    -> Close();
 }
-
-
-
-
-
-
-
-
-
-
 

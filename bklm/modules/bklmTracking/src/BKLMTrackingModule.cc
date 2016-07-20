@@ -87,7 +87,7 @@ void BKLMTrackingModule::event()
         if (ho == hi || ho == hj) continue; //exclude seed hits
         if (hits2D[ho]->isOnStaTrack()) continue;
         if (!sameSector(hits2D[ho], hits2D[hi])) continue;
-        if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
+        // if (hits2D[ho]->getLayer() == hits2D[hi]->getLayer() || hits2D[ho]->getLayer() == hits2D[hj]->getLayer()) continue;
         if ((hits2D[ho]->getTime() - m_MeanDt) > m_MaxDt) continue;
         sectorHitList.push_back(hits2D[ho]);
       }

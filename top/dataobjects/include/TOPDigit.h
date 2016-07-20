@@ -27,7 +27,12 @@ namespace Belle2 {
     /**
      * hit quality enumerators
      */
-    enum EHitQuality {c_Junk, c_Good, c_ChargeShare, c_CrossTalk};
+    enum EHitQuality {c_Junk = 0,
+                      c_Good = 1,
+                      c_ChargeShare = 2,
+                      c_CrossTalk = 3,
+                      c_CalPulse = 4
+                     };
 
     /**
      * Default constructor

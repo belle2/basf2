@@ -59,6 +59,4 @@ assert statistics.get(testmod).calls(statistics.END_RUN) == 2
 assert statistics.get(pgun).calls(statistics.EVENT) == 6
 assert statistics.get(testmod).calls(statistics.EVENT) == 3*6
 
-#
-# print "event"
 # print(statistics)

@@ -83,7 +83,7 @@ class Basf2CalculationQueueStatistics(Statistics):
         for stats in statistics.modules:
             modules.append(ModuleStatistics(stats, categories))
 
-        modules.append(ModuleStatistics(statistics.getGlobal(), categories))
+        modules.append(ModuleStatistics(statistics.get_global(), categories))
 
         #: The str representation
         self.str = statistics()

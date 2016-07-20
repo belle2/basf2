@@ -147,10 +147,10 @@ processing should stop.
 
 Information on other calls like initialize(), terminate(), etc. are also available:
 
->>> print statistics(statistics.INIT)
->>> print statistics(statistics.BEGIN_RUN)
->>> print statistics(statistics.END_RUN)
->>> print statistics(statistics.TERM)
+>>> print(statistics(statistics.INIT))
+>>> print(statistics(statistics.BEGIN_RUN))
+>>> print(statistics(statistics.END_RUN))
+>>> print(statistics(statistics.TERM))
 )", no_init);
 
   stats
@@ -165,7 +165,7 @@ between them.)")
   .def("__call__", &ProcessStatisticsPython::getModuleStatistics, getModuleStatistics_overloads())
   .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>(),
        "Get :class:`ModuleStatistics` for given Module.")
-  .def("getGlobal", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>(),
+  .def("get_global", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>(),
        "Get global :class:`ModuleStatistics` containing total elapsed time etc.")
   .def("clear", &ProcessStatisticsPython::clear, "Clear collected statistics but keep names of modules")
   .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all :class:`ModuleStatistics` objects.")

@@ -303,8 +303,9 @@ mdst_dataobjects = [
     }),
     DataStorePrinter("KLMCluster", [
         "getTime", "getLayers", "getInnermostLayer",  # "getGlobalPosition", skipped because of strange return class
-        "getClusterPosition", "getPosition", "getMomentum", "getAssociatedEclClusterFlag",
-        "getErrorMatrix", "getAssociatedTrackFlag",
+        "getClusterPosition", "getPosition", "getAssociatedEclClusterFlag",
+        "getAssociatedTrackFlag",
+        # incompatibilities: "getMomentum", "getErrorMatrix"
     ], {
         "getRelationsWith": ["ECLClusters"],
     }),

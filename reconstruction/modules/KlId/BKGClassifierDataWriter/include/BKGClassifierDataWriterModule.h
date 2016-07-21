@@ -112,8 +112,6 @@ namespace Belle2 {
     Float_t m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
     Float_t m_KLMtrackToECL;
-    /** angle cluster to its mc particle  */
-    Float_t m_KLMangleToMC;
 
     // ECL cluster variables for pure ECL Klongs
     /** measured energy */
@@ -135,49 +133,8 @@ namespace Belle2 {
     /** ECL trarget variable */
     Float_t m_ECLTruth;
 
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE;
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE03;
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE04;
-
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE05;
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE06;
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE07;
-    /** ECL angle to miss e vector */
-    Float_t m_ECLangleTomissE08;
-    /** ECL angle cluster to mc particle*/
-    Float_t m_ECLangleToMC;
-
-
-    /** ecl bkg probability */
-    Float_t m_ECLbkgProb;
-
-
-    /** Angle to closest KLM */
-    Float_t m_ECLangleToClosestKLM;
-    /** PDG of ECLcluster */
-    Float_t m_ECLPDG;
-    /**pdg of closest cluster */
-    Float_t m_ECLKLMPDG;
-    /** used in both trees */
+    /** is beam bkg */
     Float_t m_isBeamBKG;
-    /**timeing of closest ECL */
-    Float_t m_ECLKLMTime;
-    /** angle to next KLM cluster of same mcpart */
-    Float_t m_ECLAngleToKLMHit;
-    /** angle to next KLM cluster of same mcpart */
-    Float_t m_ECLAngleToKLMHitDaughter;
-    /** time of KLM cluster of same mcpart */
-    Float_t m_ECLAngleToKLMHitDaughterTime;
-    /** time of true matchable KLMcluster */
-    Float_t m_ECLmatchTime;
-    /** nDaughters of mc particle  */
-    Float_t m_ECLnMCDaughters;
 
     /** root file */
     TFile* m_f = nullptr; //

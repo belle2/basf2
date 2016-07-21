@@ -26,7 +26,6 @@
 #include <cstring>
 #include <utility>
 
-//#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
 #include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
 
 using namespace Belle2;
@@ -68,7 +67,6 @@ void BKGClassifierDataWriterModule::initialize()
   klmClusters.registerRelationTo(eclClusters);
 
 
-  // initialize root tree to write stuff into
   m_f = new TFile(m_outPath.c_str(), "recreate");
   m_treeKLM = new TTree("KLMdata", "KLMdata");
   m_treeECL = new TTree("ECLdata", "ECLdata");
@@ -97,7 +95,6 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeKLM   -> Branch("KLMECLdeltaL",             & m_KLMECLdeltaL);
   m_treeKLM   -> Branch("KLMECLmintrackDist",       & m_KLMECLminTrackDist);
 
-  //new TODO check feature importance
   m_treeKLM   -> Branch("KLMTrackSepDist",          & m_KLMTrackSepDist);
   m_treeKLM   -> Branch("KLMTrackSepAngle",         & m_KLMTrackSepAngle);
 
@@ -118,22 +115,6 @@ void BKGClassifierDataWriterModule::initialize()
 
   m_treeECL   -> Branch("ECLdeltaL",            & m_ECLdeltaL);
   m_treeECL   -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
-  m_treeECL   -> Branch("ECLangleToMissE03",    & m_ECLangleTomissE03);
-  m_treeECL   -> Branch("ECLangleToMissE04",    & m_ECLangleTomissE04);
-  m_treeECL   -> Branch("ECLangleToMissE05",    & m_ECLangleTomissE05);
-  m_treeECL   -> Branch("ECLangleToMissE06",    & m_ECLangleTomissE06);
-  m_treeECL   -> Branch("ECLangleToMissE07",    & m_ECLangleTomissE07);
-  m_treeECL   -> Branch("ECLangleToMissE08",    & m_ECLangleTomissE08);
-  m_treeECL   -> Branch("ECLPDG",               & m_ECLPDG);
-  m_treeECL   -> Branch("ECLKLMPDG",            & m_ECLKLMPDG);
-  m_treeECL   -> Branch("ECLangleToClosestKLM", & m_ECLangleToClosestKLM);
-  m_treeECL   -> Branch("ECKKLMTime",           & m_ECLKLMTime);
-  m_treeECL   -> Branch("ECLbkgProb",           & m_ECLbkgProb);
-  m_treeECL   -> Branch("ECLAngleToKLMHit",           & m_ECLAngleToKLMHit);
-  m_treeECL   -> Branch("ECLAngleToKLMHitDaughter",   & m_ECLAngleToKLMHitDaughter);
-  m_treeECL   -> Branch("ECLKLMHitDaughterTime",   & m_ECLAngleToKLMHitDaughterTime);
-  m_treeECL   -> Branch("ECLmatchTime",           & m_ECLmatchTime);
-
   m_treeECL   -> Branch("isBeamBKG",  & m_isBeamBKG);
 
 }//init
@@ -149,7 +130,6 @@ void BKGClassifierDataWriterModule::endRun()
 
 void BKGClassifierDataWriterModule::event()
 {
-  // objects needed
   StoreArray<MCParticle> mcParticles;
   StoreArray<KLMCluster> klmClusters;
   StoreArray<RecoTrack> genfitTracks;
@@ -160,10 +140,8 @@ void BKGClassifierDataWriterModule::event()
 
   for (const KLMCluster& cluster : klmClusters) {
 
-    // needed later
     const TVector3& clusterPos = cluster.getClusterPosition();
 
-    // get various KLMCluster vars
     m_KLMglobalZ = clusterPos.Z();
     m_KLMnCluster = klmClusters.getEntries();
     m_KLMnLayer = cluster.getLayers();
@@ -182,26 +160,19 @@ void BKGClassifierDataWriterModule::event()
     m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
-    // find nearest ecl cluster and calculate angular distance
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
     ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
     m_KLMECLDist = get<1>(closestECLAndDist);
 
-    // get vars from nearest ECL CLuster
-    //TODO introduce cutoff to what is "nearest"
     if (!(closestECLCluster == nullptr)) {
       m_KLMECLE      = closestECLCluster->getEnergy();
       m_KLMECLE9oE25 = closestECLCluster->getE9oE25();
       m_KLMECLEerror = closestECLCluster->getErrorEnergy();
       m_KLMECLTerror = closestECLCluster->getErrorTiming();
-      // new KLMECL vars
-      // names might change
+
       m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();;
       m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
       m_KLMECLTiming = closestECLCluster->getTiming();
-      // needed to add those ecl clusters to KLM particles that have a high
-      // kl probability and no relation
-      cluster.addRelationTo(closestECLCluster);
     } else {
       m_KLMECLdeltaL = -999;
       m_KLMECLminTrackDist = -999;
@@ -212,19 +183,15 @@ void BKGClassifierDataWriterModule::event()
       m_KLMECLEerror = -999;
     }
 
-    // calculate distance to next cluster and average inter cluster distance
     tuple<const KLMCluster*, double, double> closestKLMAndDist = findClosestKLMCluster(clusterPos);
     m_KLMnextCluster = get<1>(closestKLMAndDist);
     m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
-    // find mc truth
-    // go thru all particles mothers up to Y4s and check if its a Klong
     MCParticle* part = cluster.getRelatedTo<MCParticle>();
     m_KLMTruth = mcParticleIsKlong(part);
     m_isBeamBKG = mcParticleIsBeamBKG(part);
 
-    // calculate eucl. distance klmcluster <-> nearest track
-    // extrapolate genfit trackfit result to their ends and find the
+    // use genfit to find nearest track by extrapolation
     tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
       = findClosestTrack(clusterPos);
     m_KLMtrackDist = get<1>(closestTrackAndDistance);
@@ -241,19 +208,9 @@ void BKGClassifierDataWriterModule::event()
   }// for klmcluster in klmclusters
 
 // ---------------   ECL CLUSTERS
-
-  TVector3 missE03 = calculateMissEVector(0.3);
-  TVector3 missE04 = calculateMissEVector(0.4);
-  TVector3 missE05 = calculateMissEVector(0.5);
-  TVector3 missE06 = calculateMissEVector(0.6);
-  TVector3 missE07 = calculateMissEVector(0.7);
-  TVector3 missE08 = calculateMissEVector(0.8);
-
   for (const ECLCluster& cluster : eclClusters) {
 
-    // get various ECLCluster vars from getters
 
-    // new vasr
     m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
     m_ECLdeltaL = cluster.getTemporaryDeltaL();
 
@@ -266,97 +223,13 @@ void BKGClassifierDataWriterModule::event()
 
     const TVector3& clusterPos = cluster.getclusterPosition();
 
-    m_ECLangleTomissE03 = missE03.Angle(clusterPos);
-    m_ECLangleTomissE04 = missE04.Angle(clusterPos);
-    m_ECLangleTomissE05 = missE05.Angle(clusterPos);
-    m_ECLangleTomissE06 = missE06.Angle(clusterPos);
-    m_ECLangleTomissE07 = missE07.Angle(clusterPos);
-    m_ECLangleTomissE08 = missE08.Angle(clusterPos);
-
-    // find mc truth
-    // go thru all particles mothers up to Y4s and check if its a Klong
     MCParticle* part = cluster.getRelatedTo<MCParticle>();
     m_isBeamBKG = mcParticleIsBeamBKG(part);
     m_ECLTruth = mcParticleIsKlong(part);
-    if (cluster.getRelatedTo<KlId>()) {
-      m_ECLbkgProb = cluster.getRelatedTo<KlId>()->getBkgProb();
-    } else {
-      cout << " no klid " << endl;
-      m_ECLbkgProb = 0;
-    }
-    //find closest track
+
     tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance = findClosestTrack(clusterPos);
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
-    tuple<const KLMCluster*, double, double> nextKLM = findClosestKLMCluster(clusterPos);
-
-    MCParticle* eclmcpart = cluster.getRelatedTo<MCParticle>();
-    if (eclmcpart) {
-      m_ECLPDG = eclmcpart->getPDG();
-
-      MCParticle* klmmcpart = get<0>(nextKLM)->getRelatedTo<MCParticle>();
-
-      if (get<0>(nextKLM)  and klmmcpart) {
-        m_ECLKLMPDG = klmmcpart->getPDG();
-      } else {
-        m_ECLKLMPDG = 0;
-      }
-    } else {
-      m_ECLPDG = 0;
-      m_ECLKLMPDG = 0;
-    }
-
-    if (eclmcpart) {
-      KLMCluster* hitInKLM = eclmcpart->getRelatedFrom<KLMCluster>();
-
-      if (hitInKLM) {
-        m_ECLmatchTime = hitInKLM->getTime();
-        m_ECLAngleToKLMHit = hitInKLM->getClusterPosition().Angle(cluster.getclusterPosition());
-        cout << "hit in KLM found angle:" << m_ECLAngleToKLMHit << endl;
-      } else {
-        m_ECLmatchTime = -999;
-        m_ECLAngleToKLMHit = -999 ;
-      }
-
-
-
-
-      // find klm hits of daughters and pick the next best one
-      vector<MCParticle*> eclMcDaughters = eclmcpart->getDaughters();
-
-
-
-      for (MCParticle* mcpart : eclMcDaughters) {
-        KLMCluster* daughterHitInKLM = mcpart->getRelatedFrom<KLMCluster>();
-        if (daughterHitInKLM) {
-          m_ECLAngleToKLMHitDaughter =
-            daughterHitInKLM->getClusterPosition().Angle(cluster.getclusterPosition());
-          m_ECLAngleToKLMHitDaughterTime = daughterHitInKLM->getTime();
-          break;// just take a random daughter
-        } else {
-          m_ECLAngleToKLMHitDaughter = -999;
-          m_ECLAngleToKLMHitDaughterTime = -999;
-        }
-        m_ECLnMCDaughters = eclMcDaughters.size();
-      }
-
-    } else {
-      m_ECLAngleToKLMHitDaughter = -999;
-      m_ECLAngleToKLMHitDaughterTime = -999;
-      m_ECLnMCDaughters = -999;
-      m_ECLAngleToKLMHit = -999 ;
-      m_ECLmatchTime = -999;
-    }
-
-
-    if (get<0>(nextKLM)) {
-      m_ECLKLMTime = get<0>(nextKLM)->getTime();
-      m_ECLangleToClosestKLM = get<0>(nextKLM)->getClusterPosition().Angle(clusterPos);
-    } else {
-      m_ECLangleToClosestKLM = 0;
-      m_ECLKLMTime = 0;
-    }
-    // finally fill tree
     m_treeECL -> Fill();
   }// for ecl cluster in clusters
 } // event

@@ -240,7 +240,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         std::string cutString = arguments[0];
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
         auto func = [cut](const Particle * particle) -> double {
 
           if (particle == nullptr)
@@ -439,7 +439,7 @@ namespace Belle2 {
           cutString = arguments[1];
         }
 
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [listName, cut](const Particle*) -> double {
 
@@ -479,7 +479,7 @@ namespace Belle2 {
         }
 
         auto flavourType = (Belle2::EvtPDLUtil::hasAntiParticle(pdgCode)) ? Particle::c_Flavored : Particle::c_Unflavored;
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
 
         auto func = [roeListName, cut, pdgCode, flavourType](const Particle * particle) -> double {
           if (particle == nullptr)
@@ -510,7 +510,7 @@ namespace Belle2 {
     {
       if (arguments.size() == 1) {
         std::string cutString = arguments[0];
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutString));
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
         auto func = [cut](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;

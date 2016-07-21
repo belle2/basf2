@@ -25,7 +25,7 @@ int main()
   std::cout << "Please input a condition " << std::flush;
   std::getline(std::cin, condition);
 
-  std::unique_ptr<Variable::Cut> cut = Variable::Cut::Compile(condition);
+  std::unique_ptr<Variable::Cut> cut = Variable::Cut::compile(condition);
 
   cut->print();
 

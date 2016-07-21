@@ -67,7 +67,7 @@ namespace Belle2 {
     StoreArray<Particle>::required();
     m_inputList.isRequired(m_inputListName);
 
-    m_cut = Variable::Cut::Compile(m_selection);
+    m_cut = Variable::Cut::compile(m_selection);
 
     B2INFO("RestOfEventUpdater updated track/eclCluster ROEMask(s) with infoList: " << m_inputListName << " and cut: " << m_selection);
 

@@ -1,3 +1,13 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2010 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Thomas Keck                                              *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #pragma once
 
 #include <analysis/VariableManager/Manager.h>
@@ -21,7 +31,7 @@ namespace Belle2 {
      *   addParam("cut", m_cutParameter, "Selection criteria to be applied", std::string(""));
      *
      * initialize method of the module:
-     *   m_cut = Variable::Cut::Compile(m_cutParameter);
+     *   m_cut = Variable::Cut::compile(m_cutParameter);
      *
      * event function of the module:
      *   if(m_cut->check(particlePointer)) {

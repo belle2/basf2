@@ -75,8 +75,8 @@ namespace Belle2 {
       std::string eclClusterSelection = get<2>(ROEMask);
       std::vector<double> fractions = get<3>(ROEMask);
 
-      std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(trackSelection));
-      std::shared_ptr<Variable::Cut> eclClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(eclClusterSelection));
+      std::shared_ptr<Variable::Cut> trackCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(trackSelection));
+      std::shared_ptr<Variable::Cut> eclClusterCut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(eclClusterSelection));
 
       m_maskNames.push_back(maskName);
       m_trackCuts.insert(stringAndCutMap::value_type(maskName, trackCut));

@@ -101,7 +101,7 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
-    m_cut = Variable::Cut::Compile(m_cutParameter);
+    m_cut = Variable::Cut::compile(m_cutParameter);
   }
 
   void ParticleListManipulatorModule::event()

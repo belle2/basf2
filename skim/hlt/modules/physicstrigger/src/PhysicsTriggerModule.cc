@@ -70,7 +70,7 @@ void PhysicsTriggerModule::initialize()
 {
   B2INFO("PhysicsTriggerModule processing");
   StoreArray<PhysicsTriggerInformation>::registerPersistent();
-  m_cut = Variable::Cut::Compile(m_hltcut);
+  m_cut = Variable::Cut::compile(m_hltcut);
 }
 
 void PhysicsTriggerModule::beginRun()

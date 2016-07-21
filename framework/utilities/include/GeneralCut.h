@@ -92,11 +92,11 @@ namespace Belle2 {
   public:
     /**
      * Creates an instance of a cut and returns a unique_ptr to it, if you need a copy-able object instead
-     * you can cast it to a shared_ptr using std::shared_ptr<Variable::Cut>(Cut::Compile(cutString))
+     * you can cast it to a shared_ptr using std::shared_ptr<Variable::Cut>(Cut::compile(cutString))
      * @param cut the string defining the cut
      * @return std::unique_ptr<Cut>
      */
-    static std::unique_ptr<GeneralCut> Compile(std::string cut)
+    static std::unique_ptr<GeneralCut> compile(std::string cut)
     {
       return std::unique_ptr<GeneralCut>(new GeneralCut(cut));
     }

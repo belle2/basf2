@@ -69,7 +69,7 @@ namespace Belle2 {
     StoreObjPtr<ParticleList> particleList(m_listName);
     particleList.isRequired(m_listName);
 
-    m_cut = Variable::Cut::Compile(m_cutParameter);
+    m_cut = Variable::Cut::compile(m_cutParameter);
 
     B2INFO("ParticleSelector: " << m_listName);
     B2INFO("   -> With cuts  : " << m_cutParameter);

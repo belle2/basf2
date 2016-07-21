@@ -114,7 +114,7 @@ namespace Belle2 {
       antiParticleList.registerInDataStore(flags);
     }
 
-    m_cut = Variable::Cut::Compile(m_cutParameter);
+    m_cut = Variable::Cut::compile(m_cutParameter);
 
     if (m_recoilParticleType != 0 && m_recoilParticleType != 1 && m_recoilParticleType != 2)
       B2FATAL("Invalid recoil particle type = " << m_recoilParticleType <<

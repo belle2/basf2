@@ -138,19 +138,19 @@ namespace {
     Manager::Instance().registerVariable("dummyvar", (Manager::FunctionPtr)&dummyVar, "blah");
     Manager::Instance().registerVariable("dummymetavar(cut)", (Manager::MetaFunctionPtr)&dummyMetaVar, "blah");
 
-    std::unique_ptr<Cut> a = Cut::Compile("dummyvar > 1.0");
+    std::unique_ptr<Cut> a = Cut::compile("dummyvar > 1.0");
     EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("1.0 < dummyvar <= dummyvar");
-    EXPECT_TRUE(a->check(nullptr));
-
-    a = Cut::Compile("dummyvar < 100.0");
-    EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("dummyvar <= dummyvar <= dummyvar");
+    a = Cut::compile("1.0 < dummyvar <= dummyvar");
     EXPECT_TRUE(a->check(nullptr));
 
-    a = Cut::Compile("dummymetavar(123) < 100.0");
+    a = Cut::compile("dummyvar < 100.0");
     EXPECT_TRUE(a->check(nullptr));
-    a = Cut::Compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
+    a = Cut::compile("dummyvar <= dummyvar <= dummyvar");
+    EXPECT_TRUE(a->check(nullptr));
+
+    a = Cut::compile("dummymetavar(123) < 100.0");
+    EXPECT_TRUE(a->check(nullptr));
+    a = Cut::compile("dummymetavar(1) <= dummymetavar(1<) <= dummymetavar(1<3)");
     EXPECT_TRUE(a->check(nullptr));
   }
 

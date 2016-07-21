@@ -444,7 +444,7 @@ namespace Belle2 {
         int nPi0 = 0;
 
         // Set cut criteria for pi0
-        std::unique_ptr<Variable::Cut> pi0Cut = Variable::Cut::Compile(pi0CutString);
+        std::unique_ptr<Variable::Cut> pi0Cut = Variable::Cut::compile(pi0CutString);
 
         // Select pairs of neutral ECLClusters cut
         for (unsigned int iEcl = 0; iEcl < roeClusters.size(); iEcl++)

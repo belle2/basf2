@@ -42,7 +42,7 @@ void SignalSideParticleFilterModule::initialize()
   StoreArray<Particle>::required();
   m_inputList.isRequired(m_particleListName);
 
-  m_cut = Variable::Cut::Compile(m_selection);
+  m_cut = Variable::Cut::compile(m_selection);
 
 }
 

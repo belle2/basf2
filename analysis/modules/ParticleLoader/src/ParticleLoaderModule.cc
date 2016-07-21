@@ -146,7 +146,7 @@ namespace Belle2 {
           continue;
         }
 
-        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::Compile(cutParameter));
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutParameter));
 
         // add PList to corresponding collection of Lists
         B2INFO(" o) creating (anti-)ParticleList with name: " << listName << " (" << antiListName << ")");

@@ -72,7 +72,7 @@ void L1EmulationModule::initialize()
 {
   B2INFO("L1EmulationModule processing");
   StoreArray<L1EmulationInformation>::registerPersistent();
-  m_cut = Variable::Cut::Compile(m_userCut);
+  m_cut = Variable::Cut::compile(m_userCut);
   m_ntrg = 0;
   trgname.clear();
   nEvent = 0;

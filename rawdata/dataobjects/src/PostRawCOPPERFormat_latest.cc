@@ -39,7 +39,7 @@ int PostRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
 unsigned int PostRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] This function is not supported.(block %d) Exiting...: \n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return 0;
@@ -77,14 +77,14 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       break;
     default :
       char err_buf[500];
-      sprintf(err_buf, "Invalid finesse # : %s %s %d\n",
+      sprintf(err_buf, "[FATAL] Invalid finesse # : %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       string err_str = err_buf; throw (err_str);
   }
 
   if (nwords < 0 || nwords > 1e6) {
     char err_buf[500];
-    sprintf(err_buf, "# of words is strange. %d : %s %s %d\n", nwords,
+    sprintf(err_buf, "[FATAL] # of words is strange. %d : %s %s %d\n", nwords,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     string err_str = err_buf; throw (err_str);
   }
@@ -99,7 +99,7 @@ int PostRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
 unsigned int PostRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "No event # in B2LFEE header. (block %d) Exiting...\n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] No event # in B2LFEE header. (block %d) Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return 0;
@@ -138,7 +138,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
     sprintf(err_buf,
-            "CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+            "[FATAL] CORRUPTED DATA: checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -163,7 +163,7 @@ void PostRawCOPPERFormat_latest::CheckData(int n,
 bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "No magic word # in COPPER header (block %d). Exiting...\n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] No magic word # in COPPER header (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf; throw (err_str);
   return false;
@@ -172,7 +172,7 @@ bool PostRawCOPPERFormat_latest::CheckCOPPERMagic(int n)
 void PostRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function is not supported (block %d). Exiting...\n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] This function is not supported (block %d). Exiting...\n%s %s %d\n",
           n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
   string err_str = err_buf;
   throw (err_str);
@@ -183,7 +183,7 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
 
 {
   char err_buf[500];
-  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
+  sprintf(err_buf, "[FATAL] This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %u %u %u %u\n",
          m_node_id,  prev_eve32, prev_exprunsubrun_no, *cur_exprunsubrun_no);
@@ -196,7 +196,7 @@ unsigned int PostRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_no
 int PostRawCOPPERFormat_latest::CheckB2LHSLBMagicWords(int* finesse_buf, int finesse_nwords)
 {
   char err_buf[500];
-  sprintf(err_buf, "This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
+  sprintf(err_buf, "[FATAL] This function should be called by PrePostRawCOPPERFormat_***. Exiting...\n %s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("Print out variables to reduce unused-variables-warnings : %p %d\n", finesse_buf, finesse_nwords);
   string err_str = err_buf;
@@ -213,7 +213,8 @@ int PostRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
   int finesse_nwords = GetFINESSENwords(n, finesse_num);
   if (finesse_nwords <= 0) {
     char err_buf[500];
-    sprintf(err_buf, "The specified finesse(%d) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...\n %s %s %d\n",
+    sprintf(err_buf,
+            "[FATAL] The specified finesse(%d) seems to be empty(nwords = %d). Cannot calculate CRC16. Exiting...\n %s %s %d\n",
             finesse_num, finesse_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf;

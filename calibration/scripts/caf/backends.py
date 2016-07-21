@@ -10,7 +10,7 @@ import pickle
 
 # For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
 # So we make it a module variable. Should be fine as starting up multiple pools
-# is not recommended anyway.
+# is not recommended anyway. Will check this again someday.
 pool = None
 
 

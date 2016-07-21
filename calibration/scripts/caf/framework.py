@@ -49,23 +49,31 @@ class Calibration():
     You have the option to add in your collector/algorithm by argument here, or
     later by changing the properties.
 
-    Calibration(name, collector, algorithms, input_files)
+    Calibration(name, collector=None, algorithms=None, input_files=None)
     - 'name' must be set when you create the class instance. It should be unique
-    if you plan to add multiple ones to a CAF().
-    - 'collector' should be a CalibrationCollectorModule or a string with the module name.
-    - 'algorithms' should be a CalibrationAlgorithm or a list of them.
-    - 'input_files' is set to None by default but can be set to a string/list of strings.
+    if you plan to add multiple Calibrations to a CAF().
+    - 'collector' should be set to a CalibrationCollectorModule or a string with the module name.
+    - 'algorithms' should be set to a CalibrationAlgorithm or a list of them.
+    - 'input_files' should be set to a string/list of strings.
       The input files have to be understood by the backend used e.g. LFNs for DIRAC,
       accessible local paths for Batch/Local.
 
-    # Example
-    >>> cal = Calibration('TestCalibration1')
+    # A Calibration won't be valid in the CAF until it has all of these attributes set.
 
+    Example
+    >>> cal = Calibration('TestCalibration1')
     >>> col1 = register_module('CaTest')
     >>> cal.collector = col1
     OR
     >>> cal.collector = 'CaTest'  # Automatically create module
 
+    # If you want to run a basf2 path before your collector module when running over data
+    >>> cal.pre_collector_path = my_basf2_path
+
+    You don't have to put a RootInput module in this pre-collection path, but you can if
+    you need some special parameters. The inputFileNames parameter will be set by the CAF directly.
+
+    # Adding the CalibrationAlgorithm(s) is easy
     >>> alg1 = TestAlgo()
     >>> alg2 = TestAlgo()
     >>> cal.algorithms = alg1
@@ -74,16 +82,31 @@ class Calibration():
     OR
     cal.algorithms = [alg1, alg2]  # Multiple algorithms for one collector
 
-    # Or can use optional arguments to pass in some/all during initialisation #
+    # Note that when you set the algorithms, they are automatically wrapped and stored as
+    caf.framework.Algorithm instances. To access the algorithm underneath directly do:
+    >>> cal.algorithms[i].algorithm
+
+    # If you have a setup function that you want to run before each of the algorithms, set that with
+    >>> cal.pre_algorithms = my_function_object
+
+    OR, if you want a different setup for each algorithm use a list with the same number of elements
+    as your algorithm list.
+    >>> cal.pre_algorithms = [my_function1, my_function2, ...]
+
+    # Can use optional arguments to pass in some/all during initialisation #
     >>> cal = Calibration( 'TestCalibration1', 'CaTest', [alg1,alg2], ['/path/to/file.root'])
 
-    # Change the input file list later on before running with CAF()
+    # Change the input file list later on, before running with CAF()
     >>> cal.input_files = ['path/to/file.root', 'other/path/to/file2.root']
 
-    You can also specify the dependencies of the calibration
+    # You can also specify the dependencies of the calibration on others
     >>> cal.depends_on(cal2)
 
-    The CAF should automatically register these dependencies and prune out any problems.
+    # The default stored output from the collector is 'RootOutput.root'.
+    To tell the CAF about different/additional data that is output by this collector stage,
+    add output patterns e.g.
+
+    >>> cal.output_patterns.append('*.mille')
     """
 
     def __init__(self, name, collector=None, algorithms=None, input_files=None):
@@ -325,6 +348,9 @@ class Algorithm():
     these objects.
     """
     def __init__(self, algorithm, data_input=None, pre_algorithm=None):
+        """
+        Init function that only needs a CalibrationAlgorithm by default.
+        """
         #: CalibrationAlgorithm instance (assumed to be true since the Calibration class checks)
         self.algorithm = algorithm
         #: Function called before the pre_algorithm method to setup the input data that the CalibrationAlgorithm uses.
@@ -350,25 +376,24 @@ class Algorithm():
 class CAF():
     """
     Class to hold calibration objects and process them:
-    - It will define the configuration/flow of logic for the calibrations,
+    - It defines the configuration/flow of logic for the calibrations,
     but most of the heavy lifting should be done through outside functions
     or smaller classes to prevent this getting too big.
     - This will eventually be able to either run everything locally, or submit
     collection to a batch system/grid based on user's choice.
-    - It should be able to sort the required collection/algorithm steps into a
-    valid order based on dependencies.
-    - Much of the checking for consistency should be done here and in the calibration
+    - It can sort the required collection/algorithm steps into a valid order
+    based on dependencies set in each Calibration()
+    - Much of the checking for consistency is done here and in the Calibration
     class. Leaving functions that it calls to assume everything is correctly set up.
     - Choosing which files to use as input should be done from outside during the
-    setup of the CAF and Calibration instances. Allowing the CAF to assume that this
-    is your most logical set of data to calibrate at the moment and that you want
-    constants for ALL runs passed in (whether they are the best constants or not).
+    setup of the CAF and Calibration instances.
     """
     def __init__(self):
         """
         Initialise CAF instance. Sets up some empty containers for attributes.
-        No default backend is set! This is to prevent unnecessary process pools
-        being allocated. You should set it directly beofre calling caf.run()
+        No default backend is set yet. This is to prevent unnecessary process pools
+        being allocated. You should set it directly before calling CAF().run() or
+        leave it and the CAF will set a default Local one itself during run()
         e.g. caf.backend = Local()
 
         Note that the config file is in the calibration/data directory and we assume
@@ -450,7 +475,7 @@ class CAF():
         """
         - Uses dependency atrributes of calibrations to create a dependency dictionary and passes it
         to a sorting algorithm.
-        - Returns True if sort was succesful, False if it failed (most likely a cyclic dependency)
+        - Returns valid OrderedDict if sort was succesful, empty one if it failed (most likely a cyclic dependency)
         """
         # First remove any dependencies on calibrations not added to the CAF
         self._remove_missing_dependencies()
@@ -479,6 +504,9 @@ class CAF():
     def _configure_jobs(self, calibrations, iteration):
         """
         Creates a Job object for each collector to pass to the Backend.
+        It does quite a bit of extra work figuring out where the dependent
+        databases were created for addition to the input_sandbox_files.
+        (This function will likely be refactored into smaller ones)
         """
         jobs = {}
         for calibration_name in calibrations:
@@ -540,8 +568,8 @@ class CAF():
         """
         - Runs the overall calibration job, saves the outputs to the output_dir directory,
         and creates database payloads.
-        - Upload may be moved to another method or function entirely to give the option of
-        monitoring output before committing to database.
+        - Upload of final databases is not done to give the option of monitoring output
+        before committing to conditions database.
         """
         self.check_backend()
         # Creates the ordering of calibrations, including any dependencies that we must wait for
@@ -691,7 +719,10 @@ class CAF():
     def _run_algorithm(self, calibration, algorithm, working_dir, iteration, child_conn):
         """
         Runs a single algorithm of a calibration in the output directory of the collector
-        and first runs a setup function passed in.
+        and first runs its setup function if one exists.
+
+        There's probably too much spaghetti logic here about when to commit or merge IoVs.
+        Will refactor later.
         """
         logging.reset()
         set_log_level(LogLevel.INFO)

@@ -23,7 +23,7 @@
 
 namespace Belle2 {
 
-  /** Module to perform the ECL  background KlId classification. This module only classifies ECL clusters.
+  /** Module to perform the ECL background KlId classification. This module only classifies ECL clusters.
    * */
   class ECLBKGExpertModule : public Module {
 
@@ -72,18 +72,21 @@ namespace Belle2 {
 
     /** number of variables. used to resize the variable vector.  */
     float m_nVars = 7;
-
+    /** vars to be classified */
     std::vector<float> m_feature_variables;
-    float m_signal_fraction_override; /** true means use signal fraction from training  */
-    //TODO set to something that makes sense
+    /** true means use signal fraction from training  */
+    float m_signal_fraction_override;
+
+    /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(
                                  "reconstruction/data/weights/ECLBKGExpert.xml");
-
+    /**< Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
-                                                               m_weightfile_representation; /**< Database pointer to the Database representation of the weightfile */
-    std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
-    std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
-
+                                                               m_weightfile_representation;
+    /**< Pointer to the current MVA Expert */
+    std::unique_ptr<MVA::Expert> m_expert;
+    /**< Pointer to the current dataset */
+    std::unique_ptr<MVA::SingleDataset> m_dataset;
 
 
   }; // end class

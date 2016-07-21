@@ -168,6 +168,17 @@ namespace Belle2 {
     Float_t m_isBeamBKG;
     /**timeing of closest ECL */
     Float_t m_ECLKLMTime;
+    /** angle to next KLM cluster of same mcpart */
+    Float_t m_ECLAngleToKLMHit;
+    /** angle to next KLM cluster of same mcpart */
+    Float_t m_ECLAngleToKLMHitDaughter;
+    /** time of KLM cluster of same mcpart */
+    Float_t m_ECLAngleToKLMHitDaughterTime;
+    /** time of true matchable KLMcluster */
+    Float_t m_ECLmatchTime;
+    /** nDaughters of mc particle  */
+    Float_t m_ECLnMCDaughters;
+
     /** root file */
     TFile* m_f = nullptr; //
     /** tree for klm data */

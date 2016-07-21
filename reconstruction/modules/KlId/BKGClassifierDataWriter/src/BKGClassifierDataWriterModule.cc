@@ -116,19 +116,23 @@ void BKGClassifierDataWriterModule::initialize()
   m_treeECL   -> Branch("ECLTruth",                 & m_ECLTruth);
   m_treeECL   -> Branch("ECLdistToTrack",           & m_ECLtrackDist);
 
-  m_treeECL   -> Branch("ECLdeltaL",                & m_ECLdeltaL);
-  m_treeECL   -> Branch("ECLmintrackDist",          & m_ECLminTrkDistance);
-  m_treeECL   -> Branch("ECLangleToMissE03",          & m_ECLangleTomissE03);
-  m_treeECL   -> Branch("ECLangleToMissE04",          & m_ECLangleTomissE04);
-  m_treeECL   -> Branch("ECLangleToMissE05",          & m_ECLangleTomissE05);
-  m_treeECL   -> Branch("ECLangleToMissE06",          & m_ECLangleTomissE06);
-  m_treeECL   -> Branch("ECLangleToMissE07",          & m_ECLangleTomissE07);
-  m_treeECL   -> Branch("ECLangleToMissE08",          & m_ECLangleTomissE08);
-  m_treeECL   -> Branch("ECLPDG",          & m_ECLPDG);
-  m_treeECL   -> Branch("ECLKLMPDG",          & m_ECLKLMPDG);
-  m_treeECL   -> Branch("ECLangleToClosestKLM",          & m_ECLangleToClosestKLM);
-  m_treeECL   -> Branch("ECKKLMTime",          & m_ECLKLMTime);
-  m_treeECL   -> Branch("ECLbkgProb",          & m_ECLbkgProb);
+  m_treeECL   -> Branch("ECLdeltaL",            & m_ECLdeltaL);
+  m_treeECL   -> Branch("ECLmintrackDist",      & m_ECLminTrkDistance);
+  m_treeECL   -> Branch("ECLangleToMissE03",    & m_ECLangleTomissE03);
+  m_treeECL   -> Branch("ECLangleToMissE04",    & m_ECLangleTomissE04);
+  m_treeECL   -> Branch("ECLangleToMissE05",    & m_ECLangleTomissE05);
+  m_treeECL   -> Branch("ECLangleToMissE06",    & m_ECLangleTomissE06);
+  m_treeECL   -> Branch("ECLangleToMissE07",    & m_ECLangleTomissE07);
+  m_treeECL   -> Branch("ECLangleToMissE08",    & m_ECLangleTomissE08);
+  m_treeECL   -> Branch("ECLPDG",               & m_ECLPDG);
+  m_treeECL   -> Branch("ECLKLMPDG",            & m_ECLKLMPDG);
+  m_treeECL   -> Branch("ECLangleToClosestKLM", & m_ECLangleToClosestKLM);
+  m_treeECL   -> Branch("ECKKLMTime",           & m_ECLKLMTime);
+  m_treeECL   -> Branch("ECLbkgProb",           & m_ECLbkgProb);
+  m_treeECL   -> Branch("ECLAngleToKLMHit",           & m_ECLAngleToKLMHit);
+  m_treeECL   -> Branch("ECLAngleToKLMHitDaughter",   & m_ECLAngleToKLMHitDaughter);
+  m_treeECL   -> Branch("ECLKLMHitDaughterTime",   & m_ECLAngleToKLMHitDaughterTime);
+  m_treeECL   -> Branch("ECLmatchTime",           & m_ECLmatchTime);
 
   m_treeECL   -> Branch("isBeamBKG",  & m_isBeamBKG);
 
@@ -286,11 +290,14 @@ void BKGClassifierDataWriterModule::event()
 
     tuple<const KLMCluster*, double, double> nextKLM = findClosestKLMCluster(clusterPos);
 
+    MCParticle* eclmcpart = cluster.getRelatedTo<MCParticle>();
+    if (eclmcpart) {
+      m_ECLPDG = eclmcpart->getPDG();
 
-    if (cluster.getRelatedTo<MCParticle>()) {
-      m_ECLPDG = cluster.getRelatedTo<MCParticle>()->getPDG();
-      if (get<0>(nextKLM)  and get<0>(nextKLM)->getRelatedTo<MCParticle>()) {
-        m_ECLKLMPDG = get<0>(nextKLM)->getRelatedTo<MCParticle>()->getPDG();
+      MCParticle* klmmcpart = get<0>(nextKLM)->getRelatedTo<MCParticle>();
+
+      if (get<0>(nextKLM)  and klmmcpart) {
+        m_ECLKLMPDG = klmmcpart->getPDG();
       } else {
         m_ECLKLMPDG = 0;
       }
@@ -298,6 +305,49 @@ void BKGClassifierDataWriterModule::event()
       m_ECLPDG = 0;
       m_ECLKLMPDG = 0;
     }
+
+    if (eclmcpart) {
+      KLMCluster* hitInKLM = eclmcpart->getRelatedFrom<KLMCluster>();
+
+      if (hitInKLM) {
+        m_ECLmatchTime = hitInKLM->getTime();
+        m_ECLAngleToKLMHit = hitInKLM->getClusterPosition().Angle(cluster.getclusterPosition());
+        cout << "hit in KLM found angle:" << m_ECLAngleToKLMHit << endl;
+      } else {
+        m_ECLmatchTime = -999;
+        m_ECLAngleToKLMHit = -999 ;
+      }
+
+
+
+
+      // find klm hits of daughters and pick the next best one
+      vector<MCParticle*> eclMcDaughters = eclmcpart->getDaughters();
+
+
+
+      for (MCParticle* mcpart : eclMcDaughters) {
+        KLMCluster* daughterHitInKLM = mcpart->getRelatedFrom<KLMCluster>();
+        if (daughterHitInKLM) {
+          m_ECLAngleToKLMHitDaughter =
+            daughterHitInKLM->getClusterPosition().Angle(cluster.getclusterPosition());
+          m_ECLAngleToKLMHitDaughterTime = daughterHitInKLM->getTime();
+          break;// just take a random daughter
+        } else {
+          m_ECLAngleToKLMHitDaughter = -999;
+          m_ECLAngleToKLMHitDaughterTime = -999;
+        }
+        m_ECLnMCDaughters = eclMcDaughters.size();
+      }
+
+    } else {
+      m_ECLAngleToKLMHitDaughter = -999;
+      m_ECLAngleToKLMHitDaughterTime = -999;
+      m_ECLnMCDaughters = -999;
+      m_ECLAngleToKLMHit = -999 ;
+      m_ECLmatchTime = -999;
+    }
+
 
     if (get<0>(nextKLM)) {
       m_ECLKLMTime = get<0>(nextKLM)->getTime();

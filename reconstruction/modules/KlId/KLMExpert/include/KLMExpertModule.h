@@ -113,21 +113,26 @@ namespace Belle2 {
     float m_KLMECLEerror;
     /** primitive distance cluster <-> track for associated ECL cluster */
     float m_KLMtrackToECL;
+
     /** number of variables. used to resize the variable vector.  */
     float m_nVars = 20;
 
-
+    /** vars to be classified */
     std::vector<float> m_feature_variables;
-    float m_signal_fraction_override; /** true means use signal fraction from training  */
+    /** true means use signal fraction from training  */
+    float m_signal_fraction_override;
 
-    //TODO set to something that makes sense
+    /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(
                                  "reconstruction/data/weights/KLMExpert.xml") ; /** weight file  */
 
+    /**< Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
-                                                               m_weightfile_representation; /**< Database pointer to the Database representation of the weightfile */
-    std::unique_ptr<MVA::Expert> m_expert; /**< Pointer to the current MVA Expert */
-    std::unique_ptr<MVA::SingleDataset> m_dataset; /**< Pointer to the current dataset */
+                                                               m_weightfile_representation;
+    /**< Pointer to the current MVA Expert */
+    std::unique_ptr<MVA::Expert> m_expert;
+    /**< Pointer to the current dataset */
+    std::unique_ptr<MVA::SingleDataset> m_dataset;
 
 
   }; // end class

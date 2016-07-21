@@ -14,7 +14,6 @@ using namespace Belle2;
 
 //#define DESY
 //#define NO_ERROR_STOP
-
 //ClassImp(PostRawCOPPERFormat_latest);
 
 PostRawCOPPERFormat_latest::PostRawCOPPERFormat_latest()
@@ -26,52 +25,14 @@ PostRawCOPPERFormat_latest::~PostRawCOPPERFormat_latest()
 }
 
 
-
-
-// int PostRawCOPPERFormat_latest::GetBufferPos(int n)
-// {
-//   if (m_buffer == NULL || m_nwords <= 0) {
-//     char err_buf[500];
-//     sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
-//             m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     string err_str = err_buf;     throw (err_str);
-//   }
-
-//   if (n >= (m_num_events * m_num_nodes)) {
-//     char err_buf[500];
-//     sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
-//             n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     string err_str = err_buf;     throw (err_str);
-//   }
-//   int pos_nwords = 0;
-
-
-//   for (int i = 1; i <= n ; i++) {
-//     tmp_header.SetBuffer(&m_buffer[ pos_nwords ]);
-//     pos_nwords += tmp_header.GetNwords();
-
-//     if (pos_nwords >= m_nwords) {
-//       char err_buf[500];
-//       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
-//               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       string err_str = err_buf;     throw (err_str);
-//       //      exit(1);
-//     }
-//   }
-//   return pos_nwords;
-// }
-
-
 int PostRawCOPPERFormat_latest::GetDetectorNwords(int n, int finesse_num)
 {
-
   int nwords = 0;
   if (GetFINESSENwords(n, finesse_num) > 0) {
     nwords = GetFINESSENwords(n, finesse_num)
              - (SIZE_B2LHSLB_HEADER + SIZE_B2LHSLB_TRAILER +  SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER);
   }
   return nwords;
-
 }
 
 

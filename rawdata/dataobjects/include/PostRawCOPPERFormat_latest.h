@@ -278,8 +278,9 @@ namespace Belle2 {
   inline unsigned int PostRawCOPPERFormat_latest::GetCOPPERCounter(int n)
   {
     char err_buf[500];
-    sprintf(err_buf, "This data format does not have COPPER counter.(block %d) Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] This data format does not have COPPER counter.(block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf);
     string err_str = err_buf; throw (err_str);
     return 0;
   }
@@ -287,8 +288,9 @@ namespace Belle2 {
   inline unsigned int PostRawCOPPERFormat_latest::GetMagicDriverHeader(int n)
   {
     char err_buf[500];
-    sprintf(err_buf, "This function is not supported. (block %d) Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf);
     string err_str = err_buf; throw (err_str);
     return 0;
   }
@@ -296,8 +298,9 @@ namespace Belle2 {
   inline unsigned int PostRawCOPPERFormat_latest::GetMagicFPGAHeader(int n)
   {
     char err_buf[500];
-    sprintf(err_buf, "This function is not supported. (block %d) Exiting...\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
+    printf("%s", err_buf);
     string err_str = err_buf; throw (err_str);
     return 0;
   }

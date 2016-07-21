@@ -25,50 +25,6 @@ PreRawCOPPERFormat_latest::~PreRawCOPPERFormat_latest()
 {
 }
 
-
-// int PreRawCOPPERFormat_latest::GetBufferPos(int n)
-// {
-//   if (m_buffer == NULL || m_nwords <= 0) {
-//     char err_buf[500];
-//     sprintf(err_buf, "[DEBUG] [ERROR] RawPacket buffer(%p) is not available or length(%d) is not set.\n %s %s %d\n",
-//             m_buffer, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     printf("%s", err_buf); fflush(stdout);
-//     string err_str = err_buf;     throw (err_str);
-//   }
-
-//   if (n >= (m_num_events * m_num_nodes)) {
-//     char err_buf[500];
-//     sprintf(err_buf, "[DEBUG] Invalid COPPER block No. (%d : max %d ) is specified. Exiting... \n %s %s %d\n",
-//             n, (m_num_events * m_num_nodes), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//     printf("%s", err_buf); fflush(stdout);
-//     string err_str = err_buf;     throw (err_str);
-
-//   }
-//   int pos_nwords = 0;
-//   for (int i = 1; i <= n ; i++) {
-//     int size = tmp_header.RAWHEADER_NWORDS
-//                + m_buffer[ pos_nwords + tmp_header.RAWHEADER_NWORDS + POS_DATA_LENGTH ]
-//                + SIZE_COPPER_DRIVER_HEADER
-//                + SIZE_COPPER_DRIVER_TRAILER
-//                + tmp_trailer.RAWTRAILER_NWORDS;
-//     // COPPER's data length include one word from COPPER trailer. so -1 is needed.
-//     pos_nwords +=  size;
-//     if (pos_nwords >= m_nwords) {
-//       char err_buf[500];
-
-//       sprintf(err_buf, "CORRUPTED DATA: value of pos_nwords(%d) is larger than m_nwords(%d). Exiting...\n %s %s %d\n",
-//               pos_nwords, m_nwords, __FILE__, __PRETTY_FUNCTION__, __LINE__);
-//       PrintData(m_buffer, m_nwords);
-//       printf("%s", err_buf); fflush(stdout);
-//       string err_str = err_buf;     throw (err_str);
-//       //      exit(1);
-//     }
-//   }
-//   return pos_nwords;
-// }
-
-
-
 unsigned int PreRawCOPPERFormat_latest::CalcDriverChkSum(int n)
 {
   int min = GetBufferPos(n) + tmp_header.RAWHEADER_NWORDS;
@@ -102,7 +58,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
     char err_buf[500];
     PrintData(m_buffer, m_nwords);
     sprintf(err_buf,
-            "[ERROR] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
+            "[FATAL] COPPER's magic word is invalid. Exiting... Maybe it is due to data corruption or different version of the data format.\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
 
@@ -112,7 +68,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
         CheckCRC16(n, i);
       }
     }
-    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
+    printf("[DEBUG] ========== CRC check ended. : block %d =========\n", n);
     string err_str = err_buf;
     throw (err_str);
   }
@@ -132,7 +88,7 @@ int PreRawCOPPERFormat_latest::GetFINESSENwords(int n, int finesse_num)
       break;
     default :
       char err_buf[500];
-      sprintf(err_buf, "Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] Specifined FINESSE number( = %d ) is invalid. Exiting...\n %s %s %d\n",
               finesse_num, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf;
@@ -167,7 +123,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   if (flag == 0) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
+    sprintf(err_buf, "[FATAL] No HSLB data in COPPER data. Exiting...\n%s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);
@@ -176,10 +132,11 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
   if (err_flag == 1) {
     PrintData(m_buffer, m_nwords);
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n%s %s %d\n",
+    sprintf(err_buf,
+            "[FATAL] CORRUPTED DATA: Different event number over HSLBs : slot A 0x%.8x : B 0x%.8x :C 0x%.8x : D 0x%.8x\n%s %s %d\n",
             eve[ 0 ], eve[ 1 ], eve[ 2 ], eve[ 3 ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] [ERROR] %s\n", err_buf);
+    printf("[DEBUG] %s\n", err_buf);
 
     for (int i = 0; i < 4; i++) {
       printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
@@ -197,7 +154,7 @@ unsigned int PreRawCOPPERFormat_latest::GetB2LFEE32bitEventNumber(int n)
 #else // READ_OLD_B2LFEE_FORMAT_FILE
 
   char err_buf[500];
-  sprintf(err_buf, "You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
+  sprintf(err_buf, "[FATAL] You need comment out READ_OLD_B2LFEE_FORMAT_FILE if you are handling a new data format\n%s %s %d\n",
           __FILE__, __PRETTY_FUNCTION__, __LINE__);
   printf("%s", err_buf); fflush(stdout);
   string err_str = err_buf; throw (err_str);
@@ -223,7 +180,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   // check Magic words
   //
   if (!CheckCOPPERMagic(n)) {
-    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n%s %s %d\n",
             GetMagicDriverHeader(n), GetMagicFPGAHeader(n), GetMagicFPGATrailer(n), GetMagicDriverTrailer(n),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
@@ -236,7 +193,7 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int evenum_feehdr = GetB2LFEE32bitEventNumber(n);
   if (*cur_evenum_rawcprhdr != evenum_feehdr) {
     sprintf(err_buf,
-            "CORRUPTED DATA: Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
+            "[FATAL] CORRUPTED DATA: Event # in PreRawCOPPERFormat_latest header and FEE header is different : cprhdr 0x%x feehdr 0x%x : Exiting...\n%s %s %d\n",
             *cur_evenum_rawcprhdr, evenum_feehdr, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
@@ -248,34 +205,33 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   *cur_copper_ctr = GetCOPPERCounter(n);
   if (prev_exprunsubrun_no == *cur_exprunsubrun_no) {
     if ((unsigned int)(prev_evenum + 1) != *cur_evenum_rawcprhdr) {
-      sprintf(err_buf, "CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+      sprintf(err_buf,
+              "[FATAL] CORRUPTED DATA: Event # jump : i %d prev 0x%x cur 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
               n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
-
     if ((unsigned int)(prev_copper_ctr + 1) != *cur_copper_ctr) {
-      sprintf(err_buf, "COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
+      sprintf(err_buf, "[FATAL] COPPER counter jump : i %d prev 0x%x cur 0x%x :\n%s %s %d\n",
               n, prev_copper_ctr, *cur_copper_ctr,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       err_flag = 1;
     }
-
-    //
-    // Check if the first event of a run is zero. (For the moment, I will comment it out to avoid trigger reset when invoking DAQ program)
-    //
-    // }else{
-    //   if( GetRunNo( n ) !=  ( prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK ) >> RawHeader_latest::RUNNO_SHIFT ){
-    //     if( *cur_evenum_rawcprhdr != 0 ){
-    //     sprintf(err_buf, "Invalid Event # at the beginning of the run (It should be zero.): i %d preveve 0x%x cureve 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
-    //             n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
-    //             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    //     err_flag = 1;
-    //     }
-    //   }
   } else {
     printf("[INFO] New run started. cur run %.8x prev. run %.8x cur eve %.8x prev eve %8.x\n",
            *cur_exprunsubrun_no, prev_exprunsubrun_no , *cur_evenum_rawcprhdr, prev_evenum);
+
+    // Check if the first event of a run is zero.
+    if ((unsigned int)GetRunNo(n) != (prev_exprunsubrun_no & RawHeader_latest::RUNNO_MASK) >> RawHeader_latest::RUNNO_SHIFT) {
+      if (*cur_evenum_rawcprhdr != 0) {
+        sprintf(err_buf,
+                "[FATAL] Invalid Event # at the beginning of the run (It should be zero.): i %d preveve 0x%x cureve 0x%x : prevrun %.8x currun %.8x: Exiting...\n%s %s %d\n",
+                n, prev_evenum, *cur_evenum_rawcprhdr, prev_exprunsubrun_no, *cur_exprunsubrun_no,
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
+        err_flag = 1;
+      }
+    }
+
   }
 
 
@@ -285,13 +241,12 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   //
   CheckUtimeCtimeTRGType(n);
 
-
   //
   // Check checksum calculated by COPPER driver
   //
   if (GetDriverChkSum(n) != CalcDriverChkSum(n)) {
     sprintf(err_buf,
-            "CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
+            "[FATAL] CORRUPTED DATA: COPPER driver checkSum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n%s %s %d\n",
             n,
             GetBlockNwords(n),
             *cur_evenum_rawcprhdr,
@@ -301,7 +256,6 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
     err_flag = 1;
   }
 
-
   //
   // Check checksum calculated by DeSerializerCOPPER()
   //
@@ -309,38 +263,11 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
   unsigned int xor_chksum = CalcXORChecksum(GetBuffer(n), GetBlockNwords(n) - tmp_trailer.GetTrlNwords());
   if (tmp_trailer.GetChksum() != xor_chksum) {
     sprintf(err_buf,
-            "CORRUPTED DATA: PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
+            "[FATAL] CORRUPTED DATA: PreRawCOPPERFormat_latest checksum error : block %d : length %d eve 0x%x : Trailer chksum 0x%.8x : calcd. now 0x%.8x\n %s %s %d\n",
             n, GetBlockNwords(n), *cur_evenum_rawcprhdr, tmp_trailer.GetChksum(), xor_chksum,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     err_flag = 1;
   }
-
-
-#ifdef DEBUG
-  printf("[DEBUG] eve %u %d %d %d %d\n",
-         GetEveNo(n),
-         Get1stDetectorNwords(n),
-         Get2ndDetectorNwords(n),
-         Get3rdDetectorNwords(n),
-         Get4thDetectorNwords(n)
-        );
-  printf("[DEBUG] ===COPPER BLOCK==============\n");
-  printData(GetBuffer(n), GetBlockNwords(n));
-
-  printf("[DEBUG] ===FINNESSE A ==============\n");
-  printData(Get1stDetectorBuffer(n), Get1stDetectorNwords(n));
-
-  printf("[DEBUG] ===FINNESSE B ==============\n");
-  printData(Get2ndDetectorBuffer(n), Get2ndDetectorNwords(n));
-
-  printf("[DEBUG] ===FINNESSE C ==============\n");
-  printData(Get3rdDetectorBuffer(n), Get3rdDetectorNwords(n));
-
-  printf("[DEBUG] ===FINNESSE D ==============\n");
-  printData(Get4thDetectorBuffer(n), Get4thDetectorNwords(n));
-  printf("[DEBUG] === END ==============\n");
-
-#endif
 
   if (err_flag == 1) {
     printf("%s", err_buf); fflush(stdout);
@@ -352,12 +279,9 @@ void PreRawCOPPERFormat_latest::CheckData(int n,
         CheckCRC16(n, i);
       }
     }
-    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
+    printf("[DEBUG] ========== CRC check is done. : block %d =========\n", n);
     string err_str = err_buf;
     throw (err_str);
-
-    //     sleep(1234567);
-    //     exit(-1);
   }
 
   return;
@@ -389,6 +313,7 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
   unsigned int temp_utime = 0, temp_ctime_trgtype = 0, temp_eve = 0, temp_exprun = 0;
   unsigned int temp_ctime_trgtype_footer = 0, temp_eve_footer = 0;
   unsigned int utime[4], ctime_trgtype[4], eve[4], exprun[4];
+  char err_buf[500];
 
   memset(utime, 0, sizeof(utime));
   memset(ctime_trgtype, 0, sizeof(ctime_trgtype));
@@ -416,30 +341,28 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
         temp_exprun = exprun[ i ];
         flag = 1;
       } else {
-        if (temp_ctime_trgtype != ctime_trgtype[ i ] ||
-            temp_utime != utime[ i ] ||
-            temp_eve != eve[ i ] ||
-            temp_exprun != exprun[ i ]) {
-          err_flag = 1;
-        } else if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
-                   (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
-          char err_buf[500];
-          sprintf(err_buf,
-                  "CORRUPTED DATA: mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
-                  i,  temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
+        if (temp_ctime_trgtype != ctime_trgtype[ i ] || temp_utime != utime[ i ] ||
+            temp_eve != eve[ i ] || temp_exprun != exprun[ i ]) {
+          if (err_flag == 0) {
+            for (int j = 0; j < 4; j++) {
+              printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
+                     j, GetFINESSENwords(n, j), ctime_trgtype[ j ], utime[ j ], eve[ j ], exprun[ j ]);
+            }
+          }
+          sprintf(err_buf, "[FATAL] CORRUPTED DATA: mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
                   __FILE__, __PRETTY_FUNCTION__, __LINE__);
           printf("%s", err_buf); fflush(stdout);
 
-          for (int j = 0; j < 4; j++) {
-            printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, j);
-            if (GetFINESSENwords(n, j) > 0) {
-              CheckCRC16(n, j);
-            }
-          }
-          printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
-#ifndef NO_ERROR_STOP
-          string err_str = err_buf; throw (err_str);
-#endif
+          err_flag = 1;
+          break;
+        } else if (temp_ctime_trgtype != temp_ctime_trgtype_footer ||
+                   (temp_eve & 0xffff) != ((temp_eve_footer >> 16) & 0xffff)) {
+          sprintf(err_buf,
+                  "[FATAL] CORRUPTED DATA: mismatch(finesse %d) between header(ctime %.8x eve %.8x) and footer(ctime %.8x eve_crc16 %.8x). Exiting...\n %s %s %d\n",
+                  i,  temp_ctime_trgtype,  temp_eve, temp_ctime_trgtype_footer, temp_eve_footer,
+                  __FILE__, __PRETTY_FUNCTION__, __LINE__);
+          printf("%s", err_buf); fflush(stdout);
+          err_flag = 1;
         }
       }
     }
@@ -447,21 +370,12 @@ void PreRawCOPPERFormat_latest::CheckUtimeCtimeTRGType(int n)
 
   if (err_flag != 0) {
     for (int i = 0; i < 4; i++) {
-      printf("[DEBUG] FINESSE #=%d buffsize %d ctimeTRGtype 0x%.8x utime 0x%.8x eve 0x%.8x exprun 0x%.8x\n",
-             i, GetFINESSENwords(n, i), ctime_trgtype[ i ], utime[ i ], eve[ i ], exprun[ i ]);
-    }
-    char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: mismatch header value over FINESSEs. Exiting...\n %s %s %d\n",
-            __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("%s", err_buf); fflush(stdout);
-
-    for (int i = 0; i < 4; i++) {
-      printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
       if (GetFINESSENwords(n, i) > 0) {
+        printf("[DEBUG] ========== CRC check : block # %d finesse %d ==========\n", n, i);
         CheckCRC16(n, i);
+        printf("[DEBUG] ========== CRC check is done. : block %d =========\n", n);
       }
     }
-    printf("[DEBUG] ========== CRC check is O.K. : block %d =========\n", n);
 #ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
 #endif
@@ -480,7 +394,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (m_num_nodes * m_num_events != 1) {
     char err_buf[500];
     sprintf(err_buf,
-            "This function should be used for PreRawCOPPERFormat_latest containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
+            "[FATAL] This function should be used for PreRawCOPPERFormat_latest containing only one datablock, while. this object has num_nodes of %d and num_events of %d\n %s %s %d\n",
             m_num_nodes, m_num_events,  __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf;    throw (err_str);
@@ -513,7 +427,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
       copper_buf[ POS_CH_D_DATA_LENGTH ] == 0) {
     char err_buf[500];
     sprintf(err_buf,
-            "No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
+            "[FATAL] No FINESSE data in a copper data block. Exiting...\n %s %s %d\n",
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf; throw (err_str);
@@ -539,7 +453,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   if (m_buffer[ tmp_header.POS_NWORDS ] != m_nwords) {
     char err_buf[500];
     sprintf(err_buf,
-            "CORRUPTED DATA: Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
+            "[FATAL] CORRUPTED DATA: Data length is inconsistent m_nwords %d : nwords from COPPER data %d\n %s %s %d\n",
             m_nwords, m_buffer[ tmp_header.POS_NWORDS ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -585,16 +499,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   m_buffer[ tmp_header.POS_NODE_ID ] = m_node_id;
 
-
-
   //
   // Check error counts of b2link-packet CRC
   //
   //  m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = ((m_trunc_mask << 31) & 0x80000000) | (m_data_type & 0x7FFFFFFF);
-
-//   printf("%.8x %.8x %.8x %.8x : %.8x\n",
-//   copper_buf[ POS_CH_A_DATA_LENGTH ], copper_buf[ POS_CH_B_DATA_LENGTH ],
-//   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
+  //   printf("%.8x %.8x %.8x %.8x : %.8x\n",
+  //   copper_buf[ POS_CH_A_DATA_LENGTH ], copper_buf[ POS_CH_B_DATA_LENGTH ],
+  //   copper_buf[ POS_CH_C_DATA_LENGTH ], copper_buf[ POS_CH_D_DATA_LENGTH ], m_buffer[ offset_3rd_finesse + copper_buf[ POS_CH_C_DATA_LENGTH ] - SIZE_B2LHSLB_HEADER ] );
 
   m_buffer[ tmp_header.POS_TRUNC_MASK_DATATYPE ] = 0;
   if (copper_buf[ POS_CH_A_DATA_LENGTH ] != 0) {
@@ -666,7 +577,7 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   //
   if (chksum_body != (unsigned int)(m_buffer[ body_end ])) {
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: COPPER driver checksum is not consistent.: calcd. %.8x data %.8x\n %s %s %d\n",
             chksum_body, m_buffer[ body_end ],
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);
@@ -709,13 +620,13 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
   }
   if (err_flag == 1) {
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Invalid Magic word 0x7FFFF0008=%u 0xFFFFFAFA=%u 0xFFFFF5F5=%u 0x7FFF0009=%u\n %s %s %d\n",
             GetMagicDriverHeader(datablock_id),
             GetMagicFPGAHeader(datablock_id),
             GetMagicFPGATrailer(datablock_id),
             GetMagicDriverTrailer(datablock_id),
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    printf("[DEBUG] [ERROR] %s\n", err_buf);
+    printf("[DEBUG] %s\n", err_buf);
 
 #ifndef NO_ERROR_STOP
     string err_str = err_buf; throw (err_str);
@@ -739,11 +650,12 @@ unsigned int PreRawCOPPERFormat_latest::FillTopBlockRawHeader(unsigned int m_nod
 
 #ifndef NO_ERROR_STOP
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %u crun %u\n %s %s %d\n",
+      sprintf(err_buf,
+              "[FATAL] CORRUPTED DATA: Invalid event_number. Exiting...: cur 32bit eve %u preveve %u prun %u crun %u\n %s %s %d\n",
               cur_ftsw_eve32, prev_eve32,
               prev_exprunsubrun_no, *cur_exprunsubrun_no,
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      printf("[DEBUG] [ERROR] %s\n", err_buf);
+      printf("[DEBUG] %s\n", err_buf);
 
       string err_str = err_buf;
       printf("[DEBUG] i= %d : num entries %d : Tot words %d\n", 0 , GetNumEntries(), TotalBufNwords());
@@ -791,7 +703,7 @@ void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
         printf("[DEBUG] \033[0m");
         fflush(stderr);
         char err_buf[500];
-        sprintf(err_buf, "FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
+        sprintf(err_buf, "[FATAL] FTSW and b2tt firmwares are old. Exiting...\n %s %s %d\n",
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = err_buf; throw (err_str);
         //         sleep(12345678);
@@ -807,7 +719,7 @@ void PreRawCOPPERFormat_latest::CheckB2LFEEHeaderVersion(int n)
     if (i == 3) {
 #ifdef TEMP
       char err_buf[500];
-      sprintf(err_buf, "PreRawCOPPERFormat_latest contains no FINESSE data. Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] PreRawCOPPERFormat_latest contains no FINESSE data. Exiting...\n %s %s %d\n",
               __FILE__, __PRETTY_FUNCTION__, __LINE__);
       printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf; throw (err_str);
@@ -996,7 +908,7 @@ int PreRawCOPPERFormat_latest::CopyReducedBuffer(int n, int* buf_to)
           - SIZE_B2LFEE_TRAILER - SIZE_B2LHSLB_TRAILER < 0) {
         char err_buf[500];
         sprintf(err_buf,
-                "[ERROR] Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
+                "[FATAL] Finesse buffer size is too small( %d words < %d words). May be the data are corrupted. Exiting...\n %s %s %d\n",
                 finesse_nwords, SIZE_B2LHSLB_HEADER + SIZE_B2LFEE_HEADER + SIZE_B2LFEE_TRAILER + SIZE_B2LHSLB_TRAILER,
                 __FILE__, __PRETTY_FUNCTION__, __LINE__);
         printf("%s", err_buf); fflush(stdout);
@@ -1206,7 +1118,7 @@ int PreRawCOPPERFormat_latest::CheckCRC16(int n, int finesse_num)
     fflush(stdout);
     char err_buf[500];
     sprintf(err_buf,
-            "[DEBUG] [ERROR] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
+            "[FATAL] B2LCRC16 (%.4x) differs from one ( %.4x) calculated by PreRawCOPPERfromat class. Exiting...\n %s %s %d\n",
             (unsigned short)(*buf & 0xFFFF), temp_crc16,
             __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf); fflush(stdout);

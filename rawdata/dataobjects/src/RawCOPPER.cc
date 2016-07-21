@@ -67,9 +67,9 @@ void RawCOPPER::SetVersion()
       break;
     default : {
       char err_buf[500];
-      sprintf(err_buf, "Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
+      sprintf(err_buf, "[FATAL] Invalid version of a data format(0x%.8x = 0x7f7f**..). Exiting...\n %s %s %d\n",
               m_buffer[ POS_FORMAT_VERSION ], __FILE__, __PRETTY_FUNCTION__, __LINE__);
-      perror(err_buf);
+      printf("%s", err_buf); fflush(stdout);
       string err_str = err_buf; throw (err_str);
     }
     exit(1);
@@ -107,7 +107,7 @@ void RawCOPPER::SetVersion(string class_name)
     char err_buf[500];
     sprintf(err_buf, "Invalid name of a data format class (%s). Exiting...\n %s %s %d\n",
             class_name.c_str(), __FILE__, __PRETTY_FUNCTION__, __LINE__);
-    perror(err_buf);
+    printf("%s", err_buf); fflush(stdout);
     string err_str = err_buf;
     throw (err_str);
   }

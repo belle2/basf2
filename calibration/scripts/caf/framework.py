@@ -501,23 +501,25 @@ class CAF():
             if iteration > 0:
                 for algorithm in calibration.algorithms:
                     algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
-                    database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration-1), 'output', 'localdb')
+                    database_dir = os.path.join(self.output_dir, calibration_name, str(iteration-1), 'output', 'outputdb')
                     list_dependent_databases.append(database_dir)
                     B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
                            calibration_name))
 
             # Here we add the finished databases of previous calibrations that we depend on.
             # We can assume that the databases exist as we can't be here until they have returned
-            # with OK status (THIS MAY CHANGE!)
-            for cal_name in self.order:
-                if cal_name in self.dependencies[calibration_name]:
-                    database_dir = os.path.join(self.output_dir, cal_name, 'localdb')
+            # (THIS MAY CHANGE!)
+            for cal_name, future_deps in self.order.items():
+                if calibration_name in future_deps:
+                    database_dir = os.path.join(self.output_dir, cal_name, 'outputdb')
                     B2INFO('Adding local database from {0} for use by {1}'.format(database_dir, calibration_name))
+                    list_dependent_databases.append(database_dir)
 
             # Set the location where we will store the merged set of databases.
-            dependent_database_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'localdb')
+            dependent_database_dir = os.path.join(self.output_dir, calibration_name, str(iteration), 'inputdb')
             # Merge all of the local databases that are required for this calibration into a single directory
-            caf.utils.merge_local_databases(list_dependent_databases, dependent_database_dir)
+            if list_dependent_databases:
+                caf.utils.merge_local_databases(list_dependent_databases, dependent_database_dir)
             job.input_sandbox_files.append(dependent_database_dir)
             # Define the input file list and output patterns to be returned from collector job
             job.input_files = calibration.input_files
@@ -599,13 +601,18 @@ class CAF():
                             for iov_result in iov_results:
                                 if iov_result.result == CalibrationAlgorithm.c_Iterate:
                                     iteration_needed[calibration_name] = True
-                                    B2INFO('Iteration called for by {0} on IoV {1}'.format(calibration_name+'_'+algorithm_name,
+                                    B2INFO("Iteration called for by {0} on IoV {1}".format(calibration_name+'_'+algorithm_name,
                                            iov_result.iov))
+                                elif (iov_result.result == CalibrationAlgorithm.c_NotEnoughData or
+                                      iov_result.result == CalibrationAlgorithm.c_Failure):
+                                    B2FATAL("Can't continue, {0} returned by {1}::{2}".format(
+                                            AlgResult(iov_result.result).name, calibration_name, algorithm_name))
 
                     for calibration_name in col_to_submit[:]:
                         if not iteration_needed[calibration_name]:
-                            database_location = os.path.join(self.output_dir, calibration_name, str(iteration), 'output', 'localdb')
-                            final_database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
+                            database_location = os.path.join(self.output_dir, calibration_name,
+                                                             str(iteration), 'output', 'outputdb')
+                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
                             shutil.copytree(database_location, final_database_location)
                             B2INFO('No Iteration required for {0}'.format(calibration_name+'_'+algorithm_name))
                             col_to_submit.remove(calibration_name)
@@ -624,8 +631,8 @@ class CAF():
                     for calibration_name in col_to_submit[:]:
                         if iteration_needed[calibration_name]:
                             database_location = os.path.join(self.output_dir, calibration_name,
-                                                             str(self.max_iterations-1), 'output', 'localdb')
-                            final_database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
+                                                             str(self.max_iterations-1), 'output', 'outputdb')
+                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
                             shutil.copytree(database_location, final_database_location)
                             B2WARNING(("Max iterations reached for {0} but algorithms still "
                                        "requesting more!".format(calibration_name)))
@@ -695,7 +702,7 @@ class CAF():
         algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
 
         # Create a directory to store the payloads of this algorithm
-        os.mkdir('localdb')
+        os.mkdir('outputdb')
 
         # add logfile for output
         logging.add_file(algorithm_name+'_b2log')
@@ -709,19 +716,21 @@ class CAF():
         # Here we add the finished databases of previous calibrations that we depend on.
         # We can assume that the databases exist as we can't be here until they have returned
         # with OK status.
-        for calibration_name in self.order:
-            if calibration_name in self.dependencies[calibration.name]:
-                database_location = os.path.join(self.output_dir, calibration_name, 'localdb')
+
+        for calibration_name, future_deps in self.order.items():
+            if calibration.name in future_deps:
+                database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
                 use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
-                B2INFO('Adding local database from {0} for use by {1}'.format(calibration_name, algorithm_name))
+                B2INFO("Adding local database from {0} for use by {1}::{2}".format(
+                        calibration_name, calibration.name, algorithm_name))
 
         # Here we add the previous iteration's database
         if iteration > 0:
-            use_local_database(os.path.join('../../', str(iteration-1), 'output/localdb/database.txt'),
-                               os.path.join('../../', str(iteration-1), 'output/localdb'), True, LogLevel.INFO)
+            use_local_database(os.path.join('../../', str(iteration-1), 'output/outputdb/database.txt'),
+                               os.path.join('../../', str(iteration-1), 'output/outputdb'), True, LogLevel.INFO)
 
         # add local database to save payloads
-        use_local_database("localdb/database.txt", 'localdb', False, LogLevel.INFO)
+        use_local_database("outputdb/database.txt", 'outputdb', False, LogLevel.INFO)
 
         B2INFO("Running {0} in working directory {1}".format(algorithm_name, working_dir))
         B2INFO("Output folder contents of collector was"+str(glob.glob('./*')))
@@ -771,9 +780,16 @@ class CAF():
                    AlgResult(alg_result).name))
 
         else:
+            # If we haven't cleared the execution vector and we have no results, then we never got a success to commit
+            if iov_to_execute.size() and not results:
+                # We should add the result regardless and pass it out, but not commit to a database
+                iov = iov_from_vector(iov_to_execute)
+                result = IoV_Result(iov, alg_result)
+                B2INFO('Result was {0}'.format(result))
+                results.append(result)
             # Final IoV will probably have returned c_NotEnoughData so we need to merge it with the previous successful
             # IoV if one exists.
-            if iov_to_execute.size() and results:
+            elif iov_to_execute.size() and results:
                 iov = iov_from_vector(iov_to_execute)
                 B2INFO('Merging IoV for {0} onto end of previous IoV'.format(iov))
                 last_successful_result = results.pop(-1)
@@ -803,7 +819,6 @@ class CAF():
                     B2INFO("Committing final payload to local database for IoV {0}".format(iov))
                     algorithm.algorithm.commit(last_payloads)
 
-        logging.reset()
         child_conn.send(results)
         return 0
 
@@ -832,6 +847,7 @@ class CAF():
         """
         if os.path.isdir(self.output_dir):
             B2ERROR('{0} output directory already exists.'.format(self.output_dir))
+            sys.exit(1)
         else:
             os.mkdir(self.output_dir)
             abs_output_dir = os.path.join(os.getcwd(), self.output_dir)
@@ -839,6 +855,7 @@ class CAF():
                 return abs_output_dir
             else:
                 B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
+                sys.exit(1)
 
     def _make_collector_path(self, calibration_name, iteration):
         """

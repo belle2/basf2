@@ -16,7 +16,7 @@ def run_collectors():
     reset_database()
     use_database_chain(True)
     use_central_database('production')
-    use_local_database('localdb/database.txt', 'localdb', True, LogLevel.INFO)
+    use_local_database('inputdb/database.txt', 'inputdb', True, LogLevel.INFO)
 
     # create a path with all modules needed before calibration path is run.
     collector_path = create_path()

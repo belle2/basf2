@@ -1,15 +1,16 @@
 from basf2 import *
+import os
 from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
+import enum
+import shutil
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
-
-import enum
 
 
 @enum.unique
@@ -266,9 +267,23 @@ def merge_local_databases(list_database_dirs, output_database_dir):
         -> <payload file name>
         -> ...
     """
-    import shutil
-    for directory in list_database_dirs:
-        if not os.path.exists(directory):
-            B2WARNING("Database directory {0} requested by collector but it doesn't exist!".format(directory))
-            continue
-        shutil.copytree(directory, output_database_dir)
+    os.mkdir(output_database_dir)
+    database_file_path = os.path.join(output_database_dir, 'database.txt')
+    with open(database_file_path, 'w') as db_file:
+        for directory in list_database_dirs:
+            if not os.path.exists(directory):
+                B2WARNING("Database directory {0} requested by collector but it doesn't exist!".format(directory))
+                continue
+            else:
+                # Get only the files, not directories
+                listdir, isfile, join = os.listdir, os.path.isfile, os.path.join
+                file_names = [file_name for file_name in listdir(directory) if isfile(join(directory, file_name))]
+                file_names.remove('database.txt')
+                # Now we need the absolute paths to all of the payload files so we can copy them across
+                file_names = [os.path.join(directory, file_name) for file_name in file_names[:]]
+                for file_name in file_names:
+                    shutil.copy(file_name, output_database_dir)
+                # Now grab all the IoV stuff from each database.txt files and merge it.
+                with open(os.path.join(directory, 'database.txt'), 'r') as f:
+                    for line in f.readlines():
+                        db_file.write(line)

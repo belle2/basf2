@@ -37,7 +37,7 @@ CaTestModule::CaTestModule() : CalibrationCollectorModule()
 
   // Parameter definitions
   addParam("spread", m_spread,
-           "Spread of gaussian (mean=42) filling of test histogram (range=<0,100>) - probability of algo iterations depend on it", int(20.));
+           "Spread of gaussian (mean=42) filling of test histogram (range=<0,100>) - probability of algo iterations depend on it", int(17.));
 }
 
 void CaTestModule::prepare()

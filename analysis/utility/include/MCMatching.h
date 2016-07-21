@@ -128,5 +128,13 @@ namespace Belle2 {
      * @returns ORed combination of MCErrorFlags flags for missing particles.
      */
     int getMissingParticleFlags(const Belle2::Particle* particle, const Belle2::MCParticle* mcParticle);
+
+    /**
+     * Determines the number of daughter particles which are not neutrinos.
+     * Needed to handle the special case tau -> rho nu correctly.
+     * @param mcParticle
+     * @return number of daughters which are not neutrinos
+     */
+    int getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle);
   }
 }

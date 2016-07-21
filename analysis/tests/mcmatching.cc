@@ -543,6 +543,49 @@ namespace {
       EXPECT_EQ(c_MissMassiveParticle | c_MissGamma, getMCErrors(d.m_particle)) << d.getString();
     }
   }
+  TEST_F(MCMatchingTest, TauWithResonance)
+  {
+    // Correct tau
+    {
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
+      d.reconstruct({15, {0, { -213, { -211, {111, {22, 22}}}}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissNeutrino, getMCErrors(d.m_particle)) << d.getString();
+    }
+    // Miss Resoanace
+    {
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
+      d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &d[1][0]}, {111, {22, 22}, Decay::c_ReconstructFrom, &d[1][1]}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissingResonance, getMCErrors(d.m_particle)) << d.getString();
+    }
+    // Miss Gamma
+    {
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      Decay d(15, {16, { -213, { -211, {111, {22, 22}}}}});
+      d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &d[1][0]}, {111, {0, {22, {}, Decay::c_ReconstructFrom, &d[1][1][1]}},  Decay::c_ReconstructFrom, &d[1][1]}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma | c_MissingResonance, getMCErrors(d.m_particle)) << d.getString();
+    }
+    // Added Wrong Pion
+    {
+      StoreArray<Particle> particles;
+      StoreArray<MCParticle> mcparticles;
+      Decay g(-512, {211, -211, -16, {15, {16, { -213, { -211, {111, {22, 22}}}}}}});
+      Decay& d = g[3];
+      d.reconstruct({15, {{ -211, {}, Decay::c_ReconstructFrom, &g[1]}, {111, {22, 22}, Decay::c_ReconstructFrom, &d[1][1]}}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissMassiveParticle | c_MissingResonance | c_MissNeutrino | c_AddedWrongParticle,
+                getMCErrors(d.m_particle)) << d.getString();
+    }
+
+
+  }
   TEST_F(MCMatchingTest, MissGamma)
   {
     {

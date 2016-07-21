@@ -197,8 +197,19 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   }
   const Particle::EFlavorType flavorType = particle->getFlavorType();
   if ((flavorType == Particle::c_Flavored and particle->getPDGCode() != mcParticle->getPDG())
-      or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG())))
-    status |= MCErrorFlags::c_AddedWrongParticle;
+      or (flavorType == Particle::c_Unflavored and abs(particle->getPDGCode()) != abs(mcParticle->getPDG()))) {
+    // Check if mother particle has the correct pdg code, if so we have to take care of the special case
+    // tau -> rho nu, where a the matched mother is  the rho, but we have only a missing resonance and not added a wrong particle.
+    auto mother = mcParticle->getMother();
+    if (mother and particle->getPDGCode() == mother->getPDG() and getNumberOfDaughtersWithoutNeutrinos(mother) == 1) {
+      if (abs(mother->getPDG()) != 15) {
+        B2WARNING("Special treatment in MCMatching for tau is called for a non-tau particle. Check if you discovered another special case here, or if we have a bug!");
+      }
+      status |= MCErrorFlags::c_MissingResonance;
+    } else {
+      status |= MCErrorFlags::c_AddedWrongParticle;
+    }
+  }
 
   //add up all (accepted) status flags we collected for our daughters
   const int daughterStatusAcceptMask = c_MisID | c_AddedWrongParticle | c_DecayInFlight | c_InternalError;
@@ -212,6 +223,19 @@ int MCMatching::setMCErrorsExtraInfo(Particle* particle, const MCParticle* mcPar
   status |= getMissingParticleFlags(particle, mcParticle);
 
   return setStatus(particle, status);
+}
+
+int MCMatching::getNumberOfDaughtersWithoutNeutrinos(const MCParticle* mcParticle)
+{
+  auto daughters = mcParticle->getDaughters();
+  unsigned int number_of_neutrinos = 0;
+  for (auto& p : daughters) {
+    auto pdg = abs(p->getPDG());
+    if (pdg == 12 || pdg == 14 || pdg == 16) {
+      number_of_neutrinos++;
+    }
+  }
+  return daughters.size() - number_of_neutrinos;
 }
 
 int MCMatching::getMCErrors(const Particle* particle, const MCParticle* mcParticle)

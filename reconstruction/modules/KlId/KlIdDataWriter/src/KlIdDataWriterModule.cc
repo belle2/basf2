@@ -21,7 +21,7 @@
 #include <genfit/Exception.h>
 #include <cstring>
 
-#include "reconstruction/modules/KlId/KlIdKLMTMVAExpert/helperFunctions.h"
+#include "reconstruction/modules/KlId/KLMExpert/helperFunctions.h"
 
 using namespace KlIdHelpers;
 using namespace Belle2;

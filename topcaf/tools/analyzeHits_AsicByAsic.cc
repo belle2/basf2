@@ -45,10 +45,10 @@ bool analyzeHits_AsicByAsic(const char* filename, const char* outfilename = "hit
 
 
   //deifne some standard cuts to produce different plots
-  TCut tight_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 100 && (TOPCAFDigits.m_flag == 201 || TOPCAFDigits.m_flag == 4201) ");
+  TCut tight_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 100 && (TOPCAFDigits.m_flag == 2000) ");
   TCut tight_cut_no7("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 8 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch!=7");
   TCut loose_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0");
-  TCut optics_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch !=7 && TOPCAFDigits.m_tdc_bin%128 > 60 ");
+  TCut optics_cut("TOPCAFDigits.m_width > 3 && TOPCAFDigits.m_width < 10 && TOPCAFDigits.m_q > 0 && TOPCAFDigits.m_adc_height > 150 && TOPCAFDigits.m_asic_ch !=7 ");
 
 
   //  TH2F* timing_difference = new TH2F("timing_difference", "channle - by channel time difference between direct and reflected peak", 512, 0., 512., 4000, -200, 200);

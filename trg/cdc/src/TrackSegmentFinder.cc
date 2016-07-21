@@ -1420,6 +1420,7 @@ TRGCDCTrackSegmentFinder::priorityTiming(unsigned t,
     unsigned p = t / 16;
     if (t == 0)
         p = nTSF / 16 - 1;
+	else p=p-1;
     t1.push_back(* _edg0Map[p * 4 + 0]);
     t1.push_back(* _edg0Map[p * 4 + 1]);
     t1.push_back(* _edg0Map[p * 4 + 2]);
@@ -1443,7 +1444,7 @@ TRGCDCTrackSegmentFinder::priorityTiming(unsigned t,
         else if ((! stt[1]) && stt[2])
             sel = true;
         else {  // (stt[1] && stt[2])
-            if (unsigned(t0.state(clk)) << unsigned(t1.state(clk)))
+            if (unsigned(t0.state(clk)) < unsigned(t1.state(clk)))
                 sel = true;
             else
                 sel = false;
@@ -2522,10 +2523,10 @@ TRGCDCTrackSegmentFinder::inputInner(const unsigned t,
     }
 
     //...Priority timing...
-    s->push_back(* _priMap[t * 4 + 0]);
-    s->push_back(* _priMap[t * 4 + 1]);
-    s->push_back(* _priMap[t * 4 + 2]);
-    s->push_back(* _priMap[t * 4 + 3]);
+//    s->push_back(* _priMap[t * 4 + 0]);
+//    s->push_back(* _priMap[t * 4 + 1]);
+//    s->push_back(* _priMap[t * 4 + 2]);
+//    s->push_back(* _priMap[t * 4 + 3]);
 
     //...Priority timing...
     priorityTiming(t, nTSF, * s, (* s)[1], (* s)[2], (* s)[3]);
@@ -2584,10 +2585,10 @@ TRGCDCTrackSegmentFinder::inputOuter(const unsigned t,
     }
 
     //...Priority timing...
-    s->push_back(* _priMap[t * 4 + 0]);
-    s->push_back(* _priMap[t * 4 + 1]);
-    s->push_back(* _priMap[t * 4 + 2]);
-    s->push_back(* _priMap[t * 4 + 3]);
+//    s->push_back(* _priMap[t * 4 + 0]);
+//    s->push_back(* _priMap[t * 4 + 1]);
+//    s->push_back(* _priMap[t * 4 + 2]);
+//    s->push_back(* _priMap[t * 4 + 3]);
 
     //...Priority timing...
     priorityTiming(t, nTSF, * s, (* s)[6], (* s)[7], (* s)[8]);

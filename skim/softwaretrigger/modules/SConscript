@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    'framework',
+    'skim',
+    '$ROOT_LIBS'
+    ]
+
+Return('env')
+

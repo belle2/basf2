@@ -80,7 +80,7 @@ namespace Belle2 {
    *
    *  The best example for a VariableManager, that has all these parameters, is probably the analysis VariableManager with VariableManager::var equals
    *  to the analysis variable and the VariableManager::Object equal to a Particle.
-   *  For a more slimed down example of a valid variable manager, see the generalCut.cc test, where a mocking variable manager is created.
+   *  For a more slim example of a valid variable manager, see the generalCut.cc test, where a mock variable manager is created.
    */
   template <class AVariableManager>
   class GeneralCut {

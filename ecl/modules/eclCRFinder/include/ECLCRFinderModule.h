@@ -83,16 +83,16 @@ namespace Belle2 {
     private:
 
       // Module parameters
-      double m_energyCut[3]; /**< energy cut for seed, neighbours, ...*/
-      double m_energyCutBkgd[3]; /**< energy cut (for high background) for seed, neighbours, ...*/
-      double m_timeCut[3]; /**< time cut for seed, neighbours, ...*/
-      std::string m_mapType[2]; /**< neighbour map types.*/
-      double m_mapPar[2]; /**< parameters for neighbour maps.*/
-      int m_useBackgroundLevel; /**< background dependend energy and timing cuts.*/
-      int m_skipFailedTimeFitDigits; /**< handling of digits with failed time fits.*/
+      double m_energyCut[3]; /**< Energy cut for seed, neighbours, ...*/
+      double m_energyCutBkgd[3]; /**< Energy cut (for high background) for seed, neighbours, ...*/
+      double m_timeCut[3]; /**< Time cut for seed, neighbours, ...*/
+      std::string m_mapType[2]; /**< Neighbour map types.*/
+      double m_mapPar[2]; /**< Parameters for neighbour maps.*/
+      int m_useBackgroundLevel; /**< Background dependend energy and timing cuts.*/
+      int m_skipFailedTimeFitDigits; /**< Handling of digits with failed time fits.*/
+      int m_fullBkgdCount; /**< Number of expected background digits at full background. TODO move to DB*/
 
       /** Other variables. */
-      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background. TODO move to DB*/
       double m_energyCutMod[3]; /**< modified energy cut taking into account bkgd per event for seed, neighbours, ...*/
       int m_tempCRId; /**< Temporary CR ID*/
 

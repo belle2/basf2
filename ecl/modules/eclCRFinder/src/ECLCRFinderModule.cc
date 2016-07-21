@@ -50,13 +50,13 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   // Add module parameters.
   addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 10.0 * Belle2::Unit::MeV);
   addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 1.5 * Belle2::Unit::MeV);
-  addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.25 * Belle2::Unit::MeV);
+  addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.5 * Belle2::Unit::MeV);
   addParam("energyCutBkgd0", m_energyCutBkgd[0], "Seed energy cut (for high background).", 12.5 * Belle2::Unit::MeV);
   addParam("energyCutBkgd1", m_energyCutBkgd[1], "Growth energy cut (for high background).", 2.5 * Belle2::Unit::MeV);
   addParam("energyCutBkgd2", m_energyCutBkgd[2], "Digit energy cut (for high background).", 0.5 * Belle2::Unit::MeV);
-  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", -999.);
-  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", -999.);
-  addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", -999.);
+  addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 99999.);
+  addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 99999.);
+  addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", -5.);
   addParam("mapType0", m_mapType[0], "Map type for seed crystals.", std::string("N"));
   addParam("mapType1", m_mapType[1], "Map type for growth crystals.",  std::string("N"));
   addParam("mapPar0", m_mapPar[0],
@@ -65,6 +65,7 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
            "Map parameter for growth crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
   addParam("useBackgroundLevel", m_useBackgroundLevel, "Use background dependent time and energy cuts.", 1);
   addParam("skipFailedTimeFitDigits", m_skipFailedTimeFitDigits, "Digits with failed fits are skipped when checking timing cuts.", 0);
+  addParam("fullBkgdCount", m_fullBkgdCount, "Full background count (via ECLEventInformation).", 182);
 
 }
 
@@ -162,10 +163,10 @@ void ECLCRFinderModule::event()
     // This scaling can probably be more clever to be really efficienct.
     // So far just scale linearly between 0 and 280 (release-07).
     double frac = 1.0;
-    if (c_fullBkgdCount > 0) frac = static_cast<double>(bkgdcount) / static_cast<double>(c_fullBkgdCount);
+    if (m_fullBkgdCount > 0) frac = static_cast<double>(bkgdcount) / static_cast<double>(m_fullBkgdCount);
 
     B2DEBUG(175, "ECLCRFinderModule::event(), Background count for this event: " << bkgdcount << " (expected for full bkgd: " <<
-            c_fullBkgdCount << ", scaling factor is " << frac << ".");
+            m_fullBkgdCount << ", scaling factor is " << frac << ".");
 
     // Scale cut values.
     for (int i = 0; i < 3; i++) {
@@ -191,35 +192,41 @@ void ECLCRFinderModule::event()
 
     // Negative timecut is interpreted as cut on time residual, positive cut as cut on the timeresolution!
     // Fill seed crystals to a map.
+    unsigned isSeed = 0;
     if (energy >= m_energyCutMod[0]) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
       if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
       if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
 
       m_cellIdToSeedVec[cellid] = 1;
+      isSeed = 1;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'seed digit' with cellid = " << cellid);
-
     }
 
     // Fill growth crystals to a map.
+    unsigned isGrowth = 0;
     if (energy >= m_energyCutMod[1]) {
-      if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
-      if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
+      if (isSeed == 0) { // if a cell is a seed, it is also a growth cell (e.g. for different timing cuts)
+        if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
+        if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
+        if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
+      }
 
       m_cellIdToGrowthVec[cellid] = 1;
+      isGrowth = 1;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'growth digit' with cellid = " << cellid);
     }
 
     // Fill all crystals above threshold to a map (this must include growth and seed crystals!).
     if (energy >= m_energyCutMod[2]) {
-      if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
-      if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
+      if (isGrowth == 0) { // if a cell is a growth (incl. seed), it is also a growth cell (e.g. for different timing cuts)
+        if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
+        if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
+        if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
+      }
 
       m_cellIdToDigitVec[cellid] = 1;
       B2DEBUG(250, "ECLCRFinderModule::event(), adding 'digit' with cellid = " << cellid);
-
     }
 
   } // done filling digit map

@@ -68,7 +68,7 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   //  addParam("yOfTriggerCounter",m_yofcounter,"Y position of trigger counter (in Feb test y=-13.25",-13.25);
   addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
   addParam("IwireLow", m_low, "Lower boundary of hit dist. Histogram", std::vector<int> {0, 0, 0, 0, 0, 0, 0, 0, 0});
-  addParam("IwireUpper", m_up, "Lower boundary of hit dist. Histogram", std::vector<int> {15, 15, 15, 15, 15, 15, 15, 15, 15});
+  addParam("IwireUpper", m_up, "Upper boundary of hit dist. Histogram", std::vector<int> {15, 15, 15, 15, 15, 15, 15, 15, 15});
   addParam("CorrectToFofIncomingTrack", m_IncomingToF, "If true, tof of tracks which are phi0>0 will be invert", true);
   // addParam("plotResidual",m_plotHitDistribution,"plot biased residual, normalized res and xtplot for all layer",true);
 }

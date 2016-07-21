@@ -179,13 +179,12 @@ namespace Belle2 {
       }
 
       TTree* tree;                          /**< output tree, save info of each hit. */
-      TTree* treeTrk;                       /**< information of two track fit. */
       TFile* tfile;                         /**< Output file. */
       TH1* m_hNTracks;                      /**< Number of track fitted, Convegence, not conv, not fit. */
       TH1* m_hNTracksPerEvent;              /**< Number of TrackCand per Event. */
       TH1* m_hNTracksPerEventFitted;        /**< Number of TrackCand per Event**/
-      TH1* m_hE1Dist;
-      TH1* m_hE2Dist;
+      TH1* m_hE1Dist; /**< Energy distribution of 1st track. */
+      TH1* m_hE2Dist; /**< Energy distribution of 2nd track if it exists. */
       TH1* m_hNDF;                          /**< Number of Degree Freedom. */
       TH1* m_hNHits;                        /**< Number of Hits per track. */
       TH1* m_hNHits_trackcand;              /**< Number of Hits per trackCand. */
@@ -215,7 +214,6 @@ namespace Belle2 {
       double alpha;           /**< Entrance Azimuthual angle of hit (degree). */
       double theta;          /**< Entrance Polar angle of hit (degree). */
       double Phi0;           /**< Phi0 angle of track, see in TrackFitResult (degree). */
-      double tanLambda;     /**< tan(lambda) of track, see in TrackFitResult (degree). */
       unsigned short adc; /**< adc value. */
       short tdc; /**< tdc value. */
       double t;          /**< Measurement Drift time. */
@@ -223,40 +221,40 @@ namespace Belle2 {
       double dt_flight;          /**< Time of flight. */
       double dt_prop;          /**< Time of propagation. */
 
-      double x_u, x_b, xmea, z_b, z_u;               /**< X_fit/z_fit for unbiased/biased track fit.*/
+      double x_u; /**< X_fit for unbiased track fit.*/
+      double x_b; /**< X_fit for biased track fit.*/
+      double z_u; /**< Z_fit for unbiasedtrack fit.*/
+      double z_b; /**< Z_fit for biased track fit.*/
       double z_prop; /**< Propagation Length along the sense wire. */
       double r_flight; /**< Flight Length. */
       int lay; /**< Layer ID. */
       int IWire; /**< Wire ID. */
       int lr;  /**< Left or right. */
       int numhits; /**< Number of hits. */
-      int run;  /**< Run ID. */
       int boardID;    /**< Electrical Board ID. */
       double t0;                                     /**< time offset. */
       double tdcBinWidth;                            /**< width of tdc bin, =1.01777728. */
-      double Chi2; /**< Chi2 value. */
-      double Pval;               /**< P-value of fitted track.  */
-      double TrPval;             /**< P-value of fitted track.  */
-      double ndf;                        /**< degree of freedom. */
+      double Chi2;      /**< Chi2 value. */
+      double Pval;      /**< P-value of fitted track.  */
+      double TrPval;    /**< P-value of fitted track.  */
+      double ndf;       /**< degree of freedom. */
 
       TVector3 trigHitPos; /**< Trigger position. */
-      std::vector<double> m_TriggerPos;
-      std::vector<int> m_up;
-      std::vector<int> m_low;
-      double trigHitPos_x;
-      double trigHitPos_z;
-      int m_Nchannel;
-      int trighit;
+      std::vector<double> m_TriggerPos; /**< Nominal center position of trigger counter. */
+      std::vector<int> m_up; /**< upper channel list for each board. */
+      std::vector<int> m_low; /**< lower channel list for each board. */
+      double trigHitPos_x; /**< X-position of track at trigger counter */
+      double trigHitPos_z; /**< Z-position of track at trigger counter */
+      int trighit; /**< Trigger hit information. 1 if track hits trigger counter, otherwise 0. */
 
-      /** Residuals (in cm)  */
-      TH1* m_hResidualU[NLayer];
-      TH2* m_hNDFResidualU[NLayer];
 
-      /** Residuals normalized with tracking error.  */
-      TH1* m_hNormalizedResidualU[NLayer];
-      TH2* m_hNDFNormalizedResidualU[NLayer];
-      TH2* m_hDxDt[NLayer];
-      TH1* m_hMomentum;
+      TH1* m_hResidualU[NLayer];       /**< Residual distribution (in cm)  */
+      TH2* m_hNDFResidualU[NLayer]; /**< Residual vs. ndf. */
+
+
+      TH1* m_hNormalizedResidualU[NLayer];       /**< Residual distribution normalized with tracking error.  */
+      TH2* m_hNDFNormalizedResidualU[NLayer]; /**< Normalized residual vs. ndf. */
+      TH2* m_hDxDt[NLayer]; /**< Unbiased x_fit vs. drift time. */
 
 
       /**
@@ -270,7 +268,7 @@ namespace Belle2 {
       double getCorrectedDriftTime(WireID wireid, unsigned short tdc, unsigned short adc, double z,
                                    double z0); //get Drift time was corect ToP,...
       /**
-       * make hit distribution from track cand.
+       * make hit distribution from track candidate.
        */
       void getHitDistInTrackCand(const RecoTrack* track);//Draw hit distribution from track candidate
       /**
@@ -296,7 +294,8 @@ namespace Belle2 {
       bool m_hitEfficiency; /**< calculate hit eff or not, Haven't finished. */
       bool m_calExpectedDriftTime; /**< Calculate expected drift time from x_fit or not. */
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
-      bool m_ToP, m_ToF; /**< correct Tof top or not*/
+      bool m_ToP; /**< Enable to correct ToP if true. */
+      bool m_ToF; /**< Enable to correct ToF if true. */
       bool m_IncomingToF; /**< Invert top for incoming track or not. */
 
     };

@@ -1467,7 +1467,7 @@ void ECLDataAnalysisModule::event()
       m_eclShowerIsTrack->push_back(cluster_shower->getisTrack());
     } else {
       m_eclShowerIsCluster->push_back(0);
-      m_eclShowerIsTrack->push_back(-1);
+      m_eclShowerIsTrack->push_back(0);
     }
 
   }

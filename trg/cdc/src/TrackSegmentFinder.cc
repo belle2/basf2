@@ -2867,6 +2867,7 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
     vector<int> changeTime = Hitmap->stateChanges();
 
     int * LUTValue = new int[changeTime.size()];
+	int oldLUT=0;
     int lastFastHit = in->clock().min();
     if (changeTime.size()) {
 
@@ -2894,7 +2895,7 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
                 const int timeCounter = ct - lastFastHit;
 
                 //...Record as the fastest timing hit...
-                if (timeCounter > 63) {
+                if (timeCounter > 15) {
                     lastFastHit = ct;
                     TRGState ftnow = fTime.state(ct);
                     ftnow += TRGState(1, 1);
@@ -2931,44 +2932,59 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
             }
 
             // output selection
-            if ((hitPosition) && (LUTValue[i]) && ((ct - tmpCTime) < 16)) {
-                //iw            tmpOutInt = tsid * pow(2, 13) + tmpPTime * pow(2, 4) +
-                //iw                LUTValue[i] * pow(2,2) + hitPosition;
-                tmpOutInt = tmpPTime * pow(2, 4) +
-                            LUTValue[i] * pow(2, 2) + hitPosition;
-                tmpOutBool = mkbool(tmpOutInt, 13);  // ID removed : iw
-
-                if (hitPosition == 3) {
-                    if (priority1rise) {
-                        resultT->set(tmpOutBool, ct);
-                    }
-                    else {
-                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
-                            if (! ((LUTValue[i - 1] == 1) |
-                                   (LUTValue[i - 1] == 2)))
-                                resultT->set(tmpOutBool, ct);
-                        }
-                        else {
-                            if (!(LUTValue[i - 1]))
-                                resultT->set(tmpOutBool, ct);
-                        }
-                    }
-                }
-                else {
-                    if (priority2rise) resultT->set(tmpOutBool, ct);
-                    else {
-                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
-                            if (! ((LUTValue[i - 1] == 1) |
-                                   (LUTValue[i - 1] == 2)))
-                                resultT->set(tmpOutBool, ct);
-                        }
-                        else {
-                            if (! (LUTValue[i - 1]))
-                                resultT->set(tmpOutBool, ct);
-                        }
-                    }
-                }
-            }
+			if((ct-tmpCTime)<16){
+	            if ((hitPosition) && (LUTValue[i])) {
+	                //iw            tmpOutInt = tsid * pow(2, 13) + tmpPTime * pow(2, 4) +
+	                //iw                LUTValue[i] * pow(2,2) + hitPosition;
+	                tmpOutInt = tmpPTime * pow(2, 4) +
+	                            LUTValue[i] * pow(2, 2) + hitPosition;
+	                tmpOutBool = mkbool(tmpOutInt, 13);  // ID removed : iw
+	
+	                if (hitPosition == 3) {
+	                    if (priority1rise) {
+	                        resultT->set(tmpOutBool, ct);
+							oldLUT=LUTValue[i];
+	                    }
+	                    else {
+	                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
+	                            if (! ((oldLUT == 1) |
+	                                   (oldLUT == 2))){
+	                                resultT->set(tmpOutBool, ct);
+									oldLUT=LUTValue[i];
+								}
+	                        }
+	                        else {
+	                            if (!(LUTValue[i - 1])){
+	                                resultT->set(tmpOutBool, ct);
+									oldLUT=LUTValue[i];
+								}
+	                        }
+	                    }
+	                }
+	                else {
+	                    if (priority2rise) resultT->set(tmpOutBool, ct);
+	                    else {
+	                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
+	                            if (! ((oldLUT== 1) |
+	                                   (oldLUT== 2))){
+	                                resultT->set(tmpOutBool, ct);
+									oldLUT=LUTValue[i];
+								}
+	                        }
+	                        else {
+	                            if (! (oldLUT)){
+	                                resultT->set(tmpOutBool, ct);
+									oldLUT=LUTValue[i];
+								}
+	                        }
+	                    }
+	                }
+	            }
+			}
+			else{
+				oldLUT=0;
+				hitPosition=0;
+			}
 
             if (TRGDebug::level() > 1) {
                 cout << TRGDebug::tab() << "clk=" << ct

@@ -2962,7 +2962,7 @@ TSFinder::simulateTSF(TRGSignalVector * in, unsigned tsid) {
 	                    }
 	                }
 	                else {
-	                    if (priority2rise) resultT->set(tmpOutBool, ct);
+	                    if ((priority2rise)&&(!oldLUT)) resultT->set(tmpOutBool, ct);
 	                    else {
 	                        if ((LUTValue[i] == 1) | (LUTValue[i] == 2)) {
 	                            if (! ((oldLUT== 1) |

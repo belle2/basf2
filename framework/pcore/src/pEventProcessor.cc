@@ -289,11 +289,13 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
 void pEventProcessor::analyzePath(const PathPtr& path)
 {
+  //modules that can be parallelised, but should not go into a parallel section by themselves
+  std::set<std::string> uselessParallelModules({"Gearbox", "Geometry"});
+
   PathPtr inpath(new Path);
   PathPtr mainpath(new Path);
   PathPtr outpath(new Path);
 
-  bool createAllPaths = false; //usually we might not need e.g. an output path
   int stage = 0; //0: in, 1: event/main, 2: out
   for (const ModulePtr& module : path->getModules()) {
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
@@ -303,12 +305,27 @@ void pEventProcessor::analyzePath(const PathPtr& path)
         hasParallelFlag = false;
     }
 
-    if (module->hasProperties(Module::c_TerminateInAllProcesses))
-      createAllPaths = true; //ensure there are all kinds of processes
-
     //update stage?
-    if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag))
+    if ((stage == 0 and hasParallelFlag) or (stage == 1 and !hasParallelFlag)) {
       stage++;
+
+      if (stage == 2) {
+        bool path_is_useful = false;
+        for (auto parallelModule : mainpath->getModules()) {
+          if (uselessParallelModules.count(parallelModule->getType()) == 0) {
+            path_is_useful = true;
+            break;
+          }
+        }
+        if (not path_is_useful) {
+          //merge mainpath back into input path
+          inpath->addPath(mainpath);
+          mainpath.reset(new Path);
+          //and search for further parallel sections
+          stage = 0;
+        }
+      }
+    }
 
     if (stage == 0) { //fill input path
       inpath->addModule(module);
@@ -327,6 +344,12 @@ void pEventProcessor::analyzePath(const PathPtr& path)
       mainpath->addModule(module);
     if (stage == 2)
       outpath->addModule(module);
+  }
+
+  bool createAllPaths = false; //usually we might not need e.g. an output path
+  for (const ModulePtr& module : path->getModules()) {
+    if (module->hasProperties(Module::c_TerminateInAllProcesses))
+      createAllPaths = true; //ensure there are all kinds of processes
   }
 
   //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
@@ -375,7 +398,6 @@ void pEventProcessor::preparePaths()
     m_rbin = connectViaRingBuffer("BASF2_RBIN", m_inputPath, m_mainPath);
   if (m_outputPath)
     m_rbout = connectViaRingBuffer("BASF2_RBOUT", m_mainPath, m_outputPath);
-
 }
 
 

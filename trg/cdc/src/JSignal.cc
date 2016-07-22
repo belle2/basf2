@@ -1138,7 +1138,7 @@ namespace Belle2{
     } else if (operate=="<=") {
       t_bool =  (t_lhs.m_int <= t_rhs.m_int ? 1 : 0);
     } else if (operate==">") {
-      t_bool =  (t_lhs.m_int >= t_rhs.m_int ? 1 : 0);
+      t_bool =  (t_lhs.m_int > t_rhs.m_int ? 1 : 0);
     } else if (operate==">=") {
       t_bool =  (t_lhs.m_int >= t_rhs.m_int ? 1 : 0);
     } else if (operate=="and") {
@@ -1146,7 +1146,7 @@ namespace Belle2{
     } else if (operate=="or") {
       t_bool =  (t_lhs.m_int || t_rhs.m_int ? 1 : 0);
     } else {
-      cout<<"[Error] TRGCDCJSignal::comp() => No error named "<<operate<<"."<<endl;
+      cout<<"[Error] TRGCDCJSignal::comp() => No operator named "<<operate<<"."<<endl;
     }
     // Actual Operation.
     if (operate=="=") {
@@ -1158,7 +1158,7 @@ namespace Belle2{
     } else if (operate=="<=") {
       t_result.m_actual =  (t_lhs.m_actual <= t_rhs.m_actual ? 1 : 0);
     } else if (operate==">") {
-      t_result.m_actual =  (t_lhs.m_actual >= t_rhs.m_actual ? 1 : 0);
+      t_result.m_actual =  (t_lhs.m_actual > t_rhs.m_actual ? 1 : 0);
     } else if (operate==">=") {
       t_result.m_actual =  (t_lhs.m_actual >= t_rhs.m_actual ? 1 : 0);
     } else if (operate=="and") {
@@ -1166,7 +1166,7 @@ namespace Belle2{
     } else if (operate=="or") {
       t_result.m_actual =  (t_lhs.m_actual || t_rhs.m_actual ? 1 : 0);
     } else {
-      cout<<"[Error] TRGCDCJSignal::comp() => No error named "<<operate<<"."<<endl;
+      cout<<"[Error] TRGCDCJSignal::comp() => No operator named "<<operate<<"."<<endl;
     }
     // Change values.
     t_result.m_name = t_lhs.m_name + operate + t_rhs.m_name;

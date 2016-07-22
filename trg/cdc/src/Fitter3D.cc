@@ -84,6 +84,8 @@ namespace Belle2 {
     m_mBool["fVerbose"] = 0;
     m_mBool["fIsPrintError"] = 0;
     m_mBool["fIsIntegerEffect"] = 1;
+    m_mBool["debugFitted"] = 1;
+    m_mBool["debugLargeZ0"] = 0;
 
     // Init values
     m_mConstD["Trg_PI"] = 3.141592653589793;
@@ -218,13 +220,6 @@ namespace Belle2 {
       TCTrack & aTrack = * trackList[iTrack];
 
       ///////////////////////////////////////
-      // Check if all superlayers have one TS for the track.
-      //bool trackFull= isAxialTrackFull(aTrack) && isStereoTrackFull(aTrack);
-      //if(trackFull == 0){
-      //   aTrack.setFitted(0);
-      //   continue;
-      //}
-
       // Get MC values for fitter.
       if(m_mBool["fMc"]) getMCValues(m_cdc, &aTrack, m_mConstD, m_mDouble, m_mVector);
       // Get track ID
@@ -370,8 +365,6 @@ namespace Belle2 {
       if(m_mDouble["cot"] == 0 || std::isnan(m_mDouble["cot"])) {
         aTrack.setFitted(0);
         aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D,1);
-        //cout<<"[Fit3D]debugValue:"<<aTrack.getDebugValue(TRGCDCTrack::EDebugValueType::fit3D)<<endl;
-        //cout<<"[Fit3D] fit error."<<endl;
         if (m_mBool["fVerbose"]) cout<<"Exit due to 3D fit cot result:"<<m_mDouble["cot"]<<endl;
         continue;
       }
@@ -425,6 +418,24 @@ namespace Belle2 {
     if(m_mBool["fRootFile"]) {
       if(m_fileFitter3D != 0) m_treeTrackFitter3D->Fill();
     }
+
+    if (m_mBool["debugFitted"]) {
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+        TCTrack & aTrack = * trackList[iTrack];
+        if (aTrack.fitted() == 0) aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D, 1);
+      }
+    }
+    if (m_mBool["debugLargeZ0"]) {
+      // If 3D fit z0 is larger or smaller than expected.
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+          TCTrack& aTrack = *trackList[iTrack];
+          if (aTrack.fitted()) {
+            double fitZ0 = aTrack.helix().dz();
+            if(fitZ0>20 || fitZ0<-20) aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D, 1);
+          }
+      }
+    }
+
 
     TRGDebug::leaveStage("Fitter 3D");
     return 1;
@@ -501,7 +512,6 @@ namespace Belle2 {
           const TCSegment * t_segment = dynamic_cast<const TCSegment *>(& links[0]->hit()->cell());
           m_mVector["tsId"][iSt*2+1] = t_segment->localId();
           m_mVector["wirePhi"][iSt*2+1] = (double) t_segment->localId()/m_mConstV["nWires"][iSt*2+1]*4*m_mConstD["Trg_PI"];
-          //m_mVector["lutLR"][iSL] = t_segment->LUT()->getLRLUT(t_segment->hitPattern(),iSL);
           m_mVector["lutLR"][iSt*2+1] = t_segment->LUT()->getValue(t_segment->lutPattern());
           if(m_mBool["fMc"]) m_mVector["mcLR"][iSt*2+1] = t_segment->hit()->mcLR() + 1;
           m_mVector["driftLength"][iSt*2+1] = t_segment->hit()->drift();
@@ -648,7 +658,6 @@ namespace Belle2 {
       }
 
       // Constrain event time
-      //if (m_mDouble["eventTime"] == 9999) m_mDouble["eventTime"] = pow(2,m_mConstD["tdcBitSize"]);
       m_mDouble["eventTimeValid"] = 1;
       if (m_mDouble["eventTime"] == 9999) m_mDouble["eventTimeValid"] = 0;
       // Change tdc and eventTime to 9 bit unsigned value. (Ex: -1 => 511, -2 => 510)
@@ -675,11 +684,6 @@ namespace Belle2 {
           make_tuple("tsId_1", m_mVector["relTsId3D"][1], ceil(log(m_mConstV["nTSs"][3])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][3])/log(2)))-0.5, 0),
           make_tuple("tsId_2", m_mVector["relTsId3D"][2], ceil(log(m_mConstV["nTSs"][5])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][5])/log(2)))-0.5, 0),
           make_tuple("tsId_3", m_mVector["relTsId3D"][3], ceil(log(m_mConstV["nTSs"][7])/log(2)), 0, pow(2,ceil(log(m_mConstV["nTSs"][7])/log(2)))-0.5, 0),
-          //make_tuple("tdc_0", m_mVector["tdc"][1], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
-          //make_tuple("tdc_1", m_mVector["tdc"][3], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
-          //make_tuple("tdc_2", m_mVector["tdc"][5], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
-          //make_tuple("tdc_3", m_mVector["tdc"][7], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
-          //make_tuple("eventTime", m_mDouble["eventTime"], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0)
           make_tuple("tdc_0", m_mVector["unsignedTdc"][1], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
           make_tuple("tdc_1", m_mVector["unsignedTdc"][3], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
           make_tuple("tdc_2", m_mVector["unsignedTdc"][5], m_mConstD["tdcBitSize"], 0, pow(2,m_mConstD["tdcBitSize"])-0.5, 0),
@@ -793,9 +797,6 @@ namespace Belle2 {
       // For failed fits.
       if (m_mDouble["cot"] == 0) {
         aTrack.setFitted(0);
-        aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D,1);
-        //cout<<"[Fit3D]debugValue:"<<aTrack.getDebugValue(TRGCDCTrack::EDebugValueType::fit3D)<<endl;
-        //cout<<"[Fit3D] fit error."<<endl;
         continue;
       } 
 
@@ -846,6 +847,23 @@ namespace Belle2 {
     // The first event that have tracks will be event 0 in ROOT file.
     if(m_mBool["fRootFile"]) {
       if(m_fileFitter3D != 0) m_treeTrackFitter3D->Fill();
+    }
+
+    if (m_mBool["debugFitted"]) {
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+        TCTrack & aTrack = * trackList[iTrack];
+        if (aTrack.fitted() == 0) aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D, 1);
+      }
+    }
+    if (m_mBool["debugLargeZ0"]) {
+      // If 3D fit z0 is larger or smaller than expected.
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+          TCTrack& aTrack = *trackList[iTrack];
+          if (aTrack.fitted()) {
+            double fitZ0 = aTrack.helix().dz();
+            if(fitZ0>20 || fitZ0<-20) aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::fit3D, 1);
+          }
+      }
     }
 
     TRGDebug::leaveStage("Fitter 3D");

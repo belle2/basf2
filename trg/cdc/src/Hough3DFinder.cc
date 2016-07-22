@@ -63,6 +63,10 @@ TRGCDCHough3DFinder::TRGCDCHough3DFinder(const TRGCDC & TRGCDC, bool makeRootFil
     m_mBool["f2DFitDrift"] = 1;
     m_mBool["f2DFit"] = 1;
 
+    // For finder3D.
+    m_mBool["debugEfficiency"] = 1;
+    m_mBool["debugNTs"] = 1;
+
     m_mConstD["Trg_PI"] = 3.141592653589793;
     // Get rr,zToStraw,angleSt,nWire
     CDC::CDCGeometryPar& cdcp = CDC::CDCGeometryPar::Instance();
@@ -402,27 +406,6 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         //cout<<"----newEnd----"<<endl;
       }
 
-      // Find number of super layers that have priority layer hit.
-      int nPriorityHitSL = 0;
-      for(unsigned iSt=0; iSt<4; iSt++){
-        int priorityHitSL = 0;
-        for(unsigned iTS=0; iTS<stTSDrift[iSt].size(); iTS++){
-          int t_priorityPosition = (stTSDrift[iSt][iTS] & 3);
-          if (t_priorityPosition == 3) priorityHitSL = 1;
-          //cout<<"iSt:"<<iSt<<" iTS:"<<iTS<<" priorityPosition:"<<t_priorityPosition<<" priorityHitSL:"<<priorityHitSL<<endl;
-        }
-        if (priorityHitSL) nPriorityHitSL++;
-      }
-      //cout<<"nPriorityHitSL:"<<nPriorityHitSL<<endl;
-      // Set debug values
-      if(m_mDouble["efficiency"] != 1) {
-        // Remove case when all hits are secondary priority.
-        if(m_mDouble["efficiency"] != nPriorityHitSL*1./4) {
-          aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::find3D,1);
-          //cout<<"[Find3D]debugValue:"<<aTrack.getDebugValue(TRGCDCTrack::EDebugValueType::find3D)<<endl;
-        }
-      }
-
       if(m_makeRootFile) {
         if(m_fileFinder3D==0) {
           m_fileFinder3D = new TFile("Finder3D.root","RECREATE");
@@ -448,6 +431,42 @@ void TRGCDCHough3DFinder::doitFind(vector<TCTrack *> & trackList){
         m_treeTrackFinder3D->Fill();
     }
 
+
+    // Set debug values.
+    if (m_mBool["debugEfficiency"]) {
+      // Notify when efficiency is not 1.
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+        TCTrack & aTrack = * trackList[iTrack];
+        // Find number of super layers that have priority layer hit.
+        int nPriorityHitSL = 0;
+        for(unsigned iSt=0; iSt<4; iSt++){
+          int priorityHitSL = 0;
+          for(unsigned iTS=0; iTS<stTSDrift[iSt].size(); iTS++){
+            int t_priorityPosition = (stTSDrift[iSt][iTS] & 3);
+            if (t_priorityPosition == 3) priorityHitSL = 1;
+            //cout<<"iSt:"<<iSt<<" iTS:"<<iTS<<" priorityPosition:"<<t_priorityPosition<<" priorityHitSL:"<<priorityHitSL<<endl;
+          }
+          if (priorityHitSL) nPriorityHitSL++;
+        }
+        //cout<<"nPriorityHitSL:"<<nPriorityHitSL<<endl;
+        if(m_mDouble["efficiency"] != 1) {
+          // Remove case when all hits are secondary priority.
+          if(m_mDouble["efficiency"] != nPriorityHitSL*1./4) {
+            aTrack.setDebugValue(TRGCDCTrack::EDebugValueType::find3D,1);
+          }
+        }
+      }
+    }
+    if (m_mBool["debugNTs"]) {
+      // Notify when not enough TS are found
+      for(unsigned iTrack = 0; iTrack<trackList.size(); iTrack++) {
+        unsigned nHitStSl = 0;
+        for(unsigned iSt=0; iSt<4; iSt++) {
+          if(trackList[iTrack]->links(2*iSt+1).size() != 0) nHitStSl++;
+        }
+        if (nHitStSl < 2) trackList[iTrack]->setDebugValue(TRGCDCTrack::EDebugValueType::find3D, 1);
+      }
+    }
 
     TRGDebug::leaveStage("3D finder");
 

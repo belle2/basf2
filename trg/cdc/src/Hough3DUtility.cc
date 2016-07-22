@@ -204,118 +204,6 @@ void Hough3DFinder::initVersion2(vector<float > & initVariables){
 void Hough3DFinder::initVersion3(vector<float > & initVariables){
   if(1==2) cout<<initVariables.size()<<endl; // Removes warning when compiling
 
-  // Get input variables.
-  string inName;
-  string inMin;
-  string inMax;
-  string inNBit;
-  ifstream inputFile;
-
-  inputFile.open(m_inputFileName.c_str());
-  if( inputFile ) {
-    m_LUT = 1;
-    //cout<<"Open File: "<< m_inputFileName <<endl;
-    while( !inputFile.eof() ) {
-      inputFile >> inName >> inMin >> inMax >> inNBit;
-      if(inName == "rho") {
-        //cout<<inName<<" "<<inMin<<" "<<inMax<<" "<<inNBit<<endl;
-        m_rhoMin = atof( inMin.c_str() );
-        m_rhoMax = atof( inMax.c_str() );
-        m_rhoBit = atoi( inNBit.c_str() );
-      }
-      if(inName == "phi0") {
-        m_phi0Min = atof( inMin.c_str() );
-        m_phi0Max = atof( inMax.c_str() );
-        m_phi0Bit = atoi( inNBit.c_str() );
-      }
-      if(inName == "stAxWireFactor") {
-        m_stAxWireFactor = atoi( inNBit.c_str() );
-      }
-    }
-  } else {
-    //cout<<"Could not open input file for GeoFinder."<<endl;
-    //cout<<"Using default values for input."<<endl;
-    m_rhoMin = 0;
-    m_rhoMax = 7.5;
-    m_rhoBit = 7;
-    m_phi0Min = 0;
-    m_phi0Max = 6.3;
-    m_phi0Bit = 9;
-    m_stAxWireFactor = 6;
-    m_LUT = 0;
-  }
-  inputFile.close();
-
-  // Set LUT information
-  if(m_LUT) {
-    // Make arccos LUT
-    int rho_bitSize = Fitter3DUtility::bitSize(m_rhoBit,0);
-    //cout<<"rho_bitSize:"<<rho_bitSize<<endl;
-    string first,second;
-    ifstream inFileLUT;
-    int iLUT;
-    m_arcCosLUT = new int*[4];
-    for(int iLayer=0; iLayer<4; iLayer++) {
-      m_arcCosLUT[iLayer] = new int[rho_bitSize];
-      iLUT = 0;
-      ostringstream strILayer;
-      strILayer << iLayer + 1;
-      string fileName = string(std::getenv("BELLE2_LOCAL_DIR"))+"/data/trg/cdc/GeoFinder.FPGA.ArcCosLayer" + strILayer.str() + ".coe";
-      inFileLUT.open(fileName.c_str());
-      //cout<<"For "<<fileName<<endl;
-      if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
-      while(1) {
-        if( iLUT == rho_bitSize + 1 ) break;
-        inFileLUT >> first >> second;
-        //cout<<"first:"<<first<<" second:"<<second<<endl;
-        istringstream isecond(second);
-        if( iLUT != 0 ) {
-          isecond >> m_arcCosLUT[iLayer][iLUT -1];
-        }
-        iLUT++;
-      }
-      inFileLUT.close();
-      //cout<<"Done"<<endl;
-    }
-    //// Print LUT info
-    //for(int iLayer=0; iLayer<4; iLayer++){
-    //  for(int iLUT=0; iLUT<rho_bitSize; iLUT++){
-    //    cout<<"LUT["<<iLayer<<"]["<<iLUT<<"]: "<<m_arcCosLUT[iLayer][iLUT]<<endl;
-    //  }
-    //}
-    // Make wireSpaceConversion LUT
-    int PI2_INT = int(m_Trg_PI * 2 * Fitter3DUtility::bitSize(m_phi0Bit,0)/(m_phi0Max - m_phi0Min));
-    m_wireConvertLUT = new int*[4];
-    for(int iLayer=0; iLayer<4; iLayer++) {
-      // Include PI2_INT. PI2_INT is smaller than PI2.
-      m_wireConvertLUT[iLayer] = new int[PI2_INT+1];
-      iLUT = 0;
-      ostringstream strILayer;
-      strILayer << iLayer + 1;
-      string fileName = string(std::getenv("BELLE2_LOCAL_DIR")) + "/data/trg/cdc/GeoFinder.FPGA.WireConvertLayer" + strILayer.str() + ".coe";
-      inFileLUT.open(fileName.c_str());
-      if(inFileLUT.is_open() != 1) cout<<"Error in opening " + fileName<<endl;
-      while(1) {
-        // Include PI2_INT. PI2_INT is smaller than PI2.
-        if( iLUT == PI2_INT + 2 ) break;
-        inFileLUT >> first >> second;
-        istringstream isecond(second);
-        if( iLUT != 0 ) {
-          isecond >> m_wireConvertLUT[iLayer][iLUT -1];
-        }
-        iLUT++;
-      }
-      inFileLUT.close();
-      //// Print LUT info
-      //for(int iLayer=0; iLayer<4; iLayer++){
-      //  for(int iLUT=0; iLUT<PI2_INT; iLUT++){
-      //    cout<<"LUT[<<iLayer<<"][<<iLUT<<"]: "<<m_arcCosLUT[iLUT]<<endl;
-      //  }
-      //}
-    }
-
-  } // End if if m_LUT flag
-
   // Make hitMap
   m_hitMap = new bool*[4];
   for(int i=0; i<4; i++) {
@@ -391,12 +279,6 @@ void Hough3DFinder::destVersion3(){
     delete [] m_driftMap[iSt];
   }
   delete [] m_driftMap;
-  if(m_LUT) {
-    for(int i=0; i<4; i++){
-      delete [] m_arcCosLUT[i];
-    }
-    delete [] m_arcCosLUT;
-  }
 
   if(m_mBool["fVHDLFile"]) {
     if(m_mSavedIoSignals.size()!=0) {
@@ -735,10 +617,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     }
   }
 
-  // Clear FPGA input and output values.
-  m_FPGAInput.clear();
-  m_FPGAOutput.clear();
-
   // 2D Track Variables
   int charge = (int)trackVariables[0];
   double rho = trackVariables[1];
@@ -776,300 +654,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   //  cout<<endl;
   //} // End layer
 
-  // For integer space
-  int rho_int, rho_bitSize;
-  int fitPhi0_int, fitPhi0_bitSize;
-  int arcCos_int, myphiz_int;
-  rho_bitSize = Fitter3DUtility::bitSize(m_rhoBit,0);
-  fitPhi0_bitSize = Fitter3DUtility::bitSize(m_phi0Bit,0);
-  // Find 2*PI in integer space using phi0. phi0 min must be 0.
-  // PI2_INT is the slightly smaller than 2*PI
-  int PI2_INT = int(m_Trg_PI * 2 / m_phi0Max * fitPhi0_bitSize);
-  
-  // Limit R and phi0 to min and max values.
-  if(rho > m_rhoMax) rho = m_rhoMax;
-  if(rho < m_rhoMin) rho = m_rhoMin;
-  if(fitPhi0 > m_phi0Max) fitPhi0 = m_phi0Max;
-  if(fitPhi0 < m_phi0Min) fitPhi0 = m_phi0Min;
-
-  // For integer space
-  Fitter3DUtility::findExtreme(m_findRhoMax, m_findRhoMin, rho);
-  Fitter3DUtility::findExtreme(m_findPhi0Max, m_findPhi0Min, fitPhi0);
-  Fitter3DUtility::changeInteger(rho_int, rho, m_rhoMin, m_rhoMax, rho_bitSize);
-  Fitter3DUtility::changeInteger(fitPhi0_int, fitPhi0, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-  Fitter3DUtility::findExtreme(m_findRhoIntMax, m_findRhoIntMin, rho_int);
-  Fitter3DUtility::findExtreme(m_findPhi0IntMax, m_findPhi0IntMin, fitPhi0_int);
-  m_FPGAInput.push_back(rho_int);
-  m_FPGAInput.push_back(fitPhi0_int);
-  Fitter3DUtility::changeReal(fitPhi0, fitPhi0_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-  Fitter3DUtility::changeReal(rho, rho_int, m_rhoMin, m_rhoMax, rho_bitSize);
-  m_FPGAInput.push_back(charge);
-
-  // Select TS candidate range variables
-  double stCand[4][10];
-  //double stCandDiff[4][10];
-  double stCandIndex[4][10];
-  double stAxPhi[4];
-  int stAxWire[4];
-  int stAxWire_int[4];
-  double myphiz;
-  int stCandHitMap[4][10];
-
-  // Initalize stCand
-  for( int i=0; i<4; i++ ) {
-    for( int j=0; j<10; j++) {
-      stCand[i][j] = 9999;
-      //stCandDiff[i][j] = 9999;
-      stCandIndex[i][j] = 9999;
-      stCandHitMap[i][j] = 0;
-    }
-    //cout<<"nWires: "<<m_nWires[i]/2<<" ";
-  }
-  //cout<<endl;
-
-
-  // Select TS candidate range algorithm
-  for( int iLayer=0; iLayer<4; iLayer++) {
-
-    // Prevents crash
-    if(m_rr[iLayer]/(2*rho) > 1 ) rho = m_rr[iLayer]/2;
-    // This is done in real space
-    double acos_real = acos(m_rr[iLayer]/(2*rho));
-    // Holds the maximum and minumum value for arc cos(radius/2/rho). 
-
-    // For integer space
-    Fitter3DUtility::findExtreme(m_findArcCosMax, m_findArcCosMin, acos_real);
-    Fitter3DUtility::changeInteger(arcCos_int, acos_real, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-    Fitter3DUtility::findExtreme(m_findArcCosIntMax, m_findArcCosIntMin, arcCos_int);
-    m_FPGAOutput.push_back(arcCos_int);
-    //if(arcCos_int != m_arcCosLUT[iLayer][rho_int]) {
-    //  cout<<"Error with arcCos LUT. rho_int:"<<rho_int<<" arcCos_int:"<<arcCos_int<<" m_arcCosLUT:"<<m_arcCosLUT[iLayer][rho_int]<<endl;
-    //  cout<<"  iLayer:"<<iLayer<<" rho:"<<rho<<" acos_real:"<<acos_real<<endl;
-    //  cout<<"  r:"<<m_rr[iLayer]<<endl;
-    //}
-
-    if(charge==1){
-      // Actual function
-      //myphiz = +acos_real+fitPhi0;
-      myphiz_int = +arcCos_int+fitPhi0_int;
-    }
-    else{
-      // Actual function
-      //myphiz = -acos_real+fitPhi0;
-      myphiz_int = -arcCos_int+fitPhi0_int;
-    }
-
-
-    Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-
-    // Find extreme value
-    Fitter3DUtility::findExtreme(m_findPhiZMax, m_findPhiZMin, myphiz);
-    Fitter3DUtility::findExtreme(m_findPhiZIntMax, m_findPhiZIntMin, myphiz_int);
-    m_FPGAOutput.push_back(myphiz_int);
-
-    // Actual function
-    //if(myphiz>2*m_Trg_PI) myphiz-=2*m_Trg_PI;
-    //if(myphiz<0) myphiz+=2*m_Trg_PI;
-    // This part can be optimized depending on bit size.
-    // This part might not be needed.
-    // It can be done when changing to wire space below.
-    // But can reduce input bitsize for below.
-    if(myphiz_int > PI2_INT) myphiz_int -= PI2_INT + 1;
-    if(myphiz_int < 0 ) myphiz_int += PI2_INT + 1;
-
-    // For real space
-    Fitter3DUtility::changeReal(myphiz, myphiz_int, m_phi0Min, m_phi0Max, fitPhi0_bitSize);
-
-
-    stAxPhi[iLayer] = myphiz;
-
-
-    // Choose stAxWire depending on layer
-
-    // Change to wire space using fake LUT
-    // This is done in real space. Result is in integer space.
-    if( iLayer%2 == 0 ) {
-      // Round down
-      stAxWire[iLayer] = int(stAxPhi[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2);
-    } else {
-      // Round up
-      stAxWire[iLayer] = int(stAxPhi[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2 + 1);
-    }
-    // Change to wire space by multiply division method.
-    stAxWire_int[iLayer] = myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor));
-    if( iLayer%2 == 0 ) {
-      stAxWire_int[iLayer] = stAxWire_int[iLayer] >> m_stAxWireFactor;
-    } else {
-      stAxWire_int[iLayer] = (stAxWire_int[iLayer] >> m_stAxWireFactor) + 1;
-    }
-    //cout<<"iSt:"<<iLayer<<" stAxWire_int:"<<stAxWire_int[iLayer]<<" stAxWire:"<<stAxWire[iLayer]<<" myphiz:"<<myphiz<<" stAxPhi:"<<stAxPhi[iLayer]<<endl;
-    //cout<<"Conversion Factor["<<iLayer<<"]: "<<int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor))<<" "<<m_nWires[iLayer]/2<<endl;
-    //// Check if something is different with multiply division method.
-    //if(stAxWire[iLayer] != stAxWire_int[iLayer]) {
-    //  cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<stAxPhi[iLayer]*m_nWires[iLayer]/2/2/m_Trg_PI<<" "<<stAxWire[iLayer]<<endl;
-    //  //cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor))<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor)) / pow(2.0,m_stAxWireFactor)<<endl;
-    //  cout<<"Layer["<<iLayer<<"]: "<<myphiz_int<<" "<<stAxPhi[iLayer]<<" "<<myphiz_int * int(m_nWires[iLayer]/2/2/m_Trg_PI/fitPhi0_bitSize*(m_phi0Max-m_phi0Min)*pow(2.0,m_stAxWireFactor)) / pow(2.0,m_stAxWireFactor)<<" "<<stAxWire_int[iLayer]<<endl;
-    //}
-    stAxWire[iLayer] = stAxWire_int[iLayer];
-
-
-    m_FPGAOutput.push_back(stAxWire[iLayer]);
-
-    //cout<<stAxPhi[iLayer]<<" "<<stAxWire[iLayer]<<endl;
-    //cout<<m_nWires[iLayer]/2/2/m_Trg_PI/81.2698412698<<endl;
-
-    // If index is at edgeIndex move to 0.
-    if(stAxWire[iLayer] == m_nWires[iLayer]/2) stAxWire[iLayer] = 0;
-    int indexTS = stAxWire[iLayer];
-
-    //// Check if something is different with LUT method.
-    //if(stAxWire[iLayer] != m_wireConvertLUT[iLayer][myphiz_int]) {
-    //  cout<<"Error with wireConvert LUT: "<<myphiz_int<<" "<<stAxWire[iLayer]<<" "<<m_wireConvertLUT[iLayer][myphiz_int]<<endl;
-    //}
-
-    //cout<<"StAxWire["<<iLayer<<"]: "<<stAxWire[iLayer]<<endl;
-    // Save stAxPhi
-    m_stAxPhi[iLayer] = stAxWire[iLayer]*2*m_Trg_PI/m_nWires[iLayer]*2;
-
-    // Select TS using stAxWire between 10 wires
-    // Need to integerize diffPhi, stCand if used later.
-    for( int iTS=0; iTS<10; iTS++) {
-      if(m_hitMap[iLayer][indexTS] == 1) {
-        // Save phi. Convert hitmap location to phi
-        // This is done in real space.
-        stCand[iLayer][iTS] = indexTS*2*m_Trg_PI/m_nWires[iLayer]*2;
-        (*m_geoCandidatesPhi)[iLayer].push_back(stCand[iLayer][iTS]);
-        // Fill with dummy. Will be filled later.
-        (*m_geoCandidatesIndex)[iLayer].push_back(9999);
-
-        // Save stCandDiff in wire space. Not needed in integer space.
-        double diffPhi = stAxPhi[iLayer]-indexTS*2*m_Trg_PI/m_nWires[iLayer]*2;
-        if (diffPhi > m_Trg_PI ) diffPhi -= 2*m_Trg_PI;
-        if (diffPhi < -m_Trg_PI ) diffPhi += 2*m_Trg_PI;
-        //stCandDiff[iLayer][iTS] = diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2;
-        (*m_geoCandidatesDiffStWires)[iLayer].push_back(diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2);
-
-        // Save indexTS
-        stCandHitMap[iLayer][iTS] = 1;
-
-      }
-      
-      //// Print info for debugging
-      //cout<<"StCand["<<iLayer<<"]["<<iTS<<"]: "<<stCand[iLayer][iTS]<<" index: "<<indexTS;
-      //cout<<" stAxPhi: "<<stAxPhi[iLayer];
-      //double diffPhi = stAxPhi[iLayer]-indexTS*2*m_Trg_PI/m_nWires[iLayer]*2;
-      //if (diffPhi > m_Trg_PI ) diffPhi -= 2*m_Trg_PI;
-      //if (diffPhi < -m_Trg_PI ) diffPhi += 2*m_Trg_PI;
-      //cout<<" diff: "<<diffPhi/2/m_Trg_PI*m_nWires[iLayer]/2<<endl;
-
-      // Choose scan direction depending on layer
-      if(iLayer%2 == 0) {
-        indexTS--;
-        // If index is below 0 deg goto 360-delta deg
-        if(indexTS < 0 ) indexTS =  m_nWires[iLayer]/2-1;
-      }
-      else {
-        indexTS++;
-        // If index is 360 deg goto 0 deg
-        if(indexTS >= m_nWires[iLayer]/2) indexTS = 0;
-      }
-    } // Select TS using stAxWire between 10 wires
-
-  } // Layer loop
-
-  //// Print stCandHitMap
-  //for(unsigned iLayer=0; iLayer<4; iLayer++){
-  //  cout<<"iSt:"<<iLayer<<" stAxWire:"<<stAxWire[iLayer]<<endl;
-  //  cout<<"stCandHitMap["<<iLayer<<"]: ";
-  //  for(int iTS=9; iTS>=0; iTS--){
-  //    cout<<stCandHitMap[iLayer][iTS];
-  //  }
-  //  cout<<endl;
-  //}
-  
-  // Save stCandHitMap in FPGAOutput
-  for(unsigned iLayer=0; iLayer<4; iLayer++){
-    int stCandHitMapInt=0;
-    for(int iTS=0; iTS<10; iTS++) {
-      stCandHitMapInt+=int(stCandHitMap[iLayer][iTS]*pow(10.,iTS));
-    }
-    m_FPGAOutput.push_back(stCandHitMapInt);
-  }
-
-  // Find and save index of TS. For vector.
-  for(unsigned iLayer=0; iLayer<4; iLayer++) {
-    for(unsigned iCand=0; iCand<(*m_geoCandidatesPhi)[iLayer].size(); iCand++) {
-      for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++) {
-        //cout<<"["<<iLayer<<"] iHitTS: "<<iHitTS<<" stTSs: "<<stTSs[iLayer][iTS]<<endl;
-        if( fabs( (*m_geoCandidatesPhi)[iLayer][iCand] - stTSs[iLayer][iTS] ) < 0.0001) {
-          (*m_geoCandidatesIndex)[iLayer][iCand] = iTS;
-          break;
-        }
-      } // End iTS
-    } // End iCand
-  } // End layer
-
-  // Find and save index of TS. For array
-  for(unsigned iLayer=0; iLayer<4; iLayer++) {
-    for(unsigned iCand=0; iCand<10; iCand++) {
-      for(unsigned iTS=0; iTS<stTSs[iLayer].size(); iTS++) {
-        //cout<<"["<<iLayer<<"] iHitTS: "<<iHitTS<<" stTSs: "<<stTSs[iLayer][iTS]<<endl;
-        if( fabs( stCand[iLayer][iCand] - stTSs[iLayer][iTS] ) < 0.0001) {
-          stCandIndex[iLayer][iCand] = iTS;
-          break;
-        }
-      } // End iTS
-    } // End iCand
-  } // End layer
-
-  // Pick middle candidate if multiple candidates
-  //double meanWireDiff[4] = { 5, 5, 5, 5 };
-  // z=0 wireDiff
-  //double meanWireDiff[4] = { 3.08452, 2.61314, 2.84096, 3.06938 };
-  // mean wire diff
-  //double meanWireDiff[4] = { 3.68186, 3.3542, 3.9099, 4.48263 };
-  // mean wire for iTS
-  double meanWireDiff[4] = { 3.1826, 2.84745, 3.40936, 3.99266 };
-
-  double bestTS[4] = {9999, 9999, 9999, 9999};
-  //double bestITS[4] = {9999, 9999, 9999, 9999};
-  for(int iLayer=0; iLayer<4; iLayer++){
-    double bestDiff=999;
-    for(int iTS=0; iTS<10; iTS++) {
-      if( stCand[iLayer][iTS] == 9999 ) continue;
-      // Pick the better TS
-      if(abs(iTS-meanWireDiff[iLayer]) < bestDiff) {
-      //if( abs( fabs(stCandDiff[iLayer][iTS])-meanWireDiff[iLayer] ) < bestDiff ) {
-        bestDiff = abs(iTS-meanWireDiff[iLayer]);
-        //bestDiff = abs( fabs(stCandDiff[iLayer][iTS])-meanWireDiff[iLayer] );
-        //cout<<"BestDiff["<<iLayer<<"]["<<iTS<<"]: "<<bestDiff<<" diffSt: "<<(*m_geoCandidatesDiffStWires)[iLayer][iTS]<<endl;
-        bestTS[iLayer] = stCand[iLayer][iTS]; 
-        //bestITS[iLayer] = iTS;
-
-        m_bestTS[iLayer] = stCand[iLayer][iTS];
-        m_bestTSIndex[iLayer] = int(stCandIndex[iLayer][iTS]+0.5);
-      }
-    } // TS loop
-  } // Layer loop
-
-  // For integer space
-  for( int iLayer=0; iLayer<4; iLayer++) {
-    m_FPGAOutput.push_back(int(bestTS[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2+0.5));
-  }
-
-  //// Check m_bestTS with version2
-  //for(int iLayer=0; iLayer<4; iLayer++) {
-  //  if(fabs(m_bestTS[iLayer] - tempBestTS[iLayer])>0.00001) {
-  //  //if(fabs(m_bestTSIndex[iLayer] - tempBestTSIndex[iLayer])>0.00001) {
-  //    cout<<"Error: "<<m_bestTS[iLayer]<<" "<<tempBestTS[iLayer]<<endl;
-  //  }
-  //}
-
-  //// Print the best candidate
-  //for( int iLayer=0; iLayer<4; iLayer++) {
-  //  cout<<"best["<<iLayer<<"]: "<<bestTS[iLayer]<<" id:"<<int(bestTS[iLayer]/2/m_Trg_PI*m_nWires[iLayer]/2+0.5)<<" iTS:"<<bestITS[iLayer]<<endl;
-  //}
-
   //// Temp geoFinder
   //for( int iLayer=0; iLayer<4; iLayer++) {
   //  double t_phiAx = acos(m_rr[iLayer]/(2*rho));
@@ -1087,7 +671,6 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   //  cout<<"      dPhiAx_c:"<<t_dPhiAx_c<<" dPhiAxWire:"<<t_dPhiAxWire<<endl;
   //}
 
-  //cout<<"####geoFinder start####"<<endl;
   // Will use cm unit.
   std::map<std::string, std::vector<double> > mConstV;
   std::map<std::string, double > mConstD;
@@ -1286,6 +869,9 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     // Process ifElse data.
     Belle2::TRGCDCJSignal::ifElse(t_data);
   }
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAxMax_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAxMax_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAxMin_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAxMin_"+to_string(iSt)].dump();}
+  //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx2Pi_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx2Pi_"+to_string(iSt)].dump();}
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_c_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_c_"+to_string(iSt)].dump();}
   // Change to wire space
   // Make wireFactor constants
@@ -1626,18 +1212,6 @@ void Hough3DFinder::getValues(const string& input, vector<double> &result ){
     //for(unsigned i=0; i<result.size(); i++) {
     //  cout<<result[i]<<endl;
     //}
-  }
-
-  if(input=="FPGAInput") {
-    for(unsigned iInput=0; iInput<m_FPGAInput.size(); iInput++){
-      result.push_back(m_FPGAInput[iInput]);
-    }
-  }
-
-  if(input=="FPGAOutput") {
-    for(unsigned iOutput=0; iOutput<m_FPGAOutput.size(); iOutput++){
-      result.push_back(m_FPGAOutput[iOutput]);
-    }
   }
 
   if(input=="hitmapLayer1") {

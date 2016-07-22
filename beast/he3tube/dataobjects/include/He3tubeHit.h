@@ -33,18 +33,19 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    He3tubeHit(): m_energyDep(0), m_detNb(0), m_peakV(0), m_time(0) {}
+    He3tubeHit(): m_energyDep(0), m_detNb(0), m_peakV(0), m_time(0), m_definiteNeutron(0) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    He3tubeHit(double energyDep, int detNb, double peakV, double time)
+    He3tubeHit(double energyDep, int detNb, double peakV, double time, bool definiteNeutron)
     {
       m_energyDep = energyDep;
       m_detNb = detNb;
       m_peakV = peakV;
       m_time = time;
+      m_definiteNeutron = definiteNeutron;
     }
 
     /** Return the energy deposition in electrons */
@@ -55,6 +56,8 @@ namespace Belle2 {
     double getPeakV() const { return m_peakV; }
     /** Return time of hit */
     double getTime() const { return m_time; }
+    /** true if this is definitely a neutron event */
+    bool definiteNeutron() const { return m_definiteNeutron;}
 
   private:
     /** Deposited energy in electrons */
@@ -65,7 +68,8 @@ namespace Belle2 {
     double m_peakV;
     /** time of hit */
     double m_time;
-
+    /** true if this is definitely a neutron event */
+    bool m_definiteNeutron;
 
     ClassDef(He3tubeHit, 1)
   };

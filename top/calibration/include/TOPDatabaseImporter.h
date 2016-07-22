@@ -11,6 +11,7 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 namespace Belle2 {
 
@@ -41,6 +42,13 @@ namespace Belle2 {
      * @param fileName text file name with calibration constants
      */
     void importSampleTimeCalibration(std::string fileName);
+
+    /**
+     * Import sample time calibration constants to database
+     * Kichimi-san data, one text file per module - for format see function code
+     * @param fileNames file names separated by space (since vector doesn't work!)
+     */
+    void importSampleTimeCalibrationKichimi(std::string fileNames);
 
     /**
      * Print sample time calibration constants stored in database

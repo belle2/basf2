@@ -78,8 +78,8 @@ namespace Belle2 {
       if (m_sensitiveBar) delete m_sensitiveBar;
       if (m_sensitivePCB1) delete m_sensitivePCB1;
       if (m_sensitivePCB2) delete m_sensitivePCB2;
-      if (m_topgp) delete m_topgp;
-      if (m_geo) delete m_geo;
+      // if (m_topgp) delete m_topgp;
+      // if (m_geo) delete m_geo;
       G4LogicalSkinSurface::CleanSurfaceTable();
     }
 

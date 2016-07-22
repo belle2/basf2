@@ -71,19 +71,15 @@ pEventProcessor::~pEventProcessor()
 {
   cleanup();
   g_pEventProcessor = nullptr;
-  delete m_procHandler;
 }
 
 void pEventProcessor::cleanup()
 {
   if (!m_procHandler->parallelProcessingUsed() or m_procHandler->isOutputProcess()) {
-    for (RingBuffer* rb : m_rbinlist)
-      delete rb;
-    m_rbinlist.clear();
-
-    for (RingBuffer* rb : m_rboutlist)
-      delete rb;
-    m_rboutlist.clear();
+    delete m_rbin;
+    m_rbin = nullptr;
+    delete m_rbout;
+    m_rbout = nullptr;
   }
 }
 
@@ -96,13 +92,9 @@ void pEventProcessor::gotSigINT()
 
 void pEventProcessor::killRingBuffers()
 {
-  for (auto rb : m_rbinlist) {
-    rb->kill();
-  }
+  m_rbin->kill();
   //these might be locked by _this_ process, so we cannot escape
-  for (auto rb : m_rboutlist) {
-    rb->kill(); //atomic, so doesn't lock
-  }
+  m_rbout->kill(); //atomic, so doesn't lock
 }
 
 void pEventProcessor::clearFileList()
@@ -132,16 +124,16 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   analyzePath(spath);
 
 
-  if (!m_inpathlist.empty()) {
-    B2INFO("Input Path " << m_inpathlist[0]->getPathString());
+  if (m_inputPath) {
+    B2INFO("Input Path " << m_inputPath->getPathString());
   }
-  if (!m_mainpathlist.empty()) {
-    B2INFO("Main Path " << m_mainpathlist[0]->getPathString());
+  if (m_mainPath) {
+    B2INFO("Main Path " << m_mainPath->getPathString());
   }
-  if (!m_outpathlist.empty()) {
-    B2INFO("Output Path " << m_outpathlist[0]->getPathString());
+  if (m_outputPath) {
+    B2INFO("Output Path " << m_outputPath->getPathString());
   }
-  if (m_mainpathlist.empty()) {
+  if (not m_mainPath) {
     B2WARNING("Cannot run any modules in parallel (no c_ParallelProcessingCertified flag), falling back to single-core mode.");
     EventProcessor::process(spath, maxEvent);
     return;
@@ -162,11 +154,11 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     if (!m_processStatisticsPtr)
       m_processStatisticsPtr.create();
     Path mergedPath;
-    if (!m_inpathlist.empty())
-      mergedPath.addPath(m_inpathlist[0]);
-    mergedPath.addPath(m_mainpathlist[0]);
-    if (!m_outpathlist.empty())
-      mergedPath.addPath(m_outpathlist[0]);
+    if (m_inputPath)
+      mergedPath.addPath(m_inputPath);
+    mergedPath.addPath(m_mainPath);
+    if (m_outputPath)
+      mergedPath.addPath(m_outputPath);
     for (ModulePtr module : mergedPath.buildModulePathList())
       m_processStatisticsPtr->initModule(module.get());
   }
@@ -203,7 +195,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
   // 3. Fork input path
   m_procHandler->startInputProcess();
   if (m_procHandler->isInputProcess()) {   // In input process
-    localPath = m_inpathlist[0];
+    localPath = m_inputPath;
   } else {
     // This is not the input path, clean up datastore to not contain the first event
     DataStore::Instance().invalidateData(DataStore::c_Event);
@@ -213,15 +205,15 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
     // 5. Fork out worker path (parallel section)
     m_procHandler->startWorkerProcesses(numProcesses);
     if (m_procHandler->isWorkerProcess()) {
-      localPath = m_mainpathlist[m_mainpathlist.size() - 1];
+      localPath = m_mainPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
   }
 
   if (localPath == nullptr) { //not forked yet -> this process is the output process
     m_procHandler->startOutputProcess();
-    if (!m_outpathlist.empty()) {
-      localPath = m_outpathlist[0];
+    if (m_outputPath) {
+      localPath = m_outputPath;
       m_master = localPath->getModules().begin()->get(); //set Rx as master
     }
   }
@@ -251,7 +243,7 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
       if (e.signal != SIGINT) {
         B2FATAL(e.what());
       }
-      //in case of SIGINT, we move on to processTerminate() to shut down saefly
+      //in case of SIGINT, we move on to processTerminate() to shut down safely
       gotSigINT = true;
     }
     prependModulesIfNotPresent(&localModules, terminateGlobally);
@@ -297,8 +289,6 @@ void pEventProcessor::process(PathPtr spath, long maxEvent)
 
 void pEventProcessor::analyzePath(const PathPtr& path)
 {
-  //TODO this should either be properly generalized so it can deal with multiple parallel sections,
-  //or one can simply get rid of the different lists for paths...
   PathPtr inpath(new Path);
   PathPtr mainpath(new Path);
   PathPtr outpath(new Path);
@@ -341,11 +331,11 @@ void pEventProcessor::analyzePath(const PathPtr& path)
 
   //if main path is empty, createAllPaths doesn't really matter, since we'll fall back to single-core processing
   if (!mainpath->isEmpty())
-    m_mainpathlist.push_back(mainpath);
+    m_mainPath = mainpath;
   if (createAllPaths or !inpath->isEmpty())
-    m_inpathlist.push_back(inpath);
+    m_inputPath = inpath;
   if (createAllPaths or !outpath->isEmpty())
-    m_outpathlist.push_back(outpath);
+    m_outputPath = outpath;
 }
 
 RingBuffer* pEventProcessor::connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b)
@@ -378,13 +368,13 @@ void pEventProcessor::preparePaths()
   if (m_histoman) {
     m_histoman->initialize();
   }
-  if (m_mainpathlist.empty())
+  if (not m_mainPath)
     return; //we'll fall back to single-core
 
-  if (!m_inpathlist.empty())
-    m_rbinlist.emplace_back(connectViaRingBuffer("BASF2_RBIN", m_inpathlist[0], m_mainpathlist[0]));
-  if (!m_outpathlist.empty())
-    m_rboutlist.emplace_back(connectViaRingBuffer("BASF2_RBOUT", m_mainpathlist[0], m_outpathlist[0]));
+  if (m_inputPath)
+    m_rbin = connectViaRingBuffer("BASF2_RBIN", m_inputPath, m_mainPath);
+  if (m_outputPath)
+    m_rbout = connectViaRingBuffer("BASF2_RBOUT", m_mainPath, m_outputPath);
 
 }
 

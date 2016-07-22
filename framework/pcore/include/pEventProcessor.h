@@ -59,7 +59,7 @@ namespace Belle2 {
     void cleanup();
 
   private:
-    /** Analyze given path. Fills m_*pathlist objects. */
+    /** Analyze given path. Fills m_*path objects. */
     void analyzePath(const PathPtr& path);
 
     /** Adds internal modules to paths, prepare RingBuffers. */
@@ -85,28 +85,21 @@ namespace Belle2 {
     /** Prepend given 'prependModules' to 'modules', if they're not already present. */
     static void prependModulesIfNotPresent(ModulePtrList* modules, const ModulePtrList& prependModules);
 
-  protected:
-
   private:
-
-    /** input modules with multi-process support */
-    ModulePtrList m_input_list;
-    /** output modules with multi-process support */
-    ModulePtrList m_output_list;
     /** handler to fork and manage processes. */
-    ProcHandler* m_procHandler;
+    std::unique_ptr<ProcHandler> m_procHandler;
 
-    /** list of input paths (contains one path. why a list?) */
-    std::vector<PathPtr> m_inpathlist;
-    /** list of main paths (contains one path. why a list?) */
-    std::vector<PathPtr> m_mainpathlist;
-    /** list of output paths (contains one path. why a list?) */
-    std::vector<PathPtr> m_outpathlist;
+    /** Input path. */
+    PathPtr m_inputPath;
+    /** Main (parallel section) path. */
+    PathPtr m_mainPath;
+    /** Output path. */
+    PathPtr m_outputPath;
 
-    /** input RingBuffers */
-    std::vector<RingBuffer*> m_rbinlist;
-    /** output RingBuffers */
-    std::vector<RingBuffer*> m_rboutlist;
+    /** input RingBuffer */
+    RingBuffer* m_rbin = nullptr;
+    /** output RingBuffer */
+    RingBuffer* m_rbout = nullptr;;
 
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;

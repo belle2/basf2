@@ -15,5 +15,6 @@
 
   <!-- include the beast Materials and detector component -->
   <xi:include href="HE3TUBE-Materials.xml"/>
+  <xi:include href="../bgo/BGO-Materials.xml"/>
   <xi:include href="HE3TUBE.xml"/>
 </Detector>

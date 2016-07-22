@@ -11,6 +11,8 @@
 #ifndef HE3DIGITIZERMODULE_H
 #define HE3DIGITIZERMODULE_H
 
+#include <beast/he3tube/dataobjects/He3tubeSimHit.h>
+
 #include <framework/core/Module.h>
 #include <string>
 #include <vector>
@@ -52,10 +54,10 @@ namespace Belle2 {
 
       /** reads data from HE3TUBE.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
-      /** filename of Garfield datafile */
       /** number of detectors. Read from the gearbox*/
       int numOfTubes = 0;
-
+      /** Whether or not mcparticle array exists */
+      bool m_mcpExist = false;
       /** Event counter */
       int Event = 0;
       /** Conversion to ADC counts, set in steering file*/
@@ -64,6 +66,10 @@ namespace Belle2 {
       double m_Workfct = 35.075;
       /** fano factor */
       double m_Fanofac = 220;
+      /** Process the he3tube simhits */
+      void ProcessHit(He3tubeSimHit* aHit, double* lowTime, double* edepDet, double* NbEle_tot);
+
+
 
     };
 

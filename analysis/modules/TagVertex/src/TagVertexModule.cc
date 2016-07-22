@@ -121,7 +121,9 @@ namespace Belle2 {
       bool ok = doVertexFit(particle);
       if (ok) deltaT(particle);
 
-      if (m_fitPval < m_confidenceLevel) {
+      //if (m_fitPval < m_confidenceLevel) {
+      if ((m_fitPval < m_confidenceLevel && m_confidenceLevel != 0)
+          || (m_fitPval <= m_confidenceLevel && m_confidenceLevel == 0)) {
         toRemove.push_back(particle->getArrayIndex());
       } else {
         // save information in the Vertex StoreArray
@@ -192,7 +194,7 @@ namespace Belle2 {
           Breco); // When using the STA, the user can ask for MC information from the tracks performing the fit
     }
     if (m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "standard_PXD") ok = findConstraintBoost(cut);
-    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(cut * 2000.);
+    if (m_useFitAlgorithm == "boost") ok = findConstraintBoost(cut * 200000.);
     if (m_useFitAlgorithm == "noConstraint") ok = true;
     if (!ok) {
       B2ERROR("TagVertex: No correct fit constraint");
@@ -217,6 +219,12 @@ namespace Belle2 {
     if ((ok == false || m_fitPval < 0.001) || m_useFitAlgorithm == "standard" || m_useFitAlgorithm == "breco"
         || m_useFitAlgorithm == "boost" || m_useFitAlgorithm == "noConstraint") {
       ok = getTagTracks_standardAlgorithm(Breco, 0);
+      if (ok) ok = makeGeneralFit();
+    }
+
+    if ((ok == false || m_fitPval <= 0.) && m_useFitAlgorithm != "noConstraint") {
+      ok = findConstraintBoost(cut * 200000.);
+      if (ok) ok = getTagTracks_standardAlgorithm(Breco, 0);
       if (ok) ok = makeGeneralFit();
     }
 

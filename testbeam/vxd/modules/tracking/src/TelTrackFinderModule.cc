@@ -12,7 +12,12 @@
 
 #include <vxd/geometry/SensorInfoBase.h>
 
+#include <svd/dataobjects/SVDCluster.h>
+
+#include <pxd/dataobjects/PXDCluster.h>
+
 #include <framework/gearbox/Const.h>
+#include <framework/datastore/StoreArray.h>
 
 using namespace Belle2;
 
@@ -53,6 +58,11 @@ void TelTrackFinderModule::initialize()
 
   //the telescope clusters
   m_clusters.isRequired(m_inputClustersName);
+
+  //register the store array for svd and pxd cluster as they might needed
+  // use the default names "" as this are the one used by genfit!
+  StoreArray<SVDCluster>::optional();
+  StoreArray<PXDCluster>::optional();
 
 
   //the output track candidates
@@ -186,6 +196,9 @@ void TelTrackFinderModule::findClusterCands(std::vector<int>& clusterindizes, Vx
 {
   B2DEBUG(1, "number of Clusters in the array: " << m_clusters.getEntries());
 
+  //find the closest (adding all might give difficulties later with genfit)
+  int minclus = -1;
+  double mindist = 9999999999.;
   for (int iclus = 0; iclus < m_clusters.getEntries(); iclus++) {
     //check the vxd id since the intersection is only valid for a specific vxdid
     VxdID thisid = m_clusters[iclus]->getSensorID();
@@ -197,9 +210,15 @@ void TelTrackFinderModule::findClusterCands(std::vector<int>& clusterindizes, Vx
 
     B2DEBUG(1, "distance in terms of fit uncertainty: diff_u = " << diff.X() / du << " (du=" << du << ") diff_v = "
             << diff.Y() / dv << " (dv=" << dv << ")");
-    //multiple clusters per layer are possible but genfit should be able to handle that!?!?
-    if (fabs(diff.X() / du) < m_distanceCut && fabs(diff.Y() / dv) < m_distanceCut) clusterindizes.push_back(iclus);
+    if (fabs(diff.X() / du) < m_distanceCut && fabs(diff.Y() / dv) < m_distanceCut) {
+      if (diff.Mag() < mindist) {
+        minclus = iclus;
+        mindist = diff.Mag();
+      }
+    }
+
   }//end iclus
+  if (minclus >= 0) clusterindizes.push_back(minclus);
 
 }
 
@@ -209,18 +228,147 @@ void TelTrackFinderModule::addNewTrackCand(const  std::vector<int>& telHitIndize
 
   B2DEBUG(1, "initial track cand has " << trackCand.getNHits() << " hits");
 
-  //create the new track cand by copying the old
+  //create the new track cand
   genfit::TrackCand newCand(trackCand);
+  // reset deletes the hits but should keep the other setting:
+  newCand.reset();
+
+
+  // need a sorting parameter as genfit assumes sorted hits
+  // WARNING: that will not cover looper (should be rare for the Test beam!)
+  int nhits = trackCand.getNHits();
+  // in case of no hits you cant add hits to
+  if (nhits <= 0) return;
+
+
+  StoreArray<SVDCluster> svdclusters;
+  StoreArray<PXDCluster> pxdclusters;
+
+  // the following does not work correctly!!
+  /*
+  VxdID minvxdid(Belle2::VxdID::MaxID);
+  VxdID maxvxdid(0);
+
+
+  //loop over the hits to find sensor with min and max id
+  for (int ihit = 0; ihit < (int)trackCand.getNHits(); ihit++) {
+    int detid(0), hitid(0);
+    trackCand.getHit(ihit, detid, hitid);
+    VxdID avxdid(0);
+    if( detid == Const::SVD && svdclusters.getEntries() >= 0 ) { // its an svd cluster and there clusters stored!
+      SVDCluster * cluster = svdclusters[hitid];
+      avxdid = cluster->getSensorID();
+    } else if ( detid == Const::PXD && pxdclusters.getEntries() >= 0 ) {
+      PXDCluster * cluster = pxdclusters[hitid];
+      avxdid = cluster->getSensorID();
+    } else {
+      B2WARNING("There are other clusters in the track cand than PXD or SVD!");
+      continue;
+    }
+    if( avxdid <= VxdID(0) ) {
+      B2WARNING("no vxdid found!"); //should not happen!
+      continue;
+    }
+
+    if( avxdid > maxvxdid ) maxvxdid = avxdid;
+    if( avxdid < minvxdid ) minvxdid = avxdid;
+  }
+  //take the center of sensor which should be precise enough!?
+  if( minvxdid == VxdID(Belle2::VxdID::MaxID) || maxvxdid == VxdID(0)){
+    B2WARNING("This should not happen!");
+    return;
+  }
+
+  VXD::SensorInfoBase minsensor_info = m_vxdGeometry.getSensorInfo( minvxdid );
+  VXD::SensorInfoBase maxsensor_info = m_vxdGeometry.getSensorInfo( maxvxdid );
+  TVector3 direction = maxsensor_info.pointToGlobal(TVector3(0.,0.,0.)) -
+    minsensor_info.pointToGlobal(TVector3(0.,0.,0.));
+  */
+
+  //the above does not seem to work in some cases so take the x-direction
+  // WARNING that will only work for the testbeam setting!!
+  TVector3 direction(1., 0., 0.);
+
+
+  //copy the old trackCand and add a sorting parameter!!
+  for (int ihit = 0; ihit < (int)trackCand.getNHits(); ihit++) {
+    int detid(0), hitid(0);
+    double sortPar(0);
+    trackCand.getHit(ihit, detid, hitid, sortPar);
+
+    VxdID avxdid;
+    if (detid == Const::SVD && svdclusters.getEntries() >= 0) {  // its an svd cluster and there clusters stored!
+      SVDCluster* cluster = svdclusters[hitid];
+      avxdid = cluster->getSensorID();
+    } else if (detid == Const::PXD && pxdclusters.getEntries() >= 0) {
+      PXDCluster* cluster = pxdclusters[hitid];
+      avxdid = cluster->getSensorID();
+    } else {
+      B2WARNING("There are other clusters in the track cand than PXD or SVD!");
+      continue;
+    }
+
+    //get the position vector of the center of the detector
+    VXD::SensorInfoBase sensor_info = m_vxdGeometry.getSensorInfo(avxdid);
+    TVector3 pos_global = sensor_info.pointToGlobal(TVector3(0., 0., 0.));
+    double newSortPar = direction.Dot(pos_global);
+    newCand.addHit(detid, hitid, -1, newSortPar);
+  }
 
   //add all the telescope hits
   for (int ihit = 0; ihit < (int)telHitIndizes.size(); ihit++) {
-    // TelCluster class does not seem to store the time!?!?
-    //float time = m_inputClusters[telHitIndizes[ihit]]->getGlobalTime();
-    newCand.addHit(Const::TEST, telHitIndizes[ihit]);
+    TelCluster* telcluster = m_clusters[ telHitIndizes[ihit] ];
+
+    VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(telcluster->getSensorID());
+    TVector3 pos_global = info.pointToGlobal(TVector3(0., 0., 0.));
+    double newSortPar = direction.Dot(pos_global);
+
+    newCand.addHit(Const::TEST, telHitIndizes[ihit], -1, newSortPar);
   }
 
-  //not sure if that one makes sense as no sorting parameter has been specified!?!?
+
+  //debugging:
+  /*
+  std::cout << "Before sorting: " << std::endl;
+  for (int ihit = 0; ihit < (int)newCand.getNHits(); ihit++) {
+    int detid(0), hitid(0);
+    double sortPar(0);
+    newCand.getHit(ihit, detid, hitid, sortPar);
+    std::cout << "ihit " << ihit << " detid " << detid << " hitid " << hitid <<  " sortPar " << sortPar << std::endl;
+  }
+  */
+
+  //will sort the hits according to their sensors  position on the x-axis!!!!!! (only make sense for the TB 2016 setup!)
   newCand.sortHits();
+
+  //now reset the position seed to the position of the first hit (but only if its a telescope hit else keep the old seed)
+  if (newCand.getNHits() > 0) {
+    int detid(0), hitid(0);
+    //get the first this should now be the most inner one (if in TB geometry)
+    newCand.getHit(0, detid, hitid);
+    //change the position seed only if the first hit is a telescope hit, otherwise the old hit should be still fine
+    if (detid == Const::TEST) {
+      TelCluster* telcluster = m_clusters[hitid];
+      VXD::SensorInfoBase info = m_vxdGeometry.getSensorInfo(telcluster->getSensorID());
+      TVector3 localpos(telcluster->getU(), telcluster->getV(), 0.);
+      TVector3 newseed = info.pointToGlobal(localpos);
+      //keep mom and charge seed!
+      TVector3 mom = newCand.getMomSeed();
+      double charge = newCand.getChargeSeed();
+      newCand.setPosMomSeed(newseed, mom, charge);
+    }
+  }
+
+  //debugging:
+  /*
+  std::cout << "After sorting: " << std::endl;
+  for (int ihit = 0; ihit < (int)newCand.getNHits(); ihit++) {
+    int detid(0), hitid(0);
+    double sortPar(0);
+    newCand.getHit(ihit, detid, hitid, sortPar);
+    std::cout << "ihit " << ihit << " detid " << detid << " hitid " << hitid <<  " sortPar " << sortPar << std::endl;
+  }
+  */
 
   B2DEBUG(1, "obtained track cand has " << newCand.getNHits() << " hits");
 

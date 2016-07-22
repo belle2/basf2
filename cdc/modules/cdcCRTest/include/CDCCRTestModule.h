@@ -211,9 +211,9 @@ namespace Belle2 {
       double weight;/**<  Weight of hit.*/
       double absRes_b;/**< absolute value of biased residual.*/
       double absRes_u;/**< absolute value of unbiased residual.*/
-      double alpha;           /**< Entrance Azimuthual angle of hit (degree). */
-      double theta;          /**< Entrance Polar angle of hit (degree). */
-      double Phi0;           /**< Phi0 angle of track, see in TrackFitResult (degree). */
+      double alpha;   /**< Entrance Azimuthual angle of hit (degree). */
+      double theta;   /**< Entrance Polar angle of hit (degree). */
+      double Phi0;   /**< Phi0 angle of track, see in TrackFitResult (degree). */
       unsigned short adc; /**< adc value. */
       short tdc; /**< tdc value. */
       double t;          /**< Measurement Drift time. */
@@ -248,11 +248,11 @@ namespace Belle2 {
       int trighit; /**< Trigger hit information. 1 if track hits trigger counter, otherwise 0. */
 
 
-      TH1* m_hResidualU[NLayer];       /**< Residual distribution (in cm)  */
+      TH1* m_hResidualU[NLayer]; /**< Residual distribution (in cm)  */
       TH2* m_hNDFResidualU[NLayer]; /**< Residual vs. ndf. */
 
 
-      TH1* m_hNormalizedResidualU[NLayer];       /**< Residual distribution normalized with tracking error.  */
+      TH1* m_hNormalizedResidualU[NLayer]; /**< Residual distribution normalized with tracking error.  */
       TH2* m_hNDFNormalizedResidualU[NLayer]; /**< Normalized residual vs. ndf. */
       TH2* m_hDxDt[NLayer]; /**< Unbiased x_fit vs. drift time. */
 

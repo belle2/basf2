@@ -275,7 +275,7 @@ void CDCCRTestModule::event()
     else {ndf = fs->getNdf();}
     Chi2 = fs->getChi2();
     TrPval = std::max(0., ROOT::Math::chisquared_cdf_c(Chi2, ndf));
-    Phi0 = fitresult->getPhi0() * 180 / 3.14;
+    Phi0 = fitresult->getPhi0() * 180 / M_PI;
 
     m_hPhi0->Fill(Phi0);
     m_hPval->Fill(TrPval);

@@ -3113,8 +3113,8 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
         int counterPos = 0;
 
         unsigned stateLR = 0; // 0:wait, 1:LUT12, 2:LUT3
-        int timeLRFound = 0;
-        int counterLR = 0;
+//      int timeLRFound = 0;
+//      int counterLR = 0;
 
         for (unsigned i = 0; i < changeTime.size(); i++) {
 
@@ -3215,18 +3215,24 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                     const unsigned val = (timing << 4) | (lut << 2) | hitPos;
                     const TRGState output(13, val);
                     resultT->set(output, ct);
-                    timeLRFound = ct;
+//                  timeLRFound = ct;
                     if ((lut == 1) || (lut ==2))
                         stateLR = 1;
                     else
                         stateLR = 2;
+
+                    if (TRGDebug::level()) {
+                        if (((lut == 1) || (lut ==2)) && (stateHitPos == 0))
+                            cout << TRGDebug::tab()
+                                 << "!!! state machines incosistent" << endl;
+                    }
                 }
             }
 
             //...State : LUT12...
             else if (stateLR == 1) {
-                counterLR = ct - timeLRFound;
-                if (counterLR > 15)
+//              counterLR = ct - timeLRFound;
+                if (counterPos > 15)
                     stateLR = 0;
             }
 
@@ -3238,12 +3244,12 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                             hitPos;
                         const TRGState output(13, val);
                         resultT->set(output, ct);
-                        timeLRFound = ct;
+//                      timeLRFound = ct;
                         stateLR = 1;
                     }
                     else {
-                        counterLR = ct - timeLRFound;
-                        if (counterLR > 15)
+//                      counterLR = ct - timeLRFound;
+                        if (counterPos > 15)
                             stateLR = 0;
                     }
                 }
@@ -3262,7 +3268,7 @@ TSFinder::simulateTSF2(TRGSignalVector * in, unsigned tsid) {
                      << ", pri=" << hit1st
                      << ", sec=" << hit2nd
                      << ", hPos=" << hitPos
-                     << ", ctrs=" << counterPos << "," << counterLR
+                     << ", ctr=" << counterPos // << "," << counterLR
                      << ", states=" << stateHitPos << "," << stateLR
                      << endl;
             }            

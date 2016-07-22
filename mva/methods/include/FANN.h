@@ -17,7 +17,6 @@
 #include <mva/interface/Expert.h>
 
 #include <fann.h>
-#include "floatfann.h"
 
 namespace Belle2 {
   namespace MVA {
@@ -50,14 +49,29 @@ namespace Belle2 {
        */
       virtual std::string getMethod() const override { return "FANN"; }
 
-      unsigned int m_max_epochs = 1000; /**< Maximum number of epochs */
-      unsigned int m_epochs_between_reports = 100; /**< Epochs between each report of training status */
-      std::vector<unsigned int> m_hidden_layer_neurons; /**< Number of hidden neurons per layer */
-      double m_desired_error = 0.100; /**< Desired error */
+      /**
+       * Returns the internal vector parameter with the number of hidden neurons per layer
+       * @param nf number of features (input nodes).
+       */
+      std::vector<unsigned int> getHiddenLayerNeurons(unsigned int nf) const;
+
+      unsigned int m_max_epochs = 10000; /**< Maximum number of epochs */
+      bool m_verbose_mode = true; /**< Sets to report training status or not*/
+      std::string m_hidden_layers_architecture = "3*N"; /**< String containing the architecture of hidden neurons. Ex. "3,3*N,3*(N-1) */
+
       std::string m_hidden_activiation_function = "FANN_SIGMOID_SYMMETRIC"; /**< Activation function in hidden layer */
       std::string m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"; /**< Activation function in output layer */
       std::string m_error_function = "FANN_ERRORFUNC_LINEAR"; /**< Loss function */
-      std::string m_training_method = "FANN_TRAIN_SARPROP"; /**< Training method for back propagation */
+      std::string m_training_method = "FANN_TRAIN_RPROP"; /**< Training method for back propagation */
+
+      double m_validation_fraction = 0.5; /**< Fraction of training sample used for validation in order to avoid overtraining. */
+      unsigned int m_random_seeds =
+        3; /**< Number of times the training is repeated with a new weight random seed. The one with the best result is saved. */
+      unsigned int m_test_rate =
+        500; /**< Error on validation is compared with the one before. The number of epochs before is given by this parameter. */
+      unsigned int m_number_of_threads = 8; /**< Number of threads for parallel training. */
+
+
       bool m_scale_features = true; /**< Scale features before training */
       bool m_scale_target = true; /**< Scale target before training */
 

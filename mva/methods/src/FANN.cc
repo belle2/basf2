@@ -11,79 +11,20 @@
 #include <mva/methods/FANN.h>
 
 #include <framework/logging/Logger.h>
+#include <TFormula.h>
+
+#ifdef HAS_OPENMP
+#include <parallel_fann.hpp>
+#else
+#include <fann.h>
+#endif
 
 namespace Belle2 {
   namespace MVA {
 
-    void FANNOptions::load(const boost::property_tree::ptree& pt)
-    {
-
-      int version = pt.get<int>("FANN_version");
-      if (version != 1) {
-        B2ERROR("Unkown weightfile version " << std::to_string(version));
-        throw std::runtime_error("Unkown weightfile version " + std::to_string(version));
-      }
-      m_max_epochs = pt.get<unsigned int>("FANN_max_epochs");
-      m_epochs_between_reports = pt.get<unsigned int>("FANN_epochs_between_reports");
-      m_desired_error = pt.get<double>("FANN_desired_error");
-
-      unsigned int numberOfLayers = pt.get<unsigned int>("FANN_number_of_layers");
-      m_hidden_layer_neurons.resize(numberOfLayers);
-      for (unsigned int i = 0; i < numberOfLayers; ++i) {
-        m_hidden_layer_neurons[i] = pt.get<unsigned int>(std::string("FANN_hidden_layer") + std::to_string(i));
-      }
-
-      m_hidden_activiation_function = pt.get<std::string>("FANN_hidden_activation_function");
-      m_output_activiation_function = pt.get<std::string>("FANN_output_activation_function");
-      m_error_function = pt.get<std::string>("FANN_error_function");
-      m_training_method = pt.get<std::string>("FANN_training_method");
-      m_scale_features = pt.get<bool>("FANN_scale_features");
-      m_scale_target = pt.get<bool>("FANN_scale_target");
-
-    }
-
-    void FANNOptions::save(boost::property_tree::ptree& pt) const
-    {
-      pt.put("FANN_version", 1);
-      pt.put("FANN_max_epochs", m_max_epochs);
-      pt.put("FANN_epochs_between_reports", m_epochs_between_reports);
-      pt.put("FANN_desired_error", m_desired_error);
-      pt.put("FANN_hidden_activation_function", m_hidden_activiation_function);
-      pt.put("FANN_output_activation_function", m_output_activiation_function);
-      pt.put("FANN_error_function", m_error_function);
-      pt.put("FANN_training_method", m_training_method);
-      pt.put("FANN_scale_features", m_scale_features);
-      pt.put("FANN_scale_target", m_scale_target);
-
-      pt.put("FANN_number_of_layers", m_hidden_layer_neurons.size());
-      for (unsigned int i = 0; i < m_hidden_layer_neurons.size(); ++i) {
-        pt.put(std::string("FANN_hidden_layer") + std::to_string(i), m_hidden_layer_neurons[i]);
-      }
-
-    }
-
-    po::options_description FANNOptions::getDescription()
-    {
-      po::options_description description("FANN options");
-      description.add_options()
-      ("hidden_layer_neurons", po::value<std::vector<unsigned int>>(&m_hidden_layer_neurons)->multitoken(),
-       "Number of neurons in each hidden layer")
-      ("max_epochs", po::value<unsigned int>(&m_max_epochs), "Number of epochs")
-      ("epochs_between_reports", po::value<unsigned int>(&m_epochs_between_reports), "Number of epochs between reports")
-      ("desired_error", po::value<double>(&m_desired_error), "Desired error")
-      ("hidden_activiation_function", po::value<std::string>(&m_hidden_activiation_function),
-       "Name of acitvation function used for hidden layers")
-      ("output_activiation_function", po::value<std::string>(&m_output_activiation_function),
-       "Name of acitvation function used for output layer")
-      ("error_function", po::value<std::string>(&m_error_function), "Name of error function")
-      ("training_method", po::value<std::string>(&m_training_method), "Method used for backpropagation")
-      ("scale_features", po::value<bool>(&m_scale_features), "Boolean indicating if features should be scaled or not")
-      ("scale_target", po::value<bool>(&m_scale_target), "Boolean indicating if target should be scaled or not");
-      return description;
-    }
-
     FANNTeacher::FANNTeacher(const GeneralOptions& general_options, const FANNOptions& specific_options) : Teacher(general_options),
       m_specific_options(specific_options) { }
+
 
     Weightfile FANNTeacher::train(Dataset& training_data) const
     {
@@ -91,22 +32,23 @@ namespace Belle2 {
       unsigned int numberOfFeatures = training_data.getNumberOfFeatures();
       unsigned int numberOfEvents = training_data.getNumberOfEvents();
 
-      unsigned int number_of_layers = m_specific_options.m_hidden_layer_neurons.size() + 2;
-
-      if (m_specific_options.m_hidden_layer_neurons.size() == 0) {
-        number_of_layers += 1;
+      std::vector<unsigned int> hiddenLayers = m_specific_options.getHiddenLayerNeurons(numberOfFeatures);
+      unsigned int number_of_layers = 2;
+      for (unsigned int i = 0; i < hiddenLayers.size(); ++i) {
+        if (hiddenLayers[i] > 0) {
+          number_of_layers++;
+        }
       }
 
       auto layers = std::unique_ptr<unsigned int[]>(new unsigned int[number_of_layers]);
       layers[0] = numberOfFeatures;
-      if (m_specific_options.m_hidden_layer_neurons.size() == 0) {
-        layers[0] = numberOfFeatures + 1;
-      } else {
-        for (unsigned int i = 0; i < m_specific_options.m_hidden_layer_neurons.size(); ++i) {
-          layers[i + 1] = m_specific_options.m_hidden_layer_neurons[i];
+      for (unsigned int i = 0; i < hiddenLayers.size(); ++i) {
+        if (hiddenLayers[i] > 0) {
+          layers[i + 1] = hiddenLayers[i];
         }
       }
       layers[number_of_layers - 1] = 1;
+
       struct fann* ann = fann_create_standard_array(number_of_layers, layers.get());
 
       std::map<std::string, enum fann_activationfunc_enum> activationFunctions;
@@ -116,12 +58,22 @@ namespace Belle2 {
         i++;
       }
 
+#ifdef HAS_OPENMP
+      typedef float (*FnPtr)(struct fann * ann, struct fann_train_data * data, const unsigned int threadnumb);
+      std::map<std::string, FnPtr> trainingMethods;
+      trainingMethods["FANN_TRAIN_RPROP"] = parallel_fann::train_epoch_irpropm_parallel;
+      trainingMethods["FANN_TRAIN_BATCH"]      = parallel_fann::train_epoch_batch_parallel;
+      trainingMethods["FANN_TRAIN_QUICKPROP"] = parallel_fann::train_epoch_quickprop_parallel;
+      trainingMethods["FANN_TRAIN_SARPROP"]  = parallel_fann::train_epoch_sarprop_parallel;
+      trainingMethods["FANN_TRAIN_INCREMENTAL"] = nullptr;
+#else
       std::map<std::string, enum fann_train_enum> trainingMethods;
       i = 0;
       for (auto& name : FANN_TRAIN_NAMES) {
         trainingMethods[name] = fann_train_enum(i);
         i++;
       }
+#endif
 
       std::map<std::string, enum fann_errorfunc_enum> errorFunctions;
       i = 0;
@@ -150,12 +102,79 @@ namespace Belle2 {
         throw std::runtime_error("Coulnd't find training method function named " + m_specific_options.m_training_method);
       }
 
+      if (m_specific_options.m_max_epochs < 1) {
+        B2ERROR("m_max_epochs should be larger than 0 " << m_specific_options.m_max_epochs);
+        throw std::runtime_error("m_max_epochs should be larger than 0. The given value is " + m_specific_options.m_max_epochs);
+      }
+
+      if (m_specific_options.m_random_seeds < 1) {
+        B2ERROR("m_random_seeds should be larger than 0 " << m_specific_options.m_random_seeds);
+        throw std::runtime_error("m_random_seeds should be larger than 0. The given value is " + m_specific_options.m_random_seeds);
+      }
+
+      if (m_specific_options.m_test_rate < 1) {
+        B2ERROR("m_test_rate should be larger than 0 " << m_specific_options.m_test_rate);
+        throw std::runtime_error("m_test_rate should be larger than 0. The given value is " + m_specific_options.m_test_rate);
+      }
+
+      if (m_specific_options.m_number_of_threads < 1) {
+        B2ERROR("m_number_of_threads should be larger than 0. The given value is " << m_specific_options.m_number_of_threads);
+        throw std::runtime_error("m_number_of_threads should be larger than 0. The given value is " +
+                                 m_specific_options.m_number_of_threads);
+      }
+
+      // set network parameters
       fann_set_activation_function_hidden(ann, activationFunctions[m_specific_options.m_hidden_activiation_function]);
       fann_set_activation_function_output(ann, activationFunctions[m_specific_options.m_output_activiation_function]);
       fann_set_train_error_function(ann, errorFunctions[m_specific_options.m_error_function]);
-      fann_set_training_algorithm(ann, trainingMethods[m_specific_options.m_training_method]);
 
-      fann_train_data* data = fann_create_train(numberOfEvents, numberOfFeatures, 1);
+
+      double nTestingAndValidationEvents = numberOfEvents * m_specific_options.m_validation_fraction;
+      unsigned int nTestingEvents = int(nTestingAndValidationEvents * 0.5); // Number of events in the test sample.
+      unsigned int nValidationEvents = int(nTestingAndValidationEvents * 0.5);
+      unsigned int nTrainingEvents = numberOfEvents - nValidationEvents - nTestingEvents;
+
+      if (nTestingAndValidationEvents < 1) {
+        B2ERROR("m_validation_fraction should be a number between 0 and 1 (0 < x < 1). The given value is " <<
+                m_specific_options.m_validation_fraction <<
+                ". The total number of events is " << numberOfEvents << ". numberOfEvents * m_validation_fraction has to be larger than one");
+        throw std::runtime_error("m_validation_fraction should be a number between 0 and 1 (0 < x < 1). numberOfEvents * m_validation_fraction has to be larger than one");
+      }
+
+
+      // training set
+      struct fann_train_data* train_data =
+        fann_create_train(nTrainingEvents, numberOfFeatures, 1);
+      for (unsigned iEvent = 0; iEvent < nTrainingEvents; ++iEvent) {
+        training_data.loadEvent(iEvent);
+        for (unsigned iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+          train_data->input[iEvent][iFeature] = training_data.m_input[iFeature];
+        }
+        train_data->output[iEvent][0] = training_data.m_target;
+      }
+      // validation set
+      struct fann_train_data* valid_data =
+        fann_create_train(nValidationEvents, numberOfFeatures, 1);
+      for (unsigned iEvent = nTrainingEvents; iEvent < nTrainingEvents + nValidationEvents; ++iEvent) {
+        training_data.loadEvent(iEvent);
+        for (unsigned iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+          valid_data->input[iEvent - nTrainingEvents][iFeature] = training_data.m_input[iFeature];
+        }
+        valid_data->output[iEvent - nTrainingEvents][0] = training_data.m_target;
+      }
+
+      // testing set
+      struct fann_train_data* test_data =
+        fann_create_train(nTestingEvents, numberOfFeatures, 1);
+      for (unsigned iEvent = nTrainingEvents + nValidationEvents; iEvent < numberOfEvents; ++iEvent) {
+        training_data.loadEvent(iEvent);
+        for (unsigned iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+          test_data->input[iEvent - nTrainingEvents - nValidationEvents][iFeature] = training_data.m_input[iFeature];
+        }
+        test_data->output[iEvent - nTrainingEvents - nValidationEvents][0] = training_data.m_target;
+      }
+
+      struct fann_train_data* data = fann_create_train(numberOfEvents, numberOfFeatures, 1);
       for (unsigned int iEvent = 0; iEvent < numberOfEvents; ++iEvent) {
         training_data.loadEvent(iEvent);
         for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
@@ -174,19 +193,102 @@ namespace Belle2 {
 
       if (m_specific_options.m_scale_features or m_specific_options.m_scale_target) {
         fann_scale_train(ann, data);
+        fann_scale_train(ann, train_data);
+        fann_scale_train(ann, valid_data);
+        fann_scale_train(ann, test_data);
       }
 
-      fann_randomize_weights(ann, -0.1, 0.1);
-      fann_train_on_data(ann, data, m_specific_options.m_max_epochs, m_specific_options.m_epochs_between_reports,
-                         m_specific_options.m_desired_error);
+      struct fann* bestANN = nullptr;
+      double bestRMS = 999.;
+      std::vector<double> bestTrainLog = {};
+      std::vector<double> bestValidLog = {};
+
+      // repeat training several times with different random start weights
+      for (unsigned int iRun = 0; iRun < m_specific_options.m_random_seeds; ++iRun) {
+        double bestValid = 999.;
+        std::vector<double> trainLog = {};
+        std::vector<double> validLog = {};
+        trainLog.assign(m_specific_options.m_max_epochs, 0.);
+        validLog.assign(m_specific_options.m_max_epochs, 0.);
+        int breakEpoch = 0;
+        struct fann* iRunANN = nullptr;
+        fann_randomize_weights(ann, -0.1, 0.1);
+        for (unsigned int iEpoch = 1; iEpoch <= m_specific_options.m_max_epochs; ++iEpoch) {
+          double mse;
+#ifdef HAS_OPENMP
+          if (m_specific_options.m_training_method != "FANN_TRAIN_INCREMENTAL") {
+            mse = trainingMethods[m_specific_options.m_training_method](ann, train_data, m_specific_options.m_number_of_threads);
+          } else {mse = parallel_fann::train_epoch_incremental_mod(ann, train_data);}
+#else
+          fann_set_training_algorithm(ann, trainingMethods[m_specific_options.m_training_method]);
+          mse = fann_train_epoch(ann, train_data);
+#endif
+          trainLog[iEpoch - 1] = mse;
+          // evaluate validation set
+          fann_reset_MSE(ann);
+
+#ifdef HAS_OPENMP
+          double valid_mse = parallel_fann::test_data_parallel(ann, valid_data, m_specific_options.m_number_of_threads);
+#else
+          double valid_mse = fann_test_data(ann, valid_data);
+#endif
+
+          validLog[iEpoch - 1] = valid_mse;
+          // keep weights for lowest validation error
+          if (valid_mse < bestValid) {
+            bestValid = valid_mse;
+            iRunANN = nullptr;
+            iRunANN = fann_copy(ann);
+          }
+          // break when validation error increases
+          if (iEpoch > m_specific_options.m_test_rate && valid_mse > validLog[iEpoch - m_specific_options.m_test_rate]) {
+            if (m_specific_options.m_verbose_mode) {
+              B2INFO("Training stopped in iEpoch " << iEpoch);
+              B2INFO("Train error: " << mse << ", valid error: " << valid_mse <<
+                     ", best valid: " << bestValid);
+            }
+            breakEpoch = iEpoch;
+            break;
+          }
+          // print current status
+          if (iEpoch == 1 || (iEpoch < 100 && iEpoch % 10 == 0) || iEpoch % 100 == 0) {
+            if (m_specific_options.m_verbose_mode) B2INFO("Epoch " << iEpoch << ": Train error = " << mse <<
+                                                            ", valid error = " << valid_mse << ", best valid = " << bestValid);
+          }
+        }
+
+        // test trained network
+
+#ifdef HAS_OPENMP
+        double test_mse = parallel_fann::test_data_parallel(iRunANN, test_data, m_specific_options.m_number_of_threads);
+#else
+        double test_mse = fann_test_data(iRunANN, test_data);
+#endif
+
+        double RMS = sqrt(test_mse);
+
+        if (RMS < bestRMS) {
+          bestRMS = RMS;
+          bestANN = nullptr;
+          bestANN = fann_copy(iRunANN);
+          fann_destroy(iRunANN);
+          bestTrainLog.assign(trainLog.begin(), trainLog.begin() + breakEpoch);
+          bestValidLog.assign(validLog.begin(), validLog.begin() + breakEpoch);
+        }
+        if (m_specific_options.m_verbose_mode) B2INFO("RMS on test samples: " << RMS << " (best: " << bestRMS << ")");
+      }
 
       fann_destroy_train(data);
+      fann_destroy_train(train_data);
+      fann_destroy_train(valid_data);
+      fann_destroy_train(test_data);
+      fann_destroy(ann);
 
       Weightfile weightfile;
       std::string custom_weightfile = weightfile.getFileName();
 
-      fann_save(ann, custom_weightfile.c_str());
-      fann_destroy(ann);
+      fann_save(bestANN, custom_weightfile.c_str());
+      fann_destroy(bestANN);
 
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
@@ -228,10 +330,10 @@ namespace Belle2 {
         for (unsigned int iFeature = 0; iFeature < test_data.getNumberOfFeatures(); ++iFeature) {
           input[iFeature] = test_data.m_input[iFeature];
         }
-        fann_scale_input(m_ann, input.data());
+        if (m_specific_options.m_scale_features) fann_scale_input(m_ann, input.data());
         probabilities[iEvent] = fann_run(m_ann, input.data())[0];
       }
-
+      if (m_specific_options.m_scale_target) fann_descale_output(m_ann, probabilities.data());
       return probabilities;
     }
 

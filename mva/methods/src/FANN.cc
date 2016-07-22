@@ -141,6 +141,12 @@ namespace Belle2 {
         throw std::runtime_error("m_validation_fraction should be a number between 0 and 1 (0 < x < 1). numberOfEvents * m_validation_fraction has to be larger than one");
       }
 
+      if (nTrainingEvents < 1) {
+        B2ERROR("m_validation_fraction should be a number between 0 and 1 (0 < x < 1). The given value is " <<
+                m_specific_options.m_validation_fraction <<
+                ". The total number of events is " << numberOfEvents << ". numberOfEvents * (1 - m_validation_fraction) has to be larger than one");
+        throw std::runtime_error("m_validation_fraction should be a number between 0 and 1 (0 < x < 1). numberOfEvents * (1 - m_validation_fraction) has to be larger than one");
+      }
 
       // training set
       struct fann_train_data* train_data =

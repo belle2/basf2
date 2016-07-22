@@ -348,7 +348,7 @@ def massRave(
 def TagV(
     list_name,
     MCassociation='',
-    confidenceLevel=0.001,
+    confidenceLevel=0.,
     useFitAlgorithm='standard_PXD',
     askMCInfo=False,
     path=analysis_main,

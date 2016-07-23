@@ -127,74 +127,27 @@ buildRestOfEvent('B0:jspiks')
 TagV('B0:jspiks', 'breco', 0.001, 'standard_PXD')
 applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 
-# Before using the Flavor Tagger you need at least the default weight files for the employed release:
+# Before using the Flavor Tagger you need at least the default weight files. If you do not set
+# any parameter the flavorTagger downloads them automatically from the database.
+# You just have to specify the system build or revision you are using!!!
+
+# Alternatively you can download them from my realease:
 # copy the folder in @login.cc.kek.jp:
-# scp -r /home/belle2/abudinen/public/Belle/FT-build-20xx-xx-xx/FlavorTagging
+# scp -r /home/belle2/abudinen/public/FT-build-20xx-xx-xx/FlavorTagging
 # into your workingDirectory/.
 # The default working directory is '.'
-# If you have an own analysis package it is recomended to have a dedicated folder for Belle weight files
-# workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data/Belle'.
+# If you have an own analysis package it is recomended to use
+# workingDirectory = os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data'.
 # Note that if you also train by yourself the weights of the trained Methods are saved therein.
 #
+# NEVER set uploadToDatabaseAfterTraining to True if you are not a librarian!!!
+#
 # Flavor Tagging Function. Default Expert mode to use the default weight files for the B2JpsiKs_mu channel.
-# FlavorTagger(mode='Expert', weightFiles='B2JpsiKs_mu')
 flavorTagger(
     particleList='B0:jspiks',
-    mode='Expert',
-    weightFiles='B2JpsiKs_mu',
     combinerMethods=['TMVA-FBDT', 'FANN-MLP'],
-    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data/Belle',
-    categories=[
-        'Electron',
-        'IntermediateElectron',
-        'Muon',
-        'IntermediateMuon',
-        'KinLepton',
-        'IntermediateKinLepton',
-        'Kaon',
-        'SlowPion',
-        'FastPion',
-        'Lambda',
-        'FSC',
-        'MaximumPstar',
-        'KaonPion'],
-    belleOrBelle2='Belle2')
-#
-# If you want to train the Flavor Tagger by yourself you have to specify the name of the weight files and the categories
-# you want to use like:
-#
-# FlavorTagger(mode = 'Teacher', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
-#
-# Instead of the default name 'B2JpsiKs_mu' is better to use the abbreviation of your decay channel.
-# If you do not specify any category combination, the default one (all categories) is choosed either in 'Teacher' or 'Expert' mode:
-#
-# All available categories are:
-# [
-# 'Electron',
-# 'IntermediateElectron',
-# 'Muon',
-# 'IntermediateMuon',
-# 'KinLepton',
-# 'IntermediateKinLepton',
-# 'Kaon',
-# 'SlowPion',
-# 'FastPion',
-# 'Lambda',
-# 'FSC',
-# 'MaximumPstar',
-# 'KaonPion']
-#
-# If you train by yourself you need to run this file 3 times (in order to train track, event and combiner levels)
-# with 3 different samples of 500k events.
-# Three different 500k events samples are needed in order to avoid biases between levels.
-# You can also train track and event level for all categories (1st and 2nd runs) and then train the combiner
-# for a specific combination (3rd run).
-# It is also possible to train different combiners consecutively using the same weightFiles name.
-# You just need always to specify the desired category combination while using the expert mode as:
-#
-# FlavorTagger(mode = 'Expert', weightFiles='B2JpsiKs_mu', categories=['Electron', 'Muon', 'Kaon', ... etc.])
-#
-# Another possibility is to train a combiner for a specific category combination using the default weight files
+    workingDirectory=os.environ['BELLE2_LOCAL_DIR'] + '/analysis/data',
+    belleOrBelle2='Belle')
 #
 # By default the FlavorTagger trains and applies two methods, 'TMVA-FBDT' and 'FANN-MLP', for the combiner.
 # If you want to train or test the Flavor Tagger only for one of them you have to specify it like:
@@ -203,8 +156,8 @@ flavorTagger(
 #
 # With the belleOrBelle2 argument you specify if you are using Belle MC (also Belle Data) or Belle2 MC.
 # If you want to use Belle2 MC please follow the dedicated tutorial B2A801-FlavorTagger.py
-# since you do not need to follow the special module order and the framework conversion done here.
-
+# since you need to follow a special module order.
+#
 
 # create and fill flat Ntuple with MCTruth and kinematic information
 toolsK0 = ['EventMetaData', '^K_S0']

@@ -3,7 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Thomas Keck                                              *
+ * Contributors: Thomas Keck and Fernando Abudinen                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

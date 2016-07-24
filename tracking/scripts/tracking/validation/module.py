@@ -13,10 +13,7 @@ from .plot import ValidationPlot, compose_axis_label
 from .pull import PullAnalysis
 from .resolution import ResolutionAnalysis
 from .fom import ValidationFiguresOfMerit
-
-from .mc_side_module import MCSideTrackingValidationModule
-from .pr_side_module import PRSideTrackingValidationModule
-from .eventwise_module import EventwiseTrackingValidationModule
+from .utilities import getHelixFromMCParticle, getSeedTrackFitResult
 
 import basf2
 
@@ -26,76 +23,11 @@ import ROOT
 ROOT.gSystem.Load("libtracking")
 from ROOT import Belle2
 
-
-class SeparatedTrackingValidationModule(metamodules.PathModule):
-
-    MCSideModule = MCSideTrackingValidationModule
-    PRSideModule = PRSideTrackingValidationModule
-    EventwiseModule = EventwiseTrackingValidationModule
-
-    def __init__(self,
-                 name,
-                 contact,
-                 output_file_name=None,
-                 track_cands_name="TrackCands",
-                 mc_track_cands_name="MCTrackCands",
-                 expert_level=None):
-
-        # Output TFile to be opened in the initialize methode
-        self.output_file_name = output_file_name
-
-        # First forward the output_file_name to the separate modules
-        # but we open the TFile in the top level and forward it to them on initialize.
-
-        eventwise_module = self.EventwiseModule(name,
-                                                contact,
-                                                output_file_name=output_file_name,
-                                                track_cands_name=track_cands_name,
-                                                mc_track_cands_name=mc_track_cands_name,
-                                                expert_level=expert_level)
-
-        pr_side_module = self.PRSideModule(name,
-                                           contact,
-                                           output_file_name=output_file_name,
-                                           track_cands_name=track_cands_name,
-                                           mc_track_cands_name=mc_track_cands_name,
-                                           expert_level=expert_level)
-
-        mc_side_module = self.MCSideModule(name,
-                                           contact,
-                                           output_file_name=output_file_name,
-                                           track_cands_name=track_cands_name,
-                                           mc_track_cands_name=mc_track_cands_name,
-                                           expert_level=expert_level)
-
-        self.modules = [
-            eventwise_module,
-            pr_side_module,
-            mc_side_module,
-        ]
-
-        super().__init__(modules=self.modules)
-
-    def initialize(self):
-        super().initialize()
-        output_tfile = ROOT.TFile(self.output_file_name, "RECREATE")
-
-        # Substitute the output file with the common output file opened in this module.
-        for module in self.modules:
-            module.output_file_name = output_tfile
-
-        self.output_tfile = output_tfile
-
-    def terminate(self):
-        self.output_tfile.Flush()
-        self.output_tfile.Close()
-        super().terminate()
-
-
 # contains all informations necessary for track filters to decide whether
 # track will be included into the processed list of tracks
 # This class is used for both providing information on pattern reco and
 # MC tracks
+
 
 class FilterProperties(object):
 
@@ -714,43 +646,6 @@ clone_rate - ratio of clones divided the number of tracks that are related to a 
                 validation_plots.append(profile_plot)
 
         return validation_plots
-
-
-def getHelixFromMCParticle(mcParticle):
-    position = mcParticle.getVertex()
-    momentum = mcParticle.getMomentum()
-    charge_sign = (-1 if mcParticle.getCharge() < 0 else 1)
-    b_field = 1.5
-
-    seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
-    return seed_helix
-
-
-def getSeedTrackFitResult(trackCand):
-    position = trackCand.getPositionSeed()
-    momentum = trackCand.getMomentumSeed()
-    cartesian_covariance = trackCand.getSeedCovariance()
-    charge_sign = (-1 if trackCand.getChargeSeed() < 0 else 1)
-    # It does not matter, which particle we put in here, so we just use a pion
-    particle_type = Belle2.Const.pion
-    p_value = float('nan')
-    b_field = 1.5
-    cdc_hit_pattern = 0
-    svd_hit_pattern = 0
-
-    track_fit_result = Belle2.TrackFitResult(
-        position,
-        momentum,
-        cartesian_covariance,
-        charge_sign,
-        particle_type,
-        p_value,
-        b_field,
-        cdc_hit_pattern,
-        svd_hit_pattern,
-    )
-
-    return track_fit_result
 
 
 def main():

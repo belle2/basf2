@@ -69,7 +69,9 @@ namespace Belle2 {
 
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitCreator>;
+
   public:
+    /// Constructor setting the default store vector names
     WireHitCreatorModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
@@ -81,7 +83,9 @@ namespace Belle2 {
 
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller>;
+
   public:
+    /// Constructor setting the default store vector names
     WireHitTopologyFillerModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
@@ -93,7 +97,9 @@ namespace Belle2 {
 
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SuperClusterCreator>;
+
   public:
+    /// Constructor setting the default store vector names
     SuperClusterCreatorModule() : Super{{{"CDCWireHitVector", "CDCWireHitSuperClusterVector"}}} {}
   };
 
@@ -105,7 +111,9 @@ namespace Belle2 {
 
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterRefiner<> >;
+
   public:
+    /// Constructor setting the default store vector names
     ClusterRefinerModule() : Super{{{"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"}}} {}
   };
 
@@ -118,7 +126,9 @@ namespace Belle2 {
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::ClusterBackgroundDetector<
                   TrackFindingCDC::ChooseableClusterFilter> >;
+
   public:
+    /// Constructor setting the default store vector names
     ClusterBackgroundDetectorModule() : Super{{{"CDCWireHitClusterVector"}}} {}
   };
 
@@ -134,6 +144,7 @@ namespace Belle2 {
                   TrackFindingCDC::ChooseableFacetFilter> >;
 
   public:
+    /// Constructor setting the default store vector names
     FacetCreatorModule() : Super{{{"CDCWireHitClusterVector", "CDCFacetVector"}}} {}
   };
 
@@ -142,10 +153,12 @@ namespace Belle2 {
    */
   class SegmentCreatorFacetAutomatonModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton> {
-  public:
+
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorFacetAutomaton>;
 
+  public:
+    /// Constructor setting the default store vector names
     SegmentCreatorFacetAutomatonModule() : Super{{{"CDCFacetVector", "" /*to be set externally*/}}} {}
   };
 
@@ -183,9 +196,12 @@ namespace Belle2 {
    */
   class SegmentCreatorMCTruthModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth> {
-  public:
+
     /// Type of the base class
     using Super =  TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentCreatorMCTruth>;
+
+  public:
+    /// Constructor setting the default store vector names
     SegmentCreatorMCTruthModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
   };
 
@@ -199,6 +215,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::AxialTrackCreatorSegmentHough>;
 
   public:
+    /// Constructor setting the default store vector names
     AxialTrackCreatorSegmentHoughModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
   };
 
@@ -214,6 +231,7 @@ namespace Belle2 {
                   TrackFindingCDC::SimpleAxialSegmentPairFilter> >;
 
   public:
+    /// Constructor setting the default store vector names
     AxialSegmentPairCreatorModule() : Super{{{"CDCRecoSegment2DVector", "CDCAxialSegmentPairVector"}}} {}
   };
 
@@ -229,6 +247,7 @@ namespace Belle2 {
                   TrackFindingCDC::ChooseableSegmentPairFilter> >;
 
   public:
+    /// Constructor setting the default store vector names
     SegmentPairCreatorModule() : Super{{{"CDCRecoSegment2DVector", "CDCSegmentPairVector"}}} {}
   };
 
@@ -245,6 +264,7 @@ namespace Belle2 {
                   TrackFindingCDC::SimpleSegmentTripleFilter> >;
 
   public:
+    /// Constructor setting the default store vector names
     SegmentTripleCreatorModule() : Super{{{"CDCRecoSegment2DVector", "CDCAxialSegmentVector", "CDCSegmentTripleVector"}}} {}
   };
 
@@ -254,10 +274,12 @@ namespace Belle2 {
    */
   class TrackCreatorSegmentPairAutomatonModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackCreatorSegmentPairAutomaton> {
-  public:
+
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackCreatorSegmentPairAutomaton>;
 
+  public:
+    /// Constructor setting the default store vector names
     TrackCreatorSegmentPairAutomatonModule() : Super{{{"CDCSegmentPairVector", "" /*to be set externally*/}}} {}
   };
 
@@ -266,10 +288,12 @@ namespace Belle2 {
    */
   class TrackCreatorSegmentTripleAutomatonModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackCreatorSegmentTripleAutomaton> {
-  public:
+
     /// Type of the base class
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackCreatorSegmentTripleAutomaton>;
 
+  public:
+    /// Constructor setting the default store vector names
     TrackCreatorSegmentTripleAutomatonModule() : Super{{{"CDCSegmentTripleVector", "" /*to be set externally*/}}} {}
   };
 
@@ -283,6 +307,7 @@ namespace Belle2 {
     using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackCreatorSingleSegments>;
 
   public:
+    /// Constructor setting the default store vector names
     TrackCreatorSingleSegmentsModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
   };
 
@@ -342,6 +367,7 @@ namespace Belle2 {
                   TrackFindingCDC::ChooseableFacetRelationFilter,
                   TrackFindingCDC::ChooseableSegmentRelationFilter> >;
   public:
+    /// Constructor setting the default store vector names
     SegmentFinderFacetAutomatonModule() : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}} {}
   };
 
@@ -360,6 +386,7 @@ namespace Belle2 {
                   TrackFindingCDC::ChooseableSegmentPairRelationFilter,
                   TrackFindingCDC::ChooseableTrackRelationFilter> >;
   public:
+    /// Constructor setting the default store vector names
     TrackFinderSegmentPairAutomatonModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
   };
 }

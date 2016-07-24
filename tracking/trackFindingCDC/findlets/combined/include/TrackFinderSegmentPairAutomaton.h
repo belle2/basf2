@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackMerger.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
@@ -68,7 +67,7 @@ namespace Belle2 {
         m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
       }
 
-      /// Processes the current event
+      /// Signal the beginning of a new event the current event
       void beginEvent() override
       {
         m_segmentPairs.clear();

@@ -19,6 +19,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /// Generates tracks from segments using a cellular automaton build from segment pairs.
     class TrackFinderCDCSegmentPairAutomatonModule
       : public FindletModule<TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
         ChooseableSegmentPairRelationFilter,

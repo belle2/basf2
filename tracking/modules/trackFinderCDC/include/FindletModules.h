@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
+#include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentTripleAutomaton.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
@@ -53,6 +54,7 @@
 
 #include <tracking/trackFindingCDC/filters/axialSegmentPair/SimpleAxialSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTriple/SimpleSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTripleRelation/SimpleSegmentTripleRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
@@ -388,5 +390,27 @@ namespace Belle2 {
   public:
     /// Constructor setting the default store vector names
     TrackFinderSegmentPairAutomatonModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
+  };
+
+
+  /*
+   * Combined Module using a combination of filters on segment triples
+   */
+  class TrackFinderSegmentTripleAutomatonModule:
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackFinderSegmentTripleAutomaton<
+    TrackFindingCDC::SimpleAxialSegmentPairFilter,
+    TrackFindingCDC::SimpleSegmentTripleFilter,
+    TrackFindingCDC::SimpleSegmentTripleRelationFilter,
+    TrackFindingCDC::ChooseableTrackRelationFilter> > {
+
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackFinderSegmentTripleAutomaton<
+                  TrackFindingCDC::SimpleAxialSegmentPairFilter,
+                  TrackFindingCDC::SimpleSegmentTripleFilter,
+                  TrackFindingCDC::SimpleSegmentTripleRelationFilter,
+                  TrackFindingCDC::ChooseableTrackRelationFilter> >;
+  public:
+    /// Constructor setting the default store vector names
+    TrackFinderSegmentTripleAutomatonModule() : Super{{{"CDCRecoSegment2DVector", "CDCTrackVector"}}} {}
   };
 }

@@ -6,7 +6,7 @@ import sys
 import os.path
 import basf2
 
-from trackfindingcdc.validation.recording import RecordingRun
+from trackfindingcdc.run.recording import RecordingRun
 
 import logging
 

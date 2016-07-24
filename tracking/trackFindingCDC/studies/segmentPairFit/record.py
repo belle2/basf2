@@ -20,7 +20,7 @@ from tracking.validation.plot import ValidationPlot
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 
-import trackfindingcdc.validation.cdc_peelers as cdc_peelers
+import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
 
 from trackfindingcdc import AxialStereoPairFitterModule
 

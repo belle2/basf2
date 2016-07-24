@@ -22,7 +22,7 @@ import tracking.harvest.peelers as peelers
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
 
-import trackfindingcdc.validation.cdc_peelers as cdc_peelers
+import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
 
 import logging
 

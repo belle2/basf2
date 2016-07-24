@@ -1009,6 +1009,17 @@ def variableToSignalSideExtraInfo(
     path.add_module(mod)
 
 
+def removeExtraInfo(particleLists=[], removeEventExtraInfo=False, path=analysis_main):
+    """
+    Removes the ExtraInfo of the given particleLists. If specified (removeEventExtraInfo = True) also the EventExtraInfo is removed.
+    """
+
+    mod = register_module('ExtraInfoRemover')
+    mod.param('particleLists', particleLists)
+    mod.param('removeEventExtraInfo', removeEventExtraInfo)
+    path.add_module(mod)
+
+
 def signalSideParticleFilter(
     particleList,
     selection,

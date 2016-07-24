@@ -71,6 +71,7 @@ namespace Belle2 {
           if (xRot[0] < 0 and xRot[1] < 0) return ESign::c_Invalid;
         }
 
+        // cppcheck-suppress unreadVariable
         std::array<float, 4> xRotCor;
         xRotCor[0b00] = xRot[0] + dxdzRot[0] * s[0] * static_cast<float>(tanL[0]);
         xRotCor[0b01] = xRot[0] + dxdzRot[0] * s[0] * static_cast<float>(tanL[1]);

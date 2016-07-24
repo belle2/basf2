@@ -27,7 +27,7 @@ void NtupleFlavorTaggingTool::setupTree()
   if (strNames.empty()) return;
   int nDecayProducts = strNames.size();
 
-  qrCombinedTMVA = new float[nDecayProducts];
+  qrCombinedFBDT = new float[nDecayProducts];
   qrCombinedFANN = new float[nDecayProducts];
   qrMC = new float[nDecayProducts];
   string method("");
@@ -41,7 +41,8 @@ void NtupleFlavorTaggingTool::setupTree()
   }
 
   if (m_strOption.empty()) {
-    m_useTMVA = true;
+    m_useFBDT = true;
+    m_useFANN = true;
     B2INFO("Flavor Tagger Output saved for default Multivariate Method: No arguments given.");
   } else {
 
@@ -56,10 +57,10 @@ void NtupleFlavorTaggingTool::setupTree()
 
     for (auto& optioni : optionsVector) {
 
-      if (optioni == "TMVA") {
-        B2INFO("Flavor Tagger Output saved for TMVA Multivariate Method");
-        m_useTMVA = true;
-      } else if (optioni == "FANN") {
+      if (optioni == "TMVA-FBDT") {
+        B2INFO("Flavor Tagger Output saved for FBDT Multivariate Method");
+        m_useFBDT = true;
+      } else if (optioni == "FANN-MLP") {
         B2INFO("Flavor Tagger Output saved for FANN Multivariate Method");
         m_useFANN = true;
       } else if (optioni == "qrCategories") {
@@ -67,7 +68,7 @@ void NtupleFlavorTaggingTool::setupTree()
         m_saveCategories = true;
       } else {
         B2FATAL("Invalid option used for Flavor Tagger ntuple tool: " << m_strOption <<
-                ". Write 'TMVA' and/or 'FANN' to save the Flavor Tagger Output related to these combiner methods or leave the option empty to use the default TMVA Method"
+                ". Write 'FBDT' and/or 'FANN' to save the Flavor Tagger Output related to these combiner methods or leave the option empty to use the default FBDT Method"
                 <<
                 ". Write 'qrCategories' to save the qr output of all used categories");
       }
@@ -77,8 +78,8 @@ void NtupleFlavorTaggingTool::setupTree()
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
 
-    if (m_useTMVA == true) m_tree->Branch((strNames[iProduct] + "_TMVA_qrCombined").c_str(), &qrCombinedTMVA[iProduct],
-                                            (strNames[iProduct] + "_TMVA_qrCombined/F").c_str());
+    if (m_useFBDT == true) m_tree->Branch((strNames[iProduct] + "_FBDT_qrCombined").c_str(), &qrCombinedFBDT[iProduct],
+                                            (strNames[iProduct] + "_FBDT_qrCombined/F").c_str());
 
     if (m_useFANN == true) m_tree->Branch((strNames[iProduct] + "_FANN_qrCombined").c_str(), &qrCombinedFANN[iProduct],
                                             (strNames[iProduct] + "_FANN_qrCombined/F").c_str());
@@ -109,7 +110,7 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
   int nDecayProducts = selparticles.size();
   for (int iProduct = 0; iProduct < nDecayProducts; iProduct++) {
 
-    qrCombinedTMVA[iProduct] = -2;
+    qrCombinedFBDT[iProduct] = -2;
     qrCombinedFANN[iProduct] = -2;
     qrMC[iProduct] = 0;
 
@@ -120,14 +121,14 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
 //       method[iProduct] = flavTag->getMethod();
       if (Variable::hasRestOfEventTracks(selparticles[iProduct]) > 0) {
 
-        if (m_useTMVA == true) qrCombinedTMVA[iProduct] = flavorTaggerInfo->getMethodMap("TMVA")->getQrCombined();
+        if (m_useFBDT == true) qrCombinedFBDT[iProduct] = flavorTaggerInfo->getMethodMap("FBDT")->getQrCombined();
         if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();
 
         if (m_saveCategories == true) {
           for (auto& categoryEntry : m_qrCategories) {
             categoryEntry.second[iProduct] = 0;
           }
-          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("TMVA")-> getQrCategory();
+          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQrCategory();
 
           for (auto& categoryEntry : iQrCategories) {
             m_qrCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;

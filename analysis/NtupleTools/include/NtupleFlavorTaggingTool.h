@@ -33,10 +33,10 @@ namespace Belle2 {
 
 
     /** Flag to save the Flavor Tagger Output using the FANN Output. This is the Default */
-    bool m_useTMVA;
+    bool m_useFBDT;
 
     /**< qr Output of the Combiner. Output of the FlavorTagger using the FANN MLP method as combiner after the complete process*/
-    float* qrCombinedTMVA;
+    float* qrCombinedFBDT;
 
     /** Flag to save the Flavor Tagger Output using the FANN Output.  */
     bool m_useFANN;
@@ -62,7 +62,7 @@ namespace Belle2 {
           decaydescriptor, strOptions)
     {
       m_useFANN = false;
-      m_useTMVA = false;
+      m_useFBDT = false;
       m_saveCategories = false;
       setupTree();
     }

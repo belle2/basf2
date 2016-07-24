@@ -117,8 +117,8 @@ totalBranches = []
 for branch in tree.GetListOfBranches():
     totalBranches.append(branch.GetName())
 
-if 'B0_TMVA_qrCombined' in totalBranches:
-    methods.append("TMVA")
+if 'B0_FBDT_qrCombined' in totalBranches:
+    methods.append("FBDT")
 
 if 'B0_FANN_qrCombined' in totalBranches:
     methods.append("FANN")

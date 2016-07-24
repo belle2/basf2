@@ -57,13 +57,13 @@ def is_stable_in_generator(mc_particle):
     return mc_particle.hasStatus(Belle2.MCParticle.c_StableInGenerator)
 
 
-def get_det_hit_ids(track_cand, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Belle2.Const.CDC]):
-    """Retrieves the hit ids contained in the track candidate for the given detector ids
+def get_det_hit_ids(reco_track, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Belle2.Const.CDC]):
+    """Retrieves the hit ids contained in the track for the given detector ids
 
     Parameters
     ----------
-    track_cand : genfit::TrackCand
-        Track candidate
+    reco_track : RecoTrack
+        Track
     det_ids : list(int)
         List of the detector ids for which the hit ids should be retrieved
 
@@ -75,11 +75,11 @@ def get_det_hit_ids(track_cand, det_ids=[Belle2.Const.PXD, Belle2.Const.SVD, Bel
     det_hit_ids = set()
     for det_id in det_ids:
         if det_id == Belle2.Const.CDC:
-            hits = track_cand.getCDCHitList()
+            hits = reco_track.getCDCHitList()
         elif det_id == Belle2.Const.SVD:
-            hits = track_cand.getSVDHitList()
+            hits = reco_track.getSVDHitList()
         elif det_id == Belle2.Const.PXD:
-            hits = track_cand.getPXDHitList()
+            hits = reco_track.getPXDHitList()
         else:
             raise ValueError("DET ID not known.")
 
@@ -141,22 +141,23 @@ def calc_hit_efficiency(det_hit_ids,
                      calc_ndf_from_det_hit_ids(mc_det_hit_ids))
 
 
-def getHelixFromMCParticle(mcParticle):
-    position = mcParticle.getVertex()
-    momentum = mcParticle.getMomentum()
-    charge_sign = (-1 if mcParticle.getCharge() < 0 else 1)
+def getHelixFromMCParticle(mc_particle):
+    position = mc_particle.getVertex()
+    momentum = mc_particle.getMomentum()
+    charge_sign = (-1 if mc_particle.getCharge() < 0 else 1)
     b_field = 1.5
 
     seed_helix = Belle2.Helix(position, momentum, charge_sign, b_field)
     return seed_helix
 
 
-def getSeedTrackFitResult(trackCand):
-    position = trackCand.getPosSeed()
-    momentum = trackCand.getMomSeed()
-    cartesian_covariance = trackCand.getCovSeed()
-    charge_sign = (-1 if trackCand.getChargeSeed() < 0 else 1)
-    particle_type = Belle2.Const.ParticleType(trackCand.getPdgCode())
+def getSeedTrackFitResult(reco_track):
+    position = reco_track.getPositionSeed()
+    momentum = reco_track.getMomentumSeed()
+    cartesian_covariance = reco_track.getSeedCovariance()
+    charge_sign = (-1 if reco_track.getChargeSeed() < 0 else 1)
+    # It does not matter, which particle we put in here, so we just use a pion
+    particle_type = Belle2.Const.pion
     p_value = float('nan')
     b_field = 1.5
     cdc_hit_pattern = 0

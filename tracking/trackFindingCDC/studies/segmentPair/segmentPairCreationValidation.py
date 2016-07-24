@@ -25,11 +25,6 @@ import tracking.metamodules as metamodules
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
-from trackfindingcdc import (
-    SegmentFitterModule
-)
-
-
 import logging
 
 
@@ -66,7 +61,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
         segment_finder_module = self.get_basf2_module(self.segment_finder_module)
         main_path.add_module(segment_finder_module)
 
-        main_path.add_module(SegmentFitterModule())
+        main_path.add_module("SegmentFitterModule")
 
         segment_pair_finder_module = self.get_basf2_module(self.segment_pair_finder_module)
         main_path.add_module(segment_pair_finder_module)

@@ -352,11 +352,11 @@ void CDCSVGPlotter::drawAxialStereoSegmentPairs(const std::string& storeObjName,
 }
 
 void CDCSVGPlotter::drawCDCWireHitClusters(const std::string& storeObjName,
-                                           const std::string& stroke,
+                                           const std::string&,
                                            const std::string&)
 {
   StoreWrappedObjPtr<std::vector<CDCWireHitCluster>> storedCDCWireHitClusters(storeObjName);
-  drawStoreVector<ListColorsColorizer<CDCWireHitCluster>>(storedCDCWireHitClusters, storeObjName, stroke);
+  drawStoreVector<ListColorsColorizer<CDCWireHitCluster>>(storedCDCWireHitClusters, storeObjName);
 }
 
 void CDCSVGPlotter::drawSegmentTrajectories(const std::string& storeObjName,

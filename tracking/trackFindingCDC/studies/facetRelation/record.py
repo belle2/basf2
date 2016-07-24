@@ -22,12 +22,12 @@ class CDCFacetRelationRecordingRun(RecordingRun):
     recording_filter_parameter_name = "FacetRelationFilterParameters"
 
     recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton",
-                                                    FacetUpdateDriftLength=True, 
+                                                    FacetUpdateDriftLength=True,
                                                     FacetFilter="chi2")
 
     recording_finder_module.param({
         "FacetRelationFilter": "unionrecording",
-        recording_filter_parameter_name : {
+        recording_filter_parameter_name: {
             "rootFileName": root_output_file_name,
             "varsets": varsets,
         },

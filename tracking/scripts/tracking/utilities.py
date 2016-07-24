@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import functools
-
 import argparse
 
 
@@ -48,19 +46,3 @@ class NonstrictChoices(list):
         copy = list(self)
         copy.append('...')
         return str(copy)
-
-
-def coroutine(generator_func):
-
-    """Famous coroutine decorator.
-
-    Starts a receiving generator function to the first yield,
-    such that it can receive a send call immediatly.
-    """
-
-    @functools.wraps(generator_func)
-    def start(*args, **kwargs):
-        cr = generator_func(*args, **kwargs)
-        next(cr)
-        return cr
-    return start

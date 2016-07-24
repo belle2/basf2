@@ -7,13 +7,13 @@ import collections
 import array
 import numpy as np
 import types
+import functools
 
 import basf2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
 from tracking.modules import BrowseTFileOnTerminateModule
-from tracking.utilities import coroutine
 from tracking.root_utils import root_cd, root_browse
 from .refiners import Refiner
 
@@ -47,6 +47,21 @@ class AttributeDict(dict):
     def __getattr__(self, name):
         """If the name is not an attribute of the object, try to look it up as an item instead."""
         return self[name]
+
+
+def coroutine(generator_func):
+    """Famous coroutine decorator.
+
+    Starts a receiving generator function to the first yield,
+    such that it can receive a send call immediatly.
+    """
+
+    @functools.wraps(generator_func)
+    def start(*args, **kwargs):
+        cr = generator_func(*args, **kwargs)
+        next(cr)
+        return cr
+    return start
 
 
 def harvest(foreach="", pick=None, name=None, output_file_name=None, show_results=False):

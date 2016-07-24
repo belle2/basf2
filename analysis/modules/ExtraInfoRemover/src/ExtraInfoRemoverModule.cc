@@ -3,7 +3,7 @@
 * Copyright(C) 2010 - Belle II Collaboration                             *
 *                                                                        *
 * Author: The Belle II Collaboration                                     *
-* Contributors: Phillip Urquijo                                          *
+* Contributors: Fernando Abudinen                                        *
 *                                                                        *
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
@@ -39,13 +39,13 @@ void ExtraInfoRemoverModule::event()
 
   for (auto& iList :  m_strParticleLists) {
 
-    StoreObjPtr<ParticleList> particlelist(iList);
-    if (!particlelist.isValid()) {
+    StoreObjPtr<ParticleList> particleList(iList);
+    if (!particleList.isValid()) {
       B2INFO("ParticleList " << iList << " not found");
       continue;
     } else {
-      for (unsigned int i = 0; i < particlelist->getListSize(); ++i) {
-        Particle* iParticle =  particlelist ->getParticle(i);
+      for (unsigned int i = 0; i < particleList->getListSize(); ++i) {
+        Particle* iParticle =  particleList ->getParticle(i);
         iParticle->removeExtraInfo();
       }
     }

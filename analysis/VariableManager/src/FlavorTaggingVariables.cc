@@ -13,7 +13,6 @@
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
 
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/utility/MCMatching.h>
 
 // framework - DataStore

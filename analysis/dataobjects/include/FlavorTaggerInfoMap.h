@@ -71,7 +71,7 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param track pointer to track object
     */
-    void setTargetTrackLevel(std::string category, Belle2::Track* track);
+    void setTargetTrackLevel(std::string category, const Belle2::Track* track);
 
     /**
     * Map filler: Set the category name and the corresponding highest target track probability.
@@ -86,7 +86,7 @@ namespace Belle2 {
     * @param category string name of the given category
     * @param track pointer to track object
     */
-    void setTargetEventLevel(std::string category, Belle2::Track* track);
+    void setTargetEventLevel(std::string category, const Belle2::Track* track);
 
     /**
     * Map filler: Set the category name and the highest category probability for the corresponding
@@ -131,7 +131,7 @@ namespace Belle2 {
     /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level
     * @return map
     */
-    std::map<std::string, Belle2::Track*> getTargetTrackLevel();
+    std::map<std::string, const Belle2::Track*> getTargetTrackLevel();
 
     /**< map containing the category name and thecorresponding highest target track probability in Track Level
     * @return map
@@ -141,7 +141,7 @@ namespace Belle2 {
     /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level
     * @return map
     */
-    std::map<std::string, Belle2::Track*> getTargetEventLevel();
+    std::map<std::string, const Belle2::Track*> getTargetEventLevel();
 
     /**< map containing the category name and the corresponding highest category probability in Event Level
     * @return map
@@ -175,11 +175,11 @@ namespace Belle2 {
 
     // Track, Event and Combiner Level Flavor Tagger Info
 
-    std::map<std::string, Belle2::Track*>
+    std::map<std::string, const Belle2::Track*>
     m_targetTrackLevel; /**< map containing the category name and the corresponding pointer to the track with highest target probability in Track Level*/
     std::map<std::string, float>
     m_probTrackLevel; /**< map containing the category name and thecorresponding highest target track probability in Track Level*/
-    std::map<std::string, Belle2::Track*>
+    std::map<std::string, const Belle2::Track*>
     m_targetEventLevel; /**< map containing the category name and the corresponding pointer to the track with highest category probability in Event Level*/
     std::map<std::string, float>
     m_probEventLevel; /**< map containing the category name and the corresponding highest category probability in Event Level*/

@@ -3,8 +3,7 @@
 
 # *************  Flavor Tagging   ************
 # * Authors: Fernando Abudinen, Moritz Gelb  *
-# *.....     and Thomas Keck
-# * Contributor: Christian Roca
+# *.....     and Thomas Keck                 *
 # * This script is needed to train           *
 # * and to test the flavor tagger.           *
 # ********************************************
@@ -16,133 +15,6 @@ import variables as mc_variables
 from ROOT import Belle2
 import os
 import glob
-
-
-class flavorTaggerInfoFiller(Module):
-
-    """
-    Creates a new flavorTaggerInfoMap DataObject for a specific method. Saves there all the relevant information of the
-    flavorTagger:
-    -The pointer to the track with highest target probability in Track Level for each category*/
-    -The highest target track probability in Track Level for each category*/
-    -The pointer to the track with highest category probability in Event Level*/
-    -The highest category probability in Event Level for each category*/
-    -The qr Output of each category, i.e. the Combiner input values. They could be used for independent tags.*/
-
-    -qr Output of the Combiner.
-    -Direct Output of the Combiner: Probability of being a B0.*/
-    -Direct Output of the Combiner: Probability of being a B0bar).*/
-    """
-
-    def event(self):
-        """ Process for each event """
-
-        path = analysis_main
-        info = Belle2.PyStoreObj('EventExtraInfo')  # Calls the event extra info were all Flavor Tagging Info is saved
-        weightFiles = 'B2JpsiKs_mu'
-
-        roe = Belle2.PyStoreObj('RestOfEvent')
-        flavorTaggerInfo = roe.obj().getRelated('FlavorTaggerInfos')
-
-        flavorTaggerInfo.setUseModeFlavorTagger("Expert")
-
-        infoMaps = dict()
-
-        if TMVAfbdt:
-            flavorTaggerInfo.addMethodMap("FBDT")
-            infoMaps["FBDT"] = flavorTaggerInfo.getMethodMap("FBDT")
-
-            qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedFBDT') - 0.5)
-            B0Probability = info.obj().getExtraInfo('qrCombinedFBDT')
-            B0barProbability = 1 - info.obj().getExtraInfo('qrCombinedFBDT')
-            infoMaps["FBDT"].setQrCombined(qrCombined)
-            infoMaps["FBDT"].setB0Probability(B0Probability)
-            infoMaps["FBDT"].setB0barProbability(B0barProbability)
-
-        if FANNmlp:
-            flavorTaggerInfo.addMethodMap("FANN")
-            infoMaps["FANN"] = flavorTaggerInfo.getMethodMap("FANN")
-
-            qrCombined = 2 * (info.obj().getExtraInfo('qrCombinedFANN') - 0.5)
-            B0Probability = info.obj().getExtraInfo('qrCombinedFANN')
-            B0barProbability = 1 - info.obj().getExtraInfo('qrCombinedFANN')
-            infoMaps["FANN"].setQrCombined(qrCombined)
-            infoMaps["FANN"].setB0Probability(B0Probability)
-            infoMaps["FANN"].setB0barProbability(B0barProbability)
-
-        if not flavorTaggerInfo:
-            B2ERROR('flavorTaggerInfoFiller: FlavorTaggerInfo does not exist')
-            return
-
-        for (particleList, category) in trackLevelParticleLists:
-            # Load the Particle list in Python after the cuts in Track Level
-            plist = Belle2.PyStoreObj(particleList)
-
-            # From the likelihood it is possible to have Kaon category with no actual kaons
-            if plist.obj().getListSize() == 0:
-                infoMaps["FBDT"].setTargetTrackLevel(category, None)
-                infoMaps["FBDT"].setProbTrackLevel(category, 0)
-
-            for i in range(0, plist.obj().getListSize()):
-                particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
-                if mc_variables.variables.evaluate(
-                        'hasHighestProbInCat(' + particleList + ',' + 'isRightTrack(' + category + '))',
-                        particle) == 1:
-                    # Prob of being the right target track
-                    targetProb = particle.getExtraInfo('isRightTrack(' + category + ')')
-                    track = particle.getTrack()  # Track of the particle
-                    infoMaps["FBDT"].setTargetTrackLevel(category, track)
-                    infoMaps["FBDT"].setProbTrackLevel(category, targetProb)
-                    break
-
-        for (particleList, category) in eventLevelParticleLists:
-            # Load the Particle list in Python after the cuts in Event Level
-            plist = Belle2.PyStoreObj(particleList)
-
-            # From the likelihood it is possible to have Kaon category with no actual kaons
-            if plist.obj().getListSize() == 0:
-                infoMaps["FBDT"].setTargetEventLevel(category, None)
-                infoMaps["FBDT"].setProbEventLevel(category, 0)
-                infoMaps["FBDT"].setQrCategory(category, 0)
-
-            for i in range(0, plist.obj().getListSize()):
-                particle = plist.obj().getParticle(i)  # Pointer to the particle with highest prob
-                if mc_variables.variables.evaluate(
-                        'hasHighestProbInCat(' + particleList + ',' + 'isRightCategory(' + category + '))',
-                        particle) == 1:
-                    # Prob of belonging to a cat
-                    categoryProb = particle.getExtraInfo('isRightCategory(' + category + ')')
-                    track = particle.getTrack()  # Track of the particle
-                    qrCategory = mc_variables.variables.evaluate(AvailableCategories[category][3], particle)
-
-                    # Save information in the FlavorTaggerInfo DataObject
-                    infoMaps["FBDT"].setTargetEventLevel(category, track)
-                    infoMaps["FBDT"].setProbEventLevel(category, categoryProb)
-                    infoMaps["FBDT"].setQrCategory(category, qrCategory)
-                    break
-
-
-def setModeCode(mode='Expert'):
-    """
-    Sets ModeCode= 0 for Teacher or =1 for Expert mode.
-    """
-
-    global ModeCode
-    if mode == 'Expert':
-        ModeCode = 1
-    else:
-        ModeCode = 0
-
-
-def getModeCode():
-    """
-    Gets the global ModeCode.
-    """
-
-    if ModeCode == 1:
-        return 1
-    else:
-        return 0
 
 
 def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='build-2016-07-25'):
@@ -335,7 +207,7 @@ def WhichCategories(categories=[
                     AvailableCategories[category][2]) \
                     not in eventLevelParticleLists:
                 eventLevelParticleLists.append((AvailableCategories[category][0],
-                                                AvailableCategories[category][2]))
+                                                AvailableCategories[category][2], AvailableCategories[category][3]))
                 variablesCombinerLevel.append(AvailableCategories[category][3])
                 categoriesCombination.append(AvailableCategories[category][4])
             else:
@@ -668,7 +540,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
     eventLevelPathsList = dict()
 
-    for (particleList, category) in eventLevelParticleLists:
+    for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
         eventLevelPath = create_path()
         SkipEmptyParticleList = register_module("SkimFilter")
@@ -751,7 +623,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
     ReadyMethods = 0
 
-    for (particleList, category) in eventLevelParticleLists:
+    for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
         methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
         targetVariable = 'isRightCategory(' + category + ')'
@@ -1080,7 +952,6 @@ def flavorTagger(
     B2INFO('    Working directory is: ' + filesDirectory)
     B2INFO(' ')
 
-    setModeCode(mode)
     setBelleOrBelle2AndRevision(belleOrBelle2, buildOrRevision)
     setInteractionWithDatabase(downloadFromDatabaseIfNotfound, uploadToDatabaseAfterTraining)
     WhichCategories(categories)
@@ -1096,7 +967,9 @@ def flavorTagger(
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':
         signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0', roe_path, deadEndPath)
-
+        # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
+        flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
+        path.add_module(flavorTaggerInfoBuilder)
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
         if FillParticleLists(mode, roe_path):
@@ -1104,12 +977,17 @@ def flavorTagger(
                 if eventLevel(mode, weightFiles, roe_path):
                     combinerLevel(mode, weightFiles, roe_path)
                     if mode == 'Expert':
-                            # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
-                        flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
-                        path.add_module(flavorTaggerInfoBuilder)
-                        roe_path.add_module(flavorTaggerInfoFiller())  # Add FlavorTag Info filler to roe_path
+                        flavorTaggerInfoFiller = register_module('FlavorTaggerInfoFiller')
+                        flavorTaggerInfoFiller.param('trackLevelParticleLists', trackLevelParticleLists)
+                        flavorTaggerInfoFiller.param('eventLevelParticleLists', eventLevelParticleLists)
+                        flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
+                        flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
+                        flavorTaggerInfoFiller.param('qrCategories', True)
+                        flavorTaggerInfoFiller.param('targetProb', True)
+                        flavorTaggerInfoFiller.param('trackPointers', True)
+                        roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
 
-        # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
+    # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists
     particleListsToRemoveExtraInfo = []
     for particleList in eventLevelParticleLists:
         if particleList[0] not in particleListsToRemoveExtraInfo:

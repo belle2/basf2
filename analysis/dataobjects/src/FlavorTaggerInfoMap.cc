@@ -17,9 +17,9 @@ using namespace Belle2;
 /************************SETTERS***********************/
 
 
-void FlavorTaggerInfoMap::setTargetTrackLevel(std::string category, Track* track)
+void FlavorTaggerInfoMap::setTargetTrackLevel(std::string category, const Track* track)
 {
-  m_targetTrackLevel.insert(std::pair<std::string, Track*>(category, track));
+  m_targetTrackLevel.insert(std::pair<std::string, const Track*>(category, track));
 }
 
 
@@ -29,9 +29,9 @@ void FlavorTaggerInfoMap::setProbTrackLevel(std::string category, float probabil
 }
 
 
-void FlavorTaggerInfoMap::setTargetEventLevel(std::string category, Belle2::Track* track)
+void FlavorTaggerInfoMap::setTargetEventLevel(std::string category, const Belle2::Track* track)
 {
-  m_targetEventLevel.insert(std::pair<std::string, Track*>(category, track));
+  m_targetEventLevel.insert(std::pair<std::string, const Track*>(category, track));
 }
 
 
@@ -67,7 +67,7 @@ void FlavorTaggerInfoMap::setB0barProbability(float B0barProbability)
 /************************GETTERS***********************/
 
 
-std::map<std::string, Belle2::Track*> FlavorTaggerInfoMap::getTargetTrackLevel()
+std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetTrackLevel()
 {
   return m_targetTrackLevel;
 }
@@ -77,7 +77,7 @@ std::map<std::string, float> FlavorTaggerInfoMap::getProbTrackLevel()
   return m_probTrackLevel;
 }
 
-std::map<std::string, Belle2::Track*> FlavorTaggerInfoMap::getTargetEventLevel()
+std::map<std::string, const Belle2::Track*> FlavorTaggerInfoMap::getTargetEventLevel()
 {
   return m_targetEventLevel;
 }

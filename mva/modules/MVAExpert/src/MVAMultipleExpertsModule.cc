@@ -63,6 +63,7 @@ namespace Belle2 {
     m_weightfile_representations.resize(m_identifiers.size());
     m_experts.resize(m_identifiers.size());
     m_individual_feature_variables.resize(m_identifiers.size());
+    m_datasets.resize(m_identifiers.size());
 
     for (unsigned int i = 0; i < m_identifiers.size(); ++i) {
       if (not(boost::ends_with(m_identifiers[i], ".root") or boost::ends_with(m_identifiers[i], ".xml"))) {

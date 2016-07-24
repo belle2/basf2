@@ -24,8 +24,6 @@ template<class ACDCHitCollection>
 void CDCMCHitCollectionLookUp<ACDCHitCollection>::clear()
 {
   B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
-  m_mcTrackIds.clear();
-  B2DEBUG(100, "m_mcTrackIds.size(): " <<  m_mcTrackIds.size());
 }
 
 
@@ -43,24 +41,13 @@ ITrackType
 CDCMCHitCollectionLookUp<ACDCHitCollection>
 ::getMCTrackId(const ACDCHitCollection* ptrHits) const
 {
-
   if (not ptrHits) return INVALID_ITRACK;
-
   const ACDCHitCollection& hits = *ptrHits;
-  auto itFound = m_mcTrackIds.find(ptrHits);
-
-  if (itFound == m_mcTrackIds.end()) {
-    MCTrackIdPurityPair mcTrackIdAndPurity = getHighestPurity(hits);
-    if (mcTrackIdAndPurity.getPurity() >= s_minimalMatchPurity) {
-      m_mcTrackIds[ptrHits] = mcTrackIdAndPurity.getMCTrackId();
-      return mcTrackIdAndPurity.getMCTrackId();
-    } else {
-      m_mcTrackIds[ptrHits] = INVALID_ITRACK;
-      return INVALID_ITRACK;
-    }
-
+  MCTrackIdPurityPair mcTrackIdAndPurity = getHighestPurity(hits);
+  if (mcTrackIdAndPurity.getPurity() >= s_minimalMatchPurity) {
+    return mcTrackIdAndPurity.getMCTrackId();
   } else {
-    return itFound->second;
+    return INVALID_ITRACK;
   }
 }
 

@@ -165,15 +165,7 @@ namespace Belle2 {
       /** Returns the trajectory of the collection of hits */
       CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
-    private:
-      /// Storage for the map from reconstructed collections of hits to their matched Monte Carlo Track Id
-      mutable std::map<const ACDCHitCollection*, ITrackType> m_mcTrackIds;
-
-
     }; //class
-
-
-
 
   } // end namespace TrackFindingCDC
 } // namespace Belle2

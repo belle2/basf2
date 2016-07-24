@@ -64,6 +64,11 @@ namespace Belle2 {
           adjacent_groupby(inputSegments.begin(), inputSegments.end(), getISuperCluster);
 
         for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster) {
+          if (segmentsInSuperCluster.size() == 1) {
+            // What is the difference between a duck?
+            outputSegments.push_back(segmentsInSuperCluster.at(0));
+            continue;
+          }
 
           m_symmetricSegmentsInSuperCluster.clear();
           m_symmetricSegmentsInSuperCluster.reserve(2 * segmentsInSuperCluster.size());

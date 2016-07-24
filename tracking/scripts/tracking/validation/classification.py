@@ -1,25 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tracking.validation.plot import ValidationPlot, compose_axis_label
-from tracking.validation.fom import ValidationFiguresOfMerit
-
-import tracking.validation.scores as scores
-
-# get error function as a np.ufunc vectorised for numpy array
-from tracking.validation.utilities import erf
-from tracking.root_utils import root_save_name
-import tracking.validation.statistics as statistics
-
+import numpy as np
 import math
 import collections
 import numbers
 import copy
 
-import numpy as np
+from tracking.root_utils import root_save_name
 
-from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+from . import scores
+from . import statistics
 
+from .plot import ValidationPlot, compose_axis_label
+from .fom import ValidationFiguresOfMerit
+# get error function as a np.ufunc vectorised for numpy array
+from .utilities import erf
+from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 

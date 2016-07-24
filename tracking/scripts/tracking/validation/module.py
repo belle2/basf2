@@ -5,18 +5,18 @@ import math
 import collections
 import numpy as np
 
-from tracking.validation.plot import ValidationPlot, root_save_name, \
-    compose_axis_label
-
-from tracking.validation.pull import PullAnalysis
-from tracking.validation.resolution import ResolutionAnalysis
-from tracking.validation.fom import ValidationFiguresOfMerit
-
-from tracking.validation.mc_side_module import MCSideTrackingValidationModule
-from tracking.validation.pr_side_module import PRSideTrackingValidationModule
-from tracking.validation.eventwise_module import EventwiseTrackingValidationModule
-
 import tracking.metamodules as metamodules
+from tracking.root_utils import root_save_name
+
+from .plot import ValidationPlot, compose_axis_label
+
+from .pull import PullAnalysis
+from .resolution import ResolutionAnalysis
+from .fom import ValidationFiguresOfMerit
+
+from .mc_side_module import MCSideTrackingValidationModule
+from .pr_side_module import PRSideTrackingValidationModule
+from .eventwise_module import EventwiseTrackingValidationModule
 
 import basf2
 

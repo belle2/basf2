@@ -8,7 +8,7 @@ import numpy as np
 np.seterr(invalid='ignore')
 
 import collections
-from tracking.validation.plot import ValidationPlot
+from .plot import ValidationPlot
 
 import logging
 

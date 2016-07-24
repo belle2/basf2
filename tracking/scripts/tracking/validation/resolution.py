@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from tracking.validation.plot import ValidationPlot, compose_axis_label, get_unit
+from .plot import ValidationPlot, compose_axis_label, get_unit
 
 # get error function as a np.ufunc vectorised for numpy array
-from tracking.validation.utilities import erf
+from .utilities import erf
 from tracking.root_utils import root_save_name
 
 import math
@@ -12,7 +12,7 @@ import collections
 
 import numpy as np
 
-from tracking.validation.tolerate_missing_key_formatter import TolerateMissingKeyFormatter
+from .tolerate_missing_key_formatter import TolerateMissingKeyFormatter
 
 formatter = TolerateMissingKeyFormatter()
 

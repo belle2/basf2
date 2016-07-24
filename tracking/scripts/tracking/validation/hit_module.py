@@ -8,11 +8,17 @@ import numpy as np
 # Need for B2WARNING for some reason
 import inspect
 
-from tracking.validation.pull import PullAnalysis
-from tracking.validation.fom import ValidationFiguresOfMerit, \
+from .pull import PullAnalysis
+from .fom import (
+    ValidationFiguresOfMerit,
     ValidationManyFiguresOfMerit
-from tracking.validation.module import AlwaysPassFilter, \
-    getHelixFromMCParticle, TrackingValidationModule
+    )
+
+from .module import (
+    AlwaysPassFilter,
+    getHelixFromMCParticle,
+    TrackingValidationModule
+    )
 
 import basf2
 

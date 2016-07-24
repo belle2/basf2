@@ -12,7 +12,7 @@ import ROOT
 
 from tracking.root_utils import root_cd, root_save_name
 
-import tracking.validation.statistics as statistics
+from . import statistics
 
 import logging
 

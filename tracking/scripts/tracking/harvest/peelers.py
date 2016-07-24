@@ -92,10 +92,10 @@ def peel_mc_particle(mc_particle, key="{part_name}"):
 
 
 @format_crop_keys
-def peel_track_cand_hit_content(track_cand, key="{part_name}"):
-    n_pxd_hits = track_cand.getNumberOfCDCHits()
-    n_svd_hits = track_cand.getNumberOfSVDHits()
-    n_cdc_hits = track_cand.getNumberOfPXDHits()
+def peel_reco_track_hit_content(reco_track, key="{part_name}"):
+    n_pxd_hits = reco_track.getNumberOfCDCHits()
+    n_svd_hits = reco_track.getNumberOfSVDHits()
+    n_cdc_hits = reco_track.getNumberOfPXDHits()
     ndf = 2 * n_pxd_hits + 2 * n_svd_hits + n_cdc_hits
 
     return dict(
@@ -108,9 +108,9 @@ def peel_track_cand_hit_content(track_cand, key="{part_name}"):
 
 
 @format_crop_keys
-def peel_track_cand_seed(track_cand, key="{part_name}"):
-    if track_cand:
-        seed_fit_result = get_seed_track_fit_result(track_cand)
+def peel_reco_track_seed(reco_track, key="{part_name}"):
+    if reco_track:
+        seed_fit_result = get_seed_track_fit_result(reco_track)
         return peel_track_fit_result(seed_fit_result, key="seed_{part_name}")
 
     else:
@@ -217,11 +217,11 @@ def get_helix_from_mc_particle(mc_particle):
     return seed_helix
 
 
-def get_seed_track_fit_result(track_cand):
-    position = track_cand.getPositionSeed()
-    momentum = track_cand.getMomentumSeed()
-    cartesian_covariance = track_cand.getSeedCovariance()
-    charge_sign = (-1 if track_cand.getChargeSeed() < 0 else 1)
+def get_seed_track_fit_result(reco_track):
+    position = reco_track.getPositionSeed()
+    momentum = reco_track.getMomentumSeed()
+    cartesian_covariance = reco_track.getSeedCovariance()
+    charge_sign = (-1 if reco_track.getChargeSeed() < 0 else 1)
     # It does not matter, which particle we put in here, so we just use a pion
     particle_type = Belle2.Const.pion
     p_value = float('nan')

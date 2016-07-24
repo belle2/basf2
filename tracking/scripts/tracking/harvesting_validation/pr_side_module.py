@@ -11,8 +11,9 @@ import numpy as np
 
 import tracking.validation.harvesting as harvesting
 import tracking.validation.refiners as refiners
-import tracking.validation.peelers as peelers
 import tracking.validation.utilities as utilities
+
+import tracking.harvest.peelers as peelers
 
 
 class PRSideTrackingValidationModule(harvesting.HarvestingModule):
@@ -24,67 +25,67 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             name,
             contact,
             output_file_name=None,
-            trackCandidatesColumnName="RecoTracks",
-            mcTrackCandidatesColumnName='MCRecoTracks',
+            reco_tracks_name='RecoTracks',
+            mc_reco_tracks_name='MCRecoTracks',
             expert_level=None):
 
         output_file_name = output_file_name or name + 'TrackingValidation.root'
-        super().__init__(foreach=track_cands_name,
+        super().__init__(foreach=reco_tracks_name,
                          name=name,
                          contact=contact,
                          output_file_name=output_file_name,
                          expert_level=expert_level)
 
         #: Name of the StoreArray of the tracks from pattern recognition
-        self.track_cands_name = track_cands_name
+        self.reco_tracks_name = reco_tracks_name
 
         #: Name of the StoreArray of the ideal mc tracks
-        self.mc_track_cands_name = mc_track_cands_name
+        self.mc_reco_tracks_name = mc_reco_tracks_name
 
         #: Reference to the track match lookup object reading the relation information constructed by the MCMatcherTracksModule
         self.track_match_look_up = None
 
         #: Cache for the hit content of the Monte Carlo tracks - updated each event
-        self.mc_track_cands_det_hit_ids = []
+        self.mc_reco_tracks_det_hit_ids = []
 
     def initialize(self):
         """Receive signal at the start of event processing"""
         super().initialize()
-        self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_track_cands_name,
-                                                           self.track_cands_name)
+        self.track_match_look_up = Belle2.TrackMatchLookUp(self.mc_reco_tracks_name,
+                                                           self.reco_tracks_name)
 
     def prepare(self):
         """Called once at the start of each event"""
         super().prepare()
-        mc_track_cands = Belle2.PyStoreArray(self.mc_track_cands_name)
-        mc_track_cands_det_hit_ids = []
+        mc_reco_tracks = Belle2.PyStoreArray(self.mc_reco_tracks_name)
+        mc_reco_tracks_det_hit_ids = []
 
-        for mc_track_cand in mc_track_cands:
-            mc_track_cand_det_hit_ids = utilities.get_det_hit_ids(mc_track_cand)
-            mc_track_cands_det_hit_ids.append(mc_track_cand_det_hit_ids)
+        for mc_reco_track in mc_reco_tracks:
+            mc_reco_track_det_hit_ids = utilities.get_det_hit_ids(mc_reco_track)
+            mc_reco_tracks_det_hit_ids.append(mc_reco_track_det_hit_ids)
 
-        self.mc_track_cands_det_hit_ids = mc_track_cands_det_hit_ids
+        self.mc_reco_tracks_det_hit_ids = mc_reco_tracks_det_hit_ids
 
-    def pick(self, track_cand):
+    def pick(self, reco_track):
         """Method to filter the track candidates to reject part of them"""
         return True
 
-    def peel(self, track_cand):
+    def peel(self, reco_track):
         """Looks at the individual pattern recognition tracks and store information about them"""
         track_match_look_up = self.track_match_look_up
 
         # Matching information
-        mc_particle = track_match_look_up.getRelatedMCParticle(track_cand)
+        mc_particle = track_match_look_up.getRelatedMCParticle(reco_track)
         mc_particle_crops = peelers.peel_mc_particle(mc_particle)
 
-        hit_content_crops = peelers.peel_track_cand_hit_content(track_cand)
+        hit_content_crops = peelers.peel_reco_track_hit_content(reco_track)
 
-        pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(track_cand)
+        pr_to_mc_match_info_crops = self.peel_pr_to_mc_match_info(reco_track)
 
         # Get the fit results
-        seed_fit_crops = peelers.peel_track_cand_seed(track_cand)
+        seed_fit_crops = peelers.peel_reco_track_seed(reco_track)
 
-        fit_result = track_match_look_up.getRelatedTrackFitResult(track_cand)
+        fit_result = track_match_look_up.getRelatedTrackFitResult(reco_track)
         fit_crops = peelers.peel_track_fit_result(fit_result)
 
         return dict(
@@ -95,17 +96,17 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             **fit_crops,
         )
 
-    def peel_pr_to_mc_match_info(self, track_cand):
+    def peel_pr_to_mc_match_info(self, reco_track):
         track_match_look_up = self.track_match_look_up
-        is_matched = track_match_look_up.isMatchedPRTrackCand(track_cand)
-        is_clone = track_match_look_up.isClonePRTrackCand(track_cand)
-        is_background = track_match_look_up.isBackgroundPRTrackCand(track_cand)
-        is_ghost = track_match_look_up.isGhostPRTrackCand(track_cand)
+        is_matched = track_match_look_up.isMatchedPRTrackCand(reco_track)
+        is_clone = track_match_look_up.isClonePRTrackCand(reco_track)
+        is_background = track_match_look_up.isBackgroundPRTrackCand(reco_track)
+        is_ghost = track_match_look_up.isGhostPRTrackCand(reco_track)
 
-        track_cand_det_hit_ids = utilities.get_det_hit_ids(track_cand)
+        reco_track_det_hit_ids = utilities.get_det_hit_ids(reco_track)
         n_intersecting_mc_tracks = 0
-        for mc_track_cand_det_hit_ids in self.mc_track_cands_det_hit_ids:
-            intersects = len(mc_track_cand_det_hit_ids & track_cand_det_hit_ids) > 0
+        for mc_reco_track_det_hit_ids in self.mc_reco_tracks_det_hit_ids:
+            intersects = len(mc_reco_track_det_hit_ids & reco_track_det_hit_ids) > 0
             if intersects:
                 n_intersecting_mc_tracks += 1
 
@@ -116,8 +117,8 @@ class PRSideTrackingValidationModule(harvesting.HarvestingModule):
             is_ghost=is_ghost,
             is_clone_or_match=(is_matched or is_clone),
             is_fake=not (is_matched or is_clone),
-            hit_efficiency=track_match_look_up.getRelatedEfficiency(track_cand),
-            hit_purity=track_match_look_up.getRelatedPurity(track_cand),
+            hit_efficiency=track_match_look_up.getRelatedEfficiency(reco_track),
+            hit_purity=track_match_look_up.getRelatedPurity(reco_track),
             n_intersecting_mc_tracks=n_intersecting_mc_tracks,
         )
 

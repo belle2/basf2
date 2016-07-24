@@ -1,3 +1,6 @@
+import ROOT
+from tracking import metamodules
+
 from .mc_side_module import MCSideTrackingValidationModule
 from .pr_side_module import PRSideTrackingValidationModule
 from .eventwise_module import EventwiseTrackingValidationModule
@@ -19,8 +22,8 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
                  name,
                  contact,
                  output_file_name=None,
-                 track_cands_name="TrackCands",
-                 mc_track_cands_name="MCTrackCands",
+                 reco_tracks_name='RecoTracks',
+                 mc_reco_tracks_name='MCRecoTracks',
                  expert_level=None):
         """Constructor"""
 
@@ -33,22 +36,22 @@ class CombinedTrackingValidationModule(metamodules.PathModule):
         eventwise_module = self.EventwiseModule(name,
                                                 contact,
                                                 output_file_name=output_file_name,
-                                                track_cands_name=track_cands_name,
-                                                mc_track_cands_name=mc_track_cands_name,
+                                                reco_tracks_name=reco_tracks_name,
+                                                mc_reco_tracks_name=mc_reco_tracks_name,
                                                 expert_level=expert_level)
 
         pr_side_module = self.PRSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
-                                           track_cands_name=track_cands_name,
-                                           mc_track_cands_name=mc_track_cands_name,
+                                           reco_tracks_name=reco_tracks_name,
+                                           mc_reco_tracks_name=mc_reco_tracks_name,
                                            expert_level=expert_level)
 
         mc_side_module = self.MCSideModule(name,
                                            contact,
                                            output_file_name=output_file_name,
-                                           track_cands_name=track_cands_name,
-                                           mc_track_cands_name=mc_track_cands_name,
+                                           reco_tracks_name=reco_tracks_name,
+                                           mc_reco_tracks_name=mc_reco_tracks_name,
                                            expert_level=expert_level)
 
         #: Subordinate modules

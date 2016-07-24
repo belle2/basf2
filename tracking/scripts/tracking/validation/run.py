@@ -53,6 +53,13 @@ class TrackingValidationRun(BrowseTFileOnTerminateRunMixin, ReadOrGenerateTracke
         trackingValidationModule.trackCandidatesColumnName = \
             self.trackCandidatesColumnName
 
+        # from tracking.harvesting_validation.combined_module import CombinedTrackingValidationModule
+        # trackingValidationModule = CombinedTrackingValidationModule(self.name,
+        #                                                             contact=self.contact,
+        #                                                             output_file_name=self.output_file_name,
+        #                                                             reco_tracks_name=self.trackCandidatesColumnName,
+        #                                                             mc_reco_tracks_name='MCRecoTracks')
+
         main_path.add_module(trackingValidationModule)
 
     def create_argument_parser(self, **kwds):

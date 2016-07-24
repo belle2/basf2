@@ -52,7 +52,7 @@ namespace Belle2 {
                             bool leftRight = false,
                             double z = 0,
                             double alpha = 0,
-                            double = static_cast<double>(TMath::Pi() / 2.),
+                            double theta = static_cast<double>(TMath::Pi() / 2.),
                             unsigned short adcCount = 0);
 
       /**

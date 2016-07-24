@@ -69,9 +69,19 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry& geom)
     m_xtFromDB.addCallback(this, &CDCGeometryPar::setXT);
   }
 #endif
+#if defined(CDC_XTREL_FROM_DB)
+  if (m_xtRelFromDB.isValid()) {
+    m_xtRelFromDB.addCallback(this, &CDCGeometryPar::setXtRel);
+  }
+#endif
 #if defined(CDC_SIGMA_FROM_DB)
   if (m_sigmaFromDB.isValid()) {
     m_sigmaFromDB.addCallback(this, &CDCGeometryPar::setSigma);
+  }
+#endif
+#if defined(CDC_SRESOL_FROM_DB)
+  if (m_sResolFromDB.isValid()) {
+    m_sResolFromDB.addCallback(this, &CDCGeometryPar::setSResol);
   }
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
@@ -120,6 +130,11 @@ CDCGeometryPar::CDCGeometryPar()
 #if defined(CDC_SIGMA_FROM_DB)
   if (m_sigmaFromDB.isValid()) {
     m_sigmaFromDB.addCallback(this, &CDCGeometryPar::setSigma);
+  }
+#endif
+#if defined(CDC_SRESOL_FROM_DB)
+  if (m_sResolFromDB.isValid()) {
+    m_sResolFromDB.addCallback(this, &CDCGeometryPar::setSResol);
   }
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
@@ -334,13 +349,21 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #if defined(CDC_XT_FROM_DB)
     setXT();  //Set xt param. (from DB)
 #else
+#if defined(CDC_XTREL_FROM_DB)
+    setXtRel();  //Set xt param. (from DB)
+#else
     readXT(gbxParams);  //Read xt params. (from file)
+#endif
 #endif
 
 #if defined(CDC_SIGMA_FROM_DB)
     setSigma();  //Set sigma params. (from DB)
 #else
+#if defined(CDC_SRESOL_FROM_DB)
+    setSResol();  //Set sigma param. (from DB)
+#else
     readSigma(gbxParams);  //Read sigma params. (from file)
+#endif
 #endif
 
 #if defined(CDC_PROPSPEED_FROM_DB)
@@ -448,11 +471,21 @@ void CDCGeometryPar::read()
   // Get control switch for xt file format
   m_xtFileFormat = gbxParams.getInt("XtFileFormat");
   if (m_xtFileFormat == 0) {
-    B2INFO("CDCGeometryPar: xt-file with old format specified");
+    B2INFO("CDCGeometryPar: xt-file in old format specified");
   } else if (m_xtFileFormat == 1) {
-    B2INFO("CDCGeometryPar: xt-file with new format specified");
+    B2INFO("CDCGeometryPar: xt-file in new format specified");
   } else {
     B2FATAL("CDCGeometryPar: xt-file format you specify is invalid.");
+  }
+
+  // Get control switch for xt file format
+  m_sigmaFileFormat = gbxParams.getInt("SigmaFileFormat");
+  if (m_sigmaFileFormat == 0) {
+    B2INFO("CDCGeometryPar: sigma-file in old format specified");
+  } else if (m_sigmaFileFormat == 1) {
+    B2INFO("CDCGeometryPar: sigma-file in new format specified");
+  } else {
+    B2FATAL("CDCGeometryPar: sigma-file format you specify is invalid.");
   }
 
   // Get mode for wire z-position
@@ -583,7 +616,11 @@ void CDCGeometryPar::read()
 #if defined(CDC_SIGMA_FROM_DB)
     setSigma();  //Set sigma params. (from DB)
 #else
+#if defined(CDC_SRESOL_FROM_DB)
+    setSResol();  //Set sigma param. (from DB)
+#else
     readSigma(gbxParams);  //Read sigma params. (from file)
+#endif
 #endif
 
 #if defined(CDC_PROPSPEED_FROM_DB)
@@ -883,7 +920,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
         break;
       }
     }
-    if (itheta < 0) B2FATAL("CDCGeometryPar: thetas in xt.dat and bin.dat are inconsistent !");
+    if (itheta < 0) B2FATAL("CDCGeometryPar: thetas in xt.dat are inconsistent !");
 
     int ialpha = -99;
     for (unsigned short i = 0; i < nAlphaBins; ++i) {
@@ -892,7 +929,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
         break;
       }
     }
-    if (ialpha < 0) B2FATAL("CDCGeometryPar: alphas in xt.dat and bin.dat are inconsistent !");
+    if (ialpha < 0) B2FATAL("CDCGeometryPar: alphas in xt.dat are inconsistent !");
 
     for (int i = 0; i < np; ++i) {
       m_XT[iCL][iLR][ialpha][itheta][i] = xtc[i];
@@ -1144,8 +1181,132 @@ void CDCGeometryPar::oldReadXT(const GearDir gbxParams, const int mode)
   */
 }
 
-// Read space reso. params.
+
+// Read space resol. params.
 void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
+{
+  if (m_sigmaFileFormat == 0) {
+    oldReadSigma(gbxParams, mode);
+  } else {
+    newReadSigma(gbxParams, mode);
+  }
+}
+
+void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
+{
+  m_linearInterpolationOfSgm = true;
+  //  m_linearInterpolationOfSgm = false;
+  std::string fileName0 = gbxParams.getString("sigmaFileName");
+  if (mode == 1) {
+    fileName0 = gbxParams.getString("sigma4ReconFileName");
+  }
+
+  fileName0 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName0);
+
+  ifstream ifs;
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
+  }
+
+  //read alpha bin info.
+  unsigned short nAlphaBins = 0;
+  if (ifs >> nAlphaBins) {
+    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+  } else {
+    B2FATAL("Fail to read alpha bins !");
+  }
+  m_nAlphaPoints4Sgm = nAlphaBins;
+  //  std:: cout << nAlphaBins << std::endl;
+  double alpha0, alpha1, alpha2;
+  for (unsigned short i = 0; i < nAlphaBins; ++i) {
+    ifs >> alpha0 >> alpha1 >> alpha2;
+    m_alphaPoints4Sgm[i] = alpha2;
+    //    std:: cout << alpha2 << std::endl;
+  }
+
+  //read theta bin info.
+  unsigned short nThetaBins = 0;
+  if (ifs >> nThetaBins) {
+    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("CDCGeometryPar: fail to read theta bins !");
+  } else {
+    B2FATAL("CDCGeometryPar: fail to read theta bins !");
+  }
+  m_nThetaPoints4Sgm = nThetaBins;
+  //  std:: cout << nThetaBins << std::endl;
+  double theta0, theta1, theta2;
+
+  for (unsigned short i = 0; i < nThetaBins; ++i) {
+    ifs >> theta0 >> theta1 >> theta2;
+    m_thetaPoints4Sgm[i] = theta2;
+    //    std:: cout << theta2 << std::endl;
+  }
+
+  unsigned short np = 0;
+  unsigned short iCL, iLR;
+  double sigma[nSigmaParams];
+  double theta, alpha;
+  unsigned nRead = 0;
+
+  ifs >> m_sigmaParamMode >> np;
+  //  std:: cout << m_sigmaParamMode <<" "<< np << std::endl;
+  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
+  if (m_sigmaParamMode == 1) B2FATAL("CDCGeometryPar: sigma-parameterization mode=1 not ready yet");
+
+  if (np <= 0 || np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
+
+  const double epsi = 0.1;
+
+  while (ifs >> iCL) {
+    ifs >> theta >> alpha >> iLR;
+    //    std::cout << iCL <<" "<< theta <<" "<< alpha <<" "<< iLR << std::endl;
+    for (int i = 0; i < np; ++i) {
+      ifs >> sigma[i];
+    }
+    ++nRead;
+
+    int itheta = -99;
+    for (unsigned short i = 0; i < nThetaBins; ++i) {
+      if (fabs(theta - m_thetaPoints4Sgm[i]) < epsi) {
+        itheta = i;
+        break;
+      }
+    }
+    if (itheta < 0) B2FATAL("CDCGeometryPar: thetas in sigma.dat are inconsistent !");
+
+    int ialpha = -99;
+    for (unsigned short i = 0; i < nAlphaBins; ++i) {
+      if (fabs(alpha - m_alphaPoints4Sgm[i]) < epsi) {
+        ialpha = i;
+        break;
+      }
+    }
+    if (ialpha < 0) B2FATAL("CDCGeometryPar: alphas in sigma.dat are inconsistent !");
+
+    for (int i = 0; i < np; ++i) {
+      m_Sigma[iCL][iLR][ialpha][itheta][i] = sigma[i];
+    }
+  }  //end of while loop
+
+  //convert unit
+  const double degrad = M_PI / 180.;
+  for (unsigned i = 0; i < nAlphaBins; ++i) {
+    m_alphaPoints4Sgm[i] *= degrad;
+  }
+  for (unsigned i = 0; i < nThetaBins; ++i) {
+    m_thetaPoints4Sgm[i] *= degrad;
+  }
+
+  //  std::cout << "end of newreadsigma " << std::endl;
+}
+
+// Read space resol. params.
+void CDCGeometryPar::oldReadSigma(const GearDir gbxParams, const int mode)
 {
   std::string fileName0 = gbxParams.getString("sigmaFileName");
   if (mode == 1) {
@@ -1165,7 +1326,6 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
   }
 
   int iL;
-  //  const int np = 6;
   const int np = 7;
   double sigma[np];
   unsigned nRead = 0;
@@ -1179,8 +1339,14 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
 
     ++nRead;
 
-    for (int i = 0; i < np; ++i) {
-      m_Sigma[iL][i] = sigma[i];
+    for (unsigned short iT = 0; iT < maxNThetaPoints; ++iT) {
+      for (unsigned short iA = 0; iA < maxNAlphaPoints; ++iA) {
+        for (unsigned short lr = 0; lr < 2; ++lr) {
+          for (unsigned short i = 0; i < np; ++i) {
+            m_Sigma[iL][lr][iA][iT][i] = sigma[i];
+          }
+        }
+      }
     }
 
     //    m_Sigma[iL][np] = 0.5 * m_cellSize[iL] - 0.75;
@@ -1190,7 +1356,7 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
       cout << iL;
       //      for (int i = 0; i < np + 1; ++i) {
       for (int i = 0; i < np; ++i) {
-        cout << " " << m_Sigma[iL][i];
+        cout << " " << m_Sigma[iL][0][0][0][i];
       }
       cout << endl;
     }
@@ -1519,14 +1685,14 @@ void CDCGeometryPar::setXT()
 void CDCGeometryPar::setXtRel()
 {
   //  std::cout <<"setXtRelation called" << std::endl;
-  unsigned short nb = m_xtRelFromDB->getNoOfAlphaBins();
-  for (unsigned short i = 0; i < nb; ++i) {
+  m_nAlphaPoints = m_xtRelFromDB->getNoOfAlphaBins();
+  for (unsigned short i = 0; i < m_nAlphaPoints; ++i) {
     m_alphaPoints[i] = m_xtRelFromDB->getAlphaPoint(i);
     //    std::cout << m_alphaPoints[i]*180./M_PI << std::endl;
   }
 
-  nb = m_xtRelFromDB->getNoOfThetaBins();
-  for (unsigned short i = 0; i < nb; ++i) {
+  m_nThetaPoints = m_xtRelFromDB->getNoOfThetaBins();
+  for (unsigned short i = 0; i < m_nThetaPoints; ++i) {
     m_thetaPoints[i] = m_xtRelFromDB->getThetaPoint(i);
     //    std::cout << m_thetaPoints[i]*180./M_PI << std::endl;
   }
@@ -1537,7 +1703,7 @@ void CDCGeometryPar::setXtRel()
         for (unsigned short iT = 0; iT < m_nThetaPoints; ++iT) {
           const std::vector<float> params = m_xtRelFromDB->getXtParams(iCL, iLR, iA, iT);
           unsigned short np = params.size();
-          //      std::cout <<"np= " << np << std::endl;
+          //    std::cout <<"np4xt= " << np << std::endl;
           for (unsigned short i = 0; i < np; ++i) {
             m_XT[iCL][iLR][iA][iT][i] = params[i];
           }
@@ -1578,6 +1744,45 @@ void CDCGeometryPar::setSigma()
       m_Sigma[iCL][i] = m_sigmaFromDB->getSigmaParam(iCL, i);
     }
   }
+}
+#endif
+
+
+#if defined(CDC_SRESOL_FROM_DB)
+// Set sigma params. (from DB)
+void CDCGeometryPar::setSResol()
+{
+  //  std::cout <<"setSResol called" << std::endl;
+  m_nAlphaPoints4Sgm = m_sResolFromDB->getNoOfAlphaBins();
+  for (unsigned short i = 0; i < m_nAlphaPoints4Sgm; ++i) {
+    m_alphaPoints4Sgm[i] = m_sResolFromDB->getAlphaPoint(i);
+    //    std::cout << m_alphaPoints4Sgm[i]*180./M_PI << std::endl;
+  }
+
+  m_nThetaPoints4Sgm = m_sResolFromDB->getNoOfThetaBins();
+  for (unsigned short i = 0; i < m_nThetaPoints4Sgm; ++i) {
+    m_thetaPoints4Sgm[i] = m_sResolFromDB->getThetaPoint(i);
+    //    std::cout << m_thetaPoints4Sgm[i]*180./M_PI << std::endl;
+  }
+
+  //  std::cout << "m_nAlphaPoints4Sgm= " << m_nAlphaPoints4Sgm << std::endl;
+  //  std::cout << "m_nThetaPoints4Sgm= " << m_nThetaPoints4Sgm << std::endl;
+
+  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
+    for (unsigned short iLR = 0; iLR < 2; ++iLR) {
+      for (unsigned short iA = 0; iA < m_nAlphaPoints4Sgm; ++iA) {
+        for (unsigned short iT = 0; iT < m_nThetaPoints4Sgm; ++iT) {
+          const std::vector<float> params = m_sResolFromDB->getSigmaParams(iCL, iLR, iA, iT);
+          unsigned short np = params.size();
+          //    std::cout <<"np4sigma= " << np << std::endl;
+          for (unsigned short i = 0; i < np; ++i) {
+            m_Sigma[iCL][iLR][iA][iT][i] = params[i];
+          }
+        }
+      }
+    }
+  }
+
 }
 #endif
 
@@ -2224,34 +2429,90 @@ double CDCGeometryPar::getDriftTime(const double dist, const unsigned short iCLa
 
 }
 
-double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer) const
+double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLayer, const unsigned short lr, const double alpha,
+                                const double theta) const
 {
 
-  const double P0 = m_Sigma[iCLayer][0];
-  const double P1 = m_Sigma[iCLayer][1];
-  const double P2 = m_Sigma[iCLayer][2];
-  const double P3 = m_Sigma[iCLayer][3];
-  const double P4 = m_Sigma[iCLayer][4];
-  const double P5 = m_Sigma[iCLayer][5];
-  const double P6 = m_Sigma[iCLayer][6];
+  double sigma = 0.;
 
-  double sigma = sqrt(P0 / (driftL * driftL + P1) + P2 * driftL + P3 +
-                      P4 * exp(P5 * (driftL - P6) * (driftL - P6)));
-  sigma = std::min(sigma, m_maxSpaceResol);
+  //convert incoming- to outgoing-lr
+  unsigned short lro = getOutgoingLR(lr, alpha);
+
+  if (!m_linearInterpolationOfSgm) {
+    B2FATAL("linearInterpolationOfXT = false is not allowed now !");
+  }
+  if (m_linearInterpolationOfSgm) {
+    double wal(0.);
+    unsigned short ial[2] = {0};
+    unsigned short ilr[2] = {lro, lro};
+    getClosestAlphaPoints4Sgm(alpha, wal, ial, ilr);
+    double wth(0.);
+    unsigned short ith[2] = {0};
+    getClosestThetaPoints4Sgm(theta, wth, ith);
+
+    //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
+    unsigned short jal(0), jlr(0), jth(0);
+    double w = 0.;
+    for (unsigned k = 0; k < 4; ++k) {
+      if (k == 0) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[0];
+        w = (1. - wal) * (1. - wth);
+      } else if (k == 1) {
+        jal = ial[0];
+        jlr = ilr[0];
+        jth = ith[1];
+        w = (1. - wal) * wth;
+      } else if (k == 2) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[0];
+        w = wal * (1. - wth);
+      } else if (k == 3) {
+        jal = ial[1];
+        jlr = ilr[1];
+        jth = ith[1];
+        w = wal * wth;
+      }
+      //      std::cout << "k,w= " << k <<" "<< w << std::endl;
+      //      std::cout << "ial[0],[1],jal,wal= " << ial[0] <<" "<< ial[1] <<" "<< jal <<" "<< wal << std::endl;
+      //      std::cout << "ith[0],[1],jth,wth= " << ith[0] <<" "<< ith[1] <<" "<< jth <<" "<< wth << std::endl;
+      /*
+      std::cout <<"iCLayer= " << iCLayer << std::endl;
+      std::cout <<"lr= " << lr << std::endl;
+      std::cout <<"jal,jth= " << jal <<" "<< jth << std::endl;
+      std::cout <<"wal,wth= " << wal <<" "<< wth << std::endl;
+      for (int i=0; i<9; ++i) {
+      std::cout <<"a= "<< i <<" "<< m_XT[iCLayer][lro][jal][jth][i] << std::endl;
+      }
+      */
+      const double& P0 = m_Sigma[iCLayer][jlr][jal][jth][0];
+      const double& P1 = m_Sigma[iCLayer][jlr][jal][jth][1];
+      const double& P2 = m_Sigma[iCLayer][jlr][jal][jth][2];
+      const double& P3 = m_Sigma[iCLayer][jlr][jal][jth][3];
+      const double& P4 = m_Sigma[iCLayer][jlr][jal][jth][4];
+      const double& P5 = m_Sigma[iCLayer][jlr][jal][jth][5];
+      const double& P6 = m_Sigma[iCLayer][jlr][jal][jth][6];
 
 #if defined(CDC_DEBUG)
-  cout << "driftL= " << driftL << endl;
-  cout << "iCLayer= " << iCLayer << endl;
-  cout << "P0= " << P0 << endl;
-  cout << "P1= " << P1 << endl;
-  cout << "P2= " << P2 << endl;
-  cout << "P3= " << P3 << endl;
-  cout << "P4= " << P4 << endl;
-  cout << "P5= " << P5 << endl;
-  cout << "P6= " << P6 << endl;
-  cout << "sigma= " << sigma << endl;
+      cout << "driftL= " << driftL << endl;
+      cout << "iCLayer= " << iCLayer << " " << jlr << " " << jal << " " << jth << endl;
+      cout << "P0= " << P0 << endl;
+      cout << "P1= " << P1 << endl;
+      cout << "P2= " << P2 << endl;
+      cout << "P3= " << P3 << endl;
+      cout << "P4= " << P4 << endl;
+      cout << "P5= " << P5 << endl;
+      cout << "P6= " << P6 << endl;
 #endif
 
+      sigma += w * sqrt(P0 / (driftL * driftL + P1) + P2 * driftL + P3 +
+                        P4 * exp(P5 * (driftL - P6) * (driftL - P6)));
+    }
+  }
+
+  sigma = std::min(sigma, m_maxSpaceResol);
   return sigma;
 }
 
@@ -2394,6 +2655,39 @@ void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, u
 }
 
 
+void CDCGeometryPar::getClosestAlphaPoints4Sgm(const double alpha, double& weight, unsigned short points[2],
+                                               unsigned short lrs[2]) const
+{
+  double alphao = getOutgoingAlpha(alpha);
+  weight = 1.;
+
+  if (alphao < m_alphaPoints4Sgm[0]) {
+    points[0] = m_nAlphaPoints4Sgm - 1;
+    points[1] = 0;
+    if (m_nAlphaPoints4Sgm > 1) {
+      lrs[0] = abs(lrs[0] - 1); //flip lr
+      weight = (alphao - (m_alphaPoints4Sgm[points[0]] - M_PI)) / (m_alphaPoints4Sgm[points[1]] - (m_alphaPoints4Sgm[points[0]] - M_PI));
+    }
+  } else if (m_alphaPoints4Sgm[m_nAlphaPoints4Sgm - 1] <= alphao) {
+    points[0] = m_nAlphaPoints4Sgm - 1;
+    points[1] = 0;
+    if (m_nAlphaPoints4Sgm > 1) {
+      lrs[1] = abs(lrs[1] - 1); //flip lr
+      weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] + M_PI - m_alphaPoints4Sgm[points[0]]);
+    }
+  } else {
+    for (unsigned short i = 0; i <= m_nAlphaPoints4Sgm - 2; ++i) {
+      if (m_alphaPoints4Sgm[i] <= alphao && alphao < m_alphaPoints4Sgm[i + 1]) {
+        points[0] = i;
+        points[1] = i + 1;
+        weight = (alphao - m_alphaPoints4Sgm[points[0]]) / (m_alphaPoints4Sgm[points[1]] - m_alphaPoints4Sgm[points[0]]);
+        break;
+      }
+    }
+  }
+}
+
+
 unsigned short CDCGeometryPar::getClosestThetaPoint(const double theta) const
 {
   unsigned itheta = m_nThetaPoints - 1;
@@ -2439,6 +2733,29 @@ void CDCGeometryPar::getClosestThetaPoints(const double theta, double& weight, u
     }
   }
   //  weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
+}
+
+
+void CDCGeometryPar::getClosestThetaPoints4Sgm(const double theta, double& weight, unsigned short points[2]) const
+{
+  if (theta < m_thetaPoints4Sgm[0]) {
+    points[0] = 0;
+    points[1] = 0;
+    weight = 1.;
+  } else if (m_thetaPoints4Sgm[m_nThetaPoints4Sgm - 1] <= theta) {
+    points[0] = m_nThetaPoints4Sgm - 1;
+    points[1] = m_nThetaPoints4Sgm - 1;
+    weight = 1.;
+  } else {
+    for (unsigned short i = 0; i <= m_nThetaPoints4Sgm - 2; ++i) {
+      if (m_thetaPoints4Sgm[i] <= theta && theta < m_thetaPoints4Sgm[i + 1]) {
+        points[0] = i;
+        points[1] = i + 1;
+        weight = (theta - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
+        break;
+      }
+    }
+  }
 }
 
 

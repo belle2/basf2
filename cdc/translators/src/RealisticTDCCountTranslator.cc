@@ -90,14 +90,11 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
 /** this function returns the variance that is used as the CDC measurment resolution in track fitting */
 
-double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength,
-    const WireID&  wireID,
-    bool,
-    double,
-    double,
-    double)
+double RealisticTDCCountTranslator::getDriftLengthResolution(double driftLength, const WireID&  wireID, bool leftRight, double z,
+    double alpha, double theta)
 {
-  double resol = m_cdcp.getSigma(driftLength, wireID.getICLayer());
+  static_cast<void>(z); //just to suppress warning of unused
+  double resol = m_cdcp.getSigma(driftLength, wireID.getICLayer(), leftRight, alpha, theta);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

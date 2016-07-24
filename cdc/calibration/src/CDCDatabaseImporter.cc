@@ -35,6 +35,7 @@
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
+#include <cdc/dbobjects/CDCSpaceResols.h>
 
 #include <iostream>
 #include <fstream>
@@ -285,18 +286,18 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
   */
-  short xtFitMode, np;
+  short xtParamMode, np;
   unsigned short iCL, iLR;
   const unsigned short npx = nXTParams - 1;
   double xtc[npx];
   double theta, alpha, dummy1;
   unsigned nRead = 0;
 
-  ifs >> xtFitMode >> np;
-  if (xtFitMode < 0 || xtFitMode > 1) B2FATAL("Invalid xtfit mode read !");
+  ifs >> xtParamMode >> np;
+  if (xtParamMode < 0 || xtParamMode > 1) B2FATAL("Invalid xt param mode read !");
   if (np <= 0 || np > npx) B2FATAL("No. of xt-params. outside limits !");
 
-  xt->setXtParamMode(xtFitMode);
+  xt->setXtParamMode(xtParamMode);
 
   const double epsi = 0.1;
 
@@ -314,7 +315,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
         break;
       }
     }
-    if (ialpha < 0) B2FATAL("alphas in xt.dat and bin.dat are inconsistent !");
+    if (ialpha < 0) B2FATAL("alphas in xt.dat are inconsistent !");
 
     int itheta = -99;
     for (unsigned short i = 0; i < nThetaBins; ++i) {
@@ -323,7 +324,7 @@ void CDCDatabaseImporter::importXT(std::string fileName)
         break;
       }
     }
-    if (itheta < 0) B2FATAL("thetas in xt.dat and bin.dat are inconsistent !");
+    if (itheta < 0) B2FATAL("thetas in xt.dat are inconsistent !");
 
     //    std::vector<float> xtbuff = std::vector<float>(np);
     std::vector<float> xtbuff;
@@ -341,7 +342,113 @@ void CDCDatabaseImporter::importXT(std::string fileName)
   B2RESULT("XT table imported to database.");
 }
 
+void CDCDatabaseImporter::importSigma(std::string fileName)
+{
+  DBImportObjPtr<CDCSpaceResols> sg;
+  sg.construct();
 
+  //read alpha bins
+  std::ifstream ifs;
+  ifs.open(fileName.c_str());
+  if (!ifs) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+  }
+  B2INFO(fileName << ": open for reading");
+
+  const double degrad = M_PI / 180.;
+  const double raddeg = 180. / M_PI;
+
+  unsigned short nAlphaBins = 0;
+  if (ifs >> nAlphaBins) {
+    if (nAlphaBins == 0 || nAlphaBins > maxNAlphaPoints) B2FATAL("Fail to read alpha bins !");
+  } else {
+    B2FATAL("Fail to read alpha bins !");
+  }
+  std::array<float, 3> alpha3;
+  for (unsigned short i = 0; i < nAlphaBins; ++i) {
+    for (unsigned short j = 0; j < 3; ++j) {
+      ifs >> alpha3[j];
+      alpha3[j] *= degrad;
+    }
+    sg->setAlphaBin(alpha3);
+  }
+
+  //read theta bins
+  unsigned short nThetaBins = 0;
+  if (ifs >> nThetaBins) {
+    if (nThetaBins == 0 || nThetaBins > maxNThetaPoints) B2FATAL("Fail to read theta bins !");
+  } else {
+    B2FATAL("Fail to read theta bins !");
+  }
+  std::array<float, 3> theta3;
+
+  for (unsigned short i = 0; i < nThetaBins; ++i) {
+    for (unsigned short j = 0; j < 3; ++j) {
+      ifs >> theta3[j];
+      theta3[j] *= degrad;
+    }
+    sg->setThetaBin(theta3);
+  }
+
+
+  //read sigma params.
+  short sgParamMode, np;
+  unsigned short iCL, iLR;
+  const unsigned short npx = nSigmaParams;
+  double sgm[npx];
+  double theta, alpha;
+  unsigned nRead = 0;
+
+  ifs >> sgParamMode >> np;
+  if (sgParamMode < 0 || sgParamMode > 1) B2FATAL("Invalid sigma param mode read !");
+  if (np <= 0 || np > npx) B2FATAL("No. of sgm-params. outside limits !");
+
+  sg->setSigmaParamMode(sgParamMode);
+
+  const double epsi = 0.1;
+
+  while (ifs >> iCL) {
+    ifs >> theta >> alpha >> iLR;
+    for (int i = 0; i < np; ++i) {
+      ifs >> sgm[i];
+    }
+    ++nRead;
+
+    int ialpha = -99;
+    for (unsigned short i = 0; i < nAlphaBins; ++i) {
+      if (fabs(alpha - sg->getAlphaBin(i)[2]*raddeg) < epsi) {
+        ialpha = i;
+        break;
+      }
+    }
+    if (ialpha < 0) B2FATAL("alphas in sigma.dat are inconsistent !");
+
+    int itheta = -99;
+    for (unsigned short i = 0; i < nThetaBins; ++i) {
+      if (fabs(theta - sg->getThetaBin(i)[2]*raddeg) < epsi) {
+        itheta = i;
+        break;
+      }
+    }
+    if (itheta < 0) B2FATAL("thetas in sigma.dat are inconsistent !");
+
+    //    std::vector<float> sgbuff = std::vector<float>(np);
+    std::vector<float> sgbuff;
+    for (int i = 0; i < np; ++i) {
+      sgbuff.push_back(sgm[i]);
+    }
+    //    std::cout <<"iCL,iLR,ialpha,itheta= " << iCL <<" "<< iLR <<" "<< ialpha <<" "<< itheta << std::endl;
+    sg->setSigmaParams(iCL, iLR, ialpha, itheta, sgbuff);
+  }
+
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  sg.import(iov);
+  B2RESULT("Sigma table imported to database.");
+}
+
+/*
 void CDCDatabaseImporter::importSigma(std::string fileName)
 {
   std::ifstream ifs;
@@ -372,15 +479,6 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
     for (int i = 0; i < np; ++i) {
       sgm->setSigmaParam(iL, i, sigma[i]);
     }
-
-    /*    if (m_debug) {
-      cout << iL;
-      for (int i = 0; i < np; ++i) {
-        cout << " " << m_Sigma[iL][i];
-      }
-      cout << endl;
-    }
-    */
   }
 
   ifs.close();
@@ -393,6 +491,7 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
   sgm.import(iov);
   B2RESULT("Sigma table imported to database.");
 }
+*/
 
 
 void CDCDatabaseImporter::printChannelMap()
@@ -448,6 +547,6 @@ void CDCDatabaseImporter::printXT()
 
 void CDCDatabaseImporter::printSigma()
 {
-  DBObjPtr<CDCSigmas> sgm;
+  DBObjPtr<CDCSpaceResols> sgm;
   sgm->dump();
 }

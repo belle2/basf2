@@ -444,7 +444,10 @@ float CDCDigitizerModule::smearDriftLength(const float driftLength, const float 
       resolution = m_resolution2;
     }
   } else {
-    resolution = m_cdcgp->getSigma(driftLength, m_wireID.getICLayer());
+    const unsigned short leftRight = m_posFlag;
+    double alpha = m_cdcgp->getAlpha(m_posWire, m_momentum);
+    double theta = m_cdcgp->getTheta(m_momentum);
+    resolution = m_cdcgp->getSigma(driftLength, m_wireID.getICLayer(), leftRight, alpha, theta);
   }
 
   //subtract resol. due to digitization, which'll be added later in the digitization

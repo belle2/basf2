@@ -17,10 +17,10 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
-import tracking.validation.peelers
 
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
+import tracking.harvest.peelers as peelers
+import tracking.harvest.harvesting as harvesting
+import tracking.harvest.refiners as refiners
 
 import trackfindingcdc.validation.cdc_peelers as cdc_peelers
 
@@ -162,7 +162,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
             raise ValueError("Invalid degree of Monte Carlo information")
 
         path.add_module("SegmentFitter",
-                        segments="CDCRecoSegment2DVector",
+                        inputSegments="CDCRecoSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,
                         fitVariance=self.fit_variance,
@@ -206,7 +206,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         segment_crops = cdc_peelers.peel_segment2d(segment)
 
         mc_particle = mc_segment_lookup.getMCParticle(segment)
-        mc_particle_crops = tracking.validation.peelers.peel_mc_particle(mc_particle)
+        mc_particle_crops = peelers.peel_mc_particle(mc_particle)
 
         fit3d_truth = mc_segment_lookup.getTrajectory3D(segment)
         curvature_truth = fit3d_truth.getCurvatureXY()

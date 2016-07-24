@@ -17,8 +17,8 @@ from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 from tracking.validation.utilities import is_primary
 from tracking.validation.plot import ValidationPlot
 
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
+import tracking.harvest.harvesting as harvesting
+import tracking.harvest.refiners as refiners
 
 import trackfindingcdc.validation.cdc_peelers as cdc_peelers
 

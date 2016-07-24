@@ -88,7 +88,6 @@ def main():
         classifer.train(input_tree)
 
     if arguments.show:
-        import tracking.validation.utilities
         with root_utils.root_open(weights_file_path) as tfile:
             root_utils.root_browse(tfile)
             input("Press enter to close.")

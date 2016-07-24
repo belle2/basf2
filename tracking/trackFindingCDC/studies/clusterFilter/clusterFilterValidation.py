@@ -19,8 +19,8 @@ from tracking.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
 
-import tracking.validation.harvesting as harvesting
-import tracking.validation.refiners as refiners
+import tracking.harvest.harvesting as harvesting
+import tracking.harvest.refiners as refiners
 import tracking.metamodules as metamodules
 
 from tracking.run.event_generation import StandardEventGenerationRun

@@ -1,6 +1,6 @@
 import functools
 
-import tracking.validation.peelers as peelers
+import tracking.harvest.peelers as peelers
 from tracking.validation.utilities import prob
 
 

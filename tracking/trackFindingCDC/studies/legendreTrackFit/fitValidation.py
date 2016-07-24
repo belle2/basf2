@@ -6,8 +6,8 @@ from ROOT import gSystem
 gSystem.Load('libtracking')
 gSystem.Load('libtracking_trackFindingCDC')
 
-from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest import refiners
 import logging
 import sys
 

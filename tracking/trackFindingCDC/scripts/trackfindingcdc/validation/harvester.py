@@ -1,5 +1,5 @@
-from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest import refiners
 
 from ROOT import Belle2
 

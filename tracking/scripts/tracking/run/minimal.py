@@ -161,6 +161,7 @@ class MinimalRun(object):
         # Run basf2 module path #
         #########################
         get_logger().info('Start processing')
+        basf2.print_path(main_path)
         basf2.process(main_path)
         get_logger().info("\n%s", str(basf2.statistics))
 

@@ -9,16 +9,14 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/Logger.h>
 #include <framework/utilities/Conversion.h>
-
-#include <boost/algorithm/string.hpp>
-#include <boost/algorithm/string/replace.hpp>
-#include <boost/regex.hpp>
 
 #include <string>
 #include <vector>
 #include <memory>
+
+#include <boost/algorithm/string.hpp>
+#include <sstream>
 
 #include <iostream>
 #include <stdexcept>

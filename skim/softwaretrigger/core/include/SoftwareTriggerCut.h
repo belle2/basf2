@@ -12,6 +12,8 @@
 #include <framework/utilities/GeneralCut.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 
+#include <framework/logging/Logger.h>
+
 #include <TRandom.h>
 
 namespace Belle2 {

@@ -46,7 +46,7 @@ namespace Belle2 {
     int m_nb{0}; /**< when saving a file, the total number of bytes written, 0 when reading. */
     int m_nfile{0}; /**< file counter, starting at 0 (files are split after c_MaxFileSize bytes). */
     bool m_compressed{false}; /**< bool if file is gzipped compressed */
-    std::unique_ptr<std::ios> m_stream{nullptr}; /**< pointer to the filtering input or output stream */
+    std::unique_ptr<std::ios> m_stream; /**< pointer to the filtering input or output stream */
   };
 
 }

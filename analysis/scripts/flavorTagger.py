@@ -93,10 +93,10 @@ AvailableCategories = {
         'QrOf(e+:ElectronROE, isRightCategory(Electron), isRightTrack(Electron))',
         0],
     'IntermediateElectron': [
-        'e+:IntermediateElectronROE',
+        'e+:ElectronROE',
         'IntermediateElectron',
         'IntermediateElectron',
-        'QrOf(e+:IntermediateElectronROE, isRightCategory(IntermediateElectron), isRightTrack(IntermediateElectron))',
+        'QrOf(e+:ElectronROE, isRightCategory(IntermediateElectron), isRightTrack(IntermediateElectron))',
         1],
     'Muon': [
         'mu+:MuonROE',
@@ -105,22 +105,22 @@ AvailableCategories = {
         'QrOf(mu+:MuonROE, isRightCategory(Muon), isRightTrack(Muon))',
         2],
     'IntermediateMuon': [
-        'mu+:IntermediateMuonROE',
+        'mu+:MuonROE',
         'IntermediateMuon',
         'IntermediateMuon',
-        'QrOf(mu+:IntermediateMuonROE, isRightCategory(IntermediateMuon), isRightTrack(IntermediateMuon))',
+        'QrOf(mu+:MuonROE, isRightCategory(IntermediateMuon), isRightTrack(IntermediateMuon))',
         3],
     'KinLepton': [
-        'mu+:KinLeptonROE',
+        'mu+:MuonROE',
         'KinLepton',
         'KinLepton',
-        'QrOf(mu+:KinLeptonROE, isRightCategory(KinLepton), isRightTrack(KinLepton))',
+        'QrOf(mu+:MuonROE, isRightCategory(KinLepton), isRightTrack(KinLepton))',
         4],
     'IntermediateKinLepton': [
-        'mu+:IntermediateKinLeptonROE',
+        'mu+:MuonROE',
         'IntermediateKinLepton',
         'IntermediateKinLepton',
-        'QrOf(mu+:IntermediateKinLeptonROE, isRightCategory(IntermediateKinLepton), isRightTrack(IntermediateKinLepton))',
+        'QrOf(mu+:MuonROE, isRightCategory(IntermediateKinLepton), isRightTrack(IntermediateKinLepton))',
         5],
     'Kaon': [
         'K+:KaonROE',
@@ -129,16 +129,16 @@ AvailableCategories = {
         'weightedQrOf(K+:KaonROE, isRightCategory(Kaon), isRightTrack(Kaon))',
         6],
     'SlowPion': [
-        'pi+:SlowPionROE',
+        'pi+:PionROE',
         'SlowPion',
         'SlowPion',
-        'QrOf(pi+:SlowPionROE, isRightCategory(SlowPion), isRightTrack(SlowPion))',
+        'QrOf(pi+:PionROE, isRightCategory(SlowPion), isRightTrack(SlowPion))',
         7],
     'FastPion': [
-        'pi+:FastPionROE',
+        'pi+:PionROE',
         'FastPion',
         'FastPion',
-        'QrOf(pi+:FastPionROE, isRightCategory(FastPion), isRightTrack(FastPion))',
+        'QrOf(pi+:PionROE, isRightCategory(FastPion), isRightTrack(FastPion))',
         8],
     'Lambda': [
         'Lambda0:LambdaROE',
@@ -147,16 +147,16 @@ AvailableCategories = {
         'weightedQrOf(Lambda0:LambdaROE, isRightCategory(Lambda), isRightTrack(Lambda))',
         9],
     'FSC': [
-        'pi+:SlowPionROE',
+        'pi+:PionROE',
         'SlowPion',
         'FSC',
-        'QrOf(pi+:SlowPionROE, isRightCategory(FSC), isRightTrack(SlowPion))',
+        'QrOf(pi+:PionROE, isRightCategory(FSC), isRightTrack(SlowPion))',
         10],
     'MaximumPstar': [
-        'pi+:MaximumPstarROE',
+        'pi+:PionROE',
         'MaximumPstar',
         'MaximumPstar',
-        'QrOf(pi+:MaximumPstarROE, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
+        'QrOf(pi+:PionROE, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
         11],
     'KaonPion': [
         'K+:KaonROE',
@@ -334,7 +334,7 @@ def setVariables():
 
     # Only for Event Level
     variables['KaonPion'] = ['HighestProbInCat(K+:KaonROE, isRightTrack(Kaon))',
-                             'HighestProbInCat(pi+:SlowPionROE, isRightTrack(SlowPion))',
+                             'HighestProbInCat(pi+:PionROE, isRightTrack(SlowPion))',
                              'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', 'Kid']
 
     variables['MaximumPstar'] = [
@@ -362,14 +362,19 @@ def FillParticleLists(mode='Expert', path=analysis_main):
     Fills the particle Lists for each category.
     """
 
+    readyParticleLists = []
+
     for (particleList, category) in trackLevelParticleLists:
+
+        if particleList in readyParticleLists:
+            continue
 
         # Select particles in ROE for different categories of flavour tagging.
         if particleList != 'Lambda0:LambdaROE':
 
             # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
-
+            readyParticleLists.append(particleList)
         # Check if there is K short in this event
         if particleList == 'K+:KaonROE':
             # Precut done to prevent from overtraining, might be redundant
@@ -379,7 +384,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
                              '0.40<=M<=0.60', True, path=path)
             fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
-
+            readyParticleLists.append(particleList)
         if particleList == 'Lambda0:LambdaROE':
             fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
                              path=path)
@@ -392,9 +397,7 @@ def FillParticleLists(mode='Expert', path=analysis_main):
             if mode != 'Expert':
                 matchMCTruth(particleList, path=path)
             fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
-
-    # Filling 'pi+:MaximumPstarROE' particle list
-    fillParticleList('pi+:MaximumPstarROE', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+            readyParticleLists.append(particleList)
 
     return True
 
@@ -408,49 +411,37 @@ def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
     ReadyMethods = 0
 
-    # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-    trackLevelPathsList = dict()
+    identifiersExtrainfosDict = dict()
 
     for (particleList, category) in trackLevelParticleLists:
 
-        trackLevelPath = create_path()
-        SkipEmptyParticleList = register_module("SkimFilter")
-        SkipEmptyParticleList.param('particleLists', particleList)
-        SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
-        path.add_module(SkipEmptyParticleList)
-
         methodPrefixTrackLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'TrackLevel' + category + 'FBDT'
+        identifierTrackLevel = filesDirectory + '/' + methodPrefixTrackLevel + "_1.root"
         targetVariable = 'isRightTrack(' + category + ')'
+        extraInfoName = targetVariable
 
         if mode == 'Expert':
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixTrackLevel + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixTrackLevel, filesDirectory + '/' + methodPrefixTrackLevel + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixTrackLevel + '_1.root'):
+            if not os.path.isfile(identifierTrackLevel) and downloadFlag:
+                basf2_mva.download(methodPrefixTrackLevel, identifierTrackLevel)
+                if not os.path.isfile(identifierTrackLevel):
                     B2FATAL(
                         'Flavor Tagger: Weight file ' +
-                        methodPrefixTrackLevel +
-                        '_1.config was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+                        identifierTrackLevel + ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
 
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixTrackLevel + '_1.root'):
+            if not os.path.isfile(identifierTrackLevel):
                 B2FATAL(
                     'Flavor Tagger: ' +
                     particleList +
                     ' Tracklevel was not trained. Weight file ' +
-                    methodPrefixTrackLevel +
-                    '_1.config not found. Stopped')
+                    identifierTrackLevel + ' was not found. Stopped')
             else:
-                B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixTrackLevel + ' .')
+                B2INFO('flavorTagger: MVAExpert ' + methodPrefixTrackLevel + ' ready.')
 
-                trackLevelPath.add_module(
-                    'MVAExpert',
-                    listNames=[particleList],
-                    extraInfoName=targetVariable,
-                    signalFraction=signalFraction,
-                    identifier=filesDirectory +
-                    '/' +
-                    methodPrefixTrackLevel +
-                    "_1.root")
+                if particleList not in identifiersExtrainfosDict:
+                    identifiersExtrainfosDict[particleList] = [(extraInfoName, identifierTrackLevel)]
+                else:
+                    identifiersExtrainfosDict[particleList].append((extraInfoName, identifierTrackLevel))
 
                 ReadyMethods += 1
 
@@ -459,23 +450,41 @@ def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
                 B2INFO('flavorTagger: file ' + filesDirectory + '/' + methodPrefixTrackLevel + ".root" + ' will be saved.')
 
+                trackLevelPath = create_path()
+                SkipEmptyParticleList = register_module("SkimFilter")
+                SkipEmptyParticleList.param('particleLists', particleList)
+                SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
+                path.add_module(SkipEmptyParticleList)
+
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixTrackLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixTrackLevel + "_tree")
                 ntuple.param('variables', variables[category] + [targetVariable])
                 ntuple.param('particleList', particleList)
-                trackLevelPathsList[category].add_module(ntuple)
+                trackLevelPath.add_module(ntuple)
+
             else:
-                trackLevelPathsList[category].add_module(
-                    'MVAExpert',
-                    listNames=[particleList],
-                    extraInfoName=targetVariable,
-                    signalFraction=signalFraction,
-                    identifier=filesDirectory +
-                    '/' +
-                    methodPrefixTrackLevel +
-                    "_1.root")
+                if particleList not in identifiersExtrainfosDict:
+                    identifiersExtrainfosDict[particleList] = [(extraInfoName, identifierTrackLevel)]
+                else:
+                    identifiersExtrainfosDict[particleList].append((extraInfoName, identifierTrackLevel))
                 ReadyMethods += 1
+
+    # Each category has its own Path in order to be skipped if the corresponding particle list is empty
+    for particleList in identifiersExtrainfosDict:
+
+        trackLevelPath = create_path()
+        SkipEmptyParticleList = register_module("SkimFilter")
+        SkipEmptyParticleList.param('particleLists', particleList)
+        SkipEmptyParticleList.if_true(trackLevelPath, AfterConditionPath.CONTINUE)
+        path.add_module(SkipEmptyParticleList)
+
+        trackLevelPath.add_module(
+            'MVAMultipleExperts',
+            listNames=[particleList],
+            extraInfoNames=[row[0] for row in identifiersExtrainfosDict[particleList]],
+            signalFraction=signalFraction,
+            identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
 
     if ReadyMethods != len(trackLevelParticleLists):
         return False
@@ -538,9 +547,66 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     ReadyMethods = 0
 
     # Each category has its own Path in order to be skipped if the corresponding particle list is empty
-    eventLevelPathsList = dict()
+    identifiersExtrainfosDict = dict()
 
     for (particleList, category, combinerVariable) in eventLevelParticleLists:
+
+        methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
+        identifierEventLevel = filesDirectory + '/' + methodPrefixEventLevel + '_1.root'
+        targetVariable = 'isRightCategory(' + category + ')'
+        extraInfoName = targetVariable
+
+        if mode == 'Expert':
+
+            if not os.path.isfile(identifierEventLevel) and downloadFlag:
+                basf2_mva.download(methodPrefixEventLevel, identifierEventLevel)
+                if not os.path.isfile(identifierEventLevel):
+                    B2FATAL(
+                        'Flavor Tagger: Weight file ' +
+                        identifierEventLevel + ' was not downloaded from Database. Please check the buildOrRevision name. Stopped')
+
+            if not os.path.isfile(identifierEventLevel):
+                B2FATAL(
+                    'Flavor Tagger: ' +
+                    particleList +
+                    ' Eventlevel was not trained. Weight file ' +
+                    identifierEventLevel + ' was not found. Stopped')
+            else:
+                B2INFO('flavorTagger: MVAExpert ' + methodPrefixEventLevel + ' ready.')
+
+                if particleList not in identifiersExtrainfosDict:
+                    identifiersExtrainfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
+                else:
+                    identifiersExtrainfosDict[particleList].append((extraInfoName, identifierEventLevel))
+
+                ReadyMethods += 1
+
+        if mode == 'Sampler':
+            if not os.path.isfile(filesDirectory + '/' + methodPrefixEventLevel + "_1.root"):
+
+                B2INFO('flavorTagger: file ' + methodPrefixEventLevel + ".root" + ' will be saved.')
+                eventLevelPath = create_path()
+                SkipEmptyParticleList = register_module("SkimFilter")
+                SkipEmptyParticleList.param('particleLists', particleList)
+                SkipEmptyParticleList.if_true(eventLevelPath, AfterConditionPath.CONTINUE)
+                path.add_module(SkipEmptyParticleList)
+
+                ntuple = register_module('VariablesToNtuple')
+                ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
+                ntuple.param('treeName', methodPrefixEventLevel + "_tree")
+                ntuple.param('variables', variables[category] + [targetVariable])
+                ntuple.param('particleList', particleList)
+                eventLevelPath.add_module(ntuple)
+            else:
+
+                if particleList not in identifiersExtrainfosDict:
+                    identifiersExtrainfosDict[particleList] = [(extraInfoName, identifierEventLevel)]
+                else:
+                    identifiersExtrainfosDict[particleList].append((extraInfoName, identifierEventLevel))
+                ReadyMethods += 1
+
+    # Each category has its own Path in order to be skipped if the corresponding particle list is empty
+    for particleList in identifiersExtrainfosDict:
 
         eventLevelPath = create_path()
         SkipEmptyParticleList = register_module("SkimFilter")
@@ -548,63 +614,12 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
         SkipEmptyParticleList.if_true(eventLevelPath, AfterConditionPath.CONTINUE)
         path.add_module(SkipEmptyParticleList)
 
-        methodPrefixEventLevel = belleOrBelle2Flag + buildOrRevisionFlag + weightFiles + 'EventLevel' + category + 'FBDT'
-        targetVariable = 'isRightCategory(' + category + ')'
-
-        if mode == 'Expert':
-
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixEventLevel + '_1.root') and downloadFlag:
-                basf2_mva.download(methodPrefixEventLevel, filesDirectory + '/' + methodPrefixEventLevel + '_1.root')
-                if not os.path.isfile(filesDirectory + '/' + methodPrefixEventLevel + '_1.root'):
-                    B2FATAL(
-                        'Flavor Tagger: Weight file ' +
-                        methodPrefixEventLevel +
-                        '_1.config was not downloaded from Database. Please check the buildOrRevision name. Stopped')
-
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixEventLevel + '_1.root'):
-                B2FATAL(
-                    'Flavor Tagger: ' +
-                    particleList +
-                    ' Tracklevel was not trained. Weight file ' +
-                    methodPrefixEventLevel +
-                    '_1.config not found. Stopped')
-            else:
-                B2INFO('flavorTagger: Applying MVAExpert ' + methodPrefixEventLevel + ' .')
-
-                eventLevelPath.add_module(
-                    'MVAExpert',
-                    listNames=[particleList],
-                    extraInfoName=targetVariable,
-                    signalFraction=signalFraction,
-                    identifier=filesDirectory +
-                    '/' +
-                    methodPrefixEventLevel +
-                    "_1.root")
-
-                ReadyMethods += 1
-
-        if mode == 'Sampler':
-            if not os.path.isfile(filesDirectory + '/' + methodPrefixEventLevel + "_1.root"):
-                B2INFO('flavorTagger: file ' + methodPrefixEventLevel + ".root" + ' will be saved.')
-
-                ntuple = register_module('VariablesToNtuple')
-                ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
-                ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                ntuple.param('variables', variables[category] + [targetVariable])
-                ntuple.param('particleList', particleList)
-                eventLevelPathsList[category].add_module(ntuple)
-            else:
-
-                eventLevelPathsList[category].add_module(
-                    'MVAExpert',
-                    listNames=[particleList],
-                    extraInfoName=targetVariable,
-                    signalFraction=signalFraction,
-                    identifier=filesDirectory +
-                    '/' +
-                    methodPrefixEventLevel +
-                    "_1.root")
-                ReadyMethods += 1
+        eventLevelPath.add_module(
+            'MVAMultipleExperts',
+            listNames=[particleList],
+            extraInfoNames=[row[0] for row in identifiersExtrainfosDict[particleList]],
+            signalFraction=signalFraction,
+            identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
 
     if ReadyMethods != len(eventLevelParticleLists):
         return False
@@ -970,6 +985,7 @@ def flavorTagger(
         # Initialation of flavorTaggerInfo dataObject needs to be done in the main path
         flavorTaggerInfoBuilder = register_module('FlavorTaggerInfoBuilder')
         path.add_module(flavorTaggerInfoBuilder)
+
     # sampler or expert
     if mode == 'Sampler' or mode == 'Expert':
         if FillParticleLists(mode, roe_path):

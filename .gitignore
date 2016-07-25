@@ -93,6 +93,7 @@ runtime.dat
 .#*
 *~
 *#
+*.swp
 .ipynb_checkpoints/
 
 

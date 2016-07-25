@@ -999,8 +999,8 @@ def flavorTagger(
                         flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
                         flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
                         flavorTaggerInfoFiller.param('qrCategories', True)
-                        flavorTaggerInfoFiller.param('targetProb', True)
-                        flavorTaggerInfoFiller.param('trackPointers', True)
+                        flavorTaggerInfoFiller.param('targetProb', False)
+                        flavorTaggerInfoFiller.param('trackPointers', False)
                         roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path
 
     # Removes EventExtraInfos and ParticleExtraInfos of the EventParticleLists

@@ -64,14 +64,6 @@ class EnvironmentInformation:
         Try to download the current revision number from SVN.
         """
         try:
-            info = check_output(["svn", "info"], cwd=self.release_folder)
+            return check_output(["git", "log", "-1", "--format='%H'"], cwd=self.release_folder).decode()
         except:
-            try:
-                info = check_output(["git", "svn", "info"], cwd=self.release_folder)
-            except:
-                return ""
-
-        for line in info.decode().split("\n"):
-            match = re.search(r"Revision:\s(.*)", line)
-            if match:
-                return match.group(1)
+            return ""

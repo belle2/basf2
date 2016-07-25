@@ -456,7 +456,7 @@ print('*                                                                        
 # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
 
-for (particleList, category, qrVariable) in eventLevelParticleLists:
+for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
                             category + ' (binning 50)', 50, -1.0, 1.0)

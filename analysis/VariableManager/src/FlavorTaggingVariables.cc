@@ -713,7 +713,7 @@ namespace Belle2 {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
-          StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
+          StoreObjPtr<ParticleList> SlowPionList("pi+:PionROE");
 
           PCmsLabTransform T;
           TLorentzVector momTargetKaon = T.rotateLabToCms() * particle -> get4Vector();
@@ -766,7 +766,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
-          StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
+          StoreObjPtr<ParticleList> FastParticleList("pi+:PionROE");
           PCmsLabTransform T;
           TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
           TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
@@ -1116,7 +1116,7 @@ namespace Belle2 {
           // if KaonPion
           if (index == 9)
           {
-            StoreObjPtr<ParticleList> SlowPionList("pi+:SlowPionROE");
+            StoreObjPtr<ParticleList> SlowPionList("pi+:PionROE");
             Particle* TargetSlowPion = nullptr;
             if (SlowPionList.isValid()) {
               double maximumProbSlowPion = 0;
@@ -1148,7 +1148,7 @@ namespace Belle2 {
           // FSC",
           if (index == 11)
           {
-            StoreObjPtr<ParticleList> FastParticleList("pi+:FastPionROE");
+            StoreObjPtr<ParticleList> FastParticleList("pi+:PionROE");
             PCmsLabTransform T;
             Particle* TargetFastParticle = nullptr;
             if (FastParticleList.isValid()) {

@@ -93,7 +93,16 @@ namespace Belle2 {
      * Plane.
      *
      * @var Solids::psheet
-     * Element of plastic sheet.
+     * Plastic sheets.
+     *
+     * @var Solids::segment
+     * Segments.
+     *
+     * @var Solids::stripvol
+     * Strip volumes.
+     *
+     * @var Solids::strip
+     * Strips.
      *
      * @var Solids::groove
      * Strip grooves.
@@ -123,6 +132,9 @@ namespace Belle2 {
       G4VSolid* secsupp;
       G4VSolid** plane;
       G4VSolid** psheet;
+      G4VSolid** segment;
+      G4VSolid** stripvol;
+      G4VSolid** strip;
       G4VSolid** groove;
       G4VSolid* sipm;
       G4VSolid* board;
@@ -144,6 +156,9 @@ namespace Belle2 {
      *
      * @var LogicalVolumes::cover
      * Sector cover.
+     *
+     * @var LogicalVolumes::segment
+     * Segments.
      *
      * @var LogicalVolumes::stripvol
      * Strip volumes.
@@ -173,6 +188,7 @@ namespace Belle2 {
       G4LogicalVolume* shieldLayer;
       G4LogicalVolume* shieldLayerSector;
       G4LogicalVolume* cover;
+      G4LogicalVolume** segment;
       G4LogicalVolume** stripvol;
       G4LogicalVolume** strip;
       G4LogicalVolume** groove;
@@ -201,12 +217,13 @@ namespace Belle2 {
      * Volume numbers.
      */
     struct VolumeNumbers {
-      int endcap; /**< Endcap. */
-      int layer;  /**< Layer. */
-      int sector; /**< Sector. */
-      int plane;  /**< Plane. */
-      int strip;  /**< Strip. */
-      int board;  /**< Board. */
+      int endcap;  /**< Endcap. */
+      int layer;   /**< Layer. */
+      int sector;  /**< Sector. */
+      int plane;   /**< Plane. */
+      int segment; /**< Segment. */
+      int strip;   /**< Strip. */
+      int board;   /**< Board. */
     };
 
     /**
@@ -278,9 +295,9 @@ namespace Belle2 {
       G4LogicalVolume* createLayerLogicalVolume(const char* name) const;
 
       /**
-       * Create layer solid and shield layer logical volume.
+       * Create layer solid.
        */
-      void createLayerLogicalVolume();
+      void createLayerSolid();
 
       /**
        * Create sector logical volume.
@@ -290,9 +307,9 @@ namespace Belle2 {
       G4LogicalVolume* createSectorLogicalVolume(const char* name) const;
 
       /**
-       * Create sector solid and shield layer sector logical volume.
+       * Create sector solid.
        */
-      void createSectorLogicalVolume();
+      void createSectorSolid();
 
       /**
        * Create sector cover solid.
@@ -424,14 +441,20 @@ namespace Belle2 {
        * @param[in] nSolids Number of solids.
        * @param[in] name    First part of solid names.
        */
-      G4UnionSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
-                                int nSolids, std::string name);
+      G4VSolid* unifySolids(G4VSolid** solids, HepGeom::Transform3D* transf,
+                            int nSolids, std::string name);
 
       /**
-       * Create plastic sheet solids.
-       * @param[in] n Number of sector, from 0 to 4.
+       * Create plastic sheet logical volume.
+       * @param[in] iSegment Number of segment (0-based).
        */
-      void createPlasticSheetSolid(int n);
+      void createPlasticSheetLogicalVolume(int iSegment);
+
+      /**
+       * Create segment logical volume.
+       * @param[in] iSegment Number of segment (0-based).
+       */
+      void createSegmentLogicalVolume(int iSegment);
 
       /**
        * Create strip volume logical volume.
@@ -606,16 +629,22 @@ namespace Belle2 {
                                      G4LogicalVolume* plane) const;
 
       /**
-       * Create strip volume.
+       * Create segment.
        * @param[in] plane Plane logical volume.
        */
-      void createStripVolume(G4LogicalVolume* plane) const;
+      void createSegment(G4LogicalVolume* plane) const;
+
+      /**
+       * Create strip volume.
+       * @param[in] segment Segment logical volume.
+       */
+      void createStripVolume(G4LogicalVolume* segment) const;
 
       /**
        * Create strip (version for normal mode).
-       * @param[in] plane Plane logical volume.
+       * @param[in] segment Segment logical volume.
        */
-      void createStrip(G4LogicalVolume* plane) const;
+      void createStrip(G4LogicalVolume* segment) const;
 
       /**
        * Create strip (version for background study mode).

@@ -38,6 +38,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
   m_Layer = new HepGeom::Transform3D*[nEndcaps];
   m_Sector = new HepGeom::Transform3D** [nEndcaps];
   m_Plane = new HepGeom::Transform3D** *[nEndcaps];
+  m_Segment = new HepGeom::Transform3D**** [nEndcaps];
   m_Strip = new HepGeom::Transform3D**** [nEndcaps];
   m_StripInverse = new HepGeom::Transform3D**** [nEndcaps];
   for (iEndcap = 0; iEndcap < nEndcaps; iEndcap++) {
@@ -46,6 +47,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
     m_Layer[iEndcap] = new HepGeom::Transform3D[nLayers];
     m_Sector[iEndcap] = new HepGeom::Transform3D*[nLayers];
     m_Plane[iEndcap] = new HepGeom::Transform3D** [nLayers];
+    m_Segment[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     m_Strip[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     m_StripInverse[iEndcap] = new HepGeom::Transform3D** *[nLayers];
     for (iLayer = 0; iLayer < nLayers; iLayer++) {
@@ -53,6 +55,7 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
       m_Sector[iEndcap][iLayer] = new HepGeom::Transform3D[nSectors];
       if (iLayer < nDetectorLayers) {
         m_Plane[iEndcap][iLayer] = new HepGeom::Transform3D*[nSectors];
+        m_Segment[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
         m_Strip[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
         m_StripInverse[iEndcap][iLayer] = new HepGeom::Transform3D** [nSectors];
       }
@@ -62,12 +65,20 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
         if (iLayer >= nDetectorLayers)
           continue;
         m_Plane[iEndcap][iLayer][iSector] = new HepGeom::Transform3D[nPlanes];
+        m_Segment[iEndcap][iLayer][iSector] =
+          new HepGeom::Transform3D*[nPlanes];
         m_Strip[iEndcap][iLayer][iSector] = new HepGeom::Transform3D*[nPlanes];
         m_StripInverse[iEndcap][iLayer][iSector] =
           new HepGeom::Transform3D*[nPlanes];
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
           m_GeoDat->getPlaneTransform(
             &m_Plane[iEndcap][iLayer][iSector][iPlane], iPlane);
+          m_Segment[iEndcap][iLayer][iSector][iPlane] =
+            new HepGeom::Transform3D[nSegments];
+          for (iSegment = 0; iSegment < nSegments; iSegment++) {
+            m_Segment[iEndcap][iLayer][iSector][iPlane][iSegment] =
+              HepGeom::Translate3D(0, 0, 0);
+          }
           m_Strip[iEndcap][iLayer][iSector][iPlane] =
             new HepGeom::Transform3D[nStrips];
           m_StripInverse[iEndcap][iLayer][iSector][iPlane] =
@@ -98,6 +109,15 @@ EKLM::TransformData::TransformData(bool global, bool useDisplacement)
               alignmentData = alignment->getAlignmentData(segment);
               if (alignmentData == NULL)
                 B2FATAL("Incomplete EKLM displacement data.");
+              m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
+              [iSegment - 1] =
+                HepGeom::Translate3D(
+                  alignmentData->getDx() * CLHEP::cm / Unit::cm,
+                  alignmentData->getDy() * CLHEP::cm / Unit::cm, 0) *
+                m_Segment[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
+                [iSegment - 1] *
+                HepGeom::RotateZ3D(alignmentData->getDalpha() * CLHEP::rad /
+                                   Unit::rad);
               for (iStrip = 1; iStrip <= nStripsSegment; iStrip++) {
                 m_Strip[iEndcap - 1][iLayer - 1][iSector - 1][iPlane - 1]
                 [nStripsSegment * (iSegment - 1) + iStrip - 1] =
@@ -135,20 +155,24 @@ EKLM::TransformData::~TransformData()
         continue;
       for (iSector = 0; iSector < nSectors; iSector++) {
         for (iPlane = 0; iPlane < nPlanes; iPlane++) {
+          delete[] m_Segment[iEndcap][iLayer][iSector][iPlane];
           delete[] m_Strip[iEndcap][iLayer][iSector][iPlane];
           delete[] m_StripInverse[iEndcap][iLayer][iSector][iPlane];
         }
         delete[] m_Plane[iEndcap][iLayer][iSector];
+        delete[] m_Segment[iEndcap][iLayer][iSector];
         delete[] m_Strip[iEndcap][iLayer][iSector];
         delete[] m_StripInverse[iEndcap][iLayer][iSector];
       }
       delete[] m_Plane[iEndcap][iLayer];
+      delete[] m_Segment[iEndcap][iLayer];
       delete[] m_Strip[iEndcap][iLayer];
       delete[] m_StripInverse[iEndcap][iLayer];
     }
     delete[] m_Layer[iEndcap];
     delete[] m_Sector[iEndcap];
     delete[] m_Plane[iEndcap];
+    delete[] m_Segment[iEndcap];
     delete[] m_Strip[iEndcap];
     delete[] m_StripInverse[iEndcap];
   }
@@ -156,6 +180,7 @@ EKLM::TransformData::~TransformData()
   delete[] m_Layer;
   delete[] m_Sector;
   delete[] m_Plane;
+  delete[] m_Segment;
   delete[] m_Strip;
   delete[] m_StripInverse;
 }
@@ -217,6 +242,13 @@ const HepGeom::Transform3D* EKLM::TransformData::
 getPlaneTransform(int endcap, int layer, int sector, int plane) const
 {
   return &m_Plane[endcap - 1][layer - 1][sector - 1][plane - 1];
+}
+
+const HepGeom::Transform3D* EKLM::TransformData::
+getSegmentTransform(int endcap, int layer, int sector, int plane,
+                    int segment) const
+{
+  return &m_Segment[endcap - 1][layer - 1][sector - 1][plane - 1][segment - 1];
 }
 
 const HepGeom::Transform3D* EKLM::TransformData::

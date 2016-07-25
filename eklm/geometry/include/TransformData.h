@@ -82,6 +82,18 @@ namespace Belle2 {
       getPlaneTransform(int endcap, int layer, int sector, int plane) const;
 
       /**
+       * Get segment transformation.
+       * @param[in] endcap  Endcap number.
+       * @param[in] layer   Layer number.
+       * @param[in] sector  Sector number.
+       * @param[in] plane   Plane number.
+       * @param[in] segment Segment number.
+       */
+      const HepGeom::Transform3D*
+      getSegmentTransform(int endcap, int layer, int sector, int plane,
+                          int segment) const;
+
+      /**
        * Get strip local to global transformation by hit.
        * @param[in] hit Hit.
        * @return Transformation.
@@ -145,6 +157,9 @@ namespace Belle2 {
 
       /** Plane transformations. */
       HepGeom::Transform3D**** m_Plane;
+
+      /** Segment transformations. */
+      HepGeom::Transform3D***** m_Segment;
 
       /** Strip transformations. */
       HepGeom::Transform3D***** m_Strip;

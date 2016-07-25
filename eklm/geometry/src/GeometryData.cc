@@ -759,9 +759,9 @@ EKLM::GeometryData::getSheetTransform(HepGeom::Transform3D* t, int n) const
 {
   double y;
   y = m_StripPosition[n].getY();
-  if (n % 15 == 0)
+  if (n % m_NStripsSegment == 0)
     y = y + 0.5 * m_PlasticSheetGeometry.getDeltaL();
-  else if (n % 15 == 14)
+  else if (n % m_NStripsSegment == m_NStripsSegment - 1)
     y = y - 0.5 * m_PlasticSheetGeometry.getDeltaL();
   *t = HepGeom::Translate3D(m_StripPosition[n].getX(), y, 0.0);
 }

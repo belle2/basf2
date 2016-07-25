@@ -231,7 +231,9 @@ void Hough3DFinder::initVersion3(vector<float > & initVariables){
   m_geoCandidatesDiffStWires = new vector<vector<double > >;
   for(int iLayer=0; iLayer<4; iLayer++) m_geoCandidatesDiffStWires->push_back(vector<double> ());
 
+  // [TODO] Add to class. Add getters and setters.
   m_mBool["fVHDLFile"] = 0;
+  m_mBool["fVerbose"] = 0;
 }
 
 void Hough3DFinder::setInputFileName( string inputFileName ) {
@@ -593,8 +595,7 @@ void Hough3DFinder::runFinderVersion2(vector<double> &trackVariables, vector<vec
 
 void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vector<double> > &stTSs, vector<vector<int> > &stTSDrift){
 
-  // [TODO] Add to class. Add getters and setters.
-  int m_verboseFlag = 0;
+  int m_verboseFlag = m_mBool["fVerbose"];
 
   if(m_verboseFlag) cout<<"####geoFinder start####"<<endl;
 
@@ -811,21 +812,26 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
   //cout<<"<<<phi0>>>"<<endl; m_mSignalStorage["phi0"].dump();
   //cout<<"<<<charge>>>"<<endl; m_mSignalStorage["charge"].dump();
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_"+to_string(iSt)].dump();}
-  // Add two wire unit(rad) to widen start of window.
-  for(unsigned iSt=0; iSt<4; iSt++) {
-    double wirePhiUnit = 2 * mConstD["Trg_PI"] / mConstV["nTSs"][2*iSt+1];
-    if (iSt%2 == 0) {
-      m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] + Belle2::TRGCDCJSignal(wirePhiUnit,m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
-    } else {
-      m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] - Belle2::TRGCDCJSignal(wirePhiUnit, m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
-    }
-  }
+
+  // This could be needed in the future if efficiency is low.
+  // To use this code, change dPhiAx to dPhiAx_m when constraining dPhiAx below.
+  //// Add two wire unit(rad) to widen start of window.
+  //for(unsigned iSt=0; iSt<4; iSt++) {
+  //  double wirePhiUnit = 2 * mConstD["Trg_PI"] / mConstV["nTSs"][2*iSt+1];
+  //  if (iSt%2 == 0) {
+  //    m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] + Belle2::TRGCDCJSignal(wirePhiUnit,m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
+  //  } else {
+  //    m_mSignalStorage["dPhiAx_m_"+to_string(iSt)] <= m_mSignalStorage["dPhiAx_"+to_string(iSt)] - Belle2::TRGCDCJSignal(wirePhiUnit, m_mSignalStorage["dPhiAx_"+to_string(iSt)].getToReal(), m_commonData);
+  //  }
+  //}
+
   //for(int iSt=0; iSt<4; iSt++) {cout<<"<<<dPhiAx_m_"<<iSt<<">>>"<<endl; m_mSignalStorage["dPhiAx_m_"+to_string(iSt)].dump();}
-  // Constrain dPhiAx[i] to [0, 2pi]
+  // Constrain dPhiAx[i] to [0, 2pi)
   if(m_mSignalStorage.find("dPhiAxMax_0")==m_mSignalStorage.end())
   {
     for(unsigned iSt=0; iSt<4; iSt++){
-      string t_valueName = "dPhiAx_m_" + to_string(iSt);
+      string t_valueName = "dPhiAx_" + to_string(iSt);
+      //string t_valueName = "dPhiAx_m_" + to_string(iSt);
       string t_maxName = "dPhiAxMax_" + to_string(iSt);
       string t_minName = "dPhiAxMin_" + to_string(iSt);
       string t_2PiName = "dPhiAx2Pi_" + to_string(iSt);
@@ -835,32 +841,33 @@ void Hough3DFinder::runFinderVersion3(vector<double> &trackVariables, vector<vec
     }
   }
   for(unsigned iSt=0; iSt<4; iSt++){
-    string t_in1Name = "dPhiAx_m_" + to_string(iSt);
+    string t_in1Name = "dPhiAx_" + to_string(iSt);
+    //string t_in1Name = "dPhiAx_m_" + to_string(iSt);
     string t_valueName = "dPhiAx_c_" + to_string(iSt);
     string t_maxName = "dPhiAxMax_" + to_string(iSt);
     string t_minName = "dPhiAxMin_" + to_string(iSt);
     string t_2PiName = "dPhiAx2Pi_" + to_string(iSt);
     // Create data for ifElse
     vector<pair<Belle2::TRGCDCJSignal, vector<pair<Belle2::TRGCDCJSignal*, Belle2::TRGCDCJSignal> > > > t_data;
-    // Compare
-    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">", m_mSignalStorage[t_maxName]);
-    // Assignments
+    // Compare (dPhiAx_m >= 2*pi)
+    Belle2::TRGCDCJSignal t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">=", m_mSignalStorage[t_maxName]);
+    // Assignments (dPhiAx_c <= dPhiAx_m - 2*pi)
     vector<pair<Belle2::TRGCDCJSignal *, Belle2::TRGCDCJSignal> > t_assigns = {
       make_pair(&m_mSignalStorage[t_valueName], (m_mSignalStorage[t_in1Name]-m_mSignalStorage[t_2PiName]).limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
     };
     // Push to data.
     t_data.push_back(make_pair(t_compare, t_assigns));
-    // Compare
-    t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">", m_mSignalStorage[t_minName]);
-    // Assignments
+    // Compare (dPhiAx_m >= 0)
+    t_compare = Belle2::TRGCDCJSignal::comp(m_mSignalStorage[t_in1Name], ">=", m_mSignalStorage[t_minName]);
+    // Assignments (dPhiAx_c <= dPhiAx_m)
     t_assigns = {
       make_pair(&m_mSignalStorage[t_valueName], m_mSignalStorage[t_in1Name].limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
     };
     // Push to data.
     t_data.push_back(make_pair(t_compare, t_assigns));
-    // Compare
+    // Compare (dPhiAx_m < 0)
     t_compare = Belle2::TRGCDCJSignal();
-    // Assignments
+    // Assignments (dPhiAx_c <= dPhiAx_m + 2*pi)
     t_assigns = {
       make_pair(&m_mSignalStorage[t_valueName], (m_mSignalStorage[t_in1Name]+m_mSignalStorage[t_2PiName]).limit(m_mSignalStorage[t_minName],m_mSignalStorage[t_maxName])),
     };

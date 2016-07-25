@@ -9,7 +9,7 @@
 //-
 
 
-#include <ios>
+#include <iosfwd>
 #include <memory>
 #include <string>
 

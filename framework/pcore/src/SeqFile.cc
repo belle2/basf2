@@ -9,6 +9,7 @@
 #include <framework/pcore/SeqFile.h>
 #include <framework/logging/Logger.h>
 
+#include <ios>
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -55,6 +56,8 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
 
 void SeqFile::openFile(std::string filename, bool readonly)
 {
+  if (std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get()))
+    out->flush();
   close(m_fd);
   // add compression suffix if file is supposed to be compressed
   if (m_compressed) filename += ".gz";
@@ -81,6 +84,8 @@ void SeqFile::openFile(std::string filename, bool readonly)
 
 SeqFile::~SeqFile()
 {
+  if (std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get()))
+    out->flush();
   close(m_fd);
   B2INFO("Seq File " << m_nfile << " closed");
 }

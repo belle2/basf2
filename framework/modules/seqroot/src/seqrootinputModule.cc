@@ -189,7 +189,7 @@ void SeqRootInputModule::endRun()
 void SeqRootInputModule::terminate()
 {
   delete m_streamer;
-  //  delete m_file;
+  delete m_file;
   B2INFO("SeqRootInput: terminate called");
 }
 

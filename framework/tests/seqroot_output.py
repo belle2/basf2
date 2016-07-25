@@ -192,7 +192,18 @@ main.add_module(output)
 main.add_module(progress)
 # main.add_module('PrintCollections')
 
-# Process events
 process(main)
+
+
+# ============================================================================
+# Read file again
+
+readpath = create_path()
+readpath.add_module('SeqRootInput', inputFileName='seqout_test.sroot')
+count = readpath.add_module('Progress')
+process(readpath)
+
+assert statistics.modules[1].name == 'Progress'
+assert statistics.modules[1].calls(statistics.EVENT) == 5
 
 os.remove('seqout_test.sroot')

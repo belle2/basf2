@@ -4,6 +4,15 @@ Framework
 
 basf2
 =====
+.. automodule:: basf2
+   :members:
+
+   .. autofunction:: basf2.get_random_seed
+   .. autofunction:: basf2.set_random_seed
+
+..
+  .. autofunction:: basf2.update_file_metadata
+
 
 
 Modules and Paths
@@ -70,19 +79,6 @@ Database
 .. autofunction:: basf2.set_experiment_name
 
 
-Core Functions
---------------
-
-.. automodule:: basf2
-   :members:
-
-   .. autofunction:: basf2.get_random_seed
-   .. autofunction:: basf2.set_random_seed
-
-..
-  .. autofunction:: basf2.update_file_metadata
-
-
 Utilities
 =========
 
@@ -112,3 +108,29 @@ B2Tools
 .. automodule:: B2Tools.format
    :members:
    :show-inheritance:
+
+..
+   Test
+   ----
+   
+   ..
+       .. automodule:: Belle2
+      :members:
+      :imported-members:
+      :undoc-members:
+   
+   .. currentmodule:: Belle2
+   
+   .. autoclass:: PyStoreArray
+      :members:
+      :private-members:
+      :inherited-members:
+      :special-members:
+      :undoc-members:
+   ..
+       .. autoclass:: PyStoreArray
+      :members:
+      :private-members:
+      :inherited-members:
+      :special-members:
+      :undoc-members:

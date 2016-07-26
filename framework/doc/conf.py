@@ -16,6 +16,8 @@
 import sys
 import os
 import re
+import glob
+import shutil
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -305,6 +307,77 @@ def process_sig(app, what, name, obj, options, signature, return_annotation):
         return (signature, return_annotation)
 
 
+def improve_docstring(obj):
+    """
+    Enhances docstrings of PyROOT objects/classes.
+
+    >>> improve_docstring(Belle2.Variable.Manager)
+
+    or
+
+    >>> variables = ROOT.Belle2.Variable.Manager
+    >>> improve_docstring(variables)
+    """
+    try:
+        # is this a ..._meta object?
+        classname = obj.__name__
+        pyclass = obj
+    except AttributeError:
+        classname = obj.__class__.__name__
+        pyclass = obj.__class__
+
+    if '::' not in classname:
+        return  # not a ROOT class?
+    pos = classname.find('Belle2::')
+    classname = classname[pos:]
+    if pyclass.__doc__ is None:
+        pyclass.__doc__ = ''
+
+    pyclass.__name__ = 'Belle2.' + classname
+
+    from ROOT import TClass
+    tclass = TClass(classname)
+    # if tclass:
+    #    pyclass.__doc__ += '\n' + tclass.GetTitle()
+
+    doxygen_url = 'https://belle2.cc.kek.jp/internal/software/development/class'
+    doxygen_url += '_1_1'.join(classname.split('::'))
+    doxygen_url += '.html'
+    pyclass.__doc__ += '\n`Doxygen page for %s <%s>`_' % (classname, doxygen_url)
+
+    # TODO put this into the member docstrings directly? (sadly, readonly)
+    members = tclass.GetListOfMethods()
+    if members.GetEntries() > 0:
+        pyclass.__doc__ += '\n\nMember functions:'
+    for f in members:
+        # getattr(pyclass, f.GetName()).__doc__ = "test"
+        pyclass.__doc__ += '\n * %s %s%s' % (f.GetReturnTypeName(), f.GetName(), f.GetSignature())
+        title = f.GetTitle()
+        if title:
+            pyclass.__doc__ += ' (%s)' % (title)
+
+    members = tclass.GetListOfAllPublicDataMembers()
+    if members.GetEntries() > 0:
+        pyclass.__doc__ += '\n\nPublic data members'
+    for f in members:
+        pyclass.__doc__ += '\n * %s' % (f.GetName())
+        title = f.GetTitle()
+        if title:
+            pyclass.__doc__ += ' (%s)' % (title)
+
+
+def skipmember(app, what, name, obj, skip, options):
+    """
+    This is executed before docstring processing,
+    so try improving them a bit.
+    """
+    try:
+        improve_docstring(obj)
+    except AttributeError:
+        pass
+    return skip
+
+
 def process_docstring(app, what, name, obj, options, lines):
     """
     convert doxygen syntax to sphinx
@@ -331,3 +404,31 @@ def setup(app):
     """
     app.connect('autodoc-process-signature', process_sig)
     app.connect('autodoc-process-docstring', process_docstring)
+    app.connect('autodoc-skip-member', skipmember)
+
+
+other_rst = 'build/packages/'
+
+
+def copy_rst(base):
+    """
+    copy rst files in other packages into other_rst
+    """
+    filelist = []
+    for rstfile in glob.iglob(base + "/*/**/sphinx_*.rst", recursive=True):
+        commonpref = os.path.commonprefix([rstfile, base + '/framework'])
+        if commonpref.startswith(base + '/framework'):
+            # ignore framework things
+            continue
+
+        basename = os.path.basename(rstfile)
+        if basename in filelist:
+            print('File "%s" found twice! Please use unique names!' % (basename))
+            sys.exit(1)
+        filelist.append(basename)
+        shutil.copy(rstfile, other_rst)
+
+
+shutil.rmtree(other_rst, ignore_errors=True)
+os.mkdir(other_rst)
+copy_rst(os.getenv('BELLE2_LOCAL_DIR'))

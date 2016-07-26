@@ -249,7 +249,9 @@ void EKLM::GeoEKLMCreator::createEndcapSolid()
     m_GeoDat->getEndcapStructureGeometry();
   const EKLMGeometry::ElementPosition* endcapPos =
     m_GeoDat->getEndcapPosition();
-  const double z[2] = { -endcapPos->getLength() / 2, endcapPos->getLength() / 2};
+  const double z[2] = { -endcapPos->getLength() / 2,
+                        endcapPos->getLength() / 2
+                      };
   const double rMin[2] = {0, 0};
   const double rMax[2] = {endcapPos->getOuterR(), endcapPos->getOuterR()};
   G4Polyhedra* op = NULL;
@@ -766,7 +768,8 @@ void EKLM::GeoEKLMCreator::createSectorSupportLogicalVolume()
   }
   try {
     us3 = new G4UnionSolid("SectorSupport_Union3", us2,
-                           m_Solids.sectorsup.otube, HepGeom::Translate3D(0., 0., 0.));
+                           m_Solids.sectorsup.otube,
+                           HepGeom::Translate3D(0., 0., 0.));
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -1397,8 +1400,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailALogicalVolume()
   G4Box* box = NULL;
   G4SubtractionSolid* ss1, *ss2, *ss3, *solidDetailA;
   double lx, ly;
-  const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const EKLMGeometry::ShieldDetailGeometry* detailA = shieldGeometry->getDetailA();
+  const EKLMGeometry::ShieldGeometry* shieldGeometry =
+    m_GeoDat->getShieldGeometry();
+  const EKLMGeometry::ShieldDetailGeometry* detailA =
+    shieldGeometry->getDetailA();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
   lx = detailA->getLengthX() / 2;
   ly = detailA->getLengthY() / 2;
@@ -1448,8 +1453,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailBLogicalVolume()
   G4Box* box = NULL;
   G4SubtractionSolid* ss1, *solidDetailB;
   double lx, ly;
-  const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const EKLMGeometry::ShieldDetailGeometry* detailB = shieldGeometry->getDetailB();
+  const EKLMGeometry::ShieldGeometry* shieldGeometry =
+    m_GeoDat->getShieldGeometry();
+  const EKLMGeometry::ShieldDetailGeometry* detailB =
+    shieldGeometry->getDetailB();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
   lx = detailB->getLengthX() / 2;
   ly = detailB->getLengthY() / 2;
@@ -1487,8 +1494,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
   G4Box* box = NULL;
   G4SubtractionSolid* ss1, *ss2, *ss3, *solidDetailC;
   double lx, ly;
-  const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const EKLMGeometry::ShieldDetailGeometry* detailC = shieldGeometry->getDetailC();
+  const EKLMGeometry::ShieldGeometry* shieldGeometry =
+    m_GeoDat->getShieldGeometry();
+  const EKLMGeometry::ShieldDetailGeometry* detailC =
+    shieldGeometry->getDetailC();
   HepGeom::Transform3D t = HepGeom::Translate3D(0, 0, 0);
   lx = detailC->getLengthX() / 2;
   ly = detailC->getLengthY() / 2;
@@ -1536,8 +1545,10 @@ void EKLM::GeoEKLMCreator::createShieldDetailCLogicalVolume()
 void EKLM::GeoEKLMCreator::createShieldDetailDLogicalVolume()
 {
   G4TriangularPrism* solidDetailDPrism;
-  const EKLMGeometry::ShieldGeometry* shieldGeometry = m_GeoDat->getShieldGeometry();
-  const EKLMGeometry::ShieldDetailGeometry* detailD = shieldGeometry->getDetailD();
+  const EKLMGeometry::ShieldGeometry* shieldGeometry =
+    m_GeoDat->getShieldGeometry();
+  const EKLMGeometry::ShieldDetailGeometry* detailD =
+    shieldGeometry->getDetailD();
   try {
     solidDetailDPrism =
       new G4TriangularPrism("ShieldDetailD_Prism",
@@ -1729,7 +1740,8 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
 {
   int i;
   int j;
-  const EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
+  const EKLMGeometry::BoardGeometry* boardGeometry =
+    m_GeoDat->getBoardGeometry();
   const EKLMGeometry::BoardPosition* boardPos;
   for (i = 0; i < m_GeoDat->getNPlanes(); i++) {
     for (j = 0; j < m_GeoDat->getNBoards(); j++) {
@@ -1737,7 +1749,8 @@ void EKLM::GeoEKLMCreator::calcBoardTransform()
       m_BoardTransform[i][j] =
         HepGeom::Transform3D(
           HepGeom::RotateZ3D(boardPos->getPhi()) *
-          HepGeom::Translate3D(boardPos->getR() - 0.5 * boardGeometry->getHeight(), 0., 0.) *
+          HepGeom::Translate3D(boardPos->getR() -
+                               0.5 * boardGeometry->getHeight(), 0., 0.) *
           HepGeom::RotateZ3D(90.0 * CLHEP::deg));
     }
   }
@@ -1907,7 +1920,8 @@ createBaseBoard(G4LogicalVolume* segmentReadoutBoard) const
 {
   G4LogicalVolume* logicBaseBoard = NULL;
   HepGeom::Transform3D t;
-  const EKLMGeometry::BoardGeometry* boardGeometry = m_GeoDat->getBoardGeometry();
+  const EKLMGeometry::BoardGeometry* boardGeometry =
+    m_GeoDat->getBoardGeometry();
   std::string boardName = "BaseBoard_" + segmentReadoutBoard->GetName();
   try {
     logicBaseBoard =
@@ -1949,9 +1963,10 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
   }
   geometry::setVisibility(*logicStripBoard, true);
   geometry::setColor(*logicStripBoard, "#0000ffff");
-  t = HepGeom::Translate3D(-0.5 * boardGeometry->getLength() + stripBoardPos->getX(),
-                           -0.5 * boardGeometry->getHeight() + boardGeometry->getBaseHeight() +
-                           0.5 * boardGeometry->getStripHeight(), 0.);
+  t = HepGeom::Translate3D(
+        -0.5 * boardGeometry->getLength() + stripBoardPos->getX(),
+        -0.5 * boardGeometry->getHeight() + boardGeometry->getBaseHeight() +
+        0.5 * boardGeometry->getStripHeight(), 0.);
   try {
     new G4PVPlacement(t, logicStripBoard, boardName, segmentReadoutBoard,
                       false, 1, false);
@@ -2278,7 +2293,8 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
                  m_CurVol.segment++)
               createSegment(plane);
           }
-          if (m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorBackground) {
+          if (m_GeoDat->getDetectorMode() ==
+              EKLMGeometry::c_DetectorBackground) {
             for (m_CurVol.plane = 1; m_CurVol.plane <= m_GeoDat->getNPlanes();
                  m_CurVol.plane++) {
               for (m_CurVol.board = 1; m_CurVol.board <= m_GeoDat->getNBoards();

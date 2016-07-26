@@ -113,20 +113,20 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   switch (m_type) {
     case c_SensitiveStrip:
       hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());
-      hit->setPlane(hist->GetVolume(stripLevel + 2)->GetCopyNo());
-      hit->setSector(hist->GetVolume(stripLevel + 3)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(stripLevel + 4)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(stripLevel + 5)->GetCopyNo());
+      hit->setPlane(hist->GetVolume(stripLevel + 3)->GetCopyNo());
+      hit->setSector(hist->GetVolume(stripLevel + 4)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(stripLevel + 5)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(stripLevel + 6)->GetCopyNo());
       hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
                                              hit->getSector(), hit->getPlane(),
                                              hit->getStrip()));
       break;
     case c_SensitiveSiPM:
       hit->setStrip(hist->GetVolume(1)->GetCopyNo());
-      hit->setPlane(hist->GetVolume(3)->GetCopyNo());
-      hit->setSector(hist->GetVolume(4)->GetCopyNo());
-      hit->setLayer(hist->GetVolume(5)->GetCopyNo());
-      hit->setEndcap(hist->GetVolume(6)->GetCopyNo());
+      hit->setPlane(hist->GetVolume(4)->GetCopyNo());
+      hit->setSector(hist->GetVolume(5)->GetCopyNo());
+      hit->setLayer(hist->GetVolume(6)->GetCopyNo());
+      hit->setEndcap(hist->GetVolume(7)->GetCopyNo());
       hit->setVolumeID(m_GeoDat->stripNumber(hit->getEndcap(), hit->getLayer(),
                                              hit->getSector(), hit->getPlane(),
                                              hit->getStrip()) + 100000);

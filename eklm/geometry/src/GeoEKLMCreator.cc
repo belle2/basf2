@@ -82,6 +82,10 @@ void EKLM::GeoEKLMCreator::newVolumes()
     (G4VSolid**)malloc(m_GeoDat->getNPlanes() * sizeof(G4VSolid*));
   if (m_Solids.plane == NULL)
     B2FATAL(MemErr);
+  m_Solids.plasticSheetElement =
+    (G4VSolid**)malloc(m_GeoDat->getNStrips() * sizeof(G4VSolid*));
+  if (m_Solids.plasticSheetElement == NULL)
+    B2FATAL(MemErr);
   m_Solids.psheet =
     (G4VSolid**)malloc(m_GeoDat->getNSegments() * sizeof(G4VSolid*));
   if (m_Solids.psheet == NULL)
@@ -90,14 +94,19 @@ void EKLM::GeoEKLMCreator::newVolumes()
                     malloc(m_GeoDat->getNSegments() * sizeof(G4LogicalVolume*));
   if (m_LogVol.psheet == NULL)
     B2FATAL(MemErr);
-  m_Solids.segment =
-    (G4VSolid**)malloc(m_GeoDat->getNSegments() * sizeof(G4VSolid*));
-  if (m_Solids.segment == NULL)
-    B2FATAL(MemErr);
   m_LogVol.segment =
     (G4LogicalVolume**)malloc(m_GeoDat->getNSegments() *
                               sizeof(G4LogicalVolume*));
   if (m_LogVol.segment == NULL)
+    B2FATAL(MemErr);
+  m_Solids.stripSegment =
+    (G4VSolid**)malloc(m_GeoDat->getNSegments() * sizeof(G4VSolid*));
+  if (m_Solids.stripSegment == NULL)
+    B2FATAL(MemErr);
+  m_LogVol.stripSegment =
+    (G4LogicalVolume**)malloc(m_GeoDat->getNSegments() *
+                              sizeof(G4LogicalVolume*));
+  if (m_LogVol.stripSegment == NULL)
     B2FATAL(MemErr);
   nDiff = m_GeoDat->getNStripsDifferentLength();
   m_Solids.stripvol = (G4VSolid**)malloc(nDiff * sizeof(G4VSolid*));
@@ -183,10 +192,11 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
 {
   int i;
   free(m_Solids.plane);
+  free(m_Solids.plasticSheetElement);
   free(m_Solids.psheet);
   free(m_LogVol.psheet);
-  free(m_Solids.segment);
   free(m_LogVol.segment);
+  free(m_LogVol.stripSegment);
   free(m_Solids.stripvol);
   free(m_LogVol.stripvol);
   free(m_Solids.strip);
@@ -986,7 +996,7 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   G4UnionSolid* solidSegmentSupport = NULL;
   std::string segmentSupportName =
     "SegmentSupport_" + boost::lexical_cast<std::string>(iSegmentSupport) +
-    "Plane_" + boost::lexical_cast<std::string>(iPlane);
+    "_Plane_" + boost::lexical_cast<std::string>(iPlane);
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
@@ -1131,7 +1141,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
   int i, m, nStrip;
   double ly;
   char name[128];
-  G4Box** b;
+  G4VSolid** elements;
   HepGeom::Transform3D* t;
   const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
     m_GeoDat->getPlasticSheetGeometry();
@@ -1139,7 +1149,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   nStrip = m_GeoDat->getNStripsSegment();
-  b = new G4Box*[nStrip];
+  elements = new G4VSolid*[nStrip];
   t = new HepGeom::Transform3D[nStrip];
   /* Transformations. */
   for (i = 0; i < nStrip; i++) {
@@ -1155,15 +1165,17 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
     m = nStrip * iSegment + i;
     stripPos = m_GeoDat->getStripPosition(m + 1);
     try {
-      b[i] = new G4Box(name, 0.5 * stripPos->getLength(), 0.5 * ly,
-                       0.5 * plasticSheetGeometry->getWidth());
+      m_Solids.plasticSheetElement[m] =
+        new G4Box(name, 0.5 * stripPos->getLength(), 0.5 * ly,
+                  0.5 * plasticSheetGeometry->getWidth());
     } catch (std::bad_alloc& ba) {
       B2FATAL(MemErr);
     }
+    elements[i] = m_Solids.plasticSheetElement[m];
   }
   /* Union. */
   snprintf(name, 128, "PlasticSheet_%d", iSegment + 1);
-  m_Solids.psheet[iSegment] = unifySolids((G4VSolid**)b, t, nStrip, name);
+  m_Solids.psheet[iSegment] = unifySolids(elements, t, nStrip, name);
   try {
     m_LogVol.psheet[iSegment] =
       new G4LogicalVolume(m_Solids.psheet[iSegment],
@@ -1173,11 +1185,11 @@ void EKLM::GeoEKLMCreator::createPlasticSheetLogicalVolume(int iSegment)
   }
   geometry::setVisibility(*m_LogVol.psheet[iSegment], false);
   geometry::setColor(*m_LogVol.psheet[iSegment], "#00ff00ff");
-  delete[] b;
+  delete[] elements;
   delete[] t;
 }
 
-void EKLM::GeoEKLMCreator::createSegmentLogicalVolume(int iSegment)
+void EKLM::GeoEKLMCreator::createStripSegmentLogicalVolume(int iSegment)
 {
   int i, m, nStrip;
   char name[128];
@@ -1202,19 +1214,55 @@ void EKLM::GeoEKLMCreator::createSegmentLogicalVolume(int iSegment)
         break;
     }
   }
+  snprintf(name, 128, "StripSegment_%d", iSegment + 1);
+  m_Solids.stripSegment[iSegment] = unifySolids(strips, t, nStrip, name);
+  try {
+    m_LogVol.stripSegment[iSegment] =
+      new G4LogicalVolume(m_Solids.stripSegment[iSegment], m_Materials.air,
+                          name);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+  geometry::setVisibility(*m_LogVol.stripSegment[iSegment], false);
+  geometry::setColor(*m_LogVol.stripSegment[iSegment], "#00ff00ff");
+  delete[] strips;
+  delete[] t;
+}
+
+void EKLM::GeoEKLMCreator::createSegmentLogicalVolume(int iSegment)
+{
+  double z;
+  char name[128];
+  G4UnionSolid* u1, *u2;
+  HepGeom::Transform3D t;
+  const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
+    m_GeoDat->getPlasticSheetGeometry();
+  const EKLMGeometry::StripGeometry* stripGeometry =
+    m_GeoDat->getStripGeometry();
+  z = 0.5 * (stripGeometry->getThickness() + plasticSheetGeometry->getWidth());
+  snprintf(name, 128, "Segment_%d_Union_1", iSegment + 1);
+  t = HepGeom::Translate3D(0, 0, -z);
+  try {
+    u1 = new G4UnionSolid(name, m_Solids.stripSegment[iSegment],
+                          m_Solids.psheet[iSegment], t);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
   snprintf(name, 128, "Segment_%d", iSegment + 1);
-  m_Solids.segment[iSegment] = unifySolids(strips, t, nStrip, name);
+  t = HepGeom::Translate3D(0, 0, z);
+  try {
+    u2 = new G4UnionSolid(name, u1, m_Solids.psheet[iSegment], t);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
   try {
     m_LogVol.segment[iSegment] =
-      new G4LogicalVolume(m_Solids.segment[iSegment],
-                          m_Materials.air, name);
+      new G4LogicalVolume(u2, m_Materials.air, name);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
   geometry::setVisibility(*m_LogVol.segment[iSegment], false);
   geometry::setColor(*m_LogVol.segment[iSegment], "#00ff00ff");
-  delete[] strips;
-  delete[] t;
 }
 
 void EKLM::GeoEKLMCreator::createStripVolumeLogicalVolume(int iStrip)
@@ -1556,6 +1604,9 @@ void EKLM::GeoEKLMCreator::createSolids()
   /* Plastic sheet elements. */
   for (i = 0; i < m_GeoDat->getNSegments(); i++)
     createPlasticSheetLogicalVolume(i);
+  /* Strip segments. */
+  for (i = 0; i < m_GeoDat->getNSegments(); i++)
+    createStripSegmentLogicalVolume(i);
   /* Segments. */
   for (i = 0; i < m_GeoDat->getNSegments(); i++)
     createSegmentLogicalVolume(i);
@@ -1931,32 +1982,39 @@ createSegmentSupport(int iSegmentSupport, G4LogicalVolume* plane) const
   }
 }
 
-void EKLM::GeoEKLMCreator::
-createPlasticSheetElement(int iSheetPlane, int iSheet,
-                          G4LogicalVolume* plane) const
+void EKLM::GeoEKLMCreator::createPlasticSheet(int iSheetPlane, int iSheet) const
 {
   double z;
-  const HepGeom::Transform3D* t;
-  HepGeom::Transform3D t2;
+  HepGeom::Transform3D t;
   const EKLMGeometry::PlasticSheetGeometry* plasticSheetGeometry =
     m_GeoDat->getPlasticSheetGeometry();
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   std::string sheetName =
     "Sheet_" + boost::lexical_cast<std::string>(iSheet) +
-    "_SheetPlane_" + boost::lexical_cast<std::string>(iSheetPlane) +
-    "_" + plane->GetName();
+    "_SheetPlane_" + boost::lexical_cast<std::string>(iSheetPlane);
   z = 0.5 * (stripGeometry->getThickness() + plasticSheetGeometry->getWidth());
   if (iSheetPlane == 2)
     z = -z;
-  t = m_TransformData->getSegmentTransform(
-        m_CurVol.endcap, m_CurVol.layer, m_CurVol.sector, m_CurVol.plane,
-        iSheet);
-  t2 = (*t) * HepGeom::Translate3D(0, 0, z);
+  t = HepGeom::Translate3D(0, 0, z);
   try {
-    new G4PVPlacement(t2, m_LogVol.psheet[iSheet - 1], sheetName, plane, false,
-                      (iSheetPlane - 1) * m_GeoDat->getNSegments() + iSheet,
-                      false);
+    new G4PVPlacement(t, m_LogVol.psheet[iSheet - 1], sheetName,
+                      m_LogVol.segment[iSheet - 1], false, (iSheetPlane - 1) *
+                      m_GeoDat->getNSegments() + iSheet, false);
+  } catch (std::bad_alloc& ba) {
+    B2FATAL(MemErr);
+  }
+}
+
+void EKLM::GeoEKLMCreator::createStripSegment(int iSegment) const
+{
+  HepGeom::Transform3D t;
+  std::string segmentName =
+    "StripSegment_" + boost::lexical_cast<std::string>(iSegment);
+  t = HepGeom::Translate3D(0, 0, 0);
+  try {
+    new G4PVPlacement(t, m_LogVol.stripSegment[iSegment - 1], segmentName,
+                      m_LogVol.segment[iSegment - 1], false, iSegment, false);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
@@ -2178,13 +2236,18 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
     for (m_CurVol.strip = imin + 1; m_CurVol.strip <= imax; m_CurVol.strip++) {
       switch (m_GeoDat->getDetectorMode()) {
         case EKLMGeometry::c_DetectorNormal:
-          createStrip(m_LogVol.segment[i]);
+          createStrip(m_LogVol.stripSegment[i]);
           break;
         case EKLMGeometry::c_DetectorBackground:
-          createStripVolume(m_LogVol.segment[i]);
+          createStripVolume(m_LogVol.stripSegment[i]);
           break;
       }
     }
+  }
+  for (i = 1; i <= m_GeoDat->getNSegments(); i++) {
+    for (j = 1; j <= 2; j++)
+      createPlasticSheet(j, i);
+    createStripSegment(i);
   }
   /* Create other volumes. */
   for (m_CurVol.endcap = 1; m_CurVol.endcap <= m_GeoDat->getNEndcaps();
@@ -2210,10 +2273,6 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
             plane = createPlane(sector);
             for (i = 1; i <= m_GeoDat->getNSegments() + 1; i++)
               createSegmentSupport(i, plane);
-            for (i = 1; i <= 2; i++) {
-              for (j = 1; j <= m_GeoDat->getNSegments(); j++)
-                createPlasticSheetElement(i, j, plane);
-            }
             for (m_CurVol.segment = 1;
                  m_CurVol.segment <= m_GeoDat->getNSegments();
                  m_CurVol.segment++)

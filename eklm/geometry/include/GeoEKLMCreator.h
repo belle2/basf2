@@ -92,11 +92,14 @@ namespace Belle2 {
      * @var Solids::plane
      * Plane.
      *
-     * @var Solids::psheet
-     * Plastic sheets.
+     * @var Solids::stripSegment
+     * Strip segment.
      *
-     * @var Solids::segment
-     * Segments.
+     * @var Solids::plasticSheetElement
+     * Plastic sheet element.
+     *
+     * @var Solids::psheet
+     * Plastic sheets (combined).
      *
      * @var Solids::stripvol
      * Strip volumes.
@@ -131,8 +134,9 @@ namespace Belle2 {
       G4VSolid* sector;
       G4VSolid* secsupp;
       G4VSolid** plane;
+      G4VSolid** stripSegment;
+      G4VSolid** plasticSheetElement;
       G4VSolid** psheet;
-      G4VSolid** segment;
       G4VSolid** stripvol;
       G4VSolid** strip;
       G4VSolid** groove;
@@ -159,6 +163,9 @@ namespace Belle2 {
      *
      * @var LogicalVolumes::segment
      * Segments.
+     *
+     * @var LogicalVolumes::stripSegment
+     * Strip segments.
      *
      * @var LogicalVolumes::stripvol
      * Strip volumes.
@@ -189,6 +196,7 @@ namespace Belle2 {
       G4LogicalVolume* shieldLayerSector;
       G4LogicalVolume* cover;
       G4LogicalVolume** segment;
+      G4LogicalVolume** stripSegment;
       G4LogicalVolume** stripvol;
       G4LogicalVolume** strip;
       G4LogicalVolume** groove;
@@ -451,7 +459,13 @@ namespace Belle2 {
       void createPlasticSheetLogicalVolume(int iSegment);
 
       /**
-       * Create segment logical volume.
+       * Create strip segment logical volume.
+       * @param[in] iSegment Number of segment (0-based).
+       */
+      void createStripSegmentLogicalVolume(int iSegment);
+
+      /**
+       * Create segment logical volume (strips + plastic sheets).
        * @param[in] iSegment Number of segment (0-based).
        */
       void createSegmentLogicalVolume(int iSegment);
@@ -620,16 +634,20 @@ namespace Belle2 {
                                 G4LogicalVolume* plane) const;
 
       /**
-       * Create plastic sheet element.
+       * Create plastic sheet.
        * @param[in] iSheetPlane Number of sheet plane.
-       * @param[in] iSheet      Number of sheet.
-       * @param[in] plane       Plane logical volume.
+       * @param[in] iSheet      Number of sheet (segment).
        */
-      void createPlasticSheetElement(int iSheetPlane, int iSheet,
-                                     G4LogicalVolume* plane) const;
+      void createPlasticSheet(int iSheetPlane, int iSheet) const;
 
       /**
-       * Create segment.
+       * Create strip segment.
+       * @param[in] iSegment Number of segment.
+       */
+      void createStripSegment(int iSegment) const;
+
+      /**
+       * Create segment (strips + plastic sheets).
        * @param[in] plane Plane logical volume.
        */
       void createSegment(G4LogicalVolume* plane) const;

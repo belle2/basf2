@@ -10,7 +10,7 @@ from ROOT import Belle2
 # Script options
 
 if len(sys.argv) < 2:
-    print('Usage: basf2 1_generate.py magnet|no-magnet')
+    print('Usage: basf2 3_collect.py magnet|no-magnet')
     print('Always specify if magnetic field has ON or OFF')
     sys.exit(1)
 

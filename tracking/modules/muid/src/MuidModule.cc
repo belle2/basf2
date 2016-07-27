@@ -694,10 +694,10 @@ void MuidModule::getVolumeID(const G4TouchableHandle& touch, Const::EDetector& d
   if (name.compare(0, 14, "StripSensitive") == 0) {
     detID = Const::EDetector::KLM;
     copyID = EKLM::GeometryData::Instance().stripNumber(
+               touch->GetVolume(7)->GetCopyNo(),
+               touch->GetVolume(6)->GetCopyNo(),
                touch->GetVolume(5)->GetCopyNo(),
                touch->GetVolume(4)->GetCopyNo(),
-               touch->GetVolume(3)->GetCopyNo(),
-               touch->GetVolume(2)->GetCopyNo(),
                touch->GetVolume(1)->GetCopyNo());
   }
 

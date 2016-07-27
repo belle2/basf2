@@ -26,6 +26,8 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
+  addParam("DigitizationInitialTime", m_DigPar.digitizationInitialTime,
+           "Initial digitization time (ns).", double(0.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
            "Create merged EKLMSim2Hits", bool(false));
   addParam("Debug", m_DigPar.debug,

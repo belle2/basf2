@@ -22,6 +22,9 @@ namespace Belle2 {
      * @var DigitizationParams::ADCRange
      * ADC range: 2**(resolution in bits).
      *
+     * @var DigitizationParams::digitizationInitialTime
+     * Initial digitization time, ns.
+     *
      * @var DigitizationParams::ADCSamplingTime
      * ADC conversion time, ns.
      *
@@ -75,6 +78,7 @@ namespace Belle2 {
      */
     struct DigitizationParams {
       double ADCRange;
+      double digitizationInitialTime;
       double ADCSamplingTime;
       int nDigitizations;
       double ADCPedestal;

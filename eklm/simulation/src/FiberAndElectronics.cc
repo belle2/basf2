@@ -175,7 +175,8 @@ void EKLM::FiberAndElectronics::processEntry()
    * time = ADC conversion time,
    * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime * m_DigPar->ADCSamplingTime;
+  m_FPGAParams.startTime = m_FPGAParams.startTime * m_DigPar->ADCSamplingTime +
+                           m_DigPar->digitizationInitialTime;
   if (m_DigPar->debug)
     if (m_npe >= 10)
       debugOutput();
@@ -322,7 +323,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
     deExcitationTime = gRandom->Exp(m_DigPar->scintillatorDeExcitationTime) +
                        gRandom->Exp(m_DigPar->fiberDeExcitationTime);
     hitTime = hitDist * inverseLightSpeed + deExcitationTime +
-              timeShift;
+              timeShift - m_DigPar->digitizationInitialTime;
     if (hitTime >= maxHitTime)
       continue;
     if (hitTime >= 0)

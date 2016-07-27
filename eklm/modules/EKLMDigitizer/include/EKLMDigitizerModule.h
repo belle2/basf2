@@ -11,9 +11,19 @@
 #ifndef EKLMDIGITIZERMODULE_H
 #define EKLMDIGITIZERMODULE_H
 
+/* Externaql headers. */
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/connected_components.hpp>
+
 /* Belle2 headers. */
-#include <framework/core/Module.h>
+#include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMSimHit.h>
+#include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/Digitizer.h>
+#include <eklm/simulation/FPGAFitter.h>
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -63,14 +73,44 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Read hits from the store, sort sim hits and fill m_HitStripMap.
+     */
+    void readAndSortSimHits();
+
+    /**
+     * Create EKLMSim2Hits from EKLMSimHits using boost:graph mechanism.
+     */
+    void makeSim2Hits();
+
+    /**
+     * Merge hits from the same strip. Create EKLMDigits.
+     */
+    void mergeSimHitsToStripHits();
+
     /** Strip hits with npe lower this value will be marked as bad. */
-    double m_discriminatorThreshold;
+    double m_DiscriminatorThreshold;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_digPar;
+    struct EKLM::DigitizationParams m_DigPar;
 
     /** Create EKLMSim2Hits? */
     bool m_CreateSim2Hits;
+
+    /** Geometry data. */
+    const EKLM::GeometryData* m_GeoDat;
+
+    /** Map for EKLMSimHit sorting according sensitive volumes. */
+    std::multimap<int, EKLMSimHit*> m_SimHitVolumeMap;
+
+    /** FPGA fitter. */
+    EKLM::FPGAFitter* m_Fitter;
+
+    /** SimHit storage initialization. */
+    StoreArray<EKLMSim2Hit> m_Sim2Hits;
+
+    /** StripHit storage initialization. */
+    StoreArray<EKLMDigit> m_Digits;
 
   };
 

@@ -152,8 +152,6 @@ void EKLMReconstructorModule::event()
         t1 = getTime(*it4, d1) + 0.5 * sd / Const::speedOfLight;
         t2 = getTime(*it5, d2) - 0.5 * sd / Const::speedOfLight;
         t = (t1 + t2) / 2;
-        if (fastHit(crossPoint, t))
-          continue;
         EKLMHit2d* hit2d = hit2ds.appendNew(*it4);
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());

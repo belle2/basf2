@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
-from ROOT import Belle2
 
 from tracking import (
     add_mc_tracking_reconstruction,
@@ -17,6 +16,8 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
+
+    @param components list of geometry components to include reconstruction for, or None for all components.
     """
     # CDC dE/dx PID
     if components is None or 'CDC' in components:
@@ -138,6 +139,9 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
 def add_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules to a path.
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
+
+    @param components list of geometry components to include reconstruction for, or None for all components.
     """
 
     # tracking
@@ -155,6 +159,8 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True):
     """
     This function adds the standard reconstruction modules with MC tracking
     to a path.
+
+    @param components list of geometry components to include reconstruction for, or None for all components.
     """
 
     # tracking
@@ -175,7 +181,12 @@ def add_mdst_output(
     additionalBranches=[],
 ):
     """
-    This function adds the mdst output modules to a path.
+    This function adds the MDST output modules to a path, saving only objects defined as part of the MDST data format.
+
+    @param path Path to add modules to
+    @param mc Save Monte Carlo quantities? (MCParticles and corresponding relations)
+    @param filename Output file name.
+    @param additionalBranches Additional objects/arrays of event durability to save
     """
 
     output = register_module('RootOutput')

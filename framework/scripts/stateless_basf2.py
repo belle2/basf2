@@ -7,6 +7,9 @@ Import this module at the top of your steering file to get a (more) stateless ve
 This is useful if you want to pickle the path using --dump-path and execute it later using --execute-path.
 Usually all calls to functions in basf2 like use_central_database are forgotten if you only save the path.
 With this module, these functions are executed again if you execute the pickled path using --execute-path.
+
+If you want to exclude some functions, delete them from this module using
+del stateless_basf2.functionname
 """
 
 
@@ -27,14 +30,14 @@ class BASF2StateRecorder(object):
 
 
 basf2_state_recorder = BASF2StateRecorder()
+manager = mock.Mock()
 
 
 def process(path, max_event=0):
     """ Process call which pickles the recorded state in addition to the path """
     sys.modules['basf2'] = original_basf2
     original_basf2.process(path, max_event)
-    state = [(name, list(map(tuple, x.mock_calls)))
-             for name, x in basf2_state_recorder.__dict__.items() if isinstance(x, mock.Mock)]
+    state = list(map(tuple, manager.mock_calls))
     pickle_path = original_basf2.fw.get_pickle_path()
     print("Path", path)
     print("State", state)
@@ -48,10 +51,13 @@ def process(path, max_event=0):
 for name, x in original_basf2.__dict__.items():
     # We record function and fake Boost.Python.function objects
     if inspect.isfunction(x) or isinstance(x, type(original_basf2.use_central_database)):
-        setattr(basf2_state_recorder, name, mock.Mock(x, side_effect=x))
+        mock_x = mock.Mock(x, side_effect=x)
+        manager.attach_mock(mock_x, name)
+        setattr(basf2_state_recorder, name, mock_x)
     # Other names we have to set as well, because otherwise they won't be important by from basf2 import *
     else:
         setattr(basf2_state_recorder, name, x)
 
 basf2_state_recorder.process = process
 sys.modules['basf2'] = basf2_state_recorder
+sys.modules['stateless_basf2'] = basf2_state_recorder

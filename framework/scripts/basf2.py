@@ -316,10 +316,8 @@ def process(path, max_event=0):
             loaded = pickle.load(open(pickle_path, 'br'))
             if 'state' in loaded:
                 B2INFO("Pickled path contains a state object. Activating pickled state.")
-                for name, calls in loaded['state']:
-                    func = getattr(sys.modules[__name__], name)
-                    for call in calls:
-                        func(*call[1], **call[2])
+                for name, args, kwargs in loaded['state']:
+                    getattr(sys.modules[__name__], name)(*args, **kwargs)
 
         # Otherwise we dump the given path into the pickle file and exit
         elif path is not None:

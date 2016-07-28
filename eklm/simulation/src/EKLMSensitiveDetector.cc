@@ -30,8 +30,6 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   m_type = type;
   GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   gd.append("/SensitiveDetector");
-  m_ThresholdEnergyDeposit =
-    Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "MeV");
   m_ThresholdHitTime =
     Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
 
@@ -57,16 +55,6 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
    * Get deposited energy
    */
   const G4double eDep = aStep->GetTotalEnergyDeposit();
-
-  /**
-   * in normal opearation mode (m_mode=0)
-   * ignore tracks with small energy deposition
-   * use "<=" instead of "<" to drop hits from neutrinos etc unless eDepositionThreshold is non-negative
-   * Background studies m_mode=1 accepts all tracks
-   */
-  if (eDep <= m_ThresholdEnergyDeposit &&
-      m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal)
-    return false;
 
   /**
    * get reference to the track

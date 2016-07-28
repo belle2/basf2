@@ -55,12 +55,6 @@ namespace Belle2 {
       const EKLM::GeometryData* m_GeoDat;
 
       /**
-       * All hits with energies less than m_ThresholdEnergyDeposit
-       * will be dropped.
-       */
-      G4double m_ThresholdEnergyDeposit;
-
-      /**
        * All hits with time large  than m_ThresholdHitTime
        * will be dropped.
        */

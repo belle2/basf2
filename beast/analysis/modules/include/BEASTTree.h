@@ -24,10 +24,24 @@ namespace Belle2 {
 
       /**Beast PVs **/
       double ts;
+      std::vector<Float_t> SKB_LER_current;
+      std::vector<Float_t> SKB_HER_current;
       std::vector<Float_t> SKB_LER_pressure;
       std::vector<Float_t> SKB_HER_pressure;
       std::vector<Float_t> SKB_LER_averagePressure;
       std::vector<Float_t> SKB_HER_averagePressure;
+      std::vector<Float_t> SKB_HER_collimatorBeamPositionX;
+      std::vector<Float_t> SKB_HER_collimatorBeamPositionY;
+      std::vector<Float_t> SKB_LER_collimatorBeamPositionX;
+      std::vector<Float_t> SKB_LER_collimatorBeamPositionY;
+      std::vector<Float_t> SKB_HER_BeamSizeX;
+      std::vector<Float_t> SKB_HER_BeamSizeY;
+      std::vector<Float_t> SKB_LER_BeamSizeX;
+      std::vector<Float_t> SKB_LER_BeamSizeY;
+      std::vector<Float_t> SKB_LER_injection_OneBunch_BucketNumber;
+      std::vector<Float_t> SKB_HER_injection_OneBunch_BucketNumber;
+      std::vector<Float_t> SKB_HER_injectionFlag;
+      std::vector<Float_t> SKB_LER_injectionFlag;
       std::vector<Float_t> PIN_dose;
       std::vector<Float_t> BGO_energy;
       std::vector<Float_t> HE3_rate;
@@ -52,10 +66,24 @@ namespace Belle2 {
       void clear()
       {
         ts = 0;
+        SKB_LER_current.clear();
+        SKB_HER_current.clear();
         SKB_LER_pressure.clear();
         SKB_HER_pressure.clear();
         SKB_LER_averagePressure.clear();
         SKB_HER_averagePressure.clear();
+        SKB_HER_collimatorBeamPositionX.clear();
+        SKB_HER_collimatorBeamPositionY.clear();
+        SKB_LER_collimatorBeamPositionX.clear();
+        SKB_LER_collimatorBeamPositionY.clear();
+        SKB_HER_BeamSizeX.clear();
+        SKB_HER_BeamSizeY.clear();
+        SKB_LER_BeamSizeX.clear();
+        SKB_LER_BeamSizeY.clear();
+        SKB_LER_injection_OneBunch_BucketNumber.clear();
+        SKB_HER_injection_OneBunch_BucketNumber.clear();
+        SKB_HER_injectionFlag.clear();
+        SKB_LER_injectionFlag.clear();
         PIN_dose.clear();
         BGO_energy.clear();
         HE3_rate.clear();

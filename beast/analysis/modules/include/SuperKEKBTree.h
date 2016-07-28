@@ -58,6 +58,8 @@ namespace Belle2 {
       double VAHCCG_D12_HER_PRES_AVG;
       double BMHXRM_BEAM_SIGMAY;
       double BMLXRM_BEAM_SIGMAY;
+      double BMHXRM_BEAM_SIGMAX;
+      double BMLXRM_BEAM_SIGMAX;
       double CGHINJ_BKSEL_NOB_SET;
       double CGLINJ_BKSEL_NOB_SET;
       double VALCCG_D02_L18_PRES;
@@ -140,6 +142,8 @@ namespace Belle2 {
         VAHCCG_D12_HER_PRES_AVG = 0;
         BMHXRM_BEAM_SIGMAY = 0;
         BMLXRM_BEAM_SIGMAY = 0;
+        BMHXRM_BEAM_SIGMAX = 0;
+        BMLXRM_BEAM_SIGMAX = 0;
         CGHINJ_BKSEL_NOB_SET = 0;
         CGLINJ_BKSEL_NOB_SET = 0;
         VALCCG_D02_L18_PRES = 0;

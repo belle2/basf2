@@ -27,11 +27,10 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
         # Using Belle specific Variables for e-ID, mu-ID and K-ID
         # atcPIDBelle(3,2) is used as K-ID
         # atcPIDBelle(4,2) and atcPIDBelle(4,3) are used as pr-ID
-        # TODO Check how the respective *_dEdx, *_TOP, *_ARICH and *_ECL should be treated
-        chargedVariables = ['eIDBelle', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
-                            'atcPIDBelle(3,2)', 'Kid_dEdx', 'Kid_TOP', 'Kid_ARICH', 'Kid_belle',
-                            'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)', 'prid_dEdx', 'prid_TOP', 'prid_ARICH',
-                            'muIDBelle', 'muid_dEdx', 'muid_TOP', 'muid_ARICH',
+        chargedVariables = ['eIDBelle',
+                            'atcPIDBelle(3,2)', 'Kid_belle',
+                            'atcPIDBelle(4,2)', 'atcPIDBelle(4,3)',
+                            'muIDBelle',
                             'p', 'pt', 'pz', 'dr', 'dz', 'chiProb', 'extraInfo(preCut_rank)']
     else:
         chargedVariables = ['eid', 'eid_dEdx', 'eid_TOP', 'eid_ARICH', 'eid_ECL',
@@ -82,48 +81,87 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
-    gamma = Particle('gamma',
-                     MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
-                                                 'clusterE9E25', 'pt', 'E', 'pz', 'goodGamma'],
-                                      target='isPrimarySignal'),
-                     PreCutConfiguration(userCut='goodBelleGamma == 1' if convertedFromBelle else '',
-                                         bestCandidateMode='highest',
-                                         bestCandidateVariable='E',
-                                         bestCandidateCut=40),
-                     PostCutConfiguration(bestCandidateCut=20, value=0.01))
-    gamma.addChannel(['gamma:FSP'])
-    gamma.addChannel(['gamma:V0'],
-                     MVAConfiguration(variables=['pt', 'E', 'pz'],
-                                      target='isPrimarySignal'))
+    if convertedFromBelle:
+        gamma = Particle('gamma',
+                         MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
+                                                     'clusterE9E25', 'pt', 'E', 'pz'],
+                                          target='isPrimarySignal'),
+                         PreCutConfiguration(userCut='goodBelleGamma == 1',
+                                             bestCandidateMode='highest',
+                                             bestCandidateVariable='E',
+                                             bestCandidateCut=40),
+                         PostCutConfiguration(bestCandidateCut=20, value=0.01))
+        gamma.addChannel(['gamma:mdst'])
+        gamma.addChannel(['gamma:v0mdst'],
+                         MVAConfiguration(variables=['pt', 'E', 'pz', 'extraInfo(preCut_rank)'],
+                                          target='isPrimarySignal'))
 
-    pi0 = Particle('pi0',
-                   MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
-                                               'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
-                                    target='isSignal'),
-                   PreCutConfiguration(userCut='0.08 < M < 0.18',
-                                       bestCandidateVariable='abs(dM)',
-                                       bestCandidateCut=20),
-                   PostCutConfiguration(bestCandidateCut=10, value=0.01))
-    pi0.addChannel(['gamma', 'gamma'])
+        pi0 = Particle('pi0',
+                       MVAConfiguration(variables=['M', 'extraInfo(preCut_rank)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut='0.08 < M < 0.18',
+                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        pi0.addChannel(['pi0:mdst'])
 
-    KS0 = Particle('K_S0',
-                   MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
-                                               'useCMSFrame(E)', 'daughterAngle(0,1)', 'daughter({},extraInfo(SignalProbability))',
-                                               'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
-                                               'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
-                                    target='isSignal'),
-                   PreCutConfiguration(userCut='0.4 < M < 0.6',
-                                       bestCandidateVariable='abs(dM)',
-                                       bestCandidateCut=20),
-                   PostCutConfiguration(bestCandidateCut=10, value=0.01))
-    KS0.addChannel(['pi+', 'pi-'])
-    KS0.addChannel(['pi0', 'pi0'])
-    KS0.addChannel(['K_S0:V0'],
-                   MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
-                                               'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
-                                               'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
-                                               'daughter({}, dz)', 'daughter({}, dr)'],
-                                    target='isSignal'))
+        KS0 = Particle('K_S0',
+                       MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                                                   'useCMSFrame(E)', 'daughterAngle(0,1)',
+                                                   'cosAngleBetweenMomentumAndVertexVector',
+                                                   'extraInfo(preCut_rank)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut='0.4 < M < 0.6',
+                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        KS0.addChannel(['K_S0:mdst'])
+
+    else:
+        gamma = Particle('gamma',
+                         MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
+                                                     'clusterE9E25', 'pt', 'E', 'pz'],
+                                          target='isPrimarySignal'),
+                         PreCutConfiguration(userCut='goodGamma == 1',
+                                             bestCandidateMode='highest',
+                                             bestCandidateVariable='E',
+                                             bestCandidateCut=40),
+                         PostCutConfiguration(bestCandidateCut=20, value=0.01))
+        gamma.addChannel(['gamma:FSP'])
+        gamma.addChannel(['gamma:V0'],
+                         MVAConfiguration(variables=['pt', 'E', 'pz'],
+                                          target='isPrimarySignal'))
+
+        pi0 = Particle('pi0',
+                       MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',
+                                                   'daughterAngle(0,1)', 'pt', 'pz', 'E', 'abs(dM)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut='0.08 < M < 0.18',
+                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        pi0.addChannel(['gamma', 'gamma'])
+
+        KS0 = Particle('K_S0',
+                       MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
+                                                   'useCMSFrame(E)', 'daughterAngle(0,1)',
+                                                   'daughter({},extraInfo(SignalProbability))',
+                                                   'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                                                   'daughter({}, dz)', 'daughter({}, dr)', 'extraInfo(preCut_rank)'],
+                                        target='isSignal'),
+                       PreCutConfiguration(userCut='0.4 < M < 0.6',
+                                           bestCandidateVariable='abs(dM)',
+                                           bestCandidateCut=20),
+                       PostCutConfiguration(bestCandidateCut=10, value=0.01))
+        KS0.addChannel(['pi+', 'pi-'])
+        KS0.addChannel(['pi0', 'pi0'])
+        KS0.addChannel(['K_S0:V0'],
+                       MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M',
+                                                   'useCMSFrame(E)', 'daughterAngle(0,1)', 'extraInfo(preCut_rank)', 'abs(dM)',
+                                                   'useRestFrame(daughter({}, p))', 'cosAngleBetweenMomentumAndVertexVector',
+                                                   'daughter({}, dz)', 'daughter({}, dr)'],
+                                        target='isSignal'))
 
     KL0 = Particle('K_L0',
                    MVAConfiguration(variables=['E', 'klmClusterTiming'],

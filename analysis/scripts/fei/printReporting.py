@@ -56,7 +56,7 @@ def print_summary(p):
     print('Stats after tag')
     print(p.after_tag)
     print(bold('Multivariate classifier'))
-    print('Method', p.mvaConfig.name)
+    print('Method', p.mvaConfig.method)
     print('Target', p.mvaConfig.target)
     print(bold('Individual channels'))
     for channel in p.channels:

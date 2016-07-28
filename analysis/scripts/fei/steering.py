@@ -104,6 +104,12 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
         for resource in ['ParticleList_', 'VertexFit_', 'SignalProbability_']:
             dag.add(resource + fsp, fsp)
 
+    # Add some fake resources for FSPs which are only available in b2bii
+    if BtoBII:
+        for fsp in ['gamma:mdst', 'gamma:v0mdst', 'pi0:mdst', 'K_S0:mdst']:
+            for resource in ['ParticleList_', 'VertexFit_', 'SignalProbability_']:
+                dag.add(resource + fsp, fsp)
+
     # Add basic properties defined by the user of all Particles as Resources into the graph
     for particle in particles:
         dag.add('Name_' + particle.identifier, particle.name)
@@ -308,7 +314,6 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
 
         if BtoBII:
             gearbox = register_module('Gearbox')
-            gearbox.param('fileName', 'b2bii/Belle.xml')
             path.add_module(gearbox)
             path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticFieldConstantBelle'])
         else:

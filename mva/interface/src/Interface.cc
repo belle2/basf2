@@ -44,7 +44,7 @@ namespace Belle2 {
     void AbstractInterface::initSupportedInterfaces()
     {
       static Interface<FastBDTOptions, FastBDTTeacher, FastBDTExpert> interface_FastBDT;
-      static Interface<NeuroBayesOptions, NeuroBayesTeacher, NeuroBayesExpert> interface_NeuroBayes;
+      //static Interface<NeuroBayesOptions, NeuroBayesTeacher, NeuroBayesExpert> interface_NeuroBayes;
       static Interface<FANNOptions, FANNTeacher, FANNExpert> interface_FANN;
       static Interface<TMVAOptionsClassification, TMVATeacherClassification, TMVAExpertClassification>
       interface_TMVAClassification;

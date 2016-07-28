@@ -25,7 +25,7 @@ NeuroBayesTeacher* NeuroBayesTeacher::Instance(dsa::ec_t**, int , dsa::log_func_
   printf("ERROR: NeuroBayesTeacher not available.");
   return 0;
 }
-
+#define assert(x) x
 void NeuroBayesTeacher::NB_DEF(bool) {assert(0);}
 void NeuroBayesTeacher::NB_DEF_TASK(const char*) {assert(0);}
 void NeuroBayesTeacher::NB_DEF_TASK(std::string&) {assert(0);}

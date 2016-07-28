@@ -44,6 +44,9 @@ namespace Belle2 {
 
     // Data members
   private:
+    /** Get list of input files, taking -i command line overrides into account. */
+    std::vector<std::string> getInputFiles() const;
+
     /** Open the next file from the list of files
      * @returns true on success */
     bool openNextFile();

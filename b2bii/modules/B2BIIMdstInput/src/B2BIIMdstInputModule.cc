@@ -27,6 +27,29 @@
 using namespace std;
 using namespace Belle2;
 
+
+/*
+Some code for simple globing from
+http://stackoverflow.com/questions/8401777/simple-glob-in-c-on-unix-system
+In RootInput this is handled by ROOT
+*/
+#include <glob.h>
+#include <vector>
+#include <string>
+vector<string> globbing(const vector<string>& patterns)
+{
+  vector<string> ret;
+  for (const auto& pat : patterns) {
+    glob_t glob_result;
+    glob(pat.c_str(), GLOB_TILDE, NULL, &glob_result);
+    for (unsigned int i = 0; i < glob_result.gl_pathc; ++i) {
+      ret.push_back(string(glob_result.gl_pathv[i]));
+    }
+    globfree(&glob_result);
+  }
+  return ret;
+}
+
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
@@ -56,19 +79,22 @@ B2BIIMdstInputModule::~B2BIIMdstInputModule()
 {
 }
 
+std::vector<std::string> B2BIIMdstInputModule::getInputFiles() const
+{
+  std::vector<std::string> inputFiles = Environment::Instance().getInputFilesOverride();
+  if (!inputFiles.empty()) {
+    return inputFiles;
+  }
+  inputFiles = m_inputFileNames;
+  if (!m_inputFileName.empty())
+    inputFiles.push_back(m_inputFileName);
+  return inputFiles;
+}
+
 void B2BIIMdstInputModule::initialize()
 {
-  //Check parameters
-  if (getParam<std::string>("inputFileName").isSetInSteering()) {
-    if (m_inputFileName.empty()) {
-      B2ERROR("Empty filename provided for inputFileName");
-      return;
-    }
-    if (getParam<std::vector<std::string>>("inputFileNames").isSetInSteering()) {
-      B2ERROR("Cannot set both inputFileName and inputFileNames");
-    }
-    m_inputFileNames = {m_inputFileName};
-  }
+  m_inputFileNames = globbing(getInputFiles());
+
   //Check if there is at least one filename provided
   if (m_inputFileNames.empty()) {
     B2FATAL("Empty list of files supplied, cannot continue");

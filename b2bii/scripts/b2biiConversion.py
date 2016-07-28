@@ -58,7 +58,8 @@ def convertBelleMdstToBelleIIMdst(inputBelleMDSTFile, applyHadronBJSkim=True, pa
     """
 
     input = register_module('B2BIIMdstInput')
-    input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))
+    if inputBelleMDSTFile is not None:
+        input.param('inputFileNames', parse_process_url(inputBelleMDSTFile))
     # input.logging.set_log_level(LogLevel.DEBUG)
     # input.logging.set_info(LogLevel.DEBUG, LogInfo.LEVEL | LogInfo.MESSAGE)
     path.add_module(input)

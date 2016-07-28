@@ -24,9 +24,9 @@
 #include <tuple>
 
 /** size of hit */
-constexpr int MAXSIZE = 60000;
+constexpr int MAXSIZE = 26880;
 /** size of pixel hit */
-constexpr int MAXtSIZE = 30000;
+constexpr int MAXtSIZE = 10000;
 
 namespace Belle2 {
   namespace microtpc {

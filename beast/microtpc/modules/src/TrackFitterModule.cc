@@ -333,7 +333,7 @@ void TrackFitterModule::event()
       nTPC = TpcMetaHits.getEntries();
     }
     for (int i = 0; i < nTPC; i++) {
-      if (nentries) detNB = i;
+      if (nentries > 0) detNB = i;
 
       for (int j = 0; j < MAXSIZE; j++) {
         x[j] = 0;
@@ -473,6 +473,7 @@ void TrackFitterModule::event()
                 if (1 <= row && row <= 5 * (k + 1))m_side[4 * k + 2] = k + 1;
                 if (336 - 5 * (k + 1) <= row && row <= 336)m_side[4 * k + 3] = k + 1;
               }
+
               if (col == 1) {
                 m_impact_y[0] += y[fpxhits];
                 ynpts[0]++;
@@ -506,6 +507,46 @@ void TrackFitterModule::event()
                 xnpts[3]++;
               }
 
+              /*
+                    for (int k = 0; k < 4; k++) {
+                      if (1 <= col && col <= k + 1)m_side[4 * k + 0] = k + 1;
+                      if (80 - (k + 1) <= col && col <= 80)m_side[4 * k + 1] = k + 1;
+                      if (1 <= row && row <= 5 * (k + 1))m_side[4 * k + 2] = k + 1;
+                      if (336 - 5 * (k + 1) <= row && row <= 336)m_side[4 * k + 3] = k + 1;
+                    }
+                    if (col == 1) {
+                      m_impact_y[0] += y[fpxhits];
+                      ynpts[0]++;
+                    }
+                    if (col == 2) {
+                      m_impact_y[1] += y[fpxhits];
+                      ynpts[1]++;
+                    }
+                    if (col == 79) {
+                      m_impact_y[2] += y[fpxhits];
+                      ynpts[2]++;
+                    }
+                    if (col == 80) {
+                      m_impact_y[3] += y[fpxhits];
+                      ynpts[3]++;
+                    }
+                    if (row == 1) {
+                      m_impact_x[0] += x[fpxhits];
+                      xnpts[0]++;
+                    }
+                    if (row == 2) {
+                      m_impact_x[1] += x[fpxhits];
+                      xnpts[1]++;
+                    }
+                    if (row == 335) {
+                      m_impact_x[2] += x[fpxhits];
+                      xnpts[2]++;
+                    }
+                    if (row == 336) {
+                      m_impact_x[3] += x[fpxhits];
+                      xnpts[3]++;
+                    }
+              */
               fpxhits++;
             }
           }
@@ -605,138 +646,153 @@ void TrackFitterModule::event()
         }
 
       }
+      fpxhits = 0;
+      if (nentries > 0)fpxhits = m_dchip_map.size();
+      else if (nEntries > 0)fpxhits = TpcDataHits.getEntries();
 
-      for (int j = 0; j < 4; j++) {
-        if (xnpts[j] > 0)m_impact_x[j] = m_impact_x[j] / ((double)xnpts[j]);
-        if (ynpts[j] > 0)m_impact_y[j] = m_impact_y[j] / ((double)ynpts[j]);
-      }
+      if (fpxhits > 0) {
 
-      L = new float[fpxhits];
-      ix = new int[fpxhits];
-      iy = new int[fpxhits];
-      iz = new int[fpxhits];
-      TMath::Sort(fpxhits, x, ix, false);
-      TMath::Sort(fpxhits, y, iy, false);
-      TMath::Sort(fpxhits, z, iz, false);
-
-      TVirtualFitter::SetDefaultFitter("Minuit");
-      TVirtualFitter* min = TVirtualFitter::Fitter(0, 5);
-      min->SetDefaultFitter("Minuit");
-      min->SetObjectFit(Track);
-      min->SetFCN(SumDistance2_angles);
-
-      Double_t arglist[6] = { -1, 0, 0, 0, 0, 0};
-      min->ExecuteCommand("SET PRINT", arglist, 1);
-      min->ExecuteCommand("SET NOWARNINGS", arglist, 0);
-
-      XYZVector temp_vector3(0, 0, 0);
-      float pStart[5] = {0, 0, 0, 0, 0};
-      temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]], z[iz[fpxhits - 1]] - z[iz[0]]);
-      //float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
-      //float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
-      float init_theta = temp_vector3.Theta();
-      float init_phi = temp_vector3.Phi();
-      pStart[0] = x[ix[0]];
-      pStart[1] = y[iy[0]];
-      pStart[2] = z[iz[0]];
-      pStart[3] = init_theta;
-      pStart[4] = init_phi;
-
-      min->SetParameter(0, "x0",    pStart[0], 0.01, 0, 0);
-      min->SetParameter(1, "y0",    pStart[1], 0.01, 0, 0);
-      min->SetParameter(2, "z0",    pStart[2], 0.01, 0, 0);
-      min->SetParameter(3, "theta", pStart[3], 0.0001, 0, TMath::Pi());
-      min->SetParameter(4, "phi",   pStart[4], 0.0001, -TMath::Pi(), TMath::Pi());
-
-      arglist[0] = 10000; // number of fucntion calls
-      arglist[1] = 0.001; // tolerance
-      min->ExecuteCommand("MIGRAD", arglist, 2);
-
-      int nvpar, nparx;
-      double amin, edm, errdef;
-      min->GetStats(amin, edm, errdef, nvpar, nparx);
-      m_chi2 = amin;
-
-      for (int j = 0; j < 5; j++) {
-        m_parFit[j] = 0;
-        m_parFit_err[j] = 0;
-        m_parFit[j] = min->GetParameter(j);
-        m_parFit_err[i] = min->GetParError(j);
-        for (int k = 0; k < 5; k++) {
-          //m_cov[j][k] = 0;
-          //m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
-          m_cov[j * 5 + k] = 0;
-          m_cov[j * 5 + k] = min->GetCovarianceMatrixElement(j, k);
+        for (int j = 0; j < 4; j++) {
+          if (xnpts[j] > 0)m_impact_x[j] = m_impact_x[j] / ((double)xnpts[j]);
+          if (ynpts[j] > 0)m_impact_y[j] = m_impact_y[j] / ((double)ynpts[j]);
         }
+
+        L = new float[fpxhits];
+        ix = new int[fpxhits];
+        iy = new int[fpxhits];
+        iz = new int[fpxhits];
+        TMath::Sort(fpxhits, x, ix, false);
+        TMath::Sort(fpxhits, y, iy, false);
+        TMath::Sort(fpxhits, z, iz, false);
+
+        XYZVector temp_vector3(0, 0, 0);
+        float pStart[5] = {0, 0, 0, 0, 0};
+        if (fpxhits != 0)temp_vector3  = XYZVector(x[ix[fpxhits - 1]] - x[ix[0]] , y[iy[fpxhits - 1]] - y[iy[0]],
+                                                     z[iz[fpxhits - 1]] - z[iz[0]]);
+        //float init_theta = TPCCenter[i].Theta();//temp_vector3.Theta();
+        //float init_phi = TPCCenter[i].Phi();//temp_vector3.Phi();
+        float init_theta = temp_vector3.Theta();
+        float init_phi = temp_vector3.Phi();
+
+        pStart[0] = x[ix[0]];
+        pStart[1] = y[iy[0]];
+        pStart[2] = z[iz[0]];
+        pStart[3] = init_theta;
+        pStart[4] = init_phi;
+        /*
+        cout <<"fpxhits " << fpxhits
+             << " pStart[0] " << pStart[0]
+             << " pStart[1] " << pStart[1]
+             << " pStart[2] " << pStart[2]
+             << " pStart[3] " << pStart[3]
+             << " pStart[4] " << pStart[4] << endl;
+        */
+        TVirtualFitter::SetDefaultFitter("Minuit");
+        TVirtualFitter* min = TVirtualFitter::Fitter(0, 5);
+        min->SetDefaultFitter("Minuit");
+        min->SetObjectFit(Track);
+        min->SetFCN(SumDistance2_angles);
+
+        Double_t arglist[6] = { -1, 0, 0, 0, 0, 0};
+        min->ExecuteCommand("SET PRINT", arglist, 1);
+        min->ExecuteCommand("SET NOWARNINGS", arglist, 0);
+
+        min->SetParameter(0, "x0",    pStart[0], 0.01, 0, 0);
+        min->SetParameter(1, "y0",    pStart[1], 0.01, 0, 0);
+        min->SetParameter(2, "z0",    pStart[2], 0.01, 0, 0);
+        min->SetParameter(3, "theta", pStart[3], 0.0001, 0, TMath::Pi());
+        min->SetParameter(4, "phi",   pStart[4], 0.0001, -TMath::Pi(), TMath::Pi());
+
+        arglist[0] = 10000; // number of fucntion calls
+        arglist[1] = 0.001; // tolerance
+        min->ExecuteCommand("MIGRAD", arglist, 2);
+
+        int nvpar, nparx;
+        double amin, edm, errdef;
+        min->GetStats(amin, edm, errdef, nvpar, nparx);
+        m_chi2 = amin;
+
+        for (int j = 0; j < 5; j++) {
+          m_parFit[j] = 0;
+          m_parFit_err[j] = 0;
+          m_parFit[j] = min->GetParameter(j);
+          m_parFit_err[i] = min->GetParError(j);
+          for (int k = 0; k < 5; k++) {
+            //m_cov[j][k] = 0;
+            //m_cov[j][k] = min->GetCovarianceMatrixElement(j, k);
+            m_cov[j * 5 + k] = 0;
+            m_cov[j * 5 + k] = min->GetCovarianceMatrixElement(j, k);
+          }
+        }
+
+        TVector3 TrackDir(1, 0, 0);
+        TrackDir.SetTheta(m_parFit[3]);
+        TrackDir.SetPhi(m_parFit[4]);
+
+        m_theta = m_parFit[3] * TMath::RadToDeg();
+        m_phi   = m_parFit[4] * TMath::RadToDeg();
+
+        for (int j = 0; j < fpxhits; j++) {
+          TVector3 Point(x[j], y[j], z[j]);
+          L[j] = Point * TrackDir.Unit();
+        }
+
+        iL = new int [fpxhits];
+        TMath::Sort(fpxhits, L, iL, false);
+        m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
+
+        for (int j = 0; j < 6; j++)m_partID[j] = 0;
+        Bool_t GoodRawXray = false;
+        if (fpxhits < 10) {
+          GoodRawXray = true;
+          m_partID[0] = 1;
+        }
+        Bool_t EdgeCuts = false;
+        if (m_side[0] == 0 && m_side[1] == 0 && m_side[2] == 0 && m_side[3] == 0) EdgeCuts = true;
+        //Bool_t GoodXray = false;
+        if (EdgeCuts && GoodRawXray) {
+          //GoodXray = true;
+          m_partID[1] = 1;
+        }
+        Bool_t StillAlpha = false;
+        //StillAlpha = m_CutExtraPO210->IsInside(m_esum, m_trl);
+        Bool_t IsTopSource = false;
+        Bool_t IsBotSource = false;
+        if (detNB == 0 || detNB == 3) {
+          IsBotSource = m_CutTPC1e4_PO210bot->IsInside(m_impact_y[0], m_phi);
+          IsTopSource = m_CutTPC1e4_PO210top->IsInside(m_impact_y[0], m_phi);
+          StillAlpha = m_CutTPC4ExtraPO210->IsInside(m_esum, m_trl);
+        } else if (detNB == 1 || detNB == 2) {
+          IsBotSource = m_CutTPC2e3_PO210bot->IsInside(m_impact_y[3], m_phi);
+          IsTopSource = m_CutTPC2e3_PO210top->IsInside(m_impact_y[3], m_phi);
+          StillAlpha = m_CutTPC3ExtraPO210->IsInside(m_esum, m_trl);
+        }
+        if (StillAlpha) m_partID[2] = 1;
+        if (IsBotSource) m_partID[3] = 1;
+        if (IsTopSource) m_partID[4] = 1;
+
+        //Bool_t GoodNeutron = false;
+        if (EdgeCuts && fpxhits > 10  && m_esum > 10.0 && !StillAlpha) {
+          //GoodNeutron = true;
+          m_partID[5] = 1;
+        }
+
+        StoreArray<MicrotpcRecoTrack> RecoTracks;
+        RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
+                             m_impact_x, m_impact_y, m_side, m_partID);
+
+
+
+
+        delete [] iL;
+        delete min;
+        delete [] L;
+        delete [] ix;
+        delete [] iy;
+        delete [] iz;
+
+        Track->Delete();
       }
-
-      TVector3 TrackDir(1, 0, 0);
-      TrackDir.SetTheta(m_parFit[3]);
-      TrackDir.SetPhi(m_parFit[4]);
-
-      m_theta = m_parFit[3] * TMath::RadToDeg();
-      m_phi   = m_parFit[4] * TMath::RadToDeg();
-
-      for (int j = 0; j < fpxhits; j++) {
-        TVector3 Point(x[j], y[j], z[j]);
-        L[j] = Point * TrackDir.Unit();
-      }
-
-      iL = new int [fpxhits];
-      TMath::Sort(fpxhits, L, iL, false);
-      m_trl = fabs(L[iL[fpxhits - 1]] - L[iL[0]]);
-
-      for (int j = 0; j < 6; j++)m_partID[j] = 0;
-      Bool_t GoodRawXray = false;
-      if (fpxhits < 10) {
-        GoodRawXray = true;
-        m_partID[0] = 1;
-      }
-      Bool_t EdgeCuts = false;
-      if (m_side[0] == 0 && m_side[1] == 0 && m_side[2] == 0 && m_side[3] == 0) EdgeCuts = true;
-      //Bool_t GoodXray = false;
-      if (EdgeCuts && GoodRawXray) {
-        //GoodXray = true;
-        m_partID[1] = 1;
-      }
-      Bool_t StillAlpha = false;
-      //StillAlpha = m_CutExtraPO210->IsInside(m_esum, m_trl);
-      Bool_t IsTopSource = false;
-      Bool_t IsBotSource = false;
-      if (detNB == 0 || detNB == 3) {
-        IsBotSource = m_CutTPC1e4_PO210bot->IsInside(m_impact_y[0], m_phi);
-        IsTopSource = m_CutTPC1e4_PO210top->IsInside(m_impact_y[0], m_phi);
-        StillAlpha = m_CutTPC4ExtraPO210->IsInside(m_esum, m_trl);
-      } else if (detNB == 1 || detNB == 2) {
-        IsBotSource = m_CutTPC2e3_PO210bot->IsInside(m_impact_y[3], m_phi);
-        IsTopSource = m_CutTPC2e3_PO210top->IsInside(m_impact_y[3], m_phi);
-        StillAlpha = m_CutTPC3ExtraPO210->IsInside(m_esum, m_trl);
-      }
-      if (StillAlpha) m_partID[2] = 1;
-      if (IsBotSource) m_partID[3] = 1;
-      if (IsTopSource) m_partID[4] = 1;
-
-      //Bool_t GoodNeutron = false;
-      if (EdgeCuts && fpxhits > 10  && m_esum > 10.0 && !StillAlpha) {
-        //GoodNeutron = true;
-        m_partID[5] = 1;
-      }
-
-      StoreArray<MicrotpcRecoTrack> RecoTracks;
-      RecoTracks.appendNew(i, fpxhits, m_chi2, m_theta, m_phi, m_esum, m_totsum, m_trl, m_time_range, m_parFit, m_parFit_err, m_cov,
-                           m_impact_x, m_impact_y, m_side, m_partID);
-
-
-
-
-      delete [] iL;
-      delete min;
-      delete [] L;
-      delete [] ix;
-      delete [] iy;
-      delete [] iz;
-
-      Track->Delete();
     }
   }
 

@@ -99,6 +99,12 @@ void TpcDigitizerModule::event()
   StoreArray<MCParticle> mcParticles;
   StoreArray<MicrotpcSimHit> microtpcSimHits;
 
+  m_dchip_map.clear();
+  m_dchip.clear();
+  m_dchip_detNb_map.clear();
+  m_dchip_pdg_map.clear();
+  m_dchip_trkID_map.clear();
+
   std::vector<double> T0(m_nTPC,
                          m_upperTimingCut);  // TODO: why this number? Maybe pick something larger the the upperTiming cut? e.g. m_upperTimingCut + 1
   std::vector<bool> PixelFired(m_nTPC, false);
@@ -166,10 +172,11 @@ void TpcDigitizerModule::event()
       // check if enough energy to ionize if not break
       // keV -> eV
 
-      if ((ionEn * 1e3) <  m_Workfct) continue; // TODO: Use Unit constants instead of self made magic numbers
+      //if ((ionEn * 1e3) <  m_Workfct) continue; // TODO: Use Unit constants instead of self made magic numbers
       ////////////////////////////////
       // check if enough energy to ionize
-      else if ((ionEn * 1e3) >  m_Workfct) { // TODO: Use Unit constants instead of self made magic numbers
+      //else if ((ionEn * 1e3) >  m_Workfct) { // TODO: Use Unit constants instead of self made magic numbers
+      if ((ionEn * 1e3) >  m_Workfct) { // TODO: Use Unit constants instead of self made magic numbers
 
         const double meanEl = ionEn * 1e3 /  m_Workfct;
         const double sigma = sqrt(m_Fanofac * meanEl);
@@ -262,13 +269,15 @@ void TpcDigitizerModule::event()
     }
   }
   */
-  if (m_dchip_map.size() > 0) Pixelization();
+  if (m_dchip_map.size() > 0 && m_dchip.size() < 20000) {
+    //std::cout << " event size " << m_dchip_map.size() << " all " << m_dchip.size() << std::endl;
+    Pixelization();
+  }
   m_dchip_map.clear();
   m_dchip.clear();
   m_dchip_detNb_map.clear();
   m_dchip_pdg_map.clear();
   m_dchip_trkID_map.clear();
-
 }
 /*
 TLorentzVector TpcDigitizerModule::Drift(
@@ -354,7 +363,11 @@ void TpcDigitizerModule::Pixelization()
   std::vector<int> row;
   std::vector<int> ToT;
   std::vector<int> bci;
-
+  t0.clear();
+  col.clear();
+  row.clear();
+  ToT.clear();
+  bci.clear();
   StoreArray<MicrotpcHit> microtpcHits;
 
   for (auto& keyValuePair : m_dchip_map) {
@@ -458,7 +471,7 @@ void TpcDigitizerModule::Pixelization()
         continue;
       }
       //create MicrotpcHit
-      microtpcHits.appendNew(MicrotpcHit(col[j], row[j], bci[j] - t0[0], ToT[j],
+      microtpcHits.appendNew(MicrotpcHit(col[j] + 1, row[j] + 1, bci[j] - t0[0] + 1, ToT[j] + 1,
                                          m_dchip_detNb_map[std::tuple<int, int>(col[j], row[j])],
                                          m_dchip_pdg_map[std::tuple<int, int>(col[j], row[j])],
                                          m_dchip_trkID_map[std::tuple<int, int>(col[j], row[j])]));

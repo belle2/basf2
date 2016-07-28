@@ -555,7 +555,7 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     matchMCTruth('gamma:b2bii_monitor', path)
     matchMCTruth('pi0:b2bii_monitor', path)
 
-    cutAndCopyLists('pi0:b2bii_monitorMC', 'pi0:b2bii_monitor', 'mcPDG == 111')
+    cutAndCopyLists('pi0:b2bii_monitorMC', 'pi0:b2bii_monitor', 'mcPDG == 111', path=path)
 
     # register VariablesToHistogram and fill them with monitored variables
     gamma2hist = register_module('VariablesToHistogram')

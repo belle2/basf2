@@ -320,7 +320,7 @@ PARALLELPROCESSINGCERTIFIED
 HISTOGRAMMANAGER
   This module is used to manage histograms accumulated by other modules
 TERMINATEINALLPROCESSES
-  When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process.
+  When using parallel processing, call this module's terminate() function in all processes. This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process.
 )")
   .value("INPUT", Module::EModulePropFlags::c_Input)
   .value("OUTPUT", Module::EModulePropFlags::c_Output)
@@ -376,7 +376,7 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("package", &Module::getPackage, return_value_policy<copy_const_reference>(), "Returns package this module belongs to.")
   .def("available_params", &_getParamInfoListPython, "Return list of all module parameters")
   .def("has_properties", &Module::hasProperties)
-  .def("set_property_flags", &Module::setPropertyFlags, "Set module properties in the form of an ORed set of :class:`basf2.ModulePropFlags`.")
+  .def("set_property_flags", &Module::setPropertyFlags, "Set module properties in the form of an ORed set of `basf2.ModulePropFlags`.")
   .def("if_value", &Module::if_value, if_value_overloads())
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())

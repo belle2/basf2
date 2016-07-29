@@ -9,7 +9,7 @@ Small wrapper module to ease access to pdg codes for particle gun or similar
 usage in the steering file
 """
 
-from basf2 import *
+import basf2
 import ROOT
 from ROOT.Belle2 import EvtGenDatabasePDG
 
@@ -121,17 +121,17 @@ def add_particle(name, pdgCode, mass, width, charge, spin, max_width=None, lifet
         pythiaID (int): pythiaID of the particle (if any), if omitted 0 will be used
     """
     if lifetime > 0:
-        B2WARNING("Userdefined particle with non-zero lifetime will not be simulated correctly")
+        basf2.B2WARNING("Userdefined particle with non-zero lifetime will not be simulated correctly")
 
     if max_width is None:
         # FIXME: is 3 a good default?
-        max_width = width*3
+        max_width = width * 3
 
-    particle = _database.AddParticle(name, name, mass, False, width, charge*3, "userdefined",
+    particle = _database.AddParticle(name, name, mass, False, width, charge * 3, "userdefined",
                                      pdgCode, 0, 0, lifetime, spin, max_width, pythiaID)
     if particle:
-        B2RESULT("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
-                 (name, pdgCode, mass, width, charge, spin))
+        basf2.B2RESULT("Adding new particle '%s' (pdg=%d, mass=%.3g GeV, width=%.3g GeV, charge=%d, spin=%d)" %
+                       (name, pdgCode, mass, width, charge, spin))
         return True
 
     return False

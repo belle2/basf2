@@ -161,7 +161,7 @@ void LogPythonInterface::exposePythonAPI()
   class_<LogConfig>("LogConfig",
                     R"(Defines logging settings (log levels and items included in each message) for a certain context, e.g. a module or package.
 
-.. seealso:: :func:`logging.package(str) <basf2.LogPythonInterface.package>`)")
+.. seealso:: `logging.package(str) <basf2.LogPythonInterface.package>`)")
   .def(init<optional<LogConfig::ELogLevel, int> >())
   .add_property("log_level",  &LogConfig::getLogLevel,  &LogConfig::setLogLevel, "set or get the current log level")
   .add_property("debug_level", &LogConfig::getDebugLevel, &LogConfig::setDebugLevel, "set or get the current debug level")
@@ -178,13 +178,13 @@ void LogPythonInterface::exposePythonAPI()
 
   //Interface the Interface class :)
   class_<LogPythonInterface, boost::noncopyable>("LogPythonInterface",
-                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global `logging` object in Python. See also :func:`basf2.set_log_level()` and :func:`basf2.set_debug_level()`.
+                                                 R"(Logging configuration (for messages generated from C++ or Python), available as a global ``logging`` object in Python. See also `basf2.set_log_level()` and `basf2.set_debug_level()`.
 
 This class exposes a object called ``logging`` to the python interface. With
 this object it is possible to set all properties of the logging system
 directly in the steering file in a consistent manner This class also
-exposes the :class:`basf2.LogConfig` class as well as the :class:`basf2.LogLevel`
-and :class:`basf2.LogInfo` enums to make setting of properties more transparent
+exposes the `basf2.LogConfig` class as well as the `basf2.LogLevel`
+and `basf2.LogInfo` enums to make setting of properties more transparent
 by using the names and not just the values.  To set or get the log level,
 one can simply do:
 
@@ -199,21 +199,21 @@ consistent error reporting througout the framework
 
 For all features, see b2logging.py in the framework/examples folder)")
   .add_property("log_level",  &LogPythonInterface::getLogLevel,  &LogPythonInterface::setLogLevel,
-                "Attribute for setting/getting the current log level (:class:`basf2.LogLevel`). Messages with a lower level are ignored.")
+                "Attribute for setting/getting the current log level (`basf2.LogLevel`). Messages with a lower level are ignored.")
   .add_property("debug_level", &LogPythonInterface::getDebugLevel, &LogPythonInterface::setDebugLevel,
                 "Attribute for getting/setting the debug log level. If debug messages are enabled, their level needs to be at least this high to be printed. Defaults to 100.")
   .add_property("abort_level", &LogPythonInterface::getAbortLevel, &LogPythonInterface::setAbortLevel,
-                "Attribute for setting/getting the log level (:class:`basf2.LogLevel`) at which to abort processing. Defaults to FATAL.")
+                "Attribute for setting/getting the log level (`basf2.LogLevel`) at which to abort processing. Defaults to FATAL.")
   .def("set_package", &LogPythonInterface::setPackageLogConfig,
-       "Set :class:`basf2.LogConfig` for given package, see also :func:`package() <basf2.LogPythonInterface.package>`.")
+       "Set `basf2.LogConfig` for given package, see also `package() <basf2.LogPythonInterface.package>`.")
   .def("package", &LogPythonInterface::getPackageLogConfig, return_value_policy<reference_existing_object>(),
-       R"(Get :class:`basf2.LogConfig` for given package.
+       R"(Get `basf2.LogConfig` for given package.
 
   >>> logging.package('svd').debug_level = 10
   >>> logging.package('svd').set_info(LogLevel.INFO, LogInfo.LEVEL | LogInfo.MESSAGE | LogInfo.FILE)
       )")
   .def("set_info", &LogPythonInterface::setLogInfo,
-       "Set info to print for given log level. Should be ORed combination of :class:`basf2.LogInfo`.")
+       "Set info to print for given log level. Should be ORed combination of `basf2.LogInfo`.")
   .def("get_info", &LogPythonInterface::getLogInfo, "Get info to print for given log level.")
   .def("add_file", &LogPythonInterface::addLogFile,
        addLogFile_overloads("Write log output to given file. (In addition to existing outputs)"))
@@ -222,7 +222,7 @@ For all features, see b2logging.py in the framework/examples folder)")
   .def("terminal_supports_colors", &LogConnectionIOStream::terminalSupportsColors)
   .staticmethod("terminal_supports_colors")
   .def("reset", &LogPythonInterface::reset,
-       "Remove all configured logging outputs. You can then configure your own via :func:`add_file() <basf2.LogPythonInterface.add_file>` or :func:`add_console() <basf2.LogPythonInterface.add_console>`")
+       "Remove all configured logging outputs. You can then configure your own via `add_file() <basf2.LogPythonInterface.add_file>` or `add_console() <basf2.LogPythonInterface.add_console>`")
   .def("zero_counters", &LogPythonInterface::zeroCounters, "Reset the per-level message counters.")
   .def_readonly("log_stats", &LogPythonInterface::getLogStatistics, "Returns dictionary with message counters.")
   .def("enable_summary", &LogPythonInterface::enableErrorSummary, args("on"),

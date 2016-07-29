@@ -123,7 +123,7 @@ void ProcessStatisticsPython::exposePythonAPI()
 
   //Wrap ProcessStatisticsPython as non-copy and non-instantiable in python
   class_<ProcessStatisticsPython, boost::noncopyable> stats("ProcessStatisticsPython",
-                                                            R"(Interface for retrieving statistics about modules at runtime or after basf2.process() returns, through a global instance ``basf2.statistics``.
+                                                            R"(Interface for retrieving statistics about modules at runtime or after `basf2.process()` returns, through a global instance ``basf2.statistics``.
 
 Statistics for event() calls are available as a string representation of the object:
 
@@ -164,11 +164,11 @@ between them.)")
   .def("__call__", &ProcessStatisticsPython::getStatisticsString, getStatistics_overloads())
   .def("__call__", &ProcessStatisticsPython::getModuleStatistics, getModuleStatistics_overloads())
   .def("get", &ProcessStatisticsPython::get, return_value_policy<reference_existing_object>(),
-       "Get :class:`ModuleStatistics` for given Module.")
+       "Get `ModuleStatistics` for given Module.")
   .def("get_global", &ProcessStatisticsPython::getGlobal, return_value_policy<reference_existing_object>(),
-       "Get global :class:`ModuleStatistics` containing total elapsed time etc.")
+       "Get global `ModuleStatistics` containing total elapsed time etc.")
   .def("clear", &ProcessStatisticsPython::clear, "Clear collected statistics but keep names of modules")
-  .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all :class:`ModuleStatistics` objects.")
+  .def_readonly("modules", &ProcessStatisticsPython::getAll, "List of all `ModuleStatistics` objects.")
   ;
 
   //Set scope to current class

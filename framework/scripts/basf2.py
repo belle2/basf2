@@ -230,7 +230,7 @@ def register_module(name_or_module, shared_lib_path=None, logLevel=None, debugLe
     :param debugLevel: Number indicating the detail of debug messages, default 100
     :param kwargs: Additional parameters of the module to be set.
 
-    You can also use :func:`Path.add_module() <basf2.Path.add_module>` directly,
+    You can also use `Path.add_module() <basf2.Path.add_module>` directly,
     which accepts the same name, logging and module parameter arguments.
 
     >>> basf.register_module('EventInfoSetter', evtNumList=100, logLevel=LogLevel.ERROR)
@@ -261,8 +261,8 @@ def set_module_parameters(path, name, recursive=False, **kwargs):
 
     :param path: The path to search for the modules
     :param name: Then name of the module to set parameters for
-    :param recursive: if True also look in paths connected by conditions or :func:`Path.for_each() <basf2.Path.for_each>`
-    :param kwargs: Named parameters to be set for the module, see  :func:`register_module() <basf2.register_module>`
+    :param recursive: if True also look in paths connected by conditions or `Path.for_each()`
+    :param kwargs: Named parameters to be set for the module, see  `register_module()`
     """
     if not kwargs:
         raise ValueError("no parameters given")
@@ -288,14 +288,14 @@ def set_module_parameters(path, name, recursive=False, **kwargs):
 
 def create_path():
     """
-    Creates a new path and returns it. You can also instantiate :class:`basf2.Path` directly.
+    Creates a new path and returns it. You can also instantiate `basf2.Path` directly.
     """
     return Path()
 
 
 def process(path, max_event=0):
     """
-    Start processing events using the modules in the given :class:`basf2.Path` object.
+    Start processing events using the modules in the given `basf2.Path` object.
 
     Can be called multiple times in one steering file (some restrictions apply:
     modules need to perform proper cleanup & reinitialisation, if Geometry is

@@ -207,7 +207,7 @@ void Database::exposePythonAPI()
 
   def("set_experiment_name", &Database_addExperimentName, args("experiment", "name"), R"DOCSTRING(
 Set a name for the given experiment number when looking up payloads in the
-central database. A central database needs to be set up before using "use_central_database".
+central database. A central database needs to be set up before using `use_central_database`.
 
 The experiment and numbers and names need to be unique because the mapping
 needs to be performed in both directions so different experiment numbers cannot

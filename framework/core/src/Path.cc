@@ -192,7 +192,7 @@ void Path::exposePythonAPI()
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   class_<Path>("Path",
-               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use :func:`basf2.create_path()` to create a new object.
+               R"(Implements a path consisting of Module and/or Path objects (arranged in a linear order). Use `basf2.create_path()` to create a new object.
 
 .. seealso:: :func:`basf2.process`)")
   .def("__str__", &Path::getPathString)

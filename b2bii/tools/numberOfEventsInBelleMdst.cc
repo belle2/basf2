@@ -76,15 +76,20 @@ int main(int argc, char* argv[])
 
   // read event
   int rectype = -1;
-  while (rectype < 0 && rectype != -2) {
-    //clear all previous event data before reading!
-    BsClrTab(BBS_CLEAR);
-    rectype = fd->read();
-    if (rectype == -1) {
-      B2ERROR("Error while reading panther tables! Record skipped.");
+  while (rectype > -2) {
+    rectype = -1;
+    while (rectype < 0 && rectype != -2) {
+      //clear all previous event data before reading!
+      BsClrTab(BBS_CLEAR);
+      rectype = fd->read();
+      if (rectype == -1) {
+        B2ERROR("Error while reading panther tables! Record skipped.");
+      }
+      nevt++;
     }
-    nevt++;
   }
+
+  std::cout << nevt << std::endl;
   if (rectype == -2) { // EoF detected
     B2INFO("[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << nevt << ". EOF detected!");
     return false;

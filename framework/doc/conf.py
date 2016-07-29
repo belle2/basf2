@@ -383,7 +383,7 @@ def process_docstring(app, what, name, obj, options, lines):
     convert doxygen syntax to sphinx
     """
     substitutions = {
-        re.compile(r'^( *)@param (.*?) '): r':param \2: ',
+        re.compile(r'^( *)@param (.*?):? '): r':param \2: ',
         re.compile(r'^( *)@returns? '): r':return: ',
     }
     newlines = []

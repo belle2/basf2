@@ -91,7 +91,9 @@ namespace Belle2 {
              _configFilename,
              "The filename of CDC trigger config file",
              _configFilename);
-    addParam("ReturnValueModuleNames", _returnValueModuleNames, "Chooses modules for return value. Can be a list of [TSF, ETF, 2DFind, 2DFit, 3DFind, 3DFit]. If empty list then returnValue will be for all modules.", emptyvector);
+    addParam("ReturnValueModuleNames", _returnValueModuleNames,
+             "Chooses modules for return value. Can be a list of [TSF, ETF, 2DFind, 2DFit, 3DFind, 3DFit]. If empty list then returnValue will be for all modules.",
+             emptyvector);
     addParam("InnerTSLUTFile",
              _innerTSLUTFilename,
              "The filename of LUT for inner-most track segments",
@@ -366,8 +368,8 @@ namespace Belle2 {
     // Set return value
     int returnValue = _cdc->getReturnValue();
     int mask = 0;
-    for(vector<string>::iterator it = _returnValueModuleNames.begin(); it != _returnValueModuleNames.end(); ++it) {
-      string const & moduleName = *it;
+    for (vector<string>::iterator it = _returnValueModuleNames.begin(); it != _returnValueModuleNames.end(); ++it) {
+      string const& moduleName = *it;
       if (moduleName == "TSF") mask |= TRGCDC::EReturnValueType::TSF;
       else if (moduleName == "ETF") mask |= TRGCDC::EReturnValueType::ETF;
       else if (moduleName == "find2D") mask |= TRGCDC::EReturnValueType::find2D;

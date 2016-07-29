@@ -317,12 +317,12 @@ namespace Belle2 {
     _firmwareSimulationWindow = TRGSignal(rise & fall);
     _firmwareSimulationWindow.name("Firmware simulation window in FE clock");
     _firmwareSimulationWindow.dump();
-    
+
     //...Time window in other clocks...
     _firmwareSimulationStartDataClock =
-        _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStart));
+      _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStart));
     _firmwareSimulationStopDataClock =
-        _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStop));
+      _clockD.position(_clockFE.absoluteTime(_firmwareSimulationStop));
 
     cout << "In " << _clock.name() << endl;
     cout << "    Start : "
@@ -682,7 +682,7 @@ namespace Belle2 {
     configure();
 
     //...Initialize root file...
-    if (_makeRootFile) { 
+    if (_makeRootFile) {
       m_file = new TFile((char*)_rootTRGCDCFilename.c_str(), "RECREATE");
       //m_file = new TFile("TRGCDC.root", "RECREATE");
       m_tree = new TTree("m_tree", "tree");
@@ -1091,9 +1091,9 @@ namespace Belle2 {
         TRGTime fall = rise;
         fall.shift(1).reverse();
         if (_simulationMode & 1)
-            w._signal |=  TRGSignal(rise & fall);
+          w._signal |=  TRGSignal(rise & fall);
         else
-            w._signal |= (TRGSignal(rise & fall) & _firmwareSimulationWindow);
+          w._signal |= (TRGSignal(rise & fall) & _firmwareSimulationWindow);
         w._signal.name(w.name());
 
         //...Left/right...
@@ -1510,7 +1510,7 @@ namespace Belle2 {
 
 
     // Save CDC hit data and TRG hit data to ROOT file.
-    if (_makeRootFile) { 
+    if (_makeRootFile) {
       saveTRGRawInformation(trgInformations);
       saveCDCHitInformation(hitCdcData);
       if (trgOutput == 2) {
@@ -2099,7 +2099,7 @@ namespace Belle2 {
     {
       // For any track
       int t_debugValue = 0;
-      for(unsigned iTrack = 0; iTrack<_trackList3D.size(); iTrack++) {
+      for (unsigned iTrack = 0; iTrack < _trackList3D.size(); iTrack++) {
         t_debugValue |= _trackList3D[iTrack]->getDebugValue(TRGCDCTrack::EDebugValueType::any);
       }
       //// For all tracks
@@ -2463,7 +2463,7 @@ namespace Belle2 {
       //...Super layer ID...
       const unsigned sl = _wires[wid]->superLayerId();
       if (sl != lastSl)
-          lastMergerLocalId = 0;
+        lastMergerLocalId = 0;
 
       //...Make a front-end board if necessary...
       bool newFrontEnd = false;
@@ -2506,7 +2506,7 @@ namespace Belle2 {
           if (! m) {
             newMerger = true;
             const string name = "CDCMerger" + TRGUtil::itostring(sl) +
-                "-" + TRGUtil::itostring(lastMergerLocalId);
+                                "-" + TRGUtil::itostring(lastMergerLocalId);
             TCMerger::unitType mt = TCMerger::unknown;
             if (sl == 0)
               mt = TCMerger::innerType;
@@ -2698,13 +2698,13 @@ namespace Belle2 {
     return _eventTime.back()->getT0();
   }
 
-  void TRGCDC::setReturnValue(EReturnValueType const & moduleName, bool flag)
+  void TRGCDC::setReturnValue(EReturnValueType const& moduleName, bool flag)
   {
     if (flag) _returnValue |= moduleName;
     else _returnValue &= ~moduleName;
   }
 
-  int TRGCDC::getReturnValue(EReturnValueType const & moduleName) const
+  int TRGCDC::getReturnValue(EReturnValueType const& moduleName) const
   {
     return _returnValue & moduleName;
   }

@@ -882,6 +882,44 @@ namespace {
 
   }
 
+  TEST_F(MetaVariableTest, nCleanedTracks)
+  {
+    DataStore::Instance().setInitializeActive(true);
+    StoreArray<TrackFitResult>::registerPersistent();
+    StoreArray<Track>::registerPersistent();
+    DataStore::Instance().setInitializeActive(false);
+
+    Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);
+    Particle p2({ 0.1 , -0.4, 0.8, 4.0 }, 11);
+
+    StoreArray<TrackFitResult> track_fit_results;
+    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.1, 0.0, 0.0),
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.15, 0.0, 0.0),
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.4, 0.0, 0.0),
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+    track_fit_results.appendNew(TVector3(0.1, 0.1, 0.1), TVector3(0.6, 0.0, 0.0),
+                                TMatrixDSym(6), 1, Const::pion, 0.01, 1.5, 0, 0);
+
+    StoreArray<Track> tracks;
+    tracks.appendNew()->setTrackFitResultIndex(Const::pion, 0);
+    tracks.appendNew()->setTrackFitResultIndex(Const::pion, 1);
+    tracks.appendNew()->setTrackFitResultIndex(Const::pion, 2);
+    tracks.appendNew()->setTrackFitResultIndex(Const::pion, 3);
+
+    const Manager::Var* var1 = Manager::Instance().getVariable("nCleanedTracks(p > 0.5)");
+    EXPECT_FLOAT_EQ(var1->function(nullptr), 1);
+
+    const Manager::Var* var2 = Manager::Instance().getVariable("nCleanedTracks(p > 0.2)");
+    EXPECT_FLOAT_EQ(var2->function(nullptr), 2);
+
+    const Manager::Var* var3 = Manager::Instance().getVariable("nCleanedTracks()");
+    EXPECT_FLOAT_EQ(var3->function(nullptr), 4);
+
+
+  }
+
   TEST_F(MetaVariableTest, NumberOfMCParticlesInEvent)
   {
     Particle p({ 0.1 , -0.4, 0.8, 2.0 }, 11);

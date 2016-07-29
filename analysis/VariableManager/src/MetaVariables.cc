@@ -38,6 +38,8 @@
 
 #include <cmath>
 #include <stdexcept>
+#include <memory>
+#include <string>
 
 namespace Belle2 {
   namespace Variable {
@@ -233,6 +235,34 @@ namespace Belle2 {
         }
       } else {
         B2FATAL("Wrong number of arguments for meta function formula");
+      }
+    }
+
+    Manager::FunctionPtr nCleanedTracks(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() <= 1) {
+
+        std::string cutString;
+        if (arguments.size() == 1)
+          cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle*) -> double {
+
+          unsigned int number_of_tracks = 0;
+          StoreArray<Track> tracks;
+          for (const auto& track : tracks)
+          {
+            Particle particle(&track, Const::pion);
+            if (cut->check(&particle))
+              number_of_tracks++;
+          }
+
+          return static_cast<double>(number_of_tracks);
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function nCleanedTracks");
       }
     }
 
@@ -604,6 +634,9 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("MetaFunctions");
+    REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
+                      "[Eventbased] ]Returns the number of clean Tracks in the event\n"
+                      "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");
     REGISTER_VARIABLE("formula(v1 + v2 * v3 - v4 / v5^v6)", formula,
                       "Returns the result of the given formula, where v1-v6 are variables.\n"
                       "Useful Calculate formula, no parenthesis allowed yet.");

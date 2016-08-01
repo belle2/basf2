@@ -52,7 +52,13 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
     }
 
     // Extrapolate the tracks to the perigee.
-    genfit::MeasuredStateOnPlane msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+    genfit::MeasuredStateOnPlane msop;
+    try {
+      msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+    } catch (genfit::Exception& exception) {
+      B2WARNING(exception.what());
+      continue;
+    }
 
     try {
       msop.extrapolateToLine(m_beamSpot, m_beamAxis);

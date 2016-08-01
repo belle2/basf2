@@ -41,6 +41,9 @@ namespace Belle2 {
 
     private:
       std::map<std::string, bool> m_results;
+
+      /** Making this class a ROOT class.*/
+      ClassDef(SoftwareTriggerResult, 1);
     };
   }
 }

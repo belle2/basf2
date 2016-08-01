@@ -58,6 +58,21 @@ namespace Belle2 {
         cutToUpload.import(iov);
       }
 
+      static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier)
+      {
+        const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);
+        B2WARNING(fullCutName);
+        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullCutName);
+        if (downloadedCut) {
+          return downloadedCut->getCut();
+        } else {
+          return std::unique_ptr<SoftwareTriggerCut>();
+        }
+      }
+
+      /** Use the default constructor (needed as we delete the copy constructor) */
+      SoftwareTriggerDBHandler() = default;
+
       /**
        * Download cuts with the given base name and specific names from the database and register them here.
        * When calling the checkForChangedDBEntries, these cuts will be checked for changes.
@@ -100,6 +115,12 @@ namespace Belle2 {
       };
 
     private:
+      /// Delete the copy constructor
+      SoftwareTriggerDBHandler(const SoftwareTriggerDBHandler& rhs) = delete;
+
+      /// Delete the assignment constructror
+      SoftwareTriggerDBHandler& operator=(SoftwareTriggerDBHandler& rhs) = delete;
+
       /// Common suffix to identify all software trigger cuts in the database.
       static const std::string s_dbPackageIdentifier;
 

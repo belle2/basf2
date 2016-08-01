@@ -6,7 +6,10 @@ Import('env')
 env['LIBS'] = [
     'framework',
     'skim',
-    '$ROOT_LIBS'
+    '$ROOT_LIBS',
+    "framework",
+    "tracking_dataobjects",
+    "mdst_dataobjects"
     ]
 
 Return('env')

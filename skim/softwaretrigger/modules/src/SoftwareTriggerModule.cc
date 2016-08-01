@@ -65,7 +65,8 @@ void SoftwareTriggerModule::terminate()
   if (m_debugTTree) {
     m_debugOutputFile->cd();
     m_debugOutputFile->Write();
-    m_debugOutputFile->Close();
+    m_debugTTree.reset();
+    m_debugOutputFile.reset();
   }
 }
 

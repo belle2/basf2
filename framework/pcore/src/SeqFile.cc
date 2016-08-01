@@ -56,9 +56,6 @@ SeqFile::SeqFile(const std::string& filename, const std::string& rwflag):
 
 void SeqFile::openFile(std::string filename, bool readonly)
 {
-  if (std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get()))
-    out->flush();
-  close(m_fd);
   // add compression suffix if file is supposed to be compressed
   if (m_compressed) filename += ".gz";
   if (!readonly) {
@@ -66,7 +63,7 @@ void SeqFile::openFile(std::string filename, bool readonly)
     m_fd = open(filename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0664);
     auto filter = new io::filtering_ostream();
     if (m_compressed) filter->push(io::gzip_compressor());
-    filter->push(io::file_descriptor_sink(m_fd, io::never_close_handle));
+    filter->push(io::file_descriptor_sink(m_fd, io::close_handle));
     filter->exceptions(ios_base::badbit | ios_base::failbit);
     m_stream.reset(filter);
   } else {
@@ -74,7 +71,7 @@ void SeqFile::openFile(std::string filename, bool readonly)
     m_fd = open(filename.c_str(), O_RDONLY);
     auto filter = new io::filtering_istream();
     if (m_compressed) filter->push(io::gzip_decompressor());
-    filter->push(io::file_descriptor_source(m_fd, io::never_close_handle));
+    filter->push(io::file_descriptor_source(m_fd, io::close_handle));
     filter->exceptions(ios_base::badbit | ios_base::failbit);
     m_stream.reset(filter);
   }
@@ -84,10 +81,8 @@ void SeqFile::openFile(std::string filename, bool readonly)
 
 SeqFile::~SeqFile()
 {
-  if (std::ostream* out = dynamic_cast<std::ostream*>(m_stream.get()))
-    out->flush();
-  close(m_fd);
-  B2INFO("Seq File " << m_nfile << " closed");
+  B2INFO("Closing SeqFile " << m_nfile);
+  //closed automatically by m_stream.
 }
 
 int SeqFile::status() const
@@ -95,7 +90,7 @@ int SeqFile::status() const
   return m_fd;
 }
 
-int SeqFile::write(char* buf)
+int SeqFile::write(const char* buf)
 {
   int insize = *((int*)buf); // nbytes in the buffer at the beginning
   if (insize + m_nb >= c_MaxFileSize && m_filename != "/dev/null") {
@@ -147,6 +142,7 @@ int SeqFile::read(char* buf, int size)
     if (m_fd < 0) return 0;   // End of all files
     // update the stream pointer
     in = dynamic_cast<std::istream*>(m_stream.get());
+    B2INFO("SeqFile::read() opened '" << nextfile << "'");
   }
   try {
     // Obtain new header

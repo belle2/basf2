@@ -41,7 +41,8 @@ SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size
   m_nevt = -1;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name.", string("SeqRootInput.sroot"));
+  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name. Can also be a gzip-compressed file (with suffix .gz).",
+           string("SeqRootInput.sroot"));
 
   B2DEBUG(1, "SeqRootInput: Constructor done.");
 }

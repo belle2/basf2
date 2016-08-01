@@ -29,7 +29,7 @@ namespace Belle2 {
     int status() const;
 
     /** Write a record to a file.  First word of the record should contain number of words.*/
-    int write(char* buf);
+    int write(const char* buf);
     /** Read a record from a file. The record length is returned. */
     int read(char* buf, int max);
 
@@ -45,7 +45,7 @@ namespace Belle2 {
     int m_fd{ -1}; /**< file descriptor. */
     int m_nb{0}; /**< when saving a file, the total number of bytes written, 0 when reading. */
     int m_nfile{0}; /**< file counter, starting at 0 (files are split after c_MaxFileSize bytes). */
-    bool m_compressed{false}; /**< bool if file is gzipped compressed */
+    bool m_compressed{false}; /**< is file gzipped compressed? */
     std::unique_ptr<std::ios> m_stream; /**< pointer to the filtering input or output stream */
   };
 

@@ -4,7 +4,7 @@ from ROOT import Belle2
 import numpy as np
 
 
-class FullEventStatisticsGetterModule(basf2.Module):
+class PerEventStatisticsGetterModule(basf2.Module):
     """
     A basf2 python module to export *all* module time statistics (of every event, not just averaged)
      into a ROOT TTree written to a file.
@@ -16,7 +16,7 @@ class FullEventStatisticsGetterModule(basf2.Module):
     """
     def __init__(self, output_file_name):
         """
-        Create a new FullEventStatisticsGetterModule. You have to give the name of the
+        Create a new PerEventStatisticsGetterModule. You have to give the name of the
         file, where the TTree with the full event statistics will be saved.
         """
         #: Name of the output file.
@@ -50,7 +50,7 @@ class FullEventStatisticsGetterModule(basf2.Module):
         # Create the object in the DataStore
         self.statistics = Belle2.PyStoreObj(Belle2.RootMergeable(ROOT.TTree).Class(),
                                             Belle2.DataStore.c_Persistent)
-        self.statistics.registerInDataStore("FullModuleStatistics")
+        self.statistics.registerInDataStore("PerEventStatistics")
 
         # Before creating the TTree, open the output file.
         self.file = ROOT.TFile.Open(self.output_file_name, "RECREATE")

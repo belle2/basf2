@@ -120,6 +120,20 @@ namespace Belle2 {
       }
 
       /**
+       * Add a vector to the xml tree
+       * @param identifier identifier of the vector
+       * @param element the std::vector
+       */
+      template<class T>
+      void addVector(const std::string& identifier, const std::vector<T>& vector)
+      {
+        m_pt.put(identifier + "_size", vector.size());
+        for (unsigned int i = 0; i < vector.size(); ++i) {
+          m_pt.put(identifier + std::to_string(i), vector[i]);
+        }
+      }
+
+      /**
        * Creates a file from our weightfile (mostly this will be a weightfile of an MVA library)
        * @param identifier of the file
        * @param custom_weightfile the filename which is created
@@ -140,6 +154,21 @@ namespace Belle2 {
       T getElement(const std::string& identifier) const
       {
         return m_pt.get<T>(identifier);
+      }
+
+      /**
+      * Returns a stored vector from the xml tree
+      * @param identifier of the stored std::vector
+      */
+      template<class T>
+      std::vector<T> getVector(const std::string& identifier) const
+      {
+        std::vector<T> vector;
+        vector.resize(m_pt.get<T>(identifier + "_size"));
+        for (unsigned int i = 0; i < vector.size(); ++i) {
+          vector[i] = m_pt.get<T>(identifier + std::to_string(i));
+        }
+        return vector;
       }
 
       /**

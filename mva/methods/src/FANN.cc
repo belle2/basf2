@@ -299,6 +299,8 @@ namespace Belle2 {
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
       weightfile.addFile("FANN_Weightfile", custom_weightfile);
+      weightfile.addVector("FANN_bestTrainLog", bestTrainLog);
+      weightfile.addVector("FANN_bestValidLog", bestValidLog);
       weightfile.addSignalFraction(training_data.getSignalFraction());
 
       return weightfile;

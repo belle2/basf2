@@ -178,7 +178,7 @@ void EventProcessor::callEvent(Module* module)
   LogSystem& logSystem = LogSystem::Instance();
   const bool collectStats = !Environment::Instance().getNoStats();
   // set up logging
-  logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+  logSystem.updateModule(&(module->getLogConfig()), module->getName());
   // set up statistics is requested
   if (collectStats) m_processStatisticsPtr->startModule();
   // call module
@@ -186,7 +186,7 @@ void EventProcessor::callEvent(Module* module)
   // stop timing
   if (collectStats) m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Event);
   // reset logging
-  logSystem.setModuleLogConfig(NULL);
+  logSystem.updateModule(NULL);
 };
 
 void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool setEventInfo)
@@ -210,7 +210,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     }
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+    logSystem.updateModule(&(module->getLogConfig()), module->getName());
     DataStore::Instance().getDependencyMap().setModule(*module);
 
     //Do initialization
@@ -220,7 +220,7 @@ void EventProcessor::processInitialize(const ModulePtrList& modulePathList, bool
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Init);
 
     //Set the global log level
-    logSystem.setModuleLogConfig(NULL);
+    logSystem.updateModule(NULL);
 
     //Check whether this is the master module
     if (!m_master && DataStore::Instance().getEntry(m_eventMetaDataPtr) != NULL) {
@@ -388,7 +388,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     Module* module = listIter->get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+    logSystem.updateModule(&(module->getLogConfig()), module->getName());
 
     //Do termination
     m_processStatisticsPtr->startModule();
@@ -396,7 +396,7 @@ void EventProcessor::processTerminate(const ModulePtrList& modulePathList)
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_Term);
 
     //Set the global log level
-    logSystem.setModuleLogConfig(NULL);
+    logSystem.updateModule(NULL);
   }
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_Term);
@@ -419,7 +419,7 @@ void EventProcessor::processBeginRun(bool skipDB)
     Module* module = modPtr.get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+    logSystem.updateModule(&(module->getLogConfig()), module->getName());
 
     //Do beginRun() call
     m_processStatisticsPtr->startModule();
@@ -427,7 +427,7 @@ void EventProcessor::processBeginRun(bool skipDB)
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_BeginRun);
 
     //Set the global log level
-    logSystem.setModuleLogConfig(NULL);
+    logSystem.updateModule(NULL);
   }
 
   m_processStatisticsPtr->stopGlobal(ModuleStatistics::c_BeginRun);
@@ -453,7 +453,7 @@ void EventProcessor::processEndRun()
     Module* module = modPtr.get();
 
     //Set the module dependent log level
-    logSystem.setModuleLogConfig(&(module->getLogConfig()), module->getName());
+    logSystem.updateModule(&(module->getLogConfig()), module->getName());
 
     //Do endRun() call
     m_processStatisticsPtr->startModule();
@@ -461,7 +461,7 @@ void EventProcessor::processEndRun()
     m_processStatisticsPtr->stopModule(module, ModuleStatistics::c_EndRun);
 
     //Set the global log level
-    logSystem.setModuleLogConfig(NULL);
+    logSystem.updateModule(NULL);
   }
   *m_eventMetaDataPtr = newEventMetaData;
 

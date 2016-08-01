@@ -207,11 +207,11 @@ void Module::setReturnValue(bool value)
 void Module::setParamPython(const std::string& name, const boost::python::object& pyObj)
 {
   LogSystem& logSystem = LogSystem::Instance();
-  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
+  logSystem.updateModule(&(getLogConfig()), getName());
 
   m_moduleParamList.setParamPython(name, pyObj);
 
-  logSystem.setModuleLogConfig(NULL);
+  logSystem.updateModule(NULL);
 }
 
 
@@ -219,7 +219,7 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
 {
 
   LogSystem& logSystem = LogSystem::Instance();
-  logSystem.setModuleLogConfig(&(getLogConfig()), getName());
+  logSystem.updateModule(&(getLogConfig()), getName());
 
   boost::python::list dictKeys = dictionary.keys();
   int nKey = boost::python::len(dictKeys);
@@ -237,7 +237,7 @@ void Module::setParamPythonDict(const boost::python::dict& dictionary)
     }
   }
 
-  logSystem.setModuleLogConfig(NULL);
+  logSystem.updateModule(NULL);
 }
 
 

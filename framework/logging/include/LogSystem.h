@@ -73,16 +73,6 @@ namespace Belle2 {
     LogConfig* getLogConfig() {return &m_logConfig;}
 
     /**
-     * Sets the log configuration to the given module log configuration and sets the module name
-     * This method should _only_ be called by the EventProcessor.
-     *
-     * @param moduleLogConfig Pointer to the logging configuration object of the module.
-     *                        Set to NULL to use the global log configuration.
-     * @param moduleName Name of the module.
-     */
-    void setModuleLogConfig(LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
-
-    /**
      * Add the per package log configuration.
      * Adds a new log configuration for the given package name.
      *
@@ -169,13 +159,20 @@ namespace Belle2 {
      */
     void enableErrorSummary(bool on) { m_printErrorSummary = on; }
 
-
+    /**
+     * Sets the log configuration to the given module log configuration and sets the module name
+     * This method should _only_ be called by the EventProcessor.
+     *
+     * @param moduleLogConfig Pointer to the logging configuration object of the module.
+     *                        Set to NULL to use the global log configuration.
+     * @param moduleName Name of the module.
+     */
+    void updateModule(const LogConfig* moduleLogConfig = nullptr, const std::string& moduleName = "-global-") { m_moduleLogConfig = moduleLogConfig; m_moduleName = moduleName; };
 
   private:
-
-    std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. */
-    LogConfig m_logConfig;                                /**< The global log system configuration. */
-    LogConfig* m_moduleLogConfig;                         /**< The current module log system configuration. */
+    std::vector<LogConnectionBase*> m_logConnections;     /**< Stores the pointers to the log connection objects. (owned by us) */
+    LogConfig m_logConfig; /**< The global log system configuration. */
+    const LogConfig* m_moduleLogConfig; /**< log config of current module */
     std::string m_moduleName;                             /**< The current module name. */
     std::map<std::string, LogConfig> m_packageLogConfigs; /**< Stores the log configuration objects for packages. */
     bool m_printErrorSummary;                             /**< Wether to re-print errors-warnings encountered during execution at the end. */
@@ -187,10 +184,10 @@ namespace Belle2 {
     LogSystem();
 
     /** Disable/Hide the copy constructor. */
-    LogSystem(const LogSystem&);
+    LogSystem(const LogSystem&) = delete;
 
     /** Disable/Hide the copy assignment operator. */
-    LogSystem& operator=(const LogSystem&);
+    LogSystem& operator=(const LogSystem&) = delete;
 
     /** The LogSystem destructor. */
     ~LogSystem();

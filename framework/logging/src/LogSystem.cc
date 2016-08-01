@@ -111,20 +111,19 @@ int LogSystem::getMessageCounter(LogConfig::ELogLevel logLevel) const
 
 const LogConfig& LogSystem::getCurrentLogConfig(const char* package) const
 {
-  //TODO why is this before module config??
+  //module specific config?
+  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
+    return *m_moduleLogConfig;
+  }
+
   //package specific config?
-  if (package && !m_packageLogConfigs.empty()) {
-    map<string, LogConfig>::const_iterator packageLogConfig = m_packageLogConfigs.find(package);
+  if (package) {
+    const map<string, LogConfig>::const_iterator& packageLogConfig = m_packageLogConfigs.find(package);
     if (packageLogConfig != m_packageLogConfigs.end()) {
       const LogConfig& logConfig = packageLogConfig->second;
       if (logConfig.getLogLevel() != LogConfig::c_Default)
         return logConfig;
     }
-  }
-
-  //module specific config?
-  if (m_moduleLogConfig && (m_moduleLogConfig->getLogLevel() != LogConfig::c_Default)) {
-    return *m_moduleLogConfig;
   }
 
   //global config

@@ -28,17 +28,22 @@ std::unique_ptr<ADCCountTranslatorBase>    CDCRecoHit::s_adcCountTranslator    =
 std::unique_ptr<CDCGeometryTranslatorBase> CDCRecoHit::s_cdcGeometryTranslator = 0;
 std::unique_ptr<TDCCountTranslatorBase>    CDCRecoHit::s_tdcCountTranslator    = 0;
 bool                                       CDCRecoHit::s_useTrackTime          = false;
+//temp4cosmics
+bool                                       CDCRecoHit::s_cosmics = false;
 
 
 void CDCRecoHit::setTranslators(ADCCountTranslatorBase*    const adcCountTranslator,
                                 CDCGeometryTranslatorBase* const cdcGeometryTranslator,
                                 TDCCountTranslatorBase*    const tdcCountTranslator,
-                                bool useTrackTime)
+                                //temp4cosmics                                bool useTrackTime)
+                                bool useTrackTime, bool cosmics)
 {
   s_adcCountTranslator.reset(adcCountTranslator);
   s_cdcGeometryTranslator.reset(cdcGeometryTranslator);
   s_tdcCountTranslator.reset(tdcCountTranslator);
   s_useTrackTime = useTrackTime;
+  //temp4cosmics
+  s_cosmics = cosmics;
 }
 
 CDCRecoHit::CDCRecoHit()
@@ -168,6 +173,14 @@ std::vector<genfit::MeasurementOnPlane*> CDCRecoHit::constructMeasurementsOnPlan
   */
 
   double trackTime = s_useTrackTime ? state.getTime() : 0;
+  //temp4cosmics
+  //  std::cout <<"phi,trackTime= " << atan2(py,px) <<" "<< trackTime << std::endl;
+  if (s_cosmics) {
+    if (atan2(py, px) > 0.) {
+      //    if (atan2(wy,wx) > 0.) {
+      trackTime *= -1.;
+    }
+  }
 
   // The meaning of the left / right flag (called
   // 'ambiguityDiscriminator' in TDCCounTranslatorBase) is inferred

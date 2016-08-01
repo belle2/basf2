@@ -54,7 +54,8 @@ namespace Belle2 {
     static void setTranslators(CDC::ADCCountTranslatorBase*    const adcCountTranslator,
                                CDC::CDCGeometryTranslatorBase* const cdcGeometryTranslator,
                                CDC::TDCCountTranslatorBase*    const tdcCountTranslator,
-                               bool useTrackTime = false);
+                               //temp4cosmics                               bool useTrackTime = false);
+                               bool useTrackTime = false, bool cosmics = false);
 
     /** Methods that actually interface to Genfit.
      */
@@ -119,6 +120,8 @@ namespace Belle2 {
      * measurementOnPlane.  This needs to be in sync with the
      * TDCCountTranslator.  */
     static bool s_useTrackTime;
+    //temp4cosmics
+    static bool s_cosmics;
 
 #endif
 

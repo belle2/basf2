@@ -2,6 +2,8 @@
 
 #include <framework/core/Module.h>
 
+#include <skim/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+#include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
@@ -16,13 +18,16 @@ namespace Belle2 {
       SoftwareTriggerModule();
 
       /// Initialize/Require the DB object pointers and any needed store arrays.
-      virtual void initialize() override;
+      void initialize() override;
 
       /// Run over all cuts and check them. If one of the cuts yields true, give a positive return value of the module.
-      virtual void event() override;
+      void event() override;
 
       /// Check if the cut representations in the database have changed and download newer ones if needed.
-      virtual void beginRun() override;
+      void beginRun() override;
+
+      /// Store and delete the ttree if it was created.
+      void terminate() override;
 
     private:
       // Parameters
@@ -42,6 +47,13 @@ namespace Belle2 {
 
       /// Internal handler object for the DB interface.
       SoftwareTriggerDBHandler m_dbHandler;
+
+      /// Internal handler for the calculations
+      SoftwareTriggerCalculation<FastRecoCalculator> m_calculation;
+
+      std::unique_ptr<TFile> m_debugOutputFile;
+
+      std::unique_ptr<TTree> m_debugTTree;
     };
   }
 }

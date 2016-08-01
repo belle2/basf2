@@ -1,4 +1,5 @@
 #include <skim/softwaretrigger/modules/SoftwareTriggerModule.h>
+#include <TFile.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -7,7 +8,7 @@ REG_MODULE(SoftwareTrigger)
 
 
 /// Create a new module instance and set the parameters.
-SoftwareTriggerModule::SoftwareTriggerModule() : Module()
+SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPointer("", DataStore::c_Event)
 {
   setDescription("Module to perform cuts on various variables in the event. The cuts can be defined "
                  "by elements loaded from the database. Each cut is executed, its result stored "
@@ -43,22 +44,52 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module()
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
+  m_calculation.requireStoreArrays();
 
   m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
+
+  if (m_param_storeDebugOutput) {
+    m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
+    if (not m_debugOutputFile) {
+      B2ERROR("Could not open debug output file. Aborting.");
+    }
+    m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
+    if (not m_debugTTree) {
+      B2ERROR("Could not create debug output tree. Aborting.");
+    }
+  }
+}
+
+void SoftwareTriggerModule::terminate()
+{
+  if (m_debugTTree) {
+    m_debugOutputFile->cd();
+    m_debugOutputFile->Write();
+    m_debugOutputFile->Close();
+  }
 }
 
 /// Run over all cuts and check them. If one of the cuts yields true, give a positive return value of the module.
 void SoftwareTriggerModule::event()
 {
-  m_resultStoreObjectPointer.create();
+  m_resultStoreObjectPointer.construct();
 
-  // TODO: Do the calculation!
-  SoftwareTriggerObject prefilledObject;
+  B2DEBUG(100, "Doing the calculation...");
+  const SoftwareTriggerObject& prefilledObject = m_calculation.fillInCalculations();
+  B2DEBUG(100, "Successfully finished the calculation.");
+
+  if (m_param_storeDebugOutput) {
+    B2DEBUG(100, "Storing debug output as requested.");
+    m_calculation.writeDebugOutput(m_debugTTree);
+    B2DEBUG(100, "Finished storing the debug output.");
+  }
 
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
+    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
     const bool cutResult = cut->checkPreScaled(prefilledObject);
+    B2DEBUG(100, "The result if the trigger cut is " << cutResult);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 

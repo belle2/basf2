@@ -5,7 +5,8 @@ Import('env')
 
 env['LIBS'] = [
     'skim',
-    'framework'
+    'framework',
+    'skim_softwaretrigger_dbobjects'
     ]
 
 Return('env')

@@ -16,18 +16,22 @@ using namespace std;
 namespace Belle2 {
   namespace SoftwareTrigger {
 
+    /// Base class for the cut tests.
     class SoftwareTriggerCutTest : public ::testing::Test {
+      /// Set the random seed to a known value.
       void SetUp()
       {
         m_savedSeed = gRandom->GetSeed();
         gRandom->SetSeed(42);
       }
 
+      /// Reset the random seed.
       void TearDown()
       {
         gRandom->SetSeed(m_savedSeed);
       }
 
+      /// Internal storage for the random seed before this test.
       unsigned int m_savedSeed = 0;
     };
 

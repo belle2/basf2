@@ -29,20 +29,26 @@ def download_cut_from_db(base_name, cut_name):
 
 
 def set_event_number(evt_number, run_number, exp_number):
-    evtPtr = Belle2.PyStoreObj(Belle2.EventMetaData.Class(), "EventMetaData")
+    """
+    Helper function to set the event number although we are not in a typical
+    "module-path" setup. This is done by initializing the database,
+    creating an EventMetaData and string the requested numbers in it.
+    """
+    event_meta_data_pointer = Belle2.PyStoreObj(Belle2.EventMetaData.Class(), "EventMetaData")
 
     Belle2.DataStore.Instance().setInitializeActive(True)
 
-    evtPtr.registerInDataStore()
-    evtPtr.create(False)
-    evtPtr.setEvent(evt_number)
-    evtPtr.setRun(run_number)
-    evtPtr.setExperiment(exp_number)
+    event_meta_data_pointer.registerInDataStore()
+    event_meta_data_pointer.create(False)
+    event_meta_data_pointer.setEvent(evt_number)
+    event_meta_data_pointer.setRun(run_number)
+    event_meta_data_pointer.setExperiment(exp_number)
 
     Belle2.DataStore.Instance().setInitializeActive(False)
 
 
 if __name__ == '__main__':
+    # Create an example cut.
     cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile("[[highest_1_ecl > 0.1873] or [max_pt > 0.4047]]", 1)
     print(cut.decompile())
 

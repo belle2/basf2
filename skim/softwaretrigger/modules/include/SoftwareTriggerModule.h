@@ -12,6 +12,12 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
+    /**
+     * Module to perform cuts on various variables in the event. The cuts can be defined
+     * by elements loaded from the database. Each cut is executed, its result stored
+     * and the return value of this module is set to true of one of the cuts give a
+     * positive result.
+     */
     class SoftwareTriggerModule : public Module {
     public:
       /// Create a new module instance and set the parameters.
@@ -41,18 +47,15 @@ namespace Belle2 {
       bool m_param_storeDebugOutput = false;
       /// Output file name for the debug output. Is only used if debug is turned on.
       std::string m_param_debugOutputFileName = "software_trigger_debug.root";
-
       /// Store Object for storing the trigger decision.
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
-
       /// Internal handler object for the DB interface.
       SoftwareTriggerDBHandler m_dbHandler;
-
       /// Internal handler for the calculations
       SoftwareTriggerCalculation<FastRecoCalculator> m_calculation;
-
+      /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).
       std::unique_ptr<TFile> m_debugOutputFile;
-
+      /// TTree to store the debug output (or a nullptr if we do not save the debug output).
       std::unique_ptr<TTree> m_debugTTree;
     };
   }

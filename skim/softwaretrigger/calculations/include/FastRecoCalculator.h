@@ -16,16 +16,34 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
+    /**
+     * Implementation of a calculator used in the SoftwareTriggerModule
+     * to fill a SoftwareTriggerObject for doing HLT cuts.
+     *
+     * This calculator exports variables needed for the FastReco part
+     * of the path, namely
+     * * visible_energy
+     * * highest_1_ecl
+     * * max_pt
+     * * max_pz
+     * * first_highest_cdc_energies
+     *
+     * You do not have to create an instance of this class by yourself,
+     * but rather use the SoftwareTriggerCalculation for it.
+     */
     class FastRecoCalculator {
     public:
+      /// Require the CDCRecoHits and the ECLClusters. We do not need more here.
       void requireStoreArrays();
 
+      /// Actually write out the variables into the map.
       void doCalculation(SoftwareTriggerObject& calculationResult) const;
 
     public:
+      /// Internal storage of the cdc reco tracks.
       StoreArray <RecoTrack> m_cdcRecoTracks;
+      /// Internal storage of the ecl clusters.
       StoreArray <ECLCluster> m_eclClusters;
-
     };
   }
 }

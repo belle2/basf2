@@ -58,6 +58,14 @@ namespace Belle2 {
         cutToUpload.import(iov);
       }
 
+      /**
+       * Download a cut from the database. This function should only
+       * be called from python to interact with/edit single cuts and not from your module
+       * to check the cuts (use the initialize method etc. for this).
+       * @param baseCutIdentifier The base name of the cut to download.
+       * @param cutIdentifier The identifier of the cut to download.
+       * @return A unique pointer to the downloaded cut or a nullptr of no cut with this name is in the DB.
+       */
       static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier)
       {
         const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);

@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 
+#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <TTree.h>
 
 namespace Belle2 {
@@ -80,8 +80,11 @@ namespace Belle2 {
       }
 
     private:
+      /// Internal storage of the underlaying algorithm class implemented by the user.
       ACalculator m_calculatorAlgorithm;
+      /// Internal storage of the result of the calculation.
       SoftwareTriggerObject m_calculationResult;
+      /// Flag to not add the branches twice to the TTree.
       bool m_debugPrepared = false;
     };
   }

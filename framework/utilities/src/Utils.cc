@@ -44,6 +44,12 @@ namespace Belle2 {
       clock_gettime(CLOCK_REALTIME, &ts);
       return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
     }
+    double getCPUClock()
+    {
+      timespec ts;
+      clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &ts);
+      return (ts.tv_sec * Unit::s) + (ts.tv_nsec * Unit::ns);
+    }
 
     unsigned long getVirtualMemoryKB()
     {

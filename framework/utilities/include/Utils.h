@@ -29,14 +29,22 @@ namespace Belle2 {
 
 
     /**
-     * Return current value of the high performance clock.
+     * Return current value of the real-time clock.
      *
      * The returned value is meant to measure relative times and does not show
-     * absolute time values;
+     * absolute time values.
      *
+     * @note See getCPUClock() for a higher-resolution clock unaffected by wait times.
      * @return Clock value in default time unit (ns)
      */
     double getClock();
+
+    /**
+     * Return current value of the per-thread CPU clock.
+     *
+     * @return CPU clock value in default time unit (ns)
+     */
+    double getCPUClock();
 
     /**
      * Returns currently used virtual memory in KB, includes swapped and not occupied memory

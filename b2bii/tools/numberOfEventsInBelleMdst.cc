@@ -34,9 +34,11 @@ int main(int argc, char* argv[])
   description.add_options()
   ("filename", po::value<std::string>(&filename), "belle 1 mdst file");
   po::variables_map vm;
+  po::positional_options_description p;
+  p.add("filename", -1);
 
   try {
-    po::parsed_options parsed = po::command_line_parser(argc, argv).options(description).run();
+    po::parsed_options parsed = po::command_line_parser(argc, argv).options(description).positional(p).run();
     po::store(parsed, vm);
 
     if (vm.count("help")) {
@@ -89,9 +91,8 @@ int main(int argc, char* argv[])
     }
   }
 
-  std::cout << nevt << std::endl;
+  std::cout << static_cast<int>(nevt) - 2 << std::endl;
   if (rectype == -2) { // EoF detected
-    B2INFO("[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << nevt << ". EOF detected!");
     return false;
   }
 

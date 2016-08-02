@@ -53,15 +53,15 @@ TYPED_TEST_CASE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
 TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {
   DataStore& datastore = DataStore::Instance();
+  StoreWrappedObjPtr< TypeParam > storeObj;
 
   //Initialization phase
   datastore.setInitializeActive(true);
-  StoreWrappedObjPtr< TypeParam >::registerTransient();
+  storeObj.registerInDataStore(DataStore::c_DontWriteOut);
   datastore.setInitializeActive(false);
 
   //Event processing phase
   // First module
-  StoreWrappedObjPtr< TypeParam > storeObj;
   storeObj.create();
   const string& objectName = storeObj.getName();
 

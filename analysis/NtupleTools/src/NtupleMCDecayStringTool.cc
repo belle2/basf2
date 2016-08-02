@@ -15,15 +15,15 @@
 
 #include <TTree.h>
 #include <TBranch.h>
-#include <sstream>
 
 using namespace Belle2;
 
-NtupleMCDecayStringTool::NtupleMCDecayStringTool(TTree* tree, DecayDescriptor& decaydescriptor) : NtupleFlatTool(tree, decaydescriptor)
+NtupleMCDecayStringTool::NtupleMCDecayStringTool(TTree* tree, DecayDescriptor& decaydescriptor):
+  NtupleFlatTool(tree, decaydescriptor)
 {
   setupTree();
 
-  StoreObjPtr<DecayHashMap>::required();
+  StoreObjPtr<DecayHashMap>().isRequired();
 }
 
 void NtupleMCDecayStringTool::setupTree()
@@ -32,9 +32,8 @@ void NtupleMCDecayStringTool::setupTree()
   if (strNames.empty()) return;
   m_decayString[0] = '\0';
 
-  std::stringstream ss;
-  ss << strNames[0] << "_mcDecayString[" << c_lengthOfDecayString << "]/C";
-  m_tree->Branch((strNames[0] + "_mcDecayString").c_str(), m_decayString, ss.str().c_str());
+  auto branchDesc = strNames[0] + "_mcDecayString[" + std::to_string(c_lengthOfDecayString) + "]/C";
+  m_tree->Branch((strNames[0] + "_mcDecayString").c_str(), m_decayString, branchDesc.c_str());
 }
 
 void NtupleMCDecayStringTool::eval(const Particle* particle)

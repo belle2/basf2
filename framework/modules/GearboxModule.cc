@@ -60,7 +60,7 @@ GearboxModule::GearboxModule() : Module()
 void GearboxModule::initialize()
 {
   //gearbox might need exp/run numbers
-  StoreObjPtr<EventMetaData>::required();
+  StoreObjPtr<EventMetaData>().isRequired();
 
   Gearbox& gearbox = Gearbox::getInstance();
   for (auto& unit : m_unitOverrides) {

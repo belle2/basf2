@@ -42,7 +42,7 @@ PrintCollectionsModule::~PrintCollectionsModule()
 
 void PrintCollectionsModule::initialize()
 {
-  StoreObjPtr<EventMetaData>::required();
+  StoreObjPtr<EventMetaData>().isRequired();
 }
 
 void PrintCollectionsModule::event()

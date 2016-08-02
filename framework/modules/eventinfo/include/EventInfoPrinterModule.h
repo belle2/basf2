@@ -11,6 +11,8 @@
 
 #include <framework/core/Module.h>
 
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 namespace Belle2 {
   /** The event meta data info module.
@@ -56,6 +58,7 @@ namespace Belle2 {
 
   private:
     bool m_printTime;  /**< Print time in addition to exp/run/evt numbers. */
+    StoreObjPtr<EventMetaData> m_eventMetaData; /**< EventMetaData. */
   };
 
 }

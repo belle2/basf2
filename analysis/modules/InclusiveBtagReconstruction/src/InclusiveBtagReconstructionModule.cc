@@ -52,9 +52,11 @@ InclusiveBtagReconstructionModule::~InclusiveBtagReconstructionModule()
 
 void InclusiveBtagReconstructionModule::initialize()
 {
-  StoreObjPtr<ParticleList>::required(m_bsigListName);
+  StoreObjPtr<ParticleList> bsigList(m_bsigListName);
+  bsigList.isRequired();
   for (std::string inputListName : m_inputListsNames) {
-    StoreObjPtr<ParticleList>::required(inputListName);
+    StoreObjPtr<ParticleList> inputList(inputListName);
+    inputList.isRequired();
   }
 
   StoreObjPtr<ParticleList> btagList(m_btagListName);

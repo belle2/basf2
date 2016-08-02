@@ -29,6 +29,7 @@ namespace Belle2 {
 
     public:
 
+#if 0 //use of static StoreObjPtr members is discouraged.
       /** Register an object, that should not be written to the output by default, in the data store.
        *
        *  This must be called in the initialization phase.
@@ -72,6 +73,7 @@ namespace Belle2 {
       {
         return StoreObjPtr<StoreWrapper<T> >::optional(name, durability);
       }
+#endif
 
     public:
       /** Constructor to access an object in the DataStore.

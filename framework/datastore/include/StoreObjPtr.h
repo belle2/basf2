@@ -95,6 +95,7 @@ namespace Belle2 {
     /** Register an object, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use registerInDataStore() instead.
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
@@ -107,27 +108,12 @@ namespace Belle2 {
                                                  errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
     }
 
-    /** Register an object, that should not be written to the output by default, in the data store.
-     *
-     *  This must be called in the initialization phase.
-     *
-     *  @param name        Name under which the object is stored.
-     *  @param durability  Specifies lifetime of object in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the object was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = true)
-    {
-      return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false,
-                                                 DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
-    }
-
     /** Check whether an object was registered before.
      *
      *  It will cause an error if the object does not exist.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use isRequired() instead.
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.
@@ -143,6 +129,7 @@ namespace Belle2 {
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use isOptional() instead.
      *  @param name        Name under which the object is stored.
      *  @param durability  Specifies lifetime of object in question.
      *  @return            True if the object exists.

@@ -61,10 +61,11 @@ void TrackFinderCDCBaseModule::initialize()
   m_trackExporter.initialize();
 
   // Output StoreArray
+  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
   if (m_param_tracksStoreObjNameIsInput) {
-    StoreWrappedObjPtr< std::vector<CDCTrack> >::required(m_param_tracksStoreObjName);
+    storedTracks.isRequired();
   } else {
-    StoreWrappedObjPtr< std::vector<CDCTrack> >::registerTransient(m_param_tracksStoreObjName);
+    storedTracks.registerInDataStore(DataStore::c_DontWriteOut);
   }
 }
 

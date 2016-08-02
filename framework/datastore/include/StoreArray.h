@@ -98,17 +98,12 @@ namespace Belle2 {
    *  For <b>non-default names</b> (which you might not know in the constructor, e.g. in the
    *  case of module parameters), set the 'name' argument of any of these three functions to
    *  permanently bind the StoreArray to the array with the given name.
-
    *
-   *
-   *  <h2>Internals</h2>
-   *  Internally, the arrays are stored as TClonesArrays, see
-   *  http://root.cern.ch/root/html/TClonesArray.html for technical details.
    *
    *  @sa Objects in different arrays can be linked using relations, see RelationsInterface, RelationsObject
    *  @sa See StoreObjPtr for a way store single objects
    *  @sa Data can also be accessed from Python modules using PyStoreArray
-   *  @sa While objects cannot be removed directly from StoreArray, SelectSubset can be used to filter it.
+   *  @sa While individual elements cannot be removed directly from StoreArray, SelectSubset can be used to filter it.
    *
    *  @author <a href="mailto:software@belle2.kek.jp?subject=StoreArray">The basf2 developers</a>
    */
@@ -123,6 +118,7 @@ namespace Belle2 {
     /** Register an array, that should be written to the output by default, in the data store.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use registerInDataStore() instead.
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
      *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
@@ -136,25 +132,11 @@ namespace Belle2 {
 
     }
 
-    /** Register an array, that should not be written to the output by default, in the data store.
-     *  This must be called in the initialization phase.
-     *
-     *  @param name        Name under which the TClonesArray is stored.
-     *  @param durability  Specifies lifetime of array in question.
-     *  @param errorIfExisting  Flag whether an error will be reported if the array was already registered.
-     *  @return            True if the registration succeeded.
-     */
-    static bool registerTransient(const std::string& name = "", DataStore::EDurability durability = DataStore::c_Event,
-                                  bool errorIfExisting = false)
-    {
-      return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
-                                                 DataStore::c_DontWriteOut | (errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0));
-    }
-
     /** Check whether an array was registered before.
      *  It will cause an error if the array does not exist.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use isRequired() instead.
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.
@@ -170,6 +152,7 @@ namespace Belle2 {
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *  This must be called in the initialization phase.
      *
+     *  @warning Use discouraged, use isOptional() instead.
      *  @param name        Name under which the TClonesArray is stored.
      *  @param durability  Specifies lifetime of array in question.
      *  @return            True if the array exists.

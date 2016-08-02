@@ -60,7 +60,7 @@ namespace Belle2 {
   {
     // Input lists
     for (const std::string& listName : m_inputListNames) {
-      StoreObjPtr<ParticleList>::required(listName);
+      StoreObjPtr<ParticleList>().isRequired(listName);
     }
   }
 

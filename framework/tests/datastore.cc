@@ -309,21 +309,21 @@ namespace {
   /** check required() functionality */
   TEST_F(DataStoreTest, RequireObjects)
   {
-    EXPECT_TRUE(StoreObjPtr<EventMetaData>::required());
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Persistent));
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("nonexisting2"));
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("", DataStore::c_Persistent));
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>().isRequired());
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>("", DataStore::c_Persistent).isRequired());
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>("nonexisting2").isRequired());
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>("", DataStore::c_Persistent).isRequired());
     //check we didn't create one...
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required("nonexisting2"));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>("nonexisting2").isRequired());
 
-    EXPECT_TRUE(StoreArray<EventMetaData>::required());
-    EXPECT_TRUE(StoreArray<EventMetaData>::required("EventMetaDatas_2"));
-    EXPECT_TRUE(StoreArray<EventMetaData>::required("", DataStore::c_Persistent));
-    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
-    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
-    EXPECT_TRUE(StoreArray<ProfileInfo>::required());
+    EXPECT_TRUE(StoreArray<EventMetaData>().isRequired());
+    EXPECT_TRUE(StoreArray<EventMetaData>("EventMetaDatas_2").isRequired());
+    EXPECT_TRUE(StoreArray<EventMetaData>("", DataStore::c_Persistent).isRequired());
+    EXPECT_FALSE(StoreArray<EventMetaData>("blah").isRequired());
+    EXPECT_FALSE(StoreArray<EventMetaData>("blah").isRequired());
+    EXPECT_TRUE(StoreArray<ProfileInfo>().isRequired());
     //check we didn't create one...
-    EXPECT_FALSE(StoreArray<EventMetaData>::required("blah"));
+    EXPECT_FALSE(StoreArray<EventMetaData>("blah").isRequired());
   }
 
   /** Test iteration. */
@@ -446,8 +446,8 @@ namespace {
     EXPECT_FALSE(evtArray.isRequired());
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_FALSE(StoreArray<EventMetaData>::optional(evtArray.getName()));
-    EXPECT_FALSE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
-    EXPECT_FALSE(StoreArray<EventMetaData>::required(evtArray.getName()));
+    EXPECT_FALSE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
+    EXPECT_FALSE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
 
     //emulate Module::initialize()
     DataStore::Instance().setInitializeActive(true);
@@ -472,8 +472,8 @@ namespace {
     EXPECT_TRUE(evtArray.isRequired());
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
-    EXPECT_TRUE(StoreObjPtr<EventMetaData>::required(evtPtr.getName()));
-    EXPECT_TRUE(StoreArray<EventMetaData>::required(evtArray.getName()));
+    EXPECT_TRUE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
+    EXPECT_TRUE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
   }
 
   TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)

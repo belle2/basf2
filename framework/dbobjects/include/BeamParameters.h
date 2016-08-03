@@ -45,7 +45,7 @@ namespace Belle2 {
       return *this;
     }
     /** equality operator */
-    bool operator==(const BeamParameters& b)
+    bool operator==(const BeamParameters& b) const
     {
       // since we only save the covariance matrices with float precision we
       // need to also do the comparison with float precision.

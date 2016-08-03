@@ -133,13 +133,13 @@ namespace Belle2 {
     AccessorParams getAccessorParams() const { return make_pair(m_name, m_durability);};
 
     /** Check if two store accessors point to the same object/array. */
-    virtual bool operator==(const StoreAccessorBase& other)
+    virtual bool operator==(const StoreAccessorBase& other) const
     {
       return getAccessorParams() == other.getAccessorParams();
     }
 
     /** Check if two store accessors point to a different object/array. */
-    virtual bool operator!=(const StoreAccessorBase& other)
+    virtual bool operator!=(const StoreAccessorBase& other) const
     {
       return !(*this == other);
     }

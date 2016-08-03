@@ -71,7 +71,7 @@ namespace Belle2 {
     /**
      * Check if two store accessors point to the same object/array.
      */
-    virtual bool operator==(const DBAccessorBase& other)
+    virtual bool operator==(const DBAccessorBase& other) const
     {
       return getPackage() == other.getPackage() && getModule() == other.getModule();
     }
@@ -79,7 +79,7 @@ namespace Belle2 {
     /**
      * Check if two store accessors point to a different object/array.
      */
-    virtual bool operator!=(const DBAccessorBase& other)
+    virtual bool operator!=(const DBAccessorBase& other) const
     {
       return !(*this == other);
     }

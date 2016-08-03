@@ -53,7 +53,7 @@ namespace Belle2 {
     /**
      * Check whether two intervals of validity are identical.
      */
-    bool operator==(const IntervalOfValidity& other)
+    bool operator==(const IntervalOfValidity& other) const
     {
       return (m_experimentLow == other.m_experimentLow) && (m_runLow == other.m_runLow) &&
              (m_experimentHigh == other.m_experimentHigh) && (m_runHigh == other.m_runHigh);
@@ -62,7 +62,7 @@ namespace Belle2 {
     /**
      * Check whether two intervals of validity are different.
      */
-    bool operator!=(const IntervalOfValidity& other)
+    bool operator!=(const IntervalOfValidity& other) const
     {
       return !(*this == other);
     }

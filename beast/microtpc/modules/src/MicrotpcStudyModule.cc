@@ -135,6 +135,10 @@ void MicrotpcStudyModule::defineHisto()
                                    2000, 200, 0., 6.);
 
     h_tvp[i]  = new TH2F(TString::Format("h_tvp_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_wtvpb[i]  = new TH2F(TString::Format("h_wtvpb_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_wtvpc[i]  = new TH2F(TString::Format("h_wtvpc_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+    h_wtvpd[i]  = new TH2F(TString::Format("h_wtvpd_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+
     h_tvpb[i]  = new TH2F(TString::Format("h_tvpb_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_tvpc[i]  = new TH2F(TString::Format("h_tvpc_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
     h_tvpd[i]  = new TH2F(TString::Format("h_tvpd_%d", i), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
@@ -172,6 +176,11 @@ void MicrotpcStudyModule::defineHisto()
     h_tvpb[i]->Sumw2();
     h_tvpc[i]->Sumw2();
     h_tvpd[i]->Sumw2();
+
+    h_wtvpb[i]->Sumw2();
+    h_wtvpc[i]->Sumw2();
+    h_wtvpd[i]->Sumw2();
+
     h_ttvp[i]->Sumw2();
     h_tvp_x[i]->Sumw2();
     h_ttvp_x[i]->Sumw2();
@@ -226,7 +235,7 @@ void MicrotpcStudyModule::event()
     cout << " col " << col << " row " << row << " tot " << tot << " detNb " << detNb << endl;
   }
   */
-  Bool_t EdgeCut[8];
+  //Bool_t EdgeCut[8];
   double esum[8];
   //Initialize recoil and hit type counters
   for (int i = 0; i < 8; i++) {
@@ -237,7 +246,7 @@ void MicrotpcStudyModule::event()
     CRec[i] = false;
     //ARec[i] = false;
     pid_old[i] = 0;
-    EdgeCut[i] = true;
+    //EdgeCut[i] = true;
     esum[i] = 0;
   }
 
@@ -289,7 +298,7 @@ void MicrotpcStudyModule::event()
         //edgeArray].push_back(1);
       } else {
         //edgeArray[i].push_back(0);
-        EdgeCut[detNb] = false;
+        //EdgeCut[detNb] = false;
       }
 
       if (pid_old[detNb] != PDGid) {
@@ -349,7 +358,7 @@ void MicrotpcStudyModule::event()
       }
     }
   }
-
+  /*
   for (int i = 0; i < 8;  i++) {
 
     for (int j = 0; j < (int)phiArray[i].size(); j++) {
@@ -392,77 +401,88 @@ void MicrotpcStudyModule::event()
       //}
     }
   }
-
+  */
 
   //number of Tracks
-  int nTracks = Tracks.getEntries();
+  //int nTracks = Tracks.getEntries();
 
   //loop over all Tracks
-  for (int i = 0; i < nTracks;  i++) {
-    MicrotpcRecoTrack* aTrack = Tracks[i];
-    int detNb = aTrack->getdetNb();
-    float phi = aTrack->getphi();
-    float theta = aTrack->gettheta();
-    float trl = aTrack->gettrl();
-    float esum = aTrack->getesum();
-    int time_range = aTrack->gettime_range();
-    int side[4] = {aTrack->getside()[0], aTrack->getside()[1], aTrack->getside()[2], aTrack->getside()[3]};
-    bool EdgeCuts = false;
+  for (const auto& aTrack : Tracks) { // start loop over all Tracks
+    const int detNb = aTrack.getdetNb();
+    const float phi = aTrack.getphi();
+    const float theta = aTrack.gettheta();
+    const float trl = aTrack.gettrl();
+    const float esum = aTrack.getesum();
+    const int pixnb = aTrack.getpixnb();
+    //const int time_range = aTrack.gettime_range();
+    int side[16];
+    for (int j = 0; j < 16; j++) {
+      side[j] = 0;
+      side[j] = aTrack.getside()[j];
+    }
+    Bool_t EdgeCuts = false;
     if (side[0] == 0 && side[1] == 0 && side[2] == 0 && side[3] == 0) EdgeCuts = true;
+    Bool_t Asource = false;
+    if (side[4] == 2 && side[5] == 2) Asource = true;
+    //Bool_t Goodtrk = false;
+    //if (2.015 < trl && trl < 2.03) Goodtrk = true;
+    //Bool_t GoodAngle = false;
+    //if (88.5 < theta && theta < 91.5) GoodAngle = true;
+    int partID[7];
+    partID[0] = 1; //[0] for all events
+    for (int j = 0; j < 6; j++) partID[j + 1] = aTrack.getpartID()[j];
 
     h_evtrl[detNb]->Fill(esum, trl);
     h_tvp[detNb]->Fill(theta, phi);
     h_wtvp[detNb]->Fill(theta, phi, esum);
-    //if(time_range>20) {
-    if (time_range > 10) {
+
+    if (EdgeCuts && pixnb > 10. && esum > 10.) {
       h_evtrlb[detNb]->Fill(esum, trl);
       h_tvpb[detNb]->Fill(theta, phi);
-      if (EdgeCuts) {
-        h_evtrlc[detNb]->Fill(esum, trl);
-        h_tvpc[detNb]->Fill(theta, phi);
-        if (esum > 400) {
+      h_wtvpb[detNb]->Fill(theta, phi, esum);
+    }
+
+    for (int j = 0; j < 7; j++) {
+      if (j == 3 && !EdgeCuts && (partID[1] == 1 || partID[2] == 1 || partID[4] == 1 || partID[5] == 1 || partID[6] == 1)) partID[j] = 0;
+      if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
+      if (partID[j] == 1) {
+        if (j == 0) {
+          h_evtrlc[detNb]->Fill(esum, trl);
+          h_tvpc[detNb]->Fill(theta, phi);
+          h_wtvpc[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 1) {
           h_evtrld[detNb]->Fill(esum, trl);
           h_tvpd[detNb]->Fill(theta, phi);
+          h_wtvpd[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 2) {
+          h_evtrl_x[detNb]->Fill(esum, trl);
+          h_tvp_x[detNb]->Fill(theta, phi);
+          h_wtvp_x[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 3) {
+          h_evtrl_p[detNb]->Fill(esum, trl);
+          h_tvp_p[detNb]->Fill(theta, phi);
+          h_wtvp_p[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 4) {
+          h_evtrl_x[detNb]->Fill(esum, trl);
+          h_tvp_x[detNb]->Fill(theta, phi);
+          h_wtvp_x[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 5) {
+          h_evtrl_He[detNb]->Fill(esum, trl);
+          h_tvp_He[detNb]->Fill(theta, phi);
+          h_wtvp_He[detNb]->Fill(theta, phi, esum);
+        }
+        if (j == 6) {
+          h_evtrl_Hex[detNb]->Fill(esum, trl);
+          h_tvp_Hex[detNb]->Fill(theta, phi);
+          h_wtvp_Hex[detNb]->Fill(theta, phi, esum);
         }
       }
     }
-
-    if (xRec[detNb]) {
-      h_evtrl_x[detNb]->Fill(esum, trl);
-      h_tvp_x[detNb]->Fill(theta, phi);
-      h_wtvp_x[detNb]->Fill(theta, phi, esum);
-    }
-    if (pRec[detNb]) {
-      h_evtrl_p[detNb]->Fill(esum, trl);
-      h_tvp_p[detNb]->Fill(theta, phi);
-      h_wtvp_p[detNb]->Fill(theta, phi, esum);
-    }
-    if (HeRec[detNb]) {
-      h_evtrl_Hex[detNb]->Fill(esum, trl);
-      h_tvp_Hex[detNb]->Fill(theta, phi);
-      h_wtvp_Hex[detNb]->Fill(theta, phi, esum);
-    }
-    if (CRec[detNb]) {
-      h_evtrl_C[detNb]->Fill(esum, trl);
-      h_tvp_C[detNb]->Fill(theta, phi);
-      h_wtvp_C[detNb]->Fill(theta, phi, esum);
-    }
-    if (ORec[detNb]) {
-      h_evtrl_O[detNb]->Fill(esum, trl);
-      h_tvp_O[detNb]->Fill(theta, phi);
-      h_wtvp_O[detNb]->Fill(theta, phi, esum);
-    }
-    if (side[0] == 0 && side[1] == 0 && side[2] == 0 && side[3] == 0) {
-      h_evtrl_He[detNb]->Fill(esum, trl);
-      h_tvp_He[detNb]->Fill(theta, phi);
-      h_wtvp_He[detNb]->Fill(theta, phi, esum);
-      if (time_range > 20) {
-        h_evtrl_He_pure[detNb]->Fill(esum, trl);
-        h_tvp_He_pure[detNb]->Fill(theta, phi);
-        h_wtvp_He_pure[detNb]->Fill(theta, phi, esum);
-      }
-    }
-
   }
 
   eventNum++;

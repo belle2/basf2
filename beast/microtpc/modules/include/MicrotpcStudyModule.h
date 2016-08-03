@@ -143,6 +143,12 @@ namespace Belle2 {
       TH2F* h_tvpc[8];
       /** Phi v. theta per TPC */
       TH2F* h_tvpd[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_wtvpb[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_wtvpc[8];
+      /** Phi v. theta per TPC */
+      TH2F* h_wtvpd[8];
       /** Phi v. theta per TPC for He */
       TH2F* h_tvp_He[8];
       /** Phi v. theta per TPC for He and x */

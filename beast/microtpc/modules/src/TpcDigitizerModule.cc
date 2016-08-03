@@ -107,7 +107,7 @@ void TpcDigitizerModule::event()
 
   std::vector<double> T0(m_nTPC,
                          m_upperTimingCut);  // TODO: why this number? Maybe pick something larger the the upperTiming cut? e.g. m_upperTimingCut + 1
-  std::vector<bool> PixelFired(m_nTPC, false);
+  //std::vector<bool> PixelFired(m_nTPC, false);
 
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
@@ -125,7 +125,8 @@ void TpcDigitizerModule::event()
       val = -1.;
     }
   }
-
+  olddetNb = -1;
+  oldtrkID = -1;
   //loop on all entries to store in 3D the ionization for each TPC
   for (const auto& microtpcSimHit : microtpcSimHits) {
 
@@ -150,9 +151,10 @@ void TpcDigitizerModule::event()
     );
 
     //If new detector filled the chip
-    if (olddetNb != detNb && m_dchip_map.size() > 0) {
+    if (olddetNb != detNb && m_dchip_map.size() > 0 && m_dchip.size() < 20000 && oldtrkID != trkID) {
       Pixelization();
       olddetNb = detNb;
+      oldtrkID = trkID;
       m_dchip_map.clear();
       m_dchip.clear();
       m_dchip_detNb_map.clear();
@@ -235,7 +237,7 @@ void TpcDigitizerModule::event()
                   (0 <= row && row < m_ChipRowNb) &&
                   (0 <= pix && pix < m_ChipColumnNb * m_ChipRowNb)  &&
                   (0 <= bci && bci < MAXtSIZE)) {
-                PixelFired[detNb] = true;
+                //PixelFired[detNb] = true;
                 //store info into 3D array for each TPCs
                 ////m_dchip[detNb][col][row][bci] += (int)(m_ScaleGain1 * m_ScaleGain2);
                 //m_dchip_map[std::tuple<int, int, int>(detNb, col, row)] = 1;

@@ -201,6 +201,9 @@ namespace Belle2 {
       /** Old detector counter */
       int olddetNb = -1;
 
+      /** Old track ID */
+      int oldtrkID = -1;
+
     };
 
   }

@@ -59,8 +59,10 @@ BgoDigitizerModule::BgoDigitizerModule() : Module()
   setDescription("Bgo digitizer module");
 
   //Default values are set here. New values can be in BGO.xml.
-  addParam("EnergyResolutionFactor", m_EnergyResolutionFactor, "Energy resolution factor ", 1.4);
-  addParam("EnergyResolutionConst", m_EnergyResolutionConst, "Energy resolution constant ", 1.4);
+  //addParam("EnergyResolutionFactor", m_EnergyResolutionFactor, "Energy resolution factor ");
+  //addParam("EnergyResolutionConst", m_EnergyResolutionConst, "Energy resolution constant ");
+  //addParam("Threshold", m_Threshold, "Energy threshold");
+  //addParam("Range", m_Range, "Energy range")
 }
 
 BgoDigitizerModule::~BgoDigitizerModule()
@@ -96,7 +98,7 @@ void BgoDigitizerModule::event()
     TVector3 m_Pos = aHit->getPosition();
     double m_energyDeposit = aHit->getEnergyDep();
     double erecdep = m_energyDeposit;
-    erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit));
+    erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit, m_cellID));
     if (m_Threshold[m_cellID] <= erecdep && erecdep <= m_Range[m_cellID]) {
       BgoHit(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
              m_Pos * (m_energyDeposit / erecdep), erecdep);
@@ -109,9 +111,18 @@ void BgoDigitizerModule::getXMLData()
 {
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"BGO\"]/Content/");
 
-
-  m_EnergyResolutionConst = content.getDouble("EnergyResolutionConst");
-  m_EnergyResolutionFactor = content.getDouble("EnergyResolutionFactor");
+  //m_EnergyResolutionConst = content.getDouble("EnergyResolutionConst");
+  //m_EnergyResolutionFactor = content.getDouble("EnergyResolutionFactor");
+  int iEnResConst = 0;
+  for (double  EnResConst : content.getArray("EnergyResolutionConst", {0})) {
+    m_EnergyResolutionConst[iEnResConst] = EnResConst;
+    iEnResConst++;
+  }
+  int iEnResFac = 0;
+  for (double  EnResFac : content.getArray("EnergyResolutionFactor", {0})) {
+    m_EnergyResolutionFactor[iEnResFac] = EnResFac;
+    iEnResFac++;
+  }
   int iThres = 0;
   for (double Threshold : content.getArray("Threshold", {0})) {
     //Threshold *= CLHEP::GeV;
@@ -131,10 +142,10 @@ void BgoDigitizerModule::getXMLData()
 }
 
 
-Double_t BgoDigitizerModule::GetEnergyResolutionGeV(Double_t pEnergy)
+Double_t BgoDigitizerModule::GetEnergyResolutionGeV(Double_t pEnergy, int CellId)
 {
   // Returns energy resolution in GeV when supplied Energy in GeV
-  return (m_EnergyResolutionFactor * TMath::Sqrt(pEnergy) + m_EnergyResolutionConst * pEnergy);
+  return (m_EnergyResolutionFactor[CellId] * TMath::Sqrt(pEnergy) + m_EnergyResolutionConst[CellId] * pEnergy);
 
 }
 

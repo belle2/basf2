@@ -70,7 +70,7 @@ namespace Belle2 {
       }
       */
       /** Fold energy resolution */
-      Double_t GetEnergyResolutionGeV(Double_t);
+      Double_t GetEnergyResolutionGeV(Double_t, Int_t);
 
       /** number of detectors. Read from BGO.xml*/
       int nBGO = 8;
@@ -79,9 +79,9 @@ namespace Belle2 {
       /** Energy range */
       double m_Range[8];
       /** Energy resolution factor */
-      double m_EnergyResolutionFactor;
+      double m_EnergyResolutionFactor[8];
       /** Energy resolution constant */
-      double m_EnergyResolutionConst;
+      double m_EnergyResolutionConst[8];
 
     };
 

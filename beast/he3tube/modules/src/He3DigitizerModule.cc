@@ -125,6 +125,8 @@ void He3DigitizerModule::event()
 
         MCParticle* mom = mcp.getMother();
 
+        if (mom == NULL) continue;
+
         //if(processNum==121){
         if (mom->getPDG() == 2112) {
           He3tubeSimHit* aHit = He3SimHits[relation.indexTo];

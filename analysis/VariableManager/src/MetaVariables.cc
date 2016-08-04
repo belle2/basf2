@@ -252,9 +252,14 @@ namespace Belle2 {
           StoreArray<Track> tracks;
           for (const auto& track : tracks)
           {
-            Particle particle(&track, Const::pion);
-            if (cut->check(&particle))
-              number_of_tracks++;
+            const TrackFitResult* trackFit = track->getTrackFitResult(Const::pion);
+            if (trackFit->getChargeSign() == 0) {
+              // Ignore track
+            } else {
+              Particle particle(&track, Const::pion);
+              if (cut->check(&particle))
+                number_of_tracks++;
+            }
           }
 
           return static_cast<double>(number_of_tracks);

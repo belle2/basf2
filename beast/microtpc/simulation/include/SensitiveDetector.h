@@ -23,7 +23,7 @@ namespace Belle2 {
       SensitiveDetector();
 
       //! Save BgoSimHit into datastore
-      int saveSimHit();
+      //int saveSimHit();
 
     protected:
 
@@ -33,7 +33,7 @@ namespace Belle2 {
        */
       bool step(G4Step* step, G4TouchableHistory*);
     };
-    int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
+    //int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
   } //microtpc namespace
 } //Belle2 namespace
 

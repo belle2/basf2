@@ -78,6 +78,7 @@ namespace Belle2 {
       StoreArray<MCParticle>  mcParticles;
       StoreArray<MicrotpcSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
+      /*
       //find out if the process that created the particle was a neutron process
       bool neuProc = false;
       G4String CPName;
@@ -90,7 +91,7 @@ namespace Belle2 {
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
         if (neuProc) saveSimHit();
       }
-
+      */
       StoreArray<MicrotpcSimHit> MicrotpcHits;
       if (!MicrotpcHits.isValid()) MicrotpcHits.create();
       MicrotpcSimHit* hit = MicrotpcHits.appendNew(
@@ -112,7 +113,7 @@ namespace Belle2 {
 
       return true;
     }
-
+    /*
     int SensitiveDetector::saveSimHit()
     {
 
@@ -128,6 +129,6 @@ namespace Belle2 {
       }
       return (m_simhitNumber);
     }//saveSimHit
-
+    */
   } //microtpc namespace
 } //Belle2 namespace

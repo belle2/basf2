@@ -10,7 +10,7 @@
 
 #include <beast/microtpc/simulation/SensitiveDetector.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-#include <beast/microtpc/dataobjects/TpcMCParticles.h>
+//#include <beast/microtpc/dataobjects/TpcMCParticles.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>

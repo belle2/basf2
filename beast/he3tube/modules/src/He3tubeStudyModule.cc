@@ -96,7 +96,7 @@ void He3tubeStudyModule::initialize()
   REG_HISTOGRAM
 
   //convert sample time into rate in Hz
-  rateCorrection = m_sampletime / 1e6;
+  rateCorrection = ((double)m_sampletime) / 1e6;
 }
 
 void He3tubeStudyModule::beginRun()
@@ -173,7 +173,7 @@ void He3tubeStudyModule::event()
     if (aHit->definiteNeutron()) { //if this is true, this hit was definitely caused by a neutron.
       nDefiniteNeutron++;
       h_DefNeutronHits->Fill(aHit->getdetNb());
-      h_DefNeutronRate->AddBinContent(aHit->getdetNb() + 1, 1 / rateCorrection);
+      h_DefNeutronRate->AddBinContent(aHit->getdetNb() + 1, 1. / rateCorrection);
       h_PulseHeights_DefNeutron->Fill(aHit->getPeakV());
       neutronStatus = 1;
       tubeNum = aHit->getdetNb();
@@ -184,7 +184,7 @@ void He3tubeStudyModule::event()
       tubeNum = aHit->getdetNb();
       h_PulseHeights_Neutron->Fill(aHit->getPeakV());
       h_NeutronHits->Fill(aHit->getdetNb());
-      h_NeutronRate->AddBinContent(aHit->getdetNb() + 1, 1 / rateCorrection);
+      h_NeutronRate->AddBinContent(aHit->getdetNb() + 1, 1. / rateCorrection);
       nNeutronHits++;
     } else {
       h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());

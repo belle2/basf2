@@ -21,6 +21,8 @@
 
 #include <boost/spirit/home/support/detail/endian.hpp>
 
+#include <TRandom.h>
+
 // DHP modes are the same as for DHE envelope
 #define DHP_FRAME_HEADER_DATA_TYPE_RAW  0x0
 #define DHP_FRAME_HEADER_DATA_TYPE_ZSD  0x5
@@ -189,6 +191,8 @@ void PXDPackerModule::event()
   m_trigger_nr = evtPtr->getEvent();
   m_run_nr_word1 = ((evtPtr->getRun() & 0xFF) << 8) | (evtPtr->getSubrun() & 0xFF);
   m_run_nr_word2 = ((evtPtr->getExperiment() & 0x3FF) << 6) | ((evtPtr->getRun() >> 8) & 0x3F);
+  m_meta_time = evtPtr->getTime();
+
   pack_event();
   m_packed_events++;
 }
@@ -283,10 +287,10 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   /// HLT frame ??? format still t.b.d. TODO
   start_frame();
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_ONSEN_TRG << 27) | (m_trigger_nr & 0xFFFF));
-  append_int32(0xCAFE0000);// HLT HEADER
+  append_int32(0xCAFE8000);// HLT HEADER, accepted flag set
   append_int32(m_trigger_nr); // HLT Trigger Nr
   append_int32(m_run_nr_word1); // HLT Run NR etc
-  append_int32(0xCAFE0000);// DATCON HEADER ... one of them should be 0xCAFE2000, check! TODO
+  append_int32(0xCAFE0000);// DATCON HEADER ...
   append_int32(m_trigger_nr); // DATCON Trigger Nr
   append_int32(m_run_nr_word1); // DATCON Run NR etc
   add_frame_to_payload();
@@ -297,9 +301,9 @@ void PXDPackerModule::pack_dhc(int dhc_id, int dhe_active, int* dhe_ids)
   append_int32((DHC_FRAME_HEADER_DATA_TYPE_DHC_START << 27) | ((dhc_id & 0xF) << 21) | ((dhe_active & 0x1F) << 16) |
                (m_trigger_nr & 0xFFFF));
   append_int16(m_trigger_nr >> 16);
-  append_int16(0x00000000); // TT 11-0 | Type --- fill with something usefull TODO
-  append_int16(0x00000000); // TT 27-12
-  append_int16(0x00000000); // TT 43-28
+  append_int16(((m_meta_time << 4) & 0xFFF0) | 0x1); // TT 11-0 | Type --- fill with something usefull TODO
+  append_int16((m_meta_time >> 12) & 0xFFFF); // TT 27-12 ... not clear if completely filled by DHC
+  append_int16((m_meta_time >> 28) & 0xFFFF); // TT 43-28 ... not clear if completely filled by DHC
   append_int16(m_run_nr_word1); // Run Nr 7-0 | Subrunnr 7-0
   append_int16(m_run_nr_word2); // Exp NR 9-0 | Run Nr 13-8
   add_frame_to_payload();
@@ -402,10 +406,11 @@ void PXDPackerModule::pack_dhe(int dhe_id, int dhp_active)
     for (int i = 0; i < 4; i++) {
       if (dhp_active & 0x1) {
         pack_dhp(i, dhe_id, dhe_reformat);
-        if (m_trigger_nr == 0x11) {
-          pack_dhp_raw(i, dhe_id, false);
-          pack_dhp_raw(i, dhe_id, true);
-        }
+        /// The following lines "simulate" a full frame readout frame ... not for production yet!
+//         if (m_trigger_nr == 0x11) {
+//           pack_dhp_raw(i, dhe_id, false);
+//           pack_dhp_raw(i, dhe_id, true);
+//         }
       }
       dhp_active >>= 1;
     }

@@ -67,6 +67,8 @@ namespace Belle2 {
       unsigned short m_run_nr_word1;
       /** Exp+Run Nr */
       unsigned short m_run_nr_word2;
+      /** Time(Tag) from MetaInfo */
+      unsigned long long int m_meta_time;
 
       /** For one DHC event, we utilize one header (writing out, beware of endianess!) */
       std::vector <unsigned int> m_onsen_header;

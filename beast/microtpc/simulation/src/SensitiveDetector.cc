@@ -10,6 +10,7 @@
 
 #include <beast/microtpc/simulation/SensitiveDetector.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
+#include <beast/microtpc/dataobjects/TpcMCParticles.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -18,6 +19,7 @@
 
 #include <G4Track.hh>
 #include <G4Step.hh>
+#include "G4VProcess.hh"
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for the MICROTPC detector */
@@ -76,6 +78,18 @@ namespace Belle2 {
       StoreArray<MCParticle>  mcParticles;
       StoreArray<MicrotpcSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
+      //find out if the process that created the particle was a neutron process
+      bool neuProc = false;
+      G4String CPName;
+      if (step->GetTrack()->GetCreatorProcess() != 0) {
+        const  G4VProcess* creator = step->GetTrack()->GetCreatorProcess();
+        CPName = creator->GetProcessName();
+        if (CPName.contains("Neutron")) neuProc = true;
+      }
+      //Save Hit if track leaves volume or is killed
+      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+        if (neuProc) saveSimHit();
+      }
 
       StoreArray<MicrotpcSimHit> MicrotpcHits;
       if (!MicrotpcHits.isValid()) MicrotpcHits.create();
@@ -98,6 +112,22 @@ namespace Belle2 {
 
       return true;
     }
+
+    int SensitiveDetector::saveSimHit()
+    {
+
+      //Get the datastore arrays
+      StoreArray<MCParticle>   mcParticles;
+      for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
+        int pdg = mcParticle.getPDG();
+        if (pdg == 2112) {
+          TVector3 VerPos = mcParticle.getProductionVertex();
+          TLorentzVector FourP = mcParticle.get4Vector();
+
+        }
+      }
+      return (m_simhitNumber);
+    }//saveSimHit
 
   } //microtpc namespace
 } //Belle2 namespace

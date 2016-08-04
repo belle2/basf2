@@ -2,7 +2,7 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * Calculation of shower positions using lists of digits and weights      *
+ * Calculation of shower positions using lists of digits and weights.     *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
@@ -16,8 +16,8 @@
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 
-// ROOT
-#include "TVector3.h"
+// FRAMEWORK
+#include <framework/geometry/B2Vector3.h>
 
 // OTHER
 #include <vector>
@@ -30,7 +30,7 @@ namespace Belle2 {
      \param weights List of weights
      \param parameters List of parameters
      */
-    TVector3 computePositionLiLo(std::vector<ECLCalDigit>& digits, std::vector<double>& weights, std::vector<double>& parameters);
+    B2Vector3D computePositionLiLo(std::vector<ECLCalDigit>& digits, std::vector<double>& weights, std::vector<double>& parameters);
 
     //! Computes the sum of all energies.
     /*!
@@ -38,13 +38,6 @@ namespace Belle2 {
      \param weights List of weights
      */
     double computeEnergySum(std::vector<ECLCalDigit>& digits, std::vector<double>& weights);
-
-    //! Find the id of the closest crystal. This can go wrong if the position is not in the digit list.
-    /*!
-     \param digits List of ECLCalDigits
-     \param direction weighted shower direction
-     */
-    int findClosestCrystal(std::vector<ECLCalDigit>& digits, TVector3& direction);
 
   } // namespace ECL
 } // namespace Belle2

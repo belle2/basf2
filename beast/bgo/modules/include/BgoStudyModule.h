@@ -66,14 +66,18 @@ namespace Belle2 {
     private:
 
       /** reads data from BGO.xml: tube location, drift data filename, sigma of impulse response function */
-      virtual void getXMLData();
+      //virtual void getXMLData();
       /** Energy threshold */
-      double m_Ethres;
+      std::vector<Double_t> m_Ethres;
 
       /** Energy deposited vs TOF */
       TH2F* h_bgos_Evtof1[8];
       /** Energy deposited vs TOF */
       TH2F* h_bgos_Evtof2[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_bgo_Evtof1[8];
+      /** Energy deposited vs TOF */
+      TH2F* h_bgo_Evtof2[8];
       /** Energy deposited vs TOF */
       TH2F* h_bgos_Evtof3[8];
       /** Energy deposited vs TOF */
@@ -82,6 +86,10 @@ namespace Belle2 {
       TH1F* h_bgos_edep[8];
       /** Energy deposited */
       TH1F* h_bgos_edep_test[8];
+      /** Energy deposited */
+      TH1F* h_bgo_edep[8];
+      /** Energy deposited */
+      TH1F* h_bgo_edep_test[8];
       /** Scattering position in the rings */
       TH1F* h_bgo_s;
       /** Scattering position in the rings */

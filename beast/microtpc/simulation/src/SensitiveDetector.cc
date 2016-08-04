@@ -10,7 +10,7 @@
 
 #include <beast/microtpc/simulation/SensitiveDetector.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-//#include <beast/microtpc/dataobjects/TpcMCParticles.h>
+#include <beast/microtpc/dataobjects/TpcMCParticle.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -31,12 +31,14 @@ namespace Belle2 {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<MicrotpcSimHit>  simHits;
+      StoreArray<TpcMCParticle> TpcMCParticles;
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerInDataStore();
       simHits.registerInDataStore();
       relMCSimHit.registerInDataStore();
+      TpcMCParticles.registerInDataStore();
 
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
@@ -78,7 +80,7 @@ namespace Belle2 {
       StoreArray<MCParticle>  mcParticles;
       StoreArray<MicrotpcSimHit> simHits;
       RelationArray relMCSimHit(mcParticles, simHits);
-      /*
+
       //find out if the process that created the particle was a neutron process
       bool neuProc = false;
       G4String CPName;
@@ -91,7 +93,7 @@ namespace Belle2 {
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
         if (neuProc) saveSimHit();
       }
-      */
+
       StoreArray<MicrotpcSimHit> MicrotpcHits;
       if (!MicrotpcHits.isValid()) MicrotpcHits.create();
       MicrotpcSimHit* hit = MicrotpcHits.appendNew(
@@ -113,22 +115,35 @@ namespace Belle2 {
 
       return true;
     }
-    /*
+
     int SensitiveDetector::saveSimHit()
     {
 
       //Get the datastore arrays
-      StoreArray<MCParticle>   mcParticles;
+
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<TpcMCParticle> TpcMCParticles;
       for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
         int pdg = mcParticle.getPDG();
         if (pdg == 2112) {
-          TVector3 VerPos = mcParticle.getProductionVertex();
-          TLorentzVector FourP = mcParticle.get4Vector();
+          int PDG = mcParticle.getPDG();
+          float Mass = mcParticle.getMass();
+          float Energy = mcParticle.getEnergy();
+          float vtx[3];
+          vtx[0] = mcParticle.getProductionVertex().X();
+          vtx[1] = mcParticle.getProductionVertex().Y();
+          vtx[2] = mcParticle.getProductionVertex().Z();
+          float mom[3];
+          mom[0] = mcParticle.getMomentum().X();
+          mom[1] = mcParticle.getMomentum().Y();
+          mom[2] = mcParticle.getMomentum().Z();
 
+          if (!TpcMCParticles.isValid()) TpcMCParticles.create();
+          TpcMCParticles.appendNew(TpcMCParticle(PDG, Mass, Energy, vtx, mom));
         }
       }
       return (m_simhitNumber);
     }//saveSimHit
-    */
+
   } //microtpc namespace
 } //Belle2 namespace

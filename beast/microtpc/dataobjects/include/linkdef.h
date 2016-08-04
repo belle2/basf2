@@ -11,5 +11,6 @@
 #pragma link C++ class Belle2::MicrotpcMetaEDataHit+;
 #pragma link C++ class Belle2::MicrotpcMetaHit+;
 #pragma link C++ class Belle2::MicrotpcRecoTrack+;
+#pragma link C++ class Belle2::TpcMCParticle+;
 
 #endif

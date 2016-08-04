@@ -22,8 +22,8 @@ namespace Belle2 {
       /** Constructor */
       SensitiveDetector();
 
-      //! Save BgoSimHit into datastore
-      //int saveSimHit();
+      //! Save TpcMCParticles into datastore
+      int saveSimHit();
 
     protected:
 
@@ -32,8 +32,8 @@ namespace Belle2 {
        * @return true if a Hit has been created, false if the hit was ignored
        */
       bool step(G4Step* step, G4TouchableHistory*);
+      int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore TpcMCParticles. */
     };
-    //int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore ECLSimHit. */
   } //microtpc namespace
 } //Belle2 namespace
 

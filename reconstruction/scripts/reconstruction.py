@@ -96,18 +96,15 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
         eklm_rec = register_module('EKLMReconstructor')
         path.add_module(eklm_rec)
 
-        # K0L reconstruction
-        eklm_k0l_rec = register_module('EKLMK0LReconstructor')
-        path.add_module(eklm_k0l_rec)
-
     # BKLM reconstruction
     if components is None or 'BKLM' in components:
         bklm_rec = register_module('BKLMReconstructor')
         path.add_module(bklm_rec)
 
-        # K0L reconstruction
-        bklm_k0l_rec = register_module('BKLMK0LReconstructor')
-        path.add_module(bklm_k0l_rec)
+    # K0L reconstruction
+    if components is None or 'BKLM' in components or 'EKLM' in components:
+        klm_k0l_rec = register_module('KLMK0LReconstructor')
+        path.add_module(klm_k0l_rec)
 
     # MC matching
     if components is None or 'BKLM' in components or 'EKLM' in components:

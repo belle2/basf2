@@ -7,6 +7,6 @@
 
 #pragma link C++ class Belle2::He3tubeSimHit+;
 #pragma link C++ class Belle2::He3tubeHit+;
-
+#pragma link C++ class Belle2::He3MCParticle+;
 
 #endif

@@ -10,6 +10,8 @@
 
 #include <beast/he3tube/simulation/SensitiveDetector.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
+#include <beast/he3tube/dataobjects/He3MCParticle.h>
+
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -31,13 +33,14 @@ namespace Belle2 {
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<He3tubeSimHit>  simHits;
+      StoreArray<He3MCParticle> He3MCParticles;
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerInDataStore();
       simHits.registerInDataStore();
       relMCSimHit.registerInDataStore();
-
+      He3MCParticles.registerInDataStore();
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
       //secondary particles might not be stored so everything relating to those
@@ -88,6 +91,11 @@ namespace Belle2 {
         if (CPName.contains("Neutron")) neuProc = true;
       }
 
+      //Save Hit if track leaves volume or is killed
+      if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
+        if (neuProc) saveSimHit();
+      }
+
       StoreArray<He3tubeSimHit> He3tubeHits;
       if (!He3tubeHits.isValid()) He3tubeHits.create();
       He3tubeSimHit* hit = He3tubeHits.appendNew(
@@ -109,6 +117,38 @@ namespace Belle2 {
 
       return true;
     }
+
+    int SensitiveDetector::saveSimHit()
+    {
+
+      //Get the datastore arrays
+      StoreArray<MCParticle> mcParticles;
+      StoreArray<He3MCParticle> He3MCParticles;
+      for (const auto& mcParticle :
+           mcParticles) { // start loop over all Tracks
+        int pdg = mcParticle.getPDG();
+        if (pdg == 2112) {
+          int PDG = mcParticle.getPDG();
+          float Mass = mcParticle.getMass();
+          float Energy = mcParticle.getEnergy();
+          float vtx[3];
+          vtx[0] = mcParticle.getProductionVertex().X();
+          vtx[1] = mcParticle.getProductionVertex().Y();
+          vtx[2] = mcParticle.getProductionVertex().Z();
+          float mom[3];
+          mom[0] = mcParticle.getMomentum().X();
+          mom[1] = mcParticle.getMomentum().Y();
+          mom[2] = mcParticle.getMomentum().Z();
+
+          if (!He3MCParticles.isValid()) He3MCParticles.create();
+          He3MCParticles.appendNew(He3MCParticle(PDG, Mass, Energy, vtx, mom));
+        }
+      }
+      return (m_simhitNumber);
+    }//saveSimHit
+
+
+
 
   } //he3tube namespace
 } //Belle2 namespace

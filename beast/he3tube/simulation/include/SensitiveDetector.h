@@ -21,12 +21,17 @@ namespace Belle2 {
     public:
       /** Constructor */
       SensitiveDetector();
+
+      //! Save He3MCParticles into datastore
+      int saveSimHit();
+
     protected:
       /** Step processing method
        * @param step the G4Step with the current step information
        * @return true if a Hit has been created, false if the hit was ignored
        */
       bool step(G4Step* step, G4TouchableHistory*);
+      int m_simhitNumber;               /** The current number of created hits in an event. Used to fill the DataStore */
     };
 
   } //he3tube namespace

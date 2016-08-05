@@ -20,6 +20,7 @@ output.param('outputFileName', sys.argv[2])
 main = create_path()
 main.add_module(input)
 add_simulation(main)
+main.add_module('Progress')
 main.add_module(output)
 
 # generate events

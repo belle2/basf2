@@ -19,22 +19,32 @@
 #include <framework/gearbox/Const.h>
 
 using namespace std;
+
 namespace Belle2 {
+
   /// Class to identify beam parameters
   class BeamID {
+
   public:
+
     /// Primary vertex x-position
     static const int vertexX = 1;
+
     /// Primary vertex y-position
     static const int vertexY = 2;
+
     /// Primary vertex z-position
     static const int vertexZ = 3;
+
     /// Constructor
     explicit BeamID() {}
+
     /// convert to int, returns 0 as there are no elements of beam, only parameters
     operator int() {return 0;}
+
     /// convert to unsigned int, returns 0 as there are no elements of beam, only parameters
     operator unsigned int() {return 0;}
+
   };
 
   /**
@@ -59,7 +69,9 @@ namespace Belle2 {
    * - TID  is time interval id
    */
   class GlobalLabel {
+
   public:
+
     typedef unsigned int gidTYPE;              /**< shortcut for main data type (unsigned int) */
     static const gidTYPE maxPID     = 99;      /**< max 99 parameter types  1..99 */
     static const gidTYPE maxEID     = 9999999; /**< max 9.999.999 detector elements 1..9999999 (NOT time-dep-) */
@@ -79,6 +91,7 @@ namespace Belle2 {
     static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
     static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
     static const gidTYPE klmOffset  = 300000;  /**< Offset of 300000 in element ids for KLM */
+
     /**
      * @brief Constructor from Pede label
      * Depends on registered time dependent parameters
@@ -95,6 +108,7 @@ namespace Belle2 {
      *                type (x,y,z of vertex etc.).
      */
     GlobalLabel(BeamID beamid, gidTYPE paramId);
+
     /**
      * @brief Constructor from VxdID (depends on time internally)
      * @param vxdid VxdId of detector element (sensor, layer, ladder)
@@ -102,6 +116,7 @@ namespace Belle2 {
      *                type (U-shift, V-shift, alpha-Rotation, Lorentz-angle etc.).
      */
     GlobalLabel(VxdID vxdid, gidTYPE paramId);
+
     /**
      * @brief Constructor from WireID (depends on time internally)
      * @param vxdid WireID of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
@@ -109,6 +124,7 @@ namespace Belle2 {
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
     GlobalLabel(WireID cdcid, gidTYPE paramId);
+
     /**
      * @brief Constructor from KLMid (currently BKLMElementID) (depends on time internally)
      * @param klmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
@@ -116,6 +132,7 @@ namespace Belle2 {
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
     GlobalLabel(BKLMElementID klmid, gidTYPE paramId);
+
     /**
      * @brief Register this Detector element and parameter
      *        as time dependent with instance starting at
@@ -131,6 +148,7 @@ namespace Belle2 {
      *            The number after "end" is 0 if not set.
      */
     void registerTimeDependent(gidTYPE start, gidTYPE end = maxTID);
+
     /**
      * @brief Usefull setter to quickly change only the parameter id
      *        and return back the encoded label (for use in RecoHits)
@@ -138,48 +156,65 @@ namespace Belle2 {
      * @return Encoded Pede label with new parameter id
      */
     gidTYPE setParameterId(gidTYPE paramId);
+
     /**
      * @brief Returns encoded Pede label
      *
      * @return int
      */
     int label() {return gid;}
+
     /**
      * @brief Cast to encoded Pede label
      */
     operator int() {return (int)label();}
+
     /**
      * @brief Cast to encoded Pede label
      */
     operator unsigned int() {return (unsigned int)label();}
+
     /**
      * @brief Assignment operator
      */
     GlobalLabel& operator=(const GlobalLabel& rhs) {gid = rhs.gid, eid = rhs.eid, pid = rhs.pid, tid = rhs.tid, tif = rhs.tif; return *this; };
+
     //! Get the VxdID (returns default if not VXD label)
     VxdID   getVxdID()       const;
+
     //! Get the WireID (returns default if not CDC label)
     WireID  getWireID()      const;
+
     //! Get the KlmID (returns 0 if not KLM label)
     BKLMElementID  getKlmID()      const;
+
     //! Is this beam label?
     bool    isBeam()          const {return (eid < vxdOffset);}
+
     //! Is this VXD label?
     bool    isVXD()          const {return (eid >= vxdOffset && eid < cdcOffset);}
+
     //! Is this CDC label?
     bool    isCDC()          const {return (eid >= cdcOffset && eid < klmOffset);}
+
     //! Is this KLM label?
     bool    isKLM()          const {return (eid >= klmOffset && eid < maxEID);}
+
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}
+
     //! Get time id
     gidTYPE getTimeId()      const {return tid;}
+
     //! Is label time-dependent?
     bool    getTimeFlag()    const {return tif;}
+
     //! Is label valid? (non-zero)
     bool    isValid() {return 0 != gid * eid * pid;}
+
     //! Dumps the label to std::cout
     void    dump(int level = 0) const;
+
     //! Get the last time id, where this label is valid
     int     getEndOfValidity()
     {
@@ -199,12 +234,14 @@ namespace Belle2 {
      * @brief Forget all previously registered time dependent parameters
      */
     static void clearTimeDependentParamaters();
+
     //! Returns reference to current time id
     static unsigned int& getCurrentTimeIntervalRef()
     {
       static unsigned int subrun = 0;
       return subrun;
     }
+
     //! Sets current time id
     //! @param time time id
     static void setCurrentTimeInterval(gidTYPE time)
@@ -212,23 +249,32 @@ namespace Belle2 {
       gidTYPE& timeref = GlobalLabel::getCurrentTimeIntervalRef();
       timeref = time;
     }
+
     //! Get current time id
     static gidTYPE getCurrentTimeInterval()
     {
       return GlobalLabel::getCurrentTimeIntervalRef();
     }
+
   private:
+
     //! Constructor for any detector
     //! @param elementId Unique id of Belle2 detector element (sensor, layer, wire...)
     void construct(gidTYPE elementId, gidTYPE paramId);
+
     //! Struct to hold intervals of validity
     struct TimeInterval {
+
     private:
+
       //! Time element id & parameter id
       gidTYPE teidpid_;
+
       //! Array of time ids
       gidTYPE arr_[maxTID + 1];
+
     public:
+
       //! Constructor for given validity interval
       //! @param TEIDPID Time-dependent parameter id
       //! @param start start time id of validity
@@ -243,10 +289,13 @@ namespace Belle2 {
             arr_[i] = 0;
         }
       }
+
       //! Get composed time element id & param id
       gidTYPE teidpid() {return teidpid_;}
+
       //! Get the start time id for validity interval valid at given timeid
       gidTYPE get(gidTYPE timeid) {return arr_[timeid];}
+
       //! Set new parameter validity interval from start to end
       void set(gidTYPE start, gidTYPE end)
       {
@@ -256,6 +305,7 @@ namespace Belle2 {
         }
       }
     };
+
     //! Reference to map EIDPID -> (TEIDPID, time intervals)
     static map<gidTYPE, TimeInterval >& getTimeIntervals()
     {
@@ -263,6 +313,7 @@ namespace Belle2 {
       static map<gidTYPE, TimeInterval > intervals;
       return intervals;
     }
+
     //! Reference to dictionary/map TEIDPID -> EIDPID
     static map<gidTYPE, gidTYPE>& getDictionary()
     {
@@ -270,20 +321,31 @@ namespace Belle2 {
       static map<gidTYPE, gidTYPE> dictionary;
       return dictionary;
     }
+
     //! Helper to compose elemnt id & param id
     gidTYPE makeEIDPID(gidTYPE eid_, gidTYPE pid_) {return pid_ * pidOffset + eid_ * eidOffest;}
+
     //! Helper to compose time elemnt id & param id
     gidTYPE makeTEIDPID(gidTYPE teid_, gidTYPE pid_) {return pid_ * pidOffset + teid_ * teidOffset;}
+
     //! global id
     gidTYPE gid;
+
     //! element id
     gidTYPE eid;
+
     //! parameter id
     gidTYPE pid;
+
     //! time id
     gidTYPE tid;
+
     //! time identification flag
     gidTYPE tif;
+
   };
+
 }
+
 #endif
+

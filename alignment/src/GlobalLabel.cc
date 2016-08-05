@@ -59,10 +59,10 @@ GlobalLabel::GlobalLabel(WireID cdcid, GlobalLabel::gidTYPE paramId): gid(0),
   construct(cdcid.getEWire() + cdcOffset, paramId);
 }
 
-GlobalLabel::GlobalLabel(BKLMElementID klmid, GlobalLabel::gidTYPE paramId):
+GlobalLabel::GlobalLabel(BKLMElementID bklmid, GlobalLabel::gidTYPE paramId):
   gid(0), eid(0), pid(0), tid(0), tif(0)
 {
-  construct(klmid.getID() + klmOffset, paramId);
+  construct(bklmid.getID() + bklmOffset, paramId);
 }
 
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,
@@ -115,11 +115,11 @@ WireID GlobalLabel::getWireID() const
   return WireID(eid - cdcOffset);
 }
 
-BKLMElementID GlobalLabel::getKlmID() const
+BKLMElementID GlobalLabel::getBklmID() const
 {
-  if (eid < klmOffset)
+  if (eid < bklmOffset)
     return BKLMElementID();
-  return BKLMElementID(eid - klmOffset);
+  return BKLMElementID(eid - bklmOffset);
 }
 
 void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,

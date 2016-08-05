@@ -58,7 +58,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isBeam()) ++nBeamParams;
     if (param.isVXD()) ++nVXDparams;
     if (param.isCDC()) ++nCDCparams;
-    if (param.isKLM()) ++nBKLMparams;
+    if (param.isBKLM()) ++nBKLMparams;
   }
   if (!nBeamParams)
     B2INFO("No Beam parameters determined");
@@ -207,10 +207,10 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       }
     }
 
-    if (param.isKLM()) {
+    if (param.isBKLM()) {
       // Add correction to all objects
       for (auto& bklm : newBKLM) {
-        bklm.second->add(param.getKlmID(), param.getParameterId(), correction, m_invertSign);
+        bklm.second->add(param.getBklmID(), param.getParameterId(), correction, m_invertSign);
       }
     }
   }

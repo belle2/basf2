@@ -90,7 +90,7 @@ namespace Belle2 {
     static const gidTYPE beamOffset = 0;       /**< Offset of 0 for BeamParameters */
     static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
     static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
-    static const gidTYPE klmOffset  = 300000;  /**< Offset of 300000 in element ids for KLM */
+    static const gidTYPE bklmOffset  = 300000;  /**< Offset of 300000 in element ids for BKLM */
 
     /**
      * @brief Constructor from Pede label
@@ -126,12 +126,12 @@ namespace Belle2 {
     GlobalLabel(WireID cdcid, gidTYPE paramId);
 
     /**
-     * @brief Constructor from KLMid (currently BKLMElementID) (depends on time internally)
-     * @param klmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
+     * @brief Constructor from BKLMid (depends on time internally)
+     * @param bklmid Unique of detector element (wire, layer?, superlayer?, endplate1?, endplate2?)
      * @param paramId Numeric identificator of calibration/alignment parameter
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
-    GlobalLabel(BKLMElementID klmid, gidTYPE paramId);
+    GlobalLabel(BKLMElementID bklmid, gidTYPE paramId);
 
     /**
      * @brief Register this Detector element and parameter
@@ -185,8 +185,8 @@ namespace Belle2 {
     //! Get the WireID (returns default if not CDC label)
     WireID  getWireID()      const;
 
-    //! Get the KlmID (returns 0 if not KLM label)
-    BKLMElementID  getKlmID()      const;
+    //! Get the BklmID (returns 0 if not BKLM label)
+    BKLMElementID getBklmID() const;
 
     //! Is this beam label?
     bool    isBeam()          const {return (eid < vxdOffset);}
@@ -195,10 +195,10 @@ namespace Belle2 {
     bool    isVXD()          const {return (eid >= vxdOffset && eid < cdcOffset);}
 
     //! Is this CDC label?
-    bool    isCDC()          const {return (eid >= cdcOffset && eid < klmOffset);}
+    bool    isCDC()          const {return (eid >= cdcOffset && eid < bklmOffset);}
 
-    //! Is this KLM label?
-    bool    isKLM()          const {return (eid >= klmOffset && eid < maxEID);}
+    //! Is this BKLM label?
+    bool    isBKLM()         const {return (eid >= bklmOffset && eid < maxEID);}
 
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}

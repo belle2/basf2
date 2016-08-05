@@ -64,11 +64,11 @@ for sector in range(1, 9):
                 if ipar in [1, 2]:
                     continue
 
-                klmid = Belle2.BKLMElementID()
-                klmid.setIsForward(forward)
-                klmid.setSectorNumber(sector)
-                klmid.setLayerNumber(layer)
-                label = Belle2.GlobalLabel(klmid, ipar)
+                bklmid = Belle2.BKLMElementID()
+                bklmid.setIsForward(forward)
+                bklmid.setSectorNumber(sector)
+                bklmid.setLayerNumber(layer)
+                label = Belle2.GlobalLabel(bklmid, ipar)
                 cmd = str(label.label()) + ' 0. -1.'
                 algo.steering().command(cmd)
 
@@ -87,7 +87,7 @@ algo.execute()
 payloads = list(algo.getPayloads())
 vxd = None
 cdc = None
-klm = None
+bklm = None
 for payload in payloads:
     if payload.module == 'VXDAlignment':
         vxd = payload.object.IsA().DynamicCast(Belle2.VXDAlignment().IsA(), payload.object, False)
@@ -96,7 +96,7 @@ for payload in payloads:
         cdc = payload.object.IsA().DynamicCast(Belle2.CDCCalibration().IsA(), payload.object, False)
 
     if payload.module == 'BKLMAlignment':
-        klm = payload.object.IsA().DynamicCast(Belle2.BKLMAlignment().IsA(), payload.object, False)
+        bklm = payload.object.IsA().DynamicCast(Belle2.BKLMAlignment().IsA(), payload.object, False)
 
 
 # Profile plot for all determined parameters
@@ -132,13 +132,13 @@ cdctree.Branch('param', param, 'param/I')
 cdctree.Branch('value', value, 'value/D')
 cdctree.Branch('error', error, 'error/D')
 # Tree with BKLM data
-klmtree = ROOT.TTree('klm', 'KLM data')
-klmtree.Branch('layer', layer, 'layer/I')
-klmtree.Branch('sector', sector, 'sector/I')
-klmtree.Branch('forward', forward, 'forward/I')
-klmtree.Branch('param', param, 'param/I')
-klmtree.Branch('value', value, 'value/D')
-klmtree.Branch('error', error, 'error/D')
+bklmtree = ROOT.TTree('bklm', 'BKLM data')
+bklmtree.Branch('layer', layer, 'layer/I')
+bklmtree.Branch('sector', sector, 'sector/I')
+bklmtree.Branch('forward', forward, 'forward/I')
+bklmtree.Branch('param', param, 'param/I')
+bklmtree.Branch('value', value, 'value/D')
+bklmtree.Branch('error', error, 'error/D')
 
 # Index of determined param
 ibin = 0
@@ -164,11 +164,11 @@ for ipar in range(0, algo.result().getNoParameters()):
         layer[0] = label.getWireID().getICLayer()
         cdctree.Fill()
 
-    if (label.isKLM()):
-        layer[0] = label.getKlmID().getLayerNumber()
-        sector[0] = label.getKlmID().getSectorNumber()
-        forward[0] = label.getKlmID().getIsForward()
-        klmtree.Fill()
+    if (label.isBKLM()):
+        layer[0] = label.getBklmID().getLayerNumber()
+        sector[0] = label.getBklmID().getSectorNumber()
+        forward[0] = label.getBklmID().getIsForward()
+        bklmtree.Fill()
 
     profile.SetBinContent(ibin, value[0])
     profile.SetBinError(ibin, error[0])
@@ -185,8 +185,8 @@ print(' You are now in interactive environment. You can still access the algorit
 print(' or the DataStore. Try e.g.:')
 print('')
 print(' >>> pval.Draw()')
-print(' >>> klmtree.Draw("value:layer")')
-print(' >>> klm.dump()')
+print(' >>> bklmtree.Draw("value:layer")')
+print(' >>> bklm.dump()')
 print(' >>> profile.Draw()')
 print('')
 print(' Look into this script and use TAB or python ? help to play more...')

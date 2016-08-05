@@ -19,14 +19,12 @@
 
 using namespace Belle2;
 
-ConditionsService* ConditionsService::m_instance = NULL;
-
 ConditionsService* ConditionsService::getInstance()
 {
 
-  if (!m_instance) m_instance = new ConditionsService;
+  static ConditionsService instance;
 
-  return m_instance;
+  return &instance;
 };
 
 

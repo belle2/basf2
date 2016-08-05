@@ -149,7 +149,7 @@ namespace Belle2 {
      *
      *  @return Nothing yet
      */
-    void addReturn(std::string buffer) {m_buffer += buffer;};
+    void addReturn(const std::string& buffer) {m_buffer += buffer;};
 
     /** Adds a payload file to the conditions database.
      *  @param payloadFileName The file name of the payload.
@@ -208,9 +208,6 @@ namespace Belle2 {
     /** Function to display file transfer progress */
     static int progress_func(void* ptr, double TotalToDownload, double NowDownloaded,
                              double TotalToUpload, double NowUploaded);
-
-    /** The single instance of this class */
-    static ConditionsService* m_instance;
 
     /** The base name for the REST services */
     std::string m_RESTbase;

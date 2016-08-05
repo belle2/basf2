@@ -39,7 +39,7 @@ void DQMHistAnalysisInputModule::initialize()
   m_expno = m_runno = 0;
   m_count = 0;
   m_memory = new DqmMemFile(m_mempath.c_str());
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
   B2INFO("DQMHistAnalysisInput: initialized.");
 }
 

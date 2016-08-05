@@ -69,18 +69,18 @@ void DeSerializerHLTModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  raw_datablkarray.registerPersistent();
-  rawcprarray.registerPersistent();
-  raw_cdcarray.registerPersistent();
-  raw_svdarray.registerPersistent();
-  raw_bpidarray.registerPersistent();
-  raw_epidarray.registerPersistent();
-  raw_eclarray.registerPersistent();
-  raw_klmarray.registerPersistent();
-  raw_ftswarray.registerPersistent();
+  raw_datablkarray.registerInDataStore();
+  rawcprarray.registerInDataStore();
+  raw_cdcarray.registerInDataStore();
+  raw_svdarray.registerInDataStore();
+  raw_bpidarray.registerInDataStore();
+  raw_epidarray.registerInDataStore();
+  raw_eclarray.registerInDataStore();
+  raw_klmarray.registerInDataStore();
+  raw_ftswarray.registerInDataStore();
 
 
 

@@ -70,11 +70,11 @@ void DeSerializerPrePCModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
-  raw_datablkarray.registerPersistent();
-  rawcprarray.registerPersistent();
-  raw_ftswarray.registerPersistent();
+  raw_datablkarray.registerInDataStore();
+  rawcprarray.registerInDataStore();
+  raw_ftswarray.registerInDataStore();
 
   // Initialize Array of RawCOPPER
 

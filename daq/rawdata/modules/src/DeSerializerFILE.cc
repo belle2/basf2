@@ -66,7 +66,7 @@ void DeSerializerFILEModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));

@@ -81,11 +81,11 @@ void DeSerializerCOPPERModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   // Initialize Array of RawCOPPER
-  //  rawcprarray.registerPersistent();
-  raw_dblkarray.registerPersistent();
+  //  rawcprarray.registerInDataStore();
+  raw_dblkarray.registerInDataStore();
 
   if (m_dump_fname.size() > 0) {
     openOutputFile();

@@ -68,6 +68,7 @@ void GeneratorPreselectionModule::initialize()
   m_MinPhotonTheta  *= Unit::deg;
   m_MaxPhotonTheta  *= Unit::deg;
 
+  m_mcparticles.isRequired(m_particleList);
 }
 
 
@@ -77,14 +78,12 @@ void GeneratorPreselectionModule::event()
   m_nCharged = 0;
   m_nPhoton  = 0.;
 
-  m_mcparticles.required(m_particleList);
-  StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
-  m_seen.resize(MCParticles.getEntries() + 1, false);
+  m_seen.resize(m_mcparticles.getEntries() + 1, false);
 
 
-  for (int i = 0; i < MCParticles.getEntries(); i++) {
-    MCParticle& mc = *MCParticles[i];
+  for (int i = 0; i < m_mcparticles.getEntries(); i++) {
+    MCParticle& mc = *m_mcparticles[i];
     if (mc.getMother() != NULL) continue;
     checkParticle(mc, 0);
   }

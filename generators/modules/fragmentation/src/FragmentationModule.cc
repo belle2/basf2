@@ -94,6 +94,8 @@ void FragmentationModule::terminate()
 //-----------------------------------------------------------------
 void FragmentationModule::initialize()
 {
+  m_mcparticles.isRequired(m_particleList);
+
   B2INFO("Initialize PYTHIA8");
   if (getParam<std::string>("EvtPdl").isSetInSteering()) {
     B2ERROR("The 'pdlFile' parameter is deprecated and will be ignored. Use \"import pdg; pdg.read('pdlFile')\" instead.");
@@ -142,9 +144,6 @@ void FragmentationModule::initialize()
 //-----------------------------------------------------------------
 void FragmentationModule::event()
 {
-  m_mcparticles.required(m_particleList);
-  StoreArray<MCParticle> mcParticles(m_particleList);
-
   // Reset the indices of the graph
   mcParticleGraph.clear();
   mcParticleGraph.loadList(m_particleList);
@@ -167,9 +166,9 @@ void FragmentationModule::event()
   int quarkPosition = 0;
 
   // Loop over all particles to find the quark pair
-  int nPart = mcParticles.getEntries();
+  int nPart = m_mcparticles.getEntries();
   for (int iPart = 0; iPart < nPart; iPart++) {
-    MCParticle* currParticle = mcParticles[iPart];
+    MCParticle* currParticle = m_mcparticles[iPart];
 
     //returns quark id if it finds a quark, zero otherwise
     //increments a counter for the number of found quarks

@@ -61,7 +61,7 @@ void DeSerializerPXDModule::initialize()
   m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
-  m_eventMetaDataPtr.registerPersistent();
+  m_eventMetaDataPtr.registerInDataStore();
 
   // Initialize Array of RawCOPPER
   StoreArray<RawPXD>::registerPersistent();

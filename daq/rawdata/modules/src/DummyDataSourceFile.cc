@@ -42,13 +42,13 @@ void DummyDataSourceFileModule::initialize()
   //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   /// Initialize EvtMetaData
-  //  m_eventMetaDataPtr.registerPersistent();
+  //  m_eventMetaDataPtr.registerInDataStore();
 
 #ifdef USE_RAWDATABLOCK
-  //  raw_datablkarray.registerPersistent();
+  //  raw_datablkarray.registerInDataStore();
 #endif
 
-  rawcprarray.registerPersistent();
+  rawcprarray.registerInDataStore();
 
   //  n_basf2evt = 0;
   n_basf2evt = 0;

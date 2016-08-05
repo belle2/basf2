@@ -48,7 +48,7 @@ using namespace Belle2;
 // void DesSerPrePCMainModule::initialize()
 // {
 //   // Initialize EvtMetaData
-//   m_eventMetaDataPtr.registerPersistent();
+//   m_eventMetaDataPtr.registerInDataStore();
 //   // Open message handler
 
 

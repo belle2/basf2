@@ -40,6 +40,8 @@ namespace Belle2 {
     /** Destructor. */
     virtual ~PrintMCParticlesModule() {}
 
+    /** init. */
+    virtual void initialize();
     /** Method is called for each event. */
     virtual void event();
 

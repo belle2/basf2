@@ -37,18 +37,20 @@ PrintMCParticlesModule::PrintMCParticlesModule() : Module()
   addParam("maxLevel", m_maxLevel, "Show only up to specified depth level, -1 means no limit", -1);
 }
 
+void PrintMCParticlesModule::initialize()
+{
+  m_mcparticles.isRequired(m_particleList);
+}
 
 void PrintMCParticlesModule::event()
 {
-  m_mcparticles.required(m_particleList);
-  StoreArray<MCParticle> MCParticles(m_particleList);
   m_seen.clear();
-  m_seen.resize(MCParticles.getEntries() + 1, false);
+  m_seen.resize(m_mcparticles.getEntries() + 1, false);
   B2INFO("Content from MCParticle list '" + m_mcparticles.getName() + "':");
 
   //Loop over the top level particles (no mother particle exists)
-  for (int i = 0; i < MCParticles.getEntries(); i++) {
-    MCParticle& mc = *MCParticles[i];
+  for (int i = 0; i < m_mcparticles.getEntries(); i++) {
+    MCParticle& mc = *m_mcparticles[i];
     if (mc.getMother() != NULL) continue;
     printTree(mc, 0);
   }
@@ -85,7 +87,7 @@ void PrintMCParticlesModule::printTree(const MCParticle& mc, int level)
         );
 
   const vector<MCParticle*> daughters = mc.getDaughters();
-  for (MCParticle * daughter : daughters) {
+  for (MCParticle* daughter : daughters) {
     printTree(*daughter, level);
   }
   m_seen[mc.getIndex()] = true;

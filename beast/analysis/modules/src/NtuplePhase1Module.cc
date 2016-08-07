@@ -163,18 +163,56 @@ namespace Belle2 {
     m_eventCount = 0;
 
     m_tree->SetBranchAddress("ts", &(m_skb.ts));
-    m_tree->SetBranchAddress("BM_DCCT_HCUR", &(m_skb.BM_DCCT_HCUR));
-    m_tree->SetBranchAddress("BM_DCCT_LCUR", &(m_skb.BM_DCCT_LCUR));
+    //m_tree->SetBranchAddress("BM_DCCT_HCUR", &(m_skb.BM_DCCT_HCUR));
+    //m_tree->SetBranchAddress("BM_DCCT_LCUR", &(m_skb.BM_DCCT_LCUR));
 
-    m_tree->SetBranchAddress("CGLINJ_BEAM_GATE_STATUS", &(m_skb.CGLINJ_BEAM_GATE_STATUS));
-    m_tree->SetBranchAddress("CGHINJ_BEAM_GATE_STATUS", &(m_skb.CGHINJ_BEAM_GATE_STATUS));
+    //m_tree->SetBranchAddress("CGLINJ_BEAM_GATE_STATUS", &(m_skb.CGLINJ_BEAM_GATE_STATUS));
+    //m_tree->SetBranchAddress("CGHINJ_BEAM_GATE_STATUS", &(m_skb.CGHINJ_BEAM_GATE_STATUS));
     /*
     m_tree->SetBranchAddress("VAHBMD_BEAMDOSE_VAL", &(m_skb.VAHBMD_BEAMDOSE_VAL));
     m_tree->SetBranchAddress("VALBMD_BEAMDOSE_VAL", &(m_skb.VALBMD_BEAMDOSE_VAL));
     */
-    m_tree->SetBranchAddress("VAHCCG_HER_PRES_AVG", &(m_skb.VAHCCG_HER_PRES_AVG));
-    m_tree->SetBranchAddress("VALCCG_LER_PRES_AVG", &(m_skb.VALCCG_LER_PRES_AVG));
+    /*
+    m_tree->SetBranchAddress("BMHXRM_BEAM_SIGMAX", &(m_skb.BMHXRM_BEAM_SIGMAX));
+    m_tree->SetBranchAddress("BMLXRM_BEAM_SIGMAX", &(m_skb.BMLXRM_BEAM_SIGMAX));
+    m_tree->SetBranchAddress("BMHXRM_BEAM_SIGMAY", &(m_skb.BMHXRM_BEAM_SIGMAY));
+    m_tree->SetBranchAddress("BMLXRM_BEAM_SIGMAY", &(m_skb.BMLXRM_BEAM_SIGMAY));
 
+    m_tree->SetBranchAddress("CGHINJ_BKSEL_NOB_SET", &(m_skb.CGHINJ_BKSEL_NOB_SET));
+    m_tree->SetBranchAddress("CGLINJ_BKSEL_NOB_SET", &(m_skb.CGLINJ_BKSEL_NOB_SET));
+    */
+
+    m_tree->SetBranchAddress("CGLINJ_BEAM_GATE_STATUS", &(m_skb.CGLINJ_BEAM_GATE_STATUS));
+    m_tree->SetBranchAddress("CGHINJ_BEAM_GATE_STATUS", &(m_skb.CGHINJ_BEAM_GATE_STATUS));
+    m_tree->SetBranchAddress("CO_KEKB_KEKB_Status_FLG", &(m_skb.CO_KEKB_KEKB_Status_FLG));
+    m_tree->SetBranchAddress("CGHINJ_RATE_AVE", &(m_skb.CGHINJ_RATE_AVE));
+    m_tree->SetBranchAddress("CGLINJ_RATE_AVE", &(m_skb.CGLINJ_RATE_AVE));
+    m_tree->SetBranchAddress("COpLER_BEAM_LIFE", &(m_skb.COpLER_BEAM_LIFE));
+    m_tree->SetBranchAddress("COeHER_BEAM_LIFE", &(m_skb.COeHER_BEAM_LIFE));
+    m_tree->SetBranchAddress("BM_DCCT_HCUR", &(m_skb.BM_DCCT_HCUR));
+    m_tree->SetBranchAddress("BM_DCCT_LCUR", &(m_skb.BM_DCCT_LCUR));
+    m_tree->SetBranchAddress("CGLINJ_EFFICIENCY", &(m_skb.CGLINJ_EFFICIENCY));
+    m_tree->SetBranchAddress("CGHINJ_EFFICIENCY", &(m_skb.CGHINJ_EFFICIENCY));
+    m_tree->SetBranchAddress("BM_BLM_D01_ADC_MEAN", &(m_skb.BM_BLM_D01_ADC_MEAN));
+    m_tree->SetBranchAddress("BM_BLM_TB4_ADC_MEAN", &(m_skb.BM_BLM_TB4_ADC_MEAN));
+    m_tree->SetBranchAddress("BM_BLM_D07_ADC_MEAN", &(m_skb.BM_BLM_D07_ADC_MEAN));
+    m_tree->SetBranchAddress("BM_BLM_D10_ADC_MEAN", &(m_skb.BM_BLM_D10_ADC_MEAN));
+    m_tree->SetBranchAddress("CG_BTP_BPM_CHARGE_AVE", &(m_skb.CG_BTP_BPM_CHARGE_AVE));
+    m_tree->SetBranchAddress("CG_BTE_BPM_CHARGE_AVE", &(m_skb.CG_BTE_BPM_CHARGE_AVE));
+    m_tree->SetBranchAddress("BMHDCCT_LIFE", &(m_skb.BMHDCCT_LIFE));
+    m_tree->SetBranchAddress("BMLDCCT_LIFE", &(m_skb.BMLDCCT_LIFE));
+    m_tree->SetBranchAddress("LIiEV_BEAM_REP_READ_KBP", &(m_skb.LIiEV_BEAM_REP_READ_KBP));
+    m_tree->SetBranchAddress("LIiEV_BEAM_REP_READ_KBE", &(m_skb.LIiEV_BEAM_REP_READ_KBE));
+    m_tree->SetBranchAddress("TM_BKT_config_SNAM", &(m_skb.TM_BKT_config_SNAM));
+    m_tree->SetBranchAddress("TM_BKT_AUTO_FILL_Mode", &(m_skb.TM_BKT_AUTO_FILL_Mode));
+    m_tree->SetBranchAddress("TM_BKT_AUTO_FILL_Nbunch", &(m_skb.TM_BKT_AUTO_FILL_Nbunch));
+    m_tree->SetBranchAddress("TM_BKT_ONE_BUNCH_LER_InjBucket", &(m_skb.TM_BKT_ONE_BUNCH_LER_InjBucket));
+    m_tree->SetBranchAddress("TM_BKT_ONE_BUNCH_HER_InjBucket", &(m_skb.TM_BKT_ONE_BUNCH_HER_InjBucket));
+    m_tree->SetBranchAddress("TM_BKT_ONE_BUNCH_Nbunch", &(m_skb.TM_BKT_ONE_BUNCH_Nbunch));
+    m_tree->SetBranchAddress("CGLSAFE_MR_ABORT", &(m_skb.CGLSAFE_MR_ABORT));
+    m_tree->SetBranchAddress("CGHSAFE_MR_ABORT", &(m_skb.CGHSAFE_MR_ABORT));
+
+    m_tree->SetBranchAddress("VALCCG_LER_PRES_AVG", &(m_skb.VALCCG_LER_PRES_AVG));
     m_tree->SetBranchAddress("VALCCG_D01_LER_PRES_AVG", &(m_skb.VALCCG_D01_LER_PRES_AVG));
     m_tree->SetBranchAddress("VALCCG_D02_LER_PRES_AVG", &(m_skb.VALCCG_D02_LER_PRES_AVG));
     m_tree->SetBranchAddress("VALCCG_D03_LER_PRES_AVG", &(m_skb.VALCCG_D03_LER_PRES_AVG));
@@ -187,6 +225,8 @@ namespace Belle2 {
     m_tree->SetBranchAddress("VALCCG_D10_LER_PRES_AVG", &(m_skb.VALCCG_D10_LER_PRES_AVG));
     m_tree->SetBranchAddress("VALCCG_D11_LER_PRES_AVG", &(m_skb.VALCCG_D11_LER_PRES_AVG));
     m_tree->SetBranchAddress("VALCCG_D12_LER_PRES_AVG", &(m_skb.VALCCG_D12_LER_PRES_AVG));
+
+    m_tree->SetBranchAddress("VAHCCG_HER_PRES_AVG", &(m_skb.VAHCCG_HER_PRES_AVG));
     m_tree->SetBranchAddress("VAHCCG_D01_HER_PRES_AVG", &(m_skb.VAHCCG_D01_HER_PRES_AVG));
     m_tree->SetBranchAddress("VAHCCG_D02_HER_PRES_AVG", &(m_skb.VAHCCG_D02_HER_PRES_AVG));
     m_tree->SetBranchAddress("VAHCCG_D03_HER_PRES_AVG", &(m_skb.VAHCCG_D03_HER_PRES_AVG));
@@ -200,12 +240,109 @@ namespace Belle2 {
     m_tree->SetBranchAddress("VAHCCG_D11_HER_PRES_AVG", &(m_skb.VAHCCG_D11_HER_PRES_AVG));
     m_tree->SetBranchAddress("VAHCCG_D12_HER_PRES_AVG", &(m_skb.VAHCCG_D12_HER_PRES_AVG));
 
-    m_tree->SetBranchAddress("BMHXRM_BEAM_SIGMAX", &(m_skb.BMHXRM_BEAM_SIGMAX));
-    m_tree->SetBranchAddress("BMLXRM_BEAM_SIGMAX", &(m_skb.BMLXRM_BEAM_SIGMAX));
+    //SKB HER collimator absolute positions as measured by DMM
+    m_tree->SetBranchAddress("VAHCLM_D09H1_PM_POS", &(m_skb.VAHCLM_D09H1_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H2_PM_POS", &(m_skb.VAHCLM_D09H2_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H3_PM_POS", &(m_skb.VAHCLM_D09H3_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H4_PM_POS", &(m_skb.VAHCLM_D09H4_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V1_PM_POS", &(m_skb.VAHCLM_D09V1_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V2_PM_POS", &(m_skb.VAHCLM_D09V2_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V3_PM_POS", &(m_skb.VAHCLM_D09V3_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V4_PM_POS", &(m_skb.VAHCLM_D09V4_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H1_PM_POS", &(m_skb.VAHCLM_D12H1_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H2_PM_POS", &(m_skb.VAHCLM_D12H2_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H3_PM_POS", &(m_skb.VAHCLM_D12H3_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H4_PM_POS", &(m_skb.VAHCLM_D12H4_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V1_PM_POS", &(m_skb.VAHCLM_D12V1_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V2_PM_POS", &(m_skb.VAHCLM_D12V2_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V3_PM_POS", &(m_skb.VAHCLM_D12V3_PM_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V4_PM_POS", &(m_skb.VAHCLM_D12V4_PM_POS));
+
+    //SKB HER beam position in X
+    m_tree->SetBranchAddress("VAHCLM_D09H1_BMX_POS", &(m_skb.VAHCLM_D09H1_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H2_BMX_POS", &(m_skb.VAHCLM_D09H2_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H3_BMX_POS", &(m_skb.VAHCLM_D09H3_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H4_BMX_POS", &(m_skb.VAHCLM_D09H4_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V1_BMX_POS", &(m_skb.VAHCLM_D09V1_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V2_BMX_POS", &(m_skb.VAHCLM_D09V2_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V3_BMX_POS", &(m_skb.VAHCLM_D09V3_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V4_BMX_POS", &(m_skb.VAHCLM_D09V4_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H1_BMX_POS", &(m_skb.VAHCLM_D12H1_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H2_BMX_POS", &(m_skb.VAHCLM_D12H2_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H3_BMX_POS", &(m_skb.VAHCLM_D12H3_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H4_BMX_POS", &(m_skb.VAHCLM_D12H4_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V1_BMX_POS", &(m_skb.VAHCLM_D12V1_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V2_BMX_POS", &(m_skb.VAHCLM_D12V2_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V3_BMX_POS", &(m_skb.VAHCLM_D12V3_BMX_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V4_BMX_POS", &(m_skb.VAHCLM_D12V4_BMX_POS));
+
+    //SKB HER beam position in Y
+    m_tree->SetBranchAddress("VAHCLM_D09H1_BMY_POS", &(m_skb.VAHCLM_D09H1_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H2_BMY_POS", &(m_skb.VAHCLM_D09H2_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H3_BMY_POS", &(m_skb.VAHCLM_D09H3_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H4_BMY_POS", &(m_skb.VAHCLM_D09H4_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V1_BMY_POS", &(m_skb.VAHCLM_D09V1_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V2_BMY_POS", &(m_skb.VAHCLM_D09V2_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V3_BMY_POS", &(m_skb.VAHCLM_D09V3_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V4_BMY_POS", &(m_skb.VAHCLM_D09V4_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H1_BMY_POS", &(m_skb.VAHCLM_D12H1_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H2_BMY_POS", &(m_skb.VAHCLM_D12H2_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H3_BMY_POS", &(m_skb.VAHCLM_D12H3_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H4_BMY_POS", &(m_skb.VAHCLM_D12H4_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V1_BMY_POS", &(m_skb.VAHCLM_D12V1_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V2_BMY_POS", &(m_skb.VAHCLM_D12V2_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V3_BMY_POS", &(m_skb.VAHCLM_D12V3_BMY_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V4_BMY_POS", &(m_skb.VAHCLM_D12V4_BMY_POS));
+
+    //SKB HER collimator position with respect to beam
+    m_tree->SetBranchAddress("VAHCLM_D09H1_DIF_POS", &(m_skb.VAHCLM_D09H1_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H2_DIF_POS", &(m_skb.VAHCLM_D09H2_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H3_DIF_POS", &(m_skb.VAHCLM_D09H3_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09H4_DIF_POS", &(m_skb.VAHCLM_D09H4_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V1_DIF_POS", &(m_skb.VAHCLM_D09V1_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V2_DIF_POS", &(m_skb.VAHCLM_D09V2_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V3_DIF_POS", &(m_skb.VAHCLM_D09V3_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D09V4_DIF_POS", &(m_skb.VAHCLM_D09V4_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H1_DIF_POS", &(m_skb.VAHCLM_D12H1_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H2_DIF_POS", &(m_skb.VAHCLM_D12H2_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H3_DIF_POS", &(m_skb.VAHCLM_D12H3_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12H4_DIF_POS", &(m_skb.VAHCLM_D12H4_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V1_DIF_POS", &(m_skb.VAHCLM_D12V1_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V2_DIF_POS", &(m_skb.VAHCLM_D12V2_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V3_DIF_POS", &(m_skb.VAHCLM_D12V3_DIF_POS));
+    m_tree->SetBranchAddress("VAHCLM_D12V4_DIF_POS", &(m_skb.VAHCLM_D12V4_DIF_POS));
+
+    //SKB LER collimator absolute positions as measured by DMM
+    m_tree->SetBranchAddress("VALCLM_D06H4IN_CSS_NOWPOS_DMM", &(m_skb.VALCLM_D06H4IN_CSS_NOWPOS_DMM));
+    m_tree->SetBranchAddress("VALCLM_D06H4OUT_CSS_NOWPOS_DMM", &(m_skb.VALCLM_D06H4OUT_CSS_NOWPOS_DMM));
+    m_tree->SetBranchAddress("VALCLM_D06H3IN_CSS_NOWPOS_DMM", &(m_skb.VALCLM_D06H3IN_CSS_NOWPOS_DMM));
+    m_tree->SetBranchAddress("VALCLM_D06H3OUT_CSS_NOWPOS_DMM", &(m_skb.VALCLM_D06H3OUT_CSS_NOWPOS_DMM));
+
+    //SKB LER beam position in X
+    m_tree->SetBranchAddress("VALCLM_D06H4IN_CSS_NOWPOS_BMX_POS", &(m_skb.VALCLM_D06H4IN_CSS_NOWPOS_BMX_POS));
+    m_tree->SetBranchAddress("VALCLM_D06H4OUT_CSS_NOWPOS_BMX_POS", &(m_skb.VALCLM_D06H4OUT_CSS_NOWPOS_BMX_POS));
+    m_tree->SetBranchAddress("VALCLM_D06H3IN_CSS_NOWPOS_BMX_POS", &(m_skb.VALCLM_D06H3IN_CSS_NOWPOS_BMX_POS));
+    m_tree->SetBranchAddress("VALCLM_D06H3OUT_CSS_NOWPOS_BMX_POS", &(m_skb.VALCLM_D06H3OUT_CSS_NOWPOS_BMX_POS));
+
+    //Beam size monitors
+    m_tree->SetBranchAddress("BMHSRM_BEAM_SIGMAX", &(m_skb.BMHSRM_BEAM_SIGMAX));
+    m_tree->SetBranchAddress("BMHSRM_BEAM_SIGMAY", &(m_skb.BMHSRM_BEAM_SIGMAY));
+    m_tree->SetBranchAddress("BMLSRM_BEAM_SIGMAX", &(m_skb.BMLSRM_BEAM_SIGMAX));
+    m_tree->SetBranchAddress("BMLSRM_BEAM_SIGMAY", &(m_skb.BMLSRM_BEAM_SIGMAY));
     m_tree->SetBranchAddress("BMHXRM_BEAM_SIGMAY", &(m_skb.BMHXRM_BEAM_SIGMAY));
     m_tree->SetBranchAddress("BMLXRM_BEAM_SIGMAY", &(m_skb.BMLXRM_BEAM_SIGMAY));
+    m_tree->SetBranchAddress("BMHXRM_BEAM_SIGMAX", &(m_skb.BMHXRM_BEAM_SIGMAX));
+    m_tree->SetBranchAddress("BMLXRM_BEAM_SIGMAX", &(m_skb.BMLXRM_BEAM_SIGMAX));
+
+    //Integrated beam dose in A*hours
+    m_tree->SetBranchAddress("VAHBMD_BEAMDOSE_VAL", &(m_skb.VAHBMD_BEAMDOSE_VAL));
+    m_tree->SetBranchAddress("VALBMD_BEAMDOSE_VAL", &(m_skb.VALBMD_BEAMDOSE_VAL));
+
+    //Bunch number
     m_tree->SetBranchAddress("CGHINJ_BKSEL_NOB_SET", &(m_skb.CGHINJ_BKSEL_NOB_SET));
     m_tree->SetBranchAddress("CGLINJ_BKSEL_NOB_SET", &(m_skb.CGLINJ_BKSEL_NOB_SET));
+
+
     /*
     m_tree->SetBranchAddress("VALCCG_D02_L18_PRES", &(m_skb.VALCCG_D02_L18_PRES));
     m_tree->SetBranchAddress("VALCCG_D02_L19_PRES", &(m_skb.VALCCG_D02_L19_PRES));
@@ -259,6 +396,7 @@ namespace Belle2 {
     m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
     m_treeBEAST = new TTree("tout", "BEAST data tree (simulation)");
     m_treeBEAST->Branch("ts", &(m_beast.ts));
+    /*
     m_treeBEAST->Branch("SKB_LER_current", &(m_beast.SKB_LER_current));
     m_treeBEAST->Branch("SKB_HER_current", &(m_beast.SKB_HER_current));
     m_treeBEAST->Branch("SKB_LER_pressure", &(m_beast.SKB_LER_pressure));
@@ -277,6 +415,58 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_HER_injection_OneBunch_BucketNumber", &(m_beast.SKB_HER_injection_OneBunch_BucketNumber));
     m_treeBEAST->Branch("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
     m_treeBEAST->Branch("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
+    */
+
+    m_treeBEAST->Branch("SKB_HER_injectionFlag", &(m_beast.SKB_HER_injectionFlag));
+    m_treeBEAST->Branch("SKB_LER_injectionFlag", &(m_beast.SKB_LER_injectionFlag));
+    m_treeBEAST->Branch("SKB_status", &(m_beast.SKB_status));
+    m_treeBEAST->Branch("SKB_HER_injectionRate", &(m_beast.SKB_HER_injectionRate));
+    m_treeBEAST->Branch("SKB_LER_injectionRate", &(m_beast.SKB_LER_injectionRate));
+    m_treeBEAST->Branch("SKB_HER_beamLife", &(m_beast.SKB_HER_beamLife));
+    m_treeBEAST->Branch("SKB_LER_beamLife", &(m_beast.SKB_LER_beamLife));
+    m_treeBEAST->Branch("SKB_LER_current", &(m_beast.SKB_LER_current));
+    m_treeBEAST->Branch("SKB_HER_current", &(m_beast.SKB_HER_current));
+    m_treeBEAST->Branch("SKB_LER_injectionEfficiency", &(m_beast.SKB_LER_injectionEfficiency));
+    m_treeBEAST->Branch("SKB_HER_injectionEfficiency", &(m_beast.SKB_HER_injectionEfficiency));
+    m_treeBEAST->Branch("SKB_IP_beamLoss_IonChambers", &(m_beast.SKB_IP_beamLoss_IonChambers));
+    m_treeBEAST->Branch("SKB_IP_beamLoss_PINdiodes", &(m_beast.SKB_IP_beamLoss_PINdiodes));
+    m_treeBEAST->Branch("SKB_LER_beamLoss_NearCollimators", &(m_beast.SKB_LER_beamLoss_NearCollimators));
+    m_treeBEAST->Branch("SKB_HER_beamLoss_NearCollimators", &(m_beast.SKB_HER_beamLoss_NearCollimators));
+    m_treeBEAST->Branch("SKB_LER_injectionCharge", &(m_beast.SKB_LER_injectionCharge));
+    m_treeBEAST->Branch("SKB_HER_injectionCharge", &(m_beast.SKB_HER_injectionCharge));
+    m_treeBEAST->Branch("SKB_HER_beamLife_2", &(m_beast.SKB_HER_beamLife_2));
+    m_treeBEAST->Branch("SKB_LER_beamLife_2", &(m_beast.SKB_LER_beamLife_2));
+    m_treeBEAST->Branch("SKB_LER_injection_RepetitionRate", &(m_beast.SKB_LER_injection_RepetitionRate));
+    m_treeBEAST->Branch("SKB_HER_injection_RepetitionRate", &(m_beast.SKB_HER_injection_RepetitionRate));
+    m_treeBEAST->Branch("SKB_injection_BucketSelection", &(m_beast.SKB_injection_BucketSelection));
+    m_treeBEAST->Branch("SKB_injection_AutoFill_Mode", &(m_beast.SKB_injection_AutoFill_Mode));
+    m_treeBEAST->Branch("SKB_injection_AutoFill_Nbunches", &(m_beast.SKB_injection_AutoFill_Nbunches));
+    m_treeBEAST->Branch("SKB_LER_injection_OneBunch_BucketNumber", &(m_beast.SKB_LER_injection_OneBunch_BucketNumber));
+    m_treeBEAST->Branch("SKB_HER_injection_OneBunch_BucketNumber", &(m_beast.SKB_HER_injection_OneBunch_BucketNumber));
+    m_treeBEAST->Branch("SKB_injection_OneBunch_Nbunches", &(m_beast.SKB_injection_OneBunch_Nbunches));
+    m_treeBEAST->Branch("SKB_LER_abort", &(m_beast.SKB_LER_abort));
+    m_treeBEAST->Branch("SKB_HER_abort", &(m_beast.SKB_HER_abort));
+    m_treeBEAST->Branch("SKB_LER_pressure", &(m_beast.SKB_LER_pressure));
+    m_treeBEAST->Branch("SKB_HER_pressure", &(m_beast.SKB_HER_pressure));
+    m_treeBEAST->Branch("SKB_LER_averagePressure", &(m_beast.SKB_LER_averagePressure));
+    m_treeBEAST->Branch("SKB_HER_averagePressure", &(m_beast.SKB_HER_averagePressure));
+    m_treeBEAST->Branch("SKB_HER_collimatorAbsolutePosition", &(m_beast.SKB_HER_collimatorAbsolutePosition));
+    m_treeBEAST->Branch("SKB_HER_collimatorBeamPositionX", &(m_beast.SKB_HER_collimatorBeamPositionX));
+    m_treeBEAST->Branch("SKB_HER_collimatorBeamPositionY", &(m_beast.SKB_HER_collimatorBeamPositionY));
+    m_treeBEAST->Branch("SKB_HER_collimatorDistanceToBeam", &(m_beast.SKB_HER_collimatorDistanceToBeam));
+    m_treeBEAST->Branch("SKB_LER_collimatorBeamPositionX", &(m_beast.SKB_LER_collimatorBeamPositionX));
+    m_treeBEAST->Branch("SKB_LER_collimatorBeamPositionY", &(m_beast.SKB_LER_collimatorBeamPositionY));
+    m_treeBEAST->Branch("SKB_LER_collimatorDistanceToBeam", &(m_beast.SKB_LER_collimatorDistanceToBeam));
+    m_treeBEAST->Branch("SKB_HER_BeamSize_xray_X", &(m_beast.SKB_HER_BeamSize_xray_X));
+    m_treeBEAST->Branch("SKB_HER_BeamSize_xray_Y", &(m_beast.SKB_HER_BeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_LER_BeamSize_xray_X", &(m_beast.SKB_LER_BeamSize_xray_X));
+    m_treeBEAST->Branch("SKB_LER_BeamSize_xray_Y", &(m_beast.SKB_LER_BeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_LER_BeamSize_SR_X", &(m_beast.SKB_LER_BeamSize_SR_X));
+    m_treeBEAST->Branch("SKB_LER_BeamSize_SR_Y", &(m_beast.SKB_LER_BeamSize_SR_Y));
+    m_treeBEAST->Branch("SKB_HER_BeamSize_SR_X", &(m_beast.SKB_HER_BeamSize_SR_X));
+    m_treeBEAST->Branch("SKB_HER_BeamSize_SR_Y", &(m_beast.SKB_HER_BeamSize_SR_Y));
+    m_treeBEAST->Branch("SKB_HER_integratedCurrent", &(m_beast.SKB_HER_integratedCurrent));
+    m_treeBEAST->Branch("SKB_LER_integratedCurrent", &(m_beast.SKB_LER_integratedCurrent));
 
     m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
     m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
@@ -410,60 +600,70 @@ namespace Belle2 {
     if (I_LER < 0) I_LER = 0;
     if (P_HER < 0) P_HER = 0;
     if (P_LER < 0) P_LER = 0;
-    float coefBG_HER = 0;
-    float coefBG_LER = 0;
-    float coefTo_HER = 0;
-    float coefTo_LER = 0;
+
+    //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
+    float ScaleFacBG_HER = 0;
+    float ScaleFacBG_LER = 0;
     if (I_LER > 0 && P_LER > 0)
-      coefBG_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+      ScaleFacBG_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
     if (I_HER > 0 && P_HER > 0)
-      coefBG_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+      ScaleFacBG_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+
+    //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
+    float ScaleFacTo_HER = 0;
+    float ScaleFacTo_LER = 0;
     if (bunch_nb_LER > 0 && sigma_y_LER > 0)
-      coefTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
-                                2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_LER[0]);
+      ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
+                                    2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_LER[0]);
     if (bunch_nb_HER > 0 && sigma_y_HER > 0)
-      coefTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
-                                2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_HER[0]);
+      ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
+                                    2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_HER[0]);
+
+    //Scale DIA
     for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
       float LBG = m_input_LB_DIA_dose[i] + m_input_LC_DIA_dose[i];
       float HBG = m_input_HB_DIA_dose[i] + m_input_HC_DIA_dose[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_DIA_dose[i] + coefTo_HER * m_input_HB_DIA_dose[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_DIA_dose[i] + ScaleFacTo_HER * m_input_HB_DIA_dose[i];
       m_beast.DIA_dose.push_back(BG + To);
     }
+    //Scale PIN
     for (int i = 0; i < (int)m_input_LT_PIN_dose.size(); i++) {
       float LBG = m_input_LB_PIN_dose[i] + m_input_LC_PIN_dose[i];
       float HBG = m_input_HB_PIN_dose[i] + m_input_HC_PIN_dose[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_PIN_dose[i] + coefTo_HER * m_input_HB_PIN_dose[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_PIN_dose[i] + ScaleFacTo_HER * m_input_HB_PIN_dose[i];
       m_beast.PIN_dose.push_back(BG + To);
     }
+    //Scale BGO
     for (int i = 0; i < (int)m_input_LT_BGO_dose.size(); i++) {
       float LBG = m_input_LB_BGO_dose[i] + m_input_LC_BGO_dose[i];
       float HBG = m_input_HB_BGO_dose[i] + m_input_HC_BGO_dose[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_BGO_dose[i] + coefTo_HER * m_input_HB_BGO_dose[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_BGO_dose[i] + ScaleFacTo_HER * m_input_HB_BGO_dose[i];
       m_beast.BGO_energy.push_back(BG + To);
     }
+    //Scale HE3
     for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
       float LBG = m_input_LB_HE3_rate[i] + m_input_LC_HE3_rate[i];
       float HBG = m_input_HB_HE3_rate[i] + m_input_HC_HE3_rate[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_HE3_rate[i] + coefTo_HER * m_input_HB_HE3_rate[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_HE3_rate[i] + ScaleFacTo_HER * m_input_HB_HE3_rate[i];
       m_beast.HE3_rate.push_back(BG + To);
     }
+    //Scale CSI
     for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
       float LBG = m_input_LB_CSI_dose[i] + m_input_LC_CSI_dose[i];
       float HBG = m_input_HB_CSI_dose[i] + m_input_HC_CSI_dose[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_CSI_dose[i] + coefTo_HER * m_input_HB_CSI_dose[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_CSI_dose[i] + ScaleFacTo_HER * m_input_HB_CSI_dose[i];
       m_beast.CSI_sumE.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       float LBG = m_input_LB_CSI_rate[i] + m_input_LC_CSI_rate[i];
       float HBG = m_input_HB_CSI_rate[i] + m_input_HC_CSI_rate[i];
-      float BG = LBG * coefBG_LER + HBG * coefBG_HER;
-      float To = coefTo_LER * m_input_LB_CSI_rate[i] + coefTo_HER * m_input_HB_CSI_rate[i];
+      float BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      float To = ScaleFacTo_LER * m_input_LB_CSI_rate[i] + ScaleFacTo_HER * m_input_HB_CSI_rate[i];
       m_beast.CSI_hitRate.push_back(BG + To);
     }
 

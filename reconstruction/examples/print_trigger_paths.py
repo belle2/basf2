@@ -9,5 +9,4 @@ for mode, label in zip(modes, labels):
     print("%s Mode:" % label)
     path = create_path()
     add_reconstruction(path, trigger_mode=mode, match_to_mc_information=False)
-    for module in path.modules():
-        print(module)
+    print(path)

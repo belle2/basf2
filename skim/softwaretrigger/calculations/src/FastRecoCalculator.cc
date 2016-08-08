@@ -45,7 +45,7 @@ namespace Belle2 {
 
       for (const T& item : storeArray) {
         const TLorentzVector& fourVector = getFourVector(item);
-        lorentzVectors.push_back(std::move(PCmsLabTransform::labToCms(fourVector)));
+        lorentzVectors.push_back(PCmsLabTransform::labToCms(fourVector));
       }
 
       std::sort(lorentzVectors.begin(), lorentzVectors.end(),
@@ -57,7 +57,7 @@ namespace Belle2 {
       energies.reserve(lorentzVectors.size());
 
       for (const TLorentzVector& lorentzVector : lorentzVectors) {
-        energies.push_back(std::move(lorentzVector.Energy()));
+        energies.push_back(lorentzVector.Energy());
       }
 
       return energies;
@@ -69,7 +69,7 @@ namespace Belle2 {
       momenta.reserve(m_cdcRecoTracks.getEntries());
 
       for (const RecoTrack& cdcRecoTrack : m_cdcRecoTracks) {
-        momenta.push_back(std::move(cdcRecoTrack.getMomentumSeed()));
+        momenta.push_back(cdcRecoTrack.getMomentumSeed());
       }
 
       // TODO: Do only return the first (we do not need more).

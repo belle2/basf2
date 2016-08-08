@@ -157,7 +157,7 @@ def add_arich_modules(path, components=None):
     Add the ARICH reconstruction to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
         arich_rec = register_module('ARICHReconstructor')
@@ -169,7 +169,7 @@ def add_top_modules(path, components=None):
     Add the TOP reconstruction to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     # TOP reconstruction
     if components is None or 'TOP' in components:
@@ -182,7 +182,7 @@ def add_cluster_expert_modules(path, components=None):
     Add the cluster expert modules to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     # klong id and cluster matcher, whcih also builds "cluster"
     if components is None or 'EKLM' and 'BKLM' and 'ECL' in components:
@@ -201,7 +201,7 @@ def add_pid_module(path, components=None):
     Add the PID modules to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     # charged particle PID
     if components is None or 'SVD' in components or 'CDC' in components:
@@ -214,7 +214,7 @@ def add_klm_modules(path, components=None):
     Add the (E/B)KLM reconstruction modules to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'EKLM' in components:
         eklm_rec = register_module('EKLMReconstructor')
@@ -236,7 +236,7 @@ def add_klm_mc_matcher_module(path, components=None):
     Add the (E/B)KLM mc matcher module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     # MC matching
     if components is None or 'BKLM' in components or 'EKLM' in components:
@@ -249,7 +249,7 @@ def add_muid_module(path, components=None):
     Add the MuID module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'BKLM' in components and 'EKLM' in components:
         muid = register_module('Muid')
@@ -261,7 +261,7 @@ def add_ecl_modules(path, components=None):
     Add the ECL reconstruction modules to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     # ECL calibration and reconstruction
     if components is None or 'ECL' in components:
@@ -299,7 +299,7 @@ def add_ecl_track_matcher_module(path, components=None):
     Add the ECL track matcher module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
         # track shower matching
@@ -312,7 +312,7 @@ def add_ecl_eip_module(path, components=None):
     Add the ECL electron ID module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
         # electron ID
@@ -325,7 +325,7 @@ def add_ecl_mc_matcher_module(path, components=None):
     Add the ECL MC matcher module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ECL' in components:
         # MC matching
@@ -338,7 +338,7 @@ def add_ext_module(path, components=None):
     Add the extrapolation module to the path.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     """
     if components is None or 'CDC' in components:
         ext = register_module('Ext')
@@ -351,7 +351,7 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
     and prune the tracks afterwards if wanted.
 
     :param path: The path to add the modules to.
-    :param components: The components to use of None to use all standard components.
+    :param components: The components to use or None to use all standard components.
     :param pruneTracks: delete all hits except the first or last hit in the tracks.
     """
     # CDC dE/dx PID

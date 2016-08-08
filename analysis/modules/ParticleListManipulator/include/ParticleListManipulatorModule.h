@@ -92,11 +92,6 @@ namespace Belle2 {
      */
     bool isUnique(const std::vector<int>& idSequence);
 
-    /**
-     * Compares two sequences and returns true if they are found to be the same.
-     */
-    bool isIdenticalSequence(const std::vector<int>& idSeqIN, const std::vector<int>& idSeqOUT);
-
   };
 
 } // Belle2 namespace

@@ -184,21 +184,8 @@ namespace Belle2 {
     for (unsigned i = 0; i < m_particlesInTheList.size(); i++) {
       std::vector<int> idSeqIN = m_particlesInTheList[i];
 
-      bool sameSeq = isIdenticalSequence(idSeqIN, idSeqOUT);
+      bool sameSeq = (idSeqIN == idSeqOUT);
       if (sameSeq)
-        return false;
-    }
-
-    return true;
-  }
-
-  bool ParticleListManipulatorModule::isIdenticalSequence(const std::vector<int>& idSeqIN, const std::vector<int>& idSeqOUT)
-  {
-    if (idSeqIN.size() != idSeqOUT.size())
-      return false;
-
-    for (unsigned i = 0; i < idSeqIN.size(); i++) {
-      if (idSeqIN[i] != idSeqOUT[i])
         return false;
     }
 

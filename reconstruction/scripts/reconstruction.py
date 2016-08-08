@@ -12,23 +12,42 @@ from tracking import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True):
+def add_reconstruction(path, components=None, pruneTracks=True, match_to_mc_information=True, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
 
-    @param components list of geometry components to include reconstruction for, or None for all components.
+    :param path: Add the modules to this path.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
+    :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
+    :param match_to_mc_information: Match the found entities to MC information where possible. Please note that this is
+        only possible if MC information is present in the DataStore.
+    :param trigger_mode: Trigger mode to emulate. Possible values are: "all", "hlt", "fast_reco".
+        * "all": Normal mode. Do add all the modules in the standard reconstruction. This is the mode for the typical
+                user.
+        * "fast_reco": Only add those modules that are needed for classifying an event as background or not in the
+                fast reco part of the software trigger.
+        * "hlt": Only add those modules thar are needed for classifying an event as background or not in the
+                hlt part of the software trigger. Please note that the fast reco part is also needed for this to work.
+
+        The trigger_mode does just steer, which modules in the standard reconstruction are added to the path. It does
+        not make any trigger decisions itself.
     """
 
     # tracking
     add_tracking_reconstruction(path,
                                 components=components,
-                                pruneTracks=False)
+                                pruneTracks=False,
+                                mcTrackFinding=False,
+                                match_to_mc_information=match_to_mc_information,
+                                trigger_mode=trigger_mode)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
-                                    pruneTracks=pruneTracks)
+                                    pruneTracks=pruneTracks,
+                                    match_to_mc_information=match_to_mc_information,
+                                    trigger_mode=trigger_mode)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True):
@@ -50,32 +69,42 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True):
                                     pruneTracks=pruneTracks)
 
 
-def add_posttracking_reconstruction(path, components=None, pruneTracks=True):
+def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
+                                    match_to_mc_information=True, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
 
     @param components list of geometry components to include reconstruction for, or None for all components.
     """
-    add_dedx_modules(path, components, pruneTracks)
 
-    add_ext_module(path, components)
+    if trigger_mode in ["hlt", "all"]:
+        add_dedx_modules(path, components, pruneTracks)
+        add_ext_module(path, components)
+        add_top_modules(path, components)
+        add_arich_modules(path, components)
 
-    add_top_modules(path, components)
+    if trigger_mode in ["fast_reco", "all"]:
+        add_ecl_modules(path, components)
 
-    add_arich_modules(path, components)
+    if trigger_mode in ["hlt", "all"]:
+        add_ecl_track_matcher_module(path, components)
+        add_ecl_eip_module(path, components)
 
-    add_ecl_modules(path, components)
-    add_ecl_track_matcher_module(path, components)
-    add_ecl_eip_module(path, components)
-    add_ecl_mc_matcher_module(path, components)
+    if trigger_mode in ["hlt", "all"]:
+        if match_to_mc_information:
+            add_ecl_mc_matcher_module(path, components)
 
-    add_klm_modules(path, components)
-    add_klm_mc_matcher_module(path, components)
+        add_klm_modules(path, components)
 
-    add_pid_module(path, components)
+        if match_to_mc_information:
+            add_klm_mc_matcher_module(path, components)
 
-    add_cluster_expert_modules(path, components)
+        add_pid_module(path, components)
+
+    if trigger_mode in ["all"]:
+        # FIXME: Disabled for HLT until performance bug is fixed
+        add_cluster_expert_modules(path, components)
 
 
 def add_mdst_output(

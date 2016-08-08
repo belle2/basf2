@@ -147,7 +147,7 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   return createdTrackCand;
 }
 
-size_t RecoTrack::addHitsFromRecoTrack(RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
+size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset)
 {
   size_t hitsCopied = 0;
 

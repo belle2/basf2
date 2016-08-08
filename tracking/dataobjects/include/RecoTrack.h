@@ -181,11 +181,11 @@ namespace Belle2 {
      * @todo Let the track finders determine the cov seed.
      */
     static RecoTrack* createFromTrackCand(const genfit::TrackCand& trackCand,
-                                          const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
-                                          const std::string& storeArrayNameOfCDCHits = "CDCHits",
-                                          const std::string& storeArrayNameOfSVDHits = "SVDClusters",
-                                          const std::string& storeArrayNameOfPXDHits = "PXDClusters",
-                                          const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations",
+                                          const std::string& storeArrayNameOfRecoTracks = "",
+                                          const std::string& storeArrayNameOfCDCHits = "",
+                                          const std::string& storeArrayNameOfSVDHits = "",
+                                          const std::string& storeArrayNameOfPXDHits = "",
+                                          const std::string& storeArrayNameOfRecoHitInformation = "",
                                           const bool recreateSortingParameters = false
                                          );
 
@@ -218,7 +218,7 @@ namespace Belle2 {
      *        this reco track.
      * @return The number of hits copied.
      */
-    size_t addHitsFromRecoTrack(RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
+    size_t addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigned int sortingParameterOffset = 0);
 
     /**
      * Adds a pxd hit with the given information to the reco track.

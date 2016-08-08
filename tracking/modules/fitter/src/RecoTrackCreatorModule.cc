@@ -12,8 +12,6 @@
 #include <tracking/dataobjects/RecoHitInformation.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include <framework/datastore/RelationArray.h>
-
 using namespace std;
 using namespace Belle2;
 
@@ -86,17 +84,11 @@ void RecoTrackCreatorModule::initialize()
 
 void RecoTrackCreatorModule::event()
 {
-  StoreArray <genfit::TrackCand> trackCandidates(m_param_trackCandidatesStoreArrayName);
+  StoreArray<genfit::TrackCand> trackCandidates(m_param_trackCandidatesStoreArrayName);
 
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
-  if (not recoTracks.isValid()) {
-    recoTracks.create();
-  }
 
   StoreArray<RecoHitInformation> recoHitInformations(m_param_recoHitInformationStoreArrayName);
-  if (not recoHitInformations.isValid()) {
-    recoHitInformations.create();
-  }
 
   StoreArray<MCParticle> mcParticles;
 
@@ -123,7 +115,7 @@ void RecoTrackCreatorModule::event()
       if (relatedMCParticle) {
         newRecoTrack->addRelationTo(relatedMCParticle);
       } else {
-        B2WARNING("Related MCParticle is invalid. Can not make a relations.");
+        B2WARNING("Related MCParticle is invalid. Can not make a relation.");
       }
     }
   }

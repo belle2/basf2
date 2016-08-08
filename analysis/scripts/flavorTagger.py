@@ -768,18 +768,19 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
                 signalFraction=signalFraction,
                 identifiers=[row[1] for row in identifiersExtrainfosDict[particleList]])
 
-        trackAndEventLevelKaonPionPath = create_path()
-        SkipEmptyParticleList = register_module("SkimFilter")
-        SkipEmptyParticleList.param('particleLists', 'K+:KaonROE')
-        SkipEmptyParticleList.if_true(trackAndEventLevelKaonPionPath, AfterConditionPath.CONTINUE)
-        path.add_module(SkipEmptyParticleList)
+        if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
+            trackAndEventLevelKaonPionPath = create_path()
+            SkipEmptyParticleList = register_module("SkimFilter")
+            SkipEmptyParticleList.param('particleLists', 'K+:KaonROE')
+            SkipEmptyParticleList.if_true(trackAndEventLevelKaonPionPath, AfterConditionPath.CONTINUE)
+            path.add_module(SkipEmptyParticleList)
 
-        trackAndEventLevelKaonPionPath.add_module(
-            'MVAExpert',
-            listNames=['K+:KaonROE'],
-            extraInfoName=identifiersExtrainfosKaonPion[0][0],
-            signalFraction=signalFraction,
-            identifier=identifiersExtrainfosKaonPion[0][1])
+            trackAndEventLevelKaonPionPath.add_module(
+                'MVAExpert',
+                listNames=['K+:KaonROE'],
+                extraInfoName=identifiersExtrainfosKaonPion[0][0],
+                signalFraction=signalFraction,
+                identifier=identifiersExtrainfosKaonPion[0][1])
         return True
 
 

@@ -108,6 +108,10 @@ namespace Belle2 {
 
   float MVAExpertModule::analyse(Particle* particle)
   {
+    if (not m_expert) {
+      B2ERROR("MVA Expert is not loaded! I will return 0");
+      return 0.0;
+    }
     for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
       m_dataset->m_input[i] = m_feature_variables[i]->function(particle);
     }

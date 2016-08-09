@@ -117,13 +117,14 @@ namespace {
     // Error and throw runtime error if method does not exist
     trivial_weightfile2.addElement("method", "DOESNOTEXIST");
     MVA::Weightfile::saveToXMLFile(trivial_weightfile2, "weightfile2.xml");
-    weightfile = teacher->train(dataset);
+
+    auto weightfile2 = teacher->train(dataset);
     try {
-      EXPECT_B2ERROR(expert->load(weightfile));
+      EXPECT_B2ERROR(expert->load(weightfile2));
     } catch (...) {
 
     }
-    EXPECT_THROW(expert->load(weightfile), std::runtime_error);
+    EXPECT_THROW(expert->load(weightfile2), std::runtime_error);
 
 
   }

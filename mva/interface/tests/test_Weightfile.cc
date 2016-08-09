@@ -291,9 +291,10 @@ namespace {
       EXPECT_TRUE(boost::filesystem::exists(filename));
     }
     EXPECT_TRUE(boost::filesystem::exists(filename));
-    boost::filesystem::remove_all(filename);
+    // Does not delete the directory itself
+    boost::filesystem::remove_all(boost::filesystem::path(filename).parent_path());
 
-    char* directory_template = strdup("/tmp/Basf2Sub.XXXXXXXXXX");
+    char* directory_template = strdup("/tmp/Basf2Sub.XXXXXX");
     auto tempdir = std::string(mkdtemp(directory_template));
     {
       MVA::Weightfile weightfile2;

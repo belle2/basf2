@@ -81,7 +81,7 @@ namespace Belle2 {
 
     std::string Weightfile::getFileName(const std::string& suffix)
     {
-      char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXXXXXX").c_str());
+      char* directory_template = strdup((m_temporary_directory + "/Basf2MVA.XXXXXX").c_str());
       auto directory = mkdtemp(directory_template);
       std::string tmpfile = std::string(directory) + std::string("/weightfile") + suffix;
       m_filenames.push_back(directory);

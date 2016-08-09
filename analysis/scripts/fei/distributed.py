@@ -212,6 +212,8 @@ if __name__ == '__main__':
             start = 4
         elif args.skip == 'submit':
             start = 5
+        elif args.skip == 'resubmit':
+            start = 6
         elif args.skip == 'run':
             start = 0
         else:
@@ -220,6 +222,13 @@ if __name__ == '__main__':
         if start >= 5:
             print('Submitting jobs')
             for i in range(args.nJobs):
+                if start >= 6:
+                    error_file = args.directory + '/jobs/{}/basf2_job_error'.format(i)
+                    if os.path.isfile(error_file):
+                        print("Delete " + error_file + " and resubmit job")
+                        os.remove(error_file)
+                    else:
+                        continue
                 if not submit_job(args, i):
                     raise RuntimeError('Error during submiting job')
 

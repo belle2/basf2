@@ -1422,6 +1422,11 @@ namespace Belle2 {
       return inf;
     }
 
+    double random(const Particle*)
+    {
+      return gRandom->Uniform(0, 1);
+    }
+
     VARIABLE_GROUP("Kinematics");
     REGISTER_VARIABLE("p", particleP, "momentum magnitude");
     REGISTER_VARIABLE("E", particleE, "energy");
@@ -1647,6 +1652,8 @@ namespace Belle2 {
                       "number of charged track matched to this cluster");
     REGISTER_VARIABLE("infinity", infinity,
                       "returns std::numeric_limits<double>::infinity()");
+    REGISTER_VARIABLE("random", random, "return a random number between 0 and 1. Can be used, e.g. for picking a random"
+                      "candidate in the best candidate selection.");
 
   }
 }

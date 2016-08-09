@@ -579,6 +579,11 @@ namespace Belle2 {
      * return std::numeric_limits<double>::infinity()
      */
     double infinity(const Particle*);
+
+    /**
+     * return a random number between 0 and 1
+     */
+    double random(const Particle*);
   }
 } // Belle2 namespace
 

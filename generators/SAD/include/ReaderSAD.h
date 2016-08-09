@@ -18,7 +18,6 @@
 #include <TGeoMatrix.h>
 #include <TFile.h>
 #include <TTree.h>
-#include <TRandom3.h>
 
 #include <string>
 
@@ -116,8 +115,6 @@ namespace Belle2 {
 
 
   protected:
-
-    TRandom3 m_random;             /**< The internal random number generator. */
 
     TFile* m_file;                 /**< The input root file. */
     TTree* m_tree;                 /**< The input root tree. */

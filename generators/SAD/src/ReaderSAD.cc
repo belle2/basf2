@@ -27,6 +27,8 @@
 #include <framework/dataobjects/EventMetaData.h>
 //End my addition
 
+#include <TRandom3.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -337,8 +339,8 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   double totalMomSqr = m_lostE * m_lostE; // SAD output "E" is "P", in fact.
 
   if (gaussSmearing) {
-    particleMomSAD[0] = m_random.Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
-    particleMomSAD[1] = -1.0 * m_random.Gaus(m_lostPy, m_pyRes * m_lostPy);
+    particleMomSAD[0] = gRandom->Gaus(m_lostPx, m_pxRes * m_lostPx); //1% px resolution
+    particleMomSAD[1] = -1.0 * gRandom->Gaus(m_lostPy, m_pyRes * m_lostPy);
   } else {
     particleMomSAD[0] = m_lostPx;
     particleMomSAD[1] = -m_lostPy;
@@ -384,7 +386,7 @@ int ReaderSAD::calculateRealParticleNumber(double rate)
   int numPart_int = static_cast<int>(floor(numPart));
   double numPart_dec = numPart  - numPart_int;
 
-  double rnd = m_random.Uniform(); //returns a random number in the interval ]0, 1]
+  double rnd = gRandom->Uniform(); //returns a random number in the interval ]0, 1]
   if (rnd < numPart_dec) numPart_int += 1;
 
   return numPart_int;

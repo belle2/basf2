@@ -227,6 +227,7 @@ if __name__ == '__main__':
                     if os.path.isfile(error_file):
                         print("Delete " + error_file + " and resubmit job")
                         os.remove(error_file)
+                        os.remove(args.directory + '/jobs/{}/basf2_finished_successfully'.format(i))
                     else:
                         continue
                 if not submit_job(args, i):

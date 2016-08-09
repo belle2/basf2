@@ -12,12 +12,16 @@ import glob
 import subprocess
 import difflib
 from concurrent.futures import ThreadPoolExecutor
+import threading
 import argparse
 import re
 
 # allow stopping tests with Ctrl+c
 import signal
 signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+# avoid mixing print statements from different threads
+print_lock = threading.Lock()
 
 
 def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
@@ -49,6 +53,7 @@ def run_test(argument):
     """Run the test for the given steering file"""
 
     global options
+    global print_lock
 
     name, release_dir = argument
     steering = os.path.join(release_dir, name)
@@ -92,7 +97,8 @@ def run_test(argument):
             output.append("=== end %s ===\n" % name)
         extra = "".join(output)
 
-    print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
+    with print_lock:
+        print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
     return (result, message)
 
 

@@ -31,7 +31,7 @@ using namespace std;
 
 REG_MODULE(ECLExpert);
 
-ECLExpertModule::ECLExpertModule(): Module()
+ECLExpertModule::ECLExpertModule(): Module(), m_feature_variables(7, 0)
 {
   setDescription("Use to calculate KlId for each ECLCluster.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -55,8 +55,6 @@ void ECLExpertModule::initialize()
   StoreArray<ECLCluster> eclClusters;
   eclClusters.registerRelationTo(klids);
   //run KLMTMVA Expert first
-
-  m_feature_variables.resize(m_nVars);
 
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
@@ -88,9 +86,6 @@ void ECLExpertModule::init_mva(MVA::Weightfile& weightfile)
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  // Overwrite signal fraction from training
-  if (m_signal_fraction_override > 0)
-    weightfile.addSignalFraction(m_signal_fraction_override);
 
   m_expert = supported_interfaces[general_options.m_method]->getExpert();
   m_expert->load(weightfile);
@@ -129,7 +124,7 @@ void ECLExpertModule::event()
     const TVector3& clusterPos = cluster.getclusterPosition();
 
     //find closest track
-    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance = findClosestTrack(clusterPos);
+    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos);
     m_ECLtrackDist = get<1>(closestTrackAndDistance);
 
 

@@ -32,7 +32,7 @@ using namespace std;
 
 REG_MODULE(KLMExpert);
 
-KLMExpertModule::KLMExpertModule(): Module()
+KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(20, 0)
 {
   setDescription("Use to calculate KlId for each KLMCluster.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -62,8 +62,6 @@ void KLMExpertModule::initialize()
   StoreArray<KlId> klids;
   klmClusters.registerRelationTo(klids);
 
-  // resize n variables in the vector !!:w
-  m_feature_variables.resize(m_nVars);
 
   if (not(boost::ends_with(m_identifier, ".root") or boost::ends_with(m_identifier, ".xml"))) {
     m_weightfile_representation = std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>(new
@@ -99,17 +97,12 @@ void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
   MVA::GeneralOptions general_options;
   weightfile.getOptions(general_options);
 
-  // Overwrite signal fraction from training
-  if (m_signal_fraction_override > 0) {
-    weightfile.addSignalFraction(m_signal_fraction_override);
-  }
-
   m_expert = supported_interfaces[general_options.m_method]->getExpert();
   m_expert->load(weightfile);
 
   std::vector<float> dummy;
   dummy.resize(m_feature_variables.size(), 0);
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
+  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, std::move(dummy), 0));
 
 }
 
@@ -173,10 +166,10 @@ void KLMExpertModule::event()
 
     // calculate eucl. distance klmcluster <-> nearest track
     // extrapolate genfit trackfit result to their ends and find the
-    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
-      = findClosestTrack(clusterPos);
+    tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance
+                                                            = findClosestTrack(clusterPos);
     m_KLMtrackDist = get<1>(closestTrackAndDistance);
-    const TVector3* poca = get<2>(closestTrackAndDistance);
+    const TVector3* poca = get<2>(closestTrackAndDistance).get();
 
     if (poca and closestECLCluster) {
       const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;

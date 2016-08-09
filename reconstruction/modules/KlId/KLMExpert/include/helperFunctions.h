@@ -19,7 +19,7 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/Exception.h>
 #include <utility>
-
+#include <math.h>
 #include <TLorentzVector.h>
 
 using namespace Belle2;
@@ -119,16 +119,15 @@ namespace KlIdHelpers {
 
 
   /** find nearest genfit track and return it and its distance  */
-  tuple<RecoTrack*, double, const TVector3*> findClosestTrack(const TVector3& clusterPosition)
+  tuple<RecoTrack*, double, std::unique_ptr<const TVector3> > findClosestTrack(const TVector3& clusterPosition)
   {
     StoreArray<RecoTrack> genfitTracks;
-    double oldDistance = 999999;
+    double oldDistance = INFINITY;
     RecoTrack* closestTrack = nullptr;
-    const TVector3* poca = new TVector3(0, 0, 0); // inits as 0,0,0,
+    TVector3 poca = TVector3(0, 0, 0);
 
 
     for (RecoTrack& track : genfitTracks) {
-
       try {
         genfit::MeasuredStateOnPlane state;
         state = track.getMeasuredStateOnPlaneFromLastHit();
@@ -142,14 +141,18 @@ namespace KlIdHelpers {
         if (newDistance < oldDistance) {
           oldDistance = newDistance;
           closestTrack = &track;
-          poca = &trackPos;
+          poca = trackPos;
         }
 
       } catch (genfit::Exception& e) {
       }// try
     }// for gftrack
 
-    return make_tuple(closestTrack, oldDistance, poca);
+    if (not closestTrack) {
+      return make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(nullptr));
+    } else {
+      return make_tuple(closestTrack, oldDistance, std::unique_ptr<const TVector3>(new TVector3(poca)));
+    }
   }
 
 

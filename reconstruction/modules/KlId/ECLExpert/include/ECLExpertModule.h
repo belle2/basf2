@@ -45,6 +45,14 @@ namespace Belle2 {
     /** process event */
     virtual void event();
 
+    /** terminate and free */
+    virtual void terminate() override
+    {
+      m_expert.reset();
+      m_dataset.reset();
+    }
+
+
   protected:
 
   private:
@@ -70,13 +78,9 @@ namespace Belle2 {
     float m_ECLdeltaL; // new
     /** distance cluster to next track in ECL */
     float m_ECLtrackDist;
-    /** number of variables. used to resize the variable vector.  */
-    float m_nVars = 7;
 
     /** vars to be classified */
     std::vector<float> m_feature_variables;
-    /** true means use signal fraction from training  */
-    float m_signal_fraction_override;
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(

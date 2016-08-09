@@ -46,6 +46,14 @@ namespace Belle2 {
     /** process event */
     virtual void event();
 
+    /** terminate and free */
+    virtual void terminate() override
+    {
+      m_expert.reset();
+      m_dataset.reset();
+    }
+
+
   protected:
 
   private:
@@ -92,8 +100,6 @@ namespace Belle2 {
     /** angle between trach momentum and cluster (measured from ip) */
     float m_KLMTrackClusterSepAngle;
 
-
-
     // variables of closest ECL cluster with respect to KLM cluster
     /** distance associated ECL <-> KLM cluster, extrapolated by genfit */
     float m_KLMECLDist;
@@ -114,13 +120,8 @@ namespace Belle2 {
     /** primitive distance cluster <-> track for associated ECL cluster */
     float m_KLMtrackToECL;
 
-    /** number of variables. used to resize the variable vector.  */
-    float m_nVars = 20;
-
     /** vars to be classified */
     std::vector<float> m_feature_variables;
-    /** true means use signal fraction from training  */
-    float m_signal_fraction_override;
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(

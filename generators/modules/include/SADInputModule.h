@@ -12,6 +12,8 @@
 #define SADINPUTMODULE_H_
 
 #include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <generators/SAD/ReaderSAD.h>
 
 #include <string>
@@ -79,6 +81,8 @@ namespace Belle2 {
      * @param mpg Reference to the MCParticle Graph which is filled for each event.
      */
     void readRealParticle(ReaderSAD& reader, MCParticleGraph& mpg);
+
+    StoreObjPtr<EventMetaData> m_eventMetaDataPtr; /**< EventMetaData (for setting event weights). */
   };
 
 } // end namespace Belle2

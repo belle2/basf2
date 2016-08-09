@@ -17,8 +17,6 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 #include <TGeoMatrix.h>
@@ -59,9 +57,10 @@ SADInputModule::SADInputModule() : Module()
 
 void SADInputModule::initialize()
 {
-  //Register collections
-  //StoreArray<MCParticle> MCParticles;
-  StoreArray<MCParticle>::registerPersistent();
+  //Register inputs/outputs
+  m_eventMetaDataPtr.isRequired();
+  StoreArray<MCParticle> mcParticles;
+  mcParticles.registerInDataStore();
 
   //Check parameters
   if (!FileSystem::fileExists(m_filename)) {
@@ -95,7 +94,6 @@ void SADInputModule::event()
 {
   try {
     MCParticleGraph mpg;
-    StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
 
     try {
       //----------------------------------
@@ -119,7 +117,7 @@ void SADInputModule::event()
 
     } catch (ReaderSAD::SADEndOfFile& exc) {
       B2DEBUG(10, exc.what());
-      eventMetaDataPtr->setEndOfData();
+      m_eventMetaDataPtr->setEndOfData();
       return;
     }
   } catch (runtime_error& exc) {
@@ -134,15 +132,13 @@ void SADInputModule::event()
 
 void SADInputModule::readSADParticle(ReaderSAD& reader, MCParticleGraph& mpg)
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   double rate = reader.getSADParticle(mpg);
   if (rate < 0) return;
-  eventMetaDataPtr->setGeneratedWeight(rate);
+  m_eventMetaDataPtr->setGeneratedWeight(rate);
 }
 
 void SADInputModule::readRealParticle(ReaderSAD& reader, MCParticleGraph& mpg)
 {
-  StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   if (!reader.getRealParticle(mpg)) return;
-  eventMetaDataPtr->setGeneratedWeight(1.0);
+  m_eventMetaDataPtr->setGeneratedWeight(1.0);
 }

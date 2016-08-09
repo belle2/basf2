@@ -86,150 +86,148 @@ void KLMExpertModule::beginRun()
     }
   } else {
     auto weightfile = MVA::Weightfile::loadFromFile(m_identifier);
+
     init_mva(weightfile);
+
   }
 
-}
+  void KLMExpertModule::init_mva(MVA::Weightfile & weightfile) {
 
-void KLMExpertModule::init_mva(MVA::Weightfile& weightfile)
-{
+    auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
+    MVA::GeneralOptions general_options;
+    weightfile.getOptions(general_options);
 
-  auto supported_interfaces = MVA::AbstractInterface::getSupportedInterfaces();
-  MVA::GeneralOptions general_options;
-  weightfile.getOptions(general_options);
+    // Overwrite signal fraction from training
+    if (m_signal_fraction_override > 0)
+      weightfile.addSignalFraction(m_signal_fraction_override);
 
-  // Overwrite signal fraction from training
-  if (m_signal_fraction_override > 0)
-    weightfile.addSignalFraction(m_signal_fraction_override);
+    m_expert = supported_interfaces[general_options.m_method]->getExpert();
+    m_expert->load(weightfile);
 
-  m_expert = supported_interfaces[general_options.m_method]->getExpert();
-  m_expert->load(weightfile);
+    std::vector<float> dummy;
+    dummy.resize(m_feature_variables.size(), 0);
+    m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
 
-  std::vector<float> dummy;
-  dummy.resize(m_feature_variables.size(), 0);
-  m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(general_options, dummy, 0));
-
-}
+  }
 
 
-void KLMExpertModule::event()
-{
-  StoreArray<KLMCluster> klmClusters;
-  StoreArray<RecoTrack> genfitTracks;
-  StoreArray<ECLCluster> eclClusters;
-  StoreArray<KlId> KlIds;
+  void KLMExpertModule::event() {
+    StoreArray<KLMCluster> klmClusters;
+    StoreArray<RecoTrack> genfitTracks;
+    StoreArray<ECLCluster> eclClusters;
+    StoreArray<KlId> KlIds;
 
-  //overwritten at the end of the cluster loop
-  KlId* klid = nullptr;
-  double IDMVAOut;
+    //overwritten at the end of the cluster loop
+    KlId* klid = nullptr;
+    double IDMVAOut;
 
-  // loop thru clusters in event and classify
-  for (KLMCluster& cluster : klmClusters) {
+    // loop thru clusters in event and classify
+    for (KLMCluster& cluster : klmClusters) {
 
-    const TVector3& clusterPos = cluster.getClusterPosition();
+      const TVector3& clusterPos = cluster.getClusterPosition();
 
-    // get various KLMCluster vars
-    m_KLMglobalZ         = clusterPos.Z();
-    m_KLMnCluster        = klmClusters.getEntries();
-    m_KLMnLayer          = cluster.getLayers();
-    m_KLMnInnermostLayer = cluster.getInnermostLayer();
-    m_KLMtime            = cluster.getTime();
-    m_KLMinvM            = cluster.getMomentum().M2();
-    m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
+      // get various KLMCluster vars
+      m_KLMglobalZ         = clusterPos.Z();
+      m_KLMnCluster        = klmClusters.getEntries();
+      m_KLMnLayer          = cluster.getLayers();
+      m_KLMnInnermostLayer = cluster.getInnermostLayer();
+      m_KLMtime            = cluster.getTime();
+      m_KLMinvM            = cluster.getMomentum().M2();
+      m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
 
-    // find nearest ecl cluster and calculate distance
-    pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
-    ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
-    m_KLMECLDist = get<1>(closestECLAndDist);
-
-
-    if (!(closestECLCluster == nullptr)) {
-      m_KLMECLE      = closestECLCluster -> getEnergy();
-      m_KLMECLE9oE25 = closestECLCluster -> getE9oE25();
-      m_KLMECLTerror = closestECLCluster -> getErrorTiming();
-      m_KLMECLTiming = closestECLCluster -> getTiming();
-      m_KLMECLEerror = closestECLCluster -> getErrorEnergy();
-      m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();
-      m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
-    } else {
-
-      m_KLMECLdeltaL       = -999;
-      m_KLMECLminTrackDist = -999;
-
-      m_KLMECLE      = -999;
-      m_KLMECLE9oE25 = -999;
-      m_KLMECLTiming = -999;
-      m_KLMECLTerror = -999;
-      m_KLMECLEerror = -999;
-    }
-
-    // calculate distance to next cluster
-    tuple<const KLMCluster*, double, double> closestKLMAndDist = findClosestKLMCluster(clusterPos);
-    m_KLMnextCluster = get<1>(closestKLMAndDist);
-    m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
+      // find nearest ecl cluster and calculate distance
+      pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
+      ECLCluster* closestECLCluster = get<0>(closestECLAndDist);
+      m_KLMECLDist = get<1>(closestECLAndDist);
 
 
-    // calculate eucl. distance klmcluster <-> nearest track
-    // extrapolate genfit trackfit result to their ends and find the
-    tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
-      = findClosestTrack(clusterPos);
-    m_KLMtrackDist = get<1>(closestTrackAndDistance);
-    const TVector3* poca = get<2>(closestTrackAndDistance);
+      if (!(closestECLCluster == nullptr)) {
+        m_KLMECLE      = closestECLCluster -> getEnergy();
+        m_KLMECLE9oE25 = closestECLCluster -> getE9oE25();
+        m_KLMECLTerror = closestECLCluster -> getErrorTiming();
+        m_KLMECLTiming = closestECLCluster -> getTiming();
+        m_KLMECLEerror = closestECLCluster -> getErrorEnergy();
+        m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();
+        m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
+      } else {
 
-    if (poca and closestECLCluster) {
-      const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
-      m_KLMtrackToECL = trackECLClusterDist.Mag2();
-    } else {
-      m_KLMtrackToECL = -999;
-    }
+        m_KLMECLdeltaL       = -999;
+        m_KLMECLminTrackDist = -999;
 
+        m_KLMECLE      = -999;
+        m_KLMECLE9oE25 = -999;
+        m_KLMECLTiming = -999;
+        m_KLMECLTerror = -999;
+        m_KLMECLEerror = -999;
+      }
 
-    TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
-    m_KLMTrackSepDist         = trackSep->getDistance();
-    m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
-
-    m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
-    m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
-    m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
-
-
-    m_feature_variables[0] = m_KLMnCluster;
-    m_feature_variables[1] = m_KLMnLayer;
-    m_feature_variables[2] = m_KLMnInnermostLayer;
-    m_feature_variables[3] = m_KLMglobalZ;
-    m_feature_variables[4] = m_KLMtime;
-    m_feature_variables[5] = m_KLMinvM;
-    m_feature_variables[6] = m_KLMtrackDist;
-    m_feature_variables[7] = m_KLMnextCluster;
-    m_feature_variables[8] = m_KLMavInterClusterDist;
-    m_feature_variables[9] = m_KLMTrackSepDist;
-    m_feature_variables[10] = m_KLMTrackSepAngle;
-    m_feature_variables[11] = m_KLMInitialTrackSepAngle;
-    m_feature_variables[12] = m_KLMECLDist;
-    m_feature_variables[13] = m_KLMECLE;
-    m_feature_variables[14] = m_KLMECLE9oE25;
-    m_feature_variables[15] = m_KLMECLTiming;
-    m_feature_variables[16] = m_KLMECLEerror;
-    m_feature_variables[17] = m_KLMtrackToECL;
-    m_feature_variables[18] = m_KLMECLdeltaL;
-    m_feature_variables[19] = m_KLMECLminTrackDist;
+      // calculate distance to next cluster
+      tuple<const KLMCluster*, double, double> closestKLMAndDist = findClosestKLMCluster(clusterPos);
+      m_KLMnextCluster = get<1>(closestKLMAndDist);
+      m_KLMavInterClusterDist = get<2>(closestKLMAndDist);
 
 
-    // rewrite dataset
-    for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
-      m_dataset->m_input[i] = m_feature_variables[i];
-    }
+      // calculate eucl. distance klmcluster <-> nearest track
+      // extrapolate genfit trackfit result to their ends and find the
+      tuple<RecoTrack*, double, const TVector3*> closestTrackAndDistance
+        = findClosestTrack(clusterPos);
+      m_KLMtrackDist = get<1>(closestTrackAndDistance);
+      const TVector3* poca = get<2>(closestTrackAndDistance);
 
-    //classify dartaset
-    IDMVAOut = m_expert->apply(*m_dataset)[0];
+      if (poca and closestECLCluster) {
+        const TVector3& trackECLClusterDist = closestECLCluster->getPosition() - *poca;
+        m_KLMtrackToECL = trackECLClusterDist.Mag2();
+      } else {
+        m_KLMtrackToECL = -999;
+      }
 
-    // KlId, bkg prob, KLM, ECL
-    klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
-    cluster.addRelationTo(klid);
+
+      TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
+      m_KLMTrackSepDist         = trackSep->getDistance();
+      m_KLMTrackSepAngle        = trackSep->getTrackClusterAngle();
+
+      m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
+      m_KLMTrackRotationAngle   = trackSep->getTrackRotationAngle();
+      m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
-  }// for cluster in clusters
-} // event
+      m_feature_variables[0] = m_KLMnCluster;
+      m_feature_variables[1] = m_KLMnLayer;
+      m_feature_variables[2] = m_KLMnInnermostLayer;
+      m_feature_variables[3] = m_KLMglobalZ;
+      m_feature_variables[4] = m_KLMtime;
+      m_feature_variables[5] = m_KLMinvM;
+      m_feature_variables[6] = m_KLMtrackDist;
+      m_feature_variables[7] = m_KLMnextCluster;
+      m_feature_variables[8] = m_KLMavInterClusterDist;
+      m_feature_variables[9] = m_KLMTrackSepDist;
+      m_feature_variables[10] = m_KLMTrackSepAngle;
+      m_feature_variables[11] = m_KLMInitialTrackSepAngle;
+      m_feature_variables[12] = m_KLMECLDist;
+      m_feature_variables[13] = m_KLMECLE;
+      m_feature_variables[14] = m_KLMECLE9oE25;
+      m_feature_variables[15] = m_KLMECLTiming;
+      m_feature_variables[16] = m_KLMECLEerror;
+      m_feature_variables[17] = m_KLMtrackToECL;
+      m_feature_variables[18] = m_KLMECLdeltaL;
+      m_feature_variables[19] = m_KLMECLminTrackDist;
+
+
+      // rewrite dataset
+      for (unsigned int i = 0; i < m_feature_variables.size(); ++i) {
+        m_dataset->m_input[i] = m_feature_variables[i];
+      }
+
+      //classify dartaset
+      IDMVAOut = m_expert->apply(*m_dataset)[0];
+
+      // KlId, bkg prob, KLM, ECL
+      klid = KlIds.appendNew(IDMVAOut, -1, 1, 0);
+      cluster.addRelationTo(klid);
+
+
+    }// for cluster in clusters
+  } // event
 
 
 

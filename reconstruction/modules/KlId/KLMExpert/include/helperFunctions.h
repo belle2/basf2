@@ -153,29 +153,5 @@ namespace KlIdHelpers {
   }
 
 
-  TVector3 calculateMissEVector(float cut = 0.5)
-  {
-
-    StoreArray<ECLCluster> eclClusters;
-
-    TLorentzVector summedVector;
-    for (ECLCluster& eclcluster : eclClusters) {
-
-      cout << " id: " << eclcluster.getRelatedTo<KlId>() << " wert: " << eclcluster.getRelatedTo<KlId>()->getBkgProb() << endl;
-
-      if (eclcluster.getRelatedTo<KlId>()->getBkgProb() < cut) {
-        summedVector += eclcluster.get4Vector() ;
-      }
-    }
-
-    PCmsLabTransform T;
-    TLorentzVector boost = T.getBoostVector();
-    TLorentzVector missE = boost - summedVector;
-
-    return  missE.Vect();
-  }
-
-
-
 
 }//end namespace

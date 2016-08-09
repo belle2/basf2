@@ -148,7 +148,7 @@ void BKGClassifierDataWriterModule::event()
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
     m_KLMtime = cluster.getTime();
     m_KLMinvM = cluster.getMomentum().M2();
-    m_KLMenergy = cluster.getMomentum().E();
+    m_KLMenergy = cluster.getEnergy();
     m_KLMhitDepth = cluster.getClusterPosition().Mag2();
 
     TrackClusterSeparation* trackSep = cluster.getRelatedTo<TrackClusterSeparation>();
@@ -158,6 +158,20 @@ void BKGClassifierDataWriterModule::event()
     m_KLMInitialTrackSepAngle = trackSep->getTrackClusterInitialSeparationAngle();
     m_KLMTrackRotationAngle = trackSep->getTrackRotationAngle();
     m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
+
+    if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
+    if (isnan(m_KLMnCluster))             { m_KLMnCluster             = -999;}
+    if (isnan(m_KLMnLayer))               { m_KLMnLayer               = -999;}
+    if (isnan(m_KLMnInnermostLayer))      { m_KLMnInnermostLayer      = -999;}
+    if (isnan(m_KLMtime))                 { m_KLMtime                 = -999;}
+    if (isnan(m_KLMinvM))                 { m_KLMinvM                 = -999;}
+    if (isnan(m_KLMenergy))               { m_KLMenergy               = -999;}
+    if (isnan(m_KLMhitDepth))             { m_KLMhitDepth             = -999;}
+    if (isnan(m_KLMTrackSepDist))         { m_KLMTrackSepDist         = -999;}
+    if (isnan(m_KLMTrackSepAngle))        { m_KLMTrackSepAngle        = -999;}
+    if (isnan(m_KLMInitialTrackSepAngle)) { m_KLMInitialTrackSepAngle = -999;}
+    if (isnan(m_KLMTrackRotationAngle))   { m_KLMTrackRotationAngle   = -999;}
+    if (isnan(m_KLMTrackClusterSepAngle)) { m_KLMTrackClusterSepAngle = -999;}
 
 
     pair<ECLCluster*, double> closestECLAndDist = findClosestECLCluster(clusterPos);
@@ -219,6 +233,15 @@ void BKGClassifierDataWriterModule::event()
     m_ECLTiming = cluster.getTiming();
     m_ECLR = cluster.getR();
     m_ECLEerror = cluster.getErrorEnergy();
+
+
+    if (isnan(m_ECLminTrkDistance)) {m_ECLminTrkDistance = -999;}
+    if (isnan(m_ECLdeltaL)) {m_ECLdeltaL                 = -999;}
+    if (isnan(m_ECLE)) {m_ECLE                           = -999;}
+    if (isnan(m_ECLE9oE25)) {m_ECLE9oE25                 = -999;}
+    if (isnan(m_ECLTiming)) {m_ECLTiming                 = -999;}
+    if (isnan(m_ECLR)) {m_ECLR                           = -999;}
+    if (isnan(m_ECLEerror)) {m_ECLEerror                 = -999;}
 
 
     const TVector3& clusterPos = cluster.getclusterPosition();

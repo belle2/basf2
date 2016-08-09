@@ -26,7 +26,8 @@ using namespace Belle2;
 
 MeasurementAdder::MeasurementAdder(const std::string& storeArrayNameOfCDCHits,
                                    const std::string& storeArrayNameOfSVDHits,
-                                   const std::string& storeArrayNameOfPXDHits) :
+                                   const std::string& storeArrayNameOfPXDHits,
+                                   const bool& cosmicsTemporaryFix) :
   m_param_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_param_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_param_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits)
@@ -35,7 +36,7 @@ MeasurementAdder::MeasurementAdder(const std::string& storeArrayNameOfCDCHits,
   CDCRecoHit::setTranslators(new CDC::LinearGlobalADCCountTranslator(),
                              new CDC::RealisticCDCGeometryTranslator(true),
                              new CDC::RealisticTDCCountTranslator(true),
-                             true);
+                             true, cosmicsTemporaryFix);
 
   createGenfitMeasurementFactory();
   resetMeasurementCreatorsToDefaultSettings();

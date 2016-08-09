@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
 #include <genfit/AbsKalmanFitter.h>
@@ -17,7 +18,6 @@
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <tracking/modules/fitter/BaseRecoFitterModule.h>
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 
 using namespace std;
@@ -45,6 +45,9 @@ BaseRecoFitterModule::BaseRecoFitterModule() :
 
   addParam("resortHits", m_param_resortHits, "Resort the hits while fitting.",
            m_param_resortHits);
+
+  addParam("cosmicsTemporaryFix", m_param_cosmicsTemporaryFix, "Turn on the temporary fix for cosmics events",
+           m_param_cosmicsTemporaryFix);
 }
 
 void BaseRecoFitterModule::initialize()
@@ -67,7 +70,8 @@ void BaseRecoFitterModule::event()
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
   // The used fitting algorithm class.
-  TrackFitter fitter(m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName);
+  TrackFitter fitter(m_param_cdcHitsStoreArrayName, m_param_svdHitsStoreArrayName, m_param_pxdHitsStoreArrayName,
+                     m_param_cosmicsTemporaryFix);
 
   const std::shared_ptr<genfit::AbsFitter>& genfitFitter = createFitter();
   fitter.resetFitter(genfitFitter);

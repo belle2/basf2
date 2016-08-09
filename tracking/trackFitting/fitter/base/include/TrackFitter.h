@@ -113,8 +113,9 @@ namespace Belle2 {
     /// Create a new fitter instance.
     TrackFitter(const std::string& storeArrayNameOfCDCHits = "CDCHits",
                 const std::string& storeArrayNameOfSVDHits = "SVDClusters",
-                const std::string& storeArrayNameOfPXDHits = "PXDClusters") :
-      m_measurementAdder(storeArrayNameOfCDCHits, storeArrayNameOfSVDHits, storeArrayNameOfPXDHits)
+                const std::string& storeArrayNameOfPXDHits = "PXDClusters",
+                const bool& cosmicsTemporaryFix = false) :
+      m_measurementAdder(storeArrayNameOfCDCHits, storeArrayNameOfSVDHits, storeArrayNameOfPXDHits, cosmicsTemporaryFix)
     {
       resetFitterToDefaultSettings();
     }

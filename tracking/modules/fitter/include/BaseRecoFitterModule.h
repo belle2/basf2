@@ -64,6 +64,8 @@ namespace Belle2 {
     std::vector<unsigned int> m_param_pdgCodesToUseForFitting = {211};
     /** Resort the hits while fitting. */
     bool m_param_resortHits = false;
+    /** FIXME: Temporary fix for the cosmics data. */
+    bool m_param_cosmicsTemporaryFix = false;
   };
 }
 

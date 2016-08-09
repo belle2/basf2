@@ -76,7 +76,8 @@ namespace Belle2 {
      */
     MeasurementAdder(const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
-                     const std::string& storeArrayNameOfPXDHits);
+                     const std::string& storeArrayNameOfPXDHits,
+                     const bool& cosmicsTemporaryFix = false);
 
     /**
      * Reset the internal measurement creator storage to the default settings.

@@ -65,6 +65,13 @@ GlobalLabel::GlobalLabel(BKLMElementID bklmid, GlobalLabel::gidTYPE paramId):
   construct(bklmid.getID() + bklmOffset, paramId);
 }
 
+GlobalLabel::GlobalLabel(EKLMSegmentID eklmSegment,
+                         GlobalLabel::gidTYPE paramId):
+  gid(0), eid(0), pid(0), tid(0), tif(0)
+{
+  construct(eklmSegment.getSegmentNumber() + eklmOffset, paramId);
+}
+
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,
                                         GlobalLabel::gidTYPE end)
 {
@@ -120,6 +127,13 @@ BKLMElementID GlobalLabel::getBklmID() const
   if (eid < bklmOffset)
     return BKLMElementID();
   return BKLMElementID(eid - bklmOffset);
+}
+
+EKLMSegmentID GlobalLabel::getEklmID() const
+{
+  if (!isEKLM())
+    B2FATAL("Attempt to call GlobalLabel::getEklmID() for non-EKLM label.");
+  return EKLMSegmentID(eid - eklmOffset);
 }
 
 void GlobalLabel::construct(GlobalLabel::gidTYPE elementId,

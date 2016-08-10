@@ -15,6 +15,7 @@
 #include <vxd/dataobjects/VxdID.h>
 #include <cdc/dataobjects/WireID.h>
 #include <bklm/dataobjects/BKLMElementID.h>
+#include <eklm/dataobjects/EKLMSegmentID.h>
 
 #include <framework/gearbox/Const.h>
 
@@ -91,6 +92,7 @@ namespace Belle2 {
     static const gidTYPE vxdOffset  = 100000;  /**< Offset of 100000 for VXD (VxdID(0) is dummy) */
     static const gidTYPE cdcOffset  = 200000;  /**< Offset of 200000 in element ids for CDC. WireID(0) is a real wire */
     static const gidTYPE bklmOffset  = 300000;  /**< Offset of 300000 in element ids for BKLM */
+    static const gidTYPE eklmOffset  = 400000;  /**< Offset of 400000 in element ids for EKLM */
 
     /**
      * @brief Constructor from Pede label
@@ -132,6 +134,13 @@ namespace Belle2 {
      *                type (x-wire-shift, y-layer-shift, endplate-Rotation, XT-parameter1 etc.).
      */
     GlobalLabel(BKLMElementID bklmid, gidTYPE paramId);
+
+    /**
+     * Constructor from EKLMSegmentID.
+     * @param[in] eklmSegment EKLM segment identifier.
+     * @param[in] paramId     Numeric identifier of alignment parameter.
+     */
+    GlobalLabel(EKLMSegmentID eklmSegment, gidTYPE paramId);
 
     /**
      * @brief Register this Detector element and parameter
@@ -188,6 +197,13 @@ namespace Belle2 {
     //! Get the BklmID (returns 0 if not BKLM label)
     BKLMElementID getBklmID() const;
 
+    /**
+     * Get EKLM segment identifier. It should be checked that this label is
+     * a EKLM label. If this is not the case, then the function fails with
+     * fatal error.
+     */
+    EKLMSegmentID getEklmID() const;
+
     //! Is this beam label?
     bool    isBeam()          const {return (eid < vxdOffset);}
 
@@ -198,7 +214,10 @@ namespace Belle2 {
     bool    isCDC()          const {return (eid >= cdcOffset && eid < bklmOffset);}
 
     //! Is this BKLM label?
-    bool    isBKLM()         const {return (eid >= bklmOffset && eid < maxEID);}
+    bool    isBKLM()         const {return (eid >= bklmOffset && eid < eklmOffset);}
+
+    //! Is this EKLM label?
+    bool    isEKLM()         const {return (eid >= eklmOffset && eid < maxEID);}
 
     //! Get id of alignment/calibration parameter
     gidTYPE getParameterId() const {return pid;}

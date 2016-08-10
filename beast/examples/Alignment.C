@@ -24,7 +24,7 @@ void Alignment()
 
   TString odir[] = { "ph1sustr" , "microtpc" , "he3tube" };
   TString ifn[] = { "tmp_PH1SUSTR.xml" , "tmp_MICROTPC.xml" , "tmp_HE3TUBE.xml" };
-  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1.xml" , "HE3TUBE-phase1.xml" };
+  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1-test.xml" , "HE3TUBE-phase1-test.xml" };
   
   //Set the Al plate position in centimeter
   /*
@@ -67,9 +67,9 @@ void Alignment()
     {
       //{51.8,0.8,0.4},
       {51.8,0.8,40.0},
-      {-53.2,-0.3,37.7},
       {0.1,52.1,37.9},
       {2.1,-50.5,42.3}
+      {-53.2,-0.3,37.7},
     };
 
   /*

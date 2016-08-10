@@ -61,6 +61,7 @@ namespace Belle2 {
       std::vector<Float_t> SKB_HER_collimatorBeamPositionX;
       std::vector<Float_t> SKB_HER_collimatorBeamPositionY;
       std::vector<Float_t> SKB_HER_collimatorDistanceToBeam;
+      std::vector<Float_t> SKB_LER_collimatorAbsolutePosition;
       std::vector<Float_t> SKB_LER_collimatorBeamPositionX;
       std::vector<Float_t> SKB_LER_collimatorBeamPositionY;
       std::vector<Float_t> SKB_LER_collimatorDistanceToBeam;
@@ -136,6 +137,7 @@ namespace Belle2 {
         SKB_HER_collimatorBeamPositionX.clear();
         SKB_HER_collimatorBeamPositionY.clear();
         SKB_HER_collimatorDistanceToBeam.clear();
+        SKB_LER_collimatorAbsolutePosition.clear();
         SKB_LER_collimatorBeamPositionX.clear();
         SKB_LER_collimatorBeamPositionY.clear();
         SKB_LER_collimatorDistanceToBeam.clear();

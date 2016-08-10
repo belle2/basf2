@@ -78,13 +78,15 @@ namespace Belle2 {
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
+        G4double inch = 2.54 * CLHEP::cm;
+
         //create vessel volume inner volume will be subtracted by "inactive" gas
         G4double dx_Vessel = activeParams.getLength("dx_Vessel") * CLHEP::cm / 2.;
         G4double dy_Vessel = activeParams.getLength("dy_Vessel") * CLHEP::cm / 2.;
-        G4double dz_Vessel = activeParams.getLength("dz_Vessel") * CLHEP::cm / 2.;
+        G4double dz_VesselEndCap = 1. / 8. / 2.*inch;
+        G4double dz_Vessel = activeParams.getLength("dz_Vessel") * CLHEP::cm / 2. + dz_VesselEndCap;
         G4VSolid* s_Vessel = new G4Box("s_Vessel_tmp", dx_Vessel, dy_Vessel, dz_Vessel);
 
-        G4double inch = 2.54 * CLHEP::cm;
         G4double width = 1. / 8.*inch;
         G4double dx_iGasTPC = (dx_Vessel - width);
         G4double dy_iGasTPC = (dy_Vessel - width);
@@ -101,9 +103,6 @@ namespace Belle2 {
         string matGas = activeParams.getString("MaterialGas");
         G4LogicalVolume* l_iGasTPC = new G4LogicalVolume(s_iGasTPC, geometry::Materials::get(matGas), "l_iGasTPC");
 
-
-
-
         G4RotationMatrix* rotXx = new G4RotationMatrix();
         G4double AngleX = activeParams.getAngle("AngleX");
         G4double AngleZ = activeParams.getAngle("AngleZ");
@@ -117,28 +116,32 @@ namespace Belle2 {
 
         new G4PVPlacement(rotXx, TPCpos, l_Vessel, "p_Vessel", &topVolume, false, 1);
         new G4PVPlacement(rotXx, TPCpos, l_iGasTPC, "p_iGasTPC", &topVolume, false, 1);
+        /*
+              //create endcap top and bottom
+              G4double dx_VesselEndCap = dx_Vessel;
+              G4double dy_VesselEndCap = dy_Vessel;
+              G4double dz_VesselEndCap = 1. / 8. / 2.*inch;
+              G4VSolid* s_VesselEndCap = new G4Box("s_VesselEndCap", dx_VesselEndCap, dy_VesselEndCap, dz_VesselEndCap);
 
-        //create endcap top and bottom
-        G4double dx_VesselEndCap = dx_Vessel;
-        G4double dy_VesselEndCap = dy_Vessel;
-        G4double dz_VesselEndCap = 1. / 8. / 2.*inch;
-        G4VSolid* s_VesselEndCap = new G4Box("s_VesselEndCap", dx_VesselEndCap, dy_VesselEndCap, dz_VesselEndCap);
+              string matEndCap = activeParams.getString("MaterialEndCap");
+              G4LogicalVolume* l_VesselEndCap = new G4LogicalVolume(s_VesselEndCap, geometry::Materials::get(matEndCap), "l_VesselEndCap");
 
-        string matEndCap = activeParams.getString("MaterialEndCap");
-        G4LogicalVolume* l_VesselEndCap = new G4LogicalVolume(s_VesselEndCap, geometry::Materials::get(matEndCap), "l_VesselEndCap");
+              G4double x_VesselEndCap[2] = {0, 0};
+              //G4double y_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* sin(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* sin(AngleX * CLHEP::deg)};
+              //G4double z_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* cos(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* cos(AngleX * CLHEP::deg)};
+        G4double y_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap) * sin(AngleX * CLHEP::deg),
+                    (-dz_VesselEndCap - dz_Vessel) * sin(AngleX * CLHEP::deg)};
+              G4double z_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap) * cos(AngleX * CLHEP::deg),
+                    (-dz_VesselEndCap - dz_Vessel) * cos(AngleX * CLHEP::deg)};
 
-        G4double x_VesselEndCap[2] = {0, 0};
-        G4double y_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* sin(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* sin(AngleX * CLHEP::deg)};
-        G4double z_VesselEndCap[2] = {(dz_Vessel + dz_VesselEndCap)* cos(AngleX * CLHEP::deg), (-dz_VesselEndCap - dz_Vessel - 0.00001)* cos(AngleX * CLHEP::deg)};
-
-        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[0], y_VesselEndCap[0], z_VesselEndCap[0]) + TPCpos, l_VesselEndCap,
-                          "p_VesselEndCapTop", &topVolume, false, 1);
-        new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[1], y_VesselEndCap[1], z_VesselEndCap[1]) + TPCpos, l_VesselEndCap,
-                          "p_VesselEndCapBottom", &topVolume, false, 1);
-
+              new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[0], y_VesselEndCap[0], z_VesselEndCap[0]) + TPCpos, l_VesselEndCap,
+                                "p_VesselEndCapTop", &topVolume, false, 1);
+              new G4PVPlacement(rotXx, G4ThreeVector(x_VesselEndCap[1], y_VesselEndCap[1], z_VesselEndCap[1]) + TPCpos, l_VesselEndCap,
+                                "p_VesselEndCapBottom", &topVolume, false, 1);
+        */
         G4VisAttributes* orange = new G4VisAttributes(G4Colour(1, 2, 0));
         orange->SetForceAuxEdgeVisible(true);
-        l_VesselEndCap->SetVisAttributes(orange);
+        //l_VesselEndCap->SetVisAttributes(orange);
         l_Vessel->SetVisAttributes(orange);
 
         G4double dx_parC1 = dx_iGasTPC;

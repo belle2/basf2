@@ -166,6 +166,18 @@ namespace Belle2 {
       double VALCLM_D06H3IN_CSS_NOWPOS_BMX_POS;
       double VALCLM_D06H3OUT_CSS_NOWPOS_BMX_POS;
 
+      //SKB LER beam position in Y
+      double VALCLM_D06H4IN_CSS_NOWPOS_BMY_POS;
+      double VALCLM_D06H4OUT_CSS_NOWPOS_BMY_POS;
+      double VALCLM_D06H3IN_CSS_NOWPOS_BMY_POS;
+      double VALCLM_D06H3OUT_CSS_NOWPOS_BMY_POS;
+
+      //SKB LER collimator position with respect to beam
+      double VALCLM_D06H4IN_CSS_NOWPOS_DIF_POS;
+      double VALCLM_D06H4OUT_CSS_NOWPOS_DIF_POS;
+      double VALCLM_D06H3IN_CSS_NOWPOS_DIF_POS;
+      double VALCLM_D06H3OUT_CSS_NOWPOS_DIF_POS;
+
       //Beam size monitors
       double BMHSRM_BEAM_SIGMAX;
       double BMHSRM_BEAM_SIGMAY;
@@ -365,6 +377,18 @@ namespace Belle2 {
         VALCLM_D06H4OUT_CSS_NOWPOS_BMX_POS = 0;
         VALCLM_D06H3IN_CSS_NOWPOS_BMX_POS = 0;
         VALCLM_D06H3OUT_CSS_NOWPOS_BMX_POS = 0;
+
+        //SKB LER beam position in Y
+        VALCLM_D06H4IN_CSS_NOWPOS_BMY_POS = 0;
+        VALCLM_D06H4OUT_CSS_NOWPOS_BMY_POS = 0;
+        VALCLM_D06H3IN_CSS_NOWPOS_BMY_POS = 0;
+        VALCLM_D06H3OUT_CSS_NOWPOS_BMY_POS = 0;
+
+        //SKB LER collimator position with respect to beam
+        VALCLM_D06H4IN_CSS_NOWPOS_DIF_POS = 0;
+        VALCLM_D06H4OUT_CSS_NOWPOS_DIF_POS = 0;
+        VALCLM_D06H3IN_CSS_NOWPOS_DIF_POS = 0;
+        VALCLM_D06H3OUT_CSS_NOWPOS_DIF_POS = 0;
 
         //Beam size monitors
         BMHXRM_BEAM_SIGMAY = 0;

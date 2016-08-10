@@ -25,8 +25,19 @@ namespace Belle2 {
 
     /**
      * Constructor.
+     * @param[in] endcap  Endcap number.
+     * @param[in] layer   Layer number.
+     * @param[in] sector  Sector number.
+     * @param[in] plane   Plane number.
+     * @param[in] segment Segment number.
      */
     EKLMSegmentID(int endcap, int layer, int sector, int plane, int segment);
+
+    /**
+     * Constructor.
+     * @param[in] segment Segment number (global).
+     */
+    EKLMSegmentID(int segment);
 
     /**
      * Destructor.

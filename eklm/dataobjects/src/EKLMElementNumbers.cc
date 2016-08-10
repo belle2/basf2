@@ -84,11 +84,38 @@ int EKLMElementNumbers::detectorLayerNumber(int endcap, int layer) const
   return m_MaximalDetectorLayerNumber[0] + layer;
 }
 
+void EKLMElementNumbers::layerNumberToElementNumbers(
+  int layerGlobal, int* endcap, int* layer) const
+{
+  static int maxLayer = getMaximalLayerGlobalNumber();
+  if (layerGlobal <= 0 || layerGlobal > maxLayer)
+    B2FATAL("Number of segment must be from 1 to " << maxLayer << ".");
+  if (layerGlobal <= m_MaximalDetectorLayerNumber[0]) {
+    *endcap = 1;
+    *layer = layerGlobal;
+  } else {
+    *endcap = 2;
+    *layer = layerGlobal - m_MaximalDetectorLayerNumber[0];
+  }
+}
+
 int EKLMElementNumbers::sectorNumber(int endcap, int layer, int sector) const
 {
   checkSector(sector);
   return m_MaximalSectorNumber * (detectorLayerNumber(endcap, layer) - 1) +
          sector;
+}
+
+void EKLMElementNumbers::sectorNumberToElementNumbers(
+  int sectorGlobal, int* endcap, int* layer, int* sector) const
+{
+  static int maxSector = getMaximalSectorGlobalNumber();
+  int layerGlobal;
+  if (sectorGlobal <= 0 || sectorGlobal > maxSector)
+    B2FATAL("Number of segment must be from 1 to " << maxSector << ".");
+  *sector = (sectorGlobal - 1) % m_MaximalSectorNumber + 1;
+  layerGlobal = (sectorGlobal - 1) / m_MaximalSectorNumber + 1;
+  layerNumberToElementNumbers(layerGlobal, endcap, layer);
 }
 
 int EKLMElementNumbers::planeNumber(int endcap, int layer, int sector,
@@ -99,12 +126,37 @@ int EKLMElementNumbers::planeNumber(int endcap, int layer, int sector,
          plane;
 }
 
+void EKLMElementNumbers::planeNumberToElementNumbers(
+  int planeGlobal, int* endcap, int* layer, int* sector, int* plane) const
+{
+  static int maxPlane = getMaximalPlaneGlobalNumber();
+  int sectorGlobal;
+  if (planeGlobal <= 0 || planeGlobal > maxPlane)
+    B2FATAL("Number of segment must be from 1 to " << maxPlane << ".");
+  *plane = (planeGlobal - 1) % m_MaximalPlaneNumber + 1;
+  sectorGlobal = (planeGlobal - 1) / m_MaximalPlaneNumber + 1;
+  sectorNumberToElementNumbers(sectorGlobal, endcap, layer, sector);
+}
+
 int EKLMElementNumbers::segmentNumber(int endcap, int layer, int sector,
                                       int plane, int segment) const
 {
   checkSegment(segment);
   return m_MaximalSegmentNumber * (planeNumber(endcap, layer, sector, plane) -
                                    1) + segment;
+}
+
+void EKLMElementNumbers::segmentNumberToElementNumbers(
+  int segmentGlobal, int* endcap, int* layer, int* sector, int* plane,
+  int* segment) const
+{
+  static int maxSegment = getMaximalSegmentGlobalNumber();
+  int planeGlobal;
+  if (segmentGlobal <= 0 || segmentGlobal > maxSegment)
+    B2FATAL("Number of segment must be from 1 to " << maxSegment << ".");
+  *segment = (segmentGlobal - 1) % m_MaximalSegmentNumber + 1;
+  planeGlobal = (segmentGlobal - 1) / m_MaximalSegmentNumber + 1;
+  planeNumberToElementNumbers(planeGlobal, endcap, layer, sector, plane);
 }
 
 int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
@@ -117,13 +169,42 @@ int EKLMElementNumbers::stripNumber(int endcap, int layer, int sector,
 
 int EKLMElementNumbers::stripLocalNumber(int strip) const
 {
-  static int maxStrip = getMaximalStripNumber();
+  static int maxStrip = getMaximalStripGlobalNumber();
   if (strip <= 0 || strip > maxStrip)
-    B2FATAL("Number of strip must be from 1 to getMaximalStripNumber().");
+    B2FATAL("Number of strip must be from 1 to " << maxStrip << ".");
   return (strip - 1) % m_MaximalStripNumber + 1;
 }
 
-int EKLMElementNumbers::getMaximalStripNumber() const
+int EKLMElementNumbers::getMaximalLayerGlobalNumber() const
+{
+  return detectorLayerNumber(
+           m_MaximalEndcapNumber,
+           m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1]);
+}
+
+int EKLMElementNumbers::getMaximalSectorGlobalNumber() const
+{
+  return sectorNumber(m_MaximalEndcapNumber,
+                      m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
+                      m_MaximalSectorNumber);
+}
+
+int EKLMElementNumbers::getMaximalPlaneGlobalNumber() const
+{
+  return planeNumber(m_MaximalEndcapNumber,
+                     m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
+                     m_MaximalSectorNumber, m_MaximalPlaneNumber);
+}
+
+int EKLMElementNumbers::getMaximalSegmentGlobalNumber() const
+{
+  return segmentNumber(m_MaximalEndcapNumber,
+                       m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],
+                       m_MaximalSectorNumber, m_MaximalPlaneNumber,
+                       m_MaximalSegmentNumber);
+}
+
+int EKLMElementNumbers::getMaximalStripGlobalNumber() const
 {
   return stripNumber(m_MaximalEndcapNumber,
                      m_MaximalDetectorLayerNumber[m_MaximalEndcapNumber - 1],

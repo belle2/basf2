@@ -20,6 +20,14 @@ EKLMSegmentID::EKLMSegmentID(
 {
 }
 
+EKLMSegmentID::EKLMSegmentID(int segment)
+{
+  static const EKLM::ElementNumbersSingleton& elementNumbers =
+    EKLM::ElementNumbersSingleton::Instance();
+  elementNumbers.segmentNumberToElementNumbers(
+    segment, &m_Endcap, &m_Layer, &m_Sector, &m_Plane, &m_Segment);
+}
+
 EKLMSegmentID::~EKLMSegmentID()
 {
 }

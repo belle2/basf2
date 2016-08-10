@@ -11,6 +11,7 @@
 #include <framework/utilities/FileSystem.h>
 #include <framework/utilities/TestHelpers.h>
 
+#include <boost/property_tree/ptree.hpp>
 #include <gtest/gtest.h>
 
 using namespace Belle2;

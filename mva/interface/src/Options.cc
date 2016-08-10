@@ -10,6 +10,7 @@
 
 
 #include <mva/interface/Options.h>
+#include <boost/property_tree/ptree.hpp>
 
 namespace Belle2 {
   namespace MVA {

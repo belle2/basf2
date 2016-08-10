@@ -275,7 +275,7 @@ namespace Belle2 {
         if (checkForBranch(m_tree, "__weight__")) {
           m_tree->SetBranchAddress("__weight__", &m_weight);
         } else {
-          B2WARNING("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the weight variable to an empty string if you don't need it.");
+          B2INFO("Couldn't find default weight feature named __weight__, all weights will be 1. Consider setting the weight variable to an empty string if you don't need it.");
           m_weight = 1;
         }
       } else if (not m_general_options.m_weight_variable.empty()) {

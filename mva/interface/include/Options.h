@@ -13,8 +13,7 @@
 #define INCLUDE_GUARD_BELLE2_MVA_OPTIONS_HEADER
 
 #include <boost/program_options.hpp>
-#include <boost/property_tree/xml_parser.hpp>
-#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/ptree_fwd.hpp>
 
 #include <string>
 #include <vector>

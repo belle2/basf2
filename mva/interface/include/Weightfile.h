@@ -19,12 +19,8 @@
 #include <framework/database/Database.h>
 #include <framework/dataobjects/EventMetaData.h>
 
-#include <TObject.h>
-#include <TGenericClassInfo.h>
-
 #include <boost/property_tree/ptree.hpp>
 
-#include <iostream>
 #include <vector>
 #include <string>
 #include <fstream>

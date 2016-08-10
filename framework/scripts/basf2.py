@@ -665,3 +665,14 @@ def list_functions(mod):
     Returns list of function names defined in the given Python module.
     """
     return [func.__name__ for func in mod.__dict__.values() if is_mod_function(mod, func)]
+
+
+def make_code_pickable(code):
+    """
+    Sometimes it is necessary to execute code which won't be pickled if a user dumps the basf2 path
+    and wants to execute it later. Using using the pickable_basf2 module all calls to basf2 functions
+    are recorded. Now if a user has to execute code outside of basf2, e.g. modifying objects in the ROOT namespace,
+    this won't be pickled. By wrapping the code in this function it is technically a call to a basf2 function
+    and will be pickled again. Problem solved.
+    """
+    return exec(code, globals())

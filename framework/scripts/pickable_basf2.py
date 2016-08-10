@@ -2,14 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-Stateless basf2
-Import this module at the top of your steering file to get a (more) stateless version of basf2.
+Pickable basf2
+Import this module at the top of your steering file to get a (more) pickable version of basf2.
 This is useful if you want to pickle the path using --dump-path and execute it later using --execute-path.
 Usually all calls to functions in basf2 like use_central_database are forgotten if you only save the path.
 With this module, these functions are executed again if you execute the pickled path using --execute-path.
 
+Technically this works by recording all calls to basf2 functions.
+If you have other code which should be pickled as well you can wrap it in the make_code_pickable function.
+
 If you want to exclude some functions, delete them from this module using
-del stateless_basf2.functionname
+del pickable_basf2.functionname
 """
 
 
@@ -60,4 +63,4 @@ for name, x in original_basf2.__dict__.items():
 
 basf2_state_recorder.process = process
 sys.modules['basf2'] = basf2_state_recorder
-sys.modules['stateless_basf2'] = basf2_state_recorder
+sys.modules['pickable_basf2'] = basf2_state_recorder

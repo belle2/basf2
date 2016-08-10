@@ -74,9 +74,9 @@ void KLMK0LReconstructorModule::beginRun()
 {
 }
 
-static bool compareDistance(KLMHit2d* hit1, KLMHit2d* hit2)
+static bool compareDistance(KLMHit2d& hit1, KLMHit2d& hit2)
 {
-  return hit1->getPosition().Mag() < hit2->getPosition().Mag();
+  return hit1.getPosition().Mag() < hit2.getPosition().Mag();
 }
 
 void KLMK0LReconstructorModule::event()
@@ -90,9 +90,8 @@ void KLMK0LReconstructorModule::event()
   StoreArray<KLMCluster> klmClusters;
   StoreArray<BKLMHit2d> bklmHit2ds;
   StoreArray<EKLMHit2d> eklmHit2ds;
-  std::vector<KLMHit2d*> klmHit2ds, klmClusterHits;
-  std::vector<KLMHit2d*>::iterator it, it0, it2;
-  KLMHit2d* hit2d;
+  std::vector<KLMHit2d> klmHit2ds, klmClusterHits;
+  std::vector<KLMHit2d>::iterator it, it0, it2;
   KLMCluster* klmCluster;
   TVector3 hitPos;
   nLayersEKLM = m_GeoDat->getNLayers();
@@ -103,13 +102,11 @@ void KLMK0LReconstructorModule::event()
   for (i = 0; i < n; i++) {
     if (bklmHit2ds[i]->isOutOfTime())
       continue;
-    hit2d = new KLMHit2d(bklmHit2ds[i]);
-    klmHit2ds.push_back(hit2d);
+    klmHit2ds.push_back(KLMHit2d(bklmHit2ds[i]));
   }
   n = eklmHit2ds.getEntries();
   for (i = 0; i < n; i++) {
-    hit2d = new KLMHit2d(eklmHit2ds[i]);
-    klmHit2ds.push_back(hit2d);
+    klmHit2ds.push_back(KLMHit2d(eklmHit2ds[i]));
   }
   /* Sort by the distance from center. */
   sort(klmHit2ds.begin(), klmHit2ds.end(), compareDistance);
@@ -124,7 +121,7 @@ void KLMK0LReconstructorModule::event()
       switch (m_ClusterMode) {
         case c_AnyHit:
           while (it2 != klmClusterHits.end()) {
-            if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+            if (it->getPosition().Angle(it2->getPosition()) <
                 m_ClusteringAngle) {
               klmClusterHits.push_back(*it);
               it = klmHit2ds.erase(it);
@@ -134,7 +131,7 @@ void KLMK0LReconstructorModule::event()
           }
           break;
         case c_FirstHit:
-          if ((*it)->getPosition().Angle((*it2)->getPosition()) <
+          if (it->getPosition().Angle(it2->getPosition()) <
               m_ClusteringAngle) {
             klmClusterHits.push_back(*it);
             it = klmHit2ds.erase(it);
@@ -156,18 +153,17 @@ clusterFound:;
     it0 = klmClusterHits.begin();
     nHits = 0;
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
-      if (((*it)->getLayer() == (*it0)->getLayer() &&
-           (*it)->inBKLM() == (*it0)->inBKLM()) ||
-          m_PositionMode == c_FullAverage) {
-        hitPos = hitPos + (*it)->getPosition();
+      if ((it->getLayer() == it0->getLayer() &&
+           it->inBKLM() == it0->inBKLM()) || m_PositionMode == c_FullAverage) {
+        hitPos = hitPos + it->getPosition();
         nHits++;
       }
-      if (minTime < 0 || (*it)->getTime() < minTime)
-        minTime = (*it)->getTime();
-      if ((*it)->inBKLM())
-        layerHitsBKLM[(*it)->getLayer() - 1]++;
+      if (minTime < 0 || it->getTime() < minTime)
+        minTime = it->getTime();
+      if (it->inBKLM())
+        layerHitsBKLM[it->getLayer() - 1]++;
       else
-        layerHitsEKLM[(*it)->getLayer() - 1]++;
+        layerHitsEKLM[it->getLayer() - 1]++;
     }
     hitPos = hitPos * (1.0 / nHits);
     /* Find innermost layer. */
@@ -188,7 +184,7 @@ clusterFound:;
       }
     }
     /* Calculate energy. */
-    if ((*it0)->inBKLM()) {
+    if (it0->inBKLM()) {
       /*
        * TODO: The constant is from BKLM K0L reconstructor,
        * it must be recalculated.
@@ -205,14 +201,14 @@ clusterFound:;
                    hitPos.x(), hitPos.y(), hitPos.z(), minTime, nLayers,
                    innermostLayer, p);
     for (it = klmClusterHits.begin(); it != klmClusterHits.end(); ++it) {
-      if ((*it)->inBKLM())
-        klmCluster->addRelationTo((*it)->getBKLMHit2d());
+      if (it->inBKLM())
+        klmCluster->addRelationTo(it->getBKLMHit2d());
       else
-        klmCluster->addRelationTo((*it)->getEKLMHit2d());
+        klmCluster->addRelationTo(it->getEKLMHit2d());
     }
   }
-  delete layerHitsBKLM;
-  delete layerHitsEKLM;
+  delete[] layerHitsBKLM;
+  delete[] layerHitsEKLM;
 }
 
 void KLMK0LReconstructorModule::endRun()

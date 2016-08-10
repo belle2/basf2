@@ -123,7 +123,7 @@ namespace Belle2 {
      * Number is from 1 to 5*2*4*26 = 1040.
      */
     int segmentNumber(int endcap, int layer, int sector, int plane,
-                      int strip) const;
+                      int segment) const;
 
     /**
      * Get strip number.

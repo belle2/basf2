@@ -14,6 +14,7 @@
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 #include <analysis/dataobjects/RestOfEvent.h>
 #include <analysis/VariableManager/Manager.h>
+#include <mdst/dataobjects/MCParticle.h>
 
 #include <iostream>
 
@@ -35,7 +36,8 @@ FlavorTaggerInfoFillerModule::FlavorTaggerInfoFillerModule() : Module()
            vector<tuple<string, string, string>>());
   addParam("FANNmlp", m_FANNmlp, "Sets if FANN Combiner output will be saved or not", false);
   addParam("TMVAfbdt", m_TMVAfbdt, "Sets if FANN Combiner output will be saved or not", false);
-  addParam("qrCategories", m_qrCategories, "Sets if individual Categories output will be saved or not", false);
+  addParam("qrCategories", m_qrCategories, "Sets if individual categories output will be saved or not", false);
+  addParam("istrueCategories", m_istrueCategories, "Sets if individual MC truth for each category is saved or not", false);
   addParam("targetProb", m_targetProb, "Sets if individual Categories output will be saved or not", false);
   addParam("trackPointers", m_trackPointers, "Sets if track pointers to target tracks are saved or not", false);
 
@@ -121,12 +123,19 @@ void FlavorTaggerInfoFillerModule::event()
   }
 
   if (m_qrCategories) {
+
+    bool mcFlag = false;
+
+    if (m_istrueCategories) {
+      StoreArray<MCParticle> mcparticles;
+      if (mcparticles.isValid()) mcFlag = true;
+    };
+
     for (auto& iTuple : m_eventLevelParticleLists) {
       string particleListName = get<0>(iTuple);
       string category = get<1>(iTuple);
       string qrCategoryVariable = get<2>(iTuple);
       StoreObjPtr<ParticleList> particleList(particleListName);
-
 
       if (!particleList.isValid()) {
         B2INFO("ParticleList " << particleListName << " not found");
@@ -146,6 +155,10 @@ void FlavorTaggerInfoFillerModule::event()
               float qrCategory =  manager.getVariable(qrCategoryVariable)-> function(iParticle);
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
               infoMapsFBDT -> setQrCategory(category, qrCategory);
+              if (m_istrueCategories and mcFlag) {
+                float isTrue = manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr);
+                infoMapsFBDT -> setIsTrueCategory(category, isTrue);
+              }
               if (m_trackPointers) {
                 infoMapsFBDT-> setTargetEventLevel(category, iParticle -> getTrack());
               }

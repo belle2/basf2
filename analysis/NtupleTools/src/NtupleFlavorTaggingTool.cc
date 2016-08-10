@@ -10,7 +10,6 @@
 
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
 #include <analysis/VariableManager/FlavorTaggingVariables.h>
-#include <analysis/VariableManager/Manager.h>
 #include <analysis/VariableManager/Variables.h>
 #include <analysis/utility/MCMatching.h>
 #include <mdst/dataobjects/MCParticle.h>
@@ -38,6 +37,7 @@ void NtupleFlavorTaggingTool::setupTree()
 
   for (auto& category : categories) {
     m_qrCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
+    m_isTrueCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
   }
 
   if (m_strOption.empty()) {
@@ -92,6 +92,10 @@ void NtupleFlavorTaggingTool::setupTree()
         m_tree->Branch((strNames[iProduct] + "_qr" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
                        (strNames[iProduct] + "_qr" + categoryEntry.first + "/F").c_str());
       }
+      for (auto& categoryEntry : m_isTrueCategories) {
+        m_tree->Branch((strNames[iProduct] + "_isRightCategory" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
+                       (strNames[iProduct] + "_isRightCategory" + categoryEntry.first + "/F").c_str());
+      }
     }
 
   }
@@ -128,12 +132,18 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
           for (auto& categoryEntry : m_qrCategories) {
             categoryEntry.second[iProduct] = 0;
           }
-          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQrCategory();
+          for (auto& categoryEntry : m_isTrueCategories) {
+            categoryEntry.second[iProduct] = 0;
+          }
 
+          std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getIsTrueCategory();
+          std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQrCategory();
           for (auto& categoryEntry : iQrCategories) {
             m_qrCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
           }
-
+          for (auto& categoryEntry : iIsTrueCategories) {
+            m_isTrueCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
+          }
         }
 
         //  MC Flavor is saved only if mcparticles is not empty
@@ -146,7 +156,6 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
             }
           }
         }
-
       }
     }
   }

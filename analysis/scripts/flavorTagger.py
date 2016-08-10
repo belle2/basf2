@@ -71,7 +71,7 @@ mlpFANNCombiner.m_output_activiation_function = "FANN_SIGMOID_SYMMETRIC"
 mlpFANNCombiner.m_error_function = "FANN_ERRORFUNC_LINEAR"
 mlpFANNCombiner.m_training_method = "FANN_TRAIN_RPROP"
 mlpFANNCombiner.m_validation_fraction = 0.5
-mlpFANNCombiner.m_random_seeds = 10
+mlpFANNCombiner.m_random_seeds = 1  # 10
 mlpFANNCombiner.m_test_rate = 500
 mlpFANNCombiner.m_number_of_threads = 8
 mlpFANNCombiner.m_scale_features = True
@@ -87,82 +87,82 @@ signalFraction = -2
 # 'combinerLevel variable name', 'category code']
 AvailableCategories = {
     'Electron': [
-        'e+:ElectronROE',
+        'e+:inRoe',
         'Electron',
         'Electron',
-        'QrOf(e+:ElectronROE, isRightCategory(Electron), isRightTrack(Electron))',
+        'QrOf(e+:inRoe, isRightCategory(Electron), isRightTrack(Electron))',
         0],
     'IntermediateElectron': [
-        'e+:ElectronROE',
+        'e+:inRoe',
         'IntermediateElectron',
         'IntermediateElectron',
-        'QrOf(e+:ElectronROE, isRightCategory(IntermediateElectron), isRightTrack(IntermediateElectron))',
+        'QrOf(e+:inRoe, isRightCategory(IntermediateElectron), isRightTrack(IntermediateElectron))',
         1],
     'Muon': [
-        'mu+:MuonROE',
+        'mu+:inRoe',
         'Muon',
         'Muon',
-        'QrOf(mu+:MuonROE, isRightCategory(Muon), isRightTrack(Muon))',
+        'QrOf(mu+:inRoe, isRightCategory(Muon), isRightTrack(Muon))',
         2],
     'IntermediateMuon': [
-        'mu+:MuonROE',
+        'mu+:inRoe',
         'IntermediateMuon',
         'IntermediateMuon',
-        'QrOf(mu+:MuonROE, isRightCategory(IntermediateMuon), isRightTrack(IntermediateMuon))',
+        'QrOf(mu+:inRoe, isRightCategory(IntermediateMuon), isRightTrack(IntermediateMuon))',
         3],
     'KinLepton': [
-        'mu+:MuonROE',
+        'mu+:inRoe',
         'KinLepton',
         'KinLepton',
-        'QrOf(mu+:MuonROE, isRightCategory(KinLepton), isRightTrack(KinLepton))',
+        'QrOf(mu+:inRoe, isRightCategory(KinLepton), isRightTrack(KinLepton))',
         4],
     'IntermediateKinLepton': [
-        'mu+:MuonROE',
+        'mu+:inRoe',
         'IntermediateKinLepton',
         'IntermediateKinLepton',
-        'QrOf(mu+:MuonROE, isRightCategory(IntermediateKinLepton), isRightTrack(IntermediateKinLepton))',
+        'QrOf(mu+:inRoe, isRightCategory(IntermediateKinLepton), isRightTrack(IntermediateKinLepton))',
         5],
     'Kaon': [
-        'K+:KaonROE',
+        'K+:inRoe',
         'Kaon',
         'Kaon',
-        'weightedQrOf(K+:KaonROE, isRightCategory(Kaon), isRightTrack(Kaon))',
+        'weightedQrOf(K+:inRoe, isRightCategory(Kaon), isRightTrack(Kaon))',
         6],
     'SlowPion': [
-        'pi+:PionROE',
+        'pi+:inRoe',
         'SlowPion',
         'SlowPion',
-        'QrOf(pi+:PionROE, isRightCategory(SlowPion), isRightTrack(SlowPion))',
+        'QrOf(pi+:inRoe, isRightCategory(SlowPion), isRightTrack(SlowPion))',
         7],
     'FastPion': [
-        'pi+:PionROE',
+        'pi+:inRoe',
         'FastPion',
         'FastPion',
-        'QrOf(pi+:PionROE, isRightCategory(FastPion), isRightTrack(FastPion))',
+        'QrOf(pi+:inRoe, isRightCategory(FastPion), isRightTrack(FastPion))',
         8],
     'Lambda': [
-        'Lambda0:LambdaROE',
+        'Lambda0:inRoe',
         'Lambda',
         'Lambda',
-        'weightedQrOf(Lambda0:LambdaROE, isRightCategory(Lambda), isRightTrack(Lambda))',
+        'weightedQrOf(Lambda0:inRoe, isRightCategory(Lambda), isRightTrack(Lambda))',
         9],
     'FSC': [
-        'pi+:PionROE',
+        'pi+:inRoe',
         'SlowPion',
         'FSC',
-        'QrOf(pi+:PionROE, isRightCategory(FSC), isRightTrack(SlowPion))',
+        'QrOf(pi+:inRoe, isRightCategory(FSC), isRightTrack(SlowPion))',
         10],
     'MaximumPstar': [
-        'pi+:PionROE',
+        'pi+:inRoe',
         'MaximumPstar',
         'MaximumPstar',
-        'QrOf(pi+:PionROE, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
+        'QrOf(pi+:inRoe, isRightCategory(MaximumPstar), isRightTrack(MaximumPstar))',
         11],
     'KaonPion': [
-        'K+:KaonROE',
+        'K+:inRoe',
         'Kaon',
         'KaonPion',
-        'QrOf(K+:KaonROE, isRightCategory(KaonPion), isRightTrack(Kaon))',
+        'QrOf(K+:inRoe, isRightCategory(KaonPion), isRightTrack(Kaon))',
         12],
 }
 
@@ -296,7 +296,7 @@ def setVariables():
         'Kid_dEdx',
         'Kid_TOP',
         'Kid_ARICH',
-        'NumberOfKShortinROEParticleList(K_S0:ROEKaon)',
+        'NumberOfKShortsInRoe',
         'ptTracksRoe',
         'distance',
         'chiProb',
@@ -320,7 +320,7 @@ def setVariables():
     variables['FastPion'] = variables['SlowPion']
     variables['Lambda'] = [
         'lambdaFlavor',
-        'NumberOfKShortinROEParticleList(K_S0:ROELambda)',
+        'NumberOfKShortsInRoe',
         'M',
         'cosAngleBetweenMomentumAndVertexVector',
         'lambdaZError',
@@ -334,8 +334,8 @@ def setVariables():
 
     # Only for Event Level
     variables['KaonPion'] = ['extraInfo(isRightTrack(Kaon))',
-                             'HighestProbInCat(pi+:PionROE, isRightTrack(SlowPion))',
-                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', 'Kid']
+                             'HighestProbInCat(pi+:inRoe, isRightTrack(SlowPion))',
+                             'KaonPionVariables(cosKaonPion)', 'KaonPionVariables(HaveOpositeCharges)', KId[getBelleOrBelle2()]]
 
     variables['MaximumPstar'] = [
         'useCMSFrame(p)',
@@ -349,7 +349,7 @@ def setVariables():
     variables['FSC'] = [
         'useCMSFrame(p)',
         'cosTPTO',
-        'Kid',
+        KId[getBelleOrBelle2()],
         'FSCVariables(pFastCMS)',
         'FSCVariables(cosSlowFast)',
         'FSCVariables(cosTPTOFast)',
@@ -359,7 +359,7 @@ def setVariables():
 
 def FillParticleLists(mode='Expert', path=analysis_main):
     """
-    Fills the particle Lists for each category.
+    Fills the particle Lists for all categories.
     """
 
     readyParticleLists = []
@@ -369,42 +369,45 @@ def FillParticleLists(mode='Expert', path=analysis_main):
         if particleList in readyParticleLists:
             continue
 
-        # Select particles in ROE for different categories of flavour tagging.
-        if particleList != 'Lambda0:LambdaROE':
+        # Select particles in ROE for different categories according to mass hypothesis.
+        if particleList != ('Lambda0:inRoe' or 'K+:inRoe'):
 
             # Filling particle list for actual category
             fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
             readyParticleLists.append(particleList)
-        # Check if there is K short in this event
-        if particleList == 'K+:KaonROE':
-            # Precut done to prevent from overtraining, might be redundant
-            applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
-            fillParticleList('pi+:inKaonRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
-                             path=path)
-            reconstructDecay('K_S0:ROEKaon -> pi+:inKaonRoe pi-:inKaonRoe',
-                             '0.40<=M<=0.60', True, path=path)
-            fitVertex('K_S0:ROEKaon', 0.01, fitter='kfitter', path=path)
-            readyParticleLists.append(particleList)
-        if particleList == 'Lambda0:LambdaROE':
-            fillParticleList('pi+:inLambdaRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
-                             path=path)
-            fillParticleList('p+:inLambdaRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1',
-                             path=path)
-            reconstructDecay(particleList + ' -> pi-:inLambdaRoe p+:inLambdaRoe',
-                             '1.00<=M<=1.23', True, path=path)
-            reconstructDecay('K_S0:ROELambda -> pi+:inLambdaRoe pi-:inLambdaRoe', '0.40<=M<=0.60', True, path=path)
-            fitVertex(particleList, 0.01, fitter='kfitter', path=path)
-            if mode != 'Expert':
-                matchMCTruth(particleList, path=path)
-            fitVertex('K_S0:ROELambda', 0.01, fitter='kfitter', path=path)
-            readyParticleLists.append(particleList)
+
+        else:
+            if 'pi+:inRoe' not in readyParticleLists:
+                fillParticleList('pi+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                readyParticleLists.append('pi+:inRoe')
+
+            if 'K_S0:inRoe' not in readyParticleLists:
+                reconstructDecay('K_S0:inRoe -> pi+:inRoe pi-:inRoe', '0.40<=M<=0.60', True, path=path)
+                fitVertex('K_S0:inRoe', 0.01, fitter='kfitter', path=path)
+                readyParticleLists.append('K_S0:inRoe')
+
+            if particleList == 'K+:inRoe':
+                fillParticleList(particleList, 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                # Precut done to prevent from overtraining, might be redundant
+                applyCuts(particleList, '0.1<' + KId[getBelleOrBelle2()], path=path)
+                readyParticleLists.append(particleList)
+
+            if particleList == 'Lambda0:inRoe':
+                fillParticleList('p+:inRoe', 'isInRestOfEvent > 0.5 and isNAN(p) !=1 and isInfinity(p) != 1', path=path)
+                reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe',
+                                 '1.00<=M<=1.23', True, path=path)
+                fitVertex(particleList, 0.01, fitter='kfitter', path=path)
+                if mode != 'Expert':
+                    matchMCTruth(particleList, path=path)
+                readyParticleLists.append(particleList)
 
     return True
 
 
 def trackLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     """
-    Trains or tests all categories at track level except KaonPion, MaximumPstar and FSC which are only at the event level.
+    Samples data for training or tests all categories at track level except
+    KaonPion, MaximumPstar and FSC which are only at the event level.
     """
 
     B2INFO('TRACK LEVEL')
@@ -537,7 +540,7 @@ def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
 
 def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
     """
-    Tests all categories at event level.
+    Samples data for training or tests all categories all categories at event level.
     """
 
     B2INFO('EVENT LEVEL')
@@ -625,7 +628,7 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
 
 def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
     """
-    Trains all categories at event level except KaonPion, MaximumPstar and FSC which are only at the event level.
+    Trains all categories at event level.
     """
 
     B2INFO('EVENT LEVEL TEACHER')
@@ -771,13 +774,13 @@ def trackAndEventLevels(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_
         if 'KaonPion' in [row[1] for row in eventLevelParticleLists]:
             trackAndEventLevelKaonPionPath = create_path()
             SkipEmptyParticleList = register_module("SkimFilter")
-            SkipEmptyParticleList.param('particleLists', 'K+:KaonROE')
+            SkipEmptyParticleList.param('particleLists', 'K+:inRoe')
             SkipEmptyParticleList.if_true(trackAndEventLevelKaonPionPath, AfterConditionPath.CONTINUE)
             path.add_module(SkipEmptyParticleList)
 
             trackAndEventLevelKaonPionPath.add_module(
                 'MVAExpert',
-                listNames=['K+:KaonROE'],
+                listNames=['K+:inRoe'],
                 extraInfoName=identifiersExtrainfosKaonPion[0][0],
                 signalFraction=signalFraction,
                 identifier=identifiersExtrainfosKaonPion[0][1])
@@ -1112,6 +1115,7 @@ def flavorTagger(
                     flavorTaggerInfoFiller.param('TMVAfbdt', TMVAfbdt)
                     flavorTaggerInfoFiller.param('FANNmlp', FANNmlp)
                     flavorTaggerInfoFiller.param('qrCategories', True)
+                    flavorTaggerInfoFiller.param('istrueCategories', True)
                     flavorTaggerInfoFiller.param('targetProb', False)
                     flavorTaggerInfoFiller.param('trackPointers', False)
                     roe_path.add_module(flavorTaggerInfoFiller)  # Add FlavorTag Info filler to roe_path

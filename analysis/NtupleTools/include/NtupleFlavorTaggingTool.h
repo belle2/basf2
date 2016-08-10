@@ -53,6 +53,9 @@ namespace Belle2 {
     /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
     std::map<std::string, float*> m_qrCategories;
 
+    /**< map containing the category name and the corresponding MC Variable isRightCategory. They could be used to evaluate independent tags.*/
+    std::map<std::string, float*> m_isTrueCategories;
+
     /** Create branches in m_tree - this function should be called by the constructor only. */
     void setupTree();
 

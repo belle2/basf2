@@ -46,6 +46,11 @@ void FlavorTaggerInfoMap::setQrCategory(std::string category, float qr)
   m_qrCategory.insert(std::pair<std::string, float>(category, qr));
 }
 
+void FlavorTaggerInfoMap::setIsTrueCategory(std::string category, float isTrue)
+{
+  m_isTrueCategory.insert(std::pair<std::string, float>(category, isTrue));
+}
+
 void FlavorTaggerInfoMap::setQrCombined(float qr)
 {
   m_qrCombined = qr;
@@ -90,6 +95,11 @@ std::map<std::string, float> FlavorTaggerInfoMap::getProbEventLevel()
 std::map<std::string, float> FlavorTaggerInfoMap::getQrCategory()
 {
   return m_qrCategory;
+}
+
+std::map<std::string, float> FlavorTaggerInfoMap::getIsTrueCategory()
+{
+  return m_isTrueCategory;
 }
 
 float FlavorTaggerInfoMap::getQrCombined()

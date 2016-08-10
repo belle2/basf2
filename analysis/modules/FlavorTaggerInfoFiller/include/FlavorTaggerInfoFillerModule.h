@@ -48,6 +48,8 @@ namespace Belle2 {
 
     bool m_trackPointers; /** Sets if track pointers to target tracks are saved or not **/
 
+    bool m_istrueCategories;  /** Sets if individual MC thruth for each Category is saved or not **/
+
   public:
     /** Constructor. */
     FlavorTaggerInfoFillerModule();

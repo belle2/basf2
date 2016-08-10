@@ -56,8 +56,7 @@ r_subsample = array('d', [
     0.625,
     0.75,
     0.875,
-    1.0,
-])
+    1.0])
 r_size = len(r_subsample)
 average_eff = 0
 
@@ -252,6 +251,7 @@ for method in methods:
     event_fractionB0 = array('f', [0] * r_size)
     event_fractionB0bar = array('f', [0] * r_size)
     event_fractionTotal = array('f', [0] * r_size)
+    event_fractionDiff = array('f', [0] * r_size)
     rvalueB0 = array('f', [0] * r_size)
     rvalueB0bar = array('f', [0] * r_size)
     rvalueB0Average = array('f', [0] * r_size)
@@ -262,11 +262,12 @@ for method in methods:
     entries = array('f', [0] * r_size)
     entriesB0 = array('f', [0] * r_size)
     entriesB0bar = array('f', [0] * r_size)
-    intervallEff = array('f', [0] * r_size)
+    # intervallEff = array('f', [0] * r_size)
+
     print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
     print('*                                                                                                  *')
     print('* ------------------------------------------------------------------------------------------------ *')
-    print('*   r-interval        <r>        Efficiency        Event fraction         w         Delta_w        *')
+    print('*   r-interval        <r>        Efficiency       Delta_Efficiency        w         Delta_w        *')
     print('* ------------------------------------------------------------------------------------------------ *')
     for i in range(1, r_size):
         # get the average r-value
@@ -283,13 +284,14 @@ for method in methods:
         entriesB0bar[i] = histo_entries_per_binB0bar.GetBinContent(i)
         # fraction of events/all events
         event_fractionTotal[i] = (entriesB0[i] + entriesB0bar[i]) / total_entries
+        event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
         event_fractionB0[i] = entriesB0[i] / total_entries_B0
         event_fractionB0bar[i] = entriesB0bar[i] / total_entries_B0bar
-        intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
+        # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
         print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' +
-              '{:.3f}'.format(rvalueB0Average[i]) + '        ' +
-              '{:.4f}'.format(intervallEff[i]) + '              ' +
+              '{:.3f}'.format(rvalueB0Average[i]) + '          ' +
               '{:.4f}'.format(event_fractionTotal[i]) + '           ' +
+              '{: .4f}'.format(event_fractionDiff[i]) + '           ' +
               '{:.4f}'.format(wvalue[i]) + '       ' +
               '{: .4f}'.format(wvalueDiff[i]) + '        *')
         # finally calculating the total effective efficiency
@@ -305,8 +307,8 @@ for method in methods:
     print('*   | TOTAL NUMBER OF TAGGED EVENTS  =  ' +
           '{:<24}'.format("%.0f" % total_entries) + '{:>36}'.format('|   *'))
     print('*   |                                                                                          |   *')
-    print('*   | TOTAL AVERAGE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) +
-          ' %                                              |   *')
+    print('*   | TOTAL AVERAGE EFFECTIVE EFFICIENCY  (q=+-1)=  ' + '{:.2f}'.format(average_eff * 100) +
+          ' %                                    |   *')
     print('*   |                                                                                          |   *')
     print('*   | B0-TAGGER  TOTAL EFFECTIVE EFFICIENCIES: ' +
           '{:.2f}'.format(tot_eff_effB0 * 100) + ' % (q=+1)  ' +

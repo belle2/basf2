@@ -72,6 +72,13 @@ namespace Belle2 {
     double transverseMomentumOfChargeTracksInRoe(const Particle* part);
 
     /**
+     * Returns the number of K_S0 in the given ROE Particle List(flavor tagging specific variable).
+     *
+     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:inRoe") exists.
+     */
+    double NumberOfKShortsInRoe(const Particle* particle);
+
+    /**
      * returns 1.0 if the particle has been selected as target in the muon or electron flavor tagging category, 0.0 else.
      */
     double isInElectronOrMuonCat(const Particle* particle);
@@ -117,13 +124,6 @@ namespace Belle2 {
     double McFlavorOfTagSide(const Particle* part);
 
     /**
-     * Returns the number of K_S0 in the given ROE Particle List(flavor tagging specific variable).
-     *
-     * requires that StoreObjPtr<ParticleList> KShorts("K_S0:ROELambda") or KShorts("K_S0:ROEKaon") exists.
-     */
-    Manager::FunctionPtr NumberOfKShortinROEParticleList(const std::vector<std::string>& arguments);
-
-    /**
      * Returns function which returns a requested kinematical variable via argument[0] of the group of the semileptonic flavor tagging variables. The Possibilities are:
      * recoilMass: recoiling mass of the Btag system against the target particle in CMS
      * pMissCMS: CMS momentum magnitude missing in Btag using as target hypothesis the given particle
@@ -153,14 +153,14 @@ namespace Belle2 {
     Manager::FunctionPtr FSCVariables(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns Returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName (argument[0]).
+     * Returns function which returns 1.0 if the given Particle is classified as target, i.e. if it has the highest probability in particlelistName (argument[0]).
      * The probability is accessed via extraInfoName (argument[1]).
      * This is a Flavor Tagging specific variable!
      */
     Manager::FunctionPtr hasHighestProbInCat(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns Returns the value of the highest target probability in particlelistName (argument[0]).
+     * Returns function which returns the value of the highest target probability in particlelistName (argument[0]).
      * The probability is accessed via extraInfoName (argument[1]).
      * This is a Flavor Tagging specific variable!
      */
@@ -190,6 +190,11 @@ namespace Belle2 {
      */
     Manager::FunctionPtr weightedQrOf(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns function which returns 1.0 if the given ategory name tags the B0 MC flavor correctly.
+     * This is a Flavor Tagging specific variable on event level!
+     */
+    Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments);
 
   }
 }

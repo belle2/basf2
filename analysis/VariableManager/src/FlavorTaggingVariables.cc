@@ -205,7 +205,7 @@ namespace Belle2 {
     {
       double maximumKaonid = 0;
       double maximum_charge = 0;
-      StoreObjPtr<ParticleList> KaonList("K+:KaonROE");
+      StoreObjPtr<ParticleList> KaonList("K+:inRoe");
       if (KaonList.isValid()) {
         for (unsigned int i = 0; i < KaonList->getListSize(); ++i) {
           Particle* p = KaonList->getParticle(i);
@@ -239,13 +239,28 @@ namespace Belle2 {
 
     }
 
+    double NumberOfKShortsInRoe(const Particle* particle)
+    {
+      int flag = 0;
+      StoreObjPtr<ParticleList> KShortList("K_S0:inRoe");
+      if (KShortList.isValid()) {
+        if (KShortList.isValid()) {
+          for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
+            if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
+            flag++;
+          }
+        }
+      } else B2FATAL("NumberOfKShortsInRoe cannot be calculated because the required particleList K_S0:inRoe could not be found or is not valid");
+      return flag;
+    }
+
 //     Event Level Variables --------------------------------------------------------------------------------------------
 
     double isInElectronOrMuonCat(const Particle* particle)
     {
 
-      StoreObjPtr<ParticleList> MuonList("mu+:MuonROE");
-      StoreObjPtr<ParticleList> ElectronList("e+:ElectronROE");
+      StoreObjPtr<ParticleList> MuonList("mu+:inRoe");
+      StoreObjPtr<ParticleList> ElectronList("e+:inRoe");
 
       const Track* trackTargetMuon = nullptr;
       const Track* trackTargetElectron = nullptr;
@@ -607,29 +622,6 @@ namespace Belle2 {
 
 //  Track and Event Level variables ------------------------------------------------------------------------
 
-    Manager::FunctionPtr NumberOfKShortinROEParticleList(const std::vector<std::string>& arguments)
-    {
-      if (arguments.size() == 1) {
-        auto particleListName = arguments[0];
-        auto func = [particleListName](const Particle * particle) -> double {
-          int flag = 0;
-          if (particleListName == "K_S0:ROEKaon" || particleListName == "K_S0:ROELambda")
-          {
-            StoreObjPtr<ParticleList> KShortList(particleListName);
-            if (KShortList.isValid()) {
-              for (unsigned int i = 0; i < KShortList->getListSize(); i++) {
-                if (particle->overlapsWith(KShortList->getParticle(i))) {continue;}
-                flag++;
-              }
-            }
-          } else B2FATAL("NumberOfKShortinROEParticleList not available for the requested particleListName  " << particleListName << " . The possibilities are K_S0:ROEKaon or K_S0:ROELambda");          return flag;
-        };
-        return func;
-      } else {
-        B2FATAL("Wrong number of arguments (1 required) for meta function NumberOfKShortinROEParticleList");
-      }
-    }
-
     Manager::FunctionPtr SemiLeptonicVariables(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -713,7 +705,7 @@ namespace Belle2 {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
 //       StoreObjPtr<ParticleList> KaonList("K+:ROE");
-          StoreObjPtr<ParticleList> SlowPionList("pi+:PionROE");
+          StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
 
           PCmsLabTransform T;
           TLorentzVector momTargetKaon = T.rotateLabToCms() * particle -> get4Vector();
@@ -766,7 +758,7 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         auto requestedVariable = arguments[0];
         auto func = [requestedVariable](const Particle * particle) -> double {
-          StoreObjPtr<ParticleList> FastParticleList("pi+:PionROE");
+          StoreObjPtr<ParticleList> FastParticleList("pi+:inRoe");
           PCmsLabTransform T;
           TLorentzVector momSlowPion = T.rotateLabToCms() * particle -> get4Vector();  //Momentum of Slow Pion in CMS-System
           TLorentzVector momFastParticle;  //Momentum of Fast Pion in CMS-System
@@ -1116,7 +1108,7 @@ namespace Belle2 {
           // if KaonPion
           if (index == 9)
           {
-            StoreObjPtr<ParticleList> SlowPionList("pi+:PionROE");
+            StoreObjPtr<ParticleList> SlowPionList("pi+:inRoe");
             Particle* TargetSlowPion = nullptr;
             if (SlowPionList.isValid()) {
               double maximumProbSlowPion = 0;
@@ -1148,7 +1140,7 @@ namespace Belle2 {
           // FSC",
           if (index == 11)
           {
-            StoreObjPtr<ParticleList> FastParticleList("pi+:PionROE");
+            StoreObjPtr<ParticleList> FastParticleList("pi+:inRoe");
             PCmsLabTransform T;
             Particle* TargetFastParticle = nullptr;
             if (FastParticleList.isValid()) {
@@ -1404,7 +1396,7 @@ namespace Belle2 {
               for (unsigned int i = 0; i < Limit; i++) {
                 if (ParticleVector[i]->hasExtraInfo(extraInfoRightCategory)) {
                   double flavor = 0.0;
-                  if (particleListName == "Lambda0:LambdaROE") {
+                  if (particleListName == "Lambda0:inRoe") {
                     flavor = (-1) * ParticleVector[i]->getPDGCode() / TMath::Abs(ParticleVector[i]->getPDGCode());
                   } else if (extraInfoRightTrack == "isRightTrack(IntermediateElectron)" || extraInfoRightTrack == "isRightTrack(IntermediateMuon)"
                              || extraInfoRightTrack == "isRightTrack(IntermediateKinLepton)" || extraInfoRightTrack == "isRightTrack(SlowPion)") {
@@ -1430,6 +1422,72 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto categoryName = arguments[0];
+        auto func = [categoryName](const Particle*) -> double {
+          if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
+          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          {
+            B2FATAL("isCategoryTrue: Not available category" << categoryName <<
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            return 0.0;
+          }
+
+          std::string particleListName;
+          std::string trackTargetName = categoryName;
+
+          if (categoryName == "Electron" || categoryName == "IntermediateElectron") particleListName = "e+:inRoe";
+          else if (categoryName == "Muon" ||  categoryName ==  "IntermediateMuon" || categoryName ==  "KinLepton" || categoryName ==  "IntermediateKinLepton") particleListName = "mu+:inRoe";
+          else if (categoryName == "Kaon" || categoryName ==  "KaonPion") {particleListName = "K+:inRoe"; trackTargetName = "Kaon";}
+          else if (categoryName == "Lambda") particleListName = "Lambda0:inRoe";
+          else particleListName = "pi+:inRoe";
+
+          if (categoryName == "FSC") trackTargetName = "SlowPion";
+
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+
+          double Output = 0.0;
+
+          std::vector<Particle*> targetParticles;
+          int nTargets = 0;
+          Variable::Manager& manager = Variable::Manager::Instance();
+
+          if (ListOfParticles.isValid())
+          {
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* iParticle = ListOfParticles->getParticle(i);
+              if (iParticle != nullptr) {
+                double targetFlag = 0;
+                if (categoryName == "MaximumPstar") {
+                  targetFlag = manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")-> function(iParticle);
+                } else {
+                  targetFlag = manager.getVariable("isRightTrack(" + trackTargetName + ")")-> function(iParticle);
+                }
+                if (targetFlag == 1) {
+                  targetParticles.push_back(iParticle);
+                }
+              }
+            }
+
+            for (auto& targetParticle : targetParticles) {
+              if (manager.getVariable("isRightCategory(" +  categoryName + ")")-> function(targetParticle) == 1) {
+                Output = 1;
+                nTargets += 1;
+              }
+            }
+
+            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+          }
+          return Output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (1 required) for meta function isCategoryTrue");
+      }
+    }
+
     VARIABLE_GROUP("Flavor Tagger Variables");
 
     REGISTER_VARIABLE("pMissTag", momentumMissingTagSide,  "Calculates the missing Momentum for a given particle on the tag side.");
@@ -1445,6 +1503,8 @@ namespace Belle2 {
                       "Returns the q*(highest PID_Likelihood for Kaons), else 0.");
     REGISTER_VARIABLE("ptTracksRoe", transverseMomentumOfChargeTracksInRoe,
                       "Returns the transverse momentum of all charged tracks if there exists a ROE for the given particle, else 0.");
+    REGISTER_VARIABLE("NumberOfKShortsInRoe", NumberOfKShortsInRoe,
+                      "Returns the number of K_S0 in the rest of event. The particleList K_S0:inRoe is required");
 
     REGISTER_VARIABLE("isInElectronOrMuonCat", isInElectronOrMuonCat,
                       "Returns 1.0 if the particle has been selected as target in the Muon or Electron Category, 0.0 else.");
@@ -1472,8 +1532,6 @@ namespace Belle2 {
                       "FlavorTagging:[Eventbased] Available checking variables are getListSize for particle lists.");
     REGISTER_VARIABLE("IsDaughterOf(variable)", IsDaughterOf, "Check if the particle is a daughter of the given list.");
 
-    REGISTER_VARIABLE("NumberOfKShortinROEParticleList(particleListName)", NumberOfKShortinROEParticleList,
-                      "Returns the number of K_S0 in the given ROE ParticleList. The possibilities are K_S0:ROEKaon or K_S0:ROELambda");
     REGISTER_VARIABLE("SemiLeptonicVariables(requestedVariable)", SemiLeptonicVariables,
                       "FlavorTagging:[Eventbased] Kinematical variables (recoilMass, pMissCMS, cosThetaMissCMS or EW90) assuming a semileptonic decay with the given particle as target.");
     REGISTER_VARIABLE("KaonPionVariables(requestedVariable)"  , KaonPionVariables ,
@@ -1493,6 +1551,8 @@ namespace Belle2 {
                       "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("weightedQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", weightedQrOf,
                       "FlavorTagging: [Eventbased] weighted q*r where r is calculated from the output of event level for the 3 particles with highest track probability in particlelistName.");
+    REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
+                      "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.")
 
 
 

@@ -50,6 +50,7 @@ namespace Belle2 {
                         m_targetEventLevel({}),
                         m_probEventLevel({}),
                         m_qrCategory({}),
+                        m_isTrueCategory({}),
                         m_qrCombined(-2),
                         m_B0Probability(-2),
                         m_B0barProbability(-2)
@@ -105,6 +106,13 @@ namespace Belle2 {
     void setQrCategory(std::string category, float qr);
 
     /**
+    * Map filler: Set the category name and the corresponding truth MC value.
+    * @param category string name of the given category
+    * @param isTrue output of the given category
+    */
+    void setIsTrueCategory(std::string category, float isTrue);
+
+    /**
     * Saves qr Output of the Combiner. Output of the FlavorTagger after the complete process.
     * @param qr final FlavorTagger output
     */
@@ -153,6 +161,11 @@ namespace Belle2 {
     */
     std::map<std::string, float> getQrCategory();
 
+    /**< map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
+    * @return map
+    */
+    std::map<std::string, float> getIsTrueCategory();
+
     /**qr Output of the Combiner. Output of the FlavorTagger after the complete process.
     * @return qr
     */
@@ -185,6 +198,8 @@ namespace Belle2 {
     m_probEventLevel; /**< map containing the category name and the corresponding highest category probability in Event Level*/
     std::map<std::string, float>
     m_qrCategory; /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
+    std::map<std::string, float>
+    m_isTrueCategory; /**< map containing the category name and a float value which is 1 if the corresponding category tags the MC Flavor correctly or 0 else.*/
 
     float m_qrCombined; /**< qr Output of the Combiner. Output of the FlavorTagger after the complete process*/
     float m_B0Probability; /**< Direct Output of the Combiner: Probability of being a B0.*/

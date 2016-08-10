@@ -75,7 +75,7 @@ namespace Belle2 {
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
       const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
       //Ignore everything below 1eV
-      if (depEnergy < CLHEP::eV) return false;
+      //if (depEnergy < CLHEP::eV) return false;
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;

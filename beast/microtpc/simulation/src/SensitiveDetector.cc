@@ -74,7 +74,7 @@ namespace Belle2 {
       const int detNb = step->GetTrack()->GetVolume()->GetCopyNo();
       const double GlTime = step->GetPreStepPoint()->GetGlobalTime();
       //Ignore everything below 1eV
-      if (depEnergy < CLHEP::eV) return false;
+      //if (depEnergy < CLHEP::eV) return false;
 
       //Get the datastore arrays
       StoreArray<MCParticle>  mcParticles;
@@ -125,7 +125,7 @@ namespace Belle2 {
       StoreArray<TpcMCParticle> TpcMCParticles;
       for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
         int pdg = mcParticle.getPDG();
-        if (pdg == 2112) {
+        if (pdg == 2112 || pdg == 1000080160 || pdg == 100006012 || pdg == 1000020040 || pdg == 2212) {
           int PDG = mcParticle.getPDG();
           float Mass = mcParticle.getMass();
           float Energy = mcParticle.getEnergy();

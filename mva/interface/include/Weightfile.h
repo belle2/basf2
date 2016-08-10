@@ -153,6 +153,16 @@ namespace Belle2 {
       }
 
       /**
+       * Returns a stored element from the xml tree
+       * @param identifier of the stored element
+       */
+      template<class T>
+      T getElement(const std::string& identifier, const T& default_value) const
+      {
+        return m_pt.get<T>(identifier, default_value);
+      }
+
+      /**
       * Returns a stored vector from the xml tree
       * @param identifier of the stored std::vector
       */

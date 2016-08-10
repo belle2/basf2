@@ -135,8 +135,50 @@ namespace Belle2 {
       weightfile.getFile("FastBDT_Weightfile", custom_weightfile);
       std::fstream file(custom_weightfile, std::ios_base::in);
 #if FastBDT_VERSION_MAJOR >= 3
-      m_expert_forest = FastBDT::readForestFromStream<float>(file);
+      std::stringstream s;
+      {
+        std::string t;
+        std::fstream file2(custom_weightfile, std::ios_base::in);
+        getline(file2, t);
+        s << t;
+      }
+      int dummy;
+      // Try to read to integers, if this is sucessfull we have a old weightfile with a Feature Binning before the Tree.
+      if (!(s >> dummy >> dummy)) {
+        B2INFO("FastBDT: I read a new weightfile of FastBDT using the new FastBDT version 3. Everythings fine!");
+        // New format since version 3
+        m_expert_forest = FastBDT::readForestFromStream<float>(file);
+      } else {
+        B2INFO("FastBDT: I read an old weightfile of FastBDT using the new FastBDT version 3."
+               "I will convert your FastBDT on-the-fly to the new version."
+               "Retrain the classifier to get rid of this message");
+        // Old format before version 3
+        // We read in first the feature binnings and than rewrite the tree
+        std::vector<FastBDT::FeatureBinning<float>> feature_binnings;
+        file >> feature_binnings;
+        double F0;
+        file >> F0;
+        double shrinkage;
+        file >> shrinkage;
+        // This parameter was not available in the old version
+        bool transform2probability = true;
+        FastBDT::Forest<unsigned int> temp_forest(shrinkage, F0, transform2probability);
+        unsigned int size;
+        file >> size;
+        for (unsigned int i = 0; i < size; ++i) {
+          temp_forest.AddTree(FastBDT::readTreeFromStream<unsigned int>(file));
+        }
+
+        FastBDT::Forest<float> cleaned_forest(temp_forest.GetShrinkage(), temp_forest.GetF0(), temp_forest.GetTransform2Probability());
+        for (auto& tree : temp_forest.GetForest()) {
+          cleaned_forest.AddTree(FastBDT::removeFeatureBinningTransformationFromTree(tree, feature_binnings));
+        }
+        m_expert_forest = cleaned_forest;
+      }
 #else
+      B2INFO("FastBDT: I read an old weightfile of FastBDT using the old FastBDT version."
+             "I try to fix the weightfile first to avoid problems due to NaN and inf values."
+             "Consider to switch to the newer version of FastBDT (newer externals)");
       // Check for nan or inf in file and replace with 0
       std::stringstream s;
       std::string t;

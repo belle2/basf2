@@ -10,6 +10,7 @@
 
 #include <beast/microtpc/modules/MicrotpcStudyModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
+#include <beast/microtpc/dataobjects/TpcMCParticle.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
@@ -74,6 +75,7 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcStudyModule::defineHisto()
 {
+  h_tpc_neutron  = new TH1F("h_tpc_neutron", "Neutron kin. energy [MeV]", 1000, 0., 100.);
   for (int i = 0 ; i < 8 ; i++) {
     h_z[i] = new TH1F(TString::Format("h_z_%d", i), "Charged density per cm^2", 2000, 0.0, 20.0);
 
@@ -222,6 +224,7 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcSimHit>  SimHits;
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
+  StoreArray<TpcMCParticle> mcparts;
   /*
   StoreArray<MicrotpcDataHit> DataHits;
   int dentries = DataHits.getEntries();
@@ -402,7 +405,14 @@ void MicrotpcStudyModule::event()
     }
   }
   */
-
+  for (const auto& mcpart : mcparts) { // start loop over all Tracks
+    const double energy = mcpart.getEnergy();
+    const double mass = mcpart.getMass();
+    double kin = energy - mass;
+    const double pdg = mcpart.getPDG();
+    if (pdg == 2112)
+      h_tpc_neutron->Fill(kin);
+  }
   //number of Tracks
   //int nTracks = Tracks.getEntries();
 

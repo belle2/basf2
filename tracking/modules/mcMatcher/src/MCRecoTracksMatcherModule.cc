@@ -177,7 +177,7 @@ void MCRecoTracksMatcherModule::initialize()
   // Check if there are MC Particles
   StoreArray<MCParticle> storeMCParticles;
 
-  if (storeMCParticles.isValid()) {
+  if (storeMCParticles.isOptional()) {
     m_mcParticlesPresent = true;
 
     // Actually retrieve the StoreArrays

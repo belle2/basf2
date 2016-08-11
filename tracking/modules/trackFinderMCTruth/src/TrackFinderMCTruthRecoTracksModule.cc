@@ -161,9 +161,7 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 void TrackFinderMCTruthRecoTracksModule::initialize()
 {
   StoreArray<MCParticle> mcparticles;
-  if (mcparticles.isValid()) {
-    mcparticles.isRequired();
-
+  if (mcparticles.isOptional()) {
     m_mcParticlesPresent = true;
 
     //output store arrays have to be registered in initialize()

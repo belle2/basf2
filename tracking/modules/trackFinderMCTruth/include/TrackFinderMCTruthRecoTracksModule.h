@@ -90,6 +90,9 @@ namespace Belle2 {
     m_fromPdgCodes;                            /**< if size() is not 0, only for particles having an ancestor (mother or mother of mother etc) with PDG codes same as in this vector a track candidate be created*/
     std::vector<int>
     m_particlePdgCodes;                        /**< if size() is not 0, only for particles with PDG codes same as in this vector a track candidate will be created*/
+
+    bool m_mcParticlesPresent =
+      false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
   };
 }
 

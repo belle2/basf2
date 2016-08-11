@@ -161,71 +161,74 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
 void TrackFinderMCTruthRecoTracksModule::initialize()
 {
   StoreArray<MCParticle> mcparticles;
-  mcparticles.isRequired();
+  if (mcparticles.isValid()) {
+    mcparticles.isRequired();
 
-  //output store arrays have to be registered in initialize()
-  StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
-  recoTracks.registerInDataStore();
+    m_mcParticlesPresent = true;
 
-  recoTracks.registerRelationTo(mcparticles);
+    //output store arrays have to be registered in initialize()
+    StoreArray<RecoTrack> recoTracks(m_recoTracksStoreArrayName);
+    recoTracks.registerInDataStore();
 
-  RecoTrack::registerRequiredRelations(recoTracks);
+    recoTracks.registerRelationTo(mcparticles);
 
-  // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
-  m_particleProperties = 0;
-  int aPdgCode = 0;
-  const int nProperties = m_whichParticles.size();
-  for (int i = 0; i not_eq nProperties; ++i) {
-    if (m_whichParticles[i] == "primary") {
-      m_particleProperties += 1;
-    } else if (m_whichParticles[i] == "PXD") {
-      m_particleProperties += 2;
-    } else if (m_whichParticles[i] == "SVD") {
-      m_particleProperties += 4;
-    } else if (m_whichParticles[i] == "CDC") {
-      m_particleProperties += 8;
-    } else if (m_whichParticles[i] == "TOP") {
-      m_particleProperties += 16;
-    } else if (m_whichParticles[i] == "ARICH") {
-      m_particleProperties += 32;
-    } else if (m_whichParticles[i] == "ECL") {
-      m_particleProperties += 64;
-    } else if (m_whichParticles[i] == "KLM") {
-      m_particleProperties += 128;
-    } else if (m_whichParticles[i].substr(0, 3) == "is:") {
-      std::string pdgCodeString = m_whichParticles[i].substr(3);
-      std::stringstream(pdgCodeString) >> aPdgCode;
-      B2DEBUG(100, "PDG code added to m_particlePdgCodes " << aPdgCode << " *******");
-      m_particlePdgCodes.push_back(aPdgCode);
-    } else if (m_whichParticles[i].substr(0, 5) == "from:") {
-      std::string pdgCodeString = m_whichParticles[i].substr(5);
-      std::stringstream(pdgCodeString) >> aPdgCode;
-      B2DEBUG(100, "PDG code added to m_fromPdgCodes " << aPdgCode << " *******");
-      m_fromPdgCodes.push_back(aPdgCode);
-    } else {
-      B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
+    RecoTrack::registerRequiredRelations(recoTracks);
+
+    // build a bit mask with all properties a MCParticle should have to lead to the creation of a track candidate
+    m_particleProperties = 0;
+    int aPdgCode = 0;
+    const int nProperties = m_whichParticles.size();
+    for (int i = 0; i not_eq nProperties; ++i) {
+      if (m_whichParticles[i] == "primary") {
+        m_particleProperties += 1;
+      } else if (m_whichParticles[i] == "PXD") {
+        m_particleProperties += 2;
+      } else if (m_whichParticles[i] == "SVD") {
+        m_particleProperties += 4;
+      } else if (m_whichParticles[i] == "CDC") {
+        m_particleProperties += 8;
+      } else if (m_whichParticles[i] == "TOP") {
+        m_particleProperties += 16;
+      } else if (m_whichParticles[i] == "ARICH") {
+        m_particleProperties += 32;
+      } else if (m_whichParticles[i] == "ECL") {
+        m_particleProperties += 64;
+      } else if (m_whichParticles[i] == "KLM") {
+        m_particleProperties += 128;
+      } else if (m_whichParticles[i].substr(0, 3) == "is:") {
+        std::string pdgCodeString = m_whichParticles[i].substr(3);
+        std::stringstream(pdgCodeString) >> aPdgCode;
+        B2DEBUG(100, "PDG code added to m_particlePdgCodes " << aPdgCode << " *******");
+        m_particlePdgCodes.push_back(aPdgCode);
+      } else if (m_whichParticles[i].substr(0, 5) == "from:") {
+        std::string pdgCodeString = m_whichParticles[i].substr(5);
+        std::stringstream(pdgCodeString) >> aPdgCode;
+        B2DEBUG(100, "PDG code added to m_fromPdgCodes " << aPdgCode << " *******");
+        m_fromPdgCodes.push_back(aPdgCode);
+      } else {
+        B2FATAL("Invalid values were given to the MCTrackFinder parameter WhichParticles");
+      }
+    }
+
+
+
+    //transfom the smearingCov vector into a TMatrixD
+    //first check if it can be transformed into a 6x6 matrix
+    if (m_smearingCov.size() != 36) {
+      B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
+    }
+    m_initialCov.ResizeTo(6, 6);
+    m_initialCov = TMatrixDSym(6, &m_smearingCov[0]);
+    for (int i = 0; i != 6; ++i) {
+      if (m_initialCov(i, i) < 0.0) {
+        m_initialCov(0, 0) = -1.0; // if first element of matrix is negative this using this matrix will be switched off
+      }
+    }
+
+    if (m_smearing > 0.0 && m_initialCov(0, 0) > 0.0) {
+      B2FATAL("Both relative smearing (Smearing) and using a smearing cov (SmearingCov) is activated but only one of both can be used");
     }
   }
-
-
-
-  //transfom the smearingCov vector into a TMatrixD
-  //first check if it can be transformed into a 6x6 matrix
-  if (m_smearingCov.size() != 36) {
-    B2FATAL("SmearingCov does not have exactly 36 elements. So 6x6 covariance matrix can be formed from it");
-  }
-  m_initialCov.ResizeTo(6, 6);
-  m_initialCov = TMatrixDSym(6, &m_smearingCov[0]);
-  for (int i = 0; i != 6; ++i) {
-    if (m_initialCov(i, i) < 0.0) {
-      m_initialCov(0, 0) = -1.0; // if first element of matrix is negative this using this matrix will be switched off
-    }
-  }
-
-  if (m_smearing > 0.0 && m_initialCov(0, 0) > 0.0) {
-    B2FATAL("Both relative smearing (Smearing) and using a smearing cov (SmearingCov) is activated but only one of both can be used");
-  }
-
 }
 
 void TrackFinderMCTruthRecoTracksModule::beginRun()
@@ -238,6 +241,12 @@ void TrackFinderMCTruthRecoTracksModule::beginRun()
 
 void TrackFinderMCTruthRecoTracksModule::event()
 {
+  // Skip in the case there are no MC particles present.
+  if (not m_mcParticlesPresent) {
+    B2DEBUG(100, "Skipping MC Track Finder as there are no MC Particles registered in the DataStore.");
+    return;
+  }
+
   StoreObjPtr<EventMetaData> eventMetaDataPtr("EventMetaData", DataStore::c_Event);
   const int eventCounter = eventMetaDataPtr->getEvent();
   B2DEBUG(100, "*******   MCTrackFinderModule processing event number: " << eventCounter << " *******");

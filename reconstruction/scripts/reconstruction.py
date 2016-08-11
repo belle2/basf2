@@ -12,7 +12,7 @@ from tracking import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, match_to_mc_information=True, trigger_mode="all"):
+def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
@@ -20,8 +20,6 @@ def add_reconstruction(path, components=None, pruneTracks=True, match_to_mc_info
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
-    :param match_to_mc_information: Match the found entities to MC information where possible. Please note that this is
-        only possible if MC information is present in the DataStore.
     :param trigger_mode: Trigger mode to emulate. Possible values are: "all", "hlt", "fast_reco".
         * "all": Normal mode. Do add all the modules in the standard reconstruction. This is the mode for the typical
                 user.
@@ -39,14 +37,12 @@ def add_reconstruction(path, components=None, pruneTracks=True, match_to_mc_info
                                 components=components,
                                 pruneTracks=False,
                                 mcTrackFinding=False,
-                                match_to_mc_information=match_to_mc_information,
                                 trigger_mode=trigger_mode)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
-                                    match_to_mc_information=match_to_mc_information,
                                     trigger_mode=trigger_mode)
 
 
@@ -70,7 +66,7 @@ def add_mc_reconstruction(path, components=None, pruneTracks=True):
 
 
 def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
-                                    match_to_mc_information=True, trigger_mode="all"):
+                                    trigger_mode="all"):
     """
     This function adds the standard reconstruction modules after tracking
     to a path.
@@ -78,8 +74,6 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
     :param path: The path to add the modules to.
     :param components list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
-    :param match_to_mc_information: Match the entities to the MC information where possible. Please note that this
-        is only possible when the MC information is present in the DataStore.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     """
 
@@ -97,13 +91,11 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
         add_ecl_eip_module(path, components)
 
     if trigger_mode in ["hlt", "all"]:
-        if match_to_mc_information:
-            add_ecl_mc_matcher_module(path, components)
+        add_ecl_mc_matcher_module(path, components)
 
         add_klm_modules(path, components)
 
-        if match_to_mc_information:
-            add_klm_mc_matcher_module(path, components)
+        add_klm_mc_matcher_module(path, components)
 
         add_pid_module(path, components)
 

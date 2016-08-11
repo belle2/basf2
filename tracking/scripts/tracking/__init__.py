@@ -5,8 +5,7 @@ from basf2 import *
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False,
-                                mcTrackFinding=False, match_to_mc_information=True,
-                                trigger_mode="all"):
+                                mcTrackFinding=False, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -15,8 +14,6 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False,
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
-    :param match_to_mc_information: Match the found tracks to the MC tracks - this can only be done when MC
-        information is present.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     """
 
@@ -33,9 +30,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False,
         add_track_finding(path, components, trigger_mode)
 
     if trigger_mode in ["hlt", "all"]:
-        if match_to_mc_information:
-            add_mc_matcher(path, components)
-
+        add_mc_matcher(path, components)
         add_track_fit_and_track_creator(path, components, pruneTracks)
 
 

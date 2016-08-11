@@ -159,7 +159,11 @@ namespace Belle2 {
 
     /// Descriptive type defintion for a number of degrees of freedom.
     typedef int NDF;
-    std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 2}, {Const::CDC, 1}};            /**< Map storing the standard number degrees of freedom for a single hit by detector */
+    std::map<int, NDF> m_ndf_by_detId = {{Const::PXD, 2}, {Const::SVD, 2}, {Const::CDC, 1}}; /**< Map storing the standard number degrees of freedom for a single hit by detector */
+
+    bool m_mcParticlesPresent =
+      false; /**< This flag is set to false if there are no MC Particles in the data store (probably data run?) and we can not create MC Reco tracks. */
+
   }; // end class
 } // end namespace Belle2
 

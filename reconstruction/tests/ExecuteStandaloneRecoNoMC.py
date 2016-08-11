@@ -11,19 +11,18 @@ import tempfile
 import shutil
 from ROOT import Belle2
 
-evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen.py_noexec')
+evtgen_steering = Belle2.FileSystem.findFile('reconstruction/tests/evtgen_no_mc.py_noexec')
 reco_steering = Belle2.FileSystem.findFile('reconstruction/tests/reco.py_noexec')
 
 # create and move to temporary directory
 tempdir = tempfile.mkdtemp()
+
 print("Moving to temporary directory " + str(tempdir))
 os.chdir(tempdir)
 
 # run generator & simulation
 assert(0 == os.system("basf2 " + evtgen_steering))
 # run reconstruction only
-assert(0 == os.system("basf2 " + reco_steering))
-# Check if there are 10 events in the file
-assert(0 == os.system("check_basf2_file -n10 evtgen_bbar.root"))
-
-shutil.rmtree(tempdir)
+assert(0 == os.system("basf2 " + reco_steering + " -i evtgen_bbar_no_mc.root"))
+# Check if there is 1 event in the file
+assert(0 == os.system("check_basf2_file -n1 evtgen_bbar_no_mc.root"))

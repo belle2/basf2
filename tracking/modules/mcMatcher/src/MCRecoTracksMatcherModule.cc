@@ -174,42 +174,48 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule() : Module()
 
 void MCRecoTracksMatcherModule::initialize()
 {
-  // Actually retrieve the StoreArrays
-  StoreArray<RecoTrack> storePRRecoTracks(m_param_prRecoTracksStoreArrayName);
-  StoreArray<RecoTrack> storeMCRecoTracks(m_param_mcRecoTracksStoreArrayName);
+  // Check if there are MC Particles
   StoreArray<MCParticle> storeMCParticles;
 
-  // Require both GFTrackCand arrays and the MCParticles to be present in the DataStore
-  storePRRecoTracks.isRequired();
-  storeMCRecoTracks.isRequired();
-  storeMCParticles.isRequired();
+  if (storeMCParticles.isOptional()) {
+    m_mcParticlesPresent = true;
 
-  // Extract the default names for the case empty stings were given
-  m_param_prRecoTracksStoreArrayName = storePRRecoTracks.getName();
-  m_param_mcRecoTracksStoreArrayName = storeMCRecoTracks.getName();
+    // Actually retrieve the StoreArrays
+    StoreArray<RecoTrack> storePRRecoTracks(m_param_prRecoTracksStoreArrayName);
+    StoreArray<RecoTrack> storeMCRecoTracks(m_param_mcRecoTracksStoreArrayName);
 
-  // Purity relation - for each PRTrack to store the purest MCTrack
-  storeMCRecoTracks.registerRelationTo(storePRRecoTracks);
-  // Efficiency relation - for each MCTrack to store the most efficient PRTrack
-  storePRRecoTracks.registerRelationTo(storeMCRecoTracks);
-  // MC matching relation
-  storePRRecoTracks.registerRelationTo(storeMCParticles);
+    // Require both GFTrackCand arrays and the MCParticles to be present in the DataStore
+    storePRRecoTracks.isRequired();
+    storeMCRecoTracks.isRequired();
+    storeMCParticles.isRequired();
 
-  // Announce optional store arrays to the hits or clusters in case they should be used
-  // We make them optional in case of limited detector setup.
-  // PXD
-  if (m_param_usePXDHits) {
-    StoreArray<PXDCluster>::optional();
-  }
+    // Extract the default names for the case empty stings were given
+    m_param_prRecoTracksStoreArrayName = storePRRecoTracks.getName();
+    m_param_mcRecoTracksStoreArrayName = storeMCRecoTracks.getName();
 
-  // SVD
-  if (m_param_useSVDHits) {
-    StoreArray<SVDCluster>::optional();
-  }
+    // Purity relation - for each PRTrack to store the purest MCTrack
+    storeMCRecoTracks.registerRelationTo(storePRRecoTracks);
+    // Efficiency relation - for each MCTrack to store the most efficient PRTrack
+    storePRRecoTracks.registerRelationTo(storeMCRecoTracks);
+    // MC matching relation
+    storePRRecoTracks.registerRelationTo(storeMCParticles);
 
-  // CDC
-  if (m_param_useCDCHits) {
-    StoreArray<CDCHit>::optional();
+    // Announce optional store arrays to the hits or clusters in case they should be used
+    // We make them optional in case of limited detector setup.
+    // PXD
+    if (m_param_usePXDHits) {
+      StoreArray<PXDCluster>::optional();
+    }
+
+    // SVD
+    if (m_param_useSVDHits) {
+      StoreArray<SVDCluster>::optional();
+    }
+
+    // CDC
+    if (m_param_useCDCHits) {
+      StoreArray<CDCHit>::optional();
+    }
   }
 }
 
@@ -217,6 +223,12 @@ void MCRecoTracksMatcherModule::initialize()
 
 void MCRecoTracksMatcherModule::event()
 {
+  // Skip in the case there are no MC particles present.
+  if (not m_mcParticlesPresent) {
+    B2DEBUG(100, "Skipping MC Track Matcher as there are no MC Particles registered in the DataStore.");
+    return;
+  }
+
   B2DEBUG(100, "########## MCRecoTracksMatcherModule ############");
 
   //Fetch store array

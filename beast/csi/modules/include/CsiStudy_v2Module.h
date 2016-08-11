@@ -78,8 +78,16 @@ namespace Belle2 {
       TH2F* h_csi_Evtof3[18];
       /** Energy deposited vs TOF */
       TH2F* h_csi_Evtof4[18];
+      /** Energy deposited vs TOF */
+      TH2F* h_csi_Evtof5[18];
+      /** Energy deposited vs TOF */
+      TH2F* h_csi_Evtof6[18];
       /** Energy deposited */
       TH1F* h_csi_edep[18];
+      /** Energy deposited */
+      TH1F* h_csi_edep1[18];
+      /** Energy deposited */
+      TH1F* h_csi_edep2[18];
       /** Energy deposited */
       TH1F* h_csi_edep_nocut[18];
       /** Energy deposited */

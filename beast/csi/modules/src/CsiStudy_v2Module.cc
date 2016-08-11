@@ -10,6 +10,7 @@
 
 #include <beast/csi/modules/CsiStudy_v2Module.h>
 #include <beast/csi/dataobjects/CsiSimHit.h>
+#include <beast/csi/dataobjects/CsiHit_v2.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -75,7 +76,13 @@ void CsiStudy_v2Module::defineHisto()
                                1000., 1000, 0., 400.);
     h_csi_Evtof4[i] = new TH2F(TString::Format("h_csi_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                1000., 1000, 0., 400.);
+    h_csi_Evtof5[i] = new TH2F(TString::Format("h_csi_Evtof5_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                               1000., 1000, 0., 400.);
+    h_csi_Evtof6[i] = new TH2F(TString::Format("h_csi_Evtof6_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+                               1000., 1000, 0., 400.);
     h_csi_edep[i] = new TH1F(TString::Format("h_csi_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_csi_edep1[i] = new TH1F(TString::Format("h_csi_edep1_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_csi_edep2[i] = new TH1F(TString::Format("h_csi_edep2_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_nocut[i] = new TH1F(TString::Format("h_csi_edep_nocut_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_test[i] = new TH1F(TString::Format("h_csi_edep_test_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
   }
@@ -103,6 +110,7 @@ void CsiStudy_v2Module::event()
 {
   //Here comes the actual event processing
   StoreArray<CsiSimHit>  SimHits;
+  StoreArray<CsiHit_v2>  Hits;
   StoreArray<SADMetaHit> SADtruth;
 
   //Skip events with no Hits
@@ -140,11 +148,22 @@ void CsiStudy_v2Module::event()
     else h_csi_Evtof4[detNB]->Fill(tof, Edep);
     if (Edep > m_Ethres) {
       h_csi_edep[detNB]->Fill(Edep);
-      if (!Reject)h_csi_edep_test[detNB]->Fill(Edep);
+      if (!Reject)
+        h_csi_edep_test[detNB]->Fill(Edep);
     }
   }
 
 
+  for (const auto& Hit : Hits) {
+    int detNB = Hit.getCellId();
+    double Edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
+    double RecEdep = Hit.getEnergyRecDep() * 1e3; //GeV -> MeV
+    double tof = Hit.getFlightTime(); //ns
+    h_csi_edep1[detNB]->Fill(Edep);
+    h_csi_edep2[detNB]->Fill(RecEdep);
+    h_csi_Evtof5[detNB]->Fill(tof, Edep);
+    h_csi_Evtof6[detNB]->Fill(tof, RecEdep);
+  }
 }
 //read tube centers, impulse response, and garfield drift data filename from CSI.xml
 void CsiStudy_v2Module::getXMLData()

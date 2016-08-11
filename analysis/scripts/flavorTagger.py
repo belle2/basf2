@@ -397,8 +397,8 @@ def FillParticleLists(mode='Expert', path=analysis_main):
                 reconstructDecay(particleList + ' -> pi-:inRoe p+:inRoe',
                                  '1.00<=M<=1.23', True, path=path)
                 fitVertex(particleList, 0.01, fitter='kfitter', path=path)
-                if mode != 'Expert':
-                    matchMCTruth(particleList, path=path)
+                # if mode != 'Expert':
+                matchMCTruth(particleList, path=path)
                 readyParticleLists.append(particleList)
 
     return True

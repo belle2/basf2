@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <beast/analysis/modules/AnalysisPhase1Module.h>
+#include <beast/analysis/modules/AnalysisPhase1StudyModule.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -38,30 +38,30 @@ using namespace std;
 
 using namespace Belle2;
 
-using namespace analysis;
+//using namespace analysis;
 
 //-----------------------------------------------------------------
 //                 Register the Module
 //-----------------------------------------------------------------
-REG_MODULE(AnalysisPhase1)
+REG_MODULE(AnalysisPhase1Study)
 
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
 
-AnalysisPhase1Module::AnalysisPhase1Module() : HistoModule()
+AnalysisPhase1StudyModule::AnalysisPhase1StudyModule() : HistoModule()
 {
   // Set module properties
   setDescription("Study module for BEAST");
 
 }
 
-AnalysisPhase1Module::~AnalysisPhase1Module()
+AnalysisPhase1StudyModule::~AnalysisPhase1StudyModule()
 {
 }
 
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
-void AnalysisPhase1Module::defineHisto()
+void AnalysisPhase1StudyModule::defineHisto()
 {
   h_count = new TH1F("h_count", "", 10, 0., 10.);
   for (int i = 0; i < 9; i++) {
@@ -73,19 +73,19 @@ void AnalysisPhase1Module::defineHisto()
   }
 }
 
-void AnalysisPhase1Module::initialize()
+void AnalysisPhase1StudyModule::initialize()
 {
-  B2INFO("AnalysisPhase1Module: Initialize");
+  B2INFO("AnalysisPhase1StudyModule: Initialize");
 
   REG_HISTOGRAM
 
 }
 
-void AnalysisPhase1Module::beginRun()
+void AnalysisPhase1StudyModule::beginRun()
 {
 }
 
-void AnalysisPhase1Module::event()
+void AnalysisPhase1StudyModule::event()
 {
   StoreArray<MCParticle> mcParticles;
   for (const auto& mcParticle : mcParticles) { // start loop over all MC particles
@@ -143,13 +143,13 @@ void AnalysisPhase1Module::event()
 
 }
 
-void AnalysisPhase1Module::endRun()
+void AnalysisPhase1StudyModule::endRun()
 {
 
 
 }
 
-void AnalysisPhase1Module::terminate()
+void AnalysisPhase1StudyModule::terminate()
 {
 }
 

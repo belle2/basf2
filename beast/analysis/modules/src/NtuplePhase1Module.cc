@@ -618,9 +618,9 @@ namespace Belle2 {
     float ScaleFacBG_HER = 0;
     float ScaleFacBG_LER = 0;
     if (I_LER > 0 && P_LER > 0)
-      ScaleFacBG_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+      ScaleFacBG_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]) /** bunch_nb_LER / m_input_bunchNb_LER[0]*/;
     if (I_HER > 0 && P_HER > 0)
-      ScaleFacBG_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+      ScaleFacBG_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]) /** bunch_nb_HER / m_input_bunchNb_HER[0]*/;
 
     //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
     float ScaleFacTo_HER = 0;

@@ -315,14 +315,14 @@ void MCMatcherTracksModule::event()
   if (m_param_usePXDHits) {
     if (m_param_useClusters) {
       StoreArray<PXDCluster> pxdClusters;
-      if (pxdClusters.isValid()) {
+      if (pxdClusters.getEntries() > 0) {
         int nHits = pxdClusters.getEntries();
         nHits_by_detId[Const::PXD] = nHits;
       }
 
     } else {
       StoreArray<PXDTrueHit> pxdTrueHits;
-      if (pxdTrueHits.isValid()) {
+      if (pxdTrueHits.getEntries() > 0) {
         int nHits = pxdTrueHits.getEntries();
         nHits_by_detId[Const::PXD] = nHits;
       }
@@ -333,13 +333,13 @@ void MCMatcherTracksModule::event()
   if (m_param_useSVDHits) {
     if (m_param_useClusters) {
       StoreArray<SVDCluster> svdClusters;
-      if (svdClusters.isValid()) {
+      if (svdClusters.getEntries() > 0) {
         int nHits = svdClusters.getEntries();
         nHits_by_detId[Const::SVD] = nHits;
       }
     } else {
       StoreArray<SVDTrueHit> svdTrueHits;
-      if (svdTrueHits.isValid()) {
+      if (svdTrueHits.getEntries() > 0) {
         int nHits = svdTrueHits.getEntries();
         nHits_by_detId[Const::SVD] = nHits;
       }
@@ -349,7 +349,7 @@ void MCMatcherTracksModule::event()
   // CDC
   if (m_param_useCDCHits) {
     StoreArray<CDCHit> cdcHits;
-    if (cdcHits.isValid()) {
+    if (cdcHits.getEntries() > 0) {
       nHits_by_detId[Const::CDC] = cdcHits.getEntries();
     }
   }

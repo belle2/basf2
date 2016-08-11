@@ -43,7 +43,7 @@ void PruneRecoTracksModule::initialize()
 void PruneRecoTracksModule::event()
 {
   Belle2::StoreArray<RecoTrack> tracks(m_storeArrayName);
-  if (tracks.isValid()) {
+  if (tracks.getEntries() > 0) {
     for (auto& t : tracks) {
       t.prune();
     }

@@ -45,9 +45,34 @@ namespace Belle2 {
     ~EKLMSegmentID();
 
     /**
+     * Get endcap number.
+     */
+    int getEndcap() const;
+
+    /**
+     * Get layer number.
+     */
+    int getLayer() const;
+
+    /**
+     * Get sector number.
+     */
+    int getSector() const;
+
+    /**
+     * Get plane number.
+     */
+    int getPlane() const;
+
+    /**
      * Get segment number.
      */
-    int getSegmentNumber() const;
+    int getSegment() const;
+
+    /**
+     * Get segment global number.
+     */
+    int getSegmentGlobalNumber() const;
 
   private:
 

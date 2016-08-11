@@ -27,5 +27,6 @@
 
 /* Element identifiers. */
 #pragma link C++ class Belle2::EKLMElementNumbers+;
+#pragma link C++ class Belle2::EKLMSegmentID+;
 
 #endif

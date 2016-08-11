@@ -69,7 +69,7 @@ GlobalLabel::GlobalLabel(EKLMSegmentID eklmSegment,
                          GlobalLabel::gidTYPE paramId):
   gid(0), eid(0), pid(0), tid(0), tif(0)
 {
-  construct(eklmSegment.getSegmentNumber() + eklmOffset, paramId);
+  construct(eklmSegment.getSegmentGlobalNumber() + eklmOffset, paramId);
 }
 
 void GlobalLabel::registerTimeDependent(GlobalLabel::gidTYPE start,

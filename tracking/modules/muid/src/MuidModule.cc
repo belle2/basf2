@@ -994,7 +994,7 @@ bool MuidModule::findMatchingBarrelHit(Point& point, const Track&)
       track.addRelationTo(hit);
       const TrackFitResult* tfResult = track.getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::KLM, bestHit, 0, point.positionAtHitPlane.Mag()); // "0" for BKLM
+      tc->addHit(Const::EDetector::BKLM, bestHit, 0, point.positionAtHitPlane.Mag()); // "0" for BKLM
       */
     }
   }
@@ -1045,7 +1045,7 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track)
       /* not yet for EKLM
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::KLM, bestHit, 1, point.positionAtHitPlane.Mag()); // "1" for EKLM
+      tc->addHit(Const::EDetector::EKLM, bestHit, 0, point.positionAtHitPlane.Mag());
       */
     }
   }

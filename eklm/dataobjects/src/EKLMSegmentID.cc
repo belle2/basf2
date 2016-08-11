@@ -32,7 +32,32 @@ EKLMSegmentID::~EKLMSegmentID()
 {
 }
 
-int EKLMSegmentID::getSegmentNumber() const
+int EKLMSegmentID::getEndcap() const
+{
+  return m_Endcap;
+}
+
+int EKLMSegmentID::getLayer() const
+{
+  return m_Layer;
+}
+
+int EKLMSegmentID::getSector() const
+{
+  return m_Sector;
+}
+
+int EKLMSegmentID::getPlane() const
+{
+  return m_Plane;
+}
+
+int EKLMSegmentID::getSegment() const
+{
+  return m_Segment;
+}
+
+int EKLMSegmentID::getSegmentGlobalNumber() const
 {
   static const EKLM::ElementNumbersSingleton& elementNumbers =
     EKLM::ElementNumbersSingleton::Instance();

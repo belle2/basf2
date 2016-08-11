@@ -79,9 +79,9 @@ namespace Belle2 {
       /** Enegy range */
       double m_Range[18];
       /** Energy resolution factor */
-      double m_EnergyResolutionFactor[3];
+      double m_EnergyResolutionFactor[18];
       /** Energy resolution constant */
-      double m_EnergyResolutionConst[3];
+      double m_EnergyResolutionConst[18];
 
     };
 

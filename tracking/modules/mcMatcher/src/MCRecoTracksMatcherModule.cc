@@ -257,7 +257,7 @@ void MCRecoTracksMatcherModule::event()
   // PXD
   if (m_param_usePXDHits) {
     StoreArray<PXDCluster> pxdClusters;
-    if (pxdClusters.getEntries() > 0) {
+    if (pxdClusters.isOptional()) {
       int nHits = pxdClusters.getEntries();
       nHits_by_detId[Const::PXD] = nHits;
     }
@@ -266,7 +266,7 @@ void MCRecoTracksMatcherModule::event()
   // SVD
   if (m_param_useSVDHits) {
     StoreArray<SVDCluster> svdClusters;
-    if (svdClusters.getEntries() > 0) {
+    if (svdClusters.isOptional()) {
       int nHits = svdClusters.getEntries();
       nHits_by_detId[Const::SVD] = nHits;
     }
@@ -275,7 +275,7 @@ void MCRecoTracksMatcherModule::event()
   // CDC
   if (m_param_useCDCHits) {
     StoreArray<CDCHit> cdcHits;
-    if (cdcHits.getEntries() > 0) {
+    if (cdcHits.isOptional()) {
       nHits_by_detId[Const::CDC] = cdcHits.getEntries();
     }
   }

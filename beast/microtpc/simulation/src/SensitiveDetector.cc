@@ -89,9 +89,10 @@ namespace Belle2 {
         CPName = creator->GetProcessName();
         if (CPName.contains("Neutron")) neuProc = true;
       }
+
       //Save Hit if track leaves volume or is killed
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        if (neuProc) saveSimHit();
+        /*if (neuProc)*/ saveSimHit();
       }
 
       StoreArray<MicrotpcSimHit> MicrotpcHits;
@@ -123,24 +124,24 @@ namespace Belle2 {
 
       StoreArray<MCParticle> mcParticles;
       StoreArray<TpcMCParticle> TpcMCParticles;
-      for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
-        int pdg = mcParticle.getPDG();
-        if (pdg == 2112 || pdg == 1000080160 || pdg == 100006012 || pdg == 1000020040 || pdg == 2212) {
-          int PDG = mcParticle.getPDG();
-          float Mass = mcParticle.getMass();
-          float Energy = mcParticle.getEnergy();
-          float vtx[3];
-          vtx[0] = mcParticle.getProductionVertex().X();
-          vtx[1] = mcParticle.getProductionVertex().Y();
-          vtx[2] = mcParticle.getProductionVertex().Z();
-          float mom[3];
-          mom[0] = mcParticle.getMomentum().X();
-          mom[1] = mcParticle.getMomentum().Y();
-          mom[2] = mcParticle.getMomentum().Z();
 
-          if (!TpcMCParticles.isValid()) TpcMCParticles.create();
-          TpcMCParticles.appendNew(TpcMCParticle(PDG, Mass, Energy, vtx, mom));
-        }
+      for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
+        int PDG = mcParticle.getPDG();
+        //if (PDG == 2112 || PDG == 1000080160 || PDG == 100006012 || PDG == 1000020040 || PDG == 2212) {
+
+        float Mass = mcParticle.getMass();
+        float Energy = mcParticle.getEnergy();
+        float vtx[3];
+        vtx[0] = mcParticle.getProductionVertex().X();
+        vtx[1] = mcParticle.getProductionVertex().Y();
+        vtx[2] = mcParticle.getProductionVertex().Z();
+        float mom[3];
+        mom[0] = mcParticle.getMomentum().X();
+        mom[1] = mcParticle.getMomentum().Y();
+        mom[2] = mcParticle.getMomentum().Z();
+        if (!TpcMCParticles.isValid()) TpcMCParticles.create();
+        TpcMCParticles.appendNew(TpcMCParticle(PDG, Mass, Energy, vtx, mom));
+        //}
       }
       return (m_simhitNumber);
     }//saveSimHit

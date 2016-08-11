@@ -99,9 +99,9 @@ void BeamDigitizerModule::event()
     double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
     double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
     int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-    double fedep = ((double) NbEle) * m_WorkFunction * 1e3; //eV to keV
+    double fedep = ((double) NbEle) * m_WorkFunction * 1e-3; //eV to keV
     double Amp = NbEle / (6.25 * 1e18); // A x s
-    if ((fedep * 1e-3) > m_WorkFunction)
+    if ((fedep * 1e3) > m_WorkFunction)
       BeamHits.appendNew(BeamabortHit(fedep, Amp, time, detNb, pdg));
   }
 

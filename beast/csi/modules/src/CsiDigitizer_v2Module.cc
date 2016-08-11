@@ -84,7 +84,7 @@ void CsiDigitizer_v2Module::beginRun()
 void CsiDigitizer_v2Module::event()
 {
   StoreArray<CsiSimHit> CsiSimHits;
-  StoreArray<CsiHit_v2> CsiHits;
+  StoreArray<CsiHit_v2> CsiHits_v2;
   int nentries = CsiSimHits.getEntries();
   for (int i = 0; i < nentries; i++) {
     CsiSimHit* aHit = CsiSimHits[i];
@@ -99,9 +99,9 @@ void CsiDigitizer_v2Module::event()
     double m_energyDeposit = aHit->getEnergyDep();
     double erecdep = m_energyDeposit;
     erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit, m_cry));
-    if (m_Threshold[m_cellID] <= erecdep && erecdep <= m_Range[m_cellID]) {
-      CsiHit_v2(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
-                m_Pos * (m_energyDeposit / erecdep), erecdep);
+    if (m_Threshold[m_cry] <= erecdep && erecdep <= m_Range[m_cry]) {
+      CsiHits_v2.appendNew(CsiHit_v2(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
+                                     m_Pos * (m_energyDeposit / erecdep), erecdep));
     }
   }
 

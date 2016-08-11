@@ -93,7 +93,7 @@ namespace Belle2 {
 
       //Save Hit if track leaves volume or is killed
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        if (neuProc) saveSimHit();
+        /*if (neuProc)*/ saveSimHit();
       }
 
       StoreArray<He3tubeSimHit> He3tubeHits;
@@ -124,25 +124,24 @@ namespace Belle2 {
       //Get the datastore arrays
       StoreArray<MCParticle> mcParticles;
       StoreArray<He3MCParticle> He3MCParticles;
+
       for (const auto& mcParticle :
            mcParticles) { // start loop over all Tracks
-        int pdg = mcParticle.getPDG();
-        if (pdg == 2112) {
-          int PDG = mcParticle.getPDG();
-          float Mass = mcParticle.getMass();
-          float Energy = mcParticle.getEnergy();
-          float vtx[3];
-          vtx[0] = mcParticle.getProductionVertex().X();
-          vtx[1] = mcParticle.getProductionVertex().Y();
-          vtx[2] = mcParticle.getProductionVertex().Z();
-          float mom[3];
-          mom[0] = mcParticle.getMomentum().X();
-          mom[1] = mcParticle.getMomentum().Y();
-          mom[2] = mcParticle.getMomentum().Z();
-
-          if (!He3MCParticles.isValid()) He3MCParticles.create();
-          He3MCParticles.appendNew(He3MCParticle(PDG, Mass, Energy, vtx, mom));
-        }
+        int PDG = mcParticle.getPDG();
+        //if (PDG == 2112) {
+        float Mass = mcParticle.getMass();
+        float Energy = mcParticle.getEnergy();
+        float vtx[3];
+        vtx[0] = mcParticle.getProductionVertex().X();
+        vtx[1] = mcParticle.getProductionVertex().Y();
+        vtx[2] = mcParticle.getProductionVertex().Z();
+        float mom[3];
+        mom[0] = mcParticle.getMomentum().X();
+        mom[1] = mcParticle.getMomentum().Y();
+        mom[2] = mcParticle.getMomentum().Z();
+        if (!He3MCParticles.isValid()) He3MCParticles.create();
+        He3MCParticles.appendNew(He3MCParticle(PDG, Mass, Energy, vtx, mom));
+        //}
       }
       return (m_simhitNumber);
     }//saveSimHit

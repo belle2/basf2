@@ -100,8 +100,8 @@ void BgoDigitizerModule::event()
     double erecdep = m_energyDeposit;
     erecdep += gRandom->Gaus(0, GetEnergyResolutionGeV(m_energyDeposit, m_cellID));
     if (m_Threshold[m_cellID] <= erecdep && erecdep <= m_Range[m_cellID]) {
-      BgoHit(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
-             m_Pos * (m_energyDeposit / erecdep), erecdep);
+      BgoHits.appendNew(BgoHit(m_cellID, m_trackID, pdgCode, m_Time * m_energyDeposit / erecdep, m_energyDeposit, m_Mom,
+                               m_Pos * (m_energyDeposit / erecdep), erecdep));
     }
   }
 
@@ -120,7 +120,7 @@ void BgoDigitizerModule::getXMLData()
   }
   int iEnResFac = 0;
   for (double  EnResFac : content.getArray("EnergyResolutionFactor", {0})) {
-    m_EnergyResolutionFactor[iEnResFac] = EnResFac;
+    m_EnergyResolutionFactor[iEnResFac] = EnResFac / 100.;
     iEnResFac++;
   }
   int iThres = 0;

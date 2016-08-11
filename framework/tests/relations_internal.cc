@@ -64,11 +64,11 @@ namespace {
   /** Check finding of relations. */
   TEST_F(RelationsInternal, RelationFind)
   {
+    DataStore::Instance().setInitializeActive(true);
     EXPECT_FALSE(evtData.optionalRelationTo(profileData));
     EXPECT_FALSE(evtData.requireRelationTo(profileData));
 
     StoreArray<EventMetaData> evtData2;
-    DataStore::Instance().setInitializeActive(true);
     evtData.registerRelationTo(profileData);
     evtData2.registerInDataStore("OwnName");
     evtData2.registerRelationTo(profileData);
@@ -96,6 +96,9 @@ namespace {
     relation2.create();
     EXPECT_TRUE(relation2.getName() == "OwnNameToProfileInfos");
     EXPECT_TRUE(RelationArray(evtData2, profileData));
+
+    //outside of initialize() this should fail
+    EXPECT_B2FATAL(evtData.requireRelationTo(profileData));
   }
 
   /** Test that Relations wich points to the wrong arrays yields a FATAL. */

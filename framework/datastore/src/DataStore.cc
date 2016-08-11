@@ -661,6 +661,9 @@ bool DataStore::requireInput(const StoreAccessorBase& accessor)
   if (m_initializeActive) {
     m_dependencyMap->getCurrentModuleInfo().addEntry(accessor.getName(), DependencyMap::c_Input,
                                                      (accessor.getClass() == RelationContainer::Class()));
+  } else {
+    B2FATAL("Attempt to require input " << accessor.readableName() <<
+            " outside of the initialization phase. Please move isRequired() calls into your Module's initialize() function.");
   }
 
   if (!getEntry(accessor)) {
@@ -682,6 +685,11 @@ bool DataStore::optionalInput(const StoreAccessorBase& accessor)
 
 bool DataStore::requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability)
 {
+  if (!m_initializeActive) {
+    B2FATAL("Attempt to require relation " << fromArray.readableName() << " -> " << toArray.readableName() <<
+            " outside of the initialization phase. Please move requireRelationTo() calls into your Module's initialize() function.");
+  }
+
   if (!fromArray.isArray())
     B2FATAL(fromArray.readableName() << " is not an array!");
   if (!toArray.isArray())

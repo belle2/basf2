@@ -150,7 +150,7 @@ namespace Belle2 {
     /** Tell the data store about an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
+     *
      *
      *  @warning Use discouraged, use isOptional() instead.
      *  @param name        Name under which the TClonesArray is stored.
@@ -205,7 +205,7 @@ namespace Belle2 {
     /** Tell the data store about a relation that we could make use of. (aka. optional input)
      *
      * Mainly useful for creating diagrams of module inputs and outputs.
-     * This must be called in the initialization phase.
+     *
      *
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.

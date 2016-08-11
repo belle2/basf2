@@ -201,6 +201,7 @@ namespace Belle2 {
      *  @param array      Whether it is a TClonesArray or not.
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return           True if the registration succeeded.
+     *  @sa DependencyMap
      */
     bool registerEntry(const std::string& name, EDurability durability,
                        const TClass* objClass, bool array, EStoreFlags storeFlags);
@@ -211,20 +212,25 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
      *  @return           True if the registration succeeded.
+     *  @sa DependencyMap
      */
     bool registerRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability,
                           EStoreFlags storeFlags);
 
     /** Produce ERROR message if no entry of the given type is registered in the DataStore.
      *
+     *  @note can only be used in initialize() function
      *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if the requested object exists.
+     *  @sa DependencyMap
      */
     bool requireInput(const StoreAccessorBase& accessor);
 
     /** Produce ERROR message if no relation of given durability exists between fromArray and toArray (in that direction).
      *
+     *  @note can only be used in initialize() function
      *  @return           True if the requested object exists.
+     *  @sa DependencyMap
      */
     bool requireRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
 
@@ -234,6 +240,7 @@ namespace Belle2 {
      *
      *  @param accessor   Encapsulates name, durability, and type
      *  @return           True if the requested object exists.
+     *  @sa DependencyMap
      */
     bool optionalInput(const StoreAccessorBase& accessor);
 
@@ -242,6 +249,7 @@ namespace Belle2 {
      *  Mainly useful for creating diagrams of module inputs and outputs.
      *
      *  @return           True if the requested object exists.
+     *  @sa DependencyMap
      */
     bool optionalRelation(const StoreAccessorBase& fromArray, const StoreAccessorBase& toArray, EDurability durability);
 

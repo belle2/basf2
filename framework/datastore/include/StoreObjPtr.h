@@ -127,7 +127,7 @@ namespace Belle2 {
     /** Tell the data store about an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
+     *
      *
      *  @warning Use discouraged, use isOptional() instead.
      *  @param name        Name under which the object is stored.

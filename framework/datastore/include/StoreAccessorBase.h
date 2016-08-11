@@ -84,7 +84,7 @@ namespace Belle2 {
     /** Tell the DataStore about an optional input.
      *
      *  Mainly useful for creating diagrams of module inputs and outputs.
-     *  This must be called in the initialization phase.
+     *
      *
      *  @param name  If not empty, set non-default name for this object/array. This is permanent, so that e.g. after using registerInDataStore("myName") in initialize(), this object will continue refer to 'myName' in event().
      *  @return            True if the object/array exists.

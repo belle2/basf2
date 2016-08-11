@@ -9,7 +9,11 @@ namespace Belle2 {
 
   /** Collect information about the dependencies between modules.
    *
-   * Filled inside DataStore during register/require/optional.
+   * Filled inside DataStore during register/require/optional, and used by the
+   * --visualize-dataflow and --module-io arguments to basf2 to create
+   * graphs of data dependencies.
+   *
+   * @sa DataFlowVisualization
    */
   class DependencyMap {
   public:

@@ -309,6 +309,7 @@ namespace {
   /** check required() functionality */
   TEST_F(DataStoreTest, RequireObjects)
   {
+    DataStore::Instance().setInitializeActive(true);
     EXPECT_TRUE(StoreObjPtr<EventMetaData>().isRequired());
     EXPECT_FALSE(StoreObjPtr<EventMetaData>("", DataStore::c_Persistent).isRequired());
     EXPECT_FALSE(StoreObjPtr<EventMetaData>("nonexisting2").isRequired());
@@ -324,6 +325,9 @@ namespace {
     EXPECT_TRUE(StoreArray<ProfileInfo>().isRequired());
     //check we didn't create one...
     EXPECT_FALSE(StoreArray<EventMetaData>("blah").isRequired());
+    DataStore::Instance().setInitializeActive(false);
+
+    EXPECT_B2FATAL(StoreObjPtr<EventMetaData>().isRequired());
   }
 
   /** Test iteration. */
@@ -436,6 +440,9 @@ namespace {
   /** test registerInDataStore(), optional() */
   TEST_F(DataStoreTest, DataStoreRegistration)
   {
+    //emulate Module::initialize()
+    DataStore::Instance().setInitializeActive(true);
+
     StoreObjPtr<EventMetaData> evtPtr("abc123");
     StoreArray<EventMetaData> evtArray("abc123array");
 
@@ -449,21 +456,16 @@ namespace {
     EXPECT_FALSE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
     EXPECT_FALSE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
 
-    //emulate Module::initialize()
-    DataStore::Instance().setInitializeActive(true);
-    {
-      EXPECT_TRUE(evtPtr.registerInDataStore());
-      EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
+    EXPECT_TRUE(evtPtr.registerInDataStore());
+    EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
 
-      //already registered, ok by default
-      EXPECT_TRUE(evtPtr.registerInDataStore());
-      EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
+    //already registered, ok by default
+    EXPECT_TRUE(evtPtr.registerInDataStore());
+    EXPECT_TRUE(evtArray.registerInDataStore(DataStore::c_DontWriteOut));
 
-      //test c_ErrorIfAlreadyRegistered (return code=false + B2ERROR)
-      EXPECT_B2ERROR(EXPECT_FALSE(evtPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered)));
-      EXPECT_B2ERROR(EXPECT_FALSE(evtArray.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)));
-    }
-    DataStore::Instance().setInitializeActive(false);
+    //test c_ErrorIfAlreadyRegistered (return code=false + B2ERROR)
+    EXPECT_B2ERROR(EXPECT_FALSE(evtPtr.registerInDataStore(DataStore::c_ErrorIfAlreadyRegistered)));
+    EXPECT_B2ERROR(EXPECT_FALSE(evtArray.registerInDataStore(DataStore::c_DontWriteOut | DataStore::c_ErrorIfAlreadyRegistered)));
 
     //now they should be available:
     EXPECT_TRUE(evtPtr.isOptional());
@@ -474,6 +476,7 @@ namespace {
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
     EXPECT_TRUE(StoreArray<EventMetaData>(evtArray.getName()).isRequired());
+    DataStore::Instance().setInitializeActive(false);
   }
 
   TEST_F(DataStoreTest, RegistrationOutsideOfInitializeShouldFail)

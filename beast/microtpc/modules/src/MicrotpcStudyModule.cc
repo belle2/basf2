@@ -271,7 +271,7 @@ void MicrotpcStudyModule::event()
     TVector3 position = aHit->gettkPos();
     double xpos = position.X() / 100. - TPCCenter[detNb].X();
     double ypos = position.Y() / 100. - TPCCenter[detNb].Y();
-    double zpos = position.Z() / 100. - TPCCenter[detNb].Z() + m_z_DG;
+    double zpos = position.Z() / 100. - TPCCenter[detNb].Z() - m_z_DG;
     if (0. < zpos && zpos <  m_z_DG) {
 
       int PDGid = aHit->gettkPDG();

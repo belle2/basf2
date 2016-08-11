@@ -112,7 +112,7 @@ void TpcDigitizerModule::event()
   for (const auto& microtpcSimHit : microtpcSimHits) {
     const int detNb = microtpcSimHit.getdetNb();
     const TVector3 trackPosition = microtpcSimHit.gettkPos();
-    const double T = trackPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG;
+    const double T = 2. * m_z_DG - (trackPosition.Z() / 100. - m_TPCCenter[detNb].Z() - m_z_DG);
     if (T < T0[detNb]) {
       T0[detNb] = T;
     }
@@ -147,7 +147,7 @@ void TpcDigitizerModule::event()
     const TVector3 chipPosition(
       simHitPosition.X() / 100. - m_TPCCenter[detNb].X(),
       simHitPosition.Y() / 100. - m_TPCCenter[detNb].Y(),
-      simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() + m_z_DG
+      2. * m_z_DG - (simHitPosition.Z() / 100. - m_TPCCenter[detNb].Z() - m_z_DG)
     );
 
     //If new detector filled the chip

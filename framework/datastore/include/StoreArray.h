@@ -229,25 +229,15 @@ namespace Belle2 {
       _StoreArrayImpl::clearRelations(*this);
     }
 
-    /** Check whether the array was created.
-     *
-     *  @return          True if the array exists.
-     **/
-    inline bool isValid() const
-    {
-      ensureAttached();
-      return m_storeArray && *m_storeArray;
-    }
-
-    /** Is this StoreArray's data safe to access? */
-    inline operator bool() const { return isValid(); }
-
     /** Get the number of objects in the array. */
     inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
 
     /** Access to the stored objects.
      *
      *  Out-of-bounds accesses throw an std::out_of_range exception
+     *
+     *  Note that using iterators (or range-based for) avoids the range-check internally,
+     *  and thus might be slightly faster.
      *
      *  \param i Array index, should be in 0..getEntries()-1
      *  \return pointer to the object
@@ -304,6 +294,26 @@ namespace Belle2 {
       return DataStore::Instance().getListOfArrays(T::Class(), durability);
     }
 
+
+    /** Check wether the array object was created.
+     *
+     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
+     *           Please use getEntries() for checking whether an array is empty or not.
+     *  @return          True if the array was created internally..
+     **/
+    inline bool isValid() const
+    {
+      ensureAttached();
+      return m_storeArray && *m_storeArray;
+    }
+
+    /** Check wether the array object was created.
+     *
+     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
+     *           Please use getEntries() for checking whether an array is empty or not.
+     *  @return          True if the array was created internally..
+     **/
+    inline operator bool() const { return isValid(); }
 
     /** Raw access to the underlying TClonesArray.
      *

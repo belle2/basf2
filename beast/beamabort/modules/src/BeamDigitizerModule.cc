@@ -59,7 +59,8 @@ BeamDigitizerModule::BeamDigitizerModule() : Module()
   setDescription("Beamabort digitizer module");
 
   //Default values are set here. New values can be in BEAMABORT.xml.
-  addParam("PreampGain", m_PreampGain, "Charge sensitive preamplifier gain [volts/C] ", 1.4);
+  addParam("WorkFunction", m_WorkFunction, "Convert eV to e [e/eV] ", 1.12);
+  addParam("FanoFactor", m_FanoFactor, "e resolution ", 0.1);
 
 }
 
@@ -72,9 +73,6 @@ void BeamDigitizerModule::initialize()
   B2INFO("BeamDigitizer: Initializing");
   StoreArray<BeamabortHit>::registerPersistent();
 
-  //get the garfield drift data, gas, and BEAM paramters
-  getXMLData();
-
 }
 
 void BeamDigitizerModule::beginRun()
@@ -83,67 +81,29 @@ void BeamDigitizerModule::beginRun()
 
 void BeamDigitizerModule::event()
 {
-  /*
-  StoreArray<MCParticle> particles;
+
   StoreArray<BeamabortSimHit> BeamSimHits;
   StoreArray<BeamabortHit> BeamHits;
   //Skip events with no BeamSimHits, but continue the event counter
-  if (BeamSimHits.getEntries() == 0) {
-    Event++;
+  if (BeamSimHits.getEntries() == 0)
     return;
-  }
 
-  //Declare and initialze energy and time
-  double edep[nBEAM];
-  double time[nBEAM];
-  double itime[nBEAM];
-  double volt[nBEAM];
-  int pdg[nBEAM];
-  for (int i = 0; i < nBEAM; i++) {
-    edep[i] = 0;
-    time[i] = 0;
-    itime[i] = 0;
-    volt[i] = 0;
-    pdg[i] = 0;
-  }
 
   int nentries = BeamSimHits.getEntries();
   for (int i = 0; i < nentries; i++) {
     BeamabortSimHit* aHit = BeamSimHits[i];
     int detNb = aHit->getCellId();
-    edep[detNb] += aHit->getEnergyDep();
-    time[detNb] += aHit->getFlightTime();
-    itime[detNb] ++;
-    int PDG = aHit->getPDGCode();
-    if (PDG == 22) pdg[detNb] = 1;
+    double edep = aHit->getEnergyDep();
+    double time = aHit->getFlightTime();
+    int pdg = aHit->getPDGCode();
+    double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+    double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+    int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+    double fedep = ((double) NbEle) * m_WorkFunction * 1e3; //eV to keV
+    double Amp = NbEle / (6.25 * 1e18); // A x s
+    if ((fedep * 1e-3) > m_WorkFunction)
+      BeamHits.appendNew(BeamabortHit(fedep, Amp, time, detNb, pdg));
   }
-
-  for (int i = 0; i < nBEAM; i++) {
-    if (itime[i] > 0) {
-      time[i] /= itime[i];
-      volt[i] = edep[i] * 1e6 * 1.602176565e-19 * m_PreampGain * 1e12;
-      BeamHits.appendNew(BeamabortHit(i, edep[i], volt[i], time[i], pdg[i]));
-    }
-  }
-  */
-  Event++;
-
-}
-//read from BEAMABORT.xml
-void BeamDigitizerModule::getXMLData()
-{
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"BEAMABORT\"]/Content/");
-
-  //get the location of the tubes
-  BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-    BEAMCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
-                                  activeParams.getLength("Phi")));
-    nBEAM++;
-  }
-  m_PreampGain = content.getDouble("PreampGain");
-
-  B2INFO("BeamDigitizer: Aquired pin locations and gas parameters");
-  B2INFO("              from BEAMABORT.xml. There are " << nBEAM << " BEAMs implemented");
 
 }
 

@@ -74,9 +74,6 @@ void PinDigitizerModule::initialize()
   B2INFO("PinDigitizer: Initializing");
   StoreArray<PindiodeHit>::registerPersistent();
 
-  //get xml data
-  getXMLData();
-
 }
 
 void PinDigitizerModule::beginRun()
@@ -85,76 +82,29 @@ void PinDigitizerModule::beginRun()
 
 void PinDigitizerModule::event()
 {
-  /*
-  StoreArray<MCParticle> particles;
+
+
   StoreArray<PindiodeSimHit> PinSimHits;
   StoreArray<PindiodeHit> PinHits;
   //Skip events with no PinSimHits, but continue the event counter
-  if (PinSimHits.getEntries() == 0) {
-    //Event++;
+  if (PinSimHits.getEntries() == 0)
     return;
-  }
-
-  //Declare and initialze energy and time
-  //nPIN = 2 * nPIN;
-  double edep[100];
-  double time[100];
-  double itime[100];
-  double volt[100];
-  int pdg[nPIN];
-  for (int i = 0; i < 64; i++) {
-    edep[i] = 0;
-    time[i] = 0;
-    itime[i] = 0;
-    volt[i] = 0;
-    pdg[i] = 0;
-  }
 
   int nentries = PinSimHits.getEntries();
   for (int i = 0; i < nentries; i++) {
     PindiodeSimHit* aHit = PinSimHits[i];
     int detNb = aHit->getCellId();
-    if (detNb > 64)continue;
-    edep[detNb] += aHit->getEnergyDep();
-    time[detNb] += aHit->getFlightTime();
-    itime[detNb] ++;
-    int PDG = aHit->getPDGCode();
-    if (PDG == 22) pdg[detNb] = 1;
+    double edep = aHit->getEnergyDep();
+    double time = aHit->getFlightTime();
+    int pdg = aHit->getPDGCode();
+    double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
+    double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
+    int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
+    double fedep = ((double) NbEle) * m_WorkFunction * 1e3; //eV to keV
+    double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
+    if ((fedep * 1e-3) > m_WorkFunction)
+      PinHits.appendNew(PindiodeHit(edep, volt, time, detNb, pdg));
   }
-
-  for (int i = 0; i < 64; i++) {
-    if (itime[i] > 0) {
-      time[i] /= itime[i];
-
-      const double meanEl = edep[i] / m_WorkFunction * 1e9; //GeV to eV
-      const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
-      const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
-      volt[i] = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
-      //PinHits.appendNew(PindiodeHit(i, edep[i], volt[i], time[i], pdg[i]));
-      PinHits.appendNew(PindiodeHit(edep[i], volt[i], time[i], i, pdg[i]));
-    }
-  }
-  */
-  //Event++;
-
-}
-//read from PINDIODE.xml
-void PinDigitizerModule::getXMLData()
-{
-  GearDir content = GearDir("/Detector/DetectorComponent[@name=\"PINDIODE\"]/Content/");
-
-  //get the location of the tubes
-  // BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
-  //PINCenter.push_back(TVector3(activeParams.getLength("z_pindiode"), activeParams.getLength("r_pindiode"),
-  //                           activeParams.getLength("Phi")));
-  //nPIN++;
-  //}
-  m_CrematGain = content.getDouble("CrematGain");
-  m_WorkFunction = content.getDouble("WorkFunction");
-  m_FanoFactor = content.getDouble("FanoFactor");
-
-  B2INFO("PinDigitizer: Aquired pin locations and gas parameters");
-  B2INFO("              from PINDIODE.xml. There are " << nPIN << " PINs implemented");
 
 }
 

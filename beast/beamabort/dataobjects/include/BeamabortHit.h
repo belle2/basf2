@@ -33,21 +33,21 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    BeamabortHit(): m_edep(0), m_V(0), m_time(0), m_detNb(0), m_pdg(0) {}
+    BeamabortHit(): m_edep(0), m_I(0), m_time(0), m_detNb(0), m_pdg(0) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    BeamabortHit(float edep, float V, float time, int detNb, int pdg):
-      m_edep(edep), m_V(V), m_time(time), m_detNb(detNb), m_pdg(pdg)
+    BeamabortHit(float edep, float I, float time, int detNb, int pdg):
+      m_edep(edep), m_I(I), m_time(time), m_detNb(detNb), m_pdg(pdg)
     {
     }
 
     /** Return the energy deposited */
     float getedep() const { return m_edep; }
     /** Return the amplitude */
-    float getV() const { return m_V; }
+    float getI() const { return m_I; }
     /** Return the time */
     float gettime() const { return m_time; }
     /** Return the PIN diode number */
@@ -60,7 +60,7 @@ namespace Belle2 {
     /** Energy deposited */
     float m_edep;
     /** V */
-    float m_V;
+    float m_I;
     /** time */
     float m_time;
     /** Detector Number */

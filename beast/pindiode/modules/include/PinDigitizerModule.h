@@ -58,21 +58,13 @@ namespace Belle2 {
 
     private:
 
-      /** reads data from PINDIODE.xml: tube location, drift data filename, sigma of impulse response function */
-      virtual void getXMLData();
-
-      /** number of detectors. Read from PINDIODE.xml*/
-      int nPIN = 32;
-      /** PIN coordinate */
-      std::vector<TVector3> PINCenter;
       /** Cremat gain */
       double m_CrematGain;
       /** Work function */
       double m_WorkFunction;
       /** Fano Factor */
       double m_FanoFactor;
-      /** Event counter */
-      //int Event = 0;
+
     };
 
   }

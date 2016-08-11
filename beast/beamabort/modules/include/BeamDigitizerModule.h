@@ -62,18 +62,10 @@ namespace Belle2 {
 
     private:
 
-      /** reads data from BEAMABORT.xml: tube location, drift data filename, sigma of impulse response function */
-      virtual void getXMLData();
-
-      /** number of detectors. Read from BEAMABORT.xml*/
-      int nBEAM = 0;
-      /** BEAM coordinate */
-      std::vector<TVector3> BEAMCenter;
-      /** Preamp gain */
-      double m_PreampGain;
-      /** Event counter */
-      int Event = 0;
-
+      /** Work function */
+      double m_WorkFunction;
+      /** Fano Factor */
+      double m_FanoFactor;
     };
 
   }

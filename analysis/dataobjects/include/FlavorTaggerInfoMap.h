@@ -50,6 +50,7 @@ namespace Belle2 {
                         m_targetEventLevel({}),
                         m_probEventLevel({}),
                         m_qrCategory({}),
+                        m_hasTrueTarget({}),
                         m_isTrueCategory({}),
                         m_qrCombined(-2),
                         m_B0Probability(-2),
@@ -104,6 +105,13 @@ namespace Belle2 {
     * @param qr output of the given category
     */
     void setQrCategory(std::string category, float qr);
+
+    /**
+    * Map filler: Set the category name and the corresponding MC target truth value.
+    * @param category string name of the given category
+    * @param isTrue output of the given category
+    */
+    void setHasTrueTarget(std::string category, float isTrue);
 
     /**
     * Map filler: Set the category name and the corresponding truth MC value.
@@ -161,6 +169,11 @@ namespace Belle2 {
     */
     std::map<std::string, float> getQrCategory();
 
+    /**< map containing the category truth. 1 if the Category has a target or 0 else.
+    * @return map
+    */
+    std::map<std::string, float> getHasTrueTarget();
+
     /**< map containing the category truth. 1 if the Category tags the B0 MC flavor correctly 0 else.
     * @return map
     */
@@ -198,6 +211,8 @@ namespace Belle2 {
     m_probEventLevel; /**< map containing the category name and the corresponding highest category probability in Event Level*/
     std::map<std::string, float>
     m_qrCategory; /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
+    std::map<std::string, float>
+    m_hasTrueTarget; /**< map containing the category name and a float value which is 1 if the corresponding category has a target or 0 else.*/
     std::map<std::string, float>
     m_isTrueCategory; /**< map containing the category name and a float value which is 1 if the corresponding category tags the MC Flavor correctly or 0 else.*/
 

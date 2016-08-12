@@ -191,7 +191,13 @@ namespace Belle2 {
     Manager::FunctionPtr weightedQrOf(const std::vector<std::string>& arguments);
 
     /**
-     * Returns function which returns 1.0 if the given ategory name tags the B0 MC flavor correctly.
+     * Returns function which returns 1.0 if the given category has at least one target.
+     * This is a Flavor Tagging specific variable on event level!
+     */
+    Manager::FunctionPtr hasTrueTarget(const std::vector<std::string>& arguments);
+
+    /**
+     * Returns function which returns 1.0 if the given category tags the B0 MC flavor correctly.
      * This is a Flavor Tagging specific variable on event level!
      */
     Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments);

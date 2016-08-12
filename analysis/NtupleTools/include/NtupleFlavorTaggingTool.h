@@ -53,6 +53,9 @@ namespace Belle2 {
     /**< map containing the category name and the corresponding qr Output, i.e. the Combiner input value. They could be used for independent tags.*/
     std::map<std::string, float*> m_qrCategories;
 
+    /**< map containing the category name and the corresponding MC Variable isRightTarget. They could be used to evaluate independent tags.*/
+    std::map<std::string, float*> m_hasTrueTargets;
+
     /**< map containing the category name and the corresponding MC Variable isRightCategory. They could be used to evaluate independent tags.*/
     std::map<std::string, float*> m_isTrueCategories;
 

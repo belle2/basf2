@@ -156,8 +156,10 @@ void FlavorTaggerInfoFillerModule::event()
               infoMapsFBDT->setProbEventLevel(category, categoryProb);
               infoMapsFBDT -> setQrCategory(category, qrCategory);
               if (m_istrueCategories and mcFlag) {
-                float isTrue = manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr);
-                infoMapsFBDT -> setIsTrueCategory(category, isTrue);
+                float isTrueTarget = manager.getVariable("hasTrueTarget(" + category + ")")-> function(nullptr);
+                infoMapsFBDT -> setHasTrueTarget(category, isTrueTarget);
+                float isTrueCategory = manager.getVariable("isTrueCategory(" + category + ")")-> function(nullptr);
+                infoMapsFBDT -> setIsTrueCategory(category, isTrueCategory);
               }
               if (m_trackPointers) {
                 infoMapsFBDT-> setTargetEventLevel(category, iParticle -> getTrack());

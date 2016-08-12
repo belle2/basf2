@@ -37,6 +37,7 @@ void NtupleFlavorTaggingTool::setupTree()
 
   for (auto& category : categories) {
     m_qrCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
+    m_hasTrueTargets.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
     m_isTrueCategories.insert(std::pair<std::string, float*>(category, new float[nDecayProducts]));
   }
 
@@ -92,6 +93,10 @@ void NtupleFlavorTaggingTool::setupTree()
         m_tree->Branch((strNames[iProduct] + "_qr" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
                        (strNames[iProduct] + "_qr" + categoryEntry.first + "/F").c_str());
       }
+      for (auto& categoryEntry : m_hasTrueTargets) {
+        m_tree->Branch((strNames[iProduct] + "_hasTrueTarget" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
+                       (strNames[iProduct] + "_hasTrueTarget" + categoryEntry.first + "/F").c_str());
+      }
       for (auto& categoryEntry : m_isTrueCategories) {
         m_tree->Branch((strNames[iProduct] + "_isRightCategory" + categoryEntry.first).c_str(), &categoryEntry.second[iProduct],
                        (strNames[iProduct] + "_isRightCategory" + categoryEntry.first + "/F").c_str());
@@ -128,19 +133,30 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
         if (m_useFBDT == true) qrCombinedFBDT[iProduct] = flavorTaggerInfo->getMethodMap("FBDT")->getQrCombined();
         if (m_useFANN == true) qrCombinedFANN[iProduct] = flavorTaggerInfo->getMethodMap("FANN")->getQrCombined();
 
-        if (m_saveCategories == true) {
+        if (m_saveCategories == true and (m_useFBDT == true or m_useFANN == true)) {
           for (auto& categoryEntry : m_qrCategories) {
             categoryEntry.second[iProduct] = 0;
           }
+
+          for (auto& categoryEntry : m_hasTrueTargets) {
+            categoryEntry.second[iProduct] = 0;
+          }
+
           for (auto& categoryEntry : m_isTrueCategories) {
             categoryEntry.second[iProduct] = 0;
           }
 
+          std::map<std::string, float> iHasTrueTargets = flavorTaggerInfo -> getMethodMap("FBDT")-> getHasTrueTarget();
           std::map<std::string, float> iIsTrueCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getIsTrueCategory();
           std::map<std::string, float> iQrCategories = flavorTaggerInfo -> getMethodMap("FBDT")-> getQrCategory();
           for (auto& categoryEntry : iQrCategories) {
             m_qrCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
           }
+
+          for (auto& categoryEntry : iHasTrueTargets) {
+            m_hasTrueTargets.at(categoryEntry.first)[iProduct] = categoryEntry.second;
+          }
+
           for (auto& categoryEntry : iIsTrueCategories) {
             m_isTrueCategories.at(categoryEntry.first)[iProduct] = categoryEntry.second;
           }

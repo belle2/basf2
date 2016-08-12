@@ -1422,6 +1422,66 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr hasTrueTarget(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        auto categoryName = arguments[0];
+        auto func = [categoryName](const Particle*) -> double {
+          if (!(categoryName == "Electron" || categoryName == "IntermediateElectron" || categoryName == "Muon" ||  categoryName == "IntermediateMuon" || categoryName == "KinLepton" || categoryName == "IntermediateKinLepton" || categoryName == "Kaon"
+          || categoryName == "SlowPion" ||  categoryName == "FastPion" || categoryName == "KaonPion" || categoryName == "Lambda" || categoryName == "MaximumPstar" ||  categoryName == "FSC"))
+          {
+            B2FATAL("isCategoryTrue: Not available category" << categoryName <<
+            ". The possibilities for the category name are \nElectron, IntermediateElectron, Muon, IntermediateMuon, KinLepton, IntermediateKinLepton, Kaon, SlowPion, FastPion, KaonPion, MaximumPstar, FSC and Lambda");
+            return 0.0;
+          }
+
+          std::string particleListName;
+          std::string trackTargetName = categoryName;
+
+          if (categoryName == "Electron" || categoryName == "IntermediateElectron") particleListName = "e+:inRoe";
+          else if (categoryName == "Muon" ||  categoryName ==  "IntermediateMuon" || categoryName ==  "KinLepton" || categoryName ==  "IntermediateKinLepton") particleListName = "mu+:inRoe";
+          else if (categoryName == "Kaon" || categoryName ==  "KaonPion") {particleListName = "K+:inRoe"; trackTargetName = "Kaon";}
+          else if (categoryName == "Lambda") particleListName = "Lambda0:inRoe";
+          else particleListName = "pi+:inRoe";
+
+          if (categoryName == "FSC") trackTargetName = "SlowPion";
+
+          StoreObjPtr<ParticleList> ListOfParticles(particleListName);
+
+          double Output = 0.0;
+
+          int nTargets = 0;
+          Variable::Manager& manager = Variable::Manager::Instance();
+
+          if (ListOfParticles.isValid())
+          {
+            for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
+              Particle* iParticle = ListOfParticles->getParticle(i);
+              if (iParticle != nullptr) {
+                double targetFlag = 0;
+                if (categoryName == "MaximumPstar") {
+                  targetFlag = manager.getVariable("hasHighestProbInCat(pi+:inRoe, isRightTrack(MaximumPstar))")-> function(iParticle);
+                } else {
+                  targetFlag = manager.getVariable("isRightTrack(" + trackTargetName + ")")-> function(iParticle);
+                }
+                if (targetFlag == 1) {
+                  nTargets += 1;
+                }
+              }
+            }
+
+            if (nTargets > 0) Output = 1;
+
+            if (nTargets > 1) B2INFO("The Category " << categoryName << " has " <<  std::to_string(nTargets) << " target tracks.");
+          }
+          return Output;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments (1 required) for meta function hasTrueTarget");
+      }
+    }
+
     Manager::FunctionPtr isTrueCategory(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -1551,6 +1611,8 @@ namespace Belle2 {
                       "FlavorTagging: [Eventbased] q*r where r is calculated from the output of event level in particlelistName.");
     REGISTER_VARIABLE("weightedQrOf(particleListName, extraInfoRightCategory, extraInfoRightTrack)", weightedQrOf,
                       "FlavorTagging: [Eventbased] weighted q*r where r is calculated from the output of event level for the 3 particles with highest track probability in particlelistName.");
+    REGISTER_VARIABLE("hasTrueTarget(categoryName)", hasTrueTarget,
+                      "Returns 1 if the given category has a target. 0 Else.")
     REGISTER_VARIABLE("isTrueCategory(categoryName)", isTrueCategory,
                       "Returns 1 if the given category tags the B0 MC flavor correctly. 0 Else.")
 

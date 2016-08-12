@@ -54,7 +54,7 @@ namespace Belle2 {
         moduleParamList->addParameter(prefixed(prefix, "flightTimeEstimation"),
                                       m_param_flightTimeEstimation,
                                       "Option which flight direction should be assumed for "
-                                      "an initial time of flight estimation."
+                                      "an initial time of flight estimation. Options are: "
                                       "'none' (no TOF correction), "
                                       "'outwards', "
                                       "'downwards'.",

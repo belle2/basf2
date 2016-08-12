@@ -224,7 +224,7 @@ namespace Belle2 {
         int order = primary ? 1 : 2;
         bool input = isInputStoreVector<I>();
         std::string classParameterDescription = m_classMnemomics.getParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
-        return getStoreVectorParameterName(classParameterDescription, order, input);
+        return getStoreVectorParameterDescription(classParameterDescription, order, input);
       }
 
       /** Compose a parameter name for the name of the vector on the DataStore.
@@ -239,10 +239,8 @@ namespace Belle2 {
           orderPrefix = "";
         } else if (order == 2) {
           orderPrefix = "secondary";
-        } else if (order == 3) {
-          orderPrefix = "tertiary";
         } else {
-          B2ERROR("More than three inputs of the same type are not supported");
+          B2ERROR("More than two inputs of the same type are not supported");
         }
         std::string inputPrefix = input ? "input" : "";
 
@@ -268,10 +266,8 @@ namespace Belle2 {
           orderPrefix = "";
         } else if (order == 2) {
           orderPrefix = "secondary ";
-        } else if (order == 3) {
-          orderPrefix = "tertiary ";
         } else {
-          B2ERROR("More than three inputs of the same type are not supported");
+          B2ERROR("More than two inputs of the same type are not supported");
         }
         std::string inputPrefix = input ? "input " : "";
         return "Name of the " + orderPrefix + inputPrefix + classMnenomic + " vector.";

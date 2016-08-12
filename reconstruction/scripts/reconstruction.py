@@ -97,6 +97,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
 
         add_klm_mc_matcher_module(path, components)
 
+        add_muid_module(path, components)
         add_pid_module(path, components)
 
     if trigger_mode in ["all"]:

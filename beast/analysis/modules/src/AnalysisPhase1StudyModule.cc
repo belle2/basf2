@@ -65,9 +65,10 @@ void AnalysisPhase1StudyModule::defineHisto()
 {
   h_count = new TH1F("h_count", "", 10, 0., 10.);
   for (int i = 0; i < 9; i++) {
-    h_prodvtx[i] = new TH2F(TString::Format("h_prodvtx_%d", i), "", 200, -400., 400., 200, -400., -400.);
-    h_decavtx[i] = new TH2F(TString::Format("h_decavtx_%d", i), "", 200, -400., 400., 200, -400., -400.);
+    h_prodvtx[i] = new TH2F(TString::Format("h_prodvtx_%d", i), "", 200, -400., 400., 200, 0., -400.);
+    h_decavtx[i] = new TH2F(TString::Format("h_decavtx_%d", i), "", 200, -400., 400., 200, 0., -400.);
     h_kineticvz[i] = new TH2F(TString::Format("h_kineticvz_%d", i), "", 200, -400., 400., 1000, 0., 10.);
+    h_kineticvz_zoom[i] = new TH2F(TString::Format("h_kineticvz_zoom_%d", i), "", 200, -400., 400., 1000, 0., 0.01);
     h_phivz[i] = new TH2F(TString::Format("h_phivz_%d", i), "", 200, -400., 400., 360, -180., 180.);
     h_thetavz[i] = new TH2F(TString::Format("h_thetavz_%d", i), "", 200, -400., 400., 180, 0., 180.);
   }
@@ -127,6 +128,7 @@ void AnalysisPhase1StudyModule::event()
         h_prodvtx[i]->Fill(prodvtx[2], prodr);
         h_decavtx[i]->Fill(decavtx[2], decar);
         h_kineticvz[i]->Fill(prodvtx[2], Kinetic);
+        h_kineticvz_zoom[i]->Fill(prodvtx[2], Kinetic);
         h_thetavz[i]->Fill(prodvtx[2], theta);
         h_phivz[i]->Fill(prodvtx[2], phi);
       }
@@ -136,6 +138,7 @@ void AnalysisPhase1StudyModule::event()
     h_prodvtx[8]->Fill(prodvtx[2], prodr);
     h_decavtx[8]->Fill(decavtx[2], decar);
     h_kineticvz[8]->Fill(prodvtx[2], Kinetic);
+    h_kineticvz_zoom[8]->Fill(prodvtx[2], Kinetic);
     h_thetavz[8]->Fill(prodvtx[2], theta);
     h_phivz[8]->Fill(prodvtx[2], phi);
     //}

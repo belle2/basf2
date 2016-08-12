@@ -675,4 +675,4 @@ def make_code_pickable(code):
     this won't be pickled. By wrapping the code in this function it is technically a call to a basf2 function
     and will be pickled again. Problem solved.
     """
-    return exec(code, globals())
+    exec(code, globals())

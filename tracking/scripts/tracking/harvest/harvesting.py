@@ -96,7 +96,7 @@ def harvest(foreach="", pick=None, name=None, output_file_name=None, show_result
 
     def harvest_decorator(peel_func):
         name_or_default = name or peel_func.__name__
-        output_file_name_or_default = output_file_name or "{}.root".format(name)
+        output_file_name_or_default = output_file_name or "{}.root".format(name_or_default)
         harvesting_module = HarvestingModule(foreach=foreach,
                                              output_file_name=output_file_name_or_default,
                                              name=name_or_default,

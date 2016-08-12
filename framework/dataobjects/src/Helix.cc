@@ -148,6 +148,58 @@ double Helix::getArcLength2DAtXY(const double& x, const double& y) const
   return arcLength2D;
 }
 
+double Helix::getArcLength2DAtNormalPlane(const double& byX, const double& byY,
+                                          const double& nX, const double& nY) const
+{
+  // Construct the tangential vector to the plan in xy space
+  const double tX = nY;
+  const double tY = -nX;
+
+  // Fetch the helix parameters
+  const double omega = getOmega();
+  const double cosPhi0 = getCosPhi0();
+  const double sinPhi0 = getSinPhi0();
+  const double d0 = getD0();
+
+  // Prepare a delta vector, which is the vector from the perigee point to the support point of the plane
+  // Split it in component parallel and a component orthogonal to tangent at the perigee.
+  const double deltaParallel = byX * cosPhi0 + byY * sinPhi0;
+  const double deltaOrthogonal = byY * cosPhi0 - byX * sinPhi0 + d0;
+  const double deltaCylindricalR = hypot(deltaOrthogonal, deltaParallel);
+  const double deltaCylindricalRSquared = deltaCylindricalR * deltaCylindricalR;
+
+  const double UOrthogonal = 1 + omega * deltaOrthogonal; // called nu in the Karimaki paper.
+  const double UParallel = omega * deltaParallel;
+
+  // Some commonly used terms - compare Karimaki 1990
+  const double A = 2 * deltaOrthogonal + omega * deltaCylindricalRSquared;
+
+  const double tParallel = tX * cosPhi0 + tY * sinPhi0;
+  const double tOrthogonal = tY * cosPhi0 - tX * sinPhi0;
+  const double tCylindricalR = (tX * tX + tY * tY);
+
+  const double c = A / 2;
+  const double b = UParallel * tParallel + UOrthogonal * tOrthogonal;
+  const double a = omega / 2 * tCylindricalR;
+
+  const double discriminant = ((double)b) * b - 4 * a * c;
+  const double root = sqrt(discriminant);
+  const double bigSum = (b > 0) ? -b - root : -b + root;
+
+  const double bigOffset = bigSum / 2 / a;
+  const double smallOffset = 2 * c / bigSum;
+
+  const double distance1 = hypot(byX + bigOffset   * tX, byY + bigOffset   * tY);
+  const double distance2 = hypot(byX + smallOffset * tX, byY + smallOffset * tY);
+
+  if (distance1 < distance2) {
+    return getArcLength2DAtXY(byX + bigOffset   * tX, byY + bigOffset   * tY);
+  } else {
+    return getArcLength2DAtXY(byX + smallOffset * tX, byY + smallOffset * tY);
+  }
+}
+
+
 TVector3 Helix::getPositionAtArcLength2D(const double& arcLength2D) const
 {
   /*

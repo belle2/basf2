@@ -191,6 +191,19 @@ namespace Belle2 {
      */
     double getArcLength2DAtXY(const double& x, const double& y) const;
 
+    /** Calculates the arc length to reach a plane parallel to the z axes.
+     *
+     *  If there is no intersection with the plane NAN is returned
+     *
+     *  @param x        X coordinate of the support point of the plane
+     *  @param y        Y coordinate of the support point of the plane
+     *  @param nX       X coordinate of the normal vector of the plane
+     *  @param nX       Y coordinate of the normal vector of the plane
+     *  @return         Shortest two dimensional arc length to the plane
+     */
+    double getArcLength2DAtNormalPlane(const double& x, const double& y,
+                                       const double& nX,  const double& nY) const;
+
     /** Calculates the position on the helix at the given two dimensional arc length
      *
      *  @param arcLength2D       Two dimensional arc length to be traversed.

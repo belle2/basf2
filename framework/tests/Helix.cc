@@ -170,7 +170,6 @@ namespace {
     }
   } // Testcases for getters
 
-
   TEST_F(HelixTest, SignOfD0)
   {
     // This tests the assumption that the sign of d0 is given by the sign of position x momentum as a two dimensional cross product.
@@ -382,6 +381,76 @@ namespace {
     }
   } // end TEST_F
 
+
+  TEST_F(HelixTest, ExtrapolationToNormalPlane)
+  {
+    {
+      TVector3 center(0.0, 2.0, 0.0);
+      float radius = -1;
+      // Keep it flat
+      float tanLambda = 0;
+      Helix helix = helixFromCenter(center, radius, tanLambda);
+
+      // Plane coordinate
+      double x = 0.0;
+      double y = 3.0;
+      double nx = -1.0;
+      double ny = 1.0;
+      double arcLength2D = helix.getArcLength2DAtNormalPlane(x, y, nx, ny);
+      EXPECT_NEAR(-M_PI / 2, arcLength2D, absError);
+    }
+
+    {
+      TVector3 center(0.0, 2.0, 0.0);
+      float radius = -1;
+      // Keep it flat
+      float tanLambda = 0;
+      Helix helix = helixFromCenter(center, radius, tanLambda);
+
+      // Plane coordinate
+      double x = 0.0;
+      double y = 3.0;
+      double nx = 1.0;
+      double ny = 1.0;
+      double arcLength2D = helix.getArcLength2DAtNormalPlane(x, y, nx, ny);
+      EXPECT_NEAR(M_PI / 2, arcLength2D, absError);
+    }
+
+    {
+      TVector3 center(0.0, 2.0, 0.0);
+      float radius = 1;
+      // Keep it flat
+      float tanLambda = 0;
+      Helix helix = helixFromCenter(center, radius, tanLambda);
+
+      // Plane coordinate
+      double x = 0.0;
+      double y = 3.0;
+      double nx = -1.0;
+      double ny = 1.0;
+      double arcLength2D = helix.getArcLength2DAtNormalPlane(x, y, nx, ny);
+      EXPECT_NEAR(M_PI / 2, arcLength2D, absError);
+    }
+
+    {
+      TVector3 center(0.0, 2.0, 0.0);
+      float radius = 1;
+      // Keep it flat
+      float tanLambda = 0;
+      Helix helix = helixFromCenter(center, radius, tanLambda);
+
+      // Plane coordinate
+      double x = 0.0;
+      double y = 3.0;
+      double nx = 1.0;
+      double ny = 1.0;
+      double arcLength2D = helix.getArcLength2DAtNormalPlane(x, y, nx, ny);
+      EXPECT_NEAR(-M_PI / 2, arcLength2D, absError);
+    }
+
+
+
+  }
 
   TEST_F(HelixTest, PerigeeExtrapolateRoundTrip)
   {

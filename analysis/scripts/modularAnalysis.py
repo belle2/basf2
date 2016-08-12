@@ -1,6 +1,11 @@
 # !/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This module defines wrapper functions around the analysis modules. An overview can
+be found at https://confluence.desy.de/display/BI/Physics+AnalysisSteering
+"""
+
 from basf2 import *
 import os
 import sys
@@ -547,7 +552,7 @@ def fillParticleListsFromMC(
 
 def applyCuts(list_name, cut, path=analysis_main):
     """
-    Removes StoreArray<PArticle> indices of Particles from given ParticleList
+    Removes StoreArray<Particle> indices of Particles from given ParticleList
     that do not pass the given selection criteria (given in ParticleSelector style).
 
     @param list_name input ParticleList name

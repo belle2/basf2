@@ -264,8 +264,98 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
 
     # Correct time seed (only necessary for the CDC tracks)
-    path.add_module("IPTrackTimeEstimator", useFittedInformation=False,
+    path.add_module("IPTrackTimeEstimator",
+                    useFittedInformation=False,
                     recoTracksStoreArrayName=reco_tracks)
+
+
+def add_cdc_cr_track_finding(path,
+                             reco_tracks="RecoTracks",
+                             trigger_point=(0, 0, 0),
+                             ):
+    """
+    Convenience function for adding all cdc track finder modules currently dedicated for the CDC-TOP testbeam
+    to the path.
+
+    The result is a StoreArray with name @param reco_tracks full of RecoTracks (not TrackCands any more!).
+
+    Arguments
+    ---------
+    path: basf2.Path
+       The path to be  filled
+    reco_tracks: str
+       Name of the output RecoTracks. Defaults to RecoTracks.
+    """
+
+    # Init the geometry for cdc tracking and the hits
+    path.add_module("WireHitTopologyPreparer",
+                    flightTimeEstimation="downwards",
+                    )
+
+    # Find segments and reduce background hits
+    path.add_module("SegmentFinderCDCFacetAutomaton",
+                    ClusterFilter="tmva",
+                    ClusterFilterParameters={"cut": 0.2},
+                    FacetUpdateDriftLength=False,
+                    FacetFilter="chi2",
+                    SegmentOrientation="downwards",
+                    )
+
+    # Find axial tracks
+    path.add_module("TrackFinderCDCLegendreTracking",
+                    WriteRecoTracks=False)
+
+    # Improve the quality of the axial tracks
+    path.add_module("TrackQualityAsserterCDC",
+                    WriteRecoTracks=False,
+                    TracksStoreObjNameIsInput=True,
+                    corrections=["B2B"])
+
+    # Find the stereo hits to those axial tracks
+    path.add_module('StereoHitFinderCDCLegendreHistogramming',
+                    TracksStoreObjNameIsInput=True,
+                    useSingleMatchAlgorithm=True,
+                    singleMatchCheckForB2BTracks=True,
+                    WriteRecoTracks=False,
+                    )
+
+    # Delete segments which where fully used in the last events
+    path.add_module("UsedSegmentsDeleter")
+
+    # Combine segments with axial tracks
+    path.add_module('SegmentTrackCombinerDev',
+                    TracksStoreObjNameIsInput=True,
+                    WriteRecoTracks=False,
+                    SegmentTrackFilterFirstStepFilter="tmva",
+                    SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
+                    TrackFilter="tmva",
+                    TrackFilterParameters={"cut": 0.1})
+
+    # Improve the quality of all tracks and output
+    path.add_module("TrackQualityAsserterCDC",
+                    TracksStoreObjNameIsInput=True,
+                    corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
+                    WriteRecoTracks=False,
+                    )
+
+    # Flip track orientation to always point downwards
+    path.add_module("TrackOrienter",
+                    inputTracks="CDCTrackVector",
+                    tracks="OrientedCDCTrackVector",
+                    TrackOrientation="downwards",
+                    )
+
+    # Correct time seed - assumes velocity near light speed
+    path.add_module("TrackFlightTimeAdjuster",
+                    inputTracks="OrientedCDCTrackVector",
+                    triggerPoint=trigger_point,
+                    )
+
+    # Export CDCTracks to RecoTracks representation
+    path.add_module("TrackExporter",
+                    inputTracks="OrientedCDCTrackVector",
+                    RecoTracksStoreArrayName=reco_tracks,
+                    )
 
 
 def add_vxd_track_finding(path, reco_tracks="RecoTracks", components=None):

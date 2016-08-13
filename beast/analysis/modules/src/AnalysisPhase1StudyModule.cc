@@ -10,6 +10,7 @@
 
 #include <beast/analysis/modules/AnalysisPhase1StudyModule.h>
 #include <mdst/dataobjects/MCParticle.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -64,14 +65,31 @@ AnalysisPhase1StudyModule::~AnalysisPhase1StudyModule()
 void AnalysisPhase1StudyModule::defineHisto()
 {
   h_count = new TH1F("h_count", "", 10, 0., 10.);
-  for (int i = 0; i < 9; i++) {
-    h_prodvtx[i] = new TH2F(TString::Format("h_prodvtx_%d", i), "", 200, -400., 400., 200, 0., -400.);
-    h_decavtx[i] = new TH2F(TString::Format("h_decavtx_%d", i), "", 200, -400., 400., 200, 0., -400.);
+  for (int i = 0; i < 10; i++) {
+    h_prodvtx[i] = new TH2F(TString::Format("h_prodvtx_%d", i), "", 200, -400., 400., 200, 0., 400.);
+    h_decavtx[i] = new TH2F(TString::Format("h_decavtx_%d", i), "", 200, -400., 400., 200, 0., 400.);
     h_kineticvz[i] = new TH2F(TString::Format("h_kineticvz_%d", i), "", 200, -400., 400., 1000, 0., 10.);
     h_kineticvz_zoom[i] = new TH2F(TString::Format("h_kineticvz_zoom_%d", i), "", 200, -400., 400., 1000, 0., 0.01);
     h_phivz[i] = new TH2F(TString::Format("h_phivz_%d", i), "", 200, -400., 400., 360, -180., 180.);
     h_thetavz[i] = new TH2F(TString::Format("h_thetavz_%d", i), "", 200, -400., 400., 180, 0., 180.);
   }
+  for (int i = 0; i < 2; i++) {
+    h_sad_xy[i] = new TH2F(TString::Format("h_xy_%d", i), "", 100, -5.99, 5.99, 100, -5.99, 5.99);
+    h_sad_sir[i] = new TH1F(TString::Format("h_sir_%d", i), "", 100, -3.99, 3.99);
+    h_sad_sall[i] = new TH1F(TString::Format("h_sall_%d", i), "", 100, -1499.99, 1499.99);
+    h_sad_sE[i] = new TH2F(TString::Format("h_sE_%d", i), "", 100, -3.99, 3.99, 1000, 0., 10.);
+    h_sad_sraw[i] = new TH1F(TString::Format("h_sraw_%d", i), "", 100, -1499.99, 1499.99);
+  }
+  h_dpx = new TH1F("h_dpx", "", 1000, -1., 1.);
+  h_dpy = new TH1F("h_dpy", "", 1000, -1., 1.);
+  h_dE = new TH1F("h_dE", "", 1000, -1., 1.);
+  h_px = new TH1F("h_px", "", 10000, -10., 10.);
+  h_py = new TH1F("h_py", "", 10000, -10., 10.);
+  h_pz = new TH1F("h_pz", "", 10000, -10., 10.);
+  h_dx = new TH1F("h_dx", "", 10000, -400., 400.);
+  h_dy = new TH1F("h_dy", "", 10000, -400., 400.);
+  h_dz = new TH1F("h_dz", "", 10000, -400., 400.);
+  h_E = new TH1F("h_E", "", 1000, 0., 10.);
 }
 
 void AnalysisPhase1StudyModule::initialize()
@@ -88,6 +106,42 @@ void AnalysisPhase1StudyModule::beginRun()
 
 void AnalysisPhase1StudyModule::event()
 {
+  double px = 0;
+  double py = 0;
+  double x = 0;
+  double y = 0;
+  double s = 0;
+  //double xraw = 0;
+  //double yraw = 0;
+  double sraw = 0;
+  double E = 0;
+  double rate = 0;
+  StoreArray<SADMetaHit> sadMetaHits;
+  for (const auto& sadMetaHit : sadMetaHits) {
+    px = sadMetaHit.getpx();
+    py = sadMetaHit.getpy();
+    x = sadMetaHit.getx();
+    y = sadMetaHit.gety();
+    s = sadMetaHit.gets();
+    //xraw = sadMetaHit.getxraw();
+    //yraw = sadMetaHit.getyraw();
+    sraw = sadMetaHit.getsraw();
+    E = sadMetaHit.getE();
+    rate = sadMetaHit.getrate();
+    h_sad_xy[0]->Fill(x, y);
+    h_sad_sir[0]->Fill(s / 100., rate);
+    h_sad_sall[0]->Fill(s / 100., rate);
+    h_sad_sE[0]->Fill(s / 100., E);
+    h_sad_sraw[0]->Fill(sraw / 100., rate);
+    if (-400. < s && s < 400.) {
+      h_sad_xy[1]->Fill(x, y);
+      h_sad_sir[1]->Fill(s / 100., rate);
+      h_sad_sall[1]->Fill(s / 100., rate);
+      h_sad_sraw[1]->Fill(sraw / 100., rate);
+      h_sad_sE[1]->Fill(s / 100., E);
+    }
+  }
+  int counter = 0;
   StoreArray<MCParticle> mcParticles;
   for (const auto& mcParticle : mcParticles) { // start loop over all MC particles
     int PDG = mcParticle.getPDG();
@@ -133,15 +187,38 @@ void AnalysisPhase1StudyModule::event()
         h_phivz[i]->Fill(prodvtx[2], phi);
       }
     }
-    //if(Mother == 1) {
-    h_count->Fill(9);
+
+    //h_count->Fill(9);
     h_prodvtx[8]->Fill(prodvtx[2], prodr);
     h_decavtx[8]->Fill(decavtx[2], decar);
     h_kineticvz[8]->Fill(prodvtx[2], Kinetic);
     h_kineticvz_zoom[8]->Fill(prodvtx[2], Kinetic);
     h_thetavz[8]->Fill(prodvtx[2], theta);
     h_phivz[8]->Fill(prodvtx[2], phi);
-    //}
+
+    if (counter == 0) {
+      h_count->Fill(9);
+      h_prodvtx[9]->Fill(prodvtx[2], prodr);
+      h_decavtx[9]->Fill(decavtx[2], decar);
+      h_kineticvz[9]->Fill(prodvtx[2], Kinetic);
+      h_kineticvz_zoom[9]->Fill(prodvtx[2], Kinetic);
+      h_thetavz[9]->Fill(prodvtx[2], theta);
+      h_phivz[9]->Fill(prodvtx[2], phi);
+
+      h_dx->Fill(x - prodvtx[0]);
+      h_dy->Fill(-y - prodvtx[1]);
+      h_dz->Fill(s - prodvtx[2]);
+
+      h_dpx->Fill(px - mom[0]);
+      h_dpy->Fill(-py - mom[1]);
+      h_dE->Fill(E - Energy);
+
+      h_px->Fill(mom[0]);
+      h_py->Fill(mom[1]);
+      h_pz->Fill(mom[2]);
+      h_E->Fill(Kinetic);
+    }
+    counter++;
   }
 
 }

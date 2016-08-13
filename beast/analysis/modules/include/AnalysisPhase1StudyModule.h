@@ -78,6 +78,37 @@ namespace Belle2 {
     TH2F* h_thetavz[10];
     /** phi v z */
     TH2F* h_phivz[10];
+    /** sad xy */
+    TH2F* h_sad_xy[2];
+    /** sad rate */
+    TH1F* h_sad_sir[2];
+    /** sad rate */
+    TH1F* h_sad_sall[2];
+    /** sad rate */
+    TH1F* h_sad_sraw[2];
+    /** sad s v E */
+    TH2F* h_sad_sE[2];
+    /** comp. E */
+    TH1F* h_dE;
+    /** comp. px */
+    TH1F* h_dpx;
+    /** comp. py */
+    TH1F* h_dpy;
+    /** E */
+    TH1F* h_E;
+    /** px */
+    TH1F* h_px;
+    /** py */
+    TH1F* h_py;
+    /** pz */
+    TH1F* h_pz;
+    /** x */
+    TH1F* h_dx;
+    /** y */
+    TH1F* h_dy;
+    /** z */
+    TH1F* h_dz;
+
   };
 
   //  }

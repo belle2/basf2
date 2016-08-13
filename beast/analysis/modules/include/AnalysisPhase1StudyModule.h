@@ -80,6 +80,8 @@ namespace Belle2 {
     TH2F* h_phivz[10];
     /** sad xy */
     TH2F* h_sad_xy[2];
+    /** g4 xy */
+    TH2F* h_g4_xy;
     /** sad rate */
     TH1F* h_sad_sir[2];
     /** sad rate */

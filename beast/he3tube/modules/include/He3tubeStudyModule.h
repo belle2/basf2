@@ -99,6 +99,9 @@ namespace Belle2 {
       /** Pulse heught of all waveforms */
       TH1F* h_PulseHeights_All;
 
+      /** MC kin energy dis */
+      TH1F* h_mche3_kinetic[10];
+
       /** Number of neutrons */
       int nNeutronHits = 0;
       /** Number of definte neutrons */

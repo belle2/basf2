@@ -75,7 +75,9 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcStudyModule::defineHisto()
 {
-  h_tpc_neutron  = new TH1F("h_tpc_neutron", "Neutron kin. energy [MeV]", 1000, 0., 100.);
+  for (int i = 0 ; i < 9 ; i++) {
+    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
+  }
   for (int i = 0 ; i < 8 ; i++) {
     h_z[i] = new TH1F(TString::Format("h_z_%d", i), "Charged density per cm^2", 2000, 0.0, 20.0);
 
@@ -409,9 +411,23 @@ void MicrotpcStudyModule::event()
     const double energy = mcpart.getEnergy();
     const double mass = mcpart.getMass();
     double kin = energy - mass;
-    const double pdg = mcpart.getPDG();
-    if (pdg == 2112)
-      h_tpc_neutron->Fill(kin);
+    const double PDG = mcpart.getPDG();
+    int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    if (PDG == 11) partID[0] = 1; //positron
+    else if (PDG == -11) partID[1] = 1; //electron
+    else if (PDG == 22) partID[2] = 1; //photon
+    else if (PDG == 2112) partID[3] = 1; //neutron
+    else if (PDG == 2212) partID[4] = 1; //proton
+    else if (PDG == 1000080160) partID[5] = 1; // O
+    else if (PDG == 1000060120) partID[6] = 1; // C
+    else if (PDG == 1000020040) partID[7] = 1; // He
+    else partID[8] = 1;
+    for (int i = 0; i < 9; i++) {
+      if (partID[i] == 1) {
+        h_mctpc_kinetic[i]->Fill(kin);
+      }
+    }
   }
   //number of Tracks
   //int nTracks = Tracks.getEntries();

@@ -73,12 +73,13 @@ void AnalysisPhase1StudyModule::defineHisto()
     h_phivz[i] = new TH2F(TString::Format("h_phivz_%d", i), "", 200, -400., 400., 360, -180., 180.);
     h_thetavz[i] = new TH2F(TString::Format("h_thetavz_%d", i), "", 200, -400., 400., 180, 0., 180.);
   }
+  h_g4_xy = new TH2F("h_g4_xy", "", 100, -5.99, 5.99, 100, -5.99, 5.99);
   for (int i = 0; i < 2; i++) {
-    h_sad_xy[i] = new TH2F(TString::Format("h_xy_%d", i), "", 100, -5.99, 5.99, 100, -5.99, 5.99);
-    h_sad_sir[i] = new TH1F(TString::Format("h_sir_%d", i), "", 100, -3.99, 3.99);
-    h_sad_sall[i] = new TH1F(TString::Format("h_sall_%d", i), "", 100, -1499.99, 1499.99);
-    h_sad_sE[i] = new TH2F(TString::Format("h_sE_%d", i), "", 100, -3.99, 3.99, 1000, 0., 10.);
-    h_sad_sraw[i] = new TH1F(TString::Format("h_sraw_%d", i), "", 100, -1499.99, 1499.99);
+    h_sad_xy[i] = new TH2F(TString::Format("h_sad_xy_%d", i), "", 100, -5.99, 5.99, 100, -5.99, 5.99);
+    h_sad_sir[i] = new TH1F(TString::Format("h_sad_sir_%d", i), "", 100, -3.99, 3.99);
+    h_sad_sall[i] = new TH1F(TString::Format("h_sad_sall_%d", i), "", 100, -1499.99, 1499.99);
+    h_sad_sE[i] = new TH2F(TString::Format("h_sad_sE_%d", i), "", 100, -3.99, 3.99, 1000, 0., 10.);
+    h_sad_sraw[i] = new TH1F(TString::Format("h_sad_sraw_%d", i), "", 100, -1499.99, 1499.99);
   }
   h_dpx = new TH1F("h_dpx", "", 1000, -1., 1.);
   h_dpy = new TH1F("h_dpy", "", 1000, -1., 1.);
@@ -128,7 +129,6 @@ void AnalysisPhase1StudyModule::event()
     sraw = sadMetaHit.getsraw();
     E = sadMetaHit.getE();
     rate = sadMetaHit.getrate();
-    h_sad_xy[0]->Fill(x, y);
     h_sad_sir[0]->Fill(s / 100., rate);
     h_sad_sall[0]->Fill(s / 100., rate);
     h_sad_sE[0]->Fill(s / 100., E);
@@ -165,7 +165,7 @@ void AnalysisPhase1StudyModule::event()
     mom[2] = mcParticle.getMomentum().Z();
     float theta = mcParticle.getMomentum().Theta() * TMath::RadToDeg();
     float phi = mcParticle.getMomentum().Phi() * TMath::RadToDeg();
-    int partID[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+    int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     if (PDG == 11) partID[0] = 1; //positron
     else if (PDG == -11) partID[1] = 1; //electron
@@ -207,11 +207,13 @@ void AnalysisPhase1StudyModule::event()
 
       h_dx->Fill(x - prodvtx[0]);
       h_dy->Fill(-y - prodvtx[1]);
-      h_dz->Fill(s - prodvtx[2]);
+      h_dz->Fill(-s - prodvtx[2]);
 
       h_dpx->Fill(px - mom[0]);
       h_dpy->Fill(-py - mom[1]);
       h_dE->Fill(E - Energy);
+
+      h_g4_xy->Fill(prodvtx[0], prodvtx[1]);
 
       h_px->Fill(mom[0]);
       h_py->Fill(mom[1]);

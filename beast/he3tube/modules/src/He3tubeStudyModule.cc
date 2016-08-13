@@ -11,6 +11,7 @@
 #include <beast/he3tube/modules/He3tubeStudyModule.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
+#include <beast/he3tube/dataobjects/He3MCParticle.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -66,7 +67,9 @@ He3tubeStudyModule::~He3tubeStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void He3tubeStudyModule::defineHisto()
 {
-
+  for (int i = 0 ; i < 9 ; i++) {
+    h_mche3_kinetic[i]  = new TH1F(TString::Format("h_mche3_kinetic_%d", i), "MC kin. energy [GeV]", 1000, 0., 10.);
+  }
 
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_DefNeutronHits = new TH1F("DefNeutronHits", "Definite Neutron Hits;Tube ", 4, -0.5, 3.5);
@@ -109,6 +112,30 @@ void He3tubeStudyModule::event()
 
   StoreArray<He3tubeSimHit>  simHits;
   StoreArray<He3tubeHit> Hits;
+  StoreArray<He3MCParticle> mcparts;
+
+  for (const auto& mcpart : mcparts) { // start loop over all Tracks
+    const double energy = mcpart.getEnergy();
+    const double mass = mcpart.getMass();
+    double kin = energy - mass;
+    const double PDG = mcpart.getPDG();
+    int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+
+    if (PDG == 11) partID[0] = 1; //positron
+    else if (PDG == -11) partID[1] = 1; //electron
+    else if (PDG == 22) partID[2] = 1; //photon
+    else if (PDG == 2112) partID[3] = 1; //neutron
+    else if (PDG == 2212) partID[4] = 1; //proton
+    else if (PDG == 1000080160) partID[5] = 1; // O
+    else if (PDG == 1000060120) partID[6] = 1; // C
+    else if (PDG == 1000020040) partID[7] = 1; // He
+    else partID[8] = 1;
+    for (int i = 0; i < 9; i++) {
+      if (partID[i] == 1) {
+        h_mche3_kinetic[i]->Fill(kin);
+      }
+    }
+  }
 
   //initalize various counters
   double edepSum = 0;

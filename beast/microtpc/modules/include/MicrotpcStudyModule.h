@@ -85,7 +85,7 @@ namespace Belle2 {
       /** Event counter */
       //int Event = 0;
       /** Neutron kin energy dis */
-      TH1F* h_tpc_neutron;
+      TH1F* h_mctpc_kinetic[10];
       /** Charged density vs z vs section */
       TH1F* h_z[8];
       /** Charged density vs x vs y */

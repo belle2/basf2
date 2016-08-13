@@ -139,7 +139,7 @@ namespace Belle2 {
         mom[0] = mcParticle.getMomentum().X();
         mom[1] = mcParticle.getMomentum().Y();
         mom[2] = mcParticle.getMomentum().Z();
-        if (!He3MCParticles.isValid()) He3MCParticles.create();
+        //if (!He3MCParticles.isValid()) He3MCParticles.create();
         He3MCParticles.appendNew(He3MCParticle(PDG, Mass, Energy, vtx, mom));
         //}
       }

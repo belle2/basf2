@@ -11,11 +11,22 @@ You can also run ``basf2 variables.py`` to list all available variables.
 
 from basf2 import *
 from ROOT import gSystem
+import argparse
+import pager
 gSystem.Load('libanalysis.so')
 
 # import everything into current namespace.
 from ROOT import Belle2
 variables = Belle2.Variable.Manager.Instance()
+
+
+def getCommandLineOptions():
+    """ Parses the command line options of the fei and returns the corresponding arguments. """
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--no-pager', dest='pager', default=True, action='store_false',
+                        help='Use a pager to show output or print to terminal.')
+    args = parser.parse_args()
+    return args
 
 
 def printVars():
@@ -40,4 +51,11 @@ def printVars():
 
 
 if __name__ == "__main__":
-    printVars()
+    args = getCommandLineOptions()
+
+    if args.pager:
+        with pager.Pager():
+            printVars()
+        printVars()
+    else:
+        printVars()

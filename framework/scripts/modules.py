@@ -3,6 +3,7 @@
 
 import sys
 from basf2 import *
+from pager import Pager
 
 # Do not show INFO messages in module list (actually a problem of the module)
 set_log_level(LogLevel.WARNING)
@@ -22,10 +23,12 @@ if len(sys.argv) == 2:
                     'caused by a library with missing links.')
     elif modName == modName.lower():
         # lower case? might be a package instead
-        print_all_modules(avModList, modName)
+        with Pager('List of modules in package "%s"' % (modName)):
+            print_all_modules(avModList, modName)
     else:
         B2FATAL('Print module information: A module with the name "' +
                 modName + '" does not exist!')
 else:
     # Otherwise print all modules.
-    print_all_modules(avModList)
+    with Pager('List of all basf2 modules'):
+        print_all_modules(avModList)

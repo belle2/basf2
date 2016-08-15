@@ -54,7 +54,7 @@ if __name__ == "__main__":
     args = getCommandLineOptions()
 
     if args.pager:
-        with pager.Pager():
+        with pager.Pager('Available variables in Variable\:\:Manager'):
             printVars()
     else:
         printVars()

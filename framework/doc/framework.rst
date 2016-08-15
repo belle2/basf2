@@ -98,6 +98,9 @@ Utilities
    :members:
    :imported-members:
 
+.. automodule:: pager
+   :members:
+
 
 B2Tools
 -------

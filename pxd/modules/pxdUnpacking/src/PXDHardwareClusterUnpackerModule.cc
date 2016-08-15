@@ -15,6 +15,7 @@
 #include <framework/logging/Logger.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
+#include <vector>
 
 using namespace std;
 using namespace Belle2;
@@ -51,14 +52,15 @@ PXDHardwareClusterUnpackerModule::PXDHardwareClusterUnpackerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
   addParam("HeaderEndianSwap", m_headerEndianSwap, "Swap the endianess of the ONSEN header", true);
   addParam("DoNotStore", m_doNotStore, "only unpack and check, but do not store", false);
-  addParam("RawClusterName", m_RawClustersName, "The name of the StoreArray of PXD Raw Clusters to be processed", std::string(""));
-  addParam("HarwareClusterName", m_HardwareClusterName, "The name of the StoreArray of PXD Hardware Cluster to be processed",
+  addParam("rawClusterName", m_RawClustersName, "The name of the StoreArray of PXD Raw Clusters to be processed", std::string(""));
+  addParam("harwareClusterName", m_HardwareClusterName, "The name of the StoreArray of PXD Hardware Cluster to be processed",
            std::string(""));
 }
 
 void PXDHardwareClusterUnpackerModule::initialize()
 {
-  StoreArray<PXDRawCluster>::required(m_RawClustersName);
+//  StoreArray<PXDRawCluster>::required(m_RawClustersName);
+  m_rawClusters.isRequired(m_RawClustersName);
   m_storeHardwareCluster.registerInDataStore(m_HardwareClusterName);
 
   B2INFO("HeaderEndianSwap: " << m_headerEndianSwap);
@@ -75,9 +77,10 @@ void PXDHardwareClusterUnpackerModule::terminate()
 
 void PXDHardwareClusterUnpackerModule::event()
 {
-  StoreArray<PXDRawCluster> RawClusters;
+//  StoreArray<PXDRawCluster> RawClusters;
   StoreObjPtr<EventMetaData> evtPtr;
-  int nRaws = RawClusters.getEntries();
+//  int nRaws = RawClusters.getEntries();
+  int nRaws = m_rawClusters.getEntries();
 
   if (verbose) {
     B2INFO("PXD Hardware Cluster Unpacker Info  --> RawClusters Objects in event: " << nRaws);
@@ -94,7 +97,7 @@ void PXDHardwareClusterUnpackerModule::event()
 
 
   int nsr = 0;
-  for (auto& it : RawClusters) {
+  for (auto& it : m_rawClusters) {
     if (verbose) {
       B2INFO("PXD Hardware Cluster Unpacker Module --> Unpack Objects");
     };
@@ -105,7 +108,7 @@ void PXDHardwareClusterUnpackerModule::event()
   m_unpackedEventsCount++;
 }
 
-void PXDHardwareClusterUnpackerModule::unpack_event(PXDRawCluster& cl)
+void PXDHardwareClusterUnpackerModule::unpack_event(const PXDRawCluster& cl)
 {
   int fullsize;
   VxdID vxdID;
@@ -115,13 +118,15 @@ void PXDHardwareClusterUnpackerModule::unpack_event(PXDRawCluster& cl)
     return;
   }
 
-  unsigned short data[cl.getLength()];
+  std::vector<unsigned short> data;
+
   fullsize = cl.getLength();
   B2INFO("size of data array " << fullsize);
 
   vxdID = cl.getVxdID();
 
   for (int i = 0 ; i < fullsize ; i++) {
+    data.push_back(i);
     data[i] = cl.getData(i);
   }
 
@@ -133,7 +138,7 @@ void PXDHardwareClusterUnpackerModule::unpack_event(PXDRawCluster& cl)
   B2INFO("unpack Cluster frame with size " << fullsize);
 }
 
-unsigned int PXDHardwareClusterUnpackerModule::calc_cluster_charge(unsigned short* data, unsigned int nr_pixel_words)
+unsigned int PXDHardwareClusterUnpackerModule::calc_cluster_charge(const unsigned short* data, unsigned int nr_pixel_words)
 {
   unsigned char charge;//[nr_pixel_words];
   unsigned int cluster_charge = 0;
@@ -146,7 +151,7 @@ unsigned int PXDHardwareClusterUnpackerModule::calc_cluster_charge(unsigned shor
   return cluster_charge;
 }
 
-PXDHardwareClusterUnpackerModule::seed_pixel PXDHardwareClusterUnpackerModule::find_seed_pixel(unsigned short* data,
+PXDHardwareClusterUnpackerModule::seed_pixel PXDHardwareClusterUnpackerModule::find_seed_pixel(const unsigned short* data,
     unsigned int nr_pixel_words, unsigned int dhp_id)
 {
   seed_pixel addr;
@@ -189,10 +194,10 @@ PXDHardwareClusterUnpackerModule::seed_pixel PXDHardwareClusterUnpackerModule::f
   return addr;
 }
 
-void PXDHardwareClusterUnpackerModule::unpack_fce(void* data, unsigned int nr_words,
+void PXDHardwareClusterUnpackerModule::unpack_fce(const void* data, unsigned int nr_words,
                                                   VxdID vxdID)  //frame_len in bytes (excl. CRC )!!!
 {
-  unsigned short* dhe_fce = (unsigned short*)data;
+  const unsigned short* dhe_fce = (unsigned short*)data;
   int nrPixel = 0;
   unsigned int increment_row_flag = 0;
   unsigned short rows[nr_words];

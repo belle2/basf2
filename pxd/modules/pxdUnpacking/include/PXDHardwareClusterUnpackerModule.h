@@ -81,10 +81,13 @@ namespace Belle2 {
       /** Output array for Clusters. */
       StoreArray<PXDHardwareCluster> m_storeHardwareCluster;
 
+      /** input array. */
+      StoreArray<PXDRawCluster> m_rawClusters;
+
       /** Unpack dhp (several cluster frames) stored in RawCluster object.
        * @param cl Cluster data object
        */
-      void unpack_event(PXDRawCluster& cl);
+      void unpack_event(const PXDRawCluster& cl);
 
       /** Unpack one frame (within an event).
        * @param data pointer to frame
@@ -94,7 +97,7 @@ namespace Belle2 {
        */
 
       /** Unpack one cluster  */
-      void unpack_fce(void* data, unsigned int length, VxdID vxdID);
+      void unpack_fce(const void* data, unsigned int length, VxdID vxdID);
 
       /**
        * @param dhe_id Pixel row coordinate.
@@ -105,10 +108,10 @@ namespace Belle2 {
        */
 
       /** Calculates the total cluster charge of one cluster */
-      unsigned int calc_cluster_charge(unsigned short* data, unsigned int nr_pixel_words);
+      unsigned int calc_cluster_charge(const unsigned short* data, unsigned int nr_pixel_words);
 
       /** Finds the seed pixel and its charge */
-      seed_pixel find_seed_pixel(unsigned short* data, unsigned int nr_pixel_words, unsigned int dhp_id);
+      seed_pixel find_seed_pixel(const unsigned short* data, unsigned int nr_pixel_words, unsigned int dhp_id);
 
       /** give verbose unpacking information -> will eb a parameter in next release */
       bool verbose = true;

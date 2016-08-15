@@ -56,6 +56,5 @@ if __name__ == "__main__":
     if args.pager:
         with pager.Pager():
             printVars()
-        printVars()
     else:
         printVars()

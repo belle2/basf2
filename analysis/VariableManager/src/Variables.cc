@@ -654,6 +654,7 @@ namespace Belle2 {
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
       status &= (~MCMatching::c_MissingResonance);
       //status &= (~MCMatching::c_DecayInFlight);
 
@@ -674,6 +675,7 @@ namespace Belle2 {
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
       status &= (~MCMatching::c_MissingResonance);
       status &= (~MCMatching::c_MisID);
       status &= (~MCMatching::c_AddedWrongParticle);
@@ -732,6 +734,7 @@ namespace Belle2 {
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
+      status &= (~MCMatching::c_MissPHOTOS);
       status &= (~MCMatching::c_MissingResonance);
       //status &= (~MCMatching::c_DecayInFlight);
       status &= (~MCMatching::c_MissNeutrino);

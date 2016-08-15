@@ -37,6 +37,7 @@ std::string MCMatching::explainFlags(unsigned int flags)
         case c_MisID               : s += "c_MisID"; break;
         case c_AddedWrongParticle  : s += "c_AddedWrongParticle"; break;
         case c_InternalError       : s += "c_InternalError"; break;
+        case c_MissPHOTOS          : s += "c_MissPHOTOS"; break;
         default:
           s += to_string(f);
           B2ERROR("MCMatching::explainFlags() doesn't know about flag " << f << ", please update it.");
@@ -272,20 +273,7 @@ bool MCMatching::isFSP(int pdg)
 
 bool MCMatching::isFSR(const MCParticle* p)
 {
-  const MCParticle* mother = p->getMother();
-  if (!mother) {
-    B2ERROR("The hell? why would this gamma not have a mother?");
-    return false; //?
-  }
-
-  //TODO: this is a rough approximation, needs EvtGen changes for correct determination
-  //once fixed, have a look at the TODOs in mcmatching tests, some should have different flags
-  int ndaug = mother->getNDaughters();
-  if (ndaug > 2) { // M -> A B (...) gamma is probably FSR
-    return true;
-  } else { // M -> A gamma is probably a decay
-    return false;
-  }
+  return p->hasStatus(MCParticle::c_IsFSRPhoton);
 }
 
 //utility functions used by getMissingParticleFlags()
@@ -352,12 +340,12 @@ int MCMatching::getMissingParticleFlags(const Particle* particle, const MCPartic
       if (!isFSP(generatedPDG)) {
         flags |= c_MissingResonance;
       } else if (generatedPDG == 22) { //missing photon
-        if (!(flags & c_MissFSR) or !(flags & c_MissGamma)) {
-          if (isFSR(genPart))
-            flags |= c_MissFSR;
-          else
-            flags |= c_MissGamma;
-        }
+        if (isFSR(genPart))
+          flags |= c_MissFSR;
+        else if (genPart->hasStatus(MCParticle::c_IsPHOTOSPhoton))
+          flags |= c_MissPHOTOS;
+        else
+          flags |= c_MissGamma;
 
       } else if (absGeneratedPDG == 12 || absGeneratedPDG == 14 || absGeneratedPDG == 16) { // missing neutrino
         flags |= c_MissNeutrino;

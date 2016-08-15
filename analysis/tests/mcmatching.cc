@@ -623,8 +623,7 @@ namespace {
       Decay d(111, {11, -11, 22});
       d.reconstruct({111, {11, -11, 0}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      //TODO: this should get c_MissGamma, but distinction between these cases is hard
-      EXPECT_EQ(c_MissFSR, getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCErrors(d.m_particle)) << d.getString();
     }
     {
       //pi0 -> 2 gamma, with both clusters coming from same photon
@@ -647,8 +646,7 @@ namespace {
       Decay d(111, {22, 22, 22, 22});
       d.reconstruct({111, {22, 22, 0, 0}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      //TODO: this should get c_MissGamma, but distinction between these cases is hard
-      EXPECT_EQ(c_MissFSR, getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCErrors(d.m_particle)) << d.getString();
     }
     {
       //pi0 -> 4 gamma, with two clusters coming from same photon
@@ -656,8 +654,7 @@ namespace {
       Decay& gamma = d[0];
       d.reconstruct({111, {22, 22, 22, {22, {}, Decay::c_ReconstructFrom, &gamma}}});
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      //TODO: this should get c_MissGamma, but distinction between these cases is hard
-      EXPECT_EQ(c_MissFSR, getMCErrors(d.m_particle)) << d.getString();
+      EXPECT_EQ(c_MissGamma, getMCErrors(d.m_particle)) << d.getString();
     }
   }
   /** photon 'reconstructed' from a pi+ track, combined into other stuff. */
@@ -672,18 +669,18 @@ namespace {
       Decay* pi0decay = d.getDecay(111);
       ASSERT_TRUE(setMCTruth(pi0)) << pi0decay->getString();
       EXPECT_EQ(521, pi0->getRelated<MCParticle>()->getPDG());
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance | c_MissFSR,
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissMassiveParticle | c_MissGamma | c_MissingResonance,
                 getMCErrors(pi0)) << pi0decay->getString();
 
       //flags migrate upstream
       Particle* p = d.getParticle(421);
       Decay* d0decay = d.getDecay(421);
       ASSERT_TRUE(setMCTruth(p)) << d0decay->getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR, getMCErrors(p)) << d0decay->getString();
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance, getMCErrors(p)) << d0decay->getString();
 
       //even with addedWrongParticle (inherited from daughter), missFSR should be detected.
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
-      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance | c_MissFSR,
+      EXPECT_EQ(c_MisID | c_AddedWrongParticle | c_MissGamma | c_MissingResonance,
                 getMCErrors(d.m_particle)) << d.getString();
     }
   }
@@ -972,6 +969,64 @@ namespace {
       ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
       EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
       EXPECT_EQ(c_MissMassiveParticle | c_MisID, getMCErrors(d.m_particle)) << d.getString();
+    }
+  }
+
+  /** distinction between FSR/PHOTOS and real photons. */
+  TEST_F(MCMatchingTest, MissingFSRMissingPHOTOS)
+  {
+    {
+      Decay d(521, { -11, 12, 22});
+      d.finalize();
+      MCParticle* photon = d.getMCParticle(22);
+      EXPECT_FALSE(MCMatching::isFSR(photon));
+
+      d.reconstruct({521, { -11}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MissGamma | c_MissNeutrino, getMCErrors(d.m_particle)) << d.getString();
+
+    }
+    {
+      //ISR flag should not trigger anything special
+      Decay d(521, { -11, 12, 22});
+      d.finalize();
+      MCParticle* photon = d.getMCParticle(22);
+      photon->setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_IsISRPhoton);
+      EXPECT_FALSE(MCMatching::isFSR(photon));
+
+      d.reconstruct({521, { -11}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MissGamma | c_MissNeutrino, getMCErrors(d.m_particle)) << d.getString();
+    }
+
+    {
+      //now try the same with FSR flag
+      Decay d(521, { -11, 12, 22});
+      d.finalize();
+      MCParticle* photon = d.getMCParticle(22);
+      photon->setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_IsFSRPhoton);
+      EXPECT_TRUE(MCMatching::isFSR(photon));
+
+      d.reconstruct({521, { -11}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MissFSR | c_MissNeutrino, getMCErrors(d.m_particle)) << d.getString();
+    }
+
+    {
+      //now try PHOTOS photon
+      Decay d(521, { -11, 12, 22});
+      d.finalize();
+      MCParticle* photon = d.getMCParticle(22);
+      photon->setStatus(MCParticle::c_PrimaryParticle | MCParticle::c_IsPHOTOSPhoton);
+      EXPECT_FALSE(MCMatching::isFSR(photon));
+
+      d.reconstruct({521, { -11}});
+      ASSERT_TRUE(setMCTruth(d.m_particle)) << d.getString();
+      EXPECT_EQ(d.m_mcparticle->getPDG(), d.m_particle->getRelated<MCParticle>()->getPDG());
+      EXPECT_EQ(c_MissPHOTOS | c_MissNeutrino, getMCErrors(d.m_particle)) << d.getString();
     }
   }
 }  // namespace

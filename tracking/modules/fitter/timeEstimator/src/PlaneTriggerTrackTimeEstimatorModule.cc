@@ -11,6 +11,7 @@
 
 #include <tracking/dataobjects/RecoTrack.h>
 #include <framework/dataobjects/Helix.h>
+#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace std;
 using namespace Belle2;
@@ -59,7 +60,9 @@ double PlaneTriggerTrackTimeEstimatorModule::estimateFlightLengthUsingSeedInform
   const short int charge = recoTrack.getChargeSeed();
   const TVector3& position = recoTrack.getPositionSeed();
 
-  const Helix h(position, momentum, charge, 1.5);
+  const double bZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  const Helix h(position, momentum, charge, bZ);
+
   const double arcLengthAtPosition = h.getArcLength2DAtXY(position.X(), position.Y());
 
   double arcLengthOfIntersection;

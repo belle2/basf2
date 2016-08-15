@@ -28,9 +28,19 @@ def main():
     # ################################ #
     cdc_top_geometry = False
     if cdc_top_geometry:
-        gearbox_module.param(dict(fileName="geometry/CDCcosmicTests.xml"))  # <- does something mysterious to tracking...
+        gearbox_module.param(dict(fileName="geometry/CDCcosmicTests.xml"))  # <- does something mysterious to the reconstruction...
+        # The peculiar behaviour seems to originate from the low magnetic field setup close to the earth magentic field.
+        # In the current state of the reconstruction it seems to be better to set the magnetic field to zero
+        # Override of the magnetic field is made below as a temporary work around until we discussed the topic with
+        # the TOP group how composed the geometry/CDCcosmicTests.xml.
+        gearbox_module.param(dict(overrideMultiple=[
+            # Explicitly override magnetic field to zero instead of earth magnetic field as defined in CDC TOP geometry
+            ("/DetectorComponent[@name='MagneticField']//Component/Z", "0", ""),
+        ]
+        ))
+
     else:
-        # Use the regular geometry but only the cdc
+        # Use the regular geometry but only the cdc, no magnetic field.
         geometry_module.param(dict(components=["CDC"],))
 
     gearbox_module.param(dict(
@@ -49,28 +59,79 @@ def main():
         ]
     ))
 
-    # Register the CRY generator
-    path.add_module('CRYInput',
-                    # cosmic data input
-                    CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
-                    # CosmicDataDir='.'
-                    # user input file
-                    SetupFile='cry.setup',
+    # Generator setup #
+    # ############### #
+    generator_module = "cry"
+    # generator_module = "cosmics"
+    # generator_module = "particle_gun"
 
-                    # acceptance half-lengths - at least one particle has to enter that box to use that event
-                    acceptLength=0.5,
-                    acceptWidth=0.5,
-                    acceptHeight=0.5,
-                    maxTrials=10000,
+    if generator_module == "cry":
+        # Register the CRY generator
+        path.add_module('CRYInput',
+                        # cosmic data input
+                        CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
+                        # CosmicDataDir='.'
+                        # user input file
+                        SetupFile='cry.setup',
 
-                    # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
-                    keepLength=0.5,
-                    keepWidth=0.5,
-                    keepHeight=0.5,
+                        # acceptance half-lengths - at least one particle has to enter that box to use that event
+                        acceptLength=0.5,
+                        acceptWidth=0.5,
+                        acceptHeight=0.5,
+                        maxTrials=10000,
 
-                    # minimal kinetic energy - all particles below that energy are ignored
-                    kineticEnergyThreshold=0.01,
-                    )
+                        # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
+                        keepLength=0.5,
+                        keepWidth=0.5,
+                        keepHeight=0.5,
+
+                        # minimal kinetic energy - all particles below that energy are ignored
+                        kineticEnergyThreshold=0.01,
+                        )
+
+    elif generator_module == "cosmics":
+        path.add_module("Cosmics")
+
+    elif generator_module == "particle_gun":
+        # Generate muons starting in the IP
+        # Yields outgoing arm only
+
+        # PDG code of a muon
+        muon_pdg_code = 13
+        sector = 0
+        phiBounds = [240 + 60.0 * sector % 360.0, 300 + 60.0 * sector % 360.0]
+
+        path.add_module("ParticleGun",
+                        pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                        nTracks=1,
+                        varyNTracks=False,
+                        momentumGeneration='uniform',
+                        momentumParams=[2.0, 4.0],
+                        phiGeneration='uniform',
+                        phiParams=phiBounds,
+                        thetaGeneration='uniform',
+                        thetaParams=[70., 110.])
+
+    else:
+        raise ValueError("Unknown generator module key " + generator_module)
+
+    # Flight time versus trigger setup #
+    # ################################ #
+
+    # Two alternative tof setups:
+    #  *  Relative to plane sets the Monte Carlo time of flight
+    #     such that zero is on first intersection with the trigger counter plane
+    #  *  Relative to point sets the Monte Carlo time of flight
+    #     such that zero is at the perigee relative to central point of the trigger counter plane
+    use_tof_relative_to_trigger_plane = True
+    use_tof_relative_to_trigger_point = not use_tof_relative_to_trigger_plane
+    if use_tof_relative_to_trigger_plane:
+        tof_mode = 1
+    elif use_tof_relative_to_trigger_point:
+        tof_mode = 2
+
+    # Also counter the adjustments the CRY generator makes to the production time in case it is used.
+    use_cry_generator = generator_module == "cry"
 
     path.add_module('CDCCosmicSelector',
                     lOfCounter=30.,
@@ -83,8 +144,8 @@ def main():
                     # yOfCounter = 5,
                     # zOfCounter = 16,
 
-                    TOF=1,
-                    cryGenerator=True
+                    TOF=tof_mode,
+                    cryGenerator=use_cry_generator,
                     )
 
     # Run simulation
@@ -107,16 +168,17 @@ def main():
     # tracking.add_cdc_track_finding(path)
     # path.add_module("TrackFinderMCTruthRecoTracks")
 
-    path.add_module("PlaneTriggerTrackTimeEstimator",
-                    triggerPlanePosition=[0.3744, 0, -1.284],
-                    triggerPlaneDirection=[0, 1, 0],
-                    useFittedInformation=False)
+    if use_tof_relative_to_trigger_plane:
+        path.add_module("PlaneTriggerTrackTimeEstimator",
+                        triggerPlanePosition=[0.3744, 0, -1.284],
+                        triggerPlaneDirection=[0, 1, 0],
+                        useFittedInformation=False)
 
     path.add_module("SetupGenfitExtrapolation")
     path.add_module("DAFRecoFitter")
 
     # Create a harvesting module
-    @save_pull_analysis(part_name="time")
+    @save_pull_analysis(part_name="time", groupby=[None, "incoming_arm"], outlier_z_score=5,)
     @save_tree(name="tree")
     @harvest(foreach="RecoTracks", show_results=True)
     def harvest_flight_times(reco_track):
@@ -136,13 +198,16 @@ def main():
 
             cdc_sim_hit = cdc_hit.getRelated("CDCSimHits")
             time_truth = cdc_sim_hit.getFlightTime()
+            incoming_arm = time_truth > 0
 
             yield dict(time_estimate=time_estimate,
-                       time_truth=time_truth)
+                       time_truth=time_truth,
+                       incoming_arm=incoming_arm)
 
     path.add_module(harvest_flight_times)
 
     # generate events
+    basf2.print_path(path)
     basf2.process(path)
 
     # show call statistics

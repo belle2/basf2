@@ -164,6 +164,7 @@ def main():
     tracking.add_cdc_cr_track_finding(path,
                                       trigger_point=(0.3744, 0, -1.284),
                                       )
+
     # path.add_module("TrackFinderCDCCosmics")
     # tracking.add_cdc_track_finding(path)
     # path.add_module("TrackFinderMCTruthRecoTracks")
@@ -198,7 +199,7 @@ def main():
 
             cdc_sim_hit = cdc_hit.getRelated("CDCSimHits")
             time_truth = cdc_sim_hit.getFlightTime()
-            incoming_arm = time_truth > 0
+            incoming_arm = time_truth < 0
 
             yield dict(time_estimate=time_estimate,
                        time_truth=time_truth,

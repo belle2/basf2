@@ -736,7 +736,6 @@ class GroupByRefiner(Refiner):
     def __init__(self,
                  wrapped_refiner,
                  by=[],
-                 folder_name=None,
                  exclude_by=None):
 
         self.wrapped_refiner = wrapped_refiner
@@ -872,16 +871,15 @@ class CdRefiner(Refiner):
 
         folder_name = root_save_name(folder_name)
 
-        if folder_name:
-            with root_cd(tdirectory):
-                with root_cd(folder_name) as tdirectory:
-                    self.wrapped_refiner(harvesting_module,
-                                         crops,
-                                         tdirectory=tdirectory,
-                                         groupby_part_name=groupby_part_name,
-                                         groupby_value=groupby_value,
-                                         *args,
-                                         **kwds)
+        with root_cd(tdirectory):
+            with root_cd(folder_name) as tdirectory:
+                self.wrapped_refiner(harvesting_module,
+                                     crops,
+                                     tdirectory=tdirectory,
+                                     groupby_part_name=groupby_part_name,
+                                     groupby_value=groupby_value,
+                                     *args,
+                                     **kwds)
 
 
 class ExpertLevelRefiner(Refiner):

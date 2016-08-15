@@ -271,6 +271,34 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr nCleanedECLClusters(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() <= 1) {
+
+        std::string cutString;
+        if (arguments.size() == 1)
+          cutString = arguments[0];
+        std::shared_ptr<Variable::Cut> cut = std::shared_ptr<Variable::Cut>(Variable::Cut::compile(cutString));
+        auto func = [cut](const Particle*) -> double {
+
+          unsigned int number_of_clusters = 0;
+          StoreArray<ECLCluster> clusters;
+          for (const auto& cluster : clusters)
+          {
+            Particle particle(&cluster);
+            if (cut->check(&particle))
+              number_of_clusters++;
+          }
+
+          return static_cast<double>(number_of_clusters);
+
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function nCleanedECLClusters");
+      }
+    }
+
     Manager::FunctionPtr passesCut(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -639,6 +667,9 @@ namespace Belle2 {
 
 
     VARIABLE_GROUP("MetaFunctions");
+    REGISTER_VARIABLE("nCleanedECLClusters(cut)", nCleanedECLClusters,
+                      "[Eventbased] ]Returns the number of clean Clusters in the event\n"
+                      "Clean clusters are defined by the clusters which pass the given cut assuming a photon hypothesis.");
     REGISTER_VARIABLE("nCleanedTracks(cut)", nCleanedTracks,
                       "[Eventbased] ]Returns the number of clean Tracks in the event\n"
                       "Clean tracks are defined by the tracks which pass the given cut assuming a pion hypothesis.");

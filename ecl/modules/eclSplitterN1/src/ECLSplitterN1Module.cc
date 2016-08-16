@@ -23,6 +23,8 @@
 // FRAMEWORK
 #include <framework/datastore/RelationArray.h>
 #include <framework/logging/Logger.h>
+#include <framework/utilities/FileSystem.h>
+#include <framework/geometry/B2Vector3.h>
 
 // ECL
 #include <ecl/utility/Position.h>
@@ -46,16 +48,21 @@ REG_MODULE(ECLSplitterN1PureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLSplitterN1Module::ECLSplitterN1Module() : Module(), m_eclCalDigits(eclCalDigitArrayName()),
+ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
+  m_eclCalDigits(eclCalDigitArrayName()),
   m_eclConnectedRegions(eclConnectedRegionArrayName()),
-  m_eclShowers(eclShowerArrayName()), m_eclLocalMaximums(eclLocalMaximumArrayName()), m_eclEventInformation(eclEventInformationName())
+  m_eclShowers(eclShowerArrayName()),
+  m_eclLocalMaximums(eclLocalMaximumArrayName()),
+  m_eclEventInformation(eclEventInformationName())
 {
   // Set description.
   setDescription("ECLSplitterN1Module: Baseline reconstruction splitter code for the all photon hypothesis (N1).");
+  addParam("fullBkgdCount", m_fullBkgdCount, "Number of background digits at full background (as provided by ECLEventInformation).",
+           182);
 
   // Set module parameters.
   // Local Maximum.
-  addParam("lmEnergyCut", m_lmEnergyCut, "Local maximum energy cut.", 17.5 * Belle2::Unit::MeV); // to be optimized!
+  addParam("lmEnergyCut", m_lmEnergyCut, "Local maximum energy cut.", 15.0 * Belle2::Unit::MeV); // to be optimized!
   addParam("lmEnergyNeighbourCut", m_lmEnergyNeighbourCut, "Neighbours of maximum energy cut.",
            0.5 * Belle2::Unit::MeV); // to be optimized!
   addParam("lmMethod", m_lmMethod, "Method to find local maximum", std::string("BaBar"));
@@ -78,8 +85,18 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(), m_eclCalDigits(eclCalDigi
            "Minimum digit energy to be included in the shower energy calculation.", 0.5 * Belle2::Unit::MeV);
   addParam("cutDigitTimeResidualForEnergy", m_cutDigitTimeResidualForEnergy,
            "Maximum time residual to be included in the shower energy calculation.", 5.0);
+
+  // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
            "Optimize the number of digits for energy calculations.", 1);
+  addParam("fileENENormName", m_fileENENormName, "FWD number of optimal neighbours filename.",
+           FileSystem::findFile("/data/ecl/ene.root"));
+  addParam("fileNOptimalFWDName", m_fileNOptimalFWDName, "ENE normalization filename.",
+           FileSystem::findFile("/data/ecl/noptimal_fwd.root"));
+  addParam("fileNOptimalBarrelName", m_fileNOptimalBarrelName, "Barrel number of optimal neighbours filename.",
+           FileSystem::findFile("/data/ecl/noptimal_barrel.root"));
+  addParam("fileNOptimalBWDName", m_fileNOptimalBWDName, "BWD number of optimal neighbours filename.",
+           FileSystem::findFile("/data/ecl/noptimal_bwd.root"));
 
   // Position.
   addParam("positionMethod", m_positionMethod, "Position determination method.", std::string("lilo"));
@@ -102,7 +119,7 @@ void ECLSplitterN1Module::initialize()
   // Geometry instance.
   m_geom = ECLGeometryPar::Instance();
 
-  // Check user input.
+  // Check and format user input.
   m_liloParameters.resize(3);
   m_liloParameters.at(0) = m_liloParameterA;
   m_liloParameters.at(1) = m_liloParameterB;
@@ -136,13 +153,41 @@ void ECLSplitterN1Module::initialize()
   m_NeighbourMap21 = new ECLNeighbours("NC", 2); // 5x5 excluding corners = 21
 
   // Initialize optimal digit TGraph2D (for default energy and time cuts)
-  double m_neighboursEnergy[30] = {0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2};
-  double m_neighboursBackground[30] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-  double m_neighboursN[30] = {5, 6, 7, 7, 9, 11, 13, 21, 21, 21, 2, 3, 4, 4, 5, 9, 11, 11, 15, 21, 2, 3, 3, 4, 4, 5, 8, 9, 11, 21};
-  m_tg2OptimalNumberOfDigitsForEnergy = new TGraph2D(30, m_neighboursEnergy, m_neighboursBackground, m_neighboursN);
+//  double m_neighboursEnergy[30] = {0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2};
+//  double m_neighboursBackground[30] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
+//  double m_neighboursN[30] = {5, 6, 7, 7, 9, 11, 13, 21, 21, 21, 2, 3, 4, 4, 5, 9, 11, 11, 15, 21, 2, 3, 3, 4, 4, 5, 8, 9, 11, 21};
+//  m_tg2OptimalNumberOfDigitsForEnergy = new TGraph2D(30, m_neighboursEnergy, m_neighboursBackground, m_neighboursN);
 
   // initialize the vector that gives the relation between cellid and store array position
   m_StoreArrPosition.resize(8736 + 1);
+
+  // read the ENE correction factors (for full background)
+  m_fileENENorm = new TFile(m_fileENENormName.c_str(), "READ");
+  if (!m_fileENENorm) B2FATAL("Could not find file: " << m_fileENENormName);
+  m_th1dENENorm = (TH1D*) m_fileENENorm->Get("hist1d_norm_6");
+
+  // read the optimal neighbour maps
+  m_fileNOptimalFWD = new TFile(m_fileNOptimalFWDName.c_str(), "READ");
+  if (!m_fileNOptimalFWD) B2FATAL("Could not find file: " << m_fileNOptimalFWDName);
+  const unsigned c_nSectorCellIdFWD[13] = {3, 3, 4, 4, 4, 6, 6, 6, 6, 6, 6, 9, 9}; // crystals per sector for theta rings
+  for (unsigned t = 0; t < 13; ++t) {
+    for (unsigned s = 0; s < c_nSectorCellIdFWD[t]; ++s) {
+      m_tg2dNOptimalFWD[t][s] = (TGraph2D*) m_fileNOptimalFWD->Get(Form("thetaid-%i_sectorcellid-%i", t, s));
+    }
+  }
+
+  m_fileNOptimalBarrel = new TFile(m_fileNOptimalBarrelName.c_str(), "READ");
+  if (!m_fileNOptimalBarrel) B2FATAL("Could not find file: " << m_fileNOptimalBarrelName);
+  m_tg2dNOptimalBarrel = (TGraph2D*) m_fileNOptimalBarrel->Get("thetaid-50_sectorcellid-8");
+
+  m_fileNOptimalBWD = new TFile(m_fileNOptimalBWDName.c_str(), "READ");
+  if (!m_fileNOptimalBWD) B2FATAL("Could not find file: " << m_fileNOptimalBWDName);
+  const unsigned c_nSectorCellIdBWD[10] = {9, 9, 6, 6, 6, 6, 6, 4, 4, 4}; // crystals per sector for theta rings
+  for (unsigned t = 0; t < 10; ++t) {
+    for (unsigned s = 0; s < c_nSectorCellIdBWD[t]; ++s) {
+      m_tg2dNOptimalBWD[t][s] = (TGraph2D*) m_fileNOptimalBWD->Get(Form("thetaid-%i_sectorcellid-%i", t + 59, s));
+    }
+  }
 
 }
 
@@ -170,7 +215,6 @@ void ECLSplitterN1Module::event()
 
     m_cellIdInCR.resize(entries);
 
-
     // Fill all calDigits ids in this CR into a vector to make them 'find'-able.
     int i = 0;
     for (const auto& caldigit : aCR.getRelationsTo<ECLCalDigit>()) {
@@ -191,13 +235,17 @@ void ECLSplitterN1Module::event()
 
 void ECLSplitterN1Module::endRun()
 {
-  if (m_tg2OptimalNumberOfDigitsForEnergy) delete m_tg2OptimalNumberOfDigitsForEnergy;
+//  if (m_tg2OptimalNumberOfDigitsForEnergy) delete m_tg2OptimalNumberOfDigitsForEnergy;
 }
 
 
 void ECLSplitterN1Module::terminate()
 {
-  ;
+  // delete open TFiles
+  if (m_fileENENorm) delete m_fileENENorm;
+  if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
+  if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
+  if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
 }
 
 
@@ -305,8 +353,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
   // Get the event background level
   const int bkgdcount = m_eclEventInformation->getBackgroundECL();
-  double backgroundLevel = 0.0;
-  if (c_fullBkgdCount > 0) backgroundLevel = static_cast<double>(bkgdcount) / static_cast<double>(c_fullBkgdCount);
+  double backgroundLevel = 0.0; // from out of time digit counting
+  if (m_fullBkgdCount > 0) {
+    backgroundLevel = static_cast<double>(bkgdcount) / static_cast<double>(m_fullBkgdCount);
+  }
 
   // Get the number of LMs in this CR
   const int nLocalMaximums = aCR.getRelationsTo<ECLLocalMaximum>().size();
@@ -366,12 +416,10 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     if (nNeighbours == 9 and !m_useOptimalNumberOfDigitsForEnergy) neighbourMap = m_NeighbourMap9;
     else neighbourMap = m_NeighbourMap21;
 
-    // Add neighbours etc (this is either a very low energetic photon or garbage anyhow...).
+    // Add neighbours etc (this is most likely either a very low energetic photon or garbage anyhow...).
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
     for (auto& neighbourId : neighbourMap->getNeighbours(highestEnergyID)) {
-
-//      std::map<int, ECLCalDigit>::iterator it; // iterator for the CR digit map
       const auto it = std::find(m_cellIdInCR.begin(), m_cellIdInCR.end(),
                                 neighbourId); // check if the neighbour is in the list for this CR
       if (it == m_cellIdInCR.end()) continue; // not in this CR
@@ -385,7 +433,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
     // Get position.
-    const TVector3& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
+    const B2Vector3D& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
     aECLShower->setTheta(showerposition.Theta());
     aECLShower->setPhi(showerposition.Phi());
     aECLShower->setR(showerposition.Mag());
@@ -393,7 +441,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // Get Energy, if requested, set some weights to zero for energy calculation.
     double showerEnergy = 0.0;
     if (m_useOptimalNumberOfDigitsForEnergy) {
-      const unsigned int nOptimal = getOptimalNumberOfDigits(energyEstimation, backgroundLevel);
+
+      // Get the optimal number of neighbours as function of raw energy and background level
+      const unsigned int nOptimal = getOptimalNumberOfDigits(highestEnergyID, energyEstimation, backgroundLevel);
 
       std::vector < std::pair<double, double> > weighteddigits;
       weighteddigits.resize(digits.size());
@@ -430,15 +480,15 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
-  } else {
+  } else { // this is the really interesing part where showers are split. this alogorithm is based on BaBar code.
 
     std::vector<ECLCalDigit> digits;
     std::vector<double> weights;
-    std::map<int, TVector3> centroidList; // key = cellid, value = centroid position
+    std::map<int, B2Vector3D> centroidList; // key = cellid, value = centroid position
     std::map<int, double> centroidEnergyList; // key = cellid, value = centroid position
-    std::map<int, TVector3> centroidPoints; // key = locmaxid (as index), value = centroid position
-    std::map<int, TVector3> localMaximumsPoints; // key = locmaxid, value = maximum position
-    std::map<int, TVector3> allPoints; // key = cellid, value = digit position
+    std::map<int, B2Vector3D> centroidPoints; // key = locmaxid (as index), value = centroid position
+    std::map<int, B2Vector3D> localMaximumsPoints; // key = locmaxid, value = maximum position
+    std::map<int, B2Vector3D> allPoints; // key = cellid, value = digit position
     std::map<int, std::vector < double > > weightMap; // key = locmaxid, value = vector of weights
     std::vector < ECLCalDigit > digitVector; // the order of weights in weightMap must be the same
 
@@ -451,19 +501,18 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         else B2FATAL("Multiple ECLCalDigit relations from one Local Maximum?"); // TF: Can that happen?
       }
 
-      // get the position of this crystal and fill them in a maps
-      TVector3 vectorPosition = m_geom->GetCrystalPos(cellid - 1);
-      localMaximumsPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
-      centroidPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
+      // Get the position of this crystal and fill it in two maps.
+      B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
+      localMaximumsPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
+      centroidPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
     }
 
-    // Fill all digits in a map
+    // Fill all digits from this CR in a map
     for (auto& aCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
       const int cellid = aCalDigit.getCellId();
       // get the position of this crystal and fill them in a map
-      TVector3 vectorPosition = m_geom->GetCrystalPos(cellid - 1);
-      allPoints.insert(std::map<int, TVector3>::value_type(cellid, vectorPosition));
-
+      B2Vector3D vectorPosition = m_geom->GetCrystalPos(cellid - 1);
+      allPoints.insert(std::map<int, B2Vector3D>::value_type(cellid, vectorPosition));
       digits.push_back(aCalDigit);
     }
 
@@ -500,11 +549,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         // clear weights vector
         weights.clear();
 
-        // if this is the first iteration the shower energy is not know, take the local maximum energy * 2.
+        // if this is the first iteration the shower energy is not know, take the local maximum energy * 1.5.
         if (nIterations == 0) {
           const int pos = m_StoreArrPosition[locmaxcellid];
           const double locmaxenergy = m_eclCalDigits[pos]->getEnergy();
-          centroidEnergyList[locmaxcellid] = 2.*locmaxenergy;
+          centroidEnergyList[locmaxcellid] = 1.5 * locmaxenergy;
         }
 
         B2DEBUG(175, "local maximum cellid: " << locmaxcellid);
@@ -516,7 +565,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
           // cellid and position of this digit
           const int digitcellid = digitpoint.first;
-          TVector3 digitpos = digitpoint.second;
+          B2Vector3D digitpos = digitpoint.second;
 
           const int pos = m_StoreArrPosition[digitcellid];
           const double digitenergy = m_eclCalDigits[pos]->getEnergy();
@@ -531,7 +580,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
 
             // cell id and position of this centroid
             const int centroidcellid = centroidpoint.first;
-            TVector3 centroidpos = centroidpoint.second;
+            B2Vector3D centroidpos = centroidpoint.second;
 
             double thisdistance = 0.;
 
@@ -539,7 +588,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
             if (nIterations == 0 and digitcellid == centroidcellid) {
               thisdistance = 0.0;
             } else {
-              TVector3 vectorDistance = ((centroidpos) - (digitpos));
+              B2Vector3D vectorDistance = ((centroidpos) - (digitpos));
               thisdistance = vectorDistance.Mag();
             }
 
@@ -587,17 +636,16 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         } // end allPoints
 
         // Get the old centroid position.
-        TVector3 oldCentroidPos = (centroidPoints.find(locmaxcellid))->second;
+        B2Vector3D oldCentroidPos = (centroidPoints.find(locmaxcellid))->second;
 
         // Calculate the new centroid position.
-        TVector3 newCentroidPos = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters
-                                                                  );
+        B2Vector3D newCentroidPos = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
 
         // Calculate new energy
         const double newEnergy = Belle2::ECL::computeEnergySum(digits, weights);
 
         // Calculate the shift of the centroid position for this local maximum.
-        const TVector3 centroidShift = (oldCentroidPos - newCentroidPos);
+        const B2Vector3D centroidShift = (oldCentroidPos - newCentroidPos);
 
         // Save the new centroid position (but dont update yet!), also save the weights and energy.
         centroidList[locmaxcellid] = newCentroidPos;
@@ -646,7 +694,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       const auto aECLShower = m_eclShowers.appendNew();
 
       // Use the same method for the estimate (3x3).
-//      const double energyEstimation = (*centroidEnergyList.find(locmaxcellid)).second;
       const double energyEstimation = estimateEnergy(locmaxcellid);
 
       // Get the neighbour list.
@@ -698,7 +745,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       // Old position:
-      TVector3* oldshowerposition = new TVector3((centroidList.find(locmaxcellid))->second);
+      B2Vector3D* oldshowerposition = new B2Vector3D((centroidList.find(locmaxcellid))->second);
 
       B2DEBUG(175, "old theta: " << oldshowerposition->Theta());
       B2DEBUG(175, "old phi: " << oldshowerposition->Phi());
@@ -708,7 +755,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // New position (with reduced number of neighbours)
       // There are some cases where high backgrounds fake local maxima and the splitted centroid position is far
       // away from the original LM cell... this will throw a (non fatal) error, and create a cluster with zero energy now).
-      TVector3* showerposition = new TVector3(Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters));
+      B2Vector3D* showerposition = new B2Vector3D(Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters));
       aECLShower->setTheta(showerposition->Theta());
       aECLShower->setPhi(showerposition->Phi());
       aECLShower->setR(showerposition->Mag());
@@ -719,7 +766,9 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Get Energy, if requested, set weights to zero for energy calculation.
       double showerEnergy = 0.0;
       if (m_useOptimalNumberOfDigitsForEnergy) {
-        const unsigned int nOptimal = getOptimalNumberOfDigits(energyEstimation, backgroundLevel);
+
+        // Get the optimal number of neighbours as function of raw energy and background level
+        const unsigned int nOptimal = getOptimalNumberOfDigits(locmaxcellid, energyEstimation, backgroundLevel);
 
         std::vector < std::pair<double, double> > weighteddigits;
         weighteddigits.resize(digits.size());
@@ -766,23 +815,43 @@ int ECLSplitterN1Module::getNeighbourMap(const double energy, const double backg
   }
 }
 
-unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const double energy, const double background)
+unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const int cellid, const double energy, const double bg)
 {
-  if (background <= 0.1) return 21;
-  else {
-    // some checks to be within the limits of the tgraph2d
-    double energyChecked = energy;
-    double bgChecked = background;
-    if (bgChecked > 1.0) bgChecked = 1.0;
-    if (energyChecked < 30.0 * Belle2::Unit::MeV) energyChecked = 30.0 * Belle2::Unit::MeV;
-    if (energyChecked > 2.0 * Belle2::Unit::GeV) energyChecked = 2.0 * Belle2::Unit::GeV;
+  int nOptimalNeighbours = 21;
 
-    // extrapolate from tgraph2d
-    const unsigned int nopt = static_cast<unsigned int>(m_tg2OptimalNumberOfDigitsForEnergy->Interpolate(energyChecked, bgChecked));
-    B2DEBUG(150, "Optimal number of neighbours for: Eraw= " << energy << " (Echecked=" << energyChecked << ", BG: " << bgChecked << ": "
-            << nopt);
-    return static_cast<unsigned int>(m_tg2OptimalNumberOfDigitsForEnergy->Interpolate(energyChecked, bgChecked));
-  }
+  // Get the corrected background level
+  const double bgCorrected = bg * m_th1dENENorm->GetBinContent(cellid);
+
+  // For very small background levels, we always use 21 neighbours.
+  if (bgCorrected > 0.025) {
+    // Some checks to be within the limits of the tgraph2ds.
+    double energyChecked = energy;
+    double bgChecked = bgCorrected;
+    if (bgCorrected > 1.0) bgChecked = 1.0;
+    if (energyChecked < 30.0 * Belle2::Unit::MeV) energyChecked = 30.0 * Belle2::Unit::MeV;
+    if (energyChecked > 1.95 * Belle2::Unit::GeV)  energyChecked = 1.95 * Belle2::Unit::GeV;
+
+    // Find detector region and sector phi Id
+    m_geom->Mapping(cellid - 1);
+    const int thetaId = m_geom->GetThetaID();
+    const int crystalsPerSector = c_crystalsPerRing[thetaId] / 16;
+    const int phiIdInSector = m_geom->GetPhiID() % crystalsPerSector;
+
+    if (thetaId < 13) { //FWD
+      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalFWD[thetaId][phiIdInSector]->Interpolate(energyChecked, bgChecked));
+    } else if (thetaId < 59) { //Barrel
+      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalBarrel->Interpolate(energyChecked, bgChecked));
+    } else { // BWD
+      nOptimalNeighbours = static_cast<unsigned int>(m_tg2dNOptimalBWD[thetaId - 59][phiIdInSector]->Interpolate(energyChecked,
+                                                     bgChecked));
+    }
+    B2DEBUG(175, "ECLSplitterN1Module::getOptimalNumberOfDigits: theta ID: " << thetaId << ", bg: " << bg << " (after corr.: " <<
+            bgCorrected << "), energy: " << energy << ", n: " << nOptimalNeighbours);
+  } else B2DEBUG(175, "ECLSplitterN1Module::getOptimalNumberOfDigits: small bg: " << bg << " (after corr.: " << bgCorrected <<
+                   "), energy: " << energy << ", n: " << nOptimalNeighbours);
+
+  return nOptimalNeighbours;
+
 }
 
 double ECLSplitterN1Module::getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n)

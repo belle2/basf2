@@ -10,7 +10,7 @@
  * a CR has no LM the highest energetic digit in the CR is taken as LM.   *
  * The position is reconstructed using logarithmic weights for not too    *
  * small shower and linear weights otherwise ('lilo').                    *
- *                                                                        *                                                                        *
+ *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *                                                                        *
@@ -40,6 +40,7 @@
 
 // ROOT
 #include "TH1F.h"
+#include "TH1D.h"
 #include "TFile.h"
 #include "TTree.h"
 #include "TGraph2D.h"
@@ -115,7 +116,20 @@ namespace Belle2 {
       double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
       double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
       int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
-      TGraph2D* m_tg2OptimalNumberOfDigitsForEnergy; /**< 2D graph used for interpolation between background and energy. */
+//      TGraph2D* m_tg2OptimalNumberOfDigitsForEnergy; /**< 2D graph used for interpolation between background and energy. */
+
+      std::string m_fileENENormName; /**< ENE normalization filename. */
+      std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
+      std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
+      std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
+      TFile* m_fileENENorm; /**< ENE normalization file. */
+      TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
+      TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
+      TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
+      TH1D* m_th1dENENorm; /**< ENE normalization histogram. */
+      TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
+      TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
+      TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */
 
       // Position
       std::string m_positionMethod;  /**< Position calculation: lilo or linear */
@@ -125,7 +139,17 @@ namespace Belle2 {
       std::vector<double> m_liloParameters; /**< lin-log parameters A, B, and C */
 
       // Background
-      const int c_fullBkgdCount = 280; /**< Number of expected background digits at full background, FIXME: ove to database. */
+      int m_fullBkgdCount; /**< Number of expected background digits at full background, FIXME: move to database. */
+
+      // Crystals per Ring
+      const unsigned short c_crystalsPerRing[69] = {48, 48, 64, 64, 64, 96, 96, 96, 96, 96, 96, 144, 144, //FWD (13)
+                                                    144, 144, 144, 144, 144, 144, 144,  // BARREL 20
+                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //30
+                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //40
+                                                    144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //50
+                                                    144, 144, 144, 144, 144, 144, 144, 144, 144,//59
+                                                    144, 144, 96, 96, 96, 96, 96, 64, 64, 64
+                                                   }; //BWD
 
       /** vector (8736+1 entries) with cell id to store array positions */
       std::vector< int > m_StoreArrPosition;
@@ -185,7 +209,7 @@ namespace Belle2 {
       int getNeighbourMap(const double energy, const double background);
 
       /** Get optimal number of digits (out of 21) based on first energy estimation and background level per event. */
-      unsigned int getOptimalNumberOfDigits(const double energy, const double background);
+      unsigned int getOptimalNumberOfDigits(const int cellid, const double energy, const double background);
 
       /** Get energy sum for weighted entries. */
       double getEnergySum(std::vector < std::pair<double, double> >& weighteddigits, const unsigned int n);

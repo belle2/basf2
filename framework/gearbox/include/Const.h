@@ -34,12 +34,30 @@ namespace Belle2 {
   public:
 
     /**
-     * The enum for identifying the detector components.
+     * Enum for identifying the detector components (detector and subdetector).
+     * Edetector = subdetector * 256 + detector
      */
-    enum EDetector {invalidDetector, PXD, SVD, CDC, TOP, ARICH, ECL, KLM, IR, TRG, DAQ, BEAST, TEST};
+    enum EDetector {
+      invalidDetector = 0x0,
+      PXD = 0x1,
+      SVD = 0x2,
+      CDC = 0x3,
+      TOP = 0x4,
+      ARICH = 0x5,
+      ECL = 0x6,
+      KLM = 0x7,
+      BKLM = 0x100 + KLM,
+      EKLM = 0x200 + KLM,
+      IR = 0x8,
+      TRG = 0x9,
+      DAQ = 0xA,
+      BEAST = 0xB,
+      TEST = 0xC,
+    };
 
     /**
-     * The DetectorSet class for sets of detector IDs in the form of EDetector values.
+     * The DetectorSet class for sets of detector IDs in the form of EDetector
+     * values. Only detectors may be included, not subdetectors.
      */
     class DetectorSet {
     public:
@@ -129,14 +147,14 @@ namespace Belle2 {
        * @param det  The detector ID.
        * @return     The bit pattern representing the given detector ID.
        */
-      unsigned short getBit(EDetector det) const;
+      static unsigned short getBit(EDetector det);
 
       /**
        * Conversion of bit pattern to detector ID.
        * @param bit  The bit pattern.
        * @return     The detector ID corresponding to the given bit pattern.
        */
-      EDetector getDetector(unsigned short bit) const;
+      static EDetector getDetector(unsigned short bit);
 
       unsigned short m_bits;  /**< The internal representation of the set as bit pattern. */
 

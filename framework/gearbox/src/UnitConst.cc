@@ -158,12 +158,18 @@ Const::DetectorSet operator + (Const::EDetector firstDet, Const::EDetector secon
   return set;
 }
 
-unsigned short Const::DetectorSet::getBit(Const::EDetector det) const
+unsigned short Const::DetectorSet::getBit(Const::EDetector det)
 {
+  if (det == 0 || det > 0x100) {
+    B2ERROR("Const::DetectorSet::getBit() called for an invalid detector "
+            "identifier (possibly a subdetector):" << det);
+    return 0;
+  }
+
   return (1 << (det - 1));
 }
 
-Const::EDetector Const::DetectorSet::getDetector(unsigned short bit) const
+Const::EDetector Const::DetectorSet::getDetector(unsigned short bit)
 {
   switch (bit) {
     case 0x0001: return PXD;

@@ -12,6 +12,7 @@
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/ECLCluster.h>
+#include <analysis/utility/PCmsLabTransform.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -39,11 +40,13 @@ namespace Belle2 {
       /// Actually write out the variables into the map.
       void doCalculation(SoftwareTriggerObject& calculationResult) const;
 
-    public:
+    private:
       /// Internal storage of the cdc reco tracks.
       StoreArray <RecoTrack> m_cdcRecoTracks;
       /// Internal storage of the ecl clusters.
       StoreArray <ECLCluster> m_eclClusters;
+
+      PCmsLabTransform m_transformer;
     };
   }
 }

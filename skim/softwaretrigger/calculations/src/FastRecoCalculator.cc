@@ -9,7 +9,6 @@
  **************************************************************************/
 
 #include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
-#include <analysis/utility/PCmsLabTransform.h>
 #include <TVector3.h>
 
 namespace Belle2 {
@@ -38,14 +37,14 @@ namespace Belle2 {
     }
 
     template <class T>
-    std::vector<double> getSortedEnergiesFrom(const StoreArray<T>& storeArray)
+    std::vector<double> getSortedEnergiesFrom(const StoreArray<T>& storeArray, const PCmsLabTransform& transformer)
     {
       std::vector<TLorentzVector> lorentzVectors;
       lorentzVectors.reserve(storeArray.getEntries());
 
       for (const T& item : storeArray) {
         const TLorentzVector& fourVector = getFourVector(item);
-        lorentzVectors.push_back(PCmsLabTransform::labToCms(fourVector));
+        lorentzVectors.push_back(transformer.rotateLabToCms() * fourVector);
       }
 
       std::sort(lorentzVectors.begin(), lorentzVectors.end(),
@@ -73,8 +72,8 @@ namespace Belle2 {
       }
 
       // TODO: Do only return the first (we do not need more).
-      const std::vector<double>& sortedRhoECLEnergyList = getSortedEnergiesFrom(m_eclClusters);
-      const std::vector<double>& sortedRhoCDCEnergyList = getSortedEnergiesFrom(m_cdcRecoTracks);
+      const std::vector<double>& sortedRhoECLEnergyList = getSortedEnergiesFrom(m_eclClusters, m_transformer);
+      const std::vector<double>& sortedRhoCDCEnergyList = getSortedEnergiesFrom(m_cdcRecoTracks, m_transformer);
 
       double visibleEnergy = 0;
       if (not momenta.empty()) {

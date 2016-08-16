@@ -80,7 +80,9 @@ namespace Belle2 {
     //!the number of fired z-measuring strips
     //int m_numZStrips;
 
-    ClassDef(BKLMRecoHit, 1)
+    /** Needed to make object storable. */
+    ClassDef(BKLMRecoHit, 2);
+
   };
 
 } // namespace Belle2

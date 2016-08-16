@@ -568,6 +568,7 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     skim_path to clean up e.g. the list of particles, save a skimmed uDST file,
     and continue working with the unmodified DataStore contents outside of
     skim_path.
+
     :param ds_ID: can be specified to give a defined ID to the temporary DataStore,
         otherwise, a random name will be generated.
     :param merge_back_event: is a list of object/array names (of event durability)

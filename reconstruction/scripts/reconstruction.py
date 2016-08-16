@@ -21,12 +21,13 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
     :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last of the tracks after the dEdX modules.
     :param trigger_mode: Trigger mode to emulate. Possible values are: "all", "hlt", "fast_reco".
+
         * "all": Normal mode. Do add all the modules in the standard reconstruction. This is the mode for the typical
-                user.
+          user.
         * "fast_reco": Only add those modules that are needed for classifying an event as background or not in the
-                fast reco part of the software trigger.
+          fast reco part of the software trigger.
         * "hlt": Only add those modules thar are needed for classifying an event as background or not in the
-                hlt part of the software trigger. Please note that the fast reco part is also needed for this to work.
+          hlt part of the software trigger. Please note that the fast reco part is also needed for this to work.
 
         The trigger_mode does just steer, which modules in the standard reconstruction are added to the path. It does
         not make any trigger decisions itself.
@@ -72,7 +73,7 @@ def add_posttracking_reconstruction(path, components=None, pruneTracks=True,
     to a path.
 
     :param path: The path to add the modules to.
-    :param components list of geometry components to include reconstruction for, or None for all components.
+    :param components: list of geometry components to include reconstruction for, or None for all components.
     :param pruneTracks: Delete all hits except the first and last after the dEdX modules.
     :param trigger_mode: Please see add_reconstruction for a description of all trigger modes.
     """

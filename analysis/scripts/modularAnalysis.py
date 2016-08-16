@@ -20,13 +20,14 @@ def inputMdst(environmentType, filename, path=analysis_main):
 
     The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
     The currently available environments are:
-       o) 'MC5'     : for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
-                      This environment sets the constant magnetic field (B = 1.5 T)
-       o) 'default' : for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
-                      This environment sets the default magnetic field (see geometry settings)
-       o) 'Belle'   : for analysis of converted (or during of conversion of) Belle MC/DATA samples
-       o) 'None'    : for analysis of generator level information or during simulation/reconstruction of
-                      previously generated events
+
+    - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
+      This environment sets the constant magnetic field (B = 1.5 T)
+    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+      This environment sets the default magnetic field (see geometry settings)
+    - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
+    - 'None': for analysis of generator level information or during simulation/reconstruction of
+      previously generated events
 
     @param environmentType type of the environment to be loaded
     @param filename the name of the file to be loaded
@@ -42,13 +43,14 @@ def inputMdstList(environmentType, filelist, path=analysis_main):
 
     The correct environment (e.g. magnetic field settings) are determined from the specified environment type.
     The currently available environments are:
-       o) 'MC5'     : for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
-                      This environment sets the constant magnetic field (B = 1.5 T)
-       o) 'default' : for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
-                      This environment sets the default magnetic field (see geometry settings)
-       o) 'Belle'   : for analysis of converted (or during of conversion of) Belle MC/DATA samples
-       o) 'None'    : for analysis of generator level information or during simulation/reconstruction of
-                      previously generated events
+
+    - 'MC5': for analysis of Belle II MC samples produced with releases prior to build-2016-05-01.
+      This environment sets the constant magnetic field (B = 1.5 T)
+    - 'default': for analysis of Belle II MC samples produced with releases with build-2016-05-01 or newer
+      This environment sets the default magnetic field (see geometry settings)
+    - 'Belle': for analysis of converted (or during of conversion of) Belle MC/DATA samples
+    - 'None': for analysis of generator level information or during simulation/reconstruction of
+      previously generated events
 
     @param environmentType type of the environment to be loaded
     @param filelist the filename list of files to be loaded
@@ -409,10 +411,10 @@ def fillParticleLists(decayStringsWithCuts, writeOut=False,
     The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    o) charged final state particles (input MDST type = Tracks)
+    - charged final state particles (input MDST type = Tracks)
        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    o) neutral final state particles
+    - neutral final state particles
        - gamma         (input MDST type = ECLCluster)
        - K_S0, Lambda0 (input MDST type = V0)
        - K_L0          (input MDST type = KLMCluster)
@@ -444,10 +446,10 @@ def fillParticleList(
     The type of the MDST dataobject that is used as an input is determined from the type of
     the particle. The following types of the particles can be loaded:
 
-    o) charged final state particles (input MDST type = Tracks)
+    - charged final state particles (input MDST type = Tracks)
        - e+, mu+, pi+, K+, p, deuteron (and charge conjugated particles)
 
-    o) neutral final state particles
+    - neutral final state particles
        - gamma         (input MDST type = ECLCluster)
        - K_S0, Lambda0 (input MDST type = V0)
        - K_L0          (input MDST type = KLMCluster)
@@ -1127,14 +1129,17 @@ def appendROEMask(
     selection criteria for tracks and eclClusters which will be used by variables in ROEVariables.cc.
     A-priori ChargedStable fractions can be provided, otherwise pion mass hypothesis is used.
 
-    o) append a ROE mask with all tracks in ROE coming from the IP region
-       - appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+    - append a ROE mask with all tracks in ROE coming from the IP region
 
-    o) append a ROE mask with only ECLClusters that pass as good photon candidates
-       - appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+       >>> appendROEMask('B+:sig', 'IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
 
-    o) append a ROE mask with track from IP, use equal a-priori probabilities
-       - appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+    - append a ROE mask with only ECLClusters that pass as good photon candidates
+
+       >>> appendROEMask('B+:sig', 'goodROEGamma', '', 'goodGamma == 1')
+
+    - append a ROE mask with track from IP, use equal a-priori probabilities
+
+       >>> appendROEMask('B+:sig', 'IPAndGoodGamma', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the appended ROEMask
@@ -1161,10 +1166,11 @@ def appendROEMasks(list_name, mask_tuples, path=analysis_main):
     via list of tuples (mask_name, trackSelection, eclClusterSelection) or
     (mask_name, trackSelection, eclClusterSelection, chargedStable fractions) in case with fractions.
 
-    o) Example for two tuples, one with and one without fractions
-       ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
-       goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
-       appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
+    - Example for two tuples, one with and one without fractions
+
+       >>> ipTracks     = ('IPtracks', 'abs(d0) < 0.05 and abs(z0) < 0.1', '')
+       >>> goodROEGamma = ('ROESel', 'abs(d0) < 0.05 and abs(z0) < 0.1', 'goodGamma == 1', [1,1,1,1,1,1])
+       >>> appendROEMasks('B+:sig', [ipTracks, goodROEGamma])
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
@@ -1200,7 +1206,7 @@ def updateROEMask(
     and change a-priori charged stable fractions. Empty string or array containers result
     in no change.
 
-    See function appendROEMask!
+    See function `appendROEMask`!
 
     @param list_name             name of the input ParticleList
     @param mask_name             name of the ROEMask to update
@@ -1255,7 +1261,7 @@ def updateROEMasks(
     via list tuples (mask_name, trackSelection, eclClusterSelection) or
     (mask_name, trackSelection, eclClusterSelection, chargedStable fractions) in case with fractions.
 
-    See function appendROEMasks!
+    See function `appendROEMasks`!
 
     @param list_name             name of the input ParticleList
     @param mask_tuples           array of ROEMask list tuples to be appended
@@ -1287,21 +1293,24 @@ def keepInROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask and appendROEFractions).
+    It is possible to update a-priori fractions by providing them (see `appendROEMask()` and `updateROEFractions()`).
     Empty array will result in no change.
 
     Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
     pion-mass hypothesis will be used as default.
 
-    o) keep only those tracks that were used in provided particle list
-       - keepInROEMasks('pi+:goodTracks', 'mask', '')
+    - keep only those tracks that were used in provided particle list
 
-    o) keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
-       - keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
+       >>> keepInROEMasks('pi+:goodTracks', 'mask', '')
 
-    o) create a ROE mask on-the-fly with some fractions and with tracks used in provided particle list
-       - keepInROEMasks('pi+:trueTracks', 'newMask', 'mcPrimary == 1', [1,1,1,1,1,1])
-       - or use [-1] fractions to use true MC mass hypothesis
+    - keep only those clusters that were used in provided particle list and pass a cut, apply to several masks
+
+       >>> keepInROEMasks('gamma:goodClusters', ['mask1', 'mask2'], 'E > 0.1')
+
+    - create a ROE mask on-the-fly with some fractions and with tracks used in provided particle list
+
+       >>> keepInROEMasks('pi+:trueTracks', 'newMask', 'mcPrimary == 1', [1,1,1,1,1,1])
+       >>> # - or use [-1] fractions to use true MC mass hypothesis
 
 
     @param list_name    name of the input ParticleList
@@ -1338,21 +1347,24 @@ def discardFromROEMasks(
     particle list (e.g. 'gamma:someLabel'). To update the Track masks, the input particle list should be a charged
     pion particle list (e.g. 'pi+:someLabel').
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask or appendROEFractions).
+    It is possible to update a-priori fractions by providing them (see appendROEMask or updateROEFractions).
     Empty array will result in no change.
 
     Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
     pion-mass hypothesis will be used as default.
 
-    o) discart tracks that were used in provided particle list
-       - discardFromROEMasks('pi+:badTracks', 'mask', '')
+    - discard tracks that were used in provided particle list
 
-    o) discart clusters that were used in provided particle list and pass a cut, apply to several masks
-       - discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
+       >>> discardFromROEMasks('pi+:badTracks', 'mask', '')
 
-    o) create a ROE mask on-the-fly with some fractions and with tracks NOT used in provided particle list
-       - discardFromROEMasks('pi+:badTracks', 'newMask', 'mcPrimary != 1', [1,1,1,1,1,1])
-       - or use [-1] fractions to use true MC mass hypothesis
+    - discard clusters that were used in provided particle list and pass a cut, apply to several masks
+
+       >>> discardFromROEMasks('gamma:badClusters', ['mask1', 'mask2'], 'E < 0.1')
+
+    - create a ROE mask on-the-fly with some fractions and with tracks NOT used in provided particle list
+
+       >>> discardFromROEMasks('pi+:badTracks', 'newMask', 'mcPrimary != 1', [1,1,1,1,1,1])
+       >>> # or use [-1] fractions to use true MC mass hypothesis
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -1387,14 +1399,15 @@ def optimizeROEWithV0(
     The input particle list should be a V0 particle list: K_S0 ('K_S0:someLabel', ''),
     Lambda ('Lambda:someLabel', '') or converted photons ('gamma:someLabel')
 
-    It is possible to update a-priori fractions by providing them (see appendROEMask and appendROEFractions).
+    It is possible to update a-priori fractions by providing them (see appendROEMask and updateROEFractions).
     Empty array will result in no change.
 
     Updating a non-existing mask will create a new one. If a-priori fractions for ChargedStable particles are not provided,
     pion-mass hypothesis will be used as default.
 
-    o) treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
-       - optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550')
+    - treat tracks from K_S0 inside mass window separately, replace track momenta with K_S0 momentum
+
+       >>> optimizeROEWithV0('K_S0:opt', 'mask', '0.450 < M < 0.550')
 
     @param list_name    name of the input ParticleList
     @param mask_names   array of ROEMasks to be updated
@@ -1489,7 +1502,7 @@ def inclusiveBtagReconstruction(upsilon_list_name, bsig_list_name, btag_list_nam
     """
     Reconstructs Btag from particles in given ParticleLists which do not share any final state particles (mdstSource) with Bsig.
 
-    @param upsilon_list_name Name of the ParticleList to be filled with `Upsilon(4S) -> B:sig anti-B:tag`
+    @param upsilon_list_name Name of the ParticleList to be filled with 'Upsilon(4S) -> B:sig anti-B:tag'
     @param bsig_list_name Name of the Bsig ParticleList
     @param btag_list_name Name of the Bsig ParticleList
     @param input_lists_names List of names of the ParticleLists which are used to reconstruct Btag from

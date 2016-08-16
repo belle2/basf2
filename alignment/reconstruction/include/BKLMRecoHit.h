@@ -45,9 +45,6 @@ namespace Belle2 {
     /** Methods that actually interface to Genfit.  */
     virtual std::vector<genfit::MeasurementOnPlane*> constructMeasurementsOnPlane(const genfit::StateOnPlane& state) const;
 
-    /** Get pointer to the TrueHit used when creating this RecoHit, can be NULL if created from something else */
-    const BKLMHit2d* getBKLMHit2d() const { return m_bklmHit2d; }
-
     virtual const genfit::AbsHMatrix* constructHMatrix(const genfit::AbsTrackRep*) const { return new genfit::HMatrixUV(); };
 
     virtual TMatrixD derivatives(const genfit::StateOnPlane* sop);
@@ -60,10 +57,14 @@ namespace Belle2 {
 
     unsigned short m_moduleID; /**< Unique module identifier.*/
 
-    const BKLMHit2d* m_bklmHit2d; /**< Pointer to the BKLMHit2d used when creating this object */
+    /** Forward or not. */
+    bool m_IsForward;
 
-    /** layer number */
-    int layer;
+    /** Sector number. */
+    int m_Sector;
+
+    /** Layer number. */
+    int m_Layer;
 
     /** module used to get geometry information */
     const bklm::Module* module; //! not streamed

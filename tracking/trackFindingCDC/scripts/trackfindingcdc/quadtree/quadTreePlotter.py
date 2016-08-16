@@ -446,7 +446,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
             for track in mc_track_cands:
                 mcTrackID = track.getMcTrackId()
                 trajectory = self.create_trajectory_from_track(track)
-                z0 = trajectory.getTrajectorySZ().getStartZ()
+                z0 = trajectory.getTrajectorySZ().getZ0()
 
                 for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
                     cdcHit = cdcHits[cdcHitID]

@@ -72,8 +72,8 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       const CDCSZFitter& fitter = CDCSZFitter::getFitter();
       const CDCTrajectorySZ& szTrajectorySegments = fitter.fit(observations);
 
-      double startZTrack = szTrajectoryTrack.getStartZ();
-      double startZSegments = szTrajectorySegments.getStartZ();
+      double startZTrack = szTrajectoryTrack.getZ0();
+      double startZSegments = szTrajectorySegments.getZ0();
 
       var<named("z_distance")>() = startZTrack - startZSegments;
       var<named("theta_distance")>() = szTrajectoryTrack.getTanLambda() - szTrajectorySegments.getTanLambda();

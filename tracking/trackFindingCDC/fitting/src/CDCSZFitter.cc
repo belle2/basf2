@@ -131,7 +131,7 @@ CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& 
 
       update(trajectorySZ, observationsSZFiltered);
       meanTanLambda += trajectorySZ.getTanLambda();
-      meanStartZ += trajectorySZ.getStartZ();
+      meanStartZ += trajectorySZ.getZ0();
     }
 
     return CDCTrajectorySZ(meanTanLambda / observationsSZ.size(),

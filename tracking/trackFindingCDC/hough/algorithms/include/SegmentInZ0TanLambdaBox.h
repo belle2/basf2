@@ -43,7 +43,7 @@ namespace Belle2 {
         const CDCTrajectorySZ& szTrajectory = recoSegmentWithTrajectorySZ.second;
         const CDCRecoSegment3D& recoSegment = recoSegmentWithTrajectorySZ.first;
 
-        const float& trajectoryZ0 = szTrajectory.getStartZ();
+        const float& trajectoryZ0 = szTrajectory.getZ0();
         const float& trajectoryTanLambda = szTrajectory.getTanLambda();
 
         if (std::isnan(trajectoryZ0) or std::isnan(trajectoryTanLambda)) {

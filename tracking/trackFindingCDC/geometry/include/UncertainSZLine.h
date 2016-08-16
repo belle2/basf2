@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A line in sz where s is the transverse travel distance as seen in the xy projection with uncertainties in the slope and intercept of the line.
-    class UncertainSZLine : public Line2D {
+    class UncertainSZLine {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -32,7 +32,7 @@ namespace Belle2 {
                       const SZCovariance& szCovariance = SZUtil::identity(),
                       const double chi2 = 0.0,
                       const size_t ndf = 0)
-        : Line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
+        : m_line2D(Line2D::fromSlopeIntercept(tanLambda, z0)),
           m_szCovariance(szCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -43,8 +43,8 @@ namespace Belle2 {
                       const SZCovariance& szCovariance = SZUtil::identity(),
                       const double chi2 = 0.0,
                       const size_t ndf = 0)
-        : Line2D(Line2D::fromSlopeIntercept(szParameters(ESZParameter::c_TanL),
-                                            szParameters(ESZParameter::c_Z0))),
+        : m_line2D(Line2D::fromSlopeIntercept(szParameters(ESZParameter::c_TanL),
+                                              szParameters(ESZParameter::c_Z0))),
           m_szCovariance(szCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -57,19 +57,35 @@ namespace Belle2 {
                       const SZCovariance& szCovariance = SZUtil::identity(),
                       const double chi2 = 0.0,
                       const size_t ndf = 0)
-        : Line2D(line2D),
+        : m_line2D(line2D),
           m_szCovariance(szCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
       {}
 
+      /**
+       *  Access to the constant interface of the underlying parameter line
+       *  Allows the user of this "super" class to use the getters and
+       *  other methods to get inforamation about the line but disallows mutation
+       *  of internal state.
+       *  This ensures that the parameters are not changed without proper adjustment to
+       *  the covariance matrix in this class, which can be achieved by the more limited
+       *  set of methods in this class accessable by normal . method calls
+       */
+      const Line2D* operator->() const
+      { return &m_line2D;}
+
+      /// Downcast to the "super" class
+      operator Line2D() const
+      { return m_line2D; }
+
       /// Getter for the sz parameters in the order defined by ESZParameter.h
-      SZParameters parameters() const
+      SZParameters szParameters() const
       {
         using namespace NSZParameterIndices;
         SZParameters result;
-        result(c_TanL) = slope();
-        result(c_Z0) = intercept();
+        result(c_TanL) = m_line2D.slope();
+        result(c_Z0) = m_line2D.intercept();
         return result;
       }
 
@@ -107,10 +123,11 @@ namespace Belle2 {
       { m_ndf = ndf; }
 
 
+
       /// Sets all line parameters to zero including the covariance matrix
-      inline void invalidate()
+      void invalidate()
       {
-        Line2D::invalidate();
+        m_line2D.invalidate();
         m_szCovariance = SZUtil::identity();
         m_chi2 = 0.0;
         m_ndf = 0;
@@ -118,16 +135,16 @@ namespace Belle2 {
 
     public:
       /// Reverses the direction of flight represented by this sz line
-      inline void reverse()
+      void reverse()
       {
-        Line2D::flipFirst();
+        m_line2D.flipFirst();
         SZUtil::reverse(m_szCovariance);
       }
 
       /// Returns a copy of the line corresponding to the reverse direction of travel.
-      inline UncertainSZLine reversed() const
+      UncertainSZLine reversed() const
       {
-        return UncertainSZLine(Line2D::flippedFirst(),
+        return UncertainSZLine(m_line2D.flippedFirst(),
                                SZUtil::reversed(szCovariance()),
                                chi2(),
                                ndf());
@@ -149,7 +166,7 @@ namespace Belle2 {
         // Move the covariance matrix first to have access to the original parameters
         SZJacobian jacobian = passiveMoveByJacobian(bySZ);
         SZUtil::transport(jacobian, m_szCovariance);
-        Line2D::passiveMoveBy(bySZ);
+        m_line2D.passiveMoveBy(bySZ);
       }
 
       /**
@@ -163,16 +180,18 @@ namespace Belle2 {
       }
 
       /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output, const UncertainSZLine& szLine)
+      friend std::ostream& operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine)
       {
         return output <<
-               "SZLine(" <<
-               "tanL=" << szLine.slope() << "," <<
-               "z0=" << szLine.intercept() << ")" ;
+               "UncertainSZLine(" <<
+               "tanL=" << uncertainSZLine->slope() << "," <<
+               "z0=" << uncertainSZLine->intercept() << ")" ;
       }
 
-
     private:
+      /// Memory for the underlying line
+      Line2D m_line2D;
+
       /// Memory for the 2x2 covariance matrix of sz slope (aka tan lambda) and z0.
       SZCovariance m_szCovariance = SZUtil::identity();
 
@@ -180,8 +199,7 @@ namespace Belle2 {
       double m_chi2 = 0.0;
 
       /// Memory for the number of degrees of freedim of the fit of this line.
-      size_t m_ndf = 0.0;
-
+      size_t m_ndf = 0;
 
     }; //class
 

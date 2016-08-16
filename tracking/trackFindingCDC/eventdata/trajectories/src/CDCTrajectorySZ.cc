@@ -14,10 +14,7 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
-
-CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
+SZCovariance CDCTrajectorySZ::getBasicSZCovariance()
 {
   // Dummy error estimates
   SZCovariance szCovariance;
@@ -26,12 +23,16 @@ CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
   szCovariance(c_Z0, c_TanL) = 0.0;
   szCovariance(c_TanL, c_Z0) = 0.0;
   szCovariance(c_Z0, c_Z0) = 2.0;
+  return szCovariance;
+}
 
+CDCTrajectorySZ CDCTrajectorySZ::basicAssumption()
+{
   // A dummy line with no increasing z coordinate
   double tanLambda = 0.0;
   double z0 = 0.0;
+  SZCovariance szCovariance = getBasicSZCovariance();
   UncertainSZLine uncertainSZLine(tanLambda, z0, szCovariance);
-
   CDCTrajectorySZ trajectorySZ(uncertainSZLine);
   return trajectorySZ;
 }

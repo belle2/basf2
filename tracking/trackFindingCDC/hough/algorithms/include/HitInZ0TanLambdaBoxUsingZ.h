@@ -47,12 +47,10 @@ namespace Belle2 {
         const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
         const float centerTanLambda = 0.5 * (lowerTanLambda + upperTanLambda);
 
-        const CDCTrajectorySZ boxTrajectory(centerTanLambda, centerZ0);
-
         const float& perpS = recoHit.getArcLength2D();
         const Vector2D& recoPosition = recoHit.getRecoPos2D();
 
-        const float& hitZ = boxTrajectory.mapSToZ(perpS);
+        const float& hitZ = centerTanLambda * perpS + centerZ0;
 
         const Vector3D& pos3D = wireLine.pos3DAtZ(hitZ);
 

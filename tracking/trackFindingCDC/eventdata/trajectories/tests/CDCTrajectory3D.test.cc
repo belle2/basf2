@@ -65,7 +65,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
   PerigeeCircle perigeeCircle = helix.circleXY();
   GeneralizedCircle generalizedCircle = perigeeCircle;
 
-  Line2D lineSZ = helix.lineSZ();
+  SZLine szLine = helix.szLine();
 
   trajectory3D.clear();
   EXPECT_TRUE(trajectory3D.isInvalid());
@@ -83,8 +83,8 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
   generalizedCircle.invalidate();
   EXPECT_TRUE(generalizedCircle.isInvalid());
 
-  lineSZ.invalidate();
-  EXPECT_TRUE(lineSZ.isInvalid());
+  szLine.invalidate();
+  EXPECT_TRUE(szLine.isInvalid());
 }
 
 

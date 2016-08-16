@@ -43,8 +43,7 @@ namespace Belle2 {
 
       /// Constructs the trajectory with the given slope and start z.
       CDCTrajectorySZ(const double tanLambda, const double z0)
-        : m_szLine(Line2D::fromSlopeIntercept(tanLambda, z0),
-                   getBasicSZCovariance())
+        : m_szLine(tanLambda, z0, getBasicSZCovariance())
       {}
 
       /// Constucts a basic assumption, what the z0 start position and the sz slope are, including some broad values for the covariance matrix.

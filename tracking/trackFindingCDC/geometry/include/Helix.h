@@ -10,17 +10,15 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/geometry/SZLine.h>
 
 #include <tracking/trackFindingCDC/geometry/HelixParameters.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 
-#include <TVectorD.h>
 #include <cmath>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
@@ -30,21 +28,20 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       Helix() :
         m_circleXY(),
-        m_lineSZ()
+        m_szLine()
       {}
 
       /// Constructor combining a two dimensional circle with the linear augment in the sz space.
       Helix(const PerigeeCircle& circleXY,
-            const Line2D& lineSZ) :
+            const SZLine& szLine) :
         m_circleXY(circleXY),
-        m_lineSZ(lineSZ)
+        m_szLine(szLine)
       {}
 
       /// Constructor taking all stored parameters for internal use.
       explicit Helix(const HelixParameters& parameters)
         : m_circleXY(HelixUtil::getPerigeeParameters(parameters)),
-          m_lineSZ(Line2D::fromSlopeIntercept(parameters(EHelixParameter::c_TanL),
-                                              parameters(EHelixParameter::c_Z0)))
+          m_szLine(HelixUtil::getSZParameters(parameters))
       {}
 
       /// Constructor from all helix parameter
@@ -54,7 +51,7 @@ namespace Belle2 {
             const double tanLambda,
             const double z0) :
         m_circleXY(curvature, tangentialPhi, impact),
-        m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
+        m_szLine(tanLambda, z0)
       {}
 
       /// Constructor from all helix parameter, phi given as a unit vector
@@ -64,31 +61,30 @@ namespace Belle2 {
             const double tanLambda,
             const double z0) :
         m_circleXY(curvature, tangential, impact),
-        m_lineSZ(Line2D::fromSlopeIntercept(tanLambda, z0))
+        m_szLine(tanLambda, z0)
       {}
 
       /// Sets all circle parameters to zero.
       void invalidate()
       {
         m_circleXY.invalidate();
-        m_lineSZ.invalidate();
+        m_szLine.invalidate();
       }
 
       /// Indicates if the stored parameter combination designates a valid helix.
       bool isInvalid() const
-      { return circleXY().isInvalid() and lineSZ().isInvalid(); }
+      { return circleXY().isInvalid() and szLine().isInvalid(); }
 
       /// Flips the travel direction of the helix in place, pivot point is unchanged.
       inline void reverse()
       {
         m_circleXY.reverse();
-        //Invert the travel distance scale, but not the z scale.
-        m_lineSZ.flipFirst();
+        m_szLine.reverse();
       }
 
       /// Returns a copy of the helix with flips the travel direction, pivot point is the same.
       inline Helix reversed() const
-      { return Helix(circleXY().reversed(), lineSZ().flippedFirst()); }
+      { return Helix(circleXY().reversed(), szLine().reversed()); }
 
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
@@ -128,7 +124,7 @@ namespace Belle2 {
         double byS = circleXY().arcLengthTo(by.xy());
         m_circleXY.passiveMoveBy(by.xy());
         Vector2D bySZ(byS, by.z());
-        m_lineSZ.passiveMoveBy(bySZ);
+        m_szLine.passiveMoveBy(bySZ);
         return byS;
       }
 
@@ -138,9 +134,8 @@ namespace Belle2 {
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
       void shiftTanLambdaZ0(const double tanLambdaShift, const double zShift)
       {
-        double z0 = m_lineSZ.intercept();
-        double tanLambda = m_lineSZ.slope();
-        m_lineSZ.setSlopeIntercept(tanLambda + tanLambdaShift, z0 + zShift);
+        m_szLine.setTanLambda(m_szLine.tanLambda() + tanLambdaShift);
+        m_szLine.setZ0(m_szLine.z0() + zShift);
       }
 
       /**
@@ -149,14 +144,14 @@ namespace Belle2 {
        */
       double shiftPeriod(int nPeriods)
       {
-        double arcLength2D =  nPeriods * fabs(perimeterXY());
-        m_lineSZ.passiveMoveAlongFirst(arcLength2D);
+        double arcLength2D = nPeriods * fabs(perimeterXY());
+        m_szLine.passiveMoveBy(Vector2D(arcLength2D, 0.0));
         return arcLength2D;
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
       Vector3D atArcLength2D(const double s) const
-      { return Vector3D(circleXY().atArcLength(s), lineSZ().map(s)); }
+      { return Vector3D(circleXY().atArcLength(s), szLine().map(s)); }
 
       /// Calculates the point, which lies at the given z coordinate
       Vector3D atZ(const double z) const
@@ -164,7 +159,7 @@ namespace Belle2 {
 
       /// Calculates the point, which lies at the given z coordinate
       Vector2D xyAtZ(const double z) const
-      { return Vector2D(circleXY().atArcLength(lineSZ().inverseMap(z))); }
+      { return Vector2D(circleXY().atArcLength(szLine().inverseMap(z))); }
 
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
@@ -200,7 +195,7 @@ namespace Belle2 {
 
       /// Getter for the proportinality factor from arc length in xy space to z.
       double tanLambda() const
-      { return m_lineSZ.slope(); }
+      { return m_szLine.tanLambda(); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
       double cotTheta() const
@@ -208,11 +203,11 @@ namespace Belle2 {
 
       /// Getter for z coordinate at the support point of the helix.
       double z0() const
-      { return m_lineSZ.intercept(); }
+      { return m_szLine.z0(); }
 
       /// Getter for the distance in z at which the two points on the helix coincide in the xy projection
       double zPeriod() const
-      { return lineSZ().map(perimeterXY()); }
+      { return szLine().map(perimeterXY()); }
 
       /// Getter for the perimeter of the circle in the xy projection
       double perimeterXY() const
@@ -260,8 +255,8 @@ namespace Belle2 {
       { return m_circleXY; }
 
       /// Getter for the projection into xy space
-      const Line2D& lineSZ() const
-      { return m_lineSZ; }
+      const SZLine& szLine() const
+      { return m_szLine; }
 
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const Helix& helix)
@@ -280,7 +275,7 @@ namespace Belle2 {
       PerigeeCircle m_circleXY;
 
       /// Memory of the of the linear relation between perpendicular travel distance and the z position.
-      Line2D m_lineSZ;
+      SZLine m_szLine;
 
     }; //class
 

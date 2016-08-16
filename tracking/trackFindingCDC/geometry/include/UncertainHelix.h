@@ -159,7 +159,7 @@ namespace Belle2 {
 
       /// Reduces the helix to an sz line carrying over the relevant parts of the convariance matrix.
       UncertainSZLine uncertainSZLine() const
-      { return UncertainSZLine(lineSZ(), HelixUtil::getSZCovariance(helixCovariance()));}
+      { return UncertainSZLine(szLine(), HelixUtil::getSZCovariance(helixCovariance()));}
 
       /// Setter for the whole covariance matrix of the perigee parameters
       inline void setHelixCovariance(const HelixCovariance& helixCovariance)

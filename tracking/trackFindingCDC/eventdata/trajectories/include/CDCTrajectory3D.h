@@ -241,15 +241,13 @@ namespace Belle2 {
         return result;
       }
 
-
-
       /// Getter for the circle in local coordinates
       UncertainPerigeeCircle getLocalCircle() const
       { return getLocalHelix().uncertainCircleXY(); }
 
       /// Getter for the sz line starting from the local origin
       UncertainSZLine getLocalSZLine() const
-      { return getLocalHelix().lineSZ(); }
+      { return getLocalHelix().szLine(); }
 
       ///  Getter for p-value
       double getPValue() const
@@ -281,7 +279,7 @@ namespace Belle2 {
 
       /// Getter for the sz trajectory
       CDCTrajectorySZ getTrajectorySZ() const
-      { return CDCTrajectorySZ(getLocalHelix().lineSZ().passiveMovedAlongSecond(getLocalOrigin().z())); }
+      { return CDCTrajectorySZ(getLocalHelix().szLine().passiveMovedBy(0, -getLocalOrigin().z())); }
 
       /// Getter for the helix in local coordinates.
       const UncertainHelix& getLocalHelix() const

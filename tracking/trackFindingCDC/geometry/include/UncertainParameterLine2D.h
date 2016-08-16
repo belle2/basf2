@@ -26,10 +26,10 @@ namespace Belle2 {
       {}
 
       /// Attaching a covariance matrix to a parameter line.
-      UncertainParameterLine2D(const ParameterLine2D& parameterLine2D,
-                               const LineCovariance& lineCovariance = LineUtil::identity(),
-                               const double chi2 = 0.0,
-                               const size_t ndf = 0)
+      explicit UncertainParameterLine2D(const ParameterLine2D& parameterLine2D,
+                                        const LineCovariance& lineCovariance = LineUtil::identity(),
+                                        const double chi2 = 0.0,
+                                        const size_t ndf = 0)
         : m_parameterLine2D(parameterLine2D),
           m_lineCovariance(lineCovariance),
           m_chi2(chi2),
@@ -48,6 +48,10 @@ namespace Belle2 {
        */
       const ParameterLine2D* operator->() const
       { return &m_parameterLine2D;}
+
+      /// Downcast to the "super" class
+      operator ParameterLine2D() const
+      { return m_parameterLine2D; }
 
     public:
 
@@ -164,7 +168,7 @@ namespace Belle2 {
       double m_chi2 = 0.0;
 
       /// Memory for the number of degrees of freedim of the fit of this line.
-      size_t m_ndf = 0.0;
+      size_t m_ndf = 0;
 
     }; // class
 

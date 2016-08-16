@@ -178,7 +178,7 @@ namespace Belle2 {
         CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left);
         CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left);
         CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
-        CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, ParameterLine2D());
+        CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, UncertainParameterLine2D());
 
         for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
           facet.setStartRLInfo(startRLInfo);

@@ -49,7 +49,7 @@ namespace Belle2 {
 
       std::sort(lorentzVectors.begin(), lorentzVectors.end(),
       [](const TLorentzVector & lhs, const TLorentzVector & rhs) {
-        return lhs.Rho() < rhs.Rho();
+        return lhs.Rho() > rhs.Rho();
       });
 
       std::vector<double> energies;
@@ -103,7 +103,7 @@ namespace Belle2 {
       calculationResult["visible_energy"] = visibleEnergy;
 
       calculationResult["energy_sum_of_high_energy_ecl"] =
-        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), 0,
+        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
         const double& energy = eclCluster.getEnergy();
         if (energy > 0.05) {
@@ -113,7 +113,7 @@ namespace Belle2 {
         }
       });
       calculationResult["energy_sum_of_ecl"] =
-        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), 0,
+        std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), static_cast<double>(0.0),
       [](const double & value, const ECLCluster & eclCluster) {
         return value + eclCluster.getEnergy();
       });
@@ -180,7 +180,7 @@ namespace Belle2 {
           return momentum.Pt() > 0.2;
         });
 
-        calculationResult["mean_theta"] = std::accumulate(momenta.begin(), momenta.end(), 0,
+        calculationResult["mean_theta"] = std::accumulate(momenta.begin(), momenta.end(), static_cast<double>(0),
         [](const double & value, const TVector3 & momentum) {
           return value + momentum.Theta();
         }) / momenta.size();

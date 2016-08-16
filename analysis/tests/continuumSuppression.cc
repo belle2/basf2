@@ -1,6 +1,5 @@
 #include <analysis/ContinuumSuppression/Thrust.h>
-//#include <analysis/ContinuumSuppression/FuncPtr.h>
-
+#include <analysis/ContinuumSuppression/CleoCones.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -33,6 +32,70 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0.571661, thrustB.X());
     EXPECT_FLOAT_EQ(0.306741, thrustB.Y());
     EXPECT_FLOAT_EQ(0.660522, thrustB.Z());
+  }
+
+  TEST_F(ContinuumSuppressionTests, CleoCones)
+  {
+    const bool use_all = true;
+    const bool use_roe = true;
+    std::vector<TVector3> momenta;
+    std::vector<TVector3> sig_side_momenta;
+    std::vector<TVector3> roe_side_momenta;
+
+    // "Signal Side"
+    sig_side_momenta.push_back(TVector3(0.5429965262452898, 0.37010582077332344, 0.0714978744529432));
+    sig_side_momenta.push_back(TVector3(0.34160659934755344, 0.6444967896760643, 0.18455766323674105));
+    sig_side_momenta.push_back(TVector3(0.9558442475237068, 0.3628892505037786, 0.545225050633818));
+    sig_side_momenta.push_back(TVector3(0.8853521332124835, 0.340704481181513, 0.34728211023189237));
+    sig_side_momenta.push_back(TVector3(0.3155615844988947, 0.8307541128801257, 0.45701302024212986));
+
+    // "ROE Side"
+    roe_side_momenta.push_back(TVector3(0.6100164897524695, 0.5077455724845565, 0.06639458334119974));
+    roe_side_momenta.push_back(TVector3(0.5078972239903029, 0.9196504908351234, 0.3710366834603026));
+    roe_side_momenta.push_back(TVector3(0.06252858849289977, 0.4680168989606487, 0.4056055050148607));
+    roe_side_momenta.push_back(TVector3(0.61672460498333, 0.4472311336875816, 0.31288581834261064));
+    roe_side_momenta.push_back(TVector3(0.18544654870476218, 0.0758107751704592, 0.31909701462121065));
+
+    // "All momenta"
+    momenta.push_back(TVector3(0.5429965262452898, 0.37010582077332344, 0.0714978744529432));
+    momenta.push_back(TVector3(0.34160659934755344, 0.6444967896760643, 0.18455766323674105));
+    momenta.push_back(TVector3(0.9558442475237068, 0.3628892505037786, 0.545225050633818));
+    momenta.push_back(TVector3(0.8853521332124835, 0.340704481181513, 0.34728211023189237));
+    momenta.push_back(TVector3(0.3155615844988947, 0.8307541128801257, 0.45701302024212986));
+    momenta.push_back(TVector3(0.6100164897524695, 0.5077455724845565, 0.06639458334119974));
+    momenta.push_back(TVector3(0.5078972239903029, 0.9196504908351234, 0.3710366834603026));
+    momenta.push_back(TVector3(0.06252858849289977, 0.4680168989606487, 0.4056055050148607));
+    momenta.push_back(TVector3(0.61672460498333, 0.4472311336875816, 0.31288581834261064));
+    momenta.push_back(TVector3(0.18544654870476218, 0.0758107751704592, 0.31909701462121065));
+
+
+    // Calculate thrust from "Signal Side"
+    const TVector3 thrustB = thrust(sig_side_momenta.begin(), sig_side_momenta.end(), SelfFunc(TVector3()));
+
+    CleoCones myCleoCones(momenta, roe_side_momenta, thrustB, use_all, use_roe);
+
+    const auto& cleo_cone_with_all = myCleoCones.cleo_cone_with_all();
+    const auto& cleo_cone_with_roe = myCleoCones.cleo_cone_with_roe();
+
+    EXPECT_FLOAT_EQ(0.823567, cleo_cone_with_all[0]);
+    EXPECT_FLOAT_EQ(4.7405558, cleo_cone_with_all[1]);
+    EXPECT_FLOAT_EQ(1.7517139, cleo_cone_with_all[2]);
+    EXPECT_FLOAT_EQ(0.37677661, cleo_cone_with_all[3]);
+    EXPECT_FLOAT_EQ(0.622467, cleo_cone_with_all[4]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_all[5]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_all[6]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_all[7]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_all[8]);
+
+    EXPECT_FLOAT_EQ(0.823567, cleo_cone_with_roe[0]);
+    EXPECT_FLOAT_EQ(1.9106253, cleo_cone_with_roe[1]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[2]);
+    EXPECT_FLOAT_EQ(0.37677661, cleo_cone_with_roe[3]);
+    EXPECT_FLOAT_EQ(0.622467, cleo_cone_with_roe[4]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[5]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[6]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[7]);
+    EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[8]);
   }
 
 }  // namespace

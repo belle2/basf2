@@ -55,8 +55,8 @@ for icLayer in (range(0, 57)):
 
 # Fixing BKLM params --------------------------------------
 # Fix all parameters except U, V for all modules
-for sector in range(0, 9):
-    for layer in range(1, 17):
+for sector in range(1, 9):
+    for layer in range(1, 16):
         for forward in [0, 1]:
             for ipar in [1, 2, 3, 4, 5, 6]:
 

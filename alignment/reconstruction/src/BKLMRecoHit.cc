@@ -26,17 +26,15 @@ using namespace Belle2;
 
 
 BKLMRecoHit::BKLMRecoHit(const BKLMHit2d* hit, const genfit::TrackCandHit*):
-  genfit::PlanarMeasurement(HIT_DIMENSIONS), m_moduleID(0), m_bklmHit2d(hit)
+  genfit::PlanarMeasurement(HIT_DIMENSIONS)
 {
-
-  //derived from BKLMHit2d
   m_moduleID = hit->getModuleID();
+  m_IsForward = hit->isForward();
+  m_Sector = hit->getSector();
+  m_Layer = hit->getLayer();
 
   bklm::GeometryPar*  m_GeoPar = Belle2::bklm::GeometryPar::instance();
-  module = m_GeoPar->findModule(hit->isForward(), hit->getSector(), hit->getLayer());
-
-  //+++ layer number
-  layer = hit->getLayer();
+  module = m_GeoPar->findModule(m_IsForward, m_Sector, m_Layer);
 
   //+++ global coordinates of the hit
   global[0] = hit->getGlobalPosition()[0];
@@ -108,7 +106,7 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
   localmom = module->RotateToLocal(localmom);
 
   //do correction for scintillators
-  if (layer == 1 || layer == 2) {
+  if (m_Layer == 1 || m_Layer == 2) {
     CLHEP::Hep3Vector global_shift_z(0, 0, predFglo[5]*halfheight_sci / sqrt(predFglo[3]*predFglo[3] + predFglo[4]*predFglo[4]));
     CLHEP::Hep3Vector local_corrected_z = module->globalToLocal(global - global_shift_z);
     double local_shift_u = localmom[1] / localmom[0] * halfheight_sci;
@@ -128,9 +126,9 @@ std::vector<genfit::MeasurementOnPlane*> BKLMRecoHit::constructMeasurementsOnPla
 vector< int > BKLMRecoHit::labels()
 {
   BKLMElementID klmid;
-  klmid.setIsForward(m_bklmHit2d->isForward());
-  klmid.setSectorNumber(m_bklmHit2d->getSector());
-  klmid.setLayerNumber(m_bklmHit2d->getLayer());
+  klmid.setIsForward(m_IsForward);
+  klmid.setSectorNumber(m_Sector);
+  klmid.setLayerNumber(m_Layer);
   std::vector<int> labGlobal;
 
   labGlobal.push_back(GlobalLabel(klmid, BKLMAlignment::dU)); // du

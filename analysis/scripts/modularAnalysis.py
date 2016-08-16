@@ -1510,4 +1510,7 @@ if __name__ == '__main__':
         signature = inspect.formatargspec(*inspect.getargspec(function))
         signature = signature.replace(repr(analysis_main), 'analysis_main')
         desc_list.append((function.__name__, signature + '\n' + function.__doc__))
-    pretty_print_description_list(desc_list)
+
+    from pager import Pager
+    with Pager('List of available functions in modularAnalysis'):
+        pretty_print_description_list(desc_list)

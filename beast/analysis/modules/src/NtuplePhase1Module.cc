@@ -25,10 +25,12 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
+#include <framework/core/RandomNumbers.h>
 
 // DataStore classes
 #include <framework/io/RootIOUtilities.h>
 #include <framework/dataobjects/EventMetaData.h>
+
 
 #include <TTimeStamp.h>
 #include <TMath.h>
@@ -573,8 +575,8 @@ namespace Belle2 {
 
     m_tree->GetEntry(m_eventCount);
 
-    float I_HER = m_skb.BM_DCCT_HCUR;
-    float I_LER = m_skb.BM_DCCT_LCUR;
+    float I_HER = m_skb.BM_DCCT_HCUR + gRandom->Gaus(0, m_input_I_HER[1]);
+    float I_LER = m_skb.BM_DCCT_LCUR + gRandom->Gaus(0, m_input_I_HER[1]);
     float P_HER = (m_skb.VAHCCG_D01_HER_PRES_AVG +
                    m_skb.VAHCCG_D02_HER_PRES_AVG +
                    m_skb.VAHCCG_D03_HER_PRES_AVG +
@@ -586,7 +588,7 @@ namespace Belle2 {
                    m_skb.VAHCCG_D09_HER_PRES_AVG +
                    m_skb.VAHCCG_D10_HER_PRES_AVG +
                    m_skb.VAHCCG_D11_HER_PRES_AVG +
-                   m_skb.VAHCCG_D12_HER_PRES_AVG) / 12. * 0.00750062 * 1e9;
+                   m_skb.VAHCCG_D12_HER_PRES_AVG) / 12. * 0.00750062 * 1e9 + gRandom->Gaus(0, m_input_P_HER[1]);
     float P_LER = (m_skb.VALCCG_D01_LER_PRES_AVG +
                    m_skb.VALCCG_D02_LER_PRES_AVG +
                    m_skb.VALCCG_D03_LER_PRES_AVG +
@@ -598,11 +600,11 @@ namespace Belle2 {
                    m_skb.VALCCG_D09_LER_PRES_AVG +
                    m_skb.VALCCG_D10_LER_PRES_AVG +
                    m_skb.VALCCG_D11_LER_PRES_AVG +
-                   m_skb.VALCCG_D12_LER_PRES_AVG) / 12. * 0.00750062 * 1e9;
-    const float sigma_y_HER = m_skb.BMHXRM_BEAM_SIGMAY;
-    const float sigma_y_LER = m_skb.BMLXRM_BEAM_SIGMAY;
-    const float bunch_nb_HER = m_skb.CGHINJ_BKSEL_NOB_SET;
-    const float bunch_nb_LER = m_skb.CGLINJ_BKSEL_NOB_SET;
+                   m_skb.VALCCG_D12_LER_PRES_AVG) / 12. * 0.00750062 * 1e9 + gRandom->Gaus(0, m_input_P_LER[1]);
+    const float sigma_y_HER = m_skb.BMHXRM_BEAM_SIGMAY + gRandom->Gaus(0, m_input_sigma_HER[1]);
+    const float sigma_y_LER = m_skb.BMLXRM_BEAM_SIGMAY + gRandom->Gaus(0, m_input_sigma_LER[1]);
+    const float bunch_nb_HER = m_skb.CGHINJ_BKSEL_NOB_SET + gRandom->Gaus(0, m_input_bunchNb_HER[1]);
+    const float bunch_nb_LER = m_skb.CGLINJ_BKSEL_NOB_SET + gRandom->Gaus(0, m_input_bunchNb_LER[1]);
     /*
     cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
          endl;
@@ -703,12 +705,12 @@ namespace Belle2 {
     m_beast.SKB_injection_BucketSelection.push_back(m_skb.TM_BKT_config_SNAM);
     m_beast.SKB_injection_AutoFill_Mode.push_back(m_skb.TM_BKT_AUTO_FILL_Mode);
     m_beast.SKB_injection_AutoFill_Nbunches.push_back(m_skb.TM_BKT_AUTO_FILL_Nbunch);
-    m_beast.SKB_LER_injection_OneBunch_BucketNumber.push_back(bunch_nb_LER/*m_skb.CGLINJ_BKSEL_NOB_SET*/);
-    m_beast.SKB_HER_injection_OneBunch_BucketNumber.push_back(bunch_nb_HER/*m_skb.CGHINJ_BKSEL_NOB_SET*/);
+    m_beast.SKB_LER_injection_OneBunch_BucketNumber.push_back(m_skb.CGLINJ_BKSEL_NOB_SET);
+    m_beast.SKB_HER_injection_OneBunch_BucketNumber.push_back(m_skb.CGHINJ_BKSEL_NOB_SET);
     m_beast.SKB_injection_OneBunch_Nbunches.push_back(m_skb.TM_BKT_ONE_BUNCH_Nbunch);
     m_beast.SKB_LER_abort.push_back(m_skb.CGLSAFE_MR_ABORT);
     m_beast.SKB_HER_abort.push_back(m_skb.CGHSAFE_MR_ABORT);
-    m_beast.SKB_LER_averagePressure.push_back(P_LER/*m_skb.VALCCG_LER_PRES_AVG*/);
+    m_beast.SKB_LER_averagePressure.push_back(m_skb.VALCCG_LER_PRES_AVG);
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D01_LER_PRES_AVG);
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D02_LER_PRES_AVG);
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D03_LER_PRES_AVG);
@@ -721,7 +723,7 @@ namespace Belle2 {
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D10_LER_PRES_AVG);
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D11_LER_PRES_AVG);
     m_beast.SKB_LER_pressure.push_back(m_skb.VALCCG_D12_LER_PRES_AVG);
-    m_beast.SKB_HER_averagePressure.push_back(P_HER/*m_skb.VAHCCG_HER_PRES_AVG*/);
+    m_beast.SKB_HER_averagePressure.push_back(m_skb.VAHCCG_HER_PRES_AVG);
     m_beast.SKB_HER_pressure.push_back(m_skb.VAHCCG_D01_HER_PRES_AVG);
     m_beast.SKB_HER_pressure.push_back(m_skb.VAHCCG_D02_HER_PRES_AVG);
     m_beast.SKB_HER_pressure.push_back(m_skb.VAHCCG_D03_HER_PRES_AVG);
@@ -815,9 +817,9 @@ namespace Belle2 {
     m_beast.SKB_LER_collimatorDistanceToBeam.push_back(m_skb.VALCLM_D06H3IN_CSS_NOWPOS_DIF_POS);
     m_beast.SKB_LER_collimatorDistanceToBeam.push_back(m_skb.VALCLM_D06H3OUT_CSS_NOWPOS_DIF_POS);
     m_beast.SKB_HER_BeamSize_xray_X.push_back(m_skb.BMHXRM_BEAM_SIGMAX);
-    m_beast.SKB_HER_BeamSize_xray_Y.push_back(sigma_y_HER/*m_skb.BMHXRM_BEAM_SIGMAY*/);
+    m_beast.SKB_HER_BeamSize_xray_Y.push_back(m_skb.BMHXRM_BEAM_SIGMAY);
     m_beast.SKB_LER_BeamSize_xray_X.push_back(m_skb.BMLXRM_BEAM_SIGMAX);
-    m_beast.SKB_LER_BeamSize_xray_Y.push_back(sigma_y_LER/*m_skb.BMLXRM_BEAM_SIGMAY*/);
+    m_beast.SKB_LER_BeamSize_xray_Y.push_back(m_skb.BMLXRM_BEAM_SIGMAY);
     m_beast.SKB_HER_BeamSize_SR_X.push_back(m_skb.BMHSRM_BEAM_SIGMAX);
     m_beast.SKB_HER_BeamSize_SR_Y.push_back(m_skb.BMHSRM_BEAM_SIGMAY);
     m_beast.SKB_LER_BeamSize_SR_X.push_back(m_skb.BMLSRM_BEAM_SIGMAX);

@@ -94,13 +94,29 @@ namespace Belle2 {
 
       if (sortedRhoECLEnergyList.empty()) {
         calculationResult["highest_1_ecl"] = 0;
+        calculationResult["energy_sum_of_high_energy_ecl"] = 0;
       } else {
         calculationResult["highest_1_ecl"] = sortedRhoECLEnergyList.front();
+        calculationResult["energy_sum_of_high_energy_ecl"] = std::accumulate(std::begin(m_eclClusters), std::end(m_eclClusters), 0,
+        [](const double & value, const ECLCluster & eclCluster) {
+          const double& energy = eclCluster.getEnergy();
+          if (energy > 0.05) {
+            return value + energy;
+          } else {
+            return value;
+          }
+        });
       }
+
+
+      calculationResult["number_of_cdc_tracks"] = momenta.size();
+      calculationResult["number_of_ecl_cluster"] = m_eclClusters.getEntries();
 
       if (momenta.empty()) {
         calculationResult["max_pt"] = 0;
         calculationResult["max_pz"] = 0;
+        calculationResult["number_of_high_energy_tracks"] = 0;
+        calculationResult["mean_theta"] = 0;
       } else {
         calculationResult["max_pt"] = std::max_element(momenta.begin(), momenta.end(),
         [](const TVector3 & lhs, const TVector3 & rhs) {
@@ -111,6 +127,16 @@ namespace Belle2 {
         [](const TVector3 & lhs, const TVector3 & rhs) {
           return rhs.Z() > lhs.Z();
         })->Z();
+
+        calculationResult["number_of_high_energy_tracks"] = std::count_if(momenta.begin(), momenta.end(),
+        [](const TVector3 & momentum) {
+          return momentum.Pt() > 0.2;
+        });
+
+        calculationResult["mean_theta"] = std::accumulate(momenta.begin(), momenta.end(), 0,
+        [](const double & value, const TVector3 & momentum) {
+          return value + momentum.Theta();
+        }) / momenta.size();
       }
 
       if (sortedRhoCDCEnergyList.empty()) {
@@ -119,6 +145,5 @@ namespace Belle2 {
         calculationResult["first_highest_cdc_energies"] = sortedRhoCDCEnergyList.front();
       }
     }
-
   }
 }

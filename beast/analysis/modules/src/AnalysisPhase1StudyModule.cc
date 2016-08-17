@@ -80,6 +80,8 @@ void AnalysisPhase1StudyModule::defineHisto()
     h_sad_sall[i] = new TH1F(TString::Format("h_sad_sall_%d", i), "", 100, -1499.99, 1499.99);
     h_sad_sE[i] = new TH2F(TString::Format("h_sad_sE_%d", i), "", 100, -3.99, 3.99, 1000, 0., 10.);
     h_sad_sraw[i] = new TH1F(TString::Format("h_sad_sraw_%d", i), "", 100, -1499.99, 1499.99);
+    h_sad_E[i] = new TH1F(TString::Format("h_sad_E_%d", i), "", 8000, 0, 7.99);
+    h_sad_s[i] = new TH1F(TString::Format("h_sad_s_%d", i), "", 400, -3.99, 3.99);
   }
   h_dpx = new TH1F("h_dpx", "", 1000, -1., 1.);
   h_dpy = new TH1F("h_dpy", "", 1000, -1., 1.);
@@ -90,7 +92,8 @@ void AnalysisPhase1StudyModule::defineHisto()
   h_dx = new TH1F("h_dx", "", 10000, -400., 400.);
   h_dy = new TH1F("h_dy", "", 10000, -400., 400.);
   h_dz = new TH1F("h_dz", "", 10000, -400., 400.);
-  h_E = new TH1F("h_E", "", 1000, 0., 10.);
+  h_E = new TH1F("h_E", "", 8000, 0., 7.99);
+  h_P = new TH1F("h_P", "", 8000, 0., 7.99);
 }
 
 void AnalysisPhase1StudyModule::initialize()
@@ -132,6 +135,8 @@ void AnalysisPhase1StudyModule::event()
     h_sad_sir[0]->Fill(s / 100., rate);
     h_sad_sall[0]->Fill(s / 100., rate);
     h_sad_sE[0]->Fill(s / 100., E);
+    h_sad_s[0]->Fill(s / 100.);
+    h_sad_E[0]->Fill(E);
     h_sad_sraw[0]->Fill(sraw / 100., rate);
     if (-400. < s && s < 400.) {
       h_sad_xy[1]->Fill(x, y);
@@ -139,6 +144,8 @@ void AnalysisPhase1StudyModule::event()
       h_sad_sall[1]->Fill(s / 100., rate);
       h_sad_sraw[1]->Fill(sraw / 100., rate);
       h_sad_sE[1]->Fill(s / 100., E);
+      h_sad_s[1]->Fill(s / 100.);
+      h_sad_E[1]->Fill(E);
     }
   }
   int counter = 0;
@@ -219,6 +226,7 @@ void AnalysisPhase1StudyModule::event()
       h_py->Fill(mom[1]);
       h_pz->Fill(mom[2]);
       h_E->Fill(Kinetic);
+      h_P->Fill(sqrt(mom[0] * mom[0] + mom[1] * mom[1] + mom[2] * mom[2]));
     }
     counter++;
   }

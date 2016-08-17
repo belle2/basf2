@@ -575,8 +575,10 @@ namespace Belle2 {
 
     m_tree->GetEntry(m_eventCount);
 
-    float I_HER = m_skb.BM_DCCT_HCUR + gRandom->Gaus(0, m_input_I_HER[1]);
-    float I_LER = m_skb.BM_DCCT_LCUR + gRandom->Gaus(0, m_input_I_HER[1]);
+    float I_HER = m_skb.BM_DCCT_HCUR;
+    if (m_input_I_HER[1] > 0) I_HER += gRandom->Gaus(0, m_input_I_HER[1]);
+    float I_LER = m_skb.BM_DCCT_LCUR;
+    if (m_input_I_LER[1] > 0) I_LER += gRandom->Gaus(0, m_input_I_LER[1]);
     float P_HER = (m_skb.VAHCCG_D01_HER_PRES_AVG +
                    m_skb.VAHCCG_D02_HER_PRES_AVG +
                    m_skb.VAHCCG_D03_HER_PRES_AVG +
@@ -588,7 +590,8 @@ namespace Belle2 {
                    m_skb.VAHCCG_D09_HER_PRES_AVG +
                    m_skb.VAHCCG_D10_HER_PRES_AVG +
                    m_skb.VAHCCG_D11_HER_PRES_AVG +
-                   m_skb.VAHCCG_D12_HER_PRES_AVG) / 12. * 0.00750062 * 1e9 + gRandom->Gaus(0, m_input_P_HER[1]);
+                   m_skb.VAHCCG_D12_HER_PRES_AVG) / 12. * 0.00750062 * 1e9;
+    if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     float P_LER = (m_skb.VALCCG_D01_LER_PRES_AVG +
                    m_skb.VALCCG_D02_LER_PRES_AVG +
                    m_skb.VALCCG_D03_LER_PRES_AVG +
@@ -600,11 +603,16 @@ namespace Belle2 {
                    m_skb.VALCCG_D09_LER_PRES_AVG +
                    m_skb.VALCCG_D10_LER_PRES_AVG +
                    m_skb.VALCCG_D11_LER_PRES_AVG +
-                   m_skb.VALCCG_D12_LER_PRES_AVG) / 12. * 0.00750062 * 1e9 + gRandom->Gaus(0, m_input_P_LER[1]);
-    const float sigma_y_HER = m_skb.BMHXRM_BEAM_SIGMAY + gRandom->Gaus(0, m_input_sigma_HER[1]);
-    const float sigma_y_LER = m_skb.BMLXRM_BEAM_SIGMAY + gRandom->Gaus(0, m_input_sigma_LER[1]);
-    const float bunch_nb_HER = m_skb.CGHINJ_BKSEL_NOB_SET + gRandom->Gaus(0, m_input_bunchNb_HER[1]);
-    const float bunch_nb_LER = m_skb.CGLINJ_BKSEL_NOB_SET + gRandom->Gaus(0, m_input_bunchNb_LER[1]);
+                   m_skb.VALCCG_D12_LER_PRES_AVG) / 12. * 0.00750062 * 1e9;
+    if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
+    float sigma_y_HER = m_skb.BMHXRM_BEAM_SIGMAY;
+    if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
+    float sigma_y_LER = m_skb.BMLXRM_BEAM_SIGMAY;
+    if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
+    float bunch_nb_HER = m_skb.CGHINJ_BKSEL_NOB_SET;
+    if (m_input_bunchNb_HER[1] > 0) bunch_nb_HER += gRandom->Gaus(0, m_input_bunchNb_HER[1]);
+    float bunch_nb_LER = m_skb.CGLINJ_BKSEL_NOB_SET;
+    if (m_input_bunchNb_LER[1] > 0) bunch_nb_LER += gRandom->Gaus(0, m_input_bunchNb_LER[1]);
     /*
     cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
          endl;

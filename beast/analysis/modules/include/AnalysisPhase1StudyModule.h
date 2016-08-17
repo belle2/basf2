@@ -90,6 +90,10 @@ namespace Belle2 {
     TH1F* h_sad_sraw[2];
     /** sad s v E */
     TH2F* h_sad_sE[2];
+    /** sad E */
+    TH1F* h_sad_E[2];
+    /** sad s */
+    TH1F* h_sad_s[2];
     /** comp. E */
     TH1F* h_dE;
     /** comp. px */
@@ -98,6 +102,8 @@ namespace Belle2 {
     TH1F* h_dpy;
     /** E */
     TH1F* h_E;
+    /** P */
+    TH1F* h_P;
     /** px */
     TH1F* h_px;
     /** py */

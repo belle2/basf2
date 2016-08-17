@@ -23,6 +23,7 @@
 #include <analysis/ContinuumSuppression/KsfwMoments.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
+#include <analysis/ContinuumSuppression/FuncPtr.h>
 #include <utility>
 #include <vector>
 #include <iostream>
@@ -172,8 +173,8 @@ namespace Belle2 {
       }
 
       // Thrust variables
-      thrustB  = thrust(p3_cms_sigB.begin(), p3_cms_sigB.end(), SelfFunc(TVector3()));
-      thrustO  = thrust(p3_cms_roe.begin() , p3_cms_roe.end() , SelfFunc(TVector3()));
+      thrustB = calculateThrust(p3_cms_sigB);
+      thrustO = calculateThrust(p3_cms_roe);
       thrustBm = thrustB.Mag();
       thrustOm = thrustO.Mag();
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));

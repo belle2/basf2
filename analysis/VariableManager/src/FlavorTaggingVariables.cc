@@ -147,7 +147,7 @@ namespace Belle2 {
           }
         }
 
-        thrustO  = thrust(p3_cms_roe.begin() , p3_cms_roe.end() , SelfFunc(TVector3()));
+        thrustO  = calculateThrust(p3_cms_roe);
         const TVector3 pAxis = PCmsLabTransform::labToCms(part->get4Vector()).Vect();
         if (pAxis == pAxis) result = fabs(cos(pAxis.Angle(thrustO)));
 

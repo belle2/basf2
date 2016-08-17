@@ -26,7 +26,7 @@ namespace Belle2 {
     momenta.push_back(TVector3(0.8548902083897467, 0.6887268865943484, 0.34301136659215437));
     momenta.push_back(TVector3(0.26863521039211535, 0.011148638667487942, 0.96186334199901));
 
-    const TVector3 thrustB = thrust(momenta.begin(), momenta.end(), SelfFunc(TVector3()));
+    const TVector3 thrustB = calculateThrust(momenta);
 
     EXPECT_FLOAT_EQ(0.925838, thrustB.Mag());
     EXPECT_FLOAT_EQ(0.571661, thrustB.X());
@@ -70,7 +70,7 @@ namespace Belle2 {
 
 
     // Calculate thrust from "Signal Side"
-    const TVector3 thrustB = thrust(sig_side_momenta.begin(), sig_side_momenta.end(), SelfFunc(TVector3()));
+    const TVector3 thrustB = calculateThrust(sig_side_momenta);
 
     CleoCones myCleoCones(momenta, roe_side_momenta, thrustB, use_all, use_roe);
 

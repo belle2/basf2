@@ -74,17 +74,22 @@ namespace Belle2 {
     sum[4] += mag * (4.375 * cost2 * cost2 - 3.75 * cost2 + 0.375);
   }
 
-  template <class Iterator, class Function>
-  FoxWolfram foxwolfram(Iterator begin, Iterator end, Function func)
+  FoxWolfram foxwolfram(const std::vector<TVector3>& momenta)
   {
     FoxWolfram f;
 
-    Iterator p, q;
+    decltype(momenta.begin()) p;
+    decltype(momenta.begin()) q;
+
+    const auto begin = momenta.begin();
+    const auto end = momenta.end();
+
+
     for (p = begin; p != end; p++) {
-      const TVector3 pvec = func(*p);
+      const TVector3 pvec = (*p);
       double pmag = pvec.Mag();
       for (q = p; q != end; q++) {
-        const TVector3 qvec = func(*q);
+        const TVector3 qvec = (*q);
         double mag = pmag * qvec.Mag();
         double costh = pvec.Dot(qvec) / mag;
         if (p != q) mag *= 2;

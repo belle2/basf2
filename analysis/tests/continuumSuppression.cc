@@ -1,5 +1,6 @@
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
+#include <analysis/ContinuumSuppression/FoxWolfram.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -96,6 +97,27 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[6]);
     EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[7]);
     EXPECT_FLOAT_EQ(0, cleo_cone_with_roe[8]);
+  }
+
+  TEST_F(ContinuumSuppressionTests, FoxWolfram)
+  {
+    const bool use_all = true;
+    const bool use_roe = true;
+    std::vector<TVector3> momenta;
+
+    momenta.push_back(TVector3(0.5429965262452898, 0.37010582077332344, 0.0714978744529432));
+    momenta.push_back(TVector3(0.34160659934755344, 0.6444967896760643, 0.18455766323674105));
+    momenta.push_back(TVector3(0.9558442475237068, 0.3628892505037786, 0.545225050633818));
+    momenta.push_back(TVector3(0.8853521332124835, 0.340704481181513, 0.34728211023189237));
+    momenta.push_back(TVector3(0.3155615844988947, 0.8307541128801257, 0.45701302024212986));
+    momenta.push_back(TVector3(0.6100164897524695, 0.5077455724845565, 0.06639458334119974));
+    momenta.push_back(TVector3(0.5078972239903029, 0.9196504908351234, 0.3710366834603026));
+    momenta.push_back(TVector3(0.06252858849289977, 0.4680168989606487, 0.4056055050148607));
+    momenta.push_back(TVector3(0.61672460498333, 0.4472311336875816, 0.31288581834261064));
+    momenta.push_back(TVector3(0.18544654870476218, 0.0758107751704592, 0.31909701462121065));
+
+    FoxWolfram FW(foxwolfram(momenta));
+    EXPECT_FLOAT_EQ(0.63011014, FW.R(2));
   }
 
 }  // namespace

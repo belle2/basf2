@@ -3,7 +3,8 @@ Import('env')
 env['LIBS'] = [
     '$ROOT_LIBS',
     "framework",
-    "analysis"
+    "analysis",
+    "analysis_utility"
 ]
 
 Return('env')

@@ -23,7 +23,6 @@
 #include <analysis/ContinuumSuppression/KsfwMoments.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
-#include <analysis/ContinuumSuppression/FuncPtr.h>
 #include <utility>
 #include <vector>
 #include <iostream>

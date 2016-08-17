@@ -116,6 +116,8 @@ namespace Belle2 {
     TH1F* h_dy;
     /** z */
     TH1F* h_dz;
+    /** z */
+    TH1F* h_z[2];
 
   };
 

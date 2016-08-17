@@ -69,6 +69,8 @@ namespace Belle2 {
 
       /** Neutron Hits */
       TH1F* h_NeutronHits;
+      /** Neutron Hits */
+      TH1F* h_NeutronHitsWeighted;
       /** Definite Neutron Hits */
       TH1F* h_DefNeutronHits;
       /** Energy deposited by Proton and Tritium */
@@ -85,6 +87,8 @@ namespace Belle2 {
       TH1F* h_DetN_Edep;
       /** Neutron Hits per second */
       TH1F* h_NeutronRate;
+      /** Neutron Hits per second */
+      TH1F* h_NeutronRateWeighted;
       /** Definite Neutron Hits per second */
       TH1F* h_DefNeutronRate;
 

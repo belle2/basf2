@@ -12,6 +12,7 @@
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
 #include <beast/he3tube/dataobjects/He3MCParticle.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -72,8 +73,10 @@ void He3tubeStudyModule::defineHisto()
   }
 
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
+  h_NeutronHitsWeighted = new TH1F("NeutronHitsWeighted", "Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_DefNeutronHits = new TH1F("DefNeutronHits", "Definite Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
+  h_NeutronRateWeighted = new TH1F("NeutronRateWeighted", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
   h_DefNeutronRate = new TH1F("DefNeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
 
   h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
@@ -88,6 +91,10 @@ void He3tubeStudyModule::defineHisto()
   h_PulseHeights_DefNeutron =    new TH1F("PulseHeights_DefNeutron"   , "Pulse height of waveforms from definite neutron events", 100,
                                           0, 18000);
   h_PulseHeights_All =        new TH1F("PulseHeights_All"   , "Pulse height of waveforms from all events", 100, 0, 18000);
+
+  h_NeutronRate->Sumw2();
+  h_DefNeutronRate->Sumw2();
+  h_NeutronRateWeighted->Sumw2();
 
 }
 
@@ -113,6 +120,11 @@ void He3tubeStudyModule::event()
   StoreArray<He3tubeSimHit>  simHits;
   StoreArray<He3tubeHit> Hits;
   StoreArray<He3MCParticle> mcparts;
+  StoreArray<SADMetaHit> sadMetaHits;
+  double rate = 0;
+  for (const auto& sadMetaHit : sadMetaHits) {
+    rate = sadMetaHit.getrate();
+  }
 
   for (const auto& mcpart : mcparts) { // start loop over all Tracks
     const double energy = mcpart.getEnergy();
@@ -200,7 +212,6 @@ void He3tubeStudyModule::event()
     if (aHit->definiteNeutron()) { //if this is true, this hit was definitely caused by a neutron.
       nDefiniteNeutron++;
       h_DefNeutronHits->Fill(aHit->getdetNb());
-      h_DefNeutronRate->Sumw2();
       h_DefNeutronRate->Fill(aHit->getdetNb(), 1 / rateCorrection);
       h_PulseHeights_DefNeutron->Fill(aHit->getPeakV());
       neutronStatus = 1;
@@ -212,8 +223,9 @@ void He3tubeStudyModule::event()
       tubeNum = aHit->getdetNb();
       h_PulseHeights_Neutron->Fill(aHit->getPeakV());
       h_NeutronHits->Fill(aHit->getdetNb());
-      h_NeutronRate->Sumw2();
       h_NeutronRate->Fill(aHit->getdetNb(), 1 / rateCorrection);
+      h_NeutronHitsWeighted->Fill(aHit->getdetNb(), rate);
+      h_NeutronRateWeighted->Fill(aHit->getdetNb(), 1 / rateCorrection * rate);
       nNeutronHits++;
     } else {
       h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());

@@ -77,6 +77,7 @@ void AnalysisPhase1StudyModule::defineHisto()
   for (int i = 0; i < 2; i++) {
     h_sad_xy[i] = new TH2F(TString::Format("h_sad_xy_%d", i), "", 100, -5.99, 5.99, 100, -5.99, 5.99);
     h_sad_sir[i] = new TH1F(TString::Format("h_sad_sir_%d", i), "", 100, -3.99, 3.99);
+    h_z[i] = new TH1F(TString::Format("h_z_%d", i), "", 100, -3.99, 3.99);
     h_sad_sall[i] = new TH1F(TString::Format("h_sad_sall_%d", i), "", 100, -1499.99, 1499.99);
     h_sad_sE[i] = new TH2F(TString::Format("h_sad_sE_%d", i), "", 100, -3.99, 3.99, 1000, 0., 10.);
     h_sad_sraw[i] = new TH1F(TString::Format("h_sad_sraw_%d", i), "", 100, -1499.99, 1499.99);
@@ -215,6 +216,9 @@ void AnalysisPhase1StudyModule::event()
       h_dx->Fill(x - prodvtx[0]);
       h_dy->Fill(-y - prodvtx[1]);
       h_dz->Fill(-s - prodvtx[2]);
+
+      h_z[0]->Fill(prodvtx[2] / 100.);
+      h_z[1]->Fill(prodvtx[2] / 100., rate);
 
       h_dpx->Fill(px - mom[0]);
       h_dpy->Fill(-py - mom[1]);

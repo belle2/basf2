@@ -1,12 +1,12 @@
 #include <framework/utilities/GeneralCut.h>
-
+#include <cmath>
 
 namespace Belle2 {
 
   bool almostEqualFloat(const float& a, const float& b)
   {
     assert(sizeof(float) == sizeof(int));
-    return abs(*(int*)&a - * (int*)&b) <= 2 or (a == b);
+    return std::fabs(*(int*)&a - * (int*)&b) <= 2 or (a == b);
   }
 
   unsigned long int findMatchedParenthesis(std::string str, char open, char close)

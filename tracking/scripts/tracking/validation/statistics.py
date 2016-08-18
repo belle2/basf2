@@ -67,11 +67,11 @@ def rice_exceptional_values(xs):
     while True:
         n_data = np.sum(unique_xs_count)
         n_exceptional = 1.0 * n_data / rice_n_bin(n_data)
-        excpetional_indices = unique_xs_count > n_exceptional
+        exceptional_indices = unique_xs_count > n_exceptional
 
-        if np.any(excpetional_indices):
-            exceptional_xs.extend(unique_xs[excpetional_indices])
-            unique_xs_count[excpetional_indices] = 0
+        if np.any(exceptional_indices):
+            exceptional_xs.extend(unique_xs[exceptional_indices])
+            unique_xs_count[exceptional_indices] = 0
         else:
             break
 
@@ -107,7 +107,15 @@ def is_discrete_series(xs, max_n_unique=None):
     if max_n_unique is None:
         max_n_unique = default_max_n_unique_for_discrete
 
-    # FIXME: improve test for discrete variable
     unique_xs = np.unique(xs)
     if len(unique_xs) < max_n_unique:
         return True
+    elif len(unique_xs) > 150:
+        return False
+    else:
+        exceptional_xs = rice_exceptional_values(xs)
+        rest_xs = np.setdiff1d(unique_xs, exceptional_xs, assume_unique=True)
+        if len(rest_xs) < max_n_unique:
+            return True
+
+    return False

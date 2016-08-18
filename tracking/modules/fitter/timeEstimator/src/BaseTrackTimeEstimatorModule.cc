@@ -157,7 +157,7 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
       const double propagationLength = (position - readoutPositionAsTVector3).Mag();
       const double propagationTime = propagationLength / m_param_readoutPositionPropagationSpeed;
 
-      return flightTime + propagationTime;
+      return flightTime - propagationTime;
     } else {
       return flightTime;
     }

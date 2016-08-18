@@ -24,7 +24,8 @@ const
   const TVector3 ipPosition;
   try {
     const double s = measuredStateOnPlane.extrapolateToPoint(ipPosition);
-    return s;
+    // Negative, because we extrapolated in the wrong direction
+    return -s;
   } catch (const genfit::Exception& e) {
     B2WARNING("Extrapolation failed: " << e.what());
     return 0;

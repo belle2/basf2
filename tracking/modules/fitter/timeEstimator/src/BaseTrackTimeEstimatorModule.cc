@@ -12,6 +12,8 @@
 #include <tracking/trackFitting/fitter/base/TrackFitter.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
+#include <TVector3.h>
+
 using namespace std;
 using namespace Belle2;
 
@@ -42,15 +44,32 @@ BaseTrackTimeEstimatorModule::BaseTrackTimeEstimatorModule() :
 
   addParam("recoTracksStoreArrayName", m_param_recoTracksStoreArrayName, "StoreArray name of the input and output reco tracks.",
            m_param_recoTracksStoreArrayName);
+
   addParam("useFittedInformation", m_param_useFittedInformation, "Whether to use the information in the measurements (after fit)"
            " or the tracking seeds for doing the extrapolation. Of course, the track fit has to be performed to use the fitted information.",
            m_param_useFittedInformation);
+
   addParam("pdgCodeToUseForEstimation", m_param_pdgCodeToUseForEstimation,
            "Which PDG code to use for creating the time estimate. How this information is used"
            "depends on the implementation details of the child modules. Please only use the positive pdg code.",
            m_param_pdgCodeToUseForEstimation);
+
   addParam("timeOffset", m_param_timeOffset, "If you want to subtract or add a certain time, you can use this variable.",
            m_param_timeOffset);
+
+  addParam("readoutPosition", m_param_readoutPosition,
+           "In cases where the readout of the trigger is not located at the trigger directly and the signal has to"
+           "propagate a non-vanashing distance, you can set the readout position here. Please note that you have to"
+           "enable this feature by using the useReadoutPosition flag. You can control the propagation speed with the"
+           "flag readoutPositionPropagationSpeed.", m_param_readoutPosition);
+  addParam("useReadoutPosition", m_param_useReadoutPosition, "Enable the usage of the readout position."
+           "When this feature is enabled, the length from the incident of the particle in the trigger to the position"
+           "set by the readoutPosition flag is calculated and using the readoutPositionPropagationSpeed, a time is"
+           "calculated which is used in the time estimation as an offset."
+           "In the moment, this feature is only possible when using the fitted information." , m_param_useReadoutPosition);
+  addParam("readoutPositionPropagationSpeed", m_param_readoutPositionPropagationSpeed,
+           "Speed of the propagation from the hit on the trigger to the readoutPosition. Only is used when the"
+           "flag useReadoutPosition is enabled.", m_param_readoutPositionPropagationSpeed);
 }
 
 void BaseTrackTimeEstimatorModule::initialize()
@@ -58,6 +77,10 @@ void BaseTrackTimeEstimatorModule::initialize()
   // Read and write out RecoTracks
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
   recoTracks.isRequired();
+
+  if (m_param_useReadoutPosition and not m_param_useFittedInformation) {
+    B2FATAL("The combination of using the seed information and the readout position is not implemented in the moment.");
+  }
 }
 
 void BaseTrackTimeEstimatorModule::event()
@@ -117,13 +140,27 @@ double BaseTrackTimeEstimatorModule::estimateTimeSeedUsingFittedInformation(Reco
     // Fix the position and momentum seed to the same place as where we calculation the time seed: the first measured state on plane
     recoTrack.setPositionAndMomentum(measuredState.getPos(), measuredState.getMom());
 
-    const double s = estimateFlightLengthUsingFittedInformation(measuredState);
+    const double flightLength = estimateFlightLengthUsingFittedInformation(measuredState);
 
     // Be aware that we use the measured state on plane after the extrapolation to compile the momentum.
     const TVector3& momentum = measuredState.getMom();
     const double v = calculateVelocity(momentum, particleHypothesis);
 
-    return s / v;
+    const double flightTime = flightLength / v;
+
+    // When the readout position should be used, calculate the propagation time of the signal from the hit to the
+    // readout position.
+    if (m_param_useReadoutPosition) {
+      const TVector3& position = measuredState.getPos();
+      B2ASSERT("Readout Position must have 3 components.", m_param_readoutPosition.size() == 3);
+      const TVector3 readoutPositionAsTVector3(m_param_readoutPosition[0], m_param_readoutPosition[1], m_param_readoutPosition[2]);
+      const double propagationLength = (position - readoutPositionAsTVector3).Mag();
+      const double propagationTime = propagationLength / m_param_readoutPositionPropagationSpeed;
+
+      return flightTime + propagationTime;
+    } else {
+      return flightTime;
+    }
   }
 }
 

@@ -8,24 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-
-
 #include <analysis/ContinuumSuppression/ContinuumSuppression.h>
-#include <mdst/dataobjects/Track.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/KLMCluster.h>
-#include <framework/datastore/StoreArray.h>
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/dataobjects/ContinuumSuppression.h>
-#include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/ContinuumSuppression/Thrust.h>
 #include <analysis/ContinuumSuppression/KsfwMoments.h>
 #include <analysis/ContinuumSuppression/FoxWolfram.h>
 #include <analysis/ContinuumSuppression/CleoCones.h>
-#include <utility>
+#include <analysis/dataobjects/RestOfEvent.h>
+#include <analysis/dataobjects/ContinuumSuppression.h>
+#include <analysis/utility/PCmsLabTransform.h>
+#include <mdst/dataobjects/Track.h>
+#include <mdst/dataobjects/ECLCluster.h>
+#include <mdst/dataobjects/KLMCluster.h>
+#include <framework/datastore/StoreArray.h>
+
 #include <vector>
-#include <iostream>
+
 
 namespace Belle2 {
 

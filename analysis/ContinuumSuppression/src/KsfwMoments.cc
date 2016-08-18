@@ -23,15 +23,7 @@
 //////////////////////////////////////////
 
 #include <analysis/ContinuumSuppression/KsfwMoments.h>
-#include <framework/gearbox/Unit.h>
-#include <framework/gearbox/Const.h>
-#include <framework/logging/Logger.h>
-#include <iostream>
-#include <iomanip>
-#include <math.h>
-#include <vector>
-#include <string>
-#include <sstream>
+
 
 namespace Belle2 {
 

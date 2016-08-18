@@ -9,22 +9,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef THRUST_H
-#define THRUST_H
+#include <TVector3.h>
 
 #include <vector>
-#include <map>
-#include <string>
-#include <utility>
-#include <iostream>
-#include <sstream>
 
-#include <analysis/VariableManager/Variables.h>
-
-#include <analysis/dataobjects/Particle.h>
-#include <analysis/dataobjects/RestOfEvent.h>
-#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 
@@ -89,7 +79,5 @@ namespace Belle2 {
   }
 
 } // Belle2 namespace
-
-#endif
 
 

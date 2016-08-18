@@ -9,16 +9,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef FOXWOLFRAM_H
-#define FOXWOLFRAM_H
+#include <TVector3.h>
 
 #include <vector>
-#include <map>
-#include <string>
-#include <utility>
-#include <iostream>
-#include <sstream>
+
 
 namespace Belle2 {
 
@@ -100,5 +96,3 @@ namespace Belle2 {
   }
 
 } // Belle2 namespace
-
-#endif

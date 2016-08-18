@@ -7,8 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
+
+#include <analysis/dataobjects/Particle.h>
+
+
 namespace Belle2 {
   class Particle;
 

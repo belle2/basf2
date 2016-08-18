@@ -21,19 +21,13 @@
 //  M. Nakao                            //
 //                                      //
 //////////////////////////////////////////
-
-#ifndef KSFWMOMENTS_H
-#define KSFWMOMENTS_H
-
-#include <vector>
-#include <map>
-#include <string>
-#include <utility>
-#include <iostream>
-#include <sstream>
+#pragma once
 
 #include <TVector3.h>
 #include <TLorentzVector.h>
+
+#include <vector>
+
 
 namespace Belle2 {
 
@@ -130,5 +124,3 @@ namespace Belle2 {
   };
 
 } // Belle2 namespace
-
-#endif

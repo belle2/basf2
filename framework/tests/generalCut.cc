@@ -71,6 +71,13 @@ namespace {
     a = MockGeneralCut::compile(" 1.5<1.2");
     EXPECT_FALSE(a->check(&testObject));
 
+    // Check for regression
+    // This was broken in the past due to the abs function in almostEqual
+    a = MockGeneralCut::compile("-1 == 1");
+    EXPECT_FALSE(a->check(&testObject));
+    a = MockGeneralCut::compile("-1 != 1");
+    EXPECT_TRUE(a->check(&testObject));
+
     a = MockGeneralCut::compile(" 12.3 >1.5 ");
     EXPECT_TRUE(a->check(&testObject));
     a = MockGeneralCut::compile("12 > 15");

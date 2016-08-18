@@ -245,6 +245,7 @@ class Plot2DRefiner(Refiner):
                  contact=None,
                  description=None,
                  check=None,
+                 stackby=None,
                  y_unit=None,
                  y_binary=None,
                  y_log=None,
@@ -267,6 +268,7 @@ class Plot2DRefiner(Refiner):
 
         self.x = x
         self.y = y
+        self.stackby = stackby
         self.y_unit = y_unit
 
         self.lower_bound = lower_bound
@@ -357,7 +359,8 @@ class Plot2DRefiner(Refiner):
                                          y_binary=self.y_binary,
                                          y_log=self.y_log,
                                          outlier_z_score=self.outlier_z_score,
-                                         allow_discrete=self.allow_discrete)
+                                         allow_discrete=self.allow_discrete,
+                                         stackby=self.stackby)
 
                     if self.fit:
                         fit_method_name = 'fit_' + str(self.fit)

@@ -19,13 +19,6 @@
     </Components>
   </Material>
 
-  <Material name="Helium">
-     <density unit="g/cm3">1.786e-4</density>
-     <Components>
-        <Element fraction="1.0">He</Element>
-     </Components>
-  </Material>
-
   <Material name="CDCHeGas">
     <density unit="g/cm3">0.000164637157859193</density>
     <state>Gas</state>

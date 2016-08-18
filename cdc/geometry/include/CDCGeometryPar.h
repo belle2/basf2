@@ -492,6 +492,42 @@ namespace Belle2 {
       */
       double getWireSagCoef(EWirePosition set, int layerId, int cellId) const;
 
+
+      //! Returns threshold for energy deposit in one G4 step
+      /*!
+      \return threshold (GeV)
+      */
+      double getThresholdEnerguDeposit() const
+      {
+        return m_thresholdEnergyDeposit;
+      }
+
+      //! Returns the minimum track length required in one G4 step (only secondary particles which pass this criterion are to be saved in MCParticle)
+      /*!
+      \return length (cm)
+      */
+      double getMinTrackLength() const
+      {
+        return m_minTrackLength;
+      }
+
+      //! Returns on/off for sense wire sag in FullSim
+      /*!
+      */
+      bool isWireSagOn() const
+      {
+        return m_wireSag;
+      }
+
+      //! Returns on/off for modified left/right calculation in FullSim
+      /*!
+      */
+      bool isModifiedLeftRightFlagOn() const
+      {
+        return  m_modLeftRightFlag;
+      }
+
+
       //! Returns t0 parameter of the specified sense wire
       /*!
       \param layerId The layer id. of the wire
@@ -949,6 +985,10 @@ namespace Belle2 {
       bool m_Misalignment;   /*!< Switch for misalignment. */
       bool m_Alignment;      /*!< Switch for alignment. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
+
+      bool m_wireSag;        /*!< Switch for sense wire sag */
+      bool m_modLeftRightFlag; /*!< Switch for modified left/right flag */
+
       std::string m_version; /*!< The version of geometry parameters. */
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
       int m_senseWireZposMode; /*!< Mode for sense wire z position corr. */
@@ -991,6 +1031,9 @@ namespace Belle2 {
 
       double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
       double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
+
+      double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
+      double m_minTrackLength;         /*!< Minimum track length for G4 step */
 
       float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each cell; to be implemented in a smarter way. */
       float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each cell; ibid. */

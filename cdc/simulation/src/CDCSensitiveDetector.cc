@@ -19,7 +19,6 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <cdc/dataobjects/CDCEBSimHit.h>
@@ -69,23 +68,20 @@ namespace Belle2 {
     cdcEBArray.registerInDataStore(DataStore::c_DontWriteOut);
     mcParticles.registerRelationTo(cdcSimHits);
 
-    GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content");
-    gd.append("/SensitiveDetector");
-    //    m_thresholdEnergyDeposit =  Unit::convertValue(gd.getDouble("EnergyDepositionThreshold"), "eV");
-    m_thresholdEnergyDeposit = gd.getWithUnit("EnergyDepositionThreshold");
+    m_thresholdEnergyDeposit = m_cdcgp.getThresholdEnerguDeposit();
     m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
     B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
 
     //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
-    //    m_wireSag = gd.getBool("WireSag");
+    //    m_wireSag = m_cdcgp.isWireSagOn();
     m_wireSag = false;
     //    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
-    m_modifiedLeftRightFlag = gd.getBool("ModifiedLeftRightFlag");
+
+    m_modifiedLeftRightFlag = m_cdcgp.isModifiedLeftRightFlagOn();
     B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
-    //    m_minTrackLength = gd.getDouble("MinTrackLength");
-    m_minTrackLength = gd.getWithUnit("MinTrackLength");
+    m_minTrackLength = m_cdcgp.getMinTrackLength();
     m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
     B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 

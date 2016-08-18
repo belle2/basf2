@@ -468,6 +468,14 @@ void CDCGeometryPar::read()
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
 
+  // Get control params. for CDC FullSim
+  GearDir gd(content);
+  gd.append("/SensitiveDetector");
+  m_thresholdEnergyDeposit = gd.getWithUnit("EnergyDepositionThreshold");
+  m_minTrackLength = gd.getWithUnit("MinTrackLength");
+  m_wireSag = gd.getBool("WireSag");
+  m_modLeftRightFlag = gd.getBool("ModifiedLeftRightFlag");
+
   // Get control switch for xt file format
   m_xtFileFormat = gbxParams.getInt("XtFileFormat");
   if (m_xtFileFormat == 0) {

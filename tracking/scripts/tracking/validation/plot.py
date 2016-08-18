@@ -6,7 +6,6 @@ import itertools
 import collections
 import array
 import numpy as np
-from functools import reduce
 
 import ROOT
 
@@ -228,24 +227,47 @@ class ValidationPlot(object):
                 include_exceptionals=True,
                 allow_discrete=False,
                 cumulation_direction=None,
+                gaus_z_score=None,
                 is_expert=True):
         """Fill the plot with a one dimensional profile of one variable over another."""
-
         th1_factory = ROOT.TProfile
         self._is_expert = is_expert
+        if gaus_z_score is None:
+            self.create_1d(th1_factory,
+                           xs,
+                           ys,
+                           weights=weights,
+                           stackby=stackby,
+                           bins=bins,
+                           lower_bound=lower_bound,
+                           upper_bound=upper_bound,
+                           outlier_z_score=outlier_z_score,
+                           include_exceptionals=include_exceptionals,
+                           allow_discrete=allow_discrete,
+                           cumulation_direction=cumulation_direction)
+        else:
+            # Introduce a dummy name for the temporary two dimensional histogram
+            self.name = "_" + self.name
+            self.hist2d(xs, ys=ys, weights=weights, stackby=stackby,
+                        bins=(bins, None),
+                        lower_bound=(lower_bound, None),
+                        upper_bound=(upper_bound, None),
+                        outlier_z_score=(outlier_z_score, outlier_z_score),
+                        include_exceptionals=(include_exceptionals, True),
+                        allow_discrete=(allow_discrete, False),
+                        is_expert=is_expert)
 
-        self.create_1d(th1_factory,
-                       xs,
-                       ys,
-                       weights=weights,
-                       stackby=stackby,
-                       bins=bins,
-                       lower_bound=lower_bound,
-                       upper_bound=upper_bound,
-                       outlier_z_score=outlier_z_score,
-                       include_exceptionals=include_exceptionals,
-                       allow_discrete=allow_discrete,
-                       cumulation_direction=cumulation_direction)
+            self.name = self.name[1:]
+            profiles = []
+            for histogram in self.histograms:
+                profile = self.gaus_slice_fit(histogram,
+                                              name=histogram.GetName()[1:],
+                                              z_score=gaus_z_score)
+                profiles.append(profile)
+            print(profiles)
+            self.histograms = profiles
+            self.plot = self.create_stack(profiles, name=self.plot.GetName()[1:], reverse_stack=False)
+
         if y_log:
             self.y_log = True
 
@@ -463,7 +485,7 @@ class ValidationPlot(object):
 
         # Adjust the discrete bins after the filling to be equidistant
         if y_bin_labels:
-            for histogram in self.histogram:
+            for histogram in self.histograms:
                 x_taxis = histogram.GetXaxis()
                 y_bin_edges = array.array("d", list(range(len(y_bin_labels) + 1)))
                 y_taxis.Set(n_y_bins, y_bin_edges)
@@ -902,6 +924,7 @@ class ValidationPlot(object):
             self.fill_into(histogram, xs, ys, weights=weights)
             if cumulation_direction is not None:
                 histogram = self.cumulate(histogram, cumulation_direction=cumulation_direction)
+
             histograms.append(histogram)
             plot = histogram
 
@@ -920,33 +943,42 @@ class ValidationPlot(object):
                 histograms = [self.cumulate(histogram, cumulation_direction=cumulation_direction)
                               for histogram in histograms]
 
-            if isinstance(histogram_template, (ROOT.TProfile, ROOT.TGraph)):
+            plot = self.create_stack(histograms, name=name + "_stacked", reverse_stack=reverse_stack)
+
+        self.histograms = histograms
+        self.plot = plot
+        self.attach_attributes()
+
+    @classmethod
+    def create_stack(cls, histograms, name, reverse_stack):
+        if len(histograms) == 1:
+            plot = histograms[0]
+        else:
+            if isinstance(histograms[0], (ROOT.TProfile, ROOT.TGraph)):
                 plot = ROOT.TMultiGraph()
             else:
                 plot = ROOT.THStack()
 
-            plot.SetName(name + "_stacked")
+            plot.SetName(name)
 
             # Add the histogram in reverse order such
             # that the signal usually is on the bottom an well visible
             if reverse_stack:
                 for histogram in reversed(histograms):
                     if isinstance(histogram, ROOT.TProfile):
-                        histogram = self.convert_tprofile_to_tgrapherrors(histogram)
+                        histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
                         plot.Add(histogram)
             else:
                 for histogram in histograms:
                     if isinstance(histogram, ROOT.TProfile):
-                        histogram = self.convert_tprofile_to_tgrapherrors(histogram)
+                        histogram = cls.convert_tprofile_to_tgrapherrors(histogram)
                         plot.Add(histogram, "APZ")
                     else:
                         plot.Add(histogram)
 
-        self.histograms = histograms
-        self.plot = plot
-        self.attach_attributes()
+        return plot
 
     @classmethod
     def convert_tprofile_to_tgrapherrors(cls, tprofile):
@@ -1299,6 +1331,46 @@ class ValidationPlot(object):
                 value = stats_entry.GetVal()
                 additional_stats[label] = value
         return additional_stats
+
+    @classmethod
+    def gaus_slice_fit(cls, th2, name, z_score=None):
+        # profile = th2.ProfileX(name)
+
+        y_taxis = th2.GetYaxis()
+        fit_lower_bound = y_taxis.GetXmin()
+        fit_upper_bound = y_taxis.GetXmax()
+        if z_score:
+            y_mean = th2.GetMean(2)
+            y_std = th2.GetStdDev(2)
+            fit_lower_bound = max(fit_lower_bound, y_mean - z_score * y_std)
+            fit_upper_bound = min(fit_upper_bound, y_mean + z_score * y_std)
+
+        fit_tf1 = ROOT.TF1("Fit", "gaus", fit_lower_bound, fit_upper_bound)
+        fit_tf1.SetParName(0, "n")
+        fit_tf1.SetParName(1, "mean")
+        fit_tf1.SetParName(2, "std")
+        i_first_bin = 0
+        i_last_bin = -1
+        n_bins_inslice_filled = y_taxis.GetNbins() // 3
+        fit_options = "QNR"
+        param_fit_th1s = ROOT.TObjArray()
+        th2.FitSlicesY(fit_tf1, i_first_bin, i_last_bin, n_bins_inslice_filled, fit_options, param_fit_th1s)
+
+        th1_means = param_fit_th1s.At(1)
+        th1_means.SetName(name)
+        th1_means.SetTitle(th2.GetTitle())
+        for label, value in cls.get_additional_stats(th2).items():
+            cls.add_stats_entry(th1_means, label, value)
+
+        # Manually copy labels grumble grumble
+        x_taxis = th2.GetXaxis()
+        new_x_taxis = th1_means.GetXaxis()
+        for i_bin in range(x_taxis.GetNbins()):
+            label = x_taxis.GetBinLabel(i_bin)
+            if label != "":
+                new_x_taxis.SetBinLabel(i_bin, label)
+
+        return th1_means
 
     @classmethod
     def cumulate(cls, histogram, cumulation_direction=None):

@@ -42,6 +42,7 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
                 # print directly to the raw buffer object as bytes, don't
                 # decode/encode first
                 sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
+                sys.stdout.buffer.write(b"\n")
             return False
         else:
             return True
@@ -67,41 +68,41 @@ def run_test(argument):
     (out, err) = process.communicate()
     result = None
     message = None
-    if process.returncode != 0:
-        # check for skipped test
-        skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
-        if skipped:
-            result = None
-            message = skipped.group(1).decode()
-        else:
-            result = False
-            message = "return code %d" % process.returncode
-
-    else:
-        log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),
-                     compare_log(steering[:-2] + 'err', err, 0, options.diff_lines)]
-        if log_tests[0] is None and log_tests[1] is None:
-            result = True
-            message = "finished successfully"
-        elif not (log_tests[0] == False or log_tests[1] == False):
-            result = True
-            message = "logs ok"
-        else:
-            result = False
-            message = "logs differ"
-
-    extra = ""
-    if not options.quiet and process.returncode != 0:
-        output = []
-        if out.strip():
-            output += ["=== stdout of %s ===\n" % name, out.decode()]
-        if err.strip():
-            output += ["=== stderr of %s ===\n" % name, err.decode()]
-        if len(output):
-            output.append("=== end %s ===\n" % name)
-        extra = "".join(output)
-
     with print_lock:
+        if process.returncode != 0:
+            # check for skipped test
+            skipped = re.search(b"^TEST SKIPPED:\s*(.+)$", err, re.MULTILINE)
+            if skipped:
+                result = None
+                message = skipped.group(1).decode()
+            else:
+                result = False
+                message = "return code %d" % process.returncode
+
+        else:
+            log_tests = [compare_log(steering[:-2] + 'out', out, 1, options.diff_lines),
+                         compare_log(steering[:-2] + 'err', err, 0, options.diff_lines)]
+            if log_tests[0] is None and log_tests[1] is None:
+                result = True
+                message = "finished successfully"
+            elif not (log_tests[0] == False or log_tests[1] == False):
+                result = True
+                message = "logs ok"
+            else:
+                result = False
+                message = "logs differ"
+
+        extra = ""
+        if not options.quiet and process.returncode != 0:
+            output = []
+            if out.strip():
+                output += ["=== stdout of %s ===\n" % name, out.decode()]
+            if err.strip():
+                output += ["=== stderr of %s ===\n" % name, err.decode()]
+            if len(output):
+                output.append("=== end %s ===\n" % name)
+            extra = "".join(output)
+
         print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
     return (result, message)
 

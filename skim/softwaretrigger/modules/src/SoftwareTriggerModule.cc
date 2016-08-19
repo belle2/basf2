@@ -10,10 +10,21 @@ REG_MODULE(SoftwareTrigger)
 /// Create a new module instance and set the parameters.
 SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPointer("", DataStore::c_Event)
 {
-  setDescription("Module to perform cuts on various variables in the event. The cuts can be defined "
-                 "by elements loaded from the database. Each cut is executed, its result stored "
-                 "and the return value of this module is set to true of one of the cuts give a "
-                 "positive result.");
+  setDescription("Module to perform cuts on various variables in the event. The cuts can be defined"
+                 "by elements loaded from the database. Each cut is executed and its result stored."
+                 "The return value of this module is an integer, which is:\n"
+                 "if reject is more important than accept:"
+                 "* 1: if one of the accept cuts has a true result and none of the reject cuts is false ( = accepted)\n"
+                 "* 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)\n"
+                 "* -1: if one of the reject cuts is false ( = rejected)\n"
+                 "Please note that the reject cuts override the accept cuts decision in this case!\n"
+                 "if accept is more important than reject:\n"
+                 "* 1: if one of the accept cuts has a true result. ( = accepted)\n"
+                 "* 0: if neither one of the accept cuts is true nor one of the reject cuts false ( = don't know)\n"
+                 "* -1: if one of the reject cuts is false and none of the accept cuts is true ( = rejected)\n"
+                 "Please note that the accept cuts override the reject cuts decision in this case!"
+                 "What is more important can be controlled by the flag acceptOverridesReject, which is off by default "
+                 "(so reject is more important than accept by default).");
 
   setPropertyFlags(c_ParallelProcessingCertified);
 
@@ -26,6 +37,9 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "look for database entries with the form <base_identifier>/<cut_identifier> for each cut_identifier in the "
            "list of strings you provide here. Make sure to choose those wisely as the modules return value depends "
            "on these cuts.");
+
+  addParam("m_param_acceptOverridesReject", m_param_acceptOverridesReject, "Flag to control which class of cuts is "
+           "more \"important\": accept cuts or reject cuts.", m_param_acceptOverridesReject);
 
   addParam("resultStoreArrayName", m_param_resultStoreArrayName, "Store Object Pointer name for storing the "
            "trigger decision.", m_param_resultStoreArrayName);
@@ -88,13 +102,14 @@ void SoftwareTriggerModule::event()
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
-    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
-    const bool cutResult = cut->checkPreScaled(prefilledObject);
-    B2DEBUG(100, "The result if the trigger cut is " << cutResult);
+    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << "), with a prescale of " <<
+            cut->getPreScaleFactor());
+    const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
+    // TODO: B2DEBUG(100, "The result if the trigger cut is " << cutResult);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 
-  setReturnValue(m_resultStoreObjectPointer->getTotalResult());
+  setReturnValue(m_resultStoreObjectPointer->getTotalResult(m_param_acceptOverridesReject));
 }
 
 /// Check if the cut representations in the database have changed and download newer ones if needed.

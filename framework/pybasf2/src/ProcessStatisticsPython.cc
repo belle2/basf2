@@ -175,7 +175,7 @@ between them.)")
   scope statistics = stats;
 
   //Define enum for all the counter types in scope of class
-  enum_<ModuleStatistics::EStatisticCounters>("_EStatisticCounters", "Select type of statistics (corresponds to Module functions)")
+  enum_<ModuleStatistics::EStatisticCounters>("EStatisticCounters", "Select type of statistics (corresponds to Module functions)")
   .value("INIT", ModuleStatistics::c_Init)
   .value("BEGIN_RUN", ModuleStatistics::c_BeginRun)
   .value("EVENT", ModuleStatistics::c_Event)

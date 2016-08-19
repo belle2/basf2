@@ -133,6 +133,14 @@ namespace Belle2 {
         return m_preScaleFactor;
       }
 
+      /**
+       * Function to check if the cut is a reject cut.
+       */
+      bool isRejectCut() const
+      {
+        return m_rejectCut;
+      }
+
     private:
       /// Internal representation of the cut condition as a general cut.
       std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>> m_cut = nullptr;

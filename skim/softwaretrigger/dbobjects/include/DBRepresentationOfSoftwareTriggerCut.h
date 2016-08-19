@@ -36,7 +36,8 @@ namespace Belle2 {
      * Both can be easily uploaded into the database.
      */
     explicit DBRepresentationOfSoftwareTriggerCut(const std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut>& softwareTriggerCut) :
-      m_cutString(softwareTriggerCut->decompile()), m_preScaleFactor(softwareTriggerCut->getPreScaleFactor())
+      m_cutString(softwareTriggerCut->decompile()), m_preScaleFactor(softwareTriggerCut->getPreScaleFactor()),
+      m_reject(softwareTriggerCut->isRejectCut())
     {
     }
 
@@ -46,7 +47,7 @@ namespace Belle2 {
      */
     std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut> getCut() const
     {
-      return SoftwareTrigger::SoftwareTriggerCut::compile(m_cutString, m_preScaleFactor);
+      return SoftwareTrigger::SoftwareTriggerCut::compile(m_cutString, m_preScaleFactor, m_reject);
     }
 
   private:
@@ -58,8 +59,10 @@ namespace Belle2 {
     /// The internal storage of the string representation of the cut.
     std::string m_cutString = "";
     /// The internal storage of the prescale factor of the cut.
-    double m_preScaleFactor = 1;
+    unsigned int m_preScaleFactor = 1;
+    /// The internal storage if it is a reject cut.
+    bool m_reject = false;
 
-    ClassDef(DBRepresentationOfSoftwareTriggerCut, 1);
+    ClassDef(DBRepresentationOfSoftwareTriggerCut, 2);
   };
 }

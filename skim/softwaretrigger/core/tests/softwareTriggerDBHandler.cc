@@ -23,28 +23,31 @@ namespace Belle2 {
 
     /// Class to test the down- and upload of trigger cuts to the DB.
     class SoftwareTriggerDBHandlerTest : public ::testing::Test {
-
       /// Do everything in a temporary dir.
-      TestHelpers::TempDirCreator tmp_dir;
+      TestHelpers::TempDirCreator* tmp_dir;
 
       /// Setup the local DB and the datastore with the event meta data.
       void SetUp()
       {
+        tmp_dir = new TestHelpers::TempDirCreator;
+
         StoreObjPtr<EventMetaData> evtPtr;
         DataStore::Instance().setInitializeActive(true);
         evtPtr.registerInDataStore();
         DataStore::Instance().setInitializeActive(false);
-        evtPtr.construct(0, 0, 0);
+        evtPtr.construct(1, 0, 0);
 
-        LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
+        LocalDatabase::createInstance(tmp_dir->getTempDir() + "/testPayloads/TestDatabase.txt");
       }
 
       /// Destroy the DB and the DataStore.
       void TearDown()
       {
-        boost::filesystem::remove_all("testPayloads");
         Database::reset();
+        DBStore::Instance().reset();
         DataStore::Instance().reset();
+
+        delete tmp_dir;
       }
     };
 
@@ -87,6 +90,36 @@ namespace Belle2 {
       EXPECT_EQ(SoftwareTriggerCutResult::c_noResult,
                 cutsWithNames.at("software_trigger_cut_test_cutTwo")->checkPreScaled(preFilledObject));
 
+    }
+
+    /** Python down and upload functions */
+    TEST_F(SoftwareTriggerDBHandlerTest, pythonUpAndDownload)
+    {
+      IntervalOfValidity iov(0, 0, -1, -1);
+
+      // Create a new cut.
+      auto cutOne = SoftwareTriggerCut::compile("1 == 1", 1);
+
+      SoftwareTriggerDBHandler::upload(cutOne, "test", "cutOne1", iov);
+      auto downloadedCutOne = SoftwareTriggerDBHandler::download("test", "cutOne1");
+
+      ASSERT_NE(downloadedCutOne, nullptr);
+
+      EXPECT_EQ(cutOne->decompile(), downloadedCutOne->decompile());
+      EXPECT_EQ(cutOne->getPreScaleFactor(), downloadedCutOne->getPreScaleFactor());
+      EXPECT_EQ(cutOne->isRejectCut(), downloadedCutOne->isRejectCut());
+
+      // Create a second cut.
+      const auto& cutTwo = SoftwareTriggerCut::compile("1 == 2", 1, true);
+
+      SoftwareTriggerDBHandler::upload(cutTwo, "test", "cutTwo2", iov);
+      const auto& downloadedCutTwo = SoftwareTriggerDBHandler::download("test", "cutTwo2");
+
+      ASSERT_NE(downloadedCutTwo, nullptr);
+
+      EXPECT_EQ(cutTwo->decompile(), downloadedCutTwo->decompile());
+      EXPECT_EQ(cutTwo->getPreScaleFactor(), downloadedCutTwo->getPreScaleFactor());
+      EXPECT_EQ(cutTwo->isRejectCut(), downloadedCutTwo->isRejectCut());
     }
   }
 }

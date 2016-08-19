@@ -69,7 +69,6 @@ namespace Belle2 {
       static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier)
       {
         const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);
-        B2WARNING(fullCutName);
         DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullCutName);
         if (downloadedCut) {
           return downloadedCut->getCut();

@@ -1,5 +1,5 @@
 Import('env')
 
-#env['TOOLS_LIBS']['clipc'] = ['framework']
+env['TOOLS_LIBS']['monitor_ringbuffers'] = ['framework']
 
 Return('env')

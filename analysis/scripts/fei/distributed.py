@@ -126,6 +126,8 @@ def create_report(args, summary_file):
 def submit_job(args, i):
     os.chdir(args.directory + '/jobs/{}/'.format(i))
     if args.site == 'kekcc':
+        ret = subprocess.call("bsub -q l -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
+    elif args.site == 'kekcc2':
         ret = subprocess.call("bsub -q b2_fei -e error.log -o output.log ./basf2_script.sh | cut -f 2 -d ' ' | sed 's/<//' | sed 's/>//' > basf2_jobid", shell=True)  # noqa
     elif args.site == 'kitekp':
         ret = subprocess.call("qsub -cwd -q express,short,medium,long -e error.log -o output.log -V basf2_script.sh | cut -f 3 -d ' ' > basf2_jobid", shell=True)  # noqa
@@ -224,10 +226,13 @@ if __name__ == '__main__':
             for i in range(args.nJobs):
                 if start >= 6:
                     error_file = args.directory + '/jobs/{}/basf2_job_error'.format(i)
-                    if os.path.isfile(error_file):
+                    success_file = args.directory + '/jobs/{}/basf2_finished_successfully'.format(i)
+                    if os.path.isfile(error_file) or not os.path.isfile(success_file):
                         print("Delete " + error_file + " and resubmit job")
-                        os.remove(error_file)
-                        os.remove(args.directory + '/jobs/{}/basf2_finished_successfully'.format(i))
+                        if os.path.isfile(error_file):
+                            os.remove(error_file)
+                        if os.path.isfile(success_file):
+                            os.remove(success_file)
                     else:
                         continue
                 if not submit_job(args, i):

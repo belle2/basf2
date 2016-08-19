@@ -105,7 +105,7 @@ void SoftwareTriggerModule::event()
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << "), with a prescale of " <<
             cut->getPreScaleFactor());
     const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
-    // TODO: B2DEBUG(100, "The result if the trigger cut is " << cutResult);
+    //TODO: B2DEBUG(100, "The result if the trigger cut is " << cutResult);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 

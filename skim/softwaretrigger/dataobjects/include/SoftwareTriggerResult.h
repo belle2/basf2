@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/logging/Logger.h>
+
 #include <map>
 #include <string>
 #include <TObject.h>
@@ -22,12 +24,16 @@ namespace Belle2 {
       c_noResult /**< This cut did not give any information on what to do with the event. */
     };
 
+    /// Make the SoftwareTriggerCutResult printable
+    //std::ostream &operator<<(std::ostream &os, SoftwareTriggerCutResult const &result);
+
     /**
      * Dataobject to store the results of the cut calculations
      * performed by the SoftwareTriggerModule. This is basically
      * a map storing
      *  cut/trigger identifier -> result
      * where cut/trigger identifier is the identifier of the checked cut
+     * and result is a bool variable with the result of the decision.
      * and result is a bool variable with the result of the decision.
      */
     class SoftwareTriggerResult : public TObject {

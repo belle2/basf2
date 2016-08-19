@@ -35,6 +35,9 @@ CDCCosmicSelectorModule::CDCCosmicSelectorModule() : Module()
   addParam("wOfCounter", m_wOfCounter, "full-width  of trigger counter (cm)",  7.0);
   addParam("lOfCounter", m_lOfCounter, "full-length of trigger counter (cm)", 12.5);
   addParam("TOF", m_tof, "Tof=1(2): TOF from production point to trigger counter (IP) is subtracted", 1);
+  addParam("TOP", m_top, "TOP from hit point to pmt in trigger counter is subtracted (assuming PMT is put at -z end of counter",
+           false);
+  addParam("propSpeed", m_propSpeed, "Light prop. speed in counter (cm/ns)", 14.4);
   addParam("cryGenerator", m_cryGenerator, "true: CRY generator; false Cosmics generator", true);
 }
 
@@ -65,7 +68,7 @@ void CDCCosmicSelectorModule::event()
   */
 
   const double c = 29.9792458; //light speed (cm/ns)
-
+  bool returnVal = false;
   for (int iMCPs = 0; iMCPs < nMCPs; ++iMCPs) {
     MCParticle* m_P = mcParticles[iMCPs];
 
@@ -110,6 +113,7 @@ void CDCCosmicSelectorModule::event()
 
     //if hit, re-set the production time to zero at IP
     if (hitCounter) {
+      returnVal = true;
       const double p = sqrt(pX * pX + pY * pY + pZ * pZ);
       const double cX = pX / p;
       const double cY = pY / p;
@@ -153,15 +157,16 @@ void CDCCosmicSelectorModule::event()
       }
 
       const double tofToCounter = fl / (c * beta);
-      m_P->setProductionTime(pTime - tofToCounter);
+      const double topToPMT = m_top ? (zi - (m_zOfCounter - 0.5 * m_lOfCounter)) / m_propSpeed : 0.;
+      //      std::cout << "topToPMT= " << topToPMT << std::endl;
+      m_P->setProductionTime(pTime - tofToCounter - topToPMT);
       //      std::cout <<"org,mod= " << pTimeOrg << m_P->getProductionTime() << std::endl;
       //if not hit, reverse the momentum vector so that the particle will not be simulated
       //better to use condition in basf2...
     } else {
       m_P->setMomentum(-1. * momentum);
-      setReturnValue(false);
+
     }
-
   } // end loop over SimHits.
-
+  setReturnValue(returnVal);
 }

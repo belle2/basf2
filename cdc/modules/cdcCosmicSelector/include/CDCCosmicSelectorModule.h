@@ -44,8 +44,10 @@ namespace Belle2 {
     double m_phiOfCounter; /**< phi-angle of counter (deg) */
     double m_wOfCounter;   /**< full-width  of counter (cm) */
     double m_lOfCounter;   /**< full-length of counter (cm) */
+    double m_propSpeed;    /**< Light speed in counter (cm/ns) */
     int    m_tof;          /**< tof option */
     bool   m_cryGenerator; /**< cry or cosmics generator */
+    bool    m_top;         /**< top option */
   };
 
 } // end of Belle2 namespace

@@ -316,6 +316,9 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
             gearbox = register_module('Gearbox')
             path.add_module(gearbox)
             path.add_module('Geometry', ignoreIfPresent=False, components=['MagneticFieldConstantBelle'])
+            make_code_pickable('import ROOT\n'
+                               'from ROOT import Belle2\n'
+                               'ROOT.Belle2.BFieldManager.getInstance().setConstantOverride(0, 0, 1.5 * ROOT.Belle2.Unit.T)')
         else:
             path.add_module('Gearbox')
             path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])

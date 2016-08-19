@@ -25,7 +25,7 @@ namespace Belle2 {
 
       // Normal user case
       const auto compiledFirstCut = SoftwareTriggerCut::compile("one_variable == 1.1", 1);
-      EXPECT_TRUE(compiledFirstCut->checkPreScaled(softwareTriggerObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_accept, compiledFirstCut->checkPreScaled(softwareTriggerObject));
 
       // Unregistered variable
       EXPECT_THROW(SoftwareTriggerCut::compile("two_variable == 1.1", 1)->checkPreScaled(softwareTriggerObject),
@@ -35,11 +35,11 @@ namespace Belle2 {
 
       // Now it is registered
       const auto compiledSecondCut = SoftwareTriggerCut::compile("two_variable == 2.2", 1);
-      EXPECT_TRUE(compiledSecondCut->checkPreScaled(softwareTriggerObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_accept, compiledSecondCut->checkPreScaled(softwareTriggerObject));
 
       // Check should fail
       softwareTriggerObject["two_variable"] = 2.3;
-      EXPECT_FALSE(compiledSecondCut->checkPreScaled(softwareTriggerObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_noResult, compiledSecondCut->checkPreScaled(softwareTriggerObject));
     }
   }
 }

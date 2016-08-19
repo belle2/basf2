@@ -35,6 +35,24 @@ namespace Belle2 {
       unsigned int m_savedSeed = 0;
     };
 
+    /** Test simple cuts without prescales. */
+    TEST_F(SoftwareTriggerCutTest, basic)
+    {
+      SoftwareTriggerObject object;
+
+      auto cut = SoftwareTriggerCut::compile("1 == 1", 1, false);
+      EXPECT_EQ(SoftwareTriggerCutResult::c_accept, cut->checkPreScaled(object));
+
+      cut = SoftwareTriggerCut::compile("1 == 1", 1, true);
+      EXPECT_EQ(SoftwareTriggerCutResult::c_reject, cut->checkPreScaled(object));
+
+      cut = SoftwareTriggerCut::compile("-1 == 1", 1, false);
+      EXPECT_EQ(SoftwareTriggerCutResult::c_noResult, cut->checkPreScaled(object));
+
+      cut = SoftwareTriggerCut::compile("-1 == 1", 1, true);
+      EXPECT_EQ(SoftwareTriggerCutResult::c_noResult, cut->checkPreScaled(object));
+    }
+
     /** Test simple cuts and prescales. */
     TEST_F(SoftwareTriggerCutTest, prescaling)
     {
@@ -42,31 +60,38 @@ namespace Belle2 {
       SoftwareTriggerObject object;
 
       // As a random seed is implemented in the software trigger cut, we test it multiple times.
-      auto cut = SoftwareTriggerCut::compile("1 == 1", 0);
+      auto cut = SoftwareTriggerCut::compile("1 == 1", 0, false);
       for (unsigned int i = 0; i < 1e3; i++) {
-        EXPECT_FALSE(cut->checkPreScaled(object));
+        EXPECT_EQ(SoftwareTriggerCutResult::c_noResult, cut->checkPreScaled(object));
+      }
+
+      // For reject cuts, the prescale is not allowed to have any influence
+      cut = SoftwareTriggerCut::compile("1 == 1", 0, true);
+      for (unsigned int i = 0; i < 1e3; i++) {
+        EXPECT_EQ(SoftwareTriggerCutResult::c_reject, cut->checkPreScaled(object));
+      }
+
+      cut = SoftwareTriggerCut::compile("1 == 1", 1, true);
+      for (unsigned int i = 0; i < 1e3; i++) {
+        EXPECT_EQ(SoftwareTriggerCutResult::c_reject, cut->checkPreScaled(object));
       }
 
       cut = SoftwareTriggerCut::compile("1 == 1", 1);
       for (unsigned int i = 0; i < 1e3; i++) {
-        EXPECT_TRUE(cut->checkPreScaled(object));
+        EXPECT_EQ(SoftwareTriggerCutResult::c_accept, cut->checkPreScaled(object));
       }
-
-      // Test default value
-      cut = SoftwareTriggerCut::compile("1 == 1");
-      for (unsigned int i = 0; i < 1e3; i++) {
-        EXPECT_TRUE(cut->checkPreScaled(object));
-      }
-
       // As we set a stable seed, we know already the result quite well
       cut = SoftwareTriggerCut::compile("1 == 1", 10);
 
       unsigned int numberOfYes = 0;
       unsigned int numberOfNo = 0;
       for (unsigned int i = 0; i < 1e3; i++) {
-        if (cut->checkPreScaled(object)) {
+        const auto cutResult = cut->checkPreScaled(object);
+        EXPECT_NE(SoftwareTriggerCutResult::c_reject, cutResult);
+
+        if (cutResult == SoftwareTriggerCutResult::c_accept) {
           numberOfYes++;
-        } else {
+        } else if (cutResult == SoftwareTriggerCutResult::c_noResult) {
           numberOfNo++;
         }
       }

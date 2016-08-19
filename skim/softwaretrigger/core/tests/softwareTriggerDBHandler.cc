@@ -68,7 +68,8 @@ namespace Belle2 {
       // Download and test the single uploaded cut.
       dbHandler.initialize("test", {"cutOne"});
       const auto& cutsWithNames = dbHandler.getCutsWithNames();
-      EXPECT_TRUE(cutsWithNames.at("software_trigger_cut_test_cutOne")->checkPreScaled(preFilledObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_accept,
+                cutsWithNames.at("software_trigger_cut_test_cutOne")->checkPreScaled(preFilledObject));
       EXPECT_THROW(cutsWithNames.at("software_trigger_cut_test_cutTwo"), std::out_of_range);
 
       // Create the missing cut
@@ -81,8 +82,10 @@ namespace Belle2 {
       dbHandler.initialize("test", {"cutOne", "cutTwo"});
 
       // Try out both cuts
-      EXPECT_TRUE(cutsWithNames.at("software_trigger_cut_test_cutOne")->checkPreScaled(preFilledObject));
-      EXPECT_FALSE(cutsWithNames.at("software_trigger_cut_test_cutTwo")->checkPreScaled(preFilledObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_accept,
+                cutsWithNames.at("software_trigger_cut_test_cutOne")->checkPreScaled(preFilledObject));
+      EXPECT_EQ(SoftwareTriggerCutResult::c_noResult,
+                cutsWithNames.at("software_trigger_cut_test_cutTwo")->checkPreScaled(preFilledObject));
 
     }
   }

@@ -304,8 +304,10 @@ class PullAnalysis(object):
                 aux_residuals_profile.profile(aux_values,
                                               residuals,
                                               outlier_z_score=outlier_z_score,
+                                              gaus_z_score=1.0,
                                               allow_discrete=True,
-                                              is_expert=is_expert)
+                                              is_expert=is_expert,
+                                              )
                 aux_residuals_profile.xlabel = compose_axis_label(aux_name)
                 aux_residuals_profile.ylabel = compose_axis_label("#Delta " + quantity_name + " (estimate - truth)", self.unit)
                 aux_residuals_profile.title = formatter.format(plot_title,

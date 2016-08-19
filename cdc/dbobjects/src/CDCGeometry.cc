@@ -242,4 +242,9 @@ void CDCGeometry::read(const GearDir& content)
   m_misalignmentFile = content.getString("misalignmentFileName");
   m_alignmentFile = content.getString("alignmentFileName");
 
+  m_thresholdEnergyDeposit = content.getWithUnit("SensitiveDetector/EnergyDepositionThreshold");
+  m_minTrackLength = content.getWithUnit("SensitiveDetector/MinTrackLength");
+  m_wireSag = content.getBool("SensitiveDetector/WireSag");
+  m_modLeftRightFlag = content.getBool("SensitiveDetector/ModifiedLeftRightFlag");
+
 }

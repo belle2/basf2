@@ -82,8 +82,8 @@ namespace Belle2 {
     void GeoCDCCreator::createGeometry(const CDCGeometry& geo, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
-      G4Material* medHelium = geometry::Materials::get("Helium");
-      G4Material* medEthane = geometry::Materials::get("Ethane");
+      G4Material* medHelium = geometry::Materials::get("CDCHeGas");
+      G4Material* medEthane = geometry::Materials::get("CDCEthaneGas");
       G4Material* medAluminum = geometry::Materials::get("Al");
       G4Material* medTungsten = geometry::Materials::get("W");
       G4Material* medCFRP = geometry::Materials::get("CFRP");

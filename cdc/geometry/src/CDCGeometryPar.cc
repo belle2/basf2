@@ -344,6 +344,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     readWirePositionParams(geom, c_Aligned);
   }
 
+
+  // Get control params. for CDC FullSim
+  m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
+  m_minTrackLength = geom.getMinimumTrackLength();
+  m_wireSag = geom.getWireSagMode();
+  m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+
   m_XTetc = true;
   if (m_XTetc) {
 #if defined(CDC_XT_FROM_DB)

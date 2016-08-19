@@ -1039,6 +1039,39 @@ namespace Belle2 {
      */
     std::string getAlignmentFile() const { return m_alignmentFile;}
 
+    /**
+     * Get the threshold of energy deposition in geant4.
+     */
+    double getEnergyDepositThreshold() const
+    {
+      return m_thresholdEnergyDeposit;
+    }
+
+    /**
+     * Get the minimum track length.
+     */
+    double getMinimumTrackLength() const
+    {
+      return m_minTrackLength;
+    }
+
+    /**
+     * Get the wire sag mode.
+     */
+    bool getWireSagMode() const
+    {
+      return m_wireSag;
+    }
+
+    /**
+     * Get the modified left/right definition mode.
+     */
+    bool getModifiedLeftRightFlag() const
+    {
+      return m_modLeftRightFlag;
+    }
+
+
   private:
 
     double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
@@ -1073,6 +1106,11 @@ namespace Belle2 {
     bool m_alignment; /**< Alignment mode. */
     std::string m_misalignmentFile; /**< Misalignment file. */
     std::string m_alignmentFile; /**< Alignment file. */
+
+    double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
+    double m_minTrackLength;         /*!< Minimum track length for G4 step */
+    bool m_wireSag;        /*!< Switch for sense wire sag */
+    bool m_modLeftRightFlag; /*!< Switch for modified left/right flag */
 
     ClassDef(CDCGeometry, 1);  /**< ClassDef, must be the last term before the closing {}*/
 

@@ -11,6 +11,7 @@
 #include <beast/pindiode/modules/PindiodeStudyModule.h>
 #include <beast/pindiode/dataobjects/PindiodeSimHit.h>
 #include <beast/pindiode/dataobjects/PindiodeHit.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -70,13 +71,16 @@ void PindiodeStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in PINDIODE.xml.
   for (int i = 0; i < 100; i++) {
-    h_dose1[i] = new TH1F(TString::Format("h_dose1_%d", i), "", 10000, 0., 1000.);
-    h_dose2[i] = new TH1F(TString::Format("h_dose2_%d", i), "", 10000, 0., 1000.);
+    h_dose1[i] = new TH1F(TString::Format("h_dose1_%d", i), "", 10000, 0., 10000.);
+    h_dose2[i] = new TH1F(TString::Format("h_dose2_%d", i), "", 10000, 0., 10000.);
+    h_dose1Weight[i] = new TH1F(TString::Format("h_dose1Weight_%d", i), "", 10000, 0., 10000.);
+    h_dose2Weight[i] = new TH1F(TString::Format("h_dose2Weight_%d", i), "", 10000, 0., 10000.);
     h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 100.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
 
-    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 10000, 0., 1000.);
+    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 10000, 0., 10000.);
+    h_idoseWeight[i] = new TH1F(TString::Format("h_idoseWeight_%d", i), "", 10000, 0., 10000.);
     h_ivolt[i] = new TH1F(TString::Format("h_ivolt_%d", i), "", 10000, 0., 100.);
     h_itime[i] = new TH1F(TString::Format("h_itime_%d", i), "", 1000, 0., 100.);
     h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
@@ -106,6 +110,11 @@ void PindiodeStudyModule::event()
 
   StoreArray<PindiodeSimHit>  SimHits;
   StoreArray<PindiodeHit> Hits;
+  StoreArray<SADMetaHit> sadMetaHits;
+  double rate = 0;
+  for (const auto& sadMetaHit : sadMetaHits) {
+    rate = sadMetaHit.getrate();
+  }
 
   //Skip events with no Hits
   if (SimHits.getEntries() == 0) {
@@ -125,8 +134,10 @@ void PindiodeStudyModule::event()
       const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
       double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
       h_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_dose1Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
       if ((edep * 1e9) > m_WorkFunction) {
         h_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
+        h_dose2Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
         h_volt[detNb]->Fill(volt * 1e3); //V to mV
         h_time[detNb]->Fill(time);
         h_vtime[detNb]->Fill(time, volt);
@@ -141,7 +152,8 @@ void PindiodeStudyModule::event()
       double edep = aHit->getedep();
       double volt = aHit->getV();
       double time = aHit->gettime();
-      h_idose[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_idose[detNb]->Fill(edep); //keV
+      h_idoseWeight[detNb]->Fill(edep, rate); //keV
       h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
       h_itime[detNb]->Fill(time);
       h_ivtime[detNb]->Fill(time, volt);

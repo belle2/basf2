@@ -83,6 +83,8 @@ void CsiStudy_v2Module::defineHisto()
     h_csi_edep[i] = new TH1F(TString::Format("h_csi_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep1[i] = new TH1F(TString::Format("h_csi_edep1_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep2[i] = new TH1F(TString::Format("h_csi_edep2_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_csi_edep1Weight[i] = new TH1F(TString::Format("h_csi_edep1Weight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_csi_edep2Weight[i] = new TH1F(TString::Format("h_csi_edep2Weight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_nocut[i] = new TH1F(TString::Format("h_csi_edep_nocut_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_test[i] = new TH1F(TString::Format("h_csi_edep_test_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
   }
@@ -117,13 +119,13 @@ void CsiStudy_v2Module::event()
   if (SimHits.getEntries() == 0) {
     return;
   }
-
+  double rate = 0;
   int nSAD = SADtruth.getEntries();
   Bool_t Reject = false;
   for (int i = 0; i < nSAD; i++) {
     SADMetaHit* aHit = SADtruth[i];
     double s = aHit->gets();
-    //double rate = aHit->getrate();
+    rate = aHit->getrate();
     h_csi_s->Fill(-s);
     if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
       h_csi_s_cut->Fill(-s);
@@ -161,6 +163,8 @@ void CsiStudy_v2Module::event()
     double tof = Hit.getFlightTime(); //ns
     h_csi_edep1[detNB]->Fill(Edep);
     h_csi_edep2[detNB]->Fill(RecEdep);
+    h_csi_edep1Weight[detNB]->Fill(Edep, rate);
+    h_csi_edep2Weight[detNB]->Fill(RecEdep, rate);
     h_csi_Evtof5[detNB]->Fill(tof, Edep);
     h_csi_Evtof6[detNB]->Fill(tof, RecEdep);
   }

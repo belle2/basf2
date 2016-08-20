@@ -86,6 +86,9 @@ void BgoStudyModule::defineHisto()
 
     h_bgo_edep[i] = new TH1F(TString::Format("h_bgo_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_bgo_edep_test[i] = new TH1F(TString::Format("h_bgo_edep_test_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+
+    h_bgo_edepWeight[i] = new TH1F(TString::Format("h_bgo_edepWeight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_bgo_edep_testWeight[i] = new TH1F(TString::Format("h_bgo_edep_testWeight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
   }
   h_bgo_s = new TH1F("h_bgo_s", "", 4000, -200., 200.);
   h_bgo_s_cut = new TH1F("h_bgo_s_cut", "", 4000, -200., 200.);
@@ -118,13 +121,13 @@ void BgoStudyModule::event()
   if (SimHits.getEntries() == 0) {
     return;
   }
-
+  double rate = 0;
   int nSAD = SADtruth.getEntries();
   Bool_t Reject = false;
   for (int i = 0; i < nSAD; i++) {
     SADMetaHit* aHit = SADtruth[i];
     double s = aHit->gets();
-    //double rate = aHit->getrate();
+    rate = aHit->getrate();
     h_bgo_s->Fill(-s);
     if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
       h_bgo_s_cut->Fill(-s);
@@ -160,6 +163,8 @@ void BgoStudyModule::event()
     const double tof = Hit.getFlightTime(); //ns
     h_bgo_edep[detNB]->Fill(recedep);
     h_bgo_edep_test[detNB]->Fill(edep);
+    h_bgo_edepWeight[detNB]->Fill(recedep, rate);
+    h_bgo_edep_testWeight[detNB]->Fill(edep, rate);
     h_bgo_Evtof1[detNB]->Fill(tof, recedep);
     h_bgo_Evtof2[detNB]->Fill(tof, edep);
   }

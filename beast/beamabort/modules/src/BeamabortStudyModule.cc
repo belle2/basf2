@@ -71,11 +71,13 @@ void BeamabortStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in BEAMABORT.xml.
   for (int i = 0; i < 8; i++) {
-    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 1000, 0., 1000.);
+    h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 10000.);
+    h_doseWeight[i] = new TH1F(TString::Format("h_doseWeight_%d", i), "", 10000, 0., 10000.);
     h_amp[i] = new TH1F(TString::Format("h_amp_%d", i), "", 10000, 0., 10000.);
     h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
     h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
-    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 1000, 0., 1000.);
+    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 10000, 0., 10000.);
+    h_idoseWeight[i] = new TH1F(TString::Format("h_idoseWeight_%d", i), "", 10000, 0., 10000.);
     h_iamp[i] = new TH1F(TString::Format("h_iamp_%d", i), "", 10000, 0., 10000.);
     h_itime[i] = new TH1F(TString::Format("h_itime_%d", i), "", 1000, 0., 100.);
     h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
@@ -119,13 +121,13 @@ void BeamabortStudyModule::event()
   if (SimHits.getEntries() == 0) {
     return;
   }
-
+  double rate = 0;
   int nSAD = SADtruth.getEntries();
   //Bool_t Reject = false;
   for (int i = 0; i < nSAD; i++) {
     SADMetaHit* aHit = SADtruth[i];
     double s = aHit->gets();
-    //double rate = aHit->getrate();
+    rate = aHit->getrate();
     h_s->Fill(-s);
     if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
       h_s_cut->Fill(-s);
@@ -147,6 +149,7 @@ void BeamabortStudyModule::event()
       Edep[detNb] += edep;
       curr[detNb] += Amp;
       h_dose[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_doseWeight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
       h_amp[detNb]->Fill(Amp * 1e15); //A x s -> mA x s
       h_time[detNb]->Fill(time);
       h_vtime[detNb]->Fill(time, Amp * 1e15);
@@ -166,7 +169,8 @@ void BeamabortStudyModule::event()
     double edep = aHit->getedep();
     double current = aHit->getI();
     double time = aHit->gettime();
-    h_idose[detNb]->Fill(edep * 1e6); //GeV to keV
+    h_idose[detNb]->Fill(edep); //keV
+    h_idoseWeight[detNb]->Fill(edep, rate); //keV
     h_iamp[detNb]->Fill(current * 1e6); //I to uI
     h_itime[detNb]->Fill(time);
     h_ivtime[detNb]->Fill(time, current * 1e6);

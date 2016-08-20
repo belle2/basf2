@@ -92,6 +92,10 @@ namespace Belle2 {
       TH1F* h_bgo_edep[8];
       /** Energy deposited */
       TH1F* h_bgo_edep_test[8];
+      /** Energy deposited */
+      TH1F* h_bgo_edepWeight[8];
+      /** Energy deposited */
+      TH1F* h_bgo_edep_testWeight[8];
       /** Scattering position in the rings */
       TH1F* h_bgo_s;
       /** Scattering position in the rings */

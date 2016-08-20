@@ -1,10 +1,10 @@
-#include "shapes.hh"
+#include "ecl/geometry/shapes.h"
 #include "G4TessellatedSolid.hh"
 #include "G4TriangularFacet.hh"
 #include "G4QuadrangularFacet.hh"
 #include <G4ExtrudedSolid.hh>
 #include "G4Trap.hh"
-#include "BelleCrystal.hh"
+#include "ecl/geometry/BelleCrystal.h"
 #include <iostream>
 #include <fstream>
 #include <iterator>
@@ -15,255 +15,14 @@
 #include <G4Vector3D.hh>
 #include <G4Polycone.hh>
 #include <G4LogicalVolume.hh>
-#include "BelleLathe.hh"
+#include "ecl/geometry/BelleLathe.h"
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
 using namespace std;
 
-G4VSolid* solid_to_test;
-
-void pentspeed(G4VSolid* p)
-{
-  ifstream IN("input.dat");
-  string t;
-  struct test_t {
-    G4ThreeVector p, v;
-    bool k;
-    double lmin;
-  };
-  vector<test_t> a;
-  double px, py, pz, vx, vy, vz, lmin;
-  bool k;
-  while (IN >> t >> px >> py >> pz >> vx >> vy >> vz >> k >> lmin) {
-    test_t v = {G4ThreeVector(px, py, pz), G4ThreeVector(vx, vy, vz), k, lmin};
-    a.push_back(v);
-  }
-
-  for (int j = 0; j < 2 * 10000; j++) {
-    for (int i = 0, imax = a.size(); i < imax; i++) {
-      const test_t& v = a[i];
-      G4ThreeVector r;
-      bool is;
-      p->DistanceToOut(v.p, v.v, v.k, &is, &r);
-      //      double d = p->DistanceToOut(v.p);
-      //      if(abs((d-v.lmin)/v.lmin)>1e-15) cout<<i<<" "<<d<<" "<<d-v.lmin<<" "<<v.p<<" "<<v.v<<endl;
-    }
-  }
-  //measured  ~146 clocks/call for BelleCrystal::DistanceToOut(v.p,v.v,v.k,&is,&r);
-  //measured ~28.4 clocks/call for BelleCrystal::DistanceToOut(v.p);
-  //measured ~1582 clocks/call for G4TessellatedSolid::DistanceToOut(v.p,v.v,v.k,&is,&r);
-  //measured ~2082 clocks/call for G4TessellatedSolid::DistanceToOut(v.p);
-  cout << a.size() << endl;
-
-}
-
-void pentspeed2(G4VSolid* p)
-{
-  ifstream IN("input2.dat");
-  string t;
-  struct test_t {
-    G4ThreeVector p, v;
-    double lmin;
-  };
-  vector<test_t> a;
-  double px, py, pz, vx, vy, vz, lmin;
-  while (IN >> t >> px >> py >> pz >> vx >> vy >> vz >> lmin) {
-    test_t v = {G4ThreeVector(px, py, pz), G4ThreeVector(vx, vy, vz), lmin};
-    a.push_back(v);
-  }
-
-  for (int j = 0; j < 2 * 10000; j++) {
-    for (int i = 0, imax = a.size(); i < imax; i++) {
-      const test_t& v = a[i];
-      p->DistanceToIn(v.p, v.v);
-      //      double d = p->DistanceToIn(v.p);
-      //      if(abs((d-v.lmin)/v.lmin)>1e-15) cout<<i<<" "<<d<<" "<<d-v.lmin<<" "<<v.p<<" "<<v.v<<endl;
-    }
-  }
-  // measured ~107 clocks/call for BelleCrystal::DistanceToIn(v.p,v.v)
-  // measured  ~26 clocks/call for BelleCrystal::DistanceToIn(v.p);
-  // measured ~650 clocks/call for G4TessellatedSolid::DistanceToIn(v.p,v.v)
-  // measured  ~46 clocks/call for G4TessellatedSolid::DistanceToIn(v.p);
-  cout << a.size() << endl;
-}
-
-extern int _test_mode, _method, _shape;
-#define M 5
-void shapespeed(G4VSolid* p)
-{
-  ifstream IN("out_sv_fwd_crystal2.log");
-  //  ifstream IN("out_sv_fwd_crystals.log");
-  //  ifstream IN("out_sv_crystalcontainer.log");
-  struct test0_t {G4ThreeVector p;};
-  struct test3_t {G4ThreeVector p, v;};
-  struct test5_t {G4ThreeVector p, v; bool n;};
-  const char* methodnames[] = {"Inside(p)", "SurfaceNormal(p)", "DistanceToIn(p)", "DistanceToOut(p)", "DistanceToIn(p,v)", "DistanceToOut(p,v)"};
-
-  int jmax = _test_mode;
-  //  if(_test_mode>0) jmax = _test_mode;
-  cout << "Testing " << methodnames[_method] << " " << p->GetEntityType() << endl;
-  G4ThreeVector shift(0, 0, 0); // for crystal #2
-  if (p->GetEntityType() == "G4Trap" && p->GetName() == "sv_fwd_crystal2")
-    shift.set(0.0001000898483098922, -0.032559907410922406, 0); // for trapezoid crystal #2
-  if (_method <= 3) {
-    vector<test0_t> a;
-    string s;
-    while (getline(IN, s)) {
-      if (s.find(methodnames[_method]) != 0) continue;
-      istringstream ost(s);
-      string t;        ost >> t;
-      double px, py, pz; ost >> px >> py >> pz; G4ThreeVector p(px, py, pz); p -= shift;
-      test0_t u = {p};
-      a.push_back(u);
-    }
-
-    cout << "Nsample = " << a.size() << " " << jmax << endl;
-    if (_method == 0) {
-      for (int j = 0; j < jmax; j++) {
-        for (int i = 0, imax = a.size(); i < imax; i++) {
-          const test0_t& v = a[i];
-          p->Inside(v.p);
-        }
-      }
-    } else if (_method == 1) {
-      for (int j = 0; j < jmax; j++) {
-        for (int i = 0, imax = a.size(); i < imax; i++) {
-          const test0_t& v = a[i];
-          p->SurfaceNormal(v.p);
-        }
-      }
-    } else if (_method == 2) {
-      for (int j = 0; j < jmax; j++) {
-        for (int i = 0, imax = a.size(); i < imax; i++) {
-          const test0_t& v = a[i];
-          p->DistanceToIn(v.p);
-        }
-      }
-    } else if (_method == 3) {
-      for (int j = 0; j < jmax; j++) {
-        for (int i = 0, imax = a.size(); i < imax; i++) {
-          const test0_t& v = a[i];
-          p->DistanceToOut(v.p);
-        }
-      }
-    }
-  } else if (_method == 4) {
-    vector<test3_t> a;
-    string s;
-    while (getline(IN, s)) {
-      if (s.find(methodnames[_method]) != 0) continue;
-      istringstream ost(s);
-      string t;        ost >> t;
-      double px, py, pz; ost >> px >> py >> pz; G4ThreeVector p(px, py, pz); p -= shift;
-      double vx, vy, vz; ost >> vx >> vy >> vz; G4ThreeVector v(vx, vy, vz);
-      test3_t u = {p, v};
-      a.push_back(u);
-    }
-
-    cout << "Nsample = " << a.size() << " " << jmax << endl;
-    for (int j = 0; j < jmax; j++) {
-      for (int i = 0, imax = a.size(); i < imax; i++) {
-        const test3_t& v = a[i];
-        p->DistanceToIn(v.p, v.v);
-      }
-    }
-  } else if (_method == 5) {
-    vector<test5_t> a;
-    string s;
-    while (getline(IN, s)) {
-      if (s.find(methodnames[_method]) != 0) continue;
-      istringstream ost(s);
-      string t;        ost >> t;
-      double px, py, pz; ost >> px >> py >> pz; G4ThreeVector p(px, py, pz); p -= shift;
-      double vx, vy, vz; ost >> vx >> vy >> vz; G4ThreeVector v(vx, vy, vz);
-      bool n;          ost >> n;
-      test5_t u = {p, v, n};
-      a.push_back(u);
-    }
-
-    cout << "Nsample = " << a.size() << " " << jmax << endl;
-
-    for (int j = 0; j < jmax; j++) {
-      for (int i = 0, imax = a.size(); i < imax; i++) {
-        const test5_t& v = a[i];
-        bool isvalid; G4ThreeVector n; p->DistanceToOut(v.p, v.v, v.n, &isvalid, &n);
-      }
-    }
-  }
-  // cout<<"Ninside = "<<count<<endl;
-
-  // G4Polycone sv_crystalcontainersolid with 18 z-planes in 2*M_PI angle
-  // 1187 Inside(v.p)
-  // 1934 SurfaceNormal(v.p)
-  // 1603 DistanceToIn(v.p)
-  // 1364 DistanceToOut(v.p)
-  // 3375 DistanceToIn(v.p,v.v)
-  // 3314 DistanceToOut(v.p,v.v,v.n)
-
-  // BelleLathe sv_crystalcontainersolid with 18 z-planes in 2*M_PI angle
-  // 246 Inside(v.p)
-  // 294 SurfaceNormal(v.p)
-  // 278 DistanceToIn(v.p)
-  // 245 DistanceToOut(v.p)
-  // 780 DistanceToIn(v.p,v.v)
-  // 752 DistanceToOut(v.p,v.v,v.n)
-
-  // G4Polycone sv_fwd_crystalssolid with 3 z-planes in 1/8*M_PI angle
-  // clocks/call method's name
-  // 1266 Inside(v.p)
-  // 1403 SurfaceNormal(v.p)
-  // 1736 DistanceToIn(v.p)
-  // 1381 DistanceToOut(v.p)
-  // 1382 DistanceToIn(v.p,v.v)
-  // 1432 DistanceToOut(v.p,v.v,v.n)
-
-  // BelleLathe sv_fwd_crystalssolid with 3 z-planes in 1/8*M_PI angle
-  // clocks/call method's name
-  // 102 Inside(v.p)
-  // 193 SurfaceNormal(v.p)
-  // 112 DistanceToIn(v.p)
-  // 129 DistanceToOut(v.p)
-  // 312 DistanceToIn(v.p,v.v)
-  // 301 DistanceToOut(v.p,v.v,v.n)
-
-  // G4Trap sv_fwd_crystal2
-  // clocks/call method's name
-  // 34.7   Inside(v.p)
-  // 67.1   SurfaceNormal(v.p)
-  // 20.1   DistanceToIn(v.p)
-  // 23.7   DistanceToOut(v.p)
-  // 126.6  DistanceToIn(v.p,v.v)
-  // 130.6  DistanceToOut(v.p,v.v,v.n)
-
-  // G4ExtrudedSolid sv_fwd_crystal2
-  // clocks/call method's name
-  // 397   Inside(v.p)
-  // 1453. SurfaceNormal(v.p)
-  // 24.4  DistanceToIn(v.p)
-  // 1554  DistanceToOut(v.p)
-  // 885   DistanceToIn(v.p,v.v)
-  // 1288  DistanceToOut(v.p,v.v,v.n)
-
-  // G4TesselatedSolid sv_fwd_crystal2
-  // clocks/call method's name
-  // 3033  Inside(v.p)
-  // 830   SurfaceNormal(v.p)
-  // 15.3  DistanceToIn(v.p)
-  // 1509  DistanceToOut(v.p)
-  // 863   DistanceToIn(v.p,v.v)
-  // 1262  DistanceToOut(v.p,v.v,v.n)
-
-  // BelleCrystal sv_fwd_crystal2
-  // clocks/call method's name         ncalls
-  // 24.1   Inside(v.p)                126047
-  // 54.5   SurfaceNormal(v.p)           2426
-  // 22.0   DistanceToIn(v.p)           39188
-  // 25.6   DistanceToOut(v.p)         381759
-  // 95.2   DistanceToIn(v.p,v.v)       15351
-  // 124.7  DistanceToOut(v.p,v.v,v.n)  54706
-  _exit(0);
-}
-#undef M
+double cosd(double x) {return cos(x * (M_PI / 180));}
+double sind(double x) {return sin(x * (M_PI / 180));}
+double tand(double x) {return tan(x * (M_PI / 180));}
 
 double volume(const G4ThreeVector& v0, const G4ThreeVector& v1, const G4ThreeVector& v2, const G4ThreeVector& v3)
 {
@@ -303,25 +62,7 @@ G4ThreeVector moveto(double r, double phi)
 
 G4VSolid* shape_t::get_solid(const string& prefix, double wrapthick, G4Translate3D& shift) const
 {
-  G4VSolid* shape;
-  // if(_shape/10 == 0) shape = get_trapezoid(prefix, wrapthick, shift);
-  // else if(_shape/10 == 1) shape = get_bellecrystal(prefix, wrapthick, shift);
-  // else if(_shape/10 == 2) shape = get_extrudedsolid(prefix, wrapthick, shift);
-  // else shape = get_tesselatedsolid(prefix, wrapthick, shift);
-
-  if (_shape / 10 == 0) {
-    if (istrap()) shape = get_trapezoid(prefix, wrapthick, shift);
-    else shape = get_tesselatedsolid(prefix, wrapthick, shift);
-  } else {
-    shape = get_bellecrystal(prefix, wrapthick, shift);
-  }
-  //    if(istrap())
-  // if(shape->GetName()=="sv_fwd_crystal2"){
-  //   solid_to_test = shape;
-  //   //      if(istrap()) cout<<"trap"<<endl;
-  //   shapespeed(shape);
-  // }
-  return shape;
+  return get_bellecrystal(prefix, wrapthick, shift);
 }
 
 G4ThreeVector centerofgravity(const map<int, G4ThreeVector>& v, int i0, int n)
@@ -948,29 +689,8 @@ G4VSolid* getpc_solid(const char* pref, int n, const TripletF* b, double phi0, d
     v2[i] = ri;
     v3[i] = ro;
   }
-  string solidname(pref); solidname += "solid";
-  G4VSolid* shape;
-  if ((_shape % 10) == 0)
-    shape = new G4Polycone(solidname.c_str(), phi0, dphi, n, v1.data(), v2.data(), v3.data());
-  else
-    shape = new BelleLathe(solidname.c_str(), phi0, dphi, n, v1.data(), v2.data(), v3.data());
-
-  //  if(solidname == "sv_crystalcontainersolid") shapespeed(shape);
-  //  if(solidname == "sv_fwd_crystalssolid") shapespeed(shape);
-
-  // if(solidname == "sv_inletsolid"){
-  //   for(int i=0;i<100000;i++){
-  //     auto v = shape->GetPointOnSurface();
-  //     cout<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
-  //   }
-  //   cout<<endl;
-  //   _exit(0);
-  // }
-  //  cout<<pref<<" "<<shape->GetCubicVolume()<<" "<<shape->GetSurfaceArea()<<endl;
-  //  cout<<pref<<" "<<shape->GetCubicVolume()<<endl;
-  //  cout<<pref<<" "<<shape->GetSurfaceArea()<<endl;
-
-  return shape;
+  string solidname(pref); solidname += "_solid";
+  return new BelleLathe(solidname.c_str(), phi0, dphi, n, v1.data(), v2.data(), v3.data());
 }
 
 G4VSolid* getpc_solid(const char* pref, const TripletF* b, const TripletF* e, double phi0, double dphi)
@@ -982,7 +702,7 @@ G4LogicalVolume* getpc(const char* pref, const TripletF* b, const TripletF* e, d
                        G4VisAttributes* attvol = NULL)
 {
   G4VSolid* pcons = getpc_solid(pref, b, e, phi0, dphi);
-  string lvolname(pref); lvolname += "logic";
+  string lvolname(pref); lvolname += "_logic";
   G4LogicalVolume* pconl = new G4LogicalVolume(pcons, med, lvolname.c_str());
   if (attvol != NULL) pconl->SetVisAttributes(attvol);
   return pconl;

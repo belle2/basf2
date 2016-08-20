@@ -5,7 +5,6 @@
 #include <G4VSolid.hh>
 #include <G4Transform3D.hh>
 #include <G4LogicalVolume.hh>
-#include <BelleCrystal.hh>
 
 double cosd(double);
 double sind(double);
@@ -41,8 +40,17 @@ struct cplacement_t {
 std::vector<shape_t*> load_shapes(const std::string& fname);
 
 G4VSolid* getpc_solid(const char*, int n, const TripletF*, double, double);
+struct Point_t;
 Point_t centerofgravity(Point_t*, Point_t*);
 G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
 G4Transform3D get_transform(const cplacement_t& t);
+
+inline std::string suf(const std::string& s, int indx)
+{
+  std::string r(s);
+  r += "_" + std::to_string(indx);
+  return r;
+}
+
 
 #endif //__h_shapes

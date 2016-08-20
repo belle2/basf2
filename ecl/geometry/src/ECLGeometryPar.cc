@@ -201,6 +201,8 @@ void ECLGeometryPar::read()
   m_crystals.clear();
   m_crystals.reserve(46 * 2 + 132); // 10752 bytes
 
+  return;
+
   G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
   G4ThreeVector a0(0, 0, 0), a1(0, 0, 1);
 
@@ -279,7 +281,6 @@ void ECLGeometryPar::InitCrystal(int cid)
   const CrystalGeom_t& t = m_crystals[indx];
   double phi = nreplica * sectorPhi[isect], s, c;
   sincos(phi, &s, &c);
-  // cout<<cid<<" "<<thetaid<<" "<<phiid<<" "<<nreplica<<" "<<indx<<" "<<isect<<" "<<sectorPhi[isect]<<" "<<phi<<" "<<s<<" "<<c<<endl;
 
   double xp = c * t.pos.x() - s * t.pos.y();
   double yp = s * t.pos.x() + c * t.pos.y();

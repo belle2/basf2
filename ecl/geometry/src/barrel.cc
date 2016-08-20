@@ -1,5 +1,3 @@
-#include "BelleLathe.hh"
-#include "BelleCrystal.hh"
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4NistManager.hh"
@@ -20,7 +18,10 @@
 #include "CLHEP/Matrix/Matrix.h"
 #include "G4Vector3D.hh"
 #include "G4Point3D.hh"
-#include "shapes.hh"
+
+#include "ecl/geometry/BelleLathe.h"
+#include "ecl/geometry/BelleCrystal.h"
+#include "ecl/geometry/shapes.h"
 
 using namespace std;
 
@@ -1026,7 +1027,13 @@ G4VSolid* get_crystal_support(int n)
   return new G4ExtrudedSolid(name, p, 1.5, off, 1, off, 1);
 }
 
-void barrel(G4LogicalVolume* top)
+namespace  Belle2 {
+  namespace ECL {
+    void barrel(G4LogicalVolume* top);
+  };
+};
+
+void Belle2::ECL::barrel(G4LogicalVolume* top)
 {
   // bool b_crystals = false;
   // bool b_forward_support_legs = false;
@@ -1063,8 +1070,32 @@ void barrel(G4LogicalVolume* top)
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
 
-  //  G4Material* medCsI = nist->FindOrBuildMaterial("G4_CESIUM_IODIDE");
-  //  G4Material* medSilicon = nist->FindOrBuildMaterial("G4_Si");
+  G4Material* sus304 = new G4Material("SUS304", 8.00 * CLHEP::g / CLHEP::cm3, 3);
+  sus304->AddElement(nist->FindOrBuildElement("Fe"), 0.74);
+  sus304->AddElement(nist->FindOrBuildElement("Cr"), 0.18);
+  sus304->AddElement(nist->FindOrBuildElement("Ni"), 0.08);
+  cout << "SUS304 radiation length = " << sus304->GetRadlen() << " mm" << endl;
+
+  G4Material* a5083 = new G4Material("A5083", 2.65 * CLHEP::g / CLHEP::cm3, 2);
+  a5083->AddElement(nist->FindOrBuildElement("Al"), 0.955);
+  a5083->AddElement(nist->FindOrBuildElement("Mg"), 0.045);
+  cout << "A5083 radiation length = " << a5083->GetRadlen() << " mm" << endl;
+
+  G4Material* a5052 = new G4Material("A5052", 2.68 * CLHEP::g / CLHEP::cm3, 2);
+  a5052->AddElement(nist->FindOrBuildElement("Al"), 0.975);
+  a5052->AddElement(nist->FindOrBuildElement("Mg"), 0.025);
+  cout << "A5052 radiation length = " << a5052->GetRadlen() << " mm" << endl;
+
+  G4Material* a6063 = new G4Material("A6063", 2.68 * CLHEP::g / CLHEP::cm3, 3);
+  a6063->AddElement(nist->FindOrBuildElement("Al"), 0.98925);
+  a6063->AddElement(nist->FindOrBuildElement("Mg"), 0.00675);
+  a6063->AddElement(nist->FindOrBuildElement("Si"), 0.004);
+  cout << "A6063 radiation length = " << a6063->GetRadlen() << " mm" << endl;
+
+  G4Material* c1220 = new G4Material("C1220", 2.68 * CLHEP::g / CLHEP::cm3, 1); // c1200 contains >99.9% of copper
+  c1220->AddElement(nist->FindOrBuildElement("Cu"), 1);
+  cout << "Pure copper radiation length = " << c1220->GetRadlen() << " mm" << endl;
+
   double wrapm = 2.699 * 0.0025 + 1.4 * 0.0025 + 2.2 * 0.02;
   G4Material* medWrap = new G4Material("WRAP", wrapm / 0.025 * CLHEP::g / CLHEP::cm3, 3);
   medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_Al"), 2.699 * 0.0025 / wrapm);
@@ -1082,7 +1113,7 @@ void barrel(G4LogicalVolume* top)
 
   int nseg = 72;
 
-  int overlap = 1;
+  int overlap = 0;
 
   G4LogicalVolume* sectorlogical; // tilted sector
   {
@@ -1112,15 +1143,8 @@ void barrel(G4LogicalVolume* top)
     sectorlogical->SetVisAttributes(att_air);
     for (int i = 0; i < nseg; i++) {
       double phi = i * M_PI / 36;
-      new G4PVPlacement(G4RotateZ3D(phi), sectorlogical, "sectorphysical", top, false, i, overlap);
+      new G4PVPlacement(G4RotateZ3D(phi), sectorlogical, suf("sectorphysical", i), top, false, i, overlap);
     }
-    // G4LogicalVolume* sect0logical = new G4LogicalVolume(sect0, nist->FindOrBuildMaterial("G4_AIR"), "sect0logical", 0, 0, 0);
-    // sect0logical->SetVisAttributes(att_iron);
-    // new G4PVPlacement(NULL, G4ThreeVector(0,0,0),sect0logical, "sect0physical", top, false, 0, overlap);
-
-    // G4LogicalVolume* sect1logical = new G4LogicalVolume(sect1, nist->FindOrBuildMaterial("G4_AIR"), "sect1logical", 0, 0, 0);
-    // sect1logical->SetVisAttributes(att_alum);
-    // new G4PVPlacement(G4Translate3D(r0)*G4RotateZ3D(M_PI/144)*G4Translate3D(u0.x()/2,trt0.y()/2,(2288-1219.)/2)*G4RotateX3D(-M_PI/2), sect1logical, "sect1physical", top, false, 0, overlap);
   }
 
   // phi septum wall

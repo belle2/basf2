@@ -1,4 +1,4 @@
-#include "BelleCrystal.hh"
+#include "ecl/geometry/BelleCrystal.h"
 
 #include "globals.hh"
 

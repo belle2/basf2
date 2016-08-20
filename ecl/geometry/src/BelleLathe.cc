@@ -1,4 +1,4 @@
-#include "BelleLathe.hh"
+#include "ecl/geometry/BelleLathe.h"
 
 #include "globals.hh"
 

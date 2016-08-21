@@ -11,6 +11,7 @@
 #include <beast/claw/modules/ClawStudyModule.h>
 #include <beast/claw/dataobjects/ClawSimHit.h>
 #include <beast/claw/dataobjects/ClawHit.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -76,6 +77,7 @@ void ClawStudyModule::defineHisto()
     h_claws_Evtof4[i] = new TH2F(TString::Format("h_claws_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                  1000., 1000, 0., 10.);
     h_claws_edep[i] = new TH1F(TString::Format("h_claws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+    h_Wclaws_edep[i] = new TH1F(TString::Format("h_Wclaws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 }
 
@@ -98,6 +100,11 @@ void ClawStudyModule::event()
 {
   //Here comes the actual event processing
   StoreArray<ClawSimHit>  SimHits;
+  StoreArray<SADMetaHit> sadMetaHits;
+  double rate = 0;
+  for (const auto& sadMetaHit : sadMetaHits) {
+    rate = sadMetaHit.getrate();
+  }
 
   //number of entries in SimHits
   int nSimHits = SimHits.getEntries();
@@ -116,7 +123,10 @@ void ClawStudyModule::event()
       if (pdg == 22) h_claws_Evtof2[detNB]->Fill(tof, Edep);
       else if (fabs(pdg) == 11) h_claws_Evtof3[detNB]->Fill(tof, Edep);
       else h_claws_Evtof4[detNB]->Fill(tof, Edep);
-      if (Edep > m_Ethres)h_claws_edep[detNB]->Fill(Edep);
+      if (Edep > m_Ethres) {
+        h_claws_edep[detNB]->Fill(Edep);
+        h_Wclaws_edep[detNB]->Fill(Edep, rate);
+      }
     }
   }
 

@@ -79,6 +79,7 @@ void QcsmonitorStudyModule::defineHisto()
     h_qcsms_Evtof4[i] = new TH2F(TString::Format("h_qcsms_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 500, 0.,
                                  1000., 500, 0., 10.);
     h_qcsms_edep[i] = new TH1F(TString::Format("h_qcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+    h_Wqcsms_edep[i] = new TH1F(TString::Format("h_Wqcsms_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
   h_qcsms_s = new TH1F("h_qcsms_s", "", 4000, -200., 200.);
   h_qcsms_s_cut = new TH1F("h_qcsms_s_cut", "", 4000, -200., 200.);
@@ -106,13 +107,13 @@ void QcsmonitorStudyModule::event()
 
   StoreArray<QcsmonitorSimHit>  SimHits;
   StoreArray<SADMetaHit> SADtruth;
-
+  double rate = 0;
   int nSAD = SADtruth.getEntries();
   Bool_t Reject = false;
   for (int i = 0; i < nSAD; i++) {
     SADMetaHit* aHit = SADtruth[i];
     double s = aHit->gets();
-    //double rate = aHit->getrate();
+    rate = aHit->getrate();
     h_qcsms_s->Fill(-s);
     if ((-33.0 <= -s && -s <= -30.0) || (19.0 <= -s && -s <= 23.0)) {
       h_qcsms_s_cut->Fill(-s);
@@ -136,7 +137,10 @@ void QcsmonitorStudyModule::event()
     if (pdg == 22) h_qcsms_Evtof2[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_qcsms_Evtof3[detNB]->Fill(tof, Edep);
     else h_qcsms_Evtof4[detNB]->Fill(tof, Edep);
-    if (m_Ethres < Edep && Edep < m_Erange)h_qcsms_edep[detNB]->Fill(Edep);
+    if (m_Ethres < Edep && Edep < m_Erange) {
+      h_qcsms_edep[detNB]->Fill(Edep);
+      h_Wqcsms_edep[detNB]->Fill(Edep, rate);
+    }
   }
 
 

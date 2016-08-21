@@ -181,7 +181,14 @@ namespace Belle2 {
       TH2F* h_ttvp_C[8];
       /** Phi v. theta per TPC for X-ray */
       TH2F* h_ttvp_x[8];
-
+      /** Phi v. theta */
+      TH2F* h_Wtvp1[8][12];
+      /** Phi v. theta */
+      TH2F* h_Wtvp2[8][12];
+      /** e v l */
+      TH2F* h_Wevtrl1[8][12];
+      /** e v l */
+      TH2F* h_Wevtrl2[8][12];
       /** Phi v. theta per TPC for He w/ edge cuts weighted */
       TH2F* h_twtvp_He_pure[8];
 

@@ -14,6 +14,7 @@
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -78,6 +79,17 @@ void MicrotpcStudyModule::defineHisto()
   for (int i = 0 ; i < 9 ; i++) {
     h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
   }
+  for (int i = 0 ; i < 8 ; i++) {
+    for (int j = 0; j < 12; j++) {
+      h_Wtvp1[i][j] = new TH2F(TString::Format("h_Wtvp1_%d_%d", i, j), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+      h_Wtvp2[i][j] = new TH2F(TString::Format("h_Wtvp2_%d_%d", i, j), "Phi [deg] v. theta [deg]", 180, 0., 180, 360, -180., 180.);
+      h_Wevtrl1[i][j] = new TH2F(TString::Format("h_Wevtrl1_%d_%d", i, j), "Deposited energy [keV] v. track length [cm]", 2000, 0., 10000,
+                                 200, 0., 6.);
+      h_Wevtrl2[i][j] = new TH2F(TString::Format("h_Wevtrl2_%d_%d", i, j), "Deposited energy [keV] v. track length [cm]", 2000, 0., 10000,
+                                 200, 0., 6.);
+    }
+  }
+
   for (int i = 0 ; i < 8 ; i++) {
     h_z[i] = new TH1F(TString::Format("h_z_%d", i), "Charged density per cm^2", 2000, 0.0, 20.0);
 
@@ -227,6 +239,11 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
   StoreArray<TpcMCParticle> mcparts;
+  StoreArray<SADMetaHit> sadMetaHits;
+  double rate = 0;
+  for (const auto& sadMetaHit : sadMetaHits) {
+    rate = sadMetaHit.getrate();
+  }
   /*
   StoreArray<MicrotpcDataHit> DataHits;
   int dentries = DataHits.getEntries();
@@ -461,17 +478,26 @@ void MicrotpcStudyModule::event()
     h_evtrl[detNb]->Fill(esum, trl);
     h_tvp[detNb]->Fill(theta, phi);
     h_wtvp[detNb]->Fill(theta, phi, esum);
-
+    h_Wtvp1[detNb][0]->Fill(theta, phi, rate);
+    h_Wevtrl1[detNb][0]->Fill(esum, trl, rate);
+    h_Wtvp2[detNb][0]->Fill(theta, phi, rate * esum);
+    //h_Wevtrl1[detNb][0]->Fill(esum, trl, rate);
     if (EdgeCuts && pixnb > 10. && esum > 10.) {
       h_evtrlb[detNb]->Fill(esum, trl);
       h_tvpb[detNb]->Fill(theta, phi);
       h_wtvpb[detNb]->Fill(theta, phi, esum);
+      h_Wtvp1[detNb][1]->Fill(theta, phi, rate);
+      h_Wevtrl1[detNb][1]->Fill(esum, trl, rate);
+      h_Wtvp2[detNb][1]->Fill(theta, phi, rate * esum);
     }
 
     for (int j = 0; j < 7; j++) {
       if (j == 3 && !EdgeCuts && (partID[1] == 1 || partID[2] == 1 || partID[4] == 1 || partID[5] == 1 || partID[6] == 1)) partID[j] = 0;
       if ((j == 4 || j == 5) && !Asource) partID[j] = 0;
       if (partID[j] == 1) {
+        h_Wtvp1[detNb][2 + j]->Fill(theta, phi, rate);
+        h_Wevtrl1[detNb][2 + j]->Fill(esum, trl, rate);
+        h_Wtvp2[detNb][2 + j]->Fill(theta, phi, rate * esum);
         if (j == 0) {
           h_evtrlc[detNb]->Fill(esum, trl);
           h_tvpc[detNb]->Fill(theta, phi);

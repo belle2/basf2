@@ -26,6 +26,8 @@
 #include <neurobayes/NeuroBayesExpert.hh>  //NeuroBayes Header
 #endif
 
+#define DEACTIVATE_NEUROBAYES
+
 #include <memory>
 
 namespace Belle2 {

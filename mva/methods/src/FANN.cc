@@ -104,23 +104,26 @@ namespace Belle2 {
 
       if (m_specific_options.m_max_epochs < 1) {
         B2ERROR("m_max_epochs should be larger than 0 " << m_specific_options.m_max_epochs);
-        throw std::runtime_error("m_max_epochs should be larger than 0. The given value is " + m_specific_options.m_max_epochs);
+        throw std::runtime_error("m_max_epochs should be larger than 0. The given value is " + std::to_string(
+                                   m_specific_options.m_max_epochs));
       }
 
       if (m_specific_options.m_random_seeds < 1) {
         B2ERROR("m_random_seeds should be larger than 0 " << m_specific_options.m_random_seeds);
-        throw std::runtime_error("m_random_seeds should be larger than 0. The given value is " + m_specific_options.m_random_seeds);
+        throw std::runtime_error("m_random_seeds should be larger than 0. The given value is " + std::to_string(
+                                   m_specific_options.m_random_seeds));
       }
 
       if (m_specific_options.m_test_rate < 1) {
         B2ERROR("m_test_rate should be larger than 0 " << m_specific_options.m_test_rate);
-        throw std::runtime_error("m_test_rate should be larger than 0. The given value is " + m_specific_options.m_test_rate);
+        throw std::runtime_error("m_test_rate should be larger than 0. The given value is " + std::to_string(
+                                   m_specific_options.m_test_rate));
       }
 
       if (m_specific_options.m_number_of_threads < 1) {
         B2ERROR("m_number_of_threads should be larger than 0. The given value is " << m_specific_options.m_number_of_threads);
         throw std::runtime_error("m_number_of_threads should be larger than 0. The given value is " +
-                                 m_specific_options.m_number_of_threads);
+                                 std::to_string(m_specific_options.m_number_of_threads));
       }
 
       // set network parameters

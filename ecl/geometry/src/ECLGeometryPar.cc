@@ -14,6 +14,9 @@
 #include <G4VTouchable.hh>
 #include <G4PhysicalVolumeStore.hh>
 #include <G4NavigationHistory.hh>
+#include <G4Transform3D.hh>
+#include <G4Point3D.hh>
+#include <G4Vector3D.hh>
 
 #include "TVector3.h"
 
@@ -196,15 +199,22 @@ void ParticleGunParameters(const G4String& comment, const G4ThreeVector& n, cons
   cout << "    'zVertexParams': [" << z << ", " << z << "]" << endl;
 }
 
+G4Transform3D getT(const G4VPhysicalVolume& v)
+{
+  return  G4Transform3D(v.GetObjectRotationValue(), v.GetObjectTranslation());
+}
+
+G4Transform3D getT(const G4String& n)
+{
+  G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
+  G4VPhysicalVolume* v = store->GetVolume(n);
+  return getT(*v);
+}
+
 void ECLGeometryPar::read()
 {
   m_crystals.clear();
   m_crystals.reserve(46 * 2 + 132); // 10752 bytes
-
-  return;
-
-  G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
-  G4ThreeVector a0(0, 0, 0), a1(0, 0, 1);
 
   // Endcap sectors are rotated since behaviour of G4Replica class. It
   // requires a physical volume during phi replication to be symmetric
@@ -212,61 +222,51 @@ void ECLGeometryPar::read()
   // geometry description are return back here.
   G4RotationMatrix H = CLHEP::HepRotationZ(sectorPhi[1] * 0.5);
 
-  G4String tnamef("eclFwdFoilPhysical_");
-  for (int i = 1; i <= 72; i++) {
-    G4String vname(tnamef); vname += to_string(i);
-    G4VPhysicalVolume* v0 = store->GetVolume(vname);
-    G4RotationMatrix m0 = v0->GetObjectRotationValue();
-    G4ThreeVector d0 = v0->GetObjectTranslation();
-    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (H * d0), H* (m0 * a1)};
-    m_crystals.push_back(c0);
-    // const CrystalGeom_t &t = m_crystals.back();
-    // ParticleGunParameters(string("Forward ")+to_string(i),t.dir,t.pos,sectorPhi[1]);
+  G4Point3D p0(0, 0, 0); G4Vector3D v0(0, 0, 1);
+
+  {
+    G4Transform3D T = G4RotateZ3D(sectorPhi[1] * 0.5) * getT("ECLForwardPhysical") * getT("ECLForwardSectorPhysical") *
+                      getT("ECLForwardCrystalSectorPhysical_0");
+    G4String tnamef("ECLForwardWrappedCrystal_Physical_");
+    for (int i = 0; i < 72; i++) {
+      G4String vname(tnamef); vname += to_string(i);
+      G4Transform3D cT = T * getT(vname);
+      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      m_crystals.push_back(c);
+      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
+    }
   }
 
-  G4String tnameb("eclBwdFoilPhysical_");
-  for (int i = 73; i <= 132; i++) {
-    G4String vname(tnameb); vname += to_string(i);
-    G4VPhysicalVolume* v0 = store->GetVolume(vname);
-    G4RotationMatrix m0 = v0->GetObjectRotationValue();
-    G4ThreeVector d0 = v0->GetObjectTranslation();
-    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (H * d0), H* (m0 * a1)};
-    m_crystals.push_back(c0);
-    // const CrystalGeom_t &t = m_crystals.back();
-    // ParticleGunParameters(string("Backward ")+to_string(i),t.dir,t.pos,sectorPhi[1]);
+  {
+    G4Transform3D T = G4RotateZ3D(sectorPhi[1] * 0.5) * getT("ECLBackwardPhysical") * getT("ECLBackwardSectorPhysical") *
+                      getT("ECLBackwardCrystalSectorPhysical_0");
+    G4String tnamef("ECLBackwardWrappedCrystal_Physical_");
+    for (int i = 0; i < 60; i++) {
+      G4String vname(tnamef); vname += to_string(i);
+      G4Transform3D cT = T * getT(vname);
+      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      m_crystals.push_back(c);
+      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
+    }
   }
 
-  // since barrel sector is symmetric around phi=0 we need to
-  // translate crystal with negative phi back to positive rotating
-  // crystal position by (2*M_PI/72) angle
-  G4RotationMatrix S = CLHEP::HepRotationZ(sectorPhi[0]);
+  {
+    // get barrel sector (between two septums) transformation
+    G4Transform3D Ts = getT("ECLBarrelSectorPhysical_0");
+    // since barrel sector is symmetric around phi=0 we need to
+    // translate crystal with negative phi back to positive rotating
+    // crystal position by (2*M_PI/72) angle
+    G4Transform3D Ts1 = G4RotateZ3D(sectorPhi[0]) * Ts;
 
-  // get barrel sector (between two septums) transformation
-  G4VPhysicalVolume* bs = store->GetVolume("eclBarrelCrystalSectorPhysical");
-  G4RotationMatrix mbs = bs->GetObjectRotationValue();
-  G4ThreeVector dbs = bs->GetObjectTranslation();
-
-  G4String tnameb0("eclBarrelFoilPhysical_0_"), tnameb1("eclBarrelFoilPhysical_1_");
-  for (int i = 1; i <= 46; i++) {
-    G4String istr(to_string(i));
-
-    G4String vname0(tnameb0); vname0 += istr;
-    G4VPhysicalVolume* v0 = store->GetVolume(vname0);
-    G4RotationMatrix m0 = v0->GetObjectRotationValue();
-    G4ThreeVector d0 = v0->GetObjectTranslation();
-    CrystalGeom_t c0 = {(1 / CLHEP::cm)* (mbs * d0 + dbs), mbs* (m0 * a1)};
-    m_crystals.push_back(c0);
-    // const CrystalGeom_t &t0 = m_crystals.back();
-    // ParticleGunParameters(string("Barrel0 ")+to_string(i),t0.dir,t0.pos,sectorPhi[1]);
-
-    G4String vname1(tnameb1); vname1 += istr;
-    G4VPhysicalVolume* v1 = store->GetVolume(vname1);
-    G4RotationMatrix m1 = v1->GetObjectRotationValue();
-    G4ThreeVector d1 = v1->GetObjectTranslation();
-    CrystalGeom_t c1 = {(1 / CLHEP::cm)* (S * (mbs * d1 + dbs)), S* (mbs * (m1 * a1))};
-    m_crystals.push_back(c1);
-    // const CrystalGeom_t &t1 = m_crystals.back();
-    // ParticleGunParameters(string("Barrel1 ")+to_string(i),t1.dir,t1.pos,sectorPhi[1]);
+    G4String tname("ECLBarrelWrappedCrystal_Physical_");
+    for (int i = 0; i < 2 * 46; i++) {
+      G4String vname(tname); vname += to_string(i);
+      G4Transform3D cT = ((i % 2) ? Ts : Ts1) * getT(vname);
+      CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
+      m_crystals.push_back(c);
+      //    const CrystalGeom_t&c = m_crystals.back();
+      //    G4cout<<c.pos<<" "<<c.dir<<G4endl;
+    }
   }
   B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }

@@ -34,8 +34,8 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
     void barrel(G4LogicalVolume*);
-    // void backward(G4LogicalVolume *);
-    // void forward(G4LogicalVolume *);
+    void backward(G4LogicalVolume*);
+    void forward(G4LogicalVolume*);
 
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
@@ -59,8 +59,8 @@ namespace Belle2 {
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
       barrel(&topVolume);
-      // forward(&topVolume);
-      // backward(&topVolume);
+      forward(&topVolume);
+      backward(&topVolume);
     }
 
   }//ecl

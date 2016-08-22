@@ -51,19 +51,19 @@ ECLCRFinderModule::ECLCRFinderModule() : Module(), m_eclCalDigits(eclCalDigitArr
   addParam("energyCut0", m_energyCut[0], "Seed energy cut.", 10.0 * Belle2::Unit::MeV);
   addParam("energyCut1", m_energyCut[1], "Growth energy cut.", 1.5 * Belle2::Unit::MeV);
   addParam("energyCut2", m_energyCut[2], "Digit energy cut.", 0.5 * Belle2::Unit::MeV);
-  addParam("energyCutBkgd0", m_energyCutBkgd[0], "Seed energy cut (for high background).", 12.5 * Belle2::Unit::MeV);
-  addParam("energyCutBkgd1", m_energyCutBkgd[1], "Growth energy cut (for high background).", 2.5 * Belle2::Unit::MeV);
+  addParam("energyCutBkgd0", m_energyCutBkgd[0], "Seed energy cut (for high background).", 10.0 * Belle2::Unit::MeV);
+  addParam("energyCutBkgd1", m_energyCutBkgd[1], "Growth energy cut (for high background).", 1.5 * Belle2::Unit::MeV);
   addParam("energyCutBkgd2", m_energyCutBkgd[2], "Digit energy cut (for high background).", 0.5 * Belle2::Unit::MeV);
   addParam("timeCut0", m_timeCut[0], "Seed time cut (negative values for residual cut).", 99999.);
   addParam("timeCut1", m_timeCut[1], "Growth time cut (negative values for residual cut).", 99999.);
-  addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", -5.);
+  addParam("timeCut2", m_timeCut[2], "Digit time cut (negative values for residual cut).", 99999.);
   addParam("mapType0", m_mapType[0], "Map type for seed crystals.", std::string("N"));
   addParam("mapType1", m_mapType[1], "Map type for growth crystals.",  std::string("N"));
   addParam("mapPar0", m_mapPar[0],
            "Map parameter for seed crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
   addParam("mapPar1", m_mapPar[1],
            "Map parameter for growth crystals (radius (type=R), integer (for type=N) or fraction (for type=MC)).", 1.0);
-  addParam("useBackgroundLevel", m_useBackgroundLevel, "Use background dependent time and energy cuts.", 1);
+  addParam("useBackgroundLevel", m_useBackgroundLevel, "Use background dependent time and energy cuts.", 0);
   addParam("skipFailedTimeFitDigits", m_skipFailedTimeFitDigits, "Digits with failed fits are skipped when checking timing cuts.", 0);
   addParam("fullBkgdCount", m_fullBkgdCount, "Full background count (via ECLEventInformation).", 182);
 

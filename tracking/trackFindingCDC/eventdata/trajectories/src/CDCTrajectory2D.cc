@@ -112,7 +112,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
   const Vector2D support = getSupport();
   const GeneralizedCircle globalCircle = getGlobalCircle();
   if (support.cylindricalR() < innerCylindricalR) {
-    // If we start inside of the volume of the CDC we want the trajectory to enter the CDC
+    // If we start within the inner volumn of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
     const Vector2D apogee = globalCircle.apogee();
@@ -125,10 +125,8 @@ Vector2D CDCTrajectory2D::getInnerExit() const
 
 Vector2D CDCTrajectory2D::getOuterExit(double factor) const
 {
-
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
-
   double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
 
   const Vector2D support = getSupport();

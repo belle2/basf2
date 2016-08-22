@@ -12,6 +12,7 @@
 #define MODULE_H
 
 #include <framework/core/ModuleParamList.h>
+#include <framework/core/ModuleCondition.h>
 #include <framework/core/PathElement.h>
 #include <framework/logging/LogConfig.h>
 
@@ -34,12 +35,10 @@ namespace boost {
 namespace Belle2 {
 
   class Module;
-  class ModuleCondition;
   class Path;
 
   /** Defines a pointer to a module object as a boost shared pointer. */
   typedef boost::shared_ptr<Module> ModulePtr;
-
 
   /**
    * Base class for Modules.
@@ -82,11 +81,8 @@ namespace Belle2 {
       c_TerminateInAllProcesses     = 32,  /**< When using parallel processing, call this module's terminate() function in all processes(). This will also ensure that there is exactly one process (single-core if no parallel modules found) or at least one input, one main and one output process. */
     };
 
-    /** Different options for behaviour _after_ a conditional path was executed. */
-    enum class EAfterConditionPath {
-      c_End, /**< End current event after the conditional path. */
-      c_Continue, /**< After the conditional path, resume execution after this module. */
-    };
+    /// Forward the EAfterConditionPath definition from the ModuleCondition.
+    typedef ModuleCondition::EAfterConditionPath EAfterConditionPath;
 
     /**
      * Constructor.
@@ -98,13 +94,6 @@ namespace Belle2 {
      * the module list (basf2 -m).
      */
     Module();
-
-    /**
-     * Destructor.
-     *
-     * Use the destructor to release the memory you allocated in the constructor.
-     */
-    virtual ~Module();
 
     /**
      * Initialize the Module.
@@ -234,7 +223,9 @@ namespace Belle2 {
 
 
     /**
-     * Sets the condition of the module.
+     * Add a condition to the module. Please note that successive calls of this function will add more than
+     * one condition to the module.
+     * If more than one condition results in true, only the *last* of them will be used.
      *
      * See https://confluence.desy.de/display/BI/Software+ModCondTut or ModuleCondition for a description of the syntax.
      *
@@ -250,7 +241,9 @@ namespace Belle2 {
                   EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
-     * A simplified version to set the condition of the module.
+     * A simplified version to add a condition to the module. Please note that successive calls of this function will
+     * add more than one condition to the module.
+     * If more than one condition results in true, only the *last* of them will be used.
      *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
      * to a path which is processed before the path where this module is
@@ -265,7 +258,9 @@ namespace Belle2 {
     void if_false(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
-     * A simplified version to set the condition of the module.
+     * A simplified version to set the condition of the module. Please note that successive calls of this function will
+     * add more than one condition to the module.
+     * If more than one condition results in true, only the *last* of them will be used.
      *
      * Please be careful: Avoid creating cyclic paths, e.g. by linking a condition
      * to a path which is processed before the path where this module is
@@ -280,28 +275,36 @@ namespace Belle2 {
     void if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath = EAfterConditionPath::c_End);
 
     /**
-     * Returns true if a condition was set for the module.
+     * Returns true if at least one condition was set for the module.
      */
-    bool hasCondition() const { return m_condition != nullptr; };
+    bool hasCondition() const { return not m_condition.empty(); };
 
-    /** Returns condition (or nullptr, if none was set) */
-    const ModuleCondition* getCondition() const { return m_condition; }
+    /** Return a pointer to the first condition (or nullptr, if none was set) */
+    const ModuleCondition* getCondition() const
+    {
+      if (m_condition.empty()) {
+        return nullptr;
+      } else {
+        return &m_condition.front();
+      }
+    }
 
     /**
-     * If a condition was set, it is evaluated and the result is returned.
+     * If at least one condition was set, it is evaluated and true returned if at least one condition returns true.
      *
      * If no condition or result value was defined, the method returns false.
-     * Otherwise, the condition is evaluated and the result of the evaluation returned.
-     * To speed up the evaluation, the condition string was already parsed in the method if_value().
+     * Otherwise, the condition is evaluated and true returned, if at least one condition returns true.
+     * To speed up the evaluation, the condition strings were already parsed in the method if_value().
      *
-     * @return True if a condition and return value exists and the condition expression was evaluated to true.
+     * @return True if at least one condition and return value exists and at least one condition expression was
+     *         evaluated to true.
      */
     bool evalCondition() const;
 
-    /** Returns the path of the condition.  */
+    /** TODO Returns the path of the condition.  */
     boost::shared_ptr<Path> getConditionPath() const;
 
-    /** What to do after a conditional path is finished. (defaults to c_End if no condition is set)*/
+    /** TODO What to do after a conditional path is finished. (defaults to c_End if no condition is set)*/
     Module::EAfterConditionPath getAfterConditionPath() const;
 
     /**
@@ -469,7 +472,7 @@ namespace Belle2 {
     bool m_hasReturnValue;     /**< True, if the return value is set. */
     int  m_returnValue;        /**< The return value. */
 
-    ModuleCondition* m_condition; /**< Module condition, only non-null if set. */
+    std::vector<ModuleCondition> m_condition; /**< Module condition, only non-null if set. */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                    Python API

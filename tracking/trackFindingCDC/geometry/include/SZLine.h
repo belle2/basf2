@@ -65,7 +65,7 @@ namespace Belle2 {
 
       /// Getter for the z0 parameter
       double z0() const
-      { return m_tanLambda; }
+      { return m_z0; }
 
       /// Getter for the intercept in the sz space which is equivalent to z0
       double intercept() const

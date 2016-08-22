@@ -25,7 +25,7 @@ namespace Belle2 {
     /** increase track counter */
     void countTrack() { ++trackCounter; }
     /** add a pair of input and target */
-    void addSample(std::vector<float> input, std::vector<float> target)
+    void addSample(const std::vector<float>& input, const std::vector<float>& target)
     {
       inputSamples.push_back(input);
       targetSamples.push_back(target);
@@ -40,9 +40,9 @@ namespace Belle2 {
     /** get number of samples (same for input and target) */
     unsigned nSamples() const { return targetSamples.size(); }
     /** get input vector of sample i */
-    std::vector<float> getInput(unsigned i) const { return inputSamples[i]; }
+    const std::vector<float>& getInput(unsigned i) const { return inputSamples[i]; }
     /** get target value of sample i */
-    std::vector<float> getTarget(unsigned i) const { return targetSamples[i]; }
+    const std::vector<float>& getTarget(unsigned i) const { return targetSamples[i]; }
 
   private:
     /** list of input vectors for network training. */

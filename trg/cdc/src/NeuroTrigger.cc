@@ -388,7 +388,7 @@ NeuroTrigger::getRelId(const CDCTriggerSegmentHit& hit)
 unsigned long
 NeuroTrigger::getInputPattern(unsigned isector)
 {
-  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> hits;
   CDCTriggerMLP& expert = m_MLPs[isector];
   unsigned long hitPattern = 0;
   vector<unsigned> nHits;
@@ -415,7 +415,7 @@ NeuroTrigger::getInputPattern(unsigned isector)
 vector<unsigned>
 NeuroTrigger::selectHits(unsigned isector)
 {
-  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> hits;
   CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
@@ -481,9 +481,9 @@ NeuroTrigger::selectHits(unsigned isector)
 }
 
 vector<float>
-NeuroTrigger::getInputVector(unsigned isector, vector<unsigned>& hitIds)
+NeuroTrigger::getInputVector(unsigned isector, const vector<unsigned>& hitIds)
 {
-  StoreArray<CDCTriggerSegmentHit> hits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> hits;
   CDCTriggerMLP& expert = m_MLPs[isector];
   // prepare empty input vector and vectors to keep best drift times
   vector<float> inputVector;

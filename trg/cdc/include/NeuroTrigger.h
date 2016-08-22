@@ -111,7 +111,7 @@ namespace Belle2 {
     unsigned nSectors() const { return m_MLPs.size(); }
 
     /** add an MLP to the list of networks */
-    void addMLP(CDCTriggerMLP newMLP) { m_MLPs.push_back(newMLP); }
+    void addMLP(const CDCTriggerMLP& newMLP) { m_MLPs.push_back(newMLP); }
 
     /** Select one expert MLP based on the track parameters of the given track.
      * This function assumes that sectors are unique.
@@ -155,7 +155,7 @@ namespace Belle2 {
      * @param hitIds hit indices to be used for the input
      * @return scaled vector of input values (1 for each input node)
      */
-    std::vector<float> getInputVector(unsigned isector, std::vector<unsigned>& hitIds);
+    std::vector<float> getInputVector(unsigned isector, const std::vector<unsigned>& hitIds);
 
     /** Run an expert MLP.
      * @param isector index of the MLP

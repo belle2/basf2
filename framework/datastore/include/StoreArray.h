@@ -223,10 +223,10 @@ namespace Belle2 {
      */
     void clear() override
     {
-      if (isValid())
+      if (getEntries() != 0) {
         (*m_storeArray)->Delete();
-
-      _StoreArrayImpl::clearRelations(*this);
+        _StoreArrayImpl::clearRelations(*this);
+      }
     }
 
     /** Get the number of objects in the array. */

@@ -6,6 +6,7 @@
 #pragma link C++ nestedclasses;
 
 #pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerCut-;
+#pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerObject-;
 #pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerDBHandler-;
 
 #endif

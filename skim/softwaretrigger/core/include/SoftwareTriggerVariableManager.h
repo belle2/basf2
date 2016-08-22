@@ -9,22 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <map>
+#include <skim/softwaretrigger/core/SoftwareTriggerObject.h>
+
 #include <memory>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    /**
-     * Base object to store the variable_name to double value map,
-     * which is used in the software trigger variable manager and the cuts.
-     * This map has to be compiled before using any cut and has to be given
-     * to the cut whenever it is checked.
-     *
-     * This has the advantage that the values are only created once and can
-     * share temporary objects during calculation.
-     */
-    typedef std::map<std::string, double> SoftwareTriggerObject;
-
     /**
      * Variable Manager for the software trigger cuts.
      * This class fulfills all the requirement of a variable manager, as stated in the GeneralCut class

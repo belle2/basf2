@@ -28,7 +28,7 @@
 #pragma link C++ class Belle2::ARICHMirrorMap+;
 #pragma link C++ class Belle2::ARICHSensorModuleInfo+;
 #pragma link C++ class Belle2::ARICHSensorModuleMap+;
-
+#pragma link C++ class Belle2::ARICHGeoBase+;
 
 
 #endif

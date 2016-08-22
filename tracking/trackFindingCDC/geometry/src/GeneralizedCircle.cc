@@ -12,14 +12,11 @@
 
 #include <framework/logging/Logger.h>
 
-#include <boost/math/tools/precision.hpp>
+#include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 
-#include <boost/math/special_functions/sinc.hpp>
 #include <cmath>
 
 using namespace std;
-using namespace boost::math;
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -350,52 +347,14 @@ double GeneralizedCircle::arcLengthFactor(const double directDistance,
                                           const double curvature)
 {
   double x = directDistance * curvature / 2.0;
-
-  // Implementation of asin(x)/x
-  // Inspired by BOOST's sinc
-  BOOST_MATH_STD_USING;
-
-  double const taylor_n_bound = tools::forth_root_epsilon<double>();
-
-  if (abs(x) >= taylor_n_bound) {
-    return  asin(x) / x;
-
-  } else {
-    // approximation by taylor series in x at 0 up to order 0
-    double result = 1.0;
-
-    double const taylor_0_bound = tools::epsilon<double>();
-    if (abs(x) >= taylor_0_bound) {
-      double x2 = x * x;
-      // approximation by taylor series in x at 0 up to order 2
-      result += x2 / 6.0;
-
-      double const taylor_2_bound = tools::root_epsilon<double>();
-      if (abs(x) >= taylor_2_bound) {
-        // approximation by taylor series in x at 0 up to order 4
-        result += x2 * x2 * (3.0 / 40.0);
-
-      }
-    }
-    return result;
-  }
+  return asinc(x);
 }
-
-
-
-
 
 double GeneralizedCircle::distance(const Vector2D& point) const
 {
-  // this is the approximated distance also used for the fit
-  // can be correct for second order deviations if nessecary
   const double fastD = fastDistance(point);
   return distance(fastD);
 }
-
-
-
-
 
 double GeneralizedCircle::distance(const double fastDistance) const
 {

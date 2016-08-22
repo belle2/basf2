@@ -14,6 +14,8 @@
 #include <framework/core/Module.h>
 #include <arich/geometry/ARICHGeometryPar.h>
 #include <string>
+#include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
+
 
 namespace Belle2 {
 
@@ -63,10 +65,21 @@ namespace Belle2 {
      */
     virtual void terminate();
 
+    /**
+     * Writes raw data header
+     * @param buffer pointer to data buffer
+     * @param ibyte position of first header byte in buffer
+     * @param head raw data header
+     */
+    void writeHeader(int* buffer, unsigned& ibyte, const ARICHRawHeader& head);
+
+
   private:
 
     ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
-    int m_nonSuppressed;   /**< type of data (1 nonsuppressed, 0 suppressed) */
+
+    unsigned m_nonSuppressed;   /**< type of data (1 nonsuppressed, 0 suppressed) */
+    unsigned m_version;
     unsigned m_bitMask;    /**< bitmask for hit detection (4bit/hit) */
     int m_debug; /**< debug */
     std::string m_inputDigitsName;   /**< name of ARICHDigit store array */

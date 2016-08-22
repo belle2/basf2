@@ -50,7 +50,7 @@ namespace Belle2 {
     // set module description (e.g. insert text)
     setDescription("Raw data packer for ARICH");
     setPropertyFlags(c_ParallelProcessingCertified);
-    addParam("nonSuppressed", m_nonSuppressed, "Pack in non-suppressed format (store all channels)", 0);
+    addParam("nonSuppressed", m_nonSuppressed, "Pack in non-suppressed format (store all channels)", unsigned(0));
     addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
     addParam("debug", m_debug, "print packed bitmap", 0);
     addParam("inputDigitsName", m_inputDigitsName, "name of ARICHDigit store array", string(""));
@@ -99,8 +99,7 @@ namespace Belle2 {
       sortedDigits[boardID - 1].push_back(&digit);
     }
 
-    int bufferDim = 0;
-    bufferDim = 1 + 12 + 6 * 18; // 1 merger header word + 2 FEB header words / FEB + 18 data words per / FEB
+    int bufferDim = 3 + 33 + 6 * 36; // 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
 
     int buffer[4][bufferDim];
 
@@ -112,17 +111,24 @@ namespace Belle2 {
           buffer[finesse][j] = 0;
         }
 
+        unsigned ibyte = 0;
+
         auto* buf = buffer[finesse];
-        auto& i = bufferSize[finesse];
 
         // get corresponding merger ID
         unsigned mergerID = m_arichgp->getMergerFromCooper(copperID, finesse);
         if (!mergerID) continue;
 
+        ARICHRawHeader mergerHead;
         unsigned dataFormat = m_nonSuppressed + 1; // production data -> TODO: use enum
-        unsigned version = 0;
-        buf[i] = (mergerID << 8) + (version << 16) + (dataFormat << 24);
-        i++; // one merger (finesse) header word
+        mergerHead.type = dataFormat;
+        mergerHead.version = m_version;
+        mergerHead.mergerID = mergerID;
+        mergerHead.FEBSlot = 0;
+        mergerHead.trigger = evtMetaData->getEvent();
+        // mergerHead.length dont forget
+
+        ibyte += ARICHRAW_HEADER_SIZE;
 
         int nboards = m_arichgp->getNBoardsOnMerger(mergerID);
 
@@ -131,42 +137,55 @@ namespace Belle2 {
           int boardID = m_arichgp->getBoardFromMerger(mergerID, k);
           if (boardID < 0) continue;
 
-          // FEB first header word
-          buf[i] = k + (mergerID << 8) + (version << 16) + (dataFormat << 24);
-          i++;
+          // FEB header
+          ARICHRawHeader FEBHead;
+          FEBHead.type = dataFormat;
+          FEBHead.version = m_version;
+          FEBHead.mergerID = mergerID;
+          FEBHead.FEBSlot = k;
+          FEBHead.trigger = evtMetaData->getEvent();
+
 
           if (m_nonSuppressed) {
             // data length in bytes
-            buf[i] = unsigned(18 * 4); // 144ch * 4bit
-            i++;
+            FEBHead.length = 144 + ARICHFEB_HEADER_SIZE; // 144ch * 1 byte
+            writeHeader(buf, ibyte, FEBHead);
+            ibyte += ARICHFEB_HEADER_SIZE; // leave slot for FEB header (FEB header to be implemented!)
+
             // write data
             for (const auto& digit : sortedDigits[boardID - 1]) {
               unsigned chn = digit->getChannelID();
-              unsigned chan_n = chn / 8;
-              unsigned chan_i = chn % 8;
+              //std::cout << "pack: mod: " << boardID << " ch " << chn<< std::endl;
+              unsigned shift = 143 - chn;
               unsigned bitmap = (unsigned)digit->getBitmap();
-              buf[i + chan_n] += (bitmap << chan_i * 4);
+              buf[(ibyte + shift) / 4] += (bitmap << (3 - (ibyte + shift) % 4) * 8);
             }
-            i += 18;
+            ibyte += 144;
           }
 
           else {
-            // data length in bytes (2 bytes/digit)
-            buf[i] = (unsigned)sortedDigits[boardID - 1].size() * 2;
-            i++;
-            int j = 1;
-            // write data
+            FEBHead.length = ARICHFEB_HEADER_SIZE + sortedDigits[boardID - 1].size() * 2; // each hit is 2 bytes! channel + bitmap
+            writeHeader(buf, ibyte, FEBHead);
+            ibyte += ARICHFEB_HEADER_SIZE; // leave slot for FEB header (FEB header to be implemented!)
+
             for (const auto& digit : sortedDigits[boardID - 1]) {
               unsigned chn = digit->getChannelID();
+              unsigned shift = (3 - ibyte % 4) * 8;
+              buf[ibyte / 4] += (chn << shift);
+              ibyte++;
+              shift = (3 - ibyte % 4) * 8;
               unsigned bitmap = (unsigned)digit->getBitmap();
-              unsigned chn_data = bitmap + (chn << 8);
-              if (j % 2 == 1) buf[i] = (chn_data << 16);
-              else {buf[i] += chn_data; i++;}
-              j++;
+              buf[ibyte / 4] += (bitmap << shift);
+              ibyte++;
             }
-            if (j % 2 == 0) i++;
           }
         }
+
+        unsigned merg = 0;
+        mergerHead.length = ibyte - ARICHRAW_HEADER_SIZE;
+        writeHeader(buf, merg, mergerHead);
+
+        bufferSize[finesse] = ceil(ibyte / 4.);
 
         if (m_debug) {
           std::cout << "Pack finesse: " << finesse << std::endl;
@@ -202,6 +221,39 @@ namespace Belle2 {
 
   }
 
+
+  void ARICHPackerModule::writeHeader(int* buffer, unsigned& ibyte, const ARICHRawHeader& head)
+  {
+
+    unsigned char line1[4];
+    int shift;
+
+    line1[3] = head.type;
+    line1[2] = head.version;
+    line1[1] = head.mergerID;
+    line1[0] = head.FEBSlot;
+
+    for (int i = 0; i < 4; i++) {
+      shift = (3 - ibyte % 4) * 8;
+      buffer[ibyte / 4] |= line1[3 - i] << shift;
+      ibyte++;
+    }
+
+    unsigned char* len = (unsigned char*)&head.length;
+    for (int i = 0; i < 4; i++) {
+      shift = (3 - ibyte % 4) * 8;
+      buffer[ibyte / 4] |= len[3 - i] << shift;
+      ibyte++;
+    }
+
+    // trigger number
+    unsigned char* trg = (unsigned char*)(&head.trigger);
+    for (int i = 0; i < 4; i++) {
+      shift = (3 - ibyte % 4) * 8;
+      buffer[ibyte / 4] |= trg[3 - i] << shift;
+      ibyte++;
+    }
+  }
 
   void ARICHPackerModule::endRun()
   {

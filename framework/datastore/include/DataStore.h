@@ -545,8 +545,6 @@ namespace Belle2 {
     /** Clears all registered StoreEntry objects of a specified durability, invalidating all objects.
      *
      *  Called by the framework once the given durability is over. Users should usually not use this function without a good reason.
-     *
-     *  Memory occupied by objects/arrays is only freed once a new object is created in its place (in createObject()).
      */
     void invalidateData(EDurability durability);
 

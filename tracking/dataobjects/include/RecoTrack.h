@@ -181,11 +181,11 @@ namespace Belle2 {
      * @todo Let the track finders determine the cov seed.
      */
     static RecoTrack* createFromTrackCand(const genfit::TrackCand& trackCand,
-                                          const std::string& storeArrayNameOfRecoTracks = "",
-                                          const std::string& storeArrayNameOfCDCHits = "",
-                                          const std::string& storeArrayNameOfSVDHits = "",
-                                          const std::string& storeArrayNameOfPXDHits = "",
-                                          const std::string& storeArrayNameOfRecoHitInformation = "",
+                                          const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
+                                          const std::string& storeArrayNameOfCDCHits = "CDCHits",
+                                          const std::string& storeArrayNameOfSVDHits = "SVDClusters",
+                                          const std::string& storeArrayNameOfPXDHits = "PXDClusters",
+                                          const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations",
                                           const bool recreateSortingParameters = false
                                          );
 

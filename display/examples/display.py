@@ -15,12 +15,20 @@
 # edit this steering file.
 
 from basf2 import *
+from ROOT import Belle2
 
 # create paths
 main = create_path()
 
-rootinput = register_module('RootInput')
-# no input file set, use -i
+# Get type of input file to decide, which input module we want to use
+input_files = Belle2.Environment.Instance().getInputFilesOverride()
+if input_files.empty():
+    rootinput = register_module('RootInput')
+else:
+    if input_files.front().endswith(".sroot"):
+        rootinput = register_module('SeqRootInput')
+    else:
+        rootinput = register_module('RootInput')
 
 # create geometry
 gearbox = register_module('Gearbox')

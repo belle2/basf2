@@ -26,22 +26,22 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT compatibility.
-      Helix() :
-        m_circleXY(),
-        m_szLine()
+      Helix()
+        : m_circleXY()
+        , m_szLine()
       {}
 
       /// Constructor combining a two dimensional circle with the linear augment in the sz space.
       Helix(const PerigeeCircle& circleXY,
-            const SZLine& szLine) :
-        m_circleXY(circleXY),
-        m_szLine(szLine)
+            const SZLine& szLine)
+        : m_circleXY(circleXY)
+        , m_szLine(szLine)
       {}
 
       /// Constructor taking all stored parameters for internal use.
       explicit Helix(const HelixParameters& parameters)
-        : m_circleXY(HelixUtil::getPerigeeParameters(parameters)),
-          m_szLine(HelixUtil::getSZParameters(parameters))
+        : m_circleXY(HelixUtil::getPerigeeParameters(parameters))
+        , m_szLine(HelixUtil::getSZParameters(parameters))
       {}
 
       /// Constructor from all helix parameter
@@ -49,9 +49,9 @@ namespace Belle2 {
             const double tangentialPhi,
             const double impact,
             const double tanLambda,
-            const double z0) :
-        m_circleXY(curvature, tangentialPhi, impact),
-        m_szLine(tanLambda, z0)
+            const double z0)
+        : m_circleXY(curvature, tangentialPhi, impact)
+        , m_szLine(tanLambda, z0)
       {}
 
       /// Constructor from all helix parameter, phi given as a unit vector
@@ -59,9 +59,9 @@ namespace Belle2 {
             const Vector2D& tangential,
             const double impact,
             const double tanLambda,
-            const double z0) :
-        m_circleXY(curvature, tangential, impact),
-        m_szLine(tanLambda, z0)
+            const double z0)
+        : m_circleXY(curvature, tangential, impact)
+        , m_szLine(tanLambda, z0)
       {}
 
       /// Sets all circle parameters to zero.
@@ -88,24 +88,27 @@ namespace Belle2 {
 
     public:
       /// Calculates the perpendicular travel distance at which the helix has the closest approach to the given point.
-      double arcLength2DToClosest(const Vector3D& point) const;
+      double arcLength2DToClosest(const Vector3D& point, bool firstPeriod = true) const;
 
-      /** Calculates the two dimensional arc length that is closest to two dimensional point
+      /**
+       *  Calculates the two dimensional arc length that is closest to two dimensional point
        *  in the xy projection.
        *  Always gives a solution in the first half period in the positive or negative direction
        */
       double arcLength2DToXY(const Vector2D& point) const
       { return circleXY().arcLengthTo(point); }
 
-      /** Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
-       *  Returns NAN if the radius cannot be reached.*/
+      /**
+       *  Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
+       *  Returns NAN if the radius cannot be reached.
+       */
       double arcLength2DToCylindricalR(const double cylindricalR) const
       { return circleXY().arcLengthToCylindricalR(cylindricalR); }
 
       /// Calculates the point of closest approach on the helix to the given point.
-      Vector3D closest(const Vector3D& point) const
+      Vector3D closest(const Vector3D& point, bool firstPeriod = true) const
       {
-        double arcLength2D = arcLength2DToClosest(point);
+        double arcLength2D = arcLength2DToClosest(point, firstPeriod);
         return atArcLength2D(arcLength2D);
       }
 
@@ -113,9 +116,8 @@ namespace Belle2 {
       double distance(const Vector3D& point) const
       { return point.distance(closest(point));}
 
-      //double lengthOnCurve(const Vector3D& from, const Vector3D& to) const;
-
-      /** Moves the coordinates system by the given vector. Updates support point in place.
+      /**
+       *  Moves the coordinates system by the given vector. Updates support point in place.
        *  @return arcLength2D that has to be traversed to the new origin
        */
       double passiveMoveBy(const Vector3D& by)
@@ -186,8 +188,9 @@ namespace Belle2 {
       Vector2D perigeeXY() const
       { return circleXY().perigee(); }
 
-      /// Getter for the support point of the helix.
-      /** The support point marks the zero of the travel distance on the helix curve.
+      /**
+       *  Getter for the support point of the helix.
+       *  The support point marks the zero of the travel distance on the helix curve.
        *  It can not be choosen abitrary but has to be equivalent to the perigee point in the xy projection.
        */
       Vector3D support() const
@@ -207,7 +210,7 @@ namespace Belle2 {
 
       /// Getter for the distance in z at which the two points on the helix coincide in the xy projection
       double zPeriod() const
-      { return szLine().map(perimeterXY()); }
+      { return tanLambda() * fabs(perimeterXY()); }
 
       /// Getter for the perimeter of the circle in the xy projection
       double perimeterXY() const
@@ -277,8 +280,7 @@ namespace Belle2 {
       /// Memory of the of the linear relation between perpendicular travel distance and the z position.
       SZLine m_szLine;
 
-    }; //class
-
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

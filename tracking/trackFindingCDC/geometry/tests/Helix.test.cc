@@ -47,12 +47,21 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
     helix.passiveMoveBy(by);
     expectedClosest.passiveMoveBy(by);
     point.passiveMoveBy(by);
+    // {
+    //   Vector3D realClosest = helix.closest(point, true);
+    //   EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
+    //   EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
+    //   EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
+    // }
 
-    Vector3D realClosest = helix.closest(point);
+    helix.shiftPeriod(2);
+    {
+      Vector3D realClosest = helix.closest(point, false);
+      EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
+    }
 
-    EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
-    EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
-    EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
   }
 }
 

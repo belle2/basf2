@@ -15,15 +15,23 @@ def upload_cut_to_db(software_trigger_cut, base_identifier, cut_identifier, iov=
     dbHandler.upload(software_trigger_cut, base_identifier, cut_identifier, iov)
 
 
-def download_cut_from_db(base_name, cut_name):
+def download_cut_from_db(base_name, cut_name, not_set_event_number=False):
     """
     Python function to download a cut from the database. As each cut is uniquely identified by a
     base and a cut name, you have to give in both here.
     Please remember that the database access depends on the current event number. If you do not call
     this function in a basf2 module environment, you can use the set_event_number function in this
     python file to set the event number correctly nevertheless.
+    :param base_name: the base name of the cut
+    :param base_name: the specific name of the cut
+    :param not_set_event_number: it is important to always have a proper event number set for the database to work.
+        This is why this functions sets the event number in all cases to (1, 0, 0). If you want to prevent this
+        (because you maybe want to use another event number), set this flag to True.
     :return: the downloaded cut or throw an error, if the name can not be found.
     """
+    if not not_set_event_number:
+        set_event_number(1, 0, 0)
+
     dbHandler = Belle2.SoftwareTrigger.SoftwareTriggerDBHandler()
     return dbHandler.download(base_name, cut_name)
 

@@ -135,10 +135,9 @@ Vector2D PerigeeCircle::atArcLength(const double arcLength) const
   double chiHalf = chi / 2.0;
 
   using boost::math::sinc_pi;
-
-  double atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
-  double atY =  -arcLength * sinc_pi(chi);
-  return Vector2D::compose(-n12().unit(), atX, atY);
+  double atX = arcLength * sinc_pi(chi);
+  double atY = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  return Vector2D::compose(tangential(), atX, atY);
 }
 
 

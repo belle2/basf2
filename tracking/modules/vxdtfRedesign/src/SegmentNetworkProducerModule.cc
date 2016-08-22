@@ -90,9 +90,11 @@ void SegmentNetworkProducerModule::event()
   B2INFO("\n" << "SegmentNetworkProducerModule:event: event " << m_eventCounter << "\n");
 
   // make sure that network exists:
-  if (! m_network) { m_network.create(); }
+  if (! m_network) {
+    m_network.create();
+    B2INFO("As no network (DirectedNodeNetworkContainer) was present, a new network was created");
+  }
 // // // // //   StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);s
-  B2INFO("RawSecMapMerger::initialize():");
 
   vector< RawSectorData > collectedData = matchSpacePointToSectors();
 

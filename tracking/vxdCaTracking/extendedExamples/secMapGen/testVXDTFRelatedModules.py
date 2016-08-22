@@ -28,7 +28,7 @@ from VXDTF.setup_modules_ml import *
 
 # rootInputFileName = "seed11nEv100pGun1_1T.root"  # test- and TrainSample
 # rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
-rootInputFileName = "rootfiles/seed14nEv100000pGun1_1T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+rootInputFileName = "seed12345nEv1000pGun1_20T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
 
 
 # file name into which the segNetAnalize stores its stuff
@@ -52,7 +52,7 @@ useFBDT = False  # use the ML Filter for creating the SegmentNetwork instead of 
 activateSegNetAnalizer = False  # only needed when studying FastBDT-behavior
 
 doStrictSeeds = False  # if true, a smaller amount of TCs are created from the same segment-tree
-doNewSubsetSelection = False  # if true, then no noNewSubsetSelection will be executed
+doNewSubsetSelection = True  # if true, then NewSubsetSelection will be executed
 doVirtualIPRemovalb4Fit = True  # if false, the vIP willbe removed after the fit
 doEventSummary = True  # if true TFVXDAnalizer will produce event-wise results
 switchFiltersOff = False  # if true, SegNetProducer does not apply any filters of the sectorMap.
@@ -68,6 +68,7 @@ tempStringList = rootInputFileName.split('nEv', 1)
 stringInitialValue = tempStringList[0].split("seed", 1)
 print("found seed: " + stringInitialValue[1])
 numEvents = 200  # WARNING has to be identical with the value named in rootInputFileName!
+# comment Martin: this doesn't seem to be true. With
 initialValue = int(stringInitialValue[1])
 # initialValue = 4
 
@@ -127,9 +128,9 @@ elif (initialValue == 13):
 elif (initialValue == 57):
     print("chosen initialvalue 57! setup remark: train: 10k events, 10 tracks per event, theta 60-85°, phi 0-360°, pT 100-145MeV.")
     acceptedRawSecMapFiles = ['lowTestRedesign_779994078.root']  # 55 - single track, single event raw data
-elif (initialValue == 14):
+elif (initialValue == 12345):
     print("chosen initialvalue 12345! some dummy setup!")
-    acceptedRawSecMapFiles = ['lowTestRedesign_1942086555.root']
+    acceptedRawSecMapFiles = ['lowTestRedesign_349397772.root']
 else:
     print("ERROR! no valid initialvalue chosen!")
     acceptedRawSecMapFiles = [""]

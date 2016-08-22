@@ -89,9 +89,9 @@ ECLSplitterN1Module::ECLSplitterN1Module() : Module(),
   // Neighbour definitions
   addParam("useOptimalNumberOfDigitsForEnergy", m_useOptimalNumberOfDigitsForEnergy,
            "Optimize the number of digits for energy calculations.", 1);
-  addParam("fileENENormName", m_fileENENormName, "FWD number of optimal neighbours filename.",
-           FileSystem::findFile("/data/ecl/ene.root"));
-  addParam("fileNOptimalFWDName", m_fileNOptimalFWDName, "ENE normalization filename.",
+  addParam("fileBackgroundNormName", m_fileBackgroundNormName, "Background filename.",
+           FileSystem::findFile("/data/ecl/background_norm.root"));
+  addParam("fileNOptimalFWDName", m_fileNOptimalFWDName, "FWD number of optimal neighbours filename.",
            FileSystem::findFile("/data/ecl/noptimal_fwd.root"));
   addParam("fileNOptimalBarrelName", m_fileNOptimalBarrelName, "Barrel number of optimal neighbours filename.",
            FileSystem::findFile("/data/ecl/noptimal_barrel.root"));
@@ -152,19 +152,13 @@ void ECLSplitterN1Module::initialize()
   m_NeighbourMap9 = new ECLNeighbours("N", 1); // 3x3 = 9
   m_NeighbourMap21 = new ECLNeighbours("NC", 2); // 5x5 excluding corners = 21
 
-  // Initialize optimal digit TGraph2D (for default energy and time cuts)
-//  double m_neighboursEnergy[30] = {0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2, 0.03, 0.05, 0.075, 0.1, 0.15, 0.25, 0.5, 0.75, 1, 2};
-//  double m_neighboursBackground[30] = {0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
-//  double m_neighboursN[30] = {5, 6, 7, 7, 9, 11, 13, 21, 21, 21, 2, 3, 4, 4, 5, 9, 11, 11, 15, 21, 2, 3, 3, 4, 4, 5, 8, 9, 11, 21};
-//  m_tg2OptimalNumberOfDigitsForEnergy = new TGraph2D(30, m_neighboursEnergy, m_neighboursBackground, m_neighboursN);
-
   // initialize the vector that gives the relation between cellid and store array position
   m_StoreArrPosition.resize(8736 + 1);
 
-  // read the ENE correction factors (for full background)
-  m_fileENENorm = new TFile(m_fileENENormName.c_str(), "READ");
-  if (!m_fileENENorm) B2FATAL("Could not find file: " << m_fileENENormName);
-  m_th1dENENorm = (TH1D*) m_fileENENorm->Get("hist1d_norm_6");
+  // read the Background correction factors (for full background)
+  m_fileBackgroundNorm = new TFile(m_fileBackgroundNormName.c_str(), "READ");
+  if (!m_fileBackgroundNorm) B2FATAL("Could not find file: " << m_fileBackgroundNormName);
+  m_th1dBackgroundNorm = (TH1D*) m_fileBackgroundNorm->Get("background_norm");
 
   // read the optimal neighbour maps
   m_fileNOptimalFWD = new TFile(m_fileNOptimalFWDName.c_str(), "READ");
@@ -242,7 +236,7 @@ void ECLSplitterN1Module::endRun()
 void ECLSplitterN1Module::terminate()
 {
   // delete open TFiles
-  if (m_fileENENorm) delete m_fileENENorm;
+  if (m_fileBackgroundNorm) delete m_fileBackgroundNorm;
   if (m_fileNOptimalFWD) delete m_fileNOptimalFWD;
   if (m_fileNOptimalBarrel) delete m_fileNOptimalBarrel;
   if (m_fileNOptimalBWD) delete m_fileNOptimalBWD;
@@ -820,7 +814,7 @@ unsigned int ECLSplitterN1Module::getOptimalNumberOfDigits(const int cellid, con
   int nOptimalNeighbours = 21;
 
   // Get the corrected background level
-  const double bgCorrected = bg * m_th1dENENorm->GetBinContent(cellid);
+  const double bgCorrected = bg * m_th1dBackgroundNorm->GetBinContent(cellid);
 
   // For very small background levels, we always use 21 neighbours.
   if (bgCorrected > 0.025) {

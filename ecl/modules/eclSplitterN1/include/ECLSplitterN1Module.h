@@ -116,17 +116,16 @@ namespace Belle2 {
       double m_cutDigitEnergyForEnergy; /**< Minimum digit energy to be included in the shower energy calculation*/
       double m_cutDigitTimeResidualForEnergy; /**< Maximum time residual to be included in the shower energy calculation*/
       int m_useOptimalNumberOfDigitsForEnergy; /**< Optimize the number of neighbours for energy calculations */
-//      TGraph2D* m_tg2OptimalNumberOfDigitsForEnergy; /**< 2D graph used for interpolation between background and energy. */
 
-      std::string m_fileENENormName; /**< ENE normalization filename. */
+      std::string m_fileBackgroundNormName; /**< Background normalization filename. */
       std::string m_fileNOptimalFWDName; /**< FWD number of optimal neighbours filename. */
       std::string m_fileNOptimalBarrelName; /**< Barrel number of optimal neighbours filename. */
       std::string m_fileNOptimalBWDName; /**< BWD number of optimal neighbours filename. */
-      TFile* m_fileENENorm; /**< ENE normalization file. */
+      TFile* m_fileBackgroundNorm; /**< Background normalization file. */
       TFile* m_fileNOptimalFWD; /**< FWD number of optimal neighbours. */
       TFile* m_fileNOptimalBarrel; /**< Barrel number of optimal neighbours. */
       TFile* m_fileNOptimalBWD; /**< BWD number of optimal neighbours. */
-      TH1D* m_th1dENENorm; /**< ENE normalization histogram. */
+      TH1D* m_th1dBackgroundNorm; /**< Background normalization histogram. */
       TGraph2D* m_tg2dNOptimalFWD[13][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
       TGraph2D* m_tg2dNOptimalBWD[10][9]; /**< Array of 2D graphs used for interpolation between background and energy. */
       TGraph2D* m_tg2dNOptimalBarrel; /**< Array of 2D graphs used for interpolation between background and energy. */

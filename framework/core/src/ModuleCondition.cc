@@ -8,7 +8,7 @@
 
 using namespace Belle2;
 
-ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, Module::EAfterConditionPath afterConditionPath):
+ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, EAfterConditionPath afterConditionPath):
   m_conditionPath(conditionPath),
   m_afterConditionPath(afterConditionPath)
 {

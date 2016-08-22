@@ -38,13 +38,13 @@ namespace Belle2 {
     virtual ~KLMExpertModule();
 
     /** init */
-    virtual void initialize();
+    virtual void initialize() override;
 
     /** beginn run */
-    virtual void beginRun();
+    virtual void beginRun() override;
 
     /** process event */
-    virtual void event();
+    virtual void event() override;
 
     /** terminate and free */
     virtual void terminate() override

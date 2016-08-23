@@ -313,16 +313,8 @@ namespace Belle2 {
     /** What to do after the conditional path is finished. (defaults to c_End if no condition is set)*/
     Module::EAfterConditionPath getAfterConditionPath() const;
 
-    /** Return all conditions paths currently set (no matter if there condition is true or not). */
-    std::vector<boost::shared_ptr<Path>> getAllConditionPaths() const
-    {
-      std::vector<boost::shared_ptr<Path>> allConditionPaths;
-      for (const auto& condition : m_conditions) {
-        allConditionPaths.push_back(condition.getPath());
-      }
-
-      return allConditionPaths;
-    }
+    /** Return all condition paths currently set (no matter if the condition is true or not). */
+    std::vector<boost::shared_ptr<Path>> getAllConditionPaths() const;
 
     /**
      * Returns true if all specified property flags are available in this module.

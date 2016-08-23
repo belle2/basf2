@@ -149,6 +149,15 @@ Module::EAfterConditionPath Module::getAfterConditionPath() const
 
   return EAfterConditionPath::c_End;
 }
+std::vector<boost::shared_ptr<Path>> Module::getAllConditionPaths() const
+{
+  std::vector<boost::shared_ptr<Path>> allConditionPaths;
+  for (const auto& condition : m_conditions) {
+    allConditionPaths.push_back(condition.getPath());
+  }
+
+  return allConditionPaths;
+}
 
 bool Module::hasProperties(unsigned int propertyFlags) const
 {

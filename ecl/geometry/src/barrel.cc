@@ -498,27 +498,6 @@ cplacement_t barrel_placement[] = {
   }
 };
 
-vector<cplacement_t> load_placements(const string& fname)
-{
-  vector<cplacement_t> res;
-  ifstream IN(fname.c_str());
-  while (IN) {
-    double wt;
-    cplacement_t t;
-    IN >> t.nshape >> wt >> t.Rphi1 >> t.Rtheta >> t.Rphi2 >> t.Pr >> t.Ptheta >> t.Pphi;
-
-    t.Rphi1  *= CLHEP::degree;
-    t.Rtheta *= CLHEP::degree;
-    t.Rphi2  *= CLHEP::degree;
-    t.Pr     *= CLHEP::cm;
-    t.Ptheta *= CLHEP::degree;
-    t.Pphi   *= CLHEP::degree;
-    res.push_back(t);
-
-  }
-  return res;
-}
-
 Point_t p1[]  = {{0.0, 0.0}, {263.4, 0.0}, {263.4, 197.2}, {248.6, 206.6}, {212.0, 152.6}, {145.2, 199.0}, {108.5, 146.6}, {46.4, 192.1}, {7.9, 140.5}, { -50.0, 185.2}, { -90.3, 134.2}, { -143.8, 178.3}, { -170.7, 145.0}};
 Point_t p2[]  = {{0.0, 0.0}, {384.8, 0.0}, {181.9, 172.5}, {136.8, 122.3}, {90.7, 163.9}, {46.5, 115.6}, {4.1, 156.3}, { -42.5, 109.9}, { -80.9, 149.5}, { -110.9, 119.8}};
 Point_t p3[]  = {{0.0, 0.0}, {343.2, 0.0}, {209.6, 144.2}, {158.0, 98.1}, {125.8, 135.0}, {74.3, 92.4}, {46.1, 128.4}, { -6.9, 87.3}, { -32.5, 121.3}, { -67.3, 95.8}};

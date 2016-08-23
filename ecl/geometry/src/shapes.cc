@@ -682,6 +682,42 @@ vector<shape_t*> load_shapes(const string& fname)
   // return crystals;
 }
 
+vector<cplacement_t> load_placements(const string& fname)
+{
+  vector<cplacement_t> plcmnt;
+  std::string fnamef = Belle2::FileSystem::findFile(fname);
+
+  ifstream IN(fnamef.c_str());
+  string tmp;
+  while (getline(IN, tmp)) {
+    size_t ic = tmp.find("#");
+    if (ic != string::npos) tmp.erase(ic);
+    istringstream iss(tmp);
+    vector<string> t;
+    copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
+    if (t.size() == 7) {
+      cplacement_t p;
+      istringstream in(t[0]);
+      in >> p.nshape;
+      in.str(t[1]); in.seekg(0, ios_base::beg);
+      in >> p.Rphi1;
+      in.str(t[2]); in.seekg(0, ios_base::beg);
+      in >> p.Rtheta;
+      in.str(t[3]); in.seekg(0, ios_base::beg);
+      in >> p.Rphi2;
+      in.str(t[4]); in.seekg(0, ios_base::beg);
+      in >> p.Pr;
+      in.str(t[5]); in.seekg(0, ios_base::beg);
+      in >> p.Ptheta;
+      in.str(t[5]); in.seekg(0, ios_base::beg);
+      in >> p.Pphi;
+      plcmnt.push_back(p);
+    }
+  }
+
+  return plcmnt;
+}
+
 G4Transform3D get_transform(const cplacement_t& t)
 {
   G4Transform3D r = G4Rotate3D(t.Rphi1, G4Vector3D(sin(t.Rtheta) * cos(t.Rphi2), sin(t.Rtheta) * sin(t.Rphi2), cos(t.Rtheta)));

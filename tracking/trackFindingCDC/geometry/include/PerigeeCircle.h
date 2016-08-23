@@ -352,7 +352,7 @@ namespace Belle2 {
       { return m_impact; }
 
       /// Getter for the three perigee parameters in the order defined by EPerigeeParameter.h
-      PerigeeParameters parameters() const
+      PerigeeParameters perigeeParameters() const
       {
         using namespace NPerigeeParameterIndices;
         PerigeeParameters result;

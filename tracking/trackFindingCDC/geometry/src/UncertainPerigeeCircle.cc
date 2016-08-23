@@ -25,10 +25,10 @@ using namespace TrackFindingCDC;
 UncertainPerigeeCircle UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
                                                        const UncertainPerigeeCircle& toPerigeeCircle)
 {
-  const PerigeeParameters& fromPar = fromPerigeeCircle.parameters();
+  const PerigeeParameters& fromPar = fromPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  const PerigeeParameters& toPar = toPerigeeCircle.parameters();
+  const PerigeeParameters& toPar = toPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& toCov = toPerigeeCircle.perigeeCovariance();
 
   using namespace NPerigeeParameterIndices;

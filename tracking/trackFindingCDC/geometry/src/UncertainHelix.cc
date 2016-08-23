@@ -60,7 +60,7 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
                                        const JacobianMatrix<3, 5>& fromAmbiguity,
                                        const UncertainHelix& toHelix)
 {
-  PerigeeParameters fromPar = fromPerigeeCircle.parameters();
+  PerigeeParameters fromPar = fromPerigeeCircle.perigeeParameters();
   PerigeeCovariance fromCov = fromPerigeeCircle.perigeeCovariance();
 
   HelixParameters toPar = toHelix.parameters();
@@ -103,10 +103,10 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
                                        const JacobianMatrix<3, 5>& toAmbiguity,
                                        const SZParameters& szParameters)
 {
-  const PerigeeParameters& fromPar = fromPerigeeCircle.parameters();
+  const PerigeeParameters& fromPar = fromPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  const PerigeeParameters& toPar = toPerigeeCircle.parameters();
+  const PerigeeParameters& toPar = toPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& toCov = toPerigeeCircle.perigeeCovariance();
 
   using namespace NPerigeeParameterIndices;

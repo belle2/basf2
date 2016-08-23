@@ -117,12 +117,12 @@ namespace Belle2 {
       { return point.distance(closest(point));}
 
       /**
-       *  Moves the coordinates system by the given vector. Updates support point in place.
+       *  Moves the coordinates system by the given vector. Updates perigee point in place.
        *  @return arcLength2D that has to be traversed to the new origin
        */
       double passiveMoveBy(const Vector3D& by)
       {
-        // First keep the necessary shift of the perpendicular travel distance to the new support point.
+        // First keep the necessary shift of the perpendicular travel distance to the new perigee point.
         double byS = circleXY().arcLengthTo(by.xy());
         m_circleXY.passiveMoveBy(by.xy());
         Vector2D bySZ(byS, by.z());
@@ -163,7 +163,6 @@ namespace Belle2 {
       Vector2D xyAtZ(const double z) const
       { return Vector2D(circleXY().atArcLength(szLine().inverseMap(z))); }
 
-
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
       inline double minimalCylindricalR() const
       { return circleXY().minimalCylindricalR(); }
@@ -176,11 +175,11 @@ namespace Belle2 {
       inline double curvatureXY() const
       { return circleXY().curvature(); }
 
-      /// Getter for the signed distance to the z axes at the support point.
+      /// Getter for the signed distance to the z axes at the perigee point.
       double impactXY() const
       { return circleXY().impact(); }
 
-      /// Getter for the signed distance to the z axes at the support point
+      /// Getter for the signed distance to the z axes at the perigee point
       double d0() const
       { return circleXY().d0(); }
 
@@ -188,12 +187,8 @@ namespace Belle2 {
       Vector2D perigeeXY() const
       { return circleXY().perigee(); }
 
-      /**
-       *  Getter for the support point of the helix.
-       *  The support point marks the zero of the travel distance on the helix curve.
-       *  It can not be choosen abitrary but has to be equivalent to the perigee point in the xy projection.
-       */
-      Vector3D support() const
+      /// Getter for the perigee point of the helix.
+      Vector3D perigee() const
       { return Vector3D(perigeeXY(), z0()); }
 
       /// Getter for the proportinality factor from arc length in xy space to z.
@@ -204,7 +199,7 @@ namespace Belle2 {
       double cotTheta() const
       { return tanLambda(); }
 
-      /// Getter for z coordinate at the support point of the helix.
+      /// Getter for z coordinate at the perigee point of the helix.
       double z0() const
       { return m_szLine.z0(); }
 
@@ -220,28 +215,28 @@ namespace Belle2 {
       double radiusXY() const
       { return circleXY().radius(); }
 
-      /// Getter for the unit three dimensional tangential vector at the support point of the helix.
+      /// Getter for the unit three dimensional tangential vector at the perigee point of the helix.
       Vector3D tangential() const
-      {
-        Vector3D result(tangentialXY(), tanLambda());
-        result.normalize();
-        return result;
-      }
+      { return Vector3D(phi0Vec(), tanLambda()).unit(); }
 
-      /// Getter for the tangential vector in the xy projection at the support point of the helix.
+      /// Getter for the tangential vector in the xy projection at the perigee point of the helix.
       const Vector2D& tangentialXY() const
       { return circleXY().tangential(); }
 
-      /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
+      /// Getter for the tangential vector in the xy projection at the perigee of the helix.
+      const Vector2D& phi0Vec() const
+      { return circleXY().tangential(); }
+
+      /// Getter for the azimuth angle of the tangential vector at the perigee point of the helix.
       double tangentialPhi() const
       { return circleXY().tangentialPhi(); }
 
-      /// Getter for the azimuth angle of the tangential vector at the support point of the helix.
+      /// Getter for the azimuth angle of the tangential vector at the perigee point of the helix.
       double phi0() const
       { return tangentialPhi(); }
 
-      /// Getter for the five helix parameters in the order defined by EHelixParameter.h and EPerigeeParameter.h
-      HelixParameters parameters() const
+      /// Getter for the five helix parameters in the order defined by EHelixParameter.h
+      HelixParameters helixParameters() const
       {
         HelixParameters result;
         using namespace NHelixParameterIndices;
@@ -264,13 +259,12 @@ namespace Belle2 {
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const Helix& helix)
       {
-        return output <<
-               "Helix(" <<
-               "curvature=" << helix.curvatureXY() << "," <<
-               "tangentialPhi=" << helix.tangentialPhi() << "," <<
-               "impact=" << helix.impactXY() << "," <<
-               "tanL=" << helix.tanLambda() << "," <<
-               "z0=" << helix.z0() << ")" ;
+        return output << "Helix("
+               << "curv=" << helix.curvatureXY() << ","
+               << "phi0=" << helix.tangentialPhi() << ","
+               << "impact=" << helix.impactXY() << ","
+               << "tanL=" << helix.tanLambda() << ","
+               << "z0=" << helix.z0() << ")" ;
       }
 
     private:

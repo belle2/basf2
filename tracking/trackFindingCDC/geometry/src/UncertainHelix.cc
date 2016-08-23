@@ -24,10 +24,10 @@ using namespace TrackFindingCDC;
 UncertainHelix UncertainHelix::average(const UncertainHelix& fromHelix,
                                        const UncertainHelix& toHelix)
 {
-  HelixParameters fromPar = fromHelix.parameters();
+  HelixParameters fromPar = fromHelix.helixParameters();
   HelixCovariance fromCov = fromHelix.helixCovariance();
 
-  HelixParameters toPar = toHelix.parameters();
+  HelixParameters toPar = toHelix.helixParameters();
   HelixCovariance toCov = toHelix.helixCovariance();
 
   using namespace NHelixParameterIndices;
@@ -63,7 +63,7 @@ UncertainHelix UncertainHelix::average(const UncertainPerigeeCircle& fromPerigee
   PerigeeParameters fromPar = fromPerigeeCircle.perigeeParameters();
   PerigeeCovariance fromCov = fromPerigeeCircle.perigeeCovariance();
 
-  HelixParameters toPar = toHelix.parameters();
+  HelixParameters toPar = toHelix.helixParameters();
   HelixCovariance toCov = toHelix.helixCovariance();
   JacobianMatrix<5, 5> toAmbiguity = JacobianMatrixUtil::identity<5>();
 

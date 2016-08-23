@@ -194,7 +194,7 @@ namespace Belle2 {
 
       /// Get the support point of the trajectory in global coordinates
       Vector3D getSupport() const
-      { return getLocalHelix().support() + getLocalOrigin(); }
+      { return getLocalHelix().perigee() + getLocalOrigin(); }
 
       /// Clears all information from this trajectoy
       void clear()

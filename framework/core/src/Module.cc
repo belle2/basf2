@@ -411,7 +411,6 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("param", &Module::setParamPythonDict,
        "Set parameters using a dictionary: parameters given by the dictionary keys will be set to the corresponding values.")
   .def("return_value", setReturnValueInt)
-  .def("return_value", setReturnValueBool)
   .def("set_log_level", &Module::setLogLevel)
   .def("set_debug_level", &Module::setDebugLevel)
   .def("set_abort_level", &Module::setAbortLevel)

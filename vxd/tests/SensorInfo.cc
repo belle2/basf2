@@ -127,8 +127,9 @@ namespace Belle2 {
     /**
      * Check that a SensorPlane bails if it cannot find the SensorInfo associated
      * with the plane
+     * Disabled temporarily, 23/08/2016, P. Kvasnicka
      */
-    TEST(SensorPlane, NotFound)
+    TEST(SensorPlane, DISABLED_NotFound)
     {
       SensorPlane plane(VxdID(1, 1, 1));
       EXPECT_B2FATAL(plane.isInActive(0, 0));

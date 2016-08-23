@@ -92,9 +92,12 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
       file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
     }
     if (mod->hasCondition()) {
-      const Path* conditionPath = mod->getConditionPath().get();
-      plotPath(file, *conditionPath, module);
-      file << "    \"" << module << "\" -> \"cluster" << module << "_inv\" [color=grey,lhead=\"cluster" << module << "\"];\n";
+      for (const auto& condition : mod->getAllConditions()) {
+        const std::string& conditionName = condition.getString();
+        plotPath(file, *condition.getPath(), conditionName);
+        file << "    \"" << module << "\" -> \"cluster" << conditionName << "_inv\" " <<
+             "[color=grey,lhead=\"cluster" << conditionName << "\",label=\"" << conditionName << "\",fontcolor=grey];\n";
+      }
     }
 
     lastModule = module;

@@ -328,7 +328,7 @@ bool EventProcessor::processEvent(PathIterator moduleIter, bool skipMasterModule
       throw StoppedBySignalException(gSignalReceived);
     }
 
-    //Check for a module condition, evaluate it and if it is true switch to a new path
+    //Check for the module conditions, evaluate them and if one is true switch to the new path
     if (module->evalCondition()) {
       PathPtr condPath = module->getConditionPath();
       //continue with parent Path after condition path is executed?

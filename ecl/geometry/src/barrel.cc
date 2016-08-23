@@ -1,3 +1,4 @@
+#include <ecl/geometry/GeoECLCreator.h>
 #include "G4LogicalVolume.hh"
 #include "G4PVPlacement.hh"
 #include "G4NistManager.hh"
@@ -542,14 +543,10 @@ G4VSolid* get_crystal_support(int n)
   return new G4ExtrudedSolid(name, p, 1.5, off, 1, off, 1);
 }
 
-namespace  Belle2 {
-  namespace ECL {
-    void barrel(G4LogicalVolume* top);
-  };
-};
-
-void Belle2::ECL::barrel(G4LogicalVolume* top)
+void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume& _top)
 {
+  G4LogicalVolume* top = &_top;
+
   // bool b_crystals = false;
   // bool b_forward_support_legs = false;
   // bool b_backward_support_legs = false;
@@ -582,40 +579,7 @@ void Belle2::ECL::barrel(G4LogicalVolume* top)
   bool b_crystal_holder = true;
   bool b_pipe = true;
 
-  // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
-
-  G4Material* sus304 = new G4Material("SUS304", 8.00 * CLHEP::g / CLHEP::cm3, 3);
-  sus304->AddElement(nist->FindOrBuildElement("Fe"), 0.74);
-  sus304->AddElement(nist->FindOrBuildElement("Cr"), 0.18);
-  sus304->AddElement(nist->FindOrBuildElement("Ni"), 0.08);
-  cout << "SUS304 radiation length = " << sus304->GetRadlen() << " mm" << endl;
-
-  G4Material* a5083 = new G4Material("A5083", 2.65 * CLHEP::g / CLHEP::cm3, 2);
-  a5083->AddElement(nist->FindOrBuildElement("Al"), 0.955);
-  a5083->AddElement(nist->FindOrBuildElement("Mg"), 0.045);
-  cout << "A5083 radiation length = " << a5083->GetRadlen() << " mm" << endl;
-
-  G4Material* a5052 = new G4Material("A5052", 2.68 * CLHEP::g / CLHEP::cm3, 2);
-  a5052->AddElement(nist->FindOrBuildElement("Al"), 0.975);
-  a5052->AddElement(nist->FindOrBuildElement("Mg"), 0.025);
-  cout << "A5052 radiation length = " << a5052->GetRadlen() << " mm" << endl;
-
-  G4Material* a6063 = new G4Material("A6063", 2.68 * CLHEP::g / CLHEP::cm3, 3);
-  a6063->AddElement(nist->FindOrBuildElement("Al"), 0.98925);
-  a6063->AddElement(nist->FindOrBuildElement("Mg"), 0.00675);
-  a6063->AddElement(nist->FindOrBuildElement("Si"), 0.004);
-  cout << "A6063 radiation length = " << a6063->GetRadlen() << " mm" << endl;
-
-  G4Material* c1220 = new G4Material("C1220", 2.68 * CLHEP::g / CLHEP::cm3, 1); // c1200 contains >99.9% of copper
-  c1220->AddElement(nist->FindOrBuildElement("Cu"), 1);
-  cout << "Pure copper radiation length = " << c1220->GetRadlen() << " mm" << endl;
-
-  double wrapm = 2.699 * 0.0025 + 1.4 * 0.0025 + 2.2 * 0.02;
-  G4Material* medWrap = new G4Material("WRAP", wrapm / 0.025 * CLHEP::g / CLHEP::cm3, 3);
-  medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_Al"), 2.699 * 0.0025 / wrapm);
-  medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_MYLAR"), 1.4 * 0.0025 / wrapm);
-  medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_TEFLON"), 2.2 * 0.02 / wrapm);
 
   G4VisAttributes* att_iron = new G4VisAttributes(G4Colour(1., 0.1, 0.1));
   G4VisAttributes* att_iron2 = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
@@ -1001,17 +965,23 @@ void Belle2::ECL::barrel(G4LogicalVolume* top)
   }
 
   if (b_crystals) {
-    vector<shape_t*> barcryst = load_shapes("crystal_barrel.txt");
+    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
+    vector<G4LogicalVolume*> wrapped_crystals;
+    for (auto it = cryst.begin(); it != cryst.end(); it++) {
+      shape_t* s = *it;
+      wrapped_crystals.push_back(wrapped_crystal(s, "barrel", 0.17 - 0.03));
+    }
+
     cplacement_t* bp = barrel_placement;
     for (cplacement_t* it = bp; it != bp + 46 * 2; it++) {
       const cplacement_t& t = *it;
-      auto s = find_if(barcryst.begin(), barcryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
-      if (s == barcryst.end()) continue;
+      auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
+      if (s == cryst.end()) continue;
 
-      G4LogicalVolume* wc = wrapped_crystal(*s, "barrel", 0.17 - 0.03);
       G4Transform3D twc = get_transform(t);
       int indx = it - bp;
-      new G4PVPlacement(twc, wc, suf("ECLBarrelWrappedCrystal_Physical", indx), sectorlogical, false, indx, overlap);
+      new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBarrelWrappedCrystal_Physical", indx), sectorlogical, false,
+                        72 + 9 * (indx / 2) + (indx % 2), overlap);
     }
   }
 

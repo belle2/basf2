@@ -19,6 +19,7 @@
 #include <framework/logging/Logger.h>
 
 class G4LogicalVolume;
+class shape_t;
 
 namespace Belle2 {
 
@@ -49,18 +50,19 @@ namespace Belle2 {
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
       /** Make the ECL barrel and then place elements inside it */
-      void makeBarrel(const GearDir&, G4LogicalVolume*);
-      /** Place elements inside the forward endcap */
-      void makeForwardEndcap(const GearDir&, G4LogicalVolume*);
+      void barrel(const GearDir&, G4LogicalVolume&);
       /** Place elements inside the backward endcap */
-      void makeBackwardEndcap(const GearDir&, G4LogicalVolume*);
-      /** make geometry of endcap container */
-      void makeEndcapSupport(const bool aForward, G4LogicalVolume*);
+      void backward(const GearDir&, G4LogicalVolume&);
+      /** Place elements inside the forward endcap */
+      void forward(const GearDir&, G4LogicalVolume&);
+
     protected:
       /** isBeamBkgStudy for neutron flux  */
       int isBeamBkgStudy;
 
     private:
+
+      G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
 
       /** Sensitive detector */
       SensitiveDetector* m_sensitive;

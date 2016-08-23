@@ -4,19 +4,12 @@
 #include <vector>
 #include <G4VSolid.hh>
 #include <G4Transform3D.hh>
-#include <G4LogicalVolume.hh>
 
 double cosd(double);
 double sind(double);
 double tand(double);
 
 #define UNUSED __attribute__((unused))
-
-struct TripletF {
-  double m_1, m_2, m_3;
-  TripletF() {}
-  TripletF(const double& a1, const double& a2, const double& a3): m_1(a1), m_2(a2), m_3(a3) {}
-};
 
 struct shape_t {
   int nshape;
@@ -39,10 +32,8 @@ struct cplacement_t {
 
 std::vector<shape_t*> load_shapes(const std::string& fname);
 
-G4VSolid* getpc_solid(const char*, int n, const TripletF*, double, double);
 struct Point_t;
 Point_t centerofgravity(Point_t*, Point_t*);
-G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
 G4Transform3D get_transform(const cplacement_t& t);
 
 inline std::string suf(const std::string& s, int indx)

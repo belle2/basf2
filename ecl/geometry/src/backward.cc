@@ -1,3 +1,4 @@
+#include <ecl/geometry/GeoECLCreator.h>
 #include "ecl/geometry/BelleLathe.h"
 #include "ecl/geometry/BelleCrystal.h"
 #include "G4LogicalVolume.hh"
@@ -328,14 +329,9 @@ cplacement_t backward_placement[] = {
 // zshift = 1 d[33]= 0.31, d[36]= 0.175, d[59]= 0.117, d[0]= 0.052, d[56]= 0.0149, d[46]= 0.00887, d[13]= 0.00878, d[16]= 0.00459, d[17]= 0.00219, d[32]= 0.00123, d[55]= 0.00114, d[23]= 0.00106, d[53]= 0.00105, d[30]= 0.00102, d[3]= 0.00101, d[43]= 0.001, d[24]= 0.001, d[41]= 0.001, d[39]= 0.001, d[49]= 0.001, d[37]= 0.001, d[35]= 0.001, d[45]= 0.001, d[26]= 0.001, d[48]= 0.001, d[22]= 0.001, d[34]= 0.001, d[27]= 0.000994, d[29]= 0.000992, d[42]= 0.000989, d[4]= 0.00098, d[58]= 0.000973, d[15]= 0.00097, d[28]= 0.000965, d[44]= 0.000958, d[6]= 0.000955, d[54]= 0.000952, d[31]= 0.00095, d[57]= 0.000943, d[50]= 0.000927, d[1]= 0.000919, d[38]= 0.000917, d[12]= 0.000892, d[21]= 0.000887, d[25]= 0.00087, d[2]= 0.00086, d[19]= 0.000856, d[20]= 0.000852, d[11]= 0.000845, d[9]= 0.00078, d[40]= 0.00075, d[14]= 0.000708, d[18]= 0.000701, d[47]= 0.000671, d[7]= 0.000566, d[10]= 0.000543, d[5]= 0.000367, d[8]= 0.000193, d[52]= 0.000192, d[51]= -7.66e-05,
 };
 
-namespace Belle2 {
-  namespace ECL {
-    void backward(G4LogicalVolume* top);
-  }
-}
-
-void Belle2::ECL::backward(G4LogicalVolume* top)
+void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolume& _top)
 {
+  G4LogicalVolume* top = &_top;
   // Get nist material manager
   G4NistManager* nist = G4NistManager::Instance();
 
@@ -396,14 +392,14 @@ void Belle2::ECL::backward(G4LogicalVolume* top)
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, nist->FindOrBuildMaterial("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att_air);
-  new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), innervolume_logical, "innervolume_physical", top, false, 0,
+  new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), innervolume_logical, "ECLBackwardPhysical", top, false, 0,
                     overlap);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, cin);
   G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, nist->FindOrBuildMaterial("G4_AIR"),
       "innervolumesector_logical", 0, 0, 0);
   innervolumesector_logical->SetVisAttributes(att_air);
-  new G4PVReplica("ECLBackwardInnerVolumeSector_Physical", innervolumesector_logical, innervolume_logical, kPhi, 8, M_PI / 4, 0);
+  new G4PVReplica("ECLBackwardSectorPhysical", innervolumesector_logical, innervolume_logical, kPhi, 8, M_PI / 4, 0);
 
   if (b_ribs) {
     double H = 60, W = 20;
@@ -497,8 +493,9 @@ void Belle2::ECL::backward(G4LogicalVolume* top)
   G4LogicalVolume* crystalvolume_logical = new G4LogicalVolume(crystalvolume_solid, nist->FindOrBuildMaterial("G4_AIR"),
       "crystalvolume_logical", 0, 0, 0);
   crystalvolume_logical->SetVisAttributes(att_air);
-  new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "crystalvolume_physical", innervolumesector_logical, false, 0, overlap);
-  new G4PVPlacement(G4RotateZ3D(-M_PI / 8), crystalvolume_logical, "crystalvolume_physical", innervolumesector_logical, false, 1,
+  new G4PVPlacement(G4RotateZ3D(-M_PI / 8), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_0", innervolumesector_logical,
+                    false, 0, overlap);
+  new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_1", innervolumesector_logical, false, 1,
                     overlap);
 
   if (b_septum_wall) {
@@ -517,23 +514,28 @@ void Belle2::ECL::backward(G4LogicalVolume* top)
                                                                "septumwall3_logical", 0, 0, 0);
     septumwall3_logical->SetVisAttributes(att_alum2);
     new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2), septumwall3_logical,
-                      "septumwall3_physical", crystalvolume_logical, false, 0, overlap);
+                      "septumwall3_physical_0", crystalvolume_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, -0.5 / 2 / 2),
-                      septumwall3_logical, "septumwall3_physical", crystalvolume_logical, false, 1, overlap);
+                      septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
   }
 
   if (b_crystals) {
-    vector<shape_t*> barcryst = load_shapes("crystal_backward.txt");
+    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_backward.dat");
+    vector<G4LogicalVolume*> wrapped_crystals;
+    for (auto it = cryst.begin(); it != cryst.end(); it++) {
+      shape_t* s = *it;
+      wrapped_crystals.push_back(wrapped_crystal(s, "backward", 0.20 - 0.02));
+    }
     cplacement_t* bp = backward_placement;
     for (cplacement_t* it = bp; it != bp + 60; it++) {
       const cplacement_t& t = *it;
-      auto s = find_if(barcryst.begin(), barcryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
-      if (s == barcryst.end()) continue;
+      auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
+      if (s == cryst.end()) continue;
 
-      G4LogicalVolume* wc = wrapped_crystal(*s, "backward", 0.2 - 0.02);
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(t);
       int indx = it - bp;
-      new G4PVPlacement(twc, wc, suf("ECLBackwardWrappedCrystal_Physical", indx), crystalvolume_logical, false, indx, overlap);
+      new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBackwardWrappedCrystal_Physical", indx), crystalvolume_logical,
+                        false, (1152 + 6624) / 16 + indx, overlap);
     }
   }
 

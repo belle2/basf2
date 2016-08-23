@@ -18,6 +18,8 @@
 #include "ecl/geometry/BelleLathe.h"
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
+#include <framework/utilities/FileSystem.h>
+
 using namespace std;
 
 double cosd(double x) {return cos(x * (M_PI / 180));}
@@ -619,8 +621,9 @@ struct pent_t: public shape_t {
 vector<shape_t*> load_shapes(const string& fname)
 {
   vector<shape_t*> shapes;
+  std::string fnamef = Belle2::FileSystem::findFile(fname);
 
-  ifstream IN(fname.c_str());
+  ifstream IN(fnamef.c_str());
   string tmp;
   while (getline(IN, tmp)) {
     size_t ic = tmp.find("#");
@@ -677,70 +680,6 @@ vector<shape_t*> load_shapes(const string& fname)
   // }
 
   // return crystals;
-}
-
-G4VSolid* getpc_solid(const char* pref, int n, const TripletF* b, double phi0, double dphi)
-{
-  vector<double > v1(n), v2(n), v3(n);
-  for (int i = 0; i < n; b++, i++) {
-    const TripletF& t = *b;
-    double z = t.m_1, ri = t.m_2, ro = t.m_3;
-    v1[i] = z;
-    v2[i] = ri;
-    v3[i] = ro;
-  }
-  string solidname(pref); solidname += "_solid";
-  return new BelleLathe(solidname.c_str(), phi0, dphi, n, v1.data(), v2.data(), v3.data());
-}
-
-G4VSolid* getpc_solid(const char* pref, const TripletF* b, const TripletF* e, double phi0, double dphi)
-{
-  return getpc_solid(pref, e - b, b, phi0, dphi);
-}
-
-G4LogicalVolume* getpc(const char* pref, const TripletF* b, const TripletF* e, double phi0, double dphi, G4Material* med,
-                       G4VisAttributes* attvol = NULL)
-{
-  G4VSolid* pcons = getpc_solid(pref, b, e, phi0, dphi);
-  string lvolname(pref); lvolname += "_logic";
-  G4LogicalVolume* pconl = new G4LogicalVolume(pcons, med, lvolname.c_str());
-  if (attvol != NULL) pconl->SetVisAttributes(attvol);
-  return pconl;
-}
-
-void print(const TripletF* b, const TripletF* e)
-{
-  //  int n = e-b;
-  for (int i = 0; b != e; b++, i++) {
-    const TripletF& t = *b;
-    double z = t.m_1, ri = t.m_2, ro = t.m_3;
-    cout << i << " " << z << " " << ri << " " << ro << endl;
-  }
-}
-
-G4LogicalVolume* wrapped_crystal(const shape_t* s, const string& endcap, double wrapthickness)
-{
-  // Get nist material manager
-  G4NistManager* nist = G4NistManager::Instance();
-
-  string prefix("sv_"); prefix += endcap; prefix += "_wrap";
-  G4Translate3D tw;
-  G4VSolid* wrapped_crystal = s->get_solid(prefix, wrapthickness, tw);
-  //  cout<<wrapped_crystal<<endl;
-  string name("lv_"); name += endcap + "_wrap_" + to_string(s->nshape);
-  G4LogicalVolume* wrapped_logical = new G4LogicalVolume(wrapped_crystal, nist->FindOrBuildMaterial("WRAP"), name.c_str(), 0, 0, 0);
-  //  wrapLogical->SetVisAttributes(cvol);
-
-  prefix = "sv_"; prefix += endcap; prefix += "_crystal";
-  G4Translate3D tc;
-  G4VSolid* crystal_solid = s->get_solid(prefix, 0, tc);
-  name = "lv_" + endcap + "_crystal_" + to_string(s->nshape);
-  G4LogicalVolume* crystal_logical = new G4LogicalVolume(crystal_solid, nist->FindOrBuildMaterial("G4_CESIUM_IODIDE"), name.c_str(),
-                                                         0, 0, 0);
-  //  crystalLogical->SetVisAttributes(cvol);
-
-  new G4PVPlacement(NULL, G4ThreeVector(), crystal_logical, name.c_str(), wrapped_logical, false, 0, 0);
-  return wrapped_logical;
 }
 
 G4Transform3D get_transform(const cplacement_t& t)

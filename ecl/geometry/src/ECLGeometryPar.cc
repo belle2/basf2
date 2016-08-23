@@ -220,25 +220,23 @@ void ECLGeometryPar::read()
   // requires a physical volume during phi replication to be symmetric
   // around phi=0. So we need to rotate it by -((2*pi)/16)/2 angle at the
   // geometry description are return back here.
-  G4RotationMatrix H = CLHEP::HepRotationZ(sectorPhi[1] * 0.5);
 
   G4Point3D p0(0, 0, 0); G4Vector3D v0(0, 0, 1);
 
   {
-    G4Transform3D T = G4RotateZ3D(sectorPhi[1] * 0.5) * getT("ECLForwardPhysical") * getT("ECLForwardSectorPhysical") *
-                      getT("ECLForwardCrystalSectorPhysical_0");
+    G4Transform3D T = getT("ECLForwardPhysical") * getT("ECLForwardSectorPhysical") * getT("ECLForwardCrystalSectorPhysical_1");
     G4String tnamef("ECLForwardWrappedCrystal_Physical_");
     for (int i = 0; i < 72; i++) {
       G4String vname(tnamef); vname += to_string(i);
       G4Transform3D cT = T * getT(vname);
       CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
       m_crystals.push_back(c);
-      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
+      //      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
     }
   }
 
   {
-    G4Transform3D T = G4RotateZ3D(sectorPhi[1] * 0.5) * getT("ECLBackwardPhysical") * getT("ECLBackwardSectorPhysical") *
+    G4Transform3D T = G4RotateZ3D(M_PI) * getT("ECLBackwardPhysical") * getT("ECLBackwardSectorPhysical") *
                       getT("ECLBackwardCrystalSectorPhysical_0");
     G4String tnamef("ECLBackwardWrappedCrystal_Physical_");
     for (int i = 0; i < 60; i++) {
@@ -246,7 +244,7 @@ void ECLGeometryPar::read()
       G4Transform3D cT = T * getT(vname);
       CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
       m_crystals.push_back(c);
-      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
+      //      G4cout << i << " " << c.pos << " " << c.dir << G4endl;
     }
   }
 
@@ -261,13 +259,18 @@ void ECLGeometryPar::read()
     G4String tname("ECLBarrelWrappedCrystal_Physical_");
     for (int i = 0; i < 2 * 46; i++) {
       G4String vname(tname); vname += to_string(i);
-      G4Transform3D cT = ((i % 2) ? Ts : Ts1) * getT(vname);
+      G4Transform3D cT = ((i % 2) ? Ts1 : Ts) * getT(vname);
       CrystalGeom_t c = {(1 / CLHEP::cm)* (cT * p0), cT * v0};
       m_crystals.push_back(c);
-      //    const CrystalGeom_t&c = m_crystals.back();
-      //    G4cout<<c.pos<<" "<<c.dir<<G4endl;
+      //      G4cout << i << " " << c.pos << " " <<c.dir<<G4endl;
     }
   }
+
+  // for(int i=0;i<8736;i++){
+  //   const TVector3& v = GetCrystalPos(i);
+  //   cout<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
+  // }
+  // exit(0);
   B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }
 
@@ -323,22 +326,35 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
   //  call instead of three here
   const G4NavigationHistory* h = touch->GetHistory();
   int hd = h->GetDepth();
-  int indx     = h->GetReplicaNo(hd - 0); // index of each volume is set at physical volume creation
+  int indx     = h->GetReplicaNo(hd - 1); // index of each volume is set at physical volume creation
   int NReplica = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
-  //  int indx     = touch->GetCopyNumber(0); // index of each volume is set at physical volume creation
-  //  int NReplica = touch->GetCopyNumber(2); // go up in volume hierarchy
 
   int ThetaId  = Mapping_t::Indx2ThetaId(indx);
   int NCryst   = Mapping_t::ThetaId2NCry(ThetaId); // the number of crystals in a sector at given ThetaId
   int Offset   = Mapping_t::Offset(ThetaId);
-  int PhiId    = NReplica * NCryst + (indx - Offset);
-  if (NCryst == 2) { // barrel
-    PhiId -= h->GetReplicaNo(hd - 1);
-    //    PhiId -= touch->GetCopyNumber(1);
-    if (PhiId == -1) PhiId = 143; // this can occure only @ NReplica==0
+
+  int ik = indx - Offset;
+  int PhiId;
+  if (NCryst == 2) {
+    PhiId = (NReplica - (ik % 2)) * NCryst + ik;
+    PhiId = (PhiId + 144) % 144;
+  } else {
+    int n3 = h->GetReplicaNo(hd - 3); // go up in volume hierarchy
+    if (ThetaId < 13)
+      PhiId = (NReplica + 2 * n3) * NCryst + ik;
+    else {
+      int n3r = (3 - (n3 % 4)) + 4 * (n3 / 4);
+      // int tt[] = {3,2,1,0,7,6,5,4};
+      // if(n3r!=tt[n3]){
+      //  cout<<n3<<" "<<n3<<" "<<tt[n3]<<endl;
+      //  exit(0);
+      // }
+      PhiId = (2 * n3r + 1 - NReplica) * NCryst + ik;
+    }
   }
+
   int cellID = Offset * 16 + PhiId;
-  //  cout<<"ECLGeometryPar::TouchableToCellID "<<indx<<" "<<NReplica<<" "<<ThetaId<<" "<<NCryst<<" "<<Offset<<" "<<PhiId<<endl;
+  //    cout<<"ECLGeometryPar::TouchableToCellID "<<h->GetVolume(hd-1)->GetName()<<" "<<indx<<" "<<NReplica<<" "<<h->GetReplicaNo(hd - 3)<<" "<<ThetaId<<" "<<NCryst<<" "<<Offset<<" "<<PhiId<<endl;
 
   // test of the position and direction of crystal
   if (0) {
@@ -354,10 +370,17 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 
     G4ThreeVector dr(drx, dry, drz), dn(dnx, dny, dnz);
     if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
-      cout << NReplica << " " << indx << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
+      cout << hd << " " << NReplica << " " << indx << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
+
+      for (int i = 0; i < 144; i++) {
+        int ci = Mapping_t::CellID(ThetaId, i);
+        InitCrystal(ci);
+        drx = geom_pos.X() - ro.x(), dry = geom_pos.Y() - ro.y(), drz = geom_pos.Z() - ro.z();
+        G4ThreeVector dr(drx, dry, drz);
+        if (dr.mag() < 1e-10) cout << "best PhiId = " << i << endl;
+      }
     }
   }
-
   return cellID;
 }
 

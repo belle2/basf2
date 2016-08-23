@@ -658,12 +658,14 @@ def deserialize_path(path_state):
 
 def get_path_from_file(path_filename):
     import pickle
-    return deserialize_path(pickle.load(open(path_filename, 'br')))
+    with open(path_filename, 'br') as f:
+        return deserialize_path(pickle.load(f))
 
 
 def write_path_to_file(path, filename):
     import pickle
-    pickle.dump(serialize_path(path), open(filename, 'bw'))
+    with open(filename, 'bw') as f:
+        pickle.dump(serialize_path(path), f)
 
 
 def is_mod_function(mod, func):

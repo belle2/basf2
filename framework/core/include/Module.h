@@ -277,16 +277,22 @@ namespace Belle2 {
     /**
      * Returns true if at least one condition was set for the module.
      */
-    bool hasCondition() const { return not m_condition.empty(); };
+    bool hasCondition() const { return not m_conditions.empty(); };
 
     /** Return a pointer to the first condition (or nullptr, if none was set) */
     const ModuleCondition* getCondition() const
     {
-      if (m_condition.empty()) {
+      if (m_conditions.empty()) {
         return nullptr;
       } else {
-        return &m_condition.front();
+        return &m_conditions.front();
       }
+    }
+
+    /** Return all set conditions for this module. */
+    const std::vector<ModuleCondition>& getAllConditions() const
+    {
+      return m_conditions;
     }
 
     /**
@@ -301,11 +307,22 @@ namespace Belle2 {
      */
     bool evalCondition() const;
 
-    /** TODO Returns the path of the condition.  */
+    /** Returns the path of the last true condition (if there is at least one, else reaturn a null pointer).  */
     boost::shared_ptr<Path> getConditionPath() const;
 
-    /** TODO What to do after a conditional path is finished. (defaults to c_End if no condition is set)*/
+    /** What to do after the conditional path is finished. (defaults to c_End if no condition is set)*/
     Module::EAfterConditionPath getAfterConditionPath() const;
+
+    /** Return all conditions paths currently set (no matter if there condition is true or not). */
+    std::vector<boost::shared_ptr<Path>> getAllConditionPaths() const
+    {
+      std::vector<boost::shared_ptr<Path>> allConditionPaths;
+      for (const auto& condition : m_conditions) {
+        allConditionPaths.push_back(condition.getPath());
+      }
+
+      return allConditionPaths;
+    }
 
     /**
      * Returns true if all specified property flags are available in this module.
@@ -472,7 +489,7 @@ namespace Belle2 {
     bool m_hasReturnValue;     /**< True, if the return value is set. */
     int  m_returnValue;        /**< The return value. */
 
-    std::vector<ModuleCondition> m_condition; /**< Module condition, only non-null if set. */
+    std::vector<ModuleCondition> m_conditions; /**< Module condition, only non-null if set. */
 
     //~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     //                    Python API

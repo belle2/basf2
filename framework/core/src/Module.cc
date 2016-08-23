@@ -80,7 +80,7 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 
 void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
-  m_condition.emplace_back(expression, path, afterConditionPath);
+  m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
@@ -97,14 +97,14 @@ void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterCond
 
 bool Module::evalCondition() const
 {
-  if (m_condition.empty()) return false;
+  if (m_conditions.empty()) return false;
 
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
 
-  for (const auto& condition : m_condition) {
+  for (const auto& condition : m_conditions) {
     if (condition.evaluate(m_returnValue)) {
       return true;
     }
@@ -115,14 +115,14 @@ bool Module::evalCondition() const
 boost::shared_ptr<Path> Module::getConditionPath() const
 {
   PathPtr p;
-  if (m_condition.empty()) return p;
+  if (m_conditions.empty()) return p;
 
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
 
-  for (auto reverse_iterator = m_condition.rbegin(); reverse_iterator != m_condition.rend(); ++reverse_iterator) {
+  for (auto reverse_iterator = m_conditions.rbegin(); reverse_iterator != m_conditions.rend(); ++reverse_iterator) {
     const auto& condition = *reverse_iterator;
     if (condition.evaluate(m_returnValue)) {
       return condition.getPath();
@@ -135,14 +135,14 @@ boost::shared_ptr<Path> Module::getConditionPath() const
 
 Module::EAfterConditionPath Module::getAfterConditionPath() const
 {
-  if (m_condition.empty()) return EAfterConditionPath::c_End;
+  if (m_conditions.empty()) return EAfterConditionPath::c_End;
 
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
 
-  for (auto reverse_iterator = m_condition.rbegin(); reverse_iterator != m_condition.rend(); ++reverse_iterator) {
+  for (auto reverse_iterator = m_conditions.rbegin(); reverse_iterator != m_conditions.rend(); ++reverse_iterator) {
     const auto& condition = *reverse_iterator;
     if (condition.evaluate(m_returnValue)) {
       return condition.getAfterConditionPath();
@@ -172,11 +172,7 @@ boost::shared_ptr<PathElement> Module::clone() const
   newModule->m_package = m_package;
   newModule->m_propertyFlags = m_propertyFlags;
   newModule->m_logConfig = m_logConfig;
-
-  if (not m_condition.empty()) {
-    // TODO
-    //newModule->m_condition = new ModuleCondition(*m_condition);
-  }
+  newModule->m_conditions = m_conditions;
 
   return newModule;
 }
@@ -186,7 +182,7 @@ std::string Module::getPathString() const
 
   std::string output = getName();
 
-  for (const auto& condition : m_condition) {
+  for (const auto& condition : m_conditions) {
     output += condition.getString();
   }
 

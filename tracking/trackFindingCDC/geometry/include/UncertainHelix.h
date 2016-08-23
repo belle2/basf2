@@ -31,21 +31,21 @@ namespace Belle2 {
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainHelix(const double curvature,
-                     const double tangentialPhi,
+                     const double phi0,
                      const double impact,
                      const double tanLambda,
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : Helix(curvature, tangentialPhi, impact, tanLambda, z0),
+        : Helix(curvature, phi0, impact, tanLambda, z0),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
       {}
 
 
-      /// Constructor taking all stored parameters as a SVector.
+      /// Constructor taking all stored parameters
       explicit UncertainHelix(const HelixParameters& parameters,
                               const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
@@ -58,14 +58,14 @@ namespace Belle2 {
 
       /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
       UncertainHelix(const double curvature,
-                     const Vector2D& tangential,
+                     const Vector2D& phi0Vec,
                      const double impact,
                      const double tanLambda,
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : Helix(curvature, tangential, impact, tanLambda, z0),
+        : Helix(curvature, phi0Vec, impact, tanLambda, z0),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -231,7 +231,7 @@ namespace Belle2 {
       /// Memory for the chi square value of the fit of this helix.
       double m_chi2 = 0.0;
 
-      /// Memory for the number of degrees of freedim of the fit of this helix.
+      /// Memory for the number of degrees of freedom of the fit of this helix.
       size_t m_ndf = 0.0;
 
     }; //class

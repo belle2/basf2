@@ -25,11 +25,11 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
   double curvature = 1.0;
-  double tangentialPhi = M_PI / 4.0;
+  double phi0 = M_PI / 4.0;
   double impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
-  PerigeeCircle perigeeCircle(curvature, tangentialPhi, impact);
+  PerigeeCircle perigeeCircle(curvature, phi0, impact);
 
   const GeneralizedCircle generalizedCircle(perigeeCircle.n0(),
                                             perigeeCircle.n12(),
@@ -44,9 +44,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 
   EXPECT_NEAR(curvature, roundTripCircle.curvature(), 10e-7);
   EXPECT_NEAR(impact, roundTripCircle.impact(), 10e-7);
-  EXPECT_NEAR(cos(tangentialPhi), roundTripCircle.tangential().x(), 10e-7);
-  EXPECT_NEAR(sin(tangentialPhi), roundTripCircle.tangential().y(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, roundTripCircle.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(cos(phi0), roundTripCircle.phi0Vec().x(), 10e-7);
+  EXPECT_NEAR(sin(phi0), roundTripCircle.phi0Vec().y(), 10e-7);
+  EXPECT_NEAR(phi0, roundTripCircle.phi0(), 10e-7);
 
 
   PerigeeCircle roundTripCircle2;
@@ -54,9 +54,9 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 
   EXPECT_NEAR(curvature, roundTripCircle2.curvature(), 10e-7);
   EXPECT_NEAR(impact, roundTripCircle2.impact(), 10e-7);
-  EXPECT_NEAR(cos(tangentialPhi), roundTripCircle2.tangential().x(), 10e-7);
-  EXPECT_NEAR(sin(tangentialPhi), roundTripCircle2.tangential().y(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, roundTripCircle2.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(cos(phi0), roundTripCircle2.tangential().x(), 10e-7);
+  EXPECT_NEAR(sin(phi0), roundTripCircle2.tangential().y(), 10e-7);
+  EXPECT_NEAR(phi0, roundTripCircle2.phi0(), 10e-7);
 
 }
 
@@ -163,10 +163,10 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
 
   double curvature = -1.;
-  double tangentialPhi = 3. * M_PI / 4.;
+  double phi0 = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.);
 
-  PerigeeCircle circle(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, phi0, impact);
 
   EXPECT_TRUE(circle.isCircle());
   EXPECT_FALSE(circle.isLine());
@@ -176,7 +176,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(1.0, circle.center().y(), 10e-7);
 
   EXPECT_NEAR(curvature, circle.curvature(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, circle.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(phi0, circle.phi0(), 10e-7);
   EXPECT_NEAR(impact, circle.impact(), 10e-7);
 
   EXPECT_NEAR(0, circle.distance(Vector2D(1.0, 0.0)), 10e-7);
@@ -198,10 +198,10 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_TRUE(defaultCircle.isInvalid());
 
   double curvature = -1.;
-  double tangentialPhi = 3. * M_PI / 4.;
+  double phi0 = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.0);
 
-  PerigeeCircle circle(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, phi0, impact);
 
   circle.invalidate();
   EXPECT_TRUE(circle.isInvalid());
@@ -402,7 +402,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
   const PerigeeCircle perigeeCircle(expectedCurvature,
                                     expectedPhi0,
                                     impact);
-  const Vector2D& expectedPhi0Vec = perigeeCircle.tangential();
+  const Vector2D& expectedPhi0Vec = perigeeCircle.phi0Vec();
 
   double randomArcLength = 2.0;
   Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);

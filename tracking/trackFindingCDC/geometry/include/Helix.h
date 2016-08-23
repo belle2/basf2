@@ -45,22 +45,22 @@ namespace Belle2 {
       {}
 
       /// Constructor from all helix parameter
-      Helix(const double curvature,
-            const double tangentialPhi,
-            const double impact,
-            const double tanLambda,
-            const double z0)
-        : m_circleXY(curvature, tangentialPhi, impact)
+      Helix(double curvature,
+            double phi0,
+            double impact,
+            double tanLambda,
+            double z0)
+        : m_circleXY(curvature, phi0, impact)
         , m_szLine(tanLambda, z0)
       {}
 
       /// Constructor from all helix parameter, phi given as a unit vector
-      Helix(const double curvature,
-            const Vector2D& tangential,
-            const double impact,
-            const double tanLambda,
-            const double z0)
-        : m_circleXY(curvature, tangential, impact)
+      Helix(double curvature,
+            const Vector2D& phi0Vec,
+            double impact,
+            double tanLambda,
+            double z0)
+        : m_circleXY(curvature, phi0Vec, impact)
         , m_szLine(tanLambda, z0)
       {}
 
@@ -102,7 +102,7 @@ namespace Belle2 {
        *  Calculates the two dimensional arc length that first reaches a cylindrical radius on the helix
        *  Returns NAN if the radius cannot be reached.
        */
-      double arcLength2DToCylindricalR(const double cylindricalR) const
+      double arcLength2DToCylindricalR(double cylindricalR) const
       { return circleXY().arcLengthToCylindricalR(cylindricalR); }
 
       /// Calculates the point of closest approach on the helix to the given point.
@@ -134,7 +134,7 @@ namespace Belle2 {
       HelixJacobian passiveMoveByJacobian(const Vector3D& by) const;
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
-      void shiftTanLambdaZ0(const double tanLambdaShift, const double zShift)
+      void shiftTanLambdaZ0(double tanLambdaShift, double zShift)
       {
         m_szLine.setTanLambda(m_szLine.tanLambda() + tanLambdaShift);
         m_szLine.setZ0(m_szLine.z0() + zShift);
@@ -152,32 +152,36 @@ namespace Belle2 {
       }
 
       /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
-      Vector3D atArcLength2D(const double s) const
+      Vector3D atArcLength2D(double s) const
       { return Vector3D(circleXY().atArcLength(s), szLine().map(s)); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector3D atZ(const double z) const
+      Vector3D atZ(double z) const
       { return Vector3D(xyAtZ(z), z); }
 
       /// Calculates the point, which lies at the given z coordinate
-      Vector2D xyAtZ(const double z) const
+      Vector2D xyAtZ(double z) const
       { return Vector2D(circleXY().atArcLength(szLine().inverseMap(z))); }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
-      inline double minimalCylindricalR() const
+      double minimalCylindricalR() const
       { return circleXY().minimalCylindricalR(); }
 
       /// Gives the maximal cylindrical radius the circle reaches
-      inline double maximalCylindricalR() const
+      double maximalCylindricalR() const
       { return circleXY().maximalCylindricalR(); }
 
       /// Getter for the signed curvature in the xy projection.
-      inline double curvatureXY() const
+      double curvatureXY() const
       { return circleXY().curvature(); }
 
       /// Getter for the signed distance to the z axes at the perigee point.
       double impactXY() const
       { return circleXY().impact(); }
+
+      /// Getter for the omega parameter of the common helix parameterisation.
+      double omega() const
+      { return circleXY().omega(); }
 
       /// Getter for the signed distance to the z axes at the perigee point
       double d0() const
@@ -219,21 +223,13 @@ namespace Belle2 {
       Vector3D tangential() const
       { return Vector3D(phi0Vec(), tanLambda()).unit(); }
 
-      /// Getter for the tangential vector in the xy projection at the perigee point of the helix.
-      const Vector2D& tangentialXY() const
-      { return circleXY().tangential(); }
-
-      /// Getter for the tangential vector in the xy projection at the perigee of the helix.
+      /// Getter for the direction vector in the xy projection at the perigee of the helix.
       const Vector2D& phi0Vec() const
-      { return circleXY().tangential(); }
+      { return circleXY().phi0Vec(); }
 
-      /// Getter for the azimuth angle of the tangential vector at the perigee point of the helix.
-      double tangentialPhi() const
-      { return circleXY().tangentialPhi(); }
-
-      /// Getter for the azimuth angle of the tangential vector at the perigee point of the helix.
+      /// Getter for the azimuth angle of the direction of flight at the perigee.
       double phi0() const
-      { return tangentialPhi(); }
+      { return phi0(); }
 
       /// Getter for the five helix parameters in the order defined by EHelixParameter.h
       HelixParameters helixParameters() const
@@ -261,7 +257,7 @@ namespace Belle2 {
       {
         return output << "Helix("
                << "curv=" << helix.curvatureXY() << ","
-               << "phi0=" << helix.tangentialPhi() << ","
+               << "phi0=" << helix.phi0() << ","
                << "impact=" << helix.impactXY() << ","
                << "tanL=" << helix.tanLambda() << ","
                << "z0=" << helix.z0() << ")" ;

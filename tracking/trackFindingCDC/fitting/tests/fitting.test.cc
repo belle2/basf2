@@ -80,13 +80,13 @@ namespace {
         "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(generalCircle.radius(), fittedCircle->radius(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
-    EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle->tangentialPhi(), 10e-7) <<
+    EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle->phi0(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
     EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) << "AFitter " << typeid(fitter).name() << " failed.";
 
     const double curv = fittedCircle->curvature();
     const double I = fittedCircle->impact();
-    const double phi = fittedCircle->tangentialPhi();
+    const double phi = fittedCircle->phi0();
 
     const double chi2 = fittedCircle.chi2();
 

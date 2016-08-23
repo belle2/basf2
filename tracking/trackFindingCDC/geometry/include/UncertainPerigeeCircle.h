@@ -35,12 +35,12 @@ namespace Belle2 {
        * Covariance matrix defaults to a zero matrix.
        */
       UncertainPerigeeCircle(const double curvature,
-                             const double tangentialPhi,
+                             const double phi0Vec,
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : m_perigeeCircle(curvature, tangentialPhi, impact),
+        : m_perigeeCircle(curvature, phi0Vec, impact),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -52,12 +52,12 @@ namespace Belle2 {
        *  Covariance matrix defaults to a zero matrix
        */
       UncertainPerigeeCircle(const double curvature,
-                             const Vector2D& tangential,
+                             const Vector2D& phi0,
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : m_perigeeCircle(curvature, tangential, impact),
+        : m_perigeeCircle(curvature, phi0, impact),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)

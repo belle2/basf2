@@ -59,7 +59,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
 
   const double curv = circle.curvature();
   // const Vector2D& phi0Vec = circle.tangential();
-  const double phi0 = circle.tangentialPhi();
+  const double phi0 = circle.phi0();
   // const double impact = circle.impact();
   const Vector2D& perigee = circle.perigee();
 

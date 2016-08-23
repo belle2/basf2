@@ -245,10 +245,6 @@ namespace Belle2 {
       const Vector2D& tangential() const
       { return phi0Vec(); }
 
-      /// Getter for the azimuth angle of the direction of flight at the perigee - Deprecated for phi0()
-      double tangentialPhi() const
-      { return phi0(); }
-
       /// Getter for the perigee point
       Vector2D perigee() const
       { return phi0Vec().orthogonal() * impact(); }
@@ -367,17 +363,17 @@ namespace Belle2 {
       { m_curvature = curvature; }
 
       /// Sets the azimuth angle of the direction of flight at the perigee.
-      void setTangentialPhi(double phi0)
+      void setPhi0(double phi0)
       {
         m_phi0 = phi0;
         m_phi0Vec = Vector2D::Phi(phi0);
       }
 
       /// Sets the unit direction of flight at the perigee
-      void setTangential(const Vector2D& tangential)
+      void setPhi0(const Vector2D& phi0Vec)
       {
-        m_phi0 = tangential.phi();
-        m_phi0Vec = tangential.unit();
+        m_phi0 = phi0Vec.phi();
+        m_phi0Vec = phi0Vec.unit();
       }
 
       /// Sets the impact parameter of the circle.
@@ -389,7 +385,7 @@ namespace Belle2 {
       {
         m_impact = impact;
         m_phi0 = phi0Vec.phi();
-        m_phi0Vec = phi0Vec;
+        m_phi0Vec = phi0Vec.unit();
         m_curvature = curvature;
       }
 

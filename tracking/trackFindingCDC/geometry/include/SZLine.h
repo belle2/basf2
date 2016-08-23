@@ -37,7 +37,7 @@ namespace Belle2 {
       {}
 
       /// Constructor from the sz parameters
-      SZLine(const SZParameters& szParameters)
+      explicit SZLine(const SZParameters& szParameters)
         : m_tanLambda(szParameters(ESZParameter::c_TanL))
         , m_z0(szParameters(ESZParameter::c_Z0))
       {}

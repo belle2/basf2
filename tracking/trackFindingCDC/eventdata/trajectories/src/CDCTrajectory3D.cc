@@ -166,10 +166,10 @@ namespace {
                                                 const double bZ)
   {
     const double impactXY = localHelix.impactXY();
-    const Vector2D& tangentialXY = localHelix.tangentialXY();
+    const Vector2D& phi0Vec = localHelix.phi0Vec();
 
-    const double cosPhi0 = tangentialXY.x();
-    const double sinPhi0 = tangentialXY.y();
+    const double cosPhi0 = phi0Vec.x();
+    const double sinPhi0 = phi0Vec.y();
 
     const double curvatureXY = localHelix.curvatureXY();
     const double tanLambda = localHelix.tanLambda();

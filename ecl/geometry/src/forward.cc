@@ -557,7 +557,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
                       septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 1, overlap);
   }
 
-  zr_t vcr[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20}, {ZT - 134.2, RT - 20}, {3, RC}};
+  zr_t vcr[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
   std::vector<zr_t> ccr(vcr, vcr + sizeof(vcr) / sizeof(zr_t));
   G4VSolid* crystalvolume_solid = new BelleLathe("crystalvolume_solid", 0, M_PI / 8, ccr);
   G4LogicalVolume* crystalvolume_logical = new G4LogicalVolume(crystalvolume_solid, nist->FindOrBuildMaterial("G4_AIR"),
@@ -597,14 +597,14 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
       wrapped_crystals.push_back(wrapped_crystal(s, "forward", 0.20 - 0.02));
     }
 
-    cplacement_t* bp = forward_placement;
-    for (cplacement_t* it = bp; it != bp + 72; it++) {
+    vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
       if (s == cryst.end()) continue;
 
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(t);
-      int indx = it - bp;
+      int indx = it - bp.begin();
       new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLForwardWrappedCrystal_Physical", indx), crystalvolume_logical,
                         false, indx, overlap);
     }

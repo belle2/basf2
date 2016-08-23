@@ -376,18 +376,7 @@ namespace Belle2 {
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
       std::pair<Belle2::TrackFindingCDC::Vector2D, Belle2::TrackFindingCDC::Vector2D>
-      sameCylindricalR(const double cylindricalR) const;
-
-      /**
-       *  Approach with the same cylindrical radius on the circle to the point.
-       *  Calculates the point on the circle with the same cylindrical radius as the given point.
-       *  This is particularly useful to extraplotate within  a certain layer.
-       *  In case on intersection with this cylindrical radius does not exist return
-       *  Vector2D(NAN,NAN).
-       *  @param point   Point to which to extrapolate.
-       *  @return Close  Point with same cylindrical radius on the circle
-       */
-      Vector2D sameCylindricalR(const Vector2D& point) const;
+      atCylindricalR(const double cylindricalR) const;
 
       /**
        *  Approach on the circle with the given cylindrical radius
@@ -402,8 +391,8 @@ namespace Belle2 {
        *  @param cylindricalR Cylindrical radius of interest
        *  @return Close point in forward direction with same cylindrical radius on the circle.
        */
-      Vector2D sameCylindricalRForwardOf(const Vector2D& startPoint,
-                                         const double cylindricalR) const;
+      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint,
+                                       const double cylindricalR) const;
 
       /**
        *  Approximate distance.
@@ -525,17 +514,6 @@ namespace Belle2 {
        */
       inline ERotation orientation() const
       { return static_cast<ERotation>(sign(n3())); }
-
-      /**
-       *  Calculates the angle between two points of closest approach on the circle.
-       *  The angle is signed positiv for a counterclockwise rotation.
-       *  The points are essentially first taken to their closest approach
-       *  before we take the opening angle as seen from the circle center.
-       *  The angle will zero if the generalized circle was line.
-       */
-      inline double openingAngleBetween(const Vector2D& from, const Vector2D& to) const
-      { return gradient(from).angleWith(gradient(to)); } //not optimal in number of computations
-
 
       /// Getter for the arc length for a full round of the circle
       double arcLengthPeriod() const

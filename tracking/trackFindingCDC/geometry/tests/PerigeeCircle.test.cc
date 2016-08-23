@@ -362,6 +362,35 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
   }
 }
 
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
+
+  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+
+  EXPECT_NEAR(2, solutions.first.x(), 10e-7);
+  EXPECT_NEAR(1, solutions.first.y(), 10e-7);
+
+  EXPECT_NEAR(2, solutions.second.x(), 10e-7);
+  EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
+}
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR_opposite_orientation)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius, ERotation::c_Clockwise);
+
+  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+
+  EXPECT_NEAR(2, solutions.first.x(), 10e-7);
+  EXPECT_NEAR(-1, solutions.first.y(), 10e-7);
+
+  EXPECT_NEAR(2, solutions.second.x(), 10e-7);
+  EXPECT_NEAR(1, solutions.second.y(), 10e-7);
+}
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
 {

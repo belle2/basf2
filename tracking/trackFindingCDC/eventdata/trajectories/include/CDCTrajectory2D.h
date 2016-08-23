@@ -134,15 +134,6 @@ namespace Belle2 {
       { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
       /**
-       *  Calculates the closest point with the same cylindricalR on the trajectory to the given point
-       *  This returns the point where the trajectory reaches as certain distance from the origin \n
-       *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
-       *  specific wire layer.
-       */
-      Vector2D getCloseSameCylindricalR(const Vector2D& point) const
-      { return getGlobalCircle().sameCylindricalR(point); }
-
-      /**
        *  Calculates the point where the trajectory meets the outer wall of the CDC.
        *  This method returns the first point in forward flight direction from the start
        *  point of the trajectory where it meets the outer radius of the outer most layer.
@@ -150,7 +141,6 @@ namespace Belle2 {
        *  The factor can be used to virtually resize the CDC.
        */
       Vector2D getOuterExit(double factor = 1) const;
-
 
       /**
        *  Calculates the point where the trajectory meets the inner wall of the CDC.

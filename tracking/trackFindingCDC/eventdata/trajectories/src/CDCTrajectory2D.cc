@@ -116,10 +116,10 @@ Vector2D CDCTrajectory2D::getInnerExit() const
     // and not stop at first intersection with the inner wall.
     // Therefore we take the inner exit that comes after the apogee (far point of the circle).
     const Vector2D apogee = globalCircle.apogee();
-    return globalCircle.sameCylindricalRForwardOf(apogee, innerCylindricalR);
+    return globalCircle.atCylindricalRForwardOf(apogee, innerCylindricalR);
 
   } else {
-    return globalCircle.sameCylindricalRForwardOf(support, innerCylindricalR);
+    return globalCircle.atCylindricalRForwardOf(support, innerCylindricalR);
   }
 }
 
@@ -136,16 +136,16 @@ Vector2D CDCTrajectory2D::getOuterExit(double factor) const
     // and not stop at first intersection with the outer wall.
     // Therefore we take the outer exit that comes after the perigee.
     const Vector2D perigee = globalCircle.perigee();
-    return globalCircle.sameCylindricalRForwardOf(perigee, outerCylindricalR);
+    return globalCircle.atCylindricalRForwardOf(perigee, outerCylindricalR);
 
   } else {
-    return getGlobalCircle().sameCylindricalRForwardOf(support, outerCylindricalR);
+    return getGlobalCircle().atCylindricalRForwardOf(support, outerCylindricalR);
   }
 }
 
 Vector2D CDCTrajectory2D::getExit() const
 {
-  Vector2D outerExit = getOuterExit();
+  const Vector2D outerExit = getOuterExit();
   const Vector2D innerExit = getInnerExit();
   return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
 }

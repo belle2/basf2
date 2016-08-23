@@ -259,19 +259,24 @@ void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& j
   jacobian(c_I, c_I) = 2 * mu * nu;
 }
 
-Vector2D PerigeeCircle::closest(const Vector2D& point) const
-{
-  Vector2D delta = point - perigee();
-  Vector2D uVec = delta * curvature() - phi0Vec().orthogonal();
-  return point - uVec.unit() * distance(point);
-}
-
 double PerigeeCircle::arcLengthTo(const Vector2D& point) const
 {
   Vector2D closestToPoint = closest(point);
   double secantLength = perigee().distance(closestToPoint);
   double deltaParallel = phi0Vec().dot(point);
   return copysign(arcLengthAtSecantLength(secantLength), deltaParallel);
+}
+
+double PerigeeCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
+{
+  EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
+  if (not NForwardBackward::isValid(lengthSign)) return NAN;
+  // Handling the rare case that from and to correspond to opposing points on the circle
+  if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
+  Vector2D closestAtFrom = closest(from);
+  Vector2D closestAtTo = closest(to);
+  double directDistance = closestAtFrom.distance(closestAtTo);
+  return lengthSign * arcLengthFactor(directDistance) * directDistance;
 }
 
 double PerigeeCircle::arcLengthToCylindricalR(double cylindricalR) const
@@ -298,17 +303,51 @@ double PerigeeCircle::arcLengthAtSecantLength(double secantLength) const
   return secantLength * arcLengthFactor;
 }
 
+pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double R) const
+{
+  const double u = (1 + curvature() * impact());
+  const double orthogonal = ((impact() * impact() + R * R) * curvature() / 2.0 + impact()) / u;
+  const double parallel = sqrt(square(R) - square(orthogonal));
+  Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
+  Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(),  parallel, orthogonal);
+  pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
+  return result;
+}
+
+Vector2D PerigeeCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
+                                                const double cylindricalR) const
+{
+  pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
+  return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
+}
+
+Vector2D PerigeeCircle::chooseNextForwardOf(const Vector2D& start,
+                                            const Vector2D& end1,
+                                            const Vector2D& end2) const
+{
+  double arcLength1 = arcLengthBetween(start, end1);
+  double arcLength2 = arcLengthBetween(start, end2);
+  if (arcLength1 < 0) arcLength1 += arcLengthPeriod();
+  if (arcLength2 < 0) arcLength2 += arcLengthPeriod();
+  if (fmin(arcLength1, arcLength2) == arcLength1) {
+    return end1;
+  } else if (fmin(arcLength1, arcLength2) == arcLength2) {
+    return end2;
+  } else {
+    return Vector2D(NAN, NAN);
+  }
+}
+
+Vector2D PerigeeCircle::closest(const Vector2D& point) const
+{
+  return point - normal(point) * distance(point);
+}
+
 double PerigeeCircle::distance(double fastDistance) const
 {
-  if (fastDistance == 0.0 or isLine()) {
-    // special case for unfitted state
-    // and line
-    return fastDistance;
-  } else {
-    double A = 2 * fastDistance;
-    double U = std::sqrt(1 + A * curvature());
-    return A / (1.0 + U);
-  }
+  double A = 2 * fastDistance;
+  double U = std::sqrt(1 + A * curvature());
+  return A / (1.0 + U);
 }
 
 double PerigeeCircle::fastDistance(const Vector2D& point) const
@@ -334,7 +373,6 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
 void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
 {
   double normalization = sqrt(n12.normSquared() - 4 * n0 * n3);
-
   m_curvature = 2 * n3 / normalization;
   m_phi0Vec = n12.orthogonal();
   m_phi0Vec.normalize();

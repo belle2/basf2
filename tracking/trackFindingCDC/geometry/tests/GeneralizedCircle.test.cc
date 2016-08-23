@@ -90,8 +90,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_conformalTranform)
 
   double firstConformalArcLength = circle.arcLengthTo(firstPos);
   double secondConformalArcLength = circle.arcLengthTo(secondPos);
-  B2INFO(firstConformalArcLength);
-  B2INFO(secondConformalArcLength);
   EXPECT_TRUE(firstConformalArcLength < secondConformalArcLength);
   EXPECT_LT(firstConformalArcLength, secondConformalArcLength);
 
@@ -287,6 +285,21 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
 
+}
+
+TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atCylindricalR)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(center, radius);
+
+  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+
+  EXPECT_NEAR(2, solutions.first.x(), 10e-7);
+  EXPECT_NEAR(1, solutions.first.y(), 10e-7);
+
+  EXPECT_NEAR(2, solutions.second.x(), 10e-7);
+  EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
 }
 
 

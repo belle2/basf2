@@ -127,6 +127,17 @@ namespace Belle2 {
       double arcLengthTo(const Vector2D& point) const;
 
       /**
+       *  Calculates the arc length between two points of closest approach on the circle.
+       *  The arc length is signed positiv for travel in orientation direction.
+       *  In the circle case the arc length is between -pi*radius and pi*radius,
+       *  hence the discontinuity is on the far side of the circle relative to the given from point.
+       *  The points are essentially first taken to their closest approach
+       *  before we take the length on the curve.
+       *  For the line case the length is the distance component parallel to the line.
+       */
+      double arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
+
+      /**
        *  Calculates the two dimensional arc length till the cylindrical radius is reached
        *  If the radius can not be reached return NAN.
        *  Note that there are two solutions which have equivalent arc lengths with different sign
@@ -134,6 +145,47 @@ namespace Belle2 {
        */
       double arcLengthToCylindricalR(double cylindricalR) const;
 
+      /// Calculates the two points with the given cylindrical radius on the generalised circle
+      std::pair<Vector2D, Vector2D> atCylindricalR(const double cylindricalR) const;
+
+      /**
+       *  Approach on the circle with the given cylindrical radius
+       *  that lies in the forward direction of a start point.
+       *
+       *  Calculates the point on the circle with cylindrical radius cylindricalR,
+       *  which is closest following the circle in the direction of positive forward orientation
+       *  This is particularly useful to extraplotate into a certain layer.
+       *  In case no intersection with this cylindrical radius exists
+       *  the function returns Vector2D(NAN,NAN)
+       *  @param startPoint Start point from which to follow in the circle in the forward direction
+       *  @param cylindricalR Cylindrical radius of interest
+       *  @return Close point in forward direction with same cylindrical radius on the circle.
+       */
+      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint,
+                                       const double cylindricalR) const;
+
+      /// Indicates whether to given point lies in the forward direction from the perigee
+      EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
+      { return tangential(from).isForwardOrBackwardOf(to - from); }
+
+      /// Indicates whether to given point lies in the forward direction from the perigee
+      EForwardBackward isForwardOrBackward(const Vector2D& to) const
+      { return tangential().isForwardOrBackwardOf(to); }
+
+      /**
+       *  Returns the one of two end point which is first reached from the given start
+       *  if one stricly follows the forward direction of the circle.
+       *
+       *  If the generalized circle is truely a line none of the points might lie
+       *  in the forward direction and Vector2D(NAN,NAN) is returned.
+       *  @param start Point to start the traversal
+       *  @param end1 One possible end point
+       *  @param end2 Other possible end point
+       *  @return end1 or end2 depending, which lies closer to start in the forward direction or
+       *          Vector2D(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction
+       *          (line case only)
+       */
+      Vector2D chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
       /// Calculates the point of closest approach on the circle to the given point.
       Vector2D closest(const Vector2D& point) const;
 
@@ -177,17 +229,21 @@ namespace Belle2 {
       bool isCircle() const
       { return curvature() != 0.0; }
 
-      /**
-       *  Gives the orientation of the circle.
-       *  The circle can be either orientated counterclockwise or clockwise.
-       *  @return ERotation::c_CounterClockwise for counterclockwise travel, ERotation::c_Clockwise for clockwise.
-       */
+      /// Getter for the orientation of the circle
       inline ERotation orientation() const
       { return static_cast<ERotation>(sign(curvature())); }
 
-      /// Getter for the tangtial vector at the perigee
-      Vector2D tangential(const Vector2D& pos) const
-      { return GeneralizedCircle::tangential(pos); }
+      /// Gradient of the distance field, hence indicates the direction of increasing distance.
+      Vector2D gradient(const Vector2D& point) const
+      { return (point - perigee()) * curvature() - phi0Vec().orthogonal(); }
+
+      /// Unit normal vector from the circle to the given point.
+      Vector2D normal(const Vector2D& point) const
+      { return gradient(point).unit(); }
+
+      /// Tangential vector to the circle near the given position.
+      Vector2D tangential(const Vector2D& point) const
+      { return normal(point).orthogonal(); }
 
       /// Getter for the tangtial vector at the perigee
       const Vector2D& tangential() const

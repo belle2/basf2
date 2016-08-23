@@ -463,7 +463,7 @@ def print_params(module, print_values=True, shared_lib_path=None):
         print(' * denotes a required parameter.')
 
 
-def print_path(path, defaults=False, description=False):
+def print_path(path, defaults=False, description=False, indentation=0, title=True):
     """
     This function prints the modules in the given path and the module
     parameters.
@@ -472,12 +472,18 @@ def print_path(path, defaults=False, description=False):
     :param defaults: Set it to True to print also the parameters with default values
     :param description: Set to True to print the descriptions of modules and
         parameters
+    :param indentation: an internal parameter to indent the whole output (needed for outputting subpaths)
+    :param title: show the title string or not (defaults to True)
     """
 
-    B2INFO('Modules and parameter settings in the path:')
+    if title:
+        B2INFO('Modules and parameter settings in the path:')
     index = 1
+
+    indentation_string = ' ' * indentation
+
     for module in path.modules():
-        out = '%2d. %s' % (index, module.name())
+        out = indentation_string + ' % 2d. % s' % (index, module.name())
         if description:
             out += '  #%s' % module.description()
         print(out)
@@ -485,10 +491,16 @@ def print_path(path, defaults=False, description=False):
         for param in module.available_params():
             if not defaults and param.values == param.default:
                 continue
-            out = '      %s=%s' % (param.name, param.values)
+            out = indentation_string + '      %s=%s' % (param.name, param.values)
             if description:
                 out += '  #%s' % param.description
             print(out)
+
+        for condition in module.get_all_conditions():
+            out = "\n" + indentation_string + '      ' + str(condition) + ":"
+            print(out)
+            print_path(condition.get_path(), defaults=defaults, description=description, indentation=indentation + 6,
+                       title=False)
 
 
 def set_log_level(level):

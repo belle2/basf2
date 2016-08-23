@@ -114,7 +114,7 @@ namespace Belle2 {
     momenta.push_back(TVector3(0.61672460498333, 0.4472311336875816, 0.31288581834261064));
     momenta.push_back(TVector3(0.18544654870476218, 0.0758107751704592, 0.31909701462121065));
 
-    FoxWolfram FW(foxwolfram(momenta));
+    FoxWolfram FW(momenta);
     EXPECT_FLOAT_EQ(0.63011014, FW.R(2));
   }
 

@@ -21,78 +21,28 @@ namespace Belle2 {
   class FoxWolfram {
   public:
 
-    /**
-     * Constructor
-     */
-    FoxWolfram();
+    /// Default Constructor
+    FoxWolfram() : sum {0, 0, 0, 0, 0} {};
 
-    /**
-     * Destructor
-     */
+    /// Constructor which calculates the Fox Wolfram Moments from a given set of momenta.
+    FoxWolfram(const std::vector<TVector3>& momenta);
+
+    /// Destructor
     ~FoxWolfram() {};
 
-    /**
-     * Returns the i-th Fox-Wolfram moment
-     */
+    /// Returns the i-th Fox-Wolfram moment
     double H(int i) { return (i < 0 || i > 4) ? 0 : sum[i]; }
 
-    /**
-     * Returns the i-th normalized Fox-Wolfram moment
-     */
+    /// Returns the i-th normalized Fox-Wolfram moment
     double R(int i) { return (i < 0 || i > 4 || sum[0] == 0) ? 0 : sum[i] / sum[0]; }
 
-    /**
-     * Utility function for Fox-Wolfram moment calculation
-     */
+  private:
+    /// Utility function for Fox-Wolfram moment calculation.
     void add(const double mag, const double costh);
 
-  protected:
-
-    double sum[5]; /** Fox-Wolfram moments */
+    /// Fox-Wolfram moments
+    double sum[5];
 
   };
-
-
-  FoxWolfram::FoxWolfram()
-  {
-    for (int i = 0; i < 5; i++)
-      sum[i] = 0;
-  }
-
-  void FoxWolfram::add(const double mag, const double costh)
-  {
-    double cost2 = costh * costh;
-
-    sum[0] += mag;
-    sum[1] += mag * costh;
-    sum[2] += mag * (1.5 * cost2 - 0.5);
-    sum[3] += mag * costh * (2.5 * cost2 - 1.5);
-    sum[4] += mag * (4.375 * cost2 * cost2 - 3.75 * cost2 + 0.375);
-  }
-
-  FoxWolfram foxwolfram(const std::vector<TVector3>& momenta)
-  {
-    FoxWolfram f;
-
-    decltype(momenta.begin()) p;
-    decltype(momenta.begin()) q;
-
-    const auto begin = momenta.begin();
-    const auto end = momenta.end();
-
-
-    for (p = begin; p != end; p++) {
-      const TVector3 pvec = (*p);
-      double pmag = pvec.Mag();
-      for (q = p; q != end; q++) {
-        const TVector3 qvec = (*q);
-        double mag = pmag * qvec.Mag();
-        double costh = pvec.Dot(qvec) / mag;
-        if (p != q) mag *= 2;
-        f.add(mag, costh);
-      }
-    }
-    return f;
-  }
 
 } // Belle2 namespace

@@ -57,6 +57,11 @@ namespace Belle2 {
     /** A string representation of this condition. */
     std::string getString() const;
 
+    /**
+     * Exposes methods of the ModuleCondition class to Python.
+     */
+    static void exposePythonAPI();
+
   private:
     /** no default constructed objects. */
     ModuleCondition() = delete;

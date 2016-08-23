@@ -1,0 +1,18 @@
+# -*- coding: utf-8 -*-
+#vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    'pxd_dataobjects',
+    'svd_dataobjects',
+    'tracking',
+    'tracking_spacePointCreation_sptcNetwork',
+    'vxd', 'vxd_dataobjects', 
+    'framework',
+    'Geom',
+    '$ROOT_LIBS',
+    'genfit2',
+    ]
+
+Return('env')

@@ -101,8 +101,6 @@ namespace Belle2 {
 
   TEST_F(ContinuumSuppressionTests, FoxWolfram)
   {
-    const bool use_all = true;
-    const bool use_roe = true;
     std::vector<TVector3> momenta;
 
     momenta.push_back(TVector3(0.5429965262452898, 0.37010582077332344, 0.0714978744529432));

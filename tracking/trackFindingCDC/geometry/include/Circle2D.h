@@ -8,40 +8,32 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A two dimensional circle in its natural representation
-    /** An oriented two dimensional circle in the central point, radius representation.
-     *  The circle is oriented by using the sign of the radius variable.
-     *  The convension is that positiv radii correspond to a counterclockwise orientation of the circle,
-     *  while negative radii are for the clockwise orientation.
-     */
+    /// A two dimensional circle in its natural representation using center and radius as parameters.
     class Circle2D  {
 
     public:
-
-      /// Default constructor for ROOT compatibility. , Constructs the unit circle around the origin
-      Circle2D():
-        m_center(0.0, 0.0),
-        m_radius(0.0)
+      /// Default constructor for ROOT compatibility. Creates an invalid circle
+      Circle2D()
+        : m_center(0.0, 0.0)
+        , m_radius(0.0)
       {}
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
-      Circle2D(const Vector2D& center, const double radius):
-        m_center(center),
-        m_radius(radius)
-      {}
+      Circle2D(const Vector2D& center, const double radius)
+        : m_center(center)
+        , m_radius(radius)
+      {
+      }
 
       /// Constructs a circle with given center, absolut value of the radius and orientation
-      Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo):
-        m_center(center),
-        m_radius(fabs(absRadius) * ccwInfo)
+      Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo)
+        : m_center(center)
+        , m_radius(fabs(absRadius) * ccwInfo)
       {}
 
     public:
@@ -90,13 +82,10 @@ namespace Belle2 {
 
     public:
       /// Calculates the signed distance of the point to the circle line.
-      /** Returns the signed distance of the point to the line. The sign is positiv \n
-       *  for the right side of the line and negativ for the left side. */
       double distance(const Vector2D& point) const
       { return copysign(center().distance(point), radius()) - radius(); }
 
       /// Returns the signed distance to the origin
-      /** The distance to the origin is equivalent to the first line parameter*/
       double impact() const
       { return copysign(center().norm(), radius()) - radius(); }
 
@@ -144,11 +133,6 @@ namespace Belle2 {
       { return tangential().phi(); }
 
       /// Gradient of the distance field
-      /**
-       * Gives the gradient of the euclidian distance field for the given point.
-       * @param point Point in the plane to calculate the gradient
-       * @return Gradient of the distance field
-       */
       inline Vector2D gradient(const Vector2D& point) const
       {
         Vector2D connection = (point - center()) * orientation();
@@ -156,74 +140,33 @@ namespace Belle2 {
       }
 
       /// Normal vector to the circle near the given position
-      /**
-       * Gives the unit normal vector to the circle line.
-       * It points to the outside of the circle for counterclockwise orientation,
-       * and inwards for the clockwise orientation.
-       * It is essentially the gradient normalized to unit length.
-       * @param point Point in the plane to calculate the tangential
-       * @return Unit normal vector to the circle line
-       */
       inline Vector2D normal(const Vector2D& point) const
       { return gradient(point).unit(); }
 
       /// Tangential vector to the circle near the given position
-      /**
-       * Gives the unit tangential vector to the circle line.
-       * It always points in the direction of positiv advance
-       * at the point of closest approach from the given point.
-       * @param point Point in the plane to calculate the tangential
-       * @return Unit tangential vector to the circle line
-       */
       inline Vector2D tangential(const Vector2D& point) const
       { return normal(point).orthogonal(); }
 
-      /// Calculates the angle between two points of closest approach on the circle
-      /**
-       * The angle is signed positiv for a counterclockwise rotation.
-       * The points are essentially first taken to their closest approach
-       * before we take the opening angle as seen from the circle center.
-       * The angle will zero if the generalized circle was line.
-       */
-      inline double openingAngle(const Vector2D& from, const Vector2D& to) const
+      /// Calculates the angle between two points as seen from the center of the circle
+      double openingAngle(const Vector2D& from, const Vector2D& to) const
       { return gradient(from).angleWith(gradient(to)); } //can be optimized in the number of computations
 
 
       /// Calculates the arc length between two points of closest approach on the circle.
-      /**
-       * The arc length is signed positiv for travel in orientation direction
-       * The points are essentially first taken to their closest approach
-       * before we take the length on the curve.
-       * For the line case the length is the distance component parallel to the line.
-       */
-      inline double lengthOnCurve(const Vector2D& from, const Vector2D& to) const
+      double arcLengthBetween(const Vector2D& from, const Vector2D& to) const
       { return openingAngle(from, to) * radius(); }
 
       /// Getter for the signed radius
-      /** The sign encodes the orientation of the circle */
       double radius() const
       { return m_radius; }
 
-      /// Getter for the square radius
-      /** The sign encodes the orientation of the circle */
-      double radiusSquared() const { return radius() * radius(); }
+      /// Getter for the squared radius
+      double radiusSquared() const
+      { return radius() * radius(); }
 
       /// Getter for the absolute radius
-      /** The absolute radius is the absolute value of the signed Radius */
       double absRadius() const
       { return fabs(radius()); }
-
-      /// Indicates if the circle is oriented counterclockwise
-      // bool isERotation::c_CounterClockwise() const
-      // { return isERotation::c_CounterClockwiseOrERotation::c_Clockwise == ERotation::c_CounterClockwise; }
-
-      // /// Indicates if the circle is oriented clockwise
-      // bool isERotation::c_Clockwise() const
-      // { return isERotation::c_CounterClockwiseOrERotation::c_Clockwise() == ERotation::c_Clockwise; }
-
-      // /// Indicates if the circle is oriented counterclockwise or clockwise
-      // ERotation isERotation::c_CounterClockwiseOrERotation::c_Clockwise() const
-      // { return sign(radius()); }
 
       /// Indicates if the circle is to be interpreted counterclockwise or clockwise
       ERotation orientation() const

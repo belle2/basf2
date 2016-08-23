@@ -31,6 +31,7 @@ struct cplacement_t {
 };
 
 std::vector<shape_t*> load_shapes(const std::string& fname);
+std::vector<cplacement_t> load_placements(const std::string& fname);
 
 struct Point_t;
 Point_t centerofgravity(Point_t*, Point_t*);

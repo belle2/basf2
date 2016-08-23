@@ -448,7 +448,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
   }
 
   if (b_outer_support_ring) {
-    zr_t vc4[] = {{ZT - 134.2, RT - 20}, {ZT, RT - 20}, {ZT, RT}, {ZT - 103.3, RT}};
+    zr_t vc4[] = {{3 + (RT - 20 - RC) / tand(th1), RT - 20}, {ZT, RT - 20}, {ZT, RT}, {3 + (RT - RC) / tand(th1), RT}};
     std::vector<zr_t> contour4(vc4, vc4 + sizeof(vc4) / sizeof(zr_t));
     G4VSolid* part4solid = new BelleLathe("part4solid", phi0, dphi, contour4);
     G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, nist->FindOrBuildMaterial("SUS304"), "part4logical", 0, 0, 0);
@@ -456,7 +456,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     new G4PVPlacement(G4Translate3D(0, 0, 1960), part4logical, "part4physical", top, false, 0, overlap);
   }
 
-  zr_t vin[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {ZT - 134.2, RT - 20}, {3, RC}};
+  zr_t vin[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
   std::vector<zr_t> cin(vin, vin + sizeof(vin) / sizeof(zr_t));
   G4VSolid* innervolume_solid = new BelleLathe("innervolume_solid", 0, 2 * M_PI, cin);
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, nist->FindOrBuildMaterial("G4_AIR"),

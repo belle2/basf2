@@ -79,6 +79,7 @@ FileMetaData updateFileMetaData(const std::string& fileName, const std::string& 
 BOOST_PYTHON_MODULE(pybasf2)
 {
   Module::exposePythonAPI();
+  ModuleCondition::exposePythonAPI();
   Path::exposePythonAPI();
   Framework::exposePythonAPI();
   ModuleParamInfoPython::exposePythonAPI();

@@ -1,6 +1,7 @@
 #pragma once
 
-#include <framework/core/Module.h>
+#include <boost/shared_ptr.hpp>
+#include <string>
 
 namespace Belle2 {
   class Path;
@@ -26,8 +27,14 @@ namespace Belle2 {
       c_NE     /**< Not equal:             "!=" */
     };
 
+    /** Different options for behaviour _after_ a conditional path was executed. */
+    enum class EAfterConditionPath {
+      c_End, /**< End current event after the conditional path. */
+      c_Continue, /**< After the conditional path, resume execution after this module. */
+    };
+
     /** initialize from string expression (see class doc). Throws runtime_error if expression is invalid. */
-    ModuleCondition(std::string expression, boost::shared_ptr<Path> conditionPath, Module::EAfterConditionPath afterConditionPath);
+    ModuleCondition(std::string expression, boost::shared_ptr<Path> conditionPath, EAfterConditionPath afterConditionPath);
     /** copy ctor (uses Path::clone()). */
     ModuleCondition(const ModuleCondition& other);
     ~ModuleCondition() { };
@@ -45,10 +52,15 @@ namespace Belle2 {
     EConditionOperators getConditionOperator() const {return m_conditionOperator; };
 
     /** What to do after a conditional path is finished. */
-    Module::EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
+    EAfterConditionPath getAfterConditionPath() const { return m_afterConditionPath; }
 
     /** A string representation of this condition. */
     std::string getString() const;
+
+    /**
+     * Exposes methods of the ModuleCondition class to Python.
+     */
+    static void exposePythonAPI();
 
   private:
     /** no default constructed objects. */
@@ -57,6 +69,6 @@ namespace Belle2 {
     boost::shared_ptr<Path> m_conditionPath; /**< The path which which will be executed if the condition is evaluated to true. */
     EConditionOperators m_conditionOperator;  /**< The operator of the condition (set by parsing the condition expression). */
     int m_conditionValue;                    /**< Numeric value used in the condition (set by parsing the condition expression). */
-    Module::EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
+    EAfterConditionPath m_afterConditionPath; /**< What to do after a conditional path is finished. */
   };
 }

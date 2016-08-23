@@ -47,7 +47,7 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
   const bool steeringFileFlow = true;
-  for (ModulePtr mod : path.getModules())
+  for (ModulePtr mod : path.buildModulePathList())
     generateModulePlot(file, *mod, steeringFileFlow);
 
   plotPath(file, path);
@@ -92,9 +92,12 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
       file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
     }
     if (mod->hasCondition()) {
-      const Path* conditionPath = mod->getConditionPath().get();
-      plotPath(file, *conditionPath, module);
-      file << "    \"" << module << "\" -> \"cluster" << module << "_inv\" [color=grey,lhead=\"cluster" << module << "\"];\n";
+      for (const auto& condition : mod->getAllConditions()) {
+        const std::string& conditionName = condition.getString();
+        plotPath(file, *condition.getPath(), conditionName);
+        file << "    \"" << module << "\" -> \"cluster" << conditionName << "_inv\" " <<
+             "[color=grey,lhead=\"cluster" << conditionName << "\",label=\"" << conditionName << "\",fontcolor=grey];\n";
+      }
     }
 
     lastModule = module;

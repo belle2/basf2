@@ -4,11 +4,15 @@
 
 #include <boost/algorithm/string/erase.hpp>
 
+#include <boost/python/class.hpp>
+#include <boost/python/docstring_options.hpp>
+
 #include <map>
 
 using namespace Belle2;
+using namespace boost::python;
 
-ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, Module::EAfterConditionPath afterConditionPath):
+ModuleCondition::ModuleCondition(std::string expression, PathPtr conditionPath, EAfterConditionPath afterConditionPath):
   m_conditionPath(conditionPath),
   m_afterConditionPath(afterConditionPath)
 {
@@ -82,4 +86,23 @@ std::string ModuleCondition::getString() const
   output += m_conditionPath->getPathString();
   output += " )";
   return output;
+}
+
+namespace {
+  /// Same function as in the class itself, but return by value
+  boost::shared_ptr<Path> _getPathPython(ModuleCondition* m) {return m->getPath(); };
+}
+
+void ModuleCondition::exposePythonAPI()
+{
+  docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
+
+  //Python class definition
+  class_<ModuleCondition, boost::noncopyable>("ModuleCondition", no_init)
+  .def("__str__", &ModuleCondition::getString)
+  .def("get_value", &ModuleCondition::getConditionValue)
+  .def("get_operator", &ModuleCondition::getConditionOperator)
+  .def("get_after_path", &ModuleCondition::getAfterConditionPath)
+  .def("get_path", &_getPathPython)
+  ;
 }

@@ -382,15 +382,23 @@ class TestDAG(unittest.TestCase):
         self.assertTrue(self.s.run(path))
         # Check if condition is correctly implemented
         self.assertEqual(len(path.modules()), 1)
-        self.assertEqual(path.modules()[0].type(), 'VariableToReturnValue')
-        self.assertEqual(path.modules()[0].available_params()[0].name, 'variable')
-        self.assertEqual(path.modules()[0].available_params()[0].values, 'EventType')
-        self.assertTrue(path.modules()[0].has_condition())
-        self.assertEqual(path.modules()[0].get_condition_option(), basf2.AfterConditionPath.CONTINUE)
-        self.assertEqual(path.modules()[0].get_condition_value(), 0)
-        self.assertEqual(str(ConditionOperator.values[path.modules()[0].get_condition_operator()]), '==')
-        self.assertEqual(len(path.modules()[0].get_condition_path().modules()), 1)
-        self.assertEqual(path.modules()[0].get_condition_path().modules()[0].name(), 'RootInput')
+        first_module = path.modules()[0]
+
+        self.assertEqual(first_module.type(), 'VariableToReturnValue')
+        self.assertEqual(first_module.available_params()[0].name, 'variable')
+        self.assertEqual(first_module.available_params()[0].values, 'EventType')
+        self.assertTrue(first_module.has_condition())
+
+        conditions = first_module.get_all_conditions()
+        self.assertEqual(len(conditions), 1)
+        self.assertEqual(conditions[0].get_after_path(), basf2.AfterConditionPath.CONTINUE)
+        self.assertEqual(conditions[0].get_value(), 0)
+
+        self.assertEqual(str(ConditionOperator.values[conditions[0].get_operator()]), '==')
+        condition_paths = first_module.get_all_condition_paths()
+        self.assertEqual(len(condition_paths), 1)
+        self.assertEqual(len(condition_paths[0].modules()), 1)
+        self.assertEqual(condition_paths[0].modules()[0].name(), 'RootInput')
 
 
 if __name__ == '__main__':

@@ -132,7 +132,7 @@ void DataStoreStreamer::removeSideEffects()
 
 
 // Stream DataStore
-EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, bool streamTransientObjects, bool removeEmptyArrays)
+EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, bool streamTransientObjects)
 {
   // Clear Message Handler
   m_msghandler->clear();
@@ -149,11 +149,6 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       //skip transient objects/arrays?
       if (!streamTransientObjects and entry->dontWriteOut)
         continue;
-
-      //skip empty arrays
-      if (removeEmptyArrays and entry->isArray) {
-        if (static_cast<TClonesArray*>(entry->object)->GetEntriesFast() == 0) continue;
-      }
 
       //skip objects not in the list
       if (!m_streamobjnames.empty()) {

@@ -122,8 +122,7 @@ boost::shared_ptr<Path> Module::getConditionPath() const
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
 
-  for (auto reverse_iterator = m_conditions.rbegin(); reverse_iterator != m_conditions.rend(); ++reverse_iterator) {
-    const auto& condition = *reverse_iterator;
+  for (const auto& condition : m_conditions) {
     if (condition.evaluate(m_returnValue)) {
       return condition.getPath();
     }
@@ -142,8 +141,7 @@ Module::EAfterConditionPath Module::getAfterConditionPath() const
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
 
-  for (auto reverse_iterator = m_conditions.rbegin(); reverse_iterator != m_conditions.rend(); ++reverse_iterator) {
-    const auto& condition = *reverse_iterator;
+  for (const auto& condition : m_conditions) {
     if (condition.evaluate(m_returnValue)) {
       return condition.getAfterConditionPath();
     }

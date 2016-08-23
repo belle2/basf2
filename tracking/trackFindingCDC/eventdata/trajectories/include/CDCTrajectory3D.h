@@ -101,7 +101,7 @@ namespace Belle2 {
     public:
       /// Checks if the trajectory is already set to a valid value.
       bool isInvalid() const
-      { return m_localHelix.isInvalid(); }
+      { return m_localHelix->isInvalid(); }
 
       /// Checks if the trajectory has already been set to a valid value.
       bool isFitted() const
@@ -164,7 +164,7 @@ namespace Belle2 {
        *  calculation.
        */
       double calcArcLength2D(const Vector3D& point) const
-      { return getLocalHelix().circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
+      { return getLocalHelix()->circleXY().arcLengthBetween(Vector2D(0.0, 0.0), (point - getLocalOrigin()).xy()); }
 
       /*
        *  Get unit momentum vector at a specific postion.
@@ -189,12 +189,12 @@ namespace Belle2 {
 
       /// Get the unit momentum at the start point of the trajectory
       Vector3D getUnitMom3DAtSupport() const
-      { return  getLocalHelix().tangential();  }
+      { return  getLocalHelix()->tangential();  }
 
 
       /// Get the support point of the trajectory in global coordinates
       Vector3D getSupport() const
-      { return getLocalHelix().perigee() + getLocalOrigin(); }
+      { return getLocalHelix()->perigee() + getLocalOrigin(); }
 
       /// Clears all information from this trajectoy
       void clear()
@@ -207,11 +207,14 @@ namespace Belle2 {
     public:
       /// Getter for the slope of z over the transverse travel distance s.
       double getTanLambda() const
-      { return getLocalHelix().tanLambda(); }
+      { return getLocalHelix()->tanLambda(); }
 
       /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in the fusion fit.
       void shiftTanLambdaIntercept(const double tanLambdaShift, const double zShift)
-      { m_localHelix.shiftTanLambdaZ0(tanLambdaShift, zShift); }
+      {
+        // Temporary workaround - to be removed soonish
+        const_cast<Helix&>(m_localHelix.helix()).shiftTanLambdaZ0(tanLambdaShift, zShift);
+      }
 
       /**
        *  Adjusts the z0 to the one that lies n periods forward
@@ -221,7 +224,7 @@ namespace Belle2 {
 
       /// Getter for the curvature as seen from the xy projection.
       double getCurvatureXY() const
-      { return getLocalHelix().curvatureXY(); }
+      { return getLocalHelix()->curvatureXY(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       double getLocalCovariance(EHelixParameter iRow, EHelixParameter iCol) const
@@ -236,7 +239,7 @@ namespace Belle2 {
       PerigeeCircle getGlobalCircle() const
       {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        PerigeeCircle result(getLocalHelix().circleXY());
+        PerigeeCircle result(getLocalHelix()->circleXY());
         result.passiveMoveBy(-getLocalOrigin().xy());
         return result;
       }
@@ -247,7 +250,7 @@ namespace Belle2 {
 
       /// Getter for the sz line starting from the local origin
       UncertainSZLine getLocalSZLine() const
-      { return getLocalHelix().szLine(); }
+      { return getLocalHelix().uncertainSZLine(); }
 
       ///  Getter for p-value
       double getPValue() const
@@ -279,7 +282,11 @@ namespace Belle2 {
 
       /// Getter for the sz trajectory
       CDCTrajectorySZ getTrajectorySZ() const
-      { return CDCTrajectorySZ(getLocalHelix().szLine().passiveMovedBy(0, -getLocalOrigin().z())); }
+      {
+        UncertainSZLine globalSZLine = getLocalHelix().uncertainSZLine();
+        globalSZLine.passiveMoveBy(Vector2D(0, -getLocalOrigin().z()));
+        return CDCTrajectorySZ(globalSZLine);
+      }
 
       /// Getter for the helix in local coordinates.
       const UncertainHelix& getLocalHelix() const

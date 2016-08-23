@@ -70,7 +70,7 @@ TEST(TrackFindingCDCTest, CDCTrajectory3D_clear)
   EXPECT_FALSE(trajectory3D.isFitted());
 
   uncertainHelix.invalidate();
-  EXPECT_TRUE(uncertainHelix.isInvalid());
+  EXPECT_TRUE(uncertainHelix->isInvalid());
 
   helix.invalidate();
   EXPECT_TRUE(helix.isInvalid());

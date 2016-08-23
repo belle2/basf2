@@ -154,6 +154,15 @@ namespace Belle2 {
       SZLine passiveMovedBy(double s, double z) const
       { return SZLine(tanLambda(),  map(s) - z); }
 
+      /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
+      SZJacobian passiveMoveByJacobian(const Vector2D& bySZ) const
+      {
+        using namespace NSZParameterIndices;
+        SZJacobian result = SZUtil::identity();
+        result(c_Z0, c_TanL) = bySZ.first();
+        return result;
+      }
+
     private:
       /// Memory for the tan lambda parameter
       double m_tanLambda;

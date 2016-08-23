@@ -22,14 +22,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A general helix class including a covariance matrix.
-    class UncertainHelix : public Helix {
+    class UncertainHelix {
 
     public:
       /// Default constructor for ROOT compatibility.
       UncertainHelix()
       {}
 
-      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
       UncertainHelix(const double curvature,
                      const double phi0,
                      const double impact,
@@ -38,7 +38,7 @@ namespace Belle2 {
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : Helix(curvature, phi0, impact, tanLambda, z0),
+        : m_helix(curvature, phi0, impact, tanLambda, z0),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -50,13 +50,13 @@ namespace Belle2 {
                               const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
                               const size_t& ndf = 0)
-        : Helix(parameters),
+        : m_helix(parameters),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
       {}
 
-      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix. Covariance matrix defaults to a zero matrix
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
       UncertainHelix(const double curvature,
                      const Vector2D& phi0Vec,
                      const double impact,
@@ -65,7 +65,7 @@ namespace Belle2 {
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : Helix(curvature, phi0Vec, impact, tanLambda, z0),
+        : m_helix(curvature, phi0Vec, impact, tanLambda, z0),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -76,7 +76,7 @@ namespace Belle2 {
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : Helix(helix),
+        : m_helix(helix),
           m_helixCovariance(helixCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -85,7 +85,7 @@ namespace Belle2 {
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const UncertainPerigeeCircle& uncertainPerigeeCircle,
                      const UncertainSZLine& uncertainSZLine)
-        : Helix(uncertainPerigeeCircle, uncertainSZLine), // copies line and circle without uncertainties
+        : m_helix(uncertainPerigeeCircle, uncertainSZLine), // copies line and circle without uncertainties
           m_helixCovariance(HelixUtil::stackBlocks(uncertainPerigeeCircle.perigeeCovariance(), uncertainSZLine.szCovariance())),
           m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2()),
           m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
@@ -153,13 +153,38 @@ namespace Belle2 {
                                     const UncertainHelix& helix);
 
     public:
+      /**
+       *  Access to the constant interface of the underlying parameter line
+       *  Allows the user of this "super" class to use the getters and
+       *  other methods to get inforamation about the line but disallows mutation
+       *  of internal state.
+       *  This ensures that the parameters are not changed without proper adjustment to
+       *  the covariance matrix in this class, which can be achieved by the more limited
+       *  set of methods in this class accessable by normal . method calls
+       */
+      const Helix* operator->() const
+      { return &m_helix; }
+
+      /// Downcast to the "super" class
+      operator const Helix& () const
+      { return m_helix; }
+
+      /// Getter for the underlying helix
+      const Helix& helix() const
+      { return m_helix; }
+
+      /// Getter for the perigee parameters in the order defined by EPerigeeParameter.h
+      HelixParameters helixParameters() const
+      { return m_helix.helixParameters(); }
+
+    public:
       /// Projects the helix into the xy plain carrying over the relevant parts of the convariance matrix.
       UncertainPerigeeCircle uncertainCircleXY() const
-      { return UncertainPerigeeCircle(circleXY(), HelixUtil::getPerigeeCovariance(helixCovariance()));}
+      { return UncertainPerigeeCircle(helix().circleXY(), HelixUtil::getPerigeeCovariance(helixCovariance()));}
 
       /// Reduces the helix to an sz line carrying over the relevant parts of the convariance matrix.
       UncertainSZLine uncertainSZLine() const
-      { return UncertainSZLine(szLine(), HelixUtil::getSZCovariance(helixCovariance()));}
+      { return UncertainSZLine(helix().szLine(), HelixUtil::getSZCovariance(helixCovariance()));}
 
       /// Setter for the whole covariance matrix of the perigee parameters
       inline void setHelixCovariance(const HelixCovariance& helixCovariance)
@@ -193,10 +218,10 @@ namespace Belle2 {
       void setNDF(const size_t& ndf)
       { m_ndf = ndf; }
 
-      /// Sets all circle parameters to zero including the covariance matrix
+      /// Sets all circle parameters to zero and the covariance matrix to something noninformative
       inline void invalidate()
       {
-        Helix::invalidate();
+        m_helix.invalidate();
         m_helixCovariance = HelixUtil::identity();
         m_chi2 = 0.0;
         m_ndf = 0;
@@ -206,25 +231,47 @@ namespace Belle2 {
       /// Flips the orientation of the circle in place
       inline void reverse()
       {
-        Helix::reverse();
+        m_helix.reverse();
         HelixUtil::reverse(m_helixCovariance);
       }
 
       /// Returns a copy of the circle with opposite orientation.
       inline UncertainHelix reversed() const
-      { return UncertainHelix(Helix::reversed(), HelixUtil::reversed(m_helixCovariance), chi2(), ndf()); }
+      { return UncertainHelix(m_helix.reversed(), HelixUtil::reversed(m_helixCovariance), chi2(), ndf()); }
 
     public:
       /// Moves the coordinate system by the vector by and calculates the new perigee and its covariance matrix. Change is inplace.
       void passiveMoveBy(const Vector3D& by)
       {
         // Move the covariance matrix first to have access to the original parameters
-        HelixJacobian jacobian = passiveMoveByJacobian(by);
+        HelixJacobian jacobian = m_helix.passiveMoveByJacobian(by);
         HelixUtil::transport(jacobian, m_helixCovariance);
-        Helix::passiveMoveBy(by);
+        m_helix.passiveMoveBy(by);
       }
 
+      /**
+       *  Adjust the arclength measure to start n periods later.
+       *  @return The arc length needed to travel n periods.
+       */
+      double shiftPeriod(int nPeriods)
+      {
+        double arcLength2D = m_helix.shiftPeriod(nPeriods);
+        SZJacobian szJacobian = m_helix.szLine().passiveMoveByJacobian(Vector2D(arcLength2D, 0));
+        PerigeeJacobian perigeeJacobian = PerigeeUtil::identity();
+        HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
+        HelixUtil::transport(jacobian, m_helixCovariance);
+        return arcLength2D;
+      }
+
+    public:
+      /// Debug helper
+      friend std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
+      { return output << "Uncertain" << uncertainHelix.helix(); }
+
     private:
+      /// Memory for the underlying helix
+      Helix m_helix;
+
       /// Memory for the 5x5 covariance matrix of the helix parameters.
       HelixCovariance m_helixCovariance = HelixUtil::identity();
 

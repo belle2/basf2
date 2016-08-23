@@ -142,20 +142,11 @@ namespace Belle2 {
       }
 
     public:
-      /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
-      SZJacobian passiveMoveByJacobian(const Vector2D& bySZ) const
-      {
-        using namespace NSZParameterIndices;
-        SZJacobian result = SZUtil::identity();
-        result(c_Z0, c_TanL) = bySZ.first();
-        return result;
-      }
-
       /// Moves the coordinate system by the vector by and calculates the new sz line and its covariance matrix. Change is inplace.
       void passiveMoveBy(const Vector2D& bySZ)
       {
         // Move the covariance matrix first to have access to the original parameters
-        SZJacobian jacobian = passiveMoveByJacobian(bySZ);
+        SZJacobian jacobian = m_szLine.passiveMoveByJacobian(bySZ);
         SZUtil::transport(jacobian, m_szCovariance);
         m_szLine.passiveMoveBy(bySZ);
       }
@@ -166,7 +157,7 @@ namespace Belle2 {
        */
       SZCovariance passiveMovedCovarianceBy(const Vector2D& bySZ) const
       {
-        SZJacobian jacobian = passiveMoveByJacobian(bySZ);
+        SZJacobian jacobian = m_szLine.passiveMoveByJacobian(bySZ);
         return SZUtil::transported(jacobian, szCovariance());
       }
 

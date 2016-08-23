@@ -165,14 +165,14 @@ namespace {
                                                 const ESign charge,
                                                 const double bZ)
   {
-    const double impactXY = localHelix.impactXY();
-    const Vector2D& phi0Vec = localHelix.phi0Vec();
+    const double impactXY = localHelix->impactXY();
+    const Vector2D& phi0Vec = localHelix->phi0Vec();
 
     const double cosPhi0 = phi0Vec.x();
     const double sinPhi0 = phi0Vec.y();
 
-    const double curvatureXY = localHelix.curvatureXY();
-    const double tanLambda = localHelix.tanLambda();
+    const double curvatureXY = localHelix->curvatureXY();
+    const double tanLambda = localHelix->tanLambda();
 
     // 0. Define indices
     // Maybe push these out of this function:
@@ -313,16 +313,16 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 
 ESign CDCTrajectory3D::getChargeSign() const
 {
-  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalHelix()->circleXY().orientation());
 }
 
 double CDCTrajectory3D::getAbsMom3D(const double bZ) const
 {
-  double tanLambda = getLocalHelix().tanLambda();
+  double tanLambda = getLocalHelix()->tanLambda();
 
   double factor2DTo3D = hypot(1, tanLambda);
 
-  double curvatureXY = getLocalHelix().curvatureXY();
+  double curvatureXY = getLocalHelix()->curvatureXY();
 
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, bZ);
 
@@ -333,11 +333,11 @@ double CDCTrajectory3D::getAbsMom3D() const
 {
   Vector3D position = getSupport();
 
-  double tanLambda = getLocalHelix().tanLambda();
+  double tanLambda = getLocalHelix()->tanLambda();
 
   double factor2DTo3D = hypot(1, tanLambda);
 
-  double curvatureXY = getLocalHelix().curvatureXY();
+  double curvatureXY = getLocalHelix()->curvatureXY();
 
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, position);
 

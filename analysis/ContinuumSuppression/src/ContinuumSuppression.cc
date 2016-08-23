@@ -169,8 +169,8 @@ namespace Belle2 {
       }
 
       // Thrust variables
-      thrustB = calculateThrust(p3_cms_sigB);
-      thrustO = calculateThrust(p3_cms_roe);
+      thrustB = Thrust::calculateThrust(p3_cms_sigB);
+      thrustO = Thrust::calculateThrust(p3_cms_roe);
       thrustBm = thrustB.Mag();
       thrustOm = thrustO.Mag();
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));

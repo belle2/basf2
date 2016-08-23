@@ -136,7 +136,7 @@ namespace Belle2 {
 
       /// Getter for the signed impact parameter of the trajectory
       double getGlobalImpact() const
-      { return getLocalCircle().distance(-m_localOrigin.xy()); }
+      { return getLocalCircle()->distance(-m_localOrigin.xy()); }
 
     public:
       /// Gets the charge sign of the trajectory.

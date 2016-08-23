@@ -74,6 +74,10 @@ namespace Belle2 {
       operator const SZLine& () const
       { return m_szLine; }
 
+      /// Getter for the  underlying sz line
+      const SZLine& szLine() const
+      { return m_szLine; }
+
       /// Getter for the sz parameters in the order defined by ESZParameter.h
       SZParameters szParameters() const
       { return m_szLine.szParameters(); }
@@ -169,10 +173,9 @@ namespace Belle2 {
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const UncertainSZLine& uncertainSZLine)
       {
-        return output <<
-               "UncertainSZLine(" <<
-               "tanL=" << uncertainSZLine->slope() << "," <<
-               "z0=" << uncertainSZLine->intercept() << ")" ;
+        return output << "UncertainSZLine("
+               << "tanL=" << uncertainSZLine->slope() << ","
+               << "z0=" << uncertainSZLine->intercept() << ")" ;
       }
 
     private:

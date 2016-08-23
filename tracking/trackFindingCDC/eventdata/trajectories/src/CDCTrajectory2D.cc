@@ -63,18 +63,18 @@ void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
 
 ESign CDCTrajectory2D::getChargeSign() const
 {
-  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle().orientation());
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle()->orientation());
 }
 
 double CDCTrajectory2D::getAbsMom2D(const double bZ) const
 {
-  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle()->curvature(), bZ);
 }
 
 double CDCTrajectory2D::getAbsMom2D() const
 {
   Vector2D position = getSupport();
-  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), position);
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle()->curvature(), position);
 }
 
 Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,

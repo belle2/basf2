@@ -44,7 +44,7 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   double backY = observations2D.getY(nObservations - 1);
   Vector2D backPos(backX, backY);
 
-  double totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
+  double totalPerps = perigeeCircle->arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
     perigeeCircle.reverse();
   }

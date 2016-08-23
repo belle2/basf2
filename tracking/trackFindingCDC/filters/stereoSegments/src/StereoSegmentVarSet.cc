@@ -38,7 +38,7 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
 
 
   const Vector2D& startMomentum = trajectory2D.getStartMom2D();
-  const double radius = trajectory2D.getLocalCircle().radius();
+  const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track.size();
 
   const double backArcLength2D = track.back().getArcLength2D();

@@ -22,7 +22,7 @@ namespace Belle2 {
     /**
      *  Adds an uncertainty matrix to the circle in perigee parameterisation.
      */
-    class UncertainPerigeeCircle : public PerigeeCircle {
+    class UncertainPerigeeCircle {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -40,7 +40,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : PerigeeCircle(curvature, tangentialPhi, impact),
+        : m_perigeeCircle(curvature, tangentialPhi, impact),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -57,7 +57,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : PerigeeCircle(curvature, tangential, impact),
+        : m_perigeeCircle(curvature, tangential, impact),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -68,7 +68,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : PerigeeCircle(perigeeCircle),
+        : m_perigeeCircle(perigeeCircle),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -79,7 +79,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : PerigeeCircle(generalizedCircle),
+        : m_perigeeCircle(generalizedCircle),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -91,7 +91,7 @@ namespace Belle2 {
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
                              const size_t& ndf = 0)
-        : PerigeeCircle(parameters),
+        : m_perigeeCircle(parameters),
           m_perigeeCovariance(perigeeCovariance),
           m_chi2(chi2),
           m_ndf(ndf)
@@ -103,8 +103,33 @@ namespace Belle2 {
 
 
     public:
+      /**
+       *  Access to the constant interface of the underlying parameter line
+       *  Allows the user of this "super" class to use the getters and
+       *  other methods to get inforamation about the line but disallows mutation
+       *  of internal state.
+       *  This ensures that the parameters are not changed without proper adjustment to
+       *  the covariance matrix in this class, which can be achieved by the more limited
+       *  set of methods in this class accessable by normal . method calls
+       */
+      const PerigeeCircle* operator->() const
+      { return &m_perigeeCircle; }
+
+      /// Downcast to the "super" class
+      operator const PerigeeCircle& () const
+      { return m_perigeeCircle; }
+
+      /// Getter for the underlying circle
+      const PerigeeCircle& perigeeCircle() const
+      { return m_perigeeCircle; }
+
+      /// Getter for the perigee parameters in the order defined by EPerigeeParameter.h
+      PerigeeParameters perigeeParameters() const
+      { return m_perigeeCircle.perigeeParameters(); }
+
+    public:
       /// Setter for the whole covariance matrix of the perigee parameters
-      inline void setPerigeeCovariance(const PerigeeCovariance& perigeeCovariance)
+      void setPerigeeCovariance(const PerigeeCovariance& perigeeCovariance)
       { m_perigeeCovariance = perigeeCovariance; }
 
       /// Getter for the whole covariance matrix of the perigee parameters
@@ -138,25 +163,25 @@ namespace Belle2 {
 
 
       /// Sets all circle parameters to zero including the covariance matrix
-      inline void invalidate()
+      void invalidate()
       {
-        PerigeeCircle::invalidate();
+        m_perigeeCircle.invalidate();
         m_perigeeCovariance = PerigeeUtil::identity();
         m_chi2 = 0.0;
       }
 
     public:
       /// Flips the orientation of the circle in place
-      inline void reverse()
+      void reverse()
       {
-        PerigeeCircle::reverse();
+        m_perigeeCircle.reverse();
         PerigeeUtil::reverse(m_perigeeCovariance);
       }
 
       /// Returns a copy of the circle with opposite orientation.
-      inline UncertainPerigeeCircle reversed() const
+      UncertainPerigeeCircle reversed() const
       {
-        return UncertainPerigeeCircle(PerigeeCircle::reversed(),
+        return UncertainPerigeeCircle(m_perigeeCircle.reversed(),
                                       PerigeeUtil::reversed(perigeeCovariance()),
                                       chi2(),
                                       ndf());
@@ -171,9 +196,9 @@ namespace Belle2 {
       void passiveMoveBy(const Vector2D& by)
       {
         // Move the covariance matrix first to have access to the original parameters
-        PerigeeJacobian jacobian = passiveMoveByJacobian(by);
+        PerigeeJacobian jacobian = m_perigeeCircle.passiveMoveByJacobian(by);
         PerigeeUtil::transport(jacobian, m_perigeeCovariance);
-        PerigeeCircle::passiveMoveBy(by);
+        m_perigeeCircle.passiveMoveBy(by);
       }
 
       /**
@@ -182,24 +207,24 @@ namespace Belle2 {
        */
       PerigeeCovariance passiveMovedCovarianceBy(const Vector2D& by) const
       {
-        PerigeeJacobian jacobian = passiveMoveByJacobian(by);
+        PerigeeJacobian jacobian = m_perigeeCircle.passiveMoveByJacobian(by);
         return PerigeeUtil::transported(jacobian, perigeeCovariance());
       }
 
     public:
       /// Debug helper
-      friend std::ostream& operator<<(std::ostream& output,
-                                      const UncertainPerigeeCircle& perigeeCircle)
+      friend std::ostream& operator<<(std::ostream& output, const UncertainPerigeeCircle& circle)
       {
-        return output <<
-               "UncertainPerigeeCircle(" <<
-               "curvature=" << perigeeCircle.curvature() << "," <<
-               "tangentialPhi=" << perigeeCircle.tangentialPhi() << "," <<
-               "impact=" << perigeeCircle.impact() << ")" ;
+        return output << "UncertainPerigeeCircle("
+               << "curvature=" << circle->curvature() << ","
+               << "phi0=" << circle->phi0() << ","
+               << "impact=" << circle->impact() << ")" ;
       }
 
-
     private:
+      /// Memory for the underlying circle
+      PerigeeCircle m_perigeeCircle;
+
       /// Memory for the 3x3 covariance matrix of the perigee parameters.
       PerigeeCovariance m_perigeeCovariance = PerigeeUtil::identity();
 

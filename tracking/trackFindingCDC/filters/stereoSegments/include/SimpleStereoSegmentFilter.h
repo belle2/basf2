@@ -35,7 +35,7 @@ namespace Belle2 {
         const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
         const CDCTrajectorySZ& trajectorySZ = track.getStartTrajectory3D().getTrajectorySZ();
         const bool isCurler = trajectory2D.isCurler();
-        const double radius = trajectory2D.getLocalCircle().absRadius();
+        const double radius = trajectory2D.getLocalCircle()->absRadius();
 
         const ISuperLayer recoSegmentSuperLayer = recoSegment3D.getISuperLayer();
 

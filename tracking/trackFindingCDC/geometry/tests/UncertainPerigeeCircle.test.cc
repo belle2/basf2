@@ -22,7 +22,7 @@ using namespace TrackFindingCDC;
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
   for (double curvature : { -1.0, 0.0, 1.0}) {
-    UncertainPerigeeCircle circle(curvature, -M_PI / 2, 0.5);
+    PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
 
     PerigeeJacobian moveByZeroJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
     EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
@@ -87,7 +87,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
-  UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
+  PerigeeCircle circle(1.0, -M_PI / 2, 0);
 
   PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(-1.0, 0.0));
   EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
@@ -200,7 +200,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
     EXPECT_NEAR(0.0, transformedVariance(1, 2), 10e-7);
     EXPECT_NEAR(0.0, transformedVariance(2, 1), 10e-7);
   }
-
 
   {
     // Should be same as before

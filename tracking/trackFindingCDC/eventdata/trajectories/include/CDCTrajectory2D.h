@@ -77,7 +77,7 @@ namespace Belle2 {
     public:
       /// Checks if the circle is already set to a valid value.
       bool isFitted() const
-      { return not getLocalCircle().isInvalid(); }
+      { return not getLocalCircle()->isInvalid(); }
 
       /**
        *  Calculate the travel distance from the start position of the trajectory.
@@ -89,12 +89,12 @@ namespace Belle2 {
        *  calculation.
        */
       double calcArcLength2D(const Vector2D& point) const
-      { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
+      { return getLocalCircle()->arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
 
       /// Getter for the position at a given two dimensional arc length
       Vector2D getPos2DAtArcLength2D(double arcLength2D)
-      { return getLocalOrigin() + getLocalCircle().atArcLength(arcLength2D); }
+      { return getLocalOrigin() + getLocalCircle()->atArcLength(arcLength2D); }
 
       /**
        *  Calculate the travel distance between the two given positions
@@ -106,13 +106,13 @@ namespace Belle2 {
        */
       double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
       {
-        return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(),
-                                                 toPoint - getLocalOrigin());
+        return getLocalCircle()->arcLengthBetween(fromPoint - getLocalOrigin(),
+                                                  toPoint - getLocalOrigin());
       }
 
       /// Getter for the arc length for one round trip around the trajectory.
       double getArcLength2DPeriod() const
-      { return m_localPerigeeCircle.arcLengthPeriod(); }
+      { return getLocalCircle()->arcLengthPeriod(); }
 
       /**
        *  Gives the three dimensional point which is on the dirft circle away from the wire line.
@@ -131,7 +131,7 @@ namespace Belle2 {
 
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const
-      { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
+      { return getLocalCircle()->closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
       /**
        *  Calculates the point where the trajectory meets the outer wall of the CDC.
@@ -171,11 +171,11 @@ namespace Belle2 {
 
       /// Calculates the distance from the point to the trajectory as seen from the xy projection.
       double getDist2D(const Vector2D& point) const
-      {  return getLocalCircle().distance(point - getLocalOrigin()); }
+      {  return getLocalCircle()->distance(point - getLocalOrigin()); }
 
       /// Checks if the given point is to the right or to the left of the trajectory
       ERightLeft isRightOrLeft(const Vector2D& point) const
-      { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
+      { return getLocalCircle()->isRightOrLeft(point - getLocalOrigin()); }
 
       /// Getter for the maximal distance from the origin
       double getMaximalCylindricalR() const
@@ -320,7 +320,7 @@ namespace Belle2 {
        *  @return The unit travel direction at the closest approach to the position
        */
       inline Vector2D getUnitMom2D(const Vector2D& point) const
-      { return getLocalCircle().tangential(point - getLocalOrigin()); }
+      { return getLocalCircle()->tangential(point - getLocalOrigin()); }
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom2D(const double bZ) const;
@@ -342,14 +342,14 @@ namespace Belle2 {
 
       /// Get the unit momentum at the start point of the trajectory
       inline Vector2D getStartUnitMom2D() const
-      { return  getLocalCircle().tangential();  }
+      { return  getLocalCircle()->tangential();  }
 
       /// Setter for start point and momentum at the start point subjected to the charge sign.
       void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double charge);
 
       /// Get the support point of the trajectory in global coordinates
       inline Vector2D getSupport() const
-      { return getLocalCircle().perigee() + getLocalOrigin(); }
+      { return getLocalCircle()->perigee() + getLocalOrigin(); }
 
 
       /// Clears all information from this trajectoy
@@ -363,7 +363,7 @@ namespace Belle2 {
     public:
       /// Getter for the curvature as seen from the xy projection.
       double getCurvature() const
-      { return getLocalCircle().curvature(); }
+      { return getLocalCircle()->curvature(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       double getLocalCovariance(EPerigeeParameter iRow, EPerigeeParameter iCol) const

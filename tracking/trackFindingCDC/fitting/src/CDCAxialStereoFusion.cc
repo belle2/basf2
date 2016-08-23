@@ -39,7 +39,7 @@ namespace {
     for (const ARecoHit& recoHit : segment) {
       const Vector2D& recoPos2D = recoHit.getRecoPos2D();
       const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
-      const Vector2D normal = localCircle.normal(localRecoPos2D);
+      const Vector2D normal = localCircle->normal(localRecoPos2D);
       const CDCWire& wire = recoHit.getWire();
       zeta += wire.getWireLine().movePerZ().dot(normal);
     }

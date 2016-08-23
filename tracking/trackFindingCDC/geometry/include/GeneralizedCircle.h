@@ -202,7 +202,10 @@ namespace Belle2 {
        *  It works most easily by the exchange of the circle parameters n0 <-> n3
        */
       inline void conformalTransform()
-      { std::swap(m_n0, m_n3); }
+      {
+        std::swap(m_n0, m_n3);
+        reverse(); // Correct orientation
+      }
 
       /**
        *  Moves the coordinate system by the given vector.
@@ -284,7 +287,7 @@ namespace Belle2 {
        *  It works most easily by the exchange of the circle parameters n0 <-> n3
        */
       inline GeneralizedCircle conformalTransformed() const
-      { return GeneralizedCircle(n3(), n12(), n0()); }
+      { return GeneralizedCircle(-n3(), -n12(), -n0()); }
 
     public:
       /**

@@ -141,13 +141,25 @@ PerigeeCircle PerigeeCircle::reversed() const
 
 void PerigeeCircle::conformalTransform()
 {
+  double denominator = 2 + curvature() * impact();
+  std::swap(m_impact, m_curvature);
+  m_curvature *= denominator;
+  m_impact /= denominator;
+  // Also properly fixing the orientation to the opposite.
+  reverse();
+
   GeneralizedCircle::conformalTransform();
-  receivePerigeeParameters();
+  GeneralizedCircle::reverse();
 }
 
 PerigeeCircle PerigeeCircle::conformalTransformed() const
 {
-  return PerigeeCircle::fromN(n3(), n12(), n0());
+  double denominator = 2 + curvature() * impact();
+  // Also properly fixing the orientation to the opposite.
+  double newCurvature = -impact() * denominator;
+  Vector2D newPhi0Vec = -phi0Vec();
+  double newImpact = -curvature() / denominator;
+  return PerigeeCircle(newCurvature, newPhi0Vec, newImpact);
 }
 
 void PerigeeCircle::receivePerigeeParameters()

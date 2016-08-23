@@ -68,7 +68,7 @@ namespace Belle2 {
       {
         double denominator = 1 / (center().normSquared() - radius() * radius());
         m_center *= denominator;
-        m_radius *= denominator;
+        m_radius *= -denominator;
       }
 
       /**
@@ -85,7 +85,7 @@ namespace Belle2 {
       inline Circle2D conformalTransformed() const
       {
         double denominator = 1 / (center().normSquared() - radius() * radius());
-        return Circle2D(center() * denominator, radius() * denominator);
+        return Circle2D(center() * denominator, -radius() * denominator);
       }
 
     public:

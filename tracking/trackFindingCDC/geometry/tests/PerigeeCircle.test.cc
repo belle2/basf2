@@ -219,7 +219,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
   EXPECT_TRUE(circle.isInvalid());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
 {
   Vector2D center(4.0, 2.0);
@@ -233,6 +232,45 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
   EXPECT_NEAR(-3.0, circle.perigee().y(), 10e-7);
 
 }
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
+{
+  Vector2D center(1.0, 0.0);
+  double radius = 1.0;
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
+
+  // Get two points on the circle to check for the orientation to be correct
+  Vector2D firstPos = circle.atArcLength(1);
+  Vector2D secondPos = circle.atArcLength(2);
+
+  EXPECT_NEAR(1.0, circle.curvature(), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, circle.phi0(), 10e-7);
+  EXPECT_NEAR(0.0, circle.impact(), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(firstPos), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
+
+  circle.conformalTransform();
+  firstPos.conformalTransform();
+  secondPos.conformalTransform();
+
+  EXPECT_NEAR(0.0, circle.curvature(), 10e-7);
+  EXPECT_NEAR(M_PI / 2.0, circle.phi0(), 10e-7);
+  EXPECT_NEAR(-1.0 / 2.0, circle.impact(), 10e-7);
+
+  double firstConformalArcLength = circle.arcLengthTo(firstPos);
+  double secondConformalArcLength = circle.arcLengthTo(secondPos);
+  EXPECT_LT(firstConformalArcLength, secondConformalArcLength);
+
+  EXPECT_NEAR(0.0, circle.distance(firstPos), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
+
+  // Another conformal transformation goes back to the original circle
+  PerigeeCircle conformalCopy = circle.conformalTransformed();
+  EXPECT_NEAR(1.0, conformalCopy.curvature(), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, conformalCopy.phi0(), 10e-7);
+  EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
+}
+
 
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)

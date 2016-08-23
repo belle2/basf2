@@ -19,24 +19,70 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
-  UncertainPerigeeCircle circle(1.0, -M_PI / 2, 0);
+  for (double curvature : { -1.0, 0.0, 1.0}) {
+    UncertainPerigeeCircle circle(curvature, -M_PI / 2, 0.5);
 
-  PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
-  EXPECT_NEAR(1.0, moveByOneJacobian(0, 0), 10e-7);
-  EXPECT_NEAR(0.0, moveByOneJacobian(0, 1), 10e-7);
-  EXPECT_NEAR(0.0, moveByOneJacobian(0, 2), 10e-7);
+    PerigeeJacobian moveByZeroJacobian = circle.passiveMoveByJacobian(Vector2D(0.0, 0.0));
+    EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(0, 1), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(0, 2), 10e-7);
 
-  EXPECT_NEAR(0.0, moveByOneJacobian(1, 0), 10e-7);
-  EXPECT_NEAR(1.0, moveByOneJacobian(1, 1), 10e-7);
-  EXPECT_NEAR(0.0, moveByOneJacobian(1, 2), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(1, 0), 10e-7);
+    EXPECT_NEAR(1.0, moveByZeroJacobian(1, 1), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(1, 2), 10e-7);
 
-  EXPECT_NEAR(0.0, moveByOneJacobian(2, 0), 10e-7);
-  EXPECT_NEAR(0.0, moveByOneJacobian(2, 1), 10e-7);
-  EXPECT_NEAR(1.0, moveByOneJacobian(2, 2), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(2, 0), 10e-7);
+    EXPECT_NEAR(0.0, moveByZeroJacobian(2, 1), 10e-7);
+    EXPECT_NEAR(1.0, moveByZeroJacobian(2, 2), 10e-7);
+  }
 }
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip)
+{
+  for (double curvature : { -1.0, 0.0, 1.0}) {
+    PerigeeCircle circle(curvature, -M_PI / 2, 0.5);
+    Vector2D by(0.1, 1.0);
+
+    PerigeeJacobian moveByOneJacobian = circle.passiveMoveByJacobian(by);
+
+    circle.passiveMoveBy(by);
+
+    PerigeeJacobian moveOneBackJacobian = circle.passiveMoveByJacobian(-by);
+    {
+      PerigeeJacobian moveByZeroJacobian = moveByOneJacobian * moveOneBackJacobian;
+
+      EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(0, 1), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(0, 2), 10e-7);
+
+      EXPECT_NEAR(0.0, moveByZeroJacobian(1, 0), 10e-7);
+      EXPECT_NEAR(1.0, moveByZeroJacobian(1, 1), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(1, 2), 10e-7);
+
+      EXPECT_NEAR(0.0, moveByZeroJacobian(2, 0), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(2, 1), 10e-7);
+      EXPECT_NEAR(1.0, moveByZeroJacobian(2, 2), 10e-7);
+    }
+    {
+      PerigeeJacobian moveByZeroJacobian = moveOneBackJacobian * moveByOneJacobian ;
+
+      EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(0, 1), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(0, 2), 10e-7);
+
+      EXPECT_NEAR(0.0, moveByZeroJacobian(1, 0), 10e-7);
+      EXPECT_NEAR(1.0, moveByZeroJacobian(1, 1), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(1, 2), 10e-7);
+
+      EXPECT_NEAR(0.0, moveByZeroJacobian(2, 0), 10e-7);
+      EXPECT_NEAR(0.0, moveByZeroJacobian(2, 1), 10e-7);
+      EXPECT_NEAR(1.0, moveByZeroJacobian(2, 2), 10e-7);
+    }
+  }
+}
+
 
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
@@ -80,7 +126,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   EXPECT_NEAR(mu * zeta - A * lambda, moveByTwoYJacobian(2, 0), 10e-7);
   EXPECT_NEAR(2.0 * mu * u * deltaParallel, moveByTwoYJacobian(2, 1), 10e-7);
   EXPECT_NEAR(2.0 * mu * nu, moveByTwoYJacobian(2, 2), 10e-7);
-
 }
 
 

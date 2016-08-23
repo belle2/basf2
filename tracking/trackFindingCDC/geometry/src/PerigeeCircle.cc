@@ -9,6 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+#include <framework/logging/Logger.h>
 #include <boost/math/special_functions/sinc.hpp>
 
 #include <cmath>
@@ -174,65 +175,48 @@ PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
 
 void PerigeeCircle::passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const
 {
+  Vector2D deltaVec = by - perigee();
+  double delta = deltaVec.norm();
+  double deltaParallel = phi0Vec().dot(deltaVec);
+  // double deltaOrthogonal = phi0Vec().cross(deltaVec);
+  // double zeta = deltaVec.normSquared();
 
-  // In this frame of reference we have d=0,  phi= + or - M_PI
-  Vector2D coordinateVector = phi0Vec();
+  Vector2D UVec = gradient(by);
+  double U = UVec.norm();
+  double USquared = UVec.normSquared();
+  double UOrthogonal = phi0Vec().cross(UVec);
+  // double UParallel = phi0Vec().dot(UVec);
 
-  // Vector2D delta = perigee() - by;
-  Vector2D delta = by - perigee();
+  // Vector2D CB = gradient(by).orthogonal();
+  // double U = sqrt(1 + curvature() * A);
+  // double xi = 1.0 / CB.normSquared();
+  // double nu = 1 - curvature() * deltaOrthogonal;
+  // double mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
+  // double mu = 1.0 / U / 2.0;
+  // double nu = -UOrthogonal;
+  // double xi = 1 / USquared;
 
-  double deltaParallel = coordinateVector.unnormalizedParallelComp(delta);
-  double deltaOrthogonal = coordinateVector.unnormalizedOrthogonalComp(delta);
+  // double halfA = fastDistance(by);
+  // double A = 2 * halfA;
+  // double lambda = halfA / ((1 + U) * (1 + U) * U);
+  double dr = distance(by);
 
-  double halfA = fastDistance(by);
-  double A = 2 * halfA;
-
-  // B2INFO("A = " << A);
-  // B2INFO("A = " << 2 * deltaOrthogonal + curvature() * delta.normSquared());
-
-  Vector2D CB = gradient(by).orthogonal();
-  // double C = CB.first();
-  // double B = CB.second();
-
-  // B2INFO("B = " << B);
-  // B2INFO("C = " << C);
-
+  // Vector2D uVec = gradient(Vector2D(0.0, 0.0));
+  // double u = uVec.norm();
   double u = 1 + curvature() * impact(); //= n12().cylindricalR()
-
-  double U = sqrt(1 + curvature() * A);
-
-  // B2INFO("U = " << U);
-
-  double nu = 1 + curvature() * deltaOrthogonal;
-
-  // B2INFO("nu = " << nu);
-
-  double xi = 1.0 / CB.normSquared();
-
-  // B2INFO("xi = " << xi);
-
-  double lambda = halfA / ((1 + U) * (1 + U) * U);
-  double mu = 1.0 / (U * (U + 1)) + curvature() * lambda;
-
-  // B2INFO("lambda = " << lambda);
-  // B2INFO("mu = " << mu);
-
-  double zeta = delta.normSquared();
-
-  // B2INFO("zeta = " << zeta);
 
   using namespace NPerigeeParameterIndices;
   jacobian(c_Curv, c_Curv) = 1;
   jacobian(c_Curv, c_Phi0) = 0;
   jacobian(c_Curv, c_I) = 0;
 
-  jacobian(c_Phi0, c_Curv) = xi * deltaParallel;
-  jacobian(c_Phi0, c_Phi0) = xi * u * nu;
-  jacobian(c_Phi0, c_I) = -xi * curvature() * curvature() * deltaParallel;
+  jacobian(c_Phi0, c_Curv) = deltaParallel / USquared;
+  jacobian(c_Phi0, c_Phi0) = -u * UOrthogonal / USquared;
+  jacobian(c_Phi0, c_I) = -curvature() * curvature() * deltaParallel / USquared;
 
-  jacobian(c_I, c_Curv) = mu * zeta - lambda * A;
-  jacobian(c_I, c_Phi0) = 2 * mu * u * deltaParallel;
-  jacobian(c_I, c_I) = 2 * mu * nu;
+  jacobian(c_I, c_Curv) = (delta - dr) * (delta + dr) / U / 2;
+  jacobian(c_I, c_Phi0) = u * deltaParallel / U;
+  jacobian(c_I, c_I) = -UOrthogonal / U;
 }
 
 double PerigeeCircle::arcLengthTo(const Vector2D& point) const

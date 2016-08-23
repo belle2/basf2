@@ -31,14 +31,14 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
   // Checks if the normal parameters n follow the same sign convention
   PerigeeCircle perigeeCircle(curvature, tangentialPhi, impact);
 
-  const GeneralizedCircle& generalizedCircle = perigeeCircle;
-  //(perigeeCircle.n0(), perigeeCircle.n12(), perigeeCircle.n3());
+  const GeneralizedCircle generalizedCircle(perigeeCircle.n0(),
+                                            perigeeCircle.n12(),
+                                            perigeeCircle.n3());
 
   EXPECT_NEAR(curvature, generalizedCircle.curvature(), 10e-7);
   EXPECT_NEAR(impact, generalizedCircle.impact(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().x(), generalizedCircle.tangential().x(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().y(), generalizedCircle.tangential().y(), 10e-7);
-
 
   PerigeeCircle roundTripCircle(generalizedCircle);
 
@@ -416,27 +416,4 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
   EXPECT_NEAR(expectedPhi0Vec.y(), phi0Vec.y(), 10e-7);
   EXPECT_NEAR(expectedPhi0, phi0Vec.phi(), 10e-7);
   EXPECT_NEAR(1, phi0Vec.norm(), 10e-7);
-}
-
-TEST(TrackFindingCDCTest, geometry_PerigeeCircle_intersections)
-{
-
-  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
-
-  double lineCurvature = 0;
-  Vector2D linePhi0 = Vector2D(1.0, -1.0).unit();
-  double lineImpact = sqrt(2.0);
-  PerigeeCircle line = PerigeeCircle(lineCurvature, linePhi0, lineImpact);
-
-  pair<Vector2D, Vector2D> intersections = circle.intersections(line);
-
-  const Vector2D& intersection1 = intersections.first;
-  const Vector2D& intersection2 = intersections.second;
-
-  EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection1.x(), 10e-7);
-  EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection1.y(), 10e-7);
-
-  EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection2.x(), 10e-7);
-  EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection2.y(), 10e-7);
-
 }

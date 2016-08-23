@@ -155,8 +155,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
 
     // Check if the circle has been fitted reverse to the hough box by accident
     {
-      GeneralizedCircle circle = trajectory2D.getGlobalCircle();
-      const double& curv = circle.curvature();
+      const double& curv = trajectory2D.getCurvature();
       const std::array<DiscreteCurv, 2>& curvs = foundHoughBox.getBounds<DiscreteCurv>();
       const float& lowerCurv = *(curvs[0]);
       const float& upperCurv = *(curvs[1]);

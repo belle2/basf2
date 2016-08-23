@@ -373,12 +373,10 @@ namespace Belle2 {
       double getLocalVariance(EPerigeeParameter i) const
       { return getLocalCircle().variance(i); }
 
-
       /// Getter for the circle in global coordinates
-      GeneralizedCircle getGlobalCircle() const
+      PerigeeCircle getGlobalCircle() const
       {
-        // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        GeneralizedCircle result(getLocalCircle());
+        PerigeeCircle result = getLocalCircle();
         result.passiveMoveBy(-getLocalOrigin());
         return result;
       }
@@ -389,7 +387,6 @@ namespace Belle2 {
         m_localPerigeeCircle = perigeeCircle;
         m_localPerigeeCircle.passiveMoveBy(getLocalOrigin());
       }
-
 
       /// Getter for the cirlce in local coordinates
       const UncertainPerigeeCircle& getLocalCircle() const

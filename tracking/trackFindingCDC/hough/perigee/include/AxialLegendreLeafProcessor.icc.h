@@ -45,7 +45,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   /////////////////////////////////////////////////////////////////////////
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory2D = fitter.fit(*leaf);
-  GeneralizedCircle circle = trajectory2D.getGlobalCircle();
+  PerigeeCircle circle = trajectory2D.getGlobalCircle();
   {
     const double curv = circle.curvature();
     std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();

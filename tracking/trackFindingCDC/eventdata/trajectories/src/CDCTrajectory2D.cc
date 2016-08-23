@@ -110,7 +110,7 @@ Vector2D CDCTrajectory2D::getInnerExit() const
   double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
 
   const Vector2D support = getSupport();
-  const GeneralizedCircle globalCircle = getGlobalCircle();
+  const PerigeeCircle globalCircle = getGlobalCircle();
   if (support.cylindricalR() < innerCylindricalR) {
     // If we start within the inner volumn of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the inner wall.
@@ -130,7 +130,7 @@ Vector2D CDCTrajectory2D::getOuterExit(double factor) const
   double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
 
   const Vector2D support = getSupport();
-  const GeneralizedCircle globalCircle = getGlobalCircle();
+  const PerigeeCircle globalCircle = getGlobalCircle();
   if (support.cylindricalR() > outerCylindricalR) {
     // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
     // and not stop at first intersection with the outer wall.

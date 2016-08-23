@@ -233,10 +233,10 @@ namespace Belle2 {
 
 
       /// Getter for the circle in global coordinates.
-      GeneralizedCircle getGlobalCircle() const
+      PerigeeCircle getGlobalCircle() const
       {
         // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        GeneralizedCircle result(getLocalHelix().circleXY());
+        PerigeeCircle result(getLocalHelix().circleXY());
         result.passiveMoveBy(-getLocalOrigin().xy());
         return result;
       }

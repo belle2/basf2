@@ -38,7 +38,7 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "list of strings you provide here. Make sure to choose those wisely as the modules return value depends "
            "on these cuts.");
 
-  addParam("m_param_acceptOverridesReject", m_param_acceptOverridesReject, "Flag to control which class of cuts is "
+  addParam("acceptOverridesReject", m_param_acceptOverridesReject, "Flag to control which class of cuts is "
            "more \"important\": accept cuts or reject cuts.", m_param_acceptOverridesReject);
 
   addParam("resultStoreArrayName", m_param_resultStoreArrayName, "Store Object Pointer name for storing the "
@@ -87,7 +87,9 @@ void SoftwareTriggerModule::terminate()
 /// Run over all cuts and check them. If one of the cuts yields true, give a positive return value of the module.
 void SoftwareTriggerModule::event()
 {
-  m_resultStoreObjectPointer.construct();
+  if (not m_resultStoreObjectPointer.isValid()) {
+    m_resultStoreObjectPointer.construct();
+  }
 
   B2DEBUG(100, "Doing the calculation...");
   const SoftwareTriggerObject& prefilledObject = m_calculation.fillInCalculations();

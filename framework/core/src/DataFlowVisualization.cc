@@ -47,7 +47,7 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
   const bool steeringFileFlow = true;
-  for (ModulePtr mod : path.getModules())
+  for (ModulePtr mod : path.buildModulePathList())
     generateModulePlot(file, *mod, steeringFileFlow);
 
   plotPath(file, path);

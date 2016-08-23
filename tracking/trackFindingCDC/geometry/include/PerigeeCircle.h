@@ -85,6 +85,13 @@ namespace Belle2 {
       /// Sets all circle parameters to zero
       void invalidate();
 
+      /// Indicates if all circle parameters are zero
+      bool isInvalid() const;
+
+      /// Indicates if the combination of the circle parameters makes up a valid circle
+      bool isValid() const
+      { return not isInvalid(); }
+
       /// Flips the orientation of the circle in place
       void reverse();
 
@@ -230,7 +237,7 @@ namespace Belle2 {
       { return curvature() != 0.0; }
 
       /// Getter for the orientation of the circle
-      inline ERotation orientation() const
+      ERotation orientation() const
       { return static_cast<ERotation>(sign(curvature())); }
 
       /// Gradient of the distance field, hence indicates the direction of increasing distance.
@@ -302,7 +309,17 @@ namespace Belle2 {
       Vector2D n12() const
       { return -phi0Vec().orthogonal() * (1 + curvature() * impact()); }
 
-      /// Getter for the generalised circle parameter n0
+      /// Getter for the generalised circle parameters n1
+      double n1() const
+      { return n12().x(); }
+      //{ return phi0Vec().y() * (1 + curvature() * impact()); }
+
+      /// Getter for the generalised circle parameters n2
+      double n2() const
+      { return n12().y(); }
+      //{ return -(phi0Vec().x()) * (1 + curvature() * impact()); }
+
+      /// Getter for the generalised circle parameter n3
       double n3() const
       { return curvature() / 2.0; }
 

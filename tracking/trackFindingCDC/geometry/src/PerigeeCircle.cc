@@ -179,6 +179,14 @@ void PerigeeCircle::invalidate()
   GeneralizedCircle::invalidate();
 }
 
+bool PerigeeCircle::isInvalid() const
+{
+  return (not std::isfinite(phi0()) or
+          not std::isfinite(curvature()) or
+          not std::isfinite(impact()) or
+          phi0Vec().isNull());
+}
+
 void PerigeeCircle::passiveMoveBy(const Vector2D& by)
 {
   double arcLength = arcLengthTo(by);
@@ -275,8 +283,8 @@ double PerigeeCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to)
   if (lengthSign == EForwardBackward::c_Unknown) lengthSign = EForwardBackward::c_Forward;
   Vector2D closestAtFrom = closest(from);
   Vector2D closestAtTo = closest(to);
-  double directDistance = closestAtFrom.distance(closestAtTo);
-  return lengthSign * arcLengthFactor(directDistance) * directDistance;
+  double secantLength = closestAtFrom.distance(closestAtTo);
+  return lengthSign * arcLengthAtSecantLength(secantLength);
 }
 
 double PerigeeCircle::arcLengthToCylindricalR(double cylindricalR) const

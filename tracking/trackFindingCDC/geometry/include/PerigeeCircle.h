@@ -18,14 +18,12 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
 
-#include <TVectorD.h>
-
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
     /// Extension of the generalized circle also caching the perigee coordinates.
-    class PerigeeCircle : public GeneralizedCircle {
+    class PerigeeCircle {
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -42,17 +40,13 @@ namespace Belle2 {
 
     private:
       /// Constructor taking all stored parameters for internal use.
-      PerigeeCircle(const GeneralizedCircle& n0123,
-                    double curvature,
-                    double phi0,
-                    const Vector2D& phi0Vec,
-                    double impact);
+      PerigeeCircle(double curvature, double phi0, const Vector2D& phi0Vec, double impact);
 
     public:
       /// Constructor from a two dimensional line
       explicit PerigeeCircle(const Line2D& n012);
 
-      /// Constructor pomoting the generalized circle
+      /// Constructor promoting the generalized circle
       explicit PerigeeCircle(const GeneralizedCircle& n0123);
 
       /// Constructor from a two dimensional circle in center / radius representation
@@ -74,12 +68,7 @@ namespace Belle2 {
        */
       static PerigeeCircle fromCenterAndRadius(const Vector2D& center,
                                                double absRadius,
-                                               const ERotation orientation = ERotation::c_CounterClockwise);
-
-
-    protected:
-      /// Caches the perigee parameters from the underlying generalized circle parameters.
-      void receivePerigeeParameters();
+                                               ERotation orientation = ERotation::c_CounterClockwise);
 
     public:
       /// Sets all circle parameters to zero
@@ -375,17 +364,13 @@ namespace Belle2 {
 
       /// Setter for signed curvature.
       void setCurvature(double curvature)
-      {
-        m_curvature = curvature;
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
-      }
+      { m_curvature = curvature; }
 
       /// Sets the azimuth angle of the direction of flight at the perigee.
       void setTangentialPhi(double phi0)
       {
         m_phi0 = phi0;
         m_phi0Vec = Vector2D::Phi(phi0);
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
       }
 
       /// Sets the unit direction of flight at the perigee
@@ -393,15 +378,11 @@ namespace Belle2 {
       {
         m_phi0 = tangential.phi();
         m_phi0Vec = tangential.unit();
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
       }
 
       /// Sets the impact parameter of the circle.
       void setImpact(double impact)
-      {
-        m_impact = impact;
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
-      }
+      { m_impact = impact; }
 
       /// Setter for the perigee parameters
       void setPerigeeParameters(double curvature, const Vector2D& phi0Vec, double impact)
@@ -410,7 +391,6 @@ namespace Belle2 {
         m_phi0 = phi0Vec.phi();
         m_phi0Vec = phi0Vec;
         m_curvature = curvature;
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
       }
 
       /// Setter for the perigee parameters
@@ -420,17 +400,15 @@ namespace Belle2 {
         m_phi0 = phi0;
         m_phi0Vec = Vector2D::Phi(phi0);
         m_curvature = curvature;
-        GeneralizedCircle::setPerigeeParameters(m_curvature, m_phi0Vec, m_impact);
       }
 
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const PerigeeCircle& circle)
       {
-        return output <<
-               "PerigeeCircle(" <<
-               "curvature=" << circle.curvature() << "," <<
-               "phi0=" << circle.phi0() << "," <<
-               "impact=" << circle.impact() << ")" ;
+        return output << "PerigeeCircle("
+               << "curvature=" << circle.curvature() << ","
+               << "phi0=" << circle.phi0() << ","
+               << "impact=" << circle.impact() << ")" ;
       }
 
     private:
@@ -452,8 +430,7 @@ namespace Belle2 {
       /// Memory for the signed impact parameter
       double m_impact;
 
-    }; //class
-
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

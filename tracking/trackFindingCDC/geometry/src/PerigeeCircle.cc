@@ -8,31 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-
-#include <framework/logging/Logger.h>
-
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
 #include <boost/math/special_functions/sinc.hpp>
 
-#include <tracking/trackFindingCDC/numerics/SinEqLine.h>
-
 #include <cmath>
-
-using namespace std;
-using namespace boost::math;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 PerigeeCircle::PerigeeCircle()
-  : GeneralizedCircle()
 {
   invalidate();
 }
 
 PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact)
-  : GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, phi0Vec, impact))
-  , m_curvature(curvature)
+  : m_curvature(curvature)
   , m_phi0(phi0Vec.phi())
   , m_phi0Vec(phi0Vec)
   , m_impact(impact)
@@ -40,8 +30,7 @@ PerigeeCircle::PerigeeCircle(double curvature, const Vector2D& phi0Vec, double i
 }
 
 PerigeeCircle::PerigeeCircle(double curvature, double phi0, double impact)
-  : GeneralizedCircle(GeneralizedCircle::fromPerigeeParameters(curvature, phi0, impact))
-  , m_curvature(curvature)
+  : m_curvature(curvature)
   , m_phi0(phi0)
   , m_phi0Vec(Vector2D::Phi(phi0))
   , m_impact(impact)
@@ -55,13 +44,8 @@ PerigeeCircle::PerigeeCircle(const PerigeeParameters& parameters)
 {
 }
 
-PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123,
-                             double curvature,
-                             double phi0,
-                             const Vector2D& phi0Vec,
-                             double impact)
-  : GeneralizedCircle(n0123)
-  , m_curvature(curvature)
+PerigeeCircle::PerigeeCircle(double curvature, double phi0, const Vector2D& phi0Vec, double impact)
+  : m_curvature(curvature)
   , m_phi0(phi0)
   , m_phi0Vec(phi0Vec)
   , m_impact(impact)
@@ -70,13 +54,11 @@ PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123,
 }
 
 PerigeeCircle::PerigeeCircle(const Line2D& n012)
-  : GeneralizedCircle(n012)
 {
   setN(n012);
 }
 
 PerigeeCircle::PerigeeCircle(const GeneralizedCircle& n0123)
-  : GeneralizedCircle(n0123)
 {
   setN(n0123);
 }
@@ -102,7 +84,7 @@ PerigeeCircle PerigeeCircle::fromN(double n0, const Vector2D& n12, double n3)
 
 PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
                                                  double absRadius,
-                                                 const ERotation orientation)
+                                                 ERotation orientation)
 {
   PerigeeCircle circle;
   circle.setCenterAndRadius(center, absRadius, orientation);
@@ -126,13 +108,11 @@ void PerigeeCircle::reverse()
   m_phi0 = AngleUtil::reversed(m_phi0);
   m_phi0Vec.reverse();
   m_impact = -m_impact;
-  GeneralizedCircle::reverse();
 }
 
 PerigeeCircle PerigeeCircle::reversed() const
 {
-  return PerigeeCircle(GeneralizedCircle::reversed(),
-                       -m_curvature,
+  return PerigeeCircle(-m_curvature,
                        AngleUtil::reversed(m_phi0),
                        -m_phi0Vec,
                        -m_impact
@@ -147,27 +127,17 @@ void PerigeeCircle::conformalTransform()
   m_impact /= denominator;
   // Also properly fixing the orientation to the opposite.
   reverse();
-
-  GeneralizedCircle::conformalTransform();
-  GeneralizedCircle::reverse();
 }
 
 PerigeeCircle PerigeeCircle::conformalTransformed() const
 {
   double denominator = 2 + curvature() * impact();
-  // Also properly fixing the orientation to the opposite.
+  // Properly fixing the orientation to the opposite by the minus signs
   double newCurvature = -impact() * denominator;
+  double newPhi0 = AngleUtil::reversed(phi0());
   Vector2D newPhi0Vec = -phi0Vec();
   double newImpact = -curvature() / denominator;
-  return PerigeeCircle(newCurvature, newPhi0Vec, newImpact);
-}
-
-void PerigeeCircle::receivePerigeeParameters()
-{
-  m_curvature = GeneralizedCircle::curvature();
-  m_phi0Vec = GeneralizedCircle::tangential();
-  m_phi0 = GeneralizedCircle::tangentialPhi();
-  m_impact = GeneralizedCircle::impact();
+  return PerigeeCircle(newCurvature, newPhi0, newPhi0Vec, newImpact);
 }
 
 void PerigeeCircle::invalidate()
@@ -176,7 +146,6 @@ void PerigeeCircle::invalidate()
   m_phi0 = NAN;
   m_phi0Vec = Vector2D(0.0, 0.0);
   m_impact = 0;
-  GeneralizedCircle::invalidate();
 }
 
 bool PerigeeCircle::isInvalid() const
@@ -194,7 +163,6 @@ void PerigeeCircle::passiveMoveBy(const Vector2D& by)
   m_phi0 = m_phi0 + curvature() * arcLength;
   AngleUtil::normalise(m_phi0);
   m_phi0Vec = Vector2D::Phi(m_phi0);
-  GeneralizedCircle::passiveMoveBy(by);
 }
 
 PerigeeJacobian PerigeeCircle::passiveMoveByJacobian(const Vector2D& by) const
@@ -311,21 +279,21 @@ double PerigeeCircle::arcLengthAtSecantLength(double secantLength) const
   return secantLength * arcLengthFactor;
 }
 
-pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double R) const
+std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double R) const
 {
   const double u = (1 + curvature() * impact());
   const double orthogonal = ((impact() * impact() + R * R) * curvature() / 2.0 + impact()) / u;
   const double parallel = sqrt(square(R) - square(orthogonal));
   Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
   Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(),  parallel, orthogonal);
-  pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
+  std::pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
   return result;
 }
 
 Vector2D PerigeeCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
                                                 const double cylindricalR) const
 {
-  pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
+  std::pair<Vector2D, Vector2D> candidatePoints = atCylindricalR(cylindricalR);
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 }
 
@@ -374,7 +342,6 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
   m_impact = (center.norm() - std::fabs(absRadius)) * orientation;
-  GeneralizedCircle::setCenterAndRadius(center, absRadius, orientation);
 }
 
 
@@ -386,5 +353,4 @@ void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
   m_phi0Vec.normalize();
   m_phi0 = m_phi0Vec.phi();
   m_impact = distance(n0 / normalization); // Uses the new curvature
-  GeneralizedCircle::setN(n0, n12, n3);
 }

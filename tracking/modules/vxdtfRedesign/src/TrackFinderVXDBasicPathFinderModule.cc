@@ -105,27 +105,21 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 
 void TrackFinderVXDBasicPathFinderModule::event()
 {
-  /**
-   * TODO:
-   * - Whether or not there shall be a simple QI-calculator to be included, we have to decide later on.
-   * - add parameters for:
-   * -- seed-threshold (m_cellularAutomaton.findSeeds),
-   * -- SPTC-Seed-settings (see sptcCreator for more details)
-   * */
+
   m_eventCounter++;
 
 
   DirectedNodeNetwork< Segment<TrackNode>, CACell >& segmentNetwork = m_network->accessSegmentNetwork();
 
   if (m_PARAMprintNetworks) {
-    std::string fileName = m_PARAMsecMapName + "_CA_Ev" + std::to_string(m_eventCounter);
+    std::string fileName = m_PARAMsecMapName + "_BasicPF_Ev" + std::to_string(m_eventCounter);
     DNN::printCANetwork<Segment< Belle2::TrackNode>>(segmentNetwork, fileName);
   }
 
 
 /// apply CA algorithm:
   int nRounds = m_cellularAutomaton.apply(segmentNetwork);
-  if (nRounds < 0) { B2ERROR("CA failed, skipping event!"); return; }
+  if (nRounds < 0) { B2ERROR("Basic Path Finder failed, skipping event!"); return; }
 
 
 /// mark valid Cells as Seeds:

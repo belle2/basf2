@@ -3,7 +3,7 @@
 using namespace Belle2;
 
 
-FoxWolfram::FoxWolfram(const std::vector<TVector3>& momenta)
+FoxWolfram::FoxWolfram(const std::vector<TVector3>& momenta) : sum {0, 0, 0, 0, 0}
 {
   decltype(momenta.begin()) p;
   decltype(momenta.begin()) q;

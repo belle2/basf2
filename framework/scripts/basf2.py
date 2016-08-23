@@ -7,6 +7,7 @@ The core module of the Belle II Analysis Software Framework.
 
 # now let's make sure we actually run in python 3
 import sys
+
 if sys.version_info[0] < 3:
     print("basf2 requires python3. Please run the steering files using basf2 "
           "(or python3), not python")
@@ -42,7 +43,6 @@ def _avoidPyRootHang():
 
 _avoidPyRootHang()
 
-
 # -----------------------------------------------
 #             Set basf2 information
 # -----------------------------------------------
@@ -64,6 +64,7 @@ signal.signal(signal.SIGPIPE, signal.SIG_DFL)
 # Create default framework, also initialises environment
 fw = Framework()
 logging = LogPythonInterface()
+
 
 # -----------------------------------------------
 #      Global basf2 function definitions
@@ -277,7 +278,8 @@ def set_module_parameters(path, name, recursive=False, **kwargs):
 
         if recursive:
             if module.has_condition():
-                set_module_parameters(module.get_condition_path(), name, recursive, **kwargs)
+                for condition_path in module.get_all_condition_paths():
+                    set_module_parameters(condition_path, name, recursive, **kwargs)
             if module.type() == "SubEvent":
                 for subpath in [p.values for p in module.available_params() if p.name == "path"]:
                     set_module_parameters(subpath, name, recursive, **kwargs)
@@ -576,6 +578,7 @@ def _add_independent_path(self, skim_path, ds_ID='', merge_back_event=[]):
     """
     self._add_independent_path(skim_path, ds_ID, merge_back_event)
 
+
 Path.add_module = _add_module
 Path.add_independent_path = _add_independent_path
 
@@ -594,14 +597,17 @@ def deserialize_value(module, parameter_state):
         return parameter_state['values']
 
 
-def serialize_condition(module):
-    return {'value': module.get_condition_value(),
-            'operator': int(module.get_condition_operator()),
-            'path': serialize_path(module.get_condition_path()),
-            'option': int(module.get_condition_option())}
+def serialize_conditions(module):
+    condition_list = []
+
+    for condition in module.get_all_conditions():
+        condition_list.append({'value': condition.get_value(),
+                               'operator': int(condition.get_operator()),
+                               'path': serialize_path(module.get_path()),
+                               'option': int(module.get_after_path())})
 
 
-def deserialize_condition(module, module_state):
+def deserialize_conditions(module, module_state):
     cond = module_state['condition']
     module.if_value(str(ConditionOperator.values[cond['operator']]) + str(cond['value']),
                     deserialize_path(cond['path']), AfterConditionPath.values[cond['option']])
@@ -618,14 +624,14 @@ def serialize_module(module):
         'parameters': [{'name': parameter.name, 'values': serialize_value(module, parameter)}
                        for parameter in module.available_params()
                        if parameter.setInSteering or module.type() == 'SubEvent'],
-        'condition': serialize_condition(module) if module.has_condition() else None}
+        'condition': serialize_conditions(module) if module.has_condition() else None}
 
 
 def deserialize_module(module_state):
     module = fw.register_module(module_state['type'])
     module.set_name(module_state['name'])
     if 'condition' in module_state and module_state['condition'] is not None:
-        deserialize_condition(module, module_state)
+        deserialize_conditions(module, module_state)
     if 'flag' in module_state and module_state['flag']:
         # for some modules, this flag might be changed from the default
         module.set_property_flags(ModulePropFlags.PARALLELPROCESSINGCERTIFIED)

@@ -279,13 +279,13 @@ namespace Belle2 {
      */
     bool hasCondition() const { return not m_conditions.empty(); };
 
-    /** Return a pointer to the first condition (or nullptr, if none was set) */
+    /** Return a pointer to the last condition (or nullptr, if none was set) */
     const ModuleCondition* getCondition() const
     {
       if (m_conditions.empty()) {
         return nullptr;
       } else {
-        return &m_conditions.front();
+        return &m_conditions.back();
       }
     }
 

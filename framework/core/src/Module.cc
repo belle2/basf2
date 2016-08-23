@@ -271,17 +271,23 @@ namespace {
   {
     return *(m->getParamInfoListPython().get()); //copy the list object
   }
-  int _getConditionValuePython(const Module* m)
+  boost::python::list _getAllConditionPathsPython(const Module* m)
   {
-    if (m->getCondition())
-      return m->getCondition()->getConditionValue();
-    throw runtime_error("No condition was set for module " + m->getName());
+    boost::python::list allConditionPaths;
+    for (const auto& conditionPath : m->getAllConditionPaths()) {
+      allConditionPaths.append(boost::python::object(conditionPath));
+    }
+
+    return allConditionPaths;
   }
-  ModuleCondition::EConditionOperators _getConditionOperatorPython(const Module* m)
+  boost::python::list _getAllConditionsPython(const Module* m)
   {
-    if (m->getCondition())
-      return m->getCondition()->getConditionOperator();
-    throw runtime_error("No condition was set for module " + m->getName());
+    boost::python::list allConditions;
+    for (const auto& condition : m->getAllConditions()) {
+      allConditions.append(boost::python::object(boost::ref(condition)));
+    }
+
+    return allConditions;
   }
 }
 
@@ -304,7 +310,6 @@ void Module::exposePythonAPI()
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
-  void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
 
   enum_<Module::EAfterConditionPath>("AfterConditionPath",
                                      R"(Determines execution behaviour after a conditional path has been executed:
@@ -396,10 +401,8 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())
   .def("has_condition", &Module::hasCondition)
-  .def("get_condition_path", &Module::getConditionPath)
-  .def("get_condition_option", &Module::getAfterConditionPath)
-  .def("get_condition_value", &_getConditionValuePython)
-  .def("get_condition_operator", &_getConditionOperatorPython)
+  .def("get_all_condition_paths", &_getAllConditionPathsPython)
+  .def("get_all_conditions", &_getAllConditionsPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)

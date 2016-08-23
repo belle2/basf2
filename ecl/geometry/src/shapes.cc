@@ -709,7 +709,7 @@ vector<cplacement_t> load_placements(const string& fname)
       in >> p.Pr;
       in.str(t[5]); in.seekg(0, ios_base::beg);
       in >> p.Ptheta;
-      in.str(t[5]); in.seekg(0, ios_base::beg);
+      in.str(t[6]); in.seekg(0, ios_base::beg);
       in >> p.Pphi;
       plcmnt.push_back(p);
     }

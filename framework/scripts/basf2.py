@@ -603,14 +603,17 @@ def serialize_conditions(module):
     for condition in module.get_all_conditions():
         condition_list.append({'value': condition.get_value(),
                                'operator': int(condition.get_operator()),
-                               'path': serialize_path(module.get_path()),
-                               'option': int(module.get_after_path())})
+                               'path': serialize_path(condition.get_path()),
+                               'option': int(condition.get_after_path())})
+
+    return condition_list
 
 
 def deserialize_conditions(module, module_state):
-    cond = module_state['condition']
-    module.if_value(str(ConditionOperator.values[cond['operator']]) + str(cond['value']),
-                    deserialize_path(cond['path']), AfterConditionPath.values[cond['option']])
+    conditions = module_state['condition']
+    for cond in conditions:
+        module.if_value(str(ConditionOperator.values[cond['operator']]) + str(cond['value']),
+                        deserialize_path(cond['path']), AfterConditionPath.values[cond['option']])
 
 
 def serialize_module(module):

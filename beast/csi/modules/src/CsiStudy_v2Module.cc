@@ -87,6 +87,14 @@ void CsiStudy_v2Module::defineHisto()
     h_csi_edep2Weight[i] = new TH1F(TString::Format("h_csi_edep2Weight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_nocut[i] = new TH1F(TString::Format("h_csi_edep_nocut_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_csi_edep_test[i] = new TH1F(TString::Format("h_csi_edep_test_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+
+    h_csi_edep[i]->Sumw2();
+    h_csi_edep1[i]->Sumw2();
+    h_csi_edep2[i]->Sumw2();
+    h_csi_edep1Weight[i]->Sumw2();
+    h_csi_edep2Weight[i]->Sumw2();
+    h_csi_edep_nocut[i]->Sumw2();
+    h_csi_edep_test[i]->Sumw2();
   }
   h_csi_s = new TH1F("h_csi_s", "", 4000, -200., 200.);
   h_csi_s_cut = new TH1F("h_csi_s_cut", "", 4000, -200., 200.);

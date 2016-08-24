@@ -75,8 +75,8 @@ void He3tubeStudyModule::defineHisto()
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_NeutronHitsWeighted = new TH1F("NeutronHitsWeighted", "Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_DefNeutronHits = new TH1F("DefNeutronHits", "Definite Neutron Hits;Tube ", 4, -0.5, 3.5);
+  h_DefNeutronHitsWeighted = new TH1F("DefNeutronHitsWeighted", "Definite Neutron Hits;Tube ", 4, -0.5, 3.5);
   h_NeutronRate = new TH1F("NeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
-  h_NeutronRateWeighted = new TH1F("NeutronRateWeighted", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
   h_DefNeutronRate = new TH1F("DefNeutronRate", "Neutron Hits per second;Tube; Rate (Hz)", 4, -0.5, 3.5);
 
   h_Edep1H3H =       new TH1F("Edep1H3H"     , "Energy deposited by Proton and Tritium; MeV", 100, 0.7, 0.8);
@@ -92,9 +92,12 @@ void He3tubeStudyModule::defineHisto()
                                           0, 18000);
   h_PulseHeights_All =        new TH1F("PulseHeights_All"   , "Pulse height of waveforms from all events", 100, 0, 18000);
 
-  h_NeutronRate->Sumw2();
+  h_DefNeutronHits->Sumw2();
   h_DefNeutronRate->Sumw2();
-  h_NeutronRateWeighted->Sumw2();
+  h_DefNeutronHitsWeighted->Sumw2();
+  h_NeutronHits->Sumw2();
+  h_NeutronRate->Sumw2();
+  h_NeutronHitsWeighted->Sumw2();
 
 }
 
@@ -212,6 +215,7 @@ void He3tubeStudyModule::event()
     if (aHit->definiteNeutron()) { //if this is true, this hit was definitely caused by a neutron.
       nDefiniteNeutron++;
       h_DefNeutronHits->Fill(aHit->getdetNb());
+      h_DefNeutronHitsWeighted->Fill(aHit->getdetNb(), rate);
       h_DefNeutronRate->Fill(aHit->getdetNb(), 1 / rateCorrection);
       h_PulseHeights_DefNeutron->Fill(aHit->getPeakV());
       neutronStatus = 1;
@@ -225,7 +229,6 @@ void He3tubeStudyModule::event()
       h_NeutronHits->Fill(aHit->getdetNb());
       h_NeutronRate->Fill(aHit->getdetNb(), 1 / rateCorrection);
       h_NeutronHitsWeighted->Fill(aHit->getdetNb(), rate);
-      h_NeutronRateWeighted->Fill(aHit->getdetNb(), 1 / rateCorrection * rate);
       nNeutronHits++;
     } else {
       h_PulseHeights_NotNeutron->Fill(aHit->getPeakV());

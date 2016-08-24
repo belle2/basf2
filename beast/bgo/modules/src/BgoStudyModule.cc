@@ -89,6 +89,14 @@ void BgoStudyModule::defineHisto()
 
     h_bgo_edepWeight[i] = new TH1F(TString::Format("h_bgo_edepWeight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_bgo_edep_testWeight[i] = new TH1F(TString::Format("h_bgo_edep_testWeight_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+
+    h_bgo_edep[i]->Sumw2();
+    h_bgo_edep_test[i]->Sumw2();
+    h_bgo_edepWeight[i]->Sumw2();
+    h_bgo_edep_testWeight[i]->Sumw2();
+    h_bgos_edep[i]->Sumw2();
+    h_bgos_edep2[i]->Sumw2();
+    h_bgos_edep_test[i]->Sumw2();
   }
   h_bgo_s = new TH1F("h_bgo_s", "", 4000, -200., 200.);
   h_bgo_s_cut = new TH1F("h_bgo_s_cut", "", 4000, -200., 200.);

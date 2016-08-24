@@ -83,9 +83,16 @@ void BeamabortStudyModule::defineHisto()
     h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
     h_Amp[i] = new TH1F(TString::Format("h_Amp_%d", i), "", 100000, 0., 100000.);
     h_edep[i] = new TH1F(TString::Format("h_edep_%d", i), "", 4000, 0., 4000.);
+
+    h_dose[i]->Sumw2();
+    h_doseWeight[i]->Sumw2();
+    h_idose[i]->Sumw2();
+    h_idoseWeight[i]->Sumw2();
   }
   h_s = new TH1F("h_s", "", 4000, -200., 200.);
   h_s_cut = new TH1F("h_s_cut", "", 4000, -200., 200.);
+
+
 }
 
 

@@ -74,6 +74,10 @@ void AnalysisPhase1StudyModule::defineHisto()
     h_Wkineticvz_zoom[i] = new TH2F(TString::Format("h_Wkineticvz_zoom_%d", i), "", 200, -400., 400., 1000, 0., 0.01);
     h_phivz[i] = new TH2F(TString::Format("h_phivz_%d", i), "", 200, -400., 400., 360, -180., 180.);
     h_thetavz[i] = new TH2F(TString::Format("h_thetavz_%d", i), "", 200, -400., 400., 180, 0., 180.);
+    h_kineticvz[i]->Sumw2();
+    h_kineticvz_zoom[i]->Sumw2();
+    h_Wkineticvz[i]->Sumw2();
+    h_Wkineticvz_zoom[i]->Sumw2();
   }
   h_g4_xy = new TH2F("h_g4_xy", "", 100, -5.99, 5.99, 100, -5.99, 5.99);
   for (int i = 0; i < 2; i++) {
@@ -97,6 +101,8 @@ void AnalysisPhase1StudyModule::defineHisto()
   h_dz = new TH1F("h_dz", "", 10000, -400., 400.);
   h_E = new TH1F("h_E", "", 8000, 0., 7.99);
   h_P = new TH1F("h_P", "", 8000, 0., 7.99);
+  h_E->Sumw2();
+  h_P->Sumw2();
 }
 
 void AnalysisPhase1StudyModule::initialize()

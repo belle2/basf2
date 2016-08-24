@@ -84,6 +84,13 @@ void PindiodeStudyModule::defineHisto()
     h_ivolt[i] = new TH1F(TString::Format("h_ivolt_%d", i), "", 10000, 0., 100.);
     h_itime[i] = new TH1F(TString::Format("h_itime_%d", i), "", 1000, 0., 100.);
     h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
+
+    h_dose1[i]->Sumw2();
+    h_dose2[i]->Sumw2();
+    h_dose1Weight[i]->Sumw2();
+    h_dose2Weight[i]->Sumw2();
+    h_idose[i]->Sumw2();
+    h_idoseWeight[i]->Sumw2();
   }
 
 }

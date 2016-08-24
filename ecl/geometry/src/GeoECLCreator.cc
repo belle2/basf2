@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <ecl/geometry/GeoECLCreator.h>
-#include <ecl/simulation/SensitiveDetector.h>
-#include <simulation/background/BkgSensitiveDetector.h>
-#include "G4NistManager.hh"
 #include "G4Transform3D.hh"
 #include "G4PVPlacement.hh"
-#include <ecl/geometry/shapes.h>
-#include <geometry/CreatorFactory.h>
-
 #include "G4SDManager.hh"
+#include "G4NistManager.hh"
+
+#include <ecl/geometry/GeoECLCreator.h>
+#include <ecl/geometry/shapes.h>
+#include <ecl/simulation/SensitiveDetector.h>
+#include <simulation/background/BkgSensitiveDetector.h>
+#include <geometry/CreatorFactory.h>
 #include <framework/gearbox/GearDir.h>
 
 namespace Belle2 {
@@ -30,7 +30,7 @@ namespace Belle2 {
 //                 Register the GeoCreator
 //-----------------------------------------------------------------
 
-    geometry::CreatorFactory<GeoECLCreator> GeoECLFactory("ECLCreator");
+    CreatorFactory<GeoECLCreator> GeoECLFactory("ECLCreator");
 
 //-----------------------------------------------------------------
 //                 Implementation
@@ -41,7 +41,6 @@ namespace Belle2 {
     {
       m_sensitive = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
-      m_bkgsensitive.clear();
     }
 
 
@@ -49,7 +48,7 @@ namespace Belle2 {
     {
       //      delete m_sensitive;
       for (BkgSensitiveDetector* sensitive : m_bkgsensitive) delete sensitive;
-      m_bkgsensitive.clear();
+      for (auto a : m_atts) delete a.second;
     }
 
 
@@ -57,40 +56,29 @@ namespace Belle2 {
     {
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
-      // Get nist material manager
-      G4NistManager* nist = G4NistManager::Instance();
+      cout << "SUS304 radiation length = " << Materials::get("SUS304")->GetRadlen() << " mm" << endl;
+      cout << "A5083 radiation length = " << Materials::get("A5083")->GetRadlen() << " mm" << endl;
+      cout << "A5052 radiation length = " << Materials::get("A5052")->GetRadlen() << " mm" << endl;
+      cout << "A6063 radiation length = " << Materials::get("A6063")->GetRadlen() << " mm" << endl;
+      cout << "Pure copper radiation length = " << Materials::get("C1220")->GetRadlen() << " mm" << endl;
+      cout << "WRAP250 radiation length = " << Materials::get("WRAP250")->GetRadlen() << " mm" << endl;
+      cout << "WRAP200 radiation length = " << Materials::get("WRAP200")->GetRadlen() << " mm" << endl;
+      cout << "WRAP170 radiation length = " << Materials::get("WRAP170")->GetRadlen() << " mm" << endl;
 
-      G4Material* sus304 = new G4Material("SUS304", 8.00 * CLHEP::g / CLHEP::cm3, 3);
-      sus304->AddElement(nist->FindOrBuildElement("Fe"), 0.74);
-      sus304->AddElement(nist->FindOrBuildElement("Cr"), 0.18);
-      sus304->AddElement(nist->FindOrBuildElement("Ni"), 0.08);
-      cout << "SUS304 radiation length = " << sus304->GetRadlen() << " mm" << endl;
+      m_atts["wrap"]  = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
+      m_atts["cryst"] = new G4VisAttributes(G4Colour(0.7, 0.7, 1.0));
 
-      G4Material* a5083 = new G4Material("A5083", 2.65 * CLHEP::g / CLHEP::cm3, 2);
-      a5083->AddElement(nist->FindOrBuildElement("Al"), 0.955);
-      a5083->AddElement(nist->FindOrBuildElement("Mg"), 0.045);
-      cout << "A5083 radiation length = " << a5083->GetRadlen() << " mm" << endl;
-
-      G4Material* a5052 = new G4Material("A5052", 2.68 * CLHEP::g / CLHEP::cm3, 2);
-      a5052->AddElement(nist->FindOrBuildElement("Al"), 0.975);
-      a5052->AddElement(nist->FindOrBuildElement("Mg"), 0.025);
-      cout << "A5052 radiation length = " << a5052->GetRadlen() << " mm" << endl;
-
-      G4Material* a6063 = new G4Material("A6063", 2.68 * CLHEP::g / CLHEP::cm3, 3);
-      a6063->AddElement(nist->FindOrBuildElement("Al"), 0.98925);
-      a6063->AddElement(nist->FindOrBuildElement("Mg"), 0.00675);
-      a6063->AddElement(nist->FindOrBuildElement("Si"), 0.004);
-      cout << "A6063 radiation length = " << a6063->GetRadlen() << " mm" << endl;
-
-      G4Material* c1220 = new G4Material("C1220", 2.68 * CLHEP::g / CLHEP::cm3, 1); // c1200 contains >99.9% of copper
-      c1220->AddElement(nist->FindOrBuildElement("Cu"), 1);
-      cout << "Pure copper radiation length = " << c1220->GetRadlen() << " mm" << endl;
-
-      double wrapm = 2.699 * 0.0025 + 1.4 * 0.0025 + 2.2 * 0.02;
-      G4Material* medWrap = new G4Material("WRAP", wrapm / 0.025 * CLHEP::g / CLHEP::cm3, 3);
-      medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_Al"), 2.699 * 0.0025 / wrapm);
-      medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_MYLAR"), 1.4 * 0.0025 / wrapm);
-      medWrap->AddMaterial(nist->FindOrBuildMaterial("G4_TEFLON"), 2.2 * 0.02 / wrapm);
+      m_atts["iron"]  = new G4VisAttributes(G4Colour(1., 0.1, 0.1));
+      m_atts["iron2"] = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
+      m_atts["alum"]  = new G4VisAttributes(G4Colour(0.25, 0.25, 1.0, 0.5));
+      m_atts["alum2"] = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
+      m_atts["silv"]  = new G4VisAttributes(G4Colour(0.9, 0., 0.9));
+      m_atts["air"]   = new G4VisAttributes(G4Colour(1., 1., 1.)); m_atts["air"]->SetVisibility(false);
+      m_atts["preamp"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
+      m_atts["plate"] = new G4VisAttributes(G4Colour(0.2, 0.8, 0.2));
+      m_atts["connector"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1));
+      m_atts["capacitor"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
+      m_atts["holder"] = new G4VisAttributes(G4Colour(0.4, 0.8, 0.8));
 
       forward(content, topVolume);
       barrel(content, topVolume);
@@ -99,28 +87,40 @@ namespace Belle2 {
 
     G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const string& endcap, double wrapthickness)
     {
-      // Get nist material manager
-      G4NistManager* nist = G4NistManager::Instance();
-
       string prefix("sv_"); prefix += endcap; prefix += "_wrap";
       G4Translate3D tw;
       G4VSolid* wrapped_crystal = s->get_solid(prefix, wrapthickness, tw);
-      //  cout<<wrapped_crystal<<endl;
       string name("lv_"); name += endcap + "_wrap_" + to_string(s->nshape);
-      G4LogicalVolume* wrapped_logical = new G4LogicalVolume(wrapped_crystal, nist->FindOrBuildMaterial("WRAP"), name.c_str(), 0, 0, 0);
-      //  wrapLogical->SetVisAttributes(cvol);
+      G4Material* wrap = NULL;
+      if (wrapthickness < 0.170)
+        wrap = Materials::get("WRAP170");
+      else if (wrapthickness < 0.200)
+        wrap = Materials::get("WRAP200");
+      else
+        wrap = Materials::get("WRAP250");
+      G4LogicalVolume* wrapped_logical = new G4LogicalVolume(wrapped_crystal, wrap, name.c_str(), 0, 0, 0);
+      wrapped_logical->SetVisAttributes(att("wrap"));
 
       prefix = "sv_"; prefix += endcap; prefix += "_crystal";
       G4Translate3D tc;
       G4VSolid* crystal_solid = s->get_solid(prefix, 0, tc);
       name = "lv_" + endcap + "_crystal_" + to_string(s->nshape);
-      G4LogicalVolume* crystal_logical = new G4LogicalVolume(crystal_solid, nist->FindOrBuildMaterial("G4_CESIUM_IODIDE"), name.c_str(),
+      G4LogicalVolume* crystal_logical = new G4LogicalVolume(crystal_solid, Materials::get("G4_CESIUM_IODIDE"), name.c_str(),
                                                              0, 0, 0);
-      //  crystalLogical->SetVisAttributes(cvol);
+      crystal_logical->SetVisAttributes(att("cryst"));
       crystal_logical->SetSensitiveDetector(m_sensitive);
 
       new G4PVPlacement(NULL, G4ThreeVector(), crystal_logical, name.c_str(), wrapped_logical, false, 0, 0);
       return wrapped_logical;
+    }
+
+    const G4VisAttributes* GeoECLCreator::att(const string& n)
+    {
+      auto p = m_atts.find(n);
+      if (p != m_atts.end()) return p->second;
+      cout << "no such visattribute:" << n << endl;
+      exit(0);
+      return NULL;
     }
 
   }//ecl

@@ -63,12 +63,13 @@ namespace Belle2 {
     private:
 
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
+      const G4VisAttributes* att(const std::string& n);
 
       /** Sensitive detector */
       SensitiveDetector* m_sensitive;
       /** Vector of background-Sensitive detectors */
       std::vector<BkgSensitiveDetector*> m_bkgsensitive;
-
+      std::map<std::string, G4VisAttributes*> m_atts;
     };
 
   } // end of ecl namespace

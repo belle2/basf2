@@ -26,19 +26,11 @@
 #include "ecl/geometry/shapes.h"
 
 using namespace std;
+using namespace Belle2::geometry;
 
 void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume& _top)
 {
   G4LogicalVolume* top = &_top;
-  // Get nist material manager
-  G4NistManager* nist = G4NistManager::Instance();
-
-  G4VisAttributes* att_iron = new G4VisAttributes(G4Colour(1., 0.1, 0.1));
-  G4VisAttributes* att_iron2 = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
-  G4VisAttributes* att_alum = new G4VisAttributes(G4Colour(0.25, 0.25, 1.0, 0.5));
-  G4VisAttributes* att_alum2 = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
-  G4VisAttributes* att_silv = new G4VisAttributes(G4Colour(0.9, 0., 0.9));
-  G4VisAttributes* att_air = new G4VisAttributes(G4Colour(0., 1., 1.)); att_air->SetVisibility(false);
 
   bool sec = 0;
   double phi0 = 0, dphi = (sec) ? M_PI / 16 : 2 * M_PI;
@@ -64,8 +56,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     zr_t vc1[] = {{ZI - 487, 410}, {ZT - (RIp - 410 - 20 / cosd(th0)) / tand(th0), 410}, {ZT, RIp - 20 / cosd(th0)}, {ZT, RIp}, {3., RI}, {3., 418}, {ZI - 487, 418}};
     std::vector<zr_t> contour1(vc1, vc1 + sizeof(vc1) / sizeof(zr_t));
     G4VSolid* part1solid = new BelleLathe("part1solid", phi0, dphi, contour1);
-    G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, nist->FindOrBuildMaterial("SUS304"), "part1logical", 0, 0, 0);
-    part1logical->SetVisAttributes(att_iron);
+    G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);
+    part1logical->SetVisAttributes(att("iron"));
     new G4PVPlacement(G4Translate3D(0, 0, 1960), part1logical, "part1physical", top, false, 0, overlap);
   }
 
@@ -78,8 +70,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     };
     std::vector<zr_t> contour23(vc23, vc23 + sizeof(vc23) / sizeof(zr_t));
     G4VSolid* part23solid = new BelleLathe("part23solid", phi0, dphi, contour23);
-    G4LogicalVolume* part23logical = new G4LogicalVolume(part23solid, nist->FindOrBuildMaterial("A5052"), "part23logical", 0, 0, 0);
-    part23logical->SetVisAttributes(att_alum);
+    G4LogicalVolume* part23logical = new G4LogicalVolume(part23solid, Materials::get("A5052"), "part23logical", 0, 0, 0);
+    part23logical->SetVisAttributes(att("alum"));
     new G4PVPlacement(G4Translate3D(0, 0, 1960), part23logical, "part23physical", top, false, 0, overlap);
   }
 
@@ -87,23 +79,23 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     zr_t vc4[] = {{3 + (RT - 20 - RC) / tand(th1), RT - 20}, {ZT, RT - 20}, {ZT, RT}, {3 + (RT - RC) / tand(th1), RT}};
     std::vector<zr_t> contour4(vc4, vc4 + sizeof(vc4) / sizeof(zr_t));
     G4VSolid* part4solid = new BelleLathe("part4solid", phi0, dphi, contour4);
-    G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, nist->FindOrBuildMaterial("SUS304"), "part4logical", 0, 0, 0);
-    part4logical->SetVisAttributes(att_iron);
+    G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, Materials::get("SUS304"), "part4logical", 0, 0, 0);
+    part4logical->SetVisAttributes(att("iron"));
     new G4PVPlacement(G4Translate3D(0, 0, 1960), part4logical, "part4physical", top, false, 0, overlap);
   }
 
   zr_t vin[] = {{3., RI}, {ZT, RIp}, {ZT, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
   std::vector<zr_t> cin(vin, vin + sizeof(vin) / sizeof(zr_t));
   G4VSolid* innervolume_solid = new BelleLathe("innervolume_solid", 0, 2 * M_PI, cin);
-  G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, nist->FindOrBuildMaterial("G4_AIR"),
+  G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
-  innervolume_logical->SetVisAttributes(att_air);
+  innervolume_logical->SetVisAttributes(att("air"));
   new G4PVPlacement(G4Translate3D(0, 0, 1960), innervolume_logical, "ECLForwardPhysical", top, false, 0, overlap);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, cin);
-  G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, nist->FindOrBuildMaterial("G4_AIR"),
+  G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, Materials::get("G4_AIR"),
       "innervolumesector_logical", 0, 0, 0);
-  innervolumesector_logical->SetVisAttributes(att_air);
+  innervolumesector_logical->SetVisAttributes(att("air"));
   new G4PVReplica("ECLForwardSectorPhysical", innervolumesector_logical, innervolume_logical, kPhi, 8, M_PI / 4, 0);
 
   if (b_ribs) {
@@ -121,9 +113,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VSolid* solid6_p1 = new G4Trap("solid6_p1", H / 2, theta, 0, W / 2, dxymzm / 2, dxypzm / 2, alpha, W / 2, dxymzp / 2, dxypzp / 2,
                                      alpha);
-    G4LogicalVolume* lsolid6_p1 = new G4LogicalVolume(solid6_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid6", 0, 0, 0);
-    G4VisAttributes* asolid6 = new G4VisAttributes(G4Colour(1., 0.3, 0.2));
-    lsolid6_p1->SetVisAttributes(asolid6);
+    G4LogicalVolume* lsolid6_p1 = new G4LogicalVolume(solid6_p1, Materials::get("SUS304"), "lsolid6", 0, 0, 0);
+    lsolid6_p1->SetVisAttributes(att("iron"));
     G4Transform3D tsolid6_p1(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, W / 2, ZT - H / 2));
     new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*tsolid6_p1, lsolid6_p1, "psolid6_p1", innervolumesector_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p1, lsolid6_p1, "psolid6_p2", innervolumesector_logical, false, 0, overlap);
@@ -132,17 +123,16 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     dxymzm = dxymzp + tand(th0) * H, dxypzm = dxypzp + tand(th0) * H;
     G4VSolid* solid6_p2 = new G4Trap("solid6_p2", H / 2, theta, 0, W / 2, dxypzm / 2, dxymzm / 2, -alpha, W / 2, dxypzp / 2, dxymzp / 2,
                                      -alpha);
-    G4LogicalVolume* lsolid6_p2 = new G4LogicalVolume(solid6_p2, nist->FindOrBuildMaterial("SUS304"), "lsolid6", 0, 0, 0);
-    lsolid6_p2->SetVisAttributes(asolid6);
+    G4LogicalVolume* lsolid6_p2 = new G4LogicalVolume(solid6_p2, Materials::get("SUS304"), "lsolid6", 0, 0, 0);
+    lsolid6_p2->SetVisAttributes(att("iron"));
     G4Transform3D tsolid6_p2(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, -W / 2, ZT - H / 2));
     new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p2, lsolid6_p2, "psolid6_p3", innervolumesector_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid6_p2, lsolid6_p2, "psolid6_p4", innervolumesector_logical, false, 0, overlap);
 
     double hpad = 148.4;
     G4VSolid* solid7_p8 = new G4Box("solid7_p8", hpad / 2, (140. - 40) / 2 / 2, 40. / 2);
-    G4LogicalVolume* lsolid7 = new G4LogicalVolume(solid7_p8, nist->FindOrBuildMaterial("SUS304"), "lsolid7", 0, 0, 0);
-    G4VisAttributes* asolid7 = new G4VisAttributes(G4Colour(1., 0.3, 0.2));
-    lsolid7->SetVisAttributes(asolid7);
+    G4LogicalVolume* lsolid7 = new G4LogicalVolume(solid7_p8, Materials::get("SUS304"), "lsolid7", 0, 0, 0);
+    lsolid7->SetVisAttributes(att("iron"));
     double dx = sqrt(X1 * X1 - 70 * 70) - hpad / 2;
     G4Transform3D tsolid7_p1(G4Translate3D(dx, -20 - 25, ZT - 40. / 2));
     new G4PVPlacement(tsolid7_p1, lsolid7, "psolid7_p1", innervolumesector_logical, false, 0, overlap);
@@ -151,9 +141,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     double L = X1 - (X0 - tand(th0) * 40) - 10;
     G4VSolid* solid13 = new G4Box("solid13", L / 2, 5. / 2, 18. / 2);
-    G4LogicalVolume* lsolid13 = new G4LogicalVolume(solid13, nist->FindOrBuildMaterial("SUS304"), "lsolid13", 0, 0, 0);
-    G4VisAttributes* asolid13 = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
-    lsolid13->SetVisAttributes(asolid13);
+    G4LogicalVolume* lsolid13 = new G4LogicalVolume(solid13, Materials::get("SUS304"), "lsolid13", 0, 0, 0);
+    lsolid13->SetVisAttributes(att("iron"));
     G4Transform3D tsolid13(G4TranslateZ3D(ZT - 60 + 18. / 2)*G4TranslateY3D(-5. / 2 - 0.5 / 2)*G4TranslateX3D(X0 - tand(
                              th0) * 40 + L / 2 + 5));
     new G4PVPlacement(tsolid13, lsolid13, "psolid13_p1", innervolumesector_logical, false, 0, overlap);
@@ -173,9 +162,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VSolid* septumwall_solid = new BelleCrystal("septumwall_solid", n, cin);
 
-    G4LogicalVolume* septumwall_logical = new G4LogicalVolume(septumwall_solid, nist->FindOrBuildMaterial("A5052"),
+    G4LogicalVolume* septumwall_logical = new G4LogicalVolume(septumwall_solid, Materials::get("A5052"),
                                                               "septumwall_logical", 0, 0, 0);
-    septumwall_logical->SetVisAttributes(att_alum2);
+    septumwall_logical->SetVisAttributes(att("alum2"));
     new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0), septumwall_logical,
                       "septumwall_physical", innervolumesector_logical, false, 0, overlap);
 
@@ -184,9 +173,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VSolid* septumwall2_solid = new BelleCrystal("septumwall2_solid", n, cin);
 
-    G4LogicalVolume* septumwall2_logical = new G4LogicalVolume(septumwall2_solid, nist->FindOrBuildMaterial("A5052"),
+    G4LogicalVolume* septumwall2_logical = new G4LogicalVolume(septumwall2_solid, Materials::get("A5052"),
                                                                "septumwall2_logical", 0, 0, 0);
-    septumwall2_logical->SetVisAttributes(att_alum2);
+    septumwall2_logical->SetVisAttributes(att("alum2"));
     new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2),
                       septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, -0.5 / 2 / 2),
@@ -196,9 +185,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
   zr_t vcr[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20}, {3 + (RT - 20 - RC) / tand(th1), RT - 20}, {3, RC}};
   std::vector<zr_t> ccr(vcr, vcr + sizeof(vcr) / sizeof(zr_t));
   G4VSolid* crystalvolume_solid = new BelleLathe("crystalvolume_solid", 0, M_PI / 8, ccr);
-  G4LogicalVolume* crystalvolume_logical = new G4LogicalVolume(crystalvolume_solid, nist->FindOrBuildMaterial("G4_AIR"),
+  G4LogicalVolume* crystalvolume_logical = new G4LogicalVolume(crystalvolume_solid, Materials::get("G4_AIR"),
       "crystalvolume_logical", 0, 0, 0);
-  crystalvolume_logical->SetVisAttributes(att_air);
+  crystalvolume_logical->SetVisAttributes(att("air"));
   new G4PVPlacement(G4RotateZ3D(-M_PI / 8), crystalvolume_logical, "ECLForwardCrystalSectorPhysical_0", innervolumesector_logical,
                     false, 0, overlap);
   new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "ECLForwardCrystalSectorPhysical_1", innervolumesector_logical, false, 1,
@@ -216,9 +205,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VSolid* septumwall3_solid = new BelleCrystal("septumwall3_solid", n, cin);
 
-    G4LogicalVolume* septumwall3_logical = new G4LogicalVolume(septumwall3_solid, nist->FindOrBuildMaterial("A5052"),
+    G4LogicalVolume* septumwall3_logical = new G4LogicalVolume(septumwall3_solid, Materials::get("A5052"),
                                                                "septumwall3_logical", 0, 0, 0);
-    septumwall3_logical->SetVisAttributes(att_alum2);
+    septumwall3_logical->SetVisAttributes(att("alum2"));
     new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2), septumwall3_logical,
                       "septumwall3_physical_0", crystalvolume_logical, false, 0, overlap);
     new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, -0.5 / 2 / 2),
@@ -249,16 +238,15 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
   double pa_box_height = 2;
   if (b_preamplifier) {
     G4VSolid* sv_preamplifier = new G4Box("sv_preamplifier", 58. / 2, 51. / 2, pa_box_height / 2);
-    G4LogicalVolume* lv_preamplifier = new G4LogicalVolume(sv_preamplifier, nist->FindOrBuildMaterial("A5052"), "lv_preamplifier", 0, 0,
+    G4LogicalVolume* lv_preamplifier = new G4LogicalVolume(sv_preamplifier, Materials::get("A5052"), "lv_preamplifier", 0, 0,
                                                            0);
     G4VSolid* sv_diode = new G4Box("sv_diode", 10. / 2, 20. / 2, 0.3 / 2);
-    G4LogicalVolume* lv_diode = new G4LogicalVolume(sv_diode, nist->FindOrBuildMaterial("G4_Si"), "lv_diode", 0, 0, 0);
+    G4LogicalVolume* lv_diode = new G4LogicalVolume(sv_diode, Materials::get("G4_Si"), "lv_diode", 0, 0, 0);
     lv_diode->SetUserLimits(new G4UserLimits(0.01));
     new G4PVPlacement(G4Translate3D(-5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode1", lv_preamplifier, false, 1, overlap);
     new G4PVPlacement(G4Translate3D(5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode2", lv_preamplifier, false, 2, overlap);
 
-    G4VisAttributes* att_preampfifier = new G4VisAttributes(G4Colour(0.4, 0.4, 0.8));
-    lv_preamplifier->SetVisAttributes(att_preampfifier);
+    lv_preamplifier->SetVisAttributes(att("preamp"));
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
@@ -269,15 +257,15 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
   }
 
   if (b_support_leg) {
-    G4VisAttributes* batt = att_iron;
+    const G4VisAttributes* batt = att("iron");
 
     G4VSolid* s1 = new G4Box("leg_p1", 130. / 2, 170. / 2, 40. / 2);
-    G4LogicalVolume* l1 = new G4LogicalVolume(s1, nist->FindOrBuildMaterial("SUS304"), "l1", 0, 0, 0);
+    G4LogicalVolume* l1 = new G4LogicalVolume(s1, Materials::get("SUS304"), "l1", 0, 0, 0);
     G4Transform3D t1 = G4Translate3D(0, 170. / 2, 40. / 2);
     l1->SetVisAttributes(batt);
 
     G4VSolid* s2 = new G4Box("leg_p2", 60. / 2, 130. / 2, 137. / 2);
-    G4LogicalVolume* l2 = new G4LogicalVolume(s2, nist->FindOrBuildMaterial("SUS304"), "l2", 0, 0, 0);
+    G4LogicalVolume* l2 = new G4LogicalVolume(s2, Materials::get("SUS304"), "l2", 0, 0, 0);
     G4Transform3D t2 = G4Translate3D(0, 130. / 2 + 35, 40. + 137. / 2);
     l2->SetVisAttributes(batt);
 
@@ -289,38 +277,38 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     for (int i = 0; i < n3; i++) c3[i + n3] = G4ThreeVector(v3[i].x, v3[i].y, 140. / 2);
 
     G4VSolid* s3 = new BelleCrystal("leg_p3", n3, c3);
-    G4LogicalVolume* l3 = new G4LogicalVolume(s3, nist->FindOrBuildMaterial("SUS304"), "l3", 0, 0, 0);
+    G4LogicalVolume* l3 = new G4LogicalVolume(s3, Materials::get("SUS304"), "l3", 0, 0, 0);
     G4Transform3D t3 = G4Translate3D(0, 265. / 2 + 35, 40. + 137. + 75. / 2) * G4RotateY3D(-M_PI / 2);
     l3->SetVisAttributes(batt);
 
     G4VSolid* s4 = new G4Box("leg_p4", 130. / 2, 5. / 2, 5. / 2);
-    G4LogicalVolume* l4 = new G4LogicalVolume(s4, nist->FindOrBuildMaterial("SUS304"), "l4", 0, 0, 0);
+    G4LogicalVolume* l4 = new G4LogicalVolume(s4, Materials::get("SUS304"), "l4", 0, 0, 0);
     G4Transform3D t4 = G4Translate3D(0, 170. - 5. / 2, -5. / 2);
     l4->SetVisAttributes(batt);
 
     G4VSolid* s5 = new G4Box("leg_p5", 140. / 2, 130. / 2, 80. / 2);
-    G4LogicalVolume* l5 = new G4LogicalVolume(s5, nist->FindOrBuildMaterial("SUS304"), "l5", 0, 0, 0);
+    G4LogicalVolume* l5 = new G4LogicalVolume(s5, Materials::get("SUS304"), "l5", 0, 0, 0);
     G4Transform3D t5 = G4Translate3D(0, 180. + 130. / 2, 97. + 80. / 2);
     l5->SetVisAttributes(batt);
 
     G4VSolid* s6 = new G4Box("leg_p6", 140. / 2, 110. / 2, 160. / 2);
-    G4LogicalVolume* l6 = new G4LogicalVolume(s6, nist->FindOrBuildMaterial("G4_AIR"), "l6", 0, 0, 0);
+    G4LogicalVolume* l6 = new G4LogicalVolume(s6, Materials::get("G4_AIR"), "l6", 0, 0, 0);
     G4Transform3D t6 = G4Translate3D(0, 310. + 110. / 2, 97. + 160. / 2);
-    l6->SetVisAttributes(att_air);
+    l6->SetVisAttributes(att("air"));
 
     G4VSolid* s6a = new G4Box("leg_p6a", 140. / 2, (110. - 45.) / 2, 160. / 2);
-    G4LogicalVolume* l6a = new G4LogicalVolume(s6a, nist->FindOrBuildMaterial("SUS304"), "l6a", 0, 0, 0);
+    G4LogicalVolume* l6a = new G4LogicalVolume(s6a, Materials::get("SUS304"), "l6a", 0, 0, 0);
     l6a->SetVisAttributes(batt);
     new G4PVPlacement(G4TranslateY3D(-45. / 2), l6a, "l6a_physical", l6, false, 0, overlap);
 
     G4VSolid* s6b = new G4Box("leg_p6b", 60. / 2, 45. / 2, 160. / 2);
-    G4LogicalVolume* l6b = new G4LogicalVolume(s6b, nist->FindOrBuildMaterial("SUS304"), "l6b", 0, 0, 0);
+    G4LogicalVolume* l6b = new G4LogicalVolume(s6b, Materials::get("SUS304"), "l6b", 0, 0, 0);
     l6b->SetVisAttributes(batt);
     double dy = 110. / 2 - 45 + 45. / 2;
     new G4PVPlacement(G4TranslateY3D(dy), l6b, "l6b_physical", l6, false, 0, overlap);
 
     G4VSolid* s6c = new G4Box("leg_p6c", 40. / 2, 45. / 2, 22.5 / 2);
-    G4LogicalVolume* l6c = new G4LogicalVolume(s6c, nist->FindOrBuildMaterial("SUS304"), "l6c", 0, 0, 0);
+    G4LogicalVolume* l6c = new G4LogicalVolume(s6c, Materials::get("SUS304"), "l6c", 0, 0, 0);
     l6c->SetVisAttributes(batt);
     new G4PVPlacement(G4Translate3D(30 + 20, dy, 20 + 22.5 / 2), l6c, "l6c_physical", l6, false, 0, overlap);
     new G4PVPlacement(G4Translate3D(30 + 20, dy, -20 - 22.5 / 2), l6c, "l6c_physical", l6, false, 1, overlap);
@@ -343,8 +331,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     }
 
     // G4VSolid* s_all = new G4Box("leg_all", 140. / 2, 420. / 2, (97. + 160) / 2);
-    // G4LogicalVolume* l_all = new G4LogicalVolume(s_all, nist->FindOrBuildMaterial("G4_AIR"), "l_all", 0, 0, 0);
-    // l_all->SetVisAttributes(att_silv);
+    // G4LogicalVolume* l_all = new G4LogicalVolume(s_all, Materials::get("G4_AIR"), "l_all", 0, 0, 0);
+    // l_all->SetVisAttributes(att("silv"));
     // G4Transform3D tp = G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
     // support_leg->MakeImprint(l_all, tp, 0, overlap);
 
@@ -381,9 +369,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid10_p2 = new G4Box("solid10_p2", 559. / 2 + 9.5, 11. / 2, 71. / 2);
     G4VSolid* solid10_p3 = new G4SubtractionSolid("solid10_p3", solid10_p1, solid10_p2, G4Translate3D(0, -11. / 2, 71. / 2 - 17.5));
 
-    G4LogicalVolume* lsolid10 = new G4LogicalVolume(solid10_p3, nist->FindOrBuildMaterial("A6063"), "lsolid10", 0, 0, 0);
-    G4VisAttributes* asolid10 = new G4VisAttributes(G4Colour(0.3, 0.3, 1.));
-    lsolid10->SetVisAttributes(asolid10);
+    G4LogicalVolume* lsolid10 = new G4LogicalVolume(solid10_p3, Materials::get("A6063"), "lsolid10", 0, 0, 0);
+    lsolid10->SetVisAttributes(att("alum"));
     G4Transform3D tsolid10_p1(G4RotateZ3D(M_PI / 16)*G4Translate3D(954.5 + 2.55 - 1, -30, Z0 - 105. / 2 - 5));
     acs->AddPlacedVolume(lsolid10, tsolid10_p1);
     //      new G4PVPlacement(tsolid10_p1, lsolid10, "psolid10_p1", crystalSectorLogical, false, 0, overlaps);
@@ -395,9 +382,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid1_p2 = new G4Box("solid1_p2", 80. / 2, 10. / 2, 31. / 2);
     G4VSolid* solid1_p3 = new G4SubtractionSolid("solid1_p3", solid1_p1, solid1_p2, G4Transform3D::Identity);
 
-    G4LogicalVolume* lsolid1 = new G4LogicalVolume(solid1_p3, nist->FindOrBuildMaterial("A5052"), "lsolid1", 0, 0, 0);
-    G4VisAttributes* asolid1 = new G4VisAttributes(G4Colour(0.3, 0.3, 1.));
-    lsolid1->SetVisAttributes(asolid1);
+    G4LogicalVolume* lsolid1 = new G4LogicalVolume(solid1_p3, Materials::get("A5052"), "lsolid1", 0, 0, 0);
+    lsolid1->SetVisAttributes(att("alum"));
 
     G4Transform3D tsolid1_p1(G4RotateZ3D(M_PI / 16 * (-1 + 2 / 3.))*G4Translate3D(Ro - 8 - 50 - 3 * 140, 0, Z0 - 95));
     acs->AddPlacedVolume(lsolid1, tsolid1_p1);
@@ -431,15 +417,15 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     //      new G4PVPlacement(tsolid1_p10, lsolid1, "psolid1_p10", crystalSectorLogical, false, 0, overlaps);
 
     G4VSolid* solid1_p11 = new G4Box("solid1_p1", 100. / 2, 10. / 2, 30. / 2);
-    G4LogicalVolume* lsolid1_p2 = new G4LogicalVolume(solid1_p11, nist->FindOrBuildMaterial("A5052"), "lsolid1_p2", 0, 0, 0);
-    lsolid1_p2->SetVisAttributes(asolid1);
+    G4LogicalVolume* lsolid1_p2 = new G4LogicalVolume(solid1_p11, Materials::get("A5052"), "lsolid1_p2", 0, 0, 0);
+    lsolid1_p2->SetVisAttributes(att("alum"));
     G4Transform3D tsolid1_p11(G4RotateZ3D(M_PI / 16 * (-1 + 2 / 3. - 1. / 3))*G4Translate3D(Ro - 8 - 50, 0, Z0 - 100));
     acs->AddPlacedVolume(lsolid1_p2, tsolid1_p11);
     //      new G4PVPlacement(tsolid1_p11, lsolid1_p2, "psolid1_p11", crystalSectorLogical, false, 0, overlaps);
 
     G4VSolid* solid1_p12 = new G4Box("solid1_p1", 86. / 2, 10. / 2, 30. / 2);
-    G4LogicalVolume* lsolid1_p3 = new G4LogicalVolume(solid1_p12, nist->FindOrBuildMaterial("A5052"), "lsolid1_p3", 0, 0, 0);
-    lsolid1_p3->SetVisAttributes(asolid1);
+    G4LogicalVolume* lsolid1_p3 = new G4LogicalVolume(solid1_p12, Materials::get("A5052"), "lsolid1_p3", 0, 0, 0);
+    lsolid1_p3->SetVisAttributes(att("alum"));
     double alpha_p12 = M_PI / 16 * (-1 + 1. / 3);
     G4Transform3D tsolid1_p12(G4Translate3D(532.2 + 43, 0, Z0 - 75));
     acs->AddPlacedVolume(lsolid1_p3, tsolid1_p12);
@@ -454,8 +440,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid1_p4 = new G4Box("solid1_p4", 160. / 2, 30. / 2, 30. / 2);
     G4VSolid* solid1_p5 = new G4Box("solid1_p5", 140. / 2, 10. / 2, 31. / 2);
     G4VSolid* solid1_p7 = new G4SubtractionSolid("solid1_p7", solid1_p4, solid1_p5, G4Transform3D::Identity);
-    G4LogicalVolume* lsolid1_p7 = new G4LogicalVolume(solid1_p7, nist->FindOrBuildMaterial("A5052"), "lsolid1_p7", 0, 0, 0);
-    lsolid1_p7->SetVisAttributes(asolid1);
+    G4LogicalVolume* lsolid1_p7 = new G4LogicalVolume(solid1_p7, Materials::get("A5052"), "lsolid1_p7", 0, 0, 0);
+    lsolid1_p7->SetVisAttributes(att("alum"));
     G4Transform3D tsolid1_p7(G4Translate3D(Ro - 8 - 80 - 4 * 140 + 4, 0, Z0 - 95));
     acs->AddPlacedVolume(lsolid1_p7, tsolid1_p7);
     //      new G4PVPlacement(tsolid1_p7, lsolid1_p7, "psolid1_p7", crystalSectorLogical, false, 0, overlaps);
@@ -481,9 +467,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     };
     auto place_solid2 = [&](double L, double ang, double phi, double mx, double dy) {
       G4Transform3D lt;
-      G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), nist->FindOrBuildMaterial("A5052"), "lsolid2", 0, 0, 0);
-      G4VisAttributes* asolid2 = new G4VisAttributes(G4Colour(0.3, 0.4, 1.));
-      lsolid2->SetVisAttributes(asolid2);
+      G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), Materials::get("A5052"), "lsolid2", 0, 0, 0);
+      lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(G4RotateZ3D(phi)*G4Translate3D(mx, dy, obj2_dz)*lt);
       string pname("psolid2_p"); pname += to_string(++sol2count);
@@ -492,9 +477,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     };
     auto place_solid3 = [&](double L, double ang, const G4Transform3D & t) {
       G4Transform3D lt;
-      G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), nist->FindOrBuildMaterial("A5052"), "lsolid2", 0, 0, 0);
-      G4VisAttributes* asolid2 = new G4VisAttributes(G4Colour(0.3, 0.4, 1.));
-      lsolid2->SetVisAttributes(asolid2);
+      G4LogicalVolume* lsolid2 = new G4LogicalVolume(get_bracket(L, ang, lt), Materials::get("A5052"), "lsolid2", 0, 0, 0);
+      lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(t * lt);
       string pname("psolid2_p"); pname += to_string(++sol2count);
@@ -656,9 +640,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid11_p2 = new G4Box("solid11_p2", 81. / 2, 30. / 2, 40. / 2);
     G4VSolid* solid11_p3 = new G4SubtractionSolid("solid11_p3", solid11_p1, solid11_p2, G4Translate3D(0, -3, 3));
 
-    G4LogicalVolume* lsolid11 = new G4LogicalVolume(solid11_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid11", 0, 0, 0);
-    G4VisAttributes* asolid11 = new G4VisAttributes(G4Colour(1.0, 0.2, 0.2));
-    lsolid11->SetVisAttributes(asolid11);
+    G4LogicalVolume* lsolid11 = new G4LogicalVolume(solid11_p3, Materials::get("SUS304"), "lsolid11", 0, 0, 0);
+    lsolid11->SetVisAttributes(att("iron"));
     G4Transform3D tsolid11_p1(G4RotateZ3D(M_PI / 16)*G4Translate3D(580, -35, Z0 - 40));
     acs->AddPlacedVolume(lsolid11, tsolid11_p1);
 
@@ -669,9 +652,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid12_p2 = new G4Box("solid12_p2", 121. / 2, 12. / 2, 86. / 2);
     G4VSolid* solid12_p3 = new G4SubtractionSolid("solid12_p3", solid12_p1, solid12_p2, G4Translate3D(0, -11. / 2 + 1,
                                                   86. / 2 - 17.5 - 5));
-    G4LogicalVolume* lsolid12 = new G4LogicalVolume(solid12_p3, nist->FindOrBuildMaterial("A6063"), "lsolid12", 0, 0, 0);
-    G4VisAttributes* asolid12 = new G4VisAttributes(G4Colour(0.3, 0.3, 1.0));
-    lsolid12->SetVisAttributes(asolid12);
+    G4LogicalVolume* lsolid12 = new G4LogicalVolume(solid12_p3, Materials::get("A6063"), "lsolid12", 0, 0, 0);
+    lsolid12->SetVisAttributes(att("alum"));
 
     G4Transform3D tsolid12_p2(G4RotateZ3D(-M_PI / 16)*G4Translate3D(Ro - 8 - 60, 30, Z0 - 115. / 2)*G4RotateZ3D(M_PI));
     acs->AddPlacedVolume(lsolid12, tsolid12_p2);
@@ -680,9 +662,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid12r_p2 = new G4Box("solid12r_p2", 101. / 2, 21. / 2, 41. / 2);
     G4VSolid* solid12r_p3 = new G4SubtractionSolid("solid12r_p3", solid12r_p1, solid12r_p2, G4Translate3D(0, -21. / 2 + 5,
                                                    -41. / 2 - 75. / 2 + 40));
-    G4LogicalVolume* lsolid12r = new G4LogicalVolume(solid12r_p3, nist->FindOrBuildMaterial("A6063"), "lsolid12r", 0, 0, 0);
-    G4VisAttributes* asolid12r = new G4VisAttributes(G4Colour(0.3, 0.3, 1.0));
-    lsolid12r->SetVisAttributes(asolid12r);
+    G4LogicalVolume* lsolid12r = new G4LogicalVolume(solid12r_p3, Materials::get("A6063"), "lsolid12r", 0, 0, 0);
+    lsolid12r->SetVisAttributes(att("alum"));
     G4Transform3D tsolid12r_p1(G4RotateZ3D(M_PI / 16)*G4Translate3D(Ro - 8 - 50, -30 - 15, Z0 - 40 - 75. / 2));
     acs->AddPlacedVolume(lsolid12r, tsolid12r_p1);
 
@@ -702,9 +683,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid1_p3 = new G4SubtractionSolid("solid1_p3", solid1_p1, solid1_p2, G4Transform3D(G4RotationMatrix(), G4ThreeVector(-4,
                                                  0, 0)));
 
-    G4LogicalVolume* lsolid1 = new G4LogicalVolume(solid1_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid1", 0, 0, 0);
-    G4VisAttributes* asolid1 = new G4VisAttributes(G4Colour(1., 0.4, 0.3));
-    lsolid1->SetVisAttributes(asolid1);
+    G4LogicalVolume* lsolid1 = new G4LogicalVolume(solid1_p3, Materials::get("SUS304"), "lsolid1", 0, 0, 0);
+    lsolid1->SetVisAttributes(att("iron"));
     G4Transform3D tsolid1_p1(G4Translate3D(1350, -16, Z0 - 40 + 3 + 2.5));
     acs->AddPlacedVolume(lsolid1, tsolid1_p1);
 
@@ -713,9 +693,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid1a_p3 = new G4SubtractionSolid("solid1a_p3", solid1a_p1, solid1a_p2, G4Transform3D(G4RotationMatrix(),
                                                   G4ThreeVector(4, 0, 0)));
 
-    G4LogicalVolume* lsolid1a = new G4LogicalVolume(solid1a_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid1a", 0, 0, 0);
-    G4VisAttributes* asolid1a = new G4VisAttributes(G4Colour(1., 0.4, 0.3));
-    lsolid1a->SetVisAttributes(asolid1a);
+    G4LogicalVolume* lsolid1a = new G4LogicalVolume(solid1a_p3, Materials::get("SUS304"), "lsolid1a", 0, 0, 0);
+    lsolid1a->SetVisAttributes(att("iron"));
     G4Transform3D tsolid1a_p1(G4Translate3D(1250, -16, Z0 - 40 + 3 + 2.5));
     acs->AddPlacedVolume(lsolid1a, tsolid1a_p1);
 
@@ -724,9 +703,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid1b_p3 = new G4SubtractionSolid("solid1b_p3", solid1b_p1, solid1b_p2, G4Transform3D(G4RotationMatrix(),
                                                   G4ThreeVector(4, 0, 0)));
 
-    G4LogicalVolume* lsolid1b = new G4LogicalVolume(solid1b_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid1b", 0, 0, 0);
-    G4VisAttributes* asolid1b = new G4VisAttributes(G4Colour(1., 0.4, 0.3));
-    lsolid1b->SetVisAttributes(asolid1b);
+    G4LogicalVolume* lsolid1b = new G4LogicalVolume(solid1b_p3, Materials::get("SUS304"), "lsolid1b", 0, 0, 0);
+    lsolid1b->SetVisAttributes(att("iron"));
     G4Transform3D t1b(G4Translate3D(1204 - (210 + 210 + 16) / 2 + 16, 0, Z0 - 52 + 8 + 5. / 2));
     G4Transform3D tsolid1b_p1(t1b * G4TranslateY3D(-10)*G4RotateZ3D(-M_PI / 2));
     acs->AddPlacedVolume(lsolid1b, tsolid1b_p1);
@@ -742,9 +720,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid2_p3 = new G4SubtractionSolid("solid2_p3", solid2_p1, solid2_p2, G4Transform3D(G4RotationMatrix(), G4ThreeVector(-4,
                                                  0, 0)));
 
-    G4LogicalVolume* lsolid2 = new G4LogicalVolume(solid2_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid2", 0, 0, 0);
-    G4VisAttributes* asolid2 = new G4VisAttributes(G4Colour(1., 0.4, 0.3));
-    lsolid2->SetVisAttributes(asolid2);
+    G4LogicalVolume* lsolid2 = new G4LogicalVolume(solid2_p3, Materials::get("SUS304"), "lsolid2", 0, 0, 0);
+    lsolid2->SetVisAttributes(att("iron"));
     G4Transform3D tsolid2_p1(G4Translate3D(1204 - (210 + 210) - 210 / 2 + 16, 58, Z0 - 52 + 8 + 5. / 2)*G4RotateZ3D(-M_PI / 2));
     acs->AddPlacedVolume(lsolid2, tsolid2_p1);
     //      new G4PVPlacement(tsolid2_p1, lsolid2, "psolid2_p1", crystalSectorLogical, false, 0, overlap);
@@ -753,25 +730,22 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     //      new G4PVPlacement(tsolid2_p2, lsolid2, "psolid2_p2", crystalSectorLogical, false, 0, overlap);
 
     G4VSolid* solid3_p1 = new G4Box("solid3_p1", 32. / 2, 396. / 2, 8. / 2);
-    G4LogicalVolume* lsolid3 = new G4LogicalVolume(solid3_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid3", 0, 0, 0);
-    G4VisAttributes* asolid3 = new G4VisAttributes(G4Colour(1., 0.3, 0.3));
-    lsolid3->SetVisAttributes(asolid3);
+    G4LogicalVolume* lsolid3 = new G4LogicalVolume(solid3_p1, Materials::get("SUS304"), "lsolid3", 0, 0, 0);
+    lsolid3->SetVisAttributes(att("iron"));
     G4Transform3D tsolid3_p1(G4Translate3D(1204, 0, Z0 - 52 + 8. / 2));
     acs->AddPlacedVolume(lsolid3, tsolid3_p1);
     //      new G4PVPlacement(tsolid3_p1, lsolid3, "psolid3_p1", crystalSectorLogical, false, 0, overlap);
 
     G4VSolid* solid3n_p1 = new G4Box("solid3n_p1", 32. / 2, 230. / 2, 8. / 2);
-    G4LogicalVolume* lsolid3n = new G4LogicalVolume(solid3n_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid3n", 0, 0, 0);
-    G4VisAttributes* asolid3n = new G4VisAttributes(G4Colour(1., 0.3, 0.3));
-    lsolid3n->SetVisAttributes(asolid3n);
+    G4LogicalVolume* lsolid3n = new G4LogicalVolume(solid3n_p1, Materials::get("SUS304"), "lsolid3n", 0, 0, 0);
+    lsolid3n->SetVisAttributes(att("iron"));
     G4Transform3D tsolid3n_p1(G4Translate3D(1204 - 420, 0, Z0 - 52 + 8. / 2));
     acs->AddPlacedVolume(lsolid3n, tsolid3n_p1);
     //      new G4PVPlacement(tsolid3n_p1, lsolid3n, "psolid3n_p1", crystalSectorLogical, false, 0, overlap);
 
     G4VSolid* solid4_p1 = new G4Box("solid4_p1", 16. / 2, 160. / 2, 8. / 2);
-    G4LogicalVolume* lsolid4 = new G4LogicalVolume(solid4_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid4", 0, 0, 0);
-    G4VisAttributes* asolid4 = new G4VisAttributes(G4Colour(1., 0.3, 0.3));
-    lsolid4->SetVisAttributes(asolid4);
+    G4LogicalVolume* lsolid4 = new G4LogicalVolume(solid4_p1, Materials::get("SUS304"), "lsolid4", 0, 0, 0);
+    lsolid4->SetVisAttributes(att("iron"));
     G4Transform3D tsolid4_p1(G4Translate3D(598, 0, Z0 - 52 + 8. / 2));
     acs->AddPlacedVolume(lsolid4, tsolid4_p1);
     //      new G4PVPlacement(tsolid4_p1, lsolid4, "psolid4_p1", crystalSectorLogical, false, 0, overlap);
@@ -780,9 +754,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid5_p2 = new G4Box("solid5_p2", 651. / 2, 30. / 2, 40. / 2);
     G4VSolid* solid5_p3 = new G4SubtractionSolid("solid5_p3", solid5_p1, solid5_p2, G4Translate3D(0, -3, 3));
 
-    G4LogicalVolume* lsolid5 = new G4LogicalVolume(solid5_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid5", 0, 0, 0);
-    G4VisAttributes* asolid5 = new G4VisAttributes(G4Colour(1., 0.3, 0.3));
-    lsolid5->SetVisAttributes(asolid5);
+    G4LogicalVolume* lsolid5 = new G4LogicalVolume(solid5_p3, Materials::get("SUS304"), "lsolid5", 0, 0, 0);
+    lsolid5->SetVisAttributes(att("iron"));
     G4Transform3D tsolid5_p1(G4RotateZ3D(M_PI / 16)*G4Translate3D(910, -45, Z0 - 20 - 15));
     acs->AddPlacedVolume(lsolid5, tsolid5_p1);
     //      new G4PVPlacement(tsolid5_p1, lsolid5, "psolid5_p1", crystalSectorLogical, false, 0, overlap);
@@ -794,9 +767,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     G4VSolid* solid7_p2 = new G4Box("solid7_p2", 131. / 2, 30. / 2, 40. / 2);
     G4VSolid* solid7_p3 = new G4SubtractionSolid("solid7_p3", solid7_p1, solid7_p2, G4Transform3D(G4RotationMatrix(), G4ThreeVector(0,
                                                  -3, 3)));
-    G4LogicalVolume* lsolid7 = new G4LogicalVolume(solid7_p3, nist->FindOrBuildMaterial("SUS304"), "lsolid7", 0, 0, 0);
-    G4VisAttributes* asolid7 = new G4VisAttributes(G4Colour(1., 0.3, 0.3));
-    lsolid7->SetVisAttributes(asolid7);
+    G4LogicalVolume* lsolid7 = new G4LogicalVolume(solid7_p3, Materials::get("SUS304"), "lsolid7", 0, 0, 0);
+    lsolid7->SetVisAttributes(att("iron"));
     G4Transform3D tsolid7_p1(G4RotateZ3D(-M_PI / 16)*G4Translate3D(Ro - 8 - 65, 54, Z0 - 40. / 2)*G4RotateZ3D(M_PI));
     acs->AddPlacedVolume(lsolid7, tsolid7_p1);
     //      new G4PVPlacement(tsolid7_p1, lsolid7, "psolid7_p1", crystalSectorLogical, false, 0, overlap);
@@ -810,9 +782,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     // new G4PVPlacement(tsolid7_p4, lsolid7, "psolid7_p4", crystalSectorLogical, false, 0, overlap);
 
     G4VSolid* solid8_p1 = new G4Box("solid8_p1", 120. / 2, 10. / 2, 42. / 2);
-    G4LogicalVolume* lsolid8 = new G4LogicalVolume(solid8_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid8", 0, 0, 0);
-    G4VisAttributes* asolid8 = new G4VisAttributes(G4Colour(1., 0.2, 0.2));
-    lsolid8->SetVisAttributes(asolid8);
+    G4LogicalVolume* lsolid8 = new G4LogicalVolume(solid8_p1, Materials::get("SUS304"), "lsolid8", 0, 0, 0);
+    lsolid8->SetVisAttributes(att("iron"));
     G4Transform3D tsolid8_p1(G4RotateZ3D(-M_PI / 16)*G4Translate3D(Ro - 8 - 60, 34, Z0 - 42. / 2));
     acs->AddPlacedVolume(lsolid8, tsolid8_p1);
     //      new G4PVPlacement(tsolid8_p1, lsolid8, "psolid8_p1", crystalSectorLogical, false, 0, overlap);
@@ -821,9 +792,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
 
     G4VSolid* solid9_p1 = new G4Box("solid9_p1", 26. / 2, 12. / 2, 26. / 2);
-    G4LogicalVolume* lsolid9 = new G4LogicalVolume(solid9_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid9", 0, 0, 0);
-    G4VisAttributes* asolid9 = new G4VisAttributes(G4Colour(1., 0.2, 0.2));
-    lsolid9->SetVisAttributes(asolid9);
+    G4LogicalVolume* lsolid9 = new G4LogicalVolume(solid9_p1, Materials::get("SUS304"), "lsolid9", 0, 0, 0);
+    lsolid9->SetVisAttributes(att("iron"));
     G4Transform3D tsolid9_p1(G4RotateZ3D(-M_PI / 16)*G4Translate3D(Ro - 8 - 120 + 26. / 2 + 17, 20 + 9 + 10 + 9 + 3,
                              Z0 - 37 + 26. / 2));
     acs->AddPlacedVolume(lsolid9, tsolid9_p1);
@@ -831,9 +801,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
 
     G4VSolid* solid10_p1 = new G4Box("solid10_p1", 26. / 2, 12. / 2, 42. / 2);
-    G4LogicalVolume* lsolid10 = new G4LogicalVolume(solid10_p1, nist->FindOrBuildMaterial("SUS304"), "lsolid10", 0, 0, 0);
-    G4VisAttributes* asolid10 = new G4VisAttributes(G4Colour(1., 0.2, 0.2));
-    lsolid10->SetVisAttributes(asolid10);
+    G4LogicalVolume* lsolid10 = new G4LogicalVolume(solid10_p1, Materials::get("SUS304"), "lsolid10", 0, 0, 0);
+    lsolid10->SetVisAttributes(att("iron"));
     //    G4Transform3D tsolid5_p3(G4RotateZ3D(-M_PI/16)*G4Translate3D(910, 45, Z0-20-15)*G4RotateZ3D(M_PI));
     G4Transform3D tsolid10_p1(G4RotateZ3D(-M_PI / 16)*G4Translate3D(910 + 650. / 2 - 221, 20 + 10 + 6 + 6, Z0 - 52 + 42. / 2));
     acs->AddPlacedVolume(lsolid10, tsolid10_p1);
@@ -847,23 +816,23 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
       solid_connector = new G4SubtractionSolid("solid_connector", solid_connector, solid_connector2, G4Translate3D(55 + (20 + t) / 2,
                                                -140, 0));
       solid_connector = new G4SubtractionSolid("solid_connector", solid_connector, solid_connector3, G4Translate3D(-70, 0, -t - 1));
-      G4LogicalVolume* lsolid_connector = new G4LogicalVolume(solid_connector, nist->FindOrBuildMaterial("G4_AIR"), "lsolid_connector", 0,
+      G4LogicalVolume* lsolid_connector = new G4LogicalVolume(solid_connector, Materials::get("G4_AIR"), "lsolid_connector", 0,
                                                               0, 0);
-      lsolid_connector->SetVisAttributes(att_air);
+      lsolid_connector->SetVisAttributes(att("air"));
       G4Transform3D tsolid_connector(G4Translate3D(1360 - 60, 0, Z0 - h20 / 2));
       acs->AddPlacedVolume(lsolid_connector, tsolid_connector);
       //      new G4PVPlacement(tsolid_connector, lsolid_connector, "psolid20", crystalSectorLogical, false, 0, overlap);
 
-      G4VisAttributes* asolid20 = new G4VisAttributes(G4Colour(1., 0.2, 0.2));
+      const G4VisAttributes* asolid20 = att("iron");
       auto lvolume = [&](int part, double dx, double dy, double dz) {
         ostringstream ost(""); ost << "solid20_p" << part;
         G4VSolid* sv = new G4Box(ost.str().c_str(), dx / 2, dy / 2, dz / 2);
         ost.str(""); ost << "lsolid20_p" << part;
-        return new G4LogicalVolume(sv, nist->FindOrBuildMaterial("A5052"), ost.str().c_str(), 0, 0, 0);
+        return new G4LogicalVolume(sv, Materials::get("A5052"), ost.str().c_str(), 0, 0, 0);
       };
 
       auto place = [&](G4LogicalVolume * lv, const G4Translate3D & move, int n) {
-        lv->SetVisAttributes(asolid20);
+        lv->SetVisAttributes(att("alum"));
         ostringstream ost(""); ost << "phys_" << lv->GetName();
         new G4PVPlacement(move, lv, ost.str().c_str(), lsolid_connector, false, n, overlap);
       };
@@ -892,16 +861,16 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
       place(lv6, G4Translate3D(0, 250 / 2 - 7. / 2, -h20 / 2 + t / 2 + t), 0);
       place(lv6, G4Translate3D(0, -250 / 2 + 7. / 2, -h20 / 2 + t / 2 + t), 1);
 
-      asolid20 = new G4VisAttributes(G4Colour(0.2, 0.2, 0.2));
+      asolid20 = att("alum");
       G4LogicalVolume* lv7 = lvolume(7, 110, 250, t);
       place(lv7, G4Translate3D(0, 0, -h20 / 2 + t / 2), 0);
 
-      asolid20 = new G4VisAttributes(G4Colour(0.2, 0.2, 0.8));
+      asolid20 = att("alum2");
       //      G4LogicalVolume *lv8 = lvolume(8, 90, 10, 30);
       G4VSolid* p8_1 = new G4Box("solid20_p8_1", 90. / 2, 10. / 2, 30. / 2);
       G4VSolid* p8_2 = new G4Box("solid20_p8_2", 88. / 2, 8. / 2, 30. / 2);
       G4VSolid* sp8 = new G4SubtractionSolid("solid20_p8", p8_1, p8_2, G4TranslateZ3D(-1));
-      G4LogicalVolume* lv8 = new G4LogicalVolume(sp8, nist->FindOrBuildMaterial("A5052"), "lsolid20_p8", 0, 0, 0);
+      G4LogicalVolume* lv8 = new G4LogicalVolume(sp8, Materials::get("A5052"), "lsolid20_p8", 0, 0, 0);
       lv8->SetVisAttributes(asolid20);
       for (int i = 0; i < 10; i++) place(lv8, G4Translate3D(0, 25 * (i - 4.5), -h20 / 2 + t + 30 / 2), i);
     }
@@ -909,8 +878,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     if (b_boards) {
       double hbv = 30;
       G4VSolid* solid_board = new G4Box("solid_board", (210) / 2, (110) / 2, hbv / 2);
-      G4LogicalVolume* lsolid_board = new G4LogicalVolume(solid_board, nist->FindOrBuildMaterial("G4_AIR"), "lsolid_board", 0, 0, 0);
-      lsolid_board->SetVisAttributes(att_air);
+      G4LogicalVolume* lsolid_board = new G4LogicalVolume(solid_board, Materials::get("G4_AIR"), "lsolid_board", 0, 0, 0);
+      lsolid_board->SetVisAttributes(att("air"));
       for (int i = 0; i < 1; i++) {
         //  G4Transform3D t0 = G4RotateZ3D(M_PI/16*(1-2*i))*G4Translate3D(598-8+210/2, 0, Z0-52+8+5+hbv/2);
         G4Transform3D t0 = G4Translate3D(598 - 8 + 210 / 2, 0, Z0 - 52 + 8 + 5 + hbv / 2);
@@ -929,7 +898,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
         acs->AddPlacedVolume(lsolid_board, t3);
         acs->AddPlacedVolume(lsolid_board, t4);
       }
-      G4Material* boxmaterial = nist->FindOrBuildMaterial("G4_GLASS_PLATE");
+      G4Material* boxmaterial = Materials::get("G4_GLASS_PLATE");
       auto lvolumeb = [&](int part, double dx, double dy, double dz) {
         ostringstream ost(""); ost << "sboard_p" << part;
         G4VSolid* sv = new G4Box(ost.str().c_str(), dx / 2, dy / 2, dz / 2);
@@ -937,7 +906,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
         return new G4LogicalVolume(sv, boxmaterial, ost.str().c_str(), 0, 0, 0);
       };
 
-      G4VisAttributes* asolid20 = new G4VisAttributes(G4Colour(0.2, 0.8, 0.2));
+      const G4VisAttributes* asolid20 = att("plate");
 
       auto placeb = [&](G4LogicalVolume * lv, const G4Translate3D & move, int n) {
         lv->SetVisAttributes(asolid20);
@@ -951,9 +920,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
       double wcon = 20, hcon = 40, hc = hbv - hboard;
       G4VSolid* sv_connector_bundle = new G4Box("sv_connector_bundle", 4 * wcon / 2, hcon / 2, hc / 2);
-      G4LogicalVolume* lv_connector_bundle = new G4LogicalVolume(sv_connector_bundle, nist->FindOrBuildMaterial("G4_AIR"),
+      G4LogicalVolume* lv_connector_bundle = new G4LogicalVolume(sv_connector_bundle, Materials::get("G4_AIR"),
                                                                  "lv_connector_bundle", 0, 0, 0);
-      lv_connector_bundle->SetVisAttributes(att_air);
+      lv_connector_bundle->SetVisAttributes(att("air"));
       new G4PVPlacement(G4Translate3D(-210 / 2 + 10 + wcon * 2, -110 / 2 + hcon / 2, -hbv / 2 + hboard + hc / 2), lv_connector_bundle,
                         "pv_connector_bundle", lsolid_board, false, 0, overlap);
       new G4PVPlacement(G4Translate3D(-210 / 2 + 10 + wcon * 2,    10 + hcon / 2, -hbv / 2 + hboard + hc / 2), lv_connector_bundle,
@@ -964,9 +933,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
                         "pv_connector_bundle", lsolid_board, false, 0, overlap);
 
       G4VSolid* sv_crystal_connector = new G4Box("sv_crystal_connector", wcon / 2, hcon / 2, hc / 2);
-      G4LogicalVolume* lv_crystal_connector = new G4LogicalVolume(sv_crystal_connector, nist->FindOrBuildMaterial("G4_AIR"),
+      G4LogicalVolume* lv_crystal_connector = new G4LogicalVolume(sv_crystal_connector, Materials::get("G4_AIR"),
                                                                   "lv_crystal_connector", 0, 0, 0);
-      lv_crystal_connector->SetVisAttributes(att_air);
+      lv_crystal_connector->SetVisAttributes(att("air"));
 
       new G4PVPlacement(G4Translate3D(-1.5 * 20, 0, 0), lv_crystal_connector, "pv_crystal_connector", lv_connector_bundle, false, 0,
                         overlap);
@@ -978,18 +947,16 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
                         overlap);
 
       G4VSolid* sv_crystal_connector_p1 = new G4Box("sv_crystal_connector_p1", 8 / 2, 30 / 2, 20 / 2);
-      G4LogicalVolume* lv_crystal_connector_p1 = new G4LogicalVolume(sv_crystal_connector_p1, nist->FindOrBuildMaterial("SUS304"),
+      G4LogicalVolume* lv_crystal_connector_p1 = new G4LogicalVolume(sv_crystal_connector_p1, Materials::get("SUS304"),
           "lv_crystal_connector_p1", 0, 0, 0);
-      G4VisAttributes* att_crystal_connector_p1 = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1));
-      lv_crystal_connector_p1->SetVisAttributes(att_crystal_connector_p1);
+      lv_crystal_connector_p1->SetVisAttributes(att("connector"));
 
       new G4PVPlacement(G4Translate3D(-5, 0, -hc / 2 + 20. / 2), lv_crystal_connector_p1, "pv_crystal_connector_p1", lv_crystal_connector,
                         false, 0, overlap);
 
       G4VSolid* sv_capacitor = new G4Tubs("sv_capacitor", 0, 5, 5. / 2, 0, 2 * M_PI);
-      G4LogicalVolume* lv_capacitor = new G4LogicalVolume(sv_capacitor, nist->FindOrBuildMaterial("SUS304"), "lv_capacitor", 0, 0, 0);
-      G4VisAttributes* att_capacitor = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
-      lv_capacitor->SetVisAttributes(att_capacitor);
+      G4LogicalVolume* lv_capacitor = new G4LogicalVolume(sv_capacitor, Materials::get("SUS304"), "lv_capacitor", 0, 0, 0);
+      lv_capacitor->SetVisAttributes(att("capacitor"));
 
       new G4PVPlacement(G4Translate3D(5, -15, -hc / 2 + 5. / 2), lv_capacitor, "pv_capacitor", lv_crystal_connector, false, 0, overlap);
       new G4PVPlacement(G4Translate3D(5, -5, -hc / 2 + 5. / 2), lv_capacitor, "pv_capacitor", lv_crystal_connector, false, 1, overlap);
@@ -997,10 +964,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
       new G4PVPlacement(G4Translate3D(5, 15, -hc / 2 + 5. / 2), lv_capacitor, "pv_capacitor", lv_crystal_connector, false, 3, overlap);
 
       G4VSolid* sv_board_connector_p1 = new G4Box("sv_board_connector_p1", 80. / 2, 8. / 2, 20. / 2);
-      G4LogicalVolume* lv_board_connector_p1 = new G4LogicalVolume(sv_board_connector_p1, nist->FindOrBuildMaterial("SUS304"),
+      G4LogicalVolume* lv_board_connector_p1 = new G4LogicalVolume(sv_board_connector_p1, Materials::get("SUS304"),
           "lv_board_connector_p1", 0, 0, 0);
-      G4VisAttributes* att_board_connector_p1 = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1));
-      lv_board_connector_p1->SetVisAttributes(att_board_connector_p1);
+      lv_board_connector_p1->SetVisAttributes(att("connector"));
 
       new G4PVPlacement(G4Translate3D(-210 / 2 + 10 + 80 / 2, 0, -hbv / 2 + hboard + 20. / 2), lv_board_connector_p1,
                         "pv_board_connector_p1", lsolid_board, false, 0, overlap);
@@ -1037,8 +1003,8 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     //  G4cout<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
     // }
 
-    G4LogicalVolume* lsolid8 = new G4LogicalVolume(solid8, nist->FindOrBuildMaterial("A5052"), "lsolid8", 0, 0, 0);
-    lsolid8->SetVisAttributes(att_alum);
+    G4LogicalVolume* lsolid8 = new G4LogicalVolume(solid8, Materials::get("A5052"), "lsolid8", 0, 0, 0);
+    lsolid8->SetVisAttributes(att("alum"));
     for (int i = 0; i < 8; i++) {
       G4Transform3D tc = G4Translate3D(0, 0, 1960 + 3 + 434 + 0.5) * G4RotateZ3D(M_PI / 8 + i * M_PI / 4);
       new G4PVPlacement(tc * G4RotateZ3D(M_PI / 16), lsolid8, suf("cover", 0 + 2 * i), top, false, 0 + 2 * i, overlap);

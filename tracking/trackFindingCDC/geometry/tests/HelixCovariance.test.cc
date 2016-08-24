@@ -17,7 +17,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCovariance)
 {
   PerigeeCovariance perigeeCovariance = PerigeeCovariance::Zero();
@@ -46,7 +45,6 @@ TEST(TrackFindingCDCTest, geometry_HelixCovariance_constructFromPerigeeAndSZCova
 
     EXPECT_EQ(1, helixCovariance(c_TanL, c_TanL));
     EXPECT_EQ(1, helixCovariance(c_Z0, c_Z0));
-
 
     EXPECT_EQ(0, helixCovariance(c_Phi0, c_Phi0));
     EXPECT_EQ(0, helixCovariance(c_TanL, c_Curv));

@@ -27,9 +27,11 @@ namespace Belle2 {
     public:
       /// Default constructor for ROOT compatibility.
       UncertainHelix()
-      {}
+      {
+      }
 
-      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance
+      /// matrix.
       UncertainHelix(const double curvature,
                      const double phi0,
                      const double impact,
@@ -38,25 +40,27 @@ namespace Belle2 {
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : m_helix(curvature, phi0, impact, tanLambda, z0),
-          m_helixCovariance(helixCovariance),
-          m_chi2(chi2),
-          m_ndf(ndf)
-      {}
-
+        : m_helix(curvature, phi0, impact, tanLambda, z0)
+        , m_helixCovariance(helixCovariance)
+        , m_chi2(chi2)
+        , m_ndf(ndf)
+      {
+      }
 
       /// Constructor taking all stored parameters
       explicit UncertainHelix(const HelixParameters& parameters,
                               const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
                               const size_t& ndf = 0)
-        : m_helix(parameters),
-          m_helixCovariance(helixCovariance),
-          m_chi2(chi2),
-          m_ndf(ndf)
-      {}
+        : m_helix(parameters)
+        , m_helixCovariance(helixCovariance)
+        , m_chi2(chi2)
+        , m_ndf(ndf)
+      {
+      }
 
-      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance matrix.
+      /// Composes an uncertain perigee circle from the  perigee parameters and a 3x3 covariance
+      /// matrix.
       UncertainHelix(const double curvature,
                      const Vector2D& phi0Vec,
                      const double impact,
@@ -65,51 +69,62 @@ namespace Belle2 {
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : m_helix(curvature, phi0Vec, impact, tanLambda, z0),
-          m_helixCovariance(helixCovariance),
-          m_chi2(chi2),
-          m_ndf(ndf)
-      {}
+        : m_helix(curvature, phi0Vec, impact, tanLambda, z0)
+        , m_helixCovariance(helixCovariance)
+        , m_chi2(chi2)
+        , m_ndf(ndf)
+      {
+      }
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
                      const size_t& ndf = 0)
-        : m_helix(helix),
-          m_helixCovariance(helixCovariance),
-          m_chi2(chi2),
-          m_ndf(ndf)
-      {}
+        : m_helix(helix)
+        , m_helixCovariance(helixCovariance)
+        , m_chi2(chi2)
+        , m_ndf(ndf)
+      {
+      }
 
       /// Augments a plain helix with a covariance matrix. Covariance defaults to zero.
       UncertainHelix(const UncertainPerigeeCircle& uncertainPerigeeCircle,
                      const UncertainSZLine& uncertainSZLine)
-        : m_helix(uncertainPerigeeCircle, uncertainSZLine), // copies line and circle without uncertainties
-          m_helixCovariance(HelixUtil::stackBlocks(uncertainPerigeeCircle.perigeeCovariance(), uncertainSZLine.szCovariance())),
-          m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2()),
-          m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
-      {}
+        : m_helix(uncertainPerigeeCircle, uncertainSZLine)
+        , m_helixCovariance(HelixUtil::stackBlocks(uncertainPerigeeCircle.perigeeCovariance(),
+                                                   uncertainSZLine.szCovariance()))
+        , m_chi2(uncertainPerigeeCircle.chi2() + uncertainSZLine.chi2())
+        , m_ndf(uncertainPerigeeCircle.ndf() + uncertainSZLine.ndf())
+      {
+      }
 
-      /// Construct the averages of the two given helices by properly considering their covariance matrix.
-      static UncertainHelix average(const UncertainHelix& helix1,
-                                    const UncertainHelix& helix2);
+      /// Construct the averages of the two given helices by properly considering their covariance
+      /// matrix.
+      static UncertainHelix average(const UncertainHelix& helix1, const UncertainHelix& helix2);
 
       /**
-       *  Construct the average helix including its covariance matrix from two different stereo angle projections.
+       *  Construct the average helix including its covariance matrix from two different stereo
+       * angle projections.
        *
-       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional
+       * projectsions
        *  is accomplished by considering the ambiguity matrix of the projections.
-       *  The average only succeeds when the projections are not parallel two each other which is generally the case
+       *  The average only succeeds when the projections are not parallel two each other which is
+       * generally the case
        *  for two different super layers of different stereo kind.
        *
-       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed
+       * on the same origin.
        *
        *  @param perigeeCircle1    First perigee circle
-       *  @param ambiguityMatrix1  Ambiguity matrix of the first perigee parameters with respect to the helix parameters
+       *  @param ambiguityMatrix1  Ambiguity matrix of the first perigee parameters with respect to
+       * the helix parameters
        *  @param perigeeCircle2    Second perigee circle
-       *  @param ambiguityMatrix2  Ambiguity matrix of the second perigee parameters with respect to the helix parameters
-       *  @param szParameters      Reference sz parameters where the perigee circles have been fitted.
+       *  @param ambiguityMatrix2  Ambiguity matrix of the second perigee parameters with respect to
+       * the helix parameters
+       *  @param szParameters      Reference sz parameters where the perigee circles have been
+       * fitted.
        */
       static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle1,
                                     const JacobianMatrix<3, 5>& ambiguityMatrix1,
@@ -118,34 +133,44 @@ namespace Belle2 {
                                     const SZParameters& szParameters = SZParameters(0.0, 0.0));
 
       /**
-       *  Construct the average helix including its covariance matrix incoorporating additional information from a stereo projection.
+       *  Construct the average helix including its covariance matrix incoorporating additional
+       * information from a stereo projection.
        *
-       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional
+       * projectsions
        *  is accomplished by considering the ambiguity matrix of the projection.
        *
-       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed
+       * on the same origin.
        *  The circle is considered to be fitted in the sz space defined by the given helix.
        *
        *  @param helix            Second perigee circle
        *  @param perigeeCircle    Perigee circle to be incoorporated
-       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the helix parameters
+       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the
+       * helix parameters
        */
       static UncertainHelix average(const UncertainHelix& helix,
                                     const UncertainPerigeeCircle& perigeeCircle,
                                     const JacobianMatrix<3, 5>& ambiguityMatrix)
-      { return average(perigeeCircle, ambiguityMatrix, helix); }
+      {
+        return average(perigeeCircle, ambiguityMatrix, helix);
+      }
 
       /**
-       *  Construct the average helix including its covariance matrix incoorporating additional information from a stereo projection.
+       *  Construct the average helix including its covariance matrix incoorporating additional
+       * information from a stereo projection.
        *
-       *  The averaging in the higher dimensional helix parameter space from the lower dimensional projectsions
+       *  The averaging in the higher dimensional helix parameter space from the lower dimensional
+       * projectsions
        *  is accomplished by considering the ambiguity matrix of the projection.
        *
-       *  Both circle and helix parameters and their covariance matrix are considered to be passed on the same origin.
+       *  Both circle and helix parameters and their covariance matrix are considered to be passed
+       * on the same origin.
        *  The circle is considered to be fitted in the sz space defined by the given helix.
        *
        *  @param perigeeCircle    Perigee circle to be incoorporated
-       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the helix parameters
+       *  @param ambiguityMatrix  Ambiguity matrix of the perigee parameters with respect to the
+       * helix parameters
        *  @param helix            Second perigee circle
        */
       static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle,
@@ -163,60 +188,91 @@ namespace Belle2 {
        *  set of methods in this class accessable by normal . method calls
        */
       const Helix* operator->() const
-      { return &m_helix; }
+      {
+        return &m_helix;
+      }
 
       /// Downcast to the "super" class
       operator const Helix& () const
-      { return m_helix; }
+      {
+        return m_helix;
+      }
 
       /// Getter for the underlying helix
       const Helix& helix() const
-      { return m_helix; }
+      {
+        return m_helix;
+      }
 
       /// Getter for the perigee parameters in the order defined by EPerigeeParameter.h
       HelixParameters helixParameters() const
-      { return m_helix.helixParameters(); }
+      {
+        return m_helix.helixParameters();
+      }
 
     public:
-      /// Projects the helix into the xy plain carrying over the relevant parts of the convariance matrix.
+      /// Projects the helix into the xy plain carrying over the relevant parts of the convariance
+      /// matrix.
       UncertainPerigeeCircle uncertainCircleXY() const
-      { return UncertainPerigeeCircle(helix().circleXY(), HelixUtil::getPerigeeCovariance(helixCovariance()));}
+      {
+        return UncertainPerigeeCircle(helix().circleXY(),
+                                      HelixUtil::getPerigeeCovariance(helixCovariance()));
+      }
 
-      /// Reduces the helix to an sz line carrying over the relevant parts of the convariance matrix.
+      /// Reduces the helix to an sz line carrying over the relevant parts of the convariance
+      /// matrix.
       UncertainSZLine uncertainSZLine() const
-      { return UncertainSZLine(helix().szLine(), HelixUtil::getSZCovariance(helixCovariance()));}
+      {
+        return UncertainSZLine(helix().szLine(), HelixUtil::getSZCovariance(helixCovariance()));
+      }
 
       /// Setter for the whole covariance matrix of the perigee parameters
       void setHelixCovariance(const HelixCovariance& helixCovariance)
-      { m_helixCovariance = helixCovariance; }
+      {
+        m_helixCovariance = helixCovariance;
+      }
 
       /// Getter for the whole covariance matrix of the perigee parameters
       const HelixCovariance& helixCovariance() const
-      { return m_helixCovariance; }
+      {
+        return m_helixCovariance;
+      }
 
       /// Getter for individual elements of the covariance matrix
       double covariance(const EHelixParameter& iRow, const EHelixParameter& iCol) const
-      { return helixCovariance()(iRow, iCol); }
+      {
+        return helixCovariance()(iRow, iCol);
+      }
 
       /// Getter for individual diagonal elements of the covariance matrix
       double variance(const EHelixParameter& i) const
-      { return helixCovariance()(i, i); }
+      {
+        return helixCovariance()(i, i);
+      }
 
       /// Getter for the chi square value of the helix fit
       double chi2() const
-      { return m_chi2; }
+      {
+        return m_chi2;
+      }
 
       /// Setter for the chi square value of the helix fit
       void setChi2(const double chi2)
-      { m_chi2 = chi2; }
+      {
+        m_chi2 = chi2;
+      }
 
       /// Getter for the number of degrees of freediom used in the helix fit
       const size_t& ndf() const
-      { return m_ndf; }
+      {
+        return m_ndf;
+      }
 
       /// Setter for the number of degrees of freediom used in the helix fit
       void setNDF(const size_t& ndf)
-      { m_ndf = ndf; }
+      {
+        m_ndf = ndf;
+      }
 
       /// Sets all circle parameters to zero and the covariance matrix to something noninformative
       void invalidate()
@@ -237,10 +293,16 @@ namespace Belle2 {
 
       /// Returns a copy of the circle with opposite orientation.
       UncertainHelix reversed() const
-      { return UncertainHelix(m_helix.reversed(), HelixUtil::reversed(m_helixCovariance), chi2(), ndf()); }
+      {
+        return UncertainHelix(m_helix.reversed(),
+                              HelixUtil::reversed(m_helixCovariance),
+                              chi2(),
+                              ndf());
+      }
 
     public:
-      /// Moves the coordinate system by the vector by and calculates the new perigee and its covariance matrix. Change is inplace.
+      /// Moves the coordinate system by the vector by and calculates the new perigee and its
+      /// covariance matrix. Change is inplace.
       void passiveMoveBy(const Vector3D& by)
       {
         // Move the covariance matrix first to have access to the original parameters
@@ -266,7 +328,9 @@ namespace Belle2 {
     public:
       /// Debug helper
       friend std::ostream& operator<<(std::ostream& output, const UncertainHelix& uncertainHelix)
-      { return output << "Uncertain" << uncertainHelix.helix(); }
+      {
+        return output << "Uncertain" << uncertainHelix.helix();
+      }
 
     private:
       /// Memory for the underlying helix
@@ -281,7 +345,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedom of the fit of this helix.
       size_t m_ndf = 0.0;
 
-    }; //class
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

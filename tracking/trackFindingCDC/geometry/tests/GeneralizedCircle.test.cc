@@ -19,7 +19,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
 {
   float absError = 10e-6;
@@ -42,10 +41,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_Getters)
   EXPECT_NEAR(M_PI / 2.0, circle.tangentialPhi(), absError);
 
   EXPECT_NEAR(0, circle.impact(), absError);
-
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
 {
@@ -61,8 +57,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_orientation)
   GeneralizedCircle reversedLine(1.0, 0.0, 0.0, -0.0);
   EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_conformalTranform)
 {
@@ -101,7 +95,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_conformalTranform)
   EXPECT_NEAR(1.0, conformalCopy.curvature(), 10e-7);
   EXPECT_NEAR(-M_PI / 2.0, conformalCopy.tangentialPhi(), 10e-7);
   EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
-
 }
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
@@ -113,19 +106,14 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_closest)
   EXPECT_EQ(Vector2D(1.0, 1.0), circle.closest(up));
   EXPECT_EQ(Vector2D(2.0, 0.0), circle.closest(far));
 
-
   // This tests for point which is on the circle
   double smallAngle = M_PI / 100;
   Vector2D near(1.0 - cos(smallAngle), sin(smallAngle));
 
-
   Vector2D closestOfNear = circle.closest(near);
   EXPECT_NEAR(near.x(), closestOfNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
-
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
 {
@@ -135,12 +123,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthFactor)
 
   double expectedArcLengthFactor = smallAngle / near.cylindricalR();
   EXPECT_NEAR(expectedArcLengthFactor, circle.arcLengthFactor(near.cylindricalR()), 10e-7);
-
 }
-
-
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
 {
@@ -164,7 +147,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
 
   EXPECT_NEAR(-smallAngle, circle.arcLengthBetween(origin, close), 10e-7);
 
-
   GeneralizedCircle line(0.0, -1.0, 0.0, 0.0);
   EXPECT_NEAR(-2, line.arcLengthBetween(origin, up), 10e-7);
   EXPECT_NEAR(2, line.arcLengthBetween(origin, down), 10e-7);
@@ -174,10 +156,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthBetween)
   EXPECT_NEAR(2, reverseLine.arcLengthBetween(origin, up), 10e-7);
   EXPECT_NEAR(-2, reverseLine.arcLengthBetween(origin, down), 10e-7);
   EXPECT_NEAR(0, reverseLine.arcLengthBetween(origin, far), 10e-7);
-
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
 {
@@ -190,17 +169,13 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_passiveMoveBy)
   EXPECT_NEAR(5.0, circle.radius(), 10e-7);
   EXPECT_NEAR(1.0, circle.center().x(), 10e-7);
   EXPECT_NEAR(-1.0, circle.center().y(), 10e-7);
-
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
 {
 
   GeneralizedCircle circle = GeneralizedCircle::fromCenterAndRadius(Vector2D(1.0, 1.0), 1);
   GeneralizedCircle line = GeneralizedCircle(sqrt(2.0), -Vector2D(1.0, 1.0).unit());
-
 
   pair<Vector2D, Vector2D> intersections = circle.intersections(line);
 
@@ -212,9 +187,7 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_intersections)
 
   EXPECT_NEAR(1 + sqrt(2.0) / 2.0, intersection2.x(), 10e-7);
   EXPECT_NEAR(1 - sqrt(2.0) / 2.0, intersection2.y(), 10e-7);
-
 }
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
 {
@@ -226,22 +199,22 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atArcLength)
   double smallAngle = M_PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  double nearArcLength =
+    -smallAngle * radius; // Minus because of default counterclockwise orientation
 
   Vector2D atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
-
   Vector2D down(2.0, -1.0);
-  double downArcLength = +M_PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength =
+    +M_PI / 2.0 * radius; // Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
-
 }
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
@@ -284,7 +257,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_arcLengthToCylindricalR)
     double unreachableLowArcLength = reversedCircle.arcLengthToCylindricalR(0.5);
     EXPECT_TRUE(std::isnan(unreachableLowArcLength));
   }
-
 }
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atCylindricalR)
@@ -302,7 +274,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_atCylindricalR)
   EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
 }
 
-
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 {
   double radius = 1;
@@ -318,7 +289,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isLine)
 
   EXPECT_TRUE(line.isLine());
 }
-
 
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
 {
@@ -336,7 +306,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_isCircle)
   EXPECT_FALSE(line.isCircle());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_perigeeConversion)
 {
   float curvature = -0.5;
@@ -349,7 +318,6 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_perigeeConversion)
   EXPECT_NEAR(curvature, circle.curvature(), 10e-7);
 }
 
-
 TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_distance)
 {
   float absError = 10e-6;
@@ -361,16 +329,16 @@ TEST(TrackFindingCDCTest, geometry_GeneralizedCircle_distance)
 
   Vector2D testPoint(3, 0);
 
-  EXPECT_NEAR(1,  circle.distance(testPoint), absError);
-  EXPECT_NEAR(1,  circle.absDistance(testPoint), absError);
-  // Approximated distance is already quite far of since the circle radius is of the order of the distance
-  EXPECT_NEAR(1.33333,  circle.fastDistance(testPoint), absError);
+  EXPECT_NEAR(1, circle.distance(testPoint), absError);
+  EXPECT_NEAR(1, circle.absDistance(testPoint), absError);
+  // Approximated distance is already quite far of since the circle radius is of the order of the
+  // distance
+  EXPECT_NEAR(1.33333, circle.fastDistance(testPoint), absError);
 
   // Now clockwise orientation. All points outside the circle have negative distance
   circle.reverse();
 
-  EXPECT_NEAR(-1,  circle.distance(testPoint), absError);
-  EXPECT_NEAR(1,  circle.absDistance(testPoint), absError);
-  EXPECT_NEAR(-1.33333,  circle.fastDistance(testPoint), absError);
-
+  EXPECT_NEAR(-1, circle.distance(testPoint), absError);
+  EXPECT_NEAR(1, circle.absDistance(testPoint), absError);
+  EXPECT_NEAR(-1.33333, circle.fastDistance(testPoint), absError);
 }

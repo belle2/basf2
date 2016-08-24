@@ -29,10 +29,12 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility.
       PerigeeCircle();
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as vector.
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given
+      /// as vector.
       PerigeeCircle(double curvature, const Vector2D& phi0Vec, double impact);
 
-      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given as azimuth angle
+      /// Constructor from the perigee parammeters. The direction of travel at the perigee is given
+      /// as azimuth angle
       PerigeeCircle(double curvature, double phi0, double impact);
 
       /// Constructor from the perigee parammeters.
@@ -66,9 +68,10 @@ namespace Belle2 {
        *  Therefore the constructor also excepts an orientated representation from them.
        *  If no orientation is given, it defaults to mathematical positiv counterclockwise.
        */
-      static PerigeeCircle fromCenterAndRadius(const Vector2D& center,
-                                               double absRadius,
-                                               ERotation orientation = ERotation::c_CounterClockwise);
+      static PerigeeCircle
+      fromCenterAndRadius(const Vector2D& center,
+                          double absRadius,
+                          ERotation orientation = ERotation::c_CounterClockwise);
 
     public:
       /// Sets all circle parameters to zero
@@ -79,7 +82,9 @@ namespace Belle2 {
 
       /// Indicates if the combination of the circle parameters makes up a valid circle
       bool isValid() const
-      { return not isInvalid(); }
+      {
+        return not isInvalid();
+      }
 
       /// Flips the orientation of the circle in place
       void reverse();
@@ -113,10 +118,12 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       PerigeeJacobian passiveMoveByJacobian(const Vector2D& by) const;
 
-      /// Puts the Jacobi matrix for a move of the coordinate system by the given vector in the given matrix as an output argument
+      /// Puts the Jacobi matrix for a move of the coordinate system by the given vector in the
+      /// given matrix as an output argument
       void passiveMoveByJacobian(const Vector2D& by, PerigeeJacobian& jacobian) const;
 
-      /// Calculates the point, which lies at the give perpendicular travel distance (counted from the perigee)
+      /// Calculates the point, which lies at the give perpendicular travel distance (counted from
+      /// the perigee)
       Vector2D atArcLength(double arcLength) const;
 
       /// Calculates the arc length between the perigee and the given point.
@@ -157,16 +164,19 @@ namespace Belle2 {
        *  @param cylindricalR Cylindrical radius of interest
        *  @return Close point in forward direction with same cylindrical radius on the circle.
        */
-      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint,
-                                       const double cylindricalR) const;
+      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint, const double cylindricalR) const;
 
       /// Indicates whether to given point lies in the forward direction from the perigee
       EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
-      { return tangential(from).isForwardOrBackwardOf(to - from); }
+      {
+        return tangential(from).isForwardOrBackwardOf(to - from);
+      }
 
       /// Indicates whether to given point lies in the forward direction from the perigee
       EForwardBackward isForwardOrBackward(const Vector2D& to) const
-      { return tangential().isForwardOrBackwardOf(to); }
+      {
+        return tangential().isForwardOrBackwardOf(to);
+      }
 
       /**
        *  Returns the one of two end point which is first reached from the given start
@@ -181,13 +191,16 @@ namespace Belle2 {
        *          Vector2D(NAN,NAN) if neither end1 nor end2 are reachable in the forward direction
        *          (line case only)
        */
-      Vector2D chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
+      Vector2D
+      chooseNextForwardOf(const Vector2D& start, const Vector2D& end1, const Vector2D& end2) const;
       /// Calculates the point of closest approach on the circle to the given point.
       Vector2D closest(const Vector2D& point) const;
 
       /// Getter for the proper signed distance of the point to the circle
       double distance(const Vector2D& point) const
-      { return distance(fastDistance(point)); }
+      {
+        return distance(fastDistance(point));
+      }
 
       /// Helper function to translate the linearised distance to the proper distance
       double distance(double fastDistance) const;
@@ -204,82 +217,120 @@ namespace Belle2 {
 
       /// Getter for the linearised distance to the origin
       double fastImpact() const
-      { return fastDistance(impact()); }
+      {
+        return fastDistance(impact());
+      }
 
       /**
        *  Helper function to translate the proper distance to the linearized distance measure of
        *  the circle retaining the sign of the distance.
        */
       double fastDistance(double distance) const
-      { return distance * (1.0 + distance * curvature() / 2); }
+      {
+        return distance * (1.0 + distance * curvature() / 2);
+      }
 
       /// Indicates if the point is on the right or left side of the circle.
       ERightLeft isRightOrLeft(const Vector2D& point) const
-      { return static_cast<ERightLeft>(sign(fastDistance(point))); }
+      {
+        return static_cast<ERightLeft>(sign(fastDistance(point)));
+      }
 
       /// Indicates if the perigee parameters represent a line
       bool isLine() const
-      { return curvature() == 0.0; }
+      {
+        return curvature() == 0.0;
+      }
 
       /// Indicates if the perigee parameters represent a closed circle
       bool isCircle() const
-      { return curvature() != 0.0; }
+      {
+        return curvature() != 0.0;
+      }
 
       /// Getter for the orientation of the circle
       ERotation orientation() const
-      { return static_cast<ERotation>(sign(curvature())); }
+      {
+        return static_cast<ERotation>(sign(curvature()));
+      }
 
       /// Gradient of the distance field, hence indicates the direction of increasing distance.
       Vector2D gradient(const Vector2D& point) const
-      { return (point - perigee()) * curvature() - phi0Vec().orthogonal(); }
+      {
+        return (point - perigee()) * curvature() - phi0Vec().orthogonal();
+      }
 
       /// Unit normal vector from the circle to the given point.
       Vector2D normal(const Vector2D& point) const
-      { return gradient(point).unit(); }
+      {
+        return gradient(point).unit();
+      }
 
       /// Tangential vector to the circle near the given position.
       Vector2D tangential(const Vector2D& point) const
-      { return normal(point).orthogonal(); }
+      {
+        return normal(point).orthogonal();
+      }
 
       /// Getter for the tangtial vector at the perigee
       const Vector2D& tangential() const
-      { return phi0Vec(); }
+      {
+        return phi0Vec();
+      }
 
       /// Getter for the perigee point
       Vector2D perigee() const
-      { return phi0Vec().orthogonal() * impact(); }
+      {
+        return phi0Vec().orthogonal() * impact();
+      }
 
       /// Getter for the center of the circle. If it was a line both components will be infinity.
       Vector2D center() const
-      { return phi0Vec().orthogonal() * (impact() + radius()); }
+      {
+        return phi0Vec().orthogonal() * (impact() + radius());
+      }
 
       /// Getter for the apogee of the circle. If it was a line both components will be infinity.
       Vector2D apogee() const
-      { return phi0Vec().orthogonal() * (impact() + 2 * radius()); }
+      {
+        return phi0Vec().orthogonal() * (impact() + 2 * radius());
+      }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
       double minimalCylindricalR() const
-      { return fabs(impact()); }
+      {
+        return fabs(impact());
+      }
 
       /// Gives the maximal cylindrical radius the circle reaches
       double maximalCylindricalR() const
-      { return fabs(impact() + 2 * radius()); }
+      {
+        return fabs(impact() + 2 * radius());
+      }
 
       /// Getter for the arc length for a full round of the circle
       double arcLengthPeriod() const
-      { return std::fabs(perimeter()); }
+      {
+        return std::fabs(perimeter());
+      }
 
       /// Gives the signed perimeter of the circle.
       double perimeter() const
-      { return 2 * M_PI * radius(); }
+      {
+        return 2 * M_PI * radius();
+      }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity.
       double radius() const
-      { return 1 / curvature(); }
+      {
+        return 1 / curvature();
+      }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity.
       double absRadius() const
-      { return fabs(radius()); }
+      {
+        return fabs(radius());
+      }
 
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
@@ -288,64 +339,92 @@ namespace Belle2 {
 
       /// Getter for the generalised circle parameter n0
       double n0() const
-      { return impact() * (impact() * curvature() / 2.0 + 1.0); }
+      {
+        return impact() * (impact() * curvature() / 2.0 + 1.0);
+      }
 
       /// Getter for the generalised circle parameters n1 and n2
       Vector2D n12() const
-      { return -phi0Vec().orthogonal() * (1 + curvature() * impact()); }
+      {
+        return -phi0Vec().orthogonal() * (1 + curvature() * impact());
+      }
 
       /// Getter for the generalised circle parameters n1
       double n1() const
-      { return n12().x(); }
+      {
+        return n12().x();
+      }
       //{ return phi0Vec().y() * (1 + curvature() * impact()); }
 
       /// Getter for the generalised circle parameters n2
       double n2() const
-      { return n12().y(); }
+      {
+        return n12().y();
+      }
       //{ return -(phi0Vec().x()) * (1 + curvature() * impact()); }
 
       /// Getter for the generalised circle parameter n3
       double n3() const
-      { return curvature() / 2.0; }
+      {
+        return curvature() / 2.0;
+      }
 
       /// Setter for four generalised circle parameters.
       void setN(double n0, double n1, double n2, double n3 = 0.0)
-      { setN(n0, Vector2D(n1, n2), n3); }
+      {
+        setN(n0, Vector2D(n1, n2), n3);
+      }
 
       /// Setter for four generalised circle parameters.
       void setN(double n0, const Vector2D& n12, double n3 = 0.0);
 
       /// Setter for generalised circle parameters from a normal line.
       void setN(const Line2D& n012)
-      { setN(n012.n0(), n012.n12()); }
+      {
+        setN(n012.n0(), n012.n12());
+      }
 
       /// Setter for four generalised circle parameters.
       void setN(const GeneralizedCircle& n0123)
-      { setN(n0123.n0(), n0123.n12(), n0123.n3()); }
+      {
+        setN(n0123.n0(), n0123.n12(), n0123.n3());
+      }
 
       /// Getter for omega parameter of the common Belle2::Helix which is the wrong sign curvature
       double omega() const
-      { return -curvature(); }
+      {
+        return -curvature();
+      }
 
       /// Getter for d0 parameter of the common Belle2::Helix representation
       double d0() const
-      { return -impact(); }
+      {
+        return -impact();
+      }
 
       /// Getter for the signed curvature.
       double curvature() const
-      { return m_curvature; }
+      {
+        return m_curvature;
+      }
 
       /// Getter for the azimuth angle of the direction of flight at the perigee
       double phi0() const
-      { return m_phi0; }
+      {
+        return m_phi0;
+      }
 
       /// Getter for the unit vector of the direction of flight at the perigee
       const Vector2D& phi0Vec() const
-      { return m_phi0Vec; }
+      {
+        return m_phi0Vec;
+      }
 
       /// Getter for the signed distance of the origin to the circle.
       double impact() const
-      { return m_impact; }
+      {
+        return m_impact;
+      }
 
       /// Getter for the three perigee parameters in the order defined by EPerigeeParameter.h
       PerigeeParameters perigeeParameters() const
@@ -360,7 +439,9 @@ namespace Belle2 {
 
       /// Setter for signed curvature.
       void setCurvature(double curvature)
-      { m_curvature = curvature; }
+      {
+        m_curvature = curvature;
+      }
 
       /// Sets the azimuth angle of the direction of flight at the perigee.
       void setPhi0(double phi0)
@@ -378,7 +459,9 @@ namespace Belle2 {
 
       /// Sets the impact parameter of the circle.
       void setImpact(double impact)
-      { m_impact = impact; }
+      {
+        m_impact = impact;
+      }
 
       /// Setter for the perigee parameters
       void setPerigeeParameters(double curvature, const Vector2D& phi0Vec, double impact)
@@ -404,14 +487,12 @@ namespace Belle2 {
         return output << "PerigeeCircle("
                << "curvature=" << circle.curvature() << ","
                << "phi0=" << circle.phi0() << ","
-               << "impact=" << circle.impact() << ")" ;
+               << "impact=" << circle.impact() << ")";
       }
 
     private:
-
       double arcLengthAtDeltaLength(double delta, double dr) const;
       double arcLengthAtSecantLength(double secantLength) const;
-
 
     private:
       /// Memory for the signed curvature

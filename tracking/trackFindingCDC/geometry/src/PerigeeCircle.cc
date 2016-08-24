@@ -83,9 +83,8 @@ PerigeeCircle PerigeeCircle::fromN(double n0, const Vector2D& n12, double n3)
   return circle;
 }
 
-PerigeeCircle PerigeeCircle::fromCenterAndRadius(const Vector2D& center,
-                                                 double absRadius,
-                                                 ERotation orientation)
+PerigeeCircle
+PerigeeCircle::fromCenterAndRadius(const Vector2D& center, double absRadius, ERotation orientation)
 {
   PerigeeCircle circle;
   circle.setCenterAndRadius(center, absRadius, orientation);
@@ -113,11 +112,7 @@ void PerigeeCircle::reverse()
 
 PerigeeCircle PerigeeCircle::reversed() const
 {
-  return PerigeeCircle(-m_curvature,
-                       AngleUtil::reversed(m_phi0),
-                       -m_phi0Vec,
-                       -m_impact
-                      );
+  return PerigeeCircle(-m_curvature, AngleUtil::reversed(m_phi0), -m_phi0Vec, -m_impact);
 }
 
 void PerigeeCircle::conformalTransform()
@@ -151,10 +146,8 @@ void PerigeeCircle::invalidate()
 
 bool PerigeeCircle::isInvalid() const
 {
-  return (not std::isfinite(phi0()) or
-          not std::isfinite(curvature()) or
-          not std::isfinite(impact()) or
-          phi0Vec().isNull());
+  return (not std::isfinite(phi0()) or not std::isfinite(curvature()) or
+          not std::isfinite(impact()) or phi0Vec().isNull());
 }
 
 void PerigeeCircle::passiveMoveBy(const Vector2D& by)
@@ -269,7 +262,7 @@ std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double R) cons
   const double orthogonal = ((impact() * impact() + R * R) * curvature() / 2.0 + impact()) / u;
   const double parallel = sqrt(square(R) - square(orthogonal));
   Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
-  Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(),  parallel, orthogonal);
+  Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(), parallel, orthogonal);
   std::pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);
   return result;
 }
@@ -327,7 +320,6 @@ void PerigeeCircle::setCenterAndRadius(const Vector2D& center,
   m_phi0 = m_phi0Vec.phi();
   m_impact = (center.norm() - std::fabs(absRadius)) * orientation;
 }
-
 
 void PerigeeCircle::setN(double n0, const Vector2D& n12, double n3)
 {

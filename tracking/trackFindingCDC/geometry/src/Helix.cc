@@ -63,11 +63,7 @@ double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) cons
   int bits = std::numeric_limits<double>::digits;
   boost::uintmax_t nMaxIter = 100;
 
-  std::pair<double, double> sBounds = brent_find_minima(distance3D,
-                                                        lowerS,
-                                                        upperS,
-                                                        bits,
-                                                        nMaxIter);
+  std::pair<double, double> sBounds = brent_find_minima(distance3D, lowerS, upperS, bits, nMaxIter);
 
   // Stopped before iterations were exhausted?
   // bool converged = nMaxIter > 0;
@@ -95,7 +91,7 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   using namespace NHelixParameterIndices;
   jacobian(c_Z0, c_Curv) = tanL * (jacobian(c_Phi0, c_Curv) - sArc) / curv;
   jacobian(c_Z0, c_Phi0) = tanL * (jacobian(c_Phi0, c_Phi0) - 1.) / curv;
-  jacobian(c_Z0, c_I)    = tanL *  jacobian(c_Phi0, c_I) / curv;
+  jacobian(c_Z0, c_I) = tanL * jacobian(c_Phi0, c_I) / curv;
   jacobian(c_Z0, c_TanL) = sArc;
 
   return jacobian;

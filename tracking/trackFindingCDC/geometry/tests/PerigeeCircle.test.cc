@@ -19,8 +19,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
@@ -48,7 +46,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
   EXPECT_NEAR(sin(phi0), roundTripCircle.phi0Vec().y(), 10e-7);
   EXPECT_NEAR(phi0, roundTripCircle.phi0(), 10e-7);
 
-
   PerigeeCircle roundTripCircle2;
   roundTripCircle2.setN(generalizedCircle);
 
@@ -57,9 +54,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
   EXPECT_NEAR(cos(phi0), roundTripCircle2.tangential().x(), 10e-7);
   EXPECT_NEAR(sin(phi0), roundTripCircle2.tangential().y(), 10e-7);
   EXPECT_NEAR(phi0, roundTripCircle2.phi0(), 10e-7);
-
 }
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isLine)
 {
@@ -93,7 +88,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isCircle)
   EXPECT_FALSE(line.isCircle());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_orientation)
 {
   double curvature = 1;
@@ -114,7 +108,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_orientation)
   EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
@@ -127,7 +120,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
   EXPECT_EQ(1, perigeeCircle.minimalCylindricalR());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
@@ -139,9 +131,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 
   EXPECT_EQ(3, perigeeCircle.maximalCylindricalR());
 }
-
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
@@ -157,7 +146,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
   EXPECT_NEAR(0.5, circle.center().x(), 10e-7);
   EXPECT_NEAR(0.0, circle.center().y(), 10e-7);
 }
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
@@ -188,9 +176,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(-0.5, circle.distance(Vector2D(1.0, 2.5)), 10e-7);
   EXPECT_NEAR(-0.5, circle.distance(Vector2D(2.5, 1.0)), 10e-7);
 }
-
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
 {
@@ -230,7 +215,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
   EXPECT_NEAR(5.0, circle.radius(), 10e-7);
   EXPECT_NEAR(0.0, circle.perigee().x(), 10e-7);
   EXPECT_NEAR(-3.0, circle.perigee().y(), 10e-7);
-
 }
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
@@ -271,8 +255,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
   EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
 }
 
-
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)
 {
   PerigeeCircle circle(1.0, Vector2D(0.0, -1.0), 1.0);
@@ -291,7 +273,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)
   EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 {
   double radius = 1;
@@ -302,22 +283,22 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
   double smallAngle = M_PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  double nearArcLength =
+    -smallAngle * radius; // Minus because of default counterclockwise orientation
 
   Vector2D atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
-
   Vector2D down(2.0, -1.0);
-  double downArcLength = +M_PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength =
+    +M_PI / 2.0 * radius; // Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
-
 }
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
@@ -399,9 +380,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
   double impact = 0;
 
   // Checks if the normal parameters n follow the same sign convention
-  const PerigeeCircle perigeeCircle(expectedCurvature,
-                                    expectedPhi0,
-                                    impact);
+  const PerigeeCircle perigeeCircle(expectedCurvature, expectedPhi0, impact);
   const Vector2D& expectedPhi0Vec = perigeeCircle.phi0Vec();
 
   double randomArcLength = 2.0;

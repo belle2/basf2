@@ -18,7 +18,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_identity)
 {
   for (double curvature : { -1.0, 0.0, 1.0}) {
@@ -66,7 +65,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip
       EXPECT_NEAR(1.0, moveByZeroJacobian(2, 2), 10e-7);
     }
     {
-      PerigeeJacobian moveByZeroJacobian = moveOneBackJacobian * moveByOneJacobian ;
+      PerigeeJacobian moveByZeroJacobian = moveOneBackJacobian * moveByOneJacobian;
 
       EXPECT_NEAR(1.0, moveByZeroJacobian(0, 0), 10e-7);
       EXPECT_NEAR(0.0, moveByZeroJacobian(0, 1), 10e-7);
@@ -82,8 +81,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian_roundtrip
     }
   }
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
 {
@@ -110,7 +107,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   double u = 1;
 
   double nu = 1;
-  //double xi = 1.0 / 5.0;
+  // double xi = 1.0 / 5.0;
   double lambda = 1.0 / (5.0 + 3.0 * sqrt(5.0));
   double mu = sqrt(5.0) / 10.0;
   double zeta = 4;
@@ -127,10 +124,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveByJacobian)
   EXPECT_NEAR(2.0 * mu * u * deltaParallel, moveByTwoYJacobian(2, 1), 10e-7);
   EXPECT_NEAR(2.0 * mu * nu, moveByTwoYJacobian(2, 2), 10e-7);
 }
-
-
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
 {
@@ -181,7 +174,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
     EXPECT_NEAR(0.0, noChangeMoveVariance(2, 2), 10e-7);
   }
 
-
   {
     PerigeeCovariance transformedVariance = circle.passiveMovedCovarianceBy(Vector2D(2.0, 0.0));
 
@@ -220,11 +212,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMovedCovarianceBy)
     EXPECT_NEAR(0, transformedVariance(1, 2), 10e-7);
     EXPECT_NEAR(0, transformedVariance(2, 1), 10e-7);
   }
-
-
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
 {
@@ -244,18 +232,18 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
 
   UncertainPerigeeCircle circle(1.0, -M_PI / 4, 1.0, PerigeeCovariance(perigeeVariance));
 
-  //circle.perigeeCovariance().Print();
+  // circle.perigeeCovariance().Print();
 
-  //Test if the move commutes
+  // Test if the move commutes
   circle.passiveMoveBy(Vector2D(0.0, -1.0));
 
-  //circle.perigeeCovariance().Print();
+  // circle.perigeeCovariance().Print();
 
   circle.passiveMoveBy(Vector2D(0.0, 1.0));
 
-  //circle.perigeeCovariance().Print();
+  // circle.perigeeCovariance().Print();
 
-  PerigeeCovariance twiceMovedVariance  = circle.perigeeCovariance();
+  PerigeeCovariance twiceMovedVariance = circle.perigeeCovariance();
 
   EXPECT_NEAR(perigeeVariance(0, 0), twiceMovedVariance(0, 0), 10e-7);
   EXPECT_NEAR(perigeeVariance(0, 1), twiceMovedVariance(0, 1), 10e-7);
@@ -268,6 +256,4 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMove)
   EXPECT_NEAR(perigeeVariance(2, 0), twiceMovedVariance(2, 0), 10e-7);
   EXPECT_NEAR(perigeeVariance(2, 1), twiceMovedVariance(2, 1), 10e-7);
   EXPECT_NEAR(perigeeVariance(2, 2), twiceMovedVariance(2, 2), 10e-7);
-
 }
-

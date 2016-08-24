@@ -13,15 +13,17 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// A two dimensional circle in its natural representation using center and radius as parameters.
-    class Circle2D  {
+    /// A two dimensional circle in its natural representation using center and radius as
+    /// parameters.
+    class Circle2D {
 
     public:
       /// Default constructor for ROOT compatibility. Creates an invalid circle
       Circle2D()
         : m_center(0.0, 0.0)
         , m_radius(0.0)
-      {}
+      {
+      }
 
       /// Constructs a circle with given center and radius/ orientation as given by the signedRadius
       Circle2D(const Vector2D& center, const double radius)
@@ -34,16 +36,21 @@ namespace Belle2 {
       Circle2D(const Vector2D& center, const double absRadius, const ERotation ccwInfo)
         : m_center(center)
         , m_radius(fabs(absRadius) * ccwInfo)
-      {}
+      {
+      }
 
     public:
       /// Flips orientation the circle in place
       void reverse()
-      { m_radius *= -1; }
+      {
+        m_radius *= -1;
+      }
 
       /// Returns a copy of the line with the reversed orientation
       Circle2D reversed() const
-      { return Circle2D(center(), -radius()); }
+      {
+        return Circle2D(center(), -radius());
+      }
 
       /**
        *  Transforms the circle to conformal space inplace.
@@ -83,27 +90,39 @@ namespace Belle2 {
     public:
       /// Calculates the signed distance of the point to the circle line.
       double distance(const Vector2D& point) const
-      { return copysign(center().distance(point), radius()) - radius(); }
+      {
+        return copysign(center().distance(point), radius()) - radius();
+      }
 
       /// Returns the signed distance to the origin
       double impact() const
-      { return copysign(center().norm(), radius()) - radius(); }
+      {
+        return copysign(center().norm(), radius()) - radius();
+      }
 
       /// Returns the euclidian distance of the point to the circle line
       double absDistance(const Vector2D& point) const
-      { return fabs(center().distance(point) - absRadius()); }
+      {
+        return fabs(center().distance(point) - absRadius());
+      }
 
       /// Return if the point given is right or left of the line
       ERightLeft isRightOrLeft(const Vector2D& point) const
-      { return static_cast<ERightLeft>(sign(distance(point))); }
+      {
+        return static_cast<ERightLeft>(sign(distance(point)));
+      }
 
       /// Return if the point given is left of the circle line
       bool isLeft(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
+      {
+        return isRightOrLeft(rhs) == ERightLeft::c_Left;
+      }
 
       /// Return if the point given is right of the circle line
       bool isRight(const Vector2D& rhs) const
-      { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
+      {
+        return isRightOrLeft(rhs) == ERightLeft::c_Right;
+      }
 
       /// Calculates the point of closest approach on the line to the point
       Vector2D closest(const Vector2D& point) const
@@ -125,12 +144,15 @@ namespace Belle2 {
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
       Vector2D tangential() const
-      { return tangential(Vector2D(0.0, 0.0)).unit(); }
-
+      {
+        return tangential(Vector2D(0.0, 0.0)).unit();
+      }
 
       /// Gives to azimuth phi of the direction of flight at the perigee
       double tangentialPhi() const
-      { return tangential().phi(); }
+      {
+        return tangential().phi();
+      }
 
       /// Gradient of the distance field
       Vector2D gradient(const Vector2D& point) const
@@ -141,72 +163,101 @@ namespace Belle2 {
 
       /// Normal vector to the circle near the given position
       Vector2D normal(const Vector2D& point) const
-      { return gradient(point).unit(); }
+      {
+        return gradient(point).unit();
+      }
 
       /// Tangential vector to the circle near the given position
       Vector2D tangential(const Vector2D& point) const
-      { return normal(point).orthogonal(); }
+      {
+        return normal(point).orthogonal();
+      }
 
       /// Calculates the angle between two points as seen from the center of the circle
       double openingAngle(const Vector2D& from, const Vector2D& to) const
-      { return gradient(from).angleWith(gradient(to)); } //can be optimized in the number of computations
-
+      {
+        return gradient(from).angleWith(gradient(to));
+      } // can be optimized in the number of computations
 
       /// Calculates the arc length between two points of closest approach on the circle.
       double arcLengthBetween(const Vector2D& from, const Vector2D& to) const
-      { return openingAngle(from, to) * radius(); }
+      {
+        return openingAngle(from, to) * radius();
+      }
 
       /// Getter for the signed radius
       double radius() const
-      { return m_radius; }
+      {
+        return m_radius;
+      }
 
       /// Getter for the squared radius
       double radiusSquared() const
-      { return radius() * radius(); }
+      {
+        return radius() * radius();
+      }
 
       /// Getter for the absolute radius
       double absRadius() const
-      { return fabs(radius()); }
+      {
+        return fabs(radius());
+      }
 
       /// Indicates if the circle is to be interpreted counterclockwise or clockwise
       ERotation orientation() const
-      { return static_cast<ERotation>(sign(radius())); }
+      {
+        return static_cast<ERotation>(sign(radius()));
+      }
 
       /// Getter for the central point of the circle
       Vector2D center() const
-      { return m_center; }
+      {
+        return m_center;
+      }
 
       /** @name Transformations of the circle */
       /**@{*/
       /// Activelly moves the circle in the direction given in place by the vector given
       void moveBy(const Vector2D& by)
-      { m_center += by; }
+      {
+        m_center += by;
+      }
 
       /// Activelly moves the circle in the direction given in place along the first coordinate
       void moveAlongFirst(const double first)
-      { m_center.setFirst(m_center.first() + first); }
+      {
+        m_center.setFirst(m_center.first() + first);
+      }
 
       /// Activelly moves the circle in the direction given in place along the second coordinate
       void moveAlongSecond(const double second)
-      { m_center.setSecond(m_center.second() + second); }
+      {
+        m_center.setSecond(m_center.second() + second);
+      }
 
       /// Passivelly move the coordinate system  in place by the given vector
       void passiveMoveBy(const Vector2D& by)
-      { m_center -= by; }
+      {
+        m_center -= by;
+      }
 
       /// Passivelly move the coordinate system in place along the first coordinate
       void passiveMoveAlongFirst(const double first)
-      { m_center.setFirst(m_center.first() - first); }
+      {
+        m_center.setFirst(m_center.first() - first);
+      }
 
       /// Passivelly move the coordinate system in place along the second coordinate
       void passiveMoveAlongSecond(const double second)
-      { m_center.setSecond(m_center.second() - second); }
+      {
+        m_center.setSecond(m_center.second() - second);
+      }
       /**@}*/
 
     private:
-      Vector2D  m_center; ///< Memory for the central point
-      double m_radius; ///< Memory for the signed radius
+      Vector2D m_center; ///< Memory for the central point
+      double m_radius;   ///< Memory for the signed radius
 
-    }; //class
+    }; // class
   } // namespace TrackFindingCDC
 } // namespace Belle2

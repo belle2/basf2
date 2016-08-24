@@ -22,8 +22,9 @@ using namespace boost::math;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-UncertainPerigeeCircle UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
-                                                       const UncertainPerigeeCircle& toPerigeeCircle)
+UncertainPerigeeCircle
+UncertainPerigeeCircle::average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                const UncertainPerigeeCircle& toPerigeeCircle)
 {
   const PerigeeParameters& fromPar = fromPerigeeCircle.perigeeParameters();
   const PerigeeCovariance& fromCov = fromPerigeeCircle.perigeeCovariance();
@@ -43,9 +44,8 @@ UncertainPerigeeCircle UncertainPerigeeCircle::average(const UncertainPerigeeCir
 
   PerigeeParameters relAvgPar;
   PerigeeCovariance avgCov;
-  double chi2 = CovarianceMatrixUtil::average(relFromPar, fromCov,
-                                              relToPar, toCov,
-                                              relAvgPar, avgCov);
+  double chi2 =
+    CovarianceMatrixUtil::average(relFromPar, fromCov, relToPar, toCov, relAvgPar, avgCov);
 
   PerigeeParameters avgPar = relAvgPar + refPar;
   AngleUtil::normalise(avgPar(c_Phi0));

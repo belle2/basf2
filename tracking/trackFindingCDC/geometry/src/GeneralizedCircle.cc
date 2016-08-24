@@ -34,19 +34,13 @@ GeneralizedCircle::GeneralizedCircle(const double n0,
   normalize();
 }
 
-
-
-GeneralizedCircle::GeneralizedCircle(const double n0,
-                                     const Vector2D& n12,
-                                     const double n3)
+GeneralizedCircle::GeneralizedCircle(const double n0, const Vector2D& n12, const double n3)
   : m_n3(n3)
   , m_n12(n12)
   , m_n0(n0)
 {
   normalize();
 }
-
-
 
 GeneralizedCircle::GeneralizedCircle(const Line2D& n012)
   : m_n3(0.0)
@@ -56,11 +50,9 @@ GeneralizedCircle::GeneralizedCircle(const Line2D& n012)
   normalize();
 }
 
-
 GeneralizedCircle::GeneralizedCircle(const Circle2D& circle)
   : m_n3(1.0 / 2.0 / circle.radius())
-  , m_n12(- circle.center().x() * (m_n3 * 2.0),
-          - circle.center().y() * (m_n3 * 2.0))
+  , m_n12(-circle.center().x() * (m_n3 * 2.0), -circle.center().y() * (m_n3 * 2.0))
   , m_n0((circle.center().normSquared() - circle.radiusSquared()) * m_n3)
 {
 }
@@ -129,7 +121,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
   Vector2D coordinateSystem = gradientAtPoint.unit();
 
   // component of closest approach orthogonal to coordinateSystem
-  double closestOrthogonal =  n12().cross(point) / gradientAtPoint.norm();
+  double closestOrthogonal = n12().cross(point) / gradientAtPoint.norm();
 
   // component of closest approach parallel to coordinateSystem - two solutions expected
   double nOrthogonal = n12().unnormalizedOrthogonalComp(coordinateSystem);
@@ -137,7 +129,7 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
 
   double closestParallel = 0.0;
   if (isLine()) {
-    closestParallel = - (nOrthogonal * closestOrthogonal + n0()) / nParallel;
+    closestParallel = -(nOrthogonal * closestOrthogonal + n0()) / nParallel;
 
   } else {
     const double a = n3();
@@ -149,11 +141,12 @@ Vector2D GeneralizedCircle::closest(const Vector2D& point) const
     // take the solution with smaller distance to point
     const double pointParallel = point.unnormalizedParallelComp(coordinateSystem);
 
-    const double criterion1 = closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
-    const double criterion2 = closestParallel12.second * (closestParallel12.second - 2 * pointParallel);
+    const double criterion1 =
+      closestParallel12.first * (closestParallel12.first - 2 * pointParallel);
+    const double criterion2 =
+      closestParallel12.second * (closestParallel12.second - 2 * pointParallel);
 
     closestParallel = criterion1 < criterion2 ? closestParallel12.first : closestParallel12.second;
-
   }
   return Vector2D::compose(coordinateSystem, closestParallel, closestOrthogonal);
 }
@@ -168,7 +161,7 @@ Vector2D GeneralizedCircle::perigee() const
 Vector2D GeneralizedCircle::apogee() const
 {
   Vector2D result(n12());
-  result.setCylindricalR(- impact() - 2 * radius());
+  result.setCylindricalR(-impact() - 2 * radius());
   return result;
 }
 
@@ -201,10 +194,9 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
       } else {
         return lengthOnCurve1 < lengthOnCurve2 ? end1 : end2;
       }
-
     }
   }
-  return Vector2D(NAN, NAN); //just avoid a compiler warning
+  return Vector2D(NAN, NAN); // just avoid a compiler warning
 }
 
 pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double R) const
@@ -215,23 +207,21 @@ pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double R) const
   //  and r = R
   // search for x and y
 
-  //solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
+  // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
   const Vector2D nUnit = n12().unit();
 
   // parallel component
   const double sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
 
-  //orthogonal component
+  // orthogonal component
   const double sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
-  Vector2D sameCylindricalR1 = Vector2D::compose(nUnit,
-                                                 sameCylindricalRParallel,
-                                                 -sameCylindricalROrthogonal);
+  Vector2D sameCylindricalR1 =
+    Vector2D::compose(nUnit, sameCylindricalRParallel, -sameCylindricalROrthogonal);
 
-  Vector2D sameCylindricalR2 = Vector2D::compose(nUnit,
-                                                 sameCylindricalRParallel,
-                                                 sameCylindricalROrthogonal);
+  Vector2D sameCylindricalR2 =
+    Vector2D::compose(nUnit, sameCylindricalRParallel, sameCylindricalROrthogonal);
 
   pair<Vector2D, Vector2D> result(sameCylindricalR1, sameCylindricalR2);
   return result;
@@ -244,8 +234,7 @@ Vector2D GeneralizedCircle::atCylindricalRForwardOf(const Vector2D& startPoint,
   return chooseNextForwardOf(startPoint, candidatePoints.first, candidatePoints.second);
 }
 
-double GeneralizedCircle::arcLengthBetween(const Vector2D& from,
-                                           const Vector2D& to) const
+double GeneralizedCircle::arcLengthBetween(const Vector2D& from, const Vector2D& to) const
 {
   EForwardBackward lengthSign = isForwardOrBackwardOf(from, to);
   if (not NForwardBackward::isValid(lengthSign)) return NAN;
@@ -285,13 +274,13 @@ double GeneralizedCircle::arcLengthToCylindricalR(const double cylindricalR) con
   // We know the distance of the origin to the circle, which is just d0
   // The direct distance from the origin to the imaginary perigee is just the given cylindricalR.
   const double dr = d0();
-  const double directDistance = sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
+  const double directDistance =
+    sqrt((cylindricalR + dr) * (cylindricalR - dr) / (1 + dr * omega()));
   const double arcLength = arcLengthFactor(directDistance) * directDistance;
   return arcLength;
 }
 
-double GeneralizedCircle::arcLengthFactor(const double directDistance,
-                                          const double curvature)
+double GeneralizedCircle::arcLengthFactor(const double directDistance, const double curvature)
 {
   double x = directDistance * curvature / 2.0;
   return asinc(x);
@@ -359,7 +348,7 @@ Vector2D GeneralizedCircle::atArcLength(const double arcLength) const
   double chiHalf = chi / 2.0;
 
   using boost::math::sinc_pi;
-  double atX =  arcLength *  sinc_pi(chiHalf) * sin(chiHalf) + impact();
-  double atY =  -arcLength * sinc_pi(chi);
+  double atX = arcLength * sinc_pi(chiHalf) * sin(chiHalf) + impact();
+  double atY = -arcLength * sinc_pi(chi);
   return Vector2D::compose(-n12().unit(), atX, atY);
 }

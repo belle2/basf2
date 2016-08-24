@@ -70,6 +70,10 @@ PindiodeStudyModule::~PindiodeStudyModule()
 void PindiodeStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in PINDIODE.xml.
+  for (int i = 0; i < 4; i++) {
+    h_pin_rate[i] = new TH1F(TString::Format("h_pin_rate_%d", i), "Energy deposited [MeV]", 100, 0., 100.);
+    h_pin_rate[i]->Sumw2();
+  }
   for (int i = 0; i < 100; i++) {
     h_dose1[i] = new TH1F(TString::Format("h_dose1_%d", i), "", 10000, 0., 10000.);
     h_dose2[i] = new TH1F(TString::Format("h_dose2_%d", i), "", 10000, 0., 10000.);
@@ -148,6 +152,8 @@ void PindiodeStudyModule::event()
         h_volt[detNb]->Fill(volt * 1e3); //V to mV
         h_time[detNb]->Fill(time);
         h_vtime[detNb]->Fill(time, volt);
+        h_pin_rate[0]->Fill(detNb);
+        h_pin_rate[1]->Fill(detNb, rate);
       }
     }
   }
@@ -164,6 +170,8 @@ void PindiodeStudyModule::event()
       h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
       h_itime[detNb]->Fill(time);
       h_ivtime[detNb]->Fill(time, volt);
+      h_pin_rate[2]->Fill(detNb);
+      h_pin_rate[3]->Fill(detNb, rate);
     }
   }
 

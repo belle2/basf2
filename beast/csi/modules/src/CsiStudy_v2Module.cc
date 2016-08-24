@@ -67,6 +67,10 @@ CsiStudy_v2Module::~CsiStudy_v2Module()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void CsiStudy_v2Module::defineHisto()
 {
+  for (int i = 0; i < 4; i++) {
+    h_csi_rate[i] = new TH1F(TString::Format("h_csi_rate_%d", i), "Energy deposited [MeV]", 100, 0., 100.);
+    h_csi_rate[i]->Sumw2();
+  }
   for (int i = 0; i < 18; i++) {
     h_csi_Evtof1[i] = new TH2F(TString::Format("h_csi_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                                1000, 0., 400.);
@@ -160,6 +164,8 @@ void CsiStudy_v2Module::event()
       h_csi_edep[detNB]->Fill(Edep);
       if (!Reject)
         h_csi_edep_test[detNB]->Fill(Edep);
+      h_csi_rate[0]->Fill(detNB);
+      h_csi_rate[1]->Fill(detNB, rate);
     }
   }
 
@@ -169,6 +175,8 @@ void CsiStudy_v2Module::event()
     double Edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
     double RecEdep = Hit.getEnergyRecDep() * 1e3; //GeV -> MeV
     double tof = Hit.getFlightTime(); //ns
+    h_csi_rate[2]->Fill(detNB);
+    h_csi_rate[3]->Fill(detNB, rate);
     h_csi_edep1[detNB]->Fill(Edep);
     h_csi_edep2[detNB]->Fill(RecEdep);
     h_csi_edep1Weight[detNB]->Fill(Edep, rate);

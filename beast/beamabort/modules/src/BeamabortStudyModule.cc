@@ -70,6 +70,10 @@ BeamabortStudyModule::~BeamabortStudyModule()
 void BeamabortStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in BEAMABORT.xml.
+  for (int i = 0; i < 4; i++) {
+    h_dia_rate[i] = new TH1F(TString::Format("h_dia_rate_%d", i), "Energy deposited [MeV]", 100, 0., 100.);
+    h_dia_rate[i]->Sumw2();
+  }
   for (int i = 0; i < 8; i++) {
     h_dose[i] = new TH1F(TString::Format("h_dose_%d", i), "", 10000, 0., 10000.);
     h_doseWeight[i] = new TH1F(TString::Format("h_doseWeight_%d", i), "", 10000, 0., 10000.);
@@ -160,6 +164,8 @@ void BeamabortStudyModule::event()
       h_amp[detNb]->Fill(Amp * 1e15); //A x s -> mA x s
       h_time[detNb]->Fill(time);
       h_vtime[detNb]->Fill(time, Amp * 1e15);
+      h_dia_rate[0]->Fill(detNb);
+      h_dia_rate[1]->Fill(detNb, rate);
     }
   }
 
@@ -181,6 +187,8 @@ void BeamabortStudyModule::event()
     h_iamp[detNb]->Fill(current * 1e6); //I to uI
     h_itime[detNb]->Fill(time);
     h_ivtime[detNb]->Fill(time, current * 1e6);
+    h_dia_rate[2]->Fill(detNb);
+    h_dia_rate[3]->Fill(detNb, rate);
   }
 
   //}

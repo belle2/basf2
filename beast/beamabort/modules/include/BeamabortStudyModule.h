@@ -79,6 +79,8 @@ namespace Belle2 {
       /** Fano Factor */
       double m_FanoFactor;
 
+      /** Rate */
+      TH1F* h_dia_rate[10];
       /** histo dose */
       TH1F* h_dose[100];
       /** histo dose */

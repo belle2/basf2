@@ -70,6 +70,8 @@ namespace Belle2 {
       /** Energy threshold */
       double m_Ethres;
 
+      /** Rate */
+      TH1F* h_csi_rate[10];
       /** Energy deposited vs TOF */
       TH2F* h_csi_Evtof1[18];
       /** Energy deposited vs TOF */

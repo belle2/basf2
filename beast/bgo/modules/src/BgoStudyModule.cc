@@ -67,6 +67,10 @@ BgoStudyModule::~BgoStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void BgoStudyModule::defineHisto()
 {
+  for (int i = 0; i < 4; i++) {
+    h_bgo_rate[i] = new TH1F(TString::Format("h_bgo_rate_%d", i), "Energy deposited [MeV]", 100, 0., 100.);
+    h_bgo_rate[i]->Sumw2();
+  }
   for (int i = 0; i < 8; i++) {
     h_bgos_Evtof1[i] = new TH2F(TString::Format("h_bgos_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                                 1000, 0., 400.);
@@ -162,6 +166,8 @@ void BgoStudyModule::event()
       h_bgos_edep[detNB]->Fill(Edep);
       if (!Reject)h_bgos_edep_test[detNB]->Fill(Edep);
     }
+    h_bgo_rate[0]->Fill(detNB);
+    h_bgo_rate[1]->Fill(detNB, rate);
   }
 
   for (const auto& Hit : Hits) {
@@ -169,6 +175,8 @@ void BgoStudyModule::event()
     const double edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
     const double recedep = Hit.getEnergyRecDep() * 1e3; //GeV -> MeV
     const double tof = Hit.getFlightTime(); //ns
+    h_bgo_rate[2]->Fill(detNB);
+    h_bgo_rate[3]->Fill(detNB, rate);
     h_bgo_edep[detNB]->Fill(recedep);
     h_bgo_edep_test[detNB]->Fill(edep);
     h_bgo_edepWeight[detNB]->Fill(recedep, rate);

@@ -70,6 +70,14 @@ namespace Belle2 {
       /** Energy threshold */
       std::vector<Double_t> m_Ethres;
 
+      /** edep */
+      TH1F* h_bgo_edep1[10];
+      /** edep */
+      TH1F* h_bgo_edep2[10];
+      /** edep */
+      TH1F* h_bgo_edep3[10];
+      /** edep */
+      TH1F* h_bgo_edep4[10];
       /** Rate */
       TH1F* h_bgo_rate[10];
       /** Energy deposited vs TOF */

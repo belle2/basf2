@@ -67,7 +67,7 @@ BgoStudyModule::~BgoStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void BgoStudyModule::defineHisto()
 {
-  for (int i = 0; i < 4; i++) {
+  for (int i = 0; i < 8; i++) {
     h_bgo_rate[i] = new TH1F(TString::Format("h_bgo_rate_%d", i), "Energy deposited [MeV]", 100, 0., 100.);
     h_bgo_rate[i]->Sumw2();
   }
@@ -101,6 +101,16 @@ void BgoStudyModule::defineHisto()
     h_bgos_edep[i]->Sumw2();
     h_bgos_edep2[i]->Sumw2();
     h_bgos_edep_test[i]->Sumw2();
+
+    h_bgo_edep1[i] = new TH1F(TString::Format("h_bgo_edep1_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_bgo_edep2[i] = new TH1F(TString::Format("h_bgo_edep2_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_bgo_edep3[i] = new TH1F(TString::Format("h_bgo_edep3_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_bgo_edep4[i] = new TH1F(TString::Format("h_bgo_edep4_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+
+    h_bgo_edep1[i]->Sumw2();
+    h_bgo_edep2[i]->Sumw2();
+    h_bgo_edep3[i]->Sumw2();
+    h_bgo_edep4[i]->Sumw2();
   }
   h_bgo_s = new TH1F("h_bgo_s", "", 4000, -200., 200.);
   h_bgo_s_cut = new TH1F("h_bgo_s_cut", "", 4000, -200., 200.);
@@ -183,6 +193,20 @@ void BgoStudyModule::event()
     h_bgo_edep_testWeight[detNB]->Fill(edep, rate);
     h_bgo_Evtof1[detNB]->Fill(tof, recedep);
     h_bgo_Evtof2[detNB]->Fill(tof, edep);
+    double ethres = m_Ethres[detNB] * 1e3;
+    if (recedep > ethres) {
+      h_bgo_edep1[detNB]->Fill(recedep);
+      h_bgo_edep2[detNB]->Fill(recedep, rate);
+      h_bgo_rate[4]->Fill(detNB);
+      h_bgo_rate[5]->Fill(detNB, rate);
+    }
+    ethres += gRandom->Gaus(0, m_Ethres[detNB] * 1e3 * 0.3);
+    if (recedep > ethres) {
+      h_bgo_edep3[detNB]->Fill(recedep);
+      h_bgo_edep4[detNB]->Fill(recedep, rate);
+      h_bgo_rate[6]->Fill(detNB);
+      h_bgo_rate[7]->Fill(detNB, rate);
+    }
   }
 
 }

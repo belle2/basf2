@@ -332,25 +332,29 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
     support_leg->AddPlacedVolume(l1, t1);
     support_leg->AddPlacedVolume(l2, t2);
     support_leg->AddPlacedVolume(l3, t3);
-    //    support_leg->AddPlacedVolume(l4,t4);
+    support_leg->AddPlacedVolume(l4, t4);
     support_leg->AddPlacedVolume(l5, t5);
     support_leg->AddPlacedVolume(l6, t6);
 
-    G4VSolid* s_all = new G4Box("leg_all", 140. / 2, 420. / 2, (97. + 160) / 2);
-    G4LogicalVolume* l_all = new G4LogicalVolume(s_all, nist->FindOrBuildMaterial("G4_AIR"), "l_all", 0, 0, 0);
-    l_all->SetVisAttributes(att_silv);
-    G4Transform3D tp = G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
-    support_leg->MakeImprint(l_all, tp, 0, overlap);
+    for (int i = 0; i < 8; i++) {
+      G4Transform3D tp = G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4) * G4Translate3D(0, 1415 - 165 + 420. / 2,
+                         1960 + ZT + (97. + 160.) / 2) * G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
+      support_leg->MakeImprint(top, tp, 0, overlap);
+    }
 
+    // G4VSolid* s_all = new G4Box("leg_all", 140. / 2, 420. / 2, (97. + 160) / 2);
+    // G4LogicalVolume* l_all = new G4LogicalVolume(s_all, nist->FindOrBuildMaterial("G4_AIR"), "l_all", 0, 0, 0);
+    // l_all->SetVisAttributes(att_silv);
+    // G4Transform3D tp = G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
+    // support_leg->MakeImprint(l_all, tp, 0, overlap);
 
-    for (int i = 0; i < 8; i++)
-      new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
-                        1960 + ZT + (97. + 160.) / 2), l_all, suf("support_leg_physical", i), top, false, i, overlap);
+    // for (int i = 0; i < 8; i++)
+    //   new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
+    //                     1960 + ZT + (97. + 160.) / 2), l_all, suf("support_leg_physical", i), top, false, i, overlap);
 
-    for (int i = 0; i < 8; i++)
-      new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
-                        1960 + ZT + (97. + 160.) / 2)*tp * t4, l4, suf("support_leg_p4_physical", i), top, false, i, overlap);
-
+    // for (int i = 0; i < 8; i++)
+    //   new G4PVPlacement(G4RotateZ3D(-M_PI / 2 + M_PI / 8 + i * M_PI / 4)*G4Translate3D(0, 1415 - 165 + 420. / 2,
+    //                     1960 + ZT + (97. + 160.) / 2)*tp * t4, l4, suf("support_leg_p4_physical", i), top, false, i, overlap);
   }
 
 

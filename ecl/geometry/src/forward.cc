@@ -206,7 +206,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
   if (b_septum_wall) {
     double d = 5;
-    Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {ZT - 134.2 - d / tand(th1), RT - 20 - d}, {3, RC}};
+    Point_t vin[] = {{3., RI}, {ZT - zsep, RIp - tand(th0)* zsep}, {ZT - zsep, RT - 20 - d}, {3 + (RT - 20 - d - RC) / tand(th1), RT - 20 - d}, {3, RC}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
     G4ThreeVector cin[n * 2];
@@ -225,6 +225,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
                       septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
   }
 
+  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
   if (b_crystals) {
     vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
     vector<G4LogicalVolume*> wrapped_crystals;
@@ -233,7 +234,6 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
       wrapped_crystals.push_back(wrapped_crystal(s, "forward", 0.20 - 0.02));
     }
 
-    vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
@@ -259,10 +259,9 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VisAttributes* att_preampfifier = new G4VisAttributes(G4Colour(0.4, 0.4, 0.8));
     lv_preamplifier->SetVisAttributes(att_preampfifier);
-    cplacement_t* bp = forward_placement;
-    for (cplacement_t* it = bp; it != bp + 72; it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
-      int indx = it - bp;
+      int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + pa_box_height / 2)*G4RotateZ3D(-M_PI / 2), lv_preamplifier,
                                   "phys_preamplifier", crystalvolume_logical, false, indx, 0);
       if (overlap)pv->CheckOverlaps(1000);
@@ -339,7 +338,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
 
     G4VSolid* s_all = new G4Box("leg_all", 140. / 2, 420. / 2, (97. + 160) / 2);
     G4LogicalVolume* l_all = new G4LogicalVolume(s_all, nist->FindOrBuildMaterial("G4_AIR"), "l_all", 0, 0, 0);
-    l_all->SetVisAttributes(att_air);
+    l_all->SetVisAttributes(att_silv);
     G4Transform3D tp = G4Translate3D(0, -420. / 2, -(97. + 160.) / 2);
     support_leg->MakeImprint(l_all, tp, 0, overlap);
 

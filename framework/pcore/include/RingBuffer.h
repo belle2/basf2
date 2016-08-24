@@ -13,7 +13,7 @@ namespace Belle2 {
 
   /** A structure to manage ring buffer. Placed on top of the shared memory. */
   struct RingBufInfo {
-    int size; /**< ring buffer size, minus this header. */
+    int size; /**< ring buffer size (integers), minus this header. */
     int remain; /**< Unsure, always equal to size. */
     int wptr; /**< Pointer for writing entries. */
     int prevwptr; /**< Previous state of wptr (for error recovery). */

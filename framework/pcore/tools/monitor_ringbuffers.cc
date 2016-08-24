@@ -26,11 +26,12 @@ void rbinfo(int shmid)
   long filled_bytes = m_bufinfo->wptr - m_bufinfo->rptr;
   if (filled_bytes < 0)
     filled_bytes += m_bufinfo->size;
+  filled_bytes *= sizeof(int); //weird size unit
   double filled_MB = (filled_bytes) / 1024.0 / 1024.0;
   std::cout << "RB " << shmid
             << " #Tx: " << m_bufinfo->numAttachedTx << "\t"
             << m_bufinfo->nbuf << " entries\t"
-            << filled_MB << " MiB filled\t(" << 100.0 * filled_bytes / double(m_bufinfo->size) << " %)"
+            << filled_MB << " MiB filled\t(" << 100.0 * filled_bytes / double(m_bufinfo->size * sizeof(int)) << " %)"
             << "\n";
 
   shmdt(shmadr);
@@ -68,7 +69,7 @@ std::vector<int> findRingBuffers()
 }
 
 
-int main(int argc, char** argv)
+int main(int argc, char**)
 {
   if (argc > 1) {
     printf("Usage : monitor_ringbuffers\n");

@@ -3,7 +3,7 @@
 
 import sys
 import ROOT
-
+import os
 
 def printUsage():
     print('Usage: b2add OUTPUT_FILE INPUT_FILE1 [INPUT_FILE2 ...]')
@@ -68,6 +68,10 @@ if len(sys.argv) < 3:
     sys.exit(1)
 
 outFile = sys.argv[1]
+
+if os.path.isfile(outFile):
+    os.remove(outFile)
+
 inFiles = sys.argv[2:]
 
 ROOT.gSystem.Load('libdataobjects')

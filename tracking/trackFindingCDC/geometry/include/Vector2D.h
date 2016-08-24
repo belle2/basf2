@@ -62,7 +62,7 @@ namespace Belle2 {
 
 
       /// Constucts a unit vector with azimuth angle equal to phi
-      static inline Vector2D Phi(const double phi)
+      static Vector2D Phi(const double phi)
       { return std::isnan(phi) ? Vector2D(0.0, 0.0) : Vector2D(cos(phi), sin(phi)); }
 
       /// Constructs a vector from a unit coordinate system vector and the coordinates in that system
@@ -70,9 +70,9 @@ namespace Belle2 {
        *  with the parallel and orthogonal components in the coordinate system \n
        *  to a vector in laboratory coordinates. The coordinate system vector \n
        *  is assumed the unit of the coordinate system */
-      static inline Vector2D compose(const Vector2D& coordinateVec,
-                                     const double parallelCoor,
-                                     const double orthoCoor)
+      static Vector2D compose(const Vector2D& coordinateVec,
+                              const double parallelCoor,
+                              const double orthoCoor)
       { return Vector2D(coordinateVec , parallelCoor , orthoCoor); }
 
 
@@ -80,7 +80,7 @@ namespace Belle2 {
       /** Computes the average of two vectors
        *  If one vector contains NAN the average is the other vector, since the former is not considered a valid value.
        **/
-      static inline Vector2D average(const Vector2D& one , const Vector2D& two)
+      static Vector2D average(const Vector2D& one , const Vector2D& two)
       {
         if (one.hasNAN()) {
           return two;
@@ -97,7 +97,7 @@ namespace Belle2 {
        *  it is not considered a valid value for the average and is therefore left out.
        *  The average() of the other two vectors is then returned.
        **/
-      static inline Vector2D average(const Vector2D& one , const Vector2D& two , const Vector2D& three)
+      static Vector2D average(const Vector2D& one , const Vector2D& two , const Vector2D& three)
       {
 
         if (one.hasNAN()) {
@@ -115,10 +115,10 @@ namespace Belle2 {
 
 
       /// Casting the back to TVector2 seamlessly
-      inline operator const TVector2() { return TVector2(x(), y()); }
+      operator const TVector2() { return TVector2(x(), y()); }
 
       /// Equality comparison with both coordinates
-      inline bool operator==(const Vector2D& rhs) const
+      bool operator==(const Vector2D& rhs) const
       { return x() == rhs.x() and y() == rhs.y(); }
 
       /// Total ordering based on cylindrical radius first and azimuth angle second
@@ -127,7 +127,7 @@ namespace Belle2 {
        *  vectors. Secondly the azimuth angle is considered to have a total ordering \n
        *  for all vectors.\n
        */
-      inline bool operator<(const Vector2D& rhs) const
+      bool operator<(const Vector2D& rhs) const
       {
         return normSquared() < rhs.normSquared() or (
                  normSquared() == rhs.normSquared() and (
@@ -137,28 +137,28 @@ namespace Belle2 {
 
       /// Getter for the lowest possible vector
       /** The lowest possilbe vector according to the comparision is the null vector */
-      inline static Vector2D getLowest() { return Vector2D(0.0, 0.0); }
+      static Vector2D getLowest() { return Vector2D(0.0, 0.0); }
 
       /// Checks if the vector is the null vector.
-      inline bool isNull() const { return x() == 0.0 and y() == 0.0; }
+      bool isNull() const { return x() == 0.0 and y() == 0.0; }
 
       /// Checks if one of the coordinates is NAN
-      inline bool hasNAN() const { return std::isnan(x()) or std::isnan(y()); }
+      bool hasNAN() const { return std::isnan(x()) or std::isnan(y()); }
 
       /// Output operator for debugging
       friend std::ostream& operator<<(std::ostream& output, const Vector2D& vector)
       { output << "Vector2D(" << vector.x() << "," << vector.y() << ")"; return output; }
 
       /// Calculates the two dimensional dot product.
-      inline double dot(const Vector2D& rhs) const { return x() * rhs.x() + y() * rhs.y(); }
+      double dot(const Vector2D& rhs) const { return x() * rhs.x() + y() * rhs.y(); }
       /// Calculated the two dimensional cross product.
-      inline double cross(const Vector2D& rhs)const { return x() * rhs.y() - y() * rhs.x(); }
+      double cross(const Vector2D& rhs)const { return x() * rhs.y() - y() * rhs.x(); }
 
       /// Calculates \f$ x^2 + y^2 \f$ .
-      inline double normSquared() const { return x() * x() + y() * y(); }
+      double normSquared() const { return x() * x() + y() * y(); }
 
       /// Calculates the length of the vector.
-      inline double norm() const { return hypot(x(), y()); }
+      double norm() const { return hypot(x(), y()); }
 
       /** @name Angle functions
        *  These functions measure the angle between two vectors from *this* to rhs
@@ -167,15 +167,15 @@ namespace Belle2 {
        */
       ///@{
       ///Cosine of the angle between this and rhs
-      inline double cosWith(const Vector2D& rhs) const { return dot(rhs) / (norm() * rhs.norm());  }
+      double cosWith(const Vector2D& rhs) const { return dot(rhs) / (norm() * rhs.norm());  }
       ///Sine of the angle between this and rhs
-      inline double sinWith(const Vector2D& rhs) const { return cross(rhs) / (norm() * rhs.norm());  }
+      double sinWith(const Vector2D& rhs) const { return cross(rhs) / (norm() * rhs.norm());  }
       ///The angle between this and rhs
-      inline double angleWith(const Vector2D& rhs) const { return atan2(cross(rhs), dot(rhs)); }
+      double angleWith(const Vector2D& rhs) const { return atan2(cross(rhs), dot(rhs)); }
       ///@}
 
       /// Calculates the distance of this point to the rhs
-      inline double distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
+      double distance(const Vector2D& rhs = Vector2D(0.0, 0.0)) const
       {
         double deltaX = x() - rhs.x();
         double deltaY = y() - rhs.y();
@@ -183,69 +183,69 @@ namespace Belle2 {
       }
 
       /// Scales the vector in place by the given factor
-      inline Vector2D& scale(const double factor) { m_x *= factor; m_y *= factor; return *this; }
+      Vector2D& scale(const double factor) { m_x *= factor; m_y *= factor; return *this; }
       /// Same as scale()
-      inline Vector2D& operator*=(const double factor) { return scale(factor); }
+      Vector2D& operator*=(const double factor) { return scale(factor); }
 
       /// Returns a scaled copy of the vector
-      inline Vector2D scaled(const double factor) const { return Vector2D(x() * factor, y() * factor); }
+      Vector2D scaled(const double factor) const { return Vector2D(x() * factor, y() * factor); }
 
       /// Same as scaled()
-      inline friend Vector2D operator*(const Vector2D& vec2D, const double factor)
+      friend Vector2D operator*(const Vector2D& vec2D, const double factor)
       { return vec2D.scaled(factor); }
 
       /// Divides all coordinates by a common denominator in place
-      inline Vector2D& divide(const double denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
+      Vector2D& divide(const double denominator) {  m_x /= denominator; m_y /= denominator; return *this; }
 
       /// Same as divide()
-      inline Vector2D& operator/=(const double denominator) { return divide(denominator); }
+      Vector2D& operator/=(const double denominator) { return divide(denominator); }
 
       /// Returns a copy where all coordinates got divided by a common denominator
-      inline Vector2D divided(const double denominator) const { return Vector2D(x() / denominator, y() / denominator); }
+      Vector2D divided(const double denominator) const { return Vector2D(x() / denominator, y() / denominator); }
       /// Same as divided()
-      inline Vector2D operator/(const double denominator) const { return divided(denominator); }
+      Vector2D operator/(const double denominator) const { return divided(denominator); }
 
       /// Adds a vector to this in place
-      inline Vector2D& add(const Vector2D& rhs) { m_x += rhs.x();  m_y += rhs.y(); return *this; }
+      Vector2D& add(const Vector2D& rhs) { m_x += rhs.x();  m_y += rhs.y(); return *this; }
 
       /// Same as add()
-      inline Vector2D& operator+=(const Vector2D& rhs) { return add(rhs); }
+      Vector2D& operator+=(const Vector2D& rhs) { return add(rhs); }
 
       /// Subtracts a vector from this in place
-      inline Vector2D& subtract(const Vector2D& rhs) { m_x -= rhs.x();  m_y -= rhs.y(); return *this; }
+      Vector2D& subtract(const Vector2D& rhs) { m_x -= rhs.x();  m_y -= rhs.y(); return *this; }
       /// Same as subtract()
-      inline Vector2D& operator-=(const Vector2D& rhs) { return subtract(rhs); }
+      Vector2D& operator-=(const Vector2D& rhs) { return subtract(rhs); }
 
       /// Orthogonal vector to the counterclockwise direction
-      inline Vector2D orthogonal() const { return Vector2D(-y(), x()); }
+      Vector2D orthogonal() const { return Vector2D(-y(), x()); }
 
       /// Orthogonal vector to the direction given by the counterclockwise info
-      inline Vector2D orthogonal(const ERotation ccwInfo) const
+      Vector2D orthogonal(const ERotation ccwInfo) const
       { return isValid(ccwInfo) ? Vector2D(-ccwInfo * y(), ccwInfo * x()) : Vector2D(); }
 
       /// Normalizes the vector to unit length
       /** Normalizes the vector to unit length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline double normalize()
+      double normalize()
       { double originalLength = norm(); if (originalLength != 0.0) divide(originalLength); return originalLength; }
 
       /// Normalizes the vector to the given length
       /** Normalizes the vector to the given length and returns the length the vector had before. \n
        *  The null vector is not transformed. */
-      inline double normalizeTo(const double toLength)
+      double normalizeTo(const double toLength)
       { double originalLength = norm(); if (originalLength != 0.0) scale(toLength / originalLength); return originalLength; }
 
       /// Returns a unit vector colaligned with this
-      inline Vector2D unit() const
+      Vector2D unit() const
       { return isNull() ? Vector2D(0.0, 0.0) : divided(norm()); }
 
       /// Reverses the direction of the vector in place
-      inline Vector2D& reverse() { scale(-1.0); return *this; }
+      Vector2D& reverse() { scale(-1.0); return *this; }
 
       /// Returns a vector pointing in the opposite direction
-      inline Vector2D reversed() const { return scaled(-1.0); }
+      Vector2D reversed() const { return scaled(-1.0); }
       /// Same as reversed()
-      inline Vector2D operator-() const { return reversed(); }
+      Vector2D operator-() const { return reversed(); }
 
       /// Flips the first coordinate inplace (no difference between active and passive)
       void flipFirst()
@@ -273,85 +273,85 @@ namespace Belle2 {
 
       /// Transforms the vector to conformal space inplace
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace */
-      inline void conformalTransform() { divide(normSquared()); }
+      void conformalTransform() { divide(normSquared()); }
 
       /// Returns a copy of the vector transformed in conformal space
       /** Applies the conformal map in the self-inverse from  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) and returns the result as a new Vector2D */
-      inline Vector2D conformalTransformed() const { return divided(normSquared()); }
+      Vector2D conformalTransformed() const { return divided(normSquared()); }
 
       /// Returns a new vector as sum of this and rhs
-      inline Vector2D operator+(const Vector2D& rhs) const
+      Vector2D operator+(const Vector2D& rhs) const
       { return Vector2D(x() + rhs.x(), y() + rhs.y()); }
 
       /// Returns a new vector as differenc of this and rhs
-      inline Vector2D operator-(const Vector2D& rhs) const
+      Vector2D operator-(const Vector2D& rhs) const
       { return Vector2D(x() - rhs.x(), y() - rhs.y()); }
 
       /// Calculates the component parallel to the given vector
-      inline double parallelComp(const Vector2D& relativTo) const
+      double parallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this) / relativTo.norm(); }
 
       /// Calculates the part of this vector that is parallel to the given vector
-      inline Vector2D parallelVector(const Vector2D& relativTo) const
+      Vector2D parallelVector(const Vector2D& relativTo) const
       { return relativTo.scaled(relativTo.dot(*this) / relativTo.normSquared()); }
 
       /// Same as parallelComp() but assumes the given vector to be of unit length.
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline double unnormalizedParallelComp(const Vector2D& relativTo) const
+      double unnormalizedParallelComp(const Vector2D& relativTo) const
       { return relativTo.dot(*this); }
 
       /// Calculates the component orthogonal to the given vector
       /** The orthogonal component is the component parallel to relativeTo.orthogonal() */
-      inline double orthogonalComp(const Vector2D& relativTo) const
+      double orthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this) / relativTo.norm(); }
 
       /// Calculates the part of this vector that is parallel to the given vector
-      inline Vector2D orthogonalVector(const Vector2D& relativTo) const
+      Vector2D orthogonalVector(const Vector2D& relativTo) const
       { return relativTo.scaled(relativTo.cross(*this) / relativTo.normSquared()).orthogonal(); }
 
       /// Same as orthogonalComp() but assumes the given vector to be of unit length
       /** This assumes the given vector relativeTo to be of unit length and avoids \n
        *  a costly computation of the vector norm()*/
-      inline double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
+      double unnormalizedOrthogonalComp(const Vector2D& relativTo) const
       { return relativTo.cross(*this); }
 
       /// Indicates if the given vector is more left or more right if you looked in the direction of this vector.
-      inline ERightLeft isRightOrLeftOf(const Vector2D& rhs) const
+      ERightLeft isRightOrLeftOf(const Vector2D& rhs) const
       { return static_cast<ERightLeft>(-sign(unnormalizedOrthogonalComp(rhs))); }
 
       /// Indicates if the given vector is more left if you looked in the direction of this vector.
-      inline bool isLeftOf(const Vector2D& rhs) const
+      bool isLeftOf(const Vector2D& rhs) const
       { return isRightOrLeftOf(rhs) == ERightLeft::c_Left; }
 
       /// Indicates if the given vector is more right if you looked in the direction of this vector.
-      inline bool isRightOf(const Vector2D& rhs) const
+      bool isRightOf(const Vector2D& rhs) const
       { return isRightOrLeftOf(rhs) == ERightLeft::c_Right; }
 
 
       /// Indicates if the given vector is more counterclockwise or more clockwise if you looked in the direction of this vector.
-      inline ERotation isCCWOrCWOf(const Vector2D& rhs) const
+      ERotation isCCWOrCWOf(const Vector2D& rhs) const
       { return static_cast<ERotation>(sign(unnormalizedOrthogonalComp(rhs))); }
 
       /// Indicates if the given vector is more counterclockwise if you looked in the direction of this vector.
-      inline bool isCCWOf(const Vector2D& rhs) const
+      bool isCCWOf(const Vector2D& rhs) const
       { return isCCWOrCWOf(rhs) == ERotation::c_CounterClockwise; }
 
       /// Indicates if the given vector is more clockwise if you looked in the direction of this vector.
-      inline bool isCWOf(const Vector2D& rhs) const
+      bool isCWOf(const Vector2D& rhs) const
       { return isCCWOrCWOf(rhs) == ERotation::c_Clockwise; }
 
 
       /// Indicates if the given vector is more coaligned or reverse if you looked in the direction of this vector.
-      inline EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const
+      EForwardBackward isForwardOrBackwardOf(const Vector2D& rhs) const
       { return static_cast<EForwardBackward>(sign(unnormalizedParallelComp(rhs))); }
 
       /// Indicates if the given vector is more coaligned if you looked in the direction of this vector.
-      inline bool isForwardOf(const Vector2D& rhs) const
+      bool isForwardOf(const Vector2D& rhs) const
       { return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Forward; }
 
       /// Indicates if the given vector is more Reverse if you looked in the direction of this vector.
-      inline bool isBackwardOf(const Vector2D& rhs) const
+      bool isBackwardOf(const Vector2D& rhs) const
       { return isForwardOrBackwardOf(rhs) == EForwardBackward::c_Backward; }
 
 
@@ -393,17 +393,17 @@ namespace Belle2 {
       }
 
       /// Swaps the coordinates in place
-      inline void swapCoordinates() { std::swap(m_x, m_y); }
+      void swapCoordinates() { std::swap(m_x, m_y); }
 
       /// Gives the cylindrical radius of the vector. Same as norm()
-      inline double cylindricalR() const { return hypot(x(), y()); }
+      double cylindricalR() const { return hypot(x(), y()); }
 
       /// Set the cylindrical radius while keeping the azimuth angle phi the same
-      inline void setCylindricalR(const double cylindricalR)
+      void setCylindricalR(const double cylindricalR)
       { scale(cylindricalR / norm()); }
 
       /// Gives the azimuth angle being the angle to the x axes ( range -M_PI to M_PI )
-      inline double phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
+      double phi() const { return isNull() ? NAN : atan2(y(), x()) ; }
 
 
 
@@ -423,32 +423,32 @@ namespace Belle2 {
 
 
       /// Getter for the x coordinate
-      inline double x() const { return m_x; }
+      double x() const { return m_x; }
       /// Setter for the x coordinate
-      inline void setX(const double x) { m_x = x; }
+      void setX(const double x) { m_x = x; }
       /// Getter for the y coordinate
-      inline double y() const { return m_y; }
+      double y() const { return m_y; }
       /// Setter for the y coordinate
-      inline void setY(const double y) { m_y = y; }
+      void setY(const double y) { m_y = y; }
 
       /// Setter for both coordinate
-      inline void setXY(const double x, const double y) { setX(x); setY(y); }
+      void setXY(const double x, const double y) { setX(x); setY(y); }
       /// Setter for both coordinate by an other vector
-      inline void setXY(const Vector2D& xy) { m_x = xy.x(); m_y = xy.y(); }
+      void setXY(const Vector2D& xy) { m_x = xy.x(); m_y = xy.y(); }
 
       /// Getter for the first coordinate
-      inline double first() const { return m_x; }
+      double first() const { return m_x; }
       /// Setter for the first coordinate
-      inline void setFirst(const double first) { m_x = first; }
+      void setFirst(const double first) { m_x = first; }
       /// Getter for the second coordinate
-      inline double second() const { return m_y; }
+      double second() const { return m_y; }
       /// Setter for the second coordinate
-      inline void setSecond(const double second) { m_y = second; }
+      void setSecond(const double second) { m_y = second; }
 
       /// Setter for both  coordinate
-      inline void set(const double first, const double second) { setX(first); setY(second); }
+      void set(const double first, const double second) { setX(first); setY(second); }
       /// Setter for both coordinate by an other vector
-      inline void set(const Vector2D& both) { m_x = both.x(); m_y = both.y(); }
+      void set(const Vector2D& both) { m_x = both.x(); m_y = both.y(); }
 
     private:
       /// Memory for the first coordinate

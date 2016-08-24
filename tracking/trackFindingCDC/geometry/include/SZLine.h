@@ -107,7 +107,7 @@ namespace Belle2 {
       { setZ0(NAN); setTanLambda(NAN); }
 
       /// Indicates if the line parameters do not represent a valid line
-      inline bool isInvalid() const
+      bool isInvalid() const
       { return not std::isfinite(tanLambda()) or not std::isfinite(z0()); }
 
       /// Reverse the arc length direction in place

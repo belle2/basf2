@@ -184,11 +184,11 @@ namespace Belle2 {
       { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the line
-      inline bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
-      inline bool isRight(const Vector2D& rhs) const
+      bool isRight(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Calculates the point of closest approach on the line to the point
@@ -214,7 +214,7 @@ namespace Belle2 {
 
 
       /// Indicates if all circle parameters are zero
-      inline bool isInvalid() const
+      bool isInvalid() const
       { return n0() == 0.0 and n12().isNull(); }
 
       /// Gives the tangential vector in the direction of positiv advance on the line

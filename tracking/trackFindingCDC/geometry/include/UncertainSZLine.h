@@ -84,7 +84,7 @@ namespace Belle2 {
 
     public:
       /// Setter for the whole covariance matrix of the sz line parameters
-      inline void setSZCovariance(const SZCovariance& szCovariance)
+      void setSZCovariance(const SZCovariance& szCovariance)
       { m_szCovariance = szCovariance; }
 
       /// Getter for the whole covariance matrix of the sz line parameters

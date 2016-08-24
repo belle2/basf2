@@ -85,7 +85,7 @@ namespace Belle2 {
        *  You loose the information where the support point is and the scale of the parameter.
        *  However the same points lie on the line and distance to is remain the same
        */
-      inline operator Line2D() { return Line2D(distanceToOrigin(), normal().unit()); }  //not optimal yet. tangential.norm() is getting calculated two times.
+      operator Line2D() { return Line2D(distanceToOrigin(), normal().unit()); }  //not optimal yet. tangential.norm() is getting calculated two times.
 
       /// Output operate helping debugging.
       friend std::ostream& operator<<(std::ostream& output, const ParameterLine2D& line)
@@ -161,11 +161,11 @@ namespace Belle2 {
       { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the line
-      inline bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
-      inline bool isRight(const Vector2D& rhs) const
+      bool isRight(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Gives the position at the closest approach on the line to point

@@ -56,7 +56,7 @@ namespace Belle2 {
        *  This is only stable for off origin circles. The numerical stability of the transformation
        *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius().
        **/
-      inline void conformalTransform()
+      void conformalTransform()
       {
         double denominator = 1 / (center().normSquared() - radius() * radius());
         m_center *= denominator;
@@ -74,7 +74,7 @@ namespace Belle2 {
        *  This is only stable for off origin circles. The numerical stability of the transformation
        *  is subjected to the denominator center().normSquared() - signedRadius() * signedRadius().
        **/
-      inline Circle2D conformalTransformed() const
+      Circle2D conformalTransformed() const
       {
         double denominator = 1 / (center().normSquared() - radius() * radius());
         return Circle2D(center() * denominator, -radius() * denominator);
@@ -98,11 +98,11 @@ namespace Belle2 {
       { return static_cast<ERightLeft>(sign(distance(point))); }
 
       /// Return if the point given is left of the circle line
-      inline bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the circle line
-      inline bool isRight(const Vector2D& rhs) const
+      bool isRight(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Calculates the point of closest approach on the line to the point
@@ -124,27 +124,27 @@ namespace Belle2 {
       }
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
-      inline Vector2D tangential() const
+      Vector2D tangential() const
       { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
 
       /// Gives to azimuth phi of the direction of flight at the perigee
-      inline double tangentialPhi() const
+      double tangentialPhi() const
       { return tangential().phi(); }
 
       /// Gradient of the distance field
-      inline Vector2D gradient(const Vector2D& point) const
+      Vector2D gradient(const Vector2D& point) const
       {
         Vector2D connection = (point - center()) * orientation();
         return connection.unit();
       }
 
       /// Normal vector to the circle near the given position
-      inline Vector2D normal(const Vector2D& point) const
+      Vector2D normal(const Vector2D& point) const
       { return gradient(point).unit(); }
 
       /// Tangential vector to the circle near the given position
-      inline Vector2D tangential(const Vector2D& point) const
+      Vector2D tangential(const Vector2D& point) const
       { return normal(point).orthogonal(); }
 
       /// Calculates the angle between two points as seen from the center of the circle

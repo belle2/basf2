@@ -97,7 +97,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN0(const double n0)
+      void setN0(const double n0)
       { m_n0 = n0; }
 
       /**
@@ -105,7 +105,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN1(const double n1)
+      void setN1(const double n1)
       { m_n12.setX(n1); }
 
       /**
@@ -113,7 +113,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN2(const double n2)
+      void setN2(const double n2)
       { m_n12.setY(n2); }
 
       /**
@@ -121,7 +121,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN12(const double n1, const double n2)
+      void setN12(const double n1, const double n2)
       { m_n12.setXY(n1, n2); }
 
       /**
@@ -129,7 +129,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN12(const Vector2D& n12)
+      void setN12(const Vector2D& n12)
       { m_n12.setXY(n12); }
 
       /**
@@ -137,7 +137,7 @@ namespace Belle2 {
        *  Makes _no_ normalization after setting.
        *  Use is discouraged.
        */
-      inline void setN3(const double n3)
+      void setN3(const double n3)
       { m_n3 = n3; }
 
 
@@ -153,9 +153,9 @@ namespace Belle2 {
                                 const double impact);
 
       /// Setter for the perigee parameters
-      inline void setPerigeeParameters(const double curvature,
-                                       const double tangentialPhi,
-                                       const double impact)
+      void setPerigeeParameters(const double curvature,
+                                const double tangentialPhi,
+                                const double impact)
       { setPerigeeParameters(curvature, Vector2D::Phi(tangentialPhi), impact); }
 
       /**
@@ -192,7 +192,7 @@ namespace Belle2 {
       { setN(0.0, 0.0, 0.0, 0.0); }
 
       /// Flips the orientation of the circle in place
-      inline void reverse()
+      void reverse()
       { scaleN(-1); }
 
       /**
@@ -201,7 +201,7 @@ namespace Belle2 {
        *  X = x / (x^2 + y^2) and Y = y / (x^2 +y^2) inplace
        *  It works most easily by the exchange of the circle parameters n0 <-> n3
        */
-      inline void conformalTransform()
+      void conformalTransform()
       {
         std::swap(m_n0, m_n3);
         reverse(); // Correct orientation
@@ -223,7 +223,7 @@ namespace Belle2 {
        *  norm. If the normalization of the cirlce is negativ or zero all circle
        *  parameters are not changed.
        */
-      inline void normalize()
+      void normalize()
       {
         double normalization_squared = normalizationSquared();
         if (normalization_squared  > 0) scaleN(1.0 / std::sqrt(normalization_squared));
@@ -231,51 +231,51 @@ namespace Belle2 {
 
     private:
       /// Scales the circle parameters by a common factor.
-      inline void scaleN(const double factor)
+      void scaleN(const double factor)
       { m_n0 *= factor; m_n12 *= factor; m_n3 *= factor; }
 
 
     public:
       /// Getter for the first circle parameter
-      inline double n0() const
+      double n0() const
       { return m_n0; }
 
       /// Getter for the second circle parameter
-      inline double n1() const
+      double n1() const
       { return m_n12.x(); }
 
       /// Getter for the third circle parameter
-      inline double n2() const
+      double n2() const
       { return m_n12.y(); }
 
       /// Getter for the second and third circle parameter which natuarally from a vector
-      inline const Vector2D& n12() const
+      const Vector2D& n12() const
       { return m_n12; }
 
       /// Getter for the fourth circle parameter
-      inline double n3() const
+      double n3() const
       { return m_n3; }
 
     public:
       /// Indicates if all circle parameters are zero
-      inline bool isInvalid() const
+      bool isInvalid() const
       { return n0() == 0 and n12().isNull() and n3() == 0; }
 
       /// Indicates if the combination of the circle parameters makes up a valid circle
-      inline bool isValid() const
+      bool isValid() const
       { return not isInvalid(); }
 
       /**
        *  Calculates the generalized circle specific squared norm.
        *  Correctly normalized this should give one.
        */
-      inline double normalizationSquared() const
+      double normalizationSquared() const
       { return n12().normSquared() - 4 * n0() * n3(); }
 
 
     public:
       /// Returns a copy of the circle with opposite orientation.
-      inline GeneralizedCircle reversed() const
+      GeneralizedCircle reversed() const
       { return GeneralizedCircle(-n0(), -n12(), -n3()); }
 
     public:
@@ -286,7 +286,7 @@ namespace Belle2 {
        *  returns the result as a new GeneralizedCircle.
        *  It works most easily by the exchange of the circle parameters n0 <-> n3
        */
-      inline GeneralizedCircle conformalTransformed() const
+      GeneralizedCircle conformalTransformed() const
       { return GeneralizedCircle(-n3(), -n12(), -n0()); }
 
     public:
@@ -296,7 +296,7 @@ namespace Belle2 {
        *  @param point Point in the plane to calculate the gradient
        *  @return Gradient of the distance field
        */
-      inline Vector2D gradient(const Vector2D& point) const
+      Vector2D gradient(const Vector2D& point) const
       { return point * (2.0 * n3()) + n12(); }
 
       /**
@@ -308,7 +308,7 @@ namespace Belle2 {
        *  @param point Point in the plane to calculate the tangential
        *  @return Unit normal vector to the circle line
        */
-      inline Vector2D normal(const Vector2D& point) const
+      Vector2D normal(const Vector2D& point) const
       { return gradient(point).unit(); }
 
       /**
@@ -319,7 +319,7 @@ namespace Belle2 {
        *  @param point Point in the plane to calculate the tangential
        *  @return Unit tangential vector to the circle line
        */
-      inline Vector2D tangential(const Vector2D& point) const
+      Vector2D tangential(const Vector2D& point) const
       { return normal(point).orthogonal(); }
 
       /**
@@ -402,11 +402,11 @@ namespace Belle2 {
        *  The sign of the fast distance indicates if the point is to the right or to the left of the
        *  circle.
        */
-      inline double fastDistance(const Vector2D& point) const
+      double fastDistance(const Vector2D& point) const
       { return n0() + point.dot(n12()) + point.normSquared() * n3(); }
 
       /// Approximate distance to the origin
-      inline double fastImpact() const
+      double fastImpact() const
       { return n0(); }
 
       /**
@@ -430,7 +430,7 @@ namespace Belle2 {
       { return (distance * n3() + 1.0) * distance; }
 
       /// Gives the signed distance of the origin to the circle
-      inline double impact() const
+      double impact() const
       { return distance(fastImpact()); }
 
       /// Getter for the absolute distance to the z axes at the support point
@@ -438,23 +438,23 @@ namespace Belle2 {
       { return -impact(); }
 
       /// Gives the tangential vector at the closest approach to the origin / at the perigee
-      inline Vector2D tangential() const
+      Vector2D tangential() const
       { return tangential(Vector2D(0.0, 0.0)).unit(); }
 
       /// Gives to azimuth angle phi of the direction of flight at the perigee
-      inline double tangentialPhi() const
+      double tangentialPhi() const
       { return tangential().phi(); }
 
       /// Gives the minimal cylindrical radius the circle reaches (unsigned)
-      inline double minimalCylindricalR() const
+      double minimalCylindricalR() const
       { return std::fabs(impact()); }
 
       /// Gives the maximal cylindrical radius the circle reaches
-      inline double maximalCylindricalR() const
+      double maximalCylindricalR() const
       { return std::fabs(impact() + 2 * radius()); }
 
       /// Gives the proper absolute distance of the point to the circle line.
-      inline double absDistance(const Vector2D& point) const
+      double absDistance(const Vector2D& point) const
       { return fabs(distance(point)); }
 
       /**
@@ -465,46 +465,46 @@ namespace Belle2 {
       { return static_cast<ERightLeft>(sign(fastDistance(point))); }
 
       /// Return if the point given is left of the line
-      inline bool isLeft(const Vector2D& rhs) const
+      bool isLeft(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Left; }
 
       /// Return if the point given is right of the line
-      inline bool isRight(const Vector2D& rhs) const
+      bool isRight(const Vector2D& rhs) const
       { return isRightOrLeft(rhs) == ERightLeft::c_Right; }
 
       /// Indicates if the generalized circle is actually a line
-      inline bool isLine() const
+      bool isLine() const
       { return n3() == 0.0; }
 
       /// Indicates if the generalized circle is actually a circle
-      inline bool isCircle() const
+      bool isCircle() const
       { return n3() != 0.0; }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline double radius() const
+      double radius() const
       { return 1 / curvature(); }
 
       /// Gives the signed radius of the circle. If it was a line this will be infinity
-      inline double absRadius() const
+      double absRadius() const
       { return fabs(radius()); }
 
       /// Gives the signed curvature of the generalized circle
-      inline double curvature() const
+      double curvature() const
       { return 2 * n3(); }
 
       /**
        *  Gives the omega parameter as used by the framework helix.
        *  It is the signed curvature of the generalized circle with the opposite sign.
        */
-      inline double omega() const
+      double omega() const
       { return -curvature(); }
 
       /// Gives the center of the circle. If it was a line both components will be infinity
-      inline Vector2D center() const
+      Vector2D center() const
       { return n12().divided(-2 * n3()); }
 
       /// Gives the perimeter of the circle.
-      inline double perimeter() const
+      double perimeter() const
       { return 2 * M_PI * radius(); }
 
       /**
@@ -512,7 +512,7 @@ namespace Belle2 {
        *  The circle can be either orientated counterclockwise or clockwise.
        *  @return ERotation::c_CounterClockwise for counterclockwise travel, ERotation::c_Clockwise for clockwise.
        */
-      inline ERotation orientation() const
+      ERotation orientation() const
       { return static_cast<ERotation>(sign(n3())); }
 
       /// Getter for the arc length for a full round of the circle

@@ -187,7 +187,7 @@ namespace Belle2 {
       { return UncertainSZLine(helix().szLine(), HelixUtil::getSZCovariance(helixCovariance()));}
 
       /// Setter for the whole covariance matrix of the perigee parameters
-      inline void setHelixCovariance(const HelixCovariance& helixCovariance)
+      void setHelixCovariance(const HelixCovariance& helixCovariance)
       { m_helixCovariance = helixCovariance; }
 
       /// Getter for the whole covariance matrix of the perigee parameters
@@ -219,7 +219,7 @@ namespace Belle2 {
       { m_ndf = ndf; }
 
       /// Sets all circle parameters to zero and the covariance matrix to something noninformative
-      inline void invalidate()
+      void invalidate()
       {
         m_helix.invalidate();
         m_helixCovariance = HelixUtil::identity();
@@ -229,14 +229,14 @@ namespace Belle2 {
 
     public:
       /// Flips the orientation of the circle in place
-      inline void reverse()
+      void reverse()
       {
         m_helix.reverse();
         HelixUtil::reverse(m_helixCovariance);
       }
 
       /// Returns a copy of the circle with opposite orientation.
-      inline UncertainHelix reversed() const
+      UncertainHelix reversed() const
       { return UncertainHelix(m_helix.reversed(), HelixUtil::reversed(m_helixCovariance), chi2(), ndf()); }
 
     public:

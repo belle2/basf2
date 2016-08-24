@@ -76,14 +76,14 @@ namespace Belle2 {
       { return circleXY().isInvalid() and szLine().isInvalid(); }
 
       /// Flips the travel direction of the helix in place, pivot point is unchanged.
-      inline void reverse()
+      void reverse()
       {
         m_circleXY.reverse();
         m_szLine.reverse();
       }
 
       /// Returns a copy of the helix with flips the travel direction, pivot point is the same.
-      inline Helix reversed() const
+      Helix reversed() const
       { return Helix(circleXY().reversed(), szLine().reversed()); }
 
     public:

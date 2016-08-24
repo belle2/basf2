@@ -66,7 +66,7 @@ namespace Belle2 {
       }
 
       /// Setter for the whole covariance matrix of the line parameters
-      inline void setLineCovariance(const LineCovariance& lineCovariance)
+      void setLineCovariance(const LineCovariance& lineCovariance)
       { m_lineCovariance = lineCovariance; }
 
       /// Getter for the whole covariance matrix of the line parameters
@@ -98,7 +98,7 @@ namespace Belle2 {
       { m_ndf = ndf; }
 
       /// Sets all line parameters to zero including the covariance matrix
-      inline void invalidate()
+      void invalidate()
       {
         m_parameterLine2D.invalidate();
         m_lineCovariance = LineUtil::identity();
@@ -108,14 +108,14 @@ namespace Belle2 {
 
     public:
       /// Reverses the direction of flight represented by this line
-      inline void reverse()
+      void reverse()
       {
         m_parameterLine2D.reverse();
         LineUtil::reverse(m_lineCovariance);
       }
 
       /// Returns a copy of the line corresponding to the reverse direction of travel.
-      inline UncertainParameterLine2D reversed() const
+      UncertainParameterLine2D reversed() const
       {
         return UncertainParameterLine2D(m_parameterLine2D.reversed(),
                                         LineUtil::reversed(lineCovariance()),

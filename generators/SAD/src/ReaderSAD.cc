@@ -205,20 +205,12 @@ bool ReaderSAD::getRealParticle(MCParticleGraph& graph)
       m_tree->GetEntry(m_readEntry);
       convertParamsToSADUnits();
 
-      //Start my addition
-      StoreArray<SADMetaHit> SADMetaHits;
-      SADMetaHits.appendNew(SADMetaHit(m_inputSAD_ssraw, m_inputSAD_sraw, m_inputSAD_ss, m_lostS,
-                                       m_inputSAD_Lss, m_inputSAD_nturn,
-                                       m_lostX, m_lostY, m_lostPx, m_lostPy, m_inputSAD_xraw, m_inputSAD_yraw,
-                                       m_inputSAD_r, m_inputSAD_rr, m_inputSAD_dp_over_p0, m_lostE, m_lostRate,
-                                       m_inputSAD_watt));
-      //End my addition
-
       B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
               " and rate = " << m_lostRate << " Hz");
     } while ((fabs(m_lostS) > m_sRange) && (m_readEntry < m_tree->GetEntries()));
 
-    m_realPartNum = calculateRealParticleNumber(m_lostRate);
+    if (fabs(m_lostS) <= m_sRange)
+      m_realPartNum = calculateRealParticleNumber(m_lostRate);
   }
 
   //Create a new real particle from the SAD particle
@@ -301,9 +293,9 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   particle.setStatus(MCParticle::c_PrimaryParticle);
 
   switch (m_accRing) {
-    case c_HER: particle.setPDG(11); //electrons
+    case c_HER: particle.setPDG(-11); //electrons
       break;
-    case c_LER: particle.setPDG(-11); //positrons
+    case c_LER: particle.setPDG(11); //positrons
       break;
   }
 
@@ -326,11 +318,8 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
 
   TGeoHMatrix* m_transMatrix2 = new TGeoHMatrix(SADtoGeant(m_accRing, m_lostS)); //overwrite m_transMatrix given by initialize()
 
-  if (abs(m_lostS) < 400.) { //4m
-    particlePosGeant4[0] = particlePosSAD[0];
-    particlePosGeant4[1] = particlePosSAD[1];
-    particlePosGeant4[2] = particlePosSAD[2];
-    //m_transMatrix->LocalToMaster(particlePosSAD, particlePosGeant4);
+  if (abs(m_lostS) <= 400.) { //4m
+    m_transMatrix->LocalToMaster(particlePosSAD, particlePosGeant4);
   } else {
     m_transMatrix2->LocalToMaster(particlePosSADfar, particlePosGeant4);
   }
@@ -358,29 +347,16 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
       break;
   }
 
-  if (abs(m_lostS) < 400.) {
-    particleMomGeant4[0] = particleMomSAD[0];
-    particleMomGeant4[1] = particleMomSAD[1];
-    particleMomGeant4[2] = particleMomSAD[2];
-    //m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);
+  if (abs(m_lostS) <= 400.) {
+    m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);
   } else {
     m_transMatrix2->LocalToMasterVect(particleMomSAD, particleMomGeant4);
-  }
-
-  switch (m_accRing) {
-    case c_HER: particle.setPDG(-11); //electrons
-      break;
-    case c_LER: particle.setPDG(11); //positrons
-      break;
   }
 
   //Set missing particle information
   particle.setMomentum(TVector3(particleMomGeant4));
   particle.setProductionVertex(TVector3(particlePosGeant4));
   particle.setProductionTime(0.0);
-  //particle.setEnergy(m_lostE);
-  particle.setPDG(particle.getPDG());
-  particle.setMass(particle.getMass());
   particle.setEnergy(sqrt(m_lostE * m_lostE + particle.getMass()*particle.getMass()));
   particle.setValidVertex(true);
 

@@ -65,6 +65,32 @@ class LatexObject(object):
             \usepackage{longtable}
             \usepackage{color}
             \usepackage[load-configurations=abbreviations]{siunitx}
+            \makeatletter
+            % In newer versions of latex there is a problem with the calc package and tikz
+            % http://tex.stackexchange.com/questions/289551/how-to-resolve-conflict-between-versions-of-texlive-and-pgf
+            \def\pgfmathparse@#1{%
+                % Stuff for calc compatiability.
+                \let\real=\pgfmath@calc@real
+                \let\minof=\pgfmath@calc@minof
+                \let\maxof=\pgfmath@calc@maxof
+                \let\ratio=\pgfmath@calc@ratio
+                \let\widthof=\pgfmath@calc@widthof
+                \let\heightof=\pgfmath@calc@heightof
+                \let\depthof=\pgfmath@calc@depthof
+                % No (math) units yet.
+                \global\pgfmathunitsdeclaredfalse
+                \global\pgfmathmathunitsdeclaredfalse
+                % Expand expression so any reamining CSs are registers
+                % or box dimensions (i.e. |\wd|, |\ht|, |\dp|).
+                \edef\pgfmath@expression{#1}%
+                    %
+                    \expandafter\pgfmathparse@trynumber@loop\pgfmath@expression\pgfmath@parse@stop
+                    %
+                    % this here is the _real_ parser. it is invoked by
+                    % \pgfmathparse@trynumber@loop if that says "this is no number"
+                    %\pgfmathparse@@\pgfmath@parse@stop%
+                }
+            \makeatother
             \begin{document}
             """
         output += self.output

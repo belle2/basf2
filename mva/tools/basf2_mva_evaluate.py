@@ -100,7 +100,7 @@ if __name__ == '__main__':
 
     o += b2latex.Section("Variables")
     table = b2latex.LongTable(columnspecs=r'p{5cm}' + r'|rr' * len(informations),
-                              caption='List of variables used in the training: ' + ', '.join(labels),
+                              caption='List of variables used in the training: ' + ', '.join(map(format.string, labels)),
                               head=r'Name ' + ' & Rank / Importance ' * len(informations) + r' \\',
                               format_string=r'{} ' + ' & ${} / {:.4f}$ ' * len(informations))
     for v in variables:

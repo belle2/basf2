@@ -18,6 +18,7 @@ def variable(variable_string):
         @return string with hyphenation hints for latex
     """
     substitutes = {
+        '_': '\_',
         '=': r'=\allowbreak ',
         ':': r':\allowbreak ',
         '(': r'(\allowbreak ',

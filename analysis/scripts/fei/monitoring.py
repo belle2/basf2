@@ -228,7 +228,23 @@ class MonitoringMVARanking(object):
 
 class MonitoringModuleStatistics(object):
 
-    def __init__(self, particle, statistic, particle2list, channel2lists):
+    def __init__(self, particle, particle2list, channel2lists):
+
+        root_file = ROOT.TFile('Monitor_ModuleStatistics.root')
+        persistentTree = root_file.Get('persistent')
+        persistentTree.GetEntry(0)
+        # Clone() needed so we actually own the object (original dies when tfile is deleted)
+        stats = persistentTree.ProcessStatistics.Clone()
+
+        # merge statistics from all persistent trees into 'stats'
+        numEntries = persistentTree.GetEntriesFast()
+        for i in range(1, numEntries):
+            persistentTree.GetEntry(i)
+            stats.merge(persistentTree.ProcessStatistics)
+
+        # TODO .getTimeSum returns always 0 at the moment ?!
+        statistic = {m.getName(): m.getTimeSum(m.c_Event) / 1e9 for m in stats.getAll()}
+
         self.channel_time = {}
         self.channel_time_per_module = {}
         for channel in particle.channels:
@@ -587,7 +603,7 @@ class MonitoringParticle(object):
 
         self.mc_count = MonitoringMCCount(particle, summary)
 
-        self.module_statistic = MonitoringModuleStatistics(particle, summary['module_statistics'], particle2list, channel2lists)
+        self.module_statistic = MonitoringModuleStatistics(particle, particle2list, channel2lists)
         self.time_per_channel = self.module_statistic.channel_time
         self.time_per_channel_per_module = self.module_statistic.channel_time_per_module
         self.total_time = self.module_statistic.particle_time + sum(self.time_per_channel.values())

@@ -70,6 +70,7 @@ namespace Belle2 {
       /** Vector of background-Sensitive detectors */
       std::vector<BkgSensitiveDetector*> m_bkgsensitive;
       std::map<std::string, G4VisAttributes*> m_atts;
+      int m_overlap;
     };
 
   } // end of ecl namespace

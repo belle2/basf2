@@ -41,7 +41,7 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
   bool b_crystals = 1;
   bool b_preamplifier = 1;
   bool b_support_leg = 1;
-  int overlap = 1;
+  int overlap = m_overlap;
 
   if (b_inner_support_ring) {
     zr_t vc1[] = {{0., 452.3 + 3}, {0., 452.3}, {3., 474.9 - 20 / cosd(27.81)}, {434., 702.27 - 20 / cosd(27.81)}, {434., 702.27}, {3., 474.9}, {3., 452.3 + 3}};

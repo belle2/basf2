@@ -49,7 +49,7 @@ void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume
   bool b_boards = 0;
   bool b_cover = 0;
 
-  int overlap = 1;
+  int overlap = m_overlap;
   const double th0 = 13.12, th1 = 32.98;
   const double ZT = 437, ZI = 434, RI = 431, RIp = 532.2, RC = 1200.4, RT = 1415;
   if (b_inner_support_ring) {

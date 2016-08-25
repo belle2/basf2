@@ -37,7 +37,7 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
 
-    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0)
+    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0), m_overlap(0)
     {
       m_sensitive = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);

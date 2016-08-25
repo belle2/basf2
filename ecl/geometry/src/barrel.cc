@@ -85,7 +85,7 @@ void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume&
 
   int nseg = 72;
 
-  int overlap = 1;
+  int overlap = m_overlap;
 
   G4LogicalVolume* sectorlogical; // tilted sector
   {

@@ -415,7 +415,7 @@ class EventType:
 
     def Sample(self):
         # Check if overriden
-        if 'Sample' in list(self.KeywordDictionary.keys()):
+        if 'Sample' in self.KeywordDictionary:
             return self.KeywordDictionary['Sample']
         sample = 'otherTreatment'
         if int(self.EventTypeNumber()[0]) in (1, 2, 3, 7):

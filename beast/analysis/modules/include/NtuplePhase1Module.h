@@ -74,6 +74,8 @@ namespace Belle2 {
 
   private:
 
+    std::vector<Int_t> m_input_ts; /**< time stamp start and stop */
+
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     std::vector<Float_t> m_input_LT_DIA_dose; /**< list of DIA LT dose */
     std::vector<Float_t> m_input_HT_DIA_dose; /**< list of DIA HT dose */

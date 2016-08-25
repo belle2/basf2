@@ -63,6 +63,8 @@ namespace Belle2 {
 
     addParam("outputFileName", m_outputFileName, "Output file name");
 
+    addParam("input_ts", m_input_ts, "Input time stamp start and stop");
+
     addParam("input_I_HER", m_input_I_HER, "HER current");
     addParam("input_I_LER", m_input_I_LER, "LER current");
 
@@ -835,7 +837,8 @@ namespace Belle2 {
     m_beast.SKB_HER_integratedCurrent.push_back(m_skb.VAHBMD_BEAMDOSE_VAL);
     m_beast.SKB_LER_integratedCurrent.push_back(m_skb.VALBMD_BEAMDOSE_VAL);
 
-    m_treeBEAST->Fill();
+    if (m_input_ts[0] <= m_beast.ts && m_beast.ts <= m_input_ts[1])
+      m_treeBEAST->Fill();
 
     // set event metadata
     //evtMetaData->setEvent(m_eventCount);

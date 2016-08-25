@@ -526,6 +526,15 @@ def SaveModuleStatistics(resource: fei.dag.Resource) -> typing.Mapping[str, floa
         @return cpu time statistic
     """
     resource.cache = True
+
+    if resource.env['monitor']:
+        output = register_module('RootOutput')
+        output.param('outputFileName', 'Monitor_ModuleStatistics.root')
+        output.param('branchNames', ['EventMetaData'])  # cannot be removed, but of only small effect on file size
+        output.param('branchNamesPersistent', ['ProcessStatistics'])
+        output.param('ignoreCommandLineOverride', True)
+        resource.path.add_module(output)
+
     filename = 'moduleStatistics_' + resource.hash + '.root'
     if not os.path.isfile(filename):
         output = register_module('RootOutput')

@@ -24,9 +24,9 @@ def getCommandLineOptions():
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
                         help='DB Identifier or weightfile')
-    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, required=False, action='append', nargs='+',
+    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, required=True, action='append', nargs='+',
                         help='Data file containing ROOT TTree used during training')
-    parser.add_argument('-test', '--test_datafiles', dest='test_datafiles', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-test', '--test_datafiles', dest='test_datafiles', type=str, required=False, action='append', nargs='+',
                         help='Data file containing ROOT TTree with independent test data')
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
@@ -67,7 +67,10 @@ if __name__ == '__main__':
     tempdir = tempfile.mkdtemp()
     identifiers = sum(args.identifiers, [])
     train_datafiles = sum(args.train_datafiles, [])
-    test_datafiles = sum(args.test_datafiles, [])
+    if args.test_datafiles is not None:
+        test_datafiles = sum(args.test_datafiles, [])
+    else:
+        test_datafiles = []
 
     train_rootfilename = tempdir + '/train_expert.root'
     basf2_mva.expert(basf2_mva.vector(*identifiers), basf2_mva.vector(*train_datafiles), args.treename, train_rootfilename)

@@ -673,430 +673,430 @@
     <FLayers>
       <FLayer id="0">
         <Radius desc="Radius of field wires in this layer" unit="mm">173</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-299.645</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">565.858</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-312.1</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">588.45</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="1">
         <Radius desc="Radius of field wires in this layer" unit="mm">183</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-316.965</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">598.566</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-329.42</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">621.16</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="2">
         <Radius desc="Radius of field wires in this layer" unit="mm">193</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-334.286</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">631.275</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-346.74</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">653.87</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="3">
         <Radius desc="Radius of field wires in this layer" unit="mm">203</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-351.606</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">663.983</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-364.06</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">686.58</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="4">
         <Radius desc="Radius of field wires in this layer" unit="mm">213</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-368.927</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">696.692</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-381.38</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">719.29</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="5">
         <Radius desc="Radius of field wires in this layer" unit="mm">223</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-386.247</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">729.4</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-398.7</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">752.0</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="6">
         <Radius desc="Radius of field wires in this layer" unit="mm">233</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-403.568</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">762.109</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-416.02</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">784.7</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="7">
         <Radius desc="Radius of field wires in this layer" unit="mm">243</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-420.888</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">794.817</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-433.34</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">817.41</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="8">
         <Radius desc="Radius of field wires in this layer" unit="mm">266.1</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-460.899</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">870.374</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-479.91</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">890.87</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="9">
         <Radius desc="Radius of field wires in this layer" unit="mm">284.3</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-492.422</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">929.904</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-511.43</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">950.4</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="10">
         <Radius desc="Radius of field wires in this layer" unit="mm">302.5</Radius>
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-523.946</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">989.433</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-542.96</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1009.92</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="11">
         <Radius desc="Radius of field wires in this layer" unit="mm">320.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-555.469</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-557.688</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1048.96</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-570.3</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1069.45</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="12">
         <Radius desc="Radius of field wires in this layer" unit="mm">338.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-586.992</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-561.226</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1108.49</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-573.84</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1128.98</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="13">
         <Radius desc="Radius of field wires in this layer" unit="mm">356.6</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-614.866</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-564.666</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1166.39</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-577.28</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1186.88</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">320</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">14</NShift>
       </FLayer>
       <FLayer id="14">
         <Radius desc="Radius of field wires in this layer" unit="mm">374.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-618.307</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-568.107</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1224.28</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-580.72</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1244.77</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="15">
         <Radius desc="Radius of field wires in this layer" unit="mm">392.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-621.845</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-571.645</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1283.81</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-584.25</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1304.3</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="16">
         <Radius desc="Radius of field wires in this layer" unit="mm">410.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-625.382</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-575.182</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1343.34</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-587.79</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1363.83</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="17">
         <Radius desc="Radius of field wires in this layer" unit="mm">428.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-628.92</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-578.72</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1402.87</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-591.33</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1423.36</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="18">
         <Radius desc="Radius of field wires in this layer" unit="mm">447.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-632.458</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-582.258</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1432.46</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-594.9</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1449.9</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="19">
         <Radius desc="Radius of field wires in this layer" unit="mm">466.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-636.19</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-585.99</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1436.19</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-596.5</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1451.5</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">384</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">11</NShift>
       </FLayer>
       <FLayer id="20">
         <Radius desc="Radius of field wires in this layer" unit="mm">485.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-639.922</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-589.722</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1439.92</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-602.337</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1457.34</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="21">
         <Radius desc="Radius of field wires in this layer" unit="mm">503.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-643.46</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-593.26</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1443.46</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-605.875</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1460.88</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="22">
         <Radius desc="Radius of field wires in this layer" unit="mm">521.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-646.997</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-596.797</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1447</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-609.413</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1464.41</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="23">
         <Radius desc="Radius of field wires in this layer" unit="mm">540.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-650.535</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-600.335</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1450.54</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-612.951</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1467.95</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="24">
         <Radius desc="Radius of field wires in this layer" unit="mm">558.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-654.073</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-603.873</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1454.07</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-616.488</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1471.49</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">18</NShift>
       </FLayer>
       <FLayer id="25">
         <Radius desc="Radius of field wires in this layer" unit="mm">575.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-657.416</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-607.216</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1457.42</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-619.832</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1474.83</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">448</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
       </FLayer>
       <FLayer id="26">
         <Radius desc="Radius of field wires in this layer" unit="mm">592.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-660.759</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-610.559</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1460.76</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-623.175</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1478.17</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="27">
         <Radius desc="Radius of field wires in this layer" unit="mm">610.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-664.297</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-614.097</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1464.3</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-626.713</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1481.71</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="28">
         <Radius desc="Radius of field wires in this layer" unit="mm">629.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-667.835</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-617.635</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1467.84</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-630.25</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1485.25</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="29">
         <Radius desc="Radius of field wires in this layer" unit="mm">647.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-671.373</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-621.173</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1471.37</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-633.788</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1488.79</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="30">
         <Radius desc="Radius of field wires in this layer" unit="mm">665.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-674.91</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-624.71</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1474.91</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-637.326</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1492.33</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="31">
         <Radius desc="Radius of field wires in this layer" unit="mm">684.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-678.642</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-628.442</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1478.64</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-641.058</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1496.06</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">512</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">12</NShift>
       </FLayer>
       <FLayer id="32">
         <Radius desc="Radius of field wires in this layer" unit="mm">703.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-682.375</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-632.175</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1482.38</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-644.79</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1499.79</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">19</NShift>
       </FLayer>
       <FLayer id="33">
         <Radius desc="Radius of field wires in this layer" unit="mm">722.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-685.912</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-635.712</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1485.91</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-648.328</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1503.33</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">19</NShift>
       </FLayer>
       <FLayer id="34">
         <Radius desc="Radius of field wires in this layer" unit="mm">740.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-689.45</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-639.25</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1489.45</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-651.865</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1506.87</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">19</NShift>
       </FLayer>
       <FLayer id="35">
         <Radius desc="Radius of field wires in this layer" unit="mm">758.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-692.988</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-642.788</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1492.99</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-655.403</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1510.4</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">19</NShift>
       </FLayer>
       <FLayer id="36">
         <Radius desc="Radius of field wires in this layer" unit="mm">776.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-696.525</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-646.325</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1496.53</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-658.941</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1513.94</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">19</NShift>
       </FLayer>
       <FLayer id="37">
         <Radius desc="Radius of field wires in this layer" unit="mm">793.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-699.869</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-649.669</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1499.87</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-662.284</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1517.28</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">576</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
       </FLayer>
       <FLayer id="38">
         <Radius desc="Radius of field wires in this layer" unit="mm">811.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-703.212</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-653.012</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1503.21</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-665.628</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1520.63</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="39">
         <Radius desc="Radius of field wires in this layer" unit="mm">829.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-706.75</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-656.55</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1506.75</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-669.165</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1524.17</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="40">
         <Radius desc="Radius of field wires in this layer" unit="mm">847.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-710.288</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-660.088</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1510.29</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-672.703</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1527.7</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="41">
         <Radius desc="Radius of field wires in this layer" unit="mm">865.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-713.825</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-663.625</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1513.83</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-676.241</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1531.24</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="42">
         <Radius desc="Radius of field wires in this layer" unit="mm">883.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-717.363</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-667.163</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1517.36</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-679.779</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1534.78</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="43">
         <Radius desc="Radius of field wires in this layer" unit="mm">903.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-721.095</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-670.895</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1521.1</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-683.511</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1538.51</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">640</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">13</NShift>
       </FLayer>
       <FLayer id="44">
         <Radius desc="Radius of field wires in this layer" unit="mm">922.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-724.827</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-674.627</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1524.83</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-687.243</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1542.24</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">20</NShift>
       </FLayer>
       <FLayer id="45">
         <Radius desc="Radius of field wires in this layer" unit="mm">940.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-728.365</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-678.165</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1528.37</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-690.78</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1545.78</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">20</NShift>
       </FLayer>
       <FLayer id="46">
         <Radius desc="Radius of field wires in this layer" unit="mm">958.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-731.903</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-681.703</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1531.9</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-694.318</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1549.32</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">20</NShift>
       </FLayer>
       <FLayer id="47">
         <Radius desc="Radius of field wires in this layer" unit="mm">976.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-735.44</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-685.24</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1535.44</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-697.856</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1552.86</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">20</NShift>
       </FLayer>
       <FLayer id="48">
         <Radius desc="Radius of field wires in this layer" unit="mm">995.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-738.978</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-688.778</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1538.98</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-701.394</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1556.39</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">20</NShift>
       </FLayer>
       <FLayer id="49">
         <Radius desc="Radius of field wires in this layer" unit="mm">1012.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-742.321</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-692.121</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1542.32</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-704.737</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1559.74</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">704</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">14</NShift>
       </FLayer>
       <FLayer id="50">
         <Radius desc="Radius of field wires in this layer" unit="mm">1029.5</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-745.665</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-695.465</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1545.67</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-708.08</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1563.08</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">768</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="51">
         <Radius desc="Radius of field wires in this layer" unit="mm">1047.7</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-749.202</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-699.003</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1549.2</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-711.618</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1566.62</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">768</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="52">
         <Radius desc="Radius of field wires in this layer" unit="mm">1065.9</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-752.74</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-702.54</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1552.74</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-715.156</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1570.16</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">768</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="53">
         <Radius desc="Radius of field wires in this layer" unit="mm">1084.1</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-756.278</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-706.078</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1556.28</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-718.693</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1573.69</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">768</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>
       <FLayer id="54">
         <Radius desc="Radius of field wires in this layer" unit="mm">1102.3</Radius>
 	<!--        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-759.816</BackwardZ> -->
-        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm">-709.616</BackwardZ>
-        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm">1559.82</ForwardZ>
+        <BackwardZ desc="z position of this field wire layer at backward endplate" unit="mm" updated="yes">-722.231</BackwardZ>
+        <ForwardZ desc="z position of this field wire layer at forward endplate" unit="mm" updated="yes">1577.23</ForwardZ>
         <NHoles desc="the number of holes in this layer, 2*(cell number)">768</NHoles>
         <NShift desc="the shifted hole number of each wire in this layer">0</NShift>
       </FLayer>

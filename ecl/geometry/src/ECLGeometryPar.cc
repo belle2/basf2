@@ -176,8 +176,6 @@ void ECLGeometryPar::clear()
   mPar_phiID = 0;
 }
 
-const double sectorPhi[2] = {M_PI / 36, M_PI / 8};
-
 // There is no way to get world coordinates of a local point of a physical volume in Geant.
 // The only way to check geometry is to trace particle and check volumes it crosses.
 // Here particle gun parameters are produced to check crystal positions with the center @ r0 and direction n
@@ -254,7 +252,7 @@ void ECLGeometryPar::read()
     // since barrel sector is symmetric around phi=0 we need to
     // translate crystal with negative phi back to positive rotating
     // crystal position by (2*M_PI/72) angle
-    G4Transform3D Ts1 = G4RotateZ3D(sectorPhi[0]) * Ts;
+    G4Transform3D Ts1 = G4RotateZ3D(M_PI / 36) * Ts;
 
     G4String tname("ECLBarrelWrappedCrystal_Physical_");
     for (int i = 0; i < 2 * 46; i++) {

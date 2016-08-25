@@ -386,7 +386,6 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
   int PhiId;
   if (NCryst == 2) {
     PhiId = (i2 - (ik % 2)) * NCryst + ik;
-    //    cout<<"UU "<<i1<<" "<<PhiId<<"\n";
     if (PhiId < 0) PhiId += 144;
   } else {
     int i3 = h->GetReplicaNo(hd - 3); // go up in volume hierarchy
@@ -437,13 +436,15 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
 {
   int depth = touch->GetHistoryDepth();
-  if ((depth != 5) && (depth != 6)) {
-    B2WARNING("ECLGeometryPar::ECLVolumeToCellID: History depth = " << depth << " is out of range: should be 5 or 6.");
+  if ((depth != 3) && (depth != 5)) {
+    B2WARNING("ECLGeometryPar::ECLVolumeToCellID: History depth = " << depth << " is out of range: should be 3 or 5.");
     return -1;
   }
   const G4String& vname = touch->GetVolume()->GetName();
-  std::size_t pos = vname.find("CrystalPhysical_");
-  if (pos == string::npos) {
+  std::size_t pos0 = vname.find("lv_forward_crystal_");
+  std::size_t pos1 = vname.find("lv_barrel_crystal_");
+  std::size_t pos2 = vname.find("lv_backward_crystal_");
+  if (pos0 == string::npos && pos1 == string::npos && pos2 == string::npos) {
     B2WARNING("ECLGeometryPar::ECLVolumeToCellID: Volume name does not match pattern. NAME=" << vname);
     return -1;
   }

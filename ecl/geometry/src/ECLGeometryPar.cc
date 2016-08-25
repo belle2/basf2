@@ -274,16 +274,65 @@ void ECLGeometryPar::read()
   B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }
 
+template <int n>
+void sincos(const double* ss, int iphi, double& s, double& c)
+{
+  int n4 = n / 4;
+  int iq = iphi / n4; // quadrant
+  int is = iphi % n4;
+  int ic = n4 - is;
+  if (iq & 1) {int t = is; is = ic; ic = t;}
+  double ls = ss[is];
+  double lc = ss[ic];
+  // check quadrant and assign sign bit accordingly
+  if ((((0 << 0) + (0 << 1) + (1 << 2) + (1 << 3)) >> iq) & 1) ls = -ls;
+  if ((((0 << 0) + (1 << 1) + (1 << 2) + (0 << 3)) >> iq) & 1) lc = -lc;
+  s = ls;
+  c = lc;
+}
+
+double ss72[] = {
+  0.0000000000000000000000,
+  0.0871557427476581735581,
+  0.1736481776669303488517,
+  0.2588190451025207623489,
+  0.3420201433256687330441,
+  0.4226182617406994361870,
+  0.5000000000000000000000,
+  0.5735764363510460961080,
+  0.6427876096865393263226,
+  0.7071067811865475244008,
+  0.7660444431189780352024,
+  0.8191520442889917896845,
+  0.8660254037844386467637,
+  0.9063077870366499632426,
+  0.9396926207859083840541,
+  0.9659258262890682867497,
+  0.9848077530122080593667,
+  0.9961946980917455322950,
+  1.0000000000000000000000
+};
+
+double ss16[] = {
+  0.0000000000000000000000,
+  0.3826834323650897717285,
+  0.7071067811865475244008,
+  0.9238795325112867561282,
+  1.0000000000000000000000
+};
+
 TVector3 geom_pos, geom_vec;
 
 void ECLGeometryPar::InitCrystal(int cid)
 {
   int thetaid, phiid, nreplica, indx;
   Mapping_t::Mapping(cid, thetaid, phiid, nreplica, indx);
-  int isect = indx > 131 ? 0 : 1;
   const CrystalGeom_t& t = m_crystals[indx];
-  double phi = nreplica * sectorPhi[isect], s, c;
-  sincos(phi, &s, &c);
+  double s, c;
+  if (indx > 131)
+    sincos<72>(ss72, nreplica, s, c);
+  else
+    sincos<16>(ss16, nreplica, s, c);
 
   double xp = c * t.pos.x() - s * t.pos.y();
   double yp = s * t.pos.x() + c * t.pos.y();
@@ -326,35 +375,36 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
   //  call instead of three here
   const G4NavigationHistory* h = touch->GetHistory();
   int hd = h->GetDepth();
-  int indx     = h->GetReplicaNo(hd - 1); // index of each volume is set at physical volume creation
-  int NReplica = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
+  int i1 = h->GetReplicaNo(hd - 1); // index of each volume is set at physical volume creation
+  int i2 = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
 
-  int ThetaId  = Mapping_t::Indx2ThetaId(indx);
-  int NCryst   = Mapping_t::ThetaId2NCry(ThetaId); // the number of crystals in a sector at given ThetaId
-  int Offset   = Mapping_t::Offset(ThetaId);
+  int ThetaId = Mapping_t::Indx2ThetaId(i1);
+  int NCryst  = Mapping_t::ThetaId2NCry(ThetaId); // the number of crystals in a sector at given ThetaId
+  int Offset  = Mapping_t::Offset(ThetaId);
 
-  int ik = indx - Offset;
+  int ik = i1 - Offset;
   int PhiId;
   if (NCryst == 2) {
-    PhiId = (NReplica - (ik % 2)) * NCryst + ik;
-    PhiId = (PhiId + 144) % 144;
+    PhiId = (i2 - (ik % 2)) * NCryst + ik;
+    //    cout<<"UU "<<i1<<" "<<PhiId<<"\n";
+    if (PhiId < 0) PhiId += 144;
   } else {
-    int n3 = h->GetReplicaNo(hd - 3); // go up in volume hierarchy
+    int i3 = h->GetReplicaNo(hd - 3); // go up in volume hierarchy
     if (ThetaId < 13)
-      PhiId = (NReplica + 2 * n3) * NCryst + ik;
+      PhiId = (i2 + 2 * i3) * NCryst + ik;
     else {
-      int n3r = (3 - (n3 % 4)) + 4 * (n3 / 4);
       // int tt[] = {3,2,1,0,7,6,5,4};
-      // if(n3r!=tt[n3]){
-      //  cout<<n3<<" "<<n3<<" "<<tt[n3]<<endl;
+      // if(i3r!=tt[i3]){
+      //  cout<<i3<<" "<<i3<<" "<<tt[i3]<<endl;
       //  exit(0);
       // }
-      PhiId = (2 * n3r + 1 - NReplica) * NCryst + ik;
+      int i3r = (3 - (i3 % 4)) + 4 * (i3 / 4);
+      PhiId = (2 * i3r + (1 - i2)) * NCryst + ik;
     }
   }
 
   int cellID = Offset * 16 + PhiId;
-  //    cout<<"ECLGeometryPar::TouchableToCellID "<<h->GetVolume(hd-1)->GetName()<<" "<<indx<<" "<<NReplica<<" "<<h->GetReplicaNo(hd - 3)<<" "<<ThetaId<<" "<<NCryst<<" "<<Offset<<" "<<PhiId<<endl;
+  //    cout<<"ECLGeometryPar::TouchableToCellID "<<h->GetVolume(hd-1)->GetName()<<" "<<i1<<" "<<i2<<" "<<h->GetReplicaNo(hd - 3)<<" "<<ThetaId<<" "<<NCryst<<" "<<Offset<<" "<<PhiId<<endl;
 
   // test of the position and direction of crystal
   if (0) {
@@ -370,7 +420,7 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 
     G4ThreeVector dr(drx, dry, drz), dn(dnx, dny, dnz);
     if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
-      cout << hd << " " << NReplica << " " << indx << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
+      cout << hd << " " << i2 << " " << i1 << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
 
       for (int i = 0; i < 144; i++) {
         int ci = Mapping_t::CellID(ThetaId, i);

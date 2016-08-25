@@ -104,6 +104,7 @@ feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEIT
 process(feistate.path)
 assert feistate.is_trained
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
+assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 assert len(glob.glob('Monitor_TagUniqueSignal_*')) == 7
 assert len(glob.glob('Monitor_FitVertex_*')) == 12
 assert len(glob.glob('Monitor_Final_*')) == 7
@@ -111,7 +112,7 @@ assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
 assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
-assert len(glob.glob('Monitor_*')) == 91
+assert len(glob.glob('Monitor_*')) == 92
 
 sys.argv.append('-dump-path')
 feistate = fullEventInterpretation('B+:signal', selection_path, particles, 'FEITEST')
@@ -192,6 +193,7 @@ assert len(glob.glob('Summary*.pickle')) == 1
 assert len(glob.glob('cache.pickle.bkp4')) == 1
 # Check if now all Monitoring histograms are available
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
+assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 assert len(glob.glob('Monitor_TagUniqueSignal_*')) == 7
 assert len(glob.glob('Monitor_FitVertex_*')) == 12
 assert len(glob.glob('Monitor_Final_*')) == 7
@@ -201,7 +203,7 @@ assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 # Additional monitoring stuff during training
 assert len(glob.glob('Monitor_GenerateTrainingData_*')) == 11
-assert len(glob.glob('Monitor_*')) == 102
+assert len(glob.glob('Monitor_*')) == 103
 assert feistate.is_trained
 
 sys.argv.pop()

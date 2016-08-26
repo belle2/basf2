@@ -15,7 +15,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Structure to expose some drift time and length related functions
+    /// Structure to expose some drift time and length functions from the CDCGeometryPar to Python.
     struct DriftTimeUtil {
 
       /**

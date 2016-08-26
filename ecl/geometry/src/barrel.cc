@@ -76,7 +76,7 @@ void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume&
   bool b_septum_walls = true;
   bool b_inner_support_wall = true;
   bool b_support_ribs = true;
-  bool b_outer_plates = 0;
+  bool b_outer_plates = true;
   bool b_forward_part5 = true;
   bool b_crystal_holder = true;
   bool b_pipe = true;

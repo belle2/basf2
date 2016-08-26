@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
@@ -24,8 +25,6 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -59,6 +58,11 @@ namespace Belle2 {
                                       "'outwards', "
                                       "'downwards'.",
                                       m_param_flightTimeEstimation);
+
+        // moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
+        //            m_param_triggerPoint,
+        //            "Point relative to which the flight times of tracks should be adjusted",
+        //            m_param_triggerPoint);
       }
 
       /// Signals the start of the event processing
@@ -83,8 +87,16 @@ namespace Belle2 {
           }
         }
 
+        m_triggerPoint = Vector3D(std::get<0>(m_param_triggerPoint),
+                                  std::get<1>(m_param_triggerPoint),
+                                  std::get<2>(m_param_triggerPoint));
+
         if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
           B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
+        } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
+          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new CosmicRayFlightTimeEstimator(m_triggerPoint)));
+        } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
+          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new BeamEventFlightTimeEstimator));
         }
 
         Super::initialize();
@@ -112,33 +124,30 @@ namespace Belle2 {
           }
 
           const CDCWire* wire = CDCWire::getInstance(hit);
-
-          double initialTOFEstimate = 0;
-
-          if (m_flightTimeEstimation == EPreferredDirection::c_None) {
-            initialTOFEstimate = 0;
-          } else {
-            double directArcLength2D = wire->getRefCylindricalR();
-            if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
-              initialTOFEstimate = directArcLength2D / Const::speedOfLight;
-            } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
-              initialTOFEstimate = std::copysign(directArcLength2D / Const::speedOfLight, -wire->getRefPos2D().y());
-            }
+          const Vector2D& pos2D = wire->getRefPos2D();
+          double alpha = 0;
+          if (m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0) {
+            // Fix the flight direction to downwards.
+            alpha = M_PI;
           }
+          const double beta = 1;
+          double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
           double refDriftLengthRight =
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
-                                              initialTOFEstimate,
+                                              flightTimeEstimate,
                                               false, //bool leftRight
-                                              wire->getRefZ());
+                                              wire->getRefZ(),
+                                              alpha);
 
           double refDriftLengthLeft =
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
-                                              initialTOFEstimate,
+                                              flightTimeEstimate,
                                               true, //bool leftRight
-                                              wire->getRefZ());
+                                              wire->getRefZ(),
+                                              alpha);
 
           double refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
 
@@ -175,6 +184,12 @@ namespace Belle2 {
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
+
+      /// Parameter : Location of the flight time zero
+      std::tuple<double, double, double> m_param_triggerPoint{0.0, 0.0, 0.0};
+
+      /// Central location of the flight time zero position usually the location of the trigger.
+      Vector3D m_triggerPoint =  Vector3D(0, 0, 0);
 
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
       std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator{nullptr};

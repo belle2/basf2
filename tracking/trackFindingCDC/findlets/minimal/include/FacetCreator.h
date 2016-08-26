@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
@@ -24,9 +25,6 @@
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/gearbox/Const.h>
-
-#include <boost/math/special_functions/sinc.hpp>
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
@@ -75,7 +73,6 @@ namespace Belle2 {
                                       m_param_leastSquareFit);
 
       }
-
 
       /**
        *  Central function creating the hit triplets from the clusters.
@@ -238,16 +235,17 @@ namespace Belle2 {
         Vector2D flightDirection = line->tangential();
         Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
         const double alpha = centralPos2D.angleWith(flightDirection);
-        const double cylindricalRToFlightTimeFactor = 1.0 / (boost::math::sinc_pi(alpha) * Const::speedOfLight);
 
+        const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
         auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
           const CDCWire& wire = rlWireHit.getWire();
           const CDCHit* hit = rlWireHit.getWireHit().getHit();
           const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
-          double flightTimeEstimation =  recoPos2D.cylindricalR() * cylindricalRToFlightTimeFactor;
+          const double beta = 1;
+          double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
           double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                                                  wire.getWireID(),
-                                                                 flightTimeEstimation,
+                                                                 flightTimeEstimate,
                                                                  rl,
                                                                  wire.getRefZ(),
                                                                  alpha);
@@ -273,12 +271,12 @@ namespace Belle2 {
       double getDriftLengthEstimate(const CDCRecoHit2D& recoHit2D) const
       {
         static CDC::RealisticTDCCountTranslator tdcCountTranslator;
+        const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
 
         Vector2D flightDirection = recoHit2D.getFlightDirection2D();
         Vector2D recoPos = recoHit2D.getRecoPos2D();
         double alpha = recoPos.angleWith(flightDirection);
-        double arcLength2D = recoPos.cylindricalR() / boost::math::sinc_pi(alpha);
-        double flightTimeEstimation = arcLength2D / Const::speedOfLight;
+        double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos, alpha);
 
         const CDCWire& wire = recoHit2D.getWire();
         const CDCHit* hit = recoHit2D.getWireHit().getHit();
@@ -287,7 +285,7 @@ namespace Belle2 {
         double driftLength =
           tdcCountTranslator.getDriftLength(hit->getTDCCount(),
                                             wire.getWireID(),
-                                            flightTimeEstimation,
+                                            flightTimeEstimate,
                                             rl,
                                             wire.getRefZ(),
                                             alpha);

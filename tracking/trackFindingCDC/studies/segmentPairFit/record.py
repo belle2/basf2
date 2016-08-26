@@ -36,10 +36,8 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
     n_events = 10000
     generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
 
-    monte_carlo = "no"
-    flight_time_estimation = "none"
-    flight_time_reestimation = False
-    use_alpha_in_drift_length = False
+    monte_carlo = "full"
+    segment_orientation = "outwards"
 
     fit_method_name = "fuse-sz"
     # Specification for BrowseTFileOnTerminateRunMixin
@@ -103,9 +101,42 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
 
         elif fit_method_name == 'fuse-sz':
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
+            CDCSegmentPair = Belle2.TrackFindingCDC.CDCSegmentPair
 
             def sz_segment_pair_fusion_fit(pair):
-                return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, True)
+                CDCAxialStereoFusion.reconstructFuseTrajectories(pair, True)
+                return
+
+                trajectory3D = pair.getTrajectory3D()
+                revFromSegment = pair.getFromSegment().reversed()
+                revToSegment = pair.getToSegment().reversed()
+                revPair = CDCSegmentPair(revToSegment, revFromSegment)
+
+                CDCAxialStereoFusion.reconstructFuseTrajectories(revPair, True)
+                revTrajectory3D = revPair.getTrajectory3D().reversed()
+
+                # print("One origin x", trajectory3D.getLocalOrigin().x())
+                # print("One origin y", trajectory3D.getLocalOrigin().y())
+                # print("One origin z", trajectory3D.getLocalOrigin().z())
+
+                # print("Rev origin x", revTrajectory3D.getLocalOrigin().x())
+                # print("Rev origin y", revTrajectory3D.getLocalOrigin().y())
+                # print("Rev origin z", revTrajectory3D.getLocalOrigin().z())
+
+                print("One parameters", [trajectory3D.getLocalHelix().parameters()[i] for i in range(5)])
+                print("Rev parameters", [revTrajectory3D.getLocalHelix().parameters()[i] for i in range(5)])
+
+                print("One covariance")
+                for j in range(5):
+                    print([trajectory3D.getLocalHelix().helixCovariance()(i, j) for i in range(5)])
+
+                print("Rev covariance")
+                for j in range(5):
+                    print([revTrajectory3D.getLocalHelix().helixCovariance()(i, j) for i in range(5)])
+
+                # return revTrajectory3D
+                # return trajectory3D
+
             return sz_segment_pair_fusion_fit
 
         else:
@@ -117,24 +148,29 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation="outwards")
+                        flightTimeEstimation="outwards"
+                        )
 
         if self.monte_carlo == "no":
             # MC free - default
             path.add_module("SegmentFinderCDCFacetAutomaton",
-                            SegmentOrientation="outwards")
+                            SegmentOrientation="outwards"
+                            )
 
         elif self.monte_carlo == "medium":
             # Medium MC - proper generation logic, but true facets and facet relations
             path.add_module("SegmentFinderCDCFacetAutomaton",
                             FacetFilter="truth",
                             FacetRelationFilter="truth",
-                            SegmentOrientation="outwards")
+                            SegmentOrientation="outwards"
+                            )
 
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
             path.add_module("SegmentCreatorMCTruth",
-                            reconstructedPositions=True)
+                            reconstructedPositions=True,
+                            # segments="MCSegments"
+                            )
 
         else:
             raise ValueError("Invalid degree of Monte Carlo information")
@@ -142,12 +178,23 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         path.add_module("SegmentFitter",
                         inputSegments="CDCRecoSegment2DVector",
                         updateDriftLength=True,
-                        useAlphaInDriftLength=True)
+                        useAlphaInDriftLength=True
+                        )
+
+        path.add_module("SegmentOrienter",
+                        SegmentOrientation="symmetric",
+                        # SegmentOrientation="none",
+                        inputSegments="CDCRecoSegment2DVector",
+                        segments="CDCRecoSegment2DVectorOriented"
+                        )
 
         path.add_module("TrackFinderSegmentPairAutomaton",
+                        inputSegments="CDCRecoSegment2DVectorOriented",
                         WriteSegmentPairs=True,
                         SegmentPairFilter="truth",
-                        SegmentPairRelationFilter="none")
+                        SegmentPairFilterParameters={"allowReverse": True},
+                        SegmentPairRelationFilter="none"
+                        )
 
         path.add_module(AxialStereoPairFitterModule(fit_method=self.get_fit_method()))
         path.add_module(SegmentPairFitValidationModule(self.output_file_name))
@@ -195,9 +242,10 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         # Take the fit best at the middle of the segment pair
         fit3d_truth = mc_segment_lookup.getTrajectory3D(to_segment)
 
+        fb_info = 1 if segment_pair.getAutomatonCell().getCellWeight() > 0 else -1
         truth_crops = dict(
-            curvature_truth=fit3d_truth.getCurvatureXY(),
-            tan_lambda_truth=fit3d_truth.getTanLambda(),
+            curvature_truth=fb_info * fit3d_truth.getCurvatureXY(),
+            tan_lambda_truth=fb_info * fit3d_truth.getTanLambda(),
         )
 
         segment_pair_crops = cdc_peelers.peel_segment_pair(segment_pair)
@@ -265,7 +313,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
     )
 
 
-class AxialStereoPairFitterModule(Module):
+class AxialStereoPairFitterModule(basf2.Module):
 
     @staticmethod
     def default_fit_method(segmentPair):

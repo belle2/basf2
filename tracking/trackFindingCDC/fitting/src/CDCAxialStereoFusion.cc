@@ -153,43 +153,41 @@ void CDCAxialStereoFusion::fuseTrajectories(const CDCSegmentPair& segmentPair)
 
 
 
-CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment,
-    const CDCRecoSegment2D& toSegment,
+CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
+    const CDCRecoSegment2D& toSegment2D,
     bool priorityOnSZ)
 {
-  if (fromSegment.empty()) {
+  if (fromSegment2D.empty()) {
     B2WARNING("From segment is empty.");
     return CDCTrajectory3D();
   }
 
-  if (toSegment.empty()) {
+  if (toSegment2D.empty()) {
     B2WARNING("To segment is empty.");
     return CDCTrajectory3D();
   }
 
-  bool fromIsAxial = fromSegment.getStereoKind() == EStereoKind::c_Axial;
+  bool fromIsAxial = fromSegment2D.isAxial();
+  const CDCAxialRecoSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
+  const CDCStereoRecoSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
 
-  const CDCAxialRecoSegment2D& axialSegment = fromIsAxial ? fromSegment : toSegment;
-  const CDCStereoRecoSegment2D& stereoSegment = not fromIsAxial ? fromSegment : toSegment;
+  CDCTrajectory2D axialTrajectory2D = axialSegment2D.getTrajectory2D();
 
-  const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
+  Vector2D localOrigin2D = (fromIsAxial ? fromSegment2D.back() : toSegment2D.front()).getRecoPos2D();
+  axialTrajectory2D.setLocalOrigin(localOrigin2D);
 
-  // const Vector2D& localOrigin2D = (fromIsAxial ? fromSegment.back() : toSegment.front()).getRecoPos2D();
-  // axialTrajectory2D.setLocalOrigin(localOrigin2D);
-
-  CDCRecoSegment3D stereoSegment3D = CDCRecoSegment3D::reconstruct(stereoSegment, axialTrajectory2D);
+  CDCRecoSegment3D stereoSegment3D = CDCRecoSegment3D::reconstruct(stereoSegment2D, axialTrajectory2D);
 
   CDCTrajectorySZ trajectorySZ;
-
   const bool mcTruthReference = false;
   if (mcTruthReference) {
     const CDCMCSegmentLookUp& theMCSegmentLookUp = CDCMCSegmentLookUp::getInstance();
-    CDCTrajectory3D axialMCTrajectory3D = theMCSegmentLookUp.getTrajectory3D(&axialSegment);
+    CDCTrajectory3D axialMCTrajectory3D = theMCSegmentLookUp.getTrajectory3D(&axialSegment2D);
     Vector3D localOrigin3D =  axialMCTrajectory3D.getLocalOrigin();
     localOrigin3D.setXY(axialTrajectory2D.getLocalOrigin());
     axialMCTrajectory3D.setLocalOrigin(localOrigin3D);
     trajectorySZ = axialMCTrajectory3D.getTrajectorySZ();
-    stereoSegment3D = CDCRecoSegment3D::reconstruct(stereoSegment, axialMCTrajectory3D.getTrajectory2D());
+    stereoSegment3D = CDCRecoSegment3D::reconstruct(stereoSegment2D, axialMCTrajectory3D.getTrajectory2D());
 
   } else {
     CDCSZFitter szFitter = CDCSZFitter::getFitter();
@@ -235,8 +233,8 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   // Correct the values of tan lambda and z0
   CDCTrajectory3D fusedTrajectory3D =
     fromIsAxial ?
-    fuseTrajectoriesImpl(fromSegment, stereoSegment3D) :
-    fuseTrajectoriesImpl(stereoSegment3D, toSegment);
+    fuseTrajectoriesImpl(fromSegment2D, stereoSegment3D) :
+    fuseTrajectoriesImpl(stereoSegment3D, toSegment2D);
 
   double tanLambdaShift = trajectorySZ.getTanLambda();
 

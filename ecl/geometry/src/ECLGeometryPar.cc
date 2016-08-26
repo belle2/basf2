@@ -18,8 +18,6 @@
 #include <G4Point3D.hh>
 #include <G4Vector3D.hh>
 
-#include "TVector3.h"
-
 using namespace std;
 using namespace Belle2::ECL;
 
@@ -319,8 +317,6 @@ double ss16[] = {
   1.0000000000000000000000
 };
 
-TVector3 geom_pos, geom_vec;
-
 void ECLGeometryPar::InitCrystal(int cid)
 {
   int thetaid, phiid, nreplica, indx;
@@ -334,25 +330,13 @@ void ECLGeometryPar::InitCrystal(int cid)
 
   double xp = c * t.pos.x() - s * t.pos.y();
   double yp = s * t.pos.x() + c * t.pos.y();
-  geom_pos.SetXYZ(xp, yp, t.pos.z());
+  m_current_crystal.pos.set(xp, yp, t.pos.z());
 
   double xv = c * t.dir.x() - s * t.dir.y();
   double yv = s * t.dir.x() + c * t.dir.y();
-  geom_vec.SetXYZ(xv, yv, t.dir.z());
+  m_current_crystal.dir.set(xv, yv, t.dir.z());
 
   m_ini_cid = cid;
-}
-
-const TVector3& ECLGeometryPar::GetCrystalPos(int cid)
-{
-  if (cid != m_ini_cid) InitCrystal(cid);
-  return geom_pos;
-}
-
-const TVector3& ECLGeometryPar::GetCrystalVec(int cid)
-{
-  if (cid != m_ini_cid) InitCrystal(cid);
-  return geom_vec;
 }
 
 int ECLGeometryPar::GetCellID(int ThetaId, int PhiId)
@@ -412,18 +396,15 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 
     InitCrystal(cellID);
     ro *= 1 / CLHEP::cm;
-    double drx = geom_pos.X() - ro.x(), dry = geom_pos.Y() - ro.y(), drz = geom_pos.Z() - ro.z();
-    double dnx = geom_vec.X() - rn.x(), dny = geom_vec.Y() - rn.y(), dnz = geom_vec.Z() - rn.z();
 
-    G4ThreeVector dr(drx, dry, drz), dn(dnx, dny, dnz);
+    G4ThreeVector dr = m_current_crystal.pos - ro, dn = m_current_crystal.dir - rn;
     if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
       cout << hd << " " << i2 << " " << i1 << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
 
       for (int i = 0; i < 144; i++) {
         int ci = Mapping_t::CellID(ThetaId, i);
         InitCrystal(ci);
-        drx = geom_pos.X() - ro.x(), dry = geom_pos.Y() - ro.y(), drz = geom_pos.Z() - ro.z();
-        G4ThreeVector dr(drx, dry, drz);
+        dr = m_current_crystal.pos - ro;
         if (dr.mag() < 1e-10) cout << "best PhiId = " << i << endl;
       }
     }

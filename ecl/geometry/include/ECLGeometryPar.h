@@ -17,6 +17,7 @@
 #include <vector>
 #include <map>
 #include <G4ThreeVector.hh>
+#include <TVector3.h>
 
 typedef int EclIdentifier;
 typedef double EclGeV;
@@ -24,7 +25,6 @@ typedef double EclCM;
 typedef double EclRad;
 
 class G4VTouchable;
-class TVector3;
 
 namespace Belle2 {
   namespace ECL {
@@ -62,11 +62,6 @@ namespace Belle2 {
       //! Mapping theta, phi Id
       void Mapping(int cid);
 
-      /** The Postion of crystal*/
-      const TVector3& GetCrystalPos(int cid);
-      /** The direction of crystal*/
-      const TVector3& GetCrystalVec(int cid);
-
       /** Get Cell Id */
       int GetCellID(int ThetaId, int PhiId);
       /** Get Cell Id */
@@ -79,13 +74,43 @@ namespace Belle2 {
       int ECLVolumeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
       int TouchableToCellID(const G4VTouchable*); // The same as above but without sanity checks
 
+      /** The Position of crystal*/
+      G4ThreeVector getCrystalPos(int cid)
+      {
+        if (cid != m_ini_cid) InitCrystal(cid);
+        return m_current_crystal.pos;
+      }
+
+      /** The direction of crystal*/
+      G4ThreeVector getCrystalVec(int cid)
+      {
+        if (cid != m_ini_cid) InitCrystal(cid);
+        return m_current_crystal.dir;
+      }
+
+      /** The Position of crystal*/
+      TVector3 GetCrystalPos(int cid)
+      {
+        if (cid != m_ini_cid) InitCrystal(cid);
+        const G4ThreeVector& t = m_current_crystal.pos;
+        return TVector3(t.x(), t.y(), t.z());
+      }
+
+      /** The direction of crystal*/
+      TVector3 GetCrystalVec(int cid)
+      {
+        if (cid != m_ini_cid) InitCrystal(cid);
+        const G4ThreeVector& t = m_current_crystal.dir;
+        return TVector3(t.x(), t.y(), t.z());
+      }
+
     private:
       void InitCrystal(int cid);
       struct CrystalGeom_t {
         G4ThreeVector pos, dir;
       };
       std::vector<CrystalGeom_t> m_crystals;
-
+      CrystalGeom_t m_current_crystal;
       /** The Cell ID information*/
       int mPar_cellID;
       /** The Theta ID information*/

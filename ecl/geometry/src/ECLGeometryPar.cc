@@ -430,6 +430,14 @@ int ECLGeometryPar::ECLVolumeToCellID(const G4VTouchable* touch)
   return TouchableToCellID(touch);
 }
 
+double ECLGeometryPar::time2sensor(int cid, const G4ThreeVector& hit_pos)
+{
+  if (cid != m_ini_cid) InitCrystal(cid);
+  double z = 15. - (hit_pos - m_current_crystal.pos) * m_current_crystal.dir; // position along the vector of crystal axis
+  double dt = 6.05 + z * (0.0749 - z * 0.00112); // flight time to diode sensor in nanoseconds
+  return dt;
+}
+
 EclNbr::EclNbr() :
   m_nbrs(*new std::vector< Identifier >)
 {

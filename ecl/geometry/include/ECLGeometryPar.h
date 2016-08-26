@@ -104,6 +104,7 @@ namespace Belle2 {
         return TVector3(t.x(), t.y(), t.z());
       }
 
+      double time2sensor(int cid, const G4ThreeVector& hit_pos);
     private:
       void InitCrystal(int cid);
       struct CrystalGeom_t {

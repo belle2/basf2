@@ -103,13 +103,7 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
     int cellId = t.getCellId() - 1;
     int key = cellId * 80 + TimeIndex;
     double edep = t.getEnergyDep();
-    G4ThreeVector p = t.getPosition();
-
-    const TVector3& r = eclp->GetCrystalPos(cellId);        // center of crystal position
-    const TVector3& v = eclp->GetCrystalVec(cellId);        // vector of crystal axis
-    double z = 15. - ((p.x() - r.X()) * v.X() + (p.y() - r.Y()) * v.Y() + (p.z() - r.Z()) *
-                      v.Z()); // position along the vector of crystal axis
-    double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
+    double tsen = tof + eclp->time2sensor(cellId, t.getPosition()); // flight time to diode sensor
 
     hit_t& h = a[key];
 

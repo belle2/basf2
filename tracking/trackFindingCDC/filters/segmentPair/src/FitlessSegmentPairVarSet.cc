@@ -108,8 +108,8 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const CDCWire& stereoLastWire = stereoLastHit.getWire();
 
   // Momentum vector
-  const Vector2D startLastUnitMom2D = startFit.getUnitMom2D(startLastRecoPos2D);
-  const Vector2D endFirstUnitMom2D = endFit.getUnitMom2D(endFirstRecoPos2D);
+  const Vector2D startLastUnitMom2D = startFit.getFlightDirection2D(startLastRecoPos2D);
+  const Vector2D endFirstUnitMom2D = endFit.getFlightDirection2D(endFirstRecoPos2D);
 
   const double endFirstToStartLastHitPosPhiDifference = endFirstRecoPos2D.angleWith(startLastRecoPos2D);
   const double endFirstToStartLastHitMomPhiDifference = endFirstUnitMom2D.angleWith(startLastUnitMom2D);
@@ -204,11 +204,11 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
     var<named("startFit_absMom2D")>() = startFit.getAbsMom2D();
     var<named("endFit_absMom2D")>() = endFit.getAbsMom2D();
 
-    Vector2D startMomAtCenter = startFit.getUnitMom2DAtCenter(startSegment);
-    Vector2D endMomAtCenter = endFit.getUnitMom2DAtCenter(endSegment);
+    Vector2D startMomAtCenter = startFit.getFlightDirection2DAtCenter(startSegment);
+    Vector2D endMomAtCenter = endFit.getFlightDirection2DAtCenter(endSegment);
 
-    Vector2D startMomAtExtrapolation = startFit.getUnitMom2DAtCenter(endSegment);
-    Vector2D endMomAtExtrapolation = endFit.getUnitMom2DAtCenter(startSegment);
+    Vector2D startMomAtExtrapolation = startFit.getFlightDirection2DAtCenter(endSegment);
+    Vector2D endMomAtExtrapolation = endFit.getFlightDirection2DAtCenter(startSegment);
 
     var<named("momAngleAtCenter_startSegment")>() = startMomAtCenter.angleWith(endMomAtExtrapolation);
     var<named("momAngleAtCenter_endSegment")>() = endMomAtCenter.angleWith(startMomAtExtrapolation);

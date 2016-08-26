@@ -121,11 +121,11 @@ bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   var<named("startFit_absMom2D")>() = startFit.getAbsMom2D();
   var<named("endFit_absMom2D")>() = endFit.getAbsMom2D();
 
-  Vector2D startMom2DAtStartBack = startFit.getUnitMom2D(startBackRecoPos2D);
-  Vector2D endMom2DAtEndFront = endFit.getUnitMom2D(endFrontRecoPos2D);
+  Vector2D startMom2DAtStartBack = startFit.getFlightDirection2D(startBackRecoPos2D);
+  Vector2D endMom2DAtEndFront = endFit.getFlightDirection2D(endFrontRecoPos2D);
 
-  Vector2D startMom2DAtEndFront = startFit.getUnitMom2D(endFrontRecoPos2D);
-  Vector2D endMom2DAtStartBack = endFit.getUnitMom2D(startBackRecoPos2D);
+  Vector2D startMom2DAtEndFront = startFit.getFlightDirection2D(endFrontRecoPos2D);
+  Vector2D endMom2DAtStartBack = endFit.getFlightDirection2D(startBackRecoPos2D);
 
   var<named("momAngleAtStartBack")>() = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
   var<named("momAngleAtEndFront")>() = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);

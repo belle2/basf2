@@ -27,7 +27,7 @@ bool StereoHitVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrac
   if (not extracted or not testPair or not recoHit or not track) return false;
 
   const CDCTrajectory2D& trajectory2D = track->getStartTrajectory3D().getTrajectory2D();
-  const Vector2D& startMomentum = trajectory2D.getStartMom2D();
+  const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track->size();
   const Vector3D& reconstructedPosition = recoHit->getRecoPos3D();

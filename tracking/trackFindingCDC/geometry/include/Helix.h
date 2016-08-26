@@ -111,10 +111,17 @@ namespace Belle2 {
         return circleXY().arcLengthToCylindricalR(cylindricalR);
       }
 
-      /// Calculates the point of closest approach on the helix to the given point.
+      /// Calculates the point on the helix with the smallest total distance
       Vector3D closest(const Vector3D& point, bool firstPeriod = true) const
       {
         double arcLength2D = arcLength2DToClosest(point, firstPeriod);
+        return atArcLength2D(arcLength2D);
+      }
+
+      /// Calculates the point on the helix with the smallest perpendicular (xy) distance
+      Vector3D closestXY(const Vector2D& pointXY) const
+      {
+        double arcLength2D = arcLength2DToXY(pointXY);
         return atArcLength2D(arcLength2D);
       }
 
@@ -250,7 +257,13 @@ namespace Belle2 {
       /// projection
       double zPeriod() const
       {
-        return tanLambda() * fabs(perimeterXY());
+        return tanLambda() * arcLength2DPeriod();
+      }
+
+      /// Getter for the arc length of one trip around the helix.
+      double arcLength2DPeriod() const
+      {
+        return circleXY().arcLengthPeriod();
       }
 
       /// Getter for the perimeter of the circle in the xy projection
@@ -263,6 +276,12 @@ namespace Belle2 {
       double radiusXY() const
       {
         return circleXY().radius();
+      }
+
+      /// Getter for the central point of the helix
+      Vector2D centerXY() const
+      {
+        return circleXY().center();
       }
 
       /// Getter for the unit three dimensional tangential vector at the perigee point of the helix.

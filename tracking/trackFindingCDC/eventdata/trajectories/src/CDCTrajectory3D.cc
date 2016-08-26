@@ -254,7 +254,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
+  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -282,7 +282,7 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
+  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -310,6 +310,11 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 }
 
 
+bool CDCTrajectory3D::isCurler(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  return getMaximalCylindricalR() < factor * topology.getOuterCylindricalR();
+}
 
 ESign CDCTrajectory3D::getChargeSign() const
 {
@@ -319,28 +324,19 @@ ESign CDCTrajectory3D::getChargeSign() const
 double CDCTrajectory3D::getAbsMom3D(const double bZ) const
 {
   double tanLambda = getLocalHelix()->tanLambda();
-
   double factor2DTo3D = hypot(1, tanLambda);
-
   double curvatureXY = getLocalHelix()->curvatureXY();
-
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, bZ);
-
   return factor2DTo3D * absMom2D;
 }
 
 double CDCTrajectory3D::getAbsMom3D() const
 {
   Vector3D position = getSupport();
-
   double tanLambda = getLocalHelix()->tanLambda();
-
   double factor2DTo3D = hypot(1, tanLambda);
-
   double curvatureXY = getLocalHelix()->curvatureXY();
-
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, position);
-
   return factor2DTo3D * absMom2D;
 }
 

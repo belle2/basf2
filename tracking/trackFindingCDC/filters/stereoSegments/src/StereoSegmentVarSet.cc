@@ -37,7 +37,7 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   const bool isCurler = trajectory2D.isCurler();
 
 
-  const Vector2D& startMomentum = trajectory2D.getStartMom2D();
+  const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track.size();
 

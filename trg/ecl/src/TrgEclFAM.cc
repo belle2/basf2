@@ -166,10 +166,10 @@ TrgEclFAM::getTCHit(int TableFlag)
 
   }
   */
-  std::vector< std::vector<float> > E_cell( 8736, std::vector<float>(80, 0.0) ); 
-  std::vector< std::vector<float> > T_ave( 8736, std::vector<float>(80, 0.0) );
-  std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0) );
-  std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0) );
+  std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > T_ave(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0));
 
   int nBinTime = 80;
   TimeRange = 4000; // -4us ~ 4us
@@ -229,7 +229,8 @@ TrgEclFAM::getTCHit(int TableFlag)
       float hitE     = aECLSimHit->getEnergyDep() / Unit::GeV;
       float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns;
 
-      TVector3 HitInPos = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      G4ThreeVector t = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
       TVector3 PosCell  = eclp->GetCrystalPos(hitCellId); // [cm], Xtal position (based on from IP)
       TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
       // "local_pos_r" = Distance between track hit in Xtal and
@@ -364,9 +365,9 @@ TrgEclFAM::digitization01(void)
   float* X_pr = new float [64];
   float* X_sr = new float [64];
   */
-  std::vector< std::vector<float> > noise_pileup( 576, std::vector<float>(64, 0.0));  // [GeV]
-  std::vector< std::vector<float> > noise_parallel( 576, std::vector<float>(64, 0.0));  // [GeV]
-  std::vector< std::vector<float> > noise_serial( 576, std::vector<float>(64, 0.0));  // [GeV]
+  std::vector< std::vector<float> > noise_pileup(576, std::vector<float>(64, 0.0));   // [GeV]
+  std::vector< std::vector<float> > noise_parallel(576, std::vector<float>(64, 0.0));   // [GeV]
+  std::vector< std::vector<float> > noise_serial(576, std::vector<float>(64, 0.0));   // [GeV]
   std::vector<float> X_pr(64, 0.0);
   std::vector<float> X_sr(64, 0.0);
 
@@ -559,13 +560,13 @@ TrgEclFAM::digitization01(void)
   //
   //
   //
-/*
-  delete [] X_pr;
-  delete [] X_sr;
-  delete [] noise_pileup;
-  delete [] noise_serial;
-  delete [] noise_parallel;
-*/
+  /*
+    delete [] X_pr;
+    delete [] X_sr;
+    delete [] noise_pileup;
+    delete [] noise_serial;
+    delete [] noise_parallel;
+  */
 
 
   return;
@@ -583,9 +584,9 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 125; //@ [ns]
   int NSampling = 64;
 
-  std::vector< std::vector<double> > noise_pileup( 576, std::vector<double>(64, 0.0) );  // [GeV]
-  std::vector< std::vector<double> > noise_parallel( 576, std::vector<double>(64, 0.0) );  // [GeV]
-  std::vector< std::vector<double> > noise_serial( 576, std::vector<double>(64, 0.0) );  // [GeV]
+  std::vector< std::vector<double> > noise_pileup(576, std::vector<double>(64, 0.0));    // [GeV]
+  std::vector< std::vector<double> > noise_parallel(576, std::vector<double>(64, 0.0));    // [GeV]
+  std::vector< std::vector<double> > noise_serial(576, std::vector<double>(64, 0.0));    // [GeV]
   std::vector<double> X_pr(64, 0.0);
   std::vector<double> X_sr(64, 0.0);
   /*
@@ -840,8 +841,8 @@ TrgEclFAM::digitization03(void)
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
-  std::vector< std::vector<float> > TCDigiEnergy( 576, std::vector<float>(666, 0.0) );  // [GeV]
-  std::vector< std::vector<float> > TCDigiTiming( 576, std::vector<float>(666, 0.0) );  // [ns]
+  std::vector< std::vector<float> > TCDigiEnergy(576, std::vector<float>(666, 0.0));    // [GeV]
+  std::vector< std::vector<float> > TCDigiTiming(576, std::vector<float>(666, 0.0));    // [ns]
   /*
   float (*TCDigiEnergy)[666] = new  float [576][666];  // [GeV]
   float (*TCDigiTiming)[666] = new float [576][666];  // [ns]

@@ -35,8 +35,8 @@ namespace Belle2 {
     //! Useful Constructor
     ECLHit(
       int CellId,
-      float Edep,
-      float TimeAve
+      double Edep,
+      double TimeAve
     ): SimHitBase()
     {
       m_CellId = CellId;
@@ -51,11 +51,11 @@ namespace Belle2 {
 
     /*! Set deposit energy
      */
-    void setEnergyDep(double Edep) { m_Edep = static_cast<float>(Edep); }
+    void setEnergyDep(double Edep) { m_Edep = static_cast<double>(Edep); }
 
     /*! Set  average time
      */
-    void setTimeAve(double TimeAve) { m_TimeAve = static_cast<float>(TimeAve); }
+    void setTimeAve(double TimeAve) { m_TimeAve = static_cast<double>(TimeAve); }
 
 
     /*! Get Cell ID
@@ -87,8 +87,8 @@ namespace Belle2 {
   private:
 
     int m_CellId;      /**< Cell ID */
-    float m_Edep;      /**< deposited energy */
-    float m_TimeAve;   /**< average time */
+    double m_Edep;      /**< deposited energy */
+    double m_TimeAve;   /**< average time */
 
     ClassDef(ECLHit, 3); /**< ClassDef */
 

@@ -41,7 +41,6 @@ namespace Belle2 {
     private:
       /** Create ECLSimHit and ECLHit and relations from MCParticle and put them in datastore */
       int saveSimHit(G4int, G4int, G4int, G4double, G4double, const G4ThreeVector&, const G4ThreeVector&);
-
       // members of SensitiveDetector
       // G4double m_thresholdEnergyDeposit;// Energy Deposit  threshold
       // G4double m_thresholdKineticEnergy;// Kinetic Energy  threshold
@@ -56,7 +55,7 @@ namespace Belle2 {
       double m_energyDeposit;       /**< total energy deposited in a volume by a track */
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
-      int m_ECLHitIndex[8736][80];  /**< Hit index of StoreArray */
+
     };
   } // end of namespace ecl
 } // end of namespace Belle2

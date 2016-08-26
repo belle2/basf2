@@ -43,11 +43,6 @@ SensitiveDetector::~SensitiveDetector()
 
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
-      m_ECLHitIndex[iECLCell][TimeIndex] = -1;
-    }
-  }
 }
 
 //-----------------------------------------------------
@@ -55,6 +50,7 @@ void SensitiveDetector::Initialize(G4HCofThisEvent*)
 //-----------------------------------------------------
 bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();
   const G4StepPoint& s0 = *aStep->GetPreStepPoint();
   const G4StepPoint& s1 = *aStep->GetPostStepPoint();
@@ -92,11 +88,50 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 
 void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 {
-}
+  struct hit_t { double e, t; };
+  map<int, hit_t> a;
 
-inline double dot(const TVector3& u, const TVector3& v)
-{
-  return u.x() * v.x() +  u.y() * v.y() +  u.z() * v.z();
+  struct thit_t { int tid, hid; };
+  vector<thit_t> tr;
+
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+
+  for (const ECLSimHit& t : m_eclSimHits) {
+    double tof = t.getFlightTime();
+    if (tof >= 8000 || tof < 0) continue;
+    int TimeIndex = tof * (1. / 100);
+    int cellId = t.getCellId() - 1;
+    int key = cellId * 80 + TimeIndex;
+    double edep = t.getEnergyDep();
+    G4ThreeVector p = t.getPosition();
+
+    const TVector3& r = eclp->GetCrystalPos(cellId);        // center of crystal position
+    const TVector3& v = eclp->GetCrystalVec(cellId);        // vector of crystal axis
+    double z = 15. - ((p.x() - r.X()) * v.X() + (p.y() - r.Y()) * v.Y() + (p.z() - r.Z()) *
+                      v.Z()); // position along the vector of crystal axis
+    double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
+
+    hit_t& h = a[key];
+
+    int trkid = t.getTrackId();
+    tr.push_back({trkid, key});
+
+    double old_edep = h.e, old_tsen = h.t;
+    double new_edep = old_edep + edep;
+
+    h.e = new_edep;
+    h.t = (old_edep * old_tsen + edep * tsen) / new_edep;
+  }
+
+  int hitNum = m_eclHits.getEntries();
+  assert(hitNum == 0);
+  for (const pair<int, hit_t>&  t : a) {
+    int key = t.first, cellId = key / 80;
+    for (const thit_t& s : tr)
+      if (s.hid == key) m_eclHitRel.add(s.tid, hitNum);
+    const hit_t& h = t.second;
+    m_eclHits.appendNew(cellId + 1, h.e, h.t); hitNum++;
+  }
 }
 
 int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4double tof, G4double edep,
@@ -104,39 +139,8 @@ int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4doub
 {
   int simhitNumber = m_eclSimHits.getEntries();
   m_eclSimHitRel.add(trackID, simhitNumber);
-
-  TVector3 momentum(mom.getX(), mom.getY(), mom.getZ());
-  TVector3 position(pos.getX(), pos.getY(), pos.getZ());
-  momentum *= 1 / CLHEP::GeV;
-  position *= 1 / CLHEP::cm;
-  tof      *= 1 / CLHEP::ns;
-  edep     *= 1 / CLHEP::GeV;
-  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, momentum, position);
-
-  if (tof < 8000) {
-    ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-    const TVector3& PosCell = eclp->GetCrystalPos(cellId);        // center of crystal position
-    const TVector3& VecCell = eclp->GetCrystalVec(cellId);        // vector of crystal axis
-    position -= PosCell;
-    double z = 15. - dot(position, VecCell);      // position along the vector of crystal axis
-    double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
-
-    int TimeIndex = tof * (1. / 100);                      // Hit Time of StoreArray
-    int hitNum = m_ECLHitIndex[cellId][TimeIndex];
-    if (hitNum == -1) {
-      hitNum = m_eclHits.getEntries();
-      m_eclHitRel.add(trackID, hitNum);
-      m_eclHits.appendNew(cellId + 1, edep, tsen);
-      m_ECLHitIndex[cellId][TimeIndex] = hitNum;
-    } else {
-      m_eclHitRel.add(trackID, hitNum);
-      ECLHit* eclHit  = m_eclHits[hitNum];
-      double old_edep = eclHit->getEnergyDep();
-      double old_tsen = eclHit->getTimeAve();
-      double new_edep = old_edep + edep;
-      eclHit->setEnergyDep(new_edep);
-      eclHit->setTimeAve((old_edep * old_tsen + edep * tsen) / new_edep);
-    }
-  }
+  tof  *= 1 / CLHEP::ns;
+  edep *= 1 / CLHEP::GeV;
+  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, mom * (1 / CLHEP::GeV), pos * (1 / CLHEP::cm));
   return simhitNumber;
 }

@@ -12,6 +12,8 @@
 #include "G4PVPlacement.hh"
 #include "G4SDManager.hh"
 #include "G4NistManager.hh"
+#include "G4UserLimits.hh"
+#include <G4Box.hh>
 
 #include <ecl/geometry/GeoECLCreator.h>
 #include <ecl/geometry/shapes.h>
@@ -39,14 +41,15 @@ namespace Belle2 {
 
     GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0), m_overlap(0)
     {
-      m_sensitive = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
+      m_sensitive  = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
+      m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
+      G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);
     }
 
 
     GeoECLCreator::~GeoECLCreator()
     {
-      //      delete m_sensitive;
       for (BkgSensitiveDetector* sensitive : m_bkgsensitive) delete sensitive;
       for (auto a : m_atts) delete a.second;
     }
@@ -114,13 +117,36 @@ namespace Belle2 {
       return wrapped_logical;
     }
 
-    const G4VisAttributes* GeoECLCreator::att(const string& n)
+    const G4VisAttributes* GeoECLCreator::att(const string& n) const
     {
       auto p = m_atts.find(n);
       if (p != m_atts.end()) return p->second;
       cout << "no such visattribute:" << n << endl;
       exit(0);
       return NULL;
+    }
+
+    G4LogicalVolume* GeoECLCreator::get_preamp() const
+    {
+      static G4LogicalVolume* lv_preamplifier = NULL;
+      if (lv_preamplifier == NULL) {
+        G4VSolid* sv_preamplifier = new G4Box("sv_preamplifier", 58. / 2, 51. / 2, get_pa_box_height() / 2);
+        lv_preamplifier = new G4LogicalVolume(sv_preamplifier, Materials::get("A5052"), "lv_preamplifier", 0, 0, 0);
+        G4VSolid* sv_diode = new G4Box("sv_diode", 20. / 2, 20. / 2, 0.3 / 2);
+        G4LogicalVolume* lv_diode = new G4LogicalVolume(sv_diode, Materials::get("G4_Si"), "lv_diode", 0, 0, 0);
+        lv_diode->SetUserLimits(new G4UserLimits(0.01));
+        lv_diode->SetSensitiveDetector(m_sensediode);
+        new G4PVPlacement(G4TranslateZ3D(-get_pa_box_height() / 2 + 0.3 / 2), lv_diode, "pv_diode", lv_preamplifier, false, 0, m_overlap);
+
+        // G4VSolid* sv_diode = new G4Box("sv_diode", 10. / 2, 20. / 2, 0.3 / 2);
+        // G4LogicalVolume* lv_diode = new G4LogicalVolume(sv_diode, Materials::get("G4_Si"), "lv_diode", 0, 0, 0);
+        // lv_diode->SetUserLimits(new G4UserLimits(0.01));
+        // new G4PVPlacement(G4Translate3D(-5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode1", lv_preamplifier, false, 1, overlap);
+        // new G4PVPlacement(G4Translate3D(5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode2", lv_preamplifier, false, 2, overlap);
+
+        lv_preamplifier->SetVisAttributes(att("preamp"));
+      }
+      return lv_preamplifier;
     }
 
   }//ecl

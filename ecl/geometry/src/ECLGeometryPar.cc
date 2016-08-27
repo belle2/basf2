@@ -155,7 +155,8 @@ ECLGeometryPar* ECLGeometryPar::Instance()
 ECLGeometryPar::ECLGeometryPar()
 {
   clear();
-  read();
+  // delay crystal positions fetching to a moment when it actually needed and geometry is already built
+  //  read();
 }
 
 ECLGeometryPar::~ECLGeometryPar()
@@ -319,6 +320,7 @@ double ss16[] = {
 
 void ECLGeometryPar::InitCrystal(int cid)
 {
+  if (m_ini_cid == -1) read();
   int thetaid, phiid, nreplica, indx;
   Mapping_t::Mapping(cid, thetaid, phiid, nreplica, indx);
   const CrystalGeom_t& t = m_crystals[indx];
@@ -348,6 +350,11 @@ void ECLGeometryPar::Mapping(int cid)
 {
   mPar_cellID = cid;
   Mapping_t::Mapping(mPar_cellID, mPar_thetaID, mPar_phiID);
+}
+
+int ECLGeometryPar::TouchableDiodeToCellID(const G4VTouchable* touch)
+{
+  return TouchableToCellID(touch);
 }
 
 int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)

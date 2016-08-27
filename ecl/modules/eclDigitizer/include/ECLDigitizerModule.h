@@ -118,6 +118,7 @@ namespace Belle2 {
 
       // input arrays
       StoreArray<ECLHit>    m_eclHits;
+      StoreArray<ECLHit>    m_eclDiodeHits;
       StoreArray<ECLSimHit> m_eclSimHits;
       // Output Arrays
       StoreArray<ECLDigit>  m_eclDigits;

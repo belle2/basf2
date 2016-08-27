@@ -74,6 +74,8 @@ namespace Belle2 {
       int ECLVolumeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
       int TouchableToCellID(const G4VTouchable*); // The same as above but without sanity checks
 
+      int TouchableDiodeToCellID(const G4VTouchable*); // Mapping from G4VTouchable copyNumbers to Crystal CellID
+
       /** The Position of crystal*/
       G4ThreeVector getCrystalPos(int cid)
       {

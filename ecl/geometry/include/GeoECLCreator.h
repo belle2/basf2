@@ -28,6 +28,7 @@ namespace Belle2 {
   namespace ECL {
 
     class SensitiveDetector;
+    class SensitiveDiode;
 
     //!  The GeoECLCreator class.
     /*!
@@ -63,10 +64,13 @@ namespace Belle2 {
     private:
 
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
-      const G4VisAttributes* att(const std::string& n);
+      const G4VisAttributes* att(const std::string& n) const;
+      G4LogicalVolume* get_preamp() const ;
+      double get_pa_box_height() const {return 2;}
 
       /** Sensitive detector */
       SensitiveDetector* m_sensitive;
+      SensitiveDiode* m_sensediode;
       /** Vector of background-Sensitive detectors */
       std::vector<BkgSensitiveDetector*> m_bkgsensitive;
       std::map<std::string, G4VisAttributes*> m_atts;

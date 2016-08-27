@@ -58,6 +58,8 @@ void ECLDigitizerModule::initialize()
   m_eclDigits.registerInDataStore();
   m_eclTrigs.registerInDataStore();
 
+  m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
+
   m_eclDigits.registerRelationTo(m_eclHits);
   m_eclHits.registerRelationTo(m_eclDigits);
 
@@ -115,7 +117,17 @@ void ECLDigitizerModule::event()
   for (const auto& eclHit : m_eclHits) {
     int j = eclHit.getCellId() - 1; //0~8735
     if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, eclHit.getArrayIndex()});
+    //    cout<<"C:"<<eclHit.getCellId()<<" "<<eclHit.getEnergyDep()<<" "<<eclHit.getTimeAve()<<endl;
   }
+
+#if 0 // postponed to electronic response function for delta input will be avaliable
+  for (const auto& hit : m_eclDiodeHits) {
+    int j = hit.getCellId() - 1; //0~8735
+    double hitE       = hit.getEnergyDep() / Unit::GeV;
+    double hitTimeAve = hit.getTimeAve() / Unit::us;
+    //    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf, m_ss[m_tbl[j].iss]);
+  }
+#endif
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {

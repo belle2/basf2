@@ -227,23 +227,12 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     }
   }
 
-  double pa_box_height = 2;
   if (b_preamplifier) {
-    G4VSolid* sv_preamplifier = new G4Box("sv_preamplifier", 58. / 2, 51. / 2, pa_box_height / 2);
-    G4LogicalVolume* lv_preamplifier = new G4LogicalVolume(sv_preamplifier, Materials::get("A5052"), "lv_preamplifier", 0, 0,
-                                                           0);
-    G4VSolid* sv_diode = new G4Box("sv_diode", 10. / 2, 20. / 2, 0.3 / 2);
-    G4LogicalVolume* lv_diode = new G4LogicalVolume(sv_diode, Materials::get("G4_Si"), "lv_diode", 0, 0, 0);
-    lv_diode->SetUserLimits(new G4UserLimits(0.01));
-    new G4PVPlacement(G4Translate3D(-5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode1", lv_preamplifier, false, 1, overlap);
-    new G4PVPlacement(G4Translate3D(5, 0, -pa_box_height / 2 + 0.3 / 2), lv_diode, "pv_diode2", lv_preamplifier, false, 2, overlap);
-
-    lv_preamplifier->SetVisAttributes(att("preamp"));
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
-      auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + pa_box_height / 2)*G4RotateZ3D(-M_PI / 2), lv_preamplifier,
-                                  "phys_preamplifier", crystalvolume_logical, false, indx, 0);
+      auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),
+                                  suf("phys_backward_preamplifier", indx), crystalvolume_logical, false, (1152 + 6624) / 16 + indx, 0);
       if (overlap)pv->CheckOverlaps(1000);
     }
   }

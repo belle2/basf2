@@ -138,3 +138,111 @@ int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4doub
   m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, mom * (1 / CLHEP::GeV), pos * (1 / CLHEP::cm));
   return simhitNumber;
 }
+
+SensitiveDiode::SensitiveDiode(const G4String& name):
+  Simulation::SensitiveDetectorBase(name, Const::ECL)
+{
+  m_eclHits.registerInDataStore("ECLDiodeHits");
+  m_eclp = ECLGeometryPar::Instance();
+}
+
+SensitiveDiode::~SensitiveDiode()
+{
+}
+
+void SensitiveDiode::Initialize(G4HCofThisEvent*)
+{
+  m_hits.clear();
+  m_cells.clear();
+}
+
+//-----------------------------------------------------
+// Method invoked for every step in sensitive detector
+//-----------------------------------------------------
+bool SensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
+{
+  const G4StepPoint& s0 = *aStep->GetPreStepPoint();
+  const G4StepPoint& s1 = *aStep->GetPostStepPoint();
+  const G4Track&  track = *aStep->GetTrack();
+
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+    m_trackID = track.GetTrackID();
+    //Reset track parameters
+    m_esum = 0;
+    m_tsum = 0;
+  }
+  //Update energy deposit
+  G4double edep = aStep->GetTotalEnergyDeposit();
+  m_esum += edep;
+  m_tsum += (s0.GetGlobalTime() + s1.GetGlobalTime()) * edep;
+  //Save Hit if track leaves volume or is killed
+  if (track.GetNextVolume() != track.GetVolume() ||
+      track.GetTrackStatus() >= fStopAndKill) {
+    if (m_esum > 0.0) {
+      int cellID = m_eclp->TouchableDiodeToCellID(s0.GetTouchable());
+      m_tsum /= 2 * m_esum; // average
+      m_hits.push_back({cellID, m_esum, m_tsum});
+      auto it = find(m_cells.begin(), m_cells.end(), cellID);
+      if (it == m_cells.end())m_cells.push_back(cellID);
+#if 0
+      const G4ThreeVector& p = s0.GetPosition();
+      G4ThreeVector cp = 10 * m_eclp->getCrystalPos(cellID);
+      G4ThreeVector cv = m_eclp->getCrystalVec(cellID);
+      double dz = (p - cp) * cv;
+      double rho = ((p - cp) - dz * cv).perp();
+      cout << "diff " << cellID << " " << dz << " " << rho << endl;
+      if (abs(dz - 150) > 1) {
+        const G4VTouchable* touch = s0.GetTouchable();
+        const G4NavigationHistory* h = touch->GetHistory();
+        int hd = h->GetDepth();
+        int i1 = h->GetReplicaNo(hd - 1); // index of each volume is set at physical volume creation
+        int i2 = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
+        const G4String& vname = touch->GetVolume()->GetName();
+        cout << vname << " " << hd << " " << i1 << " " << i2 << endl;
+        for (int i = 0; i <= hd; i++) {
+          G4VPhysicalVolume* v = h->GetVolume(i);
+          cout << v->GetName() << endl;
+        }
+      }
+#endif
+    }
+    //Reset TrackID
+    m_trackID = 0;
+  }
+  return true;
+}
+
+void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
+{
+  struct dep_t {double e, t;};
+  vector<dep_t> v;
+  for (int cellId : m_cells) {
+    for (const hit_t& h : m_hits) {
+      if (cellId == h.cellId) v.push_back({h.e, h.t});
+    }
+
+    double esum = 0, tsum = 0;
+    for (const dep_t& t : v) {
+      esum += t.e;
+      tsum += t.t * t.e;
+    }
+    tsum /= esum;
+
+    double trms = 0;
+    for (const dep_t& t : v) trms += pow(t.t - tsum, 2) * t.e ;
+    trms /= esum;
+
+    tsum *= 1 / CLHEP::ns;
+    esum *= 1 / CLHEP::GeV;
+    m_eclHits.appendNew(cellId + 1, esum, tsum);
+
+
+    // cout<<"DD: "<<cellId<<" "<<esum<<" "<<tsum<<" +- "<<sqrt(tsum2)<<endl;
+
+    // sort(v.begin(),v.end(),[](const dep_t &a, const dep_t &b){return a.t<b.t;});
+    // cout<<"DD: "<<cellId<<" ";
+    // for(const dep_t &t: v)cout<<t.e<<" MeV "<<t.t<<" nsec, ";
+    // cout<<"\n";
+
+  }
+}

@@ -20,6 +20,7 @@
 
 namespace Belle2 {
   namespace ECL {
+    class ECLGeometryPar;
     /** Class for ECL Sensitive Detector */
     class SensitiveDetector: public Simulation::SensitiveDetectorBase {
     public:
@@ -56,6 +57,36 @@ namespace Belle2 {
       G4ThreeVector m_WeightedPos;  /**< average track position weighted by energy deposition */
       G4ThreeVector m_momentum;     /**< initial momentum of track before energy deposition inside sensitive volume */
 
+    };
+    /** Class for ECL Sensitive Detector */
+    class SensitiveDiode: public Simulation::SensitiveDetectorBase {
+    public:
+      /** Constructor */
+      SensitiveDiode(const G4String&);
+
+      /** Destructor */
+      ~SensitiveDiode();
+
+      /** Register ECL hits collection into G4HCofThisEvent */
+      void Initialize(G4HCofThisEvent* HCTE);
+
+      /** Process each step and calculate variables defined in ECLHit */
+      bool step(G4Step* aStep, G4TouchableHistory* history);
+
+      /** Do what you want to do at the end of each event */
+      void EndOfEvent(G4HCofThisEvent* eventHC);
+
+    private:
+      // members of SensitiveDiode
+      ECLGeometryPar* m_eclp;
+      struct hit_t { int cellId; double e, t; };
+      int m_trackID;                /**< current track id */
+      double m_tsum;        /**< average track time weighted by energy deposition */
+      double m_esum;       /**< total energy deposited in a volume by a track */
+
+      std::vector<hit_t> m_hits;
+      std::vector<int> m_cells;
+      StoreArray<ECLHit> m_eclHits;         /**< ECLHit array */
     };
   } // end of namespace ecl
 } // end of namespace Belle2

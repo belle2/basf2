@@ -216,13 +216,12 @@ namespace Belle2 {
      */
     explicit GeneralCut(std::string str)
     {
-      boost::algorithm::trim(str);
+      str = preprocess(str);
       if (str.empty()) {
         m_operation = EMPTY;
         return;
       }
 
-      str = preprocess(str);
       if (not processLogicConditions(str)) {
         if (not processTernaryNumericConditions(str)) {
           if (not processBinaryNumericConditions(str)) {
@@ -255,17 +254,11 @@ namespace Belle2 {
     std::string preprocess(std::string str) const
     {
       boost::algorithm::trim(str);
-      if (str.empty())
-        throw std::runtime_error("Cut string has an invalid format: Empty" + str);
 
       while (str.size() > 1 and findMatchedParenthesis(str) == str.size() - 1) {
         str = str.substr(1, str.size() - 2);
         boost::algorithm::trim(str);
-        if (str.empty())
-          throw std::runtime_error("Cut string has an invalid format: Empty" + str);
-
       }
-
 
       return str;
     }

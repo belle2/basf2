@@ -72,9 +72,16 @@ namespace Belle2 {
       /// Look up the position of the primary ionisation from related simulated hit.
       Vector3D getRecoPos3D(const CDCHit* ptrHit) const;
 
+      /// Look up the drift length from the primary ionisation to the wire from related simulated hit.
+      double getDriftLength(const CDCHit* ptrHit) const;
+
       /// Look up the position of the primary ionisation from the closest primary simulated hit.
-      /// If no primary sim hit is available use the secondary simulated hit position
+      /// If no primary sim hit is available use the information from the secondary hit
       Vector3D getClosestPrimaryRecoPos3D(const CDCHit* ptrHit) const;
+
+      /// Look up the drift length from the primary ionisation to the wire from related simulated hit.
+      /// If no primary sim hit is available use the information from the secondary hit
+      double getClosestPrimaryDriftLength(const CDCHit* ptrHit) const;
 
     public:
       /// Retrieve the wire hit the given CDCHit form the given wire hits

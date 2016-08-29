@@ -317,7 +317,6 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     }
 
     MCAxialSegmentPairFilter mcAxialAxialSegmentPairFilter;
-    CDCMCSegmentLookUp mcSegmentLookup;
 
     std::vector<CDCSegmentTriple> segmentTriples;
     for (const CDCAxialRecoSegment2D& startSegment : axialSegments) {

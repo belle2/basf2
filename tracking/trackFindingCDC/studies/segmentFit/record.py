@@ -44,7 +44,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
     use_alpha_in_drift_length = False
     flight_time_mass_scale = float("nan")
 
-    fit_positions = "rlDriftCircle"
+    fit_positions = "recoPos"
     fit_variance = "proper"
 
     output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
@@ -139,7 +139,8 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
         path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation=self.flight_time_estimation)
+                        flightTimeEstimation=self.flight_time_estimation,
+                        UseNLoops=0.5)
 
         if self.monte_carlo == "no":
             # MC free - default
@@ -156,6 +157,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
             path.add_module("SegmentCreatorMCTruth",
+                            reconstructedDriftLength=False,
                             reconstructedPositions=True)
 
         else:
@@ -236,6 +238,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         part_name="curvature",
         unit="1/cm",
         absolute=False,
+        aux_names=["tan_lambda_truth", "curvature_truth"],
         groupby=[None, "stereo_kind", "superlayer_id"],
         outlier_z_score=5.0,
         title_postfix="")
@@ -244,21 +247,10 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         part_name="curvature",
         unit="1/cm",
         absolute=True,
+        aux_names=["tan_lambda_truth", "curvature_truth"],
         groupby=[None, "stereo_kind", "superlayer_id"],
         outlier_z_score=5.0,
         title_postfix="")
-
-    save_curvature_pull_by_tan_lambda = refiners.save_profiles(
-        x="tan_lambda_truth",
-        y="curvature_pull",
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0)
-
-    save_curvature_residual_by_tan_lambda = refiners.save_profiles(
-        x="tan_lambda_truth",
-        y="curvature_residual",
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0)
 
     save_fit_quality_histograms = refiners.save_histograms(
         outlier_z_score=5.0,

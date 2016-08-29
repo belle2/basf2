@@ -57,11 +57,11 @@ namespace Belle2 {
       /// Parameter : Option string which variance information from the hits should be used
       std::string m_param_fitVarianceString = "proper";
 
-      /// Parameter : Switch to reestimate the drift length
-      bool m_param_updateDriftLength = false;
+      /// Parameter : Switch to reestimate the drift length before the fit
+      bool m_param_updateDriftLength = true;
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
-      bool m_param_useAlphaInDriftLength = false;
+      bool m_param_useAlphaInDriftLength = true;
 
       /// Parameter : Mass to estimate the velocity in the flight time to the hit
       double m_param_tofMassScale = NAN;

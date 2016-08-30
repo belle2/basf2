@@ -208,8 +208,7 @@ namespace Belle2 {
        *  Also the right left passage hypotheses does not play a role in
        *  the reconstruction in any way.
        */
-      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const
-      { return getWireHit().reconstruct2D(trajectory2D); }
+      Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
 
       /**
        *  Attempts to reconstruct a three dimensional position (especially of stereo hits).
@@ -224,8 +223,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const
-      { return getWireHit().reconstruct3D(trajectory2D, getRLInfo()); }
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D) const;
 
       /// Output operator. Help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCRLWireHit& rlWireHit)

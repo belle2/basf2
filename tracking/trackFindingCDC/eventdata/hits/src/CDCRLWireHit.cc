@@ -16,10 +16,9 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit,
-                           ERightLeft rlInfo)
+CDCRLWireHit::CDCRLWireHit(const CDCWireHit* wireHit)
   : CDCRLWireHit(wireHit,
-                 rlInfo,
+                 ERightLeft::c_Unknown,
                  wireHit->getRefDriftLength())
 {
 }
@@ -86,7 +85,7 @@ CDCRLWireHit CDCRLWireHit::fromSimHit(const CDCWireHit* wirehit,
 
   ERightLeft rlInfo = trackPosToWire.xy().isRightOrLeftOf(directionOfFlight.xy());
 
-  CDCRLWireHit rlWireHit(wirehit, rlInfo);
+  CDCRLWireHit rlWireHit(wirehit, rlInfo, simhit.getDriftLength());
 
   return rlWireHit;
 }

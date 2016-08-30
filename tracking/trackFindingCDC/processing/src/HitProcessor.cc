@@ -57,7 +57,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
       ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getWireHit()->getRefPos2D());
       // Is this lookup really necessary?
       const CDCWireHit* wireHit = wireHitTopology.getWireHit(hit->getWireHit()->getHit());
-      CDCRLWireHit rlWireHit(wireHit, rlInfo);
+      CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
       if (wireHit->getAutomatonCell().hasTakenFlag())
         continue;
 

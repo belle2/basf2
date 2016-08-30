@@ -31,12 +31,10 @@ namespace Belle2 {
       CDCRLWireHit() = default;
 
       /**
-       *  Constructs an oriented wire hit.
+       *  Constructs an oriented wire hit with unknown left right passage information.
        *  @param wireHit      The wire hit the oriented hit is associated with.
-       *  @param rlInfo       The right left passage information of the _wire_ relative to the track
        */
-      CDCRLWireHit(const CDCWireHit* wireHit,
-                   ERightLeft rlInfo = ERightLeft::c_Unknown);
+      CDCRLWireHit(const CDCWireHit* wireHit);
 
       /**
        *  Constructs an oriented wire hit.
@@ -74,7 +72,7 @@ namespace Belle2 {
 
       /// Returns the oriented wire hit with the opposite right left information.
       CDCRLWireHit reversed() const
-      { return CDCRLWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo)); }
+      { return CDCRLWireHit(m_wireHit, NRightLeft::reversed(m_rlInfo), m_refDriftLength); }
 
       /// Swiches the right left passage to its opposite inplace.
       void reverse()

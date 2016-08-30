@@ -1740,10 +1740,11 @@ class ValidationPlot(object):
             finite_xs = xs
 
         # Prepare for the estimation of outliers
+        make_symmetric = False
         if outlier_z_score is not None and (lower_bound is None or upper_bound is None):
 
             x_mean, x_std = self.get_robust_mean_and_std(finite_xs)
-
+            make_symmetric = abs(x_mean) < x_std / 5.0 and lower_bound is None and upper_bound is None
             lower_exceptional_x = np.nan
             upper_exceptional_x = np.nan
 
@@ -1752,6 +1753,7 @@ class ValidationPlot(object):
                 if len(exceptional_xs):
                     lower_exceptional_x = np.min(exceptional_xs)
                     upper_exceptional_x = np.max(exceptional_xs)
+                    make_symmetric = False
 
         # Find the lower bound, if it is not given.
         if lower_bound is None:
@@ -1795,6 +1797,12 @@ class ValidationPlot(object):
                 debug('Upper bound after outlier detection')
                 debug('Upper bound %s', upper_bound)
                 debug('Upper outlier bound %s', upper_outlier_bound)
+
+        if make_symmetric and lower_bound < 0 and upper_bound > 0:
+            if abs(abs(lower_bound) - abs(upper_bound)) < x_std / 5.0:
+                abs_bound = max(abs(lower_bound), abs(upper_bound))
+                lower_bound = -abs_bound
+                upper_bound = abs_bound
 
         return lower_bound, upper_bound
 

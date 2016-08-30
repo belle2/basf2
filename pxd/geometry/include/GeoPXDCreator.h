@@ -50,7 +50,7 @@ namespace Belle2 {
        * @param placement Information on how to place the sensor
        */
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
-        VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement& placement);
+        VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement);
 
     private:
 

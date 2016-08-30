@@ -70,9 +70,9 @@ namespace Belle2 {
 
     GeoVXDAssembly GeoVXDCreator::createLadderSupport(int, GearDir) { return GeoVXDAssembly(); }
 
-    vector<GeoVXDPlacement> GeoVXDCreator::getSubComponents(GearDir path)
+    vector<VXDGeoPlacement> GeoVXDCreator::getSubComponents(GearDir path)
     {
-      vector<GeoVXDPlacement> result;
+      vector<VXDGeoPlacement> result;
       for (const GearDir& component : path.getNodes("Component")) {
         string type;
         if (!component.exists("@type")) {
@@ -85,7 +85,7 @@ namespace Belle2 {
         nPos = max(nPos, component.getNumberNodes("woffset"));
         for (int iPos = 1; iPos <= nPos; ++iPos) {
           string index = (boost::format("[%1%]") % iPos).str();
-          result.push_back(GeoVXDPlacement(
+          result.push_back(VXDGeoPlacement(
                              type,
                              component.getLength("u" + index, 0) / Unit::mm,
                              component.getLength("v" + index, 0) / Unit::mm,
@@ -97,10 +97,10 @@ namespace Belle2 {
       return result;
     }
 
-    GeoVXDComponent GeoVXDCreator::getComponent(const string& name)
+    VXDGeoComponent GeoVXDCreator::getComponent(const string& name)
     {
       //Check if component already exists
-      map<string, GeoVXDComponent >::iterator cached = m_componentCache.find(name);
+      map<string, VXDGeoComponent>::iterator cached = m_componentCache.find(name);
       if (cached != m_componentCache.end()) {
         return cached->second;
       }
@@ -109,7 +109,7 @@ namespace Belle2 {
       GearDir params(m_components, path);
       if (!params) B2FATAL("Could not find definition for component " << name);
 
-      GeoVXDComponent c(
+      VXDGeoComponent c(
         params.getString("Material", m_defaultMaterial),
         params.getString("Color", ""),
         params.getLength("width", 0) / Unit::mm,
@@ -119,111 +119,111 @@ namespace Belle2 {
       );
       double angle  = params.getAngle("angle", 0);
 
-      if (c.width <= 0 || c.length <= 0 || c.height <= 0) {
+      if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
         B2DEBUG(100, "One dimension empty, using auto resize for component");
       } else {
-        G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.width, c.width2, c.length, c.height, angle);
-        c.volume = new G4LogicalVolume(solid, Materials::get(c.material), m_prefix + "." + name);
+        G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.getWidth(), c.getWidth2(), c.getLength(), c.getHeight(), angle);
+        c.setVolume(new G4LogicalVolume(solid, Materials::get(c.getMaterial()), m_prefix + "." + name));
       }
-      vector<GeoVXDPlacement> subComponents = getSubComponents(params);
+      vector<VXDGeoPlacement> subComponents = getSubComponents(params);
       createSubComponents(m_prefix + "." + name, c, subComponents);
       if (m_activeChips && params.exists("activeChipID")) {
         int chipID = params.getInt("activeChipID");
         B2DEBUG(50, "Creating BkgSensitiveDetector for component " << name << " with chipID " <<  chipID);
         BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_prefix.c_str(), chipID);
-        c.volume->SetSensitiveDetector(sensitive);
+        c.getVolume()->SetSensitiveDetector(sensitive);
         m_sensitive.push_back(sensitive);
       }
       m_componentCache[name] = c;
       return c;
     }
 
-    GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, GeoVXDComponent& component,
-                                                      vector<GeoVXDPlacement> placements, bool originCenter, bool allowOutside)
+    GeoVXDAssembly GeoVXDCreator::createSubComponents(const string& name, VXDGeoComponent& component,
+                                                      vector<VXDGeoPlacement> placements, bool originCenter, bool allowOutside)
     {
       GeoVXDAssembly assembly;
       B2DEBUG(100, "Creating component " << name);
-      vector<GeoVXDComponent> subComponents;
+      vector<VXDGeoComponent> subComponents;
       subComponents.reserve(placements.size());
       //Go over all subcomponents and check if they will fit inside.
       //If component.volume is zero we will create one so sum up needed space
-      bool widthResize  = component.width <= 0;
-      bool lengthResize = component.length <= 0;
-      bool heightResize = component.height <= 0;
-      for (GeoVXDPlacement& p : placements) {
+      bool widthResize  = component.getWidth() <= 0;
+      bool lengthResize = component.getLength() <= 0;
+      bool heightResize = component.getHeight() <= 0;
+      for (VXDGeoPlacement& p : placements) {
 
-        GeoVXDComponent sub = getComponent(p.name);
-        B2DEBUG(100, "SubComponent " << p.name);
-        B2DEBUG(100, boost::format("Placement: u:%1% cm, v:%2% cm, w:%3% + %4% cm") % p.u % p.v % p.w % p.woffset);
-        B2DEBUG(100, boost::format("Dimensions: %1%x%2%x%3% cm") % sub.width % sub.length % sub.height);
+        VXDGeoComponent sub = getComponent(p.getName());
+        B2DEBUG(100, "SubComponent " << p.getName());
+        B2DEBUG(100, boost::format("Placement: u:%1% cm, v:%2% cm, w:%3% + %4% cm") % p.getU() % p.getV() % p.getW() % p.getWOffset());
+        B2DEBUG(100, boost::format("Dimensions: %1%x%2%x%3% cm") % sub.getWidth() % sub.getLength() % sub.getHeight());
 
-        if (p.w == GeoVXDPlacement::c_above || p.w == GeoVXDPlacement::c_below) {
+        if (p.getW() == VXDGeoPlacement::c_above || p.getW() == VXDGeoPlacement::c_below) {
           //Below placement only valid if we are allowed to create a container around component
-          if (!allowOutside) B2FATAL("Cannot place component " << p.name << " outside of component " << name);
-        } else if (sub.height + p.woffset > component.height) {
+          if (!allowOutside) B2FATAL("Cannot place component " << p.getName() << " outside of component " << name);
+        } else if (sub.getHeight() + p.getWOffset() > component.getHeight()) {
           //Component will not fit heightwise. If we resize the volume anyway than we don't have problems
           if (!heightResize) {
-            B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
-                    << "height " << sub.height << " > " << component.height);
+            B2FATAL("Subcomponent " << p.getName() << " does not fit into volume: "
+                    << "height " << sub.getHeight() << " > " << component.getHeight());
           }
-          component.height = sub.height + p.woffset;
+          component.getHeight() = sub.getHeight() + p.getWOffset();
         }
 
         //Check if compoent will fit inside width,length. If we can resize do it if needed, otherwise bail
-        double minWidth =  max(abs(p.u + sub.width / 2.0), abs(p.u - sub.width / 2.0));
-        double minLength = max(abs(p.v + sub.length / 2.0), abs(p.v - sub.length / 2.0));
-        if (minWidth > component.width + component.width * numeric_limits<double>::epsilon()) {
+        double minWidth =  max(abs(p.getU() + sub.getWidth() / 2.0), abs(p.getU() - sub.getWidth() / 2.0));
+        double minLength = max(abs(p.getV() + sub.getLength() / 2.0), abs(p.getV() - sub.getLength() / 2.0));
+        if (minWidth > component.getWidth() + component.getWidth() * numeric_limits<double>::epsilon()) {
           if (!widthResize) {
-            B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
-                    << "minWidth " << minWidth << " > " << component.width);
+            B2FATAL("Subcomponent " << p.getName() << " does not fit into volume: "
+                    << "minWidth " << minWidth << " > " << component.getWidth());
           }
-          component.width = minWidth * 2.0;
-          component.width2 = minWidth * 2.0;
+          component.setWidth(minWidth * 2.0);
         }
-        if (minLength > component.length + component.length * numeric_limits<double>::epsilon()) {
+        if (minLength > component.getLength() + component.getLength() * numeric_limits<double>::epsilon()) {
           if (!lengthResize) {
-            B2FATAL("Subcomponent " << p.name << " does not fit into volume: "
-                    << "minLength " << minLength << " > " << component.length);
+            B2FATAL("Subcomponent " << p.getName() << " does not fit into volume: "
+                    << "minLength " << minLength << " > " << component.getLength());
           }
-          component.length = minLength * 2.0;
+          component.setLength(minLength * 2.0);
         }
         subComponents.push_back(sub);
       }
 
       //zero dimensions are fine mathematically but we don't want them in the simulation
-      if (component.width <= 0 || component.length <= 0 || component.height <= 0) {
+      if (component.getWidth() <= 0 || component.getLength() <= 0 || component.getHeight() <= 0) {
         B2FATAL("At least one dimension of component " << name << " is zero which does not make sense");
       }
 
       //No volume yet, create a new one automatically assuming air material
-      if (!component.volume) {
-        G4VSolid* componentShape = createTrapezoidal(name, component.width, component.width2, component.length, component.height);
-        component.volume = new G4LogicalVolume(componentShape, Materials::get(component.material), name);
+      if (!component.getVolume()) {
+        G4VSolid* componentShape = createTrapezoidal(name, component.getWidth(), component.getWidth2(), component.getLength(),
+                                                     component.getHeight());
+        component.setVolume(new G4LogicalVolume(componentShape, Materials::get(component.getMaterial()), name));
       }
 
-      B2DEBUG(100, boost::format("Component %1% dimensions: %2%x%3%x%4% cm") % name % component.width % component.length %
-              component.height);
+      B2DEBUG(100, boost::format("Component %1% dimensions: %2%x%3%x%4% cm") % name % component.getWidth() % component.getLength() %
+              component.getHeight());
 
       //Ok, all volumes set up, now add them together
       for (size_t i = 0; i < placements.size(); ++i) {
-        GeoVXDPlacement& p = placements[i];
-        GeoVXDComponent& s = subComponents[i];
+        VXDGeoPlacement& p = placements[i];
+        VXDGeoComponent& s = subComponents[i];
         G4Transform3D transform = getPosition(component, s, p, originCenter);
-        if (p.w ==  GeoVXDPlacement::c_below || p.w == GeoVXDPlacement::c_above) {
+        if (p.getW() ==  VXDGeoPlacement::c_below || p.getW() == VXDGeoPlacement::c_above) {
           //Add to selected mother (either component or container around component
-          assembly.add(s.volume, transform);
+          assembly.add(s.getVolume(), transform);
         } else {
-          new G4PVPlacement(transform, s.volume, name + "." + p.name, component.volume, false, i);
+          new G4PVPlacement(transform, s.getVolume(), name + "." + p.getName(), component.getVolume(), false, i);
         }
       }
 
       //Set some visibility options for volume. Done here because all components including sensor go through here
-      if (component.color.empty()) {
+      if (component.getColor().empty()) {
         B2DEBUG(200, "Component " << name << " is an Air volume, setting invisible");
-        setVisibility(*component.volume, false);
+        setVisibility(*component.getVolume(), false);
       } else {
-        B2DEBUG(200, "Component " << name << " color: " << component.color);
-        setColor(*component.volume, component.color);
+        B2DEBUG(200, "Component " << name << " color: " << component.getColor());
+        setColor(*component.getVolume(), component.getColor());
       }
       B2DEBUG(100, "--> Created component " << name);
       //Return the difference in W between the origin of the original component and the including container
@@ -249,32 +249,32 @@ namespace Belle2 {
       return G4Transform3D(rotation, translation);
     }
 
-    G4Transform3D GeoVXDCreator::getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter,
-                                             const GeoVXDPlacement& placement, bool originCenter)
+    G4Transform3D GeoVXDCreator::getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter,
+                                             const VXDGeoPlacement& placement, bool originCenter)
     {
-      double u(placement.u), v(placement.v), w(0);
-      switch (placement.w) {
-        case GeoVXDPlacement::c_below:  //Place below component
-          w = - mother.height / 2.0 - daughter.height / 2.0;
+      double u(placement.getU()), v(placement.getV()), w(0);
+      switch (placement.getW()) {
+        case VXDGeoPlacement::c_below:  //Place below component
+          w = - mother.getHeight() / 2.0 - daughter.getHeight() / 2.0;
           break;
-        case GeoVXDPlacement::c_bottom: //Place inside, at bottom of component
-          w = - mother.height / 2.0 + daughter.height / 2.0;
+        case VXDGeoPlacement::c_bottom: //Place inside, at bottom of component
+          w = - mother.getHeight() / 2.0 + daughter.getHeight() / 2.0;
           break;
-        case GeoVXDPlacement::c_center: //Place inside, centered
+        case VXDGeoPlacement::c_center: //Place inside, centered
           w = 0;
           break;
-        case GeoVXDPlacement::c_top:    //Place inside, at top of mother
-          w = mother.height / 2.0 - daughter.height / 2.0;
+        case VXDGeoPlacement::c_top:    //Place inside, at top of mother
+          w = mother.getHeight() / 2.0 - daughter.getHeight() / 2.0;
           break;
-        case GeoVXDPlacement::c_above:  //Place above mother
-          w = mother.height / 2.0 + daughter.height / 2.0;
+        case VXDGeoPlacement::c_above:  //Place above mother
+          w = mother.getHeight() / 2.0 + daughter.getHeight() / 2.0;
           break;
       }
       if (!originCenter) { //Sensor has coordinate origin in the corner, all submothers at their center
-        u -= mother.width / 2.0;
-        v -= mother.length / 2.0;
+        u -= mother.getWidth() / 2.0;
+        v -= mother.getLength() / 2.0;
       }
-      return G4Translate3D(u, v, w + placement.woffset);
+      return G4Translate3D(u, v, w + placement.getWOffset());
     }
 
 
@@ -308,44 +308,44 @@ namespace Belle2 {
 
     G4Transform3D GeoVXDCreator::placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement)
     {
-      VxdID ladder(m_ladder.layerID, ladderID, 0);
+      VxdID ladder(m_ladder.getLayerID(), ladderID, 0);
 
-      G4Translate3D ladderPos(m_ladder.radius, m_ladder.shift, 0);
+      G4Translate3D ladderPos(m_ladder.getRadius(), m_ladder.getShift(), 0);
       G4Transform3D ladderPlacement = placement * G4RotateZ3D(phi) * ladderPos * getAlignment(ladder);
 
       vector<G4Point3D> lastSensorEdge;
-      for (GeoVXDSensorPlacement& p : m_ladder.sensors) {
+      for (const VXDGeoSensorPlacement& p : m_ladder.getSensors()) {
         VxdID sensorID(ladder);
-        sensorID.setSensorNumber(p.sensorID);
+        sensorID.setSensorNumber(p.getSensorID());
 
-        std::map<string, GeoVXDSensor>::iterator it = m_sensorMap.find(p.sensorTypeID);
+        std::map<string, VXDGeoSensor>::iterator it = m_sensorMap.find(p.getSensorTypeID());
         if (it == m_sensorMap.end()) {
-          B2FATAL("Invalid SensorTypeID " << p.sensorTypeID << ", please check the definition of " << sensorID);
+          B2FATAL("Invalid SensorTypeID " << p.getSensorTypeID() << ", please check the definition of " << sensorID);
         }
-        GeoVXDSensor& s = it->second;
+        VXDGeoSensor& s = it->second;
         string name = m_prefix + "." + (string)sensorID;
 
         //Calculate the reflection transformation needed. Since we want the
         //active area to be non reflected we apply this transformation on the
         //sensor and on the active area
         G4Transform3D reflection;
-        if (p.flipU) reflection = reflection * G4ReflectX3D();
-        if (p.flipV) reflection = reflection * G4ReflectY3D();
-        if (p.flipW) reflection = reflection * G4ReflectZ3D();
+        if (p.getFlipU()) reflection = reflection * G4ReflectX3D();
+        if (p.getFlipV()) reflection = reflection * G4ReflectY3D();
+        if (p.getFlipW()) reflection = reflection * G4ReflectZ3D();
 
-        G4VSolid* sensorShape = createTrapezoidal(name, s.width, s.width2, s.length, s.height);
-        G4Material* sensorMaterial = Materials::get(s.material);
+        G4VSolid* sensorShape = createTrapezoidal(name, s.getWidth(), s.getWidth2(), s.getLength(), s.getHeight());
+        G4Material* sensorMaterial = Materials::get(s.getMaterial());
         if (m_onlyActiveMaterial) {
-          s.volume = new G4LogicalVolume(sensorShape, Materials::get(m_defaultMaterial), name);
+          s.setVolume(new G4LogicalVolume(sensorShape, Materials::get(m_defaultMaterial), name));
         } else {
-          s.volume = new G4LogicalVolume(sensorShape, sensorMaterial, name);
+          s.setVolume(new G4LogicalVolume(sensorShape, sensorMaterial, name));
         }
         // Create sensitive Area: this Part is created separately since we want full control over the coordinate system:
         // local x (called u) should point in RPhi direction
         // local y (called v) should point in global z
         // local z (called w) should away from the origin
-        G4VSolid* activeShape = createTrapezoidal(name + ".Active", s.activeArea.width, s.activeArea.width2,
-                                                  s.activeArea.length, s.activeArea.height);
+        G4VSolid* activeShape = createTrapezoidal(name + ".Active", s.getActiveArea().getWidth(), s.getActiveArea().getWidth2(),
+                                                  s.getActiveArea().getLength(), s.getActiveArea().getHeight());
         //Create appropriate sensitive detector instance
         SensitiveDetectorBase* sensitive = createSensitiveDetector(sensorID, s, p);
         sensitive->setOptions(m_seeNeutrons, m_onlyPrimaryTrueHits,
@@ -370,34 +370,35 @@ namespace Belle2 {
         //   new G4PVPlacement(G4Translate3D(0,0,5*CLHEP::mm),wBox,"w",active,false,1);
         // }
 
-        setColor(*active, s.activeArea.color);
+        setColor(*active, s.getActiveArea().getColor());
         //The coordinates of the active region are given as the distance between the corners, not to the center
         //Place the active area
-        G4Transform3D activePosition = G4Translate3D(s.activeArea.width / 2.0, s.activeArea.length / 2.0, 0) *
-                                       getPosition(s, s.activeArea, s.activePlacement, false);
-        G4ReflectionFactory::Instance()->Place(activePosition * reflection, name + ".Active", active, s.volume,
+        G4Transform3D activePosition = G4Translate3D(s.getActiveArea().getWidth() / 2.0, s.getActiveArea().getLength() / 2.0, 0) *
+                                       getPosition(s, s.getActiveArea(), s.getActivePlacement(), false);
+        G4ReflectionFactory::Instance()->Place(activePosition * reflection, name + ".Active", active, s.getVolume(),
                                                false, (int)sensorID, false);
 
         //Now create all the other components and place the Sensor
         GeoVXDAssembly assembly;
-        if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.components, false, true);
+        if (!m_onlyActiveMaterial) assembly = createSubComponents(name, s, s.getComponents(), false, true);
         G4RotationMatrix rotation(0, -M_PI / 2.0, -M_PI / 2.0);
         G4Transform3D sensorAlign = getAlignment(sensorID);
         G4Transform3D placement = G4Rotate3D(rotation) * sensorAlign * reflection;
 
-        if (s.slanted) {
-          placement = G4TranslateX3D(m_ladder.slantedRadius - m_ladder.radius) * G4RotateY3D(-m_ladder.slantedAngle) * placement;
+        if (s.getSlanted()) {
+          placement = G4TranslateX3D(m_ladder.getSlantedRadius() - m_ladder.getRadius()) * G4RotateY3D(
+                        -m_ladder.getSlantedAngle()) * placement;
         }
-        placement = ladderPlacement * G4Translate3D(0.0, 0.0, p.z) * placement;
+        placement = ladderPlacement * G4Translate3D(0.0, 0.0, p.getZ()) * placement;
 
-        assembly.add(s.volume);
+        assembly.add(s.getVolume());
         assembly.place(volume, placement);
 
         //See if we want to glue the modules together
-        if (!m_ladder.glueMaterial.empty() && !m_onlyActiveMaterial) {
-          double u = s.width / 2.0 + m_ladder.glueSize;
-          double v = s.length / 2.0;
-          double w = s.height / 2.0 + m_ladder.glueSize;
+        if (!m_ladder.getGlueMaterial().empty() && !m_onlyActiveMaterial) {
+          double u = s.getWidth() / 2.0 + m_ladder.getGlueSize();
+          double v = s.getLength() / 2.0;
+          double w = s.getHeight() / 2.0 + m_ladder.getGlueSize();
           std::vector<G4Point3D> curSensorEdge(4);
           //Lets get the forward corners of the sensor by applying the unreflected placement matrix
           curSensorEdge[0] = placement * reflection * G4Point3D(u, v, + w);
@@ -446,7 +447,7 @@ namespace Belle2 {
 
               solidTarget->SetSolidClosed(true);
 
-              G4LogicalVolume* glue = new G4LogicalVolume(solidTarget,  Materials::get(m_ladder.glueMaterial),
+              G4LogicalVolume* glue = new G4LogicalVolume(solidTarget,  Materials::get(m_ladder.getGlueMaterial()),
                                                           m_prefix + ".Glue." + (string)sensorID);
               setColor(*glue, "#097");
               new G4PVPlacement(G4Transform3D(), glue, m_prefix + ".Glue." + (string)sensorID, volume, false, 1);
@@ -500,7 +501,7 @@ namespace Belle2 {
       //Read the definition of all sensor types
       for (const GearDir& paramsSensor : m_components.getNodes("Sensor")) {
         string sensorTypeID = paramsSensor.getString("@type");
-        GeoVXDSensor sensor(
+        VXDGeoSensor sensor(
           paramsSensor.getString("Material"),
           paramsSensor.getString("Color", ""),
           paramsSensor.getLength("width") / Unit::mm,
@@ -509,23 +510,22 @@ namespace Belle2 {
           paramsSensor.getLength("height") / Unit::mm,
           paramsSensor.getBool("@slanted", false)
         );
-        sensor.activeArea = GeoVXDComponent(
-                              paramsSensor.getString("Material"),
-                              paramsSensor.getString("Active/Color", "#f00"),
-                              paramsSensor.getLength("Active/width") / Unit::mm,
-                              paramsSensor.getLength("Active/width2", 0) / Unit::mm,
-                              paramsSensor.getLength("Active/length") / Unit::mm,
-                              paramsSensor.getLength("Active/height") / Unit::mm
-                            );
-        sensor.activePlacement = GeoVXDPlacement(
-                                   "Active",
-                                   paramsSensor.getLength("Active/u") / Unit::mm,
-                                   paramsSensor.getLength("Active/v") / Unit::mm,
-                                   paramsSensor.getString("Active/w", "center"),
-                                   paramsSensor.getLength("Active/woffset", 0) / Unit::mm
-                                 );
-        sensor.info = createSensorInfo(GearDir(paramsSensor, "Active"));
-        sensor.components = getSubComponents(paramsSensor);
+        sensor.setActive(VXDGeoComponent(
+                           paramsSensor.getString("Material"),
+                           paramsSensor.getString("Active/Color", "#f00"),
+                           paramsSensor.getLength("Active/width") / Unit::mm,
+                           paramsSensor.getLength("Active/width2", 0) / Unit::mm,
+                           paramsSensor.getLength("Active/length") / Unit::mm,
+                           paramsSensor.getLength("Active/height") / Unit::mm
+                         ), VXDGeoPlacement(
+                           "Active",
+                           paramsSensor.getLength("Active/u") / Unit::mm,
+                           paramsSensor.getLength("Active/v") / Unit::mm,
+                           paramsSensor.getString("Active/w", "center"),
+                           paramsSensor.getLength("Active/woffset", 0) / Unit::mm
+                         ));
+        sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
+        sensor.setComponents(getSubComponents(paramsSensor));
         m_sensorMap[sensorTypeID] = sensor;
       }
 
@@ -589,7 +589,7 @@ namespace Belle2 {
       if (!paramsLadder) {
         B2FATAL("Could not find Ladder definition for layer " << layer);
       }
-      m_ladder = GeoVXDLadder(
+      m_ladder = VXDGeoLadder(
                    layer,
                    paramsLadder.getLength("shift") / Unit::mm,
                    paramsLadder.getLength("radius") / Unit::mm,
@@ -600,14 +600,14 @@ namespace Belle2 {
                  );
 
       for (const GearDir& sensorInfo : paramsLadder.getNodes("Sensor")) {
-        m_ladder.sensors.push_back(GeoVXDSensorPlacement(
-                                     sensorInfo.getInt("@id"),
-                                     sensorInfo.getString("@type"),
-                                     sensorInfo.getLength(".") / Unit::mm,
-                                     sensorInfo.getBool("@flipU", false),
-                                     sensorInfo.getBool("@flipV", false),
-                                     sensorInfo.getBool("@flipW", false)
-                                   ));
+        m_ladder.addSensor(VXDGeoSensorPlacement(
+                             sensorInfo.getInt("@id"),
+                             sensorInfo.getString("@type"),
+                             sensorInfo.getLength(".") / Unit::mm,
+                             sensorInfo.getBool("@flipU", false),
+                             sensorInfo.getBool("@flipV", false),
+                             sensorInfo.getBool("@flipW", false)
+                           ));
       }
     }
   }  // namespace VXD

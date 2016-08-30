@@ -84,8 +84,8 @@ namespace Belle2 {
        * @param sensorID SensorID for the sensor
        * @param sensor   Information about the sensor to create the Sensitive Detector for
        */
-      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const GeoVXDSensor& sensor,
-                                                             const GeoVXDSensorPlacement& placement) = 0;
+      virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
+                                                             const VXDGeoSensorPlacement& placement) = 0;
 
       /**
        * Read parameters for given layer and store in m_ladder
@@ -104,7 +104,7 @@ namespace Belle2 {
        * @param daugther Daughter component
        * @return Transformation matrix to place the daughter relative to the origin to the mother
        */
-      G4Transform3D getPosition(const GeoVXDComponent& mother, const GeoVXDComponent& daughter, const GeoVXDPlacement& placement,
+      G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
                                 bool originCenter);
 
       /**
@@ -123,12 +123,12 @@ namespace Belle2 {
        * @return pair containing the TGeoVolume* of the component as well as
        *         the height of the component
        */
-      GeoVXDComponent getComponent(const std::string& component);
+      VXDGeoComponent getComponent(const std::string& component);
 
       /**
-       * Return vector of GeoVXDPlacements with all the components defined inside a given path
+       * Return vector of VXDGeoPlacements with all the components defined inside a given path
        */
-      std::vector<GeoVXDPlacement> getSubComponents(GearDir path);
+      std::vector<VXDGeoPlacement> getSubComponents(GearDir path);
 
       /**
        * Place a list of subcomponents into an component.
@@ -149,8 +149,8 @@ namespace Belle2 {
        *        wrapped in an Air volume fitting all components
        * @return offset in w which was applied to the component when extending it
        */
-      GeoVXDAssembly createSubComponents(const std::string& name, GeoVXDComponent&
-                                         component, std::vector<GeoVXDPlacement> placements,
+      GeoVXDAssembly createSubComponents(const std::string& name, VXDGeoComponent&
+                                         component, std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
@@ -179,11 +179,11 @@ namespace Belle2 {
       /** Name of the Material to be used for Air */
       std::string m_defaultMaterial;
       /** Cache of all previously created components */
-      std::map<std::string, GeoVXDComponent> m_componentCache;
+      std::map<std::string, VXDGeoComponent> m_componentCache;
       /** Map containing Information about all defined sensor types */
-      std::map<std::string, GeoVXDSensor> m_sensorMap;
+      std::map<std::string, VXDGeoSensor> m_sensorMap;
       /** Parameters of the currently active ladder */
-      GeoVXDLadder m_ladder;
+      VXDGeoLadder m_ladder;
       /** List to all created sensitive detector instances */
       std::vector<Simulation::SensitiveDetectorBase*> m_sensitive;
       /** Diamond radiation sensor "sub creator" */

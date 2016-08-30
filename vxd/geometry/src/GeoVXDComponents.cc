@@ -11,23 +11,22 @@
 
 #include <vxd/geometry/GeoVXDComponents.h>
 #include <framework/logging/Logger.h>
-#include <boost/algorithm/string.hpp>
+#include <locale>
 
 namespace Belle2 {
-  namespace VXD {
-    GeoVXDPlacement::GeoVXDPlacement(const std::string& name, double u, double v, std::string w, double woffset): name(name), u(u), v(v), woffset(woffset)
-    {
-      boost::to_lower(w);
-      if (w == "below")        this->w = c_below;
-      else if (w == "bottom")  this->w = c_bottom;
-      else if (w == "center")  this->w = c_center;
-      else if (w == "top")     this->w = c_top;
-      else if (w == "above")   this->w = c_above;
-      else  B2FATAL("Unknown z-placement for VXD Component " << name << ": " << w << ", check xml file");
+  VXDGeoPlacement::VXDGeoPlacement(const std::string& name, double u, double v, std::string w, double woffset): m_name(name), m_u(u),
+    m_v(v), m_woffset(woffset)
+  {
+    w = std::tolower(w, std::locale());
+    if (w == "below")        m_w = c_below;
+    else if (w == "bottom")  m_w = c_bottom;
+    else if (w == "center")  m_w = c_center;
+    else if (w == "top")     m_w = c_top;
+    else if (w == "above")   m_w = c_above;
+    else  B2FATAL("Unknown z-placement for VXD Component " << name << ": " << w << ", check xml file");
 
-      if (this->w != c_center && woffset < 0) {
-        B2FATAL("VXD Component " << name << ": Offset has to be positive except for centered placement");
-      }
+    if (m_w != c_center && m_woffset < 0) {
+      B2FATAL("VXD Component " << name << ": Offset has to be positive except for centered placement");
     }
-  }  // namespace svd
+  }
 }  // namespace Belle2

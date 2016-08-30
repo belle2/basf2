@@ -79,9 +79,9 @@ namespace Belle2 {
     }
 
     VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetector(
-      VxdID sensorID, const VXD::GeoVXDSensor& sensor, const VXD::GeoVXDSensorPlacement&)
+      VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement&)
     {
-      SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<SensorInfo&>(*sensor.info));
+      SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<const SensorInfo&>(*sensor.getSensorInfo()));
       sensorInfo->setID(sensorID);
       SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo);
       return sensitive;

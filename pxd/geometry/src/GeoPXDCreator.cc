@@ -85,12 +85,12 @@ namespace Belle2 {
       return info;
     }
 
-    VXD::SensitiveDetectorBase* GeoPXDCreator::createSensitiveDetector(VxdID sensorID, const VXD::GeoVXDSensor& sensor,
-        const VXD::GeoVXDSensorPlacement& placement)
+    VXD::SensitiveDetectorBase* GeoPXDCreator::createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
+        const VXDGeoSensorPlacement& placement)
     {
-      SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<SensorInfo&>(*sensor.info));
+      SensorInfo* sensorInfo = new SensorInfo(dynamic_cast<const SensorInfo&>(*sensor.getSensorInfo()));
       sensorInfo->setID(sensorID);
-      if (placement.flipV) sensorInfo->flipVSegmentation();
+      if (placement.getFlipV()) sensorInfo->flipVSegmentation();
       SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo);
       return sensitive;
     }

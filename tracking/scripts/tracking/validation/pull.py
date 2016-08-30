@@ -304,7 +304,7 @@ class PullAnalysis(object):
                 aux_residuals_profile.profile(aux_values,
                                               residuals,
                                               outlier_z_score=outlier_z_score,
-                                              gaus_z_score=1.0,
+                                              gaus_z_score=1.5,
                                               allow_discrete=True,
                                               is_expert=is_expert,
                                               )

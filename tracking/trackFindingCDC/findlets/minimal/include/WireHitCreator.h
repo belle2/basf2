@@ -131,13 +131,14 @@ namespace Belle2 {
             alpha = M_PI;
           }
           const double beta = 1;
-          double flightTimeEstimate = FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
+          double flightTimeEstimate =
+            FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
           double refDriftLengthRight =
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
                                               flightTimeEstimate,
-                                              false, //bool leftRight
+                                              true, // right
                                               wire->getRefZ(),
                                               alpha);
 
@@ -145,7 +146,7 @@ namespace Belle2 {
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
                                               flightTimeEstimate,
-                                              true, //bool leftRight
+                                              false, // left
                                               wire->getRefZ(),
                                               alpha);
 
@@ -160,9 +161,9 @@ namespace Belle2 {
           double refChargeDeposit =
             adcCountTranslator.getCharge(hit.getADCCount(),
                                          wire->getWireID(),
-                                         false, //bool leftRight
+                                         false, // leftRight
                                          wire->getRefZ(),
-                                         0); //theta
+                                         0); // theta
 
           outputWireHits.push_back(CDCWireHit(&hit,
                                               refDriftLength,

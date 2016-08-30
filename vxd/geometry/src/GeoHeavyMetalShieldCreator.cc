@@ -19,7 +19,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/math/special_functions/sign.hpp>
 
@@ -47,7 +46,7 @@ namespace Belle2 {
 
     void GeoHeavyMetalShieldCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
-      BOOST_FOREACH(const GearDir & shield, content.getNodes("Shield")) {
+      for (const GearDir& shield : content.getNodes("Shield")) {
         double minZ(0), maxZ(0);
         string name = shield.getString("@name");
         G4VSolid* geoShield = createPolyCone(name + " IR Shield", shield, minZ, maxZ);

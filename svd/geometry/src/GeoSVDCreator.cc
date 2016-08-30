@@ -23,7 +23,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -93,7 +92,7 @@ namespace Belle2 {
 
       //Half shell support is easy as we just add all the defined RotationSolids from the xml file
       double minZ(0), maxZ(0);
-      BOOST_FOREACH(const GearDir & component, support.getNodes("HalfShell/RotationSolid")) {
+      for (const GearDir& component : support.getNodes("HalfShell/RotationSolid")) {
         string name = component.getString("Name");
         string material = component.getString("Material");
 
@@ -119,7 +118,7 @@ namespace Belle2 {
         double baseThickness = support.getLength("Endrings/baseThickness") / Unit::mm / 2.0;
 
         //Create  the endrings
-        BOOST_FOREACH(const GearDir & endring, endrings.getNodes("Endring")) {
+        for (const GearDir& endring : endrings.getNodes("Endring")) {
           double z             = endring.getLength("z") / Unit::mm;
           double baseRadius    = endring.getLength("baseRadius") / Unit::mm;
           double innerRadius   = endring.getLength("innerRadius") / Unit::mm;
@@ -251,7 +250,7 @@ namespace Belle2 {
       if (params.exists("height")) height = params.getLength("height") / Unit::mm / 2.0;
 
       // Now lets create the ribs by adding all boxes to form one union solid
-      BOOST_FOREACH(const GearDir & box, params.getNodes("box")) {
+      for (const GearDir& box : params.getNodes("box")) {
         double theta = box.getAngle("theta");
         double zpos = box.getLength("z") / Unit::mm;
         double rpos = box.getLength("r") / Unit::mm;
@@ -269,7 +268,7 @@ namespace Belle2 {
         }
       }
       // Now lets add the tabs
-      BOOST_FOREACH(const GearDir & tab, params.getNodes("tab")) {
+      for (const GearDir& tab : params.getNodes("tab")) {
         double theta = tab.getAngle("theta");
         double zpos = tab.getLength("z") / Unit::mm;
         double rpos = tab.getLength("r") / Unit::mm;
@@ -284,7 +283,7 @@ namespace Belle2 {
       }
 
       // Now lets create forward and backward endmounts for the ribs
-      BOOST_FOREACH(const GearDir & endmount, params.getNodes("Endmount")) {
+      for (const GearDir& endmount : params.getNodes("Endmount")) {
         double height = endmount.getLength("height") / Unit::mm / 2.0;
         double width = endmount.getLength("width") / Unit::mm / 2.0;
         double length = endmount.getLength("length") / Unit::mm / 2.0;

@@ -23,7 +23,6 @@
 
 #include <cmath>
 #include <boost/format.hpp>
-#include <boost/foreach.hpp>
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
@@ -100,7 +99,7 @@ namespace Belle2 {
       VXD::GeoVXDAssembly supportAssembly;
       if (!support) return supportAssembly;
 
-      BOOST_FOREACH(const GearDir & endflange, support.getNodes("Endflange")) {
+      for (const GearDir& endflange : support.getNodes("Endflange")) {
         double minZ(0), maxZ(0);
         string name = endflange.getString("@name");
         G4VSolid* supportCone = geometry::createPolyCone(name, endflange, minZ, maxZ);

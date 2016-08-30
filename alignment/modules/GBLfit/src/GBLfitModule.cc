@@ -35,6 +35,7 @@
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>

@@ -22,8 +22,7 @@
 
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMAlignmentHit.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
-#include <eklm/geometry/GeometryData.h>
+#include <eklm/dataobjects/EKLMSegmentID.h>
 
 namespace Belle2 {
 
@@ -72,14 +71,8 @@ namespace Belle2 {
 
   private:
 
-    /** EKLMAlignmentHit. */
-    const EKLMAlignmentHit* m_AlignmentHit; //!
-
-    /** EKLMHit2d. */
-    const EKLMHit2d* m_Hit2d; //!
-
-    /** Geometry data. */
-    const EKLM::GeometryData* m_GeoDat;
+    /** Segment identifier. */
+    EKLMSegmentID m_Segment;
 
     /** Needed to make objects storable. */
     ClassDef(AlignableEKLMRecoHit, 1)

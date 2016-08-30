@@ -14,6 +14,11 @@
 
 using namespace Belle2;
 
+EKLMSegmentID::EKLMSegmentID() : m_Endcap(-1), m_Layer(-1), m_Sector(-1),
+  m_Plane(-1), m_Segment(-1)
+{
+}
+
 EKLMSegmentID::EKLMSegmentID(
   int endcap, int layer, int sector, int plane, int segment) : m_Endcap(endcap),
   m_Layer(layer), m_Sector(sector), m_Plane(plane), m_Segment(segment)
@@ -32,9 +37,19 @@ EKLMSegmentID::~EKLMSegmentID()
 {
 }
 
+void EKLMSegmentID::setEndcap(int endcap)
+{
+  m_Endcap = endcap;
+}
+
 int EKLMSegmentID::getEndcap() const
 {
   return m_Endcap;
+}
+
+void EKLMSegmentID::setLayer(int layer)
+{
+  m_Layer = layer;
 }
 
 int EKLMSegmentID::getLayer() const
@@ -42,14 +57,29 @@ int EKLMSegmentID::getLayer() const
   return m_Layer;
 }
 
+void EKLMSegmentID::setSector(int sector)
+{
+  m_Sector = sector;
+}
+
 int EKLMSegmentID::getSector() const
 {
   return m_Sector;
 }
 
+void EKLMSegmentID::setPlane(int plane)
+{
+  m_Plane = plane;
+}
+
 int EKLMSegmentID::getPlane() const
 {
   return m_Plane;
+}
+
+void EKLMSegmentID::setSegment(int segment)
+{
+  m_Segment = segment;
 }
 
 int EKLMSegmentID::getSegment() const

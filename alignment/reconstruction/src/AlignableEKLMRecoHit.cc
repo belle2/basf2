@@ -12,25 +12,35 @@
 #include <alignment/GlobalLabel.h>
 #include <alignment/reconstruction/AlignableEKLMRecoHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
+#include <eklm/geometry/GeometryData.h>
 
 using namespace Belle2;
 
-AlignableEKLMRecoHit::AlignableEKLMRecoHit()
+AlignableEKLMRecoHit::AlignableEKLMRecoHit() : m_Segment()
 {
-  m_AlignmentHit = NULL;
-  m_Hit2d = NULL;
-  m_GeoDat = &(EKLM::GeometryData::Instance());
 }
 
 AlignableEKLMRecoHit::AlignableEKLMRecoHit(
-  const EKLMAlignmentHit* hit, const genfit::TrackCandHit* trackCandHit)
+  const EKLMAlignmentHit* hit, const genfit::TrackCandHit* trackCandHit) :
+  m_Segment()
 {
+  int digit, segment;
+  const EKLM::GeometryData* geoDat = &(EKLM::GeometryData::Instance());
   RelationVector<EKLMHit2d> hit2ds = hit->getRelationsTo<EKLMHit2d>();
   if (hit2ds.size() != 1)
     B2FATAL("Incorrect number of related EKLMHit2ds.");
-  m_AlignmentHit = hit;
-  m_Hit2d = hit2ds[0];
-  m_GeoDat = &(EKLM::GeometryData::Instance());
+  RelationVector<EKLMDigit> eklmDigits = hit2ds[0]->getRelationsTo<EKLMDigit>();
+  if (eklmDigits.size() != 2)
+    B2FATAL("Incorrect number of related EKLMDigits.");
+  digit = hit->getDigitIdentifier();
+  segment = (eklmDigits[digit]->getStrip() - 1) / geoDat->getNStripsSegment()
+            + 1;
+  m_Segment.setEndcap(eklmDigits[digit]->getEndcap());
+  m_Segment.setLayer(eklmDigits[digit]->getLayer());
+  m_Segment.setSector(eklmDigits[digit]->getSector());
+  m_Segment.setPlane(eklmDigits[digit]->getPlane());
+  m_Segment.setSegment(segment);
 }
 
 AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
@@ -39,22 +49,9 @@ AlignableEKLMRecoHit::~AlignableEKLMRecoHit()
 
 std::vector<int> AlignableEKLMRecoHit::labels()
 {
-  int digit, segment;
   std::vector<int> labels;
-  EKLMSegmentID* segmentId;
-  RelationVector<EKLMDigit> eklmDigits =
-    m_Hit2d->getRelationsTo<EKLMDigit>();
-  if (eklmDigits.size() != 2)
-    B2FATAL("Incorrect number of related EKLMDigits.");
-  digit = m_AlignmentHit->getDigitIdentifier();
-  segment = (eklmDigits[digit]->getStrip() - 1) /
-            m_GeoDat->getNStripsSegment() + 1;
-  segmentId = new EKLMSegmentID(
-    eklmDigits[digit]->getEndcap(), eklmDigits[digit]->getLayer(),
-    eklmDigits[digit]->getSector(), eklmDigits[digit]->getPlane(), segment);
-  labels.push_back(GlobalLabel(*segmentId, 1));
-  labels.push_back(GlobalLabel(*segmentId, 2));
-  delete segmentId;
+  labels.push_back(GlobalLabel(m_Segment, 1));
+  labels.push_back(GlobalLabel(m_Segment, 2));
   return labels;
 }
 

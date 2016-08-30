@@ -25,6 +25,11 @@ namespace Belle2 {
 
     /**
      * Constructor.
+     */
+    EKLMSegmentID();
+
+    /**
+     * Constructor.
      * @param[in] endcap  Endcap number.
      * @param[in] layer   Layer number.
      * @param[in] sector  Sector number.
@@ -45,9 +50,19 @@ namespace Belle2 {
     ~EKLMSegmentID();
 
     /**
+     * Set endcap number.
+     */
+    void setEndcap(int endcap);
+
+    /**
      * Get endcap number.
      */
     int getEndcap() const;
+
+    /**
+     * Set layer number.
+     */
+    void setLayer(int layer);
 
     /**
      * Get layer number.
@@ -55,14 +70,29 @@ namespace Belle2 {
     int getLayer() const;
 
     /**
+     * Set sector number.
+     */
+    void setSector(int sector);
+
+    /**
      * Get sector number.
      */
     int getSector() const;
 
     /**
+     * Set plane number.
+     */
+    void setPlane(int plane);
+
+    /**
      * Get plane number.
      */
     int getPlane() const;
+
+    /**
+     * Set segment number.
+     */
+    void setSegment(int segment);
 
     /**
      * Get segment number.

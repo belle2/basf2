@@ -364,9 +364,11 @@ namespace Belle2 {
       if (tc.hasHitsOnSameSensor()) return false;
 
       // catch TCS where particle type is wrong
+      bool found = false;
       for (const auto& pdg : m_config.pdgCodesAllowed) {
-        if (tc.getPdgCode() == pdg) return false;
+        if (tc.getPdgCode() == pdg) found = true;
       }
+      if (found == false and m_config.pdgCodesAllowed.empty() == false) return false;
 
       // check if momentum of TC is within range:
       auto pT = tc.getMomSeed().Perp();

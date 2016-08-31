@@ -17,8 +17,11 @@
 
 namespace Belle2 {
   /**
-   * Clears the content of the DataStore while it keeps entries listed in the keepEntries option
-   */
+   * Clears the content of the DataStore while it keeps entries listed in the keepEntries option.
+   * Note: Also all Relations will be cleared if they are not matched by one entry in the keepEntries list.
+   * You have to ensure the objects referenced by kept relations are also matched by one entry in the
+   * keepEntries list so a relation does not point to nirvana.
+   **/
   class PruneDatastoreModule: public Module {
 
   public:

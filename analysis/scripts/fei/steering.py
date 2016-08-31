@@ -46,7 +46,7 @@ def getCommandLineOptions():
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
                         help='Use the given file to cache results between multiple executions.'
                              'Data from previous runs has to be provided as input!')
-    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='basf2_mva_teacher',
+    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='externClusterTeacher',
                         help='Use this command to invoke extern teacher: basf2_mva_teacher or externClusterTeacher')
     parser.add_argument('-monitor', '--monitor', dest='monitor', action='store_true',
                         help='Create monitor NTuples/Histograms used for Reporting system')

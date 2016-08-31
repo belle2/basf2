@@ -228,7 +228,7 @@ genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
   return recoTrack.m_genfitTrack;
 }
 
-const genfit::MeasuredStateOnPlane RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
     const genfit::AbsTrackRep* representation)
 {
   checkDirtyFlag();

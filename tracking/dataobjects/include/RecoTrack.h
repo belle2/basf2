@@ -482,7 +482,7 @@ namespace Belle2 {
     /** Return genfit's MasuredStateOnPlane, that is closest to the given point
      * useful for extrapolation of measurements other locations
      */
-    const genfit::MeasuredStateOnPlane getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::MeasuredStateOnPlane& getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
         const genfit::AbsTrackRep* representation = nullptr);
 
     /** Prune the genfit track, e.g. remove all track points with measurements, but the first and the last one.

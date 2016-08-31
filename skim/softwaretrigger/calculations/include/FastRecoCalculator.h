@@ -22,7 +22,7 @@ namespace Belle2 {
      * to fill a SoftwareTriggerObject for doing HLT cuts.
      *
      * This calculator exports variables needed for the FastReco part
-     * of the path, namely
+     * of the path, e.g.
      * * visible_energy
      * * highest_1_ecl
      * * max_pt
@@ -45,7 +45,7 @@ namespace Belle2 {
       StoreArray <RecoTrack> m_cdcRecoTracks;
       /// Internal storage of the ecl clusters.
       StoreArray <ECLCluster> m_eclClusters;
-
+      /// Cached transformation object to be used in each calculation (we cache it because of the slow database fetch).
       PCmsLabTransform m_transformer;
     };
   }

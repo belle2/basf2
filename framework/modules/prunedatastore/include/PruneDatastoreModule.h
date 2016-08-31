@@ -25,7 +25,7 @@ namespace Belle2 {
     /** Constructor */
     PruneDatastoreModule();
 
-    /** Virtual Constructor to produce memory leaks */
+    /** Virtual Constructor to prevent memory leaks */
     virtual ~PruneDatastoreModule() = default;
 
     /** Prune datastore */

@@ -24,7 +24,7 @@ PruneDatastoreModule::PruneDatastoreModule() :
   setDescription(
     "Clears the content of the DataStore while it keeps entries listed in the keepEntries option");
   addParam("keepEntries", m_keepEntries,
-           "name of all entries (with regex wildcard ) to not remove from the DataStore",
+           "name of all entries (with regex wildcard ) to not remove from the DataStore. For example, you can use 'Raw.*' to keep all Raw-Objects.",
            m_keepEntries);
   setPropertyFlags(c_ParallelProcessingCertified);
 

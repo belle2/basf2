@@ -10,8 +10,6 @@
 #include <framework/modules/prunedatastore/PruneDatastoreModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
-#include <algorithm>
-#include <boost/regex.hpp>
 
 using namespace std;
 using namespace Belle2;
@@ -30,16 +28,17 @@ PruneDatastoreModule::PruneDatastoreModule() :
 
 }
 
+void PruneDatastoreModule::initialize()
+{
+  // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
+  for (auto& kEntry : m_keepEntries) {
+    m_compiled_regex.push_back(boost::regex(kEntry));
+  }
+}
+
 void PruneDatastoreModule::event()
 {
   auto& storemap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
-
-  // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
-  std::vector < boost::regex > compiled_regex;
-
-  for (auto& kEntry : m_keepEntries) {
-    compiled_regex.push_back(boost::regex(kEntry));
-  }
 
   // iterate through all StoreEntries and check the Regex expression for each eintry
   for (auto& datastore_item : storemap) {
@@ -47,7 +46,7 @@ void PruneDatastoreModule::event()
 
     // check if this entry is in our to keep list
     bool toKeep = false;
-    for (auto const& regx : compiled_regex) {
+    for (auto const& regx : m_compiled_regex) {
       if (regex_match(datastore_key, regx)) {
         toKeep = true;
       }

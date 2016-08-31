@@ -62,7 +62,7 @@ void PruneDatastoreModule::event()
 
     if (!toKeep) {
       // recreate to clear its content
-      datastore_item.second.recreate();
+      datastore_item.second.invalidate();
     }
   }
 

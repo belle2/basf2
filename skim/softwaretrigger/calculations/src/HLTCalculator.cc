@@ -176,6 +176,115 @@ namespace Belle2 {
 
       // EC12CMSLE
       calculationResult["EC12CMSLE"] = ec1CMSLE + ec2CMSLE;
+
+      // ENeutralLE
+      double eNeutralLE = -1;
+      if (eclClusterNeutral) {
+        eNeutralLE = eclClusterNeutral->getEnergy();
+      }
+
+      calculationResult["ENeutralLE"] = eNeutralLE;
+
+      // maxAngleTTLE
+      double maxAngleTTLE = -10.;
+      if (m_pionParticles->getListSize() >= 2) {
+        ;
+        for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
+          Particle* par1 = m_pionParticles->getParticle(i);
+          for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
+            Particle* par2 = m_pionParticles->getParticle(j);
+            TLorentzVector V4p1 = par1->get4Vector();
+            TLorentzVector V4p2 = par2->get4Vector();
+            const TVector3 V3p1 = (PCmsLabTransform::labToCms(V4p1)).Vect();
+            const TVector3 V3p2 = (PCmsLabTransform::labToCms(V4p2)).Vect();
+            const double temp = V3p1.Angle(V3p2);
+            if (maxAngleTTLE < temp) maxAngleTTLE = temp;
+          }
+        }
+      }
+
+      calculationResult["maxAngleTTLE"] = maxAngleTTLE;
+
+      // nEidLE
+      int nEidLE = 0;
+
+      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
+        Particle* p = m_pionParticles->getParticle(i);
+        double mom  = p->getMomentumMagnitude();
+        TLorentzVector V4p1 = p->get4Vector();
+        double Pcms = (PCmsLabTransform::labToCms(V4p1)).Rho();
+        const ECLCluster* eclTrack = (p->getTrack())->getRelated<ECLCluster>();
+        double eop = -1.;
+        if (eclTrack)
+          eop = eclTrack->getEnergy() / mom;
+        if (Pcms > 5.0 && eop > 0.8) nEidLE++;
+      }
+
+      calculationResult["nEidLE"] = nEidLE;
+
+      // nECLMatchTracksLE
+      int nECLMatchTracksLE = 0;
+      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
+        Particle* p = m_pionParticles->getParticle(i);
+        const Track* trk = p->getTrack();
+        if (trk->getRelated<ECLCluster>()) nECLMatchTracksLE++;
+      }
+
+      calculationResult["nECLMatchTracksLE"] = nECLMatchTracksLE;
+
+      // nTracksLE
+      calculationResult["nTracksLE"] = m_pionParticles->getListSize();
+
+      // P1CMSBhabhaLE
+      double p1CMSBhabhaLE = -1;
+      if (t1) {
+        const TLorentzVector& V4p1 = t1->get4Vector();
+        p1CMSBhabhaLE = (PCmsLabTransform::labToCms(V4p1)).Rho();
+      }
+      calculationResult["P1CMSBhabhaLE"] = p1CMSBhabhaLE;
+
+      // P2CMSBhabhaLE
+      double p2CMSBhabhaLE = -1;
+      if (t2) {
+        const TLorentzVector& V4p2 = t2->get4Vector();
+        p2CMSBhabhaLE = (PCmsLabTransform::labToCms(V4p2)).Rho();
+      }
+      calculationResult["P2CMSBhabhaLE"] = p2CMSBhabhaLE;
+
+      // P12CMSBhabhaLE
+      calculationResult["P12CMSBhabhaLE"] = p1CMSBhabhaLE + p2CMSBhabhaLE;
+
+      // VisibleEnergyLE
+      double VisibleEnergyLE = 0.;
+      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
+        Particle* p = m_pionParticles->getParticle(i);
+        VisibleEnergyLE += p->getMomentumMagnitude();
+      }
+
+      for (unsigned int i = 0; i < m_gammaParticles->getListSize(); i++) {
+        Particle* p = m_gammaParticles->getParticle(i);
+        VisibleEnergyLE += p->getMomentumMagnitude();
+      }
+
+      calculationResult["VisibleEnergyLE"] = VisibleEnergyLE;
+
+      // EtotLE
+      double EtotLE = 0.;
+      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
+        Particle* p = m_pionParticles->getParticle(i);
+        const Track* trk = p->getTrack();
+        const ECLCluster* eclTrack = trk->getRelated<ECLCluster>();
+        if (!eclTrack) continue;
+        if (eclTrack->getEnergy() > 0.1)
+          EtotLE += eclTrack->getEnergy();
+      }
+
+      for (unsigned int i = 0; i < m_gammaParticles->getListSize(); i++) {
+        Particle* p = m_gammaParticles->getParticle(i);
+        EtotLE += p->getEnergy();
+      }
+
+      calculationResult["EtotLE"] = EtotLE;
     }
   }
 }

@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/ca/Relation.h>
+
 #include <vector>
 #include <string>
 #include <assert.h>
@@ -26,62 +28,47 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetBendNames[] = {
-      "start_phi",
-      "start_phi_sigma",
-      "start_phi_pull",
-      "start_d",
-      "start_chi2",
-
-      "middle_phi",
-      "middle_phi_sigma",
-      "middle_phi_pull",
-      "middle_d",
-      "middle_chi2",
-
-      "end_phi",
-      "end_phi_sigma",
-      "end_phi_pull",
-      "end_d",
-      "end_chi2",
-
-      "curv",
-      "curv_sigma",
-      "curv_pull",
+    static char const* const facetRelationBendNames[] = {
+      "delta_phi",
+      "delta_phi_pull",
+      "delta_phi_pull_per_r",
+      "delta_curv",
+      "delta_curv_pull",
+      "delta_curv_pull_per_r",
     };
 
     /** Class that specifies the names of the variables
-     *  that should be generated from a facet
+     *  that should be generated from a facetRelation
      */
-    class BendFacetVarNames : public VarNames<CDCFacet> {
+    class BendFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetBendNames);
+      static const size_t nNames = size(facetRelationBendNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetBendNames[iName];
+        return facetRelationBendNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a facet.
+    /** Class that computes floating point variables from a facetRelation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class BendFacetVarSet : public VarSet<BendFacetVarNames> {
+    class BendFacetRelationVarSet : public VarSet<BendFacetRelationVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<BendFacetVarNames>;
+      using Super = VarSet<BendFacetRelationVarNames>;
 
     public:
       /// Construct the varset to be prepended to all variable names.
-      explicit BendFacetVarSet();
+      explicit BendFacetRelationVarSet();
 
-      /// Generate and assign the variables from the facet
-      virtual bool extract(const CDCFacet* facet) override final;
+      /// Generate and assign the variables from the facetRelation
+      virtual bool extract(const Relation<const CDCFacet>* facetRelation) override final;
     };
   }
 }

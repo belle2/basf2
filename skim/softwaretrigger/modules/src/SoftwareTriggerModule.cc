@@ -58,7 +58,13 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
-  m_calculation.requireStoreArrays();
+  if (m_param_baseIdentifier == "fast_reco") {
+    m_fastRecoCalculation.requireStoreArrays();
+  } else if (m_param_baseIdentifier == "hlt") {
+    m_hltCalculation.requireStoreArrays();
+  } else {
+    B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
+  }
 
   m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
 
@@ -92,12 +98,22 @@ void SoftwareTriggerModule::event()
   }
 
   B2DEBUG(100, "Doing the calculation...");
-  const SoftwareTriggerObject& prefilledObject = m_calculation.fillInCalculations();
+  SoftwareTriggerObject prefilledObject;
+
+  if (m_param_baseIdentifier == "fast_reco") {
+    prefilledObject = m_fastRecoCalculation.fillInCalculations();
+  } else if (m_param_baseIdentifier == "hlt") {
+    prefilledObject = m_hltCalculation.fillInCalculations();
+  }
   B2DEBUG(100, "Successfully finished the calculation.");
 
   if (m_param_storeDebugOutput) {
     B2DEBUG(100, "Storing debug output as requested.");
-    m_calculation.writeDebugOutput(m_debugTTree);
+    if (m_param_baseIdentifier == "fast_reco") {
+      m_fastRecoCalculation.writeDebugOutput(m_debugTTree);
+    } else if (m_param_baseIdentifier == "hlt") {
+      m_hltCalculation.writeDebugOutput(m_debugTTree);
+    }
     B2DEBUG(100, "Finished storing the debug output.");
   }
 

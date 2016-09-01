@@ -4,6 +4,7 @@
 
 #include <skim/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
+#include <skim/softwaretrigger/calculations/HLTCalculator.h>
 #include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
@@ -71,8 +72,10 @@ namespace Belle2 {
       StoreObjPtr<SoftwareTriggerResult> m_resultStoreObjectPointer;
       /// Internal handler object for the DB interface.
       SoftwareTriggerDBHandler m_dbHandler;
-      /// Internal handler for the calculations
-      SoftwareTriggerCalculation<FastRecoCalculator> m_calculation;
+      /// Internal handler for the FastReco Calculations
+      SoftwareTriggerCalculation<FastRecoCalculator> m_fastRecoCalculation;
+      /// Internal handler for the HLT Calculations
+      SoftwareTriggerCalculation<HLTCalculator> m_hltCalculation;
       /// TFile to store the debug TTree (or a nullptr if we do not save the debug output).
       std::unique_ptr<TFile> m_debugOutputFile;
       /// TTree to store the debug output (or a nullptr if we do not save the debug output).

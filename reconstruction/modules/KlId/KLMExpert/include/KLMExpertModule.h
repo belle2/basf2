@@ -82,7 +82,7 @@ namespace Belle2 {
     /** hit depth in KLM, distance to IP */
     float m_KLMhitDepth;
     /** Energy deposit in KLM (0.2 GeV * nHitCells) */
-    float m_KLMinvM;
+    float m_KLMenergy;
     /** distance KLM Cluster <-> track extrapolated into KLM */
     float m_KLMtrackDist;
     /** distance to next KLM cluster */
@@ -125,7 +125,7 @@ namespace Belle2 {
 
     /** mva identifier. no ending means its loaded from the database  */
     std::string m_identifier = FileSystem::findFile(
-                                 "reconstruction/data/weights/KLMExpert.xml") ; /** weight file  */
+                                 "reconstruction/data/weights/KLMExpert_final.xml") ; /** weight file  */
 
     /**< Database pointer to the Database representation of the weightfile */
     std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>

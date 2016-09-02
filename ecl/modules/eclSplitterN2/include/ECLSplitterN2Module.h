@@ -3,8 +3,7 @@
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Main reconstruction splitter code for the N2 hypothesis                *
- * (neutral hadron).                                                      *
- * Include all digits of the CR.                                          *
+ * (neutral hadron). This code must run after the N1 splitter             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
@@ -18,6 +17,7 @@
 // ECL
 #include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
+#include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
 
@@ -73,6 +73,9 @@ namespace Belle2 {
       /** Store array: ECLConnectedRegion. */
       StoreArray<ECLConnectedRegion> m_eclConnectedRegions;
 
+      /** Store array: ECLLocalMaximum. */
+      StoreArray<ECLLocalMaximum> m_eclLocalMaximums;
+
       /** Store array: ECLShower. */
       StoreArray<ECLShower> m_eclShowers;
 
@@ -86,6 +89,10 @@ namespace Belle2 {
       /** Default name ECLConnectedRegions */
       virtual const char* eclConnectedRegionArrayName() const
       { return "ECLConnectedRegions" ; }
+
+      /** Default name ECLLocalMaximums */
+      virtual const char* eclLocalMaximumArrayName() const
+      { return "ECLLocalMaximums" ; }
 
       /** Default name ECLShowers */
       virtual const char* eclShowerArrayName() const
@@ -108,6 +115,10 @@ namespace Belle2 {
       /** PureCsI name ECLConnectedRegionsPureCsI */
       virtual const char* eclConnectedRegionArrayName() const override
       { return "ECLConnectedRegionsPureCsI" ; }
+
+      /** PureCsI name ECLLocalMaximumsPureCsI */
+      virtual const char* eclLocalMaximumArrayName() const override
+      { return "ECLLocalMaximumsPureCsI" ; }
 
       /** PureCsI name ECLShowersPureCsI */
       virtual const char* eclShowerArrayName() const override

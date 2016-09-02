@@ -98,82 +98,78 @@ void ECLSplitterN2Module::event()
   for (auto& aCR : m_eclConnectedRegions) {
     int iShower = 0;
 
-    // Loop over all local maximums (LM). This is needed in order to have access to all crystals in case of multiple N1 showers.
+    if (!m_eclShowers) m_eclShowers.create();
+    const auto aECLShower = m_eclShowers.appendNew();
+
+    // Add relation to the CR.
+    aECLShower->addRelationTo(&aCR);
+
+    // Loop over all local maximums (LM).
     for (auto& aLM : aCR.getRelationsWith<ECLLocalMaximum>()) {
-
-      if (!m_eclShowers) m_eclShowers.create();
-      const auto aECLShower = m_eclShowers.appendNew();
-
       // Add relation to the CR.
-      aECLShower->addRelationTo(&aCR);
-
-      // Add relation to the LM.
       aECLShower->addRelationTo(&aLM);
+    }
 
-      // Prepare shower variables.
-      double highestEnergy = 0.0;
-      double highestEnergyTime = 0.;
-      double highestEnergyTimeResolution = 0.;
-      double weightSum = 0.0;
-      double energySum = 0.0;
-      unsigned int highestEnergyID = 0;
-      std::vector< ECLCalDigit > digits;
-      std::vector< double > weights;
+    // Prepare shower variables.
+    double highestEnergy = 0.0;
+    double highestEnergyTime = 0.;
+    double highestEnergyTimeResolution = 0.;
+    double weightSum = 0.0;
+    double energySum = 0.0;
+    unsigned int highestEnergyID = 0;
+    std::vector< ECLCalDigit > digits;
+    std::vector< double > weights;
 
-      // Loop over all digits that are related to the local maximum, they can be weighted.
-      auto relatedDigitsPairs = aLM.getRelationsTo<ECLCalDigit>();
-      for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
-        const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
-        const auto weight = relatedDigitsPairs.weight(iRel);
+    // Loop over all digits that are related to the CR, they can be weighted (in the future?).
+    auto relatedDigitsPairs = aCR.getRelationsTo<ECLCalDigit>();
+    for (unsigned int iRel = 0; iRel < relatedDigitsPairs.size(); iRel++) {
+      const auto aECLCalDigit = relatedDigitsPairs.object(iRel);
+      const auto weight = relatedDigitsPairs.weight(iRel);
 
-        // Add Relation to ECLCalDigits.
-        aECLShower->addRelationTo(aECLCalDigit, weight);
+      // Add Relation to ECLCalDigits.
+      aECLShower->addRelationTo(aECLCalDigit, weight);
 
-        // Find highest energetic crystal, its time, and its time resolution. This is not neceessarily the LM!
-        const double energyDigit = aECLCalDigit->getEnergy();
-        if (energyDigit > highestEnergy) {
-          highestEnergy               = energyDigit * weight;
-          highestEnergyID             = aECLCalDigit->getCellId();
-          highestEnergyTime           = aECLCalDigit->getTime();
-          highestEnergyTimeResolution = aECLCalDigit->getTimeResolution();
-        }
-
-        digits.push_back(*aECLCalDigit);
-        weights.push_back(weight);
-
-        weightSum += weight;
-        energySum += energyDigit * weight;
-
+      // Find highest energetic crystal, its time, and its time resolution. This is not neceessarily the LM!
+      const double energyDigit = aECLCalDigit->getEnergy();
+      if (energyDigit > highestEnergy) {
+        highestEnergy               = energyDigit * weight;
+        highestEnergyID             = aECLCalDigit->getCellId();
+        highestEnergyTime           = aECLCalDigit->getTime();
+        highestEnergyTimeResolution = aECLCalDigit->getTimeResolution();
       }
 
-      const TVector3& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
-      aECLShower->setTheta(showerposition.Theta());
-      aECLShower->setPhi(showerposition.Phi());
-      aECLShower->setR(showerposition.Mag());
+      digits.push_back(*aECLCalDigit);
+      weights.push_back(weight);
 
-      aECLShower->setEnergy(energySum);
-      aECLShower->setEnedepsum(energySum);
-      aECLShower->setHighestEnergy(highestEnergy);
-      aECLShower->setCentralCellId(highestEnergyID);
-      aECLShower->setTime(highestEnergyTime);
-      aECLShower->setTimeResolution(highestEnergyTimeResolution);
-      aECLShower->setNofCrystals(weightSum);
+      weightSum += weight;
+      energySum += energyDigit * weight;
 
-      aECLShower->setShowerId(iShower);
-      aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N2);
-      aECLShower->setConnectedRegionId(aCR.getCRId());
+    }
 
-      B2DEBUG(175, "N2 shower " << iShower);
-      B2DEBUG(175, "  theta           = " << aECLShower->getTheta());
-      B2DEBUG(175, "  phi             = " << aECLShower->getPhi());
-      B2DEBUG(175, "  R               = " << aECLShower->getR());
-      B2DEBUG(175, "  energy          = " << aECLShower->getEnergy());
-      B2DEBUG(175, "  time            = " << aECLShower->getTime());
-      B2DEBUG(175, "  time resolution = " << aECLShower->getTimeResolution());
+    const TVector3& showerposition = Belle2::ECL::computePositionLiLo(digits, weights, m_liloParameters);
+    aECLShower->setTheta(showerposition.Theta());
+    aECLShower->setPhi(showerposition.Phi());
+    aECLShower->setR(showerposition.Mag());
 
-      ++iShower;
+    aECLShower->setEnergy(energySum);
+    aECLShower->setEnedepsum(energySum);
+    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setCentralCellId(highestEnergyID);
+    aECLShower->setTime(highestEnergyTime);
+    aECLShower->setTimeResolution(highestEnergyTimeResolution);
+    aECLShower->setNofCrystals(weightSum);
 
-    } // end auto $ aLM
+    aECLShower->setShowerId(iShower);
+    aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N2);
+    aECLShower->setConnectedRegionId(aCR.getCRId());
+
+    B2DEBUG(175, "N2 shower " << iShower);
+    B2DEBUG(175, "  theta           = " << aECLShower->getTheta());
+    B2DEBUG(175, "  phi             = " << aECLShower->getPhi());
+    B2DEBUG(175, "  R               = " << aECLShower->getR());
+    B2DEBUG(175, "  energy          = " << aECLShower->getEnergy());
+    B2DEBUG(175, "  time            = " << aECLShower->getTime());
+    B2DEBUG(175, "  time resolution = " << aECLShower->getTimeResolution());
 
   } // end auto& aCR
 

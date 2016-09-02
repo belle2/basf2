@@ -340,6 +340,7 @@ class PullAnalysis(object):
                 aux_pulls_profile.profile(aux_values,
                                           pulls,
                                           outlier_z_score=outlier_z_score,
+                                          gaus_z_score=1.5,
                                           allow_discrete=True,
                                           is_expert=is_expert)
                 aux_pulls_profile.xlabel = compose_axis_label(aux_name)

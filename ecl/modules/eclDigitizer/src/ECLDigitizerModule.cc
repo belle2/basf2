@@ -112,12 +112,22 @@ void ECLDigitizerModule::event()
     m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf  , m_ss[m_tbl[j].iss]);
   }
 
+  // add only background hits
+  for (const auto& hit : m_eclHits) {
+    if (hit.getBackgroundTag() == ECLHit::bg_none) continue;
+    int j = hit.getCellId() - 1; //0~8735
+    double hitE       = hit.getEnergyDep() / Unit::GeV;
+    double hitTimeAve = hit.getTimeAve() / Unit::us;
+    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf  , m_ss[m_tbl[j].iss]);
+  }
+
+  // make relation between cellid and eclhits
   struct ch_t {int cell, id;};
   vector<ch_t> hitmap;
-  for (const auto& eclHit : m_eclHits) {
-    int j = eclHit.getCellId() - 1; //0~8735
-    if (eclHit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, eclHit.getArrayIndex()});
-    //    cout<<"C:"<<eclHit.getCellId()<<" "<<eclHit.getEnergyDep()<<" "<<eclHit.getTimeAve()<<endl;
+  for (const auto& hit : m_eclHits) {
+    int j = hit.getCellId() - 1; //0~8735
+    if (hit.getBackgroundTag() == ECLHit::bg_none) hitmap.push_back({j, hit.getArrayIndex()});
+    //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
 #if 0 // postponed to electronic response function for delta input will be avaliable

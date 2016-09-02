@@ -690,7 +690,7 @@ class SaveTreeRefiner(Refiner):
 
         if output_ttree.GetNbranches() == 1:
             # On filling of the first branch we need to use the fill method of the TTree
-            # For all other branches we can use.
+            # For all other branches we can use the one of the branch
             # #justrootthings
             for value in parts:
                 input_value[0] = value

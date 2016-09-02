@@ -5,4 +5,6 @@ import validationserver
 
 # Only execute if the file is not imported
 if __name__ == '__main__':
+    # run validation server with default settings and 
+    # parse command line input
     validationserver.run_server(parseCommandLine=True)

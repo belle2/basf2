@@ -43,13 +43,15 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
   bool b_support_leg = 1;
   int overlap = m_overlap;
 
+  int npoints = 1000 * 1000;
   if (b_inner_support_ring) {
     zr_t vc1[] = {{0., 452.3 + 3}, {0., 452.3}, {3., 474.9 - 20 / cosd(27.81)}, {434., 702.27 - 20 / cosd(27.81)}, {434., 702.27}, {3., 474.9}, {3., 452.3 + 3}};
     std::vector<zr_t> contour1(vc1, vc1 + sizeof(vc1) / sizeof(zr_t));
     G4VSolid* part1solid = new BelleLathe("part1solid", phi0, dphi, contour1);
     G4LogicalVolume* part1logical = new G4LogicalVolume(part1solid, Materials::get("SUS304"), "part1logical", 0, 0, 0);
     part1logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part1logical, "part1physical", top, false, 0, overlap);
+    auto pv = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part1logical, "part1physical", top, false, 0, 0);
+    if (overlap) pv->CheckOverlaps(npoints);
   }
 
   if (b_support_wall) {
@@ -62,7 +64,8 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4VSolid* part23solid = new BelleLathe("part23solid", phi0, dphi, contour23);
     G4LogicalVolume* part23logical = new G4LogicalVolume(part23solid, Materials::get("A5052"), "part23logical", 0, 0, 0);
     part23logical->SetVisAttributes(att("alum"));
-    new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part23logical, "part23physical", top, false, 0, overlap);
+    auto pv = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part23logical, "part23physical", top, false, 0, 0);
+    if (overlap) pv->CheckOverlaps(npoints);
   }
 
   if (b_outer_support_ring) {
@@ -71,7 +74,8 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4VSolid* part4solid = new BelleLathe("part4solid", phi0, dphi, contour4);
     G4LogicalVolume* part4logical = new G4LogicalVolume(part4solid, Materials::get("SUS304"), "part4logical", 0, 0, 0);
     part4logical->SetVisAttributes(att("iron"));
-    new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part4logical, "part4physical", top, false, 0, overlap);
+    auto pv = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), part4logical, "part4physical", top, false, 0, 0);
+    if (overlap) pv->CheckOverlaps(npoints);
   }
 
   zr_t vin[] = {{3., 474.9}, {434., 702.27}, {434, 1496 - 20}, {434 - 214.8, 1496 - 20}, {3, 1190.2}};
@@ -80,8 +84,10 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
   G4LogicalVolume* innervolume_logical = new G4LogicalVolume(innervolume_solid, Materials::get("G4_AIR"),
                                                              "innervolume_logical", 0, 0, 0);
   innervolume_logical->SetVisAttributes(att("air"));
-  new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), innervolume_logical, "ECLBackwardPhysical", top, false, 0,
-                    overlap);
+  auto gpvbp = new G4PVPlacement(G4Translate3D(0, 0, -1020)*G4RotateY3D(M_PI), innervolume_logical, "ECLBackwardPhysical", top, false,
+                                 0,
+                                 0);
+  if (overlap) gpvbp->CheckOverlaps(npoints);
 
   G4VSolid* innervolumesector_solid = new BelleLathe("innervolumesector_solid", -M_PI / 8, M_PI / 4, cin);
   G4LogicalVolume* innervolumesector_logical = new G4LogicalVolume(innervolumesector_solid, Materials::get("G4_AIR"),
@@ -91,7 +97,7 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
 
   if (b_ribs) {
     double H = 60, W = 20;
-    double X0 = 702.27, X1 = 1496 - 20;
+    double X0 = 702.27 + 0.001, X1 = 1496 - 20;
     G4TwoVector r0o(X1, 0), r1o(X1 * sqrt(1 - pow(W / X1, 2)), W);
     double beta = asin(W / X0);
     G4TwoVector r0i(X0 / cos(beta / 2), 0), r1i(X0 * cos(beta / 2) - tan(beta / 2) * (W - X0 * sin(beta / 2)), W);
@@ -108,8 +114,10 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4VisAttributes* asolid6 = new G4VisAttributes(G4Colour(1., 0.3, 0.2));
     lsolid6_p1->SetVisAttributes(asolid6);
     G4Transform3D tsolid6_p1(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, W / 2, 434 - H / 2));
-    new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*tsolid6_p1, lsolid6_p1, "psolid6_p1", innervolumesector_logical, false, 0, overlap);
-    new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p1, lsolid6_p1, "psolid6_p2", innervolumesector_logical, false, 0, overlap);
+    auto pv61 = new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*tsolid6_p1, lsolid6_p1, "psolid6_p1", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv61->CheckOverlaps(npoints);
+    auto pv62 = new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p1, lsolid6_p1, "psolid6_p2", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv62->CheckOverlaps(npoints);
 
     H = 40;
     dxymzm = dxymzp + tand(27.81) * H, dxypzm = dxypzp + tand(27.81) * H;
@@ -118,8 +126,10 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4LogicalVolume* lsolid6_p2 = new G4LogicalVolume(solid6_p2, Materials::get("SUS304"), "lsolid6", 0, 0, 0);
     lsolid6_p2->SetVisAttributes(asolid6);
     G4Transform3D tsolid6_p2(G4Translate3D(X0 * cos(beta / 2) + (dxymzp / 2 + dxypzp / 2) / 2 - tan(theta)*H / 2, -W / 2, 434 - H / 2));
-    new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p2, lsolid6_p2, "psolid6_p3", innervolumesector_logical, false, 0, overlap);
-    new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid6_p2, lsolid6_p2, "psolid6_p4", innervolumesector_logical, false, 0, overlap);
+    auto pv63 = new G4PVPlacement(G4RotateZ3D(0)*tsolid6_p2, lsolid6_p2, "psolid6_p3", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv63->CheckOverlaps(npoints);
+    auto pv64 = new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid6_p2, lsolid6_p2, "psolid6_p4", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv64->CheckOverlaps(npoints);
 
     G4VSolid* solid7_p8 = new G4Box("solid7_p8", 171. / 2, (140. - 40) / 2 / 2, 40. / 2);
     G4LogicalVolume* lsolid7 = new G4LogicalVolume(solid7_p8, Materials::get("SUS304"), "lsolid7", 0, 0, 0);
@@ -127,9 +137,11 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     lsolid7->SetVisAttributes(asolid7);
     double dx = sqrt(X1 * X1 - 70 * 70) - 171. / 2;
     G4Transform3D tsolid7_p1(G4Translate3D(dx, -20 - 25, 434 - 40. / 2));
-    new G4PVPlacement(tsolid7_p1, lsolid7, "psolid7_p1", innervolumesector_logical, false, 0, overlap);
+    auto pv71 = new G4PVPlacement(tsolid7_p1, lsolid7, "psolid7_p1", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv71->CheckOverlaps(npoints);
     G4Transform3D tsolid7_p2(G4Translate3D(dx, 20 + 25, 434 - 40. / 2));
-    new G4PVPlacement(tsolid7_p2, lsolid7, "psolid7_p2", innervolumesector_logical, false, 0, overlap);
+    auto pv72 = new G4PVPlacement(tsolid7_p2, lsolid7, "psolid7_p2", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv72->CheckOverlaps(npoints);
 
     double L = X1 - (X0 - tand(27.81) * 40) - 10;
     G4VSolid* solid13 = new G4Box("solid13", L / 2, 5. / 2, 18. / 2);
@@ -138,8 +150,10 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     lsolid13->SetVisAttributes(asolid13);
     G4Transform3D tsolid13(G4TranslateZ3D(434 - 60 + 18. / 2)*G4TranslateY3D(-5. / 2 - 0.5 / 2)*G4TranslateX3D(X0 - tand(
                              27.81) * 40 + L / 2 + 5));
-    new G4PVPlacement(tsolid13, lsolid13, "psolid13_p1", innervolumesector_logical, false, 0, overlap);
-    new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid13, lsolid13, "psolid13_p2", innervolumesector_logical, false, 0, overlap);
+    auto pv131 = new G4PVPlacement(tsolid13, lsolid13, "psolid13_p1", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv131->CheckOverlaps(npoints);
+    auto pv132 = new G4PVPlacement(G4RotateZ3D(M_PI / 8)*tsolid13, lsolid13, "psolid13_p2", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv132->CheckOverlaps(npoints);
   }
 
 
@@ -158,8 +172,9 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4LogicalVolume* septumwall_logical = new G4LogicalVolume(septumwall_solid, Materials::get("A5052"),
                                                               "septumwall_logical", 0, 0, 0);
     septumwall_logical->SetVisAttributes(att("alum2"));
-    new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0), septumwall_logical,
-                      "septumwall_physical", innervolumesector_logical, false, 0, overlap);
+    auto pv = new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0), septumwall_logical,
+                                "septumwall_physical", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv->CheckOverlaps(npoints);
 
     for (int i = 0; i < n; i++) cin[i + 0] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, -0.5 / 2 / 2);
     for (int i = 0; i < n; i++) cin[i + n] = G4ThreeVector(vin[i].x - c.x, vin[i].y - c.y, 0.5 / 2 / 2);
@@ -169,10 +184,14 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4LogicalVolume* septumwall2_logical = new G4LogicalVolume(septumwall2_solid, Materials::get("A5052"),
                                                                "septumwall2_logical", 0, 0, 0);
     septumwall2_logical->SetVisAttributes(att("alum2"));
-    new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2),
-                      septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 0, overlap);
-    new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, -0.5 / 2 / 2),
-                      septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 1, overlap);
+    auto pv0 = new G4PVPlacement(G4RotateZ3D(-M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y,
+                                 0.5 / 2 / 2),
+                                 septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 0, 0);
+    if (overlap) pv0->CheckOverlaps(npoints);
+    auto pv1 = new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y,
+                                 -0.5 / 2 / 2),
+                                 septumwall2_logical, "septumwall2_physical", innervolumesector_logical, false, 1, 0);
+    if (overlap) pv1->CheckOverlaps(npoints);
   }
 
   zr_t vcr[] = {{3., 474.9}, {434. - zsep, 702.27 - tand(27.81)* zsep}, {434 - zsep, 1496 - 20}, {434 - 214.8, 1496 - 20}, {3, 1190.2}};
@@ -181,14 +200,18 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
   G4LogicalVolume* crystalvolume_logical = new G4LogicalVolume(crystalvolume_solid, Materials::get("G4_AIR"),
       "crystalvolume_logical", 0, 0, 0);
   crystalvolume_logical->SetVisAttributes(att("air"));
-  new G4PVPlacement(G4RotateZ3D(-M_PI / 8), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_0", innervolumesector_logical,
-                    false, 0, overlap);
-  new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_1", innervolumesector_logical, false, 1,
-                    overlap);
+  auto gpv0 = new G4PVPlacement(G4RotateZ3D(-M_PI / 8), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_0",
+                                innervolumesector_logical,
+                                false, 0, 0);
+  if (overlap) gpv0->CheckOverlaps(npoints);
+  auto gpv1 = new G4PVPlacement(G4RotateZ3D(0), crystalvolume_logical, "ECLBackwardCrystalSectorPhysical_1",
+                                innervolumesector_logical, false, 1,
+                                0);
+  if (overlap) gpv1->CheckOverlaps(npoints);
 
   if (b_septum_wall) {
-    double d = 5;
-    Point_t vin[] = {{3., 474.9}, {434. - zsep, 702.27 - tand(27.81)* zsep}, {434 - zsep, 1496 - 20 - d}, {434 - 214.8 - d / tand(52.90), 1496 - 20 - d}, {3, 1190.2}};
+    double d = 5, dr = 0.001;
+    Point_t vin[] = {{3., 474.9}, {434. - zsep, 702.27 - tand(27.81)* zsep}, {434 - zsep, 1496 - 20 - d - dr}, {434 - 214.8 - d / tand(52.90), 1496 - 20 - d - dr}, {3, 1190.2 - dr}};
     const int n = sizeof(vin) / sizeof(Point_t);
     Point_t c = centerofgravity(vin, vin + n);
     G4ThreeVector cin[n * 2];
@@ -201,10 +224,14 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
     G4LogicalVolume* septumwall3_logical = new G4LogicalVolume(septumwall3_solid, Materials::get("A5052"),
                                                                "septumwall3_logical", 0, 0, 0);
     septumwall3_logical->SetVisAttributes(att("alum2"));
-    new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2), septumwall3_logical,
-                      "septumwall3_physical_0", crystalvolume_logical, false, 0, overlap);
-    new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, -0.5 / 2 / 2),
-                      septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
+    auto pv0 = new G4PVPlacement(G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y, 0.5 / 2 / 2),
+                                 septumwall3_logical,
+                                 "septumwall3_physical_0", crystalvolume_logical, false, 0, overlap);
+    if (overlap) pv0->CheckOverlaps(npoints);
+    auto pv1 = new G4PVPlacement(G4RotateZ3D(M_PI / 8)*G4RotateZ3D(-M_PI / 2)*G4RotateY3D(-M_PI / 2)*G4Translate3D(c.x, c.y,
+                                 -0.5 / 2 / 2),
+                                 septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
+    if (overlap) pv1->CheckOverlaps(npoints);
   }
 
   vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_backward.dat");
@@ -222,8 +249,10 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
 
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(t);
       int indx = it - bp.begin();
-      new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBackwardWrappedCrystal_Physical", indx), crystalvolume_logical,
-                        false, (1152 + 6624) / 16 + indx, overlap);
+      auto pv = new G4PVPlacement(twc, wrapped_crystals[s - cryst.begin()], suf("ECLBackwardWrappedCrystal_Physical", indx),
+                                  crystalvolume_logical,
+                                  false, (1152 + 6624) / 16 + indx, 0);
+      if (overlap)pv->CheckOverlaps(npoints);
     }
   }
 
@@ -233,7 +262,7 @@ void Belle2::ECL::GeoECLCreator::backward(const GearDir& content, G4LogicalVolum
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),
                                   suf("phys_backward_preamplifier", indx), crystalvolume_logical, false, (1152 + 6624) / 16 + indx, 0);
-      if (overlap)pv->CheckOverlaps(1000);
+      if (overlap)pv->CheckOverlaps(npoints);
     }
   }
 

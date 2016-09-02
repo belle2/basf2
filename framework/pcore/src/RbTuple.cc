@@ -151,7 +151,6 @@ int RbTupleManager::hadd(bool deleteflag)
   // Set up merger with output file
   TFileMerger merger(false, false);
   if (!merger.OutputFile(m_filename.c_str())) {
-    printf("RbTupleManager:: error to open output file %s\n", m_filename);
     B2ERROR("RbTupleManager:: error to open output file " << m_filename);
     return -1;
   }

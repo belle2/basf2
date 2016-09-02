@@ -69,7 +69,7 @@ RFEventProcessor::RFEventProcessor(string conffile)
   m_rbufout = new RingBuffer(rbufout.c_str(), rboutsize);
 
   // 5. Initialize LogManager
-  m_log = new RFLogManager(m_nodename);
+  m_log = new RFLogManager(m_nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());

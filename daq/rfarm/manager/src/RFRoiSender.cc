@@ -37,7 +37,7 @@ RFRoiSender::RFRoiSender(string conffile)
   m_proc = new RFProcessManager(nodename);
 
   // 4. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 5. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());

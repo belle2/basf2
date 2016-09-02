@@ -38,6 +38,7 @@ class EmptyRun(object):
         # Create path and run #
         #######################
         path = self.create_path()
+        self.adjust_path(path)
 
         # Run basf2 module path #
         #########################
@@ -68,6 +69,11 @@ class EmptyRun(object):
     def create_path(self):
         path = basf2.create_path()
         return path
+
+    def adjust_path(self, path):
+        """Hook that gives the opportunity to check the path for constistance before processing it"""
+        pass
+
 
 # Minimal run stub #
 ####################

@@ -34,7 +34,7 @@ def drawSignal(signalHist, i):
         signalHist.SetMarkerColor(ROOT.TColor.GetColor("#0000ee"))
         signalHist.SetMarkerSize(0.7)
         signalHist.SetMarkerStyle(20)
-        signalHist.SetLineWidth(1)
+        signalHist.SetLineWidth(2)
         signalHist.SetLineColor(ROOT.TColor.GetColor("#0000ee"))
         signalHist.Draw("e1same")
     else:
@@ -52,7 +52,7 @@ def drawBckgrd(bckgrdHist, i):
         bckgrdHist.SetMarkerColor(ROOT.TColor.GetColor("#ff0000"))
         bckgrdHist.SetMarkerSize(0.7)
         bckgrdHist.SetMarkerStyle(20)
-        bckgrdHist.SetLineWidth(1)
+        bckgrdHist.SetLineWidth(2)
         bckgrdHist.SetLineColor(ROOT.TColor.GetColor("#ff0000"))
         bckgrdHist.Draw("e1same")
     else:
@@ -65,14 +65,21 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
     canvas.cd()
 
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
-    legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
+    legend = ROOT.TLegend(0.15, 0.77, 0.48, 0.9)
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.SetFillStyle(0)
+    legend.SetTextFont(42)
+    legend.SetTextSize(0.03)
 
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         signalHist, bckgrdHist = _from_ntuple(ntuple, probability, truth)
         drawSignal(signalHist, i)
         drawBckgrd(bckgrdHist, i)
-        legend.AddEntry(signalHist, "Signal " + label, "f")
-        legend.AddEntry(bckgrdHist, "Background " + label, "f")
+        legend.AddEntry(signalHist, "Signal", "f")
+        legend.AddEntry(bckgrdHist, "Background", "f")
+
+    legend.SetHeader(label)
     legend.Draw("same")
 
     canvas.SaveAs(outputfilename)

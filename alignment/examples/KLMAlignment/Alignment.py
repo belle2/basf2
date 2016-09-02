@@ -87,7 +87,8 @@ for endcap in range(1, 3):
                                                       plane, segment)
                         label = Belle2.GlobalLabel(eklmid, ipar)
                         cmd = str(label.label()) + ' 0. -1.'
-                        algo.steering().command(cmd)
+                        # Uncomment to fix EKLM parameters.
+                        # algo.steering().command(cmd)
 
 # ---------- end of parameter fixing ----------------------
 

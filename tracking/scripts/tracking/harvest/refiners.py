@@ -577,7 +577,10 @@ class SavePullAnalysisRefiner(Refiner):
 
         name = self.name or self.default_name
 
-        auxiliaries = {aux_name: crops[aux_name] for aux_name in self.aux_names}
+        if self.aux_names:
+            auxiliaries = select_crop_parts(crops, self.aux_names)
+        else:
+            auxiliaries = {}
 
         for part_name in self.part_names:
             name = formatter.format(name, part_name=part_name, **replacement_dict)

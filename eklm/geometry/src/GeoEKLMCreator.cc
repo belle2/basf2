@@ -2312,7 +2312,7 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
         layer = createLayer(endcap, m_LogVol.shieldLayer);
         for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
              m_CurVol.sector++)
-          sector = createSector(layer, m_LogVol.shieldLayerSector);
+          createSector(layer, m_LogVol.shieldLayerSector);
         createSectorSupport(m_LogVol.shieldLayerSector);
         createSectorSupportCorner1(m_LogVol.shieldLayerSector);
         createSectorSupportCorner2(m_LogVol.shieldLayerSector);

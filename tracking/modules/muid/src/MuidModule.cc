@@ -1045,7 +1045,10 @@ bool MuidModule::findMatchingEndcapHit(Point& point, const Track& track)
       /* not yet for EKLM
       const TrackFitResult* tfResult = track->getTrackFitResult(Const::muon);
       genfit::TrackCand* tc = DataStore::getRelated<genfit::TrackCand>(tfResult);
-      tc->addHit(Const::EDetector::EKLM, bestHit, 0, point.positionAtHitPlane.Mag());
+      // For alignment, 2 hits per each EKLMHit2d are required
+      // (their type is EKLMAlignmentHit). Hits with their indices are added.
+      tc->addHit(Const::EDetector::EKLM, 2 * bestHit, 0, point.positionAtHitPlane.Mag());
+      tc->addHit(Const::EDetector::EKLM, 2 * bestHit + 1, 0, point.positionAtHitPlane.Mag());
       */
     }
   }

@@ -69,6 +69,11 @@ namespace Belle2 {
      */
     TMatrixD derivatives(const genfit::StateOnPlane* sop);
 
+    /**
+     * Clone.
+     */
+    genfit::AbsMeasurement* clone() const;
+
   private:
 
     /** Segment identifier. */

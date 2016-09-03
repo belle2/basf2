@@ -10,8 +10,6 @@
 #include <gtest/gtest.h>
 
 #include <tracking/trackFindingCDC/tmva/PyEstimator.h>
-
-#include <tracking/trackFindingCDC/numerics/numerics.h>
 #include <tracking/trackFindingCDC/utilities/TimeIt.h>
 
 #include <framework/logging/Logger.h>

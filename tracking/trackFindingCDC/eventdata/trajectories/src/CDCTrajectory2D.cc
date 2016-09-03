@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>

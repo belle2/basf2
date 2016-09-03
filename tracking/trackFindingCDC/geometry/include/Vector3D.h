@@ -9,14 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <math.h>
-#include <iostream>
+#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <TVector3.h>
-
-#include <tracking/trackFindingCDC/numerics/numerics.h>
-
-#include <tracking/trackFindingCDC/geometry/Vector2D.h>
+#include <math.h>
+#include <iostream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

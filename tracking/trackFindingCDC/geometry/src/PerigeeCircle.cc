@@ -9,9 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
+
 #include <framework/logging/Logger.h>
 #include <boost/math/special_functions/sinc.hpp>
-
 #include <cmath>
 
 using namespace Belle2;

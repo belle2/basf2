@@ -10,6 +10,7 @@
 
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
 #include <tracking/trackFindingCDC/numerics/SpecialFunctions.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 #include <cmath>
 
 using namespace std;

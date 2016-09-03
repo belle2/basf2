@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <tracking/trackFindingCDC/numerics/EForwardBackward.h>
 #include <tracking/trackFindingCDC/numerics/ERightLeft.h>

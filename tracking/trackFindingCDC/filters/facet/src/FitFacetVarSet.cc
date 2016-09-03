@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <assert.h>
 

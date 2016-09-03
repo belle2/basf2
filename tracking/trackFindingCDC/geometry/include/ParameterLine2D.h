@@ -14,6 +14,7 @@
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

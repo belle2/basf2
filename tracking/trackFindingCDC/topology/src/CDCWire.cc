@@ -56,26 +56,25 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 CDCWire::CDCWire(const WireID& wireID)
   : m_wireID(wireID)
 {
-  initialize();
+  CDC::CDCGeometryPar::EWirePosition wirePosSet = CDC::CDCGeometryPar::c_Base;
+  initialize(wirePosSet, false);
 }
 
 CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
-  : m_wireID(iSuperLayer, iLayer, iWire)
+  : CDCWire(WireID(iSuperLayer, iLayer, iWire))
 {
-  initialize();
 }
 
-void CDCWire::initialize()
+void CDCWire::initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag)
 {
   CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
 
-  CDC::CDCGeometryPar::EWirePosition wirePosSet = CDC::CDCGeometryPar::c_Base;
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();
 
   Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire, wirePosSet)};
   Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire, wirePosSet)};
-  double sagCoeff = cdcgp.getWireSagCoef(wirePosSet, iCLayer, iWire);
+  double sagCoeff = ignoreWireSag ? 0 : cdcgp.getWireSagCoef(wirePosSet, iCLayer, iWire);
 
   m_wireLine = WireLine(forwardPos, backwardPos, sagCoeff);
   m_refCylindricalR = getRefPos2D().norm();

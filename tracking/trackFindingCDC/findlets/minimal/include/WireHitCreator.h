@@ -50,6 +50,21 @@ namespace Belle2 {
       /// Add the parameters to the surrounding module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
+        moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
+                                      m_param_wirePosSet,
+                                      "Set of geometry parameters to be used in the track finding. "
+                                      "Either 'base', 'misaligned' or 'aligned'.",
+                                      m_param_wirePosSet);
+
+
+        moduleParamList->addParameter(prefixed(prefix, "ignoreWireSag"),
+                                      m_param_ignoreWireSag,
+                                      "Assume a wire sag coefficient of zero "
+                                      "such that the wires appear to be straight for "
+                                      "the track finders",
+                                      m_param_ignoreWireSag);
+
+
         moduleParamList->addParameter(prefixed(prefix, "flightTimeEstimation"),
                                       m_param_flightTimeEstimation,
                                       "Option which flight direction should be assumed for "
@@ -71,10 +86,18 @@ namespace Belle2 {
         StoreArray<CDCHit> hits;
         hits.isRequired();
 
-        // Preload geometry during initialization
-        // Marked as unused intentionally to avoid a compile warning
-        CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
-        CDCWireTopology& wireTopology  __attribute__((unused)) = CDCWireTopology::getInstance();
+        // Create the wires and layers once during initialisation
+        CDCWireTopology::getInstance();
+
+        if (m_param_wirePosSet == "base") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+        } else if (m_param_wirePosSet == "misaligned") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Misaligned;
+        } else if (m_param_wirePosSet == "aligned") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Aligned;
+        } else {
+          B2ERROR("Received unknown wirePosSet " << m_param_wirePosSet);
+        }
 
         m_tdcCountTranslator.reset(new CDC::RealisticTDCCountTranslator);
         m_adcCountTranslator.reset(new CDC::LinearGlobalADCCountTranslator);
@@ -100,6 +123,12 @@ namespace Belle2 {
         }
 
         Super::initialize();
+      }
+
+      virtual void beginRun() override
+      {
+        CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+        wireTopology.reinitialize(m_wirePosSet, m_param_ignoreWireSag);
       }
 
       /// Main algorithm creating the wire hits
@@ -180,6 +209,15 @@ namespace Belle2 {
       }
 
     private:
+      /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
+      std::string m_param_wirePosSet = "base";
+
+      /// Geometry set to be used.
+      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+
+      /// Parameter : Switch to deactivate the sag of the wires for the concerns of the track finders.
+      bool m_param_ignoreWireSag = false;
+
       /// Parameter : Method for the initial time of flight estimation as string
       std::string m_param_flightTimeEstimation = "none";
 

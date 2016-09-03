@@ -59,6 +59,22 @@ void CDCWireTopology::initialize()
   }
 }
 
+void CDCWireTopology::reinitialize(CDC::CDCGeometryPar::EWirePosition wirePosSet,
+                                   bool ignoreWireSag)
+{
+  for (CDCWire& wire : m_wires) {
+    wire.initialize(wirePosSet, ignoreWireSag);
+  }
+
+  for (CDCWireLayer& wireLayer : m_wireLayers) {
+    wireLayer.initialize();
+  }
+
+  for (CDCWireSuperLayer& wireSuperLayer : m_wireSuperLayers) {
+    wireSuperLayer.initialize();
+  }
+}
+
 ISuperLayer CDCWireTopology::getISuperLayerAtCylindricalR(const double cylindricalR)
 {
   const CDCWireTopology& cdcWireTopology = CDCWireTopology::getInstance();

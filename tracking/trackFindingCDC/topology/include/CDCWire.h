@@ -88,23 +88,23 @@ namespace Belle2 {
       { return getWireID() == other.getWireID(); }
 
       /**
-      *  Total ordering relation based on the wire id
-      *  Defines a total ordering scheme for wire objects based on the encoded wireID only.
-      *  Therefore the wires can get sorted for the super layer,
-      *  than for the layers and finally for the in layer wire id.
-      *  Hence the wires increase in counterclockwise spiral like manner from the inside out.
-      *  It is required for the wires to work with the stl algorithms and containers.
-      */
+       *  Total ordering relation based on the wire id
+       *  Defines a total ordering scheme for wire objects based on the encoded wireID only.
+       *  Therefore the wires can get sorted for the super layer,
+       *  than for the layers and finally for the in layer wire id.
+       *  Hence the wires increase in counterclockwise spiral like manner from the inside out.
+       *  It is required for the wires to work with the stl algorithms and containers.
+       */
       bool operator<(const CDCWire& other) const
       { return getWireID() < other.getWireID(); }
 
     public:
-      /// Updates the line definition of this wire from the CDCGeometry
-      void initialize();
+      /// (Re)load all geometry parameters form the CDCGeometryPar to adjust to changes in geometry.
+      void initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag);
 
       /**
-      *  @name Wire index
-      */
+       *  @name Wire index
+       */
       /**@{*/
 
       /// Implicit downcast to WireID forgetting the line information as needed
@@ -155,10 +155,6 @@ namespace Belle2 {
       ///  Gives the superlayer id ranging from 0 - 8.
       ISuperLayer getISuperLayer() const
       { return getWireID().getISuperLayer(); }
-
-      /// Setter for the wireID
-      void setWireID(const WireID& wireID)
-      { m_wireID.setWireID(wireID); initialize(); }
       /**@}*/
 
       /**

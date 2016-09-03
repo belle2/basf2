@@ -72,7 +72,7 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
     arcLength2DList.push_back(arcLength2D);
 
     const double reconstructedZ = trajectorySZ.mapSToZ(arcLength2D);
-    const Vector2D& reconstructedPositionToZ = recoHit3D.getWire().getWireLine().pos2DAtZ(reconstructedZ);
+    const Vector2D& reconstructedPositionToZ = recoHit3D.getWire().getWirePos2DAtZ(reconstructedZ);
     sumDistance2DReconstructedZ += (reconstructedPositionToZ - reconstructedPositionTo2D.xy()).norm();
   }
 

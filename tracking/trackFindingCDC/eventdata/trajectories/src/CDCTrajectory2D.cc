@@ -53,7 +53,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
                                         const double distance) const
 {
   Vector2D globalRefPos2D = wireLine.refPos2D();
-  Vector2D movePerZ = wireLine.movePerZ();
+  Vector2D movePerZ = wireLine.nominalMovePerZ();
 
   Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
@@ -70,7 +70,7 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
   const double deltaZ = solutionsDeltaZ.second;
   const double z = deltaZ + wireLine.refZ();
 
-  Vector3D recoWirePos2D = wireLine.pos3DAtZ(z);
+  Vector3D recoWirePos2D = wireLine.nominalPos3DAtZ(z);
   return Vector3D(getClosest(recoWirePos2D.xy()), z);
 }
 

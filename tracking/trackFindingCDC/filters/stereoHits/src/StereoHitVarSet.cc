@@ -41,8 +41,7 @@ bool StereoHitVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrac
   const CDCRecoHit3D & listRecoHit) { return sum + listRecoHit.getArcLength2D();});
 
   const CDCWire& wire = recoHit->getWire();
-  const WireLine& wireLine = wire.getWireLine();
-  Vector2D wirePos = wireLine.pos2DAtZ(0);
+  Vector2D wirePos = wire.getWirePos2DAtZ(reconstructedPosition.z());
   Vector2D disp2D = reconstructedPosition.xy() - wirePos;
   const double xyDistance = disp2D.norm();
 

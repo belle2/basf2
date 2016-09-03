@@ -52,9 +52,9 @@ namespace Belle2 {
 
         const float& hitZ = centerTanLambda * perpS + centerZ0;
 
-        const Vector3D& pos3D = wireLine.pos3DAtZ(hitZ);
+        Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
 
-        const float& distanceToRecoPosition = (pos3D.xy() - recoPosition).norm();
+        const float& distanceToRecoPosition = (pos2D - recoPosition).norm();
 
         return exp(-distanceToRecoPosition);
       }

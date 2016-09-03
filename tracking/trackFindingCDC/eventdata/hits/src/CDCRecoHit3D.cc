@@ -115,8 +115,8 @@ CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
   const double z = trajectorySZ.mapSToZ(arcLength2D);
 
   // Reevaluating the z position eventually accounts for wire sag.
-  const WireLine& wireLine = recoHit2D.getWireLine();
-  const Vector2D recoWirePos2D = wireLine.pos2DAtZ(z);
+  const CDCWire& wire = recoHit2D.getWire();
+  const Vector2D recoWirePos2D = wire.getWirePos2DAtZ(z);
   const Vector2D correctedRecoPos2D = trajectory2D.getClosest(recoWirePos2D);
   const double correctedPerpS = trajectory2D.calcArcLength2D(correctedRecoPos2D);
   const double correctedZ = trajectorySZ.mapSToZ(correctedPerpS);
@@ -152,10 +152,9 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
 Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
   const CDCWire& wire = getWire();
-  const WireLine& wireLine = wire.getWireLine();
   const double recoPosZ = getRecoPos3D().z();
 
-  Vector2D wirePos = wireLine.pos2DAtZ(recoPosZ);
+  Vector2D wirePos = wire.getWirePos2DAtZ(recoPosZ);
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
   return disp2D;
 }
@@ -173,10 +172,9 @@ CDCRecoHit3D CDCRecoHit3D::reversed() const
 void CDCRecoHit3D::snapToDriftCircle()
 {
   const CDCWire& wire = getWire();
-  const WireLine& wireLine = wire.getWireLine();
   const double recoPosZ = getRecoPos3D().z();
 
-  Vector2D wirePos = wireLine.pos2DAtZ(recoPosZ);
+  Vector2D wirePos = wire.getWirePos2DAtZ(recoPosZ);
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
 
   disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));

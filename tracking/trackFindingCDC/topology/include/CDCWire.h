@@ -24,6 +24,7 @@
 
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/WireID.h>
 
 #include <iostream>
@@ -186,19 +187,19 @@ namespace Belle2 {
 
       /// Gives the xy projected position of the wire at the given z coordinate
       Vector2D getWirePos2DAtZ(const double z) const
-      { return getWireLine().pos2DAtZ(z); }
+      { return getWireLine().sagPos2DAtZ(z); }
 
       /// Gives position of the wire at the given z coordinate
       Vector3D getWirePos3DAtZ(const double z) const
-      { return getWireLine().pos3DAtZ(z); }
+      { return getWireLine().sagPos3DAtZ(z); }
 
       /// Calculates the distance from the position to the wire
       double getDistance(const Vector3D& pos3D) const
-      { return getWireLine().distance(pos3D); }
+      { return getWireLine().sagDistance(pos3D); }
 
       /// Calculates the closest approach in the wire to the position
       Vector3D getClosest(const Vector3D& pos3D) const
-      { return getWireLine().closest3D(pos3D); }
+      { return getWireLine().sagClosest3D(pos3D); }
 
       /**
       *  Calculates the straight drift length from the position to the wire
@@ -242,11 +243,15 @@ namespace Belle2 {
 
       /// Getter for the vector pointing from the back end ofthe wire to the front end of the wire
       Vector3D getWireVector() const
-      { return getWireLine().tangential3D(); }
+      { return getWireLine().wireVector(); }
 
-      /// Getter for the vector describing the positional change in the xy plane per unit z.
+      /// Getter for the vector describing the nominal positional change in the xy plane per unit z.
       Vector2D getMovePerZ() const
-      { return getWireLine().movePerZ(); }
+      { return getWireLine().nominalMovePerZ(); }
+
+      /// Getter for the vector describing the real positional change in the xy plane per unit z at the z position of the wire .
+      Vector2D getMovePerZAtZ(double z) const
+      { return getWireLine().sagMovePerZ(z); }
 
       /// Getter for the cylindrical radius at the wire reference position
       double getRefCylindricalR() const
@@ -254,9 +259,9 @@ namespace Belle2 {
 
       /// Getter for the closest distance to the beamline ( z-axes )
       double getMinCylindricalR() const
-      { return getWireLine().perigee2D().norm(); }
+      { return getWireLine().nominalPerigee2D().norm(); }
 
-      /// Getter for the distance to the beamline ( z-axes ) at the forward joint point
+      /// Getter for the nominal distance to the beamline ( z-axes ) at the forward joint point
       double getForwardCylindricalR() const
       { return getWireLine().forwardCylindricalR(); };
 

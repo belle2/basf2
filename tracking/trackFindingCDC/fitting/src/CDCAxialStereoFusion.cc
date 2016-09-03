@@ -41,7 +41,7 @@ namespace {
       const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
       const Vector2D normal = localCircle->normal(localRecoPos2D);
       const CDCWire& wire = recoHit.getWire();
-      zeta += wire.getWireLine().movePerZ().dot(normal);
+      zeta += wire.getMovePerZ().dot(normal);
     }
     zeta /= nHits;
 
@@ -213,7 +213,7 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
       const double s = recoHit3D.getArcLength2D();
       const double newZ = trajectorySZ.mapSToZ(s);
 
-      const Vector2D recoWirePos2D = wire.getWireLine().pos2DAtZ(newZ);
+      const Vector2D recoWirePos2D = wire.getWirePos2DAtZ(newZ);
       const Vector2D correctedRecoPos2D = axialTrajectory2D.getClosest(recoWirePos2D);
       const Vector3D correctedRecoPos3D(correctedRecoPos2D, newZ);
       const double correctedPerpS = axialTrajectory2D.calcArcLength2D(correctedRecoPos2D);

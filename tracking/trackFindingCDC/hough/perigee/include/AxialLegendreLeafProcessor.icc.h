@@ -9,7 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
@@ -21,6 +20,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 template<class ANode>

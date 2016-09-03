@@ -80,30 +80,5 @@ namespace Belle2 {
 
       return result;
     }
-
-    /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n,
-                                      const std::function<AResultType(double)>& map)
-    {
-      std::vector<AResultType> result;
-      result.reserve(n);
-      result.push_back(map(start));
-      for (std::size_t i = 1; i < n - 1; ++i) {
-        result.push_back(map((start * (n - 1 - i) + final * i) / (n - 1)));
-      }
-      result.push_back(map(final));
-      assert(result.size() == n);
-      return result;
-    }
-
-    /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n)
-    {
-      auto map = [](const double in) -> AResultType {return AResultType(in);};
-      return linspace<AResultType>(start, final, n, map);
-    }
   } // end namespace TrackFindingCDC
 } // end namespace Belle2
-

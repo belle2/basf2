@@ -172,7 +172,7 @@ namespace Belle2 {
        */
       double distance(double s, double z) const
       {
-        return (map(s) - z) / hypot(1, tanLambda());
+        return (map(s) - z) / hypot2(1, tanLambda());
       }
 
       /// Calculates the intersection point of two line. Infinity for parallels

@@ -10,14 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <assert.h>
 
-namespace {
-  double hypot3(double x, double y, double z)
-  {
-    return hypot(hypot(x, y), z);
-  }
-}
-
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

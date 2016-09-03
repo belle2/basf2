@@ -50,7 +50,7 @@ namespace {
       double alpha = recoPos2D.angleWith(flightDirection);
       const double beta = 1;
       double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
-      flightTimeEstimate *= std::hypot(1, tanLambda);
+      flightTimeEstimate *= hypot2(1, tanLambda);
 
       const CDCWire& wire = recoHit3D.getWire();
       const CDCHit* hit = recoHit3D.getWireHit().getHit();

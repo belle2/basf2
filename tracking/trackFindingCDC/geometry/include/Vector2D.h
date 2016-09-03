@@ -198,7 +198,7 @@ namespace Belle2 {
       /// Calculates the length of the vector.
       double norm() const
       {
-        return hypot(x(), y());
+        return hypot2(x(), y());
       }
 
       /** @name Angle functions
@@ -229,7 +229,7 @@ namespace Belle2 {
       {
         double deltaX = x() - rhs.x();
         double deltaY = y() - rhs.y();
-        return hypot(deltaX, deltaY);
+        return hypot2(deltaX, deltaY);
       }
 
       /// Scales the vector in place by the given factor
@@ -578,7 +578,7 @@ namespace Belle2 {
       /// Gives the cylindrical radius of the vector. Same as norm()
       double cylindricalR() const
       {
-        return hypot(x(), y());
+        return hypot2(x(), y());
       }
 
       /// Set the cylindrical radius while keeping the azimuth angle phi the same

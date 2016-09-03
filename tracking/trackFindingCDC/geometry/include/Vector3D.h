@@ -202,7 +202,7 @@ namespace Belle2 {
       /// Calculates the length of the vector
       double norm() const
       {
-        return hypot(hypot(x(), y()), z());
+        return hypot3(x(), y(), z());
       }
 
       /** @name Angle functions
@@ -237,7 +237,7 @@ namespace Belle2 {
         double deltaX = x() - rhs.x();
         double deltaY = y() - rhs.y();
         double deltaZ = z() - rhs.z();
-        return hypot(hypot(deltaX, deltaY), deltaZ);
+        return hypot3(deltaX, deltaY, deltaZ);
       }
 
       /// Scales the vector in place by the given factor

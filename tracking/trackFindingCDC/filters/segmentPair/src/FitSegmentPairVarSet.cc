@@ -54,7 +54,8 @@ bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
     getRiemannFitter().update(endFit, endSegment);
   }
 
-  CDCAxialStereoFusion::reconstructFuseTrajectories(segmentPair);
+  CDCAxialStereoFusion fusionFit;
+  fusionFit.reconstructFuseTrajectories(segmentPair);
   const CDCTrajectory3D& commonFit3D = segmentPair.getTrajectory3D();
   const CDCTrajectory2D commonFit = commonFit3D.getTrajectory2D();
 

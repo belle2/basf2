@@ -9,16 +9,13 @@ from ROOT import std
 
 import os
 import sys
-import numpy as np
-
-from tracking.run.event_generation import StandardEventGenerationRun
-from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
 from tracking.validation.utilities import is_primary
 from tracking.validation.plot import ValidationPlot
 
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
+from tracking.harvest.run import HarvestingRun
 
 import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
 
@@ -28,20 +25,35 @@ import logging
 def get_logger():
     return logging.getLogger(__name__)
 
-
 CONTACT = "oliver.frost@desy.de"
 
 
-class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+class SegmentPairFitValidationRun(HarvestingRun):
     n_events = 10000
     generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
 
-    monte_carlo = "full"
+    monte_carlo = "no"
     segment_orientation = "outwards"
 
     fit_method_name = "fuse-sz"
-    # Specification for BrowseTFileOnTerminateRunMixin
-    output_file_name = "SegmentPairFitValidation.root"
+
+    @property
+    def output_file_name(self):
+        file_name = self.fit_method_name
+        file_name += "-mc-" + self.monte_carlo
+
+        if self.root_input_file:
+            file_name += "-" + os.path.split(self.root_input_file)[1]
+        else:
+            file_name += ".root"
+
+        return file_name
+
+    def harvesting_module(self, path=None):
+        harvesting_module = SegmentPairFitValidationModule(self.output_file_name)
+        if path:
+            path.add_module(harvesting_module)
+        return harvesting_module
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
@@ -57,20 +69,15 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
 
         argument_parser.add_argument(
             "--fit",
-            choices=["zreco", "fuse-simple", "fuse-sz", "fuse-xy"],
+            choices=["zreco", "fuse-sz", "fuse-sz-re"],
             default=self.fit_method_name,
             dest="fit_method_name",
             help=("Choose which fit positional information of the segment should be used. \n"
                   "* 'zreco' means the z coordinate is reconstructed and a linear sz fit is made. "
                   "No covariance between the circle and the linear sz part can be made.\n"
-                  "* 'fuse-simple' means the axial-stereo fusion technique is used "
-                  "without a prior z reconstruction step.\n"
-                  "* 'fuse-xy-priority' means the axial-stereo fusion technique is used "
-                  "with a prior z reconstruction step and a linear sz fit, "
-                  "on which the fusion technique acts as a correction..\n"
-                  "* 'fuse-sz-priority' is like 'fuse-xy-priority' but the z position is "
-                  "reestimated after the sz linear fit has been performed, "
-                  "which means that the residuals become visible in xy plane again.")
+                  "* 'fuse-sz' means the Kalmanesk fuse of the two trajectory fits.\n"
+                  "* 'fuse-sz-re' means the Kalmanesk fuse of the two trajectory fits but reestimate the drift length."
+                  )
         )
 
         return argument_parser
@@ -85,26 +92,14 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
                 return sz_fitter.update(pair)
             return z_reconstruction_fit
 
-        elif fit_method_name == 'fuse-simple':
-            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
-
-            def simple_segment_pair_fusion_fit(pair):
-                return CDCAxialStereoFusion.fuseTrajectories(pair)
-            return simple_segment_pair_fusion_fit
-
-        elif fit_method_name == 'fuse-xy':
-            CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
-
-            def xy_segment_pair_fusion_fit(pair):
-                return CDCAxialStereoFusion.reconstructFuseTrajectories(pair, False)
-            return xy_segment_pair_fusion_fit
-
-        elif fit_method_name == 'fuse-sz':
+        elif fit_method_name.startswith('fuse-sz'):
             CDCAxialStereoFusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
             CDCSegmentPair = Belle2.TrackFindingCDC.CDCSegmentPair
+            reestimateDriftLength = fit_method_name.endswith("re")
+            fusionFit = CDCAxialStereoFusion(reestimateDriftLength)
 
             def sz_segment_pair_fusion_fit(pair):
-                CDCAxialStereoFusion.reconstructFuseTrajectories(pair, True)
+                fusionFit.reconstructFuseTrajectories(pair)
                 return
 
                 trajectory3D = pair.getTrajectory3D()
@@ -112,7 +107,7 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
                 revToSegment = pair.getToSegment().reversed()
                 revPair = CDCSegmentPair(revToSegment, revFromSegment)
 
-                CDCAxialStereoFusion.reconstructFuseTrajectories(revPair, True)
+                CDCAxialStereoFusion.reconstructFuseTrajectories(revPair)
                 revTrajectory3D = revPair.getTrajectory3D().reversed()
 
                 # print("One origin x", trajectory3D.getLocalOrigin().x())
@@ -148,7 +143,8 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
         path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation="outwards"
+                        flightTimeEstimation="outwards",
+                        UseNLoops=0.5
                         )
 
         if self.monte_carlo == "no":
@@ -166,8 +162,10 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
                             )
 
         elif self.monte_carlo == "full":
-            # Only true monte carlo segments, but make the positions realistic
+            # Only true monte carlo segments
+            # make the positions realistic but keep the true drift length
             path.add_module("SegmentCreatorMCTruth",
+                            reconstructedDriftLength=False,
                             reconstructedPositions=True,
                             # segments="MCSegments"
                             )
@@ -177,12 +175,12 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
 
         path.add_module("SegmentFitter",
                         inputSegments="CDCRecoSegment2DVector",
-                        updateDriftLength=True,
-                        useAlphaInDriftLength=True
+                        updateDriftLength=False,
+                        # useAlphaInDriftLength=True,
                         )
 
         path.add_module("SegmentOrienter",
-                        SegmentOrientation="symmetric",
+                        # SegmentOrientation="outwards",
                         # SegmentOrientation="none",
                         inputSegments="CDCRecoSegment2DVector",
                         segments="CDCRecoSegment2DVectorOriented"
@@ -197,8 +195,6 @@ class SegmentPairFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventG
                         )
 
         path.add_module(AxialStereoPairFitterModule(fit_method=self.get_fit_method()))
-        path.add_module(SegmentPairFitValidationModule(self.output_file_name))
-
         return path
 
 

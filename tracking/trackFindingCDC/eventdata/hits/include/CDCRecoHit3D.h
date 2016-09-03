@@ -265,6 +265,13 @@ namespace Belle2 {
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
       Vector2D getRecoDisp2D() const;
 
+      /// Getter for the direction of flight
+      Vector2D getFlightDirection2D() const
+      {
+        ERotation rotation = static_cast<ERotation>(-getRLInfo());
+        return getRecoDisp2D().orthogonal(rotation);
+      }
+
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference postion.

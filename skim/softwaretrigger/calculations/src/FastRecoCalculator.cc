@@ -15,7 +15,7 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     void FastRecoCalculator::requireStoreArrays()
     {
-      m_cdcRecoTracks.isRequired("CDCRecoTracks");
+      m_cdcRecoTracks.isRequired();
       m_eclClusters.isRequired();
     };
 

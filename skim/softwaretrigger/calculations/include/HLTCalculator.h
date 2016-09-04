@@ -10,6 +10,7 @@
 #pragma once
 
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <skim/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
 #include <analysis/dataobjects/ParticleList.h>
 #include <framework/datastore/StoreObjPtr.h>
 
@@ -28,16 +29,16 @@ namespace Belle2 {
      * You do not have to create an instance of this class by yourself,
      * but rather use the SoftwareTriggerCalculation for it.
      */
-    class HLTCalculator {
+    class HLTCalculator : public SoftwareTriggerCalculation {
     public:
       /// Set the default names for the store object particle lists.
       HLTCalculator() : m_pionParticles("pi+:HLT"), m_gammaParticles("gamma:HLT") {}
 
       /// Require the particle list. We do not need more here.
-      void requireStoreArrays();
+      void requireStoreArrays() override ;
 
       /// Actually write out the variables into the map.
-      void doCalculation(SoftwareTriggerObject& calculationResult) const;
+      void doCalculation(SoftwareTriggerObject& calculationResult) const override ;
 
     private:
       /// Internal storage of the tracks as particles.

@@ -52,7 +52,7 @@ namespace Belle2 {
         debugOutputTTree->Fill();
       }
 
-      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
+      /*void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
       {
         for (auto& identifierWithValue : m_calculationResult) {
           const std::string& identifier = identifierWithValue.first;
@@ -60,7 +60,7 @@ namespace Belle2 {
 
           //storeObject.append(prefix + "_" + identifier, value);
         }
-      }
+      }*/
 
       /**
        * Main function of this class: calculate the needed variables using the
@@ -79,14 +79,14 @@ namespace Belle2 {
         doCalculation(m_calculationResult);
 
         if (m_calculationResult.size() != sizeBeforeCheck and sizeBeforeCheck > 0) {
-          B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
-                    ") than there were before (" << sizeBeforeCheck << "). Probably something strange is going on!");
+          //B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
+          //          ") than there were before (" << sizeBeforeCheck << "). Probably something strange is going on!");
         }
 
         return m_calculationResult;
       }
 
-      virtual void doCalculation(const SoftwareTriggerObject& m_calculationResult) = 0;
+      virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) const = 0;
 
     private:
       /// Internal storage of the result of the calculation.

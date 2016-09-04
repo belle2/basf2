@@ -380,12 +380,16 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   //each rings have 12 section of ~250m
   //the 1st section D01, the second section is D12, followed by D11, D10 .... for both rings
   int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
-  /*double ssraw = 0.;
+  //int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
+  double ssraw = 0.;
   if (ring == 1) {
-    if (m_inputSAD_ssraw > 0) ssraw = m_inputSAD_ssraw;
-    else ssraw = m_inputSAD_ssraw;
-    }*/
-  int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
+    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw;
+    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw;
+  } else if (ring == 2) {
+    if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw;
+    else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw;
+  }
+  int ring_section = section_ordering[(int)((ssraw) / 12.)];
 
   if (abs(m_lostS) <= 400.) {
     m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);

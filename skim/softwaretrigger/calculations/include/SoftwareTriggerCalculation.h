@@ -10,10 +10,12 @@
 #pragma once
 
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <skim/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
+
+#include <framework/datastore/StoreObjPtr.h>
 #include <TTree.h>
 
 namespace Belle2 {
-  template<class T> class StoreObjPtr;
   namespace SoftwareTrigger {
     /**
      * Base class for all calculation algorithms to be used when calculating
@@ -52,15 +54,15 @@ namespace Belle2 {
         debugOutputTTree->Fill();
       }
 
-      /*void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
+      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
       {
         for (auto& identifierWithValue : m_calculationResult) {
           const std::string& identifier = identifierWithValue.first;
           const double value = identifierWithValue.second;
 
-          //storeObject.append(prefix + "_" + identifier, value);
+          storeObject->append(prefix + "_" + identifier, value);
         }
-      }*/
+      }
 
       /**
        * Main function of this class: calculate the needed variables using the
@@ -79,8 +81,8 @@ namespace Belle2 {
         doCalculation(m_calculationResult);
 
         if (m_calculationResult.size() != sizeBeforeCheck and sizeBeforeCheck > 0) {
-          //B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
-          //          ") than there were before (" << sizeBeforeCheck << "). Probably something strange is going on!");
+          B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
+                    ") than there were before (" << sizeBeforeCheck << "). Probably something strange is going on!");
         }
 
         return m_calculationResult;

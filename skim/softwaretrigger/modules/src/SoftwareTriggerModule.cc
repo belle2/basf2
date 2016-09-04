@@ -107,9 +107,9 @@ void SoftwareTriggerModule::event()
 void SoftwareTriggerModule::initializeCalculation()
 {
   if (m_param_baseIdentifier == "fast_reco") {
-    //m_calculation = new FastRecoCalculator();
+    m_calculation.reset(new FastRecoCalculator());
   } else if (m_param_baseIdentifier == "hlt") {
-    //m_calculation = new HLTCalculator();
+    m_calculation.reset(new HLTCalculator());
   } else {
     B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
   }

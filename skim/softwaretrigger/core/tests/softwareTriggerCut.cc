@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <skim/softwaretrigger/core/SoftwareTriggerCut.h>
+#include <TRandom.h>
 #include <gtest/gtest.h>
 
 using namespace std;

@@ -12,10 +12,9 @@
 #include <framework/utilities/GeneralCut.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <skim/softwaretrigger/core/utilities.h>
 
 #include <framework/logging/Logger.h>
-
-#include <TRandom.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -116,7 +115,7 @@ namespace Belle2 {
           // First check if the cut gives a positive result. If not, we can definitely return "noResult".
           if (cutCondition) {
             // if yes, we have to use the prescale factor to see, if the result is really yes.
-            if (makePreScale()) {
+            if (makePreScale(m_preScaleFactor)) {
               return SoftwareTriggerCutResult::c_accept;
             }
           }
@@ -168,25 +167,6 @@ namespace Belle2 {
       * Delete the assign operator.
       */
       SoftwareTriggerCut& operator=(const SoftwareTriggerCut&) = delete;
-
-
-      /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.
-      bool makePreScale() const
-      {
-        // A prescale factor of one is always true...
-        if (m_preScaleFactor == 1) {
-          return true;
-          // ... and a prescale factor of 0 is always false...
-        } else if (m_preScaleFactor == 0) {
-          return false;
-        } else {
-          // All other cases are a bit more interesting
-          // We do this by drawing a random number between 0 and m_preScaleFactor - 1 and comparing it to 0.
-          // The probability to get back a true result is then given by 1/m_preScaleFactor.
-          const unsigned int randomNumber = gRandom->Integer(m_preScaleFactor);
-          return randomNumber == 0;
-        }
-      }
     };
   }
 }

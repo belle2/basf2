@@ -10,6 +10,7 @@
 
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerCut.h>
+#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 #include <gtest/gtest.h>
 
 using namespace std;

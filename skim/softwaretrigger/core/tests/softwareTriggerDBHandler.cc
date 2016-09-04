@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <skim/softwaretrigger/core/SoftwareTriggerDBHandler.h>
+#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <boost/filesystem.hpp>

@@ -11,13 +11,14 @@
 
 #include <framework/utilities/GeneralCut.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
-#include <skim/softwaretrigger/core/utilities.h>
 
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
+    class SoftwareTriggerResult;
+    enum class SoftwareTriggerCutResult;
+
     /**
      * Software Trigger Cut to be used in the Software Trigger Modules.
      * This cut can be down- and uploaded from the database or compiled from a string.
@@ -74,14 +75,7 @@ namespace Belle2 {
        */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
                                                          const unsigned int prescaleFactor = 1,
-                                                         const bool rejectCut = false)
-      {
-        auto compiledGeneralCut = GeneralCut<SoftwareTriggerVariableManager>::compile(cut_string);
-        std::unique_ptr<SoftwareTriggerCut> compiledSoftwareTriggerCut(new SoftwareTriggerCut(std::move(compiledGeneralCut),
-            prescaleFactor, rejectCut));
-
-        return compiledSoftwareTriggerCut;
-      }
+                                                         const bool rejectCut = false);
 
       /**
        * Decompile the internal General Cut back into a string.
@@ -96,33 +90,7 @@ namespace Belle2 {
        * Main function of the SoftwareTriggerCut: check the cut condition.
        * See the constructor of this class for more information on when which result is returned.
        */
-      SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
-      {
-        if (not m_cut) {
-          B2FATAL("Software Trigger is not initialized!");
-        }
-        const bool cutCondition = m_cut->check(&prefilledObject);
-
-        // If the cut is a reject cut, return false if the cut is true and false if the cut is true.
-        if (m_rejectCut) {
-          if (cutCondition) {
-            return SoftwareTriggerCutResult::c_reject;
-          } else {
-            return SoftwareTriggerCutResult::c_noResult;
-          }
-        } else {
-          // This is the "normal" accept case:
-          // First check if the cut gives a positive result. If not, we can definitely return "noResult".
-          if (cutCondition) {
-            // if yes, we have to use the prescale factor to see, if the result is really yes.
-            if (makePreScale(m_preScaleFactor)) {
-              return SoftwareTriggerCutResult::c_accept;
-            }
-          }
-
-          return SoftwareTriggerCutResult::c_noResult;
-        }
-      }
+      SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const;
 
       /**
        * Function to get the prescale factor. See the constructor for a description on what the prescale is.

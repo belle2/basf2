@@ -1,5 +1,7 @@
 #include <skim/softwaretrigger/modules/SoftwareTriggerModule.h>
 #include <TFile.h>
+#include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
+#include <skim/softwaretrigger/calculations/HLTCalculator.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -57,35 +59,20 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
 }
 
-/// Initialize/Require the DB object pointers and any needed store arrays.
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
 
-  if (m_param_baseIdentifier == "fast_reco") {
-    m_fastRecoCalculation.requireStoreArrays();
-  } else if (m_param_baseIdentifier == "hlt") {
-    m_hltCalculation.requireStoreArrays();
-  } else {
-    B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
-  }
+  initializeCalculation();
 
   m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
 
-  if (m_param_storeDebugOutputToROOTFile) {
-    m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
-    if (not m_debugOutputFile) {
-      B2ERROR("Could not open debug output file. Aborting.");
-    }
-    m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
-    if (not m_debugTTree) {
-      B2ERROR("Could not create debug output tree. Aborting.");
-    }
-  }
+  initializeDebugOutput();
+}
 
-  if (m_param_storeDebugOutputToDataStore) {
-    m_debugOutputStoreObject.registerInDataStore(m_param_debugOutputStoreObjName);
-  }
+void SoftwareTriggerModule::beginRun()
+{
+  m_dbHandler.checkForChangedDBEntries();
 }
 
 void SoftwareTriggerModule::terminate()
@@ -110,34 +97,46 @@ void SoftwareTriggerModule::event()
   }
 
   B2DEBUG(100, "Doing the calculation...");
-  SoftwareTriggerObject prefilledObject;
-
-  if (m_param_baseIdentifier == "fast_reco") {
-    prefilledObject = m_fastRecoCalculation.fillInCalculations();
-  } else if (m_param_baseIdentifier == "hlt") {
-    prefilledObject = m_hltCalculation.fillInCalculations();
-  }
+  const SoftwareTriggerObject& prefilledObject = m_calculation->fillInCalculations();
   B2DEBUG(100, "Successfully finished the calculation.");
 
+  makeCut(prefilledObject);
+  makeDebugOutput();
+}
+
+void SoftwareTriggerModule::initializeCalculation()
+{
+  if (m_param_baseIdentifier == "fast_reco") {
+    //m_calculation = new FastRecoCalculator();
+  } else if (m_param_baseIdentifier == "hlt") {
+    //m_calculation = new HLTCalculator();
+  } else {
+    B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
+  }
+
+  m_calculation->requireStoreArrays();
+}
+
+void SoftwareTriggerModule::initializeDebugOutput()
+{
   if (m_param_storeDebugOutputToROOTFile) {
-    B2DEBUG(100, "Storing debug output to file as requested.");
-    if (m_param_baseIdentifier == "fast_reco") {
-      m_fastRecoCalculation.writeDebugOutput(m_debugTTree);
-    } else if (m_param_baseIdentifier == "hlt") {
-      m_hltCalculation.writeDebugOutput(m_debugTTree);
+    m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
+    if (not m_debugOutputFile) {
+      B2ERROR("Could not open debug output file. Aborting.");
     }
-    B2DEBUG(100, "Finished storing the debug output to file.");
+    m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
+    if (not m_debugTTree) {
+      B2ERROR("Could not create debug output tree. Aborting.");
+    }
   }
 
   if (m_param_storeDebugOutputToDataStore) {
-    B2DEBUG(100, "Storing debug output to DataStore as requested.");
-    if (m_param_baseIdentifier == "fast_reco") {
-      m_fastRecoCalculation.addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
-    } else if (m_param_baseIdentifier == "hlt") {
-      m_hltCalculation.addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
-    }
+    m_debugOutputStoreObject.registerInDataStore(m_param_debugOutputStoreObjName);
   }
+}
 
+void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
+{
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
@@ -150,8 +149,16 @@ void SoftwareTriggerModule::event()
   setReturnValue(m_resultStoreObjectPointer->getTotalResult(m_param_acceptOverridesReject));
 }
 
-/// Check if the cut representations in the database have changed and download newer ones if needed.
-void SoftwareTriggerModule::beginRun()
+void SoftwareTriggerModule::makeDebugOutput()
 {
-  m_dbHandler.checkForChangedDBEntries();
+  if (m_param_storeDebugOutputToROOTFile) {
+    B2DEBUG(100, "Storing debug output to file as requested.");
+    m_calculation->writeDebugOutput(m_debugTTree);
+    B2DEBUG(100, "Finished storing the debug output to file.");
+  }
+
+  if (m_param_storeDebugOutputToDataStore) {
+    B2DEBUG(100, "Storing debug output to DataStore as requested.");
+    m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
+  }
 }

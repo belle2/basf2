@@ -13,16 +13,16 @@
 #include <TTree.h>
 
 namespace Belle2 {
+  template<class T> class StoreObjPtr;
   namespace SoftwareTrigger {
     /**
-     * Templated base class for all calculation algorithms to be used when calculating
+     * Base class for all calculation algorithms to be used when calculating
      * the variables needed in the SoftwareTrigger modules for the cuts.
      *
-     * Put in your own calculation here as a template argument. This algorithm class must
+     * Override in your own calculation. Your override class must
      * have a function requireStoreArray (which can be empty) and a function doCalculation
      * getting the SoftwareTriggerObject as a reference.
      */
-    template <class ACalculator>
     class SoftwareTriggerCalculation {
     public:
       /**
@@ -30,10 +30,7 @@ namespace Belle2 {
        * StoreArrays can be made a requirement.
        * Override it in your class if you need special store arrays.
        */
-      void requireStoreArrays()
-      {
-        m_calculatorAlgorithm.requireStoreArrays();
-      };
+      virtual void requireStoreArrays() = 0;
 
       /**
        * Function to write out debug output into the given TTree.
@@ -61,7 +58,7 @@ namespace Belle2 {
           const std::string& identifier = identifierWithValue.first;
           const double value = identifierWithValue.second;
 
-          storeObject.append(prefix + "_" + identifier, value);
+          //storeObject.append(prefix + "_" + identifier, value);
         }
       }
 
@@ -79,7 +76,7 @@ namespace Belle2 {
       const SoftwareTriggerObject& fillInCalculations()
       {
         const unsigned int sizeBeforeCheck = m_calculationResult.size();
-        m_calculatorAlgorithm.doCalculation(m_calculationResult);
+        doCalculation(m_calculationResult);
 
         if (m_calculationResult.size() != sizeBeforeCheck and sizeBeforeCheck > 0) {
           B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
@@ -89,9 +86,9 @@ namespace Belle2 {
         return m_calculationResult;
       }
 
+      virtual void doCalculation(const SoftwareTriggerObject& m_calculationResult) = 0;
+
     private:
-      /// Internal storage of the underlaying algorithm class implemented by the user.
-      ACalculator m_calculatorAlgorithm;
       /// Internal storage of the result of the calculation.
       SoftwareTriggerObject m_calculationResult;
       /// Flag to not add the branches twice to the TTree.

@@ -44,20 +44,24 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
   addParam("resultStoreArrayName", m_param_resultStoreArrayName, "Store Object Pointer name for storing the "
            "trigger decision.", m_param_resultStoreArrayName);
 
-  addParam("storeDebugOutput", m_param_storeDebugOutput, "Flag to save the results of the calculations leading "
+  addParam("storeDebugOutputToROOTFile", m_param_storeDebugOutputToROOTFile, "Flag to save the results of the calculations leading "
            "to the the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
-           "debugOutputFileName parameter.", m_param_storeDebugOutput);
+           "debugOutputFileName parameter.", m_param_storeDebugOutputToROOTFile);
+
+  addParam("storeDebugOutputToDataStore", m_param_storeDebugOutputToDataStore, "Flag to save the results of the calculations leading "
+           "to the the trigger decisions into the DataStore.", m_param_storeDebugOutputToDataStore);
 
   addParam("debugOutputFileName", m_param_debugOutputFileName, "File path and name of the ROOT "
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
            "turned on. Please note that already present files will be overridden. "
-           "ATTENTION: This debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
+           "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
 }
 
 /// Initialize/Require the DB object pointers and any needed store arrays.
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
+
   if (m_param_baseIdentifier == "fast_reco") {
     m_fastRecoCalculation.requireStoreArrays();
   } else if (m_param_baseIdentifier == "hlt") {
@@ -68,7 +72,7 @@ void SoftwareTriggerModule::initialize()
 
   m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
 
-  if (m_param_storeDebugOutput) {
+  if (m_param_storeDebugOutputToROOTFile) {
     m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
     if (not m_debugOutputFile) {
       B2ERROR("Could not open debug output file. Aborting.");
@@ -77,6 +81,10 @@ void SoftwareTriggerModule::initialize()
     if (not m_debugTTree) {
       B2ERROR("Could not create debug output tree. Aborting.");
     }
+  }
+
+  if (m_param_storeDebugOutputToDataStore) {
+    m_debugOutputStoreObject.registerInDataStore(m_param_debugOutputStoreObjName);
   }
 }
 
@@ -97,6 +105,10 @@ void SoftwareTriggerModule::event()
     m_resultStoreObjectPointer.construct();
   }
 
+  if (m_param_storeDebugOutputToDataStore and not m_debugOutputStoreObject.isValid()) {
+    m_debugOutputStoreObject.construct();
+  }
+
   B2DEBUG(100, "Doing the calculation...");
   SoftwareTriggerObject prefilledObject;
 
@@ -107,14 +119,23 @@ void SoftwareTriggerModule::event()
   }
   B2DEBUG(100, "Successfully finished the calculation.");
 
-  if (m_param_storeDebugOutput) {
-    B2DEBUG(100, "Storing debug output as requested.");
+  if (m_param_storeDebugOutputToROOTFile) {
+    B2DEBUG(100, "Storing debug output to file as requested.");
     if (m_param_baseIdentifier == "fast_reco") {
       m_fastRecoCalculation.writeDebugOutput(m_debugTTree);
     } else if (m_param_baseIdentifier == "hlt") {
       m_hltCalculation.writeDebugOutput(m_debugTTree);
     }
-    B2DEBUG(100, "Finished storing the debug output.");
+    B2DEBUG(100, "Finished storing the debug output to file.");
+  }
+
+  if (m_param_storeDebugOutputToDataStore) {
+    B2DEBUG(100, "Storing debug output to DataStore as requested.");
+    if (m_param_baseIdentifier == "fast_reco") {
+      m_fastRecoCalculation.addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
+    } else if (m_param_baseIdentifier == "hlt") {
+      m_hltCalculation.addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
+    }
   }
 
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
@@ -123,7 +144,6 @@ void SoftwareTriggerModule::event()
     B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << "), with a prescale of " <<
             cut->getPreScaleFactor());
     const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
-    //TODO: B2DEBUG(100, "The result if the trigger cut is " << cutResult);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 

@@ -55,6 +55,16 @@ namespace Belle2 {
         debugOutputTTree->Fill();
       }
 
+      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
+      {
+        for (auto& identifierWithValue : m_calculationResult) {
+          const std::string& identifier = identifierWithValue.first;
+          const double value = identifierWithValue.second;
+
+          storeObject.append(prefix + "_" + identifier, value);
+        }
+      }
+
       /**
        * Main function of this class: calculate the needed variables using the
        * implemented doCalculation function of the given algorithm and write out

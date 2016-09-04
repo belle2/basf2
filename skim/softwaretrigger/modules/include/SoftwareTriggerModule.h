@@ -62,10 +62,14 @@ namespace Belle2 {
       std::string m_param_resultStoreArrayName = "SoftwareTriggerResults";
       /// Flag to control which class of cuts is more "important": accept cuts or reject cuts.
       bool m_param_acceptOverridesReject = false;
-      /// Flag to also store the result of the calculations.
-      bool m_param_storeDebugOutput = false;
+      /// Flag to also store the result of the calculations into a root file.
+      bool m_param_storeDebugOutputToROOTFile = false;
+      /// Flag to also store the result of the calculations into the datastore.
+      bool m_param_storeDebugOutputToDataStore = false;
       /// Output file name for the debug output. Is only used if debug is turned on.
       std::string m_param_debugOutputFileName = "software_trigger_debug.root";
+      /// Output store object name for the debug output. Is only used if debug is turned on.
+      std::string m_param_debugOutputStoreObjName = "";
 
       // Object pools
       /// Store Object for storing the trigger decision.
@@ -80,6 +84,8 @@ namespace Belle2 {
       std::unique_ptr<TFile> m_debugOutputFile;
       /// TTree to store the debug output (or a nullptr if we do not save the debug output).
       std::unique_ptr<TTree> m_debugTTree;
+      /// TTree living in the datastore for debug reasons
+      StoreObjPtr<SoftwareTriggerVariables> m_debugOutputStoreObject;
     };
   }
 }

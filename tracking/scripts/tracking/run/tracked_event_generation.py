@@ -36,9 +36,6 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
     #: Determines which fit geometry should be used.
     fit_geometry = None
 
-    #: Name of the store array of RecoTracks
-    trackCandidatesColumnName = 'RecoTracks'
-
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
 

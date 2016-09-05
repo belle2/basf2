@@ -27,6 +27,11 @@ class CDCLocal(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = 'TrackFinderCDCAutomaton'
+    tracking_coverage = {'UsePXDHits': False,
+                         'UseSVDHits': False,
+                         'UseCDCHits': True,
+                         'UseOnlyAxialCDCHits': False}
+
     fit_geometry = None
     pulls = True
     contact = CONTACT

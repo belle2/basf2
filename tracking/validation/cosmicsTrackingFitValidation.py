@@ -20,6 +20,8 @@ basf2.set_random_seed(1337)
 
 import logging
 
+import tracking
+from tracking.adjustments import adjust_module
 from tracking.validation.run import TrackingValidationRun
 
 
@@ -27,13 +29,31 @@ class Cosmics(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
-    finder_module = 'TrackFinderCDCCosmics'
-    tracking_coverage = {'UsePXDHits': False,
-                         'UseSVDHits': False,
-                         'UseCDCHits': True,
-                         'UseOnlyAxialCDCHits': False}
-    fit_geometry = None
+
+    def finder_module(self, path):
+        tracking.add_cdc_cr_track_finding(path)
+
+    def adjust_path(self, path):
+        adjust_module(path, 'DAFRecoFitter',
+                      pdgCodesToUseForFitting=[13],
+                      )
+
+        adjust_module(path, 'TrackCreator',
+                      defaultPDGCode=13,
+                      useClosestHitToIP=True,
+                      )
+
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': False
+        }
+
+    fit_geometry = "default"
+    fit_tracks = True
     pulls = True
+    resolution = True
     contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE
 

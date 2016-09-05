@@ -33,7 +33,9 @@ void NtupleContinuumSuppressionTool::setupTree()
       B2INFO("KSFW moments calculated from B final state particles: user specified option " << m_strOption);
       m_useFS1 = true;
     } else {
-      B2FATAL("Invalid option used for ContinuumSuppression ntuple tool. Set to 'FS1' to store the KSFW moments formed using the B final state particles, or leave the option empty to use the default KSFW moments formed from the B primary daughters: " << m_strOption);
+      B2FATAL("Invalid option used for ContinuumSuppression ntuple tool. Set to 'FS1' to store the KSFW moments formed"
+              " using the B final state particles, or leave the option empty to use the default KSFW moments formed "
+              "from the B primary daughters: " << m_strOption);
     }
   }
 
@@ -124,51 +126,53 @@ void NtupleContinuumSuppressionTool::eval(const Particle* particle)
   if (selparticles.empty()) return;
 
   const ContinuumSuppression* qq = selparticles[0]->getRelated<ContinuumSuppression>();
-  if (qq) {
-    m_fThrustB = qq->getThrustBm();
-    m_fThrustO = qq->getThrustOm();
-    m_fCosTBTO = qq->getCosTBTO();
-    m_fCosTBz  = qq->getCosTBz();
-
-    m_fR2  = qq->getR2();
-
-    std::vector<float> cleoCones = qq->getCleoCones();
-    m_fcc1 = cleoCones.at(0);
-    m_fcc2 = cleoCones.at(1);
-    m_fcc3 = cleoCones.at(2);
-    m_fcc4 = cleoCones.at(3);
-    m_fcc5 = cleoCones.at(4);
-    m_fcc6 = cleoCones.at(5);
-    m_fcc7 = cleoCones.at(6);
-    m_fcc8 = cleoCones.at(7);
-    m_fcc9 = cleoCones.at(8);
-
-    // Defualt KSFW moments calculated using B primary daughters.
-    std::vector<float> ksfw = qq->getKsfwFS0();
-
-    // User speficied override: Store KSFW moments calculated using B final-state particles.
-    if (m_useFS1)
-      ksfw = qq->getKsfwFS1();
-
-    m_fmm2    = ksfw.at(0);
-    m_fet     = ksfw.at(1);
-    m_fhso00  = ksfw.at(2);
-    m_fhso01  = ksfw.at(3);
-    m_fhso02  = ksfw.at(4);
-    m_fhso03  = ksfw.at(5);
-    m_fhso04  = ksfw.at(6);
-    m_fhso10  = ksfw.at(7);
-    m_fhso12  = ksfw.at(8);
-    m_fhso14  = ksfw.at(9);
-    m_fhso20  = ksfw.at(10);
-    m_fhso22  = ksfw.at(11);
-    m_fhso24  = ksfw.at(12);
-    m_fhoo0   = ksfw.at(13);
-    m_fhoo1   = ksfw.at(14);
-    m_fhoo2   = ksfw.at(15);
-    m_fhoo3   = ksfw.at(16);
-    m_fhoo4   = ksfw.at(17);
+  if (!qq) {
+    B2ERROR("NtupleContinuumSuppressionTool::eval - no ContinuumSuppression found! Did you forget the module that builds it?");
+    return;
   }
+  m_fThrustB = qq->getThrustBm();
+  m_fThrustO = qq->getThrustOm();
+  m_fCosTBTO = qq->getCosTBTO();
+  m_fCosTBz  = qq->getCosTBz();
+
+  m_fR2  = qq->getR2();
+
+  std::vector<float> cleoCones = qq->getCleoCones();
+  m_fcc1 = cleoCones.at(0);
+  m_fcc2 = cleoCones.at(1);
+  m_fcc3 = cleoCones.at(2);
+  m_fcc4 = cleoCones.at(3);
+  m_fcc5 = cleoCones.at(4);
+  m_fcc6 = cleoCones.at(5);
+  m_fcc7 = cleoCones.at(6);
+  m_fcc8 = cleoCones.at(7);
+  m_fcc9 = cleoCones.at(8);
+
+  // Defualt KSFW moments calculated using B primary daughters.
+  std::vector<float> ksfw = qq->getKsfwFS0();
+
+  // User speficied override: Store KSFW moments calculated using B final-state particles.
+  if (m_useFS1)
+    ksfw = qq->getKsfwFS1();
+
+  m_fmm2    = ksfw.at(0);
+  m_fet     = ksfw.at(1);
+  m_fhso00  = ksfw.at(2);
+  m_fhso01  = ksfw.at(3);
+  m_fhso02  = ksfw.at(4);
+  m_fhso03  = ksfw.at(5);
+  m_fhso04  = ksfw.at(6);
+  m_fhso10  = ksfw.at(7);
+  m_fhso12  = ksfw.at(8);
+  m_fhso14  = ksfw.at(9);
+  m_fhso20  = ksfw.at(10);
+  m_fhso22  = ksfw.at(11);
+  m_fhso24  = ksfw.at(12);
+  m_fhoo0   = ksfw.at(13);
+  m_fhoo1   = ksfw.at(14);
+  m_fhoo2   = ksfw.at(15);
+  m_fhoo3   = ksfw.at(16);
+  m_fhoo4   = ksfw.at(17);
 
 }
 

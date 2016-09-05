@@ -128,7 +128,7 @@ namespace Belle2 {
                                    bool errorIfExisting = false)
     {
       return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
-                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : DataStore::c_WriteOut);
 
     }
 
@@ -180,7 +180,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.
-     * @param storeFlags ORed combination of DataStore::EStoreFlag flags
+     * @param storeFlags ORed combination of DataStore::EStoreFlags
      */
     template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
                                                 DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const

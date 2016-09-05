@@ -92,6 +92,7 @@ namespace Belle2 {
       \endcode
    */
   template <class BASE> class RelationsInterface: public BASE {
+    /** template class cannot be removed without breaking ROOT I/O, so just disable it. */
     static_assert(std::is_same<TObject, BASE>::value,
                   "Using RelationsInterface<BASE> is no longer allowed. Please use RelationsObject as a base class.");
   public:

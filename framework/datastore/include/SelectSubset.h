@@ -222,7 +222,7 @@ namespace Belle2 {
     /** Register the StoreArray<StoredClass> that will contain the subset of selected elements
      *  @param set         The StoreArray<StoredClass> from which the elements will be selected
      *  @param subsetName  The name of the StoreArray<StoredClass> that will contain the selected elements
-     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlags.
      */
     void registerSubset(const StoreArray< StoredClass >& set, const std::string& subsetName,
                         DataStore::EStoreFlags storeFlags = DataStore::c_ErrorIfAlreadyRegistered)
@@ -331,11 +331,9 @@ namespace Belle2 {
     /** Copy any set -> set relations between selected objects. */
     void copyRelationsToSelf();
 
-    /** Empty method to stop the recursion of the variadic template.
-    */
+    /** Empty method to stop the recursion of the variadic template.  */
     void inheritRelationsFrom() { }
-    /** Empty method to stop the recursion of the variadic template.
-    */
+    /** Empty method to stop the recursion of the variadic template.  */
     void inheritRelationsTo() { }
 
     /** The array we use as input. */
@@ -343,7 +341,7 @@ namespace Belle2 {
     /** The array we create. */
     StoreArray<StoredClass>* m_subset = nullptr;
     /** Flags used for m_subset. */
-    DataStore::EStoreFlags m_subsetFlags = 0;
+    DataStore::EStoreFlags m_subsetFlags = DataStore::c_WriteOut;
   };
 
   template < class StoredClass>

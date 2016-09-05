@@ -105,7 +105,7 @@ namespace Belle2 {
                                    bool errorIfExisting = true)
     {
       return DataStore::Instance().registerEntry(DataStore::objectName<T>(name), durability, T::Class(), false,
-                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : DataStore::c_WriteOut);
     }
 
     /** Check whether an object was registered before.

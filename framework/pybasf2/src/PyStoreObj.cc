@@ -60,7 +60,7 @@ bool PyStoreObj::registerInDataStore(DataStore::EStoreFlags storeFlags)
   return registerInDataStore(m_storeAccessor.getName(), storeFlags);
 }
 
-bool PyStoreObj::registerInDataStore(std::string name, int storeFlags)
+bool PyStoreObj::registerInDataStore(std::string name, DataStore::EStoreFlags storeFlags)
 {
   if (not hasValidClass()) {
     B2ERROR("Cannot register PyStoreObj '" << name << "' with unknown TClass. Please supply one to the PyStoreObj constructor.");

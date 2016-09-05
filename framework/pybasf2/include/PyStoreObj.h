@@ -89,7 +89,7 @@ namespace Belle2 {
     /** Register the object in the DataStore.
      *  This must be called in the initialization phase.
      *
-     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
+     *  @param storeFlags ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
     bool registerInDataStore(DataStore::EStoreFlags storeFlags);
@@ -98,11 +98,11 @@ namespace Belle2 {
      *  This must be called in the initialization phase, and a TClass or name=class name must have been supplied during construction.
      *
      *  @param name        Name of the entry to be registered. Empty for default name.
-     *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
+     *  @param storeFlags  ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
     bool registerInDataStore(std::string name = "",
-                             DataStore::EStoreFlags storeFlags = DataStore::EStoreFlag::c_WriteOut);
+                             DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut);
 
     /** Ensure this object has been registered previously.
      *  Will cause an ERROR if it does not exist.

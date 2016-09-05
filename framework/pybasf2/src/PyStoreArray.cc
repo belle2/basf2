@@ -84,7 +84,7 @@ bool PyStoreArray::isOptional(const std::string& name)
 
 bool PyStoreArray::registerRelationTo(const PyStoreArray& toArray,
                                       DataStore::EDurability durability,
-                                      int storeFlags) const
+                                      DataStore::EStoreFlags storeFlags) const
 {
   return DataStore::Instance().registerRelation(this->m_storeAccessor,
                                                 toArray.m_storeAccessor,

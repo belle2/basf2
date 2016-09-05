@@ -251,8 +251,8 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         if (array)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
         if (m_initStatus == 0) { //are we called by the module's initialize() function?
-          bool transient = obj->TestBit(c_IsTransient);
-          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
+          auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
+          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
@@ -426,8 +426,8 @@ int DataStoreStreamer::restoreDataStoreAsync()
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
       if (m_initStatus == 0) { //are we called by the module's initialize() function?
-        bool transient = obj->TestBit(c_IsTransient);
-        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
+        auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
+        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
       }
       //only restore object if it is valid for current event
       bool ptrIsNULL = obj->TestBit(c_IsNull);

@@ -1,4 +1,4 @@
-import os
+from basf2 import *
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -7,7 +7,9 @@ from itertools import repeat
 import glob
 from .utils import method_dispatch
 import pickle
+import configparser
 
+import ROOT
 # For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
 # So we make it a module variable. Should be fine as starting up multiple pools
 # is not recommended anyway. Will check this again someday.
@@ -170,7 +172,77 @@ class PBS(Backend):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
-    pass
+    cmd_wkdir = "#PBS -d"
+    cmd_stdout = "#PBS -o"
+    cmd_stderr = "#PBS -e"
+    cmd_walltime = "#PBS -l walltime="
+    cmd_queue = "#PBS -q"
+    cmd_name = "#PBS -N"
+
+    default_config = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+
+    def __init__(self):
+        """
+        Init method for PBS Backend. Does default setup based on config file.
+        """
+        self.config = PBS.default_config
+
+    @property
+    def config(self):
+        """
+        Getter for config object
+        """
+        return self._config
+
+    @config.setter
+    def config(self, value):
+        """
+        Takes a file path string and sets the self.config attribute to be equal to a
+        ConfigParser object that reads from that file. Also calls the _update_config
+        method so that any attributes that can be changed, will be.
+        """
+        self._config = configparser.ConfigParser()
+        self._config.read(value)
+        self._update_config()
+
+    def _update_config(self):
+        setup_name = self.config["PBS"]["Setup"]
+        #: Default PBS queue name used
+        self.default_queue = self.config[setup_name]["Queue"]
+
+    def _generate_pbs_script(self, job):
+        script = ""
+        return script
+
+    class Result():
+
+        def ready(self):
+            return True
+
+    @method_dispatch
+    def submit(self, job):
+        """
+        Submit method of PBS backend. Should take job object, create needed directories, create PBS script,
+        and send it off with qsub applying the correct options (default and user requested.)
+
+        Should return a Result object that allows a 'ready' member method to be called from it which queries
+        the PBS system and the job about whether or not the job has finished.
+        """
+        result = PBS.Result()
+        return result
+
+    @submit.register(list)
+    def _(self, jobs):
+        """
+        Submit method of PBS() that takes a list of jobs instead of just one and submits each one
+        with qsub. Possibly with multiple submissions based on input file splitting.
+        """
+        results = []
+        # Submit the jobs to PBS
+        for job in jobs:
+            results.append(self.submit(job))
+        print('Jobs submitted')
+        return results
 
 
 class LSF(Backend):

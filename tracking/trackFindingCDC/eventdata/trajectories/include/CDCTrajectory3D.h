@@ -168,13 +168,6 @@ namespace Belle2 {
       { return getLocalHelix()->arcLength2DPeriod(); }
 
     public:
-      /// Shifts the tanLambda and z0 by the given amount.
-      void shiftTanLambdaIntercept(const double tanLambdaShift, const double zShift)
-      {
-        // Temporary workaround - to be removed soonish
-        const_cast<Helix&>(m_localHelix.helix()).shiftTanLambdaZ0(tanLambdaShift, zShift);
-      }
-
       /**
        *  Adjusts the z0 to the one that lies n periods forward
        *  @returns The two dimensional arc length needed to travel from the old to the new support point.

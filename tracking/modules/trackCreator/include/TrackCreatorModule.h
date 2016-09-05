@@ -71,8 +71,6 @@ namespace Belle2 {
     std::vector<int> m_additionalPDGCodes;  ///< PDG codes for which TrackFitResults will be created.
     int m_defaultPDGCode; ///< Default PDG code, for which TrackFitResults will be created.
 
-    bool m_refitTracks = true; ///< Flag to turn on (or off) the refitting of the track.
     bool m_useClosestHitToIP = false; ///< Flag to turn on special handling which measurement to choose; especially useful for Cosmics.
   };
 }
-

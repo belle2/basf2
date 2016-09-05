@@ -95,7 +95,7 @@ if __name__ == '__main__':
 
     o = b2latex.LatexFile()
     o += b2latex.TitlePage(title='Automatic MVA Evaluation',
-                           authors=['Thomas Keck'],
+                           authors=['Thomas Keck, Moritz Gelb'],
                            abstract='Evaluation plots',
                            add_table_of_contents=True).finish()
 
@@ -119,13 +119,11 @@ if __name__ == '__main__':
     for variable in sorted_var.items():
         for var, list in sorted_var.items():
             if list[0] == rank:
-                print(list, var)
                 rank += 1
                 table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
 
     for var, list in sorted_var.items():
         if list[0] == -1:
-            print(var, list)
             table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
 
     o += table.finish()

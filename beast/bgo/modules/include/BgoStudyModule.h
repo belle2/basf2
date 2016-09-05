@@ -70,46 +70,37 @@ namespace Belle2 {
       /** Energy threshold */
       std::vector<Double_t> m_Ethres;
 
-      /** edep */
-      TH1F* h_bgo_edep1[10];
-      /** edep */
-      TH1F* h_bgo_edep2[10];
-      /** edep */
-      TH1F* h_bgo_edep3[10];
-      /** edep */
-      TH1F* h_bgo_edep4[10];
+
       /** Rate */
-      TH1F* h_bgo_rate[10];
+      TH1F* h_bgo_rate[2];
+      /** Rate */
+      TH2F* h_bgo_rs_rate[2];
       /** Energy deposited vs TOF */
-      TH2F* h_bgos_Evtof1[8];
+      TH2F* h_bgo_Evtof1[18];
       /** Energy deposited vs TOF */
-      TH2F* h_bgos_Evtof2[8];
+      TH2F* h_bgo_Evtof2[18];
       /** Energy deposited vs TOF */
-      TH2F* h_bgo_Evtof1[8];
+      TH2F* h_bgo_Evtof3[18];
       /** Energy deposited vs TOF */
-      TH2F* h_bgo_Evtof2[8];
-      /** Energy deposited vs TOF */
-      TH2F* h_bgos_Evtof3[8];
-      /** Energy deposited vs TOF */
-      TH2F* h_bgos_Evtof4[8];
+      TH2F* h_bgo_Evtof[18];
       /** Energy deposited */
-      TH1F* h_bgos_edep[8];
+      TH1F* h_bgo_edep[18];
       /** Energy deposited */
-      TH1F* h_bgos_edep2[8];
+      TH1F* h_bgo_edep1[18];
       /** Energy deposited */
-      TH1F* h_bgos_edep_test[8];
+      TH1F* h_bgo_edep2[18];
       /** Energy deposited */
-      TH1F* h_bgo_edep[8];
+      TH1F* h_bgo_edep1Weight[18];
       /** Energy deposited */
-      TH1F* h_bgo_edep_test[8];
+      TH1F* h_bgo_edep2Weight[18];
       /** Energy deposited */
-      TH1F* h_bgo_edepWeight[8];
+      TH2F* h_bgo_rs_edep1[18];
       /** Energy deposited */
-      TH1F* h_bgo_edep_testWeight[8];
-      /** Scattering position in the rings */
-      TH1F* h_bgo_s;
-      /** Scattering position in the rings */
-      TH1F* h_bgo_s_cut;
+      TH2F* h_bgo_rs_edep2[18];
+      /** Energy deposited */
+      TH2F* h_bgo_rs_edep1Weight[18];
+      /** Energy deposited */
+      TH2F* h_bgo_rs_edep2Weight[18];
     };
 
   }

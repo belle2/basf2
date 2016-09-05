@@ -43,33 +43,34 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
     ntuple = rootfile.Get("variables")
     canvas = ROOT.TCanvas("canvas", "Diagonal plot", 1600, 1200)
     canvas.cd()
-    legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
+    legend = ROOT.TLegend(0.1, 0.8, 0.48, 0.9)
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.SetFillStyle(0)
+    legend.SetTextFont(42)
+    legend.SetTextSize(0.035)
 
     mg = ROOT.TMultiGraph()
     color = 1
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         purityPerBin = _from_ntuple(ntuple, probability, truth, nbins)
         purityPerBin.SetLineColor(color)
+        purityPerBin.SetLineWidth(2)
 
         color += 1
         if color in [5, 10, 11]:
             color += 1
 
-        plotLabel = ';classifier output;purity per bin'
-        purityPerBin.SetTitle(plotLabel)
-        purityPerBin.GetXaxis().SetRangeUser(0.0, 1.0)
-        purityPerBin.GetYaxis().SetRangeUser(0.0, 1.0)
-        purityPerBin.GetXaxis().SetTitleSize(0.05)
-        purityPerBin.GetXaxis().SetLabelSize(0.05)
-        purityPerBin.GetYaxis().SetTitleSize(0.05)
-        purityPerBin.GetYaxis().SetLabelSize(0.05)
         mg.Add(purityPerBin)
         legend.AddEntry(purityPerBin, label, "lep")
 
     mg.Draw('APZ')
+    mg.SetTitle(";Classifier Output;Purity Per Bin")
+    mg.GetXaxis().SetRangeUser(0.0, 1.0)
+    mg.GetYaxis().SetRangeUser(0.0, 1.0)
     diagonal = ROOT.TLine(0.0, 0.0, 1.0, 1.0)
     diagonal.SetLineColor(ROOT.kAzure)
-    diagonal.SetLineWidth(2)
+    diagonal.SetLineWidth(3)
     diagonal.Draw()
     legend.Draw()
 

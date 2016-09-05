@@ -13,15 +13,19 @@ def _from_hists(signalHist, bckgrdHist):
 
 
 def _from_ntuple(ntuple, probability, truth, nbins=100):
-    bckgrdHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
-    signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
+    bckgrdHist = ROOT.TH1D('ROCbackground', '', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('ROCsignal', '', nbins, 0.0, 1.0)
+    signalHist.SetTitle(";Classifier Output;Entries (norm.)")
     bckgrdHist.Sumw2()
     signalHist.Sumw2()
     ntuple.Project('ROCbackground', probability, '!' + truth)
     ntuple.Project('ROCsignal', probability, truth)
     _from_hists(signalHist, bckgrdHist)
+
+    # normalize to 1
     bckgrdHist.Scale(1.0 / bckgrdHist.Integral(), "width")
     signalHist.Scale(1.0 / signalHist.Integral(), "width")
+
     signalHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = signalHist
     bckgrdHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = bckgrdHist
     return signalHist, bckgrdHist
@@ -71,6 +75,11 @@ def from_file(train_rootfile, test_rootfile, probabilities, truths, labels, outp
 
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.SetFillStyle(0)
+    legend.SetTextFont(42)
+    legend.SetTextSize(0.035)
 
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         signalHist, bckgrdHist = _from_ntuple(train_ntuple, probability, truth)
@@ -79,8 +88,8 @@ def from_file(train_rootfile, test_rootfile, probabilities, truths, labels, outp
         legend.AddEntry(signalHist, "(Train) Signal " + label, "f")
         legend.AddEntry(bckgrdHist, "(Train) Background " + label, "f")
         signalHist, bckgrdHist = _from_ntuple(test_ntuple, probability, truth)
-        drawSignal(signalHist, i+1)
-        drawBckgrd(bckgrdHist, i+1)
+        drawSignal(signalHist, i + 1)
+        drawBckgrd(bckgrdHist, i + 1)
         legend.AddEntry(signalHist, "(Test) Signal " + label, "f")
         legend.AddEntry(bckgrdHist, "(Test) Background " + label, "f")
     legend.Draw("same")

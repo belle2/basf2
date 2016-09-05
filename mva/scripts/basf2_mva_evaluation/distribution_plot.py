@@ -13,10 +13,17 @@ def _from_hists(signalHist, bckgrdHist):
 
 
 def _from_ntuple(ntuple, probability, truth, nbins=100):
-    bckgrdHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
-    signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
+    bckgrdHist = ROOT.TH1D('ROCbackground', '', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('ROCsignal', '', nbins, 0.0, 1.0)
+    signalHist.SetTitle(";Classifier Output;Entries (norm.)")
+    signalHist.GetYaxis().SetTitleOffset(1.2)
     ntuple.Project('ROCbackground', probability, '!' + truth)
     ntuple.Project('ROCsignal', probability, truth)
+
+    # normalize to 1 # normalize to 1
+    bckgrdHist.Scale(1.0 / bckgrdHist.Integral(), "width")
+    signalHist.Scale(1.0 / signalHist.Integral(), "width")
+
     _from_hists(signalHist, bckgrdHist)
     signalHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = signalHist
     bckgrdHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = bckgrdHist
@@ -70,7 +77,7 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
     legend.SetFillColor(0)
     legend.SetFillStyle(0)
     legend.SetTextFont(42)
-    legend.SetTextSize(0.03)
+    legend.SetTextSize(0.035)
 
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         signalHist, bckgrdHist = _from_ntuple(ntuple, probability, truth)

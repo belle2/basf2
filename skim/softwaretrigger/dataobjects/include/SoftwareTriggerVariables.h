@@ -21,10 +21,14 @@ namespace Belle2 {
      */
     class SoftwareTriggerVariables : public TObject {
     public:
-      /// Add a new cut result to the storage or override the result with the same name.
       void append(const std::string& identifier, const double& value)
       {
         m_results[identifier] = value;
+      }
+
+      const std::map<std::string, double>& get() const
+      {
+        return m_results;
       }
 
       /// Clear all results
@@ -34,7 +38,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Internal storage of the cut decisions with names.
+      /// Internal storage of the variables with names.
       std::map<std::string, double> m_results;
 
       /** Making this class a ROOT class.*/

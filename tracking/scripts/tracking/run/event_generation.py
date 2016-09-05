@@ -91,6 +91,18 @@ class ReadOrGenerateEventsRun(MinimalRun):
     def create_path(self):
         path = super().create_path()
 
+        # Gearbox & Geometry must always be registered
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        if self.detector_setup:
+            detector_setup = self.detector_setup
+            detector_setup_function = detector_setups_by_short_name[detector_setup]
+            components = detector_setup_function(path)
+
+        if self.components:
+            adjustments.adjust_module(path, "Geometry", components=self.components)
+            components = self.components
+
         # Only generate events if no input file has been provided
         if self.root_input_file is None:
             # Check if generator means a decay file
@@ -103,18 +115,6 @@ class ReadOrGenerateEventsRun(MinimalRun):
                                       self.generator_module,
                                       generators_by_short_name,
                                       allow_function_import=True)
-
-        # Gearbox & Geometry must always be registered
-        path.add_module("Gearbox")
-        path.add_module("Geometry")
-        if self.detector_setup:
-            detector_setup = self.detector_setup
-            detector_setup_function = detector_setups_by_short_name[detector_setup]
-            components = detector_setup_function(path)
-
-        if self.components:
-            adjustments.adjust_module(path, "Geometry", components=self.components)
-            components = self.components
 
         # Only simulate if generator is setup
         if self.root_input_file is None:

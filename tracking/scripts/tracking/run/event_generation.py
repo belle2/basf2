@@ -68,7 +68,7 @@ class ReadOrGenerateEventsRun(MinimalRun):
             help='Name module or short name of the generator to be used.',
         )
 
-        simulation_argument_group = argument_parser.add_argument_group("Generator arguments")
+        simulation_argument_group = argument_parser.add_argument_group("Simulation arguments")
         simulation_argument_group.add_argument(
             '-b',
             '--bkg-file',

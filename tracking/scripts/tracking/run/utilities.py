@@ -138,3 +138,12 @@ def extend_path(path,
         raise ValueError(message_template % (module,
                                              type(module),
                                              module_by_short_name.keys()))
+
+
+def get_module_param(module, name):
+    parameters = module.available_params()
+    for parameter in parameters:
+        if name == parameter.name:
+            return parameter.values
+        else:
+            raise AttributeError('%s module does not have a parameter named %s' % (module, name))

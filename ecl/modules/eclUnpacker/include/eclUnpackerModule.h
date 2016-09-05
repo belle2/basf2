@@ -19,7 +19,7 @@
 #include <rawdata/dataobjects/RawECL.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <framework/core/Module.h>
-#include "ecl/modules/eclUnpacker/eclChannelMapper.h"
+#include "ecl/utility/eclChannelMapper.h"
 
 namespace Belle2 {
   namespace ECL {

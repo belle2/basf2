@@ -1,4 +1,4 @@
-#include "ecl/modules/eclUnpacker/eclChannelMapper.h"
+#include "ecl/utility/eclChannelMapper.h"
 #include <iostream>
 
 #include <fstream>
@@ -26,6 +26,8 @@ ECLChannelMapper::ECLChannelMapper()
     for (j = 0; j < 3; j++)
       convertArrayInv[i][j] = 0;
 
+  isInitialized = false;
+
 }
 
 bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
@@ -35,11 +37,11 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
   ifstream mapFile(eclMapFileName);
   if (mapFile.is_open()) {
 
+    float iCrate, iShaper, iChannel, thetaID, phiID, cellID;
+    int arrayIndex = 0;
+    int arrayCount = 0;
     while (mapFile.good()) {
 
-      float iCrate, iShaper, iChannel, thetaID, phiID, cellID;
-      int arrayIndex = 0;
-      int arrayCount = 0;
 
       mapFile >> iCrate >> iShaper >> iChannel >> thetaID >> phiID >> cellID;
 
@@ -83,7 +85,10 @@ bool ECLChannelMapper::initFromFile(const char* eclMapFileName = "crpsch.dat")
 
 //  std::cout << "ECL Channel mapper is initialized \n";
 
+  isInitialized = true;
+
   return true;
+
 
 }
 

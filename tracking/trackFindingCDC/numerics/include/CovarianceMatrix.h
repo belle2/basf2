@@ -9,9 +9,9 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/ParameterVector.h>
-#include <tracking/trackFindingCDC/geometry/JacobianMatrix.h>
-#include <tracking/trackFindingCDC/geometry/PrecisionMatrix.h>
+#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
+#include <tracking/trackFindingCDC/numerics/JacobianMatrix.h>
+#include <tracking/trackFindingCDC/numerics/PrecisionMatrix.h>
 
 #include <Eigen/Dense>
 #include <TMatrixDSym.h>
@@ -20,7 +20,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// The representation type of a covariance matrix
+    /// The representation type of a covariance matrix of n related parameters
     template <int N>
     using CovarianceMatrix = Eigen::Matrix<double, N, N>;
 

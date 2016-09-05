@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/ParameterVector.h>
+#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
 #include <Eigen/Dense>
 
@@ -17,8 +17,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// The matrix type implementing the repesentation of a jacobian matrix used in the transport
-    /// operations
+    /// The representation type of derivatives from n to m parameters as used in the transport of covariance matrices.
     template <int M, int N = M>
     using JacobianMatrix = Eigen::Matrix<double, M, N>;
 

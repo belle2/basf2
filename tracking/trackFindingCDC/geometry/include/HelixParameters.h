@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Oliver Frost                                             *
@@ -17,28 +17,25 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
+
     /// Namespace to hide the contained enum constants
     namespace NHelixParameterIndices {
 
       /// Enumeration to address the individual helix parameters in a vector or matrix
       enum EHelixParameter {
-        /// Constant to address the curvature in a vector or matrix assoziated with helix
-        /// parameters.
+        /// Constant to address the curvature in the xy plane
         c_Curv = 0,
 
-        /// Constant to address the azimuth angle of the direction of flight at the helix in a
-        /// vector or matrix assoziated with helix parameters.
+        /// Constant to address the azimuth angle of the direction of flight
         c_Phi0 = 1,
 
-        /// Constant to address the impact parameter in a vector or matrix assoziated with helix
-        /// parameters.
+        /// Constant to address the impact parameter
         c_I = 2,
 
-        /// Constant to address the tanLambda in a vector or matrix assoziated with helix parameters
+        /// Constant to address the tan lambda dip out of the xy plane
         c_TanL = 3,
 
-        /// Constant to address the z reference point in a vector or matrix assoziated with helix
-        /// parameters
+        /// Constant to address the z start position
         c_Z0 = 4,
 
         /// Constant for the total number of indices.
@@ -49,9 +46,10 @@ namespace Belle2 {
     /// Importing the enumeration for the namespace but not the constants.
     using EHelixParameter = NHelixParameterIndices::EHelixParameter;
 
-    /// Utiliy functions and types related
+    /// Utility struct for functions and types related to the helix parameters.
     struct HelixUtil : UncertainParametersUtil<HelixUtil, EHelixParameter> {
-      /// Getter for the indices;
+
+      /// Getter for the signs which have to be applied to reverse the parameters
       static ParameterVector reversalSigns()
       {
         ParameterVector result;

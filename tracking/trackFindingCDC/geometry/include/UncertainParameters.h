@@ -9,35 +9,33 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/geometry/CovarianceMatrix.h>
-#include <tracking/trackFindingCDC/geometry/ParameterVector.h>
+#include <tracking/trackFindingCDC/numerics/CovarianceMatrix.h>
+#include <tracking/trackFindingCDC/numerics/ParameterVector.h>
 
 namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Utility class template the instantiate many helper function related to a uncertain parameter
-    /// vector
+    /// Utility struct to instantiate a couple of helper function related to a set of uncertain parameters
     template <class T, class AEParameters>
     struct UncertainParametersUtil {
 
       /// Indices of the parameters
       using EParamaters = AEParameters;
 
-      /// Number of Elements
+      /// Number of elements
       static const size_t c_N = EParamaters::c_N;
 
       /// The vector type representing the n related parameters.
       using ParameterVector = TrackFindingCDC::ParameterVector<c_N>;
 
-      /// The matrix type implementing the representation of the covariance
+      /// The matrix type representing the covariance of the n related parameters
       using CovarianceMatrix = TrackFindingCDC::CovarianceMatrix<c_N>;
 
-      /// The matrix type implementing the representation of the precision
+      /// The matrix type representing the precision of the n related parameters
       using PrecisionMatrix = TrackFindingCDC::PrecisionMatrix<c_N>;
 
-      /// The matrix type implementing the representation of a jacobian matrix used in the transport
-      /// operations
+      /// The matrix type used to translate covariances and precisions im auto mapping of the parameter space
       using JacobianMatrix = TrackFindingCDC::JacobianMatrix<c_N>;
 
       /// Transport the covariance matrix inplace with the given jacobian matrix

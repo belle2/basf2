@@ -383,11 +383,11 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   //int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
   double ssraw = 0.;
   if (ring == 1) {
-    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw;
-    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw;
+    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
+    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
   } else if (ring == 2) {
-    if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw;
-    else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw;
+    if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw / 100.;
+    else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw / 100.;
   }
   int ring_section = section_ordering[(int)((ssraw) / 12.)];
 

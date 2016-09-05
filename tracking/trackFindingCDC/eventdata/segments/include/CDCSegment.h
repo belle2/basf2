@@ -73,12 +73,26 @@ namespace Belle2 {
         });
       }
 
+      /// Getter for the flag that this segment may have an aliased version
+      bool getMayAlias() const
+      {
+        return m_mayAlias;
+      }
+
+      /// Setter for the flag that this segment may have an aliased version
+      void setMayAlias(bool mayAlias)
+      {
+        m_mayAlias = mayAlias;
+      }
+
     private:
       /// Memory for the two dimensional trajectory fitted to this segment
       mutable CDCTrajectory2D m_trajectory2D;
+
+      /// Boolean flag to indicate that this segment has a valid alias version
+      bool m_mayAlias;
 
     }; //class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2
-

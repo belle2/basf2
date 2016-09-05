@@ -193,29 +193,27 @@ namespace {
 
 }
 
-
-
-
-
 CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegment)
 {
   const std::vector<CDCTangent>& tangents = tangentSegment;
-  return ::condenseTangentSegment(tangents);
+  CDCRecoSegment2D segment2D = ::condenseTangentSegment(tangents);
+  segment2D.setTrajectory2D(tangentSegment.getTrajectory2D());
+  segment2D.setMayAlias(tangentSegment.getMayAlias());
+  return segment2D;
 }
-
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCTangent* >& tangentPath)
 {
   return ::condenseTangentSegment(tangentPath | boost::adaptors::indirected);
 }
 
-
-
-
 CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
 {
   const std::vector<CDCFacet>& facets = facetSegment;
-  return ::condenseFacetSegment(facets);
+  CDCRecoSegment2D segment2D = ::condenseFacetSegment(facets);
+  segment2D.setTrajectory2D(facetSegment.getTrajectory2D());
+  segment2D.setMayAlias(facetSegment.getMayAlias());
+  return segment2D;
 }
 
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
@@ -226,27 +224,34 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >&
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)
 {
   CDCRecoSegment2D result;
-  for (const CDCRecoSegment2D* ptrSegment : segmentPath) {
-    assert(ptrSegment);
-    const CDCRecoSegment2D& segment = *ptrSegment;
-    for (const CDCRecoHit2D& recoHit2D : segment) {
+  bool mayAlias = true;
+  for (const CDCRecoSegment2D* ptrSegment2D : segmentPath) {
+    assert(ptrSegment2D);
+    const CDCRecoSegment2D& segment2D = *ptrSegment2D;
+    for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(recoHit2D);
     }
+    mayAlias = mayAlias and segment2D.getMayAlias();
   }
   result.receiveISuperCluster();
+  result.setMayAlias(mayAlias);
   return result;
 }
 
 CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment)
 {
   if (rlWireHitSegment.size() == 1) {
-    CDCRecoSegment2D segment;
+    CDCRecoSegment2D segment2D;
     Vector2D zeroDisp2D(0.0, 0.0);
-    segment.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
-    return segment;
+    segment2D.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
+    segment2D.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
+    segment2D.setMayAlias(rlWireHitSegment.getMayAlias());
+    return segment2D;
   } else {
     CDCTangentSegment tangentSegment;
     createTangentSegment(rlWireHitSegment, tangentSegment);
+    tangentSegment.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
+    tangentSegment.setMayAlias(rlWireHitSegment.getMayAlias());
     return condense(tangentSegment);
   }
 }
@@ -258,6 +263,8 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   } else {
     CDCFacetSegment facetSegment;
     createFacetSegment(rlWireHitSegment, facetSegment);
+    facetSegment.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
+    facetSegment.setMayAlias(rlWireHitSegment.getMayAlias());
     return condense(facetSegment);
   }
 }
@@ -278,6 +285,7 @@ CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
     wireHitSegment.push_back(&(recoHit2D.getWireHit()));
   }
   wireHitSegment.setTrajectory2D(getTrajectory2D());
+  wireHitSegment.setMayAlias(getMayAlias());
   return wireHitSegment;
 }
 
@@ -288,6 +296,7 @@ CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
     rlWireHitSegment.push_back(recoHit2D.getRLWireHit());
   }
   rlWireHitSegment.setTrajectory2D(getTrajectory2D());
+  rlWireHitSegment.setMayAlias(getMayAlias());
   return rlWireHitSegment;
 }
 
@@ -316,6 +325,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
 
   reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
   reverseSegment.m_automatonCell = m_automatonCell;
+  reverseSegment.setMayAlias(getMayAlias());
   return reverseSegment;
 }
 

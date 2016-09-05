@@ -23,6 +23,7 @@ CDCRecoSegment2D CDCRecoSegment3D::stereoProjectToRef() const
   for (const CDCRecoHit3D&  recoHit3D : *this) {
     result.push_back(recoHit3D.stereoProjectToRef());
   }
+  result.setMayAlias(getMayAlias());
   return result;
 }
 
@@ -34,5 +35,6 @@ CDCRecoSegment3D CDCRecoSegment3D::reconstruct(const CDCRecoSegment2D& segment2D
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
     segment3D.push_back(recoHit3D);
   }
+  segment3D.setMayAlias(segment2D.getMayAlias());
   return segment3D;
 }

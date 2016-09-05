@@ -38,7 +38,7 @@ namespace Belle2 {
      *
      *  Finally we want to estimate the travel distance to z coordinate relation of the particle trajectory.
      *  Therefore the three dimensional reconstructed hit stores the travel distance as seen from the xy projection
-     *  ( perpS ) it took to get to hit. This variable can be calculated from the trajectory circle fitted in
+     *  ( arcLength2D ) it took to get to hit. This variable can be calculated from the trajectory circle fitted in
      *  the two dimensional tracking as the arc length.
      */
     class CDCRecoHit3D  {
@@ -49,13 +49,13 @@ namespace Belle2 {
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
                    const Vector3D& position,
-                   double perpS = 0);
+                   double arcLength2D = 0);
 
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCWireHit* wireHit,
                    ERightLeft rlInfo,
                    const Vector3D& position,
-                   double perpS = 0);
+                   double arcLength2D = 0);
 
       /**
        *  Constructs a three dimensional reconstructed hit from a sim hit and the assoziated wirehit.
@@ -116,6 +116,8 @@ namespace Belle2 {
                                       const CDCTrajectory3D& trajectory3D);
 
       /**
+       *  Deprecated - try to use the method above for the same purpose.
+       *
        *  Reconstructs the three dimensional hit from the two dimensional,
        *  the two dimensional trajectory and sz trajectory.
        *  For two dimensional reconstructed hits on axial wires this reconstructs
@@ -133,6 +135,7 @@ namespace Belle2 {
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
+    public:
       /**
        *  Constructs the average of two reconstructed hit positions.
        *  Averages the hit positions and the travel distance. The function averages only reconstructed hits
@@ -261,6 +264,13 @@ namespace Belle2 {
 
       /// Gets the displacement from the wire position in the xy plain at the reconstructed position.
       Vector2D getRecoDisp2D() const;
+
+      /// Getter for the direction of flight
+      Vector2D getFlightDirection2D() const
+      {
+        ERotation rotation = static_cast<ERotation>(-getRLInfo());
+        return getRecoDisp2D().orthogonal(rotation);
+      }
 
       /**
        *  Constructs a two dimensional reconstructed hit by

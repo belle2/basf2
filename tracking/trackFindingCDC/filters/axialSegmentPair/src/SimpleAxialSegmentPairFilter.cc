@@ -63,11 +63,11 @@ Weight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
   Vector2D endFrontRecoPos2D = endSegment.front().getRecoPos2D();
 
   // Momentum agreement cut
-  Vector2D startMom2DAtStartBack = startFit.getUnitMom2D(startBackRecoPos2D);
-  Vector2D endMom2DAtEndFront = endFit.getUnitMom2D(endFrontRecoPos2D);
+  Vector2D startMom2DAtStartBack = startFit.getFlightDirection2D(startBackRecoPos2D);
+  Vector2D endMom2DAtEndFront = endFit.getFlightDirection2D(endFrontRecoPos2D);
 
-  Vector2D startMom2DAtEndFront = startFit.getUnitMom2D(endFrontRecoPos2D);
-  Vector2D endMom2DAtStartBack = endFit.getUnitMom2D(startBackRecoPos2D);
+  Vector2D startMom2DAtEndFront = startFit.getFlightDirection2D(endFrontRecoPos2D);
+  Vector2D endMom2DAtStartBack = endFit.getFlightDirection2D(startBackRecoPos2D);
 
   double momAngleAtStartBack = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
   double momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);

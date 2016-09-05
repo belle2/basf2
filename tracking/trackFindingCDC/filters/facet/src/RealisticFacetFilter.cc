@@ -18,13 +18,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-namespace {
-  double hypot3(double x, double y, double z)
-  {
-    return hypot(hypot(x, y), z);
-  }
-}
-
 RealisticFacetFilter::RealisticFacetFilter():
   m_param_phiPullCut(11)
 {

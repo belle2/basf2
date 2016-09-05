@@ -23,76 +23,82 @@ namespace Belle2 {
     struct BEASTTree {
 
       /**Beast PVs **/
-      double ts;
-      std::vector<Float_t> SKB_HER_injectionFlag;
-      std::vector<Float_t> SKB_LER_injectionFlag;
-      std::vector<Float_t> SKB_status;
-      std::vector<Float_t> SKB_HER_injectionRate;
-      std::vector<Float_t> SKB_LER_injectionRate;
-      std::vector<Float_t> SKB_HER_beamLife;
-      std::vector<Float_t> SKB_LER_beamLife;
-      std::vector<Float_t> SKB_LER_current;
-      std::vector<Float_t> SKB_HER_current;
-      std::vector<Float_t> SKB_LER_injectionEfficiency;
-      std::vector<Float_t> SKB_HER_injectionEfficiency;
-      std::vector<Float_t> SKB_IP_beamLoss_IonChambers;
-      std::vector<Float_t> SKB_IP_beamLoss_PINdiodes;
-      std::vector<Float_t> SKB_LER_beamLoss_NearCollimators;
-      std::vector<Float_t> SKB_HER_beamLoss_NearCollimators;
-      std::vector<Float_t> SKB_LER_injectionCharge;
-      std::vector<Float_t> SKB_HER_injectionCharge;
-      std::vector<Float_t> SKB_HER_beamLife_2;
-      std::vector<Float_t> SKB_LER_beamLife_2;
-      std::vector<Float_t> SKB_LER_injection_RepetitionRate;
-      std::vector<Float_t> SKB_HER_injection_RepetitionRate;
-      std::vector<Float_t> SKB_injection_BucketSelection;
-      std::vector<Float_t> SKB_injection_AutoFill_Mode;
-      std::vector<Float_t> SKB_injection_AutoFill_Nbunches;
-      std::vector<Float_t> SKB_LER_injection_OneBunch_BucketNumber;
-      std::vector<Float_t> SKB_HER_injection_OneBunch_BucketNumber;
-      std::vector<Float_t> SKB_injection_OneBunch_Nbunches;
-      std::vector<Float_t> SKB_LER_abort;
-      std::vector<Float_t> SKB_HER_abort;
-      std::vector<Float_t> SKB_LER_pressure;
-      std::vector<Float_t> SKB_HER_pressure;
-      std::vector<Float_t> SKB_LER_averagePressure;
-      std::vector<Float_t> SKB_HER_averagePressure;
-      std::vector<Float_t> SKB_HER_collimatorAbsolutePosition;
-      std::vector<Float_t> SKB_HER_collimatorBeamPositionX;
-      std::vector<Float_t> SKB_HER_collimatorBeamPositionY;
-      std::vector<Float_t> SKB_HER_collimatorDistanceToBeam;
-      std::vector<Float_t> SKB_LER_collimatorAbsolutePosition;
-      std::vector<Float_t> SKB_LER_collimatorBeamPositionX;
-      std::vector<Float_t> SKB_LER_collimatorBeamPositionY;
-      std::vector<Float_t> SKB_LER_collimatorDistanceToBeam;
-      std::vector<Float_t> SKB_HER_BeamSize_xray_X;
-      std::vector<Float_t> SKB_HER_BeamSize_xray_Y;
-      std::vector<Float_t> SKB_LER_BeamSize_xray_X;
-      std::vector<Float_t> SKB_LER_BeamSize_xray_Y;
-      std::vector<Float_t> SKB_LER_BeamSize_SR_X;
-      std::vector<Float_t> SKB_LER_BeamSize_SR_Y;
-      std::vector<Float_t> SKB_HER_BeamSize_SR_X;
-      std::vector<Float_t> SKB_HER_BeamSize_SR_Y;
-      std::vector<Float_t> SKB_HER_integratedCurrent;
-      std::vector<Float_t> SKB_LER_integratedCurrent;
+      double ts;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionFlag;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionFlag;/**Beast PVs **/
+      std::vector<Double_t> SKB_status;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionRate;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionRate;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamLife;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamLife;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_current;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_current;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionEfficiency;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionEfficiency;/**Beast PVs **/
+      std::vector<Double_t> SKB_beamLoss_ionChambers_mean;/**Beast PVs **/
+      std::vector<Double_t> SKB_beamLoss_PINdiodes_mean;/**Beast PVs **/
+      std::vector<Double_t> SKB_beamLoss_nearCollimators;/**Beast PVs **/
+      std::vector<Double_t> SKB_beamLoss_aroundMasks;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionCharge;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionCharge;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamLife_2;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamLife_2;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionRepetitionRate;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionRepetitionRate;/**Beast PVs **/
+      std::vector<Double_t> SKB_injection_BucketSelection;/**Beast PVs **/
+      std::vector<Double_t> SKB_injection_AutoFill_Mode;/**Beast PVs **/
+      std::vector<Double_t> SKB_injection_AutoFill_Nbunches;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_injectionNumberOfBunches;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_injectionNumberOfBunches;/**Beast PVs **/
+      std::vector<Double_t> SKB_injection_OneBunch_Nbunches;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_abort;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_abort;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_pressures;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_pressures;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_pressure_average;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_pressure_average;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_collimatorPositions_DMM;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_collimatorPositions_mm;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_collimatorPositions_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_collimatorPositions_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_collimatorPosition_fromBeam;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_collimatorPositions_DMM;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_collimatorPositions_mm;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_collimatorPositions_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_collimatorPositions_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_collimatorPosition_fromBeam;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamSize_xray_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamSize_xray_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamSize_xray_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamSize_xray_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamSize_SR_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_beamSize_SR_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamSize_SR_X;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_beamSize_SR_Y;/**Beast PVs **/
+      std::vector<Double_t> SKB_HER_integratedCurrent;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_integratedCurrent;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_partialPressures_D06;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_partialPressures_D02;/**Beast PVs **/
+      std::vector<Double_t> SKB_LER_pressures_local;/**Beast PVs **/
 
-      std::vector<Float_t> PIN_dose;
-      std::vector<Float_t> BGO_energy;
-      std::vector<Float_t> HE3_rate;
-      std::vector<Float_t> CSI_sumE;
-      std::vector<Float_t> CSI_hitRate;
-      std::vector<Float_t> DIA_dose;
-      std::vector<UInt_t> TPC_neutrons_N;
-      std::vector<Float_t> TPC_neutrons_tracks_E;
-      std::vector<Float_t> TPC_neutrons_phi;
-      std::vector<Float_t> TPC_neutrons_theta;
-      std::vector<Float_t> TPC_neutrons_length;
-      std::vector<UInt_t> TPC_alphas_top_N;
-      std::vector<UInt_t> TPC_alphas_bot_N;
-      std::vector<Float_t> TPC_alphas_top_tracks_dEdx;
-      std::vector<Float_t> TPC_alphas_bot_tracks_dEdx;
-      std::vector<UInt_t> TPC_xrays_N;
-      std::vector<Float_t> TPC_xrays_sumE;
+
+      std::vector<Double_t> PIN_dose;/**Beast PVs **/
+      std::vector<Double_t> BGO_energy;/**Beast PVs **/
+      std::vector<Double_t> HE3_rate;/**Beast PVs **/
+      std::vector<Double_t> CSI_sumE;/**Beast PVs **/
+      std::vector<Double_t> CSI_hitRate;/**Beast PVs **/
+      std::vector<Double_t> DIA_dose;/**Beast PVs **/
+      std::vector<UInt_t> TPC_neutrons_N;/**Beast PVs **/
+      std::vector<Double_t> TPC_neutrons_tracks_E;/**Beast PVs **/
+      std::vector<Double_t> TPC_neutrons_phi;/**Beast PVs **/
+      std::vector<Double_t> TPC_neutrons_theta;/**Beast PVs **/
+      std::vector<Double_t> TPC_neutrons_length;/**Beast PVs **/
+      std::vector<UInt_t> TPC_alphas_top_N;/**Beast PVs **/
+      std::vector<UInt_t> TPC_alphas_bot_N;/**Beast PVs **/
+      std::vector<Double_t> TPC_alphas_top_tracks_dEdx;/**Beast PVs **/
+      std::vector<Double_t> TPC_alphas_bot_tracks_dEdx;/**Beast PVs **/
+      std::vector<UInt_t> TPC_xrays_N;/**Beast PVs **/
+      std::vector<Double_t> TPC_xrays_sumE;/**Beast PVs **/
 
       /**
        * Clear the structure: set elements to zero
@@ -111,46 +117,51 @@ namespace Belle2 {
         SKB_HER_current.clear();
         SKB_LER_injectionEfficiency.clear();
         SKB_HER_injectionEfficiency.clear();
-        SKB_IP_beamLoss_IonChambers.clear();
-        SKB_IP_beamLoss_PINdiodes.clear();
-        SKB_LER_beamLoss_NearCollimators.clear();
-        SKB_HER_beamLoss_NearCollimators.clear();
+        SKB_beamLoss_ionChambers_mean.clear();
+        SKB_beamLoss_PINdiodes_mean.clear();
+        SKB_beamLoss_nearCollimators.clear();
+        SKB_beamLoss_aroundMasks.clear();
         SKB_LER_injectionCharge.clear();
         SKB_HER_injectionCharge.clear();
         SKB_HER_beamLife_2.clear();
         SKB_LER_beamLife_2.clear();
-        SKB_LER_injection_RepetitionRate.clear();
-        SKB_HER_injection_RepetitionRate.clear();
+        SKB_LER_injectionRepetitionRate.clear();
+        SKB_HER_injectionRepetitionRate.clear();
         SKB_injection_BucketSelection.clear();
         SKB_injection_AutoFill_Mode.clear();
         SKB_injection_AutoFill_Nbunches.clear();
-        SKB_LER_injection_OneBunch_BucketNumber.clear();
-        SKB_HER_injection_OneBunch_BucketNumber.clear();
+        SKB_LER_injectionNumberOfBunches.clear();
+        SKB_HER_injectionNumberOfBunches.clear();
         SKB_injection_OneBunch_Nbunches.clear();
         SKB_LER_abort.clear();
         SKB_HER_abort.clear();
-        SKB_LER_pressure.clear();
-        SKB_HER_pressure.clear();
-        SKB_LER_averagePressure.clear();
-        SKB_HER_averagePressure.clear();
-        SKB_HER_collimatorAbsolutePosition.clear();
-        SKB_HER_collimatorBeamPositionX.clear();
-        SKB_HER_collimatorBeamPositionY.clear();
-        SKB_HER_collimatorDistanceToBeam.clear();
-        SKB_LER_collimatorAbsolutePosition.clear();
-        SKB_LER_collimatorBeamPositionX.clear();
-        SKB_LER_collimatorBeamPositionY.clear();
-        SKB_LER_collimatorDistanceToBeam.clear();
-        SKB_HER_BeamSize_xray_X.clear();
-        SKB_HER_BeamSize_xray_Y.clear();
-        SKB_LER_BeamSize_xray_X.clear();
-        SKB_LER_BeamSize_xray_Y.clear();
-        SKB_LER_BeamSize_SR_X.clear();
-        SKB_LER_BeamSize_SR_Y.clear();
-        SKB_HER_BeamSize_SR_X.clear();
-        SKB_HER_BeamSize_SR_Y.clear();
+        SKB_LER_pressures.clear();
+        SKB_HER_pressures.clear();
+        SKB_LER_pressure_average.clear();
+        SKB_HER_pressure_average.clear();
+        SKB_HER_collimatorPositions_DMM.clear();
+        SKB_HER_collimatorPositions_mm.clear();
+        SKB_HER_collimatorPositions_X.clear();
+        SKB_HER_collimatorPositions_Y.clear();
+        SKB_HER_collimatorPosition_fromBeam.clear();
+        SKB_LER_collimatorPositions_DMM.clear();
+        SKB_LER_collimatorPositions_mm.clear();
+        SKB_LER_collimatorPositions_X.clear();
+        SKB_LER_collimatorPositions_Y.clear();
+        SKB_LER_collimatorPosition_fromBeam.clear();
+        SKB_HER_beamSize_xray_X.clear();
+        SKB_HER_beamSize_xray_Y.clear();
+        SKB_LER_beamSize_xray_X.clear();
+        SKB_LER_beamSize_xray_Y.clear();
+        SKB_LER_beamSize_SR_X.clear();
+        SKB_LER_beamSize_SR_Y.clear();
+        SKB_HER_beamSize_SR_X.clear();
+        SKB_HER_beamSize_SR_Y.clear();
         SKB_HER_integratedCurrent.clear();
         SKB_LER_integratedCurrent.clear();
+        SKB_LER_partialPressures_D06.clear();
+        SKB_LER_partialPressures_D02.clear();
+        SKB_LER_pressures_local.clear();
 
         PIN_dose.clear();
         BGO_energy.clear();

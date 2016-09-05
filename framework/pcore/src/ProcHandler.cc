@@ -27,6 +27,8 @@ using namespace Belle2;
 namespace {
   /// Set static process ID number
   static int s_processID = -1;
+  // Set static number of processes
+  static int s_nproc = 0;
   // global list of PIDs managed by ProcHandler.
   static std::set<int> s_pidList;
 
@@ -136,6 +138,7 @@ void ProcHandler::startWorkerProcesses(int nproc)
     if (startProc(&m_processList, "worker", i))
       break; // in child process
   }
+  s_nproc = nproc;
 }
 
 void ProcHandler::startOutputProcess() { s_processID = 20000; }
@@ -147,6 +150,16 @@ bool ProcHandler::isInputProcess() { return (s_processID >= 10000 and s_processI
 bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_processID < 10000); }
 
 bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
+
+int ProcHandler::NumEvtProcs()
+{
+  return s_nproc;
+}
+
+std::set<int> ProcHandler::ProcessList()
+{
+  return s_pidList;
+}
 
 int ProcHandler::EvtProcID() { return s_processID; }
 

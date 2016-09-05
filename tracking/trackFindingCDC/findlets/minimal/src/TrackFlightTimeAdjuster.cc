@@ -44,7 +44,7 @@ void TrackFlightTimeAdjuster::apply(std::vector<CDCTrack>& tracks)
   for (CDCTrack& track : tracks) {
     CDCTrajectory3D startTrajectory3D = track.getStartTrajectory3D();
     double arcLength2D = startTrajectory3D.calcArcLength2D(m_triggerPoint);
-    double arcLength3D = arcLength2D * std::hypot(1, startTrajectory3D.getTanLambda());
+    double arcLength3D = arcLength2D * hypot2(1, startTrajectory3D.getTanLambda());
     double flightTime = arcLength3D / Const::speedOfLight;
     // Insert negative drift time such that the time at the trigger point is 0.
     startTrajectory3D.setFlightTime(-flightTime);

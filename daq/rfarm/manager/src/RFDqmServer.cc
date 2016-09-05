@@ -30,7 +30,7 @@ RFDqmServer::RFDqmServer(string conffile)
   m_proc = new RFProcessManager(nodename);
 
   // 3. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 }
 
 RFDqmServer::~RFDqmServer()

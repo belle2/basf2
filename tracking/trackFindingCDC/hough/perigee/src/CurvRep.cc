@@ -11,7 +11,7 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

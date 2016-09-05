@@ -153,7 +153,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
 
     CDCTrack& mcTrack = mcTracks[simpleSimHit.m_iMCTrack];
 
-    CDCRLWireHit rlWireHit(&wireHit, simpleSimHit.m_rlInfo);
+    CDCRLWireHit rlWireHit(&wireHit, simpleSimHit.m_rlInfo, wireHit.getRefDriftLength());
     CDCRecoHit3D recoHit3D(rlWireHit, simpleSimHit.m_pos3D, simpleSimHit.m_arcLength2D);
     mcTrack.push_back(recoHit3D);
   }
@@ -348,7 +348,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
 
   double delayTime = getEventTime();
   if (m_addTOFDelay) {
-    double arcLength3D = std::hypot(1, globalHelix.tanLambda()) * (correctedArcLength2D + arcLength2DOffset);
+    double arcLength3D = hypot2(1, globalHelix.tanLambda()) * (correctedArcLength2D + arcLength2DOffset);
     delayTime += arcLength3D / Const::speedOfLight;
   }
 
@@ -356,7 +356,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
     double backwardZ = wire.getBackwardZ();
     // Position where wire has been hit
     Vector3D wirePos = wire.getClosest(correctedPos3D);
-    double distanceToBack = (wirePos.z() - backwardZ) * hypot(1, wire.getTanStereoAngle());
+    double distanceToBack = (wirePos.z() - backwardZ) * hypot2(1, wire.getTanStereoAngle());
 
     delayTime += distanceToBack / m_propSpeed;
   }

@@ -577,7 +577,10 @@ class SavePullAnalysisRefiner(Refiner):
 
         name = self.name or self.default_name
 
-        auxiliaries = {aux_name: crops[aux_name] for aux_name in self.aux_names}
+        if self.aux_names:
+            auxiliaries = select_crop_parts(crops, self.aux_names)
+        else:
+            auxiliaries = {}
 
         for part_name in self.part_names:
             name = formatter.format(name, part_name=part_name, **replacement_dict)
@@ -687,7 +690,7 @@ class SaveTreeRefiner(Refiner):
 
         if output_ttree.GetNbranches() == 1:
             # On filling of the first branch we need to use the fill method of the TTree
-            # For all other branches we can use.
+            # For all other branches we can use the one of the branch
             # #justrootthings
             for value in parts:
                 input_value[0] = value

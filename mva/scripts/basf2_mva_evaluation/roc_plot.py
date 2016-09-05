@@ -45,27 +45,29 @@ def from_file(rootfile, probabilities, truths, labels, outputfilename, nbins=100
     canvas = ROOT.TCanvas("canvas", "ROC curve", 1600, 1200)
     canvas.cd()
 
-    legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
+    legend = ROOT.TLegend(0.1, 0.1, 0.48, 0.2)
+    legend.SetBorderSize(0)
+    legend.SetFillColor(0)
+    legend.SetFillStyle(0)
+    legend.SetTextFont(42)
+    legend.SetTextSize(0.035)
 
     mg = ROOT.TMultiGraph()
     color = 1
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
         rocgraph = _from_ntuple(ntuple, probability, truth, nbins)
         rocgraph.SetLineColor(color)
+        rocgraph.SetLineWidth(3)
 
         color += 1
         if color in [5, 10, 11]:
             color += 1
 
-        rocgraph.SetTitle(';purity (%);efficiency (%)')
-        rocgraph.GetXaxis().SetTitleSize(0.05)
-        rocgraph.GetXaxis().SetLabelSize(0.05)
-        rocgraph.GetYaxis().SetTitleSize(0.05)
-        rocgraph.GetYaxis().SetLabelSize(0.05)
         mg.Add(rocgraph)
         legend.AddEntry(rocgraph, label, "lep")
 
     mg.Draw('ALPZ')
+    mg.SetTitle(";Purity (%);Efficiency (%)")
     legend.Draw()
 
     canvas.SaveAs(outputfilename)

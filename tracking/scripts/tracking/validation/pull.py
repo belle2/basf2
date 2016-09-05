@@ -205,10 +205,28 @@ class PullAnalysis(object):
             # Estimates versus truths profile plot
             estimates_by_truths_profile_name = formatter.format(plot_name, subplot_name="diag_profile")
             estimates_by_truths_profile = ValidationPlot(estimates_by_truths_profile_name)
+
+            # Fill residuals and correct afterwards
             estimates_by_truths_profile.profile(truths,
-                                                estimates,
+                                                estimates - truths,
                                                 outlier_z_score=outlier_z_score,
+                                                gaus_z_score=4,
                                                 is_expert=is_expert)
+
+            # Correct with TF1 - only works because the gaus fit is active.
+            hist = estimates_by_truths_profile.histograms[0]
+            GetBinContent = hist.GetBinContent
+            GetBinCenter = hist.GetBinCenter
+            SetBinContent = hist.SetBinContent
+            for i_bin in range(hist.GetNbinsX() + 2):
+                residual = GetBinContent(i_bin)
+                truth = GetBinCenter(i_bin)
+                if residual != 0:
+                    SetBinContent(i_bin, residual + truth)
+
+            # Reset maximum and minimum
+            estimates_by_truths_profile.histograms[0].SetMaximum()
+            estimates_by_truths_profile.histograms[0].SetMinimum()
 
             estimates_by_truths_profile.xlabel = 'True ' + axis_label
             estimates_by_truths_profile.ylabel = 'Estimated ' + axis_label
@@ -304,7 +322,7 @@ class PullAnalysis(object):
                 aux_residuals_profile.profile(aux_values,
                                               residuals,
                                               outlier_z_score=outlier_z_score,
-                                              gaus_z_score=1.0,
+                                              gaus_z_score=1.5,
                                               allow_discrete=True,
                                               is_expert=is_expert,
                                               )
@@ -340,6 +358,7 @@ class PullAnalysis(object):
                 aux_pulls_profile.profile(aux_values,
                                           pulls,
                                           outlier_z_score=outlier_z_score,
+                                          gaus_z_score=1.5,
                                           allow_discrete=True,
                                           is_expert=is_expert)
                 aux_pulls_profile.xlabel = compose_axis_label(aux_name)

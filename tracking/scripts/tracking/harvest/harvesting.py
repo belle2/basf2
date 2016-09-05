@@ -13,14 +13,8 @@ import basf2
 import ROOT
 from ROOT import Belle2  # make Belle2 namespace available
 
-from tracking.modules import BrowseTFileOnTerminateModule
-from tracking.root_utils import root_cd, root_browse
 from .refiners import Refiner
-
-import tracking.run.tracked_event_generation
-
-
-import tracking.metamodules as metamodules
+from tracking.root_utils import root_cd, root_browse
 
 import logging
 
@@ -28,25 +22,6 @@ import logging
 def get_logger():
     """Getter for the logger instance of this file."""
     return logging.getLogger(__name__)
-
-
-class AttributeDict(dict):
-
-    """Class that enables access to the dictionaries items by attribute lookup
-    in addition to normal item lookup.
-
-    Example
-    -------
-    >>> style = AttributeDict(color="red", dash=True)
-    >>> print style["color"] # normal access
-    'red'
-    >>> print style.color    # access as attribute lookup
-    'red'
-    """
-
-    def __getattr__(self, name):
-        """If the name is not an attribute of the object, try to look it up as an item instead."""
-        return self[name]
 
 
 def coroutine(generator_func):
@@ -168,16 +143,6 @@ class HarvestingModule(basf2.Module):
         save_tree = refiners.save_tree()
 
     is a predefined method to output the MutableMapping of numpy arrays as a TTree.
-
-
-    Examples
-    --------
-    You find examples of concrete HarvestingModules in
-    * tracking/scripts/tracking/validation/mc_side_module.py
-    * tracking/scripts/tracking/validation/pr_side_module.py
-    * tracking/scripts/tracking/validation/eventwise_side_module.py
-    * tracking/trackFindingCDC/scripts/trackfindingcdc/validation/segmentFitValidation.py
-    * tracking/trackFindingCDC/scripts/trackfindingcdc/validation/segmentPairFitValidation.py
     """
 
     default_expert_level = 1
@@ -217,7 +182,7 @@ class HarvestingModule(basf2.Module):
            Indicator to show the refined results at termination of the path
            """
 
-        super(HarvestingModule, self).__init__()
+        super().__init__()
 
         #: Name of the StoreArray or iterable StoreObjPtr that contains the objects to be harvested
         self.foreach = foreach
@@ -254,53 +219,6 @@ class HarvestingModule(basf2.Module):
         Exposing the name as a property using a different name
         """
         return self.name()
-
-    def run(self,
-            input_root_file,
-            components=False,
-            show=True,
-            pyprofile=False):
-        """Run the module on a basf2 output file and harvest objects from it.
-
-        Parameters
-        ----------
-        input_root_file : str
-            Name of the basf2 output file to be read.
-            The file is read by RootInputModule.
-        components : list(str), optional
-            A list of geometry components that should be loaded for the harvesting to work.
-            Defaults to the default compontent of
-            tracking.run.tracked_event_generation.ReadOrGenerateTrackedEventsRun
-        show : bool, optional
-            Open a TBrowser and show the ROOT file that has been generated on terminate.
-            Defaults to True.
-        pyprofile: bool
-            Use the tracking.metamodules.PyProfilingModule on the harvesting module
-            to investigate bottlenecks in the python code.
-            Defaults to False
-            """
-
-        run = tracking.run.tracked_event_generation.ReadOrGenerateTrackedEventsRun()
-
-        if input_root_file:
-            run.root_input_file = input_root_file
-
-        if components:
-            run.components = components
-
-        run.configure_from_commandline()
-
-        if pyprofile:
-            run.add_module(metamodules.PyProfilingModule(self))
-        else:
-            run.add_module(self)
-
-        # Display the root file on terminate
-        if show and self.output_file_name:
-            run.add_module(BrowseTFileOnTerminateModule(self.output_file_name))
-
-        get_logger().info("Processing...")
-        run.execute()
 
     def initialize(self):
         """Initialisation method of the module.
@@ -343,16 +261,6 @@ class HarvestingModule(basf2.Module):
         self.stash.close()
         del self.stash
         self.refine(self.crops)
-
-        if self.show_results and self.output_file_name:
-            if isinstance(self.output_file_name, str):
-                output_tfile = ROOT.TFile(self.output_file_name)
-                root_browse(output_tfile)
-                input("Press enter to close")
-                output_tfile.Close()
-            else:
-                root_browse(self.output_file_name)
-                input("Press enter to close")
 
     @staticmethod
     def create_crop_part_collection():
@@ -465,7 +373,7 @@ class HarvestingModule(basf2.Module):
             Unpacked names and values
 
         """
-        return {"name", np.nan}
+        return {"name": np.nan}
 
     def pick(self, crop):
         """Indicate whether the instance should be forwarded to the peeling
@@ -510,6 +418,16 @@ class HarvestingModule(basf2.Module):
                 if isinstance(self.output_file_name, str):
                     output_tfile.Close()
 
+        if self.show_results and self.output_file_name:
+            if isinstance(self.output_file_name, str):
+                output_tfile = ROOT.TFile(self.output_file_name)
+                root_browse(output_tfile)
+                input("Press enter to close")
+                output_tfile.Close()
+            else:
+                root_browse(self.output_file_name)
+                input("Press enter to close")
+
     @staticmethod
     def iter_store_obj(store_obj):
         """Obtain a iterator from a StoreObj
@@ -534,7 +452,7 @@ class HarvestingModule(basf2.Module):
 def test():
     """Test a quick analysis of the MCParticles in generic events."""
     from tracking.validation.utilities import is_primary, is_stable_in_generator
-    from tracking.validation.refiners import save_histograms, save_tree, save_fom
+    from .refiners import save_histograms, save_tree, save_fom
 
     def primaries_seen_in_detector(mc_particle):
         return (mc_particle.hasStatus(Belle2.MCParticle.c_PrimaryParticle) and
@@ -573,7 +491,7 @@ def test():
         pdg_code = mc_particle.getPDG()
         secondary_process = mc_particle.getSecondaryPhysicsProcess()
 
-        return AttributeDict(
+        return dict(
             # Save divide not throwing an ZeroDivisionError
             tan_lambda=np.divide(1.0, np.tan(momentum_tvector3.Theta())),
             pt=momentum_tvector3.Pt(),
@@ -586,8 +504,15 @@ def test():
             pdg_code=pdg_code,
         )
 
-    MCParticleOverview.run("generic1000.root")
+    from .run import HarvestingRun
 
+    class ExampleHarvestingRun(HarvestingRun):
+        n_events = 100
+
+        def harvesting_module(self):
+            return MCParticleOverview
+
+    ExampleHarvestingRun().configure_and_execute_from_commandline()
 
 if __name__ == "__main__":
     test()

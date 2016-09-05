@@ -26,7 +26,7 @@
 #include <ecl/dataobjects/ECLLocalMaximum.h>
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/dataobjects/ECLEventInformation.h>
-#include <ecl/utility/ECLShowerId.h>
+//#include <ecl/utility/ECLShowerId.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -77,32 +77,6 @@ namespace Belle2 {
 
     private:
       // Module parameters:
-      // Local Maximum
-      double m_lmEnergyCut; /**< Local maximum energy cut. */
-      double m_lmEnergyNeighbourCut; /**< Neighbours of maximum energy cut. */
-      std::string m_lmMethod; /**< LM Method. */
-      // Local Maximum, Method specific parameters: BaBar method
-      double m_lmCutOffset; /**< cut offset */
-      double m_lmCutSlope; /**< cut slope. */
-      double m_lmRatioCorrection; /**< correction for nominator and denominator of the ratio. */
-      // from BaBar:
-      //                                            ^
-      //                                            |  ....             /
-      //                                         1.0|   ....           /|
-      //                                            |                 / | fCutSlope
-      //                                            |  splitoffs     /  |
-      //          MaxE of neighbours - fERatioCorr  |    and        /___|
-      // ERatio =  -------------------------------  |  hadrons     /..
-      //                    MaxE-fERatioCorr        |             / ..
-      //                                            |  ....      /  ..
-      //                                            |   ....    /  ...  <-- merged pions
-      //                                            |          /  ....      and photons
-      //                                            |  ...    /   ....
-      //                                         0.0|        /    ....
-      //                                            |------------------->
-      //                                             0     /     6 7 8
-      //                                            <------->             number of neighbours
-      //                                            fCutOffset             with energy > fNeighbourECut
 
       // Splitter
       double m_expConstant; /**< Constant a from exp(-a*dist/RM), 1.5 to 2.5 */
@@ -153,6 +127,9 @@ namespace Belle2 {
       /** vector (8736+1 entries) with cell id to store array positions */
       std::vector< int > m_StoreArrPosition;
 
+      /** vector (8736+1 entries) with cell id to store array positions for LM*/
+      std::vector< int > m_StoreArrPositionLM;
+
       /** list with all cellid of this connected region */
       std::vector< int > m_cellIdInCR;
 
@@ -197,9 +174,6 @@ namespace Belle2 {
 
       /** Geometry */
       ECLGeometryPar* m_geom;
-
-      /** Make local maximas for a given connected region. */
-      void makeLocalMaximums(ECLConnectedRegion& aCR);
 
       /** Split connected region into showers. */
       void splitConnectedRegion(ECLConnectedRegion& aCR);

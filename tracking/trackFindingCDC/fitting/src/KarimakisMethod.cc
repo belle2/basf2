@@ -44,7 +44,7 @@ void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
   double backY = observations2D.getY(nObservations - 1);
   Vector2D backPos(backX, backY);
 
-  double totalPerps = perigeeCircle.arcLengthBetween(frontPos, backPos);
+  double totalPerps = perigeeCircle->arcLengthBetween(frontPos, backPos);
   if (totalPerps < 0) {
     perigeeCircle.reverse();
   }
@@ -98,7 +98,7 @@ namespace {
 
     // Karimaki uses the opposite sign for phi in contrast to the convention of this framework !!!
     phi += phi > 0 ? -M_PI : M_PI;
-    return PerigeeCircle::fromPerigeeParameters(curv, phi, I);
+    return PerigeeCircle(curv, phi, I);
 
   }
 

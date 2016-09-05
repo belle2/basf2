@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
-#include <tracking/trackFindingCDC/numerics/numerics.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

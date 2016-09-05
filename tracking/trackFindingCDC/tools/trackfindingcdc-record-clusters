@@ -13,10 +13,10 @@ import logging
 
 class CDCClusterRecordingRun(RecordingRun):
     """Run for recording clusters encountered at the filter"""
-    n_events = 50
+    n_events = 1000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
-
-    root_output_file_name = "CDCClusterTruthRecords.root"
+    flight_time_estimation = "outwards"
+    root_output_file_name = "BackgroundHitFinder.root"
     varsets = ["basic", "truth", ]
 
     recording_filter_parameter_name = "ClusterFilterParameters"

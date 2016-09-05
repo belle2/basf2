@@ -19,13 +19,16 @@ namespace Belle2 {
 
       /// Enumeration to address the individual perigee parameters in a vector or matrix
       enum EPerigeeParameter {
-        /// Constant to address the curvature in a vector or matrix assoziated with perigee parameters.
+        /// Constant to address the curvature in a vector or matrix assoziated with perigee
+        /// parameters.
         c_Curv = 0,
 
-        /// Constant to address the azimuth angle of the direction of flight at the perigee in a vector or matrix assoziated with perigee parameters.
+        /// Constant to address the azimuth angle of the direction of flight at the perigee in a
+        /// vector or matrix assoziated with perigee parameters.
         c_Phi0 = 1,
 
-        /// Constant to address the impact parameter in a vector or matrix assoziated with perigee parameters.
+        /// Constant to address the impact parameter in a vector or matrix assoziated with perigee
+        /// parameters.
         c_I = 2,
 
         /// Constant for the total number of indices.
@@ -43,7 +46,7 @@ namespace Belle2 {
       {
         ParameterVector result;
         result << -1, 1, -1;
-        return  result;
+        return result;
       }
     };
 

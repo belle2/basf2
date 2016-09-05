@@ -49,8 +49,10 @@ void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)
   for (CDCWireHit& wireHit : wireHits) {
     bool markAsBackground = false;
 
-    if (wireHit.getRefDriftLength() < 0 and m_param_blockNegativeDriftLength) {
-      markAsBackground = true;
+    if (m_param_blockNegativeDriftLength) {
+      if (wireHit.getRefDriftLength() < 0) {
+        markAsBackground = true;
+      }
     }
 
     if (wireHit.getRefChargeDeposit() < m_param_noiseChargeDeposit) {

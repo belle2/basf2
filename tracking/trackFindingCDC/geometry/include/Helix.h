@@ -299,7 +299,7 @@ namespace Belle2 {
       /// Getter for the azimuth angle of the direction of flight at the perigee.
       double phi0() const
       {
-        return phi0();
+        return circleXY().phi0();
       }
 
       /// Getter for the five helix parameters in the order defined by EHelixParameter.h

@@ -48,7 +48,7 @@ void EclPainterAmp::GetInformation(int px, int py, MultilineWidget* panel)
 void EclPainterAmp::Draw()
 {
   EclData* data = GetData();
-  TTree* tree = data->GetTree();
+  //  TTree* tree = data->GetTree();
 
   m_hist->Reset();
   data->FillAmpHistogram(m_hist, m_amp_min, m_amp_max);

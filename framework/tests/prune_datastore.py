@@ -41,7 +41,7 @@ main.add_module(input)
 main.add_module(eventinfo)
 main.add_module(printcollections)
 
-prune = register_module("PruneDatastore")
+prune = register_module("PruneDataStore")
 prune.param('keepEntries', ['PXDClusters.*', 'EventMetaData'])
 main.add_module(prune)
 

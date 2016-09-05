@@ -7,8 +7,8 @@
  *                                                                        *
  **************************************************************************/
 
-#ifndef PruneDatastoreModule_H
-#define PruneDatastoreModule_H
+#ifndef PruneDataStoreModule_H
+#define PruneDataStoreModule_H
 
 #include <framework/core/Module.h>
 #include <string>
@@ -22,15 +22,15 @@ namespace Belle2 {
    * You have to ensure the objects referenced by kept relations are also matched by one entry in the
    * keepEntries list so a relation does not point to nirvana.
    **/
-  class PruneDatastoreModule: public Module {
+  class PruneDataStoreModule: public Module {
 
   public:
 
     /** Constructor */
-    PruneDatastoreModule();
+    PruneDataStoreModule();
 
     /** Virtual Constructor to prevent memory leaks */
-    virtual ~PruneDatastoreModule() = default;
+    virtual ~PruneDataStoreModule() = default;
 
     /** Prepare regex checks */
     void initialize() override;
@@ -48,4 +48,4 @@ namespace Belle2 {
   };
 } // end namespace Belle2
 
-#endif // PruneDatastoreModule_H
+#endif // PruneDataStoreModule_H

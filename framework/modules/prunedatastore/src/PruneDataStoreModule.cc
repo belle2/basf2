@@ -1,22 +1,22 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2010-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Thomas Hauth                                             *
  *                                                                        *
  **************************************************************************/
 
-#include <framework/modules/prunedatastore/PruneDatastoreModule.h>
+#include <framework/modules/prunedatastore/PruneDataStoreModule.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/logging/Logger.h>
 
 using namespace std;
 using namespace Belle2;
 
-REG_MODULE(PruneDatastore)
+REG_MODULE(PruneDataStore)
 
-PruneDatastoreModule::PruneDatastoreModule() :
+PruneDataStoreModule::PruneDataStoreModule() :
   Module()
 {
   setDescription(
@@ -28,7 +28,7 @@ PruneDatastoreModule::PruneDatastoreModule() :
 
 }
 
-void PruneDatastoreModule::initialize()
+void PruneDataStoreModule::initialize()
 {
   // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
   for (auto& kEntry : m_keepEntries) {
@@ -36,7 +36,7 @@ void PruneDatastoreModule::initialize()
   }
 }
 
-void PruneDatastoreModule::event()
+void PruneDataStoreModule::event()
 {
   auto& storemap = DataStore::Instance().getStoreEntryMap(DataStore::c_Event);
 

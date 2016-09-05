@@ -270,7 +270,7 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_sag)
     const double backwardZ = wireLine.backwardZ();
     const double centerZ = (forwardZ + backwardZ) / 2;
 
-    EXPECT_LT(0, wireLine.sagCoeff());
+    EXPECT_LE(0, wireLine.sagCoeff());
 
     EXPECT_EQ(wireLine.nominalPos2DAtZ(forwardZ).y(), wireLine.sagPos2DAtZ(forwardZ).y());
     EXPECT_EQ(wireLine.nominalPos2DAtZ(backwardZ).y(), wireLine.sagPos2DAtZ(backwardZ).y());

@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     /**
      */
-    class SoftwareTriggerVariables : public TObject {
+    class SoftwareTriggerVariable : public TObject {
     public:
       void append(const std::string& identifier, const double& value)
       {
@@ -42,7 +42,7 @@ namespace Belle2 {
       std::map<std::string, double> m_results;
 
       /** Making this class a ROOT class.*/
-      ClassDef(SoftwareTriggerVariables, 1);
+      ClassDef(SoftwareTriggerVariable, 1);
     };
   }
 }

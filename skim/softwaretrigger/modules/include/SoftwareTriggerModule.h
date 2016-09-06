@@ -81,7 +81,7 @@ namespace Belle2 {
       /// TTree to store the debug output (or a nullptr if we do not save the debug output).
       std::unique_ptr<TTree> m_debugTTree;
       /// TTree living in the datastore for debug reasons
-      StoreObjPtr<SoftwareTriggerVariables> m_debugOutputStoreObject;
+      StoreObjPtr<SoftwareTriggerVariable> m_debugOutputStoreObject;
 
       void initializeCalculation();
 

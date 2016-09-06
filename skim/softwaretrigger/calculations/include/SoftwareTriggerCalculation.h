@@ -10,7 +10,7 @@
 #pragma once
 
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <skim/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
+#include <skim/softwaretrigger/dataobjects/SoftwareTriggerVariable.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <TTree.h>

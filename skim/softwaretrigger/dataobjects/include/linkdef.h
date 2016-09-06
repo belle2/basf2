@@ -7,6 +7,6 @@
 
 #pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerCutResult+;
 #pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerResult+;
-#pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerVariables+;
+#pragma link C++ class Belle2::SoftwareTrigger::SoftwareTriggerVariable+;
 
 #endif

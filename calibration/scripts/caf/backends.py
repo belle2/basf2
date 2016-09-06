@@ -211,13 +211,36 @@ class PBS(Backend):
         self.default_queue = self.config[setup_name]["Queue"]
 
     def _generate_pbs_script(self, job):
-        script = ""
-        return script
+        with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
+            batch_file.write("#!/bin/bash")
+            batch_file.write("# --- Start PBS ---")
+            batch_file.write(" ".join([PBS.cmd_queue, self.default_queue]))
+            batch_file.write(" ".join([PBS.cmd_name, job.name]))
+            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir]))
+            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]))
+            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]))
+            batch_file.write("# --- End PBS ---")
 
     class Result():
+        """
+        Simple class to help monitor status of jobs submitted by CAF backend to PBS.
+
+        You pass in a Job ID from a qsub command and when you call the 'ready' method
+        it runs qstat to see whether or not the job has finished.
+        """
+
+        def __init__(self, job_id):
+            self.job_id = job_id
 
         def ready(self):
-            return True
+            try:
+                d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+            except subprocess.CalledProcessError as cpe:
+                first_line = cpe.output.splitlines()[0]
+                if "Unknown Job Id Error" in first_line:
+                    return True
+            else:
+                return False
 
     @method_dispatch
     def submit(self, job):
@@ -228,7 +251,52 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        result = PBS.Result()
+        print('Job Submitting:', job.name)
+        # Make sure the output directory of the job is created
+        if not os.path.exists(job.output_dir):
+            os.makedirs(job.output_dir)
+
+        # Make sure the working directory of the job is created
+        if job.working_dir and not os.path.exists(job.working_dir):
+            os.makedirs(job.working_dir)
+
+        # Get all of the requested files for the input sandbox and copy them to the working directory
+        for file_pattern in job.input_sandbox_files:
+            input_files = glob.glob(file_pattern)
+            for file_path in input_files:
+                if os.path.isdir(file_path):
+                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                else:
+                    shutil.copy(file_path, job.working_dir)
+
+        # Check if we have any valid input files
+        existing_input_files = []
+        for input_file_path in job.input_files:
+            if input_file_path[:7] != "root://":
+                if os.path.exists(input_file_path):
+                    existing_input_files.append(input_file_path)
+                else:
+                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+            else:
+                existing_input_files.append(input_file_path)
+
+        if existing_input_files:
+            # Now make a python file in our input sandbox containing a list of these valid files
+            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
+                pickle.dump(existing_input_files, input_data_file)
+
+        self._generate_pbs_script(job)
+        result = self._submit_to_qsub(job)
+        return result
+
+    def _submit_to_qsub(self, job):
+        """
+        Do the actual qsub command and collect the output to find out the job id for later monitoring.
+        """
+        script_path = os.path.join(job.working_dir, "submit.sh")
+        qsub_out = subprocess.check_output(["qsub", script_path], stderr=subprocess.STDOUT, universal_newlines=True)
+        qsub_out = qsub_out.replace("\n", "")
+        result = PBS.Result(qsub_out)
         return result
 
     @submit.register(list)

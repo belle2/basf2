@@ -212,14 +212,24 @@ class PBS(Backend):
 
     def _generate_pbs_script(self, job):
         with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
-            batch_file.write("#!/bin/bash")
-            batch_file.write("# --- Start PBS ---")
-            batch_file.write(" ".join([PBS.cmd_queue, self.default_queue]))
-            batch_file.write(" ".join([PBS.cmd_name, job.name]))
-            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir]))
-            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")]))
-            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")]))
-            batch_file.write("# --- End PBS ---")
+            batch_file.write("#!/bin/bash\n")
+            batch_file.write("# --- Start PBS ---\n")
+            batch_file.write(" ".join([PBS.cmd_queue, self.default_queue])+"\n")
+            batch_file.write(" ".join([PBS.cmd_name, job.name])+"\n")
+            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir])+"\n")
+            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
+            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
+            batch_file.write("# --- End PBS ---\n")
+            setup_basf2 = ["VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
+                           "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                           "BELLE2_RELEASE_LOC=/data/ddossett/software/release/\n",
+                           "source $SETUPBELLE2_CVMFS\n",
+                           "pushd $BELLE2_RELEASE_LOC > /dev/null\n",
+                           "setuprel\n",
+                           "popd > /dev/null\n"]
+            for line in setup_basf2:
+                batch_file.write(line)
+            batch_file.write(" ".join(job.cmd)+"\n")
 
     class Result():
         """

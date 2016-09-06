@@ -1,230 +1,111 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 from basf2 import *
-from subprocess import call
-from sys import argv
 from beamparameters import add_beamparameters
 
 # This is tracking/vxdCaTracking/extendedExamples/scripts/setup_modules.py
+# If later the use of bg is wanted, you can as well import setup_bg
 from VXDTF.setup_modules import (setup_sim,
-                                 setup_pGun,
                                  setup_realClusters,
-                                 setup_mcTF,
-                                 setup_bg)
+                                 setup_mcTF)
 
+# 0 means really random. Set to different seed to have reproducable simulation.
+set_random_seed(0)
 
-# ################
-useSimpleClusterizer = False
-useEvtGen = False
-usePGun = True
-# useEDeposit: If you want to work w/o E-deposit, edit pxd/data/PXD.xml and svd/data/SVD.xml,
-# where you have to activate see neutrons = true:
-useEDeposit = True
-# usePXD: useful only for generateSecMap = false, activates secMaps for PXD+SVD and changes settings for the
-# TrackFinderMCTruth too.
-usePXD = False
-useBG = False
-bgFolder = "~/FW/bkgFiles/campaign12th/"
-# ################
-details = 'simpleClusters: ' + str(useSimpleClusterizer) + ', evtGen: ' + str(useEvtGen) + ', usePGun: ' + str(
-    usePGun) + ', eDeposit: ' + str(useEDeposit) + ', usePXD: ' + str(usePXD) + ', useBG: ' + str(useBG) + '\n\n'
-
-# Important parameters:
-numEvents = 1000  # can be overridden by the parameters given via terminal
-initialValue = 12345  # want random events, if set to 0
-
-
-# flags for the pGun
-numTracks = 20
-# transverseMomentum:
-momentumMin = 0.1  # GeV/c
-momentumMax = 0.145  # %
-# theta: starting angle of particle direction in r-z-plane
-thetaMin = 60.0  # degrees
-thetaMax = 85.  # degrees
-# phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-phiMin = 0.  # degrees
-phiMax = 90.  # degrees
-# 13: muons, 211: charged pions
-pdgCODES = [13]
-
-
-# flags for the 2nd pGun
-numTracks2 = 0
-# transverseMomentum:
-momentumMin2 = 0.3  # GeV/c
-momentumMax2 = 3.5  # %
-# theta: starting angle of particle direction in r-z-plane
-thetaMin2 = 65.0  # degrees
-thetaMax2 = 85.  # degrees
-# phi: starting angle of particle direction in x-y-plane (r-phi-plane)
-phiMin2 = 315.  # degrees
-phiMax2 = 360.  # degrees
-# 13: muons, 211: charged pions
-pdgCODES2 = [13]
-
-
-MyLogLevel = LogLevel.INFO
-MyDebugLevel = 10
-
-rootIOFileName = ""
-
-if len(argv) is 1:
-    print('no arguments given, using standard values')
-elif len(argv) is 2:
-    initialValue = int(argv[1])
-    print('1 argument given, new value for seed: ' + str(initialValue))
-elif len(argv) is 3:
-    initialValue = int(argv[1])
-    numEvents = int(argv[2])
-    print('2 arguments given, new value for seed: ' + str(initialValue) +
-          ' and for numEvents: ' + str(numEvents))
-
+# Extremely "non-verbose". Should be OK, as this are well tested modules...
+# Can be overridden with the "-l LEVEL" flag for basf2.
 set_log_level(LogLevel.ERROR)
-set_random_seed(initialValue)
 
+# ---------------------------------------------------------------------------------------
+# Creating the main path, that will be executed in the end:
+main = create_path()
 
-if useSimpleClusterizer:
-    rootIOFileName += 'simpleClusterizer'
-if useEvtGen:
-    rootIOFileName += 'evtGen'
-eDepType = 'eDepNo'
-if useEDeposit is False:
-    rootIOFileName += ' NOeDep'
+# EventInfoSetter, EventInfoPrinter, Progress:
 
-rootIOFileName += 'seed' + str(initialValue) + 'nEv' + str(numEvents)
-
-
+# Default is 1 event. To make more use the "-n NUMBER" flag for basf2.
 eventinfosetter = register_module('EventInfoSetter')
-eventinfosetter.param('expList', [0])
-eventinfosetter.param('runList', [1])
-eventinfosetter.param('evtNumList', [numEvents])
 
-
+# Just some info about what is going on...
 eventinfoprinter = register_module('EventInfoPrinter')
-
-
-gearbox = register_module('Gearbox')
-
-
-if (numTracks != 0 and usePGun is True):
-    particlegun = setup_pGun(
-        pdgCODES=pdgCODES, numTracks=numTracks, momParams=[
-            momentumMin, momentumMax], thetaParams=[
-            thetaMin, thetaMax], phiParams=[
-                phiMin, phiMax], logLevel=LogLevel.WARNING)
-    rootIOFileName += 'pGun1_' + str(numTracks) + 'T'
-    details += 'pGun1 with ' + str(numTracks) + ' tracks:\n'
-    details += 'pMin/Max: ' + str(momentumMin) + '/' + str(momentumMax) + ' , phiMin/Max: ' + \
-        str(phiMin) + '/' + str(phiMax) + ' , thetaMin/Max: ' + str(thetaMin) + '/' + str(thetaMax) + '\n'
-
-
-if (numTracks2 != 0 and usePGun is True):
-    particlegun2 = setup_pGun(
-        pdgCODES=pdgCODES2, numTracks=numTracks2, momParams=[
-            momentumMin2, momentumMax2], thetaParams=[
-            thetaMin2, thetaMax2], phiParams=[
-                phiMin2, phiMax2], logLevel=LogLevel.WARNING)
-    rootIOFileName += 'pGun2_' + str(numTracks2) + 'T'
-    details += 'pGun2 with ' + str(numTracks2) + ' tracks:\n'
-    details += 'pMin/Max: ' + str(momentumMin2) + '/' + str(momentumMax2) + ' , phiMin/Max: ' + str(phiMin2) + \
-        '/' + str(phiMax2) + ' , thetaMin/Max: ' + str(thetaMin2) + '/' + str(thetaMax2) + '\n'
-
-runLogFName = rootIOFileName + ".log"
-
-f = open(runLogFName, 'w')
-f.write(details + '\n')
-
-
-evtgeninput = register_module('EvtGenInput')
-evtgeninput.logging.log_level = LogLevel.WARNING
-
-
-geometry = register_module('Geometry')
-geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',
-                              'PXD', 'SVD'])
-
-
-rootOutputM = register_module('RootOutput')
-rootIOFileName += '.root'
-rootOutputM.param('outputFileName', rootIOFileName)
-
-
 progress = register_module('Progress')
 
-print('')
-print('')
+main.add_module(eventinfosetter)
+main.add_module(eventinfoprinter)
+main.add_module(progress)
+
+# beam parameters
+# To find out about the add_... functions: start basf2, import the function and use help(add_...)
+beamparameters = add_beamparameters(main, "Y4S")
+print_params(beamparameters)
+
+# We might want to have particle gun(s) and EVTGen.
+# Still in that case the ParticleGun modules better come first:
+param_pGun = {
+    'pdgCodes': [13, -13],                   # 13 = muon --> negatively charged!
+    'nTracks': 20,                          # 20 tracks is a lot, but we don't use beam background in this script.
+    'momentumGeneration': 'uniformPt',
+    'momentumParams': [0.1, 0.15],           # 2 values: [min, max] in GeV
+    'thetaGeneration': 'uniform',
+    'thetaParams': [60., 85.],               # 2 values: [min, max] in degree
+    'phiGeneration': 'uniform',
+    'phiParams': [0., 90.],                  # [min, max] in degree
+    'vertexGeneration': 'uniform',
+    'xVertexParams': [-0.1, 0.1],            # in cm...
+    'yVertexParams': [-0.1, 0.1],
+    'zVertexParams': [-0.5, 0.5],
+}
+
+particlegun = register_module('ParticleGun')
+particlegun.logging.log_level = LogLevel.WARNING
+particlegun.param(param_pGun)
+main.add_module(particlegun)
+
+# Now we might want to add EvtGen:
+if False:
+    evtgenInput = register_module('EvtGenInput')
+    evtgenInput.logging.log_level = LogLevel.WARNING
+    main.add_module(evtgenInput)
+
+# Gearbox to access stuff from the data folders, and Geometry:
+gearbox = register_module('Gearbox')
+main.add_module(gearbox)
+
+geometry = register_module('Geometry')
+geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD',  # Important: look at B field!
+                              'PXD', 'SVD'])
+main.add_module(geometry)
+
+# Geant 4 Simulation: this setup could be fed with ignoring the energy deposit as parameter...
+# read careful the description as you otherwise might not get any hits.
+g4sim = setup_sim()
+main.add_module(g4sim)
 
 
-if useSimpleClusterizer:
+# Digitization and Clusterization -------------------------------------------------------
+if True:
+    setup_realClusters(main, usePXD=True)  # usePXD=True: needed since 2gftc-converter does not work without it
+
+else:                    # Use simple clusterizer, that takes TrueHits.
     simpleClusterizer = register_module('VXDSimpleClusterizer')
-    simpleClusterizer.logging.log_level = LogLevel.INFO
-    simpleClusterizer.logging.debug_level = 1
     simpleClusterizer.param('setMeasSigma', 0)
     simpleClusterizer.param('onlyPrimaries', True)
+    useEDeposit = True
     if useEDeposit is False:
         simpleClusterizer.param('energyThresholdU', -0.0001)
         simpleClusterizer.param('energyThresholdV', -0.0001)
         simpleClusterizer.param('energyThreshold', -0.0001)
-
-
-eventCounter = register_module('EventCounter')
-eventCounter.logging.log_level = LogLevel.INFO
-eventCounter.param('stepSize', 1)
-
-
-g4sim = setup_sim()
-
-
-log_to_file('createSim' + str(initialValue) + '_' + str(numEvents) + '.log', append=False)
-# Create paths
-main = create_path()
-
-# beam parameters
-beamparameters = add_beamparameters(main, "Y4S")
-# beamparameters = add_beamparameters(main, "Y1S")
-# beamparameters.param("generateCMS", True)
-# beamparameters.param("smearVertex", False)
-# beamparameters.param("smearEnergy", False)
-# print_params(beamparameters)
-
-# Add modules to paths
-main.add_module(eventinfosetter)
-main.add_module(eventinfoprinter)
-main.add_module(progress)
-if useEvtGen:
-    # # following modules only for evtGen:
-    if usePGun:
-        if (numTracks != 0):
-            main.add_module(particlegun)
-        if (numTracks2 != 0):
-            main.add_module(particlegun2)
-    main.add_module(evtgeninput)
-else:
-    # # following modules only for pGun:
-    if (numTracks != 0):
-        main.add_module(particlegun)
-    if (numTracks2 != 0):
-        main.add_module(particlegun2)
-if useBG:
-    setup_bg(path=main, bgFilesFolder=bgFolder, usePXD=usePXD, logLevel=LogLevel.INFO)
-main.add_module(gearbox)
-main.add_module(geometry)
-
-main.add_module(g4sim)
-if useSimpleClusterizer:
     main.add_module(simpleClusterizer)
-else:
-    setup_realClusters(main, usePXD=True)  # usePXD=True: needed since 2gftc-converter does not work without it
 
-setup_mcTF(path=main, nameOutput='mcTracks', usePXD=usePXD, logLevel=LogLevel.INFO)
+# Setting up the MC based track finder is necessary to collect information etc.
+setup_mcTF(path=main, nameOutput='mcTracks', usePXD=False, logLevel=LogLevel.INFO)
 
+# Module to write the DataStore into a Root file. Name of output file can be overriden with "-o NAME" flag.
+rootOutput = register_module('RootOutput')
+rootOutput.param('outputFileName', "MyRootFile.root")
+main.add_module(rootOutput)
 
-main.add_module(rootOutputM)
-
-
+# Final words:
+log_to_file('createSim.log', append=False)
 process(main)
-
 print(statistics)

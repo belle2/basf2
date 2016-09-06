@@ -85,9 +85,13 @@ namespace Belle2 {
              "List of root files with histograms");
 
     addParam("inputRateHistoNames", m_inputRateHistoNames,
-             "List of root files with histograms");
-    addParam("inputRateDoseNames", m_inputDoseHistoNames,
-             "List of root files with histograms");
+             "List of rate histograms");
+    addParam("inputDoseHistoNames", m_inputDoseHistoNames,
+             "List of dose histograms");
+    addParam("inputRateHistoNamesVrs", m_inputRateHistoNamesVrs,
+             "List of rate histograms");
+    addParam("inputDoseHistoNamesVrs", m_inputDoseHistoNamesVrs,
+             "List of dose histograms");
 
     // initialize other private data members
     m_file = NULL;
@@ -186,7 +190,7 @@ namespace Belle2 {
           }
         }
       } else {
-        for (const string& HistoRateName : m_inputRateHistoNames) {
+        for (const string& HistoRateName : m_inputRateHistoNamesVrs) {
           TH2F* h2D = (TH2F*)fh[iter]->Get(HistoRateName.c_str());
           for (int k = 0; k < h2D->GetNbinsY(); k++) {
             for (int i = 0; i < h2D->GetNbinsX(); i++) {
@@ -212,7 +216,7 @@ namespace Belle2 {
           }
           delete h2D;
         }
-        for (const string& HistoDoseName : m_inputDoseHistoNames) {
+        for (const string& HistoDoseName : m_inputDoseHistoNamesVrs) {
           int imax = 0;
           if (HistoDoseName.find("csi")) imax = 18;
           if (HistoDoseName.find("bgo")) imax = 8;

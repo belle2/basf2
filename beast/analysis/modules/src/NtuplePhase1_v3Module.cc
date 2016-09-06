@@ -136,12 +136,12 @@ namespace Belle2 {
             double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
             if (fileName.find("HER")) {
-              if (HistoRateName.find("csi")) m_input_HT_CSI_rate.push_back(rate);
-              if (HistoRateName.find("he3")) m_input_HT_HE3_rate.push_back(rate);
+              if (HistoRateName.find("csi")) m_input_HT_CSI_rate.push_back(rate); //Hz
+              if (HistoRateName.find("he3")) m_input_HT_HE3_rate.push_back(rate); //Hz
             }
             if (fileName.find("LER")) {
-              if (HistoRateName.find("csi")) m_input_LT_CSI_rate.push_back(rate);
-              if (HistoRateName.find("he3")) m_input_LT_HE3_rate.push_back(rate);
+              if (HistoRateName.find("csi")) m_input_LT_CSI_rate.push_back(rate); //Hz
+              if (HistoRateName.find("he3")) m_input_LT_HE3_rate.push_back(rate); //Hz
             }
           }
           delete h1D;
@@ -193,20 +193,20 @@ namespace Belle2 {
               double counts = h2D->GetBinContent(i + 1);
               double rate = counts / m_input_Time_eqv;
               if (fileName.find("Coulomb_HER")) {
-                if (HistoRateName.find("csi")) m_input_HC_CSI_rate[k].push_back(rate);
-                if (HistoRateName.find("he3")) m_input_HC_HE3_rate[k].push_back(rate);
+                if (HistoRateName.find("csi")) m_input_HC_CSI_rate[k].push_back(rate); //Hz
+                if (HistoRateName.find("he3")) m_input_HC_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.find("Coulomb_LER")) {
-                if (HistoRateName.find("csi")) m_input_LC_CSI_rate[k].push_back(rate);
-                if (HistoRateName.find("he3")) m_input_LC_HE3_rate[k].push_back(rate);
+                if (HistoRateName.find("csi")) m_input_LC_CSI_rate[k].push_back(rate); //Hz
+                if (HistoRateName.find("he3")) m_input_LC_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.find("Brems_HER")) {
-                if (HistoRateName.find("csi")) m_input_HB_CSI_rate[k].push_back(rate);
-                if (HistoRateName.find("he3")) m_input_HB_HE3_rate[k].push_back(rate);
+                if (HistoRateName.find("csi")) m_input_HB_CSI_rate[k].push_back(rate); //Hz
+                if (HistoRateName.find("he3")) m_input_HB_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.find("Brems_LER")) {
-                if (HistoRateName.find("csi")) m_input_LB_CSI_rate[k].push_back(rate);
-                if (HistoRateName.find("he3")) m_input_LB_HE3_rate[k].push_back(rate);
+                if (HistoRateName.find("csi")) m_input_LB_CSI_rate[k].push_back(rate); //Hz
+                if (HistoRateName.find("he3")) m_input_LB_HE3_rate[k].push_back(rate); //Hz
               }
             }
           }
@@ -226,7 +226,7 @@ namespace Belle2 {
             imax = 4;
             volume = 0.4 * 0.4 * 0.05; //cm^3
             rho = 3.53; //g/cm^3
-            mass = rho * volume * 1e-3;
+            mass = rho * volume * 1e-3; //g to kg
           }
           for (int i = 0; i < imax; i++) {
             TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.c_str(), i));

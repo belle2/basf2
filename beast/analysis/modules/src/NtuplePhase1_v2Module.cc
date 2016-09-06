@@ -393,7 +393,7 @@ namespace Belle2 {
     double bunch_nb_LER = 0;
     if (m_beast.SKB_LER_injectionNumberOfBunches != 0) bunch_nb_LER = m_beast.SKB_LER_injectionNumberOfBunches->at(0);
     if (m_input_bunchNb_LER[1] > 0) bunch_nb_LER += gRandom->Gaus(0, m_input_bunchNb_LER[1]);
-    bunch_nb_HER = 1576;
+    //bunch_nb_HER = 1576;
     /*
     cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
          endl;

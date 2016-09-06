@@ -470,47 +470,58 @@ namespace Belle2 {
 
     //cout << " factor BG LER " << ScaleFacBG_LER << " Toushek LER " << ScaleFacTo_LER << endl;
     //cout << " factor BG HER " << ScaleFacBG_HER << " Toushek HER " << ScaleFacTo_HER << endl;
-    /*
+
     //Scale DIA
     for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
-      double LBG = m_input_LB_DIA_dose[i] + m_input_LC_DIA_dose[i];
-      double HBG = m_input_HB_DIA_dose[i] + m_input_HC_DIA_dose[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        double LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
+        double HBG = m_input_HB_DIA_dose[j][i] + m_input_HC_DIA_dose[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+      }
       double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
       m_beast.DIA_dose.push_back(BG + To);
     }
     //Scale PIN
     for (int i = 0; i < (int)m_input_LT_PIN_dose.size(); i++) {
-      double LBG = m_input_LB_PIN_dose[i] + m_input_LC_PIN_dose[i];
-      double HBG = m_input_HB_PIN_dose[i] + m_input_HC_PIN_dose[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
-      double To = ScaleFacTo_LER * m_input_LB_PIN_dose[i] + ScaleFacTo_HER * m_input_HB_PIN_dose[i];
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        double LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
+        double HBG = m_input_HB_PIN_dose[j][i] + m_input_HC_PIN_dose[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+      }
+      double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
       m_beast.PIN_dose.push_back(BG + To);
     }
     //Scale BGO
     for (int i = 0; i < (int)m_input_LT_BGO_dose.size(); i++) {
-      double LBG = m_input_LB_BGO_dose[i] + m_input_LC_BGO_dose[i];
-      double HBG = m_input_HB_BGO_dose[i] + m_input_HC_BGO_dose[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        double LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
+        double HBG = m_input_HB_BGO_dose[j][i] + m_input_HC_BGO_dose[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+      }
       double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
       m_beast.BGO_energy.push_back(BG + To);
     }
     //Scale HE3
     for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
-      double LBG = m_input_LB_HE3_rate[i] + m_input_LC_HE3_rate[i];
-      double HBG = m_input_HB_HE3_rate[i] + m_input_HC_HE3_rate[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        double LBG = m_input_LB_HE3_rate[j][i] + m_input_LC_HE3_rate[j][i];
+        double HBG = m_input_HB_HE3_rate[j][i] + m_input_HC_HE3_rate[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+      }
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
       m_beast.HE3_rate.push_back(BG + To);
     }
-
     //Scale CSI
     for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
       double BG = 0;
       for (int j = 0; j < 12; j++) {
-    double LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
-    double HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
-    BG += LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+        double LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
+        double HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
       }
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE.push_back(BG + To);
@@ -518,14 +529,14 @@ namespace Belle2 {
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double BG = 0;
       for (int j = 0; j < 12; j++) {
-    double LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
-    double HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
-    BG += LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+        double LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
+        double HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
+        BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
       }
       double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
       m_beast.CSI_hitRate.push_back(BG + To);
     }
-    */
+
     m_treeBEAST->Fill();
 
     // set event metadata

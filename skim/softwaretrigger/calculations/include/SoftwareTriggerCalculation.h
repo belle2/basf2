@@ -41,7 +41,7 @@ namespace Belle2 {
        */
       void writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree);
 
-      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix);
+      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariable>& storeObject, const std::string& prefix);
 
       /**
        * Main function of this class: calculate the needed variables using the

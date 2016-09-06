@@ -11,13 +11,13 @@
 
 #include <framework/utilities/GeneralCut.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <skim/softwaretrigger/dataobjects/SoftwareTriggerCutResult.h>
 
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
     class SoftwareTriggerResult;
-    enum class SoftwareTriggerCutResult;
 
     /**
      * Software Trigger Cut to be used in the Software Trigger Modules.

@@ -38,7 +38,7 @@ namespace Belle2 {
       const bool cutCondition = m_cut->check(&prefilledObject);
 
       // If the cut is a reject cut, return false if the cut is true and false if the cut is true.
-      if (m_rejectCut) {
+      if (isRejectCut()) {
         if (cutCondition) {
           return SoftwareTriggerCutResult::c_reject;
         } else {
@@ -49,7 +49,7 @@ namespace Belle2 {
         // First check if the cut gives a positive result. If not, we can definitely return "noResult".
         if (cutCondition) {
           // if yes, we have to use the prescale factor to see, if the result is really yes.
-          if (makePreScale(m_preScaleFactor)) {
+          if (makePreScale(getPreScaleFactor())) {
             return SoftwareTriggerCutResult::c_accept;
           }
         }

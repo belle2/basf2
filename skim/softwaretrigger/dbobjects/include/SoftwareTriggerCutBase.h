@@ -10,9 +10,9 @@
 #pragma once
 
 namespace Belle2 {
-  class SoftwareTriggerCutBaseObject {
+  class SoftwareTriggerCutBase {
   public:
-    SoftwareTriggerCutBaseObject(const unsigned int& preScaleFactor = 1, const bool& isRejectCut = false) :
+    SoftwareTriggerCutBase(const unsigned int& preScaleFactor = 1, const bool& isRejectCut = false) :
       m_preScaleFactor(preScaleFactor), m_isRejectCut(isRejectCut)
     {
     }
@@ -29,9 +29,9 @@ namespace Belle2 {
 
   private:
     /// Do not copy/assign this object.
-    SoftwareTriggerCutBaseObject& operator=(const SoftwareTriggerCutBaseObject&) = delete;
+    SoftwareTriggerCutBase& operator=(const SoftwareTriggerCutBase&) = delete;
     /// Do not copy this object.
-    SoftwareTriggerCutBaseObject(const SoftwareTriggerCutBaseObject& rhs) = delete;
+    SoftwareTriggerCutBase(const SoftwareTriggerCutBase& rhs) = delete;
 
     /// The internal storage of the prescale factor of the cut.
     unsigned int m_preScaleFactor = 1;

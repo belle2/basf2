@@ -25,7 +25,7 @@ namespace Belle2 {
    * prescale factor. When using the cut, they are recompiled back into a cut
    * from the string representation.
    */
-  class DBRepresentationOfSoftwareTriggerCut : public TObject, public SoftwareTriggerCutBaseObject {
+  class DBRepresentationOfSoftwareTriggerCut : public TObject, public SoftwareTriggerCutBase {
   public:
     /// Empty constructor for ROOT (you will probably want to use the explicit copy from SoftwareTriggerCut).
     DBRepresentationOfSoftwareTriggerCut() {}
@@ -37,7 +37,7 @@ namespace Belle2 {
      * Both can be easily uploaded into the database.
      */
     explicit DBRepresentationOfSoftwareTriggerCut(const std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut>& softwareTriggerCut) :
-      SoftwareTriggerCutBaseObject(softwareTriggerCut->getPreScaleFactor(), softwareTriggerCut->isRejectCut()),
+      SoftwareTriggerCutBase(softwareTriggerCut->getPreScaleFactor(), softwareTriggerCut->isRejectCut()),
       m_cutString(softwareTriggerCut->decompile())
     {
     }

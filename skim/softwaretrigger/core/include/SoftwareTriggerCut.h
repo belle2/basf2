@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <skim/softwaretrigger/dbobjects/SoftwareTriggerCutBase.h>
 #include <framework/utilities/GeneralCut.h>
 #include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <skim/softwaretrigger/dataobjects/SoftwareTriggerCutResult.h>
@@ -26,7 +27,7 @@ namespace Belle2 {
      *
      * For database interactions, use the SoftwareTriggerDBHandler.
      */
-    class SoftwareTriggerCut {
+    class SoftwareTriggerCut : public SoftwareTriggerCutBase {
     public:
       /**
        * Compile a new SoftwareTriggerCut from a cut string (by using the GeneralCut::compile function) and
@@ -92,49 +93,19 @@ namespace Belle2 {
        */
       SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const;
 
-      /**
-       * Function to get the prescale factor. See the constructor for a description on what the prescale is.
-       */
-      unsigned int getPreScaleFactor() const
-      {
-        return m_preScaleFactor;
-      }
-
-      /**
-       * Function to check if the cut is a reject cut.
-       */
-      bool isRejectCut() const
-      {
-        return m_rejectCut;
-      }
-
     private:
       /// Internal representation of the cut condition as a general cut.
       std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>> m_cut = nullptr;
-      /// Internal variable for the prescale factor.
-      unsigned int m_preScaleFactor = 1;
-      /// Internal flag if this cut is a reject cut. See the SoftwareTriggerModule for more information on what this means.
-      bool m_rejectCut = false;
 
       /**
       * Make constructor private. You should only download a SoftwareCut from the database or compile a new one from a string.
       */
       SoftwareTriggerCut(std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>>&& cut,
                          const unsigned int prescaleFactor = 1,
-                         const bool rejectCut = false) :
-        m_cut(std::move(cut)), m_preScaleFactor(prescaleFactor), m_rejectCut(rejectCut)
+                         const bool rejectCut = false) : SoftwareTriggerCutBase(prescaleFactor, rejectCut),
+        m_cut(std::move(cut))
       {
       }
-
-      /**
-      * Delete the copy constructor.
-      */
-      SoftwareTriggerCut(const SoftwareTriggerCut&) = delete;
-
-      /**
-      * Delete the assign operator.
-      */
-      SoftwareTriggerCut& operator=(const SoftwareTriggerCut&) = delete;
     };
   }
 }

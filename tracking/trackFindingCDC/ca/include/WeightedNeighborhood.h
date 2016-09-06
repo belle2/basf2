@@ -145,7 +145,7 @@ namespace Belle2 {
       bool areNeighbors(AItem* itemPtr, AItem* neighborPtr) const
       {
         for (const WeightedRelation<AItem>& relation : this->equal_range(itemPtr)) {
-          if (relation.getTo == neighborPtr) {
+          if (relation.getTo() == neighborPtr) {
             return true;
           }
         }

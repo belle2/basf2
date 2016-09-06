@@ -9,7 +9,7 @@
  **************************************************************************/
 
 // Own include
-#include <beast/analysis/modules/NtuplePhase1_v2Module.h>
+#include <beast/analysis/modules/NtuplePhase1_v3Module.h>
 #include <beast/analysis/modules/BEASTTree_v2.h>
 
 // framework - DataStore
@@ -33,6 +33,9 @@
 
 #include <TTimeStamp.h>
 #include <TMath.h>
+#include <TH1F.h>
+#include <TH2F.h>
+#include <TString.h>
 
 using namespace std;
 
@@ -44,13 +47,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(NtuplePhase1_v2)
+  REG_MODULE(NtuplePhase1_v3)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  NtuplePhase1_v2Module::NtuplePhase1_v2Module() : Module()
+  NtuplePhase1_v3Module::NtuplePhase1_v3Module() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Read SKB PVs, simulated measurements of BEAST sensors, and write scaled simulated Ntuple in BEAST phase 1 data format");
@@ -64,6 +67,8 @@ namespace Belle2 {
 
     //addParam("input_ts", m_input_ts, "Input time stamp start and stop");
 
+    addParam("input_Time_eqv", m_input_Time_eqv, "time-eqv");
+
     addParam("input_I_HER", m_input_I_HER, "HER current");
     addParam("input_I_LER", m_input_I_LER, "LER current");
 
@@ -76,47 +81,8 @@ namespace Belle2 {
     addParam("input_bunchNb_HER", m_input_bunchNb_HER, "HER bunch number");
     addParam("input_bunchNb_LER", m_input_bunchNb_LER, "LER bunch number");
 
-    addParam("input_LT_DIA_dose", m_input_LT_DIA_dose, "List of LT DIA dose ");
-    addParam("input_HT_DIA_dose", m_input_HT_DIA_dose, "List of HT DIA dose ");
-    addParam("input_LB_DIA_dose", m_input_LB_DIA_dose, "List of LB DIA dose ");
-    addParam("input_HB_DIA_dose", m_input_HB_DIA_dose, "List of HB DIA dose ");
-    addParam("input_LC_DIA_dose", m_input_LC_DIA_dose, "List of LC DIA dose ");
-    addParam("input_HC_DIA_dose", m_input_HC_DIA_dose, "List of HC DIA dose ");
-
-    addParam("input_LT_PIN_dose", m_input_LT_PIN_dose, "List of LT PIN dose ");
-    addParam("input_HT_PIN_dose", m_input_HT_PIN_dose, "List of HT PIN dose ");
-    addParam("input_LB_PIN_dose", m_input_LB_PIN_dose, "List of LB PIN dose ");
-    addParam("input_HB_PIN_dose", m_input_HB_PIN_dose, "List of HB PIN dose ");
-    addParam("input_LC_PIN_dose", m_input_LC_PIN_dose, "List of LC PIN dose ");
-    addParam("input_HC_PIN_dose", m_input_HC_PIN_dose, "List of HC PIN dose ");
-
-    addParam("input_LT_BGO_dose", m_input_LT_BGO_dose, "List of LT BGO dose ");
-    addParam("input_HT_BGO_dose", m_input_HT_BGO_dose, "List of HT BGO dose ");
-    addParam("input_LB_BGO_dose", m_input_LB_BGO_dose, "List of LB BGO dose ");
-    addParam("input_HB_BGO_dose", m_input_HB_BGO_dose, "List of HB BGO dose ");
-    addParam("input_LC_BGO_dose", m_input_LC_BGO_dose, "List of LC BGO dose ");
-    addParam("input_HC_BGO_dose", m_input_HC_BGO_dose, "List of HC BGO dose ");
-
-    addParam("input_LT_HE3_rate", m_input_LT_HE3_rate, "List of LT HE3 rate ");
-    addParam("input_HT_HE3_rate", m_input_HT_HE3_rate, "List of HT HE3 rate ");
-    addParam("input_LB_HE3_rate", m_input_LB_HE3_rate, "List of LB HE3 rate ");
-    addParam("input_HB_HE3_rate", m_input_HB_HE3_rate, "List of HB HE3 rate ");
-    addParam("input_LC_HE3_rate", m_input_LC_HE3_rate, "List of LC HE3 rate ");
-    addParam("input_HC_HE3_rate", m_input_HC_HE3_rate, "List of HC HE3 rate ");
-
-    addParam("input_LT_CSI_rate", m_input_LT_CSI_rate, "List of LT CSI rate ");
-    addParam("input_HT_CSI_rate", m_input_HT_CSI_rate, "List of HT CSI rate ");
-    addParam("input_LB_CSI_rate", m_input_LB_CSI_rate, "List of LB CSI rate ");
-    addParam("input_HB_CSI_rate", m_input_HB_CSI_rate, "List of HB CSI rate ");
-    addParam("input_LC_CSI_rate", m_input_LC_CSI_rate, "List of LC CSI rate ");
-    addParam("input_HC_CSI_rate", m_input_HC_CSI_rate, "List of HC CSI rate ");
-
-    addParam("input_LT_CSI_dose", m_input_LT_CSI_dose, "List of LT CSI dose ");
-    addParam("input_HT_CSI_dose", m_input_HT_CSI_dose, "List of HT CSI dose ");
-    addParam("input_LB_CSI_dose", m_input_LB_CSI_dose, "List of LB CSI dose ");
-    addParam("input_HB_CSI_dose", m_input_HB_CSI_dose, "List of HB CSI dose ");
-    addParam("input_LC_CSI_dose", m_input_LC_CSI_dose, "List of LC CSI dose ");
-    addParam("input_HC_CSI_dose", m_input_HC_CSI_dose, "List of HC CSI dose ");
+    addParam("inputHistoFileNames", m_inputHistoFileNames,
+             "List of root files with histograms");
 
     // initialize other private data members
     m_file = NULL;
@@ -129,13 +95,81 @@ namespace Belle2 {
 
   }
 
-  NtuplePhase1_v2Module::~NtuplePhase1_v2Module()
+  NtuplePhase1_v3Module::~NtuplePhase1_v3Module()
   {
   }
 
-  void NtuplePhase1_v2Module::initialize()
+  void NtuplePhase1_v3Module::initialize()
   {
     loadDictionaries();
+    // read TFile with histograms
+
+    // expand possible wildcards
+    m_inputHistoFileNames = expandWordExpansions(m_inputHistoFileNames);
+    if (m_inputFileNames.empty()) {
+      B2FATAL("No valid files specified!");
+    }
+
+    // check files
+    TDirectory* dirh = gDirectory;
+    TFile* fh[6];
+    int iter = 0;
+    for (const string& fileName : m_inputHistoFileNames) {
+      fh[iter] = TFile::Open(fileName.c_str(), "READ");
+      if (!fh[iter] or !fh[iter]->IsOpen()) {
+        B2FATAL("Couldn't open input file " + fileName);
+      }
+      //csi
+      if (fileName.compare("Touschek")) {
+        TH1F* h1D = (TH1F*)fh[iter]->Get("h_csi_rate_0");
+        for (int i = 0; i < h1D->GetNbinsX(); i++) {
+          double counts = h1D->GetBinContent(i + 1);
+          double rate = counts / m_input_Time_eqv;
+          if (fileName.compare("Touschek_HER")) m_input_HT_CSI_rate.push_back(rate);
+          if (fileName.compare("Touschek_LER")) m_input_LT_CSI_rate.push_back(rate);
+          TH1F* he = (TH1F*)fh[iter]->Get(TString::Format("h_csi_edep2_%d", i));
+          double esum = 0;
+          for (int j = 0; j < he->GetNbinsX(); j++) {
+            double co = he->GetBinContent(j + 1);
+            double va = he->GetBinCenter(j + 1);
+            esum += va * co / m_input_Time_eqv;
+          }
+          if (fileName.compare("Touschek_HER")) m_input_HT_CSI_dose.push_back(esum);
+          if (fileName.compare("Touschek_LER")) m_input_LT_CSI_dose.push_back(esum);
+          delete he;
+        }
+        delete h1D;
+
+      } else {
+        TH2F* h2D = (TH2F*)fh[iter]->Get("h_csi_rs_rate_0");
+        for (int k = 0; k < h2D->GetNbinsY(); k++) {
+          for (int i = 0; i < h2D->GetNbinsX(); i++) {
+            double counts = h2D->GetBinContent(i + 1);
+            double rate = counts / m_input_Time_eqv;
+            if (fileName.compare("Coulomb_HER")) m_input_HC_CSI_rate[k].push_back(rate);
+            if (fileName.compare("Coulomb_LER")) m_input_LC_CSI_rate[k].push_back(rate);
+            if (fileName.compare("Brems_HER")) m_input_HB_CSI_rate[k].push_back(rate);
+            if (fileName.compare("Brems_LER")) m_input_LB_CSI_rate[k].push_back(rate);
+            TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("h_csi_rs_edep2_%d", i));
+            double esum = 0;
+            for (int j = 0; j < he->GetNbinsX(); j++) {
+              double co = he->GetBinContent(j + 1);
+              double va = he->GetBinCenter(j + 1);
+              esum += va * co / m_input_Time_eqv;
+            }
+            if (fileName.compare("Coulomb_HER")) m_input_HC_CSI_dose[k].push_back(esum);
+            if (fileName.compare("Coulomb_LER")) m_input_LC_CSI_dose[k].push_back(esum);
+            if (fileName.compare("Brems_HER")) m_input_HB_CSI_dose[k].push_back(esum);
+            if (fileName.compare("Brems_LER")) m_input_LB_CSI_dose[k].push_back(esum);
+            delete he;
+          }
+        }
+        delete h2D;
+      }
+      iter++;
+    }
+    dirh->cd();
+
 
     // expand possible wildcards
     m_inputFileNames = expandWordExpansions(m_inputFileNames);
@@ -349,12 +383,12 @@ namespace Belle2 {
   }
 
 
-  void NtuplePhase1_v2Module::beginRun()
+  void NtuplePhase1_v3Module::beginRun()
   {
   }
 
 
-  void NtuplePhase1_v2Module::event()
+  void NtuplePhase1_v3Module::event()
   {
     m_beast.clear();
     // create data store objects
@@ -393,7 +427,7 @@ namespace Belle2 {
     double bunch_nb_LER = 0;
     if (m_beast.SKB_LER_injectionNumberOfBunches != 0) bunch_nb_LER = m_beast.SKB_LER_injectionNumberOfBunches->at(0);
     if (m_input_bunchNb_LER[1] > 0) bunch_nb_LER += gRandom->Gaus(0, m_input_bunchNb_LER[1]);
-    bunch_nb_HER = 1576;
+    //sigma_y_HER *= 8.;
     /*
     cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
          endl;
@@ -406,13 +440,24 @@ namespace Belle2 {
     if (P_LER < 0) P_LER = 0;
 
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
-    double ScaleFacBG_HER = 0;
-    double ScaleFacBG_LER = 0;
-    if (I_LER > 0 && P_LER > 0)
-      ScaleFacBG_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
-    if (I_HER > 0 && P_HER > 0)
-      ScaleFacBG_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
-
+    double ScaleFacBG_HER[12];
+    double ScaleFacBG_LER[12];
+    for (int i = 0; i < 12; i++) {
+      ScaleFacBG_HER[i] = 0;
+      ScaleFacBG_LER[i] = 0;
+      double iP_HER = 0;
+      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9;
+      if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
+      double iP_LER = 0;
+      if (m_beast.SKB_LER_pressures != 0) iP_HER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9;
+      if (m_input_P_LER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_LER[1]);
+      if (iP_HER < 0) iP_HER = 0;
+      if (iP_LER < 0) iP_LER = 0;
+      if (I_LER > 0 && iP_LER > 0)
+        ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
+      if (I_HER > 0 && iP_HER > 0)
+        ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
+    }
     //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
     double ScaleFacTo_HER = 0;
     double ScaleFacTo_LER = 0;
@@ -425,7 +470,7 @@ namespace Belle2 {
 
     //cout << " factor BG LER " << ScaleFacBG_LER << " Toushek LER " << ScaleFacTo_LER << endl;
     //cout << " factor BG HER " << ScaleFacBG_HER << " Toushek HER " << ScaleFacTo_HER << endl;
-
+    /*
     //Scale DIA
     for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
       double LBG = m_input_LB_DIA_dose[i] + m_input_LC_DIA_dose[i];
@@ -439,7 +484,7 @@ namespace Belle2 {
       double LBG = m_input_LB_PIN_dose[i] + m_input_LC_PIN_dose[i];
       double HBG = m_input_HB_PIN_dose[i] + m_input_HC_PIN_dose[i];
       double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
-      double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
+      double To = ScaleFacTo_LER * m_input_LB_PIN_dose[i] + ScaleFacTo_HER * m_input_HB_PIN_dose[i];
       m_beast.PIN_dose.push_back(BG + To);
     }
     //Scale BGO
@@ -458,22 +503,29 @@ namespace Belle2 {
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
       m_beast.HE3_rate.push_back(BG + To);
     }
+
     //Scale CSI
     for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
-      double LBG = m_input_LB_CSI_dose[i] + m_input_LC_CSI_dose[i];
-      double HBG = m_input_HB_CSI_dose[i] + m_input_HC_CSI_dose[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+    double LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
+    double HBG = m_input_HB_CSI_dose[j][i] + m_input_HC_CSI_dose[j][i];
+    BG += LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      }
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
-      double LBG = m_input_LB_CSI_rate[i] + m_input_LC_CSI_rate[i];
-      double HBG = m_input_HB_CSI_rate[i] + m_input_HC_CSI_rate[i];
-      double BG = LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+    double LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
+    double HBG = m_input_HB_CSI_rate[j][i] + m_input_HC_CSI_rate[j][i];
+    BG += LBG * ScaleFacBG_LER + HBG * ScaleFacBG_HER;
+      }
       double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
       m_beast.CSI_hitRate.push_back(BG + To);
     }
-
+    */
     m_treeBEAST->Fill();
 
     // set event metadata
@@ -485,11 +537,11 @@ namespace Belle2 {
   }
 
 
-  void NtuplePhase1_v2Module::endRun()
+  void NtuplePhase1_v3Module::endRun()
   {
   }
 
-  void NtuplePhase1_v2Module::terminate()
+  void NtuplePhase1_v3Module::terminate()
   {
     delete m_tree;
     m_file->cd();
@@ -497,7 +549,7 @@ namespace Belle2 {
     m_file->Close();
   }
 
-  void NtuplePhase1_v2Module::printModuleParams() const
+  void NtuplePhase1_v3Module::printModuleParams() const
   {
   }
 

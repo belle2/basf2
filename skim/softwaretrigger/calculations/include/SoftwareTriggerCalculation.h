@@ -39,30 +39,9 @@ namespace Belle2 {
        * Needs an already prefilled calculationResult for this
        * (probably using the fillInCalculations function).
        */
-      void writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree)
-      {
-        if (not m_debugPrepared) {
-          for (auto& identifierWithValue : m_calculationResult) {
-            const std::string& identifier = identifierWithValue.first;
-            double& value = identifierWithValue.second;
+      void writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree);
 
-            debugOutputTTree->Branch(identifier.c_str(), &value);
-          }
-          m_debugPrepared = true;
-        }
-
-        debugOutputTTree->Fill();
-      }
-
-      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix)
-      {
-        for (auto& identifierWithValue : m_calculationResult) {
-          const std::string& identifier = identifierWithValue.first;
-          const double value = identifierWithValue.second;
-
-          storeObject->append(prefix + "_" + identifier, value);
-        }
-      }
+      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix);
 
       /**
        * Main function of this class: calculate the needed variables using the
@@ -75,18 +54,7 @@ namespace Belle2 {
        * What variables exactly are added to the result depends on the implementation
        * details of the class.
        */
-      const SoftwareTriggerObject& fillInCalculations()
-      {
-        const unsigned int sizeBeforeCheck = m_calculationResult.size();
-        doCalculation(m_calculationResult);
-
-        if (m_calculationResult.size() != sizeBeforeCheck and sizeBeforeCheck > 0) {
-          B2WARNING("Calculator added more variables (" << m_calculationResult.size() <<
-                    ") than there were before (" << sizeBeforeCheck << "). Probably something strange is going on!");
-        }
-
-        return m_calculationResult;
-      }
+      const SoftwareTriggerObject& fillInCalculations();
 
       virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) const = 0;
 

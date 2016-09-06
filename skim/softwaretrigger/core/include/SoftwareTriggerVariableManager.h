@@ -90,11 +90,7 @@ namespace Belle2 {
        * You can still use it multiple times in different modules, as it depends on the map of values
        * you hand in when checking the cut if the variable is defined or not.
        */
-      static SoftwareTriggerVariableManager& Instance()
-      {
-        static SoftwareTriggerVariableManager instance;
-        return instance;
-      }
+      static SoftwareTriggerVariableManager& Instance();
 
       /**
        * Get the variable with the given name. If it is not already present in the internal map
@@ -104,14 +100,7 @@ namespace Belle2 {
        * or not depends only on the SoftwareTriggerObject that is used when checking the cut
        * (and if there is an entry with the same name as the variable in this object).
        */
-      SoftwareTriggerVariable* getVariable(const std::string& variableName)
-      {
-        if (m_variableNameToVariable.find(variableName) == m_variableNameToVariable.end()) {
-          m_variableNameToVariable.emplace(variableName, std::shared_ptr<SoftwareTriggerVariable>(
-                                             new SoftwareTriggerVariable(variableName)));
-        }
-        return m_variableNameToVariable[variableName].get();
-      }
+      SoftwareTriggerVariable* getVariable(const std::string& variableName);
 
     private:
       /// Make the constructor private: only use this class as a singleton.

@@ -84,6 +84,11 @@ namespace Belle2 {
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
 
+    addParam("inputRateHistoNames", m_inputRateHistoNames,
+             "List of root files with histograms");
+    addParam("inputRateDoseNames", m_inputDoseHistoNames,
+             "List of root files with histograms");
+
     // initialize other private data members
     m_file = NULL;
     m_tree = NULL;
@@ -110,6 +115,11 @@ namespace Belle2 {
       B2FATAL("No valid files specified!");
     }
 
+    double volume = 0.;
+    double rho = 0.;
+    double mass = 0.;
+    const double RadConv = 6.24e7; // 1 rad = 6.24e7 MeV/kg
+
     // check files
     TDirectory* dirh = gDirectory;
     TFile* fh[6];
@@ -119,52 +129,142 @@ namespace Belle2 {
       if (!fh[iter] or !fh[iter]->IsOpen()) {
         B2FATAL("Couldn't open input file " + fileName);
       }
-      //csi
-      if (fileName.compare("Touschek")) {
-        TH1F* h1D = (TH1F*)fh[iter]->Get("h_csi_rate_0");
-        for (int i = 0; i < h1D->GetNbinsX(); i++) {
-          double counts = h1D->GetBinContent(i + 1);
-          double rate = counts / m_input_Time_eqv;
-          if (fileName.compare("Touschek_HER")) m_input_HT_CSI_rate.push_back(rate);
-          if (fileName.compare("Touschek_LER")) m_input_LT_CSI_rate.push_back(rate);
-          TH1F* he = (TH1F*)fh[iter]->Get(TString::Format("h_csi_edep2_%d", i));
-          double esum = 0;
-          for (int j = 0; j < he->GetNbinsX(); j++) {
-            double co = he->GetBinContent(j + 1);
-            double va = he->GetBinCenter(j + 1);
-            esum += va * co / m_input_Time_eqv;
-          }
-          if (fileName.compare("Touschek_HER")) m_input_HT_CSI_dose.push_back(esum);
-          if (fileName.compare("Touschek_LER")) m_input_LT_CSI_dose.push_back(esum);
-          delete he;
-        }
-        delete h1D;
-
-      } else {
-        TH2F* h2D = (TH2F*)fh[iter]->Get("h_csi_rs_rate_0");
-        for (int k = 0; k < h2D->GetNbinsY(); k++) {
-          for (int i = 0; i < h2D->GetNbinsX(); i++) {
-            double counts = h2D->GetBinContent(i + 1);
+      if (fileName.find("Touschek")) {
+        for (const string& HistoRateName : m_inputRateHistoNames) {
+          TH1F* h1D = (TH1F*)fh[iter]->Get(HistoRateName.c_str());
+          for (int i = 0; i < h1D->GetNbinsX(); i++) {
+            double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
-            if (fileName.compare("Coulomb_HER")) m_input_HC_CSI_rate[k].push_back(rate);
-            if (fileName.compare("Coulomb_LER")) m_input_LC_CSI_rate[k].push_back(rate);
-            if (fileName.compare("Brems_HER")) m_input_HB_CSI_rate[k].push_back(rate);
-            if (fileName.compare("Brems_LER")) m_input_LB_CSI_rate[k].push_back(rate);
-            TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("h_csi_rs_edep2_%d", i));
+            if (fileName.find("HER")) {
+              if (HistoRateName.find("csi")) m_input_HT_CSI_rate.push_back(rate);
+              if (HistoRateName.find("he3")) m_input_HT_HE3_rate.push_back(rate);
+            }
+            if (fileName.find("LER")) {
+              if (HistoRateName.find("csi")) m_input_LT_CSI_rate.push_back(rate);
+              if (HistoRateName.find("he3")) m_input_LT_HE3_rate.push_back(rate);
+            }
+          }
+          delete h1D;
+        }
+        for (const string& HistoDoseName : m_inputDoseHistoNames) {
+          int imax = 0;
+          if (HistoDoseName.find("csi")) imax = 18;
+          if (HistoDoseName.find("bgo")) imax = 8;
+          if (HistoDoseName.find("pin")) {
+            imax = 64;
+            volume = 0.265 * 0.265 * 0.01; //cm^3
+            rho = 2.32; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
+          if (HistoDoseName.find("dia")) {
+            imax = 4;
+            volume = 0.4 * 0.4 * 0.05; //cm^3
+            rho = 3.53; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
+          for (int i = 0; i < imax; i++) {
+            TH1F* he = (TH1F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.c_str(), i));
             double esum = 0;
             for (int j = 0; j < he->GetNbinsX(); j++) {
               double co = he->GetBinContent(j + 1);
               double va = he->GetBinCenter(j + 1);
-              esum += va * co / m_input_Time_eqv;
+              esum += va * co;
             }
-            if (fileName.compare("Coulomb_HER")) m_input_HC_CSI_dose[k].push_back(esum);
-            if (fileName.compare("Coulomb_LER")) m_input_LC_CSI_dose[k].push_back(esum);
-            if (fileName.compare("Brems_HER")) m_input_HB_CSI_dose[k].push_back(esum);
-            if (fileName.compare("Brems_LER")) m_input_LB_CSI_dose[k].push_back(esum);
+            if (fileName.find("HER")) {
+              if (HistoDoseName.find("csi")) m_input_HT_CSI_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+              if (HistoDoseName.find("bgo")) m_input_HT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+              if (HistoDoseName.find("pin")) m_input_HT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.find("dia")) m_input_HT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+            }
+            if (fileName.find("LER")) {
+              if (HistoDoseName.find("csi")) m_input_LT_CSI_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+              if (HistoDoseName.find("bgo")) m_input_LT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+              if (HistoDoseName.find("pin")) m_input_LT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              if (HistoDoseName.find("dia")) m_input_LT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+            }
             delete he;
           }
         }
-        delete h2D;
+      } else {
+        for (const string& HistoRateName : m_inputRateHistoNames) {
+          TH2F* h2D = (TH2F*)fh[iter]->Get(HistoRateName.c_str());
+          for (int k = 0; k < h2D->GetNbinsY(); k++) {
+            for (int i = 0; i < h2D->GetNbinsX(); i++) {
+              double counts = h2D->GetBinContent(i + 1);
+              double rate = counts / m_input_Time_eqv;
+              if (fileName.find("Coulomb_HER")) {
+                if (HistoRateName.find("csi")) m_input_HC_CSI_rate[k].push_back(rate);
+                if (HistoRateName.find("he3")) m_input_HC_HE3_rate[k].push_back(rate);
+              }
+              if (fileName.find("Coulomb_LER")) {
+                if (HistoRateName.find("csi")) m_input_LC_CSI_rate[k].push_back(rate);
+                if (HistoRateName.find("he3")) m_input_LC_HE3_rate[k].push_back(rate);
+              }
+              if (fileName.find("Brems_HER")) {
+                if (HistoRateName.find("csi")) m_input_HB_CSI_rate[k].push_back(rate);
+                if (HistoRateName.find("he3")) m_input_HB_HE3_rate[k].push_back(rate);
+              }
+              if (fileName.find("Brems_LER")) {
+                if (HistoRateName.find("csi")) m_input_LB_CSI_rate[k].push_back(rate);
+                if (HistoRateName.find("he3")) m_input_LB_HE3_rate[k].push_back(rate);
+              }
+            }
+          }
+          delete h2D;
+        }
+        for (const string& HistoDoseName : m_inputDoseHistoNames) {
+          int imax = 0;
+          if (HistoDoseName.find("csi")) imax = 18;
+          if (HistoDoseName.find("bgo")) imax = 8;
+          if (HistoDoseName.find("pin")) {
+            imax = 64;
+            volume = 0.265 * 0.265 * 0.01; //cm^3
+            rho = 2.32; //g/cm^3
+            mass = rho * volume * 1e-3; //g to kg
+          }
+          if (HistoDoseName.find("dia")) {
+            imax = 4;
+            volume = 0.4 * 0.4 * 0.05; //cm^3
+            rho = 3.53; //g/cm^3
+            mass = rho * volume * 1e-3;
+          }
+          for (int i = 0; i < imax; i++) {
+            TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.c_str(), i));
+            for (int k = 0; k < he->GetNbinsY(); k++) {
+              double esum = 0;
+              for (int j = 0; j < he->GetNbinsX(); j++) {
+                double co = he->GetBinContent(j + 1);
+                double va = he->GetBinCenter(j + 1);
+                esum += va * co;
+              }
+              if (fileName.find("Coulomb_HER")) {
+                if (HistoDoseName.find("csi")) m_input_HC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("bgo")) m_input_HC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("pin")) m_input_HC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.find("dia")) m_input_HC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              }
+              if (fileName.find("Coulomb_LER")) {
+                if (HistoDoseName.find("csi")) m_input_LC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("bgo")) m_input_LC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("pin")) m_input_LC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.find("dia")) m_input_LC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              }
+              if (fileName.find("Brems_HER")) {
+                if (HistoDoseName.find("csi")) m_input_HB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("bgo")) m_input_HB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("pin")) m_input_HB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.find("dia")) m_input_HB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              }
+              if (fileName.find("Brems_LER")) {
+                if (HistoDoseName.find("csi")) m_input_LB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("bgo")) m_input_LB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.find("pin")) m_input_LB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+                if (HistoDoseName.find("dia")) m_input_LB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
+              }
+            }
+            delete he;
+          }
+        }
       }
       iter++;
     }

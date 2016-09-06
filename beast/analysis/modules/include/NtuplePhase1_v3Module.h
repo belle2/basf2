@@ -78,6 +78,8 @@ namespace Belle2 {
     std::vector<Int_t> m_input_ts; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
+    std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
+    std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */
     std::vector<Double_t> m_input_LT_DIA_dose; /**< list of DIA LT dose */
     std::vector<Double_t> m_input_HT_DIA_dose; /**< list of DIA HT dose */
     std::vector<Double_t> m_input_LC_DIA_dose[12]; /**< list of DIA LC dose */

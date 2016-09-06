@@ -1,7 +1,9 @@
 #include <skim/softwaretrigger/modules/SoftwareTriggerModule.h>
-#include <TFile.h>
+#include <skim/softwaretrigger/core/utilities.h>
 #include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <skim/softwaretrigger/calculations/HLTCalculator.h>
+
+#include <TFile.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;
@@ -47,11 +49,13 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
            "trigger decision.", m_param_resultStoreArrayName);
 
   addParam("storeDebugOutputToROOTFile", m_param_storeDebugOutputToROOTFile, "Flag to save the results of the calculations leading "
-           "to the the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
+           "to the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
            "debugOutputFileName parameter.", m_param_storeDebugOutputToROOTFile);
 
-  addParam("storeDebugOutputToDataStore", m_param_storeDebugOutputToDataStore, "Flag to save the results of the calculations leading "
-           "to the the trigger decisions into the DataStore.", m_param_storeDebugOutputToDataStore);
+  addParam("preScaleStoreDebugOutputToDataStore", m_param_preScaleStoreDebugOutputToDataStore,
+           "Prescale with which to save the results of the calculations leading "
+           "to the trigger decisions into the DataStore. Leave to zero, to not store them at all.",
+           m_param_preScaleStoreDebugOutputToDataStore);
 
   addParam("debugOutputFileName", m_param_debugOutputFileName, "File path and name of the ROOT "
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
@@ -92,7 +96,7 @@ void SoftwareTriggerModule::event()
     m_resultStoreObjectPointer.construct();
   }
 
-  if (m_param_storeDebugOutputToDataStore and not m_debugOutputStoreObject.isValid()) {
+  if (m_param_preScaleStoreDebugOutputToDataStore > 0 and not m_debugOutputStoreObject.isValid()) {
     m_debugOutputStoreObject.construct();
   }
 
@@ -130,7 +134,7 @@ void SoftwareTriggerModule::initializeDebugOutput()
     }
   }
 
-  if (m_param_storeDebugOutputToDataStore) {
+  if (m_param_preScaleStoreDebugOutputToDataStore > 0) {
     m_debugOutputStoreObject.registerInDataStore(m_param_debugOutputStoreObjName);
   }
 }
@@ -157,7 +161,7 @@ void SoftwareTriggerModule::makeDebugOutput()
     B2DEBUG(100, "Finished storing the debug output to file.");
   }
 
-  if (m_param_storeDebugOutputToDataStore) {
+  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore)) {
     B2DEBUG(100, "Storing debug output to DataStore as requested.");
     m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
   }

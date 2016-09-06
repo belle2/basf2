@@ -62,8 +62,8 @@ namespace Belle2 {
       bool m_param_acceptOverridesReject = false;
       /// Flag to also store the result of the calculations into a root file.
       bool m_param_storeDebugOutputToROOTFile = false;
-      /// Flag to also store the result of the calculations into the datastore.
-      bool m_param_storeDebugOutputToDataStore = false;
+      /// Prescale with which to save the results of the calculations into the DataStore.
+      unsigned int m_param_preScaleStoreDebugOutputToDataStore = 0;
       /// Output file name for the debug output. Is only used if debug is turned on.
       std::string m_param_debugOutputFileName = "software_trigger_debug.root";
       /// Output store object name for the debug output. Is only used if debug is turned on.

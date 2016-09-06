@@ -33,7 +33,7 @@ namespace Belle2 {
       void addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result);
 
       /// Return the cut result with the given name or throw an error if no result is there.
-      const SoftwareTriggerCutResult& getResult(const std::string& triggerIdentifier) const;
+      SoftwareTriggerCutResult getResult(const std::string& triggerIdentifier) const;
 
       /**
        * Return the "total result" of this event. See the SoftwareTriggerModule for a description on
@@ -46,10 +46,10 @@ namespace Belle2 {
 
     private:
       /// Internal storage of the cut decisions with names.
-      std::map<std::string, SoftwareTriggerCutResult> m_results;
+      std::map<std::string, int> m_results;
 
       /** Making this class a ROOT class.*/
-      ClassDef(SoftwareTriggerResult, 2);
+      ClassDef(SoftwareTriggerResult, 3);
     };
   }
 }

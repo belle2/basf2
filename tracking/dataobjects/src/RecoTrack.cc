@@ -238,21 +238,15 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
 
   const genfit::MeasuredStateOnPlane* nearestStateOnPlane = nullptr;
   double minimalDistance2 = 0;
-
   for (unsigned int hitIndex = 0; hitIndex < numberOfPoints; hitIndex++) {
     const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
 
     const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
 
-    if (nearestStateOnPlane) {
-      if (currentDistance2 < minimalDistance2) {
-        nearestStateOnPlane = &measuredStateOnPlane;
-        minimalDistance2 = currentDistance2;
-      }
-    } else {
+    if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
       nearestStateOnPlane = &measuredStateOnPlane;
+      minimalDistance2 = currentDistance2;
     }
   }
-
   return *nearestStateOnPlane;
 }

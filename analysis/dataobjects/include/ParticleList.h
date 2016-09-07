@@ -90,7 +90,7 @@ namespace Belle2 {
    * To loop over all particles (as well as their anti-particles) do the following
    *
      \code
-     const unsigned int n = m_plist->getListSize();
+     const unsigned int n = pList->getListSize();
      for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i);
 
@@ -102,7 +102,7 @@ namespace Belle2 {
    * If you would like to loop over the particles stored in a particular ParticleList _without_ including the anti-particles as well,
    * do the following (set the boolean parameter in the relevant functions to false)
      \code
-     const unsigned int n = m_plist->getListSize(false);
+     const unsigned int n = pList->getListSize(false);
      for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i, false);
 
@@ -114,7 +114,7 @@ namespace Belle2 {
    * You can also use C++11 range-based for loops to loop over all particles (and anti-particles):
    *
      \code
-     for(const Particle& particle : m_plist) {
+     for(const Particle& particle : *pList) {
         // do something with the particle
      }
    *
@@ -127,16 +127,15 @@ namespace Belle2 {
    *
      \code
       std::vector<unsigned int> toRemove;
-      const unsigned int n = m_plist->getListSize();
+      const unsigned int n = pList->getListSize();
       for (unsigned i = 0; i < n; i++) {
         const Particle* part = pList->getParticle(i);
         if (...particle should be removed...) toRemove.push_back(part->getArrayIndex());
       }
 
-      plist->removeParticles(toRemove);
+      pList->removeParticles(toRemove);
       \endcode
    */
-
   class ParticleList : public TObject {
   public:
 

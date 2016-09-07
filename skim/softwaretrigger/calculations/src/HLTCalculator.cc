@@ -22,173 +22,193 @@ namespace Belle2 {
       m_gammaParticles.isRequired();
     };
 
-    const ECLCluster* ECLClusterNeutralLE(const StoreObjPtr<ParticleList>& gammas)
+    template <class AnEntityType>
+    const AnEntityType* getElementFromParticle(const Particle& particle);
+
+    template <>
+    const Particle* getElementFromParticle(const Particle& particle)
     {
-      const ECLCluster* ecle = nullptr;
-      double E1 = -1.;
-      for (unsigned int i = 0; i < gammas->getListSize(); i++) {
-        Particle* p = gammas->getParticle(i);
-        const ECLCluster* ecle_tmp = p->getECLCluster();
-        TLorentzVector V4p = ecle_tmp->get4Vector();
-        double e = (PCmsLabTransform::labToCms(V4p)).Rho();
-        if (E1 < e) {
-          E1 = e;
-          ecle = ecle_tmp;
-        }
-      }
-      return ecle;
+      return &particle;
     }
 
-    const Particle* T1(const StoreObjPtr<ParticleList>& pions)
+    template <>
+    const ECLCluster* getElementFromParticle(const Particle& particle)
     {
-      if (pions->getListSize() < 1) {
-        return nullptr;
+      return particle.getECLCluster();
+    }
+
+    template <class AnEntity>
+    double getRho(const AnEntity* entity)
+    {
+      if (not entity) {
+        return -1;
+      }
+      const TLorentzVector& fourVector = entity->get4Vector();
+      return PCmsLabTransform::labToCms(fourVector).Rho();
+    }
+
+    const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack)
+    {
+      if (fromTrack) {
+        return particle.getTrack()->getRelated<ECLCluster>();
       } else {
-        const Particle* t = nullptr;
-        double topp = -1.;
-        for (unsigned int i = 0; i < pions->getListSize(); i++) {
-          const Particle* t1 = pions->getParticle(i);
-          TLorentzVector V4p1 = t1->get4Vector();
-          if ((PCmsLabTransform::labToCms(V4p1)).Rho() > topp) {
-            t = t1;
-            topp = (PCmsLabTransform::labToCms(V4p1)).Rho();
-          }
-        }
-        return t;
+        return particle.getECLCluster();
       }
     }
 
-    const Particle*  T2(const StoreObjPtr<ParticleList>& pionshlt)
+    template <class AReturnType>
+    const AReturnType* getElementWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& particles,
+                                                     const double belowLimit)
     {
-      if (pionshlt->getListSize() <= 1) {
-        return nullptr;
-      } else {
-        const  Particle* t = nullptr;
-        double sedp = -1.;
-        const Particle* t1 = T1(pionshlt);
-        TLorentzVector V4p1 = t1->get4Vector();
-        double topp = (PCmsLabTransform::labToCms(V4p1)).Rho();
-        for (unsigned int i = 0; i < pionshlt->getListSize(); i++) {
-          const Particle* t2 = pionshlt->getParticle(i);
-          TLorentzVector V4p2 = t2->get4Vector();
-          double mom = (PCmsLabTransform::labToCms(V4p2)).Rho();
-          if (mom > sedp && mom < topp) {
-            t = t2;
-            sedp = mom;
-          }
+      const AReturnType* elementMaximumRho = nullptr;
+      double maximumRho = -1.;
+      for (const Particle& currentParticle : *particles) {
+        const auto currentElement = getElementFromParticle<AReturnType>(currentParticle);
+        const double& currentRho = getRho(currentElement);
+        if (currentRho >= belowLimit) {
+          continue;
         }
-        return t;
+        if (currentRho > maximumRho) {
+          maximumRho = currentRho;
+          elementMaximumRho = currentElement;
+        }
       }
+      return elementMaximumRho;
     }
 
-    const ECLCluster*  ECLClusterC1LE(const StoreObjPtr<ParticleList>& pionshlt, const StoreObjPtr<ParticleList>& gammahlt)
+    template <class AReturnType>
+    const AReturnType* getElementWithMaximumRho(const StoreObjPtr<ParticleList>& particles)
     {
-      const ECLCluster*  ecle = nullptr;
-      double E1 = -1.;
-      for (unsigned  int i = 0; i < (pionshlt->getListSize() + gammahlt->getListSize()); i++) {
-        Particle* p;
-        const ECLCluster* ecle_tmp;
-        if (i < pionshlt->getListSize()) {
-          p = pionshlt->getParticle(i);
-          const Track* trk = p->getTrack();
-          ecle_tmp = trk->getRelated<ECLCluster>();
-          if (!ecle_tmp) { continue;}
-
-        } else {
-          p = gammahlt->getParticle(i - pionshlt->getListSize());
-          ecle_tmp = p->getECLCluster();
-        }
-        TLorentzVector V4p1 = ecle_tmp->get4Vector();
-        double e = (PCmsLabTransform::labToCms(V4p1)).Rho();
-        if (E1 < e) {E1 = e; ecle = ecle_tmp;}
-      }
-      return ecle;
+      return getElementWithMaximumRhoBelow<AReturnType>(particles, std::nan(""));
     }
 
-    const ECLCluster*  ECLClusterC2LE(const double Ehigh, const StoreObjPtr<ParticleList>& pionshlt,
-                                      const StoreObjPtr<ParticleList>& gammahlt)
+    double getRhoOfECLClusterWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& pions,
+                                                 const StoreObjPtr<ParticleList>& gammas,
+                                                 const double belowLimit)
     {
-      const ECLCluster*  ecle = nullptr;
-      double result = -1.;
-      for (unsigned  int i = 0; i < (pionshlt->getListSize() + gammahlt->getListSize()); i++) {
-        Particle* p;
-        const ECLCluster* ecle_tmp;
-        if (i < pionshlt->getListSize()) {
-          p = pionshlt->getParticle(i);
-          const Track* trk = p->getTrack();
-          ecle_tmp = trk->getRelated<ECLCluster>();
-          if (!ecle_tmp) { continue;}
+      const ECLCluster* eclClusterWithMaximumRho = nullptr;
+      double maximumRho = -1.;
 
-        } else {
-          p = gammahlt->getParticle(i - pionshlt->getListSize());
-          ecle_tmp = p->getECLCluster();
+      for (const Particle& particle : *pions) {
+        const ECLCluster* tmpCluster = getECLCluster(particle, true);
+        if (not tmpCluster) {
+          continue;
         }
-        TLorentzVector V4p2 = ecle_tmp->get4Vector();
-        double e = (PCmsLabTransform::labToCms(V4p2)).Rho();
-        if (e >= Ehigh) continue;
-        else if (result < e) {result = e; ecle = ecle_tmp;}
-      }
-      return ecle;
 
+        const double& currentRho = getRho(tmpCluster);
+
+        if (currentRho >= belowLimit) {
+          continue;
+        }
+
+        if (currentRho > maximumRho) {
+          maximumRho = currentRho;
+          eclClusterWithMaximumRho = tmpCluster;
+        }
+      }
+
+      for (const Particle& particle : *gammas) {
+        const ECLCluster* tmpCluster = getECLCluster(particle, false);
+        if (not tmpCluster) {
+          continue;
+        }
+
+        const double& currentRho = getRho(tmpCluster);
+
+        if (currentRho >= belowLimit) {
+          continue;
+        }
+
+        if (currentRho > maximumRho) {
+          maximumRho = currentRho;
+          eclClusterWithMaximumRho = tmpCluster;
+        }
+      }
+
+      return maximumRho;
+    }
+
+    double getRhoOfECLClusterWithMaximumRho(const StoreObjPtr<ParticleList>& pionshlt,
+                                            const StoreObjPtr<ParticleList>& gammahlt)
+    {
+      return getRhoOfECLClusterWithMaximumRhoBelow(pionshlt, gammahlt, std::nan(""));
     }
 
     void HLTCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
+      // Prefetch some later needed objects/values
+      const ECLCluster* eclClusterWithMaximumRho = getElementWithMaximumRho<ECLCluster>(m_gammaParticles);
+      const Particle* trackWithMaximumRho = getElementWithMaximumRho<Particle>(m_pionParticles);
+      const Particle* trackWithSecondMaximumRho = getElementWithMaximumRhoBelow<Particle>(m_pionParticles,
+                                                  getRho(trackWithMaximumRho));
+
+      const double& rhoOfECLClusterWithMaximumRho = getRhoOfECLClusterWithMaximumRho(m_pionParticles, m_gammaParticles);
+      const double& rhoOfECLClusterWithSecondMaximumRho = getRhoOfECLClusterWithMaximumRhoBelow(m_pionParticles,
+                                                          m_gammaParticles,
+                                                          rhoOfECLClusterWithMaximumRho);
+
+      const double& rhoOfTrackWithMaximumRho = getRho(trackWithMaximumRho);
+      const double& rhoOfTrackWithSecondMaximumRho = getRho(trackWithSecondMaximumRho);
+
+      // Simple to calculate variables
+      // EC1CMSLE
+      calculationResult["EC1CMSLE"] = rhoOfECLClusterWithMaximumRho;
+
+      // EC2CMSLE
+      calculationResult["EC2CMSLE"] = rhoOfECLClusterWithSecondMaximumRho;
+
+      // EC12CMSLE
+      calculationResult["EC12CMSLE"] = rhoOfECLClusterWithMaximumRho + rhoOfECLClusterWithSecondMaximumRho;
+
+      // nTracksLE
+      calculationResult["nTracksLE"] = m_pionParticles->getListSize();
+
+      // P1CMSBhabhaLE
+      calculationResult["P1CMSBhabhaLE"] = rhoOfTrackWithMaximumRho;
+
+      // P2CMSBhabhaLE
+      calculationResult["P2CMSBhabhaLE"] = rhoOfTrackWithSecondMaximumRho;
+
+      // P12CMSBhabhaLE
+      calculationResult["P12CMSBhabhaLE"] = rhoOfTrackWithMaximumRho + rhoOfTrackWithSecondMaximumRho;
+
+      // Medium hard to calculate variables
+      // ENeutralLE
+      if (eclClusterWithMaximumRho) {
+        calculationResult["ENeutralLE"] = eclClusterWithMaximumRho->getEnergy();
+      } else {
+        calculationResult["ENeutralLE"] = -1;
+      }
+
+      // nECLMatchTracksLE
+      const unsigned int numberOfTracksWithECLMatch = std::count_if(m_pionParticles->begin(), m_pionParticles->end(),
+      [](const Particle & particle) {
+        return getECLCluster(particle, true) != nullptr;
+      });
+      calculationResult["nECLMatchTracksLE"] = numberOfTracksWithECLMatch;
+
+
       // AngleGTLE
       double angleGTLE = -10.;
-      const ECLCluster* eclClusterNeutral = ECLClusterNeutralLE(m_gammaParticles);
-      const Particle* t1 = T1(m_pionParticles);
-      const Particle* t2 = T2(m_pionParticles);
-
-      if (eclClusterNeutral) {
-        TLorentzVector V4g1 = eclClusterNeutral->get4Vector();
-        if (t1) {
-          const TLorentzVector& V4p1 = t1->get4Vector();
+      if (eclClusterWithMaximumRho) {
+        const TLorentzVector& V4g1 = eclClusterWithMaximumRho->get4Vector();
+        if (trackWithMaximumRho) {
+          const TLorentzVector& V4p1 = trackWithMaximumRho->get4Vector();
           const double theta1 = (V4g1.Vect()).Angle(V4p1.Vect());
           if (angleGTLE < theta1) angleGTLE = theta1;
         }
-        if (t2) {
-          const TLorentzVector& V4p2 = t2->get4Vector();
+        if (trackWithSecondMaximumRho) {
+          const TLorentzVector& V4p2 = trackWithSecondMaximumRho->get4Vector();
           const double theta2 = (V4g1.Vect()).Angle(V4p2.Vect());
           if (angleGTLE < theta2) angleGTLE = theta2;
         }
       }
-
       calculationResult["AngleGTLE"] = angleGTLE;
 
-      // EC1CMSLE
-      double ec1CMSLE = -1.;
-      const ECLCluster* eclCluster1 = ECLClusterC1LE(m_pionParticles, m_gammaParticles);
-      if (eclCluster1) {
-        const TLorentzVector& V4p2 = eclCluster1->get4Vector();
-        ec1CMSLE = (PCmsLabTransform::labToCms(V4p2)).Rho();
-      }
-      calculationResult["EC1CMSLE"] = ec1CMSLE;
-
-      // EC2CMSLE
-      double ec2CMSLE = -1.;
-      const ECLCluster* eclCluster2 = ECLClusterC2LE(ec1CMSLE, m_pionParticles, m_gammaParticles);
-      if (eclCluster2) {
-        const TLorentzVector& V4p2 = eclCluster2->get4Vector();
-        ec2CMSLE = (PCmsLabTransform::labToCms(V4p2)).Rho();
-      }
-      calculationResult["EC2CMSLE"] = ec2CMSLE;
-
-      // EC12CMSLE
-      calculationResult["EC12CMSLE"] = ec1CMSLE + ec2CMSLE;
-
-      // ENeutralLE
-      double eNeutralLE = -1;
-      if (eclClusterNeutral) {
-        eNeutralLE = eclClusterNeutral->getEnergy();
-      }
-
-      calculationResult["ENeutralLE"] = eNeutralLE;
 
       // maxAngleTTLE
       double maxAngleTTLE = -10.;
       if (m_pionParticles->getListSize() >= 2) {
-        ;
         for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
           Particle* par1 = m_pionParticles->getParticle(i);
           for (unsigned int j = i + 1; j < m_pionParticles->getListSize(); j++) {
@@ -206,85 +226,52 @@ namespace Belle2 {
       calculationResult["maxAngleTTLE"] = maxAngleTTLE;
 
       // nEidLE
-      int nEidLE = 0;
-
-      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-        Particle* p = m_pionParticles->getParticle(i);
-        double mom  = p->getMomentumMagnitude();
-        TLorentzVector V4p1 = p->get4Vector();
-        double Pcms = (PCmsLabTransform::labToCms(V4p1)).Rho();
-        const ECLCluster* eclTrack = (p->getTrack())->getRelated<ECLCluster>();
-        double eop = -1.;
-        if (eclTrack)
-          eop = eclTrack->getEnergy() / mom;
-        if (Pcms > 5.0 && eop > 0.8) nEidLE++;
-      }
+      const unsigned int nEidLE = std::count_if(m_pionParticles->begin(), m_pionParticles->end(), [](const Particle & p) {
+        const double& momentum  = p.getMomentumMagnitude();
+        const double& rho = getRho(&p);
+        const ECLCluster* eclTrack = getECLCluster(p, true);
+        if (eclTrack) {
+          const double& energyOverMomentum = eclTrack->getEnergy() / momentum;
+          return rho > 5.0 && energyOverMomentum > 0.8;
+        }
+        return false;
+      });
 
       calculationResult["nEidLE"] = nEidLE;
 
-      // nECLMatchTracksLE
-      int nECLMatchTracksLE = 0;
-      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-        Particle* p = m_pionParticles->getParticle(i);
-        const Track* trk = p->getTrack();
-        if (trk->getRelated<ECLCluster>()) nECLMatchTracksLE++;
-      }
-
-      calculationResult["nECLMatchTracksLE"] = nECLMatchTracksLE;
-
-      // nTracksLE
-      calculationResult["nTracksLE"] = m_pionParticles->getListSize();
-
-      // P1CMSBhabhaLE
-      double p1CMSBhabhaLE = -1;
-      if (t1) {
-        const TLorentzVector& V4p1 = t1->get4Vector();
-        p1CMSBhabhaLE = (PCmsLabTransform::labToCms(V4p1)).Rho();
-      }
-      calculationResult["P1CMSBhabhaLE"] = p1CMSBhabhaLE;
-
-      // P2CMSBhabhaLE
-      double p2CMSBhabhaLE = -1;
-      if (t2) {
-        const TLorentzVector& V4p2 = t2->get4Vector();
-        p2CMSBhabhaLE = (PCmsLabTransform::labToCms(V4p2)).Rho();
-      }
-      calculationResult["P2CMSBhabhaLE"] = p2CMSBhabhaLE;
-
-      // P12CMSBhabhaLE
-      calculationResult["P12CMSBhabhaLE"] = p1CMSBhabhaLE + p2CMSBhabhaLE;
 
       // VisibleEnergyLE
-      double VisibleEnergyLE = 0.;
-      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-        Particle* p = m_pionParticles->getParticle(i);
-        VisibleEnergyLE += p->getMomentumMagnitude();
-      }
+      const double visibleEnergyTracks = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
+      [](const double & visibleEnergy, const Particle & p) {
+        return visibleEnergy + p.getMomentumMagnitude();
+      });
 
-      for (unsigned int i = 0; i < m_gammaParticles->getListSize(); i++) {
-        Particle* p = m_gammaParticles->getParticle(i);
-        VisibleEnergyLE += p->getMomentumMagnitude();
-      }
+      const double visibleEnergyGammas = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
+      [](const double & visibleEnergy, const Particle & p) {
+        return visibleEnergy + p.getMomentumMagnitude();
+      });
 
-      calculationResult["VisibleEnergyLE"] = VisibleEnergyLE;
+      calculationResult["VisibleEnergyLE"] = visibleEnergyTracks + visibleEnergyGammas;
 
       // EtotLE
-      double EtotLE = 0.;
-      for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-        Particle* p = m_pionParticles->getParticle(i);
-        const Track* trk = p->getTrack();
-        const ECLCluster* eclTrack = trk->getRelated<ECLCluster>();
-        if (!eclTrack) continue;
-        if (eclTrack->getEnergy() > 0.1)
-          EtotLE += eclTrack->getEnergy();
-      }
+      const double eTotTracks = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
+      [](const double & eTot, const Particle & p) {
+        const ECLCluster* eclCluster = getECLCluster(p, true);
+        if (eclCluster) {
+          const double eclEnergy = eclCluster->getEnergy();
+          if (eclEnergy > 0.1) {
+            return eTot + eclCluster->getEnergy();
+          }
+        }
+        return eTot;
+      });
 
-      for (unsigned int i = 0; i < m_gammaParticles->getListSize(); i++) {
-        Particle* p = m_gammaParticles->getParticle(i);
-        EtotLE += p->getEnergy();
-      }
+      const double eTotGammas = std::accumulate(m_gammaParticles->begin(), m_gammaParticles->end(), 0.0,
+      [](const double & eTot, const Particle & p) {
+        return eTot + p.getEnergy();
+      });
 
-      calculationResult["EtotLE"] = EtotLE;
+      calculationResult["EtotLE"] = eTotTracks + eTotGammas;
     }
   }
 }

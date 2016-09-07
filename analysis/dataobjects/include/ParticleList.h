@@ -12,6 +12,7 @@
 #define PARTICLELIST_H
 
 #include <analysis/dataobjects/Particle.h>
+#include <framework/utilities/ArrayIterator.h>
 
 #include <TObject.h>
 #include <vector>

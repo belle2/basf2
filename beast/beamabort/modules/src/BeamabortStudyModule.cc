@@ -71,28 +71,28 @@ void BeamabortStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in BEAMABORT.xml.
   for (int i = 0; i < 4; i++) {
-    h_dia_rate[i] = new TH1F(TString::Format("h_dia_rate_%d", i), "Count", 8, 0., 8.);
+    h_dia_rate[i] = new TH1F(TString::Format("dia_rate_%d", i), "Count", 8, 0., 8.);
     h_dia_rate[i]->Sumw2();
   }
   for (int i = 0; i < 2; i++) {
-    h_dia_rs_rate[i] = new TH2F(TString::Format("h_dia_rs_rate_%d", i), "Count vs ring section", 8, 0., 8., 12, 0., 12.);
+    h_dia_rs_rate[i] = new TH2F(TString::Format("dia_rs_rate_%d", i), "Count vs ring section", 8, 0., 8., 12, 0., 12.);
     h_dia_rs_rate[i]->Sumw2();
   }
   for (int i = 0; i < 8; i++) {
-    h_dia_dose[i] = new TH1F(TString::Format("h_dia_dose_%d", i), "", 10000, 0., 10000.);
-    h_dia_doseWeight[i] = new TH1F(TString::Format("h_dia_doseWeight_%d", i), "", 10000, 0., 10000.);
-    h_dia_amp[i] = new TH1F(TString::Format("h_dia_amp_%d", i), "", 10000, 0., 10000.);
-    h_dia_time[i] = new TH1F(TString::Format("h_dia_time_%d", i), "", 1000, 0., 100.);
-    h_dia_vtime[i] = new TH1F(TString::Format("h_dia_vtime_%d", i), "", 1000, 0., 100.);
-    h_dia_idose[i] = new TH1F(TString::Format("h_dia_idose_%d", i), "", 10000, 0., 10000.);
-    h_dia_idoseWeight[i] = new TH1F(TString::Format("h_dia_idoseWeight_%d", i), "", 10000, 0., 10000.);
-    h_dia_rs_idose[i] = new TH2F(TString::Format("h_dia_rs_idose_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
-    h_dia_rs_idoseWeight[i] = new TH2F(TString::Format("h_dia_rs_idoseWeight_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
-    h_dia_iamp[i] = new TH1F(TString::Format("h_dia_iamp_%d", i), "", 10000, 0., 10000.);
-    h_dia_itime[i] = new TH1F(TString::Format("h_dia_itime_%d", i), "", 1000, 0., 100.);
-    h_dia_ivtime[i] = new TH1F(TString::Format("h_dia_ivtime_%d", i), "", 1000, 0., 100.);
-    h_dia_Amp[i] = new TH1F(TString::Format("h_dia_Amp_%d", i), "", 100000, 0., 100000.);
-    h_dia_edep[i] = new TH1F(TString::Format("h_dia_edep_%d", i), "", 4000, 0., 4000.);
+    h_dia_dose[i] = new TH1F(TString::Format("dia_dose_%d", i), "", 10000, 0., 10000.);
+    h_dia_doseWeight[i] = new TH1F(TString::Format("dia_doseWeight_%d", i), "", 10000, 0., 10000.);
+    h_dia_amp[i] = new TH1F(TString::Format("dia_amp_%d", i), "", 10000, 0., 10000.);
+    h_dia_time[i] = new TH1F(TString::Format("dia_time_%d", i), "", 1000, 0., 100.);
+    h_dia_vtime[i] = new TH1F(TString::Format("dia_vtime_%d", i), "", 1000, 0., 100.);
+    h_dia_idose[i] = new TH1F(TString::Format("dia_idose_%d", i), "", 10000, 0., 10000.);
+    h_dia_idoseWeight[i] = new TH1F(TString::Format("dia_idoseWeight_%d", i), "", 10000, 0., 10000.);
+    h_dia_rs_idose[i] = new TH2F(TString::Format("dia_rs_idose_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
+    h_dia_rs_idoseWeight[i] = new TH2F(TString::Format("dia_rs_idoseWeight_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
+    h_dia_iamp[i] = new TH1F(TString::Format("dia_iamp_%d", i), "", 10000, 0., 10000.);
+    h_dia_itime[i] = new TH1F(TString::Format("dia_itime_%d", i), "", 1000, 0., 100.);
+    h_dia_ivtime[i] = new TH1F(TString::Format("dia_ivtime_%d", i), "", 1000, 0., 100.);
+    h_dia_Amp[i] = new TH1F(TString::Format("dia_Amp_%d", i), "", 100000, 0., 100000.);
+    h_dia_edep[i] = new TH1F(TString::Format("dia_edep_%d", i), "", 4000, 0., 4000.);
 
     h_dia_dose[i]->Sumw2();
     h_dia_doseWeight[i]->Sumw2();

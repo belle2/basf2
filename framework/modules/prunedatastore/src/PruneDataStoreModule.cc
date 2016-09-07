@@ -20,7 +20,7 @@ PruneDataStoreModule::PruneDataStoreModule() :
   Module()
 {
   setDescription(
-    "Clears the content of the DataStore while it keeps entries listed in the keepEntries option. Note: Also all Relations will be cleared if they are not matched by one entry in the keepEntries list. You have to ensure the objects referenced by kept relations are also matched by one entry in the keepEntries list so a relation does not point to nirvana.");
+    "Clears the content of the DataStore while it keeps entries listed in the keepEntries option. The EventMetaData object will always be kept, as it is required by the framework to properly work with the DataStore. Note: Also all Relations will be cleared if they are not matched by one entry in the keepEntries list. You have to ensure the objects referenced by kept relations are also matched by one entry in the keepEntries list so a relation does not point to nirvana.");
   addParam("keepEntries", m_keepEntries,
            "name of all entries (with regex wildcard ) to not remove from the DataStore. For example, you can use 'Raw.*' to keep all Raw-Objects.",
            m_keepEntries);
@@ -32,6 +32,10 @@ void PruneDataStoreModule::initialize()
 {
   // prepare the regex_matchers, otherwise this nede to be done for each DataStore item
   for (auto& kEntry : m_keepEntries) {
+    m_compiled_regex.push_back(boost::regex(kEntry));
+  }
+  // also get the regex for the implicit keeps
+  for (auto& kEntry : m_keepEntriesImplicit) {
     m_compiled_regex.push_back(boost::regex(kEntry));
   }
 }

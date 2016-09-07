@@ -18,7 +18,6 @@ namespace Belle2 {
     Type m_type;
     TH2F* m_hist;
 
-    TH2F* hgrid;
     TPad* grid;
 
     void SetTitle();

@@ -37,11 +37,7 @@ EclDisplayModule::EclDisplayModule() : Module()
   addParam("autoDisplay", m_autoDisplay,
            "If true, events are displayed as soon as they are loaded.", true);
 
-  int filedes[2];
-  pipe(filedes);
-  m_out = filedes[1];
 
-  startThread(filedes[0]);
 }
 
 void EclDisplayModule::startThread(int in)
@@ -82,6 +78,12 @@ void EclDisplayModule::initialize()
   char buf[1024];
   int len = snprintf(buf, 1024, "%d %d %d", m_displayEnergy, m_displayMode, m_autoDisplay);
   write(m_out, buf, len + 1);
+
+  int filedes[2];
+  pipe(filedes);
+  m_out = filedes[1];
+  startThread(filedes[0]);
+
 }
 
 void EclDisplayModule::beginRun()

@@ -246,7 +246,7 @@ namespace Belle2 {
         return visibleEnergy + p.getMomentumMagnitude();
       });
 
-      const double visibleEnergyGammas = std::accumulate(m_pionParticles->begin(), m_pionParticles->end(), 0.0,
+      const double visibleEnergyGammas = std::accumulate(m_gammaParticles->begin(), m_gammaParticles->end(), 0.0,
       [](const double & visibleEnergy, const Particle & p) {
         return visibleEnergy + p.getMomentumMagnitude();
       });

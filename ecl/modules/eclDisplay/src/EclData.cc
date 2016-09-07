@@ -13,6 +13,15 @@ EclData::EclData(int in)
   m_expanded = false;
   m_in = in;
   InitVariables();
+  m_en_range_min    = 0;
+  m_energy_emission = 0;
+  m_energy_sums_max = 0;
+  m_ev_range_min    = 0;
+  m_ev_range_max    = 0;
+  m_event_count_max = 0;
+  m_time_max        = 0;
+  m_time_range_max  = 0;
+  m_time_range_min  = 0;
 }
 
 EclData::~EclData()

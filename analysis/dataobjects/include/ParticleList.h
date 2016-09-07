@@ -130,6 +130,11 @@ namespace Belle2 {
   class ParticleList : public TObject {
   public:
 
+    /** STL-like iterator over the particles (not Particle*). */
+    typedef ArrayIterator<ParticleList, Particle> iterator;
+    /** STL-like const_iterator over the particles (not Particle*). */
+    typedef ArrayIterator<ParticleList, const Particle> const_iterator;
+
     /** Type of Particle (determines in which of the two internal lists the particle is stored). */
     enum EParticleType {
       c_FlavorSpecificParticle = 0,
@@ -295,6 +300,19 @@ namespace Belle2 {
      * Prints the list
      */
     void print() const;
+
+    /** Return iterator to first entry. */
+    iterator begin() { return iterator(this, 0); }
+    /** Return iterator to last entry +1. */
+    iterator end() { return iterator(this, getListSize()); }
+
+    /** Return const_iterator to first entry. */
+    const_iterator begin() const { return const_iterator(this, 0); }
+    /** Return const_iterator to last entry +1. */
+    const_iterator end() const { return const_iterator(this, getListSize()); }
+
+    /** Convenience function to get particle with index. **/
+    Particle* operator[](int index) const {return getParticle(index);}
 
   private:
     /** Returns bound anti-particle list.

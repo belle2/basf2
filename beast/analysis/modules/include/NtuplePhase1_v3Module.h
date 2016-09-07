@@ -91,6 +91,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_DIA_dose[12]; /**< list of DIA HC dose */
     std::vector<Double_t> m_input_LB_DIA_dose[12]; /**< list of DIA LB dose */
     std::vector<Double_t> m_input_HB_DIA_dose[12]; /**< list of DIA HB dose */
+    std::vector<Double_t> m_input_LC_DIA_dose_av; /**< list of DIA LC dose */
+    std::vector<Double_t> m_input_HC_DIA_dose_av; /**< list of DIA HC dose */
+    std::vector<Double_t> m_input_LB_DIA_dose_av; /**< list of DIA LB dose */
+    std::vector<Double_t> m_input_HB_DIA_dose_av; /**< list of DIA HB dose */
 
     std::vector<Double_t> m_input_LT_PIN_dose; /**< list of PIN LT dose */
     std::vector<Double_t> m_input_HT_PIN_dose; /**< list of PIN HT dose */
@@ -98,6 +102,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_PIN_dose[12]; /**< list of PIN HC dose */
     std::vector<Double_t> m_input_LB_PIN_dose[12]; /**< list of PIN LB dose */
     std::vector<Double_t> m_input_HB_PIN_dose[12]; /**< list of PIN HB dose */
+    std::vector<Double_t> m_input_LC_PIN_dose_av; /**< list of PIN LC dose */
+    std::vector<Double_t> m_input_HC_PIN_dose_av; /**< list of PIN HC dose */
+    std::vector<Double_t> m_input_LB_PIN_dose_av; /**< list of PIN LB dose */
+    std::vector<Double_t> m_input_HB_PIN_dose_av; /**< list of PIN HB dose */
 
     std::vector<Double_t> m_input_LT_BGO_dose; /**< list of BGO LT dose */
     std::vector<Double_t> m_input_HT_BGO_dose; /**< list of BGO HT dose */
@@ -105,6 +113,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_BGO_dose[12]; /**< list of BGO HC dose */
     std::vector<Double_t> m_input_LB_BGO_dose[12]; /**< list of BGO LB dose */
     std::vector<Double_t> m_input_HB_BGO_dose[12]; /**< list of BGO HB dose */
+    std::vector<Double_t> m_input_LC_BGO_dose_av; /**< list of BGO LC dose */
+    std::vector<Double_t> m_input_HC_BGO_dose_av; /**< list of BGO HC dose */
+    std::vector<Double_t> m_input_LB_BGO_dose_av; /**< list of BGO LB dose */
+    std::vector<Double_t> m_input_HB_BGO_dose_av; /**< list of BGO HB dose */
 
     std::vector<Double_t> m_input_LT_HE3_rate; /**< list of HE3 LT rate */
     std::vector<Double_t> m_input_HT_HE3_rate; /**< list of HE3 HT rate */
@@ -112,6 +124,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_HE3_rate[12]; /**< list of HE3 HC rate */
     std::vector<Double_t> m_input_LB_HE3_rate[12]; /**< list of HE3 LB rate */
     std::vector<Double_t> m_input_HB_HE3_rate[12]; /**< list of HE3 HB rate */
+    std::vector<Double_t> m_input_LC_HE3_rate_av; /**< list of HE3 LC rate */
+    std::vector<Double_t> m_input_HC_HE3_rate_av; /**< list of HE3 HC rate */
+    std::vector<Double_t> m_input_LB_HE3_rate_av; /**< list of HE3 LB rate */
+    std::vector<Double_t> m_input_HB_HE3_rate_av; /**< list of HE3 HB rate */
 
     std::vector<Double_t> m_input_LT_CSI_dose; /**< list of CSI LT dose */
     std::vector<Double_t> m_input_HT_CSI_dose; /**< list of CSI HT dose */
@@ -119,6 +135,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_CSI_dose[12]; /**< list of CSI HC dose */
     std::vector<Double_t> m_input_LB_CSI_dose[12]; /**< list of CSI LB dose */
     std::vector<Double_t> m_input_HB_CSI_dose[12]; /**< list of CSI HB dose */
+    std::vector<Double_t> m_input_LC_CSI_dose_av; /**< list of CSI LC dose */
+    std::vector<Double_t> m_input_HC_CSI_dose_av; /**< list of CSI HC dose */
+    std::vector<Double_t> m_input_LB_CSI_dose_av; /**< list of CSI LB dose */
+    std::vector<Double_t> m_input_HB_CSI_dose_av; /**< list of CSI HB dose */
 
     std::vector<Double_t> m_input_LT_CSI_rate; /**< list of CSI LT rate */
     std::vector<Double_t> m_input_HT_CSI_rate; /**< list of CSI HT rate */
@@ -126,6 +146,10 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_CSI_rate[12]; /**< list of CSI HC rate */
     std::vector<Double_t> m_input_LB_CSI_rate[12]; /**< list of CSI LB rate */
     std::vector<Double_t> m_input_HB_CSI_rate[12]; /**< list of CSI HB rate */
+    std::vector<Double_t> m_input_LC_CSI_rate_av; /**< list of CSI LC rate */
+    std::vector<Double_t> m_input_HC_CSI_rate_av; /**< list of CSI HC rate */
+    std::vector<Double_t> m_input_LB_CSI_rate_av; /**< list of CSI LB rate */
+    std::vector<Double_t> m_input_HB_CSI_rate_av; /**< list of CSI HB rate */
 
     std::vector<Double_t> m_input_I_HER; /**< HER current and error */
     std::vector<Double_t> m_input_I_LER; /**< LER current and error */

@@ -136,9 +136,15 @@ void PindiodeStudyModule::event()
   //Look at the meta data to extract IR rate and scattering ring section
   double rate = 0;
   int ring_section = -1;
+  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
   for (const auto& MetaHit : MetaHits) {
     rate = MetaHit.getrate();
-    ring_section = MetaHit.getring_section() - 1;
+    double sad_ssraw = MetaHit.getssraw();
+    double ssraw = 0;
+    if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;
+    else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
+    ring_section = section_ordering[(int)((ssraw) / 250.)] - 1;
+    //ring_section = MetaHit.getring_section() - 1;
   }
 
   //Skip events with no Hits

@@ -83,6 +83,7 @@ namespace Belle2 {
       std::vector<float>*   PIN_voltage;/** */
       std::vector<float>*   PIN_temperature;/** */
       std::vector<float> PIN_dose;/** */
+      std::vector<float> PIN_dose_av;/** */
       std::vector<int>*     TPC3_idx;/** */
       std::vector<int>*     TPC3_npoints;/** */
       std::vector<int>*     TPC3_channel;/** */
@@ -142,6 +143,11 @@ namespace Belle2 {
       std::vector<float> CSI_sumE;/** */
       std::vector<float> HE3_rate;/** */
       std::vector<float> DIA_dose; /** */
+      std::vector<float> BGO_energy_av;/** */
+      std::vector<float> CSI_hitRate_av;/** */
+      std::vector<float> CSI_sumE_av;/** */
+      std::vector<float> HE3_rate_av;/** */
+      std::vector<float> DIA_dose_av; /** */
 
 
       /**
@@ -208,6 +214,13 @@ namespace Belle2 {
         CSI_sumE.clear();
         CSI_hitRate.clear();
         DIA_dose.clear();
+
+        PIN_dose_av.clear();
+        BGO_energy_av.clear();
+        HE3_rate_av.clear();
+        CSI_sumE_av.clear();
+        CSI_hitRate_av.clear();
+        DIA_dose_av.clear();
 
       }
 

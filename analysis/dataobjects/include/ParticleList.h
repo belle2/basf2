@@ -111,6 +111,15 @@ namespace Belle2 {
      }
      \endcode
    *
+   * You can also use C++11 range-based for loops to loop over all particles (and anti-particles):
+   *
+     \code
+     for(const Particle& particle : m_plist) {
+        // do something with the particle
+     }
+   *
+   * Remember to dereference the StoreObjPtr<ParticleList> before you can use it in the range based for loop.
+   *
    * <h1>Remove Particles from ParticleList</h1>
    *
    * Particles can be removed in the following way (as above, this action will by default be applied to list of

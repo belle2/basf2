@@ -289,6 +289,17 @@ CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
   return wireHitSegment;
 }
 
+CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
+{
+  CDCRecoSegment2D segment;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    segment.push_back(recoHit2D.getAlias());
+  }
+  segment.setMayAlias(getMayAlias());
+  return segment;
+}
+
+
 CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
 {
   CDCRLWireHitSegment rlWireHitSegment;

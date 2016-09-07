@@ -86,6 +86,9 @@ namespace Belle2 {
       /// Returns the recohit with the opposite right left information.
       CDCRecoHit2D reversed() const;
 
+      /// Getter for the alias version of the reco hit
+      CDCRecoHit2D getAlias() const;
+
       /**
        *  Constructs a two dimensional reconstructed hit from a sim hit and the assoziated wirehit.
        *  This translates the sim hit to a reconstructed hit mainly to be able to compare the

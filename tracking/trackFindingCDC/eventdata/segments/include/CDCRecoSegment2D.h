@@ -70,6 +70,9 @@ namespace Belle2 {
       /// Getter for the vector of right left oriented the hits of this segment.
       CDCRLWireHitSegment getRLWireHitSegment() const;
 
+      /// Getter for the alias version of the segment - fit not copied.
+      CDCRecoSegment2D getAlias() const;
+
       /** Fill the hit content of this segment into a genfit::TrackCand.
        *  @return true, if the trajectory information is valid, false otherwise.
        */

@@ -95,3 +95,8 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
   reversedRecoHit.reverse();
   return reversedRecoHit;
 }
+
+CDCRecoHit2D CDCRecoHit2D::getAlias() const
+{
+  return CDCRecoHit2D(getRLWireHit().getAlias(), -getRecoDisp2D());
+}

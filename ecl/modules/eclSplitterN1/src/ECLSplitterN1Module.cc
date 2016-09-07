@@ -261,6 +261,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     double weightSum = 0.0;
 
     unsigned int highestEnergyID = 0;
+
+    // Add relation to the LM.
     RelationVector<ECLLocalMaximum> locmaxvector = aCR.getRelationsWith<ECLLocalMaximum>();
     aECLShower->addRelationTo(locmaxvector[0]);
 
@@ -344,7 +346,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
-    // Add relations of all CalDigits to the local maximum (here: all weights = 1).
+    // Add relations of all CalDigits of the CR to the local maximum (here: all weights = 1).
     const int posLM = m_StoreArrPositionLM[locmaxcellid];
     for (const auto& aDigit : aCR.getRelationsWith<ECLCalDigit>()) {
       const int pos = m_StoreArrPosition[aDigit.getCellId()];
@@ -555,6 +557,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     for (const auto& locmaxpoint : localMaximumsPoints) {
 
       const int locmaxcellid = locmaxpoint.first;
+      const int posLM = m_StoreArrPositionLM[locmaxcellid];
 
       // Create a shower
       if (!m_eclShowers) m_eclShowers.create();
@@ -591,8 +594,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
         const int cellid = digit.getCellId();
         const int pos = m_StoreArrPosition[cellid];
 
-        // Add relations of all CalDigits to the local maximum (here: all weights = 1).
-        const int posLM = m_StoreArrPositionLM[locmaxcellid];
+        // Add weighted relations of all CalDigits to the local maximum.
         m_eclLocalMaximums[posLM]->addRelationTo(m_eclCalDigits[pos], weight);
 
         // Positive weight and in allowed neighbour list?
@@ -633,6 +635,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       aECLShower->setTheta(showerposition->Theta());
       aECLShower->setPhi(showerposition->Phi());
       aECLShower->setR(showerposition->Mag());
+
       B2DEBUG(175, "new theta: " << showerposition->Theta());
       B2DEBUG(175, "new phi: " << showerposition->Phi());
       B2DEBUG(175, "new R: " << showerposition->Mag());
@@ -676,6 +679,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       // Add relation to the CR.
       aECLShower->addRelationTo(&aCR);
 
+      // Add relation to the LM.
+      aECLShower->addRelationTo(m_eclLocalMaximums[posLM]);
     }
   }
 }

@@ -386,10 +386,12 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
     if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
     else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
   } else if (ring == 2) {
-    if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw / 100.;
-    else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw / 100.;
+    //if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw / 100.;
+    //else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw / 100.;
+    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
+    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
   }
-  int ring_section = section_ordering[(int)((ssraw) / 12.)];
+  int ring_section = section_ordering[(int)((ssraw) / 250.)];
 
   if (abs(m_lostS) <= 400.) {
     m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);

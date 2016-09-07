@@ -9,8 +9,7 @@
  **************************************************************************/
 
 #include <skim/softwaretrigger/calculations/HLTCalculator.h>
-#include <mdst/dataobjects/ECLCluster.h>
-#include <mdst/dataobjects/Track.h>
+#include <skim/softwaretrigger/core/utilities.h>
 // TODO: Also cache it
 #include <analysis/utility/PCmsLabTransform.h>
 
@@ -21,118 +20,6 @@ namespace Belle2 {
       m_pionParticles.isRequired();
       m_gammaParticles.isRequired();
     };
-
-    template <class AnEntityType>
-    const AnEntityType* getElementFromParticle(const Particle& particle);
-
-    template <>
-    const Particle* getElementFromParticle(const Particle& particle)
-    {
-      return &particle;
-    }
-
-    template <>
-    const ECLCluster* getElementFromParticle(const Particle& particle)
-    {
-      return particle.getECLCluster();
-    }
-
-    template <class AnEntity>
-    double getRho(const AnEntity* entity)
-    {
-      if (not entity) {
-        return -1;
-      }
-      const TLorentzVector& fourVector = entity->get4Vector();
-      return PCmsLabTransform::labToCms(fourVector).Rho();
-    }
-
-    const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack)
-    {
-      if (fromTrack) {
-        return particle.getTrack()->getRelated<ECLCluster>();
-      } else {
-        return particle.getECLCluster();
-      }
-    }
-
-    template <class AReturnType>
-    const AReturnType* getElementWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& particles,
-                                                     const double belowLimit)
-    {
-      const AReturnType* elementMaximumRho = nullptr;
-      double maximumRho = -1.;
-      for (const Particle& currentParticle : *particles) {
-        const auto currentElement = getElementFromParticle<AReturnType>(currentParticle);
-        const double& currentRho = getRho(currentElement);
-        if (currentRho >= belowLimit) {
-          continue;
-        }
-        if (currentRho > maximumRho) {
-          maximumRho = currentRho;
-          elementMaximumRho = currentElement;
-        }
-      }
-      return elementMaximumRho;
-    }
-
-    template <class AReturnType>
-    const AReturnType* getElementWithMaximumRho(const StoreObjPtr<ParticleList>& particles)
-    {
-      return getElementWithMaximumRhoBelow<AReturnType>(particles, std::nan(""));
-    }
-
-    double getRhoOfECLClusterWithMaximumRhoBelow(const StoreObjPtr<ParticleList>& pions,
-                                                 const StoreObjPtr<ParticleList>& gammas,
-                                                 const double belowLimit)
-    {
-      const ECLCluster* eclClusterWithMaximumRho = nullptr;
-      double maximumRho = -1.;
-
-      for (const Particle& particle : *pions) {
-        const ECLCluster* tmpCluster = getECLCluster(particle, true);
-        if (not tmpCluster) {
-          continue;
-        }
-
-        const double& currentRho = getRho(tmpCluster);
-
-        if (currentRho >= belowLimit) {
-          continue;
-        }
-
-        if (currentRho > maximumRho) {
-          maximumRho = currentRho;
-          eclClusterWithMaximumRho = tmpCluster;
-        }
-      }
-
-      for (const Particle& particle : *gammas) {
-        const ECLCluster* tmpCluster = getECLCluster(particle, false);
-        if (not tmpCluster) {
-          continue;
-        }
-
-        const double& currentRho = getRho(tmpCluster);
-
-        if (currentRho >= belowLimit) {
-          continue;
-        }
-
-        if (currentRho > maximumRho) {
-          maximumRho = currentRho;
-          eclClusterWithMaximumRho = tmpCluster;
-        }
-      }
-
-      return maximumRho;
-    }
-
-    double getRhoOfECLClusterWithMaximumRho(const StoreObjPtr<ParticleList>& pionshlt,
-                                            const StoreObjPtr<ParticleList>& gammahlt)
-    {
-      return getRhoOfECLClusterWithMaximumRhoBelow(pionshlt, gammahlt, std::nan(""));
-    }
 
     void HLTCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {

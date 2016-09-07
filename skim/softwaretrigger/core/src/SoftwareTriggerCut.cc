@@ -16,7 +16,7 @@
 namespace Belle2 {
   namespace SoftwareTrigger {
     std::unique_ptr<SoftwareTriggerCut> SoftwareTriggerCut::compile(const std::string& cut_string,
-        const unsigned int prescaleFactor,
+        const std::vector<unsigned int>& prescaleFactor,
         const bool rejectCut)
     {
       auto compiledGeneralCut = GeneralCut<SoftwareTriggerVariableManager>::compile(cut_string);

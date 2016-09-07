@@ -144,8 +144,7 @@ void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
-    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << "), with a prescale of " <<
-            cut->getPreScaleFactor());
+    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
     const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }

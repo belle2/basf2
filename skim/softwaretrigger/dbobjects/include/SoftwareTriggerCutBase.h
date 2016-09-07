@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+#include <vector>
 
 namespace Belle2 {
   class SoftwareTriggerCutBase {
   public:
-    SoftwareTriggerCutBase(const unsigned int& preScaleFactor = 1, const bool& isRejectCut = false) :
+    SoftwareTriggerCutBase(const std::vector<unsigned int>& preScaleFactor = {1}, const bool& isRejectCut = false) :
       m_preScaleFactor(preScaleFactor), m_isRejectCut(isRejectCut)
     {
     }
 
-    unsigned int getPreScaleFactor() const
+    const std::vector<unsigned int>& getPreScaleFactor() const
     {
       return m_preScaleFactor;
     }
@@ -34,7 +35,7 @@ namespace Belle2 {
     SoftwareTriggerCutBase(const SoftwareTriggerCutBase& rhs) = delete;
 
     /// The internal storage of the prescale factor of the cut.
-    unsigned int m_preScaleFactor = 1;
+    std::vector<unsigned int> m_preScaleFactor = {1};
     /// The internal storage if it is a reject cut.
     bool m_isRejectCut = false;
   };

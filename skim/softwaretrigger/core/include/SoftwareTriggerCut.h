@@ -75,8 +75,16 @@ namespace Belle2 {
        * "dismiss", in all other cases it depends on the other loaded cuts.
        */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
-                                                         const unsigned int prescaleFactor = 1,
+                                                         const std::vector<unsigned int>& prescaleFactor = {1},
                                                          const bool rejectCut = false);
+
+      static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
+                                                         const unsigned int prescaleFactor = 1,
+                                                         const bool rejectCut = false)
+      {
+        const std::vector<unsigned int>& preScaleFactors = {prescaleFactor};
+        return SoftwareTriggerCut::compile(cut_string, preScaleFactors, rejectCut);
+      }
 
       /**
        * Decompile the internal General Cut back into a string.
@@ -101,8 +109,8 @@ namespace Belle2 {
       * Make constructor private. You should only download a SoftwareCut from the database or compile a new one from a string.
       */
       SoftwareTriggerCut(std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>>&& cut,
-                         const unsigned int prescaleFactor = 1,
-                         const bool rejectCut = false) : SoftwareTriggerCutBase(prescaleFactor, rejectCut),
+                         const std::vector<unsigned int> prescaleFactor,
+                         const bool rejectCut) : SoftwareTriggerCutBase(prescaleFactor, rejectCut),
         m_cut(std::move(cut))
       {
       }

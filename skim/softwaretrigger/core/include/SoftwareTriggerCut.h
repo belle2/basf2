@@ -79,7 +79,7 @@ namespace Belle2 {
                                                          const bool rejectCut = false);
 
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
-                                                         const unsigned int prescaleFactor = 1,
+                                                         const unsigned int prescaleFactor,
                                                          const bool rejectCut = false)
       {
         const std::vector<unsigned int>& preScaleFactors = {prescaleFactor};

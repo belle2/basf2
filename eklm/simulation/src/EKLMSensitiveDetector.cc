@@ -48,32 +48,17 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   int stripLevel = 1;
   HepGeom::Point3D<double> gpos, lpos;
-  G4TouchableHandle hist = aStep->GetPreStepPoint()->
-                           GetTouchableHandle();
-
-  /**
-   * Get deposited energy
-   */
+  G4TouchableHandle hist = aStep->GetPreStepPoint()->GetTouchableHandle();
   const G4double eDep = aStep->GetTotalEnergyDeposit();
-
-  /**
-   * get reference to the track
-   */
   const G4Track& track = * aStep->GetTrack();
-
-  /**
-   * get time of hit
-   */
   const G4double hitTime = track.GetGlobalTime();
-
-  // No time cut for background studeis
+  /* No time cut for background studies. */
   if (hitTime > m_ThresholdHitTime &&
       m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorNormal) {
     B2INFO("EKLMSensitiveDetector: "
            " ALL HITS WITH TIME > hitTimeThreshold ARE DROPPED!!");
     return false;
   }
-
   /* Hit position. */
   gpos = 0.5 * (aStep->GetPostStepPoint()->GetPosition() +
                 aStep->GetPreStepPoint()->GetPosition());
@@ -97,7 +82,7 @@ bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   hit->setTime(hitTime);
   if (m_GeoDat->getDetectorMode() == EKLMGeometry::c_DetectorBackground)
     stripLevel = 2;
-  /** Get information on mother volumes and store them to the hit. */
+  /* Get information on mother volumes and store them to the hit. */
   switch (m_type) {
     case c_SensitiveStrip:
       hit->setStrip(hist->GetVolume(stripLevel)->GetCopyNo());

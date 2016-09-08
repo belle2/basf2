@@ -22,6 +22,8 @@ namespace Belle2 {
       "truth",
       "truth_pos_theta",
       "truth_mom_phi",
+      "truth_curv",
+      "truth_alpha",
     };
 
     /** Class that specifies the names of the variables

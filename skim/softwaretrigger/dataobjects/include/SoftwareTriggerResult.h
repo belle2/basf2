@@ -35,6 +35,11 @@ namespace Belle2 {
       /// Return the cut result with the given name or throw an error if no result is there.
       SoftwareTriggerCutResult getResult(const std::string& triggerIdentifier) const;
 
+      const std::map<std::string, int>& getResults() const
+      {
+        return m_results;
+      };
+
       /**
        * Return the "total result" of this event. See the SoftwareTriggerModule for a description on
        * when what is returned.

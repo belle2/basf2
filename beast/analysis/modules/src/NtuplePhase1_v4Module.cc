@@ -9,8 +9,8 @@
  **************************************************************************/
 
 // Own include
-#include <beast/analysis/modules/NtuplePhase1_v3Module.h>
-#include <beast/analysis/modules/BEASTTree_v2.h>
+#include <beast/analysis/modules/NtuplePhase1_v4Module.h>
+#include <beast/analysis/modules/BEASTTree_v3.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -47,13 +47,13 @@ namespace Belle2 {
   //                 Register module
   //-----------------------------------------------------------------
 
-  REG_MODULE(NtuplePhase1_v3)
+  REG_MODULE(NtuplePhase1_v4)
 
   //-----------------------------------------------------------------
   //                 Implementation
   //-----------------------------------------------------------------
 
-  NtuplePhase1_v3Module::NtuplePhase1_v3Module() : Module()
+  NtuplePhase1_v4Module::NtuplePhase1_v4Module() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Read SKB PVs, simulated measurements of BEAST sensors, and write scaled simulated Ntuple in BEAST phase 1 data format");
@@ -107,11 +107,11 @@ namespace Belle2 {
 
   }
 
-  NtuplePhase1_v3Module::~NtuplePhase1_v3Module()
+  NtuplePhase1_v4Module::~NtuplePhase1_v4Module()
   {
   }
 
-  void NtuplePhase1_v3Module::initialize()
+  void NtuplePhase1_v4Module::initialize()
   {
     loadDictionaries();
     // read TFile with histograms
@@ -411,6 +411,12 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_tree->SetBranchAddress("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_tree->SetBranchAddress("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
+    m_tree->SetBranchAddress("PIN_dose", &(m_beast.PIN_dose));
+    m_tree->SetBranchAddress("BGO_energy", &(m_beast.BGO_energy));
+    m_tree->SetBranchAddress("HE3_rate", &(m_beast.HE3_rate));
+    m_tree->SetBranchAddress("CSI_sumE", &(m_beast.CSI_sumE));
+    m_tree->SetBranchAddress("CSI_hitRate", &(m_beast.CSI_hitRate));
+    m_tree->SetBranchAddress("DIA_dose", &(m_beast.DIA_dose));
 
     m_numEntries = m_tree->GetEntries();
     cout << "m_numEntries " << m_numEntries << endl;
@@ -472,19 +478,19 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_partialPressures_D06", &(m_beast.SKB_LER_partialPressures_D06));
     m_treeBEAST->Branch("SKB_LER_partialPressures_D02", &(m_beast.SKB_LER_partialPressures_D02));
     m_treeBEAST->Branch("SKB_LER_pressures_local", &(m_beast.SKB_LER_pressures_local));
-    m_treeBEAST->Branch("PIN_dose", &(m_beast.PIN_dose));
-    m_treeBEAST->Branch("BGO_energy", &(m_beast.BGO_energy));
-    m_treeBEAST->Branch("HE3_rate", &(m_beast.HE3_rate));
-    m_treeBEAST->Branch("CSI_sumE", &(m_beast.CSI_sumE));
-    m_treeBEAST->Branch("CSI_hitRate", &(m_beast.CSI_hitRate));
-    m_treeBEAST->Branch("DIA_dose", &(m_beast.DIA_dose));
+    m_treeBEAST->Branch("PIN_dose_mc", &(m_beast.PIN_dose_mc));
+    m_treeBEAST->Branch("BGO_energy_mc", &(m_beast.BGO_energy_mc));
+    m_treeBEAST->Branch("HE3_rate_mc", &(m_beast.HE3_rate_mc));
+    m_treeBEAST->Branch("CSI_sumE_mc", &(m_beast.CSI_sumE_mc));
+    m_treeBEAST->Branch("CSI_hitRate_mc", &(m_beast.CSI_hitRate_mc));
+    m_treeBEAST->Branch("DIA_dose_mc", &(m_beast.DIA_dose_mc));
 
-    m_treeBEAST->Branch("PIN_dose_av", &(m_beast.PIN_dose_av));
-    m_treeBEAST->Branch("BGO_energy_av", &(m_beast.BGO_energy_av));
-    m_treeBEAST->Branch("HE3_rate_av", &(m_beast.HE3_rate_av));
-    m_treeBEAST->Branch("CSI_sumE_av", &(m_beast.CSI_sumE_av));
-    m_treeBEAST->Branch("CSI_hitRate_av", &(m_beast.CSI_hitRate_av));
-    m_treeBEAST->Branch("DIA_dose_av", &(m_beast.DIA_dose_av));
+    m_treeBEAST->Branch("PIN_dose_mc_av", &(m_beast.PIN_dose_mc_av));
+    m_treeBEAST->Branch("BGO_energy_mc_av", &(m_beast.BGO_energy_mc_av));
+    m_treeBEAST->Branch("HE3_rate_mc_av", &(m_beast.HE3_rate_mc_av));
+    m_treeBEAST->Branch("CSI_sumE_mc_av", &(m_beast.CSI_sumE_mc_av));
+    m_treeBEAST->Branch("CSI_hitRate_mc_av", &(m_beast.CSI_hitRate_mc_av));
+    m_treeBEAST->Branch("DIA_dose_mc_av", &(m_beast.DIA_dose_mc_av));
 
     /*
     m_treeBEAST->Branch("TPC_neutrons_N", &(m_beast.TPC_neutrons_N));
@@ -553,12 +559,12 @@ namespace Belle2 {
   }
 
 
-  void NtuplePhase1_v3Module::beginRun()
+  void NtuplePhase1_v4Module::beginRun()
   {
   }
 
 
-  void NtuplePhase1_v3Module::event()
+  void NtuplePhase1_v4Module::event()
   {
     m_beast.clear();
     // create data store objects
@@ -656,7 +662,7 @@ namespace Belle2 {
       double HBG = m_input_HB_DIA_dose_av[i] + m_input_HC_DIA_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
-      m_beast.DIA_dose_av.push_back(BG + To);
+      m_beast.DIA_dose_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
       double BG = 0;
@@ -668,7 +674,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
-      m_beast.DIA_dose.push_back(BG + To);
+      m_beast.DIA_dose_mc.push_back(BG + To);
     }
 
     //Scale PIN
@@ -677,7 +683,7 @@ namespace Belle2 {
       double HBG = m_input_HB_PIN_dose_av[i] + m_input_HC_PIN_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
-      m_beast.PIN_dose_av.push_back(BG + To);
+      m_beast.PIN_dose_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_PIN_dose.size(); i++) {
       double BG = 0;
@@ -689,7 +695,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
-      m_beast.PIN_dose.push_back(BG + To);
+      m_beast.PIN_dose_mc.push_back(BG + To);
     }
 
     //Scale BGO
@@ -698,7 +704,7 @@ namespace Belle2 {
       double HBG = m_input_HB_BGO_dose_av[i] + m_input_HC_BGO_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
-      m_beast.BGO_energy_av.push_back(BG + To);
+      m_beast.BGO_energy_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_BGO_dose.size(); i++) {
       double BG = 0;
@@ -710,7 +716,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
-      m_beast.BGO_energy.push_back(BG + To);
+      m_beast.BGO_energy_mc.push_back(BG + To);
     }
 
     //Scale HE3
@@ -719,7 +725,7 @@ namespace Belle2 {
       double HBG = m_input_HB_HE3_rate_av[i] + m_input_HC_HE3_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
-      m_beast.HE3_rate_av.push_back(BG + To);
+      m_beast.HE3_rate_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
       double BG = 0;
@@ -731,7 +737,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
-      m_beast.HE3_rate.push_back(BG + To);
+      m_beast.HE3_rate_mc.push_back(BG + To);
     }
     //Scale CSI
     for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
@@ -739,14 +745,14 @@ namespace Belle2 {
       double HBG = m_input_HB_CSI_dose_av[i] + m_input_HC_CSI_dose_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
-      m_beast.CSI_sumE_av.push_back(BG + To);
+      m_beast.CSI_sumE_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double LBG = m_input_LB_CSI_rate_av[i] + m_input_LC_CSI_rate_av[i];
       double HBG = m_input_HB_CSI_rate_av[i] + m_input_HC_CSI_rate_av[i];
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
-      m_beast.CSI_hitRate_av.push_back(BG + To);
+      m_beast.CSI_hitRate_mc_av.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
       double BG = 0;
@@ -758,7 +764,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
-      m_beast.CSI_sumE.push_back(BG + To);
+      m_beast.CSI_sumE_mc.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double BG = 0;
@@ -770,7 +776,7 @@ namespace Belle2 {
         }
       }
       double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
-      m_beast.CSI_hitRate.push_back(BG + To);
+      m_beast.CSI_hitRate_mc.push_back(BG + To);
     }
 
     m_treeBEAST->Fill();
@@ -785,11 +791,11 @@ namespace Belle2 {
   }
 
 
-  void NtuplePhase1_v3Module::endRun()
+  void NtuplePhase1_v4Module::endRun()
   {
   }
 
-  void NtuplePhase1_v3Module::terminate()
+  void NtuplePhase1_v4Module::terminate()
   {
     delete m_tree;
     m_file->cd();
@@ -797,7 +803,7 @@ namespace Belle2 {
     m_file->Close();
   }
 
-  void NtuplePhase1_v3Module::printModuleParams() const
+  void NtuplePhase1_v4Module::printModuleParams() const
   {
   }
 

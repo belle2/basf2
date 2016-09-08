@@ -13,6 +13,7 @@
 #include <framework/utilities/TestHelpers.h>
 
 #include <gtest/gtest.h>
+#include <numeric>
 
 using namespace Belle2;
 

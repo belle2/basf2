@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 
 #include <fstream>
+#include <numeric>
 
 using namespace Belle2;
 

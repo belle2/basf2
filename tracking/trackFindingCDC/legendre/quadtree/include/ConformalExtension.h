@@ -47,7 +47,7 @@ namespace Belle2 {
         Vector2D refPos = trackTrajectory2D.getGlobalPerigee();
         double curv =
           -1.*trackTrajectory2D.getCurvature(); //change sign of the curvature; should be the same as the charge of the candidate
-        double theta = trackTrajectory2D.getGlobalCircle().tangentialPhi() - boost::math::constants::pi<double>() /
+        double theta = trackTrajectory2D.getGlobalCircle().phi0() - boost::math::constants::pi<double>() /
                        2.; //theta is an angle between x-axis and vector to the center of the track
 
         for (const CDCWireHit* hit : cdcWireHits) {

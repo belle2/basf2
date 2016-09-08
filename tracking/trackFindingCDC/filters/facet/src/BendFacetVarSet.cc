@@ -10,14 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <assert.h>
 
-namespace {
-  double hypot3(double x, double y, double z)
-  {
-    return hypot(hypot(x, y), z);
-  }
-}
-
-
 using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -110,7 +102,9 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double middlePhiPull = middlePhi / middlePhiSigma;
   const double endPhiPull = endPhi / endPhiSigma;
 
-
+  const double curv = middlePhi / startToEndLength;
+  const double curvSigma = middlePhiSigma / startToEndLength;
+  const double curvPull = middlePhiPull / startToEndLength;
 
   var<named("start_phi")>() = startPhi;
   var<named("start_phi_sigma")>() = startPhiSigma;
@@ -129,6 +123,10 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("end_phi_pull")>() = endPhiPull;
   var<named("end_d")>() = endDistance;
   var<named("end_chi2")>() = endChi2;
+
+  var<named("curv")>() = curv;
+  var<named("curv_sigma")>() = curvSigma;
+  var<named("curv_pull")>() = curvPull;
 
   return true;
 }

@@ -20,8 +20,8 @@ import sys
 import glob
 
 # user input
-withbg = 0  # add beam background boolean
-bgfolder = '/gs/project/belle2-mcgill/users/belle2/background/campaign12'  # folder that holds beam background
+withbg = 0  # add beam background yes/no
+bgfolder = ''  # folder that holds beam background
 bgfrac = 1.0  # fracion of nominal background
 seed = 10000  # seed for random numbers
 mdstfile = 'eclrefactoring.root'  # output file
@@ -59,6 +59,10 @@ main.add_module(ecl_digit_calibration)
 # ECL Connected Region Finder
 ecl_crfinder = register_module('ECLCRFinder')
 main.add_module(ecl_crfinder)
+
+# ECL Local Maximum Finder
+ecl_lmfinder = register_module('ECLLocalMaximumFinder')
+main.add_module(ecl_lmfinder)
 
 # ECL Splitter(s)
 ecl_n1 = register_module('ECLSplitterN1')

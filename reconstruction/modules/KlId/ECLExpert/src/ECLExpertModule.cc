@@ -132,9 +132,8 @@ void ECLExpertModule::event()
     m_feature_variables[1] = m_ECLE9oE25;
     m_feature_variables[2] = m_ECLTiming;
     m_feature_variables[3] = m_ECLEerror;
-    m_feature_variables[4] = m_ECLtrackDist;
+    m_feature_variables[4] = m_ECLminTrkDistance;
     m_feature_variables[5] = m_ECLdeltaL;
-    m_feature_variables[6] = m_ECLminTrkDistance;
 
 
     // rewrite dataset

@@ -260,3 +260,24 @@ TEST_F(TrackFindingCDCTestWithTopology, topology_CDCGeometryPar_cellId)
   EXPECT_TRUE(iWireInFourthLayer < 160);
   EXPECT_LT(iWireInFourthLayer, 160);
 }
+
+TEST_F(TrackFindingCDCTestWithTopology, topology_sag)
+{
+  const CDCWireTopology& theWireTopology  = CDCWireTopology::getInstance();
+  for (const CDCWire& wire : theWireTopology.getWires()) {
+    const WireLine& wireLine = wire.getWireLine();
+    const double forwardZ = wireLine.forwardZ();
+    const double backwardZ = wireLine.backwardZ();
+    const double centerZ = (forwardZ + backwardZ) / 2;
+
+    EXPECT_LE(0, wireLine.sagCoeff());
+
+    EXPECT_EQ(wireLine.nominalPos2DAtZ(forwardZ).y(), wireLine.sagPos2DAtZ(forwardZ).y());
+    EXPECT_EQ(wireLine.nominalPos2DAtZ(backwardZ).y(), wireLine.sagPos2DAtZ(backwardZ).y());
+    EXPECT_GE(wireLine.nominalPos2DAtZ(centerZ).y(), wireLine.sagPos2DAtZ(centerZ).y());
+
+    EXPECT_LE(wireLine.nominalMovePerZ().y(), wireLine.sagMovePerZ(forwardZ).y());
+    EXPECT_GE(wireLine.nominalMovePerZ().y(), wireLine.sagMovePerZ(backwardZ).y());
+    EXPECT_EQ(wireLine.nominalMovePerZ().y(), wireLine.sagMovePerZ(centerZ).y());
+  }
+}

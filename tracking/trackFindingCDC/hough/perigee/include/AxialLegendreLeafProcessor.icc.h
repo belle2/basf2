@@ -9,7 +9,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
 #include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StereoHitContained.h>
@@ -21,6 +20,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
 template<class ANode>
@@ -45,7 +45,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
   /////////////////////////////////////////////////////////////////////////
   const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
   CDCTrajectory2D trajectory2D = fitter.fit(*leaf);
-  GeneralizedCircle circle = trajectory2D.getGlobalCircle();
+  PerigeeCircle circle = trajectory2D.getGlobalCircle();
   {
     const double curv = circle.curvature();
     std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
@@ -59,7 +59,7 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
 
   const double curv = circle.curvature();
   // const Vector2D& phi0Vec = circle.tangential();
-  const double phi0 = circle.tangentialPhi();
+  const double phi0 = circle.phi0();
   // const double impact = circle.impact();
   const Vector2D& perigee = circle.perigee();
 

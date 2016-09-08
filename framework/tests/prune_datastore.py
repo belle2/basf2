@@ -25,6 +25,11 @@ class TestModule(Module):
         # while the PXDDigits should be empty
         assert PXDDigits.getEntries() == 0
 
+        # ensure the eventmetadata has been kept, which is implicitly done by
+        # PruneDataStore
+        evtmetadata = Belle2.PyStoreObj('EventMetaData')
+        assert evtmetadata
+
 set_random_seed("something important")
 # make sure FATAL messages don't have the function signature as this makes
 # problems with clang printing namespaces differently
@@ -41,12 +46,20 @@ main.add_module(input)
 main.add_module(eventinfo)
 main.add_module(printcollections)
 
-prune = register_module("PruneDatastore")
-prune.param('keepEntries', ['PXDClusters.*', 'EventMetaData'])
+prune = register_module("PruneDataStore")
+prune.param('keepEntries', ['PXDClusters.*'])
 main.add_module(prune)
 
 main.add_module(register_module('PrintCollections'))
 main.add_module(TestModule())
 
+# ensure the pruned datastore is still write-able to disk
+output = register_module('RootOutput')
+output.param('outputFileName', 'prune_datastore_output_test.root')
+output.param('updateFileCatalog', False)
+main.add_module(output)
+
 # Process events
 process(main)
+
+os.remove('prune_datastore_output_test.root')

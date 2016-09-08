@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/numerics/SinEqLine.h>
-#include <tracking/trackFindingCDC/numerics/numerics.h>
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
+#include <tracking/trackFindingCDC/numerics/ESign.h>
 
 #include <framework/gearbox/Unit.h>
 

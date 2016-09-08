@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
-#include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 using namespace Belle2;
@@ -57,29 +56,30 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
 CDCWire::CDCWire(const WireID& wireID)
   : m_wireID(wireID)
 {
-  initialize();
+  CDC::CDCGeometryPar::EWirePosition wirePosSet = CDC::CDCGeometryPar::c_Base;
+  initialize(wirePosSet, false);
 }
 
 CDCWire::CDCWire(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
-  : m_wireID(iSuperLayer, iLayer, iWire)
+  : CDCWire(WireID(iSuperLayer, iLayer, iWire))
 {
-  initialize();
 }
 
-void CDCWire::initialize()
+void CDCWire::initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag)
 {
   CDC::CDCGeometryPar& cdcgp = CDC::CDCGeometryPar::Instance();
 
   IWire iWire = getIWire();
   ILayer iCLayer = getICLayer();
 
-  Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire)};
-  Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire)};
+  Vector3D forwardPos{cdcgp.wireForwardPosition(iCLayer, iWire, wirePosSet)};
+  Vector3D backwardPos{cdcgp.wireBackwardPosition(iCLayer, iWire, wirePosSet)};
+  double sagCoeff = ignoreWireSag ? 0 : cdcgp.getWireSagCoef(wirePosSet, iCLayer, iWire);
 
-  m_wireLine = WireLine(forwardPos, backwardPos);
+  m_wireLine = WireLine(forwardPos, backwardPos, sagCoeff);
   m_refCylindricalR = getRefPos2D().norm();
 
-  /// used to check for odd stereo wires
+  /// used to check for odd stereo wires -- did not trigger in ages
   if (not isAxial() and (m_wireLine.tanTheta() == 0)) {
     B2WARNING("Odd wire " << *this);
     B2WARNING("wireForwardPosition  " << forwardPos);

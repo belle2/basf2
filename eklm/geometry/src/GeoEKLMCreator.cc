@@ -122,7 +122,7 @@ void EKLM::GeoEKLMCreator::newVolumes()
   m_LogVol.strip = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.strip == NULL)
     B2FATAL(MemErr);
-  m_Solids.groove = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
+  m_Solids.groove = (G4VSolid**)malloc(nDiff * sizeof(G4VSolid*));
   if (m_Solids.groove == NULL)
     B2FATAL(MemErr);
   m_LogVol.groove = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
@@ -2312,7 +2312,7 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
         layer = createLayer(endcap, m_LogVol.shieldLayer);
         for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
              m_CurVol.sector++)
-          sector = createSector(layer, m_LogVol.shieldLayerSector);
+          createSector(layer, m_LogVol.shieldLayerSector);
         createSectorSupport(m_LogVol.shieldLayerSector);
         createSectorSupportCorner1(m_LogVol.shieldLayerSector);
         createSectorSupportCorner2(m_LogVol.shieldLayerSector);

@@ -36,8 +36,8 @@ namespace Belle2 {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
         moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
-        moduleParamList->getParameter<bool>("FacetUpdateDriftLength").setDefaultValue(false);
-        moduleParamList->getParameter<bool>("FacetUpdateDriftLength").resetValue();
+        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").setDefaultValue(true);
+        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").resetValue();
         moduleParamList->getParameter<bool>("updateDriftLength").setDefaultValue(false);
         moduleParamList->getParameter<bool>("updateDriftLength").resetValue();
         moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");

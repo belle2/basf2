@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/hough/perigee/ImpactRep.h>
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;

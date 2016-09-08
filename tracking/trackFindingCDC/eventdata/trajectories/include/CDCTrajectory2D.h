@@ -77,43 +77,31 @@ namespace Belle2 {
     public:
       /// Checks if the circle is already set to a valid value.
       bool isFitted() const
-      { return not getLocalCircle().isInvalid(); }
+      { return not getLocalCircle()->isInvalid(); }
 
-      /**
-       *  Calculate the travel distance from the start position of the trajectory.
-       *
-       *  Returns the travel distance on the trajectory from the start point to \n
-       *  the given point. This is subjected to a discontinuity at the far point \n
-       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
-       *  If you have a heavily curling track you have care about the feasibility of this \n
-       *  calculation.
-       */
-      double calcArcLength2D(const Vector2D& point) const
-      { return getLocalCircle().arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
-
-
-      /// Getter for the position at a given two dimensional arc length
-      Vector2D getPos2DAtArcLength2D(double arcLength2D)
-      { return getLocalOrigin() + getLocalCircle().atArcLength(arcLength2D); }
-
-      /**
-       *  Calculate the travel distance between the two given positions
-       *  Returns the travel distance on the trajectory from the first given point to \n
-       *  the second given point. This is subjected to a discontinuity at the far point \n
-       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
-       *  If you have a heavily curling track you have care about the feasibility of this \n
-       *  calculation.
-       */
-      double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      /// Clears all information from this trajectoy
+      void clear()
       {
-        return getLocalCircle().arcLengthBetween(fromPoint - getLocalOrigin(),
-                                                 toPoint - getLocalOrigin());
+        m_localOrigin.set(0.0, 0.0);
+        m_localPerigeeCircle.invalidate();
+        m_flightTime = NAN;
       }
 
-      /// Getter for the arc length for one round trip around the trajectory.
-      double getArcLength2DPeriod() const
-      { return m_localPerigeeCircle.arcLengthPeriod(); }
+    public:
+      /// Reverses the trajectory in place
+      void reverse()
+      {
+        m_localPerigeeCircle.reverse();
+        m_flightTime = -m_flightTime;
+      }
 
+      /// Returns the reverse trajectory as a copy
+      CDCTrajectory2D reversed() const
+      {
+        return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed(), -getFlightTime());
+      }
+
+    public:
       /**
        *  Gives the three dimensional point which is on the dirft circle away from the wire line.
        *
@@ -124,84 +112,9 @@ namespace Belle2 {
       Vector3D reconstruct3D(const WireLine& wireLine,
                              const double distance = 0.0) const;
 
-    public:
-      /// Calculates the closest approach on the trajectory to the global origin
-      Vector2D getGlobalPerigee() const
-      { return getGlobalCircle().perigee(); }
-
       /// Calculates the closest approach on the trajectory to the given point
       Vector2D getClosest(const Vector2D& point) const
-      { return getLocalCircle().closest(point - getLocalOrigin()) + getLocalOrigin(); }
-
-      /**
-       *  Calculates the closest point with the same cylindricalR on the trajectory to the given point
-       *  This returns the point where the trajectory reaches as certain distance from the origin \n
-       *  ( in the xy projection ). It is useful to estimate where the trajectory reaches a  \n
-       *  specific wire layer.
-       */
-      Vector2D getCloseSameCylindricalR(const Vector2D& point) const
-      { return getGlobalCircle().sameCylindricalR(point); }
-
-      /**
-       *  Calculates the point where the trajectory meets the outer wall of the CDC.
-       *  This method returns the first point in forward flight direction from the start
-       *  point of the trajectory where it meets the outer radius of the outer most layer.
-       *  If the trajectory does not meet the CDC by the outer wall this will return Vector2D(nan,nan)
-       *  The factor can be used to virtually resize the CDC.
-       */
-      Vector2D getOuterExit(double factor = 1) const;
-
-
-      /**
-       *  Calculates the point where the trajectory meets the inner wall of the CDC.
-       *  This method returns the first point in forward flight direction from the start
-       *  point of the trajectory where it meets the inner radius of the inner most layer.
-       *  If the trajectory does not meet the CDC by the inner wall this will return Vector2D(nan,nan)
-       */
-      Vector2D getInnerExit() const;
-
-      /**
-       *  Calculates the point where the trajectory leaves the CDC.
-       *  This method returns the first point in forward flight direction from the start
-       *  point of the trajectory where it meets either the radius of the inner most layer
-       *  or the outer radius of the outer most wall.
-       *  If the trajectory does not leave the CDC by the inner or outer wall this will return Vector2D(nan,nan).
-       */
-      Vector2D getExit() const;
-
-      /**
-       *  Checks if the trajectory describes a curler by looking at the outerExit of the trajectory.
-       *  If it contains a NaN, the trajectory is a curler.
-       */
-      bool isCurler(double factor = 1) const
-      {
-        const Vector2D& outerExit = getOuterExit(factor);
-        return outerExit.hasNAN();
-      }
-
-      /// Calculates the distance from the point to the trajectory as seen from the xy projection.
-      double getDist2D(const Vector2D& point) const
-      {  return getLocalCircle().distance(point - getLocalOrigin()); }
-
-      /// Checks if the given point is to the right or to the left of the trajectory
-      ERightLeft isRightOrLeft(const Vector2D& point) const
-      { return getLocalCircle().isRightOrLeft(point - getLocalOrigin()); }
-
-      /// Getter for the maximal distance from the origin
-      double getMaximalCylindricalR() const
-      { return  getGlobalCircle().maximalCylindricalR(); }
-
-      /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
-      double getMinimalCylindricalR() const
-      { return  getGlobalCircle().minimalCylindricalR(); }
-
-      /// Getter for the signed impact parameter of the trajectory
-      double getGlobalImpact() const
-      { return  getGlobalCircle().impact(); }
-
-      /// Indicates if the trajectory is moving outwards or inwards (to or away from the origin) from the start point on
-      bool isMovingOutward() const
-      { return getStartUnitMom2D().dot(getLocalOrigin()) > 0; }
+      { return getLocalCircle()->closest(point - getLocalOrigin()) + getLocalOrigin(); }
 
     private:
       /**
@@ -241,8 +154,6 @@ namespace Belle2 {
       /// Indicates which axial superlayer the trajectory traverses before the one, where the start point of the trajectory is located.
       ISuperLayer getPreviousAxialISuperLayer() const;
 
-
-
       /// Indicates the maximal superlayer the trajectory traverses
       ISuperLayer getMaximalISuperLayer() const;
 
@@ -253,6 +164,16 @@ namespace Belle2 {
       ISuperLayer getMinimalISuperLayer() const;
 
     public:
+      /**
+       *  Calculates if this trajectory and the hits are coaligned
+       *  Returns:
+       *  * EForwardBackward::c_Forward if the last entity lies behind the first.
+       *  * EForwardBackward::c_Backward if the last entity lies before the first.
+       */
+      template<class AHits>
+      EForwardBackward isForwardOrBackwardTo(const AHits& hits) const
+      { return static_cast<EForwardBackward>(sign(getTotalArcLength2D(hits))); }
+
       /**
        *  Calculates the perpendicular travel distance from the last position of the fromHits
        *  to the first position of the toHits.
@@ -299,38 +220,40 @@ namespace Belle2 {
       }
 
       /**
-       *  Calculates if this trajectory and the hits are coaligned
-       *  Returns:
-       *  * EForwardBackward::c_Forward if the last entity lies behind the first.
-       *  * EForwardBackward::c_Backward if the last entity lies before the first.
+       *  Calculate the travel distance from the start position of the trajectory.
+       *
+       *  Returns the travel distance on the trajectory from the start point to \n
+       *  the given point. This is subjected to a discontinuity at the far point \n
+       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
+       *  If you have a heavily curling track you have care about the feasibility of this \n
+       *  calculation.
        */
-      template<class AHits>
-      EForwardBackward isForwardOrBackwardTo(const AHits& hits) const
-      { return static_cast<EForwardBackward>(sign(getTotalArcLength2D(hits))); }
-
-    public:
-      /// Gets the charge sign of the trajectory
-      ESign getChargeSign() const;
-
-      /// Reverses the trajectory in place
-      void reverse()
-      {
-        m_localPerigeeCircle.reverse();
-        m_flightTime = -m_flightTime;
-      }
-
-      /// Returns the reverse trajectory as a copy
-      CDCTrajectory2D reversed() const
-      {
-        return CDCTrajectory2D(getLocalOrigin(), getLocalCircle().reversed(), -getFlightTime());
-      }
+      double calcArcLength2D(const Vector2D& point) const
+      { return getLocalCircle()->arcLengthBetween(Vector2D(0.0, 0.0), point - getLocalOrigin()); }
 
       /**
-       *  Get unit momentum vector at a specific postion.
-       *  @return The unit travel direction at the closest approach to the position
+       *  Calculate the travel distance between the two given positions
+       *  Returns the travel distance on the trajectory from the first given point to \n
+       *  the second given point. This is subjected to a discontinuity at the far point \n
+       *  of the circle. Hence the value return is in the range from -pi*radius to pi*radius \n
+       *  If you have a heavily curling track you have care about the feasibility of this \n
+       *  calculation.
        */
-      inline Vector2D getUnitMom2D(const Vector2D& point) const
-      { return getLocalCircle().tangential(point - getLocalOrigin()); }
+      double calcArcLength2DBetween(const Vector2D& fromPoint, const Vector2D& toPoint) const
+      {
+        return getLocalCircle()->arcLengthBetween(fromPoint - getLocalOrigin(),
+                                                  toPoint - getLocalOrigin());
+      }
+      /// Getter for the arc length for one round trip around the trajectory.
+      double getArcLength2DPeriod() const
+      { return getLocalCircle()->arcLengthPeriod(); }
+
+    public:
+      /// Setter for start point and momentum at the start point subjected to the charge sign.
+      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double charge);
+
+      /// Gets the charge sign of the trajectory
+      ESign getChargeSign() const;
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom2D(const double bZ) const;
@@ -339,41 +262,90 @@ namespace Belle2 {
       double getAbsMom2D() const;
 
       /// Get the momentum at the support point of the trajectory
-      inline Vector2D getMom2DAtSupport(const double bZ) const
-      { return  getStartUnitMom2D() *= getAbsMom2D(bZ);  }
+      Vector2D getMom2DAtSupport(const double bZ) const
+      { return  getFlightDirection2DAtSupport() *= getAbsMom2D(bZ);  }
 
       /// Get the momentum at the support point of the trajectory
-      inline Vector2D getMom2DAtSupport() const
-      { return  getStartUnitMom2D() *= getAbsMom2D();  }
+      Vector2D getMom2DAtSupport() const
+      { return  getFlightDirection2DAtSupport() *= getAbsMom2D();  }
 
-      /// Get the momentum at the start point of the trajectory
-      inline Vector2D getStartMom2D() const
-      { return  getStartUnitMom2D() *= getAbsMom2D();  }
+      /// Get the unit direction of flight at the given point, where arcLength2D = 0.
+      Vector2D getFlightDirection2D(const Vector2D& point) const
+      { return getLocalCircle()->tangential(point - getLocalOrigin()); }
 
-      /// Get the unit momentum at the start point of the trajectory
-      inline Vector2D getStartUnitMom2D() const
-      { return  getLocalCircle().tangential();  }
+      /// Get the unit direction of flight at the support point, where arcLength2D = 0.
+      Vector2D getFlightDirection2DAtSupport() const
+      { return  getLocalCircle()->tangential();  }
 
-      /// Setter for start point and momentum at the start point subjected to the charge sign.
-      void setPosMom2D(const Vector2D& pos2D, const Vector2D& mom2D, const double charge);
+      /// Indicates if the trajectory is moving outwards or inwards (to or away from the origin) from the start point on
+      bool isMovingOutward() const
+      { return getFlightDirection2DAtSupport().dot(getSupport()) > 0; }
+
+      /// Getter for the position at a given two dimensional arc length
+      Vector2D getPos2DAtArcLength2D(double arcLength2D)
+      { return getLocalOrigin() + getLocalCircle()->atArcLength(arcLength2D); }
 
       /// Get the support point of the trajectory in global coordinates
-      inline Vector2D getSupport() const
-      { return getLocalCircle().perigee() + getLocalOrigin(); }
+      Vector2D getSupport() const
+      { return getLocalCircle()->perigee() + getLocalOrigin(); }
 
+      /// Getter for the closest approach on the trajectory to the global origin
+      Vector2D getGlobalPerigee() const
+      { return getLocalCircle()->closest(-m_localOrigin) + m_localOrigin; }
 
-      /// Clears all information from this trajectoy
-      void clear()
-      {
-        m_localOrigin.set(0.0, 0.0);
-        m_localPerigeeCircle.invalidate();
-        m_flightTime = NAN;
-      }
+      /**
+       *  Calculates the point where the trajectory meets the outer wall of the CDC.
+       *  This method returns the first point in forward flight direction from the start
+       *  point of the trajectory where it meets the outer radius of the outer most layer.
+       *  If the trajectory does not meet the CDC by the outer wall this will return Vector2D(nan,nan)
+       *  The factor can be used to virtually resize the CDC.
+       */
+      Vector2D getOuterExit(double factor = 1) const;
+
+      /**
+       *  Calculates the point where the trajectory meets the inner wall of the CDC.
+       *  This method returns the first point in forward flight direction from the start
+       *  point of the trajectory where it meets the inner radius of the inner most layer.
+       *  If the trajectory does not meet the CDC by the inner wall this will return Vector2D(nan,nan)
+       */
+      Vector2D getInnerExit() const;
+
+      /**
+       *  Calculates the point where the trajectory leaves the CDC.
+       *  This method returns the first point in forward flight direction from the start
+       *  point of the trajectory where it meets either the radius of the inner most layer
+       *  or the outer radius of the outer most wall.
+       *  If the trajectory does not leave the CDC by the inner or outer wall this will return Vector2D(nan,nan).
+       */
+      Vector2D getExit() const;
+
+      /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance factor
+      bool isCurler(double factor = 1) const;
+
+      /// Getter for the maximal distance from the origin
+      double getMaximalCylindricalR() const
+      { return std::fabs(getGlobalImpact() + 2 * getLocalCircle()->radius()); }
+
+      /// Getter for the minimal distance from the origin - same as absolute value of the impact parameter
+      double getMinimalCylindricalR() const
+      { return std::fabs(getGlobalImpact()); }
+
+      /// Getter for the signed impact parameter of the trajectory
+      double getGlobalImpact() const
+      { return getLocalCircle()->distance(-m_localOrigin); }
+
+      /// Calculates the distance from the point to the trajectory as seen from the xy projection.
+      double getDist2D(const Vector2D& point) const
+      {  return getLocalCircle()->distance(point - getLocalOrigin()); }
+
+      /// Checks if the given point is to the right or to the left of the trajectory
+      ERightLeft isRightOrLeft(const Vector2D& point) const
+      { return getLocalCircle()->isRightOrLeft(point - getLocalOrigin()); }
 
     public:
       /// Getter for the curvature as seen from the xy projection.
       double getCurvature() const
-      { return getLocalCircle().curvature(); }
+      { return getLocalCircle()->curvature(); }
 
       /// Getter for an individual element of the covariance matrix of the local helix parameters.
       double getLocalCovariance(EPerigeeParameter iRow, EPerigeeParameter iCol) const
@@ -383,12 +355,10 @@ namespace Belle2 {
       double getLocalVariance(EPerigeeParameter i) const
       { return getLocalCircle().variance(i); }
 
-
       /// Getter for the circle in global coordinates
-      GeneralizedCircle getGlobalCircle() const
+      PerigeeCircle getGlobalCircle() const
       {
-        // Down cast since we do not necessarily wont the covariance matrix transformed as well
-        GeneralizedCircle result(getLocalCircle());
+        PerigeeCircle result = getLocalCircle();
         result.passiveMoveBy(-getLocalOrigin());
         return result;
       }
@@ -399,7 +369,6 @@ namespace Belle2 {
         m_localPerigeeCircle = perigeeCircle;
         m_localPerigeeCircle.passiveMoveBy(getLocalOrigin());
       }
-
 
       /// Getter for the cirlce in local coordinates
       const UncertainPerigeeCircle& getLocalCircle() const

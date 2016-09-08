@@ -1,0 +1,5 @@
+Import('env')
+
+env['LIBS'] = ['Core',  'GX11',  'Graf3d', 'Gui', '$ROOT_LIBS', 'rawdata_dataobjects', 'framework']
+
+Return('env')

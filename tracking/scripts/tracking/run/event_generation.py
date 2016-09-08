@@ -7,16 +7,137 @@ import basf2
 import simulation
 import beamparameters
 
-import tracking.utilities as utilities
-
-import logging
-
-from tracking.run.minimal import MinimalRun
+from . import utilities
+from .minimal import MinimalRun
 import tracking.adjustments as adjustments
+
+import argparse
+import logging
 
 
 def get_logger():
     return logging.getLogger(__name__)
+
+
+# Standard run for generating or reading event #
+################################################
+
+class ReadOrGenerateEventsRun(MinimalRun):
+    description = "Simulate events using various generator and detector setups from command line."
+    # Declarative section which can be redefined in a subclass
+    generator_module = None
+    detector_setup = "Default"
+    bkg_files = []
+    components = None
+    disable_deltas = False
+    simulate_only = False
+
+    def create_argument_parser(self, **kwds):
+        argument_parser = super().create_argument_parser(**kwds)
+
+        setup_argument_group = argument_parser.add_argument_group("Detector setup arguments")
+        setup_argument_group.add_argument(
+            '-d',
+            '--detector',
+            dest='detector_setup',
+            default=argparse.SUPPRESS,
+            metavar='DETECTOR_SETUP_NAME',
+            choices=utilities.NonstrictChoices(detector_setups_by_short_name.keys()),
+            help=('Name of the detector setup to be used')
+        )
+
+        setup_argument_group.add_argument(
+            '-c',
+            '--component',
+            dest='components',
+            nargs='+',
+            default=argparse.SUPPRESS,
+            metavar='COMPONENTS',
+            action='store',
+            help=('Overrides the components of the detector setup')
+        )
+
+        generator_argument_group = argument_parser.add_argument_group("Generator arguments")
+        generator_argument_group.add_argument(
+            '-g',
+            '--generator',
+            dest='generator_module',
+            default=argparse.SUPPRESS,
+            metavar='GENERATOR_NAME',
+            choices=utilities.NonstrictChoices(valid_generator_short_names),
+            help='Name module or short name of the generator to be used.',
+        )
+
+        simulation_argument_group = argument_parser.add_argument_group("Generator arguments")
+        simulation_argument_group.add_argument(
+            '-b',
+            '--bkg-file',
+            dest='bkg_files',
+            default=self.bkg_files,
+            action='append',
+            metavar='BACKGROUND_DIRECTORY',
+            help='Path to folder of files or to a file containing the background to be used. ' +
+                 'Can be given multiple times.',
+        )
+
+        simulation_argument_group.add_argument(
+            '--disable-deltas',
+            action='store_true',
+            help='Disable the generation of delta rays in the simulation'
+        )
+
+        return argument_parser
+
+    def create_path(self):
+        path = super().create_path()
+
+        # Only generate events if no input file has been provided
+        if self.root_input_file is None:
+            # Check if generator means a decay file
+            if isinstance(self.generator_module, str) and utilities.find_file(self.generator_module):
+                dec_file_path = utilities.find_file(self.generator_module)
+                add_evtgen_generator(path, dec_file_path)
+            else:
+                # All other possibilities
+                utilities.extend_path(path,
+                                      self.generator_module,
+                                      generators_by_short_name,
+                                      allow_function_import=True)
+
+        # Gearbox & Geometry must always be registered
+        path.add_module("Gearbox")
+        path.add_module("Geometry")
+        if self.detector_setup:
+            detector_setup = self.detector_setup
+            detector_setup_function = detector_setups_by_short_name[detector_setup]
+            components = detector_setup_function(path)
+
+        if self.components:
+            adjustments.adjust_module(path, "Geometry", components=self.components)
+            components = self.components
+
+        # Only simulate if generator is setup
+        if self.root_input_file is None:
+            bkg_file_paths = get_bkg_file_paths(self.bkg_files)
+
+            simulation.add_simulation(path,
+                                      components=components,
+                                      bkgfiles=bkg_file_paths)
+
+            if self.disable_deltas:
+                adjustments.disable_deltas(path)
+
+            # Catch if no generator is added, no background should be simulated and events
+            # are not read from a file.
+            if not bkg_file_paths and self.generator_module is None:
+                raise RuntimeError('Need at least one of root_input_file,'
+                                   ' generator_module or bkg_files specified.')
+
+        return path
+
+
+class StandardEventGenerationRun(ReadOrGenerateEventsRun):
+    generator_module = "EvtGenInput"
 
 
 # Default settings and shorthand names for generator with specific settings #
@@ -31,171 +152,256 @@ muon_pdg_code = 13
 # PDG code of a tau
 tau_pdg_code = 15
 
+
+def add_single_gun_generator(path):
+    """Add ParticleGun with a single muon"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=1,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    momentumParams=[0.6, 1.4],
+                    thetaGeneration='uniform',
+                    thetaParams=[17., 150.])
+
+
+def add_simple_gun_generator(path):
+    """Add ParticleGun firing 10 muons at medium energy"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=10,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    momentumParams=[0.6, 1.4],
+                    thetaGeneration='uniform')
+
+
+def add_low_gun_generator(path):
+    """Add ParticleGun firing 10 muons at low energy"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=10,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    momentumParams=[0.4, 0.8],
+                    thetaGeneration='uniform')
+
+
+def add_gun_generator(path):
+    """Add ParticleGun firing 10 muons with wide energy range"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=10,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    thetaGeneration='uniform',
+                    thetaParams=[17., 150.])
+
+
+def add_forward_gun_generator(path):
+    """Add ParticleGun with one muon in rather forward direction"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=1,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    thetaGeneration='uniform',
+                    thetaParams=[30., 31.])
+
+
+def add_evtgen_generator(path, dec_file_path=None):
+    """Add Y4S generator"""
+    beamparameters.add_beamparameters(path, "Y4S")
+    if dec_file_path:
+        path.add_module("EvtGenInput", userDECFile=dec_file_path)
+    else:
+        path.add_module("EvtGenInput")
+
+
+def add_cosmics_generator(path):
+    """Add simple cosmics generator"""
+    path.add_module("Cosmics")
+
+
+def add_cosmics_tb_generator(path):
+    """Add simple cosmics generator resembling the test beam setup"""
+    path.add_module("Cosmics",
+                    ipRequirement=1,
+                    ipdr=5,
+                    ipdz=15,
+                    )
+
+    # Use point trigger
+    tof_mode = 1
+    cosmics_selector = path.add_module('CDCCosmicSelector',
+                                       xOfCounter=0.0,
+                                       yOfCounter=0.0,
+                                       zOfCounter=0.0,
+                                       TOF=tof_mode,
+                                       cryGenerator=False,
+                                       )
+
+    cosmics_selector.if_false(basf2.create_path())
+
+
+def add_sector_tb_generator(path, sector=1):
+    phiBounds = (240 + 60.0 * sector % 360.0, 300 + 60.0 * sector % 360.0)
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=1,
+                    varyNTracks=False,
+                    momentumGeneration='uniform',
+                    momentumParams=[2.0, 4.0],
+                    phiGeneration='uniform',
+                    phiParams=phiBounds,
+                    thetaGeneration='uniform',
+                    thetaParams=[70., 110.])
+
+
+def add_cry_tb_generator(path):
+    """Add cry generator resembling the test beam setup"""
+    from ROOT import Belle2
+    path.add_module('CRYInput',
+                    # cosmic data input
+                    CosmicDataDir=Belle2.FileSystem.findFile('data/generators/modules/cryinput/'),
+                    SetupFile=Belle2.FileSystem.findFile('data/tracking/muon_cry.setup'),
+                    # acceptance half-lengths - at least one particle has to enter that box to use that event
+                    acceptLength=0.5,
+                    acceptWidth=0.5,
+                    acceptHeight=0.5,
+                    maxTrials=10000,
+
+                    # keep half-lengths - all particles that do not enter the box are removed (keep box >= accept box)
+                    keepLength=0.5,
+                    keepWidth=0.5,
+                    keepHeight=0.5,
+
+                    # minimal kinetic energy - all particles below that energy are ignored
+                    kineticEnergyThreshold=0.01,
+                    )
+
+    # Use plane trigger
+    tof_mode = 2
+    cosmics_selector = path.add_module('CDCCosmicSelector',
+                                       lOfCounter=30.,
+                                       wOfCounter=10.,
+                                       xOfCounter=0.0,
+                                       yOfCounter=0.0,
+                                       zOfCounter=0.0,
+                                       TOF=tof_mode,
+                                       cryGenerator=True,
+                                       )
+
+    cosmics_selector.if_false(basf2.create_path())
+
+
+def add_no_generator(path):
+    """Add no generator for e.g. background only studies"""
+    # Nothing to do here since the background files are included in the add_simulation
+    pass
+
 # Generator module names hashed by shorthand menomics. Includes
 # None as a special value for background only simulation
-generator_module_names_by_short_name = {
-    'gun': 'ParticleGun',
-    'single_gun': 'ParticleGun',
-    'simple_gun': 'ParticleGun',
-    'forward_gun': 'ParticleGun',
-    'generic': 'EvtGenInput',
-    'cosmics': 'Cosmics',
-    'bkg': None,
+generators_by_short_name = {
+    'single_gun': add_single_gun_generator,
+    'simple_gun': add_simple_gun_generator,
+    'low_gun': add_low_gun_generator,
+    'forward_gun': add_forward_gun_generator,
+    'gun': add_gun_generator,
+    'generic': add_evtgen_generator,
+    "EvtGenInput": add_evtgen_generator,  # <- requires beam parameters
+    'cosmics': add_cosmics_generator,
+    'cosmics_tb': add_cosmics_tb_generator,
+    'cry_tb': add_cry_tb_generator,
+    'sector_tb': add_sector_tb_generator,
+    'bkg': add_no_generator,
+    'none': add_no_generator,
 }
 
 # Names of module names and short names of the generators usable in this script.
-valid_generator_names = list(generator_module_names_by_short_name.keys()) \
-    + list(generator_module_names_by_short_name.values())
+valid_generator_short_names = list(generators_by_short_name.keys())
 
-# Strip of the None value
-valid_generator_names.remove(None)
 
-# Default parameters of the generator modules hashed by their respective module name
-default_generator_params_by_generator_name = {
-    'single_gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 1,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'momentumParams': [0.6, 1.4],
-        'thetaGeneration': 'uniform',
-        'thetaParams': [20., 145.],
-    },
-    'simple_gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 10,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'momentumParams': [1.0, 1.4],
-        'thetaGeneration': 'uniform',
-        'thetaParams': [17., 150.],
-    },
-    'gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 10,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'thetaGeneration': 'uniform',
-        'thetaParams': [17., 150.],
-    },
-    'forward_gun': {
-        'pdgCodes': [muon_pdg_code, -muon_pdg_code],
-        'nTracks': 1,
-        'varyNTracks': False,
-        'momentumGeneration': 'uniform',
-        'momentumParams': [0.6, 1.4],
-        'thetaGeneration': 'uniform',
-        'thetaParams': [30., 31.],
-    },
-    'cosmics': {},
-    'ParticleGun': {},
-    'EvtGenInput': {},
+# Memorandum of geometry setups #
+# ############################# #
+def setup_default_detector(path):
+    pass
+
+
+def setup_tracking_detector(path):
+    components = ["BeamPipe", "PXD", "SVD", "CDC", "MagneticField"]
+    override = [
+        ("/DetectorComponent[@name='MagneticField']//Component[@type='3d'][2]/ExcludeRadiusMax",
+         "4.20", "m", )  # Remove the second compontent which is the magnetic field outside the tracking volumn.
+    ]
+
+    adjustments.adjust_module(path, "Gearbox", override=override)
+    adjustments.adjust_module(path, "Geometry", components=components)
+    return components
+
+
+def setup_tracking_detector_constant_b(path):
+    components = ["BeamPipe", "PXD", "SVD", "CDC", "MagneticFieldConstant4LimitedRCDC"]
+    adjustments.adjust_module(path, "Geometry", components=components)
+    return components
+
+
+def setup_cdc_cr_test(path):
+    components = ["CDC"]
+    override = [
+        # Reset the top volume to accomodate cosmics that can hit all parts of the detector
+        ("/Global/length", "8.", "m"),
+        ("/Global/width", "8.", "m"),
+        ("/Global/height", "1.5", "m"),
+
+        # Adjustments of the CDC setup
+        ("/DetectorComponent[@name='CDC']//t0FileName", "t0.dat", ""),
+        ("/DetectorComponent[@name='CDC']//xtFileName", "xt_noB_v1.dat", ""),
+        ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", "1.875", "deg"),
+        # ("/DetectorComponent[@name='CDC']//bwFileName", "badwire_CDCTOP.dat", ""),
+    ]
+
+    adjustments.adjust_module(path, "Gearbox", override=override)
+    adjustments.adjust_module(path, "Geometry", components=components)
+    return components
+
+
+def setup_cdc_top_test(path):
+    components = ["CDC"]
+    override = [
+        # Reset the top volume: must be larger than the generated surface and higher than the detector
+        # It is the users responsibility to ensure a full angular coverage
+        ("/Global/length", "8.", "m"),
+        ("/Global/width", "8.", "m"),
+        ("/Global/height", "1.5", "m"),
+
+        # Adjustments of the CDC setup
+        ("/DetectorComponent[@name='CDC']//t0FileName", "t0.dat", ""),
+        ("/DetectorComponent[@name='CDC']//xtFileName", "xt_noB_v1.dat", ""),
+        # ("/DetectorComponent[@name='CDC']//bwFileName", "badwire_CDCTOP.dat", ""),
+        ("/DetectorComponent[@name='CDC']//GlobalPhiRotation", "1.875", "deg"),
+        ("/DetectorComponent[@name='MagneticField']//Component/Z", "0", ""),
+    ]
+
+    adjustments.adjust_module(path, "Gearbox",
+                              override=override,
+                              fileName="geometry/CDCcosmicTests.xml"  # <- does something mysterious to the reconstruction...
+                              )
+
+    adjustments.adjust_module(path, "Geometry", components=components)
+    return components
+
+detector_setups_by_short_name = {
+    "Default": setup_default_detector,
+    'TrackingDetector': setup_tracking_detector,
+    'TrackingDetectorConstB': setup_tracking_detector_constant_b,
+    'CDCCRTest': setup_cdc_cr_test,
+    'CDCTOPTest': setup_cdc_top_test,
 }
 
 
-# Standard run for generating or reading event #
-################################################
-
-# This also provides a commandline interface to specify some parameters.
-
-class ReadOrGenerateEventsRun(MinimalRun):
-    # Declarative section which can be redefined in a subclass
-    generator_module = None
-    bkg_files = []
-    components = None
-    simulate_only = False
-    disable_deltas = False
-
-    def create_argument_parser(self, **kwds):
-        argument_parser = super(ReadOrGenerateEventsRun, self).create_argument_parser(**kwds)
-
-        argument_parser.add_argument(
-            '-c',
-            '--component',
-            dest='components',
-            default=None,
-            action='append',
-            help=('Add component. Multiple repeatition adds more components.'
-                  'If not given use the default settings of the run: %s' % type(self).components)
-        )
-
-        argument_parser.add_argument(
-            '-g',
-            '--generator',
-            dest='generator_module',
-            default=self.generator_module,
-            metavar='GENERATOR_NAME',
-            choices=utilities.NonstrictChoices(valid_generator_names),
-            help='Name module or short name of the generator to be used.',
-        )
-
-        argument_parser.add_argument(
-            '-b',
-            '--bkg-file',
-            dest='bkg_files',
-            default=self.bkg_files,
-            action='append',
-            metavar='BACKGROUND_DIRECTORY',
-            help='Path to folder of files or to a file containing the background to be used. ' +
-                 'Can be given multiple times.',
-        )
-
-        argument_parser.add_argument(
-            '--disable-deltas',
-            action='store_true',
-            help='Disable the generation of delta rays in the simulation'
-        )
-
-        return argument_parser
-
-    def create_path(self):
-        # Compose basf2 module path #
-        #############################
-        main_path = super(ReadOrGenerateEventsRun, self).create_path()
-
-        # Only generate events if no input file has been provided
-        if self.root_input_file is None:
-            generator_module = get_generator_module(self.generator_module)
-
-            if generator_module is not None:
-                generator_module_name = self.get_basf2_module_name(generator_module)
-                if generator_module_name == "EvtGenInput":
-                    beamparameters.add_beamparameters(main_path, "Y4S")
-
-                # Allow for Background only execution
-                main_path.add_module(generator_module)
-
-        # gearbox & geometry needs to be registered any way
-        gearbox_module = basf2.register_module('Gearbox')
-        main_path.add_module(gearbox_module)
-
-        components = self.components
-        geometry_module = basf2.register_module('Geometry')
-        if components is not None:
-            geometry_module.param('components', components)
-        main_path.add_module(geometry_module)
-
-        if self.root_input_file is None:
-            random_barrier_module = basf2.register_module("RandomBarrier")
-            main_path.add_module(random_barrier_module)
-
-            bkg_file_paths = get_bkg_file_paths(self.bkg_files)
-            components = self.components
-            simulation.add_simulation(main_path,
-                                      components=components,
-                                      bkgfiles=bkg_file_paths)
-
-            if self.disable_deltas:
-                adjustments.disable_deltas(main_path)
-
-            # Catch if no generator is added, no background should be simulated and events
-            # are not read from a file.
-            if not bkg_file_paths and generator_module is None:
-                raise RuntimeError('Need at least one of root_input_file,'
-                                   ' generator_module or bkg_files specified.')
-
-        return main_path
-
+# Heuristic to find background files #
+# ################################## #
 
 def is_bkg_file(bkg_file_path):
     """Test if a file path points to a file containing background mixins.
@@ -208,7 +414,6 @@ def is_bkg_file(bkg_file_path):
     ----
     Simple test only checks if file exists and ends with ".root"
     """
-
     return os.path.isfile(bkg_file_path) and bkg_file_path.endswith('.root')
 
 
@@ -248,181 +453,3 @@ def get_bkg_file_paths(bkg_dir_or_file_paths):
                     result.append(bkg_file_path)
 
     return result
-
-
-def is_generator_name(generator_name):
-    """Test, if the given name correspondes to a valid short or module name of a generator.
-
-    Returns
-    -------
-    bool
-        If the name is a module name or a valid short hand for a module
-    """
-
-    if generator_name in list(generator_module_names_by_short_name.values()) \
-            or generator_name in list(generator_module_names_by_short_name.keys()):
-        return True
-    else:
-        # Also except any module from the generator package
-        # although there are false positives.
-        generator_module = basf2.register_module(generator_name)
-        return generator_module.package() == "generators"
-
-
-def get_generator_module_name(generator_name):
-    """Translates the proper basf2 module name from a short name.
-
-    Returns
-    -------
-    The proper module name resolved from the short name.
-
-    Raises
-    ------
-    ValueError
-        If no valid module name can be found.
-    """
-
-    if is_generator_name(generator_name):
-        return generator_module_names_by_short_name.get(generator_name,
-                                                        generator_name)
-    else:
-        raise ValueError('%s does not refer to a valid module name or short hand'
-                         % generator_name)
-
-
-def update_default_generator_params(generator_name, additional_params):
-    """Takes to default parameters of the generator module and
-    returns a copy updated with the explicitly given additional parameters.
-
-    Parameters
-    ----------
-    generator_name : string
-        Name or short name of a generator module
-    additional_params : dict
-        Parameters that shall overwrite the defaults
-
-    Returns
-    -------
-    dict
-        Parameters updated with the additional parameters from the defaults.
-        Usable with module.param()
-    """
-
-    return params
-
-
-def get_generator_module(generator_module_or_generator_name):
-    if isinstance(generator_module_or_generator_name, str):
-        generator_name = generator_module_or_generator_name
-
-        # Translate short hand name to basf module name
-        generator_module_name = get_generator_module_name(generator_name)
-
-        # Allow None as special value for background only simulation
-        if generator_module_name is not None:
-            generator_module = basf2.register_module(generator_module_name)
-            generator_params = \
-                default_generator_params_by_generator_name.get(generator_name,
-                                                               {})
-            get_logger().info('Setting up generator with parameters %s',
-                              generator_params)
-            generator_module.param(generator_params)
-        else:
-
-            generator_module = None
-    else:
-
-        generator_module = generator_module_or_generator_name
-
-    return generator_module
-
-
-class StandardEventGenerationRun(ReadOrGenerateEventsRun):
-    generator_module = 'EvtGenInput'
-
-
-class IdempotentGeneratorRun(ReadOrGenerateEventsRun):
-
-    """
-    A special setup in which the given self.root_input_file is either used as input (if it is present)
-    or generated using the generator specified in self.generator_module (if it is not present).
-    Running the same run twice should one generate the events once and read them from the input file the
-    second time.
-
-    No matter if the file is generated or read, the modules specified in add_computation are evaluated
-    after the generation/read-in.
-    """
-
-    root_output_file = None
-    root_output_directory = None
-
-    def add_computation(self, main_path):
-        return main_path
-
-    def create_path(self, *args, **kwargs):
-        import hashlib
-
-        if self.root_input_file:
-            raise ValueError("root_input_file should not be declared for this class!")
-
-        if not self.root_output_directory:
-            raise ValueError("root_output_directory needs to be declared for this class!")
-
-        if not self.generator_module:
-            raise ValueError("generator_module needs to be declared for this class!")
-
-        generator_parameters = {param.name: str(param.values) for param in self.generator_module.available_params()}
-        generator_parameters.update({"n_events": str(self.n_events)})
-
-        sorted_generator_parameters = sorted(key + ":" + value for key, value in generator_parameters.items())
-        generator_parameters_as_string = "".join(sorted_generator_parameters)
-
-        hashed_generator_parameters = hashlib.md5(generator_parameters_as_string.encode("utf8")).hexdigest()
-        self.root_input_file = os.path.join(self.root_output_directory, hashed_generator_parameters + ".root")
-
-        if os.path.exists(self.root_input_file):
-            self.generator_module = None
-        else:
-            self.root_output_file = self.root_input_file
-            self.root_input_file = None
-
-        main_path = ReadOrGenerateEventsRun.create_path(self)
-
-        if self.root_output_file:
-            main_path.add_module("RootOutput", outputFileName=self.root_output_file)
-
-        main_path = self.add_computation(main_path, *args, **kwargs)
-
-        return main_path
-
-
-def main():
-    readOrGenerateEventsRun = StandardEventGenerationRun()
-
-    argument_parser = \
-        readOrGenerateEventsRun.create_argument_parser(allow_input=False)
-
-    argument_parser.add_argument('root_output_file',
-                                 help='Output file to which the simulated events shall be written.'
-                                 )
-
-    arguments = argument_parser.parse_args()
-
-    # Configure the read or event generation from the command line
-    readOrGenerateEventsRun.configure(arguments)
-
-    # Add the output module
-    root_output_file_path = arguments.root_output_file
-    root_output_module = basf2.register_module('RootOutput')
-    root_output_params = {'outputFileName': root_output_file_path}
-    root_output_module.param(root_output_params)
-
-    readOrGenerateEventsRun.add_module(root_output_module)
-
-    # Execute the run
-    readOrGenerateEventsRun.execute()
-
-
-if __name__ == '__main__':
-    logging.basicConfig(level=logging.INFO)
-    main()

@@ -19,47 +19,94 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_inheritance)
 {
 
   double curvature = 1.0;
-  double tangentialPhi = M_PI / 4.0;
+  double phi0 = M_PI / 4.0;
   double impact = 1.0;
 
   // Checks if the normal parameters n follow the same sign convention
-  PerigeeCircle perigeeCircle(curvature, tangentialPhi, impact);
+  PerigeeCircle perigeeCircle(curvature, phi0, impact);
 
-  const GeneralizedCircle& generalizedCircle = perigeeCircle;
-  //(perigeeCircle.n0(), perigeeCircle.n12(), perigeeCircle.n3());
+  const GeneralizedCircle generalizedCircle(perigeeCircle.n0(),
+                                            perigeeCircle.n12(),
+                                            perigeeCircle.n3());
 
   EXPECT_NEAR(curvature, generalizedCircle.curvature(), 10e-7);
   EXPECT_NEAR(impact, generalizedCircle.impact(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().x(), generalizedCircle.tangential().x(), 10e-7);
   EXPECT_NEAR(perigeeCircle.tangential().y(), generalizedCircle.tangential().y(), 10e-7);
 
-
   PerigeeCircle roundTripCircle(generalizedCircle);
 
   EXPECT_NEAR(curvature, roundTripCircle.curvature(), 10e-7);
   EXPECT_NEAR(impact, roundTripCircle.impact(), 10e-7);
-  EXPECT_NEAR(cos(tangentialPhi), roundTripCircle.tangential().x(), 10e-7);
-  EXPECT_NEAR(sin(tangentialPhi), roundTripCircle.tangential().y(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, roundTripCircle.tangentialPhi(), 10e-7);
-
+  EXPECT_NEAR(cos(phi0), roundTripCircle.phi0Vec().x(), 10e-7);
+  EXPECT_NEAR(sin(phi0), roundTripCircle.phi0Vec().y(), 10e-7);
+  EXPECT_NEAR(phi0, roundTripCircle.phi0(), 10e-7);
 
   PerigeeCircle roundTripCircle2;
   roundTripCircle2.setN(generalizedCircle);
 
   EXPECT_NEAR(curvature, roundTripCircle2.curvature(), 10e-7);
   EXPECT_NEAR(impact, roundTripCircle2.impact(), 10e-7);
-  EXPECT_NEAR(cos(tangentialPhi), roundTripCircle2.tangential().x(), 10e-7);
-  EXPECT_NEAR(sin(tangentialPhi), roundTripCircle2.tangential().y(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, roundTripCircle2.tangentialPhi(), 10e-7);
-
+  EXPECT_NEAR(cos(phi0), roundTripCircle2.tangential().x(), 10e-7);
+  EXPECT_NEAR(sin(phi0), roundTripCircle2.tangential().y(), 10e-7);
+  EXPECT_NEAR(phi0, roundTripCircle2.phi0(), 10e-7);
 }
 
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isLine)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
+
+  EXPECT_FALSE(circle.isLine());
+
+  float curvature = 0;
+  float phi0 = M_PI / 2;
+  float impact = -1;
+  PerigeeCircle line = PerigeeCircle(curvature, phi0, impact);
+
+  EXPECT_TRUE(line.isLine());
+}
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_isCircle)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
+
+  EXPECT_TRUE(circle.isCircle());
+
+  float curvature = 0;
+  float phi0 = M_PI / 2;
+  float impact = -1;
+  PerigeeCircle line = PerigeeCircle(curvature, phi0, impact);
+
+  EXPECT_FALSE(line.isCircle());
+}
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_orientation)
+{
+  double curvature = 1;
+  Vector2D phi0 = Vector2D::Phi(1);
+  double impact = 1;
+
+  PerigeeCircle circle(curvature, phi0, impact);
+  EXPECT_EQ(ERotation::c_CounterClockwise, circle.orientation());
+
+  PerigeeCircle reversedCircle = circle.reversed();
+  EXPECT_EQ(ERotation::c_Clockwise, reversedCircle.orientation());
+
+  curvature = 0;
+  PerigeeCircle line(curvature, phi0, impact);
+  EXPECT_EQ(ERotation::c_CounterClockwise, line.orientation());
+
+  PerigeeCircle reversedLine = line.reversed();
+  EXPECT_EQ(ERotation::c_Clockwise, reversedLine.orientation());
+}
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
 {
@@ -73,7 +120,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_minimalCylindricalR)
   EXPECT_EQ(1, perigeeCircle.minimalCylindricalR());
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 {
   double curvature = 1.0 / 2.0;
@@ -85,9 +131,6 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_maximalCylindricalR)
 
   EXPECT_EQ(3, perigeeCircle.maximalCylindricalR());
 }
-
-
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
 {
@@ -104,15 +147,14 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_setCenterAndRadius)
   EXPECT_NEAR(0.0, circle.center().y(), 10e-7);
 }
 
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
 {
 
   double curvature = -1.;
-  double tangentialPhi = 3. * M_PI / 4.;
+  double phi0 = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.);
 
-  PerigeeCircle circle(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, phi0, impact);
 
   EXPECT_TRUE(circle.isCircle());
   EXPECT_FALSE(circle.isLine());
@@ -122,7 +164,7 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(1.0, circle.center().y(), 10e-7);
 
   EXPECT_NEAR(curvature, circle.curvature(), 10e-7);
-  EXPECT_NEAR(tangentialPhi, circle.tangentialPhi(), 10e-7);
+  EXPECT_NEAR(phi0, circle.phi0(), 10e-7);
   EXPECT_NEAR(impact, circle.impact(), 10e-7);
 
   EXPECT_NEAR(0, circle.distance(Vector2D(1.0, 0.0)), 10e-7);
@@ -135,99 +177,32 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_distance)
   EXPECT_NEAR(-0.5, circle.distance(Vector2D(2.5, 1.0)), 10e-7);
 }
 
-
-
-
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_invalidate)
 {
-
   PerigeeCircle defaultCircle;
   EXPECT_TRUE(defaultCircle.isInvalid());
 
-  EXPECT_EQ(0., defaultCircle.n0());
-  EXPECT_EQ(0., defaultCircle.n1());
-  EXPECT_EQ(0., defaultCircle.n2());
-  EXPECT_EQ(0., defaultCircle.n3());
-
-  EXPECT_EQ(0., defaultCircle.curvature());
-  EXPECT_TRUE(std::isnan(defaultCircle.tangentialPhi()));
-  EXPECT_EQ(0., defaultCircle.tangential().x());
-  EXPECT_EQ(0., defaultCircle.tangential().y());
-  EXPECT_EQ(0., defaultCircle.impact());
-
-
   double curvature = -1.;
-  double tangentialPhi = 3. * M_PI / 4.;
+  double phi0 = 3. * M_PI / 4.;
   double impact = 1. - sqrt(2.0);
 
-  PerigeeCircle circle(curvature, tangentialPhi, impact);
+  PerigeeCircle circle(curvature, phi0, impact);
 
   circle.invalidate();
-
   EXPECT_TRUE(circle.isInvalid());
-
-  EXPECT_EQ(0., circle.n0());
-  EXPECT_EQ(0., circle.n1());
-  EXPECT_EQ(0., circle.n2());
-  EXPECT_EQ(0., circle.n3());
-
-  EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
-  EXPECT_EQ(0., circle.tangential().x());
-  EXPECT_EQ(0., circle.tangential().y());
-  EXPECT_EQ(0., circle.impact());
-
 
   circle.reverse();
-
   EXPECT_TRUE(circle.isInvalid());
 
-  EXPECT_EQ(0., circle.n0());
-  EXPECT_EQ(0., circle.n1());
-  EXPECT_EQ(0., circle.n2());
-  EXPECT_EQ(0., circle.n3());
-
-  EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
-  EXPECT_EQ(0., circle.tangential().x());
-  EXPECT_EQ(0., circle.tangential().y());
-  EXPECT_EQ(0., circle.impact());
-
-
-  circle =  circle.reversed();
-
+  circle = circle.reversed();
   EXPECT_TRUE(circle.isInvalid());
-
-  EXPECT_EQ(0., circle.n0());
-  EXPECT_EQ(0., circle.n1());
-  EXPECT_EQ(0., circle.n2());
-  EXPECT_EQ(0., circle.n3());
-
-  EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
-  EXPECT_EQ(0., circle.tangential().x());
-  EXPECT_EQ(0., circle.tangential().y());
-  EXPECT_EQ(0., circle.impact());
-
 
   GeneralizedCircle generalizedCircle;
   generalizedCircle.invalidate();
   circle.setN(generalizedCircle);
 
   EXPECT_TRUE(circle.isInvalid());
-
-  EXPECT_EQ(0., circle.n0());
-  EXPECT_EQ(0., circle.n1());
-  EXPECT_EQ(0., circle.n2());
-  EXPECT_EQ(0., circle.n3());
-
-  EXPECT_EQ(0., circle.curvature());
-  EXPECT_TRUE(std::isnan(circle.tangentialPhi()));
-  EXPECT_EQ(0., circle.tangential().x());
-  EXPECT_EQ(0., circle.tangential().y());
-  EXPECT_EQ(0., circle.impact());
 }
-
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
 {
@@ -240,11 +215,63 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_passiveMoveBy)
   EXPECT_NEAR(5.0, circle.radius(), 10e-7);
   EXPECT_NEAR(0.0, circle.perigee().x(), 10e-7);
   EXPECT_NEAR(-3.0, circle.perigee().y(), 10e-7);
-
 }
 
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_conformalTranform)
+{
+  Vector2D center(1.0, 0.0);
+  double radius = 1.0;
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
 
+  // Get two points on the circle to check for the orientation to be correct
+  Vector2D firstPos = circle.atArcLength(1);
+  Vector2D secondPos = circle.atArcLength(2);
 
+  EXPECT_NEAR(1.0, circle.curvature(), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, circle.phi0(), 10e-7);
+  EXPECT_NEAR(0.0, circle.impact(), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(firstPos), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
+
+  circle.conformalTransform();
+  firstPos.conformalTransform();
+  secondPos.conformalTransform();
+
+  EXPECT_NEAR(0.0, circle.curvature(), 10e-7);
+  EXPECT_NEAR(M_PI / 2.0, circle.phi0(), 10e-7);
+  EXPECT_NEAR(-1.0 / 2.0, circle.impact(), 10e-7);
+
+  double firstConformalArcLength = circle.arcLengthTo(firstPos);
+  double secondConformalArcLength = circle.arcLengthTo(secondPos);
+  EXPECT_LT(firstConformalArcLength, secondConformalArcLength);
+
+  EXPECT_NEAR(0.0, circle.distance(firstPos), 10e-7);
+  EXPECT_NEAR(0.0, circle.distance(secondPos), 10e-7);
+
+  // Another conformal transformation goes back to the original circle
+  PerigeeCircle conformalCopy = circle.conformalTransformed();
+  EXPECT_NEAR(1.0, conformalCopy.curvature(), 10e-7);
+  EXPECT_NEAR(-M_PI / 2.0, conformalCopy.phi0(), 10e-7);
+  EXPECT_NEAR(0.0, conformalCopy.impact(), 10e-7);
+}
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_closest)
+{
+  PerigeeCircle circle(1.0, Vector2D(0.0, -1.0), 1.0);
+  Vector2D up(2.0, 2.0);
+  Vector2D far(5.0, 0.0);
+
+  EXPECT_EQ(Vector2D(2.0, 1.0), circle.closest(up));
+  EXPECT_EQ(Vector2D(3.0, 0.0), circle.closest(far));
+
+  // This tests for point which is on the circle
+  double smallAngle = M_PI / 100;
+  Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
+
+  Vector2D closestOfNear = circle.closest(near);
+  EXPECT_NEAR(near.x(), closestOfNear.x(), 10e-7);
+  EXPECT_NEAR(near.y(), closestOfNear.y(), 10e-7);
+}
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
 {
@@ -256,22 +283,22 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atArcLength)
   double smallAngle = M_PI / 100;
   Vector2D near(2.0 - cos(smallAngle), sin(smallAngle));
 
-  double nearArcLength = -smallAngle * radius; //Minus because of default counterclockwise orientation
+  double nearArcLength =
+    -smallAngle * radius; // Minus because of default counterclockwise orientation
 
   Vector2D atNear = circle.atArcLength(nearArcLength);
 
   EXPECT_NEAR(near.x(), atNear.x(), 10e-7);
   EXPECT_NEAR(near.y(), atNear.y(), 10e-7);
 
-
   Vector2D down(2.0, -1.0);
-  double downArcLength = +M_PI / 2.0 * radius; //Plus because of default counterclockwise orientation
+  double downArcLength =
+    +M_PI / 2.0 * radius; // Plus because of default counterclockwise orientation
 
   Vector2D atDown = circle.atArcLength(downArcLength);
 
   EXPECT_NEAR(down.x(), atDown.x(), 10e-7);
   EXPECT_NEAR(down.y(), atDown.y(), 10e-7);
-
 }
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
@@ -316,6 +343,35 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_arcLengthToCylindricalR)
   }
 }
 
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius);
+
+  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+
+  EXPECT_NEAR(2, solutions.first.x(), 10e-7);
+  EXPECT_NEAR(1, solutions.first.y(), 10e-7);
+
+  EXPECT_NEAR(2, solutions.second.x(), 10e-7);
+  EXPECT_NEAR(-1, solutions.second.y(), 10e-7);
+}
+
+TEST(TrackFindingCDCTest, geometry_PerigeeCircle_atCylindricalR_opposite_orientation)
+{
+  double radius = 1;
+  Vector2D center = Vector2D(2.0, 0.0);
+  PerigeeCircle circle = PerigeeCircle::fromCenterAndRadius(center, radius, ERotation::c_Clockwise);
+
+  std::pair<Vector2D, Vector2D> solutions = circle.atCylindricalR(sqrt(5.0));
+
+  EXPECT_NEAR(2, solutions.first.x(), 10e-7);
+  EXPECT_NEAR(-1, solutions.first.y(), 10e-7);
+
+  EXPECT_NEAR(2, solutions.second.x(), 10e-7);
+  EXPECT_NEAR(1, solutions.second.y(), 10e-7);
+}
 
 TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
 {
@@ -324,10 +380,8 @@ TEST(TrackFindingCDCTest, geometry_PerigeeCircle_OriginCircleFromPointDirection)
   double impact = 0;
 
   // Checks if the normal parameters n follow the same sign convention
-  const PerigeeCircle perigeeCircle(expectedCurvature,
-                                    expectedPhi0,
-                                    impact);
-  const Vector2D& expectedPhi0Vec = perigeeCircle.tangential();
+  const PerigeeCircle perigeeCircle(expectedCurvature, expectedPhi0, impact);
+  const Vector2D& expectedPhi0Vec = perigeeCircle.phi0Vec();
 
   double randomArcLength = 2.0;
   Vector2D pos2D = perigeeCircle.atArcLength(randomArcLength);

@@ -44,6 +44,10 @@ namespace Belle2 {
       "end_phi_pull",
       "end_d",
       "end_chi2",
+
+      "curv",
+      "curv_sigma",
+      "curv_pull",
     };
 
     /** Class that specifies the names of the variables

@@ -64,8 +64,15 @@ namespace Belle2 {
       static const ISuperLayer c_NSuperLayers = 9;
 
     private:
-      /// Initializes all wires, wire layers and wire superlayers their interdependences from the CDCGeometryPar.
+      /**
+       * Create all wires, wire layers and wire superlayers and their interdependences
+       * with base geometry from the CDCGeometryPar.
+       */
       void initialize();
+
+    public:
+      /// Reload all geometry parameters form the CDCGeometryPar to adjust to changes in geometry
+      void reinitialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ignoreWireSag);
 
     public:
       /**

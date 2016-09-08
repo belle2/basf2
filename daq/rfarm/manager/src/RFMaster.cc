@@ -13,6 +13,8 @@ using namespace Belle2;
 
 //#define DESY
 
+
+// Main
 RFMaster::RFMaster(string conffile)
 {
   // 0. Initialize configuration manager
@@ -31,12 +33,13 @@ RFMaster::RFMaster(string conffile)
   chdir(execdir.c_str());
 
   // 3. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 4. Leave PID file
   FILE* f = fopen("pid.data", "w");
   fprintf(f, "%d", getpid());
   fclose(f);
+
 
 }
 
@@ -45,6 +48,26 @@ RFMaster::~RFMaster()
   delete m_log;
   //  delete m_shm;
   delete m_conf;
+}
+
+void RFMaster::Hook_Message_Handlers()
+{
+  // 5. Hook message handlers
+  if (b2nsm_callback("LOG", Log_Handler) < 0) {
+    fprintf(stderr, "RFMaster : hooking INFO handler failed, %s\n",
+            b2nsm_strerror());
+  }
+  printf("RFMaster: Message Handlers - Ready\n");
+
+}
+
+// NSM callback functions for message
+
+void RFMaster::Log_Handler(NSMmsg* msg, NSMcontext* ctx)
+{
+  //  printf ( "RFMaster : [INFO] received\n" );
+  //  b2nsm_ok ( msg, "INFO!!", NULL );
+  //  fflush ( stdout );
 }
 
 

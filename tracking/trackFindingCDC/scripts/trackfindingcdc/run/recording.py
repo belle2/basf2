@@ -1,5 +1,6 @@
 import basf2
 
+from tracking.run.utilities import extend_path
 from tracking.run.event_generation import StandardEventGenerationRun
 from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
 
@@ -84,6 +85,5 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
                         flightTimeEstimation=self.flight_time_estimation,
                         UseNLoops=self.n_loops)
 
-        recording_finder_module = self.get_basf2_module(self.recording_finder_module)
-        path.add_module(recording_finder_module)
+        extend_path(path, self.recording_finder_module)
         return path

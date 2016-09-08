@@ -22,19 +22,23 @@ namespace Belle2 {
 
       /// Enumeration to address the individual helix parameters in a vector or matrix
       enum EHelixParameter {
-        /// Constant to address the curvature in a vector or matrix assoziated with helix parameters.
+        /// Constant to address the curvature in a vector or matrix assoziated with helix
+        /// parameters.
         c_Curv = 0,
 
-        /// Constant to address the azimuth angle of the direction of flight at the helix in a vector or matrix assoziated with helix parameters.
+        /// Constant to address the azimuth angle of the direction of flight at the helix in a
+        /// vector or matrix assoziated with helix parameters.
         c_Phi0 = 1,
 
-        /// Constant to address the impact parameter in a vector or matrix assoziated with helix parameters.
+        /// Constant to address the impact parameter in a vector or matrix assoziated with helix
+        /// parameters.
         c_I = 2,
 
         /// Constant to address the tanLambda in a vector or matrix assoziated with helix parameters
         c_TanL = 3,
 
-        /// Constant to address the z reference point in a vector or matrix assoziated with helix parameters
+        /// Constant to address the z reference point in a vector or matrix assoziated with helix
+        /// parameters
         c_Z0 = 4,
 
         /// Constant for the total number of indices.
@@ -98,7 +102,6 @@ namespace Belle2 {
         CovarianceMatrix result = CovarianceMatrixUtil::stackBlocks(perigeeCov, szCov);
         return result;
       }
-
     };
 
     /// Vector of helix parameters

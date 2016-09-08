@@ -22,7 +22,8 @@ namespace Belle2 {
         /// Constant to address the tanLambda in a vector or matrix assoziated with sz parameters
         c_TanL = 0,
 
-        /// Constant to address the z reference point in a vector or matrix assoziated with sz parameters
+        /// Constant to address the z reference point in a vector or matrix assoziated with sz
+        /// parameters
         c_Z0 = 1,
 
         /// Constant for the total number of indices.
@@ -40,10 +41,9 @@ namespace Belle2 {
       static ParameterVector reversalSigns()
       {
         ParameterVector result;
-        result <<  -1, 1;
+        result << -1, 1;
         return result;
       }
-
     };
 
     /// Vector of the sz parameters

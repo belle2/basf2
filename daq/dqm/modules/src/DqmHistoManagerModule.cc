@@ -33,9 +33,11 @@ DqmHistoManagerModule::DqmHistoManagerModule() : Module(), m_initmain(false), m_
 
   // Parameters
   addParam("histoFileName", m_histfile, "Name of histogram output file.", string("histofile.root"));
+  addParam("workDirName", m_workdir, "Name of working directory", string("."));
   addParam("HostName", m_hostname, "Name of host to send histograms", string("localhost"));
   addParam("Port", m_port, "Socket port number to connect", DQM_SOCKET);
   addParam("DumpInterval", m_interval, "Interval to dump histos", 1000);
+  addParam("WriteInterval", m_dumpinterval, "Interval to write file", 10000);
 }
 
 DqmHistoManagerModule::~DqmHistoManagerModule()
@@ -56,7 +58,7 @@ DqmHistoManagerModule::~DqmHistoManagerModule()
 
 void DqmHistoManagerModule::initialize()
 {
-  RbTupleManager::Instance().init(Environment::Instance().getNumberProcesses(), m_histfile.c_str());
+  RbTupleManager::Instance().init(Environment::Instance().getNumberProcesses(), m_histfile.c_str(), m_workdir.c_str());
 
   m_initmain = true;
   //  cout << "DqmHistoManager::initialization done" << endl;
@@ -109,7 +111,11 @@ void DqmHistoManagerModule::event()
     RbTupleManager::Instance().begin(ProcHandler::EvtProcID());
     m_initialized = true;
   }
-  if (m_nevent % m_interval == 0) {
+  if ((ProcHandler::EvtProcID() < 100 &&
+       m_nevent % (m_interval / ProcHandler::NumEvtProcs()) == 0) ||
+      (ProcHandler::EvtProcID() >= 10000 &&
+       m_nevent % m_interval == 0)) {
+    //  if (m_nevent % m_interval == 0) {
     //    printf ( "DqmHistoManager: event = %d\n", m_nevent );
     //    printf ( "DqmHistoManger: dumping histos.....\n" );
     m_msg->clear();
@@ -133,7 +139,16 @@ void DqmHistoManagerModule::event()
 
     delete(msg);
 
+    // Dump histograms to file
+    RbTupleManager::Instance().dump();
   }
+
+  /*
+  if ( m_dumpinterval > 0 && m_nevent % m_dumpinterval == 0 && ProcHandler::EvtProcID() >= 20000) {
+    RbTupleManager::Instance().hadd(false);
+  }
+  */
+
   m_nevent++;
 
 }

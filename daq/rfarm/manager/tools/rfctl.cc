@@ -164,6 +164,15 @@ error_handler(NSMmsg* msg, NSMcontext*)
 {
   xprintlog("ERROR received");
 }
+
+// -- msg_handler -----------------------------------------------------
+//
+// ----------------------------------------------------------------------
+void
+msg_handler(NSMmsg* msg, NSMcontext*)
+{
+  xprintlog("MSG received");
+}
 // -- main --------------------------------------------------------------
 //    main does everything except callback functions
 // ----------------------------------------------------------------------
@@ -209,6 +218,11 @@ main(int argc, char** argv)
     return 1;
   }
 
+  /*
+  if ( b2nsm_callback("MSG", msg_handler ) < 0) {
+    xprintlog("%s: CALLBACK(MSG) %s", program, b2nsm_strerror());
+  }
+  */
   // prompt
   prompt = (char*)malloc(strlen(nodename) + 2);
   strcpy(prompt, nodename);

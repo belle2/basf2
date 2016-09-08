@@ -248,7 +248,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << trajectory2D.getGlobalCircle().tangentialPhi());
+      B2DEBUG(100, "Phi0 " << trajectory2D.getGlobalCircle().phi0());
       B2DEBUG(100, "Curv " << trajectory2D.getCurvature());
       B2DEBUG(100, "Tags of the hits");
 

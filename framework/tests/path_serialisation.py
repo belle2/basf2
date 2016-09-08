@@ -1,9 +1,15 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 import os
 import shutil
 import tempfile
 from unittest import TestCase, main
 
 import basf2
+from ROOT import Belle2
+
+# @cond internal_test
 
 
 class PathSerialisationTestCase(TestCase):
@@ -68,5 +74,40 @@ class PathSerialisationTestCase(TestCase):
         self.pickle_and_check(condition_path_2)
         self.pickle_and_check(path)
 
+    def test_high_level_things(self):
+        self.assertNotEqual(0, os.system('basf2 --execute-path /this/path/doesnot/exist'))
+
+        pathFile = tempfile.NamedTemporaryFile(prefix='b2pathtest_')
+
+        # uses Python modules, this should fail
+        steeringFile = Belle2.FileSystem.findFile('framework/tests/module_paths.py')
+        self.assertNotEqual(0, os.system('basf2 --dump-path ' + pathFile.name + ' ' + steeringFile))
+
+        # test actual execution
+        outputFile = tempfile.NamedTemporaryFile(prefix='b2pathtest_')
+
+        path = basf2.create_path()
+        path.add_module('EventInfoSetter', evtNumList=[2, 1], expList=[1, 1], runList=[1, 2])
+        path.add_module('RootOutput', outputFileName=outputFile.name)
+
+        # equivalent to --dump-path
+        basf2.fw.set_pickle_path(pathFile.name)
+        basf2.process(path)
+
+        # path dumped, but not executed
+        pathSize = os.stat(pathFile.name).st_size
+        self.assertNotEqual(0, pathSize)
+        self.assertEqual(0, os.stat(outputFile.name).st_size)
+
+        # equivalent to --execute-path
+        self.assertEqual(basf2.fw.get_pickle_path(), pathFile.name)
+        basf2.process(None)
+
+        # path unmodified, output file created
+        self.assertEqual(pathSize, os.stat(pathFile.name).st_size)
+        self.assertNotEqual(0, os.stat(outputFile.name).st_size)
+
 if __name__ == '__main__':
     main()
+
+# @endcond

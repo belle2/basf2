@@ -107,7 +107,7 @@ CDCTrajectory3D::CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const dou
 
   const double px = gfTrackCand.getStateSeed()[iPx];
   const double py = gfTrackCand.getStateSeed()[iPy];
-  const double pt = hypot(px, py);
+  const double pt = hypot2(px, py);
 
   const double cosPhi0 = px / pt;
   const double sinPhi0 = py / pt;
@@ -165,14 +165,14 @@ namespace {
                                                 const ESign charge,
                                                 const double bZ)
   {
-    const double impactXY = localHelix.impactXY();
-    const Vector2D& tangentialXY = localHelix.tangentialXY();
+    const double impactXY = localHelix->impactXY();
+    const Vector2D& phi0Vec = localHelix->phi0Vec();
 
-    const double cosPhi0 = tangentialXY.x();
-    const double sinPhi0 = tangentialXY.y();
+    const double cosPhi0 = phi0Vec.x();
+    const double sinPhi0 = phi0Vec.y();
 
-    const double curvatureXY = localHelix.curvatureXY();
-    const double tanLambda = localHelix.tanLambda();
+    const double curvatureXY = localHelix->curvatureXY();
+    const double tanLambda = localHelix->tanLambda();
 
     // 0. Define indices
     // Maybe push these out of this function:
@@ -254,7 +254,7 @@ bool CDCTrajectory3D::fillInto(genfit::TrackCand& gfTrackCand, const double bZ) 
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
+  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -282,7 +282,7 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 {
   // Set the start parameters
   Vector3D position = getSupport();
-  Vector3D momentum = bZ == 0 ? getUnitMom3DAtSupport() : getMom3DAtSupport(bZ);
+  Vector3D momentum = bZ == 0 ? getFlightDirection3DAtSupport() : getMom3DAtSupport(bZ);
   ESign charge = getChargeSign();
 
   // Do not propagate invalid fits, signal that the fit is invalid to the caller.
@@ -310,37 +310,33 @@ RecoTrack* CDCTrajectory3D::storeInto(StoreArray<RecoTrack>& recoTracks, const d
 }
 
 
+bool CDCTrajectory3D::isCurler(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  return getMaximalCylindricalR() < factor * topology.getOuterCylindricalR();
+}
 
 ESign CDCTrajectory3D::getChargeSign() const
 {
-  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalHelix().circleXY().orientation());
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalHelix()->circleXY().orientation());
 }
 
 double CDCTrajectory3D::getAbsMom3D(const double bZ) const
 {
-  double tanLambda = getLocalHelix().tanLambda();
-
-  double factor2DTo3D = hypot(1, tanLambda);
-
-  double curvatureXY = getLocalHelix().curvatureXY();
-
+  double tanLambda = getLocalHelix()->tanLambda();
+  double factor2DTo3D = hypot2(1, tanLambda);
+  double curvatureXY = getLocalHelix()->curvatureXY();
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, bZ);
-
   return factor2DTo3D * absMom2D;
 }
 
 double CDCTrajectory3D::getAbsMom3D() const
 {
   Vector3D position = getSupport();
-
-  double tanLambda = getLocalHelix().tanLambda();
-
-  double factor2DTo3D = hypot(1, tanLambda);
-
-  double curvatureXY = getLocalHelix().curvatureXY();
-
+  double tanLambda = getLocalHelix()->tanLambda();
+  double factor2DTo3D = hypot2(1, tanLambda);
+  double curvatureXY = getLocalHelix()->curvatureXY();
   double absMom2D = CDCBFieldUtil::curvatureToAbsMom2D(curvatureXY, position);
-
   return factor2DTo3D * absMom2D;
 }
 
@@ -354,7 +350,7 @@ double CDCTrajectory3D::shiftPeriod(int nPeriods)
 double CDCTrajectory3D::setLocalOrigin(const Vector3D& localOrigin)
 {
   double arcLength2D = calcArcLength2D(localOrigin);
-  double factor2DTo3D = hypot(1, getTanLambda());
+  double factor2DTo3D = hypot2(1, getTanLambda());
   double arcLength3D = arcLength2D * factor2DTo3D;
   m_flightTime += arcLength3D / Const::speedOfLight;
   m_localHelix.passiveMoveBy(localOrigin - m_localOrigin);

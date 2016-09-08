@@ -127,7 +127,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
   }
 
   //check if the orientation is alright
-  Vector2D directionAtCenter = trajectory2D.getUnitMom2D(Vector2D(0.0, 0.0));
+  Vector2D directionAtCenter = trajectory2D.getFlightDirection2D(Vector2D(0.0, 0.0));
 
 
   size_t voteForChangeSign = 0;

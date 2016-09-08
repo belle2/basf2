@@ -17,20 +17,19 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 TEST(TrackFindingCDCTest, geometry_Helix_closest)
 {
   // Tests the calculation of points of closest approach under various orientation of the helix.
-  // Here this is done by moving the coordinate system and thereby changing the perigee point to different representations.
-  // The point of closest approach should always lie at the position of the original origin / its transformed counterpart.
-  std::vector<Vector3D> bys = {
-    Vector3D(0.0, 0.0, 0.0),
-    Vector3D(0.0, 0.0, 5.0),
-    Vector3D(0.0, 3.0, 0.0),
-    Vector3D(3.0, 0.0, 0.0),
-    Vector3D(-1.0, -2.0, 3.0)
-  };
-
+  // Here this is done by moving the coordinate system and thereby changing the perigee point to
+  // different representations.
+  // The point of closest approach should always lie at the position of the original origin / its
+  // transformed counterpart.
+  std::vector<Vector3D> bys = {Vector3D(0.0, 0.0, 0.0),
+                               Vector3D(0.0, 0.0, 5.0),
+                               Vector3D(0.0, 3.0, 0.0),
+                               Vector3D(3.0, 0.0, 0.0),
+                               Vector3D(-1.0, -2.0, 3.0)
+                              };
 
   for (const Vector3D& by : bys) {
     double curvature = +1.0 / 2.0;
@@ -42,20 +41,27 @@ TEST(TrackFindingCDCTest, geometry_Helix_closest)
     Helix helix(curvature, phi0, impact, tanLambda, z0);
     Vector3D point(0.0, 0.0, 0.0);
 
-    Vector3D expectedClosest = helix.support();
+    Vector3D expectedClosest = helix.perigee();
 
     helix.passiveMoveBy(by);
     expectedClosest.passiveMoveBy(by);
     point.passiveMoveBy(by);
+    {
+      Vector3D realClosest = helix.closest(point, true);
+      EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
+    }
 
-    Vector3D realClosest = helix.closest(point);
-
-    EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
-    EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
-    EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
+    helix.shiftPeriod(2);
+    {
+      Vector3D realClosest = helix.closest(point, false);
+      EXPECT_NEAR(expectedClosest.x(), realClosest.x(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.y(), realClosest.y(), 10e-7) << "Test for displacement by " << by;
+      EXPECT_NEAR(expectedClosest.z(), realClosest.z(), 10e-7) << "Test for displacement by " << by;
+    }
   }
 }
-
 
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
 {
@@ -83,8 +89,6 @@ TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToCylndricalR)
   double unreachableLowArcLength2D = helix.arcLength2DToCylindricalR(0.5);
   EXPECT_TRUE(std::isnan(unreachableLowArcLength2D));
 }
-
-
 
 TEST(TrackFindingCDCTest, geometry_Helix_arcLength2DToXY)
 {

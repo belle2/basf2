@@ -9,92 +9,72 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/geometry/Helix.h>
 
-#include <tracking/trackFindingCDC/numerics/SinEqLine.h>
+#include <boost/math/tools/minima.hpp>
 
 using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-double Helix::arcLength2DToClosest(const Vector3D& point) const
+double Helix::arcLength2DToClosest(const Vector3D& point, bool firstPeriod) const
 {
-  // TODO: Introduce special case for curvatureXY == 0
-
-
-  double byArcLength2D = circleXY().arcLengthTo(point.xy());
-
-  // Handle z coordinate
-  double transformedZ0 = byArcLength2D * tanLambda() + z0();
-  double deltaZ = point.z() - transformedZ0;
-  // double iPeriod = floor(deltaZ / zPeriod());
-
-  // Sign ?
-  //ERotation ccwInfo = circleXY().orientation();
-  //if (ccwInfo != ERotation::c_CounterClockwise and ccwInfo != ERotation::c_Clockwise) return NAN;
-
-  //double d0 = ccwInfo * circleXY().distance(point.xy());
+  // The point may happen to lie in the center of the helix.
   double d0 = circleXY().distance(point.xy());
-
   double denominator = 1 + curvatureXY() * d0;
-  //B2INFO("denominator = " << denominator);
   if (denominator == 0) {
-    return deltaZ / tanLambda() + byArcLength2D;
-  }
-
-  double slope = - tanLambda() * tanLambda() / denominator;
-  double intercept = - tanLambda() * curvatureXY() * deltaZ / denominator;
-
-  // B2INFO("slope = " << slope);
-  // B2INFO("intercept = " << intercept);
-
-  SinEqLine sinEqLineSolver(slope, intercept);
-
-  int iHalfPeriod = sinEqLineSolver.getIHalfPeriod(deltaZ / tanLambda() * curvatureXY());
-
-  // B2INFO("iHalfPeriod : " << iHalfPeriod);
-  // B2INFO("Basic solution : " << sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(-1));
-
-  // There are 4 candidate solutions
-  // Note: Two of them are local maxima of the distance to the helix and could be abolished before further consideration as an optimization.
-  double solutions[4] = { NAN, NAN, NAN, NAN };
-
-  solutions[0] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod - 2);
-  solutions[1] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod - 1);
-  solutions[2] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod);
-  solutions[3] = sinEqLineSolver.computeRootLargerThanExtemumInHalfPeriod(iHalfPeriod + 1);
-
-  double distances[4] = { NAN, NAN, NAN, NAN };
-
-  double smallestDistance = NAN;
-  int iSmallestSol = 0;
-
-  for (int iSol = 0; iSol < 4; ++iSol) {
-    distances[iSol] = -2.0 * (1.0 + d0 * curvatureXY()) * cos(solutions[iSol]) + tanLambda() * tanLambda() * solutions[iSol] *
-                      solutions[iSol] + 2 * tanLambda() * curvatureXY() * deltaZ * solutions[iSol];
-    // B2INFO("Solution : " << iSol);
-    // B2INFO("arcLength * curvature = " << solutions[iSol]);
-    // B2INFO("distance = " << distances[iSol]);
-
-    if (not std::isnan(distances[iSol]) and not(smallestDistance < distances[iSol])) {
-      smallestDistance = distances[iSol];
-      iSmallestSol = iSol;
+    // When this happens we can optimise the z distance for the closest point
+    double arcLength2D = (point.z() - z0()) / tanLambda();
+    if (not std::isfinite(arcLength2D)) {
+      return 0.0;
+    } else {
+      return arcLength2D;
     }
-    // B2INFO("smallestDistance = " << smallestDistance);
-
   }
 
-  // B2INFO("Smallest solution : " << iSmallestSol);
-  // B2INFO("arcLength * curvature = " << solutions[iSmallestSol]);
-  // B2INFO("distance = " << distances[iSmallestSol]);
+  // First approximation optimising the xy distance.
+  double arcLength2D = circleXY().arcLengthTo(point.xy());
+  // In case the helix is a flat circle with no extend into z this is the actual solution
+  if (tanLambda() == 0) {
+    return arcLength2D;
+  }
 
-  double curvatureXYTimesArcLength2D = solutions[iSmallestSol] ;
+  double deltaZ = point.z() - szLine().map(arcLength2D);
+  if (not firstPeriod) {
+    if (fabs(deltaZ) > zPeriod() / 2) {
+      double newDeltaZ = std::remainder(deltaZ, zPeriod());
+      double nPeriodShift = (deltaZ - newDeltaZ) / zPeriod();
+      arcLength2D += nPeriodShift * perimeterXY();
+      deltaZ = newDeltaZ;
+    }
+  }
 
-  double arcLength2D = curvatureXYTimesArcLength2D / curvatureXY();
+  using boost::math::tools::brent_find_minima;
 
-  // Correct for the periods off set before
-  arcLength2D += byArcLength2D;
-  return arcLength2D;
+  auto distance3D = [this, &point](const double & s) -> double {
+    Vector3D pos = atArcLength2D(s);
+    return pos.distance(point);
+  };
 
+  double searchWidth = std::fmin(perimeterXY(), 2 * deltaZ / tanLambda());
+
+  double lowerS = arcLength2D - searchWidth;
+  double upperS = arcLength2D + searchWidth;
+
+  int bits = std::numeric_limits<double>::digits;
+  boost::uintmax_t nMaxIter = 100;
+
+  std::pair<double, double> sBounds = brent_find_minima(distance3D, lowerS, upperS, bits, nMaxIter);
+
+  // Stopped before iterations were exhausted?
+  // bool converged = nMaxIter > 0;
+
+  double firstDistance = distance3D(sBounds.first);
+  double secondDistance = distance3D(sBounds.second);
+  if (firstDistance < secondDistance) {
+    return sBounds.first;
+  } else {
+    return sBounds.second;
+  }
 }
 
 HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
@@ -105,13 +85,13 @@ HelixJacobian Helix::passiveMoveByJacobian(const Vector3D& by) const
   HelixJacobian jacobian = JacobianMatrixUtil::stackBlocks(perigeeJacobian, szJacobian);
 
   double curv = curvatureXY();
-  double m = tanLambda();
+  double tanL = tanLambda();
   double sArc = circleXY().arcLengthTo(by.xy());
 
   using namespace NHelixParameterIndices;
-  jacobian(c_Z0, c_Curv) = m * (jacobian(c_Phi0, c_Curv) - sArc) / curv;
-  jacobian(c_Z0, c_Phi0) = m * (jacobian(c_Phi0, c_Phi0) - 1.) / curv;
-  jacobian(c_Z0, c_I)    = m *  jacobian(c_Phi0, c_I) / curv;
+  jacobian(c_Z0, c_Curv) = tanL * (jacobian(c_Phi0, c_Curv) - sArc) / curv;
+  jacobian(c_Z0, c_Phi0) = tanL * (jacobian(c_Phi0, c_Phi0) - 1.) / curv;
+  jacobian(c_Z0, c_I) = tanL * jacobian(c_Phi0, c_I) / curv;
   jacobian(c_Z0, c_TanL) = sArc;
 
   return jacobian;

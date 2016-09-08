@@ -9,7 +9,6 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/numerics.h>
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 #include <tracking/trackFindingCDC/utilities/EnableIf.h>

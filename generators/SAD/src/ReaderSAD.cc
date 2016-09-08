@@ -1,6 +1,6 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2012  Belle II Collaboration                         *
+ * Copyright(C) 2010-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Hiroyuki Nakayama, Igal Jaegle             *
@@ -347,6 +347,52 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
       break;
   }
 
+  int ring = 0;
+
+  switch (m_accRing) {
+    case c_HER: ring = 1;
+      break;
+    case c_LER: ring = 2;
+      break;
+  }
+  /*
+  int ler_section[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  int ler_inf_section[12] = {0., 254.74, 498.59, 754.14, 1009.66, 1253.52, 1488.7, 1764.1, 2007.05, 2262.14, 2517.2, 2760.15};
+  int her_inf_section[12] = {254.32, 494.31, 750.25, 1009.24, 1249.24, 1488.43, 1763.68, 2002.77, 2258.25, 2516.78, 2755.87, 3011.33};
+  int her_section[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  int ler_sup_section[12] = {0., 254.61, 496.52, 727.23, 1007.7, 1249.3, 1479.82, 1761.31, 2003.88, 2239.89, 2516.31, 2758.89};
+  int her_sup_section[12] = {254.3, 495.32, 726.92, 1007.39, 1248.41, 1479.51, 1761, 2002.99, 2239.58, 2516, 2758, 3011.87};
+
+  int section = -1;
+
+  if (ring == 1) {
+    for (int i = 0; i < 12; i++) {
+      if (her_inf_section[i] <= (m_inputSAD_ssraw + 1500.) && (m_inputSAD_ssraw + 1500.) <= her_sup_section[i])
+  section = her_section[i] - 1;
+    }
+  } else if  (ring == 2) {
+    for (int i = 0; i < 12; i++) {
+      if (ler_inf_section[i] <= (m_inputSAD_ssraw + 1500.) && (m_inputSAD_ssraw + 1500.) <= ler_sup_section[i])
+  section = ler_section[i] - 1;
+    }
+  }
+  */
+  //each rings have 12 section of ~250m
+  //the 1st section D01, the second section is D12, followed by D11, D10 .... for both rings
+  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  //int ring_section = section_ordering[(int)((m_inputSAD_ssraw + 1500.) / 12.)];
+  double ssraw = 0.;
+  if (ring == 1) {
+    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
+    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
+  } else if (ring == 2) {
+    //if (m_inputSAD_ssraw >= 0) ssraw = 3000. - m_inputSAD_ssraw / 100.;
+    //else if (m_inputSAD_ssraw < 0) ssraw = -m_inputSAD_ssraw / 100.;
+    if (m_inputSAD_ssraw >= 0) ssraw = m_inputSAD_ssraw / 100.;
+    else if (m_inputSAD_ssraw < 0) ssraw = 3000. + m_inputSAD_ssraw / 100.;
+  }
+  int ring_section = section_ordering[(int)((ssraw) / 250.)];
+
   if (abs(m_lostS) <= 400.) {
     m_transMatrix->LocalToMasterVect(particleMomSAD, particleMomGeant4);
   } else {
@@ -366,7 +412,7 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
                                    m_inputSAD_Lss, m_inputSAD_nturn,
                                    m_lostX, m_lostY, m_lostPx, m_lostPy, m_inputSAD_xraw, m_inputSAD_yraw,
                                    m_inputSAD_r, m_inputSAD_rr, m_inputSAD_dp_over_p0, m_lostE, m_lostRate,
-                                   m_inputSAD_watt));
+                                   m_inputSAD_watt, ring, ring_section));
   //End my addition
 }
 

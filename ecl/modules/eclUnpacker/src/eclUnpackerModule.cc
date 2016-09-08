@@ -10,7 +10,7 @@ using namespace ECL;
 REG_MODULE(ECLUnpacker)
 
 ECLUnpackerModule::ECLUnpackerModule() :
-  m_eclDigits("", DataStore::c_Persistent)
+  m_eclDigits("", DataStore::c_Event)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
@@ -153,6 +153,13 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
     // pointer to data from COPPER/FINESSE
     m_bufPtr = rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
+    B2DEBUG(15, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
+    for (int i = 0; i < m_bufLength; i++) {
+      //    B2DEBUG(15,"" << std::hex << setfill('0') << setw(8) << m_bufPtr[i]);
+
+    }
+    //  B2DEBUG(15,"***** " );
+
     m_bufPos = 0; // set read position to 1-st word
 
 
@@ -219,10 +226,14 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
 
           cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
 
+          if (cellID < 1) continue; // channel is not connected to crystal
+
           // fill eclDigits data object
-          if (dspAmplitude > 50)
-            B2DEBUG(10, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
-                    dspQualityFlag);
+          if (dspAmplitude > 50) {
+            //B2DEBUG(10, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<    dspQualityFlag);
+            //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
+          }
+
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
           newEclDigit->setCellId(cellID);
           newEclDigit->setAmp(dspAmplitude);

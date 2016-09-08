@@ -16,13 +16,13 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Vector type for n related parameters
-    template<int N>
-    using ParameterVector = Eigen::Matrix< double, N, 1>;
+    template <int N>
+    using ParameterVector = Eigen::Matrix<double, N, 1>;
 
     struct ParameterVectorUtil {
 
       /// Gets a sub vector from a parameter vector
-      template<class AParameterVector, int I = 0, int N = 0>
+      template <class AParameterVector, int I = 0, int N = 0>
       static AParameterVector getSub(const ParameterVector<N>& par)
       {
         constexpr const int M = AParameterVector::RowsAtCompileTime;
@@ -30,7 +30,7 @@ namespace Belle2 {
       }
 
       /// Combines two parameter vectors by stacking them over each other.
-      template<int N1, int N2>
+      template <int N1, int N2>
       static ParameterVector < N1 + N2 > stack(const ParameterVector<N1>& upperPar,
                                                const ParameterVector<N2>& lowerPar)
       {
@@ -38,8 +38,6 @@ namespace Belle2 {
         result << upperPar, lowerPar;
         return result;
       }
-
-
     };
 
   } // namespace TrackFindingCDC

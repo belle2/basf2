@@ -39,6 +39,7 @@ class WeightfileInformation:
     """
     Extract information about an expert from the database using the given identifiers
     """
+
     def __init__(self, identifier):
         """
         Construct new Weightfile Information object
@@ -94,7 +95,7 @@ if __name__ == '__main__':
 
     o = b2latex.LatexFile()
     o += b2latex.TitlePage(title='Automatic MVA Evaluation',
-                           authors=['Thomas Keck'],
+                           authors=['Thomas Keck, Moritz Gelb'],
                            abstract='Evaluation plots',
                            add_table_of_contents=True).finish()
 
@@ -103,6 +104,7 @@ if __name__ == '__main__':
                               caption='List of variables used in the training: ' + ', '.join(map(format.string, labels)),
                               head=r'Name ' + ' & Rank / Importance ' * len(informations) + r' \\',
                               format_string=r'{} ' + ' & ${} / {:.4f}$ ' * len(informations))
+    sorted_var = {}
     for v in variables:
         l = []
         for information in informations:
@@ -110,8 +112,20 @@ if __name__ == '__main__':
                 l += [list(map(lambda x: x[0], reversed(sorted(information.variables.items(), key=lambda x: x[1])))).index(v),
                       information.variables[v]]
             else:
-                l += ['--', '--']
-        table.add(format.variable(Belle2.invertMakeROOTCompatible(v)), *l)
+                l += [-1, 0]
+            sorted_var[v] = l
+
+    rank = 0
+    for variable in sorted_var.items():
+        for var, list in sorted_var.items():
+            if list[0] == rank:
+                rank += 1
+                table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
+
+    for var, list in sorted_var.items():
+        if list[0] == -1:
+            table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
+
     o += table.finish()
 
     o += b2latex.Section("ROC Plot")

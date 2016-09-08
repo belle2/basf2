@@ -13,15 +13,19 @@ def _from_hists(signalHist, bckgrdHist):
 
 
 def _from_ntuple(ntuple, probability, truth, nbins=100):
-    bckgrdHist = ROOT.TH1D('ROCbackground', 'background', nbins, 0.0, 1.0)
-    signalHist = ROOT.TH1D('ROCsignal', 'signal', nbins, 0.0, 1.0)
+    bckgrdHist = ROOT.TH1D('ROCbackground', '', nbins, 0.0, 1.0)
+    signalHist = ROOT.TH1D('ROCsignal', '', nbins, 0.0, 1.0)
+    signalHist.SetTitle(";Classifier Output;Entries (norm.)")
     bckgrdHist.Sumw2()
     signalHist.Sumw2()
     ntuple.Project('ROCbackground', probability, '!' + truth)
     ntuple.Project('ROCsignal', probability, truth)
     _from_hists(signalHist, bckgrdHist)
+
+    # normalize to 1
     bckgrdHist.Scale(1.0 / bckgrdHist.Integral(), "width")
     signalHist.Scale(1.0 / signalHist.Integral(), "width")
+
     signalHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = signalHist
     bckgrdHist.ROOT_OBJECT_OWNERSHIP_WORKAROUND = bckgrdHist
     return signalHist, bckgrdHist
@@ -70,19 +74,39 @@ def from_file(train_rootfile, test_rootfile, probabilities, truths, labels, outp
     canvas.cd()
 
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
-    legend = ROOT.TLegend(0.1, 0.7, 0.48, 0.9)
+    legend_left = ROOT.TLegend(0.15, 0.77, 0.45, 0.9)
+    legend_left.SetBorderSize(0)
+    legend_left.SetFillColor(0)
+    legend_left.SetFillStyle(0)
+    legend_left.SetTextFont(42)
+    legend_left.SetTextSize(0.03)
+
+    legend_right = ROOT.TLegend(0.47, 0.77, 0.77, 0.9)
+    legend_right.SetBorderSize(0)
+    legend_right.SetFillColor(0)
+    legend_right.SetFillStyle(0)
+    legend_right.SetTextFont(42)
+    legend_right.SetTextSize(0.03)
 
     for i, (probability, truth, label) in enumerate(zip(probabilities, truths, labels)):
-        signalHist, bckgrdHist = _from_ntuple(train_ntuple, probability, truth)
-        drawSignal(signalHist, i)
-        drawBckgrd(bckgrdHist, i)
-        legend.AddEntry(signalHist, "(Train) Signal " + label, "f")
-        legend.AddEntry(bckgrdHist, "(Train) Background " + label, "f")
-        signalHist, bckgrdHist = _from_ntuple(test_ntuple, probability, truth)
-        drawSignal(signalHist, i+1)
-        drawBckgrd(bckgrdHist, i+1)
-        legend.AddEntry(signalHist, "(Test) Signal " + label, "f")
-        legend.AddEntry(bckgrdHist, "(Test) Background " + label, "f")
-    legend.Draw("same")
+        signalHist_train, bckgrdHist_train = _from_ntuple(train_ntuple, probability, truth)
+        drawSignal(signalHist_train, i)
+        drawBckgrd(bckgrdHist_train, i)
+        legend_left.SetHeader(label)
+        legend_left.AddEntry(signalHist_train, "Signal (training set)", "f")
+        legend_left.AddEntry(bckgrdHist_train, "Background (training set)", "f")
+
+        signalHist_test, bckgrdHist_test = _from_ntuple(test_ntuple, probability, truth)
+        drawSignal(signalHist_test, i + 1)
+        drawBckgrd(bckgrdHist_test, i + 1)
+        # Kolmogorov-Smirnov test
+        kv_signal = signalHist_train.KolmogorovTest(signalHist_test)
+        kv_bckgrd = bckgrdHist_train.KolmogorovTest(bckgrdHist_test)
+        legend_right.SetHeader("KS test   Signal (Background):   " + str(kv_signal) + " (" + str(kv_bckgrd) + ")")
+        legend_right.AddEntry(signalHist_test, "Signal (test set)", "f")
+        legend_right.AddEntry(bckgrdHist_test, "Background (test set)", "f")
+
+    legend_left.Draw("same")
+    legend_right.Draw("same")
 
     canvas.SaveAs(outputfilename)

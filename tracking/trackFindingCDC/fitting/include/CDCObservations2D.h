@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <Eigen/Dense>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
@@ -25,6 +22,7 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
+#include <Eigen/Dense>
 #include <iterator>
 
 namespace Belle2 {
@@ -65,7 +63,7 @@ namespace Belle2 {
       static double getPseudoDriftLengthVariance(const double driftLength,
                                                  const double driftLengthVariance)
       {
-        return square(driftLength) + driftLengthVariance;
+        return driftLength * driftLength + driftLengthVariance;
       }
 
       /// Calculate the pseudo variance from the drift length and its variance.

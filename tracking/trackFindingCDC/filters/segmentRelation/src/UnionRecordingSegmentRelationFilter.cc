@@ -20,7 +20,7 @@ std::vector<std::string>
 UnionRecordingSegmentRelationFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {});
+  varSetNames.insert(varSetNames.end(), {"fit"});
   return varSetNames;
 }
 
@@ -30,10 +30,11 @@ UnionRecordingSegmentRelationFilter::createVarSet(const std::string& name) const
 {
   // if (name == "basic") {
   //   return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new CDCSegmentRelationBasicVarSet());
-  // } else if (name == "truth") {
-  //   return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new CDCSegmentRelationTruthVarSet());
-  // } else {
-  return Super::createVarSet(name);
-  // }
+  //} else
+  if (name == "fit") {
+    return std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >(new FitSegmentRelationVarSet);
+  } else {
+    return Super::createVarSet(name);
+  }
 
 }

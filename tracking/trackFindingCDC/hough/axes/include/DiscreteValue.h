@@ -9,13 +9,10 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/numerics/numerics.h>
-
 #include <framework/logging/Logger.h>
-#include <functional>
 
 #include <vector>
-#include <cassert>
+#include <iostream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

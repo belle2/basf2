@@ -153,20 +153,6 @@ namespace Belle2 {
       const CDCRecoHit2D* operator->() const
       { return this; }
 
-      /**
-       *  Return the wire line assoziated with the reconstructed  two dimensional hit.
-       *  The two dimensional reconstructed hit stores only the displacement at the reference position.
-       *  Like the wire is related to its reference position, the reconstructed position represents many possible
-       *  three dimensional positions. This method returns a line parallel to the wire moved by the reconstructed
-       *  displacement. This line represents all possible three dimensional reconstructed positions.
-       *
-       *  Note : This is not optimal yet. In computation steps as well as the correctness of the line.
-       *  It could be corrected for flight time and in wire delays. The effect of this adjustments might
-       *  be worth while investigating.
-       */
-      WireLine getWireLine() const
-      { return getWire().getWireLine().movedBy(getRecoDisp2D()); }
-
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
       { return getRLWireHit().getStereoKind(); }

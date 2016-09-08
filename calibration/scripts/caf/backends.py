@@ -113,10 +113,13 @@ class Local(Backend):
         # Check if we have any valid input files
         existing_input_files = []
         for input_file_path in job.input_files:
-            if os.path.exists(input_file_path):
-                existing_input_files.append(input_file_path)
+            if input_file_path[:7] != "root://":
+                if os.path.exists(input_file_path):
+                    existing_input_files.append(input_file_path)
+                else:
+                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
             else:
-                print("Requested input file {0} can't be found, it will be skipped!".format(input_file_path))
+                existing_input_files.append(input_file_path)
 
         if existing_input_files:
             # Now make a python file in our input sandbox containing a list of these valid files

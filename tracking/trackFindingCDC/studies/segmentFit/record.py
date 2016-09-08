@@ -9,20 +9,19 @@ from ROOT import std
 
 import os
 import sys
-import numpy as np
 
-from tracking.run.event_generation import StandardEventGenerationRun
-from tracking.run.mixins import BrowseTFileOnTerminateRunMixin
-
-from tracking.utilities import NonstrictChoices
+from tracking.run.utilities import NonstrictChoices
 from tracking.validation.utilities import prob, is_primary
 from tracking.validation.plot import ValidationPlot
 
 import tracking.harvest.peelers as peelers
 import tracking.harvest.harvesting as harvesting
 import tracking.harvest.refiners as refiners
+from tracking.harvest.run import HarvestingRun
 
 import trackfindingcdc.harvest.cdc_peelers as cdc_peelers
+
+import argparse
 
 import logging
 
@@ -30,24 +29,40 @@ import logging
 def get_logger():
     return logging.getLogger(__name__)
 
-
 CONTACT = "oliver.frost@desy.de"
 
 
-class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
+class SegmentFitValidationRun(HarvestingRun):
     n_events = 10000
     generator_module = "simple_gun"  # Rather high momentum tracks should make the tracks rather straight.
     monte_carlo = "no"
     karimaki_fit = False
     flight_time_estimation = "none"
     flight_time_reestimation = False
-    use_alpha_in_drift_length = False
+    use_alpha_in_drift_length = True
     flight_time_mass_scale = float("nan")
 
-    fit_positions = "rlDriftCircle"
+    fit_positions = "recoPos"
     fit_variance = "proper"
 
-    output_file_name = "SegmentFitValidation.root"  # Specification for BrowseTFileOnTerminateRunMixin
+    @property
+    def output_file_name(self):
+        file_name = "karimaki" if self.karimaki_fit else "riemann"
+        file_name += "-mc-" + self.monte_carlo
+        if self.flight_time_reestimation:
+            file_name += "-re"
+        if self.root_input_file:
+            file_name += "-" + os.path.split(self.root_input_file)[1]
+        else:
+            file_name += ".root"
+
+        return file_name
+
+    def harvesting_module(self, path=None):
+        harvesting_module = SegmentFitValidationModule(self.output_file_name)
+        if path:
+            path.add_module(harvesting_module)
+        return harvesting_module
 
     def create_argument_parser(self, **kwds):
         argument_parser = super().create_argument_parser(**kwds)
@@ -139,7 +154,8 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
         path = super().create_path()
 
         path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation=self.flight_time_estimation)
+                        flightTimeEstimation=self.flight_time_estimation,
+                        UseNLoops=0.5)
 
         if self.monte_carlo == "no":
             # MC free - default
@@ -156,6 +172,7 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
         elif self.monte_carlo == "full":
             # Only true monte carlo segments, but make the positions realistic
             path.add_module("SegmentCreatorMCTruth",
+                            reconstructedDriftLength=False,
                             reconstructedPositions=True)
 
         else:
@@ -169,8 +186,6 @@ class SegmentFitValidationRun(BrowseTFileOnTerminateRunMixin, StandardEventGener
                         updateDriftLength=self.flight_time_reestimation,
                         useAlphaInDriftLength=self.use_alpha_in_drift_length,
                         tofMassScale=self.flight_time_mass_scale)
-
-        path.add_module(SegmentFitValidationModule(self.output_file_name))
 
         return path
 
@@ -229,36 +244,32 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
-    save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
+    # save_histograms = refiners.save_histograms(outlier_z_score=5.0, allow_discrete=True)
     save_tree = refiners.save_tree()
 
     save_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=False,
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0,
+        aux_names=["tan_lambda_truth", "curvature_truth"],
+        groupby=[
+            "stereo_kind",
+            "superlayer_id"
+        ],
+        outlier_z_score=4.0,
         title_postfix="")
 
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",
         unit="1/cm",
         absolute=True,
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0,
+        aux_names=["tan_lambda_truth", "curvature_truth"],
+        groupby=[
+            "stereo_kind",
+            "superlayer_id"
+        ],
+        outlier_z_score=4.0,
         title_postfix="")
-
-    save_curvature_pull_by_tan_lambda = refiners.save_profiles(
-        x="tan_lambda_truth",
-        y="curvature_pull",
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0)
-
-    save_curvature_residual_by_tan_lambda = refiners.save_profiles(
-        x="tan_lambda_truth",
-        y="curvature_residual",
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        outlier_z_score=5.0)
 
     save_fit_quality_histograms = refiners.save_histograms(
         outlier_z_score=5.0,
@@ -271,24 +282,6 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         groupby=[None, "stereo_kind", "superlayer_id"],
         title="Histogram of {part_name}{stacked_by_indication}{stackby}",
         description="Distribution of {part_name} in the segment fits",
-    )
-
-    save_fit_quality_by_tan_lambda_profiles = refiners.save_profiles(
-        select={
-            'curvature_residual': 'curvature residual',
-            "p_value": "fit p-value",
-            "tan_lambda_truth": "true tan #lambda",
-        },
-        groupby=[None, "stereo_kind", "superlayer_id"],
-        y=["curvature residual", "fit p-value"],
-        x="true tan #lambda",
-        check=("The {y_part_name} should be essentially the same over"
-               "the whole range of the tan lambda spectrum"),
-        description=("Investigating the reconstruction quality for different "
-                     "tan lambda regions of the CDC. Most notably is the superlayer dependency."
-                     "For stereo superlayers the curve is not flat but has distinct slope."),
-        title="Profile of {y_part_name} by {x_part_name}",
-        fit='line',
     )
 
 

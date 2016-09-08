@@ -49,7 +49,7 @@ RFOutputServer::RFOutputServer(string conffile)
   m_proc = new RFProcessManager(nodename);
 
   // 5. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());

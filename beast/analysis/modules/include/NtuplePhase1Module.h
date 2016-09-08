@@ -131,6 +131,9 @@ namespace Belle2 {
     std::vector<Float_t> m_input_sigma_LER; /**< LER beam size and errors */
     std::vector<Float_t> m_input_sigma_HER; /**< HER beam size and errors */
 
+    Double_t m_input_data_bunchNb_LER; /**< LER bunch number and error */
+    Double_t m_input_data_bunchNb_HER; /**< HER bunch number and error */
+
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TChain* m_tree = 0;            /**< tree pointer */
     std::string m_inputFileName;  /**< input file name */

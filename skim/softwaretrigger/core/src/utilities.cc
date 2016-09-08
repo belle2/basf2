@@ -14,7 +14,7 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     double getThetaOfNegativeTrackWithMaximumRhoInEvent()
     {
-      StoreObjPtr<ParticleList> pionParticles("pion+:hlt");
+      StoreObjPtr<ParticleList> pionParticles("pi+:HLT");
 
       if (pionParticles.isValid()) {
         const Particle* trackWithMaximumRho = getElementWithMaximumRho<Particle>(pionParticles);
@@ -30,9 +30,12 @@ namespace Belle2 {
             }
           }
         }
+
+        return -1;
+      } else {
+        B2FATAL("You are using a list of pre scales although the pion list is not present! This is currently not possible.");
       }
 
-      return -1;
     }
 
     const ECLCluster* getECLCluster(const Particle& particle, const bool fromTrack)
@@ -48,7 +51,6 @@ namespace Belle2 {
                                                  const StoreObjPtr<ParticleList>& gammas,
                                                  const double belowLimit)
     {
-      const ECLCluster* eclClusterWithMaximumRho = nullptr;
       double maximumRho = -1.;
 
       for (const Particle& particle : *pions) {
@@ -65,7 +67,6 @@ namespace Belle2 {
 
         if (currentRho > maximumRho) {
           maximumRho = currentRho;
-          eclClusterWithMaximumRho = tmpCluster;
         }
       }
 
@@ -83,7 +84,6 @@ namespace Belle2 {
 
         if (currentRho > maximumRho) {
           maximumRho = currentRho;
-          eclClusterWithMaximumRho = tmpCluster;
         }
       }
 
@@ -113,7 +113,7 @@ namespace Belle2 {
         return false;
       }
 
-      const unsigned int factorSize = preScaleFactors.size();
+      const unsigned long factorSize = preScaleFactors.size();
 
       if (factorSize == 1) {
         return makePreScale(preScaleFactors.front());
@@ -121,11 +121,14 @@ namespace Belle2 {
         const double& theta = getThetaOfNegativeTrackWithMaximumRhoInEvent();
         const double& intervalSize = TMath::Pi() / factorSize;
 
-        B2ASSERT("Theta is negative, something went truly wrong here", theta >= 0);
+        if (theta < 0) {
+          B2WARNING("Theta is negative, something went truly wrong here");
+          return false;
+        }
 
         const unsigned int index = static_cast<unsigned int>(std::floor(theta / intervalSize));
 
-        B2ASSERT("Index is larger than pre scale factor array.", index >= factorSize);
+        B2ASSERT("Index (" << index << ") is larger than pre scale factor array (" << factorSize  << ").", index < factorSize);
 
         return makePreScale(preScaleFactors[index]);
       }

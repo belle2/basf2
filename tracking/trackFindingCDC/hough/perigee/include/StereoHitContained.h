@@ -15,6 +15,8 @@
 #include <tracking/trackFindingCDC/numerics/ESign.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
+#include <numeric>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 

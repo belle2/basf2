@@ -18,6 +18,7 @@
 #include <vector>
 #include <algorithm>
 #include <chrono>
+#include <numeric>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

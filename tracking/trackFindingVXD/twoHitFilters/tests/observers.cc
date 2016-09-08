@@ -838,24 +838,24 @@ namespace VXDTFObserversTest {
 
     /// TODO further tests!
     // the filter was too loose, everything is accepted
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).accept);
-    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).accept);
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11}).accept);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11, 13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{13}).accept);
     // and nothing was rejected...
-    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({11}).reject);
-    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).reject);
-    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult({13}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11, 13}).reject);
+    EXPECT_EQ(0, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{13}).reject);
 
 
     mcCounter.mcIDacceptedRejected.PrintResults("pID");
 
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).accept);
-    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).accept);
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1}).accept);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1, 2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{2}).accept);
 
-    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({1}).reject);
-    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).reject);
-    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult({2}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1, 2}).reject);
+    EXPECT_EQ(0, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{2}).reject);
 
 
     // now we set the filter using values which are too strict
@@ -875,22 +875,22 @@ namespace VXDTFObserversTest {
     EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.size());
 
     // first filter does write into the same container, therefore values didn't change for accepted
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).accept);
-    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).accept);
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11}).accept);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11, 13}).accept);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{13}).accept);
 
     // second filter does reject everything:
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({11}).reject);
-    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult({11, 13}).reject);
-    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult({13}).reject);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11}).reject);
+    EXPECT_EQ(3, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{11, 13}).reject);
+    EXPECT_EQ(1, mcCounter.pdGacceptedRejected.ReturnResult(CountContainer::Particles{13}).reject);
 
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).accept);
-    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).accept);
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1}).accept);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1, 2}).accept);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{2}).accept);
 
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({1}).reject);
-    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult({1, 2}).reject);
-    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult({2}).reject);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1}).reject);
+    EXPECT_EQ(3, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{1, 2}).reject);
+    EXPECT_EQ(1, mcCounter.mcIDacceptedRejected.ReturnResult(CountContainer::Particles{2}).reject);
 
   }
 

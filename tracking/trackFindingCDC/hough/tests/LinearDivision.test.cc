@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 
 #include <gtest/gtest.h>
+#include <cmath>
 
 using namespace std;
 

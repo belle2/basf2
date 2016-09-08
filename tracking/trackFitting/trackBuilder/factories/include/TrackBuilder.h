@@ -66,10 +66,12 @@ namespace Belle2 {
      * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult.
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
      *
-     * @param recoTrack
+     * @param recoTrack:
+     * @param useClosestHitInIP: Flag to turn on special handling which measurement "
+    "to choose; especially useful for Cosmics
      * @return
      */
-    bool storeTrackFromRecoTrack(RecoTrack& recoTrack);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP = false);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

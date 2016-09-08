@@ -11,6 +11,7 @@
 /* Belle2 headers. */
 #include <eklm/simulation/Digitizer.h>
 #include <framework/gearbox/GearDir.h>
+#include <cmath>
 
 using namespace Belle2;
 

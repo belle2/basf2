@@ -12,6 +12,9 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+
 namespace genfit {
   class TrackCand;
 }
@@ -19,13 +22,8 @@ namespace genfit {
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCFacetSegment;
     class CDCTangentSegment;
-    class CDCRLWireHitSegment;
     class CDCWireHitSegment;
-
-    class CDCFacet;
-    class CDCTangent;
 
     /// A segment consisting of two dimensional reconsturcted hits.
     class CDCRecoSegment2D : public CDCSegment<CDCRecoHit2D> {

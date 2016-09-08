@@ -57,32 +57,6 @@ namespace {
 
   }
 
-
-  void createFacetSegment(const CDCRLWireHitSegment& rlWireHitSegment,
-                          CDCFacetSegment& facetSegment)
-  {
-    size_t nRLWireHits = rlWireHitSegment.size();
-    if (nRLWireHits < 3) return;
-
-    facetSegment.reserve(nRLWireHits - 2);
-
-    // Make tangents from pairs of hits along the segment.
-    transform_adjacent_triples(rlWireHitSegment.begin(), rlWireHitSegment.end(),
-                               back_inserter(facetSegment),
-                               [](const CDCRLWireHit & firstRLWireHit,
-                                  const CDCRLWireHit & secondRLWireHit,
-    const CDCRLWireHit & thirdRLWireHit) {
-      return CDCFacet(firstRLWireHit, secondRLWireHit, thirdRLWireHit);
-    });
-
-    if (facetSegment.size() + 2 != rlWireHitSegment.size()) {
-      B2ERROR("Wrong number of facets created.");
-    }
-
-  }
-
-
-
   template<class ATangentRange>
   CDCRecoSegment2D condenseTangentSegment(const ATangentRange& tangentSegment)
   {
@@ -261,10 +235,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   if (rlWireHitSegment.size() < 3) {
     return reconstructUsingTangents(rlWireHitSegment);
   } else {
-    CDCFacetSegment facetSegment;
-    createFacetSegment(rlWireHitSegment, facetSegment);
-    facetSegment.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
-    facetSegment.setAliasScore(rlWireHitSegment.getAliasScore());
+    CDCFacetSegment facetSegment = CDCFacetSegment::create(rlWireHitSegment);
     return condense(facetSegment);
   }
 }

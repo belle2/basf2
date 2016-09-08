@@ -41,9 +41,6 @@ EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   registerMCParticleRelation(particleToSimHits);
 }
 
-//-----------------------------------------------------
-// Method invoked for every step in sensitive detector
-//-----------------------------------------------------
 bool EKLM::EKLMSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
   int stripLevel = 1;

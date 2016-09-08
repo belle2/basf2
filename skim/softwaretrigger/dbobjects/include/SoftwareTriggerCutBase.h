@@ -11,18 +11,29 @@
 #include <vector>
 
 namespace Belle2 {
+  /**
+   * Base class for the SoftwareTriggerCut and its DBRepresentation. This is needed as we do not want to upload the
+   * GeneralCut with all of its pointers to the database, but rather decompile the cut back into a string before
+   * and compile it again after down- and upload. This base class hosts all the properties that are common to both
+   * implementations, which is the pre scale factor list and the cut type (rehect or accept).
+   *
+   * Please refer to the child classes (especially to SoftwareTriggerCut) for mroe information.
+   */
   class SoftwareTriggerCutBase {
   public:
+    /// Create a new base instance. This should rarely be called by yourself.
     SoftwareTriggerCutBase(const std::vector<unsigned int>& preScaleFactor = {1}, const bool& isRejectCut = false) :
       m_preScaleFactor(preScaleFactor), m_isRejectCut(isRejectCut)
     {
     }
 
+    /// Return the list of pre scale factors.
     const std::vector<unsigned int>& getPreScaleFactor() const
     {
       return m_preScaleFactor;
     }
 
+    /// Returns true, if the cut is a reject cut and false otherwise.
     bool isRejectCut() const
     {
       return m_isRejectCut;

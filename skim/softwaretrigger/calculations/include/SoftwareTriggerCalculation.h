@@ -37,18 +37,24 @@ namespace Belle2 {
       /**
        * Function to write out debug output into the given TTree.
        * Needs an already prefilled calculationResult for this
-       * (probably using the fillInCalculations function).
+       * (probably using the doCalculation function).
        */
       void writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree);
 
+      /**
+       * Function to write out debug output into the given StoreObject.
+       * Needs an already prefilled calculationResult for this
+       * (probably using the fillInCalculations function).
+       * All added variables are prefixed with the given prefix string.
+       */
       void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariable>& storeObject, const std::string& prefix);
 
       /**
        * Main function of this class: calculate the needed variables using the
-       * implemented doCalculation function of the given algorithm and write out
+       * overwritten doCalculation function and write out
        * the values into the results object (with their names).
        *
-       * Please make sure to override the variables! Otherwise is can happen that their
+       * Please make sure to override (or clear) the variables! Otherwise it can happen that their
        * old values are still in the object.
        *
        * What variables exactly are added to the result depends on the implementation
@@ -56,6 +62,7 @@ namespace Belle2 {
        */
       const SoftwareTriggerObject& fillInCalculations();
 
+      /// Override this function to implement your calculation.
       virtual void doCalculation(SoftwareTriggerObject& m_calculationResult) const = 0;
 
     private:

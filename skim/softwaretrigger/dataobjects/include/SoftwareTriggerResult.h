@@ -35,6 +35,10 @@ namespace Belle2 {
       /// Return the cut result with the given name or throw an error if no result is there.
       SoftwareTriggerCutResult getResult(const std::string& triggerIdentifier) const;
 
+      /**
+       * Return all stored cut tags with their results as a map identifier -> cut result.
+       * Please be aware that the cut result is an integer (because of ROOT reasons).
+       */
       const std::map<std::string, int>& getResults() const
       {
         return m_results;

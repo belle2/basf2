@@ -35,8 +35,10 @@ namespace Belle2 {
        * create a new SoftwareTriggerCut.
        * @param cut_string: The string from which the cut should be compiled. Must be in a format, the GeneralCut::compile function understands.
        * @param prescaleFactor: An optional prescale factor which will be used whenever the cut is checked.
-       *        If the prescale is e.g. 10, the cut will only result in a "accept" result (although the cut condition
-       *        itself is true) in 1 of 10 cases on average for accept cuts (for reject cuts, the prescale is *not* used).
+       *        The prescale factor is a list of integer values. Using more than one value in this list is a special
+       *        case and is described below. If the prescale is e.g. 10, the cut will only result in a "accept" result
+       *        (although the cut condition itself is true) in 1 of 10 cases on average for accept cuts
+       *        (for reject cuts, the prescale is *not* used).
        *        Defaults to 1, which means that the prescale has no impact on the cut check.
        * @param rejectCut: Turn this cut into a reject cut and not a accept cut. The result of the SoftwareTriggerModules
        *        is defined by these two cut types. See the SoftwareTriggerModule for more information. Please note that
@@ -73,11 +75,19 @@ namespace Belle2 {
        * it returns "noResult".
        * The SoftwareTriggerModule will not pass this event if the result is
        * "dismiss", in all other cases it depends on the other loaded cuts.
+       *
+       * If you give in a list of pre scale factors with a length above 1, you need to have a particle list of
+       * pions (name pi+:HLT) in your data store - otherwise the cut can not be evaluated. It will search for the
+       * negative charged pion (= track) with the largest momentum in the CMS frame and use the theta of this track.
+       * Then, the theta range vom 0 to pi is split up in as many intervals as you have elements in your preScaleFactor
+       * list and the one element, where the calculated theta value belongs to is taken. This is more or less only
+       * useful for ee-events, where a prescaling dependent on theta can make the theta distribution more uniform.
        */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
                                                          const std::vector<unsigned int>& prescaleFactor = {1},
                                                          const bool rejectCut = false);
 
+      /** Shortcut constructor to not use a list of preScaleFactors. The rest is the same as in the normal costructor. */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
                                                          const unsigned int prescaleFactor,
                                                          const bool rejectCut = false)

@@ -13,9 +13,9 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     /// Enumeration with all possible results of the SoftwareTriggerCut.
     enum class SoftwareTriggerCutResult {
-      c_reject, /**< Reject this event. */
-      c_accept, /**< Accept this event. */
-      c_noResult /**< This cut did not give any information on what to do with the event. */
+      c_reject = -1, /**< Reject this event. */
+      c_accept = 1, /**< Accept this event. */
+      c_noResult = 0 /**< There were not enough information to decide on what to do with the event. */
     };
   }
 }

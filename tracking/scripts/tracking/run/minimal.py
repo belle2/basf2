@@ -59,8 +59,8 @@ class EmptyRun(object):
             if value is None:
                 continue
             if hasattr(self, key):
-                setattr(self, key, value)
                 get_logger().info("Setting %s to %s", key, value)
+                setattr(self, key, value)
 
     def create_argument_parser(self, **kwds):
         argument_parser = utilities.ArgumentParser(description=self.description, **kwds)

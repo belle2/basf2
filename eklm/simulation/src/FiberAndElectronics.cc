@@ -8,8 +8,10 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <string>
+
 /* External headers. */
-#include <boost/lexical_cast.hpp>
 #include <TH1D.h>
 #include <TFile.h>
 
@@ -116,7 +118,7 @@ void EKLM::FiberAndElectronics::setHitRange(
 {
   m_hit = it;
   m_hitEnd = end;
-  m_stripName = "Strip" + boost::lexical_cast<std::string>(it->first);
+  m_stripName = "Strip" + std::to_string(it->first);
 }
 
 void EKLM::FiberAndElectronics::processEntry()
@@ -441,7 +443,7 @@ void EKLM::FiberAndElectronics::debugOutput()
     histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
   }
   std::string filename = m_stripName +
-                         boost::lexical_cast<std::string>(gRandom->Integer(10000000)) + ".root";
+                         std::to_string(gRandom->Integer(10000000)) + ".root";
   try {
     hfile = new TFile(filename.c_str(), "NEW");
   } catch (std::bad_alloc& ba) {

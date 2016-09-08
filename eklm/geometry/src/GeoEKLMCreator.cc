@@ -15,7 +15,6 @@
 #include <string>
 
 /* External headers. */
-#include <boost/format.hpp>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <G4Box.hh>
 #include <G4Tubs.hh>

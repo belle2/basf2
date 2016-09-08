@@ -214,7 +214,11 @@ namespace Belle2 {
 
       /// Getter for the position in the reference plane.
       Vector2D getRecoPos2D() const
-      { return getRecoDisp2D() + getWireHit().getRefPos2D(); }
+      { return getRecoDisp2D() + getRefPos2D(); }
+
+      /// Setter for the position in the reference plane.
+      void setRecoPos2D(const Vector2D& recoPos2D)
+      { m_recoDisp2D = recoPos2D - getRefPos2D(); }
 
       /// Getter for the displacement from the wire reference position.
       const Vector2D& getRecoDisp2D() const

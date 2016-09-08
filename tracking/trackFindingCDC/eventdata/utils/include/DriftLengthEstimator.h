@@ -14,6 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    class CDCFacet;
     class CDCRecoHit2D;
     class CDCRecoSegment2D;
 
@@ -22,6 +23,13 @@ namespace Belle2 {
 
       /// Add the parameters of the estimator to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
+
+      /**
+       *  Reestimate the drift length of all three contained drift circles.
+       *  Using the additional flight direction information the accuracy of the drift length
+       *  can be increased alot helping the filters following this step
+       */
+      void updateDriftLength(CDCFacet& facet);
 
       /// Update the drift length of the reconstructed hit in place.
       void updateDriftLength(CDCRecoHit2D& recoHit2D);

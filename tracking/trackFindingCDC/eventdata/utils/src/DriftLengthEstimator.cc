@@ -10,6 +10,7 @@
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
@@ -31,6 +32,52 @@ void DriftLengthEstimator::exposeParameters(ModuleParamList* moduleParamList, co
                                 m_param_tofMassScale,
                                 "Mass to estimate the velocity in the flight time to the hit",
                                 m_param_tofMassScale);
+}
+
+
+/**
+ *  Reestimate the drift length of all three contained drift circles.
+ *  Using the additional flight direction information the accuracy of the drift length
+ *  can be increased alot helping the filters following this step
+ */
+void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
+{
+  CDC::RealisticTDCCountTranslator tdcCountTranslator;
+  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
+
+  const UncertainParameterLine2D& line = facet.getFitLine();
+  Vector2D flightDirection = line->tangential();
+  Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
+  const double alpha = centralPos2D.angleWith(flightDirection);
+
+  auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
+    const CDCWire& wire = rlWireHit.getWire();
+    const CDCHit* hit = rlWireHit.getWireHit().getHit();
+    const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
+    const double beta = 1;
+    double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+    double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                                           wire.getWireID(),
+                                                           flightTimeEstimate,
+                                                           rl,
+                                                           wire.getRefZ(),
+                                                           alpha);
+    rlWireHit.setRefDriftLength(driftLength);
+  };
+
+  doUpdate(facet.getStartRLWireHit(), facet.getStartRecoPos2D());
+  doUpdate(facet.getMiddleRLWireHit(), facet.getMiddleRecoPos2D());
+  doUpdate(facet.getEndRLWireHit(), facet.getEndRecoPos2D());
+
+  // More accurate implementation
+  // double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
+  // facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
+
+  // double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
+  // facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
+
+  // double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
+  // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
 }
 
 void DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)

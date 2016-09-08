@@ -69,13 +69,11 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double startToEndLength = startToEndTangentialVector.norm();
   const double middleToEndLength = middleToEndTangentialVector.norm();
 
-  const double startCos = startToMiddleTangentialVector.cosWith(startToEndTangentialVector);
-  const double middleCos = startToMiddleTangentialVector.cosWith(middleToEndTangentialVector);
-  const double endCos = startToEndTangentialVector.cosWith(middleToEndTangentialVector);
+  const double startPhi = startToMiddleTangentialVector.angleWith(startToEndTangentialVector);
+  const double middlePhi = startToMiddleTangentialVector.angleWith(middleToEndTangentialVector);
+  const double endPhi = startToEndTangentialVector.angleWith(middleToEndTangentialVector);
 
-  const double startPhi = acos(startCos);
-  const double middlePhi = acos(middleCos);
-  const double endPhi = acos(endCos);
+  const double alpha = startToEndLine.at(0.5).angleWith(startToEndTangentialVector);
 
   const double startToMiddleSigmaPhi = startDriftLengthSigma / startToMiddleLength;
   const double startToEndSigmaPhi = startDriftLengthSigma / startToEndLength;
@@ -102,8 +100,8 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double middlePhiPull = middlePhi / middlePhiSigma;
   const double endPhiPull = endPhi / endPhiSigma;
 
-  const double curv = middlePhi / startToEndLength;
-  const double curvSigma = middlePhiSigma / startToEndLength;
+  const double curv = 2 * middlePhi / startToEndLength;
+  const double curvSigma = 2 * middlePhiSigma / startToEndLength;
   const double curvPull = middlePhiPull / startToEndLength;
 
   var<named("start_phi")>() = startPhi;
@@ -123,6 +121,9 @@ bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("end_phi_pull")>() = endPhiPull;
   var<named("end_d")>() = endDistance;
   var<named("end_chi2")>() = endChi2;
+
+  var<named("s")>() = startToEndLength;
+  var<named("alpha")>() = alpha;
 
   var<named("curv")>() = curv;
   var<named("curv_sigma")>() = curvSigma;

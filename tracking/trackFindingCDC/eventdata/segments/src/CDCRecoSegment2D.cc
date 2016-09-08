@@ -198,7 +198,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegm
   const std::vector<CDCTangent>& tangents = tangentSegment;
   CDCRecoSegment2D segment2D = ::condenseTangentSegment(tangents);
   segment2D.setTrajectory2D(tangentSegment.getTrajectory2D());
-  segment2D.setMayAlias(tangentSegment.getMayAlias());
+  segment2D.setAliasScore(tangentSegment.getAliasScore());
   return segment2D;
 }
 
@@ -212,7 +212,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
   const std::vector<CDCFacet>& facets = facetSegment;
   CDCRecoSegment2D segment2D = ::condenseFacetSegment(facets);
   segment2D.setTrajectory2D(facetSegment.getTrajectory2D());
-  segment2D.setMayAlias(facetSegment.getMayAlias());
+  segment2D.setAliasScore(facetSegment.getAliasScore());
   return segment2D;
 }
 
@@ -224,17 +224,17 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >&
 CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)
 {
   CDCRecoSegment2D result;
-  bool mayAlias = true;
+  double aliasScore = 0;
   for (const CDCRecoSegment2D* ptrSegment2D : segmentPath) {
     assert(ptrSegment2D);
     const CDCRecoSegment2D& segment2D = *ptrSegment2D;
     for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(recoHit2D);
     }
-    mayAlias = mayAlias and segment2D.getMayAlias();
+    aliasScore = aliasScore + segment2D.getAliasScore();
   }
   result.receiveISuperCluster();
-  result.setMayAlias(mayAlias);
+  result.setAliasScore(aliasScore);
   return result;
 }
 
@@ -245,13 +245,13 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSe
     Vector2D zeroDisp2D(0.0, 0.0);
     segment2D.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
     segment2D.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
-    segment2D.setMayAlias(rlWireHitSegment.getMayAlias());
+    segment2D.setAliasScore(rlWireHitSegment.getAliasScore());
     return segment2D;
   } else {
     CDCTangentSegment tangentSegment;
     createTangentSegment(rlWireHitSegment, tangentSegment);
     tangentSegment.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
-    tangentSegment.setMayAlias(rlWireHitSegment.getMayAlias());
+    tangentSegment.setAliasScore(rlWireHitSegment.getAliasScore());
     return condense(tangentSegment);
   }
 }
@@ -264,7 +264,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
     CDCFacetSegment facetSegment;
     createFacetSegment(rlWireHitSegment, facetSegment);
     facetSegment.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
-    facetSegment.setMayAlias(rlWireHitSegment.getMayAlias());
+    facetSegment.setAliasScore(rlWireHitSegment.getAliasScore());
     return condense(facetSegment);
   }
 }
@@ -285,7 +285,7 @@ CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
     wireHitSegment.push_back(&(recoHit2D.getWireHit()));
   }
   wireHitSegment.setTrajectory2D(getTrajectory2D());
-  wireHitSegment.setMayAlias(getMayAlias());
+  wireHitSegment.setAliasScore(getAliasScore());
   return wireHitSegment;
 }
 
@@ -295,7 +295,7 @@ CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
   for (const CDCRecoHit2D& recoHit2D : *this) {
     segment.push_back(recoHit2D.getAlias());
   }
-  segment.setMayAlias(getMayAlias());
+  segment.setAliasScore(getAliasScore());
   return segment;
 }
 
@@ -307,7 +307,7 @@ CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
     rlWireHitSegment.push_back(recoHit2D.getRLWireHit());
   }
   rlWireHitSegment.setTrajectory2D(getTrajectory2D());
-  rlWireHitSegment.setMayAlias(getMayAlias());
+  rlWireHitSegment.setAliasScore(getAliasScore());
   return rlWireHitSegment;
 }
 
@@ -336,7 +336,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
 
   reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
   reverseSegment.m_automatonCell = m_automatonCell;
-  reverseSegment.setMayAlias(getMayAlias());
+  reverseSegment.setAliasScore(getAliasScore());
   return reverseSegment;
 }
 

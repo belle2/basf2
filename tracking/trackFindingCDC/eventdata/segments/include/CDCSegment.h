@@ -74,15 +74,15 @@ namespace Belle2 {
       }
 
       /// Getter for the flag that this segment may have an aliased version
-      bool getMayAlias() const
+      double getAliasScore() const
       {
-        return m_mayAlias;
+        return m_aliasScore;
       }
 
       /// Setter for the flag that this segment may have an aliased version
-      void setMayAlias(bool mayAlias)
+      void setAliasScore(double aliasScore)
       {
-        m_mayAlias = mayAlias;
+        m_aliasScore = aliasScore;
       }
 
     private:
@@ -90,7 +90,7 @@ namespace Belle2 {
       mutable CDCTrajectory2D m_trajectory2D;
 
       /// Boolean flag to indicate that this segment has a valid alias version
-      bool m_mayAlias;
+      double m_aliasScore;
 
     }; //class
 

@@ -10,6 +10,7 @@
 
 #include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <TVector3.h>
+#include <numeric>
 
 namespace Belle2 {
   namespace SoftwareTrigger {

@@ -27,6 +27,7 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 
   ISuperLayer superlayerID = facet.getISuperLayer();
 
+
   const CDCRLWireHit& startRLWirehit = facet.getStartRLWireHit();
   const double startDriftLength = startRLWirehit.getSignedRefDriftLength();
   const double startDriftLengthVar = startRLWirehit.getRefDriftLengthVariance();
@@ -42,6 +43,16 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   const double endDriftLengthVar = endRLWirehit.getRefDriftLengthVariance();
   const double endDriftLengthSigma = sqrt(endDriftLengthVar);
 
+  const ERightLeft startRLInfo = facet.getStartRLInfo();
+  const ERightLeft middleRLInfo = facet.getMiddleRLInfo();
+  const ERightLeft endRLInfo = facet.getEndRLInfo();
+  CDCRLWireHitTriple::Shape shape = facet.getShape();
+  short oClockDelta = shape.getOClockDelta();
+  short cellExtend = shape.getCellExtend();
+  const short stableTwist = -sign(shape.getOClockDelta()) * middleRLInfo;
+  const bool startToMiddleIsCrossing = startRLInfo != middleRLInfo;
+  const bool middleToEndIsCrossing = middleRLInfo != endRLInfo;
+
   var<named("superlayer_id")>() = superlayerID;
 
   var<named("start_layer_id")>() = facet.getStartWire().getILayer();
@@ -56,5 +67,9 @@ bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
   var<named("end_drift_length")>() = endDriftLength;
   var<named("end_drift_length_sigma")>() = endDriftLengthSigma;
 
+  var<named("oclock_delta")>() = oClockDelta;
+  var<named("twist")>() = stableTwist;
+  var<named("cell_extend")>() = cellExtend;
+  var<named("n_crossing")>() = startToMiddleIsCrossing + middleToEndIsCrossing;
   return true;
 }

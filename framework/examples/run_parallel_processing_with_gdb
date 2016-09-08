@@ -1,6 +1,3 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-
 #!/usr/bin/env bash
 
 if [ $# -lt 1 ]
@@ -24,7 +21,7 @@ do
     #stop after first fail
     if ! jobs %% >/dev/null
     then
-      continue 2
+      break 2
     fi
 
     #sleep 1

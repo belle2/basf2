@@ -18,6 +18,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentExporter.h>
 
@@ -57,6 +58,7 @@ namespace Belle2 {
         addProcessingSignalListener(&m_segmentMerger);
 
         addProcessingSignalListener(&m_segmentFitter);
+        addProcessingSignalListener(&m_segmentAliasResolver);
         addProcessingSignalListener(&m_segmentOrienter);
         addProcessingSignalListener(&m_segmentExporter);
 
@@ -84,6 +86,7 @@ namespace Belle2 {
         // FIXME : make parameter names small
 
         m_segmentFitter.exposeParameters(moduleParamList, prefix);
+        m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
         m_segmentOrienter.exposeParameters(moduleParamList, prefix);
         m_segmentExporter.exposeParameters(moduleParamList, prefix);
 
@@ -121,9 +124,10 @@ namespace Belle2 {
         m_clusterBackgroundDetector.apply(m_clusters);
         m_facetCreator.apply(m_clusters, m_facets);
         m_facetRelationCreator.apply(m_facets, m_facetRelations);
-        m_segmentCreatorFacetAutomaton.apply(m_facets,  m_facetRelations, m_segments);
+        m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
         m_segmentMerger.apply(m_segments, m_mergedSegments);
         m_segmentFitter.apply(m_mergedSegments);
+        m_segmentAliasResolver.apply(m_mergedSegments);
         m_segmentOrienter.apply(m_mergedSegments, outputSegments);
         m_segmentExporter.apply(outputSegments);
 
@@ -161,6 +165,9 @@ namespace Belle2 {
 
       /// Fits the generated segments
       SegmentFitter m_segmentFitter;
+
+      /// Resolves ambiguous right left information alias segments and hits
+      SegmentAliasResolver m_segmentAliasResolver;
 
       /// Adjustes the orientation of the generated segments to a prefered direction of flight
       SegmentOrienter m_segmentOrienter;

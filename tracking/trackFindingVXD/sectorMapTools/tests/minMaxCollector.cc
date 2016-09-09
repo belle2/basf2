@@ -148,8 +148,6 @@ namespace VXDTFMinMaxCollectorTest {
   /** fill MinMaxCollector and a std::vector and compare results */
   TEST_F(MinMaxCollectorTest, ComparisonWithClassicApproach)
   {
-    gRandom->SetSeed(23);
-
     auto newCollector = MinMaxCollector<double>(0.03);
 
     auto vectorCollector = std::vector<double>();
@@ -266,8 +264,8 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.0005);
-    EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
+    EXPECT_EQ(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second, 0.0005);
 
 
 
@@ -287,8 +285,8 @@ namespace VXDTFMinMaxCollectorTest {
     EXPECT_EQ(vectorCollector.back(), newCollector.getMinMax(0., 1.).second);
     EXPECT_EQ(vectorCollector.at(getIndex(0.01)), newCollector.getMinMax(0.01, 0.99).first);
     EXPECT_EQ(vectorCollector.at(getIndex(0.99)), newCollector.getMinMax(0.01, 0.99).second);
-    EXPECT_NEAR(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first, 0.0001);
-    EXPECT_EQ(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second);
+    EXPECT_EQ(vectorCollector.at(getIndex(0.022)), newCollector.getMinMax(0.022, 0.978).first);
+    EXPECT_NEAR(vectorCollector.at(getIndex(0.978)), newCollector.getMinMax(0.022, 0.978).second, 0.0001);
   }
 }
 

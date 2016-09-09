@@ -632,10 +632,10 @@ namespace Belle2 {
       ScaleFacBG_HER[i] = 0;
       ScaleFacBG_LER[i] = 0;
       double iP_HER = 0;
-      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(ordering[i]) * 0.00750062 * 1e9;
+      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(ordering[i] - 1) * 0.00750062 * 1e9;
       if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
       double iP_LER = 0;
-      if (m_beast.SKB_LER_pressures != 0) iP_LER = m_beast.SKB_LER_pressures->at(ordering[i]) * 0.00750062 * 1e9;
+      if (m_beast.SKB_LER_pressures != 0) iP_LER = m_beast.SKB_LER_pressures->at(ordering[i] - 1) * 0.00750062 * 1e9;
       if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
       if (iP_HER < 0) iP_HER = 0;
       if (iP_LER < 0) iP_LER = 0;

@@ -125,7 +125,7 @@ namespace Belle2 {
     double volume = 0.;
     double rho = 0.;
     double mass = 0.;
-    const double RadConv = 6.24e7; // 1 rad = 6.24e7 MeV/kg
+    const double RadConv = 6.24e7; // 1 mrad = 6.24e7 MeV/kg
 
     // check files
     TDirectory* dirh = gDirectory;
@@ -621,14 +621,15 @@ namespace Belle2 {
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBG_HER[12];
     double ScaleFacBG_LER[12];
+    double ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
     for (int i = 0; i < 12; i++) {
       ScaleFacBG_HER[i] = 0;
       ScaleFacBG_LER[i] = 0;
       double iP_HER = 0;
-      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9;
+      if (m_beast.SKB_HER_pressures != 0) iP_HER = m_beast.SKB_HER_pressures->at(ordering[i]) * 0.00750062 * 1e9;
       if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
       double iP_LER = 0;
-      if (m_beast.SKB_LER_pressures != 0) iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9;
+      if (m_beast.SKB_LER_pressures != 0) iP_LER = m_beast.SKB_LER_pressures->at(ordering[i]) * 0.00750062 * 1e9;
       if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
       if (iP_HER < 0) iP_HER = 0;
       if (iP_LER < 0) iP_LER = 0;

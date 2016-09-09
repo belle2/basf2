@@ -55,7 +55,7 @@ ECLLocalMaximumFinderModule::ECLLocalMaximumFinderModule() : Module(),
   addParam("isTrainingMode", m_isTrainingMode,
            "Run in training mode (i.e. fill file with MVA input variables and determine MC truth of LM.).", 0);
   addParam("outfileName", m_outfileName, "Output file name for training file.", std::string("ECLLocalMaximumFinderOutput.root"));
-  addParam("method", m_method, "Method to determine the LM (cut, none, fastbdt).", std::string("cut"));
+  addParam("method", m_method, "Method to determine the LM (cut, none, fastbdt).", std::string("none"));
   addParam("truthFraction", m_truthFraction, "Minimum matched energy fraction truth/rec for the LM.", 0.51);
   addParam("cutOffset", m_cutOffset, "Cut method specific: Offset.", 1.40);
   addParam("cutSlope", m_cutSlope, "Cut method specific: Slope.", 3.0);

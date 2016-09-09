@@ -17,23 +17,7 @@ namespace Belle2 {
   namespace SoftwareTrigger {
 
     /// Base class for the cut tests.
-    class SoftwareTriggerCutTest : public ::testing::Test {
-      /// Set the random seed to a known value.
-      void SetUp()
-      {
-        m_savedSeed = gRandom->GetSeed();
-        gRandom->SetSeed(42);
-      }
-
-      /// Reset the random seed.
-      void TearDown()
-      {
-        gRandom->SetSeed(m_savedSeed);
-      }
-
-      /// Internal storage for the random seed before this test.
-      unsigned int m_savedSeed = 0;
-    };
+    class SoftwareTriggerCutTest : public ::testing::Test {};
 
     /** Test simple cuts without prescales. */
     TEST_F(SoftwareTriggerCutTest, basic)
@@ -97,8 +81,8 @@ namespace Belle2 {
       }
 
       // More or less 1 out of 10...
-      EXPECT_EQ(numberOfYes, 115);
-      EXPECT_EQ(numberOfNo, 885);
+      EXPECT_EQ(numberOfYes, 101);
+      EXPECT_EQ(numberOfNo, 899);
     }
   }
 }

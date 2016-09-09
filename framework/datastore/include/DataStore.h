@@ -657,5 +657,5 @@ namespace Belle2 {
     DependencyMap* m_dependencyMap;
   };
 
-  ADD_BITMASK_OPERATORS(DataStore::EStoreFlags);
+  ADD_BITMASK_OPERATORS(DataStore::EStoreFlags); /**< Add bitmask operators to DataStore::EStoreFlags. */
 } // namespace Belle2

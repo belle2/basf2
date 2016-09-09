@@ -59,6 +59,7 @@ class ParticleStatisticsModule(basf2.Module):
     """Collect statistics on particles - also parallel processable"""
 
     def __init__(self):
+        """set module flags"""
         super().__init__()
         self.set_property_flags(
             basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED |

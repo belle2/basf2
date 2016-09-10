@@ -67,6 +67,8 @@ namespace Belle2 {
     bool m_writeToRoot; /**< if true, a rootFile named by m_rootFileName will be filled with info */
     bool m_doTracking; /**< if true, info on tracking will be stored, job will fail if doTracking==1 and the tracking modules are not enabled at phyton level */
     bool m_doPureCsIStudy; /**< if true, info on pureCsI upgrade is stored*/
+    bool m_doSimulation; /**< if true, info on Hits and SimHits is stored*/
+    bool m_doMC; /**< if true, MC info is stored*/
     std::string m_pure_clusters; /**< Pure CsI clusters StoreArray name*/
     std::string m_pure_digits; /**< Pure CsI digits StoreArray name*/
     std::string m_pure_cal_digits; /**< Pure CsI cal digits StoreArray name*/
@@ -297,16 +299,16 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerR; /**< Shower R */
     std::vector<double>* m_eclShowerNHits; /**< Shower NHits */
     std::vector<double>* m_eclShowerE9oE25; /**< Shower E9oE25 */
-    std::vector<double>* m_eclShowerTime; /**< Shower Time */
-    std::vector<int>* m_eclShowerConnectedRegionId;
+    std::vector<double>* m_eclShowerTime;
+    std::vector<double>* m_eclShowerConnectedRegionId;
     std::vector<int>* m_eclShowerHypothesisId;
     std::vector<int>* m_eclShowerCentralCellId;
     std::vector<double>* m_eclShowerEnergyError;
-    std::vector<double>*   m_eclShowerThetaError;
-    std::vector<double>*   m_eclShowerPhiError;
-    std::vector<double>*   m_eclShowerTimeResolution;
-    std::vector<double>*   m_eclShowerHighestEnergy;
-    std::vector<double>*   m_eclShowerLateralEnergy;
+    std::vector<double>* m_eclShowerThetaError;
+    std::vector<double>* m_eclShowerPhiError;
+    std::vector<double>* m_eclShowerTimeResolution;
+    std::vector<double>* m_eclShowerHighestEnergy;
+    std::vector<double>* m_eclShowerLateralEnergy;
     std::vector<double>* m_eclShowerMinTrkDistance;
     std::vector<double>* m_eclShowerTrkDepth;
     std::vector<double>* m_eclShowerShowerDepth;
@@ -316,9 +318,11 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerAbsZernike51;
     std::vector<double>* m_eclShowerAbsZernike53;
     std::vector<double>* m_eclShowerSecondMoment;
-    std::vector<double>*   m_eclShowerE1oE9;
-    std::vector<int>*   m_eclShowerIsTrack;
-    std::vector<bool>*   m_eclShowerIsCluster;
+    std::vector<double>* m_eclShowerE1oE9;
+    std::vector<int>* m_eclShowerIsTrack;
+    std::vector<bool>* m_eclShowerIsCluster;
+    std::vector<int>*   m_eclShowerMCVtxInEcl;
+    std::vector<double>*   m_eclShowerHighestE1mE2;
 
 
     int m_mcMultip; /**< Multiplicity of MCParticles */

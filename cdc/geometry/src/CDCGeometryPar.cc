@@ -235,7 +235,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
-    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
   } else {
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
@@ -479,7 +480,8 @@ void CDCGeometryPar::read()
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
-    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
   } else {
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
@@ -495,7 +497,8 @@ void CDCGeometryPar::read()
   // Get control switch for xt file format
   m_xtFileFormat = gbxParams.getInt("XtFileFormat");
   if (m_xtFileFormat == 0) {
-    B2INFO("CDCGeometryPar: xt-file in old format specified");
+    //    B2INFO("CDCGeometryPar: xt-file in old format specified");
+    B2FATAL("CDCGeometryPar: xt-file format=0 is disabled now.");
   } else if (m_xtFileFormat == 1) {
     B2INFO("CDCGeometryPar: xt-file in new format specified");
   } else {
@@ -505,7 +508,8 @@ void CDCGeometryPar::read()
   // Get control switch for xt file format
   m_sigmaFileFormat = gbxParams.getInt("SigmaFileFormat");
   if (m_sigmaFileFormat == 0) {
-    B2INFO("CDCGeometryPar: sigma-file in old format specified");
+    //    B2INFO("CDCGeometryPar: sigma-file in old format specified");
+    B2FATAL("CDCGeometryPar: sigma-file format=0 is disabled now.");
   } else if (m_sigmaFileFormat == 1) {
     B2INFO("CDCGeometryPar: sigma-file in new format specified");
   } else {

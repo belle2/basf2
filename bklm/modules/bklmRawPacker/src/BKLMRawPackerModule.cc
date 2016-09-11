@@ -76,6 +76,11 @@ void BKLMRawPackerModule::event()
   StoreArray<BKLMDigit> digits;
   vector<uint32_t> data_words[4][4];//4 copper, 16 finesse
   data_words[4][4].clear();
+  for (unsigned int ii = 0; ii < 4; ++ii) {
+    for (unsigned int jj = 0; jj < 4; ++jj) {
+      data_words[ii][jj].clear();
+    }
+  }
   //int tot_num_hits=digits.getEntries();
 
   B2DEBUG(1, "BKLMRawPackerModule:: entries of bklmdigits " << digits.getEntries());

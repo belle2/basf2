@@ -5,9 +5,9 @@ Import('env')
 
 env['LIBS'] = [
     'framework',
-    'skim_softwaretrigger_dataobjects',
-    'skim_softwaretrigger_dbobjects',
-    'skim',
+    'hlt_softwaretrigger_dataobjects',
+    'hlt_softwaretrigger_dbobjects',
+    'hlt',
     '$ROOT_LIBS',
     "framework",
     "tracking_dataobjects",

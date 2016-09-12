@@ -2,6 +2,6 @@ Import('env')
 
 # env['CONTINUE'] = False
 
-env['LIBS'] = ['framework','skim_hlt_dataobjects']
+env['LIBS'] = ['framework','hlt_hlt_dataobjects']
 
 Return('env')

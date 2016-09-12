@@ -11,7 +11,7 @@
 #ifndef FCCluster_H
 #define FCCluster_H
 
-#include "skim/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FTList.h"
 #include <TVector3.h>
 
 namespace Belle2 {

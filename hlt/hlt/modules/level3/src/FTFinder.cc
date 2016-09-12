@@ -13,7 +13,7 @@
 #include "framework/datastore/StoreArray.h"
 #include "cdc/geometry/CDCGeometryPar.h"
 #include "cdc/dataobjects/CDCHit.h"
-#include "skim/hlt/modules/level3/FTFinder.h"
+#include "hlt/hlt/modules/level3/FTFinder.h"
 
 using namespace Belle2;
 using namespace L3;

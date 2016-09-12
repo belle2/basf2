@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <TTree.h>
 
 namespace Belle2 {

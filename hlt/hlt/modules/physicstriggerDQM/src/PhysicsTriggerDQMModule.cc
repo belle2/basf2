@@ -5,8 +5,8 @@
 // Author : Chunhua LI,
 // Date : 4 - March - 2015
 //-
-#include <skim/hlt/modules/physicstriggerDQM/PhysicsTriggerDQMModule.h>
-#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
+#include <hlt/hlt/modules/physicstriggerDQM/PhysicsTriggerDQMModule.h>
+#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 using namespace std;
 using namespace Belle2;

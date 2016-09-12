@@ -17,10 +17,10 @@
 
 #include "cdc/geometry/CDCGeometryPar.h"
 //#include "mdst/dataobjects/MCParticle.h"
-#include "skim/hlt/modules/level3/FTLayer.h"
-#include "skim/hlt/modules/level3/FTSuperLayer.h"
-#include "skim/hlt/modules/level3/FTList.h"
-#include "skim/hlt/modules/level3/Lpav.h"
+#include "hlt/hlt/modules/level3/FTLayer.h"
+#include "hlt/hlt/modules/level3/FTSuperLayer.h"
+#include "hlt/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/Lpav.h"
 #include "TVectorD.h"
 
 namespace Belle2 {

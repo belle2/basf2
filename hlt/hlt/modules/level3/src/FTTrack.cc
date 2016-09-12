@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "skim/hlt/modules/level3/FTTrack.h"
-#include "skim/hlt/modules/level3/FTSegment.h"
-#include "skim/hlt/modules/level3/FTFinder.h"
+#include "hlt/hlt/modules/level3/FTTrack.h"
+#include "hlt/hlt/modules/level3/FTSegment.h"
+#include "hlt/hlt/modules/level3/FTFinder.h"
 
 using namespace Belle2;
 using namespace L3;

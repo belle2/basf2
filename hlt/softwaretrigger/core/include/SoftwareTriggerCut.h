@@ -10,8 +10,8 @@
 #pragma once
 
 #include <framework/utilities/GeneralCut.h>
-#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/logging/Logger.h>
 

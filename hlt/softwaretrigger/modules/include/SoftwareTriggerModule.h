@@ -2,10 +2,10 @@
 
 #include <framework/core/Module.h>
 
-#include <skim/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
-#include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
-#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
-#include <skim/softwaretrigger/core/SoftwareTriggerDBHandler.h>
+#include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+#include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
+#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 #include <vector>
 #include <string>

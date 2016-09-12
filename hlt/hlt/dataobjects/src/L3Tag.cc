@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/hlt/dataobjects/L3Tag.h>
+#include <hlt/hlt/dataobjects/L3Tag.h>
 
 using namespace Belle2;
 

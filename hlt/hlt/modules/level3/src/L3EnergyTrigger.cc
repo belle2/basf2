@@ -9,11 +9,11 @@
  **************************************************************************/
 
 #include "framework/datastore/StoreArray.h"
-#include "skim/hlt/dataobjects/L3Tag.h"
-//#include "skim/hlt/dataobjects/L3Cluster.h"
-#include "skim/hlt/modules/level3/FCFinder.h"
-#include "skim/hlt/modules/level3/FCCluster.h"
-#include "skim/hlt/modules/level3/L3EnergyTrigger.h"
+#include "hlt/hlt/dataobjects/L3Tag.h"
+//#include "hlt/hlt/dataobjects/L3Cluster.h"
+#include "hlt/hlt/modules/level3/FCFinder.h"
+#include "hlt/hlt/modules/level3/FCCluster.h"
+#include "hlt/hlt/modules/level3/L3EnergyTrigger.h"
 #include <cmath>
 
 using namespace Belle2;

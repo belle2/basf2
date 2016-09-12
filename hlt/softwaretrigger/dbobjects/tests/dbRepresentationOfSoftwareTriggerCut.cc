@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/softwaretrigger/core/SoftwareTriggerDBHandler.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <boost/filesystem.hpp>

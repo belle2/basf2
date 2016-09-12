@@ -1,4 +1,4 @@
-#include <skim/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 
 using namespace Belle2;
 using namespace SoftwareTrigger;

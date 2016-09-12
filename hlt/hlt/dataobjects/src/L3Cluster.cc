@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/hlt/dataobjects/L3Cluster.h>
+#include <hlt/hlt/dataobjects/L3Cluster.h>
 
 using namespace Belle2;
 

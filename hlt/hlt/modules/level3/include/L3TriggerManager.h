@@ -11,7 +11,7 @@
 #ifndef L3TRIGGERMANAGER_H
 #define L3TRIGGERMANAGER_H
 
-#include "skim/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FTList.h"
 
 namespace Belle2 {
   class L3TriggerBase;

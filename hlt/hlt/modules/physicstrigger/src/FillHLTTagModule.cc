@@ -9,8 +9,8 @@
  **************************************************************************/
 
 // own include
-#include <skim/hlt/modules/physicstrigger/FillHLTTagModule.h>
-#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
+#include <hlt/hlt/modules/physicstrigger/FillHLTTagModule.h>
+#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>

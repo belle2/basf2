@@ -13,8 +13,8 @@
 
 #include <string>
 
-#include "skim/hlt/modules/level3/FTList.h"
-#include "skim/hlt/modules/level3/FCCrystal.h"
+#include "hlt/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FCCrystal.h"
 
 namespace Belle2 {
 

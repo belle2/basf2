@@ -15,7 +15,7 @@
 
 // user include files
 //#include "TMatrixDSym.h"
-#include "skim/hlt/modules/level3/Lpar.h"
+#include "hlt/hlt/modules/level3/Lpar.h"
 
 namespace Belle2 {
   namespace L3 {

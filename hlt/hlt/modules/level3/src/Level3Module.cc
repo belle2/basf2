@@ -8,19 +8,19 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include "skim/hlt/modules/level3/Level3Module.h"
-#include "skim/hlt/modules/level3/FTFinder.h"
-#include "skim/hlt/modules/level3/FCFinder.h"
-#include "skim/hlt/modules/level3/FCCluster.h"
+#include "hlt/hlt/modules/level3/Level3Module.h"
+#include "hlt/hlt/modules/level3/FTFinder.h"
+#include "hlt/hlt/modules/level3/FCFinder.h"
+#include "hlt/hlt/modules/level3/FCCluster.h"
 
 #include "framework/datastore/StoreArray.h"
 #include "framework/datastore/RelationArray.h"
-#include "skim/hlt/dataobjects/L3Tag.h"
-#include "skim/hlt/dataobjects/L3Track.h"
-#include "skim/hlt/dataobjects/L3Cluster.h"
+#include "hlt/hlt/dataobjects/L3Tag.h"
+#include "hlt/hlt/dataobjects/L3Track.h"
+#include "hlt/hlt/dataobjects/L3Cluster.h"
 
-#include "skim/hlt/modules/level3/L3TrackTrigger.h"
-#include "skim/hlt/modules/level3/L3EnergyTrigger.h"
+#include "hlt/hlt/modules/level3/L3TrackTrigger.h"
+#include "hlt/hlt/modules/level3/L3EnergyTrigger.h"
 
 using namespace Belle2;
 

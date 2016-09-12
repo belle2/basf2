@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
+#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 //using namespace std;
 using namespace Belle2;

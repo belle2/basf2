@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <skim/softwaretrigger/core/SoftwareTriggerCut.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>

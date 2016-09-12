@@ -12,9 +12,9 @@
 #define LEVEL3MODULE_H
 
 #include <framework/core/Module.h>
-#include "skim/hlt/modules/level3/L3TrackTrigger.h"
-#include "skim/hlt/modules/level3/L3TriggerManager.h"
-#include "skim/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/L3TrackTrigger.h"
+#include "hlt/hlt/modules/level3/L3TriggerManager.h"
+#include "hlt/hlt/modules/level3/FTList.h"
 
 namespace Belle2 {
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/L1Emulator/dataobjects/L1EmulationInformation.h>
+#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 
 //using namespace std;
 using namespace Belle2;

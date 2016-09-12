@@ -13,7 +13,7 @@
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/VariableManager/Utility.h>
 #include <framework/core/Module.h>
-#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
+#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
 #include <string>
 #include <memory>

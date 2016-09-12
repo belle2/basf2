@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/softwaretrigger/calculations/FastRecoCalculator.h>
+#include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <TVector3.h>
 
 namespace Belle2 {

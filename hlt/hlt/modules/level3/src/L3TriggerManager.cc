@@ -11,12 +11,12 @@
 #include <framework/logging/Logger.h>
 #include <framework/datastore/StoreArray.h>
 
-#include "skim/hlt/modules/level3/L3TriggerManager.h"
-#include "skim/hlt/dataobjects/L3Tag.h"
+#include "hlt/hlt/modules/level3/L3TriggerManager.h"
+#include "hlt/hlt/dataobjects/L3Tag.h"
 #include "mdst/dataobjects/HLTTag.h"
 
-#include "skim/hlt/modules/level3/L3TrackTrigger.h"
-#include "skim/hlt/modules/level3/L3EnergyTrigger.h"
+#include "hlt/hlt/modules/level3/L3TrackTrigger.h"
+#include "hlt/hlt/modules/level3/L3EnergyTrigger.h"
 
 using namespace Belle2;
 

@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <skim/softwaretrigger/core/SoftwareTriggerCut.h>
-#include <skim/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
+#include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
 

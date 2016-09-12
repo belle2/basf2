@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <skim/softwaretrigger/core/SoftwareTriggerObject.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerObject.h>
 
 #include <memory>
 

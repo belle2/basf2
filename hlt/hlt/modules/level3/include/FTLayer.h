@@ -13,7 +13,7 @@
 
 #include <cmath>
 
-#include "skim/hlt/modules/level3/FTSuperLayer.h"
+#include "hlt/hlt/modules/level3/FTSuperLayer.h"
 
 namespace Belle2 {
 

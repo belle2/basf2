@@ -12,7 +12,7 @@
 #define L3TRIGGERBASE_H
 
 #include <cstring>
-#include "skim/hlt/dataobjects/L3Tag.h"
+#include "hlt/hlt/dataobjects/L3Tag.h"
 
 namespace Belle2 {
 

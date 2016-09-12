@@ -14,11 +14,11 @@
 #include <TVectorD.h>
 #include <TVector3.h>
 
-#include "skim/hlt/modules/level3/Lpav.h"
-#include "skim/hlt/modules/level3/Zav.h"
+#include "hlt/hlt/modules/level3/Lpav.h"
+#include "hlt/hlt/modules/level3/Zav.h"
 
-#include "skim/hlt/modules/level3/FTList.h"
-#include "skim/hlt/modules/level3/FTSegment.h"
+#include "hlt/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FTSegment.h"
 
 namespace Belle2 {
 

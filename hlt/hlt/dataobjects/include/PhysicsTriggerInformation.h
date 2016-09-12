@@ -11,7 +11,7 @@
 
 #pragma once
 
-//#include <skim/hlt/dataobjects/PhysicsTriggerInformation.h>
+//#include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 #include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {

@@ -9,8 +9,8 @@
  **************************************************************************/
 
 // own include
-#include <skim/L1Emulator/modules/L1Emulation/L1EmulationPrintModule.h>
-#include <skim/L1Emulator/dataobjects/L1EmulationInformation.h>
+#include <hlt/L1Emulator/modules/L1Emulation/L1EmulationPrintModule.h>
+#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>

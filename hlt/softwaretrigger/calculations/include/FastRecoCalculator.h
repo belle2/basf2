@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <analysis/utility/PCmsLabTransform.h>

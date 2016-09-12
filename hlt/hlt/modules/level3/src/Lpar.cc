@@ -10,7 +10,7 @@
 
 #include <iostream>
 #include <cmath>
-#include "skim/hlt/modules/level3/Lpar.h"
+#include "hlt/hlt/modules/level3/Lpar.h"
 
 using namespace Belle2;
 using namespace L3;

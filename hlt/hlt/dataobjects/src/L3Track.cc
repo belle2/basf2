@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/hlt/dataobjects/L3Track.h>
+#include <hlt/hlt/dataobjects/L3Track.h>
 
 using namespace Belle2;
 

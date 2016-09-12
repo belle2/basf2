@@ -1,4 +1,4 @@
-#include <skim/softwaretrigger/modules/SoftwareTriggerModule.h>
+#include <hlt/softwaretrigger/modules/SoftwareTriggerModule.h>
 #include <TFile.h>
 
 using namespace Belle2;

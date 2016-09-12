@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <skim/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <skim/softwaretrigger/core/SoftwareTriggerCut.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <gtest/gtest.h>
 
 using namespace std;

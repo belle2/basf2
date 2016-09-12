@@ -9,10 +9,10 @@
  **************************************************************************/
 
 #include <cmath>
-#include "skim/hlt/modules/level3/FTSegment.h"
-#include "skim/hlt/modules/level3/FTTrack.h"
-#include "skim/hlt/modules/level3/FTWire.h"
-#include "skim/hlt/modules/level3/FTSuperLayer.h"
+#include "hlt/hlt/modules/level3/FTSegment.h"
+#include "hlt/hlt/modules/level3/FTTrack.h"
+#include "hlt/hlt/modules/level3/FTWire.h"
+#include "hlt/hlt/modules/level3/FTSuperLayer.h"
 
 using namespace Belle2;
 using namespace L3;

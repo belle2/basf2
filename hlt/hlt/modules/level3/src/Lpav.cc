@@ -12,7 +12,7 @@
 #include <iostream>
 
 // user include files
-#include "skim/hlt/modules/level3/Lpav.h"
+#include "hlt/hlt/modules/level3/Lpav.h"
 #include "framework/logging/Logger.h"
 
 using namespace Belle2;

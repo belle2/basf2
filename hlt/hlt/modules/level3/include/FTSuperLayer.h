@@ -11,7 +11,7 @@
 #ifndef FTSuperLayer_H
 #define FTSuperLayer_H
 
-#include "skim/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FTList.h"
 
 namespace Belle2 {
 

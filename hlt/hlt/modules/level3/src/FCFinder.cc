@@ -10,8 +10,8 @@
 
 #include <fstream>
 
-#include "skim/hlt/modules/level3/FCFinder.h"
-#include "skim/hlt/modules/level3/FCCluster.h"
+#include "hlt/hlt/modules/level3/FCFinder.h"
+#include "hlt/hlt/modules/level3/FCCluster.h"
 
 #include "ecl/geometry/ECLGeometryPar.h"
 #include "framework/datastore/StoreArray.h"

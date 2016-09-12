@@ -12,11 +12,11 @@
 #define FTFinder_H
 
 #include <TVector3.h>
-#include "skim/hlt/modules/level3/FTList.h"
-#include "skim/hlt/modules/level3/FTWire.h"
-#include "skim/hlt/modules/level3/FTTrack.h"
-#include "skim/hlt/modules/level3/FTLayer.h"
-#include "skim/hlt/modules/level3/FTSuperLayer.h"
+#include "hlt/hlt/modules/level3/FTList.h"
+#include "hlt/hlt/modules/level3/FTWire.h"
+#include "hlt/hlt/modules/level3/FTTrack.h"
+#include "hlt/hlt/modules/level3/FTLayer.h"
+#include "hlt/hlt/modules/level3/FTSuperLayer.h"
 
 namespace Belle2 {
 

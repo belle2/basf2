@@ -11,7 +11,7 @@
 #ifndef L3TRACKTRIGGER_H
 #define L3TRACKTRIGGER_H
 
-#include "skim/hlt/modules/level3/L3TriggerBase.h"
+#include "hlt/hlt/modules/level3/L3TriggerBase.h"
 
 namespace Belle2 {
 

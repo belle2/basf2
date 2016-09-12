@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import basf2_mva
-from basf2_mva_evaluation import roc_plot, diag_plot, distribution_plot, overtraining_plot
+from basf2_mva_evaluation import plotting, histogram
 import argparse
 import tempfile
 
@@ -24,9 +24,9 @@ def getCommandLineOptions():
     parser = argparse.ArgumentParser()
     parser.add_argument('-id', '--identifiers', dest='identifiers', type=str, required=True, action='append', nargs='+',
                         help='DB Identifier or weightfile')
-    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, required=True, action='append', nargs='+',
+    parser.add_argument('-train', '--train_datafiles', dest='train_datafiles', type=str, required=False, action='append', nargs='+',
                         help='Data file containing ROOT TTree used during training')
-    parser.add_argument('-test', '--test_datafiles', dest='test_datafiles', type=str, required=False, action='append', nargs='+',
+    parser.add_argument('-data', '--datafiles', dest='datafiles', type=str, required=True, action='append', nargs='+',
                         help='Data file containing ROOT TTree with independent test data')
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
@@ -60,103 +60,125 @@ class WeightfileInformation:
         self.branch_target = Belle2.makeROOTCompatible(identifier + '_' + self.general_options.m_target_variable)
 
 
+def tree2dict(tree, tree_columns, dict_columns=None):
+    if dict_columns is None:
+        dict_columns = tree_columns
+    d = {column: np.zeros((tree.GetEntries(),)) for column in dict_columns}
+    for iEvent, event in enumerate(tree):
+        for dict_column, tree_column in zip(dict_columns, tree_columns):
+            d[dict_column][iEvent] = getattr(event, tree_column)
+    return d
+
+
+def apply_experts(informations, datafiles, treename):
+    tempdir = tempfile.mkdtemp()
+    datafiles = sum(datafiles, [])
+    rootfilename = tempdir + '/expert.root'
+    basf2_mva.expert(basf2_mva.vector(*[i.label for i in informations]),
+                     basf2_mva.vector(*datafiles),
+                     treename,
+                     rootfilename)
+    rootfile = ROOT.TFile(rootfilename, "UPDATE")
+    roottree = rootfile.Get("variables")
+    probabilities = tree2dict(roottree, [i.branch_probability for i in informations], [i.label for i in informations])
+    targets = tree2dict(roottree, [i.branch_target for i in informations], [i.label for i in informations])
+    shutil.rmtree(tempdir)
+    return probabilities, targets
+
+
 if __name__ == '__main__':
+
     old_cwd = os.getcwd()
     ROOT.gROOT.SetBatch(True)
     args = getCommandLineOptions()
 
-    tempdir = tempfile.mkdtemp()
     identifiers = sum(args.identifiers, [])
-    train_datafiles = sum(args.train_datafiles, [])
-    if args.test_datafiles is not None:
-        test_datafiles = sum(args.test_datafiles, [])
-    else:
-        test_datafiles = []
-
-    train_rootfilename = tempdir + '/train_expert.root'
-    basf2_mva.expert(basf2_mva.vector(*identifiers), basf2_mva.vector(*train_datafiles), args.treename, train_rootfilename)
-    train_rootfile = ROOT.TFile(train_rootfilename, "UPDATE")
-
-    test_rootfile = None
-    if len(test_datafiles) > 0:
-        test_rootfilename = tempdir + '/test_expert.root'
-        basf2_mva.expert(basf2_mva.vector(*identifiers), basf2_mva.vector(*test_datafiles), args.treename, test_rootfilename)
-        test_rootfile = ROOT.TFile(test_rootfilename, "UPDATE")
-
     informations = [WeightfileInformation(identifier) for identifier in identifiers]
-    branches_target = list(map(lambda x: x.branch_target, informations))
-    branches_probability = list(map(lambda x: x.branch_probability, informations))
+
+    test_probability, test_target = apply_experts(informations, args.datafiles, args.treename)
+    if args.train_datafiles is not None:
+        train_probability, train_target = apply_experts(informations, args.train_datafiles, args.treename)
+    else:
+        train_probability, train_target = None, None
+
     labels = list(map(lambda x: x.label, informations))
     variables = set([v for information in informations for v in information.variables.keys()])
 
+    rootchain = ROOT.TChain(args.treename)
+    for variable_datafile in sum(args.datafiles, []):
+        rootchain.Add(variable_datafile)
+    variables_data = tree2dict(rootchain, variables, [Belle2.invertMakeROOTCompatible(var) for var in variables])
+
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
+    tempdir = tempfile.mkdtemp()
     os.chdir(tempdir)
 
     o = b2latex.LatexFile()
     o += b2latex.TitlePage(title='Automatic MVA Evaluation',
-                           authors=['Thomas Keck, Moritz Gelb'],
+                           authors=['Thomas Keck\\ Moritz Gelb'],
                            abstract='Evaluation plots',
                            add_table_of_contents=True).finish()
 
     o += b2latex.Section("Variables")
-    table = b2latex.LongTable(columnspecs=r'p{5cm}' + r'|rr' * len(informations),
-                              caption='List of variables used in the training: ' + ', '.join(map(format.string, labels)),
-                              head=r'Name ' + ' & Rank / Importance ' * len(informations) + r' \\',
-                              format_string=r'{} ' + ' & ${} / {:.4f}$ ' * len(informations))
-    sorted_var = {}
-    for v in variables:
-        l = []
-        for information in informations:
-            if v in information.variables:
-                l += [list(map(lambda x: x[0], reversed(sorted(information.variables.items(), key=lambda x: x[1])))).index(v),
-                      information.variables[v]]
-            else:
-                l += [-1, 0]
-            sorted_var[v] = l
+    graphics = b2latex.Graphics()
+    p = plotting.Importance()
+    p.add({i.label: np.array([i.variables[v] for v in variables]) for i in informations},
+          identifiers, [Belle2.invertMakeROOTCompatible(var) for var in variables])
+    p.finish()
+    p.save('importance.png')
+    graphics.add('importance.png', width=1.0)
+    o += graphics.finish()
 
-    rank = 0
-    for variable in sorted_var.items():
-        for var, list in sorted_var.items():
-            if list[0] == rank:
-                rank += 1
-                table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
-
-    for var, list in sorted_var.items():
-        if list[0] == -1:
-            table.add(format.variable(Belle2.invertMakeROOTCompatible(var)), *list)
-
-    o += table.finish()
+    graphics = b2latex.Graphics()
+    p = plotting.CorrelationMatrix()
+    p.add(variables_data, [Belle2.invertMakeROOTCompatible(var) for var in variables],
+          test_target[identifiers[0]] == 1,
+          test_target[identifiers[0]] == 0)
+    p.finish()
+    p.save('correlation_signal.png')
+    graphics.add('correlation_signal.png', width=1.0)
+    o += graphics.finish()
 
     o += b2latex.Section("ROC Plot")
     graphics = b2latex.Graphics()
-    roc_plot.from_file(train_rootfile, branches_probability, branches_target, labels, 'roc_plot.png')
-    graphics.add('roc_plot.png', width=1.0)
+    p = plotting.RejectionOverEfficiency()
+    for identifier in identifiers:
+        p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
+    p.finish()
+    p.axis.set_title("ROC Rejection Plot on independent data")
+    p.save('roc_plot_test.png')
+    graphics.add('roc_plot_test.png', width=1.0)
     o += graphics.finish()
 
     o += b2latex.Section("Diagonal Plot")
     graphics = b2latex.Graphics()
-    diag_plot.from_file(train_rootfile, branches_probability, branches_target, labels, 'diagonal_plot.png')
-    graphics.add('diagonal_plot.png', width=1.0)
+    p = plotting.Diagonal()
+    for identifier in identifiers:
+        p.add(test_probability, identifier, test_target[identifier] == 1, test_target[identifier] == 0)
+    p.finish()
+    p.axis.set_title("Diagonal plot on independent data")
+    p.save('diagonal_plot_test.png')
+    graphics.add('diagonal_plot_test.png', width=1.0)
     o += graphics.finish()
 
-    o += b2latex.Section("Distribution Plot")
-    graphics = b2latex.Graphics()
-    distribution_plot.from_file(train_rootfile, branches_probability, branches_target, labels, 'distribution_plot.png')
-    graphics.add('distribution_plot.png', width=1.0)
-    o += graphics.finish()
-
-    o += b2latex.Section("Overtraining Plot")
-    if test_rootfile is not None:
-        for branch_probability, branch_target, label in zip(branches_probability, branches_target, labels):
+    if train_probability is not None:
+        o += b2latex.Section("Overtraining Plot")
+        for identifier in identifiers:
+            probability = {identifier: np.r_[train_probability[identifier], test_probability[identifier]]}
+            target = np.r_[train_target[identifier], test_target[identifier]]
+            train_mask = np.r_[np.ones(len(train_target[identifier])), np.zeros(len(test_target[identifier]))]
             graphics = b2latex.Graphics()
-            filename = 'overtraining_plot_{}.png'.format(hashlib.md5(label.encode('utf-8')).hexdigest())
-            overtraining_plot.from_file(train_rootfile, test_rootfile, [branch_probability],
-                                        [branch_target], [label], filename)
-            graphics.add(filename, width=1.0)
+            p = plotting.Overtraining()
+            p.add(probability, identifier,
+                  train_mask == 1, train_mask == 0,
+                  target == 1, target == 0, )
+            p.finish()
+            p.axis.set_title("Overtraining check for {}".format(identifier))
+            p.save('overtraining_plot.png')
+            graphics.add('overtraining_plot.png', width=1.0)
             o += graphics.finish()
 
-    o.finish()
     o.save('latex.tex', compile=True)
     os.chdir(old_cwd)
     shutil.copy(tempdir + '/latex.pdf', args.outputfile)

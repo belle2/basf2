@@ -9,7 +9,11 @@ import os
 import tempfile
 import subprocess
 import sys
+import shutil
 
+variables = ['p', 'pz', 'daughter(0, p)', 'daughter(0, pz)', 'daughter(1, p)', 'daughter(1, pz)',
+             'chiProb', 'dr', 'dz', 'daughter(0, dr)', 'daughter(1, dr)', 'daughter(0, chiProb)', 'daughter(1, chiProb)',
+             'daughter(0, Kid)', 'daughter(0, piid)', 'daughterAngle(0, 1)']
 
 if __name__ == "__main__":
 
@@ -20,11 +24,11 @@ if __name__ == "__main__":
     general_options = basf2_mva.GeneralOptions()
     general_options.m_datafiles = basf2_mva.vector("train.root")
     general_options.m_treename = "tree"
-    general_options.m_variables = basf2_mva.vector('p', 'pz', 'daughter(0, Kid)')
+    general_options.m_variables = basf2_mva.vector(*variables)
     general_options.m_target_variable = "isSignal"
 
     methods = [
-            ('Trivial.xml', basf2_mva.TrivialOptions()),
+            # ('Trivial.xml', basf2_mva.TrivialOptions()),
             ('FastBDT.xml', basf2_mva.FastBDTOptions()),
             ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
             # ('FANN.xml', basf2_mva.FANNOptions()),
@@ -43,4 +47,8 @@ if __name__ == "__main__":
     basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
                      basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
-    subprocess.call('basf2_mva_evaluate.py -train train.root -test test.root -i ' + ' '.join([i for i, _ in methods]), shell=True)
+    subprocess.call('basf2_mva_evaluate.py -o latex.pdf -train train.root -data test.root -i ' +
+                    ' '.join([i for i, _ in methods]), shell=True)
+
+    os.chdir(olddir)
+    shutil.copyfile(tempdir + '/latex.pdf', 'latex.pdf')

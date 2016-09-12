@@ -4,9 +4,7 @@
 # Thomas Keck 2015
 
 import copy
-
 import numpy
-import pandas
 
 
 def binom_error(n_sig, n_tot):
@@ -49,7 +47,7 @@ class Histograms(object):
         """
         Creates a common binning of the given column of the given pandas.Dataframe,
         and stores for each given mask the histogram of the column
-        @param data pandas.DataFrame containing column and weight_column
+        @param data pandas.DataFrame  like object containing column and weight_column
         @param column string identifiying the column in the pandas.DataFrame which is binned.
         @param masks dictionary of names and boolean arrays, which select the data
                      used for the creation of histograms with these names
@@ -64,8 +62,8 @@ class Histograms(object):
         self.bin_widths = (self.bins - numpy.roll(self.bins, 1))[1:] - 0.00001
         self.hists = dict()
         for name, mask in masks.items():
-            self.hists[name] = numpy.histogram(data.loc[mask, column], bins=self.bins,
-                                               weights=None if weight_column is None else data.loc[mask, weight_column])[0]
+            self.hists[name] = numpy.histogram(data[column][mask], bins=self.bins,
+                                               weights=None if weight_column is None else data[weight_column][mask])[0]
 
     def get_hist(self, name=None):
         """

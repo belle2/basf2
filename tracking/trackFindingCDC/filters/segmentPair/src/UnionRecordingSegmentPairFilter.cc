@@ -28,7 +28,14 @@ UnionRecordingSegmentPairFilter::getValidVarSetNames() const
 std::unique_ptr<BaseVarSet<CDCSegmentPair> >
 UnionRecordingSegmentPairFilter::createVarSet(const std::string& name) const
 {
-  if (name == "fitless") {
+
+  if (name == "basic") {
+    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new BasicSegmentPairVarSet());
+  } else if (name == "hit_gap") {
+    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new HitGapSegmentPairVarSet());
+  } else if (name == "skimmed_hit_gap") {
+    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new SkimmedHitGapSegmentPairVarSet());
+  } else if (name == "fitless") {
     return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new FitlessSegmentPairVarSet());
   } else if (name == "skimmed_fitless") {
     return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new SkimmedFitlessSegmentPairVarSet());

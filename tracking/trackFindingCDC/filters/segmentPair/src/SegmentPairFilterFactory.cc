@@ -40,6 +40,7 @@ SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "all segment pairs are valid"},
     {"truth", "monte carlo truth"},
     {"none", "no segment pair is valid"},
+    {"hit_gap", "multivariat method based on variables of the first and last hit in each segment"},
     {"unionrecording", "record many multiple choosable variable set"},
     {"simple", "mc free with simple criteria"},
     {"fitless", "mc free with simple criteria without the common fit"},
@@ -56,6 +57,8 @@ SegmentPairFilterFactory::create(const std::string& filterName) const
     return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
   } else if (filterName == "truth") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
+  } else if (filterName == "hit_gap") {
+    return std::unique_ptr<Filter<CDCSegmentPair> >(new TMVAHitGapSegmentPairFilter());
   } else if (filterName == "simple") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
   } else if (filterName == "fitless") {

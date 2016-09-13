@@ -7,11 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
-#include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+SkimmedHitGapSegmentPairVarSet::SkimmedHitGapSegmentPairVarSet()
+  : Super()
+{
+}
+
+bool SkimmedHitGapSegmentPairVarSet::accept(const CDCSegmentPair*)
+{
+  if (fabs(var<named("delta_hit_pos_phi")>()) > 1) return false;
+  if (fabs(var<named("delta_hit_alpha")>()) > 1.5) return false;
+  if (var<named("delta_hit_distance")>() < 0) return false;
+  if (var<named("hit_distance")>() > 45) return false;
+  if (var<named("hit_long_distance")>() < 5) return false;
+  if (var<named("hit_forward")>() < -5) return false;
+  return true;
+}

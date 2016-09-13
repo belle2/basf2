@@ -9,9 +9,28 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/varsets/SkimmedVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    /**
+     *  Class that computes floating point variables from segment pairs.
+     *  Is the same as the HitGapSegmentPairVarSet but skimmed for non sensical combinations
+     *  without the expensive common fit.
+     */
+    class  SkimmedHitGapSegmentPairVarSet : public SkimmedVarSet<HitGapSegmentPairVarSet> {
+
+    private:
+      /// Name of the super class.
+      using Super = SkimmedVarSet<HitGapSegmentPairVarSet> ;
+
+    public:
+      /// Construct the varset.
+      explicit SkimmedHitGapSegmentPairVarSet();
+
+      /// Implement the skim cut.
+      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
+    };
+  }
+}

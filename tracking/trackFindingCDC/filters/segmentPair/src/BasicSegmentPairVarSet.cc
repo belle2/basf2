@@ -7,11 +7,24 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+#include <assert.h>
+
+
+using namespace std;
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+BasicSegmentPairVarSet::BasicSegmentPairVarSet()
+  : Super()
+{
+}
+
+bool BasicSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
+{
+  bool extracted = extractNested(ptrSegmentPair);
+  if (not extracted or not ptrSegmentPair) return false;
+
+  var<named("axial_first")>() = ptrSegmentPair->getFromSegment()->isAxial();
+  return true;
+}

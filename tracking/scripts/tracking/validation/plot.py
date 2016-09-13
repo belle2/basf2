@@ -980,7 +980,7 @@ class ValidationPlot(object):
         return plot
 
     @classmethod
-    def convert_tprofile_to_tgrapherrors(cls, tprofile):
+    def convert_tprofile_to_tgrapherrors(cls, tprofile, abs_x=False):
         if isinstance(tprofile, ROOT.TGraph):
             return tprofile
 
@@ -991,6 +991,8 @@ class ValidationPlot(object):
         bin_ids_without_underflow = list(range(1, n_bins + 1))
 
         bin_centers = np.array([x_taxis.GetBinCenter(i_bin) for i_bin in bin_ids_without_underflow])
+        if abs_x:
+            bin_centers = np.abs(bin_centers)
         bin_widths = np.array([x_taxis.GetBinWidth(i_bin) for i_bin in bin_ids_without_underflow])
         bin_x_errors = bin_widths / 2.0
 

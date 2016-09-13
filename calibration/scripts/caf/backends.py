@@ -179,57 +179,92 @@ class PBS(Backend):
     cmd_queue = "#PBS -q"
     cmd_name = "#PBS -N"
 
-    default_config = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    default_config_section = "PBS"
 
-    def __init__(self):
+    required_config = ["Queue", "Release"]
+
+    def __init__(self, config_file_path="", section=""):
         """
         Init method for PBS Backend. Does default setup based on config file.
         """
-        self.config = PBS.default_config
+        if config_file_path and section:
+            self.load_from_config(config_file_path, section)
+        else:
+            self.load_from_config(PBS.default_config_file, PBS.default_config_section)
+        self.basf2_setup = None
 
-    @property
-    def config(self):
+    def load_from_config(self, config_file_path, section):
         """
-        Getter for config object
-        """
-        return self._config
+        Takes a config file path (string) and the relevant section name (string).
+        Checks that the required setup options are set. When loading from a config file you
+        can't have a partially complete list of required options.
 
-    @config.setter
-    def config(self, value):
+        If you want to modify the default setup try changing the public attributes directly.
         """
-        Takes a file path string and sets the self.config attribute to be equal to a
-        ConfigParser object that reads from that file. Also calls the _update_config
-        method so that any attributes that can be changed, will be.
-        """
-        self._config = configparser.ConfigParser()
-        self._config.read(value)
-        self._update_config()
+        if config_file_path and section:
+            if os.path.exists(config_file_path):
+                cp = configparser.ConfigParser()
+                cp.read(config_file_path)
+            else:
+                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
+            if cp.has_section(section):
+                for option in PBS.required_config:
+                    if not cp.has_option(section, option):
+                        B2FATAL(("Tried to load config file but required option {0} "
+                                 "not found in section {1}".format(option, section)))
+            else:
+                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
+        self._update_from_config(cp, section)
 
-    def _update_config(self):
-        setup_name = self.config["PBS"]["Setup"]
-        #: Default PBS queue name used
-        self.default_queue = self.config[setup_name]["Queue"]
+    def _update_from_config(self, config, section):
+        """
+        Sets attributes from a ConfigParser object. Checks for required options should already be done
+        so we can just use them here.
+        """
+        #: queue name for PBS submission
+        self.queue = config[section]["Queue"]
+        #: basf2 release path
+        self.release = config[section]["Release"]
+
+    def _generate_basf2_setup(self):
+        """
+        Creates a list of lines to write into a bash shell script that will setup basf2.
+        Will not be called if the user has set the pbs.basf2_setup attribute themselves.
+        """
+        #: A list of string lines that define how basf2 will be setup on the worker node.
+        #: Can be set explicitly by the user or ignored if the default/user defined config file
+        #: is good enough
+        self.basf2_setup = ["SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                            "CAF_RELEASE_LOCATION="+self.release+"\n",
+                            "source $SETUPBELLE2_CVMFS\n",
+                            "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
+                            "setuprel\n",
+                            "popd > /dev/null\n"]
 
     def _generate_pbs_script(self, job):
+        """
+        Creates the bash shell script that qsub will call. Includes PBD directives
+        and basf2 setup.
+        """
         with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
             batch_file.write("#!/bin/bash\n")
             batch_file.write("# --- Start PBS ---\n")
-            batch_file.write(" ".join([PBS.cmd_queue, self.default_queue])+"\n")
+            batch_file.write(" ".join([PBS.cmd_queue, self.queue])+"\n")
             batch_file.write(" ".join([PBS.cmd_name, job.name])+"\n")
             batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir])+"\n")
             batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
             batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
             batch_file.write("# --- End PBS ---\n")
-            setup_basf2 = ["VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                           "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
-                           "BELLE2_RELEASE_LOC=/data/ddossett/software/release/\n",
-                           "source $SETUPBELLE2_CVMFS\n",
-                           "pushd $BELLE2_RELEASE_LOC > /dev/null\n",
-                           "setuprel\n",
-                           "popd > /dev/null\n"]
-            for line in setup_basf2:
-                batch_file.write(line)
+            self._add_basf2_setup(batch_file)
             batch_file.write(" ".join(job.cmd)+"\n")
+
+    def _add_basf2_setup(self, file):
+        """
+        Adds basf2 setup lines to the PBS shell script file.
+        """
+        for line in self.basf2_setup:
+            file.write(line)
 
     class Result():
         """
@@ -240,9 +275,14 @@ class PBS(Backend):
         """
 
         def __init__(self, job_id):
+            """
+            """
             self.job_id = job_id
 
         def ready(self):
+            """
+            Function that queries qstat to check for jobs that are still running.
+            """
             try:
                 d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
             except subprocess.CalledProcessError as cpe:
@@ -295,6 +335,9 @@ class PBS(Backend):
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
                 pickle.dump(existing_input_files, input_data_file)
 
+        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
+        if not self.basf2_setup:
+            self._generate_basf2_setup()
         self._generate_pbs_script(job)
         result = self._submit_to_qsub(job)
         return result

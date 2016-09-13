@@ -1246,22 +1246,42 @@ class ValidationPlot(object):
             finite_filter &= np.isfinite(ys)
 
         if weights is None:
-            weights = itertools.repeat(1.0)
+            xs = xs[finite_filter]
+            weights = np.ones_like(xs)
         else:
             weights = weights[filter]
             self.add_nan_inf_stats(histogram, 'w', weights)
             finite_filter &= np.isfinite(weights)
+            xs = xs[finite_filter]
+            weights[finite_filter]
+
+        if ys is not None:
+            ys = ys[finite_filter]
 
         # Now fill the actual histogram
-        Fill = histogram.Fill
-        if ys is None:
-            for (x, weight, passes) in zip(xs, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(weight))
+        try:
+            histogram.FillN
+        except AttributeError:
+            Fill = histogram.Fill
+            if ys is None:
+                fill = np.frompyfunc(Fill, 2, 1)
+                fill(xs.astype(np.float64, copy=False),
+                     weights.astype(np.float64, copy=False))
+            else:
+                fill = np.frompyfunc(Fill, 3, 1)
+                fill(xs.astype(np.float64, copy=False),
+                     ys.astype(np.float64, copy=False),
+                     weights.astype(np.float64, copy=False))
         else:
-            for (x, y, weight, passes) in zip(xs, ys, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(y), float(weight))
+            if ys is None:
+                histogram.FillN(len(xs),
+                                xs.astype(np.float64, copy=False),
+                                weights.astype(np.float64, copy=False))
+            else:
+                histogram.FillN(len(xs),
+                                xs.astype(np.float64, copy=False),
+                                ys.astype(np.float64, copy=False),
+                                weights.astype(np.float64, copy=False))
 
         self.set_additional_stats_tf1(histogram)
 

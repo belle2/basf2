@@ -32,6 +32,8 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
   const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
 
+  if (startSegment.size() < 4 or endSegment.size() < 4) return NAN;
+
   const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track

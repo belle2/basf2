@@ -975,12 +975,12 @@ void ECLDataAnalysisModule::event()
       m_eclSimHitPdg->push_back(aECLSimHits->getPDGCode());
       m_eclSimHitEnergyDep->push_back(aECLSimHits->getEnergyDep());
       m_eclSimHitFlightTime->push_back(aECLSimHits->getFlightTime());
-      m_eclSimHitX->push_back(aECLSimHits->getPosition().X());
-      m_eclSimHitY->push_back(aECLSimHits->getPosition().Y());
-      m_eclSimHitZ->push_back(aECLSimHits->getPosition().Z());
-      m_eclSimHitPx->push_back(aECLSimHits->getMomentum().X());
-      m_eclSimHitPy->push_back(aECLSimHits->getMomentum().Y());
-      m_eclSimHitPz->push_back(aECLSimHits->getMomentum().Z());
+      m_eclSimHitX->push_back(aECLSimHits->getPosition().x());
+      m_eclSimHitY->push_back(aECLSimHits->getPosition().y());
+      m_eclSimHitZ->push_back(aECLSimHits->getPosition().z());
+      m_eclSimHitPx->push_back(aECLSimHits->getMomentum().x());
+      m_eclSimHitPy->push_back(aECLSimHits->getMomentum().y());
+      m_eclSimHitPz->push_back(aECLSimHits->getMomentum().z());
 
       if (aECLSimHits->getRelated<MCParticle>() != (nullptr)) {
         const MCParticle* mc_simhit = aECLSimHits->getRelated<MCParticle>();

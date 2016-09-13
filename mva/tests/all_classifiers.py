@@ -31,7 +31,7 @@ if __name__ == "__main__":
             # ('Trivial.xml', basf2_mva.TrivialOptions()),
             ('FastBDT.xml', basf2_mva.FastBDTOptions()),
             ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
-            # ('FANN.xml', basf2_mva.FANNOptions()),
+            ('FANN.xml', basf2_mva.FANNOptions()),
             ]
 
     olddir = os.getcwd()

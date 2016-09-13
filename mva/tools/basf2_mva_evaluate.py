@@ -54,6 +54,7 @@ class WeightfileInformation:
         importances = weightfile.getFeatureImportance()
         #: Variables and importanceses
         self.variables = {k: importances[k] for k in variables}
+        self.description = str(basf2_mva.info(identifier))
 
         #: Branch names as written by the basf2_mva.expert
         self.branch_probability = Belle2.makeROOTCompatible(identifier)
@@ -102,7 +103,8 @@ if __name__ == '__main__':
         train_probability, train_target = None, None
 
     labels = list(map(lambda x: x.label, informations))
-    variables = set([v for information in informations for v in information.variables.keys()])
+    variables = sorted(set([v for information in informations for v in information.variables.keys()]),
+                       key=lambda v: informations[0].variables.get(v, 0.0))
 
     rootchain = ROOT.TChain(args.treename)
     for variable_datafile in sum(args.datafiles, []):
@@ -116,14 +118,26 @@ if __name__ == '__main__':
 
     o = b2latex.LatexFile()
     o += b2latex.TitlePage(title='Automatic MVA Evaluation',
-                           authors=['Thomas Keck\\ Moritz Gelb'],
+                           authors=[r'Thomas Keck\\ Moritz Gelb'],
                            abstract='Evaluation plots',
                            add_table_of_contents=True).finish()
 
+    o += b2latex.Section("Classifiers")
+    o += b2latex.String("""
+        This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree
+    """)
+
+    for information in informations:
+        o += b2latex.SubSection(information.label)
+        o += b2latex.Listing(language='XML').add(information.description).finish()
+
     o += b2latex.Section("Variables")
+    o += b2latex.String("""
+        This section contains an overview of the importance and correlation of the variables used by the classifiers
+    """)
     graphics = b2latex.Graphics()
     p = plotting.Importance()
-    p.add({i.label: np.array([i.variables[v] for v in variables]) for i in informations},
+    p.add({i.label: np.array([i.variables.get(v, 0.0) for v in variables]) for i in informations},
           identifiers, [Belle2.invertMakeROOTCompatible(var) for var in variables])
     p.finish()
     p.save('importance.png')
@@ -141,6 +155,9 @@ if __name__ == '__main__':
     o += graphics.finish()
 
     o += b2latex.Section("ROC Plot")
+    o += b2latex.String("""
+        This section contains the receiver operating characteristics (ROC) of the classifiers on training and independent data
+    """)
     graphics = b2latex.Graphics()
     p = plotting.RejectionOverEfficiency()
     for identifier in identifiers:
@@ -150,6 +167,19 @@ if __name__ == '__main__':
     p.save('roc_plot_test.png')
     graphics.add('roc_plot_test.png', width=1.0)
     o += graphics.finish()
+
+    if train_probability is not None:
+        graphics = b2latex.Graphics()
+        p = plotting.Multiplot(plotting.RejectionOverEfficiency, len(identifiers))
+        for i, identifier in enumerate(identifiers):
+            p.add(i, train_probability, identifier, train_target[identifier] == 1,
+                  train_target[identifier] == 0, label=identifier + ' (train)')
+            p.add(i, test_probability, identifier, test_target[identifier] == 1,
+                  test_target[identifier] == 0, label=identifier + ' (test)')
+        p.finish()
+        p.save('roc_multiplot_test.png')
+        graphics.add('roc_multiplot_test.png', width=1.0)
+        o += graphics.finish()
 
     o += b2latex.Section("Diagonal Plot")
     graphics = b2latex.Graphics()

@@ -6,6 +6,7 @@ env['TOOLS_LIBS']['basf2_mva_expert'] = ['stdc++', 'framework', 'mva', 'mva_data
 env['TOOLS_LIBS']['basf2_mva_extract'] = ['stdc++', 'framework', 'mva', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS']
 env['TOOLS_LIBS']['basf2_mva_upload'] = ['stdc++', 'framework', 'mva', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS']
 env['TOOLS_LIBS']['basf2_mva_download'] = ['stdc++', 'framework', 'mva', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS']
+env['TOOLS_LIBS']['basf2_mva_info'] = ['stdc++', 'framework', 'mva', 'mva_dataobjects', 'boost_program_options', '$ROOT_LIBS']
 
 
 Return('env')

@@ -240,7 +240,7 @@ class PurityOverEfficiency(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the ROC plot
         @param data pandas.DataFrame containing all data
@@ -258,7 +258,10 @@ class PurityOverEfficiency(Plotter):
 
         p = self._plot_datapoints(self.axis, efficiency, purity, xerr=efficiency_error, yerr=purity_error)
         self.plots.append(p)
-        self.labels.append(column)
+        if label is not None:
+            self.labels.append(label)
+        else:
+            self.labels.append(column)
         return self
 
     def finish(self):
@@ -283,7 +286,7 @@ class RejectionOverEfficiency(Plotter):
     #: @var ymax
     #: Maximum y value
 
-    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None):
+    def add(self, data, column, signal_mask, bckgrd_mask, weight_column=None, label=None):
         """
         Add a new curve to the ROC plot
         @param data pandas.DataFrame containing all data
@@ -302,7 +305,10 @@ class RejectionOverEfficiency(Plotter):
 
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
-        self.labels.append(column)
+        if label is not None:
+            self.labels.append(label)
+        else:
+            self.labels.append(column)
         return self
 
     def finish(self):
@@ -315,6 +321,48 @@ class RejectionOverEfficiency(Plotter):
         self.axis.get_xaxis().set_label_text('Signal Efficiency')
         self.axis.get_yaxis().set_label_text('Background Rejection')
         self.axis.legend([x[0] for x in self.plots], self.labels, loc='best', fancybox=True, framealpha=0.5)
+        return self
+
+
+class Multiplot(Plotter):
+    #: figure which is used to draw
+    figure = None
+    #: Main axis
+    axis = None
+
+    def __init__(self, cls, number_of_plots, figure=None):
+        """
+        Creates a new figure if None is given, sets the default plot parameters
+        @param figure default draw figure which is used
+        """
+        if figure is None:
+            self.figure = matplotlib.figure.Figure(figsize=(32, 18))
+            self.figure.set_tight_layout(True)
+        else:
+            self.figure = figure
+
+        if number_of_plots == 1:
+            gs = matplotlib.gridspec.GridSpec(1, 1)
+        elif number_of_plots == 2:
+            gs = matplotlib.gridspec.GridSpec(1, 2)
+        elif number_of_plots == 3:
+            gs = matplotlib.gridspec.GridSpec(1, 3)
+        else:
+            gs = matplotlib.gridspec.GridSpec(np.ceil(number_of_plots / 3), 3)
+
+        self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
+        self.axis = self.sub_plots[0].axis
+        super(Multiplot, self).__init__(self.figure, self.axis)
+
+    def add(self, i, *args, **kwargs):
+        self.sub_plots[i].add(*args, **kwargs)
+
+    def finish(self):
+        """
+        Sets limits, title, axis-labels and legend of the plot
+        """
+        for plot in self.sub_plots:
+            plot.finish()
         return self
 
 
@@ -609,15 +657,16 @@ class Overtraining(Plotter):
         distribution.add(data, column, test_mask & bckgrd_mask, weight_column)
 
         distribution.set_plot_options({'color': distribution.plots[0][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
-        distribution.set_fill_options({'color': distribution.plots[0][0].get_color(), 'alpha': 0.5})
+        distribution.set_fill_options({'color': distribution.plots[0][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.set_errorbar_options(None)
         distribution.set_errorband_options(None)
         distribution.add(data, column, train_mask & signal_mask, weight_column)
         distribution.set_plot_options({'color': distribution.plots[1][0].get_color(), 'linestyle': 'steps-mid-', 'lw': 4})
-        distribution.set_fill_options({'color': distribution.plots[1][0].get_color(), 'alpha': 0.5})
+        distribution.set_fill_options({'color': distribution.plots[1][0].get_color(), 'alpha': 0.5, 'step': 'mid'})
         distribution.add(data, column, train_mask & bckgrd_mask, weight_column)
 
         distribution.labels = ['Train-Signal', 'Train-Background', 'Test-Signal', 'Test-Background']
+
         distribution.finish()
 
         self.plot_kwargs['color'] = distribution.plots[0][0].get_color()
@@ -921,8 +970,8 @@ class CorrelationMatrix(Plotter):
         cb = self.figure.colorbar(signal_heatmap, cax=self.colorbar_axis, ticks=[-100, 0, 100], orientation='horizontal')
         cb.ax.set_xticklabels(['negative', 'uncorrelated', 'positive'])
 
-        self.signal_axis.text(0.5, -0.3, "Signal", horizontalalignment='center')
-        self.bckgrd_axis.text(0.5, -0.3, "Background", horizontalalignment='center')
+        self.signal_axis.text(0.5, -1.0, "Signal", horizontalalignment='center')
+        self.bckgrd_axis.text(0.5, -1.0, "Background", horizontalalignment='center')
 
         return self
 

@@ -26,6 +26,8 @@
 #include <framework/utilities/MakeROOTCompatible.h>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/xml_parser.hpp>
 
 #include <TFile.h>
 #include <TTree.h>
@@ -82,6 +84,34 @@ namespace Belle2 {
       weightfile.getOptions(general_options);
       auto expert = supported_interfaces[general_options.m_method]->getExpert();
       expert->load(weightfile);
+
+    }
+
+    std::string info(const std::string& filename)
+    {
+
+      AbstractInterface::initSupportedInterfaces();
+      auto supported_interfaces = AbstractInterface::getSupportedInterfaces();
+      auto weightfile = Weightfile::load(filename);
+      GeneralOptions general_options;
+      weightfile.getOptions(general_options);
+
+      auto specific_options = supported_interfaces[general_options.m_method]->getOptions();
+      specific_options->load(weightfile.getXMLTree());
+
+      boost::property_tree::ptree temp_tree;
+      general_options.save(temp_tree);
+      specific_options->save(temp_tree);
+      std::ostringstream oss;
+
+#if BOOST_VERSION < 105600
+      boost::property_tree::xml_writer_settings<char> settings('\t', 1);
+#else
+      boost::property_tree::xml_writer_settings<std::string> settings('\t', 1);
+#endif
+      boost::property_tree::xml_parser::write_xml(oss, temp_tree, settings);;
+
+      return oss.str();
 
     }
 

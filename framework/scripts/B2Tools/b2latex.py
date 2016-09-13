@@ -64,6 +64,30 @@ class LatexObject(object):
             \usepackage{hyperref} %adds links (also in TOC), should be loaded at the very end
             \usepackage{longtable}
             \usepackage{color}
+            \usepackage{listings}
+
+            \definecolor{gray}{rgb}{0.4,0.4,0.4}
+            \definecolor{darkblue}{rgb}{0.0,0.0,0.6}
+            \definecolor{cyan}{rgb}{0.0,0.6,0.6}
+
+            \lstset{
+              basicstyle=\ttfamily\scriptsize,
+              columns=fullflexible,
+              showstringspaces=false,
+              commentstyle=\color{gray}\upshape
+            }
+
+            \lstdefinelanguage{XML}
+            {
+              morestring=[b]",
+              morestring=[s]{>}{<},
+              morecomment=[s]{<?}{?>},
+              stringstyle=\color{black},
+              identifierstyle=\color{darkblue},
+              keywordstyle=\color{cyan},
+              morekeywords={xmlns,version,type}% list your attributes here
+            }
+
             \usepackage[load-configurations=abbreviations]{siunitx}
             \makeatletter
             % In newer versions of latex there is a problem with the calc package and tikz
@@ -159,6 +183,38 @@ class String(LatexObject):
         """
         #: output string
         self.output = self.output.format(**kwargs) + '\n'
+        return self
+
+
+class Listing(LatexObject):
+    """
+    Used for wrapping code in a listing environment
+    """
+
+    def __init__(self, language='XML'):
+        """
+        Calls super-class initialize and adds initial text to output
+            @param text intial text, usually you want to give a raw string r"some text"
+        """
+        super(Listing, self).__init__()
+        #: output string
+        self.output += r'\lstset{language=' + language + '}\n'
+        self.output += r'\begin{lstlisting}[breaklines=true]' + '\n'
+
+    def add(self, text=''):
+        """
+        Adds code to the output
+            @param code which is wrapped in the listing environment
+        """
+        self.output += str(text)
+        return self
+
+    def finish(self, **kwargs):
+        """
+        Finish the generation of the lsiting environment
+        """
+        #: output string
+        self.output += r'\end{lstlisting}'
         return self
 
 

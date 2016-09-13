@@ -231,6 +231,12 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /// Scales the displacement vector in place to lie on the dirft circle.
       void snapToDriftCircle()
       { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }

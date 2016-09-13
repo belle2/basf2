@@ -32,24 +32,35 @@ namespace Belle2 {
 
     public:
       /**
-       *  Calculate the ambiguity of the helix parameters relative to the three circle
-       *  parameters given the hit content of the segment and their stereo displacement.
+       *  Combine the two trajectories of the segments in the pair and assign the
+       *  resulting three dimensional trajectory to the segment pair
        */
-      JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
-                                         const CDCTrajectory2D& trajectory2D);
+      void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair);
 
-    public:
+      void fusePreliminary(const CDCSegmentPair& segmentPair);
+
       /**
        * Combine the trajectories of the two given segments to a full helix trajectory
        */
       CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
                                                   const CDCRecoSegment2D& endSegment);
 
+      CDCTrajectory3D fusePreliminary(const CDCRecoSegment2D& fromSegment2D,
+                                      const CDCRecoSegment2D& toSegment2D);
+
+      /// Combine the two segments given a prelimiary reference trajectory to which a creation is applied
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
+                                                  const CDCRecoSegment2D& toSegment2D,
+                                                  const CDCTrajectory3D& preliminaryTrajectory3D);
+
+    public:
       /**
-       *  Combine the two trajectories of the segments in the pair and assign the
-       *  resulting three dimensional trajectory to the segment pair
+       *  Calculate the ambiguity of the helix parameters relative to the three circle
+       *  parameters given the hit content of the segment and their stereo displacement.
        */
-      void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair);
+      JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+                                         const CDCTrajectory2D& trajectory2D);
+
 
     private:
       /// Swtich to reestimate the  drift length.

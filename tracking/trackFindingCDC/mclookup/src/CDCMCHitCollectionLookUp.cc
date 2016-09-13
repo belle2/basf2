@@ -170,24 +170,42 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     else return EForwardBackward::c_Invalid;
   }
 
-  // Now we are in the same passed super layer with both segments
-  Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
-  if (lastInTrackIdOfStartSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  Index firstInTrackIdOfEndSegment = getFirstInTrackId(ptrEndSegment2D);
-  if (firstInTrackIdOfEndSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
+  // Now we are in the same true segment with both segments
+  Index lastInTrackSegmentIdOfStartSegment = getLastInTrackSegmentId(ptrStartSegment2D);
+  if (lastInTrackSegmentIdOfStartSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
 
-  if (startFBInfo == EForwardBackward::c_Forward and endFBInfo == EForwardBackward::c_Forward) {
-    if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return EForwardBackward::c_Forward;
+  Index firstInTrackSegmentIdOfEndSegment = getFirstInTrackSegmentId(ptrEndSegment2D);
+  if (firstInTrackSegmentIdOfEndSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
+
+  if (lastInTrackSegmentIdOfStartSegment < firstInTrackSegmentIdOfEndSegment) {
+    if (startFBInfo == EForwardBackward::c_Forward and endFBInfo == EForwardBackward::c_Forward) return EForwardBackward::c_Forward;
     else return EForwardBackward::c_Invalid;
-  } else if (startFBInfo == EForwardBackward::c_Backward and endFBInfo == EForwardBackward::c_Backward) {
+  } else if (lastInTrackSegmentIdOfStartSegment > firstInTrackSegmentIdOfEndSegment) {
     // Test if end segment lies before in the mc track
     // Hence the whole pair of segments is reverse to the track direction of flight
-    if (lastInTrackIdOfStartSegment > firstInTrackIdOfEndSegment) return EForwardBackward::c_Backward;
+    if (startFBInfo == EForwardBackward::c_Backward and endFBInfo == EForwardBackward::c_Backward) return EForwardBackward::c_Backward;
     else return EForwardBackward::c_Invalid;
+  } else {
+    // Now we are in the same true segment with both segments
+    Index lastInTrackIdOfStartSegment = getLastInTrackId(ptrStartSegment2D);
+    if (lastInTrackIdOfStartSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
+
+    Index firstInTrackIdOfEndSegment = getFirstInTrackId(ptrEndSegment2D);
+    if (firstInTrackIdOfEndSegment == c_InvalidIndex) return EForwardBackward::c_Invalid;
+
+    if (startFBInfo == EForwardBackward::c_Forward and endFBInfo == EForwardBackward::c_Forward) {
+      if (lastInTrackIdOfStartSegment < firstInTrackIdOfEndSegment) return EForwardBackward::c_Forward;
+      else return EForwardBackward::c_Invalid;
+    } else if (startFBInfo == EForwardBackward::c_Backward and endFBInfo == EForwardBackward::c_Backward) {
+      // Test if end segment lies before in the mc track
+      // Hence the whole pair of segments is reverse to the track direction of flight
+      if (lastInTrackIdOfStartSegment > firstInTrackIdOfEndSegment) return EForwardBackward::c_Backward;
+      else return EForwardBackward::c_Invalid;
+    }
+
   }
   return EForwardBackward::c_Invalid;
-
 }
 
 

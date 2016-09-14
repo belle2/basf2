@@ -94,7 +94,7 @@ def LoadParticlesB2BII(resource: fei.dag.Resource, names: typing.Sequence[str]) 
                        ('mu+:FSP', cut), ('p+:FSP', cut), ('K_L0:FSP', cut)], writeOut=True, path=resource.path)
 
     for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
-                                  ('pi0:V0', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
+                                  ('pi0:FSP', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
         copyParticles(outputList, inputList, writeOut=True, path=resource.path)
         applyCuts(outputList, cut, path=resource.path)
 

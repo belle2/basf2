@@ -106,9 +106,8 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
 
     # Add some fake resources for FSPs which are only available in b2bii
     if BtoBII:
-        for fsp in ['gamma:mdst', 'gamma:v0mdst', 'pi0:mdst', 'K_S0:mdst']:
-            for resource in ['ParticleList_', 'VertexFit_', 'SignalProbability_']:
-                dag.add(resource + fsp, fsp)
+        for resource in ['ParticleList_', 'VertexFit_', 'SignalProbability_']:
+            dag.add(resource + 'pi0:FSP', 'pi0:FSP')
         # Add Modules which are always needed
         dag.add('particles', provider.LoadParticlesB2BII,
                 names=['Name_' + particle.identifier for particle in particles])

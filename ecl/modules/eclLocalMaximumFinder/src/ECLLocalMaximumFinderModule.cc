@@ -172,7 +172,7 @@ void ECLLocalMaximumFinderModule::event()
   // Loop over connected regions.
   for (const ECLConnectedRegion& aCR : m_eclConnectedRegions) {
     const int crId = aCR.getCRId();
-    int iLM = 0;
+    int iLM = 1;
 
     // Loop over all entries in this CR.
     for (const ECLCalDigit& aECLCalDigit : aCR.getRelationsTo<ECLCalDigit>()) {
@@ -304,7 +304,7 @@ void ECLLocalMaximumFinderModule::event()
     } // end CalDigit loop
 
     // Check if there is at least one local maximum in the CR. If not, make the highest energetic crystal one.
-    if (iLM == 0) {
+    if (iLM == 1) {
 
       int highestEnergyCellId = -1;
       double highestEnergy = 0.0;

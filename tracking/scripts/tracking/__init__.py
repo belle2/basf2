@@ -146,24 +146,21 @@ def add_track_finding(path, components=None, trigger_mode="all"):
     # if only CDC or VXD are used, the track finding result
     # will be directly written to the final RecoTracks array
     # because no merging is required
-    cdc_reco_tracks = "RecoTracks"
-    vxd_reco_tracks = "RecoTracks"
+
+    if use_cdc and use_svd:
+        cdc_reco_tracks = "CDCRecoTracks"
+        vxd_reco_tracks = "VXDRecoTracks"
+    else:
+        cdc_reco_tracks = "RecoTracks"
+        vxd_reco_tracks = "RecoTracks"
 
     # CDC track finder
     if trigger_mode in ["fast_reco", "all"]:
-        if use_cdc:
-            if use_svd:
-                cdc_reco_tracks = "CDCRecoTracks"
-
             add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
     if trigger_mode in ["hlt", "all"]:
-        if use_svd:
-            if use_cdc:
-                vxd_reco_tracks = "VXDRecoTracks"
-
-            add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
+        add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
         # track merging
         if use_svd and use_cdc:

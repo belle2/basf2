@@ -596,11 +596,13 @@ namespace Belle2 {
     }
 
     // Matching status
+    /// Return the matching status set by the TrackMatcher module
     MatchingStatus getMatchingStatus() const
     {
       return m_matchingStatus;
     }
 
+    /// Set the matching status (used by the TrackMatcher module)
     void setMatchingStatus(MatchingStatus matchingStatus)
     {
       m_matchingStatus = matchingStatus;

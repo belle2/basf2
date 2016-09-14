@@ -40,8 +40,15 @@ Unit: cm and microsec.
 * xt_v1.dat      : obsolete. xt = xt(layer,l/r,alpha.theta)
 * xt_v0.dat      : obsolete. 1'st version of realistic xt; only layer and L/R dependence is taken into account.
 * xt_simple.dat  : obsolete. ideal linear xt. v=40 mu/ns.
-* xt_noB_v0.3.dat: obsolete. xt for B-field = 0.
-
+* xt_noB_v0.3.dat: obsolete. 
+                              xt for B-field = 0 ([cdc-soft:00383] ).
+                              Just calculated for alpha = -10, 0 and 10 deg, 
+                                                           theta = 60, 90, 120 and 130 deg.
+                             xt for other angles are also set but they are duplicates,  i.e.
+                             xt(alpha =  90 -  20) = xt(alpha =  10); 
+                             xt(alpha = -20 - -80) = xt(alpha = -10;)
+                             xt(theta = 18, 40) = xt(theta = 60);
+                             xt(theta = 149) = xt(theta = 130).
 
 
 sigma in new format
@@ -131,10 +138,19 @@ Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward 
 
 
 tentative correction for the difference betw. old design and final design
-=========================================================================
+===========================================
 Only apply to sense wire z-positions.
 To be eliminated when the final design is implemented in geometry in future.
 
 Format: layer  backward-deltaz (cm)  forward-deltaz (cm)
 
 deltaz.dat
+
+
+displacement  w.r.t. final design
+===========================================
+Only apply to sense wire positions.
+
+Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at backward end-plate [cm], ibid. at forward end-plate [cm]
+
+deisplacement.dat

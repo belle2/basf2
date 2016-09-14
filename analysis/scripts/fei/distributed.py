@@ -90,7 +90,7 @@ def setup(args):
 
 def run_basf2(args):
     os.chdir(args.directory + '/collection')
-    if args.site == 'kekcc':
+    if args.site == 'kekcc' or args.site == 'kekcc2':
         ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_path.pickle', '-i', 'dummy.root', '--', '-monitor',
                                '--prune',
                                '--verbose', '--nThreads', '4', '--cache', 'cache.pkl', '--externTeacher', 'externClusterTeacher'])

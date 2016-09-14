@@ -45,6 +45,9 @@ namespace Belle2 {
       "end_d",
       "end_chi2",
 
+      "s",
+      "alpha",
+
       "curv",
       "curv_sigma",
       "curv_pull",

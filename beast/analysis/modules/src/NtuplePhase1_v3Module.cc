@@ -125,7 +125,7 @@ namespace Belle2 {
     double volume = 0.;
     double rho = 0.;
     double mass = 0.;
-    const double RadConv = 6.24e7; // 1 rad = 6.24e7 MeV/kg
+    const double RadConv = 6.24e7; // 1 mrad = 6.24e7 MeV/kg
 
     // check files
     TDirectory* dirh = gDirectory;
@@ -271,6 +271,7 @@ namespace Belle2 {
           }
           delete h2D;
         }
+
         for (const TString& HistoDoseName : m_inputDoseHistoNamesVrs) {
           int imax = 0;
           if (HistoDoseName.Contains("csi")) imax = 18;
@@ -322,10 +323,10 @@ namespace Belle2 {
                 if (HistoDoseName.Contains("dia")) m_input_LB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
             }
-
             delete he;
           }
         }
+
       }
       iter++;
     }

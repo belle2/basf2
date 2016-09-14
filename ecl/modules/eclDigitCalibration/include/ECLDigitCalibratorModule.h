@@ -37,6 +37,8 @@
 
 namespace Belle2 {
   namespace ECL {
+
+    /** Class to find calibrate digits and convert waveform fit information to physics quantities */
     class ECLDigitCalibratorModule : public Module {
 
     public:

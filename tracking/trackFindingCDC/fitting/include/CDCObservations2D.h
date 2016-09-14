@@ -299,6 +299,13 @@ namespace Belle2 {
         if (m_fitPos == EFitPos::c_RecoPos) {
           fitPos2D = recoHit2D.getRecoPos2D();
           signedDriftLength = 0;
+
+          // Fall back to the rl circle in case position is not setup
+          if (fitPos2D.hasNAN()) {
+            fitPos2D = recoHit2D.getWire().getRefPos2D();
+            signedDriftLength = recoHit2D.getSignedRefDriftLength();
+          }
+
         } else if (m_fitPos == EFitPos::c_RLDriftCircle) {
           fitPos2D = recoHit2D.getWire().getRefPos2D();
           signedDriftLength = recoHit2D.getSignedRefDriftLength();

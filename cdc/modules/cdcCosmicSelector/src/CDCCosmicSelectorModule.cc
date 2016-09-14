@@ -175,6 +175,6 @@ void CDCCosmicSelectorModule::event()
       //      m_P->setMomentum(-1. * momentum);
 
     }
-  } // end loop over SimHits.
+  } // end loop over MCParticles
   setReturnValue(returnVal);
 }

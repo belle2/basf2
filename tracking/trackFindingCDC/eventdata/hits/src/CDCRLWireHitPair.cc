@@ -15,15 +15,17 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 CDCRLWireHitPair::CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
-                                   const CDCRLWireHit& toRLWireHit):
-  m_fromRLWireHit(fromRLWireHit),
-  m_toRLWireHit(toRLWireHit)
+                                   const CDCRLWireHit& toRLWireHit,
+                                   int iCluster)
+  : m_fromRLWireHit(fromRLWireHit)
+  , m_toRLWireHit(toRLWireHit)
+  , m_iCluster(iCluster)
 {
 }
 
 CDCRLWireHitPair CDCRLWireHitPair::reversed() const
 {
-  return CDCRLWireHitPair(m_toRLWireHit.reversed(), m_fromRLWireHit.reversed());
+  return CDCRLWireHitPair(getToRLWireHit().reversed(), getFromRLWireHit().reversed(), getICluster());
 }
 
 void CDCRLWireHitPair::reverse()
@@ -31,6 +33,11 @@ void CDCRLWireHitPair::reverse()
   std::swap(m_fromRLWireHit, m_toRLWireHit);
   m_fromRLWireHit.reverse();
   m_toRLWireHit.reverse();
+}
+
+CDCRLWireHitPair CDCRLWireHitPair::getAlias() const
+{
+  return CDCRLWireHitPair(getFromRLWireHit().getAlias(), getToRLWireHit().getAlias(), getICluster());
 }
 
 void CDCRLWireHitPair::setFromRLInfo(ERightLeft fromRLInfo)

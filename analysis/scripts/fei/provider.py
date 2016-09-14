@@ -81,6 +81,32 @@ def LoadParticles(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Ha
     return resource.hash
 
 
+def LoadParticlesB2BII(resource: fei.dag.Resource, names: typing.Sequence[str]) -> Hash:
+    """
+    Load FSP and V0 Particles from B2BII Particle lists
+    Restricts loading to Particles contained in current Rest Of Event if specific FEI mode is used.
+        @param resource object
+    """
+    resource.cache = True
+    cut = 'isInRestOfEvent > 0.5' if resource.env['ROE'] else ''
+
+    fillParticleLists([('K+:FSP', cut), ('pi+:FSP', cut), ('e+:FSP', cut),
+                       ('mu+:FSP', cut), ('p+:FSP', cut), ('K_L0:FSP', cut)], writeOut=True, path=resource.path)
+
+    for outputList, inputList in [('gamma:FSP', 'gamma:mdst'), ('K_S0:V0', 'K_S0:mdst'),
+                                  ('pi0:V0', 'pi0:mdst'), ('gamma:V0', 'gamma:v0mdst')]:
+        copyParticles(outputList, inputList, writeOut=True, path=resource.path)
+        applyCuts(outputList, cut, path=resource.path)
+
+    if resource.env['monitor']:
+        hist_filename = 'Monitor_MCCounts.root'
+        unique_abs_pdgs = set([abs(pdg.from_name(name)) for name in names])
+        hist_variables = [('NumberOfMCParticlesInEvent({i})'.format(i=pdgcode), 100, -0.5, 99.5) for pdgcode in unique_abs_pdgs]
+        variablesToHistogram('', variables=hist_variables,
+                             filename=removeJPsiSlash(hist_filename), path=resource.path)
+    return resource.hash
+
+
 def MakeParticleList(resource: fei.dag.Resource, particleName: str, daughterParticleLists: typing.Sequence[ParticleList],
                      preCutConfig: fei.config.PreCutConfiguration,
                      mvaConfig: fei.config.MVAConfiguration, decayModeID: int) -> ParticleList:

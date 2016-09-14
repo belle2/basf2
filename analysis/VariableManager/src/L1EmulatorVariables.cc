@@ -18,8 +18,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 
-//#include <skim/L1Emulator/modules/L1Emulation/L1EmulationModule.h>
-#include <skim/L1Emulator/dataobjects/L1EmulationInformation.h>
+//#include <hlt/L1Emulator/modules/L1Emulation/L1EmulationModule.h>
+#include <hlt/L1Emulator/dataobjects/L1EmulationInformation.h>
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>

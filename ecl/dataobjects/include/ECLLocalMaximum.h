@@ -31,6 +31,8 @@ namespace Belle2 {
       c_electron = 2, /**< electron */
       c_mergedpi0 = 3, /**< merged pi0 */
     };
+
+    /** Number of different types */
     static const size_t c_nTypes = 3;
 
     /** default constructor for ROOT */
@@ -72,8 +74,8 @@ namespace Belle2 {
 
   private:
     int m_LMId;  /**< LM ID */
-    int m_Type; /** LM type  (photon, electron, merged pi0...) */
-    int m_CellId; /** Cell Id */
+    int m_Type; /**< LM type  (photon, electron, merged pi0...) */
+    int m_CellId; /**< Cell Id */
 
     // 1: Initial version.
     // 2: Added identifier for LM type (photon, electron, merged pi0...).

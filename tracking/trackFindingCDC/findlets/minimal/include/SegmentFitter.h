@@ -17,6 +17,8 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
+#include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
+
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
@@ -37,7 +39,7 @@ namespace Belle2 {
       /// Short description of the findlet
       virtual std::string getDescription();
 
-      /// Add the parameters of the filter to the module
+      /// Add the parameters of the fitter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
 
       /// Signals the beginning of the event processing
@@ -60,12 +62,6 @@ namespace Belle2 {
       /// Parameter : Switch to reestimate the drift length before the fit
       bool m_param_updateDriftLength = true;
 
-      /// Parameter : Switch to serve the alpha angle to the drift length translator.
-      bool m_param_useAlphaInDriftLength = true;
-
-      /// Parameter : Mass to estimate the velocity in the flight time to the hit
-      double m_param_tofMassScale = NAN;
-
       /// Option which positional information from the hits should be used
       EFitPos m_fitPos = EFitPos::c_RecoPos;
 
@@ -77,6 +73,9 @@ namespace Belle2 {
 
       /// Instance of the karimaki fitter to be used.
       CDCKarimakiFitter m_karimakiFitter;
+
+      /// Instance of the drift length estimator to be used.
+      DriftLengthEstimator m_driftLengthEstimator;
 
     }; // end class
   } // end namespace TrackFindingCDC

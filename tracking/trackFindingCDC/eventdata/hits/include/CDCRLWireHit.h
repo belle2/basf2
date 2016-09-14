@@ -78,6 +78,10 @@ namespace Belle2 {
       void reverse()
       { m_rlInfo = NRightLeft::reversed(m_rlInfo); }
 
+      /// Returns the aliased version of this oriented wire hit - here same as reverse
+      CDCRLWireHit getAlias() const
+      { return reversed(); }
+
       /// Equality comparison based on wire hit, left right passage information.
       bool operator==(const CDCRLWireHit& rhs) const
       { return getWireHit() == rhs.getWireHit() and getRLInfo() == rhs.getRLInfo(); }

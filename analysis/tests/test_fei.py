@@ -1094,7 +1094,7 @@ class TestTagUniqueSignal(unittest.TestCase):
 class TestSaveModuleStatistics(unittest.TestCase):
 
     def test_SaveModuleStatistics(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42')
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42', env={'monitor': False})
         self.assertEqual(fei.provider.SaveModuleStatistics(resource), None)
 
         path = basf2.create_path()
@@ -1108,7 +1108,7 @@ class TestSaveModuleStatistics(unittest.TestCase):
     def test_FileAlreadyAvailable(self):
         # Deactivated
         return
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42')
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42', env={'monitor': False})
         with temporary_file('moduleStatistics_42.root'):
             self.assertEqual(fei.provider.SaveModuleStatistics(resource), 'moduleStatistics_42.root')
 

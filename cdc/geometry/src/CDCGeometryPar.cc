@@ -235,7 +235,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
-    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
   } else {
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
@@ -329,11 +330,20 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
 
+  //Set displacement params. (from input data)
+  m_Displacement = geom.getDisplacement();
+  B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
+         m_Displacement);
+  if (m_Displacement) {
+    readWirePositionParams(c_Base, &geom, gbxParams);
+  }
+
+  //Set misalignment params. (from input data)
   m_Misalignment = geom.getMisalignment();
   B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
          m_Misalignment);
   if (m_Misalignment) {
-    readWirePositionParams(geom, c_Misaligned);
+    readWirePositionParams(c_Misaligned, &geom, gbxParams);
   }
 
   //Set alignment params. (from input data)
@@ -341,7 +351,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
          m_Alignment);
   if (m_Alignment) {
-    readWirePositionParams(geom, c_Aligned);
+    readWirePositionParams(c_Aligned, &geom, gbxParams);
   }
 
 
@@ -470,7 +480,8 @@ void CDCGeometryPar::read()
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
-    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    //    B2INFO("CDCGeometryPar: Define all sense and field wires explicitly in the tracking volume.");
+    B2FATAL("CDCGeometryPar: Materialdefinition=2 is disabled for now.");
   } else {
     B2FATAL("CDCGeometryPar: Materialdefinition mode you specify is invalid.");
   }
@@ -486,7 +497,8 @@ void CDCGeometryPar::read()
   // Get control switch for xt file format
   m_xtFileFormat = gbxParams.getInt("XtFileFormat");
   if (m_xtFileFormat == 0) {
-    B2INFO("CDCGeometryPar: xt-file in old format specified");
+    //    B2INFO("CDCGeometryPar: xt-file in old format specified");
+    B2FATAL("CDCGeometryPar: xt-file format=0 is disabled now.");
   } else if (m_xtFileFormat == 1) {
     B2INFO("CDCGeometryPar: xt-file in new format specified");
   } else {
@@ -496,7 +508,8 @@ void CDCGeometryPar::read()
   // Get control switch for xt file format
   m_sigmaFileFormat = gbxParams.getInt("SigmaFileFormat");
   if (m_sigmaFileFormat == 0) {
-    B2INFO("CDCGeometryPar: sigma-file in old format specified");
+    //    B2INFO("CDCGeometryPar: sigma-file in old format specified");
+    B2FATAL("CDCGeometryPar: sigma-file format=0 is disabled now.");
   } else if (m_sigmaFileFormat == 1) {
     B2INFO("CDCGeometryPar: sigma-file in new format specified");
   } else {
@@ -598,12 +611,20 @@ void CDCGeometryPar::read()
   m_nominalSpaceResol = gbxParams.getLength("SenseWire/SpaceResol");
   m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
 
+  //Set displacement params. (from input data)
+  m_Displacement = gbxParams.getBool("Displacement");
+  B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
+         m_Displacement);
+  if (m_Displacement) {
+    readWirePositionParams(c_Base, nullptr, gbxParams);
+  }
+
   //Set misalignment params. (from input data)
   m_Misalignment = gbxParams.getBool("Misalignment");
   B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
          m_Misalignment);
   if (m_Misalignment) {
-    readWirePositionParams(gbxParams, c_Misaligned);
+    readWirePositionParams(c_Misaligned, nullptr, gbxParams);
   }
 
   //Set alignment params. (from input data)
@@ -611,7 +632,7 @@ void CDCGeometryPar::read()
   B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
          m_Alignment);
   if (m_Alignment) {
-    readWirePositionParams(gbxParams, c_Aligned);
+    readWirePositionParams(c_Aligned, nullptr, gbxParams);
   }
 
   //Set xt etc. params. for digitization
@@ -688,89 +709,30 @@ void CDCGeometryPar::read()
 
 }
 
-// Read (mis)alignment params.
-void CDCGeometryPar::readWirePositionParams(const GearDir gbxParams, EWirePosition set)
+
+// Read displacement or (mis)alignment params.
+void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom,  const GearDir gbxParams)
 {
-  std::string fileName0 = gbxParams.getString("misalignmentFileName");
-  if (set == c_Aligned) {
-    fileName0 = gbxParams.getString("alignmentFileName");
-  }
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
 
-  ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
-
-  int iL(0), iC(0);
-  const int np = 3;
-  double back[np], fwrd[np], tension;
-  unsigned nRead = 0;
-
-  while (true) {
-    ifs >> iL >> iC;
-    for (int i = 0; i < np; ++i) {
-      ifs >> back[i];
-    }
-    for (int i = 0; i < np; ++i) {
-      ifs >> fwrd[i];
-    }
-    ifs >> tension;
-
-    if (ifs.eof()) break;
-
-    ++nRead;
-
-    for (int i = 0; i < np; ++i) {
-      if (set == c_Misaligned) {
-        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
-        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
-      } else if (set == c_Aligned) {
-        m_BWirPosAlign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
-        m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
-      }
-    }
-
-    //    double baseTension = M_PI * m_senseWireDensity *
-    //    m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
-    double baseTension = 0.;
-
-    if (set == c_Misaligned) {
-      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
-                                      m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+  std::string fileName0;
+  if (geom) {
+    if (set == c_Base) {
+      fileName0 = geom->getDisplacementFile();
+    } else if (set == c_Misaligned) {
+      fileName0 = geom->getMisalignmentFile();
     } else if (set == c_Aligned) {
-      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
-                                   m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      fileName0 = geom->getAlignmentFile();
     }
-    //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
-
-    if (m_debug) {
-      std::cout << iL << " " << iC;
-      for (int i = 0; i < np; ++i) cout << " " << back[i];
-      for (int i = 0; i < np; ++i) cout << " " << fwrd[i];
-      std::cout << " " << tension << std::endl;
+  } else {
+    if (set == c_Base) {
+      fileName0 = gbxParams.getString("displacementFileName");
+    } else if (set == c_Misaligned) {
+      fileName0 = gbxParams.getString("misalignmentFileName");
+    } else if (set == c_Aligned) {
+      fileName0 = gbxParams.getString("alignmentFileName");
     }
-
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCGeometryPar::readWirePositionParams: #lines read-in (=" << nRead <<
-                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
-
-  ifs.close();
-}
-
-void CDCGeometryPar::readWirePositionParams(const CDCGeometry& geom, EWirePosition set)
-{
-  std::string fileName0 = geom.getMisalignmentFile();
-  if (set == c_Aligned) {
-    fileName0 = geom.getAlignmentFile();
-  }
   fileName0 = "/cdc/data/" + fileName0;
   std::string fileName = FileSystem::findFile(fileName0);
 
@@ -797,14 +759,17 @@ void CDCGeometryPar::readWirePositionParams(const CDCGeometry& geom, EWirePositi
     for (int i = 0; i < np; ++i) {
       ifs >> fwrd[i];
     }
-    ifs >> tension;
+    if (set != c_Base)  ifs >> tension;
 
     if (ifs.eof()) break;
 
     ++nRead;
 
     for (int i = 0; i < np; ++i) {
-      if (set == c_Misaligned) {
+      if (set == c_Base) {
+        m_BWirPos[iL][iC][i] += back[i];
+        m_FWirPos[iL][iC][i] += fwrd[i];
+      } else if (set == c_Misaligned) {
         m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
         m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
       } else if (set == c_Aligned) {

@@ -149,14 +149,6 @@ namespace Belle2 {
       /// Computes the Jacobi matrix for a move of the coordinate system by the given vector.
       HelixJacobian passiveMoveByJacobian(const Vector3D& by) const;
 
-      /// Shifts the tanLambda and z0 by the given amount. Method is specific to the corrections in
-      /// the fusion fit.
-      void shiftTanLambdaZ0(double tanLambdaShift, double zShift)
-      {
-        m_szLine.setTanLambda(m_szLine.tanLambda() + tanLambdaShift);
-        m_szLine.setZ0(m_szLine.z0() + zShift);
-      }
-
       /**
        *  Adjust the arclength measure to start n periods later.
        *  @return The arc length needed to travel n periods.

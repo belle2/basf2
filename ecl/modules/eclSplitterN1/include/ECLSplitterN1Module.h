@@ -122,7 +122,7 @@ namespace Belle2 {
                                                     144, 144, 144, 144, 144, 144, 144, 144, 144, 144, //50
                                                     144, 144, 144, 144, 144, 144, 144, 144, 144,//59
                                                     144, 144, 96, 96, 96, 96, 96, 64, 64, 64
-                                                   }; //BWD
+                                                   }; /**< Number of crystals per theta ring. */
 
       /** vector (8736+1 entries) with cell id to store array positions */
       std::vector< int > m_StoreArrPosition;

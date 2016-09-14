@@ -51,6 +51,9 @@ TrackCreatorModule::TrackCreatorModule() :
            std::vector<int> {});
   addParam("defaultPDGCode", m_defaultPDGCode, "Default PDG code, for which TrackFitResults will be created.", 211);
 
+  addParam("useClosestHitToIP", m_useClosestHitToIP, "Flag to turn on special handling which measurement "
+           "to choose; especially useful for Cosmics.", m_useClosestHitToIP);
+
 }
 
 
@@ -99,13 +102,16 @@ void TrackCreatorModule::event()
   TrackFitter trackFitter;
   TrackBuilder trackBuilder(m_trackColName, m_trackFitResultColName, m_mcParticleColName);
   for (auto& recoTrack : recoTracks) {
+    // Require pion fit as a safety measure
     const bool pionFitWasSuccessful = trackFitter.fit(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)));
+    // Does not refit in case the particle hypotheses demanded in this module have already been fitted before.
+    // Otherwise fits them with the default fitter.
     if (pionFitWasSuccessful) {
       for (const auto& pdg : m_additionalPDGCodes) {
         B2DEBUG(200, "Trying to fit with PDG = " << pdg);
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
       }
-      trackBuilder.storeTrackFromRecoTrack(recoTrack);
+      trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);
     } else {
       B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
     }

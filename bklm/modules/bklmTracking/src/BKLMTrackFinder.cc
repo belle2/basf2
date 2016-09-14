@@ -43,7 +43,7 @@ bool BKLMTrackFinder::filter(std::list<BKLMHit2d*>& seed,
                              std::list<BKLMHit2d*>& track)
 {
 
-  std::list<BKLMHit2d*>::iterator i, j;
+  std::list<BKLMHit2d*>::iterator i;
 
   track = seed;
 

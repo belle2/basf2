@@ -46,7 +46,7 @@ def getCommandLineOptions():
     parser.add_argument('-cache', '--cache', dest='cache', type=str, default=None,
                         help='Use the given file to cache results between multiple executions.'
                              'Data from previous runs has to be provided as input!')
-    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='externClusterTeacher',
+    parser.add_argument('-externTeacher', '--externTeacher', dest='externTeacher', type=str, default='basf2_mva_teacher',
                         help='Use this command to invoke extern teacher: basf2_mva_teacher or externClusterTeacher')
     parser.add_argument('-monitor', '--monitor', dest='monitor', action='store_true',
                         help='Create monitor NTuples/Histograms used for Reporting system')
@@ -109,6 +109,13 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
         for fsp in ['gamma:mdst', 'gamma:v0mdst', 'pi0:mdst', 'K_S0:mdst']:
             for resource in ['ParticleList_', 'VertexFit_', 'SignalProbability_']:
                 dag.add(resource + fsp, fsp)
+        # Add Modules which are always needed
+        dag.add('particles', provider.LoadParticlesB2BII,
+                names=['Name_' + particle.identifier for particle in particles])
+    else:
+        # Add Modules which are always needed
+        dag.add('particles', provider.LoadParticles,
+                names=['Name_' + particle.identifier for particle in particles])
 
     # Add basic properties defined by the user of all Particles as Resources into the graph
     for particle in particles:
@@ -125,10 +132,6 @@ def fullEventInterpretation(signalParticleList, selection_path, particles, datab
             dag.add('MVAConfig_' + channel.name, channel.mvaConfig)
             dag.add('PreCutConfig_' + channel.name, channel.preCutConfig)
             dag.add('DecayModeID_' + channel.name, channel.decayModeID)
-
-    # Add Modules which are always needed
-    dag.add('particles', provider.LoadParticles,
-            names=['Name_' + particle.identifier for particle in particles])
 
     # Reconstruct given particle topology
     for particle in particles:

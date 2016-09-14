@@ -342,7 +342,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     B2DEBUG(175, "backgroundLevel = " << backgroundLevel);
 
     // Fill shower Ids
-    aECLShower->setShowerId(1); // always one (only this single shower in the CR)
+    aECLShower->setShowerId(0); // always one (only this single shower in the CR)
     aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
     aECLShower->setConnectedRegionId(aCR.getCRId());
 
@@ -671,8 +671,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new energy: " << showerEnergy);
 
       // Get unique ID
-      ++iShower;
       aECLShower->setShowerId(iShower);
+      ++iShower;
       aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 

@@ -118,7 +118,7 @@ void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
   }
 
   int hitNum = m_eclHits.getEntries();
-  assert(hitNum == 0);
+  //  assert(hitNum == 0);
   for (const pair<int, hit_t>&  t : a) {
     int key = t.first, cellId = key / 80;
     for (const thit_t& s : tr)

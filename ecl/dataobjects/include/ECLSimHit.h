@@ -133,7 +133,7 @@ namespace Belle2 {
     G4ThreeVector m_Position;        /**< Position */
 
 
-    ClassDef(ECLSimHit, 3);/**< the class title */
+    ClassDef(ECLSimHit, 4);/**< the class title */
 
   };
 } // end namespace Belle2

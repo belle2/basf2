@@ -90,7 +90,7 @@ namespace Belle2 {
     double m_Edep;      /**< deposited energy */
     double m_TimeAve;   /**< average time */
 
-    ClassDef(ECLHit, 3); /**< ClassDef */
+    ClassDef(ECLHit, 4); /**< ClassDef */
 
   };
 

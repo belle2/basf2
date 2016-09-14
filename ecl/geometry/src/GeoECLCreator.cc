@@ -59,14 +59,14 @@ namespace Belle2 {
     {
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
-      cout << "SUS304 radiation length = " << Materials::get("SUS304")->GetRadlen() << " mm" << endl;
-      cout << "A5083 radiation length = " << Materials::get("A5083")->GetRadlen() << " mm" << endl;
-      cout << "A5052 radiation length = " << Materials::get("A5052")->GetRadlen() << " mm" << endl;
-      cout << "A6063 radiation length = " << Materials::get("A6063")->GetRadlen() << " mm" << endl;
-      cout << "Pure copper radiation length = " << Materials::get("C1220")->GetRadlen() << " mm" << endl;
-      cout << "WRAP250 radiation length = " << Materials::get("WRAP250")->GetRadlen() << " mm" << endl;
-      cout << "WRAP200 radiation length = " << Materials::get("WRAP200")->GetRadlen() << " mm" << endl;
-      cout << "WRAP170 radiation length = " << Materials::get("WRAP170")->GetRadlen() << " mm" << endl;
+      // cout << "SUS304 radiation length = " << Materials::get("SUS304")->GetRadlen() << " mm" << endl;
+      // cout << "A5083 radiation length = " << Materials::get("A5083")->GetRadlen() << " mm" << endl;
+      // cout << "A5052 radiation length = " << Materials::get("A5052")->GetRadlen() << " mm" << endl;
+      // cout << "A6063 radiation length = " << Materials::get("A6063")->GetRadlen() << " mm" << endl;
+      // cout << "Pure copper radiation length = " << Materials::get("C1220")->GetRadlen() << " mm" << endl;
+      // cout << "WRAP250 radiation length = " << Materials::get("WRAP250")->GetRadlen() << " mm" << endl;
+      // cout << "WRAP200 radiation length = " << Materials::get("WRAP200")->GetRadlen() << " mm" << endl;
+      // cout << "WRAP170 radiation length = " << Materials::get("WRAP170")->GetRadlen() << " mm" << endl;
 
       m_atts["wrap"]  = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
       m_atts["cryst"] = new G4VisAttributes(G4Colour(0.7, 0.7, 1.0));

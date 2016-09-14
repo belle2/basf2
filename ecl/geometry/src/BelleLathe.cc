@@ -114,11 +114,11 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 
 
   fcontour = contour;
-  cout << "BelleLathe::BelleLathe: " << fcontour.size() << endl;
-  for (int i = 0, imax = fcontour.size(); i < imax; i++) {
-    cout << fcontour[i] << " ";
-  }
-  cout << endl;
+  // cout << "BelleLathe::BelleLathe: " << fcontour.size() << endl;
+  // for (int i = 0, imax = fcontour.size(); i < imax; i++) {
+  //   cout << fcontour[i] << " ";
+  // }
+  // cout << endl;
 
   frmin =  kInfinity;
   frmax = -kInfinity;
@@ -162,7 +162,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   fgtpi = dphi > M_PI;
   ftwopi = abs(dphi - 2 * M_PI) < kCarTolerance;
 
-  cout << ftwopi << " " << fgtpi << " " << fn0y << " " << fn0x << " " << fn1y << " " << fn1x << endl;
+  //  cout << ftwopi << " " << fgtpi << " " << fn0y << " " << fn0x << " " << fn1y << " " << fn1x << endl;
 
   for (int i = 0, n = fcontour.size(); i < n; i++) {
     const zr_t& s = fcontour[i];

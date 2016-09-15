@@ -8,6 +8,9 @@
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <TFileMerger.h>
 #include <TFile.h>
@@ -39,7 +42,9 @@ int main(int argc, char** argv)
     sprintf(histofile, "%s/evp_hltwk%2.2d/%s",
             topdir.c_str(), startnode + i,
             file.c_str());
-    merger.AddFile(histofile);
+    struct stat statbuf;
+    if (stat(histofile, &statbuf) == 0)
+      merger.AddFile(histofile);
   }
 
   // Do Merge

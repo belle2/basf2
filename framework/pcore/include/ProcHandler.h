@@ -40,10 +40,10 @@ namespace Belle2 {
 
 
     /** Return number of worker processes */
-    static int NumEvtProcs();
+    static int numEventProcesses();
 
     /** Return list of pid's */
-    static std::set<int> ProcessList();
+    static std::set<int> processList();
 
     /** Return ID of the current process.
      *

@@ -151,12 +151,12 @@ bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_pro
 
 bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
 
-int ProcHandler::NumEvtProcs()
+int ProcHandler::numEventProcesses()
 {
   return s_nproc;
 }
 
-std::set<int> ProcHandler::ProcessList()
+std::set<int> ProcHandler::processList()
 {
   return s_pidList;
 }

@@ -7,7 +7,6 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>

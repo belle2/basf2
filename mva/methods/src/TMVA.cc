@@ -160,6 +160,7 @@ namespace Belle2 {
           boost::split(strs, line, boost::is_any_of(":"));
           std::string variable = strs[2];
           boost::trim(variable);
+          variable = Belle2::invertMakeROOTCompatible(variable);
           float importance = std::stof(strs[3]);
           feature_importances[variable] = importance;
         }

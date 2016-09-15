@@ -5,6 +5,14 @@
 
 import sys
 
+
+from ROOT import PyConfig
+PyConfig.IgnoreCommandLineOptions = True
+
+# FEI uses multi-threading for parallel execution of tasks therefore
+# the ROOT gui-thread is disabled, which otherwise interferes sometimes
+PyConfig.StartGuiThread = False
+
 # First load the required shared library
 from ROOT import gSystem
 gSystem.Load('libmva.so')
@@ -32,6 +40,10 @@ class ForwardBelle2MVANamespace(object):
         for x in args:
             v.push_back(x)
         return v
+
+Belle2.MVA.AbstractInterface.initSupportedInterfaces()
+ROOT.gROOT.SetBatch(True)
+
 
 # This is a hack (recommended by Guido) to replace this module
 # with an object of the ForwardBelle2MVANamespace class

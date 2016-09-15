@@ -303,12 +303,14 @@ class RejectionOverEfficiency(Plotter):
         self.xmin, self.xmax = numpy.nanmin([efficiency.min(), self.xmin]), numpy.nanmax([efficiency.max(), self.xmax])
         self.ymin, self.ymax = numpy.nanmin([rejection.min(), self.ymin]), numpy.nanmax([rejection.max(), self.ymax])
 
+        auc = numpy.abs(numpy.trapz(rejection, efficiency))
+
         p = self._plot_datapoints(self.axis, efficiency, rejection, xerr=efficiency_error, yerr=rejection_error)
         self.plots.append(p)
         if label is not None:
-            self.labels.append(label)
+            self.labels.append(label[:10] + " ({:.2f})".format(auc))
         else:
-            self.labels.append(column)
+            self.labels.append(column[:10] + " ({:.2f})".format(auc))
         return self
 
     def finish(self):
@@ -851,6 +853,8 @@ class Importance(Plotter):
         @param data pandas.DataFrame containing all data
         @param columns which are used to calculate the correlations
         """
+        self.figure.set_tight_layout(True)
+
         def norm(x):
             width = (numpy.max(x) - numpy.min(x))
             if width <= 0:
@@ -887,7 +891,6 @@ class Importance(Plotter):
         """
         Sets limits, title, axis-labels and legend of the plot
         """
-        self.figure.set_tight_layout(True)
         return self
 
 

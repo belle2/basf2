@@ -423,7 +423,7 @@ class TitlePage(LatexObject):
     You should include only one of these objects in your latex code.
     """
 
-    def __init__(self, title, authors, abstract, add_table_of_contents=True):
+    def __init__(self, title, authors, abstract, add_table_of_contents=True, clearpage=True):
         """
         Sets author, date, title property, calls maketitle, optionalla adds abstract and table-of-contents.
             @param title of the latex file.
@@ -444,11 +444,13 @@ class TitlePage(LatexObject):
             self.output += abstract
             self.output += '\n' + r'\end{abstract}' + '\n'
 
-        self.output += r"\clearpage" + '\n'
+        if clearpage:
+            self.output += r"\clearpage" + '\n'
         if add_table_of_contents:
             self.output += r"\tableofcontents" + '\n'
             self.output += r"\FloatBarrier" + '\n'
-            self.output += r"\clearpage" + '\n'
+            if clearpage:
+                self.output += r"\clearpage" + '\n'
 
 
 if __name__ == '__main__':

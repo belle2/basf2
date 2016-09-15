@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import basf2_mva
-from basf2_mva_evaluation import plotting, histogram
+import basf2_mva_util
+
+from basf2_mva_evaluation import plotting
 import argparse
 import tempfile
 
 import numpy as np
 from B2Tools import b2latex, format
+
 import ROOT
-from ROOT import Belle2
-from ROOT import gSystem
-gSystem.Load('libanalysis.so')
 
 import os
 import shutil
@@ -35,81 +35,49 @@ def getCommandLineOptions():
     return args
 
 
-class WeightfileInformation:
-    """
-    Extract information about an expert from the database using the given identifiers
-    """
-
-    def __init__(self, identifier):
-        """
-        Construct new Weightfile Information object
-        """
-        #: Label of this weightfile
-        self.label = identifier
-        weightfile = basf2_mva.Weightfile.load(identifier)
-        #: General options
-        self.general_options = basf2_mva.GeneralOptions()
-        weightfile.getOptions(self.general_options)
-        variables = [Belle2.makeROOTCompatible(v) for v in self.general_options.m_variables]
-        importances = weightfile.getFeatureImportance()
-        #: Variables and importanceses
-        self.variables = {k: importances[k] for k in variables}
-        self.description = str(basf2_mva.info(identifier))
-
-        #: Branch names as written by the basf2_mva.expert
-        self.branch_probability = Belle2.makeROOTCompatible(identifier)
-        self.branch_target = Belle2.makeROOTCompatible(identifier + '_' + self.general_options.m_target_variable)
-
-
-def tree2dict(tree, tree_columns, dict_columns=None):
-    if dict_columns is None:
-        dict_columns = tree_columns
-    d = {column: np.zeros((tree.GetEntries(),)) for column in dict_columns}
-    for iEvent, event in enumerate(tree):
-        for dict_column, tree_column in zip(dict_columns, tree_columns):
-            d[dict_column][iEvent] = getattr(event, tree_column)
-    return d
-
-
-def apply_experts(informations, datafiles, treename):
-    tempdir = tempfile.mkdtemp()
-    datafiles = sum(datafiles, [])
-    rootfilename = tempdir + '/expert.root'
-    basf2_mva.expert(basf2_mva.vector(*[i.label for i in informations]),
-                     basf2_mva.vector(*datafiles),
-                     treename,
-                     rootfilename)
-    rootfile = ROOT.TFile(rootfilename, "UPDATE")
-    roottree = rootfile.Get("variables")
-    probabilities = tree2dict(roottree, [i.branch_probability for i in informations], [i.label for i in informations])
-    targets = tree2dict(roottree, [i.branch_target for i in informations], [i.label for i in informations])
-    shutil.rmtree(tempdir)
-    return probabilities, targets
+def unique(input):
+    output = []
+    for x in input:
+        if x not in output:
+            output.append(x)
+    return output
 
 
 if __name__ == '__main__':
 
-    old_cwd = os.getcwd()
     ROOT.gROOT.SetBatch(True)
+
+    old_cwd = os.getcwd()
     args = getCommandLineOptions()
 
     identifiers = sum(args.identifiers, [])
-    informations = [WeightfileInformation(identifier) for identifier in identifiers]
+    datafiles = sum(args.datafiles, [])
 
-    test_probability, test_target = apply_experts(informations, args.datafiles, args.treename)
+    methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]
+
+    test_probability = {}
+    test_target = {}
+    for method in methods:
+        p, t = method.apply_expert(datafiles, args.treename)
+        test_probability[method.identifier] = p
+        test_target[method.identifier] = t
+
+    train_probability = {}
+    train_target = {}
     if args.train_datafiles is not None:
-        train_probability, train_target = apply_experts(informations, args.train_datafiles, args.treename)
-    else:
-        train_probability, train_target = None, None
+        train_datafiles = sum(args.train_datafiles, [])
+        for method in methods:
+            p, t = method.apply_expert(train_datafiles, args.treename)
+            train_probability[method.identifier] = p
+            train_target[method.identifier] = t
 
-    labels = list(map(lambda x: x.label, informations))
-    variables = sorted(set([v for information in informations for v in information.variables.keys()]),
-                       key=lambda v: informations[0].variables.get(v, 0.0))
+    variables = unique(v for method in methods for v in method.variables)
+    root_variables = unique(v for method in methods for v in method.root_variables)
 
     rootchain = ROOT.TChain(args.treename)
-    for variable_datafile in sum(args.datafiles, []):
-        rootchain.Add(variable_datafile)
-    variables_data = tree2dict(rootchain, variables, [Belle2.invertMakeROOTCompatible(var) for var in variables])
+    for datafile in datafiles:
+        rootchain.Add(datafile)
+    variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, variables)
 
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
@@ -127,9 +95,9 @@ if __name__ == '__main__':
         This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree
     """)
 
-    for information in informations:
-        o += b2latex.SubSection(information.label)
-        o += b2latex.Listing(language='XML').add(information.description).finish()
+    for method in methods:
+        o += b2latex.SubSection(method.identifier)
+        o += b2latex.Listing(language='XML').add(method.description).finish()
 
     o += b2latex.Section("Variables")
     o += b2latex.String("""
@@ -137,8 +105,8 @@ if __name__ == '__main__':
     """)
     graphics = b2latex.Graphics()
     p = plotting.Importance()
-    p.add({i.label: np.array([i.variables.get(v, 0.0) for v in variables]) for i in informations},
-          identifiers, [Belle2.invertMakeROOTCompatible(var) for var in variables])
+    p.add({i.identifier: np.array([i.importances.get(v, 0.0) for v in variables]) for i in methods},
+          identifiers, variables)
     p.finish()
     p.save('importance.png')
     graphics.add('importance.png', width=1.0)
@@ -146,7 +114,7 @@ if __name__ == '__main__':
 
     graphics = b2latex.Graphics()
     p = plotting.CorrelationMatrix()
-    p.add(variables_data, [Belle2.invertMakeROOTCompatible(var) for var in variables],
+    p.add(variables_data, variables,
           test_target[identifiers[0]] == 1,
           test_target[identifiers[0]] == 0)
     p.finish()
@@ -156,7 +124,8 @@ if __name__ == '__main__':
 
     o += b2latex.Section("ROC Plot")
     o += b2latex.String("""
-        This section contains the receiver operating characteristics (ROC) of the classifiers on training and independent data
+        This section contains the receiver operating characteristics (ROC) of the classifiers on training and independent data.
+        The legend of each plot contains the shortened identifier and the area under the ROC curve in parenthesis.
     """)
     graphics = b2latex.Graphics()
     p = plotting.RejectionOverEfficiency()

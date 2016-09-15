@@ -55,6 +55,41 @@ class Local(Backend):
         #: The size of the multiprocessing process pool.
         self.max_processes = max_processes
 
+    class Result():
+        """
+        Simple class to help monitor status of jobs submitted by CAF backend to PBS.
+
+        You pass in a Job ID from a qsub command and when you call the 'ready' method
+        it runs qstat to see whether or not the job has finished.
+        """
+
+        def __init__(self, job, result):
+            """
+            Pass in the job object and the multiprocessing result to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            self.job = job
+            self.result = result
+
+        def ready(self):
+            """
+            Function that simply wraps the ready() function of the multiprocessing result object.
+            """
+            return self.result.ready()
+
+        def post_process(self):
+            """
+            Does clean up tasks after the main job has finished. Mainly downloading output to the
+            correct output location.
+            """
+            # Once the subprocess is done, move the requested output to the output directory
+            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            for pattern in self.job.output_patterns:
+                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.job.output_dir)
+                    # print('moving', file_name, 'to', job.output_dir)
+
     def join(self):
         """
         Closes and joins the Pool, letting you wait for all results currently
@@ -128,7 +163,7 @@ class Local(Backend):
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
                 pickle.dump(existing_input_files, input_data_file)
 
-        result = pool.apply_async(Local.run_job, (job,))
+        result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
         print('Job {0} submitted'.format(job.name))
         return result
 
@@ -158,14 +193,6 @@ class Local(Backend):
             print('Starting Sub Process: {0}'.format(job.name))
             subprocess.run(job.cmd, shell=False, stdout=f_out, stderr=f_err, cwd=job.working_dir)
             print('Sub Process {0} Finished.'.format(job.name))
-
-        # Once the subprocess is done, move the requested output to the output directory
-        # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
-        for pattern in job.output_patterns:
-            output_files = glob.glob(os.path.join(job.working_dir, pattern))
-            for file_name in output_files:
-                shutil.move(file_name, job.output_dir)
-                # print('moving', file_name, 'to', job.output_dir)
 
 
 class PBS(Backend):
@@ -235,12 +262,14 @@ class PBS(Backend):
         #: A list of string lines that define how basf2 will be setup on the worker node.
         #: Can be set explicitly by the user or ignored if the default/user defined config file
         #: is good enough
-        self.basf2_setup = ["SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
-                            "CAF_RELEASE_LOCATION="+self.release+"\n",
-                            "source $SETUPBELLE2_CVMFS\n",
-                            "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
-                            "setuprel\n",
-                            "popd > /dev/null\n"]
+        self.basf2_setup = []
+        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
+                                 "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
+                                 "source $SETUPBELLE2_CVMFS\n",
+                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
+                                 "setuprel\n",
+                                 "popd > /dev/null\n"])
 
     def _generate_pbs_script(self, job):
         """
@@ -274,9 +303,12 @@ class PBS(Backend):
         it runs qstat to see whether or not the job has finished.
         """
 
-        def __init__(self, job_id):
+        def __init__(self, job, job_id):
             """
+            Pass in the job object and the job id to allow the result to do monitoring and perform
+            post processing of the job.
             """
+            self.job = job
             self.job_id = job_id
 
         def ready(self):
@@ -291,6 +323,19 @@ class PBS(Backend):
                     return True
             else:
                 return False
+
+        def post_process(self):
+            """
+            Does clean up tasks after the main job has finished. Mainly downloading output to the
+            correct output location.
+            """
+            # Once the subprocess is done, move the requested output to the output directory
+            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            for pattern in self.job.output_patterns:
+                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.job.output_dir)
+                    # print('moving', file_name, 'to', job.output_dir)
 
     @method_dispatch
     def submit(self, job):
@@ -349,7 +394,7 @@ class PBS(Backend):
         script_path = os.path.join(job.working_dir, "submit.sh")
         qsub_out = subprocess.check_output(["qsub", script_path], stderr=subprocess.STDOUT, universal_newlines=True)
         qsub_out = qsub_out.replace("\n", "")
-        result = PBS.Result(qsub_out)
+        result = PBS.Result(job, qsub_out)
         return result
 
     @submit.register(list)

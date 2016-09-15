@@ -705,10 +705,8 @@ namespace Belle2 {
           G4LogicalVolume* logical = new G4LogicalVolume(tube, Materials::get("G4_Al"),
                                                          "logicalCDCEndplate" + name, 0, 0);
           logical->SetVisAttributes(m_VisAttributes.back());
-          if (iEndplate != 55 || (iEPLayer != 2 && iEPLayer != 5)) {
-            new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfwd + zbwd)*CLHEP::cm / 2.0), logical,
-                              "physicalCDCEndplate" + name, logical_cdc, false, iEPLayer);
-          }
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfwd + zbwd)*CLHEP::cm / 2.0), logical,
+                            "physicalCDCEndplate" + name, logical_cdc, false, iEPLayer);
 
         }
       }

@@ -55,11 +55,11 @@ namespace Belle2 {
     /** StoreArray name of the input and output reco tracks. */
     std::string m_param_recoTracksStoreArrayName = "RecoTracks";
     /** StoreArray name of the CDC hits. */
-    std::string m_param_cdcHitsStoreArrayName = "CDCHits";
+    std::string m_param_cdcHitsStoreArrayName = "";
     /** StoreArray name of the SVD hits. */
-    std::string m_param_svdHitsStoreArrayName = "SVDClusters";
+    std::string m_param_svdHitsStoreArrayName = "";
     /** StoreArray name of the PXD hits. */
-    std::string m_param_pxdHitsStoreArrayName = "PXDClusters";
+    std::string m_param_pxdHitsStoreArrayName = "";
     /** Use these particle hypotheses for fitting. Please use positive pdg codes only. */
     std::vector<unsigned int> m_param_pdgCodesToUseForFitting = {211};
     /** Resort the hits while fitting. */

@@ -13,11 +13,14 @@
 # yourself.                                                                                     #
 ####                                                                                         ####
 #################################################################################################
+# You should be setting a directory where you want the output to be stored (it will be created if
+# it doesn't exist)
+[ $# -eq 0 ] && { echo "Usage: $0 <data directory>"; exit 1; }
 
-# First define and create directories to store the output.
-EXAMPLE_DIR=${BELLE2_LOCAL_DIR}/calibration/examples
-mkdir -p ${EXAMPLE_DIR}/example_calibration_dsts
-pushd ${EXAMPLE_DIR}/example_calibration_dsts
+# Define and create directories to store the output.
+EXAMPLE_DIR=$1
+mkdir -p ${EXAMPLE_DIR}
+pushd ${EXAMPLE_DIR}
 # This creates cosmic track events usually used for VXD alignment (they are nice and quick to
 # generate) for a few runs.
 basf2 ${BELLE2_LOCAL_DIR}/alignment/examples/1_generate.py 1 1 500 1

@@ -112,7 +112,7 @@ void DqmHistoManagerModule::event()
     m_initialized = true;
   }
   if ((ProcHandler::EvtProcID() < 100 &&
-       m_nevent % (m_interval / ProcHandler::NumEvtProcs()) == 0) ||
+       m_nevent % (m_interval / ProcHandler::numEventProcesses()) == 0) ||
       (ProcHandler::EvtProcID() >= 10000 &&
        m_nevent % m_interval == 0)) {
     //  if (m_nevent % m_interval == 0) {

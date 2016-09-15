@@ -29,6 +29,18 @@
 #pragma link C++ class Belle2::ARICHSensorModuleInfo+;
 #pragma link C++ class Belle2::ARICHSensorModuleMap+;
 #pragma link C++ class Belle2::ARICHGeoBase+;
-
-
+#pragma link C++ class Belle2::ARICHGeoMasterVolume+;
+#pragma link C++ class Belle2::ARICHGeoAerogelPlane+;
+#pragma link C++ class Belle2::ARICHGeoDetectorPlane+;
+#pragma link C++ class Belle2::ARICHGeoHAPD+;
+#pragma link C++ class Belle2::ARICHGeoSupport+;
+#pragma link C++ class Belle2::ARICHGeoMirrors+;
+#pragma link C++ class Belle2::ARICHGeometryConfig+;
+#pragma link C++ class Belle2::ARICHModulesInfo+;
+#pragma link C++ class Belle2::ARICHChannelMapping+;
+#pragma link C++ class Belle2::ARICHMergerMapping+;
+#pragma link C++ class Belle2::ARICHCopperMapping+;
+#pragma link C++ class Belle2::ARICHSimulationPar+;
+#pragma link C++ class Belle2::ARICHChannelMask+;
+#pragma link C++ class Belle2::ARICHModuleTest+;
 #endif

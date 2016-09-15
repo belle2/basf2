@@ -168,21 +168,21 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
 }
 int ECLChannelMapper::getCrateID(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1 ][0];
   } else  return -1;
 }
 
 int ECLChannelMapper::getShaperPosition(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1][1];
   } else  return -1;
 }
 
 int ECLChannelMapper::getShaperChannel(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1][2];
   } else  return -1;
 }

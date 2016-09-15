@@ -12,7 +12,7 @@ REG_MODULE(ECLPacker)
 
 ECLPackerModule::ECLPackerModule() :
   m_compressMode(false),
-  m_eclRawCOPPERs("", DataStore::c_Persistent)
+  m_eclRawCOPPERs("", DataStore::c_Event)
 {
   setDescription("");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
@@ -115,6 +115,10 @@ void ECLPackerModule::event()
     iCrate = m_eclMapper->getCrateID(cid);
     iShaper = m_eclMapper->getShaperPosition(cid);
     iChannel = m_eclMapper->getShaperChannel(cid);
+    if (iCrate < 1 && iShaper < 1 && iChannel < 1) {
+      B2ERROR("Wrong crate/shaper/channel ids: " << iCrate << " " << iShaper << " " << iChannel << " for CID " << cid);
+      throw eclPacker_internal_error();
+    }
 
     collectorMaskArray[iCrate - 1] |= (1 << (iShaper - 1));
 
@@ -181,14 +185,14 @@ void ECLPackerModule::event()
       if (!shaperMaskArray[iCrate - 1]) continue;
       B2DEBUG(200, "Pack data for iCrate = " << iCrate << " nShapers = " << nShapers);
 
-      int type   = 0; //TODO
-      int fee_id = 0; //TODO
-      int ver    = 0; //TODO
-      const short trigTime = 0x0;
+//      int type   = 0;
+//      int fee_id = 0;
+//      int ver    = 0;
+//      const short trigTime = 0x0;
 
-      buff[iFINESSE].push_back((type << 24) | (ver << 16) | fee_id);
-      buff[iFINESSE].push_back((trigTime << 16) | nwords[iFINESSE]); // recalculate nworda later
-      buff[iFINESSE].push_back(m_EvtNum);
+//      buff[iFINESSE].push_back((type << 24) | (ver << 16) | fee_id);
+//      buff[iFINESSE].push_back((trigTime << 16) | nwords[iFINESSE]); // recalculate nwords later
+//      buff[iFINESSE].push_back(m_EvtNum);
 
       // write EclCollector header to the buffer
       int eclCollectorHeader = 0xFFF;

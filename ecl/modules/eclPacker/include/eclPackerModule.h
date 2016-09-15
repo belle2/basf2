@@ -43,6 +43,8 @@ namespace Belle2 {
 
       BELLE2_DEFINE_EXCEPTION(Write_adc_samples_error,
                               "Error packing adc samples to buffer");
+      BELLE2_DEFINE_EXCEPTION(eclPacker_internal_error,
+                              "Something wrong with ECL Packer");
 
 
     protected:

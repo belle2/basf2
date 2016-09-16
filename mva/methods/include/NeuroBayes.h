@@ -26,7 +26,7 @@
 #include <neurobayes/NeuroBayesExpert.hh>  //NeuroBayes Header
 #endif
 
-#define DEACTIVATE_NEUROBAYES
+//#define DEACTIVATE_NEUROBAYES
 
 #include <memory>
 

@@ -85,14 +85,6 @@ int* NeuroBayesTeacher::nb_get_individual_prepro_flags(int*) {assert(0); return 
 void NeuroBayesTeacher::SayHello() {assert(0);}
 NeuroBayesTeacher::~NeuroBayesTeacher() {assert(0);}
 
-Expert::Expert(const std::string, int, bool, dsa::ec_t**,
-               dsa::log_func_t*, void*,
-               dsa::delete_enclosed_func_t*) {assert(0);}
-
-float Expert::nb_expert(ACTION, double*,
-                        float) {assert(0); return 0.0;}
-float Expert::nb_expert(ACTION, float*, float) {assert(0); return 0.0;}
-Expert::~Expert() {assert(0);}
 #endif
 
 namespace Belle2 {

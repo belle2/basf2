@@ -36,6 +36,7 @@ def feature_importance(state):
     """
     Return a list containing the feature importances
     """
+    from sklearn.ensemble import GradientBoostingClassifier
     if isinstance(state.estimator, GradientBoostingClassifier):
         return [x for x in state.estimator.feature_importances_]
     return []

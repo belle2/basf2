@@ -98,6 +98,11 @@ Expert::~Expert() {assert(0);}
 namespace Belle2 {
   namespace MVA {
 
+    bool IsNeuroBayesAvailable()
+    {
+      return (::NeuroBayesTeacher::Instance() != 0);
+    }
+
     void NeuroBayesOptions::load(const boost::property_tree::ptree& pt)
     {
       int version = pt.get<int>("NeuroBayes_version");

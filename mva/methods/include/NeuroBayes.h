@@ -34,6 +34,11 @@ namespace Belle2 {
   namespace MVA {
 
     /**
+     * Check if NeuroBayes is available
+     */
+    bool IsNeuroBayesAvailable();
+
+    /**
      * Options for the NeuroBayes MVA method
      */
     class NeuroBayesOptions : public SpecificOptions {

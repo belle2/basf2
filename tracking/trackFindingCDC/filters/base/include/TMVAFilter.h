@@ -102,6 +102,7 @@ namespace Belle2 {
 
       /// TMVA Expert to examine the object
       std::unique_ptr<TMVAExpert> m_tmvaExpert;
+
     };
 
     /// Convience template to create a tmva filter for a set of variables.

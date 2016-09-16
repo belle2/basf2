@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/tmva/PyEstimator.h>
+#include <tracking/trackFindingCDC/mva/PyEstimator.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <boost/python/import.hpp>

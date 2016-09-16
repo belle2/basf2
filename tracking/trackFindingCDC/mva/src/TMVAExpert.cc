@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/tmva/Expert.h>
+#include <tracking/trackFindingCDC/mva/TMVAExpert.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <framework/logging/Logger.h>
@@ -15,7 +15,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Expert::Expert(const std::string& weightFolderName, const std::string& trainingName) :
+TMVAExpert::TMVAExpert(const std::string& weightFolderName, const std::string& trainingName) :
   m_reader("Silent;!V"),
   m_weightFolderName(weightFolderName),
   m_trainingName(trainingName)
@@ -25,7 +25,7 @@ Expert::Expert(const std::string& weightFolderName, const std::string& trainingN
   B2DEBUG(100, "finished load plugin");
 }
 
-std::string Expert::getAbsWeightFilePath()
+std::string TMVAExpert::getAbsWeightFilePath()
 {
   std::string weightFilePath =
     m_weightFolderName == "" ?
@@ -35,14 +35,14 @@ std::string Expert::getAbsWeightFilePath()
   return absWeightFilePath;
 }
 
-void Expert::initializeReader(const std::function<void(TMVA::Reader&)>& setReaderAddresses)
+void TMVAExpert::initializeReader(const std::function<void(TMVA::Reader&)>& setReaderAddresses)
 {
   setReaderAddresses(m_reader);
   B2DEBUG(100, "book method");
   m_reader.BookMVA("FastBDT", getAbsWeightFilePath());
 }
 
-void Expert::initializeReader(std::vector<Named<Float_t*> > namedVariables)
+void TMVAExpert::initializeReader(std::vector<Named<Float_t*> > namedVariables)
 {
   initializeReader([&namedVariables](TMVA::Reader & reader) {
     for (const Named<Float_t*>& namedVariable : namedVariables) {
@@ -54,7 +54,7 @@ void Expert::initializeReader(std::vector<Named<Float_t*> > namedVariables)
   });
 }
 
-double Expert::predict()
+double TMVAExpert::predict()
 {
   return m_reader.EvaluateMVA("FastBDT");
 }

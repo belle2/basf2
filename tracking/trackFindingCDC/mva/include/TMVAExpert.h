@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
-#include <tracking/trackFindingCDC/tmva/TMVA.h>
+#include <tracking/trackFindingCDC/mva/TMVA.h>
 #include <TMVA/Reader.h>
 #include <functional>
 
@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Class to interact with TMVA.
-    class Expert {
+    class TMVAExpert {
     public:
       /** Construct the Expert with the specified weight folder and
        *  the name of the training that was used in the teacher run.
@@ -26,7 +26,7 @@ namespace Belle2 {
                                     should be sought.
        *  @param trainingName       Name of the training of the teacher run.
        */
-      Expert(const std::string& weightFolderName, const std::string& trainingName);
+      TMVAExpert(const std::string& weightFolderName, const std::string& trainingName);
 
       /// Evaluate the TMVA method and return the MVAOutput
       double predict();

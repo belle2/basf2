@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/tmva/Recorder.h>
+#include <tracking/trackFindingCDC/mva/Recorder.h>
 #include <framework/utilities/FileSystem.h>
 
 #include <framework/pcore/ProcHandler.h>

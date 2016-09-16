@@ -1,4 +1,4 @@
-#include <tracking/trackFindingCDC/tmva/TMVA.h>
+#include <tracking/trackFindingCDC/mva/TMVA.h>
 #include <TPluginManager.h>
 
 namespace Belle2 {

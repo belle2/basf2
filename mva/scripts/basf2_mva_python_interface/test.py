@@ -15,6 +15,13 @@ class State(object):
         pass
 
 
+def feature_importance(state):
+    """
+    Return a list containing the feature importances
+    """
+    return []
+
+
 def get_model(number_of_features, number_of_events, parameters):
     """
     Return default test model

@@ -29,7 +29,8 @@ if __name__ == "__main__":
 
     methods = [
             ('Trivial.xml', basf2_mva.TrivialOptions()),
-            # ('NeuroBayes.xml', basf2_mva.NeuroBayesOptions()),
+            ('Python.xml', basf2_mva.PythonOptions()),
+            ('NeuroBayes.xml', basf2_mva.NeuroBayesOptions()),
             ('FastBDT.xml', basf2_mva.FastBDTOptions()),
             ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
             ('FANN.xml', basf2_mva.FANNOptions()),

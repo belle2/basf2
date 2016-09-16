@@ -32,6 +32,15 @@ def get_model(number_of_features, number_of_events, parameters):
     return State(clf)
 
 
+def feature_importance(state):
+    """
+    Return a list containing the feature importances
+    """
+    if isinstance(state.estimator, GradientBoostingClassifier):
+        return [x for x in state.estimator.feature_importances_]
+    return []
+
+
 def load(obj):
     """
     Load sklearn estimator into state

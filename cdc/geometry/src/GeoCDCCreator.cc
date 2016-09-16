@@ -690,7 +690,6 @@ namespace Belle2 {
 
       m_VisAttributes.push_back(new G4VisAttributes(true, G4Colour(1., 1., 0.)));
       for (const auto& endplate : geo.getEndPlates()) {
-        const int iEndplate = endplate.getId();
         for (const auto& epLayer : endplate.getEndPlateLayers()) {
           const int iEPLayer = epLayer.getILayer();
           const string name = epLayer.getName();

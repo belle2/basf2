@@ -124,6 +124,11 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
     return -1;
   }
 //    B2DEBUG(100,"ECLChannelMapper:: " << std::hex << "0x"<<iCOPPERNode << " " << iFINESSE << " iCrate = " << std::dec << iCrate);
+  if (iCrate > ECL_CRATES || iCrate < 1) {
+    B2ERROR("ECLChannelMapper::getCrateID::ERROR:: wrong crate number " << iCrate << " return -1");
+    return -1;
+  }
+
   return iCrate;
 
 }

@@ -172,7 +172,7 @@ int RbTupleManager::hadd(bool deleteflag)
   printf("compfile = %s\n", compfile.c_str());
   while ((dirp = readdir(dp)) != NULL) {
     std::string curfile = std::string(dirp->d_name);
-    printf("Checking %s with compfile%s\n", curfile.c_str(), compfile.c_str());
+    //    printf("Checking %s with compfile%s\n", curfile.c_str(), compfile.c_str());
     if (curfile.compare(0, compfile.size(), compfile) == 0) {
       printf("RbTupleManager:: adding  file =%s\n", curfile.c_str());
       merger.AddFile((m_workdir + "/" + curfile).c_str());

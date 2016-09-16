@@ -20,6 +20,7 @@ def reconstruction_path(inputfiles):
     fillParticleLists([('K-', 'Kid > 0.5'), ('pi+', 'piid > 0.5')], path=path)
     reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
     fitVertex('D0', 0.1, path=path)
+    applyCuts('D0', '1.8 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
     return path
 

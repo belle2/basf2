@@ -225,7 +225,7 @@ namespace Belle2 {
       if (supported_interfaces.find(general_options.m_method) != supported_interfaces.end()) {
         auto teacher = supported_interfaces[general_options.m_method]->getTeacher(general_options, specific_options);
         auto weightfile = teacher->train(data);
-        Weightfile::save(weightfile, general_options.m_weightfile);
+        Weightfile::save(weightfile, general_options.m_identifier);
         auto expert = supported_interfaces[general_options.m_method]->getExpert();
         expert->load(weightfile);
         return expert;
@@ -242,13 +242,17 @@ namespace Belle2 {
       GeneralOptions data_general_options = general_options;
       data_general_options.m_target_variable = "";
       if (meta_options.m_splot_combined)
-        data_general_options.m_weightfile = general_options.m_weightfile + "_splot.xml";
+        data_general_options.m_identifier = general_options.m_identifier + "_splot.xml";
       ROOTDataset data_dataset(data_general_options);
+      // Reset target variable so that it shows up in the weightfile at the end
+      data_general_options.m_target_variable = general_options.m_target_variable;
 
       GeneralOptions discriminant_general_options = general_options;
       discriminant_general_options.m_target_variable = "";
       discriminant_general_options.m_variables = {meta_options.m_splot_variable};
       ROOTDataset discriminant_dataset(discriminant_general_options);
+      // Reset target variable so that it shows up in the weightfile at the end
+      discriminant_general_options.m_target_variable = general_options.m_target_variable;
 
       GeneralOptions mc_general_options = general_options;
       mc_general_options.m_datafiles = meta_options.m_splot_mc_files;
@@ -266,7 +270,7 @@ namespace Belle2 {
 
       if (meta_options.m_splot_boosted) {
         GeneralOptions boost_general_options = data_general_options;
-        boost_general_options.m_weightfile = general_options.m_weightfile + "_boost.xml";
+        boost_general_options.m_identifier = general_options.m_identifier + "_boost.xml";
         SPlotDataset splot_dataset(boost_general_options, data_dataset, getBoostWeights(discriminant_dataset, binning), signalFraction);
         auto boost_expert = teacher_dataset(boost_general_options, specific_options, splot_dataset);
 
@@ -282,7 +286,7 @@ namespace Belle2 {
           return splot_expert;
       }
 
-      mc_general_options.m_weightfile = general_options.m_weightfile + "_pdf.xml";
+      mc_general_options.m_identifier = general_options.m_identifier + "_pdf.xml";
       mc_general_options.m_method = "PDF";
       PDFOptions pdf_options;
       auto pdf_expert = teacher_dataset(mc_general_options, pdf_options, mc_dataset);
@@ -291,7 +295,7 @@ namespace Belle2 {
       combination_general_options.m_method = "Combination";
       combination_general_options.m_variables.push_back(meta_options.m_splot_variable);
       CombinationOptions combination_options;
-      combination_options.m_weightfiles = {data_general_options.m_weightfile, mc_general_options.m_weightfile};
+      combination_options.m_weightfiles = {data_general_options.m_identifier, mc_general_options.m_identifier};
       auto combination_expert = teacher_dataset(combination_general_options, combination_options, data_dataset);
 
       return combination_expert;

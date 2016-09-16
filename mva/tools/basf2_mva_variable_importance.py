@@ -28,14 +28,24 @@ def getCommandLineOptions():
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
                         help='Name of the outputted pdf file')
-    parser.add_argument('-iterative', '--iterative', dest='iterative', action='store_true',
-                        help='Improve the importance estimation by iteratively'
+    parser.add_argument('-recursive', '--recursive', dest='recursive', action='store_true',
+                        help='Improve the importance estimation by recursively'
                              'remove the most important variable. Needs O(NFeatures**2) Trainings!')
     args = parser.parse_args()
     return args
 
 
 def get_importances(method, train_datfiles, test_datafiles, treename, variables, global_auc):
+    """
+    Calculate the importance of the variables of a method by retraning the method without
+    one of the variables at a time and comparing the auc to the global_auc
+    @param method the method object
+    @param train_datafiles data used to retrain the method
+    @param test_datafiles data used to evaluate the method and calculate the new auc
+    @param treename the name of the tree containing the data
+    @param variables list of variables which are considered for the trainings
+    @param global_auc the auc of the training with all variables
+    """
     importances = {}
     for variable in variables:
         general_options = method.general_options
@@ -46,7 +56,18 @@ def get_importances(method, train_datfiles, test_datafiles, treename, variables,
     return importances
 
 
-def get_importances_iterative(method, train_datfiles, test_datafiles, treename, variables, global_auc):
+def get_importances_recursive(method, train_datfiles, test_datafiles, treename, variables, global_auc):
+    """
+    Calculate the importance of the variables of a method by retraning the method without
+    one of the variables at a time. Then the best variable (the one which leads to the lowest auc
+    if it is left out) is removed and the importance of the remaining variables is calculated recursively
+    @param method the method object
+    @param train_datafiles data used to retrain the method
+    @param test_datafiles data used to evaluate the method and calculate the new auc
+    @param treename the name of the tree containing the data
+    @param variables list of variables which are considered for the trainings
+    @param global_auc the auc of the training with all variables
+    """
     imp = get_importances(method, train_datfiles, test_datafiles, treename, variables, global_auc)
     most_important = max(imp.keys(), key=lambda x: imp[x])
     print(most_important, imp[most_important])
@@ -56,7 +77,7 @@ def get_importances_iterative(method, train_datfiles, test_datafiles, treename, 
         return imp
 
     importances = {most_important: imp[most_important]}
-    rest = get_importances_iterative(method, train_datfiles, test_datafiles, treename, remaining_variables, global_auc)
+    rest = get_importances_recursive(method, train_datfiles, test_datafiles, treename, remaining_variables, global_auc)
     importances.update(rest)
     return importances
 
@@ -78,8 +99,8 @@ if __name__ == '__main__':
         global_auc = basf2_mva_util.calculate_roc_auc(*method.apply_expert(test_datafiles, args.treename))
         for variable in method.variables:
             all_variables.append(variable)
-        if args.iterative:
-            imp = get_importances_iterative(method, train_datafiles, test_datafiles, args.treename, method.variables, global_auc)
+        if args.recursive:
+            imp = get_importances_recursive(method, train_datafiles, test_datafiles, args.treename, method.variables, global_auc)
             for key in imp.keys():
                 imp[key] = global_auc - imp[key]
         else:

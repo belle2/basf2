@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
   po::options_description description("Options");
   description.add_options()
   ("help", "print this message")
-  ("weightfiles", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Names of weightfiles");
+  ("identifiers", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Identifiers of the trained methods");
 
   po::variables_map vm;
 

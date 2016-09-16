@@ -150,7 +150,7 @@ class Plotter(object):
     def set_fill_options(self, fill_kwargs=None):
         """
         Overrides default fill_between options for datapoint errorband
-        @param fillbar_kwargs keyword arguments for the fill_between function
+        @param fill_kwargs keyword arguments for the fill_between function
         """
         self.fill_kwargs = copy.copy(fill_kwargs)
         return self
@@ -327,6 +327,9 @@ class RejectionOverEfficiency(Plotter):
 
 
 class Multiplot(Plotter):
+    """
+    Plots multiple other plots into a grid 3x?
+    """
     #: figure which is used to draw
     figure = None
     #: Main axis
@@ -350,13 +353,18 @@ class Multiplot(Plotter):
         elif number_of_plots == 3:
             gs = matplotlib.gridspec.GridSpec(1, 3)
         else:
-            gs = matplotlib.gridspec.GridSpec(np.ceil(number_of_plots / 3), 3)
+            gs = matplotlib.gridspec.GridSpec(int(numpy.ceil(number_of_plots / 3)), 3)
 
+        #: the subplots which are displayed in the grid
         self.sub_plots = [cls(self.figure, self.figure.add_subplot(gs[i // 3, i % 3])) for i in range(number_of_plots)]
         self.axis = self.sub_plots[0].axis
         super(Multiplot, self).__init__(self.figure, self.axis)
 
     def add(self, i, *args, **kwargs):
+        """
+        Call add function of ith subplot
+        @param i position of the subplot
+        """
         self.sub_plots[i].add(*args, **kwargs)
 
     def finish(self):
@@ -919,7 +927,9 @@ class CorrelationMatrix(Plotter):
         gs = matplotlib.gridspec.GridSpec(8, 2)
         self.signal_axis = self.figure.add_subplot(gs[:6, 0])
         self.bckgrd_axis = self.figure.add_subplot(gs[:6, 1], sharey=self.signal_axis)
+        #: Colorbar axis contains the colorbar
         self.colorbar_axis = self.figure.add_subplot(gs[7, :])
+        #: Usual axis object which every Plotter object needs, here it is just a dummy
         self.axis = self.signal_axis
 
         super(CorrelationMatrix, self).__init__(self.figure, self.axis)

@@ -80,6 +80,9 @@ namespace Belle2 {
         splot_weights.push_back((covariance[1] * binning.m_signal_pdf[iBin] + covariance[2] * binning.m_bckgrd_pdf[iBin]) / norm);
       }
 
+      B2INFO("Covariance Matrix of SPlot");
+      B2INFO(covariance[0] << " " << covariance[1] << " " << covariance[2]);
+
       return splot_weights;
 
     }

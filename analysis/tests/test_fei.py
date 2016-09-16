@@ -853,9 +853,9 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.xml' "
-                                                "--identifier 'FEITEST_trainingData'", shell=True)
+                                                "--identifier 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --identifier 'trainingData.xml' "
+                                                "--db_identifier 'FEITEST_trainingData'", shell=True)
         os.remove('trainingData.xml')
 
         path = basf2.create_path()
@@ -938,9 +938,9 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.xml' "
-                                                "--identifier 'FEITEST_trainingData'", shell=True)
+                                                "--identifier 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --identifier 'trainingData.xml' "
+                                                "--db_identifier 'FEITEST_trainingData'", shell=True)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)

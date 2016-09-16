@@ -36,6 +36,10 @@ def getCommandLineOptions():
 
 
 def unique(input):
+    """
+    Returns a list containing only unique elements, keeps the original order of the list
+    @param input list containing the elements
+    """
     output = []
     for x in input:
         if x not in output:
@@ -91,8 +95,9 @@ if __name__ == '__main__':
                            add_table_of_contents=True).finish()
 
     o += b2latex.Section("Classifiers")
-    o += b2latex.String("""
-        This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree
+    o += b2latex.String(r"""
+        This section contains the GeneralOptions and SpecificOptions of all classifiers represented by an XML tree.
+        The same information can be retreived using the basf2\_mva\_info tool
     """)
 
     for method in methods:
@@ -174,8 +179,8 @@ if __name__ == '__main__':
                   target == 1, target == 0, )
             p.finish()
             p.axis.set_title("Overtraining check for {}".format(identifier))
-            p.save('overtraining_plot.png')
-            graphics.add('overtraining_plot.png', width=1.0)
+            p.save('overtraining_plot_{}.png'.format(identifier))
+            graphics.add('overtraining_plot_{}.png'.format(identifier), width=1.0)
             o += graphics.finish()
 
     o.save('latex.tex', compile=True)

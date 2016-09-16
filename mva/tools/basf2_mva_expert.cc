@@ -30,7 +30,7 @@ int main(int argc, char* argv[])
   po::options_description description("Options");
   description.add_options()
   ("help", "print this message")
-  ("weightfiles", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Names of weightfiles")
+  ("identifiers", po::value<std::vector<std::string>>(&filenames)->multitoken(), "Identifiers of the trained methods")
   ("datafiles", po::value<std::vector<std::string>>(&datafiles)->multitoken()->required(),
    "ROOT files containing the training dataset")
   ("treename", po::value<std::string>(&treename), "Name of tree in ROOT datafile")

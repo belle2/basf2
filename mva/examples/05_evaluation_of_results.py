@@ -3,15 +3,21 @@
 
 # Thomas Keck 2016
 
-import root_pandas
-from B2Tools import b2plot
-import sklearn.metrics
+from basf2_mva_util import tree2dict, calculate_roc_auc
+from basf2_mva_evaluation import plotting
+import ROOT
 
 if __name__ == "__main__":
 
-    data = root_pandas.read_root('ntuple.root')
+    rootchain = ROOT.TChain("variables")
+    rootchain.Add('ntuple.root')
 
-    p = b2plot.PurityOverEfficiency()
+    variables = ['extraInfo__boFull__bc', 'extraInfo__boOrdinary__bc', 'extraInfo__boPdf__bc', 'extraInfo__boSPlot__bc',
+                 'extraInfo__boSPlotCombined__bc', 'extraInfo__boSPlotBoosted__bc', 'extraInfo__boSPlotCombinedBoosted__bc',
+                 'isSignal']
+    data = tree2dict(rootchain, variables, variables)
+
+    p = plotting.RejectionOverEfficiency()
     p.set_plot_options(dict(linestyle='-', lw=6))
     p.set_errorband_options(None)
     p.set_errorbar_options(None)
@@ -22,15 +28,13 @@ if __name__ == "__main__":
     p.add(data, 'extraInfo__boSPlotCombined__bc', data['isSignal'] == 1, data['isSignal'] == 0)
     p.add(data, 'extraInfo__boSPlotBoosted__bc', data['isSignal'] == 1, data['isSignal'] == 0)
     p.add(data, 'extraInfo__boSPlotCombinedBoosted__bc', data['isSignal'] == 1, data['isSignal'] == 0)
-    p.xmin = 0.8
-    p.ymin = 0.5
     p.finish()
     p.save('evaluation.png')
 
-    print('AUC (Ordinary)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boOrdinary__bc))
-    print('AUC (Full)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boFull__bc))
-    print('AUC (Pdf)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boPdf__bc))
-    print('AUC (SPlot)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boSPlot__bc))
-    print('AUC (SPlotCombined)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boSPlotCombined__bc))
-    print('AUC (SPlotBoosted)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boSPlotBoosted__bc))
-    print('AUC (SPlotCombinedBoosted)', sklearn.metrics.roc_auc_score(data.isSignal, data.extraInfo__boSPlotCombinedBoosted__bc))
+    print('AUC (Ordinary)', calculate_roc_auc(data['extraInfo__boOrdinary__bc'], data['isSignal']))
+    print('AUC (Full)', calculate_roc_auc(data['extraInfo__boFull__bc'], data['isSignal']))
+    print('AUC (Pdf)', calculate_roc_auc(data['extraInfo__boPdf__bc'], data['isSignal']))
+    print('AUC (SPlot)', calculate_roc_auc(data['extraInfo__boSPlot__bc'], data['isSignal']))
+    print('AUC (SPlotCombined)', calculate_roc_auc(data['extraInfo__boSPlotCombined__bc'], data['isSignal']))
+    print('AUC (SPlotBoosted)', calculate_roc_auc(data['extraInfo__boSPlotBoosted__bc'], data['isSignal']))
+    print('AUC (SPlotCombinedBoosted)', calculate_roc_auc(data['extraInfo__boSPlotCombinedBoosted__bc'], data['isSignal']))

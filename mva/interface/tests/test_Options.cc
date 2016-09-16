@@ -24,7 +24,7 @@ namespace {
     MVA::GeneralOptions general_options;
 
     EXPECT_EQ(general_options.m_method, "");
-    EXPECT_EQ(general_options.m_weightfile, "");
+    EXPECT_EQ(general_options.m_identifier, "");
     EXPECT_EQ(general_options.m_datafiles.size(), 0);
     EXPECT_EQ(general_options.m_treename, "ntuple");
     EXPECT_EQ(general_options.m_variables.size(), 0);
@@ -33,7 +33,7 @@ namespace {
     EXPECT_EQ(general_options.m_weight_variable, "__weight__");
 
     general_options.m_method = "Method";
-    general_options.m_weightfile = "Weightfile";
+    general_options.m_identifier = "Weightfile";
     general_options.m_datafiles = {"Datafile"};
     general_options.m_treename = "Tree";
     general_options.m_variables = {"v", "a", "r", "s"};
@@ -61,7 +61,7 @@ namespace {
     general_options2.load(pt);
 
     EXPECT_EQ(general_options2.m_method, "Method");
-    EXPECT_EQ(general_options2.m_weightfile, "Weightfile");
+    EXPECT_EQ(general_options2.m_identifier, "Weightfile");
     EXPECT_EQ(general_options2.m_datafiles.size(), 1);
     EXPECT_EQ(general_options2.m_datafiles[0], "Datafile");
     EXPECT_EQ(general_options2.m_treename, "Tree");

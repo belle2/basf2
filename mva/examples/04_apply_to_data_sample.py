@@ -10,7 +10,7 @@ from modularAnalysis import *
 import create_data_sample
 
 if __name__ == "__main__":
-    path = create_data_sample.reconstruction_path(['/local/scratch/hdd/MC/MC5/Charged02/mdst_00300*'])
+    path = create_data_sample.reconstruction_path(['/storage/jbod/tkeck/MC6/charged/sub00/mdst_0001*.root'])
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Test', identifier='weightfile.root')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Pdf', identifier='MVAPdf')
     path.add_module('MVAExpert', listNames=['D0'], extraInfoName='Full', identifier='MVAFull')

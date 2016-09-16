@@ -20,8 +20,8 @@ namespace po = boost::program_options;
 int main(int argc, char* argv[])
 {
 
-  std::string filename;
   std::string identifier;
+  std::string db_identifier;
 
   int event = 0;
   int run = 0;
@@ -30,8 +30,8 @@ int main(int argc, char* argv[])
   po::options_description description("Options");
   description.add_options()
   ("help", "print this message")
-  ("filename", po::value<std::string>(&filename)->required(), "Name of weightfile produced by basf2_mva_teacher")
-  ("identifier", po::value<std::string>(&identifier)->required(), "Database identifier")
+  ("identifier", po::value<std::string>(&identifier)->required(), "Identifier produced by basf2_mva_teacher")
+  ("db_identifier", po::value<std::string>(&db_identifier)->required(), "Database identifier")
   ("experiment", po::value<int>(&experiment), "Experiment for which the weightfile should be valid")
   ("run", po::value<int>(&run), "Run for which the weightfile should be valid")
   ("event", po::value<int>(&event), "Experiment for which the weightfile should be valid");
@@ -51,6 +51,6 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::download(identifier, filename, experiment, run, event);
+  Belle2::MVA::download(db_identifier, identifier, experiment, run, event);
 
 }

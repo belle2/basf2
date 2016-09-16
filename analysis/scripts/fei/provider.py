@@ -446,8 +446,8 @@ def TrainMultivariateClassifier(resource: fei.dag.Resource, databasePrefix: str,
 
         command = (
             "{externTeacher} --method '{method}' --target_variable '{target}' --treename variables --datafile '{prefix}.root' "
-            "--signal_class 1 --variables '{variables}' --weightfile '{prefix}.xml' {config} > '{prefix}'.log 2>&1"
-            " && basf2_mva_upload --filename '{prefix}.xml' --identifier '{databasePrefix}_{prefix}'".format(
+            "--signal_class 1 --variables '{variables}' --identifier '{prefix}.xml' {config} > '{prefix}'.log 2>&1"
+            " && basf2_mva_upload --identifier '{prefix}.xml' --db_identifier '{databasePrefix}_{prefix}'".format(
                 databasePrefix=databasePrefix,
                 externTeacher=resource.env['externTeacher'],
                 method=mvaConfig.method,

@@ -28,7 +28,7 @@ if __name__ == "__main__":
     general_options.m_target_variable = "isSignal"
 
     methods = [
-            # ('Trivial.xml', basf2_mva.TrivialOptions()),
+            ('Trivial.xml', basf2_mva.TrivialOptions()),
             ('FastBDT.xml', basf2_mva.FastBDTOptions()),
             ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
             ('FANN.xml', basf2_mva.FANNOptions()),
@@ -41,7 +41,7 @@ if __name__ == "__main__":
     os.chdir(tempdir)
 
     for identifier, specific_options in methods:
-        general_options.m_weightfile = identifier
+        general_options.m_identifier = identifier
         basf2_mva.teacher(general_options, specific_options)
 
     basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),

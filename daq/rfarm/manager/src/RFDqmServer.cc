@@ -90,8 +90,18 @@ int RFDqmServer::Start(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFDqmServer::Stop(NSMmsg*, NSMcontext*)
+int RFDqmServer::Stop(NSMmsg* msg, NSMcontext*)
 {
+  char* merger = m_conf->getconf("dqmserver", "merge", "script");
+  char* topdir = m_conf->getconf("system", "exec_dir_base");
+  char* infile = m_conf->getconf("processor", "dqm", "file");
+  char* nnodes = m_conf->getconf("processor", "nnodes");
+  char* startnode = m_conf->getconf("processor", "idbase");
+  char outfile[1024];
+  sprintf(outfile, "dqm_%e%4.4dr%6.6d.root", msg->pars[0], msg->pars[1]);
+
+  int pid_dqmmerge = m_proc->Execute(merger, topdir, infile, nnodes, startnode, outfile);
+
   return 0;
 }
 

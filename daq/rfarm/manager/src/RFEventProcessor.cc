@@ -203,6 +203,12 @@ int RFEventProcessor::Start(NSMmsg*, NSMcontext*)
 
 int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
 {
+  char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
+  char* filename = m_conf->getconf("processor", "dqm", "file");
+  char* nprocs = m_conf->getconf("processor", "basf2", "nprocs");
+  int pid_hcollect = m_proc->Execute(hcollect, filename, nprocs);
+  int status;
+  waitpid(pid_hcollect, &status, 0);
   return 0;
 }
 

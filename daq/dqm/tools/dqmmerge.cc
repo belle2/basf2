@@ -20,18 +20,19 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-  if (argc < 5) {
-    printf("Usage : dqmmerge topdir histofile nnodes startnode\n");
+  if (argc < 6) {
+    printf("Usage : dqmmerge topdir histofile nnodes startnode outfile\n");
     exit(-1);
   }
   string topdir = string(argv[1]);
   string file = string(argv[2]);
   int nnodes = atoi(argv[3]);
   int startnode = atoi(argv[4]);
+  string outfile = string(argv[5]);
 
   // Set up merger with output file
   TFileMerger merger(false, false);
-  if (!merger.OutputFile(file.c_str())) {
+  if (!merger.OutputFile(outfile.c_str())) {
     printf("RbTupleManager:: error to open output file %s\n", file.c_str());
     return -1;
   }

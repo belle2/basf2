@@ -57,8 +57,8 @@ ECLLocalMaximumFinderModule::ECLLocalMaximumFinderModule() : Module(),
   addParam("outfileName", m_outfileName, "Output file name for training file.", std::string("ECLLocalMaximumFinderOutput.root"));
   addParam("method", m_method, "Method to determine the LM (cut, none, fastbdt).", std::string("none"));
   addParam("truthFraction", m_truthFraction, "Minimum matched energy fraction truth/rec for the LM.", 0.51);
-  addParam("cutOffset", m_cutOffset, "Cut method specific: Offset.", 1.40);
-  addParam("cutSlope", m_cutSlope, "Cut method specific: Slope.", 3.0);
+  addParam("cutOffset", m_cutOffset, "Cut method specific: Offset. (BaBar: 2.5, high eff: 1.40)", 2.5);
+  addParam("cutSlope", m_cutSlope, "Cut method specific: Slope. (BaBar: 0.5, high eff: 3.0)", 0.5);
   addParam("cutRatioCorrection", m_cutRatioCorrection, "Cut method specific: Ratio correction.", 0.0);
 
 }
@@ -184,6 +184,7 @@ void ECLLocalMaximumFinderModule::event()
         std::fill_n(vNeighourEnergies.begin(), vNeighourEnergies.size(),
                     -999);   // -999 means later: this digit is just not available in this neighbour definition.
         resetTrainingVariables();
+        resetClassifierVariables();
 
         // Check neighbours: Must be a local energy maximum.
         bool isLocMax = 1;
@@ -287,6 +288,14 @@ void ECLLocalMaximumFinderModule::event()
           } // end training
 
           if (m_method == "cut") {
+
+            B2DEBUG(200, "m_cutSlope: " << m_cutSlope << ", m_nNeighbours10: " << m_nNeighbours10 << ", m_cutOffset: " << m_cutOffset <<
+                    ", m_maxNeighbourEnergy: " << m_maxNeighbourEnergy << ", m_cutRatioCorrection: " << m_cutRatioCorrection <<
+                    ", aECLCalDigit.getEnergy(): " << aECLCalDigit.getEnergy());
+            B2DEBUG(200, "m_cutSlope * (m_nNeighbours10 - m_cutOffset): " << m_cutSlope * (m_nNeighbours10 - m_cutOffset));
+            B2DEBUG(200, "(m_maxNeighbourEnergy - m_cutRatioCorrection) / (aECLCalDigit.getEnergy() - m_cutRatioCorrection)" <<
+                    (m_maxNeighbourEnergy - m_cutRatioCorrection) / (aECLCalDigit.getEnergy() - m_cutRatioCorrection) << "\n");
+
             if (m_cutSlope * (m_nNeighbours10 - m_cutOffset) >= (m_maxNeighbourEnergy - m_cutRatioCorrection) /
                 (aECLCalDigit.getEnergy() - m_cutRatioCorrection)) {
               makeLocalMaximum(aCR, aECLCalDigit.getCellId(), iLM);

@@ -179,8 +179,8 @@ if __name__ == '__main__':
                   target == 1, target == 0, )
             p.finish()
             p.axis.set_title("Overtraining check for {}".format(identifier))
-            p.save('overtraining_plot_{}.png'.format(identifier))
-            graphics.add('overtraining_plot_{}.png'.format(identifier), width=1.0)
+            p.save('overtraining_plot_{}.png'.format(hash(identifier)))
+            graphics.add('overtraining_plot_{}.png'.format(hash(identifier)), width=1.0)
             o += graphics.finish()
 
     o.save('latex.tex', compile=True)

@@ -49,6 +49,7 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
+        if (not m_varSet) B2ERROR("Variable set ot setup");
         m_varSet->initialize();
       }
 
@@ -104,6 +105,11 @@ namespace Belle2 {
         bool extracted = m_varSet->extract(&obj);
         return extracted ? 1 : NAN;
       }
+
+    public:
+      /// Steal the set of variables form this filter - filter becomes disfunctional afterwards
+      std::unique_ptr<AVarSet> releaseVarSet()&&
+      { return std::move(m_varSet); }
 
     protected:
       /// Getter for the set of variables

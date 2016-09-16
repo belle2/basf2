@@ -71,6 +71,12 @@ namespace Belle2 {
       /// Getter for the alias version of the segment - fit not copied.
       CDCRecoSegment2D getAlias() const;
 
+      /// Getter for the number of changes in the right left passage in the segment
+      int getNRLSwitches() const;
+
+      /// Getter for the sum of right left information relative to the size.
+      double getRLAsymmetry() const;
+
       /** Fill the hit content of this segment into a genfit::TrackCand.
        *  @return true, if the trajectory information is valid, false otherwise.
        */

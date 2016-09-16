@@ -269,6 +269,29 @@ CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
   return segment;
 }
 
+int CDCRecoSegment2D::getNRLSwitches() const
+{
+  ERightLeft rlInfo = ERightLeft::c_Invalid;
+  int nRLSwitches = -1;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    if (rlInfo != recoHit2D.getRLInfo()) {
+      rlInfo = recoHit2D.getRLInfo();
+      ++nRLSwitches;
+    }
+  }
+  return nRLSwitches;
+}
+
+double CDCRecoSegment2D::getRLAsymmetry() const
+{
+  int rlSum = 0;
+  for (const CDCRecoHit2D& recoHit2D : *this) {
+    if (isValid(recoHit2D.getRLInfo())) {
+      rlSum += recoHit2D.getRLInfo();
+    }
+  }
+  return static_cast<double>(rlSum) / size();
+}
 
 CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
 {

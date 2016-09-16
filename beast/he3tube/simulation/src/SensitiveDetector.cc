@@ -10,7 +10,7 @@
 
 #include <beast/he3tube/simulation/SensitiveDetector.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
-#include <beast/he3tube/dataobjects/He3MCParticle.h>
+#include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 
 
 #include <framework/datastore/DataStore.h>
@@ -30,17 +30,19 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("He3tubeSensitiveDetector", Const::invalidDetector)
     {
+      m_simhitNumber = 0;
+      m_trackID = 0;
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<He3tubeSimHit>  simHits;
-      StoreArray<He3MCParticle> He3MCParticles;
+      StoreArray<HE3G4TrackInfo> HE3G4TrackInfos;
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerInDataStore();
       simHits.registerInDataStore();
       relMCSimHit.registerInDataStore();
-      He3MCParticles.registerInDataStore();
+      HE3G4TrackInfos.registerInDataStore();
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
       //secondary particles might not be stored so everything relating to those
@@ -91,9 +93,27 @@ namespace Belle2 {
         if (CPName.contains("Neutron")) neuProc = true;
       }
 
+      if (m_trackID != track.GetTrackID()) {
+        //TrackID changed, store track informations
+        m_trackID = track.GetTrackID();
+      }
       //Save Hit if track leaves volume or is killed
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        /*if (neuProc)*/ saveSimHit();
+        auto& mcparticle = Simulation::TrackInfo::getInfo(track);
+        int PDG = mcparticle.getPDG();
+        float Mass = mcparticle.getMass();
+        float Energy = mcparticle.getEnergy();
+        float vtx[3];
+        vtx[0] = mcparticle.getProductionVertex().X();
+        vtx[1] = mcparticle.getProductionVertex().Y();
+        vtx[2] = mcparticle.getProductionVertex().Z();
+        float mom[3];
+        mom[0] = mcparticle.getMomentum().X();
+        mom[1] = mcparticle.getMomentum().Y();
+        mom[2] = mcparticle.getMomentum().Z();
+        saveG4TrackInfo(m_trackID, PDG, Mass, Energy, vtx, mom);
+        //Reset TrackID
+        m_trackID = 0;
       }
 
       StoreArray<He3tubeSimHit> He3tubeHits;
@@ -118,33 +138,24 @@ namespace Belle2 {
       return true;
     }
 
-    int SensitiveDetector::saveSimHit()
+    int SensitiveDetector::saveG4TrackInfo(
+      int trackID,
+      int PDG,
+      float Mass,
+      float Energy,
+      float vtx[3],
+      float mom[3]
+    )
     {
-
       //Get the datastore arrays
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<He3MCParticle> He3MCParticles;
+      StoreArray<HE3G4TrackInfo> HE3G4TrackInfos;
 
-      for (const auto& mcParticle :
-           mcParticles) { // start loop over all Tracks
-        int PDG = mcParticle.getPDG();
-        //if (PDG == 2112) {
-        float Mass = mcParticle.getMass();
-        float Energy = mcParticle.getEnergy();
-        float vtx[3];
-        vtx[0] = mcParticle.getProductionVertex().X();
-        vtx[1] = mcParticle.getProductionVertex().Y();
-        vtx[2] = mcParticle.getProductionVertex().Z();
-        float mom[3];
-        mom[0] = mcParticle.getMomentum().X();
-        mom[1] = mcParticle.getMomentum().Y();
-        mom[2] = mcParticle.getMomentum().Z();
-        //if (!He3MCParticles.isValid()) He3MCParticles.create();
-        He3MCParticles.appendNew(He3MCParticle(PDG, Mass, Energy, vtx, mom));
-        //}
-      }
+      HE3G4TrackInfos.appendNew(HE3G4TrackInfo(trackID, PDG, Mass, Energy, vtx, mom));
+
+      int m_simhitNumber = HE3G4TrackInfos.getEntries() - 1;
+
       return (m_simhitNumber);
-    }//saveSimHit
+    }//saveG4TrackInfo
 
 
 

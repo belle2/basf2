@@ -83,6 +83,7 @@ namespace Belle2 {
 
     addParam("input_data_bunchNb_HER", m_input_data_bunchNb_HER, "HER bunch number");
     addParam("input_data_bunchNb_LER", m_input_data_bunchNb_LER, "LER bunch number");
+    addParam("input_data_SingleBeam", m_input_data_SingleBeam, "LER/HER/Both");
 
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
@@ -609,6 +610,14 @@ namespace Belle2 {
     if (I_LER < 0) I_LER = 0;
     if (P_HER < 0) P_HER = 0;
     if (P_LER < 0) P_LER = 0;
+
+    if (m_input_data_SingleBeam == "LER") {
+      I_HER = 0;
+      P_HER = 0;
+    } else if (m_input_data_SingleBeam == "HER") {
+      I_LER = 0;
+      P_LER = 0;
+    }
 
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBGav_HER = 0;

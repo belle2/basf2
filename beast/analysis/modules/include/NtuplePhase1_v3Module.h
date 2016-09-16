@@ -162,6 +162,7 @@ namespace Belle2 {
 
     Double_t m_input_data_bunchNb_LER; /**< LER bunch number and error */
     Double_t m_input_data_bunchNb_HER; /**< HER bunch number and error */
+    std::string m_input_data_SingleBeam; /**< LER or HER or Both*/
 
     std::vector<Double_t> m_input_sigma_LER; /**< LER beam size and errors */
     std::vector<Double_t> m_input_sigma_HER; /**< HER beam size and errors */

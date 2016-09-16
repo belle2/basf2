@@ -10,7 +10,7 @@
 
 #include <beast/microtpc/modules/MicrotpcStudyModule.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-#include <beast/microtpc/dataobjects/TpcMCParticle.h>
+#include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 #include <beast/microtpc/dataobjects/MicrotpcHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcDataHit.h>
 #include <beast/microtpc/dataobjects/MicrotpcRecoTrack.h>
@@ -238,7 +238,7 @@ void MicrotpcStudyModule::event()
   StoreArray<MicrotpcSimHit>  SimHits;
   StoreArray<MicrotpcHit> Hits;
   StoreArray<MicrotpcRecoTrack> Tracks;
-  StoreArray<TpcMCParticle> mcparts;
+  StoreArray<TPCG4TrackInfo> mcparts;
   StoreArray<SADMetaHit> sadMetaHits;
   double rate = 0;
   for (const auto& sadMetaHit : sadMetaHits) {

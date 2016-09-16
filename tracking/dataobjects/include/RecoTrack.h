@@ -114,10 +114,10 @@ namespace Belle2 {
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
-      std::string recoHitInformationStoreArrayName = "RecoHitInformations",
-      std::string pxdHitsStoreArrayName = "PXDClusters",
-      std::string svdHitsStoreArrayName = "SVDClusters",
-      std::string cdcHitsStoreArrayName = "CDCHits")
+      std::string recoHitInformationStoreArrayName = "",
+      std::string pxdHitsStoreArrayName = "",
+      std::string svdHitsStoreArrayName = "",
+      std::string cdcHitsStoreArrayName = "")
     {
       StoreArray<RecoHitInformation> recoHitInformations(recoHitInformationStoreArrayName);
       recoHitInformations.registerInDataStore();
@@ -157,10 +157,10 @@ namespace Belle2 {
        * @param storeArrayNameOfRecoHitInformation The name of the store array where the related hit information are stored.
        */
     RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum, const short int seedCharge,
-              const std::string& storeArrayNameOfCDCHits = "CDCHits",
-              const std::string& storeArrayNameOfSVDHits = "SVDClusters",
-              const std::string& storeArrayNameOfPXDHits = "PXDClusters",
-              const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations");
+              const std::string& storeArrayNameOfCDCHits = "",
+              const std::string& storeArrayNameOfSVDHits = "",
+              const std::string& storeArrayNameOfPXDHits = "",
+              const std::string& storeArrayNameOfRecoHitInformation = "");
 
     /** Delete the copy construtr. */
     RecoTrack(const RecoTrack&) = delete;
@@ -181,11 +181,11 @@ namespace Belle2 {
      * @todo Let the track finders determine the cov seed.
      */
     static RecoTrack* createFromTrackCand(const genfit::TrackCand& trackCand,
-                                          const std::string& storeArrayNameOfRecoTracks = "RecoTracks",
-                                          const std::string& storeArrayNameOfCDCHits = "CDCHits",
-                                          const std::string& storeArrayNameOfSVDHits = "SVDClusters",
-                                          const std::string& storeArrayNameOfPXDHits = "PXDClusters",
-                                          const std::string& storeArrayNameOfRecoHitInformation = "RecoHitInformations",
+                                          const std::string& storeArrayNameOfRecoTracks = "",
+                                          const std::string& storeArrayNameOfCDCHits = "",
+                                          const std::string& storeArrayNameOfSVDHits = "",
+                                          const std::string& storeArrayNameOfPXDHits = "",
+                                          const std::string& storeArrayNameOfRecoHitInformation = "",
                                           const bool recreateSortingParameters = false
                                          );
 

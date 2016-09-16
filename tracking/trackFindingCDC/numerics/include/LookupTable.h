@@ -74,8 +74,9 @@ namespace Belle2 {
       const T& nearest(const double& x) const
       {
         if (not std::isfinite(x)) return m_values.back(); // Return sentinal value
-        int i = std::round((x - m_lowerBound) / m_binWidth);
-
+        const int iMax =  m_values.size() - 2; // Subtracting sentinal index
+        int iBin = std::round((x - m_lowerBound) / m_binWidth);
+        int i = boost::algorithm::clamp(iBin, 0, iMax);
         return m_values[i];
       }
 

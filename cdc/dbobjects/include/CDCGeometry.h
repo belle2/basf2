@@ -714,7 +714,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      EndPlateLayer(std::string name, int ilay,
+      EndPlateLayer(const std::string& name, int ilay,
                     double rmin, double rmax, double zfwd, double zbwd):
         m_name(name), m_layer(ilay), m_rmin(rmin),
         m_rmax(rmax), m_zfwd(zfwd), m_zbwd(zbwd)
@@ -793,7 +793,7 @@ namespace Belle2 {
       /**
        * Add new endplate layer.
        */
-      void appendNew(std::string name, int ilay,
+      void appendNew(const std::string& name, int ilay,
                      double rmin, double rmax, double zfwd, double zbwd)
       {
         EndPlateLayer eplayer(name, ilay, rmin, rmax, zfwd, zbwd);

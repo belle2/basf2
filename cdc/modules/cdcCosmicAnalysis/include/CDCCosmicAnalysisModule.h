@@ -93,8 +93,12 @@ namespace Belle2 {
       int m_fitstatus;                  /**< fit status, 0 - nofit;1 - fit but not convergence;2-fit and convergence.*/
 
       TVector3 trigHitPos; /**< Trigger position. */
-      TVector3 getTriggerHitPosition(const Helix h, double yofcounter);
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
+
+      /**
+       * Get the hit position (x,y) from helix at y = yofcounter plane.
+       */
+      TVector3 getTriggerHitPosition(const Helix h, double yofcounter);
 
     };
   }

@@ -102,7 +102,7 @@ void CDCGeometry::read(const GearDir& content)
       double rmax = epLayerContent.getLength("OuterR");
       double zfwd = epLayerContent.getLength("ForwardZ");
       double zbwd = epLayerContent.getLength("BackwardZ");
-      string name = "Layer" + to_string(i) + epName + to_string(iEPLayer);
+      std::string name = "Layer" + to_string(i) + epName + to_string(iEPLayer);
 
       ep.appendNew(name, iEPLayer, rmin, rmax, zfwd, zbwd);
     }

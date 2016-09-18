@@ -206,7 +206,7 @@ class PBS(Backend):
     default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
     default_config_section = "PBS"
 
-    required_config = ["Queue", "Release"]
+    required_config = ["Queue", "Release", "Tools"]
 
     def __init__(self, config_file_path="", section=""):
         """
@@ -250,6 +250,8 @@ class PBS(Backend):
         self.queue = config[section]["Queue"]
         #: basf2 release path
         self.release = config[section]["Release"]
+        #: basf2 tools location
+        self.tools = config[section]["Tools"]
 
     def _generate_basf2_setup(self):
         """
@@ -261,9 +263,9 @@ class PBS(Backend):
         #: is good enough
         self.basf2_setup = []
         self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
                                  "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $SETUPBELLE2_CVMFS\n",
+                                 "source $CAF_TOOLS_LOCATION\n",
                                  "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
                                  "setuprel\n",
                                  "popd > /dev/null\n"])
@@ -465,6 +467,8 @@ class LSF(Backend):
         self.queue = config[section]["Queue"]
         #: basf2 release path
         self.release = config[section]["Release"]
+        #: basf2 tools location
+        self.tools = config[section]["Tools"]
 
     def _generate_basf2_setup(self):
         """
@@ -476,9 +480,9 @@ class LSF(Backend):
         #: is good enough
         self.basf2_setup = []
         self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
-                                 "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                                 "CAF_TOOLS_LOCATION="+self.tools+"\n",
                                  "CAF_RELEASE_LOCATION="+self.release+"\n",
-                                 "source $SETUPBELLE2_CVMFS\n",
+                                 "source $CAF_TOOLS_LOCATION\n",
                                  "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
                                  "setuprel\n",
                                  "popd > /dev/null\n"])

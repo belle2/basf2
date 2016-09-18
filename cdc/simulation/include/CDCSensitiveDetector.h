@@ -239,7 +239,8 @@ namespace Belle2 {
 
     private:
 
-      CDCGeometryPar& m_cdcgp; /**< Reference to CDCGeometryPar object. */
+      //      CDCGeometryPar& m_cdcgp; /**< Reference to CDCGeometryPar object. */
+      CDCGeometryPar* m_cdcgp; /**< Pointer to CDCGeometryPar object. */
 
       /**
        * Threshold energy deposit to be stored.

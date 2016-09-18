@@ -42,7 +42,7 @@ CDCGeometryPar& CDCGeometryPar::Instance(const CDCGeometry& geom)
 
 CDCGeometryPar::CDCGeometryPar(const CDCGeometry& geom)
 {
-
+  //  std::cout <<"CDCGeometryPar(geom) called" << std::endl;
 
 #if defined(CDC_T0_FROM_DB)
   if (m_t0FromDB.isValid()) {
@@ -97,6 +97,8 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry& geom)
 
 CDCGeometryPar::CDCGeometryPar()
 {
+  //  std::cout <<"CDCGeometryPar() called" << std::endl;
+
 #if defined(CDC_T0_FROM_DB)
   if (m_t0FromDB.isValid()) {
     m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
@@ -360,6 +362,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_minTrackLength = geom.getMinimumTrackLength();
   m_wireSag = geom.getWireSagMode();
   m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  //N.B. The following two lines are hard-coded temporarily to avoid job crash
+  m_xtFileFormat = 1;
+  m_sigmaFileFormat = 1;
 
   m_XTetc = true;
   if (m_XTetc) {

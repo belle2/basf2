@@ -890,20 +890,6 @@ namespace Belle2 {
 
 
       /**
-       * Returns the closest alpha point for track incident angle (alpha).
-       * @param alpha in rad.
-       */
-      unsigned short getClosestAlphaPoint(const double alpha) const;
-
-
-      /**
-       * Returns the closest theta point for track incident angle (theta).
-       * @param theta in rad.
-       */
-      unsigned short getClosestThetaPoint(const double theta) const;
-
-
-      /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
        * @param alpha in rad.
        */

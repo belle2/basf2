@@ -306,6 +306,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_minTrackLength = geom.getMinimumTrackLength();
   m_wireSag = geom.getWireSagMode();
   m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  if (m_modLeftRightFlag) {
+    B2FATAL("ModifiedLeftRightFlag = true is disabled for now; need to update a G4-related code in framework...");
+  }
   //N.B. The following two lines are hard-coded temporarily to avoid job crash
   m_xtFileFormat = 1;
   m_sigmaFileFormat = 1;
@@ -442,6 +445,9 @@ void CDCGeometryPar::read()
   m_minTrackLength = gd.getWithUnit("MinTrackLength");
   m_wireSag = gd.getBool("WireSag");
   m_modLeftRightFlag = gd.getBool("ModifiedLeftRightFlag");
+  if (m_modLeftRightFlag) {
+    B2FATAL("ModifiedLeftRightFlag = true is disabled for now; need to update a G4-related code in framework...");
+  }
 
   // Get control switch for xt file format
   m_xtFileFormat = gbxParams.getInt("XtFileFormat");
@@ -770,8 +776,7 @@ void CDCGeometryPar::readXT(const GearDir gbxParams, const int mode)
 // Read x-t params. (new)
 void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
 {
-  m_linearInterpolationOfXT = true;
-  //  m_linearInterpolationOfXT = false;
+  m_linearInterpolationOfXT = true;  //must be true now
 
   std::string fileName0 = gbxParams.getString("xtFileName");
   if (mode == 1) {
@@ -888,8 +893,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
 // Read x-t params. (old)
 void CDCGeometryPar::oldReadXT(const GearDir gbxParams, const int mode)
 {
-  m_linearInterpolationOfXT = true;
-  //  m_linearInterpolationOfXT = false;
+  m_linearInterpolationOfXT = true;  //must be true now
 
   std::string fileName0 = gbxParams.getString("xtFileName");
   if (mode == 1) {
@@ -1123,8 +1127,8 @@ void CDCGeometryPar::readSigma(const GearDir gbxParams, const int mode)
 
 void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
 {
-  m_linearInterpolationOfSgm = true;
-  //  m_linearInterpolationOfSgm = false;
+  m_linearInterpolationOfSgm = true; //must be true now
+
   std::string fileName0 = gbxParams.getString("sigmaFileName");
   if (mode == 1) {
     fileName0 = gbxParams.getString("sigma4ReconFileName");
@@ -2178,20 +2182,6 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
     }
 
   } else {
-    unsigned short ialpha = getClosestAlphaPoint(alpha);
-    unsigned short itheta = getClosestThetaPoint(theta);
-
-    const double boundary = m_XT[iCLayer][lro][ialpha][itheta][6];
-
-    if (time < boundary) {
-      dDdt =    m_XT[iCLayer][lro][ialpha][itheta][1] + time
-                * (2.*m_XT[iCLayer][lro][ialpha][itheta][2] + time
-                   * (3.*m_XT[iCLayer][lro][ialpha][itheta][3] + time
-                      * (4.*m_XT[iCLayer][lro][ialpha][itheta][4] + time
-                         * (5.*m_XT[iCLayer][lro][ialpha][itheta][5]))));
-    } else {
-      dDdt = m_XT[iCLayer][lro][ialpha][itheta][7];
-    }
   }
 
   //replaced with return fabs, since dDdt < 0 rarely; why happens ???
@@ -2281,29 +2271,6 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
     }
 
   } else {
-    unsigned short ialpha = getClosestAlphaPoint(alpha);
-    unsigned short itheta = getClosestThetaPoint(theta);
-    /*
-    std::cout <<"iCLayer= " << iCLayer << std::endl;
-    std::cout <<"lr= " << lr << std::endl;
-    std::cout <<"alpha,ialpha= " << alpha <<" "<< ialpha << std::endl;
-    for (int i=0; i<9; ++i) {
-      std::cout <<"a= "<< i <<" "<< m_XT[iCLayer][lro][ialpha][itheta][i] << std::endl;
-    }
-    */
-
-    const double boundary = m_XT[iCLayer][lro][ialpha][itheta][6];
-
-    if (time < boundary) {
-      dist = m_XT[iCLayer][lro][ialpha][itheta][0] + time
-             * (m_XT[iCLayer][lro][ialpha][itheta][1] + time
-                * (m_XT[iCLayer][lro][ialpha][itheta][2] + time
-                   * (m_XT[iCLayer][lro][ialpha][itheta][3] + time
-                      * (m_XT[iCLayer][lro][ialpha][itheta][4] + time
-                         * (m_XT[iCLayer][lro][ialpha][itheta][5])))));
-    } else {
-      dist = m_XT[iCLayer][lro][ialpha][itheta][7] * (time - boundary) + m_XT[iCLayer][lro][ialpha][itheta][8];
-    }
   }
 
   return fabs(dist);
@@ -2529,27 +2496,6 @@ double CDCGeometryPar::getOutgoingAlpha(const double alpha) const
 }
 
 
-unsigned short CDCGeometryPar::getClosestAlphaPoint(const double alpha) const
-{
-  //convert incoming- to outgoing-alpha
-  double alphap = getOutgoingAlpha(alpha);
-
-  //tentative; should rewrite using m_alphaPoints later
-  unsigned short ialpha = (alphap >= 0.) ? (alphap * 180. / M_PI + 5.) / 10. : (alphap * 180. / M_PI - 5.) / 10.;
-  ialpha += 9;
-  ialpha = std::max(static_cast<unsigned short>(0), ialpha);
-  ialpha = std::min(static_cast<unsigned short>(m_nAlphaPoints - 1), ialpha);
-
-  /*  std::cout <<" alpha, alphap, ialpha= " << alpha*180./M_PI <<" "<< alphap*180./M_PI <<" "<< ialpha << std::endl;
-  for (unsigned i=0; i <= m_nAlphaPoints - 1; ++i) {
-    std::cout << i <<" "<< m_alphaPoints[i]*180./M_PI  << std::endl;
-  }
-  */
-
-  return ialpha;
-}
-
-
 void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, unsigned short points[2],
                                            unsigned short lrs[2]) const
 {
@@ -2614,26 +2560,6 @@ void CDCGeometryPar::getClosestAlphaPoints4Sgm(const double alpha, double& weigh
       }
     }
   }
-}
-
-
-unsigned short CDCGeometryPar::getClosestThetaPoint(const double theta) const
-{
-  unsigned itheta = m_nThetaPoints - 1;
-  for (unsigned short i = 0; i <= m_nThetaPoints - 2; ++i) {
-    if (theta < 0.5 * (m_thetaPoints[i] + m_thetaPoints[i + 1])) {
-      itheta = i;
-      break;
-    }
-  }
-
-  /*  std::cout <<" theta, itheta= " << theta*180./M_PI <<" "<< itheta << std::endl;
-  for (unsigned i=0; i <= m_nThetaPoints - 1; ++i) {
-    std::cout << i <<" "<< m_thetaPoints[i]*180./M_PI  << std::endl;
-  }
-  */
-
-  return itheta;
 }
 
 

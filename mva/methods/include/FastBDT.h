@@ -62,7 +62,7 @@ namespace Belle2 {
        */
       virtual std::string getMethod() const override { return "FastBDT"; }
 
-      unsigned int m_nTrees = 400; /**< Number of trees */
+      unsigned int m_nTrees = 200; /**< Number of trees */
       unsigned int m_nCuts = 8; /**< Number of cut Levels = log_2(Number of Cuts) */
       unsigned int m_nLevels = 3; /**< Depth of tree */
       double m_shrinkage = 0.1; /**< Shrinkage during the boosting step */

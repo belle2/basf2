@@ -22,7 +22,7 @@ namespace {
   {
     MVA::FastBDTOptions specific_options;
 
-    EXPECT_EQ(specific_options.m_nTrees, 400);
+    EXPECT_EQ(specific_options.m_nTrees, 200);
     EXPECT_EQ(specific_options.m_nCuts, 8);
     EXPECT_EQ(specific_options.m_nLevels, 3);
     EXPECT_FLOAT_EQ(specific_options.m_shrinkage, 0.1);

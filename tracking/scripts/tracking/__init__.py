@@ -22,7 +22,12 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     if not skipGeometryAdding:
         # Add the geometry in all trigger modes if not already in the path
-        add_geometry_modules(path, components)
+        add_geometry_modules(path, components, trigger_mode)
+
+    # Material effects for all track extrapolations
+    if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
+        material_effects = register_module('SetupGenfitExtrapolation')
+        path.add_module(material_effects)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
@@ -35,7 +40,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components, pruneTracks)
 
 
-def add_geometry_modules(path, components=None):
+def add_geometry_modules(path, components=None, trigger_mode="all"):
     """
     Helper function to add the geometry related modules needed for tracking
     to the path.
@@ -49,11 +54,6 @@ def add_geometry_modules(path, components=None):
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
-
-    # Material effects for all track extrapolations
-    if 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
-        path.add_module(material_effects)
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):

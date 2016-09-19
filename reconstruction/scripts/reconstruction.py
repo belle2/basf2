@@ -12,7 +12,7 @@ from tracking import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all"):
+def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
@@ -38,7 +38,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 components=components,
                                 pruneTracks=False,
                                 mcTrackFinding=False,
-                                trigger_mode=trigger_mode)
+                                trigger_mode=trigger_mode,
+                                skipGeometryAdding=skipGeometryAdding)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,

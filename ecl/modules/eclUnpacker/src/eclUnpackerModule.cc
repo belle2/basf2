@@ -30,7 +30,7 @@ void ECLUnpackerModule::initialize()
 {
 
   // require input data
-  StoreArray<RawCOPPER>::required();
+  StoreArray<RawECL>::required();
 
   // register output conteinder in data store
   m_eclDigits.registerInDataStore(m_eclDigitsName);

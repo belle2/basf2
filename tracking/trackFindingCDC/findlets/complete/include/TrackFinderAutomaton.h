@@ -77,6 +77,9 @@ namespace Belle2 {
         m_trackFlightTimeAdjuster.exposeParameters(moduleParamList, prefix);
         m_trackExporter.exposeParameters(moduleParamList, prefix);
 
+        moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
+        moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
+
         moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
         moduleParamList->getParameter<std::string>("SegmentOrientation").resetValue();
 

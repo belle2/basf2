@@ -80,25 +80,14 @@ namespace Belle2 {
       //! Wire position set
       enum EWirePosition {c_Base = 0, c_Misaligned, c_Aligned};
 
-      //      //! Constructor
-      //      CDCGeometryPar();
-
-      //! Constructor.
-      explicit CDCGeometryPar(const CDCGeometry&);
       //! Destructor
       virtual ~CDCGeometryPar();
 
       //! Static method to get a reference to the CDCGeometryPar instance.
       /*!
-          \return A reference to an instance of this class.
+      \return A reference to an instance of this class.
       */
-      static CDCGeometryPar& Instance();
-
-      /**
-       * Static method to get a reference to the CDCGeometryPar instance
-       * from database.
-       */
-      static CDCGeometryPar& Instance(const CDCGeometry&);
+      static CDCGeometryPar& Instance(const CDCGeometry* = nullptr);
 
       //! Clears
       void clear();
@@ -980,7 +969,7 @@ namespace Belle2 {
 
     private:
       /** Singleton class */
-      CDCGeometryPar();
+      CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */

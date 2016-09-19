@@ -28,22 +28,14 @@ using namespace CDC;
 
 CDCGeometryPar* CDCGeometryPar::m_B4CDCGeometryParDB = 0;
 
-CDCGeometryPar& CDCGeometryPar::Instance()
-{
-  if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar();
-  return *m_B4CDCGeometryParDB;
-}
-
-CDCGeometryPar& CDCGeometryPar::Instance(const CDCGeometry& geom)
+CDCGeometryPar& CDCGeometryPar::Instance(const CDCGeometry* geom)
 {
   if (!m_B4CDCGeometryParDB) m_B4CDCGeometryParDB = new CDCGeometryPar(geom);
   return *m_B4CDCGeometryParDB;
 }
 
-CDCGeometryPar::CDCGeometryPar(const CDCGeometry& geom)
+CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
 {
-  //  std::cout <<"CDCGeometryPar(geom) called" << std::endl;
-
 #if defined(CDC_T0_FROM_DB)
   if (m_t0FromDB.isValid()) {
     m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
@@ -91,61 +83,13 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry& geom)
 #endif
 
   clear();
-  readFromDB(geom);
-}
-
-
-CDCGeometryPar::CDCGeometryPar()
-{
-  //  std::cout <<"CDCGeometryPar() called" << std::endl;
-
-#if defined(CDC_T0_FROM_DB)
-  if (m_t0FromDB.isValid()) {
-    m_t0FromDB.addCallback(this, &CDCGeometryPar::setT0);
+  if (geom) {
+    //    std::cout <<"readFromDBcalled" << std::endl;
+    readFromDB(*geom);
+  } else {
+    //    std::cout <<"readcalled" << std::endl;
+    read();
   }
-#endif
-#if defined(CDC_BADWIRE_FROM_DB)
-  if (m_badWireFromDB.isValid()) {
-    m_badWireFromDB.addCallback(this, &CDCGeometryPar::setBadWire);
-  }
-#endif
-#if defined(CDC_PROPSPEED_FROM_DB)
-  if (m_propSpeedFromDB.isValid()) {
-    m_propSpeedFromDB.addCallback(this, &CDCGeometryPar::setPropSpeed);
-  }
-#endif
-#if defined(CDC_TIMEWALK_FROM_DB)
-  if (m_timeWalkFromDB.isValid()) {
-    m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTW);
-  }
-#endif
-#if defined(CDC_XT_FROM_DB)
-  if (m_xtFromDB.isValid()) {
-    m_xtFromDB.addCallback(this, &CDCGeometryPar::setXT);
-  }
-#endif
-#if defined(CDC_XTREL_FROM_DB)
-  if (m_xtRelFromDB.isValid()) {
-    m_xtRelFromDB.addCallback(this, &CDCGeometryPar::setXtRel);
-  }
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-  if (m_sigmaFromDB.isValid()) {
-    m_sigmaFromDB.addCallback(this, &CDCGeometryPar::setSigma);
-  }
-#endif
-#if defined(CDC_SRESOL_FROM_DB)
-  if (m_sResolFromDB.isValid()) {
-    m_sResolFromDB.addCallback(this, &CDCGeometryPar::setSResol);
-  }
-#endif
-#if defined(CDC_CHMAP_FROM_DB)
-  if (m_chMapFromDB.isValid()) {
-    m_chMapFromDB.addCallback(this, &CDCGeometryPar::setChMap);
-  }
-#endif
-  clear();
-  read();
 }
 
 CDCGeometryPar::~CDCGeometryPar()

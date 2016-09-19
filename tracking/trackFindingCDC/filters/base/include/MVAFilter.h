@@ -74,7 +74,7 @@ namespace Belle2 {
 
     public:
       /// Function to object for its signalness
-      virtual Weight operator()(const Object& obj) override final
+      virtual Weight operator()(const Object& obj) override
       {
         double prediction = predict(obj);
         return prediction < m_param_cut ? NAN : prediction;

@@ -101,7 +101,7 @@ if __name__ == '__main__':
     """)
 
     for method in methods:
-        o += b2latex.SubSection(method.identifier)
+        o += b2latex.SubSection(format.string(method.identifier))
         o += b2latex.Listing(language='XML').add(method.description).finish()
 
     o += b2latex.Section("Variables")
@@ -142,7 +142,7 @@ if __name__ == '__main__':
     graphics.add('roc_plot_test.png', width=1.0)
     o += graphics.finish()
 
-    if train_probability is not None:
+    if train_probability:
         graphics = b2latex.Graphics()
         p = plotting.Multiplot(plotting.RejectionOverEfficiency, len(identifiers))
         for i, identifier in enumerate(identifiers):
@@ -166,7 +166,7 @@ if __name__ == '__main__':
     graphics.add('diagonal_plot_test.png', width=1.0)
     o += graphics.finish()
 
-    if train_probability is not None:
+    if train_probability:
         o += b2latex.Section("Overtraining Plot")
         for identifier in identifiers:
             probability = {identifier: np.r_[train_probability[identifier], test_probability[identifier]]}

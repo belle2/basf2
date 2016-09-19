@@ -27,84 +27,36 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentPairFitlessVarNames[] = {
-      "start_fit_superlayer_id",
-      "end_fit_superlayer_id",
+    static char const* const fitlessSegmentPairVarNames[] = {
+      "from_ndf",
+      "to_ndf",
 
-      "start_fit_superlayer_id_difference",
-      "end_fit_superlayer_id_difference",
+      "avg_curv",
+      "delta_curv",
+      "delta_curv_var",
+      "delta_curv_pull",
 
-      "next_superlayer_id_difference",
-      "previous_superlayer_id_difference",
+      "delta_pos_phi",
+      "delta_mom_phi",
+      "from_delta_mom_phi",
+      "to_delta_mom_phi",
+      "delta_alpha",
 
+      "reco_arc_length_gap",
+      "stereo_arc_length",
+      "near_reco_z",
+      "near_z_bound_factor",
+      "far_reco_z",
+      "far_z_bound_factor",
 
-      "end_first_to_start_last_hit_pos_phi_difference",
-      "end_first_to_start_last_hit_mom_phi_difference",
-      "end_first_to_start_last_hit_phi_difference",
+      "coarse_tanl",
+      "stereo_rel_size",
 
-      "stereo_first_hit_z",
-      "stereo_last_hit_z",
-
-      "stereo_first_hit_dist_z_forward_wall",
-      "stereo_first_hit_dist_z_backward_wall",
-
-      "stereo_last_hit_dist_z_forward_wall",
-      "stereo_last_hit_dist_z_backward_wall",
-
-      "stereo_hits_min_dist_z_forward_wall",
-      "stereo_hits_max_dist_z_forward_wall",
-
-      "stereo_hits_min_dist_z_backward_wall",
-      "stereo_hits_max_dist_z_backward_wall",
-
-      "start_arc_length_front_offset",
-      "end_arc_length_front_offset",
-      "start_arc_length_back_offset",
-      "end_arc_length_back_offset",
-
-      // "arc_length2d_gap",
-
-      // "start_fit_chi2",
-      // "end_fit_chi2",
-
-      // "start_fit_curvature_xy",
-      // "end_fit_curvature_xy",
-
-      // "startFit_totalPerpS_startSegment",
-      // "endFit_totalPerpS_startSegment" ,
-
-      // "startFit_totalPerpS_endSegment",
-      // "endFit_totalPerpS_endSegment",
-
-      // "startFit_isForwardOrBackwardTo_startSegment",
-      // "endFit_isForwardOrBackwardTo_startSegment",
-
-      // "startFit_isForwardOrBackwardTo_endSegment",
-      // "endFit_isForwardOrBackwardTo_endSegment",
-
-      // "startFit_perpSGap",
-      // "endFit_perpSGap",
-
-      // "startFit_perpSFrontOffset" ,
-      // "endFit_perpSFrontOffset",
-
-      // "startFit_perpSBackOffset",
-      // "endFit_perpSBackOffset",
-
-      // "startFit_dist2DToCenter_endSegment",
-      // "endFit_dist2DToCenter_startSegment",
-
-      // "startFit_dist2DToFront_endSegment",
-      // "endFit_dist2DToBack_startSegment",
-
-      // "startFit_absMom2D",
-      // "endFit_absMom2D",
-
-      // "momAngleAtCenter_endSegment" ,
-      // "momAngleAtCenter_startSegment" ,
-
-      // "axialFit_curvatureXY" ,
-      // "axialFit_curvatureXY_variance" ,
+      "arc_length_front_offset",
+      "arc_length_back_offset",
+      "from_arc_length_total",
+      "to_arc_length_total",
+      "arc_length_gap",
     };
 
     /** Class that specifies the names of the variables
@@ -114,24 +66,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentPairFitlessVarNames);
+      static const size_t nNames = size(fitlessSegmentPairVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return segmentPairFitlessVarNames[iName];
-      }
-
-      /// Marking that the basic facet variables should be included.
-      typedef PairVarSet<BasicSegmentVarSet> NestedVarSet;
-
-      /// Unpack the object for for the nested variable set
-      static
-      const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment2D*>
-      getNested(const CDCSegmentPair* segmentPair)
-      {
-        return std::make_pair(segmentPair->getFromSegment(), segmentPair->getToSegment());
+        return fitlessSegmentPairVarNames[iName];
       }
     };
 
@@ -145,7 +86,7 @@ namespace Belle2 {
       using Super = VarSet<FitlessSegmentPairVarNames>;
 
     public:
-      /// Construct the varset to be prepended to all variable names.
+      /// Construct the varset.
       explicit FitlessSegmentPairVarSet();
 
       /// Generate and assign the variables from the segment pair

@@ -12,18 +12,18 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Filter for the constuction of segment pairs based on simple criteria without the common fit.
-    class FitlessSegmentPairFilter : public FilterOnVarSet<SkimmedFitlessSegmentPairVarSet> {
+    class FitlessSegmentPairFilter : public FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> {
 
     private:
       /// Type of the base class
-      typedef FilterOnVarSet<SkimmedFitlessSegmentPairVarSet> Super;
+      typedef FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> Super;
 
     public:
       /// Checks if a pair of segments is a good combination

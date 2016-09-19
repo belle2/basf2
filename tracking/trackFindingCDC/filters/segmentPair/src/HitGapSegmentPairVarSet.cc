@@ -8,7 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
-#include <assert.h>
 
 using namespace std;
 using namespace Belle2;
@@ -24,7 +23,7 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;
 
-  const CDCSegmentPair segmentPair = *ptrSegmentPair;
+  const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
   const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
   const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
@@ -83,12 +82,12 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   Vector2D movePerZ = wireLine.nominalMovePerZ();
 
   double z = -relRefPos.cross(axialHitMom) / movePerZ.cross(axialHitMom);
-  Vector2D stereoHitPos = wireLine.nominalPos2DAtZ(z);
+  Vector2D stereoHitPos = stereoHit.getRecoPos2D() + movePerZ * z;
 
   var<named("hit_reco_z")>() = z;
-  var<named("hit_z_bound_factor")>() =
-    std::fmax(wireLine.backwardZ() - z, z - wireLine.forwardZ()) / (wireLine.forwardZ() - wireLine.backwardZ());
-  var<named("hit_arclength_gap")>() = (stereoHitPos - axialHitPos).dot(axialHitMom);
+  var<named("hit_z_bound_factor")>() = wireLine.outOfZBoundsFactor(z);
+  double arcLengthGap = (stereoHitPos - axialHitPos).dot(axialHitMom);
+  var<named("hit_arclength_gap")>() = toFirstHit.isAxial() ? -arcLengthGap : arcLengthGap;
 
   // const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
   // const Vector2D toStretch = toLastHitPos - toFirstHitPos;
@@ -103,6 +102,7 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   // const double lastOffset = lastPosGap.norm();
 
   // var<named("hit_ptolemy")>() =
-  // firstOffset * lastOffset - longHitDistance * hitDistance - fromLength * toLength;
+  //   firstOffset * lastOffset - longHitDistance * hitDistance - fromLength * toLength;
+
   return true;
 }

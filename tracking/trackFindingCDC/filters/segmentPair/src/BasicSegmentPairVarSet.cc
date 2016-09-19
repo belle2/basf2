@@ -8,8 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
-#include <assert.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace std;
 using namespace Belle2;
@@ -25,6 +25,18 @@ bool BasicSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   bool extracted = extractNested(ptrSegmentPair);
   if (not extracted or not ptrSegmentPair) return false;
 
-  var<named("axial_first")>() = ptrSegmentPair->getFromSegment()->isAxial();
+  CDCSegmentPair segmentPair = *ptrSegmentPair;
+
+  var<named("axial_first")>() = segmentPair.getFromSegment()->isAxial();
+
+  var<named("axial_size")>() = segmentPair.getAxialSegment()->size();
+  var<named("stereo_size")>() = segmentPair.getStereoSegment()->size();
+
+  ISuperLayer fromISuperLayer = segmentPair.getFromISuperLayer();
+  ISuperLayer toISuperLayer = segmentPair.getToISuperLayer();
+
+  std::pair<int, int> superLayerIdPair = std::minmax(fromISuperLayer, toISuperLayer);
+  var<named("sl_id_pair")>() = superLayerIdPair.second * 10 + superLayerIdPair.first;
+
   return true;
 }

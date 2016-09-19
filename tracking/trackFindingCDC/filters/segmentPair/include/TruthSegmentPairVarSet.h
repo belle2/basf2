@@ -19,43 +19,48 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const basicSegmentPairVarNames[] = {
-      "axial_first",
-      "axial_size",
-      "stereo_size",
-      "sl_id_pair",
+    static char const* const truthSegmentPairVarNames[] = {
+      "truth_tanl",
+      "truth_z",
+      "truth_curv",
+      "truth_from_alpha",
+      "truth_to_alpha",
+      "truth_delta_alpha",
+      "truth_track_fraction",
+      "__weight__",
     };
 
     /**
      *  Class that specifies the names of the variables
      *  that should be generated from a segment pair
      */
-    class BasicSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    class TruthSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentPairVarNames);
+      static const size_t nNames = size(truthSegmentPairVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return basicSegmentPairVarNames[iName];
+        return truthSegmentPairVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment relation.
+     *  Class that computes floating point variables from a segment pair.
+     *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class BasicSegmentPairVarSet : public VarSet<BasicSegmentPairVarNames> {
+    class TruthSegmentPairVarSet : public VarSet<TruthSegmentPairVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<BasicSegmentPairVarNames>;
+      using Super = VarSet<TruthSegmentPairVarNames>;
 
     public:
       /// Construct the varset.
-      explicit BasicSegmentPairVarSet();
+      explicit TruthSegmentPairVarSet();
 
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;

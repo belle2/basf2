@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
@@ -19,43 +20,43 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const basicSegmentPairVarNames[] = {
-      "axial_first",
-      "axial_size",
-      "stereo_size",
-      "sl_id_pair",
+    static char const* const trailSegmentPairVarNames[] = {
+      "from_rl_asym",
+      "to_rl_asym",
+
+      "from_rl_switches",
+      "to_rl_switches",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment pair
+    /** Class that specifies the names of the variables
+     *  that should be generated from a segment
      */
-    class BasicSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    class TrailSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentPairVarNames);
+      static const size_t nNames = size(trailSegmentPairVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return basicSegmentPairVarNames[iName];
+        return trailSegmentPairVarNames[iName];
       }
     };
 
-    /**
-     *  Class that computes floating point variables from a segment relation.
+    /** Class that computes floating point variables from a segment pair.
+     *  that can be forwarded to a flat TNtuple or a TMVA method
      */
-    class BasicSegmentPairVarSet : public VarSet<BasicSegmentPairVarNames> {
+    class TrailSegmentPairVarSet : public VarSet<TrailSegmentPairVarNames> {
 
     private:
       /// Type of the base class
-      using Super = VarSet<BasicSegmentPairVarNames>;
+      using Super = VarSet<TrailSegmentPairVarNames>;
 
     public:
       /// Construct the varset.
-      explicit BasicSegmentPairVarSet();
+      explicit TrailSegmentPairVarSet();
 
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;

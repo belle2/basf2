@@ -21,7 +21,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentPairHitGapVarNames[] = {
+    static char const* const hitGapSegmentPairVarNames[] = {
       "delta_hit_pos_phi",
       "delta_hit_mom_phi",
       "delta_hit_alpha",
@@ -46,13 +46,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentPairHitGapVarNames);
+      static const size_t nNames = size(hitGapSegmentPairVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return segmentPairHitGapVarNames[iName];
+        return hitGapSegmentPairVarNames[iName];
       }
     };
 

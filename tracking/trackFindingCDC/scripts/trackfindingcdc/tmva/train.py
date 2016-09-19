@@ -290,7 +290,9 @@ class ClassificationOverview:
         print("Loading tree")
         branch_names = {*variable_names, truth_name, *groupbys, *filters}
         branch_names = [name for name in branch_names if name]
-        input_record_array = root_numpy.tree2rec(input_tree, branches=branch_names)
+        input_array = root_numpy.tree2array(input_tree, branches=branch_names)
+        input_record_array = input_array.view(np.recarray)
+
         if filters:
             for filter in filters:
                 filter_values = input_record_array[filter]
@@ -324,6 +326,8 @@ class ClassificationOverview:
 
                         # Get the truths as a numpy array
                         estimates = input_record_array[variable_name]
+                        estimates[estimates == np.finfo(np.float32).max] = float("nan")
+                        estimates[estimates == -np.finfo(np.float32).max] = -float("inf")
 
                         classification_analysis = classification.ClassificationAnalysis(
                             contact="",

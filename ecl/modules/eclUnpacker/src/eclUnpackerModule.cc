@@ -1,4 +1,5 @@
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
+#include <framework/utilities/FileSystem.h>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +16,8 @@ ECLUnpackerModule::ECLUnpackerModule() :
   setPropertyFlags(c_ParallelProcessingCertified);
 
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
-  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
+  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file",
+           FileSystem::findFile("ecl/utility/include/crpsch.dat"));
   addParam("ECLDigitsName", m_eclDigitsName, "Name of the ECLDigits container", string("ECLDigits"));
 
   m_EvtNum = 0;

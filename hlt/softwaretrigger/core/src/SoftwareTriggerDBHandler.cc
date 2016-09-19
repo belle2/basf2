@@ -46,7 +46,10 @@ namespace Belle2 {
     std::string SoftwareTriggerDBHandler::makeFullCutName(const std::string& baseCutIdentifier,
                                                           const std::string& cutIdentifier)
     {
-      return s_dbPackageIdentifier + "_" + baseCutIdentifier + "_" + cutIdentifier;
+      assert(baseCutIdentifier.find("&") == std::string::npos);
+      assert(cutIdentifier.find("&") == std::string::npos);
+
+      return s_dbPackageIdentifier + "&" + baseCutIdentifier + "&" + cutIdentifier;
     }
 
     void SoftwareTriggerDBHandler::upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,

@@ -110,6 +110,9 @@ void ReprocessorModule::event()
     rate = MetaHit.getrate();
   }
 
+  if (m_input_HE3_Ntimes != 0 && m_input_TPC_Ntimes == 0) rate *= m_input_HE3_Ntimes;
+  if (m_input_TPC_Ntimes != 0 && m_input_HE3_Ntimes == 0) rate *= m_input_TPC_Ntimes;
+
   // if not already existed, create MCParticles data store
   StoreArray<MCParticle> MCParticles;
   MCParticles.clear();

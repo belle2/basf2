@@ -1,5 +1,8 @@
 #include <ecl/modules/eclPacker/eclPackerModule.h>
 #include <ecl/dataobjects/ECLDsp.h>
+
+#include <framework/utilities/FileSystem.h>
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,7 +18,8 @@ ECLPackerModule::ECLPackerModule() :
   m_eclRawCOPPERs("", DataStore::c_Event)
 {
   setDescription("");
-  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
+  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file",
+           FileSystem::findFile("ecl/utility/include/crpsch.dat"));
   addParam("RawCOPPERsName", m_eclRawCOPPERsName, "Name of the RawECL container", string(""));
   addParam("CompressMode", m_compressMode, "compress mode for ADC samples", true);
   addParam("AmpThreshold", m_ampThreshold, "Amplitude threshold", -50);

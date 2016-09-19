@@ -16,7 +16,7 @@ ECLPackerModule::ECLPackerModule() :
 {
   setDescription("");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
-  addParam("RawCOPPERsName", m_eclRawCOPPERsName, "Name of the RawECL container", string("RawECL"));
+  addParam("RawCOPPERsName", m_eclRawCOPPERsName, "Name of the RawECL container", string(""));
   addParam("CompressMode", m_compressMode, "compress mode for ADC samples", true);
   addParam("AmpThreshold", m_ampThreshold, "Amplitude threshold", -50);
   addParam("PackWfRareFactor", m_WaveformRareFactor, "Pack ADC samples for one of N events. No waveform is packed if 0", 100);

@@ -1,4 +1,5 @@
 from ROOT import Belle2
+from softwaretrigger import SOFTWARE_TRIGGER_GLOBAL_TAG_NAME
 
 
 def upload_cut_to_db(software_trigger_cut, base_identifier, cut_identifier, iov=None):
@@ -53,6 +54,20 @@ def set_event_number(evt_number, run_number, exp_number):
     event_meta_data_pointer.setExperiment(exp_number)
 
     Belle2.DataStore.Instance().setInitializeActive(False)
+
+
+def get_all_cuts_in_database(base_identifier=None, software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME):
+    from conditions_db import ConditionsDB
+
+    db = ConditionsDB()
+    payloads = db.get_payloads(software_trigger_global_tag_name)
+    cuts_in_database = [tuple(cut_name.split("&")[1:]) for store_name, cut_name, checksum in payloads
+                        if "&" in cut_name and len(cut_name.split("&")) == 3]
+
+    if base_identifier:
+        cuts_in_database = list(filter(lambda x: x[0] == base_identifier, cuts_in_database))
+
+    return cuts_in_database
 
 
 if __name__ == '__main__':

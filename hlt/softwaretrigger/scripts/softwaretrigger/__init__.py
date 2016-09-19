@@ -4,8 +4,15 @@ import basf2
 import reconstruction
 import modularAnalysis
 
-raw_save_objects = ["EventMetaData", "RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs",
-                    "EKLMDigits"]
+SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
+
+RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs",
+                         "EKLMDigits"]
+ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
+
+FAST_RECO_CUTS = ['reject_ee', 'accept_ee', 'reject_bkg']
+HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
+            "accept_mu_mu", "accept_gamma_gamma"]
 
 
 def add_packers(path):
@@ -69,7 +76,8 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
 
     # Add fast reco cuts
     fast_reco_cut_module = fast_reco_reconstruction_path.add_module("SoftwareTrigger", baseIdentifier="fast_reco",
-                                                                    cutIdentifiers=[])
+                                                                    cutIdentifiers=FAST_RECO_CUTS,
+                                                                    acceptOverridesReject=True)
 
     if store_array_debug_prescale is not None:
         fast_reco_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
@@ -77,10 +85,14 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     # There are three possibilities for the output of this module
     # (1) the event is dismissed -> only store the metadata
     fast_reco_cut_module.if_value("==-1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
-    # (2) the event is immediately accepted -> store everything
-    fast_reco_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
-    # (3) we do not know what to do -> go on with the reconstruction
-    fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+    # (2) we do not know what to do or the event is accepted -> go on with the hlt reconstruction
+    fast_reco_cut_module.if_value("!=-1", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
+
+    # second possibility
+    # # (2) the event is immediately accepted -> store everything
+    # fast_reco_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
+    # # (3) we do not know what to do -> go on with the reconstruction
+    # fast_reco_cut_module.if_value("==0", hlt_reconstruction_path, basf2.AfterConditionPath.CONTINUE)
 
     # Add hlt reconstruction
     reconstruction.add_reconstruction(hlt_reconstruction_path, trigger_mode="hlt", skipGeometryAdding=True)
@@ -89,8 +101,7 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
 
     # Add fast reco cuts
     hlt_cut_module = hlt_reconstruction_path.add_module("SoftwareTrigger", baseIdentifier="hlt",
-                                                        # TODO
-                                                        cutIdentifiers=[])
+                                                        cutIdentifiers=HLT_CUTS)
 
     if store_array_debug_prescale is not None:
         hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
@@ -106,7 +117,7 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
 
 def get_store_only_metadata_path():
     store_metadata_path = basf2.create_path()
-    store_metadata_path.add_module("PruneDataStore", keepEntries=["EventMetaData", "SoftwareTrigger.*"]).\
+    store_metadata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX). \
         set_name("KeepMetaData")
 
     return store_metadata_path
@@ -114,12 +125,13 @@ def get_store_only_metadata_path():
 
 def get_store_only_rawdata_path():
     store_rawdata_path = basf2.create_path()
-    store_rawdata_path.add_module("PruneDataStore", keepEntries=raw_save_objects).set_name("KeepRawData")
+    store_rawdata_path.add_module("PruneDataStore", keepEntries=ALWAYS_SAVE_REGEX + RAW_SAVE_STORE_ARRAYS)\
+        .set_name("KeepRawData")
 
     return store_rawdata_path
 
 
-def setup_softwaretrigger_database_access(software_trigger_global_tag_name="software_trigger",
+def setup_softwaretrigger_database_access(software_trigger_global_tag_name=SOFTWARE_TRIGGER_GLOBAL_TAG_NAME,
                                           production_global_tag_name="production"):
     basf2.reset_database()
     basf2.use_local_database()
@@ -149,7 +161,7 @@ if __name__ == '__main__':
         add_packers(path)
 
         path.add_module("SeqRootOutput", outputFileName=sroot_file_name,
-                        saveObjs=raw_save_objects)  # TODO: EKLM is not Raw
+                        saveObjs=["EventMetaData"] + RAW_SAVE_STORE_ARRAYS)  # TODO: EKLM is not Raw
     else:
         path.add_module("SeqRootInput", inputFileName=sroot_file_name)
 

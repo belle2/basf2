@@ -1,15 +1,13 @@
-from .utils import method_dispatch
 from functools import partial
+from collections import defaultdict
+
+from .utils import method_dispatch
 
 
 class Machine():
     """
     Base class for a final state machine wrapper.
     Implements the framwork that a more complex machine can inherit from.
-
-    * 'model' attribute represents another class instance that contains information
-    that will set up your Machine and allow your machine to make descisions. Currently
-    this base class won't use the attribute.
 
     * 'states' attribute is a list of possible states of the machine. (strings)
 
@@ -19,18 +17,13 @@ class Machine():
     an allowed state to an allowed state. A condition is optional but must be a callable
     that returns True or False based on some inputs/state of the machine.
     """
-    def __init__(self, model=None, states=None, transitions=None, initial_state=None):
+    def __init__(self):
         """
         Basic Setup
         """
-        self.model = model
-        self.states = []
-        self.state = initial_state
-        self.transitions = {}
-        if states:
-            self.states = states
-        if transitions:
-            self.transitions = transitions
+        self.states = set()
+        self.state = ""
+        self.transitions = defaultdict(list)
 
     @staticmethod
     def default_condition():
@@ -55,14 +48,14 @@ class Machine():
             transition_dict["condition"] = condition
         else:
             transition_dict["condition"] = Machine.default_condition
-        self.transitions[trigger] = transition_dict
+        self.transitions[trigger].append(transition_dict)
 
     def add_state(self, state):
         """
         Adds a single state to the list of possible ones.
         Should be a unique string.
         """
-        self.states.append(state)
+        self.states.add(state)
 
     def __getattr__(self, name):
         """
@@ -71,35 +64,40 @@ class Machine():
         AttributeError is called.
         """
         try:
-            transition_dict = self.transitions[name]
+            transition_dicts = self.transitions[name]
         except KeyError:
             raise AttributeError("{0} does not exist in transitions".format(name))
         else:
-            return partial(self._trigger, name, transition_dict)
+            return partial(self._trigger, transition_dicts)
 
-    def _trigger(self, name, transition_dict):
+    def _trigger(self, transition_dicts):
         """
         Runs the transition logic
         """
-        if self.state == transition_dict["source"]:
-            condition = transition_dict["condition"]
-            if condition():
-                self.state = transition_dict["dest"]
+        for transition in transition_dicts:
+            source, dest, condition = transition["source"], transition["dest"], transition["condition"]
+            if self.state == source:
+                if condition():
+                    self.state = dest
+                    break
+        else:
+            print("Implement Trigger Error Here")
 
     def save_graph(self, filename, graphname):
         with open(filename, "w") as dotfile:
             dotfile.write("digraph "+graphname+" {\n")
             for state in self.states:
                 dotfile.write('"'+state+'" [shape=ellipse, color=black]\n')
-            for transition, transition_dict in self.transitions.items():
-                dotfile.write('"'+transition_dict["source"]+'" -> "'+transition_dict["dest"]+'" [label="'+transition+'"]\n')
+            for trigger, transition_dicts in self.transitions.items():
+                for transition in transition_dicts:
+                    dotfile.write('"'+transition["source"]+'" -> "'+transition["dest"]+'" [label="'+trigger+'"]\n')
             dotfile.write("}\n")
 
 
 class CalibrationMachine(Machine):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.states.extend(["init",
+    def __init__(self, calibration, initial_state="init"):
+        super().__init__()
+        self.states.update(["init",
                             "running_collector",
                             "collector_failed",
                             "collector_completed",
@@ -109,10 +107,12 @@ class CalibrationMachine(Machine):
                             "completed"])
 
         self.add_transition("submit_collector", "init", "running_collector")
-        self.add_transition("fail_collector", "running_collector", "collector_failed")
-        self.add_transition("complete_collector", "running_collector", "collector_completed")
+        self.add_transition("fail", "running_collector", "collector_failed")
+        self.add_transition("complete", "running_collector", "collector_completed")
         self.add_transition("run_algorithm", "collector_completed", "running_algorithm")
-        self.add_transition("complete_algorithm", "running_algorithm", "algorithm_completed")
-        self.add_transition("fail_algorithm", "running_algorithm", "algorithm_failed")
+        self.add_transition("complete", "running_algorithm", "algorithm_completed")
+        self.add_transition("fail", "running_algorithm", "algorithm_failed")
         self.add_transition("iterate", "algorithm_completed", "init")
         self.add_transition("finish", "algorithm_completed", "completed")
+
+        self.initial_state = initial_state

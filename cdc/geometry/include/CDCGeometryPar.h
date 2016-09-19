@@ -129,7 +129,6 @@ namespace Belle2 {
        * @param[in] GearDir Gear Dir.
        * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
        */
-
       void readWirePositionParams(const GearDir, EWirePosition set);
 
 
@@ -139,6 +138,15 @@ namespace Belle2 {
        * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
        */
       void readWirePositionParams(const CDCGeometry&, EWirePosition set);
+
+      /**
+       * Read displacement or (mis)alignment params from xml or DB.
+       * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
+       * @param[in] Pointer to DB CDCGeometry db object.
+       * @param[in] GearDir Gear Dir.
+       */
+      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+
       /**
        * Read XT-relation table.
        * @param[in] GearDir Gear Dir.
@@ -982,6 +990,7 @@ namespace Belle2 {
       bool m_linearInterpolationOfXT;  /*!< Switch for linear interpolation of xt */
       bool m_linearInterpolationOfSgm; /*!< Switch for linear interpolation of sigma */
       bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
+      bool m_Displacement;   /*!< Switch for displacement. */
       bool m_Misalignment;   /*!< Switch for misalignment. */
       bool m_Alignment;      /*!< Switch for alignment. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
@@ -1035,8 +1044,8 @@ namespace Belle2 {
       double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
       double m_minTrackLength;         /*!< Minimum track length for G4 step */
 
-      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each cell; to be implemented in a smarter way. */
-      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each cell; ibid. */
+      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the forward endplate for each cell; to be implemented in a smarter way. */
+      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the backward endplate for each cell; ibid. */
       float m_WireSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient for each cell; ibid. */
 
       float m_FWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the forward endplate for each cell; ibid. */

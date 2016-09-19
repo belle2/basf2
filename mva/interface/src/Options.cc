@@ -23,7 +23,7 @@ namespace Belle2 {
       ("datafiles", po::value<std::vector<std::string>>(&m_datafiles)->required()->multitoken(),
        "ROOT files containing the training dataset")
       ("treename", po::value<std::string>(&m_treename), "Name of tree in ROOT datafile")
-      ("weightfile", po::value<std::string>(&m_weightfile)->required(), "Filename of the outputted weightfile")
+      ("identifier", po::value<std::string>(&m_identifier)->required(), "Identifier of the outputted weightfile")
       ("variables", po::value<std::vector<std::string>>(&m_variables)->required()->multitoken(),
        "feature variables used in the training")
       ("target_variable", po::value<std::string>(&m_target_variable),
@@ -38,7 +38,7 @@ namespace Belle2 {
     void GeneralOptions::load(const boost::property_tree::ptree& pt)
     {
       m_method = pt.get<std::string>("method");
-      m_weightfile = pt.get<std::string>("weightfile");
+      m_identifier = pt.get<std::string>("weightfile");
       m_treename = pt.get<std::string>("treename");
       m_target_variable = pt.get<std::string>("target_variable");
       m_weight_variable = pt.get<std::string>("weight_variable");
@@ -60,7 +60,7 @@ namespace Belle2 {
     void GeneralOptions::save(boost::property_tree::ptree& pt) const
     {
       pt.put("method", m_method);
-      pt.put("weightfile", m_weightfile);
+      pt.put("weightfile", m_identifier);
       pt.put("treename", m_treename);
       pt.put("target_variable", m_target_variable);
       pt.put("weight_variable", m_weight_variable);

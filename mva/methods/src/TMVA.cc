@@ -17,6 +17,14 @@
 #include <TPluginManager.h>
 #include <TROOT.h>
 
+#include <boost/algorithm/string.hpp>
+
+#include <unistd.h>
+#include <fcntl.h>
+#include <stdio.h>
+#include <stdlib.h>
+
+
 namespace Belle2 {
   namespace MVA {
 
@@ -105,13 +113,59 @@ namespace Belle2 {
         B2ERROR("TMVA Method with name " + specific_options.m_method + " cannot be booked.");
       }
 
+      Weightfile weightfile;
+      std::string logfilename = weightfile.getFileName(".log");
+
+      // Pipe stdout into a logfile to get TMVA output, which contains valueable information
+      // which cannot be retreived otherwise!
+      // Hence we do some black magic here
+      auto logfile = open(logfilename.c_str(), O_WRONLY | O_CREAT | O_TRUNC, 0666);
+      auto saved_stdout = dup(STDOUT_FILENO);
+      dup2(logfile, 1);
+
       factory.TrainAllMethods();
       factory.TestAllMethods();
       factory.EvaluateAllMethods();
 
-      Weightfile weightfile;
+      // Reset original output
+      dup2(saved_stdout, STDOUT_FILENO);
+      close(saved_stdout);
+      close(logfile);
+
+
       weightfile.addOptions(m_general_options);
       weightfile.addFile("TMVA_Weightfile", std::string("weights/") + jobName + "_" + specific_options.m_method + ".weights.xml");
+      weightfile.addFile("TMVA_Logfile", logfilename);
+
+      // We have to parse the TMVA output to get the feature importances, there is no other way currently
+      std::string begin = "Ranking input variables (method specific)";
+      std::string end = "-----------------------------------";
+      std::string line;
+      std::ifstream file(logfilename, std::ios::in);
+      std::map<std::string, float> feature_importances;
+      int state = 0;
+      while (std::getline(file, line)) {
+        if (state == 0 && line.find(begin) != std::string::npos) {
+          state = 1;
+          continue;
+        }
+        if (state >= 1 and state <= 4) {
+          state++;
+          continue;
+        }
+        if (state == 5) {
+          if (line.find(end) != std::string::npos)
+            break;
+          std::vector<std::string> strs;
+          boost::split(strs, line, boost::is_any_of(":"));
+          std::string variable = strs[2];
+          boost::trim(variable);
+          variable = Belle2::invertMakeROOTCompatible(variable);
+          float importance = std::stof(strs[3]);
+          feature_importances[variable] = importance;
+        }
+      }
+      weightfile.addFeatureImportance(feature_importances);
 
       return weightfile;
 
@@ -250,6 +304,11 @@ namespace Belle2 {
       m_input_cache.resize(general_options.m_variables.size(), 0);
       for (unsigned int i = 0; i < general_options.m_variables.size(); ++i) {
         m_expert->AddVariable(Belle2::makeROOTCompatible(general_options.m_variables[i]), &m_input_cache[i]);
+      }
+
+      if (weightfile.containsElement("TMVA_Logfile")) {
+        std::string custom_weightfile = weightfile.getFileName("logfile");
+        weightfile.getFile("TMVA_Logfile", custom_weightfile);
       }
 
     }

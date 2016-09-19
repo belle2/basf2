@@ -30,6 +30,7 @@ floating_expressions = {
 
 for width in integral_types:
     # check signed types, we want min, max -1, 0 and 1
+    dtype = np.dtype("int%d" % width)
     for i, value in enumerate([-2**(width-1), -1, 0, 1, 2**(width-1) - 1]):
         # create a unique member name
         func_name = "int{0}test{1}".format(width, i)
@@ -40,10 +41,11 @@ for width in integral_types:
         testclass.append("int{0}_t& ref_{1}() {{ static int{0}_t val = {2}{3}; return val; }}".format(
             width, func_name, value, prefix))
         # and remember name and result for checking
-        results.append([func_name, value])
-        results.append(['ref_' + func_name, value])
+        results.append([func_name, value, dtype])
+        results.append(['ref_' + func_name, value, dtype])
 
     # check unsigned types, just 0, 1, and max
+    dtype = np.dtype("uint%d" % width)
     for i, value in enumerate([0, 1, 2**(width) - 1]):
         # create a unique member name
         func_name = "uint{0}test{1}".format(width, i)
@@ -54,8 +56,8 @@ for width in integral_types:
         testclass.append("uint{0}_t& ref_{1}() {{ static uint{0}_t val = {2}{3}; return val; }}".format(
             width, func_name, value, prefix))
         # and remember name and result for checking
-        results.append([func_name, value])
-        results.append(['ref_' + func_name, value])
+        results.append([func_name, value, dtype])
+        results.append(['ref_' + func_name, value, dtype])
 
 # now add floating types
 for t in floating_types:
@@ -69,8 +71,8 @@ for t in floating_types:
         expression = repr(value) if value not in floating_expressions else floating_expressions[value].format(t)
         testclass.append("{0} {1}() const {{ return {2}; }}".format(t, func_name, expression))
         testclass.append("{0}& ref_{1}() {{ static {0} val = {2}; return val; }}".format(t, func_name, expression))
-        results.append([func_name, value])
-        results.append(['ref_' + func_name, value])
+        results.append([func_name, value, info.dtype])
+        results.append(['ref_' + func_name, value, info.dtype])
 
 
 # compile the test class
@@ -80,11 +82,13 @@ ROOT.gROOT.ProcessLine("\n".join(testclass))
 tests = ROOT.ReturnValueTests()
 # and do all the checks
 failures = 0
-for func, value in results:
+for func, value, dtype in results:
     ret = getattr(tests, func)()
-    # char is odd and sometimes returns strings for positive values. Fix that
+    # char is odd and returns strings instead of int. The simple way of using
+    # ord(string) will loose the sign so we have to convert it to the correct
+    # type using numpy but for that we have to convert the string to 8bit.
     if isinstance(ret, str):
-        ret = ord(ret[0])
+        ret = np.fromstring(ret.encode("latin1"), dtype)[0]
 
     # print the test
     print("check %s(): %r == %r: " % (func, value, ret), end="")

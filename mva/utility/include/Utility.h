@@ -29,7 +29,7 @@ namespace Belle2 {
     void download(const std::string& identifier, const std::string& filename, int experiment = 0, int run = 0, int event = 0);
 
     /**
-     * Conenience function which uploads a given weightfile to the database
+     * Convenience function which uploads a given weightfile to the database
      * @param filename of the weightfile
      * @param identifier identifier in the database
      * @param exp1 first valid experiment
@@ -40,7 +40,7 @@ namespace Belle2 {
     void upload(const std::string& filename, const std::string& identifier, int exp1 = 0, int run1 = 0, int exp2 = -1, int run2 = -1);
 
     /**
-     * Conenience function which checks if an experise is available
+     * Convenience function which checks if an experise is available
      * @param filename or identifier of the expertise
      * @param experiment current experiment
      * @param run current run
@@ -49,11 +49,17 @@ namespace Belle2 {
     bool available(const std::string& filename, int experiment = 0, int run = 0, int event = 0);
 
     /**
-     * Conenience function which extracts the expertise in a given weightfile into a temporary directory
+     * Convenience function which extracts the expertise in a given weightfile into a temporary directory
      * @param filename of the weightfile
      * @param directory temporary directory to use
      */
     void extract(const std::string& filename, const std::string& directory);
+
+    /**
+     * Print information about the classifier stored in the given weightfile
+     * @param filename of the weightfile
+     */
+    std::string info(const std::string& filename);
 
     /**
      * Convenience function which performs a training with the given options

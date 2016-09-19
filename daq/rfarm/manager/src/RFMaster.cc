@@ -196,8 +196,44 @@ int RFMaster::Start(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFMaster::Stop(NSMmsg*, NSMcontext*)
+int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
 {
+  int pars[10];
+  pars[0] = msg->pars[0];
+  pars[1] = msg->pars[1];
+
+  // 1. Stop worker nodes
+  // Unconfigure event processors
+  int maxnodes = m_conf->getconfi("processor", "nnodes");
+  int idbase = m_conf->getconfi("processor", "idbase");
+  char* hostbase = m_conf->getconf("processor", "nodebase");
+  char* badlist = m_conf->getconf("processor", "badlist");
+
+  char hostnode[512], idname[3];
+  RFNSM_Status::Instance().set_flag(0);
+  int nnodes = 0;
+  for (int i = 0; i < maxnodes; i++) {
+    sprintf(idname, "%2.2d", idbase + i);
+    if (badlist == NULL  ||
+        strstr(badlist, idname) == 0) {
+      sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
+      b2nsm_sendreq(hostnode, "RF_STOP", 0, pars);
+      nnodes++;
+    }
+  }
+#ifdef DESY
+  b2nsm_wait(5);
+#else
+  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
+#endif
+
+  // 2. Stop DqmServer node
+  // Unconfigure DqmServer
+  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+
   return 0;
 }
 

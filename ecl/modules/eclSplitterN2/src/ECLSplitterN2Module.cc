@@ -96,7 +96,7 @@ void ECLSplitterN2Module::event()
 
   // Loop over all connected regions (CR_.
   for (auto& aCR : m_eclConnectedRegions) {
-    int iShower = 0;
+    unsigned int iShower = 1;
 
     if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();

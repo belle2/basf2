@@ -553,7 +553,7 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     // DONE!
 
     // Create the ECLShower objects, one per LocalMaximum
-    unsigned int iShower = 0;
+    unsigned int iShower = 1;
     for (const auto& locmaxpoint : localMaximumsPoints) {
 
       const int locmaxcellid = locmaxpoint.first;
@@ -671,8 +671,8 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       B2DEBUG(175, "new energy: " << showerEnergy);
 
       // Get unique ID
-      ++iShower;
       aECLShower->setShowerId(iShower);
+      ++iShower;
       aECLShower->setHypothesisId(Belle2::ECLConnectedRegion::c_N1);
       aECLShower->setConnectedRegionId(aCR.getCRId());
 

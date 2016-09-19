@@ -613,6 +613,7 @@ class CAF():
                             ready = result.ready()
                             B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
                             if ready:
+                                result.post_process()
                                 waiting_on_results.remove(calibration_name)
                                 results.remove(result)
 

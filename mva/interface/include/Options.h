@@ -76,7 +76,7 @@ namespace Belle2 {
       virtual po::options_description getDescription() override;
 
       std::string m_method; /**< Name of the MVA method to use */
-      std::string m_weightfile; /**< Name of the weightfile containing the finished training */
+      std::string m_identifier; /**< Identifier containing the finished training */
       std::vector<std::string> m_datafiles; /**< Name of the datafiles containing the training data */
       std::string m_treename = "ntuple"; /**< Name of the TTree inside the datafile containing the training data */
       std::vector<std::string> m_variables; /**< Vector of all variables (branch names) used in the training */

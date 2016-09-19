@@ -1,4 +1,4 @@
-import os
+from basf2 import *
 import subprocess
 import multiprocessing as mp
 from collections import defaultdict
@@ -7,7 +7,9 @@ from itertools import repeat
 import glob
 from .utils import method_dispatch
 import pickle
+import configparser
 
+import ROOT
 # For weird reasons, a multiprocessing pool doesn't work properly as a class attribute
 # So we make it a module variable. Should be fine as starting up multiple pools
 # is not recommended anyway. Will check this again someday.
@@ -52,6 +54,38 @@ class Local(Backend):
         """
         #: The size of the multiprocessing process pool.
         self.max_processes = max_processes
+
+    class Result():
+        """
+        Simple class to help monitor status of jobs submitted by CAF backend to Local process.
+        """
+
+        def __init__(self, job, result):
+            """
+            Pass in the job object and the multiprocessing result to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            self.job = job
+            self.result = result
+
+        def ready(self):
+            """
+            Function that simply wraps the ready() function of the multiprocessing result object.
+            """
+            return self.result.ready()
+
+        def post_process(self):
+            """
+            Does clean up tasks after the main job has finished. Mainly downloading output to the
+            correct output location.
+            """
+            # Once the subprocess is done, move the requested output to the output directory
+            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            for pattern in self.job.output_patterns:
+                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.job.output_dir)
+                    # print('moving', file_name, 'to', job.output_dir)
 
     def join(self):
         """
@@ -126,7 +160,7 @@ class Local(Backend):
             with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
                 pickle.dump(existing_input_files, input_data_file)
 
-        result = pool.apply_async(Local.run_job, (job,))
+        result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
         print('Job {0} submitted'.format(job.name))
         return result
 
@@ -157,27 +191,439 @@ class Local(Backend):
             subprocess.run(job.cmd, shell=False, stdout=f_out, stderr=f_err, cwd=job.working_dir)
             print('Sub Process {0} Finished.'.format(job.name))
 
-        # Once the subprocess is done, move the requested output to the output directory
-        # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
-        for pattern in job.output_patterns:
-            output_files = glob.glob(os.path.join(job.working_dir, pattern))
-            for file_name in output_files:
-                shutil.move(file_name, job.output_dir)
-                # print('moving', file_name, 'to', job.output_dir)
-
 
 class PBS(Backend):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
-    pass
+    cmd_wkdir = "#PBS -d"
+    cmd_stdout = "#PBS -o"
+    cmd_stderr = "#PBS -e"
+    cmd_walltime = "#PBS -l walltime="
+    cmd_queue = "#PBS -q"
+    cmd_name = "#PBS -N"
+
+    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    default_config_section = "PBS"
+
+    required_config = ["Queue", "Release"]
+
+    def __init__(self, config_file_path="", section=""):
+        """
+        Init method for PBS Backend. Does default setup based on config file.
+        """
+        if config_file_path and section:
+            self.load_from_config(config_file_path, section)
+        else:
+            self.load_from_config(PBS.default_config_file, PBS.default_config_section)
+        self.basf2_setup = None
+
+    def load_from_config(self, config_file_path, section):
+        """
+        Takes a config file path (string) and the relevant section name (string).
+        Checks that the required setup options are set. When loading from a config file you
+        can't have a partially complete list of required options.
+
+        If you want to modify the default setup try changing the public attributes directly.
+        """
+        if config_file_path and section:
+            if os.path.exists(config_file_path):
+                cp = configparser.ConfigParser()
+                cp.read(config_file_path)
+            else:
+                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
+            if cp.has_section(section):
+                for option in PBS.required_config:
+                    if not cp.has_option(section, option):
+                        B2FATAL(("Tried to load config file but required option {0} "
+                                 "not found in section {1}".format(option, section)))
+            else:
+                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
+        self._update_from_config(cp, section)
+
+    def _update_from_config(self, config, section):
+        """
+        Sets attributes from a ConfigParser object. Checks for required options should already be done
+        so we can just use them here.
+        """
+        #: queue name for PBS submission
+        self.queue = config[section]["Queue"]
+        #: basf2 release path
+        self.release = config[section]["Release"]
+
+    def _generate_basf2_setup(self):
+        """
+        Creates a list of lines to write into a bash shell script that will setup basf2.
+        Will not be called if the user has set the pbs.basf2_setup attribute themselves.
+        """
+        #: A list of string lines that define how basf2 will be setup on the worker node.
+        #: Can be set explicitly by the user or ignored if the default/user defined config file
+        #: is good enough
+        self.basf2_setup = []
+        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
+                                 "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
+                                 "source $SETUPBELLE2_CVMFS\n",
+                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
+                                 "setuprel\n",
+                                 "popd > /dev/null\n"])
+
+    def _generate_pbs_script(self, job):
+        """
+        Creates the bash shell script that qsub will call. Includes PBD directives
+        and basf2 setup.
+        """
+        with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
+            batch_file.write("#!/bin/bash\n")
+            batch_file.write("# --- Start PBS ---\n")
+            batch_file.write(" ".join([PBS.cmd_queue, self.queue])+"\n")
+            batch_file.write(" ".join([PBS.cmd_name, job.name])+"\n")
+            batch_file.write(" ".join([PBS.cmd_wkdir, job.working_dir])+"\n")
+            batch_file.write(" ".join([PBS.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
+            batch_file.write(" ".join([PBS.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
+            batch_file.write("# --- End PBS ---\n")
+            self._add_basf2_setup(batch_file)
+            batch_file.write(" ".join(job.cmd)+"\n")
+
+    def _add_basf2_setup(self, file):
+        """
+        Adds basf2 setup lines to the PBS shell script file.
+        """
+        for line in self.basf2_setup:
+            file.write(line)
+
+    class Result():
+        """
+        Simple class to help monitor status of jobs submitted by CAF backend to PBS.
+
+        You pass in a Job ID from a qsub command and when you call the 'ready' method
+        it runs qstat to see whether or not the job has finished.
+        """
+
+        def __init__(self, job, job_id):
+            """
+            Pass in the job object and the job id to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            self.job = job
+            self.job_id = job_id
+
+        def ready(self):
+            """
+            Function that queries qstat to check for jobs that are still running.
+            """
+            try:
+                d = subprocess.check_output(["qstat", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+            except subprocess.CalledProcessError as cpe:
+                first_line = cpe.output.splitlines()[0]
+                if "Unknown Job Id Error" in first_line:
+                    return True
+            else:
+                return False
+
+        def post_process(self):
+            """
+            Does clean up tasks after the main job has finished. Mainly downloading output to the
+            correct output location.
+            """
+            # Once the subprocess is done, move the requested output to the output directory
+            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            for pattern in self.job.output_patterns:
+                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.job.output_dir)
+                    # print('moving', file_name, 'to', job.output_dir)
+
+    @method_dispatch
+    def submit(self, job):
+        """
+        Submit method of PBS backend. Should take job object, create needed directories, create PBS script,
+        and send it off with qsub applying the correct options (default and user requested.)
+
+        Should return a Result object that allows a 'ready' member method to be called from it which queries
+        the PBS system and the job about whether or not the job has finished.
+        """
+        print('Job Submitting:', job.name)
+        # Make sure the output directory of the job is created
+        if not os.path.exists(job.output_dir):
+            os.makedirs(job.output_dir)
+
+        # Make sure the working directory of the job is created
+        if job.working_dir and not os.path.exists(job.working_dir):
+            os.makedirs(job.working_dir)
+
+        # Get all of the requested files for the input sandbox and copy them to the working directory
+        for file_pattern in job.input_sandbox_files:
+            input_files = glob.glob(file_pattern)
+            for file_path in input_files:
+                if os.path.isdir(file_path):
+                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                else:
+                    shutil.copy(file_path, job.working_dir)
+
+        # Check if we have any valid input files
+        existing_input_files = []
+        for input_file_path in job.input_files:
+            if input_file_path[:7] != "root://":
+                if os.path.exists(input_file_path):
+                    existing_input_files.append(input_file_path)
+                else:
+                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+            else:
+                existing_input_files.append(input_file_path)
+
+        if existing_input_files:
+            # Now make a python file in our input sandbox containing a list of these valid files
+            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
+                pickle.dump(existing_input_files, input_data_file)
+
+        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
+        if not self.basf2_setup:
+            self._generate_basf2_setup()
+        self._generate_pbs_script(job)
+        result = self._submit_to_qsub(job)
+        return result
+
+    def _submit_to_qsub(self, job):
+        """
+        Do the actual qsub command and collect the output to find out the job id for later monitoring.
+        """
+        script_path = os.path.join(job.working_dir, "submit.sh")
+        qsub_out = subprocess.check_output(["qsub", script_path], stderr=subprocess.STDOUT, universal_newlines=True)
+        qsub_out = qsub_out.replace("\n", "")
+        result = PBS.Result(job, qsub_out)
+        return result
+
+    @submit.register(list)
+    def _(self, jobs):
+        """
+        Submit method of PBS() that takes a list of jobs instead of just one and submits each one
+        with qsub. Possibly with multiple submissions based on input file splitting.
+        """
+        results = []
+        # Submit the jobs to PBS
+        for job in jobs:
+            results.append(self.submit(job))
+        print('Jobs submitted')
+        return results
 
 
 class LSF(Backend):
     """
-    Backend for submitting calibration processes to a bsub batch system
+    Backend for submitting calibration processes to a qsub batch system
     """
-    pass
+    cmd_wkdir = "#BSUB -cwd"
+    cmd_stdout = "#BSUB -o"
+    cmd_stderr = "#BSUB -e"
+    cmd_queue = "#BSUB -q"
+    cmd_name = "#BSUB -J"
+
+    default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    default_config_section = "LSF"
+
+    required_config = ["Queue", "Release"]
+
+    def __init__(self, config_file_path="", section=""):
+        """
+        Init method for LSF Backend. Does default setup based on config file.
+        """
+        if config_file_path and section:
+            self.load_from_config(config_file_path, section)
+        else:
+            self.load_from_config(LSF.default_config_file, LSF.default_config_section)
+        self.basf2_setup = None
+
+    def load_from_config(self, config_file_path, section):
+        """
+        Takes a config file path (string) and the relevant section name (string).
+        Checks that the required setup options are set. When loading from a config file you
+        can't have a partially complete list of required options.
+
+        If you want to modify the default setup try changing the public attributes directly.
+        """
+        if config_file_path and section:
+            if os.path.exists(config_file_path):
+                cp = configparser.ConfigParser()
+                cp.read(config_file_path)
+            else:
+                B2FATAL("Attempted to load a config file that doesn't exist! {0}".format(config_file_path))
+            if cp.has_section(section):
+                for option in LSF.required_config:
+                    if not cp.has_option(section, option):
+                        B2FATAL(("Tried to load config file but required option {0} "
+                                 "not found in section {1}".format(option, section)))
+            else:
+                B2FATAL("Tried to load config file but required section {0} not found.".format(section))
+        self._update_from_config(cp, section)
+
+    def _update_from_config(self, config, section):
+        """
+        Sets attributes from a ConfigParser object. Checks for required options should already be done
+        so we can just use them here.
+        """
+        #: queue name for LSF submission
+        self.queue = config[section]["Queue"]
+        #: basf2 release path
+        self.release = config[section]["Release"]
+
+    def _generate_basf2_setup(self):
+        """
+        Creates a list of lines to write into a bash shell script that will setup basf2.
+        Will not be called if the user has set the lsf.basf2_setup attribute themselves.
+        """
+        #: A list of string lines that define how basf2 will be setup on the worker node.
+        #: Can be set explicitly by the user or ignored if the default/user defined config file
+        #: is good enough
+        self.basf2_setup = []
+        self.basf2_setup.extend(["export VO_BELLE2_SW_DIR=/cvmfs/belle.cern.ch/sl6\n",
+                                 "SETUPBELLE2_CVMFS=/cvmfs/belle.cern.ch/tools.new/setup_belle2\n",
+                                 "CAF_RELEASE_LOCATION="+self.release+"\n",
+                                 "source $SETUPBELLE2_CVMFS\n",
+                                 "pushd $CAF_RELEASE_LOCATION > /dev/null\n",
+                                 "setuprel\n",
+                                 "popd > /dev/null\n"])
+
+    def _generate_lsf_script(self, job):
+        """
+        Creates the bash shell script that qsub will call. Includes BSUB directives
+        and basf2 setup.
+        """
+        with open(os.path.join(job.working_dir, "submit.sh"), "w") as batch_file:
+            batch_file.write("#!/bin/bash\n")
+            batch_file.write("# --- Start LSF ---\n")
+            batch_file.write(" ".join([LSF.cmd_queue, self.queue])+"\n")
+            batch_file.write(" ".join([LSF.cmd_name, job.name])+"\n")
+            batch_file.write(" ".join([LSF.cmd_wkdir, job.working_dir])+"\n")
+            batch_file.write(" ".join([LSF.cmd_stdout, os.path.join(job.output_dir, "stdout")])+"\n")
+            batch_file.write(" ".join([LSF.cmd_stderr, os.path.join(job.output_dir, "stderr")])+"\n")
+            batch_file.write("# --- End LSF ---\n")
+            self._add_basf2_setup(batch_file)
+            batch_file.write(" ".join(job.cmd)+"\n")
+
+    def _add_basf2_setup(self, file):
+        """
+        Adds basf2 setup lines to the LSF shell script file.
+        """
+        for line in self.basf2_setup:
+            file.write(line)
+
+    class Result():
+        """
+        Simple class to help monitor status of jobs submitted by CAF backend to LSF.
+
+        You pass in a Job ID from a bsub command and when you call the 'ready' method
+        it runs bjobs to see whether or not the job has finished.
+        """
+
+        def __init__(self, job, job_id):
+            """
+            Pass in the job object and the job id to allow the result to do monitoring and perform
+            post processing of the job.
+            """
+            self.job = job
+            self.job_id = job_id
+
+        def ready(self):
+            """
+            Function that queries bjobs to check for jobs that are still running.
+            """
+            output = subprocess.check_output(["bjobs", self.job_id], stderr=subprocess.STDOUT, universal_newlines=True)
+            stat_line = output.split("\n")[1]
+            status = stat_line.split()[2]
+            if "DONE" in output or "EXIT" in output:
+                return True
+            else:
+                return False
+
+        def post_process(self):
+            """
+            Does clean up tasks after the main job has finished. Mainly downloading output to the
+            correct output location.
+            """
+            # Once the subprocess is done, move the requested output to the output directory
+            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            for pattern in self.job.output_patterns:
+                output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
+                for file_name in output_files:
+                    shutil.move(file_name, self.job.output_dir)
+                    # print('moving', file_name, 'to', job.output_dir)
+
+    @method_dispatch
+    def submit(self, job):
+        """
+        Submit method of LSF backend. Should take job object, create needed directories, create LSF script,
+        and send it off with bsub applying the correct options (default and user requested.)
+
+        Should return a Result object that allows a 'ready' member method to be called from it which queries
+        the LSF system and the job about whether or not the job has finished.
+        """
+        print('Job Submitting:', job.name)
+        # Make sure the output directory of the job is created
+        if not os.path.exists(job.output_dir):
+            os.makedirs(job.output_dir)
+
+        # Make sure the working directory of the job is created
+        if job.working_dir and not os.path.exists(job.working_dir):
+            os.makedirs(job.working_dir)
+
+        # Get all of the requested files for the input sandbox and copy them to the working directory
+        for file_pattern in job.input_sandbox_files:
+            input_files = glob.glob(file_pattern)
+            for file_path in input_files:
+                if os.path.isdir(file_path):
+                    shutil.copytree(file_path, os.path.join(job.working_dir, os.path.split(file_path)[1]))
+                else:
+                    shutil.copy(file_path, job.working_dir)
+
+        # Check if we have any valid input files
+        existing_input_files = []
+        for input_file_path in job.input_files:
+            if input_file_path[:7] != "root://":
+                if os.path.exists(input_file_path):
+                    existing_input_files.append(input_file_path)
+                else:
+                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+            else:
+                existing_input_files.append(input_file_path)
+
+        if existing_input_files:
+            # Now make a python file in our input sandbox containing a list of these valid files
+            with open(os.path.join(job.working_dir, 'input_data_files.data'), 'bw') as input_data_file:
+                pickle.dump(existing_input_files, input_data_file)
+
+        # If the user hasn't explicitly set the basf2_setup attribute, then do the default here from the config values
+        if not self.basf2_setup:
+            self._generate_basf2_setup()
+        self._generate_lsf_script(job)
+        result = self._submit_to_bsub(job)
+        return result
+
+    def _submit_to_bsub(self, job):
+        """
+        Do the actual bsub command and collect the output to find out the job id for later monitoring.
+        """
+        print("Calling bsub for job {0}".format(job.name))
+        script_path = os.path.join(job.working_dir, "submit.sh")
+        bsub_out = subprocess.check_output(("bsub < "+script_path,), stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
+        job_id = bsub_out.split(" ")[1]
+        for wrap in ["<", ">"]:
+            job_id = job_id.replace(wrap, "")
+        print("Job ID recorded as:", job_id)
+        result = LSF.Result(job, job_id)
+        return result
+
+    @submit.register(list)
+    def _(self, jobs):
+        """
+        Submit method of LSF() that takes a list of jobs instead of just one and submits each one
+        with qsub. Possibly with multiple submissions based on input file splitting.
+        """
+        results = []
+        # Submit the jobs to LSF
+        for job in jobs:
+            results.append(self.submit(job))
+        print('Jobs submitted')
+        return results
 
 
 class DIRAC(Backend):

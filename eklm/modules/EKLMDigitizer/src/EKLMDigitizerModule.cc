@@ -11,6 +11,9 @@
 /* System headers. */
 #include <math.h>
 
+/* External headers. */
+#include <boost/graph/adjacency_list.hpp>
+
 /* Belle2 headers. */
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <eklm/simulation/FiberAndElectronics.h>

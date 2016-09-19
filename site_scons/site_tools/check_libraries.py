@@ -101,6 +101,18 @@ def check_libraries(target, source, env):
         if needed is None:
             continue
 
+        def remove_libprefix(x):
+            """small helper to get rid of lib* prefix for requirements as SCons
+            seems to do this transparently as well"""
+            if x.startswith("lib"):
+                print_libs("LIB_WARNING", "dependency given as lib*, please remove "
+                           "'lib' prefix in SConscript", pkg, str(node), [x])
+                x = x[3:]
+            return x
+
+        # filter lib* from all given libraries and emit a Warning for each
+        given = map(remove_libprefix, given)
+
         # TODO: the list of libraries to link against is short name,
         # e.g. framework instead of libframework.so so we have to fix
         # these lists. However for external libraries this is usually

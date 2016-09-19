@@ -11,7 +11,7 @@
 #include <beast/he3tube/modules/He3tubeStudyModule.h>
 #include <beast/he3tube/dataobjects/He3tubeSimHit.h>
 #include <beast/he3tube/dataobjects/He3tubeHit.h>
-#include <beast/he3tube/dataobjects/He3MCParticle.h>
+#include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
 #include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -136,7 +136,7 @@ void He3tubeStudyModule::event()
 
   StoreArray<He3tubeSimHit>  simHits;
   StoreArray<He3tubeHit> Hits;
-  StoreArray<He3MCParticle> mcparts;
+  StoreArray<HE3G4TrackInfo> mcparts;
   StoreArray<SADMetaHit> MetaHits;
 
   //Look at the meta data to extract IR rate and scattering ring section

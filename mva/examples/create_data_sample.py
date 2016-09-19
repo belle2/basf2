@@ -20,15 +20,16 @@ def reconstruction_path(inputfiles):
     fillParticleLists([('K-', 'Kid > 0.5'), ('pi+', 'piid > 0.5')], path=path)
     reconstructDecay('D0 -> K- pi+', '1.8 < M < 1.9', path=path)
     fitVertex('D0', 0.1, path=path)
+    applyCuts('D0', '1.8 < M < 1.9', path=path)
     matchMCTruth('D0', path=path)
     return path
 
 
 if __name__ == "__main__":
-    path = reconstruction_path(['/local/scratch/hdd/MC/MC5/Charged02/mdst_00200*'])
+    path = reconstruction_path(['/storage/jbod/tkeck/MC6/charged/sub00/mdst_0000*.root'])
     variablesToNTuple('D0', variables + spectators, filename='train.root', treename='tree', path=path)
     process(path)
 
-    path = reconstruction_path(['/local/scratch/hdd/MC/MC5/Charged02/mdst_00300*'])
+    path = reconstruction_path(['/storage/jbod/tkeck/MC6/charged/sub00/mdst_0001*.root'])
     variablesToNTuple('D0', variables + spectators, filename='test.root', treename='tree', path=path)
     process(path)

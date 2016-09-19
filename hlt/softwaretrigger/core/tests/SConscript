@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+# vim: syntax=python
+
+Import('env')
+
+env['LIBS'] = [
+    'hlt',
+    'framework',
+    'hlt_softwaretrigger_dbobjects'
+    ]
+
+Return('env')
+

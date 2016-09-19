@@ -124,6 +124,11 @@ int ECLChannelMapper::getCrateID(int iCOPPERNode, int iFINESSE)
     return -1;
   }
 //    B2DEBUG(100,"ECLChannelMapper:: " << std::hex << "0x"<<iCOPPERNode << " " << iFINESSE << " iCrate = " << std::dec << iCrate);
+  if (iCrate > ECL_CRATES || iCrate < 1) {
+    B2ERROR("ECLChannelMapper::getCrateID::ERROR:: wrong crate number " << iCrate << " return -1");
+    return -1;
+  }
+
   return iCrate;
 
 }
@@ -168,21 +173,21 @@ int ECLChannelMapper::getCellId(int iCrate, int iShaper, int iChannel)
 }
 int ECLChannelMapper::getCrateID(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1 ][0];
   } else  return -1;
 }
 
 int ECLChannelMapper::getShaperPosition(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1][1];
   } else  return -1;
 }
 
 int ECLChannelMapper::getShaperChannel(int cellID)
 {
-  if (cellID > 0 && cellID < ECL_TOTAL_CHANNELS) {
+  if (cellID > 0 && cellID <= ECL_TOTAL_CHANNELS) {
     return convertArrayInv[cellID - 1][2];
   } else  return -1;
 }

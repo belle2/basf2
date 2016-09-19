@@ -43,6 +43,13 @@ class State(object):
         self.optimizer = tf.get_collection('optimizer')[0]
 
 
+def feature_importance(state):
+    """
+    Return a list containing the feature importances
+    """
+    return []
+
+
 def get_model(number_of_features, number_of_events, parameters):
     """
     Return default tensorflow model

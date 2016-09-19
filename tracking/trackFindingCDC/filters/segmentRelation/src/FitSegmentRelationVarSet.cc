@@ -32,9 +32,6 @@ bool FitSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* p
   const CDCRecoSegment2D* fromSegment = ptrSegmentRelation->first;
   const CDCRecoSegment2D* toSegment   = ptrSegmentRelation->second;
 
-  const CDCTrajectory2D& fromFit = fromSegment->getTrajectory2D();
-  const CDCTrajectory2D& toFit   = toSegment->getTrajectory2D();
-
   const CDCRiemannFitter& riemannFitter = CDCRiemannFitter::getFitter();
 
   CDCTrajectory2D commonTrajectory2D = riemannFitter.fit(*fromSegment, *toSegment);

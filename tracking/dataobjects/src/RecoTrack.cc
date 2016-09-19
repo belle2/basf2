@@ -227,3 +227,26 @@ genfit::Track& RecoTrackGenfitAccess::getGenfitTrack(RecoTrack& recoTrack)
 {
   return recoTrack.m_genfitTrack;
 }
+
+const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(const TVector3& closestPoint,
+    const genfit::AbsTrackRep* representation)
+{
+  checkDirtyFlag();
+  const unsigned int numberOfPoints = m_genfitTrack.getNumPointsWithMeasurement();
+
+  assert(numberOfPoints > 0);
+
+  const genfit::MeasuredStateOnPlane* nearestStateOnPlane = nullptr;
+  double minimalDistance2 = 0;
+  for (unsigned int hitIndex = 0; hitIndex < numberOfPoints; hitIndex++) {
+    const genfit::MeasuredStateOnPlane& measuredStateOnPlane = m_genfitTrack.getFittedState(hitIndex, representation);
+
+    const double currentDistance2 = (measuredStateOnPlane.getPos() - closestPoint).Mag2();
+
+    if (not nearestStateOnPlane or currentDistance2 < minimalDistance2) {
+      nearestStateOnPlane = &measuredStateOnPlane;
+      minimalDistance2 = currentDistance2;
+    }
+  }
+  return *nearestStateOnPlane;
+}

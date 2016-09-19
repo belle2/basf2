@@ -23,13 +23,17 @@ namespace Belle2 {
 
       /// Constructor taking two oriented wire hits.
       CDCRLWireHitPair(const CDCRLWireHit& fromRLWireHit,
-                       const CDCRLWireHit& toRLWireHit);
+                       const CDCRLWireHit& toRLWireHit,
+                       int iCluster = 0);
 
       /// Constructs a oriented wire hit pair that is the reverse of this one.
       CDCRLWireHitPair reversed() const;
 
       /// Reverses the oriented wire hit pair inplace.
       void reverse();
+
+      /// Returns the aliased version of this oriented wire hit pair
+      CDCRLWireHitPair getAlias() const;
 
       /// Equality comparision based the two oriented wire hits.
       bool operator==(const CDCRLWireHitPair& other) const

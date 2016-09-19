@@ -21,8 +21,8 @@ using namespace Belle2::MVA;
 int main(int argc, char* argv[])
 {
 
-  std::string filename;
   std::string identifier;
+  std::string db_identifier;
 
   int exp1 = 0;
   int exp2 = -1;
@@ -32,8 +32,8 @@ int main(int argc, char* argv[])
   po::options_description description("Options");
   description.add_options()
   ("help", "print this message")
-  ("filename", po::value<std::string>(&filename)->required(), "Name of weightfile produced by basf2_mva_teacher")
-  ("identifier", po::value<std::string>(&identifier)->required(), "Database identifier")
+  ("identifier", po::value<std::string>(&identifier)->required(), "Identifier produced by basf2_mva_teacher")
+  ("db_identifier", po::value<std::string>(&db_identifier)->required(), "New database identifier for the method")
   ("begin_experiment", po::value<int>(&exp1), "First experiment for which the weightfile is valid")
   ("end_experiment", po::value<int>(&exp2), "Last experiment for which the weightfile is valid")
   ("begin_run", po::value<int>(&run1), "First run for which the weightfile is valid")
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     return 1;
   }
 
-  Belle2::MVA::upload(filename, identifier, exp1, run1, exp2, run2);
+  Belle2::MVA::upload(identifier, db_identifier, exp1, run1, exp2, run2);
 
 
 }

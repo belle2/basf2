@@ -45,8 +45,8 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                     MVAConfiguration(variables=chargedVariables,
                                      target='isPrimarySignal'),
                     PreCutConfiguration(userCut=charged_user_cut,
-                                        bestCandidateMode='lowest',
-                                        bestCandidateVariable='piid' if not convertedFromBelle else 'atcPIDBelle(3,2)',
+                                        bestCandidateMode='highest',
+                                        bestCandidateVariable='piid' if not convertedFromBelle else 'atcPIDBelle(2,3)',
                                         bestCandidateCut=20),
                     PostCutConfiguration(bestCandidateCut=10, value=0.01))
     pion.addChannel(['pi+:FSP'])
@@ -81,20 +81,21 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                     PostCutConfiguration(bestCandidateCut=5, value=0.01))
     muon.addChannel(['mu+:FSP'])
 
+    gamma = Particle('gamma',
+                     MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
+                                                 'clusterE9E25', 'pt', 'E', 'pz'],
+                                      target='isPrimarySignal'),
+                     PreCutConfiguration(userCut='goodGamma == 1' if not convertedFromBelle else 'goodBelleGamma == 1',
+                                         bestCandidateMode='highest',
+                                         bestCandidateVariable='E',
+                                         bestCandidateCut=40),
+                     PostCutConfiguration(bestCandidateCut=20, value=0.01))
+    gamma.addChannel(['gamma:FSP'])
+    gamma.addChannel(['gamma:V0'],
+                     MVAConfiguration(variables=['pt', 'E', 'pz', 'extraInfo(preCut_rank)'],
+                                      target='isPrimarySignal'))
+
     if convertedFromBelle:
-        gamma = Particle('gamma',
-                         MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
-                                                     'clusterE9E25', 'pt', 'E', 'pz'],
-                                          target='isPrimarySignal'),
-                         PreCutConfiguration(userCut='goodBelleGamma == 1',
-                                             bestCandidateMode='highest',
-                                             bestCandidateVariable='E',
-                                             bestCandidateCut=40),
-                         PostCutConfiguration(bestCandidateCut=20, value=0.01))
-        gamma.addChannel(['gamma:mdst'])
-        gamma.addChannel(['gamma:v0mdst'],
-                         MVAConfiguration(variables=['pt', 'E', 'pz', 'extraInfo(preCut_rank)'],
-                                          target='isPrimarySignal'))
 
         pi0 = Particle('pi0',
                        MVAConfiguration(variables=['M', 'extraInfo(preCut_rank)',
@@ -104,7 +105,7 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                                            bestCandidateVariable='abs(dM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
-        pi0.addChannel(['pi0:mdst'])
+        pi0.addChannel(['pi0:FSP'])
 
         KS0 = Particle('K_S0',
                        MVAConfiguration(variables=['dr', 'dz', 'distance', 'significanceOfDistance', 'chiProb', 'M', 'abs(dM)',
@@ -117,22 +118,9 @@ def get_default_channels(B_extra_cut=None, semileptonic=True, KLong=True, charge
                                            bestCandidateVariable='abs(dM)',
                                            bestCandidateCut=20),
                        PostCutConfiguration(bestCandidateCut=10, value=0.01))
-        KS0.addChannel(['K_S0:mdst'])
+        KS0.addChannel(['K_S0:V0'])
 
     else:
-        gamma = Particle('gamma',
-                         MVAConfiguration(variables=['clusterReg', 'clusterNHits', 'clusterTiming', 'extraInfo(preCut_rank)',
-                                                     'clusterE9E25', 'pt', 'E', 'pz'],
-                                          target='isPrimarySignal'),
-                         PreCutConfiguration(userCut='goodGamma == 1',
-                                             bestCandidateMode='highest',
-                                             bestCandidateVariable='E',
-                                             bestCandidateCut=40),
-                         PostCutConfiguration(bestCandidateCut=20, value=0.01))
-        gamma.addChannel(['gamma:FSP'])
-        gamma.addChannel(['gamma:V0'],
-                         MVAConfiguration(variables=['pt', 'E', 'pz'],
-                                          target='isPrimarySignal'))
 
         pi0 = Particle('pi0',
                        MVAConfiguration(variables=['M', 'daughter({},extraInfo(SignalProbability))', 'extraInfo(preCut_rank)',

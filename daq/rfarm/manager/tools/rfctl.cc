@@ -271,10 +271,13 @@ main(int argc, char** argv)
         b2nsm_sendreq(av[1], "RF_START", 1, &runno);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
-      if (ac < 2) {
-        printf("usage: start <node> <run-number>\n");
+      if (ac < 4) {
+        printf("usage: start <node> <exp-number> <run-number>\n");
       } else {
-        b2nsm_sendreq(av[1], "RF_STOP", 0, 0);
+        int pars[10];
+        pars[0] = atoi(av[2]);
+        pars[1] = atoi(av[3]);
+        b2nsm_sendreq(av[1], "RF_STOP", 0, pars);
       }
     } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {

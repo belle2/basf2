@@ -242,7 +242,7 @@ void ECLCRFinderModule::event()
   for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
     if (m_cellIdToSeedVec[pos] > 0) {
       checkNeighbours(pos, m_tempCRId, 0);
-      ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module, starting at one
+      ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
     }
   }
 

@@ -85,18 +85,15 @@ int* NeuroBayesTeacher::nb_get_individual_prepro_flags(int*) {assert(0); return 
 void NeuroBayesTeacher::SayHello() {assert(0);}
 NeuroBayesTeacher::~NeuroBayesTeacher() {assert(0);}
 
-Expert::Expert(const std::string, int, bool, dsa::ec_t**,
-               dsa::log_func_t*, void*,
-               dsa::delete_enclosed_func_t*) {assert(0);}
-
-float Expert::nb_expert(ACTION, double*,
-                        float) {assert(0); return 0.0;}
-float Expert::nb_expert(ACTION, float*, float) {assert(0); return 0.0;}
-Expert::~Expert() {assert(0);}
 #endif
 
 namespace Belle2 {
   namespace MVA {
+
+    bool IsNeuroBayesAvailable()
+    {
+      return (::NeuroBayesTeacher::Instance() != 0);
+    }
 
     void NeuroBayesOptions::load(const boost::property_tree::ptree& pt)
     {
@@ -230,11 +227,33 @@ namespace Belle2 {
 
       nb->TrainNet();
 
+      // Since we don't know the exact interface of the function nb_infoout,
+      // we give for each of the pointers an array of the size of the number of variables
+      // and hope that this is enough to avoid a heap overflow!
+      std::vector<float> weightsum(numberOfFeatures, 0.0);
+      std::vector<float> total(numberOfFeatures, 0.0);
+      std::vector<int> keep(numberOfFeatures, 0);
+      std::vector<int> rank(numberOfFeatures, 0);
+      std::vector<float> single(numberOfFeatures, 0.0);
+      std::vector<float> added(numberOfFeatures, 0.0);
+      std::vector<float> global(numberOfFeatures, 0.0);
+      std::vector<float> loss(numberOfFeatures, 0.0);
+      std::vector<int> nvar(numberOfFeatures, 0);
+      std::vector<int> index(numberOfFeatures, 0);
+      nb->nb_infoout(&weightsum[0], &total[0], &keep[0], &rank[0], &single[0],
+                     &added[0], &global[0], &loss[0], &nvar[0], &index[0]);
+
+      std::map<std::string, float> feature_importances;
+      for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+        feature_importances[m_general_options.m_variables[iFeature]] = loss[iFeature];
+      }
+
       Weightfile weightfile;
       weightfile.addOptions(m_general_options);
       weightfile.addOptions(m_specific_options);
       weightfile.addFile("NeuroBayes_Weightfile", m_specific_options.m_weightfile);
       weightfile.addSignalFraction(training_data.getSignalFraction());
+      weightfile.addFeatureImportance(feature_importances);
       // Individual preprocessing flags are not saved at the moment, but they are saved in the expertise
 
       return weightfile;

@@ -11,10 +11,6 @@
 #ifndef EKLMDIGITIZERMODULE_H
 #define EKLMDIGITIZERMODULE_H
 
-/* Externaql headers. */
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/connected_components.hpp>
-
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>

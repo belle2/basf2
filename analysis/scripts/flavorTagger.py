@@ -519,7 +519,7 @@ def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
                 trainingOptionsTrackLevel = basf2_mva.GeneralOptions()
                 trainingOptionsTrackLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
                 trainingOptionsTrackLevel.m_treename = methodPrefixTrackLevel + "_tree"
-                trainingOptionsTrackLevel.m_weightfile = weightFile
+                trainingOptionsTrackLevel.m_identifier = weightFile
                 trainingOptionsTrackLevel.m_variables = basf2_mva.vector(*variables[category])
                 trainingOptionsTrackLevel.m_target_variable = targetVariable
 
@@ -656,7 +656,7 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
                 trainingOptionsEventLevel = basf2_mva.GeneralOptions()
                 trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
                 trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
-                trainingOptionsEventLevel.m_weightfile = weightFile
+                trainingOptionsEventLevel.m_identifier = weightFile
                 trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
                 trainingOptionsEventLevel.m_target_variable = targetVariable
 
@@ -949,7 +949,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
             trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
-            trainingOptionsCombinerLevel.m_weightfile = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root"
+            trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root"
             trainingOptionsCombinerLevel.m_variables = basf2_mva.vector(*variablesCombinerLevel)
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             basf2_mva.teacher(trainingOptionsCombinerLevel, fastBDTCombiner)
@@ -977,7 +977,7 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
             trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
-            trainingOptionsCombinerLevel.m_weightfile = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"
+            trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"
             trainingOptionsCombinerLevel.m_variables = basf2_mva.vector(*variablesCombinerLevel)
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
             basf2_mva.teacher(trainingOptionsCombinerLevel, mlpFANNCombiner)

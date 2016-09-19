@@ -1020,6 +1020,11 @@ namespace Belle2 {
     double getNominalSpaceResolution() const { return m_nominalSpaceResolution;}
 
     /**
+     * Get the displacement mode.
+     */
+    bool getDisplacement() const { return m_displacement;}
+
+    /**
      * Get the misalignment mode.
      */
     bool getMisalignment() const { return m_misalignment;}
@@ -1028,6 +1033,11 @@ namespace Belle2 {
      * Get the alignment mode.
      */
     bool getAlignment() const { return m_alignment;}
+
+    /**
+     * Get the file name for the displacement.
+     */
+    std::string getDisplacementFile() const { return m_displacementFile;}
 
     /**
      * Get the file name for the misalignment.
@@ -1102,8 +1112,10 @@ namespace Belle2 {
     double m_clockFrequency; /**< Clock frequency. */
     double m_nominalSpaceResolution;/**< Nominal space resolution. */
 
+    bool m_displacement; /**< Displacement mode. */
     bool m_misalignment; /**< Misalignment mode. */
     bool m_alignment; /**< Alignment mode. */
+    std::string m_displacementFile; /**< Displacement file. */
     std::string m_misalignmentFile; /**< Misalignment file. */
     std::string m_alignmentFile; /**< Alignment file. */
 

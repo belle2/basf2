@@ -4,7 +4,7 @@
 from basf2 import *
 
 
-def add_tracking_reconstruction(path, components=None, pruneTracks=False,
+def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules for tracking
@@ -20,8 +20,9 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False,
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
-    # Always add the geometry in all trigger modes.
-    add_geometry_modules(path, components)
+    if not skipGeometryAdding:
+        # Add the geometry in all trigger modes if not already in the path
+        add_geometry_modules(path, components)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.

@@ -2,6 +2,9 @@
 # -*- coding: utf-8 -*-
 
 """
+NOW OUT OF DATE AND SHOULD NOT BE USED. PLEASE REFER TO THE EXAMPLES DIRECTORY
+FOR EXAMPLES OF THE NEW CALIBRATION FRAMEWORK.
+
 Calibration Framework
 
 This script implements a simple calibration framework runner which does not yet

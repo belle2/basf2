@@ -23,6 +23,14 @@
 #include <IO.h>
 #endif
 
+// Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
+#if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
+namespace FastBDT {
+  template<>
+  bool compareIncludingNaN(float i, float j);
+}
+#endif
+
 namespace Belle2 {
   namespace MVA {
 

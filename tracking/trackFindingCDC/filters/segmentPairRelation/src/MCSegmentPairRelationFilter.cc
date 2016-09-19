@@ -19,14 +19,11 @@ MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
 {
 }
 
-
 void MCSegmentPairRelationFilter::beginEvent()
 {
   m_mcSegmentPairFilter.beginEvent();
   Super::beginEvent();
 }
-
-
 
 void MCSegmentPairRelationFilter::initialize()
 {
@@ -34,22 +31,42 @@ void MCSegmentPairRelationFilter::initialize()
   m_mcSegmentPairFilter.initialize();
 }
 
-
-
 void MCSegmentPairRelationFilter::terminate()
 {
   m_mcSegmentPairFilter.terminate();
   Super::terminate();
 }
 
-
-Weight
-MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
-                                        const CDCSegmentPair& toSegmentPair)
+Weight MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
+                                               const CDCSegmentPair& toSegmentPair)
 {
   Weight mcFromPairWeight = m_mcSegmentPairFilter(fromSegmentPair);
   Weight mcToPairWeight = m_mcSegmentPairFilter(toSegmentPair);
 
-  bool mcDecision = (not std::isnan(mcFromPairWeight)) and (not std::isnan(mcToPairWeight));
-  return mcDecision ? -toSegmentPair.getFromSegment()->size() : NAN;
+  ESign fromFBInfo = sign(mcFromPairWeight);
+  ESign toFBInfo = sign(mcToPairWeight);
+
+  if (isValid(fromFBInfo) and isValid(toFBInfo) and fromFBInfo == toFBInfo) {
+    ESign commonFBInfo = fromFBInfo;
+
+    size_t fromOverlapSize = fromSegmentPair.getToSegment()->size();
+    size_t fromSize = fromOverlapSize + fromSegmentPair.getFromSegment()->size();
+    Weight fromWeight = fromSegmentPair.getAutomatonCell().getCellWeight();
+
+    size_t toOverlapSize = toSegmentPair.getFromSegment()->size();
+    size_t toSize = toOverlapSize + toSegmentPair.getToSegment()->size();
+    Weight toWeight = toSegmentPair.getAutomatonCell().getCellWeight();
+    double overlapWeight =
+      (fromWeight * fromOverlapSize / fromSize + toWeight * toOverlapSize / toSize) / 2.0;
+
+    if (commonFBInfo < 0 and Super::getAllowReverse()) {
+      return -std::fabs(overlapWeight);
+    } else if (commonFBInfo > 0) {
+      return std::fabs(overlapWeight);
+    } else {
+      return NAN;
+    }
+  } else {
+    return NAN;
+  }
 }

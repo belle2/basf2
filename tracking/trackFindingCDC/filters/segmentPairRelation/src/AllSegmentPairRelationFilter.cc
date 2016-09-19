@@ -14,8 +14,16 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-Weight AllSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
-                                                const CDCSegmentPair& toPair)
+Weight AllSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
+                                                const CDCSegmentPair& toSegmentPair)
 {
-  return  -toPair.getFromSegment()->size();
+  size_t fromOverlapSize = fromSegmentPair.getToSegment()->size();
+  size_t fromSize = fromOverlapSize + fromSegmentPair.getFromSegment()->size();
+  Weight fromWeight = fromSegmentPair.getAutomatonCell().getCellWeight();
+
+  size_t toOverlapSize = toSegmentPair.getFromSegment()->size();
+  size_t toSize = toOverlapSize + toSegmentPair.getToSegment()->size();
+  Weight toWeight = toSegmentPair.getAutomatonCell().getCellWeight();
+
+  return (fromWeight * fromOverlapSize / fromSize + toWeight * toOverlapSize / toSize) / 2.0;
 }

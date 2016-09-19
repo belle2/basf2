@@ -14,20 +14,22 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair&,
-                                                   const CDCSegmentPair& toPair)
+Weight SimpleSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,
+                                                   const CDCSegmentPair& toSegmentPair)
 {
-
-  // Just let all found neighors pass since we have the same start -> end segment
+  // Just let all found neighors pass since we have the same to -> from segment
   // and let the cellular automaton figure auto which is longest
 
-  // can of course be adjusted by comparing the z components between
-  // pair and neighbor pair
-
   // neighbor weight is a penalty for the overlap of the segments since we would
-  // count it to times
-  // could also be a better measure of fit quality
+  // count it two times
 
-  return  -toPair.getFromSegment()->size();
+  size_t fromOverlapSize = fromSegmentPair.getToSegment()->size();
+  size_t fromSize = fromOverlapSize + fromSegmentPair.getFromSegment()->size();
+  Weight fromWeight = fromSegmentPair.getAutomatonCell().getCellWeight();
 
+  size_t toOverlapSize = toSegmentPair.getFromSegment()->size();
+  size_t toSize = toOverlapSize + toSegmentPair.getToSegment()->size();
+  Weight toWeight = toSegmentPair.getAutomatonCell().getCellWeight();
+
+  return -(fromWeight * fromOverlapSize / fromSize + toWeight * toOverlapSize / toSize) / 2.0;
 }

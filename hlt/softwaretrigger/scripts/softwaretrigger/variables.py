@@ -11,6 +11,7 @@ from tracking.root_utils import root_save_name
 
 
 class PandasHarvestingModule(HarvestingModule):
+
     @coroutine
     def barn(self):
         """Coroutine that receives the dictionaries of names and values from peel and store them."""
@@ -63,40 +64,24 @@ def pandas_harvest(foreach="", pick=None, name=None, output_file_name=None):
     return harvest_decorator
 
 
-class SummarizeTriggerVariables(basf2.Module):
-    """
-    Small helper module to export the software trigger variables saved in the data store to
-    a ROOT file for later analysis.
-    """
+class SummarizeTriggerResults(PandasHarvestingModule):
+
+    def __init__(self, root_file_name="save_results.root", store_object_name="SoftwareTriggerResults"):
+        super().__init__(foreach=store_object_name, output_file_name=root_file_name)
+
+    def peel(self, result):
+        return_dict = {identifier: result for identifier, result in result.getResults()}
+
+        return_dict["total_result_true"] = result.getTotalResult(True)
+        return_dict["total_result_false"] = result.getTotalResult(False)
+
+        yield return_dict
+
+
+class SummarizeTriggerVariables(PandasHarvestingModule):
 
     def __init__(self, root_file_name="save_vars.root", store_object_name="SoftwareTriggerVariable"):
-        """
-        Create a new SummarizeTriggerVariables module.
-        :param root_file_name: The root file name to save to results to.
-        :param store_object_name: The name of the object in the data store from where to get the variables.
-        """
-        basf2.Module.__init__(self)
+        super().__init__(foreach=store_object_name, output_file_name=root_file_name)
 
-        self.df = pd.DataFrame()
-        self.root_file_name = root_file_name
-        self.store_object_name = store_object_name
-
-        self.event_number_counter = 0
-
-    def event(self):
-        """
-        Extract the variables from the data store and save them in an internal pandas data frame.
-        Also increment the internal event number counter.
-        """
-        variables = Belle2.PyStoreObj(self.store_object_name)
-
-        return_dict = {identifier: value for identifier, value in variables.get()}
-        self.df = self.df.append(pd.DataFrame(return_dict, index=[self.event_number_counter]))
-
-        self.event_number_counter += 1
-
-    def terminate(self):
-        """
-        Save the internal pandas data frame to a ROOT file.
-        """
-        to_root(self.df, self.store_object_name)
+    def peel(self, variables):
+        yield {identifier: value for identifier, value in variables.get()}

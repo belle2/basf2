@@ -12,6 +12,8 @@ REG_MODULE(ECLUnpacker)
 ECLUnpackerModule::ECLUnpackerModule() :
   m_eclDigits("", DataStore::c_Event)
 {
+  setPropertyFlags(c_ParallelProcessingCertified);
+
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
   addParam("ECLDigitsName", m_eclDigitsName, "Name of the ECLDigits container", string("ECLDigits"));

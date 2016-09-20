@@ -6,6 +6,7 @@
 #include "TEveScene.h"
 #include "TEveManager.h"
 #include "TEveBrowser.h"
+#include "TEveProjectionAxes.h"
 #include "TEveViewer.h"
 #include "TEveWindowManager.h"
 #include "TGMenu.h"
@@ -19,6 +20,17 @@
 
 using namespace Belle2;
 
+namespace {
+  /** toggles menu entry with given id, returns whether it is checked in new state. */
+  bool toggleMenuEntry(TGPopupMenu* menu, int entryid)
+  {
+    if (menu->IsEntryChecked(entryid))
+      menu->UnCheckEntry(entryid);
+    else
+      menu->CheckEntry(entryid);
+    return menu->IsEntryChecked(entryid);
+  }
+}
 
 SplitGLView::SplitGLView() :
   m_activeViewer(-1),
@@ -86,6 +98,8 @@ SplitGLView::SplitGLView() :
     if (projectionMgr) {
       s->AddElement(projectionMgr);
       gEve->AddToListTree(projectionMgr, kTRUE);
+      TEveProjectionAxes* axes = new TEveProjectionAxes(projectionMgr);
+      projectionMgr->AddElement(axes);
     }
   }
 
@@ -106,24 +120,27 @@ SplitGLView::SplitGLView() :
   m_cameraMenu->AddEntry("Orthographic (X/Z)", kGLXOZ);
   m_cameraMenu->AddEntry("Orthographic (Z/Y)", kGLZOY);
   m_cameraMenu->AddSeparator();
-  m_cameraMenu->AddEntry("Orthographic: Allow rotating", kGLOrthoRotate);
-  m_cameraMenu->AddEntry("Orthographic: Right click to dolly", kGLOrthoDolly);
+  m_cameraMenu->AddEntry("Orthographic: Allow Rotating", kGLOrthoRotate);
+  m_cameraMenu->AddEntry("Orthographic: Right Click to Dolly", kGLOrthoDolly);
   m_cameraMenu->AddSeparator();
-  m_cameraMenu->AddEntry("Perspective: Enable stereographic 3D (requires hardware or stereowrap)", kGLStereo);
+  m_cameraMenu->AddEntry("Perspective: Enable Stereographic 3D (Requires Hardware or stereowrap)", kGLStereo);
 
-  TGPopupMenu* sceneMenu = new TGPopupMenu(gClient->GetDefaultRoot());
-  sceneMenu->AddEntry("&Update Current", kSceneUpdate);
-  sceneMenu->AddEntry("Update &All", kSceneUpdateAll);
-  sceneMenu->AddSeparator();
-  sceneMenu->AddEntry("Save &Geometry Extract", kSaveGeometryExtract);
+  m_sceneMenu = new TGPopupMenu(gClient->GetDefaultRoot());
+  m_sceneMenu->AddEntry("&Update Current", kSceneUpdate);
+  m_sceneMenu->AddEntry("Update &All", kSceneUpdateAll);
+  m_sceneMenu->AddSeparator();
+  m_sceneMenu->AddEntry("&Show Scale for Projections", kShowScale);
+  m_sceneMenu->CheckEntry(kShowScale);
+  m_sceneMenu->AddSeparator();
+  m_sceneMenu->AddEntry("Save &Geometry Extract", kSaveGeometryExtract);
 
   TGMenuBar* menuBar = gEve->GetBrowser()->GetMenuBar();
   menuBar->AddPopup("&Camera", m_cameraMenu, new TGLayoutHints(kLHintsTop | kLHintsLeft, 0, 4, 0, 0));
-  menuBar->AddPopup("&Scene", sceneMenu, new TGLayoutHints(kLHintsTop | kLHintsLeft, 0, 4, 0, 0));
+  menuBar->AddPopup("&Scene", m_sceneMenu, new TGLayoutHints(kLHintsTop | kLHintsLeft, 0, 4, 0, 0));
 
   // connect menu signals to our menu handler slot
   m_cameraMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this, "handleMenu(Int_t)");
-  sceneMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this, "handleMenu(Int_t)");
+  m_sceneMenu->Connect("Activated(Int_t)", "Belle2::SplitGLView", this, "handleMenu(Int_t)");
 
   // use status bar from the browser
   m_statusBar = gEve->GetBrowser()->GetStatusBar();
@@ -142,37 +159,55 @@ SplitGLView::~SplitGLView()
     delete m_glViewer[i];
   }
   delete m_cameraMenu;
+  delete m_sceneMenu;
   delete m_infoWidget;
 }
 
-void SplitGLView::handleMenu(Int_t id)
+void SplitGLView::updateCamera(int cameraAction)
+{
+  TGLEmbeddedViewer* viewer = getActiveGLViewer();
+  if (!viewer)
+    return;
+
+  TGLViewer::ECameraType cameraType;
+  switch (cameraAction) {
+    case kGLPerspYOZ:
+      cameraType = TGLViewer::kCameraPerspYOZ;
+      break;
+    case kGLPerspXOZ:
+      cameraType = TGLViewer::kCameraPerspXOZ;
+      break;
+    case kGLPerspXOY:
+      cameraType = TGLViewer::kCameraPerspXOY;
+      break;
+    case kGLXOY:
+      cameraType = TGLViewer::kCameraOrthoXOY;
+      break;
+    case kGLXOZ:
+      cameraType = TGLViewer::kCameraOrthoXOZ;
+      break;
+    case kGLZOY:
+      cameraType = TGLViewer::kCameraOrthoZOY;
+      break;
+    default:
+      B2ERROR("unknown camera action " << cameraAction);
+      return;
+  }
+  viewer->SetCurrentCamera(cameraType);
+}
+
+void SplitGLView::handleMenu(Int_t menuCommand)
 {
   // Handle menu items.
 
-  switch (id) {
+  switch (menuCommand) {
     case kGLPerspYOZ:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraPerspYOZ);
-      break;
     case kGLPerspXOZ:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraPerspXOZ);
-      break;
     case kGLPerspXOY:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraPerspXOY);
-      break;
     case kGLXOY:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOY);
-      break;
     case kGLXOZ:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoXOZ);
-      break;
     case kGLZOY:
-      if (getActiveGLViewer())
-        getActiveGLViewer()->SetCurrentCamera(TGLViewer::kCameraOrthoZOY);
+      updateCamera(menuCommand);
       break;
     case kGLOrthoRotate:
       toggleOrthoRotate();
@@ -193,6 +228,10 @@ void SplitGLView::handleMenu(Int_t id)
     case kSceneUpdateAll:
       for (int i = 0; i < 3; i++)
         m_glViewer[i]->UpdateScene();
+      break;
+
+    case kShowScale:
+      toggleShowScale();
       break;
 
     case kSaveGeometryExtract:
@@ -320,11 +359,7 @@ void SplitGLView::onMouseOver(TGLPhysicalShape* shape)
 
 void SplitGLView::toggleOrthoRotate()
 {
-  if (m_cameraMenu->IsEntryChecked(kGLOrthoRotate))
-    m_cameraMenu->UnCheckEntry(kGLOrthoRotate);
-  else
-    m_cameraMenu->CheckEntry(kGLOrthoRotate);
-  Bool_t state = m_cameraMenu->IsEntryChecked(kGLOrthoRotate);
+  Bool_t state = toggleMenuEntry(m_cameraMenu, kGLOrthoRotate);
   if (getActiveGLViewer()) {
     getActiveGLViewer()->GetOrthoXOYCamera()->SetEnableRotate(state);
     getActiveGLViewer()->GetOrthoXOZCamera()->SetEnableRotate(state);
@@ -334,11 +369,7 @@ void SplitGLView::toggleOrthoRotate()
 
 void SplitGLView::toggleOrthoDolly()
 {
-  if (m_cameraMenu->IsEntryChecked(kGLOrthoDolly))
-    m_cameraMenu->UnCheckEntry(kGLOrthoDolly);
-  else
-    m_cameraMenu->CheckEntry(kGLOrthoDolly);
-  Bool_t state = !m_cameraMenu->IsEntryChecked(kGLOrthoDolly);
+  Bool_t state = !toggleMenuEntry(m_cameraMenu, kGLOrthoDolly);
   if (getActiveGLViewer()) {
     getActiveGLViewer()->GetOrthoXOYCamera()->SetDollyToZoom(state);
     getActiveGLViewer()->GetOrthoXOZCamera()->SetDollyToZoom(state);
@@ -351,11 +382,29 @@ void SplitGLView::toggleStereo()
   if (!getActiveGLViewer())
     return;
 
-  getActiveGLViewer()->SetStereo(!getActiveGLViewer()->GetStereo());
-  if (getActiveGLViewer()->GetStereo())
-    m_cameraMenu->CheckEntry(kGLStereo);
-  else
-    m_cameraMenu->UnCheckEntry(kGLStereo);
+  getActiveGLViewer()->SetStereo(toggleMenuEntry(m_cameraMenu, kGLStereo));
+}
+
+void SplitGLView::toggleShowScale()
+{
+  bool state = toggleMenuEntry(m_sceneMenu, kShowScale);
+
+  TEveElement::List_ci end_it = m_rhozManager->EndChildren();
+  for (TEveElement::List_i it = m_rhozManager->BeginChildren(); it != end_it; ++it) {
+    TEveProjectionAxes* a = dynamic_cast<TEveProjectionAxes*>(*it);
+    if (a) {
+      a->SetRnrSelf(state);
+    }
+  }
+
+  end_it = m_rphiManager->EndChildren();
+  for (TEveElement::List_i it = m_rphiManager->BeginChildren(); it != end_it; ++it) {
+    TEveProjectionAxes* a = dynamic_cast<TEveProjectionAxes*>(*it);
+    if (a) {
+      a->SetRnrSelf(state);
+    }
+  }
+  gEve->Redraw3D(false); //do not reset camera when redrawing
 }
 
 void SplitGLView::itemClicked(TGListTreeItem* item, Int_t, Int_t, Int_t)

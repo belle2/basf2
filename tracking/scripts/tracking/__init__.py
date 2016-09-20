@@ -13,6 +13,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     """
@@ -22,7 +26,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     if not skipGeometryAdding:
         # Add the geometry in all trigger modes if not already in the path
-        add_geometry_modules(path, components, trigger_mode)
+        add_geometry_modules(path, components)
 
     # Material effects for all track extrapolations
     if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
@@ -40,7 +44,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
         add_track_fit_and_track_creator(path, components, pruneTracks)
 
 
-def add_geometry_modules(path, components=None, trigger_mode="all"):
+def add_geometry_modules(path, components=None):
     """
     Helper function to add the geometry related modules needed for tracking
     to the path.
@@ -137,6 +141,7 @@ def add_track_finding(path, components=None, trigger_mode="all"):
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
+    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return

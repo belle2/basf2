@@ -150,13 +150,13 @@ namespace {
       auto probabilities = expert->apply(dataset);
       EXPECT_EQ(probabilities.size(), dataset.getNumberOfEvents());
       for (unsigned int i = 0; i < 4; ++i) {
-        EXPECT_LE(probabilities[i], 0.6);
-        EXPECT_GE(probabilities[i], 0.4);
+        EXPECT_LE(probabilities[i], 0.2);
+        EXPECT_GE(probabilities[i], -0.2);
       }
-      EXPECT_LE(probabilities[4], 0.2);
-      EXPECT_GE(probabilities[5], 0.8);
-      EXPECT_LE(probabilities[6], 0.2);
-      EXPECT_GE(probabilities[7], 0.8);
+      EXPECT_LE(probabilities[4], -0.6);
+      EXPECT_GE(probabilities[5], 0.6);
+      EXPECT_LE(probabilities[6], -0.6);
+      EXPECT_GE(probabilities[7], 0.6);
     }
 #endif
 

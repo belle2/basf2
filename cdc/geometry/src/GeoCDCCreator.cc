@@ -120,7 +120,7 @@ namespace Belle2 {
 
       G4Material* cdcMedGas = cdcMed;
 
-      CDCGeometryPar& cdcgp = CDCGeometryPar::Instance(geo);
+      CDCGeometryPar& cdcgp = CDCGeometryPar::Instance(&geo);
 
       if (cdcgp.getMaterialDefinitionMode() == 2) {
         double density = denHelium + denEthane;

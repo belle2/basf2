@@ -80,25 +80,14 @@ namespace Belle2 {
       //! Wire position set
       enum EWirePosition {c_Base = 0, c_Misaligned, c_Aligned};
 
-      //      //! Constructor
-      //      CDCGeometryPar();
-
-      //! Constructor.
-      explicit CDCGeometryPar(const CDCGeometry&);
       //! Destructor
       virtual ~CDCGeometryPar();
 
       //! Static method to get a reference to the CDCGeometryPar instance.
       /*!
-          \return A reference to an instance of this class.
+      \return A reference to an instance of this class.
       */
-      static CDCGeometryPar& Instance();
-
-      /**
-       * Static method to get a reference to the CDCGeometryPar instance
-       * from database.
-       */
-      static CDCGeometryPar& Instance(const CDCGeometry&);
+      static CDCGeometryPar& Instance(const CDCGeometry* = nullptr);
 
       //! Clears
       void clear();
@@ -901,20 +890,6 @@ namespace Belle2 {
 
 
       /**
-       * Returns the closest alpha point for track incident angle (alpha).
-       * @param alpha in rad.
-       */
-      unsigned short getClosestAlphaPoint(const double alpha) const;
-
-
-      /**
-       * Returns the closest theta point for track incident angle (theta).
-       * @param theta in rad.
-       */
-      unsigned short getClosestThetaPoint(const double theta) const;
-
-
-      /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
        * @param alpha in rad.
        */
@@ -980,7 +955,7 @@ namespace Belle2 {
 
     private:
       /** Singleton class */
-      CDCGeometryPar();
+      CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */

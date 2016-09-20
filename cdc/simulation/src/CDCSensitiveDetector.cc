@@ -49,9 +49,14 @@ typedef HepGeom::Vector3D<double> HepVector3D;
 namespace Belle2 {
   using namespace CDC;
 
+  //N.B.#0: Do not put CDCGeometryPar::Instance() in the initializing list of the constructor,
+  //because it is called before CDCGeometryPar(geom) is called in case of UseDB=true of Geometry module.
+  //N.B.#1:  Do not call AddNewDetector(), because it'll cause a job crash currently.
+  //N.B.#2: So, all initializations related  to m_cdcgp are done for the first call of step().
+
   CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     SensitiveDetectorBase(name, Const::CDC),
-    m_cdcgp(CDCGeometryPar::Instance()),
+    //    m_cdcgp(CDCGeometryPar::Instance()),
     m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
   {
@@ -68,9 +73,9 @@ namespace Belle2 {
     cdcEBArray.registerInDataStore(DataStore::c_DontWriteOut);
     mcParticles.registerRelationTo(cdcSimHits);
 
-    m_thresholdEnergyDeposit = m_cdcgp.getThresholdEnerguDeposit();
-    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
-    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+    //    m_thresholdEnergyDeposit = m_cdcgp.getThresholdEnerguDeposit();
+    //    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+    //    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
 
     //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
@@ -78,21 +83,35 @@ namespace Belle2 {
     m_wireSag = false;
     //    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
 
-    m_modifiedLeftRightFlag = m_cdcgp.isModifiedLeftRightFlagOn();
-    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+    //    m_modifiedLeftRightFlag = m_cdcgp.isModifiedLeftRightFlagOn();
+    //    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
-    m_minTrackLength = m_cdcgp.getMinTrackLength();
-    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
-    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+    //    m_minTrackLength = m_cdcgp.getMinTrackLength();
+    //    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+    //    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 
     //For activating Initialize and EndOfEvent functions
-    if (m_modifiedLeftRightFlag) {
-      G4SDManager::GetSDMpointer()->AddNewDetector(this);
-    }
+    //    if (m_modifiedLeftRightFlag) {
+    //      G4SDManager::GetSDMpointer()->AddNewDetector(this);
+    //    }
   }
 
   void CDCSensitiveDetector::Initialize(G4HCofThisEvent*)
   {
+    /*
+    m_cdcgp = &CDCGeometryPar::Instance();
+
+    m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnerguDeposit();
+    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+    m_modifiedLeftRightFlag = m_cdcgp->isModifiedLeftRightFlagOn();
+    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+
+    m_minTrackLength = m_cdcgp->getMinTrackLength();
+    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+    */
+
     // Initialize
     m_nonUniformField = 0;
     //    std::cout << "Initialize called" << std::endl;
@@ -105,6 +124,25 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
+    static bool firstCall = true;
+    if (firstCall) {
+      firstCall = false;
+      m_cdcgp = &CDCGeometryPar::Instance();
+
+      m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnerguDeposit();
+      m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+      B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+
+      m_modifiedLeftRightFlag = m_cdcgp->isModifiedLeftRightFlagOn();
+      B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+
+      m_minTrackLength = m_cdcgp->getMinTrackLength();
+      m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+      B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+
+      m_nonUniformField = 0;
+    }
+
 #if defined(CDC_DEBUG)
     std::cout << " " << std::endl;
     std::cout << "********* step in ********" << std::endl;
@@ -182,15 +220,15 @@ namespace Belle2 {
     // Calculate cell ID
     TVector3 tposIn(posIn.x() / CLHEP::cm, posIn.y() / CLHEP::cm, posIn.z() / CLHEP::cm);
     TVector3 tposOut(posOut.x() / CLHEP::cm, posOut.y() / CLHEP::cm, posOut.z() / CLHEP::cm);
-    const unsigned idIn = m_cdcgp.cellId(layerId, tposIn);
-    const unsigned idOut = m_cdcgp.cellId(layerId, tposOut);
+    const unsigned idIn = m_cdcgp->cellId(layerId, tposIn);
+    const unsigned idOut = m_cdcgp->cellId(layerId, tposOut);
 #if defined(CDC_DEBUG)
     std::cout << "edep= " << edep << std::endl;
     std::cout << "idIn,idOut= " << idIn << " " << idOut << std::endl;
 #endif
 
     // Calculate drift length
-    std::vector<int> wires = WireId_in_hit_order(idIn, idOut, m_cdcgp.nWiresInLayer(layerId));
+    std::vector<int> wires = WireId_in_hit_order(idIn, idOut, m_cdcgp->nWiresInLayer(layerId));
     G4double sint(0.);
     const G4double s_in_layer = stepLength / CLHEP::cm;
     G4double xint[6] = {0};
@@ -240,8 +278,8 @@ namespace Belle2 {
       HepPoint3D pOnTrack;
 
       // Calculate forward/backward position of current wire
-      const TVector3 tfw3v = m_cdcgp.wireForwardPosition(layerId, wires[i]);
-      const TVector3 tbw3v = m_cdcgp.wireBackwardPosition(layerId, wires[i]);
+      const TVector3 tfw3v = m_cdcgp->wireForwardPosition(layerId, wires[i]);
+      const TVector3 tbw3v = m_cdcgp->wireBackwardPosition(layerId, wires[i]);
 
       const HepPoint3D fwd(tfw3v.x(), tfw3v.y(), tfw3v.z());
       const HepPoint3D bck(tbw3v.x(), tbw3v.y(), tbw3v.z());
@@ -256,6 +294,10 @@ namespace Belle2 {
                                   Bfield[1] / CLHEP::kilogauss,
                                   Bfield[2] / CLHEP::kilogauss
                                  };
+#if defined(CDC_DEBUG)
+        std::cout << "B_kG= " << B_kG[0] << " " << B_kG[1] << " " << B_kG[2] << std::endl;
+        std::cout << "magneticField= " << m_magneticField << std::endl;
+#endif
 
         const HepPoint3D  x(pos[0] / CLHEP::cm, pos[1] / CLHEP::cm, pos[2] / CLHEP::cm);
         const HepVector3D p(momIn.x() / CLHEP::GeV, momIn.y() / CLHEP::GeV, momIn.z() / CLHEP::GeV);
@@ -311,7 +353,7 @@ namespace Belle2 {
         if (ntry <= ntryMax) {
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], q2[2], ywb_sag, ywf_sag);
+            m_cdcgp->getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], q2[2], ywb_sag, ywf_sag);
             HELWIR(xwb, ywb_sag, zwb, xwf, ywf_sag, zwf,
                    xp,   yp,   zp,   px,   py,   pz,
                    B_kG, charge, ntryMax, dist, q2, q1, q3, ntry);
@@ -341,7 +383,7 @@ namespace Belle2 {
                                      hitPosition, wirePosition);
           if (m_wireSag) {
             G4double ywb_sag, ywf_sag;
-            m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+            m_cdcgp->getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
             bwp.setY(ywb_sag);
             fwp.setY(ywf_sag);
             distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -361,7 +403,7 @@ namespace Belle2 {
                                    hitPosition, wirePosition);
         if (m_wireSag) {
           G4double ywb_sag, ywf_sag;
-          m_cdcgp.getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
+          m_cdcgp->getWireSagEffect(CDCGeometryPar::c_Base, layerId, wires[i], wirePosition.z(), ywb_sag, ywf_sag);
           bwp.setY(ywb_sag);
           fwp.setY(ywf_sag);
           distance = ClosestApproach(bwp, fwp, posIn / CLHEP::cm, posOut / CLHEP::cm,
@@ -398,8 +440,8 @@ namespace Belle2 {
       const TVector3 tPosW(posW.x(), posW.y(), posW.z());
       const TVector3 tPosTrack(posTrack.x(), posTrack.y(), posTrack.z());
       const TVector3 tMom(mom.x(), mom.y(), mom.z());
-      G4int lr = m_cdcgp.getOldLeftRight(tPosW, tPosTrack, tMom);
-      G4int newLrRaw = m_cdcgp.getNewLeftRightRaw(tPosW, tPosTrack, tMom);
+      G4int lr = m_cdcgp->getOldLeftRight(tPosW, tPosTrack, tMom);
+      G4int newLrRaw = m_cdcgp->getNewLeftRightRaw(tPosW, tPosTrack, tMom);
       //      if(abs(pid) == 11) {
       //  std::cout <<"pid,lr,newLrRaw 4electron= " << pid <<" "<< lr <<" "<< newLrRaw << std::endl;
       //      }
@@ -695,7 +737,7 @@ namespace Belle2 {
         pHit = pIt->second;
         pWireId = pHit->getWireID();
         //      neigh = cdcg.areNeighbors(sWireId, pWireId);
-        neighb = m_cdcgp.areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
+        neighb = m_cdcgp->areNeighbors(sClayer, sSuperLayer, sLayer, sWire, pWireId);
         if (neighb != 0 || pWireId == sWireId) {
           distance2 = (pHit->getPosTrack() - sPos).Mag2();
           if (distance2 < minDistance2) {
@@ -707,9 +749,9 @@ namespace Belle2 {
       }
 
       //reassign LR using the momentum-direction of the primary particle found
-      unsigned short lR = m_cdcgp.getNewLeftRightRaw(sHit->getPosWire(),
-                                                     sHit->getPosTrack(),
-                                                     fHit->getMomentum());
+      unsigned short lR = m_cdcgp->getNewLeftRightRaw(sHit->getPosWire(),
+                                                      sHit->getPosTrack(),
+                                                      fHit->getMomentum());
       //      unsigned short bflr = sHit->getLeftRightPassage();
       sHit->setLeftRightPassage(lR);
       //      std::cout <<"neighb, bfaf lrs, minDistance= " << bestNeighb <<" "<<" "<< bflr <<" "<< sHit->getLeftRightPassage() <<" "<< std::scientific << sqrt(minDistance2) << std::endl;
@@ -886,7 +928,7 @@ namespace Belle2 {
     // when calculating the cell-boundary assuming misalign. is small.
     //--------------------------------------------------------------------------
 
-    G4double div   = m_cdcgp.nWiresInLayer(layerId);
+    G4double div   = m_cdcgp->nWiresInLayer(layerId);
 
     //Check if s1, s2, ic1 and ic2 are ok
     if (s1 >= s2) {
@@ -901,12 +943,12 @@ namespace Belle2 {
     }
 
     //get wire positions for the entrance cell
-    G4double xwb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).x();
-    G4double ywb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).y();
-    G4double zwb = (m_cdcgp.wireBackwardPosition(layerId, ic1 - 1)).z();
-    G4double xwf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).x();
-    G4double ywf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).y();
-    G4double zwf = (m_cdcgp.wireForwardPosition(layerId,  ic1 - 1)).z();
+    G4double xwb = (m_cdcgp->wireBackwardPosition(layerId, ic1 - 1)).x();
+    G4double ywb = (m_cdcgp->wireBackwardPosition(layerId, ic1 - 1)).y();
+    G4double zwb = (m_cdcgp->wireBackwardPosition(layerId, ic1 - 1)).z();
+    G4double xwf = (m_cdcgp->wireForwardPosition(layerId,  ic1 - 1)).x();
+    G4double ywf = (m_cdcgp->wireForwardPosition(layerId,  ic1 - 1)).y();
+    G4double zwf = (m_cdcgp->wireForwardPosition(layerId,  ic1 - 1)).z();
 
     /*
     G4double pathl = sqrt((vexit[0] - venter[0]) * (vexit[0] - venter[0])

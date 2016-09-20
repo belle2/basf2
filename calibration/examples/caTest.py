@@ -1,5 +1,14 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+
+#  ####### IMPORTANT! #######
+# This file and the calibration_framework module are
+# now out of date and left in for historical reasons
+# only. They may be removed at any time.
+
+# If you wish to use the current CAF please look at
+# the other examples files.
+
 import os
 import sys
 from basf2 import *

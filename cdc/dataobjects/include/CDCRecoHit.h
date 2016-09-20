@@ -120,12 +120,14 @@ namespace Belle2 {
      * measurementOnPlane.  This needs to be in sync with the
      * TDCCountTranslator.  */
     static bool s_useTrackTime;
-    //temp4cosmics
+    /**
+     * Switch to use cosmic events, or physics events from IP.
+     * Default value is 0, which means "physics event" mode.
+     */
     static bool s_cosmics;
 
 #endif
 
-    //---------------------------------------------------------------------------------------------------------------------------
     /** TDC Count as out of CDCHit. */
     unsigned short m_tdcCount;
 

@@ -481,10 +481,33 @@
       <Element fraction="0.3658">Cs</Element>  
     </Components>  
     <Property name="RINDEX" unit="eV"> 
-      <value energy="1.0">3.71</value>
-      <value energy="2.0">3.71</value>
-      <value energy="3.0">3.71</value>
-      <value energy="4.0">3.71</value>
+      <value energy="1.4">1.50923</value>
+      <value energy="1.5">1.51026</value>
+      <value energy="1.6">1.51129</value>
+      <value energy="1.7">1.51232</value>
+      <value energy="1.8">1.51337</value>
+      <value energy="1.9">1.51444</value>
+      <value energy="2.0">1.51554</value>
+      <value energy="2.1">1.51668</value>
+      <value energy="2.2">1.51786</value>
+      <value energy="2.3">1.51909</value>
+      <value energy="2.4">1.52036</value>
+      <value energy="2.5">1.52168</value>
+      <value energy="2.6">1.52306</value>
+      <value energy="2.7">1.5245</value>
+      <value energy="2.8">1.52599</value>
+      <value energy="2.9">1.52755</value>
+      <value energy="3.0">1.52916</value>
+      <value energy="3.1">1.53085</value>
+      <value energy="3.2">1.5326</value>
+      <value energy="3.3">1.53443</value>
+      <value energy="3.4">1.53632</value>
+      <value energy="3.5">1.5383</value>
+      <value energy="3.6">1.54035</value>
+      <value energy="3.7">1.54248</value>
+      <value energy="3.8">1.54471</value>
+      <value energy="3.9">1.54701</value>
+      <value energy="4.0">1.54942</value>
     </Property> 
   </Material>
     

@@ -389,19 +389,14 @@ void SplitGLView::toggleShowScale()
 {
   bool state = toggleMenuEntry(m_sceneMenu, kShowScale);
 
-  TEveElement::List_ci end_it = m_rhozManager->EndChildren();
-  for (TEveElement::List_i it = m_rhozManager->BeginChildren(); it != end_it; ++it) {
-    TEveProjectionAxes* a = dynamic_cast<TEveProjectionAxes*>(*it);
-    if (a) {
-      a->SetRnrSelf(state);
-    }
-  }
-
-  end_it = m_rphiManager->EndChildren();
-  for (TEveElement::List_i it = m_rphiManager->BeginChildren(); it != end_it; ++it) {
-    TEveProjectionAxes* a = dynamic_cast<TEveProjectionAxes*>(*it);
-    if (a) {
-      a->SetRnrSelf(state);
+  std::vector<TEveProjectionManager*> projections = {m_rhozManager, m_rphiManager};
+  for (auto mgr : projections) {
+    TEveElement::List_ci end_it = mgr->EndChildren();
+    for (TEveElement::List_i it = mgr->BeginChildren(); it != end_it; ++it) {
+      TEveProjectionAxes* a = dynamic_cast<TEveProjectionAxes*>(*it);
+      if (a) {
+        a->SetRnrSelf(state);
+      }
     }
   }
   gEve->Redraw3D(false); //do not reset camera when redrawing

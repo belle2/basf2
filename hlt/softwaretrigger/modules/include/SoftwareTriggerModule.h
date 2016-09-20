@@ -59,7 +59,7 @@ namespace Belle2 {
       /// List of identifiers for the different cuts.
       std::vector<std::string> m_param_cutIdentifiers;
       /// Store Object Pointer name for storing the trigger decision.
-      std::string m_param_resultStoreArrayName = "SoftwareTriggerResults";
+      std::string m_param_resultStoreArrayName = "";
       /// Flag to control which class of cuts is more "important": accept cuts or reject cuts.
       bool m_param_acceptOverridesReject = false;
       /// Flag to also store the result of the calculations into a root file.

@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/filters/segment/BasicSegmentVarSet.h>
-
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <tracking/trackFindingCDC/varsets/PairVarSet.h>
@@ -31,7 +29,13 @@ namespace Belle2 {
       "from_ndf",
       "to_ndf",
 
-      "avg_curv",
+      "from_chi2_over_ndf",
+      "to_chi2_over_ndf",
+
+      "from_p_value",
+      "to_p_value",
+
+      "abs_avg_curv",
       "delta_curv",
       "delta_curv_var",
       "delta_curv_pull",

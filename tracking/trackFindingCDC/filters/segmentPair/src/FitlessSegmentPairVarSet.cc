@@ -47,6 +47,12 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   finitevar<named("from_ndf")>() = fromFit.getNDF();
   finitevar<named("to_ndf")>() = toFit.getNDF();
 
+  finitevar<named("from_chi2_over_ndf")>() = fabs(fromFit.getChi2() / fromFit.getNDF());
+  finitevar<named("to_chi2_over_ndf")>() = fabs(toFit.getChi2() / toFit.getNDF());
+
+  finitevar<named("from_p_value")>() = fromFit.getPValue();
+  finitevar<named("to_p_value")>() = toFit.getPValue();
+
   // Direction agreement
   using namespace NPerigeeParameterIndices;
   const double fromCurv = fromFit.isFitted() ? fromFit.getCurvature() : NAN;
@@ -59,7 +65,7 @@ bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const double avgPrecision = 1 / fromCurvVar + 1 / toCurvVar;
   const double deltaCurvSigma = std::sqrt(deltaCurvVar);
 
-  finitevar<named("avg_curv")>() = (toCurv / toCurvVar  + fromCurv / fromCurvVar) / avgPrecision;
+  finitevar<named("abs_avg_curv")>() = std::fabs(toCurv / toCurvVar  + fromCurv / fromCurvVar) / avgPrecision;
   finitevar<named("delta_curv_var")>() = deltaCurvVar;
   finitevar<named("delta_curv")>() = toCurv - fromCurv;
   finitevar<named("delta_curv_pull")>() = (toCurv - fromCurv) / deltaCurvSigma;

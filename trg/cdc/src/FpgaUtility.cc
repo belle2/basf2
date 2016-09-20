@@ -9,6 +9,7 @@
 #include <sstream>
 #include <bitset>
 #include <algorithm>
+#include <cmath>
 
 using std::cout;
 using std::endl;
@@ -19,6 +20,11 @@ using std::stringstream;
 using std::bitset;
 using std::ifstream;
 using std::ofstream;
+using std::ceil;
+using std::floor;
+using std::fmod;
+using std::pow;
+using std::log;
 
 
 // Rounds value to an integer.

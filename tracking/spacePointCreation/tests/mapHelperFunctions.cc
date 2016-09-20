@@ -19,6 +19,7 @@
 #include <complex>
 #include <cmath>
 #include <tuple>
+#include <numeric>
 
 using namespace std;
 

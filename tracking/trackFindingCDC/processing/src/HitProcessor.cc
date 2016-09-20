@@ -20,6 +20,7 @@
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
 #include <TMath.h>
+#include <numeric>
 
 using namespace std;
 

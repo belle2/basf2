@@ -18,6 +18,7 @@
 #include <array>
 #include <algorithm>
 #include <assert.h>
+#include <numeric>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

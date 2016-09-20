@@ -17,6 +17,7 @@
 #include <framework/datastore/StoreObjPtr.h>
 
 #include <algorithm>
+#include <numeric>
 // #include <mdst/dataobjects/MCParticle.h> // already in header
 
 #include <TVector3.h> // COULDDO: B2Vector3.h

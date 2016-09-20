@@ -5,6 +5,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <cmath>
 
 namespace Belle2 {
   namespace SVD {
@@ -32,7 +33,7 @@ namespace Belle2 {
           return 0.0;
         else {
           double z = t / m_tau;
-          return z * exp(1.0 - z);
+          return z * std::exp(1.0 - z);
         }
       }
 

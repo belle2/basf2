@@ -110,8 +110,8 @@ void ReprocessorModule::event()
     rate = MetaHit.getrate();
   }
 
-  if (m_input_HE3_Ntimes != 0 && m_input_TPC_Ntimes == 0) rate *= m_input_HE3_Ntimes;
-  if (m_input_TPC_Ntimes != 0 && m_input_HE3_Ntimes == 0) rate *= m_input_TPC_Ntimes;
+  if (m_input_HE3_Ntimes != 0 && m_input_TPC_Ntimes == 0) rate /= (double)m_input_HE3_Ntimes;
+  if (m_input_TPC_Ntimes != 0 && m_input_HE3_Ntimes == 0) rate /= (double)m_input_TPC_Ntimes;
 
   // if not already existed, create MCParticles data store
   StoreArray<MCParticle> MCParticles;
@@ -128,7 +128,6 @@ void ReprocessorModule::event()
       const double energy = mcpart.getEnergy();
       TVector3 Momentum = mcpart.getMomentum();
       TVector3 ProductionVertex = mcpart.getProductionVertex();
-
       if (m_input_TPC_PDG == PDG) {
         for (int i = 0; i < m_input_TPC_Ntimes; i ++) {
           // store generated particle

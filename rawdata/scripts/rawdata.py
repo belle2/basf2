@@ -87,13 +87,15 @@ def add_packers(path, components=None):
         svdpacker = register_module('SVDPacker')
         path.add_module(svdpacker)
 
-    # CDC (parameters from cdc_packer_unpacker.py)
+    # CDC
     if components is None or 'CDC' in components:
-        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
         cdcpacker = register_module('CDCPacker')
-        cdcpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcpacker.param('cdcHitName', "CDCHits")
         path.add_module(cdcpacker)
+
+    # ECL
+    if components is None or 'ECL' in components:
+        eclpacker = register_module('ECLPacker')
+        path.add_module(eclpacker)
 
     # TOP
     if components is None or 'TOP' in components:
@@ -131,15 +133,16 @@ def add_unpackers(path, components=None):
         svdunpacker = register_module('SVDUnpacker')
         path.add_module(svdunpacker)
 
-    # CDC (parameters from cdc_packer_unpacker.py)
+    # CDC
     if components is None or 'CDC' in components:
-        cdc_mapping_file = Belle2.FileSystem.findFile("data/cdc/ch_map.dat")
-        cdc_hits_pack_unpack_collection = "CDCHits_test_output"
         cdcunpacker = register_module('CDCUnpacker')
-        cdcunpacker.param('xmlMapFileName', cdc_mapping_file)
-        cdcunpacker.param('cdcHitName', cdc_hits_pack_unpack_collection)
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
+
+    # ECL
+    if components is None or 'ECL' in components:
+        eclunpacker = register_module('ECLUnpacker')
+        path.add_module(eclunpacker)
 
     # TOP
     if components is None or 'TOP' in components:

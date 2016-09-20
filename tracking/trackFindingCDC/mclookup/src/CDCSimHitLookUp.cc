@@ -151,19 +151,20 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCHit* ptrHit) const
 {
   if (not m_ptrMCMap) {
-    B2WARNING("CDCMCMap not set. Look up closest primary sim hit.");
+    B2WARNING("CDCMCMap not set in look up of closest primary sim hit.");
     return nullptr;
   }
   const CDCMCMap& mcMap = *m_ptrMCMap;
 
   if (mcMap.isReassignedSecondary(ptrHit)) {
-
     auto itFoundPrimarySimHit = m_primarySimHits.find(ptrHit);
-    return itFoundPrimarySimHit == m_primarySimHits.end() ? nullptr : itFoundPrimarySimHit->second;
-
-  } else {
-    return mcMap.getSimHit(ptrHit);
+    if (itFoundPrimarySimHit != m_primarySimHits.end()) {
+      const CDCSimHit* simHit = itFoundPrimarySimHit->second;
+      if (simHit) return simHit;
+    }
   }
+  // Return the normal (potentially secondary) CDCSimHit of no primary is available
+  return mcMap.getSimHit(ptrHit);
 }
 
 Vector3D CDCSimHitLookUp::getDirectionOfFlight(const CDCHit* ptrHit)

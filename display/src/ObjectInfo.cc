@@ -14,7 +14,7 @@ using namespace Belle2;
 TString ObjectInfo::getName(const TObject* obj)
 {
   if (!obj)
-    B2FATAL("ObjectInfo::getName() got null?");
+    B2ERROR("ObjectInfo::getName() got null?");
   if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getName();
   }
@@ -24,7 +24,7 @@ TString ObjectInfo::getName(const TObject* obj)
 TString ObjectInfo::getInfo(const TObject* obj)
 {
   if (!obj)
-    B2FATAL("ObjectInfo::getInfo() got null?");
+    B2ERROR("ObjectInfo::getInfo() got null?");
   if (auto relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getInfoHTML();
   } else if (auto vertex = dynamic_cast<const genfit::GFRaveVertex*>(obj)) {

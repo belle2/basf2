@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * Function to write out debug output into the given TTree.
        * Needs an already prefilled calculationResult for this
-       * (probably using the doCalculation function).
+       * (probably using the fillInCalculations function).
        */
       void writeDebugOutput(const std::unique_ptr<TTree>& debugOutputTTree);
 

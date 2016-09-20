@@ -26,8 +26,8 @@ namespace Belle2 {
      * * EC12CMSHLT
      * * etc.
      *
-     * You do not have to create an instance of this class by yourself,
-     * but rather use the SoftwareTriggerCalculation for it.
+     * This class implements the two main functions requireStoreArrays and doCalculation of the
+     * SoftwareTriggerCalculation class.
      */
     class HLTCalculator : public SoftwareTriggerCalculation {
     public:
@@ -35,10 +35,10 @@ namespace Belle2 {
       HLTCalculator() : m_pionParticles("pi+:HLT"), m_gammaParticles("gamma:HLT") {}
 
       /// Require the particle list. We do not need more here.
-      void requireStoreArrays() override ;
+      void requireStoreArrays() override;
 
       /// Actually write out the variables into the map.
-      void doCalculation(SoftwareTriggerObject& calculationResult) const override ;
+      void doCalculation(SoftwareTriggerObject& calculationResult) const override;
 
     private:
       /// Internal storage of the tracks as particles.

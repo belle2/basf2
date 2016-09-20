@@ -37,13 +37,17 @@ namespace Belle2 {
       /**
        * Helper function to compile the full identifier from the base an the specific cut name.
        * The full name is then created as:
-       *  <package_identifier>_<base_name>_<cut_name>
+       *  <package_identifier>&<base_name>&<cut_name>
+       *
+       * Make sure to not include & into the base or cut name.
        */
       static std::string makeFullCutName(const std::string& baseCutIdentifier,
                                          const std::string& cutIdentifier);
 
       /**
-       * Upload a new (or replace an old version) cut with the given base and specific name
+       * Upload a new (or replace an old version) cut with the given base and specific name. Neither the base nor the
+       * cut name are allowed to have '&' in it. Please make sure that the base name must correspond to the identifiers
+       * of the calculation objects created in the SoftwareTriggerModule.
        */
       static void upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
                          const std::string& cutIdentifier, const IntervalOfValidity& iov);

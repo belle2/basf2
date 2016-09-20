@@ -52,21 +52,21 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   const Vector2D fromLastHitMom = fromLastHit.getFlightDirection2D();
   const Vector2D toFirstHitMom = toFirstHit.getFlightDirection2D();
 
-  var<named("delta_hit_pos_phi")>() = fromLastHitPos.angleWith(toFirstHitPos);
-  var<named("delta_hit_mom_phi")>() = fromLastHitMom.angleWith(toFirstHitMom);
+  finitevar<named("delta_hit_pos_phi")>() = fromLastHitPos.angleWith(toFirstHitPos);
+  finitevar<named("delta_hit_mom_phi")>() = fromLastHitMom.angleWith(toFirstHitMom);
 
   double fromLastHitAlpha = fromLastHit.getAlpha();
   double toFirstHitAlpha = toFirstHit.getAlpha();
-  var<named("delta_hit_alpha")>() = AngleUtil::normalised(toFirstHitAlpha - fromLastHitAlpha);
+  finitevar<named("delta_hit_alpha")>() = AngleUtil::normalised(toFirstHitAlpha - fromLastHitAlpha);
 
-  var<named("hit_distance")>() = hitDistance;
-  var<named("hit_long_distance")>() = longHitDistance;
+  finitevar<named("hit_distance")>() = hitDistance;
+  finitevar<named("hit_long_distance")>() = longHitDistance;
 
-  var<named("delta_hit_distance")>() = longHitDistance - hitDistance;
+  finitevar<named("delta_hit_distance")>() = longHitDistance - hitDistance;
 
-  var<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
-  var<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
-  var<named("hit_forward")>() = hitPosGap.dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
+  finitevar<named("from_hit_forward")>() = hitPosGap.dot(fromLastHitMom);
+  finitevar<named("to_hit_forward")>() = hitPosGap.dot(toFirstHitMom);
+  finitevar<named("hit_forward")>() = hitPosGap.dot(Vector2D::average(fromLastHitMom, toFirstHitMom));
 
   const CDCRecoHit2D& axialHit = toFirstHit.isAxial() ? toFirstHit : fromLastHit;
   const CDCRecoHit2D& stereoHit = not toFirstHit.isAxial() ? toFirstHit : fromLastHit;
@@ -84,10 +84,10 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   double z = -relRefPos.cross(axialHitMom) / movePerZ.cross(axialHitMom);
   Vector2D stereoHitPos = stereoHit.getRecoPos2D() + movePerZ * z;
 
-  var<named("hit_reco_z")>() = z;
-  var<named("hit_z_bound_factor")>() = wireLine.outOfZBoundsFactor(z);
+  finitevar<named("hit_reco_z")>() = z;
+  finitevar<named("hit_z_bound_factor")>() = wireLine.outOfZBoundsFactor(z);
   double arcLengthGap = (stereoHitPos - axialHitPos).dot(axialHitMom);
-  var<named("hit_arclength_gap")>() = toFirstHit.isAxial() ? -arcLengthGap : arcLengthGap;
+  finitevar<named("hit_arclength_gap")>() = toFirstHit.isAxial() ? -arcLengthGap : arcLengthGap;
 
   // const Vector2D fromStretch = fromLastHitPos - fromFirstHitPos;
   // const Vector2D toStretch = toLastHitPos - toFirstHitPos;
@@ -101,7 +101,7 @@ bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
   // const double firstOffset = firstPosGap.norm();
   // const double lastOffset = lastPosGap.norm();
 
-  // var<named("hit_ptolemy")>() =
+  // finitevar<named("hit_ptolemy")>() =
   //   firstOffset * lastOffset - longHitDistance * hitDistance - fromLength * toLength;
 
   return true;

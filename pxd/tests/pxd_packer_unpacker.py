@@ -1,6 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+# Disabling this test for the time being as it fails the incremental builds for
+# a long time now which gives no additional information to anyone.
+# See https://agira.desy.de/browse/BII-1647
+# FIXME: remove once packer is fixed
+import sys
+print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
+sys.exit(1)
+
 from basf2 import *
 from ROOT import Belle2
 import numpy

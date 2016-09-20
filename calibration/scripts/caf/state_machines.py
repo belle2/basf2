@@ -22,7 +22,6 @@ class Machine():
         Basic Setup
         """
         self.states = set()
-        self.state = ""
         self.transitions = defaultdict(list)
 
     @staticmethod
@@ -83,6 +82,17 @@ class Machine():
         else:
             print("Implement Trigger Error Here")
 
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, value):
+        if value in self.states:
+            self._state = value
+        else:
+            raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(value))
+
     def save_graph(self, filename, graphname):
         with open(filename, "w") as dotfile:
             dotfile.write("digraph "+graphname+" {\n")
@@ -115,4 +125,11 @@ class CalibrationMachine(Machine):
         self.add_transition("iterate", "algorithm_completed", "init")
         self.add_transition("finish", "algorithm_completed", "completed")
 
-        self.initial_state = initial_state
+        self.state = initial_state
+
+
+class MachineError(Exception):
+    """
+    Base exception class for this module
+    """
+    pass

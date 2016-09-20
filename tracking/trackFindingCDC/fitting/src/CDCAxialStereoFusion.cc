@@ -64,9 +64,9 @@ namespace {
                                           theta,
                                           hit->getADCCount());
 
-      if (driftLength > 0) {
-        recoHit3D.setRecoDriftLength(driftLength);
-        recoHit3D.snapToDriftCircle();
+      if (driftLength > -2) {
+        bool snapRecoPos = true;
+        recoHit3D.setRecoDriftLength(driftLength, snapRecoPos);
       }
     }
   }

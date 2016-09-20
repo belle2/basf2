@@ -118,17 +118,16 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
                                             alpha);
       } else {
         // In case the true drift length should be kept at least smear it with its variance.
-        double driftLengthVariance = \
-                                     tdcCountTranslator.getDriftLengthResolution(driftLength,
-                                         wire.getWireID(),
-                                         rl,
-                                         wire.getRefZ(),
-                                         alpha);
+        double driftLengthVariance = tdcCountTranslator.getDriftLengthResolution(driftLength,
+                                     wire.getWireID(),
+                                     rl,
+                                     wire.getRefZ(),
+                                     alpha);
 
         driftLength += gRandom->Gaus(0, std::sqrt(driftLengthVariance));
       }
-      recoHit2D.setRefDriftLength(driftLength);
-      recoHit2D.snapToDriftCircle();
+      bool snapRecoPos = true;
+      recoHit2D.setRefDriftLength(driftLength, snapRecoPos);
     }
   }
 

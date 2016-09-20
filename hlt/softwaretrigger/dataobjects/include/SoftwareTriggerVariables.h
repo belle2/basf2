@@ -25,7 +25,7 @@ namespace Belle2 {
      * are the identifier of the variables (prefixed with the base_identifier) and the double are the
      * variables' values.
      */
-    class SoftwareTriggerVariable : public TObject {
+    class SoftwareTriggerVariables : public TObject {
     public:
       /// Append a new variable to the collection. Make sure not to override existing ones.
       void append(const std::string& identifier, const double& value)
@@ -50,7 +50,7 @@ namespace Belle2 {
       std::map<std::string, double> m_results;
 
       /** Making this class a ROOT class.*/
-      ClassDef(SoftwareTriggerVariable, 1);
+      ClassDef(SoftwareTriggerVariables, 1);
     };
   }
 }

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariable.h>
+#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <TTree.h>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
        * (probably using the fillInCalculations function).
        * All added variables are prefixed with the given prefix string.
        */
-      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariable>& storeObject, const std::string& prefix);
+      void addDebugOutput(const StoreObjPtr<SoftwareTriggerVariables>& storeObject, const std::string& prefix);
 
       /**
        * Main function of this class: calculate the needed variables using the

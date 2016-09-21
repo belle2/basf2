@@ -79,8 +79,8 @@ void ReprocessorModule::initialize()
   evtMetaData.registerInDataStore();
 
   MetaHits.isRequired();
-  mc_he3_parts.isRequired();
-  mc_tpc_parts.isRequired();
+  mc_he3_parts.isOptional();
+  mc_tpc_parts.isOptional();
 }
 
 void ReprocessorModule::beginRun()

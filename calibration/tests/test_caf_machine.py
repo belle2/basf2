@@ -91,6 +91,40 @@ class Test_Machine(TestCase):
         with self.assertRaises(ConditionError):
             self.m.jump()
 
+    def test_true_conditions(self):
+        """
+        Check that when multiple conditions for a transition all evaulate true it will transition
+        to the correct state
+        """
+        self.m.add_state("airborne")
+
+        def can_jump():
+            return True
+
+        def eaten_lunch():
+            return True
+        self.m.add_transition("jump", "standing", "airborne", conditions=[can_jump, eaten_lunch])
+        self.m.state = "standing"
+        self.m.jump()
+        self.assertEqual(self.m.state, "airborne")
+
+    def test_halftrue_conditions(self):
+        """
+        Check that when a single condition out of many for a transition evaulates true it will
+        fail to move to the correct state
+        """
+        self.m.add_state("airborne")
+
+        def can_jump():
+            return True
+
+        def eaten_lunch():
+            return False
+        self.m.add_transition("jump", "standing", "airborne", conditions=[can_jump, eaten_lunch])
+        self.m.state = "standing"
+        with self.assertRaises(ConditionError):
+            self.m.jump()
+
 
 class Test_CalibrationMachine(TestCase):
     def setUp(self):
@@ -98,7 +132,7 @@ class Test_CalibrationMachine(TestCase):
         """
         col = register_module('CaTest')
         alg = TestAlgo()
-        cal = Calibration('TestCalibrationClass_Configure_test5')
+        cal = Calibration('TestCalibrationClass1')
         cal.collector = col
         cal.algorithms = alg
         cal.input_files = '/path/to/file.root'
@@ -122,6 +156,22 @@ class Test_CalibrationMachine(TestCase):
         cm.complete()
         cm.finish()
         self.assertEqual(cm.state, "completed")
+
+    def test_fail_dependencies(self):
+        """
+        Tests that if a dependency of a calibration isn't in completed state, the
+        submit_collector transition can't be called without error.
+        """
+        col = register_module('CaTest')
+        alg = TestAlgo()
+        cal2 = Calibration('TestCalibrationClass2', col, alg, '/path/to/file.root')
+
+        self.cal.depends_on(cal2)
+
+        cm = CalibrationMachine(self.cal)
+        cm2 = CalibrationMachine(cal2)
+        with self.assertRaises(ConditionError):
+            cm.submit_collector()
 
 
 def main():

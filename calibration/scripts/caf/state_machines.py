@@ -78,7 +78,7 @@ class Machine():
         else:
             return partial(self._trigger, name, transition_dicts)
 
-    def _trigger(self, transition, transition_dicts):
+    def _trigger(self, name, transition_dicts):
         """
         Runs the transition logic
         """
@@ -91,10 +91,10 @@ class Machine():
                     break
                 else:
                     raise ConditionError(("Transition '{0}' called for but one or more conditions "
-                                          "evaluated False".format(transition)))
+                                          "evaluated False".format(name)))
         else:
             raise MachineError(("Transition '{0}' called but there isn't one defined "
-                                "for the current state '{1}'".format(transition, self.state)))
+                                "for the current state '{1}'".format(name, self.state)))
 
     @property
     def state(self):
@@ -119,6 +119,10 @@ class Machine():
 
 
 class CalibrationMachine(Machine):
+    """
+    A state machine to handle Calibration objects and the flow of
+    processing for them.
+    """
     default_states = {"init",
                       "running_collector",
                       "collector_failed",
@@ -129,9 +133,13 @@ class CalibrationMachine(Machine):
                       "completed"}
 
     def __init__(self, calibration, initial_state="init"):
+        """
+        Takes a Calibration object from the caf framework and lets you
+        set the initial state
+        """
         super().__init__(CalibrationMachine.default_states, initial_state)
 
-        self.add_transition("submit_collector", "init", "running_collector")
+        self.add_transition("submit_collector", "init", "running_collector", conditions=self.dependencies_completed)
         self.add_transition("fail", "running_collector", "collector_failed")
         self.add_transition("complete", "running_collector", "collector_completed")
         self.add_transition("run_algorithm", "collector_completed", "running_algorithm")
@@ -139,6 +147,16 @@ class CalibrationMachine(Machine):
         self.add_transition("fail", "running_algorithm", "algorithm_failed")
         self.add_transition("iterate", "algorithm_completed", "init")
         self.add_transition("finish", "algorithm_completed", "completed")
+
+        self.calibration = calibration
+        self.calibration.state = self.state
+
+    def dependencies_completed(self):
+        for calibration in self.calibration.dependencies:
+            if not calibration.state == "completed":
+                return False
+        else:
+            return True
 
 
 class MachineError(Exception):

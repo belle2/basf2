@@ -11,11 +11,7 @@
 #include <beast/analysis/modules/ReprocessorModule.h>
 
 #include <mdst/dataobjects/MCParticle.h>
-#include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
-#include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
-#include <generators/SAD/dataobjects/SADMetaHit.h>
 #include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/RelationIndex.h>
@@ -81,6 +77,10 @@ void ReprocessorModule::initialize()
 
   StoreObjPtr<EventMetaData> evtMetaData;
   evtMetaData.registerInDataStore();
+
+  MetaHits.isRequired();
+  mc_he3_parts.isRequired();
+  mc_tpc_parts.isRequired();
 }
 
 void ReprocessorModule::beginRun()
@@ -89,10 +89,6 @@ void ReprocessorModule::beginRun()
 
 void ReprocessorModule::event()
 {
-  StoreArray<HE3G4TrackInfo> mc_he3_parts;
-  StoreArray<TPCG4TrackInfo> mc_tpc_parts;
-  StoreArray<SADMetaHit> MetaHits;
-
   //skip events with no HE3G4 and TPCG4 particles stored
   if (mc_he3_parts.getEntries() == 0 && mc_tpc_parts.getEntries() == 0 && m_input_TPC_Ntimes != 0 && m_input_HE3_Ntimes != 0) {
     return;

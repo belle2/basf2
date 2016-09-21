@@ -16,6 +16,12 @@
 #include <string>
 #include <vector>
 
+#include <framework/datastore/StoreArray.h>
+#include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
+#include <beast/he3tube/dataobjects/HE3G4TrackInfo.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
+
+
 //ROOT
 #include <TRandom3.h>
 #include <TMath.h>
@@ -68,6 +74,13 @@ namespace Belle2 {
     int m_input_HE3_PDG;
     /** Set N times */
     int m_input_HE3_Ntimes;
+
+
+    StoreArray<HE3G4TrackInfo> mc_he3_parts; /**< Array of G4 particles crossing the He3 tubes */
+    StoreArray<TPCG4TrackInfo> mc_tpc_parts; /**< Array of G4 particles crossing the uTPCs */
+    StoreArray<SADMetaHit> MetaHits; /**< Array of SAD particles */
+
+
 
   };
 

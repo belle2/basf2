@@ -12,8 +12,8 @@
 <GEMGain2>50</GEMGain2>
 <GEMGainRMS1>0.2</GEMGainRMS1>
 <GEMGainRMS2>0.2</GEMGainRMS2>
-<ScaleGain1>10</ScaleGain1>
-<ScaleGain2>10</ScaleGain2>
+<ScaleGain1>1</ScaleGain1>
+<ScaleGain2>1</ScaleGain2>
 <GEMpitch>0.014</GEMpitch>
 <PixelThreshold>3000</PixelThreshold>
 <PixelThresholdRMS>150</PixelThresholdRMS>

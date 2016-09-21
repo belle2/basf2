@@ -75,6 +75,17 @@ void CsiStudy_v2Module::defineHisto()
     h_csi_rs_rate[i]->Sumw2();
   }
   for (int i = 0; i < 18; i++) {
+    h_csi_energy1[i] = new TH2F(TString::Format("csi_energy1_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0., 12.);
+    h_csi_energy2[i] = new TH2F(TString::Format("csi_energy2_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0., 12.);
+    h_csi_energy3[i] = new TH2F(TString::Format("csi_energy3_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0., 12.);
+
+    h_csi_energy1W[i] = new TH2F(TString::Format("csi_energy1W_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0.,
+                                 12.);
+    h_csi_energy2W[i] = new TH2F(TString::Format("csi_energy2W_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0.,
+                                 12.);
+    h_csi_energy3W[i] = new TH2F(TString::Format("csi_energy3W_%d", i), "Energy deposited [MeV] per section", 200, 0.1, 3., 12, 0.,
+                                 12.);
+
     h_csi_Evtof[i] = new TH2F(TString::Format("csi_Evtof_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                               1000, 0., 400.);
     h_csi_Evtof1[i] = new TH2F(TString::Format("csi_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
@@ -163,6 +174,8 @@ void CsiStudy_v2Module::event()
     h_csi_Evtof[detNB]->Fill(tof, Edep);
     if (pdg == 22) h_csi_Evtof1[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_csi_Evtof2[detNB]->Fill(tof, Edep);
+    h_csi_energy1[detNB]->Fill(Edep, ring_section);
+    h_csi_energy1W[detNB]->Fill(Edep, ring_section, rate);
   }
 
   //Loop over DigiHit
@@ -184,6 +197,10 @@ void CsiStudy_v2Module::event()
     h_csi_rs_edep2[detNB]->Fill(RecEdep, ring_section);
     h_csi_rs_edep1Weight[detNB]->Fill(Edep, ring_section, rate);
     h_csi_rs_edep2Weight[detNB]->Fill(RecEdep, ring_section, rate);
+    h_csi_energy2[detNB]->Fill(Edep, ring_section);
+    h_csi_energy3[detNB]->Fill(RecEdep, ring_section);
+    h_csi_energy2W[detNB]->Fill(Edep, ring_section, rate);
+    h_csi_energy3W[detNB]->Fill(RecEdep, ring_section, rate);
   }
 }
 //read tube centers, impulse response, and garfield drift data filename from CSI.xml

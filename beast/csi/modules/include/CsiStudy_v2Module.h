@@ -101,6 +101,18 @@ namespace Belle2 {
       TH2F* h_csi_rs_edep1Weight[18];
       /** Energy deposited */
       TH2F* h_csi_rs_edep2Weight[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy1[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy2[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy3[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy1W[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy2W[18];
+      /** Energy deposited per section */
+      TH2F* h_csi_energy3W[18];
 
     };
 

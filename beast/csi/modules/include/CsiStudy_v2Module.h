@@ -12,6 +12,11 @@
 #define CSISTUDY_V2MODULE_H
 
 #include <framework/core/HistoModule.h>
+#include <framework/datastore/StoreArray.h>
+#include <beast/csi/dataobjects/CsiSimHit.h>
+#include <beast/csi/dataobjects/CsiHit_v2.h>
+#include <generators/SAD/dataobjects/SADMetaHit.h>
+
 #include <string>
 #include <vector>
 
@@ -65,6 +70,10 @@ namespace Belle2 {
 
     private:
 
+      StoreArray<CsiSimHit>  SimHits; /**< Array of sim hits */
+      StoreArray<CsiHit_v2>  Hits; /**< Array of digi hits */
+      StoreArray<SADMetaHit> MetaHits; /**< Array of SAD particle */
+
       /** reads data from CSI.xml: tube location, drift data filename, sigma of impulse response function */
       virtual void getXMLData();
       /** Energy threshold */
@@ -102,17 +111,30 @@ namespace Belle2 {
       /** Energy deposited */
       TH2F* h_csi_rs_edep2Weight[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy1[18];
+      TH2F* h_csi_energyVrs1[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy2[18];
+      TH2F* h_csi_energyVrs2[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy3[18];
+      TH2F* h_csi_energyVrs3[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy1W[18];
+      TH2F* h_csi_energyVrs1W[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy2W[18];
+      TH2F* h_csi_energyVrs2W[18];
       /** Energy deposited per section */
-      TH2F* h_csi_energy3W[18];
+      TH2F* h_csi_energyVrs3W[18];
+
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy1[18];
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy2[18];
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy3[18];
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy1W[18];
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy2W[18];
+      /** Energy deposited for all section */
+      TH1F* h_csi_energy3W[18];
 
     };
 

@@ -56,9 +56,10 @@ void InfoWidget::update()
   m_history.clear();
 
   //check if the object given by lastURI exists in the new event, too.
+  //array pages are ok, too
   if (lastURI != "") {
     URI parsedURI(lastURI);
-    if (!parsedURI.object) {
+    if (!parsedURI.object and !lastURI.EndsWith("/")) {
       //doesn't exist, go to main page
       lastURI = "";
     }

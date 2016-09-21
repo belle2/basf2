@@ -12,16 +12,22 @@ class Machine():
     * 'states' attribute is a list of possible states of the machine. (strings)
 
     * 'transitions' attribute is a dictionary of trigger name keys, each value of
-    which is another dictionary of 'source' states, 'dest' states, and 'condition'
-    methods. Currently only one of each allowed. A transition is valid if it goes from
-    an allowed state to an allowed state. A condition is optional but must be a callable
-    that returns True or False based on some inputs/state of the machine.
+    which is another dictionary of 'source' states, 'dest' states, and 'conditions'
+    methods. 'conditions' should be a list of callables or a single one.
+    A transition is valid if it goes from an allowed state to an allowed state.
+    Conditions are optional but must be a callable that returns True or False based
+    on some state of the machine. They cannot have input arguments currently.
     """
-    def __init__(self):
+    def __init__(self, states=set(), initial_state=""):
         """
         Basic Setup
         """
-        self.states = set()
+        if states:
+            self.states = set(states)
+            if initial_state:
+                self.state = initial_state
+        else:
+            self.states = set()
         self.transitions = defaultdict(list)
 
     @staticmethod
@@ -31,7 +37,7 @@ class Machine():
         """
         return True
 
-    def add_transition(self, trigger, source, dest, condition=None):
+    def add_transition(self, trigger, source, dest, conditions=None):
         """
         Adds a single transition to the dictionary of possible ones.
         Trigger is the method name that begins the transtion between the
@@ -43,10 +49,13 @@ class Machine():
         transition_dict = {}
         transition_dict["source"] = source
         transition_dict["dest"] = dest
-        if condition:
-            transition_dict["condition"] = condition
+        if conditions:
+            if isinstance(conditions, (list, tuple, set)):
+                transition_dict["conditions"] = list(conditions)
+            else:
+                transition_dict["conditions"] = [conditions]
         else:
-            transition_dict["condition"] = Machine.default_condition
+            transition_dict["conditions"] = [Machine.default_condition]
         self.transitions[trigger].append(transition_dict)
 
     def add_state(self, state):
@@ -67,20 +76,25 @@ class Machine():
         except KeyError:
             raise AttributeError("{0} does not exist in transitions".format(name))
         else:
-            return partial(self._trigger, transition_dicts)
+            return partial(self._trigger, name, transition_dicts)
 
-    def _trigger(self, transition_dicts):
+    def _trigger(self, transition, transition_dicts):
         """
         Runs the transition logic
         """
         for transition in transition_dicts:
-            source, dest, condition = transition["source"], transition["dest"], transition["condition"]
+            source, dest, conditions = transition["source"], transition["dest"], transition["conditions"]
             if self.state == source:
-                if condition():
+                # Returns True only if every condition returns True when called
+                if all(map(lambda x: x(), conditions)):
                     self.state = dest
                     break
+                else:
+                    raise ConditionError(("Transition '{0}' called for but one or more conditions "
+                                          "evaluated False".format(transition)))
         else:
-            print("Implement Trigger Error Here")
+            raise MachineError(("Transition '{0}' called but there isn't one defined "
+                                "for the current state '{1}'".format(transition, self.state)))
 
     @property
     def state(self):
@@ -105,16 +119,17 @@ class Machine():
 
 
 class CalibrationMachine(Machine):
+    default_states = {"init",
+                      "running_collector",
+                      "collector_failed",
+                      "collector_completed",
+                      "running_algorithm",
+                      "algorithm_failed",
+                      "algorithm_completed",
+                      "completed"}
+
     def __init__(self, calibration, initial_state="init"):
-        super().__init__()
-        self.states.update(["init",
-                            "running_collector",
-                            "collector_failed",
-                            "collector_completed",
-                            "running_algorithm",
-                            "algorithm_failed",
-                            "algorithm_completed",
-                            "completed"])
+        super().__init__(CalibrationMachine.default_states, initial_state)
 
         self.add_transition("submit_collector", "init", "running_collector")
         self.add_transition("fail", "running_collector", "collector_failed")
@@ -125,11 +140,16 @@ class CalibrationMachine(Machine):
         self.add_transition("iterate", "algorithm_completed", "init")
         self.add_transition("finish", "algorithm_completed", "completed")
 
-        self.state = initial_state
-
 
 class MachineError(Exception):
     """
     Base exception class for this module
+    """
+    pass
+
+
+class ConditionError(MachineError):
+    """
+    Exception for when conditions fail during a transition
     """
     pass

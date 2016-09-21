@@ -5,7 +5,7 @@ from basf2 import *
 import ROOT
 from ROOT.Belle2 import TestCalibrationAlgorithm as TestAlgo
 from caf.framework import Calibration
-from caf.state_machines import Machine, CalibrationMachine, MachineError
+from caf.state_machines import Machine, CalibrationMachine, MachineError, ConditionError
 
 
 class Test_Machine(TestCase):
@@ -21,12 +21,21 @@ class Test_Machine(TestCase):
         self.m.add_transition("walk", "standing", "walking")
         self.m.add_transition("stop", "walking", "standing")
 
+    def test_initial(self):
+        """
+        Checks that a new machine sets an initial state correctly
+        """
+        states = {"walking", "standing"}
+        initial = "walking"
+        m = Machine(states, initial)
+        self.assertEqual(m.state, initial)
+
     def test_set(self):
         """
         Checks that machine sets at a state
         """
         self.m.state = "walking"
-        self.assertTrue(self.m.state == "walking")
+        self.assertEqual(self.m.state, "walking")
 
     def test_bad_set(self):
         """
@@ -41,7 +50,7 @@ class Test_Machine(TestCase):
         """
         self.m.state = "standing"
         self.m.walk()
-        self.assertTrue(self.m.state == "walking")
+        self.assertEqual(self.m.state, "walking")
 
     def test_walk_stop(self):
         """
@@ -50,7 +59,37 @@ class Test_Machine(TestCase):
         self.m.state = "standing"
         self.m.walk()
         self.m.stop()
-        self.assertTrue(self.m.state == "standing")
+        self.assertEqual(self.m.state, "standing")
+
+    def test_true_condition(self):
+        """
+        Check that when a condition for a transition evaulates true it will transition
+        to the correct state
+        """
+        self.m.add_state("airborne")
+
+        def can_jump():
+            return True
+
+        self.m.add_transition("jump", "standing", "airborne", conditions=can_jump)
+        self.m.state = "standing"
+        self.m.jump()
+        self.assertEqual(self.m.state, "airborne")
+
+    def test_false_condition(self):
+        """
+        Check that when a condition for a transition evaulates false it will raise
+        the correct error.
+        """
+        self.m.add_state("airborne")
+
+        def can_jump():
+            return False
+
+        self.m.add_transition("jump", "standing", "airborne", conditions=can_jump)
+        self.m.state = "standing"
+        with self.assertRaises(ConditionError):
+            self.m.jump()
 
 
 class Test_CalibrationMachine(TestCase):
@@ -70,7 +109,7 @@ class Test_CalibrationMachine(TestCase):
         Checks that the default init state was setup
         """
         cm = CalibrationMachine(self.cal)
-        self.assertTrue(cm.state == "init")
+        self.assertEqual(cm.state, "init")
 
     def test_traverse_full(self):
         """
@@ -82,7 +121,7 @@ class Test_CalibrationMachine(TestCase):
         cm.run_algorithm()
         cm.complete()
         cm.finish()
-        self.assertTrue(cm.state == "completed")
+        self.assertEqual(cm.state, "completed")
 
 
 def main():

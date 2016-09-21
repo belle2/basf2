@@ -174,8 +174,8 @@ void CsiStudy_v2Module::event()
     h_csi_Evtof[detNB]->Fill(tof, Edep);
     if (pdg == 22) h_csi_Evtof1[detNB]->Fill(tof, Edep);
     else if (fabs(pdg) == 11) h_csi_Evtof2[detNB]->Fill(tof, Edep);
-    h_csi_energy1[detNB]->Fill(Edep, ring_section);
-    h_csi_energy1W[detNB]->Fill(Edep, ring_section, rate);
+    h_csi_energy1[detNB]->Fill(log10(Edep), ring_section);
+    h_csi_energy1W[detNB]->Fill(log10(Edep), ring_section, rate);
   }
 
   //Loop over DigiHit
@@ -197,10 +197,10 @@ void CsiStudy_v2Module::event()
     h_csi_rs_edep2[detNB]->Fill(RecEdep, ring_section);
     h_csi_rs_edep1Weight[detNB]->Fill(Edep, ring_section, rate);
     h_csi_rs_edep2Weight[detNB]->Fill(RecEdep, ring_section, rate);
-    h_csi_energy2[detNB]->Fill(Edep, ring_section);
-    h_csi_energy3[detNB]->Fill(RecEdep, ring_section);
-    h_csi_energy2W[detNB]->Fill(Edep, ring_section, rate);
-    h_csi_energy3W[detNB]->Fill(RecEdep, ring_section, rate);
+    h_csi_energy2[detNB]->Fill(log10(Edep), ring_section);
+    h_csi_energy3[detNB]->Fill(log10(RecEdep), ring_section);
+    h_csi_energy2W[detNB]->Fill(log10(Edep), ring_section, rate);
+    h_csi_energy3W[detNB]->Fill(log10(RecEdep), ring_section, rate);
   }
 }
 //read tube centers, impulse response, and garfield drift data filename from CSI.xml

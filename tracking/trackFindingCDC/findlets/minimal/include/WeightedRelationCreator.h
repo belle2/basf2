@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <vector>
 
@@ -47,6 +48,11 @@ namespace Belle2 {
                             const std::string& prefix = "") override final
       {
         m_relationFilter.exposeParameters(moduleParamList, prefix);
+        moduleParamList->addParameter(prefixed(prefix, "onlyBest"),
+                                      m_param_onlyBest,
+                                      "Maximal number of the best relation to keep from each " +
+                                      ClassMnemomics::getParameterDescription((AItem*)nullptr),
+                                      m_param_onlyBest);
       }
 
       /// Main function
@@ -56,11 +62,37 @@ namespace Belle2 {
         B2ASSERT("Expected the objects on which relations are constructed to be sorted",
                  std::is_sorted(inputObjects.begin(), inputObjects.end()));
         WeightedNeighborhood<AItem>::appendUsing(m_relationFilter, inputObjects, weightedRelations);
+
+        if (m_param_onlyBest > 0) {
+          const int nMaxRepetitions = m_param_onlyBest;
+          int nCurrentRepetitions = 1;
+          auto sameFrom = [&nMaxRepetitions, &nCurrentRepetitions]
+                          (const WeightedRelation<AItem>& relation,
+          const WeightedRelation<AItem>& otherRelation) -> bool {
+            if (relation.getFrom() == otherRelation.getFrom())
+            {
+              ++nCurrentRepetitions;
+              return nCurrentRepetitions > nMaxRepetitions;
+            } else {
+              nCurrentRepetitions = 1;
+              return false;
+            }
+          };
+
+          auto itLast = std::unique(weightedRelations.begin(),
+                                    weightedRelations.end(),
+                                    sameFrom);
+
+          weightedRelations.erase(itLast, weightedRelations.end());
+        }
       }
 
     private:
       /// Reference to the relation filter
       ARelationFilter m_relationFilter;
+
+      /// Maximal number of the best relations from each item to keep
+      int m_param_onlyBest = 0;
 
     }; // end class WeightedRelationCreator
 

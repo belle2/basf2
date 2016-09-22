@@ -11,13 +11,13 @@
 
 #include <vxd/geometry/GeoVXDComponents.h>
 #include <framework/logging/Logger.h>
-#include <locale>
+#include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
   VXDGeoPlacement::VXDGeoPlacement(const std::string& name, double u, double v, std::string w, double woffset): m_name(name), m_u(u),
     m_v(v), m_woffset(woffset)
   {
-    w = std::tolower(w, std::locale());
+    boost::to_lower(w);
     if (w == "below")        m_w = c_below;
     else if (w == "bottom")  m_w = c_bottom;
     else if (w == "center")  m_w = c_center;

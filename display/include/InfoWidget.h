@@ -40,7 +40,7 @@ namespace Belle2 {
     void back();
 
     /** Used to colour visited links. */
-    virtual int IsVisited(const char* uri); //please add 'override' here once CINT is gone
+    virtual int IsVisited(const char* uri) override;
 
   private:
     /** a parsed URI. allowed URI formats are
@@ -83,7 +83,7 @@ namespace Belle2 {
 
     std::vector<TString> m_history; /**< ordered list of all pages viewed in current event. */
 
-    ClassDef(InfoWidget, 0); /**< text-based info viewer showing DataStore contents. */
+    ClassDefOverride(InfoWidget, 0); /**< text-based info viewer showing DataStore contents. */
   };
 
 }

@@ -230,7 +230,6 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     // If there is no primary SimHit simply use the secondary simhit as reference
     ptrPrimarySimHit = mcHitLookUp.getSimHit(ptrFirstHit);
     if (not ptrPrimarySimHit) {
-      B2WARNING("First simhit of CDCRecoSegment is nullptr. Could not get fit.");
       return CDCTrajectory3D();
     }
   }

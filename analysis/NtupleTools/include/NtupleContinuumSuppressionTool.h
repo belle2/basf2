@@ -13,12 +13,8 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <TTree.h>
 #include <string>
 #include <utility>
-
-using namespace std;
-using namespace Belle2;
 
 namespace Belle2 {
 

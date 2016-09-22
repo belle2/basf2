@@ -20,6 +20,8 @@
 #include <analysis/dataobjects/ContinuumSuppression.h>
 #include <analysis/NtupleTools/NtupleROEMultiplicitiesTool.h>
 
+using namespace Belle2;
+using namespace std;
 
 void NtupleContinuumSuppressionTool::setupTree()
 {

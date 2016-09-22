@@ -79,7 +79,7 @@ def rice_exceptional_values(xs):
 
 
 def is_binary_series(xs):
-    """Deterimes of the given series only consists of true and false values"""
+    """Determines if the given series only consists of true and false values"""
     is_one_or_zero = np.all((xs == 0) | (xs == 1) | ~np.isfinite(xs))
     return is_one_or_zero
 

@@ -1785,21 +1785,32 @@ class ValidationPlot(object):
         else:
             finite_xs = xs
 
-        # Prepare for the estimation of outliers
         make_symmetric = False
-        if outlier_z_score is not None and (lower_bound is None or upper_bound is None):
+        exclude_outliers = outlier_z_score is not None and (lower_bound is None or upper_bound is None)
 
-            x_mean, x_std = self.get_robust_mean_and_std(finite_xs)
+        # Look for exceptionally frequent values in the series, e.g. interal delta values like -999
+        if include_exceptionals or exclude_outliers:
+            exceptional_xs = self.get_exceptional_values(finite_xs)
+            exceptional_indices = np.in1d(finite_xs, exceptional_xs)
+
+        # Prepare for the estimation of outliers
+        if exclude_outliers:
+            if not np.all(exceptional_indices):
+                # Exclude excecptional values from the estimation to be unbiased
+                # even in case exceptional values fall into the central region near the mean
+                x_mean, x_std = self.get_robust_mean_and_std(finite_xs[~exceptional_indices])
+            else:
+                x_mean, x_std = np.nan, np.nan
+
             make_symmetric = abs(x_mean) < x_std / 5.0 and lower_bound is None and upper_bound is None
+
+        if include_exceptionals and len(exceptional_xs) != 0:
+            lower_exceptional_x = np.min(exceptional_xs)
+            upper_exceptional_x = np.max(exceptional_xs)
+            make_symmetric = False
+        else:
             lower_exceptional_x = np.nan
             upper_exceptional_x = np.nan
-
-            if include_exceptionals:
-                exceptional_xs = self.get_exceptional_values(finite_xs)
-                if len(exceptional_xs):
-                    lower_exceptional_x = np.min(exceptional_xs)
-                    upper_exceptional_x = np.max(exceptional_xs)
-                    make_symmetric = False
 
         # Find the lower bound, if it is not given.
         if lower_bound is None:

@@ -29,7 +29,6 @@ class G4VPhysicalVolume;
 class G4VisAttributes;
 class G4UserLimits;
 
-using namespace std;
 
 namespace Belle2 {
 
@@ -106,7 +105,7 @@ namespace Belle2 {
       void createCone(const double rmin1, const double rmax1,
                       const double rmin2, const double rmax2,
                       const double thick, const double posz,
-                      const int id, G4Material* med, const string& name);
+                      const int id, G4Material* med, const std::string& name);
       /**
        * Create G4Box.
        */
@@ -114,14 +113,14 @@ namespace Belle2 {
                      const double thick, const double x,
                      const double y, const double z,
                      const int id, G4Material* med,
-                     const string& name);
+                     const std::string& name);
       /**
        * Create G4Tube.
        */
       void createTube(const double rmin, const double rmax,
                       const double thick, const double posZ,
                       const int id, G4Material* med,
-                      const string& name);
+                      const std::string& name);
 
     protected:
 

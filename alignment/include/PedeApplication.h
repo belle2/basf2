@@ -8,7 +8,6 @@
 #include <vector>
 
 
-using namespace std;
 namespace Belle2 {
   namespace alignment {
     //! Class interfacing Millepede solver (Pede)
@@ -31,9 +30,9 @@ namespace Belle2 {
       //! Returns the Pede exit code (from millepede.end file)
       int getExitCode() const {return exitCode;}
       //! Returns the Pede exit message (from millepede.end file)
-      string getExitMessage() const {return exitMessage;}
+      std::string getExitMessage() const {return exitMessage;}
       //! Reads the millepede.end file and sets this object retrieved state
-      void readEndFile(string filename = "millepede.end");
+      void readEndFile(std::string filename = "millepede.end");
       //! Return Pede revision number
       int revision();
 
@@ -41,7 +40,7 @@ namespace Belle2 {
       //! Pede exit code
       int exitCode;
       //! Pede exit message
-      string exitMessage;
+      std::string exitMessage;
     };
   }
 }

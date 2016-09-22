@@ -3,6 +3,8 @@
 #include <sstream>
 #include <iostream>
 
+using namespace std;
+
 namespace Belle2 {
   namespace alignment {
 

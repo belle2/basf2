@@ -44,6 +44,9 @@ def EtabList():
     Etabcuts = 'M > 7 and M < 10'
 #    fillParticleList('pi+:soft', 'p<1.5 and pt>0.05')
     cutAndCopyList('gamma:hard', 'gamma:good', 'E>3.5')
+    buildRestOfEvent('gamma:hard')
+    buildContinuumSuppression('gamma:hard')
+    applyCuts('gamma:hard', 'R2 < 0.995')
 
     Etab_Channels = ['gamma:hard gamma:hard']
 

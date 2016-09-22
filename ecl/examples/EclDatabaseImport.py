@@ -33,4 +33,4 @@ gearbox.initialize()
 rootFiles = ROOT.vector('string')()
 [rootFiles.push_back(name) for name in glob.glob(inputFile)]
 eclDBImporter = ECLDatabaseImporter(rootFiles, outputFile)
-eclDBImporter.importDigitCalibration()
+eclDBImporter.importDigitEnergyCalibration()

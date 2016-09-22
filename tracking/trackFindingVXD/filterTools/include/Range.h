@@ -51,10 +51,10 @@ namespace Belle2 {
      * The leaves will be named as the selection variable name with the "_inf"/"_sup"
      * suffixes for the inf/sup value.
      */
-    void persist(TTree* t, const string& branchName, const string& variableName)
+    void persist(TTree* t, const std::string& branchName, const std::string& variableName)
     {
 
-      string leafList;
+      std::string leafList;
       leafList += variableName;
       leafList += "_inf/";
       leafList += TBranchLeafType(m_inf);

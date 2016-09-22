@@ -16,8 +16,6 @@
 #include <vector>
 #include <TTree.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /// This class provides a computer convenient numbering scheme for
@@ -66,9 +64,9 @@ namespace Belle2 {
     /// [0,a) and [a,1). )
     /// The returned value is the number of fullSecIDs actually added to
     /// this CompacSecIDs.
-    int addSectors(const vector< double>&   normalizedUsup,
-                   const vector< double>&   normalizedVsup,
-                   const vector< vector< FullSecID >>& fullSecIDs)
+    int addSectors(const std::vector< double>&   normalizedUsup,
+                   const std::vector< double>&   normalizedVsup,
+                   const std::vector< std::vector< FullSecID >>& fullSecIDs)
     {
       // First let us check that there is space to store all the sectors
       if (getAvailableSlots() < (normalizedUsup.size() + 1) *
@@ -277,9 +275,9 @@ namespace Belle2 {
       return m_compactSectorsIDMap[layer][ladder][sensor].areCoordinatesValid(normalizedU, normalizedV);
     }
 
-    typedef vector< SectorsOnSensor<sectorID_t> > SensorsOnLadder_t;
-    typedef vector< SensorsOnLadder_t > LaddersOnLayer_t;
-    typedef vector< LaddersOnLayer_t > LayersLookUpTable_t;
+    typedef std::vector< SectorsOnSensor<sectorID_t> > SensorsOnLadder_t;
+    typedef std::vector< SensorsOnLadder_t > LaddersOnLayer_t;
+    typedef std::vector< LaddersOnLayer_t > LayersLookUpTable_t;
 
 
     /// Get access to the whole map
@@ -368,9 +366,9 @@ namespace Belle2 {
     template<  class TContainer,
                class ... Indexes >
     int privateAddSectors(TContainer& container,
-                          const vector< double >&     normalizedUsup,
-                          const vector< double >&     normalizedVsup,
-                          const vector< vector< FullSecID > >& fullSecIDs,
+                          const std::vector< double >&     normalizedUsup,
+                          const std::vector< double >&     normalizedVsup,
+                          const std::vector< std::vector< FullSecID > >& fullSecIDs,
                           short unsigned int index, Indexes ... indexes)
     {
       try {
@@ -387,9 +385,9 @@ namespace Belle2 {
     /// It returns the number of added sectors.
     /// In particular it return 0 if sectors are already defined on the sensor.
     int privateAddSectors(SectorsOnSensor<sectorID_t>&            sectors,
-                          const vector< double>&                  normalizedUsup,
-                          const vector< double>&                  normalizedVsup,
-                          const vector< vector< FullSecID > >&    fullSecIDs)
+                          const std::vector< double>&                  normalizedUsup,
+                          const std::vector< double>&                  normalizedVsup,
+                          const std::vector< std::vector< FullSecID > >&    fullSecIDs)
     {
       if (sectors.size() != 0)
         return 0;

@@ -16,8 +16,6 @@
 #include <cxxabi.h>
 #include <stdlib.h>
 
-using namespace std;
-
 namespace Belle2 {
   /** Base class of the selection variable objects used for pair filtering
    *

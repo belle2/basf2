@@ -48,10 +48,10 @@ namespace Belle2 {
      * suffixes for the m_sup value.
      */
 
-    void persist(TTree* t, const string& branchName, const string& variableName)
+    void persist(TTree* t, const std::string& branchName, const std::string& variableName)
     {
 
-      string leafList;
+      std::string leafList;
       leafList += variableName;
       leafList += "_sup/";
       leafList += TBranchLeafType(m_sup);

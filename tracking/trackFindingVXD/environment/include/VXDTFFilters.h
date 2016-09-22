@@ -121,9 +121,9 @@ namespace Belle2 {
     }
 
 
-    int addSectorsOnSensor(const vector<double>&              normalizedUsup,
-                           const vector<double>&              normalizedVsup,
-                           const vector< vector<FullSecID> >& sectorIds)
+    int addSectorsOnSensor(const std::vector<double>&              normalizedUsup,
+                           const std::vector<double>&              normalizedVsup,
+                           const std::vector< std::vector<FullSecID> >& sectorIds)
     {
 
       auto addedSectors = m_compactSecIDsMap.addSectors(normalizedUsup,
@@ -363,7 +363,7 @@ namespace Belle2 {
     /** This vector contains all the static sectors on a sector map.
      *  The index is the compact ID provided by the CompactSecIDs
      */
-    vector< staticSector_t* > m_staticSectors;
+    std::vector< staticSector_t* > m_staticSectors;
 
     /** Configuration: i.e. name of the sector map, tuning
     parameters, etc.  */

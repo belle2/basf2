@@ -119,7 +119,7 @@ namespace Belle2 {
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
      */
-    void persist(TTree* t, const string& branchName)
+    void persist(TTree* t, const std::string& branchName)
     {
       m_range.persist(t, branchName , Variable().name());
     }
@@ -401,10 +401,10 @@ namespace Belle2 {
       return ! m_filter.accept(args ...);
     }
 
-    void persist(TTree* t, const string& branchName)
+    void persist(TTree* t, const std::string& branchName)
     {
 
-      string nameOfFilter(branchName);
+      std::string nameOfFilter(branchName);
       nameOfFilter += "_not";
       m_filter.persist(t, nameOfFilter);
 
@@ -464,13 +464,13 @@ namespace Belle2 {
       return Filter< Belle2::OperatorAnd, FilterA, FilterB, otherObserver >(m_filterA, m_filterB);
     }
 
-    void persist(TTree* t, const string& branchName)
+    void persist(TTree* t, const std::string& branchName)
     {
-      string nameOfFilterA(branchName);
+      std::string nameOfFilterA(branchName);
       nameOfFilterA += "_and_A";
       m_filterA.persist(t, nameOfFilterA);
 
-      string nameOfFilterB(branchName);
+      std::string nameOfFilterB(branchName);
       nameOfFilterB += "_and_B";
       m_filterB.persist(t, nameOfFilterB);
 
@@ -540,13 +540,13 @@ namespace Belle2 {
       m_filterA(filterA), m_filterB(filterB) { };
     Filter() {};
 
-    void persist(TTree* t, const string& branchName)
+    void persist(TTree* t, const std::string& branchName)
     {
-      string nameOfFilterA(branchName);
+      std::string nameOfFilterA(branchName);
       nameOfFilterA += "_or_A";
       m_filterA.persist(t, nameOfFilterA);
 
-      string nameOfFilterB(branchName);
+      std::string nameOfFilterB(branchName);
       nameOfFilterB += "_or_B";
       m_filterB.persist(t, nameOfFilterB);
 

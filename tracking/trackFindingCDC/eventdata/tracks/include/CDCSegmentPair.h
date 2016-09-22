@@ -92,7 +92,9 @@ namespace Belle2 {
       ISuperLayer getToISuperLayer() const
       { return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getToSegment()->getISuperLayer(); }
 
-
+      /// Getter for the total number of hits in this segment pair
+      std::size_t size() const
+      { return getFromSegment()->size() + getToSegment()->size(); }
 
       /// Getter for the from segment.
       const CDCRecoSegment2D* getFromSegment() const

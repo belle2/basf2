@@ -166,13 +166,16 @@ namespace Belle2 {
     int getIndex(const Module* module);
 
     /** Merge other ProcessStatistics object into this one. */
-    virtual void merge(const Mergeable* other);
+    virtual void merge(const Mergeable* other) override;
 
     /** Clear collected statistics but keep names of modules */
-    virtual void clear();
+    virtual void clear() override;
 
     /** Reimplement TObject::Clone() since we also need m_modulesToStatsIndex. */
-    virtual TObject* Clone(const char* newname = "") const; /* override */
+    virtual TObject* Clone(const char* newname = "") const override;
+
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
 
   private:
     /** Hide copy constructor */
@@ -221,7 +224,7 @@ namespace Belle2 {
      * element so we keep it a plain double. */
     double m_suspendedMemory; //! (transient)
 
-    ClassDef(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
+    ClassDefOverride(ProcessStatistics, 2); /**< Class to collect call statistics for all modules. */
   };
 
 } //Belle2 namespace

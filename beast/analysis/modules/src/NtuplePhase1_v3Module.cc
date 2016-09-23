@@ -187,10 +187,22 @@ namespace Belle2 {
             for (int j = 0; j < he->GetNbinsX(); j++) {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
+              if (HistoDoseName.Contains("csi_energy")) {
+                if (fileName.Contains("HER")) {
+                  if (fileName.Contains("Touschek")) m_input_HT_CSI_dose_binE.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                }
+                if (fileName.Contains("LER")) {
+                  if (fileName.Contains("Touschek")) m_input_LT_CSI_dose_binE.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE_av.push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                }
+              }
               esum += va * co;
             }
             if (fileName.Contains("HER")) {
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Touschek")) m_input_HT_CSI_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Touschek")) m_input_HT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -198,7 +210,7 @@ namespace Belle2 {
                   && fileName.Contains("Touschek")) m_input_HT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Touschek")) m_input_HT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Brems")) m_input_HB_CSI_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Brems")) m_input_HB_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -206,7 +218,7 @@ namespace Belle2 {
                   && fileName.Contains("Brems")) m_input_HB_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Brems")) m_input_HB_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Coulomb")) m_input_HC_CSI_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Coulomb")) m_input_HC_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -216,7 +228,7 @@ namespace Belle2 {
                   && fileName.Contains("Coulomb")) m_input_HC_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
             }
             if (fileName.Contains("LER")) {
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Touschek")) m_input_LT_CSI_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Touschek")) m_input_LT_BGO_dose.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -224,7 +236,7 @@ namespace Belle2 {
                   && fileName.Contains("Touschek")) m_input_LT_PIN_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Touschek")) m_input_LT_DIA_dose.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Brems")) m_input_LB_CSI_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Brems")) m_input_LB_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -232,7 +244,7 @@ namespace Belle2 {
                   && fileName.Contains("Brems")) m_input_LB_PIN_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               if (HistoDoseName.Contains("dia")
                   && fileName.Contains("Brems")) m_input_LB_DIA_dose_av.push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
-              if (HistoDoseName.Contains("csi")
+              if (HistoDoseName.Contains("csi") && HistoDoseName.Contains("edep")
                   && fileName.Contains("Coulomb")) m_input_LC_CSI_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
               if (HistoDoseName.Contains("bgo")
                   && fileName.Contains("Coulomb")) m_input_LC_BGO_dose_av.push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -296,29 +308,43 @@ namespace Belle2 {
               for (int j = 0; j < he->GetNbinsX(); j++) {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
+                if (HistoDoseName.Contains("csi_energy")) {
+                  if (fileName.Contains("HER")) {
+                    if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Brems")) m_input_HB_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  }
+                  if (fileName.Contains("LER")) {
+                    if (fileName.Contains("Coulomb")) m_input_LC_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                    if (fileName.Contains("Brems")) m_input_LB_CSI_dose_binE[k].push_back(va * co / m_input_Time_eqv * 1e-3); //MeV to GeV
+                  }
+                }
                 esum += va * co;
               }
 
               if (fileName.Contains("Coulomb_HER")) {
-                if (HistoDoseName.Contains("csi")) m_input_HC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.Contains("csi")
+                    && HistoDoseName.Contains("edep")) m_input_HC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_HC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_HC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
                 if (HistoDoseName.Contains("dia")) m_input_HC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Coulomb_LER")) {
-                if (HistoDoseName.Contains("csi")) m_input_LC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.Contains("csi")
+                    && HistoDoseName.Contains("edep")) m_input_LC_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_LC_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_LC_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
                 if (HistoDoseName.Contains("dia")) m_input_LC_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Brems_HER")) {
-                if (HistoDoseName.Contains("csi")) m_input_HB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.Contains("csi")
+                    && HistoDoseName.Contains("edep")) m_input_HB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_HB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_HB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
                 if (HistoDoseName.Contains("dia")) m_input_HB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
               }
               if (fileName.Contains("Brems_LER")) {
-                if (HistoDoseName.Contains("csi")) m_input_LB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
+                if (HistoDoseName.Contains("csi")
+                    && HistoDoseName.Contains("edep")) m_input_LB_CSI_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("bgo")) m_input_LB_BGO_dose[k].push_back(esum / m_input_Time_eqv * 1e-3); //MeV to GeV
                 if (HistoDoseName.Contains("pin")) m_input_LB_PIN_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
                 if (HistoDoseName.Contains("dia")) m_input_LB_DIA_dose[k].push_back(esum / m_input_Time_eqv / mass / RadConv * 1e-3); //keV to MeV
@@ -750,6 +776,13 @@ namespace Belle2 {
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE_av.push_back(BG + To);
     }
+    for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
+      double LBG = m_input_LB_CSI_dose_binE_av[i] + m_input_LC_CSI_dose_binE_av[i];
+      double HBG = m_input_HB_CSI_dose_binE_av[i] + m_input_HC_CSI_dose_binE_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
+      m_beast.CSI_Ebin_av.push_back(BG + To);
+    }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double LBG = m_input_LB_CSI_rate_av[i] + m_input_LC_CSI_rate_av[i];
       double HBG = m_input_HB_CSI_rate_av[i] + m_input_HC_CSI_rate_av[i];
@@ -768,6 +801,18 @@ namespace Belle2 {
       }
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE.push_back(BG + To);
+    }
+    for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        if (m_input_LB_CSI_dose_binE[j].size() > 0) {
+          double LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
+          double HBG = m_input_HB_CSI_dose_binE[j][i] + m_input_HC_CSI_dose_binE[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
+      m_beast.CSI_Ebin.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
       double BG = 0;

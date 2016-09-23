@@ -140,6 +140,17 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_CSI_dose_av; /**< list of CSI LB dose */
     std::vector<Double_t> m_input_HB_CSI_dose_av; /**< list of CSI HB dose */
 
+    std::vector<Double_t> m_input_LT_CSI_dose_binE; /**< list of CSI LT dose_binE */
+    std::vector<Double_t> m_input_HT_CSI_dose_binE; /**< list of CSI HT dose_binE */
+    std::vector<Double_t> m_input_LC_CSI_dose_binE[12]; /**< list of CSI LC dose_binE */
+    std::vector<Double_t> m_input_HC_CSI_dose_binE[12]; /**< list of CSI HC dose_binE */
+    std::vector<Double_t> m_input_LB_CSI_dose_binE[12]; /**< list of CSI LB dose_binE */
+    std::vector<Double_t> m_input_HB_CSI_dose_binE[12]; /**< list of CSI HB dose_binE */
+    std::vector<Double_t> m_input_LC_CSI_dose_binE_av; /**< list of CSI LC dose_binE */
+    std::vector<Double_t> m_input_HC_CSI_dose_binE_av; /**< list of CSI HC dose_binE */
+    std::vector<Double_t> m_input_LB_CSI_dose_binE_av; /**< list of CSI LB dose_binE */
+    std::vector<Double_t> m_input_HB_CSI_dose_binE_av; /**< list of CSI HB dose_binE */
+
     std::vector<Double_t> m_input_LT_CSI_rate; /**< list of CSI LT rate */
     std::vector<Double_t> m_input_HT_CSI_rate; /**< list of CSI HT rate */
     std::vector<Double_t> m_input_LC_CSI_rate[12]; /**< list of CSI LC rate */

@@ -89,6 +89,9 @@ namespace Belle2 {
 
         G4LogicalVolume* l_BGO = new G4LogicalVolume(s_BGO, geometry::Materials::get("BGO"), "l_BGO", 0, m_sensitive);
 
+        //cout << "BGO volume " << s_BGO->GetCubicVolume() / CLHEP::cm / CLHEP::cm / CLHEP::cm
+        //<< " density " << geometry::Materials::get("BGO")->GetDensity() / CLHEP::g * CLHEP::cm * CLHEP::cm * CLHEP::cm << endl;
+
         //Lets limit the Geant4 stepsize inside the volume
         l_BGO->SetUserLimits(new G4UserLimits(stepSize));
 

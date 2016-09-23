@@ -1,7 +1,9 @@
 from functools import partial
 from collections import defaultdict
 
+import ROOT
 from .utils import method_dispatch
+from .utils import decode_json_string
 
 
 class Machine():
@@ -17,6 +19,15 @@ class Machine():
     A transition is valid if it goes from an allowed state to an allowed state.
     Conditions are optional but must be a callable that returns True or False based
     on some state of the machine. They cannot have input arguments currently.
+
+    * Every condition/before/after callback function MUST take **kwargs as the only
+    argument (except 'self' if it's a clas method). This is because it's basically
+    impossible to determine which arguments to pass to which functions for a transition.
+    Therefore this machine just enforces that every function should simply take **kwargs
+    and use the dictionary of arguments (even if it doesn't need any arguments).
+
+    This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
+    you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
     """
     def __init__(self, states=set(), initial_state=""):
         """
@@ -31,13 +42,13 @@ class Machine():
         self.transitions = defaultdict(list)
 
     @staticmethod
-    def default_condition():
+    def default_condition(**kwargs):
         """
         Method to always return True.
         """
         return True
 
-    def add_transition(self, trigger, source, dest, conditions=None):
+    def add_transition(self, trigger, source, dest, conditions=None, before=None, after=None):
         """
         Adds a single transition to the dictionary of possible ones.
         Trigger is the method name that begins the transtion between the
@@ -56,6 +67,21 @@ class Machine():
                 transition_dict["conditions"] = [conditions]
         else:
             transition_dict["conditions"] = [Machine.default_condition]
+
+        if not before:
+            before = []
+        if isinstance(before, (list, tuple, set)):
+            transition_dict["before"] = list(before)
+        else:
+            transition_dict["before"] = [before]
+
+        if not after:
+            after = []
+        if isinstance(after, (list, tuple, set)):
+            transition_dict["after"] = list(after)
+        else:
+            transition_dict["after"] = [after]
+
         self.transitions[trigger].append(transition_dict)
 
     def add_state(self, state):
@@ -65,10 +91,10 @@ class Machine():
         """
         self.states.add(state)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name, **kwargs):
         """
         Allows us to create a new method for each trigger on the fly.
-        If there is no trigger name in the machine to match, then th normal
+        If there is no trigger name in the machine to match, then the normal
         AttributeError is called.
         """
         try:
@@ -76,25 +102,41 @@ class Machine():
         except KeyError:
             raise AttributeError("{0} does not exist in transitions".format(name))
         else:
-            return partial(self._trigger, name, transition_dicts)
+            return partial(self._trigger, name, transition_dicts, **kwargs)
 
-    def _trigger(self, name, transition_dicts):
+    def _trigger(self, name, transition_dicts, **kwargs):
         """
-        Runs the transition logic
+        Runs the transition logic. Callbacks are evaluated in the order:
+        conditions -> before -> <new state set here> -> after
         """
         for transition in transition_dicts:
-            source, dest, conditions = transition["source"], transition["dest"], transition["conditions"]
+            source, dest, conditions, before_callbacks, after_callbacks = (transition["source"],
+                                                                           transition["dest"],
+                                                                           transition["conditions"],
+                                                                           transition["before"],
+                                                                           transition["after"])
             if self.state == source:
                 # Returns True only if every condition returns True when called
-                if all(map(lambda x: x(), conditions)):
+                if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
+                    for before_func in before_callbacks:
+                        self._callback(before_func, **kwargs)
                     self.state = dest
+                    for after_func in after_callbacks:
+                        self._callback(after_func, **kwargs)
                     break
                 else:
                     raise ConditionError(("Transition '{0}' called for but one or more conditions "
                                           "evaluated False".format(name)))
         else:
-            raise MachineError(("Transition '{0}' called but there isn't one defined "
-                                "for the current state '{1}'".format(name, self.state)))
+            raise TransitionError(("Transition '{0}' called but there isn't one defined "
+                                   "for the current state '{1}'".format(name, self.state)))
+
+    @staticmethod
+    def _callback(func, **kwargs):
+        """
+        Calls a condition/before/after.. function using arguments passed (or not)
+        """
+        return func(**kwargs)
 
     @property
     def state(self):
@@ -132,12 +174,19 @@ class CalibrationMachine(Machine):
                       "algorithm_completed",
                       "completed"}
 
-    def __init__(self, calibration, initial_state="init"):
+    perfect_order = ["submit_collector",
+                     "complete",
+                     "run_algorithm",
+                     "complete",
+                     "finish"]
+
+    def __init__(self, calibration, initial_state="init", iteration=0):
         """
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
         super().__init__(CalibrationMachine.default_states, initial_state)
+        self.setup_defaults()
 
         self.add_transition("submit_collector", "init", "running_collector", conditions=self.dependencies_completed)
         self.add_transition("fail", "running_collector", "collector_failed")
@@ -148,12 +197,37 @@ class CalibrationMachine(Machine):
         self.add_transition("iterate", "algorithm_completed", "init")
         self.add_transition("finish", "algorithm_completed", "completed")
 
+        #: Calibration object whose state we are modelling
         self.calibration = calibration
-        self.calibration.state = self.state
+        # Monkey Patching for the win!
+        #: Allows calibration object to hold a refernce to the machine controlling it
+        self.calibration.machine = self
+        #: Which iteration step are we in
+        self.iteration = iteration
+        #: Maximum allowed iterations
+        self.max_iterations = self.default_max_iterations
 
-    def dependencies_completed(self):
+    @classmethod
+    def setup_defaults(self):
+        """
+        Anything that is setup by outside config files by default goes here.
+        """
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            import configparser
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        CalibrationMachine.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
+
+    def dependencies_completed(self, **kwargs):
+        """
+        Condition function to check that the dependencies of our calibration are in the 'completed' state.
+        Technically only need to check explicit dependencies.
+        """
         for calibration in self.calibration.dependencies:
-            if not calibration.state == "completed":
+            if not calibration.machine.state == "completed":
                 return False
         else:
             return True
@@ -169,5 +243,12 @@ class MachineError(Exception):
 class ConditionError(MachineError):
     """
     Exception for when conditions fail during a transition
+    """
+    pass
+
+
+class TransitionError(MachineError):
+    """
+    Exception for when transitions fail
     """
     pass

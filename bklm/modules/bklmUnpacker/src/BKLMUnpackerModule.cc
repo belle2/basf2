@@ -40,7 +40,7 @@ REG_MODULE(BKLMUnpacker)
 BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
-  setPropertyFlags(c_ParallelProcessingCertified); //not sure if true yet...
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);

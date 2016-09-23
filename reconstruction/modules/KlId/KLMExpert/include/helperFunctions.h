@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  * **************************************************************************/
 
+#pragma once
+
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>

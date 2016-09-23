@@ -322,6 +322,9 @@ namespace Belle2 {
       /// Checks if the trajectory leaves the outer radius of the CDC times the given tolerance factor
       bool isCurler(double factor = 1) const;
 
+      /// Checks if the trajectory intersects with the inner radius of the CDC time the given tolerance factor
+      bool isOriginer(double factor = 1) const;
+
       /// Getter for the maximal distance from the origin
       double getMaximalCylindricalR() const
       { return std::fabs(getGlobalImpact() + 2 * getLocalCircle()->radius()); }

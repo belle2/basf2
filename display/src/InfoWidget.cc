@@ -325,8 +325,7 @@ TString InfoWidget::getContents(const TObject* obj)
   return info;
 }
 
-InfoWidget::URI::URI(const TString& uri):
-  object(nullptr), scheme(""), entryName(""), arrayIndex(-1)
+InfoWidget::URI::URI(const TString& uri)
 {
   //split uri into schema:path (no double slash: only path after scheme)
   Ssiz_t protStart = uri.First(":");

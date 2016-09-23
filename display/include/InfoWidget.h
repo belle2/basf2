@@ -47,20 +47,20 @@ namespace Belle2 {
      *
      * durability:[entryName[/arrayIndex]] (durability: event/persistent)
      * raw:addressOfTObject (for objects not in DataStore)
-     * main: (the mian page)
+     * main: (the main page)
      */
     struct URI {
-      URI(): object(0), entryName(""), arrayIndex(-1) { }
+      URI() {}
       /** Construct URI by parsing given string. */
       explicit URI(const TString& uri);
 
       /** get URI string to given object. */
       static TString getURI(const TObject* obj);
 
-      const TObject* object; /**< object referenced (or NULL). */
-      TString scheme; /**< scheme name (part before first colon). */
-      TString entryName; /**< name of DataStore entry. */
-      int arrayIndex; /**< index in array, only valid if arrayName and object are filled. */
+      const TObject* object = nullptr; /**< object referenced (or NULL). */
+      TString scheme = ""; /**< scheme name (part before first colon). */
+      TString entryName = ""; /**< name of DataStore entry. */
+      int arrayIndex = -1; /**< index in array, only valid if arrayName and object are filled. */
     };
 
     /** create DataStore overview. */

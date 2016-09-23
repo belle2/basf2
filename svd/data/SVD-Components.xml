@@ -268,19 +268,23 @@
 
 	<!-- APV layout -->
 	<Component name="APVs">
-		<width  unit="mm"> 20.546</width>
+		<width  unit="mm"> 23.346</width>
 		<length unit="mm">124.080</length>
 		<Component type="APV25">
-			<u unit="mm">  6.245</u> <v unit="mm">-57.885</v>
-			<u unit="mm">  6.245</u> <v unit="mm">-50.385</v>
-			<u unit="mm">  6.245</u> <v unit="mm">-42.885</v>
-			<u unit="mm">  6.245</u> <v unit="mm">-34.785</v>
-			<u unit="mm">  6.245</u> <v unit="mm">-11.595</v>
-			<u unit="mm">  6.245</u> <v unit="mm"> 11.595</v>
-			<u unit="mm">  6.245</u> <v unit="mm"> 34.785</v>
-			<u unit="mm">  6.245</u> <v unit="mm"> 42.885</v>
-			<u unit="mm">  6.245</u> <v unit="mm"> 50.385</v>
-			<u unit="mm">  6.245</u> <v unit="mm"> 57.885</v>
+			<u unit="mm">  7.645</u> <v unit="mm">-57.885</v>
+			<u unit="mm">  7.645</u> <v unit="mm">-50.385</v>
+			<u unit="mm">  7.645</u> <v unit="mm">-42.885</v>
+			<u unit="mm">  7.645</u> <v unit="mm">-34.785</v>
+			<u unit="mm">  7.645</u> <v unit="mm">-11.595</v>
+			<u unit="mm">  7.645</u> <v unit="mm"> 11.595</v>
+			<u unit="mm">  7.645</u> <v unit="mm"> 34.785</v>
+			<u unit="mm">  7.645</u> <v unit="mm"> 42.885</v>
+			<u unit="mm">  7.645</u> <v unit="mm"> 50.385</v>
+			<u unit="mm">  7.645</u> <v unit="mm"> 57.885</v>
+		</Component>
+		<Component type="Keratherm">
+			<u unit="mm">  5.245</u> <v unit="mm">-46.0</v><woffset unit="mm">0.125</woffset>
+			<u unit="mm">  5.245</u> <v unit="mm">46.0</v><woffset unit="mm">0.125</woffset>
 		</Component>
 		<!-- Add the top part of the Origami pitch adapter -->
 		<Component name="TopLongOrigamiPitchAdapter">
@@ -310,6 +314,15 @@
 		<width  unit="mm">8.055</width>
 		<length unit="mm">7.100</length>
 		<height unit="mm">0.100</height>
+	</Component>
+
+	<Component name="Keratherm">
+		<Color>#42342B</Color>
+		<Material>Si</Material>
+		<activeChipID>1</activeChipID>
+		<width  unit="mm">4.0</width>
+		<length unit="mm">31.500</length>
+		<height unit="mm">0.327</height>
 	</Component>
 
 	<!-- Origami flexes on bottom of sensors. The real shape is kind of

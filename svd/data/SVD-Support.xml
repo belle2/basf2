@@ -212,7 +212,7 @@
 
 	<SupportRibs>
 		<!-- spacing between the center of the ribs -->
-		<spacing unit="mm">18.560</spacing>
+		<spacing unit="mm">17.660</spacing>
 		<!-- height of the ribs -->
 		<height unit="mm">3.000</height>
 		<!-- parameters for the inner part of the ribs -->
@@ -660,7 +660,7 @@
 	<CoolingPipes>
 		<Material>Fe</Material>
 		<outerDiameter unit="mm">1.500</outerDiameter>
-		<wallThickness unit="mm">0.050</wallThickness>
+		<wallThickness unit="mm">0.100</wallThickness>
 		<Layer id="4">
 			<!-- number of pipes for this layer/halfshell -->
 			<nPipes>6</nPipes>

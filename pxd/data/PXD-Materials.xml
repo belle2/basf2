@@ -95,4 +95,11 @@
       <Material>PXD-Switcher</Material>
     </Components>
   </Material>
+
+  <Material name="PXD-Groove">
+    <state>Solid</state>
+    <Components>
+      <Material>ColdAir</Material>
+    </Components>
+  </Material>
 </Materials>

@@ -125,10 +125,15 @@ namespace Belle2 {
         m_facetCreator.apply(m_clusters, m_facets);
         m_facetRelationCreator.apply(m_facets, m_facetRelations);
         m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
+        m_segmentFitter.apply(m_segments);
+
         m_segmentMerger.apply(m_segments, m_mergedSegments);
         m_segmentFitter.apply(m_mergedSegments);
-        m_segmentAliasResolver.apply(m_mergedSegments);
+
         m_segmentOrienter.apply(m_mergedSegments, outputSegments);
+        m_segmentFitter.apply(outputSegments);
+
+        m_segmentAliasResolver.apply(outputSegments);
         m_segmentExporter.apply(outputSegments);
 
         // Move superclusters to the DataStore

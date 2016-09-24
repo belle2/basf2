@@ -15,7 +15,6 @@
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

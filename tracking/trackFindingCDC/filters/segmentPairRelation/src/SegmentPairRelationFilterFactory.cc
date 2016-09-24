@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -47,20 +46,19 @@ SegmentPairRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseSegmentPairRelationFilter>
 SegmentPairRelationFilterFactory::create(const std::string& filterName) const
 {
-  B2INFO("Filter name " << filterName);
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return makeUnique<BaseSegmentPairRelationFilter>();
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return makeUnique<AllSegmentPairRelationFilter>();
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return makeUnique<MCSegmentPairRelationFilter>();
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return makeUnique<SimpleSegmentPairRelationFilter>();
-  } else if (filterName == string("realistic")) {
+  } else if (filterName == "realistic") {
     return makeUnique<MVARealisticSegmentPairRelationFilter>();
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingSegmentPairRelationFilter>();
   } else {
-    return nullptr;//std::unique_ptr<BaseSegmentPairRelationFilter>(nullptr);
+    return Super::create(filterName);
   }
 }

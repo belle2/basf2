@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

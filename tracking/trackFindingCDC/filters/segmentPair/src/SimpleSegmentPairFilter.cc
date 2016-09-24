@@ -13,7 +13,6 @@
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

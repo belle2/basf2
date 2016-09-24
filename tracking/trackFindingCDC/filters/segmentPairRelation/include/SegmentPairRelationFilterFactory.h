@@ -25,6 +25,9 @@ namespace Belle2 {
     class SegmentPairRelationFilterFactory : public FilterFactory<BaseSegmentPairRelationFilter> {
 
     public:
+      /// Type of the base class
+      using Super = FilterFactory<BaseSegmentPairRelationFilter>;
+
       /** Fill the default filter name and parameter values*/
       SegmentPairRelationFilterFactory(const std::string& defaultFilterName = "simple");
 

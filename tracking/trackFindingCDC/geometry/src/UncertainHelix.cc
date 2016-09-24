@@ -15,7 +15,6 @@
 #include <boost/math/tools/precision.hpp>
 #include <cmath>
 
-using namespace std;
 using namespace boost::math;
 
 using namespace Belle2;

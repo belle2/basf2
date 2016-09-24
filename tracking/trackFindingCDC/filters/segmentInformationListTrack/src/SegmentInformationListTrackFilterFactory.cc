@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SimpleSegmentInformationListTrackFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -34,15 +33,15 @@ SegmentInformationListTrackFilterFactory::getValidFilterNamesAndDescriptions() c
 std::unique_ptr<BaseSegmentInformationListTrackFilter>
 SegmentInformationListTrackFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new BaseSegmentInformationListTrackFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new MCSegmentInformationListTrackFilter());
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new SimpleSegmentInformationListTrackFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new TMVASegmentInformationListTrackFilter());
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new RecordingSegmentInformationListTrackFilter());
   } else {
     return Super::create(filterName);

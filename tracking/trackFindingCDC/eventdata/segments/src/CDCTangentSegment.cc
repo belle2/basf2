@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

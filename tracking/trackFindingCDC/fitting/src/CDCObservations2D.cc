@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-using namespace std;
 using namespace Eigen;
 
 using namespace Belle2;

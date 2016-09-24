@@ -14,6 +14,5 @@
 #include <framework/logging/Logger.h>
 
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

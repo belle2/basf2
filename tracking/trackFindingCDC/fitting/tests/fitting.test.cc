@@ -22,9 +22,8 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace Belle2::TrackFindingCDC;
+using namespace TrackFindingCDC;
 
 namespace {
   const Vector2D generalCenter(6.0, 0);
@@ -32,9 +31,9 @@ namespace {
 
   const Circle2D generalCircle(generalCenter, generalRadius);
 
-  vector<Vector2D> createGeneralCircleObservationCenters()
+  std::vector<Vector2D> createGeneralCircleObservationCenters()
   {
-    vector<Vector2D> observationCenters;
+    std::vector<Vector2D> observationCenters;
     // Setting up a trajectory traveling clockwise
     for (int iObservation = 11; iObservation > -12; --iObservation) {
       double y = iObservation / 2.0;
@@ -46,7 +45,7 @@ namespace {
 
   CDCObservations2D createGeneralCircleObservations(bool withDriftLength = true)
   {
-    vector<Vector2D>&&  observationCenters = createGeneralCircleObservationCenters();
+    std::vector<Vector2D> observationCenters = createGeneralCircleObservationCenters();
 
     CDCObservations2D observations2D;
     if (withDriftLength) {

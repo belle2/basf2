@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/stereoSegments/SimpleStereoSegmentFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -35,19 +34,19 @@ StereoSegmentFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseStereoSegmentFilter>
 StereoSegmentFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new BaseStereoSegmentFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new MCStereoSegmentFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new AllStereoSegmentFilter());
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new RecordingStereoSegmentFilter("StereoSegment.root"));
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new SimpleStereoSegmentFilter());
-  } else if (filterName == string("random")) {
+  } else if (filterName == "random") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new RandomStereoSegmentFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseStereoSegmentFilter>(new TMVAStereoSegmentFilter("StereoSegment"));
   } else {
     return Super::create(filterName);

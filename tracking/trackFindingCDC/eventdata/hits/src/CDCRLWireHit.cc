@@ -12,7 +12,6 @@
 
 #include <cdc/dataobjects/CDCSimHit.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

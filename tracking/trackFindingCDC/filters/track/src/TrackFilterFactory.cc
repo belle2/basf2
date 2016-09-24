@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,15 +31,15 @@ TrackFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseTrackFilter>
 TrackFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseTrackFilter>(new BaseTrackFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseTrackFilter>(new MCTrackFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<BaseTrackFilter>(new AllTrackFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseTrackFilter>(new TMVATrackFilter("TrackFilter"));
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseTrackFilter>(new RecordingTrackFilter("TrackFilter.root"));
   } else {
     return Super::create(filterName);

@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/trackRelation/CDCTrackRelationVarSets.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

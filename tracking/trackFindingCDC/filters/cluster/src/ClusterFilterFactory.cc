@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -47,13 +46,13 @@ ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<Filter<CDCWireHitCluster> >
 ClusterFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("all")) {
+  if (filterName == "all") {
     return std::unique_ptr<Filter<CDCWireHitCluster> >(new AllClusterFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<Filter<CDCWireHitCluster> >(new TMVAClusterFilter());
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<Filter<CDCWireHitCluster> >(new RecordingClusterFilter());
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return std::unique_ptr<Filter<CDCWireHitCluster> >(new UnionRecordingClusterFilter());
   } else {
     return Super::create(filterName);

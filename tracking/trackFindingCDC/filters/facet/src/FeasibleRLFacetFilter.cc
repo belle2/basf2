@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

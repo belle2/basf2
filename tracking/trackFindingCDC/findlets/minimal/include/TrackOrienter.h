@@ -29,45 +29,21 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Fixes the flight direction of tracks to a preferred orientation by simple heuristics.";
-      }
+      virtual std::string getDescription() override;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
-      {
-        moduleParamList->addParameter(prefixed(prefix, "TrackOrientation"),
-                                      m_param_trackOrientationString,
-                                      "Option which orientation of tracks shall be generate. "
-                                      "Valid options are '' (default of the finder), "
-                                      "'none' (one orientation, algorithm dependent), "
-                                      "'symmetric', "
-                                      "'outwards', "
-                                      "'downwards'.",
-                                      std::string(m_param_trackOrientationString));
-      }
-
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
       /// Signals the beginning of the event processing
-      void initialize() override
-      {
-        Super::initialize();
-        if (m_param_trackOrientationString != std::string("")) {
-          try {
-            m_trackOrientation = getPreferredDirection(m_param_trackOrientationString);
-          } catch (std::invalid_argument& e) {
-            B2ERROR("Unexpected 'TrackOrientation' parameter : '" << m_param_trackOrientationString);
-          }
-        }
-      }
+      void initialize() override;
 
     public:
-      /** Set the default output orientation of the tracks.
+      /**
+       *  Set the default output orientation of the tracks.
        *  * EPreferredDirection::c_None does not modify the orientation from the concret algorithm.
        *  * EPreferredDirection::c_Symmetric makes two copies of each track with forward and backward to the original orientation.
        *  * EPreferredDirection::c_Outwards flips the orientation of the track such that they point away from the interaction point.
        *  * EPreferredDirection::c_Downwards flips the orientation of the track such that they point downwards.
-       *
+       *  * EPreferredDirection::c_Curling makes two copies for tracks that are likely curlers, fix others to outwards
        *  This properties can also be overridden by the user by a module parameter.
        */
       void setTrackOrientation(const EPreferredDirection& trackOrientation)
@@ -80,55 +56,19 @@ namespace Belle2 {
     public:
       /// Main algorithm applying the adjustment of the orientation.
       virtual void apply(const std::vector<CDCTrack>& inputTracks,
-                         std::vector<CDCTrack>& outputTracks) override final
-      {
-        /// Copy tracks to output fixing their orientation
-        if (m_trackOrientation == EPreferredDirection::c_None) {
-          // Copy the tracks unchanged.
-          outputTracks = inputTracks;
-        } else if (m_trackOrientation == EPreferredDirection::c_Symmetric) {
-          outputTracks.reserve(2 * inputTracks.size());
-          for (const CDCTrack& track : inputTracks) {
-            outputTracks.push_back(track.reversed());
-            outputTracks.push_back(track);
-          }
-        } else if (m_trackOrientation == EPreferredDirection::c_Outwards) {
-          outputTracks.reserve(inputTracks.size());
-          for (const CDCTrack& track : inputTracks) {
-            const CDCRecoHit3D& firstHit = track.front();
-            const CDCRecoHit3D& lastHit = track.back();
-            if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
-              outputTracks.push_back(track.reversed());
-            } else {
-              outputTracks.push_back(track);
-            }
-          }
-        } else if (m_trackOrientation == EPreferredDirection::c_Downwards) {
-          outputTracks.reserve(inputTracks.size());
-          for (const CDCTrack& track : inputTracks) {
-            const CDCRecoHit3D& firstHit = track.front();
-            const CDCRecoHit3D& lastHit = track.back();
-            if (lastHit.getRecoPos2D().y() > firstHit.getRecoPos2D().y()) {
-              outputTracks.push_back(track.reversed());
-            } else {
-              outputTracks.push_back(track);
-            }
-          }
-        } else {
-          B2WARNING("Unexpected 'TrackOrientation' parameter of track finder module : '" <<
-                    m_param_trackOrientationString <<
-                    "'. No tracks are put out.");
-        }
-      }
+                         std::vector<CDCTrack>& outputTracks) override final;
 
     private:
-      /** Parameter: String that states the desired track orientation.
-       *  Valid orientations are "none" (unchanged), "symmetric", "outwards", "downwards".
+      /**
+       *  Parameter: String that states the desired track orientation.
+       *  Valid orientations are "none" (unchanged), "outwards", "downwards", "symmetric", "curling"
        */
       std::string m_param_trackOrientationString = "";
 
-      /** Encoded desired track orientation.
-       *  Valid orientations are "c_None" (unchanged), "c_Symmetric", "c_Outwards", "c_Downwards.
+
+      /**
+       *  Encoded desired track orientation.
+       *  Valid orientations are "c_None" (unchanged), "c_Outwards", "c_Downwards", "c_Symmetric", "c_Curling",
        */
       EPreferredDirection m_trackOrientation = EPreferredDirection::c_None;
 

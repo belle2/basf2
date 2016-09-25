@@ -7,4 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
+
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+Weight AllTrackRelationFilter::operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack)
+{
+  return fromTrack.getAutomatonCell().getCellWeight() + toTrack.getAutomatonCell().getCellWeight();
+}

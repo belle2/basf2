@@ -171,6 +171,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegm
   const std::vector<CDCTangent>& tangents = tangentSegment;
   CDCRecoSegment2D segment2D = ::condenseTangentSegment(tangents);
   segment2D.setTrajectory2D(tangentSegment.getTrajectory2D());
+  segment2D.receiveISuperCluster();
   segment2D.setAliasScore(tangentSegment.getAliasScore());
   return segment2D;
 }
@@ -185,6 +186,7 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
   const std::vector<CDCFacet>& facets = facetSegment;
   CDCRecoSegment2D segment2D = ::condenseFacetSegment(facets);
   segment2D.setTrajectory2D(facetSegment.getTrajectory2D());
+  segment2D.receiveISuperCluster();
   segment2D.setAliasScore(facetSegment.getAliasScore());
   return segment2D;
 }
@@ -218,6 +220,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSe
     Vector2D zeroDisp2D(0.0, 0.0);
     segment2D.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
     segment2D.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
+    segment2D.receiveISuperCluster();
     segment2D.setAliasScore(rlWireHitSegment.getAliasScore());
     return segment2D;
   } else {
@@ -265,6 +268,7 @@ CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
   for (const CDCRecoHit2D& recoHit2D : *this) {
     segment.push_back(recoHit2D.getAlias());
   }
+  segment.setISuperCluster(getISuperCluster());
   segment.setAliasScore(getAliasScore());
   return segment;
 }
@@ -329,6 +333,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
 
   reverseSegment.setTrajectory2D(getTrajectory2D().reversed());
   reverseSegment.m_automatonCell = m_automatonCell;
+  reverseSegment.setISuperCluster(getISuperCluster());
   reverseSegment.setAliasScore(getAliasScore());
   return reverseSegment;
 }

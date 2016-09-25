@@ -34,6 +34,7 @@ from .utils import IoV_Result
 
 import caf.utils
 import caf.backends
+from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
@@ -563,6 +564,10 @@ class CAF():
         """
         if not isinstance(self._backend, caf.backends.Backend):
             self.backend = caf.backends.Local()
+        if isinstance(self._backend, caf.backends.Local):
+            self._algorithm_backend = self.backend
+        else:
+            self._algorithm_backend = caf.backends.Local()
 
     def run(self):
         """
@@ -571,119 +576,178 @@ class CAF():
         - Upload of final databases is not done to give the option of monitoring output
         before committing to conditions database.
         """
-        self.check_backend()
-        # Creates the ordering of calibrations, including any dependencies that we must wait for
-        # before continuing.
-        self.order = self._order_calibrations()
-        if not self.order:
+        # Checks whether the dependencies we've added will give a valid order
+        order = self._order_calibrations()
+        if not order:
             B2ERROR("Couldn't order the calibrations properly. Probably a cyclic dependency.")
 
-        # Create a shallow copy of self.order that we can remove items from
-        order = self.order.copy()
+        # Check that a backend has been set and use default Local() one if not
+        self.check_backend()
 
-        # Creates list of first set of calibrations to submit
-        col_to_submit = list(find_sources(order))
-        # remove the submitting calibrations from the overall order
-        for calibration_name in col_to_submit:
-            order.pop(calibration_name)
+        # Patch in a machine to each calibration
+        for calibration in self.calibrations.values():
+            cm = CalibrationMachine(calibration)
 
         # Creates the overall output directory and reset the attribute to use an absolute path to it.
         self.output_dir = self._make_output_dir()
-        # Enter the overall output dir
+        # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
             # Make the output directory for each calibration
             for calibration_name in self.calibrations.keys():
                 os.mkdir(calibration_name)
 
             # Main running loop, continues until we're completely finished or we fail
-            while col_to_submit:
-                for iteration in range(self.max_iterations):
-                    # Create job objects for collectors
-                    col_jobs = self._configure_jobs(col_to_submit, iteration)
-                    # Submit collection jobs that have no dependencies
-                    results = self.backend.submit(list(col_jobs.values()))
-                    # Event loop waiting for results
-                    waiting_on_results = col_to_submit[:]
-                    while waiting_on_results:
-                        # We sleep initially since we only just submitted the collector jobs
-                        sleep(self.heartbeat)
-                        # loop to check which results are finished and remove from waiting list
-                        # Iterates over a copy as we're editing it.
-                        for calibration_name, result in zip(waiting_on_results[:], results[:]):
-                            ready = result.ready()
-                            B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
-                            if ready:
-                                result.post_process()
-                                waiting_on_results.remove(calibration_name)
-                                results.remove(result)
+            # Requires that ALL calibration machines have state 'completed' to end properly
+            while any(map(lambda calibration: calibration.machine.state != "completed", self.calibrations.values())):
+                for calibration_name, calibration in self.calibrations.items():
+                    if calibration.machine.state == "init":
+                        try:
+                            # Here we are calling the transition and not caring if it fails due to conditions
+                            calibration.machine.submit_collector(backend=self.backend)
+                            B2INFO(" ".join([calibration.name, "moved from", "init", "to", calibration.machine.state]))
+                        # Don't care if a ConditionError is raised, as we are deliberately attempting to transition
+                        # without checking the conditions.
+                        except ConditionError:
+                            pass
 
-                    # Once the collectors are all done, run the algorithms for them
-                    # We pass in the col_jobs dictionary as it contains the calibration names
-                    # and job objects (output directories) that we need.
-                    self._run_algorithms(col_jobs, iteration)
+                    if calibration.machine.state == "running_collector":
+                        try:
+                            calibration.machine.complete()
+                            B2INFO(" ".join([calibration.name,
+                                             "moved from",
+                                             "running_collector",
+                                             "to",
+                                             calibration.machine.state]))
+                        except ConditionError:
+                            pass
 
-                    iteration_needed = {}
-                    for calibration_name in col_to_submit:
-                        iteration_needed[calibration_name] = False
-                        cal_results = self.calibrations[calibration_name].results[iteration]
-                        for algorithm_name, iov_results in cal_results.items():
-                            for iov_result in iov_results:
-                                if iov_result.result == CalibrationAlgorithm.c_Iterate:
-                                    iteration_needed[calibration_name] = True
-                                    B2INFO("Iteration called for by {0} on IoV {1}".format(calibration_name+'_'+algorithm_name,
-                                           iov_result.iov))
-                                elif (iov_result.result == CalibrationAlgorithm.c_NotEnoughData or
-                                      iov_result.result == CalibrationAlgorithm.c_Failure):
-                                    B2FATAL("Can't continue, {0} returned by {1}::{2}".format(
-                                            AlgResult(iov_result.result).name, calibration_name, algorithm_name))
+                    if calibration.machine.state == "collector_completed":
+                        try:
+                            calibration.machine.run_algorithms(backend=self._algorithm_backend)
+                            B2INFO(" ".join([calibration.name,
+                                             "moved from",
+                                             "collector_completed",
+                                             "to",
+                                             calibration.machine.state]))
+                        except ConditionError:
+                            pass
 
-                    for calibration_name in col_to_submit[:]:
-                        if not iteration_needed[calibration_name]:
-                            database_location = os.path.join(self.output_dir, calibration_name,
-                                                             str(iteration), 'output', 'outputdb')
-                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
-                            shutil.copytree(database_location, final_database_location)
-                            B2INFO('No Iteration required for {0}'.format(calibration_name+'_'+algorithm_name))
-                            col_to_submit.remove(calibration_name)
+                    if calibration.machine.state == "running_algorithms":
+                        try:
+                            calibration.machine.complete()
+                            B2INFO(" ".join([calibration.name,
+                                             "moved from",
+                                             "running_algorithms",
+                                             "to",
+                                             calibration.machine.state]))
+                        except ConditionError:
+                            pass
 
-                    # Once all the algorithms have returned c_OK we can move on to the next collectors
-                    if not col_to_submit:
-                        # Find new sources if they exist
-                        col_to_submit = list(find_sources(order))
-                        # Remove new sources from order
-                        for calibration_name in col_to_submit:
-                            order.pop(calibration_name)
-                        # Go round and submit next calibrations
-                        break
+                    if calibration.machine.state == "algorithms_completed":
+                        try:
+                            calibration.machine.finish()
+                            B2INFO(" ".join([calibration.name,
+                                             "moved from",
+                                             "algorithms_completed",
+                                             "to",
+                                             calibration.machine.state]))
+                        except ConditionError:
+                            pass
 
-                else:
-                    for calibration_name in col_to_submit[:]:
-                        if iteration_needed[calibration_name]:
-                            database_location = os.path.join(self.output_dir, calibration_name,
-                                                             str(self.max_iterations-1), 'output', 'outputdb')
-                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
-                            shutil.copytree(database_location, final_database_location)
-                            B2WARNING(("Max iterations reached for {0} but algorithms still "
-                                       "requesting more!".format(calibration_name)))
-                            col_to_submit.remove(calibration_name)
+                # do a sleep before we do another round
+                sleep(self.heartbeat)
 
-                    # We'll continue on even if the algorithms reach max iterations. But we'll grumble about it
-                    if not col_to_submit:
-                        # Find new sources if they exist
-                        col_to_submit = list(find_sources(order))
-                        # Remove new sources from order
-                        for calibration_name in col_to_submit:
-                            order.pop(calibration_name)
-                        # Round we go again for collector submission
-
-        B2INFO('Results of all calibrations, NOT IN ORDER!')
-        for calibration in self.calibrations.values():
-            print("Results of {}".format(calibration.name))
-            pp.pprint(calibration.results)
-
-        # Close down our processing pool nicely if we used one
+#            # Main running loop, continues until we're completely finished or we fail
+#            while col_to_submit:
+#                for iteration in range(self.max_iterations):
+#                    # Create job objects for collectors
+#                    col_jobs = self._configure_jobs(col_to_submit, iteration)
+#                    # Submit collection jobs that have no dependencies
+#                    results = self.backend.submit(list(col_jobs.values()))
+#                    # Event loop waiting for results
+#                    waiting_on_results = col_to_submit[:]
+#                    while waiting_on_results:
+#                        # We sleep initially since we only just submitted the collector jobs
+#                        sleep(self.heartbeat)
+#                        # loop to check which results are finished and remove from waiting list
+#                        # Iterates over a copy as we're editing it.
+#                        for calibration_name, result in zip(waiting_on_results[:], results[:]):
+#                            ready = result.ready()
+#                            B2DEBUG(100, '{0} is ready: {1}'.format(calibration_name, ready))
+#                            if ready:
+#                                result.post_process()
+#                                waiting_on_results.remove(calibration_name)
+#                                results.remove(result)
+#
+#                    # Once the collectors are all done, run the algorithms for them
+#                    # We pass in the col_jobs dictionary as it contains the calibration names
+#                    # and job objects (output directories) that we need.
+#                    self._run_algorithms(col_jobs, iteration)
+#
+#                    iteration_needed = {}
+#                    for calibration_name in col_to_submit:
+#                        iteration_needed[calibration_name] = False
+#                        cal_results = self.calibrations[calibration_name].results[iteration]
+#                        for algorithm_name, iov_results in cal_results.items():
+#                            for iov_result in iov_results:
+#                                if iov_result.result == CalibrationAlgorithm.c_Iterate:
+#                                    iteration_needed[calibration_name] = True
+#                                    B2INFO("Iteration called for by {0} on IoV {1}".format(calibration_name+'_'+algorithm_name,
+#                                           iov_result.iov))
+#                                elif (iov_result.result == CalibrationAlgorithm.c_NotEnoughData or
+#                                      iov_result.result == CalibrationAlgorithm.c_Failure):
+#                                    B2FATAL("Can't continue, {0} returned by {1}::{2}".format(
+#                                            AlgResult(iov_result.result).name, calibration_name, algorithm_name))
+#
+#                    for calibration_name in col_to_submit[:]:
+#                        if not iteration_needed[calibration_name]:
+#                            database_location = os.path.join(self.output_dir, calibration_name,
+#                                                             str(iteration), 'output', 'outputdb')
+#                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
+#                            shutil.copytree(database_location, final_database_location)
+#                            B2INFO('No Iteration required for {0}'.format(calibration_name+'_'+algorithm_name))
+#                            col_to_submit.remove(calibration_name)
+#
+#                    # Once all the algorithms have returned c_OK we can move on to the next collectors
+#                    if not col_to_submit:
+#                        # Find new sources if they exist
+#                        col_to_submit = list(find_sources(order))
+#                        # Remove new sources from order
+#                        for calibration_name in col_to_submit:
+#                            order.pop(calibration_name)
+#                        # Go round and submit next calibrations
+#                        break
+#
+#                else:
+#                    for calibration_name in col_to_submit[:]:
+#                        if iteration_needed[calibration_name]:
+#                            database_location = os.path.join(self.output_dir, calibration_name,
+#                                                             str(self.max_iterations-1), 'output', 'outputdb')
+#                            final_database_location = os.path.join(self.output_dir, calibration_name, 'outputdb')
+#                            shutil.copytree(database_location, final_database_location)
+#                            B2WARNING(("Max iterations reached for {0} but algorithms still "
+#                                       "requesting more!".format(calibration_name)))
+#                            col_to_submit.remove(calibration_name)
+#
+#                    # We'll continue on even if the algorithms reach max iterations. But we'll grumble about it
+#                    if not col_to_submit:
+#                        # Find new sources if they exist
+#                        col_to_submit = list(find_sources(order))
+#                        # Remove new sources from order
+#                        for calibration_name in col_to_submit:
+#                            order.pop(calibration_name)
+#                        # Round we go again for collector submission
+#
+#        B2INFO('Results of all calibrations, NOT IN ORDER!')
+#        for calibration in self.calibrations.values():
+#            print("Results of {}".format(calibration.name))
+#            pp.pprint(calibration.results)
+#
+        # Close down our processing pools nicely
         if isinstance(self.backend, caf.backends.Local):
             self.backend.join()
+        else:
+            self._algorithm_backend.join()
 
     def _run_algorithms(self, jobs, iteration):
         """

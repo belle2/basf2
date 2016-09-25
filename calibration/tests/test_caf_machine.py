@@ -152,7 +152,7 @@ class Test_CalibrationMachine(TestCase):
         cm = CalibrationMachine(self.cal)
         cm.submit_collector()
         cm.complete()
-        cm.run_algorithm()
+        cm.run_algorithms()
         cm.complete()
         cm.finish()
         self.assertEqual(cm.state, "completed")

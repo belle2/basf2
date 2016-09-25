@@ -169,16 +169,10 @@ class CalibrationMachine(Machine):
                       "running_collector",
                       "collector_failed",
                       "collector_completed",
-                      "running_algorithm",
-                      "algorithm_failed",
-                      "algorithm_completed",
+                      "running_algorithms",
+                      "algorithms_failed",
+                      "algorithms_completed",
                       "completed"}
-
-    perfect_order = ["submit_collector",
-                     "complete",
-                     "run_algorithm",
-                     "complete",
-                     "finish"]
 
     def __init__(self, calibration, initial_state="init", iteration=0):
         """
@@ -191,11 +185,11 @@ class CalibrationMachine(Machine):
         self.add_transition("submit_collector", "init", "running_collector", conditions=self.dependencies_completed)
         self.add_transition("fail", "running_collector", "collector_failed")
         self.add_transition("complete", "running_collector", "collector_completed")
-        self.add_transition("run_algorithm", "collector_completed", "running_algorithm")
-        self.add_transition("complete", "running_algorithm", "algorithm_completed")
-        self.add_transition("fail", "running_algorithm", "algorithm_failed")
-        self.add_transition("iterate", "algorithm_completed", "init")
-        self.add_transition("finish", "algorithm_completed", "completed")
+        self.add_transition("run_algorithms", "collector_completed", "running_algorithms")
+        self.add_transition("complete", "running_algorithms", "algorithms_completed")
+        self.add_transition("fail", "running_algorithms", "algorithms_failed")
+        self.add_transition("iterate", "algorithms_completed", "init")
+        self.add_transition("finish", "algorithms_completed", "completed")
 
         #: Calibration object whose state we are modelling
         self.calibration = calibration
@@ -207,7 +201,6 @@ class CalibrationMachine(Machine):
         #: Maximum allowed iterations
         self.max_iterations = self.default_max_iterations
 
-    @classmethod
     def setup_defaults(self):
         """
         Anything that is setup by outside config files by default goes here.

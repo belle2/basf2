@@ -103,7 +103,7 @@ namespace Belle2 {
         m_facets.clear();
         m_facetRelations.clear();
         m_segments.clear();
-        m_mergedSegments.clear();
+        m_intermediateSegments.clear();
         Super::beginEvent();
       }
 
@@ -116,7 +116,7 @@ namespace Belle2 {
         m_facets.reserve(800);
         m_facetRelations.reserve(800);
         m_segments.reserve(200);
-        m_mergedSegments.reserve(200);
+        m_intermediateSegments.reserve(200);
         outputSegments.reserve(outputSegments.size() + 200);
 
         m_superClusterCreator.apply(inputWireHits, m_superClusters);
@@ -127,13 +127,14 @@ namespace Belle2 {
         m_segmentCreatorFacetAutomaton.apply(m_facets, m_facetRelations, m_segments);
         m_segmentFitter.apply(m_segments);
 
-        m_segmentMerger.apply(m_segments, m_mergedSegments);
-        m_segmentFitter.apply(m_mergedSegments);
+        m_segmentOrienter.apply(m_segments, m_intermediateSegments);
+        m_segmentFitter.apply(m_intermediateSegments);
 
-        m_segmentOrienter.apply(m_mergedSegments, outputSegments);
+        m_segmentAliasResolver.apply(m_intermediateSegments);
+
+        m_segmentMerger.apply(m_intermediateSegments, outputSegments);
         m_segmentFitter.apply(outputSegments);
 
-        m_segmentAliasResolver.apply(outputSegments);
         m_segmentExporter.apply(outputSegments);
 
         // Move superclusters to the DataStore
@@ -165,9 +166,6 @@ namespace Belle2 {
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
 
-      /// Merges segments with closeby segments of the same super cluster
-      SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
-
       /// Fits the generated segments
       SegmentFitter m_segmentFitter;
 
@@ -176,6 +174,9 @@ namespace Belle2 {
 
       /// Adjustes the orientation of the generated segments to a prefered direction of flight
       SegmentOrienter m_segmentOrienter;
+
+      /// Merges segments with closeby segments of the same super cluster
+      SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
 
       /// Writes out copies of the segments as track candidates.
       SegmentExporter m_segmentExporter;
@@ -210,7 +211,7 @@ namespace Belle2 {
       std::vector<CDCRecoSegment2D> m_segments;
 
       /// Memory for the reconstructed segments
-      std::vector<CDCRecoSegment2D> m_mergedSegments;
+      std::vector<CDCRecoSegment2D> m_intermediateSegments;
 
     }; // end class SegmentFinderFacetAutomaton
 

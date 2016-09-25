@@ -98,16 +98,16 @@ namespace Belle2 {
 
       /// Unset the masked flag of the automaton cell of this segment
       /// and of all contained wire hits.
-      void unsetAndForwardMaskedFlag(bool toHits = true) const;
+      void unsetAndForwardMaskedFlag(bool toHits = false) const;
 
       /// Set the masked flag of the automaton cell of this segment
       /// and forward the masked flag to all contained wire hits.
-      void setAndForwardMaskedFlag(bool toHits = true) const;
+      void setAndForwardMaskedFlag(bool toHits = false) const;
 
       /// Check all contained wire hits if one has the masked flag.
       /** Set the masked flag of this segment in case at least one of
        *  the contained wire hits is flagged as masked.*/
-      void receiveMaskedFlag(bool fromHits = true) const;
+      void receiveMaskedFlag(bool fromHits = false) const;
 
       /// Getter for the global super cluster id.
       int getISuperCluster() const

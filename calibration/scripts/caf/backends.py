@@ -80,23 +80,23 @@ class Local(Backend):
             correct output location.
             """
             # Once the subprocess is done, move the requested output to the output directory
-            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
+            # B2INFO('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
             for pattern in self.job.output_patterns:
                 output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
-                    # print('moving', file_name, 'to', job.output_dir)
+                    # B2INFO('moving', file_name, 'to', job.output_dir)
 
     def join(self):
         """
         Closes and joins the Pool, letting you wait for all results currently
         still processing.
         """
-        print('Joining Process Pool, waiting for results to finish')
+        B2INFO('Joining Process Pool, waiting for results to finish')
         global pool
         pool.close()
         pool.join()
-        print('Process Pool joined.')
+        B2INFO('Process Pool joined.')
 
     @property
     def max_processes(self):
@@ -116,7 +116,7 @@ class Local(Backend):
         global pool
         if pool:
             self.join()
-        print('Starting up new Pool with {0} processes'.format(self.max_processes))
+        B2INFO('Starting up new Pool with {0} processes'.format(self.max_processes))
         pool = mp.Pool(self.max_processes)
 
     @method_dispatch
@@ -126,7 +126,7 @@ class Local(Backend):
         """
         global pool
         # Submit the jobs to owned Pool
-        print('Job Submitting:', job.name)
+        B2INFO('Job Submitting:', job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -151,7 +151,7 @@ class Local(Backend):
                 if os.path.exists(input_file_path):
                     existing_input_files.append(input_file_path)
                 else:
-                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    B2WARNING("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
             else:
                 existing_input_files.append(input_file_path)
 
@@ -161,7 +161,7 @@ class Local(Backend):
                 pickle.dump(existing_input_files, input_data_file)
 
         result = Local.Result(job, pool.apply_async(Local.run_job, (job,)))
-        print('Job {0} submitted'.format(job.name))
+        B2INFO('Job {0} submitted'.format(job.name))
         return result
 
     @submit.register(list)
@@ -174,7 +174,7 @@ class Local(Backend):
         # Submit the jobs to owned Pool
         for job in jobs:
             results.append(self.submit(job))
-        print('Jobs submitted')
+        B2INFO('All Requested Jobs Submitted')
         return results
 
     @staticmethod
@@ -187,9 +187,9 @@ class Local(Backend):
         stderr_file_path = os.path.join(job.output_dir, 'stderr')
         # Open the stdout and stderr for redirection of subprocess
         with open(stdout_file_path, 'w') as f_out, open(stderr_file_path, 'w') as f_err:
-            print('Starting Sub Process: {0}'.format(job.name))
+            B2INFO('Starting Sub Process: {0}'.format(job.name))
             subprocess.run(job.cmd, shell=False, stdout=f_out, stderr=f_err, cwd=job.working_dir)
-            print('Sub Process {0} Finished.'.format(job.name))
+            B2INFO('Sub Process {0} Finished.'.format(job.name))
 
 
 class PBS(Backend):
@@ -329,12 +329,10 @@ class PBS(Backend):
             correct output location.
             """
             # Once the subprocess is done, move the requested output to the output directory
-            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
             for pattern in self.job.output_patterns:
                 output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
-                    # print('moving', file_name, 'to', job.output_dir)
 
     @method_dispatch
     def submit(self, job):
@@ -345,7 +343,7 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        print('Job Submitting:', job.name)
+        B2INFO('Job Submitting:', job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -370,7 +368,7 @@ class PBS(Backend):
                 if os.path.exists(input_file_path):
                     existing_input_files.append(input_file_path)
                 else:
-                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    B2WARNING("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
             else:
                 existing_input_files.append(input_file_path)
 
@@ -406,7 +404,7 @@ class PBS(Backend):
         # Submit the jobs to PBS
         for job in jobs:
             results.append(self.submit(job))
-        print('Jobs submitted')
+        B2INFO('All Requested Jobs Submitted')
         return results
 
 
@@ -545,12 +543,10 @@ class LSF(Backend):
             correct output location.
             """
             # Once the subprocess is done, move the requested output to the output directory
-            # print('Moving any output files of process {0} to output directory {1}'.format(job.name, job.output_dir))
             for pattern in self.job.output_patterns:
                 output_files = glob.glob(os.path.join(self.job.working_dir, pattern))
                 for file_name in output_files:
                     shutil.move(file_name, self.job.output_dir)
-                    # print('moving', file_name, 'to', job.output_dir)
 
     @method_dispatch
     def submit(self, job):
@@ -561,7 +557,7 @@ class LSF(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the LSF system and the job about whether or not the job has finished.
         """
-        print('Job Submitting:', job.name)
+        B2INFO('Job Submitting:', job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -586,7 +582,7 @@ class LSF(Backend):
                 if os.path.exists(input_file_path):
                     existing_input_files.append(input_file_path)
                 else:
-                    print("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
+                    B2INFO("Requested local input file {0} can't be found, it will be skipped!".format(input_file_path))
             else:
                 existing_input_files.append(input_file_path)
 
@@ -606,13 +602,13 @@ class LSF(Backend):
         """
         Do the actual bsub command and collect the output to find out the job id for later monitoring.
         """
-        print("Calling bsub for job {0}".format(job.name))
+        B2INFO("Calling bsub for job {0}".format(job.name))
         script_path = os.path.join(job.working_dir, "submit.sh")
         bsub_out = subprocess.check_output(("bsub < "+script_path,), stderr=subprocess.STDOUT, universal_newlines=True, shell=True)
         job_id = bsub_out.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        print("Job ID recorded as:", job_id)
+        B2INFO("Job ID recorded as:", job_id)
         result = LSF.Result(job, job_id)
         return result
 
@@ -626,7 +622,7 @@ class LSF(Backend):
         # Submit the jobs to LSF
         for job in jobs:
             results.append(self.submit(job))
-        print('Jobs submitted')
+        B2INFO('All Requested Jobs Submitted')
         return results
 
 

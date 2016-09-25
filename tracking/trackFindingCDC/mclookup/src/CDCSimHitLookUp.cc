@@ -57,7 +57,7 @@ void CDCSimHitLookUp::fillPrimarySimHits()
   }
 
   const CDCMCMap& mcMap = *m_ptrMCMap;
-
+  int nMissingPrimarySimHits = 0;
   for (const CDCMCMap::CDCSimHitByCDCHitRelation& relation : mcMap.getSimHitByHitRelations()) {
 
     const CDCHit* ptrHit = relation.get<CDCHit>();
@@ -69,12 +69,19 @@ void CDCSimHitLookUp::fillPrimarySimHits()
     }
 
     if (mcMap.isReassignedSecondary(ptrSimHit)) {
-      m_primarySimHits[ptrHit] = getClosestPrimarySimHit(ptrSimHit);
+      MayBePtr<const CDCSimHit> primarySimHit = getClosestPrimarySimHit(ptrSimHit);
+      if (not primarySimHit) {
+        ++nMissingPrimarySimHits;
+      }
+      m_primarySimHits[ptrHit] = primarySimHit;
     }
+  }
+  if (nMissingPrimarySimHits != 0) {
+    B2WARNING("NO primary hit found for " << nMissingPrimarySimHits << " reassigned secondaries");
   }
 }
 
-const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const
+MayBePtr<const CDCSimHit> CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSimHit) const
 {
   if (not ptrSimHit) {
     return nullptr;
@@ -121,28 +128,23 @@ const CDCSimHit* CDCSimHitLookUp::getClosestPrimarySimHit(const CDCSimHit* ptrSi
 
     // Now from the neighboring primary CDCSimHits pick to one with the smallest distance to the
     // secondary CDCSimHit.
-    auto itClosestPrimarySimHit =
-      std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
-                       primarySimHitsOnSameOrNeighborWire.end(),
-                       [&simHit](const CDCSimHit * primarySimHit,
+    auto compareDistanceBetweenSimHits =
+      [&simHit](const CDCSimHit * primarySimHit,
     const CDCSimHit * otherPrimarySimHit) -> bool {
+      Vector3D primaryHitPos(primarySimHit->getPosTrack());
+      Vector3D otherPrimaryHitPos(otherPrimarySimHit->getPosTrack());
+      Vector3D secondaryHitPos(simHit.getPosTrack());
+      return primaryHitPos.distance(secondaryHitPos) < otherPrimaryHitPos.distance(secondaryHitPos);
+    };
 
-      Vector3D primaryHitPos{primarySimHit->getPosTrack()};
-      Vector3D otherPrimaryHitPos{otherPrimarySimHit->getPosTrack()};
-
-      Vector3D secondaryHitPos{simHit.getPosTrack()};
-
-      return primaryHitPos.distance(secondaryHitPos) <
-             otherPrimaryHitPos.distance(secondaryHitPos);
-
-    });
+    auto itClosestPrimarySimHit = std::min_element(primarySimHitsOnSameOrNeighborWire.begin(),
+                                                   primarySimHitsOnSameOrNeighborWire.end(),
+                                                   compareDistanceBetweenSimHits);
 
     if (itClosestPrimarySimHit != primarySimHitsOnSameOrNeighborWire.end()) {
       // Found primary simulated hit for secondary hit.
       return *itClosestPrimarySimHit;
-
     } else {
-      B2WARNING("NO primary hit for reassigned secondary");
       return nullptr;
     }
   }

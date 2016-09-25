@@ -8,12 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/mva/MVAExpert.h>
-#include <framework/utilities/FileSystem.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <mva/interface/Interface.h>
 
-#include <boost/algorithm/string/predicate.hpp>
+#include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
+
+#include <boost/algorithm/string/predicate.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -31,6 +34,32 @@ void MVAExpert::initialize(std::vector<Named<Float_t*> > namedVariables)
   std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
 
   if (weightfile) {
+    if (weightfile->getElement<std::string>("method") == "FastBDT" and
+        weightfile->getElement<int>("FastBDT_version") == 1) {
+
+      int nExpectedVars = weightfile->getElement<int>("number_feature_variables");
+      int nActualVars = m_namedVariables.size();
+
+      if (nExpectedVars != nActualVars) {
+        B2ERROR("Variable number mismatch for FastBDT. " <<
+                "Expected '" << nExpectedVars << "' " <<
+                "but received '" << nActualVars << "'");
+      }
+
+      for (int iVar = 0; iVar < nActualVars; ++iVar) {
+        std::string variableElementName = "variable" + std::to_string(iVar);
+        std::string expectedName = weightfile->getElement<std::string>(variableElementName);
+        std::string actualName = m_namedVariables[iVar].getName();
+        if (expectedName != actualName) {
+          B2ERROR("Variable name " << iVar << " mismatch for FastBDT. " <<
+                  "Expected '" << expectedName << "' " <<
+                  "but received '" << actualName << "'");
+        }
+      }
+    } else {
+      B2WARNING("Unpacked new kind of classifier. Consider to extend the feature variable check.");
+    }
+
     std::map<std::string, MVA::AbstractInterface*> supportedInterfaces =
       MVA::AbstractInterface::getSupportedInterfaces();
     MVA::GeneralOptions generalOptions;
@@ -40,8 +69,9 @@ void MVAExpert::initialize(std::vector<Named<Float_t*> > namedVariables)
 
     std::vector<float> dummy;
     dummy.resize(m_namedVariables.size(), 0);
-    m_dataset =
-      std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, std::move(dummy), 0));
+    m_dataset = makeUnique<MVA::SingleDataset>(generalOptions, std::move(dummy), 0);
+  } else {
+    B2ERROR("Could not find weight file for identifier " << m_identifier);
   }
 }
 
@@ -50,20 +80,19 @@ std::unique_ptr<MVA::Weightfile> MVAExpert::getWeightFile()
   if (not m_weightfileRepresentation and not(boost::ends_with(m_identifier, ".root") or
                                              boost::ends_with(m_identifier, ".xml"))) {
     using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
-    m_weightfileRepresentation
-      = std::unique_ptr<DBWeightFileRepresentation>(new DBWeightFileRepresentation(m_identifier));
+    m_weightfileRepresentation = makeUnique<DBWeightFileRepresentation>(m_identifier);
   }
 
   if (m_weightfileRepresentation) {
     if (m_weightfileRepresentation->hasChanged()) {
       std::stringstream ss((*m_weightfileRepresentation)->m_data);
-      return std::unique_ptr<MVA::Weightfile>(new MVA::Weightfile(MVA::Weightfile::loadFromStream(ss)));
+      return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromStream(ss));
     } else {
       return nullptr;
     }
   } else {
     std::string weightFilePath = FileSystem::findFile(m_identifier);
-    return std::unique_ptr<MVA::Weightfile>(new MVA::Weightfile(MVA::Weightfile::loadFromFile(weightFilePath)));
+    return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromFile(weightFilePath));
   }
 }
 

@@ -27,6 +27,7 @@ void SegmentOrienter::exposeParameters(ModuleParamList* moduleParamList, const s
                                 "Valid options are '' (default of the finder), "
                                 "'none' (one orientation, algorithm dependent), "
                                 "'symmetric', "
+                                "'curling', "
                                 "'outwards', "
                                 "'downwards'.",
                                 std::string(m_param_segmentOrientationString));

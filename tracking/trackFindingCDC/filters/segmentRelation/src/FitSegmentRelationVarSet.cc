@@ -35,6 +35,15 @@ bool FitSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* p
 
   CDCTrajectory2D commonTrajectory2D = riemannFitter.fit(*fromSegment, *toSegment);
 
-  var<named("chi2_common")>() = commonTrajectory2D.getChi2();
+  finitevar<named("is_fitted")>() = commonTrajectory2D.isFitted();
+  finitevar<named("curv")>() = commonTrajectory2D.getCurvature();
+
+  using namespace NPerigeeParameterIndices;
+  finitevar<named("curv_var")>() = commonTrajectory2D.getLocalVariance(c_Curv);
+
+  finitevar<named("chi2")>() = std::fabs(commonTrajectory2D.getChi2());
+  finitevar<named("chi2_per_ndf")>() = std::fabs(commonTrajectory2D.getChi2() / commonTrajectory2D.getNDF());
+  finitevar<named("ndf")>() = commonTrajectory2D.getNDF();
+  finitevar<named("p_value")>() =  commonTrajectory2D.getPValue();
   return true;
 }

@@ -346,26 +346,29 @@ void CDCRecoSegment2D::reverse()
   std::reverse(begin(), end());
 }
 
-void CDCRecoSegment2D::unsetAndForwardMaskedFlag() const
+void CDCRecoSegment2D::unsetAndForwardMaskedFlag(bool toHits) const
 {
   getAutomatonCell().unsetMaskedFlag();
+  if (not toHits) return;
   for (const CDCRecoHit2D& recoHit2D : *this) {
     const CDCWireHit& wireHit = recoHit2D.getWireHit();
     wireHit.getAutomatonCell().unsetMaskedFlag();
   }
 }
 
-void CDCRecoSegment2D::setAndForwardMaskedFlag() const
+void CDCRecoSegment2D::setAndForwardMaskedFlag(bool toHits) const
 {
   getAutomatonCell().setMaskedFlag();
+  if (not toHits) return;
   for (const CDCRecoHit2D& recoHit2D : *this) {
     const CDCWireHit& wireHit = recoHit2D.getWireHit();
     wireHit.getAutomatonCell().setMaskedFlag();
   }
 }
 
-void CDCRecoSegment2D::receiveMaskedFlag() const
+void CDCRecoSegment2D::receiveMaskedFlag(bool fromHits) const
 {
+  if (not fromHits) return;
   for (const CDCRecoHit2D& recoHit2D : *this) {
     const CDCWireHit& wireHit = recoHit2D.getWireHit();
     if (wireHit.getAutomatonCell().hasMaskedFlag()) {

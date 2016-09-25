@@ -205,23 +205,26 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getFromSegment()->unsetAndForwardMaskedFlag();
-        getToSegment()->unsetAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->unsetAndForwardMaskedFlag(toHits);
+        getToSegment()->unsetAndForwardMaskedFlag(toHits);
       }
 
       /// Sets the masked flag of the segment triple's automaton cell and of the three contained segments.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getFromSegment()->setAndForwardMaskedFlag();
-        getToSegment()->setAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->setAndForwardMaskedFlag(toHits);
+        getToSegment()->setAndForwardMaskedFlag(toHits);
       }
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getFromSegment()->receiveMaskedFlag();
-        getToSegment()->receiveMaskedFlag();
+        const bool fromHits = true;
+        getFromSegment()->receiveMaskedFlag(fromHits);
+        getToSegment()->receiveMaskedFlag(fromHits);
 
         if (getFromSegment()->getAutomatonCell().hasMaskedFlag() or
             getToSegment()->getAutomatonCell().hasMaskedFlag()) {

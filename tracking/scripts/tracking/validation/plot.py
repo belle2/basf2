@@ -427,6 +427,7 @@ class ValidationPlot(object):
         x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
+                                                             stackbys=stackby,
                                                              bins=x_bins,
                                                              lower_bound=x_lower_bound,
                                                              upper_bound=x_upper_bound,
@@ -435,6 +436,7 @@ class ValidationPlot(object):
                                                              allow_discrete=x_allow_discrete)
 
         y_bin_edges, y_bin_labels = self.determine_bin_edges(ys,
+                                                             stackbys=stackby,
                                                              bins=y_bins,
                                                              lower_bound=y_lower_bound,
                                                              upper_bound=y_upper_bound,
@@ -444,6 +446,9 @@ class ValidationPlot(object):
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
+        self.lower_bound = (x_bin_edges[0], y_bin_edges[0])
+        self.upper_bound = (x_bin_edges[-1], y_bin_edges[-1])
+
         histogram = ROOT.TH2D(name,
                               '',
                               n_x_bins,
@@ -870,6 +875,7 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges, bin_labels = self.determine_bin_edges(xs,
+                                                         stackbys=stackby,
                                                          bins=bins,
                                                          lower_bound=lower_bound,
                                                          upper_bound=upper_bound,
@@ -878,6 +884,8 @@ class ValidationPlot(object):
                                                          allow_discrete=allow_discrete)
 
         n_bins = len(bin_edges) - 1
+        self.lower_bound = bin_edges[0]
+        self.upper_bound = bin_edges[-1]
         histogram = th1_factory(name, '', n_bins, bin_edges)
 
         if bin_labels:
@@ -1519,6 +1527,7 @@ class ValidationPlot(object):
 
     def determine_bin_edges(self,
                             xs,
+                            stackbys=None,
                             bins=None,
                             lower_bound=None,
                             upper_bound=None,
@@ -1531,6 +1540,8 @@ class ValidationPlot(object):
         ----------
         xs : numpy.ndarray (1d)
             Data point for which a binning should be found.
+        stackbys : numpy.ndarray (1d)
+            Categories of the data points to be distinguishable
         bins : list(float) or int or None, optional
             Preset bin edges or preset number of desired bins.
             The default, None, means the bound should be extracted from data.
@@ -1634,6 +1645,7 @@ class ValidationPlot(object):
 
         else:
             bin_range = self.determine_bin_range(xs,
+                                                 stackbys=stackbys,
                                                  n_bins=n_bins,
                                                  lower_bound=lower_bound,
                                                  upper_bound=upper_bound,
@@ -1666,6 +1678,7 @@ class ValidationPlot(object):
 
     def determine_bin_range(self,
                             xs,
+                            stackbys=None,
                             n_bins=None,
                             lower_bound=None,
                             upper_bound=None,
@@ -1692,6 +1705,8 @@ class ValidationPlot(object):
         ----------
         xs : numpy.ndarray (1d)
             Data point for which a binning should be found.
+        stackbys : numpy.ndarray (1d)
+            Categories of the data points to be distinguishable
         n_bins : int or None, optional
             Preset number of desired bins. The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
@@ -1717,22 +1732,39 @@ class ValidationPlot(object):
             A triple of found number of bins, lower bound and upper bound of the binning range.
         """
 
-        finite_xs_indices = np.isfinite(xs)
-        if np.any(finite_xs_indices):
-            finite_xs = xs[finite_xs_indices]
-        else:
-            finite_xs = xs
+        if stackbys is not None:
+            unique_stackbys = np.unique(stackbys)
+            stack_ranges = []
+            for value in unique_stackbys:
+                if np.isnan(value):
+                    indices_for_value = np.isnan(stackbys)
+                else:
+                    indices_for_value = stackbys == value
 
-        lower_bound, upper_bound = self.determine_range(finite_xs,
-                                                        lower_bound=lower_bound,
-                                                        upper_bound=upper_bound,
-                                                        outlier_z_score=outlier_z_score,
-                                                        include_exceptionals=include_exceptionals)
+                stack_lower_bound, stack_upper_bound = \
+                    self.determine_range(xs[indices_for_value],
+                                         lower_bound=lower_bound,
+                                         upper_bound=upper_bound,
+                                         outlier_z_score=outlier_z_score,
+                                         include_exceptionals=include_exceptionals)
+
+                stack_ranges.append([stack_lower_bound, stack_upper_bound])
+
+            print(stack_ranges)
+            lower_bound = np.nanmin([lwb for lwb, upb in stack_ranges])
+            upper_bound = np.nanmax([upb for lwb, upb in stack_ranges])
+
+        else:
+            lower_bound, upper_bound = self.determine_range(xs,
+                                                            lower_bound=lower_bound,
+                                                            upper_bound=upper_bound,
+                                                            outlier_z_score=outlier_z_score,
+                                                            include_exceptionals=include_exceptionals)
 
         if n_bins is None:
             # Assume number of bins according to the rice rule.
             # The number of data points should not include outliers.
-            n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
+            n_data = np.sum((lower_bound <= xs) & (xs <= upper_bound))
             rice_n_bins = int(statistics.rice_n_bin(n_data))
             n_bins = rice_n_bins
 

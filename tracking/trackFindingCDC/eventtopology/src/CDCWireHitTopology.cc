@@ -9,8 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-#include <cdc/translators/SimpleTDCCountTranslator.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/RelationsObject.h>
@@ -42,7 +41,7 @@ void CDCWireHitTopology::initialize()
   }
 }
 
-void CDCWireHitTopology::fill(std::shared_ptr<VectorRange<CDCWireHit> > wireHits)
+void CDCWireHitTopology::fill(std::shared_ptr<ConstVectorRange<CDCWireHit> > wireHits)
 {
   B2ASSERT("Nullptr served to CDCWireHitTopology::fill",
            wireHits);
@@ -60,9 +59,7 @@ const CDCWireHit* CDCWireHitTopology::getWireHit(const CDCHit* ptrHit) const
   const CDCHit& hit = *ptrHit;
 
   ConstVectorRange<CDCWireHit> wireHitRange =
-    std::equal_range(getWireHits().begin(),
-                     getWireHits().end(),
-                     hit);
+    std::equal_range(getWireHits().begin(), getWireHits().end(), hit);
 
   if (wireHitRange.empty()) {
     B2WARNING("No CDCWireHit for the CDCHit in the CDCWireHitTopology.");

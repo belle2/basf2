@@ -95,15 +95,13 @@ namespace Belle2 {
 
     public:
       /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
-      explicit CDCSimpleSimulation()
-        : m_wireHitTopology(nullptr)
-      {}
+      CDCSimpleSimulation() = default;
 
-      /// Set the wire hit topology that should receive the wire hit objects.
-      void setWireHitTopology(CDCWireHitTopology* wireHitTopology)
-      {
-        m_wireHitTopology = wireHitTopology;
-      }
+      /// Also publish the generated wire hits to the given wire hit topology.
+      void fillWireHitTopology(CDCWireHitTopology* wireHitTopology) const;
+
+      /// Getter for the wire hits created in the simulation
+      ConstVectorRange<CDCWireHit> getWireHits() const;
 
     public:
       /**
@@ -124,12 +122,12 @@ namespace Belle2 {
 
       /// Fills the CDCWireHitTopology with a hard coded event from the real simulation.
       std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      loadPreparedEvent() const;
+      loadPreparedEvent();
 
     private:
       /// Creates CDCWireHits in the CDCWireHitTopology and uses them to construct the true CDCTracks.
       std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const;
+      constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits);
 
       /// Generate hits for the given helix in starting from the two dimensional arc length.
       std::vector<SimpleSimHit>
@@ -173,8 +171,8 @@ namespace Belle2 {
       { m_maxNHitOnWire = maxNHitOnWire; }
 
     private:
-      /// Reference to the wireHitTopology to be filled with hits
-      CDCWireHitTopology* m_wireHitTopology;
+      /// Space for the memory of the generated wire hits
+      std::shared_ptr<const std::vector<CDCWireHit> > m_sharedWireHits;
 
       /// Default drift length variance
       const double s_nominalDriftLengthVariance = 0.000169;

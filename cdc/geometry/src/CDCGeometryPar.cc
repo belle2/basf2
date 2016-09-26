@@ -1191,7 +1191,7 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
   if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
   if (m_sigmaParamMode == 1) B2FATAL("CDCGeometryPar: sigma-parameterization mode=1 not ready yet");
 
-  if (np <= 0 || np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
+  if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
   const double epsi = 0.1;
 

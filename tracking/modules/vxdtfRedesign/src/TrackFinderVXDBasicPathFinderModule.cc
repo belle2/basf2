@@ -46,6 +46,9 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "name for StoreArray< SpacePointTrackCand> to be filled.",
            string(""));
 
+  addParam("SpacePoints", m_spacePointsName,
+           "SpacePoints collection name", string(""));
+
   addParam("sectorMapName",
            m_PARAMsecMapName,
            "the name of the SectorMap used for this instance.", string("testMap"));
@@ -76,6 +79,8 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
 
 void TrackFinderVXDBasicPathFinderModule::initialize()
 {
+  m_spacePoints.isRequired(m_spacePointsName);
+
   m_sectorMap.isRequired();
   bool wasFound = false;
   for (auto& setup : m_sectorMap->getAllSetups()) {
@@ -92,6 +97,10 @@ void TrackFinderVXDBasicPathFinderModule::initialize()
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);
+
+  //Relations SpacePoints and SpacePointTCs:
+  m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
+  m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
 }
 
 
@@ -165,10 +174,9 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
 
   /// convert the raw paths to fullgrown SpacePoinTrackCands
-  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths, m_PARAMremoveVirtualIP);
+  unsigned int nCreated = m_sptcCreator.createSPTCs(m_TCs, collectedSpacePointPaths);
   B2DEBUG(10, " TrackFinderVXDCellOMat-event" << m_eventCounter <<
           ": " << nCreated <<
           " TCs created and stored into StoreArray!");
 
 }
-

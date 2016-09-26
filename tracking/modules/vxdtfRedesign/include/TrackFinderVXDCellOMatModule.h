@@ -33,6 +33,7 @@
 #include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
 
 
 namespace Belle2 {
@@ -87,6 +88,11 @@ namespace Belle2 {
 /// module parameters
 
 
+    std::string m_spacePointsName; /**< SpacePoint collection name */
+
+    StoreArray<SpacePoint>
+    m_spacePoints; /**< the storeArray for SpacePoint as member, is faster than recreating link for each event */
+
     /** name for StoreArray< SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;
 
@@ -107,9 +113,6 @@ namespace Belle2 {
      *
      * if true, only one path per possibility is collected, if false subsets are collected too. */
     bool m_PARAMstrictSeeding;
-
-    /** If true, the virtual interaction Point will be removed from the track candidates. */
-    bool m_PARAMremoveVirtualIP = false;
 
 /// member variables
 

@@ -33,6 +33,8 @@
 #include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
+#include <tracking/spacePointCreation/SpacePoint.h>
+
 
 
 namespace Belle2 {
@@ -86,6 +88,10 @@ namespace Belle2 {
 
 /// module parameters
 
+    std::string m_spacePointsName; /**< SpacePoint collection name */
+
+    StoreArray<SpacePoint>
+    m_spacePoints; /**< the storeArray for svdClusters as member, is faster than recreating link for each event */
 
     /** name for StoreArray< SpacePointTrackCand> to be filled */
     std::string m_PARAMSpacePointTrackCandArrayName;

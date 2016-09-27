@@ -17,7 +17,7 @@
 #include <tracking/trackFindingVXD/trackletFilters/ZiggZaggRZ.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 
-#include <tracking/trackFindingVXD/filterTools/Shortcuts.h>
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
 
 #include <vxd/geometry/SensorInfoBase.h>
 

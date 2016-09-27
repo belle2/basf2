@@ -1,0 +1,7 @@
+Import('env')
+
+env['LIBS'] = [
+    '$ROOT_LIBS',
+    'tracking_dataobjects'
+    ]
+Return('env')

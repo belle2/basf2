@@ -25,7 +25,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 
@@ -152,8 +152,8 @@ namespace Belle2 {
           or m_PARAMVirtualIPErrors.size() != 3)
         B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!");
 
-        m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
-                                            m_PARAMVirtualIPCoordinates.at(2));
+      m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
+                                          m_PARAMVirtualIPCoordinates.at(2));
       m_virtualIPErrors = B2Vector3D(m_PARAMVirtualIPErrors.at(0), m_PARAMVirtualIPErrors.at(1), m_PARAMVirtualIPErrors.at(2));
     }
 

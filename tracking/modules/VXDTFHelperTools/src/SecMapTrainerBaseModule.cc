@@ -8,10 +8,10 @@
 * This software is provided "as is" without any warranty.                *
 **************************************************************************/
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 
 #include <tracking/modules/VXDTFHelperTools/SecMapTrainerBaseModule.h>
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include "framework/datastore/StoreObjPtr.h"
 
 #include <TRandom.h>
@@ -60,8 +60,8 @@ void SecMapTrainerBaseModule::initialize()
   if (m_PARAMallowTraining == false)
     B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...");
 
-    // small lambda for getting random numbers:
-    auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
+  // small lambda for getting random numbers:
+  auto rngAppendix = []() -> int { return gRandom->Integer(std::numeric_limits<int>::max()); };
   // What does it mean "Appendix"? E.P.
 
 
@@ -69,7 +69,7 @@ void SecMapTrainerBaseModule::initialize()
   sectorMap.isRequired();
   for (auto setup : sectorMap->getAllSetups()) {
     auto config = setup.second->getConfig();
-    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(config, rngAppendix());
+    SecMapTrainer<SelectionVariableFactory<SecMapTrainerHit> > newMap(sectorMap, setup.first, rngAppendix());
     m_secMapTrainers.push_back(std::move(newMap));
   }
 

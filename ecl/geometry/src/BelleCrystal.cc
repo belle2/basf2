@@ -76,6 +76,22 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
     return true;
   };
 
+  auto isClockwise = [](std::vector<Point_t>::const_iterator begin, std::vector<Point_t>::const_iterator end) -> bool {
+    bool sign = false;
+    int n = end - begin;
+    double sum = 0;
+    for (int i0 = 0; i0 < n; i0++)
+    {
+      int i1 = (i0 + 1) % n, i2 = (i0 + 2) % n;
+      const Point_t& r2 = *(begin + i2), &r1 = *(begin + i1), &r0 = *(begin + i0);
+      double dx1 = r2.x - r1.x, dy1 = r2.y - r1.y;
+      double dx2 = r0.x - r1.x, dy2 = r0.y - r1.y;
+      double x = dx1 * dy2 - dy1 * dx2;
+      sum += x;
+    }
+    return sum > 0;
+  };
+
   if (!isConvex(fx.begin(), fx.begin() + nsides)) {
     std::ostringstream message;
     message << "At -z polygon is not convex: " << GetName();
@@ -84,6 +100,17 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
   if (!isConvex(fx.begin() + nsides, fx.end())) {
     std::ostringstream message;
     message << "At +z polygon is not convex: " << GetName();
+    G4Exception("BelleCrystal::BelleCrystal()", "BelleCrystal", FatalException, message);
+  }
+
+  if (!isClockwise(fx.begin(), fx.begin() + nsides)) {
+    std::ostringstream message;
+    message << "At -z polygon is not in anti-clockwise order: " << GetName();
+    G4Exception("BelleCrystal::BelleCrystal()", "BelleCrystal", FatalException, message);
+  }
+  if (!isClockwise(fx.begin() + nsides, fx.end())) {
+    std::ostringstream message;
+    message << "At +z polygon is not in anti-clockwise order: " << GetName();
     G4Exception("BelleCrystal::BelleCrystal()", "BelleCrystal", FatalException, message);
   }
 

@@ -11,7 +11,7 @@
 
 #include "G4VGraphicsScene.hh"
 
-#include "G4Polycone.hh"
+#include "G4GenericPolycone.hh"
 
 #include <map>
 
@@ -43,23 +43,18 @@ inline double dotxy(const G4ThreeVector& p, const G4ThreeVector& n)
 
 ostream& operator <<(ostream& o, const zr_t& v)
 {
-  return o << "( " << v.z << "  " << v.r << " )";
+  return o << "{" << v.z << ",  " << v.r << "}";
 }
 
 BelleLathe::BelleLathe(const G4String& pName, double phi0, double dphi, const vector<zr_t>& c)
   : G4CSGSolid(pName)
 {
-  fshape = NULL;
   Init(c, phi0, dphi);
 }
 
 BelleLathe::BelleLathe(const G4String& pName, double phi0, double dphi, int n, double* z, double* rin, double* rout)
   : G4CSGSolid(pName)
 {
-  fshape = NULL;
-  //  if(pName == "sv_inletsolid")
-  fshape = new G4Polycone(pName, phi0, dphi, n, z, rin, rout);
-
   vector<zr_t> contour;
   for (int i = 0; i < n; i++) {
     zr_t t = {z[i], rin[i]};
@@ -112,13 +107,25 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
     }
   } while (0);
 
+  auto isClockwise = [&contour]() -> bool {
+    double sum = 0;
+    zr_t p0 = contour[0];
+    for (int i = 1, imax = contour.size(); i < imax; i++)
+    {
+      zr_t p1 = contour[i]; sum += (p1.z - p0.z) * (p1.r + p0.r);
+      p0 = p1;
+    }
+    zr_t p1 = contour[0]; sum += (p1.z - p0.z) * (p1.r + p0.r);
+    return sum > 0;
+  };
 
+  if (isClockwise()) {
+    // std::ostringstream message;
+    // message << "Polygon is not in anti-clockwise order: " << GetName() << "\nReversing order...";
+    // G4Exception("BelleLathe::BelleLathe()", "BelleLathe", JustWarning, message);
+    std::reverse(contour.begin(), contour.end());
+  }
   fcontour = contour;
-  // cout << "BelleLathe::BelleLathe: " << fcontour.size() << endl;
-  // for (int i = 0, imax = fcontour.size(); i < imax; i++) {
-  //   cout << fcontour[i] << " ";
-  // }
-  // cout << endl;
 
   auto convexside = [this](cachezr_t& s, double eps) -> void {
     s.isconvex = false;
@@ -168,17 +175,19 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   fphi = phi0;
   fdphi = dphi;
 
-  fc0 = cos(phi0);
-  fs0 = sin(phi0);
-  fc1 = cos(phi0 + dphi);
-  fs1 = sin(phi0 + dphi);
+  fdphi = std::min(2 * M_PI, fdphi);
+  fdphi = std::max(0.0, fdphi);
+  fc0 = cos(fphi);
+  fs0 = sin(fphi);
+  fc1 = cos(fphi + fdphi);
+  fs1 = sin(fphi + fdphi);
 
   fn0x =  fs0;
   fn0y = -fc0;
   fn1x = -fs1;
   fn1y =  fc1;
-  fgtpi = dphi > M_PI;
-  ftwopi = abs(dphi - 2 * M_PI) < kCarTolerance;
+  fgtpi = fdphi > M_PI;
+  ftwopi = abs(fdphi - 2 * M_PI) < kCarTolerance;
 
   //  cout << ftwopi << " " << fgtpi << " " << fn0y << " " << fn0x << " " << fn1y << " " << fn1x << endl;
 
@@ -203,6 +212,23 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   findx.push_back(fseg.size());
 
   getvolarea();
+
+#if COMPARE>0
+  auto getpolycone = [](const G4String & pName, double phi0, double dphi, const vector<zr_t>& c) -> G4GenericPolycone* {
+    vector<double> r, z;
+    r.reserve(c.size());
+    z.reserve(c.size());
+    for (int i = 0, imax = c.size(); i < imax; i++)
+    {
+      r.push_back(c[i].r);
+      z.push_back(c[i].z);
+    }
+    return new G4GenericPolycone(pName, phi0, dphi, c.size(), r.data(), z.data());
+  };
+  fshape = getpolycone(GetName(), phi0, dphi, fcontour);
+#else
+  fshape = NULL;
+#endif
 }
 
 // Nominal constructor for BelleLathe whose parameters are to be set by
@@ -1325,14 +1351,14 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
   auto hitside = [this, &p, &n, nn, np, pp](double t, const cachezr_t& s) -> bool {
     double z = p.z() + n.z() * t;
     //    cout<<t<<" "<<x<<" "<<y<<" "<<z<<endl;
-    bool k = s.zmin < z && z <= s.zmax;
+    double dot = n.z() * s.dr * sqrt(pp + ((np + np) + nn * t) * t) - s.dz * (np + nn * t);
+    bool k = s.zmin < z && z <= s.zmax && dot > 0;
     if (k && !ftwopi)
     {
       double x = p.x() + n.x() * t;
       double y = p.y() + n.y() * t;
-      double dot = n.z() * s.dr * sqrt(pp + ((np + np) + nn * t) * t) - s.dz * (np + nn * t);
 
-      k = k && insector(x, y) && dot > 0;
+      k = k && insector(x, y);
     }
     return k;
   };
@@ -1484,19 +1510,20 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
   //  cout<<"tmin "<<tmin<<endl;
 #if COMPARE==2
   do {
+    G4ThreeVector p0(1210.555046, -292.9578965, -36.71671492);
+    if ((p - p0).mag() > 1e-2)continue;
     bool isvalid;
     G4ThreeVector norm;
-    double dd = fshape->Inside(p) == kOutside ? 0.0 : fshape->DistanceToOut(p, n, calcNorm, &isvalid, &norm);
-    //    double dd = fshape->DistanceToOut(p,n,calcNorm,&isvalid,&norm);
-    if (abs(tmin - dd) > 1e-10 || *IsValid != isvalid) {
-      int oldprec = cout.precision(16);
-      cout << GetName() << " DistanceToOut(p,v) p=" << p << " n=" << n << " calcNorm=" << calcNorm << " myInside=" << Inside(
-             p) << " tmin=" << tmin << " dd=" << dd << " d=" << tmin - dd << " iseg=" << iseg << " ";
-      if (calcNorm) cout << "myIsValid = " << *IsValid << " tIsValid=" << isvalid << " myn=" << (*_n) << " tn=" << (norm);
-      cout << endl;
-      cout.precision(oldprec);
-      //      _exit(0);
-    }
+    double dd = fshape->DistanceToOut(p, n, calcNorm, &isvalid, &norm);
+    //    if (abs(tmin - dd) > 1e-10 || (calcNorm && *IsValid != isvalid)) {
+    int oldprec = cout.precision(16);
+    cout << GetName() << " DistanceToOut(p,v) p=" << p << " n=" << n << " calcNorm=" << calcNorm << " myInside=" << Inside(
+           p) << " tmin=" << tmin << " dd=" << dd << " d=" << tmin - dd << " iseg=" << iseg << " ";
+    if (calcNorm) cout << "myIsValid = " << *IsValid << " tIsValid=" << isvalid << " myn=" << (*_n) << " tn=" << (norm);
+    cout << endl;
+    cout.precision(oldprec);
+    //      _exit(0);
+    //    }
   } while (0);
 #endif
   return tmin;
@@ -1628,9 +1655,16 @@ std::ostream& BelleLathe::StreamInfo(std::ostream& os) const
      << "    *** Dump for solid - " << GetName() << " ***\n"
      << "    ===================================================\n"
      << " Solid type: BelleLathe\n"
-     << " Parameters: \n"
-     << "    crystal side plane equations:\n"
-     << "-----------------------------------------------------------\n";
+     << "    Contour: " << fcontour.size() << " sides, {z, r} points \n";
+  for (int i = 0, imax = fcontour.size(); i < imax; i++) {
+    os << fcontour[i] << ", ";
+  }
+  os << "\n";
+  os << "phi0 = " << fphi << ", dphi = " << fdphi << ", Full Circle = " << (ftwopi ? "yes" : "no") << "\n";
+  double xmin = fzmin - 0.05 * (fzmax - fzmin), xmax = fzmax + 0.05 * (fzmax - fzmin);
+  double ymin = frmin - 0.05 * (frmax - frmin), ymax = frmax + 0.05 * (frmax - frmin);
+  os << " BB: " << xmin << ", " << xmax << ", " << ymin << ", " << ymax << endl;
+  os << "-----------------------------------------------------------\n";
   os.precision(oldprc);
 
   return os;

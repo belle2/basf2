@@ -15,10 +15,11 @@ struct zr_t {
 struct cachezr_t {
   double z, r;
   double dz, dr;
-  double s2, is2;
+  double s2, is2, is;
   double zmin, zmax;
   double r2min, r2max;
   double ta;
+  bool isconvex;
 };
 
 struct vector_t {double x, y, z;};

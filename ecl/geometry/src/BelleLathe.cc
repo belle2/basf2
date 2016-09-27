@@ -120,6 +120,22 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
   // }
   // cout << endl;
 
+  auto convexside = [this](cachezr_t& s, double eps) -> void {
+    s.isconvex = false;
+    if (s.dz > 0) return;
+    vector<zr_t>::const_iterator it = fcontour.begin();
+    double a = s.dz * s.is, b = s.dr * s.is, c = b * s.z - a * s.r;
+    bool dp = false, dm = false;
+    s.isconvex = true;
+    do {
+      const zr_t& p = *it;
+      double d = a * p.r - b * p.z + c; // distance to line
+      dm = dm || (d < -eps);
+      dp = dp || (d >  eps);
+      if (dm && dp) {s.isconvex = false; return;}
+    } while (++it != fcontour.end());
+  };
+
   frmin =  kInfinity;
   frmax = -kInfinity;
   fzmin =  kInfinity;
@@ -134,11 +150,13 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
     t.dr = s1.r - s0.r;
     t.s2 = t.dz * t.dz + t.dr * t.dr;
     t.is2 = 1 / t.s2;
+    t.is = sqrt(t.is2);
     t.zmin = min(s0.z, s1.z);
     t.zmax = max(s0.z, s1.z);
     t.r2min = pow(min(s0.r, s1.r), 2);
     t.r2max = pow(max(s0.r, s1.r), 2);
     t.ta = (s1.r - s0.r) / (s1.z - s0.z);
+    convexside(t, kCarTolerance);
     fcache.push_back(t);
 
     frmax = max(frmax, s0.r);

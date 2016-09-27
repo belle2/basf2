@@ -319,7 +319,8 @@ void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume&
     G4Vector3D n2(0, 1, 0); G4Point3D r2(0, 1251.6 + 0.2, 0), r3(0, 1251.6 + 310, 0);
 
     for (unsigned int i = 0; i < sizeof(zs) / sizeof(zwall_t); i++) {
-      double th = -atan(404 / (zs[i].zlow - zs[i].zup));
+      //  double th = -atan(404 / (zs[i].zlow - zs[i].zup));
+      double th = atan2(404, -(zs[i].zlow - zs[i].zup));
       //    std::cout<<i<<" "<<th*180/M_PI<<std::endl;
 
       G4Vector3D nf(0, -cos(th), sin(th)); G4Point3D rf(0, 1251.6, zs[i].zlow);
@@ -354,12 +355,12 @@ void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume&
       double dz = 0.25;
       thfin[0] = G4ThreeVector(t0.x(), t0.y(), -dz);
       thfin[1] = G4ThreeVector(t1.x(), t1.y(), -dz);
-      thfin[3] = G4ThreeVector(t2.x(), t2.y(), -dz);
       thfin[2] = G4ThreeVector(t3.x(), t3.y(), -dz);
+      thfin[3] = G4ThreeVector(t2.x(), t2.y(), -dz);
       thfin[4] = G4ThreeVector(t0.x(), t0.y(), +dz);
       thfin[5] = G4ThreeVector(t1.x(), t1.y(), +dz);
-      thfin[7] = G4ThreeVector(t2.x(), t2.y(), +dz);
       thfin[6] = G4ThreeVector(t3.x(), t3.y(), +dz);
+      thfin[7] = G4ThreeVector(t2.x(), t2.y(), +dz);
 
       G4VSolid* thfinsolid = new BelleCrystal("thfinsolid", 4, thfin);
       G4LogicalVolume* thfinlogical = new G4LogicalVolume(thfinsolid, Materials::get("A5052"), "thfinlogical", 0, 0, 0);

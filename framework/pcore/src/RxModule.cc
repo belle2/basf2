@@ -35,6 +35,11 @@ RxModule::RxModule(RingBuffer* rbuf) : Module(), m_streamer(0), m_nrecv(-1)
 
 RxModule::~RxModule() { }
 
+void RxModule::initStreamer()
+{
+  m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
+}
+
 void RxModule::readEvent()
 {
   char* evtbuf = new char[EvtMessage::c_MaxEventSize];
@@ -64,8 +69,7 @@ void RxModule::initialize()
 
   m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 
-  // Initialize DataStoreStreamer
-  m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
+  initStreamer();
 
   // Read the first event in RingBuffer and restore in DataStore.
   // This is necessary to create object tables before TTree initialization

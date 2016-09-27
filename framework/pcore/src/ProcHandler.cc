@@ -156,9 +156,13 @@ int ProcHandler::numEventProcesses()
   return s_nproc;
 }
 
-std::set<int> ProcHandler::processList()
+std::set<int> ProcHandler::globalProcessList()
 {
   return s_pidList;
+}
+std::set<int> ProcHandler::processList() const
+{
+  return m_processList;
 }
 
 int ProcHandler::EvtProcID() { return s_processID; }

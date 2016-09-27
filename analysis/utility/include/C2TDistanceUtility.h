@@ -22,7 +22,7 @@ namespace Belle2 {
     /**
      * Calculate the position on the track at the ECL cylindrical radius in the barrel region or at the cylindrical radius of the point in the endcap regions.
      */
-    TVector3 getECLTrackHitPosition(Helix helix, TVector3 v1);
+    TVector3 getECLTrackHitPosition(const Helix& helix, const TVector3& v1);
 
   }
 }

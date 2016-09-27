@@ -1119,6 +1119,32 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p) const
 // Calculate distance to shape from outside - return kInfinity if no intersection
 G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n) const
 {
+  auto getnormal = [this, &p, &n](int i, double t) ->G4ThreeVector{
+    const int imax = fcache.size();
+    G4ThreeVector o;
+    if (i < 0)
+    {
+    } else if (i < imax)
+    {
+      const cachezr_t& s = fcache[i];
+      if (s.dz == 0.0) {
+        o.setZ(copysign(1, s.dr));
+      } else {
+        double x = p.x() + n.x() * t;
+        double y = p.y() + n.y() * t;
+        double sth = s.dr * s.is, cth = -s.dz * s.is;
+        double ir = cth / sqrt(x * x + y * y);
+        o.set(x * ir, y * ir, sth);
+      }
+    } else if (i == imax)
+    {
+      o.setX(fn0x), o.setY(fn0y);
+    } else {
+      o.setX(fn1x), o.setY(fn1y);
+    }
+    return o;
+  };
+
   auto hitside = [this, &p, &n](double t, const cachezr_t& s) -> bool {
     double z = p.z() + n.z() * t;
     //    cout<<t<<" "<<x<<" "<<y<<" "<<z<<endl;
@@ -1169,34 +1195,11 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
     }
     return false;
   };
-  // auto hitphi0side = [this,&p,&n](double t) -> bool {
-  //   double x = p.x() + n.x()*t;
-  //   double y = p.y() + n.y()*t;
-  //   double prod = x*fn0y - y*fn0x;
-  //   if(prod<0){
-  //     double z = p.z() + n.z()*t;
-  //     zr_t r = {z, sqrt(x*x + y*y)};
-  //     return wn_poly(r)==2;
-  //   }
-  //   return false;
-  // };
-
-  // auto hitphi1side = [this,&p,&n](double t) -> bool {
-  //   double x = p.x() + n.x()*t;
-  //   double y = p.y() + n.y()*t;
-  //   double prod = x*fn1y - y*fn1x;
-  //   if(prod>0){
-  //     double z = p.z() + n.z()*t;
-  //     zr_t r = {z, sqrt(x*x + y*y)};
-  //     return wn_poly(r)==2;
-  //   }
-  //   return false;
-  // };
 
   double tmin = kInfinity;
   const int imax = fcache.size();
   int iseg = -1;
-  const double delta = 0.5 * kCarTolerance, delta2 = delta * delta;
+  const double delta = 0.5 * kCarTolerance;
   double inz = 1 / n.z();
   double nn = dotxy(n, n), np = dotxy(n, p), pp = dotxy(p, p);
   double pz = p.z(), pr = sqrt(pp);
@@ -1204,7 +1207,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
     const cachezr_t& s = fcache[i];
 
     double d = (pz - s.z) * s.dr - (pr - s.r) * s.dz;
-    bool surface = (d * d) * s.is2 < delta2;
+    bool surface = abs(d * s.is) < delta;
     if (s.dz == 0.0) { // z-plane
       if (!surface) {
         double t = (s.z - p.z()) * inz;
@@ -1227,10 +1230,13 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
         A = nzta * nzta - nn;
         B = np - nzta * R;
       }
-      double D = B * B + (pp - R2) * A;
+      double C = pp - R2;
+      double D = B * B + C * A;
       if (D > 0) {
-        double sD = sqrt(D), iA = 1 / A;
-        double t0 = (B + sD) * iA, t1 = (B - sD) * iA;
+        // double sD = sqrt(D), iA = 1 / A;
+        // double t0 = (B + sD) * iA, t1 = (B - sD) * iA;
+        double sD = sqrt(D), sum = B + copysign(sD, B);
+        double t0 = -C / sum, t1 = sum / A;
         if (surface) { // exclude solution on surface
           if (abs(t0) > abs(t1)) {
             if (t0 > 0 && t0 < tmin && hitside(t0, s)) { tmin = t0; iseg = i;}
@@ -1268,32 +1274,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
   }
 
   if (iseg >= 0) {
-    double ox, oy, oz;
-    if (iseg < imax) {
-      const cachezr_t& s = fcache[iseg];
-      if (s.dz == 0.0) {
-        ox = 0, oy = 0, oz = copysign(1, s.dr);
-      } else {
-        double x = p.x() + n.x() * tmin;
-        double y = p.y() + n.y() * tmin;
-        double ir = 1 / sqrt(x * x + y * y);
-        double sth = 0;
-        if (s.dr != 0.0) {
-          double cth = 1 / sqrt(1 + s.ta * s.ta);
-          sth = -s.ta * cth;
-          ir *= cth;
-          //    cout<<GetName()<<" "<<ox<<" "<<oy<<" "<<oz<<endl;
-        }
-        ox = x * ir, oy = y * ir, oz = sth;
-        if (s.dz > 0)
-          ox = -ox, oy = -oy, oz = -oz;
-      }
-    } else if (iseg == imax) {
-      ox = fn0x, oy = fn0y, oz = 0;
-    } else {
-      ox = fn1x, oy = fn1y, oz = 0;
-    }
-    if (ox * n.x() + oy * n.y() + oz * n.z() > 0) tmin = 0;
+    if (getnormal(iseg, tmin)*n > 0) tmin = 0;
   }
 
 #if COMPARE==1
@@ -1314,7 +1295,34 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& n,
                                    const G4bool calcNorm, G4bool* IsValid, G4ThreeVector* _n) const
 {
-  auto hitside = [this, &p, &n](double t, const cachezr_t& s) -> bool {
+  auto getnormal = [this, &p, &n](int i, double t)->G4ThreeVector{
+    const int imax = fcache.size();
+    G4ThreeVector o;
+    if (i < 0)
+    {
+    } else if (i < imax)
+    {
+      const cachezr_t& s = fcache[i];
+      if (s.dz == 0.0) {
+        o.setZ(copysign(1, s.dr));
+      } else {
+        double x = p.x() + n.x() * t;
+        double y = p.y() + n.y() * t;
+        double sth = s.dr * s.is, cth = -s.dz * s.is;
+        double ir = cth / sqrt(x * x + y * y);
+        o.set(x * ir, y * ir, sth);
+      }
+    } else if (i == imax)
+    {
+      o.setX(fn0x), o.setY(fn0y);
+    } else {
+      o.setX(fn1x), o.setY(fn1y);
+    }
+    return o;
+  };
+
+  double nn = dotxy(n, n), np = dotxy(n, p), pp = dotxy(p, p);
+  auto hitside = [this, &p, &n, nn, np, pp](double t, const cachezr_t& s) -> bool {
     double z = p.z() + n.z() * t;
     //    cout<<t<<" "<<x<<" "<<y<<" "<<z<<endl;
     bool k = s.zmin < z && z <= s.zmax;
@@ -1322,7 +1330,9 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     {
       double x = p.x() + n.x() * t;
       double y = p.y() + n.y() * t;
-      k = k && insector(x, y);
+      double dot = n.z() * s.dr * sqrt(pp + ((np + np) + nn * t) * t) - s.dz * (np + nn * t);
+
+      k = k && insector(x, y) && dot > 0;
     }
     return k;
   };
@@ -1331,7 +1341,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     double x = p.x() + n.x() * t;
     double y = p.y() + n.y() * t;
     double r2 = x * x + y * y;
-    bool k = s.r2min <= r2 && r2 < s.r2max;
+    bool k = s.dr * n.z() > 0 && s.r2min <= r2 && r2 < s.r2max;
     if (k && !ftwopi)
     {
       k = k && insector(x, y);
@@ -1364,46 +1374,23 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     }
     return false;
   };
-  // auto hitphi0side = [this,&p,&n](double t) -> bool {
-  //   double x = p.x() + n.x()*t;
-  //   double y = p.y() + n.y()*t;
-  //   double prod = x*fn0y - y*fn0x;
-  //   if(prod<0){
-  //     double z = p.z() + n.z()*t;
-  //     zr_t r = {z, sqrt(x*x + y*y)};
-  //     return wn_poly(r)==2;
-  //   }
-  //   return false;
-  // };
-
-  // auto hitphi1side = [this,&p,&n](double t) -> bool {
-  //   double x = p.x() + n.x()*t;
-  //   double y = p.y() + n.y()*t;
-  //   double prod = x*fn1y - y*fn1x;
-  //   if(prod>0){
-  //     double z = p.z() + n.z()*t;
-  //     zr_t r = {z, sqrt(x*x + y*y)};
-  //     return wn_poly(r)==2;
-  //   }
-  //   return false;
-  // };
 
   COUNTER(5);
   double tmin = kInfinity;
 
   const int imax = fcache.size();
-  int iseg = -1;
+  int iseg = -1, isurface = -1;
 
-  const double delta = 0.5 * kCarTolerance, delta2 = delta * delta;
+  const double delta = 0.5 * kCarTolerance;
   double inz = 1 / n.z();
-  double nn = dotxy(n, n), np = dotxy(n, p), pp = dotxy(p, p);
   double pz = p.z(), pr = sqrt(pp);
 
   for (int i = 0; i < imax; i++) {
     const cachezr_t& s = fcache[i];
 
     double d = (pz - s.z) * s.dr - (pr - s.r) * s.dz;
-    bool surface = (d * d) * s.is2 < delta2;
+    bool surface = abs(d * s.is) < delta;
+    if (surface) isurface = i;
     if (s.dz == 0.0) {
       if (!surface) {
         double t = (s.z - p.z()) * inz;
@@ -1427,10 +1414,12 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
         A = nzta * nzta - nn;
         B = np - nzta * R;
       }
-      double D = B * B + (pp - R2) * A;
+      double C = pp - R2;
+      double D = B * B + C * A;
       if (D > 0) {
-        double sD = sqrt(D), iA = 1 / A;
-        double t0 = (B + sD) * iA, t1 = (B - sD) * iA;
+        double sD = sqrt(D);
+        double sum = B + copysign(sD, B);
+        double t0 = -C / sum, t1 = sum / A;
         //    cout<<t0<<" "<<t1<<" "<<endl;
         if (surface) { //exclude solution on surface
           if (abs(t0) > abs(t1)) {
@@ -1454,7 +1443,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
       if (!surface) {
         double vn = fn0x * n.x() + fn0y * n.y();
         double t = -d / vn;
-        if (0 < t && t < tmin && hitphi0side(t)) {tmin = t; iseg = imax + 0;}
+        if (vn > 0 && 0 < t && t < tmin && hitphi0side(t)) {tmin = t; iseg = imax + 0;}
       }
     } while (0);
 
@@ -1464,47 +1453,32 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
       if (!surface) {
         double vn = fn1x * n.x() + fn1y * n.y();
         double t = -d / vn;
-        if (0 < t && t < tmin && hitphi1side(t)) {tmin = t; iseg = imax + 1;}
+        if (vn > 0 && 0 < t && t < tmin && hitphi1side(t)) {tmin = t; iseg = imax + 1;}
       }
     } while (0);
   }
 
-  double ox, oy, oz;
-  if (iseg < 0) { // no side intersection found, initial point is probably outside of the solid
-    tmin = 0;
-  } else { // something has found
-    if (iseg < imax) {
-      const cachezr_t& s = fcache[iseg];
-      if (s.dz == 0.0) {
-        ox = 0, oy = 0, oz = copysign(1, s.dr);
-      } else {
-        double x = p.x() + n.x() * tmin;
-        double y = p.y() + n.y() * tmin;
-        double ir = 1 / sqrt(x * x + y * y);
-        double sth = 0;
-        if (s.dr != 0.0) {
-          double cth = 1 / sqrt(1 + s.ta * s.ta);
-          sth = -s.ta * cth;
-          ir *= cth;
-          //    cout<<GetName()<<" "<<ox<<" "<<oy<<" "<<oz<<endl;
-        }
-        ox = x * ir, oy = y * ir, oz = sth;
-        if (s.dz > 0)
-          ox = -ox, oy = -oy, oz = -oz;
-      }
-    } else if (iseg == imax) {
-      ox = fn0x, oy = fn0y, oz = 0;
-    } else {
-      ox = fn1x, oy = fn1y, oz = 0;
-    }
-    if (ox * n.x() + oy * n.y() + oz * n.z() < 0) tmin = 0;
-  }
+  auto convex = [this, imax](int i) -> bool{
+    if (i < imax)
+      return fcache[i].isconvex;
+    else
+      return !fgtpi;
+  };
+
   if (calcNorm) {
-    if (tmin > 0) {
-      (*_n).set(ox, oy, oz);
-      *IsValid = true;
+    if (tmin > 0 && tmin < kInfinity) {
+      *_n = getnormal(iseg, tmin);
+      *IsValid = convex(iseg);
     } else {
-      *IsValid = false;
+      if (Inside(p) == kSurface) {
+        if (isurface >= 0) {
+          *_n = getnormal(isurface, tmin);
+          *IsValid = convex(isurface);
+          tmin = 0;
+        }
+      } else {
+        *IsValid = false;
+      }
     }
   }
   //  cout<<"tmin "<<tmin<<endl;

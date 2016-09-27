@@ -229,6 +229,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 #else
   fshape = NULL;
 #endif
+  //  StreamInfo(G4cout);
 }
 
 // Nominal constructor for BelleLathe whose parameters are to be set by
@@ -1658,6 +1659,10 @@ std::ostream& BelleLathe::StreamInfo(std::ostream& os) const
      << "    Contour: " << fcontour.size() << " sides, {z, r} points \n";
   for (int i = 0, imax = fcontour.size(); i < imax; i++) {
     os << fcontour[i] << ", ";
+  }
+  os << "\n";
+  for (int i = 0, imax = fcontour.size(); i < imax; i++) {
+    os << fcache[i].isconvex << ", ";
   }
   os << "\n";
   os << "phi0 = " << fphi << ", dphi = " << fdphi << ", Full Circle = " << (ftwopi ? "yes" : "no") << "\n";

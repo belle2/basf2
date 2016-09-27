@@ -44,7 +44,7 @@ namespace Belle2 {
        * @param config configuration object
        * @param useExistingData if correct TFile and TTree exists already exists, use the stored samples for training
        */
-      Teacher(TeacherConfig config, bool useExistingData = false);
+      Teacher(const TeacherConfig& config, bool useExistingData = false);
 
       /**
        * Destructor
@@ -112,17 +112,17 @@ namespace Belle2 {
        * @param maxEventsPerClass maximum number of events given to TMVA per class. TMVA internally uses a vector instead of a tree and therefore looses out-of-core ability.
        * @param splot use every sample twice assuming weight's are splot weights regardless of the assigned classid
        */
-      void trainClassification(std::string factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification",
-                               std::string prepareOption = "SplitMode=random:!V",
-                               std::string target = "",
-                               std::string weight = "");
+      void trainClassification(const std::string& factoryOption = "!V:!Silent:Color:DrawProgressBar:AnalysisType=Classification",
+                               const std::string& prepareOption = "SplitMode=random:!V",
+                               const std::string& target = "",
+                               const std::string& weight = "");
 
       /**
        * Train, test and evaluate all methods using sPlot
        */
-      void trainSPlot(std::string modelFileName,
+      void trainSPlot(const std::string& modelFileName,
                       std::vector<std::string> discriminatingVariables,
-                      std::string weight = "");
+                      const std::string& weight = "");
     private:
 
       /**
@@ -133,8 +133,9 @@ namespace Belle2 {
        * @param signal_weight
        * @param background_weight
        */
-      void train(std::string factoryOption, std::string prepareOption, std::string target, std::string signal_weight,
-                 std::string background_weight);
+      void train(const std::string& factoryOption, const std::string& prepareOption, const std::string& target,
+                 const std::string& signal_weight,
+                 const std::string& background_weight);
 
       /**
        * Set Branch Addresses of m_input
@@ -155,7 +156,7 @@ namespace Belle2 {
        * Returns Tree with all samples with the given classID
        * @param classID
        */
-      TTree* getClassTree(std::string target, int classID);
+      TTree* getClassTree(const std::string& target, int classID);
 
       /**
        * Train a class against the rest and return ptree with the configuration of the resulting training.

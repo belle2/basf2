@@ -19,7 +19,6 @@
 
 // tracking
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -49,7 +48,6 @@ namespace Belle2 {
 
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
-//     using StaticSectorType = StaticSectorDummy;
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     // TODO WARNING JKL
@@ -57,7 +55,7 @@ namespace Belle2 {
     struct StaticSectorMap {
 
       /** contains static sectors. */
-      std::vector<StaticSectorDummy*> sectors;
+      std::vector<StaticSectorType*> sectors;
 
       /** destructor. */
       ~StaticSectorMap()
@@ -67,10 +65,10 @@ namespace Belle2 {
       FullSecID getSecID() {return FullSecID(); }
 
       /** returns pointerTo a Static Sector */
-      StaticSectorDummy* getSector(FullSecID aSecID)
+      StaticSectorType* getSector(FullSecID aSecID)
       {
         // TODO WARNING JKL
-        sectors.push_back(new StaticSectorDummy(aSecID));
+        sectors.push_back(new StaticSectorType(aSecID));
         return sectors.back();
       }
     };

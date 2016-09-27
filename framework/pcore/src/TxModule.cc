@@ -45,7 +45,7 @@ void TxModule::initialize()
   m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
 
   if ((Environment::Instance().getStreamingObjects()).size() > 0) {
-    m_streamer->registerStreamObjs(Environment::Instance().getStreamingObjects());
+    m_streamer->setStreamingObjects(Environment::Instance().getStreamingObjects());
     B2INFO("Tx: Streaming objects limited : " << (Environment::Instance().getStreamingObjects()).size() << " objects");
   }
 

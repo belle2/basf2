@@ -89,6 +89,15 @@ namespace Belle2 {
     int detectorLayerNumber(int endcap, int layer) const;
 
     /**
+     * Get element numbers by detector layer global number.
+     * @param[in]  layerGlobal Layer global number.
+     * @param[out] endcap      Endcap number.
+     * @param[out] layer       Layer number.
+     */
+    void layerNumberToElementNumbers(
+      int layerGlobal, int* endcap, int* layer) const;
+
+    /**
      * Get sector number.
      * @param[in] endcap Endcap number.
      * @param[in] layer  Layer number.
@@ -98,6 +107,16 @@ namespace Belle2 {
      * Number is from 1 to 4*14*2 = 112.
      */
     int sectorNumber(int endcap, int layer, int sector) const;
+
+    /**
+     * Get element numbers by sector global number.
+     * @param[in]  sectorGlobal Sector global number.
+     * @param[out] endcap       Endcap number.
+     * @param[out] layer        Layer number.
+     * @param[out] sector       Sector number.
+     */
+    void sectorNumberToElementNumbers(
+      int sectorGlobal, int* endcap, int* layer, int* sector) const;
 
     /**
      * Get plane number.
@@ -112,6 +131,18 @@ namespace Belle2 {
     int planeNumber(int endcap, int layer, int sector, int plane) const;
 
     /**
+     * Get element numbers by plane global number.
+     * @param[in]  planeGlobal Plane global number.
+     * @param[out] endcap      Endcap number.
+     * @param[out] layer       Layer number.
+     * @param[out] sector      Sector number.
+     * @param[out] plane       Plane number.
+     */
+    void planeNumberToElementNumbers(
+      int planeGlobal, int* endcap, int* layer, int* sector, int* segment)
+    const;
+
+    /**
      * Get segment number.
      * @param[in] endcap  Endcap number.
      * @param[in] layer   Layer number.
@@ -123,7 +154,20 @@ namespace Belle2 {
      * Number is from 1 to 5*2*4*26 = 1040.
      */
     int segmentNumber(int endcap, int layer, int sector, int plane,
-                      int strip) const;
+                      int segment) const;
+
+    /**
+     * Get element numbers by segment global number.
+     * @param[in]  segmentGlobal Segment global number.
+     * @param[out] endcap        Endcap number.
+     * @param[out] layer         Layer number.
+     * @param[out] sector        Sector number.
+     * @param[out] plane         Plane number.
+     * @param[out] segment       Segment number.
+     */
+    void segmentNumberToElementNumbers(
+      int segmentGlobal, int* endcap, int* layer, int* sector, int* plane,
+      int* segment) const;
 
     /**
      * Get strip number.
@@ -146,9 +190,29 @@ namespace Belle2 {
     int stripLocalNumber(int strip) const;
 
     /**
-     * Get maximal strip number.
+     * Get maximal detector layer global number.
      */
-    int getMaximalStripNumber() const;
+    int getMaximalLayerGlobalNumber() const;
+
+    /**
+     * Get maximal sector global number.
+     */
+    int getMaximalSectorGlobalNumber() const;
+
+    /**
+     * Get maximal plane global number.
+     */
+    int getMaximalPlaneGlobalNumber() const;
+
+    /**
+     * Get maximal segment global number.
+     */
+    int getMaximalSegmentGlobalNumber() const;
+
+    /**
+     * Get maximal strip global number.
+     */
+    int getMaximalStripGlobalNumber() const;
 
   protected:
 

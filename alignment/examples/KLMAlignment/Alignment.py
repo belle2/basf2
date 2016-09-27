@@ -10,7 +10,7 @@ import numpy as np
 main = create_path()
 
 input = register_module('RootInput')
-input.param('inputFileName', 'RootOutput.root')
+input.param('inputFileName', sys.argv[1])
 input.initialize()
 
 gear = register_module('Gearbox')
@@ -72,6 +72,24 @@ for sector in range(1, 9):
                 cmd = str(label.label()) + ' 0. -1.'
                 algo.steering().command(cmd)
 
+# Fix EKLM parameters
+for endcap in range(1, 3):
+    if (endcap == 1):
+        maxlayer = 12
+    else:
+        maxlayer = 14
+    for layer in range(1, maxlayer + 1):
+        for sector in range(1, 5):
+            for plane in range(1, 3):
+                for segment in range(1, 6):
+                    for ipar in range(1, 3):
+                        eklmid = Belle2.EKLMSegmentID(endcap, layer, sector,
+                                                      plane, segment)
+                        label = Belle2.GlobalLabel(eklmid, ipar)
+                        cmd = str(label.label()) + ' 0. -1.'
+                        # Uncomment to fix EKLM parameters.
+                        # algo.steering().command(cmd)
+
 # ---------- end of parameter fixing ----------------------
 
 
@@ -116,7 +134,11 @@ ladder = np.zeros(1, dtype=int)
 sector = np.zeros(1, dtype=int)
 sensor = np.zeros(1, dtype=int)
 forward = np.zeros(1, dtype=int)
+endcap = np.zeros(1, dtype=int)
+plane = np.zeros(1, dtype=int)
+segment = np.zeros(1, dtype=int)
 
+alignment_file = ROOT.TFile('alignment.root', 'recreate')
 # Tree with VXD data
 vxdtree = ROOT.TTree('vxd', 'VXD data')
 vxdtree.Branch('layer', layer, 'layer/I')
@@ -139,20 +161,30 @@ bklmtree.Branch('forward', forward, 'forward/I')
 bklmtree.Branch('param', param, 'param/I')
 bklmtree.Branch('value', value, 'value/D')
 bklmtree.Branch('error', error, 'error/D')
+# Tree with EKLM data.
+eklmtree = ROOT.TTree('eklm', 'EKLM data')
+eklmtree.Branch('endcap', endcap, 'endcap/I')
+eklmtree.Branch('layer', layer, 'layer/I')
+eklmtree.Branch('sector', sector, 'sector/I')
+eklmtree.Branch('plane', plane, 'plane/I')
+eklmtree.Branch('segment', segment, 'segment/I')
+eklmtree.Branch('param', param, 'param/I')
+eklmtree.Branch('value', value, 'value/D')
+eklmtree.Branch('error', error, 'error/D')
 
 # Index of determined param
 ibin = 0
 
 for ipar in range(0, algo.result().getNoParameters()):
-    if not algo.result().isParameterDetermined(ipar):
-        continue
-
-    ibin = ibin + 1
-
     label = Belle2.GlobalLabel(algo.result().getParameterLabel(ipar))
     param[0] = label.getParameterId()
-    value[0] = algo.result().getParameterCorrection(ipar)
-    error[0] = algo.result().getParameterError(ipar)
+
+    if algo.result().isParameterDetermined(ipar):
+        value[0] = algo.result().getParameterCorrection(ipar)
+        error[0] = algo.result().getParameterError(ipar)
+    else:
+        value[0] = 0.0
+        error[0] = -1.0
 
     if (label.isVXD()):
         layer[0] = label.getVxdID().getLayerNumber()
@@ -170,6 +202,18 @@ for ipar in range(0, algo.result().getNoParameters()):
         forward[0] = label.getBklmID().getIsForward()
         bklmtree.Fill()
 
+    if (label.isEKLM()):
+        endcap[0] = label.getEklmID().getEndcap()
+        layer[0] = label.getEklmID().getLayer()
+        sector[0] = label.getEklmID().getSector()
+        plane[0] = label.getEklmID().getPlane()
+        segment[0] = label.getEklmID().getSegment()
+        eklmtree.Fill()
+
+    if not algo.result().isParameterDetermined(ipar):
+        continue
+
+    ibin = ibin + 1
     profile.SetBinContent(ibin, value[0])
     profile.SetBinError(ibin, error[0])
 
@@ -177,21 +221,9 @@ for ipar in range(0, algo.result().getNoParameters()):
 chi2ndf = Belle2.PyStoreObj('MillepedeCollector_chi2/ndf', 1).obj().getObject('1.1')
 pval = Belle2.PyStoreObj('MillepedeCollector_pval', 1).obj().getObject('1.1')
 
-# Skip into interactive environment
-# You can draw something in the trees or the profile
-# Exit with Ctrl+D
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-print(' You are now in interactive environment. You can still access the algorithm')
-print(' or the DataStore. Try e.g.:')
-print('')
-print(' >>> pval.Draw()')
-print(' >>> bklmtree.Draw("value:layer")')
-print(' >>> bklm.dump()')
-print(' >>> profile.Draw()')
-print('')
-print(' Look into this script and use TAB or python ? help to play more...')
-print(' Exit with [Ctrl] + [D] and then [Enter]')
-print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
-
-import interactive
-interactive.embed()
+alignment_file.cd()
+vxdtree.Write()
+cdctree.Write()
+bklmtree.Write()
+eklmtree.Write()
+alignment_file.Close()

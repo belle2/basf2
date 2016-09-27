@@ -1450,11 +1450,11 @@ namespace Belle2 {
 
           double Output = 0.0;
 
-          int nTargets = 0;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
           {
+            int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
               if (iParticle != nullptr) {
@@ -1511,11 +1511,11 @@ namespace Belle2 {
           double Output = 0.0;
 
           std::vector<Particle*> targetParticles;
-          int nTargets = 0;
           Variable::Manager& manager = Variable::Manager::Instance();
 
           if (ListOfParticles.isValid())
           {
+            int nTargets = 0;
             for (unsigned int i = 0; i < ListOfParticles->getListSize(); ++i) {
               Particle* iParticle = ListOfParticles->getParticle(i);
               if (iParticle != nullptr) {

@@ -34,7 +34,7 @@ namespace Belle2 {
     /** Constructor. */
     NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor);
     /** Constructor with option. */
-    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOption);
+    NtupleFlatTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOption);
     /** Destructor. */
     virtual ~NtupleFlatTool() {}
     /** Calculate branch variables from provided Particle. */

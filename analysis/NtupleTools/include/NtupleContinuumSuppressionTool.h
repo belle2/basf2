@@ -65,7 +65,7 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constructor. */
-    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions)
     {
       m_useFS1 = false;

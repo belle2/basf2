@@ -83,10 +83,12 @@ void NtupleMCGenKinematicsTool::eval(const  Particle*)
   m_nMCGen = 0;
   for (const auto& mcParticle : mcParticles) {
     iGen = storeiGen[mcParticle.getArrayIndex()];
-    int mothArrayIndex = -1;
     int mothIndex = -1;
     MCParticle* mother = mcParticle.getMother();
-    if (mother) {mothArrayIndex = mother->getArrayIndex(); mothIndex = storeiGen[mothArrayIndex]; }
+    if (mother) {
+      int mothArrayIndex = mother->getArrayIndex();
+      mothIndex = storeiGen[mothArrayIndex];
+    }
     if (iGen >= 0 && iGen < MCGenMax) {
       m_MCGenPDG[iGen] = mcParticle.getPDG();
       m_MCGenMothIndex[iGen] = mothIndex;

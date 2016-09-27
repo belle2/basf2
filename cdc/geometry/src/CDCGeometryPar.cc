@@ -197,7 +197,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   //
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content/");
   GearDir gbxParams(content);
-  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
+  //  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
 
 
   //
@@ -218,8 +218,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     //correction to z-position
     if (m_senseWireZposMode == 0) {
     } else if (m_senseWireZposMode == 1) {
-      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
-      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
+      //      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
+      //      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
       m_zSBackwardLayer[layerId] += m_dzSBackwardLayer[layerId];
       m_zSForwardLayer [layerId] -= m_dzSForwardLayer [layerId];
     } else {
@@ -475,7 +475,7 @@ void CDCGeometryPar::read()
   m_senseWireZposMode = gbxParams.getInt("SenseWireZposMode");
   //Set z corrections (from input data)
   B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
-  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
+  //  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
 
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
@@ -498,8 +498,8 @@ void CDCGeometryPar::read()
       //      B2INFO("bwddz,fwddz=" << m_bwdDz[layerId] <<" "<< m_fwdDz[layerId]);
       //      B2INFO("bwd z,dz=" << m_zSBackwardLayer[layerId] <<" "<< m_dzSBackwardLayer[layerId]);
       //      B2INFO("fwd z,dz=" << m_zSForwardLayer[layerId] <<" "<< m_dzSForwardLayer[layerId]);
-      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
-      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
+      //      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
+      //      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
       m_zSBackwardLayer[layerId] += m_dzSBackwardLayer[layerId];
       m_zSForwardLayer [layerId] -= m_dzSForwardLayer [layerId];
     } else {
@@ -1342,6 +1342,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   ifs.close();
 }
 
+/*
 // Read deltaz params.
 void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 {
@@ -1373,6 +1374,7 @@ void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 
   ifs.close();
 }
+*/
 
 
 // Read t0 params.

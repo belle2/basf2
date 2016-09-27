@@ -20,9 +20,10 @@
     <MaterialDefinitionMode desc="=0: define a mixture of gases and wires in the entire tracking volume; =1: dummy (unavailable now); =2: define all sense and field wires explicitly in the volume.">0</MaterialDefinitionMode>
 
     <!-- Mode for sense wire z-position correction -->
-    <SenseWireZposMode desc="=0: no corr.; =1: corr. for feedthrough effect and for diff. betw. new- and old-design (tentative).">1</SenseWireZposMode>
+    <SenseWireZposMode desc="=1: correct for feedthrough effect; =0: not correct.">1</SenseWireZposMode>
+
     <!-- Tentative corr. of sense wire z for endplate z -->
-    <deltazFileName desc="file which contains corrs. for diff. betw. final- and old-design.">deltaz.dat</deltazFileName>
+    <!-- <deltazFileName desc="file which contains corrs. for diff. betw. final- and old-design.">deltaz.dat</deltazFileName> -->
 
     <!-- Switch for printing for debug -->
     <Debug desc="true: print out; false: not print out.">false</Debug>

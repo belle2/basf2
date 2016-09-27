@@ -14,7 +14,6 @@
 /* External headers. */
 #include <TFile.h>
 #include <TH1F.h>
-#include <TMinuit.h>
 
 /* Belle2 headers. */
 #include <eklm/simulation/FPGAFitter.h>

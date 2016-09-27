@@ -34,10 +34,8 @@ namespace Belle2 {
       {}
 
       /// Constructor of the chooseable filter taking the default filter name and parameters
-      ChooseableFilter(std::string filterName,
-                       std::map<std::string, std::string> filterParameters
-                       = std::map<std::string, std::string>()) :
-        m_filterFactory(filterName, filterParameters)
+      ChooseableFilter(const std::string& filterName) :
+        m_filterFactory(filterName)
       {}
 
       /**
@@ -68,7 +66,11 @@ namespace Belle2 {
       virtual void initialize() override
       {
         m_filter = m_filterFactory.create();
-        m_filter->initialize();
+        if (m_filter) {
+          m_filter->initialize();
+        } else {
+          B2ERROR("Could not create filter with name " << getFilterName());
+        }
         Super::initialize();
       }
 

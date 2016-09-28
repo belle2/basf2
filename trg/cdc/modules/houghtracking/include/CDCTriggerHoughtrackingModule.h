@@ -180,8 +180,15 @@ namespace Belle2 {
     unsigned m_nCellsR;
     /** Hough plane limit in Pt [GeV] */
     double m_minPt;
+    /** shift the Hough plane in 1/r to avoid curvature 0 tracks
+     *  < 0: shift in negative direction (negative half is larger)
+     *    0: no shift (same limits for negative and positive half)
+     *  > 0: shift in positive direction (positive half is larger) */
+    int m_shiftPt;
     /** Hough plane limit in 1/r [1/cm] */
     double maxR;
+    /** Hough plane shift in 1/r [1/cm] */
+    double shiftR;
     /** number of iterations for the fast peak finder,
      *  smallest n such that 2^(n+1) > max(nCellsPhi, nCellsR) */
     unsigned maxIterations;

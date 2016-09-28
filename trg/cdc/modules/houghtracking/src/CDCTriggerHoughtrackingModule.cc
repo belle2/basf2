@@ -52,6 +52,10 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
   addParam("minPt", m_minPt,
            "Minimum Pt [GeV]. "
            "Hough plane limits in 1/r are [-1/r(minPt), 1/r(minPt)]", (double)(0.3));
+  addParam("shiftPt", m_shiftPt,
+           "Shift the Hough plane by 1/4 cell size in 1/r to avoid "
+           "curvature 0 tracks (<0: shift in negative direction, "
+           "0: no shift, >0: shift in positive direction).", 0);
 
   addParam("minHits", m_minHits,
            "Minimum hits from different super layers required in a peak cell.",
@@ -152,14 +156,20 @@ CDCTriggerHoughtrackingModule::event()
   nCells = pow(2, maxIterations + 1);
   /* limits in phi: [-pi, pi] + extra cells */
   double rectX = M_PI * nCells / m_nCellsPhi;
-  /* limits in R: [-R(minPt), R(minPt)] + extra cells */
+  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
   maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
   double rectY = maxR * nCells / m_nCellsR;
+  shiftR = 0;
+  if (m_shiftPt < 0) {
+    shiftR = -maxR / 2. / m_nCellsR;
+  } else if (m_shiftPt > 0) {
+    shiftR = maxR / 2. / m_nCellsR;
+  }
 
   B2DEBUG(50, "extending Hough plane to " << maxIterations << " iterations, "
           << nCells << " cells: phi in ["
           << -rectX * 180. / M_PI << ", " << rectX * 180. / M_PI
-          << "] deg, 1/r in [" << -rectY << ", " << rectY << "] cm");
+          << "] deg, 1/r in [" << -rectY + shiftR << ", " << rectY + shiftR << "] cm");
 
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {
@@ -169,7 +179,7 @@ CDCTriggerHoughtrackingModule::event()
   }
 
   /* find track candidates in Hough plane */
-  fastInterceptFinder(hitMap, -rectX, rectX, -rectY, rectY, 0, 0, 0);
+  fastInterceptFinder(hitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
 
   /* merge track candidates */
   if (m_clusterPattern)

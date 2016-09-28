@@ -90,7 +90,7 @@ CDCTriggerHoughtrackingModule::fastInterceptFinder(cdcMap& hits,
       iy = 2 * iy_s + j;
 
       // skip extra cells outside of the Hough plane
-      if (x2_d <= -M_PI || x1_d >= M_PI || y2_d <= -maxR || y1_d >= maxR) {
+      if (x2_d <= -M_PI || x1_d >= M_PI || y2_d <= -maxR + shiftR || y1_d >= maxR + shiftR) {
         B2DEBUG(150, indent << "skip Hough cell outside of plane limits");
         continue;
       }
@@ -375,8 +375,9 @@ CDCTriggerHoughtrackingModule::patternClustering()
     unsigned ix = floor((x + M_PI) / 2. / M_PI * m_nCellsPhi);
     double y = (houghCand[icand].getCoord().first.Y() +
                 houghCand[icand].getCoord().second.Y()) / 2.;
-    unsigned iy = floor((y + maxR) / 2. / maxR * m_nCellsR);
+    unsigned iy = floor((y + maxR - shiftR) / 2. / maxR * m_nCellsR);
     plane2[ix / 2][iy / 2] += 1 << ((ix % 2) + 2 * (iy % 2));
+    B2DEBUG(100, "candidate at ix " << ix << " iy " << iy);
   }
   // look for clusters of 2 x 2 squares in a (rX x rY) region
   unsigned nX = m_nCellsPhi / 2;
@@ -388,11 +389,11 @@ CDCTriggerHoughtrackingModule::patternClustering()
       if (!plane2[ix][iy]) continue;
       // check if we are in a lower left corner
       unsigned ileft = (ix - 1 + nX) % nX;
-      B2DEBUG(100, "ix " << ix << " ileft " << ileft << " nX " << nX);
+      B2DEBUG(100, "ix " << ix << " iy " << iy);
       if (connectedLR(plane2[ileft][iy], plane2[ix][iy]) ||
           (iy > 0 && connectedUD(plane2[ix][iy - 1], plane2[ix][iy])) ||
           (iy > 0 && connectedDiag(plane2[ileft][iy - 1], plane2[ix][iy]))) {
-        B2DEBUG(100, "skip connected square at " << ix << " " << iy);
+        B2DEBUG(100, "skip connected square");
         continue;
       }
       // form cluster
@@ -465,6 +466,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
       unsigned ixBL = bottomLeft % 2;
       unsigned iyTR = 2 * (topRight2 / m_clusterSizeX) + (topRight / 2);
       unsigned iyBL = bottomLeft / 2;
+      B2DEBUG(100, "ixTR " << ixTR << " ixBL " << ixBL << " iyTR " << iyTR << " iyBL " << iyBL);
       // skip size 1 clusters
       if (m_minCells > 1 && ixTR == ixBL && iyTR == iyBL) {
         B2DEBUG(100, "skipping cluster of size 1");
@@ -475,7 +477,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
       B2DEBUG(100, "center at cell (" << centerX << ", " << centerY << ")");
       // convert to coordinates
       double x = -M_PI + (centerX + 0.5) * 2. * M_PI / m_nCellsPhi;
-      double y = -maxR + (centerY + 0.5) * 2. * maxR / m_nCellsR;
+      double y = -maxR + shiftR + (centerY + 0.5) * 2. * maxR / m_nCellsR;
       B2DEBUG(100, "center coordinates (" << x << ", " << y << ")");
       // find cells around center to get hit IDs
       vector<unsigned> idList = {};

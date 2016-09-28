@@ -739,11 +739,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
                zValues; // fitted z value in the first point, tan(lambda) -> WARNING FIXME why is the first point 1,0 not 0,0? jkl feb8th2014
   if (lambdaCheckMatrix4NAN(p) == true) { B2DEBUG(10, "helixFit: p got 'nan'-entries!"); }
 
-  B2WARNING("Testing helix fit: fit result is:");
-  p.Print();
-  B2WARNING("p(0,0) = " << p(0, 0));
-  B2WARNING("p(1,0) = " << p(1, 0));
-
   TMatrixD TAtG = AtG;
   TAtG.T();
   TMatrixD zValuesT = zValues;
@@ -751,7 +746,6 @@ std::pair<double, TVector3> TrackletFilters::helixFit(const std::vector<Position
 
   TMatrixD sigma2M = zValuesT * (Diag * TAtG * AtGAInv * AtG) * zValues;
   double sigma2 = sigma2M(0, 0) / (nHits - 2);
-  B2WARNING("Sigma_Squared Value is " << sigma2);
 
   double thetaVal = (M_PI * 0.5 - atan(p(1,
                                          0))); // WARNING: was M_PI*0.5 - atan(p(1,0)), but values were wrong! double-WARNING: but + atan was wrong too!

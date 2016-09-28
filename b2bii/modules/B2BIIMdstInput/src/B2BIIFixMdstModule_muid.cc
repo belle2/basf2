@@ -126,9 +126,12 @@ namespace Belle2 {
   {
 
     Mdst_klm_mu_ex_Manager& muexMgr = Mdst_klm_mu_ex_Manager::get_manager();
-    //if (muexMgr.count()) {
-    // TODO: this always evaluates to false!
-    if (&muexMgr == NULL) {
+    // In well formed C++ references must always be legal but panther sometimes
+    // returns references to NULL. To catch this reliably we check the address
+    // of the reference and to make sure the compiler does not optimize this
+    // away we cast to a void pointer first so he doesn't know it's the address
+    // of a reference anymore.
+    if ((void*)&muexMgr == NULL) {
       B2ERROR("%B2BIIFixMdst muid did not find Mdst_klm_mu_ex table "
               << "in this event, which implies" << std::endl
               << "   that muid_set and muid_dec were not run yet. "

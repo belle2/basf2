@@ -46,6 +46,16 @@ ostream& operator <<(ostream& o, const zr_t& v)
   return o << "{" << v.z << ",  " << v.r << "}";
 }
 
+struct curl_t {
+  G4ThreeVector v;
+  curl_t(const G4ThreeVector& _v): v(_v) {}
+};
+
+ostream& operator <<(ostream& o, const curl_t& c)
+{
+  return o << "{" << c.v.x() << ", " << c.v.y() << ", " << c.v.z() << "}, ";
+}
+
 BelleLathe::BelleLathe(const G4String& pName, double phi0, double dphi, const vector<zr_t>& c)
   : G4CSGSolid(pName)
 {
@@ -808,7 +818,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
   pmax += kCarTolerance;
   bool hit = pmin > -kInfinity && pmax < kInfinity;
 
-#if COMPARE==1
+#if COMPARE==10
   if (fshape) {
     bool res = fshape->CalculateExtent(A, bb, T, pMin, pMax);
     double diff = kCarTolerance;
@@ -950,6 +960,7 @@ zr_t BelleLathe::normal(const zr_t& r, double& d2) const
     double is = sqrt(s.is2);
     return {s.dr * is, -s.dz * is};
   };
+  return getn(iseg);
 
   if (t < 0.0) {
     const cachezr_t& s = fcache[iseg];
@@ -1098,7 +1109,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p) const
       }
     }
   }
-#if COMPARE==1
+#if COMPARE==4
   double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p);
   if (abs(d - dd) > kCarTolerance) {
     int oldprec = cout.precision(16);
@@ -1306,7 +1317,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 
 #if COMPARE==1
   double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p, n);
-  if (abs(tmin - dd) > 1e-11) {
+  if (abs(tmin - dd) > 1e-10) {
     int oldprec = cout.precision(16);
     EInside inside = fshape->Inside(p);
     cout << GetName() << " DistanceToIn(p,v) " << p << " " << n << " " << tmin << " " << dd << " " << tmin - dd << " " << inside << " "
@@ -1419,9 +1430,10 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     bool surface = abs(d * s.is) < delta;
     if (surface) isurface = i;
     if (s.dz == 0.0) {
-      if (!surface) {
-        double t = (s.z - p.z()) * inz;
-        //  cout<<"zplane "<<tmin<<" "<<t<<endl;
+      double t = (s.z - p.z()) * inz;
+      if (surface) {
+        if (hitzside(t, s)) {tmin = 0; iseg = i; break;}
+      } else {
         if (0 < t && t < tmin && hitzside(t, s)) {tmin = t; iseg = i;}
       }
     } else {
@@ -1449,10 +1461,12 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
         double t0 = -C / sum, t1 = sum / A;
         //    cout<<t0<<" "<<t1<<" "<<endl;
         if (surface) { //exclude solution on surface
-          if (abs(t0) > abs(t1)) {
-            if (0 < t0 && t0 < tmin && hitside(t0, s)) { tmin = t0; iseg = i;}
-          } else {
+          if (abs(t0) < abs(t1)) {
+            if (hitside(t0, s)) { tmin = 0; iseg = i; break;}
             if (0 < t1 && t1 < tmin && hitside(t1, s)) { tmin = t1; iseg = i;}
+          } else {
+            if (hitside(t1, s)) { tmin = 0; iseg = i; break;}
+            if (0 < t0 && t0 < tmin && hitside(t0, s)) { tmin = t0; iseg = i;}
           }
         } else { // check both solutions
           if (0 < t0 && t0 < tmin && hitside(t0, s)) { tmin = t0; iseg = i;}
@@ -1465,22 +1479,35 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
 
   if (!ftwopi) {
     do { // side at phi0
-      double d = fn0x * p.x() + fn0y * p.y();
-      bool surface = std::abs(d) < delta;
-      if (!surface) {
-        double vn = fn0x * n.x() + fn0y * n.y();
+      double vn = fn0x * n.x() + fn0y * n.y();
+      if (vn > 0) {
+        double d = fn0x * p.x() + fn0y * p.y();
         double t = -d / vn;
-        if (vn > 0 && 0 < t && t < tmin && hitphi0side(t)) {tmin = t; iseg = imax + 0;}
+        if (hitphi0side(t)) {
+          bool surface = std::abs(d) < delta;
+          if (surface) {
+            tmin = 0; iseg = imax + 0;
+          } else {
+            if (0 < t && t < tmin) {tmin = t; iseg = imax + 0;}
+
+          }
+        }
       }
     } while (0);
 
     do { // side at phi0+dphi
-      double d = fn1x * p.x() + fn1y * p.y();
-      bool surface = std::abs(d) < delta;
-      if (!surface) {
-        double vn = fn1x * n.x() + fn1y * n.y();
+      double vn = fn1x * n.x() + fn1y * n.y();
+      if (vn > 0) {
+        double d = fn1x * p.x() + fn1y * p.y();
         double t = -d / vn;
-        if (vn > 0 && 0 < t && t < tmin && hitphi1side(t)) {tmin = t; iseg = imax + 1;}
+        if (hitphi1side(t)) {
+          bool surface = std::abs(d) < delta;
+          if (surface) {
+            tmin = 0; iseg = imax + 1;
+          } else {
+            if (0 < t && t < tmin) { tmin = t; iseg = imax + 1;}
+          }
+        }
       }
     } while (0);
   }
@@ -1493,7 +1520,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
   };
 
   if (calcNorm) {
-    if (tmin > 0 && tmin < kInfinity) {
+    if (tmin >= 0 && tmin < kInfinity) {
       *_n = getnormal(iseg, tmin);
       *IsValid = convex(iseg);
     } else {
@@ -1509,22 +1536,23 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     }
   }
   //  cout<<"tmin "<<tmin<<endl;
-#if COMPARE==2
+#if COMPARE==1
   do {
-    G4ThreeVector p0(1210.555046, -292.9578965, -36.71671492);
-    if ((p - p0).mag() > 1e-2)continue;
+    // G4ThreeVector p0(1210.555046, -292.9578965, -36.71671492);
+    // if ((p - p0).mag() > 1e-2)continue;
     bool isvalid;
     G4ThreeVector norm;
     double dd = fshape->DistanceToOut(p, n, calcNorm, &isvalid, &norm);
-    //    if (abs(tmin - dd) > 1e-10 || (calcNorm && *IsValid != isvalid)) {
-    int oldprec = cout.precision(16);
-    cout << GetName() << " DistanceToOut(p,v) p=" << p << " n=" << n << " calcNorm=" << calcNorm << " myInside=" << Inside(
-           p) << " tmin=" << tmin << " dd=" << dd << " d=" << tmin - dd << " iseg=" << iseg << " ";
-    if (calcNorm) cout << "myIsValid = " << *IsValid << " tIsValid=" << isvalid << " myn=" << (*_n) << " tn=" << (norm);
-    cout << endl;
-    cout.precision(oldprec);
-    //      _exit(0);
-    //    }
+    if (abs(tmin - dd) > 1e-10 || (calcNorm && *IsValid != isvalid)) {
+      int oldprec = cout.precision(16);
+      cout << GetName() << " DistanceToOut(p,v) p,n =" << curl_t(p) << curl_t(n) << " calcNorm=" << calcNorm
+           << " myInside=" << Inside(p) << " tmin=" << tmin << " dd=" << dd << " d=" << tmin - dd << " iseg=" << iseg << " isurf=" << isurface
+           << " ";
+      if (calcNorm) cout << "myIsValid = " << *IsValid << " tIsValid=" << isvalid << " myn=" << (*_n) << " tn=" << (norm);
+      cout << endl;
+      cout.precision(oldprec);
+      //      _exit(0);
+    }
   } while (0);
 #endif
   return tmin;

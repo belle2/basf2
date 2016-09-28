@@ -20,15 +20,27 @@
     <Active>
       <Material>BEAMABORT-Material</Material>
       <phase >1</phase>
-      <x_offset unit="cm">0,0,0,0</x_offset>
-      <y_offset unit="cm">0,0,0,0</y_offset>
-      <!--x unit="cm">8.0,8.1,-4.8,-4.5</x-->
-      <x unit="cm">4.5,4.5,-4.5,-4.5</x>
+      <!--
+      <x unit="cm">4.9,5.0,-7.8,-7.6</x>
       <y unit="cm">1.3,0.6,0.4,0.1</y>
-      <!--z unit="cm">12.1,-10.4,10.9,-11.7</z-->
-      <z unit="cm">11.7,-10.4,10.4,-9.4</z>
+      <z unit="cm">12.1,-10.4,10.9,-11.7</z>
+      <ThetaX unit="deg">0,0,0,0</ThetaX>
+      <ThetaY unit="deg">90,90,90,90</ThetaY>
       <ThetaZ unit="deg">0,0,0,0</ThetaZ>
-      <Phi unit="deg">0,0,180,180</Phi>
+      
+      <x unit="cm">4.9,5.0,-4.9,-5.0</x>
+      <y unit="cm">1.3,0.6,0.4,0.1</y>
+      <z unit="cm">12.1,-10.4,10.9,-13.7</z>
+      <ThetaX unit="deg">0,0,0,0</ThetaX>
+      <ThetaY unit="deg">90,90,90,90</ThetaY>
+      <ThetaZ unit="deg">0,0,0,0</ThetaZ>
+      -->
+      <x unit="cm">-4.9,4.9,-5.0,5.0</x>
+      <y unit="cm">0.4,1.3,0.1,0.6</y>
+      <z unit="cm">10.9,12.1,-13.7,-10.4</z>
+      <ThetaX unit="deg">0,0,0,0</ThetaX>
+      <ThetaY unit="deg">90,90,90,90</ThetaY>
+      <ThetaZ unit="deg">0,0,0,0</ThetaZ>
    </Active>
 
   </Content>

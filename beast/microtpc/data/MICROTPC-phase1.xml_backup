@@ -84,11 +84,9 @@ whitespace, comma or semi-colon -->
 <dz_Vessel unit="cm">31.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">0.0</AngleZ>
-<!--TPCpos_x unit="cm">9.95700</TPCpos_x-->
-<TPCpos_x unit="cm">6.6</TPCpos_x>
+<TPCpos_x unit="cm">-4.04300</TPCpos_x>
 <TPCpos_y unit="cm">46.63900</TPCpos_y>
-<!--TPCpos_z unit="cm">37.90000</TPCpos_z-->
-<TPCpos_z unit="cm">34.4</TPCpos_z>
+<TPCpos_z unit="cm">37.90000</TPCpos_z>
 </Active>
 <!-- Position 3 TPC # 1 -->
 <Active>
@@ -103,10 +101,8 @@ whitespace, comma or semi-colon -->
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">90.0</AngleZ>
 <TPCpos_x unit="cm">-48.25500</TPCpos_x>
-<!--TPCpos_y unit="cm">7.34000</TPCpos_y-->
-<TPCpos_y unit="cm">6.2</TPCpos_y>
-<!--TPCpos_z unit="cm">37.57700</TPCpos_z-->
-<TPCpos_z unit="cm">30.5</TPCpos_z>
+<TPCpos_y unit="cm">7.34000</TPCpos_y>
+<TPCpos_z unit="cm">37.57700</TPCpos_z>
 </Active>
 <!-- Position 4 prot # 1 -->
 <Active>
@@ -120,11 +116,9 @@ whitespace, comma or semi-colon -->
 <dz_Vessel unit="cm">30.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">0.0</AngleZ>
-<!--TPCpos_x unit="cm">-7.19700</TPCpos_x-->
-<TPCpos_x unit="cm">-4.4</TPCpos_x>
+<TPCpos_x unit="cm">-7.19700</TPCpos_x>
 <TPCpos_y unit="cm">-45.15900</TPCpos_y>
-<!--TPCpos_z unit="cm">42.30000</TPCpos_z-->
-<TPCpos_z unit="cm">38.8</TPCpos_z>
+<TPCpos_z unit="cm">42.30000</TPCpos_z>
 </Active>
 </Content>
 </DetectorComponent>

@@ -56,14 +56,10 @@ whitespace, comma or semi-colon -->
 <zBase unit="cm">50,50</zBase>
 <!--110, 111, 140, 139 -->
 <lbgoBeamv unit="cm">92.837</lbgoBeamv>
-<!--xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv-->
-<!--xbgoBeamv unit="cm">19.428999954,-16.971000046,-16.971000046,19.428999954</xbgoBeamv-->
-<xbgoBeamv unit="cm">19.428999954,-16.971000046,-16.971000046,19.428999954</xbgoBeamv>
+<xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv>
 <!-- (69.17375-29.77325)/2. -->
 <ybgoBeamv unit="cm">-19.7002,-19.7002,-19.7002,-19.7002</ybgoBeamv>
-<!--ybgoBeamv unit="cm">-18.553,-22.83,-22.83,-18.553</ybgoBeamv-->
-<!--zbgoBeamv unit="cm">34.94625,34.94625,-20.00875,-20.00875</zbgoBeamv-->
-<zbgoBeamv unit="cm">-20.00875,-20.00875,34.94625,34.94625</zbgoBeamv>
+<zbgoBeamv unit="cm">34.94625,34.94625,-20.00875,-20.00875</zbgoBeamv>
 <!-- 113, 112, 142, 141 -->
 <lbgoBeamh unit="cm">31.8</lbgoBeamh>
 <xbgoBeamh unit="cm">1.229,1.229,1.229,1.229</xbgoBeamh>

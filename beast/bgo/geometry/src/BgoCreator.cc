@@ -96,6 +96,7 @@ namespace Belle2 {
         l_BGO->SetUserLimits(new G4UserLimits(stepSize));
 
         //position bgo volume
+        /*
         G4Transform3D theta_init = G4RotateX3D(- activeParams.getLength("cDtheta"));
         G4Transform3D phi_init = G4RotateZ3D(activeParams.getLength("k_phi_init"));
         G4Transform3D tilt_z = G4RotateY3D(activeParams.getLength("k_z_TILTED"));
@@ -105,9 +106,18 @@ namespace Belle2 {
         G4Transform3D pos_phi = G4RotateZ3D(activeParams.getLength("k_phiC"));
         G4Transform3D Tr = pos_phi * position * tilt_phi * tilt_z * phi_init * theta_init;
         //cout << "rotation  " << Tr.getRotation() << " translation " << Tr.getTranslation() << endl;
+        */
+        double px = activeParams.getDouble("px");
+        double py = activeParams.getDouble("py");
+        double pz = activeParams.getDouble("pz");
+        double angle = activeParams.getDouble("angle");
+        double rx = activeParams.getDouble("rx");
+        double ry = activeParams.getDouble("ry");
+        double rz = activeParams.getDouble("rz");
 
-        new G4PVPlacement(Tr, l_BGO, "p_BGO", &topVolume, false, detID);
-
+        G4RotationMatrix* pRot = new G4RotationMatrix();
+        pRot->rotate(-angle, G4ThreeVector(rx, ry, rz));
+        new G4PVPlacement(pRot, G4ThreeVector(px, py, pz), l_BGO, "p_BGO", &topVolume, false, detID);
         detID++;
       }
     }

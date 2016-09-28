@@ -212,11 +212,12 @@ void NeuroTriggerTrainerModule::initialize()
     if (m_IDranges.size() == 1 || m_IDranges.size() == m_NeuroTrigger.nSectors()) {
       B2DEBUG(50, "Setting relevant ID ranges from parameters.");
       for (unsigned isector = 0; isector < m_NeuroTrigger.nSectors(); ++isector) {
-        if (m_IDranges[isector].size() == 18)
-          m_NeuroTrigger[isector].relevantID = m_IDranges[isector];
+        unsigned iranges = (m_IDranges.size() == 1) ? 0 : isector;
+        if (m_IDranges[iranges].size() == 18)
+          m_NeuroTrigger[isector].relevantID = m_IDranges[iranges];
         else
           B2ERROR("IDranges must contain 18 values (sector " << isector
-                  << " has " << m_IDranges[isector].size() << ")");
+                  << " has " << m_IDranges[iranges].size() << ")");
       }
       if (m_nTrainPrepare > 0)
         B2WARNING("Given ID ranges will be replaced during training. "

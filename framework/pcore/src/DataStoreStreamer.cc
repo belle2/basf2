@@ -17,15 +17,14 @@
 
 #include <TClonesArray.h>
 #include <TClass.h>
+#include <TStreamerInfo.h>
+#include <TList.h>
 
 #include <unistd.h>
 #include <stdio.h>                      // for NULL, printf
 
 #include <algorithm>
 #include <queue>
-
-#include <TStreamerInfo.h>
-#include <TList.h>
 
 
 using namespace std;
@@ -360,8 +359,6 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
     // Construct EvtMessage
     EvtMessage* msg = new EvtMessage(evtbuf);
-    //    EvtMessage* msg = new EvtMessage();
-    //    msg->buffer(evtbuf);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;

@@ -84,7 +84,7 @@ namespace Belle2 {
     int   msg_size() const;
 
     /** Get record type */
-    RECORD_TYPE type();
+    RECORD_TYPE type() const;
     /** Set record type */
     void type(RECORD_TYPE);
 

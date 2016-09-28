@@ -117,7 +117,7 @@ int EvtMessage::msg_size() const
 }
 
 // Record type
-RECORD_TYPE EvtMessage::type()
+RECORD_TYPE EvtMessage::type() const
 {
   return ((reinterpret_cast<EvtHeader*>(m_data))->rectype);
 }

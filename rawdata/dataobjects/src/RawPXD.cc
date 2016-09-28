@@ -8,10 +8,10 @@
 
 #include "rawdata/dataobjects/RawPXD.h"
 #include "framework/logging/Logger.h"
+#include <framework/utilities/HTML.h>
+
 using namespace std;
 using namespace Belle2;
-
-ClassImp(RawPXD);
 
 RawPXD::RawPXD() : m_nwords(0), m_buffer(NULL)
 {
@@ -34,7 +34,7 @@ unsigned int RawPXD::endian_swap(unsigned int x)
   return x;
 }
 
-RawPXD::RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <unsigned char>>& payload)
+RawPXD::RawPXD(const std::vector <unsigned int>& header, const std::vector <std::vector <unsigned char>>& payload)
   : m_nwords(0), m_buffer(NULL)
 {
   // This function is only used by the PXDPacker in simulations. Does not make sense for other cases
@@ -73,7 +73,7 @@ RawPXD::~RawPXD()
   if (m_buffer != NULL) delete[] m_buffer;
 }
 
-int RawPXD::size()
+int RawPXD::size() const
 {
   return m_nwords;
 }
@@ -82,4 +82,15 @@ int* RawPXD::data(void)
 {
   int* ptr = &m_buffer[0];
   return ptr;
+}
+
+std::string RawPXD::getInfoHTML() const
+{
+  std::string s;
+  if (m_nwords >= 2)
+    s += "Frames: " + std::to_string(endian_swap(m_buffer[1])) + ", ";
+
+  s += "Size (32bit words): " + std::to_string(m_nwords) + "<br /><br />";
+  s += HTML::getHexDump(m_buffer, m_nwords);
+  return s;
 }

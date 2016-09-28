@@ -10,7 +10,6 @@
 #ifndef RAWPXD_H
 #define RAWPXD_H
 
-#include <framework/datastore/DataStore.h>
 #include <TObject.h>
 
 namespace Belle2 {
@@ -32,13 +31,13 @@ namespace Belle2 {
     RawPXD(int*, int);
 
     //! Constructor using existing data which needs to be _copied_ to a new raw data buffer, only used by PXDPacker
-    RawPXD(std::vector <unsigned int>& header, std::vector <std::vector <unsigned char>>& payload);
+    RawPXD(const std::vector <unsigned int>& header, const std::vector <std::vector <unsigned char>>& payload);
 
     //! Destructor
     virtual ~RawPXD();
 
     //! get size of buffer in 32 Bit words
-    virtual int size();
+    virtual int size() const;
     /*at the moment not used
         //! allocate buffer
         virtual int* allocate_buffer(int nwords);
@@ -49,13 +48,16 @@ namespace Belle2 {
     //! get pointer to data
     virtual int* data(void);
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
+
   private:
     int m_nwords;/**< Number of (32bit) Words stored in the buffer. There might be unsused bytes in the last word.*/
     /// Raw dump of ONSEN data. buffer of size m_nwords (32bit int)
     int* m_buffer; //[m_nwords] /**< Buffer of size m_nwords  */
 
     //! Endian swap a int32
-    unsigned int endian_swap(unsigned int x);
+    static unsigned int endian_swap(unsigned int x);
 
     ClassDef(RawPXD, 2)
   }; // class RawPXD

@@ -85,11 +85,15 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
   addParam("clusterPattern", m_clusterPattern,
            "use nested pattern algorithm to find clusters", false);
   addParam("clusterSizeX", m_clusterSizeX,
-           "maximum number of 2 x 2 squares in cluster for pattenr algorithm",
+           "maximum number of 2 x 2 squares in cluster for pattern algorithm",
            (unsigned)(3));
   addParam("clusterSizeY", m_clusterSizeY,
-           "maximum number of 2 x 2 squares in cluster for pattenr algorithm",
+           "maximum number of 2 x 2 squares in cluster for pattern algorithm",
            (unsigned)(3));
+  addParam("hitRelationsFromCorners", m_hitRelationsFromCorners,
+           "Switch for creating relations to hits in the pattern algorithm. "
+           "If true, create relations from cluster corners, otherwise "
+           "from estimated cluster center (might not have relations).", false);
 }
 
 void

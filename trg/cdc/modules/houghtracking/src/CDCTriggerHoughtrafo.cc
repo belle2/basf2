@@ -369,6 +369,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
 {
   // fill a matrix of 2 x 2 squares
   TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
+  TMatrix planeIcand(m_nCellsPhi, m_nCellsR);
   for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
     double x = (houghCand[icand].getCoord().first.X() +
                 houghCand[icand].getCoord().second.X()) / 2.;
@@ -377,7 +378,8 @@ CDCTriggerHoughtrackingModule::patternClustering()
                 houghCand[icand].getCoord().second.Y()) / 2.;
     unsigned iy = floor((y + maxR - shiftR) / 2. / maxR * m_nCellsR);
     plane2[ix / 2][iy / 2] += 1 << ((ix % 2) + 2 * (iy % 2));
-    B2DEBUG(100, "candidate at ix " << ix << " iy " << iy);
+    planeIcand[ix][iy] = icand;
+    B2DEBUG(100, "candidate " << icand << " at ix " << ix << " iy " << iy);
   }
   // look for clusters of 2 x 2 squares in a (rX x rY) region
   unsigned nX = m_nCellsPhi / 2;
@@ -473,28 +475,39 @@ CDCTriggerHoughtrackingModule::patternClustering()
         continue;
       }
       float centerX = 2 * ix + (ixTR + ixBL) / 2.;
+      if (centerX >= m_nCellsPhi) centerX -= m_nCellsPhi;
       float centerY = 2 * iy + (iyTR + iyBL) / 2.;
       B2DEBUG(100, "center at cell (" << centerX << ", " << centerY << ")");
       // convert to coordinates
       double x = -M_PI + (centerX + 0.5) * 2. * M_PI / m_nCellsPhi;
       double y = -maxR + shiftR + (centerY + 0.5) * 2. * maxR / m_nCellsR;
       B2DEBUG(100, "center coordinates (" << x << ", " << y << ")");
-      // find cells around center to get hit IDs
-      vector<unsigned> idList = {};
-      double dx = 0.1 * M_PI / m_nCellsPhi;
-      double dy = 0.1 * maxR / m_nCellsR;
-      for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
-        if (((houghCand[icand].getCoord().first.X() <= x + dx &&
-              houghCand[icand].getCoord().second.X() >= x - dx) ||
-             (houghCand[icand].getCoord().first.X() <= x + dx - 2 * M_PI &&
-              houghCand[icand].getCoord().second.X() >= x - dx - 2 * M_PI) ||
-             (houghCand[icand].getCoord().first.X() <= x + dx + 2 * M_PI &&
-              houghCand[icand].getCoord().second.X() >= x - dx + 2 * M_PI)) &&
-            houghCand[icand].getCoord().first.Y() <= y + dy &&
-            houghCand[icand].getCoord().second.Y() >= y - dy) {
-          vector<unsigned> candIdList = houghCand[icand].getIdList();
-          mergeIdList(idList, idList, candIdList);
-          B2DEBUG(100, "merge id list from candidate " << icand);
+      // get list of related hits
+      vector <unsigned> idList = {};
+      if (m_hitRelationsFromCorners) {
+        unsigned icandTR = planeIcand[(ixTR + 2 * ix) % m_nCellsPhi][iyTR + 2 * iy];
+        unsigned icandBL = planeIcand[ixBL + 2 * ix][iyBL + 2 * iy];
+        vector<unsigned> candIdListTR = houghCand[icandTR].getIdList();
+        vector<unsigned> candIdListBL = houghCand[icandBL].getIdList();
+        mergeIdList(idList, candIdListTR, candIdListBL);
+        B2DEBUG(100, "merge id lists from candidates " << icandTR << " and " << icandBL);
+      } else {
+        // find cells around center to get hit IDs
+        double dx = 0.1 * M_PI / m_nCellsPhi;
+        double dy = 0.1 * maxR / m_nCellsR;
+        for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
+          if (((houghCand[icand].getCoord().first.X() <= x + dx &&
+                houghCand[icand].getCoord().second.X() >= x - dx) ||
+               (houghCand[icand].getCoord().first.X() <= x + dx - 2 * M_PI &&
+                houghCand[icand].getCoord().second.X() >= x - dx - 2 * M_PI) ||
+               (houghCand[icand].getCoord().first.X() <= x + dx + 2 * M_PI &&
+                houghCand[icand].getCoord().second.X() >= x - dx + 2 * M_PI)) &&
+              houghCand[icand].getCoord().first.Y() <= y + dy &&
+              houghCand[icand].getCoord().second.Y() >= y - dy) {
+            vector<unsigned> candIdList = houghCand[icand].getIdList();
+            mergeIdList(idList, idList, candIdList);
+            B2DEBUG(100, "merge id list from candidate " << icand);
+          }
         }
       }
       if (idList.size() == 0) {

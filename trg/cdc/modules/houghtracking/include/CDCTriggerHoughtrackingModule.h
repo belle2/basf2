@@ -222,6 +222,13 @@ namespace Belle2 {
     unsigned m_clusterSizeX;
     /** maximum cluster size for pattern algorithm */
     unsigned m_clusterSizeY;
+    /** switch for creating relations to hits in the pattern clustering algorithm.
+     *   true: create relations for all hits passing through the corners of
+     *         a cluster,
+     *   false: create relations for all hits passing though the estimated
+     *          center of the cluster (can be 0 hits if center is not part
+     *          of the cluster) */
+    bool m_hitRelationsFromCorners;
 
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray

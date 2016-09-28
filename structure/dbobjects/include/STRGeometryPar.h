@@ -16,8 +16,6 @@
 
 namespace Belle2 {
 
-  class GearDir;
-
   /**
   * The Class for STR geometry
   */
@@ -27,16 +25,10 @@ namespace Belle2 {
   public:
 
     //! Default constructor
-    STRGeometryPar() {}
-
-    //! Constructor using Gearbox
-    explicit STRGeometryPar(const GearDir&);
+    STRGeometryPar();
 
     //! Destructor
     ~STRGeometryPar();
-
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
 
     //
     // Setters and Getters
@@ -50,88 +42,104 @@ namespace Belle2 {
     void setVersion(int version) { m_Version = version; }
 
     //
-    // Shield patameters
+    // Shield parameters
     //
 
 
     //! Get the number of layers in the shield
-    int getNLayers(int iShield) const { return m_NLayers[iShield] ; }
+    int getNLayers(int shield) const { return m_NLayers[shield] ; }
 
-    //! Set the number of layers in the shield
-    void setNLayers(int iShield, int nLayers) { m_NLayers[iShield] = nLayers ;}
+    //! Set the number of layers in the shield, resize std::vectors
+    void setNLayers(int shield, int nLayers)
+    {
+      m_NLayers[shield] = nLayers ;
+
+      // Resize std::vectors according to the number of layers
+      m_LayerMaterial[shield].resize(nLayers);
+      m_LayerNPlanes[shield].resize(nLayers);
+      m_LayerPlaneZ[shield].resize(nLayers);
+      m_LayerPlaneInnerRadius[shield].resize(nLayers);
+      m_LayerPlaneOuterRadius[shield].resize(nLayers);
+
+    }
 
     //! Get the material of a layer (as a std::string)
-    std::string getLayerMaterial(int iShield, int layer) const { return m_LayerMaterial[iShield].at(layer);}
+    std::string getLayerMaterial(int shield, int layer) const { return m_LayerMaterial[shield].at(layer);}
 
     //! Set the material of a layer (as a std::string)
-    void setLayerMaterial(int iShield, int layer, std::string material) { m_LayerMaterial[iShield].at(layer) = material; }
+    void setLayerMaterial(int shield, int layer, std::string material) { m_LayerMaterial[shield].at(layer) = material; }
 
     //! Get Number of polycone planes in each layer
-    int getLayerNPlanes(int iShield, int layer) const
+    int getLayerNPlanes(int shield, int layer) const
     {
-      return m_LayerNPlanes[iShield].at(layer);
+      return m_LayerNPlanes[shield].at(layer);
     }
 
     //! Set Number of polycone planes in each layer
-    void setLayerNPlanes(int iShield, int layer, int nplanes)
+    void setLayerNPlanes(int shield, int layer, int nplanes)
     {
-      m_LayerNPlanes[iShield].at(layer) = nplanes;
+      m_LayerNPlanes[shield].at(layer) = nplanes;
+
+      // Resize std::vectors according to the number of planes in each layer
+      m_LayerPlaneZ[shield].at(layer).resize(nplanes);
+      m_LayerPlaneInnerRadius[shield].at(layer).resize(nplanes);
+      m_LayerPlaneOuterRadius[shield].at(layer).resize(nplanes);
     }
 
     //! Get Z-position of one plane (w.r.t. IP)
-    double getLayerPlaneZ(int iShield, int layer, int plane) const
+    double getLayerPlaneZ(int shield, int layer, int plane) const
     {
-      return m_LayerPlaneZ[iShield].at(layer).at(plane);
+      return m_LayerPlaneZ[shield].at(layer).at(plane);
     }
 
     //! Get Z-positions of all planes (w.r.t. IP)
-    const double* getLayerPlaneZ(int iShield, int layer) const
+    const double* getLayerPlaneZ(int shield, int layer) const
     {
-      return &m_LayerPlaneZ[iShield].at(layer).at(0);
+      return &m_LayerPlaneZ[shield].at(layer).at(0);
     }
 
 
     //! Set Z-position of each plane (w.r.t. IP)
-    void setLayerPlaneZ(int iShield, int layer, int plane, double z)
+    void setLayerPlaneZ(int shield, int layer, int plane, double z)
     {
-      m_LayerPlaneZ[iShield].at(layer).at(plane) = z;
+      m_LayerPlaneZ[shield].at(layer).at(plane) = z;
     }
 
 
     //! Get Inner radius of one plane
-    double getLayerPlaneInnerRadius(int iShield, int layer, int plane) const
+    double getLayerPlaneInnerRadius(int shield, int layer, int plane) const
     {
-      return m_LayerPlaneInnerRadius[iShield].at(layer).at(plane);
+      return m_LayerPlaneInnerRadius[shield].at(layer).at(plane);
     }
 
     //! Get Inner radius of all planes
-    const  double* getLayerPlaneInnerRadius(int iShield, int layer) const
+    const  double* getLayerPlaneInnerRadius(int shield, int layer) const
     {
-      return &m_LayerPlaneInnerRadius[iShield].at(layer).at(0);
+      return &m_LayerPlaneInnerRadius[shield].at(layer).at(0);
     }
 
     //! Set Inner radii of the planes
-    void setLayerPlaneInnerRadius(int iShield, int layer, int plane, double r)
+    void setLayerPlaneInnerRadius(int shield, int layer, int plane, double r)
     {
-      m_LayerPlaneInnerRadius[iShield].at(layer).at(plane) = r;
+      m_LayerPlaneInnerRadius[shield].at(layer).at(plane) = r;
     }
 
     //! Get Outer radii of one planes
-    double getLayerPlaneOuterRadius(int iShield, int layer, int plane) const
+    double getLayerPlaneOuterRadius(int shield, int layer, int plane) const
     {
-      return m_LayerPlaneOuterRadius[iShield].at(layer).at(plane);
+      return m_LayerPlaneOuterRadius[shield].at(layer).at(plane);
     }
 
     //! Get Outer radii of all planes
-    const double* getLayerPlaneOuterRadius(int iShield, int layer) const
+    const double* getLayerPlaneOuterRadius(int shield, int layer) const
     {
-      return &m_LayerPlaneOuterRadius[iShield].at(layer).at(0);
+      return &m_LayerPlaneOuterRadius[shield].at(layer).at(0);
     }
 
     //! Set Outer radii of the planes
-    void setLayerPlaneOuterRadius(int iShield, int layer, int plane, double r)
+    void setLayerPlaneOuterRadius(int shield, int layer, int plane, double r)
     {
-      m_LayerPlaneOuterRadius[iShield].at(layer).at(plane) = r;
+      m_LayerPlaneOuterRadius[shield].at(layer).at(plane) = r;
     }
 
 
@@ -149,12 +157,6 @@ namespace Belle2 {
 
   private:
 
-
-    //! Read ECL shield parameters
-    /*!
-      \param side is either "FWD_Shield" or "BWD_Shield". Checking is done first in this method
-    */
-    void ReadShield(const GearDir& content, std::string side);
 
     //! static pointer to the singleton instance of this class
     static STRGeometryPar* m_Instance;

@@ -108,5 +108,62 @@ namespace Belle2 {
       }
 
     }
+
+    STRGeometryPar GeoSTRCreator::createConfiguration(const GearDir& param)
+    {
+      STRGeometryPar strGeometryPar;
+
+      // Get STR geometry parameters from Gearbox (no calculations here)
+      readShield(param, strGeometryPar, "FWD_Shield");
+      readShield(param, strGeometryPar, "BWD_Shield");
+
+
+      return strGeometryPar;
+    };
+
+    void GeoSTRCreator::readShield(const GearDir& content, STRGeometryPar& parameters, std::string side)
+    {
+
+      // Check if method was called using the correct name for the shields
+      std::size_t foundF = side.find("FWD_Shield");
+      std::size_t foundB = side.find("BWD_Shield");
+
+      int iShield;
+      if (foundF != std::string::npos) { iShield = parameters.FWD_ECLSHIELD; }
+      else if (foundB != std::string::npos) { iShield = parameters.BWD_ECLSHIELD; }
+      else { B2FATAL("No data for the ECL shield called " << side << "(not found)");}
+
+
+      std::string gearPath = (boost::format("%1%/Layers/Layer") % side).str();
+
+      // Retrieve the number of layers in the shield
+      int nLayers = content.getNumberNodes(gearPath);
+      parameters.setNLayers(iShield, nLayers);
+
+
+      for (int iLayer = 0 ; iLayer < nLayers ; ++iLayer) {
+        //Thread the strings
+        std::string layerPath   = (boost::format("/%1%[%2%]/") % gearPath % (iLayer + 1)).str();
+
+        // Connect the appropriate Gearbox path
+        GearDir layerContent(content);
+        layerContent.append(layerPath);
+
+        // Retrieve material material
+        parameters.setLayerMaterial(iShield, iLayer, layerContent.getString("Material", "Air"));
+
+        // Read the shape parameters
+        const std::vector<GearDir> planes = layerContent.getNodes("Plane");
+        parameters.setLayerNPlanes(iShield, iLayer, planes.size());
+        B2INFO("Number of planes on side  " << side << " layer " << iLayer
+               << " : " << planes.size());
+
+        for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
+          parameters.setLayerPlaneZ(iShield, iLayer, iPlane, planes.at(iPlane).getLength("posZ"));
+          parameters.setLayerPlaneInnerRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("innerRadius"));
+          parameters.setLayerPlaneOuterRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("outerRadius"));
+        }
+      }
+    }
   }
 }

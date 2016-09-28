@@ -83,25 +83,11 @@ namespace Belle2 {
     protected:
 
     private:
-      //! The methods that reads the GearBox directory and puts the shield in the G4 Top Volume
-      /*!
-      \param content directory where to read shield info from the xml
-      \param topVolume: Gean4 Top volume (where to include shields)
-       \param side: string corresponding to the shield type
-      \return the mass of the shield in kg
-      */
-      float BuildShield(const GearDir& content, G4LogicalVolume& topVolume, std::string side);
-
-
       /** Create a parameter object from the Gearbox XML parameters. If more
        * than one object is created these could be assigned to members or you
        * could return a tuple. */
-      STRGeometryPar createConfiguration(const GearDir& param)
-      {
-        STRGeometryPar strGeometryPar;
-        strGeometryPar.read(param);
-        return strGeometryPar;
-      };
+      STRGeometryPar createConfiguration(const GearDir& param);
+
 
       /** Create the geometry from a parameter object. If more than one object
        * is needed these could instead be taken from member variables or the
@@ -109,6 +95,11 @@ namespace Belle2 {
       void createGeometry(const STRGeometryPar& parameters, G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
 
+
+      /** Read xml files from GearDir for one of the ECL shields
+       *
+       */
+      void readShield(const GearDir& content, STRGeometryPar& parameters, std::string side);
 
       //! Pointer to the STR geometry accessor
       STRGeometryPar* m_GeoPar;

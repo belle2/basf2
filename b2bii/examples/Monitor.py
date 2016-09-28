@@ -45,7 +45,7 @@ inputBelleMDSTFile = sys.argv[2]
 # set the location of the Belle DB server
 # options are: ekpbelle.physik.uni-karlsruhe.de
 # or ekpbelle.physik.uni-karlsruhe.de (if you're running outside KEKCC computers)
-os.environ['BELLE_POSTGRES_SERVER'] = 'can51'
+os.environ['BELLE_POSTGRES_SERVER'] = 'can01'
 os.environ['USE_GRAND_REPROCESS_DATA'] = '1'
 
 # Convert

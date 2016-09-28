@@ -18,8 +18,8 @@ DisplayData::~DisplayData()
 {
   m_pointSets.clear();
   m_labels.clear();
-  for (unsigned int i = 0; i < m_histograms.size(); i++)
-    delete m_histograms[i];
+  for (auto hist : m_histograms)
+    delete hist;
   m_histograms.clear();
 }
 

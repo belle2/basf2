@@ -39,7 +39,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Teacher::Teacher(TeacherConfig config, bool useExistingData) : m_config(config), m_file(nullptr), m_tree("",
+    Teacher::Teacher(const TeacherConfig& config, bool useExistingData) : m_config(config), m_file(nullptr), m_tree("",
           DataStore::c_Persistent), splot_class(1)
     {
       B2WARNING("TMVAInterface is deprecated and will be removed, please migrate all your code to the new mva package!");
@@ -292,7 +292,7 @@ namespace Belle2 {
       return distinct_values;
     }
 
-    TTree* Teacher::getClassTree(std::string target, int classID)
+    TTree* Teacher::getClassTree(const std::string& target, int classID)
     {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
@@ -317,7 +317,8 @@ namespace Belle2 {
       return tree;
     }
 
-    void Teacher::trainSPlot(std::string modelFileName, std::vector<std::string> discriminatingVariables, std::string weight)
+    void Teacher::trainSPlot(const std::string& modelFileName, std::vector<std::string> discriminatingVariables,
+                             const std::string& weight)
     {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 
@@ -422,8 +423,9 @@ namespace Belle2 {
 
     }
 
-    void Teacher::train(std::string factoryOption, std::string prepareOption, std::string target, std::string signal_weight,
-                        std::string background_weight)
+    void Teacher::train(const std::string& factoryOption, const std::string& prepareOption, const std::string& target,
+                        const std::string& signal_weight,
+                        const std::string& background_weight)
     {
 
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
@@ -488,7 +490,8 @@ namespace Belle2 {
       }
     }
 
-    void Teacher::trainClassification(std::string factoryOption, std::string prepareOption, std::string target, std::string weight)
+    void Teacher::trainClassification(const std::string& factoryOption, const std::string& prepareOption, const std::string& target,
+                                      const std::string& weight)
     {
       WorkingDirectoryManager dummy(m_config.getWorkingDirectory());
 

@@ -30,7 +30,7 @@
 #include <tracking/trackFindingVXD/segmentNetwork/CACell.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
 
-#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 
 #include <tracking/trackFindingVXD/tcTools/SpacePointTrackCandCreator.h>
 

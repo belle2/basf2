@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/SimpleSegmentTripleRelationFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

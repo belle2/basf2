@@ -22,7 +22,6 @@
 #include <TMath.h>
 #include <numeric>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

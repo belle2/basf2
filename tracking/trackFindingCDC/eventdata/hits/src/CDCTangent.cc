@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCTangent.h>
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

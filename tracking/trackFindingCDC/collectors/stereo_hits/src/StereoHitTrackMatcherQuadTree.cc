@@ -9,7 +9,6 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

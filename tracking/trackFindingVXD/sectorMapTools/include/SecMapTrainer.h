@@ -15,10 +15,13 @@
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainerHit.h>
 #include <tracking/trackFindingVXD/sectorMapTools/SecMapTrainerTC.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
+#include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 
 #include <tracking/trackFindingVXD/sectorMapTools/FilterMill.h>
 #include <tracking/trackFindingVXD/sectorMapTools/RawSecMapRootInterface.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
+//#include <tracking/trackFindingVXD/sectorMapTools/SectorTools.h>
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
+
 
 #include <framework/geometry/B2Vector3.h>
 
@@ -38,7 +41,15 @@ namespace Belle2 {
   template <class FilterFactoryType>
   class SecMapTrainer {
   protected:
-    /** Contains all relevant configurations needed for training a sectorMap. */
+    /** name of the setting to be used for this training */
+    const std::string m_nameSetup;
+
+    /** pointer to the SectorMap used for this training. Needed as some information is
+    only accessable from the filters (in the sectormap).  */
+    StoreObjPtr< SectorMap<SpacePoint> >  m_secMapPtr;
+
+    /** Contains all relevant configurations needed for training a sectorMap.
+    Copy of the config in the SectorMap needed as it is modified (the one in VXDTFFilters is const).  */
     SectorMapConfig m_config;
 
 
@@ -283,15 +294,18 @@ namespace Belle2 {
   public:
 
     /** constructor. */
-    SecMapTrainer(SectorMapConfig& configData, int rngAppendix = 0) :
-      m_config(configData),
+    SecMapTrainer(StoreObjPtr< SectorMap<SpacePoint> >& sectorMap, std::string setupName , int rngAppendix = 0) :
+      m_nameSetup(setupName),
+      //WARNING: if someone ever changes the default name or the template class this will break
+      m_secMapPtr(sectorMap),
+      m_config(m_secMapPtr->getFilters(m_nameSetup)->getConfig()),
       m_factory(
-        configData.vIP.X(),
-        configData.vIP.Y(),
-        configData.vIP.Z(),
-        configData.mField),
+        m_config.vIP.X(),
+        m_config.vIP.Y(),
+        m_config.vIP.Z(),
+        m_config.mField),
       m_filterMill(),
-      m_rootInterface(configData.secMapName, rngAppendix),
+      m_rootInterface(m_config.secMapName, rngAppendix),
       m_expNo(std::numeric_limits<unsigned>::max()),
       m_runNo(std::numeric_limits<unsigned>::max()),
       m_evtNo(std::numeric_limits<unsigned>::max())
@@ -348,6 +362,11 @@ namespace Belle2 {
     /** returns configuration. */
     const SectorMapConfig& getConfig() { return m_config; }
 
+    /** returns pointer to the used sector map */
+    StoreObjPtr< SectorMap<SpacePoint> >*   getSecMapPtr() { return &m_secMapPtr; }
+
+    /** returns the name of the setup used for this trainer */
+    const std::string getSetupName() { return m_nameSetup; }
 
     /** checks if given TC is acceptable for this trainer and store it if it is accepted.
     *
@@ -390,7 +409,8 @@ namespace Belle2 {
       for (const SpacePoint* aSP : tc.getHits()) {
         if (!acceptHit(*aSP)) continue;
 
-        FullSecID fSecID = createSecID(aSP->getVxdID(), aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV());
+        FullSecID fSecID = m_secMapPtr->getFilters(m_nameSetup)->getFullID(aSP->getVxdID(),
+                           aSP->getNormalizedLocalU(), aSP->getNormalizedLocalV());
         if (fSecID.getFullSecID() == std::numeric_limits<unsigned int>::max())
         { B2ERROR("a secID for spacePoint not found!"); continue; }
 
@@ -413,6 +433,7 @@ namespace Belle2 {
 
     /** for given normalized local variables and VxdID a FullSecID is determined.
      * returns unsigned int max if correct ID could not be found. */
+    /*
     FullSecID createSecID(VxdID iD, double uVal, double vVal)
     {
       // TODO replace by new secMap-design-approach
@@ -425,7 +446,7 @@ namespace Belle2 {
         return FullSecID(std::numeric_limits<unsigned int>::max());
       return FullSecID(iD, false, secID);
     }
-
+    */
 
 
     /** takes all TCs stored and processed them for root storing.

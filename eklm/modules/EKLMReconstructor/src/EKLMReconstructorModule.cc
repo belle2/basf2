@@ -71,7 +71,7 @@ void EKLMReconstructorModule::initialize()
   m_GeoDat = &(EKLM::GeometryData::Instance());
   if (m_GeoDat->getNPlanes() != 2)
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
-  m_nStrip = m_GeoDat->getMaximalStripNumber();
+  m_nStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_TimeCalibrationData = new EKLMTimeCalibrationData*[m_nStrip];
   setDefDigitizationParams(&m_digPar);
 }

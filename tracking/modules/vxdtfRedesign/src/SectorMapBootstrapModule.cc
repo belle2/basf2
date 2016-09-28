@@ -9,19 +9,19 @@
  *******************************************************************************/
 
 #include <iostream>
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
-#include "tracking/trackFindingVXD/filterTools/Observer.h"
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h>
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
@@ -59,6 +59,7 @@ SectorMapBootstrapModule::initialize()
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
+  //Thomas : is that file used for observer only! Shouldnt it be then optional?
   m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
   m_tfile->cd();
   TTree* newTree = new TTree("twoHitTree", "reallyWeWantToHaveThatTTreeNow");
@@ -88,8 +89,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
 
 
-  // TO DO: Most of these informations are not used at all.
-  //        It seems to me (EP) that onlue the SectorDividers are used.
+  // TODO: Most of these informations are not used at all.
+  //        It seems to me (EP) that only the SectorDividers are used.
 
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;

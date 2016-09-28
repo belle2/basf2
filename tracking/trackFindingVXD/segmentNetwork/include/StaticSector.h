@@ -9,7 +9,7 @@
  *******************************************************************************/
 #pragma once
 #include <tracking/dataobjects/FullSecID.h>
-#include <tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h>
+#include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
 
 #include <unordered_map>
 #include <tuple>
@@ -168,7 +168,8 @@ namespace Belle2 {
     {
       auto filter = m_2spFilters.find(m_compactSecIDsMap->getCompactID(innerID));
       if (filter == m_2spFilters.end()) {
-        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecID (" << innerID.getFullSecString() << ")! Returning false.");
+        B2DEBUG(1, "StaticSector:accept: could not find compactID for given SecID (" << innerID.getFullSecString() <<
+                ")! Returning false.");
         return false;
       }
       return filter->second.accept(spOnThisSec , spOnInnerSec);

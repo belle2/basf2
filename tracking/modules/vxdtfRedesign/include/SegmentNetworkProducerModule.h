@@ -19,13 +19,12 @@
 
 // tracking
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/dataobjects/FullSecID.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFiltersHelperFunctions.h>
 
 
@@ -49,7 +48,6 @@ namespace Belle2 {
 
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
-//     using StaticSectorType = StaticSectorDummy;
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     // TODO WARNING JKL
@@ -57,7 +55,7 @@ namespace Belle2 {
     struct StaticSectorMap {
 
       /** contains static sectors. */
-      std::vector<StaticSectorDummy*> sectors;
+      std::vector<StaticSectorType*> sectors;
 
       /** destructor. */
       ~StaticSectorMap()
@@ -67,10 +65,10 @@ namespace Belle2 {
       FullSecID getSecID() {return FullSecID(); }
 
       /** returns pointerTo a Static Sector */
-      StaticSectorDummy* getSector(FullSecID aSecID)
+      StaticSectorType* getSector(FullSecID aSecID)
       {
         // TODO WARNING JKL
-        sectors.push_back(new StaticSectorDummy(aSecID));
+        sectors.push_back(new StaticSectorType(aSecID));
         return sectors.back();
       }
     };
@@ -152,8 +150,8 @@ namespace Belle2 {
           or m_PARAMVirtualIPErrors.size() != 3)
         B2FATAL("SegmentNetworkProducerModule:initialize: parameters for virtualIP are wrong - check basf2 -m!");
 
-        m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
-                                            m_PARAMVirtualIPCoordinates.at(2));
+      m_virtualIPCoordinates = B2Vector3D(m_PARAMVirtualIPCoordinates.at(0), m_PARAMVirtualIPCoordinates.at(1),
+                                          m_PARAMVirtualIPCoordinates.at(2));
       m_virtualIPErrors = B2Vector3D(m_PARAMVirtualIPErrors.at(0), m_PARAMVirtualIPErrors.at(1), m_PARAMVirtualIPErrors.at(2));
     }
 

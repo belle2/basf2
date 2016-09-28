@@ -7,7 +7,6 @@
 #include <utility>
 #include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

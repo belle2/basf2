@@ -144,7 +144,7 @@ To be eliminated when the final design is implemented in geometry in future.
 
 Format: layer  backward-deltaz (cm)  forward-deltaz (cm)
 
-deltaz.dat
+deltaz.dat: obsolete (no longer needed).
 
 
 displacement  w.r.t. final design

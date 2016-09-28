@@ -44,6 +44,9 @@ namespace Belle2 {
     /** The relative path and file name for the payload */
     std::string logicalFileName;
 
+    /** Revision number, only used if more then one payload with the same id is
+     * returned to take the highest one. */
+    int revision{0};
   };
 
 

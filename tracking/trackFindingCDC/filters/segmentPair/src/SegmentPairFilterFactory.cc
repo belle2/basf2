@@ -50,17 +50,17 @@ SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
-  } else if (filterName == string("fitless")) {
+  } else if (filterName == "fitless") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new FitlessSegmentPairFilter());
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return std::unique_ptr<Filter<CDCSegmentPair> >(new UnionRecordingSegmentPairFilter());
   } else {
     return Super::create(filterName);

@@ -15,7 +15,6 @@
 
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/dataobjects/RestOfEvent.h>
-#include <analysis/VariableManager/Utility.h>
 
 namespace Belle2 {
 

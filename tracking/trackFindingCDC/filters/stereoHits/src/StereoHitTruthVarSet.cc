@@ -15,7 +15,6 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

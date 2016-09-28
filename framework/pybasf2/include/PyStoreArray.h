@@ -215,7 +215,7 @@ namespace Belle2 {
     void attach() const;
 
   private:
-    /// Store accessor to retrive the object.
+    /// Store accessor to retrieve the object.
     StoreAccessorBase m_storeAccessor;
 
     /// Pointer to the DataStore entry - serves as an internal cache omitting repeated look up from the DataStore.

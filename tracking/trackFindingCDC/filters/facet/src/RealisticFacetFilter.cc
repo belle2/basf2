@@ -14,7 +14,6 @@
 #include <framework/logging/Logger.h>
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -107,7 +106,7 @@ Weight RealisticFacetFilter::operator()(const CDCFacet& facet)
 
     // Introducing a mini penilty to distiguish better facets.
     double miniPenalty =
-      min(0.1, (startPhiPull + middlePhiPull + endPhiPull) / m_param_phiPullCut / 1000);
+      std::fmin(0.1, (startPhiPull + middlePhiPull + endPhiPull) / m_param_phiPullCut / 1000);
 
     //Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

@@ -11,7 +11,6 @@
 
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Belle2::TrackFindingCDC;
 using namespace Eigen;
 

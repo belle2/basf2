@@ -11,7 +11,6 @@
 
 #include <boost/math/tools/minima.hpp>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

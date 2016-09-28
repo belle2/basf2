@@ -23,7 +23,6 @@
 
 #include <TMath.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -223,7 +222,7 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 //if B2B return 0;
 
   // Dismiss this possibility if the hit list size after all the removing of hits is even smaller than the two lists before or if the list is too small
-  if (commonHitListOfTwoTracks.size() <= max(track1.size(), track2.size())
+  if (commonHitListOfTwoTracks.size() <= std::max(track1.size(), track2.size())
       or commonHitListOfTwoTracks.size() < 15) {
     return 0;
   }

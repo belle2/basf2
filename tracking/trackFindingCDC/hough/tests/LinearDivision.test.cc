@@ -16,7 +16,6 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

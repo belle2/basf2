@@ -57,6 +57,7 @@ namespace Belle2 {
   CDCSensitiveDetector::CDCSensitiveDetector(G4String name, G4double thresholdEnergyDeposit, G4double thresholdKineticEnergy):
     SensitiveDetectorBase(name, Const::CDC),
     //    m_cdcgp(CDCGeometryPar::Instance()),
+    m_cdcgp(nullptr),
     m_thresholdEnergyDeposit(thresholdEnergyDeposit),
     m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
   {

@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilterFactory.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,15 +31,15 @@ BackgroundSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseBackgroundSegmentsFilter>
 BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new BaseBackgroundSegmentsFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new MCBackgroundSegmentsFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new AllBackgroundSegmentsFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter("BackgroundSegmentsFilter"));
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter("BackgroundSegmentsFilter.root"));
   } else {
     return Super::create(filterName);

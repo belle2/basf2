@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilters.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -48,11 +47,11 @@ TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseTrackRelationFilter >
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseTrackRelationFilter >(new BaseTrackRelationFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseTrackRelationFilter >(new MCTrackRelationFilter());
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return std::unique_ptr<BaseTrackRelationFilter >(new UnionRecordingTrackRelationFilter());
   } else {
     return Super::create(filterName);

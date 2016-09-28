@@ -56,6 +56,8 @@ ECLDigitCalibratorModule::ECLDigitCalibratorModule() : m_calibrationEnergyHigh("
   setDescription("Applies digit energy, time and time-resolution calibration to each ECL digit. Counts number of out-of-time background digits to determine the event-by-event background level.");
   addParam("backgroundEnergyCut", m_backgroundEnergyCut, "Energy cut used to count background digits", 7.0 * Belle2::Unit::MeV);
   addParam("backgroundTimingCut", m_backgroundTimingCut, "Timing cut used to count background digits", 110.0 * Belle2::Unit::ns);
+  addParam("fileBackgroundName", m_fileBackgroundName, "Background filename.",
+           FileSystem::findFile("/data/ecl/background_norm.root"));
 
   // Parallel processing certification
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -87,9 +89,24 @@ void ECLDigitCalibratorModule::initialize()
   // resize vector that holds the time (and time resolution) calibration constants
   m_calibrationTimeOffset.resize(c_nCrystals + 1);
 
-  // HARDCODED VALUES WILL DISAPPEAR FOR RELEASE-00-08
+  // HARDCODED VALUES SHOULD DISAPPEAR FOR RELEASE-00-08
   // time calibration for MC: t = a * (m_timeFit + b)
   m_timeInverseSlope = 1.0 / 2.0366; // "b", (CH for svn revision 25745)
+
+  // read the Background correction factors (for full background)
+  m_fileBackground = new TFile(m_fileBackgroundName.c_str(), "READ");
+  if (!m_fileBackground) B2FATAL("Could not find file: " << m_fileBackgroundName);
+  m_th1dBackground = (TH1D*) m_fileBackground->Get("background");
+
+  // average BG value from m_th1dBackground
+  m_averageBG = m_th1dBackground->Integral() / m_th1dBackground->GetEntries();
+
+  // get maximum position ("x") of 2-order pol background for t99
+  if (fabs(c_pol2Var3) > 1e-12) {
+    m_pol2Max = -c_pol2Var2 / (2 * c_pol2Var3);
+  } else {
+    m_pol2Max = 0.;
+  }
 
   // time resolution calibration for MC (for full background. for no background, this will be a pessimistic approximation.)
   m_timeResolutionPointResolution[0] =   0.134 * Belle2::Unit::ns; // (CH for svn revision 26660)
@@ -149,9 +166,7 @@ void ECLDigitCalibratorModule::event()
     const double calibratedTime = getCalibratedTime(cellid, time,
                                                     aECLCalDigit->hasStatus(ECLCalDigit::c_IsFailedFit)); // calibrated time
 
-    // perform the time resolution calibration
-    const double calibratedTimeResolution = getCalibratedTimeResolution(cellid, calibratedEnergy,
-                                            aECLCalDigit->hasStatus(ECLCalDigit::c_IsFailedFit)); // calibrated time resolution
+    B2DEBUG(170, "cellid = " << cellid << ", amplitude = " << amplitude << ", energy = " << calibratedEnergy);
 
     // fill the ECLCalDigit with the cell id, the calibrated information and calibration status
     aECLCalDigit->setCellId(cellid);
@@ -160,9 +175,6 @@ void ECLDigitCalibratorModule::event()
 
     aECLCalDigit->setTime(calibratedTime);
     aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeCalibrated);
-
-    aECLCalDigit->setTimeResolution(calibratedTimeResolution);
-    aECLCalDigit->addStatus(ECLCalDigit::c_IsTimeResolutionCalibrated);
 
     // set a relation to the ECLDigit
     aECLCalDigit->addRelationTo(&aECLDigit);
@@ -174,7 +186,21 @@ void ECLDigitCalibratorModule::event()
   }
 
   // determine background level
-  determineBackgroundECL();
+  const int bgCount = determineBackgroundECL();
+
+  // set the t99 (time resolution)
+  for (auto& aECLCalDigit : eclCalDigits) {
+
+    // perform the time resolution calibration
+    const double t99 = getT99(aECLCalDigit.getCellId(),
+                              aECLCalDigit.getEnergy(),
+                              aECLCalDigit.hasStatus(ECLCalDigit::c_IsFailedFit),
+                              bgCount); // calibrated time resolution
+    aECLCalDigit.setTimeResolution(t99);
+    aECLCalDigit.addStatus(ECLCalDigit::c_IsTimeResolutionCalibrated);
+  }
+
+
 
 }
 
@@ -197,11 +223,6 @@ double ECLDigitCalibratorModule::getCalibratedEnergy(int cellid, int amplitude) 
   //for small amplitudes we return zero (to be discussed and coordinated with digitizer development)
   if (amplitude <= c_MinimumAmplitude) return c_energyForSmallAmplitude;
 
-  // get the two energy points and respective calibration constants for this crystal E = A * calE/calA
-//  const float calA  = m_calibrationEnergyAmplitudeHigh.at(cellid);
-//  const float calE  = m_calibrationEnergyEnergyHigh.at(cellid);
-//  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedEnergy: calA = " << calA << ", calE = " << calE);
-
   double calenergy = static_cast<double>(amplitude) * m_calibrationEnergyHighRatio.at(cellid);
 
   return calenergy;
@@ -222,38 +243,56 @@ double ECLDigitCalibratorModule::getCalibratedTime(const int cellid, const int f
 }
 
 // Time resolution calibration
-double ECLDigitCalibratorModule::getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed) const
+double ECLDigitCalibratorModule::getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const
 {
 
   // if this digit is calibrated to the trigger time, we set the resolution to 'very bad' (to be discussed)
   if (fitfailed) return c_timeResolutionForFitFailed;
 
-  // piecewise linear extrapolation in x with E (in GeV) = 1/x
-  double x = 1.e12; //
-  if (energy > 1.e-9) x = 1. / (energy / Belle2::Unit::GeV);  // avoid division by (almost) zero
-  else return c_timeResolutionForZeroEnergy;
+  // Get the background level [MeV / mus]
+  const double bglevel = TMath::Min((double) bgcount / (double) c_nominalBG * m_th1dBackground->GetBinContent(cellid) / m_averageBG,
+                                    m_pol2Max); // c_nominalBG = 183 for actual version of digitizer, m_averageBG is about 2 MeV/ mus
 
-  int bin = 0;
-  if (x > m_timeResolutionPointX[2]) bin = 2;
-  else if (x > m_timeResolutionPointX[1]) bin = 1;
+  // Get p1 as function of background level
+  const double p1 = c_pol2Var1 + c_pol2Var2 * bglevel + c_pol2Var3 * bglevel * bglevel;
 
-  double timeresolution = getInterpolatedTimeResolution(x, bin);
+  // inverse energy in 1/MeV
+  double einv = 0.;
+  if (energy > 1e-12) einv = 1. / (energy / Belle2::Unit::MeV);
 
-  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTimeResolution: cellid = " << cellid << ", timeresolution = " <<
-          timeresolution);
+  // calculate t99 using the inverse energy and p1 (p0 is zero)
+  double t99 = p1 * einv;
 
-  return timeresolution;
+  // for high energies we fix t99 to 3.5ns
+  if (t99 < c_minT99) t99 = c_minT99;
+
+//  // piecewise linear extrapolation in x with E (in GeV) = 1/x
+//  double x = 1.e12; //
+//  if (energy > 1.e-9) x = 1. / (energy / Belle2::Unit::GeV);  // avoid division by (almost) zero
+//  else return c_timeResolutionForZeroEnergy;
+//
+//  int bin = 0;
+//  if (x > m_timeResolutionPointX[2]) bin = 2;
+//  else if (x > m_timeResolutionPointX[1]) bin = 1;
+//
+//  double timeresolution = getInterpolatedTimeResolution(x, bin);
+
+  B2DEBUG(175, "ECLDigitCalibratorModule::getCalibratedTimeResolution: dose = " << m_th1dBackground->GetBinContent(
+            cellid) << ", bglevel = " << bglevel << ", cellid = " << cellid << ", t99 = " << t99 << ", energy = " << energy /
+          Belle2::Unit::MeV);
+
+  return t99;
 }
 
-// time resolution interpolation
-double ECLDigitCalibratorModule::getInterpolatedTimeResolution(const double x, const int bin) const
-{
-  double interpolation = m_timeResolutionPointResolution[bin] +
-                         (m_timeResolutionPointResolution[bin + 1] - m_timeResolutionPointResolution[bin]) *
-                         (x - m_timeResolutionPointX[bin]) / (m_timeResolutionPointX[bin + 1] - m_timeResolutionPointX[bin]);
-
-  return interpolation;
-}
+//// time resolution interpolation
+//double ECLDigitCalibratorModule::getInterpolatedTimeResolution(const double x, const int bin) const
+//{
+//  double interpolation = m_timeResolutionPointResolution[bin] +
+//                         (m_timeResolutionPointResolution[bin + 1] - m_timeResolutionPointResolution[bin]) *
+//                         (x - m_timeResolutionPointX[bin]) / (m_timeResolutionPointX[bin + 1] - m_timeResolutionPointX[bin]);
+//
+//  return interpolation;
+//}
 
 // prepare energy calibration constants (high energy point only)
 void ECLDigitCalibratorModule::prepareEnergyCalibrationConstants()
@@ -317,7 +356,7 @@ void ECLDigitCalibratorModule::prepareTimeCalibrationConstants()
 }
 
 // Determine background level by event by counting out-of-time digits above threshold.
-void ECLDigitCalibratorModule::determineBackgroundECL()
+int ECLDigitCalibratorModule::determineBackgroundECL()
 {
   // Input StoreObjArray(s)
   StoreArray<ECLCalDigit> eclCalDigits(eclCalDigitArrayName());
@@ -346,5 +385,6 @@ void ECLDigitCalibratorModule::determineBackgroundECL()
   eclEventInformationPtr->setBackgroundECL(backgroundcount);
 
   B2DEBUG(175, "ECLDigitCalibratorModule::determineBackgroundECL(): backgroundcount = " << backgroundcount);
+  return backgroundcount;
 
 }

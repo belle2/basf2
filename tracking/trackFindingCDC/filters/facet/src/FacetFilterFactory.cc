@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet/FacetFilters.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -54,25 +53,25 @@ FacetFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<Filter<CDCFacet> >
 FacetFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<Filter<CDCFacet> >(new BaseFacetFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<Filter<CDCFacet> >(new AllFacetFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
-  } else if (filterName == string("feasible")) {
+  } else if (filterName == "feasible") {
     return std::unique_ptr<Filter<CDCFacet> >(new FeasibleRLFacetFilter());
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
-  } else if (filterName == string("realistic")) {
+  } else if (filterName == "realistic") {
     return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter());
-  } else if (filterName == string("realistic_loss")) {
+  } else if (filterName == "realistic_loss") {
     return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter(25));
-  } else if (filterName == string("chi2")) {
+  } else if (filterName == "chi2") {
     return std::unique_ptr<Filter<CDCFacet> >(new Chi2FacetFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<Filter<CDCFacet> >(new TMVAFacetFilter());
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return std::unique_ptr<Filter<CDCFacet> >(new UnionRecordingFacetFilter());
   } else {
     return Super::create(filterName);

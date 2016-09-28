@@ -76,7 +76,18 @@ SecMapTrainerVXDTFModule::SecMapTrainerVXDTFModule() :
   testData1.rarenessThreshold = 0.001;
   testData1.quantiles = {0.005, 0.005};
 
-  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(testData1, rngAppendix());
+  //needed to  store the config
+  StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
+  //sectorMap.required();
+
+  std::string setupName = "testData1";
+  VXDTFFilters<SpacePoint>* filters = new VXDTFFilters<SpacePoint>();
+  filters->setConfig(testData1);
+  // the sectormap takes the ownership
+  sectorMap->assignFilters(setupName, filters);
+
+
+  SecMapTrainer<XHitFilterFactory<SecMapTrainerHit> > newMap(sectorMap, setupName, rngAppendix());
 
   m_secMapTrainers.push_back(std::move(newMap));
 }
@@ -90,12 +101,14 @@ void SecMapTrainerVXDTFModule::initialize()
   if (m_PARAMallowTraining == false)
     B2FATAL("you want to execute SecMapTrainerVXDTF but the parameter 'allowTraining' is false! Aborting...");
 
-    for (auto& trainer : m_secMapTrainers) {
-      trainer.initialize();
-    }
+  for (auto& trainer : m_secMapTrainers) {
+    trainer.initialize();
+  }
 
-//   m_testTrainer.initialize();
+  //   m_testTrainer.initialize();
   m_spacePointTrackCands.isRequired(m_PARAMspTCarrayName);
+
+
 }
 
 
@@ -112,7 +125,7 @@ void SecMapTrainerVXDTFModule::event()
   for (auto& trainer : m_secMapTrainers) {
     trainer.initializeEvent(thisExperiment, thisRun, thisEvent);
   }
-//   m_testTrainer.initializeEvent(thisExperiment, thisRun, thisEvent);
+  //   m_testTrainer.initializeEvent(thisExperiment, thisRun, thisEvent);
 
   //simulated particles and hits
   unsigned nSPTCs = m_spacePointTrackCands.getEntries();
@@ -124,13 +137,15 @@ void SecMapTrainerVXDTFModule::event()
   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": size of array nSpacePointTrackCands: " << nSPTCs);
 
 
+
+
   /// loop over all TCs and all secMaps and assign fitting TCs to their maps, respectively.
   unsigned nAccepted = 0;
   for (unsigned iTC = 0; iTC not_eq nSPTCs; ++ iTC) {
     const SpacePointTrackCand* currentTC = m_spacePointTrackCands[iTC];
     B2DEBUG(10, "currens SPTC has got " << currentTC->getNHits() << " hits stored");
 
-//     bool accepted = m_testTrainer.storeTC(*currentTC, iTC);
+    //     bool accepted = m_testTrainer.storeTC(*currentTC, iTC);
 
     for (auto& trainer : m_secMapTrainers) {
       bool accepted = trainer.storeTC(*currentTC, iTC);
@@ -148,10 +163,10 @@ void SecMapTrainerVXDTFModule::event()
             ": number of TCs processed: " << nTCsProcessed <<
             ", calculations done!");
   }
-//   unsigned nTCsProcessed = m_testTrainer.processTracks();
+  //   unsigned nTCsProcessed = m_testTrainer.processTracks();
 
-//   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs processed: " << nTCsProcessed <<
-//           ", calculations done!");
+  //   B2DEBUG(5, "SecMapTrainerVXDTFModule, event " << thisEvent << ": number of TCs processed: " << nTCsProcessed <<
+  //           ", calculations done!");
 }
 
 

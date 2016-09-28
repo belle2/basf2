@@ -17,6 +17,7 @@
 
 // framework aux
 #include <framework/logging/Logger.h>
+#include <framework/utilities/HTML.h>
 
 #include <iostream>
 #include <algorithm>
@@ -223,17 +224,24 @@ bool ParticleList::contains(const Particle* p, bool includingAntiList) const
 
 void ParticleList::print() const
 {
+  B2INFO(HTML::htmlToPlainText(getInfoHTML()));
+}
+
+std::string ParticleList::getInfoHTML() const
+{
+  std::stringstream stream;
   unsigned thisFSCount = getNParticlesOfType(c_FlavorSpecificParticle);
   unsigned thisSCCount = getNParticlesOfType(c_SelfConjugatedParticle);
   unsigned antiFSCount = getNParticlesOfType(c_FlavorSpecificParticle, true);
   unsigned antiSCCount = getNParticlesOfType(c_SelfConjugatedParticle, true);
 
   if (!m_antiListName.empty()) {
-    B2INFO(" ParticleLists: " << m_thisListName << " (" << thisFSCount << "+" << thisSCCount << ")"
-           << " + " << m_antiListName << " (" << antiFSCount << "+" << antiSCCount << ")");
+    stream << " ParticleLists: " << m_thisListName << " (" << thisFSCount << "+" << thisSCCount << ")"
+           << " + " << m_antiListName << " (" << antiFSCount << "+" << antiSCCount << ")";
   } else {
-    B2INFO(" ParticleList : " << m_thisListName << " (" << thisFSCount << "+" << thisSCCount << ")");
+    stream << " ParticleList : " << m_thisListName << " (" << thisFSCount << "+" << thisSCCount << ")";
   }
+  return HTML::escape(stream.str());
 }
 
 ParticleList& ParticleList::getAntiParticleList() const

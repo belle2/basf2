@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

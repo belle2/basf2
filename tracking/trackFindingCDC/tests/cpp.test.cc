@@ -22,7 +22,6 @@ Its purpose is mainly to asure the programmer that his assumptions about run tim
 #include <vector>
 
 
-using namespace std;
 
 TEST(TrackFindingCDCTest, cpp_float)
 {

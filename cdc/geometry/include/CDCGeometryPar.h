@@ -101,17 +101,17 @@ namespace Belle2 {
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
-      /**
-       * Read z-corrections.
-       * @param GearDir Gear Dir.
-       */
-      void readDeltaz(const GearDir);
-
-      /**
-       * Read z-corrections from DB.
-       *
-       */
-      void readDeltaz(const CDCGeometry&);
+      //      /**
+      //       * Read z-corrections.
+      //       * @param GearDir Gear Dir.
+      //       */
+      //      void readDeltaz(const GearDir);
+      //
+      //      /**
+      //       * Read z-corrections from DB.
+      //       *
+      //       */
+      //      void readDeltaz(const CDCGeometry&);
 
       /**
        * Read (mis)alignment params.
@@ -1013,8 +1013,8 @@ namespace Belle2 {
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
-      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
-      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
+      //      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
+      //      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
 
       double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
       double m_minTrackLength;         /*!< Minimum track length for G4 step */

@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilterFactory.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -31,13 +30,13 @@ NewSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseNewSegmentsFilter>
 NewSegmentsFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseNewSegmentsFilter>(new BaseNewSegmentsFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseNewSegmentsFilter>(new MCNewSegmentsFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter("NewSegmentsFilter"));
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseNewSegmentsFilter>(new RecordingNewSegmentsFilter("NewSegmentsFilter.root"));
   } else {
     return Super::create(filterName);

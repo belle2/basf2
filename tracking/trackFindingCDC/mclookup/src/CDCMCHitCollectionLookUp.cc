@@ -15,7 +15,6 @@
 #include <TDatabasePDG.h>
 #include <boost/range/adaptor/reversed.hpp>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

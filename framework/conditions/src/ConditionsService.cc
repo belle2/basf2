@@ -177,14 +177,21 @@ void ConditionsService::parse_payloads(std::string temp)
       payloadInfo.runInitial = payloadIov.get<std::string>("initialRunId.name");
       payloadInfo.expFinal = payloadIov.get<std::string>("finalRunId.experiment.name");
       payloadInfo.runFinal = payloadIov.get<std::string>("finalRunId.name");
+      payloadInfo.revision = payload.get<int>("revision", 0);
 
       if (payloadInfo.package.size() == 0 || payloadInfo.module.size() == 0 || payloadInfo.logicalFileName.size() == 0) {
         B2WARNING("ConditionsService::parse_payload Payload not parsed correctly: empty package, module or filename");
       } else {
         std::string payloadKey = payloadInfo.package + payloadInfo.module;
-        if (payloadExists(payloadKey)) {
-          B2WARNING("Found duplicate payload key " << payloadKey <<
-                    " while parsing conditions payloads. Using refusing to add payload with identical key.");
+        auto payloadIter = m_payloads.find(payloadKey);
+        if (payloadIter != m_payloads.end()) {
+          int keep = std::max(payloadIter->second.revision, payloadInfo.revision);
+          int drop = std::min(payloadIter->second.revision, payloadInfo.revision);
+          if (payloadIter->second.revision < payloadInfo.revision) {
+            payloadIter->second = payloadInfo;
+          }
+          B2WARNING("Found duplicate payload key " << payloadKey << " while parsing conditions payloads. "
+                    "Discarding revision " << drop << " and using revision " << keep);
         } else {
           B2DEBUG(100, "Found payload for module " << payloadInfo.module << " in package " << payloadInfo.package
                   << " at URL " << payloadInfo.logicalFileName << ".  Storing with key: "

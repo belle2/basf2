@@ -1,6 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['analysis', 'framework', 'analysis_dataobjects', 'mdst_dataobjects', 'analysis_utility']
-
-Return('env')
-

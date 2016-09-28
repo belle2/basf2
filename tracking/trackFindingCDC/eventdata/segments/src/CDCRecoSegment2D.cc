@@ -29,7 +29,6 @@
 #include <numeric>
 #include <iterator>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -240,7 +239,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   }
 }
 
-vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
+std::vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
 {
   std::vector<const CDCWire*> wireSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {

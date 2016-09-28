@@ -1,14 +1,23 @@
 #include <iostream>
+#include <string>
+
+#include "TFile.h"
+#include "TH1F.h"
+#include "TCanvas.h"
+#include "TStyle.h"
+#include "TLegend.h"
+
 using namespace std;
 
 // Constructor functions to plot histograms and their difference
-void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string name2, string axisName, int opt);
+void drawHist(const string& fileName, TFile* file1, TFile* file2, const string& name1, const string& name2, const string& axisName, const int opt);
 void DrawUnderOverflow(TH1F *h, string opt);
 
 void plotComparisonBASF1vs2()
 {
   // Remove StatBox
-  gStyle->SetOptStat(0);
+  TStyle* m_gStyle = new TStyle();
+  m_gStyle->SetOptStat(0);
   
   // ADD BASF1 FILE
   TFile *gBASF = new TFile("BASFMonitors-testSample.root"); 
@@ -540,18 +549,19 @@ void plotComparisonBASF1vs2()
     }
 
 
-  gApplication->Terminate();
+  exit(1);
+  //gApplication->Terminate();
 
 }
 
-void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string name2, string axisName, int opt)
+void drawHist(const string& fileName, TFile* file1, TFile* file2, const string& name1, const string& name2, const string& axisName, const int opt)
 {
   // Create canvas
   TCanvas *C = new TCanvas("c1","c1",1000,600);
 
   // Load histograms
-  h1 = (TH1F*) file1->Get(name1.c_str());
-  h2 = (TH1F*) file2->Get(name2.c_str());
+  TH1F *h1 = (TH1F*) file1->Get(name1.c_str());
+  TH1F *h2 = (TH1F*) file2->Get(name2.c_str());
 
   if(!h1 || !h2) 
     cout << "WARNING! Did not find histogram: " << name1 << endl;
@@ -570,9 +580,8 @@ void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string 
 
       // Title for PDF
       string title;
-      ostringstream tempTitle;
-      tempTitle << "Title:" << h1->GetTitle();
-      title = tempTitle.str();
+      string t = "Title:";
+      title = t+h1->GetTitle();
 
       // Create legend
       TLegend *leg = new TLegend(0.6,0.7,0.8,0.9);
@@ -622,16 +631,16 @@ void drawHist(string fileName, TFile* file1, TFile* file2, string name1, string 
 
       // Set PDF file name
       string fName;
-      ostringstream tempfName;
-      tempfName << fileName << ".pdf";
+      string pdf = ".pdf";
+      
+      fName = fileName + pdf;
 
+      string suffix = "";
       if(opt == 0)
-	tempfName << "(";
+	fName = fName + "(";
       else if(opt == 2)
-	tempfName << ")";
-
-      fName = tempfName.str();
-
+	fName = fName + ")";
+      
       // Save histogram as PDF
       C->Print(fName.c_str(), title.c_str());
 

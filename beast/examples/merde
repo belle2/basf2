@@ -1,0 +1,1136 @@
+[INFO] Steering file: CheckGeometry.py
+[RESULT] Starting event processing, random seed is set to 'a18858067c3cfcc2136840d365c4797767dabbff18ccffa2b61c1c519a59370'
+[INFO] Creating geometry for detector: Belle2Detector
+[INFO] Creating Material Config Vacuum
+[INFO] Creating Material Config CDCGas
+[INFO] Creating Material Config STR-HDPE
+[INFO] Creating Material Config STR-PEB03
+[INFO] Creating Material Config STR-PEB30
+[INFO] Creating Material Config STR-PEB01
+[INFO] Creating Material Config STR-PEB05
+[INFO] Creating Material Config STR-PEB10
+[INFO] Creating Material Config STR-PEB15
+[INFO] Creating Material Config STR-PEB20
+[INFO] Creating Material Config STR-PEB25
+[INFO] Creating Material Config STR-Lead
+[INFO] Creating Material Config STR-SUS304
+[INFO] Creating Material Config STR-DryAir
+[INFO] Creating Material Config SUS316L
+[INFO] Creating Material Config SC_COIL
+[INFO] Creating Material Config Cryo_Liq_He
+[INFO] Creating Material Config Cryo_SiO2
+[INFO] Creating Material Config Cryo_Epoxy
+[INFO] Creating Material Config Cryo_G-10
+[INFO] Creating Material Config Cryo_NbTi
+[INFO] Creating Material Config PXD-DockBox
+[INFO] Creating Material Config SVD-DockBox
+[INFO] Creating Material Config VXD-DiamondSensor
+[INFO] Creating Material Config ColdAir
+[INFO] Creating Material Config PXD-BorderThinning
+[INFO] Creating Material Config PXD-SwitcherThinning
+[INFO] Creating Material Config PXD-Zirconoxide
+[INFO] Creating Material Config PXD-Support
+[INFO] Creating Material Config PXD-CarbonTubes
+[INFO] Creating Material Config PXD-Glue
+[INFO] Creating Material Config PXD-Switcher
+[INFO] Creating Material Config PXD-DCD
+[INFO] Creating Material Config PXD-DHP
+[INFO] Creating Material Config SVD-KaptonClean
+[INFO] Creating Material Config SVD-Glue
+[INFO] Creating Material Config SVD-Airex
+[INFO] Creating Material Config SVD-KaptonHybrid
+[INFO] Creating Material Config SVD-KaptonPitchAdapter
+[INFO] Creating Material Config SVD-Carbon
+[INFO] Creating Material Config CFRP
+[INFO] Creating Material Config NEMA_G10_Plate
+[INFO] Creating Material Config CDCHeGas
+[INFO] Creating Material Config CDCEthaneGas
+[INFO] Creating Material Config CDCGlue
+[INFO] Creating Material Config TOPSiO2
+[INFO] Creating Material Config TOPglueNOA61
+[INFO] Creating Material Config TOPglueEpotek301-2
+[INFO] Creating Material Config TOPBorosilicateGlass
+[INFO] Creating Material Config TOPWavelengthFilterIHU340
+[INFO] Creating Material Config TOPPMTBialkali
+[INFO] Creating Material Config TOPPMTBottom
+[INFO] Creating Material Config TOPPCB
+[INFO] Creating Material Config TOPPMTCase
+[INFO] Creating Material Config TOPAir
+[INFO] Creating Material Config TOPVacuum
+[INFO] Creating Material Config TOPQBB
+[INFO] Creating Material Config Aerogel1
+[INFO] Creating Material Config Aerogel2
+[INFO] Creating Material Config ARICH_HAPDQuartz
+[INFO] Creating Material Config ARICH_Ceramics
+[INFO] Creating Material Config ARICH_TileGapsFill
+[INFO] Creating Material Config ARICH_Air
+[INFO] Creating Material Config ARICH_Vacuum
+[INFO] Creating Material Config ARICH_MirrorQuartz
+[INFO] Creating Material Config HAPD_pcb
+[INFO] Creating Material Config ARICH_Silicon
+[INFO] Creating Material Config CsI
+[INFO] Creating Material Config AlTeflon
+[INFO] Creating Material Config AlTeflon_thin
+[INFO] Creating Material Config AlTeflon_thinpenta
+[INFO] Creating Material Config Styrofoam
+[INFO] Creating Material Config RPCReadout
+[INFO] Creating Material Config Freon134A
+[INFO] Creating Material Config RPCGas
+[INFO] Creating Material Config EKLMPolyethylene
+[INFO] Creating Material Config EKLMPolystyrene
+[INFO] Creating Material Config EKLMPolystyrol
+[INFO] Creating Material Config EKLMGel
+[INFO] Creating Material Config EKLMIron
+[INFO] Creating Material Config EKLMSilicon
+[INFO] Creating Material Config EKLMDuralumin
+[INFO] Creating Material Config BGO-Material
+[INFO] Creating Material Config StainlessSteel304
+[INFO] Creating Material Config G10
+[INFO] Creating Material Config ststeel
+[INFO] Creating Material Config AusteniticStainlessSteel
+[INFO] Creating Material Config MaterialVessel
+[INFO] Creating Material Config ststeel304L
+[INFO] Creating Material Config meatCuScreen
+[INFO] Creating Material Config Kovar
+[INFO] Creating Material Config Quartz
+[INFO] Creating Material Config MICROTPC-Material
+[INFO] Creating Material Config ScaleGas
+[INFO] Creating Material Config ParylenC
+[INFO] Creating Material Config HE3TUBE-Material
+[INFO] Creating Material Config PINDIODE-Material
+[INFO] Creating Material Config Al6061
+[INFO] Creating Material Config CAVE-Material
+[INFO] Creating Material Config CAVE
+[INFO] Creating Material Config PH1BPIPE-Material
+[INFO] Creating Material Config MaterialPipe
+[INFO] Creating Material Config MaterialTiN
+[INFO] Creating Material Config PH1SUSTR-Material
+[INFO] Creating Material Config PH1SUSTR
+[INFO] Creating Material Config SiO2
+[INFO] Creating Material Config CaO
+[INFO] Creating Material Config Al2O3
+[INFO] Creating Material Config MgO
+[INFO] Creating Material Config B2O3
+[INFO] Creating Material Config TiO2
+[INFO] Creating Material Config Na2O
+[INFO] Creating Material Config K2O
+[INFO] Creating Material Config Fe2O3
+[INFO] Creating Material Config ZnO
+[INFO] Creating Material Config SO3
+[INFO] Creating Material Config FGA
+[INFO] Creating Material Config Epoxy_C15H44O7
+[INFO] Creating Material Config FG_Epoxy
+[INFO] Creating Material Config SRSENSOR-Materials
+[INFO] Creating Material Config MaterialFEI4
+[INFO] Creating Material Config MaterialSDD
+[INFO] Creating Material Config MaterialDIAMOND
+[INFO] Creating Material Config Example-Material
+[INFO] Creating Material Config SUS304
+[INFO] Creating Material Config 5052-Alloy
+[INFO] Creating Material Config PureCsI
+[INFO] Creating Material Config CsI-Tl
+[INFO] Creating Material Config LYSO
+[INFO] Creating Material Config CLAW-Material
+[INFO] Creating Material Config CLAW
+[INFO] Creating Material Config BEAMABORT-Material
+[INFO] Creating Material Config Diamond
+[INFO] Creating Material Config QCSMONITOR-Material
+[INFO] Creating Material Config QCSMONITOR
+[INFO] DectorComponent FarBeamLine is not enabled by default, skipping
+[INFO] Creating geometry for detector: Belle2Detector
+[INFO] Creating Material Vacuum
+[INFO] Creating Material CDCGas
+[INFO] Creating Material STR-HDPE
+[INFO] Creating Material STR-PEB03
+[INFO] Creating Material STR-PEB30
+[INFO] Creating Material STR-PEB01
+[INFO] Creating Material STR-PEB05
+[INFO] Creating Material STR-PEB10
+[INFO] Creating Material STR-PEB15
+[INFO] Creating Material STR-PEB20
+[INFO] Creating Material STR-PEB25
+[INFO] Creating Material STR-Lead
+[INFO] Creating Material STR-SUS304
+[INFO] Creating Material STR-DryAir
+[INFO] Creating Material SUS316L
+[INFO] Creating Material SC_COIL
+[INFO] Creating Material Cryo_Liq_He
+[INFO] Creating Material Cryo_SiO2
+[INFO] Creating Material Cryo_Epoxy
+[INFO] Creating Material Cryo_G-10
+[INFO] Creating Material Cryo_NbTi
+[INFO] Creating Material PXD-DockBox
+[INFO] Creating Material SVD-DockBox
+[INFO] Creating Material VXD-DiamondSensor
+[INFO] Creating Material ColdAir
+[INFO] Creating Material PXD-BorderThinning
+[INFO] Creating Material PXD-SwitcherThinning
+[INFO] Creating Material PXD-Zirconoxide
+[INFO] Creating Material PXD-Support
+[INFO] Creating Material PXD-CarbonTubes
+[INFO] Creating Material PXD-Glue
+[INFO] Creating Material PXD-Switcher
+[INFO] Creating Material PXD-DCD
+[INFO] Creating Material PXD-DHP
+[INFO] Creating Material SVD-KaptonClean
+[INFO] Creating Material SVD-Glue
+[INFO] Creating Material SVD-Airex
+[INFO] Creating Material SVD-KaptonHybrid
+[INFO] Creating Material SVD-KaptonPitchAdapter
+[INFO] Creating Material SVD-Carbon
+[INFO] Creating Material CFRP
+[INFO] Creating Material NEMA_G10_Plate
+[INFO] Creating Material CDCHeGas
+[INFO] Creating Material CDCEthaneGas
+[INFO] Creating Material CDCGlue
+[INFO] Creating Material TOPSiO2
+[INFO] Creating Material TOPglueNOA61
+[INFO] Creating Material TOPglueEpotek301-2
+[INFO] Creating Material TOPBorosilicateGlass
+[INFO] Creating Material TOPWavelengthFilterIHU340
+[INFO] Creating Material TOPPMTBialkali
+[INFO] Creating Material TOPPMTBottom
+[INFO] Creating Material TOPPCB
+[INFO] Creating Material TOPPMTCase
+[INFO] Creating Material TOPAir
+[INFO] Creating Material TOPVacuum
+[INFO] Creating Material TOPQBB
+[INFO] Creating Material Aerogel1
+[INFO] Creating Material Aerogel2
+[INFO] Creating Material ARICH_HAPDQuartz
+[INFO] Creating Material ARICH_Ceramics
+[INFO] Creating Material ARICH_TileGapsFill
+[INFO] Creating Material ARICH_Air
+[INFO] Creating Material ARICH_Vacuum
+[INFO] Creating Material ARICH_MirrorQuartz
+[INFO] Creating Material HAPD_pcb
+[INFO] Creating Material ARICH_Silicon
+[INFO] Creating Material CsI
+[INFO] Creating Material AlTeflon
+[INFO] Creating Material AlTeflon_thin
+[INFO] Creating Material AlTeflon_thinpenta
+[INFO] Creating Material Styrofoam
+[INFO] Creating Material RPCReadout
+[INFO] Creating Material Freon134A
+[INFO] Creating Material RPCGas
+[INFO] Creating Material EKLMPolyethylene
+[INFO] Creating Material EKLMPolystyrene
+[INFO] Creating Material EKLMPolystyrol
+[INFO] Creating Material EKLMGel
+[INFO] Creating Material EKLMIron
+[INFO] Creating Material EKLMSilicon
+[INFO] Creating Material EKLMDuralumin
+[INFO] Creating Material BGO-Material
+[INFO] Creating Material StainlessSteel304
+[INFO] Creating Material G10
+[INFO] Creating Material ststeel
+[INFO] Creating Material AusteniticStainlessSteel
+[INFO] Creating Material MaterialVessel
+[INFO] Creating Material ststeel304L
+[INFO] Creating Material meatCuScreen
+[INFO] Creating Material Kovar
+[INFO] Creating Material Quartz
+[INFO] Creating Material MICROTPC-Material
+[INFO] Creating Material ScaleGas
+[INFO] Creating Material ParylenC
+[INFO] Creating Material HE3TUBE-Material
+[INFO] Creating Material PINDIODE-Material
+[INFO] Creating Material Al6061
+[INFO] Creating Material CAVE-Material
+[INFO] Creating Material CAVE
+[INFO] Creating Material PH1BPIPE-Material
+[INFO] Creating Material MaterialPipe
+[INFO] Creating Material MaterialTiN
+[INFO] Creating Material PH1SUSTR-Material
+[INFO] Creating Material PH1SUSTR
+[INFO] Creating Material SiO2
+[INFO] Creating Material CaO
+[INFO] Creating Material Al2O3
+[INFO] Creating Material MgO
+[INFO] Creating Material B2O3
+[INFO] Creating Material TiO2
+[INFO] Creating Material Na2O
+[INFO] Creating Material K2O
+[INFO] Creating Material Fe2O3
+[INFO] Creating Material ZnO
+[INFO] Creating Material SO3
+[INFO] Creating Material FGA
+[INFO] Creating Material Epoxy_C15H44O7
+[INFO] Creating Material FG_Epoxy
+[INFO] Creating Material SRSENSOR-Materials
+[INFO] Creating Material MaterialFEI4
+[INFO] Creating Material MaterialSDD
+[INFO] Creating Material MaterialDIAMOND
+[INFO] Creating Material Example-Material
+[INFO] Creating Material SUS304
+[INFO] Creating Material 5052-Alloy
+[INFO] Creating Material PureCsI
+[INFO] Creating Material CsI-Tl
+[INFO] Creating Material LYSO
+[INFO] Creating Material CLAW-Material
+[INFO] Creating Material CLAW
+[INFO] Creating Material BEAMABORT-Material
+[INFO] Creating Material Diamond
+[INFO] Creating Material QCSMONITOR-Material
+[INFO] Creating Material QCSMONITOR
+[INFO] Created top volume with x= +-800 cm, y= +-800 cm, z= +-4000 cm
+[INFO] Contents of bar: 
+[INFO] value: 0.1
+[INFO] value: 0.2
+[INFO] value: 0.3
+[INFO] value: 0.4
+[INFO] value: 0.5
+[INFO] value: 0.6
+[INFO] value: 0.7
+[INFO] value: 0.8
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+BGO volume 44054.3 density 4.4502e+19
+[INFO] called creator BGOCreator to create component BGO from Gearbox
+[INFO] DetectorComponent BGO created 8 solids, 8 logical volumes and 8 physical volumes
+[INFO] Contents of bar: 
+[INFO] value: 0.1
+[INFO] called creator PH1SUSTRCreator to create component PH1SUSTR from Gearbox
+[INFO] DetectorComponent PH1SUSTR created 101 solids, 15 logical volumes and 54 physical volumes
+[INFO] called creator PINDIODECreator to create component PINDIODE from Gearbox
+[INFO] DetectorComponent PINDIODE created 16 solids, 6 logical volumes and 224 physical volumes
+[INFO] called creator BEAMABORTCreator to create component BEAMABORT from Gearbox
+[INFO] DetectorComponent BEAMABORT created 5 solids, 2 logical volumes and 8 physical volumes
+[INFO] Contents of bar: 
+[INFO] value: 0.1
+h_Rod 10 dx 6.00623 dy 4.73623 dz 15.1325
+z ring # 0 pos. -5
+z ring # 1 pos. -3.873
+z ring # 2 pos. -2.746
+z ring # 3 pos. -1.619
+z ring # 4 pos. -0.492
+z ring # 5 pos. 0.635
+z ring # 6 pos. 1.762
+z ring # 7 pos. 2.889
+z ring # 8 pos. 4.016
+z ring # 9 pos. 5.143
+ring 1 -3.873 ring 0 -5 gem 1 -5.1435 gem 2 -5.5035
+h_Rod 10 dx 7.15623 dy 4.85623 dz 15.6325
+z ring # 0 pos. -5
+z ring # 1 pos. -3.873
+z ring # 2 pos. -2.746
+z ring # 3 pos. -1.619
+z ring # 4 pos. -0.492
+z ring # 5 pos. 0.635
+z ring # 6 pos. 1.762
+z ring # 7 pos. 2.889
+z ring # 8 pos. 4.016
+z ring # 9 pos. 5.143
+ring 1 -3.873 ring 0 -5 gem 1 -5.1435 gem 2 -5.5035
+h_Rod 10 dx 7.15623 dy 4.85623 dz 15.6325
+z ring # 0 pos. -5
+z ring # 1 pos. -3.873
+z ring # 2 pos. -2.746
+z ring # 3 pos. -1.619
+z ring # 4 pos. -0.492
+z ring # 5 pos. 0.635
+z ring # 6 pos. 1.762
+z ring # 7 pos. 2.889
+z ring # 8 pos. 4.016
+z ring # 9 pos. 5.143
+ring 1 -3.873 ring 0 -5 gem 1 -5.1435 gem 2 -5.5035
+h_Rod 10 dx 6.00623 dy 4.73623 dz 15.1325
+z ring # 0 pos. -5
+z ring # 1 pos. -3.873
+z ring # 2 pos. -2.746
+z ring # 3 pos. -1.619
+z ring # 4 pos. -0.492
+z ring # 5 pos. 0.635
+z ring # 6 pos. 1.762
+z ring # 7 pos. 2.889
+z ring # 8 pos. 4.016
+z ring # 9 pos. 5.143
+ring 1 -3.873 ring 0 -5 gem 1 -5.1435 gem 2 -5.5035
+[INFO] called creator MICROTPCCreator to create component MICROTPC from Gearbox
+[INFO] DetectorComponent MICROTPC created 292 solids, 56 logical volumes and 268 physical volumes
+[INFO] called creator HE3TUBECreator to create component HE3TUBE from Gearbox
+[INFO] DetectorComponent HE3TUBE created 16 solids, 16 logical volumes and 20 physical volumes
+[INFO] called creator CLAWCreator to create component CLAW from Gearbox
+[INFO] DetectorComponent CLAW created 56 solids, 40 logical volumes and 48 physical volumes
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+CSI volume 1.10119e+06 density 2.81492e+19
+CSI volume 811200 density 2.81492e+19
+CSI volume 125000 density 4.43147e+19
+[INFO] Volume names for the CsI crystals
+[INFO] Crystal Number 0 placed at (r[cm],[deg],z[cm]) = (50.1,8.3,211.8)
+[INFO] Crystal Number 1 placed at (r[cm],[deg],z[cm]) = (50.4,-2.0,215.5)
+[INFO] Crystal Number 2 placed at (r[cm],[deg],z[cm]) = (51.1,-9.4,209.0)
+[INFO] Crystal Number 3 placed at (r[cm],[deg],z[cm]) = (50.1,98.3,211.8)
+[INFO] Crystal Number 4 placed at (r[cm],[deg],z[cm]) = (50.4,88.0,215.5)
+[INFO] Crystal Number 5 placed at (r[cm],[deg],z[cm]) = (51.1,80.6,209.0)
+[INFO] Crystal Number 6 placed at (r[cm],[deg],z[cm]) = (50.1,-171.7,211.8)
+[INFO] Crystal Number 7 placed at (r[cm],[deg],z[cm]) = (50.4,178.0,215.5)
+[INFO] Crystal Number 8 placed at (r[cm],[deg],z[cm]) = (51.1,170.6,209.0)
+[INFO] Crystal Number 9 placed at (r[cm],[deg],z[cm]) = (51.2,-8.1,-117.0)
+[INFO] Crystal Number 10 placed at (r[cm],[deg],z[cm]) = (52.4,2.0,-120.3)
+[INFO] Crystal Number 11 placed at (r[cm],[deg],z[cm]) = (51.4,9.3,-114.1)
+[INFO] Crystal Number 12 placed at (r[cm],[deg],z[cm]) = (59.1,83.0,-117.0)
+[INFO] Crystal Number 13 placed at (r[cm],[deg],z[cm]) = (60.4,91.7,-120.3)
+[INFO] Crystal Number 14 placed at (r[cm],[deg],z[cm]) = (59.3,98.1,-114.1)
+[INFO] Crystal Number 15 placed at (r[cm],[deg],z[cm]) = (59.1,173.0,-117.0)
+[INFO] Crystal Number 16 placed at (r[cm],[deg],z[cm]) = (60.4,-178.3,-120.3)
+[INFO] Crystal Number 17 placed at (r[cm],[deg],z[cm]) = (59.3,-171.9,-114.1)
+[INFO] called creator CSICreator to create component CSI from Gearbox
+[INFO] DetectorComponent CSI created 114 solids, 48 logical volumes and 48 physical volumes
+QCS r 336.305 width 75 z 550 phi 1.5708 x 195 y 274
+phase 1
+QCS r 336.305 width 75 z 550 phi 1.5708 x 195 y 274
+phase 1
+ Nb of detector 2
+[INFO] called creator QCSMONITORCreator to create component QCSMONITOR from Gearbox
+[INFO] DetectorComponent QCSMONITOR created 1 solids, 1 logical volumes and 2 physical volumes
+[INFO] Contents of bar: 
+[INFO] value: 0.1
+[INFO] value: 0.2
+[INFO] value: 0.3
+[INFO] value: 0.4
+[INFO] called creator CAVECreator to create component CAVE from Gearbox
+[INFO] DetectorComponent CAVE created 4 solids, 4 logical volumes and 4 physical volumes
+[INFO] called creator PH1BPIPECreator to create component PH1BPIPE from Gearbox
+[INFO] DetectorComponent PH1BPIPE created 93 solids, 25 logical volumes and 33 physical volumes
+[INFO] Created a total of 707 solids, 222 logical volumes and 718 physical volumes
+[INFO] Initializing magnetic field if present ...
+[INFO] Initialization of magnetic field took  0.030 ms
+[INFO] Optimizing geometry and creating lookup tables ...
+[INFO] Optimizing geometry took  77.447 ms
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_BGO ... OK! 
+Checking overlaps for volume p_plateR ... OK! 
+Checking overlaps for volume p_tpcbeamR1 ... OK! 
+Checking overlaps for volume p_tpcbeamR2 ... OK! 
+Checking overlaps for volume p_plateL ... OK! 
+Checking overlaps for volume p_tpcbeamL1 ... OK! 
+Checking overlaps for volume p_tpcbeamL2 ... OK! 
+Checking overlaps for volume p_plateB ... OK! 
+Checking overlaps for volume p_tpcbeamB1 ... OK! 
+Checking overlaps for volume p_tpcbeamB2 ... OK! 
+Checking overlaps for volume p_plateT ... OK! 
+Checking overlaps for volume p_tpcbeamT1 ... OK! 
+Checking overlaps for volume p_tpcbeamT2 ... OK! 
+Checking overlaps for volume p_tpcbeamv1 ... OK! 
+Checking overlaps for volume p_tpcbeamv2 ... OK! 
+Checking overlaps for volume p_tpcbeamv3 ... OK! 
+Checking overlaps for volume p_tpcbeamv4 ... OK! 
+Checking overlaps for volume p_tpcbeamh1 ... OK! 
+Checking overlaps for volume p_tpcbeamh2 ... OK! 
+Checking overlaps for volume p_tpcbeamh3 ... OK! 
+Checking overlaps for volume p_tpcbeamh4 ... OK! 
+Checking overlaps for volume p_csibeamh1_0 ... OK! 
+Checking overlaps for volume p_csibeamh2_0 ... OK! 
+Checking overlaps for volume p_csibeamh1_1 ... OK! 
+Checking overlaps for volume p_csibeamh2_1 ... OK! 
+Checking overlaps for volume p_csibeamh1_2 ... OK! 
+Checking overlaps for volume p_csibeamh2_2 ... OK! 
+Checking overlaps for volume p_csibeamh1_3 ... OK! 
+Checking overlaps for volume p_csibeamh2_3 ... OK! 
+Checking overlaps for volume p_csibeamvF_0 ... OK! 
+Checking overlaps for volume p_csibeamvF_1 ... OK! 
+Checking overlaps for volume p_csibeamvF_2 ... OK! 
+Checking overlaps for volume p_csibeamvF_3 ... OK! 
+Checking overlaps for volume p_csibeamvB_0 ... OK! 
+Checking overlaps for volume p_csibeamvB_1 ... OK! 
+Checking overlaps for volume p_csibeamvB_2 ... OK! 
+Checking overlaps for volume p_csibeamvB_3 ... OK! 
+Checking overlaps for volume p_base_0 ... OK! 
+Checking overlaps for volume p_base_1 ... OK! 
+Checking overlaps for volume p_bgobeamv_0 ... OK! 
+Checking overlaps for volume p_bgobeamv_1 ... OK! 
+Checking overlaps for volume p_bgobeamv_2 ... OK! 
+Checking overlaps for volume p_bgobeamv_3 ... OK! 
+Checking overlaps for volume p_bgobeamh_0 ... OK! 
+Checking overlaps for volume p_bgobeamh_1 ... OK! 
+Checking overlaps for volume p_bgobeamh_2 ... OK! 
+Checking overlaps for volume p_bgobeamh_3 ... OK! 
+Checking overlaps for volume p_bgobeamt_0 ... OK! 
+Checking overlaps for volume p_bgobeamt_1 ... OK! 
+Checking overlaps for volume p_bgobeamb_0 ... OK! 
+Checking overlaps for volume p_bgobeamb_1 ... OK! 
+Checking overlaps for volume p_tpcbeamb_0 ... OK! 
+Checking overlaps for volume p_tpcbeamb_1 ... OK! 
+Checking overlaps for volume p_fangsbeamhf ... OK! 
+Checking overlaps for volume p_fangsbeamhb ... OK! 
+Checking overlaps for volume p_base_0 ... OK! 
+Checking overlaps for volume p_base_1 ... OK! 
+Checking overlaps for volume p_base_2 ... OK! 
+Checking overlaps for volume p_base_3 ... OK! 
+Checking overlaps for volume p_base_4 ... OK! 
+Checking overlaps for volume p_base_5 ... OK! 
+Checking overlaps for volume p_base_6 ... OK! 
+Checking overlaps for volume p_base_7 ... OK! 
+Checking overlaps for volume p_base_8 ... OK! 
+Checking overlaps for volume p_base_9 ... OK! 
+Checking overlaps for volume p_base_10 ... OK! 
+Checking overlaps for volume p_base_11 ... OK! 
+Checking overlaps for volume p_base_12 ... OK! 
+Checking overlaps for volume p_base_13 ... OK! 
+Checking overlaps for volume p_base_14 ... OK! 
+Checking overlaps for volume p_base_15 ... OK! 
+Checking overlaps for volume p_base_16 ... OK! 
+Checking overlaps for volume p_base_17 ... OK! 
+Checking overlaps for volume p_base_18 ... OK! 
+Checking overlaps for volume p_base_19 ... OK! 
+Checking overlaps for volume p_base_20 ... OK! 
+Checking overlaps for volume p_base_21 ... OK! 
+Checking overlaps for volume p_base_22 ... OK! 
+Checking overlaps for volume p_base_23 ... OK! 
+Checking overlaps for volume p_base_24 ... OK! 
+Checking overlaps for volume p_base_25 ... OK! 
+Checking overlaps for volume p_base_26 ... OK! 
+Checking overlaps for volume p_base_27 ... OK! 
+Checking overlaps for volume p_base_28 ... OK! 
+Checking overlaps for volume p_base_29 ... OK! 
+Checking overlaps for volume p_base_30 ... OK! 
+Checking overlaps for volume p_base_31 ... OK! 
+Checking overlaps for volume p_cover1_0 ... OK! 
+Checking overlaps for volume p_cover1_1 ... OK! 
+Checking overlaps for volume p_cover1_2 ... OK! 
+Checking overlaps for volume p_cover1_3 ... OK! 
+Checking overlaps for volume p_cover1_4 ... OK! 
+Checking overlaps for volume p_cover1_5 ... OK! 
+Checking overlaps for volume p_cover1_6 ... OK! 
+Checking overlaps for volume p_cover1_7 ... OK! 
+Checking overlaps for volume p_cover1_8 ... OK! 
+Checking overlaps for volume p_cover1_9 ... OK! 
+Checking overlaps for volume p_cover1_10 ... OK! 
+Checking overlaps for volume p_cover1_11 ... OK! 
+Checking overlaps for volume p_cover1_12 ... OK! 
+Checking overlaps for volume p_cover1_13 ... OK! 
+Checking overlaps for volume p_cover1_14 ... OK! 
+Checking overlaps for volume p_cover1_15 ... OK! 
+Checking overlaps for volume p_cover1_16 ... OK! 
+Checking overlaps for volume p_cover1_17 ... OK! 
+Checking overlaps for volume p_cover1_18 ... OK! 
+Checking overlaps for volume p_cover1_19 ... OK! 
+Checking overlaps for volume p_cover1_20 ... OK! 
+Checking overlaps for volume p_cover1_21 ... OK! 
+Checking overlaps for volume p_cover1_22 ... OK! 
+Checking overlaps for volume p_cover1_23 ... OK! 
+Checking overlaps for volume p_cover1_24 ... OK! 
+Checking overlaps for volume p_cover1_25 ... OK! 
+Checking overlaps for volume p_cover1_26 ... OK! 
+Checking overlaps for volume p_cover1_27 ... OK! 
+Checking overlaps for volume p_cover1_28 ... OK! 
+Checking overlaps for volume p_cover1_29 ... OK! 
+Checking overlaps for volume p_cover1_30 ... OK! 
+Checking overlaps for volume p_cover1_31 ... OK! 
+Checking overlaps for volume p_cover2_0 ... OK! 
+Checking overlaps for volume p_cover2_1 ... OK! 
+Checking overlaps for volume p_cover2_2 ... OK! 
+Checking overlaps for volume p_cover2_3 ... OK! 
+Checking overlaps for volume p_cover2_4 ... OK! 
+Checking overlaps for volume p_cover2_5 ... OK! 
+Checking overlaps for volume p_cover2_6 ... OK! 
+Checking overlaps for volume p_cover2_7 ... OK! 
+Checking overlaps for volume p_cover2_8 ... OK! 
+Checking overlaps for volume p_cover2_9 ... OK! 
+Checking overlaps for volume p_cover2_10 ... OK! 
+Checking overlaps for volume p_cover2_11 ... OK! 
+Checking overlaps for volume p_cover2_12 ... OK! 
+Checking overlaps for volume p_cover2_13 ... OK! 
+Checking overlaps for volume p_cover2_14 ... OK! 
+Checking overlaps for volume p_cover2_15 ... OK! 
+Checking overlaps for volume p_cover2_16 ... OK! 
+Checking overlaps for volume p_cover2_17 ... OK! 
+Checking overlaps for volume p_cover2_18 ... OK! 
+Checking overlaps for volume p_cover2_19 ... OK! 
+Checking overlaps for volume p_cover2_20 ... OK! 
+Checking overlaps for volume p_cover2_21 ... OK! 
+Checking overlaps for volume p_cover2_22 ... OK! 
+Checking overlaps for volume p_cover2_23 ... OK! 
+Checking overlaps for volume p_cover2_24 ... OK! 
+Checking overlaps for volume p_cover2_25 ... OK! 
+Checking overlaps for volume p_cover2_26 ... OK! 
+Checking overlaps for volume p_cover2_27 ... OK! 
+Checking overlaps for volume p_cover2_28 ... OK! 
+Checking overlaps for volume p_cover2_29 ... OK! 
+Checking overlaps for volume p_cover2_30 ... OK! 
+Checking overlaps for volume p_cover2_31 ... OK! 
+Checking overlaps for volume p_pin_1_0 ... OK! 
+Checking overlaps for volume p_pin_2_0 ... OK! 
+Checking overlaps for volume p_pin_1_1 ... OK! 
+Checking overlaps for volume p_pin_2_1 ... OK! 
+Checking overlaps for volume p_pin_1_2 ... OK! 
+Checking overlaps for volume p_pin_2_2 ... OK! 
+Checking overlaps for volume p_pin_1_3 ... OK! 
+Checking overlaps for volume p_pin_2_3 ... OK! 
+Checking overlaps for volume p_pin_1_4 ... OK! 
+Checking overlaps for volume p_pin_2_4 ... OK! 
+Checking overlaps for volume p_pin_1_5 ... OK! 
+Checking overlaps for volume p_pin_2_5 ... OK! 
+Checking overlaps for volume p_pin_1_6 ... OK! 
+Checking overlaps for volume p_pin_2_6 ... OK! 
+Checking overlaps for volume p_pin_1_7 ... OK! 
+Checking overlaps for volume p_pin_2_7 ... OK! 
+Checking overlaps for volume p_pin_1_8 ... OK! 
+Checking overlaps for volume p_pin_2_8 ... OK! 
+Checking overlaps for volume p_pin_1_9 ... OK! 
+Checking overlaps for volume p_pin_2_9 ... OK! 
+Checking overlaps for volume p_pin_1_10 ... OK! 
+Checking overlaps for volume p_pin_2_10 ... OK! 
+Checking overlaps for volume p_pin_1_11 ... OK! 
+Checking overlaps for volume p_pin_2_11 ... OK! 
+Checking overlaps for volume p_pin_1_12 ... OK! 
+Checking overlaps for volume p_pin_2_12 ... OK! 
+Checking overlaps for volume p_pin_1_13 ... OK! 
+Checking overlaps for volume p_pin_2_13 ... OK! 
+Checking overlaps for volume p_pin_1_14 ... OK! 
+Checking overlaps for volume p_pin_2_14 ... OK! 
+Checking overlaps for volume p_pin_1_15 ... OK! 
+Checking overlaps for volume p_pin_2_15 ... OK! 
+Checking overlaps for volume p_pin_1_16 ... OK! 
+Checking overlaps for volume p_pin_2_16 ... OK! 
+Checking overlaps for volume p_pin_1_17 ... OK! 
+Checking overlaps for volume p_pin_2_17 ... OK! 
+Checking overlaps for volume p_pin_1_18 ... OK! 
+Checking overlaps for volume p_pin_2_18 ... OK! 
+Checking overlaps for volume p_pin_1_19 ... OK! 
+Checking overlaps for volume p_pin_2_19 ... OK! 
+Checking overlaps for volume p_pin_1_20 ... OK! 
+Checking overlaps for volume p_pin_2_20 ... OK! 
+Checking overlaps for volume p_pin_1_21 ... OK! 
+Checking overlaps for volume p_pin_2_21 ... OK! 
+Checking overlaps for volume p_pin_1_22 ... OK! 
+Checking overlaps for volume p_pin_2_22 ... OK! 
+Checking overlaps for volume p_pin_1_23 ... OK! 
+Checking overlaps for volume p_pin_2_23 ... OK! 
+Checking overlaps for volume p_pin_1_24 ... OK! 
+Checking overlaps for volume p_pin_2_24 ... OK! 
+Checking overlaps for volume p_pin_1_25 ... OK! 
+Checking overlaps for volume p_pin_2_25 ... OK! 
+Checking overlaps for volume p_pin_1_26 ... OK! 
+Checking overlaps for volume p_pin_2_26 ... OK! 
+Checking overlaps for volume p_pin_1_27 ... OK! 
+Checking overlaps for volume p_pin_2_27 ... OK! 
+Checking overlaps for volume p_pin_1_28 ... OK! 
+Checking overlaps for volume p_pin_2_28 ... OK! 
+Checking overlaps for volume p_pin_1_29 ... OK! 
+Checking overlaps for volume p_pin_2_29 ... OK! 
+Checking overlaps for volume p_pin_1_30 ... OK! 
+Checking overlaps for volume p_pin_2_30 ... OK! 
+Checking overlaps for volume p_pin_1_31 ... OK! 
+Checking overlaps for volume p_pin_2_31 ... OK! 
+Checking overlaps for volume p_layer1_0 ... OK! 
+Checking overlaps for volume p_layer1_1 ... OK! 
+Checking overlaps for volume p_layer1_2 ... OK! 
+Checking overlaps for volume p_layer1_3 ... OK! 
+Checking overlaps for volume p_layer1_4 ... OK! 
+Checking overlaps for volume p_layer1_5 ... OK! 
+Checking overlaps for volume p_layer1_6 ... OK! 
+Checking overlaps for volume p_layer1_7 ... OK! 
+Checking overlaps for volume p_layer1_8 ... OK! 
+Checking overlaps for volume p_layer1_9 ... OK! 
+Checking overlaps for volume p_layer1_10 ... OK! 
+Checking overlaps for volume p_layer1_11 ... OK! 
+Checking overlaps for volume p_layer1_12 ... OK! 
+Checking overlaps for volume p_layer1_13 ... OK! 
+Checking overlaps for volume p_layer1_14 ... OK! 
+Checking overlaps for volume p_layer1_15 ... OK! 
+Checking overlaps for volume p_layer1_16 ... OK! 
+Checking overlaps for volume p_layer1_17 ... OK! 
+Checking overlaps for volume p_layer1_18 ... OK! 
+Checking overlaps for volume p_layer1_19 ... OK! 
+Checking overlaps for volume p_layer1_20 ... OK! 
+Checking overlaps for volume p_layer1_21 ... OK! 
+Checking overlaps for volume p_layer1_22 ... OK! 
+Checking overlaps for volume p_layer1_23 ... OK! 
+Checking overlaps for volume p_layer1_24 ... OK! 
+Checking overlaps for volume p_layer1_25 ... OK! 
+Checking overlaps for volume p_layer1_26 ... OK! 
+Checking overlaps for volume p_layer1_27 ... OK! 
+Checking overlaps for volume p_layer1_28 ... OK! 
+Checking overlaps for volume p_layer1_29 ... OK! 
+Checking overlaps for volume p_layer1_30 ... OK! 
+Checking overlaps for volume p_layer1_31 ... OK! 
+Checking overlaps for volume p_layer2_0 ... OK! 
+Checking overlaps for volume p_layer2_1 ... OK! 
+Checking overlaps for volume p_layer2_2 ... OK! 
+Checking overlaps for volume p_layer2_3 ... OK! 
+Checking overlaps for volume p_layer2_4 ... OK! 
+Checking overlaps for volume p_layer2_5 ... OK! 
+Checking overlaps for volume p_layer2_6 ... OK! 
+Checking overlaps for volume p_layer2_7 ... OK! 
+Checking overlaps for volume p_layer2_8 ... OK! 
+Checking overlaps for volume p_layer2_9 ... OK! 
+Checking overlaps for volume p_layer2_10 ... OK! 
+Checking overlaps for volume p_layer2_11 ... OK! 
+Checking overlaps for volume p_layer2_12 ... OK! 
+Checking overlaps for volume p_layer2_13 ... OK! 
+Checking overlaps for volume p_layer2_14 ... OK! 
+Checking overlaps for volume p_layer2_15 ... OK! 
+Checking overlaps for volume p_layer2_16 ... OK! 
+Checking overlaps for volume p_layer2_17 ... OK! 
+Checking overlaps for volume p_layer2_18 ... OK! 
+Checking overlaps for volume p_layer2_19 ... OK! 
+Checking overlaps for volume p_layer2_20 ... OK! 
+Checking overlaps for volume p_layer2_21 ... OK! 
+Checking overlaps for volume p_layer2_22 ... OK! 
+Checking overlaps for volume p_layer2_23 ... OK! 
+Checking overlaps for volume p_layer2_24 ... OK! 
+Checking overlaps for volume p_layer2_25 ... OK! 
+Checking overlaps for volume p_layer2_26 ... OK! 
+Checking overlaps for volume p_layer2_27 ... OK! 
+Checking overlaps for volume p_layer2_28 ... OK! 
+Checking overlaps for volume p_layer2_29 ... OK! 
+Checking overlaps for volume p_layer2_30 ... OK! 
+Checking overlaps for volume p_layer2_31 ... OK! 
+Checking overlaps for volume p_pa ... OK! 
+Checking overlaps for volume p_pa ... OK! 
+Checking overlaps for volume p_pa ... OK! 
+Checking overlaps for volume p_pa ... OK! 
+Checking overlaps for volume p_BEAMABORT ... OK! 
+Checking overlaps for volume p_BEAMABORT ... OK! 
+Checking overlaps for volume p_BEAMABORT ... OK! 
+Checking overlaps for volume p_BEAMABORT ... OK! 
+Checking overlaps for volume p_Vessel ... OK! 
+Checking overlaps for volume p_iGasTPC ... OK! 
+Checking overlaps for volume p_parylenC ... OK! 
+Checking overlaps for volume p_kapton ... OK! 
+Checking overlaps for volume p_Rod_0 ... OK! 
+Checking overlaps for volume p_Rod_1 ... OK! 
+Checking overlaps for volume p_Rod_2 ... OK! 
+Checking overlaps for volume p_Rod_3 ... OK! 
+Checking overlaps for volume p_Ring_0 ... OK! 
+Checking overlaps for volume p_Ring_1 ... OK! 
+Checking overlaps for volume p_Ring_2 ... OK! 
+Checking overlaps for volume p_Ring_3 ... OK! 
+Checking overlaps for volume p_Ring_4 ... OK! 
+Checking overlaps for volume p_Ring_5 ... OK! 
+Checking overlaps for volume p_Ring_6 ... OK! 
+Checking overlaps for volume p_Ring_7 ... OK! 
+Checking overlaps for volume p_Ring_8 ... OK! 
+Checking overlaps for volume p_Ring_9 ... OK! 
+Checking overlaps for volume p_Anode ... OK! 
+Checking overlaps for volume p_RSpacer_0_0 ... OK! 
+Checking overlaps for volume p_RSpacer_0_1 ... OK! 
+Checking overlaps for volume p_RSpacer_0_2 ... OK! 
+Checking overlaps for volume p_RSpacer_0_3 ... OK! 
+Checking overlaps for volume p_RSpacer_1_0 ... OK! 
+Checking overlaps for volume p_RSpacer_1_1 ... OK! 
+Checking overlaps for volume p_RSpacer_1_2 ... OK! 
+Checking overlaps for volume p_RSpacer_1_3 ... OK! 
+Checking overlaps for volume p_RSpacer_2_0 ... OK! 
+Checking overlaps for volume p_RSpacer_2_1 ... OK! 
+Checking overlaps for volume p_RSpacer_2_2 ... OK! 
+Checking overlaps for volume p_RSpacer_2_3 ... OK! 
+Checking overlaps for volume p_RSpacer_3_0 ... OK! 
+Checking overlaps for volume p_RSpacer_3_1 ... OK! 
+Checking overlaps for volume p_RSpacer_3_2 ... OK! 
+Checking overlaps for volume p_RSpacer_3_3 ... OK! 
+Checking overlaps for volume p_RSpacer_4_0 ... OK! 
+Checking overlaps for volume p_RSpacer_4_1 ... OK! 
+Checking overlaps for volume p_RSpacer_4_2 ... OK! 
+Checking overlaps for volume p_RSpacer_4_3 ... OK! 
+Checking overlaps for volume p_RSpacer_5_0 ... OK! 
+Checking overlaps for volume p_RSpacer_5_1 ... OK! 
+Checking overlaps for volume p_RSpacer_5_2 ... OK! 
+Checking overlaps for volume p_RSpacer_5_3 ... OK! 
+Checking overlaps for volume p_RSpacer_6_0 ... OK! 
+Checking overlaps for volume p_RSpacer_6_1 ... OK! 
+Checking overlaps for volume p_RSpacer_6_2 ... OK! 
+Checking overlaps for volume p_RSpacer_6_3 ... OK! 
+Checking overlaps for volume p_RSpacer_7_0 ... OK! 
+Checking overlaps for volume p_RSpacer_7_1 ... OK! 
+Checking overlaps for volume p_RSpacer_7_2 ... OK! 
+Checking overlaps for volume p_RSpacer_7_3 ... OK! 
+Checking overlaps for volume p_RSpacer_8_0 ... OK! 
+Checking overlaps for volume p_RSpacer_8_1 ... OK! 
+Checking overlaps for volume p_RSpacer_8_2 ... OK! 
+Checking overlaps for volume p_RSpacer_8_3 ... OK! 
+Checking overlaps for volume p_RSpacer_9_0 ... OK! 
+Checking overlaps for volume p_RSpacer_9_1 ... OK! 
+Checking overlaps for volume p_RSpacer_9_2 ... OK! 
+Checking overlaps for volume p_RSpacer_9_3 ... OK! 
+Checking overlaps for volume p_GEM_0 ... OK! 
+Checking overlaps for volume p_GEM_1 ... OK! 
+Checking overlaps for volume p_GEMSupport_0 ... OK! 
+Checking overlaps for volume p_GEMSupport_1 ... OK! 
+Checking overlaps for volume p_GasTPC ... OK! 
+Checking overlaps for volume p_PixelChip ... OK! 
+Checking overlaps for volume p_CuPlate ... OK! 
+Checking overlaps for volume p_PixelBoard ... OK! 
+Checking overlaps for volume p_Vessel ... OK! 
+Checking overlaps for volume p_iGasTPC ... OK! 
+Checking overlaps for volume p_parylenC ... OK! 
+Checking overlaps for volume p_kapton ... OK! 
+Checking overlaps for volume p_Rod_0 ... OK! 
+Checking overlaps for volume p_Rod_1 ... OK! 
+Checking overlaps for volume p_Rod_2 ... OK! 
+Checking overlaps for volume p_Rod_3 ... OK! 
+Checking overlaps for volume p_Ring_0 ... OK! 
+Checking overlaps for volume p_Ring_1 ... OK! 
+Checking overlaps for volume p_Ring_2 ... OK! 
+Checking overlaps for volume p_Ring_3 ... OK! 
+Checking overlaps for volume p_Ring_4 ... OK! 
+Checking overlaps for volume p_Ring_5 ... OK! 
+Checking overlaps for volume p_Ring_6 ... OK! 
+Checking overlaps for volume p_Ring_7 ... OK! 
+Checking overlaps for volume p_Ring_8 ... OK! 
+Checking overlaps for volume p_Ring_9 ... OK! 
+Checking overlaps for volume p_Anode ... OK! 
+Checking overlaps for volume p_RSpacer_0_0 ... OK! 
+Checking overlaps for volume p_RSpacer_0_1 ... OK! 
+Checking overlaps for volume p_RSpacer_0_2 ... OK! 
+Checking overlaps for volume p_RSpacer_0_3 ... OK! 
+Checking overlaps for volume p_RSpacer_1_0 ... OK! 
+Checking overlaps for volume p_RSpacer_1_1 ... OK! 
+Checking overlaps for volume p_RSpacer_1_2 ... OK! 
+Checking overlaps for volume p_RSpacer_1_3 ... OK! 
+Checking overlaps for volume p_RSpacer_2_0 ... OK! 
+Checking overlaps for volume p_RSpacer_2_1 ... OK! 
+Checking overlaps for volume p_RSpacer_2_2 ... OK! 
+Checking overlaps for volume p_RSpacer_2_3 ... OK! 
+Checking overlaps for volume p_RSpacer_3_0 ... OK! 
+Checking overlaps for volume p_RSpacer_3_1 ... OK! 
+Checking overlaps for volume p_RSpacer_3_2 ... OK! 
+Checking overlaps for volume p_RSpacer_3_3 ... OK! 
+Checking overlaps for volume p_RSpacer_4_0 ... OK! 
+Checking overlaps for volume p_RSpacer_4_1 ... OK! 
+Checking overlaps for volume p_RSpacer_4_2 ... OK! 
+Checking overlaps for volume p_RSpacer_4_3 ... OK! 
+Checking overlaps for volume p_RSpacer_5_0 ... OK! 
+Checking overlaps for volume p_RSpacer_5_1 ... OK! 
+Checking overlaps for volume p_RSpacer_5_2 ... OK! 
+Checking overlaps for volume p_RSpacer_5_3 ... OK! 
+Checking overlaps for volume p_RSpacer_6_0 ... OK! 
+Checking overlaps for volume p_RSpacer_6_1 ... OK! 
+Checking overlaps for volume p_RSpacer_6_2 ... OK! 
+Checking overlaps for volume p_RSpacer_6_3 ... OK! 
+Checking overlaps for volume p_RSpacer_7_0 ... OK! 
+Checking overlaps for volume p_RSpacer_7_1 ... OK! 
+Checking overlaps for volume p_RSpacer_7_2 ... OK! 
+Checking overlaps for volume p_RSpacer_7_3 ... OK! 
+Checking overlaps for volume p_RSpacer_8_0 ... OK! 
+Checking overlaps for volume p_RSpacer_8_1 ... OK! 
+Checking overlaps for volume p_RSpacer_8_2 ... OK! 
+Checking overlaps for volume p_RSpacer_8_3 ... OK! 
+Checking overlaps for volume p_RSpacer_9_0 ... OK! 
+Checking overlaps for volume p_RSpacer_9_1 ... OK! 
+Checking overlaps for volume p_RSpacer_9_2 ... OK! 
+Checking overlaps for volume p_RSpacer_9_3 ... OK! 
+Checking overlaps for volume p_GEM_0 ... OK! 
+Checking overlaps for volume p_GEM_1 ... OK! 
+Checking overlaps for volume p_GEMSupport_0 ... OK! 
+Checking overlaps for volume p_GEMSupport_1 ... OK! 
+Checking overlaps for volume p_GasTPC ... OK! 
+Checking overlaps for volume p_PixelChip ... OK! 
+Checking overlaps for volume p_CuPlate ... OK! 
+Checking overlaps for volume p_PixelBoard ... OK! 
+Checking overlaps for volume p_Vessel ... OK! 
+Checking overlaps for volume p_iGasTPC ... OK! 
+Checking overlaps for volume p_parylenC ... OK! 
+Checking overlaps for volume p_kapton ... OK! 
+Checking overlaps for volume p_Rod_0 ... OK! 
+Checking overlaps for volume p_Rod_1 ... OK! 
+Checking overlaps for volume p_Rod_2 ... OK! 
+Checking overlaps for volume p_Rod_3 ... OK! 
+Checking overlaps for volume p_Ring_0 ... OK! 
+Checking overlaps for volume p_Ring_1 ... OK! 
+Checking overlaps for volume p_Ring_2 ... OK! 
+Checking overlaps for volume p_Ring_3 ... OK! 
+Checking overlaps for volume p_Ring_4 ... OK! 
+Checking overlaps for volume p_Ring_5 ... OK! 
+Checking overlaps for volume p_Ring_6 ... OK! 
+Checking overlaps for volume p_Ring_7 ... OK! 
+Checking overlaps for volume p_Ring_8 ... OK! 
+Checking overlaps for volume p_Ring_9 ... OK! 
+Checking overlaps for volume p_Anode ... OK! 
+Checking overlaps for volume p_RSpacer_0_0 ... OK! 
+Checking overlaps for volume p_RSpacer_0_1 ... OK! 
+Checking overlaps for volume p_RSpacer_0_2 ... OK! 
+Checking overlaps for volume p_RSpacer_0_3 ... OK! 
+Checking overlaps for volume p_RSpacer_1_0 ... OK! 
+Checking overlaps for volume p_RSpacer_1_1 ... OK! 
+Checking overlaps for volume p_RSpacer_1_2 ... OK! 
+Checking overlaps for volume p_RSpacer_1_3 ... OK! 
+Checking overlaps for volume p_RSpacer_2_0 ... OK! 
+Checking overlaps for volume p_RSpacer_2_1 ... OK! 
+Checking overlaps for volume p_RSpacer_2_2 ... OK! 
+Checking overlaps for volume p_RSpacer_2_3 ... OK! 
+Checking overlaps for volume p_RSpacer_3_0 ... OK! 
+Checking overlaps for volume p_RSpacer_3_1 ... OK! 
+Checking overlaps for volume p_RSpacer_3_2 ... OK! 
+Checking overlaps for volume p_RSpacer_3_3 ... OK! 
+Checking overlaps for volume p_RSpacer_4_0 ... OK! 
+Checking overlaps for volume p_RSpacer_4_1 ... OK! 
+Checking overlaps for volume p_RSpacer_4_2 ... OK! 
+Checking overlaps for volume p_RSpacer_4_3 ... OK! 
+Checking overlaps for volume p_RSpacer_5_0 ... OK! 
+Checking overlaps for volume p_RSpacer_5_1 ... OK! 
+Checking overlaps for volume p_RSpacer_5_2 ... OK! 
+Checking overlaps for volume p_RSpacer_5_3 ... OK! 
+Checking overlaps for volume p_RSpacer_6_0 ... OK! 
+Checking overlaps for volume p_RSpacer_6_1 ... OK! 
+Checking overlaps for volume p_RSpacer_6_2 ... OK! 
+Checking overlaps for volume p_RSpacer_6_3 ... OK! 
+Checking overlaps for volume p_RSpacer_7_0 ... OK! 
+Checking overlaps for volume p_RSpacer_7_1 ... OK! 
+Checking overlaps for volume p_RSpacer_7_2 ... OK! 
+Checking overlaps for volume p_RSpacer_7_3 ... OK! 
+Checking overlaps for volume p_RSpacer_8_0 ... OK! 
+Checking overlaps for volume p_RSpacer_8_1 ... OK! 
+Checking overlaps for volume p_RSpacer_8_2 ... OK! 
+Checking overlaps for volume p_RSpacer_8_3 ... OK! 
+Checking overlaps for volume p_RSpacer_9_0 ... OK! 
+Checking overlaps for volume p_RSpacer_9_1 ... OK! 
+Checking overlaps for volume p_RSpacer_9_2 ... OK! 
+Checking overlaps for volume p_RSpacer_9_3 ... OK! 
+Checking overlaps for volume p_GEM_0 ... OK! 
+Checking overlaps for volume p_GEM_1 ... OK! 
+Checking overlaps for volume p_GEMSupport_0 ... OK! 
+Checking overlaps for volume p_GEMSupport_1 ... OK! 
+Checking overlaps for volume p_GasTPC ... OK! 
+Checking overlaps for volume p_PixelChip ... OK! 
+Checking overlaps for volume p_CuPlate ... OK! 
+Checking overlaps for volume p_PixelBoard ... OK! 
+Checking overlaps for volume p_Vessel ... OK! 
+Checking overlaps for volume p_iGasTPC ... OK! 
+Checking overlaps for volume p_parylenC ... OK! 
+Checking overlaps for volume p_kapton ... OK! 
+Checking overlaps for volume p_Rod_0 ... OK! 
+Checking overlaps for volume p_Rod_1 ... OK! 
+Checking overlaps for volume p_Rod_2 ... OK! 
+Checking overlaps for volume p_Rod_3 ... OK! 
+Checking overlaps for volume p_Ring_0 ... OK! 
+Checking overlaps for volume p_Ring_1 ... OK! 
+Checking overlaps for volume p_Ring_2 ... OK! 
+Checking overlaps for volume p_Ring_3 ... OK! 
+Checking overlaps for volume p_Ring_4 ... OK! 
+Checking overlaps for volume p_Ring_5 ... OK! 
+Checking overlaps for volume p_Ring_6 ... OK! 
+Checking overlaps for volume p_Ring_7 ... OK! 
+Checking overlaps for volume p_Ring_8 ... OK! 
+Checking overlaps for volume p_Ring_9 ... OK! 
+Checking overlaps for volume p_Anode ... OK! 
+Checking overlaps for volume p_RSpacer_0_0 ... OK! 
+Checking overlaps for volume p_RSpacer_0_1 ... OK! 
+Checking overlaps for volume p_RSpacer_0_2 ... OK! 
+Checking overlaps for volume p_RSpacer_0_3 ... OK! 
+Checking overlaps for volume p_RSpacer_1_0 ... OK! 
+Checking overlaps for volume p_RSpacer_1_1 ... OK! 
+Checking overlaps for volume p_RSpacer_1_2 ... OK! 
+Checking overlaps for volume p_RSpacer_1_3 ... OK! 
+Checking overlaps for volume p_RSpacer_2_0 ... OK! 
+Checking overlaps for volume p_RSpacer_2_1 ... OK! 
+Checking overlaps for volume p_RSpacer_2_2 ... OK! 
+Checking overlaps for volume p_RSpacer_2_3 ... OK! 
+Checking overlaps for volume p_RSpacer_3_0 ... OK! 
+Checking overlaps for volume p_RSpacer_3_1 ... OK! 
+Checking overlaps for volume p_RSpacer_3_2 ... OK! 
+Checking overlaps for volume p_RSpacer_3_3 ... OK! 
+Checking overlaps for volume p_RSpacer_4_0 ... OK! 
+Checking overlaps for volume p_RSpacer_4_1 ... OK! 
+Checking overlaps for volume p_RSpacer_4_2 ... OK! 
+Checking overlaps for volume p_RSpacer_4_3 ... OK! 
+Checking overlaps for volume p_RSpacer_5_0 ... OK! 
+Checking overlaps for volume p_RSpacer_5_1 ... OK! 
+Checking overlaps for volume p_RSpacer_5_2 ... OK! 
+Checking overlaps for volume p_RSpacer_5_3 ... OK! 
+Checking overlaps for volume p_RSpacer_6_0 ... OK! 
+Checking overlaps for volume p_RSpacer_6_1 ... OK! 
+Checking overlaps for volume p_RSpacer_6_2 ... OK! 
+Checking overlaps for volume p_RSpacer_6_3 ... OK! 
+Checking overlaps for volume p_RSpacer_7_0 ... OK! 
+Checking overlaps for volume p_RSpacer_7_1 ... OK! 
+Checking overlaps for volume p_RSpacer_7_2 ... OK! 
+Checking overlaps for volume p_RSpacer_7_3 ... OK! 
+Checking overlaps for volume p_RSpacer_8_0 ... OK! 
+Checking overlaps for volume p_RSpacer_8_1 ... OK! 
+Checking overlaps for volume p_RSpacer_8_2 ... OK! 
+Checking overlaps for volume p_RSpacer_8_3 ... OK! 
+Checking overlaps for volume p_RSpacer_9_0 ... OK! 
+Checking overlaps for volume p_RSpacer_9_1 ... OK! 
+Checking overlaps for volume p_RSpacer_9_2 ... OK! 
+Checking overlaps for volume p_RSpacer_9_3 ... OK! 
+Checking overlaps for volume p_GEM_0 ... OK! 
+Checking overlaps for volume p_GEM_1 ... OK! 
+Checking overlaps for volume p_GEMSupport_0 ... OK! 
+Checking overlaps for volume p_GEMSupport_1 ... OK! 
+Checking overlaps for volume p_GasTPC ... OK! 
+Checking overlaps for volume p_PixelChip ... OK! 
+Checking overlaps for volume p_CuPlate ... OK! 
+Checking overlaps for volume p_PixelBoard ... OK! 
+Checking overlaps for volume p_He3TUBE ... OK! 
+Checking overlaps for volume p_He3endcapTop ... OK! 
+Checking overlaps for volume p_He3endcapBot ... OK! 
+Checking overlaps for volume p_iHe3Gas ... OK! 
+Checking overlaps for volume p_He3Gas ... OK! 
+Checking overlaps for volume p_He3TUBE ... OK! 
+Checking overlaps for volume p_He3endcapTop ... OK! 
+Checking overlaps for volume p_He3endcapBot ... OK! 
+Checking overlaps for volume p_iHe3Gas ... OK! 
+Checking overlaps for volume p_He3Gas ... OK! 
+Checking overlaps for volume p_He3TUBE ... OK! 
+Checking overlaps for volume p_He3endcapTop ... OK! 
+Checking overlaps for volume p_He3endcapBot ... OK! 
+Checking overlaps for volume p_iHe3Gas ... OK! 
+Checking overlaps for volume p_He3Gas ... OK! 
+Checking overlaps for volume p_He3TUBE ... OK! 
+Checking overlaps for volume p_He3endcapTop ... OK! 
+Checking overlaps for volume p_He3endcapBot ... OK! 
+Checking overlaps for volume p_iHe3Gas ... OK! 
+Checking overlaps for volume p_He3Gas ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume p_air ... OK! 
+Checking overlaps for volume p_board ... OK! 
+Checking overlaps for volume p_Culayer_bot ... OK! 
+Checking overlaps for volume p_Culayer_top ... OK! 
+Checking overlaps for volume p_Al ... OK! 
+Checking overlaps for volume p_scint ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_1_pv_0 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_1_pv_1 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_1_Crystal_1_pv_2 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_3 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_1_Crystal_2_pv_4 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_5 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_1_Crystal_3_pv_6 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_7 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_2_pv_8 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_2_pv_9 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_2_Crystal_1_pv_10 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_11 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_2_Crystal_2_pv_12 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_13 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_2_Crystal_3_pv_14 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_15 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_3_pv_16 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_3_pv_17 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_3_Crystal_1_pv_18 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_19 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_3_Crystal_2_pv_20 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_21 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_3_Crystal_3_pv_22 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_23 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_4_pv_24 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_4_pv_25 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_4_Crystal_1_pv_26 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_27 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_4_Crystal_2_pv_28 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_29 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_4_Crystal_3_pv_30 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_31 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_5_pv_32 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_5_pv_33 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_5_Crystal_1_pv_34 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_35 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_5_Crystal_2_pv_36 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_37 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_5_Crystal_3_pv_38 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_39 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosure_6_pv_40 ... OK! 
+Checking overlaps for volume av_1_impr_1_sideEnclosureLid_6_pv_41 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_6_Crystal_1_pv_42 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_1_pv_43 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_6_Crystal_2_pv_44 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_2_pv_45 ... OK! 
+Checking overlaps for volume av_1_impr_1_Enclosure_6_Crystal_3_pv_46 ... OK! 
+Checking overlaps for volume av_1_impr_1_Foil_3_pv_47 ... OK! 
+Checking overlaps for volume p_scint_0 ... OK! 
+Checking overlaps for volume p_scint_1 ... OK! 
+Checking overlaps for volume p_CAVE ... OK! 
+Checking overlaps for volume p_CAVE ... OK! 
+Checking overlaps for volume p_CAVE ... OK! 
+Checking overlaps for volume p_CAVE ... OK! 
+Checking overlaps for volume p_bppilar1 ... OK! 
+Checking overlaps for volume p_bppilar2 ... OK! 
+Checking overlaps for volume p_bppilar3 ... OK! 
+Checking overlaps for volume p_bppilar4 ... OK! 
+Checking overlaps for volume p_bppilar5 ... OK! 
+Checking overlaps for volume p_bppilar6 ... OK! 
+Checking overlaps for volume p_Reih1 ... OK! 
+Checking overlaps for volume p_Reih2 ... OK! 
+Checking overlaps for volume p_Reiv1 ... OK! 
+Checking overlaps for volume p_Reiv2 ... OK! 
+Checking overlaps for volume p_PH1BPIPE ... OK! 
+Checking overlaps for volume p_PH1BPIPETiN ... OK! 
+Checking overlaps for volume p_PH1BPIPEVac ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapTop ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapTiNTop ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapVacTop ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapBot ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapTiNBot ... OK! 
+Checking overlaps for volume p_PH1BPIPEendcapVacBot ... OK! 
+Checking overlaps for volume phys_AluCont_f ... OK! 
+Checking overlaps for volume p_XshapeTiNForw ... OK! 
+Checking overlaps for volume p_XshapeForw ... OK! 
+Checking overlaps for volume phys_AluCont_fp ... OK! 
+Checking overlaps for volume p_XshapefPOS1 ... OK! 
+Checking overlaps for volume p_XshapefPOS2 ... OK! 
+Checking overlaps for volume p_XshapefPOS3 ... OK! 
+Checking overlaps for volume phys_AluCont_b ... OK! 
+Checking overlaps for volume p_XshapeTiNBackw ... OK! 
+Checking overlaps for volume p_XshapeBackw ... OK! 
+Checking overlaps for volume phys_AluCont_bp ... OK! 
+Checking overlaps for volume p_XshapebMIN1 ... OK! 
+Checking overlaps for volume p_XshapebMIN2 ... OK! 
+Checking overlaps for volume p_XshapebMIN3 ... OK! 

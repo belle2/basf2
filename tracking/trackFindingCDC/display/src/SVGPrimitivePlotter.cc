@@ -15,7 +15,6 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <fstream>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -149,16 +148,16 @@ void SVGPrimitivePlotter::drawCircleArc(const float& startX,
   std::ostringstream pathStream;
 
   pathStream << "M" << ' ';
-  pathStream << to_string(startX) << ' ';
-  pathStream << to_string(startY) << ' ';
+  pathStream << std::to_string(startX) << ' ';
+  pathStream << std::to_string(startY) << ' ';
   pathStream << "A" << ' ';
-  pathStream << to_string(radiusX) << ' ';
-  pathStream << to_string(radiusY) << ' ';
-  pathStream << to_string(rotationAngle) << ' ';
-  pathStream << to_string(longArc) << ' ';
-  pathStream << to_string(sweepFlag) << ' ';
-  pathStream << to_string(endX) << ' ';
-  pathStream << to_string(endY);
+  pathStream << std::to_string(radiusX) << ' ';
+  pathStream << std::to_string(radiusY) << ' ';
+  pathStream << std::to_string(rotationAngle) << ' ';
+  pathStream << std::to_string(longArc) << ' ';
+  pathStream << std::to_string(sweepFlag) << ' ';
+  pathStream << std::to_string(endX) << ' ';
+  pathStream << std::to_string(endY);
 
   AttributeMap geometryAttributeMap {
     {"d", pathStream.str()}
@@ -188,8 +187,8 @@ void SVGPrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& po
   float startY = std::get<1>(points[0]);
 
   pathStream << "M";
-  pathStream << ' ' << to_string(startX);
-  pathStream << ' ' << to_string(startY);
+  pathStream << ' ' << std::to_string(startX);
+  pathStream << ' ' << std::to_string(startY);
 
   for (size_t iCurrent = 0, iNext = 1;
        iNext < points.size();
@@ -230,14 +229,14 @@ void SVGPrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& po
 
     pathStream << ' ' << "C";
 
-    pathStream << ' ' <<  to_string(currentControlX);
-    pathStream << ' ' <<  to_string(currentControlY);
+    pathStream << ' ' <<  std::to_string(currentControlX);
+    pathStream << ' ' <<  std::to_string(currentControlY);
 
-    pathStream << ' ' <<  to_string(nextControlX);
-    pathStream << ' ' <<  to_string(nextControlY);
+    pathStream << ' ' <<  std::to_string(nextControlX);
+    pathStream << ' ' <<  std::to_string(nextControlY);
 
-    pathStream << ' ' <<  to_string(nextX);
-    pathStream << ' ' <<  to_string(nextY);
+    pathStream << ' ' <<  std::to_string(nextX);
+    pathStream << ' ' <<  std::to_string(nextY);
   }
 
   AttributeMap geometryAttributeMap {
@@ -271,7 +270,7 @@ const std::string SVGPrimitivePlotter::save(const std::string& fileName)
   int savedNIndentationSpaces = m_nIndentationSpaces;
   m_nIndentationSpaces = 0;
 
-  ofstream outputFileStream;
+  std::ofstream outputFileStream;
   outputFileStream.open(fileName);
 
   writeSVGHeader(outputFileStream);
@@ -397,7 +396,7 @@ void SVGPrimitivePlotter::writeOpeningTag(std::ostream& outputStream,
   outputStream << '>';
 
   // New line
-  outputStream << endl;
+  outputStream << std::endl;
 
   indent();
 
@@ -441,7 +440,7 @@ void SVGPrimitivePlotter::writeStandAloneTag(std::ostream& outputStream,
     outputStream << '/' << '>';
 
     // New line
-    outputStream << endl;
+    outputStream << std::endl;
   }
 }
 
@@ -471,10 +470,10 @@ void SVGPrimitivePlotter::writeAttributes(std::ostream& outputStream,
                                           const AttributeMap& attributeMap)
 {
   bool first = true;
-  for (const pair<string, string>& attribute : attributeMap) {
+  for (const std::pair<std::string, std::string>& attribute : attributeMap) {
 
-    const string& key = attribute.first;
-    const string& value = attribute.second;
+    const std::string& key = attribute.first;
+    const std::string& value = attribute.second;
 
     // Skip special attribute
     if (boost::starts_with(key, "_")) {
@@ -513,5 +512,5 @@ void SVGPrimitivePlotter::writeClosingTag(std::ostream& outputStream,
   outputStream << '>';
 
   // New line
-  outputStream << endl;
+  outputStream << std::endl;
 }

@@ -401,7 +401,7 @@ namespace Belle2 {
     return elementInserted;
   }
 
-  bool ParticleGenerator::inputListsCollide(std::pair<unsigned, unsigned> pair) const
+  bool ParticleGenerator::inputListsCollide(const std::pair<unsigned, unsigned>& pair) const
   {
     for (unsigned i = 0; i < m_collidingLists.size(); i++)
       if (pair == m_collidingLists[i])

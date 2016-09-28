@@ -34,6 +34,8 @@
 // ROOT
 #include <TRandom3.h>
 #include <TMatrixFSym.h>
+#include "TH1D.h"
+#include "TFile.h"
 
 namespace Belle2 {
   namespace ECL {
@@ -95,11 +97,11 @@ namespace Belle2 {
 
       double getCalibratedEnergy(const int cellid, const int energy) const; /**< energy calibration */
       double getCalibratedTime(const int cellid, const int time, const bool fitfailed) const; /**< timing correction. */
-      double getCalibratedTimeResolution(const int cellid, const double energy, const bool fitfailed) const; /**< timing resolution. */
-      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
+      double getT99(const int cellid, const double energy, const bool fitfailed, const int bgcount) const; /**< t99%. */
+//      double getInterpolatedTimeResolution(const double x, const int bin) const; /**< timing resolution interpolation. */
       void prepareEnergyCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
       void prepareTimeCalibrationConstants(); /**< reads calibration constants, performs checks, put them into a vector */
-      void determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
+      int determineBackgroundECL(); /**< count out of time digits to determine baclground levels */
 
       double m_timeInverseSlope; /**< Time calibration inverse slope "a". */
       double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
@@ -111,6 +113,18 @@ namespace Belle2 {
       const int c_MinimumAmplitude               = 1; /**< Minimum amplitude". */
       const double c_energyForSmallAmplitude     = 0.0; /**< Energy for small amplitudes". */
 
+      // new time calibration from Kim and Chris
+      std::string m_fileBackgroundName; /**< Background filename. */
+      TFile* m_fileBackground; /**< Background file. */
+      TH1D* m_th1dBackground; /**< Background histogram. */
+
+      const double c_pol2Var1 = 1684.0; /**< 2-order fit for p1 Var1 + Var2*bg + Var3*bg^2. */
+      const double c_pol2Var2 = 3080.0; /**< 2-order fit for p1. */
+      const double c_pol2Var3 = -613.9; /**< 2-order fit for p1. */
+      double m_pol2Max; /** < Maximum of p1 2-order fit to limit values */
+      const int c_nominalBG = 183; /**< Number of out of time digits at BGx1.0. */
+      double m_averageBG; /** < Average dose per crystal calculated from m_th1dBackground */
+      const double c_minT99 = 3.5;
     };
 
     /** Class derived from ECLDigitCalibratorModule, only difference are the names */

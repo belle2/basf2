@@ -99,7 +99,7 @@ DataStoreStreamer::~DataStoreStreamer()
   delete m_msghandler;
 }
 
-void DataStoreStreamer::registerStreamObjs(const vector<string>& objlist)
+void DataStoreStreamer::setStreamingObjects(const vector<string>& objlist)
 {
   m_streamobjnames = objlist;
 }

@@ -208,6 +208,8 @@ namespace Belle2 {
     unsigned m_connect;
     /** switch to skip second priority hits */
     bool m_ignore2nd;
+    /** switch between priority position and center position of track segment */
+    bool m_usePriority;
     /** switch to check separately for a hit in the innermost super layer */
     bool m_requireSL0;
 

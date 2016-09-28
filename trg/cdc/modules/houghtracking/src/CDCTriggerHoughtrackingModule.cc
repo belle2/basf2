@@ -73,6 +73,9 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            (unsigned)(6));
   addParam("ignore2ndPriority", m_ignore2nd,
            "Switch to skip second priority hits.", false);
+  addParam("usePriorityPosition", m_usePriority,
+           "If true, use wire position of priority cell in track segment, "
+           "otherwise use wire position of center cell.", true);
   addParam("requireSL0", m_requireSL0,
            "Switch to check separately for a hit in the innermost superlayer.", false);
   addParam("storeHoughPlane", m_storePlane,
@@ -140,11 +143,14 @@ CDCTriggerHoughtrackingModule::event()
     unsigned short iSL = tsHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
     if (m_ignore2nd && tsHits[iHit]->getPriorityPosition() < 3) continue;
-    double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL]
-                 + 0.5 * (((tsHits[iHit]->getPriorityPosition() >> 1) & 1)
-                          - (tsHits[iHit]->getPriorityPosition() & 1));
+    double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
+    if (m_usePriority) {
+      phi += 0.5 * (((tsHits[iHit]->getPriorityPosition() >> 1) & 1)
+                    - (tsHits[iHit]->getPriorityPosition() & 1));
+    }
     phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-    double r = radius[iSL][int(tsHits[iHit]->getPriorityPosition() < 3)];
+    double r = radius[iSL][int(m_usePriority &&
+                               tsHits[iHit]->getPriorityPosition() < 3)];
     TVector2 pos(cos(phi) / r, sin(phi) / r);
     hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }

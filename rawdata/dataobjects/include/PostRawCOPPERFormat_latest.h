@@ -23,7 +23,6 @@
 // version #
 #define POST_RAWCOPPER_FORMAT_VER1 1
 
-using namespace std;
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
 namespace Belle2 {
@@ -281,7 +280,7 @@ namespace Belle2 {
     sprintf(err_buf, "[FATAL] This data format does not have COPPER counter.(block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf);
-    string err_str = err_buf; throw (err_str);
+    std::string err_str = err_buf; throw (err_str);
     return 0;
   }
 
@@ -291,7 +290,7 @@ namespace Belle2 {
     sprintf(err_buf, "[FATAL] This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf);
-    string err_str = err_buf; throw (err_str);
+    std::string err_str = err_buf; throw (err_str);
     return 0;
   }
 
@@ -301,7 +300,7 @@ namespace Belle2 {
     sprintf(err_buf, "[FATAL] This function is not supported. (block %d) Exiting...\n %s %s %d\n",
             n, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     printf("%s", err_buf);
-    string err_str = err_buf; throw (err_str);
+    std::string err_str = err_buf; throw (err_str);
     return 0;
   }
 

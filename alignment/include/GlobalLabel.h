@@ -19,8 +19,6 @@
 
 #include <framework/gearbox/Const.h>
 
-using namespace std;
-
 namespace Belle2 {
 
   /// Class to identify beam parameters
@@ -326,18 +324,18 @@ namespace Belle2 {
     };
 
     //! Reference to map EIDPID -> (TEIDPID, time intervals)
-    static map<gidTYPE, TimeInterval >& getTimeIntervals()
+    static std::map<gidTYPE, TimeInterval >& getTimeIntervals()
     {
       // Map EIDPID -> (TEIDPID, time intervals)
-      static map<gidTYPE, TimeInterval > intervals;
+      static std::map<gidTYPE, TimeInterval > intervals;
       return intervals;
     }
 
     //! Reference to dictionary/map TEIDPID -> EIDPID
-    static map<gidTYPE, gidTYPE>& getDictionary()
+    static std::map<gidTYPE, gidTYPE>& getDictionary()
     {
       // Map TEIDPID -> EIDPID
-      static map<gidTYPE, gidTYPE> dictionary;
+      static std::map<gidTYPE, gidTYPE> dictionary;
       return dictionary;
     }
 
@@ -367,4 +365,3 @@ namespace Belle2 {
 }
 
 #endif
-

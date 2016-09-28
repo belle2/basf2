@@ -17,7 +17,6 @@
 #include <ecl/dataobjects/ECLSimHit.h>
 #include <ecl/dataobjects/ECLHit.h>
 
-using namespace std;
 
 namespace Belle2 {
   namespace ECL {

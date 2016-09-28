@@ -34,7 +34,7 @@ namespace Belle2 {
     virtual void writeData(RawCOPPER* raw_copper, int i);
 
   protected :
-    string m_out_fname;
+    std::string m_out_fname;
     int m_filefd;
   };
 

@@ -27,7 +27,7 @@ namespace Belle2 {
   public:
 
     //! Constructor / Destructor
-    DesSerCOPPER(string host_recv, int port_recv, string host_send, int port_send, int shmflag,
+    DesSerCOPPER(std::string host_recv, int port_recv, std::string host_send, int port_send, int shmflag,
                  const std::string& nodename, int nodeid, int finesse_bitflag);
     //    DesSerCOPPER();
     virtual ~DesSerCOPPER();

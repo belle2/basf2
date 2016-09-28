@@ -217,6 +217,15 @@ parser.add_argument(
     const=True,
     default=False,
     help='Set log level to INFO to see all messages')
+
+parser.add_argument(
+    '--tel-finder',
+    dest='tel_finder',
+    action='store_const',
+    const=True,
+    default=False,
+    help='Add telescope track finder')
+
 args = parser.parse_args()
 
 
@@ -309,10 +318,31 @@ else:
 
 add_vxdtf(main, not args.magnet_off, args.svd_only, args.momentum)
 
+telTF = register_module('TelTrackFinder')
+# telTF.param('inputTracksName', GFTracksColName)
+telTF.param('outputTrackCandsName', 'telTrackCands')
+telTF.param('inputClustersName', '')  # name of the telescope clusters
+telTF.param('distanceCut', 10)  # distance between track and clusters in units of the fit uncertainty (same cut for u and v)
+telTF.param('minTelLayers', 3)  # minmum telescope layers required to accept a track candidate (1..6)
+telTF.logging.log_level = LogLevel.WARNING
+telTF.logging.debug_level = 1
+
+
+if args.tel_finder:
+    main.add_module('GenFitter', FilterId='Kalman')
+    main.add_module(telTF)
+
+
 if args.gbl_collect:
-    main.add_module('GBLfit')
-    # main.add_module('GBLdiagnostics', rootFile='gbl' + str(args.run) + '.root')
-    main.add_module('MillepedeCollector', minPValue=0.0000)
+    if args.tel_finder:
+        main.add_module('GBLfit', GFTrackCandidatesColName='telTrackCands', GFTracksColName='telTracks')
+        main.add_module('MillepedeCollector', minPValue=0.0000, useGblTree=True, tracks='telTracks')
+    else:
+        main.add_module('GBLfit')
+        main.add_module('MillepedeCollector', minPValue=0.0000, useGblTree=True)
+
+    main.add_module('GBLdiagnostics', rootFile='gbl' + str(args.run) + '.root', tracks="telTracks")
+
 else:
     main.add_module('GenFitter', FilterId='Kalman')
 
@@ -336,8 +366,11 @@ main.add_module('RootOutput')
 
 
 if args.display:
-    main.add_module('TrackBuilder')
-    main.add_module('Display', fullGeometry=True)
+    if args.tel_finder:
+        main.add_module('TrackBuilder', GFTrackCandidatesColName='telTrackCands', GFTracksColName='telTracks')
+    else:
+        main.add_module('TrackBuilder')
 
+    main.add_module('Display', fullGeometry=True)
 process(main)
 print(statistics)

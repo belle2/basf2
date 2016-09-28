@@ -1,6 +1,11 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+Generate alignment payload for VXD
+
+"""
+
 import os
 import sys
 from basf2 import *

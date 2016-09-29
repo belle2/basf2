@@ -88,12 +88,12 @@ namespace Belle2 {
       backward(content, topVolume);
     }
 
-    G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const string& endcap, double wrapthickness)
+    G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness)
     {
-      string prefix("sv_"); prefix += endcap; prefix += "_wrap";
+      std::string prefix("sv_"); prefix += endcap; prefix += "_wrap";
       G4Translate3D tw;
       G4VSolid* wrapped_crystal = s->get_solid(prefix, wrapthickness, tw);
-      string name("lv_"); name += endcap + "_wrap_" + to_string(s->nshape);
+      std::string name("lv_"); name += endcap + "_wrap_" + std::to_string(s->nshape);
       G4Material* wrap = NULL;
       if (wrapthickness < 0.170)
         wrap = Materials::get("WRAP170");
@@ -107,7 +107,7 @@ namespace Belle2 {
       prefix = "sv_"; prefix += endcap; prefix += "_crystal";
       G4Translate3D tc;
       G4VSolid* crystal_solid = s->get_solid(prefix, 0, tc);
-      name = "lv_" + endcap + "_crystal_" + to_string(s->nshape);
+      name = "lv_" + endcap + "_crystal_" + std::to_string(s->nshape);
       G4LogicalVolume* crystal_logical = new G4LogicalVolume(crystal_solid, Materials::get("G4_CESIUM_IODIDE"), name.c_str(),
                                                              0, 0, 0);
       crystal_logical->SetVisAttributes(att("cryst"));
@@ -117,13 +117,11 @@ namespace Belle2 {
       return wrapped_logical;
     }
 
-    const G4VisAttributes* GeoECLCreator::att(const string& n) const
+    const G4VisAttributes* GeoECLCreator::att(const std::string& n) const
     {
       auto p = m_atts.find(n);
-      if (p != m_atts.end()) return p->second;
-      cout << "no such visattribute:" << n << endl;
-      exit(0);
-      return NULL;
+      assert(p != m_atts.end());
+      return p->second;
     }
 
     G4LogicalVolume* GeoECLCreator::get_preamp() const

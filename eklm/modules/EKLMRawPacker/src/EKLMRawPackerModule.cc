@@ -1,9 +1,12 @@
-//+
-// File : EKLMRawPackerModule.cc
-// Description : Module to store dummy data in RawKLM object
-//
-// Author : Petr Katrenko, based on Satoru Yamada's DummyDataPacker and Anselm Vossen BKLMRawPackerModule
-//-
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Petr Katrenko                                            *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 
 #include <eklm/modules/EKLMRawPacker/EKLMRawPackerModule.h>
 #include <eklm/dataobjects/EKLMDigit.h>

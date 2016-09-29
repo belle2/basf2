@@ -93,7 +93,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False):
     # track fitting
     path.add_module("DAFRecoFitter").set_name("Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator')
+    path.add_module('TrackCreator', defaultPDGCode=211, additionalPDGCodes=[11, 13, 321, 2212])
 
     # V0 finding
     path.add_module('V0Finder')

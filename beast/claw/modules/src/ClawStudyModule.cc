@@ -68,16 +68,27 @@ ClawStudyModule::~ClawStudyModule()
 void ClawStudyModule::defineHisto()
 {
   for (int i = 0; i < 8; i++) {
-    h_claws_Evtof1[i] = new TH2F(TString::Format("h_claws_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
+    h_claws_Evtof1[i] = new TH2F(TString::Format("claws_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
                                  1000, 0., 10.);
-    h_claws_Evtof2[i] = new TH2F(TString::Format("h_claws_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
+    h_claws_Evtof2[i] = new TH2F(TString::Format("claws_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
                                  1000., 1000, 0., 10.);
-    h_claws_Evtof3[i] = new TH2F(TString::Format("h_claws_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+    h_claws_Evtof3[i] = new TH2F(TString::Format("claws_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                  1000., 1000, 0., 10.);
-    h_claws_Evtof4[i] = new TH2F(TString::Format("h_claws_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
+    h_claws_Evtof4[i] = new TH2F(TString::Format("claws_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
                                  1000., 1000, 0., 10.);
-    h_claws_edep[i] = new TH1F(TString::Format("h_claws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
-    h_Wclaws_edep[i] = new TH1F(TString::Format("h_Wclaws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+    h_claws_edep[i] = new TH1F(TString::Format("claws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+    h_Wclaws_edep[i] = new TH1F(TString::Format("Wclaws_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
+  }
+
+  for (int i = 0; i < 8; i++) {
+    h_claws_rate1[i] = new TH1F(TString::Format("claws_rate1_%d", i), "PE distributions", 5000, 0., 5000.);
+    h_claws_rate2[i] = new TH1F(TString::Format("claws_rate2_%d", i), "PE distributions", 5000, 0., 5000.);
+    h_claws_rate1W[i] = new TH1F(TString::Format("claws_rate1W_%d", i), "PE distributions", 5000, 0., 5000.);
+    h_claws_rate2W[i] = new TH1F(TString::Format("claws_rate2W_%d", i), "PE distributions", 5000, 0., 5000.);
+    h_claws_pe1[i] = new TH2F(TString::Format("claws_pe1_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
+    h_claws_pe2[i] = new TH2F(TString::Format("claws_pe2_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
+    h_claws_pe1W[i] = new TH2F(TString::Format("claws_pe1W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
+    h_claws_pe2W[i] = new TH2F(TString::Format("claws_pe2W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
   }
 }
 
@@ -100,6 +111,7 @@ void ClawStudyModule::event()
 {
   //Here comes the actual event processing
   StoreArray<ClawSimHit>  SimHits;
+  StoreArray<ClawHit> Hits;
   StoreArray<SADMetaHit> sadMetaHits;
   double rate = 0;
   for (const auto& sadMetaHit : sadMetaHits) {
@@ -127,6 +139,23 @@ void ClawStudyModule::event()
         h_claws_edep[detNB]->Fill(Edep);
         h_Wclaws_edep[detNB]->Fill(Edep, rate);
       }
+    }
+  }
+
+  for (const auto& Hit : Hits) {
+    const int detNb = Hit.getdetNb();
+    const int timebin = Hit.gettime();
+    const float edep = Hit.getedep();
+    const float pe = Hit.getPE();
+    h_claws_rate1[detNb]->Fill(pe);
+    h_claws_rate1W[detNb]->Fill(pe, rate);
+    h_claws_pe1[detNb]->Fill(timebin, pe);
+    h_claws_pe1W[detNb]->Fill(timebin, pe, rate);
+    if (edep > m_Ethres) {
+      h_claws_rate2[detNb]->Fill(pe);
+      h_claws_rate2W[detNb]->Fill(pe, rate);
+      h_claws_pe2[detNb]->Fill(timebin, pe);
+      h_claws_pe2W[detNb]->Fill(timebin, pe, rate);
     }
   }
 

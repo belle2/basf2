@@ -26,6 +26,7 @@
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>
+#include <map>
 #include <iostream>
 
 namespace Belle2 {
@@ -73,7 +74,7 @@ namespace Belle2 {
                     unsigned short& bword2, unsigned short& bword3, unsigned short& bword4);
 
     //! to map logical coordinates to hardware coordinates
-    map<int, int> m_ModuleIdToelectId;
+    std::map<int, int> m_ModuleIdToelectId;
     //! fill m_ModuleIdToelectId from xml file
     void loadMap();
   };

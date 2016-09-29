@@ -59,6 +59,10 @@ def add_geometry_modules(path, components=None):
             geometry.param('components', components)
         path.add_module(geometry)
 
+    # Material effects for all track extrapolations
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
     """

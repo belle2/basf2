@@ -358,7 +358,6 @@ else:
         # myGreedy = register_module('TrackSetEvaluatorGreedyDEV')
         # myGreedy.param('NameSpacePointTrackCands', 'caSPTCs')
         # main.add_module(myGreedy)
-
         myHopfield = register_module('TrackSetEvaluatorHopfieldNNDEV')
         myHopfield.logging.log_level = LogLevel.DEBUG
         myHopfield.logging.debug_level = 3

@@ -127,6 +127,7 @@ void StudyMaterialEffectsModule::event()
   m_ScatterAngleGradL3L4 = (l4HitPosBegin - l3HitPosBegin).Angle(l3HitPosBegin) * 180. / TMath::Pi();
   m_ScatterAngleGradL3L6 = (l6HitPosEnd - l3HitPosBegin).Angle(l3HitPosBegin) * 180. / TMath::Pi();
 
+
   m_ScatterAngleV3GradL3L3 = l3MomentumEnd.Angle(l3MomentumBegin) * 180. / TMath::Pi();
   m_ScatterAngleV3GradL3L4 = l4MomentumBegin.Angle(l3MomentumBegin) * 180. / TMath::Pi();
   m_ScatterAngleV3GradL3L6 = l6MomentumEnd.Angle(l3MomentumBegin) * 180. / TMath::Pi();

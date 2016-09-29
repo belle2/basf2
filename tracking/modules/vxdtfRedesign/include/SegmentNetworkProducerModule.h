@@ -51,7 +51,6 @@ namespace Belle2 {
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
 
-
     /** simple struct for collecting raw data for a single sector */
     struct RawSectorData {
       /** secID of rawSector */

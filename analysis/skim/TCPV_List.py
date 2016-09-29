@@ -21,16 +21,16 @@ def TCPVList():
         'eta:loose K_S0:all',
         'K_S0:all K_S0:all K_S0:all',
         'pi0:all K_S0:all',
-        'rho0:all K_S0:all',
-        'omega:all K_S0:all',
-        'f_0:all K_S0:all',
+        'rho0:loose K_S0:all',
+        'omega:loose K_S0:all',
+        'f_0:loose K_S0:all',
         'pi0:all pi0:all K_S0:all',
         'phi:loose K_S0:all pi0:all',
         'pi+:all pi-:all K_S0:all']
 
-    bd_ccs_Channels = ['J/psi:all K_S0:all',
-                       'psi(2S):all K_S0:all',
-                       'J/psi:all K*0:loose']
+    bd_ccs_Channels = ['J/psi:eeLoose K_S0:all',
+                       'psi(2S):eeLoose K_S0:all',
+                       'J/psi:eeLoose K*0:loose']
 
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):

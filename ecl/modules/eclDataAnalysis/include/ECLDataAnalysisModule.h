@@ -94,7 +94,7 @@ namespace Belle2 {
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
     std::vector<int>* m_eclDigitFitQuality;  /**< ECLDigit fit quality */
-    std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
+    //std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
     std::vector<int>* m_eclDigitToCalDigit; /**< Index of CalDigit related to that ECLDigit */
 
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */

@@ -89,6 +89,24 @@ void ClawStudyModule::defineHisto()
     h_claws_pe2[i] = new TH2F(TString::Format("claws_pe2_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
     h_claws_pe1W[i] = new TH2F(TString::Format("claws_pe1W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
     h_claws_pe2W[i] = new TH2F(TString::Format("claws_pe2W_%d", i), "PE distributions", 5000, 0., 5000., 1000, 0., 1000.);
+
+    h_claws_rs_rate1[i] = new TH2F(TString::Format("claws_rs_rate1_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
+    h_claws_rs_rate2[i] = new TH2F(TString::Format("claws_rs_rate2_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
+    h_claws_rs_rate1W[i] = new TH2F(TString::Format("claws_rs_rate1W_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
+    h_claws_rs_rate2W[i] = new TH2F(TString::Format("claws_rs_rate2W_%d", i), "PE distributions", 5000, 0., 5000., 12, 0., 12.);
+
+    h_claws_rate1[i]->Sumw2();
+    h_claws_rate2[i]->Sumw2();
+    h_claws_rate1W[i]->Sumw2();
+    h_claws_rate2W[i]->Sumw2();
+    h_claws_rs_rate1[i]->Sumw2();
+    h_claws_rs_rate2[i]->Sumw2();
+    h_claws_rs_rate1W[i]->Sumw2();
+    h_claws_rs_rate2W[i]->Sumw2();
+    h_claws_pe1[i]->Sumw2();
+    h_claws_pe2[i]->Sumw2();
+    h_claws_pe1W[i]->Sumw2();
+    h_claws_pe2W[i]->Sumw2();
   }
 }
 
@@ -112,10 +130,13 @@ void ClawStudyModule::event()
   //Here comes the actual event processing
   StoreArray<ClawSimHit>  SimHits;
   StoreArray<ClawHit> Hits;
-  StoreArray<SADMetaHit> sadMetaHits;
+  StoreArray<SADMetaHit> MetaHits;
+
   double rate = 0;
-  for (const auto& sadMetaHit : sadMetaHits) {
-    rate = sadMetaHit.getrate();
+  int ring_section = -1;
+  for (const auto& MetaHit : MetaHits) {
+    rate = MetaHit.getrate();
+    ring_section = MetaHit.getring_section() - 1;
   }
 
   //number of entries in SimHits
@@ -149,11 +170,15 @@ void ClawStudyModule::event()
     const float pe = Hit.getPE();
     h_claws_rate1[detNb]->Fill(pe);
     h_claws_rate1W[detNb]->Fill(pe, rate);
+    h_claws_rs_rate1[detNb]->Fill(pe, ring_section);
+    h_claws_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
     h_claws_pe1[detNb]->Fill(timebin, pe);
     h_claws_pe1W[detNb]->Fill(timebin, pe, rate);
     if (edep > m_Ethres) {
       h_claws_rate2[detNb]->Fill(pe);
       h_claws_rate2W[detNb]->Fill(pe, rate);
+      h_claws_rs_rate2[detNb]->Fill(pe, ring_section);
+      h_claws_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
       h_claws_pe2[detNb]->Fill(timebin, pe);
       h_claws_pe2W[detNb]->Fill(timebin, pe, rate);
     }

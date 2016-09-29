@@ -93,6 +93,15 @@ namespace Belle2 {
       TH1F* h_claws_rate2W[8];
 
       /** Energy deposited */
+      TH2F* h_claws_rs_rate1[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate2[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate1W[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate2W[8];
+
+      /** Energy deposited */
       TH2F* h_claws_pe1[8];
       /** Energy deposited */
       TH2F* h_claws_pe2[8];

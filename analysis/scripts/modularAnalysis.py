@@ -90,10 +90,12 @@ def outputMdst(filename, path=analysis_main):
     reconstruction.add_mdst_output(path, mc=True, filename=filename)
 
 
-def outputUdst(filename, particleLists=[], path=analysis_main):
+def outputUdst(filename, particleLists=[], includeArrays=[], path=analysis_main):
     """
     Save uDST (micro-Data Summary Tables) = MDST + Particles + ParticleLists
     The charge-conjugate lists of those given in particleLists are also stored.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
 
     Note that this does not reduce the amount of Particle objects saved,
     see skimOutputUdst() for a function that does.
@@ -109,15 +111,17 @@ def outputUdst(filename, particleLists=[], path=analysis_main):
 
     partBranches = ['Particles', 'ParticlesToMCParticles',
                     'ParticlesToPIDLikelihoods', 'ParticleExtraInfoMap',
-                    'EventExtraInfo'] + list(plSet)
+                    'EventExtraInfo'] + includeArrays + list(plSet)
     reconstruction.add_mdst_output(path, mc=True, filename=filename,
                                    additionalBranches=partBranches)
 
 
-def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
+def skimOutputUdst(skimname, particleLists=[], includeArrays=[], path=analysis_main):
     """
     Create a new path for events that contain a non-empty particle list.
     Write the accepted events as a udst file, saving only necessary particles.
+    Additional Store Arrays and Relations to be stored can be specified via includeArrays
+    list argument.
 
     Currently mdst are also written. This is for testing purposes
     and will be removed in the future.
@@ -133,7 +137,7 @@ def skimOutputUdst(skimname, particleLists=[], path=analysis_main):
     # add_independent_path() is rather expensive, only do this for skimmed events
     skim_path = create_path()
     removeParticlesNotInLists(particleLists, path=skim_path)
-    outputUdst(skimname + '.udst.root', particleLists, path=skim_path)
+    outputUdst(skimname + '.udst.root', particleLists, includeArrays, path=skim_path)
     outputMdst(skimname + '.mdst.root', path=skim_path)
     filter_path.add_independent_path(skim_path, "skim_" + skimname)
 

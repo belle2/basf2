@@ -11,24 +11,28 @@ if __name__ == "__main__":
 
     # path to your files here
     general.m_datafiles = basf2_mva.vector(
-        "/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/more_new_vars_id/leo_id*.root",)
-    general.m_treename = "ECLdata"
+        "/nfs/dust/belle2/user/jkrohn/belle2/my_stuff/generation/root_files/FINAL_training/*.root",)
+
+    general.m_treename = "KLMdata"
     general.m_weight = ""
-    general.m_weightfile = "ECLExpert.xml"
+    general.m_identifier = "KLMKLExpert.xml"
     general.m_variables = basf2_mva.vector(
-        "m_KLMnLayer",
-        "m_KLMnInnermostLayer",
-        "m_KLMglobalZ",
-        "m_KLMtime",
-        "m_KLMnextCluster",
-        "m_KLMenergy",
-        "m_KLMtrackToECL",
-        "m_KLMECLEerror",
-        "m_KLMTrackSepDist",
-        "m_KLMInitialTrackSepAngle",
-        "m_KLMTrackRotationAngle",
-        "m_KLMTrackSepAngle")
+        "KLMnLayer",
+        "KLMnInnermostlayer",
+        "KLMglobalZ",
+        "KLMtime",
+        "KLMdistToNextCl",
+        "KLMenergy",
+        "KLMtrackToECL",
+        "KLMECLEerror",
+        "KLMTrackSepDist",
+        "KLMInitialtrackSepAngle",
+        "KLMTrackRotationAngle",
+        "KLMTrackSepAngle")
 
     general.m_target_variable = "KLMTruth"
     specific = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general, specific)
+
+    # Upload the weightfile on disk to the database
+    # basf2_mva.upload('KLMKLExpert.xml', 'KLMKLExpert')

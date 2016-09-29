@@ -31,7 +31,7 @@ using namespace std;
 
 REG_MODULE(ECLExpert);
 
-ECLExpertModule::ECLExpertModule(): Module(), m_feature_variables(7, 0)
+ECLExpertModule::ECLExpertModule(): Module(), m_feature_variables(6, 0)
 {
   setDescription("Use to calculate KlId for each ECLCluster.");
   setPropertyFlags(c_ParallelProcessingCertified);

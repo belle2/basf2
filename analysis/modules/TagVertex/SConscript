@@ -2,6 +2,6 @@ Import('env')
 
 env['LIBS'] = ['framework', 'analysis', 'analysis_dataobjects', 'analysis_raveInterface',
                'analysis_utility', 'mdst_dataobjects', 'RaveBase', 
-	       '$ROOT_LIBS', 'CLHEP']
+	       '$ROOT_LIBS', 'CLHEP','genfit2']
 
 Return('env')

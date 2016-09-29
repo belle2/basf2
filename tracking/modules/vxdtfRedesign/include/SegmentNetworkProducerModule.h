@@ -50,28 +50,6 @@ namespace Belle2 {
     /** to improve readability of the code, here the definition of the static sector type. */
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
-    // TODO WARNING JKL
-    /** dummy declaration to get the module compiling without real static sectorMaps */
-    struct StaticSectorMap {
-
-      /** contains static sectors. */
-      std::vector<StaticSectorType*> sectors;
-
-      /** destructor. */
-      ~StaticSectorMap()
-      { for (auto* aSector : sectors) { delete aSector; } }
-
-      /** returns secID. */
-      FullSecID getSecID() {return FullSecID(); }
-
-      /** returns pointerTo a Static Sector */
-      StaticSectorType* getSector(FullSecID aSecID)
-      {
-        // TODO WARNING JKL
-        sectors.push_back(new StaticSectorType(aSecID));
-        return sectors.back();
-      }
-    };
 
 
     /** simple struct for collecting raw data for a single sector */

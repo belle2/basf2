@@ -131,7 +131,7 @@ namespace Belle2 {
     } // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
 
 
-    /** calculates an estimation of circleCenter position, result is written into the 4th input-parameter. */
+    /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
     static B2Vector3<DataType> calcCircleCenter(const PointType& a, const PointType& b, const PointType& c) throw(Straight_Line)
     {
       // calculates the intersection point using Cramer's rule.

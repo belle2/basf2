@@ -46,12 +46,12 @@ void StudyMaterialEffectsModule::initialize()
   m_tree->get().Branch("ResidualScatterAngleL3L3", &(m_ScatterAngleL3L3));
   m_tree->get().Branch("ResidualScatterAngleL3L4", &(m_ScatterAngleL3L4));
   m_tree->get().Branch("ResidualcatterAngleL3L6", &(m_ScatterAngleL3L6));
-  m_tree->get().Branch("ResidualScatterAngleAlternativeL3L3", &(m_ScatterAngleV2L3L3));
-  m_tree->get().Branch("ResidualScatterAngleAlternativeL3L4", &(m_ScatterAngleV2L3L4));
-  m_tree->get().Branch("ResidualScatterAngleAlternativeL3L6", &(m_ScatterAngleV2L3L6));
   m_tree->get().Branch("ResidualScatterAngleV2GradL3L3", &(m_ScatterAngleGradL3L3));
   m_tree->get().Branch("ResidualScatterAngleV2GradL3L4", &(m_ScatterAngleGradL3L4));
   m_tree->get().Branch("ResidualScatterAngleV2GradL3L6", &(m_ScatterAngleGradL3L6));
+  m_tree->get().Branch("ResidualScatterAngleV3GradL3L3", &(m_ScatterAngleV3GradL3L3));
+  m_tree->get().Branch("ResidualScatterAngleV3GradL3L4", &(m_ScatterAngleV3GradL3L4));
+  m_tree->get().Branch("ResidualScatterAngleV3GradL3L6", &(m_ScatterAngleV3GradL3L6));
   m_tree->get().Branch("ResidualcatterAngleL3L6", &(m_ScatterAngleL3L6));
   m_tree->get().Branch("ResidualXYL3L4", &(m_distXY));
   m_tree->get().Branch("ResidualMomentumL3bL3e", &(m_deltaPL3L3));
@@ -65,6 +65,7 @@ void StudyMaterialEffectsModule::initialize()
 
 void StudyMaterialEffectsModule::event()
 {
+  // position and momentum in global coordinates:
   B2Vector3D l3HitPosBegin;
   B2Vector3D l3HitPosEnd;
   B2Vector3D l4HitPosBegin;
@@ -86,21 +87,23 @@ void StudyMaterialEffectsModule::event()
 
     B2Vector3D entryHitPos = getGlobalPosition(trueHit, vxdID, true);
     B2Vector3D exitHitPos = getGlobalPosition(trueHit, vxdID, false);
+    B2Vector3D entryMomentum = getGlobalMomentumVector(trueHit, vxdID, true);
+    B2Vector3D exitMomentum = getGlobalMomentumVector(trueHit, vxdID, false);
     if (vxdID.getLayerNumber() == 3) {
       l3HitPosBegin = entryHitPos;
       l3HitPosEnd = exitHitPos;
-      l3MomentumBegin = trueHit->getEntryMomentum();
-      l3MomentumEnd = trueHit->getExitMomentum();
+      l3MomentumBegin = entryMomentum;
+      l3MomentumEnd = exitMomentum;
       wasFoundL3 = true;
     }
     if (vxdID.getLayerNumber() == 4) {
       l4HitPosBegin = entryHitPos;
-      l4MomentumBegin = trueHit->getEntryMomentum();
+      l4MomentumBegin = entryMomentum;
       wasFoundL4 = true;
     }
     if (vxdID.getLayerNumber() == 6) {
       l6HitPosEnd = exitHitPos;
-      l6MomentumEnd = trueHit->getExitMomentum();
+      l6MomentumEnd = exitMomentum;
       wasFoundL6 = true;
     }
   }
@@ -120,13 +123,13 @@ void StudyMaterialEffectsModule::event()
   m_ScatterAngleL3L4 = sqrt(pow(m_ThetaL3L4, 2) + pow(m_PhiL3L4, 2));
   m_ScatterAngleL3L6 = sqrt(pow(m_ThetaL3L6, 2) + pow(m_PhiL3L6, 2));
 
-  m_ScatterAngleV2L3L3 = (l3HitPosEnd - l3HitPosBegin).Angle(l3HitPosBegin);
-  m_ScatterAngleV2L3L4 = (l4HitPosBegin - l3HitPosBegin).Angle(l3HitPosBegin);
-  m_ScatterAngleV2L3L6 = (l6HitPosEnd - l3HitPosBegin).Angle(l3HitPosBegin);
+  m_ScatterAngleGradL3L3 = (l3HitPosEnd - l3HitPosBegin).Angle(l3HitPosBegin) * 180. / TMath::Pi();
+  m_ScatterAngleGradL3L4 = (l4HitPosBegin - l3HitPosBegin).Angle(l3HitPosBegin) * 180. / TMath::Pi();
+  m_ScatterAngleGradL3L6 = (l6HitPosEnd - l3HitPosBegin).Angle(l3HitPosBegin) * 180. / TMath::Pi();
 
-  m_ScatterAngleGradL3L3 = m_ScatterAngleV2L3L3 * 180. / TMath::Pi();
-  m_ScatterAngleGradL3L4 = m_ScatterAngleV2L3L4 * 180. / TMath::Pi();
-  m_ScatterAngleGradL3L6 = m_ScatterAngleV2L3L6 * 180. / TMath::Pi();
+  m_ScatterAngleV3GradL3L3 = l3MomentumEnd.Angle(l3MomentumBegin) * 180. / TMath::Pi();
+  m_ScatterAngleV3GradL3L4 = l4MomentumBegin.Angle(l3MomentumBegin) * 180. / TMath::Pi();
+  m_ScatterAngleV3GradL3L6 = l6MomentumEnd.Angle(l3MomentumBegin) * 180. / TMath::Pi();
 
 
   m_distXY = (l3HitPosBegin - l4HitPosBegin).Perp();
@@ -165,6 +168,8 @@ B2Vector3D StudyMaterialEffectsModule::getGlobalPosition(const SVDTrueHit* trueH
   return pos;
 }
 
+
+
 const SVDTrueHit* StudyMaterialEffectsModule::getTrueHit(const SpacePoint& aSP)
 {
 //   const auto* aTrueHit = aSP.getRelationsTo<SVDCluster>("ALL")[0]->getRelationsTo<SVDTrueHit>("ALL")[0];;
@@ -180,4 +185,17 @@ const SVDTrueHit* StudyMaterialEffectsModule::getTrueHit(const SpacePoint& aSP)
     }
   }
   return aTrueHit;
+}
+
+
+B2Vector3D StudyMaterialEffectsModule::getGlobalMomentumVector(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry)
+{
+  const Belle2::VXD::SensorInfoBase* aSensorInfo = &VXD::GeoCache::getInstance().getSensorInfo(vxdID);
+
+  if (useEntry) {
+//  B2Vector3D mom = aSensorInfo->pointToGlobal(trueHit->getEntryMomentum());
+    return aSensorInfo->vectorToGlobal(trueHit->getEntryMomentum());;
+  }
+//   B2Vector3D pos = aSensorInfo->pointToGlobal(trueHit->getExitMomentum());
+  return aSensorInfo->vectorToGlobal(trueHit->getExitMomentum());;
 }

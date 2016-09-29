@@ -119,6 +119,7 @@ namespace Belle2 {
         { return Distance3DNormed<PointType>::value(outerHit, innerHit); };
       }
 
+
       // 2+1 hits:
 
       if (variableType == SelectionVariableType::Angle3DSimpleHighOccupancy) {

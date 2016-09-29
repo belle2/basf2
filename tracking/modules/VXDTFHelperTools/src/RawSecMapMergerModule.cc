@@ -430,9 +430,9 @@ template <class FilterType> void RawSecMapMergerModule::getSegmentFilters(
 template <class FilterType> void RawSecMapMergerModule::add2HitFilters(VXDTFFilters<SpacePoint>&
     filterContainer, SubGraph<FilterType>& subGraph, const SectorMapConfig& config)
 {
-  // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
-  std::string named3D = "Distance3DSquared", namedXY = "Distance2DXYSquared", nameddZ = "Distance1DZ", namesRZ = "SlopeRZ",
-              named3Dn = "Distance3DNormed";
+// //   // WARNING evil hack -> SelectionVariables themselves should be able to tell their own names!
+// //   std::string named3D = "Distance3DSquared", namedXY = "Distance2DXYSquared", nameddZ = "Distance1DZ", namesRZ = "SlopeRZ",
+// //               named3Dn = "Distance3DNormed";
   const auto& filterCutsMap = subGraph.getFinalQuantileValues();
   /// TODO tune cutoffs
 

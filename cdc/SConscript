@@ -10,13 +10,7 @@ env['LIBS'] = ['framework', 'geometry', 'simulation',
 #env.Append(CPPDEFINES = {'CDC_BADWIRE_FROM_DB':None})
 #env.Append(CPPDEFINES = {'CDC_PROPSPEED_FROM_DB':None})
 #env.Append(CPPDEFINES = {'CDC_TIMEWALK_FROM_DB':None})
-# obsolete xt
-#env.Append(CPPDEFINES = {'CDC_XT_FROM_DB':None})
-# new xt 
 #env.Append(CPPDEFINES = {'CDC_XTREL_FROM_DB':None})
-# obsolete sigma 
-#env.Append(CPPDEFINES = {'CDC_SIGMA_FROM_DB':None})
-# new sigma 
 #env.Append(CPPDEFINES = {'CDC_SRESOL_FROM_DB':None})
 #env.Append(CPPDEFINES = {'CDC_CHMAP_FROM_DB':None})
 

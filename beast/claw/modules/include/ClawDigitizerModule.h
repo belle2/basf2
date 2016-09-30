@@ -78,7 +78,7 @@ namespace Belle2 {
       /** Upper time limit */
       double m_MaxTime;
       /** Energy threshold */
-      double m_Ethres;
+      double m_PEthres;
 
     };
 

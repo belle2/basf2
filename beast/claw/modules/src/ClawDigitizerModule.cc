@@ -62,10 +62,10 @@ ClawDigitizerModule::ClawDigitizerModule() : Module()
   addParam("ScintCell", m_ScintCell, "Number of scintillator cell", 16);
   addParam("TimeStep", m_TimeStep, "Time step", 0.8);
   addParam("C_keV_to_MIP", m_C_keV_to_MIP, "C_keV_to_MIP", 805.5);
-  addParam("C_MIP_to_PE", m_C_MIP_to_PE, "C_MIP_to_PE", 24.0);
+  addParam("C_MIP_to_PE", m_C_MIP_to_PE, "C_MIP_to_PE", 15.0);
   addParam("MinTime", m_MinTime, "Min. time", 0.0);
   addParam("MaxTime", m_MaxTime, "Max. time", 750.0);
-  addParam("Ethres", m_Ethres, "Energy threshold in keV", 0.0);
+  addParam("PEthres", m_PEthres, "Energy threshold in keV", 1.0);
 }
 
 ClawDigitizerModule::~ClawDigitizerModule()
@@ -109,7 +109,7 @@ void ClawDigitizerModule::event()
     int TimeBin = tof / m_TimeStep;
     double MIP = Edep / m_C_keV_to_MIP;
     double PE = MIP * m_C_MIP_to_PE;
-    if ((m_MinTime < tof && tof < m_MaxTime) &&  Edep > m_Ethres)
+    if ((m_MinTime < tof && tof < m_MaxTime) &&  PE > m_PEthres)
       Hits.appendNew(ClawHit(detNb,  TimeBin, Edep, MIP, PE));
   }
 
@@ -124,7 +124,7 @@ void ClawDigitizerModule::getXMLData()
   m_TimeStep = content.getDouble("TimeStep");
   m_MinTime = content.getDouble("MinTime");
   m_MaxTime = content.getDouble("MaxTime");
-  m_Ethres = content.getDouble("Ethres");
+  m_PEthres = content.getDouble("PEthres");
   m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
   m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
 

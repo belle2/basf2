@@ -103,7 +103,7 @@ namespace Belle2 {
       volume.SetVisAttributes(attr);
     }
 
-    G4Polycone* createPolyCone(const string& name, GearDir params, double& minZ, double& maxZ)
+    G4Polycone* createPolyCone(const string& name, const GearDir& params, double& minZ, double& maxZ)
     {
       if (!params) return 0;
 

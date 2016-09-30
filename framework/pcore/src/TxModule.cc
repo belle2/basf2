@@ -39,7 +39,8 @@ TxModule::~TxModule() { }
 
 void TxModule::initialize()
 {
-  m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
+  if (m_sendRandomState)
+    m_randomgenerator.registerInDataStore(DataStore::c_DontWriteOut);
 
   m_rbuf->txAttached();
   m_streamer = new DataStoreStreamer(m_compressionLevel, m_handleMergeable);
@@ -61,11 +62,13 @@ void TxModule::beginRun()
 
 void TxModule::event()
 {
-  //Save event level random generator into datastore to send it to other processes
-  if (!m_randomgenerator.isValid()) {
-    m_randomgenerator.construct(RandomNumbers::getEventRandomGenerator());
-  } else {
-    *m_randomgenerator = RandomNumbers::getEventRandomGenerator();
+  if (m_sendRandomState) {
+    //Save event level random generator into datastore to send it to other processes
+    if (!m_randomgenerator.isValid()) {
+      m_randomgenerator.construct(RandomNumbers::getEventRandomGenerator());
+    } else {
+      *m_randomgenerator = RandomNumbers::getEventRandomGenerator();
+    }
   }
 
   // Stream DataStore in EvtMessage, also stream transient objects and objects of durability c_Persistent

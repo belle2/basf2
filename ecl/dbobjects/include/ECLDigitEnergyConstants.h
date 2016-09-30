@@ -51,7 +51,7 @@ namespace Belle2 {
     /** Return cell ID
      * @return cell ID
      */
-    float getCellID() const {return m_cellID; };
+    int getCellID() const {return m_cellID; };
 
     /** Set calibration amplitude (measured)
      * @param calibration amplitude
@@ -73,7 +73,8 @@ namespace Belle2 {
     float m_amplitude;  /**< Calibration amplitude */
     float m_energy;     /**< Calibration energy */
 
-    ClassDef(ECLDigitEnergyConstants, 1); /**< ClassDef */
+    // 2: changed getter getCelleID from float to int
+    ClassDef(ECLDigitEnergyConstants, 2); /**< ClassDef */
   };
 } // end namespace Belle2
 #endif

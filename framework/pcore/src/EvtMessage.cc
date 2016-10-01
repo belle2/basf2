@@ -73,16 +73,10 @@ EvtMessage& EvtMessage::operator=(const EvtMessage& obj)
   return *this;
 }
 
-/// @brief Get buffer
-/// @return Buffer address
-
 char* EvtMessage::buffer()
 {
   return m_data;
 }
-
-// @brief Set buffer
-// @param Existing buffer address
 
 void EvtMessage::buffer(const char* bufadr)
 {

@@ -49,7 +49,7 @@ namespace Belle2 {
     /** maximal EvtMessage size, in bytes (200MB). */
     const static unsigned int c_MaxEventSize = 200000000;
 
-    /** build EvtMessage from existing buffer (does not take ownership). */
+    /** build EvtMessage from existing buffer (no copy, but does not take ownership). */
     explicit EvtMessage(char* buf = NULL);
     /** build EvtMessage by allocating new message buffer (sobjs is copied). */
     EvtMessage(const char* sobjs, int size, RECORD_TYPE type);
@@ -70,7 +70,7 @@ namespace Belle2 {
      * zeroed.
      */
     char* buffer();
-    /** Set existing buffer address */
+    /** Set existing buffer address (copies buffer) */
     void  buffer(const char*);
 
     /** Get size of message including headers. Often, you'll want to use paddedSize() instead. */

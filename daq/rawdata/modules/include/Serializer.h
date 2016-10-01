@@ -15,7 +15,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 
 #include <daq/dataflow/EvtSocket.h>
 
@@ -124,9 +123,6 @@ namespace Belle2 {
 
     //!Compression parameter
     int m_compressionLevel;
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
 
     //! No. of sent events
     int n_basf2evt;

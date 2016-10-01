@@ -48,9 +48,6 @@ void TxSocketModule::initialize()
 
   // Open Socket
   m_sock = new EvtSocketSend(m_dest, m_port);
-
-  // Create Message Handler
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 
   B2INFO("Tx initialized.");

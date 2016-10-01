@@ -77,9 +77,6 @@ void DeSerializerCOPPERModule::initialize()
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
   // Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 

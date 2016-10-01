@@ -38,9 +38,6 @@ void DummyDataSourceFileModule::initialize()
 {
   B2INFO("DummyDataSourceFile: initialize() started.");
 
-  // Open message handler
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
-
   /// Initialize EvtMetaData
   //  m_eventMetaDataPtr.registerInDataStore();
 

@@ -194,7 +194,10 @@ namespace Belle2 {
         G4double dz_airbox = 0.563 / 2. * InchtoCm;
         G4double dx_airbox = 1. / 2. * InchtoCm;
         G4double dy_airbox = 0.315 / 2. * InchtoCm;
-        G4VSolid* s_airbox = new G4Box("s_airbox", dx_airbox, dy_airbox, dz_airbox);
+        G4double dz_airbox_e = 0.1 / 2. * CLHEP::cm;
+        G4double dx_airbox_e = 0.1 / 2. * CLHEP::cm;
+        G4double dy_airbox_e = 0.1 / 2. * CLHEP::cm;
+        G4VSolid* s_airbox = new G4Box("s_airbox", dx_airbox + dx_airbox_e, dy_airbox + dy_airbox_e, dz_airbox + dz_airbox_e);
         G4LogicalVolume* l_airbox = new G4LogicalVolume(s_airbox, G4Material::GetMaterial("G4_AIR"), "l_airbox");
         for (int i = 0; i < dimz; i++) {
           if (phase == 1) {

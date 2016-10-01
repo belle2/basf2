@@ -1,9 +1,95 @@
 from functools import partial
 from collections import defaultdict
 
+from basf2 import *
 import ROOT
 from .utils import method_dispatch
 from .utils import decode_json_string
+
+
+class State():
+    """
+    Basic State object that can take enter and exit state methods and records
+    the state of a machine.
+
+    You should assign the self.on_enter or self.on_exit attributes to callback functions
+    or lists of them, if you need them.
+    """
+
+    def __init__(self, name, enter=None, exit=None):
+        self.name = name
+        self.on_enter = enter
+        self.on_exit = exit
+
+    @property
+    def on_enter(self):
+        """
+        Getter for on_enter attribute
+        """
+        return self._on_enter
+
+    @on_enter.setter
+    def on_enter(self, callbacks):
+        """
+        Setter for on_enter attribute
+        """
+        self._on_enter = []
+        if callbacks:
+            self._add_callbacks(callbacks, self._on_enter)
+
+    @property
+    def on_exit(self):
+        """
+        Getter for on_exit attribute
+        """
+        return self._on_exit
+
+    @on_exit.setter
+    def on_exit(self, callbacks):
+        """
+        Setter for on_exit attribute
+        """
+        self._on_exit = []
+        if callbacks:
+            self._add_callbacks(callbacks, self._on_exit)
+
+    @method_dispatch
+    def _add_callbacks(self, callback, attribute):
+        """
+        Adds callback to a property.
+        """
+        if callable(callback):
+            attribute.append(callback)
+        else:
+            B2ERROR("Something other than a function (callable) passed into State {0}.".format(self.name))
+
+    @_add_callbacks.register(tuple)
+    @_add_callbacks.register(list)
+    def _(self, callbacks, attribute):
+        """
+        Alternate method for lists and tuples of function objects
+        """
+        if callbacks:
+            for function in callbacks:
+                if callable(function):
+                    attribute.append(function)
+                else:
+                    B2ERROR("Something other than a function (callable) passed into State {0}.".format(self.name))
+
+    def __str__(self):
+        return self.name
+
+    def __repr__(self):
+        return "State(name={0})".format(self.name)
+
+    def __eq__(self, other):
+        if isinstance(other, str):
+            return self.name == other
+        else:
+            return self.name == other.name
+
+    def __hash__(self):
+        return hash(self.name)
 
 
 class Machine():
@@ -29,17 +115,82 @@ class Machine():
     This also means that if you call a trigger with arguments e.g. machine.walk(speed=5)
     you MUST use the keyword arguments rather than positional ones e.g. machine.walk(5)
     """
-    def __init__(self, states=set(), initial_state=""):
+    def __init__(self, states=None, initial_state="default_initial"):
         """
-        Basic Setup
+        Basic Setup of states and initial_state
         """
+        self.states = []
         if states:
-            self.states = set(states)
-            if initial_state:
-                self.state = initial_state
+            for state in states:
+                self.add_state(state)
+        if initial_state != "default_initial":
+            self.initial_state = initial_state
         else:
-            self.states = set()
+            self.add_state(initial_state)
+            self._initial_state = State(initial_state)
+
+        self._state = self.initial_state
         self.transitions = defaultdict(list)
+
+    def add_state(self, state):
+        """
+        Adds a single state to the list of possible ones.
+        Should be a unique string or a State object with a unique name.
+        """
+        if isinstance(state, str):
+            self.add_state(State(state))
+        elif isinstance(state, State):
+            if state not in self.states:
+                self.states.append(state)
+            else:
+                B2WARNING("You asked to add a state {0} but it was already in the machine states.".format(state))
+        else:
+                B2WARNING("You asked to add a state ({0}) but it wasn't a State or str object".format(state))
+
+    @property
+    def initial_state(self):
+        return self._initial_state
+
+    @initial_state.setter
+    def initial_state(self, state):
+        if isinstance(state, str):
+            self.initial_state = State(state)
+        elif isinstance(state, State):
+            if state in self.states:
+                self._initial_state = state
+                self._state = state
+            else:
+                raise MachineError("Attempted to set state to '{0}' which is not in the 'states' attribute!".format(state))
+        else:
+            raise TypeError("Attempted to set state attribute to something other than str or State")
+
+    @property
+    def state(self):
+        return self._state
+
+    @state.setter
+    def state(self, state):
+        """
+        Setter for a state. Will call the exit method of the current state and enter method of the
+        new one. to get around the behaviour e.g. for setting initial states, either use the initial_state
+        property or directly set the _state attribute itself (at your own risk!)
+        """
+        if isinstance(state, str):
+            self.state = State(state)
+        elif isinstance(state, State):
+            if state in self.states:
+                # Run exit callbacks of current state
+                for callback in self.state.on_exit:
+                    callback()
+                # Run enter callbacks of new state
+                for callback in state.on_enter:
+                    callback()
+                # Set the state
+                self._state = state
+            else:
+                raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(state))
+        else:
+            raise TypeError("Attempted to set state attribute to something other than str or State")
 
     @staticmethod
     def default_condition(**kwargs):
@@ -83,13 +234,6 @@ class Machine():
             transition_dict["after"] = [after]
 
         self.transitions[trigger].append(transition_dict)
-
-    def add_state(self, state):
-        """
-        Adds a single state to the list of possible ones.
-        Should be a unique string.
-        """
-        self.states.add(state)
 
     def __getattr__(self, name, **kwargs):
         """
@@ -138,22 +282,11 @@ class Machine():
         """
         return func(**kwargs)
 
-    @property
-    def state(self):
-        return self._state
-
-    @state.setter
-    def state(self, value):
-        if value in self.states:
-            self._state = value
-        else:
-            raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(value))
-
     def save_graph(self, filename, graphname):
         with open(filename, "w") as dotfile:
             dotfile.write("digraph "+graphname+" {\n")
             for state in self.states:
-                dotfile.write('"'+state+'" [shape=ellipse, color=black]\n')
+                dotfile.write('"'+state.name+'" [shape=ellipse, color=black]\n')
             for trigger, transition_dicts in self.transitions.items():
                 for transition in transition_dicts:
                     dotfile.write('"'+transition["source"]+'" -> "'+transition["dest"]+'" [label="'+trigger+'"]\n')
@@ -165,14 +298,14 @@ class CalibrationMachine(Machine):
     A state machine to handle Calibration objects and the flow of
     processing for them.
     """
-    default_states = {"init",
+    default_states = ["init",
                       "running_collector",
                       "collector_failed",
                       "collector_completed",
                       "running_algorithms",
                       "algorithms_failed",
                       "algorithms_completed",
-                      "completed"}
+                      "completed"]
 
     def __init__(self, calibration, initial_state="init", iteration=0):
         """

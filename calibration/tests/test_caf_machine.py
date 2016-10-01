@@ -20,12 +20,13 @@ class Test_Machine(TestCase):
         self.m.add_state("walking")
         self.m.add_transition("walk", "standing", "walking")
         self.m.add_transition("stop", "walking", "standing")
+        self.m.initial_state = "standing"
 
     def test_initial(self):
         """
         Checks that a new machine sets an initial state correctly
         """
-        states = {"walking", "standing"}
+        states = ["walking", "standing"]
         initial = "walking"
         m = Machine(states, initial)
         self.assertEqual(m.state, initial)

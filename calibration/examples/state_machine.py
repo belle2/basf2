@@ -21,8 +21,12 @@ cm1 = CalibrationMachine(cal1)
 cm1.transitions["submit_collector"][0]["before"] = [print_msg_before]
 cm1.transitions["submit_collector"][0]["after"] = [print_msg_after]
 cm2 = CalibrationMachine(cal2)
-# cm1.save_graph("graph.dot", "CalibrationMachine")
+cm1.save_graph("graph.dot", "CalibrationMachine")
 
 print("Currently in", cm1.state, "state.")
+print(cm1.state.__class__)
+print(cm1.states)
+print(cm1.initial_state)
 cm1.submit_collector(msg_before="About to submit", msg_after="Now submitted")
+
 print("Currently in", cm1.state, "state.")

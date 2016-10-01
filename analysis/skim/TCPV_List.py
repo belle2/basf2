@@ -5,7 +5,7 @@
 #
 # TCPV skims
 # P. Urquijo, 6/Jan/2015
-#
+# P. Urquijo 1/Oct/2016
 ######################################################
 
 from basf2 import *
@@ -29,8 +29,11 @@ def TCPVList():
         'pi+:all pi-:all K_S0:all']
 
     bd_ccs_Channels = ['J/psi:eeLoose K_S0:all',
+                       'J/psi:mumuLoose K_S0:all',
                        'psi(2S):eeLoose K_S0:all',
-                       'J/psi:eeLoose K*0:loose']
+                       'psi(2S):mumuLoose K_S0:all',
+                       'J/psi:eeLoose K*0:loose',
+                       'J/psi:mumuLoose K*0:loose']
 
     bd_qqs_List = []
     for chID, channel in enumerate(bd_qqs_Channels):

@@ -6,8 +6,8 @@
 # See https://agira.desy.de/browse/BII-1647
 # FIXME: remove once packer is fixed
 import sys
-print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
-sys.exit(1)
+# print("TEST SKIPPED: Test fails due to changes in packer which were not propagated to unpacker. See BII-1647", file=sys.stderr)
+# sys.exit(1)
 
 from basf2 import *
 from ROOT import Belle2
@@ -122,12 +122,12 @@ packer = register_module('PXDPacker')
 # [[dhhc1, dhh1, dhh2, dhh3, dhh4, dhh5] [ ... ]]
 # -1 is disable port
 packer.param('dhe_to_dhc', [
-    [0,  2,  4, 34, 36, 38],
-    [1,  6,  8, 40, 42, 44],
+    [0, 2, 4, 34, 36, 38],
+    [1, 6, 8, 40, 42, 44],
     [2, 10, 12, 46, 48, 50],
     [3, 14, 16, 52, 54, 56],
-    [4,  3,  5, 35, 37, 39],
-    [5,  7,  9, 41, 43, 45],
+    [4, 3, 5, 35, 37, 39],
+    [5, 7, 9, 41, 43, 45],
     [6, 11, 13, 47, 49, 51],
     [7, 15, 17, 53, 55, 57],
 ])
@@ -141,6 +141,7 @@ unpacker.param("PXDRawHitsName", pxd_rawhits_pack_unpack_collection)
 unpacker.param("PXDRawAdcsName", pxd_rawhits_pack_unpack_collection_adc)
 unpacker.param("PXDRawPedestalsName", pxd_rawhits_pack_unpack_collection_pedestal)
 unpacker.param("PXDRawROIsName", pxd_rawhits_pack_unpack_collection_roi)
+unpacker.param("RemapFlag", False)
 main.add_module(unpacker)
 
 # run custom test module to check if the PXDDigits and the

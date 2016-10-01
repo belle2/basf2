@@ -1173,18 +1173,21 @@ void PXDUnpackerModule::unpack_dhp(void* data, unsigned int frame_len, unsigned 
           dhp_col += dhp_offset;
 //           B2INFO("ROW :: " << dhp_row << "COL after dhp_offset :: " << dhp_col );
           dhp_adc = dhp_pix[i] & 0xFF;
+
           if (!m_RemapFlag) {
             if (IFOB_flag == 1) {
-              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
-              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = 1 + dhp_row ;} //if outer module
-              u_cellID = 1 + dhp_col;
+//              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+//              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+              v_cellID = /*1 +*/ dhp_row ;
+              u_cellID = /*1 +*/ dhp_col;
             }
             if (IBOF_flag == 1) {
-              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
-              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = 1 + dhp_row ;} //if outer module
-              u_cellID = 250 - dhp_col;
+//              if (((dhe_ID >> 5) & 0x1) == 0) {v_cellID = 768 - dhp_row ;} //if inner module
+//              if (((dhe_ID >> 5) & 0x1) == 1) {v_cellID = /*1 +*/ dhp_row ;} //if outer module
+              v_cellID = /*1 +*/ dhp_row ;
+              u_cellID = /*250 - */dhp_col;
             }
-            B2INFO("NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID);
+            B2INFO("NOT REMAPPED coords :: row " << v_cellID << " col " << u_cellID << " dhe ID " << dhe_ID << "chip ID" << dhp_dhp_id);
           }
 
           if (printflag)

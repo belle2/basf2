@@ -5,7 +5,8 @@
 #
 # Had skims
 # P. Urquijo, 6/Jan/2015
-#
+# C-L. Hsu 3/Jun/2016
+# P. Urquijo 1/Oct/2016
 ######################################################
 
 from basf2 import *

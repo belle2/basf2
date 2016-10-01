@@ -254,7 +254,8 @@ namespace Belle2 {
         G4LogicalVolume* l_cover1 = new G4LogicalVolume(s_cover1, G4Material::GetMaterial("Al6061"), "l_cover1");
         l_cover1->SetVisAttributes(yellow);
         for (int i = 0; i < dimz; i++) {
-          new G4PVPlacement(0,  G4ThreeVector(0, dy_airbox - dy_cover1,  0), l_cover1, TString::Format("p_cover1_%d", i).Data(), l_airbox,
+          new G4PVPlacement(0,  G4ThreeVector(0, dy_airbox_e / 2. + dy_airbox - dy_cover1,  0), l_cover1, TString::Format("p_cover1_%d",
+                            i).Data(), l_airbox,
                             false, 0);
         }
 
@@ -265,8 +266,9 @@ namespace Belle2 {
         G4LogicalVolume* l_cover2 = new G4LogicalVolume(s_cover2, G4Material::GetMaterial("Al6061"), "l_cover2");
         l_cover2->SetVisAttributes(yellow);
         for (int i = 0; i < dimz; i++) {
-          new G4PVPlacement(0, G4ThreeVector(0, dy_cover2 - dy_airbox, dz_cover2 - dz_airbox), l_cover2, TString::Format("p_cover2_%d",
-                            i).Data(), l_airbox, false, 0);
+          new G4PVPlacement(0, G4ThreeVector(0, dy_cover2 - dy_airbox, dz_cover2 - dz_airbox - dz_airbox_e / 2.), l_cover2,
+                            TString::Format("p_cover2_%d",
+                                            i).Data(), l_airbox, false, 0);
         }
         //Create PIN plastic subtrate
         /*

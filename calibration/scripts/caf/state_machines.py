@@ -119,7 +119,7 @@ class Machine():
         """
         Basic Setup of states and initial_state
         """
-        self.states = []
+        self.states = {}
         if states:
             for state in states:
                 self.add_state(state)
@@ -132,16 +132,16 @@ class Machine():
         self._state = self.initial_state
         self.transitions = defaultdict(list)
 
-    def add_state(self, state):
+    def add_state(self, state, enter=None, exit=None):
         """
         Adds a single state to the list of possible ones.
         Should be a unique string or a State object with a unique name.
         """
         if isinstance(state, str):
-            self.add_state(State(state))
+            self.add_state(State(state, enter, exit))
         elif isinstance(state, State):
-            if state not in self.states:
-                self.states.append(state)
+            if state.name not in self.states.keys():
+                self.states[state.name] = state
             else:
                 B2WARNING("You asked to add a state {0} but it was already in the machine states.".format(state))
         else:
@@ -153,16 +153,11 @@ class Machine():
 
     @initial_state.setter
     def initial_state(self, state):
-        if isinstance(state, str):
-            self.initial_state = State(state)
-        elif isinstance(state, State):
-            if state in self.states:
-                self._initial_state = state
-                self._state = state
-            else:
-                raise MachineError("Attempted to set state to '{0}' which is not in the 'states' attribute!".format(state))
+        if state in self.states.keys():
+            self._initial_state = self.states[state]
+            self._state = self.states[state]
         else:
-            raise TypeError("Attempted to set state attribute to something other than str or State")
+            raise KeyError("Attempted to set state to '{0}' which is not in the 'states' attribute!".format(state))
 
     @property
     def state(self):
@@ -175,22 +170,17 @@ class Machine():
         new one. to get around the behaviour e.g. for setting initial states, either use the initial_state
         property or directly set the _state attribute itself (at your own risk!)
         """
-        if isinstance(state, str):
-            self.state = State(state)
-        elif isinstance(state, State):
-            if state in self.states:
-                # Run exit callbacks of current state
-                for callback in self.state.on_exit:
-                    callback()
-                # Run enter callbacks of new state
-                for callback in state.on_enter:
-                    callback()
-                # Set the state
-                self._state = state
-            else:
-                raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(state))
+        if state.name in self.states.keys():
+            # Run exit callbacks of current state
+            for callback in self.state.on_exit:
+                callback(prior_state=self.state, new_state=state)
+            # Run enter callbacks of new state
+            for callback in state.on_enter:
+                callback(prior_state=self.state, new_state=state)
+            # Set the state
+            self._state = state
         else:
-            raise TypeError("Attempted to set state attribute to something other than str or State")
+            raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(state))
 
     @staticmethod
     def default_condition(**kwargs):
@@ -209,8 +199,14 @@ class Machine():
         depending on the current state/input.
         """
         transition_dict = {}
-        transition_dict["source"] = source
-        transition_dict["dest"] = dest
+        try:
+            source = self.states[source]
+            dest = self.states[dest]
+            transition_dict["source"] = source
+            transition_dict["dest"] = dest
+        except KeyError as err:
+            B2WARNING("Tried to add a transition where the source or dest isn't in the list of states")
+            raise err
         if conditions:
             if isinstance(conditions, (list, tuple, set)):
                 transition_dict["conditions"] = list(conditions)
@@ -285,11 +281,11 @@ class Machine():
     def save_graph(self, filename, graphname):
         with open(filename, "w") as dotfile:
             dotfile.write("digraph "+graphname+" {\n")
-            for state in self.states:
-                dotfile.write('"'+state.name+'" [shape=ellipse, color=black]\n')
+            for state in self.states.keys():
+                dotfile.write('"'+state+'" [shape=ellipse, color=black]\n')
             for trigger, transition_dicts in self.transitions.items():
                 for transition in transition_dicts:
-                    dotfile.write('"'+transition["source"]+'" -> "'+transition["dest"]+'" [label="'+trigger+'"]\n')
+                    dotfile.write('"'+transition["source"].name+'" -> "'+transition["dest"].name+'" [label="'+trigger+'"]\n')
             dotfile.write("}\n")
 
 
@@ -298,21 +294,22 @@ class CalibrationMachine(Machine):
     A state machine to handle Calibration objects and the flow of
     processing for them.
     """
-    default_states = ["init",
-                      "running_collector",
-                      "collector_failed",
-                      "collector_completed",
-                      "running_algorithms",
-                      "algorithms_failed",
-                      "algorithms_completed",
-                      "completed"]
 
     def __init__(self, calibration, initial_state="init", iteration=0):
         """
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
-        super().__init__(CalibrationMachine.default_states, initial_state)
+        self.default_states = [State("init"),
+                               State("running_collector", enter=self._log_new_state),
+                               State("collector_failed", enter=self._log_new_state),
+                               State("collector_completed", enter=self._log_new_state),
+                               State("running_algorithms", enter=self._log_new_state),
+                               State("algorithms_failed", enter=self._log_new_state),
+                               State("algorithms_completed", enter=self._log_new_state),
+                               State("completed", enter=self._log_new_state)]
+
+        super().__init__(self.default_states, initial_state)
         self.setup_defaults()
 
         self.add_transition("submit_collector", "init", "running_collector", conditions=self.dependencies_completed)
@@ -346,6 +343,9 @@ class CalibrationMachine(Machine):
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
         CalibrationMachine.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
+
+    def _log_new_state(self, **kwargs):
+        B2INFO("Calibration {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
 
     def dependencies_completed(self, **kwargs):
         """

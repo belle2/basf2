@@ -1,6 +1,10 @@
 from functools import partial
 from collections import defaultdict
 
+import configparser
+from threading import Thread, Lock, RLock
+from time import sleep
+
 from basf2 import *
 import ROOT
 from .utils import method_dispatch
@@ -337,7 +341,6 @@ class CalibrationMachine(Machine):
         """
         config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
         if config_file_path:
-            import configparser
             config = configparser.ConfigParser()
             config.read(config_file_path)
         else:
@@ -357,6 +360,42 @@ class CalibrationMachine(Machine):
                 return False
         else:
             return True
+
+
+class CalibrationRunner(Thread):
+    def __init__(self, machine, heartbeat=None):
+        super().__init__()
+        self.setup_defaults()
+        self.machine = machine
+        self.moves = ["submit_collector", "complete", "run_algorithms", "complete", "finish"]
+        if heartbeat:
+            self.heartbeat = heartbeat
+
+    def run(self):
+        """
+        Will be run in a new Thread by calling the start() method
+        """
+        while self.machine.state != "completed":
+            for trigger in self.moves:
+                try:
+                    getattr(self.machine, trigger)()
+                except TransitionError:
+                    continue
+                sleep(self.heartbeat)
+
+    def setup_defaults(self):
+        """
+        Anything that is setup by outside config files by default goes here.
+        """
+        # Not certain if configparser requires that we lock here, but to be on the safe side we do
+        with Lock():
+            config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+            if config_file_path:
+                config = configparser.ConfigParser()
+                config.read(config_file_path)
+            else:
+                B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+            self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
 
 class MachineError(Exception):

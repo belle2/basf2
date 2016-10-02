@@ -225,14 +225,19 @@ namespace Belle2 {
         G4double sA_hole = 0.*CLHEP::deg;
         G4double spA_hole = 360.*CLHEP::deg;
         G4VSolid* s_hole = new G4Tubs("s_hole", ir_hole, or_hole, h_hole, sA_hole, spA_hole);
-        s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector((0.5 - 0.315)*InchtoCm,
-                                        (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
-        s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-(0.5 - 0.315)*InchtoCm,
-                                        (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
+        G4double x_pos_hole = dx_base - 0.315 * InchtoCm;
+        G4double y_pos_hole = (0.187 - 0.250 / 2.) * InchtoCm;
+        G4double z_pos_hole = -(0.5 - 0.382) * InchtoCm;
+        s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector(x_pos_hole, y_pos_hole, z_pos_hole));
+        s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-x_pos_hole, y_pos_hole, z_pos_hole));
+        /*s_base = new G4SubtractionSolid("s_base_hole1", s_base, s_hole, 0, G4ThreeVector((0.5 - 0.315)*InchtoCm,
+                                              (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));
+              s_base = new G4SubtractionSolid("s_base_hole2", s_base, s_hole, 0, G4ThreeVector(-(0.5 - 0.315)*InchtoCm,
+        (0.187 - 0.250 / 2.)*InchtoCm, -(0.5 - 0.382)*InchtoCm));*/
 
         G4LogicalVolume* l_base = new G4LogicalVolume(s_base, G4Material::GetMaterial("Al6061"), "l_base");
         l_base->SetVisAttributes(yellow);
-        G4Transform3D transform;
+        //G4Transform3D transform;
         for (int i = 0; i < dimz; i++) {
           new G4PVPlacement(0, G4ThreeVector(0, dy_base - dy_airbox, dz_airbox - dz_base), l_base, TString::Format("p_base_%d", i).Data(),
                             l_airbox, false, 0);
@@ -245,12 +250,17 @@ namespace Belle2 {
 
         G4double dx_shole = (0.563 - 0.406) / 2. * InchtoCm;
         G4VSolid* s_shole = new G4Box("s_shole", dx_shole, dy_cover1, dx_shole);
-
-        s_cover1 = new G4SubtractionSolid("s_cover1_hole1", s_cover1, s_shole, 0, G4ThreeVector((0.5 - 0.392)*InchtoCm + dx_shole, 0,
-                                          (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
-        s_cover1 = new G4SubtractionSolid("s_cover1_hole2", s_cover1, s_shole, 0, G4ThreeVector(-(0.5 - 0.392)*InchtoCm - dx_shole, 0,
-                                          (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
-
+        G4double x_pos_cover_hole = dx_base - 0.392 * InchtoCm + dx_shole;
+        //G4double y_pos_cover_hole = 0;
+        G4double z_pos_cover_hole = dz_airbox - 0.406 * InchtoCm + dx_shole;
+        s_cover1 = new G4SubtractionSolid("s_cover1_hole1", s_cover1, s_shole, 0, G4ThreeVector(x_pos_cover_hole, 0, z_pos_cover_hole));
+        s_cover1 = new G4SubtractionSolid("s_cover1_hole2", s_cover1, s_shole, 0, G4ThreeVector(-x_pos_cover_hole, 0, z_pos_cover_hole));
+        /*
+              s_cover1 = new G4SubtractionSolid("s_cover1_hole1", s_cover1, s_shole, 0, G4ThreeVector((0.5 - 0.392)*InchtoCm + dx_shole, 0,
+                                                (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
+              s_cover1 = new G4SubtractionSolid("s_cover1_hole2", s_cover1, s_shole, 0, G4ThreeVector(-(0.5 - 0.392)*InchtoCm - dx_shole, 0,
+                                                (0.563 / 2. - 0.406)*InchtoCm + dx_shole));
+        */
         G4LogicalVolume* l_cover1 = new G4LogicalVolume(s_cover1, G4Material::GetMaterial("Al6061"), "l_cover1");
         l_cover1->SetVisAttributes(yellow);
         for (int i = 0; i < dimz; i++) {
@@ -301,13 +311,23 @@ namespace Belle2 {
             detID1 = ch_wAu[i];
             detID2 = ch_woAu[i];
           }
-          new G4PVPlacement(0, G4ThreeVector((0.5 - 0.392) * InchtoCm + dx_shole,
-                                             (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                             (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin)
+          /*
+                new G4PVPlacement(0, G4ThreeVector((0.5 - 0.392) * InchtoCm + dx_shole,
+                                                   (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                                   (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - 0. - dz_pin)
+                                  , l_pin, TString::Format("p_pin_1_%d", i).Data(), l_airbox, false, detID1);
+                new G4PVPlacement(0,  G4ThreeVector(-(0.5 - 0.392) * InchtoCm - dx_shole,
+                                                    (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
+                                                    (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin)
+                                  , l_pin, TString::Format("p_pin_2_%d", i).Data(), l_airbox, false, detID2);
+          */
+          new G4PVPlacement(0, G4ThreeVector(x_pos_cover_hole,
+                                             y_pos_hole + dy_pin,
+                                             z_pos_cover_hole + dx_shole - dz_pin)
                             , l_pin, TString::Format("p_pin_1_%d", i).Data(), l_airbox, false, detID1);
-          new G4PVPlacement(0,  G4ThreeVector(-(0.5 - 0.392) * InchtoCm - dx_shole,
-                                              (0.187 - 0.250 / 2.) * InchtoCm + dy_pin,
-                                              (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin)
+          new G4PVPlacement(0,  G4ThreeVector(-x_pos_cover_hole,
+                                              y_pos_hole + dy_pin,
+                                              z_pos_cover_hole + dx_shole - dz_pin)
                             , l_pin, TString::Format("p_pin_2_%d", i).Data(), l_airbox, false, detID2);
         }
         G4double dx_layer = 2.65 / 2.*CLHEP::mm;
@@ -317,20 +337,32 @@ namespace Belle2 {
         G4LogicalVolume* l_layer1 = new G4LogicalVolume(s_layer1, geometry::Materials::get("G4_Au"), "l_layer1");
         l_layer1->SetVisAttributes(red);
         for (int i = 0; i < dimz; i++) {
-          new G4PVPlacement(0, G4ThreeVector((0.5 - 0.392) * InchtoCm + dx_shole,
-                                             (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
-                                             (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin),
-                            l_layer1, TString::Format("p_layer1_%d", i).Data(), l_airbox, false, 0);
+          /*
+                new G4PVPlacement(0, G4ThreeVector((0.5 - 0.392) * InchtoCm + dx_shole,
+                                                   (0.187 - 0.250 / 2.) * InchtoCm + dy_layer1 + 2.* dy_pin,
+                                                   (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin),
+                                  l_layer1, TString::Format("p_layer1_%d", i).Data(), l_airbox, false, 0);
+          */
+          new G4PVPlacement(0, G4ThreeVector(x_pos_cover_hole,
+                                             y_pos_hole + dy_layer1 + 2.* dy_pin,
+                                             z_pos_cover_hole + dx_shole - dz_pin),
+                            l_layer1, TString::Format("p_layer1_%d", i).Data(), l_airbox, false, 1);
         }
         G4double dy_layer2 = 0.001 / 2.*InchtoCm;
         G4VSolid* s_layer2 = new G4Box("s_layer1", dx_layer, dy_layer2, dz_layer);
         G4LogicalVolume* l_layer2 = new G4LogicalVolume(s_layer2, geometry::Materials::get("Al"), "l_layer2");
         l_layer2->SetVisAttributes(green);
         for (int i = 0; i < dimz; i++) {
-          new G4PVPlacement(0, G4ThreeVector(-(0.5 - 0.392) * InchtoCm - dx_shole,
-                                             (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
-                                             (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin),
-                            l_layer2, TString::Format("p_layer2_%d", i).Data(), l_airbox, false, 0);
+          /*
+                new G4PVPlacement(0, G4ThreeVector(-(0.5 - 0.392) * InchtoCm - dx_shole,
+                                                   (0.187 - 0.250 / 2.) * InchtoCm + dy_layer2 + 2. * dy_pin,
+                                                   (0.563 / 2. - 0.406) * InchtoCm + dx_shole * 2 - dz_pin),
+                                  l_layer2, TString::Format("p_layer2_%d", i).Data(), l_airbox, false, 0);
+          */
+          new G4PVPlacement(0, G4ThreeVector(-x_pos_cover_hole,
+                                             y_pos_hole + dy_layer2 + 2. * dy_pin,
+                                             z_pos_cover_hole + dx_shole - dz_pin),
+                            l_layer2, TString::Format("p_layer2_%d", i).Data(), l_airbox, false, 1);
         }
       }
     }

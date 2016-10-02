@@ -174,7 +174,13 @@ class Machine():
         new one. to get around the behaviour e.g. for setting initial states, either use the initial_state
         property or directly set the _state attribute itself (at your own risk!)
         """
-        if state.name in self.states.keys():
+        if isinstance(state, str):
+            state_name = state
+        else:
+            state_name = state.name
+
+        try:
+            state = self.states[state_name]
             # Run exit callbacks of current state
             for callback in self.state.on_exit:
                 callback(prior_state=self.state, new_state=state)
@@ -183,7 +189,7 @@ class Machine():
                 callback(prior_state=self.state, new_state=state)
             # Set the state
             self._state = state
-        else:
+        except KeyError:
             raise MachineError("Attempted to set state to '{0}' which not in the 'states' attribute!".format(state))
 
     @staticmethod
@@ -363,11 +369,16 @@ class CalibrationMachine(Machine):
 
 
 class CalibrationRunner(Thread):
+    """
+    Runs a CalibrationMachine in a Thread. Will process from intial state
+    to the final state.
+    """
+
     def __init__(self, machine, heartbeat=None):
         super().__init__()
-        self.setup_defaults()
         self.machine = machine
         self.moves = ["submit_collector", "complete", "run_algorithms", "complete", "finish"]
+        self.setup_defaults()
         if heartbeat:
             self.heartbeat = heartbeat
 
@@ -379,23 +390,25 @@ class CalibrationRunner(Thread):
             for trigger in self.moves:
                 try:
                     getattr(self.machine, trigger)()
-                except TransitionError:
+                    sleep(self.heartbeat)
+                except (ConditionError, TransitionError):
                     continue
-                sleep(self.heartbeat)
+
+            if self.machine.state == "failed":
+                break
 
     def setup_defaults(self):
         """
         Anything that is setup by outside config files by default goes here.
         """
         # Not certain if configparser requires that we lock here, but to be on the safe side we do
-        with Lock():
-            config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
-            if config_file_path:
-                config = configparser.ConfigParser()
-                config.read(config_file_path)
-            else:
-                B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-            self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
+        config_file_path = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+        if config_file_path:
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+        else:
+            B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        self.heartbeat = decode_json_string(config['CAF_DEFAULTS']['Heartbeat'])
 
 
 class MachineError(Exception):
@@ -415,5 +428,12 @@ class ConditionError(MachineError):
 class TransitionError(MachineError):
     """
     Exception for when transitions fail
+    """
+    pass
+
+
+class RunnerError(Exception):
+    """
+    Base exception class for Machine Runner
     """
     pass

@@ -29,14 +29,14 @@ class Test_Machine(TestCase):
         states = ["walking", "standing"]
         initial = "walking"
         m = Machine(states, initial)
-        self.assertEqual(m.state, initial)
+        self.assertEqual(m.state.name, initial)
 
     def test_set(self):
         """
         Checks that machine sets at a state
         """
         self.m.state = "walking"
-        self.assertEqual(self.m.state, "walking")
+        self.assertEqual(self.m.state.name, "walking")
 
     def test_bad_set(self):
         """
@@ -51,7 +51,7 @@ class Test_Machine(TestCase):
         """
         self.m.state = "standing"
         self.m.walk()
-        self.assertEqual(self.m.state, "walking")
+        self.assertEqual(self.m.state.name, "walking")
 
     def test_walk_stop(self):
         """
@@ -60,7 +60,7 @@ class Test_Machine(TestCase):
         self.m.state = "standing"
         self.m.walk()
         self.m.stop()
-        self.assertEqual(self.m.state, "standing")
+        self.assertEqual(self.m.state.name, "standing")
 
     def test_true_condition(self):
         """
@@ -75,7 +75,7 @@ class Test_Machine(TestCase):
         self.m.add_transition("jump", "standing", "airborne", conditions=can_jump)
         self.m.state = "standing"
         self.m.jump()
-        self.assertEqual(self.m.state, "airborne")
+        self.assertEqual(self.m.state.name, "airborne")
 
     def test_false_condition(self):
         """
@@ -107,7 +107,7 @@ class Test_Machine(TestCase):
         self.m.add_transition("jump", "standing", "airborne", conditions=[can_jump, eaten_lunch])
         self.m.state = "standing"
         self.m.jump()
-        self.assertEqual(self.m.state, "airborne")
+        self.assertEqual(self.m.state.name, "airborne")
 
     def test_halftrue_conditions(self):
         """
@@ -144,7 +144,7 @@ class Test_CalibrationMachine(TestCase):
         Checks that the default init state was setup
         """
         cm = CalibrationMachine(self.cal)
-        self.assertEqual(cm.state, "init")
+        self.assertEqual(cm.state.name, "init")
 
     def test_traverse_full(self):
         """
@@ -156,7 +156,7 @@ class Test_CalibrationMachine(TestCase):
         cm.run_algorithms()
         cm.complete()
         cm.finish()
-        self.assertEqual(cm.state, "completed")
+        self.assertEqual(cm.state.name, "completed")
 
     def test_fail_dependencies(self):
         """

@@ -124,7 +124,7 @@
       <u unit="mm"> 0.525</u><v unit="mm">44.085</v><w>bottom</w>
     </Component>
     <Component type="SwitcherGroovesLayer1">
-      <u unit="mm">14.150</u><v unit="mm">43.935</v><w>bottom</w>
+      <u unit="mm">14.150</u><v unit="mm">43.715</v><w>bottom</w>
     </Component>
     <!-- Readout chips outside the acceptance -->
     <Component type="ReadoutChips">
@@ -273,149 +273,148 @@
 
   <Component name="SwitcherGroovesLayer1">
     <height unit="mm"> 0.345</height>
+    <length unit="mm">41.26</length>
     <Material>Si</Material>
     <Color>#006699</Color>
     <Component type="SwitcherGroove1Layer1">
-      <u unit="mm"> 0.33</u><v unit="mm"> -19.52</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -18.30</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -17.08</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -15.86</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -14.64</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -13.42</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -12.20</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -10.98</v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -9.76 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -8.54 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -7.32 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -6.10 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -4.88 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -3.66 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -2.44 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> -1.22 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  0.00 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  1.22 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  2.44 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  3.66 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  4.88 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  6.10 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  7.32 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  8.54 </v>
-      <u unit="mm"> 0.33</u><v unit="mm">  9.76 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 10.98 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 12.20 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 13.42 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 14.64 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 15.86 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 17.08 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 18.30 </v>
-      <u unit="mm"> 0.33</u><v unit="mm"> 19.52 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 20.216 </v>
     </Component>
     <Component type="SwitcherGroove2Layer1">
-      <u unit="mm"> -0.82</u><v unit="mm"> -19.52</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -18.30</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -17.08</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -15.86</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -14.64</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -13.42</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -12.20</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -10.98</v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -9.76 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -8.54 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -7.32 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -6.10 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -4.88 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -3.66 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -2.44 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> -1.22 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  0.00 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  1.22 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  2.44 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  3.66 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  4.88 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  6.10 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  7.32 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  8.54 </v>
-      <u unit="mm"> -0.82</u><v unit="mm">  9.76 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 10.98 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 12.20 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 13.42 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 14.64 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 15.86 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 17.08 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 18.30 </v>
-      <u unit="mm"> -0.82</u><v unit="mm"> 19.52 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 20.216 </v>
     </Component>
     <Component type="SwitcherGroove3Layer1">
-      <u unit="mm"> -0.48</u><v unit="mm"> -20.03</v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -18.81</v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -17.69 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -16.47 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -15.25 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -14.03 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -12.81 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -11.59</v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -10.37</v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -9.15 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -7.93 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -6.71 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -5.49 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -4.27 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -3.05 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -1.83 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> -0.61 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  0.61 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  1.83 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  3.05 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  4.27 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  5.49 </v>      
-      <u unit="mm"> -0.48</u><v unit="mm">  6.71 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  7.93 </v>
-      <u unit="mm"> -0.48</u><v unit="mm">  9.15 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 10.37 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 11.59 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 12.81 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 14.03 </v>      
-      <u unit="mm"> -0.48</u><v unit="mm"> 15.25 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 16.37 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 17.59 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 18.81 </v>
-      <u unit="mm"> -0.48</u><v unit="mm"> 20.03 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -18.214</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -16.994</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -10.894</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -9.674</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  1.306</v>
+      <u unit="mm"> -0.48</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> -0.48</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> -0.48</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 19.606 </v>
     </Component>
     <Component type="SwitcherGroove4Layer1">
-      <u unit="mm"> 0.67</u><v unit="mm"> -20.03</v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -18.81</v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -17.69 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -16.47 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -15.25 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -14.03 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -12.81 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -11.59</v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -10.37</v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -9.15 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -7.93 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -6.71 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -5.49 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -4.27 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -3.05 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -1.83 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> -0.61 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  0.61 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  1.83 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  3.05 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  4.27 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  5.49 </v>      
-      <u unit="mm"> 0.67</u><v unit="mm">  6.71 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  7.93 </v>
-      <u unit="mm"> 0.67</u><v unit="mm">  9.15 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 10.37 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 11.59 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 12.81 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 14.03 </v>      
-      <u unit="mm"> 0.67</u><v unit="mm"> 15.25 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 16.37 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 17.59 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 18.81 </v>
-      <u unit="mm"> 0.67</u><v unit="mm"> 20.03 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -18.214</v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -16.994</v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -10.894</v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -9.674</v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  1.306</v>
+      <u unit="mm"> 0.67</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> 0.67</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> 0.67</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 19.606 </v>
     </Component>
   </Component>
 

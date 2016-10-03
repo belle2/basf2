@@ -34,7 +34,7 @@ from .utils import IoV_Result
 
 import caf.utils
 import caf.backends
-from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError
+from caf.state_machines import CalibrationMachine, MachineError, ConditionError, TransitionError, CalibrationRunner
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
@@ -596,67 +596,16 @@ class CAF():
             for calibration_name in self.calibrations.keys():
                 os.mkdir(calibration_name)
 
-            # Main running loop, continues until we're completely finished or we fail
-            # Requires that ALL calibration machines have state 'completed' to end properly
-            while any(map(lambda calibration: calibration.machine.state != "completed", self.calibrations.values())):
-                for calibration_name, calibration in self.calibrations.items():
-                    if calibration.machine.state == "init":
-                        try:
-                            # Here we are calling the transition and not caring if it fails due to conditions
-                            calibration.machine.submit_collector(backend=self.backend)
-                            B2INFO(" ".join([calibration.name, "moved from", "init", "to", calibration.machine.state]))
-                        # Don't care if a ConditionError is raised, as we are deliberately attempting to transition
-                        # without checking the conditions.
-                        except ConditionError:
-                            pass
+            runners = []
+            # Create Runners to spawn threads for each calibration
+            for calibration_name, calibration in self.calibrations.items():
+                machine = CalibrationMachine(calibration)
+                runner = CalibrationRunner(machine, heartbeat=self.heartbeat)
+                runner.start()
+                runners.append(runner)
 
-                    if calibration.machine.state == "running_collector":
-                        try:
-                            calibration.machine.complete()
-                            B2INFO(" ".join([calibration.name,
-                                             "moved from",
-                                             "running_collector",
-                                             "to",
-                                             calibration.machine.state]))
-                        except ConditionError:
-                            pass
-
-                    if calibration.machine.state == "collector_completed":
-                        try:
-                            calibration.machine.run_algorithms(backend=self._algorithm_backend)
-                            B2INFO(" ".join([calibration.name,
-                                             "moved from",
-                                             "collector_completed",
-                                             "to",
-                                             calibration.machine.state]))
-                        except ConditionError:
-                            pass
-
-                    if calibration.machine.state == "running_algorithms":
-                        try:
-                            calibration.machine.complete()
-                            B2INFO(" ".join([calibration.name,
-                                             "moved from",
-                                             "running_algorithms",
-                                             "to",
-                                             calibration.machine.state]))
-                        except ConditionError:
-                            pass
-
-                    if calibration.machine.state == "algorithms_completed":
-                        try:
-                            calibration.machine.finish()
-                            B2INFO(" ".join([calibration.name,
-                                             "moved from",
-                                             "algorithms_completed",
-                                             "to",
-                                             calibration.machine.state]))
-                        except ConditionError:
-                            pass
-
-                # do a sleep before we do another round
-                sleep(self.heartbeat)
-
+            for runner in runners:
+                runner.join()
 #            # Main running loop, continues until we're completely finished or we fail
 #            while col_to_submit:
 #                for iteration in range(self.max_iterations):

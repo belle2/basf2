@@ -247,39 +247,32 @@ class Machine():
         If there is no trigger name in the machine to match, then the normal
         AttributeError is called.
         """
-        try:
-            transition_dicts = self.transitions[name]
-        except KeyError:
-            raise AttributeError("{0} does not exist in transitions".format(name))
-        else:
-            return partial(self._trigger, name, transition_dicts, **kwargs)
+        possible_transitions = self.get_transitions(self.state)
+        if name not in possible_transitions:
+            raise AttributeError("{0} does not exist in transitions for state {1}".format(name, self.state))
+        transition_dict = self.get_transition_dict(self.state, name)
+        return partial(self._trigger, name, transition_dict, **kwargs)
 
-    def _trigger(self, name, transition_dicts, **kwargs):
+    def _trigger(self, transition_name, transition_dict, **kwargs):
         """
         Runs the transition logic. Callbacks are evaluated in the order:
         conditions -> before -> <new state set here> -> after
         """
-        for transition in transition_dicts:
-            source, dest, conditions, before_callbacks, after_callbacks = (transition["source"],
-                                                                           transition["dest"],
-                                                                           transition["conditions"],
-                                                                           transition["before"],
-                                                                           transition["after"])
-            if self.state == source:
-                # Returns True only if every condition returns True when called
-                if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
-                    for before_func in before_callbacks:
-                        self._callback(before_func, **kwargs)
-                    self.state = dest
-                    for after_func in after_callbacks:
-                        self._callback(after_func, **kwargs)
-                    break
-                else:
-                    raise ConditionError(("Transition '{0}' called for but one or more conditions "
-                                          "evaluated False".format(name)))
+        source, dest, conditions, before_callbacks, after_callbacks = (transition_dict["source"],
+                                                                       transition_dict["dest"],
+                                                                       transition_dict["conditions"],
+                                                                       transition_dict["before"],
+                                                                       transition_dict["after"])
+        # Returns True only if every condition returns True when called
+        if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
+            for before_func in before_callbacks:
+                self._callback(before_func, **kwargs)
+            self.state = dest
+            for after_func in after_callbacks:
+                self._callback(after_func, **kwargs)
         else:
-            raise TransitionError(("Transition '{0}' called but there isn't one defined "
-                                   "for the current state '{1}'".format(name, self.state)))
+            raise ConditionError(("Transition '{0}' called for but one or more conditions "
+                                  "evaluated False".format(transition_name)))
 
     @staticmethod
     def _callback(func, **kwargs):
@@ -287,6 +280,22 @@ class Machine():
         Calls a condition/before/after.. function using arguments passed (or not)
         """
         return func(**kwargs)
+
+    def get_transitions(self, source):
+        possible_transitions = []
+        for transition, transition_dicts in self.transitions.items():
+            for transition_dict in transition_dicts:
+                if transition_dict["source"] == source:
+                    possible_transitions.append(transition)
+        return possible_transitions
+
+    def get_transition_dict(self, state, transition):
+        transition_dicts = self.transitions[transition]
+        for transition_dict in transition_dicts:
+            if transition_dict["source"] == state:
+                return transition_dict
+        else:
+            raise KeyError("No transition from state {0} with the name {1}".format(state, transition))
 
     def save_graph(self, filename, graphname):
         with open(filename, "w") as dotfile:
@@ -326,9 +335,9 @@ class CalibrationMachine(Machine):
         self.add_transition("fail", "running_collector", "collector_failed")
         self.add_transition("complete", "running_collector", "collector_completed")
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms")
-        self.add_transition("complete", "running_algorithms", "algorithms_completed")
+        self.add_transition("complete", "running_algorithms", "algorithms_completed", after=self.automatic_transition)
         self.add_transition("fail", "running_algorithms", "algorithms_failed")
-        self.add_transition("iterate", "algorithms_completed", "init")
+        self.add_transition("iterate", "algorithms_completed", "init", conditions=self.require_iteration)
         self.add_transition("finish", "algorithms_completed", "completed")
 
         #: Calibration object whose state we are modelling
@@ -340,6 +349,9 @@ class CalibrationMachine(Machine):
         self.iteration = iteration
         #: Maximum allowed iterations
         self.max_iterations = self.default_max_iterations
+
+    def require_iteration(self):
+        return False
 
     def setup_defaults(self):
         """
@@ -367,6 +379,19 @@ class CalibrationMachine(Machine):
         else:
             return True
 
+    def automatic_transition(self):
+        possible_transitions = self.get_transitions(self.state)
+        for transition in possible_transitions:
+            try:
+                if transition != "fail":
+                    getattr(self, transition)()
+                    break
+            except ConditionError:
+                continue
+        else:
+            raise RunnerError(("Failed to automatically transition out of {0} state."
+                               " No conditions succeeded.".format(self.state)))
+
 
 class CalibrationRunner(Thread):
     """
@@ -377,7 +402,7 @@ class CalibrationRunner(Thread):
     def __init__(self, machine, heartbeat=None):
         super().__init__()
         self.machine = machine
-        self.moves = ["submit_collector", "complete", "run_algorithms", "complete", "finish"]
+        self.moves = ["submit_collector", "complete", "run_algorithms"]
         self.setup_defaults()
         if heartbeat:
             self.heartbeat = heartbeat
@@ -389,9 +414,10 @@ class CalibrationRunner(Thread):
         while self.machine.state != "completed":
             for trigger in self.moves:
                 try:
-                    getattr(self.machine, trigger)()
-                    sleep(self.heartbeat)
-                except (ConditionError, TransitionError):
+                    if trigger in self.machine.get_transitions(self.machine.state):
+                        getattr(self.machine, trigger)()
+                    sleep(self.heartbeat)  # Only sleeps if transition completed
+                except ConditionError:
                     continue
 
             if self.machine.state == "failed":

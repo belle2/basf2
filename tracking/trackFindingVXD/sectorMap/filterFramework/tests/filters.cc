@@ -12,7 +12,7 @@
 
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
-
+#include <tracking/trackFindingVXD/sectorMap/training/CollectAllFilterVariables.h>
 #include <tuple>
 #include <iostream>
 #include <math.h>
@@ -427,6 +427,29 @@ namespace VXDTFfilterTest {
     EXPECT_TRUE(filter2.accept(x1, x2));
 
 
+
+  }
+
+  /** explains how to use the CollectAllFilterVariables function **/
+  TEST_F(FilterTest, CollectAllFilterVariables)
+  {
+    spacePoint x1(0.0f , 0.0f, 0.0f);
+    spacePoint x2(1.0f , 0.0f, 0.0f);
+
+
+    auto filter = !(SquaredDistance3D() > 1.);
+
+    auto filter2 = !(SquaredDistance3D() > 1.) &&
+                   (SquaredDistance2Dxy() < -2);
+
+
+    std::map< std::string, double > collectedData;
+    CollectAllFilterVariables(filter , collectedData, x1, x2);
+    CollectAllFilterVariables(filter2, collectedData, x1, x2);
+
+    for (auto variablePair : collectedData)
+      std::cout << " " << variablePair.first << " = " <<
+                variablePair.second << std::endl;
 
   }
 }

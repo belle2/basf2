@@ -73,7 +73,7 @@ namespace Belle2 {
     //! RawKLM array
     StoreArray<RawKLM> rawklmarray;
 
-    void formatData(int forward, int layer, int sector, int plane, int strip, float charge, float ctime, unsigned short& bword1,
+    void formatData(int forward, int layer, int sector, int plane, int strip, int charge, float ctime, unsigned short& bword1,
                     unsigned short& bword2, unsigned short& bword3, unsigned short& bword4);
 
     //! to map logical coordinates to hardware coordinates

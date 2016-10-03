@@ -65,6 +65,8 @@ void EKLMUnpackerModule::event()
     //getNumEntries is defined in RawDataBlock.h and gives the numberOfNodes*numberOfEvents. Number of nodes is num copper boards
     for (int j = 0; j < rawKLM[i]->GetNumEntries(); j++) {
       unsigned int copperId = rawKLM[i]->GetNodeID(j);
+      if (copperId < EKLM_ID || copperId > EKLM_ID + 3) continue;
+
       rawKLM[i]->GetBuffer(j);
       for (int finesse_num = 0; finesse_num < 4; finesse_num++) {
         //addendum: There is always an additional word (count) in the end
@@ -89,10 +91,10 @@ void EKLMUnpackerModule::event()
           B2DEBUG(1, "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
 
           unsigned short strip =    bword1 & 0x7F;
-          unsigned short plane = (bword1 >> 7) & 1;
-          unsigned short sector = (bword1 >> 8) & 3;
-          unsigned short layer = (bword1 >> 10) & 0xF;
-          unsigned short forward = (bword1 >> 14) & 1;
+          unsigned short plane = ((bword1 >> 7) & 1) + 1;
+          unsigned short sector = ((bword1 >> 8) & 3) + 1;
+          unsigned short layer = ((bword1 >> 10) & 0xF) + 1;
+          unsigned short forward = ((bword1 >> 14) & 1) + 1;
           unsigned short ctime = bword2 & 0xFFFF; //full bword
 //          unsigned short tdc = bword3 & 0x7FF;                           // unused yet   ????
           unsigned short charge = bword4 & 0xFFF;
@@ -107,7 +109,7 @@ void EKLMUnpackerModule::event()
           digit->setStrip(strip);
           digit->isGood(true);
           digit->setNPE(charge);
-          digit->setEDep(charge);
+//          digit->setEDep(charge);
 
           B2DEBUG(1, "from digit:endcap " << digit->getEndcap() << " layer: " << digit->getLayer() << " strip: " << digit->getSector() << ", "
                   << " plane " << digit->getPlane() << " :strip " << digit->getStrip() << " charge=" << digit->getEDep() << " time=" <<

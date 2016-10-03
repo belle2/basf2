@@ -86,12 +86,12 @@ void EKLMRawPackerModule::event()
     int   iStrip   = digit->getStrip();
 
     int   iNPE  = digit->getNPE();
-    float fEDep    = digit->getEDep();
     float fTime    = digit->getTime();
 
-//     float fMCTime  = digit->getSiPMMCTime();
-//     float fGTime   = digit->getGlobalTime();
-//     int   iTDC = 0;                           //---Do we need TDC?
+//    float fEDep    = digit->getEDep();
+//    float fMCTime  = digit->getSiPMMCTime();
+//    float fGTime   = digit->getGlobalTime();
+//    int   iTDC = 0;                           //---Do we need TDC?
 //GET MODULE ID IN ELECTRONIC FROM PARAMETERS----------------------------------
     int electId = 1;
     int moduleId = (iSector - 1)
@@ -109,14 +109,15 @@ void EKLMRawPackerModule::event()
     int copperId = electId & 0xF;
     int finesse = (electId >> 4) & 0xF;
 
-    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iForward << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
-           iPlane << " Str: " << iStrip << " Cha: " << iNPE << " T: " << fTime << endl);
+//    B2INFO("EKLMRawPacker::copperId " << copperId << " F: " << iForward << " Lay: " << iLayer << " Sect: " << iSector << " Pl: " <<
+//           iPlane << " Str: " << iStrip << " Cha: " << iNPE << " T: " << fTime << endl);
+
 //MAKE WORDS WITH INFORMATION
     unsigned short bword1 = 0;
     unsigned short bword2 = 0;
     unsigned short bword3 = 0;
     unsigned short bword4 = 0;
-    formatData(iForward, iLayer, iSector, iPlane, iStrip, fEDep, fTime, bword1, bword2, bword3, bword4);
+    formatData(iForward, iLayer, iSector, iPlane, iStrip, iNPE, fTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -128,7 +129,7 @@ void EKLMRawPackerModule::event()
   }
   rawklmarray.create();
 
-  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
+//  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
 
   RawCOPPERPackerInfo rawcprpacker_info;
   for (int i = 0 ; i < 4; i++) {
@@ -210,22 +211,22 @@ void EKLMRawPackerModule::event()
 
 
 
-void EKLMRawPackerModule::formatData(int forward, int layer, int sector, int plane, int strip, float charge, float ctime,
+void EKLMRawPackerModule::formatData(int forward, int layer, int sector, int plane, int strip, int charge, float ctime,
                                      unsigned short& bword1,
                                      unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
 {
-  bword1 = 0; //Mapping(1st bit - enmpty; 2nd bit - forward; 3,4,5,6 bits - layer; 7,8 - sector; 9 - plane; 10,11,12,13,14,15,16 - strip)
+  bword1 = 0; //Mapping(1st bit - empty; 2nd bit - forward; 3,4,5,6 bits - layer; 7,8 - sector; 9 - plane; 10,11,12,13,14,15,16 - strip)
   bword2 = 0; //15 bits of time
   bword3 = 0; //Want to write TDC in 15 bits or less
   bword4 = 0; //15 bits of charge
   bword1 |= (strip & 0x7F);
-  bword1 |= ((plane & 1) << 7);
-  bword1 |= ((sector & 3) << 8);
-  bword1 |= ((layer & 0xF) << 10);
-  bword1 |= ((forward & 1) << 14);
-  bword2 |= (((int)ctime) & 0x7FFF);                       //TEMPORARY SCALING ?????????????
+  bword1 |= (((plane - 1) & 1) << 7);
+  bword1 |= (((sector - 1) & 3) << 8);
+  bword1 |= (((layer - 1) & 0xF) << 10);
+  bword1 |= (((forward - 1) & 1) << 14);
+  bword2 |= (((int)ctime) & 0x7FFF);
 //  bword3 |= (TDC & 0x7FFF);                              //DO WE NEED TDC ????????????????
-  bword4 |= (((int)(charge * 30000.0 / 0.3)) & 0x7FFF);    //TEMPORARY SCALING ?????????????
+  bword4 |= (charge & 0x7FFF);
 }
 
 void EKLMRawPackerModule::loadMap()
@@ -247,7 +248,7 @@ void EKLMRawPackerModule::loadMap()
                        | ((forward - 1) << 6);
 //                        | ((plane-1) << 7);            //Do we need plane?
         m_ModuleIdToelectId[moduleId] = elecid;
-        B2INFO(" electId: " << elecid << " modId: " << moduleId << endl);
+//        B2INFO(" electId: " << elecid << " modId: " << moduleId << endl);
       }
     }
   }

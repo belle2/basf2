@@ -3,6 +3,7 @@ import os
 from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
+from collections import defaultdict
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
@@ -145,6 +146,15 @@ def all_dependencies(dependencies, order=None):
         full_dependencies[node] = list(node_dependencies)
 
     return full_dependencies
+
+
+def past_from_future_dependencies(future_dependencies):
+    nodes = list(future_dependencies.keys())
+    past_dependencies = defaultdict(list)
+    for node, deps in future_dependencies.items():
+        for dep in deps:
+            past_dependencies[dep].append(node)
+    return past_dependencies
 
 
 def decode_json_string(object_string):

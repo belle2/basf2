@@ -21,6 +21,7 @@ from time import sleep
 import multiprocessing
 import glob
 
+from .utils import past_from_future_dependencies
 from .utils import topological_sort
 from .utils import all_dependencies
 from .utils import decode_json_string
@@ -38,8 +39,6 @@ from caf.state_machines import CalibrationMachine, MachineError, ConditionError,
 
 import ROOT
 from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
-
-_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
 pp = PrettyPrinter()
 
@@ -490,72 +489,28 @@ class CAF():
             self.dependencies[calibration.name] = past_dependencies_names
         # Gives us a list of A (not THE) valid ordering and checks for cyclic dependencies
         order = topological_sort(self.future_dependencies)
-        if order:
-            # We want to put the most critical (most overall dependencies) near the start
-            # First get an ordered dictionary of the sort order but including all implicit dependencies.
-            ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
-            ####################################
-            #
-            # TODO: Need to implement an ordering algorithm here, based on number of future dependents?
-            #
-            ####################################
-            order = ordered_full_dependencies
+        if not order:
+            return False
+
+        # Get an ordered dictionary of the sort order but including all implicit dependencies.
+        ordered_full_dependencies = all_dependencies(self.future_dependencies, order)
+        # Return all the implicit+explicit past dependencies
+        full_past_dependencies = past_from_future_dependencies(ordered_full_dependencies)
+        # Correct each calibration's dependency list to reflect the implicit dependencies
+        for calibration in self.calibrations.values():
+            full_deps = full_past_dependencies[calibration.name]
+            explicit_deps = [cal.name for cal in calibration.dependencies]
+            for dep in full_deps:
+                if dep not in explicit_deps:
+                    calibration.dependencies.append(self.calibrations[dep])
+        ####################################
+        #
+        # TODO: Need to implement an ordering algorithm here, based on number of future dependents?
+        #
+        ####################################
+        order = ordered_full_dependencies
+        # We should also patch in all of the implicit dependencies for the calibrations
         return order
-
-    def _configure_jobs(self, calibrations, iteration):
-        """
-        Creates a Job object for each collector to pass to the Backend.
-        It does quite a bit of extra work figuring out where the dependent
-        databases were created for addition to the input_sandbox_files.
-        (This function will likely be refactored into smaller ones)
-        """
-        jobs = {}
-        for calibration_name in calibrations:
-            calibration = self.calibrations[calibration_name]
-
-            job = Job('_'.join([calibration_name, 'Collector', 'Iteration', str(iteration)]))
-            job.output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'output')
-            job.working_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'input')
-            job.cmd = ['basf2', 'run_collector_path.py']
-            job.input_sandbox_files.append(_collector_steering_file_path)
-            collector_path_file = self._make_collector_path(calibration_name, iteration)
-            job.input_sandbox_files.append(collector_path_file)
-            if calibration.pre_collector_path:
-                pre_collector_path_file = self._make_pre_collector_path(calibration_name, iteration)
-                job.input_sandbox_files.append(pre_collector_path_file)
-
-            # Want to figure out which local databases are required for this job and their paths
-            list_dependent_databases = []
-            # Add previous iteration databases from this calibration
-            if iteration > 0:
-                for algorithm in calibration.algorithms:
-                    algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
-                    database_dir = os.path.join(self.output_dir, calibration_name, str(iteration-1), 'output', 'outputdb')
-                    list_dependent_databases.append(database_dir)
-                    B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
-                           calibration_name))
-
-            # Here we add the finished databases of previous calibrations that we depend on.
-            # We can assume that the databases exist as we can't be here until they have returned
-            # (THIS MAY CHANGE!)
-            for cal_name, future_deps in self.order.items():
-                if calibration_name in future_deps:
-                    database_dir = os.path.join(self.output_dir, cal_name, 'outputdb')
-                    B2INFO('Adding local database from {0} for use by {1}'.format(database_dir, calibration_name))
-                    list_dependent_databases.append(database_dir)
-
-            # Set the location where we will store the merged set of databases.
-            dependent_database_dir = os.path.join(self.output_dir, calibration_name, str(iteration), 'inputdb')
-            # Merge all of the local databases that are required for this calibration into a single directory
-            if list_dependent_databases:
-                caf.utils.merge_local_databases(list_dependent_databases, dependent_database_dir)
-            job.input_sandbox_files.append(dependent_database_dir)
-            # Define the input file list and output patterns to be returned from collector job
-            job.input_files = calibration.input_files
-            job.output_patterns = calibration.output_patterns
-            jobs[calibration_name] = job
-
-        return jobs
 
     def check_backend(self):
         """
@@ -579,7 +534,7 @@ class CAF():
         # Checks whether the dependencies we've added will give a valid order
         order = self._order_calibrations()
         if not order:
-            B2ERROR("Couldn't order the calibrations properly. Probably a cyclic dependency.")
+            B2FATAL("Couldn't order the calibrations properly. Probably a cyclic dependency.")
 
         # Check that a backend has been set and use default Local() one if not
         self.check_backend()
@@ -592,10 +547,6 @@ class CAF():
         self.output_dir = self._make_output_dir()
         # Enter the overall output dir during processing
         with temporary_workdir(self.output_dir):
-            # Make the output directory for each calibration
-            for calibration_name in self.calibrations.keys():
-                os.mkdir(calibration_name)
-
             runners = []
             # Create Runners to spawn threads for each calibration
             for calibration_name, calibration in self.calibrations.items():
@@ -606,6 +557,7 @@ class CAF():
 
             for runner in runners:
                 runner.join()
+
 #            # Main running loop, continues until we're completely finished or we fail
 #            while col_to_submit:
 #                for iteration in range(self.max_iterations):
@@ -901,77 +853,3 @@ class CAF():
             else:
                 B2ERROR("Attempted to create output_dir {0}, but it didn't work.".format(abs_output_dir))
                 sys.exit(1)
-
-    def _make_collector_path(self, calibration_name, iteration):
-        """
-        Creates a basf2 path for the correct collector and serializes it in the
-        self.output_dir/<calibration_name>/<iteration>/paths directory
-        """
-        path_output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'paths')
-        # Should work fine as we previously make the other directories
-        os.makedirs(path_output_dir)
-        # Create empty path and add collector to it
-        path = create_path()
-        calibration = self.calibrations[calibration_name]
-        path.add_module(calibration.collector)
-        # Dump the basf2 path to file
-        path_file_name = calibration.collector.name()+'.path'
-        path_file_name = os.path.join(path_output_dir, path_file_name)
-        with open(path_file_name, 'bw') as serialized_path_file:
-            pickle.dump(serialize_path(path), serialized_path_file)
-        # Return the pickle file path for addition to the input sandbox
-        return path_file_name
-
-    def _make_pre_collector_path(self, calibration_name, iteration):
-        """
-        Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
-        self.output_dir/<calibration_name>/<iteration>/paths directory
-        """
-        path_output_dir = os.path.join(os.getcwd(), calibration_name, str(iteration), 'paths')
-        path = self.calibrations[calibration_name].pre_collector_path
-        # Dump the basf2 path to file
-        path_file_name = 'pre_collector.path'
-        path_file_name = os.path.join(path_output_dir, path_file_name)
-        with open(path_file_name, 'bw') as serialized_path_file:
-            pickle.dump(serialize_path(path), serialized_path_file)
-        # Return the pickle file path for addition to the input sandbox
-        return path_file_name
-
-
-class Job:
-    """
-    Generic Job object used to tell a Backend what to do.
-    - This is a way to store necessary information about a process for
-    submission and pass it in one object to a backend, rather than having
-    the framework set each parameter directly.
-    - Hopefully means that ANY use case can be more easily supported,
-    not just the CAF. You just have to fill a job object and pass it to a
-    Backend for the job submission to work.
-    - Use absolute paths for all directories, otherwise you'll likely get into trouble
-    """
-
-    def __init__(self, name):
-        """
-        Init method of Job object.
-        - Here you just set the job name, everything else comes later.
-        """
-        #: Job object's name. Only descriptive, not necessarily unique.
-        self.name = name
-        #: Files to be tarballed and sent along with the job (NOT the input root files)
-        self.input_sandbox_files = []
-        #: Working directory of the job (str). Default is '.', mostly used in Local() backend
-        self.working_dir = '.'
-        #: Output directory (str), where we will download our output_files to. Default is '.'
-        self.output_dir = '.'
-        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
-        self.output_patterns = []
-        #: Command and arguments as a list that wil be run by the job on the backend
-        self.cmd = []
-        #: Input root files to basf2 job
-        self.input_files = []
-
-    def __repr__(self):
-        """
-        Representation of Job class (what happens when you print a Job() instance)
-        """
-        return self.name

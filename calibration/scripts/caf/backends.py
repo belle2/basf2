@@ -16,6 +16,45 @@ import ROOT
 pool = None
 
 
+class Job:
+    """
+    Generic Job object used to tell a Backend what to do.
+    - This is a way to store necessary information about a process for
+    submission and pass it in one object to a backend, rather than having
+    the framework set each parameter directly.
+    - Hopefully means that ANY use case can be more easily supported,
+    not just the CAF. You just have to fill a job object and pass it to a
+    Backend for the job submission to work.
+    - Use absolute paths for all directories, otherwise you'll likely get into trouble
+    """
+
+    def __init__(self, name):
+        """
+        Init method of Job object.
+        - Here you just set the job name, everything else comes later.
+        """
+        #: Job object's name. Only descriptive, not necessarily unique.
+        self.name = name
+        #: Files to be tarballed and sent along with the job (NOT the input root files)
+        self.input_sandbox_files = []
+        #: Working directory of the job (str). Default is '.', mostly used in Local() backend
+        self.working_dir = '.'
+        #: Output directory (str), where we will download our output_files to. Default is '.'
+        self.output_dir = '.'
+        #: Files that we produce during the job and want to be returned. Can use wildcard (*)
+        self.output_patterns = []
+        #: Command and arguments as a list that wil be run by the job on the backend
+        self.cmd = []
+        #: Input root files to basf2 job
+        self.input_files = []
+
+    def __repr__(self):
+        """
+        Representation of Job class (what happens when you print a Job() instance)
+        """
+        return self.name
+
+
 class Backend():
     """
     Base class for backend of CAF.

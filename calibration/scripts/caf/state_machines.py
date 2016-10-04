@@ -4,11 +4,14 @@ from collections import defaultdict
 import configparser
 from threading import Thread, Lock, RLock
 from time import sleep
+import pickle
 
 from basf2 import *
 import ROOT
 from .utils import method_dispatch
+from .utils import merge_local_databases
 from .utils import decode_json_string
+from .backends import Job
 
 
 class State():
@@ -331,13 +334,18 @@ class CalibrationMachine(Machine):
         super().__init__(self.default_states, initial_state)
         self.setup_defaults()
 
-        self.add_transition("submit_collector", "init", "running_collector", conditions=self.dependencies_completed)
+        self.add_transition("submit_collector", "init", "running_collector",
+                            conditions=self.dependencies_completed,
+                            before=[self._make_output_dir,
+                                    self._create_collector_job])
         self.add_transition("fail", "running_collector", "collector_failed")
         self.add_transition("complete", "running_collector", "collector_completed")
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms")
-        self.add_transition("complete", "running_algorithms", "algorithms_completed", after=self.automatic_transition)
+        self.add_transition("complete", "running_algorithms", "algorithms_completed",
+                            after=self.automatic_transition)
         self.add_transition("fail", "running_algorithms", "algorithms_failed")
-        self.add_transition("iterate", "algorithms_completed", "init", conditions=self.require_iteration)
+        self.add_transition("iterate", "algorithms_completed", "init",
+                            conditions=self.require_iteration)
         self.add_transition("finish", "algorithms_completed", "completed")
 
         #: Calibration object whose state we are modelling
@@ -363,7 +371,8 @@ class CalibrationMachine(Machine):
             config.read(config_file_path)
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
-        CalibrationMachine.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
+        self.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
+        self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
     def _log_new_state(self, **kwargs):
         B2INFO("Calibration {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
@@ -391,6 +400,90 @@ class CalibrationMachine(Machine):
         else:
             raise RunnerError(("Failed to automatically transition out of {0} state."
                                " No conditions succeeded.".format(self.state)))
+
+    def _make_output_dir(self):
+        os.mkdir(self.calibration.name)
+
+    def _make_collector_path(self):
+        """
+        Creates a basf2 path for the correct collector and serializes it in the
+        self.output_dir/<calibration_name>/<iteration>/paths directory
+        """
+        path_output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'paths')
+        # Should work fine as we previously make the other directories
+        os.makedirs(path_output_dir)
+        # Create empty path and add collector to it
+        path = create_path()
+        path.add_module(self.calibration.collector)
+        # Dump the basf2 path to file
+        path_file_name = self.calibration.collector.name()+'.path'
+        path_file_name = os.path.join(path_output_dir, path_file_name)
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
+        # Return the pickle file path for addition to the input sandbox
+        return path_file_name
+
+    def _make_pre_collector_path(self):
+        """
+        Creates a basf2 path for the collectors setup path (Calibration.pre_collector_path) and serializes it in the
+        self.output_dir/<calibration_name>/<iteration>/paths directory
+        """
+        path_output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'paths')
+        path = self.calibration.pre_collector_path
+        # Dump the basf2 path to file
+        path_file_name = 'pre_collector.path'
+        path_file_name = os.path.join(path_output_dir, path_file_name)
+        with open(path_file_name, 'bw') as serialized_path_file:
+            pickle.dump(serialize_path(path), serialized_path_file)
+        # Return the pickle file path for addition to the input sandbox
+        return path_file_name
+
+    def _create_collector_job(self):
+        """
+        Creates a Job object for the collector for this iteration, ready for submission
+        to backend
+        """
+        job = Job('_'.join([self.calibration.name, 'Collector', 'Iteration', str(self.iteration)]))
+        job.output_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'output')
+        job.working_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'input')
+        job.cmd = ['basf2', 'run_collector_path.py']
+        job.input_sandbox_files.append(self.default_collector_steering_file_path)
+        collector_path_file = self._make_collector_path()
+        job.input_sandbox_files.append(collector_path_file)
+        if self.calibration.pre_collector_path:
+            pre_collector_path_file = self._make_pre_collector_path()
+            job.input_sandbox_files.append(pre_collector_path_file)
+
+        # Want to figure out which local databases are required for this job and their paths
+        list_dependent_databases = []
+        # Add previous iteration databases from this calibration
+        if self.iteration > 0:
+            for algorithm in self.calibration.algorithms:
+                algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+                database_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration-1), 'output', 'outputdb')
+                list_dependent_databases.append(database_dir)
+                B2INFO('Adding local database from previous iteration of {0} for use by {1}'.format(algorithm_name,
+                       self.calibration.name))
+
+        # Here we add the finished databases of previous calibrations that we depend on.
+        # We can assume that the databases exist as we can't be here until they have returned
+        # (THIS MAY CHANGE!)
+        for dependency in self.calibration.dependencies:
+            database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
+            B2INFO('Adding local database from {0} for use by {1}'.format(database_dir, self.calibration.name))
+            list_dependent_databases.append(database_dir)
+
+        # Set the location where we will store the merged set of databases.
+        dependent_database_dir = os.path.join(os.getcwd(), self.calibration.name, str(self.iteration), 'inputdb')
+        # Merge all of the local databases that are required for this calibration into a single directory
+        if list_dependent_databases:
+            merge_local_databases(list_dependent_databases, dependent_database_dir)
+        job.input_sandbox_files.append(dependent_database_dir)
+        # Define the input file list and output patterns to be returned from collector job
+        job.input_files = self.calibration.input_files
+        job.output_patterns = self.calibration.output_patterns
+
+        return job
 
 
 class CalibrationRunner(Thread):

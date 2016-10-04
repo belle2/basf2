@@ -10,8 +10,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLDIGITENERGYCONSTANTS_H
-#define ECLDIGITENERGYCONSTANTS_H
+#ifndef ECLCrystalsShapeAndPosition_H
+#define ECLCrystalsShapeAndPosition_H
 #include <TObject.h>
 
 namespace Belle2 {
@@ -26,12 +26,12 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ECLCrystalsShapeAndPosition() {};
+    ECLCrystalsShapeAndPosition() {}
 
     /**
      * Destructor
      */
-    ~ECLCrystalsShapeAndPosition() {};
+    ~ECLCrystalsShapeAndPosition() {}
 
     /** Return crystal shape in forward endcap
      * @return crystal shape in forward endcap

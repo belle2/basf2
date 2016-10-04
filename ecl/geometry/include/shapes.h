@@ -44,5 +44,6 @@ inline std::string suf(const std::string& s, int indx)
   return r;
 }
 
+enum ECLParts { forward, barrel, backward };
 
 #endif //__h_shapes

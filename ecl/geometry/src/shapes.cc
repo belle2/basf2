@@ -19,6 +19,11 @@
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
 #include <framework/utilities/FileSystem.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/Database.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
+#include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
 
 using namespace std;
 
@@ -723,4 +728,168 @@ G4Transform3D get_transform(const cplacement_t& t)
   G4Transform3D r = G4Rotate3D(t.Rphi1, G4Vector3D(sin(t.Rtheta) * cos(t.Rphi2), sin(t.Rtheta) * sin(t.Rphi2), cos(t.Rtheta)));
   G4Transform3D p = G4Translate3D(t.Pr * sin(t.Ptheta) * cos(t.Pphi), t.Pr * sin(t.Ptheta) * sin(t.Pphi), t.Pr * cos(t.Ptheta));
   return p * r;
+}
+
+void storeToDatabase()
+{
+  stringstream buffer;
+  auto fillbuffer = [&buffer](const string & fname) {
+    string path = Belle2::FileSystem::findFile(fname);
+    ifstream IN(path.c_str());
+    buffer.clear(); buffer.str("");
+    buffer << IN.rdbuf();
+  };
+
+  Belle2::ECLCrystalsShapeAndPosition a;
+  fillbuffer("/ecl/data/crystal_shape_forward.dat"); a.setShapeForward(buffer.str());
+  fillbuffer("/ecl/data/crystal_shape_barrel.dat"); a.setShapeBarrel(buffer.str());
+  fillbuffer("/ecl/data/crystal_shape_backward.dat"); a.setShapeBackward(buffer.str());
+  fillbuffer("/ecl/data/crystal_placement_forward.dat"); a.setPlacementForward(buffer.str());
+  fillbuffer("/ecl/data/crystal_placement_barrel.dat"); a.setPlacementBarrel(buffer.str());
+  fillbuffer("/ecl/data/crystal_placement_backward.dat"); a.setPlacementBackward(buffer.str());
+  Belle2::IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  Belle2::Database::Instance().storeData<Belle2::ECLCrystalsShapeAndPosition>(&a, iov);
+}
+
+vector<shape_t*> load_shapes(stringstream& IN)
+{
+  vector<shape_t*> shapes;
+  string tmp;
+  while (getline(IN, tmp)) {
+    size_t ic = tmp.find("#");
+    if (ic != string::npos) tmp.erase(ic);
+    istringstream iss(tmp);
+    vector<string> t;
+    copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
+    if (t.size() > 0) {
+      shape_t* shape = NULL;
+      if (t.size() == 21) {
+        shape = new quadrilateral_endcap_t();
+        quadrilateral_endcap_t& trap = static_cast<quadrilateral_endcap_t&>(*shape);
+
+        istringstream in(t[0]);
+        in >> trap.nshape;
+
+        for (size_t i = 1; i < t.size(); i++) {
+          in.str(t[i]); in.seekg(0, ios_base::beg);
+          in >> trap.t[i - 1];
+        }
+      } else if (t.size() == 13) {
+        shape = new quadrilateral_barrel_t();
+        quadrilateral_barrel_t& trap = static_cast<quadrilateral_barrel_t&>(*shape);
+
+        istringstream in(t[0]);
+        in >> trap.nshape;
+
+        for (size_t i = 1; i < t.size(); i++) {
+          in.str(t[i]); in.seekg(0, ios_base::beg);
+          in >> trap.t[i - 1];
+        }
+      } else if (t.size() == 22) {
+        shape = new pent_t();
+        pent_t& pent = static_cast<pent_t&>(*shape);
+
+        istringstream in(t[0]);
+        in >> pent.nshape;
+
+        for (size_t i = 1; i < t.size(); i++) {
+          in.str(t[i]); in.seekg(0, ios_base::beg);
+          in >> pent.t[i - 1];
+        }
+        pent.adjust();
+      }
+      shapes.push_back(shape);
+    }
+  }
+
+  return shapes;
+}
+
+vector<cplacement_t> load_placements(stringstream& IN)
+{
+  vector<cplacement_t> plcmnt;
+  string tmp;
+  while (getline(IN, tmp)) {
+    size_t ic = tmp.find("#");
+    if (ic != string::npos) tmp.erase(ic);
+    istringstream iss(tmp);
+    vector<string> t;
+    copy(istream_iterator<string>(iss),  istream_iterator<string>(),  back_inserter(t));
+    if (t.size() == 7) {
+      cplacement_t p;
+      istringstream in(t[0]);
+      in >> p.nshape;
+      in.str(t[1]); in.seekg(0, ios_base::beg);
+      in >> p.Rphi1;
+      in.str(t[2]); in.seekg(0, ios_base::beg);
+      in >> p.Rtheta;
+      in.str(t[3]); in.seekg(0, ios_base::beg);
+      in >> p.Rphi2;
+      in.str(t[4]); in.seekg(0, ios_base::beg);
+      in >> p.Pr;
+      in.str(t[5]); in.seekg(0, ios_base::beg);
+      in >> p.Ptheta;
+      in.str(t[6]); in.seekg(0, ios_base::beg);
+      in >> p.Pphi;
+      plcmnt.push_back(p);
+    }
+  }
+
+  return plcmnt;
+}
+
+vector<cplacement_t> load_placements(enum ECLParts part)
+{
+  Belle2::DBObjPtr<Belle2::ECLCrystalsShapeAndPosition> crystals;
+  if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
+
+  // stringstream buffer;
+  // auto fillbuffer = [&buffer](const string &fname) {
+  //   string path = Belle2::FileSystem::findFile(fname);
+  //   ifstream IN(path.c_str());
+  //   buffer.clear(); buffer.str("");
+  //   buffer << IN.rdbuf();
+  // };
+
+  // Belle2::ECLCrystalsShapeAndPosition *crystals = new Belle2::ECLCrystalsShapeAndPosition();
+  // fillbuffer("/ecl/data/crystal_shape_forward.dat"); crystals->setShapeForward(buffer.str());
+  // fillbuffer("/ecl/data/crystal_shape_barrel.dat"); crystals->setShapeBarrel(buffer.str());
+  // fillbuffer("/ecl/data/crystal_shape_backward.dat"); crystals->setShapeBackward(buffer.str());
+  // fillbuffer("/ecl/data/crystal_placement_forward.dat"); crystals->setPlacementForward(buffer.str());
+  // fillbuffer("/ecl/data/crystal_placement_barrel.dat"); crystals->setPlacementBarrel(buffer.str());
+  // fillbuffer("/ecl/data/crystal_placement_backward.dat"); crystals->setPlacementBackward(buffer.str());
+
+  stringstream IN;
+  if (part == ECLParts::forward)
+    IN.str(crystals->getPlacementForward());
+  else if (part == ECLParts::barrel)
+    IN.str(crystals->getPlacementBarrel());
+  else if (part == ECLParts::backward)
+    IN.str(crystals->getPlacementBackward());
+  return load_placements(IN);
+}
+
+vector<shape_t*> load_shapes(enum ECLParts part)
+{
+  Belle2::DBObjPtr<Belle2::ECLCrystalsShapeAndPosition> crystals;
+  if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
+
+  stringstream IN;
+  if (part == ECLParts::forward)
+    IN.str(crystals->getShapeForward());
+  else if (part == ECLParts::barrel)
+    IN.str(crystals->getShapeBarrel());
+  else if (part == ECLParts::backward)
+    IN.str(crystals->getShapeBackward());
+  return load_shapes(IN);
+}
+
+void testtest()
+{
+  vector<cplacement_t> bp = load_placements(ECLParts::forward);
+  for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    const cplacement_t& t = *it;
+    cout << t.nshape << " " << t.Rphi1 << " " << t.Rtheta << " " << t.Rphi2 << " " << t.Pr << " " << t.Ptheta << " " << t.Pphi << endl;
+  }
+  exit(0);
 }

@@ -635,7 +635,6 @@ void drawHist(const string& fileName, TFile* file1, TFile* file2, const string& 
       
       fName = fileName + pdf;
 
-      string suffix = "";
       if(opt == 0)
 	fName = fName + "(";
       else if(opt == 2)

@@ -13,6 +13,8 @@
 // TODO: Also cache it
 #include <analysis/utility/PCmsLabTransform.h>
 
+#include <numeric>
+
 namespace Belle2 {
   namespace SoftwareTrigger {
     void HLTCalculator::requireStoreArrays()

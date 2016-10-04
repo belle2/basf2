@@ -91,6 +91,10 @@ namespace Belle2 {
     int m_nMaxIter;                                  /**< Maximum number of iterations for the Kalman filter. */
     int m_nMaxFailed;                                /**< Maximum number of failed hits before aborting the fit. */
     double m_probCut;                                /**< Probability cut for the DAF filter (0.001, 0.005, 0.01). */
+    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
+    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
+    /// See https://agira.desy.de/browse/BII-1725 for details
+    const double m_dafDeltaPval = 1.0f;
 
     //! Control track pruning
     /** Describes which information to keep after the track fit, see genfit::Track::prune for possible settings.

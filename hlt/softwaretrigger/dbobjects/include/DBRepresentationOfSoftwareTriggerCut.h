@@ -24,7 +24,7 @@ namespace Belle2 {
    * prescale factor. When using the cut, they are recompiled back into a cut
    * from the string representation.
    */
-  class DBRepresentationOfSoftwareTriggerCut : public TObject {
+  class DBRepresentationOfSoftwareTriggerCut : public TObject, public SoftwareTriggerCutBase {
   public:
     /// Empty constructor for ROOT (you will probably want to use the explicit copy from SoftwareTriggerCut).
     DBRepresentationOfSoftwareTriggerCut() {}
@@ -36,8 +36,8 @@ namespace Belle2 {
      * Both can be easily uploaded into the database.
      */
     explicit DBRepresentationOfSoftwareTriggerCut(const std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut>& softwareTriggerCut) :
-      m_cutString(softwareTriggerCut->decompile()), m_preScaleFactor(softwareTriggerCut->getPreScaleFactor()),
-      m_reject(softwareTriggerCut->isRejectCut())
+      SoftwareTriggerCutBase(softwareTriggerCut->getPreScaleFactor(), softwareTriggerCut->isRejectCut()),
+      m_cutString(softwareTriggerCut->decompile())
     {
     }
 
@@ -47,21 +47,12 @@ namespace Belle2 {
      */
     std::unique_ptr<SoftwareTrigger::SoftwareTriggerCut> getCut() const
     {
-      return SoftwareTrigger::SoftwareTriggerCut::compile(m_cutString, m_preScaleFactor, m_reject);
+      return SoftwareTrigger::SoftwareTriggerCut::compile(m_cutString, getPreScaleFactor(), isRejectCut());
     }
 
   private:
-    /// Do not copy/assign this object.
-    DBRepresentationOfSoftwareTriggerCut& operator=(const DBRepresentationOfSoftwareTriggerCut&) = delete;
-    /// Do not copy this object.
-    DBRepresentationOfSoftwareTriggerCut(const DBRepresentationOfSoftwareTriggerCut& rhs) = delete;
-
     /// The internal storage of the string representation of the cut.
     std::string m_cutString = "";
-    /// The internal storage of the prescale factor of the cut.
-    unsigned int m_preScaleFactor = 1;
-    /// The internal storage if it is a reject cut.
-    bool m_reject = false;
 
     ClassDef(DBRepresentationOfSoftwareTriggerCut, 2);
   };

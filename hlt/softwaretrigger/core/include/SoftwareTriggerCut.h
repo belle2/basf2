@@ -9,16 +9,17 @@
  **************************************************************************/
 #pragma once
 
+#include <hlt/softwaretrigger/dbobjects/SoftwareTriggerCutBase.h>
 #include <framework/utilities/GeneralCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/logging/Logger.h>
 
-#include <TRandom.h>
-
 namespace Belle2 {
   namespace SoftwareTrigger {
+    class SoftwareTriggerResult;
+
     /**
      * Software Trigger Cut to be used in the Software Trigger Modules.
      * This cut can be down- and uploaded from the database or compiled from a string.
@@ -26,7 +27,7 @@ namespace Belle2 {
      *
      * For database interactions, use the SoftwareTriggerDBHandler.
      */
-    class SoftwareTriggerCut {
+    class SoftwareTriggerCut : public SoftwareTriggerCutBase {
     public:
       /**
        * Compile a new SoftwareTriggerCut from a cut string (by using the GeneralCut::compile function) and
@@ -34,8 +35,10 @@ namespace Belle2 {
        * create a new SoftwareTriggerCut.
        * @param cut_string: The string from which the cut should be compiled. Must be in a format, the GeneralCut::compile function understands.
        * @param prescaleFactor: An optional prescale factor which will be used whenever the cut is checked.
-       *        If the prescale is e.g. 10, the cut will only result in a "accept" result (although the cut condition
-       *        itself is true) in 1 of 10 cases on average for accept cuts (for reject cuts, the prescale is *not* used).
+       *        The prescale factor is a list of integer values. Using more than one value in this list is a special
+       *        case and is described below. If the prescale is e.g. 10, the cut will only result in a "accept" result
+       *        (although the cut condition itself is true) in 1 of 10 cases on average for accept cuts
+       *        (for reject cuts, the prescale is *not* used).
        *        Defaults to 1, which means that the prescale has no impact on the cut check.
        * @param rejectCut: Turn this cut into a reject cut and not a accept cut. The result of the SoftwareTriggerModules
        *        is defined by these two cut types. See the SoftwareTriggerModule for more information. Please note that
@@ -72,16 +75,25 @@ namespace Belle2 {
        * it returns "noResult".
        * The SoftwareTriggerModule will not pass this event if the result is
        * "dismiss", in all other cases it depends on the other loaded cuts.
+       *
+       * If you give in a list of pre scale factors with a length above 1, you need to have a particle list of
+       * pions (name pi+:HLT) in your data store - otherwise the cut can not be evaluated. It will search for the
+       * negative charged pion (= track) with the largest momentum in the CMS frame and use the theta of this track.
+       * Then, the theta range vom 0 to pi is split up in as many intervals as you have elements in your preScaleFactor
+       * list and the one element, where the calculated theta value belongs to is taken. This is more or less only
+       * useful for ee-events, where a prescaling dependent on theta can make the theta distribution more uniform.
        */
       static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
-                                                         const unsigned int prescaleFactor = 1,
+                                                         const std::vector<unsigned int>& prescaleFactor = {1},
+                                                         const bool rejectCut = false);
+
+      /** Shortcut constructor to not use a list of preScaleFactors. The rest is the same as in the normal costructor. */
+      static std::unique_ptr<SoftwareTriggerCut> compile(const std::string& cut_string,
+                                                         const unsigned int prescaleFactor,
                                                          const bool rejectCut = false)
       {
-        auto compiledGeneralCut = GeneralCut<SoftwareTriggerVariableManager>::compile(cut_string);
-        std::unique_ptr<SoftwareTriggerCut> compiledSoftwareTriggerCut(new SoftwareTriggerCut(std::move(compiledGeneralCut),
-            prescaleFactor, rejectCut));
-
-        return compiledSoftwareTriggerCut;
+        const std::vector<unsigned int>& preScaleFactors = {prescaleFactor};
+        return SoftwareTriggerCut::compile(cut_string, preScaleFactors, rejectCut);
       }
 
       /**
@@ -97,95 +109,20 @@ namespace Belle2 {
        * Main function of the SoftwareTriggerCut: check the cut condition.
        * See the constructor of this class for more information on when which result is returned.
        */
-      SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const
-      {
-        if (not m_cut) {
-          B2FATAL("Software Trigger is not initialized!");
-        }
-        const bool cutCondition = m_cut->check(&prefilledObject);
-
-        // If the cut is a reject cut, return false if the cut is true and false if the cut is true.
-        if (m_rejectCut) {
-          if (cutCondition) {
-            return SoftwareTriggerCutResult::c_reject;
-          } else {
-            return SoftwareTriggerCutResult::c_noResult;
-          }
-        } else {
-          // This is the "normal" accept case:
-          // First check if the cut gives a positive result. If not, we can definitely return "noResult".
-          if (cutCondition) {
-            // if yes, we have to use the prescale factor to see, if the result is really yes.
-            if (makePreScale()) {
-              return SoftwareTriggerCutResult::c_accept;
-            }
-          }
-
-          return SoftwareTriggerCutResult::c_noResult;
-        }
-      }
-
-      /**
-       * Function to get the prescale factor. See the constructor for a description on what the prescale is.
-       */
-      unsigned int getPreScaleFactor() const
-      {
-        return m_preScaleFactor;
-      }
-
-      /**
-       * Function to check if the cut is a reject cut.
-       */
-      bool isRejectCut() const
-      {
-        return m_rejectCut;
-      }
+      SoftwareTriggerCutResult checkPreScaled(const SoftwareTriggerVariableManager::Object& prefilledObject) const;
 
     private:
       /// Internal representation of the cut condition as a general cut.
       std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>> m_cut = nullptr;
-      /// Internal variable for the prescale factor.
-      unsigned int m_preScaleFactor = 1;
-      /// Internal flag if this cut is a reject cut. See the SoftwareTriggerModule for more information on what this means.
-      bool m_rejectCut = false;
 
       /**
       * Make constructor private. You should only download a SoftwareCut from the database or compile a new one from a string.
       */
       SoftwareTriggerCut(std::unique_ptr<GeneralCut<SoftwareTriggerVariableManager>>&& cut,
-                         const unsigned int prescaleFactor = 1,
-                         const bool rejectCut = false) :
-        m_cut(std::move(cut)), m_preScaleFactor(prescaleFactor), m_rejectCut(rejectCut)
+                         const std::vector<unsigned int> prescaleFactor,
+                         const bool rejectCut) : SoftwareTriggerCutBase(prescaleFactor, rejectCut),
+        m_cut(std::move(cut))
       {
-      }
-
-      /**
-      * Delete the copy constructor.
-      */
-      SoftwareTriggerCut(const SoftwareTriggerCut&) = delete;
-
-      /**
-      * Delete the assign operator.
-      */
-      SoftwareTriggerCut& operator=(const SoftwareTriggerCut&) = delete;
-
-
-      /// Helper function to do a prescaling using a random integer number and the prescaling factor from the object.
-      bool makePreScale() const
-      {
-        // A prescale factor of one is always true...
-        if (m_preScaleFactor == 1) {
-          return true;
-          // ... and a prescale factor of 0 is always false...
-        } else if (m_preScaleFactor == 0) {
-          return false;
-        } else {
-          // All other cases are a bit more interesting
-          // We do this by drawing a random number between 0 and m_preScaleFactor - 1 and comparing it to 0.
-          // The probability to get back a true result is then given by 1/m_preScaleFactor.
-          const unsigned int randomNumber = gRandom->Integer(m_preScaleFactor);
-          return randomNumber == 0;
-        }
       }
     };
   }

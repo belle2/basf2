@@ -31,6 +31,8 @@ def getCommandLineOptions():
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
                         help='Name of the outputted pdf file')
+    parser.add_argument('-plot', '--plot-variables', dest='plot_variables', action='store_true',
+                        help='Plot the variables e.g. Correlation Matrix this can take very long')
     args = parser.parse_args()
     return args
 
@@ -57,8 +59,10 @@ if __name__ == '__main__':
     identifiers = sum(args.identifiers, [])
     datafiles = sum(args.datafiles, [])
 
+    print("Load methods")
     methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]
 
+    print("Apply experts on independent data")
     test_probability = {}
     test_target = {}
     for method in methods:
@@ -66,6 +70,7 @@ if __name__ == '__main__':
         test_probability[method.identifier] = p
         test_target[method.identifier] = t
 
+    print("Apply experts on training data")
     train_probability = {}
     train_target = {}
     if args.train_datafiles is not None:
@@ -78,11 +83,15 @@ if __name__ == '__main__':
     variables = unique(v for method in methods for v in method.variables)
     root_variables = unique(v for method in methods for v in method.root_variables)
 
-    rootchain = ROOT.TChain(args.treename)
-    for datafile in datafiles:
-        rootchain.Add(datafile)
-    variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, variables)
+    if args.plot_variables:
+        print("Load variables array")
+        rootchain = ROOT.TChain(args.treename)
+        for datafile in datafiles:
+            rootchain.Add(datafile)
 
+        variables_data = basf2_mva_util.tree2dict(rootchain, root_variables, variables)
+
+    print("Create latex file")
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
     tempdir = tempfile.mkdtemp()
@@ -117,15 +126,16 @@ if __name__ == '__main__':
     graphics.add('importance.png', width=1.0)
     o += graphics.finish()
 
-    graphics = b2latex.Graphics()
-    p = plotting.CorrelationMatrix()
-    p.add(variables_data, variables,
-          test_target[identifiers[0]] == 1,
-          test_target[identifiers[0]] == 0)
-    p.finish()
-    p.save('correlation_signal.png')
-    graphics.add('correlation_signal.png', width=1.0)
-    o += graphics.finish()
+    if args.plot_variables:
+        graphics = b2latex.Graphics()
+        p = plotting.CorrelationMatrix()
+        p.add(variables_data, variables,
+              test_target[identifiers[0]] == 1,
+              test_target[identifiers[0]] == 0)
+        p.finish()
+        p.save('correlation_signal.png')
+        graphics.add('correlation_signal.png', width=1.0)
+        o += graphics.finish()
 
     o += b2latex.Section("ROC Plot")
     o += b2latex.String("""

@@ -182,11 +182,11 @@
       <u unit="mm">13.500</u><v unit="mm">83.475</v>
       <u unit="mm">14.500</u><v unit="mm">83.475</v>
     </Component>
-    <Component type="BorderThinningLayer2">
-      <u unit="mm"> 0.525</u><v unit="mm">52.545</v><w>bottom</w>
+    <Component type="BorderGroovesLayer2">
+      <u unit="mm"> 0.525</u><v unit="mm">52.255</v><w>bottom</w>
     </Component>
-    <Component type="SwitcherThinningLayer2">
-      <u unit="mm">14.175</u><v unit="mm">52.545</v><w>bottom</w>
+    <Component type="SwitcherGroovesLayer2">
+      <u unit="mm">14.15</u><v unit="mm">52.255</v><w>bottom</w>
     </Component>
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.731</v><w>above</w>
@@ -566,22 +566,411 @@
     </Component>
   </Component>
 
-  <Component name="SwitcherThinningLayer2">
-    <Material>PXD-SwitcherThinning</Material>
-    <Color>#5599BB</Color>
-    <width  unit="mm"> 2.250</width>
-    <length unit="mm">58.510</length>
+  <Component name="SwitcherGroovesLayer2">
     <height unit="mm"> 0.345</height>
-    <angle unit="deg">54.7</angle>
+    <length unit="mm">58.510</length>
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <Component type="Groove1">
+      <u unit="mm"> 0.33</u><v unit="mm"> -27.364</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -26.144</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -24.924</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -23.704</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -22.484</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -21.264</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -20.044</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> 0.33</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 20.216 </v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 21.436</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 22.656</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 23.876</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 25.096</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 26.316</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 27.536</v>
+      <u unit="mm"> 0.33</u><v unit="mm"> 28.756</v>
+    </Component>
+    <Component type="Groove2">
+      <u unit="mm"> -0.82</u><v unit="mm"> -27.364</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -26.144</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -24.924</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -23.704</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -22.484</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -21.264</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -20.044</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> -0.82</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 20.216 </v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 21.436</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 22.656</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 23.876</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 25.096</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 26.316</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 27.536</v>
+      <u unit="mm"> -0.82</u><v unit="mm"> 28.756</v>
+    </Component>
+    <Component type="Groove3">
+      <u unit="mm"> -0.48</u><v unit="mm"> -27.974 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -26.754</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -25.534</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -24.314 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -23.094 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -21.874 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -20.654 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -18.214</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -16.994</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -10.894</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -9.674</v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  1.306</v>
+      <u unit="mm"> -0.48</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> -0.48</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> -0.48</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> -0.48</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 19.606 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 20.826 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 22.046 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 23.266 </v>      
+      <u unit="mm"> -0.48</u><v unit="mm"> 24.486 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 25.706 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 26.926 </v>
+      <u unit="mm"> -0.48</u><v unit="mm"> 28.146 </v>
+    </Component>
+    <Component type="Groove4">
+      <u unit="mm"> 0.67</u><v unit="mm"> -27.974 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -26.754 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -25.534 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -24.314 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -23.094 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -21.874 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -20.654 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -18.214 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -16.994 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -10.894 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -9.674 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  1.306 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> 0.67</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> 0.67</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> 0.67</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 19.606 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 20.826 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 22.046 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 23.266 </v>      
+      <u unit="mm"> 0.67</u><v unit="mm"> 24.486 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 25.706 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 26.926 </v>
+      <u unit="mm"> 0.67</u><v unit="mm"> 28.146 </v>
+    </Component>
   </Component>
 
-  <Component name="BorderThinningLayer2">
-    <Material>PXD-BorderThinning</Material>
-    <Color>#5599BB</Color>
-    <width  unit="mm">0.850</width>
+  <Component name="BorderGroovesLayer2">
+    <height unit="mm"> 0.345</height>
     <length unit="mm">58.510</length>
-    <height unit="mm">0.345</height>
-    <angle unit="deg">54.7</angle>
+    <width  unit="mm">0.950</width>
+    <Material>Si</Material>
+    <Color>#006699</Color>
+    <Component type="Groove2">
+      <u unit="mm"> 0.145</u><v unit="mm"> -27.364</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -26.144</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -24.924</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -23.704</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -22.484</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -21.264</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -20.044</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> 0.145</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 20.216 </v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 21.436</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 22.656</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 23.876</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 25.096</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 26.316</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 27.536</v>
+      <u unit="mm"> 0.145</u><v unit="mm"> 28.756</v>
+    </Component>
+    <Component type="Groove5">
+      <u unit="mm"> -0.305</u><v unit="mm"> -27.364</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -26.144</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -24.924</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -23.704</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -22.484</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -21.264</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -20.044</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -18.824</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -17.604</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -16.384</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -15.164</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -13.944</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -12.724</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -11.504</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -10.284</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -9.064 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -7.844 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -6.624 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -5.404 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -4.184 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -2.964 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -1.744 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> -0.524 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  0.696 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  1.916 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  3.136 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  4.356 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  5.576 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  6.796 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  8.016 </v>
+      <u unit="mm"> -0.305</u><v unit="mm">  9.236 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 10.456</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 11.676 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 12.896 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 14.116 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 15.336 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 16.556 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 17.776 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 18.996 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 20.216 </v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 21.436</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 22.656</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 23.876</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 25.096</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 26.316</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 27.536</v>
+      <u unit="mm"> -0.305</u><v unit="mm"> 28.756</v>
+    </Component>
+    <Component type="Groove2">
+      <u unit="mm"> -0.145</u><v unit="mm"> -27.974 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -26.754</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -25.534</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -24.314 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -23.094 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -21.874 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -20.654 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -18.214</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -16.994</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -10.894</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -9.674</v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  1.306</v>
+      <u unit="mm"> -0.145</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> -0.145</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> -0.145</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> -0.145</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 19.606 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 20.826 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 22.046 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 23.266 </v>      
+      <u unit="mm"> -0.145</u><v unit="mm"> 24.486 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 25.706 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 26.926 </v>
+      <u unit="mm"> -0.145</u><v unit="mm"> 28.146 </v>
+    </Component>
+    <Component type="Groove5">
+      <u unit="mm"> 0.305</u><v unit="mm"> -27.974 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -26.754 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -25.534 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -24.314 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -23.094 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -21.874 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -20.654 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -19.434 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -18.214 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -16.994 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -15.774 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -14.554 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -13.334 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -12.114 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -10.894 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -9.674 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -8.454 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -7.234 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -6.014 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -4.794 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -3.574 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -2.354 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> -1.134 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  0.086 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  1.306 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  2.526 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  3.746 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  4.966 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  6.186 </v>      
+      <u unit="mm"> 0.305</u><v unit="mm">  7.406 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  8.626 </v>
+      <u unit="mm"> 0.305</u><v unit="mm">  9.846 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 11.066 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 12.286 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 13.506 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 14.726 </v>      
+      <u unit="mm"> 0.305</u><v unit="mm"> 15.946 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 17.166 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 18.386 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 19.606 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 20.826 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 22.046 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 23.266 </v>      
+      <u unit="mm"> 0.305</u><v unit="mm"> 24.486 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 25.706 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 26.926 </v>
+      <u unit="mm"> 0.305</u><v unit="mm"> 28.146 </v>
+    </Component>
   </Component>
 
   <Component name="DCD">

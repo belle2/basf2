@@ -19,11 +19,6 @@
 #include "G4NistManager.hh"
 #include "G4PVPlacement.hh"
 #include <framework/utilities/FileSystem.h>
-#include <framework/database/IntervalOfValidity.h>
-#include <framework/database/Database.h>
-#include <framework/database/DBObjPtr.h>
-#include <framework/logging/Logger.h>
-#include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
 
 using namespace std;
 
@@ -730,7 +725,7 @@ G4Transform3D get_transform(const cplacement_t& t)
   return p * r;
 }
 
-void storeToDatabase()
+Belle2::ECLCrystalsShapeAndPosition loadCrystalsShapeAndPosition()
 {
   stringstream buffer;
   auto fillbuffer = [&buffer](const string & fname) {
@@ -747,8 +742,9 @@ void storeToDatabase()
   fillbuffer("/ecl/data/crystal_placement_forward.dat"); a.setPlacementForward(buffer.str());
   fillbuffer("/ecl/data/crystal_placement_barrel.dat"); a.setPlacementBarrel(buffer.str());
   fillbuffer("/ecl/data/crystal_placement_backward.dat"); a.setPlacementBackward(buffer.str());
-  Belle2::IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
-  Belle2::Database::Instance().storeData<Belle2::ECLCrystalsShapeAndPosition>(&a, iov);
+  return a;
+  // Belle2::IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  // Belle2::Database::Instance().storeData<Belle2::ECLCrystalsShapeAndPosition>(&a, iov);
 }
 
 vector<shape_t*> load_shapes(stringstream& IN)
@@ -838,10 +834,10 @@ vector<cplacement_t> load_placements(stringstream& IN)
   return plcmnt;
 }
 
-vector<cplacement_t> load_placements(enum ECLParts part)
+vector<cplacement_t> load_placements(const Belle2::ECLCrystalsShapeAndPosition* crystals, enum ECLParts part)
 {
-  Belle2::DBObjPtr<Belle2::ECLCrystalsShapeAndPosition> crystals;
-  if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
+  // Belle2::DBObjPtr<Belle2::ECLCrystalsShapeAndPosition> crystals;
+  // if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
 
   // stringstream buffer;
   // auto fillbuffer = [&buffer](const string &fname) {
@@ -869,11 +865,8 @@ vector<cplacement_t> load_placements(enum ECLParts part)
   return load_placements(IN);
 }
 
-vector<shape_t*> load_shapes(enum ECLParts part)
+vector<shape_t*> load_shapes(const Belle2::ECLCrystalsShapeAndPosition* crystals, enum ECLParts part)
 {
-  Belle2::DBObjPtr<Belle2::ECLCrystalsShapeAndPosition> crystals;
-  if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
-
   stringstream IN;
   if (part == ECLParts::forward)
     IN.str(crystals->getShapeForward());
@@ -886,7 +879,8 @@ vector<shape_t*> load_shapes(enum ECLParts part)
 
 void testtest()
 {
-  vector<cplacement_t> bp = load_placements(ECLParts::forward);
+  Belle2::ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
+  vector<cplacement_t> bp = load_placements(&crystals, ECLParts::forward);
   for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
     const cplacement_t& t = *it;
     cout << t.nshape << " " << t.Rphi1 << " " << t.Rtheta << " " << t.Rphi2 << " " << t.Pr << " " << t.Ptheta << " " << t.Pphi << endl;

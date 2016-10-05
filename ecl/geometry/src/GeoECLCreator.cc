@@ -21,6 +21,11 @@
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorFactory.h>
 #include <framework/gearbox/GearDir.h>
+#include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/Database.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/logging/Logger.h>
 
 namespace Belle2 {
 
@@ -39,12 +44,13 @@ namespace Belle2 {
 //-----------------------------------------------------------------
 
 
-    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0), m_overlap(0)
+    GeoECLCreator::GeoECLCreator(): isBeamBkgStudy(0), m_sap(0), m_overlap(0)
     {
       m_sensitive  = new SensitiveDetector("ECLSensitiveDetector", (2 * 24)*CLHEP::eV, 10 * CLHEP::MeV);
       m_sensediode = new SensitiveDiode("ECLSensitiveDiode");
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensitive);
       G4SDManager::GetSDMpointer()->AddNewDetector(m_sensediode);
+      defineVisAttributes();
     }
 
 
@@ -54,26 +60,29 @@ namespace Belle2 {
       for (auto a : m_atts) delete a.second;
     }
 
-    void GeoECLCreator::createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    void GeoECLCreator::createFromDB(const std::string&, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
+      DBObjPtr<ECLCrystalsShapeAndPosition> crystals;
+      if (!crystals.isValid()) B2FATAL("No crystal's data in the database.");
+      m_sap = &(*crystals);
+
+      forward(topVolume);
+      barrel(topVolume);
+      backward(topVolume);
     }
 
-    void GeoECLCreator::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+    void GeoECLCreator::createPayloads(const GearDir&, const IntervalOfValidity& iov)
     {
+      ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
+      Database::Instance().storeData<ECLCrystalsShapeAndPosition>(&crystals, iov);
     }
 
     void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
       isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
-      // cout << "SUS304 radiation length = " << Materials::get("SUS304")->GetRadlen() << " mm" << endl;
-      // cout << "A5083 radiation length = " << Materials::get("A5083")->GetRadlen() << " mm" << endl;
-      // cout << "A5052 radiation length = " << Materials::get("A5052")->GetRadlen() << " mm" << endl;
-      // cout << "A6063 radiation length = " << Materials::get("A6063")->GetRadlen() << " mm" << endl;
-      // cout << "Pure copper radiation length = " << Materials::get("C1220")->GetRadlen() << " mm" << endl;
-      // cout << "WRAP250 radiation length = " << Materials::get("WRAP250")->GetRadlen() << " mm" << endl;
-      // cout << "WRAP200 radiation length = " << Materials::get("WRAP200")->GetRadlen() << " mm" << endl;
-      // cout << "WRAP170 radiation length = " << Materials::get("WRAP170")->GetRadlen() << " mm" << endl;
+      ECLCrystalsShapeAndPosition crystals = loadCrystalsShapeAndPosition();
+      m_sap = &crystals;
 
       forward(topVolume);
       barrel(topVolume);

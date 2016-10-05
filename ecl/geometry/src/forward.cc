@@ -216,9 +216,11 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
                       septumwall3_logical, "septumwall3_physical_1", crystalvolume_logical, false, 1, overlap);
   }
 
-  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
+  //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_forward.dat");
+  vector<cplacement_t> bp = load_placements(m_sap, ECLParts::forward);
   if (b_crystals) {
-    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
+    //    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_forward.dat");
+    vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::forward);
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
       shape_t* s = *it;

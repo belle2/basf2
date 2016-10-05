@@ -24,7 +24,7 @@ class shape_t;
 namespace Belle2 {
 
   class BkgSensitiveDetector;
-
+  class ECLCrystalsShapeAndPosition;
   namespace ECL {
 
     class SensitiveDetector;
@@ -91,6 +91,9 @@ namespace Belle2 {
       const G4VisAttributes* att(const std::string& n) const;
       G4LogicalVolume* get_preamp() const ;
       double get_pa_box_height() const {return 2;}
+
+      /** pointer to a storage with crystal shapes and positions */
+      ECLCrystalsShapeAndPosition* m_sap;
 
       /** Sensitive detector */
       SensitiveDetector* m_sensitive;

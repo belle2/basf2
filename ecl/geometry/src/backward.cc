@@ -234,9 +234,11 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
     if (overlap) pv1->CheckOverlaps(npoints);
   }
 
-  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_backward.dat");
+  //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_backward.dat");
+  vector<cplacement_t> bp = load_placements(m_sap, ECLParts::backward);
   if (b_crystals) {
-    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_backward.dat");
+    //    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_backward.dat");
+    vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::backward);
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
       shape_t* s = *it;

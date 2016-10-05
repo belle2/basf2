@@ -4,6 +4,7 @@
 #include <vector>
 #include <G4VSolid.hh>
 #include <G4Transform3D.hh>
+#include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
 
 double cosd(double);
 double sind(double);
@@ -45,5 +46,8 @@ inline std::string suf(const std::string& s, int indx)
 }
 
 enum ECLParts { forward, barrel, backward };
+Belle2::ECLCrystalsShapeAndPosition loadCrystalsShapeAndPosition();
 
+std::vector<shape_t*> load_shapes(const Belle2::ECLCrystalsShapeAndPosition*, enum ECLParts);
+std::vector<cplacement_t> load_placements(const Belle2::ECLCrystalsShapeAndPosition*, enum ECLParts);
 #endif //__h_shapes

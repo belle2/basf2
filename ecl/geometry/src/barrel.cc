@@ -381,7 +381,8 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(G4Translate3D(-35, 1640, dz), tubeclogical, "tubecphysical", sectorlogical, false, 1, overlap);
   }
 
-  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_barrel.dat");
+  //  vector<cplacement_t> bp = load_placements("/ecl/data/crystal_placement_barrel.dat");
+  vector<cplacement_t> bp = load_placements(m_sap, ECLParts::barrel);
 
   if (b_preamplifier) {
     for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
@@ -410,7 +411,8 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
   }
 
   if (b_crystals) {
-    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
+    //    vector<shape_t*> cryst = load_shapes("/ecl/data/crystal_shape_barrel.dat");
+    vector<shape_t*> cryst = load_shapes(m_sap, ECLParts::barrel);
     vector<G4LogicalVolume*> wrapped_crystals;
     for (auto it = cryst.begin(); it != cryst.end(); it++) {
       shape_t* s = *it;

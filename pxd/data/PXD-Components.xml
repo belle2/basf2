@@ -1039,9 +1039,9 @@
     <Material>PXD-Switcher</Material>
     <Color>#660000</Color>
     <activeChipID>3</activeChipID>
-    <width  unit="mm">2.035</width>
+    <width  unit="mm">1.900</width>
     <length unit="mm">3.600</length>
-    <height unit="mm">0.400</height>
+    <height unit="mm">0.300</height>
   </Component>
 
   <Component name="Groove1">

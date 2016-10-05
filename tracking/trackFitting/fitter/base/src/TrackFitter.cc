@@ -91,7 +91,7 @@ bool TrackFitter::fit(RecoTrack& recoTrack, genfit::AbsTrackRep* trackRepresenta
 
 void TrackFitter::resetFitterToDefaultSettings()
 {
-  genfit::DAF* dafFitter = new genfit::DAF(true);
+  genfit::DAF* dafFitter = new genfit::DAF(true, m_dafDeltaPval);
   dafFitter->setProbCut(0.001);
   dafFitter->setMaxFailedHits(5);
 

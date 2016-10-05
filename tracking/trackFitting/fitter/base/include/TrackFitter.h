@@ -273,6 +273,11 @@ namespace Belle2 {
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
 
+    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
+    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
+    /// See https://agira.desy.de/browse/BII-1725 for details
+    const double m_dafDeltaPval = 1.0f;
+
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;
 

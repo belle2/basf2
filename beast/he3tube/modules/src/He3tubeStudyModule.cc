@@ -70,6 +70,7 @@ void He3tubeStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 9 ; i++) {
     h_mche3_kinetic[i]  = new TH1F(TString::Format("h_mche3_kinetic_%d", i), "MC kin. energy [GeV]", 1000, 0., 10.);
+    h_mche3_kinetic_zoom[i]  = new TH1F(TString::Format("h_mche3_kinetic_zoom_%d", i), "MC kin. energy [MeV]", 1000, 0., 10.);
   }
 
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
@@ -166,6 +167,7 @@ void He3tubeStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mche3_kinetic[i]->Fill(kin);
+        h_mche3_kinetic_zoom[i]->Fill(kin * 1e-3);
       }
     }
   }

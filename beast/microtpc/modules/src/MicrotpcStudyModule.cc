@@ -77,7 +77,8 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 void MicrotpcStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 9 ; i++) {
-    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
+    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 1000, 0., 10.);
+    h_mctpc_kinetic_zoom[i]  = new TH1F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
   }
   for (int i = 0 ; i < 8 ; i++) {
     for (int j = 0; j < 12; j++) {
@@ -443,6 +444,7 @@ void MicrotpcStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mctpc_kinetic[i]->Fill(kin);
+        h_mctpc_kinetic_zoom[i]->Fill(kin * 1e-3);
       }
     }
   }

@@ -67,20 +67,20 @@ QcsmonitorStudyModule::~QcsmonitorStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void QcsmonitorStudyModule::defineHisto()
 {
-  for (int i = 0; i < 48; i++) {
-    h_qcss_Evtof1[i] = new TH2F(TString::Format("qcss_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 5000, 0., 1000.,
-                                1000, 0., 10.);
-    h_qcss_Evtof2[i] = new TH2F(TString::Format("qcss_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 5000, 0.,
-                                1000., 1000, 0., 10.);
-    h_qcss_Evtof3[i] = new TH2F(TString::Format("qcss_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                1000., 1000, 0., 10.);
-    h_qcss_Evtof4[i] = new TH2F(TString::Format("qcss_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 5000, 0.,
-                                1000., 1000, 0., 10.);
+  for (int i = 0; i < 2; i++) {
+    h_qcss_Evtof1[i] = new TH2F(TString::Format("qcss_Evtof1_%d", i), "Energy deposited [MeV] vs TOF [ns] - all", 500, 0., 1000.,
+                                100, 0., 10.);
+    h_qcss_Evtof2[i] = new TH2F(TString::Format("qcss_Evtof2_%d", i), "Energy deposited [MeV] vs TOF [ns] - only photons", 500, 0.,
+                                100., 1000, 0., 10.);
+    h_qcss_Evtof3[i] = new TH2F(TString::Format("qcss_Evtof3_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 500, 0.,
+                                100., 1000, 0., 10.);
+    h_qcss_Evtof4[i] = new TH2F(TString::Format("qcss_Evtof4_%d", i), "Energy deposited [MeV] vs TOF [ns] - only e+/e-", 500, 0.,
+                                100., 1000, 0., 10.);
     h_qcss_edep[i] = new TH1F(TString::Format("qcss_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
     h_Wqcss_edep[i] = new TH1F(TString::Format("Wqcss_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 
-  for (int i = 0; i < 48; i++) {
+  for (int i = 0; i < 2; i++) {
     h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 5000, 0., 5000.);
     h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 5000, 0., 5000.);
     h_qcss_rate1W[i] = new TH1F(TString::Format("qcss_rate1W_%d", i), "PE distributions", 5000, 0., 5000.);

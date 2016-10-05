@@ -117,7 +117,8 @@ namespace Belle2 {
 
       /** MC kin energy dis */
       TH1F* h_mche3_kinetic[10];
-
+      /** Neutron kin energy dis */
+      TH1F* h_mche3_kinetic_zoom[10];
       /** Number of neutrons */
       int nNeutronHits = 0;
       /** Number of definte neutrons */

@@ -54,6 +54,13 @@ namespace Belle2 {
       for (auto a : m_atts) delete a.second;
     }
 
+    void GeoECLCreator::createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    {
+    }
+
+    void GeoECLCreator::createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+    {
+    }
 
     void GeoECLCreator::create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
@@ -83,9 +90,9 @@ namespace Belle2 {
       m_atts["capacitor"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
       m_atts["holder"] = new G4VisAttributes(G4Colour(0.4, 0.8, 0.8));
 
-      forward(content, topVolume);
-      barrel(content, topVolume);
-      backward(content, topVolume);
+      forward(topVolume);
+      barrel(topVolume);
+      backward(topVolume);
     }
 
     G4LogicalVolume* GeoECLCreator::wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness)

@@ -44,24 +44,41 @@ namespace Belle2 {
       //! The destructor of the GeoECLCreator class.
       ~GeoECLCreator();
 
-      //! Creates the ROOT Objects for the ECL geometry.
-      /*!
-        \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
-      */
+      /**
+       * Function to actually create the geometry, has to be overridden by derived classes
+       * @param content GearDir pointing to the parameters which should be used for construction
+       * @param topVolume Top volume in which the geometry has to be placed
+       * @param type Type of geometry to be build
+       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
-      /** Make the ECL barrel and then place elements inside it */
-      void barrel(const GearDir&, G4LogicalVolume&);
-      /** Place elements inside the backward endcap */
-      void backward(const GearDir&, G4LogicalVolume&);
-      /** Place elements inside the forward endcap */
-      void forward(const GearDir&, G4LogicalVolume&);
+      /**
+       * Function to create the geometry from the Database
+       * @param name name of the component in the database, could be used to disambiguate multiple components created with the same creator
+       * @param topVolume Top volume in which the geometry has to be placed
+       * @param type Type of geometry to be build
+       */
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+      /** Function to create the geometry database.
+       * This function should be implemented to convert Gearbox parameters to one ore more database payloads
+       * @param content GearDir pointing to the parameters which should be used for construction
+       * @param iov interval of validity to use when generating payloads
+       */
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov);
 
     protected:
       /** isBeamBkgStudy for neutron flux  */
       int isBeamBkgStudy;
 
     private:
+
+      /** Make the ECL barrel and then place elements inside it */
+      void barrel(G4LogicalVolume&);
+      /** Place elements inside the backward endcap */
+      void backward(G4LogicalVolume&);
+      /** Place elements inside the forward endcap */
+      void forward(G4LogicalVolume&);
 
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
       const G4VisAttributes* att(const std::string& n) const;

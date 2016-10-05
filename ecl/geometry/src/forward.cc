@@ -28,7 +28,7 @@
 using namespace std;
 using namespace Belle2::geometry;
 
-void Belle2::ECL::GeoECLCreator::forward(const GearDir& content, G4LogicalVolume& _top)
+void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
 {
   G4LogicalVolume* top = &_top;
 

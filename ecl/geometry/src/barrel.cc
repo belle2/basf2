@@ -59,7 +59,7 @@ G4VSolid* get_crystal_support(int n)
   return new G4ExtrudedSolid(name, p, 1.5, off, 1, off, 1);
 }
 
-void Belle2::ECL::GeoECLCreator::barrel(const GearDir& content, G4LogicalVolume& _top)
+void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
 {
   G4LogicalVolume* top = &_top;
 

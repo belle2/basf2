@@ -126,13 +126,19 @@
     <Component type="SwitcherGroovesLayer1">
       <u unit="mm">14.150</u><v unit="mm">43.715</v><w>bottom</w>
     </Component>
+    <Component type="Balcony1CopperLayer1">
+      <u unit="mm">14.150</u><v unit="mm">43.715</v><w>above</w>
+    </Component>
+    <Component type="Balcony2CopperLayer1">
+      <u unit="mm">0.500</u><v unit="mm">43.715</v><w>above</w>
+    </Component>
     <!-- Readout chips outside the acceptance -->
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.070</v><w>above</w>
     </Component>
     <!-- Switcher chips along the module -->
     <Component type="SwitchersLayer1">
-      <u unit="mm">14.189</u><v unit="mm">44.422</v><w>above</w>
+      <u unit="mm">14.189</u><v unit="mm">44.422</v><w>above</w><woffset unit="mm">0.003</woffset>
     </Component>
   </Sensor>
 
@@ -186,13 +192,19 @@
       <u unit="mm"> 0.525</u><v unit="mm">52.255</v><w>bottom</w>
     </Component>
     <Component type="SwitcherGroovesLayer2">
-      <u unit="mm">14.15</u><v unit="mm">52.255</v><w>bottom</w>
+      <u unit="mm">14.150</u><v unit="mm">52.255</v><w>bottom</w>
+    </Component>
+    <Component type="Balcony1CopperLayer2">
+      <u unit="mm">14.150</u><v unit="mm">52.255</v><w>above</w>
+    </Component>
+    <Component type="Balcony2CopperLayer2">
+      <u unit="mm">0.500</u><v unit="mm">52.255</v><w>above</w>
     </Component>
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.731</v><w>above</w>
     </Component>
     <Component type="SwitchersLayer2">
-      <u unit="mm">14.189</u><v unit="mm">52.242</v><w>above</w>
+      <u unit="mm">14.189</u><v unit="mm">52.242</v><w>above</w><woffset unit="mm">0.003</woffset>
     </Component>
   </Sensor>
 
@@ -232,6 +244,38 @@
     <length unit="mm">3.000</length>
     <height unit="mm">0.345</height>
     <angle  unit="deg">54.7</angle>
+  </Component>
+
+  <Component name="Balcony1CopperLayer1">
+    <Material>Cu</Material>
+    <Color>#CCCCCC</Color>
+    <width  unit="mm">2.200</width>
+    <length unit="mm">41.26</length>
+    <height unit="mm"> 0.003</height>
+  </Component>
+
+  <Component name="Balcony2CopperLayer1">
+    <Material>Cu</Material>
+    <Color>#CCCCCC</Color>
+    <width  unit="mm">0.900</width>
+    <length unit="mm">41.26</length>
+    <height unit="mm"> 0.003</height>
+  </Component>
+
+  <Component name="Balcony1CopperLayer2">
+    <Material>Cu</Material>
+    <Color>#CCCCCC</Color>
+    <width  unit="mm">2.200</width>
+    <length unit="mm">58.510</length>
+    <height unit="mm"> 0.003</height>
+  </Component>
+
+  <Component name="Balcony2CopperLayer2">
+    <Material>Cu</Material>
+    <Color>#CCCCCC</Color>
+    <width  unit="mm">0.900</width>
+    <length unit="mm">58.510</length>
+    <height unit="mm"> 0.003</height>
   </Component>
 
   <Component name="ReadoutChips">

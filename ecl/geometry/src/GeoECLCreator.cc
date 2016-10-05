@@ -75,21 +75,6 @@ namespace Belle2 {
       // cout << "WRAP200 radiation length = " << Materials::get("WRAP200")->GetRadlen() << " mm" << endl;
       // cout << "WRAP170 radiation length = " << Materials::get("WRAP170")->GetRadlen() << " mm" << endl;
 
-      m_atts["wrap"]  = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
-      m_atts["cryst"] = new G4VisAttributes(G4Colour(0.7, 0.7, 1.0));
-
-      m_atts["iron"]  = new G4VisAttributes(G4Colour(1., 0.1, 0.1));
-      m_atts["iron2"] = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
-      m_atts["alum"]  = new G4VisAttributes(G4Colour(0.25, 0.25, 1.0, 0.5));
-      m_atts["alum2"] = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
-      m_atts["silv"]  = new G4VisAttributes(G4Colour(0.9, 0., 0.9));
-      m_atts["air"]   = new G4VisAttributes(G4Colour(1., 1., 1.)); m_atts["air"]->SetVisibility(false);
-      m_atts["preamp"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
-      m_atts["plate"] = new G4VisAttributes(G4Colour(0.2, 0.8, 0.2));
-      m_atts["connector"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1));
-      m_atts["capacitor"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
-      m_atts["holder"] = new G4VisAttributes(G4Colour(0.4, 0.8, 0.8));
-
       forward(topVolume);
       barrel(topVolume);
       backward(topVolume);
@@ -122,6 +107,24 @@ namespace Belle2 {
 
       new G4PVPlacement(NULL, G4ThreeVector(), crystal_logical, name.c_str(), wrapped_logical, false, 0, 0);
       return wrapped_logical;
+    }
+
+    void GeoECLCreator::defineVisAttributes()
+    {
+      m_atts["wrap"]  = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
+      m_atts["cryst"] = new G4VisAttributes(G4Colour(0.7, 0.7, 1.0));
+
+      m_atts["iron"]  = new G4VisAttributes(G4Colour(1., 0.1, 0.1));
+      m_atts["iron2"] = new G4VisAttributes(G4Colour(1., 0.5, 0.5));
+      m_atts["alum"]  = new G4VisAttributes(G4Colour(0.25, 0.25, 1.0, 0.5));
+      m_atts["alum2"] = new G4VisAttributes(G4Colour(0.5, 0.5, 1.0));
+      m_atts["silv"]  = new G4VisAttributes(G4Colour(0.9, 0., 0.9));
+      m_atts["air"]   = new G4VisAttributes(G4Colour(1., 1., 1.)); m_atts["air"]->SetVisibility(false);
+      m_atts["preamp"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
+      m_atts["plate"] = new G4VisAttributes(G4Colour(0.2, 0.8, 0.2));
+      m_atts["connector"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.1));
+      m_atts["capacitor"] = new G4VisAttributes(G4Colour(0.1, 0.1, 0.8));
+      m_atts["holder"] = new G4VisAttributes(G4Colour(0.4, 0.8, 0.8));
     }
 
     const G4VisAttributes* GeoECLCreator::att(const std::string& n) const

@@ -81,6 +81,13 @@ namespace Belle2 {
       void forward(G4LogicalVolume&);
 
       G4LogicalVolume* wrapped_crystal(const shape_t* s, const std::string& endcap, double wrapthickness);
+
+      /** Define visual attributes */
+      void defineVisAttributes();
+
+      /** Define visual attributes
+       * @param n Attribute name
+       */
       const G4VisAttributes* att(const std::string& n) const;
       G4LogicalVolume* get_preamp() const ;
       double get_pa_box_height() const {return 2;}

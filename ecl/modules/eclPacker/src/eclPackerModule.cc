@@ -1,17 +1,12 @@
 #include <ecl/modules/eclPacker/eclPackerModule.h>
 #include <ecl/dataobjects/ECLDsp.h>
-<<< <<< < HEAD
 
 #include <framework/utilities/FileSystem.h>
-
-== == == =
-#include <framework/utilities/FileSystem.h>
-  >>> >>> > 28dc45a839732207cb6387237f81fec89590467e
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
 
-  using namespace std;
+using namespace std;
 using namespace Belle2;
 using namespace ECL;
 

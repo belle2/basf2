@@ -13,8 +13,6 @@ REG_MODULE(ECLUnpacker)
 ECLUnpackerModule::ECLUnpackerModule() :
   m_eclDigits("", DataStore::c_Event)
 {
-  setPropertyFlags(c_ParallelProcessingCertified);
-
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
 
   setPropertyFlags(c_ParallelProcessingCertified);

@@ -17,14 +17,21 @@ import os
 import glob
 
 
-def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='build-2016-07-25'):
+def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='notDefined'):
     """
     Sets belleOrBelle2Flag and the Revision of weight files according to the specified arguments.
     """
 
     global belleOrBelle2Flag
     global buildOrRevisionFlag
+
     belleOrBelle2Flag = belleOrBelle2
+
+    if buildOrRevision == 'notDefined':
+        releaseFile = open(os.environ['BELLE2_LOCAL_DIR'] + '/.release', 'r')
+        buildOrRevision = releaseFile.read().splitlines()[0]
+        releaseFile.close()
+
     buildOrRevisionFlag = "_" + buildOrRevision + "_"
 
 
@@ -1018,7 +1025,7 @@ def flavorTagger(
         'MaximumPstar',
         'KaonPion'],
     belleOrBelle2="Belle2",
-    buildOrRevision='build-2016-07-25',
+    buildOrRevision='notDefined',
     downloadFromDatabaseIfNotfound=True,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',

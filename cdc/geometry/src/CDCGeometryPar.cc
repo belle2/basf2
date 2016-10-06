@@ -2066,7 +2066,7 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
     getClosestAlphaPoints(alpha, wal, ial, ilr);
     double wth(0.);
     unsigned short ith[2] = {0};
-    getClosestThetaPoints(theta, wth, ith);
+    getClosestThetaPoints(alpha, theta, wth, ith);
 
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
@@ -2138,7 +2138,7 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
     getClosestAlphaPoints(alpha, wal, ial, ilr);
     double wth(0.);
     unsigned short ith[2] = {0};
-    getClosestThetaPoints(theta, wth, ith);
+    getClosestThetaPoints(alpha, theta, wth, ith);
 
     unsigned short jal(0), jlr(0), jth(0);
     double w = 0.;
@@ -2271,7 +2271,7 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
     getClosestAlphaPoints4Sgm(alpha, wal, ial, ilr);
     double wth(0.);
     unsigned short ith[2] = {0};
-    getClosestThetaPoints4Sgm(theta, wth, ith);
+    getClosestThetaPoints4Sgm(alpha, theta, wth, ith);
 
     //compute linear interpolation (=weithed average over 4 points) in (alpha-theta) space
     unsigned short jal(0), jlr(0), jth(0);
@@ -2392,6 +2392,7 @@ double CDCGeometryPar::getAlpha(const TVector3& posOnWire, const TVector3& momen
 
   const double cross = wx * py - wy * px;
   const double dot   = wx * px + wy * py;
+  //  std::cout <<"wx,wy,px,py,alpha= " << wx <<" "<< wy <<" " << px <<" "<< py <<" "<< atan2(cross,dot) << std::endl;
 
   return atan2(cross, dot);
 }
@@ -2422,6 +2423,13 @@ double CDCGeometryPar::getOutgoingAlpha(const double alpha) const
   return alphao;
 }
 
+double CDCGeometryPar::getOutgoingTheta(const double alpha, const double theta) const
+{
+  //convert incoming- to outgoing-theta
+  double thetao = fabs(alpha) >  0.5 * M_PI  ?  M_PI - theta  :  theta;
+  //  std::cout << alpha <<" "<< thetao << std::endl;
+  return thetao;
+}
 
 void CDCGeometryPar::getClosestAlphaPoints(const double alpha, double& weight, unsigned short points[2],
                                            unsigned short lrs[2]) const
@@ -2490,15 +2498,17 @@ void CDCGeometryPar::getClosestAlphaPoints4Sgm(const double alpha, double& weigh
 }
 
 
-void CDCGeometryPar::getClosestThetaPoints(const double theta, double& weight, unsigned short points[2]) const
+void CDCGeometryPar::getClosestThetaPoints(const double alpha, const double theta, double& weight, unsigned short points[2]) const
 {
-  if (theta < m_thetaPoints[0]) {
+  const double thetao = getOutgoingTheta(alpha, theta);
+
+  if (thetao < m_thetaPoints[0]) {
     //    points[0] = 0;
     //    points[1] = 1;
     points[0] = 0;
     points[1] = 0;
     weight = 1.;
-  } else if (m_thetaPoints[m_nThetaPoints - 1] <= theta) {
+  } else if (m_thetaPoints[m_nThetaPoints - 1] <= thetao) {
     //    points[0] = m_nThetaPoints - 2;
     //    points[1] = m_nThetaPoints - 1;
     points[0] = m_nThetaPoints - 1;
@@ -2506,34 +2516,37 @@ void CDCGeometryPar::getClosestThetaPoints(const double theta, double& weight, u
     weight = 1.;
   } else {
     for (unsigned short i = 0; i <= m_nThetaPoints - 2; ++i) {
-      if (m_thetaPoints[i] <= theta && theta < m_thetaPoints[i + 1]) {
+      if (m_thetaPoints[i] <= thetao && thetao < m_thetaPoints[i + 1]) {
         points[0] = i;
         points[1] = i + 1;
-        weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
+        weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
         break;
       }
     }
   }
-  //  weight = (theta - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
+  //  weight = (thetao - m_thetaPoints[points[0]]) / (m_thetaPoints[points[1]] - m_thetaPoints[points[0]]);
 }
 
 
-void CDCGeometryPar::getClosestThetaPoints4Sgm(const double theta, double& weight, unsigned short points[2]) const
+void CDCGeometryPar::getClosestThetaPoints4Sgm(const double alpha, const double theta, double& weight,
+                                               unsigned short points[2]) const
 {
-  if (theta < m_thetaPoints4Sgm[0]) {
+  const double thetao = getOutgoingTheta(alpha, theta);
+
+  if (thetao < m_thetaPoints4Sgm[0]) {
     points[0] = 0;
     points[1] = 0;
     weight = 1.;
-  } else if (m_thetaPoints4Sgm[m_nThetaPoints4Sgm - 1] <= theta) {
+  } else if (m_thetaPoints4Sgm[m_nThetaPoints4Sgm - 1] <= thetao) {
     points[0] = m_nThetaPoints4Sgm - 1;
     points[1] = m_nThetaPoints4Sgm - 1;
     weight = 1.;
   } else {
     for (unsigned short i = 0; i <= m_nThetaPoints4Sgm - 2; ++i) {
-      if (m_thetaPoints4Sgm[i] <= theta && theta < m_thetaPoints4Sgm[i + 1]) {
+      if (m_thetaPoints4Sgm[i] <= thetao && thetao < m_thetaPoints4Sgm[i + 1]) {
         points[0] = i;
         points[1] = i + 1;
-        weight = (theta - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
+        weight = (thetao - m_thetaPoints4Sgm[points[0]]) / (m_thetaPoints4Sgm[points[1]] - m_thetaPoints4Sgm[points[0]]);
         break;
       }
     }

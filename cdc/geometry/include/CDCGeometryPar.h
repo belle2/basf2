@@ -884,6 +884,13 @@ namespace Belle2 {
 
 
       /**
+       * Converts incoming-  to outgoing-theta.
+       * @param theta in rad.
+       */
+      double getOutgoingTheta(const double alpha, const double theta) const;
+
+
+      /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
        * @param alpha in rad.
        */
@@ -900,13 +907,13 @@ namespace Belle2 {
        * Returns the two closest theta points for the input track incident angle (theta).
        * @param theta in rad.
        */
-      void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
        * Returns the two closest theta points for sigma for the input track incident angle (theta).
        * @param theta in rad. TODO: unify the two getClosestThetaPoints().
        */
-      void getClosestThetaPoints4Sgm(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
 
       /**

@@ -21,7 +21,6 @@
 #include <boost/range/adaptor/transformed.hpp>
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -112,7 +111,7 @@ namespace {
     }
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<CDCRLWireHit> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -200,7 +199,7 @@ namespace {
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<const CDCRecoSegment2D*> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {

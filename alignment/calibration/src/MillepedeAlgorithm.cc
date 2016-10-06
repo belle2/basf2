@@ -45,6 +45,7 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
   int nVXDparams = 0;
   int nCDCparams = 0;
   int nBKLMparams = 0;
+  int nEKLMparams = 0;
   int undeterminedParams = 0;
   for (int ipar = 0; ipar < m_result.getNoParameters(); ipar++) {
     if (!m_result.isParameterDetermined(ipar)) {
@@ -58,7 +59,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     if (param.isBeam()) ++nBeamParams;
     if (param.isVXD()) ++nVXDparams;
     if (param.isCDC()) ++nCDCparams;
-    if (param.isKLM()) ++nBKLMparams;
+    if (param.isBKLM()) ++nBKLMparams;
+    if (param.isEKLM()) ++nEKLMparams;
   }
   if (!nBeamParams)
     B2INFO("No Beam parameters determined");
@@ -68,6 +70,8 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
     B2INFO("No CDC parameters determined");
   if (!nBKLMparams)
     B2INFO("No BKLM parameters determined");
+  if (!nEKLMparams)
+    B2INFO("No EKLM parameters determined");
 
   if (undeterminedParams) {
     B2WARNING("There are " << undeterminedParams << " undetermined parameters. Not enough data for calibration.");
@@ -207,10 +211,10 @@ CalibrationAlgorithm::EResult MillepedeAlgorithm::calibrate()
       }
     }
 
-    if (param.isKLM()) {
+    if (param.isBKLM()) {
       // Add correction to all objects
       for (auto& bklm : newBKLM) {
-        bklm.second->add(param.getKlmID(), param.getParameterId(), correction, m_invertSign);
+        bklm.second->add(param.getBklmID(), param.getParameterId(), correction, m_invertSign);
       }
     }
   }

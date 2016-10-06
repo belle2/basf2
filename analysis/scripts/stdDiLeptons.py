@@ -5,11 +5,29 @@ from basf2 import *
 from modularAnalysis import *
 
 
-def stdDiLeptons(path=analysis_main):
+def loadStdDiLeptons(persistent=True, path=analysis_main):
 
-    stdLooseJpsi2mumu(path)
+    loadStdLooseJpsi2mumu(persistent, path)
+    loadStdLooseJpsi2ee(persistent, path)
+    loadStdLoosepsi2s2mumu(persistent, path)
+    loadStdLoosepsi2s2ee(persistent, path)
 
 
-def stdLooseJpsi2mumu(path=analysis_main):
-    reconstructDecay('J/psi:mumuLoose -> mu-:loose mu+:loose', '2.8 < M < 3.7', 2, True, path)
-    fitVertex('J/psi:mumuLoose', 0.001, '', 'rave', 'vertex', '', path)
+def loadStdLooseJpsi2mumu(persistent=True, path=analysis_main):
+    reconstructDecay('J/psi:mumuLoose -> mu-:loose mu+:loose', '2.8 < M < 3.7', 2, persistent, path)
+    return 'J/psi:mumuLoose'
+
+
+def loadStdLooseJpsi2ee(persistent=True, path=analysis_main):
+    reconstructDecay('J/psi:eeLoose -> e-:loose e+:loose', '2.8 < M < 3.7', 2, persistent, path)
+    return 'J/psi:eeLoose'
+
+
+def loadStdLoosepsi2s2mumu(persistent=True, path=analysis_main):
+    reconstructDecay('psi(2S):mumuLoose -> mu-:loose mu+:loose', '3.2 < M < 4.1', 2, persistent, path)
+    return 'psi(2S):mumuLoose'
+
+
+def loadStdLoosepsi2s2ee(persistent=True, path=analysis_main):
+    reconstructDecay('psi(2S):eeLoose -> e-:loose e+:loose', '3.2 < M < 4.1', 2, persistent, path)
+    return 'psi(2S):eeLoose'

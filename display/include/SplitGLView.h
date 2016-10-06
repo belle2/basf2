@@ -28,17 +28,21 @@ namespace Belle2 {
     /** handler for clicks inside GL viewer. */
     void           itemClicked(TGListTreeItem* item, Int_t btn, Int_t x, Int_t y = 43);
     /** menu item handler */
-    void           handleMenu(Int_t id);
+    void           handleMenu(Int_t menuCommand);
     /** make current viewer active & show name of obj in status bar. */
     void           onClicked(TObject* obj);
     /** show name of shape in status bar. */
     void           onMouseOver(TGLPhysicalShape* shape);
+    /** change camera type, given one of EMenuCommands. */
+    void updateCamera(int cameraAction);
     /** toggle wether the active viewer may be rotated (not that useful for projections). */
     void           toggleOrthoRotate();
     /** Toggle state of the 'Ortho allow dolly' menu entry. */
     void           toggleOrthoDolly();
     /** Toggle stereo viewing for perspective viewer. */
     void toggleStereo();
+    /** Toggle visibility of axes for projections. */
+    void toggleShowScale();
 
     /** return R-Phi projection manager. */
     TEveProjectionManager* getRPhiMgr() const { return m_rphiManager; }
@@ -50,10 +54,10 @@ namespace Belle2 {
     InfoWidget* getInfoWidget() const { return m_infoWidget; }
 
     /** Which menu command was selected? */
-    enum EMyCommands {
+    enum EMenuCommands {
       kGLPerspYOZ, kGLPerspXOZ, kGLPerspXOY, kGLXOY,
       kGLXOZ, kGLZOY, kGLOrthoRotate, kGLOrthoDolly, kGLStereo,
-      kSceneUpdate, kSceneUpdateAll, kSaveGeometryExtract
+      kSceneUpdate, kSceneUpdateAll, kShowScale, kSaveGeometryExtract
     };
 
   private:
@@ -67,6 +71,7 @@ namespace Belle2 {
     TEveProjectionManager* m_rhozManager;   /**< Rho-Z projection */
 
     TGPopupMenu*           m_cameraMenu;    /**< 'Camera' popup menu */
+    TGPopupMenu*           m_sceneMenu;    /**< 'Scene' popup menu */
     TGStatusBar*           m_statusBar;     /**< status bar */
 
     /** text-based info viewer. */

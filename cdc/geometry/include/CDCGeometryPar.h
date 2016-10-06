@@ -21,14 +21,8 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#if defined(CDC_XT_FROM_DB)
-#include <cdc/dbobjects/CDCXTs.h>
-#endif
 #if defined(CDC_XTREL_FROM_DB)
 #include <cdc/dbobjects/CDCXtRelations.h>
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-#include <cdc/dbobjects/CDCSigmas.h>
 #endif
 #if defined(CDC_SRESOL_FROM_DB)
 #include <cdc/dbobjects/CDCSpaceResols.h>
@@ -101,17 +95,17 @@ namespace Belle2 {
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
-      /**
-       * Read z-corrections.
-       * @param GearDir Gear Dir.
-       */
-      void readDeltaz(const GearDir);
-
-      /**
-       * Read z-corrections from DB.
-       *
-       */
-      void readDeltaz(const CDCGeometry&);
+      //      /**
+      //       * Read z-corrections.
+      //       * @param GearDir Gear Dir.
+      //       */
+      //      void readDeltaz(const GearDir);
+      //
+      //      /**
+      //       * Read z-corrections from DB.
+      //       *
+      //       */
+      //      void readDeltaz(const CDCGeometry&);
 
       /**
        * Read (mis)alignment params.
@@ -1013,8 +1007,8 @@ namespace Belle2 {
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
-      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
-      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
+      //      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
+      //      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
 
       double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
       double m_minTrackLength;         /*!< Minimum track length for G4 step */
@@ -1068,14 +1062,8 @@ namespace Belle2 {
 #if defined(CDC_TIMEWALK_FROM_DB)
       DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
 #endif
-#if defined(CDC_XT_FROM_DB)
-      DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
-#endif
 #if defined(CDC_XTREL_FROM_DB)
       DBObjPtr<CDCXtRelations> m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-      DBObjPtr<CDCSigmas> m_sigmaFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_SRESOL_FROM_DB)
       DBObjPtr<CDCSpaceResols> m_sResolFromDB; /*!< sigma params. retrieved from DB. */

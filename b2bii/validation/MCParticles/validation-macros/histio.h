@@ -1,5 +1,5 @@
 
-#ifdef HISTIO_H
+#ifndef HISTIO_H
 #define HISTIO_H
 void histio() ;
 void saveHist(const char* filename = "out.root", const char* pat = "*") ;

@@ -34,7 +34,7 @@ simVerbose = True
 # ################
 
 # Important parameters:
-numEvents = 20000  # can be overridden by the parameters given via terminal
+numEvents = 25000  # can be overridden by the parameters given via terminal
 initialValue = 12  # want random events, if set to 0
 
 
@@ -235,7 +235,7 @@ main.add_module(register_module("StudyMaterialEffects"))
 print(main)
 
 
-set_nprocesses(4)
+set_nprocesses(6)
 
 process(main)
 

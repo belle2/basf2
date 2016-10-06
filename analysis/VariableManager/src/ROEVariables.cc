@@ -1368,7 +1368,7 @@ namespace Belle2 {
     // Below are some functions for ease of usage, they are not a part of variables
     // ------------------------------------------------------------------------------
 
-    TLorentzVector missing4Vector(const Particle* particle, std::string maskName, std::string opt)
+    TLorentzVector missing4Vector(const Particle* particle, std::string maskName, const std::string& opt)
     {
       // Get related ROE object
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();

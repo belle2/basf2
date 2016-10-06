@@ -460,15 +460,18 @@ void CDCUnpackerModule::loadMap()
 {
 
   if (m_enableDatabase == false) {
+
     // Read the channel map from the local text.
-    if (! FileSystem::fileExists(m_xmlMapFileName)) {
-      B2ERROR("CDC unpacker can't find a filename: " << m_xmlMapFileName);
+    std::string fileName = FileSystem::findFile(m_xmlMapFileName);
+    std::cout << fileName << std::endl;
+    if (fileName == "") {
+      B2ERROR("CDC unpacker can't find a filename: " << fileName);
       exit(1);
     }
 
 
     ifstream ifs;
-    ifs.open(m_xmlMapFileName.c_str());
+    ifs.open(fileName.c_str());
     int isl;
     int icl;
     int iw;

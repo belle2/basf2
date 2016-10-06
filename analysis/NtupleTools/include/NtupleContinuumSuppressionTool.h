@@ -13,12 +13,8 @@
 #include <analysis/NtupleTools/NtupleFlatTool.h>
 #include <analysis/dataobjects/Particle.h>
 #include <analysis/DecayDescriptor/DecayDescriptor.h>
-#include <TTree.h>
 #include <string>
 #include <utility>
-
-using namespace std;
-using namespace Belle2;
 
 namespace Belle2 {
 
@@ -69,7 +65,7 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constructor. */
-    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+    NtupleContinuumSuppressionTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions)
     {
       m_useFS1 = false;

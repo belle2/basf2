@@ -28,9 +28,9 @@ namespace Belle2 {
   namespace qcsmonitor {
 
     /**
-     * Study module for Qcsmonitors (BEAST)
+     * Study module for Qcsmonitor (BEAST)
      *
-     * Produces histograms from BEAST data for the Qcsmonitors.   *
+     * Produces histograms from BEAST data for the Qcsmonitor.   *
      */
     class QcsmonitorStudyModule : public HistoModule {
 
@@ -69,27 +69,46 @@ namespace Belle2 {
       virtual void getXMLData();
       /** Energy threshold */
       double m_Ethres;
-      /** Energy range */
-      double m_Erange;
-      /** Sample time */
-      double m_SampleTime;
 
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof1[50];
+      TH2F* h_qcss_Evtof1[48];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof2[50];
+      TH2F* h_qcss_Evtof2[48];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof3[50];
+      TH2F* h_qcss_Evtof3[48];
       /** Energy deposited vs TOF */
-      TH2F* h_qcsms_Evtof4[50];
+      TH2F* h_qcss_Evtof4[48];
       /** Energy deposited */
-      TH1F* h_qcsms_edep[50];
+      TH1F* h_qcss_edep[48];
       /** Energy deposited */
-      TH1F* h_Wqcsms_edep[50];
-      /** Loss position in the IR */
-      TH1F* h_qcsms_s;
-      /** Loss position in the IR */
-      TH1F* h_qcsms_s_cut;
+      TH1F* h_Wqcss_edep[48];
+
+      /** Energy deposited */
+      TH1F* h_qcss_rate1[48];
+      /** Energy deposited */
+      TH1F* h_qcss_rate2[48];
+      /** Energy deposited */
+      TH1F* h_qcss_rate1W[48];
+      /** Energy deposited */
+      TH1F* h_qcss_rate2W[48];
+
+      /** Energy deposited */
+      TH2F* h_qcss_rs_rate1[48];
+      /** Energy deposited */
+      TH2F* h_qcss_rs_rate2[48];
+      /** Energy deposited */
+      TH2F* h_qcss_rs_rate1W[48];
+      /** Energy deposited */
+      TH2F* h_qcss_rs_rate2W[48];
+
+      /** Energy deposited */
+      TH2F* h_qcss_pe1[48];
+      /** Energy deposited */
+      TH2F* h_qcss_pe2[48];
+      /** Energy deposited */
+      TH2F* h_qcss_pe1W[48];
+      /** Energy deposited */
+      TH2F* h_qcss_pe2W[48];
 
     };
 

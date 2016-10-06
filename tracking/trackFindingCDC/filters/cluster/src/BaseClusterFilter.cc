@@ -9,6 +9,5 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

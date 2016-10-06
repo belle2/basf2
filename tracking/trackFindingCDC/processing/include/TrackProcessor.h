@@ -12,7 +12,6 @@
 
 #include <vector>
 
-using namespace std;
 
 namespace Belle2 {
 

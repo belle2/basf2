@@ -10,6 +10,7 @@
 ######################################################
 from basf2 import *
 from modularAnalysis import *
+from stdV0s import stdKshorts
 
 
 def TauLFVList():
@@ -69,11 +70,11 @@ def TauLFVList():
                         'mu-:loose K_S0:all K_S0:all'
                         ]
 
-    tau_bnv_Channels = ['mu+:loose mu+:loose p-:loose',
+    tau_bnv_Channels = ['mu+:loose mu+:loose anti-p-:loose',
                         'mu-:loose mu+:loose p+:loose',
-                        'p-:loose pi+:loose pi+:loose',
+                        'anti-p-:loose pi+:loose pi+:loose',
                         'p+:loose pi-:loose pi+:loose',
-                        'p-:loose pi+:loose K+:loose',
+                        'anti-p-:loose pi+:loose K+:loose',
                         'p+:loose pi-:loose K+:loose'
                         ]
 

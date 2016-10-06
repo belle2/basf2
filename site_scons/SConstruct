@@ -264,6 +264,8 @@ else:
             global_env['PACKAGE'] = entry
 
             global_env.ProcessDirectory(entry, False, repository)
+    # for global things (e.g. tests) no package should be set
+    del global_env['PACKAGE']
 
 
 # build global dataobjects library

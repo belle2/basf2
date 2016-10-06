@@ -40,27 +40,27 @@ namespace Belle2 {
     void back();
 
     /** Used to colour visited links. */
-    virtual int IsVisited(const char* uri); //please add 'override' here once CINT is gone
+    virtual int IsVisited(const char* uri) override;
 
   private:
     /** a parsed URI. allowed URI formats are
      *
      * durability:[entryName[/arrayIndex]] (durability: event/persistent)
      * raw:addressOfTObject (for objects not in DataStore)
-     * main: (the mian page)
+     * main: (the main page)
      */
     struct URI {
-      URI(): object(0), entryName(""), arrayIndex(-1) { }
+      URI() {}
       /** Construct URI by parsing given string. */
       explicit URI(const TString& uri);
 
       /** get URI string to given object. */
       static TString getURI(const TObject* obj);
 
-      const TObject* object; /**< object referenced (or NULL). */
-      TString scheme; /**< scheme name (part before first colon). */
-      TString entryName; /**< name of DataStore entry. */
-      int arrayIndex; /**< index in array, only valid if arrayName and object are filled. */
+      const TObject* object = nullptr; /**< object referenced (or NULL). */
+      TString scheme = ""; /**< scheme name (part before first colon). */
+      TString entryName = ""; /**< name of DataStore entry. */
+      int arrayIndex = -1; /**< index in array, only valid if arrayName and object are filled. */
     };
 
     /** create DataStore overview. */
@@ -83,7 +83,7 @@ namespace Belle2 {
 
     std::vector<TString> m_history; /**< ordered list of all pages viewed in current event. */
 
-    ClassDef(InfoWidget, 0); /**< text-based info viewer showing DataStore contents. */
+    ClassDefOverride(InfoWidget, 0); /**< text-based info viewer showing DataStore contents. */
   };
 
 }

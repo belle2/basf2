@@ -59,12 +59,13 @@ QcsmonitorDigitizerModule::QcsmonitorDigitizerModule() : Module()
   setDescription("Qcsmonitor digitizer module");
 
   //Default values are set here. New values can be in QCSMONITOR.xml.
-  addParam("ScintCell", m_ScintCell, "Number of scintillator cell", 16);
+  addParam("ScintCell", m_ScintCell, "Number of scintillator cell", 2);
   addParam("TimeStep", m_TimeStep, "Time step", 0.8);
+  addParam("C_keV_to_MIP", m_C_keV_to_MIP, "C_keV_to_MIP", 241.65);
+  addParam("C_MIP_to_PE", m_C_MIP_to_PE, "C_MIP_to_PE", 15.0);
   addParam("MinTime", m_MinTime, "Min. time", 0.0);
   addParam("MaxTime", m_MaxTime, "Max. time", 750.0);
-  addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
-
+  addParam("MIPthres", m_MIPthres, "Energy threshold in keV", 0.5);
 }
 
 QcsmonitorDigitizerModule::~QcsmonitorDigitizerModule()
@@ -96,63 +97,22 @@ void QcsmonitorDigitizerModule::event()
   if (QcsmonitorSimHits.getEntries() == 0) {
     return;
   }
-  /*
-  //auto edepArray = new vector<double>[m_ScintCell](); //energy deposits per scintillator cell
-  auto adepArray = new vector<double>[m_ScintCell](); //energy deposits corrected per scintillator cell
-  auto timeArray = new vector<double>[m_ScintCell](); //time cell bin nmber
 
-  int nentries = QcsmonitorSimHits.getEntries();
-  //loop on all entries to store for each QCSMONITOR scintillator cell
-  for (int i = 0; i < nentries; i++) {
-    QcsmonitorSimHit* aHit = QcsmonitorSimHits[i];
-    int detNb = aHit->getdetNb();
-    //int pdgid = aHit->gettkPDG();
-    //float edep = aHit->getEnergyDep();
-    float adep = aHit->getEnergyNiel();
-    float G4time = aHit->getGlTime();
+  StoreArray<QcsmonitorSimHit> SimHits;
+  StoreArray<QcsmonitorHit> Hits;
 
-    //edepArray[detNb].push_back(edep);
-    adepArray[detNb].push_back(adep);
-    timeArray[detNb].push_back(G4time);
-    //pdgArray[detNb].push_back(pdgid);
-
-  }
-  //determine the number of time bin
-  int TimeNbins = (int)((m_MaxTime - m_MinTime) / m_TimeStep);
-
-  //loop over QCSMONITOR scintillator cell
-  for (int i = 0; i < m_ScintCell; i ++) {
-
-    //define and initialize the energy sum per time cell for each scintillator
-    double esum[TimeNbins];
-    for (int j = 0; j < TimeNbins; j ++) esum[j] = 0;
-
-    //loop over array entries
-    for (int j = 0; j < (int) adepArray[i].size(); j ++) {
-
-      //calculate time bin value
-      int i_bin = timeArray[i][j] / m_TimeStep;
-
-      //check if hit within time range
-      if (m_MinTime <= timeArray[i][j] && timeArray[i][j] <= m_MaxTime)
-        esum[i_bin] += adepArray[i][j];
-    }
-
-    //loop over number of time bin
-    for (int j = 0; j < TimeNbins; j ++) {
-
-      //if esum > 0 then store in QcsmonitorHit detNb, time bin, energy sum, and particle counter
-      if (esum[j] > m_Ethres) {
-        int ncount = esum[j] / m_ConvFac;
-        QcsmonitorHits.appendNew(i, j , esum[j], ncount);
-      }
-    }
+  for (const auto& SimHit : SimHits) {
+    const int detNb = SimHit.getCellId();
+    //int pdg = SimHit.getPDGCode();
+    const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
+    const double tof = SimHit.getFlightTime(); //ns
+    int TimeBin = tof / m_TimeStep;
+    double MIP = Edep / m_C_keV_to_MIP;
+    double PE = MIP * m_C_MIP_to_PE;
+    if ((m_MinTime < tof && tof < m_MaxTime) &&  MIP > m_MIPthres)
+      Hits.appendNew(QcsmonitorHit(detNb,  TimeBin, Edep, MIP, PE));
   }
 
-  //delete array
-  delete [] adepArray;
-  delete [] timeArray;
-  */
 }
 
 //read tube centers, impulse response, and garfield drift data filename from QCSMONITOR.xml
@@ -164,11 +124,11 @@ void QcsmonitorDigitizerModule::getXMLData()
   m_TimeStep = content.getDouble("TimeStep");
   m_MinTime = content.getDouble("MinTime");
   m_MaxTime = content.getDouble("MaxTime");
-  m_Ethres = content.getDouble("Ethres");
-  m_ConvFac = content.getDouble("ConvFac");
+  m_MIPthres = content.getDouble("MIPthres");
+  m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
+  m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
 
   B2INFO("QcsmonitorDigitizer: Aquired qcsmonitor locations and gas parameters");
-  B2INFO("              from QCSMONITOR.xml. There are " << m_ScintCell << " QCSMONITORs implemented");
 
 }
 

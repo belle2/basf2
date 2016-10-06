@@ -35,7 +35,7 @@ if not os.path.isfile('B2A101-Y4SEventGeneration-evtgen.root'):
         'Please run B2A101-Y4SEventGeneration.py tutorial script first.')
 
 # load input ROOT file
-inputMdst('default', 'B2A101-Y4SEventGeneration-evtgen.root')
+inputMdst('None', 'B2A101-Y4SEventGeneration-evtgen.root')
 
 # if you run at KEKCC
 bkgFiles = glob.glob('/sw/belle2/bkg/*.root')

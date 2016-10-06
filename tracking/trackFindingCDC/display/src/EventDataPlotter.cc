@@ -36,7 +36,6 @@
 #include <cmath>
 #include <exception>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

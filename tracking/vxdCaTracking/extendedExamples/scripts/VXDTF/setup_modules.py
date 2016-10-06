@@ -368,7 +368,7 @@ def setup_pGun(
     path=0, pdgCODES=[13], numTracks=1, momParams=[
         0.1, 0.15], thetaParams=[
             17., 150.], phiParams=[
-                0., 360.], logLevel=LogLevel.WARNING, debugVal=1):
+                0., 360.], logLevel=LogLevel.WARNING, debugVal=1, smearVertex=True):
     """This function adds a particleGun to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
@@ -388,28 +388,38 @@ def setup_pGun(
     @param logLevel set to logLevel level of your choice.
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
+
+    @param smearVertex if true, the primary vertex is smeared, if false no smearing is done.
     """
     # fixed, uniform, normal, polyline, uniformPt, normalPt, inversePt, polylinePt or discrete
     print("setup ParticleGun...")
-    param_pGun = {
-        'pdgCodes': pdgCODES,
-        'nTracks': numTracks,
-        'momentumGeneration': 'uniformPt',
-        'momentumParams': momParams,
-        'thetaGeneration': 'uniform',
-        'thetaParams': thetaParams,
-        'phiGeneration': 'uniform',
-        'phiParams': phiParams,
-        'vertexGeneration': 'uniform',
-        'xVertexParams': [-0.1, 0.1],
-        'yVertexParams': [-0.1, 0.1],
-        'zVertexParams': [-0.5, 0.5],
-    }
-
     particlegun = register_module('ParticleGun')
+    particlegun.param('pdgCodes', pdgCODES)
+    particlegun.param('nTracks', numTracks)
+    particlegun.param('momentumGeneration', 'uniformPt')
+    particlegun.param('momentumParams', momParams)
+    particlegun.param('thetaGeneration', 'uniform')
+    particlegun.param('thetaParams', thetaParams)
+    particlegun.param('phiGeneration', 'uniform')
+    particlegun.param('phiParams', phiParams)
+    # particlegun.param('momentumGeneration', 'fixed')
+    # particlegun.param('momentumParams', momParams[0])
+    # particlegun.param('thetaGeneration', 'fixed')
+    # particlegun.param('thetaParams', thetaParams[0])
+    # particlegun.param('phiGeneration', 'fixed')
+    # particlegun.param('phiParams', phiParams[0])
+    if smearVertex:
+        particlegun.param('vertexGeneration', 'uniform')
+        particlegun.param('xVertexParams', [-0.1, 0.1])
+        particlegun.param('yVertexParams', [-0.1, 0.1])
+        particlegun.param('zVertexParams', [-0.5, 0.5])
+    else:
+        particlegun.param('vertexGeneration', 'fixed')
+        particlegun.param('xVertexParams', [0.])
+        particlegun.param('yVertexParams', [0.])
+        particlegun.param('zVertexParams', [0.])
     particlegun.logging.log_level = logLevel
     particlegun.logging.debug_level = debugVal
-    particlegun.param(param_pGun)
     if path is 0:
         return particlegun
     else:
@@ -578,7 +588,7 @@ def setup_bg(path=0, bgFilesFolder="", usePXD=False, logLevel=LogLevel.INFO, deb
         return None
 
 
-def setup_sim(path=0, useEDeposit=True):
+def setup_sim(path=0, useEDeposit=True, useMultipleScattering=True, allowDecay=True, verbose=False):
     """This function adds the g4simulation to given path.
 
     @param path if set to 0 (standard) g4sim will not be added, but returned.
@@ -587,71 +597,115 @@ def setup_sim(path=0, useEDeposit=True):
     @param useEDeposit if False, particles will not have eDeposit. WARMING: if you still want to get hits for that case:
     useEDeposit: If you want to work w/o E-deposit, edit pxd/data/PXD.xml and svd/data/SVD.xml,
     where you have to activate see neutrons = true.
+
+    @param useMultipleScattering if False, multiple scattering in matter is deactivated.
+
+    @param allowDecay if False, particles can not decay.
+
+    @param verbose if True, some extra debug output is given.
     """
     print("setup FullSim...")
     g4sim = register_module('FullSim')
     g4sim.param('StoreAllSecondaries', True)
-    if useEDeposit is False:
-        g4sim.param('UICommands', [
-            '/process/list',
-            '/process/inactivate                msc',
-            '/process/inactivate              hIoni',
-            '/process/inactivate            ionIoni',
-            '/process/inactivate              eIoni',
-            '/process/inactivate              eBrem',
-            '/process/inactivate            annihil',
-            '/process/inactivate               phot',
-            '/process/inactivate              compt',
-            '/process/inactivate               conv',
-            '/process/inactivate             hBrems',
-            '/process/inactivate          hPairProd',
-            '/process/inactivate              muMsc',
-            '/process/inactivate             muIoni',
-            '/process/inactivate            muBrems',
-            '/process/inactivate         muPairProd',
-            '/process/inactivate        CoulombScat',
-            '/process/inactivate    PhotonInelastic',
-            '/process/inactivate     ElectroNuclear',
-            '/process/inactivate    PositronNuclear',
-            '/process/inactivate              Decay',
-            '/process/inactivate         hadElastic',
-            '/process/inactivate   NeutronInelastic',
-            '/process/inactivate           nCapture',
-            '/process/inactivate           nFission',
-            '/process/inactivate    ProtonInelastic',
-            '/process/inactivate  PionPlusInelastic',
-            '/process/inactivate PionMinusInelastic',
-            '/process/inactivate  KaonPlusInelastic',
-            '/process/inactivate KaonMinusInelastic',
-            '/process/inactivate KaonZeroLInelastic',
-            '/process/inactivate KaonZeroSInelastic',
-            '/process/inactivate AntiProtonInelastic',
-            '/process/inactivate AntiNeutronInelastic',
-            '/process/inactivate    LambdaInelastic',
-            '/process/inactivate AntiLambdaInelastic',
-            '/process/inactivate SigmaMinusInelastic',
-            '/process/inactivate AntiSigmaMinusInelastic',
-            '/process/inactivate SigmaPlusInelastic',
-            '/process/inactivate AntiSigmaPlusInelastic',
-            '/process/inactivate   XiMinusInelastic',
-            '/process/inactivate AntiXiMinusInelastic',
-            '/process/inactivate    XiZeroInelastic',
-            '/process/inactivate AntiXiZeroInelastic',
-            '/process/inactivate OmegaMinusInelastic',
-            '/process/inactivate AntiOmegaMinusInelastic',
-            '/process/inactivate CHIPSNuclearCaptureAtRest',
-            '/process/inactivate muMinusCaptureAtRest',
-            '/process/inactivate  DeuteronInelastic',
-            '/process/inactivate    TritonInelastic',
-            '/process/inactivate      ExtEnergyLoss',
-            '/process/inactivate       OpAbsorption',
-            '/process/inactivate         OpRayleigh',
-            '/process/inactivate            OpMieHG',
-            '/process/inactivate         OpBoundary',
-            '/process/inactivate              OpWLS',
-            '/process/inactivate           Cerenkov',
-            '/process/inactivate      Scintillation',
-        ])
+    uiCommandList = []
+    if verbose:
+        uiCommandList.append('/process/list')  # prints list of processes available
+    if allowDecay:
+        uiCommandList.append('/process/inactivate              Decay all')
+    if not useEDeposit:
+        uiCommandList.append('/process/inactivate        StepLimiter all')
+        uiCommandList.append('/process/inactivate             muIoni all')
+        uiCommandList.append('/process/inactivate              hIoni all')
+        uiCommandList.append('/process/inactivate            ionIoni all')
+        uiCommandList.append('/process/inactivate              eIoni all')
+        uiCommandList.append('/process/inactivate              eBrem all')
+        uiCommandList.append('/process/inactivate             hBrems all')
+        uiCommandList.append('/process/inactivate            muBrems all')
+        uiCommandList.append('/process/inactivate          hPairProd all')
+        uiCommandList.append('/process/inactivate         muPairProd all')
+        uiCommandList.append('/process/inactivate            annihil all')
+        uiCommandList.append('/process/inactivate               phot all')
+        uiCommandList.append('/process/inactivate              compt all')
+        uiCommandList.append('/process/inactivate               conv all')
+        # uiCommandList.append('/process/inactivate    PhotonInelastic')
+        # uiCommandList.append('/process/inactivate    photonInelastic')
+        uiCommandList.append('/process/inactivate    electronNuclear all')
+        uiCommandList.append('/process/inactivate    positronNuclear all')
+        uiCommandList.append('/process/inactivate        muonNuclear all')
+        uiCommandList.append('/process/inactivate      photonNuclear all')
+        uiCommandList.append('/process/inactivate              Decay all')
+        uiCommandList.append('/process/inactivate         hadElastic all')
+        uiCommandList.append('/process/inactivate   neutronInelastic all')
+        uiCommandList.append('/process/inactivate           nCapture all')
+        uiCommandList.append('/process/inactivate           nFission all')
+        uiCommandList.append('/process/inactivate    protonInelastic all')
+        uiCommandList.append('/process/inactivate    ionInelastic all')
+        uiCommandList.append('/process/inactivate  pi+Inelastic all')
+        uiCommandList.append('/process/inactivate pi-Inelastic all')
+        uiCommandList.append('/process/inactivate  kaon+Inelastic all')
+        uiCommandList.append('/process/inactivate kaon-Inelastic all')
+        uiCommandList.append('/process/inactivate kaon0LInelastic all')
+        uiCommandList.append('/process/inactivate kaon0SInelastic all')
+        uiCommandList.append('/process/inactivate anti_protonInelastic all')
+        uiCommandList.append('/process/inactivate anti_neutronInelastic all')
+        uiCommandList.append('/process/inactivate    lambdaInelastic all')
+        uiCommandList.append('/process/inactivate anti-lambdaInelastic all')
+        uiCommandList.append('/process/inactivate sigma-Inelastic all')
+        uiCommandList.append('/process/inactivate anti_sigma-Inelastic all')
+        uiCommandList.append('/process/inactivate sigma+Inelastic all')
+        uiCommandList.append('/process/inactivate anti_sigma+Inelastic all')
+        uiCommandList.append('/process/inactivate   xi-Inelastic all')
+        uiCommandList.append('/process/inactivate anti_xi-Inelastic all')
+        uiCommandList.append('/process/inactivate    xi0Inelastic all')
+        uiCommandList.append('/process/inactivate anti_xi0Inelastic all')
+        uiCommandList.append('/process/inactivate omega-Inelastic all')
+        uiCommandList.append('/process/inactivate anti_omega-Inelastic all')
+        # uiCommandList.append('/process/inactivate CHIPSNuclearCaptureAtRest')
+        uiCommandList.append('/process/inactivate hFritiofCaptureAtRest all')
+        uiCommandList.append('/process/inactivate hBertiniCaptureAtRest all')
+        uiCommandList.append('/process/inactivate muMinusCaptureAtRest all')
+        uiCommandList.append('/process/inactivate  dInelastic all')
+        uiCommandList.append('/process/inactivate  anti_deuteronInelastic all')
+        uiCommandList.append('/process/inactivate    tInelastic all')
+        uiCommandList.append('/process/inactivate    anti_tritonInelastic all')
+        uiCommandList.append('/process/inactivate    He3Inelastic all')
+        uiCommandList.append('/process/inactivate    anti_He3Inelastic all')
+        uiCommandList.append('/process/inactivate    alphaInelastic all')
+        uiCommandList.append('/process/inactivate    anti_alphaInelastic all')
+        uiCommandList.append('/process/inactivate      ExtEnergyLoss all')
+        uiCommandList.append('/process/inactivate       OpAbsorption all')
+        uiCommandList.append('/process/inactivate         OpRayleigh all')
+        uiCommandList.append('/process/inactivate            OpMieHG all')
+        uiCommandList.append('/process/inactivate         OpBoundary all')
+        uiCommandList.append('/process/inactivate              OpWLS all')
+        uiCommandList.append('/process/inactivate           Cerenkov all')
+        uiCommandList.append('/process/inactivate      Scintillation all')
+
+    if not useMultipleScattering:
+        uiCommandList.append('/process/inactivate                msc all')
+        uiCommandList.append('/process/inactivate        CoulombScat all')
+        # uiCommandList.append('/process/inactivate              muMsc')
+    # uiCommandList.append('/process/list')
+    # if (useMultipleScattering == False or useMultipleScattering == False):
+    if verbose:
+        uiCommandList.append('/particle/select pi+')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select pi-')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select e+')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select e-')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select mu+')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select mu-')
+        uiCommandList.append('/particle/select kaon+')
+        uiCommandList.append('/particle/process/dump')
+        uiCommandList.append('/particle/select kaon-')
+        uiCommandList.append('/particle/process/dump')
+    g4sim.param('UICommands', uiCommandList)
+
+    # print(uiCommandList)
     if (path is 0):
         return g4sim
     else:

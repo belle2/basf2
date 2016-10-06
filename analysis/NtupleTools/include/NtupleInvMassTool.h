@@ -47,7 +47,9 @@ namespace Belle2 {
 
   public:
     /** Constuctor. */
-    NtupleInvMassTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree, decaydescriptor, strOptions) {
+    NtupleInvMassTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
+          decaydescriptor, strOptions)
+    {
       m_useMassBeforeFit = false;
       setupTree();
     }

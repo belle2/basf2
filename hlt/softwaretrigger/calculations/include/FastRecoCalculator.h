@@ -10,6 +10,8 @@
 #pragma once
 
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
+#include <hlt/softwaretrigger/calculations/SoftwareTriggerCalculation.h>
+
 #include <tracking/dataobjects/RecoTrack.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <analysis/utility/PCmsLabTransform.h>
@@ -19,7 +21,7 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     /**
      * Implementation of a calculator used in the SoftwareTriggerModule
-     * to fill a SoftwareTriggerObject for doing HLT cuts.
+     * to fill a SoftwareTriggerObject for doing FastReco cuts.
      *
      * This calculator exports variables needed for the FastReco part
      * of the path, e.g.
@@ -29,16 +31,17 @@ namespace Belle2 {
      * * max_pz
      * * first_highest_cdc_energies
      *
-     * You do not have to create an instance of this class by yourself,
-     * but rather use the SoftwareTriggerCalculation for it.
+     * This class implements the two main functions requireStoreArrays and doCalculation of the
+     * SoftwareTriggerCalculation class.
      */
-    class FastRecoCalculator {
+    class FastRecoCalculator : public SoftwareTriggerCalculation {
     public:
+      /// Set the default names for the store arrays.
+      FastRecoCalculator() : m_cdcRecoTracks("CDCRecoTracks"), m_eclClusters() {}
       /// Require the CDCRecoHits and the ECLClusters. We do not need more here.
-      void requireStoreArrays();
-
+      void requireStoreArrays() override;
       /// Actually write out the variables into the map.
-      void doCalculation(SoftwareTriggerObject& calculationResult) const;
+      void doCalculation(SoftwareTriggerObject& calculationResult) const override;
 
     private:
       /// Internal storage of the cdc reco tracks.

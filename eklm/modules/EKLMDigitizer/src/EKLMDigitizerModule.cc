@@ -66,7 +66,7 @@ void EKLMDigitizerModule::readAndSortSimHits()
   EKLMSimHit* hit;
   StoreArray<EKLMSimHit> simHitsArray;
   int i, strip, maxStrip;
-  maxStrip = m_GeoDat->getMaximalStripNumber();
+  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
   for (i = 0; i < simHitsArray.getEntries(); i++) {
     hit = simHitsArray[i];

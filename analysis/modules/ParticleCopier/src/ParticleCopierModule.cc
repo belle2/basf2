@@ -25,7 +25,6 @@
 #include <analysis/dataobjects/ParticleList.h>
 
 // utilities
-#include <analysis/DecayDescriptor/ParticleListName.h>
 #include <analysis/utility/ParticleCopy.h>
 
 using namespace std;

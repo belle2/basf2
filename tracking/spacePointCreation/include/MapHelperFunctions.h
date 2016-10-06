@@ -17,6 +17,7 @@
 #include <vector>
 #include <utility>
 #include <tuple>
+#include <numeric>
 
 namespace Belle2 {
 

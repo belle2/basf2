@@ -571,7 +571,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      OuterWall(std::string name, int id,
+      OuterWall(const std::string& name, int id,
                 double rmin, double rmax, double zfwd, double zbwd):
         m_name(name), m_id(id), m_rmin(rmin),
         m_rmax(rmax), m_zfwd(zfwd), m_zbwd(zbwd)
@@ -642,7 +642,7 @@ namespace Belle2 {
       /**
        * Constructor.
        */
-      InnerWall(std::string name, int id,
+      InnerWall(const std::string& name, int id,
                 double rmin, double rmax, double zfwd, double zbwd):
         m_name(name), m_id(id), m_rmin(rmin),
         m_rmax(rmax), m_zfwd(zfwd), m_zbwd(zbwd)

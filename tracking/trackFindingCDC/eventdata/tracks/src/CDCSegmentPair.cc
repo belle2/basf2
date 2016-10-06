@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

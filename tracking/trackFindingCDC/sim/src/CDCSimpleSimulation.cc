@@ -32,7 +32,6 @@
 
 #include <algorithm>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -42,11 +41,11 @@ CDCTrack CDCSimpleSimulation::simulate(const CDCTrajectory3D& trajectory3D)
 }
 
 
-vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& trajectories3D)
+std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTrajectory3D>& trajectories3D)
 {
   B2ASSERT("Wire hit topology was not set in the CDCSimpleSimulation", m_wireHitTopology);
 
-  vector<SimpleSimHit> simpleSimHits;
+  std::vector<SimpleSimHit> simpleSimHits;
   const size_t nMCTracks = trajectories3D.size();
 
   for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
@@ -57,7 +56,7 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
 
     Helix globalHelix = localHelix;
     const double arcLength2DOffset = globalHelix.passiveMoveBy(-localOrigin);
-    vector<SimpleSimHit> simpleSimHitsForTrajectory = createHits(globalHelix, arcLength2DOffset);
+    std::vector<SimpleSimHit> simpleSimHitsForTrajectory = createHits(globalHelix, arcLength2DOffset);
 
     for (SimpleSimHit& simpleSimHit : simpleSimHitsForTrajectory) {
       simpleSimHit.m_iMCTrack = iMCTrack;
@@ -65,7 +64,7 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
     }
   }
 
-  vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
+  std::vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
 
   /// Assign mc trajectories to the tracks
   for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
@@ -84,8 +83,8 @@ vector<CDCTrack> CDCSimpleSimulation::simulate(const vector<CDCTrajectory3D>& tr
   return mcTracks;
 }
 
-vector<CDCTrack>
-CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> simpleSimHits) const
+std::vector<CDCTrack> CDCSimpleSimulation::constructMCTracks(size_t nMCTracks,
+    std::vector<SimpleSimHit> simpleSimHits) const
 {
 
   // Sort the hits along side their wire hits
@@ -142,7 +141,7 @@ CDCSimpleSimulation::constructMCTracks(size_t nMCTracks, vector<SimpleSimHit> si
   }
 
   // Now construct the tracks.
-  vector<CDCTrack> mcTracks;
+  std::vector<CDCTrack> mcTracks;
   mcTracks.resize(nMCTracks);
   const VectorRange<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
   const size_t nWireHits = wireHits.size();
@@ -173,7 +172,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
                                 const double arcLength2DOffset) const
 {
 
-  vector<SimpleSimHit> simpleSimHits;
+  std::vector<SimpleSimHit> simpleSimHits;
 
   CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   const double outerWallCylinderR = wireTopology.getOuterCylindricalR();
@@ -211,13 +210,13 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
       continue;
     }
 
-    double centerR = (min(outerR, maxR) + max(innerR, minR)) / 2;
+    double centerR = (std::min(outerR, maxR) + std::max(innerR, minR)) / 2;
 
     double globalArcLength2D = globalHelix.arcLength2DToCylindricalR(centerR);
     double localArcLength2D = arcLength2DOffset + globalArcLength2D;
 
 
-    vector<SimpleSimHit> simpleSimHitsInLayer;
+    std::vector<SimpleSimHit> simpleSimHitsInLayer;
     if (localArcLength2D > 0 and localArcLength2D < maxArcLength2D) {
 
       Vector3D pos3DAtLayer = globalHelix.atArcLength2D(globalArcLength2D);
@@ -388,7 +387,7 @@ std::vector<Belle2::TrackFindingCDC::CDCTrack>
 CDCSimpleSimulation::loadPreparedEvent() const
 {
   const size_t nMCTracks = 2;
-  vector<SimpleSimHit> simpleSimHits;
+  std::vector<SimpleSimHit> simpleSimHits;
   simpleSimHits.reserve(128 + 64); // First plus second mc track
 
   // First MC track
@@ -613,6 +612,6 @@ CDCSimpleSimulation::loadPreparedEvent() const
   simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 253), 0.968), iMCTrack, ERightLeft::c_Left});
   simpleSimHits.push_back(SimpleSimHit{CDCWireHit(WireID(6, 2, 252), 0.332), iMCTrack, ERightLeft::c_Right});
 
-  vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
+  std::vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
   return mcTracks;
 }

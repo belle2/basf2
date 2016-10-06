@@ -17,17 +17,17 @@ whitespace, comma or semi-colon -->
 </bar>
 <Active>
 <Material>PH1SUSTR-Material</Material>
-<x_tpcbeamR unit="cm">51.80000</x_tpcbeamR>
-<y_tpcbeamR unit="cm">0.80000</y_tpcbeamR>
-<z_tpcbeamR unit="cm">40.00000</z_tpcbeamR>
-<x_tpcbeamL unit="cm">-53.20000</x_tpcbeamL>
-<y_tpcbeamL unit="cm">-0.30000</y_tpcbeamL>
-<z_tpcbeamL unit="cm">37.70000</z_tpcbeamL>
-<x_tpcbeamT unit="cm">0.10000</x_tpcbeamT>
-<y_tpcbeamT unit="cm">52.10000</y_tpcbeamT>
-<z_tpcbeamT unit="cm">37.90000</z_tpcbeamT>
-<x_tpcbeamB unit="cm">2.10000</x_tpcbeamB>
-<y_tpcbeamB unit="cm">-50.50000</y_tpcbeamB>
+<x_tpcbeamR unit="cm">46.89100</x_tpcbeamR>
+<y_tpcbeamR unit="cm">0.75200</y_tpcbeamR>
+<z_tpcbeamR unit="cm">35.97700</z_tpcbeamR>
+<x_tpcbeamT unit="cm">2.95700</x_tpcbeamT>
+<y_tpcbeamT unit="cm">52.08900</y_tpcbeamT>
+<z_tpcbeamT unit="cm">37.57700</z_tpcbeamT>
+<x_tpcbeamL unit="cm">-53.70500</x_tpcbeamL>
+<y_tpcbeamL unit="cm">0.34000</y_tpcbeamL>
+<z_tpcbeamL unit="cm">37.57700</z_tpcbeamL>
+<x_tpcbeamB unit="cm">0.95300</x_tpcbeamB>
+<y_tpcbeamB unit="cm">-50.48900</y_tpcbeamB>
 <z_tpcbeamB unit="cm">42.30000</z_tpcbeamB>
 <!--x_offset unit="cm">-20.5</x_offset-->
 <x_offset unit="cm">0</x_offset>
@@ -56,10 +56,14 @@ whitespace, comma or semi-colon -->
 <zBase unit="cm">50,50</zBase>
 <!--110, 111, 140, 139 -->
 <lbgoBeamv unit="cm">92.837</lbgoBeamv>
-<xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv>
+<!--xbgoBeamv unit="cm">19.428999954,-16.971000046,19.428999954,-16.971000046</xbgoBeamv-->
+<!--xbgoBeamv unit="cm">19.428999954,-16.971000046,-16.971000046,19.428999954</xbgoBeamv-->
+<xbgoBeamv unit="cm">19.428999954,-16.971000046,-16.971000046,19.428999954</xbgoBeamv>
 <!-- (69.17375-29.77325)/2. -->
 <ybgoBeamv unit="cm">-19.7002,-19.7002,-19.7002,-19.7002</ybgoBeamv>
-<zbgoBeamv unit="cm">34.94625,34.94625,-20.00875,-20.00875</zbgoBeamv>
+<!--ybgoBeamv unit="cm">-18.553,-22.83,-22.83,-18.553</ybgoBeamv-->
+<!--zbgoBeamv unit="cm">34.94625,34.94625,-20.00875,-20.00875</zbgoBeamv-->
+<zbgoBeamv unit="cm">-20.00875,-20.00875,34.94625,34.94625</zbgoBeamv>
 <!-- 113, 112, 142, 141 -->
 <lbgoBeamh unit="cm">31.8</lbgoBeamh>
 <xbgoBeamh unit="cm">1.229,1.229,1.229,1.229</xbgoBeamh>

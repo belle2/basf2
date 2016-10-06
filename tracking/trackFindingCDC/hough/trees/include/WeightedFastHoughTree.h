@@ -19,6 +19,7 @@
 #include <vector>
 #include <assert.h>
 #include <float.h>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

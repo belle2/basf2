@@ -310,6 +310,9 @@ namespace Belle2 {
      */
     void print() const;
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
+
     /** Return iterator to first entry. */
     iterator begin() { return iterator(this, 0); }
     /** Return iterator to last entry +1. */

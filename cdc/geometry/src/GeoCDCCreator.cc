@@ -1706,9 +1706,8 @@ namespace Belle2 {
           G4LogicalVolume* endplateTube = new G4LogicalVolume(endplateTubeShape, medAluminum, endplateName1.str().c_str(), 0, 0);
           endplateTube->SetVisAttributes(m_VisAttributes.back());
 
-          if (iSLayer != (nSLayer - 1) || (iEPLayer != 2 && iEPLayer != 5))
-            new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (epFZ[iSLayer][iEPLayer] + epBZ[iSLayer][iEPLayer])*CLHEP::cm / 2.0), endplateTube,
-                              endplateName2.str().c_str(), logical_cdc, false, iSLayer);
+          new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (epFZ[iSLayer][iEPLayer] + epBZ[iSLayer][iEPLayer])*CLHEP::cm / 2.0), endplateTube,
+                            endplateName2.str().c_str(), logical_cdc, false, iSLayer);
         } //end of iEPLayer loop
       } //end of iSLayer loop
 

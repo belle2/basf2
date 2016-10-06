@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'rawdata', 'bklm_dataobjects', 'rawdata_dataobjects',
+env['LIBS'] = ['framework', 'bklm_dataobjects', 'rawdata_dataobjects',
                '$ROOT_LIBS', '$GEANT4_LIBS', 'CLHEP']
 
 Return('env')

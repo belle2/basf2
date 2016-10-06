@@ -56,19 +56,9 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     m_timeWalkFromDB.addCallback(this, &CDCGeometryPar::setTW);
   }
 #endif
-#if defined(CDC_XT_FROM_DB)
-  if (m_xtFromDB.isValid()) {
-    m_xtFromDB.addCallback(this, &CDCGeometryPar::setXT);
-  }
-#endif
 #if defined(CDC_XTREL_FROM_DB)
   if (m_xtRelFromDB.isValid()) {
     m_xtRelFromDB.addCallback(this, &CDCGeometryPar::setXtRel);
-  }
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-  if (m_sigmaFromDB.isValid()) {
-    m_sigmaFromDB.addCallback(this, &CDCGeometryPar::setSigma);
   }
 #endif
 #if defined(CDC_SRESOL_FROM_DB)
@@ -197,7 +187,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   //
   GearDir content = GearDir("/Detector/DetectorComponent[@name=\"CDC\"]/Content/");
   GearDir gbxParams(content);
-  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
+  //  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
 
 
   //
@@ -218,8 +208,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     //correction to z-position
     if (m_senseWireZposMode == 0) {
     } else if (m_senseWireZposMode == 1) {
-      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
-      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
+      //      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
+      //      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
       m_zSBackwardLayer[layerId] += m_dzSBackwardLayer[layerId];
       m_zSForwardLayer [layerId] -= m_dzSForwardLayer [layerId];
     } else {
@@ -315,24 +305,16 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   m_XTetc = true;
   if (m_XTetc) {
-#if defined(CDC_XT_FROM_DB)
-    setXT();  //Set xt param. (from DB)
-#else
 #if defined(CDC_XTREL_FROM_DB)
     setXtRel();  //Set xt param. (from DB)
 #else
     readXT(gbxParams);  //Read xt params. (from file)
 #endif
-#endif
 
-#if defined(CDC_SIGMA_FROM_DB)
-    setSigma();  //Set sigma params. (from DB)
-#else
 #if defined(CDC_SRESOL_FROM_DB)
     setSResol();  //Set sigma param. (from DB)
 #else
     readSigma(gbxParams);  //Read sigma params. (from file)
-#endif
 #endif
 
 #if defined(CDC_PROPSPEED_FROM_DB)
@@ -475,7 +457,7 @@ void CDCGeometryPar::read()
   m_senseWireZposMode = gbxParams.getInt("SenseWireZposMode");
   //Set z corrections (from input data)
   B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
-  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
+  //  if (m_senseWireZposMode == 1) readDeltaz(gbxParams);
 
   // Loop over all sense layers
   for (int iSLayer = 0; iSLayer < nSLayer; ++iSLayer) {
@@ -498,8 +480,8 @@ void CDCGeometryPar::read()
       //      B2INFO("bwddz,fwddz=" << m_bwdDz[layerId] <<" "<< m_fwdDz[layerId]);
       //      B2INFO("bwd z,dz=" << m_zSBackwardLayer[layerId] <<" "<< m_dzSBackwardLayer[layerId]);
       //      B2INFO("fwd z,dz=" << m_zSForwardLayer[layerId] <<" "<< m_dzSForwardLayer[layerId]);
-      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
-      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
+      //      m_zSBackwardLayer[layerId] += m_bwdDz[layerId];
+      //      m_zSForwardLayer [layerId] += m_fwdDz[layerId];
       m_zSBackwardLayer[layerId] += m_dzSBackwardLayer[layerId];
       m_zSForwardLayer [layerId] -= m_dzSForwardLayer [layerId];
     } else {
@@ -594,24 +576,16 @@ void CDCGeometryPar::read()
   m_XTetc = gbxParams.getBool("XTetc");
   B2INFO("CDCGeometryPar: Load x-t etc. params. for digitization (=1); not load (=0):" << m_XTetc);
   if (m_XTetc) {
-#if defined(CDC_XT_FROM_DB)
-    setXT();  //Set xt param. (from DB)
-#else
 #if defined(CDC_XTREL_FROM_DB)
     setXtRel();  //Set xt param. (from DB)
 #else
     readXT(gbxParams);  //Read xt params. (from file)
 #endif
-#endif
 
-#if defined(CDC_SIGMA_FROM_DB)
-    setSigma();  //Set sigma params. (from DB)
-#else
 #if defined(CDC_SRESOL_FROM_DB)
     setSResol();  //Set sigma param. (from DB)
 #else
     readSigma(gbxParams);  //Read sigma params. (from file)
-#endif
 #endif
 
 #if defined(CDC_PROPSPEED_FROM_DB)
@@ -1191,7 +1165,7 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
   if (m_sigmaParamMode < 0 || m_sigmaParamMode > 1) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
   if (m_sigmaParamMode == 1) B2FATAL("CDCGeometryPar: sigma-parameterization mode=1 not ready yet");
 
-  if (np <= 0 || np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
+  if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
   const double epsi = 0.1;
 
@@ -1342,6 +1316,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   ifs.close();
 }
 
+/*
 // Read deltaz params.
 void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 {
@@ -1373,6 +1348,7 @@ void CDCGeometryPar::readDeltaz(const GearDir gbxParams)
 
   ifs.close();
 }
+*/
 
 
 // Read t0 params.
@@ -1587,32 +1563,6 @@ void CDCGeometryPar::setTW()
 #endif
 
 
-#if defined(CDC_XT_FROM_DB)
-// Set xt params. (from DB)
-void CDCGeometryPar::setXT()
-{
-  for (unsigned short i = 0; i < m_nAlphaPoints; ++i) {
-    m_alphaPoints[i] = m_xtFromDB->getAlphaPoint(i);
-  }
-
-  for (unsigned short i = 0; i < m_nThetaPoints; ++i) {
-    m_thetaPoints[i] = m_xtFromDB->getThetaPoint(i);
-  }
-
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short LR = 0; LR < 2; ++LR) {
-      for (unsigned short iA = 0; iA < m_nAlphaPoints; ++iA) {
-        for (unsigned short iT = 0; iT < m_nThetaPoints; ++iT) {
-          for (unsigned short i = 0; i < nXTParams; ++i) {
-            m_XT[iCL][LR][iA][iT][i] = m_xtFromDB->getXTParam(iCL, LR, iA, iT, i);
-          }
-        }
-      }
-    }
-  }
-}
-#endif
-
 #if defined(CDC_XTREL_FROM_DB)
 // Set xt params. (from DB)
 void CDCGeometryPar::setXtRel()
@@ -1654,29 +1604,6 @@ void CDCGeometryPar::setXtRel()
     }
   }
 
-}
-#endif
-
-
-#if defined(CDC_SIGMA_FROM_DB)
-// Set sigma params. (from DB)
-void CDCGeometryPar::setSigma()
-{
-  /*
-  for (unsigned short i = 0; i < m_nAlphaPoints; ++i) {
-    m_alphaPoints[i] = m_xtFromDB->getAlphaPoint(i);
-  }
-
-  for (unsigned short i = 0; i < m_nThetaPoints; ++i) {
-    m_thetaPoints[i] = m_xtFromDB->getThetaPoint(i);
-  }
-  */
-
-  for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
-    for (unsigned short i = 0; i < nSigmaParams; ++i) {
-      m_Sigma[iCL][i] = m_sigmaFromDB->getSigmaParam(iCL, i);
-    }
-  }
 }
 #endif
 

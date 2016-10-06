@@ -16,29 +16,29 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 
-#include "tracking/trackFindingVXD/threeHitFilters/Angle3DSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/AngleXYSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/AngleRZSimple.h"
-#include "tracking/trackFindingVXD/threeHitFilters/CircleDist2IP.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeRZ.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSlopeZoverS.h"
-#include "tracking/trackFindingVXD/threeHitFilters/DeltaSoverZ.h"
-#include "tracking/trackFindingVXD/threeHitFilters/HelixParameterFit.h"
-#include "tracking/trackFindingVXD/threeHitFilters/Pt.h"
-#include "tracking/trackFindingVXD/threeHitFilters/CircleRadius.h"
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Pt.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleRadius.h>
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
 #include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
-#include "tracking/trackFindingVXD/filterTools/Observer.h" // empty observer
-#include "tracking/trackFindingVXD/filterTools/VoidObserver.h" // empty observer
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h> // empty observer
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/VoidObserver.h> // empty observer
 #include "tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h"
 
 #include "tracking/trackFindingVXD/filterTools/Observer3HitPrintResults.h"
@@ -46,7 +46,7 @@
 #include <tracking/dataobjects/SectorMapConfig.h>
 
 #include "vxd/dataobjects/VxdID.h"
-#include "tracking/trackFindingVXD/sectorMapTools/CompactSecIDs.h"
+#include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
 
 //#include <unordered_map>
@@ -121,9 +121,9 @@ namespace Belle2 {
     }
 
 
-    int addSectorsOnSensor(const vector<double>&              normalizedUsup,
-                           const vector<double>&              normalizedVsup,
-                           const vector< vector<FullSecID> >& sectorIds)
+    int addSectorsOnSensor(const std::vector<double>&              normalizedUsup,
+                           const std::vector<double>&              normalizedVsup,
+                           const std::vector< std::vector<FullSecID> >& sectorIds)
     {
 
       auto addedSectors = m_compactSecIDsMap.addSectors(normalizedUsup,
@@ -363,7 +363,7 @@ namespace Belle2 {
     /** This vector contains all the static sectors on a sector map.
      *  The index is the compact ID provided by the CompactSecIDs
      */
-    vector< staticSector_t* > m_staticSectors;
+    std::vector< staticSector_t* > m_staticSectors;
 
     /** Configuration: i.e. name of the sector map, tuning
     parameters, etc.  */

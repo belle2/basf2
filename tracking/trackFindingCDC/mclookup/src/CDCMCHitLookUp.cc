@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

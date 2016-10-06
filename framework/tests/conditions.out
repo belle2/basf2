@@ -57,7 +57,16 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [ERROR] Failed to get dbstore/BeamParameters from conditions database.
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [RESULT] Starting event processing, random seed is set to 'something important'
-MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=6&runName=0 HTTP/1.1" 404 -
+MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=6&runName=0 HTTP/1.1" 200 -
+[WARNING] Found duplicate payload key dbstoreBeamParameters while parsing conditions payloads. Discarding revision 1 and using revision 2
+[WARNING] Found duplicate payload key dbstoreBeamParameters while parsing conditions payloads. Discarding revision 2 and using revision 3
+[INFO] Conditions service retrieved 1 payloads for experiment 6 and run 0 listed under global tag localtest
+MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 404 -
+[WARNING] Could not download payload for dbstore/BeamParameters from database: The requested URL returned error: 404 Not Found
+[ERROR] Failed to get dbstore/BeamParameters from conditions database.
+[FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
+[RESULT] Starting event processing, random seed is set to 'something important'
+MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=7&runName=0 HTTP/1.1" 404 -
 [WARNING] Could not get list of payloads from database: The requested URL returned error: 404 Not Found
 [WARNING] Access to central database is disabled
 [WARNING] No payload dbstore/BeamParameters found in the conditions database for global tag localtest.

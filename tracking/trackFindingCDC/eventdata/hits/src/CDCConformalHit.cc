@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace CDC;
 using namespace TrackFindingCDC;

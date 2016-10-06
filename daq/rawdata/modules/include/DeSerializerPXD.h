@@ -17,7 +17,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -71,9 +70,6 @@ namespace Belle2 {
 
     //! Receiver Sockets
     std::vector<EvtSocketSend*> m_recvs;
-
-    //! Message handler
-    MsgHandler* m_msghandler;
 
     //! Compression Level
     int m_compressionLevel;

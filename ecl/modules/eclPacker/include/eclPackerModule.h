@@ -59,7 +59,7 @@ namespace Belle2 {
       int    m_EvtNum;
 
       /** pointer to data  */
-      int* m_bufPtr;
+      unsigned int* m_bufPtr;
       /** position in the  data array */
       int m_bufPos;
       /** length data  */
@@ -102,7 +102,7 @@ namespace Belle2 {
 
 
 
-      int  readNBits(unsigned int* buff, unsigned int bitsToRead);
+//      unsigned int readNBits(unsigned int* buff, unsigned int bitsToRead);
       void writeNBits(unsigned int* buff, unsigned int value, unsigned int bitsToWrite);
       void resetBuffPosition();
       void setBuffLength(int bufLength);

@@ -4,7 +4,6 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

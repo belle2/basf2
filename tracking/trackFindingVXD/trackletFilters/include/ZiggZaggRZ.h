@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingVXD/filterTools/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <boost/math/special_functions/sign.hpp>

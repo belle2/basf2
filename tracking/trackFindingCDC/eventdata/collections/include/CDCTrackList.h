@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <list>
 
-using namespace std;
 
 namespace Belle2 {
 

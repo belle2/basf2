@@ -33,7 +33,6 @@ Root2BinaryModule::~Root2BinaryModule()
 void Root2BinaryModule::initialize()
 {
   B2INFO("Root2Binary: initialize() started.");
-  m_msghandler = new MsgHandler(m_compressionLevel);
 
   m_fp_out = fopen(m_fname_out.c_str(), "w");
   if (!m_fp_out) {

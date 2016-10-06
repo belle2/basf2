@@ -32,7 +32,7 @@ namespace Belle2 {
     void setupTree();
   public:
     /** Constructor. */
-    NtupleMCGenCMSKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+    NtupleMCGenCMSKinematicsTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions) {setupTree();}
     /** Set branch variables to properties of the provided Particle. */
     void eval(const Particle* p);

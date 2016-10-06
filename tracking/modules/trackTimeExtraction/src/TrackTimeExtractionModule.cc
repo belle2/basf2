@@ -32,6 +32,7 @@
 
 #include <algorithm>
 #include <cstdlib>
+#include <numeric>
 
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>

@@ -19,8 +19,10 @@
     <TimeStep>0.8</TimeStep>
     <MinTime>0.0</MinTime>
     <MaxTime>600.0</MaxTime>
+    <PEthres>1.0</PEthres>
     <Ethres>0.05</Ethres>
-    <ConvFac>1.0</ConvFac>
+    <C_keV_to_MIP>805.5</C_keV_to_MIP>
+    <C_MIP_to_PE>15</C_MIP_to_PE>
     <!--
     <Active>
       <Material>CLAW-Material</Material>

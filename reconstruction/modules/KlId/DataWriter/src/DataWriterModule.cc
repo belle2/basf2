@@ -134,7 +134,6 @@ void DataWriterModule::event()
   StoreArray<KLMCluster> klmClusters;
   StoreArray<RecoTrack> genfitTracks;
   StoreArray<ECLCluster> eclClusters;
-  klmClusters.requireRelationTo(mcParticles);
 
 // ------------------ KLM CLUSTERS
 

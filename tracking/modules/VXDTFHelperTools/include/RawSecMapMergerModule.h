@@ -13,11 +13,11 @@
 
 #include <framework/core/Module.h>
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/dataobjects/SectorMapConfig.h>
 #include <tracking/trackFindingVXD/sectorMapTools/MinMaxCollector.h>
-#include <tracking/trackFindingVXD/sectorMapTools/SectorMap.h>
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include <framework/datastore/StoreObjPtr.h>
 
 

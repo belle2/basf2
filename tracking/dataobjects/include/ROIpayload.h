@@ -15,7 +15,6 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <boost/spirit/home/support/detail/endian.hpp>
-using namespace boost::spirit::endian;
 
 namespace Belle2 {
 
@@ -24,8 +23,9 @@ namespace Belle2 {
    */
 
   class ROIpayload : public TObject {
-
   public:
+    typedef boost::spirit::endian::ubig32_t ubig32_t;
+
     /** Default constructor.
      */
     ROIpayload(int rois = 0);

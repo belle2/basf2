@@ -42,7 +42,7 @@ TVector3 C2TDistanceUtility::clipECLClusterPosition(TVector3 v1)
   return v1;
 }
 
-TVector3 C2TDistanceUtility::getECLTrackHitPosition(Helix helix, TVector3 v1)
+TVector3 C2TDistanceUtility::getECLTrackHitPosition(const Helix& helix, const TVector3& v1)
 {
   double cylRadiusECLInCM = 125.80;
   TVector3 badVector(1, 1, 1);

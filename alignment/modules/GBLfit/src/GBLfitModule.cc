@@ -34,6 +34,8 @@
 #include <alignment/reconstruction/AlignableSVDRecoHit2D.h>
 #include <alignment/reconstruction/AlignablePXDRecoHit.h>
 #include <alignment/reconstruction/AlignableSVDRecoHit.h>
+#include <alignment/reconstruction/AlignableEKLMRecoHit.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 
 #include <bklm/dataobjects/BKLMHit2d.h>
 #include <alignment/reconstruction/BKLMRecoHit.h>
@@ -127,6 +129,7 @@ GBLfitModule::GBLfitModule() :
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));
   addParam("TelHitsColName", m_telHitsColName, "TelHits collection", string(""));
   addParam("BKLMHitsColName", m_bklmHitsColName, "BKLMHits2d collection", string(""));
+  addParam("EKLMHitsColName", m_eklmHitsColName, "EKLMHits2d collection", string(""));
 
   addParam("MCParticlesColName", m_mcParticlesColName,
            "Name of collection holding the MCParticles (need to create relations between found tracks and MCParticles)", string(""));
@@ -231,6 +234,11 @@ void GBLfitModule::initialize()
   StoreArray < genfit::Track > gf2tracks;
   StoreArray < genfit::TrackCand > trackcands(m_gfTrackCandsColName);
   StoreArray<MCParticle> mcparticles;
+  StoreArray<EKLMHit2d> eklmHit2ds;
+  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
+
+  eklmAlignmentHits.registerInDataStore();
+  eklmAlignmentHits.registerRelationTo(eklmHit2ds);
 
   trackcands.isRequired();
 
@@ -314,6 +322,11 @@ void GBLfitModule::event()
   if (bklmHits.getEntries() == 0)
     B2DEBUG(100, "GBLfit: BKLMHits2d Collection is empty!");
 
+  StoreArray< EKLMHit2d > eklmHits(m_eklmHitsColName);
+  B2DEBUG(149, "GBLfit: Number of BKLMHits2d: " << eklmHits.getEntries());
+  if (eklmHits.getEntries() == 0)
+    B2DEBUG(100, "GBLfit: EKLMHits2d Collection is empty!");
+
   StoreArray < CDCHit > cdcHits(m_cdcHitsColName);
   B2DEBUG(149, "GBLfit: Number of CDCHits: " << cdcHits.getEntries());
   if (cdcHits.getEntries() == 0)
@@ -379,7 +392,14 @@ void GBLfitModule::event()
   //Create a relation between the gftracks and their most probable 'mother' MC particle
   RelationArray gfTracksToMCPart(gfTracks, mcParticles);
 
-
+  // Fill array of EKLMAlignmentHit (1 hit for each EKLMHit2d and plane)
+  StoreArray<EKLMAlignmentHit> eklmAlignmentHits;
+  for (int i = 0; i < eklmHits.getEntries(); i++) {
+    for (int j = 0; j < 2; j++) {
+      EKLMAlignmentHit* alignmentHit = eklmAlignmentHits.appendNew(j);
+      alignmentHit->addRelationTo(eklmHits[i]);
+    }
+  }
 
   //counter for fitted tracks, the number of fitted tracks may differ from the number of trackCandidates if the fit fails for some of them
   int trackCounter = -1;
@@ -526,7 +546,12 @@ void GBLfitModule::event()
       if (bklmHits.getEntries()) {
         genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit>* BKLMProducer =  NULL;
         BKLMProducer =  new genfit::MeasurementProducer <BKLMHit2d, BKLMRecoHit> (bklmHits.getPtr());
-        factory.addProducer(Const::KLM, BKLMProducer);
+        factory.addProducer(Const::BKLM, BKLMProducer);
+      }
+      if (eklmAlignmentHits.getEntries()) {
+        genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>* eklmProducer = NULL;
+        eklmProducer = new genfit::MeasurementProducer<EKLMAlignmentHit, AlignableEKLMRecoHit>(eklmAlignmentHits.getPtr());
+        factory.addProducer(Const::EKLM, eklmProducer);
       }
 
       // The track fit needs an initial guess for the resolution.  The
@@ -556,6 +581,7 @@ void GBLfitModule::event()
       int nPXD = 0;
       int nTel = 0;
       int nBKLM = 0;
+      int nEKLM = 0;
 
       for (unsigned int hit = 0; hit < aTrackCandPointer->getNHits(); hit++) {
         int detId = 0;
@@ -569,15 +595,18 @@ void GBLfitModule::event()
           nSVD++;
         } else if (detId == Const::CDC) {
           nCDC++;
-        } else if (detId == Const::KLM) {
+        } else if (detId == Const::BKLM) {
           nBKLM++;
+        } else if (detId == Const::EKLM) {
+          nEKLM++;
         } else {
           B2WARNING("Hit from unknown detectorID has contributed to this track! The unknown id is: " << detId);
         }
       }
 
-      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD << ", PXD: " << nPXD << ", Tel: " << nTel << ", BKLM: " << nBKLM <<
-              ")");
+      B2DEBUG(99, "            (CDC: " << nCDC << ", SVD: " << nSVD <<
+              ", PXD: " << nPXD << ", Tel: " << nTel << ", BKLM: " << nBKLM <<
+              ", EKLM: " << nEKLM << ")");
 
       if (aTrackCandPointer->getNHits() <
           3) { // this should not be nessesary because track finder should only produce track candidates with enough hits to calculate a momentum
@@ -681,7 +710,11 @@ void GBLfitModule::event()
 
       if (m_seedFromDAF) {
         try {
-          genfit::AbsFitter* dafFitter = new genfit::DAF();
+          genfit::AbsFitter* dafFitter = new genfit::DAF(true,
+                                                         /// This is the difference on pvalue between two fit iterations of the DAF procedure which
+                                                         /// is used as a early termination criteria of the DAF procedure. This is large on purpose
+                                                         /// See https://agira.desy.de/browse/BII-1725 for details
+                                                         1.0f);
           dafFitter->processTrack(&gfTrack);
           genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
           TVector3 poca(0., 0., 0.); //point of closest approach

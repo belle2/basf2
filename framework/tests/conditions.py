@@ -37,6 +37,7 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         <currentPayloadIovs><currentPayloadIov>
         <payload payloadId="1">
             <checksum>{checksum}</checksum>
+            <revision>{revision}</revision>
             <payloadUrl>dbstore_BeamParameters_rev_{revision}.root</payloadUrl>
             <basf2Module><name>BeamParameters</name><basf2Package><name>dbstore</name></basf2Package></basf2Module>
         </payload><payloadIov>
@@ -59,6 +60,10 @@ class SimpleConditionsDB(BaseHTTPRequestHandler):
         "4": example_payload.format(checksum="[wrong checksum]", revision="1"),
         # non existing payload file
         "5": example_payload.format(checksum="missing", revision="2"),
+        # duplicate payload, or in this case triple
+        "6": example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="2")[:-21] +
+             example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="1")[20:-21] +
+             example_payload.format(checksum="2447fbcf76419fbbc7c6d015ef507769", revision="3")[20:],
     }
 
     def reply(self, xml):
@@ -170,7 +175,7 @@ main.add_module("PrintBeamParameters")
 
 # run trough a set of experiments, each time we want to process two runs to make
 # sure that it works correctly for more than one run
-for exp in range(7):
+for exp in range(len(SimpleConditionsDB.payloads) + 1):
     evtinfo.param({"expList": [exp, exp], "runList": [0, 1], "evtNumList": [1, 1]})
     dbprocess(host, main)
 

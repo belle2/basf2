@@ -10,9 +10,7 @@
 #pragma link C++ class Belle2::CDCBadWires+;
 #pragma link C++ class Belle2::CDCPropSpeeds+;
 #pragma link C++ class Belle2::CDCTimeWalks+;
-#pragma link C++ class Belle2::CDCXTs+;
 #pragma link C++ class Belle2::CDCXtRelations+;
-#pragma link C++ class Belle2::CDCSigmas+;
 #pragma link C++ class Belle2::CDCSpaceResols+;
 #pragma link C++ class Belle2::CDCGeometry+;
 #pragma link C++ class Belle2::CDCGeometry::Rib+;

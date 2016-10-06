@@ -13,7 +13,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace std;
 
 
 void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track)

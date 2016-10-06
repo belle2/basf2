@@ -21,11 +21,6 @@
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-// utilities
-#include <analysis/DecayDescriptor/ParticleListName.h>
-#include <utility>
-
-
 using namespace std;
 using namespace Belle2;
 

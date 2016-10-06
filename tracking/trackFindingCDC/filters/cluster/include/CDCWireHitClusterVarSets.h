@@ -7,6 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
 #include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBasicVarSet.h>

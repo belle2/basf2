@@ -17,6 +17,7 @@
 #include <numpy/arrayobject.h>
 
 #include <framework/logging/Logger.h>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {

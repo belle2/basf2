@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/TruthFacetRelationVarSet.h>
 #include <assert.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

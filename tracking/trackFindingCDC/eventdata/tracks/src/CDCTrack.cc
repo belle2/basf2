@@ -19,7 +19,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackCand.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace genfit;
@@ -324,7 +323,7 @@ bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 
 
 
-vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
+std::vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
 {
   vector<CDCRecoSegment3D> result;
   ISuperLayer lastISuperLayer = -1;

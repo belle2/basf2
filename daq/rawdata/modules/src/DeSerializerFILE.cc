@@ -62,8 +62,6 @@ void DeSerializerFILEModule::initialize()
 {
   B2INFO("DeSerializerFILE: initialize() started.");
   fileOpen();
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();

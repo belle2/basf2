@@ -37,7 +37,7 @@ namespace Belle2 {
        * @param methodName name of the method which is used by this expert
        * @param signalClass Class which is considered as signal
        */
-      Expert(ExpertConfig config, bool transformToProbability);
+      Expert(const ExpertConfig& config, bool transformToProbability);
 
       /**
        * Analyse a Particle with the given method and calculates signal probability

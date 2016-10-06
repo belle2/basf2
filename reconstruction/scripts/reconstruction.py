@@ -12,7 +12,7 @@ from tracking import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all"):
+def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
@@ -31,6 +31,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
 
         The trigger_mode does just steer, which modules in the standard reconstruction are added to the path. It does
         not make any trigger decisions itself.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
     """
 
     # tracking
@@ -38,7 +42,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 components=components,
                                 pruneTracks=False,
                                 mcTrackFinding=False,
-                                trigger_mode=trigger_mode)
+                                trigger_mode=trigger_mode,
+                                skipGeometryAdding=skipGeometryAdding)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,

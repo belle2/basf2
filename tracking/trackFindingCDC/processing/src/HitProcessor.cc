@@ -20,8 +20,8 @@
 #include <tracking/trackFindingCDC/processing/TrackProcessor.h>
 
 #include <TMath.h>
+#include <numeric>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

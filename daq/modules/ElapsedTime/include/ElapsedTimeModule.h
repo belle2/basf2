@@ -10,9 +10,6 @@
 #define ELAPSEDTIMEMODULE_H
 
 #include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/pcore/RingBuffer.h>
 
 #include <boost/shared_ptr.hpp>
 #include <string>

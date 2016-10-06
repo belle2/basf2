@@ -32,7 +32,7 @@ using namespace std;
 
 REG_MODULE(KLMExpert);
 
-KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(20, 0)
+KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(12, 0)
 {
   setDescription("Use to calculate KlId for each KLMCluster.");
   setPropertyFlags(c_ParallelProcessingCertified);

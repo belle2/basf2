@@ -4,7 +4,7 @@
 from basf2 import *
 
 
-def add_tracking_reconstruction(path, components=None, pruneTracks=False,
+def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
                                 mcTrackFinding=False, trigger_mode="all"):
     """
     This function adds the standard reconstruction modules for tracking
@@ -13,6 +13,10 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False,
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
     :param pruneTracks: Delete all hits except the first and the last in the found tracks.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
     :param mcTrackFinding: Use the MC track finders instead of the realistic ones.
     :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     """
@@ -20,8 +24,14 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False,
     if not is_svd_used(components) and not is_cdc_used(components):
         return
 
-    # Always add the geometry in all trigger modes.
-    add_geometry_modules(path, components)
+    if not skipGeometryAdding:
+        # Add the geometry in all trigger modes if not already in the path
+        add_geometry_modules(path, components)
+
+    # Material effects for all track extrapolations
+    if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
+        material_effects = register_module('SetupGenfitExtrapolation')
+        path.add_module(material_effects)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
@@ -48,11 +58,6 @@ def add_geometry_modules(path, components=None):
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
-
-    # Material effects for all track extrapolations
-    if 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
-        path.add_module(material_effects)
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
@@ -136,6 +141,7 @@ def add_track_finding(path, components=None, trigger_mode="all"):
 
     :param path: The path to add the tracking reconstruction modules to
     :param components: the list of geometry components in use or None for all components.
+    :param trigger_mode: For a description of the available trigger modes see add_reconstruction.
     """
     if not is_svd_used(components) and not is_cdc_used(components):
         return
@@ -146,24 +152,21 @@ def add_track_finding(path, components=None, trigger_mode="all"):
     # if only CDC or VXD are used, the track finding result
     # will be directly written to the final RecoTracks array
     # because no merging is required
-    cdc_reco_tracks = "RecoTracks"
-    vxd_reco_tracks = "RecoTracks"
+
+    if use_cdc and use_svd:
+        cdc_reco_tracks = "CDCRecoTracks"
+        vxd_reco_tracks = "VXDRecoTracks"
+    else:
+        cdc_reco_tracks = "RecoTracks"
+        vxd_reco_tracks = "RecoTracks"
 
     # CDC track finder
     if trigger_mode in ["fast_reco", "all"]:
-        if use_cdc:
-            if use_svd:
-                cdc_reco_tracks = "CDCRecoTracks"
-
             add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
     if trigger_mode in ["hlt", "all"]:
-        if use_svd:
-            if use_cdc:
-                vxd_reco_tracks = "VXDRecoTracks"
-
-            add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
+        add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
         # track merging
         if use_svd and use_cdc:

@@ -27,13 +27,10 @@ namespace Belle2 {
     SampleTimeCalibrationV6Module();
     ~SampleTimeCalibrationV6Module();
 
-//
     void initialize();
     void beginRun();
     void event();
     void terminate();
-
-
 
   private:
 
@@ -44,7 +41,6 @@ namespace Belle2 {
     void getSampleNumbersAndFractions(Belle2::hit_info* this_hit_info, int& sample1, int& sample2, double& fraction1,
                                       double& fraction2);
     void makeClosurePlots(topcaf_channel_id_t ch_id, std::vector<hit_info>& hitInfoVector);
-
 
     //var
     std::string m_out_filename, m_in_filename;
@@ -64,7 +60,6 @@ namespace Belle2 {
     int m_nIterations;
     int m_nMinimiserBins;
     float m_dTval[257];
-
 
     std::string m_payload_tag, m_experiment, m_run;
     std::string m_initial_run, m_final_run;
@@ -100,9 +95,9 @@ namespace Belle2 {
 
     int m_channel_samples;  // Can we get this from the data somehow?
     double m_time2tdc;
+
   };
-
   //  typedef std::vector<TOPCAFDigit*> TOPDigits;
-
 }
 #endif
+

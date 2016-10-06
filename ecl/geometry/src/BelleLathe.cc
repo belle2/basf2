@@ -18,7 +18,7 @@
 using namespace CLHEP;
 using namespace std;
 
-#define COMPARE 0
+#define COMPARE 1
 #define PERFCOUNTER 0
 #if PERFCOUNTER==1
 typedef int counter_t[6];
@@ -239,7 +239,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 #else
   fshape = NULL;
 #endif
-  //  StreamInfo(G4cout);
+  StreamInfo(G4cout);
 }
 
 // Nominal constructor for BelleLathe whose parameters are to be set by
@@ -1109,7 +1109,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p) const
       }
     }
   }
-#if COMPARE==4
+#if COMPARE==1
   double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p);
   if (abs(d - dd) > kCarTolerance) {
     int oldprec = cout.precision(16);
@@ -1157,6 +1157,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p) const
 // Calculate distance to shape from outside - return kInfinity if no intersection
 G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n) const
 {
+  //  return fshape->DistanceToIn(p, n);
   auto getnormal = [this, &p, &n](int i, double t) ->G4ThreeVector{
     const int imax = fcache.size();
     G4ThreeVector o;
@@ -1236,7 +1237,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 
   double tmin = kInfinity;
   const int imax = fcache.size();
-  int iseg = -1;
+  int iseg = -1, isurface = -1;
   const double delta = 0.5 * kCarTolerance;
   double inz = 1 / n.z();
   double nn = dotxy(n, n), np = dotxy(n, p), pp = dotxy(p, p);
@@ -1246,6 +1247,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 
     double d = (pz - s.z) * s.dr - (pr - s.r) * s.dz;
     bool surface = abs(d * s.is) < delta;
+    if (surface) isurface = i;
     if (s.dz == 0.0) { // z-plane
       if (!surface) {
         double t = (s.z - p.z()) * inz;
@@ -1291,37 +1293,62 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 
   if (!ftwopi) {
     do { // side at phi0
-      double d = fn0x * p.x() + fn0y * p.y();
-      bool surface = std::abs(d) < delta;
-      if (!surface) {
-        double vn = fn0x * n.x() + fn0y * n.y();
+      double vn = fn0x * n.x() + fn0y * n.y();
+      if (vn < 0) {
+        double d = fn0x * p.x() + fn0y * p.y();
         double t = -d / vn;
-        if (0 < t && t < tmin && hitphi0side(t)) {tmin = t; iseg = imax + 0;}
+        if (hitphi0side(t)) {
+          bool surface = std::abs(d) < delta;
+          if (surface) {
+            tmin = 0; iseg = imax + 0;
+          } else {
+            if (0 < t && t < tmin) {tmin = t; iseg = imax + 0;}
+
+          }
+        }
       }
     } while (0);
 
     do { // side at phi0+dphi
-      double d = fn1x * p.x() + fn1y * p.y();
-      bool surface = std::abs(d) < delta;
-      if (!surface) {
-        double vn = fn1x * n.x() + fn1y * n.y();
+      double vn = fn1x * n.x() + fn1y * n.y();
+      if (vn < 0) {
+        double d = fn1x * p.x() + fn1y * p.y();
         double t = -d / vn;
-        if (0 < t && t < tmin && hitphi1side(t)) {tmin = t; iseg = imax + 1;}
+        if (hitphi1side(t)) {
+          bool surface = std::abs(d) < delta;
+          if (surface) {
+            tmin = 0; iseg = imax + 1;
+          } else {
+            if (0 < t && t < tmin) { tmin = t; iseg = imax + 1;}
+          }
+        }
       }
     } while (0);
   }
 
   if (iseg >= 0) {
     if (getnormal(iseg, tmin)*n > 0) tmin = 0;
+    //    if (getnormal(iseg, tmin)*n > 0) tmin = kInfinity; // mimic genericpolycone
+  }
+
+  if (tmin >= 0 && tmin < kInfinity) {
+  } else {
+    if (Inside(p) == kSurface) {
+      if (isurface >= 0) {
+        tmin = (getnormal(isurface, 0) * n > 0) ? kInfinity : 0; // mimic genericpolycone
+      }
+    }
   }
 
 #if COMPARE==1
-  double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p, n);
+  //  double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p, n);
+  double dd = fshape->DistanceToIn(p, n);
   if (abs(tmin - dd) > 1e-10) {
     int oldprec = cout.precision(16);
     EInside inside = fshape->Inside(p);
     cout << GetName() << " DistanceToIn(p,v) " << p << " " << n << " " << tmin << " " << dd << " " << tmin - dd << " " << inside << " "
-         << Inside(p) << endl;
+         << Inside(p) << " iseg = " << iseg << " " << isurface << endl;
+    if (isurface >= 0) cout << getnormal(isurface, 0) << endl;
     cout.precision(oldprec);
   }
 #endif
@@ -1333,6 +1360,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
 G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& n,
                                    const G4bool calcNorm, G4bool* IsValid, G4ThreeVector* _n) const
 {
+  //  return fshape->DistanceToOut(p, n, calcNorm, IsValid, _n);
   auto getnormal = [this, &p, &n](int i, double t)->G4ThreeVector{
     const int imax = fcache.size();
     G4ThreeVector o;

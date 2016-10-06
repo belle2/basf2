@@ -18,7 +18,7 @@
 using namespace CLHEP;
 using namespace std;
 
-#define COMPARE 1
+#define COMPARE 0
 #define PERFCOUNTER 0
 #if PERFCOUNTER==1
 typedef int counter_t[6];
@@ -239,7 +239,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 #else
   fshape = NULL;
 #endif
-  StreamInfo(G4cout);
+  //  StreamInfo(G4cout);
 }
 
 // Nominal constructor for BelleLathe whose parameters are to be set by

@@ -74,12 +74,12 @@ categories = [
     'KinLepton',
     'IntermediateKinLepton',
     'Kaon',
+    'KaonPion',
     'SlowPion',
-    'FastPion',
-    'Lambda',
     'FSC',
     'MaximumPstar',
-    'KaonPion']
+    'FastPion',
+    'Lambda']
 
 
 methods = []
@@ -262,6 +262,8 @@ for method in methods:
     entries = array('f', [0] * r_size)
     entriesB0 = array('f', [0] * r_size)
     entriesB0bar = array('f', [0] * r_size)
+    iEffEfficiency = array('f', [0] * r_size)
+    iDeltaEffEfficiency = array('f', [0] * r_size)
     # intervallEff = array('f', [0] * r_size)
 
     print('*                 -->  DETERMINATION BASED ON MONTE CARLO                                          *')
@@ -269,6 +271,7 @@ for method in methods:
     print('* ------------------------------------------------------------------------------------------------ *')
     print('*   r-interval        <r>        Efficiency       Delta_Efficiency        w         Delta_w        *')
     print('* ------------------------------------------------------------------------------------------------ *')
+    performance = []
     for i in range(1, r_size):
         # get the average r-value
         rvalueB0[i] = histo_avr_rB0.GetBinContent(i)
@@ -287,6 +290,10 @@ for method in methods:
         event_fractionDiff[i] = (entriesB0[i] - entriesB0bar[i]) / total_entries
         event_fractionB0[i] = entriesB0[i] / total_entries_B0
         event_fractionB0bar[i] = entriesB0bar[i] / total_entries_B0bar
+        iEffEfficiency[i] = (event_fractionB0[i] * rvalueB0[i] * rvalueB0[i] +
+                             event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]) / 2
+        iDeltaEffEfficiency[i] = event_fractionB0[i] * rvalueB0[i] * \
+            rvalueB0[i] - event_fractionB0bar[i] * rvalueB0bar[i] * rvalueB0bar[i]
         # intervallEff[i] = event_fractionTotal[i] * rvalueB0Average[i] * rvalueB0Average[i]
         print('* ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '      ' +
               '{:.3f}'.format(rvalueB0Average[i]) + '          ' +
@@ -442,6 +449,25 @@ for method in methods:
     Canvas1.Destructor()
     Canvas2.Destructor()
 
+    print('\\begin{tabular}{| l | r  r | r  r | r  r |}\n\\hline')
+    print(r'$r$- Interval & $\varepsilon_i(\%)$ & $\Delta \varepsilon_i(\%) $ & $w_i(\%) $ ' +
+          r' & $\Delta w_i(\%) $& $\varepsilon_{\text{eff}, i}(\%) $& $\Delta \varepsilon_{\text{eff}, i}(\%) $\\ \hline\hline')
+    for i in range(1, r_size):
+        print('$ ' + '{:.3f}'.format(r_subsample[i - 1]) + ' - ' + '{:.3f}'.format(r_subsample[i]) + '$ & $'
+              '{: 6.1f}'.format(event_fractionTotal[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(event_fractionDiff[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(wvalue[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(wvalueDiff[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(iEffEfficiency[i] * 100) + '$ & $' +
+              '{: 6.1f}'.format(iDeltaEffEfficiency[i] * 100) + r'$ \\ ')
+    print('\hline\hline')
+    print(r'\multicolumn{1}{|r|}{Total} &  \multicolumn{4}{r|}{ $\varepsilon_\text{eff} = ' +
+          r'\sum_i \varepsilon_i \cdot \langle 1-2w_i\rangle^2 = ' +
+          '{: 6.1f}'.format(average_eff * 100) + r' \%$ }')
+    print(r'& \multicolumn{2}{r|}{ $\Delta \varepsilon_\text{eff} = ' +
+          '{: 6.1f}'.format(diff_eff * 100) + r' \%$ }' + r' \\')
+    print('\\hline\n\\end{tabular}')
+
 
 # **********************************************
 # DETERMINATION OF INDIVIDUAL EFFECTIVE EFFICIENCY
@@ -457,7 +483,7 @@ print('************************* MEASURED EFFECTIVE EFFICIENCY FOR INDIVIDUAL CA
 print('*                                                                                                                 *')
 # input: Classifier input from event-level. Output of event-level is recalculated for input on combiner-level.
 # but is re-evaluated under combiner target. Signal is B0, background is B0Bar.
-
+categoriesPerformance = []
 for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # histogram of input variable (only signal) - not yet a probability! It's a classifier plot!
     hist_signal = ROOT.TH1F('Signal_' + category, 'Input Signal (B0)' +
@@ -654,15 +680,9 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
             100) +
         ' %' +
         '   EffAverage=' +
-        '{: 8.2f}'.format(
-            effAverage *
-            100) +
-        ' %' +
+        '{: 8.2f}'.format(effAverage * 100) + ' %' +
         '   EffDiff=' +
-        '{: 8.2f}'.format(
-            effDiff *
-            100) +
-        ' %   *')
+        '{: 8.2f}'.format(effDiff * 100) + ' %   *')
 
     # hist_signal.Write('', ROOT.TObject.kOverwrite)
     # hist_background.Write('', ROOT.TObject.kOverwrite)
@@ -676,6 +696,7 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     # hist_aver_rB0bar.Write('', ROOT.TObject.kOverwrite)
     # hist_all.Write('', ROOT.TObject.kOverwrite)
     # hist_calib_B0.Write('', ROOT.TObject.kOverwrite)
+    categoriesPerformance.append((category, effAverage, effDiff))
     Canvas.Destructor()
 # if average_eff != 0:
     # print '*    -------------------------------------------------------------------------'
@@ -684,4 +705,19 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
 
 print('*                                                                                                                 *')
 print('*******************************************************************************************************************')
+print('\\begin{tabular}{| l | r  r |}\n\hline')
+print(r'Categories & $\varepsilon_\text{eff}(\%) $& $\Delta \varepsilon_\text{eff}(\%) $\\ \hline\hline')
+for (category, effAverage, effDiff) in categoriesPerformance:
+    print(
+        '{:<23}'.format(category) +
+        ' & $' +
+        '{: 6.2f}'.format(
+            effAverage *
+            100) +
+        ' $ & $' +
+        '{: 6.2f}'.format(
+            effDiff *
+            100) +
+        r' $ \\')
+print("\hline\n\\end{tabular}")
 B2INFO('qr Output Histograms in pdf format saved at: ' + workingDirectory)

@@ -129,7 +129,7 @@ applyCuts('B0:jspiks', 'abs(DeltaT)<25.')
 
 # Before using the Flavor Tagger you need at least the default weight files. If you do not set
 # any parameter the flavorTagger downloads them automatically from the database.
-# You just have to specify the system build or revision you are using!!!
+# You just have to specify the system build or revision you are using if you train by yourself!!!
 
 # Alternatively you can download them from my realease:
 # copy the folder in @login.cc.kek.jp:

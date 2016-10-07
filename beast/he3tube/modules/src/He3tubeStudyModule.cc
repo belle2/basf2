@@ -167,7 +167,7 @@ void He3tubeStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mche3_kinetic[i]->Fill(kin);
-        h_mche3_kinetic_zoom[i]->Fill(kin * 1e-3);
+        h_mche3_kinetic_zoom[i]->Fill(kin * 1e3);
       }
     }
   }

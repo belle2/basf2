@@ -444,7 +444,7 @@ void MicrotpcStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mctpc_kinetic[i]->Fill(kin);
-        h_mctpc_kinetic_zoom[i]->Fill(kin * 1e-3);
+        h_mctpc_kinetic_zoom[i]->Fill(kin * 1e3);
       }
     }
   }

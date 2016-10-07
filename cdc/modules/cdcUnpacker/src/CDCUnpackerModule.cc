@@ -60,7 +60,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
 
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", FileSystem::findFile("data/cdc/ch_map.dat"));
+  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);

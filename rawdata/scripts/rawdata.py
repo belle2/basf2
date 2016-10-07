@@ -90,6 +90,7 @@ def add_packers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcpacker = register_module('CDCPacker')
+        cdcpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
         path.add_module(cdcpacker)
 
     # ECL
@@ -136,6 +137,7 @@ def add_unpackers(path, components=None):
     # CDC
     if components is None or 'CDC' in components:
         cdcunpacker = register_module('CDCUnpacker')
+        cdcunpacker.param('xmlMapFileName', Belle2.FileSystem.findFile("data/cdc/ch_map.dat"))
         cdcunpacker.param('enablePrintOut', False)
         path.add_module(cdcunpacker)
 

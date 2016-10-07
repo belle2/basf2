@@ -53,12 +53,12 @@ namespace Belle2 {
     static const baseType wireBwdY = 1;
     /// Wire Z position w.r.t. nominal on backward endplate
     static const baseType wireBwdZ = 2;
-    /// Wire X position on forward enplate taking wireBwdX as new nominal
-    static const baseType wireFwdDx = 4;
-    /// Wire Y position on forward enplate taking wireBwdY as new nominal
-    static const baseType wireFwdDy = 5;
-    /// Wire Z position on forward enplate taking wireBwdZ as new nominal
-    static const baseType wireFwdDz = 6;
+    /// Wire X position w.r.t. nominal on forward endplate
+    static const baseType wireFwdX = 4;
+    /// Wire Y position w.r.t. nominal on forward endplate
+    static const baseType wireFwdY = 5;
+    /// Wire Z position w.r.t. nominal on forward endplate
+    static const baseType wireFwdZ = 6;
 
     // Layer alignment -------------------------------------------------
     /// Layer X position w.r.t. geometry
@@ -78,6 +78,44 @@ namespace Belle2 {
 
     /// Constructor
     CDCAlignment() : DBObjCalibrationConstMapBase() {}
+
+    /// Getter to X shift of bwd wire
+    double getBwdWireShiftX(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireBwdX);
+    }
+    /// Getter to Y shift of bwd wire
+    double getBwdWireShiftY(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireBwdY);
+    }
+    /// Getter to Z shift of bwd wire
+    double getBwdWireShiftZ(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireBwdZ);
+    }
+
+    /// Getter to X shift of fwd wire
+    double getFwdWireShiftX(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireFwdX);
+    }
+    /// Getter to Y shift of fwd wire
+    double getFwdWireShiftY(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireFwdY);
+    }
+    /// Getter to Z shift of fwd wire
+    double getFwdWireShiftZ(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireFwdZ);
+    }
+
+    /// Getter to wire tension
+    double getWireTension(int ICLayer,  int ILayer)
+    {
+      return get(WireID(ICLayer, ILayer), wireTension);
+    }
 
     /// Direct getter to X shift of layer
     double getLayerShiftX(int ICLayer) {return get(WireID(ICLayer, Wire4Layers), layerX);}

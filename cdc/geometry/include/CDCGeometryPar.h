@@ -21,13 +21,10 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#if defined(CDC_XTREL_FROM_DB)
 #include <cdc/dbobjects/CDCXtRelations.h>
-#endif
-#if defined(CDC_SRESOL_FROM_DB)
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#endif
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
@@ -108,27 +105,17 @@ namespace Belle2 {
       //      void readDeltaz(const CDCGeometry&);
 
       /**
-       * Read (mis)alignment params.
-       * @param[in] GearDir Gear Dir.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
-       */
-      void readWirePositionParams(const GearDir, EWirePosition set);
-
-
-      /**
-       * Read (mis)alignment params from DB.
-       * @param[in] DB object of CDCGeometry.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
-       */
-      void readWirePositionParams(const CDCGeometry&, EWirePosition set);
-
-      /**
-       * Read displacement or (mis)alignment params from xml or DB.
+       * Read displacement or (mis)alignment params from text file.
        * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
        * @param[in] Pointer to DB CDCGeometry db object.
        * @param[in] GearDir Gear Dir.
        */
       void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+
+      /**
+       * Set wire alignment params. from DB.
+       */
+      void setWirPosAlignParams();
 
       /**
        * Read XT-relation table.
@@ -1077,6 +1064,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
+#endif
+#if defined(CDC_ALIGN_FROM_DB)
+      DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

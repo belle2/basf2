@@ -132,7 +132,12 @@ CDCTriggerHoughtrackingModule::event()
   /* Clean hits */
   hitMap.clear();
   houghCand.clear();
-  houghTrack.clear();
+
+  if (!storeTracks.isValid()) {
+    storeTracks.create();
+  } else {
+    storeTracks.getPtr()->Clear();
+  }
 
   /* set default return value */
   setReturnValue(true);
@@ -196,26 +201,4 @@ CDCTriggerHoughtrackingModule::event()
     patternClustering();
   else
     connectedRegions();
-
-  /* write tracks to datastore */
-  vector<unsigned> idList;
-  TVector2 coord;
-
-  if (!storeTracks.isValid()) {
-  } else {
-    storeTracks.getPtr()->Clear();
-  }
-
-  for (auto it = houghTrack.begin(); it != houghTrack.end(); ++it) {
-    idList = it->getIdList();
-    coord = it->getCoord();
-    const CDCTriggerTrack* track =
-      storeTracks.appendNew(coord.X(), 2. * coord.Y(), 0.);
-
-    // relations
-    for (unsigned i = 0; i < idList.size(); ++i) {
-      unsigned its = idList[i];
-      track->addRelationTo(tsHits[its]);
-    }
-  }
 }

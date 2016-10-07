@@ -68,31 +68,6 @@ namespace Belle2 {
             a.getCoord().first.Y() == b.getCoord().first.Y());
   }
 
-  /**
-   * Hough Track class.
-   * A track is the center of a cluster of candidates.
-   * It contains the center coordinates and a hit list.
-   */
-  class CDCTriggerHoughTrack {
-  public:
-    /** Constructor for hough candidates */
-    CDCTriggerHoughTrack(std::vector<unsigned>& _list, TVector2 _coord):
-      hitList(_list), coord(_coord) {}
-
-    ~CDCTriggerHoughTrack() {}
-
-    /** Get Index list */
-    std::vector<unsigned> getIdList() { return hitList; }
-    /** Get center coordinates */
-    TVector2 getCoord() { return coord; }
-
-  private:
-    /** ID list of points */
-    std::vector<unsigned> hitList;
-    /** Coordinate of cluster center */
-    TVector2 coord;
-  };
-
   class CDCTriggerHoughtrackingModule : public Module {
   public:
     /** Constructor.  */
@@ -237,8 +212,6 @@ namespace Belle2 {
     cdcMap hitMap;
     /** Hough Candidates */
     std::vector<CDCTriggerHoughCand> houghCand;
-    /** Purified Hough Candidates */
-    std::vector<CDCTriggerHoughTrack> houghTrack;
 
     /** Radius of the CDC layers with priority wires (2 per super layer) */
     double radius[9][2];

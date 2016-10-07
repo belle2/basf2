@@ -12,6 +12,8 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/logging/Logger.h>
+#include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
+#include <trg/cdc/dataobjects/CDCTriggerTrack.h>
 
 #include <cmath>
 
@@ -167,6 +169,9 @@ CDCTriggerHoughtrackingModule::connectedRegions()
   vector<vector<CDCTriggerHoughCand>> regions;
   vector<CDCTriggerHoughCand> cpyCand = houghCand;
 
+  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+
   // debug: print candidate list
   B2DEBUG(50, "houghCand number " << cpyCand.size());
   for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
@@ -231,7 +236,14 @@ CDCTriggerHoughtrackingModule::connectedRegions()
       x += 2 * M_PI;
     y *= 0.5 / n;
     B2DEBUG(50, "x " << x << " y " << y);
-    houghTrack.push_back(CDCTriggerHoughTrack(mergedList, TVector2(x, y)));
+    // save track
+    const CDCTriggerTrack* track =
+      storeTracks.appendNew(x, 2. * y, 0.);
+    // relations
+    for (unsigned i = 0; i < mergedList.size(); ++i) {
+      unsigned its = mergedList[i];
+      track->addRelationTo(tsHits[its]);
+    }
   }
 }
 
@@ -367,6 +379,9 @@ CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
 void
 CDCTriggerHoughtrackingModule::patternClustering()
 {
+  StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
+  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+
   // fill a matrix of 2 x 2 squares
   TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
   TMatrix planeIcand(m_nCellsPhi, m_nCellsR);
@@ -514,7 +529,14 @@ CDCTriggerHoughtrackingModule::patternClustering()
         setReturnValue(false);
         B2WARNING("id list empty");
       }
-      houghTrack.push_back(CDCTriggerHoughTrack(idList, TVector2(x, y)));
+      // save track
+      const CDCTriggerTrack* track =
+        storeTracks.appendNew(x, 2. * y, 0.);
+      // relations
+      for (unsigned i = 0; i < idList.size(); ++i) {
+        unsigned its = idList[i];
+        track->addRelationTo(tsHits[its]);
+      }
     }
   }
 }

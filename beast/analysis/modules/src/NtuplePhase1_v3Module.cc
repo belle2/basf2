@@ -147,23 +147,29 @@ namespace Belle2 {
             cout << fileName << " rate " <<  rate << " counts " << counts << " m_input_Time_eqv " << m_input_Time_eqv << endl;
             }*/
             if (fileName.Contains("HER")) {
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_HT_CLAWS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Touschek")) m_input_HT_CSI_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Touschek")) m_input_HT_HE3_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Brems")) m_input_HB_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Brems")) m_input_HB_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Brems")) m_input_HB_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Brems")) m_input_HB_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Coulomb")) m_input_HC_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Coulomb")) m_input_HC_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Coulomb")) m_input_HC_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Coulomb")) m_input_HC_HE3_rate_av.push_back(rate); //Hz
             }
             if (fileName.Contains("LER")) {
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_LT_QCSS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Touschek")) m_input_LT_CLAWS_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Touschek")) m_input_LT_CSI_rate.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Touschek")) m_input_LT_HE3_rate.push_back(rate); //Hz
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Brems")) m_input_LB_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Brems")) m_input_LB_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Brems")) m_input_LB_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Brems")) m_input_LB_HE3_rate_av.push_back(rate); //Hz
+              if (HistoRateName.Contains("qcss") && fileName.Contains("Coulomb")) m_input_LC_QCSS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("claws") && fileName.Contains("Coulomb")) m_input_LC_CLAWS_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("csi") && fileName.Contains("Coulomb")) m_input_LC_CSI_rate_av.push_back(rate); //Hz
               if (HistoRateName.Contains("Def") && fileName.Contains("Coulomb")) m_input_LC_HE3_rate_av.push_back(rate); //Hz
@@ -271,21 +277,25 @@ namespace Belle2 {
               double counts = h2D->GetBinContent(i + 1, k + 1);
               double rate = counts / m_input_Time_eqv;
               if (fileName.Contains("Coulomb_HER")) {
+                if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_HC_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_HC_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Coulomb_LER")) {
+                if (HistoRateName.Contains("qcss")) m_input_LC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_LC_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_LC_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_LC_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Brems_HER")) {
+                if (HistoRateName.Contains("qcss")) m_input_HB_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HB_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_HB_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_HB_HE3_rate[k].push_back(rate); //Hz
               }
               if (fileName.Contains("Brems_LER")) {
+                if (HistoRateName.Contains("qcss")) m_input_LB_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_LB_CLAWS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("csi")) m_input_LB_CSI_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("Def")) m_input_LB_HE3_rate[k].push_back(rate); //Hz
@@ -546,49 +556,104 @@ namespace Belle2 {
     m_treeBEAST->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
     m_treeBEAST->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
     m_treeBEAST->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
-    /*
+
+    for (int i = 0; i < 12; i ++) {
+      m_treeBEAST->Branch(TString::Format("MC_LC_DIA_dose_%d", i), &(m_input_LC_DIA_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_DIA_dose_%d", i), &(m_input_HC_DIA_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_DIA_dose_%d", i), &(m_input_LB_DIA_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_DIA_dose_%d", i), &(m_input_HB_DIA_dose[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_PIN_dose_%d", i), &(m_input_LC_PIN_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_PIN_dose_%d", i), &(m_input_HC_PIN_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_PIN_dose_%d", i), &(m_input_LB_PIN_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_PIN_dose_%d", i), &(m_input_HB_PIN_dose[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_BGO_dose_%d", i), &(m_input_LC_BGO_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_BGO_dose_%d", i), &(m_input_HC_BGO_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_BGO_dose_%d", i), &(m_input_LB_BGO_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_BGO_dose_%d", i), &(m_input_HB_BGO_dose[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_HE3_rate_%d", i), &(m_input_LC_HE3_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_HE3_rate_%d", i), &(m_input_HC_HE3_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_HE3_rate_%d", i), &(m_input_LB_HE3_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_HE3_rate_%d", i), &(m_input_HB_HE3_rate[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_CSI_rate_%d", i), &(m_input_LC_CSI_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_CSI_rate_%d", i), &(m_input_HC_CSI_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_CSI_rate_%d", i), &(m_input_LB_CSI_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_CSI_rate_%d", i), &(m_input_HB_CSI_rate[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_CSI_dose_%d", i), &(m_input_LC_CSI_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_CSI_dose_%d", i), &(m_input_HC_CSI_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_CSI_dose_%d", i), &(m_input_LB_CSI_dose[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_CSI_dose_%d", i), &(m_input_HB_CSI_dose[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_CLAWS_rate_%d", i), &(m_input_LC_CLAWS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_CLAWS_rate_%d", i), &(m_input_HC_CLAWS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_CLAWS_rate_%d", i), &(m_input_LB_CLAWS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_CLAWS_rate_%d", i), &(m_input_HB_CLAWS_rate[i]));
+
+      m_treeBEAST->Branch(TString::Format("MC_LC_QCSS_rate_%d", i), &(m_input_LC_QCSS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HC_QCSS_rate_%d", i), &(m_input_HC_QCSS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_LB_QCSS_rate_%d", i), &(m_input_LB_QCSS_rate[i]));
+      m_treeBEAST->Branch(TString::Format("MC_HB_QCSS_rate_%d", i), &(m_input_HB_QCSS_rate[i]));
+    }
+
     m_treeBEAST->Branch("MC_LT_DIA_dose", &(m_input_LT_DIA_dose));
     m_treeBEAST->Branch("MC_HT_DIA_dose", &(m_input_HT_DIA_dose));
-    m_treeBEAST->Branch("MC_LC_DIA_dose", &(m_input_LC_DIA_dose));
-    m_treeBEAST->Branch("MC_HC_DIA_dose", &(m_input_HC_DIA_dose));
-    m_treeBEAST->Branch("MC_LB_DIA_dose", &(m_input_LB_DIA_dose));
-    m_treeBEAST->Branch("MC_HB_DIA_dose", &(m_input_HB_DIA_dose));
+    m_treeBEAST->Branch("MC_LC_DIA_dose_av", &(m_input_LC_DIA_dose_av));
+    m_treeBEAST->Branch("MC_HC_DIA_dose_av", &(m_input_HC_DIA_dose_av));
+    m_treeBEAST->Branch("MC_LB_DIA_dose_av", &(m_input_LB_DIA_dose_av));
+    m_treeBEAST->Branch("MC_HB_DIA_dose_av", &(m_input_HB_DIA_dose_av));
 
     m_treeBEAST->Branch("MC_LT_PIN_dose", &(m_input_LT_PIN_dose));
     m_treeBEAST->Branch("MC_HT_PIN_dose", &(m_input_HT_PIN_dose));
-    m_treeBEAST->Branch("MC_LC_PIN_dose", &(m_input_LC_PIN_dose));
-    m_treeBEAST->Branch("MC_HC_PIN_dose", &(m_input_HC_PIN_dose));
-    m_treeBEAST->Branch("MC_LB_PIN_dose", &(m_input_LB_PIN_dose));
-    m_treeBEAST->Branch("MC_HB_PIN_dose", &(m_input_HB_PIN_dose));
+    m_treeBEAST->Branch("MC_LC_PIN_dose_av", &(m_input_LC_PIN_dose_av));
+    m_treeBEAST->Branch("MC_HC_PIN_dose_av", &(m_input_HC_PIN_dose_av));
+    m_treeBEAST->Branch("MC_LB_PIN_dose_av", &(m_input_LB_PIN_dose_av));
+    m_treeBEAST->Branch("MC_HB_PIN_dose_av", &(m_input_HB_PIN_dose_av));
 
     m_treeBEAST->Branch("MC_LT_BGO_dose", &(m_input_LT_BGO_dose));
     m_treeBEAST->Branch("MC_HT_BGO_dose", &(m_input_HT_BGO_dose));
-    m_treeBEAST->Branch("MC_LC_BGO_dose", &(m_input_LC_BGO_dose));
-    m_treeBEAST->Branch("MC_HC_BGO_dose", &(m_input_HC_BGO_dose));
-    m_treeBEAST->Branch("MC_LB_BGO_dose", &(m_input_LB_BGO_dose));
-    m_treeBEAST->Branch("MC_HB_BGO_dose", &(m_input_HB_BGO_dose));
+    m_treeBEAST->Branch("MC_LC_BGO_dose_av", &(m_input_LC_BGO_dose_av));
+    m_treeBEAST->Branch("MC_HC_BGO_dose_av", &(m_input_HC_BGO_dose_av));
+    m_treeBEAST->Branch("MC_LB_BGO_dose_av", &(m_input_LB_BGO_dose_av));
+    m_treeBEAST->Branch("MC_HB_BGO_dose_av", &(m_input_HB_BGO_dose_av));
 
     m_treeBEAST->Branch("MC_LT_HE3_rate", &(m_input_LT_HE3_rate));
     m_treeBEAST->Branch("MC_HT_HE3_rate", &(m_input_HT_HE3_rate));
-    m_treeBEAST->Branch("MC_LC_HE3_rate", &(m_input_LC_HE3_rate));
-    m_treeBEAST->Branch("MC_HC_HE3_rate", &(m_input_HC_HE3_rate));
-    m_treeBEAST->Branch("MC_LB_HE3_rate", &(m_input_LB_HE3_rate));
-    m_treeBEAST->Branch("MC_HB_HE3_rate", &(m_input_HB_HE3_rate));
+    m_treeBEAST->Branch("MC_LC_HE3_rate_av", &(m_input_LC_HE3_rate_av));
+    m_treeBEAST->Branch("MC_HC_HE3_rate_av", &(m_input_HC_HE3_rate_av));
+    m_treeBEAST->Branch("MC_LB_HE3_rate_av", &(m_input_LB_HE3_rate_av));
+    m_treeBEAST->Branch("MC_HB_HE3_rate_av", &(m_input_HB_HE3_rate_av));
 
     m_treeBEAST->Branch("MC_LT_CSI_rate", &(m_input_LT_CSI_rate));
     m_treeBEAST->Branch("MC_HT_CSI_rate", &(m_input_HT_CSI_rate));
-    m_treeBEAST->Branch("MC_LC_CSI_rate", &(m_input_LC_CSI_rate));
-    m_treeBEAST->Branch("MC_HC_CSI_rate", &(m_input_HC_CSI_rate));
-    m_treeBEAST->Branch("MC_LB_CSI_rate", &(m_input_LB_CSI_rate));
-    m_treeBEAST->Branch("MC_HB_CSI_rate", &(m_input_HB_CSI_rate));
+    m_treeBEAST->Branch("MC_LC_CSI_rate_av", &(m_input_LC_CSI_rate_av));
+    m_treeBEAST->Branch("MC_HC_CSI_rate_av", &(m_input_HC_CSI_rate_av));
+    m_treeBEAST->Branch("MC_LB_CSI_rate_av", &(m_input_LB_CSI_rate_av));
+    m_treeBEAST->Branch("MC_HB_CSI_rate_av", &(m_input_HB_CSI_rate_av));
 
     m_treeBEAST->Branch("MC_LT_CSI_dose", &(m_input_LT_CSI_dose));
     m_treeBEAST->Branch("MC_HT_CSI_dose", &(m_input_HT_CSI_dose));
-    m_treeBEAST->Branch("MC_LC_CSI_dose", &(m_input_LC_CSI_dose));
-    m_treeBEAST->Branch("MC_HC_CSI_dose", &(m_input_HC_CSI_dose));
-    m_treeBEAST->Branch("MC_LB_CSI_dose", &(m_input_LB_CSI_dose));
-    m_treeBEAST->Branch("MC_HB_CSI_dose", &(m_input_HB_CSI_dose));
-    */
+    m_treeBEAST->Branch("MC_LC_CSI_dose_av", &(m_input_LC_CSI_dose_av));
+    m_treeBEAST->Branch("MC_HC_CSI_dose_av", &(m_input_HC_CSI_dose_av));
+    m_treeBEAST->Branch("MC_LB_CSI_dose_av", &(m_input_LB_CSI_dose_av));
+    m_treeBEAST->Branch("MC_HB_CSI_dose_av", &(m_input_HB_CSI_dose_av));
+
+    m_treeBEAST->Branch("MC_LT_CLAWS_rate", &(m_input_LT_CLAWS_rate));
+    m_treeBEAST->Branch("MC_HT_CLAWS_rate", &(m_input_HT_CLAWS_rate));
+    m_treeBEAST->Branch("MC_LC_CLAWS_rate_av", &(m_input_LC_CLAWS_rate_av));
+    m_treeBEAST->Branch("MC_HC_CLAWS_rate_av", &(m_input_HC_CLAWS_rate_av));
+    m_treeBEAST->Branch("MC_LB_CLAWS_rate_av", &(m_input_LB_CLAWS_rate_av));
+    m_treeBEAST->Branch("MC_HB_CLAWS_rate_av", &(m_input_HB_CLAWS_rate_av));
+
+    m_treeBEAST->Branch("MC_LT_QCSS_rate", &(m_input_LT_QCSS_rate));
+    m_treeBEAST->Branch("MC_HT_QCSS_rate", &(m_input_HT_QCSS_rate));
+    m_treeBEAST->Branch("MC_LC_QCSS_rate_av", &(m_input_LC_QCSS_rate_av));
+    m_treeBEAST->Branch("MC_HC_QCSS_rate_av", &(m_input_HC_QCSS_rate_av));
+    m_treeBEAST->Branch("MC_LB_QCSS_rate_av", &(m_input_LB_QCSS_rate_av));
+    m_treeBEAST->Branch("MC_HB_QCSS_rate_av", &(m_input_HB_QCSS_rate_av));
   }
 
 
@@ -800,6 +865,27 @@ namespace Belle2 {
       }
       double To = ScaleFacTo_LER * m_input_LT_CLAWS_rate[i] + ScaleFacTo_HER * m_input_HT_CLAWS_rate[i];
       m_beast.CLAWS_rate.push_back(BG + To);
+    }
+
+    //Scale QCSS
+    for (int i = 0; i < (int)m_input_LT_QCSS_rate.size(); i++) {
+      double LBG = m_input_LB_QCSS_rate_av[i] + m_input_LC_QCSS_rate_av[i];
+      double HBG = m_input_HB_QCSS_rate_av[i] + m_input_HC_QCSS_rate_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
+      m_beast.QCSS_rate_av.push_back(BG + To);
+    }
+    for (int i = 0; i < (int)m_input_LT_QCSS_rate.size(); i++) {
+      double BG = 0;
+      for (int j = 0; j < 12; j++) {
+        if (m_input_LB_QCSS_rate[j].size() > 0) {
+          double LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
+          double HBG = m_input_HB_QCSS_rate[j][i] + m_input_HC_QCSS_rate[j][i];
+          BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
+        }
+      }
+      double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
+      m_beast.QCSS_rate.push_back(BG + To);
     }
 
     //Scale CSI

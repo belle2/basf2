@@ -80,6 +80,16 @@ void QcsmonitorStudyModule::defineHisto()
     h_Wqcss_edep[i] = new TH1F(TString::Format("Wqcss_edep_%d", i), "Energy deposited [MeV]", 5000, 0., 10.);
   }
 
+  h_qcss_hitrate1 = new TH1F("qcss_hitrate1", "Hit distributions", 2, 0., 2.);
+  h_qcss_hitrate2 = new TH1F("qcss_hitrate2", "Hit distributions", 2, 0., 2.);
+  h_qcss_hitrate1W = new TH1F("qcss_hitrate1W", "Hit distributions", 2, 0., 2.);
+  h_qcss_hitrate2W = new TH1F("qcss_hitrate2W", "Hit distributions", 2, 0., 2.);
+
+  h_qcss_hitrate1->Sumw2();
+  h_qcss_hitrate1W->Sumw2();
+  h_qcss_hitrate2->Sumw2();
+  h_qcss_hitrate2W->Sumw2();
+
   for (int i = 0; i < 2; i++) {
     h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 5000, 0., 5000.);
     h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 5000, 0., 5000.);
@@ -168,6 +178,8 @@ void QcsmonitorStudyModule::event()
     const int timebin = Hit.gettime();
     const float edep = Hit.getedep();
     const float pe = Hit.getPE();
+    h_qcss_hitrate1->Fill(detNb);
+    h_qcss_hitrate1W->Fill(detNb, rate);
     h_qcss_rate1[detNb]->Fill(pe);
     h_qcss_rate1W[detNb]->Fill(pe, rate);
     h_qcss_rs_rate1[detNb]->Fill(pe, ring_section);
@@ -175,6 +187,8 @@ void QcsmonitorStudyModule::event()
     h_qcss_pe1[detNb]->Fill(timebin, pe);
     h_qcss_pe1W[detNb]->Fill(timebin, pe, rate);
     if (edep > m_Ethres) {
+      h_qcss_hitrate2->Fill(detNb);
+      h_qcss_hitrate2W->Fill(detNb, rate);
       h_qcss_rate2[detNb]->Fill(pe);
       h_qcss_rate2W[detNb]->Fill(pe, rate);
       h_qcss_rs_rate2[detNb]->Fill(pe, ring_section);

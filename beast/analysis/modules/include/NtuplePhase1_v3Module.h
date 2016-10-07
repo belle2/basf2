@@ -173,6 +173,17 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_CLAWS_rate_av; /**< list of CLAWS_rate LB  */
     std::vector<Double_t> m_input_HB_CLAWS_rate_av; /**< list of CLAWS_rate HB  */
 
+    std::vector<Double_t> m_input_LT_QCSS_rate; /**< list of QCSS_rate LT  */
+    std::vector<Double_t> m_input_HT_QCSS_rate; /**< list of QCSS_rate HT  */
+    std::vector<Double_t> m_input_LC_QCSS_rate[12]; /**< list of QCSS_rate LC  */
+    std::vector<Double_t> m_input_HC_QCSS_rate[12]; /**< list of QCSS_rate HC  */
+    std::vector<Double_t> m_input_LB_QCSS_rate[12]; /**< list of QCSS_rate LB  */
+    std::vector<Double_t> m_input_HB_QCSS_rate[12]; /**< list of QCSS_rate HB  */
+    std::vector<Double_t> m_input_LC_QCSS_rate_av; /**< list of QCSS_rate LC  */
+    std::vector<Double_t> m_input_HC_QCSS_rate_av; /**< list of QCSS_rate HC  */
+    std::vector<Double_t> m_input_LB_QCSS_rate_av; /**< list of QCSS_rate LB  */
+    std::vector<Double_t> m_input_HB_QCSS_rate_av; /**< list of QCSS_rate HB  */
+
     std::vector<Double_t> m_input_I_HER; /**< HER current and error */
     std::vector<Double_t> m_input_I_LER; /**< LER current and error */
 

@@ -1,5 +1,6 @@
 #include <ecl/modules/eclPacker/eclPackerModule.h>
 #include <ecl/dataobjects/ECLDsp.h>
+
 #include <framework/utilities/FileSystem.h>
 #include <iostream>
 #include <stdio.h>

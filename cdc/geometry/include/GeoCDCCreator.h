@@ -54,7 +54,13 @@ namespace Belle2 {
       /*!
         \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
       */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+      //      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        CDCGeometry config = createConfiguration(content);
+        createGeometry(config, topVolume, type);
+      }
 
       /**
        * Create geometry from DB.

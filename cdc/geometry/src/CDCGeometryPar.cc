@@ -79,7 +79,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
 
   clear();
   if (geom) {
-    //    std::cout <<"readFromDBcalled" << std::endl;
+    B2INFO("readFromDB");
     readFromDB(*geom);
   } else {
     //    std::cout <<"readcalled" << std::endl;
@@ -273,6 +273,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 
   //Set displacement params. (from input data)
   m_Displacement = geom.getDisplacement();
+
   B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
          m_Displacement);
   if (m_Displacement) {
@@ -299,7 +300,6 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #endif
   }
 
-
   // Get control params. for CDC FullSim
   m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
   m_minTrackLength = geom.getMinimumTrackLength();
@@ -315,12 +315,14 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_XTetc = true;
   if (m_XTetc) {
 #if defined(CDC_XTREL_FROM_DB)
+    B2INFO("Read XT from DB");
     setXtRel();  //Set xt param. (from DB)
 #else
     readXT(gbxParams);  //Read xt params. (from file)
 #endif
 
 #if defined(CDC_SRESOL_FROM_DB)
+    B2INFO("Read Sigma from DB");
     setSResol();  //Set sigma param. (from DB)
 #else
     readSigma(gbxParams);  //Read sigma params. (from file)

@@ -90,6 +90,16 @@ void QcsmonitorStudyModule::defineHisto()
   h_qcss_hitrate2->Sumw2();
   h_qcss_hitrate2W->Sumw2();
 
+  h_qcss_rs_hitrate1 = new TH2F("qcss_rs_hitrate1", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
+  h_qcss_rs_hitrate2 = new TH2F("qcss_rs_hitrate2", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
+  h_qcss_rs_hitrate1W = new TH2F("qcss_rs_hitrate1W", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
+  h_qcss_rs_hitrate2W = new TH2F("qcss_rs_hitrate2W", "Hit distributions vs rs", 2, 0., 2., 12, 0., 12.);
+
+  h_qcss_rs_hitrate1->Sumw2();
+  h_qcss_rs_hitrate1W->Sumw2();
+  h_qcss_rs_hitrate2->Sumw2();
+  h_qcss_rs_hitrate2W->Sumw2();
+
   for (int i = 0; i < 2; i++) {
     h_qcss_rate1[i] = new TH1F(TString::Format("qcss_rate1_%d", i), "PE distributions", 5000, 0., 5000.);
     h_qcss_rate2[i] = new TH1F(TString::Format("qcss_rate2_%d", i), "PE distributions", 5000, 0., 5000.);
@@ -184,6 +194,8 @@ void QcsmonitorStudyModule::event()
     h_qcss_rate1W[detNb]->Fill(pe, rate);
     h_qcss_rs_rate1[detNb]->Fill(pe, ring_section);
     h_qcss_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
+    h_qcss_rs_hitrate1->Fill(detNb, ring_section);
+    h_qcss_rs_hitrate1W->Fill(detNb, ring_section, rate);
     h_qcss_pe1[detNb]->Fill(timebin, pe);
     h_qcss_pe1W[detNb]->Fill(timebin, pe, rate);
     if (edep > m_Ethres) {
@@ -193,6 +205,8 @@ void QcsmonitorStudyModule::event()
       h_qcss_rate2W[detNb]->Fill(pe, rate);
       h_qcss_rs_rate2[detNb]->Fill(pe, ring_section);
       h_qcss_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
+      h_qcss_rs_hitrate2->Fill(detNb, ring_section);
+      h_qcss_rs_hitrate2W->Fill(detNb, ring_section, rate);
       h_qcss_pe2[detNb]->Fill(timebin, pe);
       h_qcss_pe2W[detNb]->Fill(timebin, pe, rate);
     }

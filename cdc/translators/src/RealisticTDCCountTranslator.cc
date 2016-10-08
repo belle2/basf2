@@ -16,7 +16,7 @@ using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
   m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0), m_cdcp(CDCGeometryPar::Instance()),
-  m_tdcBinWidth(m_cdcp.getTdcBinWidth()), m_vFactor(1.)
+  m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   //  m_tdcOffset   = m_cdcp.getTdcOffset();
   //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
@@ -26,7 +26,6 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   cout << "RealisticTDCCountTranslator constructor" << endl;
   cout << "m_cdcp=" << &m_cdcp << endl;
   cout << "m_tdcBinWidth=" << m_tdcBinWidth << endl;
-  cout << "m_vFactor=" << m_vFactor << endl;
 #endif
 }
 

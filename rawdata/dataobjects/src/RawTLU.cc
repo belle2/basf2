@@ -10,8 +10,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawTLU);
-
 RawTLU::RawTLU()
 {
   m_access = new RawTLUFormat;

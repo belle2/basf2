@@ -149,6 +149,8 @@ namespace Belle2 {
 
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */
     std::string m_outputCollectionName;
+    /** Name of the StoreArray containing the clusters formed in the Hough plane. */
+    std::string m_clusterCollectionName;
     /** number of Hough cells in phi */
     unsigned m_nCellsPhi;
     /** number of Hough cells in 1/r */

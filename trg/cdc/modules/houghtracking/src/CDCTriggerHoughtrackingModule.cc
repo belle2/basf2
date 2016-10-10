@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -43,6 +44,9 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
   addParam("outputCollection", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
            string("Trg2DFinderTracks"));
+  addParam("clusterCollection", m_clusterCollectionName,
+           "Name of the StoreArray holding the clusters formed in the Hough plane.",
+           string(""));
   addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
            (unsigned)(160));
@@ -101,11 +105,14 @@ CDCTriggerHoughtrackingModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
+  StoreArray<CDCTriggerHoughCluster>::registerPersistent(m_clusterCollectionName);
 
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
+  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   tracks.registerRelationTo(segmentHits);
+  tracks.registerRelationTo(clusters);
 
   if (m_storePlane > 0) StoreObjPtr<TMatrix>::registerPersistent("HoughPlane");
 
@@ -184,7 +191,7 @@ CDCTriggerHoughtrackingModule::event()
   B2DEBUG(50, "extending Hough plane to " << maxIterations << " iterations, "
           << nCells << " cells: phi in ["
           << -rectX * 180. / M_PI << ", " << rectX * 180. / M_PI
-          << "] deg, 1/r in [" << -rectY + shiftR << ", " << rectY + shiftR << "] cm");
+          << "] deg, 1/r in [" << -rectY + shiftR << ", " << rectY + shiftR << "] /cm");
 
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {

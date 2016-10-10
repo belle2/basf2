@@ -14,6 +14,7 @@
 #include <framework/logging/Logger.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 
 #include <cmath>
 
@@ -170,7 +171,8 @@ CDCTriggerHoughtrackingModule::connectedRegions()
   vector<CDCTriggerHoughCand> cpyCand = houghCand;
 
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> tsHits;
+  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   // debug: print candidate list
   B2DEBUG(50, "houghCand number " << cpyCand.size());
@@ -213,21 +215,36 @@ CDCTriggerHoughtrackingModule::connectedRegions()
     double y = 0;
     int n = 0;
     vector<unsigned> mergedList;
+    int xmin = m_nCellsPhi;
+    int xmax = 0;
+    int ymin = m_nCellsR;
+    int ymax = 0;
+    vector<TVector2> cellIds = {};
     for (unsigned ir2 = 0; ir2 < regions[ir].size(); ++ir2) {
       coord2dPair hc = regions[ir][ir2].getCoord();
       B2DEBUG(100, "  " << regions[ir][ir2].getID()
               << " nSL " << regions[ir][ir2].getSLcount()
               << " x1 " << hc.first.X() << " x2 " << hc.second.X()
               << " y1 " << hc.first.Y() << " y2 " << hc.second.Y());
+      int ix = floor((hc.first.X() + M_PI) / 2. / M_PI * m_nCellsPhi + 0.5);
+      int iy = floor((hc.first.Y() + maxR - shiftR) / 2. / maxR * m_nCellsR + 0.5);
       x += (hc.first.X() + hc.second.X());
-      if (xfirst - hc.first.X() > M_PI)
+      if (xfirst - hc.first.X() > M_PI) {
         x += 4 * M_PI;
-      else if (hc.first.X() - xfirst > M_PI)
+        ix += m_nCellsPhi;
+      } else if (hc.first.X() - xfirst > M_PI) {
         x -= 4 * M_PI;
+        ix -= m_nCellsPhi;
+      }
       y += (hc.first.Y() + hc.second.Y());
       n += 1;
       vector<unsigned> idList = regions[ir][ir2].getIdList();
       mergeIdList(mergedList, mergedList, idList);
+      xmin = min(xmin, ix);
+      xmax = max(xmax, ix);
+      ymin = min(ymin, iy);
+      ymax = max(ymax, iy);
+      cellIds.push_back(TVector2(ix, iy));
     }
     x *= 0.5 / n;
     if (x > M_PI)
@@ -244,6 +261,10 @@ CDCTriggerHoughtrackingModule::connectedRegions()
       unsigned its = mergedList[i];
       track->addRelationTo(tsHits[its]);
     }
+    // save detail information about the cluster
+    const CDCTriggerHoughCluster* cluster =
+      clusters.appendNew(xmin, xmax, ymin, ymax, cellIds);
+    track->addRelationTo(cluster);
   }
 }
 
@@ -380,7 +401,8 @@ void
 CDCTriggerHoughtrackingModule::patternClustering()
 {
   StoreArray<CDCTriggerTrack> storeTracks(m_outputCollectionName);
-  StoreArray<CDCTriggerSegmentHit> tsHits("CDCTriggerSegmentHits");
+  StoreArray<CDCTriggerSegmentHit> tsHits;
+  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   // fill a matrix of 2 x 2 squares
   TMatrix plane2(m_nCellsPhi / 2, m_nCellsR / 2);
@@ -416,6 +438,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
       // form cluster
       vector<unsigned> pattern(rX * rY, 0);
       pattern[0] = plane2[ix][iy];
+      vector<TVector2> cellIds = {TVector2(2 * ix, 2 * iy)};
       for (unsigned ix2 = 0; ix2 < rX; ++ix2) {
         for (unsigned iy2 = 0; iy2 < rY; ++iy2) {
           if (iy + iy2 >= nY) continue;
@@ -434,6 +457,7 @@ CDCTriggerHoughtrackingModule::patternClustering()
                connectedDiag(plane2[ileft][iy + iy2 - 1], plane2[iright][iy + iy2]))) {
             pattern[ip] = plane2[iright][iy + iy2];
             B2DEBUG(100, "connect cell " << iright << " " << iy + iy2);
+            cellIds.push_back(TVector2(2 * (ix + ix2), 2 * (iy + iy2)));
           }
         }
       }
@@ -537,6 +561,12 @@ CDCTriggerHoughtrackingModule::patternClustering()
         unsigned its = idList[i];
         track->addRelationTo(tsHits[its]);
       }
+      // save detail information about the cluster
+      const CDCTriggerHoughCluster* cluster =
+        clusters.appendNew(2 * ix, 2 * (ix + m_clusterSizeX) - 1,
+                           2 * iy, 2 * (iy + m_clusterSizeY) - 1,
+                           cellIds);
+      track->addRelationTo(cluster);
     }
   }
 }

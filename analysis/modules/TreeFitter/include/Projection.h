@@ -63,7 +63,7 @@ namespace TreeFitter {
       int dimC = m_matrixH.num_row() ;
       int dimP = m_matrixH.num_col() ;
 
-      std::cout << "Projection::reset(): resetting H(" << dimC << "," << dimP << ")" << std::endl << std::flush;
+      //      std::cout << "Projection::reset(): resetting H(" << dimC << "," << dimP << ")" << std::endl << std::flush;
       memset(&(m_matrixH(1, 1)), 0, dimP * dimC * sizeof(double));
       memset(&(m_r(1))  , 0, dimC * sizeof(double));
       memset(&(m_matrixV(1, 1)), 0, dimC * (dimC + 1) / 2 * sizeof(double));

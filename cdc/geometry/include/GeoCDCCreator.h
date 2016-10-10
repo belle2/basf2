@@ -65,7 +65,7 @@ namespace Belle2 {
       /**
        * Create geometry from DB.
        */
-      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
       {
         DBObjPtr<CDCGeometry> geo;
         if (!geo) {
@@ -77,7 +77,7 @@ namespace Belle2 {
       /**
        * Create payloads.
        */
-      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov)
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
       {
         DBImportObjPtr<CDCGeometry> importObj;
         importObj.construct(createConfiguration(content));

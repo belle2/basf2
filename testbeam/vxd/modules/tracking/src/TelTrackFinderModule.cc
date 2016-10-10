@@ -76,52 +76,57 @@ void TelTrackFinderModule::beginRun()
 
 void TelTrackFinderModule::event()
 {
+  try {
 
-  B2DEBUG(1, "New event with number of genfit::Tracks: " <<  m_tracks.getEntries() << std::endl);
-  //loop over all the tracks
-  for (int itrack = 0; itrack < m_tracks.getEntries(); itrack++) {
-    //get the intersections for each Tel layer
+    B2DEBUG(1, "New event with number of genfit::Tracks: " <<  m_tracks.getEntries() << std::endl);
+    //loop over all the tracks
+    for (int itrack = 0; itrack < m_tracks.getEntries(); itrack++) {
+      //get the intersections for each Tel layer
 
 
-    std::vector<int> clusterindizes;
+      std::vector<int> clusterindizes;
 
-    //loop over the telescope planes to find the intersections with this track
-    std::vector<VxdID> sensorlist = m_vxdGeometry.getListOfSensors();
-    int ntellayer = 0; //count the number of telescope ladders where hits have been found
-    for (int isen = 0; isen < (int)sensorlist.size(); isen++) {
-      VxdID theId = sensorlist[isen];
+      //loop over the telescope planes to find the intersections with this track
+      std::vector<VxdID> sensorlist = m_vxdGeometry.getListOfSensors();
+      int ntellayer = 0; //count the number of telescope ladders where hits have been found
+      for (int isen = 0; isen < (int)sensorlist.size(); isen++) {
+        VxdID theId = sensorlist[isen];
 
-      VXD::SensorInfoBase sensorInfo = m_vxdGeometry.getSensorInfo(theId);
+        VXD::SensorInfoBase sensorInfo = m_vxdGeometry.getSensorInfo(theId);
 
-      if (sensorInfo.getType() != VXD::SensorInfoBase::TEL) continue; //also the szintlators will pass that cut!!
-      //only select the ladder assigned to the telescope (WARNING: currently hard coded!)
-      if (theId.getLadderNumber() < m_mintelLadder || theId.getLadderNumber() > m_maxtelLadder) continue;
+        if (sensorInfo.getType() != VXD::SensorInfoBase::TEL) continue; //also the szintlators will pass that cut!!
+        //only select the ladder assigned to the telescope (WARNING: currently hard coded!)
+        if (theId.getLadderNumber() < m_mintelLadder || theId.getLadderNumber() > m_maxtelLadder) continue;
 
-      //check if a good intersection has been found
-      bool isgood = false;
-      double du(0), dv(0);
-      TVector3 intersec = getTrackIntersec(theId, *(m_tracks[itrack]), isgood, du, dv);
-      if (!isgood) continue;
+        //check if a good intersection has been found
+        bool isgood = false;
+        double du(0), dv(0);
+        TVector3 intersec = getTrackIntersec(theId, *(m_tracks[itrack]), isgood, du, dv);
+        if (!isgood) continue;
 
-      B2DEBUG(1, "The found intersection " << intersec.X() << " " << intersec.Y() << " " << intersec.Z());
+        B2DEBUG(1, "The found intersection " << intersec.X() << " " << intersec.Y() << " " << intersec.Z());
 
-      int nin = clusterindizes.size();
-      findClusterCands(clusterindizes, theId, intersec, du, dv);
-      int nout = clusterindizes.size();
-      B2DEBUG(1, "Found " << (nout - nin) << " hits on sensor layer " << (std::string)theId);
+        int nin = clusterindizes.size();
+        findClusterCands(clusterindizes, theId, intersec, du, dv);
+        int nout = clusterindizes.size();
+        B2DEBUG(1, "Found " << (nout - nin) << " hits on sensor layer " << (std::string)theId);
 
-      //if the number of clusters changed for that sensor
-      if (nin != nout) ntellayer++;
-    }//end isen
+        //if the number of clusters changed for that sensor
+        if (nin != nout) ntellayer++;
+      }//end isen
 
-    //generate a new track cand by adding the new clusters to the old track cand
-    if (ntellayer >= m_minTelLayers) {
-      RelationVector<genfit::TrackCand> trackcands_from_track
-        = DataStore::getRelationsToObj<genfit::TrackCand>(m_tracks[itrack], "ALL");  // there should be only one!
-      if (trackcands_from_track.size() == 1) addNewTrackCand(clusterindizes, *(trackcands_from_track[0]));
-    } else {
-      B2DEBUG(1, "No track candidate added as only for " << ntellayer << " Layers hits have been found!");
+      //generate a new track cand by adding the new clusters to the old track cand
+      if (ntellayer >= m_minTelLayers) {
+        RelationVector<genfit::TrackCand> trackcands_from_track
+          = DataStore::getRelationsToObj<genfit::TrackCand>(m_tracks[itrack], "ALL");  // there should be only one!
+        if (trackcands_from_track.size() == 1) addNewTrackCand(clusterindizes, *(trackcands_from_track[0]));
+      } else {
+        B2DEBUG(1, "No track candidate added as only for " << ntellayer << " Layers hits have been found!");
+      }
     }
+
+  } catch (...) {
+    B2ERROR("Error in TelTrackFInder");
   }
 
 }

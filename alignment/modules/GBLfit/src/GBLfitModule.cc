@@ -124,6 +124,9 @@ GBLfitModule::GBLfitModule() :
   addParam("GFTrackCandidatesColName", m_gfTrackCandsColName,
            "Name of collection holding the genfit::TrackCandidates (should be created by the pattern recognition or MCTrackFinderModule)",
            string(""));
+  addParam("GFTracksColName", m_gfTracksColName,
+           "Name of collection holding the genfit::Tracks (output)",
+           string(""));
   addParam("CDCHitsColName", m_cdcHitsColName, "CDCHits collection", string(""));
   addParam("SVDHitsColName", m_svdHitsColName, "SVDHits collection", string(""));
   addParam("PXDHitsColName", m_pxdHitsColName, "PXDHits collection", string(""));

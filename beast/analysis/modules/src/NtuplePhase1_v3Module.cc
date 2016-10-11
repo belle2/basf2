@@ -469,6 +469,8 @@ namespace Belle2 {
     evtMetaData.registerInDataStore();
 
     m_file = new TFile(m_outputFileName.c_str(), "RECREATE");
+    m_treeTruth = new TTree("truth", "Truth table (simulation)");
+
     m_treeBEAST = new TTree("tout", "BEAST data tree (simulation)");
     m_treeBEAST->Branch("ts", &(m_beast.ts));
 
@@ -526,6 +528,7 @@ namespace Belle2 {
     m_treeBEAST->Branch("CSI_hitRate", &(m_beast.CSI_hitRate));
     m_treeBEAST->Branch("DIA_dose", &(m_beast.DIA_dose));
     m_treeBEAST->Branch("CLAWS_rate", &(m_beast.CLAWS_rate));
+    m_treeBEAST->Branch("QCSS_rate", &(m_beast.QCSS_rate));
 
     m_treeBEAST->Branch("PIN_dose_av", &(m_beast.PIN_dose_av));
     m_treeBEAST->Branch("BGO_energy_av", &(m_beast.BGO_energy_av));
@@ -534,7 +537,7 @@ namespace Belle2 {
     m_treeBEAST->Branch("CSI_hitRate_av", &(m_beast.CSI_hitRate_av));
     m_treeBEAST->Branch("DIA_dose_av", &(m_beast.DIA_dose_av));
     m_treeBEAST->Branch("CLAWS_rate_av", &(m_beast.CLAWS_rate_av));
-
+    m_treeBEAST->Branch("QCSS_rate_av", &(m_beast.QCSS_rate_av));
     /*
     m_treeBEAST->Branch("TPC_neutrons_N", &(m_beast.TPC_neutrons_N));
     m_treeBEAST->Branch("TPC_neutrons_tracks_E", &(m_beast.TPC_neutrons_tracks_E));
@@ -548,112 +551,114 @@ namespace Belle2 {
     m_treeBEAST->Branch("TPC_xrays_N", &(m_beast.TPC_xrays_N));
     m_treeBEAST->Branch("TPC_xrays_sumE", &(m_beast.TPC_xrays_sumE));
     */
-    m_treeBEAST->Branch("SAD_I_HER", &(m_input_I_HER));
-    m_treeBEAST->Branch("SAD_I_LER", &(m_input_I_LER));
-    m_treeBEAST->Branch("SAD_P_HER", &(m_input_P_HER));
-    m_treeBEAST->Branch("SAD_P_LER", &(m_input_P_LER));
-    m_treeBEAST->Branch("SAD_sigma_HER", &(m_input_sigma_HER));
-    m_treeBEAST->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
-    m_treeBEAST->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
-    m_treeBEAST->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
+    m_treeTruth->Branch("SAD_I_HER", &(m_input_I_HER));
+    m_treeTruth->Branch("SAD_I_LER", &(m_input_I_LER));
+    m_treeTruth->Branch("SAD_P_HER", &(m_input_P_HER));
+    m_treeTruth->Branch("SAD_P_LER", &(m_input_P_LER));
+    m_treeTruth->Branch("SAD_sigma_HER", &(m_input_sigma_HER));
+    m_treeTruth->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
+    m_treeTruth->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
+    m_treeTruth->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
 
     for (int i = 0; i < 12; i ++) {
-      m_treeBEAST->Branch(TString::Format("MC_LC_DIA_dose_%d", i), &(m_input_LC_DIA_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_DIA_dose_%d", i), &(m_input_HC_DIA_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_DIA_dose_%d", i), &(m_input_LB_DIA_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_DIA_dose_%d", i), &(m_input_HB_DIA_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_DIA_dose_%d", i), &(m_input_LC_DIA_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_DIA_dose_%d", i), &(m_input_HC_DIA_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_DIA_dose_%d", i), &(m_input_LB_DIA_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_DIA_dose_%d", i), &(m_input_HB_DIA_dose[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_PIN_dose_%d", i), &(m_input_LC_PIN_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_PIN_dose_%d", i), &(m_input_HC_PIN_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_PIN_dose_%d", i), &(m_input_LB_PIN_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_PIN_dose_%d", i), &(m_input_HB_PIN_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_PIN_dose_%d", i), &(m_input_LC_PIN_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_PIN_dose_%d", i), &(m_input_HC_PIN_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_PIN_dose_%d", i), &(m_input_LB_PIN_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_PIN_dose_%d", i), &(m_input_HB_PIN_dose[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_BGO_dose_%d", i), &(m_input_LC_BGO_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_BGO_dose_%d", i), &(m_input_HC_BGO_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_BGO_dose_%d", i), &(m_input_LB_BGO_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_BGO_dose_%d", i), &(m_input_HB_BGO_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_BGO_dose_%d", i), &(m_input_LC_BGO_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_BGO_dose_%d", i), &(m_input_HC_BGO_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_BGO_dose_%d", i), &(m_input_LB_BGO_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_BGO_dose_%d", i), &(m_input_HB_BGO_dose[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_HE3_rate_%d", i), &(m_input_LC_HE3_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_HE3_rate_%d", i), &(m_input_HC_HE3_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_HE3_rate_%d", i), &(m_input_LB_HE3_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_HE3_rate_%d", i), &(m_input_HB_HE3_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_HE3_rate_%d", i), &(m_input_LC_HE3_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_HE3_rate_%d", i), &(m_input_HC_HE3_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_HE3_rate_%d", i), &(m_input_LB_HE3_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_HE3_rate_%d", i), &(m_input_HB_HE3_rate[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_CSI_rate_%d", i), &(m_input_LC_CSI_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_CSI_rate_%d", i), &(m_input_HC_CSI_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_CSI_rate_%d", i), &(m_input_LB_CSI_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_CSI_rate_%d", i), &(m_input_HB_CSI_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_CSI_rate_%d", i), &(m_input_LC_CSI_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_CSI_rate_%d", i), &(m_input_HC_CSI_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_CSI_rate_%d", i), &(m_input_LB_CSI_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_CSI_rate_%d", i), &(m_input_HB_CSI_rate[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_CSI_dose_%d", i), &(m_input_LC_CSI_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_CSI_dose_%d", i), &(m_input_HC_CSI_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_CSI_dose_%d", i), &(m_input_LB_CSI_dose[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_CSI_dose_%d", i), &(m_input_HB_CSI_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_CSI_dose_%d", i), &(m_input_LC_CSI_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_CSI_dose_%d", i), &(m_input_HC_CSI_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_CSI_dose_%d", i), &(m_input_LB_CSI_dose[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_CSI_dose_%d", i), &(m_input_HB_CSI_dose[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_CLAWS_rate_%d", i), &(m_input_LC_CLAWS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_CLAWS_rate_%d", i), &(m_input_HC_CLAWS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_CLAWS_rate_%d", i), &(m_input_LB_CLAWS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_CLAWS_rate_%d", i), &(m_input_HB_CLAWS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_CLAWS_rate_%d", i), &(m_input_LC_CLAWS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_CLAWS_rate_%d", i), &(m_input_HC_CLAWS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_CLAWS_rate_%d", i), &(m_input_LB_CLAWS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_CLAWS_rate_%d", i), &(m_input_HB_CLAWS_rate[i]));
 
-      m_treeBEAST->Branch(TString::Format("MC_LC_QCSS_rate_%d", i), &(m_input_LC_QCSS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HC_QCSS_rate_%d", i), &(m_input_HC_QCSS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_LB_QCSS_rate_%d", i), &(m_input_LB_QCSS_rate[i]));
-      m_treeBEAST->Branch(TString::Format("MC_HB_QCSS_rate_%d", i), &(m_input_HB_QCSS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LC_QCSS_rate_%d", i), &(m_input_LC_QCSS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HC_QCSS_rate_%d", i), &(m_input_HC_QCSS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_LB_QCSS_rate_%d", i), &(m_input_LB_QCSS_rate[i]));
+      m_treeTruth->Branch(TString::Format("MC_HB_QCSS_rate_%d", i), &(m_input_HB_QCSS_rate[i]));
     }
 
-    m_treeBEAST->Branch("MC_LT_DIA_dose", &(m_input_LT_DIA_dose));
-    m_treeBEAST->Branch("MC_HT_DIA_dose", &(m_input_HT_DIA_dose));
-    m_treeBEAST->Branch("MC_LC_DIA_dose_av", &(m_input_LC_DIA_dose_av));
-    m_treeBEAST->Branch("MC_HC_DIA_dose_av", &(m_input_HC_DIA_dose_av));
-    m_treeBEAST->Branch("MC_LB_DIA_dose_av", &(m_input_LB_DIA_dose_av));
-    m_treeBEAST->Branch("MC_HB_DIA_dose_av", &(m_input_HB_DIA_dose_av));
+    m_treeTruth->Branch("MC_LT_DIA_dose", &(m_input_LT_DIA_dose));
+    m_treeTruth->Branch("MC_HT_DIA_dose", &(m_input_HT_DIA_dose));
+    m_treeTruth->Branch("MC_LC_DIA_dose_av", &(m_input_LC_DIA_dose_av));
+    m_treeTruth->Branch("MC_HC_DIA_dose_av", &(m_input_HC_DIA_dose_av));
+    m_treeTruth->Branch("MC_LB_DIA_dose_av", &(m_input_LB_DIA_dose_av));
+    m_treeTruth->Branch("MC_HB_DIA_dose_av", &(m_input_HB_DIA_dose_av));
 
-    m_treeBEAST->Branch("MC_LT_PIN_dose", &(m_input_LT_PIN_dose));
-    m_treeBEAST->Branch("MC_HT_PIN_dose", &(m_input_HT_PIN_dose));
-    m_treeBEAST->Branch("MC_LC_PIN_dose_av", &(m_input_LC_PIN_dose_av));
-    m_treeBEAST->Branch("MC_HC_PIN_dose_av", &(m_input_HC_PIN_dose_av));
-    m_treeBEAST->Branch("MC_LB_PIN_dose_av", &(m_input_LB_PIN_dose_av));
-    m_treeBEAST->Branch("MC_HB_PIN_dose_av", &(m_input_HB_PIN_dose_av));
+    m_treeTruth->Branch("MC_LT_PIN_dose", &(m_input_LT_PIN_dose));
+    m_treeTruth->Branch("MC_HT_PIN_dose", &(m_input_HT_PIN_dose));
+    m_treeTruth->Branch("MC_LC_PIN_dose_av", &(m_input_LC_PIN_dose_av));
+    m_treeTruth->Branch("MC_HC_PIN_dose_av", &(m_input_HC_PIN_dose_av));
+    m_treeTruth->Branch("MC_LB_PIN_dose_av", &(m_input_LB_PIN_dose_av));
+    m_treeTruth->Branch("MC_HB_PIN_dose_av", &(m_input_HB_PIN_dose_av));
 
-    m_treeBEAST->Branch("MC_LT_BGO_dose", &(m_input_LT_BGO_dose));
-    m_treeBEAST->Branch("MC_HT_BGO_dose", &(m_input_HT_BGO_dose));
-    m_treeBEAST->Branch("MC_LC_BGO_dose_av", &(m_input_LC_BGO_dose_av));
-    m_treeBEAST->Branch("MC_HC_BGO_dose_av", &(m_input_HC_BGO_dose_av));
-    m_treeBEAST->Branch("MC_LB_BGO_dose_av", &(m_input_LB_BGO_dose_av));
-    m_treeBEAST->Branch("MC_HB_BGO_dose_av", &(m_input_HB_BGO_dose_av));
+    m_treeTruth->Branch("MC_LT_BGO_dose", &(m_input_LT_BGO_dose));
+    m_treeTruth->Branch("MC_HT_BGO_dose", &(m_input_HT_BGO_dose));
+    m_treeTruth->Branch("MC_LC_BGO_dose_av", &(m_input_LC_BGO_dose_av));
+    m_treeTruth->Branch("MC_HC_BGO_dose_av", &(m_input_HC_BGO_dose_av));
+    m_treeTruth->Branch("MC_LB_BGO_dose_av", &(m_input_LB_BGO_dose_av));
+    m_treeTruth->Branch("MC_HB_BGO_dose_av", &(m_input_HB_BGO_dose_av));
 
-    m_treeBEAST->Branch("MC_LT_HE3_rate", &(m_input_LT_HE3_rate));
-    m_treeBEAST->Branch("MC_HT_HE3_rate", &(m_input_HT_HE3_rate));
-    m_treeBEAST->Branch("MC_LC_HE3_rate_av", &(m_input_LC_HE3_rate_av));
-    m_treeBEAST->Branch("MC_HC_HE3_rate_av", &(m_input_HC_HE3_rate_av));
-    m_treeBEAST->Branch("MC_LB_HE3_rate_av", &(m_input_LB_HE3_rate_av));
-    m_treeBEAST->Branch("MC_HB_HE3_rate_av", &(m_input_HB_HE3_rate_av));
+    m_treeTruth->Branch("MC_LT_HE3_rate", &(m_input_LT_HE3_rate));
+    m_treeTruth->Branch("MC_HT_HE3_rate", &(m_input_HT_HE3_rate));
+    m_treeTruth->Branch("MC_LC_HE3_rate_av", &(m_input_LC_HE3_rate_av));
+    m_treeTruth->Branch("MC_HC_HE3_rate_av", &(m_input_HC_HE3_rate_av));
+    m_treeTruth->Branch("MC_LB_HE3_rate_av", &(m_input_LB_HE3_rate_av));
+    m_treeTruth->Branch("MC_HB_HE3_rate_av", &(m_input_HB_HE3_rate_av));
 
-    m_treeBEAST->Branch("MC_LT_CSI_rate", &(m_input_LT_CSI_rate));
-    m_treeBEAST->Branch("MC_HT_CSI_rate", &(m_input_HT_CSI_rate));
-    m_treeBEAST->Branch("MC_LC_CSI_rate_av", &(m_input_LC_CSI_rate_av));
-    m_treeBEAST->Branch("MC_HC_CSI_rate_av", &(m_input_HC_CSI_rate_av));
-    m_treeBEAST->Branch("MC_LB_CSI_rate_av", &(m_input_LB_CSI_rate_av));
-    m_treeBEAST->Branch("MC_HB_CSI_rate_av", &(m_input_HB_CSI_rate_av));
+    m_treeTruth->Branch("MC_LT_CSI_rate", &(m_input_LT_CSI_rate));
+    m_treeTruth->Branch("MC_HT_CSI_rate", &(m_input_HT_CSI_rate));
+    m_treeTruth->Branch("MC_LC_CSI_rate_av", &(m_input_LC_CSI_rate_av));
+    m_treeTruth->Branch("MC_HC_CSI_rate_av", &(m_input_HC_CSI_rate_av));
+    m_treeTruth->Branch("MC_LB_CSI_rate_av", &(m_input_LB_CSI_rate_av));
+    m_treeTruth->Branch("MC_HB_CSI_rate_av", &(m_input_HB_CSI_rate_av));
 
-    m_treeBEAST->Branch("MC_LT_CSI_dose", &(m_input_LT_CSI_dose));
-    m_treeBEAST->Branch("MC_HT_CSI_dose", &(m_input_HT_CSI_dose));
-    m_treeBEAST->Branch("MC_LC_CSI_dose_av", &(m_input_LC_CSI_dose_av));
-    m_treeBEAST->Branch("MC_HC_CSI_dose_av", &(m_input_HC_CSI_dose_av));
-    m_treeBEAST->Branch("MC_LB_CSI_dose_av", &(m_input_LB_CSI_dose_av));
-    m_treeBEAST->Branch("MC_HB_CSI_dose_av", &(m_input_HB_CSI_dose_av));
+    m_treeTruth->Branch("MC_LT_CSI_dose", &(m_input_LT_CSI_dose));
+    m_treeTruth->Branch("MC_HT_CSI_dose", &(m_input_HT_CSI_dose));
+    m_treeTruth->Branch("MC_LC_CSI_dose_av", &(m_input_LC_CSI_dose_av));
+    m_treeTruth->Branch("MC_HC_CSI_dose_av", &(m_input_HC_CSI_dose_av));
+    m_treeTruth->Branch("MC_LB_CSI_dose_av", &(m_input_LB_CSI_dose_av));
+    m_treeTruth->Branch("MC_HB_CSI_dose_av", &(m_input_HB_CSI_dose_av));
 
-    m_treeBEAST->Branch("MC_LT_CLAWS_rate", &(m_input_LT_CLAWS_rate));
-    m_treeBEAST->Branch("MC_HT_CLAWS_rate", &(m_input_HT_CLAWS_rate));
-    m_treeBEAST->Branch("MC_LC_CLAWS_rate_av", &(m_input_LC_CLAWS_rate_av));
-    m_treeBEAST->Branch("MC_HC_CLAWS_rate_av", &(m_input_HC_CLAWS_rate_av));
-    m_treeBEAST->Branch("MC_LB_CLAWS_rate_av", &(m_input_LB_CLAWS_rate_av));
-    m_treeBEAST->Branch("MC_HB_CLAWS_rate_av", &(m_input_HB_CLAWS_rate_av));
+    m_treeTruth->Branch("MC_LT_CLAWS_rate", &(m_input_LT_CLAWS_rate));
+    m_treeTruth->Branch("MC_HT_CLAWS_rate", &(m_input_HT_CLAWS_rate));
+    m_treeTruth->Branch("MC_LC_CLAWS_rate_av", &(m_input_LC_CLAWS_rate_av));
+    m_treeTruth->Branch("MC_HC_CLAWS_rate_av", &(m_input_HC_CLAWS_rate_av));
+    m_treeTruth->Branch("MC_LB_CLAWS_rate_av", &(m_input_LB_CLAWS_rate_av));
+    m_treeTruth->Branch("MC_HB_CLAWS_rate_av", &(m_input_HB_CLAWS_rate_av));
 
-    m_treeBEAST->Branch("MC_LT_QCSS_rate", &(m_input_LT_QCSS_rate));
-    m_treeBEAST->Branch("MC_HT_QCSS_rate", &(m_input_HT_QCSS_rate));
-    m_treeBEAST->Branch("MC_LC_QCSS_rate_av", &(m_input_LC_QCSS_rate_av));
-    m_treeBEAST->Branch("MC_HC_QCSS_rate_av", &(m_input_HC_QCSS_rate_av));
-    m_treeBEAST->Branch("MC_LB_QCSS_rate_av", &(m_input_LB_QCSS_rate_av));
-    m_treeBEAST->Branch("MC_HB_QCSS_rate_av", &(m_input_HB_QCSS_rate_av));
+    m_treeTruth->Branch("MC_LT_QCSS_rate", &(m_input_LT_QCSS_rate));
+    m_treeTruth->Branch("MC_HT_QCSS_rate", &(m_input_HT_QCSS_rate));
+    m_treeTruth->Branch("MC_LC_QCSS_rate_av", &(m_input_LC_QCSS_rate_av));
+    m_treeTruth->Branch("MC_HC_QCSS_rate_av", &(m_input_HC_QCSS_rate_av));
+    m_treeTruth->Branch("MC_LB_QCSS_rate_av", &(m_input_LB_QCSS_rate_av));
+    m_treeTruth->Branch("MC_HB_QCSS_rate_av", &(m_input_HB_QCSS_rate_av));
+
+    m_treeTruth->Fill();
   }
 
 
@@ -968,6 +973,7 @@ namespace Belle2 {
     delete m_tree;
     m_file->cd();
     m_treeBEAST->Write();
+    m_treeTruth->Write();
     m_file->Close();
   }
 

@@ -201,6 +201,7 @@ namespace Belle2 {
     std::vector<Double_t> m_input_sigma_HER; /**< HER beam size and errors */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
+    TTree* m_treeTruth = 0;   /**< Truth tree pointer */
     TChain* m_tree = 0;            /**< tree pointer */
     std::string m_inputFileName;  /**< input file name */
     std::vector<std::string> m_inputHistoFileNames; /**< list of histo. file names */

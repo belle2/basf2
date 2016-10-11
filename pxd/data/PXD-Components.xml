@@ -47,7 +47,7 @@
     <Material>Si</Material>
     <width  unit="mm">15.400</width>
     <length unit="mm">67.975</length>
-    <height unit="mm"> 0.420</height>
+    <height unit="mm"> 0.525</height>
     <!-- definition of the active area of the module which is a part of the
          whole thing. The position is given relative to the lower left edge of
          the module (the point with the most negative local coordinates). -->
@@ -149,7 +149,7 @@
     <Color>#006699</Color>
     <width  unit="mm">15.400</width>
     <length unit="mm">84.975</length>
-    <height unit="mm"> 0.420</height>
+    <height unit="mm"> 0.525</height>
     <Active>
       <u unit="mm"> 0.600</u>
       <v unit="mm">23.150</v>
@@ -224,7 +224,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">12.000</width>
     <length unit="mm">44.775</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.450</height>
     <angle  unit="deg">54.7</angle>
   </Component>
 
@@ -233,7 +233,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">12.000</width>
     <length unit="mm">61.775</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.450</height>
     <angle  unit="deg">54.7</angle>
   </Component>
 
@@ -242,7 +242,7 @@
     <Color>#CCCCCC</Color>
     <width  unit="mm">0.600</width>
     <length unit="mm">3.000</length>
-    <height unit="mm">0.345</height>
+    <height unit="mm">0.3450</height>
     <angle  unit="deg">54.7</angle>
   </Component>
 
@@ -316,7 +316,7 @@
   </Component>
 
   <Component name="SwitcherGroovesLayer1">
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <length unit="mm">41.26</length>
     <Material>Si</Material>
     <Color>#006699</Color>
@@ -463,7 +463,7 @@
   </Component>
 
   <Component name="BorderGroovesLayer1">
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <length unit="mm">41.26</length>
     <width  unit="mm">0.950</width>
     <Material>Si</Material>
@@ -611,7 +611,7 @@
   </Component>
 
   <Component name="SwitcherGroovesLayer2">
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <length unit="mm">58.510</length>
     <Material>Si</Material>
     <Color>#006699</Color>
@@ -814,7 +814,7 @@
   </Component>
 
   <Component name="BorderGroovesLayer2">
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <length unit="mm">58.510</length>
     <width  unit="mm">0.950</width>
     <Material>Si</Material>
@@ -1049,7 +1049,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">1.590</width>
     <length unit="mm">0.510</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <angle unit="deg">54.7</angle>
   </Component>
 
@@ -1058,7 +1058,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">0.510</width>
     <length unit="mm">0.510</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <angle unit="deg">54.7</angle>
   </Component>
 
@@ -1067,7 +1067,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">1.190</width>
     <length unit="mm">0.510</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <angle unit="deg">54.7</angle>
   </Component>
 
@@ -1076,7 +1076,7 @@
     <Color>#5599BB</Color>
     <width  unit="mm">0.910</width>
     <length unit="mm">0.510</length>
-    <height unit="mm"> 0.345</height>
+    <height unit="mm"> 0.360</height>
     <angle unit="deg">54.7</angle>
   </Component>
 

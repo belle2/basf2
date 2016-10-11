@@ -16,7 +16,7 @@
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
 

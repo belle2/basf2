@@ -557,7 +557,7 @@ template <class FilterType> void RawSecMapMergerModule::add3HitFilters(VXDTFFilt
     (
       (filterCutsMap.at("Angle3DSimple").getMin() <= Angle3DSimple<SpacePoint>() <= filterCutsMap.at("Angle3DSimple").getMax()).observe(
         VoidObserver()) &&
-      (filterCutsMap.at("AngleXYSimple").getMin() <= AngleXYSimple<SpacePoint>() <= filterCutsMap.at("AngleXYSimple").getMax()).observe(
+      (filterCutsMap.at("CosAngleXY").getMin() <= CosAngleXY<SpacePoint>() <= filterCutsMap.at("CosAngleXY").getMax()).observe(
         VoidObserver()) &&
       (filterCutsMap.at("AngleRZSimple").getMin() <= AngleRZSimple<SpacePoint>() <= filterCutsMap.at("AngleRZSimple").getMax()).observe(
         VoidObserver()) &&

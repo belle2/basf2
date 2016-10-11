@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -24,13 +25,15 @@ namespace Belle2 {
   template <typename PointType >
   class DeltaSlopeZoverS : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "DeltaSlopeZoverS"; };
 
     /** compares the "slopes" z over arc length. calcDeltaSlopeZOverS is invariant under rotations in the r-z plane. */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D cCenter = CircleCenterXY<PointType>::value(outerHit, centerHit, innerHit);
       double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
       B2Vector3D vecOuter2cC((outerHit.X() - cCenter.X()),
                              (outerHit.Y() - cCenter.Y()),
@@ -48,7 +51,7 @@ namespace Belle2 {
       // Beware of z>r!:
       double result = (asin(double(outerHit.Z() - centerHit.Z()) / alfaOCr)) - asin(double(centerHit.Z() - innerHit.Z()) / alfaCIr);
 
-      return Helper::checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     }
   };
 

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -24,13 +25,15 @@ namespace Belle2 {
   template <typename PointType >
   class HelixParameterFit : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "HelixParameterFit"; };
 
     /** calculates the helixparameter describing the deviation in z per unit angle, returning unit: none */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D cCenter = CircleCenterXY<PointType>::value(outerHit, centerHit, innerHit);
 
       B2Vector3D vecOuter2cC(outerHit.X() - cCenter.X(), outerHit.Y() - cCenter.Y(), outerHit.Z() - cCenter.Z());
       B2Vector3D vecCenter2cC(centerHit.X() - cCenter.X(), centerHit.Y() - cCenter.Y(), centerHit.Z() - cCenter.Z());
@@ -41,7 +44,7 @@ namespace Belle2 {
       // real calculation: ratio is (m_vecij[2] = deltaZ): alfaAB/deltaZab : alfaBC/deltaZbc, the following equation saves two times '/'
       double result = (alfaAB * double(centerHit.Z() - innerHit.Z())) / (alfaBC * double(outerHit.Z() - centerHit.Z()));
 
-      return Helper::checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     } // return unit: none
   };
 

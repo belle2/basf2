@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <math.h>
 
 namespace Belle2 {
@@ -23,13 +22,20 @@ namespace Belle2 {
   template <typename PointType >
   class SlopeRZ : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "SlopeRZ"; };
+
 
     /** value calculates the slope in R-Z for a given pair of hits. */
     static double value(const PointType& outerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, double> Helper;
-
-      return Helper::calcSlopeRZ(outerHit, innerHit);
+      double result = atan(
+                        sqrt(std::pow(double(outerHit.X() - innerHit.X()), 2)
+                             + std::pow(double(outerHit.Y() - innerHit.Y()), 2)
+                            ) / double(outerHit.Z() - innerHit.Z())
+                      );
+      // TODO: check if 0 is a good default return value in the case z_i==z_o!
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     }
   };
 

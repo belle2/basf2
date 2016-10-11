@@ -38,6 +38,9 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance3D-filter */
   class SquaredDistance3D : public SelectionVariable< spacePoint , float > {
   public:
+    /** return name of the class */
+    static const std::string name(void) {return "SquaredDistance3D"; };
+
     /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
@@ -52,6 +55,9 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance2D-filter in XY */
   class SquaredDistance2Dxy : public SelectionVariable< spacePoint , float > {
   public:
+    /** return name of the class */
+    static const std::string name(void) {return "SquaredDistance2Dxy"; };
+
     /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
@@ -65,6 +71,9 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a distance1D-filter in X */
   class SquaredDistance1Dx : public SelectionVariable< spacePoint , float > {
   public:
+    /** return name of the class */
+    static const std::string name(void) {return "SquaredDistance1Dx"; };
+
     /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
@@ -77,6 +86,9 @@ namespace VXDTFfilterTest {
   /** a small filter illustrating the behavior of a filter which is compatible with boolean comparisons */
   class BooleanVariable : public SelectionVariable< spacePoint , bool > {
   public:
+    /** return name of the class */
+    static const std::string name(void) {return "BooleanVariable"; };
+
     /** value function does the actual calculation of this class. */
     static float value(const spacePoint& p1, const spacePoint& p2)
     {
@@ -209,8 +221,7 @@ namespace VXDTFfilterTest {
   TEST_F(FilterTest, SelectionVariableName)
   {
 
-    EXPECT_EQ("VXDTFfilterTest__SquaredDistance3D" , SquaredDistance3D().name());
-
+    EXPECT_EQ("SquaredDistance3D" , SquaredDistance3D().name());
   }
 
 

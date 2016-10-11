@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -23,16 +24,21 @@ namespace Belle2 {
   class DeltaCircleRadius : public SelectionVariable< PointType , double > {
   public:
 
+    /** returns the name of the Class */
+    static const std::string name(void) {return "DeltaCircleRadius"; };
+
+
     /** calculates dpt-value (dpt= difference in transverse momentum of 2 subsets of the hits), returning unit: cm */
+    /** TODO: a straight line exception is thrown and not catched (at least here) in calcCircleCenter */
     static double value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
                         const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
+      B2Vector3D outerCircleCenter = CircleCenterXY<PointType>::value(outerHit, outerCenterHit, innerCenterHit);
       double outerCircleRadius = Helper::calcRadius(outerHit, outerCenterHit, innerCenterHit, outerCircleCenter);
 
-      B2Vector3D innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
+      B2Vector3D innerCircleCenter = CircleCenterXY<PointType>::value(outerCenterHit, innerCenterHit, innerHit);
       double innerCircleRadius = Helper::calcRadius(outerCenterHit, innerCenterHit, innerHit, innerCircleCenter);
 
       return outerCircleRadius - innerCircleRadius;

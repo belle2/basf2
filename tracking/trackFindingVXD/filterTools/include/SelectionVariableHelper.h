@@ -26,8 +26,9 @@ namespace Belle2 {
   struct SelVarHelper {
 
     /** this exception is thrown by the CircleFit and occurs when the track is too straight. */
+    /** TODO: remove
     BELLE2_DEFINE_EXCEPTION(Straight_Line, "The hits are on a straight Line (or indistinguishably near to being on it).");
-
+    */
 
     /** this exception catches TCs which are too small to be able to be detected by the TC, therefore are likely to be ghost TCs. such TCs can be neglected. */
     BELLE2_DEFINE_EXCEPTION(Circle_too_small,
@@ -51,9 +52,10 @@ namespace Belle2 {
 
 
     /** checks if results are nan or inf and return 0 if they are, if not, return the result itself. */
+    /** TODO: remove
     static DataType checkValid(DataType result)
     { return (std::isnan(result) || std::isinf(result)) ? DataType(0) : result; }
-
+    */
 
     /** returns the perpendicular magnitude squared of given pointType. */
     static DataType calcPerp2(const PointType& aHit)
@@ -79,12 +81,14 @@ namespace Belle2 {
 
 
     /** returns B2Vector3 containing point a - b. */
+    /** TODO: remove
     static B2Vector3<DataType> doAMinusB(const PointType& a, const PointType& b)
     { return B2Vector3<DataType>(a.X() - b.X(), a.Y() - b.Y(), a.Z() - b.Z()); }
-
+    */
 
     /** calculates the angle of the slope of the hits in RZ, returnValue = theta = atan(r/z).
     * WARNING: returns 0 if no valid value could be found! */
+    /** TODO:remove
     static DataType calcSlopeRZ(const PointType& outerHit, const PointType& innerHit)
     {
       double result = atan(
@@ -94,11 +98,14 @@ namespace Belle2 {
                       );
       return checkValid(result);
     }
+    */
+
+
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none (incomplete calculation). */
     static DataType calcAngle2D(const PointType& vecA, const PointType& vecB)
     {
       DataType result = ((vecA.X() * vecB.X() + vecA.Y() * vecB.Y()) / sqrt(calcPerp2(vecA) * calcPerp2(vecB)));
-      return checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? DataType(0) : result;
     }
 
 
@@ -106,7 +113,7 @@ namespace Belle2 {
     static DataType calcAngle2D(const B2Vector3<DataType>& vecA, const B2Vector3<DataType>& vecB)
     {
       DataType result = ((vecA.X() * vecB.X() + vecA.Y() * vecB.Y()) / sqrt(vecA.Perp2() * vecB.Perp2()));
-      return checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? DataType(0) : result;
     }
 
 
@@ -132,6 +139,7 @@ namespace Belle2 {
 
 
     /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
+    /** TODO: remove
     static B2Vector3<DataType> calcCircleCenter(const PointType& a, const PointType& b, const PointType& c) throw(Straight_Line)
     {
       // calculates the intersection point using Cramer's rule.
@@ -155,7 +163,7 @@ namespace Belle2 {
 
       return B2Vector3<DataType>(c.X() + inX * 0.5 + s * inY, c.Y() + inY * 0.5 - s * inX, 0.);
     }
-
+    */
 
     /** calculates the estimation of the transverse momentum of given radius using defined strength of magnetic field, returning unit: GeV/c. */
     static DataType calcPt(DataType radius, DataType field = SelVarHelper::s_MagneticFieldFactor) throw(Circle_too_small)
@@ -174,11 +182,10 @@ namespace Belle2 {
     static int calcSign(const PointType& a, const PointType& b, const PointType& c)
     {
       using boost::math::sign;
-      B2Vector3<DataType> ba = doAMinusB(a, b); ba.SetZ(0.);
-      B2Vector3<DataType> bc = doAMinusB(b, c); bc.SetZ(0.);
+      B2Vector3<DataType> ba(a.X() - b.X(), a.Y() - b.Y(), 0.0);
+      B2Vector3<DataType> bc(b.X() - c.X(), b.Y() - c.Y(), 0.0);
       return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
     }
-
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet.
      * +1 represents a left-oriented curvature, -1 means having a right-oriented curvature.
@@ -187,8 +194,8 @@ namespace Belle2 {
     static int calcSign(const PointType& a, const PointType& b, const PointType& c, const B2Vector3<DataType>& sigma_a,
                         const B2Vector3<DataType>& sigma_b, const B2Vector3<DataType>& sigma_c)
     {
-      B2Vector3<DataType> c2b = doAMinusB(b, c);   c2b.SetZ(0.);
-      B2Vector3<DataType> b2a = doAMinusB(a, b);   b2a.SetZ(0.);
+      B2Vector3<DataType> c2b(b.X() - c.X(), b.Y() - c.Y(), 0.0);
+      B2Vector3<DataType> b2a(a.X() - b.X(), a.Y() - b.Y(), 0.0);
       DataType angle = atan2(b2a[0], b2a[1]) - atan2(c2b[0], c2b[1]);
       //TODO 1/3...mean of the sigmas. Possible improvement: Use a parameter instead, and determine with simulated events.
       DataType sigmaan = (sigma_a.Mag() + sigma_b.Mag() + sigma_c.Mag()) / (3.*(c2b.Mag() + b2a.Mag()));

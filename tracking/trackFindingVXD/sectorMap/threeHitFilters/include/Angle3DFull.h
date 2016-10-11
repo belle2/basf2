@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
 
@@ -25,18 +24,19 @@ namespace Belle2 {
   template <typename PointType >
   class Angle3DFull : public SelectionVariable< PointType, double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "Angle3DFull"; };
 
     /** calculates the angle between the hits/vectors (3D), returning unit: angle in degrees */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3D innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3D outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), outerHit.Z() - centerHit.Z());
+      B2Vector3D innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), centerHit.Z() - innerHit.Z());
 
       double result = acos(outerVector.Dot(innerVector) / (outerVector.Mag() * innerVector.Mag())); // 0-pi
       result = (result * (180. / M_PI));
-      return Helper::checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     }
   };
 

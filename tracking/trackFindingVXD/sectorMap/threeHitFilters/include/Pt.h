@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -24,13 +25,15 @@ namespace Belle2 {
   template <typename PointType >
   class Pt : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "Pt"; };
 
     /** calculates the estimation of the transverse momentum of the 3-hit-tracklet, returning unit: GeV/c */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D circleCenter = CircleCenterXY<PointType>::value(outerHit, centerHit, innerHit);
       double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, circleCenter);
 
       return circleRadius * Helper::s_MagneticFieldFactor;

@@ -27,6 +27,8 @@ namespace Belle2 {
   class MLHandover : public SelectionVariable<PointType, std::array<double, Ndims> > {
 
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "MLHandover"; };
 
     static std::array<double, Ndims> value(const PointType& innerHit, const PointType& centerHit, const PointType& outerHit)
     {

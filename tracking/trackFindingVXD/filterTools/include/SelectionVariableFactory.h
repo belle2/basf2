@@ -17,13 +17,13 @@
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
 // 3-hit:
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DFull.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CosAngleXY.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYFull.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZFull.h>
@@ -132,9 +132,9 @@ namespace Belle2 {
         { return Angle3DFull<PointType>::value(outerHit, innerHit, m_virtualIP); };
       }
 
-      if (variableType == SelectionVariableType::AngleXYSimpleHighOccupancy) {
+      if (variableType == SelectionVariableType::CosAngleXYHighOccupancy) {
         return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
-        { return AngleXYSimple<PointType>::value(outerHit, innerHit, m_virtualIP); };
+        { return CosAngleXY<PointType>::value(outerHit, innerHit, m_virtualIP); };
       }
 
       if (variableType == SelectionVariableType::AngleXYFullHighOccupancy) {
@@ -224,11 +224,11 @@ namespace Belle2 {
         { return Angle3DFull<PointType>::value(outerHit, centerHit, innerHit); };
       }
 
-      if (variableType == SelectionVariableType::AngleXYSimple) {
+      if (variableType == SelectionVariableType::CosAngleXY) {
         return [ & ](const PointType & outerHit,
                      const PointType & centerHit,
                      const PointType & innerHit) -> double
-        { return AngleXYSimple<PointType>::value(outerHit, centerHit, innerHit); };
+        { return CosAngleXY<PointType>::value(outerHit, centerHit, innerHit); };
       }
 
       if (variableType == SelectionVariableType::AngleXYFull) {

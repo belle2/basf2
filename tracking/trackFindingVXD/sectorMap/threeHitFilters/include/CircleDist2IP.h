@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -24,16 +25,19 @@ namespace Belle2 {
   template <typename PointType >
   class CircleDist2IP : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "CircleDist2IP"; };
 
     /** calculates the distance of the point of closest approach of circle to the IP, returning unit: cm */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D cCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D cCenter = CircleCenterXY<PointType>::value(outerHit, centerHit, innerHit);
       double circleRadius = Helper::calcRadius(outerHit, centerHit, innerHit, cCenter);
 
-      // distance of closest approach of circle to the IP:
+      // distance of closest approach of circle to the IP :
+      // WARNING only valid for IP=0,0,X
       return (fabs(cCenter.Perp() - circleRadius));
     } // return unit: cm
   };

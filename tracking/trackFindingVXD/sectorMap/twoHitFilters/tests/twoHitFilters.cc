@@ -15,7 +15,7 @@
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
 
@@ -329,13 +329,13 @@ namespace VXDTFtwoHitFilterTest {
   TEST_F(TwoHitFilterTest, SelectionVariableName)
   {
     auto dist3D = Distance3DSquared<SpacePoint>();
-    EXPECT_EQ("Belle2__Distance3DSquared{Belle2__SpacePoint}" , dist3D.name());
+    EXPECT_EQ("Distance3DSquared" , dist3D.name());
     auto dist2DXY = Distance2DXYSquared<SpacePoint>();
-    EXPECT_EQ("Belle2__Distance2DXYSquared{Belle2__SpacePoint}" , dist2DXY.name());
+    EXPECT_EQ("Distance2DXYSquared" , dist2DXY.name());
     auto dist1DZ = Distance1DZ<SpacePoint>();
-    EXPECT_EQ("Belle2__Distance1DZ{Belle2__SpacePoint}" , dist1DZ.name());
+    EXPECT_EQ("Distance1DZ" , dist1DZ.name());
     auto slopeRZ = SlopeRZ<SpacePoint>();
-    EXPECT_EQ("Belle2__SlopeRZ{Belle2__SpacePoint}" , slopeRZ.name());
+    EXPECT_EQ("SlopeRZ" , slopeRZ.name());
 
   }
 

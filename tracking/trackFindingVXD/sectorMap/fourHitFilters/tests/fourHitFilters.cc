@@ -102,9 +102,9 @@ namespace VXDTFfourHitFilterTest {
   TEST_F(FourHitFilterTest, SelectionVariableName)
   {
     auto dDCircleCenter = DeltaDistCircleCenter<SpacePoint>();
-    EXPECT_EQ("Belle2__DeltaDistCircleCenter{Belle2__SpacePoint}" , dDCircleCenter.name());
+    EXPECT_EQ("DeltaDistCircleCenter" , dDCircleCenter.name());
     auto dPt = DeltaPt<SpacePoint>();
-    EXPECT_EQ("Belle2__DeltaPt{Belle2__SpacePoint}" , dPt.name());
+    EXPECT_EQ("DeltaPt" , dPt.name());
   }
 
 

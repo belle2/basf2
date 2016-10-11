@@ -21,6 +21,8 @@ namespace Belle2 {
   template <typename PointType >
   class Distance1DZTemplate : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "Distance1DZTemplate"; };
 
     /** calculates the distance between the hits in z (1D), returning unit: cm */
     static double value(const PointType& outerHit, const PointType& innerHit)

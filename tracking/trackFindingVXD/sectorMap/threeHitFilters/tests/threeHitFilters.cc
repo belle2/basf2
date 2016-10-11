@@ -13,7 +13,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DFull.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CosAngleXY.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYFull.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZFull.h>
@@ -112,29 +112,29 @@ namespace VXDTFthreeHitFilterTest {
   TEST_F(ThreeHitFilterTest, SelectionVariableName)
   {
     auto angle3DS = Angle3DSimple<SpacePoint>();
-    EXPECT_EQ("Belle2__Angle3DSimple{Belle2__SpacePoint}" , angle3DS.name());
+    EXPECT_EQ("Angle3DSimple" , angle3DS.name());
     auto angle3DF = Angle3DFull<SpacePoint>();
-    EXPECT_EQ("Belle2__Angle3DFull{Belle2__SpacePoint}" , angle3DF.name());
+    EXPECT_EQ("Angle3DFull" , angle3DF.name());
     auto angleXYF = AngleXYFull<SpacePoint>();
-    EXPECT_EQ("Belle2__AngleXYFull{Belle2__SpacePoint}" , angleXYF.name());
-    auto angleXYS = AngleXYSimple<SpacePoint>();
-    EXPECT_EQ("Belle2__AngleXYSimple{Belle2__SpacePoint}" , angleXYS.name());
+    EXPECT_EQ("AngleXYFull" , angleXYF.name());
+    auto angleXYS = CosAngleXY<SpacePoint>();
+    EXPECT_EQ("CosAngleXY" , angleXYS.name());
     auto angleRZF = AngleRZFull<SpacePoint>();
-    EXPECT_EQ("Belle2__AngleRZFull{Belle2__SpacePoint}" , angleRZF.name());
+    EXPECT_EQ("AngleRZFull" , angleRZF.name());
     auto angleRZS = AngleRZSimple<SpacePoint>();
-    EXPECT_EQ("Belle2__AngleRZSimple{Belle2__SpacePoint}" , angleRZS.name());
+    EXPECT_EQ("AngleRZSimple" , angleRZS.name());
     auto dSlopeRZ = DeltaSlopeRZ<SpacePoint>();
-    EXPECT_EQ("Belle2__DeltaSlopeRZ{Belle2__SpacePoint}" , dSlopeRZ.name());
+    EXPECT_EQ("DeltaSlopeRZ" , dSlopeRZ.name());
     auto helixFit = HelixParameterFit<SpacePoint>();
-    EXPECT_EQ("Belle2__HelixParameterFit{Belle2__SpacePoint}" , helixFit.name());
+    EXPECT_EQ("HelixParameterFit" , helixFit.name());
     auto dSlopeZS = DeltaSlopeZoverS<SpacePoint>();
-    EXPECT_EQ("Belle2__DeltaSlopeZoverS{Belle2__SpacePoint}" , dSlopeZS.name());
+    EXPECT_EQ("DeltaSlopeZoverS" , dSlopeZS.name());
     auto dSZ = DeltaSoverZ<SpacePoint>();
-    EXPECT_EQ("Belle2__DeltaSoverZ{Belle2__SpacePoint}" , dSZ.name());
+    EXPECT_EQ("DeltaSoverZ" , dSZ.name());
     auto pT = Pt<SpacePoint>();
-    EXPECT_EQ("Belle2__Pt{Belle2__SpacePoint}" , pT.name());
+    EXPECT_EQ("Pt" , pT.name());
     auto cDist2IP = CircleDist2IP<SpacePoint>();
-    EXPECT_EQ("Belle2__CircleDist2IP{Belle2__SpacePoint}" , cDist2IP.name());
+    EXPECT_EQ("CircleDist2IP" , cDist2IP.name());
   }
 
 
@@ -177,10 +177,10 @@ namespace VXDTFthreeHitFilterTest {
     EXPECT_TRUE(filterAngleXYfull.accept(outerSP, centerSP, innerSP));
     EXPECT_FLOAT_EQ(26.5650511770779893515721937204532946712042, lastResult);
 
-    Filter< AngleXYSimple<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXY(Range<double, double>(0.099,
-        0.101));
+    Filter< CosAngleXY<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleXY(Range<double, double>(0.7,
+        0.9));
     EXPECT_TRUE(filterAngleXY.accept(outerSP, centerSP, innerSP));
-    EXPECT_FLOAT_EQ(0.1, lastResult);
+    EXPECT_NEAR(0.89442718, lastResult, 0.0000001);
 
 
     Filter< AngleRZFull<SpacePoint>, Range<double, double>, ResultsObserver > filterAngleRZfull(Range<double, double>(17.5,

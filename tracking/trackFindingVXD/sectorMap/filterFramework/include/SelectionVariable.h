@@ -62,8 +62,8 @@ namespace Belle2 {
      *
      * N.B. this method must be static.
      */
-    inline static variableType
-    value(const templateArgumentType& arg1, const templateArgumentType& arg2);
+    //inline static variableType
+    //value(const templateArgumentType& arg1, const templateArgumentType& arg2);
 
     /** Returns the name of the selection variable.
      *
@@ -97,6 +97,7 @@ namespace Belle2 {
      * you like to write an external name manager?
      */
 
+    /*
     const std::string name(void) const
     {
       char* realname(NULL);
@@ -122,6 +123,7 @@ namespace Belle2 {
       return name4;
 
     }
+    */
 
     /** A bogus virtual denstructor */
     virtual ~SelectionVariable() {};

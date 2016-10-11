@@ -24,21 +24,23 @@ namespace Belle2 {
   template <typename PointType >
   class AngleRZFull : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "AngleRZFull"; };
 
     /** calculates the angle between the hits/vectors (RZ), returning unit: angle in degrees */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3D innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3D outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), outerHit.Z() - centerHit.Z());
+      B2Vector3D innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), centerHit.Z() - innerHit.Z());
 
       B2Vector3D rzVecAB(outerVector.Perp(), outerVector[2], 0.);
       B2Vector3D rzVecBC(innerVector.Perp(), innerVector[2], 0.);
 
       double result = Helper::fullAngle2D(rzVecAB, rzVecBC); // 0-pi
       result *= double(180. / M_PI);
-      return Helper::checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     } // return unit: ° (0 - 180°)
   };
 

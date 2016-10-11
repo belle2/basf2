@@ -11,8 +11,10 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
+
 #include <framework/geometry/B2Vector3.h>
+
 #include <math.h>
 
 namespace Belle2 {
@@ -24,14 +26,15 @@ namespace Belle2 {
   template <typename PointType >
   class DeltaSlopeRZ : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "DeltaSlopeRZ"; };
 
     /** calculates deviations in the slope of the inner segment and the outer segment, returning unit: none */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, double> Helper;
 
-      double slopeOC = Helper::calcSlopeRZ(outerHit, centerHit);
-      double slopeCI = Helper::calcSlopeRZ(centerHit, innerHit);
+      double slopeOC = SlopeRZ<PointType>::value(outerHit, centerHit);
+      double slopeCI = SlopeRZ<PointType>::value(centerHit, innerHit);
 
       return slopeCI - slopeOC;
     } // return unit: none

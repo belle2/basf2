@@ -11,7 +11,6 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
 
@@ -23,22 +22,23 @@ namespace Belle2 {
    * WARNING: this filter returns 0 if no valid value could be found!
    * */
   template <typename PointType >
-  class AngleXYSimple : public SelectionVariable< PointType , double > {
+  class CosAngleXY : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "CosAngleXY"; };
 
     /** calculates the angle between the hits/vectors (XY),
      * returning unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead) */
     static double value(const PointType& outerHit, const PointType& centerHit, const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D outerVector = Helper::doAMinusB(outerHit, centerHit);
-      B2Vector3D innerVector = Helper::doAMinusB(centerHit, innerHit);
+      B2Vector3<double> outerVector(outerHit.X() - centerHit.X(), outerHit.Y() - centerHit.Y(), 0.);
+      B2Vector3<double> innerVector(centerHit.X() - innerHit.X(), centerHit.Y() - innerHit.Y(), 0.);
 
-      double result = (outerVector.X() * innerVector.X() + outerVector.Y() * innerVector.Y()) / (outerVector.Perp2() *
-                      innerVector.Perp2());
+      double result = (outerVector.X() * innerVector.X() + outerVector.Y() * innerVector.Y()) / (outerVector.Perp() *
+                      innerVector.Perp());
 
-      return Helper::checkValid(result);
+      return (std::isnan(result) || std::isinf(result)) ? double(0) : result;
     } // return unit: none (calculation for degrees is incomplete, if you want readable numbers, use AngleXYFull instead)
   };
 

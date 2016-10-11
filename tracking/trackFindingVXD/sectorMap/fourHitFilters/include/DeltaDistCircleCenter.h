@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
-#include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
 
@@ -22,16 +22,17 @@ namespace Belle2 {
   template <typename PointType >
   class DeltaDistCircleCenter : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "DeltaDistCircleCenter"; };
 
     /** calculates the distance between the estimated circle centers (using 2 subsets of given hits) in the xy-plane, returning unit: cm */
     static double value(const PointType& outerHit, const PointType& outerCenterHit, const PointType& innerCenterHit,
                         const PointType& innerHit)
     {
-      typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D outerCircleCenter = Helper::calcCircleCenter(outerHit, outerCenterHit, innerCenterHit);
+      B2Vector3<double> outerCircleCenter = CircleCenterXY<PointType>::value(outerHit, outerCenterHit, innerCenterHit);
 
-      B2Vector3D innerCircleCenter = Helper::calcCircleCenter(outerCenterHit, innerCenterHit, innerHit);
+      B2Vector3<double> innerCircleCenter = CircleCenterXY<PointType>::value(outerCenterHit, innerCenterHit, innerHit);
 
       return fabs(outerCircleCenter.Perp() - innerCircleCenter.Perp());
     } // return unit: GeV/c

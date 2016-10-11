@@ -19,6 +19,8 @@ namespace Belle2 {
   template <typename PointType>
   class Distance2DXYSquared : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "Distance2DXYSquared"; };
 
     /** calculates the squared distance between the hits (2D on the X-Y-plane), returning unit: cm^2 for speed optimization */
     static double value(const PointType& outerHit, const PointType& innerHit)

@@ -11,6 +11,7 @@
 #pragma once
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleCenterXY.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
 #include <math.h>
@@ -22,6 +23,8 @@ namespace Belle2 {
   template <typename PointType >
   class DeltaSoverZ : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "DeltaSoverZ"; };
 
     /** calculates the helixparameter describing the deviation in arc length per unit in z.
      * returning unit: radians*cm */
@@ -29,7 +32,7 @@ namespace Belle2 {
     {
       typedef SelVarHelper<PointType, double> Helper;
 
-      B2Vector3D circleCenter = Helper::calcCircleCenter(outerHit, centerHit, innerHit);
+      B2Vector3D circleCenter = CircleCenterXY<PointType>::value(outerHit, centerHit, innerHit);
       B2Vector3D points2outerHit((outerHit.X() - circleCenter.X()),
                                  (outerHit.Y() - circleCenter.Y()),
                                  (outerHit.Z() - circleCenter.Z()));

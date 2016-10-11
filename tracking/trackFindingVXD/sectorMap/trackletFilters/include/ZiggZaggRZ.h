@@ -13,6 +13,7 @@
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/SelectionVariable.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 #include <framework/geometry/B2Vector3.h>
+#include <boost/math/special_functions/sign.hpp>
 #include <math.h>
 
 #include <vector>
@@ -20,38 +21,42 @@
 
 namespace Belle2 {
 
-  /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns number of charge-signs found (if != 1, then the given hitContainer is ziggZagging). This functions uses the sigma to consider also approximately straight tracks as not zigg-zagging.
+  /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the R-Z-plane, returns number of charge-signs found (if != 1, then the given hitContainer is ziggZagging).
    *
    * ATTENTION: in contrast to the Two- Three- and FourHit-filters, the TrackletFilters do _NOT_ expect Hits, but a Container with pointers to Hits (e.g. Vector of hits or a SpacePointTrackCandidate, These filters therefore apply to arbitrary numbers of hits in that container.
    * */
   template <typename PointType, typename PointContainerType >
-  class ZiggZaggXYWithSigma : public SelectionVariable< PointContainerType , int > {
+  class ZiggZaggRZ : public SelectionVariable< PointContainerType , int > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "ZiggZaggRZ"; };
 
-    /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns number of charge-signs found (if != 1, then the given hitContainer is ziggZagging). This functions uses the sigma to consider also approximately straight tracks as not zigg-zagging */
+    /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the R-Z-plane, returns number of charge-signs found (if != 1, then the given hitContainer is ziggZagging) */
     static int value(const PointContainerType& hitContainer)
     {
-      if (hitContainer.size() < 4) return 1;
+      const unsigned nHits = hitContainer.size();
+      if (nHits < 4) return 1;
 
       typedef SelVarHelper<PointType, double> Helper;
+      using boost::math::sign;
+
+      std::vector<B2Vector3D> vecRZ;
+      vecRZ.reserve(nHits);
+      for (const auto* hit : hitContainer) { // collect RZ-Vrsions of the hits:
+        vecRZ.push_back(B2Vector3D(Helper::calcPerp(*hit) , hit->Z(), 0.));
+      }
 
       std::vector<int> chargeSigns;
-      chargeSigns.reserve(hitContainer.size() - 2);
-
-      auto iterPos = hitContainer.begin();
-      auto stopPos = hitContainer.end() - 2;
-
-      for (; iterPos < stopPos; ++iterPos) {
-        int signVal = Helper::calcSign(**iterPos, **(iterPos + 1), **(iterPos + 2), (*iterPos)->getPositionError(),
-                                       (*(iterPos + 1))->getPositionError(), (*(iterPos + 2))->getPositionError());
+      chargeSigns.reserve(nHits - 2);
+      for (unsigned i = 0; i < nHits - 2; ++i) {
+        int signVal = sign((vecRZ.at(i + 1) - vecRZ.at(i + 2)).Orthogonal() * (vecRZ.at(i) - vecRZ.at(i + 1)));
         chargeSigns.push_back(signVal);
       }
 
       std::sort(chargeSigns.begin(), chargeSigns.end());
-      auto endAfterRemove = std::remove(chargeSigns.begin(), chargeSigns.end(), 0);
-      auto finalEnd = std::unique(chargeSigns.begin(), endAfterRemove);
+      auto newEnd = std::unique(chargeSigns.begin(), chargeSigns.end());
 
-      return std::distance(chargeSigns.begin(), finalEnd);
+      return std::distance(chargeSigns.begin(), newEnd);
     } // return unit: none
   };
 

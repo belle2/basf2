@@ -17,7 +17,7 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
@@ -25,7 +25,7 @@
 #include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
 
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CosAngleXY.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleDist2IP.h>
 #include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeRZ.h>
@@ -93,7 +93,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= AngleXYSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= CosAngleXY<point_t>()   <= 0.).observe(VoidObserver())&&
       (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
       (CircleDist2IP<point_t>()         <= 0.).observe(VoidObserver())&&
       (0. <= DeltaSlopeRZ<point_t>()    <= 0.).observe(VoidObserver())&&

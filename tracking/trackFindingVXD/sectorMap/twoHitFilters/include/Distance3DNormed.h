@@ -19,6 +19,8 @@ namespace Belle2 {
   template <typename PointType >
   class Distance3DNormed : public SelectionVariable< PointType , double > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "Distance3DNormed";};
 
     /** calculates the normed distance between the hits (3D), returning unit: none.
     *
@@ -40,6 +42,8 @@ namespace Belle2 {
       return
         (std::isnan(result) || std::isinf(result)) ? 0 : result;
     }
+
+
   };
 
 }

@@ -12,9 +12,9 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/spacePointCreation/SpacePointTrackCand.h>
-#include <tracking/trackFindingVXD/trackletFilters/ZiggZaggXY.h>
-#include <tracking/trackFindingVXD/trackletFilters/ZiggZaggXYWithSigma.h>
-#include <tracking/trackFindingVXD/trackletFilters/ZiggZaggRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/trackletFilters/ZiggZaggXY.h>
+#include <tracking/trackFindingVXD/sectorMap/trackletFilters/ZiggZaggXYWithSigma.h>
+#include <tracking/trackFindingVXD/sectorMap/trackletFilters/ZiggZaggRZ.h>
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
@@ -103,13 +103,13 @@ namespace VXDTFtrackletFilterTest {
   TEST_F(TrackletFilterTest, SelectionVariableName)
   {
     auto ziggZaggXYChecker = ZiggZaggXY<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("Belle2__ZiggZaggXY{Belle2__SpacePoint, Belle2__SpacePointTrackCand}" , ziggZaggXYChecker.name());
+    EXPECT_EQ("ZiggZaggXY" , ziggZaggXYChecker.name());
 
     auto ziggZaggXYWithSigmaChecker = ZiggZaggXYWithSigma<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("Belle2__ZiggZaggXYWithSigma{Belle2__SpacePoint, Belle2__SpacePointTrackCand}" , ziggZaggXYWithSigmaChecker.name());
+    EXPECT_EQ("ZiggZaggXYWithSigma" , ziggZaggXYWithSigmaChecker.name());
 
     auto ziggZaggRZChecker = ZiggZaggRZ<SpacePoint, SpacePointTrackCand>();
-    EXPECT_EQ("Belle2__ZiggZaggRZ{Belle2__SpacePoint, Belle2__SpacePointTrackCand}" , ziggZaggRZChecker.name());
+    EXPECT_EQ("ZiggZaggRZ" , ziggZaggRZChecker.name());
   }
 
 

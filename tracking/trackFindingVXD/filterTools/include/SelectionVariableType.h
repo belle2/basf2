@@ -36,7 +36,7 @@ namespace Belle2 {
       Distance3DNormed,
       Angle3DSimpleHighOccupancy,
       Angle3DFullHighOccupancy,
-      AngleXYSimpleHighOccupancy,
+      CosAngleXYHighOccupancy,
       AngleXYFullHighOccupancy,
       AngleRZSimpleHighOccupancy,
       AngleRZFullHighOccupancy,
@@ -50,7 +50,7 @@ namespace Belle2 {
       /// SelectionVariables using 3 hits as an input:
       Angle3DSimple,
       Angle3DFull,
-      AngleXYSimple,
+      CosAngleXY,
       AngleXYFull,
       AngleRZSimple,
       AngleRZFull,

@@ -27,6 +27,8 @@ namespace Belle2 {
   template <typename PointType, typename PointContainerType >
   class ZiggZaggXY : public SelectionVariable< PointContainerType , int > {
   public:
+    /** return name of the Class */
+    static const std::string name(void) {return "ZiggZaggXY"; };
 
     /** checks whether chain of segments are zigg-zagging (changing sign of curvature of neighbouring segments) in the X-Y-plane, returns number of charge-signs found (if != 1, then the given hitContainer is ziggZagging) */
     static int value(const PointContainerType& hitContainer)

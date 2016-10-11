@@ -5,12 +5,20 @@ import configparser
 from threading import Thread, Lock, RLock
 from time import sleep
 import pickle
+import multiprocessing
+import glob
+import shutil
 
 from basf2 import *
 import ROOT
+from ROOT.Belle2 import PyStoreObj, CalibrationAlgorithm
+
 from .utils import method_dispatch
 from .utils import merge_local_databases
 from .utils import decode_json_string
+from .utils import iov_from_vector
+from .utils import IoV_Result
+from .utils import AlgResult
 from .backends import Job
 
 
@@ -334,20 +342,6 @@ class CalibrationMachine(Machine):
         super().__init__(self.default_states, initial_state)
         self.setup_defaults()
 
-        self.add_transition("submit_collector", "init", "running_collector",
-                            conditions=self.dependencies_completed,
-                            before=[self._make_output_dir,
-                                    self._create_collector_job])
-        self.add_transition("fail", "running_collector", "collector_failed")
-        self.add_transition("complete", "running_collector", "collector_completed")
-        self.add_transition("run_algorithms", "collector_completed", "running_algorithms")
-        self.add_transition("complete", "running_algorithms", "algorithms_completed",
-                            after=self.automatic_transition)
-        self.add_transition("fail", "running_algorithms", "algorithms_failed")
-        self.add_transition("iterate", "algorithms_completed", "init",
-                            conditions=self.require_iteration)
-        self.add_transition("finish", "algorithms_completed", "completed")
-
         #: Calibration object whose state we are modelling
         self.calibration = calibration
         # Monkey Patching for the win!
@@ -357,8 +351,51 @@ class CalibrationMachine(Machine):
         self.iteration = iteration
         #: Maximum allowed iterations
         self.max_iterations = self.default_max_iterations
+        #: Backend used for this calibration machine collector
+        self.collector_backend = None
+        #: Result object of collector, filled by submitting to backend
+        self._collector_result = None
+        #: Results of each iteration for all algorithms of this calibration
+        self._algorithm_results = {}
 
-    def require_iteration(self):
+        self.add_transition("submit_collector", "init", "running_collector",
+                            conditions=self.dependencies_completed,
+                            before=[self._make_output_dir,
+                                    self._create_collector_job,
+                                    self._submit_collector])
+        self.add_transition("fail", "running_collector", "collector_failed")
+        self.add_transition("complete", "running_collector", "collector_completed",
+                            conditions=self._collector_ready,
+                            before=self._post_process_collector)
+        self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
+                            before=self._run_algorithms,
+                            after=self.automatic_transition)
+        self.add_transition("complete", "running_algorithms", "algorithms_completed",
+                            after=self.automatic_transition)
+        self.add_transition("fail", "running_algorithms", "algorithms_failed")
+        self.add_transition("iterate", "algorithms_completed", "init",
+                            conditions=self._require_iteration)
+        self.add_transition("finish", "algorithms_completed", "completed",
+                            before=self._prepare_final_db)
+
+    def _post_process_collector(self):
+        self._collector_result.post_process()
+
+    def _collector_ready(self):
+        return self._collector_result.ready()
+
+    def _submit_collector(self):
+        self._collector_result = self.collector_backend.submit(self._collector_job)
+
+    def _require_iteration(self):
+        iteration_called = False
+        for alg_name, results in self._algorithm_results[self.iteration].items():
+            for result in results:
+                if result.result == CalibrationAlgorithm.c_Iterate:
+                    iteration_called = True
+                    break
+            if iteration_called:
+                break
         return False
 
     def setup_defaults(self):
@@ -377,7 +414,7 @@ class CalibrationMachine(Machine):
     def _log_new_state(self, **kwargs):
         B2INFO("Calibration {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
 
-    def dependencies_completed(self, **kwargs):
+    def dependencies_completed(self):
         """
         Condition function to check that the dependencies of our calibration are in the 'completed' state.
         Technically only need to check explicit dependencies.
@@ -399,7 +436,7 @@ class CalibrationMachine(Machine):
                 continue
         else:
             raise RunnerError(("Failed to automatically transition out of {0} state."
-                               " No conditions succeeded.".format(self.state)))
+                               " No non-failure conditions succeeded.".format(self.state)))
 
     def _make_output_dir(self):
         os.mkdir(self.calibration.name)
@@ -482,8 +519,170 @@ class CalibrationMachine(Machine):
         # Define the input file list and output patterns to be returned from collector job
         job.input_files = self.calibration.input_files
         job.output_patterns = self.calibration.output_patterns
+        self._collector_job = job
 
-        return job
+    def _run_algorithms(self):
+        """
+        Runs the Calibration Algorithms for this calibration machine.
+
+        Will run them sequentially locally (possible benefits to using a
+        processing pool for low memory algorithms later on.)
+        """
+        # prepare a multiprocessing context which uses fork
+        ctx = multiprocessing.get_context("fork")
+        # prepare a Pipe to receive the results of the algorithms from inside the process
+        parent_conn, child_conn = ctx.Pipe()
+        self._algorithm_results[self.iteration] = {}
+
+        for algorithm in self.calibration.algorithms:
+            child = ctx.Process(target=self._run_algorithm,
+                                args=(algorithm, child_conn))
+            child.start()
+            # wait for it to finish
+            child.join()
+            # Get a nicer version of the algorithm name
+            algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+            # Get the return codes of the algorithm for the IoVs found by the Process
+            self._algorithm_results[self.iteration][algorithm_name] = parent_conn.recv()
+
+    def _prepare_final_db(self):
+        database_location = os.path.join(self.calibration.name,
+                                         str(self.iteration), 'output', 'outputdb')
+        final_database_location = os.path.join(self.calibration.name, 'outputdb')
+        shutil.copytree(database_location, final_database_location)
+
+    def _run_algorithm(self, algorithm, child_conn):
+        """
+        Runs a single algorithm of a calibration in the output directory of the collector
+        and first runs its setup function if one exists.
+
+        There's probably too much spaghetti logic here about when to commit or merge IoVs.
+        Will refactor later.
+        """
+
+        os.chdir(self._collector_job.output_dir)
+        # Create a directory to store the payloads of this algorithm
+        os.mkdir('outputdb')
+
+        logging.reset()
+        set_log_level(LogLevel.INFO)
+        # Get a nicer version of the algorithm name
+        algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+
+        # add logfile for output
+        logging.add_file(algorithm_name+'_b2log')
+
+        # Clean everything out just in case
+        reset_database()
+        # Fall back to previous databases if no payloads are found
+        use_database_chain(True)
+        # Use the central database with production global tag as the ultimate fallback
+        use_central_database('production')
+        # Here we add the finished databases of previous calibrations that we depend on.
+        # We can assume that the databases exist as we can't be here until they have returned
+        # with OK status.
+        for calibration in self.calibration.dependencies:
+            database_location = os.path.abspath(os.path.join("../../../", calibration.name, 'outputdb'))
+            use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
+            B2INFO("Adding local database from {0} for use by {1}::{2}".format(
+                   calibration.name, self.calibration.name, algorithm_name))
+
+        # Here we add the previous iteration's database
+        if self.iteration > 0:
+            use_local_database(os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb/database.txt')),
+                               os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb')), True, LogLevel.INFO)
+
+        # add local database to save payloads
+        use_local_database("outputdb/database.txt", 'outputdb', False, LogLevel.INFO)
+
+        B2INFO("Running {0} in working directory {1}".format(algorithm_name, os.getcwd()))
+        B2INFO("Output folder contents of collector was"+str(glob.glob('./*')))
+
+        algorithm.data_input()
+        if algorithm.pre_algorithm:
+            # We have to re-pass in the algorithm here because an outside user has created this method.
+            # So the method isn't bound to the instance properly.
+            algorithm.pre_algorithm(algorithm.algorithm, self.iteration)
+
+        # Sorting the run list should not be necessary as the CalibrationAlgorithm does this during
+        # the getRunListFromAllData() function.
+        # Get a vector of all the experiments and runs passed into the algorithm via the output of the collector
+        exprun_vector = algorithm.algorithm.getRunListFromAllData()
+        # Create empty IoV vector to execute
+        iov_to_execute = ROOT.vector("std::pair<int,int>")()
+        # Create list of result codes and IoVs
+        results = []
+        # Want to store the payloads so that we only commit them once we've got a new set to hold onto.
+        # Because if we'll be merging later and should wait
+        last_payloads = None
+        for exprun in exprun_vector:
+            # Add each exprun to the vector in turn
+            B2INFO("Adding Exp:Run = {0}:{1} to execution request".format(exprun.first, exprun.second))
+            iov_to_execute.push_back(exprun)
+            # Perform the algorithm over the requested IoVs
+            B2INFO("Performing execution on IoV {0}".format(iov_from_vector(iov_to_execute)))
+            alg_result = algorithm.algorithm.execute(iov_to_execute, self.iteration)
+            # Commit to the local database if we've got a success or iteration requested
+            if alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate:
+                B2INFO("Finished execution of {0} with highest Exp:Run = {1}:{2} ".format(algorithm_name,
+                       exprun.first, exprun.second))
+                # Only commit old payload if there was a new successful calibration
+                if last_payloads:
+                    B2INFO("Committing payload to local database for IoV {0}".format(iov))
+                    algorithm.algorithm.commit(last_payloads)
+                # These new payloads for this execution will be committed later when we know if we need to merge
+                last_payloads = algorithm.algorithm.getPayloadValues()
+                # Get readable iov for this one and create a result entry. We can always pop the entry if we'll be merging.
+                # Can't do that with the database as easily.
+                iov = iov_from_vector(iov_to_execute)
+                result = IoV_Result(iov, alg_result)
+                B2INFO('Result was {0}'.format(result))
+                results.append(result)
+                iov_to_execute.clear()
+            B2INFO("Execution of {0} finished with exit code {1} = {2}".format(algorithm_name, alg_result,
+                   AlgResult(alg_result).name))
+
+        else:
+            # If we haven't cleared the execution vector and we have no results, then we never got a success to commit
+            if iov_to_execute.size() and not results:
+                # We should add the result regardless and pass it out, but not commit to a database
+                iov = iov_from_vector(iov_to_execute)
+                result = IoV_Result(iov, alg_result)
+                B2INFO('Result was {0}'.format(result))
+                results.append(result)
+            # Final IoV will probably have returned c_NotEnoughData so we need to merge it with the previous successful
+            # IoV if one exists.
+            elif iov_to_execute.size() and results:
+                iov = iov_from_vector(iov_to_execute)
+                B2INFO('Merging IoV for {0} onto end of previous IoV'.format(iov))
+                last_successful_result = results.pop(-1)
+                B2INFO('Last successful result was {0}'.format(last_successful_result))
+                iov_to_execute.clear()
+                exprun = ROOT.pair('int, int')
+                for exp in range(last_successful_result.iov[0][0], iov[1][0]+1):
+                    for run in range(last_successful_result.iov[0][1], iov[1][1]+1):
+                        iov_to_execute.push_back(exprun(exp, run))
+
+                B2INFO('Merged IoV for execution is {0}'.format(iov_from_vector(iov_to_execute)))
+                alg_result = algorithm.algorithm.execute(iov_to_execute, self.iteration)
+                # Get readable iov for this one and create a result entry.
+                iov = iov_from_vector(iov_to_execute)
+                result = IoV_Result(iov, alg_result)
+                if alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate:
+                    B2INFO("Committing payload to local database for Merged IoV {0}".format(iov))
+                    algorithm.algorithm.commit()
+                B2INFO('Result was {0}'.format(result))
+                results.append(result)
+                B2INFO("Execution of {0} finished with exit code {1} = {2}".format(algorithm_name, alg_result,
+                       AlgResult(alg_result).name))
+
+            # If there isn't any more data to calibrate then we have dangling payloads to commit from the last execution
+            elif not iov_to_execute.size():
+                if (alg_result == CalibrationAlgorithm.c_OK or alg_result == CalibrationAlgorithm.c_Iterate):
+                    B2INFO("Committing final payload to local database for IoV {0}".format(iov))
+                    algorithm.algorithm.commit(last_payloads)
+        child_conn.send(results)
+        return 0
 
 
 class CalibrationRunner(Thread):

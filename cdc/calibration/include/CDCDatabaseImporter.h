@@ -126,6 +126,18 @@ namespace Belle2 {
      */
     void printWirPosAlign();
 
+    /**
+     * Import displacement of wire position to the database.
+     */
+    void importDisplacement(std::string fileName);
+
+    /**
+     * Get the displacement of wire position from the database and
+     * print it.
+     */
+    void printDisplacement();
+
+
   private:
 
     /**

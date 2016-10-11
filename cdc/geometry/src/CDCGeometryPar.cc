@@ -76,6 +76,11 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     m_alignFromDB.addCallback(this, &CDCGeometryPar::setWirPosAlignParams);
   }
 #endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+  if (m_displacementFromDB.isValid()) {
+    m_displacementFromDB.addCallback(this, &CDCGeometryPar::setDisplacement);
+  }
+#endif
 
   clear();
   if (geom) {
@@ -277,7 +282,12 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
          m_Displacement);
   if (m_Displacement) {
+
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+    setDisplacement();
+#else
     readWirePositionParams(c_Base, &geom, gbxParams);
+#endif
   }
 
   //Set misalignment params. (from input data)
@@ -2777,3 +2787,27 @@ signed short CDCGeometryPar::getShiftInSuperLayer(unsigned short iSuperLayer, un
 {
   return m_shiftInSuperLayer[iSuperLayer][iLayer];
 }
+
+
+
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+void CDCGeometryPar::setDisplacement()
+{
+  for (const auto& disp : m_displacementFromDB) {
+    const int iLayer = disp.getICLayer();
+    const int iWire = disp.getIWire();
+    const float dxFwd = disp.getXFwd();
+    const float dyFwd = disp.getYFwd();
+    const float dzFwd = disp.getZFwd();
+    const float dxBwd = disp.getXBwd();
+    const float dyBwd = disp.getYBwd();
+    const float dzBwd = disp.getZBwd();
+    m_FWirPos[iLayer][iWire][0] += dxFwd;
+    m_FWirPos[iLayer][iWire][1] += dyFwd;
+    m_FWirPos[iLayer][iWire][2] += dzFwd;
+    m_BWirPos[iLayer][iWire][0] += dxBwd;
+    m_BWirPos[iLayer][iWire][1] += dyBwd;
+    m_BWirPos[iLayer][iWire][2] += dzBwd;
+  }
+}
+#endif

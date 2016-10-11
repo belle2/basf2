@@ -25,6 +25,7 @@
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
 #include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
@@ -939,7 +940,10 @@ namespace Belle2 {
 
       void outputDesignWirParam(unsigned layerID, unsigned cellID) const;
 
-
+      /**
+       * Set displacement of sense wire.
+       */
+      void setDisplacement();
 
     private:
       /** Singleton class */
@@ -1067,6 +1071,9 @@ namespace Belle2 {
 #endif
 #if defined(CDC_ALIGN_FROM_DB)
       DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
+#endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

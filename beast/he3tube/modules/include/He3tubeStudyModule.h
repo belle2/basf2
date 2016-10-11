@@ -119,6 +119,12 @@ namespace Belle2 {
       TH1F* h_mche3_kinetic[10];
       /** Neutron kin energy dis */
       TH1F* h_mche3_kinetic_zoom[10];
+      /** theta v phi dis */
+      TH2F* h_mche3_tvp[10];
+      /** theta v phi dis */
+      TH2F* h_mche3_tvpW[10];
+      /** r v z */
+      TH2F* h_mche3_zr[10];
       /** Number of neutrons */
       int nNeutronHits = 0;
       /** Number of definte neutrons */

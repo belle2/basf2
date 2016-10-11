@@ -165,7 +165,7 @@ class Local(Backend):
         """
         global pool
         # Submit the jobs to owned Pool
-        B2INFO('Job Submitting:', job.name)
+        B2INFO('Job Submitting: '+job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -382,7 +382,7 @@ class PBS(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the PBS system and the job about whether or not the job has finished.
         """
-        B2INFO('Job Submitting:', job.name)
+        B2INFO('Job Submitting: '+job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -596,7 +596,7 @@ class LSF(Backend):
         Should return a Result object that allows a 'ready' member method to be called from it which queries
         the LSF system and the job about whether or not the job has finished.
         """
-        B2INFO('Job Submitting:', job.name)
+        B2INFO('Job Submitting: '+job.name)
         # Make sure the output directory of the job is created
         if not os.path.exists(job.output_dir):
             os.makedirs(job.output_dir)
@@ -647,7 +647,7 @@ class LSF(Backend):
         job_id = bsub_out.split(" ")[1]
         for wrap in ["<", ">"]:
             job_id = job_id.replace(wrap, "")
-        B2INFO("Job ID recorded as:", job_id)
+        B2INFO("Job ID recorded as: "+job_id)
         result = LSF.Result(job, job_id)
         return result
 

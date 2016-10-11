@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/datastore/StoreArray.h>
 #include <tracking/dataobjects/PXDIntercept.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
 
@@ -45,7 +46,7 @@ namespace Belle2 {
     /** Fill the list of PXD intecepts corresponding to the list of track candidates.
      */
     void fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled,
-                           const StoreArray<genfit::Track>& trackList,
+                           const StoreArray<RecoTrack>& trackList,
                            RelationArray* gfTrackToPXDIntercepts);
 
     /**

@@ -33,7 +33,7 @@ PXDInterceptor::~PXDInterceptor()
 }
 
 void
-PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, const StoreArray<genfit::Track>& trackList,
+PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, const StoreArray<RecoTrack>& trackList,
                                   RelationArray* gfTrackToPXDIntercepts)
 {
 
@@ -44,7 +44,9 @@ PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, cons
 
     B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
 
-    m_theROIGeometry.appendIntercepts(listToBeFilled, trackList[i], i, gfTrackToPXDIntercepts);
+    genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*trackList[i]);
+
+    m_theROIGeometry.appendIntercepts(listToBeFilled, &gfTrack, i, gfTrackToPXDIntercepts);
 
   } //loop on the track list
 

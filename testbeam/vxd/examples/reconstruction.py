@@ -199,6 +199,8 @@ parser.add_argument('--raw-input', dest='raw_input', action='store_const', const
                     help='Use SeqRootInput to load directly raw data files in .sroot format')
 parser.add_argument('--unpacking', dest='unpacking', action='store_const', const=True,
                     default=False, help='Add PXD and SVD unpacking modules to the path')
+parser.add_argument('--masking-path', dest='masking_path', action='store', default=None, type=str,
+                    help='Location of masking XMLs XXX_MaskFiredBasic.xml XXX_MaskFired_RunYY.xml XXX=PXD|SVD|Tel')
 parser.add_argument('--dqm', dest='dqm', action='store_const', const=True, default=False, help='Produce DQM plots')
 parser.add_argument('--display', dest='display', action='store_const', const=True, default=False, help='Show Event Display window')
 parser.add_argument('--gbl-collect', dest='gbl_collect', action='store_const', const=True,
@@ -301,14 +303,46 @@ if args.unpacking:
 if not args.svd_only:
     if args.unpacking:
         main.add_module("PXDRawHitSorter")
-    # main.add_module('PXDDigitSorter')
+
+    if args.masking_path is not None:
+        pxd_maskBasic = args.masking_path + 'PXD_MaskFiredBasic.xml'
+        pxd_mask = args.masking_path + 'PXD_MaskFired_Run' + str(args.run) + '.xml'
+        PXDSortBasic = register_module('PXDDigitSorter')
+        PXDSortBasic.param('ignoredPixelsListName', pxd_maskBasic)
+        main.add_module(PXDSortBasic)
+        PXDSort = register_module('PXDDigitSorter')
+        PXDSort.param('ignoredPixelsListName', pxd_mask)
+        main.add_module(PXDSort)
+
     main.add_module('PXDClusterizer')
 
-main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
+if args.masking_path is not None:
+    svd_maskBasic = args.masking_path + 'SVD_MaskFiredBasic.xml'
+    svd_mask = args.masking_path + 'SVD_MaskFired_Run' + str(args.run) + '.xml'
+    SVDSortBasic = register_module('SVDDigitSorter')
+    SVDSortBasic.param('ignoredStripsListName', svd_maskBasic)
+    main.add_module(SVDSortBasic)
+    SVDSort = register_module('SVDDigitSorter')
+    SVDSort.param('ignoredStripsListName', svd_mask)
+    main.add_module(SVDSort)
+else:
+    main.add_module('SVDDigitSorter')  # , ignoredStripsListName='data/testbeam/vxd/SVD_Masking.xml')
+
 main.add_module('SVDClusterizer')
 
 if args.tel_input:
-    main.add_module('TelDigitSorter')
+    if args.masking_path is not None:
+        tel_maskBasic = args.masking_path + 'Tel_MaskFiredBasic.xml'
+        tel_mask = args.masking_path + 'Tel_MaskFired_Run' + str(args.run) + '.xml'
+        TelSortBasic = register_module('TelDigitSorter')
+        TelSortBasic.param('ignoredPixelsListName', tel_maskBasic)
+        main.add_module(TelSortBasic)
+        TelSort = register_module('TelDigitSorter')
+        TelSort.param('ignoredPixelsListName', tel_mask)
+        main.add_module(TelSort)
+    else:
+        main.add_module('TelDigitSorter')
+
     main.add_module('TelClusterizer')
 
 if args.gbl_collect:

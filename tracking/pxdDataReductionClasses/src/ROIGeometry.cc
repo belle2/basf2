@@ -60,7 +60,7 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
         genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
         lambda = state.extrapolateToPlane(plane);
       }  catch (...) {
-        B2WARNING("extrapolation failed");
+        B2DEBUG(1, "extrapolation failed");
         ++itPlanes;
         continue;
       }

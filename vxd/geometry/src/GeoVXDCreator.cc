@@ -464,8 +464,16 @@ namespace Belle2 {
       return ladderPlacement;
     }
 
+    void GeoVXDCreator::createGeometry(const VXDGeometryPar& parameters, G4LogicalVolume& motherLogical, GeometryTypes)
+    {
+      B2INFO("benni's comment in geovxd creator " << parameters.getVXDGeometryParComment());
+    }
+
+
     void GeoVXDCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
+
+
 
       m_activeStepSize = content.getLength("ActiveStepSize", m_activeStepSize) / Unit::mm;
       m_activeChips = content.getBool("ActiveChips", m_activeChips);

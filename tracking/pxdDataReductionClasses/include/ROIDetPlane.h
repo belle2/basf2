@@ -13,6 +13,7 @@
 #include <pxd/geometry/SensorInfo.h>
 
 #include <genfit/DetPlane.h>
+#include <genfit/SharedPlanePtr.h>
 
 namespace Belle2 {
   /** ROIDetPlane describes the plane containing a sensor.
@@ -23,14 +24,29 @@ namespace Belle2 {
   public:
     ROIDetPlane() {};
 
-    ROIDetPlane(const VxdID& sensorInfo); /**< the constructor*/
+    ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tolerancePhi); /**< the constructor*/
 
     virtual ~ROIDetPlane();
 
     /**return the sensor ID*/
     VxdID getSensorInfo() {return m_sensorInfo;};
 
+    bool isSensorInRange(TVector3 trackPosition);
+
+    void setSharedPlanePtr(genfit::SharedPlanePtr spp) {m_sharedPlanePtr = spp;};
+    genfit::SharedPlanePtr getSharedPlanePtr() {return m_sharedPlanePtr;};
+
   private:
+
+    double m_sensorPhiMin;
+    double m_sensorPhiMax;
+    double m_sensorZMin;
+    double m_sensorZMax;
+
     VxdID m_sensorInfo; /**< the sensor ID*/
+
+
+    genfit::SharedPlanePtr m_sharedPlanePtr; /**< the shared plane pointer*/
+
   };
 }

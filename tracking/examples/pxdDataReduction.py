@@ -10,7 +10,7 @@ from ROOT import Belle2
 reset_database()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
-numEvents = 100
+numEvents = 5
 
 # first register the modules
 
@@ -25,7 +25,8 @@ evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
 
 pxdDataRed = register_module('PXDDataReduction')
-pxdDataRed.logging.log_level = LogLevel.INFO
+pxdDataRed.logging.log_level = LogLevel.DEBUG
+pxdDataRed.logging.debug_level = 2
 param_pxdDataRed = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
@@ -42,16 +43,17 @@ param_pxdDataRed = {
 }
 pxdDataRed.param(param_pxdDataRed)
 
-# pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
-# pxdDataRedAnalysis.logging.log_level = LogLevel.INFO
+pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
+pxdDataRedAnalysis.logging.log_level = LogLevel.DEBUG
+pxdDataRedAnalysis.logging.debug_level = 2
 param_pxdDataRedAnalysis = {
-    'gfTrackListName': 'RTracks',
+    'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
     'rootFileName': 'pxdDataRedAnalysis_SVDCDC_MCTF_newVersion',
-}
-# pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
+    }
+pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
 
 # Create paths
 main = create_path()
@@ -61,9 +63,10 @@ main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 main.add_module(evtgeninput)
 add_simulation(main)
-add_mc_tracking_reconstruction(main, ['SVD', 'CDC'], False)
+# add_mc_tracking_reconstruction(main, ['SVD', 'CDC'], False)
+add_tracking_reconstruction(main, ['SVD', 'CDC'], False)
 main.add_module(pxdDataRed)
-# main.add_module(pxdDataRedAnalysis)
+main.add_module(pxdDataRedAnalysis)
 
 # Process events
 process(main)

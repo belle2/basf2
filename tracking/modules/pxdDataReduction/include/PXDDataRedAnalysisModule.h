@@ -63,7 +63,7 @@ namespace Belle2 {
 
   private:
 
-    std::string m_gfTrackListName; /**< Track list name */
+    std::string m_recoTrackListName; /**< Track list name */
     std::string m_PXDInterceptListName; /**< Intercept list name */
     std::string m_ROIListName; /**< ROI list name */
 
@@ -151,7 +151,6 @@ namespace Belle2 {
     TH1F* m_h1LambdaBad_timeG1; /**< distribution of phi when no ROI and intercept has wrong vxdID and GlobalTime<1*/
 
     TH1F* m_hNhits; /**< number of hits per candidate*/
-    TH1F* m_hNhitsBad; /**< number of hits per candidate, no digits in ROI*/
 
     TH2F* m_h2Map; /**<sensor perp,phi */
     TH2F* m_h2MapBad_L1; /**<sensor perp,phi - no digit in - layer2*/
@@ -203,8 +202,6 @@ namespace Belle2 {
     unsigned int NtrackNoROI4; /**< nuner of tracks with no ROI (intercept with correct vxdID) */
     unsigned int NtrackNoROI5; /**< nuner of tracks with no ROI (intercept with wrong vxdID) */
 
-
-    int m_nNoMCPart; /**< number of tracks with no MC particles*/
   };
 
 }

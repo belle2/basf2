@@ -29,20 +29,28 @@ namespace Belle2 {
 
     void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
-      // Prefetch some later needed objects/values
-      // Simple to calculate variables
-      // EC1CMSLE
-      if (m_rhoParticles)
-        calculationResult["rho0_dM"] = m_rhoParticles->getParticle(0)->getExtraInfo("rho0_dM");
 
-      if (m_D0Particles)
-        calculationResult["D0_dM"] = m_D0Particles->getParticle(0)->getExtraInfo("D0_dM");
+      double rhodM = 999.;
+      if (m_rhoParticles->getListSize() >= 1)
+        rhodM = m_rhoParticles->getParticle(0)->getExtraInfo("rho0_dM");
+      calculationResult["rho0_dM"] = rhodM;
 
-      if (m_DstarParticles)
-        calculationResult["Dstar_dQ"] = m_DstarParticles->getParticle(0)->getExtraInfo("Dstar_dQ");
+      double D0dM = 999.;
+      if (m_D0Particles->getListSize() >= 1)
+        D0dM = m_D0Particles->getParticle(0)->getExtraInfo("D0_dM");
 
-      if (m_XiParticles)
-        calculationResult["Xi_chiProb"] = m_XiParticles->getParticle(0)->getExtraInfo("Xi_chiProb");
+      calculationResult["D0_dM"] = D0dM;
+
+
+      double DstardQ = 999.;
+      if (m_DstarParticles->getListSize() >= 1)
+        DstardQ = m_DstarParticles->getParticle(0)->getExtraInfo("Dstar_dQ");
+      calculationResult["Dstar_dQ"] = DstardQ;
+
+      double Xichi = -999.;
+      if (m_XiParticles->getListSize() >= 1)
+        Xichi = m_XiParticles->getParticle(0)->getExtraInfo("Xi_chiProb");
+      calculationResult["Xi_chiProb"] = Xichi;
 
 
       calculationResult["ntracks"] = m_pionParticles->getListSize();
@@ -58,11 +66,11 @@ namespace Belle2 {
 
       calculationResult["netCharge"] = totalCharge;
 
-      double totpx = 0;
-      double totpy = 0;
+      double totpx = 99.;
+      double totpy = 99.;
       if (m_pionParticles->getListSize() >= 1) {
 
-        for (unsigned int i = 0; i < m_pionParticles->getListSize() - 1; i++) {
+        for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
           totpx += m_pionParticles->getParticle(i)->getPx();
           totpy += m_pionParticles->getParticle(i)->getPy();
         }

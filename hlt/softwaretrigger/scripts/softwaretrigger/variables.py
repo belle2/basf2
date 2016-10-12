@@ -62,7 +62,8 @@ class SummarizeTriggerResults(PandasHarvestingModule):
     Read in the trigger results stored in the data store and write them out into a ROOT file after all events have
     passed.
     """
-    def __init__(self, root_file_name="save_results.root", store_object_name="SoftwareTriggerResults"):
+
+    def __init__(self, root_file_name="save_results.root", store_object_name="SoftwareTriggerResult"):
         """
         Create a new module to get the stored trigger decisions from the data store and save them to a root file.
         :param root_file_name: The file name where to store the results.
@@ -88,6 +89,7 @@ class SummarizeTriggerVariables(PandasHarvestingModule):
     Read in the trigger variables stored in the data store and write them out into a ROOT file after all events have
     passed.
     """
+
     def __init__(self, root_file_name="save_vars.root", store_object_name="SoftwareTriggerVariables"):
         """
         Create a new module to get the stored trigger variables from the data store and save them to a root file.
@@ -102,3 +104,14 @@ class SummarizeTriggerVariables(PandasHarvestingModule):
         Write them back into the internal storage ( = pandas.DataFrame) of all events.
         """
         yield {identifier: value for identifier, value in variables.get()}
+
+if __name__ == "__main__":
+    path = basf2.create_path()
+
+    # Take the output of the __init__.py script
+    path.add_module("RootInput", inputFileName="output.root")
+
+    path.add_module(SummarizeTriggerResults())
+    path.add_module(SummarizeTriggerVariables())
+
+    basf2.process(path)

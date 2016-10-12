@@ -4,6 +4,7 @@ import basf2
 import reconstruction
 import modularAnalysis
 import rawdata
+import vertex
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
 
@@ -14,6 +15,9 @@ ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 FAST_RECO_CUTS = ['reject_ee', 'accept_ee', 'reject_bkg']
 HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
             "accept_mu_mu", "accept_gamma_gamma"]
+
+CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi", "accept_D0_Kpi",
+              "accept_Dstar", "accept_Xi_piLambda", "accept_cosmic", "accept_others"]
 
 
 def add_packers(path):
@@ -57,6 +61,44 @@ def add_unpackers(path):
 
     # add clusterizer
     path.add_module("SVDClusterizer")
+
+
+def add_tag_calib_sample(path):
+    """
+    After HLT trigger, tag samples for calibration
+    """
+    trackcut = 'abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956'
+    modularAnalysis.fillParticleList("pi+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("K+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("p+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("gamma:calib", 'E>0.05', path=path)
+    # rho
+    modularAnalysis.reconstructDecay('rho0:calib -> pi+:calib pi-:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('rho0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('rho0:calib', {'abs(dM)': 'rho0_dM'}, path=path)
+
+    # reconstruct intermediate state
+    # D0->Kpi, D*->D0(Kpi) pi
+    modularAnalysis.reconstructDecay('D0:calib -> pi+:calib K-:calib', 'abs(dM)<0.5', path=path)
+
+    modularAnalysis.reconstructDecay('D*+:calib -> D0:calib pi+:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('D0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:calib', {'abs(dM)': 'D0_dM'}, path=path)
+    modularAnalysis.rankByLowest('D*+:calib', 'abs(dQ)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:calib', {'abs(dQ)': 'Dstar_dQ'}, path=path)
+
+    # Lambda0->p pi-, Xi-->Lambda0 pi-
+    modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
+    vertex.fitVertex('Lambda0:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Lambda0:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Lambda0:calib', {'chiProb': 'Lambda0_chiProb'}, path=path)
+
+    modularAnalysis.reconstructDecay('Xi-:calib -> Lambda0:calib pi-:calib', '', path=path)
+    vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
+
+    path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
 
 
 def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
@@ -143,6 +185,9 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     hlt_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
     # (2) we do not know what to do or the event is rejected -> only store the metadata
     hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
+
+    # add tag of calibration sample
+    add_tag_calib_sample(store_only_rawdata_path)
 
     path.add_path(fast_reco_reconstruction_path)
 

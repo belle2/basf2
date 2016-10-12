@@ -42,7 +42,7 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
   setPropertyFlags(c_ParallelProcessingCertified);
 
 
-  addParam("recoTrackListName", m_recoTracksListName, " name of the list of the fitted tracks", std::string("recoTracks"));
+  addParam("recoTrackListName", m_recoTracksListName, " name of the list of the fitted tracks", std::string(""));
 
   addParam("badTrackListName", m_badTracksListName, " name of the list of the bad_track_status tracks",
            std::string("badTracksForROI"));

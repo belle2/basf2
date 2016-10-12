@@ -17,7 +17,7 @@ HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks
             "accept_mu_mu", "accept_gamma_gamma"]
 
 CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi", "accept_D0_Kpi",
-              "accept_Dstar", "accept_Xi_piLambda", "accept_cosmic", "accept_others"]
+              "accept_Dstar", "accept_Xi_piLambda"]
 
 
 def add_packers(path):
@@ -63,7 +63,7 @@ def add_unpackers(path):
     path.add_module("SVDClusterizer")
 
 
-def add_tag_calib_sample(path):
+def add_tag_calib_sample(path, store_array_debug_prescale=None):
     """
     After HLT trigger, tag samples for calibration
     """
@@ -98,7 +98,10 @@ def add_tag_calib_sample(path):
     modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
 
-    path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
+
+    if store_array_debug_prescale is not None:
+        calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
 
 
 def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
@@ -119,11 +122,11 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
 
     The whole setup looks like this:
 
-                                                 -- [ Raw Data ] ---
-                                               /                     \
-             In -- [ Fast Reco ] -- [ HLT ] --                         -- Out
-                                 \             \                     /
-                                  ----------------- [ Meta Data ] --
+                                                 -- [ Calibration ] -- [ Raw Data ] ---
+                                               /                                        \
+             In -- [ Fast Reco ] -- [ HLT ] --                                            -- Out
+                                 \             \                                        /
+                                  ----------------- [ Meta Data ] ---------------------
 
 
     Before calling this function, make sure that your database setup is suited to download software trigger cuts
@@ -138,12 +141,13 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
     store_only_metadata_path = get_store_only_metadata_path()
-    # (2) A "store-all" path (delete everything except the raw data with the metadata)
-    store_only_rawdata_path = get_store_only_rawdata_path()
     # (3) A path doing the fast reco reconstruction
     fast_reco_reconstruction_path = basf2.create_path()
     # (4) A path doing the hlt reconstruction
     hlt_reconstruction_path = basf2.create_path()
+    # (5) A path doing the calibration reconstruction with a "store-all" path, which deletes everything except
+    # raw data, trigger tags and the meta data.
+    calibration_and_store_only_rawdata_path = basf2.create_path()
 
     # Add fast reco reconstruction
     reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True)
@@ -180,14 +184,15 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     if store_array_debug_prescale is not None:
         hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
 
+    # Fill the calibration_and_store_only_rawdata_path path
+    add_tag_calib_sample(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
+    calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+
     # There are two possibilities for the output of this module
     # (1) the event is accepted -> store everything
-    hlt_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
+    hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
     # (2) we do not know what to do or the event is rejected -> only store the metadata
     hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
-
-    # add tag of calibration sample
-    add_tag_calib_sample(store_only_rawdata_path)
 
     path.add_path(fast_reco_reconstruction_path)
 

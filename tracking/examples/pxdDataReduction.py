@@ -10,7 +10,7 @@ from ROOT import Belle2
 reset_database()
 use_local_database(Belle2.FileSystem.findFile("data/framework/database.txt"), "", True, LogLevel.ERROR)
 
-numEvents = 5
+numEvents = 2000
 
 # first register the modules
 
@@ -25,15 +25,15 @@ evtgeninput = register_module('EvtGenInput')
 evtgeninput.logging.log_level = LogLevel.INFO
 
 pxdDataRed = register_module('PXDDataReduction')
-pxdDataRed.logging.log_level = LogLevel.DEBUG
+pxdDataRed.logging.log_level = LogLevel.INFO
 pxdDataRed.logging.debug_level = 2
 param_pxdDataRed = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'numIterKalmanFilter': 5,
-    # 'tolerancePhi': 0.15,
-    # 'toleranceZ': 0.5,
+    'tolerancePhi': 0.15,
+    'toleranceZ': 0.5,
     'sigmaSystU': 0.02,
     'sigmaSystV': 0.02,
     'numSigmaTotU': 10,
@@ -44,14 +44,14 @@ param_pxdDataRed = {
 pxdDataRed.param(param_pxdDataRed)
 
 pxdDataRedAnalysis = register_module('PXDDataRedAnalysis')
-pxdDataRedAnalysis.logging.log_level = LogLevel.DEBUG
+pxdDataRedAnalysis.logging.log_level = LogLevel.INFO
 pxdDataRedAnalysis.logging.debug_level = 2
 param_pxdDataRedAnalysis = {
     'recoTrackListName': 'RecoTracks',
     'PXDInterceptListName': 'PXDIntercepts',
     'ROIListName': 'ROIs',
     'writeToRoot': True,
-    'rootFileName': 'pxdDataRedAnalysis_SVDCDC_MCTF_newVersion',
+    'rootFileName': 'pxdDataRedAnalysis_SVDCDC_realTF_40planes',
     }
 pxdDataRedAnalysis.param(param_pxdDataRedAnalysis)
 

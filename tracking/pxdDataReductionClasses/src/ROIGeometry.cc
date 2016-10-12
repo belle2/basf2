@@ -16,6 +16,7 @@
 #include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
 #include <vxd/geometry/SensorInfoBase.h>
+#include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 
 #include <set>
 
@@ -25,8 +26,6 @@ using namespace Belle2;
 ROIGeometry::ROIGeometry()
 {
 
-  fillPlaneList();
-
 }
 
 ROIGeometry::~ROIGeometry()
@@ -35,6 +34,7 @@ ROIGeometry::~ROIGeometry()
 }
 
 
+/*
 void
 ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
                               RecoTrack* recoTrack, int recoTrackIndex,
@@ -93,8 +93,10 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
 };
 
+*/
+
 void
-ROIGeometry::fillPlaneList()
+ROIGeometry::fillPlaneList(double toleranceZ, double tolerancePhi)
 {
 
 
@@ -119,10 +121,10 @@ ROIGeometry::fillPlaneList()
       while (itPxdSensors != pxdSensors.end()) {
         B2DEBUG(1, "    pxd sensor info " << *itPxdSensors);
 
-        ROIDetPlane plane(*itPxdSensors);
+        ROIDetPlane plane(*itPxdSensors, toleranceZ, tolerancePhi);
+        genfit::SharedPlanePtr sharedPlane(new ROIDetPlane(plane));
+        plane.setSharedPlanePtr(sharedPlane);
 
-
-        plane.Print();
         m_planeList.push_back(plane);
 
         ++itPxdSensors;
@@ -132,4 +134,25 @@ ROIGeometry::fillPlaneList()
     ++itPxdLayers;
   }
 
+  B2DEBUG(1, "just filled the plane list with " << m_planeList.size() << "planes");
 };
+
+
+void
+ROIGeometry::appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition)
+{
+
+
+  std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
+
+  B2DEBUG(1, "append Planes, checking " << m_planeList.size() << " planes");
+
+  while (itPlanes != m_planeList.end()) {
+
+    if (itPlanes->isSensorInRange(recoTrackPosition))
+      selectedPlanes->push_back(*itPlanes);
+
+    itPlanes++;
+
+  }
+}

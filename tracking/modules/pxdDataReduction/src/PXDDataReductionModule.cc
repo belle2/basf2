@@ -46,6 +46,10 @@ PXDDataReductionModule::PXDDataReductionModule() : Module()
 
   addParam("numIterKalmanFilter", m_numIterKalmanFilter, " number of iterations of the kalman filter ", int(5));
 
+  addParam("tolerancePhi", m_tolerancePhi, "Tolerance by finding sensor in phi coordinate (radians).", double(0.15));
+
+  addParam("toleranceZ", m_toleranceZ, "Tolerance by finding sensor in Z coordinate (cm).", double(0.5));
+
   addParam("sigmaSystU", m_sigmaSystU, " systematic sigma in the u local coordinate ", double(0.025));
   addParam("sigmaSystV", m_sigmaSystV, " systematic sigma in the V local coordinate ", double(0.025));
   addParam("numSigmaTotU", m_numSigmaTotU, " number of sigmas (total) in the U local coordinate ", double(10));
@@ -96,7 +100,7 @@ void PXDDataReductionModule::beginRun()
   m_ROIinfo.ROIListName = m_ROIListName;
   m_ROIinfo.recoTracksListName = m_recoTracksListName;
 
-  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo);
+  m_thePXDInterceptor = new PXDInterceptor(&m_ROIinfo, m_toleranceZ, m_tolerancePhi);
   m_thePXDInterceptor->setNumIterKalmanFilter(m_numIterKalmanFilter);
 
   m_thePixelTranslator = new ROIPixelTranslator(&m_ROIinfo);

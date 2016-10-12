@@ -29,13 +29,13 @@ namespace Belle2 {
   public:
     /** Constructor.
      */
-    PXDInterceptor();
+    //    PXDInterceptor();
 
     /** Another Constructor.
      *
      *  @TODO: Can the comment explain, why there are these two constructors?
      */
-    PXDInterceptor(const ROIinfo* user_theROIinfo);
+    PXDInterceptor(const ROIinfo* user_theROIinfo, double toleranceZ, double tolerancePhi);
 
     /** Destructor.
      */
@@ -58,10 +58,18 @@ namespace Belle2 {
 
   private:
 
+    const float m_pxdLayerRadius[2] = {1.42854, 2.21218}; /**< mean PXD layer radius for both layers */
     genfit::KalmanFitter m_kalmanFilter; /**< kalman filter object to fit the track */
 
     ROIGeometry m_theROIGeometry; /**< the geometry of the Region Of Interest */
 
     ROIinfo m_theROIinfo; /**< the ROI info structure */
+
+    /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
+     */
+    void appendIntercepts(StoreArray<PXDIntercept>* interceptList, std::list<ROIDetPlane> planeList, RecoTrack* recoTrack,
+                          int recoTrackIndex, RelationArray* recoTrackToPXDIntercepts);
+
+
   };
 }

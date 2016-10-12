@@ -16,9 +16,10 @@
 #include <tracking/pxdDataReductionClasses/ROIDetPlane.h>
 #include <tracking/dataobjects/RecoTrack.h>
 
-class ROIDetPlane;
-
 #include <list>
+
+//class ROIDetPlane;
+
 
 namespace Belle2 {
 
@@ -37,12 +38,15 @@ namespace Belle2 {
 
     /** Append the PXDIntercept infos related to the track theTrack to the listToBeFilled.
      */
-    void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RecoTrack* theTrack,
-                          int recoTrackIndex, RelationArray* recoTrackToPXDIntercepts);
+    //    void appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled, RecoTrack* theTrack,
+    //                          int recoTrackIndex, RelationArray* recoTrackToPXDIntercepts);
 
     std::list<ROIDetPlane> m_planeList; /**< list of planes*/
 
-    void fillPlaneList(); /**< fill the list of planes*/
+    void fillPlaneList(double toleranceZ, double tolerancePhi); /**< fill the list of planes*/
+
+    void appendSelectedPlanes(std::list<ROIDetPlane>* selectedPlanes, TVector3 recoTrackPosition);
+
   };
 }
 

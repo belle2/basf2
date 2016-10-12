@@ -72,6 +72,9 @@ namespace Belle2 {
 
     int m_numIterKalmanFilter; /**< number of iterations of the Kalman Filter*/
 
+    double m_toleranceZ;
+    double m_tolerancePhi;
+
     double m_sigmaSystU; /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI U width */
     double m_sigmaSystV;  /**< fixed width to add in quadrature to the extrapolation error and obtain the ROI V width */
     double m_numSigmaTotU; /**< number of sigma (stat+syst) determining the U width of the ROI*/

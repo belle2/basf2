@@ -15,6 +15,26 @@ using namespace Belle2;
 using namespace std;
 
 
+ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo)
+  : m_sensorInfo(sensorInfo)
+{
+
+  VXD::GeoCache& aGeometry = VXD::GeoCache::getInstance();
+
+  TVector3 local(0, 0, 0);
+  TVector3 uVector(1, 0, 0);
+  TVector3 vVector(0, 1, 0);
+
+  const VXD::SensorInfoBase& aSensorInfo = aGeometry.getSensorInfo(m_sensorInfo);
+  TVector3 globalSensorPos = aSensorInfo.pointToGlobal(local);
+  TVector3 globaluVector = aSensorInfo.vectorToGlobal(uVector);
+  TVector3 globalvVector = aSensorInfo.vectorToGlobal(vVector);
+
+  setO(globalSensorPos);
+
+  setUV(globaluVector, globalvVector);
+}
+
 ROIDetPlane::ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tolerancePhi)
   : m_sensorInfo(sensorInfo)
 {

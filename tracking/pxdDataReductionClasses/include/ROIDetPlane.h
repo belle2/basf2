@@ -26,6 +26,8 @@ namespace Belle2 {
 
     ROIDetPlane(const VxdID& sensorInfo, double toleranceZ, double tolerancePhi); /**< the constructor*/
 
+    ROIDetPlane(const VxdID& sensorInfo); /**< the constructo - needed for testbeam package*/
+
     virtual ~ROIDetPlane();
 
     /**return the sensor ID*/

@@ -9,11 +9,6 @@
  **************************************************************************/
 
 #include <hlt/softwaretrigger/calculations/CalibSampleCalculator.h>
-#include <hlt/softwaretrigger/core/utilities.h>
-// TODO: Also cache it
-#include <analysis/utility/PCmsLabTransform.h>
-
-#include <numeric>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -30,54 +25,51 @@ namespace Belle2 {
     void CalibSampleCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
 
-      double rhodM = 999.;
-      if (m_rhoParticles->getListSize() >= 1)
-        rhodM = m_rhoParticles->getParticle(0)->getExtraInfo("rho0_dM");
-      calculationResult["rho0_dM"] = rhodM;
+      if (m_rhoParticles->getListSize() >= 1) {
+        calculationResult["rho0_dM"] = m_rhoParticles->getParticle(0)->getExtraInfo("rho0_dM");
+      } else {
+        calculationResult["rho0_dM"] = -999;
+      }
 
-      double D0dM = 999.;
-      if (m_D0Particles->getListSize() >= 1)
-        D0dM = m_D0Particles->getParticle(0)->getExtraInfo("D0_dM");
+      if (m_D0Particles->getListSize() >= 1) {
+        calculationResult["D0_dM"] = m_D0Particles->getParticle(0)->getExtraInfo("D0_dM");
+      } else {
+        calculationResult["D0_dM"] = -999;
+      }
 
-      calculationResult["D0_dM"] = D0dM;
+      if (m_DstarParticles->getListSize() >= 1) {
+        calculationResult["Dstar_dQ"] = m_DstarParticles->getParticle(0)->getExtraInfo("Dstar_dQ");
+      } else {
+        calculationResult["Dstar_dQ"] = -999;
+      }
 
-
-      double DstardQ = 999.;
-      if (m_DstarParticles->getListSize() >= 1)
-        DstardQ = m_DstarParticles->getParticle(0)->getExtraInfo("Dstar_dQ");
-      calculationResult["Dstar_dQ"] = DstardQ;
-
-      double Xichi = -999.;
-      if (m_XiParticles->getListSize() >= 1)
-        Xichi = m_XiParticles->getParticle(0)->getExtraInfo("Xi_chiProb");
-      calculationResult["Xi_chiProb"] = Xichi;
-
+      if (m_XiParticles->getListSize() >= 1) {
+        calculationResult["Xi_chiProb"] = m_XiParticles->getParticle(0)->getExtraInfo("Xi_chiProb");
+      } else {
+        calculationResult["Xi_chiProb"] = -999;
+      }
 
       calculationResult["ntracks"] = m_pionParticles->getListSize();
       calculationResult["ngamma"] = m_gammaParticles->getListSize();
 
       // total Charge
       int totalCharge = 0;
-      if (m_pionParticles->getListSize() >= 1) {
-        for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-          totalCharge += m_pionParticles->getParticle(i)->getCharge();
-        }
-      }
 
-      calculationResult["netCharge"] = totalCharge;
-
+      // Total pt
       double totpx = 99.;
       double totpy = 99.;
+
+      // TODO: Why only in the case of more than one particle?
       if (m_pionParticles->getListSize() >= 1) {
+        for (const Particle& pion : *m_pionParticles) {
+          totalCharge += pion.getCharge();
 
-        for (unsigned int i = 0; i < m_pionParticles->getListSize(); i++) {
-          totpx += m_pionParticles->getParticle(i)->getPx();
-          totpy += m_pionParticles->getParticle(i)->getPy();
+          totpx += pion.getPx();
+          totpy += pion.getPy();
         }
-
-        calculationResult["Pt_event"] = sqrt(totpx * totpx + totpy * totpy);
-
       }
+      calculationResult["netCharge"] = totalCharge;
+      calculationResult["Pt_event"] = sqrt(totpx * totpx + totpy * totpy);
     }
   }
 

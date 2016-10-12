@@ -10,9 +10,12 @@
 
 #pragma once
 
+#include <top/dbobjects/TOPChannelMap.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <top/dbobjects/TOPChannelMap.h>
+#include <framework/database/DBArray.h>
+#include <framework/database/IntervalOfValidity.h>
+
 
 namespace Belle2 {
   namespace TOP {
@@ -43,8 +46,9 @@ namespace Belle2 {
        * Enum for electornic types
        */
       enum EType {c_unknown = 0,
-                  c_IRS3B   = 1,
-                  c_IRSX    = 2
+                  c_default = 1,
+                  c_IRS3B   = 2,
+                  c_IRSX    = 3
                  };
 
       /**
@@ -58,16 +62,27 @@ namespace Belle2 {
       ~ChannelMapper();
 
       /**
-       * Initialize: get mapping from Gearbox
-       * @param channelMapping xpath to the mapping
+       * Initialize from Gearbox (XML)
+       * @param channelMapping XML data directory
        */
       void initialize(const GearDir& channelMapping);
+
+      /**
+       * Initialize from database
+       */
+      void initialize();
 
       /**
        * Checks if mapping is available
        * @return true if available
        */
-      bool isAvailable() const {return m_available;}
+      bool isValid() const {return m_valid;}
+
+      /**
+       * import mappings to database
+       * @param iov     Interval of validity.
+       */
+      void import(const IntervalOfValidity& iov) const;
 
       /**
        * Return electornic type (see enum)
@@ -149,7 +164,6 @@ namespace Belle2 {
 
       /**
        * Print mappings to terminal screen
-       * @param type electronic type
        */
       void print() const;
 
@@ -160,10 +174,22 @@ namespace Belle2 {
 
     private:
 
-      std::string m_typeName;    /**< electronic type name */
-      EType m_type = c_unknown;  /**< electornic type number */
-      bool m_available = false; /**< true if mapping available */
-      std::vector<TOPChannelMap> m_mapping; /**< mappings from xml file */
+      /**
+       * Clear
+       */
+      void clear();
+
+      /**
+       * re-do conversion arrays when DBArray has changed
+       */
+      void update();
+
+      EType m_type = c_unknown;                /**< electornic type */
+      std::string m_typeName;                  /**< electronic type name */
+      std::vector<TOPChannelMap> m_mapping;    /**< mappings from gearbox */
+      DBArray<TOPChannelMap>* m_mappingDB = 0; /**< mappings from database */
+      bool m_valid = false;                    /**< true if mapping available */
+      bool m_fromDB = false;                   /**< true, if from database */
 
       const TOPChannelMap* m_channels[c_numRows][c_numColumns]; /**< conversion array */
       const TOPChannelMap* m_pixels[c_numAsics][c_numChannels]; /**< conversion array */

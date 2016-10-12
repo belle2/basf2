@@ -15,6 +15,7 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/IntervalOfValidity.h>
 
 #include <map>
 #include <unordered_set>
@@ -42,33 +43,39 @@ namespace Belle2 {
       ~FrontEndMapper();
 
       /**
-       * initialize: get mappings from DB
-       * @param frontEndMapping xpath to the mapping
+       * Initialize from Gearbox (XML)
+       * @param frontEndMapping XML data directory
        */
       void initialize(const GearDir& frontEndMapping);
 
       /**
-       * re-do conversion maps when DBArray has changed
+       * Initialize from database
        */
-      void update() {B2ERROR("FrontEndMapper: function update() not implemented yet"); }
-
+      void initialize();
 
       /**
-       * store mappings to database
+       * check if the mapping is available
+       * @return true if available
        */
-      void storeData() {B2ERROR("FrontEndMapper: function storeData() not implemented yet"); }
+      bool isValid() const {return m_valid;}
+
+      /**
+       * import mappings to database
+       * @param iov     Interval of validity.
+       */
+      void import(const IntervalOfValidity& iov) const;
 
       /**
        * Return map from TOP module side
        * @param moduleID TOP module ID
-       * @param col column
+       * @param bs boardstack number
        * @return pointer to map element or NULL
        */
-      const TOPFrontEndMap* getMap(int moduleID, int col) const
+      const TOPFrontEndMap* getMap(int moduleID, int bs) const
       {
         moduleID--;
-        if (moduleID >= 0 and moduleID < c_numModules and col >= 0 and col < c_numColumns)
-          return m_fromModule[moduleID][col];
+        if (moduleID >= 0 and moduleID < c_numModules and bs >= 0 and bs < c_numColumns)
+          return m_fromModule[moduleID][bs];
         return 0;
       }
 
@@ -103,7 +110,14 @@ namespace Belle2 {
        * Return size of the map
        * @return size
        */
-      int getMapSize() const {return m_mapping.size();}
+      int getMapSize() const
+      {
+        if (m_fromDB) {
+          return m_mappingDB->getEntries();
+        } else {
+          return m_mapping.size();
+        }
+      }
 
       /**
        * Return a set of copper ID's
@@ -114,6 +128,25 @@ namespace Belle2 {
         return m_copperIDs;
       }
 
+      /**
+       * Returns module construction number
+       * @param moduleID module ID (slot number)
+       * @return module construction number
+       */
+      int getModuleCNumber(int moduleID) const
+      {
+        for (int bs = 0; bs < c_numColumns; bs++) {
+          const auto* map = getMap(moduleID, bs);
+          if (map) return map->getModuleCNumber();
+        }
+        return 0;
+      }
+
+      /**
+       * Print mappings to terminal screen
+       */
+      void print() const;
+
     private:
       /**
        * Number of TOP modules (number of physical ones can be less),
@@ -121,8 +154,20 @@ namespace Belle2 {
        */
       enum {c_numModules = 16, c_numColumns = 4};
 
-      std::vector<TOPFrontEndMap> m_mapping; /**< mappings from gearbox */
-      // DBArray<TOPFrontEndMap> m_dbmapping;   /**< mappings from database */
+      /**
+       * Clear
+       */
+      void clear();
+
+      /**
+       * re-do conversion maps when DBArray has changed
+       */
+      void update();
+
+      std::vector<TOPFrontEndMap> m_mapping;      /**< mappings from gearbox */
+      DBArray<TOPFrontEndMap>* m_mappingDB = 0;   /**< mappings from database */
+      bool m_valid = false;                       /**< true, if mapping available */
+      bool m_fromDB = false;                      /**< true, if from database */
 
       std::unordered_set<unsigned int> m_copperIDs; /**< COPPER ID's */
       const TOPFrontEndMap* m_fromModule[c_numModules][c_numColumns]; /**< conversion */

@@ -17,8 +17,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <tracking/pxdDataReductionClasses/ROIGeometry.h>
 #include <tracking/pxdDataReductionClasses/ROIinfo.h>
-
-#include <genfit/TrackCand.h>
 #include <genfit/KalmanFitter.h>
 
 
@@ -47,7 +45,7 @@ namespace Belle2 {
      */
     void fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled,
                            const StoreArray<RecoTrack>& trackList,
-                           RelationArray* gfTrackToPXDIntercepts);
+                           RelationArray* recoTrackToPXDIntercepts);
 
     /**
      * Set the nuber of iterations of the Kalman Filter to numIterKalmanFilter

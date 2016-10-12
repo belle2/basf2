@@ -8,8 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <genfit/RKTrackRep.h>
-#include <genfit/Track.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/MeasurementFactory.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -34,19 +33,14 @@ PXDInterceptor::~PXDInterceptor()
 
 void
 PXDInterceptor::fillInterceptList(StoreArray<PXDIntercept>* listToBeFilled, const StoreArray<RecoTrack>& trackList,
-                                  RelationArray* gfTrackToPXDIntercepts)
+                                  RelationArray* recoTrackToPXDIntercepts)
 {
-
-  StoreArray<genfit::TrackCand> trackCandBadStats(m_theROIinfo.badTracksListName);
-
 
   for (int i = 0; i < trackList.getEntries(); ++i) { //loop over all tracks
 
     B2DEBUG(1, " %%%%%  track candidate Nr. : " << i + 1);
 
-    genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*trackList[i]);
-
-    m_theROIGeometry.appendIntercepts(listToBeFilled, &gfTrack, i, gfTrackToPXDIntercepts);
+    m_theROIGeometry.appendIntercepts(listToBeFilled, trackList[i], i, recoTrackToPXDIntercepts);
 
   } //loop on the track list
 

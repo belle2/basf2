@@ -11,6 +11,7 @@
 
 #include "tracking/pxdDataReductionClasses/ROIGeometry.h"
 #include <framework/logging/Logger.h>
+#include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/RKTrackRep.h>
 #include <genfit/Track.h>
 #include <vxd/geometry/GeoCache.h>
@@ -36,11 +37,13 @@ ROIGeometry::~ROIGeometry()
 
 void
 ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
-                              genfit::Track* theTrack, int theGFTrackIndex,
-                              RelationArray* gfTrackToPXDIntercepts)
+                              RecoTrack* recoTrack, int recoTrackIndex,
+                              RelationArray* recoTrackToPXDIntercepts)
 {
 
   PXDIntercept tmpPXDIntercept;
+
+  genfit::Track gfTrack = RecoTrackGenfitAccess::getGenfitTrack(*recoTrack);
 
   std::list<ROIDetPlane>::iterator itPlanes = m_planeList.begin();
 
@@ -48,15 +51,16 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
 
   double lambda = 0;
 
+
   for (int propDir = -1; propDir <= 1; propDir += 2) {
-    theTrack->getCardinalRep()->setPropDir(propDir);
+    gfTrack.getCardinalRep()->setPropDir(propDir);
 
     while (itPlanes != m_planeList.end()) {
 
       genfit::MeasuredStateOnPlane state;
 
       try {
-        state = theTrack->getFittedState();
+        state = gfTrack.getFittedState();
         genfit::SharedPlanePtr plane(new ROIDetPlane(*itPlanes)); // TODO: save copying
         lambda = state.extrapolateToPlane(plane);
       }  catch (...) {
@@ -77,15 +81,15 @@ ROIGeometry::appendIntercepts(StoreArray<PXDIntercept>* listToBeFilled,
       tmpPXDIntercept.setLambda(lambda);
       tmpPXDIntercept.setVxdID(itPlanes->getSensorInfo());
 
-
       listToBeFilled->appendNew(tmpPXDIntercept);
 
-      gfTrackToPXDIntercepts->add(theGFTrackIndex, listToBeFilled->getEntries() - 1);
+      recoTrackToPXDIntercepts->add(recoTrackIndex, listToBeFilled->getEntries() - 1);
 
       ++itPlanes;
 
     }
   }
+
 
 };
 

@@ -59,6 +59,8 @@ namespace Belle2 {
 
     bool m_removeFSR; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
 
+    bool m_printHashes; /**< if true, each new hash will be printed on stdout */
+
     const std::string c_ExtraInfoName = "DecayHash"; /**< Name of the extraInfo, which is stored in each Particle **/
   };
 

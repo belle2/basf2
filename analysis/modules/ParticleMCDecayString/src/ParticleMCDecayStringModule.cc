@@ -31,21 +31,22 @@ namespace Belle2 {
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
     addParam("motherPDGs", m_motherPDGs, "PDG codes of potential mother particles (absolute values)", std::vector<int>({511, 521, 531}));
     addParam("removeFSR", m_removeFSR, "If true, final state radiation (FSR) photons are removed from the decay string.", true);
+    addParam("printHashes", m_printHashes, "If true, each new hash will be printed on stdout", false);
   }
 
   void ParticleMCDecayStringModule::initialize()
   {
     StoreObjPtr<ParticleList>::required(m_listName);
 
-    StoreObjPtr<DecayHashMap> dMap;
+    StoreObjPtr<DecayHashMap> dMap("", DataStore::c_Persistent);
     dMap.registerInDataStore();
+    dMap.create();
+
   }
 
   void ParticleMCDecayStringModule::event()
   {
-    StoreObjPtr<DecayHashMap> dMap;
-    if (not dMap.isValid())
-      dMap.create();
+    StoreObjPtr<DecayHashMap> dMap("", DataStore::c_Persistent);
 
     StoreObjPtr<ParticleList> pList(m_listName);
 
@@ -54,7 +55,7 @@ namespace Belle2 {
 
       const std::string decayString = getDecayString(*particle);
 
-      const int decayHash = dMap->addDecayHash(decayString);
+      const int decayHash = dMap->addDecayHash(decayString, m_printHashes);
 
       particle->addExtraInfo(c_ExtraInfoName, decayHash);
     }

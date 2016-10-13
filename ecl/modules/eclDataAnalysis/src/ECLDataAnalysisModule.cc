@@ -252,11 +252,9 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerMinTrkDistance(0),
     m_eclShowerTrkDepth(0),
     m_eclShowerShowerDepth(0),
-    m_eclShowerAbsZernike20(0),
     m_eclShowerAbsZernike40(0),
-    m_eclShowerAbsZernike42(0),
     m_eclShowerAbsZernike51(0),
-    m_eclShowerAbsZernike53(0),
+    m_eclShowerZernikeMVA(0),
     m_eclShowerSecondMoment(0),
     m_eclShowerE1oE9(0),
     m_eclShowerIsTrack(0),
@@ -589,11 +587,9 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclShowerMinTrkDistance",     "std::vector<double>",    &m_eclShowerMinTrkDistance);
   m_tree->Branch("eclShowerTrkDepth",     "std::vector<double>",    &m_eclShowerTrkDepth);
   m_tree->Branch("eclShowerShowerDepth",     "std::vector<double>",      &m_eclShowerShowerDepth);
-  m_tree->Branch("eclShowerAbsZernike20",     "std::vector<double>",    &m_eclShowerAbsZernike20);
   m_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &m_eclShowerAbsZernike40);
-  m_tree->Branch("eclShowerAbsZernike42",     "std::vector<double>",       &m_eclShowerAbsZernike42);
   m_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &m_eclShowerAbsZernike51);
-  m_tree->Branch("eclShowerAbsZernike53",     "std::vector<double>",       &m_eclShowerAbsZernike53);
+  m_tree->Branch("m_eclShowerZernikeMVA",     "std::vector<double>",       &m_eclShowerZernikeMVA);
   m_tree->Branch("eclShowerSecondMoment",     "std::vector<double>",        &m_eclShowerSecondMoment);
   m_tree->Branch("eclShowerE1oE9",     "std::vector<double>",      &m_eclShowerE1oE9);
   m_tree->Branch("eclShowerIsTrack",     "std::vector<int>",    &m_eclShowerIsTrack);
@@ -728,8 +724,8 @@ void ECLDataAnalysisModule::event()
   m_eclShowerHypothesisId->clear(); m_eclShowerCentralCellId->clear(); m_eclShowerEnergyError->clear();
   m_eclShowerThetaError->clear(); m_eclShowerPhiError->clear(); m_eclShowerTimeResolution->clear(); m_eclShowerHighestEnergy->clear();
   m_eclShowerLateralEnergy->clear(); m_eclShowerMinTrkDistance->clear(); m_eclShowerTrkDepth->clear();
-  m_eclShowerShowerDepth->clear(); m_eclShowerAbsZernike20->clear(); m_eclShowerAbsZernike40->clear();
-  m_eclShowerAbsZernike42->clear(); m_eclShowerAbsZernike51->clear(); m_eclShowerAbsZernike53->clear();
+  m_eclShowerShowerDepth->clear(); m_eclShowerAbsZernike40->clear();
+  m_eclShowerAbsZernike51->clear(); m_eclShowerZernikeMVA->clear();
   m_eclShowerSecondMoment->clear(); m_eclShowerE1oE9->clear(); m_eclShowerIsTrack->clear(); m_eclShowerIsCluster->clear();
   m_eclShowerMCVtxInEcl->clear();  m_eclShowerHighestE1mE2->clear();
 
@@ -1271,11 +1267,9 @@ void ECLDataAnalysisModule::event()
     m_eclShowerMinTrkDistance->push_back(aECLShowers->getMinTrkDistance());
     m_eclShowerTrkDepth->push_back(aECLShowers->getTrkDepth());
     m_eclShowerShowerDepth->push_back(aECLShowers->getShowerDepth());
-    m_eclShowerAbsZernike20->push_back(aECLShowers->getAbsZernike20());
     m_eclShowerAbsZernike40->push_back(aECLShowers->getAbsZernike40());
-    m_eclShowerAbsZernike42->push_back(aECLShowers->getAbsZernike42());
     m_eclShowerAbsZernike51->push_back(aECLShowers->getAbsZernike51());
-    m_eclShowerAbsZernike53->push_back(aECLShowers->getAbsZernike53());
+    m_eclShowerZernikeMVA->push_back(aECLShowers->getZernikeMVA());
     m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
     m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
 

@@ -7,7 +7,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
- *               Alon Hershenhorn                                         *
+ *               Alon Hershenhorn   (hershen@phas.ubc.ca)                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,10 +17,17 @@
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/gearbox/Unit.h>
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLNeighbours.h>
+
+//MVA package
+#include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
+#include <mva/interface/Weightfile.h>
+#include <mva/interface/Expert.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -52,13 +59,6 @@ namespace Belle2 {
 
     private:
 
-      // Module Parameters
-      /** Scaling factor for radial distances in perpendicular plane */
-      double m_rho0;
-
-      /** Average crystal dimension [cm] */
-      double m_avgCrystalDimension;
-
       /**Struct used to hold information of the digits projected to a plane perpendicular to the shower direction */
       struct ProjectedECLDigit {
 
@@ -72,14 +72,60 @@ namespace Belle2 {
         double alpha;
       };
 
+      // Module Parameters
+      double m_zernike_n1_rho0; /**< Scaling factor for radial distances in perpendicular plane, used in Zernike moment calculation for N1 showers */
+      double m_zernike_n2_rho0; /**< Scaling factor for radial distances in perpendicular plane, used in Zernike moment calculation for N2 showers */
+      bool m_zernike_useFarCrystals; /**< Determines if to include or ignore crystals with rho > rho0 in perpendicular plane, used in Zernike moment calculation*/
+      double m_avgCrystalDimension; /**< Average crystal dimension [cm] */
+
+      const double m_BRLthetaMin = 32.2 * Unit::deg; /**< Minimum theta of barrel used for choosing which Zernike MVA to apply */
+      const double m_BRLthetaMax = 128.7 * Unit::deg; /**< Maximum theta of barrel used for choosing which Zernike MVA to apply */
+
+      const unsigned int m_numZernikeMVAvariables = 22; /** number of variables expected in the Zernike MVA weightfile */
+
+      std::string m_zernike_MVAidentifier_FWD; /**< Zernike moment MVA - FWD endcap weight-file */
+      std::string m_zernike_MVAidentifier_BRL; /**< Zernike moment MVA - Barrel weight-file */
+      std::string m_zernike_MVAidentifier_BWD; /**< Zernike moment MVA - BWD endcap weight-file */
+      std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
+                                                                 m_weightfile_representation_FWD; /**< Database pointer to the Database representation of the Zernike moment MVA weightfile for FWD*/
+      std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
+                                                                 m_weightfile_representation_BRL; /**< Database pointer to the Database representation of the Zernike moment MVA weightfile for BRL*/
+      std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>
+                                                                 m_weightfile_representation_BWD; /**< Database pointer to the Database representation of the Zernike moment MVA weightfile for BWD*/
+      std::unique_ptr<MVA::Expert> m_expert_FWD; /**< Pointer to the current MVA Expert for FWD*/
+      std::unique_ptr<MVA::Expert> m_expert_BRL; /**< Pointer to the current MVA Expert for BRL*/
+      std::unique_ptr<MVA::Expert> m_expert_BWD; /**< Pointer to the current MVA Expert for BWD*/
+      std::unique_ptr<MVA::SingleDataset>
+      m_dataset; /**< Pointer to the current dataset. It is assumed it holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower. */
+
       /** Neighbour map 9 neighbours, for E9oE25 and E1oE9. */
       ECLNeighbours* m_neighbourMap9;
 
       /** Neighbour map 25 neighbours, for E9oE25. */
       ECLNeighbours* m_neighbourMap25;
 
+      /** initialize MVA weight files from DB
+       */
+      void initializeMVAweightFiles(const std::string& identifier,
+                                    std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation);
+
+      /** Load MVA weight file and set pointer of expert.
+       * return the general options of the weightfile associated with weightFileRepresentation.
+       */
+      MVA::GeneralOptions initilizeMVA(const std::string& identifier,
+                                       std::unique_ptr<DBObjPtr<DatabaseRepresentationOfWeightfile>>& weightFileRepresentation, std::unique_ptr<MVA::Expert>& expert);
+
+      /**
+      * Set showr shape variables.
+      * For correct zernike MVA calculation, must be run first on the N2 shower in each connected region, then on the N1 showers of the connected region.
+      * calculateZernikeMVA - determines if MVA calculation should be performed. Should be false, for example, if there was no N2 shower, so MVA can't be calculated.
+      * The function does not set the zernikeMVA variable for N2 showers, because it is calculated from zernikeMVAs of the N1 showers, so it has to be set elsewhere (unless calculateZernikeMVA is false, in which case it is set to 0.0).
+      */
+      void setShowerShapeVariables(ECLShower* eclShower, const bool calculateZernikeMVA) const;
+
+
       /** Shower shape variable: Lateral energy. */
-      double computeLateralEnergy(const ECLShower&) const;
+      double computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits, const double avgCrystalDimension) const;
 
       /** Compute the absolute value of the complex Zernike moment Znm.
           The moments are computed in a plane perpendicular to the direction of the shower.
@@ -95,7 +141,8 @@ namespace Belle2 {
           If n or m are invalid the function returns 0.0.
           */
 
-      double computeAbsZernikeMoment(const std::vector<ProjectedECLDigit>& shower, const double totalEnergy, const int n, const int m,
+      double computeAbsZernikeMoment(const std::vector<ProjectedECLDigit>& projectedDigits, const double totalEnergy, const int n,
+                                     const int m,
                                      const double rho) const;
 
       /** Compute the second moment in the plane perpendicular to the direction of the shower.

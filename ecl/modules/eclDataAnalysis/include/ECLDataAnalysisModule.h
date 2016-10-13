@@ -312,11 +312,9 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerMinTrkDistance; /**< Shower Min Dist to Track */
     std::vector<double>* m_eclShowerTrkDepth; /**< Shower Track Depth */
     std::vector<double>* m_eclShowerShowerDepth; /**< Shower Depth */
-    std::vector<double>* m_eclShowerAbsZernike20; /**< Shower Zernike20 Moment */
     std::vector<double>* m_eclShowerAbsZernike40; /**< Shower Zernike40 Moment */
-    std::vector<double>* m_eclShowerAbsZernike42; /**< Shower Zernike42 Moment */
     std::vector<double>* m_eclShowerAbsZernike51; /**< Shower Zernike51 Moment */
-    std::vector<double>* m_eclShowerAbsZernike53; /**< Shower Zernike53 Moment */
+    std::vector<double>* m_eclShowerZernikeMVA; /**< Shower ZernikeMVA */
     std::vector<double>* m_eclShowerSecondMoment; /**< Shower Second Moment */
     std::vector<double>* m_eclShowerE1oE9; /**< Shower E1/E9 */
     std::vector<int>* m_eclShowerIsTrack; /**< Shower Track Match */

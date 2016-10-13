@@ -67,11 +67,9 @@ namespace Belle2 {
       m_trkDepth = 0.0;        /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth = 0.0;     /**< Same as above, but on the cluster average direction */
       m_NofCrystals = 0.0;     /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernike20 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 20 */
-      m_absZernike40 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 40 */
-      m_absZernike42 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 42 */
-      m_absZernike51 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 51 */
-      m_absZernike53 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 53 */
+      m_absZernike40 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 40 */
+      m_absZernike51 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 51 */
+      m_zernikeMVA = 0.0;      /**< Shower shape variable, Zernike MVA output */
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
       m_E9oE25 = 0;            /**< Shower shape variable, E9oE25 */
@@ -161,25 +159,17 @@ namespace Belle2 {
      */
     void setNofCrystals(double nofCrystals) { m_NofCrystals = nofCrystals; }
 
-    /*! Set absolute value of Zernike moment 20
-     */
-    void setAbsZernike20(double absZernike20) { m_absZernike20 = absZernike20; }
-
     /*! Set absolute value of Zernike moment 40
      */
     void setAbsZernike40(double absZernike40) { m_absZernike40 = absZernike40; }
-
-    /*! Set absolute value of Zernike moment 42
-     */
-    void setAbsZernike42(double absZernike42) { m_absZernike42 = absZernike42; }
 
     /*! Set absolute value of Zernike moment 51
      */
     void setAbsZernike51(double absZernike51) { m_absZernike51 = absZernike51; }
 
-    /*! Set absolute value of Zernike moment 53
+    /*! SetZernike MVA value
      */
-    void setAbsZernike53(double absZernike53) { m_absZernike53 = absZernike53; }
+    void setZernikeMVA(double zernikeMVA) {m_zernikeMVA = zernikeMVA; }
 
     /*! Set second moment
      */
@@ -313,30 +303,20 @@ namespace Belle2 {
      */
     double getNofCrystals() const { return m_NofCrystals; }
 
-    /*! Get absolute value of Zernike moment 20
-     * @return Absolute value of Zernike moment 20
-     */
-    double getAbsZernike20() const { return m_absZernike20; }
-
     /*! Get absolute value of Zernike moment 40
      * @return Absolute value of Zernike moment 40
      */
     double getAbsZernike40() const { return m_absZernike40; }
-
-    /*! Get absolute value of Zernike moment 42
-     * @return Absolute value of Zernike moment 42
-     */
-    double getAbsZernike42() const { return m_absZernike42; }
 
     /*! Get absolute value of Zernike moment 51
      * @return Absolute value of Zernike moment 51
      */
     double getAbsZernike51() const { return m_absZernike51; }
 
-    /*! Get absolute value of Zernike moment 53
-     * @return Absolute value of Zernike moment 53
-     */
-    double getAbsZernike53() const { return m_absZernike53; }
+    /*! Get Zernike MVA
+    * @return Zernike MVA
+    */
+    double getZernikeMVA() const {return m_zernikeMVA; }
 
     /*! Get second moment
      * @return second moment
@@ -405,11 +385,9 @@ namespace Belle2 {
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
     Double32_t m_NofCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernike20;      /**< Shower shape variable, absolute value of Zernike Moment 20 (TF) */
     Double32_t m_absZernike40;      /**< Shower shape variable, absolute value of Zernike Moment 40 (TF) */
-    Double32_t m_absZernike42;      /**< Shower shape variable, absolute value of Zernike Moment 42 (TF) */
     Double32_t m_absZernike51;      /**< Shower shape variable, absolute value of Zernike Moment 51 (TF) */
-    Double32_t m_absZernike53;      /**< Shower shape variable, absolute value of Zernike Moment 53 (TF) */
+    Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
     Double32_t m_E9oE25;            /**< Shower shape variable, E9oE25 */
@@ -420,7 +398,8 @@ namespace Belle2 {
     // 5: clean up, float to Double32_t, and new variables (TF)
     // 6: changed names of Zernike moment variables/getters/setters to indicate that they are the absolute values of the moments (TF and AH)
     // 7: added centralCellId (TF)
-    ClassDef(ECLShower, 7);/**< ClassDef */
+    // 8: added zernikeMVA, removed absZernike20, 42, 53 (AH)
+    ClassDef(ECLShower, 8);/**< ClassDef */
 
   };
 

@@ -55,9 +55,16 @@ namespace Belle2 {
 
       const std::string decayString = getDecayString(*particle);
 
-      const int decayHash = dMap->addDecayHash(decayString, m_printHashes);
+      // Convert unsigned int decay hash into a float keeping the same bit pattern
+      assert(sizeof(float) == sizeof(unsigned int));
+      union convert {
+        unsigned int i;
+        float f;
+      };
 
-      particle->addExtraInfo(c_ExtraInfoName, decayHash);
+      convert hash;
+      hash.i = dMap->addDecayHash(decayString, m_printHashes);
+      particle->addExtraInfo(c_ExtraInfoName, hash.f);
     }
   }
 

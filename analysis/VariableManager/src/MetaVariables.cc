@@ -600,6 +600,9 @@ namespace Belle2 {
         for (const auto& listName : arguments)
         {
           StoreObjPtr<ParticleList> list(listName);
+          if (not list.isValid()) {
+            B2FATAL("Invalid list named " << listName << " encountered in numberOfNonOverlappingParticles.");
+          }
           for (unsigned int i = 0; i < list->getListSize(); i++) {
             const Particle* p = list->getParticle(i);
             if (not particle->overlapsWith(p)) {

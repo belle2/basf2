@@ -26,7 +26,7 @@ namespace {
   class TestOptions : public MVA::Options {
 
   public:
-    TestOptions(std::string x, std::string y) : x(x), y(y) { }
+    TestOptions(const std::string& x, const std::string& y) : x(x), y(y) { }
     virtual void load(const boost::property_tree::ptree& pt) override { y = pt.get<std::string>(x); }
     virtual void save(boost::property_tree::ptree& pt) const override { pt.put(x, y); }
     virtual po::options_description getDescription() override

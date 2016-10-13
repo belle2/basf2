@@ -23,7 +23,6 @@ int main(int argc, char* argv[])
 {
 
   std::vector<std::string> filenames;
-  std::string directory;
 
   po::options_description description("Options");
   description.add_options()

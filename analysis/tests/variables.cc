@@ -1260,6 +1260,34 @@ namespace {
     EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
   }
 
+
+  TEST_F(MetaVariableTest, numberOfNonOverlappingParticles)
+  {
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    StoreObjPtr<ParticleList> outputList("pList1");
+    DataStore::Instance().setInitializeActive(true);
+    outputList.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    outputList.create();
+    outputList->initialize(22, "pList1");
+
+    auto* p1 = particles.appendNew(Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    auto* p2 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
+    auto* p3 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
+
+    outputList->addParticle(0, 22, Particle::c_Unflavored);
+    outputList->addParticle(1, 22, Particle::c_Unflavored);
+
+    const Manager::Var* var = Manager::Instance().getVariable("numberOfNonOverlappingParticles(pList1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p1), 1);
+    EXPECT_DOUBLE_EQ(var->function(p2), 1);
+    EXPECT_DOUBLE_EQ(var->function(p3), 2);
+
+  }
+
   TEST_F(MetaVariableTest, veto)
   {
     StoreArray<Particle> particles;

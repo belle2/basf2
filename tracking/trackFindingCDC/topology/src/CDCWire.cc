@@ -23,9 +23,7 @@ const CDCWire* CDCWire::getInstance(const WireID& wireID)
   return &(CDCWireTopology::getInstance().getWire(wireID));
 }
 
-const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer,
-                                    ILayer iLayer,
-                                    IWire iWire)
+const CDCWire* CDCWire::getInstance(ISuperLayer iSuperLayer, ILayer iLayer, IWire iWire)
 {
   return &(CDCWireTopology::getInstance().getWire(iSuperLayer, iLayer, iWire));
 }
@@ -35,10 +33,10 @@ const CDCWire* CDCWire::getInstance(const CDCHit& hit)
   if (not CDCWireTopology::getInstance().isValidWireID(WireID(hit.getID()))) {
     WireID wireID(hit.getID());
     B2ERROR("Invalid encoded wire id of cdc hit " << wireID);
-    B2ERROR("Superlayer id: " <<  wireID.getISuperLayer());
-    B2ERROR("Layer cid: " <<  wireID.getICLayer());
-    B2ERROR("Layer id: " <<  wireID.getILayer());
-    B2ERROR("Wire id: " <<  wireID.getIWire());
+    B2ERROR("Superlayer id: " << wireID.getISuperLayer());
+    B2ERROR("Layer cid: " << wireID.getICLayer());
+    B2ERROR("Layer id: " << wireID.getILayer());
+    B2ERROR("Wire id: " << wireID.getIWire());
     B2FATAL("Do not continue with wrong wire id");
     return nullptr;
   }
@@ -93,6 +91,8 @@ void CDCWire::initialize(CDC::CDCGeometryPar::EWirePosition wirePosSet, bool ign
 
 bool CDCWire::isInCell(const Vector3D& pos3D) const
 {
+  // Necessary for cppcheck not understanding that the variable is read on the next line
+  // cppcheck-suppress unreadVariable
   bool inZ = getBackwardZ() < pos3D.z() and pos3D.z() < getForwardZ();
   if (not inZ) return false;
 
@@ -102,6 +102,8 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
   double outerCylindricalR = wireLayer.getOuterCylindricalR();
   double cylindricalR = pos3D.cylindricalR();
 
+  // Necessary for cppcheck not understanding that the variable is read on the next line
+  // cppcheck-suppress unreadVariable
   bool inCylindricalR = innerCylindricalR < cylindricalR and cylindricalR < outerCylindricalR;
   if (not inCylindricalR) return false;
 
@@ -113,12 +115,14 @@ bool CDCWire::isInCell(const Vector3D& pos3D) const
 }
 
 double CDCWire::getRadialCellWidth() const
-{ return getWireLayer().getRadialCellWidth(); }
-
+{
+  return getWireLayer().getRadialCellWidth();
+}
 
 double CDCWire::getLateralCellWidth() const
-{ return getWireLayer().getLateralCellWidth(); }
-
+{
+  return getWireLayer().getLateralCellWidth();
+}
 
 const CDCWireLayer& CDCWire::getWireLayer() const
 {
@@ -126,15 +130,11 @@ const CDCWireLayer& CDCWire::getWireLayer() const
   return CDCWireTopology::getInstance().getWireLayer(iCLayer);
 }
 
-
 const CDCWireSuperLayer& CDCWire::getWireSuperLayer() const
 {
   ISuperLayer iSuperLayer = getISuperLayer();
   return CDCWireTopology::getInstance().getWireSuperLayer(iSuperLayer);
 }
-
-
-
 
 WireNeighborKind CDCWire::getNeighborKind(const CDCWire& wire) const
 {
@@ -185,7 +185,6 @@ MayBePtr<const CDCWire> CDCWire::getNeighborCWOutwards() const
 {
   return CDCWireTopology::getInstance().getNeighborCWOutwards(getWireID());
 }
-
 
 MayBePtr<const CDCWire> CDCWire::getSecondaryNeighbor(short oClockDirection) const
 {

@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-ClassImp(L3Tag)
+//ClassImp(L3Tag)
 
 L3Tag::L3Tag() : m_SummaryWord(0), m_EnergySum(0.), m_nTracks(0) {}
 

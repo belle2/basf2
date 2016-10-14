@@ -5,7 +5,9 @@ env['LIBS'] = [
     "framework",
     "analysis",
     "analysis_utility",
-    "hlt_softwaretrigger_dbobjects"
+    "hlt_softwaretrigger_dbobjects",
+    "analysis_dataobjects",
+    "mdst_dataobjects"
 ]
 
 Return('env')

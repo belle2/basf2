@@ -13,6 +13,6 @@
 //using namespace std;
 using namespace Belle2;
 
-ClassImp(L1EmulationInformation)
+//ClassImp(L1EmulationInformation)
 
 

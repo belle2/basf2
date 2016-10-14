@@ -10,7 +10,6 @@
 
 #include <hlt/hlt/dataobjects/PhysicsTriggerInformation.h>
 
-//using namespace std;
 using namespace Belle2;
 
 PhysicsTriggerInformation::PhysicsTriggerInformation(): m_ngoodTracks(0), m_ngoodECLClusters(0), m_Pzvis(0.), m_Evis(0.),
@@ -23,6 +22,3 @@ PhysicsTriggerInformation::PhysicsTriggerInformation(): m_ngoodTracks(0), m_ngoo
     m_nsubtrg[i] = 0;
   }
 }
-//ClassImp(PhysicsTriggerInformation)
-
-

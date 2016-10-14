@@ -249,7 +249,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
     const double currentArcLength2D = recoHit.getArcLength2D();
     if (not std::isnan(lastArcLength2D)) {
       const double delta = (currentArcLength2D - lastArcLength2D);
-      if (abs(delta) > m_maximumArcLength2DDistance) {
+      if (fabs(delta) > m_maximumArcLength2DDistance) {
         trackletList.emplace_back();
         currentTracklet = &(trackletList.back());
       }

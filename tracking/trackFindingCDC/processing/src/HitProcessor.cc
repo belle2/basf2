@@ -194,11 +194,9 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
     }
   }
 
-  if ((fabs(vote_pos - vote_neg) / (double)(vote_pos + vote_neg) < 1.)
-      && fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
-    return true;
+  return (static_cast<double>(abs(vote_pos - vote_neg)) / (vote_pos + vote_neg) < 1.)
+         && fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.;
 
-  return false;
 }
 
 void HitProcessor::deleteAllMarkedHits(CDCTrack& track)

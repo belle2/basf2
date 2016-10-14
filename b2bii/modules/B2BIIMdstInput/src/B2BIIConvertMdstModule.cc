@@ -1543,10 +1543,7 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux,
                                                   ECLCluster* eclCluster)
 {
-  if (ecl.match() > 0)
-    eclCluster->setisTrack(true);
-  else
-    eclCluster->setisTrack(false);
+  eclCluster->setisTrack(ecl.match() > 0);
 
   eclCluster->setEnergy(ecl.energy());
   eclCluster->setPhi(ecl.phi());
@@ -1562,13 +1559,13 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   covarianceMatrix[3] = ecl.error(3);
   covarianceMatrix[4] = ecl.error(4);
   covarianceMatrix[5] = sqrt(ecl.error(5)); // error on theta
-  eclCluster->setError(covarianceMatrix);
+  eclCluster->setCovarianceMatrix(covarianceMatrix);
 
-  eclCluster->setEnedepSum(eclAux.mass());
-  eclCluster->setE9oE25(eclAux.e9oe25());
-  eclCluster->setHighestE(eclAux.seed());
-  eclCluster->setTiming(eclAux.property(0));
-  eclCluster->setNofCrystals(eclAux.nhits());
+  eclCluster->setEnergyRaw(eclAux.mass());
+  eclCluster->setE9oE21(eclAux.e9oe25());
+  eclCluster->setEnergyHighestCrystal(eclAux.seed());
+  eclCluster->setTime(eclAux.property(0));
+  eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 
 //-----------------------------------------------------------------------------

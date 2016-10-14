@@ -293,6 +293,7 @@ namespace {
     myECL.setisTrack(false);
     float eclREC = 0.5;
     myECL.setEnergy(eclREC);
+    myECL.setHypothesisId(5);
     ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
     // Particle on reconstructed side from ECLCluster
@@ -304,6 +305,7 @@ namespace {
     myROEECL.setisTrack(false);
     float eclROE = 1.0;
     myROEECL.setEnergy(eclROE);
+    myROEECL.setHypothesisId(5);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
 
     // Create KLMCluster on ROE side

@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-ClassImp(L3Cluster)
+//ClassImp(L3Cluster)
 
 L3Cluster::L3Cluster()
   : m_energy(0.),

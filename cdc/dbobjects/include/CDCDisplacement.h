@@ -35,7 +35,7 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    CDCDisplacement(WireID wire, TVector3 fwd, TVector3 bwd) :
+    CDCDisplacement(const WireID& wire, TVector3 fwd, TVector3 bwd) :
       m_wire(wire), m_fwd(fwd), m_bwd(bwd)
     {
     }

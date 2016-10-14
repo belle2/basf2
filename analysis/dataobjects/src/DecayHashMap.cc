@@ -19,7 +19,7 @@ int DecayHashMap::addDecayHash(const std::string& decayString, bool verbose)
     m_StringLookupMap[decayString] = hash;
     m_HashLookupMap[hash] = decayString;
     if (verbose) {
-      std::cout << "FOUND_NEW_DECAY_HASH " << hash << " " << decayString << std::endl;
+      std::cout << "FOUND_NEW_DECAY_HASH | " << hash << " | " << decayString << std::endl;
     }
   }
   return m_StringLookupMap[decayString];

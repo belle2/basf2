@@ -5,6 +5,8 @@ import reconstruction
 import modularAnalysis
 import rawdata
 import vertex
+import stdFSParticles
+import stdV0s
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
 
@@ -17,7 +19,10 @@ HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks
             "accept_mu_mu", "accept_gamma_gamma"]
 
 CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi", "accept_D0_Kpi",
-              "accept_Dstar", "accept_Xi_piLambda"]
+              "accept_Dstar", "accept_Xi_piLambda", "accept_test"]
+
+CALIB_CUTS += ["accept_dqm_D0", "accept_dqm_Dplus", "accept_dqm_Dstar",
+               "accept_dqm_Jpsiee", "accept_dqm_Jpsimumu"]
 
 
 def add_packers(path):
@@ -97,6 +102,42 @@ def add_tag_calib_sample(path, store_array_debug_prescale=None):
     vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
     modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
+
+    # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
+    stdFSParticles.stdPi(path=path)
+    stdFSParticles.stdK(path=path)
+    # D0->K- pi+
+    modularAnalysis.reconstructDecay('D0:dqm -> K-:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D0:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'D0_dqm_M'}, path=path)
+
+    # D*+->D0 pi-
+    modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:std',
+                                     '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
+    vertex.vertexKFit('D*+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'Dstar_dqm_M'}, path=path)
+
+    # D+ -> K- pi+ pi+
+    modularAnalysis.reconstructDecay('D+:dqm -> K-:std pi+:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'Dplus_dqm_M'}, path=path)
+
+    # Jpsi-> ee
+    modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'Jpsi_dqm_ee_M'}, path=path)
+
+    # Jpsi-> mumu
+    modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'Jpsi_dqm_mumu_M'}, path=path)
 
     calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
 

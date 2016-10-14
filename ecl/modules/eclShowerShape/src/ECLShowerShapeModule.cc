@@ -53,7 +53,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 ECLShowerShapeModule::ECLShowerShapeModule() : Module()
 {
   // Set description
-  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E25)");
+  setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("zernike_n1_rho0", m_zernike_n1_rho0,
@@ -99,7 +99,7 @@ void ECLShowerShapeModule::initialize()
 {
   // Initialize neighbour maps.
   m_neighbourMap9 = new ECLNeighbours("N", 1);
-  m_neighbourMap25 = new ECLNeighbours("N", 2);
+  m_neighbourMap21 = new ECLNeighbours("NC", 2);
 
   initializeMVAweightFiles(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL);
@@ -174,9 +174,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   eclShower->setSecondMoment(secondMoment);
   eclShower->setLateralEnergy(LATenergy);
   eclShower->setE1oE9(computeE1oE9(*eclShower));
-
-  // As long as we have the old clustering running, we should not overwrite existing values... or should we? (TF)
-  if (eclShower->getE9oE25() <= 0.0) eclShower->setE9oE25(computeE9oE25(*eclShower));
+  if (eclShower->getE9oE21() < 1e-9) eclShower->setE9oE21(computeE9oE21(*eclShower));
 
   if (calculateZernikeMVA) {
     //Set Zernike moments that will be used in MVA calculation
@@ -328,7 +326,7 @@ void ECLShowerShapeModule::endRun()
 void ECLShowerShapeModule::terminate()
 {
   if (m_neighbourMap9) delete m_neighbourMap9;
-  if (m_neighbourMap25) delete m_neighbourMap25;
+  if (m_neighbourMap21) delete m_neighbourMap21;
 }
 
 double ECLShowerShapeModule::computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits,
@@ -482,18 +480,18 @@ double ECLShowerShapeModule::computeE1oE9(const ECLShower& shower) const
   else return 0.0;
 }
 
-double ECLShowerShapeModule::computeE9oE25(const ECLShower& shower) const
+double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
 {
   // get central id
   const int centralCellId = shower.getCentralCellId();
   if (centralCellId == 0) return 0.0; //cell id starts at 1
 
-  // get list of 9 and 25 neighbour ids
+  // get list of 9 and 21 neighbour ids
   const std::vector< short int > n9 = m_neighbourMap9->getNeighbours(centralCellId);
-  const std::vector< short int > n25 = m_neighbourMap25->getNeighbours(centralCellId);
+  const std::vector< short int > n21 = m_neighbourMap21->getNeighbours(centralCellId);
 
   double energy9 = 0.0;
-  double energy25 = 0.0;
+  double energy21 = 0.0;
 
   auto relatedDigitsPairs = shower.getRelationsTo<ECLCalDigit>();
 
@@ -509,15 +507,15 @@ double ECLShowerShapeModule::computeE9oE25(const ECLShower& shower) const
       energy9 += weight * energy;
     }
 
-    // check if this is contained in the 25 neighbours
-    const auto it25 = std::find(n25.begin(), n25.end(), cellid);
-    if (it25 != n25.end()) {
-      energy25 += weight * energy;
+    // check if this is contained in the 21 neighbours
+    const auto it21 = std::find(n21.begin(), n21.end(), cellid);
+    if (it21 != n21.end()) {
+      energy21 += weight * energy;
     }
 
   }
 
-  if (energy25 >= 0.0) return energy9 / energy25;
+  if (energy21 > 1e-9) return energy9 / energy21;
   else return 0.0;
 
 }

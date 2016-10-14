@@ -98,11 +98,11 @@ namespace Belle2 {
       std::unique_ptr<MVA::SingleDataset>
       m_dataset; /**< Pointer to the current dataset. It is assumed it holds 22 entries, 11 Zernike moments of N2 shower, followed by 11 Zernike moments of N1 shower. */
 
-      /** Neighbour map 9 neighbours, for E9oE25 and E1oE9. */
+      /** Neighbour map 9 neighbours, for E9oE21 and E1oE9. */
       ECLNeighbours* m_neighbourMap9;
 
-      /** Neighbour map 25 neighbours, for E9oE25. */
-      ECLNeighbours* m_neighbourMap25;
+      /** Neighbour map 21 neighbours, for E9oE21. */
+      ECLNeighbours* m_neighbourMap21;
 
       /** initialize MVA weight files from DB
        */
@@ -164,10 +164,10 @@ namespace Belle2 {
       alpha - polar angle */
       std::complex<double> zernikeValue(const double rho, const double alpha, const int n, const int m) const;
 
-      /** Shower shape variable: E9oE25
-       The energy ratio is calculated taking the weighted 3x3 (=9) and the weighted 5x5 (=25) crystals around the central crystal.
+      /** Shower shape variable: E9oE21
+       The energy ratio is calculated taking the weighted 3x3 (=9) and the weighted 5x5-corners (=21) crystals around the central crystal.
        If the shower is smaller than this, the reduced number is used for this. */
-      double computeE9oE25(const ECLShower&) const;
+      double computeE9oE21(const ECLShower&) const;
 
       /** Shower shape variable: E1oE9
        The energy ratio is calculated taking the weighted central (=1) and the weighted 3x3 (=9) crystals around the central crystal.

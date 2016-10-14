@@ -325,11 +325,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
     aECLShower->setEnergy(showerEnergy);
-    aECLShower->setEnedepsum(showerEnergy);
-    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setEnergyRaw(showerEnergy);
+    aECLShower->setEnergyHighestCrystal(highestEnergy);
     aECLShower->setTime(highestEnergyTime);
-    aECLShower->setTimeResolution(highestEnergyTimeResolution);
-    aECLShower->setNofCrystals(weightSum);
+    aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+    aECLShower->setNumberOfCrystals(weightSum);
     aECLShower->setCentralCellId(highestEnergyID);
 
     B2DEBUG(175, "theta           = " << showerposition.Theta());
@@ -661,11 +661,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       aECLShower->setEnergy(showerEnergy);
-      aECLShower->setEnedepsum(showerEnergy);
-      aECLShower->setHighestEnergy(highestEnergy);
+      aECLShower->setEnergyRaw(showerEnergy);
+      aECLShower->setEnergyHighestCrystal(highestEnergy);
       aECLShower->setTime(highestEnergyTime);
-      aECLShower->setTimeResolution(highestEnergyTimeResolution);
-      aECLShower->setNofCrystals(weightSum);
+      aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+      aECLShower->setNumberOfCrystals(weightSum);
       aECLShower->setCentralCellId(locmaxcellid);
 
       B2DEBUG(175, "new energy: " << showerEnergy);

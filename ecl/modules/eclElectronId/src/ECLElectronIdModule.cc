@@ -74,9 +74,9 @@ void ECLElectronIdModule::event()
 
     const double p = fitRes->getMomentum().Mag();
     const double costheta = fitRes->getMomentum().CosTheta();
-    double energy(0), maxEnergy(0), e9e25(0);
+    double energy(0), maxEnergy(0), e9e21(0);
     double lat(0), dist(0), trkdepth(0), shdepth(0);
-    int nCrystals = 0;
+    double nCrystals = 0;
     int nClusters = relShowers.size();
 
     for (const auto& eclShower : relShowers) {
@@ -84,13 +84,13 @@ void ECLElectronIdModule::event()
       energy += shEnergy;
       if (shEnergy > maxEnergy) {
         maxEnergy = shEnergy;
-        e9e25 = eclShower.getE9oE25();
+        e9e21 = eclShower.getE9oE21();
         lat = eclShower.getLateralEnergy();
         dist = eclShower.getMinTrkDistance();
         trkdepth = eclShower.getTrkDepth();
         shdepth = eclShower.getShowerDepth();
       }
-      nCrystals += int(eclShower.getNofCrystals());
+      nCrystals += int(eclShower.getNumberOfCrystals());
     }
 
     float likelihoods[Const::ChargedStable::c_SetSize];
@@ -106,7 +106,8 @@ void ECLElectronIdModule::event()
       else likelihoods[hypo.getIndex()] = m_minLogLike;
     } // end loop on hypo
 
-    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e25, lat, dist, trkdepth, shdepth, nCrystals,
+    const auto eclPidLikelihood = eclPidLikelihoods.appendNew(likelihoods, energy, eop, e9e21, lat, dist, trkdepth, shdepth,
+                                                              (int) nCrystals,
                                                               nClusters);
     track.addRelationTo(eclPidLikelihood);
 

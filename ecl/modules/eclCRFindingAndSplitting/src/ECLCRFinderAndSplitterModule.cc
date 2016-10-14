@@ -152,22 +152,22 @@ void ECLCRFinderAndSplitterModule::event()
       // fill ECLShower
       aECLShower->setShowerId(nShowerWithinCR);
       aECLShower->setEnergy(shower.Energy());
-      aECLShower->setEnedepsum(shower.UncEnergy());
+      aECLShower->setEnergyRaw(shower.UncEnergy());
       aECLShower->setTheta(shower.Theta());
       aECLShower->setPhi(shower.Phi());
       aECLShower->setR(shower.Distance());
 //      aECLShower->setMass(shower.Mass());
 //      aECLShower->setWidth(shower.Width()); // should be done in eclShowerShape (TF)
-      aECLShower->setE9oE25(shower.E9oE25()); // should be done in eclShowerShape (TF)
+      aECLShower->setE9oE21(shower.E9oE25()); // should be done in eclShowerShape (TF)
 //      aECLShower->setE9oE25unf(shower.E9oE25unf()); // should be done in eclShowerShape (TF)
-      aECLShower->setNofCrystals((double) shower.NHits());
+      aECLShower->setNumberOfCrystals((double) shower.NHits());
       aECLShower->setStatus(0); // status is not used in this old clustering
 //      aECLShower->setStatus(shower.Status());
 //      aECLShower->setGrade(shower.Grade());
 //      aECLShower->setUncEnergy(shower.UncEnergy());
       aECLShower->setTime(v_TIME);
 
-      aECLShower->setHighestEnergy(v_HiEnergy); //(TF)
+      aECLShower->setEnergyHighestCrystal(v_HiEnergy); //(TF)
       // the old shower id (just a counter) must be replaced by the more complex new id
       // you can still use this just as a number - but you can also extract more from it
 //      const int uniqueId = SUtility.getShowerId(nCR, cHypothesis, nShowerWithinCR);

@@ -160,6 +160,9 @@ Particle::Particle(const ECLCluster* eclCluster) :
 {
   if (!eclCluster) return;
 
+  // Only use the photon hypothesis for now
+  if (eclCluster->getHypothesisId() != 5) return;
+
   // TODO: avoid hard coded values
   m_pdgCode = 22;
   setFlavorType();
@@ -178,7 +181,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   m_pValue = 1;
 
   // set error matrix
-  storeErrorMatrix(eclCluster->getError7x7());
+  storeErrorMatrix(eclCluster->getCovarianceMatrix7x7());
 }
 
 Particle::Particle(const KLMCluster* klmCluster) :

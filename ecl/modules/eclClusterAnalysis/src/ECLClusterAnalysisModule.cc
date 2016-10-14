@@ -84,15 +84,11 @@ ECLClusterAnalysisModule::ECLClusterAnalysisModule()
     m_eclClusterLat(0),
     m_eclClusterNofCrystals(0),
     m_eclClusterCrystalHealth(0),
-//m_eclClusterMergedPi0(0),
     m_eclClusterPx(0),
     m_eclClusterPy(0),
     m_eclClusterPz(0),
     m_eclClusterIsTrack(0),
-    m_eclClusterPi0Likel(0),
-    m_eclClusterEtaLikel(0),
     m_eclClusterDeltaL(0),
-    m_eclClusterBeta(0),
     m_mcMultip(0),
     m_mcIdx(0),
     m_mcPdg(0),
@@ -389,15 +385,11 @@ void ECLClusterAnalysisModule::initialize()
   m_tree->Branch("eclClusterLat",        "std::vector<double>",    &m_eclClusterLat);
   m_tree->Branch("eclClusterNofCrystals",   "std::vector<int>",       &m_eclClusterNofCrystals);
   m_tree->Branch("eclClusterCrystalHealth", "std::vector<int>",       &m_eclClusterCrystalHealth);
-  //m_tree->Branch("eclClusterMergedPi0",  "std::vector<double>",    &m_eclClusterMergedPi0);
   m_tree->Branch("eclClusterPx",         "std::vector<double>",    &m_eclClusterPx);
   m_tree->Branch("eclClusterPy",         "std::vector<double>",    &m_eclClusterPy);
   m_tree->Branch("eclClusterPz",         "std::vector<double>",    &m_eclClusterPz);
   m_tree->Branch("eclClusterIsTrack",    "std::vector<bool>",       &m_eclClusterIsTrack);
-  m_tree->Branch("eclClusterPi0Likel",   "std::vector<double>",    &m_eclClusterPi0Likel);
-  m_tree->Branch("eclClusterEtaLikel",   "std::vector<double>",    &m_eclClusterEtaLikel);
   m_tree->Branch("eclClusterDeltaL",     "std::vector<double>",    &m_eclClusterDeltaL);
-  m_tree->Branch("eclClusterBeta",       "std::vector<double>",    &m_eclClusterBeta);
 
   m_tree->Branch("mcMultip",     &m_mcMultip,           "mcMultip/I");
   m_tree->Branch("mcIdx",        "std::vector<int>",    &m_mcIdx);
@@ -476,9 +468,9 @@ void ECLClusterAnalysisModule::event()
   //m_eclClusterToShower->clear(); //m_eclClusterToTrack->clear();
   m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear();
-  m_eclClusterNofCrystals->clear();  m_eclClusterCrystalHealth->clear();  //m_eclClusterMergedPi0->clear();
+  m_eclClusterNofCrystals->clear();  m_eclClusterCrystalHealth->clear();
   m_eclClusterPx->clear();  m_eclClusterPy->clear();  m_eclClusterPz->clear();  m_eclClusterIsTrack->clear();
-  m_eclClusterPi0Likel->clear();  m_eclClusterEtaLikel->clear();  m_eclClusterDeltaL->clear();  m_eclClusterBeta->clear();
+  m_eclClusterDeltaL->clear();
 
   m_mcIdx->clear();  m_mcPdg->clear();  m_mcMothPdg->clear();  m_mcGMothPdg->clear();  m_mcGGMothPdg->clear();
   m_mcEnergy->clear();  m_mcPx->clear();  m_mcPy->clear();  m_mcPz->clear();
@@ -522,29 +514,25 @@ void ECLClusterAnalysisModule::event()
 
     m_eclClusterIdx->push_back(iclusters);
     m_eclClusterEnergy->push_back(aECLClusters->getEnergy());
-    m_eclClusterEnergyError->push_back(aECLClusters->getErrorEnergy());
+    m_eclClusterEnergyError->push_back(aECLClusters->getUncertaintyEnergy());
     m_eclClusterTheta->push_back(aECLClusters->getTheta());
-    m_eclClusterThetaError->push_back(aECLClusters->getErrorTheta());
+    m_eclClusterThetaError->push_back(aECLClusters->getUncertaintyTheta());
     m_eclClusterPhi->push_back(aECLClusters->getPhi());
-    m_eclClusterPhiError->push_back(aECLClusters->getErrorPhi());
+    m_eclClusterPhiError->push_back(aECLClusters->getUncertaintyPhi());
     m_eclClusterR->push_back(aECLClusters->getR());
-    m_eclClusterEnergyDepSum->push_back(aECLClusters->getEnedepSum());
-    m_eclClusterTiming->push_back(aECLClusters->getTiming());
-    m_eclClusterTimingError->push_back(aECLClusters->getErrorTiming());
-    m_eclClusterE9oE25->push_back(aECLClusters->getE9oE25());
-    m_eclClusterHighestE->push_back(aECLClusters->getHighestE());
+    m_eclClusterEnergyDepSum->push_back(aECLClusters->getEnergyRaw());
+    m_eclClusterTiming->push_back(aECLClusters->getTime());
+    m_eclClusterTimingError->push_back(aECLClusters->getDeltaTime99());
+    m_eclClusterE9oE25->push_back(aECLClusters->getE9oE21());
+    m_eclClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
     m_eclClusterLat->push_back(aECLClusters->getLAT());
-    m_eclClusterNofCrystals->push_back(aECLClusters->getNofCrystals());
-    m_eclClusterCrystalHealth->push_back(aECLClusters->getCrystHealth());
-    //m_eclClusterMergedPi0->push_back(aECLClusters->getMergedPi0());
+    m_eclClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
+    m_eclClusterCrystalHealth->push_back(aECLClusters->getStatus());
     m_eclClusterPx->push_back(aECLClusters->getPx());
     m_eclClusterPy->push_back(aECLClusters->getPy());
     m_eclClusterPz->push_back(aECLClusters->getPz());
     m_eclClusterIsTrack->push_back(aECLClusters->getisTrack());
-    m_eclClusterPi0Likel->push_back(aECLClusters->getpi0Likelihood());
-    m_eclClusterEtaLikel->push_back(aECLClusters->getetaLikelihood());
-    m_eclClusterDeltaL->push_back(aECLClusters->getdeltaL());
-    m_eclClusterBeta->push_back(aECLClusters->getbeta());
+    m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
     double sumHit = 0;
     int idx[10];

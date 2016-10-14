@@ -21,50 +21,53 @@ namespace Belle2 {
   {
     ECLCluster myECLCluster;
 
-    EXPECT_EQ(0, myECLCluster.getEnergy());
-    EXPECT_EQ(0, myECLCluster.getE9oE25());
-    EXPECT_EQ(0, myECLCluster.getEnedepSum());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergy());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergyRaw());
+    EXPECT_EQ(exp(-5.), myECLCluster.getEnergyHighestCrystal());
     EXPECT_EQ(0, myECLCluster.getTheta());
     EXPECT_EQ(0, myECLCluster.getPhi());
     EXPECT_EQ(0, myECLCluster.getR());
-    EXPECT_EQ(0, myECLCluster.getTiming());
-    EXPECT_EQ(0, myECLCluster.getErrorTiming());
-    EXPECT_EQ(0, myECLCluster.getHighestE());
-    EXPECT_EQ(0, myECLCluster.getCrystHealth());
-    EXPECT_EQ(0, myECLCluster.getNofCrystals());
+    EXPECT_EQ(0, myECLCluster.getTime());
+    EXPECT_EQ(0, myECLCluster.getDeltaTime99());
+    EXPECT_EQ(0, myECLCluster.getStatus());
+    EXPECT_EQ(0, myECLCluster.getNumberOfCrystals());
     EXPECT_EQ(0, myECLCluster.getLAT());
-    EXPECT_EQ(0, myECLCluster.getMergedPi0());
+    EXPECT_EQ(0, myECLCluster.getAbsZernike40());
+    EXPECT_EQ(0, myECLCluster.getAbsZernike51());
+    EXPECT_EQ(0, myECLCluster.getZernikeMVA());
+    EXPECT_EQ(0, myECLCluster.getE1oE9());
+    EXPECT_EQ(0, myECLCluster.getE9oE21());
 
-    EXPECT_EQ(0, myECLCluster.getErrorEnergy());
-    EXPECT_EQ(0, myECLCluster.getErrorTheta());
-    EXPECT_EQ(0, myECLCluster.getErrorPhi());
+    EXPECT_EQ(0, myECLCluster.getUncertaintyEnergy());
+    EXPECT_EQ(0, myECLCluster.getUncertaintyTheta());
+    EXPECT_EQ(0, myECLCluster.getUncertaintyPhi());
 
     EXPECT_EQ(0, myECLCluster.getPx());
     EXPECT_EQ(0, myECLCluster.getPy());
-    EXPECT_EQ(0, myECLCluster.getPz());
+    EXPECT_EQ(exp(-5.), myECLCluster.getPz());
 
     EXPECT_FALSE(myECLCluster.getisTrack());
     EXPECT_TRUE(myECLCluster.isNeutral());
 
-    double x = myECLCluster.getMomentum().X();
-    double y = myECLCluster.getMomentum().Y();
-    double z = myECLCluster.getMomentum().Z();
-    EXPECT_EQ(0, x);
-    EXPECT_EQ(0, y);
-    EXPECT_EQ(0, z);
+    double px = myECLCluster.getMomentum().X();
+    double py = myECLCluster.getMomentum().Y();
+    double pz = myECLCluster.getMomentum().Z();
+    EXPECT_EQ(0, px);
+    EXPECT_EQ(0, py);
+    EXPECT_EQ(exp(-5.), pz);
 
-    x = myECLCluster.get4Vector().X();
-    y = myECLCluster.get4Vector().Y();
-    z = myECLCluster.get4Vector().Z();
-    double e = myECLCluster.get4Vector().E();
-    EXPECT_EQ(0, x);
-    EXPECT_EQ(0, y);
-    EXPECT_EQ(0, z);
-    EXPECT_EQ(0, e);
+    px = myECLCluster.get4Vector().X();
+    py = myECLCluster.get4Vector().Y();
+    pz = myECLCluster.get4Vector().Z();
+    double energy = myECLCluster.get4Vector().E();
+    EXPECT_EQ(0, px);
+    EXPECT_EQ(0, py);
+    EXPECT_EQ(exp(-5.), pz);
+    EXPECT_EQ(exp(-5.), energy);
 
-    x = myECLCluster.getclusterPosition().X();
-    y = myECLCluster.getclusterPosition().Y();
-    z = myECLCluster.getclusterPosition().Z();
+    double x = myECLCluster.getClusterPosition().X();
+    double y = myECLCluster.getClusterPosition().Y();
+    double z = myECLCluster.getClusterPosition().Z();
     EXPECT_EQ(0, x);
     EXPECT_EQ(0, y);
     EXPECT_EQ(0, z);
@@ -76,7 +79,7 @@ namespace Belle2 {
     EXPECT_EQ(0, y);
     EXPECT_EQ(0, z);
 
-    const auto error3x3 = myECLCluster.getError3x3();
+    const auto error3x3 = myECLCluster.getCovarianceMatrix3x3();
     EXPECT_EQ(0, error3x3(0, 0));
     EXPECT_EQ(0, error3x3(0, 1));
     EXPECT_EQ(0, error3x3(0, 2));
@@ -87,7 +90,7 @@ namespace Belle2 {
     EXPECT_EQ(0, error3x3(2, 1));
     EXPECT_EQ(0, error3x3(2, 2));
 
-    const auto error4x4 = myECLCluster.getError4x4();
+    const auto error4x4 = myECLCluster.getCovarianceMatrix4x4();
     EXPECT_EQ(0, error4x4(0, 0));
     EXPECT_EQ(0, error4x4(0, 1));
     EXPECT_EQ(0, error4x4(0, 2));
@@ -105,7 +108,7 @@ namespace Belle2 {
     EXPECT_EQ(0, error4x4(3, 2));
     EXPECT_EQ(0, error4x4(3, 3));
 
-    const auto error7x7 = myECLCluster.getError7x7();
+    const auto error7x7 = myECLCluster.getCovarianceMatrix7x7();
     EXPECT_EQ(0, error7x7(0, 0));
     EXPECT_EQ(0, error7x7(0, 1));
     EXPECT_EQ(0, error7x7(0, 2));
@@ -167,51 +170,48 @@ namespace Belle2 {
     const float theta = 1.2;
     const float phi = 1.2;
     const double r = 1.2;
-    const double energyDepSum = 123.3;
-    const double timing = 17.2;
-    const double errorTiming = 1.1;
-    const double E9oE25 = 12.2;
-    const double highestE = 32.1;
-    const double lat = 21.5;
-    const int   nOfCrystals = 4;
-    const int   crystHealth = 1;
-    const double mergedPi0 = 12.2;
+    const double energyDepSum = 12.3;
+    const double time = 17.2;
+    const double deltaTime99 = 1.1;
+    const double E9oE21 = 0.1;
+    const double highestEnergy = 32.1;
+    const double lat = 0.5;
+    const double   nOfCrystals = 4;
+    const int   status = 1;
     // Energy->[0], Phi->[2], Theta->[5]
-    double error[6] = {1.1, 1.2, 1.3, 1.4, 1.5, 1.6};
+    double error[6] = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6};
 
     myECLCluster.setEnergy(energy);
-    myECLCluster.setE9oE25(E9oE25);
-    myECLCluster.setEnedepSum(energyDepSum);
+    myECLCluster.setE9oE21(E9oE21);
+    myECLCluster.setEnergyRaw(energyDepSum);
     myECLCluster.setTheta(theta);
     myECLCluster.setPhi(phi);
     myECLCluster.setR(r);
-    myECLCluster.setTiming(timing);
-    myECLCluster.setErrorTiming(errorTiming);
-    myECLCluster.setHighestE(highestE);
-    myECLCluster.setCrystHealth(crystHealth);
-    myECLCluster.setNofCrystals(nOfCrystals);
+    myECLCluster.setTime(time);
+    myECLCluster.setDeltaTime99(deltaTime99);
+    myECLCluster.setEnergyHighestCrystal(highestEnergy);
+    myECLCluster.setStatus(status);
+    myECLCluster.setNumberOfCrystals(nOfCrystals);
     myECLCluster.setLAT(lat);
-    myECLCluster.setMergedPi0(mergedPi0);
-    myECLCluster.setError(error);
+    myECLCluster.setCovarianceMatrix(error);
     myECLCluster.setisTrack(isTrack);
 
     EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy());
-    EXPECT_FLOAT_EQ(E9oE25, myECLCluster.getE9oE25());
-    EXPECT_FLOAT_EQ(energyDepSum, myECLCluster.getEnedepSum());
+    EXPECT_FLOAT_EQ(E9oE21, myECLCluster.getE9oE21());
+    EXPECT_FLOAT_EQ(energyDepSum, myECLCluster.getEnergyRaw());
     EXPECT_FLOAT_EQ(theta, myECLCluster.getTheta());
     EXPECT_FLOAT_EQ(phi, myECLCluster.getPhi());
     EXPECT_FLOAT_EQ(r, myECLCluster.getR());
-    EXPECT_FLOAT_EQ(timing, myECLCluster.getTiming());
-    EXPECT_FLOAT_EQ(errorTiming, myECLCluster.getErrorTiming());
-    EXPECT_FLOAT_EQ(highestE, myECLCluster.getHighestE());
-    EXPECT_EQ(crystHealth, myECLCluster.getCrystHealth());
-    EXPECT_EQ(nOfCrystals, myECLCluster.getNofCrystals());
+    EXPECT_FLOAT_EQ(time, myECLCluster.getTime());
+    EXPECT_FLOAT_EQ(deltaTime99, myECLCluster.getDeltaTime99());
+    EXPECT_FLOAT_EQ(highestEnergy, myECLCluster.getEnergyHighestCrystal());
+    EXPECT_EQ(status, myECLCluster.getStatus());
+    EXPECT_FLOAT_EQ(nOfCrystals, myECLCluster.getNumberOfCrystals());
     EXPECT_FLOAT_EQ(lat, myECLCluster.getLAT());
-    EXPECT_FLOAT_EQ(mergedPi0, myECLCluster.getMergedPi0());
 
-    EXPECT_FLOAT_EQ(error[0], myECLCluster.getErrorEnergy());
-    EXPECT_FLOAT_EQ(error[5], myECLCluster.getErrorTheta());
-    EXPECT_FLOAT_EQ(error[2], myECLCluster.getErrorPhi());
+    EXPECT_FLOAT_EQ(error[0], myECLCluster.getUncertaintyEnergy()*myECLCluster.getUncertaintyEnergy());
+    EXPECT_FLOAT_EQ(error[5], myECLCluster.getUncertaintyTheta()*myECLCluster.getUncertaintyTheta());
+    EXPECT_FLOAT_EQ(error[2], myECLCluster.getUncertaintyPhi()*myECLCluster.getUncertaintyPhi());
 
     EXPECT_FLOAT_EQ(energy * sin(theta) * cos(phi), myECLCluster.getPx());
     EXPECT_FLOAT_EQ(energy * sin(theta) * sin(phi), myECLCluster.getPy());
@@ -236,9 +236,9 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(energy * cos(theta), z);
     EXPECT_FLOAT_EQ(energy, e);
 
-    x = myECLCluster.getclusterPosition().X();
-    y = myECLCluster.getclusterPosition().Y();
-    z = myECLCluster.getclusterPosition().Z();
+    x = myECLCluster.getClusterPosition().X();
+    y = myECLCluster.getClusterPosition().Y();
+    z = myECLCluster.getClusterPosition().Z();
     EXPECT_FLOAT_EQ(r * sin(theta) * cos(phi), x);
     EXPECT_FLOAT_EQ(r * sin(theta) * sin(phi), y);
     EXPECT_FLOAT_EQ(r * cos(theta), z);
@@ -250,16 +250,16 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(0, y);
     EXPECT_FLOAT_EQ(0, z);
 
-    const auto error3x3 = myECLCluster.getError3x3();
-    EXPECT_FLOAT_EQ(error[0] * error[0], error3x3(0, 0));
+    const auto error3x3 = myECLCluster.getCovarianceMatrix3x3();
+    EXPECT_FLOAT_EQ(error[0], error3x3(0, 0));
     EXPECT_FLOAT_EQ(error[1], error3x3(0, 1));
     EXPECT_FLOAT_EQ(error[3], error3x3(0, 2));
     EXPECT_FLOAT_EQ(error[1], error3x3(1, 0));
-    EXPECT_FLOAT_EQ(error[2] * error[2], error3x3(1, 1));
+    EXPECT_FLOAT_EQ(error[2], error3x3(1, 1));
     EXPECT_FLOAT_EQ(error[4], error3x3(1, 2));
     EXPECT_FLOAT_EQ(error[3], error3x3(2, 0));
     EXPECT_FLOAT_EQ(error[4], error3x3(2, 1));
-    EXPECT_FLOAT_EQ(error[5] * error[5], error3x3(2, 2));
+    EXPECT_FLOAT_EQ(error[5], error3x3(2, 2));
 
     TMatrixDSym errorecl = error3x3;
     TMatrixD  jacobian(4, 3);
@@ -282,7 +282,7 @@ namespace Belle2 {
     TMatrixDSym error4x4expected(4);
     error4x4expected = errorecl.Similarity(jacobian);
 
-    const auto error4x4 = myECLCluster.getError4x4();
+    const auto error4x4 = myECLCluster.getCovarianceMatrix4x4();
     EXPECT_FLOAT_EQ(error4x4expected(0, 0), error4x4(0, 0));
     EXPECT_FLOAT_EQ(error4x4expected(0, 1), error4x4(0, 1));
     EXPECT_FLOAT_EQ(error4x4expected(0, 2), error4x4(0, 2));
@@ -300,7 +300,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(error4x4expected(3, 2), error4x4(3, 2));
     EXPECT_FLOAT_EQ(error4x4expected(3, 3), error4x4(3, 3));
 
-    const auto error7x7 = myECLCluster.getError7x7();
+    const auto error7x7 = myECLCluster.getCovarianceMatrix7x7();
     EXPECT_FLOAT_EQ(error4x4expected(0, 0), error7x7(0, 0));
     EXPECT_FLOAT_EQ(error4x4expected(0, 1), error7x7(0, 1));
     EXPECT_FLOAT_EQ(error4x4expected(0, 2), error7x7(0, 2));

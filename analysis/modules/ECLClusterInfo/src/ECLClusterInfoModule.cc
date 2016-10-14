@@ -139,12 +139,12 @@ void ECLClusterInfoModule::event()
     m_R = ecl->getR();
 
     // Get auxiliary values
-    m_Edep = ecl->getEnedepSum();
-    m_E9oE25 = ecl->getE9oE25();
-    m_HE = ecl->getHighestE();
-    m_NC = ecl->getNofCrystals();
+    m_Edep = ecl->getEnergyRaw();
+    m_E9oE25 = ecl->getE9oE21();
+    m_HE = ecl->getEnergyHighestCrystal();
+    m_NC = ecl->getNumberOfCrystals();
 
-    TMatrixFSym Err = ecl->getError3x3();
+    TMatrixFSym Err = ecl->getCovarianceMatrix3x3();
 
     m_Err00 = Err[0][0];
     m_Err10 = Err[1][0];

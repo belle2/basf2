@@ -115,13 +115,13 @@ void ECLExpertModule::event()
 
     // get various ECLCluster vars from getters
     m_ECLE              = cluster.getEnergy();
-    m_ECLE9oE25         = cluster.getE9oE25();
-    m_ECLTiming         = cluster.getTiming();
-    m_ECLEerror         = cluster.getErrorEnergy();
-    m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
-    m_ECLdeltaL         = cluster.getTemporaryDeltaL();
+    m_ECLE9oE25         = cluster.getE9oE21();
+    m_ECLTiming         = cluster.getTime();
+    m_ECLEerror         = cluster.getUncertaintyEnergy();
+    m_ECLminTrkDistance = cluster.getMinTrkDistance();
+    m_ECLdeltaL         = cluster.getDeltaL();
 
-    const TVector3& clusterPos = cluster.getclusterPosition();
+    const TVector3& clusterPos = cluster.getClusterPosition();
 
     //find closest track
     tuple<RecoTrack*, double, std::unique_ptr<const TVector3>> closestTrackAndDistance = findClosestTrack(clusterPos);

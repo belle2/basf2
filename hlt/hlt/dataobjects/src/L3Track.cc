@@ -12,7 +12,7 @@
 
 using namespace Belle2;
 
-ClassImp(L3Track)
+//ClassImp(L3Track)
 
 L3Track::L3Track()
 {

@@ -153,6 +153,7 @@ bool CalibrationAlgorithm::commit()
   if (m_payloads.empty())
     return false;
   std::list<Database::DBQuery> payloads = getPayloads();
+  B2INFO("Committing " << payloads.size()  << " payloads to database.");
   return Database::Instance().storeData(payloads);
 }
 

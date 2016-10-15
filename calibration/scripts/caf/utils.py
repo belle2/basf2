@@ -42,7 +42,7 @@ def iov_from_vector(iov_vector):
         iov_low, iov_high = iov_list[0], iov_list[-1]
     else:
         iov_low, iov_high = iov_list[0], iov_list[0]
-    return (iov_low, iov_high)
+    return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
 
 
 def find_sources(dependencies):

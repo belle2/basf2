@@ -372,11 +372,16 @@ class CalibrationMachine(Machine):
                             after=self.automatic_transition)
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
                             after=self.automatic_transition)
-        self.add_transition("fail", "running_algorithms", "algorithms_failed")
+        self.add_transition("fail", "running_algorithms", "algorithms_failed",
+                            conditions=self._any_failed_iov)
         self.add_transition("iterate", "algorithms_completed", "init",
                             conditions=self._require_iteration)
         self.add_transition("finish", "algorithms_completed", "completed",
                             before=self._prepare_final_db)
+
+    def _any_failed_iov(self):
+        iteration_results = self._algorithm_results[self.iteration]
+        return False
 
     def _post_process_collector(self):
         self._collector_result.post_process()
@@ -435,8 +440,10 @@ class CalibrationMachine(Machine):
             except ConditionError:
                 continue
         else:
-            raise RunnerError(("Failed to automatically transition out of {0} state."
-                               " No non-failure conditions succeeded.".format(self.state)))
+            if "fail" in possible_transitions:
+                getattr(self, "fail")()
+            else:
+                raise RunnerError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
     def _make_output_dir(self):
         os.mkdir(self.calibration.name)
@@ -535,15 +542,50 @@ class CalibrationMachine(Machine):
         self._algorithm_results[self.iteration] = {}
 
         for algorithm in self.calibration.algorithms:
-            child = ctx.Process(target=self._run_algorithm,
-                                args=(algorithm, child_conn))
+            machine = AlgorithmMachine(algorithm, self)
+            child = ctx.Process(target=CalibrationMachine._run_algorithm_over_data,
+                                args=(machine, child_conn))
             child.start()
             # wait for it to finish
             child.join()
-            # Get a nicer version of the algorithm name
-            algorithm_name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
             # Get the return codes of the algorithm for the IoVs found by the Process
-            self._algorithm_results[self.iteration][algorithm_name] = parent_conn.recv()
+            self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
+
+    @staticmethod
+    def _run_algorithm_over_data(machine, child_conn):
+        machine.setup_algorithm()
+
+        iov_to_execute = ROOT.vector("std::pair<int,int>")()
+        for iov in machine.all_iov:
+            iov_to_execute.push_back(iov)
+            machine.execute_iov(vec_iov=iov_to_execute)
+            if machine.results[-1].result == AlgResult.ok.value:
+                machine.success()
+                try:
+                    machine.complete()
+                except ConditionError:
+                    machine.setup_algorithm()
+            elif machine.results[-1].result == AlgResult.iterate.value:
+                machine.iteration_requested()
+                try:
+                    machine.complete()
+                except ConditionError:
+                    machine.setup_algorithm()
+            elif machine.results[-1].result == AlgResult.failure.value:
+                machine.fail()
+                try:
+                    machine.complete()
+                except ConditionError:
+                    machine.setup_algorithm()
+            elif machine.results[-1].result == AlgResult.not_enough_data.value:
+                machine.not_enough_data()
+                try:
+                    machine.complete()
+                except ConditionError:
+                    machine.setup_algorithm()
+
+        machine.algorithm.algorithm.commit()
+        child_conn.send(machine.results)
 
     def _prepare_final_db(self):
         database_location = os.path.join(self.calibration.name,
@@ -593,10 +635,9 @@ class CalibrationMachine(Machine):
                                os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb')), True, LogLevel.INFO)
 
         # add local database to save payloads
-        use_local_database("outputdb/database.txt", 'outputdb', False, LogLevel.INFO)
+        use_local_database(os.path.abspath("outputdb/database.txt"), os.path.abspath('outputdb'), False, LogLevel.INFO)
 
         B2INFO("Running {0} in working directory {1}".format(algorithm_name, os.getcwd()))
-        B2INFO("Output folder contents of collector was"+str(glob.glob('./*')))
 
         algorithm.data_input()
         if algorithm.pre_algorithm:
@@ -683,6 +724,125 @@ class CalibrationMachine(Machine):
                     algorithm.algorithm.commit(last_payloads)
         child_conn.send(results)
         return 0
+
+
+class AlgorithmMachine(Machine):
+    """
+    A state machine to handle the logic of running the algorithm on the overall IoVs contained in the data.
+    """
+
+    def __init__(self, algorithm, cal_machine, initial_state="init"):
+        """
+        Takes an Algorithm object from the caf framework and defines the transitions.
+        """
+        self.default_states = [State("init"),
+                               State("ready"),
+                               State("running_algorithm"),
+                               State("success_iov"),
+                               State("notenoughdata_iov"),
+                               State("iterate_iov"),
+                               State("completed_all_iov"),
+                               State("failed_iov"),
+                               State("finished")]
+
+        super().__init__(self.default_states, initial_state)
+
+        #: Algorithm object whose state we are modelling
+        self.algorithm = algorithm
+        #: Calibration object that we take the algorithm from
+        self.cal_machine = cal_machine
+        # Get a nicer version of the algorithm name
+        self.name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
+        #: Which iteration step are we in
+        self.iteration = self.cal_machine.iteration
+        #: Results of this iteration for this algorithm
+        self.results = []
+
+        self.add_transition("setup_algorithm", "init", "ready",
+                            before=[self._setup_database_chain,
+                                    self._pre_algorithm])
+        self.add_transition("execute_iov", "ready", "running_algorithm",
+                            after=self._execute_over_iov)
+        self.add_transition("success", "running_algorithm", "success_iov")
+        self.add_transition("fail", "running_algorithm", "failed_iov")
+        self.add_transition("iteration_requested", "running_algorithm", "iterate_iov")
+        self.add_transition("not_enough_data", "running_algorithm", "notenoughdata_iov")
+
+        self.add_transition("setup_algorithm", "success_iov", "ready")
+        self.add_transition("setup_algorithm", "failed_iov", "ready")
+        self.add_transition("setup_algorithm", "iterate_iov", "ready")
+        self.add_transition("setup_algorithm", "notenoughdata_iov", "ready")
+
+        self.add_transition("complete", "success_iov", "completed_all_iov",
+                            conditions=self._all_iov_executed)
+        self.add_transition("complete", "notenoughdata_iov", "completed_all_iov",
+                            conditions=self._all_iov_executed)
+        self.add_transition("complete", "failed_iov", "completed_all_iov",
+                            conditions=self._all_iov_executed)
+        self.add_transition("complete", "iterate_iov", "completed_all_iov",
+                            conditions=self._all_iov_executed)
+
+        self.add_transition("finish", "completed_all_iov", "finished")
+
+    def _all_iov_executed(self):
+        self.results[-1].iov == self.all_iov.size()
+
+    def _setup_database_chain(self):
+        os.chdir(self.cal_machine._collector_job.output_dir)
+        # Clean everything out just in case
+        reset_database()
+        # Fall back to previous databases if no payloads are found
+        use_database_chain(True)
+        # Use the central database with production global tag as the ultimate fallback
+        use_central_database('production')
+        # Here we add the finished databases of previous calibrations that we depend on.
+        # We can assume that the databases exist as we can't be here until they have returned
+        # with OK status.
+        for calibration in self.cal_machine.calibration.dependencies:
+            database_location = os.path.abspath(os.path.join("../../../", calibration.name, 'outputdb'))
+            use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
+            B2INFO("Adding local database from {0} for use by {1}::{2}".format(
+                   calibration.name, self.calibration.name, algorithm_name))
+
+        # Here we add the previous iteration's database
+        if self.iteration > 0:
+            use_local_database(os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb/database.txt')),
+                               os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb')), True, LogLevel.INFO)
+
+        # Create a directory to store the payloads of this algorithm
+        os.mkdir('outputdb')
+        # add local database to save payloads
+        use_local_database(os.path.abspath("outputdb/database.txt"), os.path.abspath('outputdb'), False, LogLevel.INFO)
+
+    def _pre_algorithm(self):
+        logging.reset()
+        set_log_level(LogLevel.INFO)
+
+        # add logfile for output
+        logging.add_file(self.name+'_b2log')
+
+        self.algorithm.data_input()
+        if self.algorithm.pre_algorithm:
+            # We have to re-pass in the algorithm here because an outside user has created this method.
+            # So the method isn't bound to the instance properly.
+            self.algorithm.pre_algorithm(self.algorithm.algorithm, self.iteration)
+
+        #: Update all IoVs in collected input data now that we have grabbed it
+        self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
+
+    def _execute_over_iov(self, **kwargs):
+        B2INFO("Running {0} in working directory {1}".format(self.name, os.getcwd()))
+
+        vec_iov_to_execute = kwargs["vec_iov"]
+        # Add each exprun to the vector in turn
+        iov_readable = iov_from_vector(vec_iov_to_execute)
+        B2INFO("Performing execution on IoV {0}".format(iov_readable))
+
+        # Creates new entry in list<DBQuery> payloads of algorithm
+        alg_result = self.algorithm.algorithm.execute(vec_iov_to_execute, self.iteration)
+
+        result = IoV_Result(iov_readable, alg_result)
+        self.results.append(result)
 
 
 class CalibrationRunner(Thread):

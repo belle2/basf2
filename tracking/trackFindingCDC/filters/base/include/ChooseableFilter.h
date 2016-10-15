@@ -11,61 +11,70 @@
 
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <memory>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-
-    /// Filter can delegate its decision to a filter choosen and set up at run time by parameters from a module
-    template<class AFilterFactory>
-    class ChooseableFilter: public AFilterFactory::CreatedFilter {
+    /// Filter can delegate to a filter coosen and set up at run time by parameters
+    template <class AFilter>
+    class Chooseable : public AFilter {
 
     private:
-      /// Type of the super class
-      typedef typename AFilterFactory::CreatedFilter Super;
+      /// Type of the base class
+      using Super = AFilter;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename AFilterFactory::CreatedFilter::Object Object;
+      using Object = typename AFilter::Object;
 
     public:
-      /// Constructor of the chooseable filter taking the default filter name and parameters
-      ChooseableFilter() :
-        m_filterFactory()
-      {}
+      /// Setup the chooseable filter with available choices from the factory
+      Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory)
+        : m_filterFactory(std::move(filterFactory))
+      {
+      }
 
-      /// Constructor of the chooseable filter taking the default filter name and parameters
-      ChooseableFilter(const std::string& filterName) :
-        m_filterFactory(filterName)
-      {}
+      /// Setup the chooseable filter with available choices from the factory and a default name
+      Chooseable(std::unique_ptr<FilterFactory<AFilter>> filterFactory,
+                 const std::string& filterName)
+        : m_filterFactory(std::move(filterFactory))
+      {
+        B2ASSERT("Constructing a chooseable filter with no factory", filterFactory);
+        setFilterName(filterName);
+      }
 
-      /**
-       *  Expose the set of parameters of the filter to the module parameter list.
-       *
-       *  Note that not all filters have yet exposed their parameters in this way.
-       */
+      /// Expose the set of parameters of the filter to the module parameter list.
       virtual void exposeParameters(ModuleParamList* moduleParamList,
                                     const std::string& prefix = "") override final
       {
         Super::exposeParameters(moduleParamList, prefix);
-        m_filterFactory.exposeParameters(moduleParamList, prefix);
+        m_filterFactory->exposeParameters(moduleParamList);
       }
 
       /// Return the string holding the used filter name
       const std::string& getFilterName() const
       {
-        return m_filterFactory.getFilterName();
+        return m_filterFactory->getFilterName();
       }
 
       /// Set the filter name which should be created
       void setFilterName(const std::string& filterName)
       {
-        m_filterFactory.setFilterName(filterName);
+        m_filterFactory->setFilterName(filterName);
       }
 
       /// Initialize before event processing.
       virtual void initialize() override
       {
-        m_filter = m_filterFactory.create();
+        if (not m_filterFactory) {
+          B2ERROR("Filter factory not setup");
+          return;
+        }
+
+        m_filter = m_filterFactory->create();
         if (m_filter) {
           m_filter->initialize();
         } else {
@@ -86,7 +95,6 @@ namespace Belle2 {
         m_filter->beginRun();
         Super::beginRun();
       }
-
 
       /// Signal the beginning of a new event
       virtual void beginEvent() override
@@ -124,12 +132,33 @@ namespace Belle2 {
       }
 
     private:
-      /// FilterFactory
-      AFilterFactory m_filterFactory;
+      /// Filter factor to construct a chosen filter
+      std::unique_ptr<FilterFactory<AFilter>> m_filterFactory = nullptr;
 
       /// Chosen filter
-      std::unique_ptr<typename AFilterFactory::CreatedFilter> m_filter = nullptr;
+      std::unique_ptr<AFilter> m_filter = nullptr;
+    };
 
+    /// Convenvience wrapper to setup a Chooseable filter from a specific factory object.
+    template <class AFilterFactory>
+    class ChooseableFilter : public Chooseable<typename AFilterFactory::CreatedFilter> {
+
+    private:
+      /// Type of the super class
+      using Super = Chooseable<typename AFilterFactory::CreatedFilter>;
+
+    public:
+      /// Constructor of the chooseable filter taking the default filter name and parameters
+      ChooseableFilter()
+        : Super(makeUnique<AFilterFactory>())
+      {
+      }
+
+      /// Constructor of the chooseable filter taking the default filter name and parameters
+      ChooseableFilter(const std::string& filterName)
+        : Super(makeUnique<AFilterFactory>(), filterName)
+      {
+      }
     };
   }
 }

@@ -112,7 +112,11 @@ def add_mc_matcher(path, components=None):
     """
     path.add_module('TrackFinderMCTruthRecoTracks',
                     RecoTracksStoreArrayName='MCRecoTracks',
-                    WhichParticles=[])
+                    WhichParticles=[],
+                    UsePXDHits=is_pxd_used(components),
+                    UseSVDHits=is_svd_used(components),
+                    UseCDCHits=is_cdc_used(components))
+
     path.add_module('MCRecoTracksMatcher',
                     mcRecoTracksStoreArrayName='MCRecoTracks',
                     UsePXDHits=is_pxd_used(components),

@@ -5,6 +5,8 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::VXDEnvelopePar+;
+
 #pragma link C++ class Belle2::VXDRadiationSensorPar+;
 #pragma link C++ class Belle2::VXDRadiationSensorPositionPar+; // implicit
 
@@ -18,6 +20,8 @@
 #pragma link C++ class Belle2::VXDSlotTypesPar+; // implicit
 
 #pragma link C++ class Belle2::VXDGeometryPar+;
+#pragma link C++ class Belle2::PXDGeometryPar+;
+#pragma link C++ class Belle2::SVDGeometryPar+;
 
 
 #endif

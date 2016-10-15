@@ -5,6 +5,9 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::VXDRadiationSensorPar+;
+#pragma link C++ class Belle2::VXDRadiationSensorPositionPar+; // implicit
+
 #pragma link C++ class Belle2::HeavyMetalShieldGeometryPar+;
 #pragma link C++ class Belle2::HeavyMetalShieldTypePar+; // implicit
 #pragma link C++ class Belle2::HeavyMetalShieldPlanePar+; // implicit

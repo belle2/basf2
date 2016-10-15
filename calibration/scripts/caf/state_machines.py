@@ -514,7 +514,7 @@ class CalibrationMachine(Machine):
         # (THIS MAY CHANGE!)
         for dependency in self.calibration.dependencies:
             database_dir = os.path.join(os.getcwd(), dependency.name, 'outputdb')
-            B2INFO('Adding local database from {0} for use by {1}'.format(database_dir, self.calibration.name))
+            B2INFO('Adding local database from {0} for use by {1}'.format(dependency.name, self.calibration.name))
             list_dependent_databases.append(database_dir)
 
         # Set the location where we will store the merged set of databases.
@@ -802,7 +802,7 @@ class AlgorithmMachine(Machine):
             database_location = os.path.abspath(os.path.join("../../../", calibration.name, 'outputdb'))
             use_local_database(os.path.join(database_location, 'database.txt'), database_location, True, LogLevel.INFO)
             B2INFO("Adding local database from {0} for use by {1}::{2}".format(
-                   calibration.name, self.calibration.name, algorithm_name))
+                   calibration.name, self.cal_machine.calibration.name, self.name))
 
         # Here we add the previous iteration's database
         if self.iteration > 0:

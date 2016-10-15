@@ -36,7 +36,7 @@ void VXDRadiationSensorPositionPar::read(const GearDir& position)
 // *** This is a DIVOT ***
 void VXDRadiationSensorPar::read(const GearDir& content)
 {
-  m_insideEnvelope content.getBool("insideEnvelope")
+  m_insideEnvelope = content.getBool("insideEnvelope");
   m_width = content.getLength("width");
   m_length = content.getLength("length");
   m_height = content.getLength("height");

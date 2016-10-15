@@ -70,9 +70,11 @@ def add_PXDDataReduction(path, components=None):
 
     pxdDataRed = register_module('PXDDataReduction')
     param_pxdDataRed = {
-        'gfTrackListName': svd_tracks,
+        'recoTrackListName': svd_tracks,
         'PXDInterceptListName': 'PXDIntercepts',
         'ROIListName': 'ROIs',
+        'tolerancePhi': 0.15,
+        'toleranceZ': 0.5,
         'sigmaSystU': 0.02,
         'sigmaSystV': 0.02,
         'numSigmaTotU': 10,

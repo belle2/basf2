@@ -7,12 +7,17 @@
 
 #pragma link C++ class Belle2::VXDEnvelopePar+;
 
+#pragma link C++ class Belle2::PXDSupportPar+;
+
+
+#pragma link C++ class Belle2::VXDPolyConePar+;
+#pragma link C++ class Belle2::VXDPolyConePlanePar+; // implicit
+
 #pragma link C++ class Belle2::VXDRadiationSensorPar+;
 #pragma link C++ class Belle2::VXDRadiationSensorPositionPar+; // implicit
 
 #pragma link C++ class Belle2::HeavyMetalShieldGeometryPar+;
-#pragma link C++ class Belle2::HeavyMetalShieldTypePar+; // implicit
-#pragma link C++ class Belle2::HeavyMetalShieldPlanePar+; // implicit
+
 
 #pragma link C++ class Belle2::VXDServiceGeometryPar+;
 #pragma link C++ class Belle2::VXDBoxTypesPar+;  // implicit

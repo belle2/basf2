@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/HeavyMetalShieldGeometryPar.h>
+#include <vxd/dbobjects/PXDSupportPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -17,12 +17,12 @@ using namespace Belle2;
 using namespace std;
 
 
-// Get  parameters from Gearbox (no calculations here)
+// Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void HeavyMetalShieldGeometryPar::read(const GearDir& content)
+void PXDSupportPar::read(const GearDir& content)
 {
-  for (const GearDir& shield : content.getNodes("Shield")) {
-    m_shields.push_back(VXDPolyConePar(shield));
+  for (const GearDir& endflange : content.getNodes("Endflange")) {
+    m_endflanges.push_back(VXDPolyConePar(endflange));
   }
 }
 

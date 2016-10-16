@@ -49,9 +49,9 @@ namespace Belle2 {
     {
 
       // Create the shields
-      const std::vector<HeavyMetalShieldTypePar> Shields = parameters.getShields();
+      const std::vector<VXDPolyConePar> Shields = parameters.getShields();
 
-      for (const HeavyMetalShieldTypePar& shield : Shields) {
+      for (const VXDPolyConePar& shield : Shields) {
 
         string name = shield.getName();
         double minZ(0), maxZ(0);
@@ -71,8 +71,8 @@ namespace Belle2 {
         minZ = numeric_limits<double>::infinity();
         maxZ = -numeric_limits<double>::infinity();
 
-        const std::vector<HeavyMetalShieldPlanePar> Planes = shield.getPlanes();
-        for (const HeavyMetalShieldPlanePar& plane : Planes) {
+        const std::vector<VXDPolyConePlanePar> Planes = shield.getPlanes();
+        for (const VXDPolyConePlanePar& plane : Planes) {
           z[index]    = plane.getPosZ() / Unit::mm;
           minZ = min(minZ, z[index]);
           maxZ = max(maxZ, z[index]);
@@ -102,7 +102,7 @@ namespace Belle2 {
           geoShield = new G4SubtractionSolid(name + " IR Shield", geoShield, box2, G4Translate3D(origin2));
         }
 
-        string materialName = shield.getMaterialName();
+        string materialName = shield.getMaterial();
         G4Material* material = Materials::get(materialName);
         if (!material) B2FATAL("Material '" << materialName << "', required by " << name << " IR Shield could not be found");
 

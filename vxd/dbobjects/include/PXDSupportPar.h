@@ -21,27 +21,29 @@ namespace Belle2 {
 
 
   /**
-  * The Class for VXD Heavy Metal Shield
+  * The Class for VXD support
   */
 
-  class HeavyMetalShieldGeometryPar: public TObject {
+  class PXDSupportPar: public TObject {
+
   public:
 
     //! Default constructor
-    HeavyMetalShieldGeometryPar() {}
+    PXDSupportPar() {}
     //! Constructor using Gearbox
-    explicit HeavyMetalShieldGeometryPar(const GearDir& content) { read(content); }
-    //! Read parameters from Gearbox
+    explicit PXDSupportPar(const GearDir& content) { read(content); }
+    //! Destructor
+    ~PXDSupportPar() {}
+    //! Get geometry parameters from Gearbox
     void read(const GearDir&);
-    //! Get shields
-    std::vector<VXDPolyConePar> getShields(void) const { return m_shields; }
+    //! Get endflanges
+    std::vector<VXDPolyConePar> getEndflanges(void) const { return m_endflanges; }
 
   private:
-    //! Shields
-    std::vector<VXDPolyConePar> m_shields;
+    //! Endflanges
+    std::vector<VXDPolyConePar> m_endflanges;
 
-    ClassDef(HeavyMetalShieldGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(PXDSupportPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
-
 } // end of namespace Belle2
 

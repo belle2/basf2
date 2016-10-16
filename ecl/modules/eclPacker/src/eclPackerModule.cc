@@ -53,13 +53,11 @@ void ECLPackerModule::initialize()
 
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
   if (! FileSystem::fileExists(ini_file_name)) {
-    B2ERROR("ECL Packer : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-    exit(1);
+    B2FATAL("eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
   }
 
   if (! m_eclMapper->initFromFile(ini_file_name.data())) {
-    B2ERROR("ECL Packer:: Can't initialize eclChannelMapper");
-    exit(1);
+    B2FATAL("Can't initialize eclChannelMapper!");
   }
 
   // of initialize if from DB TODO
@@ -92,7 +90,6 @@ void ECLPackerModule::event()
   // get total number of hits
   int nEclDigits   = ECLDigitData.getEntries();
   int nEclWaveform = ECLWaveformData.getEntries();
-
 
   for (int i = 0; i < ECL_CRATES; i++) {
     collectorMaskArray[i] = 0;
@@ -210,7 +207,6 @@ void ECLPackerModule::event()
     int nwords[2] = {0, 0};
     const int finesseHeaderNWords = 3;
 
-
     //cycle over finesses in copper
 
     for (iFINESSE = 0; iFINESSE < ECL_FINESSES_IN_COPPER; iFINESSE++) {
@@ -304,9 +300,8 @@ void ECLPackerModule::event()
           B2DEBUG(200, "i_wf = " << i_wf);
           ECLWaveformData[i_wf]->getDspA(m_EclWaveformSamples); // Check this method in implementation of ECLDsp.h!!!
 
+          //int cellID = ECLWaveformData[i_wf]->getCellId();
 
-
-          int cellID = ECLWaveformData[i_wf]->getCellId();
           /*
           std::cout << "event " << m_EvtNum << " cid " << cellID << " : " << std::endl;
           for (int i = 0; i < 31; i++){
@@ -323,11 +318,14 @@ void ECLPackerModule::event()
             // calculate adc_data_base and adc_data_diff_width for compressed mode
             unsigned int ampMin = m_EclWaveformSamples[0];
             unsigned int ampMax = m_EclWaveformSamples[0];
+
             for (unsigned int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
-              if (m_EclWaveformSamples[iSample] > ampMax) ampMax = m_EclWaveformSamples[iSample];
-              if (m_EclWaveformSamples[iSample] < ampMin) ampMin = m_EclWaveformSamples[iSample];
+              if ((unsigned int) m_EclWaveformSamples[iSample] > ampMax) ampMax = m_EclWaveformSamples[iSample];
+              if ((unsigned int) m_EclWaveformSamples[iSample] < ampMin) ampMin = m_EclWaveformSamples[iSample];
             }
+
             B2DEBUG(250, "ampMin = " << ampMin << " ampMax = " << ampMax);
+
             adc_data_base = ampMin & 0x3FFFF;
             writeNBits(adcBuffer_temp, adc_data_base, 18);
             adc_data_diff_width = (unsigned int)(log2((float)ampMax - (float)ampMin)) + 1;
@@ -336,13 +334,13 @@ void ECLPackerModule::event()
 
             B2DEBUG(250, "Width = " << adc_data_diff_width << " Base = " << adc_data_base);
 
-            for (int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
+            for (unsigned int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
               adc_data_offset = m_EclWaveformSamples[iSample] - adc_data_base;
               B2DEBUG(250, "offset = " << adc_data_offset);
               writeNBits(adcBuffer_temp, adc_data_offset, adc_data_diff_width);
             }
           } else {
-            for (int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
+            for (unsigned int iSample = 0; iSample < ECL_ADC_SAMPLES_PER_CHANNEL; iSample++) {
               buff[iFINESSE].push_back(m_EclWaveformSamples[iSample]);
             }
 
@@ -424,7 +422,7 @@ void ECLPackerModule::writeNBits(unsigned int* buff, unsigned int value, unsigne
 
   if (!bitsToWrite) return;
 
-  if (value > (1 << bitsToWrite) - 1) {
+  if (value > (unsigned int)(1 << bitsToWrite) - 1) {
     B2ERROR("Error compressing ADC samples: tying to write too long word");
     throw Write_adc_samples_error();
   }

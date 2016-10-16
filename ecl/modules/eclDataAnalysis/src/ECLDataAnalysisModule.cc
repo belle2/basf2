@@ -203,10 +203,8 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclPureClusterPy(0),
     m_eclPureClusterPz(0),
     m_eclPureClusterIsTrack(0),
-    m_eclPureClusterPi0Likel(0),
-    m_eclPureClusterEtaLikel(0),
     m_eclPureClusterDeltaL(0),
-    m_eclPureClusterBeta(0),
+
 //Shower
     m_eclShowerMultip(0),
     m_eclShowerIdx(0),

@@ -51,19 +51,15 @@ namespace Belle2 {
 
 
     private:
-//      /** CPU time     */
-//      double m_timeCPU;
-//      /** Run number   */
-//      int    m_nRun;
       /** Event number */
       int    m_EvtNum;
 
-      /** pointer to data  */
-      unsigned int* m_bufPtr;
       /** position in the  data array */
       int m_bufPos;
+
       /** length data  */
       int m_bufLength;
+
       /** bit position for bit-by-bit data read  */
       int m_bitPos;
 
@@ -78,6 +74,7 @@ namespace Belle2 {
 
       /** name of output collection for RawCOPPER */
       std::string m_eclRawCOPPERsName;
+
       /** name of the file with correspondence between cellID and crate/shaper/channel numbers  */
       std::string m_eclMapperInitFileName;
 

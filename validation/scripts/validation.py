@@ -37,6 +37,7 @@ from validationfunctions import get_start_time, get_validation_folders, scripts_
 import validationserver
 import validationplots
 import validationscript
+import validationpath
 
 
 def statistics_plots(
@@ -384,17 +385,20 @@ class Validation:
         # directory. Default is 'current'.
         self.tag = tag
 
-        # The logging-object for the validation (Instance of the logging-
-        # module). Initialize the log as 'None' and then call the method
-        # 'create_log()' to create the actual log.
-        self.log = None
-        self.create_log()
-
         # This dictionary holds the paths to the local and central release dir
         # (or 'None' if one of them does not exist)
         self.basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
                           'central': os.environ.get('BELLE2_RELEASE_DIR',
                                                     None)}
+
+        # Folder used for the intermediate and final results of the validation
+        self.work_folder = os.path.abspath(os.getcwd())
+
+        # The logging-object for the validation (Instance of the logging-
+        # module). Initialize the log as 'None' and then call the method
+        # 'create_log()' to create the actual log.
+        self.log = None
+        self.create_log()
 
         # The list which holds all steering file objects
         # (as instances of class Script)
@@ -528,13 +532,15 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = './results/{0}/__general__/'.format(self.tag)
+        log_dir = validationpath.get_results_tag_general_folder(validationpath.folder_name_results, self.tag)
         if not os.path.exists(log_dir):
             os.makedirs(log_dir)
 
         # Define the handler and its level (=DEBUG to get everything)
-        file_handler = logging.FileHandler(log_dir + 'validate_basf2.log',
-                                           'w+')
+        file_handler = logging.FileHandler(
+            os.path.join(
+                validationpath.get_results_tag_general_folder(self.work_folder,
+                                                              self.tag), 'validate_basf2.log'), 'w+')
         file_handler.setLevel(logging.DEBUG)
 
         # Format the handler. We want the datetime, the module that produced
@@ -589,16 +595,21 @@ class Validation:
         # Thats it, now there is a complete list of all steering files on
         # which we are going to perform the validation in self.list_of_scripts
 
+    def get_log_folder(self):
+        """!
+        Get the log folder for this validation run. The command log files (successful, failed)
+        scripts will be recorded there
+        """
+        return validationpath.get_results_tag_folder(self.work_folder, self.tag)
+
     def log_failed(self):
         """!
         This method logs all scripts with property failed into a single file
         to be read in run_validation_server.py
         """
-        # Folder, where we have the log
-        flder = "./results/{0}/__general__/".format(self.tag)
 
         # Open the log for writing
-        list_failed = open(flder + "list_of_failed_scripts.log", "w+")
+        list_failed = open(os.path.join(self.get_log_folder(), "list_of_failed_scripts.log"), "w+")
 
         # Select only failed scripts
         list_of_failed_scripts = [script for script in self.list_of_scripts if
@@ -615,11 +626,9 @@ class Validation:
         This method logs all scripts with property skipped into a single file
         to be read in run_validation_server.py
         """
-        # Folder, where we have the log
-        flder = "./results/{0}/__general__/".format(self.tag)
 
         # Open the log for writing
-        list_skipped = open(flder + "list_of_skipped_scripts.log", "w+")
+        list_skipped = open(os.path.join(self.get_log_folder(), "list_of_skipped_scripts.log"), "w+")
 
         # Select only failed scripts
         list_of_skipped_scripts = [script for script in self.list_of_scripts if
@@ -639,7 +648,7 @@ class Validation:
         run_times = {}
 
         # Open the data
-        runtimes = open("./runtimes.dat", "r")
+        runtimes = open(validationpath.get_results_runtime_file(self.work_folder), "r")
 
         # Get our data
         for line in runtimes:
@@ -734,8 +743,7 @@ class Validation:
     def apply_script_caching(self):
         cacheable_scripts = [s for s in self.list_of_scripts if s.is_cacheable()]
 
-        output_dir_datafiles = os.path.abspath('./results/{0}/'.
-                                               format(self.tag))
+        output_dir_datafiles = validationpath.get_results_tag_folder(self.work_folder, self.tag)
 
         for s in cacheable_scripts:
             # for for all output files
@@ -771,8 +779,7 @@ class Validation:
 
         # todo: assign correct color here
         rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
-        results_file = "./results/{}/revision.json".format(self.tag)
-        json_objects.dump(results_file, rev)
+        json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)
 
     def add_script(self, script):
         """!
@@ -977,8 +984,9 @@ class Validation:
             os.mkdir('html')
 
         os.chdir('html')
-        if not os.path.exists('results'):
-            os.symlink('../results', 'results')
+        if not os.path.exists(validationpath.folder_name_results):
+            os.symlink(os.path.join('..', validationpath.folder_name_results),
+                       validationpath.folder_name_results)
 
         # import and run plot function
         validationplots.create_plots(force=True)
@@ -1055,6 +1063,9 @@ def execute():
             validation.ignored_packages = []
             validation.packages = ["validation-test"]
             validation.log.note('Running in test mode')
+
+        validation.log.note("Release Folder: {} Local Folder:{}".format(validation.basepaths["central"],
+                                                                        validation.basepaths["local"]))
 
         # Now collect the steering files which will be used in this validation.
         # This will fill validation.list_of_sf_paths with values.

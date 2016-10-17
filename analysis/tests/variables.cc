@@ -290,7 +290,7 @@ namespace {
 
     // Neutral ECLCluster on reconstructed side
     ECLCluster myECL;
-    myECL.setisTrack(false);
+    myECL.setIsTrack(false);
     float eclREC = 0.5;
     myECL.setEnergy(eclREC);
     myECL.setHypothesisId(5);
@@ -302,7 +302,7 @@ namespace {
 
     // Create ECLCluster on ROE side
     ECLCluster myROEECL;
-    myROEECL.setisTrack(false);
+    myROEECL.setIsTrack(false);
     float eclROE = 1.0;
     myROEECL.setEnergy(eclROE);
     myROEECL.setHypothesisId(5);

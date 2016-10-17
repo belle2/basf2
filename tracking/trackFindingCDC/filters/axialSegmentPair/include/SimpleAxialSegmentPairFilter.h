@@ -37,7 +37,8 @@ namespace Belle2 {
       { return m_riemannFitter; }
 
     private:
-      CDCRiemannFitter m_riemannFitter; ///< Memory of the Riemann fitter for the circle fits.
+      /// Memory of the Riemann fitter for the circle fits.
+      CDCRiemannFitter m_riemannFitter;
 
     }; // end class SimpleAxialSegmentPairFilter
 

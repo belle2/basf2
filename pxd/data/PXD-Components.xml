@@ -138,8 +138,13 @@
     </Component>
     <!-- Switcher chips along the module -->
     <Component type="SwitchersLayer1">
-      <u unit="mm">14.189</u><v unit="mm">44.422</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.108</u><v unit="mm">44.422</v><w>above</w><woffset unit="mm">0.003</woffset>
     </Component>
+    <!-- Caps on the switcher balcony along the module -->
+    <!--<Component type="Cap-Pair-DCC-S">
+      <u unit="mm">14.189</u><v unit="mm">36.422</v><w>above</w><woffset unit="mm">0.003</woffset>
+    </Component>
+    -->
   </Sensor>
 
   <!-- The sensor in layer 2 is almost the same as for layer one except for the
@@ -294,13 +299,14 @@
   </Component>
 
   <Component name="SwitchersLayer1">
+    <length unit="mm">44.775</length>
     <Component type="Switcher">
-      <v unit="mm">-18.560</v>
-      <v unit="mm">-11.136</v>
-      <v unit="mm"> -3.712</v>
-      <v unit="mm">  3.712</v>
-      <v unit="mm"> 11.136</v>
-      <v unit="mm"> 18.560</v>
+      <v unit="mm">-17.787</v>
+      <v unit="mm">-10.107</v>
+      <v unit="mm"> -2.427</v>
+      <v unit="mm">  5.253</v>
+      <v unit="mm"> 12.613</v>
+      <v unit="mm"> 19.653</v>
     </Component>
   </Component>
 
@@ -1016,7 +1022,15 @@
       <u unit="mm"> 0.305</u><v unit="mm"> 28.146 </v>
     </Component>
   </Component>
-
+<!--
+  <Component name="Cap-Pair-DCC-S">
+    <length unit="mm">2.4</length>
+    <Component type="Cap-DCC-S">
+      <u unit="mm">0.0</u><v unit="mm">-0.4</v>
+      <u unit="mm">0.0</u><v unit="mm">+0.4</v>
+    </Component> 
+  </Component>
+-->
   <Component name="DCD">
     <Material>PXD-DCD</Material>
     <Color>#666633</Color>
@@ -1042,6 +1056,24 @@
     <width  unit="mm">1.900</width>
     <length unit="mm">3.600</length>
     <height unit="mm">0.300</height>
+  </Component>
+
+  <Component name="Cap-DCC-S">
+    <Material>BaTiO3</Material>
+    <Color>#660000</Color>
+    <activeChipID>3</activeChipID>
+    <width  unit="mm">1.1</width>
+    <length unit="mm">0.600</length>
+    <height unit="mm">0.542</height>
+  </Component>
+
+  <Component name="Cap-DCC-Sx">
+    <Material>BaTiO3</Material>
+    <Color>#660000</Color>
+    <activeChipID>3</activeChipID>
+    <width  unit="mm">0.3</width>
+    <length unit="mm">0.600</length>
+    <height unit="mm">0.232</height>
   </Component>
 
   <Component name="Groove1">

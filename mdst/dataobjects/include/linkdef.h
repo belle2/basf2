@@ -202,19 +202,14 @@
   code="{m_E9oE21 = onfile.m_E9oE25;}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
-  source="float m_NofCrystals" \
+  source="int m_NofCrystals" \
   targetClass="Belle2::ECLCluster" target="m_numberOfCrystals" \
-  code="{m_numberOfCrystals = onfile.m_NofCrystals;}"
+  code="{m_numberOfCrystals = (double) onfile.m_NofCrystals;}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="int m_CrystHealth" \
   targetClass="Belle2::ECLCluster" target="m_status" \
   code="{m_status = onfile.m_CrystHealth;}"
-
-#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
-  source="float m_Error[0]" \
-  targetClass="Belle2::ECLCluster" target="m_covmat_00" \
-  code="{m_covmat_00 = onfile.m_Error[0]*onfile.m_Error[0];}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_Error[0]" \

@@ -1,20 +1,19 @@
 import numbers
+import pickle
 
 import basf2
 import collections
 from ROOT import Belle2
 
-from root_pandas import to_root
-import pandas as pd
 from tracking.harvest.harvesting import HarvestingModule, coroutine
 from tracking.root_utils import root_save_name
 
+
 # Helper modules to get the stored information of the SoftwareTriggerModule from the data store after the processing
 # and write them out to a ROOT file for analysis. Uses the tracking harvester for this.
-# TODO: Rewrite this without harvester
 
 
-class PandasHarvestingModule(HarvestingModule):
+class PickleHarvestingModule(HarvestingModule):
     """
     Overloaded harvester, that stores its data into a pandas data frame instead of a numpy array,
     because they are more flexible when it comes to changing columns and value types to be stored.
@@ -23,12 +22,12 @@ class PandasHarvestingModule(HarvestingModule):
     def barn(self):
         """Coroutine that receives the dictionaries of names and values from peel and store them into a pandas df."""
         crop = (yield)
-        crops = pd.DataFrame()
+        crops = []
 
         if isinstance(crop, numbers.Number):
             try:
                 while True:
-                    crops = crops.append(pd.DataFrame({"value": crop}, index=[0]), ignore_index=True)
+                    crops = crops.append({"value": crop})
                     # next crop
                     crop = (yield)
             except GeneratorExit:
@@ -37,7 +36,7 @@ class PandasHarvestingModule(HarvestingModule):
         elif isinstance(crop, collections.MutableMapping):
             try:
                 while True:
-                    crops = crops.append(pd.DataFrame(crop, index=[0]), ignore_index=True)
+                    crops = crops.append(crop)
                     crop = (yield)
             except GeneratorExit:
                 pass
@@ -54,16 +53,17 @@ class PandasHarvestingModule(HarvestingModule):
 
     def refine(self, crops):
         """Receive the gathered crops and saves them into a ROOT file."""
-        to_root(crops, tree_key=root_save_name(self.name()), path=self.output_file_name)
+        with open(self.output_file_name, "wb") as f:
+            pickle.dump(crops, f)
 
 
-class SummarizeTriggerResults(PandasHarvestingModule):
+class SummarizeTriggerResults(PickleHarvestingModule):
     """
     Read in the trigger results stored in the data store and write them out into a ROOT file after all events have
     passed.
     """
 
-    def __init__(self, root_file_name="save_results.root", store_object_name="SoftwareTriggerResult"):
+    def __init__(self, root_file_name="save_results.pkl", store_object_name="SoftwareTriggerResult"):
         """
         Create a new module to get the stored trigger decisions from the data store and save them to a root file.
         :param root_file_name: The file name where to store the results.
@@ -84,13 +84,13 @@ class SummarizeTriggerResults(PandasHarvestingModule):
         yield return_dict
 
 
-class SummarizeTriggerVariables(PandasHarvestingModule):
+class SummarizeTriggerVariables(PickleHarvestingModule):
     """
     Read in the trigger variables stored in the data store and write them out into a ROOT file after all events have
     passed.
     """
 
-    def __init__(self, root_file_name="save_vars.root", store_object_name="SoftwareTriggerVariables"):
+    def __init__(self, root_file_name="save_vars.pkl", store_object_name="SoftwareTriggerVariables"):
         """
         Create a new module to get the stored trigger variables from the data store and save them to a root file.
         :param root_file_name: The file name where to store the variables.

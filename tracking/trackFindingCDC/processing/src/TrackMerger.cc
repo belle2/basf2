@@ -72,7 +72,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
     }
 
-    if (prob > minimum_probability_to_be_merged) {
+    if (bestCandidate and prob > minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate, conformalCDCWireHitList, cdcTrackList);
       TrackQualityTools::normalizeTrack(*bestCandidate);
 //      const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
@@ -130,10 +130,10 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
     have_merged_something = false;
     BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(track, cdcTrackList.getCDCTracks().begin(),
                                             cdcTrackList.getCDCTracks().end());
-    double& probabilityWithCandidate = candidateToMergeBest.second;
+    CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
+    const double& probabilityWithCandidate = candidateToMergeBest.second;
 
-    if (probabilityWithCandidate > minimum_probability_to_be_merged) {
-      CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
+    if (bestFitTrackCandidate and probabilityWithCandidate > minimum_probability_to_be_merged) {
       mergeTracks(track, *bestFitTrackCandidate, conformalCDCWireHitList, cdcTrackList);
       have_merged_something = true;
     }

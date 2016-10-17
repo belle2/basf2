@@ -7,7 +7,25 @@ namespace Belle2 {
   /** Utility functions related to filename validation and filesystem access */
   class FileSystem {
   public:
-    /** Check if a given filename exits */
+    /**
+     * Search for given file or directory in local or central release directory,
+     * and return absolute path if found.
+     * If the file isn't found in either of these, absolute paths and paths
+     * relative to the current working directory are also accepted.
+     *
+     * It is recommended to replace any relative paths you have with the
+     * return value of this function during initialization.
+     *
+     * @param path path to file/directory, assuming it's installed locally
+     *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
+     *             strictly required.
+     * @return absolute path to file in local directory, if it exists,
+     *         otherwise abs. path to file in central release directory,
+     *         or empty if file wasn't found.
+     */
+    static std::string findFile(const std::string& path);
+
+    /** Check if the file with given filename exists */
     static bool fileExists(const std::string& filename);
     /** Check if the dir containing the filename exists */
     static bool fileDirExists(const std::string& filename);
@@ -27,21 +45,6 @@ namespace Belle2 {
      *                 to lib<library>.so
      */
     static bool loadLibrary(std::string library, bool fullname = true);
-
-    /**
-     * Search for given file or directory in local or central release directory,
-     * and return absolute path if found.
-     * If the file isn't found in either of these, absolute paths and paths
-     * relative to the current working directory are also accepted.
-     *
-     * @param path path to file/directory, assuming it's installed locally
-     *             (e.g. /data/geometry/Belle2.xml). Leading slash is not
-     *             strictly required.
-     * @return absolute path to file in local directory, if it exists,
-     *         otherwise abs. path to file in central release directory,
-     *         or empty if file wasn't found.
-     */
-    static std::string findFile(const std::string& path);
 
     /**
      * Helper class for locking a file

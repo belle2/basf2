@@ -151,13 +151,7 @@ namespace Belle2 {
     void setEnergyHighestCrystal(double energyhighestcrystal) { m_logEnergyHighestCrystal = log(energyhighestcrystal); }
 
     /** Return true if the cluster matches with track. */
-    bool getIsTrack() const { return isTrack(); }
-
-    /** Return true if the cluster matches with track. */
     bool isTrack() const { return m_isTrack; }
-
-    /** Return true if cluster has no match with track. */
-    bool getIsNeutral() const { return isNeutral(); }
 
     /** Return true if cluster has no match with track. */
     bool isNeutral() const { return !m_isTrack; }

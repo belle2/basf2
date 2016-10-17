@@ -240,7 +240,7 @@ namespace Belle2 {
     std::vector<float> ROOTDataset::getFeature(unsigned int iFeature)
     {
       std::string branchName = Belle2::makeROOTCompatible(m_general_options.m_variables[iFeature]);
-      int nentries = m_tree->GetEntries();
+      int nentries = getNumberOfEvents();
       std::vector<float> values(nentries);
 
       float object;

@@ -239,7 +239,10 @@ namespace Belle2 {
       /**
        * Returns the number of events in this dataset
        */
-      virtual unsigned int getNumberOfEvents() const override { return m_tree->GetEntries(); }
+      virtual unsigned int getNumberOfEvents() const override
+      {
+        return (m_general_options.m_max_events == 0) ? m_tree->GetEntries() : m_general_options.m_max_events;
+      }
 
       /**
        * Load the event number iEvent from the TTree

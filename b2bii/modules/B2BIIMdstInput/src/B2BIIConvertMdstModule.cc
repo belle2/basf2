@@ -386,8 +386,6 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
   // StoreArrays
   StoreArray<Track> tracks;
   StoreArray<TrackFitResult> trackFitResults;
-  tracks.create();
-  trackFitResults.create();
 
   // Relations
   RelationArray tracksToMCParticles(tracks, mcParticles);
@@ -440,7 +438,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
   // create V0 StoreArray
   StoreArray<V0> v0s;
-  v0s.create();
 
   // Particle StoreArray exists as well
   StoreArray<Particle> particles;
@@ -768,7 +765,6 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 {
   // create MCParticle StoreArray
   StoreArray<MCParticle> mcParticles;
-  mcParticles.create();
 
   if (m_realData)
     return;
@@ -881,7 +877,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Create ECLCluster StoreArray
   StoreArray<ECLCluster> eclClusters;
-  eclClusters.create();
 
   // Relations
   RelationArray eclClustersToMCParticles(eclClusters, mcParticles);
@@ -935,7 +930,6 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
 
   // Create Particles StoreArray
   StoreArray<Particle> particles;
-  particles.create();
 
   // Relations
   RelationArray particlesToMCParticles(particles, mcParticles);

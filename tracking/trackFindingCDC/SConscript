@@ -10,8 +10,6 @@ env['LIBS'] = [
     'tracking_dataobjects',
     'mdst_dataobjects',
     'geometry',
-    'pxd_dataobjects',
-    'svd_dataobjects',
     'cdc', 'cdc_dataobjects',
     'framework',
     'genfit2',

@@ -1545,20 +1545,18 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
 {
   eclCluster->setisTrack(ecl.match() > 0);
 
-  eclCluster->setEnergy(ecl.energy());
+  eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
   eclCluster->setPhi(ecl.phi());
   eclCluster->setTheta(ecl.theta());
   eclCluster->setR(ecl.r());
 
-  // TODO: check
-  // TODO: ECLCluster is an unclear mess
   double covarianceMatrix[6];
-  covarianceMatrix[0] = sqrt(ecl.error(0)); // error on energy
+  covarianceMatrix[0] = ecl.error(0); // error on energy
   covarianceMatrix[1] = ecl.error(1);
-  covarianceMatrix[2] = sqrt(ecl.error(2)); // error on phi
+  covarianceMatrix[2] = ecl.error(2); // error on phi
   covarianceMatrix[3] = ecl.error(3);
   covarianceMatrix[4] = ecl.error(4);
-  covarianceMatrix[5] = sqrt(ecl.error(5)); // error on theta
+  covarianceMatrix[5] = ecl.error(5); // error on theta
   eclCluster->setCovarianceMatrix(covarianceMatrix);
 
   eclCluster->setEnergyRaw(eclAux.mass());

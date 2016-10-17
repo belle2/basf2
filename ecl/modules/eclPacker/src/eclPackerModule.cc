@@ -28,6 +28,7 @@ ECLPackerModule::ECLPackerModule() :
   iEclDigIndices = new int[ECL_TOTAL_CHANNELS];
   iEclWfIndices  = new int[ECL_TOTAL_CHANNELS];
 
+  m_eclMapper = new ECLChannelMapper();
 }
 
 ECLPackerModule::~ECLPackerModule()
@@ -36,6 +37,7 @@ ECLPackerModule::~ECLPackerModule()
   delete m_eclMapper;
   delete[] iEclDigIndices;
   delete[] iEclWfIndices;
+
 }
 
 void ECLPackerModule::initialize()
@@ -49,7 +51,6 @@ void ECLPackerModule::initialize()
   m_eclRawCOPPERs.registerInDataStore(m_eclRawCOPPERsName);
 
   // initialize channel mapper from file (temporary)
-  m_eclMapper = new ECLChannelMapper();
 
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
   if (! FileSystem::fileExists(ini_file_name)) {

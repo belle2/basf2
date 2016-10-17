@@ -21,8 +21,12 @@ const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& charg
     B2DEBUG(100, "TrackFitResult for the requested hypothesis is not set. Returning default hypothesis instead.");
     const auto defaultTrackFitResultArrayIndex = m_trackFitIndices[Const::pion.getIndex()];
     if (defaultTrackFitResultArrayIndex < 0) {
-      B2DEBUG(100, "TrackFitResult for the default hypothesis is not set. Returning nullptr instead. This should never happen.");
-      return nullptr;
+      B2DEBUG(100, "TrackFitResult for the default hypothesis is not set. Returning any I can find or nullptr.");
+      TrackFitResult* lastTrackFitResult = nullptr;
+      for (const auto& arrayIndex : m_trackFitIndices) {
+        if (arrayIndex >= 0) lastTrackFitResult = trackFitResults[arrayIndex];
+      }
+      return lastTrackFitResult;
     } else {
       return trackFitResults[defaultTrackFitResultArrayIndex];
     }

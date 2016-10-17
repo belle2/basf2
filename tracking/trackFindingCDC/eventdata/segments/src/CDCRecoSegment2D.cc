@@ -355,7 +355,7 @@ void CDCRecoSegment2D::receiveMaskedFlag() const
 bool CDCRecoSegment2D::isFullyTaken(unsigned int maxNotTaken) const
 {
   unsigned int notTakenCounter = 0;
-  for (const CDCRecoHit2D& recoHit : items()) {
+  for (const CDCRecoHit2D& recoHit : *this) {
     if (not recoHit.getWireHit().getAutomatonCell().hasTakenFlag()) {
       notTakenCounter++;
       if (notTakenCounter > maxNotTaken) {

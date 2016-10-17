@@ -30,27 +30,27 @@ if __name__ == "__main__":
     methods = [
             ('Trivial.xml', basf2_mva.TrivialOptions()),
             ('Python.xml', basf2_mva.PythonOptions()),
-            ('NeuroBayes.xml', basf2_mva.NeuroBayesOptions()),
+            # ('NeuroBayes.xml', basf2_mva.NeuroBayesOptions()),
             ('FastBDT.xml', basf2_mva.FastBDTOptions()),
             ('TMVAClassification.xml', basf2_mva.TMVAOptionsClassification()),
             ('FANN.xml', basf2_mva.FANNOptions()),
             ]
 
     olddir = os.getcwd()
-    tempdir = tempfile.mkdtemp()
-    os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
-    os.symlink(os.path.abspath('test.root'), tempdir + '/' + os.path.basename('test.root'))
-    os.chdir(tempdir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        os.symlink(os.path.abspath('train.root'), tempdir + '/' + os.path.basename('train.root'))
+        os.symlink(os.path.abspath('test.root'), tempdir + '/' + os.path.basename('test.root'))
+        os.chdir(tempdir)
 
-    for identifier, specific_options in methods:
-        general_options.m_identifier = identifier
-        basf2_mva.teacher(general_options, specific_options)
+        for identifier, specific_options in methods:
+            general_options.m_identifier = identifier
+            basf2_mva.teacher(general_options, specific_options)
 
-    basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
-                     basf2_mva.vector('train.root'), 'tree', 'expert.root')
+        basf2_mva.expert(basf2_mva.vector(*[i for i, _ in methods]),
+                         basf2_mva.vector('train.root'), 'tree', 'expert.root')
 
-    subprocess.call('basf2_mva_evaluate.py -o latex.pdf -train train.root -data test.root -i ' +
-                    ' '.join([i for i, _ in methods]), shell=True)
+        subprocess.call('basf2_mva_evaluate.py -o latex.pdf -train train.root -data test.root -i ' +
+                        ' '.join([i for i, _ in methods]), shell=True)
 
-    os.chdir(olddir)
-    shutil.copyfile(tempdir + '/latex.pdf', 'latex.pdf')
+        os.chdir(olddir)
+        shutil.copyfile(tempdir + '/latex.pdf', 'latex.pdf')

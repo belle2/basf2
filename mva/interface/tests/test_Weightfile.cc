@@ -132,7 +132,7 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("TestDatabase.txt");
+    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -147,6 +147,10 @@ namespace {
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
 
     EXPECT_THROW(MVA::Weightfile::loadFromDatabase("DOES_NOT_EXIST"), std::runtime_error);
+
+    boost::filesystem::remove_all("testPayloads");
+    Database::reset();
+
   }
 
   TEST(WeightfileTest, StaticSaveLoadXML)
@@ -202,7 +206,7 @@ namespace {
   {
 
     TestHelpers::TempDirCreator tmp_dir;
-    LocalDatabase::createInstance("TestDatabase.txt");
+    LocalDatabase::createInstance("testPayloads/TestDatabase.txt");
 
     MVA::Weightfile weightfile;
     weightfile.addElement("Test", "a");
@@ -212,6 +216,9 @@ namespace {
     auto loaded = MVA::Weightfile::loadFromDatabase("MVAInterfaceTest");
 
     EXPECT_EQ(loaded.getElement<std::string>("Test"), "a");
+
+    boost::filesystem::remove_all("testPayloads");
+    Database::reset();
 
   }
 
@@ -291,8 +298,8 @@ namespace {
       EXPECT_TRUE(boost::filesystem::exists(filename));
     }
     EXPECT_TRUE(boost::filesystem::exists(filename));
-    // Does not delete the directory itself
     boost::filesystem::remove_all(boost::filesystem::path(filename).parent_path());
+    EXPECT_FALSE(boost::filesystem::exists(boost::filesystem::path(filename).parent_path()));
 
     char* directory_template = strdup("/tmp/Basf2Sub.XXXXXX");
     auto tempdir = std::string(mkdtemp(directory_template));
@@ -304,7 +311,7 @@ namespace {
     }
     free(directory_template);
     boost::filesystem::remove_all(tempdir);
-
+    EXPECT_FALSE(boost::filesystem::exists(tempdir));
 
   }
 

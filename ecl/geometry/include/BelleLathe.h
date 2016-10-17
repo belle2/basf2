@@ -123,6 +123,7 @@ private:
   bool fgtpi, ftwopi;
 
   G4VSolid* fshape;
+  mutable std::vector<G4ThreeVector> fsurf;
 };
 
 class PolyhedronBelleLathe: public G4Polyhedron {

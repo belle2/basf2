@@ -27,8 +27,11 @@ map<string, counter_t> counterl;
 //#define MATCHOUT(x) //if(GetName().find("sv_crystalcontainersolid")==0) cout<<x<<endl;
 #else
 #define COUNTER(x)
-//#define MATCHOUT(x)
+//
 #endif
+
+//#define MATCHOUT(x) G4cout<<GetName()<<" "<<x<<G4endl;
+#define MATCHOUT(x)
 
 struct Plane_t {
   G4ThreeVector n;// Normal unit vector (x,y,z)
@@ -239,7 +242,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 #else
   fshape = NULL;
 #endif
-  //  StreamInfo(G4cout);
+  StreamInfo(G4cout);
 }
 
 // Nominal constructor for BelleLathe whose parameters are to be set by
@@ -615,7 +618,6 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
     int i = 0;
     do {
       const cachezr_t& seg = fcache[i];
-      if (seg.dz == 0.0) continue;
       // r0 -- cone radius at z0, c -- cone axis
       // cone equation is (r0 + tg * ((r-c0)*c))^2 = (r-c0)^2 - ((r-c0)*c)^2
       double r0 = seg.r, z0 = seg.z, tg = seg.ta, tg2 = tg * tg;
@@ -627,27 +629,28 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
       double k2 = 1, u2 = 1, o2 = o * o;
       double ck2 = ck * ck, cu2 = cu * cu, co2 = co * co;
       double dr2 = r0 * r0 - o2;
-      double q0 = 1 + tg2;
-      double q1 = co * q0 + rtg;
+      if (seg.dz != 0.0) {
+        double q0 = 1 + tg2;
+        double q1 = co * q0 + rtg;
 
-      double F00 = co2 * q0 + 2 * co * rtg + dr2;
-      double F10 = 2 * (ck * q1 - ko);
-      double F20 = ck2 * q0 - k2;
-      double F01 = 2 * (cu * q1 - uo);
-      double F11 = 2 * ck * cu * q0;
-      double F02 = cu2 * q0 - u2;
+        double F00 = co2 * q0 + 2 * co * rtg + dr2;
+        double F10 = 2 * (ck * q1 - ko);
+        double F20 = ck2 * q0 - k2;
+        double F01 = 2 * (cu * q1 - uo);
+        double F11 = 2 * ck * cu * q0;
+        double F02 = cu2 * q0 - u2;
 
-      vector<solution_t> res = extremum(F02, F11, F20, F01, F10, F00);
-      for (const solution_t& r : res) {
-        double t = r.s, s = r.t;
-        G4ThreeVector p = t * k + s * u + op;
-        if (seg.zmin < p.z() && p.z() < seg.zmax) {
-          solution_t e = {t, s};
-          if (ftwopi || insector(p.x(), p.y()))
-            ts.push_back(e);
+        vector<solution_t> res = extremum(F02, F11, F20, F01, F10, F00);
+        for (const solution_t& r : res) {
+          double t = r.s, s = r.t;
+          G4ThreeVector p = t * k + s * u + op;
+          if (seg.zmin < p.z() && p.z() < seg.zmax) {
+            solution_t e = {t, s};
+            if (ftwopi || insector(p.x(), p.y()))
+              ts.push_back(e);
+          }
         }
       }
-
       double a = -(ck2 * u2 + cu2 * k2);
       if (a != 0) {
         if (abs(cu) > abs(ck)) {
@@ -712,7 +715,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
   G4AffineTransform iT = T.Inverse();
   // axis to solid coordinates
   G4ThreeVector n0t = iT.TransformAxis(n0);
-  G4ThreeVector smin, smax; // extremum points in solid coordinate system
+  G4ThreeVector smin = n0t * kInfinity, smax = (-kInfinity) * n0t; // extremum points in solid coordinate system
   double pmin = kInfinity, pmax = -pmin;
   if (b1 && b2) {
     G4ThreeVector corners[] = {n1* dmin1 + n2 * dmin2, n1* dmax1 + n2 * dmin2, n1* dmax1 + n2 * dmax2, n1* dmin1 + n2 * dmax2};
@@ -816,28 +819,63 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
 
   pmin -= kCarTolerance;
   pmax += kCarTolerance;
-  bool hit = pmin > -kInfinity && pmax < kInfinity;
+  //  bool hit = pmin > -kInfinity && pmax < kInfinity;
+  bool hit = pmin < pmax;
 
 #if COMPARE==10
-  if (fshape) {
-    bool res = fshape->CalculateExtent(A, bb, T, pMin, pMax);
-    double diff = kCarTolerance;
-    diff = 10;
-    if (abs(pmin - pMin) > diff || abs(pmax - pMax) > diff || hit != res) {
-      cout << GetName() << " " << fcache.size() << " " << fphi << " " << fdphi << " " << ftwopi << " " << hit << " " << res << " " << b1
-           << " " << b2 << endl;
-      cout << "my " << pmin << " " << pmax << endl;
-      cout << "tc " << pMin << " " << pMax << endl;
-      cout << "df " << pmin - pMin << " " << pmax - pMax << endl;
-      G4ThreeVector bmin(bb.GetMinXExtent(), bb.GetMinYExtent(), bb.GetMinZExtent());
-      G4ThreeVector bmax(bb.GetMaxXExtent(), bb.GetMaxYExtent(), bb.GetMaxZExtent());
-      cout << A << " " << bmin << " " << bmax << " " << T << endl;
-      cout << rp << " " << rm << endl;
-      cout << smin << " " << smax << endl;
-      _exit(0);
+  auto surfhit = [this, &bb, &T, &n0, &n0t](double & pmin, double & pmax, bool print = false)->bool {
+    const int N = 1000 * 1000;
+    if (fsurf.size() == 0) for (int i = 0; i < N; i++) fsurf.push_back(GetPointOnSurface());
+
+    int umin = -1, umax = -1;
+    double wmin = 1e99, wmax = -1e99;
+    for (int i = 0; i < N; i++)
+    {
+      if (bb.Inside(T.TransformPoint(fsurf[i]))) {
+        double w = n0t * fsurf[i];
+        if (wmin > w) {wmin = w; umin = i;}
+        if (wmax < w) {wmax = w; umax = i;}
+      }
     }
-    //    cout<<endl;
+    if (print)cout << umin << " " << umax << " " << wmin << " " << wmax << endl;
+    if (umin >= 0 && umax >= 0)
+    {
+      G4ThreeVector qmin = fsurf[umin], qmax = fsurf[umax];
+      T.ApplyPointTransform(qmin);
+      T.ApplyPointTransform(qmax);
+      pmin = n0 * qmin, pmax = n0 * qmax;
+      return true;
+    }
+    return false;
+  };
+
+  bool res = fshape->CalculateExtent(A, bb, T, pMin, pMax);
+  double srfmin = kInfinity, srfmax = -srfmin;
+  bool shit = surfhit(srfmin, srfmax);
+  double diff = kCarTolerance;
+  diff = 10;
+  //  if (abs(pmin - pMin) > diff || abs(pmax - pMax) > diff || hit != res) {
+  if ((abs(pmin - srfmin) > diff || abs(pmax - srfmax) > diff) && shit) {
+    cout << "===================================\n";
+    cout << GetName() << " " << fcache.size() << " " << fphi << " " << fdphi << " " << ftwopi << "\n";
+    cout << hit << " " << res << " " << b1 << " " << b2 << "\n";
+    if (shit) {
+      cout << "ss " << srfmin << " " << srfmax << "\n";
+    } else {
+      cout << "ss : not in bounding box" << "\n";
+    }
+    cout << "my " << pmin << " " << pmax << "\n";
+    cout << "tc " << pMin << " " << pMax << "\n";
+    cout << "df " << pmin - pMin << " " << pmax - pMax << "\n";
+    G4ThreeVector bmin(bb.GetMinXExtent(), bb.GetMinYExtent(), bb.GetMinZExtent());
+    G4ThreeVector bmax(bb.GetMaxXExtent(), bb.GetMaxYExtent(), bb.GetMaxZExtent());
+    cout << "Axis=" << A << " " << bmin << " " << bmax << " " << T << "\n";
+    cout << rp << " " << rm << "\n";
+    cout << smin << " " << smax << "\n";
+    cout << flush;
+    //      _exit(0);
   }
+  //    cout<<endl;
 #endif
   pMin = pmin;
   pMax = pmax;
@@ -918,18 +956,19 @@ EInside BelleLathe::Inside(const G4ThreeVector& p) const
 
 #if COMPARE==1
   EInside dd = fshape->Inside(p);
-  if (dd != res) {
+  if (1 || dd != res) {
     double d0 = fn0x * p.x() + fn0y * p.y();
     double d1 = fn1x * p.x() + fn1y * p.y();
-    if (abs(d0) > kCarTolerance && abs(d1) > kCarTolerance) {
-      int oldprec = cout.precision(16);
-      zr_t r = {p.z(), p.perp()};
-      cout << GetName() << " Inside(p) " << p << " " << r << " " << res << " " << dd << " " << mindist(
-             r) << " " << d0 << " " << d1 << endl;
-      cout.precision(oldprec);
-    }
+    //    if (abs(d0) > kCarTolerance && abs(d1) > kCarTolerance) {
+    int oldprec = cout.precision(16);
+    zr_t r = {p.z(), p.perp()};
+    cout << GetName() << " Inside(p) " << p << " " << r << " my=" << res << " tc=" << dd <<
+         " dist=" << mindist(r) << " " << d0 << " " << d1 << endl;
+    cout.precision(oldprec);
+    //    }
   }
 #endif
+  MATCHOUT("BelleLathe::Inside(p) " << p << " res= " << res);
   return res;
 }
 
@@ -1063,6 +1102,7 @@ exit:
     //    _exit(0);
   }
 #endif
+  MATCHOUT("BelleLathe::SurfaceNormal(p,n) " << p << " res= " << res);
   return res;
 }
 
@@ -1110,8 +1150,10 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p) const
     }
   }
 #if COMPARE==1
-  double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p);
-  if (abs(d - dd) > kCarTolerance) {
+  //  double dd = fshape->Inside(p) == 2 ? 0.0 : fshape->DistanceToIn(p);
+  double dd = fshape->DistanceToIn(p);
+  //  if (abs(d - dd) > kCarTolerance) {
+  if (dd > d && abs(d - dd) > kCarTolerance) {
     int oldprec = cout.precision(16);
     EInside inside = fshape->Inside(p);
     zr_t r = {p.z(), p.perp()};
@@ -1120,6 +1162,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p) const
     //    exit(0);
   }
 #endif
+  MATCHOUT("BelleLathe::DistanceToIn(p) " << p << " res= " << d);
   return d;
 }
 
@@ -1151,6 +1194,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p) const
     cout.precision(oldprec);
   }
 #endif
+  MATCHOUT("BelleLathe::DistanceToOut(p) " << p.x() << " " << p.y() << " " << p.z() << " res= " << d);
   return d;
 }
 
@@ -1244,13 +1288,19 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
   double pz = p.z(), pr = sqrt(pp);
   for (int i = 0; i < imax; i++) { // loop over sides
     const cachezr_t& s = fcache[i];
-
-    double d = (pz - s.z) * s.dr - (pr - s.r) * s.dz;
-    bool surface = abs(d * s.is) < delta;
-    if (surface) isurface = i;
+    double dz = pz - s.z, dr = pr - s.r;
+    double d = dz * s.dr - dr * s.dz;
+    bool surface = false;
+    if (abs(d * s.is) < delta) {
+      double dot = dz * s.dz + dr * s.dr;
+      if (dot >= 0 && dot <= s.s2) {
+        surface = true;
+        isurface = i;
+      }
+    }
     if (s.dz == 0.0) { // z-plane
       if (!surface) {
-        double t = (s.z - p.z()) * inz;
+        double t = -dz * inz;
         if (0 < t && t < tmin && hitzside(t, s)) { tmin = t; iseg = i;}
       }
     } else {
@@ -1262,7 +1312,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
         A = -nn;
         B = np;
       } else { // cone
-        double taz = s.ta * (p.z() - s.z);
+        double taz = s.ta * dz;
         double R = taz + s.r;
         R2 = R * R;
 
@@ -1331,11 +1381,19 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
     //    if (getnormal(iseg, tmin)*n > 0) tmin = kInfinity; // mimic genericpolycone
   }
 
+  auto convex = [this, imax](int i) -> bool{
+    if (i < imax)
+      return fcache[i].isconvex;
+    else
+      return !fgtpi;
+  };
+
   if (tmin >= 0 && tmin < kInfinity) {
+    if (isurface >= 0) if (convex(isurface) && getnormal(isurface, 0)*n >= 0) tmin = kInfinity;
   } else {
     if (Inside(p) == kSurface) {
       if (isurface >= 0) {
-        tmin = (getnormal(isurface, 0) * n > 0) ? kInfinity : 0; // mimic genericpolycone
+        tmin = (getnormal(isurface, 0) * n >= 0) ? kInfinity : 0; // mimic genericpolycone
       }
     }
   }
@@ -1353,6 +1411,7 @@ G4double BelleLathe::DistanceToIn(const G4ThreeVector& p, const G4ThreeVector& n
   }
 #endif
   tmin = max(0.0, tmin);
+  MATCHOUT("BelleLathe::DistanceToIn(p,n) " << p << " " << n << " res= " << tmin);
   return tmin;
 }
 
@@ -1583,6 +1642,7 @@ G4double BelleLathe::DistanceToOut(const G4ThreeVector& p, const G4ThreeVector& 
     }
   } while (0);
 #endif
+  MATCHOUT("BelleLathe::DistanceToOut(p,n) " << p << " " << n << " res= " << tmin);
   return tmin;
 }
 

@@ -134,7 +134,6 @@ void MCTrackCandCombinerModule::event()
   m_nCdcTcs += nCdcTCs;
   //register StoreArray which will be filled by this module
   StoreArray<genfit::TrackCand> outCands(m_combinedTrackCandColName);
-  outCands.create();
   //RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   // loop over MCParticles.

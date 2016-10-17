@@ -112,10 +112,8 @@ void PXDDataReductionModule::event()
 {
 
   StoreArray<PXDIntercept> PXDInterceptList(m_PXDInterceptListName);
-  PXDInterceptList.create();
 
   StoreArray<ROIid> ROIList(m_ROIListName);
-  ROIList.create(true);
 
   StoreArray<RecoTrack> trackList(m_recoTracksListName);
   B2DEBUG(1, "%%%%%%%% Number of RecoTracks in the events =  " << trackList.getEntries());

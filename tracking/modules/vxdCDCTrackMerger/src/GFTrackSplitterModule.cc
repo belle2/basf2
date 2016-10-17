@@ -82,9 +82,7 @@ void GFTrackSplitterModule::event()
   if (nTracks == 0) B2WARNING("GFTracksColName is empty!");
 
   StoreArray<genfit::Track> si_mcTracks(m_SiGFTracksColName);
-  si_mcTracks.create();
   StoreArray<genfit::Track> cdc_mcTracks(m_CDCGFTracksColName);
-  cdc_mcTracks.create();
 
   //SPLIT
   //int htrack=-1;

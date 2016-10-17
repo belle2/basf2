@@ -53,7 +53,6 @@ void GenfitTrackCreatorModule::event()
   StoreArray<RecoTrack> recoTracks(m_param_recoTracksStoreArrayName);
 
   StoreArray<genfit::Track> genfitTracks(m_param_genfitTrackStoreArrayName);
-  genfitTracks.create();
 
   StoreArray<genfit::TrackCand> genfitTrackCands(m_param_genfitTrackCandsStoreArrayName);
 

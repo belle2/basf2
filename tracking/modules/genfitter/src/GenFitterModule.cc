@@ -285,7 +285,6 @@ void GenFitterModule::event()
 
 
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
-  gfTracks.create();
 
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
 

@@ -119,12 +119,8 @@ namespace Belle2 {
       using Super = VarSet<FitSegmentPairVarNames>;
 
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitSegmentPairVarSet();
-
       /// Generate and assign the variables from the segment pair
       virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override final;
-
 
     private:
       /// Returns the xy fitter instance that is used by this filter.
@@ -138,5 +134,3 @@ namespace Belle2 {
     };
   }
 }
-
-

@@ -15,10 +15,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule() :
-  TrackFinderCDCBaseModule(),
-  m_param_segmentsStoreObjName("CDCRecoSegment2DVector")
+TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule()
+  : TrackFinderCDCBaseModule()
+  , m_param_segmentsStoreObjName("CDCRecoSegment2DVector")
 {
   if (not hasParam<std::string>("SegmentsStoreObjName")) {
     addParam("SegmentsStoreObjName",
@@ -32,8 +31,6 @@ TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule() :
   this->setParamList(moduleParamList);
 }
 
-
-
 void TrackFinderCDCFromSegmentsModule::initialize()
 {
   TrackFinderCDCBaseModule::initialize();
@@ -42,18 +39,16 @@ void TrackFinderCDCFromSegmentsModule::initialize()
   // Does nothing in the normal case.
   m_param_segmentsStoreObjName = getParamValue<std::string>("SegmentsStoreObjName");
 
-  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> >::required(m_param_segmentsStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>>::required(m_param_segmentsStoreObjName);
   m_trackCreatorSingleSegments.initialize();
 }
-
-
 
 void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 {
   m_trackCreatorSingleSegments.beginEvent();
 
   // Aquire the store vector
-  StoreWrappedObjPtr< std::vector<CDCRecoSegment2D> > storedRecoSegments(m_param_segmentsStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(m_param_segmentsStoreObjName);
   if (not storedRecoSegments) {
     B2WARNING("The segments have not been created.");
     return;

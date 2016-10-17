@@ -23,11 +23,7 @@ PrimitivePlotter::PrimitivePlotter() :
 {
 }
 
-
-PrimitivePlotter::~PrimitivePlotter()
-{
-}
-
+PrimitivePlotter::~PrimitivePlotter() = default;
 
 std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 {

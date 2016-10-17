@@ -45,7 +45,7 @@ namespace Belle2 {
       typedef WithWeight<const CollectionItem*> MatchedCollectionItem;
 
       /// Empty desctructor.
-      virtual ~Collector() { }
+      virtual ~Collector() = default;
 
       /** Redirect all parameters of the matcher. **/
       void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")

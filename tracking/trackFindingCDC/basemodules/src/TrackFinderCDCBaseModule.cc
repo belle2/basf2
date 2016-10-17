@@ -25,10 +25,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
-  Module(),
-  m_param_tracksStoreObjName("CDCTrackVector"),
-  m_param_tracksStoreObjNameIsInput(false)
+TrackFinderCDCBaseModule::TrackFinderCDCBaseModule()
+  : Module()
+  , m_param_tracksStoreObjName("CDCTrackVector")
+  , m_param_tracksStoreObjNameIsInput(false)
 {
   setDescription("This a base module for all track finders in the CDC");
 
@@ -58,7 +58,7 @@ void TrackFinderCDCBaseModule::initialize()
   m_trackExporter.initialize();
 
   // Output StoreArray
-  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   if (m_param_tracksStoreObjNameIsInput) {
     storedTracks.isRequired();
   } else {
@@ -73,7 +73,7 @@ void TrackFinderCDCBaseModule::event()
   m_trackExporter.beginEvent();
 
   // Now aquire the store vector
-  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   if (m_param_tracksStoreObjNameIsInput) {
     // Somehow it is possible that we receive empty tracks (probably from the LegendreFinder)
     // Drop them before proceding

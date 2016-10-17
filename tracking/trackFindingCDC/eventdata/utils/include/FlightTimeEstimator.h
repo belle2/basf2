@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Making the destructor virtual for this interface class
-      virtual ~FlightTimeEstimator() {};
+      virtual ~FlightTimeEstimator() = default;
 
       /// Default estimator for the flight time
       virtual double

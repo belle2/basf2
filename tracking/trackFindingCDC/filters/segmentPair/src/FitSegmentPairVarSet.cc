@@ -19,11 +19,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitSegmentPairVarSet::FitSegmentPairVarSet() :
-  Super()
-{
-}
-
 bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   bool extracted = extractNested(ptrSegmentPair);

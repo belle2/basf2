@@ -37,7 +37,7 @@ namespace Belle2 {
       /// Default constructor.
       QuadTreeCandidateFinder() {};
 
-      ~QuadTreeCandidateFinder() {};
+      ~QuadTreeCandidateFinder() = default;
 
       /**
        * Performs quadtree search

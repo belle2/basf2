@@ -81,7 +81,7 @@ namespace Belle2 {
       {
       }
 
-      virtual ~FilterFactory() { }
+      virtual ~FilterFactory() = default;
 
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList)

@@ -22,7 +22,7 @@ namespace Belle2 {
     class QuadTreeBasedMatcher {
     public:
       /** Empty destructor. Everything is handled via terminate. **/
-      virtual ~QuadTreeBasedMatcher() { }
+      virtual ~QuadTreeBasedMatcher() = default;
 
       /** Expose the quad tree relevant parameters. **/
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")

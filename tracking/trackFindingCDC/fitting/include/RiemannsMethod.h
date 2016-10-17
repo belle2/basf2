@@ -21,9 +21,6 @@ namespace Belle2 {
       ///Empty constructor
       RiemannsMethod();
 
-      ///Empty destructor
-      ~RiemannsMethod();
-
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 

@@ -34,7 +34,7 @@ namespace Belle2 {
       /**
        * Virtual Destructor.
        */
-      virtual ~CDCSegmentColorMap() {};
+      virtual ~CDCSegmentColorMap() = default;
 
     protected:
       /**

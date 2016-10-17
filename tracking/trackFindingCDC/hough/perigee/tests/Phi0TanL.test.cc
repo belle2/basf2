@@ -105,7 +105,7 @@ namespace {
     for (const CDCTrack& mcTrack : m_mcTracks) {
       for (const CDCRecoHit3D& recoHit3D : mcTrack) {
         const CDCWireHit& wireHit = recoHit3D.getWireHit();
-        mcTaggedWireHits.push_back(&wireHit);
+        mcTaggedWireHits.emplace_back(&wireHit);
         mcTaggedWireHits.back().setRLInfo(recoHit3D.getRLInfo());
       }
     }

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     public:
       /// Constructor setting up the options of the fit.
-      CDCAxialStereoFusion(bool reestimateDriftLength = true)
+      explicit CDCAxialStereoFusion(bool reestimateDriftLength = true)
         : m_reestimateDriftLength(reestimateDriftLength)
       {
       }

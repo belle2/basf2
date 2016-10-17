@@ -66,7 +66,7 @@ namespace Belle2 {
 
     public:
       /// Constructor also setting up the flight time lookup table
-      CosmicRayFlightTimeEstimator(Vector3D triggerPoint = Vector3D(0, 0, 0));
+      explicit CosmicRayFlightTimeEstimator(Vector3D triggerPoint = Vector3D(0, 0, 0));
 
       /// Flight time estimator for cosmic ray events
       double getFlightTime2D(const Vector2D& pos2D, double alpha, double beta = 1) const override

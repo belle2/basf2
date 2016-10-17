@@ -17,7 +17,7 @@
 
 #include <string>
 #include <memory>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
 

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <assert.h>
+#include <cassert>
 
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>

@@ -16,7 +16,7 @@
 
 #include <vector>
 #include <string>
-#include <assert.h>
+#include <cassert>
 
 
 namespace Belle2 {

@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

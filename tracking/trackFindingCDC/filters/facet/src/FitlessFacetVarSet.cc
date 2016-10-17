@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

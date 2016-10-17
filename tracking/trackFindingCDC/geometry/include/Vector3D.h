@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <TVector3.h>
-#include <math.h>
+#include <cmath>
 #include <iostream>
 
 namespace Belle2 {

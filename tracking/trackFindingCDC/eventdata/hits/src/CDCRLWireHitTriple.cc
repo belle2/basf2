@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

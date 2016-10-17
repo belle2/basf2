@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

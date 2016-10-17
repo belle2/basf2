@@ -15,21 +15,20 @@ using namespace Belle2;
 
 const TrackFitResult* Track::getTrackFitResult(const Const::ChargedStable& chargedStable) const
 {
-  if (m_trackFitIndices[chargedStable.getIndex()] < 0) {
-    B2DEBUG(100, "Attempt to access an unset TrackFitResult");
-    //ULTRA PRELIMINARY
-    short int index = -1; // MS: better to set to invalid value and test again after
-    for (unsigned int ii = 0; ii < Const::chargedStableSet.size(); ii++) {
-      if (m_trackFitIndices[ii] >= 0) {
-        index = m_trackFitIndices[ii];
-      }
-    }
-    if (index < 0) return 0; // MS: just in case and to be sure not to get garbage
-    StoreArray<TrackFitResult> trackFitResults;
-    return trackFitResults[index];
-  }
   StoreArray<TrackFitResult> trackFitResults;
-  return trackFitResults[m_trackFitIndices[chargedStable.getIndex()]];
+  const auto trackFitResultArrayIndex = m_trackFitIndices[chargedStable.getIndex()];
+  if (trackFitResultArrayIndex < 0) {
+    B2DEBUG(100, "TrackFitResult for the requested hypothesis is not set. Returning default hypothesis instead.");
+    const auto defaultTrackFitResultArrayIndex = m_trackFitIndices[Const::pion.getIndex()];
+    if (defaultTrackFitResultArrayIndex < 0) {
+      B2DEBUG(100, "TrackFitResult for the default hypothesis is not set. Returning nullptr instead. This should never happen.");
+      return nullptr;
+    } else {
+      return trackFitResults[defaultTrackFitResultArrayIndex];
+    }
+  } else {
+    return trackFitResults[trackFitResultArrayIndex];
+  }
 }
 
 unsigned int Track::getNumberOfFittedHypotheses() const

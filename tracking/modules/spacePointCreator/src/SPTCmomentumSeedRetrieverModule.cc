@@ -14,7 +14,8 @@
 #include <tracking/vxdCaTracking/TrackletFilters.h>
 #include <tracking/vxdCaTracking/SharedFunctions.h> // e.g. PositionInfo
 
-#include <framework/geometry/BFieldManager.h>
+#include <geometry/bfieldmap/BFieldMap.h>
+
 
 // ROOT
 #include <TVector3.h>
@@ -46,9 +47,8 @@ void SPTCmomentumSeedRetrieverModule::beginRun()
   InitializeCounters();
 
   // now retrieving the bfield value used in this module
-  TVector3 chosenPosition(0., 0., 0.);
-  auto bFieldVector = BFieldManager::getField(chosenPosition);
-  m_bFieldZ = bFieldVector.Z();
+  m_bFieldZ = BFieldMap::Instance().getBField(TVector3(0, 0, 0)).Z();
+  B2DEBUG(1, "SPTCmomentumSeedRetrieverModule:beginRun: B-Field z-component: " << m_bFieldZ);
 }
 
 
@@ -109,16 +109,19 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
   convertedSPTC.reserve(aTC.size());
 
   // collecting actual hits
-  for (const SpacePoint* aHit : aTC) {
+  // Inverting the hit sequence since the helix fit in the seedGenerator expects the hits in following order:
+  // Outermost -> Innermost
+  // While SPTCs store the hits from Innermost to Outermost.
+  std::vector<const SpacePoint*> Hits = aTC.getHits();
+  for (auto aHiti = aTC.getNHits(); aHiti > 0; --aHiti) {
     PositionInfo convertedHit{
-      TVector3(aHit->getPosition()),
-      TVector3(aHit->getPositionError()),
+      TVector3(Hits.at(aHiti - 1)->getPosition()),
+      TVector3(Hits.at(aHiti - 1)->getPositionError()),
       0,
       0};
     convertedSPTCrawData.push_back(std::move(convertedHit));
     convertedSPTC.push_back(&convertedSPTCrawData.back());
   }
-
   seedGenerator.resetValues(&convertedSPTC);
 
   std::pair<TVector3, int> seedValue; // first is momentum vector, second is signCurvature
@@ -129,11 +132,13 @@ bool SPTCmomentumSeedRetrieverModule::createSPTCmomentumSeed(SpacePointTrackCand
 
   int pdgCode = seedValue.second * m_PARAMstdPDGCode * chargeSignFactor; // improved one for curved tracks
 
-  stateSeed(0) = (aTC.getHits().back()->X()); stateSeed(1) = (aTC.getHits().back()->Y()); stateSeed(2) = (aTC.getHits().back()->Z());
+  stateSeed(0) = (aTC.getHits().front()->X()); stateSeed(1) = (aTC.getHits().front()->Y());
+  stateSeed(2) = (aTC.getHits().front()->Z());
   stateSeed(3) = seedValue.first[0]; stateSeed(4) = seedValue.first[1]; stateSeed(5) = seedValue.first[2];
 
   aTC.set6DSeed(stateSeed);
   aTC.setPdgCode(pdgCode);
+  aTC.setCovSeed(covSeed);
 
   return true; // TODO: define cases for which a negative value shall be returned (e.g. seed creation failed)
 }

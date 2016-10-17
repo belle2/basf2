@@ -102,7 +102,7 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
     double dist = fabs(trajectory.getDist2D(item.getRecoPos2D()));
 
     double bestHitDist = dist;
-    CDCTrack* bestCandidate = NULL;
+    CDCTrack* bestCandidate = nullptr;
 
     cdcTrackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
       if (candInner == cand) return;

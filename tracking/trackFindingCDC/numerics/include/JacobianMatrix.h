@@ -47,7 +47,7 @@ namespace Belle2 {
 
       /// Construct a passive rotation matrix around coordinates i and j
       template <int N>
-      static JacobianMatrix<N, N> passiveRotation(int i, int j, Vector2D phiVec)
+      static JacobianMatrix<N, N> passiveRotation(int i, int j, const Vector2D& phiVec)
       {
         assert(i < N);
         assert(j < N);

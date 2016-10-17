@@ -564,8 +564,10 @@ namespace Belle2 {
           double transformedX = cross(upper);
           double transformedY = -cross(lower);
           bool inFirstQuadrant = sameSign(det, transformedX, transformedY);
-
-          return inFirstQuadrant xor flipsOrientation;
+          if (flipsOrientation) {
+            inFirstQuadrant = not inFirstQuadrant;
+          }
+          return inFirstQuadrant;
         }
       }
 

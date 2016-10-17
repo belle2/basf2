@@ -940,7 +940,7 @@ void ECLDataAnalysisModule::event()
   for (int i = 0; i < CRmultip; i++) {
     ECLConnectedRegion* aECLCR = cr[i];
     m_eclCRIdx->push_back(aECLCR->getCRId());
-    m_eclCRIsTrack->push_back(aECLCR->getIsTrack());
+    m_eclCRIsTrack->push_back(aECLCR->isTrack());
     m_eclCRLikelihoodMIPNGamma->push_back(aECLCR->getLikelihoodMIPNGamma());
     m_eclCRLikelihoodChargedHadron->push_back(aECLCR->getLikelihoodChargedHadron());
     m_eclCRLikelihoodElectronNGamma->push_back(aECLCR->getLikelihoodElectronNGamma());
@@ -1042,7 +1042,7 @@ void ECLDataAnalysisModule::event()
     m_eclClusterPx->push_back(aECLClusters->getPx());
     m_eclClusterPy->push_back(aECLClusters->getPy());
     m_eclClusterPz->push_back(aECLClusters->getPz());
-    m_eclClusterIsTrack->push_back(aECLClusters->getisTrack());
+    m_eclClusterIsTrack->push_back(aECLClusters->isTrack());
     m_eclClusterClosestTrackDist->push_back(aECLClusters->getMinTrkDistance());
     m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
@@ -1208,7 +1208,7 @@ void ECLDataAnalysisModule::event()
       m_eclPureClusterPx->push_back(aECLClusters->getPx());
       m_eclPureClusterPy->push_back(aECLClusters->getPy());
       m_eclPureClusterPz->push_back(aECLClusters->getPz());
-      m_eclPureClusterIsTrack->push_back(aECLClusters->getisTrack());
+      m_eclPureClusterIsTrack->push_back(aECLClusters->isTrack());
       m_eclPureClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
       if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {

@@ -531,7 +531,7 @@ void ECLClusterAnalysisModule::event()
     m_eclClusterPx->push_back(aECLClusters->getPx());
     m_eclClusterPy->push_back(aECLClusters->getPy());
     m_eclClusterPz->push_back(aECLClusters->getPz());
-    m_eclClusterIsTrack->push_back(aECLClusters->getisTrack());
+    m_eclClusterIsTrack->push_back(aECLClusters->isTrack());
     m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
     double sumHit = 0;

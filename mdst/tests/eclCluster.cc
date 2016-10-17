@@ -4,6 +4,7 @@
 #include <framework/datastore/StoreArray.h>
 #include <gtest/gtest.h>
 #include <cmath>
+#include <TMatrixD.h>
 
 using namespace std;
 
@@ -46,7 +47,7 @@ namespace Belle2 {
     EXPECT_EQ(0, myECLCluster.getPy());
     EXPECT_EQ(exp(-5.), myECLCluster.getPz());
 
-    EXPECT_FALSE(myECLCluster.getisTrack());
+    EXPECT_FALSE(myECLCluster.isTrack());
     EXPECT_TRUE(myECLCluster.isNeutral());
 
     double px = myECLCluster.getMomentum().X();
@@ -194,7 +195,7 @@ namespace Belle2 {
     myECLCluster.setNumberOfCrystals(nOfCrystals);
     myECLCluster.setLAT(lat);
     myECLCluster.setCovarianceMatrix(error);
-    myECLCluster.setisTrack(isTrack);
+    myECLCluster.setIsTrack(isTrack);
 
     EXPECT_FLOAT_EQ(energy, myECLCluster.getEnergy());
     EXPECT_FLOAT_EQ(E9oE21, myECLCluster.getE9oE21());
@@ -217,7 +218,7 @@ namespace Belle2 {
     EXPECT_FLOAT_EQ(energy * sin(theta) * sin(phi), myECLCluster.getPy());
     EXPECT_FLOAT_EQ(energy * cos(theta), myECLCluster.getPz());
 
-    EXPECT_TRUE(myECLCluster.getisTrack());
+    EXPECT_TRUE(myECLCluster.isTrack());
     EXPECT_FALSE(myECLCluster.isNeutral());
 
     double x = myECLCluster.getMomentum().X();

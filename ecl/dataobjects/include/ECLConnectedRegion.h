@@ -85,7 +85,7 @@ namespace Belle2 {
     /*! Get boolean to flag if a track is matched to the CR
      * @return IsTrack
      */
-    bool getIsTrack() const { return m_IsTrack; }
+    bool isTrack() const { return m_IsTrack; }
 
     /*! Get MIPNGamma likelihood (ECL based only) T1
      * @return LikelihoodMIPNGamma

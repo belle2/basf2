@@ -94,7 +94,7 @@ void ECLTrackShowerMatchModule::event()
         track.addRelationTo(shower);
         ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
         if (cluster != nullptr) {
-          cluster->setisTrack(true);
+          cluster->setIsTrack(true);
           track.addRelationTo(cluster);
         }
       }

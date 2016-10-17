@@ -228,6 +228,11 @@ namespace Belle2 {
       return supportAssembly;
     }
 
+
+    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    {
+    }
+
     VXD::GeoVXDAssembly GeoSVDCreator::createLadderSupport(int layer, GearDir support)
     {
       VXD::GeoVXDAssembly supportAssembly;

@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/VXDGeometryPar.h>
+#include <vxd/dbobjects/SVDSupportPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -17,10 +17,16 @@ using namespace Belle2;
 using namespace std;
 
 
-
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDGeometryPar::read(const GearDir& content)
+void SVDSupportPar::read(const GearDir& content)
 {
+
+  /*
+  for (const GearDir& endflange : content.getNodes("Endflange")) {
+    m_endflanges.push_back(VXDPolyConePar(endflange));
+  }
+  */
 }
+
+

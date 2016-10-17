@@ -84,6 +84,10 @@ namespace Belle2 {
       return info;
     }
 
+    void GeoPXDCreator::createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    {
+    }
+
     VXD::SensitiveDetectorBase* GeoPXDCreator::createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
         const VXDGeoSensorPlacement& placement)
     {

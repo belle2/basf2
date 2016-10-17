@@ -25,7 +25,6 @@
 #include <map>
 
 
-#include <vxd/dbobjects/VXDGeometryPar.h>
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
@@ -44,19 +43,6 @@ namespace Belle2 {
     /** The creator for the VXD geometry of the Belle II detector.   */
     class GeoVXDCreator : public geometry::CreatorBase {
 
-    private:
-
-      //! Create a parameter object from the Gearbox XML parameters.
-      VXDGeometryPar createConfiguration(const GearDir& param)
-      {
-        VXDGeometryPar vxdGeometryPar;
-        vxdGeometryPar.read(param);
-        return vxdGeometryPar;
-      };
-
-      //! Create the geometry from a parameter object.
-      void createGeometry(const VXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-
     public:
       /** Constructor of the GeoVXDCreator class. */
       explicit GeoVXDCreator(const std::string& prefix);
@@ -71,26 +57,6 @@ namespace Belle2 {
        *                objects.
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
-
-      /** Create the configuration objects and save them in the Database.  If
-       * more than one object is needed adjust accordingly */
-      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
-      {
-        DBImportObjPtr<VXDGeometryPar> importObj;
-        importObj.construct(createConfiguration(content));
-        importObj.import(iov);
-      }
-
-      /** Create the geometry from the Database */
-      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
-      {
-        DBObjPtr<VXDGeometryPar> dbObj;
-        if (!dbObj) {
-          // Check that we found the object and if not report the problem
-          B2FATAL("No configuration for " << name << " found.");
-        }
-        createGeometry(*dbObj, topVolume, type);
-      }
 
       /**
        * Create support structure for VXD Half Shell, that means everything

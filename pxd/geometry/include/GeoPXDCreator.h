@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Christian Oswald, Zbynek Drasal,           *
- *               Martin Ritter, Jozef Koval                               *
+ *               Martin Ritter, Jozef Koval, Benjamin Schwenker           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,8 @@
 
 #include <vector>
 #include <vxd/geometry/GeoVXDCreator.h>
+#include <vxd/dbobjects/PXDGeometryPar.h>
+
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the PXD */
@@ -23,12 +25,43 @@ namespace Belle2 {
 
     /** The creator for the PXD geometry of the Belle II detector.   */
     class GeoPXDCreator : public VXD::GeoVXDCreator {
+    private:
+      //! Create a parameter object from the Gearbox XML parameters.
+      PXDGeometryPar createConfiguration(const GearDir& param)
+      {
+        PXDGeometryPar pxdGeometryPar;
+        pxdGeometryPar.read(param);
+        return pxdGeometryPar;
+      };
+
+      //! Create the geometry from a parameter object.
+      void createGeometry(const PXDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     public:
       /** Constructor of the GeoPXDCreator class. */
       GeoPXDCreator(): VXD::GeoVXDCreator("PXD") {};
 
       /** The destructor of the GeoPXDCreator class. */
       virtual ~GeoPXDCreator();
+
+      /** Create the configuration objects and save them in the Database.  If
+       * more than one object is needed adjust accordingly */
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
+      {
+        DBImportObjPtr<PXDGeometryPar> importObj;
+        importObj.construct(createConfiguration(content));
+        importObj.import(iov);
+      }
+
+      /** Create the geometry from the Database */
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        DBObjPtr<PXDGeometryPar> dbObj;
+        if (!dbObj) {
+          // Check that we found the object and if not report the problem
+          B2FATAL("No configuration for " << name << " found.");
+        }
+        createGeometry(*dbObj, topVolume, type);
+      }
 
       /**
        * Create support structure for PXD Half Shell, that means everything

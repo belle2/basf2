@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Christian Oswald, Zbynek Drasal,           *
- *               Martin Ritter, Jozef Koval                               *
+ *               Martin Ritter, Jozef Koval, Benjamin Schwenker           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,6 +14,8 @@
 
 #include <vector>
 #include <vxd/geometry/GeoVXDCreator.h>
+#include <vxd/dbobjects/SVDGeometryPar.h>
+
 
 namespace Belle2 {
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
@@ -23,12 +25,43 @@ namespace Belle2 {
 
     /** The creator for the SVD geometry of the Belle II detector.   */
     class GeoSVDCreator : public VXD::GeoVXDCreator {
+    private:
+      //! Create a parameter object from the Gearbox XML parameters.
+      SVDGeometryPar createConfiguration(const GearDir& param)
+      {
+        SVDGeometryPar svdGeometryPar;
+        svdGeometryPar.read(param);
+        return svdGeometryPar;
+      };
+
+      //! Create the geometry from a parameter object.
+      void createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
     public:
       /** Constructor of the GeoSVDCreator class. */
       GeoSVDCreator(): VXD::GeoVXDCreator("SVD") {};
 
       /** The destructor of the GeoSVDCreator class. */
       virtual ~GeoSVDCreator();
+
+      /** Create the configuration objects and save them in the Database.  If
+       * more than one object is needed adjust accordingly */
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
+      {
+        DBImportObjPtr<SVDGeometryPar> importObj;
+        importObj.construct(createConfiguration(content));
+        importObj.import(iov);
+      }
+
+      /** Create the geometry from the Database */
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        DBObjPtr<SVDGeometryPar> dbObj;
+        if (!dbObj) {
+          // Check that we found the object and if not report the problem
+          B2FATAL("No configuration for " << name << " found.");
+        }
+        createGeometry(*dbObj, topVolume, type);
+      }
 
       /**
        * Create support structure for SVD Half Shell, that means everything

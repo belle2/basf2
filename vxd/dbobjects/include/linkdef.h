@@ -9,6 +9,8 @@
 
 #pragma link C++ class Belle2::PXDSupportPar+;
 
+#pragma link C++ class Belle2::SVDSupportPar+;
+
 
 #pragma link C++ class Belle2::VXDPolyConePar+;
 #pragma link C++ class Belle2::VXDPolyConePlanePar+; // implicit

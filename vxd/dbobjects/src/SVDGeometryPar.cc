@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/VXDGeometryPar.h>
+#include <vxd/dbobjects/SVDGeometryPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -18,9 +18,8 @@ using namespace std;
 
 
 
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDGeometryPar::read(const GearDir& content)
+void SVDGeometryPar::read(const GearDir& content)
 {
 }

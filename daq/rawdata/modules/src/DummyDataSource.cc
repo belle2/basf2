@@ -84,7 +84,6 @@ void DummyDataSourceModule::event()
 {
 
   //    Make RawCOPPER array
-  rawcprarray.create();
   if (m_start_flag == 0) {
     m_start_flag = 1;
     RunInfoBuffer& status(DeSerializerModule::getStatus());
@@ -199,7 +198,6 @@ void DummyDataSourceModule::event()
 #endif
 
 #ifdef USE_RAWDATABLOCK
-  raw_datablkarray.create();
   RawDataBlock* raw_datablk = raw_datablkarray.appendNew();
   raw_datablk->SetBuffer(raw_copper->GetWholeBuffer(), raw_copper->TotalBufNwords(),
                          false, 1, 1);

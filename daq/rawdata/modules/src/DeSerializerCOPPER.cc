@@ -491,7 +491,6 @@ void DeSerializerCOPPERModule::event()
   }
 
 
-  raw_dblkarray.create();
   RawDataBlock* temp_rawdblk;
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_COPPER; j++) {
     int m_size_word = 0;

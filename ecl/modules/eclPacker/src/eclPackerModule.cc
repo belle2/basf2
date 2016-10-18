@@ -16,7 +16,7 @@ ECLPackerModule::ECLPackerModule() :
   m_compressMode(false),
   m_eclRawCOPPERs("", DataStore::c_Event)
 {
-  setDescription("");
+  setDescription("The module reads ECLDigits from the DataStore and writes ECLRaw data.");
   addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string("/ecl/data/ecl_channels_map.txt"));
   addParam("RawCOPPERsName", m_eclRawCOPPERsName, "Name of the RawECL container", string("RawECLs"));
   addParam("CompressMode", m_compressMode, "compress mode for ADC samples", true);

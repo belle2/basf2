@@ -391,11 +391,11 @@ void MCMatcherTRGECLModule::event()
 
 
   int m_hitNum = 0;
+  StoreArray<TRGECLDigi0MC> TCDigiArray;
   for (int ii = 0; ii < ihit; ii++) {
 
     if (TCRawEnergy[ii] < 0.1) {continue;}
-    StoreArray<TRGECLDigi0MC> TCDigiArray;
-    new(TCDigiArray.appendNew()) TRGECLDigi0MC();
+    TCDigiArray.appendNew();
     m_hitNum = TCDigiArray.getEntries() - 1;
 
     TCDigiArray[m_hitNum]->setEventId(m_nEvent);
@@ -502,10 +502,9 @@ void MCMatcherTRGECLModule::event()
   }
 
   m_hitNum = 0;
+  StoreArray<TRGECLHitMC> TCHitArray;
   for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
-
-    StoreArray<TRGECLHitMC> TCHitArray;
-    new(TCHitArray.appendNew()) TRGECLHitMC();
+    TCHitArray.appendNew();
     m_hitNum = TCHitArray.getEntries() - 1;
 
     TCHitArray[m_hitNum]->setEventId(m_nEvent);

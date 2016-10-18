@@ -290,15 +290,14 @@ mdst_dataobjects = [
         "getLogL": const_stable,
         "isAvailable": PIDDetector_sets,
     }),
-    # The ECLCluster is incompatible with versions earlier than release-00-08-00
     DataStorePrinter("ECLCluster", [
         "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
         "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
-        "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
+        "getDeltaTime99", "getE1oE9", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
         "getNumberOfCrystals", "getStatus", "getPx", "getPy",
         "getPz", "getMomentum", "get4Vector", "getClusterPosition",
         "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
-        "isNeutral", "getDeltaL"
+        "isNeutral", "getDeltaL", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA"
     ], {
         "getRelationsWith": ["MCParticles"],
     }),

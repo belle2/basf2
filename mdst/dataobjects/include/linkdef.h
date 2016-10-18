@@ -166,6 +166,12 @@
          else m_logEnergy = -5.;}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
+  source="float m_HighestE" \
+  targetClass="Belle2::ECLCluster" target="m_logEnergyHighestCrystal" \
+  code="{if(onfile.m_HighestE>0.0) m_logEnergyHighestCrystal = log(onfile.m_HighestE); \
+         else m_logEnergyHighestCrystal = -5.;}"
+
+#pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_EnedepSum" \
   targetClass="Belle2::ECLCluster" target="m_logEnergyRaw" \
   code="{if(onfile.m_EnedepSum>0.0) m_logEnergyRaw = log(onfile.m_EnedepSum); \

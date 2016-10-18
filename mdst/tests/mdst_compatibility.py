@@ -291,18 +291,17 @@ mdst_dataobjects = [
         "isAvailable": PIDDetector_sets,
     }),
     # The ECLCluster is incompatible with versions earlier than release-00-08-00
-    # DataStorePrinter("ECLCluster", [
-    #     "getEnergy", "getTheta", "getPhi", "getR", "getErrorEnergy",
-    #     "getErrorTheta", "getErrorPhi", "getEnedepSum", "getTiming",
-    #     "getErrorTiming", "getE9oE25", "getHighestE", "getLAT",
-    #     "getNofCrystals", "getCrystHealth", "getMergedPi0", "getPx", "getPy",
-    #     "getPz", "getMomentum", "get4Vector", "getclusterPosition",
-    #     "getPosition", "getError4x4", "getError7x7", "getError3x3", "getisTrack",
-    #     "isNeutral", "getpi0Likelihood", "getetaLikelihood", "getdeltaL",
-    #     "getbeta",
-    # ], {
-    #     "getRelationsWith": ["MCParticles"],
-    # }),
+    DataStorePrinter("ECLCluster", [
+        "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
+        "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
+        "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
+        "getNumberOfCrystals", "getStatus", "getPx", "getPy",
+        "getPz", "getMomentum", "get4Vector", "getClusterPosition",
+        "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
+        "isNeutral", "getDeltaL"
+    ], {
+        "getRelationsWith": ["MCParticles"],
+    }),
     DataStorePrinter("KLMCluster", [
         "getTime", "getLayers", "getInnermostLayer",  # "getGlobalPosition", skipped because of strange return class
         "getClusterPosition", "getPosition", "getAssociatedEclClusterFlag",

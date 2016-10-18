@@ -2796,18 +2796,12 @@ void CDCGeometryPar::setDisplacement()
   for (const auto& disp : m_displacementFromDB) {
     const int iLayer = disp.getICLayer();
     const int iWire = disp.getIWire();
-    const float dxFwd = disp.getXFwd();
-    const float dyFwd = disp.getYFwd();
-    const float dzFwd = disp.getZFwd();
-    const float dxBwd = disp.getXBwd();
-    const float dyBwd = disp.getYBwd();
-    const float dzBwd = disp.getZBwd();
-    m_FWirPos[iLayer][iWire][0] += dxFwd;
-    m_FWirPos[iLayer][iWire][1] += dyFwd;
-    m_FWirPos[iLayer][iWire][2] += dzFwd;
-    m_BWirPos[iLayer][iWire][0] += dxBwd;
-    m_BWirPos[iLayer][iWire][1] += dyBwd;
-    m_BWirPos[iLayer][iWire][2] += dzBwd;
+    m_FWirPos[iLayer][iWire][0] += disp.getXFwd();
+    m_FWirPos[iLayer][iWire][1] += disp.getYFwd();
+    m_FWirPos[iLayer][iWire][2] += disp.getZFwd();
+    m_BWirPos[iLayer][iWire][0] += disp.getXBwd();
+    m_BWirPos[iLayer][iWire][1] += disp.getYBwd();
+    m_BWirPos[iLayer][iWire][2] += disp.getZBwd();
   }
 }
 #endif

@@ -242,12 +242,29 @@
       <u unit="mm">14.122</u><v unit="mm">71.133</v><w>above</w><woffset unit="mm">0.003</woffset>
       <u unit="mm">14.122</u><v unit="mm">80.093</v><w>above</w><woffset unit="mm">0.003</woffset>
     </Component>
+    <!-- Caps on the switcher balcony along the module -->
+    <Component type="Cap-Pair-DCC-S">
+      <u unit="mm">13.571</u><v unit="mm">25.533</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">36.413</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">42.492</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">47.293</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">58.173</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">64.252</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">68.317</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">77.053</v><w>above</w><woffset unit="mm">0.003</woffset>
+    </Component>
+    <Component type="Cap-Pair-DCC-Sx">
+      <u unit="mm">14.122</u><v unit="mm">31.370</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">53.130</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">73.930</v><w>above</w><woffset unit="mm">0.003</woffset>
+    </Component>
+    <Component type="Cap-DCC-S">
+      <u unit="mm">13.571</u><v unit="mm">82.508</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">13.571</u><v unit="mm">83.212</v><w>above</w><woffset unit="mm">0.003</woffset>
+    </Component>
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.731</v><w>above</w>
     </Component>
-    <!--<Component type="SwitchersLayer2">
-      <u unit="mm">14.189</u><v unit="mm">52.242</v><w>above</w><woffset unit="mm">0.003</woffset>
-    </Component>-->
   </Sensor>
 
   <!-- No we start defining components of the sensor by assigning a Material
@@ -334,17 +351,6 @@
       <u unit="mm"> 5.250</u><v unit="mm">-3.191</v>
     </Component>
   </Component>
-
- <!-- <Component name="SwitchersLayer2">
-    <Component type="Switcher">
-      <v unit="mm">-25.719</v>
-      <v unit="mm">-15.431</v>
-      <v unit="mm"> -5.144</v>
-      <v unit="mm">  5.144</v>
-      <v unit="mm"> 15.431</v>
-      <v unit="mm"> 25.719</v>
-    </Component>
-  </Component>-->
 
   <Component name="SwitcherGroovesLayer1">
     <height unit="mm"> 0.360</height>

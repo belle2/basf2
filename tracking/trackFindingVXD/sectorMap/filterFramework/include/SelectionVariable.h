@@ -12,9 +12,10 @@
 
 #include <string>
 #include <typeinfo>
-#include <boost/regex.hpp>
-#include <cxxabi.h>
-#include <stdlib.h>
+#include <TBranch.h>
+#include <TTree.h>
+
+//#include <stdlib.h>
 
 namespace Belle2 {
   /** Base class of the selection variable objects used for pair filtering

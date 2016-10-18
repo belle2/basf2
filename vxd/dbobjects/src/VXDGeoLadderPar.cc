@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/VXDGeometryPar.h>
+#include <vxd/dbobjects/VXDGeoLadderPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -18,9 +18,20 @@ using namespace std;
 
 
 
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDGeometryPar::read(const GearDir& content)
+void VXDGeoLadderPar::read(const GearDir& paramsLadder)
 {
+  m_layer = 0;
+  m_shift = paramsLadder.getLength("shift");
+  m_radius = paramsLadder.getLength("radius");
+  m_slantedAngle = paramsLadder.getAngle("slantedAngle", 0);
+  m_slantedRadius = paramsLadder.getLength("slantedRadius", 0);
+  m_glueOversize = paramsLadder.getLength("Glue/oversize", 0);
+  m_glueMaterial = paramsLadder.getString("Glue/Material", "");
 }
+
+
+
+
+

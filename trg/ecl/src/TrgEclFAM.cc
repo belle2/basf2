@@ -166,10 +166,10 @@ TrgEclFAM::getTCHit(int TableFlag)
 
   }
   */
-  std::vector< std::vector<float> > E_cell( 8736, std::vector<float>(80, 0.0) ); 
-  std::vector< std::vector<float> > T_ave( 8736, std::vector<float>(80, 0.0) );
-  std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0) );
-  std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0) );
+  std::vector< std::vector<float> > E_cell(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > T_ave(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > Tof_ave(8736, std::vector<float>(80, 0.0));
+  std::vector< std::vector<float> > beambkg_tag(8736, std::vector<float>(80, 0.0));
 
   int nBinTime = 80;
   TimeRange = 4000; // -4us ~ 4us
@@ -364,9 +364,9 @@ TrgEclFAM::digitization01(void)
   float* X_pr = new float [64];
   float* X_sr = new float [64];
   */
-  std::vector< std::vector<float> > noise_pileup( 576, std::vector<float>(64, 0.0));  // [GeV]
-  std::vector< std::vector<float> > noise_parallel( 576, std::vector<float>(64, 0.0));  // [GeV]
-  std::vector< std::vector<float> > noise_serial( 576, std::vector<float>(64, 0.0));  // [GeV]
+  std::vector< std::vector<float> > noise_pileup(576, std::vector<float>(64, 0.0));   // [GeV]
+  std::vector< std::vector<float> > noise_parallel(576, std::vector<float>(64, 0.0));   // [GeV]
+  std::vector< std::vector<float> > noise_serial(576, std::vector<float>(64, 0.0));   // [GeV]
   std::vector<float> X_pr(64, 0.0);
   std::vector<float> X_sr(64, 0.0);
 
@@ -559,13 +559,13 @@ TrgEclFAM::digitization01(void)
   //
   //
   //
-/*
-  delete [] X_pr;
-  delete [] X_sr;
-  delete [] noise_pileup;
-  delete [] noise_serial;
-  delete [] noise_parallel;
-*/
+  /*
+    delete [] X_pr;
+    delete [] X_sr;
+    delete [] noise_pileup;
+    delete [] noise_serial;
+    delete [] noise_parallel;
+  */
 
 
   return;
@@ -583,9 +583,9 @@ TrgEclFAM::digitization02(void)
   double fam_sampling_interval = 125; //@ [ns]
   int NSampling = 64;
 
-  std::vector< std::vector<double> > noise_pileup( 576, std::vector<double>(64, 0.0) );  // [GeV]
-  std::vector< std::vector<double> > noise_parallel( 576, std::vector<double>(64, 0.0) );  // [GeV]
-  std::vector< std::vector<double> > noise_serial( 576, std::vector<double>(64, 0.0) );  // [GeV]
+  std::vector< std::vector<double> > noise_pileup(576, std::vector<double>(64, 0.0));    // [GeV]
+  std::vector< std::vector<double> > noise_parallel(576, std::vector<double>(64, 0.0));    // [GeV]
+  std::vector< std::vector<double> > noise_serial(576, std::vector<double>(64, 0.0));    // [GeV]
   std::vector<double> X_pr(64, 0.0);
   std::vector<double> X_sr(64, 0.0);
   /*
@@ -840,8 +840,8 @@ TrgEclFAM::digitization03(void)
   int nbin_pedestal = 100;
   float fam_sampling_interval = 12; // [ns]
 
-  std::vector< std::vector<float> > TCDigiEnergy( 576, std::vector<float>(666, 0.0) );  // [GeV]
-  std::vector< std::vector<float> > TCDigiTiming( 576, std::vector<float>(666, 0.0) );  // [ns]
+  std::vector< std::vector<float> > TCDigiEnergy(576, std::vector<float>(666, 0.0));    // [GeV]
+  std::vector< std::vector<float> > TCDigiTiming(576, std::vector<float>(666, 0.0));    // [ns]
   /*
   float (*TCDigiEnergy)[666] = new  float [576][666];  // [GeV]
   float (*TCDigiTiming)[666] = new float [576][666];  // [ns]
@@ -1021,7 +1021,6 @@ TrgEclFAM::save(int m_nEvent)
       }
       if (noutput[iTCIdm] != ninput[iTCIdm]) {continue;}
       StoreArray<TRGECLDigi> TCDigiArray;
-      if (!TCDigiArray) TCDigiArray.create();
       TCDigiArray.appendNew();
       m_hitNum = TCDigiArray.getEntries() - 1;
       TCDigiArray[m_hitNum]->setEventId(m_nEvent);
@@ -1044,7 +1043,6 @@ TrgEclFAM::save(int m_nEvent)
     for (int iBinTime = 0; iBinTime < 80; iBinTime++) {
       if (TCEnergy[iTCIdm][iBinTime] < 0.001) {continue;}
       StoreArray<TRGECLDigi0> TCDigiArray;
-      if (!TCDigiArray) TCDigiArray.create();
       TCDigiArray.appendNew();
       m_hitNum = TCDigiArray.getEntries() - 1;
 
@@ -1089,7 +1087,6 @@ TrgEclFAM::save(int m_nEvent)
 
 
       StoreArray<TRGECLHit> TrgEclHitArray;
-      if (!TrgEclHitArray) TrgEclHitArray.create();
 
       TrgEclHitArray.appendNew();
       m_hitNum = TrgEclHitArray.getEntries() - 1;

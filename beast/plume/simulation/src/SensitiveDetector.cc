@@ -183,7 +183,6 @@ namespace Belle2 {
 
         if (current_energyDep > CLHEP::eV) {
 
-          if (!simHits.isValid()) simHits.create();
           RelationArray relMCSimHit(mcParticles, simHits);
           PlumeSimHit* hit = simHits.appendNew(
                                current_pdgID,

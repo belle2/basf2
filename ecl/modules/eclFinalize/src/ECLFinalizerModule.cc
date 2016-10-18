@@ -108,7 +108,6 @@ void ECLFinalizerModule::event()
         and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
 
       // create an mdst cluster for each ecl shower
-      if (!eclClusters) eclClusters.create();
       const auto eclCluster = eclClusters.appendNew();
 
       // set all variables

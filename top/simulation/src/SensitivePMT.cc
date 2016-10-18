@@ -115,7 +115,6 @@ namespace Belle2 {
       // write to store arrays; add relations
 
       StoreArray<TOPSimHit> simHits;
-      if (!simHits.isValid()) simHits.create();
       TOPSimHit* simHit = simHits.appendNew(moduleID, pmtID, xLocal, yLocal,
                                             detTime, energy);
 
@@ -126,7 +125,6 @@ namespace Belle2 {
       relParticleHit.add(parentID, simHit->getArrayIndex());
 
       StoreArray<TOPSimPhoton> simPhotons;
-      if (!simPhotons.isValid()) simPhotons.create();
       const auto* geo = m_topgp->getGeometry();
       if (geo->isModuleIDValid(moduleID)) {
         // transform to local frame

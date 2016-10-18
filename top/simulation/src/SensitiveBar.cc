@@ -140,7 +140,6 @@ namespace Belle2 {
 
       // write the hit to datastore
       StoreArray<TOPBarHit> barHits;
-      if (!barHits.isValid()) barHits.create();
       TOPBarHit* hit = barHits.appendNew(moduleID, PDG, TOrigin, TPosition, TMomentum,
                                          globalTime, tracklength);
 

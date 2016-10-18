@@ -395,7 +395,6 @@ void MCMatcherTRGECLModule::event()
 
     if (TCRawEnergy[ii] < 0.1) {continue;}
     StoreArray<TRGECLDigi0MC> TCDigiArray;
-    if (!TCDigiArray) TCDigiArray.create();
     new(TCDigiArray.appendNew()) TRGECLDigi0MC();
     m_hitNum = TCDigiArray.getEntries() - 1;
 
@@ -506,7 +505,6 @@ void MCMatcherTRGECLModule::event()
   for (int ii = 0; ii < trgeclHitArray.getEntries(); ii++) {
 
     StoreArray<TRGECLHitMC> TCHitArray;
-    if (!TCHitArray) TCHitArray.create();
     new(TCHitArray.appendNew()) TRGECLHitMC();
     m_hitNum = TCHitArray.getEntries() - 1;
 

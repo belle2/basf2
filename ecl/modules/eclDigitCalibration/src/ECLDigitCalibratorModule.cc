@@ -143,7 +143,6 @@ void ECLDigitCalibratorModule::event()
   for (auto& aECLDigit : eclDigits) {
 
     // create eclCalDigits if they dont exist already
-    if (!eclCalDigits) eclCalDigits.create();
 
     // append an ECLCalDigit to the storearray
     const auto aECLCalDigit = eclCalDigits.appendNew();

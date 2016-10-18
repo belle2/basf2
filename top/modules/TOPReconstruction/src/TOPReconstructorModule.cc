@@ -160,10 +160,8 @@ namespace Belle2 {
     // output: log likelihoods
 
     StoreArray<TOPLikelihood> likelihoods;
-    likelihoods.create();
 
     StoreArray<TOPPull> topPulls;
-    topPulls.create();
 
     // create reconstruction object
 

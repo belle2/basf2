@@ -248,7 +248,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
 
     // Create a shower.
-    if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();
 
     // Add relation to the CR.
@@ -560,7 +559,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       const int posLM = m_StoreArrPositionLM[locmaxcellid];
 
       // Create a shower
-      if (!m_eclShowers) m_eclShowers.create();
       const auto aECLShower = m_eclShowers.appendNew();
 
       // Use the same method for the estimate (3x3).

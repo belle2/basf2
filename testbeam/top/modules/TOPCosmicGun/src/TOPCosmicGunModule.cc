@@ -290,7 +290,6 @@ namespace Belle2 {
 
     // create MCParticles data store
     StoreArray<MCParticle> MCParticles;
-    MCParticles.create();
 
     // store generated muon
     MCParticle* part = MCParticles.appendNew();

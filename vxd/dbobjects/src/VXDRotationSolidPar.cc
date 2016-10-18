@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/SVDSupportPar.h>
+#include <vxd/dbobjects/VXDRotationSolidPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -16,25 +16,26 @@
 using namespace Belle2;
 using namespace std;
 
-
-
-// Get VXD geometry parameters from Gearbox (no calculations here)
+// Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void SVDSupportPar::read(const GearDir& support)
+void VXDRotationSolidPar::read(const GearDir& params)
 {
+  m_name = params.getString("Name", "DUMMY");
+  m_material = params.getString("Material", "Air");
+  m_color = params.getString("Color");
 
-}
+  m_minPhi = params.getAngle("minPhi", 0);
+  m_maxPhi = params.getAngle("maxPhi", 2 * M_PI);
 
-
-// Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-void SVDHalfShellPar::read(const GearDir& support)
-{
-  for (const GearDir& rotationsolid : support.getNodes("RotationSolid")) {
-    m_rotationSolid.push_back(VXDRotationSolidPar(rotationsolid));
+  for (const GearDir point : params.getNodes("InnerPoints/point")) {
+    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+    m_innerPoints.push_back(ZXPoint);
+  }
+  for (const GearDir point : params.getNodes("OuterPoints/point")) {
+    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
+    m_outerPoints.push_back(ZXPoint);
   }
 }
-
 
 
 

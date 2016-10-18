@@ -9,21 +9,42 @@
  **************************************************************************/
 #pragma once
 
-#include <vxd/dbobjects/VXDRotationSolidPar.h>
+
+#include <TObject.h>
+#include <string>
+#include <list>
+#include <vector>
+
 
 namespace Belle2 {
 
   class GearDir;
 
+
   /**
   * The Class for VXD Envelope parameters
   */
-  class VXDEnvelopePar: public VXDRotationSolidPar {
+  class VXDRotationSolidPar: public TObject {
   public:
+    //! Default constructor
+    VXDRotationSolidPar() {}
     //! Constructor using Gearbox
-    explicit VXDEnvelopePar(const GearDir& content) : VXDRotationSolidPar(content) { }
+    explicit VXDRotationSolidPar(const GearDir& content) { read(content); }
+    //! Destructor
+    ~VXDRotationSolidPar() {}
+    //! Get geometry parameters from Gearbox
+    void read(const GearDir&);
   private:
-    ClassDef(VXDEnvelopePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    std::string m_name;
+    std::string m_material;
+    std::string m_color;
+    //! List of points in the ZX plane
+    std::list< std::pair<double, double> > m_innerPoints;
+    std::list< std::pair<double, double> > m_outerPoints;
+    double m_minPhi;
+    double m_maxPhi;
+
+    ClassDef(VXDRotationSolidPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
 } // end of namespace Belle2

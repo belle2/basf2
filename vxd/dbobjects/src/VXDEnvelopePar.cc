@@ -18,20 +18,11 @@ using namespace std;
 
 // Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
 void VXDEnvelopePar::read(const GearDir& params)
 {
-  m_minPhi = params.getAngle("minPhi", 0);
-  m_maxPhi = params.getAngle("maxPhi", 2 * M_PI);
-
-  for (const GearDir point : params.getNodes("InnerPoints/point")) {
-    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
-    m_innerPoints.push_back(ZXPoint);
-  }
-  for (const GearDir point : params.getNodes("OuterPoints/point")) {
-    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
-    m_outerPoints.push_back(ZXPoint);
-  }
+   m_shields.push_back(VXDPolyConePar(shield));
 }
-
+*/
 
 

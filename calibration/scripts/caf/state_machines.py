@@ -732,6 +732,8 @@ class AlgorithmMachine(Machine):
 
         self.add_transition("setup_algorithm", "init", "ready",
                             before=[self._setup_database_chain,
+                                    self._setup_logging,
+                                    self._get_input_data,
                                     self._pre_algorithm,
                                     self._calc_highest_exprun])
         self.add_transition("execute_iov", "ready", "running_algorithm",
@@ -744,19 +746,24 @@ class AlgorithmMachine(Machine):
         self.add_transition("not_enough_data", "running_algorithm", "notenoughdata_iov")
 
         self.add_transition("setup_algorithm", "success_iov", "ready",
-                            before=AlgorithmMachine.clear_vec_iov)
+                            before=[AlgorithmMachine.clear_vec_iov,
+                                    self._pre_algorithm])
         self.add_transition("setup_algorithm", "failed_iov", "ready",
-                            before=AlgorithmMachine.clear_vec_iov)
+                            before=[AlgorithmMachine.clear_vec_iov,
+                                    self._pre_algorithm])
         self.add_transition("setup_algorithm", "iterate_iov", "ready",
-                            before=AlgorithmMachine.clear_vec_iov)
+                            before=[AlgorithmMachine.clear_vec_iov,
+                                    self._pre_algorithm])
         self.add_transition("merge_next_iov", "notenoughdata_iov", "ready",
                             conditions=self._iov_remain,
-                            before=self._log_mergenext_attempt)
+                            before=[self._log_mergenext_attempt,
+                                    self._pre_algorithm])
         self.add_transition("merge_previous_iov", "notenoughdata_iov", "ready",
                             conditions=[self._all_iov_executed,
                                         self._previous_success_exists],
                             before=[self._log_mergeprev_attempt,
-                                    self._merge_with_previous])
+                                    self._merge_with_previous,
+                                    self._pre_algorithm])
         self.add_transition("fail", "notenoughdata_iov", "failed")
 
         self.add_transition("complete", "success_iov", "completed_all_iov",
@@ -792,6 +799,8 @@ class AlgorithmMachine(Machine):
     def _calc_highest_exprun(self):
         """
         """
+        #: Update all IoVs in collected input data now that we have grabbed it
+        self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
         last_exprun_pair = self.all_iov.back()
         self.highest_exprun = (last_exprun_pair.first, last_exprun_pair.second)
 
@@ -857,9 +866,8 @@ class AlgorithmMachine(Machine):
         # add local database to save payloads
         use_local_database(os.path.abspath("outputdb/database.txt"), os.path.abspath('outputdb'), False, LogLevel.INFO)
 
-    def _pre_algorithm(self):
+    def _setup_logging(self):
         """
-        Call the data input function and algorithm setup function to do some setup
         """
         logging.reset()
         set_log_level(LogLevel.INFO)
@@ -867,14 +875,17 @@ class AlgorithmMachine(Machine):
         # add logfile for output
         logging.add_file(self.name+'_b2log')
 
+    def _get_input_data(self):
         self.algorithm.data_input()
+
+    def _pre_algorithm(self, **kwargs):
+        """
+        Call the data input function and algorithm setup function to do some setup
+        """
         if self.algorithm.pre_algorithm:
             # We have to re-pass in the algorithm here because an outside user has created this method.
             # So the method isn't bound to the instance properly.
             self.algorithm.pre_algorithm(self.algorithm.algorithm, self.iteration)
-
-        #: Update all IoVs in collected input data now that we have grabbed it
-        self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
 
     def _execute_over_iov(self, **kwargs):
         """

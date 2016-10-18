@@ -39,9 +39,6 @@ namespace {
       evtPtr.create();
       evtPtr->setEvent(42);
 
-      evtDataDifferentName.create(); //StoreArrays can be explicitly created (can also be omitted)
-      evtDataDifferentDurability.create();
-      profileInfo.create();
 
       ProfileInfo profileInfoObject(128, 64, 60.0);
       for (int i = 0; i < 10; ++i) {
@@ -489,9 +486,6 @@ namespace {
     //accessing unregistered things doesn't work.
     StoreArray<EventMetaData> someothernewname("someothernewname");
     EXPECT_FALSE(someothernewname.isValid());
-    //usually one shouldn't call StoreArray::create(), but everything like appendNew() would crash
-    EXPECT_B2ERROR(EXPECT_FALSE(someothernewname.create()));
-    EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
   }
 
   TEST_F(DataStoreTest, ConstructedBeforeInitializeButWithNonDefaultName)

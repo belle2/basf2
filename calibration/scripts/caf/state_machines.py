@@ -572,7 +572,6 @@ class CalibrationMachine(Machine):
             child.join()
             # Get the return codes of the algorithm for the IoVs found by the Process
             self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
-        print(self._algorithm_results)
 
     @staticmethod
     def _run_algorithm_over_data(machine, child_conn):

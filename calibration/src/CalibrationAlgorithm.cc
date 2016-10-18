@@ -9,7 +9,7 @@ const std::string CalibrationAlgorithm::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector< Belle2::CalibrationAlgorithm::ExpRun > runs, int iteration)
 {
   // Check if we started a new iteration and clear old data
-  if (m_iteration > 0 and m_iteration != iteration) {
+  if (m_iteration != iteration) {
     m_payloads.clear();
     m_iteration = iteration;
   }

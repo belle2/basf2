@@ -15,6 +15,7 @@ class Test_Machine(TestCase):
     def setUp(self):
         """
         """
+        #: Machine for testing
         self.m = Machine()
         self.m.add_state("standing")
         self.m.add_state("walking")

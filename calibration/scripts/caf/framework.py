@@ -518,6 +518,7 @@ class CAF():
         one that is stored isn't a valid Backend object) we should create a default Local backend.
         """
         if not isinstance(self._backend, caf.backends.Backend):
+            #: backend property
             self.backend = caf.backends.Local()
         if isinstance(self._backend, caf.backends.Local):
             self._algorithm_backend = self.backend

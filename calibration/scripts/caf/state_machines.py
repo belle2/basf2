@@ -33,8 +33,14 @@ class State():
     """
 
     def __init__(self, name, enter=None, exit=None):
+        """
+        Initialise State with a name and optional lists of callbacks
+        """
+        #: Name of the State
         self.name = name
+        #: Callback list when entering state
         self.on_enter = enter
+        #: Callback list when exiting state
         self.on_exit = exit
 
     @property
@@ -93,18 +99,26 @@ class State():
                     B2ERROR("Something other than a function (callable) passed into State {0}.".format(self.name))
 
     def __str__(self):
+        """
+        """
         return self.name
 
     def __repr__(self):
+        """
+        """
         return "State(name={0})".format(self.name)
 
     def __eq__(self, other):
+        """
+        """
         if isinstance(other, str):
             return self.name == other
         else:
             return self.name == other.name
 
     def __hash__(self):
+        """
+        """
         return hash(self.name)
 
 
@@ -135,17 +149,22 @@ class Machine():
         """
         Basic Setup of states and initial_state
         """
+        #: Valid states for this machine
         self.states = {}
         if states:
             for state in states:
                 self.add_state(state)
         if initial_state != "default_initial":
+            #: Initial state (property) for this machine
             self.initial_state = initial_state
         else:
             self.add_state(initial_state)
+            #: Initial state (private) for this machine
             self._initial_state = State(initial_state)
 
+        #: Current state (private)
         self._state = self.initial_state
+        #: Allowe transitions between states
         self.transitions = defaultdict(list)
 
     def add_state(self, state, enter=None, exit=None):
@@ -165,18 +184,25 @@ class Machine():
 
     @property
     def initial_state(self):
+        """
+        """
         return self._initial_state
 
     @initial_state.setter
     def initial_state(self, state):
+        """
+        """
         if state in self.states.keys():
             self._initial_state = self.states[state]
+            #: Current state (private)
             self._state = self.states[state]
         else:
             raise KeyError("Attempted to set state to '{0}' which is not in the 'states' attribute!".format(state))
 
     @property
     def state(self):
+        """
+        """
         return self._state
 
     @state.setter
@@ -279,6 +305,7 @@ class Machine():
         if all(map(lambda condition: self._callback(condition, **kwargs), conditions)):
             for before_func in before_callbacks:
                 self._callback(before_func, **kwargs)
+            #: Current State of machine
             self.state = dest
             for after_func in after_callbacks:
                 self._callback(after_func, **kwargs)
@@ -294,6 +321,9 @@ class Machine():
         return func(**kwargs)
 
     def get_transitions(self, source):
+        """
+        Returns allowed transitions from a given state
+        """
         possible_transitions = []
         for transition, transition_dicts in self.transitions.items():
             for transition_dict in transition_dicts:
@@ -302,6 +332,9 @@ class Machine():
         return possible_transitions
 
     def get_transition_dict(self, state, transition):
+        """
+        Returns the transition dictionary for a state and transition out of it
+        """
         transition_dicts = self.transitions[transition]
         for transition_dict in transition_dicts:
             if transition_dict["source"] == state:
@@ -310,6 +343,9 @@ class Machine():
             raise KeyError("No transition from state {0} with the name {1}".format(state, transition))
 
     def save_graph(self, filename, graphname):
+        """
+        Does a simple dot file creation to visualise states and transiitons
+        """
         with open(filename, "w") as dotfile:
             dotfile.write("digraph "+graphname+" {\n")
             for state in self.states.keys():
@@ -331,6 +367,7 @@ class CalibrationMachine(Machine):
         Takes a Calibration object from the caf framework and lets you
         set the initial state
         """
+        #: States that are defaults to the CalibrationMachine (could override later)
         self.default_states = [State("init"),
                                State("running_collector", enter=self._log_new_state),
                                State("collector_failed", enter=self._log_new_state),
@@ -384,25 +421,39 @@ class CalibrationMachine(Machine):
                             before=self._prepare_final_db)
 
     def _below_max_iterations(self):
+        """
+        """
         return self.iteration < self.max_iterations
 
     def _increment_iteration(self):
+        """
+        """
         self.iteration += 1
 
     def _any_failed_iov(self):
+        """
+        """
         iteration_results = self._algorithm_results[self.iteration]
         return False
 
     def _post_process_collector(self):
+        """
+        """
         self._collector_result.post_process()
 
     def _collector_ready(self):
+        """
+        """
         return self._collector_result.ready()
 
     def _submit_collector(self):
+        """
+        """
         self._collector_result = self.collector_backend.submit(self._collector_job)
 
     def _no_require_iteration(self):
+        """
+        """
         if self._require_iteration() and self._below_max_iterations():
             return False
         elif self._require_iteration() and not self._below_max_iterations():
@@ -412,6 +463,8 @@ class CalibrationMachine(Machine):
             return True
 
     def _require_iteration(self):
+        """
+        """
         iteration_called = False
         for alg_name, results in self._algorithm_results[self.iteration].items():
             for result in results:
@@ -432,10 +485,14 @@ class CalibrationMachine(Machine):
             config.read(config_file_path)
         else:
             B2FATAL("Tried to find the default CAF config file but it wasn't there. Is basf2 set up?")
+        #: Default max number of iterations
         self.default_max_iterations = decode_json_string(config['CAF_DEFAULTS']['MaxIterations'])
+        #: Default location of the generic collector steering file
         self.default_collector_steering_file_path = ROOT.Belle2.FileSystem.findFile('calibration/scripts/caf/run_collector_path.py')
 
     def _log_new_state(self, **kwargs):
+        """
+        """
         B2INFO("Calibration {0} moved to state {1}".format(self.calibration.name, kwargs["new_state"].name))
 
     def dependencies_completed(self):
@@ -450,6 +507,9 @@ class CalibrationMachine(Machine):
             return True
 
     def automatic_transition(self):
+        """
+        Automatically try all transitions out of this state once. Tries fail last.
+        """
         possible_transitions = self.get_transitions(self.state)
         for transition in possible_transitions:
             try:
@@ -465,6 +525,8 @@ class CalibrationMachine(Machine):
                 raise RunnerError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
     def _make_output_dir(self):
+        """
+        """
         try:
             os.mkdir(self.calibration.name)
         except FileExistsError:
@@ -575,6 +637,11 @@ class CalibrationMachine(Machine):
 
     @staticmethod
     def _run_algorithm_over_data(machine, child_conn):
+        """
+        Runs a single AlgorithmMachine inside a subprocess over the IoV vector from the
+        input data. Should produce the best constants requested and create a list of results
+        to send out.
+        """
         machine.setup_algorithm()
 
         iov_to_execute = ROOT.vector("std::pair<int,int>")()
@@ -616,6 +683,9 @@ class CalibrationMachine(Machine):
         child_conn.send(machine.results)
 
     def _prepare_final_db(self):
+        """
+        Take the last iteration's outputdb and copy it to a more easily findable place.
+        """
         database_location = os.path.join(self.calibration.name,
                                          str(self.iteration), 'output', 'outputdb')
         final_database_location = os.path.join(self.calibration.name, 'outputdb')
@@ -631,6 +701,7 @@ class AlgorithmMachine(Machine):
         """
         Takes an Algorithm object from the caf framework and defines the transitions.
         """
+        #: Default states for the AlgorithmMachine
         self.default_states = [State("init"),
                                State("ready"),
                                State("running_algorithm"),
@@ -648,7 +719,7 @@ class AlgorithmMachine(Machine):
         self.algorithm = algorithm
         #: Calibration object that we take the algorithm from
         self.cal_machine = cal_machine
-        # Get a nicer version of the algorithm name
+        #: Get a nicer version of the algorithm name
         self.name = algorithm.algorithm.Class_Name().replace('Belle2::', '')
         #: Which iteration step are we in
         self.iteration = self.cal_machine.iteration
@@ -697,44 +768,67 @@ class AlgorithmMachine(Machine):
         self.add_transition("finish", "completed_all_iov", "finished")
 
     def _merge_with_previous(self, **kwargs):
+        """
+        Take an empty vector of IoV and merge the previous run IoV and merge with the
+        last IoV.
+        """
         for iov in self.previous_iov:
             kwargs["merged_iov"].push_back(iov)
         for iov in kwargs["final_iov"]:
             kwargs["merged_iov"].push_back(iov)
 
     def _set_previous_iov(self, **kwargs):
+        """
+        """
         self.previous_iov = ROOT.vector("std::pair<int,int>")()
         for iov in kwargs["successful_iov"]:
             self.previous_iov.push_back(iov)
 
     def _previous_success_exists(self, **kwargs):
+        """
+        """
         return self.previous_iov.size() > 0
 
     def _calc_highest_exprun(self):
+        """
+        """
         last_exprun_pair = self.all_iov.back()
         self.highest_exprun = (last_exprun_pair.first, last_exprun_pair.second)
 
     def _log_mergenext_attempt(self, **kwargs):
+        """
+        """
         last_result = self.results[-1]
         B2INFO("Not enough data in "+str(last_result.iov)+". Attempting to merge with next IoV")
 
     def _log_mergeprev_attempt(self, **kwargs):
+        """
+        """
         last_result = self.results[-1]
         B2INFO("Not enough data in "+str(last_result.iov)+" and no more IoVs left to merge with."
                " Attempting to merge with previous "+str(self.results[-2]))
 
     @staticmethod
     def clear_vec_iov(**kwargs):
+        """
+        """
         kwargs["vec_iovs"].clear()
 
     def _iov_remain(self):
+        """
+        """
         return not self._all_iov_executed()
 
     def _all_iov_executed(self, **kwargs):
+        """
+        """
         last_iov = self.results[-1].iov
         return self.highest_exprun == (last_iov.exp_high, last_iov.run_high)
 
     def _setup_database_chain(self):
+        """
+        Apply all databases in the correct order
+        """
         os.chdir(self.cal_machine._collector_job.output_dir)
         # Clean everything out just in case
         reset_database()
@@ -764,6 +858,9 @@ class AlgorithmMachine(Machine):
         use_local_database(os.path.abspath("outputdb/database.txt"), os.path.abspath('outputdb'), False, LogLevel.INFO)
 
     def _pre_algorithm(self):
+        """
+        Call the data input function and algorithm setup function to do some setup
+        """
         logging.reset()
         set_log_level(LogLevel.INFO)
 
@@ -780,6 +877,9 @@ class AlgorithmMachine(Machine):
         self.all_iov = self.algorithm.algorithm.getRunListFromAllData()
 
     def _execute_over_iov(self, **kwargs):
+        """
+        Does the actual execute of the algorithm on an IoV and records the result
+        """
         B2INFO("Running {0} in working directory {1}".format(self.name, os.getcwd()))
 
         vec_iov_to_execute = kwargs["vec_iov"]
@@ -801,11 +901,16 @@ class CalibrationRunner(Thread):
     """
 
     def __init__(self, machine, heartbeat=None):
+        """
+        """
         super().__init__()
+        #: The CalibrationMachine that we will run
         self.machine = machine
+        #: Allowed transitions that we will use to progress
         self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
         self.setup_defaults()
         if heartbeat:
+            #: Heartbeat of the monitoring
             self.heartbeat = heartbeat
 
     def run(self):

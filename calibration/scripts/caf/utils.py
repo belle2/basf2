@@ -21,9 +21,13 @@ class AlgResult(enum.Enum):
     over the direct CalibrationAlgorithm members but it's nice to have
     something pythonic ready to go.
     """
+    #: OK Return code
     ok = CalibrationAlgorithm.c_OK
+    #: not enought data Return code
     not_enough_data = CalibrationAlgorithm.c_NotEnoughData
+    #: iteration required Return code
     iterate = CalibrationAlgorithm.c_Iterate
+    #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
 IoV = namedtuple('IoV', ['exp_low', 'run_low', 'exp_high', 'run_high'])

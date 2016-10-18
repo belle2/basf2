@@ -104,7 +104,9 @@ class Local(Backend):
             Pass in the job object and the multiprocessing result to allow the result to do monitoring and perform
             post processing of the job.
             """
+            #: The job object for this result
             self.job = job
+            #: The underlying result from the backend
             self.result = result
 
         def ready(self):
@@ -235,16 +237,24 @@ class PBS(Backend):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
+    #: Working directory directive
     cmd_wkdir = "#PBS -d"
+    #: stdout file directive
     cmd_stdout = "#PBS -o"
+    #: stderr file directive
     cmd_stderr = "#PBS -e"
+    #: Walltime directive
     cmd_walltime = "#PBS -l walltime="
+    #: Queue directive
     cmd_queue = "#PBS -q"
+    #: Job name directive
     cmd_name = "#PBS -N"
 
+    #: default location of config file
     default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    #: default PBS section name in config file
     default_config_section = "PBS"
-
+    #: required entries in config section
     required_config = ["Queue", "Release", "Tools"]
 
     def __init__(self, config_file_path="", section=""):
@@ -346,7 +356,9 @@ class PBS(Backend):
             Pass in the job object and the job id to allow the result to do monitoring and perform
             post processing of the job.
             """
+            #: Job object
             self.job = job
+            #: Job ID from backend
             self.job_id = job_id
 
         def ready(self):
@@ -451,15 +463,22 @@ class LSF(Backend):
     """
     Backend for submitting calibration processes to a qsub batch system
     """
+    #: Working directory directive
     cmd_wkdir = "#BSUB -cwd"
+    #: stdout file directive
     cmd_stdout = "#BSUB -o"
+    #: stderr file directive
     cmd_stderr = "#BSUB -e"
+    #: Queue directive
     cmd_queue = "#BSUB -q"
+    #: Job name directive
     cmd_name = "#BSUB -J"
 
+    #: default configuration file location
     default_config_file = ROOT.Belle2.FileSystem.findFile('calibration/data/caf.cfg')
+    #: default configuration section for LSF
     default_config_section = "LSF"
-
+    #: Required configuration keys
     required_config = ["Queue", "Release"]
 
     def __init__(self, config_file_path="", section=""):
@@ -561,7 +580,9 @@ class LSF(Backend):
             Pass in the job object and the job id to allow the result to do monitoring and perform
             post processing of the job.
             """
+            #: Job object for result
             self.job = job
+            #: job id given by LSF
             self.job_id = job_id
 
         def ready(self):

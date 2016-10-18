@@ -369,16 +369,25 @@ class CalibrationMachine(Machine):
                             conditions=self._collector_ready,
                             before=self._post_process_collector)
         self.add_transition("run_algorithms", "collector_completed", "running_algorithms",
-                            before=self._run_algorithms,
-                            after=self.automatic_transition)
+                            after=[self._run_algorithms,
+                                   self.automatic_transition])
         self.add_transition("complete", "running_algorithms", "algorithms_completed",
                             after=self.automatic_transition)
         self.add_transition("fail", "running_algorithms", "algorithms_failed",
                             conditions=self._any_failed_iov)
         self.add_transition("iterate", "algorithms_completed", "init",
-                            conditions=self._require_iteration)
+                            conditions=[self._require_iteration,
+                                        self._below_max_iterations],
+                            after=self._increment_iteration)
         self.add_transition("finish", "algorithms_completed", "completed",
+                            conditions=self._no_require_iteration,
                             before=self._prepare_final_db)
+
+    def _below_max_iterations(self):
+        return self.iteration < self.max_iterations
+
+    def _increment_iteration(self):
+        self.iteration += 1
 
     def _any_failed_iov(self):
         iteration_results = self._algorithm_results[self.iteration]
@@ -393,6 +402,15 @@ class CalibrationMachine(Machine):
     def _submit_collector(self):
         self._collector_result = self.collector_backend.submit(self._collector_job)
 
+    def _no_require_iteration(self):
+        if self._require_iteration() and self._below_max_iterations():
+            return False
+        elif self._require_iteration() and not self._below_max_iterations():
+            B2INFO("Reached maximum number of iterations ({0}), will complete now.".format(self.max_iterations))
+            return True
+        elif not self._require_iteration():
+            return True
+
     def _require_iteration(self):
         iteration_called = False
         for alg_name, results in self._algorithm_results[self.iteration].items():
@@ -402,7 +420,7 @@ class CalibrationMachine(Machine):
                     break
             if iteration_called:
                 break
-        return False
+        return iteration_called
 
     def setup_defaults(self):
         """
@@ -447,7 +465,10 @@ class CalibrationMachine(Machine):
                 raise RunnerError(("Failed to automatically transition out of {0} state.".format(self.state)))
 
     def _make_output_dir(self):
-        os.mkdir(self.calibration.name)
+        try:
+            os.mkdir(self.calibration.name)
+        except FileExistsError:
+            pass
 
     def _make_collector_path(self):
         """
@@ -538,20 +559,23 @@ class CalibrationMachine(Machine):
         """
         # prepare a multiprocessing context which uses fork
         ctx = multiprocessing.get_context("fork")
+        parent_conn, child_conn = multiprocessing.Pipe()
+
         self._algorithm_results[self.iteration] = {}
 
         for algorithm in self.calibration.algorithms:
             machine = AlgorithmMachine(algorithm, self)
             child = ctx.Process(target=CalibrationMachine._run_algorithm_over_data,
-                                args=(machine,))
+                                args=(machine, child_conn))
             child.start()
             # wait for it to finish
             child.join()
             # Get the return codes of the algorithm for the IoVs found by the Process
-            self._algorithm_results[self.iteration][machine.name] = machine.results
+            self._algorithm_results[self.iteration][machine.name] = parent_conn.recv()
+        print(self._algorithm_results)
 
     @staticmethod
-    def _run_algorithm_over_data(machine):
+    def _run_algorithm_over_data(machine, child_conn):
         machine.setup_algorithm()
 
         iov_to_execute = ROOT.vector("std::pair<int,int>")()
@@ -587,6 +611,7 @@ class CalibrationMachine(Machine):
 
         # Commit all the payloads and send out the results
         machine.algorithm.algorithm.commit()
+        child_conn.send(machine.results)
 
     def _prepare_final_db(self):
         database_location = os.path.join(self.calibration.name,
@@ -719,8 +744,10 @@ class AlgorithmMachine(Machine):
 
         # Here we add the previous iteration's database
         if self.iteration > 0:
-            use_local_database(os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb/database.txt')),
-                               os.path.abspath(os.path.join("../../", str(iteration-1), 'output/outputdb')), True, LogLevel.INFO)
+            use_local_database(os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb/database.txt')),
+                               os.path.abspath(os.path.join("../../", str(self.iteration-1), 'output/outputdb')),
+                               True,
+                               LogLevel.INFO)
 
         # Create a directory to store the payloads of this algorithm
         os.mkdir('outputdb')
@@ -767,7 +794,7 @@ class CalibrationRunner(Thread):
     def __init__(self, machine, heartbeat=None):
         super().__init__()
         self.machine = machine
-        self.moves = ["submit_collector", "complete", "run_algorithms"]
+        self.moves = ["submit_collector", "complete", "run_algorithms", "iterate"]
         self.setup_defaults()
         if heartbeat:
             self.heartbeat = heartbeat

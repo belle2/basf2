@@ -30,7 +30,10 @@ namespace Belle2 {
     /** Fork and initialize worker processes. */
     void startWorkerProcesses();
     /** There is no real output process, but marks current process as output. */
+    /** Fork and initialize an output process. */
     void startOutputProcess();
+    /** There is no real monitoring process, but marks current process as monitoring. */
+    void setAsMonitoringProcess();
 
     /** Wait until all forked processes handled by this ProcHandler terminate.
      *
@@ -48,7 +51,8 @@ namespace Belle2 {
     static bool isWorkerProcess();
     /** Return true if the process is an output process */
     static bool isOutputProcess();
-
+    /** Return true if the process is a manitoring process */
+    static bool isMonitoringProcess();
 
     /** Return number of worker processes (configured value, not current) */
     static int numEventProcesses();

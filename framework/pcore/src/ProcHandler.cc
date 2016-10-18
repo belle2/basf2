@@ -216,15 +216,21 @@ void ProcHandler::startOutputProcess()
 {
   if (s_processID == -1)
     s_processID = 20000;
+  // this was removed in master ...
+  //startProc(&m_processList, "output", 20000);
+}
+
+void ProcHandler::setAsMonitoringProcess()
+{
+  s_processID = 30000;
 }
 
 bool ProcHandler::parallelProcessingUsed() { return s_processID != -1; }
 
 bool ProcHandler::isInputProcess() { return (s_processID >= 10000 and s_processID < 20000); }
-
 bool ProcHandler::isWorkerProcess() { return (parallelProcessingUsed() and s_processID < 10000); }
-
-bool ProcHandler::isOutputProcess() { return s_processID >= 20000; }
+bool ProcHandler::isOutputProcess() { return s_processID >= 20000 and s_processID < 30000; }
+bool ProcHandler::isMonitoringProcess() { return s_processID >= 30000; }
 
 int ProcHandler::numEventProcesses()
 {
@@ -250,6 +256,8 @@ std::string ProcHandler::getProcessName()
     return "input";
   if (isOutputProcess())
     return "output";
+  if (isMonitoringProcess())
+    return "monitoring";
 
   //shouldn't happen
   return "???";

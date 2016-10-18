@@ -18,7 +18,6 @@
 namespace Belle2 {
 
   class ProcHandler;
-  class RingBuffer;
 
   /**
     This class provides the core event processing loop for parallel processing.
@@ -66,11 +65,8 @@ namespace Belle2 {
     /** Adds internal modules to paths, prepare RingBuffers. */
     void preparePaths();
 
-    /** Create RingBuffer with name from given environment variable, add Tx and Rx modules to a and b. */
-    RingBuffer* connectViaRingBuffer(const char* name, PathPtr a, PathPtr& b);
-
-    /** Dump module names in the ModulePtrList */
-    void dump_modules(const std::string, const ModulePtrList);
+    void appendModule(PathPtr& modules, ModulePtr module);
+    void prependModule(PathPtr& modules, ModulePtr module);
 
     /** TFiles are stored in a global list and cleaned up by root
      * since this will happen in all forked processes, these will be corrupted if we don't clean the list!
@@ -97,14 +93,16 @@ namespace Belle2 {
     /** Output path. */
     PathPtr m_outputPath;
 
-    /** input RingBuffer */
-    RingBuffer* m_rbin = nullptr;
-    /** output RingBuffer */
-    RingBuffer* m_rbout = nullptr;;
-
     /** Pointer to HistoManagerModule, or nullptr if not found. */
     ModulePtr m_histoman;
 
+    /** Name of the input socket */
+    std::string m_inputSocketName;
+
+    /** Name of the output socket */
+    std::string m_outputSocketName;
+
+    const std::string m_socketProtocol = "ipc";
   };
 
 }

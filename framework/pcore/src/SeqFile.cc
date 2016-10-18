@@ -161,6 +161,7 @@ int SeqFile::write(const char* buf)
   }
   try {
     out->write(buf, insize);
+    out->flush();
     m_nb += insize;
     return insize;
   } catch (ios_base::failure& e) {

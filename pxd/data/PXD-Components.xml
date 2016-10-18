@@ -233,12 +233,21 @@
     <Component type="Balcony2CopperLayer2">
       <u unit="mm">0.500</u><v unit="mm">52.255</v><w>above</w>
     </Component>
+    <!-- Switcher chips along the module -->
+    <Component type="Switcher">
+      <u unit="mm">14.122</u><v unit="mm">28.573</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">39.453</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">50.333</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">61.213</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">71.133</v><w>above</w><woffset unit="mm">0.003</woffset>
+      <u unit="mm">14.122</u><v unit="mm">80.093</v><w>above</w><woffset unit="mm">0.003</woffset>
+    </Component>
     <Component type="ReadoutChips">
       <u unit="mm"> 7.390</u><v unit="mm">15.731</v><w>above</w>
     </Component>
-    <Component type="SwitchersLayer2">
+    <!--<Component type="SwitchersLayer2">
       <u unit="mm">14.189</u><v unit="mm">52.242</v><w>above</w><woffset unit="mm">0.003</woffset>
-    </Component>
+    </Component>-->
   </Sensor>
 
   <!-- No we start defining components of the sensor by assigning a Material
@@ -326,7 +335,7 @@
     </Component>
   </Component>
 
-  <Component name="SwitchersLayer2">
+ <!-- <Component name="SwitchersLayer2">
     <Component type="Switcher">
       <v unit="mm">-25.719</v>
       <v unit="mm">-15.431</v>
@@ -335,7 +344,7 @@
       <v unit="mm"> 15.431</v>
       <v unit="mm"> 25.719</v>
     </Component>
-  </Component>
+  </Component>-->
 
   <Component name="SwitcherGroovesLayer1">
     <height unit="mm"> 0.360</height>

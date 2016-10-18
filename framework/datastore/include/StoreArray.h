@@ -367,7 +367,8 @@ namespace Belle2 {
     inline void ensureCreated() const
     {
       if (!isValid()) {
-        const_cast<StoreArray*>(this)->create();
+        if (!const_cast<StoreArray*>(this)->create())
+          throw std::runtime_error("Write access to " + readableName() + " failed, did you remember to call registerInDataStore()?");
       }
     }
 

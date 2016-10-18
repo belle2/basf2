@@ -293,11 +293,11 @@ mdst_dataobjects = [
     DataStorePrinter("ECLCluster", [
         "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
         "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
-        "getDeltaTime99", "getE1oE9", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
+        "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
         "getNumberOfCrystals", "getStatus", "getPx", "getPy",
         "getPz", "getMomentum", "get4Vector", "getClusterPosition",
         "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
-        "isNeutral", "getDeltaL", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA"
+        "isNeutral", "getDeltaL"
     ], {
         "getRelationsWith": ["MCParticles"],
     }),

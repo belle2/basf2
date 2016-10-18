@@ -127,54 +127,6 @@ class Test_Machine(TestCase):
             self.m.jump()
 
 
-class Test_CalibrationMachine(TestCase):
-    def setUp(self):
-        """
-        """
-        col = register_module('CaTest')
-        alg = TestAlgo()
-        cal = Calibration('TestCalibrationClass1')
-        cal.collector = col
-        cal.algorithms = alg
-        cal.input_files = '/path/to/file.root'
-        self.cal = cal
-
-    def test_init(self):
-        """
-        Checks that the default init state was setup
-        """
-        cm = CalibrationMachine(self.cal)
-        self.assertEqual(cm.state.name, "init")
-
-    def test_traverse_full(self):
-        """
-        Tests the correct path of states from beginning to end
-        """
-        cm = CalibrationMachine(self.cal)
-        cm.submit_collector()
-        cm.complete()
-        cm.run_algorithms()
-        cm.complete()
-        cm.finish()
-        self.assertEqual(cm.state.name, "completed")
-
-    def test_fail_dependencies(self):
-        """
-        Tests that if a dependency of a calibration isn't in completed state, the
-        submit_collector transition can't be called without error.
-        """
-        col = register_module('CaTest')
-        alg = TestAlgo()
-        cal2 = Calibration('TestCalibrationClass2', col, alg, '/path/to/file.root')
-
-        self.cal.depends_on(cal2)
-
-        cm = CalibrationMachine(self.cal)
-        cm2 = CalibrationMachine(cal2)
-        with self.assertRaises(ConditionError):
-            cm.submit_collector()
-
-
 def main():
     unittest.main()
 

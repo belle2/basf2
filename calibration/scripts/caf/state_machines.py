@@ -602,8 +602,11 @@ class CalibrationMachine(Machine):
                     machine.merge_next_iov()
                 except ConditionError:
                     try:
-                        machine.merge_previous_iov()  # If there is no next IoV, merge with previous success
-                        machine.execute_iov(vec_iov=iov_to_execute)
+                        merged_iov = ROOT.vector("std::pair<int,int>")()
+                        machine.merge_previous_iov(merged_iov=merged_iov, final_iov=iov_to_execute)
+                        list_payloads = machine.algorithm.algorithm.getPayloads()
+                        list_payloads.pop_back()
+                        machine.execute_iov(vec_iov=merged_iov)
                     except ConditionError:
                         machine.fail()  # If there's no next or previous IoVs then there wasn't enough data in the full set
                         return
@@ -681,7 +684,8 @@ class AlgorithmMachine(Machine):
         self.add_transition("merge_previous_iov", "notenoughdata_iov", "ready",
                             conditions=[self._all_iov_executed,
                                         self._previous_success_exists],
-                            before=self._log_mergeprev_attempt)
+                            before=[self._log_mergeprev_attempt,
+                                    self._merge_with_previous])
         self.add_transition("fail", "notenoughdata_iov", "failed")
 
         self.add_transition("complete", "success_iov", "completed_all_iov",
@@ -692,12 +696,18 @@ class AlgorithmMachine(Machine):
 
         self.add_transition("finish", "completed_all_iov", "finished")
 
+    def _merge_with_previous(self, **kwargs):
+        for iov in self.previous_iov:
+            kwargs["merged_iov"].push_back(iov)
+        for iov in kwargs["final_iov"]:
+            kwargs["merged_iov"].push_back(iov)
+
     def _set_previous_iov(self, **kwargs):
         self.previous_iov = ROOT.vector("std::pair<int,int>")()
         for iov in kwargs["successful_iov"]:
             self.previous_iov.push_back(iov)
 
-    def _previous_success_exists(self):
+    def _previous_success_exists(self, **kwargs):
         return self.previous_iov.size() > 0
 
     def _calc_highest_exprun(self):
@@ -720,7 +730,7 @@ class AlgorithmMachine(Machine):
     def _iov_remain(self):
         return not self._all_iov_executed()
 
-    def _all_iov_executed(self):
+    def _all_iov_executed(self, **kwargs):
         last_iov = self.results[-1].iov
         return self.highest_exprun == (last_iov.exp_high, last_iov.run_high)
 

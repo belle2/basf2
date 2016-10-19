@@ -22,6 +22,9 @@ from modularAnalysis import *
 set_log_level(LogLevel.ERROR)
 
 # --I/O----------------------------------------------------------------------------------------
+if (len(sys.argv) < 2 or sys.argv[1] not in ['signal', 'qqbar']):
+    sys.exit("usage:\n\tbasf2 B2A703-ContinuumSuppression_MVAExpert.py <signal,qqbar>")
+
 step = str(sys.argv[1])
 
 path = '/gpfs/fs02/belle2/users/pablog/analysis/rec_Bd_K0Pi0_BGx0_MC5_2015/Bd_KsPi0/mdst/'

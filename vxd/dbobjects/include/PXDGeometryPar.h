@@ -13,6 +13,7 @@
 #include <TObject.h>
 #include <string>
 
+#include <vxd/dbobjects/VXDGlobalPar.h>
 
 namespace Belle2 {
 
@@ -24,22 +25,19 @@ namespace Belle2 {
   */
 
   class PXDGeometryPar: public TObject {
-
   public:
-
     //! Default constructor
     PXDGeometryPar() {}
-
     //! Constructor using Gearbox
     explicit PXDGeometryPar(const GearDir& content) { read(content); }
-
     //! Destructor
     ~PXDGeometryPar() {}
-
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
 
   private:
+
+    VXDGlobalPar m_vxdGlobalPar;
 
     ClassDef(PXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

@@ -18,8 +18,15 @@ using namespace std;
 
 
 
+
+
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
 void PXDGeometryPar::read(const GearDir& content)
 {
+  B2INFO("Parsing PXD.xml to create PXDGeometryPar payload");
+
+  //Read some global parameters
+  m_vxdGlobalPar = VXDGlobalPar(content);
+
 }

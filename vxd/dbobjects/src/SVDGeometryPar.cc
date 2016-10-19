@@ -22,4 +22,5 @@ using namespace std;
 // *** This is a DIVOT ***
 void SVDGeometryPar::read(const GearDir& content)
 {
+  B2INFO("Parsing SVD.xml to create SVDGeometryPar payload");
 }

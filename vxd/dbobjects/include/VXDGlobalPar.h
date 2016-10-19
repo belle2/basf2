@@ -51,6 +51,8 @@ namespace Belle2 {
     /** If this is true, only active Materials will be placed for tracking
      * studies. Dead Material will be ignored */
     bool m_onlyActiveMaterial {false};
+    //! tolerance for Geant4 steps to be merged to a single step
+    float m_distanceTolerance {0.005};
     //! default material
     std::string m_defaultMaterial;
 

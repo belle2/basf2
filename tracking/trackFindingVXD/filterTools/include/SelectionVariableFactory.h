@@ -14,30 +14,29 @@
 #include <tracking/trackFindingVXD/filterTools/SelectionVariableType.h>
 
 // 2-hit:
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
 // 3-hit:
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DFull.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CosAngleXY.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYFull.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZFull.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleDist2IP.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeZoverS.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSoverZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/HelixParameterFit.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Pt.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleRadius.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Angle3DFull.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleXYFull.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleRZFull.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleRadius.h>
 // 4-hit:
-#include <tracking/trackFindingVXD/sectorMap/fourHitFilters/DeltaPt.h>
-#include <tracking/trackFindingVXD/sectorMap/fourHitFilters/DeltaDistCircleCenter.h>
-#include <tracking/trackFindingVXD/sectorMap/fourHitFilters/DeltaCircleRadius.h>
+#include <tracking/trackFindingVXD/sectorMap/fourHitVariables/DeltaPt.h>
+#include <tracking/trackFindingVXD/sectorMap/fourHitVariables/DeltaDistCircleCenter.h>
+#include <tracking/trackFindingVXD/sectorMap/fourHitVariables/DeltaCircleRadius.h>
 
 #include <framework/logging/Logger.h>
 
@@ -102,11 +101,6 @@ namespace Belle2 {
       if (variableType == SelectionVariableType::Distance1DZ) {
         return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
         { return Distance1DZ<PointType>::value(outerHit, innerHit); };
-      }
-
-      if (variableType == SelectionVariableType::Distance1DZTemplate) {
-        return [ & ](const PointType & outerHit, const PointType & innerHit) -> double
-        { return Distance1DZTemplate<PointType>::value(outerHit, innerHit); };
       }
 
       if (variableType == SelectionVariableType::SlopeRZ) {

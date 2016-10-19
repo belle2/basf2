@@ -31,8 +31,10 @@ namespace Belle2 {
     */
 
     /** this exception catches TCs which are too small to be able to be detected by the TC, therefore are likely to be ghost TCs. such TCs can be neglected. */
+    /** removed: this should be handled by proper setting of the cutoffs:
     BELLE2_DEFINE_EXCEPTION(Circle_too_small,
                             "The radius (%1%) of the circle is too small (threshold: %2%) for usefull pT-estimation.");
+    */
 
 
     /** is factor containing speed of light (c),
@@ -102,41 +104,46 @@ namespace Belle2 {
 
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none (incomplete calculation). */
+    /** TODO: remove
     static DataType calcAngle2D(const PointType& vecA, const PointType& vecB)
     {
       DataType result = ((vecA.X() * vecB.X() + vecA.Y() * vecB.Y()) / sqrt(calcPerp2(vecA) * calcPerp2(vecB)));
       return (std::isnan(result) || std::isinf(result)) ? DataType(0) : result;
     }
-
+    */
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: none (incomplete calculation). */
+    /* TODO: remove
     static DataType calcAngle2D(const B2Vector3<DataType>& vecA, const B2Vector3<DataType>& vecB)
     {
       DataType result = ((vecA.X() * vecB.X() + vecA.Y() * vecB.Y()) / sqrt(vecA.Perp2() * vecB.Perp2()));
       return (std::isnan(result) || std::isinf(result)) ? DataType(0) : result;
     }
-
+    */
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians.
      */
+    /** TODO: remove
     static DataType fullAngle2D(const PointType& vecA, const PointType& vecB)
     { return acos(calcAngle2D(vecA, vecB)); }
-
+    */
 
     /** calculates the angle between the hits/vectors (2D), generalized, returning unit: angle in radians.
     */
+    /** TODO : remove
     static DataType fullAngle2D(const B2Vector3<DataType>& vecA, const B2Vector3<DataType>& vecB)
     { return acos(calcAngle2D(vecA, vecB)); }
-
+    */
 
     /** calculates an estimation of the radius of given hits and existing estimation of circleCenter (cCenter), returning unit: radius in [cm] (positive value). */
+    /** TODO: remove
     static DataType calcRadius(const PointType& a, const PointType& b, const PointType& c, const B2Vector3<DataType>& cCenter)
     {
       return (sqrt(std::pow(cCenter.X() - a.X(), 2) + std::pow(cCenter.Y() - a.Y(), 2)) +
               sqrt(std::pow(cCenter.X() - b.X(), 2) + std::pow(cCenter.Y() - b.Y(), 2)) +
               sqrt(std::pow(cCenter.X() - c.X(), 2) + std::pow(cCenter.Y() - c.Y(), 2))) / 3.;
     } // = radius in [cm], sign here not needed. normally: signKappaAB/normAB1
-
+    */
 
     /** calculates an estimation of circleCenter position, result is returned as the x and y value of the B2Vector3. */
     /** TODO: remove
@@ -166,12 +173,13 @@ namespace Belle2 {
     */
 
     /** calculates the estimation of the transverse momentum of given radius using defined strength of magnetic field, returning unit: GeV/c. */
-    static DataType calcPt(DataType radius, DataType field = SelVarHelper::s_MagneticFieldFactor) throw(Circle_too_small)
+    static DataType calcPt(DataType radius, DataType field = SelVarHelper::s_MagneticFieldFactor)
     {
       // TODO WARNING hardcoded value, is there a quasi-global value for such cases (this case, minimal accepted radius)
-      if (fabs(radius) < 0.0000001) { throw (Circle_too_small() << radius << 0.0000001); }
+      // if (fabs(radius) < 0.0000001) { throw (Circle_too_small() << radius << 0.0000001); }
 
-      return (field * radius);
+      //WARNING: does not care for negative radius!!
+      return field * radius;
     } // return unit: GeV/c
 
 
@@ -179,6 +187,7 @@ namespace Belle2 {
      * a positive value represents a left-oriented curvature, a negative value means having a right-oriented curvature.
     * 0 means that it is exactly straight or that two hits are identical.
      * first vector should be outer hit, second = center hit, third is inner hit. */
+    /** TODO: remove
     static int calcSign(const PointType& a, const PointType& b, const PointType& c)
     {
       using boost::math::sign;
@@ -186,11 +195,13 @@ namespace Belle2 {
       B2Vector3<DataType> bc(b.X() - c.X(), b.Y() - c.Y(), 0.0);
       return sign(bc.Orthogonal() * ba); //normal vector of m_vecBC times segment of ba
     }
+    */
 
     /** calculates calculates the sign of the curvature of given 3-hit-tracklet.
      * +1 represents a left-oriented curvature, -1 means having a right-oriented curvature.
      * 0 means it is approximately straight.
      * first vector should be outer hit, second = center hit, third is inner hit. */
+    /** TODO: remove
     static int calcSign(const PointType& a, const PointType& b, const PointType& c, const B2Vector3<DataType>& sigma_a,
                         const B2Vector3<DataType>& sigma_b, const B2Vector3<DataType>& sigma_c)
     {
@@ -203,8 +214,9 @@ namespace Belle2 {
       else if (angle > sigmaan)  {return 1; }
       else  { return 0; }
     }
-  };
+    */
 
+  };
 
   template<typename PointType, typename DataType> DataType SelVarHelper<PointType, DataType>::s_MagneticFieldFactor = 1.5 *
       0.00299710;

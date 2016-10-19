@@ -10,6 +10,14 @@
 
 #pragma once
 
+
+/** c macros to ensure that the returned name for each Class is the same as the class name */
+// is expanded as the string value for X
+#define STRING_NAME(X) #X
+// is expanded as the function "static const std::string name(void)" which returns the string value of Y
+#define PUT_NAME_FUNCTION(Y) static const std::string name(void) {return STRING_NAME(Y); };
+
+
 #include <string>
 #include <typeinfo>
 #include <TBranch.h>

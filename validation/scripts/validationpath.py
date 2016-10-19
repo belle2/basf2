@@ -9,6 +9,11 @@ file_name_results_json = "revision.json"
 file_name_runtimes_dat = "runtimes.dat"
 
 
+def get_basepath():
+    return {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
+            'central': os.environ.get('BELLE2_RELEASE_DIR', None)}
+
+
 def get_results_runtime_file(output_base_dir):
     """!
     Return the absolute path to the runtimes.dat file

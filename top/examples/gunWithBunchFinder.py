@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from tracking import add_tracking_reconstruction
+from reconstruction import add_dedx_modules
 
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction with bunch finder
@@ -80,32 +82,20 @@ main.add_module(svd_clusterizer)
 cdcDigitizer = register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
-# Material effects for all track extrapolations
-material_effects = register_module('SetupGenfitExtrapolation')
-main.add_module(material_effects)
-
-# MC track finder (for simplicity)
-mctrackfinder = register_module('TrackFinderMCTruth')
-main.add_module(mctrackfinder)
-
-# Track fitting
-trackfitter = register_module('GenFitter')
-main.add_module(trackfitter)
-
-# dE/dx PID (needed for bunch finder!)
-CDCdEdxPID = register_module('CDCDedxPID')
-main.add_module(CDCdEdxPID)
-VXDdEdxPID = register_module('VXDDedxPID')
-main.add_module(VXDdEdxPID)
-
-# Track extrapolation
-ext = register_module('Ext')
-main.add_module(ext)
-
 # TOP digitization
 topdigi = register_module('TOPDigitizer')
 topdigi.param('trigT0Sigma', 2.0)  # simulate trigger ucertainy in finding correct T0
 main.add_module(topdigi)
+
+# tracking
+add_tracking_reconstruction(main)
+
+# dE/dx PID (needed for bunch finder!)
+add_dedx_modules(main)
+
+# Track extrapolation
+ext = register_module('Ext')
+main.add_module(ext)
 
 # Bunch finder
 finder = register_module('TOPBunchFinder')

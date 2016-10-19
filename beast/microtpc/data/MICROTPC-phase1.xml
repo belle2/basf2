@@ -2,11 +2,20 @@
 <DetectorComponent name="MICROTPC">
 <Creator library="beast">MICROTPCCreator</Creator>
 <Content>
+<!-- normally, parameters should be defined with a unit attribute. This
+enables automatic conversion to the default framework unit --> 
 <stepSize unit="um">200</stepSize>
+<!--if we don't supply a unit there can be no conversion but is still valid -->
 <divisions>32</divisions>
+<!-- valid values for false are: "", "0", "off", "false" (case
+insensitive), everything else will be interpreted as true -->
 <foo>true</foo>
-<bar unit="mm">1 
+<!-- we can also have arrays as parameters which makes it easy to get a
+number of values as vector<double>.  The numbers can be divided by
+whitespace, comma or semi-colon -->
+<bar unit="mm">1 2 3 4
 </bar>
+<!-- Lets define 3 sensitive Boxes at different z positions and with different sizes -->
 <LookAtRec>0</LookAtRec>
 <GEMGain1>30</GEMGain1>
 <GEMGain2>50</GEMGain2>
@@ -47,8 +56,8 @@
 <v_DG>0.00103182</v_DG>
 <v_TG>0.004079</v_TG>
 <v_CG>0.00390826</v_CG>
+<!-- Position 1 prot # 2 -->    
 <Active>
-<!-- Position 1 prot # 2 -->
 <MaterialVessel>MICROTPC-Material</MaterialVessel>
 <MaterialGas>MICROTPC-Material</MaterialGas>
 <ScaleGas>MICROTPC-Material</ScaleGas>
@@ -59,12 +68,12 @@
 <dz_Vessel unit="cm">30.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">45.64700</TPCpos_x>
-<TPCpos_y unit="cm">7.03894</TPCpos_y>
-<TPCpos_z unit="cm">40.00000</TPCpos_z>
+<TPCpos_x unit="cm">41.56100</TPCpos_x>
+<TPCpos_y unit="cm">-7.39800</TPCpos_y>
+<TPCpos_z unit="cm">35.97700</TPCpos_z>
 </Active>
-<Active>
 <!-- Position 2 TPC # 2 -->
+<Active>
 <MaterialVessel>MICROTPC-Material</MaterialVessel>
 <MaterialGas>MICROTPC-Material</MaterialGas>
 <ScaleGas>MICROTPC-Material</ScaleGas>
@@ -75,13 +84,14 @@
 <dz_Vessel unit="cm">31.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">0.0</AngleZ>
-<!--TPCpos_x unit="cm">6.33894</TPCpos_x-->
-<TPCpos_x unit="cm">-4.33894</TPCpos_x>
-<TPCpos_y unit="cm">45.94700</TPCpos_y>
-<TPCpos_z unit="cm">37.90000</TPCpos_z>
+<!--TPCpos_x unit="cm">9.95700</TPCpos_x-->
+<TPCpos_x unit="cm">6.6</TPCpos_x>
+<TPCpos_y unit="cm">46.63900</TPCpos_y>
+<!--TPCpos_z unit="cm">37.90000</TPCpos_z-->
+<TPCpos_z unit="cm">34.4</TPCpos_z>
 </Active>
-<Active>
 <!-- Position 3 TPC # 1 -->
+<Active>
 <MaterialVessel>MICROTPC-Material</MaterialVessel>
 <MaterialGas>MICROTPC-Material</MaterialGas>
 <ScaleGas>MICROTPC-Material</ScaleGas>
@@ -92,12 +102,14 @@
 <dz_Vessel unit="cm">31.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">90.0</AngleZ>
-<TPCpos_x unit="cm">-47.04700</TPCpos_x>
-<TPCpos_y unit="cm">5.93894</TPCpos_y>
-<TPCpos_z unit="cm">37.70000</TPCpos_z>
+<TPCpos_x unit="cm">-48.25500</TPCpos_x>
+<!--TPCpos_y unit="cm">7.34000</TPCpos_y-->
+<TPCpos_y unit="cm">6.2</TPCpos_y>
+<!--TPCpos_z unit="cm">37.57700</TPCpos_z-->
+<TPCpos_z unit="cm">30.5</TPCpos_z>
 </Active>
-<Active>
 <!-- Position 4 prot # 1 -->
+<Active>
 <MaterialVessel>MICROTPC-Material</MaterialVessel>
 <MaterialGas>MICROTPC-Material</MaterialGas>
 <ScaleGas>MICROTPC-Material</ScaleGas>
@@ -108,10 +120,11 @@
 <dz_Vessel unit="cm">30.0</dz_Vessel>
 <AngleX unit="deg">180.0</AngleX>
 <AngleZ unit="deg">0.0</AngleZ>
-<!--TPCpos_x unit="cm">8.33894</TPCpos_x-->
-<TPCpos_x unit="cm">-6.33894</TPCpos_x>
-<TPCpos_y unit="cm">-44.34700</TPCpos_y>
-<TPCpos_z unit="cm">42.30000</TPCpos_z>
+<!--TPCpos_x unit="cm">-7.19700</TPCpos_x-->
+<TPCpos_x unit="cm">-4.4</TPCpos_x>
+<TPCpos_y unit="cm">-45.15900</TPCpos_y>
+<!--TPCpos_z unit="cm">42.30000</TPCpos_z-->
+<TPCpos_z unit="cm">38.8</TPCpos_z>
 </Active>
 </Content>
 </DetectorComponent>

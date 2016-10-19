@@ -29,7 +29,8 @@ namespace Belle2 {
 
     /**
      * Full constructor
-     * @param moduleID TOP module ID
+     * @param moduleID TOP module ID (slot number)
+     * @param moduleCNumber TOP module construction number
      * @param boardstack Boardstack number within TOP module
      * @param scrod SCROD ID
      * @param copper COPPER ID
@@ -37,6 +38,7 @@ namespace Belle2 {
      * @param i index of this element in std::vector
      */
     TOPFrontEndMap(int moduleID,
+                   int moduleCNumber,
                    int boardstack,
                    unsigned short scrod,
                    unsigned copper,
@@ -44,6 +46,7 @@ namespace Belle2 {
                    int i)
     {
       m_moduleID = moduleID;
+      m_moduleCNumber = moduleCNumber;
       m_boardstack = boardstack;
       m_scrodID = scrod;
       m_copperID = copper;
@@ -52,10 +55,16 @@ namespace Belle2 {
     }
 
     /**
-     * Return TOP module ID
+     * Return TOP module ID (slot number)
      * @return module ID
      */
     int getModuleID() const {return m_moduleID;}
+
+    /**
+     * Return TOP module construction number
+     * @return module construction number
+     */
+    int getModuleCNumber() const {return m_moduleCNumber;}
 
     /**
      * Return boardstack number
@@ -89,14 +98,15 @@ namespace Belle2 {
 
   private:
 
-    int m_moduleID = 0;           /**< module ID */
+    int m_moduleID = 0;           /**< module ID (slot number) */
+    int m_moduleCNumber = 0;      /**< module construction number */
     int m_boardstack = 0;         /**< boardstack number within TOP module */
     unsigned short m_scrodID = 0; /**< SCROD ID */
     unsigned int m_copperID = 0;  /**< COPPER ID */
     int m_finesse = 0;            /**< Finesse slot number (0-based) */
     int m_index = 0;              /**< index of this element in std::vector */
 
-    ClassDef(TOPFrontEndMap, 2); /**< ClassDef */
+    ClassDef(TOPFrontEndMap, 3); /**< ClassDef */
 
   };
 

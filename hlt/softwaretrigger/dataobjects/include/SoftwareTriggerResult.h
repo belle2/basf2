@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerCutResult.h>
 #include <framework/logging/Logger.h>
 
 #include <map>
@@ -17,16 +18,6 @@
 
 namespace Belle2 {
   namespace SoftwareTrigger {
-    /// Enumeration with all possible results of the SoftwareTriggerCut.
-    enum class SoftwareTriggerCutResult {
-      c_reject, /**< Reject this event. */
-      c_accept, /**< Accept this event. */
-      c_noResult /**< This cut did not give any information on what to do with the event. */
-    };
-
-    /// Make the SoftwareTriggerCutResult printable
-    //std::ostream &operator<<(std::ostream &os, SoftwareTriggerCutResult const &result);
-
     /**
      * Dataobject to store the results of the cut calculations
      * performed by the SoftwareTriggerModule. This is basically
@@ -39,66 +30,35 @@ namespace Belle2 {
     class SoftwareTriggerResult : public TObject {
     public:
       /// Add a new cut result to the storage or override the result with the same name.
-      void addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result)
-      {
-        m_results[triggerIdentifier] = result;
-      }
+      void addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result);
 
       /// Return the cut result with the given name or throw an error if no result is there.
-      const SoftwareTriggerCutResult& getResult(const std::string& triggerIdentifier) const
+      SoftwareTriggerCutResult getResult(const std::string& triggerIdentifier) const;
+
+      /**
+       * Return all stored cut tags with their results as a map identifier -> cut result.
+       * Please be aware that the cut result is an integer (because of ROOT reasons).
+       */
+      const std::map<std::string, int>& getResults() const
       {
-        return m_results.at(triggerIdentifier);
-      }
+        return m_results;
+      };
 
       /**
        * Return the "total result" of this event. See the SoftwareTriggerModule for a description on
        * when what is returned.
        */
-      int getTotalResult(bool acceptOverridesReject = false) const
-      {
-        bool hasOneAcceptCut = false;
-        bool hasOneRejectCut = false;
-
-        for (const auto& identifierWithResult : m_results) {
-          const auto& result = identifierWithResult.second;
-          if (result == SoftwareTriggerCutResult::c_accept) {
-            hasOneAcceptCut = true;
-          } else if (result == SoftwareTriggerCutResult::c_reject) {
-            hasOneRejectCut = true;
-          }
-        }
-
-        if (acceptOverridesReject) {
-          if (hasOneAcceptCut) {
-            return 1;
-          } else if (hasOneRejectCut) {
-            return -1;
-          } else {
-            return 0;
-          }
-        } else {
-          if (hasOneRejectCut) {
-            return -1;
-          } else if (hasOneAcceptCut) {
-            return 1;
-          } else {
-            return 0;
-          }
-        }
-      }
+      int getTotalResult(bool acceptOverridesReject = false) const;
 
       /// Clear all results
-      void clear()
-      {
-        m_results.clear();
-      }
+      void clear();
 
     private:
       /// Internal storage of the cut decisions with names.
-      std::map<std::string, SoftwareTriggerCutResult> m_results;
+      std::map<std::string, int> m_results;
 
       /** Making this class a ROOT class.*/
-      ClassDef(SoftwareTriggerResult, 2);
+      ClassDef(SoftwareTriggerResult, 3);
     };
   }
 }

@@ -1,4 +1,5 @@
 #include <ecl/modules/eclUnpacker/eclUnpackerModule.h>
+#include <framework/utilities/FileSystem.h>
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +14,10 @@ ECLUnpackerModule::ECLUnpackerModule() :
   m_eclDigits("", DataStore::c_Event)
 {
   setDescription("The module reads RawECL data from the DataStore and writes the ECLDigit data");
-  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string(""));
+
+  setPropertyFlags(c_ParallelProcessingCertified);
+
+  addParam("InitFileName", m_eclMapperInitFileName, "Initialization file", string("/ecl/data/ecl_channels_map.txt"));
   addParam("ECLDigitsName", m_eclDigitsName, "Name of the ECLDigits container", string("ECLDigits"));
 
   m_EvtNum = 0;
@@ -28,16 +32,24 @@ void ECLUnpackerModule::initialize()
 {
 
   // require input data
-  StoreArray<RawCOPPER>::required();
+  StoreArray<RawECL>::required();
 
   // register output conteinder in data store
   m_eclDigits.registerInDataStore(m_eclDigitsName);
 
+  std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
+  if (! FileSystem::fileExists(ini_file_name)) {
+    B2FATAL("ECL Unpacker : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
+  }
+
   // initialize channel mapper from file (temporary)
-  m_eclMapper.initFromFile(m_eclMapperInitFileName.c_str());
+  if (! m_eclMapper.initFromFile(ini_file_name.data())) {
+    B2FATAL("ECL Unpacker:: Can't initialize eclChannelMapper");
+  }
 
-  // of initialize if from DB TODO
+  B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 
+  // or initialize if from DB TODO
 }
 
 void ECLUnpackerModule::beginRun()
@@ -79,24 +91,24 @@ void ECLUnpackerModule::terminate()
 }
 
 // meathod to read collector data by 32-bit words
-int ECLUnpackerModule::readNextCollectorWord()
+unsigned int ECLUnpackerModule::readNextCollectorWord()
 {
   if (m_bufPos == m_bufLength) {
     B2DEBUG(50, "Reached the end of the FINESSE buffer");
     throw Unexpected_end_of_FINESSE_buffer();
   }
-  int value = m_bufPtr[m_bufPos];
+  unsigned int value = m_bufPtr[m_bufPos];
   m_bufPos++;
   return value;
 }
 
 // read given number of bits from the buffer (in order to read compressed ADC data)
-int ECLUnpackerModule::readNBits(int bitsToRead)
+unsigned int ECLUnpackerModule::readNBits(int bitsToRead)
 {
-  int val = 0;
+  unsigned int val = 0;
 
-  val = m_bufPtr[m_bufPos] >> bitsToRead;
-  if (m_bitPos + bitsToRead > 32)
+  val = m_bufPtr[m_bufPos] >> m_bitPos;
+  if (m_bitPos + bitsToRead > 31)
     if (m_bufPos == m_bufLength) {
       B2ERROR("Reached the end of the FINESSE buffer while read compressed ADC data");
 
@@ -115,28 +127,29 @@ int ECLUnpackerModule::readNBits(int bitsToRead)
     }
   }
 
-  val &= ((unsigned long long)1 << bitsToRead) - 1;
+  val &= (1 << bitsToRead) - 1;
 
   return val;
 }
 
 
 
-void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
+void ECLUnpackerModule::readRawECLData(RawECL* rawCOPPERData, int n)
 {
   int iCrate, iShaper, iChannel, cellID;
 
   int shapersMask;
   int adcDataBase, adcDataDiffWidth;
   int compressMode, shaperDataLength;
-  int value = 0, nRead = 0, ind = 0, indSample = 0;
+  unsigned int value = 0;
+  int nRead = 0, ind = 0, indSample = 0;
   int nActiveChannelsWithADCData, nADCSamplesPerChannel, nActiveDSPChannels;
   // triggerPhase;   /TODO ?
   int dspMask, triggerTag;
   int nShapers;
   int adcMask, adcHighMask, dspTime, dspAmplitude, dspQualityFlag;
 
-  std::vector <int> eclWaveformSamples;
+  std::vector <unsigned int> eclWaveformSamples;
 
 //  unsigned int evnum = rawCOPPERData->GetEveNo(n);
   int nodeID = rawCOPPERData->GetNodeID(n);
@@ -151,7 +164,7 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
     iCrate = m_eclMapper.getCrateID(nodeID, iFINESSE);
 
     // pointer to data from COPPER/FINESSE
-    m_bufPtr = rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
+    m_bufPtr = (unsigned int*)rawCOPPERData->GetDetectorBuffer(n, iFINESSE);
 
     B2DEBUG(15, "***** iEvt " << m_EvtNum << " node " << std::hex << nodeID);
     for (int i = 0; i < m_bufLength; i++) {
@@ -188,8 +201,12 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
         value = readNextCollectorWord();
         shaperDataLength = value & 0xFFFF; // amount of words in DATA section (without COLLECTOR HEADER)
         // check shaperDSP header
+        B2DEBUG(50, "iCrate = " << iCrate << " iShaper = " << iShaper);
         B2DEBUG(50, "Shaper HEADER = 0x" << std::hex << value << " dataLength = " << std::dec << shaperDataLength);
-        if ((value & 0x00FF0000) != 0x00100000) throw Bad_ShaperDSP_header();
+        if ((value & 0x00FF0000) != 0x00100000) {
+          B2ERROR("Ecl Unpacker:: bad shaper header");
+          throw Bad_ShaperDSP_header();
+        }
 
 
         value = readNextCollectorWord();
@@ -219,7 +236,7 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
           if (((1 << ind) & dspMask) != (1 << ind)) continue;
           iChannel = ind + 1;
           value = readNextCollectorWord();
-          dspTime = (value >> 18) & 0xFFF;
+          dspTime = (int)(value << 2) >> 20;
           dspQualityFlag = (value >> 30) & 0x3;
           dspAmplitude  = (value & 0x3FFFF) - 128;
           nRead++;
@@ -229,10 +246,9 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
           if (cellID < 1) continue; // channel is not connected to crystal
 
           // fill eclDigits data object
-          if (dspAmplitude > 50) {
-            //B2DEBUG(10, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<    dspQualityFlag);
-            //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
-          }
+          B2DEBUG(100, "New eclDigit: cid = " << cellID << " amp = " << dspAmplitude << " time = " << dspTime << " qflag = " <<
+                  dspQualityFlag);
+          //B2DEBUG(10,"iCrate = " << iCrate << " iShaper = " << iShaper << " iChannel = " << iChannel);
 
           ECLDigit* newEclDigit = m_eclDigits.appendNew();
           newEclDigit->setCellId(cellID);
@@ -267,21 +283,41 @@ void ECLUnpackerModule::readRawECLData(RawCOPPER* rawCOPPERData, int n)
               if (indSample == 0) {
                 value = readNBits(18);
                 adcDataBase = value;
+                B2DEBUG(200, "adcDataBase = " << adcDataBase);
                 value = readNBits(5);
                 adcDataDiffWidth = value;
+                B2DEBUG(200, "adcDataDiffWidth = " << adcDataDiffWidth);
               }
               value = readNBits(adcDataDiffWidth);
+              B2DEBUG(200, "adcDataOffset = " << value);
               value += adcDataBase;
             }
             // fill waveform data for single channel
             eclWaveformSamples.push_back(value);
           }
+
+          cellID = m_eclMapper.getCellId(iCrate, iShaper, iChannel);
+
+          /*
+          std::cout << "mask " << std::hex << adcMask << std::dec << std::endl;
+          std::cout << "event " << m_EvtNum << " cid " << cellID << " : " << std::endl;
+          for (int i = 0; i < eclWaveformSamples.size(); i++){
+            std::cout << eclWaveformSamples[i] << " ";
+          }
+          std::cout << std::endl;
+          */
           nRead++;
+
           // fill ecl Waveform data object here (TODO)
 
         }
+        if (m_bitPos > 0) {
+          m_bufPos++;
+          m_bitPos = 0;
+        }
         if (nRead != nActiveChannelsWithADCData) {
-          B2ERROR("Number of channels with ADC data and number of read channels don't match (Corrupted data?)");
+          B2ERROR("Number of channels with ADC data " << nActiveChannelsWithADCData << " and number of read channels " << nRead <<
+                  " don't match (Corrupted data?) ");
           // do something (throw an exception etc.) TODO
         }
 

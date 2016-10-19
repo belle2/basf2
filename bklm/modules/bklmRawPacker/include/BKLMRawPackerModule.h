@@ -79,7 +79,7 @@ namespace Belle2 {
     StoreArray<RawKLM> rawklmarray;
 
     //! to map logical coordinates to hardware coordinates
-    map<int, int> m_ModuleIdToelectId;
+    std::map<int, int> m_ModuleIdToelectId;
 
     //! format the data
     //! @param[in] channel rpc channel

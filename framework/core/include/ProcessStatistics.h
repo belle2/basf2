@@ -35,11 +35,11 @@ namespace Belle2 {
    * print the event statistics after the process loop:
    *
    * >>> process(...)
-   * >>> print statistics
+   * >>> print(statistics)
    *
    * Different types of statistics can be printed using
    *
-   * >>> print statistics(type)
+   * >>> print(statistics(type))
    *
    * where type can be one of
    *  - statistics.INIT        -> time/calls spent in initialize()
@@ -56,15 +56,15 @@ namespace Belle2 {
    * >>> bar = register_module("Bar")
    * ...
    * >>> process(...)
-   * >>> print statistics([foo,bar])
-   * >>> print statistics([foo,bar],statistics.BEGIN_RUN)
+   * >>> print(statistics([foo,bar]))
+   * >>> print(statistics([foo,bar],statistics.BEGIN_RUN))
    *
    * More detailed statistics can be reached by accessing the statistics
    * for all modules directly:
    *
    * >>> process(...)
    * >>> for stats in statistics.modules:
-   * >>>     print stats.name, stats.time(statistics.EVENT), stats.calls(statistics.BEGIN_RUN)
+   * >>>     print(stats.name, stats.time(statistics.EVENT), stats.calls(statistics.BEGIN_RUN))
    *
    * Available attributes/methods for the statistics objects are
    *  - name:                         name of the module
@@ -90,7 +90,7 @@ namespace Belle2 {
     /**
      * Return string with statistics for all modules.
      *
-     * Can be used in steering file with 'print statistics'.
+     * Can be used in steering file with 'print(statistics)'.
      *
      * @param type    counter type to use for statistics
      * @param modules map of modules to use. If NULL, default map will be

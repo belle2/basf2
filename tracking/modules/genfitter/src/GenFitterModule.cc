@@ -285,7 +285,6 @@ void GenFitterModule::event()
 
 
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
-  gfTracks.create();
 
   RelationArray gfTrackCandidatesTogfTracks(trackCandidates, gfTracks);
 
@@ -478,7 +477,7 @@ void GenFitterModule::event()
       } else if (m_filterId == "DAF") {
         // FIXME ... testing
         //fitter.reset(new genfit::DAF(false));
-        fitter.reset(new genfit::DAF(true));
+        fitter.reset(new genfit::DAF(true, m_dafDeltaPval));
         ((genfit::DAF*)fitter.get())->setProbCut(m_probCut);
       } else if (m_filterId == "simpleKalman") {
         fitter.reset(new genfit::KalmanFitter(4, 1e-3, 1e3, false));

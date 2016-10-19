@@ -28,7 +28,7 @@ from VXDTF.setup_modules_ml import *
 
 # rootInputFileName = "seed11nEv100pGun1_1T.root"  # test- and TrainSample
 # rootInputFileName = "seed12nEv200pGun1_2T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
-rootInputFileName = "seed12345nEv1000pGun1_20T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
+rootInputFileName = "seed12345nEv1000pGun1_1T.root"  # test- and TrainSample 0-90° phi, 60-85° Theta
 
 
 # file name into which the segNetAnalize stores its stuff
@@ -40,7 +40,7 @@ setFilterType = 'hopfield'  # currently supported: 'greedy' and 'hopfield'
 
 usePXD = False
 useDisplay = False
-newTrain = False  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
+newTrain = True  # if true, rawSecMap-Data is collected. IF false, new TF will be executed
 printNetworks = False  # creates graphs for each network for each event if true
 useOldTFinstead = False  # if true, the old vxdtf is used instead of the new one.
 oldTFNoSubsetSelection = True  # if true, the old vxdtf does not its hopfield-part, which allows using new modules for that
@@ -74,9 +74,6 @@ initialValue = int(stringInitialValue[1])
 
 set_log_level(LogLevel.ERROR)
 set_random_seed(initialValue)
-
-trainerVXDTFLogLevel = LogLevel.INFO
-trainerVXDTFDebugLevel = 10
 
 TFlogLevel = LogLevel.INFO
 TFDebugLevel = 1
@@ -153,17 +150,10 @@ gearbox = register_module('Gearbox')
 
 secMapBootStrap = register_module('SectorMapBootstrap')
 
-
-secMapBootStrap = register_module('SectorMapBootstrap')
-
 evtStepSize = 1
 if newTrain:
-    newSecMapTrainerBase = register_module('SecMapTrainerBase')
-    newSecMapTrainerBase.logging.log_level = trainerVXDTFLogLevel
-    newSecMapTrainerBase.logging.debug_level = trainerVXDTFDebugLevel
-    newSecMapTrainerBase.param('spTCarrayName', 'checkedSPTCs')
-    newSecMapTrainerBase.param('allowTraining', True)
-
+    VXDTFTrainingDataCollector = register_module('VXDTFTrainingDataCollector')
+    VXDTFTrainingDataCollector.param('SpacePointTrackCandsName', 'checkedSPTCs')
     evtStepSize = 100
 else:
     merger = register_module('RawSecMapMerger')
@@ -308,7 +298,7 @@ vIPRemover.param('tcArrayName', 'caSPTCs')
 # TrackCands)
 setup_sp2thConnector(main, 'pxdOnly', 'nosingleSP', '_relTH', True, LogLevel.ERROR, 1)
 if newTrain:
-    main.add_module(newSecMapTrainerBase)
+    main.add_module(VXDTFTrainingDataCollector)
 else:
     if useOldTFinstead:
         main.add_module(register_module('SetupGenfitExtrapolation'))

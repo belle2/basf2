@@ -6,12 +6,14 @@ Import('env')
 env['LIBS'] = [
     'framework',
     'hlt_softwaretrigger_dataobjects',
-    'hlt_softwaretrigger_dbobjects',
     'hlt',
     '$ROOT_LIBS',
     "framework",
     "tracking_dataobjects",
-    "mdst_dataobjects"
+    "mdst_dataobjects",
+    "analysis_dataobjects",
+    "analysis_utility"
+    
     ]
 
 Return('env')

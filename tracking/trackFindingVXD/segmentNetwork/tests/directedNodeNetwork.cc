@@ -73,6 +73,8 @@ namespace DirectedNodeNetworkTests {
     /** SetUp environment - prepare related storearrays of SpacePoints and PXDClusters */
     virtual void SetUp()
     {
+      DataStore::Instance().setInitializeActive(true);
+
       spacePointData.registerInDataStore();
       pxdClusterData.registerInDataStore();
       spacePointTrackCandData.registerInDataStore();
@@ -189,7 +191,7 @@ namespace DirectedNodeNetworkTests {
     std::array<int, 5> intArray  = { { 2, 5, 3, 4, 99} };
     std::array<int, 5> intArray2  = { { 144, 121, 33, 35, 31415} }; // these entries are independent of the first intArray-entries
     std::array<int, 5> intArray3  = { { 1440, 1210, 3, 33, 3141529} }; // entry 2 crosses intArray, entry 3 crosses intArray2
-    std::vector<int> onTheFlyCreatedInts; // the user has to take care about the lifetime of the objects to be linked in the network!
+    std::deque<int> onTheFlyCreatedInts; // the user has to take care about the lifetime of the objects to be linked in the network!
     EXPECT_EQ(5, intArray.size());
 
     DirectedNodeNetwork<int, VoidMetaInfo> intNetwork;

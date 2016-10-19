@@ -48,6 +48,7 @@ REG_MODULE(CDCCRTest)
 //-----------------------------------------------------------------
 
 CDCCRTestModule::CDCCRTestModule() : HistoModule()
+//CDCCRTestModule::CDCCRTestModule() :Module()
 {
   setDescription("CDC Cosmic ray test module");
   setPropertyFlags(c_ParallelProcessingCertified);  // specify this flag if you need parallel processing
@@ -56,7 +57,6 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("RecoTracksColName", m_recoTrackArrayName, "Name of collectrion hold genfit::Track", std::string(""));
   addParam("histogramDirectoryName", m_histogramDirectoryName,
            "Track fit results histograms will be put into this directory", std::string("trackfit"));
-  addParam("Output", m_OutputFileName, "xt file name", string("xt.root"));
   addParam("fillExpertHistograms", m_fillExpertHistos,
            "Fill additional histograms", false);
   addParam("noBFit", m_noBFit, "If true -> #Params ==4, #params ==5 for calculate P-Val", true);
@@ -64,11 +64,9 @@ CDCCRTestModule::CDCCRTestModule() : HistoModule()
   addParam("calExpectedDriftTime", m_calExpectedDriftTime, "if true module will calculate expected drift time, it take a time",
            false);
   addParam("hitEfficiency", m_hitEfficiency, "calculate hit efficiency true:yes false:No", false);
-  //  addParam("NumberOfUsedChannel",m_Nchannel,"Number of channel per ICLayer used for test",16);
-  //  addParam("yOfTriggerCounter",m_yofcounter,"Y position of trigger counter (in Feb test y=-13.25",-13.25);
   addParam("TriggerPos", m_TriggerPos, "Trigger position use for cut and reconstruct Trigger image", std::vector<double> { -0.6, -13.25, 17.3});
   addParam("IwireLow", m_low, "Lower boundary of hit dist. Histogram", std::vector<int> {0, 0, 0, 0, 0, 0, 0, 0, 0});
-  addParam("IwireUpper", m_up, "Upper boundary of hit dist. Histogram", std::vector<int> {15, 15, 15, 15, 15, 15, 15, 15, 15});
+  addParam("IwireUpper", m_up, "Upper boundary of hit dist. Histogram", std::vector<int> {161, 161, 193, 225, 257, 289, 321, 355, 385});
   addParam("CorrectToFofIncomingTrack", m_IncomingToF, "If true, tof of tracks which are phi0>0 will be invert", true);
   // addParam("plotResidual",m_plotHitDistribution,"plot biased residual, normalized res and xtplot for all layer",true);
 }
@@ -82,97 +80,6 @@ CDCCRTestModule::~CDCCRTestModule()
 //-----------------------------------------------------------------
 void CDCCRTestModule::defineHisto()
 {
-
-  // int N =m_Nchannel;//Number of Wire per Layer used;
-  TDirectory* oldDir = gDirectory;
-  TDirectory* histDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
-  histDir->cd();
-  m_hNTracks = getHist("hNTracks", "number of tracks", 3, 0, 3);
-  m_hNTracks->GetXaxis()->SetBinLabel(1, "fitted, converged");
-  m_hNTracks->GetXaxis()->SetBinLabel(2, "fitted, not converged");
-  m_hNTracks->GetXaxis()->SetBinLabel(3, "TrackCand, but no Track");
-  m_hNDF = getHist("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
-  m_hNHits = getHist("hNHits", "#hit of fitted track;#hit;Tracks", 61, -1, 60);
-  m_hNHits_trackcand = getHist("hNHits_trackcand", "#hit of track candidate;#hit;Tracks", 71, -1, 70);
-  m_hNTracksPerEvent = getHist("hNTracksPerEvent", "#tracks/Event;#Tracks;Event", 61, -1, 60);
-  m_hNTracksPerEventFitted = getHist("hNTracksPerEventFitted", "#tracks/Event After Fit;#Tracks;Event", 61, -1, 60);
-  m_hE1Dist = getHist("hE1Dist", "Energy Dist. in case 1track/evt; E(Gev);Tracks", 100, 0, 20);
-  m_hE2Dist = getHist("hE2Dist", "Energy Dist. in case 2track/evt; E(Gev);Tracks", 100, 0, 20);
-  m_hChi2 = getHist("hChi2", "#chi^{2} of tracks;#chi^{2};Tracks", 400, 0, 400);
-  m_hPhi0 = getHist("hPhi0", "#Phi_{0} of tracks;#phi_{0} (Degree);Tracks", 400, -190, 190);
-  m_hAlpha = getHist("hAlpha", "#alpha Dist.;#alpha (Degree);Hits", 360, -90, 90);
-  m_hTheta = getHist("hTheta", "#theta Dist.;#theta (Degree);Hits", 360, 0, 180);
-  m_hPval = getHist("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
-
-  m_hTriggerHitZX =  getHist("TriggerHitZX", "Hit Position on trigger counter;z(cm);x(cm)", 280, -30, 40, 120, -15, 15);
-  m_h2DHitDistInCDCHit =  getHist("2DHitDistInCDCHit", " CDCHit;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0), m_up.at(8),
-                                  56, 0, 56);
-  m_h2DHitDistInTrCand =  getHist("2DHitDistInTrCand", "Track Cand ;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0),
-                                  m_up.at(8), 56, 0, 56);
-  m_h2DHitDistInTrack =   getHist("2DHitDistInTrack", "Fitted Track ;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0),
-                                  m_up.at(8), 56, 0, 56);
-  if (m_fillExpertHistos) {
-    m_hNDFChi2 = getHist("hNDFChi2", "#chi^{2} of tracks;NDF;#chi^{2};Tracks", 8, 0, 8, 800, 0, 200);
-    m_hNDFPval = getHist("hNDFPval", "p-values of tracks;NDF;pVal;Tracks", 8, 0, 8, 100, 0, 1);
-  }
-  int sl;
-  for (int i = 0; i < 56; ++i) {
-    int iLayer = i + firstLayer;
-    std::string title, name;
-    if (iLayer < 8) {sl = 0;} else { sl = floor((iLayer - 8) / 6) + 1;}
-    m_hHitDistInCDCHit[i] = getHist(Form("hHitDistInCDCHit_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
-                                    m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
-    m_hHitDistInCDCHit[i]->SetLineColor(kGreen);
-    m_hHitDistInTrCand[i] = getHist(Form("hHitDistInTrCand_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
-                                    m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
-    m_hHitDistInTrCand[i]->SetLineColor(kRed);
-    m_hHitDistInTrack[i] = getHist(Form("hHitDistInTrack_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
-                                   m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
-    B2INFO("Slayer: " << sl << " |Up:" << m_up.at(sl) << "  |low" << m_low.at(sl));
-    const  double normResRange = 20;
-    const double residualRange = 0.3;
-    if (m_plotResidual) {
-      name = (boost::format("hist_ResidualsU%1%") % iLayer).str();
-      title = (boost::format("unnormalized, unbiased residuals in layer %1%;cm;Tracks") % iLayer).str();
-      m_hResidualU[i] = getHist(name, title, 500, -residualRange, residualRange);
-
-      name = (boost::format("hNormalizedResidualsU%1%") % iLayer).str();
-      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma (cm);Tracks") % iLayer).str();
-      m_hNormalizedResidualU[i] = getHist(name, title, 500, -normResRange, normResRange);
-
-      name = (boost::format("DxDt%1%") % iLayer).str();
-      title = (boost::format("Drift Length vs Drift time at Layer_%1%;Drift Length (cm);Drift time (ns)") % iLayer).str();
-      m_hDxDt[i] = getHist(name, title, 200, -1, 1, 450, -50, 400);
-    }
-    if (m_fillExpertHistos) {
-      name = (boost::format("hNDFResidualsU%1%") % iLayer).str();
-      title = (boost::format("unnormalized, unbiased residuals along U in layer %1%;NDF;cm;Tracks") % iLayer).str();
-      m_hNDFResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
-
-      name = (boost::format("hNDFNormalizedResidualsU%1%") % iLayer).str();
-      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma (cm);Tracks") % iLayer).str();
-      m_hNDFNormalizedResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
-    }
-  }
-  oldDir->cd();
-}
-
-void CDCCRTestModule::initialize()
-{
-  // Register histograms (calls back defineHisto)
-  REG_HISTOGRAM
-  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
-  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
-  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
-  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
-  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
-  //  cdcgeo = CDCGeometryPar::Instance();
-  //Store names to speed up creation later
-  m_recoTrackArrayName = recoTracks.getName();
-  m_trackFitResultArrayName = storeTrackFitResults.getName();
-  m_relRecoTrackTrackName = relRecoTrackTrack.getName();
-
-  tfile = new TFile(m_OutputFileName.c_str(), "RECREATE");
   tree  = new TTree("tree", "tree");
   tree->Branch("x_u", &x_u, "x_u/D");
   tree->Branch("x_b", &x_b, "x_b/D");
@@ -204,6 +111,94 @@ void CDCCRTestModule::initialize()
   tree->Branch("trigHitPos_x", &trigHitPos_x, "trigHitPos_x/D");
   tree->Branch("trigHitPos_z", &trigHitPos_z, "trigHitPos_z/D");
   tree->Branch("trighit", &trighit, "trighit/I");
+  // int N =m_Nchannel;//Number of Wire per Layer used;
+  TDirectory* oldDir = gDirectory;
+  TDirectory* histDir = oldDir->mkdir(m_histogramDirectoryName.c_str());
+  histDir->cd();
+  m_hNTracks = getHist("hNTracks", "number of tracks", 3, 0, 3);
+  m_hNTracks->GetXaxis()->SetBinLabel(1, "fitted, converged");
+  m_hNTracks->GetXaxis()->SetBinLabel(2, "fitted, not converged");
+  m_hNTracks->GetXaxis()->SetBinLabel(3, "TrackCand, but no Track");
+  m_hNDF = getHist("hNDF", "NDF of fitted track;NDF;Tracks", 71, -1, 70);
+  m_hNHits = getHist("hNHits", "#hit of fitted track;#hit;Tracks", 61, -1, 70);
+  m_hNHits_trackcand = getHist("hNHits_trackcand", "#hit of track candidate;#hit;Tracks", 71, -1, 70);
+  m_hNTracksPerEvent = getHist("hNTracksPerEvent", "#tracks/Event;#Tracks;Event", 20, 0, 20);
+  m_hNTracksPerEventFitted = getHist("hNTracksPerEventFitted", "#tracks/Event After Fit;#Tracks;Event", 20, 0, 20);
+  m_hE1Dist = getHist("hE1Dist", "Energy Dist. in case 1track/evt; E(Gev);Tracks", 100, 0, 20);
+  m_hE2Dist = getHist("hE2Dist", "Energy Dist. in case 2track/evt; E(Gev);Tracks", 100, 0, 20);
+  m_hChi2 = getHist("hChi2", "#chi^{2} of tracks;#chi^{2};Tracks", 400, 0, 400);
+  m_hPhi0 = getHist("hPhi0", "#Phi_{0} of tracks;#phi_{0} (Degree);Tracks", 400, -190, 190);
+  m_hAlpha = getHist("hAlpha", "#alpha Dist.;#alpha (Degree);Hits", 360, -90, 90);
+  m_hTheta = getHist("hTheta", "#theta Dist.;#theta (Degree);Hits", 360, 0, 180);
+  m_hPval = getHist("hPval", "p-values of tracks;pVal;Tracks", 1000, 0, 1);
+
+  m_hTriggerHitZX =  getHist("TriggerHitZX", "Hit Position on trigger counter;z(cm);x(cm)", 300, -100, 100, 120, -15, 15);
+  m_h2DHitDistInCDCHit =  getHist("2DHitDistInCDCHit", " CDCHit;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0), m_up.at(8),
+                                  56, 0, 56);
+  m_h2DHitDistInTrCand =  getHist("2DHitDistInTrCand", "Track Cand ;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0),
+                                  m_up.at(8), 56, 0, 56);
+  m_h2DHitDistInTrack =   getHist("2DHitDistInTrack", "Fitted Track ;WireID;LayerID", m_up.at(8) - m_low.at(0), m_low.at(0),
+                                  m_up.at(8), 56, 0, 56);
+  if (m_fillExpertHistos) {
+    m_hNDFChi2 = getHist("hNDFChi2", "#chi^{2} of tracks;NDF;#chi^{2};Tracks", 8, 0, 8, 800, 0, 200);
+    m_hNDFPval = getHist("hNDFPval", "p-values of tracks;NDF;pVal;Tracks", 8, 0, 8, 100, 0, 1);
+  }
+  int sl;
+  for (int i = 0; i < 56; ++i) {
+    int iLayer = i + firstLayer;
+    std::string title, name;
+    if (iLayer < 8) {sl = 0;} else { sl = floor((iLayer - 8) / 6) + 1;}
+    m_hHitDistInCDCHit[i] = getHist(Form("hHitDistInCDCHit_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
+                                    m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
+    m_hHitDistInCDCHit[i]->SetLineColor(kGreen);
+    m_hHitDistInTrCand[i] = getHist(Form("hHitDistInTrCand_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
+                                    m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
+    m_hHitDistInTrCand[i]->SetLineColor(kRed);
+    m_hHitDistInTrack[i] = getHist(Form("hHitDistInTrack_layer%d", iLayer), Form("Hit Dist. ICLayer_%d;WireID;#Hits", iLayer),
+                                   m_up.at(sl) - m_low.at(sl), m_low.at(sl), m_up.at(sl));
+    const  double normResRange = 20;
+    const double residualRange = 0.3;
+    if (m_plotResidual) {
+      name = (boost::format("hist_ResidualsU%1%") % iLayer).str();
+      title = (boost::format("unnormalized, unbiased residuals in layer %1%;cm;Tracks") % iLayer).str();
+      m_hResidualU[i] = getHist(name, title, 500, -residualRange, residualRange);
+
+      name = (boost::format("hNormalizedResidualsU%1%") % iLayer).str();
+      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma (cm);Tracks") % iLayer).str();
+      m_hNormalizedResidualU[i] = getHist(name, title, 500, -normResRange, normResRange);
+
+      name = (boost::format("DxDt%1%") % iLayer).str();
+      title = (boost::format("Drift Length vs Drift time at Layer_%1%;Drift Length (cm);Drift time (ns)") % iLayer).str();
+      m_hDxDt[i] = getHist(name, title, 200, -1, 1, 450, -50, 400);
+    }
+    if (m_fillExpertHistos) {
+      name = (boost::format("hNDFResidualsU%1%") % iLayer).str();
+      title = (boost::format("unnormalized, unbiased residuals along U in layer %1%;NDF;cm;Tracks") % iLayer).str();
+      m_hNDFResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -residualRange, residualRange);
+
+      name = (boost::format("hNDFNormalizedResidualsU%1%") % iLayer).str();
+      title = (boost::format("normalized, unbiased residuals in layer %1%;NDF;#sigma (cm);Tracks") % iLayer).str();
+      m_hNDFNormalizedResidualU[i] = getHist(name, title, 8, 0, 8, 1000, -normResRange, normResRange);
+    }
+  }
+  oldDir->cd();
+
+
+}
+
+void CDCCRTestModule::initialize()
+{
+  // Register histograms (calls back defineHisto)
+  REG_HISTOGRAM
+  StoreArray<Belle2::Track> storeTrack(m_trackArrayName);
+  StoreArray<RecoTrack> recoTracks(m_recoTrackArrayName);
+  StoreArray<Belle2::TrackFitResult> storeTrackFitResults(m_trackFitResultArrayName);
+  StoreArray<Belle2::CDCHit> cdcHits(m_cdcHitArrayName);
+  RelationArray relRecoTrackTrack(recoTracks, storeTrack, m_relRecoTrackTrackName);
+  //Store names to speed up creation later
+  m_recoTrackArrayName = recoTracks.getName();
+  m_trackFitResultArrayName = storeTrackFitResults.getName();
+  m_relRecoTrackTrackName = relRecoTrackTrack.getName();
 
   for (size_t i = 0; i < m_allHistos.size(); ++i) {
     m_allHistos[i]->Reset();
@@ -299,9 +294,6 @@ void CDCCRTestModule::endRun()
 
 void CDCCRTestModule::terminate()
 {
-  tfile->cd();
-  tree->Write();
-  tfile->Close();
 }
 
 void CDCCRTestModule::plotResults(const Belle2::RecoTrack* track)

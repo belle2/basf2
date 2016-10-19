@@ -21,19 +21,11 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#if defined(CDC_XT_FROM_DB)
-#include <cdc/dbobjects/CDCXTs.h>
-#endif
-#if defined(CDC_XTREL_FROM_DB)
 #include <cdc/dbobjects/CDCXtRelations.h>
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-#include <cdc/dbobjects/CDCSigmas.h>
-#endif
-#if defined(CDC_SRESOL_FROM_DB)
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#endif
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCDisplacement.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
@@ -114,27 +106,17 @@ namespace Belle2 {
       //      void readDeltaz(const CDCGeometry&);
 
       /**
-       * Read (mis)alignment params.
-       * @param[in] GearDir Gear Dir.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
-       */
-      void readWirePositionParams(const GearDir, EWirePosition set);
-
-
-      /**
-       * Read (mis)alignment params from DB.
-       * @param[in] DB object of CDCGeometry.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
-       */
-      void readWirePositionParams(const CDCGeometry&, EWirePosition set);
-
-      /**
-       * Read displacement or (mis)alignment params from xml or DB.
+       * Read displacement or (mis)alignment params from text file.
        * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
        * @param[in] Pointer to DB CDCGeometry db object.
        * @param[in] GearDir Gear Dir.
        */
       void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+
+      /**
+       * Set wire alignment params. from DB.
+       */
+      void setWirPosAlignParams();
 
       /**
        * Read XT-relation table.
@@ -890,6 +872,13 @@ namespace Belle2 {
 
 
       /**
+       * Converts incoming-  to outgoing-theta.
+       * @param theta in rad.
+       */
+      double getOutgoingTheta(const double alpha, const double theta) const;
+
+
+      /**
        * Returns the two closest alpha points for the input track incident angle (alpha).
        * @param alpha in rad.
        */
@@ -906,13 +895,13 @@ namespace Belle2 {
        * Returns the two closest theta points for the input track incident angle (theta).
        * @param theta in rad.
        */
-      void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
        * Returns the two closest theta points for sigma for the input track incident angle (theta).
        * @param theta in rad. TODO: unify the two getClosestThetaPoints().
        */
-      void getClosestThetaPoints4Sgm(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
 
       /**
@@ -951,7 +940,10 @@ namespace Belle2 {
 
       void outputDesignWirParam(unsigned layerID, unsigned cellID) const;
 
-
+      /**
+       * Set displacement of sense wire.
+       */
+      void setDisplacement();
 
     private:
       /** Singleton class */
@@ -1068,20 +1060,20 @@ namespace Belle2 {
 #if defined(CDC_TIMEWALK_FROM_DB)
       DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
 #endif
-#if defined(CDC_XT_FROM_DB)
-      DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
-#endif
 #if defined(CDC_XTREL_FROM_DB)
       DBObjPtr<CDCXtRelations> m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-      DBObjPtr<CDCSigmas> m_sigmaFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_SRESOL_FROM_DB)
       DBObjPtr<CDCSpaceResols> m_sResolFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
+#endif
+#if defined(CDC_ALIGN_FROM_DB)
+      DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
+#endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

@@ -57,9 +57,6 @@ void DeSerializerPXDModule::initialize()
     m_recvs.push_back(new EvtSocketSend(m_hosts[i], m_ports[i]));
   }
 
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
   // Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 

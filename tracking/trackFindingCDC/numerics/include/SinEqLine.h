@@ -19,7 +19,7 @@
 #include <framework/logging/Logger.h>
 
 #include <utility>
-#include <math.h>
+#include <cmath>
 
 namespace Belle2 {
 

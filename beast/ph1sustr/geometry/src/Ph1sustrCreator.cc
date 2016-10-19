@@ -121,19 +121,28 @@ namespace Belle2 {
         G4double dz_tpcbeam = 2200. / 2.*CLHEP::mm;
         G4double dw_tpcbeam = 2.54 * 0.25 / 2.*CLHEP::cm;
         //G4double dx_plate = 2.54 * 0.35 / 2.*CLHEP::cm;
-        G4double dx_plate = 0.4765 * CLHEP::cm;
-        G4double dy_plate = 27.47788 / 2.*CLHEP::cm;
-        G4double dz_plate = 40. / 2.*CLHEP::cm;
+
+        //G4double dx_plate_short = 0.4765 * CLHEP::cm;
+        G4double dx_plate_short = 0.5 / 2. * CLHEP::cm;
+        G4double dy_plate_short = 27.47788 / 2.*CLHEP::cm;
+        G4double dz_plate_short = 40. / 2.*CLHEP::cm;
+
+        G4double dx_plate =  0.5 / 2. * CLHEP::cm;
+        G4double dy_plate = 32.  / 2.*CLHEP::cm;
+        G4double dz_plate = 50.  / 2.*CLHEP::cm;
 
         //Right from e^-~--~beam
         //create plate volume
         G4VSolid* s_plate = new G4Box("s_plate", dx_plate, dy_plate, dz_plate);
+        G4VSolid* s_plate_short = new G4Box("s_plate_short", dx_plate_short, dy_plate_short, dz_plate_short);
 
         //place plate volume
         G4LogicalVolume* l_plate = new G4LogicalVolume(s_plate,  geometry::Materials::get("Al") , "l_plate", 0, 0);
+        G4LogicalVolume* l_plate_short = new G4LogicalVolume(s_plate_short,  geometry::Materials::get("Al") , "l_plate_short", 0, 0);
         G4VisAttributes* white = new G4VisAttributes(G4Colour(1, 1, 1));
         white->SetForceAuxEdgeVisible(true);
         l_plate->SetVisAttributes(white);
+        l_plate_short->SetVisAttributes(white);
 
         G4VSolid* s_tpcbeam_a = new G4Box("s_tpcbeam_a", dx_tpcbeam, dy_tpcbeam, dz_tpcbeam);
         G4VSolid* s_tpcbeam_b = new G4Box("s_tpcbeam_b", dx_tpcbeam - 2.*dw_tpcbeam, dy_tpcbeam - dw_tpcbeam, dz_tpcbeam);
@@ -223,7 +232,7 @@ namespace Belle2 {
                         y_tpcbeamB,
                         z_tpcbeamB
                       );
-        new G4PVPlacement(rotXx, PH1SUSTRpos, l_plate, "p_plateB", &topVolume, false, 1);
+        new G4PVPlacement(rotXx, PH1SUSTRpos, l_plate_short, "p_plateB", &topVolume, false, 1);
 
         //place 1st tpc beam volume
         /*PH1SUSTRpos = G4ThreeVector(

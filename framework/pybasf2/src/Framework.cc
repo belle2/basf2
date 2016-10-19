@@ -29,6 +29,8 @@
 #include <boost/python/class.hpp>
 #include <boost/python/overloads.hpp>
 
+#include <set>
+
 using namespace std;
 using namespace boost::python;
 using namespace Belle2;
@@ -87,16 +89,28 @@ void Framework::process(PathPtr startPath, long maxEvent)
   }
 
   static bool already_executed = false;
+  static std::set<const Module*> previously_run_modules; //not a shared pointer to not screw up ownership
   static int errors_from_previous_run = 0;
+  const auto moduleListUnique = startPath->buildModulePathList(true);
   if (already_executed) {
     B2WARNING("Calling process() more than once per steering file is still experimental, please check results carefully! Python modules especially should reinitialise their state in initialise() to avoid problems");
     if (startPath->buildModulePathList(true) != startPath->buildModulePathList(false)) {
       B2FATAL("Your path contains the same module instance in multiple places. Calling process() multiple times is not implemented for this case.");
     }
 
-    //TODO only clone if modules have been run before?
-    startPath = boost::static_pointer_cast<Path>(startPath->clone());
+    //were any modules in moduleListUnique already run?
+    for (auto m : moduleListUnique) {
+      if (previously_run_modules.count(m.get()) > 0) {
+        //only clone if modules have been run before
+        startPath = boost::static_pointer_cast<Path>(startPath->clone());
+        break;
+      }
+    }
   }
+  for (auto m : moduleListUnique) {
+    previously_run_modules.insert(m.get());
+  }
+
   int numLogError = LogSystem::Instance().getMessageCounter(LogConfig::c_Error);
   if (numLogError != errors_from_previous_run) {
     B2FATAL(numLogError << " ERROR(S) occurred! The processing of events will not be started.");

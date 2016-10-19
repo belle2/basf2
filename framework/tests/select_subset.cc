@@ -250,27 +250,6 @@ namespace {
       };
 
       void
-      create(void)
-      {
-        // this method create the StoreArray
-        m_storeArray.create();
-        self = new RelationArray(m_storeArray , m_storeArray);
-        self->create();
-      };
-
-      void
-      create(StoreArray< StoredElement >& set)
-      {
-        // this method create the StoreArray and the RelationArrays
-        // to and from the set
-        m_storeArray.create();
-        from = new RelationArray(storedArray() , set);
-        from->create();
-        to = new RelationArray(set, storedArray());
-        to->create();
-      };
-
-      void
       consolidate()
       {
         // this method consolidate the StoreArray and the RelationArrays
@@ -517,11 +496,6 @@ namespace {
       void
       populateDatastore(void)
       {
-        m_set.create();
-
-        for (auto namedSet : m_otherSets)
-          namedSet.second.create(m_set.storedArray());
-
         unsigned int nElements = 1368;
         for (unsigned int i = 0; i < nElements ; i++)
           appendNewElement(m_set);

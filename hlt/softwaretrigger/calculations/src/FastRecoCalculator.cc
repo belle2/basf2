@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+#include <hlt/softwaretrigger/core/utilities.h>
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <TVector3.h>
 #include <numeric>
@@ -16,52 +17,9 @@ namespace Belle2 {
   namespace SoftwareTrigger {
     void FastRecoCalculator::requireStoreArrays()
     {
-      m_cdcRecoTracks.isRequired("CDCRecoTracks");
+      m_cdcRecoTracks.isRequired();
       m_eclClusters.isRequired();
     };
-
-    template <class T>
-    TLorentzVector getFourVector(const T& item);
-
-    template <>
-    TLorentzVector getFourVector(const ECLCluster& cluster)
-    {
-      return TLorentzVector(cluster.getPx(), cluster.getPy(), cluster.getPz(), cluster.getEnergy());
-    }
-
-    template <>
-    TLorentzVector getFourVector(const RecoTrack& cluster)
-    {
-      const TVector3& positionSeed = cluster.getPositionSeed();
-      return TLorentzVector(positionSeed.X(), positionSeed.Y(), positionSeed.Z(),
-                            sqrt(positionSeed.Mag2() + Const::pionMass * Const::pionMass));
-    }
-
-    template <class T>
-    std::vector<double> getSortedEnergiesFrom(const StoreArray<T>& storeArray, const PCmsLabTransform& transformer)
-    {
-      std::vector<TLorentzVector> lorentzVectors;
-      lorentzVectors.reserve(storeArray.getEntries());
-
-      for (const T& item : storeArray) {
-        const TLorentzVector& fourVector = getFourVector(item);
-        lorentzVectors.push_back(transformer.rotateLabToCms() * fourVector);
-      }
-
-      std::sort(lorentzVectors.begin(), lorentzVectors.end(),
-      [](const TLorentzVector & lhs, const TLorentzVector & rhs) {
-        return lhs.Rho() > rhs.Rho();
-      });
-
-      std::vector<double> energies;
-      energies.reserve(lorentzVectors.size());
-
-      for (const TLorentzVector& lorentzVector : lorentzVectors) {
-        energies.push_back(lorentzVector.Energy());
-      }
-
-      return energies;
-    }
 
     void FastRecoCalculator::doCalculation(SoftwareTriggerObject& calculationResult) const
     {
@@ -164,7 +122,7 @@ namespace Belle2 {
         calculationResult["max_pt"] = 0;
         calculationResult["max_pz"] = 0;
         calculationResult["number_of_high_energy_tracks"] = 0;
-        calculationResult["mean_theta"] = 0;
+        calculationResult["mean_abs_theta"] = 0;
       } else {
         calculationResult["max_pt"] = std::max_element(momenta.begin(), momenta.end(),
         [](const TVector3 & lhs, const TVector3 & rhs) {
@@ -181,7 +139,7 @@ namespace Belle2 {
           return momentum.Pt() > 0.2;
         });
 
-        calculationResult["mean_theta"] = std::accumulate(momenta.begin(), momenta.end(), static_cast<double>(0),
+        calculationResult["mean_abs_theta"] = std::accumulate(momenta.begin(), momenta.end(), static_cast<double>(0),
         [](const double & value, const TVector3 & momentum) {
           return value + momentum.Theta();
         }) / momenta.size();

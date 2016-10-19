@@ -16,7 +16,7 @@ using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
   m_useInWirePropagationDelay(useInWirePropagationDelay), m_eventTime(0), m_cdcp(CDCGeometryPar::Instance()),
-  m_tdcBinWidth(m_cdcp.getTdcBinWidth()), m_vFactor(1.)
+  m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   //  m_tdcOffset   = m_cdcp.getTdcOffset();
   //  m_tdcBinWidth = m_cdcp.getTdcBinWidth();
@@ -26,7 +26,6 @@ RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagati
   cout << "RealisticTDCCountTranslator constructor" << endl;
   cout << "m_cdcp=" << &m_cdcp << endl;
   cout << "m_tdcBinWidth=" << m_tdcBinWidth << endl;
-  cout << "m_vFactor=" << m_vFactor << endl;
 #endif
 }
 
@@ -72,8 +71,7 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
 
   //Now we have an estimate for the time it took from the ionisation to the hitting of the wire.
   //Need to reverse calculate the relation between drift lenght and drift time.
-  double driftL = (driftTime >= 0.) ? m_cdcp.getDriftLength(driftTime, layer, leftRight, alpha,
-                                                            theta) : m_vFactor * driftTime;
+  double driftL = std::copysign(m_cdcp.getDriftLength(fabs(driftTime), layer, leftRight, alpha, theta), driftTime);
 
 #if defined(CDC_DEBUG)
   cout << " " << endl;

@@ -3,6 +3,7 @@ import os
 from collections import deque
 from collections import OrderedDict
 from collections import namedtuple
+from collections import defaultdict
 import json
 from functools import singledispatch, update_wrapper
 import contextlib
@@ -20,9 +21,13 @@ class AlgResult(enum.Enum):
     over the direct CalibrationAlgorithm members but it's nice to have
     something pythonic ready to go.
     """
+    #: OK Return code
     ok = CalibrationAlgorithm.c_OK
+    #: not enought data Return code
     not_enough_data = CalibrationAlgorithm.c_NotEnoughData
+    #: iteration required Return code
     iterate = CalibrationAlgorithm.c_Iterate
+    #: failure Return code
     failure = CalibrationAlgorithm.c_Failure
 
 IoV = namedtuple('IoV', ['exp_low', 'run_low', 'exp_high', 'run_high'])
@@ -41,7 +46,7 @@ def iov_from_vector(iov_vector):
         iov_low, iov_high = iov_list[0], iov_list[-1]
     else:
         iov_low, iov_high = iov_list[0], iov_list[0]
-    return (iov_low, iov_high)
+    return IoV(iov_low[0], iov_low[1], iov_high[0], iov_high[1])
 
 
 def find_sources(dependencies):
@@ -145,6 +150,15 @@ def all_dependencies(dependencies, order=None):
         full_dependencies[node] = list(node_dependencies)
 
     return full_dependencies
+
+
+def past_from_future_dependencies(future_dependencies):
+    nodes = list(future_dependencies.keys())
+    past_dependencies = defaultdict(list)
+    for node, deps in future_dependencies.items():
+        for dep in deps:
+            past_dependencies[dep].append(node)
+    return past_dependencies
 
 
 def decode_json_string(object_string):

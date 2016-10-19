@@ -1,4 +1,5 @@
 #include <hlt/softwaretrigger/modules/SoftwareTriggerModule.h>
+#include <hlt/softwaretrigger/core/utilities.h>
 #include <TFile.h>
 
 using namespace Belle2;
@@ -44,34 +45,35 @@ SoftwareTriggerModule::SoftwareTriggerModule() : Module(), m_resultStoreObjectPo
   addParam("resultStoreArrayName", m_param_resultStoreArrayName, "Store Object Pointer name for storing the "
            "trigger decision.", m_param_resultStoreArrayName);
 
-  addParam("storeDebugOutput", m_param_storeDebugOutput, "Flag to save the results of the calculations leading "
-           "to the the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
-           "debugOutputFileName parameter.", m_param_storeDebugOutput);
+  addParam("storeDebugOutputToROOTFile", m_param_storeDebugOutputToROOTFile, "Flag to save the results of the calculations leading "
+           "to the trigger decisions into a ROOT file. The file path and name of this file can be handled by the "
+           "debugOutputFileName parameter.", m_param_storeDebugOutputToROOTFile);
+
+  addParam("preScaleStoreDebugOutputToDataStore", m_param_preScaleStoreDebugOutputToDataStore,
+           "Prescale with which to save the results of the calculations leading "
+           "to the trigger decisions into the DataStore. Leave to zero, to not store them at all.",
+           m_param_preScaleStoreDebugOutputToDataStore);
 
   addParam("debugOutputFileName", m_param_debugOutputFileName, "File path and name of the ROOT "
            "file, in which the results of the calculation are stored, if storeDebugOutput is "
            "turned on. Please note that already present files will be overridden. "
-           "ATTENTION: This debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
+           "ATTENTION: This file debugging mode does not work in parallel processing.", m_param_debugOutputFileName);
 }
 
-/// Initialize/Require the DB object pointers and any needed store arrays.
 void SoftwareTriggerModule::initialize()
 {
   m_resultStoreObjectPointer.registerInDataStore(m_param_resultStoreArrayName);
-  m_calculation.requireStoreArrays();
+
+  initializeCalculation();
 
   m_dbHandler.initialize(m_param_baseIdentifier, m_param_cutIdentifiers);
 
-  if (m_param_storeDebugOutput) {
-    m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
-    if (not m_debugOutputFile) {
-      B2ERROR("Could not open debug output file. Aborting.");
-    }
-    m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
-    if (not m_debugTTree) {
-      B2ERROR("Could not create debug output tree. Aborting.");
-    }
-  }
+  initializeDebugOutput();
+}
+
+void SoftwareTriggerModule::beginRun()
+{
+  m_dbHandler.checkForChangedDBEntries();
 }
 
 void SoftwareTriggerModule::terminate()
@@ -91,31 +93,74 @@ void SoftwareTriggerModule::event()
     m_resultStoreObjectPointer.construct();
   }
 
-  B2DEBUG(100, "Doing the calculation...");
-  const SoftwareTriggerObject& prefilledObject = m_calculation.fillInCalculations();
-  B2DEBUG(100, "Successfully finished the calculation.");
-
-  if (m_param_storeDebugOutput) {
-    B2DEBUG(100, "Storing debug output as requested.");
-    m_calculation.writeDebugOutput(m_debugTTree);
-    B2DEBUG(100, "Finished storing the debug output.");
+  if (m_param_preScaleStoreDebugOutputToDataStore > 0 and not m_debugOutputStoreObject.isValid()) {
+    m_debugOutputStoreObject.construct();
   }
 
+  B2DEBUG(100, "Doing the calculation...");
+  const SoftwareTriggerObject& prefilledObject = m_calculation->fillInCalculations();
+  B2DEBUG(100, "Successfully finished the calculation.");
+
+  makeCut(prefilledObject);
+  makeDebugOutput();
+}
+
+void SoftwareTriggerModule::initializeCalculation()
+{
+  if (m_param_baseIdentifier == "fast_reco") {
+    m_calculation.reset(new FastRecoCalculator());
+  } else if (m_param_baseIdentifier == "hlt") {
+    m_calculation.reset(new HLTCalculator());
+  } else if (m_param_baseIdentifier == "calib") {
+    m_calculation.reset(new CalibSampleCalculator());
+  } else {
+    B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
+  }
+
+  m_calculation->requireStoreArrays();
+}
+
+void SoftwareTriggerModule::initializeDebugOutput()
+{
+  if (m_param_storeDebugOutputToROOTFile) {
+    m_debugOutputFile.reset(TFile::Open(m_param_debugOutputFileName.c_str(), "RECREATE"));
+    if (not m_debugOutputFile) {
+      B2ERROR("Could not open debug output file. Aborting.");
+    }
+    m_debugTTree.reset(new TTree("software_trigger_results", "software_trigger_results"));
+    if (not m_debugTTree) {
+      B2ERROR("Could not create debug output tree. Aborting.");
+    }
+  }
+
+  if (m_param_preScaleStoreDebugOutputToDataStore > 0) {
+    m_debugOutputStoreObject.registerInDataStore(m_param_debugOutputStoreObjName);
+  }
+}
+
+void SoftwareTriggerModule::makeCut(const SoftwareTriggerObject& prefilledObject)
+{
   for (const auto& cutWithName : m_dbHandler.getCutsWithNames()) {
     const std::string& cutIdentifier = cutWithName.first;
     const auto& cut = cutWithName.second;
-    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << "), with a prescale of " <<
-            cut->getPreScaleFactor());
+    B2DEBUG(100, "Next processing cut " << cutIdentifier << " (" << cut->decompile() << ")");
     const SoftwareTriggerCutResult& cutResult = cut->checkPreScaled(prefilledObject);
-    //TODO: B2DEBUG(100, "The result if the trigger cut is " << cutResult);
     m_resultStoreObjectPointer->addResult(cutIdentifier, cutResult);
   }
 
   setReturnValue(m_resultStoreObjectPointer->getTotalResult(m_param_acceptOverridesReject));
 }
 
-/// Check if the cut representations in the database have changed and download newer ones if needed.
-void SoftwareTriggerModule::beginRun()
+void SoftwareTriggerModule::makeDebugOutput()
 {
-  m_dbHandler.checkForChangedDBEntries();
+  if (m_param_storeDebugOutputToROOTFile) {
+    B2DEBUG(100, "Storing debug output to file as requested.");
+    m_calculation->writeDebugOutput(m_debugTTree);
+    B2DEBUG(100, "Finished storing the debug output to file.");
+  }
+
+  if (makePreScale(m_param_preScaleStoreDebugOutputToDataStore)) {
+    B2DEBUG(100, "Storing debug output to DataStore as requested.");
+    m_calculation->addDebugOutput(m_debugOutputStoreObject, m_param_baseIdentifier);
+  }
 }

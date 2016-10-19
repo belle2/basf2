@@ -77,7 +77,16 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 void MicrotpcStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 9 ; i++) {
-    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
+    h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 1000, 0., 10.);
+    h_mctpc_kinetic_zoom[i]  = new TH1F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
+    h_mctpc_tvp[i] = new TH2F(TString::Format("h_mctpc_tvp_%d", i), "theta v phi", 180, 0., 180., 360, -180., 180.);
+    h_mctpc_tvpW[i] = new TH2F(TString::Format("h_mctpc_tvpW_%d", i), "theta v phi weighted by kin", 180, 0., 180., 360, -180., 180.);
+    h_mctpc_zr[i]  = new TH2F(TString::Format("h_mctpc_zr_%d", i), "r v z", 200, -400., 400., 200, 0., 400.);
+    h_mctpc_kinetic[i]->Sumw2();
+    h_mctpc_kinetic_zoom[i]->Sumw2();
+    h_mctpc_tvp[i]->Sumw2();
+    h_mctpc_tvpW[i]->Sumw2();
+    h_mctpc_zr[i]->Sumw2();
   }
   for (int i = 0 ; i < 8 ; i++) {
     for (int j = 0; j < 12; j++) {
@@ -429,6 +438,12 @@ void MicrotpcStudyModule::event()
     const double mass = mcpart.getMass();
     double kin = energy - mass;
     const double PDG = mcpart.getPDG();
+    const TVector3 vtx = mcpart.getProductionVertex();
+    const TVector3 mom = mcpart.getMomentum();
+    double theta = mom.Theta() * TMath::RadToDeg();
+    double phi = mom.Phi() * TMath::RadToDeg();
+    double z = vtx.Z();
+    double r = sqrt(vtx.X() * vtx.X() + vtx.Y() * vtx.Y());
     int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     if (PDG == 11) partID[0] = 1; //positron
@@ -443,6 +458,10 @@ void MicrotpcStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mctpc_kinetic[i]->Fill(kin);
+        h_mctpc_kinetic_zoom[i]->Fill(kin * 1e3);
+        h_mctpc_tvp[i]->Fill(theta, phi);
+        h_mctpc_tvpW[i]->Fill(theta, phi, kin);
+        h_mctpc_zr[i]->Fill(z, r);
       }
     }
   }

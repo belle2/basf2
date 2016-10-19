@@ -7,6 +7,9 @@ import shutil
 import glob
 import sys
 
+tempdir = tempfile.mkdtemp()
+os.chdir(tempdir)
+
 from basf2 import *
 from modularAnalysis import *
 from ROOT import Belle2
@@ -18,19 +21,20 @@ import fei.provider
 fei.provider.MaximumNumberOfMVASamples = int(1e7)
 fei.provider.MinimumNumberOfMVASamples = int(10)
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst6.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst6.root'\n")
     sys.exit(-1)
 
 selection_path = create_path()
 selection_path.add_module('RootInput', inputFileName=inputFile)
 selection_path.add_module('Gearbox')
 selection_path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
+
 fillParticleLists([('mu+:signal', 'muid > 0.1')], True, selection_path)
 matchMCTruth('mu+:signal', path=selection_path)
 reconstructDecay('tau+:signal ->  mu+:signal', '', writeOut=True, path=selection_path)
@@ -42,9 +46,6 @@ buildRestOfEvent('B+:signal', path=selection_path)
 selection_path.add_module('MCDecayFinder', decayString='B+ ==> tau+ nu_tau', listName='B+:FEIMC', writeOut=True)
 
 particles = get_unittest_channels()
-
-tempdir = tempfile.mkdtemp()
-os.chdir(tempdir)
 
 sys.argv.append('-verbose')
 sys.argv.append('-prune')

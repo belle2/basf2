@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <framework/logging/Logger.h>
 #include <string>
 #include <vector>
 #include <map>

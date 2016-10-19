@@ -14,6 +14,7 @@ from ROOT import Belle2
 from ROOT import gSystem
 
 import shutil
+import os
 
 
 def tree2dict(tree, tree_columns, dict_columns=None):
@@ -128,16 +129,15 @@ class Method(object):
         if specific_options is None:
             specific_options = self.specific_options
 
-        tempdir = tempfile.mkdtemp()
-        identifier = tempdir + "weightfile.xml"
+        with tempfile.TemporaryDirectory() as tempdir:
+            identifier = tempdir + "/weightfile.xml"
 
-        general_options.m_datafiles = basf2_mva.vector(*datafiles)
-        general_options.m_identifier = identifier
+            general_options.m_datafiles = basf2_mva.vector(*datafiles)
+            general_options.m_identifier = identifier
 
-        basf2_mva.teacher(general_options, specific_options)
+            basf2_mva.teacher(general_options, specific_options)
 
-        method = Method(identifier)
-        shutil.rmtree(tempdir)
+            method = Method(identifier)
         return method
 
     def apply_expert(self, datafiles, treename):
@@ -146,20 +146,21 @@ class Method(object):
         @param datafiles the datafiles
         @param treename the name of the tree containing the data
         """
-        tempdir = tempfile.mkdtemp()
+        with tempfile.TemporaryDirectory() as tempdir:
+            identifier = tempdir + "/weightfile.xml"
+            basf2_mva.Weightfile.save(self.weightfile, identifier)
 
-        rootfilename = tempdir + '/expert.root'
-        basf2_mva.expert(basf2_mva.vector(self.identifier),
-                         basf2_mva.vector(*datafiles),
-                         treename,
-                         rootfilename)
-        rootfile = ROOT.TFile(rootfilename, "UPDATE")
-        roottree = rootfile.Get("variables")
+            rootfilename = tempdir + '/expert.root'
+            basf2_mva.expert(basf2_mva.vector(identifier),
+                             basf2_mva.vector(*datafiles),
+                             treename,
+                             rootfilename)
+            rootfile = ROOT.TFile(rootfilename, "UPDATE")
+            roottree = rootfile.Get("variables")
 
-        expert_probability = self.identifier
-        expert_target = self.identifier + '_' + self.general_options.m_target_variable
-        d = tree2dict(roottree,
-                      [Belle2.makeROOTCompatible(expert_probability), Belle2.makeROOTCompatible(expert_target)],
-                      [expert_probability, expert_target])
-        shutil.rmtree(tempdir)
-        return d[expert_probability], d[expert_target]
+            expert_target = identifier + '_' + self.general_options.m_target_variable
+            stripped_expert_target = self.identifier + '_' + self.general_options.m_target_variable
+            d = tree2dict(roottree,
+                          [Belle2.makeROOTCompatible(identifier), Belle2.makeROOTCompatible(expert_target)],
+                          [self.identifier, stripped_expert_target])
+        return d[self.identifier], d[stripped_expert_target]

@@ -19,8 +19,10 @@
     <TimeStep>0.8</TimeStep>
     <MinTime>0.0</MinTime>
     <MaxTime>600.0</MaxTime>
+    <MIPthres>0.5</MIPthres>
     <Ethres>0.2</Ethres>
-    <ConvFac>1.0</ConvFac>
+    <C_keV_to_MIP>242.0</C_keV_to_MIP>
+    <C_MIP_to_PE>15</C_MIP_to_PE>
 
     <Active>
       <phase >1</phase>

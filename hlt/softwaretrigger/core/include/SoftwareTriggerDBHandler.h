@@ -12,7 +12,6 @@
 #include <hlt/softwaretrigger/core/SoftwareTriggerCut.h>
 #include <hlt/softwaretrigger/dbobjects/DBRepresentationOfSoftwareTriggerCut.h>
 #include <framework/database/DBObjPtr.h>
-#include <framework/database/DBImportObjPtr.h>
 
 namespace Belle2 {
   namespace SoftwareTrigger {
@@ -38,25 +37,20 @@ namespace Belle2 {
       /**
        * Helper function to compile the full identifier from the base an the specific cut name.
        * The full name is then created as:
-       *  <package_identifier>_<base_name>_<cut_name>
+       *  <package_identifier>&<base_name>&<cut_name>
+       *
+       * Make sure to not include & into the base or cut name.
        */
       static std::string makeFullCutName(const std::string& baseCutIdentifier,
-                                         const std::string& cutIdentifier)
-      {
-        return s_dbPackageIdentifier + "_" + baseCutIdentifier + "_" + cutIdentifier;
-      }
+                                         const std::string& cutIdentifier);
 
       /**
-       * Upload a new (or replace an old version) cut with the given base and specific name
+       * Upload a new (or replace an old version) cut with the given base and specific name. Neither the base nor the
+       * cut name are allowed to have '&' in it. Please make sure that the base name must correspond to the identifiers
+       * of the calculation objects created in the SoftwareTriggerModule.
        */
       static void upload(const std::unique_ptr<SoftwareTriggerCut>& cut, const std::string& baseCutIdentifier,
-                         const std::string& cutIdentifier, const IntervalOfValidity& iov)
-      {
-        const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);
-        DBImportObjPtr<DBRepresentationOfSoftwareTriggerCut> cutToUpload(fullCutName);
-        cutToUpload.construct(cut);
-        cutToUpload.import(iov);
-      }
+                         const std::string& cutIdentifier, const IntervalOfValidity& iov);
 
       /**
        * Download a cut from the database. This function should only
@@ -66,16 +60,7 @@ namespace Belle2 {
        * @param cutIdentifier The identifier of the cut to download.
        * @return A unique pointer to the downloaded cut or a nullptr of no cut with this name is in the DB.
        */
-      static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier)
-      {
-        const std::string& fullCutName = makeFullCutName(baseCutIdentifier, cutIdentifier);
-        DBObjPtr<DBRepresentationOfSoftwareTriggerCut> downloadedCut(fullCutName);
-        if (downloadedCut) {
-          return downloadedCut->getCut();
-        } else {
-          return std::unique_ptr<SoftwareTriggerCut>();
-        }
-      }
+      static std::unique_ptr<SoftwareTriggerCut> download(const std::string& baseCutIdentifier, const std::string& cutIdentifier);
 
       /** Use the default constructor (needed as we delete the copy constructor) */
       SoftwareTriggerDBHandler() = default;
@@ -86,40 +71,13 @@ namespace Belle2 {
        *
        * To get the cuts with their identifiers, call the getCutsWithNames function.
        */
-      void initialize(const std::string& baseIdentifier, const std::vector<std::string>& cutIdentifiers)
-      {
-        m_databaseObjects.clear();
-        m_cutsWithIdentifier.clear();
-
-        m_databaseObjects.reserve(cutIdentifiers.size());
-
-        for (const std::string& cutIdentifier : cutIdentifiers) {
-          const std::string& fullIdentifier = makeFullCutName(baseIdentifier, cutIdentifier);
-          m_databaseObjects.emplace_back(fullIdentifier);
-          if (m_databaseObjects.back()) {
-            m_cutsWithIdentifier[fullIdentifier] = m_databaseObjects.back()->getCut();
-          } else {
-            B2FATAL("There is no DB object with the name " << fullIdentifier);
-          }
-        }
-      }
+      void initialize(const std::string& baseIdentifier, const std::vector<std::string>& cutIdentifiers);
 
       /// Helper function to check for changes in the DB of all cuts registered in the initialize function.
-      void checkForChangedDBEntries()
-      {
-        for (auto& databaseCutEntry : m_databaseObjects) {
-          if (databaseCutEntry.hasChanged()) {
-            B2INFO(databaseCutEntry.getName());
-            m_cutsWithIdentifier[databaseCutEntry.getName()] = databaseCutEntry->getCut();
-          }
-        }
-      }
+      void checkForChangedDBEntries();
 
       /// Get the already downloaded list of constant cuts with their identifiers.
-      const std::map<std::string, std::unique_ptr<const SoftwareTriggerCut>>& getCutsWithNames() const
-      {
-        return m_cutsWithIdentifier;
-      };
+      const std::map<std::string, std::unique_ptr<const SoftwareTriggerCut>>& getCutsWithNames() const;
 
     private:
       /// Delete the copy constructor

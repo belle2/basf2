@@ -83,18 +83,19 @@ namespace Belle2 {
       m_generateVertex.reset();
     }
 
-    m_event->setGenerationFlags(0);
+    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     TLorentzVector her = generateBeam(m_beamParams->getHER(), m_beamParams->getCovHER(), m_generateHER);
     TLorentzVector ler = generateBeam(m_beamParams->getLER(), m_beamParams->getCovLER(), m_generateLER);
     TVector3 vtx = generateVertex(m_beamParams->getVertex(), m_beamParams->getCovVertex(), m_generateVertex);
     m_event->set(her, ler, vtx);
     //Check if we want to go to CMS, if so boost both
     if (m_beamParams->hasGenerationFlags(BeamParameters::c_generateCMS)) {
+      m_event->setGenerationFlags(0);
       her = m_event->getLabToCMS() * her;
       ler = m_event->getLabToCMS() * ler;
       m_event->set(her, ler, vtx);
+      m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     }
-    m_event->setGenerationFlags(m_beamParams->getGenerationFlags() & m_allowedFlags);
     return *m_event;
   }
 

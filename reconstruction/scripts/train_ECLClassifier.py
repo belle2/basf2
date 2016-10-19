@@ -11,12 +11,15 @@ if __name__ == "__main__":
 
     # path to your files here
     general.m_datafiles = basf2_mva.vector(
-        "/afs/desy.de/user/j/jkrohn/nfs/belle2/my_stuff/generation/root_files/more_new_vars_id/leo_id*.root",)
+        "/nfs/dust/belle2/user/jkrohn/belle2/my_stuff/generation/root_files/FINAL_training/*.root",)
     general.m_treename = "ECLdata"
     general.m_weight = ""
-    general.m_weightfile = "ECLExpert.xml"
+    general.m_identifier = "ECLKLExpert.xml"
     general.m_variables = basf2_mva.vector("ECLenergy", "ECLE9oE25", "ECLtiming", "ECLEerror", "ECLdistToTrack", "ECLdeltaL")
 
     general.m_target_variable = "ECLTruth"
     specific = basf2_mva.FastBDTOptions()
     basf2_mva.teacher(general, specific)
+
+    # Upload the weightfile on disk to the database
+    # basf2_mva.upload('ECLKLExpert.xml', 'ECLKLExpert')

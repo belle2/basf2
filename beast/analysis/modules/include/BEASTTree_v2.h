@@ -143,12 +143,16 @@ namespace Belle2 {
       std::vector<float> CSI_sumE;/** */
       std::vector<float> CSI_Ebin;/** */
       std::vector<float> HE3_rate;/** */
+      std::vector<float> CLAWS_rate;/** */
+      std::vector<float> QCSS_rate;/** */
       std::vector<float> DIA_dose; /** */
       std::vector<float> BGO_energy_av;/** */
       std::vector<float> CSI_hitRate_av;/** */
       std::vector<float> CSI_sumE_av;/** */
       std::vector<float> CSI_Ebin_av;/** */
       std::vector<float> HE3_rate_av;/** */
+      std::vector<float> CLAWS_rate_av;/** */
+      std::vector<float> QCSS_rate_av;/** */
       std::vector<float> DIA_dose_av; /** */
 
 
@@ -213,6 +217,8 @@ namespace Belle2 {
         PIN_dose.clear();
         BGO_energy.clear();
         HE3_rate.clear();
+        CLAWS_rate.clear();
+        QCSS_rate.clear();
         CSI_sumE.clear();
         CSI_Ebin.clear();
         CSI_hitRate.clear();
@@ -221,6 +227,8 @@ namespace Belle2 {
         PIN_dose_av.clear();
         BGO_energy_av.clear();
         HE3_rate_av.clear();
+        CLAWS_rate_av.clear();
+        QCSS_rate_av.clear();
         CSI_sumE_av.clear();
         CSI_Ebin_av.clear();
         CSI_hitRate_av.clear();

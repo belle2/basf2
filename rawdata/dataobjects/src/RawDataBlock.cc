@@ -11,8 +11,6 @@
 using namespace std;
 using namespace Belle2;
 
-ClassImp(RawDataBlock);
-
 RawDataBlock::RawDataBlock()
 {
   m_access_dblk = new RawDataBlockFormat;

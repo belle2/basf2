@@ -305,7 +305,7 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
   const CDCHit* ptrHit = mcSegment.front();
   const CDCHit* ptrNextHit = nextMCSegment.front();
 
-  if (not ptrHit or not ptrNextHit) {
+  if ((not ptrHit) or (not ptrNextHit)) {
     B2ERROR("Nullptr retrieved from MC segment.");
     return false;
   }

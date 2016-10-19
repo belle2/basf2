@@ -43,7 +43,7 @@ namespace Belle2 {
       virtual void fillWith(std::vector<ItemType>& items) = 0;
 
       /** Empty Desctructor. */
-      virtual ~LookUpBase() { }
+      virtual ~LookUpBase() = default;
 
       /// Constant iterator type of this container.
       typedef typename std::vector<ListType>::const_iterator const_iterator;

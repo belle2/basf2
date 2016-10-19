@@ -52,7 +52,6 @@ void PrintDataTemplateModule::initialize()
   // Initialize EvtMetaData
   //  m_eventMetaDataPtr.registerAsPersistent();
   // Create Message Handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
   B2INFO("PrintDataTemplate: initialize() done.");
 
 }

@@ -88,12 +88,12 @@ namespace Belle2 {
       { B2WARNING("pruneGraph: rarenessCut is rubbish: " << rarenessCut << ", stopping prune-process."); return 0; }
       if (rarenessCut == 0) { B2DEBUG(1, "pruneGraph: nothing to be done, stopping prune-process."); return 0; }
 
-      /// vector of trunks:
-      // .first counts total number of occurances of branches of this trunk
+      /// vector of trunks (= outer sector(s)):
+      // .first counts total number of occurances of branches of this trunk (= outer sector(s))
       // .second is a vector of pointers to the subgraphs of that trunk.
       std::vector< std::pair<unsigned, std::vector<SubGraph<FilterType>*> >> trunks;
 
-      // find those sharing a trunk (trunkTotal) and cluster them in trunks:
+      // find those sharing a trunk (trunkTotal) and cluster them in these trunks:
       for (auto& subGraphEntry : m_subgraphs) {
         SubGraph<FilterType>& graph = subGraphEntry.second;
         bool found = false;
@@ -115,7 +115,7 @@ namespace Belle2 {
       B2DEBUG(1, "pruneGraph - before pruning: graph of size " << sizeb4 << " has " << trunks.size() << " trunks with " << nFoundB4 <<
               " total found.");
 
-      // collect subGraphs (branches) to be deleted:
+      // collect subGraphs (=branches) to be deleted:
       std::vector<SubGraph<FilterType>*> deadBranches;
       for (auto& trunk : trunks) {
         double trunkCut = rarenessCut * double(trunk.first);
@@ -201,7 +201,8 @@ namespace Belle2 {
         B2DEBUG(50, "updateSubLayerIDs: was updated " << nSecsUpdated << " times: " << graph.getID().print());
       }
 
-      B2DEBUG(1, "updateSubLayerIDs: nSectors found/updated: " << nFound << "/" << nUpdated << ", nSubgraphs updated: " << nGraphsUpdated);
+      B2DEBUG(1, "updateSubLayerIDs: nSectors found/updated: " << nFound << "/" << nUpdated << ", nSubgraphs updated: " <<
+              nGraphsUpdated);
 
       // create new map of Subgraphs with updated LayerIDs
       // subGraph: copy with updated iD.

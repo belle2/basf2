@@ -70,7 +70,7 @@ namespace KlIdHelpers {
 
     for (ECLCluster& eclcluster : eclClusters) {
 
-      const TVector3& eclclusterPos = eclcluster.getclusterPosition();
+      const TVector3& eclclusterPos = eclcluster.getClusterPosition();
       closestECLAngleDist = eclclusterPos.Angle(klmClusterPosition);
 
       if (closestECLAngleDist < initDistance) {

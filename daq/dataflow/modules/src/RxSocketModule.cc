@@ -50,9 +50,6 @@ void RxSocketModule::initialize()
   // Open receiving socekt
   m_recv = new EvtSocketRecv(m_port);
 
-  // Open message handler
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
-
   // Initialize DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
 

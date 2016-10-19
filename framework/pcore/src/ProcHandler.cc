@@ -45,7 +45,10 @@ namespace {
           continue; //interrupted, try again
         } else if (errno == ECHILD) {
           //We don't have any child processes?
-          EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
+          //EventProcessor::writeToStdErr("\n Called waitpid() without any children left. This shouldn't happen and and indicates a problem.\n");
+          //
+          //actually, this is ok in case we already called waitpid() somewhere else.
+          //In case I want to avoid this, waitid() and WNOWAIT might help, but require libc >= 2.12 (not present in SL5)
           s_pidList.clear();
           return;
         } else {
@@ -156,9 +159,13 @@ int ProcHandler::numEventProcesses()
   return s_nproc;
 }
 
-std::set<int> ProcHandler::processList()
+std::set<int> ProcHandler::globalProcessList()
 {
   return s_pidList;
+}
+std::set<int> ProcHandler::processList() const
+{
+  return m_processList;
 }
 
 int ProcHandler::EvtProcID() { return s_processID; }

@@ -34,6 +34,7 @@
 #include <TH2.h>
 #include <TH3.h>
 #include <TFile.h>
+#include <TMath.h>
 
 int eventNum = 0;
 
@@ -70,6 +71,15 @@ void He3tubeStudyModule::defineHisto()
 {
   for (int i = 0 ; i < 9 ; i++) {
     h_mche3_kinetic[i]  = new TH1F(TString::Format("h_mche3_kinetic_%d", i), "MC kin. energy [GeV]", 1000, 0., 10.);
+    h_mche3_kinetic_zoom[i]  = new TH1F(TString::Format("h_mche3_kinetic_zoom_%d", i), "MC kin. energy [MeV]", 1000, 0., 10.);
+    h_mche3_tvp[i] = new TH2F(TString::Format("h_mche3_tvp_%d", i), "theta v phi", 180, 0., 180., 360, -180., 180.);
+    h_mche3_tvpW[i] = new TH2F(TString::Format("h_mche3_tvpW_%d", i), "theta v phi weighted by kin", 180, 0., 180., 360, -180., 180.);
+    h_mche3_zr[i]  = new TH2F(TString::Format("h_mche3_zr_%d", i), "r v z", 200, -400., 400., 200, 0., 400.);
+    h_mche3_kinetic[i]->Sumw2();
+    h_mche3_kinetic_zoom[i]->Sumw2();
+    h_mche3_tvp[i]->Sumw2();
+    h_mche3_tvpW[i]->Sumw2();
+    h_mche3_zr[i]->Sumw2();
   }
 
   h_NeutronHits = new TH1F("NeutronHits", "Neutron Hits;Tube ", 4, -0.5, 3.5);
@@ -152,7 +162,12 @@ void He3tubeStudyModule::event()
     const double mass = mcpart.getMass();
     double kin = energy - mass;
     const double PDG = mcpart.getPDG();
-    int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    const TVector3 vtx = mcpart.getProductionVertex();
+    const TVector3 mom = mcpart.getMomentum();
+    double theta = mom.Theta() * TMath::RadToDeg();
+    double phi = mom.Phi() * TMath::RadToDeg();
+    double z = vtx.Z();
+    double r = sqrt(vtx.X() * vtx.X() + vtx.Y() * vtx.Y());    int partID[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     if (PDG == 11) partID[0] = 1; //positron
     else if (PDG == -11) partID[1] = 1; //electron
@@ -166,6 +181,10 @@ void He3tubeStudyModule::event()
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mche3_kinetic[i]->Fill(kin);
+        h_mche3_kinetic_zoom[i]->Fill(kin * 1e3);
+        h_mche3_tvp[i]->Fill(theta, phi);
+        h_mche3_tvpW[i]->Fill(theta, phi, kin);
+        h_mche3_zr[i]->Fill(z, r);
       }
     }
   }

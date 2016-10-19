@@ -67,7 +67,6 @@ void FastRbuf2DsModule::initialize()
 
   //  m_rbuf = new RingBuffer(m_rbufname.c_str(), RBUFSIZE);
   m_rbuf = new RingBuffer(m_rbufname.c_str());
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
 
   // Initialize DataStoreStreamer, use Instance to use threads
   //  m_streamer = &(DataStoreStreamer::Instance());

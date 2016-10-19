@@ -143,10 +143,10 @@ void TrackFitterModule::initialize()
   //fctToT_Calib2 = new TF1("fctToT_Calib2", "[0]*(x/[3]+[1])/(x/[3]+[2])", 0., 100000.);
   //fctToT_Calib2->SetParameters(m_TOTA2, m_TOTB2, m_TOTC2, m_TOTQ2);
 
-  fctQ_Calib1 = new TF1("fctQ_Calib1", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);
+  fctQ_Calib1 = new TF1("fctQ_Calib1", "[0]*([1]*x-[2])/([3]-x)", 0., 13.);
   fctQ_Calib1->SetParameters(m_TOTQ1, m_TOTC1, m_TOTA1 * m_TOTB1, m_TOTA1);
 
-  fctQ_Calib2 = new TF1("fctQ_Calib2", "[0]*([1]*x-[2])/([3]-x)", 0., 15.);
+  fctQ_Calib2 = new TF1("fctQ_Calib2", "[0]*([1]*x-[2])/([3]-x)", 0., 13.);
   fctQ_Calib2->SetParameters(m_TOTQ2, m_TOTC2, m_TOTA2 * m_TOTB2, m_TOTA2);
 
   m_CutTPC1e4_PO210bot = new TCutG("m_CutTPC1e4_PO210bot", 25);

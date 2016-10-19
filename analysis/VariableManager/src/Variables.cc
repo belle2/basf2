@@ -1124,7 +1124,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower)
-        result = shower->getTemporaryMinTrkDistance();
+        result = shower->getMinTrkDistance();
 
       return result;
     }
@@ -1135,7 +1135,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower)
-        result = shower->getTemporaryDeltaL();
+        result = shower->getDeltaL();
 
       return result;
     }
@@ -1162,7 +1162,7 @@ namespace Belle2 {
       if (!ecl)
         return -1.0;
 
-      TVector3 v1raw = ecl->getclusterPosition();
+      TVector3 v1raw = ecl->getClusterPosition();
       TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
 
       // Get closest track from Helix
@@ -1244,7 +1244,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getErrorEnergy();
+        result = shower->getUncertaintyEnergy();
       }
       return result;
     }
@@ -1255,7 +1255,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getEnedepSum();
+        result = shower->getEnergyRaw();
       }
       return result;
     }
@@ -1266,7 +1266,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getHighestE();
+        result = shower->getEnergyHighestCrystal();
       }
       return result;
     }
@@ -1277,7 +1277,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getTiming();
+        result = shower->getTime();
       }
       return result;
     }
@@ -1288,7 +1288,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getErrorTiming();
+        result = shower->getDeltaTime99();
       }
       return result;
     }
@@ -1332,7 +1332,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getE9oE25();
+        result = shower->getE9oE21();
       }
       return result;
     }
@@ -1354,7 +1354,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getMergedPi0();
+        //result = shower->getMergedPi0();
       }
       return result;
     }
@@ -1365,7 +1365,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getNofCrystals();
+        result = shower->getNumberOfCrystals();
       }
       return result;
     }

@@ -741,11 +741,6 @@ void VXDTFModule::the_real_event()
 
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<genfit::TrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
-  finalTrackCandidates.create();
-  if (m_TESTERexpandedTestingRoutines == true) {
-    StoreArray<VXDTFInfoBoard> extraInfo4GFTCs(m_PARAMinfoBoardName);
-    extraInfo4GFTCs.create();
-  }
 
   VXD::GeoCache& geometry = VXD::GeoCache::getInstance();
 

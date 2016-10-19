@@ -28,6 +28,11 @@ def getCommandLineOptions():
     parser.add_argument('-tree', '--treename', dest='treename', type=str, default='tree', help='Treename in data file')
     parser.add_argument('-out', '--outputfile', dest='outputfile', type=str, default='output.pdf',
                         help='Name of the outputted pdf file')
+    parser.add_argument('-weightfile', '--weightfile', dest='weightfile', action='store_true',
+                        help='Read feature importances from weightfile')
+    parser.add_argument('-iterative', '--iterative', dest='iterative', action='store_true',
+                        help='Improve the importance estimation by iteratively'
+                             'leaving one variable out and retrain. Needs O(NFeatures) Trainings!')
     parser.add_argument('-recursive', '--recursive', dest='recursive', action='store_true',
                         help='Improve the importance estimation by recursively'
                              'remove the most important variable. Needs O(NFeatures**2) Trainings!')
@@ -77,7 +82,8 @@ def get_importances_recursive(method, train_datfiles, test_datafiles, treename, 
         return imp
 
     importances = {most_important: imp[most_important]}
-    rest = get_importances_recursive(method, train_datfiles, test_datafiles, treename, remaining_variables, global_auc)
+    rest = get_importances_recursive(method, train_datfiles, test_datafiles, treename,
+                                     remaining_variables, global_auc - imp[most_important])
     importances.update(rest)
     return importances
 
@@ -93,6 +99,7 @@ if __name__ == '__main__':
 
     methods = [basf2_mva_util.Method(identifier) for identifier in identifiers]
 
+    labels = []
     importances = []
     all_variables = []
     for method in methods:
@@ -100,39 +107,43 @@ if __name__ == '__main__':
         for variable in method.variables:
             all_variables.append(variable)
         if args.recursive:
-            imp = get_importances_recursive(method, train_datafiles, test_datafiles, args.treename, method.variables, global_auc)
-            for key in imp.keys():
-                imp[key] = global_auc - imp[key]
-        else:
-            imp = get_importances(method, train_datafiles, test_datafiles, args.treename, method.variables, global_auc)
-        importances.append(imp)
+            importances.append(get_importances_recursive(method, train_datafiles, test_datafiles,
+                                                         args.treename, method.variables, global_auc))
+            labels.append(method.identifier + ' (recursive)')
+        if args.iterative:
+            importances.append(get_importances(method, train_datafiles, test_datafiles,
+                                               args.treename, method.variables, global_auc))
+            labels.append(method.identifier + ' (iterative)')
+        if args.weightfile:
+            importances.append(method.importances)
+            labels.append(method.identifier + ' (weightfile)')
 
     all_variables = list(sorted(all_variables, key=lambda v: importances[0].get(v, 0.0)))
 
     importances_dict = {}
-    for i, method in enumerate(methods):
-        importances_dict[method.identifier] = np.array([importances[i].get(v, 0.0) for v in all_variables])
+    for i, label in enumerate(labels):
+        importances_dict[label] = np.array([importances[i].get(v, 0.0) for v in all_variables])
 
     # Change working directory after experts run, because they might want to access
     # a locadb in the current working directory
-    tempdir = tempfile.mkdtemp()
-    os.chdir(tempdir)
+    with tempfile.TemporaryDirectory() as tempdir:
+        os.chdir(tempdir)
 
-    o = b2latex.LatexFile()
-    o += b2latex.TitlePage(title='Automatic Feature Importance Report',
-                           authors=[r'Thomas Keck'],
-                           abstract='Feature importance calculated by leaving one variable out and retrain',
-                           add_table_of_contents=False,
-                           clearpage=False).finish()
+        o = b2latex.LatexFile()
+        o += b2latex.TitlePage(title='Automatic Feature Importance Report',
+                               authors=[r'Thomas Keck'],
+                               abstract='Feature importance calculated by leaving one variable out and retrain',
+                               add_table_of_contents=False,
+                               clearpage=False).finish()
 
-    graphics = b2latex.Graphics()
-    p = plotting.Importance()
-    p.add(importances_dict, identifiers, all_variables)
-    p.finish()
-    p.save('importance.png')
-    graphics.add('importance.png', width=1.0)
-    o += graphics.finish()
+        graphics = b2latex.Graphics()
+        p = plotting.Importance()
+        p.add(importances_dict, labels, all_variables)
+        p.finish()
+        p.save('importance.png')
+        graphics.add('importance.png', width=1.0)
+        o += graphics.finish()
 
-    o.save('latex.tex', compile=True)
-    os.chdir(old_cwd)
-    shutil.copy(tempdir + '/latex.pdf', args.outputfile)
+        o.save('latex.tex', compile=True)
+        os.chdir(old_cwd)
+        shutil.copy(tempdir + '/latex.pdf', args.outputfile)

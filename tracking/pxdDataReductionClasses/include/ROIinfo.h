@@ -15,6 +15,5 @@ struct ROIinfo {
   std::string gfTrackCandsColName; /**< TrackCand list name*/
   std::string PXDInterceptListName; /**< Intercept list name*/
   std::string ROIListName; /**< ROI list name*/
-  std::string badTracksListName; /**< bad track list name*/
-  std::string gfTracksListName; /**< track list name*/
+  std::string recoTracksListName; /**< track list name*/
 };

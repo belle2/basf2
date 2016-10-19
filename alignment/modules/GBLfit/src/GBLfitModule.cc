@@ -710,7 +710,11 @@ void GBLfitModule::event()
 
       if (m_seedFromDAF) {
         try {
-          genfit::AbsFitter* dafFitter = new genfit::DAF();
+          genfit::AbsFitter* dafFitter = new genfit::DAF(true,
+                                                         /// This is the difference on pvalue between two fit iterations of the DAF procedure which
+                                                         /// is used as a early termination criteria of the DAF procedure. This is large on purpose
+                                                         /// See https://agira.desy.de/browse/BII-1725 for details
+                                                         1.0f);
           dafFitter->processTrack(&gfTrack);
           genfit::MeasuredStateOnPlane mop = gfTrack.getFittedState();
           TVector3 poca(0., 0., 0.); //point of closest approach

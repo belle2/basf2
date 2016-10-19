@@ -10,27 +10,25 @@
 
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
-#include <framework/datastore/StoreArray.h>
-
-#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-
-#include <algorithm>
-#include <framework/core/Module.h>
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 
-//out type
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <genfit/TrackCand.h>
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
+
+#include <framework/datastore/StoreArray.h>
+#include <framework/logging/Logger.h>
+
+#include <functional>
+#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrackFinderCDCBaseModule::TrackFinderCDCBaseModule() :
-  Module(),
-  m_param_tracksStoreObjName("CDCTrackVector"),
-  m_param_tracksStoreObjNameIsInput(false)
+TrackFinderCDCBaseModule::TrackFinderCDCBaseModule()
+  : Module()
+  , m_param_tracksStoreObjName("CDCTrackVector")
+  , m_param_tracksStoreObjNameIsInput(false)
 {
   setDescription("This a base module for all track finders in the CDC");
 
@@ -60,7 +58,7 @@ void TrackFinderCDCBaseModule::initialize()
   m_trackExporter.initialize();
 
   // Output StoreArray
-  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   if (m_param_tracksStoreObjNameIsInput) {
     storedTracks.isRequired();
   } else {
@@ -75,10 +73,17 @@ void TrackFinderCDCBaseModule::event()
   m_trackExporter.beginEvent();
 
   // Now aquire the store vector
-  StoreWrappedObjPtr< std::vector<CDCTrack> > storedTracks(m_param_tracksStoreObjName);
-  if (not m_param_tracksStoreObjNameIsInput) {
+  StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+  if (m_param_tracksStoreObjNameIsInput) {
+    // Somehow it is possible that we receive empty tracks (probably from the LegendreFinder)
+    // Drop them before proceding
+    std::vector<CDCTrack>& tracks = *storedTracks;
+    auto itLast = std::remove_if(tracks.begin(), tracks.end(), std::mem_fun_ref(&CDCTrack::empty));
+    tracks.erase(itLast, tracks.end());
+  } else {
     storedTracks.create();
   }
+
   std::vector<CDCTrack>& outputTracks = *storedTracks;
 
   // Either we just have to let the generate-method fill the outputTracks,

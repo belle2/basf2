@@ -43,7 +43,7 @@ namespace Belle2 {
       typedef CDCRecoSegment2D CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.
-      virtual ~StereoSegmentTrackMatcherQuadTree() { }
+      virtual ~StereoSegmentTrackMatcherQuadTree() = default;
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "");

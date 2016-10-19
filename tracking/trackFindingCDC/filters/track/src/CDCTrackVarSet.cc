@@ -22,6 +22,9 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   bool extracted = extractNested(track);
   if (not extracted or not track) return false;
 
+  if (track->empty()) {
+    return false;
+  }
 
   unsigned int size = track->size();
   double drift_length_sum = 0;

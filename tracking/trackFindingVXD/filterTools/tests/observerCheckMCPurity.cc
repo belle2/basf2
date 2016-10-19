@@ -12,7 +12,7 @@
 
 #include <tracking/trackFindingVXD/filterTools/ObserverCheckMCPurity.h>
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/ClosedRange.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleRadius.h> // used since it is easy for testing
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleRadius.h> // used since it is easy for testing
 #include <tracking/spacePointCreation/SpacePoint.h>
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>

@@ -51,23 +51,14 @@ REG_MODULE(ECLFinalizerPureCsI)
 ECLFinalizerModule::ECLFinalizerModule() : Module()
 {
   // Set description
-  setDescription("ECLFinalizerModule: Converts ecl dataobjects to mdst dataobjects");
+  setDescription("ECLFinalizerModule: Converts ecl shower dataobjects to mdst eclcluster dataobjects");
 
   addParam("clusterEnergyCutMin", m_clusterEnergyCutMin, "Min value for the cluster energy cut.",
-           0.0 * Belle2::Unit::GeV);
-  addParam("clusterEnergyCutMax", m_clusterEnergyCutMax, "Max value for the cluster energy cut.",
-           999.9 * Belle2::Unit::GeV);
-  addParam("highestEnergyCutMin", m_highestEnergyCutMin, "Min value for the highest energy cut.",
-           0.0 * Belle2::Unit::GeV);
-  addParam("highestEnergyCutMax", m_highestEnergyCutMax, "Max value for the highest energy cut.",
-           999.9 * Belle2::Unit::GeV);
-  addParam("clusterTimeCutMin", m_clusterTimeCutMin, "Min value for the cluster time cut.",
-           -125.0 * Belle2::Unit::ns);
-  addParam("clusterTimeCutMax", m_clusterTimeCutMax, "Max value for the cluster time cut.",
-           125.0 * Belle2::Unit::ns);
+           20.0 * Belle2::Unit::MeV);
+  addParam("clusterTimeCutMaxEnergy", m_clusterTimeCutMaxEnergy, "All clusters above this energy are kept.",
+           50.0 * Belle2::Unit::MeV);
 
   setPropertyFlags(c_ParallelProcessingCertified);
-
 }
 
 ECLFinalizerModule::~ECLFinalizerModule()
@@ -104,58 +95,68 @@ void ECLFinalizerModule::event()
   // loop over all ECLShowers
   for (const auto& eclShower : eclShowers) {
 
-    // create an mdst cluster for each ecl shower
-    if (!eclClusters) eclClusters.create();
-
     // get shower time, energy and highest energy for cuts
     const double showerTime = eclShower.getTime();
+    const double showerdt99 = eclShower.getDeltaTime99();
     const double showerEnergy = eclShower.getEnergy();
-    const double highestEnergy = eclShower.getHighestEnergy();
 
-    // Loose timing cut is applied. 20150529 K.Miyabayashi (original comment)
-    // replaced -300..200 clocktick cut by +/- 125ns cut (Torbenm 24-March-2016) - THIS WILL BE REPLACED BY AN ENERGY DEPENDENT CUT USING THE RESOLUTION SOON
-    if ((m_clusterTimeCutMin < showerTime and showerTime < m_clusterTimeCutMax)
-        and (m_clusterEnergyCutMin < showerEnergy and showerEnergy < m_clusterEnergyCutMax)
-        and (m_highestEnergyCutMin < highestEnergy and highestEnergy < m_highestEnergyCutMax)) {
+    // only keep showers above an energy threshold (~20MeV) and if their time is within
+    // the 99% coverage of the time resolution (failed fits pass as well)
+    // high energetic clusters (~50MeV+) pass as well in order to keep all out of time
+    // background events that may damage real clusters
+    if (showerEnergy > m_clusterEnergyCutMin
+        and ((fabs(showerTime) < showerdt99) or (showerEnergy > m_clusterTimeCutMaxEnergy))) {
 
+      // create an mdst cluster for each ecl shower
+      if (!eclClusters) eclClusters.create();
       const auto eclCluster = eclClusters.appendNew();
 
-      eclCluster->setTiming(eclShower.getTime());
+      // set all variables
+      eclCluster->setStatus(eclShower.getStatus());
+      eclCluster->setConnectedRegionId(eclShower.getConnectedRegionId());
+      eclCluster->setHypothesisId(eclShower.getHypothesisId());
+
       eclCluster->setEnergy(eclShower.getEnergy());
+      eclCluster->setEnergyRaw(eclShower.getEnergyRaw());
+      eclCluster->setEnergyHighestCrystal(eclShower.getEnergyHighestCrystal());
+
+      double covmat[6] = {
+        eclShower.getUncertaintyEnergy()* eclShower.getUncertaintyEnergy(),
+        0.0,
+        eclShower.getUncertaintyPhi()* eclShower.getUncertaintyPhi(),
+        0.0,
+        0.0,
+        eclShower.getUncertaintyTheta()* eclShower.getUncertaintyTheta()
+      };
+      eclCluster->setCovarianceMatrix(covmat);
+
+      //TMatrixDSym covmatecls = eclShower.getCovarianceMatrix3x3();
+      //covmatecls.Print();
+      //TMatrixDSym covmatecl = eclCluster->getCovarianceMatrix3x3();
+      //covmatecl.Print();
+
+      // m_deltaL is set in track-cluster matching
+      // m_minTrkDistance is set in track-cluster matching
+
+      eclCluster->setAbsZernike40(eclShower.getAbsZernike40());
+      eclCluster->setAbsZernike51(eclShower.getAbsZernike51());
+      eclCluster->setZernikeMVA(eclShower.getZernikeMVA());
+      eclCluster->setE1oE9(eclShower.getE1oE9());
+      eclCluster->setE9oE21(eclShower.getE9oE21());
+      eclCluster->setSecondMoment(eclShower.getSecondMoment());
+      eclCluster->setLAT(eclShower.getLateralEnergy());
+      eclCluster->setNumberOfCrystals(eclShower.getNumberOfCrystals());
+      eclCluster->setTime(eclShower.getTime());
+      eclCluster->setDeltaTime99(eclShower.getDeltaTime99());
       eclCluster->setTheta(eclShower.getTheta());
       eclCluster->setPhi(eclShower.getPhi());
       eclCluster->setR(eclShower.getR());
-
-      eclCluster->setEnedepSum(eclShower.getEnedepSum());
-      eclCluster->setNofCrystals((int) eclShower.getNofCrystals());
-      eclCluster->setHighestE(eclShower.getHighestEnergy());
-      double Mdst_Error[6] = {
-        eclShower.getEnergyError(),
-        0,
-        eclShower.getPhiError(),
-        0,
-        0,
-        eclShower.getThetaError()
-      };
-      eclCluster->setError(Mdst_Error);
-
-      // ECLCluster has no "ID"-like structures yet, use the unused "CrystHealth" until we fix the mdst object
-      /** Utility unpacker of the shower id that contains CR, seed and hypothesis */
-      ECLShowerId SUtility;
-      int uniqueid = SUtility.getShowerId(eclShower.getConnectedRegionId(), eclShower.getHypothesisId(), eclShower.getShowerId());
-      eclCluster->setCrystHealth(uniqueid);
-
-      // set shower shapes variables
-      eclCluster->setLAT(eclShower.getLateralEnergy());
-      eclCluster->setE9oE25(eclShower.getE9oE25());
 
       // set relation to ECLShower
       eclCluster->addRelationTo(&eclShower);
 
     }
-
   }
-
 }
 
 void ECLFinalizerModule::endRun()

@@ -68,6 +68,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useC
       msop.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result to the perigee point. Why, I don't know.");
+      continue;
     }
 
     // Build track fit result.

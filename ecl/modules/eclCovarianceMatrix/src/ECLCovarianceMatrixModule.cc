@@ -91,9 +91,9 @@ void seterrormatrix(ECLShower& eclShower)
 
   double sigmaTheta = sigmaPhi * sin(theta);
 
-  double ErrorMatrix[6] = {sigmaE, 0.0, sigmaPhi, 0.0, 0.0, sigmaTheta};
+  double covMatrix[6] = {sigmaE * sigmaE, 0.0, sigmaPhi * sigmaPhi, 0.0, 0.0, sigmaTheta * sigmaTheta};
 
-  eclShower.setError(ErrorMatrix);
+  eclShower.setCovarianceMatrix(covMatrix);
 }
 
 void ECLCovarianceMatrixModule::event()

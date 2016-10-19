@@ -101,5 +101,12 @@ namespace Belle2 {
       */
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments);
 
+    /**
+     * Returns the number of non-overlapping particles in the given particle lists
+     * with respect to the particle the variable is applied on.
+     * Arguments are the particle lists
+     */
+    Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments);
+
   }
 }

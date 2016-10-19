@@ -33,7 +33,7 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
   addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>", string(""));
 
   addParam("reduceTCSetBeforeHNN", m_PARAMreduceTCSetBeforeHNN,
-           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered, including non-overlapping ones",
+           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered, including non-overlapping ones. WARNING at the moment only option(false) is supported!",
            bool(false));
 }
 
@@ -47,6 +47,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
 
   std::vector<TcInfo4Hopfield> overlapTCinfo;
   if (m_PARAMreduceTCSetBeforeHNN) {
+    B2FATAL(" TrackSetEvaluatorHopfieldNNDEVModule: option reduceTCSetBeforeHNN is not yet supported - would you like to implement it?");
     overlapTCinfo = reduceOverlappingNetwork();
   } else {
     overlapTCinfo = convertOverlappingNetwork();
@@ -130,7 +131,7 @@ std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvalu
 
   for (const SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     const vector<unsigned short>& currentOverlaps = m_overlapNetworks[0]->getOverlapForTrackIndex(
-                                                      aTC.getArrayIndex()); // WARNING only first overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
+                                                      aTC.getArrayIndex()); // Jakob: WARNING only first overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
 //  if (currentOverlaps.empty() or aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
 
     overlappingTCs.push_back(TcInfo4Hopfield());

@@ -386,6 +386,13 @@ namespace {
       MVA::ROOTDataset chain_test(general_options);
       EXPECT_EQ(chain_test.getNumberOfEvents(), 15);
     }
+    // Test m_max_events feature
+    {
+      general_options.m_max_events = 10;
+      MVA::ROOTDataset chain_test(general_options);
+      EXPECT_EQ(chain_test.getNumberOfEvents(), 10);
+      general_options.m_max_events = 0;
+    }
 
     // Check for missing tree
     general_options.m_treename = "missing tree";

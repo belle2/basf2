@@ -33,7 +33,7 @@ namespace Belle2 {
       typedef CDCRecoSegment2D CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.
-      virtual ~StereoSegmentTrackMatcherFilter() { }
+      virtual ~StereoSegmentTrackMatcherFilter() = default;
 
       /**
        * Use the given filter (via the module parameters) to find a matching.

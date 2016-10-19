@@ -1,4 +1,4 @@
 Import('env')
-env['LIBS'] = ['$ROOT_LIBS', 'framework', 'reconstruction_dataobjects', 'genfit2', 'cdc', 'pxd_dataobjects', 'svd_dataobjects', 'tracking_dataobjects', 'cdc_dataobjects', 'mdst_dataobjects', 'geometry', 'vxd', 'vxd_dataobjects']
+env['LIBS'] = ['$ROOT_LIBS', 'framework', 'reconstruction_dataobjects', 'genfit2', 'cdc', 'tracking_dataobjects', 'cdc_dataobjects', 'mdst_dataobjects', 'vxd']
 Return('env')
 

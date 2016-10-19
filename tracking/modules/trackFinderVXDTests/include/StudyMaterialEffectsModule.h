@@ -34,8 +34,12 @@ namespace Belle2 {
 
 
 
-    /** takes SVDTrueHit and sensorID to get global position of the hit. */
+    /** takes SVDTrueHit and sensorID to get global position of the hit. If useEntry == true, the entry position is taken, else: exitPosition. */
     B2Vector3D getGlobalPosition(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
+
+    /** takes SVDTrueHit and sensorID to get global momentum of the hit. If useEntry == true, the entry momentum is taken, else: exitMomentum. */
+    B2Vector3D getGlobalMomentumVector(const SVDTrueHit* trueHit, VxdID vxdID, bool useEntry);
+
 
     /** takes SpacePoint to get the (first) corresponding trueHit connected to the same particle. */
     const SVDTrueHit* getTrueHit(const SpacePoint& aSP);
@@ -78,15 +82,6 @@ namespace Belle2 {
     /** residual of hit.scatteringAngle (sqrt(theta^2 + phi^2)) between layer 3 begin and 6 end. */
     double m_ScatterAngleL3L6 = 0;
 
-    /** residual of hit.scatteringAngle ((outerHit-innerHit).Angle(innerHit)) between layer 3 begin and 3 end. */
-    double m_ScatterAngleV2L3L3 = 0;
-
-    /** residual of hit.scatteringAngle ((outerHit-innerHit).Angle(innerHit)) between layer 3 begin and 4 begin. */
-    double m_ScatterAngleV2L3L4 = 0;
-
-    /** residual of hit.scatteringAngle ((outerHit-innerHit).Angle(innerHit)) between layer 3 begin and 6 end. */
-    double m_ScatterAngleV2L3L6 = 0;
-
     /** residual of hit.scatteringAngle ((outerHit-innerHit).Angle(innerHit))*180/pi between layer 3 begin and 3 end. */
     double m_ScatterAngleGradL3L3 = 0;
 
@@ -96,8 +91,14 @@ namespace Belle2 {
     /** residual of hit.scatteringAngle ((outerHit-innerHit).Angle(innerHit))*180/pi between layer 3 begin and 6 end. */
     double m_ScatterAngleGradL3L6 = 0;
 
+    /** residual of hit.scatteringAngle ((outerHit.Momentum).Angle(innerHit.Momentum))*180/pi between layer 3 begin and 3 end. */
+    double m_ScatterAngleV3GradL3L3 = 0;
 
+    /** residual of hit.scatteringAngle (outerHit.Momentum).Angle(innerHit.Momentum))*180/pi between layer 3 begin and 4 begin. */
+    double m_ScatterAngleV3GradL3L4 = 0;
 
+    /** residual of hit.scatteringAngle (outerHit.Momentum).Angle(innerHit.Momentum))*180/pi between layer 3 begin and 6 end. */
+    double m_ScatterAngleV3GradL3L6 = 0;
 
     /** residual of hit distance between layer 3 begin and 4 begin. */
     double m_distXY = 0;

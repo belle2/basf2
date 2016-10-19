@@ -46,7 +46,7 @@ namespace Belle2 {
     /** Return cell ID
      * @return cell ID
      */
-    float getCellID() const {return m_cellID; };
+    int getCellID() const {return m_cellID; };
 
     /** Set calibration offset
      * @param calibration offset
@@ -62,7 +62,8 @@ namespace Belle2 {
     int m_cellID;       /**< ECL cell ID */
     float m_offset;  /**< time offset 'a' */
 
-    ClassDef(ECLDigitTimeConstants, 1); /**< ClassDef */
+    // 2: changed getter getCelleID from float to int
+    ClassDef(ECLDigitTimeConstants, 2); /**< ClassDef */
   };
 } // end namespace Belle2
 #endif

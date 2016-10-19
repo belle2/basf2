@@ -62,7 +62,6 @@ void PXDClusterRescueROIModule::event()
   // load required data
   StoreArray<genfit::Track> gfTracks(m_gfTracksColName);
   StoreArray<ROIid> ROIids(m_ROIidColName);
-  ROIids.create();
 
   // get pxd geometry and iterators
   VXD::GeoCache& vxdGeometry = VXD::GeoCache::getInstance();

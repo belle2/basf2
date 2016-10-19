@@ -25,7 +25,7 @@ MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=2&runName=0 HTTP/1
 MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=3&runName=0 HTTP/1.1" 200 -
 [INFO] Conditions service retrieved 1 payloads for experiment 3 and run 0 listed under global tag localtest
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=14
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
    LER=(0.166035, 0, -3.99855, 4.002), 
    CMS=(0.456618, 0, 2.99942, 11.006), 
@@ -36,7 +36,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=3&runName=1 HTTP/1.1" 200 -
 [INFO] Conditions service retrieved 1 payloads for experiment 3 and run 1 listed under global tag localtest
 [INFO] Found file: dbstore_BeamParameters_rev_1.root with correct MD5 checksum: 2447fbcf76419fbbc7c6d015ef507769
-[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=14
+[INFO] BeamParameters: cms Energy=10.5796 GeV, flags=smearBeamEnergy smearBeamDirection smearVertex
    HER=(0.290583, 0, 6.99797, 7.004), 
    LER=(0.166035, 0, -3.99855, 4.002), 
    CMS=(0.456618, 0, 2.99942, 11.006), 
@@ -58,8 +58,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [FATAL] 1 ERROR(S) occurred! The processing of events will not be started.
 [RESULT] Starting event processing, random seed is set to 'something important'
 MockConditionsDB: "GET /iovPayloads/?gtName=localtest&expName=6&runName=0 HTTP/1.1" 200 -
-[WARNING] Found duplicate payload key dbstoreBeamParameters while parsing conditions payloads. Discarding revision 1 and using revision 2
-[WARNING] Found duplicate payload key dbstoreBeamParameters while parsing conditions payloads. Discarding revision 2 and using revision 3
+[INFO] Found more then one payload for the following keys: BeamParameters
 [INFO] Conditions service retrieved 1 payloads for experiment 6 and run 0 listed under global tag localtest
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_3.root HTTP/1.1" 404 -
 [WARNING] Could not download payload for dbstore/BeamParameters from database: The requested URL returned error: 404 Not Found

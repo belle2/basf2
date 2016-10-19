@@ -13,7 +13,7 @@
 #include <TDatabasePDG.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

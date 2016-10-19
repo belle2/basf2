@@ -67,9 +67,7 @@ namespace prog = boost::program_options;
 namespace {
   void executePythonFile(const string& pythonFile)
   {
-    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
-
-    fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
+    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
     if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
       std::ifstream file(fullPath.string().c_str());
@@ -139,7 +137,7 @@ int main(int argc, char* argv[])
     ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("no-stats",
-     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print statistics'.")
+     "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print(statistics)'.")
     ("dry-run",
      "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),

@@ -107,8 +107,6 @@ namespace Belle2 {
       double m_timeResolutionPointResolution[4]; /**< Time resolution calibration interpolation parameter "Resolution". */
       double m_timeResolutionPointX[4];  /**< Time resolution calibration interpolation parameter "x = 1/E (GeV)". */
       const double c_timeResolutionForFitFailed  = 1.0e9; /**< Time resolution for failed fits". */
-      const double c_timeResolutionForZeroEnergy =
-        1.0e9; /**< Time resolution for (very close to) zero energy digits (should not happen)". */
       const double c_timeForFitFailed            = 0.0; /**< Time for failed fits". */
       const int c_MinimumAmplitude               = 1; /**< Minimum amplitude". */
       const double c_energyForSmallAmplitude     = 0.0; /**< Energy for small amplitudes". */

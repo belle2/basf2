@@ -1,5 +1,5 @@
 Import('env')
 
 env['SUBLIB'] = True
-env['LIBS'] = ['framework', 'analysis_dataobjects', 'mdst_dataobjects', 'EG', 'analysis_utility']
+env['LIBS'] = ['framework', 'analysis_dataobjects', 'EG', 'analysis_utility']
 Return('env')

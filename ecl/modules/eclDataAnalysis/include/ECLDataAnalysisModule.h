@@ -94,7 +94,7 @@ namespace Belle2 {
     std::vector<int>* m_eclDigitAmp;  /**< ECLDigit amplitude */
     std::vector<int>* m_eclDigitTimeFit;  /**< ECLDigit timing */
     std::vector<int>* m_eclDigitFitQuality;  /**< ECLDigit fit quality */
-    std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
+    //std::vector<int>* m_eclDigitToShower; /**< Index of Shower related to that ECLDigit */
     std::vector<int>* m_eclDigitToCalDigit; /**< Index of CalDigit related to that ECLDigit */
 
     int m_eclCalDigitMultip; /**< Number of ECLCalDigits per event */
@@ -126,14 +126,14 @@ namespace Belle2 {
     std::vector<int>* m_eclCalDigitFitQuality;  /**< ECLCalDigit fit quality */
     std::vector<int>* m_eclCalDigitToCR; /**< Index of CR related to that ECLCalDigit */
 
-    std::vector<int>*    m_eclCRIdx;
-    std::vector<int>*    m_eclCRIsTrack;
-    std::vector<double>* m_eclCRLikelihoodMIPNGamma;
-    std::vector<double>*    m_eclCRLikelihoodChargedHadron;
-    std::vector<double>*    m_eclCRLikelihoodElectronNGamma;
-    std::vector<double>*    m_eclCRLikelihoodNGamma;
-    std::vector<double>*    m_eclCRLikelihoodNeutralHadron;
-    std::vector<double>*    m_eclCRLikelihoodMergedPi0;
+    std::vector<int>*    m_eclCRIdx; /**< Connected Region ID */
+    std::vector<int>*    m_eclCRIsTrack;  /**< Int for Connected Region - Track Match*/
+    std::vector<double>* m_eclCRLikelihoodMIPNGamma;  /**< Connected Region MIP Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodChargedHadron;  /**< Connected Region Charged Hadron Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodElectronNGamma;  /**< Connected Region Electron Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodNGamma;  /**< Connected Region Gamma Likelihood */
+    std::vector<double>*    m_eclCRLikelihoodNeutralHadron;  /**< Connected Region Neutral Hadron Likelihood*/
+    std::vector<double>*    m_eclCRLikelihoodMergedPi0  /**< Connected Region Merged Pi0 Likelihood */;
     //std::vector<double>*    m_eclCRToCalDigit;
 
     int m_eclSimHitMultip;  /**< Number of ECLSimHits per event */
@@ -204,10 +204,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
     std::vector<bool>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
-    std::vector<double>* m_eclClusterPi0Likel; /**< Flag for pi0 */
-    std::vector<double>* m_eclClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclClusterDeltaL; /**< ??? */
-    std::vector<double>* m_eclClusterBeta; /**< ??? */
 
     int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
@@ -241,10 +238,8 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclPureClusterPi0Likel; /**< Flag for pi0 */
-    std::vector<double>* m_eclPureClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclPureClusterDeltaL; /**< ??? */
-    std::vector<double>* m_eclPureClusterBeta; /**< ??? */
+
     /*
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;
@@ -299,30 +294,28 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerR; /**< Shower R */
     std::vector<double>* m_eclShowerNHits; /**< Shower NHits */
     std::vector<double>* m_eclShowerE9oE25; /**< Shower E9oE25 */
-    std::vector<double>* m_eclShowerTime;
-    std::vector<double>* m_eclShowerConnectedRegionId;
-    std::vector<int>* m_eclShowerHypothesisId;
-    std::vector<int>* m_eclShowerCentralCellId;
-    std::vector<double>* m_eclShowerEnergyError;
-    std::vector<double>* m_eclShowerThetaError;
-    std::vector<double>* m_eclShowerPhiError;
-    std::vector<double>* m_eclShowerTimeResolution;
-    std::vector<double>* m_eclShowerHighestEnergy;
-    std::vector<double>* m_eclShowerLateralEnergy;
-    std::vector<double>* m_eclShowerMinTrkDistance;
-    std::vector<double>* m_eclShowerTrkDepth;
-    std::vector<double>* m_eclShowerShowerDepth;
-    std::vector<double>* m_eclShowerAbsZernike20;
-    std::vector<double>* m_eclShowerAbsZernike40;
-    std::vector<double>* m_eclShowerAbsZernike42;
-    std::vector<double>* m_eclShowerAbsZernike51;
-    std::vector<double>* m_eclShowerAbsZernike53;
-    std::vector<double>* m_eclShowerSecondMoment;
-    std::vector<double>* m_eclShowerE1oE9;
-    std::vector<int>* m_eclShowerIsTrack;
-    std::vector<bool>* m_eclShowerIsCluster;
-    std::vector<int>*   m_eclShowerMCVtxInEcl;
-    std::vector<double>*   m_eclShowerHighestE1mE2;
+    std::vector<double>* m_eclShowerTime;  /**< Shower Timing */
+    std::vector<double>* m_eclShowerConnectedRegionId; /**< Matched Connetcted Region Idx */
+    std::vector<int>* m_eclShowerHypothesisId; /**< Shower Particle Hypothesis ID */
+    std::vector<int>* m_eclShowerCentralCellId; /**< Cell ID for most energetic crystal */
+    std::vector<double>* m_eclShowerEnergyError; /**< Shower Energy Error */
+    std::vector<double>* m_eclShowerThetaError; /**< Shower Theta Error */
+    std::vector<double>* m_eclShowerPhiError; /**< Shower Phi Error */
+    std::vector<double>* m_eclShowerTimeResolution; /**< Shower Time Resolution */
+    std::vector<double>* m_eclShowerHighestEnergy; /**< Shower Highest Energy Crystal Energy */
+    std::vector<double>* m_eclShowerLateralEnergy; /**< Shower Lateral Energy */
+    std::vector<double>* m_eclShowerMinTrkDistance; /**< Shower Min Dist to Track */
+    std::vector<double>* m_eclShowerTrkDepth; /**< Shower Track Depth */
+    std::vector<double>* m_eclShowerShowerDepth; /**< Shower Depth */
+    std::vector<double>* m_eclShowerAbsZernike40; /**< Shower Zernike40 Moment */
+    std::vector<double>* m_eclShowerAbsZernike51; /**< Shower Zernike51 Moment */
+    std::vector<double>* m_eclShowerZernikeMVA; /**< Shower ZernikeMVA */
+    std::vector<double>* m_eclShowerSecondMoment; /**< Shower Second Moment */
+    std::vector<double>* m_eclShowerE1oE9; /**< Shower E1/E9 */
+    std::vector<int>* m_eclShowerIsTrack; /**< Shower Track Match */
+    std::vector<bool>* m_eclShowerIsCluster; /**< Shower Cluster Match */
+    std::vector<int>*   m_eclShowerMCVtxInEcl; /**< Int, 1 if particle decays (interacts) in ECL, 0 otherwise*/
+    std::vector<double>*   m_eclShowerHighestE1mE2; /**< Energy difference for 2 highest energy deposits in shower*/
 
 
     int m_mcMultip; /**< Multiplicity of MCParticles */

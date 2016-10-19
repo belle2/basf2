@@ -23,6 +23,10 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
+use_local_database("test_bklm.txt", "test_payloads")
+# use use_central_database for uploading data to PNNL
+# use_central_database("test_bklm", LogLevel.ERROR);
+
 # input
 # input = register_module('RootInput')
 input = register_module('SeqRootInput')
@@ -44,6 +48,7 @@ geobuilder.param('components', ['BKLM'])
 bklmUnpack = register_module('BKLMUnpacker')
 # bklmUnpack.param("keepEvenPackages",1);
 bklmUnpack.param("useDefaultModuleId", 1)
+bklmUnpack.param('loadMapFromDB', 1)
 bklmreco = register_module('BKLMReconstructor')
 # bklmreco.log_level = LogLevel.INFO
 

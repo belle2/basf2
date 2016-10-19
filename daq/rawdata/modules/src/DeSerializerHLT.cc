@@ -65,9 +65,6 @@ void DeSerializerHLTModule::initialize()
     memset(m_bufary[i], 0,  BUF_SIZE_WORD * sizeof(int));
   }
 
-  // Open message handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
-
   // Initialize EvtMetaData
   m_eventMetaDataPtr.registerInDataStore();
 
@@ -114,15 +111,6 @@ void DeSerializerHLTModule::event()
     m_start_flag = 1;
   }
 
-  raw_datablkarray.create();
-  rawcprarray.create();
-  raw_svdarray.create();
-  raw_cdcarray.create();
-  raw_bpidarray.create();
-  raw_epidarray.create();
-  raw_eclarray.create();
-  raw_klmarray.create();
-  raw_ftswarray.create();
 
   // DataStore interface
   for (int j = 0; j < NUM_EVT_PER_BASF2LOOP_PC; j++) {

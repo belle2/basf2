@@ -102,7 +102,7 @@ void HitProcessor::reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList)
     double dist = fabs(trajectory.getDist2D(item.getRecoPos2D()));
 
     double bestHitDist = dist;
-    CDCTrack* bestCandidate = NULL;
+    CDCTrack* bestCandidate = nullptr;
 
     cdcTrackList.doForAllTracks([&cand, &item, &bestHitDist, &bestCandidate](CDCTrack & candInner) {
       if (candInner == cand) return;
@@ -180,24 +180,24 @@ bool HitProcessor::isBack2BackTrack(CDCTrack& track)
   int vote_pos = 0;
   int vote_neg = 0;
 
+  Vector2D circle_center = track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center();
   for (const CDCRecoHit3D& hit : track) {
-    int curve_sign = getCurvatureSignWrt(hit, track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().center());
+    ESign curve_sign = getCurvatureSignWrt(hit, circle_center);
 
-    if (curve_sign == ESign::c_Plus)
+    if (curve_sign == ESign::c_Plus) {
       ++vote_pos;
-    else if (curve_sign == ESign::c_Minus)
+    } else if (curve_sign == ESign::c_Minus) {
       ++vote_neg;
-    else {
-      B2ERROR(
-        "Strange behaviour of TrackHit::getCurvatureSignWrt");
-      exit(EXIT_FAILURE);
+    } else {
+      B2ERROR("Unexpected value from TrackHit::getCurvatureSignWrt");
+      return false;
     }
   }
 
-  if ((fabs(vote_pos - vote_neg) / (double)(vote_pos + vote_neg) < 1.)
-      && fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
+  if (std::abs(vote_pos - vote_neg) < (vote_pos + vote_neg) and
+      std::fabs(circle_center.cylindricalR()) > 60.) {
     return true;
-
+  }
   return false;
 }
 

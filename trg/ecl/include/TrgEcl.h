@@ -22,7 +22,6 @@
 //
 //
 //
-using namespace std;
 //
 //
 namespace Belle2 {

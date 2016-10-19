@@ -5,6 +5,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
+#pragma link C++ class Belle2::SoftwareTriggerCutBase+;
 #pragma link C++ class Belle2::DBRepresentationOfSoftwareTriggerCut+;
 
 #endif

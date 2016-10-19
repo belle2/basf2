@@ -290,9 +290,10 @@ namespace {
 
     // Neutral ECLCluster on reconstructed side
     ECLCluster myECL;
-    myECL.setisTrack(false);
+    myECL.setIsTrack(false);
     float eclREC = 0.5;
     myECL.setEnergy(eclREC);
+    myECL.setHypothesisId(5);
     ECLCluster* savedECL = myECLClusters.appendNew(myECL);
 
     // Particle on reconstructed side from ECLCluster
@@ -301,9 +302,10 @@ namespace {
 
     // Create ECLCluster on ROE side
     ECLCluster myROEECL;
-    myROEECL.setisTrack(false);
+    myROEECL.setIsTrack(false);
     float eclROE = 1.0;
     myROEECL.setEnergy(eclROE);
+    myROEECL.setHypothesisId(5);
     ECLCluster* savedROEECL = myECLClusters.appendNew(myROEECL);
 
     // Create KLMCluster on ROE side
@@ -1258,6 +1260,34 @@ namespace {
     var = Manager::Instance().getVariable("countInList(pList1, E < 5)");
     ASSERT_NE(var, nullptr);
     EXPECT_DOUBLE_EQ(var->function(nullptr), 5);
+  }
+
+
+  TEST_F(MetaVariableTest, numberOfNonOverlappingParticles)
+  {
+    StoreArray<Particle> particles;
+    DataStore::EStoreFlags flags = DataStore::c_DontWriteOut;
+
+    StoreObjPtr<ParticleList> outputList("pList1");
+    DataStore::Instance().setInitializeActive(true);
+    outputList.registerInDataStore(flags);
+    DataStore::Instance().setInitializeActive(false);
+    outputList.create();
+    outputList->initialize(22, "pList1");
+
+    auto* p1 = particles.appendNew(Particle({0.5 , 0.4 , 0.5 , 0.8}, 22, Particle::c_Unflavored, Particle::c_Undefined, 2));
+    auto* p2 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 3));
+    auto* p3 = particles.appendNew(Particle({0.5 , 0.2 , 0.7 , 0.9}, 22, Particle::c_Unflavored, Particle::c_Undefined, 4));
+
+    outputList->addParticle(0, 22, Particle::c_Unflavored);
+    outputList->addParticle(1, 22, Particle::c_Unflavored);
+
+    const Manager::Var* var = Manager::Instance().getVariable("numberOfNonOverlappingParticles(pList1)");
+    ASSERT_NE(var, nullptr);
+    EXPECT_DOUBLE_EQ(var->function(p1), 1);
+    EXPECT_DOUBLE_EQ(var->function(p2), 1);
+    EXPECT_DOUBLE_EQ(var->function(p3), 2);
+
   }
 
   TEST_F(MetaVariableTest, veto)

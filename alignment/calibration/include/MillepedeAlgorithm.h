@@ -58,7 +58,7 @@ namespace Belle2 {
     /// Convert IOV to string (to be able to use it as a key in map)
     std::string to_string(IntervalOfValidity iov)
     {
-      stringstream stream;
+      std::stringstream stream;
       stream << iov;
       return stream.str();
     }
@@ -66,7 +66,7 @@ namespace Belle2 {
     /// Convert string to IOV (to convert map key back to IOV)
     IntervalOfValidity to_IOV(std::string iov)
     {
-      stringstream stream;
+      std::stringstream stream;
       stream << iov;
       IntervalOfValidity IOV;
       stream >> IOV;

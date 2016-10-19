@@ -61,7 +61,6 @@ TrackFinderVXDCellOMatModule::TrackFinderVXDCellOMatModule() : Module()
            m_PARAMstrictSeeding,
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
            bool(true));
-
 }
 
 /** *************************************+************************************* **/
@@ -96,6 +95,7 @@ void TrackFinderVXDCellOMatModule::initialize()
   //Relations SpacePoints and SpacePointTCs:
   m_TCs.registerRelationTo(m_spacePoints, DataStore::c_Event, DataStore::c_DontWriteOut);
   m_spacePoints.registerRelationTo(m_TCs, DataStore::c_Event, DataStore::c_DontWriteOut);
+
 }
 
 

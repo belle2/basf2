@@ -40,7 +40,6 @@ namespace Belle2 {
     /**
      * CDC Cosmic test calibration module.
      */
-
     class CDCCRTestModule : public HistoModule {
 
     public:
@@ -116,7 +115,6 @@ namespace Belle2 {
       std::string m_relRecoTrackTrackName;     /**< Releation between RecoTrack and Belle2:Track. */
       std::string m_histogramDirectoryName;   /**< subdir where to place the histograms. */
       std::vector<TH1*> m_allHistos;          /**< All histograms for easy deletion. */
-      std::string m_OutputFileName;           /**< xt output file name. */
 
       /**
        * Create 1D histogram.
@@ -179,7 +177,6 @@ namespace Belle2 {
       }
 
       TTree* tree;                          /**< output tree, save info of each hit. */
-      TFile* tfile;                         /**< Output file. */
       TH1* m_hNTracks;                      /**< Number of track fitted, Convegence, not conv, not fit. */
       TH1* m_hNTracksPerEvent;              /**< Number of TrackCand per Event. */
       TH1* m_hNTracksPerEventFitted;        /**< Number of TrackCand per Event**/

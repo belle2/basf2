@@ -17,9 +17,7 @@ namespace Belle2 {
 
     public:
       /// Making destructor virtual
-      virtual ~ProcessingSignalListener()
-      {
-      }
+      virtual ~ProcessingSignalListener() = default;
 
       /// Receive signal before the start of the event processing
       virtual void initialize()

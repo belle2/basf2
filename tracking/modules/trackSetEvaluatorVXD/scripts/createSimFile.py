@@ -43,7 +43,7 @@ print_params(beamparameters)
 # Still in that case the ParticleGun modules better come first:
 param_pGun = {
     'pdgCodes': [13, -13],                   # 13 = muon --> negatively charged!
-    'nTracks': 20,                          # 20 tracks is a lot, but we don't use beam background in this script.
+    'nTracks': 5,                          # 20 tracks is a lot, but we don't use beam background in this script.
     'momentumGeneration': 'uniformPt',
     'momentumParams': [0.1, 0.15],           # 2 values: [min, max] in GeV
     'thetaGeneration': 'uniform',

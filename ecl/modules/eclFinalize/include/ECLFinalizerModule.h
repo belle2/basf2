@@ -44,13 +44,8 @@ namespace Belle2 {
       virtual void terminate();
 
     private:
-
       double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
-      double m_clusterEnergyCutMax; /**< Max value for the cluster energy cut. */
-      double m_highestEnergyCutMin; /**< Min value for the highest energy cut. */
-      double m_highestEnergyCutMax; /**< Max value for the highest energy cut. */
-      double m_clusterTimeCutMin; /**< Max value for the cluster time cut. */
-      double m_clusterTimeCutMax; /**< Max value for the cluster time cut. */
+      double m_clusterTimeCutMaxEnergy; // Above this energy, keep all cluster
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

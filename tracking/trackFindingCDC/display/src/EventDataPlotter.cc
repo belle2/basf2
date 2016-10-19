@@ -706,8 +706,8 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
       float px = mom.X();
       float py = mom.Y();
 
-      points.push_back({x, y});
-      tangents.push_back({px, py});
+      points.push_back({{x, y}});
+      tangents.push_back({{px, py}});
     }
     primitivePlotter.drawCurve(points, tangents, attributeMap);
   }

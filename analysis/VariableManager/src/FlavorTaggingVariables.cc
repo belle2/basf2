@@ -368,7 +368,11 @@ namespace Belle2 {
 
         int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
 
-        if (MCMatchingError == 0 || MCMatchingError == 1) {
+        MCMatchingError &= (~MCMatching::c_MissFSR);
+        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
+        MCMatchingError &= (~MCMatching::c_MissingResonance);
+
+        if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
           StoreArray<MCParticle> AllMCParticles;
           unsigned numParticles = AllMCParticles.getEntries();
@@ -403,7 +407,11 @@ namespace Belle2 {
 
         int MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
 
-        if (MCMatchingError == 0 || MCMatchingError == 1) {
+        MCMatchingError &= (~MCMatching::c_MissFSR);
+        MCMatchingError &= (~MCMatching::c_MissPHOTOS);
+        MCMatchingError &= (~MCMatching::c_MissingResonance);
+
+        if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
           StoreArray<MCParticle> AllMCParticles;
           unsigned numParticles = AllMCParticles.getEntries();

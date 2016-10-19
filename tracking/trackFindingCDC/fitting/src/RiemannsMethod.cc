@@ -25,14 +25,6 @@ RiemannsMethod::RiemannsMethod() :
 {
 }
 
-
-
-RiemannsMethod::~RiemannsMethod()
-{
-}
-
-
-
 void RiemannsMethod::update(CDCTrajectory2D& trajectory2D,
                             CDCObservations2D& observations2D) const
 {

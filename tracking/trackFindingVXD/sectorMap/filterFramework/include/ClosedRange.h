@@ -20,7 +20,7 @@
 
 namespace Belle2 {
 
-  /** Represents a range of arithmetic types.
+  /** Represents a closed set of arithmetic types.
    *
    * Range is used in conjunction with the SelectionVariable to define
    * one of the building blocks of the Filters
@@ -36,10 +36,11 @@ namespace Belle2 {
     ClosedRange(MinType min, MaxType max): m_min(min), m_max(max) {};
     ClosedRange(): m_min(0), m_max(0) {};
 
-    /** Method used by the filter tools to decide on the fate of the pair.
+    /** Method used by the filter tools to decide if accept a combination.
      *
-     * @param x is the result of some SelectionVariable applied to a pair of objects.
-     * The return value is true if x belongs to the open set ( m_min, m_max )
+     * @param x is the result of some SelectionVariable
+     * It returns  true if x belongs to the closed set [ m_min, m_max ]
+     * It does not throw.
      */
     template< class VariableType >
     inline bool contains(const VariableType& x) const { return m_min <= x && x <= m_max ;};

@@ -146,7 +146,11 @@ namespace Belle2 {
 
       bool ok = doVertexFit(particle);
       if (!ok) particle->setPValue(-1);
-      if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
+      if (m_confidenceLevel == 0. && particle->getPValue() == 0.) {
+        toRemove.push_back(particle->getArrayIndex());
+      } else {
+        if (particle->getPValue() < m_confidenceLevel)toRemove.push_back(particle->getArrayIndex());
+      }
     }
     plist->removeParticles(toRemove);
 

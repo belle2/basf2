@@ -35,7 +35,7 @@ namespace Belle2 {
     /** Stream object list into an EvtMessage. Caller is responsible for deletion. */
     virtual EvtMessage* encode_msg(RECORD_TYPE rectype);
     /** Decode an EvtMessage into a vector list of objects with names */
-    virtual int decode_msg(EvtMessage*, std::vector<TObject*>&, std::vector<std::string>&);
+    virtual int decode_msg(EvtMessage* msg, std::vector<TObject*>& objlist, std::vector<std::string>& namelist);
 
   private:
     std::vector<TMessage*> m_buf; /**< list of messages already added. */

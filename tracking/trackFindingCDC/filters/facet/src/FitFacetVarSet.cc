@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 #include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
-#include <assert.h>
+#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

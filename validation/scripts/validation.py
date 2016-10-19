@@ -387,9 +387,7 @@ class Validation:
 
         # This dictionary holds the paths to the local and central release dir
         # (or 'None' if one of them does not exist)
-        self.basepaths = {'local': os.environ.get('BELLE2_LOCAL_DIR', None),
-                          'central': os.environ.get('BELLE2_RELEASE_DIR',
-                                                    None)}
+        self.basepaths = validationpath.get_basepath()
 
         # Folder used for the intermediate and final results of the validation
         self.work_folder = os.path.abspath(os.getcwd())
@@ -532,8 +530,9 @@ class Validation:
         # information available for debugging later.
 
         # Make sure the folder for the log file exists
-        log_dir = validationpath.get_results_tag_general_folder(validationpath.folder_name_results, self.tag)
+        log_dir = validationpath.get_results_tag_general_folder(self.work_folder, self.tag)
         if not os.path.exists(log_dir):
+            print("Creating " + log_dir)
             os.makedirs(log_dir)
 
         # Define the handler and its level (=DEBUG to get everything)
@@ -983,19 +982,21 @@ class Validation:
         if not os.path.exists('html'):
             os.mkdir('html')
 
-        os.chdir('html')
         if not os.path.exists(validationpath.folder_name_results):
-            os.symlink(os.path.join('..', validationpath.folder_name_results),
-                       validationpath.folder_name_results)
+            self.log.error("Folder {} not found in the current directory {}, please run validate_basf2 first".format(
+                           validationpath.folder_name_results,
+                           save_dir))
+
+        os.chdir('html')
 
         # import and run plot function
-        validationplots.create_plots(force=True)
+        validationplots.create_plots(force=True, work_folder=self.work_folder)
 
         # restore original working directory
         os.chdir(save_dir)
 
 
-def execute():
+def execute(tag=None, isTest=None):
     """!
     Parses the comnmand line and executes the full validation suite
     """
@@ -1010,7 +1011,14 @@ def execute():
 
         # Now we process the command line arguments.
         # First of all, we read them in:
-        cmd_arguments = parse_cmd_line_arguments()
+        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest)
+
+        # overwrite with default settings with parameters give in method
+        # call
+        if tag is not None:
+            cmd_arguments.tag = tag
+        if isTest is not None:
+            cmd_arguments.test = isTest
 
         # Create the validation object. 'validation' holds all global variables
         # and provides the logger!

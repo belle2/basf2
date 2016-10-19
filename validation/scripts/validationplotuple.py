@@ -43,13 +43,16 @@ class Plotuple:
         n-tuples) are stored (without the file extension!)
     """
 
-    def __init__(self, list_of_root_objects, list_of_revisions):
+    def __init__(self, list_of_root_objects, list_of_revisions, work_folder):
         """!
         The default constructor for a Plotuple-object.
         @param list_of_root_objects: A list of Root-objects which belong
             together (i.e. should be drawn into one histogram or one table)
         @param list_of_revisions: The list of revisions (Duh!)
         """
+
+        # the work folder containing the results and plots
+        self.work_folder = work_folder
 
         # The list of Root objects in this Plotuple-object
         self.list_of_root_objects = list_of_root_objects
@@ -335,7 +338,7 @@ class Plotuple:
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
-            index = index_from_revision(plot.revision)
+            index = index_from_revision(plot.revision, self.work_folder)
             style = get_style(index, itemsToPlotCount)
 
             self.remove_stats_tf1(plot.object)
@@ -376,6 +379,7 @@ class Plotuple:
         canvas.Print(os.path.join(path, self.get_png_filename()))
         canvas.Print(os.path.join(path, self.get_pdf_filename()))
 
+        # todo: use the self.work_folder here
         self.path = path
         self.file = './{0}/{1}_{2}'.format('/'.join(path.split('/')[2:]),
                                            strip_ext(self.rootfile), self.key)
@@ -486,7 +490,7 @@ class Plotuple:
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
-            index = index_from_revision(plot.revision)
+            index = index_from_revision(plot.revision, self.work_folder)
             style = get_style(index, itemsToPlotCount)
 
             self.remove_stats_tf1(plot.object)
@@ -609,7 +613,7 @@ class Plotuple:
         for plot in reversed(self.elements):
 
             # Get the index of the current plot
-            index = index_from_revision(plot.revision)
+            index = index_from_revision(plot.revision, self.work_folder)
             style = get_style(index, itemsToPlotCount)
 
             # self.remove_stats_tf1(plot.object)

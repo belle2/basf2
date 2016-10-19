@@ -10,13 +10,14 @@ import os
 import glob
 import argparse
 import ROOT
+import validationpath
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
 
 
-def available_revisions():
+def available_revisions(work_folder):
     """
     Loops over the results folder and looks for revisions. It then returns an
     ordered list, with the most recent revision being the first element in the
@@ -28,8 +29,8 @@ def available_revisions():
 
     # Get all folders in ./results/ sorted descending by the date they were
     # created (i.e. newest folder first)
-    revisions = sorted(os.listdir('./results'),
-                       key=lambda _: os.path.getmtime('./results/' + _),
+    revisions = sorted(os.listdir(validationpath.get_results_folder(work_folder)),
+                       key=lambda _: os.path.getmtime(os.path.join(validationpath.get_results_folder(work_folder), _)),
                        reverse=True)
     # Return it
     return revisions
@@ -129,7 +130,7 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def parse_cmd_line_arguments():
+def parse_cmd_line_arguments(isTest=None, tag=None):
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -298,7 +299,7 @@ def get_style(index, overallItemCount=1):
     return ROOT.TAttLine(color, linestyle, linewidth)
 
 
-def index_from_revision(revision):
+def index_from_revision(revision, work_folder):
     """
     Takes the name of a revision and returns the corresponding index. Indices
     are used to ensure that the color and style of a revision in a plot are
@@ -311,8 +312,8 @@ def index_from_revision(revision):
     """
 
     # If the requested revision exists, return its index
-    if revision in available_revisions():
-        index = available_revisions().index(revision)
+    if revision in available_revisions(work_folder):
+        index = available_revisions(work_folder).index(revision)
     # Else return a None object
     else:
         index = None

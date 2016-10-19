@@ -90,19 +90,27 @@ Environment::Environment() :
   }
 
   // add module directories for current build options
+  std::string added_dirs;
   if (envarAnalysisDir) {
     const string analysisModules = (fs::path(envarAnalysisDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(analysisModules);
+    added_dirs += analysisModules;
   }
 
   if (envarLocalDir) {
     const string localModules = (fs::path(envarLocalDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(localModules);
+    added_dirs += " " + localModules;
   }
 
   if (envarReleaseDir) {
     const string centralModules = (fs::path(envarReleaseDir) / "modules" / envarSubDir).string();
     ModuleManager::Instance().addModuleSearchPath(centralModules);
+    added_dirs += " " + centralModules;
+  }
+
+  if (ModuleManager::Instance().getAvailableModules().empty()) {
+    B2ERROR("No modules found! Did you forget to run 'scons'? Module paths added: " << added_dirs);
   }
 
   //set path to external software

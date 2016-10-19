@@ -69,9 +69,6 @@ void ModuleManager::addModuleSearchPath(const string& path)
         m_moduleNameLibMap[entry.first] = entry.second;
       }
     }
-
-  } else {
-    B2WARNING("Could not add module search filepath! Directory does not exist: " + path);
   }
 }
 

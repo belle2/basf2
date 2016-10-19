@@ -109,6 +109,11 @@ namespace Belle2 {
     double isRestOfEventB0Flavor(const Particle*);
 
     /**
+     * checks the decay chain upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.
+     */
+    double ancestorHasWhichFlavor(const Particle* particle);
+
+    /**
      * 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).
      */
     double isRelatedRestOfEventMajorityB0Flavor(const Particle* part);

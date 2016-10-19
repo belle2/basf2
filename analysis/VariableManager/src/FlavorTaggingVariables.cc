@@ -356,9 +356,9 @@ namespace Belle2 {
       } else return 0;
     }
 
-    double isRelatedRestOfEventB0Flavor(const Particle* part)
+    double isRelatedRestOfEventB0Flavor(const Particle* particle)
     {
-      const RestOfEvent* roe = part->getRelatedTo<RestOfEvent>();
+      const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
       float OutputB0tagQ = -2;
 
@@ -374,19 +374,12 @@ namespace Belle2 {
 
         if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
-          StoreArray<MCParticle> AllMCParticles;
-          unsigned numParticles = AllMCParticles.getEntries();
-
-          if (AllMCParticles.isValid()) {
-            for (unsigned i = 0; i < numParticles; ++i) {
-              const MCParticle* newParticle = AllMCParticles[i];
-              const MCParticle* newMother = newParticle->getMother();
-
-              if (newMother != nullptr) {
-                if (newMother == Y4S &&  newParticle != BcpMC) {
-                  if (newParticle -> getPDG() == 511) OutputB0tagQ = 1;
-                  else OutputB0tagQ = 0;
-                }
+          if (Y4S != nullptr) {
+            for (auto& iParticle : Y4S->getDaughters()) {
+              if (iParticle != BcpMC) {
+                if (iParticle -> getPDG() == 511 || iParticle -> getPDG() == 521) OutputB0tagQ = 1;
+                else OutputB0tagQ = 0;
+                break;
               }
             }
           }
@@ -413,24 +406,41 @@ namespace Belle2 {
 
         if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
-          StoreArray<MCParticle> AllMCParticles;
-          unsigned numParticles = AllMCParticles.getEntries();
-
-          if (AllMCParticles.isValid()) {
-            for (unsigned i = 0; i < numParticles; ++i) {
-              const MCParticle* newParticle = AllMCParticles[i];
-              const MCParticle* newMother = newParticle->getMother();
-
-              if (newMother != nullptr) {
-                if (newMother == Y4S &&  newParticle != BcpMC) {
-                  if (newParticle -> getPDG() == 511 || newParticle -> getPDG() == 521) OutputB0tagQ = 1;
-                  else OutputB0tagQ = 0;
-                }
+          if (Y4S != nullptr) {
+            for (auto& iParticle : Y4S->getDaughters()) {
+              if (iParticle != BcpMC) {
+                if (iParticle -> getPDG() == 511 || iParticle -> getPDG() == 521) OutputB0tagQ = 1;
+                else OutputB0tagQ = 0;
+                break;
               }
             }
           }
         }
       }
+      return OutputB0tagQ;
+    }
+
+    double ancestorHasWhichFlavor(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+      float OutputB0tagQ = 0;
+      if (roe.isValid()) {
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+        const MCParticle* Y4S = BcpMC->getMother();
+        const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
+        const MCParticle* newMother = mcParticle->getMother();
+        while (mcParticle != nullptr) {
+          if (newMother == Y4S &&  mcParticle != BcpMC) {
+            if (mcParticle -> getPDG() == 511) OutputB0tagQ = 1;
+            else OutputB0tagQ = -1;
+            break;
+          }
+          mcParticle = mcParticle->getMother();
+          newMother = mcParticle->getMother();
+        }
+      }
+
       return OutputB0tagQ;
     }
 
@@ -1587,6 +1597,8 @@ namespace Belle2 {
                       "0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
     REGISTER_VARIABLE("qrCombined", isRestOfEventB0Flavor,
                       "0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
+    REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
+                      "checks the decay chain of the given particle upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,

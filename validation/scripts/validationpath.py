@@ -4,6 +4,10 @@
 import os
 
 folder_name_results = "results"
+folder_name_html_static = "html_static"
+folder_name_html = "html"
+# the plots subfolder in the html folder
+folder_name_plots = "plots"
 folder_name_general = "__general__"
 file_name_results_json = "revision.json"
 file_name_runtimes_dat = "runtimes.dat"
@@ -28,6 +32,20 @@ def get_results_folder(output_base_dir):
     Return the absolute path to the results folder
     """
     return os.path.join(output_base_dir, folder_name_results)
+
+
+def get_html_folder(output_base_dir):
+    """!
+    Return the absolute path to the results folder
+    """
+    return os.path.join(output_base_dir, folder_name_html)
+
+
+def get_html_plots_folder(output_base_dir):
+    """!
+    Return the absolute path to the results folder
+    """
+    return os.path.join(get_html_folder(output_base_dir), folder_name_plots)
 
 
 def get_results_tag_folder(output_base_dir, tag):

@@ -979,15 +979,15 @@ class Validation:
         # Go to the html directory and create a link to the results folder
         # if it is not yet existing
         save_dir = os.getcwd()
-        if not os.path.exists('html'):
-            os.mkdir('html')
+        if not os.path.exists(validationpath.folder_name_html):
+            os.mkdir(validationpath.folder_name_html)
 
         if not os.path.exists(validationpath.folder_name_results):
             self.log.error("Folder {} not found in the current directory {}, please run validate_basf2 first".format(
                            validationpath.folder_name_results,
                            save_dir))
 
-        os.chdir('html')
+        os.chdir(validationpath.folder_name_html)
 
         # import and run plot function
         validationplots.create_plots(force=True, work_folder=self.work_folder)

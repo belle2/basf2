@@ -223,7 +223,7 @@ def scripts_in_dir(dirpath, log, ext='*'):
 
     # A list of all folder names that will be ignored (e.g. folders that are
     # important for SCons
-    blacklist = ['tools', 'scripts', 'examples', 'html']
+    blacklist = ['tools', 'scripts', 'examples', validationpath.folder_name_html_static]
 
     # Loop over the given directory and its subdirectories and find all files
     for root, dirs, files in os.walk(dirpath):

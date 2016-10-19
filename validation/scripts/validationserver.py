@@ -333,8 +333,8 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
         sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet to provide static HTML content. Did you run setuprel ?")
 
     # join the paths of the various result folders
-    results_folder = os.path.join(cwd_folder, "results")
-    comparison_folder = os.path.join(cwd_folder, "html", "plots")
+    results_folder = validationpath.get_results_folder(cwd_folder)
+    comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
 
     logging.info("Serving static content from {}".format(static_folder))
     logging.info("Serving result content and plots from {}".format(cwd_folder))

@@ -20,3 +20,21 @@ def check_excecute(cmd, terminate_on_error=True):
         return False
 
     return True
+
+
+def check_path_exists(paths, terminate_on_error=True):
+    """
+    Checks if a path exists.
+
+    @param paths: list of file system path (directories or files)
+    @param terminate_on_error: if true, the execution is terminated if one part is not present
+    @return: None
+    """
+
+    for p in paths:
+        print("Checking for existance of file {}".format(p))
+        if not os.path.exists(p):
+            print("Path {} does not exist".format(p))
+            if terminate_on_error:
+                sys.exit(1)
+        print("Jep !")

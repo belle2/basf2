@@ -229,12 +229,19 @@ namespace {
     EXPECT_TRUE(evtPtr.isValid());
     EXPECT_EQ(evtPtr->getEvent(), 1);
   }
+  TEST_F(DataStoreTest, FailedCreation)
+  {
+    StoreArray<EventMetaData> none("doesntexist");
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_THROW(none.appendNew(), std::runtime_error);
+    none.clear();
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_EQ(0, none.getEntries());
+  }
   TEST_F(DataStoreTest, RawAccess)
   {
     StoreArray<EventMetaData> evtData;
-    StoreArray<EventMetaData> none("doesntexist");
     EXPECT_TRUE(evtData.getPtr() != nullptr);
-    EXPECT_TRUE(none.getPtr() == nullptr);
   }
 
   /** check TClonesArray consistency (i.e. no gaps) */

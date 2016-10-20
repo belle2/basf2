@@ -340,6 +340,9 @@ namespace Belle2 {
     const_iterator end() const { ensureAttached(); return const_iterator(m_storeArray, true); }
 
   private:
+    /** Creating StoreArrays is unnecessary, only used internally. */
+    bool create(bool replace = false) { return StoreAccessorBase::create(replace); }
+
     /** Returns address of the next free position of the array.
      *
      *  \return pointer to address just past the last array element
@@ -364,7 +367,8 @@ namespace Belle2 {
     inline void ensureCreated() const
     {
       if (!isValid()) {
-        const_cast<StoreArray*>(this)->create();
+        if (!const_cast<StoreArray*>(this)->create())
+          throw std::runtime_error("Write access to " + readableName() + " failed, did you remember to call registerInDataStore()?");
       }
     }
 

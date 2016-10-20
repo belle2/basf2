@@ -372,15 +372,7 @@ void GBLfitModule::event()
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
   StoreArray <TrackFitResult> trackFitResults;
-  if (m_buildBelle2Tracks) {
-    if (!tracks.isValid())
-      tracks.create();
-    if (!trackFitResults.isValid())
-      trackFitResults.create();
-  }
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
-  if (!gfTracks.isValid())
-    gfTracks.create();
 
   //Relations for Tracks
   RelationArray mcParticlesToTracks(mcParticles, tracks);

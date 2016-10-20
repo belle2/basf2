@@ -136,11 +136,9 @@ namespace Belle2 {
 
     // Output - log likelihoods
     StoreArray<ARICHLikelihood> arichLikelihoods;
-    arichLikelihoods.create();
 
     // input AeroHits
     StoreArray<ARICHTrack> arichTracks;
-    arichTracks.create();
 
     // Input: ARICHDigits
     StoreArray<ARICHDigit> arichDigits;

@@ -63,7 +63,6 @@ namespace Belle2 {
 
       const int hitIndex = simHits.getEntries();
       StoreArray<CaveSimHit> CaveHits;
-      if (!CaveHits.isValid()) CaveHits.create();
       /*CaveSimHit* hit = CaveHits.appendNew(
                           depEnergy,
                           detNb

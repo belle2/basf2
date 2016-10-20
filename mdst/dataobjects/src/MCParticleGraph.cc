@@ -210,13 +210,7 @@ protected:
 
 void MCParticleGraph::generateList(const string& name, int options)
 {
-  //Check if we can create MCParticles
   StoreArray<MCParticle> MCParticles(name);
-  if (!MCParticles) MCParticles.create();
-  if (!MCParticles) {
-    B2FATAL("MCParticle Collection is not valid, unable to create List of MCParticles");
-    return;
-  }
 
   //Make Graph and connect all primary vertices (particles without mother)
   //to an artificial 0ths vertex to be able to find them easily

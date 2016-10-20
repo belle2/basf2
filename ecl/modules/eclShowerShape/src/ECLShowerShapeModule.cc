@@ -167,10 +167,14 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
   const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
-  //  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, hypothesisID);
-  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * getSecondMomentCorrection(showerTheta,
-                              showerPhi,
-                              hypothesisID);
+
+  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, showerPhi, hypothesisID);
+  B2DEBUG(175, "Second moment angular correction: " << secondMomentCorrection << " (theta(rad)=" << showerTheta << ", phi(rad)=" <<
+          showerPhi << ",hypothesisId=" << hypothesisID <<
+          ")");
+  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * secondMomentCorrection;
+  B2DEBUG(175, "Second moment after correction: " << secondMoment);
+
   const double LATenergy    = computeLateralEnergy(projectedECLDigits, m_avgCrystalDimension);
 
   // Set shower shape variables.
@@ -528,7 +532,7 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
 void ECLShowerShapeModule::prepareSecondMomentCorrections()
 {
 
-  // Read all corrections
+  // Read all corrections.
   for (const ECLShowerShapeSecondMomentCorrection& correction : m_secondMomentCorrectionArray) {
     const int type  = correction.getType();
     const int hypothesis  = correction.getHypothesisId();
@@ -550,5 +554,26 @@ void ECLShowerShapeModule::prepareSecondMomentCorrections()
 
 double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const double phi, const int hypothesis) const
 {
-  return m_secondMomentCorrections[c_thetaType][hypothesis].Eval(theta) * m_secondMomentCorrections[c_phiType][hypothesis].Eval(phi);
+  // convert to deg.
+  double thetadeg = theta * TMath::RadToDeg();
+
+  // protect angular range.
+  if (thetadeg < 0.1) thetadeg = 0.1;
+  else if (thetadeg > 179.9) thetadeg = 179.9;
+
+  //Convert phi
+  double phideg = phi * TMath::RadToDeg();
+
+  //Protect phi
+  if (phideg < -179.9) phideg = -179.9;
+  else if (phideg > 179.9) phideg = 179.9;
+
+
+  // protect hypothesis.
+  if (hypothesis < 1 or hypothesis > 10) {
+    B2FATAL("Invalid hypothesis for second moment corrections.");
+  }
+
+  return m_secondMomentCorrections[c_thetaType][hypothesis].Eval(thetadeg) * m_secondMomentCorrections[c_phiType][hypothesis].Eval(
+           phideg);
 }

@@ -176,7 +176,10 @@ namespace Belle2 {
       double computeE1oE9(const ECLShower&) const;
 
       DBArray<ECLShowerShapeSecondMomentCorrection> m_secondMomentCorrectionArray;  /**< Shower shape corrections from DB */
-      TGraph m_secondMomentCorrections[2][10]; /**< second moment corrections [type][hypothesisid] */
+
+      /** TGraphs that hold the corrections
+       */
+      TGraph m_secondMomentCorrections[2][10];
 
       /** Prepare corrections for second moment
        */

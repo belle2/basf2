@@ -166,9 +166,12 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
   const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
-  //  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, hypothesisID);
-  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * getSecondMomentCorrection(showerTheta,
-                              hypothesisID);
+
+  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, hypothesisID);
+  B2DEBUG(175, "Second moment angular correction: " << secondMomentCorrection << " (theta=" << showerTheta << ", " << hypothesisID <<
+          ")");
+  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * secondMomentCorrection;
+  B2DEBUG(175, "Second moment after correction: " << computeSecondMoment(projectedECLDigits, showerEnergy));
   const double LATenergy    = computeLateralEnergy(projectedECLDigits, m_avgCrystalDimension);
 
   // Set shower shape variables.
@@ -538,12 +541,12 @@ void ECLShowerShapeModule::prepareSecondMomentCorrections()
   }
 
   // Check that all corrections are there
-  //  if(m_secondMomentCorrections[0][ECLConnectedRegion::c_N1]==NULL or
-  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N1]==NULL or
-  //   m_secondMomentCorrections[0][ECLConnectedRegion::c_N2]==NULL or
-  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N2]==NULL) {
-  //  B2FATAL("Missing corrections for second moments..");
-  // }
+  if (m_secondMomentCorrections[0][ECLConnectedRegion::c_N1].GetN() > 0 or
+      m_secondMomentCorrections[1][ECLConnectedRegion::c_N1].GetN() > 0 or
+      m_secondMomentCorrections[0][ECLConnectedRegion::c_N2].GetN() > 0 or
+      m_secondMomentCorrections[1][ECLConnectedRegion::c_N2].GetN() > 0) {
+    B2FATAL("Missing corrections for second moments (N1 (theta, phi) and N2(theta, phi).");
+  }
 }
 
 double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const int hypothesis) const

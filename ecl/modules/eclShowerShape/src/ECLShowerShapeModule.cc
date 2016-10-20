@@ -50,7 +50,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ECLShowerShapeSecondMomentCorrection")
+ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ecl_shower_shape_second_moment_corrections")
 {
   // Set description
   setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
@@ -153,6 +153,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
   const double showerEnergy = eclShower->getEnergy();
   const double showerTheta = eclShower->getTheta();
+  const double showerPhi = eclShower->getPhi();
 
   //sum crystal energies
   double sumEnergies = 0.0;
@@ -168,6 +169,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
   //  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, hypothesisID);
   const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * getSecondMomentCorrection(showerTheta,
+                              showerPhi,
                               hypothesisID);
   const double LATenergy    = computeLateralEnergy(projectedECLDigits, m_avgCrystalDimension);
 
@@ -537,16 +539,16 @@ void ECLShowerShapeModule::prepareSecondMomentCorrections()
     m_secondMomentCorrections[type][hypothesis] = correction.getCorrection();
   }
 
-  // Check that all corrections are there
-  //  if(m_secondMomentCorrections[0][ECLConnectedRegion::c_N1]==NULL or
-  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N1]==NULL or
-  //   m_secondMomentCorrections[0][ECLConnectedRegion::c_N2]==NULL or
-  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N2]==NULL) {
-  //  B2FATAL("Missing corrections for second moments..");
-  // }
+//   Check that all corrections are there
+  if (m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N1].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N1].GetN() == 0 or
+      m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N2].GetN() == 0 or
+      m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N2].GetN() == 0) {
+    B2FATAL("Missing corrections for second moments..");
+  }
 }
 
-double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const int hypothesis) const
+double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const double phi, const int hypothesis) const
 {
-  return m_secondMomentCorrections[0][hypothesis].Eval(theta) * m_secondMomentCorrections[1][hypothesis].Eval(theta);
+  return m_secondMomentCorrections[c_thetaType][hypothesis].Eval(theta) * m_secondMomentCorrections[c_phiType][hypothesis].Eval(phi);
 }

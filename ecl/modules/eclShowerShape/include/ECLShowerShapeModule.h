@@ -38,6 +38,14 @@ namespace Belle2 {
     class ECLShowerShapeModule : public Module {
 
     public:
+
+      /** Enumeration of type for second moment corrections */
+      enum {
+        c_thetaType = 0, /**< type of theta identifier */
+        c_phiType = 1, /**< type of phi identifier */
+      };
+
+
       /** Constructor. */
       ECLShowerShapeModule();
 
@@ -184,7 +192,7 @@ namespace Belle2 {
 
       /** Get corrections for second moment
        */
-      double getSecondMomentCorrection(const double theta, const int hypothesis) const;
+      double getSecondMomentCorrection(const double theta, const double phi, const int hypothesis) const;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

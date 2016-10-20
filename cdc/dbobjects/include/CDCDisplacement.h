@@ -40,6 +40,12 @@ namespace Belle2 {
     {
     }
 
+    /** Getter for EWireID. */
+    unsigned short getEWire() const
+    {
+      return m_wire;
+    }
+
     /** Getter for Super-Layer. */
     unsigned short getISuperLayer() const
     {
@@ -83,7 +89,7 @@ namespace Belle2 {
     TVector3 m_fwd; /**< Displacement of forward side */
     TVector3 m_bwd; /**< Displacement of backward side */
     float        m_tension; /**< Displacement of wire tension (grW) */
-    ClassDef(CDCDisplacement, 2); /**< ClassDef */
+    ClassDef(CDCDisplacement, 3); /**< ClassDef */
   };
 
 } // end namespace Belle2

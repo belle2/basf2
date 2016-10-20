@@ -2626,8 +2626,12 @@ void CDCGeometryPar::setDisplacement()
 {
   //    std::cout <<"setDisplacement called" << std::endl;
   for (const auto& disp : m_displacementFromDB) {
-    const int iLayer = disp.getICLayer();
-    const int iWire = disp.getIWire();
+    //    const int iLayer0 = disp.getICLayer();
+    //    const int iWire0 = disp.getIWire();
+    const int iLayer = WireID(disp.getEWire()).getICLayer();
+    const int iWire = WireID(disp.getEWire()).getIWire();
+    //    if (iLayer0 != iLayer) B2FATAL("Layer0 != Layer");
+    //    if (iWire0  != iWire) B2FATAL("Wire0 != Wire");
     m_FWirPos[iLayer][iWire][0] += disp.getXFwd();
     m_FWirPos[iLayer][iWire][1] += disp.getYFwd();
     m_FWirPos[iLayer][iWire][2] += disp.getZFwd();

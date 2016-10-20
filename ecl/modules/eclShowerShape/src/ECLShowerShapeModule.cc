@@ -529,7 +529,7 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
 void ECLShowerShapeModule::prepareSecondMomentCorrections()
 {
 
-  // Read all corrections
+  // Read all corrections.
   for (const ECLShowerShapeSecondMomentCorrection& correction : m_secondMomentCorrectionArray) {
     const int type  = correction.getType();
     const int hypothesis  = correction.getHypothesisId();
@@ -540,7 +540,7 @@ void ECLShowerShapeModule::prepareSecondMomentCorrections()
     m_secondMomentCorrections[type][hypothesis] = correction.getCorrection();
   }
 
-  // Check that all corrections are there
+  // Check that all corrections are there.
   if (m_secondMomentCorrections[0][ECLConnectedRegion::c_N1].GetN() > 0 or
       m_secondMomentCorrections[1][ECLConnectedRegion::c_N1].GetN() > 0 or
       m_secondMomentCorrections[0][ECLConnectedRegion::c_N2].GetN() > 0 or
@@ -551,5 +551,16 @@ void ECLShowerShapeModule::prepareSecondMomentCorrections()
 
 double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const int hypothesis) const
 {
-  return m_secondMomentCorrections[0][hypothesis].Eval(theta) * m_secondMomentCorrections[1][hypothesis].Eval(theta);
+  // convert to deg.
+  double thetadeg = theta * TMath::RadToDeg();
+
+  // protect angular range.
+  if (thetadeg < 0.1) thetadeg = 0.1;
+  else if (thetadeg > 179.9) thetadeg = 179.9;
+
+  // protect hypothesis.
+  if (hypothesis < 1 or hypothesis > 10) {
+    B2FATAL("Invalid hypothesis for second moment corrections.");
+  }
+  return m_secondMomentCorrections[0][hypothesis].Eval(thetadeg) * m_secondMomentCorrections[1][hypothesis].Eval(thetadeg);
 }

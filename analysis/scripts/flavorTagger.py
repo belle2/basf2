@@ -602,7 +602,9 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                variablesToBeSaved = variables[category] + [targetVariable, ancestorHasWhichFlavor]
+                variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
+                                                            'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                            'nMCMatches', 'B0mcErrors']
                 if category != 'KaonPion' and category != 'FSC':
                     variablesToBeSaved = variablesToBeSaved + \
                         ['extraInfo(isRightTrack(' + category + '))',

@@ -114,6 +114,11 @@ namespace Belle2 {
     double ancestorHasWhichFlavor(const Particle* particle);
 
     /**
+     * mcErrors MCMatching Flag on the reconstructed B0_cp.
+     */
+    double B0mcErrors(const Particle* particle);
+
+    /**
      * 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).
      */
     double isRelatedRestOfEventMajorityB0Flavor(const Particle* part);

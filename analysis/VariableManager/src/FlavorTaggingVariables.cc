@@ -429,19 +429,36 @@ namespace Belle2 {
         const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
         const MCParticle* Y4S = BcpMC->getMother();
         const MCParticle* mcParticle = particle->getRelatedTo<MCParticle>();
-        const MCParticle* newMother = mcParticle->getMother();
         while (mcParticle != nullptr) {
-          if (newMother == Y4S &&  mcParticle != BcpMC) {
-            if (mcParticle -> getPDG() == 511) OutputB0tagQ = 1;
-            else OutputB0tagQ = -1;
+          if (mcParticle->getMother() == Y4S) {
+            if (mcParticle != BcpMC && TMath::Abs(mcParticle -> getPDG()) == 511) {
+              if (mcParticle -> getPDG() == 511) OutputB0tagQ = 1;
+              else OutputB0tagQ = -1;
+            } else if (mcParticle == BcpMC) {
+              if (mcParticle -> getPDG() == 511) OutputB0tagQ = 2;
+              else OutputB0tagQ = -2;
+            } else OutputB0tagQ = 5;
             break;
           }
           mcParticle = mcParticle->getMother();
-          newMother = mcParticle->getMother();
         }
       }
 
       return OutputB0tagQ;
+    }
+
+    double B0mcErrors(const Particle* particle)
+    {
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+
+      int MCMatchingError = -1;
+      if (roe.isValid()) {
+        const Particle* Bcp = roe->getRelated<Particle>();
+        const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
+
+        MCMatchingError = MCMatching::getMCErrors(Bcp, BcpMC);
+      }
+      return MCMatchingError;
     }
 
     double isRelatedRestOfEventMajorityB0Flavor(const Particle* part)
@@ -1599,6 +1616,7 @@ namespace Belle2 {
                       "0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.");
     REGISTER_VARIABLE("ancestorHasWhichFlavor", ancestorHasWhichFlavor,
                       "checks the decay chain of the given particle upwards up to the Y(4S) resonance.Output is 0 (1) if an ancestor is found to be a B0bar (B0), if not -2.");
+    REGISTER_VARIABLE("B0mcErrors", B0mcErrors, "mcErrors MCMatching Flag on the reconstructed B0_cp.");
     REGISTER_VARIABLE("isRelatedRestOfEventMajorityB0Flavor", isRelatedRestOfEventMajorityB0Flavor,
                       " 0 (1) if the majority of tracks and clusters of the RestOfEvent related to the given Particle are related to a B0bar (B0).");
     REGISTER_VARIABLE("isRestOfEventMajorityB0Flavor", isRestOfEventMajorityB0Flavor,

@@ -50,7 +50,7 @@ REG_MODULE(ECLShowerShapePureCsI)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLShowerShapeModule::ECLShowerShapeModule() : Module()
+ECLShowerShapeModule::ECLShowerShapeModule() : Module(), m_secondMomentCorrectionArray("ECLShowerShapeSecondMomentCorrection")
 {
   // Set description
   setDescription("ECLShowerShapeModule: Calculate ECL shower shape variable (e.g. E9E21)");
@@ -152,6 +152,7 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
   std::vector<ProjectedECLDigit> projectedECLDigits = projectECLDigits(*eclShower);
 
   const double showerEnergy = eclShower->getEnergy();
+  const double showerTheta = eclShower->getTheta();
 
   //sum crystal energies
   double sumEnergies = 0.0;
@@ -165,7 +166,9 @@ void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const b
 
   const double absZernike40 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 4, 0, rho0);
   const double absZernike51 = computeAbsZernikeMoment(projectedECLDigits, sumEnergies, 5, 1, rho0);
-  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy);
+  //  const double secondMomentCorrection = getSecondMomentCorrection(showerTheta, hypothesisID);
+  const double secondMoment = computeSecondMoment(projectedECLDigits, showerEnergy) * getSecondMomentCorrection(showerTheta,
+                              hypothesisID);
   const double LATenergy    = computeLateralEnergy(projectedECLDigits, m_avgCrystalDimension);
 
   // Set shower shape variables.
@@ -520,3 +523,30 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
 
 }
 
+void ECLShowerShapeModule::prepareSecondMomentCorrections()
+{
+
+  // Read all corrections
+  for (const ECLShowerShapeSecondMomentCorrection& correction : m_secondMomentCorrectionArray) {
+    const int type  = correction.getType();
+    const int hypothesis  = correction.getHypothesisId();
+    if (type < 0 or type > 2 or hypothesis < 1 or hypothesis > 10) {
+      B2FATAL("Invalid type or hypothesis for second moment corrections.");
+    }
+
+    m_secondMomentCorrections[type][hypothesis] = correction.getCorrection();
+  }
+
+  // Check that all corrections are there
+  //  if(m_secondMomentCorrections[0][ECLConnectedRegion::c_N1]==NULL or
+  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N1]==NULL or
+  //   m_secondMomentCorrections[0][ECLConnectedRegion::c_N2]==NULL or
+  //   m_secondMomentCorrections[1][ECLConnectedRegion::c_N2]==NULL) {
+  //  B2FATAL("Missing corrections for second moments..");
+  // }
+}
+
+double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const int hypothesis) const
+{
+  return m_secondMomentCorrections[0][hypothesis].Eval(theta) * m_secondMomentCorrections[1][hypothesis].Eval(theta);
+}

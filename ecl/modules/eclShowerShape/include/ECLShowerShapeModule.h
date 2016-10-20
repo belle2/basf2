@@ -23,6 +23,8 @@
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLNeighbours.h>
+#include <framework/database/DBArray.h>
+#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 
 //MVA package
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -123,7 +125,6 @@ namespace Belle2 {
       */
       void setShowerShapeVariables(ECLShower* eclShower, const bool calculateZernikeMVA) const;
 
-
       /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits, const double avgCrystalDimension) const;
 
@@ -174,6 +175,16 @@ namespace Belle2 {
        If the shower is smaller than this, the reduced number is used for this. */
       double computeE1oE9(const ECLShower&) const;
 
+      DBArray<ECLShowerShapeSecondMomentCorrection> m_secondMomentCorrectionArray;  /**< Shower shape corrections from DB */
+      TGraph m_secondMomentCorrections[2][10]; /**< second moment corrections [type][hypothesisid] */
+
+      /** Prepare corrections for second moment
+       */
+      void prepareSecondMomentCorrections();
+
+      /** Get corrections for second moment
+       */
+      double getSecondMomentCorrection(const double theta, const int hypothesis) const;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

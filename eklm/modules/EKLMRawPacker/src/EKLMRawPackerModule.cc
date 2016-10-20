@@ -127,7 +127,6 @@ void EKLMRawPackerModule::event()
 
     delete [] buf;
   }
-  rawklmarray.create();
 
 //  B2INFO("EKLMRawPackerModule:: N_good_eklmdigits " << n_Gdidgits);
 

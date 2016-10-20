@@ -356,7 +356,6 @@ void CDCDigitizerModule::event()
   unsigned int iCDCHits = 0;
 
   StoreArray<CDCHit> cdcHits(m_outputCDCHitsName);
-  cdcHits.create();
 
   RelationArray cdcSimHitsToCDCHits(simHits, cdcHits); //SimHit<->CDCHit
   RelationArray mcParticlesToCDCHits(mcParticles, cdcHits); //MCParticle<->CDCHit
@@ -408,7 +407,6 @@ void CDCDigitizerModule::event()
   // Store the results with trigger time window in a separate array
   // with corresponding relations.
   StoreArray<CDCHit> cdcHits4Trg(m_outputCDCHitsName4Trg);
-  cdcHits4Trg.create();
 
   for (iterSignalMapTrg = signalMapTrg.begin(); iterSignalMapTrg != signalMapTrg.end(); ++iterSignalMapTrg) {
     unsigned short adcCount = getADCCount(iterSignalMapTrg->second.m_charge);

@@ -117,7 +117,6 @@ namespace Belle2 {
       }
 
       StoreArray<He3tubeSimHit> He3tubeHits;
-      if (!He3tubeHits.isValid()) He3tubeHits.create();
       He3tubeSimHit* hit = He3tubeHits.appendNew(
                              depEnergy,
                              nielEnergy,

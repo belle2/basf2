@@ -11,6 +11,7 @@ import queue
 import webbrowser
 from multiprocessing import Process, Queue
 from validationplots import create_plots
+import validationpath
 import functools
 
 g_plottingProcesses = {}
@@ -279,28 +280,32 @@ def parse_cmd_line_arguments():
     parser.add_argument("-v", "--view", help="Open validation website"
                         " in the system's default browser.",
                         action='store_true')
+
     # Return the parsed arguments!
     return parser.parse_args()
 
 
-def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False):
+def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False, dryRun=False):
 
     # Setup options for logging
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(levelname)-8s %(message)s',
                         datefmt='%H:%M:%S')
 
+    basepath = validationpath.get_basepath()
+    cwd_folder = os.getcwd()
+
     # Only execute the program if a basf2 release is set up!
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
-    # Make sure the output of validate_basf2.py is there
-    if not os.path.isdir('html/results'):
-        sys.exit('Error: No html/results '
-                 'dir found! Run validate_basf2.py first.')
-
     # Go to the html directory
+    if not os.path.exists('html'):
+        os.mkdir('html')
     os.chdir('html')
+
+    if not os.path.exists('plots'):
+        os.mkdir('plots')
 
     cherry_config = dict()
     # just empty, will be filled below
@@ -308,19 +313,31 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     # will ensure also the json requests are gzipped
     setup_gzip_compression("/", cherry_config)
 
-    var_b2_local_dir = "BELLE2_LOCAL_DIR"
+    # check if static files are provided via central release
+    static_folder_list = ["validation", "html_static"]
+    static_folder = None
 
-    if var_b2_local_dir not in os.environ:
-        logging.fatal("{} hast to be set, exiting".format(var_b2_local_dir))
-        return
+    if basepath["central"] is not None:
+        static_folder_central = os.path.join(basepath["central"], *static_folder_list)
+        if os.path.isdir(static_folder_central):
+            static_folder = static_folder_central
 
-    # get local directory of the belle 2 release
-    local_dir = os.environ[var_b2_local_dir]
+    # check if there is also a collection of static files in the local release
+    # this overwrites the usage of the central release
+    if basepath["local"] is not None:
+        static_folder_local = os.path.join(basepath["local"], *static_folder_list)
+        if os.path.isdir(static_folder_local):
+            static_folder = static_folder_local
+
+    if static_folder is None:
+        sys.exit("Either BELLE2_RELEASE_DIR or BELLE2_LOCAL_DIR has to bet to provide static HTML content. Did you run setuprel ?")
 
     # join the paths of the various result folders
-    results_folder = os.path.join(local_dir, "results")
-    comparison_folder = os.path.join(local_dir, "html", "plots")
-    static_folder = os.path.join(local_dir, "validation", "html_static")
+    results_folder = validationpath.get_results_folder(cwd_folder)
+    comparison_folder = validationpath.get_html_plots_folder(cwd_folder)
+
+    logging.info("Serving static content from {}".format(static_folder))
+    logging.info("Serving result content and plots from {}".format(cwd_folder))
 
     # export js, css and html templates
     cherry_config["/static"] = {
@@ -369,9 +386,10 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     if openSite:
         webbrowser.open("http://" + ip + ":" + str(port))
 
-    cherrypy.quickstart(ValidationRoot(results_folder=results_folder,
-                                       comparison_folder=comparison_folder),
-                        '/', cherry_config)
+    if not dryRun:
+        cherrypy.quickstart(ValidationRoot(results_folder=results_folder,
+                                           comparison_folder=comparison_folder),
+                            '/', cherry_config)
 
 
 if __name__ == '__main__':

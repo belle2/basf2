@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 
 import sys
-import os
 import time
 import subprocess
-from multiprocessing import Process
 import validationserver
+import tempfile
+import os
+
+from validationtestutil import check_excecute
 
 try:
     import splinter
@@ -14,23 +16,6 @@ except ImportError:
     print("The splinter package is required to run this test. Run 'pip3 install splinter' to install")
     # don't give an error exit code here to not fail if splinter is not available
     sys.exit(0)
-
-
-def check_excecute(cmd, terminate_on_error=True):
-    """
-    Executes a shell commands and check for =! 0 return codes
-    """
-
-    print("Executing command '{}'".format(cmd))
-    res = os.system(cmd)
-    print("Command '{}' exited with code {}".format(cmd, res))
-    if not res == 0:
-        print("FATAL: Exit code is not 0")
-        if terminate_on_error:
-            sys.exit(res)
-        return False
-
-    return True
 
 
 def start_webserver():
@@ -93,31 +78,38 @@ def main():
 
     revs_to_gen = ["stack_test_1", "stack_test_2"]
 
-    for r in revs_to_gen:
-        check_excecute("validate_basf2 --test --tag {}".format(r))
+    # create a temporary test folder in order not to interfere with
+    # already existing validation results
+    with tempfile.TemporaryDirectory() as tmpdir:
 
-    # make sure the webserver process is terminated in any case
-    try:
-        # start webserver to serve json output files, plots and
-        # interactive website
-        server_process = subprocess.Popen(["python3", "validation/scripts/validationserver.py"])
+        # switch to this folder
+        os.chdir(str(tmpdir))
 
-        # wait for one second for the server to start
-        time.sleep(1)
-        success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
-    except:
-        e = sys.exc_info()[0]
-        # print exception again
-        print("Error {}".format(e))
-        success = False
-    finally:
-        # send terminate command
-        server_process.terminate()
-        # wait for the webserver to actually terminate
-        server_process.wait()
+        for r in revs_to_gen:
+            check_excecute("validate_basf2 --test --tag {}".format(r))
 
-    if not success:
-        sys.exit(1)
+        # make sure the webserver process is terminated in any case
+        try:
+            # start webserver to serve json output files, plots and
+            # interactive website
+            server_process = subprocess.Popen(["python3", "validation/scripts/validationserver.py"])
+
+            # wait for one second for the server to start
+            time.sleep(1)
+            success = success and check_for_content(revs_to_gen + ["reference"], 7, 7)
+        except:
+            e = sys.exc_info()[0]
+            # print exception again
+            print("Error {}".format(e))
+            success = False
+        finally:
+            # send terminate command
+            server_process.terminate()
+            # wait for the webserver to actually terminate
+            server_process.wait()
+
+        if not success:
+            sys.exit(1)
 
 if __name__ == "__main__":
     main()

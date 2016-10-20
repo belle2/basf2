@@ -90,9 +90,7 @@ namespace Belle2 {
       }
 
       StoreArray<BKLMSimHit> simHits;
-      if (!simHits.isValid()) simHits.create();
       StoreArray<BKLMSimHitPosition> simHitPositions;
-      if (!simHitPositions.isValid()) simHitPositions.create();
       StoreArray<MCParticle> particles;
       RelationArray particleToSimHits(particles, simHits);
 

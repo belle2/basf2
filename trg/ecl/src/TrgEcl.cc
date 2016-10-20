@@ -321,7 +321,6 @@ TrgEcl::simulate(int m_nEvent)
       if (ClusterEnergy == 0 && ClusterTiming == 0) {continue;}
 
       StoreArray<TRGECLCluster> ClusterArray;
-      if (!ClusterArray) ClusterArray.create();
       ClusterArray.appendNew();
       m_hitNum = ClusterArray.getEntries() - 1;
       ClusterArray[m_hitNum]->setEventId(m_nEvent);

@@ -168,7 +168,6 @@ CDCTriggerHoughtrackingModule::event()
   TVector2 coord;
 
   if (!storeTracks.isValid()) {
-    storeTracks.create();
   } else {
     storeTracks.getPtr()->Clear();
   }

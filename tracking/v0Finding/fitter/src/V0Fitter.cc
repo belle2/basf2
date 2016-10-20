@@ -11,6 +11,7 @@
 #include <genfit/GFRaveVertex.h>
 #include <genfit/Track.h>
 #include <genfit/FieldManager.h>
+#include <genfit/Exception.h>
 
 #include <TVector3.h>
 
@@ -159,8 +160,28 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   }
   genfit::Track& gfTrackMinus = RecoTrackGenfitAccess::getGenfitTrack(*recoTrackMinus);
 
-  genfit::MeasuredStateOnPlane stPlus = gfTrackPlus.getFittedState();
-  genfit::MeasuredStateOnPlane stMinus = gfTrackMinus.getFittedState();
+  const genfit::MeasuredStateOnPlane* stPlusPtr = nullptr;
+  try {
+    stPlusPtr = &gfTrackPlus.getFittedState();
+  } catch (genfit::Exception) {
+    B2DEBUG(100, "No TrackPoint with fitterInfo for the given rep.");
+    return false;
+  }
+
+  const genfit::MeasuredStateOnPlane* stMinusPtr = nullptr;
+  try {
+    stMinusPtr = &gfTrackMinus.getFittedState();
+  } catch (genfit::Exception) {
+    B2DEBUG(100, "No TrackPoint with fitterInfo for the given rep.");
+    return false;
+  }
+
+  if (not stPlusPtr or not stMinusPtr) {
+    return false;
+  }
+
+  genfit::MeasuredStateOnPlane stPlus = *stPlusPtr;
+  genfit::MeasuredStateOnPlane stMinus = *stMinusPtr;
 
   if (rejectCandidate(stPlus, stMinus)) {
     return false;

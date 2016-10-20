@@ -80,8 +80,8 @@ namespace Belle2 {
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
 
     //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
-    //    m_wireSag = m_cdcgp.isWireSagOn();
-    m_wireSag = false;
+    //    m_wireSag = m_cdcgp->isWireSagOn();
+    //    m_wireSag = false;
     //    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
 
     //    m_modifiedLeftRightFlag = m_cdcgp.isModifiedLeftRightFlagOn();
@@ -140,6 +140,8 @@ namespace Belle2 {
       m_minTrackLength = m_cdcgp->getMinTrackLength();
       m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
       B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+
+      m_wireSag = m_cdcgp->isWireSagOn();
 
       m_nonUniformField = 0;
     }

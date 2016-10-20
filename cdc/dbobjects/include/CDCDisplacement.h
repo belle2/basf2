@@ -27,7 +27,7 @@ namespace Belle2 {
      * Default constructor.
      */
     CDCDisplacement() :
-      m_wire(65535), m_fwd(), m_bwd()
+      m_wire(65535), m_fwd(), m_bwd(), m_tension()
     {
     }
 
@@ -35,8 +35,8 @@ namespace Belle2 {
     /**
      * Constructor.
      */
-    CDCDisplacement(const WireID& wire, TVector3 fwd, TVector3 bwd) :
-      m_wire(wire), m_fwd(fwd), m_bwd(bwd)
+    CDCDisplacement(const WireID& wire, TVector3 fwd, TVector3 bwd, float tension) :
+      m_wire(wire), m_fwd(fwd), m_bwd(bwd), m_tension(tension)
     {
     }
 
@@ -76,12 +76,14 @@ namespace Belle2 {
     float getYBwd() const {return m_bwd.Y();}
     float getZBwd() const {return m_bwd.Z();}
 
+    float getTension() const {return m_tension;}
+
   private:
     unsigned short m_wire; /**< Wire ID */
     TVector3 m_fwd; /**< Displacement of forward side */
     TVector3 m_bwd; /**< Displacement of backward side */
-    ClassDef(CDCDisplacement, 1); /**< ClassDef */
+    float        m_tension; /**< Displacement of wire tension (grW) */
+    ClassDef(CDCDisplacement, 2); /**< ClassDef */
   };
 
 } // end namespace Belle2
-

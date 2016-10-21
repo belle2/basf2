@@ -7,8 +7,9 @@
  **************************************************************************/
 
 #include <ecl/modules/eclTrackShowerMatch/ECLTrackShowerMatchModule.h>
-#include <ecl/dataobjects/ECLCalDigit.h>
 #include <ecl/geometry/ECLGeometryPar.h>
+#include <ecl/dataobjects/ECLCalDigit.h>
+#include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <mdst/dataobjects/ECLCluster.h>
 #include <mdst/dataobjects/Track.h>
 #include <mdst/dataobjects/TrackFitResult.h>
@@ -58,8 +59,8 @@ void ECLTrackShowerMatchModule::event()
   const int pdgCodePiPlus = Const::pion.getPDGCode();
   const int pdgCodePiMinus = -1 * Const::pion.getPDGCode();
   ECLGeometryPar* geometry = ECLGeometryPar::Instance();
-  for (const Track& track : tracks) {
-    set<int> clid;
+  for (Track& track : tracks) {
+    set< pair<int, int> > showerCRId;
 
     // Find extrapolated track hits in the ECL, considering
     // only hit points where the track enters the crystal
@@ -79,27 +80,26 @@ void ECLTrackShowerMatchModule::event()
                                  );
       if (idigit != eclDigits.end()) {
         RelationVector<ECLShower> eclShower = idigit->getRelationsFrom<ECLShower>();
-        for (const auto& sh : eclShower) clid.insert(sh.getShowerId());
-      }
-    } // end loop on ExtHit
+        for (auto& sh : eclShower) {
+          const auto* connectedRegion = sh.getRelated<ECLConnectedRegion>();
+          if (connectedRegion != nullptr) {
+            bool isNew = (showerCRId.insert(make_pair(connectedRegion->getCRId(), sh.getShowerId()))).second;
+            if (isNew) {
+              sh.setIsTrack(true);
+              track.addRelationTo(&sh);
+              ECLCluster* cluster = sh.getRelatedFrom<ECLCluster>();
+              if (cluster != nullptr) {
+                cluster->setIsTrack(true);
+                track.addRelationTo(cluster);
+              }
 
-    // Make a track --> shower relation for every shower that has a digit been hit.
-    for (const auto& id : clid) {
-      const auto ish = find_if(eclRecShowers.begin(), eclRecShowers.end(),
-      [&](const ECLShower & element) { return element.getShowerId() == id; }
-                              );
-      if (ish != eclRecShowers.end()) {
-        ish->setIsTrack(true);
-        const ECLShower* shower = &(*ish);
-        track.addRelationTo(shower);
-        ECLCluster* cluster = shower->getRelatedFrom<ECLCluster>();
-        if (cluster != nullptr) {
-          cluster->setIsTrack(true);
-          track.addRelationTo(cluster);
-        }
-      }
-    } // end loop on shower id
+            } // the CR - shower pair not already found
+          } //
+        } // end loop on showers sharing the digit
+      } //end if digit is found
+    } // end loop on ExtHit
   } // end loop on Tracks
+
 
   for (auto& shower : eclRecShowers) {
     // compute the distance from shower COG and the closest extrapolated track

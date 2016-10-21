@@ -144,10 +144,10 @@ namespace Belle2 {
               cout << "phase 1" << endl;
             }
             new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data() , &topVolume, false, detID);
+            cout << " Nb of detector " << detID << endl;
             detID++;
           }
         }
-        cout << " Nb of detector " << detID << endl;
       }
     }
   } // qcsmonitor namespace

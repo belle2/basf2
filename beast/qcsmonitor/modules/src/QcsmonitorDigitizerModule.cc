@@ -101,7 +101,25 @@ void QcsmonitorDigitizerModule::event()
   StoreArray<QcsmonitorSimHit> SimHits;
   StoreArray<QcsmonitorHit> Hits;
 
+  int number_of_timebins = (int)((m_MaxTime - m_MinTime) / m_TimeStep);
+
+  for (int i = 0; i < 1000; i ++)
+    for (int j = 0; j < 100; j ++)
+      hitsarrayinMIP[i][j] = 0;
+
   for (const auto& SimHit : SimHits) {
+    const int detNb = SimHit.getCellId();
+    const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
+    const double tof = SimHit.getFlightTime(); //ns
+    int TimeBin = tof / m_TimeStep;
+    double MIP = Edep / m_C_keV_to_MIP;
+    //double PE = MIP * m_C_MIP_to_PE;
+    if (m_MinTime < tof && tof < m_MaxTime && TimeBin < 1000 && detNb < 100)
+      hitsarrayinMIP[TimeBin][detNb] += MIP;
+  }
+
+  /*
+    for (const auto& SimHit : SimHits) {
     const int detNb = SimHit.getCellId();
     //int pdg = SimHit.getPDGCode();
     const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
@@ -110,7 +128,20 @@ void QcsmonitorDigitizerModule::event()
     double MIP = Edep / m_C_keV_to_MIP;
     double PE = MIP * m_C_MIP_to_PE;
     if ((m_MinTime < tof && tof < m_MaxTime) &&  MIP > m_MIPthres)
-      Hits.appendNew(QcsmonitorHit(detNb,  TimeBin, Edep, MIP, PE));
+    //if (hitsarrayinMIP[TimeBin][detNb] > m_MIPthres)
+    Hits.appendNew(QcsmonitorHit(detNb,  TimeBin, Edep, MIP, PE));
+    }
+  */
+
+  for (int i = 0; i < number_of_timebins; i ++) {
+    for (int j = 0; j < m_ScintCell; j ++) {
+      if (hitsarrayinMIP[i][j] > m_MIPthres) {
+        double MIP = hitsarrayinMIP[i][j];
+        double Edep = MIP * m_C_keV_to_MIP * 1e-6; //keV -> GeV.
+        double PE = MIP * m_C_MIP_to_PE;
+        Hits.appendNew(QcsmonitorHit(i, j, Edep, MIP, PE));
+      }
+    }
   }
 
 }

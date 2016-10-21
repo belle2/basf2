@@ -7,7 +7,8 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
- *               Gulgilemo De Nardo (denardo@na.infn.it) (GDN)            *
+ *               Alon Hershenhorn (hersehn@physics.ubc.ca)                *
+ *               Suman Koirala (suman@ntu.edu.tw)                         *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -17,9 +18,11 @@
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dbobjects/ECLLeakageCorrection.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
+#include <framework/database/DBArray.h>
 
 // OTHER
 #include <string>
@@ -53,36 +56,17 @@ namespace Belle2 {
       /** Terminate. */
       virtual void terminate();
 
-      // OLD METHOD (TF)
-      /**calculate correction factor of energy depending on Energy and Theta  */
-      double correctionFactor(double energy, double theta);
+      //* Prepare correction */
+      void prepareLeakageCorrections();
 
-      /** read correction accounting shower leakage to get unbiased photon energy */
-      void ReadCorrection();
+      //* Get correction */
+      double getLeakageCorrection(const double theta, const double energy, const double background) const;
 
-      /**  theta ranges for the correction */
-      std::vector<double> m_ranges;
-
-      /** correction polynomial coefficients storage */
-      std::vector<double> m_ecorr;
-
-      /** Temp fix to correct energy bias (to be removed ASAP with a proper calibration) */
-      class TmpClusterCorrection {
-      public:
-        void init(const std::string& filename); /**< initialize*/
-//        void scale(Belle2::ECLCluster& c) const;
-        void scale(Belle2::ECLShower& c) const;  /**< scale the shower energies */
-      private:
-        double m_deltaE;   /**< energ bin */
-        std::size_t m_npointsE;   /**< number of bins */
-        std::vector<double> m_maxTheta;   /**< theta bins */
-        std::vector<double> m_tmpCorrection;   /**< correction factor */
-      };
-
-      TmpClusterCorrection m_tmpClusterCorrection; /**< correction class instance */
-
+      //* Get correction uncertainty */
+      double getLeakageCorrectionUncertainty(const double theta, const double energy, const double background) const;
 
     private:
+      DBArray<ECLLeakageCorrection> m_leakageCorrectionArray;  /**< Leakage corrections from DB */
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

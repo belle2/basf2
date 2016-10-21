@@ -20,10 +20,7 @@ using namespace std;
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDGeoComponentPar::read(const GearDir& support)
-{
-
-}
+//void VXDGeoComponentPar::read(const GearDir& params){}
 
 
 

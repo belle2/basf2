@@ -9,9 +9,7 @@
  **************************************************************************/
 #pragma once
 
-
-#include <TObject.h>
-#include <string>
+#include <vxd/dbobjects/VXDGeometryPar.h>
 
 
 namespace Belle2 {
@@ -23,21 +21,23 @@ namespace Belle2 {
   * The Class for VXD geometry
   */
 
-  class SVDGeometryPar: public TObject {
+  class SVDGeometryPar: public VXDGeometryPar {
 
   public:
-
     //! Default constructor
     SVDGeometryPar() {}
-
     //! Constructor using Gearbox
-    explicit SVDGeometryPar(const GearDir& content) { read(content); }
-
+    explicit SVDGeometryPar(const GearDir& content) :  VXDGeometryPar(content) {  }
     //! Destructor
     ~SVDGeometryPar() {}
-
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    //void read(const GearDir&);
+
+    /**
+     * Read the sensor definitions from the database
+     * @param sensors Reference to the database containing the parameters
+     */
+    virtual VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor);
 
   private:
 

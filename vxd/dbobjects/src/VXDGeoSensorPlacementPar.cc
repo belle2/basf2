@@ -18,6 +18,7 @@ using namespace std;
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
 void VXDGeoSensorPlacementPar::read(const GearDir& sensorInfo)
 {
   m_id = sensorInfo.getInt("@id");
@@ -27,3 +28,4 @@ void VXDGeoSensorPlacementPar::read(const GearDir& sensorInfo)
   m_flipV = sensorInfo.getBool("@flipV", false);
   m_flipW = sensorInfo.getBool("@flipW", false);
 }
+*/

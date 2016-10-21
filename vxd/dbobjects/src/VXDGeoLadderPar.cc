@@ -20,6 +20,8 @@ using namespace std;
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
+
 void VXDGeoLadderPar::read(const GearDir& paramsLadder)
 {
   m_layer = 0;
@@ -30,7 +32,7 @@ void VXDGeoLadderPar::read(const GearDir& paramsLadder)
   m_glueOversize = paramsLadder.getLength("Glue/oversize", 0);
   m_glueMaterial = paramsLadder.getString("Glue/Material", "");
 }
-
+*/
 
 
 

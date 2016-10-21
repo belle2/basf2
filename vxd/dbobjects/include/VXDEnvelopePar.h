@@ -20,6 +20,8 @@ namespace Belle2 {
   */
   class VXDEnvelopePar: public VXDRotationSolidPar {
   public:
+    //! Default constructor
+    VXDEnvelopePar() {}
     //! Constructor using Gearbox
     explicit VXDEnvelopePar(const GearDir& content) : VXDRotationSolidPar(content) { }
   private:

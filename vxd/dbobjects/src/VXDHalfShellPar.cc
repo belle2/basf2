@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/VXDRotationSolidPar.h>
+#include <vxd/dbobjects/VXDHalfShellPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -16,26 +16,24 @@
 using namespace Belle2;
 using namespace std;
 
-// Read parameters from Gearbox (no calculations here)
+// Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDRotationSolidPar::read(const GearDir& params)
+void VXDHalfShellPar::read(const GearDir& shell)
 {
-  m_name = params.getString("Name", "RotationSolid");
-  m_material = params.getString("Material", "Air");
-  m_color = params.getString("Color", "");
+  m_shellName =  shell.getString("@name");
+  m_shellAngle = shell.getAngle("shellAngle", 0);
 
-  m_minPhi = params.getAngle("minPhi", 0);
-  m_maxPhi = params.getAngle("maxPhi", 2 * M_PI);
+  B2INFO("Reading half shell parameters: name " << m_shellName);
 
-  for (const GearDir point : params.getNodes("InnerPoints/point")) {
-    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
-    m_innerPoints.push_back(ZXPoint);
-  }
-  for (const GearDir point : params.getNodes("OuterPoints/point")) {
-    pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
-    m_outerPoints.push_back(ZXPoint);
+  for (const GearDir& layer : shell.getNodes("Layer")) {
+    int layerID = layer.getInt("@id");
+    for (const GearDir& ladder : layer.getNodes("Ladder")) {
+      int ladderID = ladder.getInt("@id");
+      double phi = ladder.getAngle("phi", 0);
+      m_layers[layerID].push_back(std::pair<int, double>(ladderID, phi));
+      B2INFO("Reading layerID " << layerID << " ladderID " << ladderID << " shell angle " << phi);
+    }
   }
 }
-
 
 

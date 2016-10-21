@@ -17,16 +17,54 @@ using namespace Belle2;
 using namespace std;
 
 
-
-
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+
+/*
 void PXDGeometryPar::read(const GearDir& content)
 {
-  B2INFO("Parsing PXD.xml to create PXDGeometryPar payload");
-
-  //Read some global parameters
-  m_vxdGlobalPar = VXDGlobalPar(content);
 
 }
+*/
+
+VXDSensorInfoBasePar* PXDGeometryPar::createSensorInfo(const GearDir& sensor)
+{
+  /*
+  SensorInfo* info = new SensorInfo(
+        VxdID(0, 0, 0),
+        sensor.getLength("width"),
+        sensor.getLength("length"),
+        sensor.getLength("height"),
+        sensor.getInt("pixelsU"),
+        sensor.getInt("pixelsV[1]"),
+        sensor.getLength("splitLength", 0),
+        sensor.getInt("pixelsV[2]", 0)
+  );
+  info->setDEPFETParams(
+        sensor.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
+        sensor.getWithUnit("BackVoltage"),
+        sensor.getWithUnit("TopVoltage"),
+        sensor.getLength("SourceBorderSmallPixel"),
+        sensor.getLength("ClearBorderSmallPixel"),
+        sensor.getLength("DrainBorderSmallPixel"),
+        sensor.getLength("SourceBorderLargePixel"),
+        sensor.getLength("ClearBorderLargePixel"),
+        sensor.getLength("DrainBorderLargePixel"),
+        sensor.getLength("GateDepth"),
+        sensor.getBool("DoublePixel"),
+        sensor.getDouble("ChargeThreshold"),
+        sensor.getDouble("NoiseFraction")
+  );
+  info->setIntegrationWindow(
+        sensor.getTime("IntegrationStart"),
+        sensor.getTime("IntegrationEnd")
+  );
+  m_SensorInfo.push_back(info);
+  return info;
+  */
+
+  B2INFO(" create PXD sensor info: backvoltage is " << sensor.getWithUnit("BackVoltage"));
+  return 0;
+}
+
+

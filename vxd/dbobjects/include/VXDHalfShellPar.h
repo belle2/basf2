@@ -9,7 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <vxd/dbobjects/VXDGeometryPar.h>
+
+#include <TObject.h>
+#include <string>
+#include <map>
+#include <vector>
+
 
 namespace Belle2 {
 
@@ -17,29 +22,30 @@ namespace Belle2 {
 
 
   /**
-  * The Class for VXD geometry
+  * The Class for VXD half shell payload
   */
 
-  class PXDGeometryPar: public VXDGeometryPar {
+  class VXDHalfShellPar: public TObject {
+
   public:
     //! Default constructor
-    PXDGeometryPar() {}
+    VXDHalfShellPar() {}
     //! Constructor using Gearbox
-    explicit PXDGeometryPar(const GearDir& content) : VXDGeometryPar(content) {  }
+    explicit VXDHalfShellPar(const GearDir& content) { read(content); }
     //! Destructor
-    ~PXDGeometryPar() {}
+    ~VXDHalfShellPar() {}
     //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
-
-    /**
-     * Read the sensor definitions from the database
-     * @param sensors Reference to the database containing the parameters
-       */
-    virtual VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor);
+    void read(const GearDir&);
 
   private:
+    std::string m_shellName;
+    double m_shellAngle;
 
-    ClassDef(PXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    std::map< int, std::vector<std::pair<int, double>> > m_layers;
+
+
+    ClassDef(VXDHalfShellPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+
   };
 } // end of namespace Belle2
 

@@ -6,6 +6,8 @@
 #pragma link C++ nestedclasses;
 
 
+#pragma link C++ class Belle2::VXDHalfShellPar+;
+
 #pragma link C++ class Belle2::SVDCoolingPipesPar+;
 #pragma link C++ class Belle2::SVDCoolingPipesLayerPar+; // implicit
 
@@ -43,8 +45,10 @@
 #pragma link C++ class Belle2::VXDPolyConePar+;
 #pragma link C++ class Belle2::VXDPolyConePlanePar+; // implicit
 
-#pragma link C++ class Belle2::VXDRadiationSensorPar+;
-#pragma link C++ class Belle2::VXDRadiationSensorPositionPar+; // implicit
+
+
+#pragma link C++ class Belle2::VXDGeoRadiationSensorsPar+;
+#pragma link C++ class Belle2::VXDGeoRadiationSensorsPositionPar+; // implicit
 
 #pragma link C++ class Belle2::HeavyMetalShieldGeometryPar+;
 
@@ -55,6 +59,9 @@
 #pragma link C++ class Belle2::VXDSlotTypesPar+; // implicit
 
 
+#pragma link C++ class Belle2::VXDSensorInfoBasePar+;
+
+#pragma link C++ class Belle2::VXDGeometryPar+;
 #pragma link C++ class Belle2::PXDGeometryPar+;
 #pragma link C++ class Belle2::SVDGeometryPar+;
 

@@ -15,34 +15,63 @@
 #include <vector>
 
 
+#include <vxd/dbobjects/VXDSensorInfoBasePar.h>
+//#include <vxd/dbobjects/PXDSensorInfoPar.h>
+#include <vxd/dbobjects/VXDGeoComponentPar.h>
+#include <vxd/dbobjects/VXDGeoPlacementPar.h>
+
 namespace Belle2 {
 
   class GearDir;
 
-
   /**
   * The Class for VXD Sensor payload
   */
-  class VXDGeoSensorPar: public TObject {
+  class VXDGeoSensorPar: public VXDGeoComponentPar {
   public:
     //! Default constructor
     VXDGeoSensorPar() {}
     //! Constructor using Gearbox
-    explicit VXDGeoSensorPar(const GearDir& content) { read(content); }
+    //explicit VXDGeoSensorPar(const GearDir& content) { read(content); }
     //! Destructor
     ~VXDGeoSensorPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    //void read(const GearDir&);
+    /** set the active area
+      * @param area component description of the active area
+      * @param placement placement description of the active area
+      */
+    void setActive(const VXDGeoComponentPar area, const VXDGeoPlacementPar& placement)
+    {
+      m_activeArea = area; m_activePlacement = placement;
+    }
+    /** get the component description for the active area */
+    VXDGeoComponentPar& getActiveArea() { return m_activeArea; }
+    /** get the placement description for the active area */
+    const VXDGeoPlacementPar& getActivePlacement() { return m_activePlacement; }
+    /** set the list of sub components to be placed */
+    void setComponents(const std::vector<VXDGeoPlacementPar>& component) { m_components = component; }
+    /** get the list of sub components */
+    const std::vector<VXDGeoPlacementPar>& getComponents() const { return m_components; }
+    /** set the pointer to the SensorInfo class */
+    void setSensorInfo(VXDSensorInfoBasePar* info) { m_info = info; }
+    /** get the pointer to the SensorInfo class */
+    const VXDSensorInfoBasePar* getSensorInfo() const { return m_info; }
+    /** return wether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
+    bool getSlanted() const { return m_slanted; }
+    /** set wether or not the sensor is slanted (usually only the first sensor in layers 4-6) */
+    void setSlanted(bool slanted) { m_slanted = slanted; }
   private:
-
-    std::string m_material;
-    std::string m_color;
-    double m_width;
-    double m_width2;
-    double m_lenght;
-    double m_height;
+    /** Paramerers of the active area */
+    VXDGeoComponentPar m_activeArea;
+    /** Position of the active area */
+    VXDGeoPlacementPar m_activePlacement;
+    /** Sensor Information instance */
+    VXDSensorInfoBasePar* m_info;
+    /** Indication wether this is a slanted sensor */
     bool m_slanted;
-
+    /** list of all components to be placed */
+    std::vector<VXDGeoPlacementPar> m_components;
 
     ClassDef(VXDGeoSensorPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

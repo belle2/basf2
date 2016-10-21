@@ -20,6 +20,7 @@ using namespace std;
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
 void VXDGeoSensorPar::read(const GearDir& paramsSensor)
 {
   m_material = paramsSensor.getString("Material");
@@ -30,7 +31,7 @@ void VXDGeoSensorPar::read(const GearDir& paramsSensor)
   m_height = paramsSensor.getLength("height");
   m_slanted = paramsSensor.getBool("@slanted", false);
 }
-
+*/
 
 
 

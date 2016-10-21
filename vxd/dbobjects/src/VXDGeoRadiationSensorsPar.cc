@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <vxd/dbobjects/VXDRadiationSensorPar.h>
+#include <vxd/dbobjects/VXDGeoRadiationSensorsPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
@@ -18,9 +18,9 @@ using namespace std;
 
 // Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDRadiationSensorPositionPar::read(const GearDir& position)
+void VXDGeoRadiationSensorsPositionPar::read(const GearDir& position)
 {
-  m_posZ = position.getLength("z");
+  m_z = position.getLength("z");
   m_radius = position.getLength("radius");
   m_theta = position.getAngle("theta");
 
@@ -34,7 +34,7 @@ void VXDRadiationSensorPositionPar::read(const GearDir& position)
 
 // Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void VXDRadiationSensorPar::read(const GearDir& content)
+void VXDGeoRadiationSensorsPar::read(const GearDir& content)
 {
   m_insideEnvelope = content.getBool("insideEnvelope");
   m_width = content.getLength("width");
@@ -44,7 +44,7 @@ void VXDRadiationSensorPar::read(const GearDir& content)
 
   //loop over all positions
   for (GearDir& position : content.getNodes("position")) {
-    m_sensors.push_back(VXDRadiationSensorPositionPar(position));
+    m_sensors.push_back(VXDGeoRadiationSensorsPositionPar(position));
   }
 }
 

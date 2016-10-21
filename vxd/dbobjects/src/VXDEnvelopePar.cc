@@ -16,13 +16,4 @@
 using namespace Belle2;
 using namespace std;
 
-// Read parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-/*
-void VXDEnvelopePar::read(const GearDir& params)
-{
-   m_shields.push_back(VXDPolyConePar(shield));
-}
-*/
-
 

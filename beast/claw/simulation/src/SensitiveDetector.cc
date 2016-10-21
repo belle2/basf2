@@ -154,7 +154,6 @@ namespace Belle2 {
       RelationArray relMClawmHit(mcParticles, simHits);
 
       StoreArray<ClawSimHit> ClawHits;
-      if (!ClawHits.isValid()) ClawHits.create();
       RelationArray clawSimHitRel(mcParticles, ClawHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       ClawHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);

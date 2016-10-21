@@ -142,7 +142,6 @@ void BKLMRawPackerModule::event()
   }
 
   //    Make RawKLM array
-  rawklmarray.create();
 
   RawCOPPERPackerInfo rawcprpacker_info;
   for (int i = 0 ; i < NUM_BKLM_COPPER; i++) {

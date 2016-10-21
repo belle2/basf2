@@ -63,7 +63,6 @@ namespace Belle2 {
 
       const int hitIndex = simHits.getEntries();
       StoreArray<Ph1bpipeSimHit> Ph1bpipeHits;
-      if (!Ph1bpipeHits.isValid()) Ph1bpipeHits.create();
       /*Ph1bpipeSimHit* hit = Ph1bpipeHits.appendNew(
                               depEnergy,
                               detNb

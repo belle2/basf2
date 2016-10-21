@@ -130,11 +130,6 @@ namespace Belle2 {
                                      geometry::GeometryTypes type)
     {
 
-      //----------->
-      throw DBNotImplemented();
-      return;
-      //<---------- remove when payloads ready!!!
-
       m_topgp->Initialize();
       if (!m_topgp->isValid()) {
         B2ERROR("Cannot create Geometry from Database: no configuration found for "
@@ -155,7 +150,7 @@ namespace Belle2 {
       m_topgp->setGeanUnits();
       geo.useGeantUnits();
 
-      // test ---------------------------->
+      // test new creator methods ---------------------------->
       bool test = false;
       if (test) {
         auto* pmtArray = createPMTArray(geo.getPMTArray());
@@ -186,6 +181,7 @@ namespace Belle2 {
         new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule",
                           &topVolume, false, id);
       }
+
     }
 
 

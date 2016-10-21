@@ -566,6 +566,7 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
   int iL(0), iC(0);
   const int np = 3;
   double back[np], fwrd[np];
+  double tension = 0.;
   unsigned nRead = 0;
 
   while (true) {
@@ -576,13 +577,15 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
     for (int i = 0; i < np; ++i) {
       ifs >> fwrd[i];
     }
+    ifs >> tension;
+
     if (ifs.eof()) break;
 
     ++nRead;
     WireID wire(iL, iC);
     TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
     TVector3 bwd(back[0], back[1], back[2]);
-    disp.appendNew(wire, fwd, bwd);
+    disp.appendNew(wire, fwd, bwd, tension);
   }
 
   if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
@@ -593,7 +596,7 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
   disp.import(iov);
-  B2RESULT("Wire alignment table imported to database.");
+  B2RESULT("Wire displasement table imported to database.");
 }
 
 void CDCDatabaseImporter::printDisplacement()
@@ -602,7 +605,7 @@ void CDCDatabaseImporter::printDisplacement()
   for (const auto& disp : displacements) {
     B2INFO(disp.getICLayer() << " " << disp.getIWire() << " "
            << disp.getXBwd() << " " << disp.getYBwd() << " " << disp.getZBwd() <<  " "
-           << disp.getXFwd() << " " << disp.getYFwd() << " " << disp.getZFwd());
+           << disp.getXFwd() << " " << disp.getYFwd() << " " << disp.getZFwd() << " " << disp.getTension());
   }
 }
 void CDCDatabaseImporter::printChannelMap()

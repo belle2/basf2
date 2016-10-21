@@ -426,7 +426,6 @@ namespace Belle2 {
       if (!retval) {
         // global transf, add track to datastore
         StoreArray<ARICHAeroHit> arichAeroHits;
-        if (!arichAeroHits.isValid()) arichAeroHits.create();
 
         int particleId = 11;// geant4
         dir *= m_beamMomentum * Unit::GeV;

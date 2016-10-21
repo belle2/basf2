@@ -21,6 +21,7 @@ using namespace Belle2;
 TOPNominalTDC::TOPNominalTDC(int numWindows,
                              int subBits,
                              double syncTimeBase,
+                             int numofBunches,
                              double offset,
                              double pileupTime,
                              double doubleHitResolution,
@@ -29,6 +30,7 @@ TOPNominalTDC::TOPNominalTDC(int numWindows,
                              const std::string& name):
   TOPGeoBase(name),
   m_numWindows(numWindows), m_subBits(subBits), m_syncTimeBase(syncTimeBase),
+  m_numofBunches(numofBunches),
   m_offset(offset), m_pileupTime(pileupTime), m_doubleHitResolution(doubleHitResolution),
   m_timeJitter(timeJitter), m_efficiency(efficiency)
 {

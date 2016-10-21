@@ -63,7 +63,7 @@ namespace Belle2 {
     addParam("darkNoise", m_darkNoise,
              "uniformly distributed dark noise (hits per module)", 0.0);
     addParam("trigT0Sigma", m_trigT0Sigma,
-             "trigger T0 resolution [ns]", 0.0);
+             "trigger T0 resolution [ns], if >0 trigger T0 will be simulated", 0.0);
 
   }
 
@@ -93,12 +93,9 @@ namespace Belle2 {
     TOPDigit::setDoubleHitResolution(geo->getNominalTDC().getDoubleHitResolution());
     TOPDigit::setPileupTime(geo->getNominalTDC().getPileupTime());
 
-    // bunch time separation (TODO: get it from TOPNominalTDC)
+    // bunch time separation
     if (m_trigT0Sigma > 0) {
-      GearDir superKEKB("/Detector/SuperKEKB/");
-      double circumference = superKEKB.getLength("circumference");
-      int numofBunches = superKEKB.getInt("numofBunches");
-      m_bunchTimeSep = circumference / Const::speedOfLight / numofBunches;
+      m_bunchTimeSep = geo->getNominalTDC().getBunchSeparationTime();
     }
   }
 

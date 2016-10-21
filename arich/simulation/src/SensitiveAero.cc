@@ -83,7 +83,6 @@ namespace Belle2 {
 
         // write the hit in datastore"
         StoreArray<ARICHAeroHit> aeroHits;
-        if (!aeroHits.isValid()) aeroHits.create();
         ARICHAeroHit* aeroHit = aeroHits.appendNew(PDGEncoding, TPosition, TMomentum);
 
         // Create relation to MCParticle

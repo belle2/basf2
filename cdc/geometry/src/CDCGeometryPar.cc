@@ -84,7 +84,7 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
 
   clear();
   if (geom) {
-    B2INFO("readFromDB");
+    B2INFO("CDCGeometryPar: readFromDB");
     readFromDB(*geom);
   } else {
     //    std::cout <<"readcalled" << std::endl;
@@ -325,14 +325,14 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_XTetc = true;
   if (m_XTetc) {
 #if defined(CDC_XTREL_FROM_DB)
-    B2INFO("Read XT from DB");
+    B2INFO("CDCGeometryPar: Read XT from DB");
     setXtRel();  //Set xt param. (from DB)
 #else
     readXT(gbxParams);  //Read xt params. (from file)
 #endif
 
 #if defined(CDC_SRESOL_FROM_DB)
-    B2INFO("Read Sigma from DB");
+    B2INFO("CDCGeometryPar: Read Sigma from DB");
     setSResol();  //Set sigma param. (from DB)
 #else
     readSigma(gbxParams);  //Read sigma params. (from file)
@@ -714,7 +714,8 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
     for (int i = 0; i < np; ++i) {
       ifs >> fwrd[i];
     }
-    if (set != c_Base)  ifs >> tension;
+    //    if (set != c_Base)  ifs >> tension;
+    ifs >> tension;
 
     if (ifs.eof()) break;
 
@@ -733,16 +734,20 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
       }
     }
 
-    //    double baseTension = M_PI * m_senseWireDensity *
-    //    m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
-    double baseTension = 0.;
+    //    double baseTension = 0.;
 
-    if (set == c_Misaligned) {
-      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
-                                      m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+    if (set == c_Base) {
+      m_WireSagCoef[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(m_senseWireTension + tension));
+      //      std::cout <<"base iL, iC, m_senseWireTension, tension= " << iL <<" " << iC <<" "<< m_senseWireTension <<" "<< tension << std::endl;
+    } else if (set == c_Misaligned) {
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*
+                                      (baseTension + tension));
+      //      std::cout <<"misa iL, iC,basetension, tension= " << iL <<" " << iC <<" "<< baseTension <<" "<< tension << std::endl;
     } else if (set == c_Aligned) {
-      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
-                                   m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+      m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      //      std::cout <<"algn iL, iC,basetension, tension= " << iL <<" " << iC <<" "<< baseTension <<" "<< tension << std::endl;
     }
     //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
 
@@ -786,7 +791,8 @@ void CDCGeometryPar::setWirPosAlignParams()
         m_FWirPosAlign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
       }
 
-      double baseTension = 0.;
+      //      double baseTension = 0.;
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
       double tension = m_alignFromDB->get(wire, CDCAlignment::wireTension);
       //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
       m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
@@ -2077,10 +2083,10 @@ void CDCGeometryPar::setDesignWirParam(const unsigned layerID, const unsigned ce
     m_BWirPosAlign   [L][C][i] = m_BWirPos[L][C][i];
   }
 
-  //  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
-  m_WireSagCoef        [L][C] = 0.;
-  m_WireSagCoefMisalign[L][C] = 0.;
-  m_WireSagCoefAlign   [L][C] = 0.;
+  m_WireSagCoef[L][C] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8. * m_senseWireTension);
+  //  m_WireSagCoef        [L][C] = 0.;
+  m_WireSagCoefMisalign[L][C] = m_WireSagCoef[L][C];
+  m_WireSagCoefAlign    [L][C] = m_WireSagCoef [L][C];
 
 }
 
@@ -2615,6 +2621,31 @@ void CDCGeometryPar::getClosestThetaPoints4Sgm(const double alpha, const double 
 }
 
 
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+void CDCGeometryPar::setDisplacement()
+{
+  //    std::cout <<"setDisplacement called" << std::endl;
+  for (const auto& disp : m_displacementFromDB) {
+    //    const int iLayer0 = disp.getICLayer();
+    //    const int iWire0 = disp.getIWire();
+    const int iLayer = WireID(disp.getEWire()).getICLayer();
+    const int iWire = WireID(disp.getEWire()).getIWire();
+    //    if (iLayer0 != iLayer) B2FATAL("Layer0 != Layer");
+    //    if (iWire0  != iWire) B2FATAL("Wire0 != Wire");
+    m_FWirPos[iLayer][iWire][0] += disp.getXFwd();
+    m_FWirPos[iLayer][iWire][1] += disp.getYFwd();
+    m_FWirPos[iLayer][iWire][2] += disp.getZFwd();
+    m_BWirPos[iLayer][iWire][0] += disp.getXBwd();
+    m_BWirPos[iLayer][iWire][1] += disp.getYBwd();
+    m_BWirPos[iLayer][iWire][2] += disp.getZBwd();
+    m_WireSagCoef[iLayer][iWire] = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.*
+                                   (m_senseWireTension + disp.getTension()));
+    //    std::cout <<"setdisp iL, iC, nominaltension, tension= " << iLayer <<" " << iWire <<" "<< m_senseWireTension <<" "<< disp.getTension() << std::endl;
+  }
+}
+#endif
+
+
 //TODO: The following lines upto the file-end are to be moved to CDCSensitiveDetector.cc
 const signed short CCW = 1; ///< Constant for counterclockwise orientation
 const signed short CW  = -1; ///< Constant for clockwise orientation
@@ -2787,21 +2818,3 @@ signed short CDCGeometryPar::getShiftInSuperLayer(unsigned short iSuperLayer, un
 {
   return m_shiftInSuperLayer[iSuperLayer][iLayer];
 }
-
-
-
-#if defined(CDC_DISPLACEMENT_FROM_DB)
-void CDCGeometryPar::setDisplacement()
-{
-  for (const auto& disp : m_displacementFromDB) {
-    const int iLayer = disp.getICLayer();
-    const int iWire = disp.getIWire();
-    m_FWirPos[iLayer][iWire][0] += disp.getXFwd();
-    m_FWirPos[iLayer][iWire][1] += disp.getYFwd();
-    m_FWirPos[iLayer][iWire][2] += disp.getZFwd();
-    m_BWirPos[iLayer][iWire][0] += disp.getXBwd();
-    m_BWirPos[iLayer][iWire][1] += disp.getYBwd();
-    m_BWirPos[iLayer][iWire][2] += disp.getZBwd();
-  }
-}
-#endif

@@ -280,6 +280,7 @@ namespace Belle2 {
         TOPNominalTDC nominalTDC(tdcParams.getInt("numWindows"),
                                  tdcParams.getInt("subBits"),
                                  tdcParams.getTime("syncTimeBase"),
+                                 tdcParams.getInt("numofBunches"),
                                  tdcParams.getTime("offset"),
                                  tdcParams.getTime("pileupTime"),
                                  tdcParams.getTime("doubleHitResolution"),

@@ -43,7 +43,7 @@ namespace Belle2 {
      * so you can change it via setPrefix(...). The prefix has to be shared among collectors and
      * the algorithm to share the datastore objects, but can be changed (via parameter for collector modules).
      */
-    explicit CalibrationAlgorithm(std::string collectorModuleName) : m_prefix(collectorModuleName) {}
+    explicit CalibrationAlgorithm(const std::string& collectorModuleName) : m_prefix(collectorModuleName) {}
 
     /// Virtual destructor (base class)
     virtual ~CalibrationAlgorithm() {}
@@ -103,7 +103,7 @@ namespace Belle2 {
 
     /// Get calibration data object by name and list of runs
     template<class T>
-    T& getObject(std::string name, std::vector<CalibrationAlgorithm::ExpRun> runlist) const
+    T& getObject(const std::string& name, std::vector<CalibrationAlgorithm::ExpRun> runlist) const
     {
       std::string fullName = m_prefix + "_" + name;
       StoreObjPtr<CalibRootObj<T>> storeobj(fullName, DataStore::c_Persistent);
@@ -156,10 +156,10 @@ namespace Belle2 {
     IntervalOfValidity getIovFromData();
 
     /// Store DB payload with given name with default IOV
-    void saveCalibration(TObject* data, std::string name);
+    void saveCalibration(TObject* data, const std::string& name);
 
     /// Store DB payload with given name and custom IOV
-    void saveCalibration(TObject* data, std::string name, IntervalOfValidity iov);
+    void saveCalibration(TObject* data, const std::string& name, const IntervalOfValidity& iov);
 
     // -----------------------------------------------
 

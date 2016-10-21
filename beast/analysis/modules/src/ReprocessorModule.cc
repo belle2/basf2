@@ -112,7 +112,6 @@ void ReprocessorModule::event()
   // if not already existed, create MCParticles data store
   StoreArray<MCParticle> MCParticles;
   MCParticles.clear();
-  if (!MCParticles.isValid()) MCParticles.create();
 
   StoreObjPtr<EventMetaData> evtMetaData;
   //evtMetaData.clear();

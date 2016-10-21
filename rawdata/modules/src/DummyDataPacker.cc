@@ -82,7 +82,6 @@ void DummyDataPackerModule::event()
   // To make RawDetector array use the following objects
   //
 
-  raw_svdarray.create();
 //   raw_cdcarray.create();
 //   raw_bpidarray.create();
 //   raw_epidarray.create();

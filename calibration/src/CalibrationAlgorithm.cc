@@ -121,12 +121,12 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
   return range.getIntervalOfValidity();
 }
 
-void CalibrationAlgorithm::saveCalibration(TObject* data, string name, IntervalOfValidity iov)
+void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
   m_payloads.emplace_back("dbstore", name, data, iov);
 }
 
-void CalibrationAlgorithm::saveCalibration(TObject* data, string name)
+void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)
 {
   if (m_runs.empty())
     return;

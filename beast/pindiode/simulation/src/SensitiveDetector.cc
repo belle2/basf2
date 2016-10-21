@@ -198,7 +198,6 @@ namespace Belle2 {
       RelationArray relMPindiodemHit(mcParticles, simHits);
 
       StoreArray<PindiodeSimHit> PindiodeHits;
-      if (!PindiodeHits.isValid()) PindiodeHits.create();
       RelationArray pindiodeSimHitRel(mcParticles, PindiodeHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       PindiodeHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);

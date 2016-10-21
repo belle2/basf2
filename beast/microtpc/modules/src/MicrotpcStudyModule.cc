@@ -76,7 +76,7 @@ MicrotpcStudyModule::~MicrotpcStudyModule()
 //This module is a histomodule. Any histogram created here will be saved by the HistoManager module
 void MicrotpcStudyModule::defineHisto()
 {
-  for (int i = 0 ; i < 9 ; i++) {
+  for (int i = 0 ; i < 12 ; i++) {
     h_mctpc_kinetic[i]  = new TH1F(TString::Format("h_mctpc_kinetic_%d", i), "Neutron kin. energy [GeV]", 1000, 0., 10.);
     h_mctpc_kinetic_zoom[i]  = new TH1F(TString::Format("h_mctpc_kinetic_zoom_%d", i), "Neutron kin. energy [MeV]", 1000, 0., 10.);
     h_mctpc_tvp[i] = new TH2F(TString::Format("h_mctpc_tvp_%d", i), "theta v phi", 180, 0., 180., 360, -180., 180.);
@@ -455,6 +455,24 @@ void MicrotpcStudyModule::event()
     else if (PDG == 1000060120) partID[6] = 1; // C
     else if (PDG == 1000020040) partID[7] = 1; // He
     else partID[8] = 1;
+
+    if (PDG == 2112) {
+      if (r < 10.0) {
+        h_mctpc_kinetic[9]->Fill(kin);
+        h_mctpc_kinetic_zoom[9]->Fill(kin * 1e3);
+        h_mctpc_tvp[9]->Fill(theta, phi);
+        h_mctpc_tvpW[9]->Fill(theta, phi, kin);
+        h_mctpc_zr[9]->Fill(z, r);
+      }
+      if (r > 70.0) {
+        h_mctpc_kinetic[10]->Fill(kin);
+        h_mctpc_kinetic_zoom[10]->Fill(kin * 1e3);
+        h_mctpc_tvp[10]->Fill(theta, phi);
+        h_mctpc_tvpW[10]->Fill(theta, phi, kin);
+        h_mctpc_zr[10]->Fill(z, r);
+      }
+    }
+
     for (int i = 0; i < 9; i++) {
       if (partID[i] == 1) {
         h_mctpc_kinetic[i]->Fill(kin);

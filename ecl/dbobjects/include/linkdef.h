@@ -8,5 +8,5 @@
 #pragma link C++ class Belle2::ECLDigitTimeConstants+;
 #pragma link C++ class Belle2::ECLDigitEnergyConstants+;
 #pragma link C++ class Belle2::ECLDatabaseImporter;
-
+#pragma link C++ class Belle2::ECLShowerShapeSecondMomentCorrection;
 #endif

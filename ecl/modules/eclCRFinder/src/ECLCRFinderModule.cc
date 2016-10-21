@@ -269,7 +269,6 @@ void ECLCRFinderModule::event()
     int connectedRegionID = entry.second;
 
     // create CR
-    if (!m_eclConnectedRegions) m_eclConnectedRegions.create();
 
     // Append to store array.
     const auto aCR = m_eclConnectedRegions.appendNew();

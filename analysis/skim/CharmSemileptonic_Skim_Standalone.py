@@ -17,11 +17,12 @@ from stdCharm import *
 
 set_log_level(LogLevel.INFO)
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000018/s00/e0001/4S/r00001/ccbar/sub00/' +
-     'mdst_000001_prod00000018_task00000001.root'
-     ]
-inputMdstList(filelist)
+filelist = [
+    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-05-03/DBxxxxxxxx/MC5/prod00000018/s00/e0001/4S/r00001/ccbar/sub00/' +
+    'mdst_000001_prod00000018_task00000001.root'
+]
+
+inputMdstList('MC5', filelist)
 
 loadStdCharged()
 loadStdPi0()

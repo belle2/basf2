@@ -31,7 +31,6 @@ namespace Belle2 {
       Distance3DSquared,
       Distance2DXYSquared,
       Distance1DZ,
-      Distance1DZTemplate,
       SlopeRZ,
       Distance3DNormed,
       Angle3DSimpleHighOccupancy,

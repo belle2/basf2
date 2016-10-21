@@ -25,7 +25,7 @@ def SystematicsList():
 
 def PiKFromDstarList():
     D0Cuts = '1.835 < M < 1.895'
-    DstarCuts = '1.7 < M < 2.3'
+    DstarCuts = 'massDifference(0)<0.16'
 
     D0Channel = ['K-:all pi+:all'
                  ]
@@ -33,7 +33,7 @@ def PiKFromDstarList():
     D0List = []
     for chID, channel in enumerate(D0Channel):
         reconstructDecay('D0:syst' + str(chID) + ' -> ' + channel, D0Cuts, chID)
-        massVertexRave('D0:syst' + str(chID), 0.0)
+        vertexRave('D0:syst' + str(chID), 0.0)
         D0List.append('D0:syst' + str(chID))
 
     DstarChannel = []

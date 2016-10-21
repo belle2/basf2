@@ -78,7 +78,6 @@ namespace Belle2 {
       RelationArray relMCSimHit(mcParticles, simHits);
 
       StoreArray<SrsensorSimHit> SrsensorHits;
-      if (!SrsensorHits.isValid()) SrsensorHits.create();
       SrsensorSimHit* hit = SrsensorHits.appendNew(
                               depEnergy,
                               nielEnergy,

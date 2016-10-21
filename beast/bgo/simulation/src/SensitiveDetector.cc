@@ -199,7 +199,6 @@ namespace Belle2 {
       RelationArray relMBgomHit(mcParticles, simHits);
 
       StoreArray<BgoSimHit> BgoHits;
-      if (!BgoHits.isValid()) BgoHits.create();
       RelationArray bgoSimHitRel(mcParticles, BgoHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       BgoHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);

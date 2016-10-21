@@ -338,11 +338,6 @@ void BaseLineTFModule::event()
 
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<genfit::TrackCand> finalTrackCandidates(m_PARAMgfTrackCandsColName);
-  finalTrackCandidates.create();
-  if (m_TESTERexpandedTestingRoutines == true) {
-    StoreArray<VXDTFInfoBoard> extraInfo4GFTCs;
-    extraInfo4GFTCs.create();
-  }
 
 //   generating virtual Hit at position (0, 0, 0) - needed for virtual segment.
   PositionInfo vertexInfo;

@@ -98,7 +98,8 @@ namespace Belle2 {
 
       m_startPos =  preStep.GetPosition();
       m_endPos = postStep.GetPosition();
-      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm, (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
+      TVector3 position((m_startPos.getX() + m_endPos.getX()) / 2 / CLHEP::cm, (m_startPos.getY() + m_endPos.getY()) / 2 / CLHEP::cm,
+                        (m_startPos.getZ() + m_endPos.getZ()) / 2 / CLHEP::cm);
       m_WightedPos += position * (step->GetTotalEnergyDeposit());
 
       //Save Hit if track leaves volume or is killed
@@ -197,7 +198,6 @@ namespace Belle2 {
       RelationArray relMBeamabortmHit(mcParticles, simHits);
 
       StoreArray<BeamabortSimHit> BeamabortHits;
-      if (!BeamabortHits.isValid()) BeamabortHits.create();
       RelationArray beamabortSimHitRel(mcParticles, BeamabortHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       BeamabortHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);

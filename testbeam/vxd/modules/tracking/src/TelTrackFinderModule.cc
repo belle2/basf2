@@ -67,7 +67,6 @@ void TelTrackFinderModule::initialize()
 
   //the output track candidates
   m_trackCands.registerInDataStore(m_outputTrackCandsName);
-  m_trackCands.create();
 }
 
 void TelTrackFinderModule::beginRun()

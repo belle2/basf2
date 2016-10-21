@@ -98,7 +98,6 @@ void ECLSplitterN2Module::event()
   for (auto& aCR : m_eclConnectedRegions) {
     unsigned int iShower = 1;
 
-    if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();
 
     // Add relation to the CR.

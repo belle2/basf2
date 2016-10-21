@@ -160,7 +160,7 @@ namespace Belle2 {
      * @param iov IOV identifier of the new object
      * @return void
      */
-    void constructObject(KeyType iov)
+    void constructObject(const KeyType& iov)
     {
       // If IOV is found, do not add object again
       if (std::find(m_iovs.begin(), m_iovs.end(), iov) != m_iovs.end())
@@ -211,7 +211,7 @@ namespace Belle2 {
      * @return T& Corresponding object. A new object+iov is created
      *  and returned if the IOV is not found.
      */
-    T& getObject(KeyType iov)
+    T& getObject(const KeyType& iov)
     {
       for (unsigned int i = 0; i < m_iovs.size(); i++) {
         if (iov == m_iovs[i]) {
@@ -238,7 +238,7 @@ namespace Belle2 {
     }
 
     /// Check whether object of given IOV exists
-    bool objectExists(KeyType iov)
+    bool objectExists(const KeyType& iov)
     {
       for (unsigned int i = 0; i < m_iovs.size(); i++) {
         if (iov == m_iovs[i]) {

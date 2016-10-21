@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess
 import multiprocessing
+import validationpath
 
 
 class Local:
@@ -89,7 +90,7 @@ class Local:
         # convention, data files will be stored in the parent dir.
         # Then make sure the folder exists (create if it does not exist) and
         # change to cwd to this folder.
-        output_dir = './results/{0}/{1}'.format(tag, job.package)
+        output_dir = validationpath.get_results_tag_package_folder(current_cwd, tag, job.package)
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
         os.chdir(output_dir)

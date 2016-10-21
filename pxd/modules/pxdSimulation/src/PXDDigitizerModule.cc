@@ -194,13 +194,6 @@ void PXDDigitizerModule::event()
   StoreArray<PXDSimHit> storeSimHits(m_storeSimHitsName);
   StoreArray<PXDTrueHit> storeTrueHits(m_storeTrueHitsName);
 
-  // FIXME: Provisional fix to ensure proper output when there are no SimHits:
-  // Create empty arrays, then empty relations will be created, too.
-  if (!storeSimHits.isValid())
-    storeSimHits.create();
-  if (!storeTrueHits.isValid())
-    storeTrueHits.create();
-  // For the same reason, initialize the RelationArrays.
   RelationArray mcParticlesToSimHits(storeMCParticles, storeSimHits,
                                      m_relMCParticleSimHitName);
   RelationArray mcParticlesToTrueHits(storeMCParticles, storeTrueHits); // not used here

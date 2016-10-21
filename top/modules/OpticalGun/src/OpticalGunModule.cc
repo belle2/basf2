@@ -137,7 +137,6 @@ namespace Belle2 {
 
     // if not already existed, create MCParticles data store
     StoreArray<MCParticle> MCParticles;
-    if (!MCParticles.isValid()) MCParticles.create();
 
     // generate number of photons
     int numPhotons = 1;

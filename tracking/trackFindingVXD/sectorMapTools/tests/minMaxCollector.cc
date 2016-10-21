@@ -14,8 +14,8 @@
 
 #include <TRandom.h>
 // #include <tracking/spacePointCreation/SpacePoint.h>
-// #include <tracking/trackFindingVXD/sectorMap/fourHitFilters/DeltaPt.h>
-// #include <tracking/trackFindingVXD/sectorMap/fourHitFilters/DeltaDistCircleCenter.h>
+// #include <tracking/trackFindingVXD/sectorMap/fourHitVariables/DeltaPt.h>
+// #include <tracking/trackFindingVXD/sectorMap/fourHitVariables/DeltaDistCircleCenter.h>
 // #include <tracking/trackFindingVXD/filterTools/SelectionVariableHelper.h>
 //
 // #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>

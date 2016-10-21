@@ -154,7 +154,6 @@ namespace Belle2 {
       RelationArray relMQcsmonitormHit(mcParticles, simHits);
 
       StoreArray<QcsmonitorSimHit> QcsmonitorHits;
-      if (!QcsmonitorHits.isValid()) QcsmonitorHits.create();
       RelationArray qcsmonitorSimHitRel(mcParticles, QcsmonitorHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
       QcsmonitorHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);

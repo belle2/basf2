@@ -9,13 +9,12 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemplate.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
 
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>

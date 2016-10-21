@@ -38,7 +38,7 @@
     <sigmaFileName desc="file which contains space resol.">sigma_v1.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
     <t0FileName desc="file which contains t0">t0.dat</t0FileName>
-    <bwFileName desc="file which contains bad-wire">badwire_off.dat</bwFileName>
+    <bwFileName desc="file which contains bad-wire">badwire_v1.dat</bwFileName>
     <!-- <bwFileName desc="file which contains bad-wire">badwire_sample.dat</bwFileName> -->
     <twFileName desc="file which contains time-walk">tw_off.dat</twFileName>
     <chmapFileName desc="file which contains channel map">ch_map.dat</chmapFileName>

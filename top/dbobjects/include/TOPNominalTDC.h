@@ -39,6 +39,7 @@ namespace Belle2 {
      * @param numWindows number of ASIC windows per waveform
      * @param subBits number of bits per sample
      * @param syncTimeBase synchonization time base (time width of c_syncWindows)
+     * @param numofBunches number of bunches per syncTimeBase
      * @param offset time offset
      * @param pileupTime pile-up time
      * @param doubleHitResolution double hit resolution time
@@ -49,6 +50,7 @@ namespace Belle2 {
     TOPNominalTDC(int numWindows,
                   int subBits,
                   double syncTimeBase,
+                  int numofBunches,
                   double offset,
                   double pileupTime,
                   double doubleHitResolution,
@@ -102,6 +104,18 @@ namespace Belle2 {
      * @return synchonization time base
      */
     double getSyncTimeBase() const {return m_syncTimeBase;}
+
+    /**
+     * Returns number of bunches in the synchonization time base
+     * @return number of bunches
+     */
+    unsigned getNumofBunches() const {return m_numofBunches;}
+
+    /**
+     * Returns bunch separation time (e.g. RF cycle - empty bunches are included!)
+     * @return bunch separation time
+     */
+    double getBunchSeparationTime() const {return m_syncTimeBase / m_numofBunches;}
 
     /**
      * Returns time offset
@@ -196,6 +210,7 @@ namespace Belle2 {
     unsigned m_numWindows = 0; /**< number of ASIC windows per waveform */
     unsigned m_subBits = 0; /**< number of bits per sample */
     float m_syncTimeBase = 0; /**< time width of c_syncWindows */
+    unsigned m_numofBunches = 0; /**< number of bunches per syncTimeBase */
     float m_offset = 0; /**< time offset */
     float m_pileupTime = 0; /**< pile-up time */
     float m_doubleHitResolution = 0; /**< double hit resolution time */

@@ -106,8 +106,9 @@ The file contains a list of bad wires.
 
 Format: layerID (0-55), wireID(0-)
 
-* badwire_sample.dat: Just a sample file.
+* badwire_sample.dat: Just a sample file. <- obsolete
 * badwire_off.dat   : Empty file; the file for turning-off badwire effect.
+* badwire_v1.dat    : contains bad wires known as of Oct.21 2016.
 
 
 

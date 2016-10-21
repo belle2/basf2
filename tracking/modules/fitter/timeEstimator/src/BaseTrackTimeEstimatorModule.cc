@@ -111,11 +111,7 @@ void BaseTrackTimeEstimatorModule::event()
     recoTrack.setTimeSeed(timeSeed);
 
     // Delete all fitted information for all representations
-    for (const genfit::AbsTrackRep* trackRep : recoTrack.getRepresentations()) {
-      for (genfit::TrackPoint* hit : recoTrack.getHitPointsWithMeasurement()) {
-        hit->deleteFitterInfo(trackRep);
-      }
-    }
+    recoTrack.deleteFittedInformation();
   }
 }
 

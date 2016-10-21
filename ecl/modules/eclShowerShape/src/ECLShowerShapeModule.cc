@@ -104,6 +104,12 @@ void ECLShowerShapeModule::initialize()
   initializeMVAweightFiles(m_zernike_MVAidentifier_FWD, m_weightfile_representation_FWD);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BRL, m_weightfile_representation_BRL);
   initializeMVAweightFiles(m_zernike_MVAidentifier_BWD, m_weightfile_representation_BWD);
+
+  //Add callback to fill m_secondMomentCorrections when m_secondMomentCorrectionArray changes
+  //21-Oct-2016 - The callback doesn't seem to be called at the begining of the run so I commented it out and added a call to prepareSecondMomentCorrectionsCallback in the beginRun
+//   m_secondMomentCorrectionArray.addCallback(this, &ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback);
+//   prepareSecondMomentCorrectionsCallback();
+
 }
 
 MVA::GeneralOptions ECLShowerShapeModule::initilizeMVA(const std::string& identifier,
@@ -144,7 +150,14 @@ void ECLShowerShapeModule::beginRun()
   std::vector<float> dummy;
   dummy.resize(generalOptions.m_variables.size(), 0);
   m_dataset = std::unique_ptr<MVA::SingleDataset>(new MVA::SingleDataset(generalOptions, dummy, 0));
+
+  //This is a hack because the callback doesn't seem to be called at the begining of the run
+  if (m_secondMomentCorrectionArray.hasChanged()) {
+    if (m_secondMomentCorrectionArray) prepareSecondMomentCorrectionsCallback();
+    else B2ERROR("ECLShowerShapeModule::beginRun - Couldn't find second moment correction for current run");
+  }
 }
+
 
 void ECLShowerShapeModule::setShowerShapeVariables(ECLShower* eclShower, const bool calculateZernikeMVA) const
 {
@@ -529,21 +542,25 @@ double ECLShowerShapeModule::computeE9oE21(const ECLShower& shower) const
 
 }
 
-void ECLShowerShapeModule::prepareSecondMomentCorrections()
+void ECLShowerShapeModule::prepareSecondMomentCorrectionsCallback()
 {
+  //Clear m_secondMomentCorrections array
+  for (auto iType = 0; iType < 2; ++iType)
+    for (auto iHypothesis = 0; iHypothesis < 10; ++iHypothesis)
+      m_secondMomentCorrections[iType][iHypothesis] = TGraph();
 
   // Read all corrections.
   for (const ECLShowerShapeSecondMomentCorrection& correction : m_secondMomentCorrectionArray) {
     const int type  = correction.getType();
     const int hypothesis  = correction.getHypothesisId();
-    if (type < 0 or type > 2 or hypothesis < 1 or hypothesis > 10) {
+    if (type < 0 or type > 1 or hypothesis < 1 or hypothesis > 9) {
       B2FATAL("Invalid type or hypothesis for second moment corrections.");
     }
 
     m_secondMomentCorrections[type][hypothesis] = correction.getCorrection();
   }
 
-//   Check that all corrections are there
+  //   Check that all corrections are there
   if (m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N1].GetN() == 0 or
       m_secondMomentCorrections[c_phiType][ECLConnectedRegion::c_N1].GetN() == 0 or
       m_secondMomentCorrections[c_thetaType][ECLConnectedRegion::c_N2].GetN() == 0 or
@@ -574,6 +591,10 @@ double ECLShowerShapeModule::getSecondMomentCorrection(const double theta, const
     B2FATAL("Invalid hypothesis for second moment corrections.");
   }
 
-  return m_secondMomentCorrections[c_thetaType][hypothesis].Eval(thetadeg) * m_secondMomentCorrections[c_phiType][hypothesis].Eval(
-           phideg);
+  const double thetaCorrection = m_secondMomentCorrections[c_thetaType][hypothesis].Eval(thetadeg);
+  const double phiCorrection = m_secondMomentCorrections[c_phiType][hypothesis].Eval(phideg);
+
+  B2DEBUG(175, "Second momen theta crrection = " << thetaCorrection << ", phi correction = " << phiCorrection);
+
+  return thetaCorrection * phiCorrection;
 }

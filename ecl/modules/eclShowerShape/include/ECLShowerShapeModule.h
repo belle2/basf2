@@ -190,8 +190,10 @@ namespace Belle2 {
       TGraph m_secondMomentCorrections[2][10];
 
       /** Prepare corrections for second moment
+       * Will be called whenever the m_secondMomentCorrectionArray get updated
+       * Clears m_secondMomentCorrections and fills it from the updated m_secondMomentCorrectionArray
        */
-      void prepareSecondMomentCorrections();
+      void prepareSecondMomentCorrectionsCallback();
 
       /** Get corrections for second moment
        */

@@ -23,6 +23,8 @@
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
 #include <ecl/geometry/ECLNeighbours.h>
+#include <framework/database/DBArray.h>
+#include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
 
 //MVA package
 #include <mva/dataobjects/DatabaseRepresentationOfWeightfile.h>
@@ -36,6 +38,14 @@ namespace Belle2 {
     class ECLShowerShapeModule : public Module {
 
     public:
+
+      /** Enumeration of type for second moment corrections */
+      enum {
+        c_thetaType = 0, /**< type of theta identifier */
+        c_phiType = 1, /**< type of phi identifier */
+      };
+
+
       /** Constructor. */
       ECLShowerShapeModule();
 
@@ -123,7 +133,6 @@ namespace Belle2 {
       */
       void setShowerShapeVariables(ECLShower* eclShower, const bool calculateZernikeMVA) const;
 
-
       /** Shower shape variable: Lateral energy. */
       double computeLateralEnergy(const std::vector<ProjectedECLDigit>& projectedDigits, const double avgCrystalDimension) const;
 
@@ -174,6 +183,21 @@ namespace Belle2 {
        If the shower is smaller than this, the reduced number is used for this. */
       double computeE1oE9(const ECLShower&) const;
 
+      DBArray<ECLShowerShapeSecondMomentCorrection> m_secondMomentCorrectionArray;  /**< Shower shape corrections from DB */
+
+      /** TGraphs that hold the corrections
+       */
+      TGraph m_secondMomentCorrections[2][10];
+
+      /** Prepare corrections for second moment
+       * Will be called whenever the m_secondMomentCorrectionArray get updated
+       * Clears m_secondMomentCorrections and fills it from the updated m_secondMomentCorrectionArray
+       */
+      void prepareSecondMomentCorrectionsCallback();
+
+      /** Get corrections for second moment
+       */
+      double getSecondMomentCorrection(const double theta, const double phi, const int hypothesis) const;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

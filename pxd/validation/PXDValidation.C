@@ -18,6 +18,7 @@
 //
 //  History of update
 //  15 Nov 2013    ver. 0.1   Peter Kodys
+//  21 Oct 2016    ver. 0.3   Actualization, P.Kodys
 //
 // -----------------------------------------------------
 // Options:
@@ -80,6 +81,16 @@ void PXDValidation()
   int nPixelTypes = 4;       // we have 4 pixel sizes in v
   int nPixSizeGroups = 4;    // we have 4 groups for pixel size analyzing: 1, 2, 3, more than 3
 
+// TODO ************** Need to impreve or set much more sistematicaly!!!  *************
+// PXD:
+// gq = 0.5 nA/e
+// Slope of amplfication curve: 70 nA/ADU (fine mode), 130 nA/ADU (coarse mode, default)
+// eToADU = 130 (70) / gq e/ADU
+// Full ADU range: 8 bits = 256
+  float ADURange = 256;
+  float ADUToElectrons = 260;
+// TODO ************** Need to impreve or set much more sistematicaly!!!  *************
+
 // -----------------------------------------------------
   // open the files with simulated and reconstructed EvtGen particles
   TFile* input = TFile::Open("PXDValidationTTreeOutput.root");
@@ -138,13 +149,18 @@ void PXDValidation()
   // 4: SignalToNoise:
   int iplot4 = 200;  // binning of plot
   float lplot4 = 0.0/DigitNoise;  // low edge of plot
-  float hplot4 = 30000.0/DigitNoise;  // high edge of plot
+  float hplot4 = ADURange * ADUToElectrons / DigitNoise;  // high edge of plot
+//  float hplot4 = 30000.0/DigitNoise;  // high edge of plot
   // 5: ClusterChargeToEDeposition 2D:
+  int iplot5a = ADURange;  // binning of plot
+  float lplot5a = 0.0;  // low edge of plot
+  float hplot5a = ADURange * ADUToElectrons;  // high edge of plot
+//  float hplot5a = 30000.0;  // high edge of plot
   // 9: ClusterCharge:
   // 10: Seed:
-  int iplot5 = 200;  // binning of plot
+  int iplot5 = ADURange;  // binning of plot
   float lplot5 = 0.0;  // low edge of plot
-  float hplot5 = 30000.0;  // high edge of plot
+  float hplot5 = ADURange;  // high edge of plot
   // 7: ErrorDistribution:
   int iplot7 = 200;  // binning of plot
   float lplot7 = -10.0;  // low edge of plot
@@ -258,11 +274,11 @@ void PXDValidation()
     TString name(Form("hValidDigitSignalToNoise_Layer%i_Region%i_PixSize%i",(int)(ipixtype/2),ipixtype%2,(int)(PixSizeV[ipixtype]*cmToMicron+0.1)));
     hValidDigitSignalToNoise[ipixtype] = new TH1F(name, title, iplot4, lplot4, hplot4);
     hValidDigitSignalToNoise[ipixtype]->GetXaxis()->SetTitle("S/N");
-    TString expr(Form("digit_charge/%f>>%s",DigitNoise,name.Data()));
+    TString expr(Form("digit_charge*%f/%f>>%s", ADUToElectrons, DigitNoise,name.Data()));
     TString cond(Form("pixel_type==%i",ipixtype));
     treeDigit->Draw(expr,cond);
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Description", title.Data()));
-    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should have visible maxima in 20."));
+    hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check shape, should have visible maxima in range 18 - 25."));
     hValidDigitSignalToNoise[ipixtype]->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
     hValidDigitSignalToNoise[ipixtype]->Write();
   }
@@ -275,11 +291,14 @@ void PXDValidation()
   TCanvas *cValidTrueDepositChargeRecoDepositCharge;
   cValidTrueDepositChargeRecoDepositCharge = new TCanvas("cValidTrueDepositChargeRecoDepositCharge","cValidTrueDepositChargeRecoDepositCharge",800,600);
   cValidTrueDepositChargeRecoDepositCharge->Draw();
-  TH2F* hValidTrueDepositChargeRecoDepositCharge = new TH2F("hValidTrueDepositChargeRecoDepositCharge", "Validation: true deposit energy vs. reconstructed deposit energy, should be bit bellow 45 deg.", iplot5, lplot5, hplot5, iplot5, lplot5, hplot5);
+  TH2F* hValidTrueDepositChargeRecoDepositCharge = new TH2F("hValidTrueDepositChargeRecoDepositCharge", "Validation: true deposit energy vs. reconstructed deposit energy, should be bit bellow 45 deg.", iplot5a, lplot5a, hplot5a, iplot5a, lplot5a, hplot5a);
   hValidTrueDepositChargeRecoDepositCharge->GetXaxis()->SetTitle("True deposit energy (electrons)");
   hValidTrueDepositChargeRecoDepositCharge->GetYaxis()->SetTitle("Reconstructed deposit energy (electrons)");
-  tree->Draw("cluster_charge:truehit_charge/3.65*1E9>>hValidTrueDepositChargeRecoDepositCharge","","COLZ");
-  TLine *line2 = new TLine(lplot5,lplot5,hplot5,hplot5);
+  expr = Form("cluster_charge*%f:truehit_charge/3.65*1E9>>hValidTrueDepositChargeRecoDepositCharge", ADUToElectrons);
+  tree->Draw(expr,"","COLZ");
+//  tree->Draw("cluster_charge*260:truehit_charge/3.65*1E9>>hValidTrueDepositChargeRecoDepositCharge","","COLZ");
+//  tree->Draw("cluster_charge:truehit_charge>>hValidTrueDepositChargeRecoDepositCharge","","COLZ");
+  TLine *line2 = new TLine(lplot5a,lplot5a,hplot5a,hplot5a);
   line2->SetLineWidth(2);
   line2->SetLineColor(kRed);
   line2->Draw();
@@ -430,51 +449,51 @@ void PXDValidation()
 
 //  9: ClusterCharge 1D (Cluster charge) [from Clasterizer]
 //      OK: cluster_charge
-  TH1F* hValidRecoDepositEnergy = new TH1F("hValidRecoDepositEnergy", "Validation: reconstructed deposit energy, MPV should be in about 6200.", iplot5, lplot5, hplot5);
-  hValidRecoDepositEnergy->GetXaxis()->SetTitle("Reconstructed deposit energy (electrons)");
+  TH1F* hValidRecoDepositEnergy = new TH1F("hValidRecoDepositEnergy", "Validation: reconstructed deposit energy, MPV should be in about 22.", iplot5, lplot5, hplot5);
+  hValidRecoDepositEnergy->GetXaxis()->SetTitle("Reconstructed deposit energy (ADU)");
   tree->Draw("cluster_charge>>hValidRecoDepositEnergy");
   hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed Deposit Energy."));
-  hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of energy plot, should be in about 6200."));
+  hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of energy plot, should be in about 22."));
   hValidRecoDepositEnergy->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidRecoDepositEnergy->Write();
 
 // 10: Seed 1D (Seed) [from Clasterizer]
 //      OK: cluster_seed
-  TH1F* hValidRecoSeed = new TH1F("hValidRecoSeed", "Validation: reconstructed seed energy, MPV should be in about 5000.", iplot5, lplot5, hplot5);
-  hValidRecoSeed->GetXaxis()->SetTitle("Reconstructed seed (electrons)");
+  TH1F* hValidRecoSeed = new TH1F("hValidRecoSeed", "Validation: reconstructed seed energy, MPV should be in about 20.", iplot5, lplot5, hplot5);
+  hValidRecoSeed->GetXaxis()->SetTitle("Reconstructed seed (ADU)");
   tree->Draw("cluster_seed>>hValidRecoSeed");
   hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed seed."));
-  hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of seed plot, should be in about 5000."));
+  hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check MPV of seed plot, should be in about 20."));
   hValidRecoSeed->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hValidRecoSeed->Write();
 
 // 11: ClusterSizeUV 1D (Cluster size) [from Clasterizer]
 //      OK: cluster_size
-  TH1F* hClusterSizeUV = new TH1F("hClusterSizeUV", "Validation: Reconstructed full cluster size, maximum should be in range 2-4.", iplot11, lplot11, hplot11);
+  TH1F* hClusterSizeUV = new TH1F("hClusterSizeUV", "Validation: Reconstructed full cluster size, maximum should be in 1.", iplot11, lplot11, hplot11);
   hClusterSizeUV->GetXaxis()->SetTitle("Cluster Size");
   tree->Draw("cluster_size>>hClusterSizeUV");
   hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels over threshold."));
-  hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in range 2-4."));
+  hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 1."));
   hClusterSizeUV->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeUV->Write();
 
 // 12: ClusterSizeU 1D (Cluster size in u projection) [from Clasterizer]
 //      OK: cluster_uSize
-  TH1F* hClusterSizeU = new TH1F("hClusterSizeU", "Validation: Reconstructed cluster size in u, maximum should be in 2.", iplot11, lplot11, hplot11);
+  TH1F* hClusterSizeU = new TH1F("hClusterSizeU", "Validation: Reconstructed cluster size in u, maximum should be in 1.", iplot11, lplot11, hplot11);
   hClusterSizeU->GetXaxis()->SetTitle("Cluster size u");
   tree->Draw("cluster_uSize>>hClusterSizeU");
   hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels in u projection over threshold."));
-  hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 2."));
+  hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 1."));
   hClusterSizeU->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeU->Write();
 
 // 13: ClusterSizeV 1D (Cluster size in v projection) [from Clasterizer]
 //      OK: cluster_vSize
-  TH1F* hClusterSizeV = new TH1F("hClusterSizeV", "Validation: Reconstructed cluster size in v, maximum should be in 2.", iplot11, lplot11, hplot11);
+  TH1F* hClusterSizeV = new TH1F("hClusterSizeV", "Validation: Reconstructed cluster size in v, maximum should be in 1.", iplot11, lplot11, hplot11);
   hClusterSizeV->GetXaxis()->SetTitle("Cluster size v");
   tree->Draw("cluster_vSize>>hClusterSizeV");
   hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Description", "Validation: Reconstructed cluster size - sume of all pixels in v projection over threshold."));
-  hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 2."));
+  hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Check", "Validation: Check maximum of plot, should be in 1."));
   hClusterSizeV->GetListOfFunctions()->Add(new TNamed("Contact", "peter.kodys@mff.cuni.cz"));
   hClusterSizeV->Write();
 

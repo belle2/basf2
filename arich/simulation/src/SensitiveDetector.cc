@@ -134,7 +134,6 @@ namespace Belle2 {
 
       TVector2 locpos(localPosition.x() / CLHEP::cm, localPosition.y() / CLHEP::cm);
       StoreArray<ARICHSimHit> arichSimHits;
-      if (!arichSimHits.isValid()) arichSimHits.create();
       ARICHSimHit* simHit = arichSimHits.appendNew(moduleID, locpos, globalTime, energy);
 
       // add relation to MCParticle

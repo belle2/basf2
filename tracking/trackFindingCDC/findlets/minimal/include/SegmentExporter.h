@@ -64,13 +64,9 @@ namespace Belle2 {
         Super::initialize();
       }
 
-      /// Signal new event recreate the store array
+      /// Signal new event
       virtual void beginEvent() override
       {
-        if (m_param_exportSegments) {
-          StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportSegmentsInto);
-          storedGFTrackCands.create();
-        }
         Super::beginEvent();
       }
 

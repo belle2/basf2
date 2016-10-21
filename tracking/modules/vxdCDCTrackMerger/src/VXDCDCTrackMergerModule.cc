@@ -176,7 +176,6 @@ void VXDCDCTrackMergerModule::event()
     }
   }    //loop on CDC
 
-  m_mergedRecoTracks.create();
   // add merged tracks to output collection
   for (auto match : vxdCdcMatched) {
     auto vxdTrack = m_VXDRecoTracks[match.first];

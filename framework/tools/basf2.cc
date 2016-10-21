@@ -67,9 +67,7 @@ namespace prog = boost::program_options;
 namespace {
   void executePythonFile(const string& pythonFile)
   {
-    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
-
-    fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
+    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(pythonFile));
     if ((!(boost::filesystem::is_directory(fullPath))) && (boost::filesystem::exists(fullPath))) {
 
       std::ifstream file(fullPath.string().c_str());

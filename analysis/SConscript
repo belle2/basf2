@@ -11,7 +11,6 @@ env['LIBS'] = [
     'RooFitCore',
     'RooStats',
     'hlt_L1Emulator_dataobjects',
-    'libFastBDT_shared',
     'boost_program_options',
     'fann',
     'analysis_utility',

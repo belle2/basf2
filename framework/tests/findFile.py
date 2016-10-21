@@ -24,6 +24,15 @@ assert len(testdir) > 0
 
 # paths relative to PWD are also ok (no, prefixing this with / is not allowed)
 os.chdir(testdir)
+print(
+    'PWD: ',
+    testdir,
+    'findfile exists: ',
+    os.path.isfile(
+        testdir +
+        '/findFile.py'),
+    'returned path: ',
+    Belle2.FileSystem.findFile('findFile.py'))
 assert abspath == Belle2.FileSystem.findFile('findFile.py')
 
 # try finding relative to basf2 dir again (from different location)

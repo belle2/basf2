@@ -9,6 +9,10 @@
  **************************************************************************/
 
 #include <top/geometry/FrontEndMapper.h>
+#include <framework/database/DBImportArray.h>
+#include <framework/logging/LogSystem.h>
+#include <iostream>
+
 
 using namespace std;
 
@@ -27,10 +31,14 @@ namespace Belle2 {
 
     FrontEndMapper::~FrontEndMapper()
     {
+      if (m_mappingDB) delete m_mappingDB;
     }
+
 
     void FrontEndMapper::initialize(const GearDir& frontEndMapping)
     {
+
+      clear();
 
       // unordered sets used to check that ...
 
@@ -38,16 +46,16 @@ namespace Belle2 {
       unordered_set<string> coppers; // COPPER inputs are used only once
       unordered_set<int> modules; // (moduleID, col) mapped only once
 
-      // read parameters from DB
+      // read parameters from gerabox
       int numModules = 0; // counter of mapped modules
       for (const GearDir& topModule : frontEndMapping.getNodes("TOPModule")) {
 
-        // int moduleCNumber = topModule.getInt("@CNumber");
+        int moduleCNumber = topModule.getInt("@CNumber");
         int moduleID = topModule.getInt("moduleID");
         if (moduleID == 0) continue; // module is not installed into barrel
         if (moduleID < 0 or moduleID > c_numModules) {
           B2ERROR(topModule.getPath() << " moduleID=" << moduleID << " ***invalid ID");
-          continue;
+          return;
         }
 
         bool moduleMapped = false; // to count mapped modules
@@ -56,21 +64,21 @@ namespace Belle2 {
           int col = boardstack.getInt("@col");
           if (col < 0 or col >= c_numColumns) {
             B2ERROR(boardstack.getPath() << " col=" << col << " ***invalid number");
-            continue;
+            return;
           }
           if (!modules.insert(moduleID * c_numColumns + col).second) {
             B2ERROR(boardstack.getPath()
                     << " moduleID=" << moduleID
                     << " col=" << col
                     << " ***already mapped");
-            continue;
+            return;
           }
 
           unsigned short scrodID = (unsigned short) boardstack.getInt("SCRODid");
           if (!scrodIDs.insert(scrodID).second) {
             B2ERROR(boardstack.getPath() << "/SCRODid " << scrodID <<
                     " ***already used");
-            continue;
+            return;
           }
 
           string finesseSlot = boardstack.getString("FinesseSlot");
@@ -82,7 +90,7 @@ namespace Belle2 {
           else {
             B2ERROR(boardstack.getPath() << "/FinesseSlot " << finesseSlot <<
                     " ***invalid slot (valid are A, B, C, D)");
-            continue;
+            return;
           }
 
           unsigned copperID = (unsigned) boardstack.getInt("COPPERid");
@@ -91,10 +99,10 @@ namespace Belle2 {
           if (!coppers.insert(copper).second) {
             B2ERROR(boardstack.getPath() << "/COPPERid " << copper <<
                     " ***input already used");
-            continue;
+            return;
           }
 
-          TOPFrontEndMap feemap(moduleID, col, scrodID, copperID, finesse,
+          TOPFrontEndMap feemap(moduleID, moduleCNumber, col, scrodID, copperID, finesse,
                                 m_mapping.size());
           m_mapping.push_back(feemap);
           moduleMapped = true;
@@ -109,11 +117,111 @@ namespace Belle2 {
         m_fromScrod[feemap.getScrodID()] = &feemap;
         m_fromCopper[feemap.getCopperID() * 4 + feemap.getFinesseSlot()] = &feemap;
       }
+      m_valid = true;
 
       B2INFO("TOP::FrontEndMapper: " << m_mapping.size() << " SCROD's mapped to "
              << numModules << " TOP module(s)");
 
+      // print mappings if debug level for package 'top' is set to 100 or larger
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
+        print();
+      }
+
     }
+
+
+    void FrontEndMapper::initialize()
+    {
+
+      if (m_mappingDB) delete m_mappingDB;
+      m_mappingDB = new DBArray<TOPFrontEndMap>();
+
+      if (!m_mappingDB->isValid()) {
+        clear();
+        return;
+      }
+      update();
+
+      m_mappingDB->addCallback(this, &FrontEndMapper::update);
+
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
+        print();
+      }
+
+    }
+
+
+    void FrontEndMapper::import(const IntervalOfValidity& iov) const
+    {
+      DBImportArray<TOPFrontEndMap> array;
+      for (const auto& map : m_mapping) {
+        array.appendNew(map);
+      }
+      array.import(iov);
+    }
+
+
+    void FrontEndMapper::clear()
+    {
+      m_mapping.clear();
+      m_copperIDs.clear();
+      m_fromScrod.clear();
+      m_fromCopper.clear();
+      for (unsigned i = 0; i < c_numModules; i++) {
+        for (unsigned k = 0; k < c_numColumns; k++) {
+          m_fromModule[i][k] = 0;
+        }
+      }
+      m_valid = false;
+      m_fromDB = false;
+    }
+
+
+    void FrontEndMapper::update()
+    {
+      clear();
+      if (!m_mappingDB->isValid()) return;
+
+      for (const auto& feemap : *m_mappingDB) {
+        m_copperIDs.insert(feemap.getCopperID());
+        m_fromModule[feemap.getModuleID() - 1][feemap.getBoardstackNumber()] = &feemap;
+        m_fromScrod[feemap.getScrodID()] = &feemap;
+        m_fromCopper[feemap.getCopperID() * 4 + feemap.getFinesseSlot()] = &feemap;
+      }
+      m_valid = true;
+      m_fromDB = true;
+    }
+
+
+    void FrontEndMapper::print() const
+    {
+      cout << endl;
+      cout << "           Mapping of TOP front-end electronics" << endl << endl;
+
+      char label[5] = "ABCD";
+      for (int i = 0; i < c_numModules; i++) {
+        int moduleID = i + 1;
+        cout << " slot " << moduleID
+             << " (module " << getModuleCNumber(moduleID) << "):" << endl;
+        for (int bs = 0; bs < c_numColumns; bs++) {
+          const auto* map = getMap(moduleID, bs);
+          if (!map) continue;
+          cout << "   BS" << bs;
+          cout << " scrod " << map->getScrodID();
+          if (map->getScrodID() < 10) cout << " ";
+          if (map->getScrodID() < 100) cout << " ";
+          cout << "  copper " << map->getCopperID();
+          cout << " " << label[map->getFinesseSlot()];
+          cout << endl;
+        }
+      }
+      cout << endl;
+
+    }
+
+
 
   } // TOP namespace
 } // Belle2 namespace

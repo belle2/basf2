@@ -363,7 +363,6 @@ void ECLLocalMaximumFinderModule::makeLocalMaximum(const ECLConnectedRegion& aCR
   StoreArray<ECLLocalMaximum> eclLocalMaximums(eclLocalMaximumArrayName());
 
   // Set the local maximum dataobject.
-  if (!eclLocalMaximums) eclLocalMaximums.create();
   const auto aLocalMaximum = eclLocalMaximums.appendNew();
 
   B2DEBUG(175, "ECLLocalMaximumFinderModule::makeLocalMaximum(): local maximum cellid: " << cellId);

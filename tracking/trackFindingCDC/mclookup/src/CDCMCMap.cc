@@ -29,18 +29,6 @@ namespace {
   }
 }
 
-CDCMCMap::CDCMCMap()
-{
-}
-
-
-
-CDCMCMap::~CDCMCMap()
-{
-}
-
-
-
 void CDCMCMap::clear()
 {
 

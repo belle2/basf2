@@ -15,11 +15,12 @@ from stdPhotons import *
 
 set_log_level(LogLevel.INFO)
 
-filelist = \
-    ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/' +
-     'MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00000198_task00000001.root'
-     ]
-inputMdstList(filelist)
+filelist = [
+    '/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/' +
+    'MC6/prod00000198/s00/e0000/4S/r00000/ccbar/sub00/mdst_000001_prod00000198_task00000001.root'
+]
+
+inputMdstList('MC5', filelist)
 
 loadStdCharged()
 

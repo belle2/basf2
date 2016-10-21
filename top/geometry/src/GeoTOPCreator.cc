@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Petric, Marko Staric                               *
- * Major revision: May-June 2016                                          *
+ * Major revision: 2016                                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -18,6 +18,10 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/Database.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/DBObjPtr.h>
 #include <top/simulation/SensitivePMT.h>
 #include <top/simulation/SensitiveBar.h>
 #include <simulation/background/BkgSensitiveDetector.h>
@@ -78,219 +82,88 @@ namespace Belle2 {
       if (m_sensitiveBar) delete m_sensitiveBar;
       if (m_sensitivePCB1) delete m_sensitivePCB1;
       if (m_sensitivePCB2) delete m_sensitivePCB2;
-      // if (m_topgp) delete m_topgp;
-      // if (m_geo) delete m_geo;
       G4LogicalSkinSurface::CleanSurfaceTable();
     }
 
 
-    const TOPGeometry* GeoTOPCreator::createConfiguration(const GearDir& content)
-    {
-      TOPGeometry* geo = new TOPGeometry("TOPGeometryIdealized");
-
-      // PMT array
-
-      GearDir pmtParams(content, "PMTs/Module");
-      TOPGeoPMT pmt(pmtParams.getLength("ModuleXSize"),
-                    pmtParams.getLength("ModuleYSize"),
-                    pmtParams.getLength("ModuleZSize") +
-                    pmtParams.getLength("WindowThickness") +
-                    pmtParams.getLength("BottomThickness"));
-      pmt.setWallThickness(pmtParams.getLength("ModuleWall"));
-      pmt.setWallMaterial(pmtParams.getString("wallMaterial"));
-      pmt.setFillMaterial(pmtParams.getString("fillMaterial"));
-      pmt.setSensVolume(pmtParams.getLength("SensXSize"),
-                        pmtParams.getLength("SensYSize"),
-                        pmtParams.getLength("SensThickness"),
-                        pmtParams.getString("sensMaterial"));
-      pmt.setNumPixels(pmtParams.getInt("PadXNum"),
-                       pmtParams.getInt("PadYNum"));
-      pmt.setWindow(pmtParams.getLength("WindowThickness"),
-                    pmtParams.getString("winMaterial"));
-      pmt.setBottom(pmtParams.getLength("BottomThickness"),
-                    pmtParams.getString("botMaterial"));
-
-      auto& materials = geometry::Materials::getInstance();
-      GearDir reflEdgeSurfParams(pmtParams, "reflectiveEdge/Surface");
-      pmt.setReflEdge(pmtParams.getLength("reflectiveEdge/width"),
-                      pmtParams.getLength("reflectiveEdge/thickness"),
-                      materials.createOpticalSurfaceConfig(reflEdgeSurfParams));
-
-      GearDir arrayParams(content, "PMTs");
-      TOPGeoPMTArray pmtArray(arrayParams.getInt("nPMTx"),
-                              arrayParams.getInt("nPMTy"),
-                              arrayParams.getLength("Xgap"),
-                              arrayParams.getLength("Ygap"),
-                              arrayParams.getString("stackMaterial"),
-                              pmt);
-      geo->setPMTArray(pmtArray);
-
-      // modules
-
-      GearDir barParams(content, "Bars");
-      GearDir barSurfParams(barParams, "Surface");
-      auto barSurface = materials.createOpticalSurfaceConfig(barSurfParams);
-      double sigmaAlpha = barSurfParams.getDouble("SigmaAlpha");
-
-      TOPGeoBarSegment bar1(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar1Length"),
-                            barParams.getString("BarMaterial"));
-      bar1.setGlue(barParams.getLength("Glue/Thicknes2"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar1.setSurface(barSurface, sigmaAlpha);
-      bar1.setName(bar1.getName() + "1");
-
-      TOPGeoBarSegment bar2(barParams.getLength("QWidth"),
-                            barParams.getLength("QThickness"),
-                            barParams.getLength("QBar2Length"),
-                            barParams.getString("BarMaterial"));
-      bar2.setGlue(barParams.getLength("Glue/Thicknes1"),
-                   barParams.getString("Glue/GlueMaterial"));
-      bar2.setSurface(barSurface, sigmaAlpha);
-      bar2.setName(bar2.getName() + "2");
-
-      TOPGeoMirrorSegment mirror(barParams.getLength("QWidth"),
-                                 barParams.getLength("QThickness"),
-                                 barParams.getLength("QBarMirror"),
-                                 barParams.getString("BarMaterial"));
-      mirror.setGlue(barParams.getLength("Glue/Thicknes3"),
-                     barParams.getString("Glue/GlueMaterial"));
-      mirror.setSurface(barSurface, sigmaAlpha);
-      GearDir mirrorParams(content, "Mirror");
-      mirror.setRadius(mirrorParams.getLength("Radius"));
-      mirror.setCenterOfCurvature(mirrorParams.getLength("Xpos"),
-                                  mirrorParams.getLength("Ypos"));
-      GearDir mirrorSurfParams(mirrorParams, "Surface");
-      mirror.setCoating(mirrorParams.getLength("mirrorThickness"),
-                        mirrorParams.getString("Material"),
-                        materials.createOpticalSurfaceConfig(mirrorSurfParams));
-
-      TOPGeoPrism prism(barParams.getLength("QWedgeWidth"),
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeLength"),
-                        barParams.getLength("QWedgeDown") +
-                        barParams.getLength("QThickness"),
-                        barParams.getLength("QWedgeFlat"),
-                        barParams.getString("BarMaterial"));
-      prism.setGlue(arrayParams.getLength("dGlue"),
-                    arrayParams.getString("glueMaterial"));
-      prism.setSurface(barSurface, sigmaAlpha);
-
-      double radius = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
-      double phi = barParams.getLength("Phi0");
-      double backwardZ = barParams.getLength("QZBackward");
-      int numModules = barParams.getInt("Nbar");
-      for (int i = 0; i < numModules; i++) {
-        unsigned id = i + 1;
-        TOPGeoModule module(id, radius, phi, backwardZ);
-        module.setName(addNumber(module.getName(), id));
-        module.setBarSegment1(bar1);
-        module.setBarSegment2(bar2);
-        module.setMirrorSegment(mirror);
-        module.setPrism(prism);
-        // module.setModuleCNumber(num);
-        // module.setPMTArrayDisplacement(arrayDispl);
-        // module.setModuleDisplacement(moduleDispl);
-        geo->appendModule(module);
-        phi += 2 * M_PI / numModules;
-      }
-
-      // boardstack
-
-      TOPGeoBoardStack bs; // TODO
-      geo->setBoardStack(bs);
-
-      // QBB
-
-      TOPGeoQBB qbb; // TODO
-      geo->setQBB(qbb);
-
-      // nominal QE
-
-      GearDir qeParams(content, "QE");
-      std::vector<float> qeData;
-      for (const GearDir& Qeffi : qeParams.getNodes("Qeffi")) {
-        qeData.push_back(Qeffi.getDouble(""));
-      }
-      TOPNominalQE nominalQE(qeParams.getLength("LambdaFirst") / Unit::nm,
-                             qeParams.getLength("LambdaStep") / Unit::nm,
-                             qeParams.getDouble("ColEffi"),
-                             qeData);
-      geo->setNominalQE(nominalQE);
-
-      // nominal TTS
-
-      GearDir ttsParams(content, "PMTs/TTS");
-      TOPNominalTTS nominalTTS("TOPNominalTTS");
-      for (const GearDir& Gauss : ttsParams.getNodes("Gauss")) {
-        nominalTTS.appendGaussian(Gauss.getDouble("fraction"),
-                                  Gauss.getTime("mean"),
-                                  Gauss.getTime("sigma"));
-      }
-      nominalTTS.normalize();
-      geo->setNominalTTS(nominalTTS);
-
-      // nominal TDC
-
-      GearDir tdcParams(content, "TDC");
-      if (tdcParams) {
-        TOPNominalTDC nominalTDC(tdcParams.getInt("numWindows"),
-                                 tdcParams.getInt("subBits"),
-                                 tdcParams.getTime("syncTimeBase"),
-                                 tdcParams.getTime("offset"),
-                                 tdcParams.getTime("pileupTime"),
-                                 tdcParams.getTime("doubleHitResolution"),
-                                 tdcParams.getTime("timeJitter"),
-                                 tdcParams.getDouble("efficiency"));
-        geo->setNominalTDC(nominalTDC);
-      } else {
-        TOPNominalTDC nominalTDC(pmtParams.getInt("TDCbits"),
-                                 pmtParams.getTime("TDCbitwidth"),
-                                 pmtParams.getTime("TDCoffset", 0),
-                                 pmtParams.getTime("TDCpileupTime", 0),
-                                 pmtParams.getTime("TDCdoubleHitResolution", 0),
-                                 pmtParams.getTime("TDCtimeJitter", 50e-3),
-                                 pmtParams.getDouble("TDCefficiency", 1));
-        geo->setNominalTDC(nominalTDC);
-      }
-
-      // check for consistency
-
-      if (!geo->isConsistent())
-        B2ERROR("GeoTOPCreator::createConfiguration: geometry not consistently defined");
-
-      return geo;
-    }
-
-
-
-
     void GeoTOPCreator::create(const GearDir& content, G4LogicalVolume& topVolume,
-                               GeometryTypes)
+                               geometry::GeometryTypes type)
     {
 
       m_isBeamBkgStudy = content.getInt("BeamBackgroundStudy");
 
-      m_geo = createConfiguration(content);
-      m_topgp->setGeometry(m_geo);
-
-      /* Build detector segment */
-
-      // Initialize parameters
       m_topgp->Initialize(content);
+      if (!m_topgp->isValid()) {
+        B2ERROR("TOP: geometry or mappers not valid (gearbox) - geometry not created");
+        return;
+      }
+
+      const auto* geo = m_topgp->getGeometry();
+      createGeometry(*geo, topVolume, type);
+
+    }
+
+
+    void GeoTOPCreator::createPayloads(const GearDir& content,
+                                       const IntervalOfValidity& iov)
+    {
+      m_topgp->Initialize(content);
+      if (!m_topgp->isValid()) {
+        B2ERROR("TOP: geometry or mappers not valid (gearbox) - no payloads imported");
+        return;
+      }
+
+      DBImportObjPtr<TOPGeometry> importObj;
+      const auto* geo = m_topgp->getGeometry();
+      importObj.construct(*geo);
+      importObj.import(iov);
+
+      m_topgp->getChannelMapper().import(iov);
+      m_topgp->getFrontEndMapper().import(iov);
+
+      B2RESULT("TOP: geometry and mappers imported to database");
+
+    }
+
+
+    void GeoTOPCreator::createFromDB(const std::string& name, G4LogicalVolume& topVolume,
+                                     geometry::GeometryTypes type)
+    {
+
+      //----------->
+      throw DBNotImplemented();
+      return;
+      //<---------- remove when payloads ready!!!
+
+      m_topgp->Initialize();
+      if (!m_topgp->isValid()) {
+        B2ERROR("Cannot create Geometry from Database: no configuration found for "
+                << name);
+        return;
+      }
+
+      const auto* geo = m_topgp->getGeometry();
+      createGeometry(*geo, topVolume, type);
+
+    }
+
+
+    void GeoTOPCreator::createGeometry(const TOPGeometry& geo,
+                                       G4LogicalVolume& topVolume,
+                                       GeometryTypes)
+    {
       m_topgp->setGeanUnits();
-      m_geo->useGeantUnits();
+      geo.useGeantUnits();
 
       // test ---------------------------->
       bool test = false;
       if (test) {
-        auto* pmtArray = createPMTArray(m_geo->getPMTArray());
-        double Lz = m_geo->getPMTArray().getPMT().getSizeZ();
-        auto* optics = assembleOptics(m_geo->getModule(1), pmtArray, Lz);
+        auto* pmtArray = createPMTArray(geo.getPMTArray());
+        double Lz = geo.getPMTArray().getPMT().getSizeZ();
+        auto* optics = assembleOptics(geo.getModule(1), pmtArray, Lz);
         G4ThreeVector move;
         G4RotationMatrix rot;
-        move.setX(m_geo->getModule(1).getBackwardZ());
+        move.setX(geo.getModule(1).getBackwardZ());
         rot.rotateY(M_PI / 2);
         optics->MakeImprint(&topVolume, move, &rot);
         return;
@@ -298,14 +171,14 @@ namespace Belle2 {
       // end <----------------------------
 
       // build one module
-      G4LogicalVolume* module = buildTOPModule(*m_geo, 1);
+      G4LogicalVolume* module = buildTOPModule(geo, 1);
 
       // position the modules
-      int numModules = m_geo->getNumModules();
+      int numModules = geo.getNumModules();
       for (int i = 0; i < numModules; i++) {
         int id = i + 1;
-        double Radius = m_geo->getModule(id).getRadius();
-        double phi = m_geo->getModule(id).getPhi();
+        double Radius = geo.getModule(id).getRadius();
+        double phi = geo.getModule(id).getPhi();
 
         G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
         G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);

@@ -15,7 +15,7 @@
 #include <tuple>
 #include <array>
 #include <iterator>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

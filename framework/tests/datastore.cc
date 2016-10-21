@@ -39,9 +39,6 @@ namespace {
       evtPtr.create();
       evtPtr->setEvent(42);
 
-      evtDataDifferentName.create(); //StoreArrays can be explicitly created (can also be omitted)
-      evtDataDifferentDurability.create();
-      profileInfo.create();
 
       ProfileInfo profileInfoObject(128, 64, 60.0);
       for (int i = 0; i < 10; ++i) {
@@ -232,12 +229,19 @@ namespace {
     EXPECT_TRUE(evtPtr.isValid());
     EXPECT_EQ(evtPtr->getEvent(), 1);
   }
+  TEST_F(DataStoreTest, FailedCreation)
+  {
+    StoreArray<EventMetaData> none("doesntexist");
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_THROW(none.appendNew(), std::runtime_error);
+    none.clear();
+    EXPECT_THROW(none.getPtr(), std::runtime_error);
+    EXPECT_EQ(0, none.getEntries());
+  }
   TEST_F(DataStoreTest, RawAccess)
   {
     StoreArray<EventMetaData> evtData;
-    StoreArray<EventMetaData> none("doesntexist");
     EXPECT_TRUE(evtData.getPtr() != nullptr);
-    EXPECT_TRUE(none.getPtr() == nullptr);
   }
 
   /** check TClonesArray consistency (i.e. no gaps) */
@@ -489,9 +493,6 @@ namespace {
     //accessing unregistered things doesn't work.
     StoreArray<EventMetaData> someothernewname("someothernewname");
     EXPECT_FALSE(someothernewname.isValid());
-    //usually one shouldn't call StoreArray::create(), but everything like appendNew() would crash
-    EXPECT_B2ERROR(EXPECT_FALSE(someothernewname.create()));
-    EXPECT_FALSE(someothernewname.isValid()); //still invalid (as create() failed)
   }
 
   TEST_F(DataStoreTest, ConstructedBeforeInitializeButWithNonDefaultName)

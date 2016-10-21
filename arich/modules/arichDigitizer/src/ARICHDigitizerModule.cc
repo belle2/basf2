@@ -112,7 +112,6 @@ namespace Belle2 {
     // (or have one created)
     //-----------------------------------------------------
     StoreArray<ARICHDigit> arichDigits;
-    if (!arichDigits.isValid()) arichDigits.create();
 
     //---------------------------------------------------------------------
     // Convert SimHits one by one to digitizer hits.

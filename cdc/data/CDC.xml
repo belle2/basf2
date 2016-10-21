@@ -7,8 +7,8 @@
     <SensitiveDetector>
       <!-- If you need Simhit with edep=0, set negative value ex. -1.0 or -10.0 -->
       <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="eV">0.0</EnergyDepositionThreshold>  
-      <!-- Switch for sense wire (gravitational) sag in FullSim. This must be always false since the sag is controlled in Digitizer, not in FullSim now. -->
-      <WireSag desc="true: on; false: off">false</WireSag> 
+      <!-- Switch for sense wire (gravitational) sag in FullSim. -->
+      <WireSag desc="true: on; false: off">true</WireSag> 
       <!-- Switch for left/right flag modified for tracking.> -->
       <ModifiedLeftRightFlag desc="true: set; false: not set">false</ModifiedLeftRightFlag>  
       <!-- Min. track length -->
@@ -45,15 +45,15 @@
 
     <!-- For displacement -->
     <Displacement desc="true: load displacements for sense wires; false: not.">true</Displacement>
-    <displacementFileName desc="file which contains displacement params.">displacement.dat</displacementFileName>
+    <displacementFileName desc="file which contains displacement params.">displacement_v1.dat</displacementFileName>
 
     <!-- For misalignment -->
     <Misalignment desc="true: load misalignments for sense wires; false: not.">true</Misalignment>
-    <misalignmentFileName desc="file which contains misalignment params.">misalignment_v1.dat</misalignmentFileName>
+    <misalignmentFileName desc="file which contains misalignment params.">misalignment_v2.dat</misalignmentFileName>
 
     <!-- For alignment -->
     <Alignment desc="true: load alignments for sense wires; false: not.">true</Alignment>
-    <alignmentFileName desc="file which contains alignment params.">alignment_v1.dat</alignmentFileName>
+    <alignmentFileName desc="file which contains alignment params.">alignment_v2.dat</alignmentFileName>
 
     <!-- Switch for selecting x-t etc. to be used in reconstruction -->
     <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>

@@ -4,6 +4,9 @@ import basf2
 import reconstruction
 import modularAnalysis
 import rawdata
+import vertex
+import stdFSParticles
+import stdV0s
 
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
 
@@ -14,6 +17,12 @@ ALWAYS_SAVE_REGEX = ["EventMetaData", "SoftwareTrigger.*"]
 FAST_RECO_CUTS = ['reject_ee', 'accept_ee', 'reject_bkg']
 HLT_CUTS = ["accept_hadron", "accept_bhabha", "accept_tau_tau", "accept_2_tracks", "accept_1_track1_cluster",
             "accept_mu_mu", "accept_gamma_gamma"]
+
+CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_gg_ee", "accept_gg_4pi", "accept_D0_Kpi",
+              "accept_Dstar", "accept_Xi_piLambda", "accept_test"]
+
+CALIB_CUTS += ["accept_dqm_D0", "accept_dqm_Dplus", "accept_dqm_Dstar",
+               "accept_dqm_Jpsiee", "accept_dqm_Jpsimumu"]
 
 
 def add_packers(path):
@@ -59,6 +68,83 @@ def add_unpackers(path):
     path.add_module("SVDClusterizer")
 
 
+def add_tag_calib_sample(path, store_array_debug_prescale=None):
+    """
+    After HLT trigger, tag samples for calibration
+    """
+    trackcut = 'abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956'
+    modularAnalysis.fillParticleList("pi+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("K+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("p+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("gamma:calib", 'E>0.05', path=path)
+    # rho
+    modularAnalysis.reconstructDecay('rho0:calib -> pi+:calib pi-:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('rho0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('rho0:calib', {'abs(dM)': 'rho0_dM'}, path=path)
+
+    # reconstruct intermediate state
+    # D0->Kpi, D*->D0(Kpi) pi
+    modularAnalysis.reconstructDecay('D0:calib -> pi+:calib K-:calib', 'abs(dM)<0.5', path=path)
+
+    modularAnalysis.reconstructDecay('D*+:calib -> D0:calib pi+:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('D0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:calib', {'abs(dM)': 'D0_dM'}, path=path)
+    modularAnalysis.rankByLowest('D*+:calib', 'abs(dQ)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:calib', {'abs(dQ)': 'Dstar_dQ'}, path=path)
+
+    # Lambda0->p pi-, Xi-->Lambda0 pi-
+    modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
+    vertex.fitVertex('Lambda0:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Lambda0:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Lambda0:calib', {'chiProb': 'Lambda0_chiProb'}, path=path)
+
+    modularAnalysis.reconstructDecay('Xi-:calib -> Lambda0:calib pi-:calib', '', path=path)
+    vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
+
+    # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
+    stdFSParticles.stdPi(path=path)
+    stdFSParticles.stdK(path=path)
+    # D0->K- pi+
+    modularAnalysis.reconstructDecay('D0:dqm -> K-:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D0:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'D0_dqm_M'}, path=path)
+
+    # D*+->D0 pi-
+    modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:std',
+                                     '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
+    vertex.vertexKFit('D*+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'Dstar_dqm_M'}, path=path)
+
+    # D+ -> K- pi+ pi+
+    modularAnalysis.reconstructDecay('D+:dqm -> K-:std pi+:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'Dplus_dqm_M'}, path=path)
+
+    # Jpsi-> ee
+    modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'Jpsi_dqm_ee_M'}, path=path)
+
+    # Jpsi-> mumu
+    modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'Jpsi_dqm_mumu_M'}, path=path)
+
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
+
+    if store_array_debug_prescale is not None:
+        calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+
+
 def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     """
     Add all modules, conditions and conditional paths to the given path, that are needed for a full
@@ -77,11 +163,11 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
 
     The whole setup looks like this:
 
-                                                 -- [ Raw Data ] ---
-                                               /                     \
-             In -- [ Fast Reco ] -- [ HLT ] --                         -- Out
-                                 \             \                     /
-                                  ----------------- [ Meta Data ] --
+                                                 -- [ Calibration ] -- [ Raw Data ] ---
+                                               /                                        \
+             In -- [ Fast Reco ] -- [ HLT ] --                                            -- Out
+                                 \             \                                        /
+                                  ----------------- [ Meta Data ] ---------------------
 
 
     Before calling this function, make sure that your database setup is suited to download software trigger cuts
@@ -96,12 +182,13 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     # In the following, we will need some paths:
     # (1) A "store-metadata" path (deleting everything except the trigger tags and some metadata)
     store_only_metadata_path = get_store_only_metadata_path()
-    # (2) A "store-all" path (delete everything except the raw data with the metadata)
-    store_only_rawdata_path = get_store_only_rawdata_path()
     # (3) A path doing the fast reco reconstruction
     fast_reco_reconstruction_path = basf2.create_path()
     # (4) A path doing the hlt reconstruction
     hlt_reconstruction_path = basf2.create_path()
+    # (5) A path doing the calibration reconstruction with a "store-all" path, which deletes everything except
+    # raw data, trigger tags and the meta data.
+    calibration_and_store_only_rawdata_path = basf2.create_path()
 
     # Add fast reco reconstruction
     reconstruction.add_reconstruction(fast_reco_reconstruction_path, trigger_mode="fast_reco", skipGeometryAdding=True)
@@ -138,9 +225,13 @@ def add_softwaretrigger_reconstruction(path, store_array_debug_prescale=None):
     if store_array_debug_prescale is not None:
         hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
 
+    # Fill the calibration_and_store_only_rawdata_path path
+    add_tag_calib_sample(calibration_and_store_only_rawdata_path, store_array_debug_prescale)
+    calibration_and_store_only_rawdata_path.add_path(get_store_only_rawdata_path())
+
     # There are two possibilities for the output of this module
     # (1) the event is accepted -> store everything
-    hlt_cut_module.if_value("==1", store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
+    hlt_cut_module.if_value("==1", calibration_and_store_only_rawdata_path, basf2.AfterConditionPath.CONTINUE)
     # (2) we do not know what to do or the event is rejected -> only store the metadata
     hlt_cut_module.if_value("!=1", store_only_metadata_path, basf2.AfterConditionPath.CONTINUE)
 

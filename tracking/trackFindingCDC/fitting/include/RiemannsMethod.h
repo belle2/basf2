@@ -21,9 +21,6 @@ namespace Belle2 {
       ///Empty constructor
       RiemannsMethod();
 
-      ///Empty destructor
-      ~RiemannsMethod();
-
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
@@ -54,8 +51,11 @@ namespace Belle2 {
       { m_originConstrained = constrained; }
 
     protected:
-      bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
-      bool m_originConstrained; ///< Memory for the flag indicating that curves through the origin shall be fitter
+      /// Memory for the flag indicating that lines should be fitted
+      bool m_lineConstrained;
+
+      /// Memory for the flag indicating that curves through the origin shall be fitter
+      bool m_originConstrained;
 
 
     public:

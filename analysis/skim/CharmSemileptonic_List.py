@@ -13,7 +13,7 @@ from modularAnalysis import *
 
 
 def CharmSemileptonicList():
-    DstarSLcuts = '1.7 < M < 2.3'
+    DstarSLcuts = 'massDifference(0)<0.16'
     antiD0SLcuts = '1.5 < M < 2.2'
 
     DstarSLRecoilChannels = ['D0:all pi+:all',

@@ -107,11 +107,6 @@ namespace Belle2 {
        * N.B. The declaration should be after m_cdcp for proper initialization.
        */
       const double m_tdcBinWidth;
-
-      /**
-       * Conv. factor to 'drift length' (cm/ns) when drift time < 0.
-       */
-      const double m_vFactor;
     };
   }
 }

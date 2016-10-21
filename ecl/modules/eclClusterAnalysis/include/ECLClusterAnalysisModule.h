@@ -116,10 +116,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclClusterPi0Likel; /**< Flag for pi0 */
-    std::vector<double>* m_eclClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclClusterDeltaL; /**< ??? */
-    std::vector<double>* m_eclClusterBeta; /**< ??? */
 
     int m_mcMultip; /**< Multiplicity of MCParticles */
     std::vector<int>* m_mcIdx; /**< MCParticle index */

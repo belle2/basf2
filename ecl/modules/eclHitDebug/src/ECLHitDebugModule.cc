@@ -138,7 +138,6 @@ void ECLHitDebugModule::event()
       if (E_cell[iECLCell][TimeIndex] > 0) {
 
         StoreArray<ECLDebugHit> eclHitArray;
-        if (!eclHitArray) eclHitArray.create();
 //        cout<<iECLCell<<" "<<E_cell[iECLCell][TimeIndex]<<" "<<Tof_ave[iECLCell][TimeIndex] + T_ave[iECLCell][TimeIndex] <<endl;
         //m_hitNum = eclHitArray->GetLast() + 1;
         //new(eclHitArray->AddrAt(m_hitNum)) ECLDebugHit();

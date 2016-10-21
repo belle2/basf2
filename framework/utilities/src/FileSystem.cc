@@ -16,11 +16,11 @@
 
 #include <chrono>
 #include <random>
+#include <cstring>
 
 //dlopen etc.
 #include <dlfcn.h>
 #include <fcntl.h>
-#include <string.h>
 
 using namespace std;
 using namespace Belle2;
@@ -28,26 +28,26 @@ namespace fs = boost::filesystem;
 
 bool FileSystem::fileExists(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return fs::exists(fullPath);
 }
 
 bool FileSystem::fileDirExists(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   fullPath.remove_filename();
   return fs::exists(fullPath);
 }
 
 bool FileSystem::isFile(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return (fs::exists(fullPath)) && (fs::is_regular_file(fullPath));
 }
 
 bool FileSystem::isDir(const string& filename)
 {
-  fs::path fullPath = fs::absolute(filename, fs::initial_path<fs::path>());
+  fs::path fullPath = fs::absolute(filename);
   return (fs::exists(fullPath)) && (fs::is_directory(fullPath));
 }
 
@@ -59,7 +59,7 @@ bool FileSystem::loadLibrary(std::string library, bool fullname)
   void* libPointer = dlopen(library.c_str() , RTLD_LAZY | RTLD_GLOBAL);
 
   if (libPointer == NULL) {
-    B2ERROR("Could not open shared library file (error in dlopen) : " + string(dlerror()));
+    B2ERROR("Could not open shared library file (error in dlopen) : " << dlerror());
     return false;
   }
 

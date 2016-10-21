@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Marko Petric, Marko Staric                               *
- * Major revision: May-June 2016                                          *
+ * Major revision: 2016                                                   *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -16,6 +16,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <framework/database/DBObjPtr.h>
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
@@ -30,31 +31,51 @@ namespace Belle2 {
     class SensitivePMT;
     class SensitiveBar;
 
-    /** Geometry creator for TOP counter.
+    /**
+     * Geometry creator for TOP counter.
      */
     class GeoTOPCreator : public geometry::CreatorBase {
 
     public:
 
-      /** Constructor */
+      /**
+       * Constructor
+       */
       GeoTOPCreator();
 
-      /** Destructor */
+      /**
+       * Destructor
+       */
       virtual ~GeoTOPCreator();
 
       /**
-       * Creates the GEANT Objects for the TOP counter.
-       * @param content A reference to the content part of the parameter description
+       * Creation of the detector geometry from Gearbox (XML).
+       * @param[in] content   XML data directory.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
        */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume,
-                          geometry::GeometryTypes type);
-
-    private:
+                          geometry::GeometryTypes type) override;
 
       /**
-       * Create a parameter object from the Gearbox XML parameters.
+       * Creation of the detector geometry from database.
+       * @param[in] name      Name of the component in the database.
+       * @param[in] topVolume Geant world volume.
+       * @param[in] type      Geometry type.
        */
-      const TOPGeometry* createConfiguration(const GearDir& param);
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume,
+                                geometry::GeometryTypes type) override;
+
+      /**
+       * Creation of payloads.
+       * @param content XML data directory.
+       * @param iov     Interval of validity.
+       */
+      virtual void createPayloads(const GearDir& content,
+                                  const IntervalOfValidity& iov) override;
+
+
+    private:
 
       /**
        * Create the geometry from a parameter object.
@@ -186,7 +207,6 @@ namespace Belle2 {
       BkgSensitiveDetector* m_sensitivePCB1 = 0;  /**< PCB sensitive for BG studies */
       BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< singleton class */
-      const TOPGeometry* m_geo = 0; /**< Geometry parameters */
       int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
     };
 

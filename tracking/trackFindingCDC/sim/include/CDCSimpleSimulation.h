@@ -48,7 +48,7 @@ namespace Belle2 {
          *  Constructor from limited truth information
          *  Mainly used by the manually prepared event
          */
-        SimpleSimHit(CDCWireHit wireHit,
+        SimpleSimHit(const CDCWireHit& wireHit,
                      size_t iMCTrack,
                      ERightLeft rlInfo) :
           m_wireHit(wireHit),
@@ -60,10 +60,10 @@ namespace Belle2 {
          *  Constructor from complete truth information.
          *  Mainly used in the simple simulation procedure.
          */
-        SimpleSimHit(CDCWireHit wireHit,
+        SimpleSimHit(const CDCWireHit& wireHit,
                      size_t iMCTrack,
                      ERightLeft rlInfo,
-                     Vector3D pos3D,
+                     const Vector3D& pos3D,
                      double arcLength2D = NAN,
                      double trueDriftLength = NAN) :
           m_wireHit(wireHit),
@@ -95,7 +95,8 @@ namespace Belle2 {
 
     public:
       /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
-      explicit CDCSimpleSimulation() : m_wireHitTopology(nullptr)
+      explicit CDCSimpleSimulation()
+        : m_wireHitTopology(nullptr)
       {}
 
       /// Set the wire hit topology that should receive the wire hit objects.
@@ -128,23 +129,23 @@ namespace Belle2 {
     private:
       /// Creates CDCWireHits in the CDCWireHitTopology and uses them to construct the true CDCTracks.
       std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      constructMCTracks(size_t nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const;
+      constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const;
 
       /// Generate hits for the given helix in starting from the two dimensional arc length.
       std::vector<SimpleSimHit>
       createHits(const Helix& globalHelix,
-                 const double arcLength2DOffset) const;
+                 double arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
       std::vector<SimpleSimHit>
       createHitsForLayer(const CDCWire& nearWire,
                          const Helix& globalHelix,
-                         const double arcLength2DOffset) const;
+                         double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
       SimpleSimHit createHitForCell(const CDCWire& wire,
                                     const Helix& globalHelix,
-                                    const double arcLengthOffset) const;
+                                    double arcLengthOffset) const;
 
     public:
       /// Getter for a global event time offset
@@ -152,23 +153,23 @@ namespace Belle2 {
       { return m_eventTime; }
 
       /// Setter for a global event time offset
-      void setEventTime(const double eventTime)
+      void setEventTime(double eventTime)
       { m_eventTime = eventTime; }
 
       /// Activate the TOF time delay
-      void activateTOFDelay(const bool& activate = true)
+      void activateTOFDelay(bool activate = true)
       { m_addTOFDelay = activate; }
 
       /// Activate the in wire signal delay
-      void activateInWireSignalDelay(const bool& activate = true)
+      void activateInWireSignalDelay(bool activate = true)
       { m_addInWireSignalDelay = activate; }
 
       /// Getter for the maximal number of hits that are allowed on each layer
-      size_t getMaxNHitOnWire() const
+      int getMaxNHitOnWire() const
       { return m_maxNHitOnWire; }
 
       /// Setter for the maximal number of hits that are allowed on each layer
-      void setMaxNHitOnWire(const size_t& maxNHitOnWire)
+      void setMaxNHitOnWire(int maxNHitOnWire)
       { m_maxNHitOnWire = maxNHitOnWire; }
 
     private:
@@ -185,16 +186,16 @@ namespace Belle2 {
       const double s_nominalDriftSpeed = 4e-3;
 
       /// Maximal number of hits allowed on each wire (0 means all).
-      size_t m_maxNHitOnWire = 0;
+      int m_maxNHitOnWire = 0;
 
       /// A global event time
       double m_eventTime = 0;
 
       /// Switch to activate the addition of the time of flight.
-      double m_addTOFDelay = false;
+      bool m_addTOFDelay = false;
 
       /// Switch to activate the in wire signal delay.
-      double m_addInWireSignalDelay = false;
+      bool m_addInWireSignalDelay = false;
 
       // TODO: make them freely setable ?
       /// Variance by which the drift length should be smeared.

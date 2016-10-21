@@ -13,11 +13,6 @@ using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SkimmedFitlessSegmentPairVarSet::SkimmedFitlessSegmentPairVarSet() :
-  Super()
-{
-}
-
 bool SkimmedFitlessSegmentPairVarSet::accept(const CDCSegmentPair*)
 {
   if (var<named("end_first_to_start_last_hit_pos_phi_difference")>() > 1) return false;

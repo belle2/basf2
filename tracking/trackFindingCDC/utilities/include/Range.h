@@ -36,9 +36,7 @@ namespace Belle2 {
 
     public:
       /// Default constructor for ROOT
-      Range()
-        : Super(AIterator(), AIterator())
-      {}
+      Range() = default;
 
       /// Constructor to adapt a pair as returned by e.g. std::equal_range.
       template<class AOtherIterator>

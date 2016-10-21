@@ -36,7 +36,7 @@ namespace Belle2 {
       /**
        * Destructor
        */
-      virtual ~QuadTreeItem() {}
+      virtual ~QuadTreeItem() = default;
 
       /**
        * Flag is set if the item was used as a result of the quad tree search and

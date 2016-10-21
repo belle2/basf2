@@ -281,7 +281,6 @@ void TrackFinderMCVXDTBModule::event()
 
   //register StoreArray which will be filled by this module
   StoreArray<genfit::TrackCand> trackCandidates(m_gfTrackCandsColName);
-  trackCandidates.create();
   RelationArray gfTrackCandToMCPart(trackCandidates, mcParticles);
 
   //an auxiliary variable to discard neutrals if necessary (assume that no particles with charge -999 exist)

@@ -12,8 +12,6 @@
 
 using namespace Belle2;
 
-ClassImp(L3Track)
-
 L3Track::L3Track()
 {
   for (int i = 0; i < 5; i++) m_helix[i] = 0;

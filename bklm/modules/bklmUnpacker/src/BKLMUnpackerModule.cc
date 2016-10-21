@@ -22,6 +22,8 @@
 #include <rawdata/dataobjects/RawKLM.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <bklm/dataobjects/BKLMStatus.h>
+#include <framework/database/DBArray.h>
+#include <bklm/dbobjects/BKLMElectronicMapping.h>
 
 #include <sstream>
 #include <iomanip>
@@ -40,11 +42,12 @@ REG_MODULE(BKLMUnpacker)
 BKLMUnpackerModule::BKLMUnpackerModule() : Module()
 {
   setDescription("Produce BKLMDigits from RawBKLM");
-  //setPropertyFlags(c_ParallelProcessingCertified); //not sure ibf true yet...
+  setPropertyFlags(c_ParallelProcessingCertified);
   addParam("useDefaultModuleId", m_useDefaultModuleId, "use default module id if not found in mapping", false);
   addParam("keepEvenPackages", m_keepEvenPackages, "keep packages that have even length normally indicating that data was corrupted ",
            false);
   addParam("outputDigitsName", m_outputDigitsName, "name of BKLMDigit store array", string("BKLMDigits"));
+  addParam("loadMapFromDB", m_loadMapFromDB, "whether load electronic map from DataBase", true);
 }
 
 
@@ -58,9 +61,40 @@ void BKLMUnpackerModule::initialize()
   //StoreArray<BKLMDigit>::registerPersistent();
   StoreArray<BKLMDigit>bklmDigits(m_outputDigitsName);
   bklmDigits.registerInDataStore();
-  loadMap();
+  if (m_loadMapFromDB) loadMapFromDB();
+  else loadMap();
 }
 
+void BKLMUnpackerModule::loadMapFromDB()
+{
+  DBArray<BKLMElectronicMapping> elements("BKLMElectronicMapping");
+  elements.getEntries();
+  for (const auto& element : elements) {
+    B2INFO("Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
+           ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
+           ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+           " plane(z/phi) = " << element.getPlane());
+
+    int copperId = element.getCopperId();
+    int slotId = element.getSlotId();
+    int laneId = element.getLaneId();
+    int axisId = element.getAxisId();
+    int sector = element.getSector();
+    int isForward = element.getIsForward();
+    int layer = element.getLayer();
+    int plane =  element.getPlane();
+    int elecId = electCooToInt(copperId, slotId, laneId, axisId);
+    int moduleId = 0;
+    B2DEBUG(1, "reading Data Base...");
+    moduleId = (isForward ? BKLM_END_MASK : 0)
+               | ((sector - 1) << BKLM_SECTOR_BIT)
+               | ((layer - 1) << BKLM_LAYER_BIT)
+               | ((plane) << BKLM_PLANE_BIT);
+    m_electIdToModuleId[elecId] = moduleId;
+    B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
+  }
+
+}
 
 void BKLMUnpackerModule::loadMap()
 {
@@ -105,7 +139,8 @@ void BKLMUnpackerModule::loadMap()
 
 void BKLMUnpackerModule::beginRun()
 {
-  loadMap();
+  if (m_loadMapFromDB) loadMapFromDB();
+  else loadMap();
 
 }
 

@@ -22,7 +22,7 @@
 #include <cdc/dataobjects/ADCCountTranslatorBase.h>
 #include <cdc/dataobjects/CDCHit.h>
 
-#include <assert.h>
+#include <cassert>
 
 
 namespace Belle2 {

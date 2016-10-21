@@ -67,7 +67,7 @@ std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTraject
   std::vector<CDCTrack> mcTracks = constructMCTracks(nMCTracks, std::move(simpleSimHits));
 
   /// Assign mc trajectories to the tracks
-  for (size_t iMCTrack = 0;  iMCTrack < nMCTracks; ++iMCTrack) {
+  for (size_t iMCTrack = 0; iMCTrack < nMCTracks; ++iMCTrack) {
     CDCTrack& mcTrack = mcTracks[iMCTrack];
     CDCTrajectory3D mcTrajectory = trajectories3D[iMCTrack];
     if (not mcTrack.empty()) {
@@ -83,8 +83,8 @@ std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTraject
   return mcTracks;
 }
 
-std::vector<CDCTrack> CDCSimpleSimulation::constructMCTracks(size_t nMCTracks,
-    std::vector<SimpleSimHit> simpleSimHits) const
+std::vector<CDCTrack>
+CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const
 {
 
   // Sort the hits along side their wire hits
@@ -169,7 +169,7 @@ std::vector<CDCTrack> CDCSimpleSimulation::constructMCTracks(size_t nMCTracks,
 
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHits(const Helix& globalHelix,
-                                const double arcLength2DOffset) const
+                                double arcLength2DOffset) const
 {
 
   std::vector<SimpleSimHit> simpleSimHits;
@@ -278,7 +278,7 @@ CDCSimpleSimulation::createHits(const Helix& globalHelix,
 std::vector<CDCSimpleSimulation::SimpleSimHit>
 CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
                                         const Helix& globalHelix,
-                                        const double arcLength2DOffset) const
+                                        double arcLength2DOffset) const
 {
   std::vector<SimpleSimHit> result;
 
@@ -318,7 +318,7 @@ CDCSimpleSimulation::createHitsForLayer(const CDCWire& nearWire,
 CDCSimpleSimulation::SimpleSimHit
 CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
                                       const Helix& globalHelix,
-                                      const double arcLength2DOffset) const
+                                      double arcLength2DOffset) const
 {
   double arcLength2D = globalHelix.arcLength2DToXY(wire.getRefPos2D());
   if ((arcLength2D + arcLength2DOffset) < 0) {

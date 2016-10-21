@@ -111,6 +111,8 @@ void SoftwareTriggerModule::initializeCalculation()
     m_calculation.reset(new FastRecoCalculator());
   } else if (m_param_baseIdentifier == "hlt") {
     m_calculation.reset(new HLTCalculator());
+  } else if (m_param_baseIdentifier == "calib") {
+    m_calculation.reset(new CalibSampleCalculator());
   } else {
     B2FATAL("You gave an invalid base identifier " << m_param_baseIdentifier << ".");
   }

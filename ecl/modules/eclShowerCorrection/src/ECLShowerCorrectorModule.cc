@@ -122,9 +122,9 @@ void ECLShowerCorrectorModule::event()
     eclShower.setEnergy(correctedEnergy);
 
     // correction for the highest energetic crystal in the shower (to be studied!) (TF)
-    const double uncorrectedHighestEnergy = eclShower.getHighestEnergy();
+    const double uncorrectedHighestEnergy = eclShower.getEnergyHighestCrystal();
     const double correctedHighestEnergy = uncorrectedHighestEnergy / correctionF;
-    eclShower.setHighestEnergy(correctedHighestEnergy);
+    eclShower.setEnergyHighestCrystal(correctedHighestEnergy);
 
     // second correction step (OLD METHOD BY GDN) (TF)
     m_tmpClusterCorrection.scale(eclShower);

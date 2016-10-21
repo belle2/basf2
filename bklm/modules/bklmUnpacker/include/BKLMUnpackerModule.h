@@ -52,6 +52,8 @@ namespace Belle2 {
 
     //! fill m_electIdToModuleId from xml file
     void loadMap();
+    //! fill m_electIdToModuleId from Data Base
+    void loadMapFromDB();
 
     //!get the module id from the electroncis coordinates
     //! @param copperId id of the copper board
@@ -88,6 +90,9 @@ namespace Belle2 {
     bool m_keepEvenPackages = false;
     //!use default module id, if not found in mapping file
     bool m_useDefaultModuleId = false;
+
+    //!use electronic map from DataBase or not
+    bool m_loadMapFromDB = true;
 
     //! offset of the scintillator ADC
     const int m_scintADCOffset = 3400;

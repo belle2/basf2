@@ -39,20 +39,17 @@ void ECLUnpackerModule::initialize()
 
   std::string ini_file_name = FileSystem::findFile(m_eclMapperInitFileName);
   if (! FileSystem::fileExists(ini_file_name)) {
-    B2ERROR("ECL Unpacker : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
-    exit(1);
+    B2FATAL("ECL Unpacker : eclChannelMapper initialization file " << ini_file_name << " doesn't exist");
   }
 
   // initialize channel mapper from file (temporary)
   if (! m_eclMapper.initFromFile(ini_file_name.data())) {
-    B2ERROR("ECL Unpacker:: Can't initialize eclChannelMapper");
-    exit(1);
+    B2FATAL("ECL Unpacker:: Can't initialize eclChannelMapper");
   }
 
   B2INFO("ECL Unpacker: eclChannelMapper initialized successfully");
 
   // or initialize if from DB TODO
-
 }
 
 void ECLUnpackerModule::beginRun()

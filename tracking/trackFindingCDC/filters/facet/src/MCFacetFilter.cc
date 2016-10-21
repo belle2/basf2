@@ -7,15 +7,11 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 
-#include <cmath>
-#include <framework/logging/Logger.h>
-
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-
+#include <framework/logging/Logger.h>
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -23,11 +19,10 @@ using namespace TrackFindingCDC;
 Weight MCFacetFilter::operator()(const CDCFacet& facet)
 {
   const int inTrackHitDistanceTolerance = 3;
-  bool isCorrectFacet = operator()(facet,
-                                   inTrackHitDistanceTolerance);
+  bool isCorrectFacet = operator()(facet, inTrackHitDistanceTolerance);
 
-  bool isCorrectReverseFacet = getAllowReverse() and operator()(facet.reversed(),
-                               inTrackHitDistanceTolerance);
+  bool isCorrectReverseFacet =
+    getAllowReverse() and operator()(facet.reversed(), inTrackHitDistanceTolerance);
 
   if (isCorrectFacet) {
     if (facet.getFitLine()->isInvalid()) {
@@ -47,14 +42,13 @@ Weight MCFacetFilter::operator()(const CDCFacet& facet)
 bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
                                int inTrackHitDistanceTolerance)
 {
-
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
   const CDCWireHit& startWireHit = rlWireHitTriple.getStartWireHit();
   const CDCWireHit& middleWireHit = rlWireHitTriple.getMiddleWireHit();
   const CDCWireHit& endWireHit = rlWireHitTriple.getEndWireHit();
 
-  //First check if the track ids are in agreement
+  // First check if the track ids are in agreement
   ITrackType startMCTrackId = mcHitLookUp.getMCTrackId(startWireHit.getHit());
   ITrackType middleMCTrackId = mcHitLookUp.getMCTrackId(middleWireHit.getHit());
   ITrackType endMCTrackId = mcHitLookUp.getMCTrackId(endWireHit.getHit());
@@ -62,7 +56,6 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   if (startMCTrackId == INVALID_ITRACK or
       middleMCTrackId == INVALID_ITRACK or
       endMCTrackId == INVALID_ITRACK) {
-    // B2INFO("rejected here");
     return false;
   }
 
@@ -88,18 +81,12 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
   const bool makeNoDifferenceForReassignedSecondaries = true;
 
-  if (makeNoDifferenceForReassignedSecondaries or
-      (not startIsReassigned and not middleIsReassigned and not endIsReassigned)) {
+  if ((not startIsReassigned and not middleIsReassigned and not endIsReassigned) or
+      makeNoDifferenceForReassignedSecondaries) {
 
     distanceInTrackIsSufficientlyLow =
       0 < startToMiddleInTrackDistance and startToMiddleInTrackDistance <= inTrackHitDistanceTolerance and
       0 < middleToEndInTrackDistance and middleToEndInTrackDistance <= inTrackHitDistanceTolerance;
-
-    // if (not distanceInTrackIsSufficientlyLow){
-    //   B2WARNING("Disagreement here");
-    //   B2WARNING("startToMiddleInTrackDistance: " <<  startToMiddleInTrackDistance);
-    //   B2WARNING("middleToEndInTrackDistance: " <<  middleToEndInTrackDistance);
-    // }
 
   } else if (not startIsReassigned and not middleIsReassigned) {
 
@@ -114,7 +101,7 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
   } else if (not startIsReassigned and not endIsReassigned) {
 
     distanceInTrackIsSufficientlyLow =
-      0 < startToEndInTrackDistance and  startToEndInTrackDistance <= 2 * inTrackHitDistanceTolerance;
+      0 < startToEndInTrackDistance and startToEndInTrackDistance <= 2 * inTrackHitDistanceTolerance;
 
   } else {
 
@@ -124,7 +111,7 @@ bool MCFacetFilter::operator()(const CDCRLWireHitTriple& rlWireHitTriple,
 
   if (not distanceInTrackIsSufficientlyLow) return false;
 
-  //Now check the right left information in track
+  // Now check the right left information in track
   ERightLeft startRLInfo = rlWireHitTriple.getStartRLInfo();
   ERightLeft middleRLInfo = rlWireHitTriple.getMiddleRLInfo();
   ERightLeft endRLInfo = rlWireHitTriple.getEndRLInfo();

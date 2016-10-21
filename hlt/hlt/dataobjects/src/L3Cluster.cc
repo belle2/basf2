@@ -12,8 +12,6 @@
 
 using namespace Belle2;
 
-ClassImp(L3Cluster)
-
 L3Cluster::L3Cluster()
   : m_energy(0.),
     m_theta(0.),

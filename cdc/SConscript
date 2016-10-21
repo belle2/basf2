@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = ['framework', 'geometry', 'simulation',
+env['LIBS'] = ['framework', 'geometry', 'simulation', 'calibration',
                '$ROOT_LIBS', 'Geom', 'EG', 'cdc_dataobjects',
                '$GEANT4_LIBS', 'CLHEP', 'mdst_dataobjects']
 
@@ -13,5 +13,7 @@ env['LIBS'] = ['framework', 'geometry', 'simulation',
 #env.Append(CPPDEFINES = {'CDC_XTREL_FROM_DB':None})
 #env.Append(CPPDEFINES = {'CDC_SRESOL_FROM_DB':None})
 #env.Append(CPPDEFINES = {'CDC_CHMAP_FROM_DB':None})
+#env.Append(CPPDEFINES = {'CDC_DISPLACEMENT_FROM_DB':None})
+#env.Append(CPPDEFINES = {'CDC_ALIGN_FROM_DB':None})
 
 Return('env')

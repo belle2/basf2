@@ -703,9 +703,6 @@ void DeSerializerPCModule::event()
 #endif
 
   // Make rawdatablk array
-  raw_datablkarray.create();
-  rawcprarray.create();
-  raw_ftswarray.create();
 
 
   //

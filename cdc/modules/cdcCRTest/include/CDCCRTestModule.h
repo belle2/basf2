@@ -177,7 +177,6 @@ namespace Belle2 {
       }
 
       TTree* tree;                          /**< output tree, save info of each hit. */
-      TFile* tfile;                         /**< Output file. */
       TH1* m_hNTracks;                      /**< Number of track fitted, Convegence, not conv, not fit. */
       TH1* m_hNTracksPerEvent;              /**< Number of TrackCand per Event. */
       TH1* m_hNTracksPerEventFitted;        /**< Number of TrackCand per Event**/

@@ -248,7 +248,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
   if (nLocalMaximums == 1 or nLocalMaximums >= m_maxSplits) {
 
     // Create a shower.
-    if (!m_eclShowers) m_eclShowers.create();
     const auto aECLShower = m_eclShowers.appendNew();
 
     // Add relation to the CR.
@@ -325,11 +324,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
     }
 
     aECLShower->setEnergy(showerEnergy);
-    aECLShower->setEnedepsum(showerEnergy);
-    aECLShower->setHighestEnergy(highestEnergy);
+    aECLShower->setEnergyRaw(showerEnergy);
+    aECLShower->setEnergyHighestCrystal(highestEnergy);
     aECLShower->setTime(highestEnergyTime);
-    aECLShower->setTimeResolution(highestEnergyTimeResolution);
-    aECLShower->setNofCrystals(weightSum);
+    aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+    aECLShower->setNumberOfCrystals(weightSum);
     aECLShower->setCentralCellId(highestEnergyID);
 
     B2DEBUG(175, "theta           = " << showerposition.Theta());
@@ -560,7 +559,6 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       const int posLM = m_StoreArrPositionLM[locmaxcellid];
 
       // Create a shower
-      if (!m_eclShowers) m_eclShowers.create();
       const auto aECLShower = m_eclShowers.appendNew();
 
       // Use the same method for the estimate (3x3).
@@ -661,11 +659,11 @@ void ECLSplitterN1Module::splitConnectedRegion(ECLConnectedRegion& aCR)
       }
 
       aECLShower->setEnergy(showerEnergy);
-      aECLShower->setEnedepsum(showerEnergy);
-      aECLShower->setHighestEnergy(highestEnergy);
+      aECLShower->setEnergyRaw(showerEnergy);
+      aECLShower->setEnergyHighestCrystal(highestEnergy);
       aECLShower->setTime(highestEnergyTime);
-      aECLShower->setTimeResolution(highestEnergyTimeResolution);
-      aECLShower->setNofCrystals(weightSum);
+      aECLShower->setDeltaTime99(highestEnergyTimeResolution);
+      aECLShower->setNumberOfCrystals(weightSum);
       aECLShower->setCentralCellId(locmaxcellid);
 
       B2DEBUG(175, "new energy: " << showerEnergy);

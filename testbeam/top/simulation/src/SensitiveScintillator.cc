@@ -99,7 +99,6 @@ namespace Belle2 {
           m_meanZ /= m_energyDeposit;
 
           StoreArray<TOPTBSimHit> hits;
-          if (!hits.isValid()) hits.create();
           hits.appendNew(m_detectorID,
                          m_type,
                          channelID,

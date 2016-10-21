@@ -45,19 +45,28 @@ namespace Belle2 {
     /** get the decay string for p. */
     std::string getDecayString(const Particle& p);
 
+    /** get decay string of particle */
+    std::string getDecayStringFromParticle(const Particle* p);
+
+    /** get mc decay string from particle */
+    std::string getMCDecayStringFromParticle(const Particle* p);
+
+    /** get mc decay string from mc particle */
+    std::string getMCDecayStringFromMCParticle(const MCParticle* mcPMatched);
+
     /** search from mcP upwards for a particle that matches specified mother PDG codes. */
-    const MCParticle* getMother(const MCParticle& mcP);
+    const MCParticle* getInitialParticle(const MCParticle* mcP);
 
     /** return decay string for mcPMother, highlight mcPMatched. */
-    std::string buildDecayString(const MCParticle& mcPMother, const MCParticle& mcPMatched);
+    std::string buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched);
 
   private:
 
     std::string m_listName; /**< Name of the particle list **/
 
-    std::vector<int> m_motherPDGs; /**< List of potential mother particles **/
-
     bool m_removeFSR; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
+
+    bool m_printHashes; /**< if true, each new hash will be printed on stdout */
 
     const std::string c_ExtraInfoName = "DecayHash"; /**< Name of the extraInfo, which is stored in each Particle **/
   };

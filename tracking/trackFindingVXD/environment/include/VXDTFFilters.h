@@ -16,24 +16,23 @@
 
 #include <tracking/spacePointCreation/SpacePoint.h>
 
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
 
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Angle3DSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleXYSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/AngleRZSimple.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleDist2IP.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSlopeZoverS.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/DeltaSoverZ.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/HelixParameterFit.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/Pt.h>
-#include <tracking/trackFindingVXD/sectorMap/threeHitFilters/CircleRadius.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Angle3DSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CosAngleXY.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/AngleRZSimple.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleDist2IP.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSlopeZoverS.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/DeltaSoverZ.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/HelixParameterFit.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/Pt.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/CircleRadius.h>
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
 #include "tracking/trackFindingVXD/filterTools/ObserverPrintResults.h"
@@ -93,7 +92,7 @@ namespace Belle2 {
     /// big working example for 3-hits:
     typedef decltype(
       (0. <= Angle3DSimple<point_t>()   <= 0.).observe(VoidObserver())&&
-      (0. <= AngleXYSimple<point_t>()   <= 0.).observe(VoidObserver())&&
+      (0. <= CosAngleXY<point_t>()   <= 0.).observe(VoidObserver())&&
       (0. <= AngleRZSimple<point_t>()   <= 0.).observe(VoidObserver())&&
       (CircleDist2IP<point_t>()         <= 0.).observe(VoidObserver())&&
       (0. <= DeltaSlopeRZ<point_t>()    <= 0.).observe(VoidObserver())&&

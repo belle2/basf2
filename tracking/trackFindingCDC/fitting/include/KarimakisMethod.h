@@ -39,7 +39,8 @@ namespace Belle2 {
       { m_lineConstrained = constrained; }
 
     protected:
-      bool m_lineConstrained; ///< Memory for the flag indicating that lines should be fitted
+      /// Memory for the flag indicating that lines should be fitted
+      bool m_lineConstrained;
 
     }; //class
   } // end namespace TrackFindingCDC

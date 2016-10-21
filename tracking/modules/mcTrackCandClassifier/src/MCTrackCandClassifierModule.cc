@@ -96,7 +96,6 @@ void MCTrackCandClassifierModule::initialize()
   //  m_selector.inheritAllRelations();
   StoreArray<genfit::TrackCand> idealMCTrackCands("idealMCTrackCands");
   idealMCTrackCands.registerInDataStore();
-  idealMCTrackCands.create();
 
   StoreArray<PXDTrueHit>::required("");
   StoreArray<SVDTrueHit>::required("");

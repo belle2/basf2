@@ -32,7 +32,7 @@ namespace Belle2 {
       }
 
       /// Destructor
-      virtual ~BasePrecisionFunction() {};
+      virtual ~BasePrecisionFunction() = default;
 
       /// Returns desired deepness of the trigonometrical lookup table. Used as template parameter for the TrigonometricalLookupTable<> class.
       static constexpr int getLookupGridLevel() {return c_lookupGridLevel; };

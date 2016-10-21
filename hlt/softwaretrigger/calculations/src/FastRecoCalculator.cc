@@ -122,7 +122,7 @@ namespace Belle2 {
         calculationResult["max_pt"] = 0;
         calculationResult["max_pz"] = 0;
         calculationResult["number_of_high_energy_tracks"] = 0;
-        calculationResult["mean_theta"] = 0;
+        calculationResult["mean_abs_theta"] = 0;
       } else {
         calculationResult["max_pt"] = std::max_element(momenta.begin(), momenta.end(),
         [](const TVector3 & lhs, const TVector3 & rhs) {
@@ -139,7 +139,7 @@ namespace Belle2 {
           return momentum.Pt() > 0.2;
         });
 
-        calculationResult["mean_theta"] = std::accumulate(momenta.begin(), momenta.end(), static_cast<double>(0),
+        calculationResult["mean_abs_theta"] = std::accumulate(momenta.begin(), momenta.end(), static_cast<double>(0),
         [](const double & value, const TVector3 & momentum) {
           return value + momentum.Theta();
         }) / momenta.size();

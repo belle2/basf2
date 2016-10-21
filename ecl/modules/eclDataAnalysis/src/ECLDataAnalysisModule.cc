@@ -164,16 +164,12 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclClusterLat(0),
     m_eclClusterNofCrystals(0),
     m_eclClusterCrystalHealth(0),
-    m_eclClusterMergedPi0(0),
     m_eclClusterPx(0),
     m_eclClusterPy(0),
     m_eclClusterPz(0),
     m_eclClusterIsTrack(0),
     m_eclClusterClosestTrackDist(0),
-    m_eclClusterPi0Likel(0),
-    m_eclClusterEtaLikel(0),
     m_eclClusterDeltaL(0),
-    m_eclClusterBeta(0),
 //PureDigit
     m_eclPureDigitMultip(0),
     m_eclPureDigitIdx(0),
@@ -207,10 +203,8 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclPureClusterPy(0),
     m_eclPureClusterPz(0),
     m_eclPureClusterIsTrack(0),
-    m_eclPureClusterPi0Likel(0),
-    m_eclPureClusterEtaLikel(0),
     m_eclPureClusterDeltaL(0),
-    m_eclPureClusterBeta(0),
+
 //Shower
     m_eclShowerMultip(0),
     m_eclShowerIdx(0),
@@ -252,11 +246,9 @@ ECLDataAnalysisModule::ECLDataAnalysisModule()
     m_eclShowerMinTrkDistance(0),
     m_eclShowerTrkDepth(0),
     m_eclShowerShowerDepth(0),
-    m_eclShowerAbsZernike20(0),
     m_eclShowerAbsZernike40(0),
-    m_eclShowerAbsZernike42(0),
     m_eclShowerAbsZernike51(0),
-    m_eclShowerAbsZernike53(0),
+    m_eclShowerZernikeMVA(0),
     m_eclShowerSecondMoment(0),
     m_eclShowerE1oE9(0),
     m_eclShowerIsTrack(0),
@@ -492,17 +484,12 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclClusterLat",        "std::vector<double>",    &m_eclClusterLat);
   m_tree->Branch("eclClusterNofCrystals",   "std::vector<int>",       &m_eclClusterNofCrystals);
   m_tree->Branch("eclClusterCrystalHealth", "std::vector<int>",       &m_eclClusterCrystalHealth);
-  m_tree->Branch("eclClusterMergedPi0",  "std::vector<double>",    &m_eclClusterMergedPi0);
   m_tree->Branch("eclClusterPx",         "std::vector<double>",    &m_eclClusterPx);
   m_tree->Branch("eclClusterPy",         "std::vector<double>",    &m_eclClusterPy);
   m_tree->Branch("eclClusterPz",         "std::vector<double>",    &m_eclClusterPz);
   m_tree->Branch("eclClusterIsTrack",    "std::vector<bool>",       &m_eclClusterIsTrack);
   m_tree->Branch("eclClusterClosestTrackDist",    "std::vector<bool>",       &m_eclClusterClosestTrackDist);
-  m_tree->Branch("eclClusterPi0Likel",   "std::vector<double>",    &m_eclClusterPi0Likel);
-  m_tree->Branch("eclClusterEtaLikel",   "std::vector<double>",    &m_eclClusterEtaLikel);
   m_tree->Branch("eclClusterDeltaL",     "std::vector<double>",    &m_eclClusterDeltaL);
-  m_tree->Branch("eclClusterBeta",       "std::vector<double>",    &m_eclClusterBeta);
-
 
   if (m_doPureCsIStudy == true) {
 
@@ -536,15 +523,12 @@ void ECLDataAnalysisModule::initialize()
     m_tree->Branch("eclPureClusterLat",        "std::vector<double>",    &m_eclPureClusterLat);
     m_tree->Branch("eclPureClusterNofCrystals",   "std::vector<int>",       &m_eclPureClusterNofCrystals);
     m_tree->Branch("eclPureClusterCrystalHealth", "std::vector<int>",       &m_eclPureClusterCrystalHealth);
-    m_tree->Branch("eclPureClusterMergedPi0",  "std::vector<double>",    &m_eclPureClusterMergedPi0);
     m_tree->Branch("eclPureClusterPx",         "std::vector<double>",    &m_eclPureClusterPx);
     m_tree->Branch("eclPureClusterPy",         "std::vector<double>",    &m_eclPureClusterPy);
     m_tree->Branch("eclPureClusterPz",         "std::vector<double>",    &m_eclPureClusterPz);
     m_tree->Branch("eclPureClusterIsTrack",    "std::vector<bool>",       &m_eclPureClusterIsTrack);
-    m_tree->Branch("eclPureClusterPi0Likel",   "std::vector<double>",    &m_eclPureClusterPi0Likel);
-    m_tree->Branch("eclPureClusterEtaLikel",   "std::vector<double>",    &m_eclPureClusterEtaLikel);
     m_tree->Branch("eclPureClusterDeltaL",     "std::vector<double>",    &m_eclPureClusterDeltaL);
-    m_tree->Branch("eclPureClusterBeta",       "std::vector<double>",    &m_eclPureClusterBeta);
+
   }
 
   ///SHOWERS
@@ -589,11 +573,9 @@ void ECLDataAnalysisModule::initialize()
   m_tree->Branch("eclShowerMinTrkDistance",     "std::vector<double>",    &m_eclShowerMinTrkDistance);
   m_tree->Branch("eclShowerTrkDepth",     "std::vector<double>",    &m_eclShowerTrkDepth);
   m_tree->Branch("eclShowerShowerDepth",     "std::vector<double>",      &m_eclShowerShowerDepth);
-  m_tree->Branch("eclShowerAbsZernike20",     "std::vector<double>",    &m_eclShowerAbsZernike20);
   m_tree->Branch("eclShowerAbsZernike40",     "std::vector<double>",       &m_eclShowerAbsZernike40);
-  m_tree->Branch("eclShowerAbsZernike42",     "std::vector<double>",       &m_eclShowerAbsZernike42);
   m_tree->Branch("eclShowerAbsZernike51",     "std::vector<double>",       &m_eclShowerAbsZernike51);
-  m_tree->Branch("eclShowerAbsZernike53",     "std::vector<double>",       &m_eclShowerAbsZernike53);
+  m_tree->Branch("m_eclShowerZernikeMVA",     "std::vector<double>",       &m_eclShowerZernikeMVA);
   m_tree->Branch("eclShowerSecondMoment",     "std::vector<double>",        &m_eclShowerSecondMoment);
   m_tree->Branch("eclShowerE1oE9",     "std::vector<double>",      &m_eclShowerE1oE9);
   m_tree->Branch("eclShowerIsTrack",     "std::vector<int>",    &m_eclShowerIsTrack);
@@ -711,9 +693,8 @@ void ECLDataAnalysisModule::event()
   m_eclClusterSimHitSum->clear(); m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear(); m_eclClusterNofCrystals->clear();
   m_eclClusterCrystalHealth->clear();  m_eclClusterMergedPi0->clear(); m_eclClusterPx->clear();  m_eclClusterPy->clear();
-  m_eclClusterPz->clear();  m_eclClusterIsTrack->clear(); m_eclClusterClosestTrackDist->clear(); m_eclClusterPi0Likel->clear();
-  m_eclClusterEtaLikel->clear();
-  m_eclClusterDeltaL->clear();  m_eclClusterBeta->clear(); m_eclClusterToShower->clear();
+  m_eclClusterPz->clear();  m_eclClusterIsTrack->clear(); m_eclClusterClosestTrackDist->clear();
+  m_eclClusterDeltaL->clear(); m_eclClusterToShower->clear();
 
   ///Showers
   m_eclShowerMultip = 0; m_eclShowerIdx->clear(); m_eclShowerToMc1->clear(); m_eclShowerToMcWeight1->clear();
@@ -728,8 +709,8 @@ void ECLDataAnalysisModule::event()
   m_eclShowerHypothesisId->clear(); m_eclShowerCentralCellId->clear(); m_eclShowerEnergyError->clear();
   m_eclShowerThetaError->clear(); m_eclShowerPhiError->clear(); m_eclShowerTimeResolution->clear(); m_eclShowerHighestEnergy->clear();
   m_eclShowerLateralEnergy->clear(); m_eclShowerMinTrkDistance->clear(); m_eclShowerTrkDepth->clear();
-  m_eclShowerShowerDepth->clear(); m_eclShowerAbsZernike20->clear(); m_eclShowerAbsZernike40->clear();
-  m_eclShowerAbsZernike42->clear(); m_eclShowerAbsZernike51->clear(); m_eclShowerAbsZernike53->clear();
+  m_eclShowerShowerDepth->clear(); m_eclShowerAbsZernike40->clear();
+  m_eclShowerAbsZernike51->clear(); m_eclShowerZernikeMVA->clear();
   m_eclShowerSecondMoment->clear(); m_eclShowerE1oE9->clear(); m_eclShowerIsTrack->clear(); m_eclShowerIsCluster->clear();
   m_eclShowerMCVtxInEcl->clear();  m_eclShowerHighestE1mE2->clear();
 
@@ -749,8 +730,7 @@ void ECLDataAnalysisModule::event()
     m_eclPureClusterE9oE25->clear(); m_eclPureClusterHighestE->clear(); m_eclPureClusterLat->clear();
     m_eclPureClusterNofCrystals->clear(); m_eclPureClusterCrystalHealth->clear(); m_eclPureClusterMergedPi0->clear();
     m_eclPureClusterPx->clear(); m_eclPureClusterPy->clear(); m_eclPureClusterPz->clear(); m_eclPureClusterIsTrack->clear();
-    m_eclPureClusterPi0Likel->clear(); m_eclPureClusterEtaLikel->clear(); m_eclPureClusterDeltaL->clear();
-    m_eclPureClusterBeta->clear();
+    m_eclPureClusterDeltaL->clear();
   }
 
   ///MC
@@ -960,7 +940,7 @@ void ECLDataAnalysisModule::event()
   for (int i = 0; i < CRmultip; i++) {
     ECLConnectedRegion* aECLCR = cr[i];
     m_eclCRIdx->push_back(aECLCR->getCRId());
-    m_eclCRIsTrack->push_back(aECLCR->getIsTrack());
+    m_eclCRIsTrack->push_back(aECLCR->isTrack());
     m_eclCRLikelihoodMIPNGamma->push_back(aECLCR->getLikelihoodMIPNGamma());
     m_eclCRLikelihoodChargedHadron->push_back(aECLCR->getLikelihoodChargedHadron());
     m_eclCRLikelihoodElectronNGamma->push_back(aECLCR->getLikelihoodElectronNGamma());
@@ -1045,30 +1025,26 @@ void ECLDataAnalysisModule::event()
     ECLCluster* aECLClusters = clusters[iclusters];
     m_eclClusterIdx->push_back(iclusters);
     m_eclClusterEnergy->push_back(aECLClusters->getEnergy());
-    m_eclClusterEnergyError->push_back(aECLClusters->getErrorEnergy());
+    m_eclClusterEnergyError->push_back(aECLClusters->getUncertaintyEnergy());
     m_eclClusterTheta->push_back(aECLClusters->getTheta());
-    m_eclClusterThetaError->push_back(aECLClusters->getErrorTheta());
+    m_eclClusterThetaError->push_back(aECLClusters->getUncertaintyTheta());
     m_eclClusterPhi->push_back(aECLClusters->getPhi());
-    m_eclClusterPhiError->push_back(aECLClusters->getErrorPhi());
+    m_eclClusterPhiError->push_back(aECLClusters->getUncertaintyPhi());
     m_eclClusterR->push_back(aECLClusters->getR());
-    m_eclClusterEnergyDepSum->push_back(aECLClusters->getEnedepSum());
-    m_eclClusterTiming->push_back(aECLClusters->getTiming());
-    m_eclClusterTimingError->push_back(aECLClusters->getErrorTiming());
-    m_eclClusterE9oE25->push_back(aECLClusters->getE9oE25());
-    m_eclClusterHighestE->push_back(aECLClusters->getHighestE());
+    m_eclClusterEnergyDepSum->push_back(aECLClusters->getEnergyRaw());
+    m_eclClusterTiming->push_back(aECLClusters->getTime());
+    m_eclClusterTimingError->push_back(aECLClusters->getDeltaTime99());
+    m_eclClusterE9oE25->push_back(aECLClusters->getE9oE21());
+    m_eclClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
     m_eclClusterLat->push_back(aECLClusters->getLAT());
-    m_eclClusterNofCrystals->push_back(aECLClusters->getNofCrystals());
-    m_eclClusterCrystalHealth->push_back(aECLClusters->getCrystHealth());
-    m_eclClusterMergedPi0->push_back(aECLClusters->getMergedPi0());
+    m_eclClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
+    m_eclClusterCrystalHealth->push_back(aECLClusters->getStatus());
     m_eclClusterPx->push_back(aECLClusters->getPx());
     m_eclClusterPy->push_back(aECLClusters->getPy());
     m_eclClusterPz->push_back(aECLClusters->getPz());
-    m_eclClusterIsTrack->push_back(aECLClusters->getisTrack());
-    m_eclClusterClosestTrackDist->push_back(aECLClusters->getTemporaryMinTrkDistance());
-    m_eclClusterPi0Likel->push_back(aECLClusters->getpi0Likelihood());
-    m_eclClusterEtaLikel->push_back(aECLClusters->getetaLikelihood());
-    m_eclClusterDeltaL->push_back(aECLClusters->getdeltaL());
-    m_eclClusterBeta->push_back(aECLClusters->getbeta());
+    m_eclClusterIsTrack->push_back(aECLClusters->isTrack());
+    m_eclClusterClosestTrackDist->push_back(aECLClusters->getMinTrkDistance());
+    m_eclClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
     if (aECLClusters->getRelated<ECLShower>() != (nullptr)) {
       const ECLShower* shower_cluster = aECLClusters->getRelated<ECLShower>();
@@ -1215,29 +1191,25 @@ void ECLDataAnalysisModule::event()
       ECLCluster* aECLClusters = pure_clusters[iclusters];
       m_eclPureClusterIdx->push_back(iclusters);
       m_eclPureClusterEnergy->push_back(aECLClusters->getEnergy());
-      m_eclPureClusterEnergyError->push_back(aECLClusters->getErrorEnergy());
+      m_eclPureClusterEnergyError->push_back(aECLClusters->getUncertaintyEnergy());
       m_eclPureClusterTheta->push_back(aECLClusters->getTheta());
-      m_eclPureClusterThetaError->push_back(aECLClusters->getErrorTheta());
+      m_eclPureClusterThetaError->push_back(aECLClusters->getUncertaintyTheta());
       m_eclPureClusterPhi->push_back(aECLClusters->getPhi());
-      m_eclPureClusterPhiError->push_back(aECLClusters->getErrorPhi());
+      m_eclPureClusterPhiError->push_back(aECLClusters->getUncertaintyPhi());
       m_eclPureClusterR->push_back(aECLClusters->getR());
-      m_eclPureClusterEnergyDepSum->push_back(aECLClusters->getEnedepSum());
-      m_eclPureClusterTiming->push_back(aECLClusters->getTiming());
-      m_eclPureClusterTimingError->push_back(aECLClusters->getErrorTiming());
-      m_eclPureClusterE9oE25->push_back(aECLClusters->getE9oE25());
-      m_eclPureClusterHighestE->push_back(aECLClusters->getHighestE());
+      m_eclPureClusterEnergyDepSum->push_back(aECLClusters->getEnergyRaw());
+      m_eclPureClusterTiming->push_back(aECLClusters->getTime());
+      m_eclPureClusterTimingError->push_back(aECLClusters->getDeltaTime99());
+      m_eclPureClusterE9oE25->push_back(aECLClusters->getE9oE21());
+      m_eclPureClusterHighestE->push_back(aECLClusters->getEnergyHighestCrystal());
       m_eclPureClusterLat->push_back(aECLClusters->getLAT());
-      m_eclPureClusterNofCrystals->push_back(aECLClusters->getNofCrystals());
-      m_eclPureClusterCrystalHealth->push_back(aECLClusters->getCrystHealth());
-      m_eclPureClusterMergedPi0->push_back(aECLClusters->getMergedPi0());
+      m_eclPureClusterNofCrystals->push_back(aECLClusters->getNumberOfCrystals());
+      m_eclPureClusterCrystalHealth->push_back(aECLClusters->getStatus());
       m_eclPureClusterPx->push_back(aECLClusters->getPx());
       m_eclPureClusterPy->push_back(aECLClusters->getPy());
       m_eclPureClusterPz->push_back(aECLClusters->getPz());
-      m_eclPureClusterIsTrack->push_back(aECLClusters->getisTrack());
-      m_eclPureClusterPi0Likel->push_back(aECLClusters->getpi0Likelihood());
-      m_eclPureClusterEtaLikel->push_back(aECLClusters->getetaLikelihood());
-      m_eclPureClusterDeltaL->push_back(aECLClusters->getdeltaL());
-      m_eclPureClusterBeta->push_back(aECLClusters->getbeta());
+      m_eclPureClusterIsTrack->push_back(aECLClusters->isTrack());
+      m_eclPureClusterDeltaL->push_back(aECLClusters->getDeltaL());
 
       if (aECLClusters->getRelated<MCParticle>() != (nullptr)) {
         const MCParticle* mc_cluster = aECLClusters->getRelated<MCParticle>();
@@ -1255,27 +1227,25 @@ void ECLDataAnalysisModule::event()
     m_eclShowerTheta->push_back(aECLShowers->getTheta());
     m_eclShowerPhi->push_back(aECLShowers->getPhi());
     m_eclShowerR->push_back(aECLShowers->getR());
-    m_eclShowerNHits->push_back(aECLShowers->getNofCrystals());
-    m_eclShowerE9oE25->push_back(aECLShowers->getE9oE25());
-    m_eclShowerUncEnergy->push_back(aECLShowers->getEnedepSum());
+    m_eclShowerNHits->push_back(aECLShowers->getNumberOfCrystals());
+    m_eclShowerE9oE25->push_back(aECLShowers->getE9oE21());
+    m_eclShowerUncEnergy->push_back(aECLShowers->getEnergyRaw());
     m_eclShowerTime->push_back(aECLShowers->getTime());
     m_eclShowerConnectedRegionId->push_back(aECLShowers->getConnectedRegionId());
     m_eclShowerHypothesisId->push_back(aECLShowers->getHypothesisId());
     m_eclShowerCentralCellId->push_back(aECLShowers->getCentralCellId());
-    m_eclShowerEnergyError->push_back(aECLShowers->getEnergyError());
-    m_eclShowerThetaError->push_back(aECLShowers->getThetaError());
-    m_eclShowerPhiError->push_back(aECLShowers->getPhiError());
-    m_eclShowerTimeResolution->push_back(aECLShowers->getTimeResolution());
-    m_eclShowerHighestEnergy->push_back(aECLShowers->getHighestEnergy());
+    m_eclShowerEnergyError->push_back(aECLShowers->getUncertaintyEnergy());
+    m_eclShowerThetaError->push_back(aECLShowers->getUncertaintyTheta());
+    m_eclShowerPhiError->push_back(aECLShowers->getUncertaintyPhi());
+    m_eclShowerTimeResolution->push_back(aECLShowers->getDeltaTime99());
+    m_eclShowerHighestEnergy->push_back(aECLShowers->getEnergyHighestCrystal());
     m_eclShowerLateralEnergy->push_back(aECLShowers->getLateralEnergy());
     m_eclShowerMinTrkDistance->push_back(aECLShowers->getMinTrkDistance());
     m_eclShowerTrkDepth->push_back(aECLShowers->getTrkDepth());
     m_eclShowerShowerDepth->push_back(aECLShowers->getShowerDepth());
-    m_eclShowerAbsZernike20->push_back(aECLShowers->getAbsZernike20());
     m_eclShowerAbsZernike40->push_back(aECLShowers->getAbsZernike40());
-    m_eclShowerAbsZernike42->push_back(aECLShowers->getAbsZernike42());
     m_eclShowerAbsZernike51->push_back(aECLShowers->getAbsZernike51());
-    m_eclShowerAbsZernike53->push_back(aECLShowers->getAbsZernike53());
+    m_eclShowerZernikeMVA->push_back(aECLShowers->getZernikeMVA());
     m_eclShowerSecondMoment->push_back(aECLShowers->getSecondMoment());
     m_eclShowerE1oE9->push_back(aECLShowers->getE1oE9());
 

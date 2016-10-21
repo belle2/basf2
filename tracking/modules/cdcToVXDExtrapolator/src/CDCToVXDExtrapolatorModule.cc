@@ -839,9 +839,7 @@ void CDCToVXDExtrapolatorModule::event()
   StoreArray<MCParticle> mcParticles(m_mcParticlesColName);
   int nTracks = gfTracks.getEntries();
   StoreArray<genfit::Track> outGfTracks(m_OutGFTrackColName);
-  outGfTracks.create();
   StoreArray<genfit::TrackCand> outGfTrackCands(m_OutGFTrackCandColName);
-  outGfTrackCands.create();
   RelationArray gfTrackCandidatesTogfTracks(outGfTrackCands, outGfTracks);
   RelationArray gfTracksToMCPart(outGfTracks, mcParticles);
 

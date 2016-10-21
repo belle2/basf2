@@ -21,7 +21,7 @@ namespace Belle2 {
     class FilterBasedMatcher {
     public:
       /// Empty desctructor. Everything is handled via terminate.
-      virtual ~FilterBasedMatcher() { }
+      virtual ~FilterBasedMatcher() = default;
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")

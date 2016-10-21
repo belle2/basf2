@@ -31,6 +31,7 @@ namespace {
     EXPECT_EQ(general_options.m_signal_class, 1);
     EXPECT_EQ(general_options.m_target_variable, "isSignal");
     EXPECT_EQ(general_options.m_weight_variable, "__weight__");
+    EXPECT_EQ(general_options.m_max_events, 0u);
 
     general_options.m_method = "Method";
     general_options.m_identifier = "Weightfile";
@@ -38,6 +39,7 @@ namespace {
     general_options.m_treename = "Tree";
     general_options.m_variables = {"v", "a", "r", "s"};
     general_options.m_signal_class = 2;
+    general_options.m_max_events = 100;
     general_options.m_target_variable = "Target";
     general_options.m_weight_variable = "Weight";
 
@@ -51,6 +53,7 @@ namespace {
     EXPECT_EQ(pt.get<std::string>("target_variable"), "Target");
     EXPECT_EQ(pt.get<std::string>("weight_variable"), "Weight");
     EXPECT_EQ(pt.get<int>("signal_class"), 2);
+    EXPECT_EQ(pt.get<unsigned int>("max_events"), 100u);
     EXPECT_EQ(pt.get<unsigned int>("number_feature_variables"), 4);
     EXPECT_EQ(pt.get<std::string>("variable0"), "v");
     EXPECT_EQ(pt.get<std::string>("variable1"), "a");
@@ -71,12 +74,13 @@ namespace {
     EXPECT_EQ(general_options2.m_variables[2], "r");
     EXPECT_EQ(general_options2.m_variables[3], "s");
     EXPECT_EQ(general_options2.m_signal_class, 2);
+    EXPECT_EQ(general_options2.m_max_events, 100u);
     EXPECT_EQ(general_options2.m_target_variable, "Target");
     EXPECT_EQ(general_options2.m_weight_variable, "Weight");
 
     // Test if po::options_description is created without crashing
     auto description = general_options.getDescription();
-    EXPECT_EQ(description.options().size(), 9);
+    EXPECT_EQ(description.options().size(), 10);
   }
 
   TEST(OptionsTest, MetaOptions)

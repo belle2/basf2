@@ -21,23 +21,57 @@
 
 namespace Belle2 {
 
-
+  /**
+   * This class is used to select pairs, triplets... of objects.
+   * It is ment to be used on a large set of objects and it is
+   * designed to be as efficient as hand written code by exploiting
+   * templates. The filter structure is defined at compilation time
+   * i.e.  ( var1 > xxx && var2 < yyy ) || var1 <zzz
+   * while xxx yyy and zzz are defined at run time.
+   * The template expansion at compilation time assures short circuit
+   * evaluation etc. etc.
+   * Several other nice features are coded.
+   */
   template< typename ... typePack >
   class Filter { /* Empty: just specialized templates are interesting */
 
   };
 
+
+  /**
+   * The all_same struct is ment to check that all the types in a template
+   * pack are of the same type.
+   * If at the end the compiler end here is because the first two
+   * typese are differente: so return false.
+   */
   template< typename ... types >
   struct all_same : std::false_type {};
 
-  template< >
-  struct all_same< > : std::true_type {};
-
+  /**
+   * The all_same struct is ment to check that all the types in a template
+   * pack are of the same type.
+   * It is true if the template pack is formed by a single type.
+   */
   template<typename T >
   struct all_same< T > : std::true_type {};
 
+  /**
+   * The all_same struct is ment to check that all the types in a template
+   * pack are of the same type.
+   * It is true if the template pack is empty.
+   */
+  template< >
+  struct all_same< > : std::true_type {};
+
+  /**
+   * The all_same struct is ment to check that all the types in a template
+   * pack are of the same type.
+   * If the first two types are identical then eat the first one and check
+   * for the others.
+   */
   template<typename T, typename ... types >
   struct all_same< T, T, types ...> : all_same< T, types ...> {};
+
 
 
   /** these are just classnames to be leveraged in the template parameters pack  */

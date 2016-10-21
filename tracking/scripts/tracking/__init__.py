@@ -162,7 +162,7 @@ def add_track_finding(path, components=None, trigger_mode="all"):
 
     # CDC track finder
     if trigger_mode in ["fast_reco", "all"]:
-            add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
+        add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
     if trigger_mode in ["hlt", "all"]:
@@ -415,3 +415,85 @@ def is_pxd_used(components):
 def is_cdc_used(components):
     """Return true, if the CDC is present in the components list"""
     return components is None or 'CDC' in components
+
+
+def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeometryAdding=False):
+    """
+    This function adds the standard reconstruction modules for tracking to be used for the simulation of PXD data reduction
+    to a path.
+
+    :param path: The path to add the tracking reconstruction modules to
+    :param components: the list of geometry components in use or None for all components, always exclude the PXD.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
+    """
+
+    if not is_svd_used(components) and not is_cdc_used(components):
+        return
+
+    if not skipGeometryAdding:
+        # Add the geometry in all trigger modes if not already in the path
+        add_geometry_modules(path, components)
+
+    # Material effects
+    material_effects = register_module('SetupGenfitExtrapolation')
+    material_effects.set_name('SetupGenfitExtrapolationForPXDDataReduction')
+    path.add_module(material_effects)
+
+    # SET StoreArray names
+    svd_trackcands = '__ROIsvdGFTrackCands'
+    svd_tracks = '__ROIsvdGFTracks'
+    svd_track_fit_results = "__ROIsvdTrackFitResults"
+    svd_reco_tracks = "__ROIsvdRecoTracks"
+
+    # SVD ONLY TRACK FINDING
+    vxd_trackfinder = path.add_module('VXDTF')
+    vxd_trackfinder.set_name('SVD-only VXDTF')
+    vxd_trackfinder.param('GFTrackCandidatesColName', svd_trackcands)
+    vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
+    vxd_trackfinder.param('sectorSetup',
+                          ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
+                           'shiftedL3IssueTestSVDStd-100to400MeV_SVD',
+                           'shiftedL3IssueTestSVDStd-25to100MeV_SVD'
+                           ])
+    vxd_trackfinder.param('tuneCutoffs', 0.06)
+
+    # Convert VXD trackcands to reco tracks
+    # not in the path yet, wait for the transition to RecoTracks before
+    recoTrackCreator = register_module("RecoTrackCreator")
+    recoTrackCreator.param('trackCandidatesStoreArrayName', svd_trackcands)
+    recoTrackCreator.param('recoTracksStoreArrayName', svd_reco_tracks)
+    recoTrackCreator.param('recreateSortingParameters', True)
+    # path.add_module(recoTrackCreator)
+
+    # TRACK FITTING
+
+    # Correct time seed - needed?
+    # path.add_module("IPTrackTimeEstimator", useFittedInformation=False)
+
+    trackfitter = register_module('GenFitter')
+    trackfitter.set_name('SVD-only GenFitter')
+    trackfitter.param({"GFTracksColName": svd_tracks,
+                       "PDGCodes": [211],
+                       'GFTrackCandidatesColName': svd_trackcands})
+    path.add_module(trackfitter)
+
+    # track fitting
+    # not in the path yet, wait for the transition to RecoTracks before
+    dafRecoFitter = register_module("DAFRecoFitter")
+    dafRecoFitter.set_name("SVD-only DAFRecoFitter")
+    dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
+#    path.add_module(dafRecoFitter)
+
+    # create Belle2 Tracks from the genfit Tracks
+    # not in the path yet, wait for the transition to RecoTracks before
+    trackCreator = register_module('TrackCreator')
+    trackCreator.set_name('SVD-only TrackCreator')
+    trackCreator.param('recoTrackColName', svd_reco_tracks)
+    trackCreator.param('trackColName', svd_tracks)
+    trackCreator.param('trackFitResultColName', svd_track_fit_results)
+#    path.add_module(trackCreator)
+
+    return svd_tracks

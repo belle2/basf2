@@ -96,14 +96,7 @@ namespace Belle2 {
       typedef MCParticleByCDCSimHitMap::value_type MCParticleByCDCSimHitRelation;
 
 
-
     public:
-      /// Empty constructor
-      CDCMCMap();
-
-
-      ~CDCMCMap();
-
       /// Delete the assignement operator in order to avoid accidental copies.
       CDCMCMap& operator=(const CDCMCMap&) = delete;
 

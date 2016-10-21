@@ -1022,7 +1022,6 @@ TrgEclFAM::save(int m_nEvent)
       }
       if (noutput[iTCIdm] != ninput[iTCIdm]) {continue;}
       StoreArray<TRGECLDigi> TCDigiArray;
-      if (!TCDigiArray) TCDigiArray.create();
       TCDigiArray.appendNew();
       m_hitNum = TCDigiArray.getEntries() - 1;
       TCDigiArray[m_hitNum]->setEventId(m_nEvent);
@@ -1045,7 +1044,6 @@ TrgEclFAM::save(int m_nEvent)
     for (int iBinTime = 0; iBinTime < 80; iBinTime++) {
       if (TCEnergy[iTCIdm][iBinTime] < 0.001) {continue;}
       StoreArray<TRGECLDigi0> TCDigiArray;
-      if (!TCDigiArray) TCDigiArray.create();
       TCDigiArray.appendNew();
       m_hitNum = TCDigiArray.getEntries() - 1;
 
@@ -1090,7 +1088,6 @@ TrgEclFAM::save(int m_nEvent)
 
 
       StoreArray<TRGECLHit> TrgEclHitArray;
-      if (!TrgEclHitArray) TrgEclHitArray.create();
 
       TrgEclHitArray.appendNew();
       m_hitNum = TrgEclHitArray.getEntries() - 1;

@@ -120,7 +120,7 @@ namespace Belle2 {
       if (data.size() > 0)
         valid = true;
     }
-    PedeResult::PedeResult(string filename): data(), eigenNumbers(), valid(false), labelIndices()
+    PedeResult::PedeResult(const string& filename): data(), eigenNumbers(), valid(false), labelIndices()
     {
       read(filename);
     }

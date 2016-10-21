@@ -36,7 +36,7 @@ namespace Belle2 {
       typedef CDCRLWireHit CollectionItem;
 
       /// Empty desctructor. Everything is handled via terminate.
-      virtual ~StereoHitTrackMatcherFilter() { }
+      virtual ~StereoHitTrackMatcherFilter() = default;
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "") override;

@@ -126,15 +126,18 @@ Format: frontend electronics boardID (0-299), A [ns/sqrt(ADCcount)]
 
 (mis)alignment
 ==============
-The file contains (mis)alignment parameters w.r.t. displaced geometry (=ideal geometry currently). Misalignment params. are use in digitization; alignment ones in reconstruction.
+The file contains (mis)alignment parameters w.r.t. displaced geometry (=design+displacement geometry). Misalignment params. are used in digitization; alignment ones in reconstruction.
 
 Format: layerID (0-55), wireID (0-), shift (dx,dy,dz) of sense wire at backward end-plate [cm], (dx,dy,dz) of sense wire at forward end-plate [cm], tension [grW]
 
 * misalignment.dat: assume (dx,dy,dz)=0 and tension=50grW for all wires.
-* alignment.dat:  : = misalignment.dat.
+* alignment.dat:  : = misalignment.dat <- obsolete.
 
 * misalignment_v1.dat: assume (dx,dy,dz)=0 and measured tensions for all wires except for Layer#7 47 and Layer#8 47.
-* alignment_v1.dat:  : = misalignment_v1.dat.
+* alignment_v1.dat:  : = misalignment_v1.dat <- obsolete
+
+* misalignment_v2.dat: assume (dx,dy,dz)=0 and measured tensions for all wires = 0 
+* alignment_v2.dat:  : = misalignment_v2.dat
 
 
 tentative correction for the difference betw. old design and final design
@@ -153,4 +156,6 @@ Only apply to sense wire positions.
 
 Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at backward end-plate [cm], ibid. at forward end-plate [cm]
 
-deisplacement.dat
+* deisplacement.dat:  obsolete
+* deisplacement_v1.dat: tensions added
+

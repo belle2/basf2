@@ -59,10 +59,10 @@ namespace Belle2 {
       float m_curv;
 
       /// Memory for two dimensional arc length at each layer.
-      std::array<float, 55> m_arcLength2DByICLayer;
+      std::array<float, 56> m_arcLength2DByICLayer;
 
       /// Memory for two dimensional arc length at each layer on the second arm.
-      std::array<float, 55> m_secondaryArcLength2DByICLayer;
+      std::array<float, 56> m_secondaryArcLength2DByICLayer;
     };
 
     /// Type for discrete curv values

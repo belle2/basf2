@@ -9,13 +9,12 @@
  *******************************************************************************/
 
 #include <iostream>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZTemp.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DNormed.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/SlopeRZ.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance1DZSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance2DXYSquared.h>
-#include <tracking/trackFindingVXD/sectorMap/twoHitFilters/Distance3DSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
 
 
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
@@ -115,7 +114,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  config1.threeHitFilters = { "Angle3DSimple", "AngleXYSimple", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
+  config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.; //0.001;

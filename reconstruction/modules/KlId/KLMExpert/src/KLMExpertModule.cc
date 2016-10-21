@@ -140,12 +140,12 @@ void KLMExpertModule::event()
 
     if (!(closestECLCluster == nullptr)) {
       m_KLMECLE      = closestECLCluster -> getEnergy();
-      m_KLMECLE9oE25 = closestECLCluster -> getE9oE25();
-      m_KLMECLTerror = closestECLCluster -> getErrorTiming();
-      m_KLMECLTiming = closestECLCluster -> getTiming();
-      m_KLMECLEerror = closestECLCluster -> getErrorEnergy();
-      m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();
-      m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
+      m_KLMECLE9oE25 = closestECLCluster -> getE9oE21();
+      m_KLMECLTerror = closestECLCluster -> getDeltaTime99();
+      m_KLMECLTiming = closestECLCluster -> getTime();
+      m_KLMECLEerror = closestECLCluster -> getUncertaintyEnergy();
+      m_KLMECLdeltaL = closestECLCluster->getDeltaL();
+      m_KLMECLminTrackDist = closestECLCluster->getMinTrkDistance();
     } else {
 
       m_KLMECLdeltaL       = -999;

@@ -204,10 +204,7 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclClusterIsTrack; /**< Flag for charged clusters */
     std::vector<bool>* m_eclClusterClosestTrackDist; /**< Flag for charged clusters */
-    std::vector<double>* m_eclClusterPi0Likel; /**< Flag for pi0 */
-    std::vector<double>* m_eclClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclClusterDeltaL; /**< ??? */
-    std::vector<double>* m_eclClusterBeta; /**< ??? */
 
     int m_eclPureDigitMultip; /**< Number of ECLPureDigits per event */
     std::vector<int>* m_eclPureDigitIdx; /**< ECLPureDigit index */
@@ -241,10 +238,8 @@ namespace Belle2 {
     std::vector<double>* m_eclPureClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclPureClusterPz;  /**< Reconstructed momentum along Z */
     std::vector<bool>* m_eclPureClusterIsTrack; /**< Flag for charged clusters */
-    std::vector<double>* m_eclPureClusterPi0Likel; /**< Flag for pi0 */
-    std::vector<double>* m_eclPureClusterEtaLikel; /**< Flag for eta */
     std::vector<double>* m_eclPureClusterDeltaL; /**< ??? */
-    std::vector<double>* m_eclPureClusterBeta; /**< ??? */
+
     /*
     int m_eclGammaMultip;
     std::vector<int>* m_eclGammaIdx;
@@ -312,11 +307,9 @@ namespace Belle2 {
     std::vector<double>* m_eclShowerMinTrkDistance; /**< Shower Min Dist to Track */
     std::vector<double>* m_eclShowerTrkDepth; /**< Shower Track Depth */
     std::vector<double>* m_eclShowerShowerDepth; /**< Shower Depth */
-    std::vector<double>* m_eclShowerAbsZernike20; /**< Shower Zernike20 Moment */
     std::vector<double>* m_eclShowerAbsZernike40; /**< Shower Zernike40 Moment */
-    std::vector<double>* m_eclShowerAbsZernike42; /**< Shower Zernike42 Moment */
     std::vector<double>* m_eclShowerAbsZernike51; /**< Shower Zernike51 Moment */
-    std::vector<double>* m_eclShowerAbsZernike53; /**< Shower Zernike53 Moment */
+    std::vector<double>* m_eclShowerZernikeMVA; /**< Shower ZernikeMVA */
     std::vector<double>* m_eclShowerSecondMoment; /**< Shower Second Moment */
     std::vector<double>* m_eclShowerE1oE9; /**< Shower E1/E9 */
     std::vector<int>* m_eclShowerIsTrack; /**< Shower Track Match */

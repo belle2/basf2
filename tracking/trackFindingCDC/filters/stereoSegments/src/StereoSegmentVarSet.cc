@@ -67,7 +67,7 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
       arcLength2D += 2 * TMath::Pi() * radius;
     }
 
-    sumDistanceZReconstructed2D += abs(trajectorySZ.getZDist(arcLength2D, reconstructedPositionTo2D.z()));
+    sumDistanceZReconstructed2D += std::fabs(trajectorySZ.getZDist(arcLength2D, reconstructedPositionTo2D.z()));
     arcLength2DList.push_back(arcLength2D);
 
     const double reconstructedZ = trajectorySZ.mapSToZ(arcLength2D);

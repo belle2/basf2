@@ -30,6 +30,7 @@ namespace Belle2 {
        "target variable used to distinguish between signal and background, isSignal is used as default.")
       ("signal_class", po::value<int>(&m_signal_class), "integer which identifies signal events")
       ("weight_variable", po::value<std::string>(&m_weight_variable), "weight variable used to weight each event")
+      ("max_events", po::value<unsigned int>(&m_max_events), "maximum number of events to process, 0 means all")
       ("method", po::value<std::string>(&m_method)->required(),
        "MVA Method [FastBDT|NeuroBayes|TMVA|XGBoost|Theano|Tensorflow|FANN|SKLearn]");
       return description;
@@ -43,6 +44,7 @@ namespace Belle2 {
       m_target_variable = pt.get<std::string>("target_variable");
       m_weight_variable = pt.get<std::string>("weight_variable");
       m_signal_class = pt.get<int>("signal_class");
+      m_max_events = pt.get<unsigned int>("max_events", 0u);
 
       unsigned int numberOfFiles = pt.get<unsigned int>("number_data_files", 0);
       m_datafiles.resize(numberOfFiles);
@@ -65,6 +67,7 @@ namespace Belle2 {
       pt.put("target_variable", m_target_variable);
       pt.put("weight_variable", m_weight_variable);
       pt.put("signal_class", m_signal_class);
+      pt.put("max_events", m_max_events);
 
       pt.put("number_feature_variables", m_variables.size());
       for (unsigned int i = 0; i < m_variables.size(); ++i) {

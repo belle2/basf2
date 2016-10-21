@@ -268,10 +268,8 @@ void TFAnalizerModule::event()
   StoreArray<genfit::TrackCand> caTrackCandidates(m_PARAMcaTCname);
   // preparing storearray for trackCandidates and fitted tracks
   StoreArray<genfit::TrackCand> acceptedTrackCandidates(m_PARAMacceptedTCname);
-  acceptedTrackCandidates.create();
 
   StoreArray<genfit::TrackCand> lostTrackCandidates(m_PARAMlostTCname);
-  lostTrackCandidates.create();
 
 
   StoreArray<PXDCluster> pxdClusters;

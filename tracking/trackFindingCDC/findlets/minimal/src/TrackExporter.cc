@@ -76,22 +76,6 @@ void TrackExporter::initialize()
 /// Signal new event recreate the store array
 void TrackExporter::beginEvent()
 {
-  if (m_param_exportTracks) {
-    if (m_param_useRecoTracks) {
-      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-      if (not storedRecoTracks.isValid()) {
-        storedRecoTracks.create();
-      }
-
-      StoreArray<RecoHitInformation> storedRecoHitInformation;
-      if (not storedRecoHitInformation.isValid()) {
-        storedRecoHitInformation.create();
-      }
-    } else {
-      StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-      storedGFTrackCands.create();
-    }
-  }
   Super::beginEvent();
 }
 

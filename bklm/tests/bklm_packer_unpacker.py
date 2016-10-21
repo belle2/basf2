@@ -95,6 +95,7 @@ main.add_module(Packer)
 unPacker = register_module('BKLMUnpacker')
 unPacker.param('outputDigitsName', 'BKLMDigitsUnpacked')
 unPacker.param("useDefaultModuleId", 1)
+unPacker.param("loadMapFromDB", 0)
 main.add_module(unPacker)
 
 main.add_module(PackerUnpackerTest())

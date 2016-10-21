@@ -98,41 +98,7 @@ void VXDGeometryPar::read(const GearDir& content)
     sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
     sensor.setComponents(getSubComponents(paramsSensor));
     m_sensorMap[sensorTypeID] = sensor;
-
   }
-
-  /*
-  //Read the definition of all sensor types
-  for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
-    string sensorTypeID = paramsSensor.getString("@type");
-    VXDGeoSensor sensor(
-          paramsSensor.getString("Material"),
-          paramsSensor.getString("Color", ""),
-          paramsSensor.getLength("width") / Unit::mm,
-          paramsSensor.getLength("width2", 0) / Unit::mm,
-          paramsSensor.getLength("length") / Unit::mm,
-          paramsSensor.getLength("height") / Unit::mm,
-          paramsSensor.getBool("@slanted", false)
-    );
-    sensor.setActive(VXDGeoComponent(
-          paramsSensor.getString("Material"),
-          paramsSensor.getString("Active/Color", "#f00"),
-          paramsSensor.getLength("Active/width") / Unit::mm,
-          paramsSensor.getLength("Active/width2", 0) / Unit::mm,
-          paramsSensor.getLength("Active/length") / Unit::mm,
-          paramsSensor.getLength("Active/height") / Unit::mm
-          ), VXDGeoPlacement(
-                           "Active",
-                           paramsSensor.getLength("Active/u") / Unit::mm,
-                           paramsSensor.getLength("Active/v") / Unit::mm,
-                           paramsSensor.getString("Active/w", "center"),
-                           paramsSensor.getLength("Active/woffset", 0) / Unit::mm
-    ));
-    sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
-    sensor.setComponents(getSubComponents(paramsSensor));
-    m_sensorMap[sensorTypeID] = sensor;
-  }
-  */
 
   //Read the definition of all sensor types
   for (const GearDir& shell : content.getNodes("HalfShell")) {

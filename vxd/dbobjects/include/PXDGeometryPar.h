@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <vxd/dbobjects/PXDSensorInfoPar.h>
 #include <vxd/dbobjects/VXDGeometryPar.h>
 
 namespace Belle2 {
@@ -27,7 +28,7 @@ namespace Belle2 {
     //! Constructor using Gearbox
     explicit PXDGeometryPar(const GearDir& content) : VXDGeometryPar(content) {  }
     //! Destructor
-    ~PXDGeometryPar() {}
+    ~PXDGeometryPar();
     //! Get geometry parameters from Gearbox
     //void read(const GearDir&);
 
@@ -38,6 +39,9 @@ namespace Belle2 {
     virtual VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor);
 
   private:
+
+    /** Vector of points to SensorInfo objects */
+    std::vector<PXDSensorInfoPar*> m_SensorInfo;
 
     ClassDef(PXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

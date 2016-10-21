@@ -60,6 +60,8 @@
 
 
 #pragma link C++ class Belle2::VXDSensorInfoBasePar+;
+#pragma link C++ class Belle2::PXDSensorInfoPar+;
+#pragma link C++ class Belle2::SVDSensorInfoPar+;
 
 #pragma link C++ class Belle2::VXDGeometryPar+;
 #pragma link C++ class Belle2::PXDGeometryPar+;

@@ -40,11 +40,23 @@ TOPCAFDigitCalib::TOPCAFDigitCalib()
   , m_int_before(-1)
   , m_int_after(-1)
   , m_risetime(0)
+  , m_falltime(0)
   , m_ped_rms(0)
+  , m_ref_time(0)
   , m_ref_amp(0)
+  , m_ref_max_bin(0)
+  , m_ref_T1(0)
   , m_ref_A1(0)
+  , m_ref_A2(0)
+  , m_cross_T1(0)
   , m_cross_A1(0)
+  , m_cross_A2(0)
+  , m_max_bin(0)
 {
+  for (int i = 0; i < 3000; ++i) {
+    m_adc_values[i] = 0;
+    m_tdc_values[i] = 0;
+  }
 }
 
 TOPCAFDigitCalib::TOPCAFDigitCalib(const EventWaveformPacket* in_wp)
@@ -83,6 +95,23 @@ TOPCAFDigitCalib::TOPCAFDigitCalib(const EventWaveformPacket* in_wp)
   m_corr_time = -1;
   m_boardstack = -1; // has to be set when the top config object is available.
   m_flag = 0;
+  for (int i = 0; i < 3000; ++i) {
+    m_adc_values[i] = 0;
+    m_tdc_values[i] = 0;
+  }
+  m_cross_A1 = 0;
+  m_cross_A2 = 0;
+  m_cross_T1 = 0;
+  m_falltime = 0;
+  m_id = -1;
+  m_int_after = 0;
+  m_int_before = 0;
+  m_max_bin = 0;
+  m_ped_rms = 0;
+  m_ref_amp = 0;
+  m_ref_max_bin = 0;
+  m_ref_time = 0;
+  m_risetime = 0;
 }
 
 void TOPCAFDigitCalib::SetHitValues(topcaf_hit_t& mydigit)

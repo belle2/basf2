@@ -57,7 +57,7 @@ namespace Belle2 {
     //    void defineHisto();
 
   private:
-    double m_fraction, m_time_delay, m_rate, m_thresh, m_frac, m_thresh_n;
+    double m_fraction, m_time_delay, m_rate, m_thresh, m_frac;
     double m_crude_time, m_cf_time;
     StoreArray<TOPCAFDigit>  m_topcafdigits_ptr;
     double m_time2tdc;

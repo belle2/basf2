@@ -73,7 +73,15 @@ namespace Belle2 {
 
     // Empty constructor
     // Recommended for ROOT IO
-    TRGECLHit() {;}
+    TRGECLHit()
+    {
+      m_eventId = 0;
+      m_cellId  = 0;
+      m_edep    = 0;
+      m_TimeAve = 0;
+      m_noutput = 0;
+      m_beambkgtag = 0;
+    }
 
     //! Useful Constructor
     TRGECLHit(

@@ -293,7 +293,67 @@ namespace Belle2 {
 
     //! Empty constructor
     //! Recommended for ROOT IO
-    TRGECLHitMC() {;}
+    TRGECLHitMC()
+    {
+
+      m_eventId = 0;
+      m_cellId  = 0;
+      m_edep    = 0;
+      m_TimeAve = 0;
+      m_noutput = 0;
+
+
+      m_background_tag_1 = 0;
+      m_background_tag_2 = 0;
+      m_background_tag_3 = 0;
+      m_bkg_contribution = 0;
+      m_signal_contribution = 0;
+      m_cellId_1 = 0;
+      m_cellId_2 = 0;
+      m_cellId_3 = 0;
+      m_contribution_1 = 0;
+      m_contribution_2 = 0;
+      m_contribution_3 = 0;
+      m_energy_1 = 0;
+      m_energy_2 = 0;
+      m_energy_3 = 0;
+      m_ggggmother_1 = 0;
+      m_ggggmother_2 = 0;
+      m_ggggmother_3 = 0;
+      m_gggmother_1 = 0;
+      m_gggmother_2 = 0;
+      m_gggmother_3 = 0;
+      m_ggmother_1 = 0;
+      m_ggmother_2 = 0;
+      m_ggmother_3 = 0;
+      m_gmother_1 = 0;
+      m_gmother_2 = 0;
+      m_gmother_3 = 0;
+      m_mother_1 = 0;
+      m_mother_2 = 0;
+      m_mother_3 = 0;
+
+
+      m_momentum_x_1 = 0;
+      m_momentum_x_2 = 0;
+      m_momentum_x_3 = 0;
+      m_momentum_y_1 = 0;
+      m_momentum_y_2 = 0;
+      m_momentum_y_3 = 0;
+      m_momentum_z_1 = 0;
+      m_momentum_z_2 = 0;
+      m_momentum_z_3 = 0;
+
+      m_pdg_1 = 0;  ;
+      m_pdg_2 = 0;  ;
+      m_pdg_3 = 0;  ;
+      m_trackId_1 = 0;
+      m_trackId_2 = 0;
+      m_trackId_3 = 0;
+
+
+
+    }
 
     //! Useful Constructor
     TRGECLHitMC(

@@ -14,8 +14,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
-#include <framework/gearbox/Const.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+//#include <framework/gearbox/Const.h>
+//#include <geometry/bfieldmap/BFieldMap.h>
 
 using namespace Belle2;
 using namespace std;
@@ -44,6 +44,7 @@ double PXDSensorInfoPar::getElectronMobility(double E) const
           / (pow(1. + pow((fabs(E) / EcElec), betaElec), (1. / betaElec))));
 }
 
+/*
 const TVector3 PXDSensorInfoPar::getEField(const TVector3& point) const
 {
   // FIXME: Get rid of the gateDepth
@@ -55,7 +56,7 @@ const TVector3 PXDSensorInfoPar::getEField(const TVector3& point) const
   TVector3 E(0, 0, Ez);
   return E;
 }
-
+*/
 
 /*
 const TVector3 PXDSensorInfoPar::getBField(const TVector3& point) const
@@ -66,7 +67,7 @@ const TVector3 PXDSensorInfoPar::getBField(const TVector3& point) const
   return Unit::T * bLocal;
 }
 */
-
+/*
 const TVector3 PXDSensorInfoPar::getDriftVelocity(const TVector3& E,
                                                   const TVector3& B) const
 {
@@ -81,7 +82,7 @@ const TVector3 PXDSensorInfoPar::getDriftVelocity(const TVector3& E,
   v *= 1.0 / (1.0 + mobilityH * mobilityH * B.Mag2());
   return v;
 }
-
+*/
 /*
 const TVector3 PXDSensorInfoPar::getLorentzShift(double u, double v) const
 {

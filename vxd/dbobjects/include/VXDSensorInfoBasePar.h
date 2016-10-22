@@ -14,8 +14,8 @@
 #include <cmath>
 #include <float.h>
 
-#include <TGeoMatrix.h>
-#include <TVector3.h>
+//#include <TGeoMatrix.h>
+//#include <TVector3.h>
 
 #include <TObject.h>
 
@@ -36,6 +36,9 @@ namespace Belle2 {
       TEL = 2,  /**< Testbeam telescope sensor */
       VXD = -1, /**< Any type of VXD Sensor */
     };
+
+    //! Default constructor
+    VXDSensorInfoBasePar() {}
 
     /** Constructor for a SensorInfo instance
      *
@@ -66,6 +69,8 @@ namespace Belle2 {
       if (width2 > 0) m_deltaWidth = width2 - width;
       if (splitLength > 0) m_splitLength = splitLength / length;
     }
+
+
     /** Default constructor to make class polymorph */
     virtual ~VXDSensorInfoBasePar() {}
 
@@ -217,11 +222,13 @@ namespace Belle2 {
      * @param local point in local coordinates
      * @return true if inside active area, false otherwise
      */
+    /*
     bool inside(const TVector3& local) const
     {
       double nw = local.z() / getThickness() + 0.5;
       return inside(local.x(), local.y()) && 0 <= nw && nw <= 1;
     }
+    */
 
     /** Force a position to be inside the active area
      * @param u u coordinate to be forced inside

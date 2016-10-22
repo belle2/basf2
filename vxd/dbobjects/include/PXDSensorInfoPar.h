@@ -13,8 +13,8 @@
 #include <TObject.h>
 #include <string>
 
-#include <algorithm>
-#include <root/TVector3.h>
+//#include <algorithm>
+//#include <root/TVector3.h>
 
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
 
@@ -39,7 +39,11 @@ namespace Belle2 {
     //! Get geometry parameters from Gearbox
     //void read(const GearDir&);
 
+    //! Default constructor
+    //PXDSensorInfoPar() : VXDSensorInfoBasePar() {}
+
     /** Constructor which automatically sets the SensorType */
+
     PXDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
                      float splitLength = 0, int vCells2 = 0):
       VXDSensorInfoBasePar(PXDSensorInfoPar::PXD, id, width, length, thickness, uCells, vCells, 0, splitLength, vCells2),
@@ -50,6 +54,7 @@ namespace Belle2 {
     {
       m_hallFactor = (1.13 + 0.0008 * (m_temperature - 273));
     }
+
     /** Change the SensorID, useful to copy the SensorInfo from one sensor and use it for another */
     void setID(VxdID id) { m_id = id; }
 
@@ -148,7 +153,7 @@ namespace Belle2 {
      * @param info The SensorInfo for the current sensor.
      * @return The E field vector in local coordinates.
      */
-    const TVector3 getEField(const TVector3& point) const;
+    //const TVector3 getEField(const TVector3& point) const;
     /** Get B field value from the field map.
      * @param point Desired position in local coordinates.
      * @param info the SensorInfo for the current sensor.
@@ -166,7 +171,7 @@ namespace Belle2 {
      * @param B Magnetic field vector
      * @result drift velocity of an electron in the E+B field.
      */
-    const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
+    //const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
 
   private:
 

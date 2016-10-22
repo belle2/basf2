@@ -15,10 +15,10 @@
 #include <framework/logging/Logger.h>
 
 
-#include <framework/gearbox/Const.h>
-#include <geometry/bfieldmap/BFieldMap.h>
+//#include <framework/gearbox/Const.h>
+//#include <geometry/bfieldmap/BFieldMap.h>
 
-#include <TVector3.h>
+//#include <TVector3.h>
 #include <math.h>
 
 using namespace Belle2;
@@ -59,7 +59,7 @@ double SVDSensorInfoPar::getHoleMobility(double E) const
   return (vmHole / EcHole * 1.
           / (pow(1. + pow((fabs(E) / EcHole), betaHole), (1. / betaHole))));
 }
-
+/*
 const TVector3 SVDSensorInfoPar::getEField(const TVector3& point) const
 {
   TVector3 E(0, 0,
@@ -68,6 +68,7 @@ const TVector3 SVDSensorInfoPar::getEField(const TVector3& point) const
              - (m_biasVoltage - m_depletionVoltage) / m_thickness);
   return E;
 }
+*/
 /*
 const TVector3& SVDSensorInfoPar::getBField(const TVector3& point) const
 {

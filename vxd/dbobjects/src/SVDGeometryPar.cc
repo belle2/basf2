@@ -18,7 +18,6 @@ using namespace Belle2;
 using namespace std;
 
 
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
 
@@ -30,14 +29,16 @@ void SVDGeometryPar::read(const GearDir& content)
 
 SVDGeometryPar::~SVDGeometryPar()
 {
-  for (SVDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
-  m_SensorInfo.clear();
+  // FIXME: delete sensorInfo causes run time crashes, outcomment it for the moment
+  //for (SVDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
+  //m_SensorInfo.clear();
 }
 
 
 
 VXDSensorInfoBasePar* SVDGeometryPar::createSensorInfo(const GearDir& sensor)
 {
+
   SVDSensorInfoPar* info = new SVDSensorInfoPar(
     VxdID(0, 0, 0),
     sensor.getLength("width"),
@@ -47,6 +48,7 @@ VXDSensorInfoBasePar* SVDGeometryPar::createSensorInfo(const GearDir& sensor)
     sensor.getInt("stripsV"),
     sensor.getLength("width2", 0)
   );
+
   const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
   info->setSensorParams(
     sensor.getWithUnit("DepletionVoltage"),

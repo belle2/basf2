@@ -14,7 +14,7 @@
 #include <string>
 
 #include <vxd/dbobjects/VXDSensorInfoBasePar.h>
-#include <root/TVector3.h>
+//#include <root/TVector3.h>
 
 namespace Belle2 {
 
@@ -53,7 +53,10 @@ namespace Belle2 {
       hole = +1      /** holes */
     };
 
-    // FIXME: Consolidate with similar enums in the digitizer.
+    //! Default constructor
+    //SVDSensorInfoPar() : VXDSensorInfoBasePar() {}
+
+
     /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
      * @param id VXD ID of the sensor.
      * @width Width of the sensor.
@@ -63,6 +66,7 @@ namespace Belle2 {
      * @vCells Number of strips in v direction.
      * @width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
      */
+
     SVDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                      int uCells = 0, int vCells = 0, float width2 = 0):
       VXDSensorInfoBasePar(SVDSensorInfoPar::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
@@ -70,6 +74,7 @@ namespace Belle2 {
       m_backplaneCapacitance(0), m_interstripCapacitance(0),
       m_couplingCapacitance(0), m_electronicNoiseU(0), m_electronicNoiseV(0)
     { }
+
 
     /** Change the SensorID. Useful to copy the SensorInfo from one sensor and use it for another.
      * @param id VxdID to be assigned to current sensor.
@@ -129,7 +134,7 @@ namespace Belle2 {
      * @param point Desired position in local coordinates.
      * @return The E field vector in local coordinates.
      */
-    const TVector3 getEField(const TVector3& point) const;
+    //const TVector3 getEField(const TVector3& point) const;
 
     /** Get B field value from the field map.
      * @param point Desired position in local coordinates.

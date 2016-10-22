@@ -19,19 +19,11 @@ using namespace Belle2;
 using namespace std;
 
 
-// Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-
-/*
-void PXDGeometryPar::read(const GearDir& content)
-{
-}
-*/
-
 PXDGeometryPar::~PXDGeometryPar()
 {
-  for (PXDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
-  m_SensorInfo.clear();
+  // FIXME: delete sensorInfo causes run time crashes, outcomment it for the moment
+  //for (PXDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
+  //m_SensorInfo.clear();
 }
 
 VXDSensorInfoBasePar* PXDGeometryPar::createSensorInfo(const GearDir& sensor)
@@ -46,6 +38,7 @@ VXDSensorInfoBasePar* PXDGeometryPar::createSensorInfo(const GearDir& sensor)
     sensor.getLength("splitLength", 0),
     sensor.getInt("pixelsV[2]", 0)
   );
+
   info->setDEPFETParams(
     sensor.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
     sensor.getWithUnit("BackVoltage"),

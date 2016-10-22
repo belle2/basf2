@@ -42,7 +42,7 @@ namespace Belle2 {
     //! Constructor using Gearbox
     explicit VXDGeometryPar(const GearDir& content) { read(content); }
     //! Destructor
-    ~VXDGeometryPar() {}
+    virtual ~VXDGeometryPar() {}
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
 

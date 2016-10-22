@@ -101,6 +101,23 @@ void ClawDigitizerModule::event()
   StoreArray<ClawSimHit> SimHits;
   StoreArray<ClawHit> Hits;
 
+  int number_of_timebins = (int)((m_MaxTime - m_MinTime) / m_TimeStep);
+
+  for (int i = 0; i < 1000; i ++)
+    for (int j = 0; j < 100; j ++)
+      hitsarrayinPE[i][j] = 0;
+
+  for (const auto& SimHit : SimHits) {
+    const int detNb = SimHit.getCellId();
+    const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
+    const double tof = SimHit.getFlightTime(); //ns
+    int TimeBin = tof / m_TimeStep;
+    double MIP = Edep / m_C_keV_to_MIP;
+    double PE = MIP * m_C_MIP_to_PE;
+    if (m_MinTime < tof && tof < m_MaxTime && TimeBin < 1000 && detNb < 100)
+      hitsarrayinPE[TimeBin][detNb] += PE;
+  }
+  /*
   for (const auto& SimHit : SimHits) {
     const int detNb = SimHit.getCellId();
     //int pdg = SimHit.getPDGCode();
@@ -111,6 +128,17 @@ void ClawDigitizerModule::event()
     double PE = MIP * m_C_MIP_to_PE;
     if ((m_MinTime < tof && tof < m_MaxTime) &&  PE > m_PEthres)
       Hits.appendNew(ClawHit(detNb,  TimeBin, Edep, MIP, PE));
+  }
+  */
+  for (int i = 0; i < number_of_timebins; i ++) {
+    for (int j = 0; j < m_ScintCell; j ++) {
+      if (hitsarrayinPE[i][j] > m_PEthres) {
+        double PE = hitsarrayinPE[i][j];
+        double MIP = PE / m_C_MIP_to_PE;
+        double Edep = MIP * m_C_keV_to_MIP * 1e-6; //keV -> GeV.
+        Hits.appendNew(ClawHit(i, j, Edep, MIP, PE));
+      }
+    }
   }
 
 }

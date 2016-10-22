@@ -71,7 +71,7 @@ CDCDedxPIDModule::CDCDedxPIDModule() : Module(), m_pdfs()
   addParam("enableDebugOutput", m_enableDebugOutput,
            "Option to write out debugging information to CDCDedxTracks (DataStore objects).", false);
   addParam("pdfFile", m_pdfFile, "The dE/dx:momentum PDF file to use. Use an empty string to disable classification.",
-           std::string("/data/reconstruction/dedxPID_PDFs_r27016_500k_events.root"));
+           std::string("/data/reconstruction/dedxPID_PDFs_578edce_500k_events.root"));
   addParam("ignoreMissingParticles", m_ignoreMissingParticles, "Ignore particles for which no PDFs are found", false);
 
   m_eventID = -1;
@@ -170,34 +170,34 @@ void CDCDedxPIDModule::initialize()
 
   // load constants
   // setting these manually for now, but they should be read in from the DB
-  m_curvepars[0] = 0.00545132;
-  m_curvepars[1] = 41.6793;
-  m_curvepars[2] = 2.97269;
-  m_curvepars[3] = -0.368886;
-  m_curvepars[4] = 9.21519;
-  m_curvepars[5] = 0.104981;
-  m_curvepars[6] = -2.02984;
-  m_curvepars[7] = -0.0001284;
-  m_curvepars[8] = 0.0029632;
-  m_curvepars[9] = -0.0132804;
-  m_curvepars[10] = 0.707393;
-  m_curvepars[11] = 0.103633;
-  m_curvepars[12] = 0.811629;
-  m_curvepars[13] = 0.556386;
-  m_curvepars[14] = 0.0111639;
+  m_curvepars[0] = 0.00392444;
+  m_curvepars[1] = 26.8709;
+  m_curvepars[2] = 3.78296;
+  m_curvepars[3] = -0.534117;
+  m_curvepars[4] = 6.63276;
+  m_curvepars[5] = 0.494768;
+  m_curvepars[6] = -1.9872;
+  m_curvepars[7] = -0.000117405;
+  m_curvepars[8] = 0.00283862;
+  m_curvepars[9] = -0.0131518;
+  m_curvepars[10] = 0.706402;
+  m_curvepars[11] = 0.0803046;
+  m_curvepars[12] = 1.08118;
+  m_curvepars[13] = 0.543991;
+  m_curvepars[14] = 0.0031143;
 
-  m_sigmapars[0] = 0.0107285;
-  m_sigmapars[1] = 0.0751956;
-  m_sigmapars[2] = 1.94039e-05;
-  m_sigmapars[3] = -0.00186657;
-  m_sigmapars[4] = 0.0669173;
-  m_sigmapars[5] = -1.07031;
-  m_sigmapars[6] = 7.17788;
-  m_sigmapars[7] = 44.0723;
-  m_sigmapars[8] = -124.406;
-  m_sigmapars[9] = 127.586;
-  m_sigmapars[10] = -56.7571;
-  m_sigmapars[11] = 10.3158;
+  m_sigmapars[0] = 0.0115507;
+  m_sigmapars[1] = 0.0773491;
+  m_sigmapars[2] = 3.9199e-05;
+  m_sigmapars[3] = -0.00345398;
+  m_sigmapars[4] = 0.111907;
+  m_sigmapars[5] = -1.59311;
+  m_sigmapars[6] = 9.16672;
+  m_sigmapars[7] = 43.9322;
+  m_sigmapars[8] = -124.213;
+  m_sigmapars[9] = 127.56;
+  m_sigmapars[10] = -56.7759;
+  m_sigmapars[11] = 10.3113;
 
   // create instances here to not confuse profiling
   CDCGeometryPar::Instance();
@@ -444,7 +444,7 @@ void CDCDedxPIDModule::event()
           // save the PID information if using individual hits
           if (!m_pdfFile.empty() and m_useIndividualHits) {
             // use the momentum valid in the cdc
-            saveLogLikelihood(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
+            saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, layerDedx, m_pdfs[2]);
           }
         }
 
@@ -476,7 +476,7 @@ void CDCDedxPIDModule::event()
 
     // save the PID information if not using individual hits
     if (!m_useIndividualHits) {
-      saveLogLikelihood(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
+      saveLookupLogl(dedxTrack->m_cdcLogl, dedxTrack->m_p_cdc, dedxTrack->m_dedx_avg_truncated, m_pdfs[2]);
     }
 
     if (m_enableDebugOutput) {
@@ -547,8 +547,8 @@ void CDCDedxPIDModule::calculateMeans(double* mean, double* truncatedMean, doubl
   }
 }
 
-void CDCDedxPIDModule::saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
-                                         TH2F* const* pdf) const
+void CDCDedxPIDModule::saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx,
+                                      TH2F* const* pdf) const
 {
   //all pdfs have the same dimensions
   const Int_t binX = pdf[0]->GetXaxis()->FindFixBin(p);
@@ -681,7 +681,7 @@ void CDCDedxPIDModule::saveChiValue(double(&chi)[Const::ChargedStable::c_SetSize
 {
   // account for the fact that electron truncated mean peaks near 60 units -> scale to 1
   // this should be done via calibration
-  dedx = dedx / 59.323877;
+  dedx = dedx / 59.267;
 
   // determine a chi value for each particle type
   Const::ParticleSet set = Const::chargedStableSet;

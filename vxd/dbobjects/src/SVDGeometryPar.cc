@@ -34,6 +34,29 @@ SVDGeometryPar::~SVDGeometryPar()
   //m_SensorInfo.clear();
 }
 
+void SVDGeometryPar::createHalfShellSupport(GearDir support)
+{
+
+  for (const GearDir& rotationsolid : support.getNodes("RotationSolid")) {
+    m_halfShell.push_back(VXDRotationSolidPar(rotationsolid));
+  }
+  return;
+}
+
+
+
+
+void SVDGeometryPar::createLayerSupport(int layer, GearDir support)
+{
+
+}
+
+
+void SVDGeometryPar::createLadderSupport(int layer, GearDir support)
+{
+
+}
+
 
 
 VXDSensorInfoBasePar* SVDGeometryPar::createSensorInfo(const GearDir& sensor)

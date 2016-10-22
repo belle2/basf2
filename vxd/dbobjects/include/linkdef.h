@@ -20,8 +20,7 @@
 #pragma link C++ class Belle2::SVDEndmountPar+; // implicit
 #pragma link C++ class Belle2::SVDSupportRibsLayerPar+; // implicit
 
-#pragma link C++ class Belle2::SVDSupportPar+;
-#pragma link C++ class Belle2::SVDHalfShellPar+; // implicit
+
 
 #pragma link C++ class Belle2::VXDGlobalPar+;
 #pragma link C++ class Belle2::VXDGeoSensorPlacementPar+;
@@ -34,7 +33,7 @@
 
 #pragma link C++ class Belle2::VXDEnvelopePar+;
 
-#pragma link C++ class Belle2::PXDSupportPar+;
+
 
 
 #pragma link C++ class Belle2::SVDEndringPar+; // implicit

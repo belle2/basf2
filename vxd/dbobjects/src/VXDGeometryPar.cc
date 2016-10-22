@@ -10,6 +10,7 @@
 
 #include <vxd/dbobjects/VXDGeometryPar.h>
 #include <framework/gearbox/Gearbox.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
@@ -72,33 +73,64 @@ void VXDGeometryPar::read(const GearDir& content)
     sensor.setSlanted(paramsSensor.getBool("@slanted", false));
     sensor.setMaterial(paramsSensor.getString("Material"));
     sensor.setColor(paramsSensor.getString("Color", ""));
-    sensor.setWidth(paramsSensor.getLength("width"));
-    sensor.setWidth2(paramsSensor.getLength("width2", 0));
-    sensor.setLength(paramsSensor.getLength("length"));
-    sensor.setHeight(paramsSensor.getLength("height"));
+    sensor.setWidth(paramsSensor.getLength("width") / Unit::mm);
+    sensor.setWidth2(paramsSensor.getLength("width2", 0) / Unit::mm);
+    sensor.setLength(paramsSensor.getLength("length") / Unit::mm);
+    sensor.setHeight(paramsSensor.getLength("height") / Unit::mm);
 
     // Create a new component for active volume (from where charge is collected)
     VXDGeoComponentPar activeArea;
     activeArea.setMaterial(paramsSensor.getString("Material"));
     activeArea.setColor(paramsSensor.getString("Active/Color", "#f00"));
-    activeArea.setWidth(paramsSensor.getLength("Active/width"));
-    activeArea.setWidth2(paramsSensor.getLength("Active/width2", 0));
-    activeArea.setLength(paramsSensor.getLength("Active/length"));
-    activeArea.setHeight(paramsSensor.getLength("Active/height"));
+    activeArea.setWidth(paramsSensor.getLength("Active/width") / Unit::mm);
+    activeArea.setWidth2(paramsSensor.getLength("Active/width2", 0) / Unit::mm);
+    activeArea.setLength(paramsSensor.getLength("Active/length") / Unit::mm);
+    activeArea.setHeight(paramsSensor.getLength("Active/height") / Unit::mm);
 
     // Define where to place active volume
     VXDGeoPlacementPar activePlacement;
     activePlacement.setName("Active");
-    activePlacement.setU(paramsSensor.getLength("Active/u"));
-    activePlacement.setV(paramsSensor.getLength("Active/v"));
+    activePlacement.setU(paramsSensor.getLength("Active/u") / Unit::mm);
+    activePlacement.setV(paramsSensor.getLength("Active/v") / Unit::mm);
     activePlacement.setW(paramsSensor.getString("Active/w", "center"));
-    activePlacement.setWOffset(paramsSensor.getLength("Active/woffset", 0));
+    activePlacement.setWOffset(paramsSensor.getLength("Active/woffset", 0) / Unit::mm);
 
     sensor.setActive(activeArea, activePlacement);
     sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
     sensor.setComponents(getSubComponents(paramsSensor));
     m_sensorMap[sensorTypeID] = sensor;
   }
+
+  //Build all ladders including Sensors
+  GearDir support(content, "Support/");
+  createHalfShellSupport(support);
+
+  for (const GearDir& shell : content.getNodes("HalfShell")) {
+
+    string shellName =  shell.getString("@name");
+    B2INFO("Building " << m_prefix << " half-shell " << shellName);
+    //G4Transform3D shellAlignment = getAlignment(m_prefix + "." + shellName);
+
+    for (const GearDir& layer : shell.getNodes("Layer")) {
+      int layerID = layer.getInt("@id");
+      //setCurrentLayer(layerID);
+      //Place Layer support
+      createLayerSupport(layerID, support);
+      createLadderSupport(layerID, support);
+    }
+  }
+
+  //Create diamond radiation sensors if defined and in background mode
+  //GearDir radiationDir(content, "RadiationSensors");
+  //if (m_activeChips && radiationDir) {
+  //m_radiationsensors.create(radiationDir, topVolume, *envelope);
+  //}
+
+  //Free some space
+  //m_componentCache.clear();
+  //FIXME: delete SensorInfo instances
+  //m_sensorMap.clear();
+
 
   //Read the definition of all sensor types
   for (const GearDir& shell : content.getNodes("HalfShell")) {

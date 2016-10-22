@@ -57,7 +57,31 @@ namespace Belle2 {
      */
     virtual VXDSensorInfoBasePar* createSensorInfo(const GearDir& sensor) = 0;
 
+    /**
+     * Create support structure for VXD Half Shell, that means everything
+     * thagt does not depend on layer or sensor alignment
+     * @param support Reference to the database containing the parameters
+     */
+    virtual void createHalfShellSupport(GearDir support) = 0;
+
+    /**
+     * Create support structure for a VXD Layer
+     * @param layer Layer ID to create the support for
+     * @param support Reference to the database containing the parameters
+     */
+    virtual void createLayerSupport(int layer, GearDir support) = 0;
+
+    /**
+     * Create support structure for a VXD Ladder
+     * @param layer Layer ID to create the support for
+     * @param support Reference to the database containing the parameters
+     */
+    virtual void createLadderSupport(int layer, GearDir support) = 0;
+
   private:
+
+    /** Prefix to prepend to all volume names */
+    std::string m_prefix {""};
 
     /** Simple container for a few general parameters */
     VXDGlobalPar m_globals;

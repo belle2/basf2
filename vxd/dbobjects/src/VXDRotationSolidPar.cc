@@ -20,7 +20,7 @@ using namespace std;
 // *** This is a DIVOT ***
 void VXDRotationSolidPar::read(const GearDir& params)
 {
-  m_name = params.getString("Name", "RotationSolid");
+  m_name = params.getString("Name", "");
   m_material = params.getString("Material", "Air");
   m_color = params.getString("Color", "");
 

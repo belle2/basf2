@@ -11,6 +11,8 @@
 #include <vxd/dbobjects/VXDPolyConePar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
+
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
@@ -34,8 +36,8 @@ void VXDPolyConePar::read(const GearDir& shield)
   m_maxPhi = shield.getAngle("maxPhi", 2 * M_PI);
   m_materialName = shield.getString("Material", "Air");
   m_doCutOut = (shield.getNodes("Cutout").size() > 0);
-  m_cutOutWidth = shield.getLength("Cutout/width", 0.);
-  m_cutOutHeight = shield.getLength("Cutout/height", 0.);
+  m_cutOutWidth = shield.getLength("Cutout/width", 0.) ;
+  m_cutOutHeight = shield.getLength("Cutout/height", 0.) ;
   m_cutOutDepth = shield.getLength("Cutout/depth", 0.);
 
   const std::vector<GearDir> planes = shield.getNodes("Plane");

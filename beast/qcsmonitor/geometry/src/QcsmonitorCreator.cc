@@ -93,34 +93,38 @@ namespace Belle2 {
         double z_pos[100];
         double r_pos[100];
         int dim = 0;
-        for (double x : activeParams.getArray("x", {0})) {
-          x *= CLHEP::cm;
-          x_pos[dim] = x;
-          dim++;
-        }
-        dim = 0;
-        for (double y : activeParams.getArray("y", {0})) {
-          y *= CLHEP::cm;
-          y_pos[dim] = y;
-          dim++;
+        if (phase == 1) {
+          dim = 0;
+          for (double x : activeParams.getArray("x", {0})) {
+            x *= CLHEP::cm;
+            x_pos[dim] = x;
+            dim++;
+          }
+          dim = 0;
+          for (double y : activeParams.getArray("y", {0})) {
+            y *= CLHEP::cm;
+            y_pos[dim] = y;
+            dim++;
+          }
         }
         dim = 0;
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos[dim] = z;
+          cout << "QCSS z " << z << " zpos " << z_pos[dim] << endl;
           if (phase == 1) {
             r_pos[dim] = sqrt(x_pos[dim] * x_pos[dim] + y_pos[dim] * y_pos[dim]);
           }
           dim++;
         }
-        dim = 0;
-        for (double r : activeParams.getArray("r", {0})) {
-          r *= CLHEP::cm;
-          if (phase == 2)
-            r_pos[dim] = r + dz_scint;
-          dim++;
-        }
+        //if (phase == 1) dim = 1;
         if (phase == 2) {
+          dim = 0;
+          for (double r : activeParams.getArray("r", {0})) {
+            r *= CLHEP::cm;
+            r_pos[dim] = r + dz_scint;
+            dim++;
+          }
           for (int i = 0; i < 100; i++) {
             x_pos[i] = 0;
             y_pos[i] = 0;
@@ -133,8 +137,6 @@ namespace Belle2 {
         for (double phi : activeParams.getArray("Phi", {M_PI / 2})) {
           //phi  *= CLHEP::deg;
           for (int i = 0; i < dim; i++) {
-            cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
-                 y_pos[i] << endl;
             if (phase == 2) {
               transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
               cout << "phase 2" << endl;
@@ -143,6 +145,8 @@ namespace Belle2 {
               transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateZ3D(phi) * G4RotateX3D(thetaZ);
               cout << "phase 1" << endl;
             }
+            cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
+                 y_pos[i] << endl;
             new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data() , &topVolume, false, detID);
             cout << " Nb of detector " << detID << endl;
             detID++;

@@ -10,6 +10,8 @@
 
 #include <cdc/geometry/GeoCDCCreator.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/simulation/CDCSensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 
@@ -59,6 +61,11 @@ namespace Belle2 {
 
     GeoCDCCreator::GeoCDCCreator()
     {
+      //      std::cout << "GeoCDCCreator constructor called" << std::endl;
+      // Set job control params. before sensitivedetector and gometry construction
+      CDCSimControlPar::getInstance();
+      CDCGeoControlPar::getInstance();
+
       m_sensitive = new CDCSensitiveDetector("CDCSensitiveDetector", (2 * 24)* CLHEP::eV, 10 * CLHEP::MeV);
       m_bkgsensitive = NULL;
       logical_cdc = 0;
@@ -81,6 +88,7 @@ namespace Belle2 {
 
     void GeoCDCCreator::createGeometry(const CDCGeometry& geo, G4LogicalVolume& topVolume, geometry::GeometryTypes)
     {
+      //      std::cout << "createGeometry called" << std::endl;
       const G4double realTemperture = (273.15 + 23.) * CLHEP::kelvin;
       G4Material* medHelium = geometry::Materials::get("CDCHeGas");
       G4Material* medEthane = geometry::Materials::get("CDCEthaneGas");
@@ -121,8 +129,11 @@ namespace Belle2 {
       G4Material* cdcMedGas = cdcMed;
 
       CDCGeometryPar& cdcgp = CDCGeometryPar::Instance(&geo);
+      CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+      //      std::cout << gcp.getMaterialDefinitionMode() << std::endl;
 
-      if (cdcgp.getMaterialDefinitionMode() == 2) {
+      //      if (cdcgp.getMaterialDefinitionMode() == 2) {
+      if (gcp.getMaterialDefinitionMode() == 2) {
         double density = denHelium + denEthane;
         cdcMedGas = new G4Material("CDCRealGas", density, 2, kStateGas, realTemperture);
         cdcMedGas->AddMaterial(medHelium, denHelium / density);
@@ -525,7 +536,8 @@ namespace Belle2 {
         new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, (zfor_sensitive_middle + zback_sensitive_middle)*CLHEP::cm / 2.0), middleSensitiveTube,
                           (format("physicalSD_CDCLayer_%1%_middle") % iSLayer).str().c_str(), logical_cdc, false, iSLayer);
 
-        if (cdcgp.getMaterialDefinitionMode() == 2) {
+        //        if (cdcgp.getMaterialDefinitionMode() == 2) {
+        if (gcp.getMaterialDefinitionMode() == 2) {
           G4String sName = "sWire";
           const G4int ic = 0;
           TVector3 wb = cdcgp.wireBackwardPosition(iSLayer, ic);

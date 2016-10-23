@@ -65,7 +65,8 @@ void FlavorTaggerInfoFillerModule::event()
   if (m_FANNmlp) {
     flavorTaggerInfo -> addMethodMap("FANN");
     FlavorTaggerInfoMap* infoMapsFANN = flavorTaggerInfo -> getMethodMap("FANN");
-    float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
+    // float qrCombined = 2 * (eventExtraInfo->getExtraInfo("qrCombinedFANN") - 0.5);
+    float qrCombined = eventExtraInfo->getExtraInfo("qrCombinedFANN");
     if (qrCombined < 1.1 && qrCombined > 1.0) qrCombined = 1.0;
     if (qrCombined > - 1.1 && qrCombined < -1.0) qrCombined = -1.0;
     float B0Probability = eventExtraInfo->getExtraInfo("qrCombinedFANN");

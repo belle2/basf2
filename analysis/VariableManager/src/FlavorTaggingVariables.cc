@@ -360,7 +360,8 @@ namespace Belle2 {
     {
       const RestOfEvent* roe = particle->getRelatedTo<RestOfEvent>();
 
-      float OutputB0tagQ = -2;
+      float BtagFlavor = 0;
+      float BcpFlavor = 0;
 
       if (roe != nullptr) {
         const Particle* Bcp = roe->getRelated<Particle>();
@@ -371,28 +372,42 @@ namespace Belle2 {
         MCMatchingError &= (~MCMatching::c_MissFSR);
         MCMatchingError &= (~MCMatching::c_MissPHOTOS);
         MCMatchingError &= (~MCMatching::c_MissingResonance);
+        MCMatchingError &= (~MCMatching::c_MissGamma);
 
         if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
-            for (auto& iParticle : Y4S->getDaughters()) {
-              if (iParticle != BcpMC) {
-                if (iParticle -> getPDG() == 511 || iParticle -> getPDG() == 521) OutputB0tagQ = 1;
-                else OutputB0tagQ = 0;
-                break;
+            for (auto& iTrack : roe->getTracks()) {
+              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+              while (mcParticle != nullptr) {
+                if (mcParticle->getMother() == Y4S) {
+                  if (mcParticle == BcpMC) {
+                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
+                    else BcpFlavor = -2;
+                  } else if (BtagFlavor == 0) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
+                      else BtagFlavor = -1;
+                    } else BtagFlavor = 5;
+                  }
+                  break;
+                }
+                mcParticle = mcParticle->getMother();
               }
+              if (BcpFlavor != 0 || BtagFlavor == 5) break;
             }
           }
         }
       }
-      return OutputB0tagQ;
+      return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
     double isRestOfEventB0Flavor(const Particle*)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
 
-      float OutputB0tagQ = -2;
+      float BtagFlavor = 0;
+      float BcpFlavor = 0;
 
       if (roe.isValid()) {
         const Particle* Bcp = roe->getRelated<Particle>();
@@ -403,27 +418,40 @@ namespace Belle2 {
         MCMatchingError &= (~MCMatching::c_MissFSR);
         MCMatchingError &= (~MCMatching::c_MissPHOTOS);
         MCMatchingError &= (~MCMatching::c_MissingResonance);
+        MCMatchingError &= (~MCMatching::c_MissGamma);
 
         if (MCMatchingError == MCMatching::c_Correct) {
           const MCParticle* Y4S = BcpMC->getMother();
           if (Y4S != nullptr) {
-            for (auto& iParticle : Y4S->getDaughters()) {
-              if (iParticle != BcpMC) {
-                if (iParticle -> getPDG() == 511 || iParticle -> getPDG() == 521) OutputB0tagQ = 1;
-                else OutputB0tagQ = 0;
-                break;
+            for (auto& iTrack : roe->getTracks()) {
+              const MCParticle* mcParticle = iTrack->getRelated<MCParticle>();
+              while (mcParticle != nullptr) {
+                if (mcParticle->getMother() == Y4S) {
+                  if (mcParticle == BcpMC) {
+                    if (mcParticle -> getPDG() > 0) BcpFlavor = 2;
+                    else BcpFlavor = -2;
+                  } else if (BtagFlavor == 0) {
+                    if (TMath::Abs(mcParticle -> getPDG()) == 511) {
+                      if (mcParticle -> getPDG() > 0) BtagFlavor = 1;
+                      else BtagFlavor = -1;
+                    } else BtagFlavor = 5;
+                  }
+                  break;
+                }
+                mcParticle = mcParticle->getMother();
               }
+              if (BcpFlavor != 0 || BtagFlavor == 5) break;
             }
           }
         }
       }
-      return OutputB0tagQ;
+      return (BcpFlavor != 0) ? BcpFlavor : BtagFlavor;
     }
 
     double ancestorHasWhichFlavor(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-
+      (void)particle;
       float OutputB0tagQ = 0;
       if (roe.isValid()) {
         const MCParticle* BcpMC = roe->getRelated<Particle>()->getRelatedTo<MCParticle>();
@@ -450,7 +478,7 @@ namespace Belle2 {
     double B0mcErrors(const Particle* particle)
     {
       StoreObjPtr<RestOfEvent> roe("RestOfEvent");
-
+      (void)particle;
       int MCMatchingError = -1;
       if (roe.isValid()) {
         const Particle* Bcp = roe->getRelated<Particle>();

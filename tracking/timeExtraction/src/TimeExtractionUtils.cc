@@ -23,6 +23,8 @@
 #include <genfit/KalmanFitStatus.h>
 #include <genfit/MeasuredStateOnPlane.h>
 
+#include <numeric>
+
 namespace Belle2 {
 
   namespace {

@@ -32,7 +32,7 @@ namespace Belle2 {
     }
 
     /// Set the T0 estimation.
-    void setEventT0(const double& eventT0, const Const::EDetector& detector = Const::EDetector::invalidDetector)
+    void setEventT0(double eventT0, Const::EDetector detector = Const::EDetector::invalidDetector)
     {
       m_eventT0 = eventT0;
 
@@ -48,7 +48,6 @@ namespace Belle2 {
     /// Internal storage of the detector, who has determined the event T0.
     Const::EDetector m_detector = Const::EDetector::invalidDetector;
 
-    /// Storage element for the eventwise T0 estimation.
-    ClassDef(EventT0, 2)
+    ClassDef(EventT0, 2) /**< Storage element for the eventwise T0 estimation. */
   };
 }

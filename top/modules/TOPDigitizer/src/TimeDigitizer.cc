@@ -59,7 +59,8 @@ namespace Belle2 {
         for (Iterator it = ranges[k]; it != ranges[k + 1]; ++it) {
           if (it->first - prevTime > pileupTime) break;
           times.push_back(it->first);
-          weights.push_back(1.0); // TODO generate proper pulse height !
+          double pulseHeight = 50.0 + gRandom->Exp(70.0); // TODO: get it from ...
+          weights.push_back(pulseHeight);
           simHits.push_back(it->second);
           prevTime = it->first;
         }
@@ -85,10 +86,17 @@ namespace Belle2 {
         int TDCcount = tdc.getTDCcount(time);
         if (TDCcount == overflow) continue;
 
+        if (pulseHeight > 2000) pulseHeight = 2000;
+        double pulseWidth = gRandom->Gaus(2.3, 0.4); // TODO: get it from ...
+        if (pulseWidth < 1.0) pulseWidth = 1.0;
+        double integral = pulseHeight * pulseWidth * 2.9; // TODO: get it from ...
+
         // append new digit
         TOPDigit* digit = digits.appendNew(m_barID, m_pixelID, TDCcount);
         digit->setTime(time);
         digit->setADC(int(pulseHeight));
+        digit->setIntegral(int(integral));
+        digit->setPulseWidth(pulseWidth);
         digit->setChannel(channelMapper.getChannel(m_pixelID));
 
         // set relations to simulated hits and MC particles

@@ -50,7 +50,8 @@ TOPNominalTDC::TOPNominalTDC(int numWindows,
   m_numBits = numBits;
 
   int syncSamples = c_syncWindows * c_WindowSize;
-  m_binWidth = syncTimeBase / syncSamples / (1 << subBits);
+  m_sampleWidth = syncTimeBase / syncSamples;
+  m_binWidth = m_sampleWidth / (1 << subBits);
 }
 
 int TOPNominalTDC::getTDCcount(double time) const
@@ -60,6 +61,23 @@ int TOPNominalTDC::getTDCcount(double time) const
   if (time < 0) return overflow;
   if (time > overflow * m_binWidth) return overflow;
   return int(time / m_binWidth);
+}
+
+int TOPNominalTDC::getSample(double time) const
+{
+  time += m_offset;
+  if (time > 0) {
+    return int(time / m_sampleWidth);
+  } else {
+    return int(time / m_sampleWidth) - 1;
+  }
+}
+
+bool TOPNominalTDC::isSampleValid(int sample) const
+{
+  if (sample < 0) return false;
+  if (sample >= (int) m_numWindows * c_WindowSize) return false;
+  return true;
 }
 
 bool TOPNominalTDC::isConsistent() const

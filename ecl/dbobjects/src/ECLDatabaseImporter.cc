@@ -3,7 +3,8 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber   (ferber@physics.ubc.ca)                  *
+ *               Alon Hershehorn (hershen@phas.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,20 +15,23 @@
 #include <ecl/dbobjects/ECLDigitTimeConstants.h>
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBImportArray.h>
+#include <framework/database/DBImportObjPtr.h>
 
 // ROOT
 #include <TH1.h>
 #include <TKey.h>
 #include <string>
 #include <TClonesArray.h>
+#include <TTree.h>
+#include <TDirectory.h>
 
 
 // NAMESPACES
@@ -130,16 +134,41 @@ void ECLDatabaseImporter::importDigitTimeCalibration()
   Database::Instance().storeData(m_name, &digitCalibrationConstants, iov);
 }
 
-TGraph* ECLDatabaseImporter::getSecondMomentCorrectionTgraph(TFile* file, const std::string& graphName) const
+void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
 {
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
 
-  TGraph* graph = (TGraph*)file->Get(graphName.data());
-  if (!graph) {
-    std::string filename = file->GetName();
-    delete file;
-    B2FATAL("Could not find " << graphName << " in " << filename);
-  }
-  return graph;
+  //Open file
+  TFile* inputFile = new TFile(m_inputFileNames[0].data(), "READ");
+
+  if (!inputFile || inputFile->IsZombie())
+    B2FATAL("Could not open file " << m_inputFileNames[0]);
+
+  //Get trees
+  TTree* correctionTree = getRootObjectFromFile<TTree*>(inputFile, "ParameterNtuple");
+  TTree* helperTree = getRootObjectFromFile<TTree*>(inputFile, "ConstantNtuple");
+  B2WARNING("line = " << __LINE__);
+  //Construct DB object
+  DBImportObjPtr<ECLShowerCorrectorLeakageCorrection> dbPtr("ecl_shower_corrector_leakage_corrections");
+  B2WARNING("line = " << __LINE__);
+  TDirectory* directory = new TDirectory();
+  if (correctionTree) correctionTree->SetDirectory(directory);
+  if (helperTree) helperTree->SetDirectory(directory);
+  dbPtr.construct(directory, helperTree, correctionTree);
+  B2WARNING("line = " << __LINE__);
+
+  //Create IOV object
+  int startExp = 0;
+  int startRun = 0;
+  int endExp = -1;
+  int endRun = -1;
+  IntervalOfValidity iov(startExp, startRun, endExp, endRun);
+  B2WARNING("line = " << __LINE__);
+  //Import into local db
+  dbPtr.import(iov);
+  B2WARNING("line = " << __LINE__);
+  delete inputFile;
 
 }
 
@@ -156,19 +185,19 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
     B2FATAL("Could not open file " << m_inputFileNames[0]);
 
   //N1 theta
-  TGraph* theta_N1_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_theta_N1");
+  TGraph* theta_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N1");
   dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
 
   //N1 phi
-  TGraph* phi_N1_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_phi_N1");
+  TGraph* phi_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N1");
   dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_phiType , *phi_N1_graph);
 
   //N2 theta
-  TGraph* theta_N2_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_theta_N2");
+  TGraph* theta_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N2");
   dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
 
   //N2 phi
-  TGraph* phi_N2_graph =  getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_phi_N2");
+  TGraph* phi_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N2");
   dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_phiType , *phi_N2_graph);
 
 

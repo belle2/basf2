@@ -3,13 +3,18 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber    (ferber@physics.ubc.ca)                   *
+ *               Alon Hershenhorn (hershen@phsa.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #ifndef ECLDATABASEIMPORTER_H
 #define ECLDATABASEIMPORTER_H
 
+//framework
+#include <framework/logging/Logger.h>
+
+//Root
 #include <TObject.h>
 #include <TGraph.h>
 #include <TFile.h>
@@ -49,15 +54,30 @@ namespace Belle2 {
      */
     void importShowerShapesSecondMomentCorrections();
 
+    /**
+    * Import ECL leakage corrections to showers
+    */
+    void importShowerCorrectorLeakageCorrections();
+
   private:
 
     std::vector<std::string> m_inputFileNames; /**< Input file name */
     std::string m_name;  /**< Database object (output) file name */
 
+    //TODO update comment if this works
     /**
      * Extract a TGraph from file with graphName. The file is assumed to be valid (pointer valid and not zombie). If graphName doesn't exist in file, do B2FATAL.
      */
-    TGraph* getSecondMomentCorrectionTgraph(TFile* file, const std::string& graphName) const;
+    template <class rootClass> rootClass getRootObjectFromFile(TFile* file, const std::string& rootObjName) const
+    {
+      rootClass rootObj = (rootClass)file->Get(rootObjName.data());
+      if (!rootObj) {
+        std::string filename = file->GetName();
+        delete file;
+        B2FATAL("Could not find " << rootObjName << " in " << filename);
+      }
+      return rootObj;
+    }
 
     /**
      * 1: Initial version.

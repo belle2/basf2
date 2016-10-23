@@ -44,7 +44,8 @@ REG_MODULE(ECLShowerCorrector)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(), m_leakageCorrectionArray("ecl_leakage_corrections")
+ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
+  m_leakageCorrectionArray("ecl_shower_corrector_leakage_corrections")
 {
   // Set description
   setDescription("ECLShowerCorrectorModule: Corrects for MC truth to reconstruction differences");

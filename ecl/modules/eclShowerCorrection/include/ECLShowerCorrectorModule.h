@@ -13,12 +13,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ECLSHOWERCORRECTORMODULE_H_
-#define ECLSHOWERCORRECTORMODULE_H_
+#pragma once
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
-#include <ecl/dbobjects/ECLLeakageCorrection.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
@@ -66,7 +65,7 @@ namespace Belle2 {
       double getLeakageCorrectionUncertainty(const double theta, const double energy, const double background) const;
 
     private:
-      DBArray<ECLLeakageCorrection> m_leakageCorrectionArray;  /**< Leakage corrections from DB */
+      DBArray<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionArray;  /**< Leakage corrections from DB */
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -96,5 +95,3 @@ namespace Belle2 {
 
   } // end of ECL namespace
 } // end of Belle2 namespace
-
-#endif

@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 
 #
-# Opens a .root file and shows MCParticles,
-# SimHits and GFTracks using the Display module.
+# Opens a .root/.sroot file and shows MCParticles,
+# SimHits and Tracks using the Display module.
 # Usage:
 #  basf2 display/example/display.py -i MyInputFile.root
 #
@@ -22,13 +22,10 @@ main = create_path()
 
 # Get type of input file to decide, which input module we want to use
 input_files = Belle2.Environment.Instance().getInputFilesOverride()
-if input_files.empty():
-    rootinput = register_module('RootInput')
+if not input_files.empty() and input_files.front().endswith(".sroot"):
+    rootinput = register_module('SeqRootInput')
 else:
-    if input_files.front().endswith(".sroot"):
-        rootinput = register_module('SeqRootInput')
-    else:
-        rootinput = register_module('RootInput')
+    rootinput = register_module('RootInput')
 
 # create geometry
 gearbox = register_module('Gearbox')

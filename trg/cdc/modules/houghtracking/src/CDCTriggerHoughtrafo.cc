@@ -253,13 +253,24 @@ CDCTriggerHoughtrackingModule::connectedRegions()
       x += 2 * M_PI;
     y *= 0.5 / n;
     B2DEBUG(50, "x " << x << " y " << y);
+
+    // select 1 hit per super layer
+    vector<unsigned> selectedList = {};
+    vector<unsigned> unselectedList = {};
+    selectHits(mergedList, selectedList, unselectedList);
+
     // save track
     const CDCTriggerTrack* track =
       storeTracks.appendNew(x, 2. * y, 0.);
-    // relations
-    for (unsigned i = 0; i < mergedList.size(); ++i) {
-      unsigned its = mergedList[i];
+    // relations to selected hits
+    for (unsigned i = 0; i < selectedList.size(); ++i) {
+      unsigned its = selectedList[i];
       track->addRelationTo(tsHits[its]);
+    }
+    // relations to additional hits get a negative weight
+    for (unsigned i = 0; i < unselectedList.size(); ++i) {
+      unsigned its = unselectedList[i];
+      track->addRelationTo(tsHits[its], -1.);
     }
     // save detail information about the cluster
     const CDCTriggerHoughCluster* cluster =
@@ -391,6 +402,42 @@ CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
     if (!found) {
       merged.push_back(*it);
     }
+  }
+}
+
+/*
+ * Select one hit per super layer
+ */
+void
+CDCTriggerHoughtrackingModule::selectHits(std::vector<unsigned>& list,
+                                          std::vector<unsigned>& selected,
+                                          std::vector<unsigned>& unselected)
+{
+  StoreArray<CDCTriggerSegmentHit> tsHits;
+
+  std::vector<int> bestPerSL(5, -1);
+  for (unsigned i = 0; i < list.size(); ++i) {
+    unsigned iax = tsHits[list[i]]->getISuperLayer() / 2;
+    bool firstPriority = (tsHits[list[i]]->getPriorityPosition() == 3);
+    if (bestPerSL[iax] < 0) {
+      bestPerSL[iax] = i;
+    } else {
+      unsigned itsBest = list[bestPerSL[iax]];
+      bool firstBest = (tsHits[itsBest]->getPriorityPosition() == 3);
+      // selection rules:
+      // first priority, higher ID
+      if ((firstPriority && !firstBest) ||
+          (firstPriority == firstBest &&
+           tsHits[list[i]]->getSegmentID() > tsHits[itsBest]->getSegmentID())) {
+        bestPerSL[iax] = i;
+      }
+    }
+  }
+
+  for (unsigned i = 0; i < list.size(); ++i) {
+    unsigned iax = tsHits[list[i]]->getISuperLayer() / 2;
+    if (int(i) == bestPerSL[iax]) selected.push_back(list[i]);
+    else unselected.push_back(list[i]);
   }
 }
 
@@ -553,13 +600,24 @@ CDCTriggerHoughtrackingModule::patternClustering()
         setReturnValue(false);
         B2WARNING("id list empty");
       }
+
+      // select 1 hit per super layer
+      vector<unsigned> selectedList = {};
+      vector<unsigned> unselectedList = {};
+      selectHits(idList, selectedList, unselectedList);
+
       // save track
       const CDCTriggerTrack* track =
         storeTracks.appendNew(x, 2. * y, 0.);
-      // relations
-      for (unsigned i = 0; i < idList.size(); ++i) {
-        unsigned its = idList[i];
+      // relations to selected hits
+      for (unsigned i = 0; i < selectedList.size(); ++i) {
+        unsigned its = selectedList[i];
         track->addRelationTo(tsHits[its]);
+      }
+      // relations to additional hits get a negative weight
+      for (unsigned i = 0; i < unselectedList.size(); ++i) {
+        unsigned its = unselectedList[i];
+        track->addRelationTo(tsHits[its], -1.);
       }
       // save detail information about the cluster
       const CDCTriggerHoughCluster* cluster =

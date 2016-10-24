@@ -145,6 +145,13 @@ namespace Belle2 {
      *  @ return   index of corner within pattern */
     unsigned bottomLeftCorner(unsigned pattern);
 
+    /** Select one hit per super layer.
+     *  @param list        input list of hit Ids
+     *  @param selected    selected hit Ids are added to selected
+     *  @param unselected  the rest of the hit Ids are added to unselected */
+    void selectHits(std::vector<unsigned>& list, std::vector<unsigned>& selected,
+                    std::vector<unsigned>& unselected);
+
   protected:
 
     /** Name of the StoreArray containing the tracks found by the Hough tracking. */

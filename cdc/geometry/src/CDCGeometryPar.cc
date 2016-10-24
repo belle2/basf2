@@ -14,6 +14,8 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/simulation/CDCSimControlPar.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -174,10 +176,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_zWall[3][1] = geom.getOuterWall(0).getZfwd();
 
   // Get sense layers parameters
-  m_debug = geom.getDebugMode();
+  //  m_debug = geom.getDebugMode();
+  m_debug = CDCGeoControlPar::getInstance().getDebug();
   m_nSLayer = geom.getNSenseLayers();
 
-  m_materialDefinitionMode = geom.getMaterialDefinitionMode();
+  //  m_materialDefinitionMode = geom.getMaterialDefinitionMode();
+  m_materialDefinitionMode = CDCGeoControlPar::getInstance().getMaterialDefinitionMode();
+  //  std::cout << m_materialDefinitionMode << std::endl;
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
@@ -188,7 +193,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   }
 
   // Get mode for wire z-position
-  m_senseWireZposMode = geom.getSenseWireZposMode();
+  //  m_senseWireZposMode = geom.getSenseWireZposMode();
+  m_senseWireZposMode = CDCGeoControlPar::getInstance().getSenseWireZposMode();
   //Set z corrections (from input data)
   B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
 
@@ -311,10 +317,14 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   }
 
   // Get control params. for CDC FullSim
-  m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
-  m_minTrackLength = geom.getMinimumTrackLength();
-  m_wireSag = geom.getWireSagMode();
-  m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  //  m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
+  m_thresholdEnergyDeposit = CDCSimControlPar::getInstance().getThresholdEnergyDeposit();
+  //  m_minTrackLength = geom.getMinimumTrackLength();
+  m_minTrackLength = CDCSimControlPar::getInstance().getMinTrackLength();
+  //  m_wireSag = geom.getWireSagMode();
+  m_wireSag = CDCSimControlPar::getInstance().getWireSag();
+  //  m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  m_modLeftRightFlag = CDCSimControlPar::getInstance().getModLeftRightFlag();
   if (m_modLeftRightFlag) {
     B2FATAL("ModifiedLeftRightFlag = true is disabled for now; need to update a G4-related code in framework...");
   }

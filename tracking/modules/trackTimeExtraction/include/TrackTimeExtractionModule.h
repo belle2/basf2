@@ -3,87 +3,68 @@
  * Copyright(C) 2015-2016  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Tobias Schlüter                                          *
+ * Contributors: Tobias Schlüter, Thomas Hauth, Nils Braun                *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+#pragma once
 
-#ifndef __TRACKTIMEEXTRACTIONMODULE_H__
-#define __TRACKTIMEEXTRACTIONMODULE_H__
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
-#include <framework/core/HistoModule.h>
-
-#include <memory>
-
-#include "TH1.h"
-#include "TH2.h"
-#include "TTree.h"
-
-template <typename t>
-class TMatrixTSym;
-template <typename t>
-class TVectorT;
-
-namespace genfit {
-  class KalmanFitterInfo;
-}
+#include <framework/dataobjects/EventT0.h>
+#include <framework/core/Module.h>
 
 namespace Belle2 {
   class RecoTrack;
-  class PXDRecoHit;
-  class SVDRecoHit;
-}
 
-namespace Belle2 {
-  class TrackTimeExtractionModule : public HistoModule {
+  /**
+   * Comparable module to the FullGridTimeExtractionModule, but less well performing.
+   *
+   * Does also extract the event time from an array of reco tracks, but uses a simple iterative approach:
+   * * Try to extract the event time from the reco tracks (by building an average over the whole array) and apply
+   *   this shift to the tracks.
+   * * Refit and extract again until the maximum number of tries is reached or the
+   *   extraction has "converged", meaning the change is below 2 ns (the needed precision).
+   * * If the extraction fails, because e.g. the fit fails, randomize the next time step to try out different
+   *   starting parameters.
+   */
+  class TrackTimeExtractionModule : public Module {
   public:
-    /** Constructor, for setting module description and parameters. */
+    /// Create a new instance of the module.
     TrackTimeExtractionModule();
 
-    /** Use to clean up anything you created in the constructor. */
-    virtual ~TrackTimeExtractionModule();
+    /// Register the store arrays and store obj pointers.
+    void initialize() override;
 
-    /** Use this to initialize resources or memory your module needs.
-     *
-     *  Also register any outputs of your module (StoreArrays, RelationArrays,
-     *  StoreObjPtrs) here, see the respective class documentation for details.
-     */
-    virtual void initialize();
-
-    virtual void defineHisto();
-
-    /** Called once for each event.
-     *
-     * This is most likely where your module will actually do anything.
-     */
-    virtual void event();
+    /// Do the time extraction.
+    void event() override;
 
   private:
+    /// StoreArray name from which to read the reco tracks.
+    std::string m_param_recoTracksStoreArrayName = "__SelectedRecoTracks";
 
-    /** Collects the dimensions of the various measurements in the track.  */
-    void getMeasurementDimensions(const RecoTrack& recoTrack, std::vector<int>& vDimMeas);
-    /** Builds the full covariance matrix for the track.  */
-    bool buildFullCovarianceMatrix(const RecoTrack& recoTrack,
-                                   TMatrixTSym<double>& fullCovariance);
-    /** Builds the full covariance matrix for the track.  In the process
-     it also builds the inverse of the (block-diagonal) measurement
-     covariance matrix.  */
-    bool buildFullResidualCovarianceMatrix(const RecoTrack& recoTrack,
-                                           const std::vector<int>& vDimMeas,
-                                           const TMatrixTSym<double>& fullCovariance,
-                                           TMatrixTSym<double>& fullResidualCovariance,
-                                           TMatrixTSym<double>& inverseFullMeasurementCovariance);
-    /** Puts together the vector of residuals and their time derivatives.  */
-    void buildResidualsAndTimeDerivative(const RecoTrack& recoTrack,
-                                         const std::vector<int>& vDimMeas,
-                                         TVectorT<double>& residuals,
-                                         TVectorT<double>& residualTimeDerivative);
+    /// Module parameter: Maximal number of iterations to perform.
+    unsigned int m_param_maximalIterations = 10;
+    /// Module parameter: Minimal number of iterations to perform.
+    unsigned int m_param_minimalIterations = 1;
+    /// Module parameter: Minimal deviation between two extractions, to call the extraction as converged.
+    double m_param_minimalTimeDeviation = 2;
+    /// Module parameter: Whether to randomize the extracted time, when the fit fails.
+    bool m_param_randomizeOnError = true;
+    /// Module parameter: The maximal and minimal limit [-l, l] in which to randomize the extracted time on errors.
+    double m_param_randomizeLimits = 20;
+    /// Module parameter: Whether to replace an existing time estimation or not.
+    bool m_param_overwriteExistingEstimation = true;
+    /// Module parameter: Hard cut on this value of extracted times in the positive as well as the negative direction.
+    double m_param_maximalExtractedT0 = 20;
 
+    /// Pointer to the storage of the eventwise T0 estimation in the data store.
+    StoreObjPtr<EventT0> m_eventT0;
 
-    std::string m_recoTracksStoreArrayName; //! Column from which to read tracks.
-
-    bool m_DoHistogramming;  //! If set analysis histograms and root tree are written.
+    /// Helper function doing one step of the time extraction.
+    double extractTrackTime(StoreArray<RecoTrack>& recoTracks, const double& randomizeLimits) const;
+    /// Helper function doing all iteration steps of the time extraction.
+    double extractTrackTimeLoop(StoreArray<RecoTrack>& recoTracks) const;
   };
 }
-
-#endif

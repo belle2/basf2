@@ -11,11 +11,9 @@
 """
 
 import basf2
-from simulation import add_simulation
-from reconstruction import add_mdst_output
 from tracking import add_tracking_reconstruction
-from tracking.validation.harvesting import HarvestingModule
-from tracking.validation import refiners
+from tracking.harvest.harvesting import HarvestingModule
+from tracking.harvest.refiners import SaveTreeRefiner
 import numpy
 
 
@@ -102,7 +100,7 @@ class V0Harvester(HarvestingModule):
             }
 
     #: Store the output of the module in a root file.
-    save_tree = refiners.SaveTreeRefiner()
+    save_tree = SaveTreeRefiner()
 
 
 basf2.set_random_seed(1337)

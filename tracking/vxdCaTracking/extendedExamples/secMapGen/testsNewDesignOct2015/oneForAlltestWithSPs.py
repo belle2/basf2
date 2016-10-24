@@ -286,6 +286,10 @@ filterCalcSVDStdNew.param(param_filterCalcSVDStdNew)
 
 
 secMapBootStrap = register_module('SectorMapBootstrap')
+secMapBootStrap.param('ReadSectorMap', False)
+secMapBootStrap.param('WriteSectorMap', True)
+
+
 if newTrain:
     newSecMapTrainer = register_module('SecMapTrainerVXDTF')
     newSecMapTrainer.logging.log_level = trainerVXDTFLogLevel

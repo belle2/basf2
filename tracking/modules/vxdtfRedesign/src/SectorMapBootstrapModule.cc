@@ -49,6 +49,22 @@ SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 {
   setDescription("Create the VXDTF SectorMap for the following modules."
                 );
+
+  addParam("SectorMapsInputFile", m_sectorMapsInputFile,
+           "File from which the SectorMaps will be retrieved if\
+ ReadSectorMap is set to true", m_sectorMapsInputFile);
+
+  addParam("SectorMapsOutputFile", m_sectorMapsOutputFile,
+           "File into which the SectorMaps will be written if\
+ WriteSectorMap is set to true", m_sectorMapsOutputFile);
+
+  addParam("ReadSectorMap", m_readSectorMap, "If set to true \
+retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSectorMap);
+
+  addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
+at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
+
+
 }
 
 void
@@ -58,10 +74,10 @@ SectorMapBootstrapModule::initialize()
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
-  //Thomas : is that file used for observer only! Shouldnt it be then optional?
+  //This file is used by the observers, at present it is created by default.
   m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
   m_tfile->cd();
-  TTree* newTree = new TTree("twoHitTree", "reallyWeWantToHaveThatTTreeNow");
+  TTree* newTree = new TTree("twoHitsTree", "Observers");
 
   // take care of two-hit-filters:
 //   auto outerHit = new SpacePoint();
@@ -70,6 +86,8 @@ SectorMapBootstrapModule::initialize()
   VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
   initializeObservers(aFilter, newTree/*, outerHit, innerHit*/);
 //   ObserverCheckMCPurity::initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(), ClosedRange<double, double>());
+  if (m_readSectorMap)
+    retrieveSectorMap();
 }
 
 void
@@ -202,7 +220,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 void
 SectorMapBootstrapModule::endRun()
 {
-  persistSectorMap();
+  if (m_writeSectorMap)
+    persistSectorMap();
 }
 
 void
@@ -262,8 +281,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
 {
 
   StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName , "RECREATE");
+  TFile rootFile(m_sectorMapsOutputFile.c_str() , "RECREATE");
 
   TTree* tree = new TTree(c_setupKeyNameTTreeName.c_str(),
                           c_setupKeyNameTTreeName.c_str());
@@ -292,7 +310,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
   rootFile.Write();
   rootFile.Close();
 
-  retrieveSectorMap();
+
 }
 
 
@@ -302,8 +320,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 {
 
   StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName);
+  TFile rootFile(m_sectorMapsInputFile.c_str());
 
   TTree* tree ;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);

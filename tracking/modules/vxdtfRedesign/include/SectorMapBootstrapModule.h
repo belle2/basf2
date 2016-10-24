@@ -53,5 +53,9 @@ namespace Belle2 {
     const std::string c_setupKeyNameBranchName      = "name";
     TFile* m_tfile = nullptr;
 
+    std::string m_sectorMapsInputFile = "SectorMaps.root";
+    std::string m_sectorMapsOutputFile = "SectorMaps.root";
+    bool m_readSectorMap  = true;
+    bool m_writeSectorMap = false;
   };
 } // Belle2 namespace

@@ -155,7 +155,7 @@ double ReaderSAD::getSADParticle(MCParticleGraph& graph)
     B2DEBUG(10, "> Read particle " << m_readEntry + 1 << "/" << m_tree->GetEntries() << " with s = " << m_lostS << " cm" <<
             " and rate = " << m_lostRate << " Hz");
 
-    printf("Read particle %d / %d with s= %f [m]\n", m_readEntry + 1 , (int)m_tree->GetEntries(), m_lostS / 100.);
+    //printf("Read particle %d / %d with s= %f [m]\n", m_readEntry + 1 , (int)m_tree->GetEntries(), m_lostS / 100.);
 
     double zMom2 = m_lostE * m_lostE - m_lostPx * m_lostPx - m_lostPy * m_lostPy ;
     if (zMom2 < 0) printf("zMom2= %f is negative. Skipped!\n", zMom2);
@@ -293,9 +293,9 @@ void ReaderSAD::addParticleToMCParticles(MCParticleGraph& graph, bool gaussSmear
   particle.setStatus(MCParticle::c_PrimaryParticle);
 
   switch (m_accRing) {
-    case c_HER: particle.setPDG(-11); //electrons
+    case c_HER: particle.setPDG(11); //electrons
       break;
-    case c_LER: particle.setPDG(11); //positrons
+    case c_LER: particle.setPDG(-11); //positrons
       break;
   }
 

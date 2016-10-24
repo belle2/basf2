@@ -36,6 +36,7 @@
 #include "G4OpticalSurface.hh"
 #include "G4LogicalBorderSurface.hh"
 #include "G4LogicalSkinSurface.hh"
+#include "G4VisAttributes.hh"
 #include "G4VoxelLimits.hh"
 
 //VGM stuff
@@ -343,6 +344,12 @@ namespace Belle2 {
       gGeoManager->CloseGeometry();
       delete g4Factory.Top();
       delete rtFactory.Top();
+    }
+
+    G4VisAttributes* GeometryManager::newVisAttributes()
+    {
+      m_VisAttributes.push_back(new G4VisAttributes());
+      return m_VisAttributes.back();
     }
   }
 } //Belle2 namespace

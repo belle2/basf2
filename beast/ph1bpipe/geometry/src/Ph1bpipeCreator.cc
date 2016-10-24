@@ -26,6 +26,7 @@
 
 #include <G4LogicalVolume.hh>
 #include <G4PVPlacement.hh>
+#include <G4VisAttributes.hh>
 
 //Shapes
 #include <G4Trap.hh>

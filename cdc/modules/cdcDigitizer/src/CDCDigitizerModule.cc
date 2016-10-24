@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <cdc/modules/cdcDigitizer/CDCDigitizerModule.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
@@ -555,7 +556,10 @@ float CDCDigitizerModule::getDriftTime(const float driftLength, const bool addTo
     TVector3 backWirePos = m_cdcgp->wireBackwardPosition(m_wireID, set);
 
     double propLength = (m_posWire - backWirePos).Mag();
-    if (m_cdcgp->getSenseWireZposMode() == 1) {
+    //    if (m_cdcgp->getSenseWireZposMode() == 1) {
+    //TODO: replace the following with cached reference
+    //    std::cout << CDCGeoControlPar::getInstance().getSenseWireZposMode() << std::endl;
+    if (CDCGeoControlPar::getInstance().getSenseWireZposMode() == 1) {
       const unsigned short layer = m_wireID.getICLayer();
       propLength += m_cdcgp->getBwdDeltaZ(layer);
     }

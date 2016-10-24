@@ -8,6 +8,7 @@
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 
+#include <framework/utilities/HTML.h>
 
 
 using namespace std;
@@ -233,4 +234,31 @@ void RawCOPPER::PackDetectorBuf4DummyData(
   m_access->SetBuffer(m_buffer, m_nwords, delete_flag, m_num_events, m_num_nodes);
 
   return;
+}
+
+std::string RawCOPPER::getInfoHTML() const
+{
+  std::string s;
+  //TODO: All these methods should be const instead.
+  RawCOPPER* nonconst_this = const_cast<RawCOPPER*>(this);
+  nonconst_this->CheckVersionSetBuffer();
+
+  const int nEntries = nonconst_this->GetNumEntries();
+  s += "Entries: " + std::to_string(nEntries);
+  s += ", Total size (32bit words): " + std::to_string(m_nwords) + "<br>";
+
+  s += "COPPER version: " + std::to_string(m_version);
+
+  for (int iEntry = 0; iEntry < nEntries; ++iEntry) {
+    s += "<h4>Entry " + std::to_string(iEntry) + "</h4>";
+    for (int iFinesse = 0; iFinesse < 4; iFinesse++) {
+      const int nWords = nonconst_this->GetDetectorNwords(iEntry, iFinesse);
+      const int* buf = nonconst_this->GetDetectorBuffer(iEntry, iFinesse);
+      s += "<p>Finesse " + std::to_string(iFinesse) + ", Size: " + std::to_string(nWords) + "</p>";
+      s += HTML::getHexDump(buf, nWords);
+      s += "<br>";
+    }
+  }
+
+  return s;
 }

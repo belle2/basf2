@@ -50,8 +50,12 @@ ECLClusterInfoModule::ECLClusterInfoModule() : Module()
   m_Phi = 0;
   m_R = 0;
   m_Edep = 0;
-  m_E9oE25 = 0;
+  m_E9oE21 = 0;
   m_HE = 0;
+  m_absZernikeMoment40 = 0;
+  m_absZernikeMoment51 = 0;
+  m_zernikeMVA = 0;
+  m_secondMoment = 0;
   m_NC = 0;
   m_Err00 = 0;
   m_Err10 = 0;
@@ -104,9 +108,14 @@ void ECLClusterInfoModule::initialize()
   m_tree->Branch("Cluster_R",        &m_R,        "Cluster_R/F");
 
   m_tree->Branch("Cluster_EnedepSum",        &m_Edep,        "Cluster_EnedepSum/F");
-  m_tree->Branch("Cluster_E9oE25",        &m_E9oE25,        "Cluster_E9oE25/F");
+  m_tree->Branch("Cluster_E9oE21",        &m_E9oE21,        "Cluster_E9oE21/F");
+  m_tree->Branch("Cluster_E9oE25",        &m_E9oE21,        "Cluster_E9oE25/F"); //Kept for backwards compatibility
   m_tree->Branch("Cluster_HighestE",        &m_HE,        "Cluster_HighestE/F");
   m_tree->Branch("Cluster_NofCrystals",        &m_NC,        "Cluster_NofCrystals/I");
+  m_tree->Branch("Cluster_absZernikeMoment40",        &m_absZernikeMoment40,        "Cluster_absZernikeMoment40/F");
+  m_tree->Branch("Cluster_absZernikeMoment51",        &m_absZernikeMoment51,        "Cluster_absZernikeMoment51/F");
+  m_tree->Branch("Cluster_zernikeMVA",        &m_zernikeMVA,        "Cluster_zernikeMVA/F");
+  m_tree->Branch("Cluster_secondMoment",        &m_secondMoment,        "Cluster_secondMoment/F");
 
   m_tree->Branch("Cluster_Err00",    &m_Err00,    "Cluster_Err00/F");
   m_tree->Branch("Cluster_Err10",    &m_Err10,    "Cluster_Err10/F");
@@ -140,8 +149,13 @@ void ECLClusterInfoModule::event()
 
     // Get auxiliary values
     m_Edep = ecl->getEnergyRaw();
-    m_E9oE25 = ecl->getE9oE21();
+    m_E9oE21 = ecl->getE9oE21();
     m_HE = ecl->getEnergyHighestCrystal();
+    m_absZernikeMoment40 = ecl->getAbsZernike40();
+    m_absZernikeMoment51 = ecl->getAbsZernike51();
+    m_zernikeMVA = ecl->getZernikeMVA();
+    m_secondMoment = ecl->getSecondMoment();
+
     m_NC = ecl->getNumberOfCrystals();
 
     TMatrixFSym Err = ecl->getCovarianceMatrix3x3();

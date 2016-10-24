@@ -13,6 +13,7 @@
 
 #include <cdc/dataobjects/TDCCountTranslatorBase.h>
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
 
 #include <framework/dataobjects/EventT0.h>
 
@@ -89,6 +90,11 @@ namespace Belle2 {
        * Event timing. The event time is fetched from the data store using this pointer.
        */
       StoreObjPtr<EventT0> m_eventTimeStoreObject;
+
+      /**
+       * Cached reference to CDC GeoControlPar object.
+       */
+      const CDCGeoControlPar& m_gcp;
 
       /**
        * Cached reference to CDC GeometryPar object.

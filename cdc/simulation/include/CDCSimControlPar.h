@@ -72,7 +72,7 @@ namespace Belle2 {
       /**
        * Get wiresag flag
        */
-      bool getWireSag()
+      bool getWireSag() const
       {
         return m_wireSag;
       }
@@ -80,7 +80,7 @@ namespace Belle2 {
       /**
        * Get modified left/right flag
        */
-      bool getModLeftRightFlag()
+      bool getModLeftRightFlag() const
       {
         return m_modLeftRightFlag;
       }
@@ -88,7 +88,7 @@ namespace Belle2 {
       /**
        * Get debug flag
        */
-      bool getDebug()
+      bool getDebug() const
       {
         return m_debug;
       }
@@ -96,7 +96,7 @@ namespace Belle2 {
       /**
        * Get threshold for Energy Deposit;
        */
-      double getThresholdEnergyDeposit()
+      double getThresholdEnergyDeposit() const
       {
         return m_thresholdEnergyDeposit;
       }
@@ -104,7 +104,7 @@ namespace Belle2 {
       /**
        * Get minimum track length
        */
-      double getMinTrackLength()
+      double getMinTrackLength() const
       {
         return m_minTrackLength;
       }

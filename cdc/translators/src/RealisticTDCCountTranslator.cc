@@ -16,7 +16,7 @@ using namespace Belle2;
 using namespace CDC;
 
 RealisticTDCCountTranslator::RealisticTDCCountTranslator(bool useInWirePropagationDelay) :
-  m_useInWirePropagationDelay(useInWirePropagationDelay), m_cdcp(CDCGeometryPar::Instance()),
+  m_useInWirePropagationDelay(useInWirePropagationDelay), m_gcp(CDCGeoControlPar::getInstance()), m_cdcp(CDCGeometryPar::Instance()),
   m_tdcBinWidth(m_cdcp.getTdcBinWidth())
 {
   //  m_tdcOffset   = m_cdcp.getTdcOffset();
@@ -53,7 +53,9 @@ double RealisticTDCCountTranslator::getDriftLength(unsigned short tdcCount,
     const TVector3& backWirePos = m_cdcp.wireBackwardPosition(wireID, CDCGeometryPar::c_Aligned);
     //subtract distance divided by speed of electric signal in the wire from the drift time.
     double zb = backWirePos.Z();
-    if (m_cdcp.getSenseWireZposMode() == 1) {
+    //    if (m_cdcp.getSenseWireZposMode() == 1) {
+    //    std::cout << m_gcp.getSenseWireZposMode() << std::endl;
+    if (m_gcp.getSenseWireZposMode() == 1) {
       //      std::cout <<"layer,zb,dzb,zf,dzf= "<< layer <<" "<< zb <<" "<< m_cdcp.getBwdDeltaZ(layer) <<" "<< m_cdcp.wireForwardPosition(wireID, CDCGeometryPar::c_Aligned).Z() <<" "<< m_cdcp.getFwdDeltaZ(layer) << std::endl;
       zb -= m_cdcp.getBwdDeltaZ(layer);
     }

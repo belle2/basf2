@@ -57,7 +57,7 @@ namespace Belle2 {
       /**
        * Get debug flag
        */
-      bool getDebug()
+      bool getDebug() const
       {
         return m_debug;
       }
@@ -65,7 +65,7 @@ namespace Belle2 {
       /**
        * Get material definition mode
        */
-      double getMaterialDefinitionMode()
+      double getMaterialDefinitionMode() const
       {
         return m_materialDefinitionMode;
       }
@@ -73,7 +73,7 @@ namespace Belle2 {
       /**
        * Get sense wire z position mode
        */
-      int getSenseWireZposMode()
+      int getSenseWireZposMode() const
       {
         return m_senseWireZposMode;
       }

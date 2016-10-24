@@ -2274,6 +2274,7 @@ ECLCluster#0:
   getR(): 220.334
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#30 (weight: 0.0928174)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.284311
   getTime(): -53
@@ -2323,6 +2324,7 @@ ECLCluster#1:
   getR(): 225.1
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#30 (weight: 0.0680436)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.351319
   getTime(): -76
@@ -2372,6 +2374,7 @@ ECLCluster#2:
   getR(): 223.965
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#46 (weight: 0.0108217)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.336228
   getTime(): -51
@@ -2422,6 +2425,7 @@ ECLCluster#3:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#31 (weight: 0.166134)
     -> MCParticles#46 (weight: 0.0109213)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.506712
   getTime(): -75
@@ -2471,6 +2475,7 @@ ECLCluster#4:
   getR(): 245.128
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#19 (weight: 0.120347)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.538518
   getTime(): -63
@@ -2520,6 +2525,7 @@ ECLCluster#5:
   getR(): 185.372
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#52 (weight: 0.247133)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.84635
   getTime(): -76
@@ -2569,6 +2575,7 @@ ECLCluster#6:
   getR(): 161.014
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#4 (weight: 0.0331303)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.05687
   getTime(): -45
@@ -2619,6 +2626,7 @@ ECLCluster#7:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#4 (weight: 0.123868)
     -> MCParticles#50 (weight: 0.00679688)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.0566
   getTime(): -82
@@ -2669,6 +2677,7 @@ ECLCluster#8:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#4 (weight: 0.116682)
     -> MCParticles#50 (weight: 0.291277)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.08354
   getTime(): -82
@@ -2718,6 +2727,7 @@ ECLCluster#9:
   getR(): 159.527
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#5 (weight: 0.167469)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.0744
   getTime(): -87
@@ -2767,6 +2777,7 @@ ECLCluster#10:
   getR(): 157.714
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#25 (weight: 0.340451)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.09779
   getTime(): -79
@@ -2817,6 +2828,7 @@ ECLCluster#11:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#1 (weight: 0.00826183)
     -> MCParticles#51 (weight: 0.111971)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.09867
   getTime(): -77
@@ -2867,6 +2879,7 @@ ECLCluster#12:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#1 (weight: 0.0451899)
     -> MCParticles#51 (weight: 0.00412959)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.17215
   getTime(): -79
@@ -2918,6 +2931,7 @@ ECLCluster#13:
     -> MCParticles#14 (weight: 2.4187e-05)
     -> MCParticles#36 (weight: 0.172888)
     -> MCParticles#41 (weight: 0.00136045)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.17543
   getTime(): -81
@@ -2969,6 +2983,7 @@ ECLCluster#14:
     -> MCParticles#14 (weight: 0.144359)
     -> MCParticles#28 (weight: 0.00411981)
     -> MCParticles#41 (weight: 0.0105868)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.19435
   getTime(): -20
@@ -3018,6 +3033,7 @@ ECLCluster#15:
   getR(): 145.571
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#14 (weight: 0.374455)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.31683
   getTime(): -78
@@ -3067,6 +3083,7 @@ ECLCluster#16:
   getR(): 146.344
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#53 (weight: 0.0916231)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.29714
   getTime(): -89
@@ -3116,6 +3133,7 @@ ECLCluster#17:
   getR(): 146.386
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#53 (weight: 0.052563)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.29617
   getTime(): -80
@@ -3167,6 +3185,7 @@ ECLCluster#18:
     -> MCParticles#18 (weight: 1.19212)
     -> MCParticles#30 (weight: 7.69406e-06)
     -> MCParticles#34 (weight: 0.00061687)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.51272
   getTime(): -79
@@ -3216,6 +3235,7 @@ ECLCluster#19:
   getR(): 141.665
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0394267)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.46426
   getTime(): -69
@@ -3266,6 +3286,7 @@ ECLCluster#20:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#17 (weight: 0.0962539)
     -> MCParticles#18 (weight: 0.00109471)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50655
   getTime(): -76
@@ -3316,6 +3337,7 @@ ECLCluster#21:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#22 (weight: 0.00615804)
     -> MCParticles#24 (weight: 0.270656)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.52238
   getTime(): -81
@@ -3368,6 +3390,7 @@ ECLCluster#22:
     -> MCParticles#14 (weight: 0.000130001)
     -> MCParticles#22 (weight: 0.108766)
     -> MCParticles#24 (weight: 0.00364215)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.59531
   getTime(): -68
@@ -3417,6 +3440,7 @@ ECLCluster#23:
   getR(): 141.032
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0106145)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50967
   getTime(): -67
@@ -3466,6 +3490,7 @@ ECLCluster#24:
   getR(): 141.005
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0161694)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50965
   getTime(): -80
@@ -3515,6 +3540,7 @@ ECLCluster#25:
   getR(): 141.032
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0104101)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50967
   getTime(): -99
@@ -3565,6 +3591,7 @@ ECLCluster#26:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#30 (weight: 0.00237615)
     -> MCParticles#33 (weight: 0.250218)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.58967
   getTime(): -77
@@ -3615,6 +3642,7 @@ ECLCluster#27:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#17 (weight: 0.00217443)
     -> MCParticles#21 (weight: 0.740275)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.6297
   getTime(): -78
@@ -3664,6 +3692,7 @@ ECLCluster#28:
   getR(): 142.444
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#35 (weight: 0.198029)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.71907
   getTime(): -83
@@ -3713,6 +3742,7 @@ ECLCluster#29:
   getR(): 144.855
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#11 (weight: 0.176085)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.80461
   getTime(): -86
@@ -3762,6 +3792,7 @@ ECLCluster#30:
   getR(): 136.659
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#32 (weight: 0.069007)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.58854
   getTime(): -62
@@ -5944,6 +5975,7 @@ ECLCluster#0:
     -> MCParticles#24 (weight: 1.01285e-07)
     -> MCParticles#29 (weight: 0.0493515)
     -> MCParticles#37 (weight: 9.40516e-07)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.541638
   getTime(): -79
@@ -5993,6 +6025,7 @@ ECLCluster#1:
   getR(): 180.843
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#40 (weight: 0.125866)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.877102
   getTime(): -89
@@ -6043,6 +6076,7 @@ ECLCluster#2:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#11 (weight: 0.000108653)
     -> MCParticles#42 (weight: 0.0535503)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.822588
   getTime(): -94
@@ -6092,6 +6126,7 @@ ECLCluster#3:
   getR(): 180.188
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#42 (weight: 0.139219)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.881526
   getTime(): -78
@@ -6141,6 +6176,7 @@ ECLCluster#4:
   getR(): 181.504
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#42 (weight: 0.0473555)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.872395
   getTime(): -83
@@ -6190,6 +6226,7 @@ ECLCluster#5:
   getR(): 195.367
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#42 (weight: 0.011181)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.786595
   getTime(): -29
@@ -6239,6 +6276,7 @@ ECLCluster#6:
   getR(): 167.839
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#13 (weight: 0.370046)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.984357
   getTime(): -82
@@ -6288,6 +6326,7 @@ ECLCluster#7:
   getR(): 164.162
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#13 (weight: 0.0654646)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.02116
   getTime(): 12
@@ -6338,6 +6377,7 @@ ECLCluster#8:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#13 (weight: 0.0551774)
     -> MCParticles#27 (weight: 0.000106326)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.09631
   getTime(): 178
@@ -6388,6 +6428,7 @@ ECLCluster#9:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#13 (weight: 0.00205659)
     -> MCParticles#46 (weight: 0.294238)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.01862
   getTime(): -82
@@ -6437,6 +6478,7 @@ ECLCluster#10:
   getR(): 148.255
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#13 (weight: 0.0107285)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.25375
   getTime(): 93
@@ -6486,6 +6528,7 @@ ECLCluster#11:
   getR(): 141.598
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#25 (weight: 1.195)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.46698
   getTime(): -85
@@ -6535,6 +6578,7 @@ ECLCluster#12:
   getR(): 140.744
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#37 (weight: 0.520605)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.5464
   getTime(): -85
@@ -6584,6 +6628,7 @@ ECLCluster#13:
   getR(): 141.015
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#47 (weight: 0.178596)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50683
   getTime(): -81
@@ -6633,6 +6678,7 @@ ECLCluster#14:
   getR(): 141.603
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#8 (weight: 0.199441)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.46604
   getTime(): -86
@@ -6686,6 +6732,7 @@ ECLCluster#15:
     -> MCParticles#19 (weight: 0.00411981)
     -> MCParticles#32 (weight: 0.0196654)
     -> MCParticles#35 (weight: 0.0362983)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.81074
   getTime(): -1
@@ -6737,6 +6784,7 @@ ECLCluster#16:
     -> MCParticles#6 (weight: 0.334701)
     -> MCParticles#11 (weight: 9.9709e-07)
     -> MCParticles#35 (weight: 0.000369058)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.87158
   getTime(): -93
@@ -6786,6 +6834,7 @@ ECLCluster#17:
   getR(): 143.537
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#26 (weight: 0.0438191)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.76213
   getTime(): -93
@@ -6835,6 +6884,7 @@ ECLCluster#18:
   getR(): 160.179
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#39 (weight: 0.0501701)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.3673
   getTime(): -77
@@ -6885,6 +6935,7 @@ ECLCluster#19:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#5 (weight: 0.107129)
     -> MCParticles#13 (weight: 5.575e-05)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.34075
   getTime(): -72
@@ -10178,6 +10229,7 @@ ECLCluster#0:
   getR(): 226.311
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#44 (weight: 0.276349)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.366491
   getTime(): -72
@@ -10227,6 +10279,7 @@ ECLCluster#1:
   getR(): 221.093
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 0.0150806)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.669266
   getTime(): -36
@@ -10276,6 +10329,7 @@ ECLCluster#2:
   getR(): 161.356
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#80 (weight: 0.386405)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.05264
   getTime(): -82
@@ -10325,6 +10379,7 @@ ECLCluster#3:
   getR(): 163.971
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#25 (weight: 0.108543)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.02359
   getTime(): -75
@@ -10374,6 +10429,7 @@ ECLCluster#4:
   getR(): 155.134
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#56 (weight: 0.177029)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.13334
   getTime(): -81
@@ -10423,6 +10479,7 @@ ECLCluster#5:
   getR(): 148.319
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#79 (weight: 0.052681)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.25239
   getTime(): -78
@@ -10474,6 +10531,7 @@ ECLCluster#6:
     -> MCParticles#5 (weight: 0.0337213)
     -> MCParticles#16 (weight: 5.3351e-07)
     -> MCParticles#37 (weight: 0.0317563)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.29941
   getTime(): 148
@@ -10527,6 +10585,7 @@ ECLCluster#7:
     -> MCParticles#16 (weight: 6.85946e-06)
     -> MCParticles#37 (weight: 0.0010945)
     -> MCParticles#63 (weight: 0.000910185)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.42189
   getTime(): -82
@@ -10578,6 +10637,7 @@ ECLCluster#8:
     -> MCParticles#5 (weight: 0.00570168)
     -> MCParticles#20 (weight: 4.42608e-08)
     -> MCParticles#27 (weight: 0.186947)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.25244
   getTime(): -86
@@ -10627,6 +10687,7 @@ ECLCluster#9:
   getR(): 146.393
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#33 (weight: 0.137503)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.29631
   getTime(): -80
@@ -10676,6 +10737,7 @@ ECLCluster#10:
   getR(): 141.643
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#81 (weight: 0.0932545)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.46556
   getTime(): -87
@@ -10725,6 +10787,7 @@ ECLCluster#11:
   getR(): 140.693
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#4 (weight: 0.135162)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.59535
   getTime(): -87
@@ -10774,6 +10837,7 @@ ECLCluster#12:
   getR(): 140.9
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#4 (weight: 0.175457)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.62666
   getTime(): -82
@@ -10823,6 +10887,7 @@ ECLCluster#13:
   getR(): 142.228
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0336126)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.70889
   getTime(): -131
@@ -10874,6 +10939,7 @@ ECLCluster#14:
     -> MCParticles#4 (weight: 0.000529796)
     -> MCParticles#49 (weight: 0.0335344)
     -> MCParticles#78 (weight: 0.00343999)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.72682
   getTime(): -77
@@ -10923,6 +10989,7 @@ ECLCluster#15:
   getR(): 147.694
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#26 (weight: 0.09854)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.87594
   getTime(): -85
@@ -10972,6 +11039,7 @@ ECLCluster#16:
   getR(): 140.67
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#41 (weight: 0.0870655)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.53982
   getTime(): -65
@@ -13955,6 +14023,7 @@ ECLCluster#0:
   getR(): 221.99
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#24 (weight: 0.224523)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.310277
   getTime(): -77
@@ -14004,6 +14073,7 @@ ECLCluster#1:
   getR(): 222.003
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#28 (weight: 0.0140082)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.310498
   getTime(): -21
@@ -14053,6 +14123,7 @@ ECLCluster#2:
   getR(): 222.305
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#26 (weight: 0.0832059)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.314592
   getTime(): -80
@@ -14102,6 +14173,7 @@ ECLCluster#3:
   getR(): 229.052
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#28 (weight: 0.211023)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.398144
   getTime(): -64
@@ -14151,6 +14223,7 @@ ECLCluster#4:
   getR(): 245.155
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#17 (weight: 0.582466)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.539176
   getTime(): -74
@@ -14200,6 +14273,7 @@ ECLCluster#5:
   getR(): 226.78
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#27 (weight: 0.71966)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.648206
   getTime(): -76
@@ -14249,6 +14323,7 @@ ECLCluster#6:
   getR(): 227.532
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#18 (weight: 0.756231)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.645539
   getTime(): -77
@@ -14298,6 +14373,7 @@ ECLCluster#7:
   getR(): 208.548
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#21 (weight: 0.0308612)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.720852
   getTime(): -104
@@ -14347,6 +14423,7 @@ ECLCluster#8:
   getR(): 201.633
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#21 (weight: 1.02809)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.753855
   getTime(): -78
@@ -14396,6 +14473,7 @@ ECLCluster#9:
   getR(): 175.914
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#35 (weight: 0.150419)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.913892
   getTime(): -72
@@ -14445,6 +14523,7 @@ ECLCluster#10:
   getR(): 171.035
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#22 (weight: 0.328071)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.954896
   getTime(): -81
@@ -14494,6 +14573,7 @@ ECLCluster#11:
   getR(): 160.716
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#31 (weight: 0.120025)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.06026
   getTime(): -77
@@ -14544,6 +14624,7 @@ ECLCluster#12:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#47 (weight: 0.00496008)
     -> MCParticles#55 (weight: 0.205706)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.21664
   getTime(): -87
@@ -14593,6 +14674,7 @@ ECLCluster#13:
   getR(): 152.457
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#33 (weight: 0.15406)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.17381
   getTime(): -90
@@ -14643,6 +14725,7 @@ ECLCluster#14:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#33 (weight: 0.209354)
     -> MCParticles#46 (weight: 0.00690248)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.18094
   getTime(): -81
@@ -14692,6 +14775,7 @@ ECLCluster#15:
   getR(): 150.1
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#48 (weight: 0.127961)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.21681
   getTime(): -88
@@ -14741,6 +14825,7 @@ ECLCluster#16:
   getR(): 143.568
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.012608)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.3795
   getTime(): -84
@@ -14790,6 +14875,7 @@ ECLCluster#17:
   getR(): 143.153
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#34 (weight: 0.0317522)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.39475
   getTime(): -22
@@ -14840,6 +14926,7 @@ ECLCluster#18:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#46 (weight: 0.00745226)
     -> MCParticles#50 (weight: 0.152645)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.47013
   getTime(): -65
@@ -14889,6 +14976,7 @@ ECLCluster#19:
   getR(): 140.696
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#46 (weight: 0.140826)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.55057
   getTime(): -77
@@ -14940,6 +15028,7 @@ ECLCluster#20:
     -> MCParticles#13 (weight: 0.0809121)
     -> MCParticles#30 (weight: 0.0304718)
     -> MCParticles#46 (weight: 6.26113e-05)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.55089
   getTime(): -93
@@ -14990,6 +15079,7 @@ ECLCluster#21:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#13 (weight: 0.0134285)
     -> MCParticles#46 (weight: 0.0483995)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.55786
   getTime(): -39
@@ -15042,6 +15132,7 @@ ECLCluster#22:
     -> MCParticles#46 (weight: 4.56141e-06)
     -> MCParticles#60 (weight: 0.00411983)
     -> MCParticles#70 (weight: 0.043388)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.47817
   getTime(): 156
@@ -15091,6 +15182,7 @@ ECLCluster#23:
   getR(): 140.901
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#32 (weight: 0.146068)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.63198
   getTime(): -83
@@ -15140,6 +15232,7 @@ ECLCluster#24:
   getR(): 143.05
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#49 (weight: 0.473651)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.74356
   getTime(): -81
@@ -15189,6 +15282,7 @@ ECLCluster#25:
   getR(): 143.533
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#56 (weight: 0.206395)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.76209
   getTime(): -83
@@ -15238,6 +15332,7 @@ ECLCluster#26:
   getR(): 154.802
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#51 (weight: 0.232084)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.00321
   getTime(): -84
@@ -15287,6 +15382,7 @@ ECLCluster#27:
   getR(): 168.522
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#57 (weight: 0.221997)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.31389
   getTime(): -85
@@ -15337,6 +15433,7 @@ ECLCluster#28:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#40 (weight: 0.334897)
     -> MCParticles#41 (weight: 0.000290472)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.45271
   getTime(): -78
@@ -15386,6 +15483,7 @@ ECLCluster#29:
   getR(): 140.32
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#41 (weight: 0.0497677)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.54381
   getTime(): -100
@@ -15435,6 +15533,7 @@ ECLCluster#30:
   getR(): 133.768
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#41 (weight: 0.0201473)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.62664
   getTime(): -58
@@ -18756,6 +18855,7 @@ ECLCluster#0:
     -> MCParticles#59 (weight: 0.000683865)
     -> MCParticles#71 (weight: 0.636997)
     -> MCParticles#72 (weight: 0.00307286)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.256673
   getTime(): -73
@@ -18807,6 +18907,7 @@ ECLCluster#1:
     -> MCParticles#48 (weight: 5.26086e-06)
     -> MCParticles#59 (weight: 0.0678436)
     -> MCParticles#71 (weight: 0.0399148)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.317863
   getTime(): -81
@@ -18858,6 +18959,7 @@ ECLCluster#2:
     -> MCParticles#33 (weight: 0.00655081)
     -> MCParticles#34 (weight: 0.0125382)
     -> MCParticles#58 (weight: 0.105853)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.246096
   getTime(): -65
@@ -18907,6 +19009,7 @@ ECLCluster#3:
   getR(): 223.966
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#33 (weight: 0.165515)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.336231
   getTime(): -72
@@ -18957,6 +19060,7 @@ ECLCluster#4:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#34 (weight: 1.50341e-06)
     -> MCParticles#72 (weight: 0.0215737)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.362911
   getTime(): -83
@@ -19006,6 +19110,7 @@ ECLCluster#5:
   getR(): 238.888
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#59 (weight: 0.0246043)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.489656
   getTime(): -123
@@ -19055,6 +19160,7 @@ ECLCluster#6:
   getR(): 227.175
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#74 (weight: 0.0467906)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.646779
   getTime(): -70
@@ -19105,6 +19211,7 @@ ECLCluster#7:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#16 (weight: 0.842273)
     -> MCParticles#33 (weight: 0.00356426)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.647713
   getTime(): -73
@@ -19154,6 +19261,7 @@ ECLCluster#8:
   getR(): 195.91
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#28 (weight: 0.248532)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.78353
   getTime(): -71
@@ -19203,6 +19311,7 @@ ECLCluster#9:
   getR(): 189.597
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#73 (weight: 0.408841)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.81971
   getTime(): -77
@@ -19252,6 +19361,7 @@ ECLCluster#10:
   getR(): 184.816
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#14 (weight: 0.21982)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 0.849983
   getTime(): -76
@@ -19301,6 +19411,7 @@ ECLCluster#11:
   getR(): 150.351
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#21 (weight: 0.292758)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.21134
   getTime(): -78
@@ -19350,6 +19461,7 @@ ECLCluster#12:
   getR(): 153.935
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#5 (weight: 0.202535)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.15043
   getTime(): -77
@@ -19399,6 +19511,7 @@ ECLCluster#13:
   getR(): 152.604
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#15 (weight: 0.0439114)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.17266
   getTime(): -51
@@ -19452,6 +19565,7 @@ ECLCluster#14:
     -> MCParticles#46 (weight: 0.00411981)
     -> MCParticles#47 (weight: 0.036355)
     -> MCParticles#65 (weight: 0.00182838)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.33027
   getTime(): 39
@@ -19503,6 +19617,7 @@ ECLCluster#15:
     -> MCParticles#23 (weight: 0.000266189)
     -> MCParticles#47 (weight: 0.123261)
     -> MCParticles#67 (weight: 1.05923e-05)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.36257
   getTime(): -29
@@ -19552,6 +19667,7 @@ ECLCluster#16:
   getR(): 142.477
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#35 (weight: 0.01512)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.42277
   getTime(): -31
@@ -19601,6 +19717,7 @@ ECLCluster#17:
   getR(): 141.001
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#23 (weight: 0.234276)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.50734
   getTime(): -80
@@ -19652,6 +19769,7 @@ ECLCluster#18:
     -> MCParticles#35 (weight: 0.207044)
     -> MCParticles#54 (weight: 0.113484)
     -> MCParticles#55 (weight: 0.0616008)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.59757
   getTime(): -76
@@ -19702,6 +19820,7 @@ ECLCluster#19:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#17 (weight: 0.219079)
     -> MCParticles#54 (weight: 0.00159566)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 1.92029
   getTime(): -80
@@ -19752,6 +19871,7 @@ ECLCluster#20:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#20 (weight: 0.00129746)
     -> MCParticles#31 (weight: 0.135588)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.03656
   getTime(): -73
@@ -19801,6 +19921,7 @@ ECLCluster#21:
   getR(): 165.036
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#18 (weight: 0.248093)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.12903
   getTime(): -77
@@ -19850,6 +19971,7 @@ ECLCluster#22:
   getR(): 171.841
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#49 (weight: 0.116742)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.19361
   getTime(): -68
@@ -19899,6 +20021,7 @@ ECLCluster#23:
   getR(): 172.038
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#61 (weight: 0.0203007)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.29308
   getTime(): -10
@@ -19949,6 +20072,7 @@ ECLCluster#24:
   getRelationsWith(MCParticles): size(2)
     -> MCParticles#28 (weight: 0.0141978)
     -> MCParticles#37 (weight: 0.121234)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.42148
   getTime(): -65
@@ -20001,6 +20125,7 @@ ECLCluster#25:
     -> MCParticles#37 (weight: 0.086495)
     -> MCParticles#38 (weight: 0.0353223)
     -> MCParticles#47 (weight: 0.00717364)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.44962
   getTime(): -29
@@ -20050,6 +20175,7 @@ ECLCluster#26:
   getR(): 142.121
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#50 (weight: 0.144597)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.52355
   getTime(): -80
@@ -20099,6 +20225,7 @@ ECLCluster#27:
   getR(): 140.614
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#50 (weight: 0.0647458)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.54034
   getTime(): -75
@@ -20148,6 +20275,7 @@ ECLCluster#28:
   getR(): 130.544
   getRelationsWith(MCParticles): size(1)
     -> MCParticles#6 (weight: 0.135697)
+  getSecondMoment(): 0
   getStatus(): 0
   getTheta(): 2.67671
   getTime(): -82

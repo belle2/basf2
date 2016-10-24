@@ -23,7 +23,7 @@ psfile = FileSystem.findFile('data/cdc/propspeed_v0.dat')
 twfile = FileSystem.findFile('data/cdc/tw_off.dat')
 xtfile = FileSystem.findFile('data/cdc/xt_v3.dat')
 sgfile = FileSystem.findFile('data/cdc/sigma_v1.dat')
-dispfile = FileSystem.findFile('data/cdc/displacement_v1.dat')
+dispfile = FileSystem.findFile('data/cdc/displacement_v1.1.dat')
 alfile = FileSystem.findFile('data/cdc/alignment_v2.dat')
 use_local_database("cdc_crt/database.txt", "cdc_crt")
 

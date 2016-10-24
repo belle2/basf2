@@ -118,10 +118,6 @@ int main(int argc, char* argv[])
     ("info", "print information about basf2")
     ("modules,m", prog::value<string>()->implicit_value(""),
      "print a list of all available modules (can be limited to a given package), or give detailed information on a specific module given as an argument (case sensitive).")
-    ("module-io", prog::value<string>(),
-     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
-    ("execute-path", prog::value<string>(),
-     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
     ;
 
     prog::options_description config("Configuration");
@@ -134,7 +130,12 @@ int main(int argc, char* argv[])
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
-    ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)")
+    ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)");
+
+    prog::options_description advanced("Advanced Options");
+    advanced.add_options()
+    ("module-io", prog::value<string>(),
+     "Create diagram of inputs and outputs for a single module, saved as ModuleName.dot. To create a PostScript file, use e.g. 'dot ModuleName.dot -Tps -o out.ps'.")
     ("visualize-dataflow", "Generate data flow diagram (dataflow.dot) for the executed steering file.")
     ("no-stats",
      "Disable collection of statistics during event processing. Useful for very high-rate applications, but produces empty table with 'print(statistics)'.")
@@ -142,6 +143,8 @@ int main(int argc, char* argv[])
      "Read steering file, but do not start any event processing when process(path) is called. Prints information on input/output files that would be used during normal execution.")
     ("dump-path", prog::value<string>(),
      "Read steering file, but do not actually start any event processing. The module path the steering file would execute is instead pickled (serialized) into the given file.")
+    ("execute-path", prog::value<string>(),
+     "Do not read any provided steering file, instead execute the pickled (serialized) path from the given file.")
 #ifdef HAS_CALLGRIND
     ("profile", prog::value<string>(),
      "Name of a module to profile using callgrind. If more than one module of that name is registered only the first one will be profiled.")
@@ -149,7 +152,7 @@ int main(int argc, char* argv[])
     ;
 
     prog::options_description cmdlineOptions;
-    cmdlineOptions.add(generic).add(config);
+    cmdlineOptions.add(generic).add(config).add(advanced);
 
     prog::positional_options_description posOptDesc;
     posOptDesc.add("steering", 1);

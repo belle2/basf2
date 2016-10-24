@@ -106,16 +106,16 @@ void SPTC2RTConverterModule::createRecoTrack(const SpacePointTrackCand& spacePoi
   unsigned int sortingParameter = 0; // Recreate sorting since there are two cluster per SVD hit.
   for (auto spacePoint : spacePointTC.getHits()) {
 
-    int detID = spacePoint->getType() == VXD::SensorInfoBase::SVD ? Const::SVD : Const::PXD;
+    int detID = spacePoint->getType();
 
-    if (detID == Const::PXD) {
+    if (detID == VXD::SensorInfoBase::SVD) {
       RelationVector<PXDCluster> relatedClusters = spacePoint->getRelationsTo<PXDCluster>(m_param_pxdClustersName);
       // relatedClusters should only contain 1 cluster for pxdHits. Loop over them to be robust against missing relations.
       for (const PXDCluster& cluster : relatedClusters) {
         newRecoTrack->addPXDHit(&cluster, sortingParameter, Belle2::RecoHitInformation::c_VXDTrackFinder);
         sortingParameter++;
       }
-    } else if (detID == Const::SVD) {
+    } else if (detID == VXD::SensorInfoBase::PXD) {
       RelationVector<SVDCluster> relatedClusters = spacePoint->getRelationsTo<SVDCluster>(m_param_svdClustersName);
       // relatedClusters should contain 2 clusters for svdHits. Loop over them to be robust against missing relations.
       for (const SVDCluster& cluster : relatedClusters) {

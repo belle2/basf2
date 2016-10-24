@@ -77,6 +77,10 @@ RootInputModule::~RootInputModule() { }
 
 void RootInputModule::initialize()
 {
+  int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
+  if (skipNEventsOverride >= 0)
+    m_skipNEvents = skipNEventsOverride;
+
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
 

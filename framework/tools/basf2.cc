@@ -129,7 +129,8 @@ int main(int argc, char* argv[])
     ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
     ("run", prog::value<int>(), "override run for EventInfoSetter, must be used with -n and --experiment")
     ("experiment", prog::value<int>(), "override experiment for EventInfoSetter, must be used with -n and --run")
-    ("skip-events", prog::value<int>(), "override skipNEvents for EventInfoSetter. Skips this many events before starting.")
+    ("skip-events", prog::value<int>(),
+     "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")

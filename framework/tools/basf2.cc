@@ -127,6 +127,8 @@ int main(int argc, char* argv[])
     ("log_level,l", prog::value<string>(),
      "set global log level (one of DEBUG, INFO, RESULT, WARNING, or ERROR). Takes precedence over set_log_level() in steering file.")
     ("events,n", prog::value<int>(), "override number of events for EventInfoSetter; otherwise set maximum number of events.")
+    ("run", prog::value<int>(), "override run for EventInfoSetter, must be used with -n and --experiment")
+    ("experiment", prog::value<int>(), "override experiment for EventInfoSetter, must be used with -n and --run")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
@@ -253,6 +255,19 @@ int main(int argc, char* argv[])
         B2FATAL("Invalid number of events!");
       }
       Environment::Instance().setNumberEventsOverride(nevents);
+    }
+    // --run & --experiment
+    if (varMap.count("experiment") or varMap.count("run")) {
+      if (!varMap.count("events"))
+        B2FATAL("--experiment and --run must be used with --events/-n!");
+      if (!(varMap.count("run") and varMap.count("experiment")))
+        B2FATAL("Both --experiment and --run must be specified!");
+
+      int run = varMap["run"].as<int>();
+      int experiment = varMap["experiment"].as<int>();
+      B2ASSERT("run must be >= 0!", run >= 0);
+      B2ASSERT("experiment must be >= 0!", experiment >= 0);
+      Environment::Instance().setRunExperimentOverride(run, experiment);
     }
 
     // -i

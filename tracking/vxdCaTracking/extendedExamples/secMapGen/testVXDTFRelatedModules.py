@@ -149,6 +149,9 @@ gearbox = register_module('Gearbox')
 
 
 secMapBootStrap = register_module('SectorMapBootstrap')
+secMapBootStrap.param('ReadSectorMap', False)
+secMapBootStrap.param('WriteSectorMap', False)
+
 
 evtStepSize = 1
 if newTrain:
@@ -156,6 +159,7 @@ if newTrain:
     VXDTFTrainingDataCollector.param('SpacePointTrackCandsName', 'checkedSPTCs')
     evtStepSize = 100
 else:
+    secMapBootStrap.param('WriteSectorMap', True)
     merger = register_module('RawSecMapMerger')
     merger.logging.log_level = trainerVXDTFLogLevel
     merger.logging.debug_level = trainerVXDTFDebugLevel

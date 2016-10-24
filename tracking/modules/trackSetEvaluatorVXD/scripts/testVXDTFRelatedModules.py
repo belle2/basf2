@@ -156,11 +156,9 @@ eventinfoprinter = register_module('EventInfoPrinter')
 
 gearbox = register_module('Gearbox')
 
-
 secMapBootStrap = register_module('SectorMapBootstrap')
-
-
-secMapBootStrap = register_module('SectorMapBootstrap')
+secMapBootStrap.param('ReadSectorMap', False)
+secMapBootStrap.param('WriteSectorMap', True)
 
 evtStepSize = 1
 if newTrain:

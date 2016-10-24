@@ -83,6 +83,10 @@ void EventInfoSetterModule::initialize()
       m_expList[0] = expOverride;
   }
 
+  int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
+  if (skipNEventsOverride >= 0)
+    m_eventsToSkip = skipNEventsOverride;
+
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
   if ((m_runList.size() != defListSize) || (m_evtNumList.size() != defListSize)) {

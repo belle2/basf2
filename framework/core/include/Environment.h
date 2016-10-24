@@ -76,6 +76,11 @@ namespace Belle2 {
     /** Get experiment override, or -1 if unset. */
     int getExperimentOverride() const { return m_experiment; }
 
+    /** Get skipNEvents override, or -1 if unset. */
+    void setSkipEventsOverride(int skipEvents) { m_skipNEvents = skipEvents; }
+    /** Set skipNEvents override */
+    int getSkipEventsOverride() const { return m_skipNEvents; }
+
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
 
@@ -207,6 +212,7 @@ namespace Belle2 {
     unsigned int m_mcEvents; /**< counter for number of generated events. */
     int m_run; /**< override run for EventInfoSetter. */
     int m_experiment; /**< override experiment for EventInfoSetter. */
+    int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

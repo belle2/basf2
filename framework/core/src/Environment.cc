@@ -70,7 +70,8 @@ Environment::Environment() :
   m_dryRun(false),
   m_mcEvents(0),
   m_run(-1),
-  m_experiment(-1)
+  m_experiment(-1),
+  m_skipNEvents(-1)
 {
   // Check for environment variables set by setuprel
   const char* envarReleaseDir = getenv("BELLE2_RELEASE_DIR");

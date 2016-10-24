@@ -52,7 +52,7 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            (unsigned)(160));
   addParam("nCellsR", m_nCellsR,
            "Number of Hough cells in 1/r. Must be an even number.",
-           (unsigned)(32));
+           (unsigned)(34));
   addParam("minPt", m_minPt,
            "Minimum Pt [GeV]. "
            "Hough plane limits in 1/r are [-1/r(minPt), 1/r(minPt)]", (double)(0.3));
@@ -66,7 +66,7 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            (unsigned)(4));
   addParam("minCells", m_minCells,
            "Peaks with less than minCells connected cells are ignored.",
-           (unsigned)(1));
+           (unsigned)(2));
   addParam("onlyLocalMax", m_onlyLocalMax,
            "Switch to remove cells connected to a cell with higher super layer count.",
            false);
@@ -87,7 +87,7 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            "0: don't store anything, 1: store only peaks, 2: store full plane "
            "(will increase runtime).", (unsigned)(0));
   addParam("clusterPattern", m_clusterPattern,
-           "use nested pattern algorithm to find clusters", false);
+           "use nested pattern algorithm to find clusters", true);
   addParam("clusterSizeX", m_clusterSizeX,
            "maximum number of 2 x 2 squares in cluster for pattern algorithm",
            (unsigned)(3));

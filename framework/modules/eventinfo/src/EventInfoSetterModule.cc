@@ -31,7 +31,8 @@ REG_MODULE(EventInfoSetter)
 
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
-  if (getenv("BELLE2_PRODUCTION")) m_production = stoi(getenv("BELLE2_PRODUCTION"));
+  if (getenv("BELLE2_PRODUCTION"))
+    m_production = stoi(getenv("BELLE2_PRODUCTION"));
 
   //Set module properties
   setDescription(
@@ -90,6 +91,10 @@ void EventInfoSetterModule::initialize()
         B2ERROR("Exp " << ret.first->first << ", run " << ret.first->second <<
                 " used more than once! Please make sure all experiment/run combinations are unique.");
       }
+      if (m_expList[i] < 0 or m_expList[i] > 1023)
+        B2ERROR("Experiment " << m_expList[i] << " is out of range, should be in [0, 1023]!");
+      if (m_runList[i] < 0)
+        B2ERROR("Run " << m_runList[i] << " is out of range, should be >= 0!");
     }
   }
 

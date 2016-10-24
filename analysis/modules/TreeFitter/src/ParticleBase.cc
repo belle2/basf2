@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates a particle. Base class for all other particle classes.
+
 //#include <iomanip>
 //#include <analysis/dataobjects/Particle.h>
 

@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Main implementation of the fitter.
+
 //#include <iomanip>
 //#include <stdio.h>
 //#include <sstream>
@@ -152,10 +164,10 @@ namespace TreeFitter {
       }
     }
     //
-    //FT adding this to save the results, but needs better treatment later
+    //FT adding this to save the results, implementation could use improvements
     updateTree(*m_particle);
     //
-    return (m_status == VertexStatus::Success); //FT adding this to make the function non void
+    return (m_status == VertexStatus::Success); //FT make the function non-void
   }
 
   void Fitter::fitOneStep()
@@ -335,11 +347,11 @@ namespace TreeFitter {
       double energy = sqrt(energy2) ;
       //
       HepMatrix jacobian(7, 6, 0);
-      //FT: (to do) merge these loops
-      for (int col = 1; col <= 3; ++col) jacobian(col, col) = 1; // don't modify momentum
-      for (int col = 1; col <= 3;
-           ++col) jacobian(4, col) = m_fitparams->par()(momindex + col) / energy ; //add energy row
-      for (int col = 4; col <= 6; ++col) jacobian(col + 1, col) = 1; // slightly off diagonal position identity
+      for (int col = 1; col <= 3; ++col) {
+        jacobian(col, col) = 1; // don't modify momentum
+        jacobian(4, col) = m_fitparams->par()(momindex + col) / energy ; //add energy row
+        jacobian(col + 4, col + 3) = 1; // slightly off diagonal position identity
+      }
       //
       cov7 = cov6.similarity(jacobian) ;
     }
@@ -378,7 +390,7 @@ namespace TreeFitter {
 
   Particle* Fitter::fittedCand(Particle& cand, Particle* headOfTree)
   {
-    B2WARNING("TreeFitter::Fitter::fittedCand: WARNING: Not yet implemented");
+    B2WARNING("TreeFitter::Fitter::fittedCand: WARNING: Not implemented");
     return 0 ;
     // assigns fitted parameters to candidate in tree
     //    Particle* acand = const_cast<Particle*>(headOfTree->cloneInTree(cand)) ;
@@ -410,10 +422,9 @@ namespace TreeFitter {
   }
 
 
-  void Fitter::updateCand(const ParticleBase& pb, Particle& cand) const //this is very delicate, come back here in case of errors
+  void Fitter::updateCand(const ParticleBase& pb, Particle& cand) const //FT: this is very delicate, come back here in case of errors
   {
     B2DEBUG(80, "Updating the candidate " << cand.getName());
-
     //    assert( pb->particle()->getPDGCode() == cand.getPDGCode() ) ; //sanity check
     int posindex = pb.posIndex() ;
     bool hasPos = true;
@@ -439,8 +450,8 @@ namespace TreeFitter {
       p.SetE(m_fitparams->par()(momindex + 4));
       B2DEBUG(80, "Setting momentum of candidate to " << p.Px() << " " << p.Py() << " " << p.Pz() << " " << p.E());
       cand.set4Vector(p);
-      TLorentzVector p_temp = cand.get4Vector();//FT: test printout
-      B2DEBUG(80, "Momentum of candidate is " << p_temp.Px() << " " << p_temp.Py() << " " << p_temp.Pz() << " " << p_temp.E());
+      //      TLorentzVector p_temp = cand.get4Vector();//FT: test printout
+      //      B2DEBUG(80, "Momentum of candidate is " << p_temp.Px() << " " << p_temp.Py() << " " << p_temp.Pz() << " " << p_temp.E());
     } else {
       double mass = cand.getMass();           //since when I feed a p4 in Particle what gets stored is actually the mass,
       p.SetE(p.Vect()*p.Vect() + mass * mass); //I risk rounding errors for no benefit

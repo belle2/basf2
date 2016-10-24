@@ -1,12 +1,13 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Francesco Tenchini                                       *
+ * Contributor: Francesco Tenchini                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
+
 #ifndef TREEFITTERMODULE_H
 #define TREEFITTERMODULE_H
 
@@ -34,7 +35,8 @@ namespace Belle2 {
     double m_confidenceLevel;       //minimum confidence level to accept fit
     double m_precision;             //max level of chi2 fluctuation required before the fit is considered stable and converging
     int m_verbose;                  //BaBar verbosity (to be phased out in favor of Belle2's logger)
-    double m_Bfield;                //Bfield from database
+    // now loaded for individual particles (FT)
+    //    double m_Bfield;                //Bfield from database
     //
     bool doTreeFit(Particle* head);
     bool printDaughters(Particle* mother);

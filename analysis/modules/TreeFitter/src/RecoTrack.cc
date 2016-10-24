@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates and initialises charged particles using helix parameters. Defines the projection of reconstruction (helix) constraints to the fit.
+
 //#include <stdio.h>
 //#include <Beta/BtaCandidate.hh>
 
@@ -25,14 +37,16 @@ namespace TreeFitter {
   RecoTrack::RecoTrack(Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_bfield(0), m_trackfit(0), m_cached(false), m_flt(0), m_m(7), m_matrixV(7)
   {
-
+    //FT: FIX ME: This initialises the BField at the IP. This might not be a correct assumption, but is the easiest and fastest for now. Check the impact of using the field at the perigee, or perhaps at the decay vertex as appropriate, especially for significantly displaced vertices.
     m_bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T; //Bz in Tesla
     B2DEBUG(80, "RecoTrack - Bz from BFieldManager: " << m_bfield);
     //    PdtPid::PidType pidType = PdtPid::pion ;
     //    if( bc()->pdtEntry() ) pidType = bc()->pdtEntry()->pidId() ;
     //    _trkFit = bc()->recoTrk()->fitResult(pidType) ;
     if (m_trackfit == 0) {
-      //FT: Hardcoded particle hypothesis; improvements are needed
+      //FT: this is superflous as m_trackfit has just been initialised, but we'll need the statement in future developments.
+
+      //FT: For now we still use the pion track hypothesis. Later: add multiple hypotheses, add a flag to allow users to choose whether they want the "true" hypothesis or just the pion (for cases where the pion works better, for whatever reason)
       m_trackfit = particle->getTrack()->getTrackFitResult(Const::pion);
     }
   }

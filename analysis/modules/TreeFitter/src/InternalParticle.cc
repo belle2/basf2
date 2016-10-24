@@ -1,3 +1,17 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates an internal particle, carefully initialising it. Base class for RecoComposite and RecoResonance.
+//Many of the constraints that could be applied here (mass, lifetime, etc.) are missing because there's no way (yet)
+//to flag a particle for them. This requires development.
+
 #include <iomanip>
 #include <algorithm>
 #include <boost/foreach.hpp>

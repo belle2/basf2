@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates and initialises pre-reconstructed composites, such as V0s. This is a work in progress as of release-00-08-00 and doesn't work as-is. Development is needed.
+
 //#include <analysis/dataobjects/Particle.h>
 
 #include <analysis/modules/TreeFitter/RecoComposite.h>
@@ -10,11 +22,10 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  //FT: This is used for fitted/reconstructed composites, not for internal particles! WIP
   RecoComposite::RecoComposite(Particle* particle, const ParticleBase* mother)
     : ParticleBase(particle, mother), m_m(), m_matrixV(), m_hasEnergy(true)
   {
-    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;//FT: this only makes sense within BaBar, redo
+    //    bool massconstraint = particle && particle->constraint(BtaConstraint::Mass) ;//FT: this requires the ability to flag a vertex for mass constraining, which we can't easily do right now
     //    m_hasEnergy = !massconstraint ;                                              //
     updCache() ;
   }
@@ -38,7 +49,7 @@ namespace TreeFitter {
     m_m(6) = mom.Z() ;
     m_m(7) = energy ;
 
-    //FT: this part will need to be reviewed, if ever needed;
+    //FT: this part will need to be reviewed;
     //    m_matrixV = particlefitparams.cov7().sub(1,dimM()) ; // so either 7 or 6, depending on mass constraint
     TMatrixFSym cov7in = particle()->getMomentumVertexErrorMatrix(); //this is (p,E,x)
     HepSymMatrix cov7out(7, 0); //this has to be (x,p,E)
@@ -57,7 +68,7 @@ namespace TreeFitter {
         cov7out(col, 3 + row) = cov7in[row - 1][3 + col];
       }
     }
-    //FT this can be optimized later into a single loop
+    //FT: the above has to be optimized later into a single loop; doesn't matter right now since we don't use it.
     m_matrixV = cov7out.sub(1, dimM()) ; // so either 7 or 6, depending on mass constraint
     if (vtxverbose >= 4) {
       std::cout << "cov matrix of external candidate: " << name().c_str()
@@ -109,7 +120,6 @@ namespace TreeFitter {
 
   ErrCode RecoComposite::projectConstraint(Constraint::Type type, const FitParams& fitparams, Projection& p) const
   {
-    //FT: this whole function seems to rely on properties that we don't have available in basf2?
     ErrCode status ;
     switch (type) {
       case Constraint::composite:

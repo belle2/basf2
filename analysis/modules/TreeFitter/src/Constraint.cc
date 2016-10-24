@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Order and filter constraints. Includes two versions of the filter, with and without referencing.
+
 #include <iomanip>
 #include <framework/logging/Logger.h>
 //
@@ -127,8 +139,8 @@ namespace TreeFitter {
       status = project(*reference, p) ;
       // now update the residual
 
-      //FT: my test
-      std::cout << "Delta p.r() = " << p.H() * (fitpar->par() - reference->par()) << std::endl;
+      //FT: test output
+      //std::cout << "Delta p.r() = " << p.H() * (fitpar->par() - reference->par()) << std::endl;
       p.r() += p.H() * (fitpar->par() - reference->par());
 
       // now call the Kalman update as usual
@@ -136,7 +148,7 @@ namespace TreeFitter {
       status |= kalman.init(p.r(), p.H(), fitpar, &p.V()) ;
       kalman.updatePar(fitpar) ;
       kalman.updateCov(fitpar) ;
-      //FT: LHCb has this neat mapping of individual particles to chi2, but we don't have the structures for it yet
+      //FT: LHCb maps individual particles to chi2, but we don't have the structures for it as far as I can tell
       //      fitpar->addChiSquare( kalman.chisq(), m_dim, p.particle() ) ;
       fitpar->addChiSquare(kalman.chisq(), m_dim) ;
       if (fitpar->cov(m_node->index() + 1) < 0 || kalman.chisq() < 0 || std::isnan(kalman.chisq()))

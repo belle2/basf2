@@ -1,14 +1,15 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2014 - Belle II Collaboration                             *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Francesco Tenchini                                       *
+ * Contributor: Francesco Tenchini                                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
 //Implementation of Decay Tree Fitter based on arXiv:physics/0503191
+//Main module implementation
 
 #include <analysis/modules/TreeFitter/TreeFitterModule.h>
 #include <analysis/modules/TreeFitter/Fitter.h>
@@ -28,8 +29,7 @@ using namespace Belle2;
 REG_MODULE(TreeFitter)
 
 // Constructor
-TreeFitterModule::TreeFitterModule() : Module(),
-  m_Bfield(0)
+TreeFitterModule::TreeFitterModule() : Module()//,  m_Bfield(0) //(FT) not used anymore
 {
   setDescription("Tree Fitter module. Performs simultaneous fit of all vertices in a decay chain.");
   //module parameters
@@ -46,7 +46,8 @@ TreeFitterModule::~TreeFitterModule() {}
 void TreeFitterModule::initialize()
 {
   // get magnetic field
-  m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
+  // Commented for now, since it's used by each particle individually (FT)
+  //m_Bfield = BFieldManager::getField(TVector3(0, 0, 0)).Z() / Unit::T;
   //Make sure we have a particle list
   StoreObjPtr<ParticleList>::required(m_particleList);
   //Also make sure we have actual particles

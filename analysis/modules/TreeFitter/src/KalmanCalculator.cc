@@ -1,6 +1,18 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Calculate Kalman gain matrix, update parameters and covariance matrix
+
 #include <analysis/modules/TreeFitter/KalmanCalculator.h>
 
-#include <iostream> //shouldn't use that but the basf2 messaging
+#include <iostream> //FT: gradually phase out in favor of basf2 messaging
 
 #define SLOWBUTSAFE 1
 //#undef SLOWBUTSAFE

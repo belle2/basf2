@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates photons and other neutrals from cluster objects. Currently only tested for photons.
+
 //#include <stdio.h>
 #include <framework/logging/Logger.h>
 
@@ -14,7 +26,7 @@
 namespace TreeFitter {
   extern int vtxverbose ;
 
-  //FT: this should not be needed if this we use this routine strictly for gammas, but will be needed for V0s
+  //FT: this is needed once Klongs become involved
   bool RecoPhoton::useEnergy(Particle& particle)
   {
     bool rc = true ;
@@ -30,7 +42,7 @@ namespace TreeFitter {
 
   RecoPhoton::RecoPhoton(Particle* particle, const ParticleBase* mother)
     : RecoParticle(particle, mother), m_init(false), m_useEnergy(useEnergy(*particle)), m_m(4),
-      m_matrixV(4) //FT: should use dimM()+1, dimensionality here needs a look over
+      m_matrixV(4) //FT: hardcoded, should use dimM()+1 as far as I can tell, dimensionality here needs a look over
       //    : RecoParticle(particle,mother),m_init(false),m_useEnergy(useEnergy(*particle)),m_m(dimM()),m_matrixV(dimM())
   {
     updCache() ;

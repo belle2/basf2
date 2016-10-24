@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Creates a particle object from a charged or neutral final state. Base class for RecoTrack and RecoPhoton. This doesn't do much by itself; most of the functionality is in those individual classes.
+
 //#include <stdio.h>
 //#include <analysis/dataobjects/Particle.h>
 #include <framework/logging/Logger.h>
@@ -33,6 +45,7 @@ namespace TreeFitter {
         break ;
       default:
         //      status |= ParticleBase::projectConstraint(type,fitparams,p) ;
+        //FT: This printout is annoying, make it B2INFO or B2DEBUG
         std::cout << ParticleBase::projectConstraint(type, fitparams, p) << std::endl << std::flush;
     }
     return status ;

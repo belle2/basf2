@@ -1,3 +1,15 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
+//Build decaytree structure allowing to index particles and handle the filtering of constraints across the tree
+
 #include <algorithm>
 #include <framework/logging/Logger.h>
 
@@ -97,7 +109,7 @@ namespace TreeFitter {
     FitParams reference = par;
 
     //#ifdef THEOLDWAY
-    if (m_mergedconstraintlist.empty()) {
+    if (m_mergedconstraintlist.empty()) {//FT:Merged constraints actually crash this so the old method is used; go back and find out why
       for (ParticleBase::constraintlist::const_iterator it = m_constraintlist.begin() ;
            it != m_constraintlist.end(); ++it) {
         //  status |= it->filter(&par) ;

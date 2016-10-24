@@ -1,8 +1,17 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2013 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributor: Francesco Tenchini                                        *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #ifndef ERRCODE_H
 #define ERRCODE_H
 
 #include <iostream>
-//#include <framework/logging/Logger.h> //FT: included only for the sake of debugging
 
 namespace TreeFitter {
 

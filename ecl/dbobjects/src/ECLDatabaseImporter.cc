@@ -148,15 +148,133 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   //Get trees
   TTree* correctionTree = getRootObjectFromFile<TTree*>(inputFile, "ParameterNtuple");
   TTree* helperTree = getRootObjectFromFile<TTree*>(inputFile, "ConstantNtuple");
-  B2WARNING("line = " << __LINE__);
+
+  //----------------------------------------------------------------------------------------------
+  //Fill ParameterNtuple vectors
+  //----------------------------------------------------------------------------------------------
+
+  int bgFractionBinNum;
+  int regNum;
+  int phiBinNum;
+  int thetaBinNum;
+  int energyBinNum;
+  float correctionFactor;
+
+  //Set Branch Addresses
+  correctionTree->SetBranchAddress(m_bgFractionBinNumBranchName.c_str(), &bgFractionBinNum);
+  correctionTree->SetBranchAddress(m_regNumBranchName.c_str(), &regNum);
+  correctionTree->SetBranchAddress(m_phiBinNumBranchName.c_str(), &phiBinNum);
+  correctionTree->SetBranchAddress(m_thetaBinNumBranchName.c_str(), &thetaBinNum);
+  correctionTree->SetBranchAddress(m_energyBinNumBranchName.c_str(), &energyBinNum);
+  correctionTree->SetBranchAddress(m_correctionFactorBranchName.c_str(), &correctionFactor);
+
+  //Fill vectors
+  std::vector<int> m_bgFractionBinNum;
+  std::vector<int> m_regNum;
+  std::vector<int> m_phiBinNum;
+  std::vector<int> m_thetaBinNum;
+  std::vector<int> m_energyBinNum;
+  std::vector<float> m_correctionFactor;
+
+  for (long iEntry = 0; iEntry < correctionTree->GetEntries(); ++iEntry) {
+    correctionTree->GetEntry(iEntry);
+
+    m_bgFractionBinNum.push_back(bgFractionBinNum);
+    m_regNum.push_back(regNum);
+    m_phiBinNum.push_back(phiBinNum);
+    m_thetaBinNum.push_back(thetaBinNum);
+    m_energyBinNum.push_back(energyBinNum);
+    m_correctionFactor.push_back(correctionFactor);
+  }
+
+  //----------------------------------------------------------------------------------------------
+  //Fill ConstantNtuple vectors
+  //----------------------------------------------------------------------------------------------
+
+  float avgRecEn[m_numAvgRecEnEntries];
+  float lReg1Theta;
+  float hReg1Theta;
+  float lReg2Theta;
+  float hReg2Theta;
+  float lReg3Theta;
+  float hReg3Theta;
+  int numOfBfBins;
+  int numOfEnergyBins;
+  int numOfReg1ThetaBins;
+  int numOfReg2ThetaBins;
+  int numOfReg3ThetaBins;
+  int phiPeriodicity;
+
+  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), &avgRecEn);
+  helperTree->SetBranchAddress(m_lReg1ThetaBranchName.c_str(), &lReg1Theta);
+  helperTree->SetBranchAddress(m_hReg1ThetaBranchName.c_str(), &hReg1Theta);
+  helperTree->SetBranchAddress(m_lReg2ThetaBranchName.c_str(), &lReg2Theta);
+  helperTree->SetBranchAddress(m_hReg2ThetaBranchName.c_str(), &hReg2Theta);
+  helperTree->SetBranchAddress(m_lReg3ThetaBranchName.c_str(), &lReg3Theta);
+  helperTree->SetBranchAddress(m_hReg3ThetaBranchName.c_str(), &hReg3Theta);
+  helperTree->SetBranchAddress(m_numOfBfBinsBranchName.c_str(), &numOfBfBins);
+  helperTree->SetBranchAddress(m_numOfEnergyBinsBranchName.c_str(), &numOfEnergyBins);
+  helperTree->SetBranchAddress(m_numOfReg1ThetaBinsBranchName.c_str(), &numOfReg1ThetaBins);
+  helperTree->SetBranchAddress(m_numOfReg2ThetaBinsBranchName.c_str(), &numOfReg2ThetaBins);
+  helperTree->SetBranchAddress(m_numOfReg3ThetaBinsBranchName.c_str(), &numOfReg3ThetaBins);
+  helperTree->SetBranchAddress(m_phiPeriodicityBranchName.c_str(), &phiPeriodicity);
+
+  //Fill vectors
+  std::vector<float> m_avgRecEn;
+  std::vector<float> m_lReg1Theta;
+  std::vector<float> m_hReg1Theta;
+  std::vector<float> m_lReg2Theta;
+  std::vector<float> m_hReg2Theta;
+  std::vector<float> m_lReg3Theta;
+  std::vector<float> m_hReg3Theta;
+  std::vector<int>   m_numOfBfBins;
+  std::vector<int>   m_numOfEnergyBins;
+  std::vector<int>   m_numOfReg1ThetaBins;
+  std::vector<int>   m_numOfReg2ThetaBins;
+  std::vector<int>   m_numOfReg3ThetaBins;
+  std::vector<int>   m_phiPeriodicity;
+
+  for (long iEntry = 0; iEntry < helperTree->GetEntries(); ++iEntry) {
+    helperTree->GetEntry(iEntry);
+    for (int iIdx = 0; iIdx < m_numAvgRecEnEntries; ++iIdx) m_avgRecEn.push_back(avgRecEn[iIdx]);
+
+    m_lReg1Theta.push_back(lReg1Theta);
+    m_hReg1Theta.push_back(hReg1Theta);
+    m_lReg2Theta.push_back(lReg2Theta);
+    m_hReg2Theta.push_back(hReg2Theta);
+    m_lReg3Theta.push_back(lReg3Theta);
+    m_hReg3Theta.push_back(hReg3Theta);
+    m_numOfBfBins.push_back(numOfBfBins);
+    m_numOfEnergyBins.push_back(numOfEnergyBins);
+    m_numOfReg1ThetaBins.push_back(numOfReg1ThetaBins);
+    m_numOfReg2ThetaBins.push_back(numOfReg2ThetaBins);
+    m_numOfReg3ThetaBins.push_back(numOfReg3ThetaBins);
+    m_phiPeriodicity.push_back(phiPeriodicity);
+  }
+
+  //----------------------------------------------------------------------------------------------
+
   //Construct DB object
   DBImportObjPtr<ECLShowerCorrectorLeakageCorrection> dbPtr("ecl_shower_corrector_leakage_corrections");
-  B2WARNING("line = " << __LINE__);
-  TDirectory* directory = new TDirectory();
-  if (correctionTree) correctionTree->SetDirectory(directory);
-  if (helperTree) helperTree->SetDirectory(directory);
-  dbPtr.construct(directory, helperTree, correctionTree);
-  B2WARNING("line = " << __LINE__);
+  dbPtr.construct(m_bgFractionBinNum,
+                  m_regNum,
+                  m_phiBinNum,
+                  m_thetaBinNum,
+                  m_energyBinNum,
+                  m_correctionFactor,
+                  m_avgRecEn,
+                  m_lReg1Theta,
+                  m_hReg1Theta,
+                  m_lReg2Theta,
+                  m_hReg2Theta,
+                  m_lReg3Theta,
+                  m_hReg3Theta,
+                  m_numOfBfBins,
+                  m_numOfEnergyBins,
+                  m_numOfReg1ThetaBins,
+                  m_numOfReg2ThetaBins,
+                  m_numOfReg3ThetaBins,
+                  m_phiPeriodicity);
 
   //Create IOV object
   int startExp = 0;
@@ -164,10 +282,10 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   int endExp = -1;
   int endRun = -1;
   IntervalOfValidity iov(startExp, startRun, endExp, endRun);
-  B2WARNING("line = " << __LINE__);
+
   //Import into local db
   dbPtr.import(iov);
-  B2WARNING("line = " << __LINE__);
+
   delete inputFile;
 
 }

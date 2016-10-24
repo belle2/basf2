@@ -31,74 +31,104 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ECLShowerCorrectorLeakageCorrection(): m_directory(new TDirectory()), m_helper(nullptr), m_correction(nullptr) {};
+    ECLShowerCorrectorLeakageCorrection() {};
 
     /**
      * Constructor
      */
-    ECLShowerCorrectorLeakageCorrection(TDirectory* directory, TTree* helper, TTree* correction) :
-      m_directory(directory),
-      m_helper(helper),
-      m_correction(correction)
+    ECLShowerCorrectorLeakageCorrection(std::vector<int> bgFractionBinNum,
+                                        std::vector<int> regNum,
+                                        std::vector<int> phiBinNum,
+                                        std::vector<int> thetaBinNum,
+                                        std::vector<int> energyBinNum,
+                                        std::vector<float> correctionFactor,
+                                        std::vector<float> avgRecEn,
+                                        std::vector<float> lReg1Theta,
+                                        std::vector<float> hReg1Theta,
+                                        std::vector<float> lReg2Theta,
+                                        std::vector<float> hReg2Theta,
+                                        std::vector<float> lReg3Theta,
+                                        std::vector<float> hReg3Theta,
+                                        std::vector<int> numOfBfBins,
+                                        std::vector<int> numOfEnergyBins,
+                                        std::vector<int> numOfReg1ThetaBins,
+                                        std::vector<int> numOfReg2ThetaBins,
+                                        std::vector<int> numOfReg3ThetaBins,
+                                        std::vector<int> phiPeriodicity) :
+      m_bgFractionBinNum(bgFractionBinNum),
+      m_regNum(regNum),
+      m_phiBinNum(phiBinNum),
+      m_thetaBinNum(thetaBinNum),
+      m_energyBinNum(energyBinNum),
+      m_correctionFactor(correctionFactor),
+      m_avgRecEn(avgRecEn),
+      m_lReg1Theta(lReg1Theta),
+      m_hReg1Theta(hReg1Theta),
+      m_lReg2Theta(lReg2Theta),
+      m_hReg2Theta(hReg2Theta),
+      m_lReg3Theta(lReg3Theta),
+      m_hReg3Theta(hReg3Theta),
+      m_numOfBfBins(numOfBfBins),
+      m_numOfEnergyBins(numOfEnergyBins),
+      m_numOfReg1ThetaBins(numOfReg1ThetaBins),
+      m_numOfReg2ThetaBins(numOfReg2ThetaBins),
+      m_numOfReg3ThetaBins(numOfReg3ThetaBins),
+      m_phiPeriodicity(phiPeriodicity)
     {
-      B2WARNING("line = " << __LINE__);
-      //Create new directory, if needed
-///      if( !m_directory) m_directory = new TDirectory();
-      B2WARNING("line = " << __LINE__);
-      //Move trees to m_directory
-//     if(m_helper) m_helper->SetDirectory(m_directory);
-      B2WARNING("line = " << __LINE__);
-//      if(m_correction) m_correction->SetDirectory(m_directory);
-//        B2WARNING( "line = " << __LINE__);
+
     }
 
     /**
      * Destructor
-     * We need to delete trees, even though we didn't create them because we moved them to m_directory
+     *
      */
     ~ECLShowerCorrectorLeakageCorrection()
     {
-      delete m_helper;
-      delete m_correction;
-      delete m_directory;
     }
 
-    /** Return helper ntuple
-     * @return ntuple with helper information
-     */
-    TTree* getHelperTree() const {return m_helper;};
-
-    /** Return correction ntuple
-     * @return ntuple with correction information
-     */
-    TTree* getCorrectionTree() const {return m_correction;};
-
-    /** Set helper ntuple
-     * @param helper ntuple
-     */
-    void setHelperNtuple(TTree* helper)
-    {
-
-      //Delete old tree, if it exists
-      if (m_helper) delete m_helper;
-      m_helper = helper;
-      if (m_helper) m_helper->SetDirectory(m_directory);
-    }
-
-    /** Set correction ntuple
-     * @param correction ntuple
-     */
-    void setCorrectionNtuple(TTree* correction)
-    {
-      if (m_correction) delete m_correction;
-      m_correction = correction;
-      if (m_correction) m_correction->SetDirectory(m_directory);
-    }
+    std::vector<int> getBgFractionBinNum() const {return m_bgFractionBinNum;};
+    std::vector<int> getRegNum() const {return m_regNum;};
+    std::vector<int> getPhiBinNum() const {return m_phiBinNum;};
+    std::vector<int> getThetaBinNum() const {return m_thetaBinNum;};
+    std::vector<int> getEnergyBinNum() const {return m_energyBinNum;};
+    std::vector<float> getCorrectionFactor() const {return m_correctionFactor;};
+    std::vector<float> getAvgRecEn() const {return m_avgRecEn;};
+    std::vector<float> getLReg1Theta() const {return m_lReg1Theta;};
+    std::vector<float> getHReg1Theta() const {return m_hReg1Theta;};
+    std::vector<float> getLReg2Theta() const {return m_lReg2Theta;};
+    std::vector<float> getHReg2Theta() const {return m_hReg2Theta;};
+    std::vector<float> getLReg3Theta() const {return m_lReg3Theta;};
+    std::vector<float> getHReg3Theta() const {return m_hReg3Theta;};
+    std::vector<int> getNumOfBfBins() const {return m_numOfBfBins;};
+    std::vector<int> getNumOfEnergyBins() const {return m_numOfEnergyBins;};
+    std::vector<int> getNumOfReg1ThetaBins() const {return m_numOfReg1ThetaBins;};
+    std::vector<int> getNumOfReg2ThetaBins() const {return m_numOfReg2ThetaBins;};
+    std::vector<int> getNumOfReg3ThetaBins() const {return m_numOfReg3ThetaBins;};
+    std::vector<int> getPhiPeriodicity() const {return m_phiPeriodicity;};
 
   private:
-    TDirectory* m_directory; //<** TDirectory that holds m_helper and m_corrections.  */
-    TTree* m_helper; //<** TTree that holds helper variables like bin boundaries. This class is the owner of the pointer and is responsible to delete it. */
-    TTree* m_correction; //<** TTree that holds corrections. This class is the owner of the pointer and is responsible to delete it. */
+    //"ParameterNtuple" tree
+    std::vector<int> m_bgFractionBinNum;
+    std::vector<int> m_regNum;
+    std::vector<int> m_phiBinNum;
+    std::vector<int> m_thetaBinNum;
+    std::vector<int> m_energyBinNum;
+    std::vector<float> m_correctionFactor;
+
+    //"ConstantNtuple" tree
+    std::vector<float> m_avgRecEn;
+    std::vector<float> m_lReg1Theta;
+    std::vector<float> m_hReg1Theta;
+    std::vector<float> m_lReg2Theta;
+    std::vector<float> m_hReg2Theta;
+    std::vector<float> m_lReg3Theta;
+    std::vector<float> m_hReg3Theta;
+    std::vector<int>    m_numOfBfBins;
+    std::vector<int>    m_numOfEnergyBins;
+    std::vector<int>    m_numOfReg1ThetaBins;
+    std::vector<int>    m_numOfReg2ThetaBins;
+    std::vector<int>    m_numOfReg3ThetaBins;
+    std::vector<int> m_phiPeriodicity;
 
     // 1: Initial version
     ClassDef(ECLShowerCorrectorLeakageCorrection, 1); /**< ClassDef */

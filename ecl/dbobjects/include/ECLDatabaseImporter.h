@@ -79,12 +79,40 @@ namespace Belle2 {
       return rootObj;
     }
 
+
+    /**
+     * Branch names for shower corrector leakage correction root file.
+     */
+    //"ParameterNtuple" tree branch names
+    std::string  m_bgFractionBinNumBranchName = "bgFractionBinNum";
+    std::string  m_regNumBranchName = "regNum";
+    std::string  m_phiBinNumBranchName = "phiBinNum";
+    std::string  m_thetaBinNumBranchName = "thetaBinNum";
+    std::string  m_energyBinNumBranchName = "energyBinNum";
+    std::string  m_correctionFactorBranchName = "correctionFactor";
+
+    //"ConstantNtuple" tree branch names
+    const int m_numAvgRecEnEntries = 15;
+    std::string m_avgRecEnBranchName = "avgRecEn";
+    std::string m_lReg1ThetaBranchName = "lReg1Theta";
+    std::string m_hReg1ThetaBranchName = "hReg1Theta";
+    std::string m_lReg2ThetaBranchName = "lReg2Theta";
+    std::string m_hReg2ThetaBranchName = "hReg2Theta";
+    std::string m_lReg3ThetaBranchName = "lReg3Theta";
+    std::string m_hReg3ThetaBranchName = "hReg3Theta";
+    std::string m_numOfBfBinsBranchName = "numOfBfBins";
+    std::string m_numOfEnergyBinsBranchName = "numOfEnergyBins";
+    std::string m_numOfReg1ThetaBinsBranchName = "numOfReg1ThetaBins";
+    std::string m_numOfReg2ThetaBinsBranchName = "numOfReg2ThetaBins";
+    std::string m_numOfReg3ThetaBinsBranchName = "numOfReg3ThetaBins";
+    std::string m_phiPeriodicityBranchName = "phiPeriodicity";
     /**
      * 1: Initial version.
      * 2: Added time calibration.
      * 3: Added Second moment importer.
+     * 4: Added shower leakage corrections importer.
      */
-    ClassDef(ECLDatabaseImporter, 3);
+    ClassDef(ECLDatabaseImporter, 4);
   };
 
 } // Belle2 namespace

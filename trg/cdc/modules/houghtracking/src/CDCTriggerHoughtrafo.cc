@@ -577,70 +577,71 @@ CDCTriggerHoughtrackingModule::patternClustering()
 bool
 CDCTriggerHoughtrackingModule::connectedLR(unsigned patternL, unsigned patternR)
 {
-  // unconnected if
-  // x x | . x  or  x . | x x
-  // x x | . x      x . | x x
-  bool unconnectDirect = ((!((patternR >> 0) & 1) && !((patternR >> 2) & 1)) ||
-                          (!((patternL >> 1) & 1) && !((patternL >> 3) & 1)));
-  // unconnected if
-  // x x | . x
-  // x . | x x
-  bool unconnectRise = (!((patternL >> 1) & 1) && !((patternR >> 2) & 1));
-  // unconnected if
-  // x . | x x
-  // x x | . x
-  bool unconnectFall = (!((patternL >> 3) & 1) && !((patternR >> 0) & 1));
+  // connected if
+  // . x | x .  or  . . | . .
+  // . . | . .      . x | x .
+  bool connectDirect = (((patternL >> 3) & 1) && ((patternR >> 2) & 1)) ||
+                       (((patternL >> 1) & 1) && ((patternR >> 0) & 1));
+  // connected if
+  // . . | x .
+  // . x | . .
+  bool connectRise = ((patternL >> 1) & 1) && ((patternR >> 2) & 1);
+  // connected if
+  // . x | . .
+  // . . | x .
+  bool connectFall = ((patternL >> 3) & 1) && ((patternR >> 0) & 1);
 
-  if (m_connect == 4) return !(unconnectDirect || unconnectRise || unconnectFall);
-  else if (m_connect == 6) return !(unconnectDirect || unconnectRise);
-  else if (m_connect == 8) return !unconnectDirect;
+  if (m_connect == 4) return connectDirect;
+  else if (m_connect == 6) return (connectDirect || connectRise);
+  else if (m_connect == 8) return (connectDirect || connectRise || connectFall);
   else B2WARNING("Unknown option for connect " << m_connect << ", using default.");
-  return !(unconnectDirect || unconnectRise);
+  return (connectDirect || connectRise);
 }
 
 bool
 CDCTriggerHoughtrackingModule::connectedUD(unsigned patternD, unsigned patternU)
 {
-  // unconnected if
-  // x x      x x
-  // . .      x x
+  // connected if
+  // . .      . .
+  // x .      . x
   // ---  or  ---
-  // x x      . .
-  // x x      x x
-  bool unconnectDirect = ((!((patternU >> 0) & 1) && !((patternU >> 1) & 1)) ||
-                          (!((patternD >> 1) & 2) && !((patternD >> 3) & 1)));
-  // unconnected if
-  // x x
-  // x .
-  // ---
-  // . x
-  // x x
-  bool unconnectRise = (!((patternD >> 1) & 2) && !((patternU >> 1) & 1));
-  // unconnected if
-  // x x
+  // x .      . x
+  // . .      . .
+  bool connectDirect = (((patternU >> 0) & 1) && ((patternD >> 2) & 1)) ||
+                       (((patternU >> 1) & 1) && ((patternD >> 3) & 1));
+  // connected if
+  // . .
   // . x
   // ---
   // x .
-  // x x
-  bool unconnectFall = (!((patternD >> 3) & 1) && !((patternU >> 0) & 1));
+  // . .
+  bool connectRise = ((patternU >> 1) & 1) && ((patternD >> 2) & 1);
+  // connected if
+  // . .
+  // x .
+  // ---
+  // . x
+  // . .
+  bool connectFall = ((patternU >> 0) & 1) && ((patternD >> 3) & 1);
 
-  if (m_connect == 4) return !(unconnectDirect || unconnectRise || unconnectFall);
-  else if (m_connect == 6) return !(unconnectDirect || unconnectRise);
-  else if (m_connect == 8) return !unconnectDirect;
+  if (m_connect == 4) return connectDirect;
+  else if (m_connect == 6) return (connectDirect || connectRise);
+  else if (m_connect == 8) return (connectDirect || connectRise || connectFall);
   else B2WARNING("Unknown option for connect " << m_connect << ", using default.");
-  return !(unconnectDirect || unconnectRise);
+  return (connectDirect || connectRise);
 }
 
 bool
 CDCTriggerHoughtrackingModule::connectedDiag(unsigned patternLD, unsigned patternRU)
 {
   if (m_connect == 4) return false;
-  // unconnected if
-  //    x x         x x
-  //    . x         x x
-  // x x     or  x .
-  // x x         x x
-  return !(!((patternRU >> 0) & 1) || !((patternLD >> 3) & 1));
+
+  // connected if
+  //     . .
+  //     x .
+  // . x
+  // . .
+  return (((patternRU >> 0) & 1) && ((patternLD >> 3) & 1));
 }
 
 unsigned

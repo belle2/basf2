@@ -11,14 +11,13 @@
 #ifndef GEOMETRY_UTILITIES_H
 #define GEOMETRY_UTILITIES_H
 
-#include <framework/gearbox/GearDir.h>
-
 #include <string>
 //class G4Colour;
 class G4LogicalVolume;
 class G4Polycone;
 
 namespace Belle2 {
+  class GearDir;
   /** Common code concerning the geometry representation of the detector */
   namespace geometry {
 

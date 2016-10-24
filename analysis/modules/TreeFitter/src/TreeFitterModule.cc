@@ -92,5 +92,6 @@ bool TreeFitterModule::doTreeFit(Particle* head)
   TreeFitter::Fitter* TreeFitObject = new TreeFitter::Fitter(head, m_precision);
   TreeFitObject->setVerbose(m_verbose);
   bool rc = TreeFitObject->fit();
+  delete TreeFitObject; //clean up statement, consider using unique_ptr<TreeFitter::Fitter> in the future
   return rc;
 }

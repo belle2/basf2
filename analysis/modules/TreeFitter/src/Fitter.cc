@@ -62,7 +62,7 @@ namespace TreeFitter {
 
   Fitter::~Fitter()
   {
-    delete m_particle ;
+    //delete m_particle ; //do not delete, particle is owned by the framework
     delete m_decaychain ;
     delete m_fitparams ;
   }

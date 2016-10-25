@@ -140,12 +140,6 @@ CDCTriggerHoughtrackingModule::event()
   hitMap.clear();
   houghCand.clear();
 
-  if (!storeTracks.isValid()) {
-    storeTracks.create();
-  } else {
-    storeTracks.getPtr()->Clear();
-  }
-
   /* set default return value */
   setReturnValue(true);
 

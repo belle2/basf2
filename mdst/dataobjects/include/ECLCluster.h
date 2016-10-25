@@ -326,7 +326,7 @@ namespace Belle2 {
     Double32_t  m_E9oE21;  //[0.0, 1., 10]
 
     /** Second Moment. */
-    Double32_t  m_secondMoment;  //[0.0, 100., 10]
+    Double32_t  m_secondMoment;  //[0.0, 40.0, 10]
 
     /** LAT. */
     Double32_t  m_LAT;  //[0.0, 1., 10]
@@ -359,7 +359,8 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 6);
+    ClassDef(ECLCluster, 7);
+    // 7: Changed range of SecondMoment from 0..100 to 0..40
     // 6: Changed stored variances to sqrt(covmat_ii).
     // 5: New HypothesisId default, removed relative covariance entries, renamed some setters/getters, adjusted covariance variable ranges.
     // 4: Complete revision and new variables. Introduction of Double32_t. Some new setters and getters.

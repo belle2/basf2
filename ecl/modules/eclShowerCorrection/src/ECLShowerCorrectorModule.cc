@@ -49,6 +49,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
   m_eclShowers(eclShowerArrayName()),
   m_eclEventInformation(eclEventInformationName())
 {
+
   // Set description
   setDescription("ECLShowerCorrectorModule: Corrects for MC truth to reconstruction differences");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -62,6 +63,8 @@ ECLShowerCorrectorModule::~ECLShowerCorrectorModule()
 
 void ECLShowerCorrectorModule::initialize()
 {
+  B2DEBUG(175, "ECLShowerCorrectorModule::initialize()");
+
   // Register in datastore
   m_eclShowers.registerInDataStore(eclShowerArrayName());
   m_eclEventInformation.registerInDataStore(eclEventInformationName());
@@ -75,6 +78,7 @@ void ECLShowerCorrectorModule::beginRun()
 
 void ECLShowerCorrectorModule::event()
 {
+
   // Get the event background level
   const int bkgdcount = m_eclEventInformation->getBackgroundECL();
   double backgroundLevel = 0.0; // from out of time digit counting
@@ -124,9 +128,9 @@ void ECLShowerCorrectorModule::prepareLeakageCorrections()
 {
   // Prepare energy correction constants taken from the database to be used in an interpolation correction
   // get all information from the payload
-  m_numOfBfBins = m_leakageCorrectionPtr->getNumOfBfBins()[0];
-  m_numOfEnergyBins = m_leakageCorrectionPtr->getNumOfEnergyBins()[0];
-  m_numOfPhiBins = 10; //FIXME
+  m_numOfBfBins        = m_leakageCorrectionPtr->getNumOfBfBins()[0];
+  m_numOfEnergyBins    = m_leakageCorrectionPtr->getNumOfEnergyBins()[0];
+  m_numOfPhiBins       = m_leakageCorrectionPtr->getNumOfPhiBins()[0];
   m_numOfReg1ThetaBins = m_leakageCorrectionPtr->getNumOfReg1ThetaBins()[0];
   m_numOfReg2ThetaBins = m_leakageCorrectionPtr->getNumOfReg2ThetaBins()[0];
   m_numOfReg3ThetaBins = m_leakageCorrectionPtr->getNumOfReg3ThetaBins()[0];

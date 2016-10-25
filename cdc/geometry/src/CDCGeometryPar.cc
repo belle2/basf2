@@ -73,14 +73,19 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     m_chMapFromDB.addCallback(this, &CDCGeometryPar::setChMap);
   }
 #endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+  if (m_displacementFromDB.isValid()) {
+    m_displacementFromDB.addCallback(this, &CDCGeometryPar::setDisplacement);
+  }
+#endif
 #if defined(CDC_ALIGN_FROM_DB)
   if (m_alignFromDB.isValid()) {
     m_alignFromDB.addCallback(this, &CDCGeometryPar::setWirPosAlignParams);
   }
 #endif
-#if defined(CDC_DISPLACEMENT_FROM_DB)
-  if (m_displacementFromDB.isValid()) {
-    m_displacementFromDB.addCallback(this, &CDCGeometryPar::setDisplacement);
+#if defined(CDC_MISALIGN_FROM_DB)
+  if (m_misalignFromDB.isValid()) {
+    m_misalignFromDB.addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
   }
 #endif
 
@@ -296,14 +301,6 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #endif
   }
 
-  //Set misalignment params. (from input data)
-  m_Misalignment = geom.getMisalignment();
-  B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
-         m_Misalignment);
-  if (m_Misalignment) {
-    readWirePositionParams(c_Misaligned, &geom, gbxParams);
-  }
-
   //Set alignment params. (from input data)
   m_Alignment = geom.getAlignment();
   B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
@@ -313,6 +310,18 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
     setWirPosAlignParams();
 #else
     readWirePositionParams(c_Aligned, &geom, gbxParams);
+#endif
+  }
+
+  //Set misalignment params. (from input data)
+  m_Misalignment = geom.getMisalignment();
+  B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
+         m_Misalignment);
+  if (m_Misalignment) {
+#if defined(CDC_MISALIGN_FROM_DB)
+    setWirPosMisalignParams();
+#else
+    readWirePositionParams(c_Misaligned, &geom, gbxParams);
 #endif
   }
 
@@ -807,6 +816,44 @@ void CDCGeometryPar::setWirPosAlignParams()
       //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
       m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
                                    m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
+    } //end of  layer loop
+  } //end of cell loop
+}
+#endif
+
+
+#if defined(CDC_MISALIGN_FROM_DB)
+// Set misalignment wire positions
+//TODO: merge this and setWirPosAlignParam() somehow
+void CDCGeometryPar::setWirPosMisalignParams()
+{
+  const int np = 3;
+  double back[np], fwrd[np];
+
+  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+    for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
+      //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
+      WireID wire(iL, iC);
+      back[0] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdX);
+      back[1] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdY);
+      back[2] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdZ);
+
+      fwrd[0] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdX);
+      fwrd[1] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdY);
+      fwrd[2] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdZ);
+
+      for (int i = 0; i < np; ++i) {
+        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
+        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+      }
+
+      //      double baseTension = 0.;
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+      double tension = m_misalignFromDB->get(wire, CDCMisalignment::wireTension);
+      //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
+      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
+                                      m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
       //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
     } //end of  layer loop
   } //end of cell loop

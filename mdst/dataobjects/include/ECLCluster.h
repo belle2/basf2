@@ -34,28 +34,28 @@ namespace Belle2 {
       m_isTrack(false),
       m_status(0),
       m_connectedRegionId(0),
-      m_hypothesisId(5), // set to 5 (all photons) for compatibility and b2bii
-      m_covmat_00(0.),
+      m_hypothesisId(5), // set to 5 (all photons) for b2bii
+      m_sqrtcovmat_00(0.),
       m_covmat_10(0.),
-      m_covmat_11(0.),
+      m_sqrtcovmat_11(0.),
       m_covmat_20(0.),
       m_covmat_21(0.),
-      m_covmat_22(0.),
-      m_deltaL(0),
-      m_minTrkDistance(0),
-      m_absZernike40(0),
-      m_absZernike51(0),
-      m_zernikeMVA(0),
-      m_E1oE9(0),
-      m_E9oE21(0),
-      m_secondMoment(0),
-      m_LAT(0),
-      m_numberOfCrystals(0),
-      m_time(0),
-      m_deltaTime99(0),
-      m_theta(0),
-      m_phi(0),
-      m_r(0),
+      m_sqrtcovmat_22(0.),
+      m_deltaL(0.),
+      m_minTrkDistance(0.),
+      m_absZernike40(0.),
+      m_absZernike51(0.),
+      m_zernikeMVA(0.),
+      m_E1oE9(0.),
+      m_E9oE21(0.),
+      m_secondMoment(0.),
+      m_LAT(0.),
+      m_numberOfCrystals(0.),
+      m_time(0.),
+      m_deltaTime99(0.),
+      m_theta(0.),
+      m_phi(0.),
+      m_r(0.),
       m_logEnergy(-5.),
       m_logEnergyRaw(-5.),
       m_logEnergyHighestCrystal(-5.) {}
@@ -79,22 +79,22 @@ namespace Belle2 {
      */
     void setCovarianceMatrix(double covArray[6])
     {
-      m_covmat_00 = covArray[0]; // energy
+      m_sqrtcovmat_00 = sqrt(fabs(covArray[0])); // energy
       m_covmat_10 = covArray[1];
-      m_covmat_11 = covArray[2]; // phi
+      m_sqrtcovmat_11 = sqrt(fabs(covArray[2])); // phi
       m_covmat_20 = covArray[3];
       m_covmat_21 = covArray[4];
-      m_covmat_22 = covArray[5]; // theta
+      m_sqrtcovmat_22 = sqrt(fabs(covArray[5])); // theta
     }
 
     /** Set energy uncertainty. */
-    void setUncertaintyEnergy(double energyunc) { m_covmat_00 = energyunc * energyunc; }
+    void setUncertaintyEnergy(double energyunc) { m_sqrtcovmat_00 = fabs(energyunc); }
 
     /** Set theta uncertainty. */
-    void setUncertaintyTheta(double thetaunc) { m_covmat_22 = thetaunc * thetaunc; }
+    void setUncertaintyTheta(double thetaunc) { m_sqrtcovmat_22 = fabs(thetaunc); }
 
     /** Set phi uncertainty. */
-    void setUncertaintyPhi(double phiunc) { m_covmat_11 = phiunc * phiunc; }
+    void setUncertaintyPhi(double phiunc) { m_sqrtcovmat_11 = fabs(phiunc); }
 
     /** Set deltaL for shower shape. */
     void setdeltaL(double deltaL) { m_deltaL = deltaL; }
@@ -220,13 +220,13 @@ namespace Belle2 {
     double getEnergyHighestCrystal() const {return exp(m_logEnergyHighestCrystal);}
 
     /** Return Uncertainty on Energy of Shower */
-    double getUncertaintyEnergy() const {return sqrt(m_covmat_00);}
+    double getUncertaintyEnergy() const {return (m_sqrtcovmat_00);}
 
     /** Return Uncertainty on Theta of Shower */
-    double getUncertaintyTheta() const {return sqrt(m_covmat_22);}
+    double getUncertaintyTheta() const {return (m_sqrtcovmat_22);}
 
     /** Return Uncertainty on Phi of Shower */
-    double getUncertaintyPhi() const { return sqrt(m_covmat_11);}
+    double getUncertaintyPhi() const { return (m_sqrtcovmat_11);}
 
     /** Return Px (GeV/c) */
     double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
@@ -286,14 +286,14 @@ namespace Belle2 {
     // E     00   01    02
     // phi   10   11    12
     // theta 20   21    22
-    /** Covariance entry 00 sigma_E*sigma_E, 0.01*0.01 and (1% to 25% between 10 MeV and 8 GeV) */
-    Double32_t m_covmat_00; //[0.0001, 1.0, 18]
+    /** Covariance entry 00 sigma_E (1% to 25% between 10 MeV and 8 GeV) */
+    Double32_t m_sqrtcovmat_00; //[0.0, 0.3, 10]
 
     /** Covariance matrix 10, not used yet */
     Double32_t m_covmat_10; //[0.0, 10., 12]
 
-    /** Covariance matrix 11, sigma_phi*sigma_phi, between 0 and 50*50 mrad^2 */
-    Double32_t m_covmat_11; //[0.0, 0.0025, 12]
+    /** Covariance matrix 11, sigma_phi, between 0 and 50 mrad */
+    Double32_t m_sqrtcovmat_11; //[0.0, 0.05, 8]
 
     /** Covariance matrix 20, not used yet */
     Double32_t m_covmat_20; //[0.0, 10., 12]
@@ -301,8 +301,8 @@ namespace Belle2 {
     /** Covariance matrix 21, not used yet */
     Double32_t m_covmat_21; //[0.0, 10., 12]
 
-    /** Covariance matrix 22, sigma_theta*sigma_theta, between 0 and 50*50 mrad^2 */
-    Double32_t m_covmat_22; //[0.0, 0.0025, 12]
+    /** Covariance matrix 22, sigma_theta, between 0 and 50 mrad */
+    Double32_t m_sqrtcovmat_22; //[0.0, 0.050, 8]
 
     /** Delta L as defined in arXiv:0711.1593. */
     Double32_t  m_deltaL;  //[-250, 250., 10]
@@ -359,7 +359,8 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 5);
+    ClassDef(ECLCluster, 6);
+    // 6: Changed stored variances to sqrt(covmat_ii).
     // 5: New HypothesisId default, removed relative covariance entries, renamed some setters/getters, adjusted covariance variable ranges.
     // 4: Complete revision and new variables. Introduction of Double32_t. Some new setters and getters.
 

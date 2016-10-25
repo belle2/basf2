@@ -11,11 +11,18 @@ from tracking import (
     add_prune_tracks,
 )
 
+from softwaretrigger import (
+    add_fast_reco_software_trigger,
+    add_hlt_software_trigger,
+    add_calibration_software_trigger,
+)
+
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
     """
     This function adds the standard reconstruction modules to a path.
-    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
+    plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
@@ -37,7 +44,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         all (but you will have to add it on your own then).
     """
 
-    # tracking
+    # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
                                 components=components,
                                 pruneTracks=False,
@@ -45,11 +52,17 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding)
 
-    # add further reconstruction modules
+    # Add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     trigger_mode=trigger_mode)
+
+    # Add the modules calculating the software trigger cuts (but not performing them)
+    if trigger_mode == "all":
+        add_fast_reco_software_trigger(path)
+        add_hlt_software_trigger(path)
+        add_calibration_software_trigger(path)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True):
@@ -139,6 +152,7 @@ def add_mdst_output(
         'KLMClusters',
         'KLMClustersToTracks',
         'TRGSummary',
+        'SoftwareTriggerResult',
     ]
     persistentBranches = ['FileMetaData']
     if mc:

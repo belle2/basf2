@@ -1,3 +1,7 @@
+import modularAnalysis
+import stdFSParticles
+import vertex
+
 SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
 
 FAST_RECO_CUTS = ["reject_ee", "accept_ee", "reject_bkg"]
@@ -9,3 +13,134 @@ CALIB_CUTS = ["accept_ee", "accept_gee", "accept_mumu", "accept_gmumu", "accept_
               "accept_D0_Kpi", "accept_Dstar", "accept_Xi_piLambda", "accept_test",
               "accept_dqm_D0", "accept_dqm_Dplus", "accept_dqm_Dstar",
               "accept_dqm_Jpsiee", "accept_dqm_Jpsimumu"]
+
+
+def add_fast_reco_software_trigger(path, store_array_debug_prescale=None):
+    """
+    Add the SoftwareTrigger for the fast reco cuts to the given path.
+
+    Only the calculation of the cuts is implemented here - the cut logic has to be done
+    using the module return value.
+
+    :param path: The path to which the module should be added.
+    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+     cut calculations in the data store.
+    :return: the software trigger module
+    """
+    fast_reco_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="fast_reco",
+                                           cutIdentifiers=FAST_RECO_CUTS,
+                                           acceptOverridesReject=True)
+    if store_array_debug_prescale is not None:
+        fast_reco_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+
+    return fast_reco_cut_module
+
+
+def add_hlt_software_trigger(path, store_array_debug_prescale=None):
+    """
+    Add the SoftwareTrigger for the HLT cuts to the given path.
+
+    Only the calculation of the cuts is implemented here - the cut logic has to be done
+    using the module return value.
+
+    :param path: The path to which the module should be added.
+    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+     cut calculations in the data store.
+    :return: the software trigger module
+    """
+    modularAnalysis.fillParticleList("pi+:HLT", 'pt>0.2', path=path)
+    modularAnalysis.fillParticleList("gamma:HLT", 'E>0.1', path=path)
+
+    # Add fast reco cuts
+    hlt_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="hlt",
+                                     cutIdentifiers=HLT_CUTS)
+
+    if store_array_debug_prescale is not None:
+        hlt_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)
+
+    return hlt_cut_module
+
+
+def add_calibration_software_trigger(path, store_array_debug_prescale=None):
+    """
+    Add the SoftwareTrigger for the calibration (after HLT) to the given path.
+
+    Only the calculation of the cuts is implemented here - the cut logic has to be done
+    using the module return value.
+
+    :param path: The path to which the module should be added.
+    :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
+     cut calculations in the data store.
+    :return: the software trigger module
+    """
+    trackcut = 'abs(dz)<4.0 and dr<2.0 and chiProb>0.001 and cosTheta>-0.866 and cosTheta<0.956'
+    modularAnalysis.fillParticleList("pi+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("K+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("p+:calib", trackcut, path=path)
+    modularAnalysis.fillParticleList("gamma:calib", 'E>0.05', path=path)
+    # rho
+    modularAnalysis.reconstructDecay('rho0:calib -> pi+:calib pi-:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('rho0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('rho0:calib', {'abs(dM)': 'rho0_dM'}, path=path)
+
+    # reconstruct intermediate state
+    # D0->Kpi, D*->D0(Kpi) pi
+    modularAnalysis.reconstructDecay('D0:calib -> pi+:calib K-:calib', 'abs(dM)<0.5', path=path)
+
+    modularAnalysis.reconstructDecay('D*+:calib -> D0:calib pi+:calib', 'abs(dM)<0.5', path=path)
+    modularAnalysis.rankByLowest('D0:calib', 'abs(dM)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:calib', {'abs(dM)': 'D0_dM'}, path=path)
+    modularAnalysis.rankByLowest('D*+:calib', 'abs(dQ)', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:calib', {'abs(dQ)': 'Dstar_dQ'}, path=path)
+
+    # Lambda0->p pi-, Xi-->Lambda0 pi-
+    modularAnalysis.reconstructDecay('Lambda0:calib -> pi-:calib p+:calib', '', path=path)
+    vertex.fitVertex('Lambda0:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Lambda0:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Lambda0:calib', {'chiProb': 'Lambda0_chiProb'}, path=path)
+
+    modularAnalysis.reconstructDecay('Xi-:calib -> Lambda0:calib pi-:calib', '', path=path)
+    vertex.fitVertex('Xi-:calib', 0.001, fitter='kfitter', path=path)
+    modularAnalysis.rankByHighest('Xi-:calib', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('Xi-:calib', {'chiProb': 'Xi_chiProb'}, path=path)
+
+    # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
+    stdFSParticles.stdPi(path=path)
+    stdFSParticles.stdK(path=path)
+    # D0->K- pi+
+    modularAnalysis.reconstructDecay('D0:dqm -> K-:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D0:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'D0_dqm_M'}, path=path)
+
+    # D*+->D0 pi-
+    modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:std',
+                                     '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
+    vertex.vertexKFit('D*+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D*+:dqm', {'M': 'Dstar_dqm_M'}, path=path)
+
+    # D+ -> K- pi+ pi+
+    modularAnalysis.reconstructDecay('D+:dqm -> K-:std pi+:std pi+:std', '1.8 < M < 1.92', path=path)
+    vertex.vertexKFit('D+:dqm', 0.0, path=path)
+    modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'Dplus_dqm_M'}, path=path)
+
+    # Jpsi-> ee
+    modularAnalysis.fillParticleList('e+:good', 'eid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_ee -> e+:good e-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_ee', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_ee', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_ee', {'M': 'Jpsi_dqm_ee_M'}, path=path)
+
+    # Jpsi-> mumu
+    modularAnalysis.fillParticleList('mu+:good', 'muid > 0.2 and d0 < 2 and abs(z0) < 4 ', path=path)
+    modularAnalysis.reconstructDecay('J/psi:dqm_mumu -> mu+:good mu-:good', '2.9 < M < 3.2', path=path)
+    vertex.massVertexKFit('J/psi:dqm_mumu', 0.0, path=path)
+    modularAnalysis.rankByHighest('J/psi:dqm_mumu', 'chiProb', 1, path=path)
+    modularAnalysis.variablesToExtraInfo('J/psi:dqm_mumu', {'M': 'Jpsi_dqm_mumu_M'}, path=path)
+
+    calibration_cut_module = path.add_module("SoftwareTrigger", baseIdentifier="calib", cutIdentifiers=CALIB_CUTS)
+
+    if store_array_debug_prescale is not None:
+        calibration_cut_module.param("preScaleStoreDebugOutputToDataStore", store_array_debug_prescale)

@@ -34,6 +34,7 @@
 #pragma link C++ class pair<short, short>+;
 
 #pragma link C++ class Belle2::TRGSummary+;
+#pragma link C++ class Belle2::SoftwareTriggerResult+;
 
 #pragma link C++ class Belle2::HLTTag;
 

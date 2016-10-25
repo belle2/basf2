@@ -1,5 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['$ROOT_LIBS', "hlt_softwaretrigger_dataobjects"]
-
-Return('env')

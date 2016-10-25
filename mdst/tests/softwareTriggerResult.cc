@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <gtest/gtest.h>
 
 using namespace std;

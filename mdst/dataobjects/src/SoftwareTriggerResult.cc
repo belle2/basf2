@@ -1,7 +1,6 @@
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 using namespace Belle2;
-using namespace SoftwareTrigger;
 
 /// Add a new cut result to the storage or override the result with the same name.
 void SoftwareTriggerResult::addResult(const std::string& triggerIdentifier, const SoftwareTriggerCutResult& result)

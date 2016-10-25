@@ -6,7 +6,7 @@
 #include <hlt/softwaretrigger/calculations/FastRecoCalculator.h>
 #include <hlt/softwaretrigger/calculations/HLTCalculator.h>
 #include <hlt/softwaretrigger/calculations/CalibSampleCalculator.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerDBHandler.h>
 
 #include <vector>

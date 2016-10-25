@@ -6,7 +6,7 @@
 // Date : 13 - Oct - 2016
 //-
 #include <hlt/softwaretrigger/modules/SoftwareTriggerDQMModule.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 #include <hlt/softwaretrigger/dataobjects/SoftwareTriggerVariables.h>
 #include <map>
 #include <string>

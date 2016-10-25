@@ -51,6 +51,7 @@ namespace Belle2 {
                                         std::vector<float> hReg3Theta,
                                         std::vector<int> numOfBfBins,
                                         std::vector<int> numOfEnergyBins,
+                                        std::vector<int> numOfPhiBins,
                                         std::vector<int> numOfReg1ThetaBins,
                                         std::vector<int> numOfReg2ThetaBins,
                                         std::vector<int> numOfReg3ThetaBins,
@@ -70,6 +71,7 @@ namespace Belle2 {
       m_hReg3Theta(hReg3Theta),
       m_numOfBfBins(numOfBfBins),
       m_numOfEnergyBins(numOfEnergyBins),
+      m_numOfPhiBins(numOfPhiBins),
       m_numOfReg1ThetaBins(numOfReg1ThetaBins),
       m_numOfReg2ThetaBins(numOfReg2ThetaBins),
       m_numOfReg3ThetaBins(numOfReg3ThetaBins),
@@ -101,6 +103,7 @@ namespace Belle2 {
     std::vector<float> getHReg3Theta() const {return m_hReg3Theta;};
     std::vector<int> getNumOfBfBins() const {return m_numOfBfBins;};
     std::vector<int> getNumOfEnergyBins() const {return m_numOfEnergyBins;};
+    std::vector<int> getNumOfPhiBins()    const {return m_numOfPhiBins;};
     std::vector<int> getNumOfReg1ThetaBins() const {return m_numOfReg1ThetaBins;};
     std::vector<int> getNumOfReg2ThetaBins() const {return m_numOfReg2ThetaBins;};
     std::vector<int> getNumOfReg3ThetaBins() const {return m_numOfReg3ThetaBins;};
@@ -125,6 +128,7 @@ namespace Belle2 {
     std::vector<float> m_hReg3Theta;
     std::vector<int>    m_numOfBfBins;
     std::vector<int>    m_numOfEnergyBins;
+    std::vector<int>    m_numOfPhiBins;
     std::vector<int>    m_numOfReg1ThetaBins;
     std::vector<int>    m_numOfReg2ThetaBins;
     std::vector<int>    m_numOfReg3ThetaBins;

@@ -200,6 +200,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   float hReg3Theta;
   int numOfBfBins;
   int numOfEnergyBins;
+  int numOfPhiBins;
   int numOfReg1ThetaBins;
   int numOfReg2ThetaBins;
   int numOfReg3ThetaBins;
@@ -214,6 +215,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   helperTree->SetBranchAddress(m_hReg3ThetaBranchName.c_str(), &hReg3Theta);
   helperTree->SetBranchAddress(m_numOfBfBinsBranchName.c_str(), &numOfBfBins);
   helperTree->SetBranchAddress(m_numOfEnergyBinsBranchName.c_str(), &numOfEnergyBins);
+  helperTree->SetBranchAddress(m_numOfPhiBinsBranchName.c_str(), &numOfPhiBins);
   helperTree->SetBranchAddress(m_numOfReg1ThetaBinsBranchName.c_str(), &numOfReg1ThetaBins);
   helperTree->SetBranchAddress(m_numOfReg2ThetaBinsBranchName.c_str(), &numOfReg2ThetaBins);
   helperTree->SetBranchAddress(m_numOfReg3ThetaBinsBranchName.c_str(), &numOfReg3ThetaBins);
@@ -229,6 +231,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   std::vector<float> m_hReg3Theta;
   std::vector<int>   m_numOfBfBins;
   std::vector<int>   m_numOfEnergyBins;
+  std::vector<int>   m_numOfPhiBins;
   std::vector<int>   m_numOfReg1ThetaBins;
   std::vector<int>   m_numOfReg2ThetaBins;
   std::vector<int>   m_numOfReg3ThetaBins;
@@ -246,6 +249,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
     m_hReg3Theta.push_back(hReg3Theta);
     m_numOfBfBins.push_back(numOfBfBins);
     m_numOfEnergyBins.push_back(numOfEnergyBins);
+    m_numOfPhiBins.push_back(numOfPhiBins);
     m_numOfReg1ThetaBins.push_back(numOfReg1ThetaBins);
     m_numOfReg2ThetaBins.push_back(numOfReg2ThetaBins);
     m_numOfReg3ThetaBins.push_back(numOfReg3ThetaBins);
@@ -271,6 +275,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
                   m_hReg3Theta,
                   m_numOfBfBins,
                   m_numOfEnergyBins,
+                  m_numOfPhiBins,
                   m_numOfReg1ThetaBins,
                   m_numOfReg2ThetaBins,
                   m_numOfReg3ThetaBins,

@@ -102,6 +102,7 @@ namespace Belle2 {
     std::string m_hReg3ThetaBranchName = "hReg3Theta";
     std::string m_numOfBfBinsBranchName = "numOfBfBins";
     std::string m_numOfEnergyBinsBranchName = "numOfEnergyBins";
+    std::string m_numOfPhiBinsBranchName = "numOfPhiBins";
     std::string m_numOfReg1ThetaBinsBranchName = "numOfReg1ThetaBins";
     std::string m_numOfReg2ThetaBinsBranchName = "numOfReg2ThetaBins";
     std::string m_numOfReg3ThetaBinsBranchName = "numOfReg3ThetaBins";

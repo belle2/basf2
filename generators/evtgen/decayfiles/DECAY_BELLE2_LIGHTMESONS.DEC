@@ -8,7 +8,7 @@
 #   Light meson decays (rho, eta, phi, f'_0...) updated to PDG 2015
 #   New Dalitz modes for eta and eta' 
 
-y
+
 Define qoverp_incohMix_B_s0 1.0
 Define dm_incohMix_B_s0 17.8e12
 Define qoverp_incohMix_B0 1.0

@@ -45,7 +45,7 @@
 
     <!-- For displacement -->
     <Displacement desc="true: load displacements for sense wires; false: not.">true</Displacement>
-    <displacementFileName desc="file which contains displacement params.">displacement_v1.dat</displacementFileName>
+    <displacementFileName desc="file which contains displacement params.">displacement_v1.1.dat</displacementFileName>
 
     <!-- For misalignment -->
     <Misalignment desc="true: load misalignments for sense wires; false: not.">true</Misalignment>

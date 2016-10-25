@@ -66,6 +66,19 @@ namespace Belle2 {
 
   private:
 
+    /**
+     * Gauss function
+     * @param x argument
+     * @param mean mean
+     * @param sigma sigma
+     * @return value
+     */
+    double gauss(double x, double mean, double sigma) const
+    {
+      double xx = (x - mean) / sigma;
+      return exp(-0.5 * xx * xx);
+    }
+
     double m_timeZeroJitter = 0;       /**< r.m.s of T0 jitter */
     double m_darkNoise = 0;            /**< uniform dark noise (hits per bar) */
     double m_trigT0Sigma = 0;          /**< trigger T0 resolution */

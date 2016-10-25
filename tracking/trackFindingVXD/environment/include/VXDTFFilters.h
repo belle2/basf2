@@ -157,7 +157,7 @@ namespace Belle2 {
                         FullSecID inner,
                         const twoHitFilter_t& filter)
     {
-      // TODO add the friendship relation to the static sector
+
       if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
           m_compactSecIDsMap[ outer ] == 0)
         return 0;
@@ -173,7 +173,7 @@ namespace Belle2 {
                           FullSecID inner,
                           const threeHitFilter_t& filter)
     {
-      // TODO add the friendship relation to the static sector
+
       if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
           m_compactSecIDsMap[ outer ] == 0 ||
           m_compactSecIDsMap[ center ] == 0 ||
@@ -349,6 +349,41 @@ namespace Belle2 {
     /// Retrieves from the current TDirectory the StaticSectors.
     bool retrieveStaticSectors(void)
     {
+      TTree* sp2tree = new TTree("SegmentFilters", "SegmentFilters");
+      twoHitFilter_t twoHitFilter;
+      twoHitFilter.persist(sp2tree, "filter");
+
+      unsigned int outerFullSecID2sp, innerFullSecID2sp;
+      sp2tree->Branch("outerFullSecID", & outerFullSecID2sp);
+      sp2tree->Branch("innerFullSecID", & innerFullSecID2sp);
+
+      for (Long64_t i = 0 ; i < sp2tree->GetEntries() ; i++) {
+        sp2tree->GetEntry(i);
+        if (!addTwoHitFilter(outerFullSecID2sp, innerFullSecID2sp,
+                             twoHitFilter))
+          return false;
+
+      }
+
+      TTree* sp3tree = new TTree("TripletsFilters", "TripletFilters");
+      threeHitFilter_t threeHitFilter;
+      threeHitFilter.persist(sp3tree, "filter");
+
+      unsigned int outerFullSecID3sp, centerFullSecID3sp,
+               innerFullSecID3sp;
+      sp3tree->Branch("outerFullSecID", & outerFullSecID3sp);
+      sp3tree->Branch("centerFullSecID", & centerFullSecID3sp);
+      sp3tree->Branch("innerFullSecID", & innerFullSecID3sp);
+
+      for (Long64_t i = 0 ; i < sp3tree->GetEntries() ; i++) {
+        sp3tree->GetEntry(i);
+        if (!addThreeHitFilter(outerFullSecID3sp, centerFullSecID3sp,
+                               innerFullSecID3sp,
+                               threeHitFilter))
+          return false;
+
+      }
+
       return true;
     }
 

@@ -608,6 +608,9 @@ namespace Belle2 {
       m_matchingStatus = matchingStatus;
     }
 
+    /// Delete all fitted information for all representations
+    void deleteFittedInformation();
+
 
   private:
     /// Internal storage for the genfit track.

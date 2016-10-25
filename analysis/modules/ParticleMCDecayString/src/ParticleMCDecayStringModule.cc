@@ -39,8 +39,10 @@ namespace Belle2 {
     StoreObjPtr<ParticleList>::required(m_listName);
 
     StoreObjPtr<DecayHashMap> dMap("", DataStore::c_Persistent);
-    dMap.registerInDataStore();
-    dMap.create();
+    if (not dMap.isValid()) {
+      dMap.registerInDataStore();
+      dMap.create();
+    }
 
   }
 

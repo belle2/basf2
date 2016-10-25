@@ -84,7 +84,8 @@ namespace Belle2 {
       m_timeJitter(timeJitter),
       m_efficiency(efficiency),
       m_numBits(numBits),
-      m_binWidth(binWidth)
+      m_binWidth(binWidth),
+      m_sampleWidth(binWidth)
     {}
 
     /**
@@ -160,6 +161,12 @@ namespace Belle2 {
     double getBinWidth() const {return m_binWidth;}
 
     /**
+     * Returns time difference between two samples
+     * @return time between two samples
+     */
+    double getSampleWidth() const {return m_sampleWidth;}
+
+    /**
      * Returns TDC overflow value
      * @return overflow value
      */
@@ -185,12 +192,34 @@ namespace Belle2 {
     double getTimeMax() const {return getOverflowValue() * m_binWidth - m_offset;}
 
     /**
-     * Convert time to TDC count.
+     * Converts time to TDC count.
      * For times being outside TDC range, TDC overflow value is returned.
      * @param time [ns]
-     * @return TDC TDC count
+     * @return TDC count
      */
     int getTDCcount(double time) const;
+
+    /**
+     * Converts time to sample number.
+     * Use isSampleValid(int) to check the validity of sample number
+     * @param time [ns]
+     * @return sample number
+     */
+    int getSample(double time) const;
+
+    /**
+     * Converts sample number to time
+     * @param sample sample number
+     * @return time [ns]
+     */
+    double getSampleTime(int sample) const {return sample * m_sampleWidth - m_offset;}
+
+    /**
+     * Check for the validity of sample number
+     * @param sample sample number
+     * @return true if sample number is valid
+     */
+    bool isSampleValid(int sample) const;
 
     /**
      * Check for consistency of data members
@@ -219,8 +248,9 @@ namespace Belle2 {
 
     unsigned m_numBits = 0; /**< number of bits */
     float m_binWidth = 0; /**< time width of a TDC bin */
+    float m_sampleWidth = 0; /**< time between two samples */
 
-    ClassDef(TOPNominalTDC, 1); /**< ClassDef */
+    ClassDef(TOPNominalTDC, 2); /**< ClassDef */
 
   };
 

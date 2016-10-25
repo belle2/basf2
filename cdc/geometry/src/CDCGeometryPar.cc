@@ -14,6 +14,8 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
+#include <cdc/geometry/CDCGeoControlPar.h>
+#include <cdc/simulation/CDCSimControlPar.h>
 
 #include <cmath>
 #include <boost/format.hpp>
@@ -71,14 +73,19 @@ CDCGeometryPar::CDCGeometryPar(const CDCGeometry* geom)
     m_chMapFromDB.addCallback(this, &CDCGeometryPar::setChMap);
   }
 #endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+  if (m_displacementFromDB.isValid()) {
+    m_displacementFromDB.addCallback(this, &CDCGeometryPar::setDisplacement);
+  }
+#endif
 #if defined(CDC_ALIGN_FROM_DB)
   if (m_alignFromDB.isValid()) {
     m_alignFromDB.addCallback(this, &CDCGeometryPar::setWirPosAlignParams);
   }
 #endif
-#if defined(CDC_DISPLACEMENT_FROM_DB)
-  if (m_displacementFromDB.isValid()) {
-    m_displacementFromDB.addCallback(this, &CDCGeometryPar::setDisplacement);
+#if defined(CDC_MISALIGN_FROM_DB)
+  if (m_misalignFromDB.isValid()) {
+    m_misalignFromDB.addCallback(this, &CDCGeometryPar::setWirPosMisalignParams);
   }
 #endif
 
@@ -174,10 +181,13 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_zWall[3][1] = geom.getOuterWall(0).getZfwd();
 
   // Get sense layers parameters
-  m_debug = geom.getDebugMode();
+  //  m_debug = geom.getDebugMode();
+  m_debug = CDCGeoControlPar::getInstance().getDebug();
   m_nSLayer = geom.getNSenseLayers();
 
-  m_materialDefinitionMode = geom.getMaterialDefinitionMode();
+  //  m_materialDefinitionMode = geom.getMaterialDefinitionMode();
+  m_materialDefinitionMode = CDCGeoControlPar::getInstance().getMaterialDefinitionMode();
+  //  std::cout << m_materialDefinitionMode << std::endl;
   if (m_materialDefinitionMode == 0) {
     B2INFO("CDCGeometryPar: Define a mixture of gases and wires in the tracking volume.");
   } else if (m_materialDefinitionMode == 2) {
@@ -188,7 +198,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   }
 
   // Get mode for wire z-position
-  m_senseWireZposMode = geom.getSenseWireZposMode();
+  //  m_senseWireZposMode = geom.getSenseWireZposMode();
+  m_senseWireZposMode = CDCGeoControlPar::getInstance().getSenseWireZposMode();
   //Set z corrections (from input data)
   B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
 
@@ -290,14 +301,6 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #endif
   }
 
-  //Set misalignment params. (from input data)
-  m_Misalignment = geom.getMisalignment();
-  B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
-         m_Misalignment);
-  if (m_Misalignment) {
-    readWirePositionParams(c_Misaligned, &geom, gbxParams);
-  }
-
   //Set alignment params. (from input data)
   m_Alignment = geom.getAlignment();
   B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
@@ -310,11 +313,27 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #endif
   }
 
+  //Set misalignment params. (from input data)
+  m_Misalignment = geom.getMisalignment();
+  B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
+         m_Misalignment);
+  if (m_Misalignment) {
+#if defined(CDC_MISALIGN_FROM_DB)
+    setWirPosMisalignParams();
+#else
+    readWirePositionParams(c_Misaligned, &geom, gbxParams);
+#endif
+  }
+
   // Get control params. for CDC FullSim
-  m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
-  m_minTrackLength = geom.getMinimumTrackLength();
-  m_wireSag = geom.getWireSagMode();
-  m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  //  m_thresholdEnergyDeposit = geom.getEnergyDepositThreshold();
+  m_thresholdEnergyDeposit = CDCSimControlPar::getInstance().getThresholdEnergyDeposit();
+  //  m_minTrackLength = geom.getMinimumTrackLength();
+  m_minTrackLength = CDCSimControlPar::getInstance().getMinTrackLength();
+  //  m_wireSag = geom.getWireSagMode();
+  m_wireSag = CDCSimControlPar::getInstance().getWireSag();
+  //  m_modLeftRightFlag = geom.getModifiedLeftRightFlag();
+  m_modLeftRightFlag = CDCSimControlPar::getInstance().getModLeftRightFlag();
   if (m_modLeftRightFlag) {
     B2FATAL("ModifiedLeftRightFlag = true is disabled for now; need to update a G4-related code in framework...");
   }
@@ -797,6 +816,44 @@ void CDCGeometryPar::setWirPosAlignParams()
       //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
       m_WireSagCoefAlign[iL][iC] = M_PI * m_senseWireDensity *
                                    m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
+      //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
+    } //end of  layer loop
+  } //end of cell loop
+}
+#endif
+
+
+#if defined(CDC_MISALIGN_FROM_DB)
+// Set misalignment wire positions
+//TODO: merge this and setWirPosAlignParam() somehow
+void CDCGeometryPar::setWirPosMisalignParams()
+{
+  const int np = 3;
+  double back[np], fwrd[np];
+
+  for (unsigned iL = 0; iL < MAX_N_SLAYERS; ++iL) {
+    for (unsigned iC = 0; iC < m_nWires[iL]; ++iC) {
+      //      std::cout << "iLiC= " << iL <<" "<< iC << std::endl;
+      WireID wire(iL, iC);
+      back[0] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdX);
+      back[1] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdY);
+      back[2] = m_misalignFromDB->get(wire, CDCMisalignment::wireBwdZ);
+
+      fwrd[0] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdX);
+      fwrd[1] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdY);
+      fwrd[2] = m_misalignFromDB->get(wire, CDCMisalignment::wireFwdZ);
+
+      for (int i = 0; i < np; ++i) {
+        m_BWirPosMisalign[iL][iC][i] = m_BWirPos[iL][iC][i] + back[i];
+        m_FWirPosMisalign[iL][iC][i] = m_FWirPos[iL][iC][i] + fwrd[i];
+      }
+
+      //      double baseTension = 0.;
+      double baseTension = M_PI * m_senseWireDensity * m_senseWireDiameter * m_senseWireDiameter / (8.* m_WireSagCoef[iL][iC]);
+      double tension = m_misalignFromDB->get(wire, CDCMisalignment::wireTension);
+      //      std::cout << back[0] <<" "<< back[1] <<" "<< back[2] <<" "<< fwrd[0] <<" "<< fwrd[1] <<" "<< fwrd[2] <<" "<< tension << std::endl;
+      m_WireSagCoefMisalign[iL][iC] = M_PI * m_senseWireDensity *
+                                      m_senseWireDiameter * m_senseWireDiameter / (8.*(baseTension + tension));
       //    std::cout << "baseTension,tension= " << baseTension <<" "<< tension << std::endl;
     } //end of  layer loop
   } //end of cell loop

@@ -1,7 +1,7 @@
 Import('env')
 
 env['LIBS'] = [ 'framework', 'mdst_dataobjects', 'pxd', 'svd', 'cdc_dataobjects', 'cdc', 'genfit2', 'alignment', 'bklm_dataobjects',
-'pxd_dataobjects', 'svd_dataobjects', 'eklm_dbobjects']
+'pxd_dataobjects', 'svd_dataobjects', 'eklm_dataobjects']
 
 if 'ALLOW_TELESCOPES_IN_GBLFITMODULE' in env['CPPDEFINES'].keys():
     env['LIBS'] += ['testbeam_vxd_dataobjects', 'testbeam']

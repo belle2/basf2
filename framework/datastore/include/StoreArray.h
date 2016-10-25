@@ -230,7 +230,7 @@ namespace Belle2 {
     }
 
     /** Get the number of objects in the array. */
-    inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
+    inline int getEntries() const { return isCreated() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
 
     /** Access to the stored objects.
      *
@@ -295,23 +295,25 @@ namespace Belle2 {
     }
 
 
-    /** Check wether the array object was created.
+    /** Check wether the array was registered.
      *
-     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
-     *           Please use getEntries() for checking whether an array is empty or not.
-     *  @return          True if the array was created internally..
+     *  @note Iterating over the array or calling getEntries() is safe even
+     *        if this returns false. (getEntries() will return 0)
+     *
+     *  @return          True if the array was registered.
      **/
     inline bool isValid() const
     {
       ensureAttached();
-      return m_storeArray && *m_storeArray;
+      return m_storeArray;
     }
 
-    /** Check wether the array object was created.
+    /** Check wether the array was registered.
      *
-     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
-     *           Please use getEntries() for checking whether an array is empty or not.
-     *  @return          True if the array was created internally..
+     *  @note Iterating over the array or calling getEntries() is safe even
+     *        if this returns false. (getEntries() will return 0)
+     *
+     *  @return          True if the array was registered.
      **/
     inline operator bool() const { return isValid(); }
 
@@ -366,10 +368,17 @@ namespace Belle2 {
      */
     inline void ensureCreated() const
     {
-      if (!isValid()) {
+      if (!isCreated()) {
         if (!const_cast<StoreArray*>(this)->create())
           throw std::runtime_error("Write access to " + readableName() + " failed, did you remember to call registerInDataStore()?");
       }
+    }
+
+    /** Check wether the array object was created.  **/
+    inline bool isCreated() const
+    {
+      ensureAttached();
+      return m_storeArray && *m_storeArray;
     }
 
     /** Pointer that actually holds the TClonesArray. */

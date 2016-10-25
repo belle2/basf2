@@ -58,6 +58,18 @@ namespace Belle2 {
     };
 
     /**
+     * Struct to hold parameters of box volumes (examples, scintilators for cosmic test)
+     */
+    struct box {
+      double size[3];
+      double position[3];
+      double rotation[3];
+      std::string name;
+      std::string material;
+    };
+
+
+    /**
      * Consistency check of geometry parameters
      * @return true if consistent
      */
@@ -74,7 +86,7 @@ namespace Belle2 {
      * @param i wedge type ID (1-3)
      * @param par vector of wedge parameters
      */
-    void setWedge(unsigned i, const std::vector<double>& par) {if (i > m_nWedgeType || i == 0) B2ERROR("invalid wedge number"); m_wedgePar[i - 1] = par;};
+    void setWedge(unsigned i, const std::vector<double>& par) {if (i > m_nWedgeType || i == 0) { B2ERROR("invalid wedge number"); return;}; m_wedgePar[i - 1] = par;};
 
     /**
      * Add wedge (all added wedges are placed)
@@ -207,15 +219,71 @@ namespace Belle2 {
      * @param i wedge type
      * @return vector of wedge parameters
      */
-    const std::vector<double> getWedge(unsigned i) const {if (i > m_nWedgeType || i == 0) B2ERROR("invalid wedge number"); std::vector<double> pars; for (auto par : m_wedgePar[i - 1]) pars.push_back(par / s_unit); return pars;}
+    const std::vector<double> getWedge(unsigned i) const {std::vector<double> pars; if (i > m_nWedgeType || i == 0) { B2ERROR("invalid wedge number"); return pars;}; for (auto par : m_wedgePar[i - 1]) pars.push_back(par / s_unit); return pars;}
+
+    /**
+     * Add box volume
+     * @param name volume name
+     * @param material volume material
+     * @param size array of side sizes
+     * @param position array of x,y,z position
+     * @param rotation array of x,y,z rotations
+     */
+    void addBox(const std::string& name, const std::string& material, double size[3], double position[3], double rotation[3])
+    {
+      m_boxes.push_back({{size[0], size[1], size[2]}, {position[0], position[1], position[2]}, {rotation[0], rotation[1], rotation[2]}, name, material});
+    }
+
+    /**
+     * Re-set parameters of existing box
+     * @param i box index
+     * @param name volume name
+     * @param material volume material
+     * @param size array of side sizes
+     * @param position array of x,y,z position
+     * @param rotation array of x,y,z rotations
+     */
+    void setBox(int i, const std::string& name, const std::string& material, double size[3], double position[3], double rotation[3])
+    {
+      m_boxes[i] = {{size[0], size[1], size[2]}, {position[0], position[1], position[2]}, {rotation[0], rotation[1], rotation[2]}, name, material};
+    }
+
+    /**
+     * Get number of box volumes
+     * @return number of box volumes
+     */
+    unsigned getNBoxes() const
+    {
+      return m_boxes.size();
+    }
+
+    /**
+     * Get box paramaters
+     * @param i box index
+     * @return box parameters
+     */
+    box getBox(unsigned i) const
+    {
+      return m_boxes[i];
+    }
+
+    /**
+     * Clear container of boxes
+     */
+    void clearBoxes()
+    {
+      m_boxes.clear();
+    }
+
 
   private:
 
     std::vector<tube> m_tubes;           /**< vector of tube volumes to be placed */
     std::string m_material;              /**< default material of support structure */
-    static const unsigned m_nWedgeType = 3;
+    static const unsigned m_nWedgeType = 3; /**< number of wedge types */
     std::vector<double> m_wedgePar[m_nWedgeType];   /**< parameters of support wedges (joints) */
     std::vector<wedge> m_wedges;         /**< vector of wedge volumes to be placed */
+    std::vector<box> m_boxes;            /**< vector of box volumes to be places */
 
     ClassDef(ARICHGeoSupport, 1); /**< ClassDef */
 

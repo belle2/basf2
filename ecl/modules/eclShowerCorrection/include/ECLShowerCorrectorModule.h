@@ -17,11 +17,16 @@
 
 // ECL
 #include <ecl/dataobjects/ECLShower.h>
+
+#include <ecl/dataobjects/ECLEventInformation.h>
 #include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 
 // FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
 
 // OTHER
 #include <string>
@@ -59,13 +64,49 @@ namespace Belle2 {
       void prepareLeakageCorrections();
 
       //* Get correction */
-      double getLeakageCorrection(const double theta, const double energy, const double background) const;
-
-      //* Get correction uncertainty */
-      double getLeakageCorrectionUncertainty(const double theta, const double energy, const double background) const;
+      double getLeakageCorrection(const double theta, const double phi, const double energy, const double background) const;
 
     private:
-      DBArray<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionArray;  /**< Leakage corrections from DB */
+      DBObjPtr<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionPtr;  /**< Leakage corrections from DB */
+
+      double m_backgroundCount; /**< Background level per event measured */
+      const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
+
+      // Vectors with one entry each:
+      int m_numOfBfBins; /**< number of background fraction bins; currently only two */
+      int m_numOfEnergyBins; /**< number of energy bins */
+      int m_numOfPhiBins; /**< number of phi bins */
+      int m_numOfReg1ThetaBins; /**< number of region 1 theta bins */
+      int m_numOfReg2ThetaBins; /**< number of region 2 theta bins */
+      int m_numOfReg3ThetaBins; /**< number of region 3 theta bins */
+      int m_phiPeriodicity; /**< repeating pattern in phi direction, for barrel it is 72 */
+      float m_lReg1Theta; /**< lower boundary of the region 1 theta */
+      float m_hReg1Theta; /**< upper boundary of the region 1 theta */
+      float m_lReg2Theta; /**< lower boundary of the region 2 theta */
+      float m_hReg2Theta; /**< upper boundary of the region 2 theta */
+      float m_lReg3Theta; /**< lower boundary of the region 3 theta */
+      float m_hReg3Theta; /**< upper boundary of the region 3 theta */
+
+      // Vector with (right now) 15 entries
+      std::vector<float> m_avgRecEn; /**< averages of the energy bins */
+
+      // Vectors with all corrections
+      std::vector<int> m_bgFractionBinNum; /**< BG fraction bin */
+      std::vector<int> m_regNum; /**< region bin */
+      std::vector<int> m_phiBinNum; /**< phi bin */
+      std::vector<int> m_thetaBinNum; /**< theta bin*/
+      std::vector<int> m_energyBinNum; /**< energu bin */
+      std::vector<float> m_correctionFactor; /**< correction value*/
+
+      std::vector < std::vector < std::vector < std::vector < float > > > > m_reg1CorrFactorArrays; /**< region 1 corrections */
+      std::vector < std::vector < std::vector < std::vector < float > > > > m_reg2CorrFactorArrays; /**< region 2 corrections */
+      std::vector < std::vector < std::vector < std::vector < float > > > > m_reg3CorrFactorArrays; /**< region 3 corrections */
+
+      /** Store array: ECLShower. */
+      StoreArray<ECLShower> m_eclShowers;
+
+      /** Store object pointer: ECLEventInformation. */
+      StoreObjPtr<ECLEventInformation> m_eclEventInformation;
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/
@@ -74,11 +115,11 @@ namespace Belle2 {
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
 
-      /** Default name ECLConnectedRegion */
-      virtual const char* eclConnectedRegionArrayName() const
-      { return "ECLConnectedRegions" ; }
-    }; // end of ECLCRFinderAndSplitterModule
+      /** Name to be used for default option: ECLEventInformation.*/
+      virtual const char* eclEventInformationName() const
+      { return "ECLEventInformation" ; }
 
+    };
 
     /** The very same module but for PureCsI */
     class ECLShowerCorrectorPureCsIModule : public ECLShowerCorrectorModule {
@@ -88,10 +129,11 @@ namespace Belle2 {
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
 
-      /** PureCsI name ECLConnectedRegionPureCsI */
-      virtual const char* eclConnectedRegionArrayName() const override
-      { return "ECLConnectedRegionsPureCsI" ; }
-    }; // end of ECLCRFinderAndSplitterPureCsIModule
+      /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
+      virtual const char* eclEventInformationName() const override
+      { return "ECLEventInformationPureCsI" ; }
+
+    };
 
   } // end of ECL namespace
 } // end of Belle2 namespace

@@ -106,7 +106,7 @@ namespace Belle2 {
     //! To be used to map module id to electronics address
     //! @param copperId id of the copper board
     //! @param finesse is the Finesse slot on the copper boards
-    void intToElectCoo(int id, int& copper, int& finesse, int& lane);
+    void intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane);
 
     //! TO be used to map electronics address to module id
     int electCooToInt(int copper, int finesse, int lane, int axis);

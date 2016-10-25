@@ -121,16 +121,17 @@ void BKLMRawPackerModule::event()
     int copperId;
     int finesse;
     int lane;
-    intToElectCoo(electId, copperId, finesse, lane);
+    int plane;
+    intToElectCoo(electId, copperId, finesse, lane, plane);
 
-    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << iLayer << " " << iAx << " " <<
+    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << plane << " " <<
             iChannelNr << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
     unsigned short bword2 = 0;
     unsigned short bword3 = 0;
     unsigned short bword4 = 0;
-    formatData(iChannelNr, iAx, iLayer, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    formatData(iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -289,7 +290,7 @@ void BKLMRawPackerModule::loadMap()
 
 }
 
-void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
+void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane)
 {
   copper = 0;
   finesse = 0;
@@ -298,6 +299,8 @@ void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& 
   finesse = (id >> 4) & 3;
   lane = 0;
   lane = (id >> 6) & 0xF;
+  plane = 0;
+  plane = (id >> 10) & 0x1;
 
 }
 

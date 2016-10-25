@@ -268,9 +268,21 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
-        # ECL CR finder and splitter (refactored old version - two steps at once)
-        ecl_finderandsplitter = register_module('ECLCRFinderAndSplitter')
-        path.add_module(ecl_finderandsplitter)
+        # ECL connected region finder
+        ecl_crfinder = register_module('ECLCRFinder')
+        path.add_module(ecl_crfinder)
+
+        # ECL local maximum finder
+        ecl_lmfinder = register_module('ECLLocalMaximumFinder')
+        path.add_module(ecl_lmfinder)
+
+        # ECL splitter N1
+        ecl_splitterN1 = register_module('ECLSplitterN1')
+        path.add_module(ecl_splitterN1)
+
+        # ECL splitter N2
+        ecl_splitterN2 = register_module('ECLSplitterN2')
+        path.add_module(ecl_splitterN2)
 
         # ECL Shower Correction
         ecl_showercorrection = register_module('ECLShowerCorrector')

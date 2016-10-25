@@ -455,6 +455,8 @@ namespace {
     EXPECT_FALSE(evtArray.isOptional());
     EXPECT_FALSE(evtPtr.isRequired());
     EXPECT_FALSE(evtArray.isRequired());
+    EXPECT_FALSE(evtPtr.isValid());
+    EXPECT_FALSE(evtArray.isValid());
     EXPECT_FALSE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_FALSE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_FALSE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());
@@ -476,6 +478,8 @@ namespace {
     EXPECT_TRUE(evtArray.isOptional());
     EXPECT_TRUE(evtPtr.isRequired());
     EXPECT_TRUE(evtArray.isRequired());
+    EXPECT_FALSE(evtPtr.isValid()); // not valid until created
+    EXPECT_TRUE(evtArray.isValid());
     EXPECT_TRUE(StoreObjPtr<EventMetaData>::optional(evtPtr.getName()));
     EXPECT_TRUE(StoreArray<EventMetaData>::optional(evtArray.getName()));
     EXPECT_TRUE(StoreObjPtr<EventMetaData>(evtPtr.getName()).isRequired());

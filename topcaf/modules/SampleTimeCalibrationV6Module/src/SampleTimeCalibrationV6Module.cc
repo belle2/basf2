@@ -541,8 +541,8 @@ void  SampleTimeCalibrationV6Module::terminate()
 
                   //B2INFO("it.sample1 = " << it->sample1 << "\tsample1index = " << s1index << "\tsample1_frac = " << sample1_frac);
                   //B2INFO("it.sample2 = " << it->sample2 << "\tsample2index = " << s2index << "\tsample2_frac = " << sample2_frac);
-                  double tLeading;
-                  double tTrailing;
+                  double tLeading = 0;
+                  double tTrailing = 0;
 
                   //tLeading = tryDt[s1index] + sample1_frac * (tryDt[s1index+1] - tryDt[s1index]);
                   //tTrailing = tryDt[s2index] + sample2_frac * (tryDt[s2index+1] - tryDt[s2index]);
@@ -999,15 +999,3 @@ void SampleTimeCalibrationV6Module::makeClosurePlots(topcaf_channel_id_t ch_id, 
   }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-

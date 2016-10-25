@@ -79,6 +79,8 @@ namespace Belle2 {
       double m_MaxTime;
       /** Energy threshold */
       double m_MIPthres;
+      /** Event MIP array*/
+      double hitsarrayinMIP[1000][100];
 
     };
 

@@ -12,11 +12,10 @@
 #include <top/geometry/TOPGeometryPar.h>
 #include <top/modules/TOPDigitizer/TimeDigitizer.h>
 
-
-
 // Hit classes
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <top/dataobjects/TOPRecBunch.h>
 #include <mdst/dataobjects/MCParticle.h>
 
@@ -80,10 +79,13 @@ namespace Belle2 {
     mcParticles.isOptional();
 
     // output
+    StoreArray<TOPRawDigit> rawDigits;
+    rawDigits.registerInDataStore();
     StoreArray<TOPDigit> digits;
     digits.registerInDataStore();
     digits.registerRelationTo(simHits);
     digits.registerRelationTo(mcParticles);
+    digits.registerRelationTo(rawDigits);
     StoreObjPtr<TOPRecBunch> recBunch;
     recBunch.registerInDataStore();
 
@@ -112,6 +114,7 @@ namespace Belle2 {
 
     // output: digitized hits
     StoreArray<TOPDigit> digits;
+    StoreArray<TOPRawDigit> rawDigits;
 
     // output: simulated bunch values
     StoreObjPtr<TOPRecBunch> recBunch;
@@ -182,6 +185,83 @@ namespace Belle2 {
     double electronicJitter = geo->getNominalTDC().getTimeJitter();
     for (auto& pixel : pixels) {
       pixel.second.digitize(digits, electronicJitter);
+    }
+
+    // convert to raw digits (gaussian pulse shape assumed!)
+    // to be moved to TimeDigitizer!!!
+    const auto& tdc = geo->getNominalTDC();
+    const auto& frontEndMapper = TOPGeometryPar::Instance()->getFrontEndMapper();
+    const auto& channelMapper = TOPGeometryPar::Instance()->getChannelMapper();
+
+    for (auto& digit : digits) {
+      double time = digit.getTime();
+      double width = digit.getPulseWidth();
+      double height = digit.getADC();
+      double mean = time + width / 2;
+      double sigma = width / 2.35482;
+      digit.setHitQuality(TOPDigit::c_Junk);
+
+      int sampleRise = tdc.getSample(time);
+      if (!tdc.isSampleValid(sampleRise)) continue;
+      short vRise0 = height * gauss(tdc.getSampleTime(sampleRise), mean, sigma);
+      short vRise1 = height * gauss(tdc.getSampleTime(sampleRise + 1), mean, sigma);
+
+      int sampleFall = tdc.getSample(time + width);
+      if (!tdc.isSampleValid(sampleFall + 1)) continue;
+      short vFall0 = height * gauss(tdc.getSampleTime(sampleFall), mean, sigma);
+      short vFall1 = height * gauss(tdc.getSampleTime(sampleFall + 1), mean, sigma);
+
+      int samplePeak = tdc.getSample(mean);
+      short vPeak = height * gauss(tdc.getSampleTime(samplePeak), mean, sigma);
+      short vPeak1 = height * gauss(tdc.getSampleTime(samplePeak + 1), mean, sigma);
+      if (vPeak1 > vPeak) {
+        vPeak = vPeak1;
+        samplePeak++;
+      }
+
+      auto moduleID = digit.getModuleID();
+      auto channel = digit.getChannel();
+      unsigned bs = 0;
+      unsigned carrier = 0;
+      unsigned asic = 0;
+      unsigned chan = 0;
+      channelMapper.splitChannelNumber(channel, bs, carrier, asic, chan);
+      const auto* map = frontEndMapper.getMap(moduleID, bs);
+      if (!map) continue;
+      auto scrodID = map->getScrodID();
+      auto* rawDigit = rawDigits.appendNew(scrodID);
+      rawDigit->setCarrierNumber(carrier);
+      rawDigit->setASICNumber(asic);
+      rawDigit->setASICChannel(chan);
+      rawDigit->setASICWindow(digit.getFirstWindow());
+      rawDigit->setTFine(0);
+      rawDigit->setSampleRise(sampleRise);
+      rawDigit->setDeltaSamplePeak(samplePeak - sampleRise);
+      rawDigit->setDeltaSampleFall(sampleFall - sampleRise);
+      rawDigit->setValueRise0(vRise0);
+      rawDigit->setValueRise1(vRise1);
+      rawDigit->setValueFall0(vFall0);
+      rawDigit->setValueFall1(vFall1);
+      rawDigit->setValuePeak(vPeak);
+      rawDigit->setIntegral(digit.getIntegral());
+
+      double cfdTime = rawDigit->getCFDLeadingTime() * tdc.getSampleWidth()
+                       - tdc.getOffset();
+      double cfdWidth = rawDigit->getFWHM() * tdc.getSampleWidth();
+      int TDCcount = tdc.getTDCcount(cfdTime);
+
+      /*
+      cout<< digit.getTime() << " " << cfdTime << " ";
+      cout<< digit.getPulseWidth() << " "<< cfdWidth << " ";
+      cout<< digit.getTDC() << " " << TDCcount << " ";
+      cout<< digit.getADC() << " " << vPeak << endl;
+      */
+
+      digit.setTime(cfdTime);
+      digit.setPulseWidth(cfdWidth);
+      digit.setTDC(TDCcount);
+      digit.setADC(vPeak);
+      digit.setHitQuality(TOPDigit::c_Good);
     }
 
   }

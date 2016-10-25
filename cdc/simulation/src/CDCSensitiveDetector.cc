@@ -11,6 +11,7 @@
 
 #include <cdc/simulation/CDCSensitiveDetector.h>
 
+#include <cdc/simulation/CDCSimControlPar.h>
 #include <cdc/simulation/Helix.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/geometry/GeoCDCCreator.h>
@@ -74,22 +75,23 @@ namespace Belle2 {
     cdcEBArray.registerInDataStore(DataStore::c_DontWriteOut);
     mcParticles.registerRelationTo(cdcSimHits);
 
-    //    m_thresholdEnergyDeposit = m_cdcgp.getThresholdEnerguDeposit();
-    //    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
-    //    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+    CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
+
+    m_thresholdEnergyDeposit = cntlp.getThresholdEnergyDeposit();
+    m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+    B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_thresholdKineticEnergy = 0.0; // Dummy to avoid a warning (tentative).
 
-    //Now sag must be always off since sag is taken into account in Digitizer, not in FullSim.
-    //    m_wireSag = m_cdcgp->isWireSagOn();
+    m_wireSag = cntlp.getWireSag();
     //    m_wireSag = false;
-    //    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
+    B2INFO("CDCSensitiveDetector: Sense wire sag on(=1)/off(=0): " << m_wireSag);
 
-    //    m_modifiedLeftRightFlag = m_cdcgp.isModifiedLeftRightFlagOn();
-    //    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+    m_modifiedLeftRightFlag = cntlp.getModLeftRightFlag();
+    B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
-    //    m_minTrackLength = m_cdcgp.getMinTrackLength();
-    //    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
-    //    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+    m_minTrackLength = cntlp.getMinTrackLength();
+    m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+    B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 
     //For activating Initialize and EndOfEvent functions
     //    if (m_modifiedLeftRightFlag) {
@@ -102,7 +104,7 @@ namespace Belle2 {
     /*
     m_cdcgp = &CDCGeometryPar::Instance();
 
-    m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnerguDeposit();
+    m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnergyDeposit();
     m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
     B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
     m_modifiedLeftRightFlag = m_cdcgp->isModifiedLeftRightFlagOn();
@@ -125,26 +127,31 @@ namespace Belle2 {
   //-----------------------------------------------------
   bool CDCSensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
   {
-    static bool firstCall = true;
-    if (firstCall) {
-      firstCall = false;
-      m_cdcgp = &CDCGeometryPar::Instance();
+    //    static bool firstCall = true;
+    //    if (firstCall) {
+    //      firstCall = false;
+    m_cdcgp = &CDCGeometryPar::Instance();
+    //      CDCSimControlPar & m_cntlp   = CDCSimControlPar::getInstance();
 
-      m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnerguDeposit();
-      m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
-      B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
+    //      //      m_thresholdEnergyDeposit = m_cdcgp->getThresholdEnergyDeposit();
+    //      m_thresholdEnergyDeposit = m_cntlp.getThresholdEnergyDeposit();
+    //      m_thresholdEnergyDeposit *= CLHEP::GeV;  //GeV to MeV (=unit in G4)
+    //      B2INFO("CDCSensitiveDetector: Threshold energy (MeV): " << m_thresholdEnergyDeposit);
 
-      m_modifiedLeftRightFlag = m_cdcgp->isModifiedLeftRightFlagOn();
-      B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
+    //      //      m_modifiedLeftRightFlag = m_cdcgp->isModifiedLeftRightFlagOn();
+    //      m_modifiedLeftRightFlag = m_cntlp.getModLeftRightFlag();
+    //      B2INFO("CDCSensitiveDetector: Set left/right flag modified for tracking (=1)/ not set (=0): " << m_modifiedLeftRightFlag);
 
-      m_minTrackLength = m_cdcgp->getMinTrackLength();
-      m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
-      B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
+    //      //      m_minTrackLength = m_cdcgp->getMinTrackLength();
+    //      m_minTrackLength = m_cntlp.getMinTrackLength();
+    //      m_minTrackLength *= CLHEP::cm;  //cm to mm (=unit in G4)
+    //      B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 
-      m_wireSag = m_cdcgp->isWireSagOn();
+    //      //      m_wireSag = m_cdcgp->isWireSagOn();
+    //      m_wireSag = m_cntlp.getWireSag();
 
-      m_nonUniformField = 0;
-    }
+    m_nonUniformField = 0;
+    //    }
 
 #if defined(CDC_DEBUG)
     std::cout << " " << std::endl;

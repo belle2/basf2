@@ -27,7 +27,7 @@ args = parser.parse_args()
 # Go to the html directory and call the create_plots function
 save_dir = os.path.abspath(os.getcwd())
 os.chdir('html')
-create_plots(args.revisions, args.force, save_dir)
+create_plots(revisions=args.revisions, force=args.force, work_folder=save_dir)
 
 # restore original working directory
 os.chdir(save_dir)

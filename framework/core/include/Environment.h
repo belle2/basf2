@@ -68,6 +68,19 @@ namespace Belle2 {
     /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
 
+    /** Override run and experiment for EventInfoSetter. */
+    void setRunExperimentOverride(int run, int experiment) { m_run = run; m_experiment = experiment; }
+
+    /** Get run override, or -1 if unset. */
+    int getRunOverride() const { return m_run; }
+    /** Get experiment override, or -1 if unset. */
+    int getExperimentOverride() const { return m_experiment; }
+
+    /** Get skipNEvents override, or -1 if unset. */
+    void setSkipEventsOverride(int skipEvents) { m_skipNEvents = skipEvents; }
+    /** Set skipNEvents override */
+    int getSkipEventsOverride() const { return m_skipNEvents; }
+
     /** Number of generated events (from EventInfoSetter). */
     unsigned int getNumberOfMCEvents() const { return m_mcEvents; }
 
@@ -197,6 +210,9 @@ namespace Belle2 {
     std::string m_picklePath; /**< Path to the file where the pickled path is stored */
     std::vector<std::string> m_streamingObjects;  /**< objects to be streamed in Tx module (all if empty) */
     unsigned int m_mcEvents; /**< counter for number of generated events. */
+    int m_run; /**< override run for EventInfoSetter. */
+    int m_experiment; /**< override experiment for EventInfoSetter. */
+    int m_skipNEvents; /**< override skipNEvents for EventInfoSetter/RootInput. */
 
     /**
      *  Set up environment from standard BELLE2_ environment variables.

@@ -73,7 +73,7 @@ void ARICHMergerMapping::print()
     std::cout << " Modules connected to merger " << i << std::endl;
     for (int j = 1; j < N_FEB2MERGER + 1; j++) {
       if (getModuleID(i, j)) std::cout << "  FEB slot " << j << ": " << getModuleID(i, j) << std::endl;
-      else std::cout << "  FEBSlot " << j << " moduleID: not connected" << std::endl;
+      else std::cout << "  FEB slot " << j << " not connected" << std::endl;
     }
 
   }

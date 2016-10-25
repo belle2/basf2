@@ -24,8 +24,9 @@
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
 #include <cdc/dbobjects/CDCChannelMap.h>
-#include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCMisalignment.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
@@ -117,6 +118,11 @@ namespace Belle2 {
        * Set wire alignment params. from DB.
        */
       void setWirPosAlignParams();
+
+      /**
+       * Set wire misalignment params. from DB.
+       */
+      void setWirPosMisalignParams();
 
       /**
        * Read XT-relation table.
@@ -1069,11 +1075,14 @@ namespace Belle2 {
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
 #endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
+#endif
 #if defined(CDC_ALIGN_FROM_DB)
       DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
 #endif
-#if defined(CDC_DISPLACEMENT_FROM_DB)
-      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
+#if defined(CDC_MISALIGN_FROM_DB)
+      DBObjPtr<CDCMisalignment> m_misalignFromDB; /*!< misalignment params. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

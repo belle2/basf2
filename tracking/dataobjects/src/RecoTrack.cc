@@ -179,6 +179,10 @@ bool RecoTrack::wasFitSuccessful(const genfit::AbsTrackRep* representation) cons
 {
   checkDirtyFlag();
 
+  if (getRepresentations().empty()) {
+    return false;
+  }
+
   if (not hasTrackFitStatus(representation)) {
     return false;
   }
@@ -249,4 +253,13 @@ const genfit::MeasuredStateOnPlane& RecoTrack::getMeasuredStateOnPlaneClosestTo(
     }
   }
   return *nearestStateOnPlane;
+}
+
+
+void RecoTrack::deleteFittedInformation()
+{
+  // Delete all fitted information for all representations
+  for (unsigned int i = 0; i < getRepresentations().size(); i++) {
+    m_genfitTrack.deleteTrackRep(i);
+  }
 }

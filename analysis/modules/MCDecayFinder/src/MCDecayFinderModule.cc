@@ -55,6 +55,7 @@ void MCDecayFinderModule::initialize()
   StoreArray<Particle> particles;
   StoreObjPtr<ParticleExtraInfoMap> extraInfoMap;
   StoreArray<MCParticle> mcparticles;
+  mcparticles.isRequired();
 
   DataStore::EStoreFlags flags = m_writeOut ? DataStore::c_WriteOut : DataStore::c_DontWriteOut;
   particleList.registerInDataStore(flags);
@@ -85,15 +86,8 @@ void MCDecayFinderModule::event()
     outputList->bindAntiParticleList(*(antiOutputList));
   }
 
-  // retrieve list of MCParticles
-  StoreArray<MCParticle> mcparticles;
-  if (!mcparticles) {
-    B2ERROR("MCParticle list not found!");
-    return;
-  }
-
-
   // loop over all MCParticles
+  StoreArray<MCParticle> mcparticles;
   int nMCParticles = mcparticles.getEntries();
   for (int i = 0; i < nMCParticles; i++) {
     for (int iCC = 0; iCC < 2; iCC++) {

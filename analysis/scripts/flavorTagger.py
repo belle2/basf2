@@ -82,7 +82,8 @@ mlpFANNCombiner.m_random_seeds = 10
 mlpFANNCombiner.m_test_rate = 500
 mlpFANNCombiner.m_number_of_threads = 8
 mlpFANNCombiner.m_scale_features = True
-mlpFANNCombiner.m_scale_target = True
+mlpFANNCombiner.m_scale_target = False
+# mlpFANNCombiner.m_scale_target = True
 
 # SignalFraction: FBDT feature
 # For smooth output set to -1, this will break the calibration.
@@ -1114,7 +1115,7 @@ def flavorTagger(
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
-        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and qrCombined > -2', roe_path, deadEndPath)
+        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':

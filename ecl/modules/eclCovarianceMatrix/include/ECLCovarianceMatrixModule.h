@@ -2,9 +2,8 @@
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2016 - Belle II Collaboration                             *
  *                                                                        *
- * This module calculates the covariance matrix for a shower.             *
- * The matrix will depend on the shower region (FWD, Bartel, BWD) and     *
- * possibly on the hypothesis.                                            *
+ * This module calculates the covariance matrix for a N1 showers.         *
+ * The matrix depends on the shower region (FWD, Bartel, BWD)             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
@@ -15,9 +14,15 @@
 #ifndef ECLCOVARIANCEMATRIXMODULE_H_
 #define ECLCOVARIANCEMATRIXMODULE_H_
 
+// FRAMEWORK
 #include <framework/core/Module.h>
 #include <framework/datastore/StoreArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/datastore/StoreObjPtr.h>
+
+// ECL
 #include <ecl/dataobjects/ECLShower.h>
+#include <ecl/dataobjects/ECLEventInformation.h>
 
 namespace Belle2 {
   namespace ECL {
@@ -47,21 +52,38 @@ namespace Belle2 {
       /** Terminate. */
       virtual void terminate();
 
-      StoreArray<ECLShower> m_eclShowers;
     private:
 
+      double m_backgroundCount; /**< Background level per event measured */
+      const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
+
+      /** Store array: ECLShower. */
+      StoreArray<ECLShower> m_eclShowers;
+
+      /** Store object pointer: ECLEventInformation. */
+      StoreObjPtr<ECLEventInformation> m_eclEventInformation;
+
     public:
-      /** We need names for the data objects to differentiate between PureCsI and default*/
+      /** Default name ECLShowers */
       virtual const char* eclShowerArrayName() const
       { return "ECLShowers" ; }
+
+      /** Name to be used for default option: ECLEventInformation.*/
+      virtual const char* eclEventInformationName() const
+      { return "ECLEventInformation" ; }
     }; // end of ECLCovarianceMatrixModule
 
 
     /** The very same module but for PureCsI */
     class ECLCovarianceMatrixPureCsIModule : public ECLCovarianceMatrixModule {
     public:
+      /** PureCsI name ECLShowersPureCsI */
       virtual const char* eclShowerArrayName() const override
       { return "ECLShowersPureCsI" ; }
+
+      /** Name to be used for PureCsI option: ECLEventInformationPureCsI.*/
+      virtual const char* eclEventInformationName() const override
+      { return "ECLEventInformationPureCsI" ; }
     }; // end of ECLCovarianceMatrixPureCsIModule
 
   } // end of ECL namespace

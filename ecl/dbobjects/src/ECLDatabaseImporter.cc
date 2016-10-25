@@ -3,7 +3,8 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Torben Ferber                                            *
+ * Contributors: Torben Ferber   (ferber@physics.ubc.ca)                  *
+ *               Alon Hershehorn (hershen@phas.ubc.ca)                    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -14,20 +15,23 @@
 #include <ecl/dbobjects/ECLDigitTimeConstants.h>
 #include <ecl/modules/eclShowerShape/ECLShowerShapeModule.h>
 #include <ecl/dbobjects/ECLShowerShapeSecondMomentCorrection.h>
+#include <ecl/dbobjects/ECLShowerCorrectorLeakageCorrection.h>
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 
 // FRAMEWORK
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/Database.h>
 #include <framework/database/DBImportArray.h>
+#include <framework/database/DBImportObjPtr.h>
 
 // ROOT
 #include <TH1.h>
 #include <TKey.h>
 #include <string>
 #include <TClonesArray.h>
+#include <TTree.h>
+#include <TDirectory.h>
 
 
 // NAMESPACES
@@ -130,16 +134,164 @@ void ECLDatabaseImporter::importDigitTimeCalibration()
   Database::Instance().storeData(m_name, &digitCalibrationConstants, iov);
 }
 
-TGraph* ECLDatabaseImporter::getSecondMomentCorrectionTgraph(TFile* file, const std::string& graphName) const
+void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
 {
+  if (m_inputFileNames.size() > 1)
+    B2FATAL("Sorry, you must only import one file at a time for now!");
 
-  TGraph* graph = (TGraph*)file->Get(graphName.data());
-  if (!graph) {
-    std::string filename = file->GetName();
-    delete file;
-    B2FATAL("Could not find " << graphName << " in " << filename);
+  //Open file
+  TFile* inputFile = new TFile(m_inputFileNames[0].data(), "READ");
+
+  if (!inputFile || inputFile->IsZombie())
+    B2FATAL("Could not open file " << m_inputFileNames[0]);
+
+  //Get trees
+  TTree* correctionTree = getRootObjectFromFile<TTree*>(inputFile, "ParameterNtuple");
+  TTree* helperTree = getRootObjectFromFile<TTree*>(inputFile, "ConstantNtuple");
+
+  //----------------------------------------------------------------------------------------------
+  //Fill ParameterNtuple vectors
+  //----------------------------------------------------------------------------------------------
+
+  int bgFractionBinNum;
+  int regNum;
+  int phiBinNum;
+  int thetaBinNum;
+  int energyBinNum;
+  float correctionFactor;
+
+  //Set Branch Addresses
+  correctionTree->SetBranchAddress(m_bgFractionBinNumBranchName.c_str(), &bgFractionBinNum);
+  correctionTree->SetBranchAddress(m_regNumBranchName.c_str(), &regNum);
+  correctionTree->SetBranchAddress(m_phiBinNumBranchName.c_str(), &phiBinNum);
+  correctionTree->SetBranchAddress(m_thetaBinNumBranchName.c_str(), &thetaBinNum);
+  correctionTree->SetBranchAddress(m_energyBinNumBranchName.c_str(), &energyBinNum);
+  correctionTree->SetBranchAddress(m_correctionFactorBranchName.c_str(), &correctionFactor);
+
+  //Fill vectors
+  std::vector<int> m_bgFractionBinNum;
+  std::vector<int> m_regNum;
+  std::vector<int> m_phiBinNum;
+  std::vector<int> m_thetaBinNum;
+  std::vector<int> m_energyBinNum;
+  std::vector<float> m_correctionFactor;
+
+  for (long iEntry = 0; iEntry < correctionTree->GetEntries(); ++iEntry) {
+    correctionTree->GetEntry(iEntry);
+
+    m_bgFractionBinNum.push_back(bgFractionBinNum);
+    m_regNum.push_back(regNum);
+    m_phiBinNum.push_back(phiBinNum);
+    m_thetaBinNum.push_back(thetaBinNum);
+    m_energyBinNum.push_back(energyBinNum);
+    m_correctionFactor.push_back(correctionFactor);
   }
-  return graph;
+
+  //----------------------------------------------------------------------------------------------
+  //Fill ConstantNtuple vectors
+  //----------------------------------------------------------------------------------------------
+
+  float avgRecEn[m_numAvgRecEnEntries];
+  float lReg1Theta;
+  float hReg1Theta;
+  float lReg2Theta;
+  float hReg2Theta;
+  float lReg3Theta;
+  float hReg3Theta;
+  int numOfBfBins;
+  int numOfEnergyBins;
+  int numOfPhiBins;
+  int numOfReg1ThetaBins;
+  int numOfReg2ThetaBins;
+  int numOfReg3ThetaBins;
+  int phiPeriodicity;
+
+  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), &avgRecEn);
+  helperTree->SetBranchAddress(m_lReg1ThetaBranchName.c_str(), &lReg1Theta);
+  helperTree->SetBranchAddress(m_hReg1ThetaBranchName.c_str(), &hReg1Theta);
+  helperTree->SetBranchAddress(m_lReg2ThetaBranchName.c_str(), &lReg2Theta);
+  helperTree->SetBranchAddress(m_hReg2ThetaBranchName.c_str(), &hReg2Theta);
+  helperTree->SetBranchAddress(m_lReg3ThetaBranchName.c_str(), &lReg3Theta);
+  helperTree->SetBranchAddress(m_hReg3ThetaBranchName.c_str(), &hReg3Theta);
+  helperTree->SetBranchAddress(m_numOfBfBinsBranchName.c_str(), &numOfBfBins);
+  helperTree->SetBranchAddress(m_numOfEnergyBinsBranchName.c_str(), &numOfEnergyBins);
+  helperTree->SetBranchAddress(m_numOfPhiBinsBranchName.c_str(), &numOfPhiBins);
+  helperTree->SetBranchAddress(m_numOfReg1ThetaBinsBranchName.c_str(), &numOfReg1ThetaBins);
+  helperTree->SetBranchAddress(m_numOfReg2ThetaBinsBranchName.c_str(), &numOfReg2ThetaBins);
+  helperTree->SetBranchAddress(m_numOfReg3ThetaBinsBranchName.c_str(), &numOfReg3ThetaBins);
+  helperTree->SetBranchAddress(m_phiPeriodicityBranchName.c_str(), &phiPeriodicity);
+
+  //Fill vectors
+  std::vector<float> m_avgRecEn;
+  std::vector<float> m_lReg1Theta;
+  std::vector<float> m_hReg1Theta;
+  std::vector<float> m_lReg2Theta;
+  std::vector<float> m_hReg2Theta;
+  std::vector<float> m_lReg3Theta;
+  std::vector<float> m_hReg3Theta;
+  std::vector<int>   m_numOfBfBins;
+  std::vector<int>   m_numOfEnergyBins;
+  std::vector<int>   m_numOfPhiBins;
+  std::vector<int>   m_numOfReg1ThetaBins;
+  std::vector<int>   m_numOfReg2ThetaBins;
+  std::vector<int>   m_numOfReg3ThetaBins;
+  std::vector<int>   m_phiPeriodicity;
+
+  for (long iEntry = 0; iEntry < helperTree->GetEntries(); ++iEntry) {
+    helperTree->GetEntry(iEntry);
+    for (int iIdx = 0; iIdx < m_numAvgRecEnEntries; ++iIdx) m_avgRecEn.push_back(avgRecEn[iIdx]);
+
+    m_lReg1Theta.push_back(lReg1Theta);
+    m_hReg1Theta.push_back(hReg1Theta);
+    m_lReg2Theta.push_back(lReg2Theta);
+    m_hReg2Theta.push_back(hReg2Theta);
+    m_lReg3Theta.push_back(lReg3Theta);
+    m_hReg3Theta.push_back(hReg3Theta);
+    m_numOfBfBins.push_back(numOfBfBins);
+    m_numOfEnergyBins.push_back(numOfEnergyBins);
+    m_numOfPhiBins.push_back(numOfPhiBins);
+    m_numOfReg1ThetaBins.push_back(numOfReg1ThetaBins);
+    m_numOfReg2ThetaBins.push_back(numOfReg2ThetaBins);
+    m_numOfReg3ThetaBins.push_back(numOfReg3ThetaBins);
+    m_phiPeriodicity.push_back(phiPeriodicity);
+  }
+
+  //----------------------------------------------------------------------------------------------
+
+  //Construct DB object
+  DBImportObjPtr<ECLShowerCorrectorLeakageCorrection> dbPtr("ecl_shower_corrector_leakage_corrections");
+  dbPtr.construct(m_bgFractionBinNum,
+                  m_regNum,
+                  m_phiBinNum,
+                  m_thetaBinNum,
+                  m_energyBinNum,
+                  m_correctionFactor,
+                  m_avgRecEn,
+                  m_lReg1Theta,
+                  m_hReg1Theta,
+                  m_lReg2Theta,
+                  m_hReg2Theta,
+                  m_lReg3Theta,
+                  m_hReg3Theta,
+                  m_numOfBfBins,
+                  m_numOfEnergyBins,
+                  m_numOfPhiBins,
+                  m_numOfReg1ThetaBins,
+                  m_numOfReg2ThetaBins,
+                  m_numOfReg3ThetaBins,
+                  m_phiPeriodicity);
+
+  //Create IOV object
+  int startExp = 0;
+  int startRun = 0;
+  int endExp = -1;
+  int endRun = -1;
+  IntervalOfValidity iov(startExp, startRun, endExp, endRun);
+
+  //Import into local db
+  dbPtr.import(iov);
+
+  delete inputFile;
 
 }
 
@@ -156,19 +308,19 @@ void ECLDatabaseImporter::importShowerShapesSecondMomentCorrections()
     B2FATAL("Could not open file " << m_inputFileNames[0]);
 
   //N1 theta
-  TGraph* theta_N1_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_theta_N1");
+  TGraph* theta_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N1");
   dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_thetaType , *theta_N1_graph);
 
   //N1 phi
-  TGraph* phi_N1_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_phi_N1");
+  TGraph* phi_N1_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N1");
   dbArray.appendNew(ECLConnectedRegion::c_N1, ECL::ECLShowerShapeModule::c_phiType , *phi_N1_graph);
 
   //N2 theta
-  TGraph* theta_N2_graph = getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_theta_N2");
+  TGraph* theta_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_theta_N2");
   dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_thetaType , *theta_N2_graph);
 
   //N2 phi
-  TGraph* phi_N2_graph =  getSecondMomentCorrectionTgraph(inputFile, "SecondMomentCorrections_phi_N2");
+  TGraph* phi_N2_graph = getRootObjectFromFile<TGraph*>(inputFile, "SecondMomentCorrections_phi_N2");
   dbArray.appendNew(ECLConnectedRegion::c_N2, ECL::ECLShowerShapeModule::c_phiType , *phi_N2_graph);
 
 

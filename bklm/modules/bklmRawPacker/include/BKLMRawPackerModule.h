@@ -57,6 +57,9 @@ namespace Belle2 {
     //! use default elect id, if not found in mapping file
     bool m_useDefaultElectId = true;
 
+    //! use electronic map from DataBase or not
+    bool m_loadMapFromDB = false;
+
     //! # of events in a run
     int max_nevt;
 
@@ -102,6 +105,9 @@ namespace Belle2 {
 
     //! fill m_ModuleIdToelectId from xml file
     void loadMap();
+
+    //! fill m_ModuleIdToelectId from data base
+    void loadMapFromDB();
 
     //! To be used to map module id to electronics address
     //! @param copperId id of the copper board

@@ -16,6 +16,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
 #ifndef _KeccakHashInterface_h_
 #define _KeccakHashInterface_h_
 
+#ifndef KeccakP1600_excluded
+
 #include "KeccakSponge.h"
 #include <string.h>
 
@@ -23,14 +25,9 @@ typedef unsigned char BitSequence;
 typedef size_t DataLength;
 typedef enum { SUCCESS = 0, FAIL = 1, BAD_HASHLEN = 2 } HashReturn;
 
-/** Struct to wrap the Keccak_Sponge instance with additional information
- * needed for FIPS 202 mode */
 typedef struct {
-  /** underlying Sponge instance */
-  Keccak_SpongeInstance sponge;
-  /** output size in case of SHA3, 0 in case of SHAKE */
+  KeccakWidth1600_SpongeInstance sponge;
   unsigned int fixedOutputLength;
-  /** padding delimiter to separate SHA3 and SHAKE */
   unsigned char delimitedSuffix;
 } Keccak_HashInstance;
 
@@ -52,27 +49,27 @@ typedef struct {
 HashReturn Keccak_HashInitialize(Keccak_HashInstance* hashInstance, unsigned int rate, unsigned int capacity,
                                  unsigned int hashbitlen, unsigned char delimitedSuffix);
 
-/** Macro to initialize a SHAKE128 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHAKE128 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHAKE128(hashInstance)        Keccak_HashInitialize(hashInstance, 1344,  256,   0, 0x1F)
 
-/** Macro to initialize a SHAKE256 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHAKE256 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHAKE256(hashInstance)        Keccak_HashInitialize(hashInstance, 1088,  512,   0, 0x1F)
 
-/** Macro to initialize a SHA3-224 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHA3-224 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHA3_224(hashInstance)        Keccak_HashInitialize(hashInstance, 1152,  448, 224, 0x06)
 
-/** Macro to initialize a SHA3-256 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHA3-256 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHA3_256(hashInstance)        Keccak_HashInitialize(hashInstance, 1088,  512, 256, 0x06)
 
-/** Macro to initialize a SHA3-384 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHA3-384 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHA3_384(hashInstance)        Keccak_HashInitialize(hashInstance,  832,  768, 384, 0x06)
 
-/** Macro to initialize a SHA3-512 instance as specified in the FIPS 202 draft.
+/** Macro to initialize a SHA3-512 instance as specified in the FIPS 202 standard.
   */
 #define Keccak_HashInitialize_SHA3_512(hashInstance)        Keccak_HashInitialize(hashInstance,  576, 1024, 512, 0x06)
 
@@ -96,7 +93,6 @@ HashReturn Keccak_HashUpdate(Keccak_HashInstance* hashInstance, const BitSequenc
   *     output bits is equal to @a hashbitlen.
   * If @a hashbitlen was 0 in the call to Keccak_HashInitialize(), the output bits
   *     must be extracted using the Keccak_HashSqueeze() function.
-  * @param  state       Pointer to the state of the sponge function initialized by Init().
   * @param  hashval     Pointer to the buffer where to store the output data.
   * @return SUCCESS if successful, FAIL otherwise.
   */
@@ -112,5 +108,7 @@ HashReturn Keccak_HashFinal(Keccak_HashInstance* hashInstance, BitSequence* hash
  * @return SUCCESS if successful, FAIL otherwise.
  */
 HashReturn Keccak_HashSqueeze(Keccak_HashInstance* hashInstance, BitSequence* data, DataLength databitlen);
+
+#endif
 
 #endif

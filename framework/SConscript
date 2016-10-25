@@ -9,4 +9,9 @@ env['LIBS'] = ['$ROOT_LIBS',
                'curl' # for REST API access to the database
                ]
 
+# Macros to limit the variations of the utilities/sha3hash implementation
+env.Append(CPPDEFINES={"KeccakP200_excluded" : None,
+                       "KeccakP400_excluded" : None,
+                       "KeccakP800_excluded" : None})
+
 Return('env')

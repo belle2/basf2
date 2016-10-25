@@ -541,6 +541,11 @@ namespace Belle2 {
     double eclClusterHighestE(const Particle* particle);
 
     /**
+     * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
+     */
+    double eclClusterE1E9(const Particle* particle);
+
+    /**
      * return ratio of energies in inner 3x3 and (5x5 cells without corners)
      */
     double eclClusterE9E21(const Particle* particle);

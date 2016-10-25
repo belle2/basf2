@@ -85,6 +85,10 @@ namespace Belle2 {
 
     float m_Edep;
 
+    /** E1/E9 */
+
+    float m_E1oE9;
+
     /** E9/E21 */
 
     float m_E9oE21;
@@ -108,6 +112,10 @@ namespace Belle2 {
     /** Second moment shower shape variable */
 
     float m_secondMoment;
+
+    /** Lateral energy (LAT) shower shape variable */
+
+    float m_LAT;
 
     /** Number of Crystals in a Cluster */
 

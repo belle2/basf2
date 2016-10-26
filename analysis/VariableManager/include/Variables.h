@@ -541,9 +541,39 @@ namespace Belle2 {
     double eclClusterHighestE(const Particle* particle);
 
     /**
-     * return ratio of energies in inner 3x3 and 5x5 cells
+     * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
      */
-    double eclClusterE9E25(const Particle* particle);
+    double eclClusterE1E9(const Particle* particle);
+
+    /**
+     * return ratio of energies in inner 3x3 and (5x5 cells without corners)
+     */
+    double eclClusterE9E21(const Particle* particle);
+
+    /**
+     * Deprecated - kept for backwards compatibility
+     */
+    inline double eclClusterE9E25(const Particle* particle) {return eclClusterE9E21(particle);}
+
+    /**
+     * return absolute value of Zernike Moment 40
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return absolute value of Zernike Moment 51
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return result of MVA using zernike moments
+     */
+    double eclClusterZernikeMVA(const Particle* particle);
+
+    /**
+     * return second moment shower shape variable
+     */
+    double eclClusterSecondMoment(const Particle* particle);
 
     /**
      * return LAT (shower variable)

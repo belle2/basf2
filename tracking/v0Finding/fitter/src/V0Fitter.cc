@@ -164,7 +164,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   try {
     stPlusPtr = &gfTrackPlus.getFittedState();
   } catch (genfit::Exception) {
-    B2DEBUG(100, "No TrackPoint with fitterInfo for the given rep.");
+    B2WARNING("No TrackPoint with fitterInfo for the given rep.");
     return false;
   }
 
@@ -172,7 +172,7 @@ bool V0Fitter::fitAndStore(const Track* trackPlus, const Track* trackMinus,
   try {
     stMinusPtr = &gfTrackMinus.getFittedState();
   } catch (genfit::Exception) {
-    B2DEBUG(100, "No TrackPoint with fitterInfo for the given rep.");
+    B2WARNING("No TrackPoint with fitterInfo for the given rep.");
     return false;
   }
 

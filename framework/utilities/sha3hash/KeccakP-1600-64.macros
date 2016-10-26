@@ -40,8 +40,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
     Cu = Abu^Agu^Aku^Amu^Asu; \
 
 #ifdef UseBebigokimisa
-// --- Code for round, with prepare-theta (lane complementing pattern 'bebigokimisa')
-// --- 64-bit lanes mapped to 64-bit words
+/* --- Code for round, with prepare-theta (lane complementing pattern 'bebigokimisa') */
+/* --- 64-bit lanes mapped to 64-bit words */
 #define thetaRhoPiChiIotaPrepareTheta(i, A, E) \
     Da = Cu^ROL64(Ce, 1); \
     De = Ca^ROL64(Ci, 1); \
@@ -156,8 +156,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
     Cu ^= E##su; \
 \
 
-// --- Code for round (lane complementing pattern 'bebigokimisa')
-// --- 64-bit lanes mapped to 64-bit words
+/* --- Code for round (lane complementing pattern 'bebigokimisa') */
+/* --- 64-bit lanes mapped to 64-bit words */
 #define thetaRhoPiChiIota(i, A, E) \
     Da = Cu^ROL64(Ce, 1); \
     De = Ca^ROL64(Ci, 1); \
@@ -247,9 +247,9 @@ http://creativecommons.org/publicdomain/zero/1.0/
     E##su =   Bsu ^(  Bsa &  Bse ); \
 \
 
-#else // UseBebigokimisa
-// --- Code for round, with prepare-theta
-// --- 64-bit lanes mapped to 64-bit words
+#else /* UseBebigokimisa */
+/* --- Code for round, with prepare-theta */
+/* --- 64-bit lanes mapped to 64-bit words */
 #define thetaRhoPiChiIotaPrepareTheta(i, A, E) \
     Da = Cu^ROL64(Ce, 1); \
     De = Ca^ROL64(Ci, 1); \
@@ -364,8 +364,8 @@ http://creativecommons.org/publicdomain/zero/1.0/
     Cu ^= E##su; \
 \
 
-// --- Code for round
-// --- 64-bit lanes mapped to 64-bit words
+/* --- Code for round */
+/* --- 64-bit lanes mapped to 64-bit words */
 #define thetaRhoPiChiIota(i, A, E) \
     Da = Cu^ROL64(Ce, 1); \
     De = Ca^ROL64(Ci, 1); \
@@ -455,7 +455,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
     E##su =   Bsu ^((~Bsa)&  Bse ); \
 \
 
-#endif // UseBebigokimisa
+#endif /* UseBebigokimisa */
 
 #define copyFromState(X, state) \
     X##ba = state[ 0]; \
@@ -538,7 +538,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
     X##so = Y##so; \
     X##su = Y##su; \
 
-#define copyFromStateAndXOR(X, state, input, laneCount) \
+#define copyFromStateAndAdd(X, state, input, laneCount) \
     if (laneCount < 16) { \
         if (laneCount < 8) { \
             if (laneCount < 4) { \
@@ -766,28 +766,47 @@ http://creativecommons.org/publicdomain/zero/1.0/
         } \
     }
 
-#define XORinputAndTrailingBits(X, input, laneCount, trailingBits) \
-    if (laneCount < 16) { \
+#define addInput(X, input, laneCount) \
+    if (laneCount == 21) { \
+        X##ba ^= input[ 0]; \
+        X##be ^= input[ 1]; \
+        X##bi ^= input[ 2]; \
+        X##bo ^= input[ 3]; \
+        X##bu ^= input[ 4]; \
+        X##ga ^= input[ 5]; \
+        X##ge ^= input[ 6]; \
+        X##gi ^= input[ 7]; \
+        X##go ^= input[ 8]; \
+        X##gu ^= input[ 9]; \
+        X##ka ^= input[10]; \
+        X##ke ^= input[11]; \
+        X##ki ^= input[12]; \
+        X##ko ^= input[13]; \
+        X##ku ^= input[14]; \
+        X##ma ^= input[15]; \
+        X##me ^= input[16]; \
+        X##mi ^= input[17]; \
+        X##mo ^= input[18]; \
+        X##mu ^= input[19]; \
+        X##sa ^= input[20]; \
+    } \
+    else if (laneCount < 16) { \
         if (laneCount < 8) { \
             if (laneCount < 4) { \
                 if (laneCount < 2) { \
                     if (laneCount < 1) { \
-                        X##ba ^= trailingBits; \
                     } \
                     else { \
                         X##ba ^= input[ 0]; \
-                        X##be ^= trailingBits; \
                     } \
                 } \
                 else { \
                     X##ba ^= input[ 0]; \
                     X##be ^= input[ 1]; \
                     if (laneCount < 3) { \
-                        X##bi ^= trailingBits; \
                     } \
                     else { \
                         X##bi ^= input[ 2]; \
-                        X##bo ^= trailingBits; \
                     } \
                 } \
             } \
@@ -798,22 +817,18 @@ http://creativecommons.org/publicdomain/zero/1.0/
                 X##bo ^= input[ 3]; \
                 if (laneCount < 6) { \
                     if (laneCount < 5) { \
-                        X##bu ^= trailingBits; \
                     } \
                     else { \
                         X##bu ^= input[ 4]; \
-                        X##ga ^= trailingBits; \
                     } \
                 } \
                 else { \
                     X##bu ^= input[ 4]; \
                     X##ga ^= input[ 5]; \
                     if (laneCount < 7) { \
-                        X##ge ^= trailingBits; \
                     } \
                     else { \
                         X##ge ^= input[ 6]; \
-                        X##gi ^= trailingBits; \
                     } \
                 } \
             } \
@@ -830,22 +845,18 @@ http://creativecommons.org/publicdomain/zero/1.0/
             if (laneCount < 12) { \
                 if (laneCount < 10) { \
                     if (laneCount < 9) { \
-                        X##go ^= trailingBits; \
                     } \
                     else { \
                         X##go ^= input[ 8]; \
-                        X##gu ^= trailingBits ; \
                     } \
                 } \
                 else { \
                     X##go ^= input[ 8]; \
                     X##gu ^= input[ 9]; \
                     if (laneCount < 11) { \
-                        X##ka ^= trailingBits; \
                     } \
                     else { \
                         X##ka ^= input[10]; \
-                        X##ke ^= trailingBits; \
                     } \
                 } \
             } \
@@ -856,22 +867,18 @@ http://creativecommons.org/publicdomain/zero/1.0/
                 X##ke ^= input[11]; \
                 if (laneCount < 14) { \
                     if (laneCount < 13) { \
-                        X##ki ^= trailingBits; \
                     } \
                     else { \
                         X##ki ^= input[12]; \
-                        X##ko ^= trailingBits; \
                     } \
                 } \
                 else { \
                     X##ki ^= input[12]; \
                     X##ko ^= input[13]; \
                     if (laneCount < 15) { \
-                        X##ku ^= trailingBits; \
                     } \
                     else { \
                         X##ku ^= input[14]; \
-                        X##ma ^= trailingBits; \
                     } \
                 } \
             } \
@@ -898,22 +905,18 @@ http://creativecommons.org/publicdomain/zero/1.0/
             if (laneCount < 20) { \
                 if (laneCount < 18) { \
                     if (laneCount < 17) { \
-                        X##me ^= trailingBits; \
                     } \
                     else { \
                         X##me ^= input[16]; \
-                        X##mi ^= trailingBits; \
                     } \
                 } \
                 else { \
                     X##me ^= input[16]; \
                     X##mi ^= input[17]; \
                     if (laneCount < 19) { \
-                        X##mo ^= trailingBits; \
                     } \
                     else { \
                         X##mo ^= input[18]; \
-                        X##mu ^= trailingBits; \
                     } \
                 } \
             } \
@@ -924,22 +927,18 @@ http://creativecommons.org/publicdomain/zero/1.0/
                 X##mu ^= input[19]; \
                 if (laneCount < 22) { \
                     if (laneCount < 21) { \
-                        X##sa ^= trailingBits; \
                     } \
                     else { \
                         X##sa ^= input[20]; \
-                        X##se ^= trailingBits; \
                     } \
                 } \
                 else { \
                     X##sa ^= input[20]; \
                     X##se ^= input[21]; \
                     if (laneCount < 23) { \
-                        X##si ^= trailingBits; \
                     } \
                     else { \
                         X##si ^= input[22]; \
-                        X##so ^= trailingBits; \
                     } \
                 } \
             } \
@@ -954,7 +953,6 @@ http://creativecommons.org/publicdomain/zero/1.0/
             X##si ^= input[22]; \
             X##so ^= input[23]; \
             if (laneCount < 25) { \
-                X##su ^= trailingBits; \
             } \
             else { \
                 X##su ^= input[24]; \
@@ -1383,7 +1381,7 @@ http://creativecommons.org/publicdomain/zero/1.0/
     output[index] = ~(input[index] ^ X##name); \
     X##name ^= output[index]; \
 
-#else // UseBebigokimisa
+#else /* UseBebigokimisa */
 
 #define copyToStateAndOutput(X, state, output, laneCount) \
     if (laneCount < 16) { \

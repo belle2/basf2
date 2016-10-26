@@ -10,6 +10,8 @@ import numpy
 
 set_random_seed(321)
 set_log_level(LogLevel.INFO)
+# use_central_database("test_bklm", LogLevel.INFO)
+use_central_database("test_bklm")
 
 
 class PackerUnpackerTest(Module):
@@ -95,7 +97,7 @@ main.add_module(Packer)
 unPacker = register_module('BKLMUnpacker')
 unPacker.param('outputDigitsName', 'BKLMDigitsUnpacked')
 unPacker.param("useDefaultModuleId", 1)
-unPacker.param("loadMapFromDB", 0)
+unPacker.param("loadMapFromDB", 1)
 main.add_module(unPacker)
 
 main.add_module(PackerUnpackerTest())

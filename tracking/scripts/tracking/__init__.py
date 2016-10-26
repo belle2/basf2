@@ -446,15 +446,16 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
     path.add_module(material_effects)
 
     # SET StoreArray names
-    svd_trackcands = '__ROIsvdGFTrackCands'
-    svd_tracks = '__ROIsvdGFTracks'
+    svd_gf_trackcands = '__ROIsvdGFTrackCands'
+    svd_gf_tracks = '__ROIsvdGFTracks'
+    svd_tracks = '__ROIsvdTracks'
     svd_track_fit_results = "__ROIsvdTrackFitResults"
     svd_reco_tracks = "__ROIsvdRecoTracks"
 
     # SVD ONLY TRACK FINDING
     vxd_trackfinder = path.add_module('VXDTF')
     vxd_trackfinder.set_name('SVD-only VXDTF')
-    vxd_trackfinder.param('GFTrackCandidatesColName', svd_trackcands)
+    vxd_trackfinder.param('GFTrackCandidatesColName', svd_gf_trackcands)
     vxd_trackfinder.param('TESTERexpandedTestingRoutines', False)
     vxd_trackfinder.param('sectorSetup',
                           ['shiftedL3IssueTestSVDStd-moreThan400MeV_SVD',
@@ -466,10 +467,10 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
     # Convert VXD trackcands to reco tracks
     # not in the path yet, wait for the transition to RecoTracks before
     recoTrackCreator = register_module("RecoTrackCreator")
-    recoTrackCreator.param('trackCandidatesStoreArrayName', svd_trackcands)
+    recoTrackCreator.param('trackCandidatesStoreArrayName', svd_gf_trackcands)
     recoTrackCreator.param('recoTracksStoreArrayName', svd_reco_tracks)
     recoTrackCreator.param('recreateSortingParameters', True)
-    # path.add_module(recoTrackCreator)
+    path.add_module(recoTrackCreator)
 
     # TRACK FITTING
 
@@ -478,25 +479,24 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
 
     trackfitter = register_module('GenFitter')
     trackfitter.set_name('SVD-only GenFitter')
-    trackfitter.param({"GFTracksColName": svd_tracks,
+    trackfitter.param({"GFTracksColName": svd_gf_tracks,
                        "PDGCodes": [211],
-                       'GFTrackCandidatesColName': svd_trackcands})
+                       'GFTrackCandidatesColName': svd_gf_trackcands})
     path.add_module(trackfitter)
 
     # track fitting
-    # not in the path yet, wait for the transition to RecoTracks before
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
-#    path.add_module(dafRecoFitter)
+    path.add_module(dafRecoFitter)
 
-    # create Belle2 Tracks from the genfit Tracks
-    # not in the path yet, wait for the transition to RecoTracks before
+    # create Belle2 Tracks from the RecoTracks
+    # --> NOT NEEDED by the PXDDataReductionModule
     trackCreator = register_module('TrackCreator')
     trackCreator.set_name('SVD-only TrackCreator')
     trackCreator.param('recoTrackColName', svd_reco_tracks)
     trackCreator.param('trackColName', svd_tracks)
     trackCreator.param('trackFitResultColName', svd_track_fit_results)
-#    path.add_module(trackCreator)
+    path.add_module(trackCreator)
 
-    return svd_tracks
+    # return svd_tracks

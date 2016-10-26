@@ -10,8 +10,6 @@ env['LIBS'] = ['$ROOT_LIBS',
                ]
 
 # Macros to limit the variations of the utilities/sha3hash implementation
-env.Append(CPPDEFINES={"KeccakP200_excluded" : None,
-                       "KeccakP400_excluded" : None,
-                       "KeccakP800_excluded" : None})
+env.Append(CPPDEFINES=["KeccakP200_excluded", "KeccakP400_excluded", "KeccakP800_excluded"])
 
 Return('env')

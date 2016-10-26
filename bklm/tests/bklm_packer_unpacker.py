@@ -92,6 +92,7 @@ main.add_module(particlegun)
 add_simulation(main, components=['BKLM'])
 
 Packer = register_module('BKLMRawPacker')
+Packer.param("loadMapFromDB", 1)
 main.add_module(Packer)
 
 unPacker = register_module('BKLMUnpacker')

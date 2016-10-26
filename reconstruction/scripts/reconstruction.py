@@ -159,6 +159,8 @@ def add_arich_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
+        arich_fillHits = register_module('ARICHFillHits')
+        path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 

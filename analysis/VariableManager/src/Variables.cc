@@ -1492,7 +1492,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
     REGISTER_VARIABLE("missingMass", missingMass,
-                      "missing mass of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
+                      "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
                       "Missing Momentum of the Signal Side in CMS Frame");
 

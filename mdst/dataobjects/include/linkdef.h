@@ -219,17 +219,17 @@
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_Error[0]" \
-  targetClass="Belle2::ECLCluster" target="m_covmat_00" \
-  code="{m_covmat_00 = onfile.m_Error[0]*onfile.m_Error[0];}"
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_00" \
+  code="{m_sqrtcovmat_00 = onfile.m_Error[0];}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_Error[2]" \
-  targetClass="Belle2::ECLCluster" target="m_covmat_11" \
-  code="{m_covmat_11 = onfile.m_Error[2]*onfile.m_Error[2];}"
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_11" \
+  code="{m_sqrtcovmat_11 = onfile.m_Error[2];}"
 
 #pragma read sourceClass="Belle2::ECLCluster" version="[-3]" \
   source="float m_Error[5]" \
-  targetClass="Belle2::ECLCluster" target="m_covmat_22" \
-  code="{m_covmat_22 = onfile.m_Error[5]*onfile.m_Error[5];}"
+  targetClass="Belle2::ECLCluster" target="m_sqrtcovmat_22" \
+  code="{m_sqrtcovmat_22 = onfile.m_Error[5];}"
 
 #endif

@@ -46,6 +46,8 @@ namespace Belle2 {
       return m_wire;
     }
 
+    //TODO: remove the following 4 functions (not needed).
+
     /** Getter for Super-Layer. */
     unsigned short getISuperLayer() const
     {
@@ -86,6 +88,7 @@ namespace Belle2 {
 
   private:
     unsigned short m_wire; /**< Wire ID */
+    //TODO: replace TVector3s with simple arrays to save memory.
     TVector3 m_fwd; /**< Displacement of forward side */
     TVector3 m_bwd; /**< Displacement of backward side */
     float        m_tension; /**< Displacement of wire tension (grW) */

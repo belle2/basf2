@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef TOPPACKERMODULE_H
-#define TOPPACKERMODULE_H
+#pragma once
 
 #include <framework/core/Module.h>
 #include <top/geometry/TOPGeometryPar.h>
+#include <top/RawDataTypes.h>
 #include <string>
 
 namespace Belle2 {
@@ -65,12 +65,33 @@ namespace Belle2 {
 
   private:
 
-    std::string m_inputDigitsName;   /**< name of TOPDigit store array */
-    std::string m_outputRawDataName; /**< name of RawTOP store array */
+    /**
+     * Pack in format Production draft
+     */
+    void packProductionDraft();
+
+    /**
+     * Pack in format Feature-extracted data
+     */
+    void packType0Ver16();
+
+    /**
+     * sum both 16-bit words of 32-bit integer
+     */
+    unsigned short sumShorts(unsigned int x) const
+    {
+      return x + (x >> 16);
+    }
+
+    std::string m_inputDigitsName;      /**< name of TOPDigit store array */
+    std::string m_inputRawDigitsName;   /**< name of TOPRawDigit store array */
+    std::string m_outputRawDataName;    /**< name of RawTOP store array */
+    std::string m_format;               /**< data format */
+    TOP::RawDataType m_dataType = TOP::RawDataType::c_Draft; /**< enum for data format */
+
     TOP::TOPGeometryPar* m_topgp = TOP::TOPGeometryPar::Instance(); /**< geometry */
 
   };
 
 } // Belle2 namespace
 
-#endif

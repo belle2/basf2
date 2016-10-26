@@ -18,6 +18,7 @@ using namespace std;
 
 // Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
 void VXDGeoRadiationSensorsPositionPar::read(const GearDir& position)
 {
   m_z = position.getLength("z");
@@ -31,9 +32,11 @@ void VXDGeoRadiationSensorsPositionPar::read(const GearDir& position)
     m_phis.push_back(sensor.getAngle());
   }
 }
+*/
 
 // Read parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
+/*
 void VXDGeoRadiationSensorsPar::read(const GearDir& content)
 {
   m_insideEnvelope = content.getBool("insideEnvelope");
@@ -47,4 +50,4 @@ void VXDGeoRadiationSensorsPar::read(const GearDir& content)
     m_sensors.push_back(VXDGeoRadiationSensorsPositionPar(position));
   }
 }
-
+*/

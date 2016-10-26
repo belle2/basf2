@@ -30,7 +30,7 @@ namespace Belle2 {
       PXDGeometryPar createConfiguration(const GearDir& param)
       {
         PXDGeometryPar pxdGeometryPar;
-        pxdGeometryPar.read(param);
+        pxdGeometryPar.read(m_prefix, param);
         return pxdGeometryPar;
       };
 

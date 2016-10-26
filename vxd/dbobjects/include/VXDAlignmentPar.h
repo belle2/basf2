@@ -12,30 +12,34 @@
 
 #include <TObject.h>
 #include <string>
-#include <map>
+#include <vector>
 
-#include <vxd/dbobjects/VXDAlignmentComponentPar.h>
 
 namespace Belle2 {
 
   class GearDir;
 
   /**
-  * The Class for VXD Alignment Component payload
+  * The Class for VXD Alignment payload
   */
   class VXDAlignmentPar: public TObject {
   public:
     //! Default constructor
     VXDAlignmentPar() {}
     //! Constructor using Gearbox
-    explicit VXDAlignmentPar(const GearDir& content) { read(content); }
+    explicit VXDAlignmentPar(const std::string& component, const GearDir& alignment) { read(component, alignment); }
     //! Destructor
     ~VXDAlignmentPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    void read(const std::string&, const GearDir&);
   private:
+    double m_dU;
+    double m_dV;
+    double m_dW;
+    double m_alpha;
+    double m_beta;
+    double m_gamma;
 
-    std::map<std::string, VXDAlignmentComponentPar > m_components;
 
     ClassDef(VXDAlignmentPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

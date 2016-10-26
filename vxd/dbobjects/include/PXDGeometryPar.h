@@ -27,11 +27,9 @@ namespace Belle2 {
     //! Default constructor
     PXDGeometryPar() {}
     //! Constructor using Gearbox
-    explicit PXDGeometryPar(const GearDir& content) : VXDGeometryPar(content) {  }
+    explicit PXDGeometryPar(const std::string& prefix, const GearDir& content) : VXDGeometryPar(prefix, content) {  }
     //! Destructor
     ~PXDGeometryPar();
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
 
     /**
      * Read the sensor definitions from the database

@@ -33,11 +33,10 @@ namespace Belle2 {
     //! Default constructor
     SVDGeometryPar() {}
     //! Constructor using Gearbox
-    explicit SVDGeometryPar(const GearDir& content) :  VXDGeometryPar(content) {  }
+    explicit SVDGeometryPar(const std::string& prefix, const GearDir& content) :  VXDGeometryPar(prefix, content) {  }
     //! Destructor
     ~SVDGeometryPar();
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
+
 
     /**
      * Read the sensor definitions from the database

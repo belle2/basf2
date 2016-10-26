@@ -25,10 +25,10 @@ namespace Belle2 {
   class VXDGeoSensorPlacementPar: public TObject {
 
   public:
-    //! Default constructor
-    VXDGeoSensorPlacementPar() {}
-    //! Constructor using Gearbox
-    //explicit VXDGeoSensorPlacementPar(const GearDir& content) { read(content); }
+    /** Constructor */
+    VXDGeoSensorPlacementPar(int sensorID = 0, const std::string& sensorTypeID = "", double z = 0,
+                             bool flipU = false, bool flipV = false, bool flipW = false):
+      m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_flipU(flipU), m_flipV(flipV), m_flipW(flipW) {}
     //! Destructor
     ~VXDGeoSensorPlacementPar() {}
     //! Get geometry parameters from Gearbox

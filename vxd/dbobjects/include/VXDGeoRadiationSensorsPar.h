@@ -23,10 +23,9 @@ namespace Belle2 {
   */
   class VXDGeoRadiationSensorsPositionPar: public TObject {
   public:
-    //! Default constructor
-    VXDGeoRadiationSensorsPositionPar() {}
-    //! Constructor using Gearbox
-    explicit VXDGeoRadiationSensorsPositionPar(const GearDir& content) { read(content); }
+    /** Constructor */
+    VXDGeoRadiationSensorsPositionPar(double z = 0, double radius = 0, double theta = 0) :
+      m_z(z), m_radius(radius), m_theta(theta) {}
     //! Destructor
     ~VXDGeoRadiationSensorsPositionPar() {}
     //! Get geometry parameters from Gearbox
@@ -46,11 +45,11 @@ namespace Belle2 {
     /** get the vector storing ids of individual sensors */
     const std::vector<int>& getIds() const { return  m_ids; }
     /** set the vector storing ids of individual sensors */
-    void setIds(const std::vector<int>& ids)  { m_ids = ids; }
+    void addId(int id)  { m_ids.push_back(id); }
     /** get the vector storing phi angles of individual sensors */
     const std::vector<double>& getPhis() const { return  m_phis; }
     /** set the vector storing phi angles of individual sensors */
-    void setPhis(const std::vector<double>& phis) { m_phis = phis; }
+    void addPhi(double phi) { m_phis.push_back(phi); }
 
   private:
     //! Common z position of the sensor centers in mm
@@ -73,13 +72,18 @@ namespace Belle2 {
   class VXDGeoRadiationSensorsPar: public TObject {
   public:
     //! Default constructor
-    VXDGeoRadiationSensorsPar() {}
+    //VXDGeoRadiationSensorsPar() {}
     //! Constructor using Gearbox
-    explicit VXDGeoRadiationSensorsPar(const GearDir& content) { read(content); }
+    //explicit VXDGeoRadiationSensorsPar(const GearDir& content) { read(content); }
+    /** Constructor */
+    VXDGeoRadiationSensorsPar(const std::string& subdetector = "", bool insideEnvelope = false,
+                              double width = 0, double length = 0, bool height = 0, const std::string& material = ""):
+      m_subdetector(subdetector), m_insideEnvelope(insideEnvelope), m_width(width), m_length(length), m_height(height),
+      m_material(material) {}
     //! Destructor
     ~VXDGeoRadiationSensorsPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    //void read(const GearDir&);
     /** get the name of the subdetector */
     const std::string& getSubDetector() const { return  m_subdetector; }
     /** set the name of the subdetector */

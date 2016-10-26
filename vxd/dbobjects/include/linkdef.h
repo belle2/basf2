@@ -26,7 +26,6 @@
 #pragma link C++ class Belle2::VXDGeoPlacementPar+;
 #pragma link C++ class Belle2::VXDGeoLadderPar+;
 #pragma link C++ class Belle2::VXDGeoComponentPar+;
-#pragma link C++ class Belle2::VXDAlignmentComponentPar+;
 #pragma link C++ class Belle2::VXDAlignmentPar+;
 
 #pragma link C++ class Belle2::VXDEnvelopePar+;
@@ -39,19 +38,15 @@
 #pragma link C++ class Belle2::VXDPolyConePar+;
 #pragma link C++ class Belle2::VXDPolyConePlanePar+; // implicit
 
-
-
 #pragma link C++ class Belle2::VXDGeoRadiationSensorsPar+;
 #pragma link C++ class Belle2::VXDGeoRadiationSensorsPositionPar+; // implicit
 
 #pragma link C++ class Belle2::HeavyMetalShieldGeometryPar+;
 
-
 #pragma link C++ class Belle2::VXDServiceGeometryPar+;
 #pragma link C++ class Belle2::VXDBoxTypesPar+;  // implicit
 #pragma link C++ class Belle2::VXDBoxPositionsPar+; // implicit
 #pragma link C++ class Belle2::VXDSlotTypesPar+; // implicit
-
 
 #pragma link C++ class Belle2::VXDSensorInfoBasePar+;
 #pragma link C++ class Belle2::PXDSensorInfoPar+;

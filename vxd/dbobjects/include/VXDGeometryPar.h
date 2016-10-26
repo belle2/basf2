@@ -40,11 +40,11 @@ namespace Belle2 {
     //! Default constructor
     VXDGeometryPar() {}
     //! Constructor using Gearbox
-    explicit VXDGeometryPar(const GearDir& content) { read(content); }
+    explicit VXDGeometryPar(const std::string& prefix, const GearDir& content) { read(prefix, content); }
     //! Destructor
     virtual ~VXDGeometryPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    void read(const std::string&, const GearDir&);
 
     /**
      * Return vector of VXDGeoPlacements with all the components defined inside a given path
@@ -78,28 +78,31 @@ namespace Belle2 {
      */
     virtual void createLadderSupport(int layer, GearDir support) = 0;
 
+    /**
+     * Read parameters for given layer and store in m_ladders
+     */
+    virtual void setCurrentLayer(int layer, GearDir components);
+
   private:
 
     /** Prefix to prepend to all volume names */
     std::string m_prefix {""};
-
-    /** Simple container for a few general parameters */
+    /** Container for a few general parameters */
     VXDGlobalPar m_globals;
-    /**  */
-    VXDAlignmentPar m_alignment;
-    /**  */
+    /** Alignment parameters for all components */
+    std::map<std::string, VXDAlignmentPar> m_alignment;
+    /** Detector envelope parameters */
     VXDEnvelopePar m_envelope;
     /** Container for half shells, can be used to loop over sensors */
     std::vector<VXDHalfShellPar> m_halfShells;
-
     /** Cache of all previously created components */
     std::map<std::string, VXDGeoComponentPar> m_componentCache;
     /** Map containing Information about all defined sensor types */
     std::map<std::string, VXDGeoSensorPar> m_sensorMap;
     /** Diamond radiation sensor "sub creator" */
     VXDGeoRadiationSensorsPar m_radiationsensors;
-    /** Parameters of the currently active ladder */
-    VXDGeoLadderPar m_ladder;
+    /** Parameters of the detector ladders */
+    std::map<int, VXDGeoLadderPar> m_ladders;
 
 
     ClassDef(VXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

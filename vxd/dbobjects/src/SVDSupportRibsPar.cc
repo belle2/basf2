@@ -42,7 +42,7 @@ void SVDSupportBoxPar::read(const GearDir& box)
 // *** This is a DIVOT ***
 void SVDEndmountPar::read(const GearDir& endmount)
 {
-  m_name = endmount.getLength("@name");
+  m_name = endmount.getString("@name");
   m_height = endmount.getLength("height");
   m_width = endmount.getLength("width");
   m_length = endmount.getLength("length");
@@ -50,31 +50,13 @@ void SVDEndmountPar::read(const GearDir& endmount)
   m_rpos = endmount.getLength("r");
 }
 
-// Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-void SVDSupportRibsLayerPar::read(const GearDir& params)
-{
-  m_id = 0;
-  m_spacing = params.getLength("spacing");
-  m_height = params.getLength("height");
-
-  for (const GearDir& box : params.getNodes("box")) {
-    m_boxes.push_back(SVDSupportBoxPar(box));
-  }
-
-  for (const GearDir& tab : params.getNodes("tab")) {
-    m_tabs.push_back(SVDSupportTabPar(tab));
-  }
-
-  for (const GearDir& endmount : params.getNodes("Endmount")) {
-    m_endmounts.push_back(SVDEndmountPar(endmount));
-  }
-}
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void SVDSupportRibsPar::read(const GearDir& support)
+void SVDSupportRibsPar::read(int layer, const GearDir& support)
 {
+  GearDir params(support, (boost::format("SupportRibs/Layer[@id='%1%']") % layer).str());
+
   // Get the common values for all layers
   m_spacing = support.getLength("SupportRibs/spacing");
   m_height = support.getLength("SupportRibs/height");
@@ -88,10 +70,22 @@ void SVDSupportRibsPar::read(const GearDir& support)
   m_innerColor = support.getString("SupportRibs/inner/Color");
   m_endmountMaterial = support.getString("SupportRibs/endmount/Material");
 
-  GearDir Layers(support, "SupportRibs");
-  for (const GearDir& layer : Layers.getNodes("Layer")) {
-    m_layers.push_back(SVDSupportRibsLayerPar(layer));
+  // Get values for the layer if available
+  if (params.exists("spacing")) m_spacing = params.getLength("spacing");
+  if (params.exists("height")) m_height = params.getLength("height");
+
+  for (const GearDir& box : params.getNodes("box")) {
+    m_boxes.push_back(SVDSupportBoxPar(box));
   }
+
+  for (const GearDir& tab : params.getNodes("tab")) {
+    m_tabs.push_back(SVDSupportTabPar(tab));
+  }
+
+  for (const GearDir& endmount : params.getNodes("Endmount")) {
+    m_endmounts.push_back(SVDEndmountPar(endmount));
+  }
+
 }
 
 

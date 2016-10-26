@@ -100,38 +100,10 @@ namespace Belle2 {
     ClassDef(SVDEndmountPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
-  /**
-  * The Class for SVD Support Rib
-  */
 
-  class SVDSupportRibsLayerPar: public TObject {
-
-  public:
-
-    //! Default constructor
-    SVDSupportRibsLayerPar() {}
-    //! Constructor using Gearbox
-    explicit SVDSupportRibsLayerPar(const GearDir& content) { read(content); }
-    //! Destructor
-    ~SVDSupportRibsLayerPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
-
-  private:
-
-    int m_id;
-    double m_spacing;
-    double m_height;
-
-    std::vector<SVDSupportTabPar> m_tabs;
-    std::vector<SVDSupportBoxPar> m_boxes;
-    std::vector<SVDEndmountPar> m_endmounts;
-
-    ClassDef(SVDSupportRibsLayerPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
-  };
 
   /**
-  * The Class for VXD Support Ribs
+  * The Class for SVD Support Ribs (one layer)
   */
 
   class SVDSupportRibsPar: public TObject {
@@ -141,11 +113,11 @@ namespace Belle2 {
     //! Default constructor
     SVDSupportRibsPar() {}
     //! Constructor using Gearbox
-    explicit SVDSupportRibsPar(const GearDir& content) { read(content); }
+    explicit SVDSupportRibsPar(int layer, const GearDir& support) { read(layer, support); }
     //! Destructor
     ~SVDSupportRibsPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    void read(int, const GearDir&);
 
   private:
 
@@ -162,7 +134,9 @@ namespace Belle2 {
     std::string m_innerColor;
     std::string m_endmountMaterial;
 
-    std::vector<SVDSupportRibsLayerPar> m_layers;
+    std::vector<SVDSupportTabPar> m_tabs;
+    std::vector<SVDSupportBoxPar> m_boxes;
+    std::vector<SVDEndmountPar> m_endmounts;
 
     ClassDef(SVDSupportRibsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

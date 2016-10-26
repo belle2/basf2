@@ -11,7 +11,7 @@
 
 #include <TObject.h>
 #include <string>
-#include <vector>
+#include <map>
 
 
 namespace Belle2 {
@@ -19,19 +19,19 @@ namespace Belle2 {
   class GearDir;
 
   /**
-  * The Class for VXD Endrings Layer
+  * The Class for SVD Endring Type
   */
 
-  class SVDEndringsLayerPar: public TObject {
+  class SVDEndringsTypePar: public TObject {
 
   public:
 
     //! Default constructor
-    SVDEndringsLayerPar() {}
+    SVDEndringsTypePar() {}
     //! Constructor using Gearbox
-    explicit SVDEndringsLayerPar(const GearDir& content) { read(content); }
+    explicit SVDEndringsTypePar(const GearDir& endring) { read(endring); }
     //! Destructor
-    ~SVDEndringsLayerPar() {}
+    ~SVDEndringsTypePar() {}
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
 
@@ -45,11 +45,11 @@ namespace Belle2 {
     double m_horizontalBarWidth;
     double m_verticalBarWidth;
 
-    ClassDef(SVDEndringsLayerPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(SVDEndringsTypePar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
 
   /**
-  * The Class for VXD Endring
+  * The Class for SVD Endring
   */
 
   class SVDEndringsPar: public TObject {
@@ -59,11 +59,11 @@ namespace Belle2 {
     //! Default constructor
     SVDEndringsPar() {}
     //! Constructor using Gearbox
-    explicit SVDEndringsPar(const GearDir& content) { read(content); }
+    explicit SVDEndringsPar(int layer, const GearDir& support) { read(layer, support); }
     //! Destructor
     ~SVDEndringsPar() {}
     //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    void read(int, const GearDir&);
 
   private:
 
@@ -72,7 +72,7 @@ namespace Belle2 {
     double m_gapWidth;
     double m_baseThickness;
 
-    std::vector<SVDEndringsLayerPar> m_layers;
+    std::vector<SVDEndringsTypePar> m_types;
 
     ClassDef(SVDEndringsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

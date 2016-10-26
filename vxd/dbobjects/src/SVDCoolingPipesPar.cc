@@ -16,29 +16,23 @@
 using namespace Belle2;
 using namespace std;
 
+
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void SVDCoolingPipesLayerPar::read(const GearDir& pipes)
+void SVDCoolingPipesPar::read(int layer, const GearDir& support)
 {
+  GearDir pipes(support, (boost::format("CoolingPipes/Layer[@id='%1%']") % layer).str());
+
+  m_material = support.getString("CoolingPipes/Material");
+  m_outerDiameter = support.getLength("CoolingPipes/outerDiameter");
+  m_wallThickness = support.getLength("CoolingPipes/wallThickness");
+
   m_nPipes = pipes.getInt("nPipes");
   m_startPhi = pipes.getAngle("startPhi");
   m_deltaPhi = pipes.getAngle("deltaPhi");
   m_radius = pipes.getLength("radius");
   m_zstart = pipes.getLength("zstart");
   m_zend = pipes.getLength("zend");
-}
-
-// Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-void SVDCoolingPipesPar::read(const GearDir& support)
-{
-  m_material = support.getString("CoolingPipes/Material");
-  m_outerDiameter = support.getLength("CoolingPipes/outerDiameter");
-  m_wallThickness = support.getLength("CoolingPipes/wallThickness");
-
-  for (const GearDir& layer : support.getNodes("CoolingPipes/Layer")) {
-    m_layers.push_back(SVDCoolingPipesLayerPar(layer));
-  }
 }
 
 

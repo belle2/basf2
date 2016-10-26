@@ -36,7 +36,6 @@ SVDGeometryPar::~SVDGeometryPar()
 
 void SVDGeometryPar::createHalfShellSupport(GearDir support)
 {
-
   for (const GearDir& rotationsolid : support.getNodes("RotationSolid")) {
     m_halfShell.push_back(VXDRotationSolidPar(rotationsolid));
   }
@@ -49,12 +48,36 @@ void SVDGeometryPar::createHalfShellSupport(GearDir support)
 void SVDGeometryPar::createLayerSupport(int layer, GearDir support)
 {
 
+  if (!support) return;
+
+  //Check if there are any endrings defined for this layer. If not we don't create any
+  GearDir endrings(support, (boost::format("Endrings/Layer[@id='%1%']") % layer).str());
+  if (endrings) {
+    m_endrings[layer] = SVDEndringsPar(layer, support);
+  }
+
+  // Now let's add the cooling pipes to the Support
+  GearDir pipes(support, (boost::format("CoolingPipes/Layer[@id='%1%']") % layer).str());
+  if (pipes) {
+    m_coolingPipes[layer] = SVDCoolingPipesPar(layer, support);
+  }
+
+  return;
 }
 
 
 void SVDGeometryPar::createLadderSupport(int layer, GearDir support)
 {
 
+  if (!support) return;
+
+  // Check if there are any support ribs defined for this layer. If not return empty assembly
+  GearDir params(support, (boost::format("SupportRibs/Layer[@id='%1%']") % layer).str());
+  if (params) {
+    m_supportRibs[layer] = SVDSupportRibsPar(layer, support);
+  }
+
+  return;
 }
 
 

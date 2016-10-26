@@ -19,25 +19,25 @@ using namespace std;
 
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void SVDEndringsPar::read(const GearDir& support)
+void SVDEndringsPar::read(int layer, const GearDir& support)
 {
-  m_material = support.getString("Endrings/Material");
+  GearDir endrings(support, (boost::format("Endrings/Layer[@id='%1%']") % layer).str());
+
+  m_material      = support.getString("Endrings/Material");
   m_length        = support.getLength("Endrings/length");
   m_gapWidth      = support.getLength("Endrings/gapWidth");
   m_baseThickness = support.getLength("Endrings/baseThickness");
 
-  GearDir Endrings(support, "Endrings/Layer");
-
-  for (const GearDir& endring : Endrings.getNodes("Endring")) {
-    m_layers.push_back(SVDEndringsLayerPar(endring));
+  //Create  the endrings
+  for (const GearDir& endring : endrings.getNodes("Endring")) {
+    m_types.push_back(SVDEndringsTypePar(endring));
   }
 
 }
 
-
 // Get VXD geometry parameters from Gearbox (no calculations here)
 // *** This is a DIVOT ***
-void SVDEndringsLayerPar::read(const GearDir& endring)
+void SVDEndringsTypePar::read(const GearDir& endring)
 {
   m_name = endring.getString("@name");
   m_z = endring.getLength("z");

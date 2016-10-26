@@ -74,11 +74,14 @@ namespace Belle2 {
     /** SVD Half Shell parameters */
     std::vector<VXDRotationSolidPar> m_halfShell;
 
-    //SVDHalfShellPar m_halfShell;
-    SVDEndringsPar m_endrings;
-    SVDSupportRibsPar m_supportRibs;
-    SVDCoolingPipesPar m_coolingPipes;
+    /** SVD Endrings parameters */
+    std::map<int, SVDEndringsPar> m_endrings;
 
+    /** SVD Cooling Pipes parameters */
+    std::map<int, SVDCoolingPipesPar> m_coolingPipes;
+
+    /** SVD SupportRibs parameters */
+    std::map<int, SVDSupportRibsPar> m_supportRibs;
 
     ClassDef(SVDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

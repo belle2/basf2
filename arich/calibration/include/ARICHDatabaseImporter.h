@@ -227,6 +227,90 @@ namespace Belle2 {
      */
     void exportSensorModule();
 
+    // classes used in simulation/reconstruction software
+
+    /**
+     * Import simulation parameters from the xml file (QE curve, etc.)
+     */
+    void importSimulationParams();
+
+    /**
+     * Print simulation parameters from the database (QE curve, etc.)
+     */
+    void printSimulationPar();
+
+    /**
+     * Import HAPD modules info from the xml file and database (2D QE maps)
+     * Goes through the list of installed modules in ARICH-InstalledModules.xml,
+     * finds corresponding 2D QE maps in the database and imports lightweight
+     * ARICHModulesInfo class (which is used in sim/rec) into database
+     */
+    void importModulesInfo();
+
+    /**
+     * Print HAPD modules info from the database (lightweight class for sim/rec=)
+     */
+    void printModulesInfo();
+
+    /**
+     * Import channel mask for all HAPD modules from the database (list of dead channels)
+     * Goes through the list of installed modules in ARICH-InstalledModules.xml,
+     * finds corresponding lists of dead channels in the database and imports lightweight
+     * ARICHChannelMask class (which is used in sim/rec) into database
+     */
+    void importChannelMask();
+
+    /**
+     * Print channel mask of all HAPD modules from the database (lightweight class for sim/rec)
+     */
+    void printChannelMask();
+
+    /**
+     * Imports HAPD (asic) channel mappings from the xml file
+     */
+    void importChannelMapping();
+
+    /**
+     * Prints HAPD (asic) channel mapping from the database
+     */
+    void printChannelMapping();
+
+    /**
+     * Imports mappings of FE electronics from the xml file (ARICH-FrontEndMapping.xml) to the database
+     * Mapping of modules to mergers and mergers to coppers
+     */
+    void importFEMappings();
+
+    /**
+     * Prints mappings of FE electronics from the database
+     */
+    void printFEMappings();
+
+    /**
+     * Prints geometry configuration parameters from the database
+     */
+    void printGeometryConfig();
+
+    /**
+     * Dumps 2D QE map of full detector surface from the database into root file (from ARICHModulesInfo)
+     * @param simple false for proper histogram with bin for each channel,
+     *               true for simpler plot with point for each channel (smaller file, faster)
+     * for simple option, draw TGraph2D with "pcolz" option and set view to "top"
+     */
+    void dumpQEMap(bool simple = false);
+
+    /**
+     * Dumps module numbering scheme into root file (module position on the detector plane -> module number)
+     */
+    void dumpModuleNumbering();
+
+    /**
+     * Import parameters of the cosmic test geometry configuration
+     */
+    void importCosmicTestGeometry();
+
+    void importGeometryConfig();
+
   private:
 
     std::vector<std::string> m_inputFilesHapdQA;        /**< Input root files for HAPD QA */

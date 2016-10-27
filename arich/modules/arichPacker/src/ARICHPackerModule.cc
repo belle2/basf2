@@ -11,7 +11,7 @@
 // Own include
 #include <arich/modules/arichPacker/ARICHPackerModule.h>
 
-
+#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -44,13 +44,14 @@ namespace Belle2 {
   //-----------------------------------------------------------------
 
   ARICHPackerModule::ARICHPackerModule() : Module(),
-    m_arichgp(ARICHGeometryPar::Instance()), m_nonSuppressed(0), m_bitMask(0), m_debug(0)
+    m_nonSuppressed(0), m_bitMask(0), m_debug(0)
 
   {
     // set module description (e.g. insert text)
     setDescription("Raw data packer for ARICH");
     setPropertyFlags(c_ParallelProcessingCertified);
     addParam("nonSuppressed", m_nonSuppressed, "Pack in non-suppressed format (store all channels)", unsigned(0));
+    addParam("version", m_version, "dataformat version", unsigned(6));
     addParam("bitMask", m_bitMask, "hit bit mask (4 bits/channel)", (unsigned)0xF);
     addParam("debug", m_debug, "print packed bitmap", 0);
     addParam("inputDigitsName", m_inputDigitsName, "name of ARICHDigit store array", string(""));
@@ -70,13 +71,6 @@ namespace Belle2 {
 
     StoreArray<RawARICH> rawData(m_outputRawDataName);
     rawData.registerInDataStore();
-
-    if (!m_arichgp->isInit()) {
-      GearDir content("/Detector/DetectorComponent[@name='ARICH']/Content");
-      m_arichgp->Initialize(content);
-    }
-    if (!m_arichgp->isInit()) B2ERROR("Component ARICH not found in Gearbox");
-
   }
 
   void ARICHPackerModule::beginRun()
@@ -90,33 +84,38 @@ namespace Belle2 {
     StoreArray<ARICHDigit> digits(m_inputDigitsName);
     StoreArray<RawARICH> rawData(m_outputRawDataName);
 
-    int nModules = m_arichgp->getNMCopies();
+    int nModules = N_MERGERS * N_FEB2MERGER;
 
     vector<const ARICHDigit*>* sortedDigits = new vector<const ARICHDigit*>[nModules];
-
+    int nPacked = 0;
     for (const auto& digit : digits) {
-      int boardID = digit.getModuleID();
-      sortedDigits[boardID - 1].push_back(&digit);
+      int moduleID = digit.getModuleID();
+      unsigned mergerID = m_mergerMap->getMergerID(moduleID);
+      if (!mergerID) { B2WARNING("No module2merger mapping for module ID: " <<  moduleID << "; Digit will not be packed!"); continue;}
+      if (!m_copperMap->getCopperID(mergerID)) { B2WARNING("No merger2copper mapping for merger ID: " <<  mergerID << "; Digit will not be packed!"); continue;}
+      sortedDigits[moduleID - 1].push_back(&digit);
+      nPacked++;
     }
 
     int bufferDim = 3 + 33 + 6 * 36; // 3 merger header words + 5.5 FEB header words / FEB + 36 data words per / FEB
 
     int buffer[4][bufferDim];
 
-    for (const auto& copperID : m_arichgp->getCopperIDs()) {
-      int bufferSize[4] = {0, 0, 0, 0};
+    for (const auto& copperID : m_copperMap->getCopperIDs()) {
+
+      int bufferSize[4]  = {0, 0, 0, 0};
       for (int finesse = 0; finesse < 4; finesse++) {
+
+        unsigned ibyte = 0;
 
         for (int j = 0; j < bufferDim; j++) {
           buffer[finesse][j] = 0;
         }
 
-        unsigned ibyte = 0;
-
         auto* buf = buffer[finesse];
 
         // get corresponding merger ID
-        unsigned mergerID = m_arichgp->getMergerFromCooper(copperID, finesse);
+        unsigned mergerID = m_copperMap->getMergerID(copperID, finesse);
         if (!mergerID) continue;
 
         ARICHRawHeader mergerHead;
@@ -130,21 +129,20 @@ namespace Belle2 {
 
         ibyte += ARICHRAW_HEADER_SIZE;
 
-        int nboards = m_arichgp->getNBoardsOnMerger(mergerID);
+        int nboards = N_FEB2MERGER;
 
         for (int k = 0; k < nboards; k++) {
 
-          int boardID = m_arichgp->getBoardFromMerger(mergerID, k);
-          if (boardID < 0) continue;
+          int moduleID = m_mergerMap->getModuleID(mergerID, k + 1);
+          if (moduleID <= 0) continue;
 
           // FEB header
           ARICHRawHeader FEBHead;
           FEBHead.type = dataFormat;
           FEBHead.version = m_version;
           FEBHead.mergerID = mergerID;
-          FEBHead.FEBSlot = k;
+          FEBHead.FEBSlot = k; // board slots go from 0-5 for now, if firmware is updated to 1-6 add +1 !!
           FEBHead.trigger = evtMetaData->getEvent();
-
 
           if (m_nonSuppressed) {
             // data length in bytes
@@ -153,7 +151,7 @@ namespace Belle2 {
             ibyte += ARICHFEB_HEADER_SIZE; // leave slot for FEB header (FEB header to be implemented!)
 
             // write data
-            for (const auto& digit : sortedDigits[boardID - 1]) {
+            for (const auto& digit : sortedDigits[moduleID - 1]) {
               unsigned chn = digit->getChannelID();
               //std::cout << "pack: mod: " << boardID << " ch " << chn<< std::endl;
               unsigned shift = 143 - chn;
@@ -161,15 +159,14 @@ namespace Belle2 {
               buf[(ibyte + shift) / 4] += (bitmap << (3 - (ibyte + shift) % 4) * 8);
             }
             ibyte += 144;
-          }
-
-          else {
-            FEBHead.length = ARICHFEB_HEADER_SIZE + sortedDigits[boardID - 1].size() * 2; // each hit is 2 bytes! channel + bitmap
+          } else {
+            FEBHead.length = ARICHFEB_HEADER_SIZE + sortedDigits[moduleID - 1].size() * 2; // each hit is 2 bytes! channel + bitmap
             writeHeader(buf, ibyte, FEBHead);
             ibyte += ARICHFEB_HEADER_SIZE; // leave slot for FEB header (FEB header to be implemented!)
 
-            for (const auto& digit : sortedDigits[boardID - 1]) {
+            for (const auto& digit : sortedDigits[moduleID - 1]) {
               unsigned chn = digit->getChannelID();
+              //std::cout << "pack: mod: " << boardID << " ch " << chn<< std::endl;
               unsigned shift = (3 - ibyte % 4) * 8;
               buf[ibyte / 4] += (chn << shift);
               ibyte++;
@@ -221,7 +218,6 @@ namespace Belle2 {
 
   }
 
-
   void ARICHPackerModule::writeHeader(int* buffer, unsigned& ibyte, const ARICHRawHeader& head)
   {
 
@@ -253,7 +249,11 @@ namespace Belle2 {
       buffer[ibyte / 4] |= trg[3 - i] << shift;
       ibyte++;
     }
+
   }
+
+
+
 
   void ARICHPackerModule::endRun()
   {

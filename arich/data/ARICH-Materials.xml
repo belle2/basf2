@@ -177,7 +177,25 @@
       <Material fraction="1">Si</Material>
     </Components>
   </Material>
-
-
-
+  
+  <Material name="BoratedPoly">
+    <state>Solid</state>
+    <density unit="g/cm3">1.19</density>
+    <Components>
+      <Element fraction="0.1293">H</Element>
+      <Element fraction="0.7707">C</Element>
+      <Element fraction="0.10">B</Element>
+    </Components>
+  </Material>
+  
+  <Material name="ARICH_Scintilator">
+    <density unit="g/cm3">1.06</density>
+    <state>Solid</state>
+    <Components>
+      <Element fraction="0.92257717">C</Element>
+      <Element fraction="0.07742283">H</Element>
+    </Components>
+  </Material>
+    
+  
 </Materials>

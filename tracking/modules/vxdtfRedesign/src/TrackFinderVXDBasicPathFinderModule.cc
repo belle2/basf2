@@ -62,11 +62,6 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
            "Regulates if every subset of sufficient length of a path shall be collected as separate path or not (if true, only one path per possibility is collected, if false subsets are collected too.",
            bool(true));
 
-  addParam("removeVirtualIP",
-           m_PARAMremoveVirtualIP,
-           "If true, the virtual interaction Point will be removed from the track candidates.",
-           bool(true));
-
 }
 
 /** *************************************+************************************* **/
@@ -151,14 +146,16 @@ void TrackFinderVXDBasicPathFinderModule::event()
 
 
   /// convert paths of directedNodeNetwork-nodes to paths of const SpacePoint*:
+  //  Resulting SpacePointPath contains SpacePoints sorted from the innermost to the outermost.
   vector< vector <const SpacePoint*> > collectedSpacePointPaths;
+  collectedSpacePointPaths.reserve(collectedPaths.size());
   for (auto& aPath : collectedPaths) {
-    collectedSpacePointPaths.push_back({});
-    vector <const SpacePoint*>& spPath = collectedSpacePointPaths.back();
-    for (auto* aNode : *aPath) {
-      spPath.push_back(aNode->getEntry().getOuterHit()->spacePoint);
-    }
+    vector <const SpacePoint*> spPath;
     spPath.push_back(aPath->back()->getEntry().getInnerHit()->spacePoint);
+    for (auto aNodeIt = (*aPath).rbegin(); aNodeIt != (*aPath).rend();  ++aNodeIt) {
+      spPath.push_back((*aNodeIt)->getEntry().getOuterHit()->spacePoint);
+    }
+    collectedSpacePointPaths.push_back(spPath);
   }
 
 

@@ -59,7 +59,7 @@ void ECLDigitizerModule::initialize()
   m_eclTrigs.registerInDataStore();
 
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
-  m_eclHits.registerRelationTo(m_eclDigits);
+
   m_eclDigits.registerRelationTo(m_eclHits);
 
   readDSPDB();

@@ -692,7 +692,7 @@ void ECLDataAnalysisModule::event()
   m_eclClusterToMc5->clear(); m_eclClusterToMcWeight5->clear(); m_eclClusterToMc5PDG->clear(); m_eclClusterToBkgWeight->clear();
   m_eclClusterSimHitSum->clear(); m_eclClusterEnergyDepSum->clear();  m_eclClusterTiming->clear();  m_eclClusterTimingError->clear();
   m_eclClusterE9oE25->clear();  m_eclClusterHighestE->clear();  m_eclClusterLat->clear(); m_eclClusterNofCrystals->clear();
-  m_eclClusterCrystalHealth->clear();  m_eclClusterMergedPi0->clear(); m_eclClusterPx->clear();  m_eclClusterPy->clear();
+  m_eclClusterCrystalHealth->clear();  m_eclClusterPx->clear();  m_eclClusterPy->clear();
   m_eclClusterPz->clear();  m_eclClusterIsTrack->clear(); m_eclClusterClosestTrackDist->clear();
   m_eclClusterDeltaL->clear(); m_eclClusterToShower->clear();
 

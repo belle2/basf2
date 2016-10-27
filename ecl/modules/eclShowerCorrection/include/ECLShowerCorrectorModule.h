@@ -69,7 +69,6 @@ namespace Belle2 {
     private:
       DBObjPtr<ECLShowerCorrectorLeakageCorrection> m_leakageCorrectionPtr;  /**< Leakage corrections from DB */
 
-      double m_backgroundCount; /**< Background level per event measured */
       const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
       // Vectors with one entry each:

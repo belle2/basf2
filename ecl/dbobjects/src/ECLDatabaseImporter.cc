@@ -191,7 +191,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   //Fill ConstantNtuple vectors
   //----------------------------------------------------------------------------------------------
 
-  float avgRecEn[m_numAvgRecEnEntries];
+  std::vector<float> avgRecEns;
   float lReg1Theta;
   float hReg1Theta;
   float lReg2Theta;
@@ -206,7 +206,13 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   int numOfReg3ThetaBins;
   int phiPeriodicity;
 
-  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), &avgRecEn);
+  //Ugly hack to circumvent 'stack usage might be unbounded [-Wstack-usage=]' compiler warning that's caused by the use of c-type arrays.
+  //This is not for the faint of heart
+
+  //Resize vector, because root GetEntry fills the whole internal array of the vector without changing it's size. So it needs to be the right size.
+  avgRecEns.resize(m_numAvgRecEnEntries);
+
+  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), &avgRecEns.front());//Set address to the first array element.
   helperTree->SetBranchAddress(m_lReg1ThetaBranchName.c_str(), &lReg1Theta);
   helperTree->SetBranchAddress(m_hReg1ThetaBranchName.c_str(), &hReg1Theta);
   helperTree->SetBranchAddress(m_lReg2ThetaBranchName.c_str(), &lReg2Theta);
@@ -239,7 +245,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
 
   for (long iEntry = 0; iEntry < helperTree->GetEntries(); ++iEntry) {
     helperTree->GetEntry(iEntry);
-    for (int iIdx = 0; iIdx < m_numAvgRecEnEntries; ++iIdx) m_avgRecEn.push_back(avgRecEn[iIdx]);
+    for (unsigned int iIdx = 0; iIdx < avgRecEns.size(); ++iIdx) m_avgRecEn.push_back(avgRecEns[iIdx]);
 
     m_lReg1Theta.push_back(lReg1Theta);
     m_hReg1Theta.push_back(hReg1Theta);

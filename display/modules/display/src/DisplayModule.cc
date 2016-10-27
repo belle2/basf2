@@ -122,10 +122,12 @@ void DisplayModule::initialize()
   m_visualizer->setOptions(m_options);
   EveGeometry::addGeometry();
 
-  std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
-  if (detectorName != "Belle2Detector") {
-    B2INFO("Non-standard detector '" << detectorName << "' used, switching to full geometry.");
-    m_fullGeometry = true;
+  if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
+    std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
+    if (detectorName != "Belle2Detector") {
+      B2INFO("Non-standard detector '" << detectorName << "' used, switching to full geometry.");
+      m_fullGeometry = true;
+    }
   }
 
   m_display->hideObjects(m_hideObjects);

@@ -125,9 +125,6 @@ namespace Belle2 {
       StoreArray<ECLDsp>    m_eclDsps;
       StoreArray<ECLTrig>   m_eclTrigs;
 
-      RelationArray m_HitToDigit;    /**< ECLDigit to ECLHit relation array */
-      RelationArray m_DigitToHit;    /**< ECLDigit to ECLHit relation array */
-
       /** Module parameters */
       bool m_background;
       bool m_calibration;

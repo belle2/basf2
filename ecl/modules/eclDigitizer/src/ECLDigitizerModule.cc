@@ -38,7 +38,7 @@ REG_MODULE(ECLDigitizer)
 //                 Implementation
 //-----------------------------------------------------------------
 
-ECLDigitizerModule::ECLDigitizerModule() : Module(), m_HitToDigit(m_eclHits, m_eclDigits), m_DigitToHit(m_eclDigits, m_eclHits)
+ECLDigitizerModule::ECLDigitizerModule() : Module()
 {
   //Set module properties
   setDescription("Creates ECLDigiHits from ECLHits.");
@@ -59,9 +59,8 @@ void ECLDigitizerModule::initialize()
   m_eclTrigs.registerInDataStore();
 
   m_eclDiodeHits.registerInDataStore("ECLDiodeHits");
-
-  m_eclDigits.registerRelationTo(m_eclHits);
   m_eclHits.registerRelationTo(m_eclDigits);
+  m_eclDigits.registerRelationTo(m_eclHits);
 
   readDSPDB();
 
@@ -182,12 +181,14 @@ void ECLDigitizerModule::event()
       eclDigit->setTimeFit(tFit);  // t0 (us)= (1520 - m_ltr)*24.*12/508/(3072/2) ;
       eclDigit->setQuality(qualityFit);
       eclDigit->setChi(chi);
-      int id = eclDigit->getArrayIndex();
       for (const auto& hit : hitmap)
-        if (hit.cell == j) {
-          m_DigitToHit.add(id, hit.id);
-          m_HitToDigit.add(hit.id, id);
-        }
+        if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
+      // int id = eclDigit->getArrayIndex();
+      // for (const auto& hit : hitmap)
+      //   if (hit.cell == j) {
+      //     m_DigitToHit.add(id, hit.id);
+      //     m_HitToDigit.add(hit.id, id);
+      //   }
     }
   } //store each crystal hit
 }

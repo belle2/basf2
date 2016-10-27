@@ -288,7 +288,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
 
   //Set displacement params. (from input data)
-  m_Displacement = geom.getDisplacement();
+  //  m_Displacement = geom.getDisplacement();
+  m_Displacement = CDCGeoControlPar::getInstance().getDisplacement();
 
   B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
          m_Displacement);
@@ -302,7 +303,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   }
 
   //Set alignment params. (from input data)
-  m_Alignment = geom.getAlignment();
+  //  m_Alignment = geom.getAlignment();
+  m_Alignment = CDCGeoControlPar::getInstance().getAlignment();
   B2INFO("CDCGeometryPar: Load alignment params. (=1); not load (=0):" <<
          m_Alignment);
   if (m_Alignment) {
@@ -314,7 +316,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   }
 
   //Set misalignment params. (from input data)
-  m_Misalignment = geom.getMisalignment();
+  //  m_Misalignment = geom.getMisalignment();
+  m_Misalignment = CDCGeoControlPar::getInstance().getMisalignment();
   B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
          m_Misalignment);
   if (m_Misalignment) {

@@ -56,6 +56,30 @@ namespace Belle2 {
       }
 
       /**
+       * Set displacement switch
+       */
+      void setDisplacement(bool input)
+      {
+        m_displacement = input;
+      }
+
+      /**
+       * Set alignment switch
+       */
+      void setAlignment(bool input)
+      {
+        m_alignment = input;
+      }
+
+      /**
+       * Set misalignment switch
+       */
+      void setMisalignment(bool input)
+      {
+        m_misalignment = input;
+      }
+
+      /**
        * Set input file name for wire displacement
        */
       void setDisplacementFile(std::string input)
@@ -161,6 +185,30 @@ namespace Belle2 {
       }
 
       /**
+       * Get displacement switch
+       */
+      bool getDisplacement() const
+      {
+        return m_displacement;
+      }
+
+      /**
+       * Get alignment switch
+       */
+      bool getAlignment() const
+      {
+        return m_alignment;
+      }
+
+      /**
+       * Get misalignment switch
+       */
+      bool getMisalignment() const
+      {
+        return m_misalignment;
+      }
+
+      /**
        * Get input file name for wire displacement
        */
       std::string getDisplacementFile() const
@@ -253,6 +301,9 @@ namespace Belle2 {
       int m_materialDefinitionMode = 0;     /*!< Material definition mode. */
       int m_senseWireZposMode = 1;     /*!< Sense wire z postion mode. */
 
+      bool m_displacement = true;  /**< Switch for displacement. */
+      bool m_alignment = true;  /**< Switch for alignment. */
+      bool m_misalignment = true;  /**< Switch for misalignment. */
       std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */

@@ -54,6 +54,9 @@ namespace Belle2 {
     int m_materialDefinitionMode;  /*!< Material definition mode */
     int m_senseWireZposMode;    /*!< Sense wire Z pos. mode */
 
+    bool m_displacement;  /**< Switch for displacement. */
+    bool m_alignment;  /**< Switch for alignment. */
+    bool m_misalignment;  /**< Switch for misalignment. */
     std::string m_displacementFile;  /**< Displacement file. */
     std::string m_alignmentFile;  /**< Alignment file. */
     std::string m_misalignmentFile;  /**< Misalignment file. */

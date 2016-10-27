@@ -19,8 +19,9 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacementFile(), m_alignmentFile(),
-  m_misalignmentFile(), m_xtFile(), m_sigmaFile(), m_propSpeedFile(), m_t0File(), m_twFile(), m_bwFile(), m_chMapFile()
+  m_minTrackLength(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacement(), m_alignment(),
+  m_misalignment(), m_displacementFile(), m_alignmentFile(), m_misalignmentFile(), m_xtFile(), m_sigmaFile(), m_propSpeedFile(),
+  m_t0File(), m_twFile(), m_bwFile(), m_chMapFile()
 
 {
   // Set description
@@ -50,11 +51,17 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //sense wire z pos mode
   addParam("SenseWireZposMode",  m_senseWireZposMode,
            "Sense wire z position mode: =1: correct for feedthrough effect; =0: not correct.",  1);
-  //displacement
+  //displacement switch
+  addParam("Displacement", m_displacement, "Switch for wire displacement: on/off.",  true);
+  //alignmentt switch
+  addParam("Alignment", m_alignment, "Switch for wire alignment: on/off.",  true);
+  //misalignment switch
+  addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
+  //displacement file
   addParam("DisplacementFile", m_displacementFile, "Input file name for wire displacement.",  string("displacement_v1.1.dat"));
-  //alignment
+  //alignment file
   addParam("AlignmentFile", m_alignmentFile, "Input file name for wire alignment.",  string("alignment_v2.dat"));
-  //misalignment
+  //misalignment file
   addParam("MisalignmentFile", m_misalignmentFile, "Input file name for wire misalignment.", string("misalignment_v2.dat"));
   //xt-relation
   addParam("XtFile", m_xtFile, "Input file name for xt-relations.",  string("xt_v3.dat"));
@@ -119,6 +126,21 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getDebug() != m_debug4Geo) {
     B2INFO("CDCJobCntlParModifier: debug4Geo modified: " << m_gcp.getDebug() << " to " << m_debug4Geo);
     m_gcp.setDebug(m_debug4Geo);
+  }
+
+  if (m_gcp.getDisplacement() != m_displacement) {
+    B2INFO("CDCJobCntlParModifier: displacement switch modified: " << m_gcp.getDisplacement() << " to " << m_displacement);
+    m_gcp.setDisplacement(m_displacement);
+  }
+
+  if (m_gcp.getAlignment() != m_alignment) {
+    B2INFO("CDCJobCntlParModifier: alignment switch modified: " << m_gcp.getAlignment() << " to " << m_alignment);
+    m_gcp.setAlignment(m_alignment);
+  }
+
+  if (m_gcp.getMisalignment() != m_misalignment) {
+    B2INFO("CDCJobCntlParModifier: misalignment switch modified: " << m_gcp.getMisalignment() << " to " << m_misalignment);
+    m_gcp.setMisalignment(m_misalignment);
   }
 
   if (m_gcp.getDisplacementFile() != m_displacementFile) {

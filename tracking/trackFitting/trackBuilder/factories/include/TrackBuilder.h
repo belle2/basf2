@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/gearbox/Const.h>
+
 #include <string>
 #include <TVector3.h>
 
@@ -71,7 +73,8 @@ namespace Belle2 {
     "to choose; especially useful for Cosmics
      * @return
      */
-    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP = false);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
+                                 const bool useClosestHitToIP = false);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

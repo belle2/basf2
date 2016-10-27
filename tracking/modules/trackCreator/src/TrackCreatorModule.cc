@@ -111,7 +111,7 @@ void TrackCreatorModule::event()
         B2DEBUG(200, "Trying to fit with PDG = " << pdg);
         trackFitter.fit(recoTrack, Const::ParticleType(abs(pdg)));
       }
-      trackBuilder.storeTrackFromRecoTrack(recoTrack, m_useClosestHitToIP);
+      trackBuilder.storeTrackFromRecoTrack(recoTrack, Const::ParticleType(abs(m_defaultPDGCode)), m_useClosestHitToIP);
     } else {
       B2DEBUG(200, "Pion fit failed - not creating a Track out of this RecoTrack.");
     }

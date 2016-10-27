@@ -15,6 +15,7 @@
 #include <utility>
 #include <map>
 #include <vector>
+#include <fstream>
 
 #include <root/TVector2.h>
 
@@ -77,6 +78,8 @@ namespace Belle2 {
     virtual void initialize();
     /** Run tracking */
     virtual void event();
+    /** Clean up */
+    virtual void terminate();
 
     /** Fast intercept finder
      *  Divide Hough plane recursively to find cells with enough crossing lines.
@@ -213,6 +216,11 @@ namespace Belle2 {
      *          center of the cluster (can be 0 hits if center is not part
      *          of the cluster) */
     bool m_hitRelationsFromCorners;
+
+    /** filename for test output for firmware debugging */
+    std::string m_testFilename;
+    /** filestream for test output for firmware debugging */
+    std::ofstream testFile;
 
     /** map of TS hits containing <iHit, <iSL, (x, y)>> with
      *  iHit: hit index in StoreArray

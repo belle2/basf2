@@ -30,8 +30,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     # Material effects for all track extrapolations
     if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
-        path.add_module(material_effects)
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.

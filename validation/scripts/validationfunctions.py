@@ -149,7 +149,7 @@ def parse_cmd_line_arguments(isTest=None, tag=None):
                         action='store_true')
     parser.add_argument("-m", "--mode", help="The mode which will be used for "
                         "running the validation. Two possible values: 'local', "
-                        "'cluster' or 'clustersge'. Default is 'local'",
+                        "'cluster' or 'cluster-sge'. Default is 'local'",
                         type=str, nargs='?', default='local')
     parser.add_argument("-i", "--intervals", help="Comma seperated list of intervals "
                         "for which to execute the validation scripts. Default is 'nightly'",

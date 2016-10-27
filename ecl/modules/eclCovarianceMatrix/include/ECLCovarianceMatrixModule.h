@@ -54,7 +54,6 @@ namespace Belle2 {
 
     private:
 
-      double m_backgroundCount; /**< Background level per event measured */
       const double m_fullBkgdCount = 183.0; /**< Nominal Background at BGx1.0 (MC12) */
 
       /** Store array: ECLShower. */

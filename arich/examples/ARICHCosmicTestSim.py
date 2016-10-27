@@ -21,8 +21,8 @@ set_log_level(LogLevel.INFO)
 
 home = os.environ['BELLE2_LOCAL_DIR']
 # cosmic test local DB folder
-# use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
-#                   home + "/arich/database/cosmicTest_payloads")
+use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
+                   home + "/arich/database/cosmicTest_payloads")
 
 # Create path
 main = create_path()
@@ -46,7 +46,7 @@ particlegun = register_module('ParticleGun')
 # Setting the random seed for particle generation:
 set_random_seed(seed)
 # Setting the list of particle codes (PDG codes) for the generated particles
-particlegun.param('pdgCodes', [13])
+particlegun.param('pdgCodes', [11])
 # Setting the number of tracks to be generated per event:
 particlegun.param('nTracks', 1)
 # if you set nTracks to 0, then for each PDG code in pdgCodes list a track
@@ -76,7 +76,9 @@ main.add_module(particlegun)
 # Run simulation
 simulation = register_module('FullSim')
 simulation.param('StoreOpticalPhotons', True)
-simulation.param('PhotonFraction', 0.40)
+# by default only 35% of photons are propagated, which is below QE of some HAPDs! change fraction to 45% here.
+# -> change the default fraction for the release!
+simulation.param('PhotonFraction', 0.45)
 main.add_module(simulation)
 
 # ARICH digitization module
@@ -101,7 +103,6 @@ main.add_module(arichDQM)
 # main.add_module(display)
 
 # store datastore objets into root file
-
 # output = register_module('RootOutput')
 # output.param('outputFileName', "rootOutput.root")
 # output.param('branchNames', ['ARICHAeroHits', 'ARICHSimHits', 'ARICHDigits', 'ARICHHits'])

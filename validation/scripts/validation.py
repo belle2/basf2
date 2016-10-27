@@ -813,6 +813,9 @@ class Validation:
         if self.mode == 'cluster':
             import clustercontrol
             control = clustercontrol.Cluster()
+        elif self.mode == 'cluster-sge':
+            import clustercontrolsge
+            control = clustercontrolsge.Cluster()
         else:
             control = local_control
 
@@ -822,13 +825,13 @@ class Validation:
             if os.path.exists("./runtimes-old.dat"):
                 # If there is an old data backup, delete it, we backup only one run
                 os.remove("./runtimes-old.dat")
-            if not self.mode == "cluster":
+            if self.mode == "local":
                 # Backup the old data file
                 shutil.copyfile("./runtimes.dat", "./runtimes-old.dat")
 
         # Open runtimes log and start logging, but log only if we are
         # running in the local mode
-        if not self.mode == "cluster":
+        if self.mode == "local":
             runtimes = open('./runtimes.dat', 'w+')
 
         if not self.quiet:
@@ -865,7 +868,7 @@ class Validation:
 
                         # If we are running locally, log a runtime
                         script_object.runtime = time.time() - script_object.start_time
-                        if not self.mode == "cluster":
+                        if self.mode == "local":
                             runtimes.write(script_object.name + "=" + str(script_object.runtime) + "\n")
 
                         # Check for the return code and set variables
@@ -962,7 +965,7 @@ class Validation:
         self.log_skipped()
 
         # And close the runtime data file
-        if not self.mode == "cluster":
+        if self.mode == "local":
             runtimes.close()
         print()
 
@@ -1046,12 +1049,14 @@ def execute(tag=None, isTest=None):
                                 .format(validation.basf2_options))
 
         # Check if we are using the cluster or local multiprocessing:
-        if cmd_arguments.mode and cmd_arguments.mode in ['local', 'cluster']:
+        if cmd_arguments.mode and cmd_arguments.mode in ['local', 'cluster', 'cluster-sge']:
             validation.mode = cmd_arguments.mode
         else:
             validation.mode = 'local'
         if validation.mode == 'local':
             validation.log.note('Validation will use local multi-processing.')
+        elif validation.mode == 'cluster-sge':
+            validation.log.note('Validation will use the SunGridEngine cluster.')
         elif validation.mode == 'cluster':
             validation.log.note('Validation will use the cluster.')
 

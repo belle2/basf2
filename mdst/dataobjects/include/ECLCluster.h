@@ -35,6 +35,7 @@ namespace Belle2 {
       m_status(0),
       m_connectedRegionId(0),
       m_hypothesisId(5), // set to 5 (all photons) for b2bii
+      m_clusterId(0),
       m_sqrtcovmat_00(0.),
       m_covmat_10(0.),
       m_sqrtcovmat_11(0.),
@@ -71,6 +72,9 @@ namespace Belle2 {
 
     /** Set hypothesis id. */
     void setHypothesisId(int hypothesisid) { m_hypothesisId = hypothesisid; }
+
+    /** Set cluster id. */
+    void setClusterId(int clusterid) { m_clusterId = clusterid; }
 
     /** Set covariance matrix (3x3), i.e. squared entries, for
      [0]->energy,
@@ -164,6 +168,9 @@ namespace Belle2 {
 
     /** Return hypothesis id */
     int getHypothesisId() const {return m_hypothesisId;}
+
+    /** Return cluster id */
+    int getClusterId() const {return m_clusterId;}
 
     /** Get distance between cluster COG and track extrapolation to ECL. */
     double getMinTrkDistance() const { return m_minTrkDistance; }
@@ -267,6 +274,9 @@ namespace Belle2 {
     /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
     int getDetectorRegion() const;
 
+    /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
+    int getUniqueId() const;
+
   private:
 
     /** Is related to track (true) or not (false). */
@@ -280,6 +290,9 @@ namespace Belle2 {
 
     /** Cluster hypothesis. */
     int m_hypothesisId;
+
+    /** Cluster id */
+    int m_clusterId;
 
     //Covariance matrix:
     //       E    phi   theta
@@ -359,7 +372,8 @@ namespace Belle2 {
     Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
 
     /** Class definition */
-    ClassDef(ECLCluster, 7);
+    ClassDef(ECLCluster, 8);
+    // 8: Added clusterId, getUniqueId
     // 7: Changed range of SecondMoment from 0..100 to 0..40
     // 6: Changed stored variances to sqrt(covmat_ii).
     // 5: New HypothesisId default, removed relative covariance entries, renamed some setters/getters, adjusted covariance variable ranges.

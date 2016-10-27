@@ -298,7 +298,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #if defined(CDC_DISPLACEMENT_FROM_DB)
     setDisplacement();
 #else
-    readWirePositionParams(c_Base, &geom, gbxParams);
+    //    readWirePositionParams(c_Base, &geom, gbxParams);
+    readWirePositionParams(c_Base, &geom);
 #endif
   }
 
@@ -311,7 +312,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #if defined(CDC_ALIGN_FROM_DB)
     setWirPosAlignParams();
 #else
-    readWirePositionParams(c_Aligned, &geom, gbxParams);
+    //    readWirePositionParams(c_Aligned, &geom, gbxParams);
+    readWirePositionParams(c_Aligned, &geom);
 #endif
   }
 
@@ -324,7 +326,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #if defined(CDC_MISALIGN_FROM_DB)
     setWirPosMisalignParams();
 #else
-    readWirePositionParams(c_Misaligned, &geom, gbxParams);
+    //    readWirePositionParams(c_Misaligned, &geom, gbxParams);
+    readWirePositionParams(c_Misaligned, &geom);
 #endif
   }
 
@@ -381,7 +384,8 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 #if defined(CDC_CHMAP_FROM_DB)
     setChMap();  //Set ch-map (from DB)
 #else
-    readChMap(gbxParams);  //Read ch-map
+    //    readChMap(gbxParams);  //Read ch-map
+    readChMap();  //Read ch-map
 #endif
 
 #if defined(CDC_TIMEWALK_FROM_DB)
@@ -597,7 +601,8 @@ void CDCGeometryPar::read()
   B2INFO("CDCGeometryPar: Load displacement params. (=1); not load (=0):" <<
          m_Displacement);
   if (m_Displacement) {
-    readWirePositionParams(c_Base, nullptr, gbxParams);
+    //    readWirePositionParams(c_Base, nullptr, gbxParams);
+    readWirePositionParams(c_Base, nullptr);
   }
 
   //Set misalignment params. (from input data)
@@ -605,7 +610,8 @@ void CDCGeometryPar::read()
   B2INFO("CDCGeometryPar: Load misalignment params. (=1); not load (=0):" <<
          m_Misalignment);
   if (m_Misalignment) {
-    readWirePositionParams(c_Misaligned, nullptr, gbxParams);
+    //    readWirePositionParams(c_Misaligned, nullptr, gbxParams);
+    readWirePositionParams(c_Misaligned, nullptr);
   }
 
   //Set alignment params. (from input data)
@@ -616,7 +622,8 @@ void CDCGeometryPar::read()
 #if defined(CDC_ALIGN_FROM_DB)
     setWirPosAlignParams();
 #else
-    readWirePositionParams(c_Aligned, nullptr, gbxParams);
+    //    readWirePositionParams(c_Aligned, nullptr, gbxParams);
+    readWirePositionParams(c_Aligned, nullptr);
 #endif
   }
 
@@ -657,7 +664,8 @@ void CDCGeometryPar::read()
 #if defined(CDC_CHMAP_FROM_DB)
     setChMap();  //Set ch-map (from DB)
 #else
-    readChMap(gbxParams);  //Read ch-map
+    //    readChMap(gbxParams);  //Read ch-map
+    readChMap();  //Read ch-map
 #endif
 
 #if defined(CDC_TIMEWALK_FROM_DB)
@@ -688,7 +696,8 @@ void CDCGeometryPar::read()
 
 
 // Read displacement or (mis)alignment params.
-void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom,  const GearDir gbxParams)
+//void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom,  const GearDir gbxParams)
+void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom)
 {
 
   std::string fileName0;
@@ -1622,7 +1631,8 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
 
 
 // Read ch-map
-void CDCGeometryPar::readChMap(const GearDir gbxParams)
+//void CDCGeometryPar::readChMap(const GearDir gbxParams)
+void CDCGeometryPar::readChMap()
 {
   //  std::string fileName0 = gbxParams.getString("chmapFileName");
   std::string fileName0 = CDCGeoControlPar::getInstance().getChMapFile();

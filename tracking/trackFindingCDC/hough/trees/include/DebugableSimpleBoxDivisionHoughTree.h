@@ -17,10 +17,11 @@ namespace Belle2 {
 
     /// A convenience class for adding debug information to a Simple Hough Tree.
     template<class AHitPtr, class AInBoxAlgorithm, size_t divisionX, size_t divisionY>
-    class DebugableSimpleBoxDivisionHoughTree : public SimpleBoxDivisionHoughTree<AHitPtr, AInBoxAlgorithm, divisionX, divisionY> {
+    class DebugableSimpleBoxDivisionHoughTree :
+      public SimpleBoxDivisionHoughTree<AHitPtr, AInBoxAlgorithm, divisionX, divisionY> {
     private:
       /// The Super class
-      typedef SimpleBoxDivisionHoughTree<AHitPtr, AInBoxAlgorithm, divisionX, divisionY> Super;
+      using Super = SimpleBoxDivisionHoughTree<AHitPtr, AInBoxAlgorithm, divisionX, divisionY>;
     public:
       /// Use the constructors of the super class.
       using Super::Super;
@@ -29,7 +30,7 @@ namespace Belle2 {
        *  Write out some debug information to a ROOT file with the given name.
        *  This must be done before felling the tree. Attention: This will delete a ROOT file
        *  with the same name if already present.
-       *  @param filename: The ROOT filename.
+       *  @param filename The ROOT filename.
        */
       void writeDebugInfoToFile(const std::string& filename)
       {
@@ -87,8 +88,10 @@ namespace Belle2 {
       }
 
     private:
-      /// Fill the tree till all nodes are touched once.
-      /** This is not for finding results, but for debug reasons. **/
+      /**
+       *  Fill the tree till all nodes are touched once.
+       *  This is not for finding results, but for debug reasons.
+       */
       void fillAll()
       {
         AInBoxAlgorithm inBoxAlgorithm;

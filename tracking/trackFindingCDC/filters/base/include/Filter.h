@@ -29,7 +29,8 @@ namespace Belle2 {
       typedef AObject Object;
 
     public:
-      /** Expose the set of parameters of the filter to the module parameter list.
+      /**
+       *  Expose the set of parameters of the filter to the module parameter list.
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
@@ -44,19 +45,21 @@ namespace Belle2 {
       }
 
     public:
-      /** Function to evaluate the object.
+      /**
+       *  Function to evaluate the object.
        *  Base implementation rejects all objects.
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
        *             NAN if the object is rejected.
        */
-      virtual Weight operator()(const Object&)
+      virtual Weight operator()(const Object& obj __attribute__((unused)))
       {
         return NAN;
       }
 
-      /** Function to evaluate the object.
+      /**
+       *  Function to evaluate the object.
        *  Base implementation rejects all objects.
        *
        *  @param obj The object to be accepted or rejected.

@@ -28,7 +28,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Class representing a hit wire in the central drift chamber.
+    /**
+     *  Class representing a hit wire in the central drift chamber.
      *
      *  This class combines the measurement information from a CDCHit
      *  with the geometry information.
@@ -63,17 +64,16 @@ namespace Belle2 {
        */
       CDCWireHit(const CDCHit* const ptrHit,
                  const double driftLength,
-                 const double driftlengthVariance = c_simpleDriftLengthVariance,
+                 const double driftLengthVariance = c_simpleDriftLengthVariance,
                  const double chargeDeposit = 0);
 
-      /// Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
-      /** Binds to the CDCHit and the corresponding wire together and translates the TDC count to a driftlength.
+      /**
+       *  Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
+       *  Binds to the CDCHit and the corresponding wire together and translates the TDC count to a driftlength.
        *  Also stores the index of the StoreArray
        *  from which the hit has been taken. Necessary for later translation to genfit.
        *
        *  @param  ptrHit          Reference to the CDCHit.
-       *  @param  ptrTranslator   Optional xt relation used to translate the tdc count to a drift length.
-       *                          If omitted use the default from the CDCWireHit.
        */
       CDCWireHit(const CDCHit* const ptrHit,
                  CDC::TDCCountTranslatorBase* = nullptr,
@@ -122,8 +122,8 @@ namespace Belle2 {
       { return wireHit.getWireID().getEWire() < hit.getID(); }
 
       /// Defines wire hits and raw CDCHit to be coaligned.
-      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
       // Same as above but the other way round.
+      friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
       { return hit.getID() < wireHit.getWireID().getEWire(); }
 
       /// Defines CDCWireSuperLayer and CDCWireHit to be coaligned on the super layer on which they are based.
@@ -135,24 +135,31 @@ namespace Belle2 {
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
       { return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer(); }
 
-      /** @name Mimic pointer
-        */
-      /// Access the object methods and methods from a pointer in the same way.
-      /** In situations where the type is not known to be a pointer or a reference
+      /**
+       *  @name Mimic pointer
+       *
+       *  Access the object methods and methods from a pointer in the same way.
+       *  In situations where the type is not known to be a pointer or a reference
        *  there is no way to tell if one should use the dot '.' or operator '->' for method look up.
        *  So this function defines the -> operator for the object.
        *  No matter you have a pointer or an object access is given with '->'
-       *  The object is effectively equal to a pointer to itself. */
-      /**@{*/
+       *  The object is effectively equal to a pointer to itself.
+       *
+       *  @{
+       */
       const CDCWireHit* operator->() const
       { return this; }
 
-      /// Allow automatic taking of the address.
-      /** In places where a pointer is expected the object is implicitly casted to a
-       *  pointer to itself.*/
+      /**
+       *  Allow automatic taking of the address.
+       *
+       *  In places where a pointer is expected the object is implicitly casted to a
+       *  pointer to itself.
+       */
       // operator Belle2::TrackFindingCDC::CDCWireHit* ()&
       // { return this; }
-      /**@}*/
+
+      /// @}
 
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
@@ -209,7 +216,8 @@ namespace Belle2 {
       bool isOnWire(const CDCWire& wire) const
       { return getWireID() == wire.getWireID(); }
 
-      /** Reconstructs a position of primary ionisation on the drift circle.
+      /**
+       *  Reconstructs a position of primary ionisation on the drift circle.
        *
        *  The result is the position of closest approach on the drift circle to the trajectory.
        *
@@ -219,7 +227,8 @@ namespace Belle2 {
        */
       Vector2D reconstruct2D(const CDCTrajectory2D& trajectory2D) const;
 
-      /** Attempts to reconstruct a three dimensional position (especially of stereo hits).
+      /**
+       *  Attempts to reconstruct a three dimensional position (especially of stereo hits).
        *
        *  This method makes a distinct difference between axial and stereo hits:
        *  * Stereo hits are moved out of the reference plane such that the
@@ -234,15 +243,15 @@ namespace Belle2 {
       Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const ERightLeft rlInfo) const;
 
       /**
-       *  Applys the conformal transformation to the drift circle this hit represents
+       *  Applys the conformal transformation to the drift circle this hit represents.
        *
        *  Although not advisable to use we provide an interface to obtain the inversion
-       *  at the unit circle as a transformation to the so called conformal space
+       *  at the unit circle as a transformation to the so called conformal space.
        *  We provide the self-inverse for of the transformation
        *  - \f$X = x / (x^2 + y^2 - r^2)\f$
        *  - \f$Y = y / (x^2 + y^2 - r^2)\f$
        *  - \f$R = r / (x^2 + y^2 - r^2)\f$
-       **/
+       */
       Circle2D conformalTransformed(const Vector2D& relativeTo) const;
 
       /// String output operator for wire hit objects to help debugging.
@@ -290,7 +299,7 @@ namespace Belle2 {
       /// Memory for the super cluster id
       int m_iSuperCluster = -1;
 
-    }; //class CDCWireHit
+    }; // class CDCWireHit
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

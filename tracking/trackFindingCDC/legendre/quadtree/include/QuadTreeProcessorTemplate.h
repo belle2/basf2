@@ -91,9 +91,10 @@ namespace Belle2 {
       /**
        * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
        * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
-       * @param node = child node
-       * @param item = item to be filled into the child node or not
-       * @param iX, iY the indices of the child node.
+       * @param node  child node
+       * @param item  item to be filled into the child node or not
+       * @param iX    index in x axes of the node
+       * @param iY    index in y axes of the node
        * @return true if this item belongs into this node.
        */
       virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int iX, unsigned int iY) const = 0;

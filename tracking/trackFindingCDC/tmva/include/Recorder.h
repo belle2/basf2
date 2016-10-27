@@ -41,7 +41,7 @@ namespace Belle2 {
        *  Construct the Recorder opening the given ROOT file and
        *  create the underlying TTree and add variable names and values addresses as branches to it.
        *
-       *  @param allVariables   A sequence of named values that are used as addresses of branches
+       *  @param namedVariables A sequence of named values that are used as addresses of branches
        *  @param rootFileName   Name of ROOT file to which should be written.
        *  @param treeName       Name of the TTree in the ROOT file.
        */

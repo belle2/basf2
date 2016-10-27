@@ -49,8 +49,8 @@ namespace Belle2 {
        *  * ACellHolderNeighborhood is required to have a .equal_range() method
        *    that yields a range of pairs which .second elements are the sought neighbors.
        *  @param cellHolderPtrs         Pointers to objects that should be clustered.
-       *  @param cellHolderNeighorhood  Relations between the objects that should be clustered
-       *  @param[out]                   Groups of connected objects in the neighborhood.
+       *  @param cellHolderNeighborhood  Relations between the objects that should be clustered
+       *  @param[out] clusters          Groups of connected objects in the neighborhood.
        */
       template<class ACellHolderPtrRange, class ACellHolderNeighborhood>
       void createFromPointers(const ACellHolderPtrRange& cellHolderPtrs,

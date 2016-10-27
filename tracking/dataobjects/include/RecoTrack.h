@@ -106,11 +106,11 @@ namespace Belle2 {
      * Convenience method which registers all relations required to fully use
      * a RecoTrack. If you create a new RecoTrack StoreArray, call this method
      * in the initialize() method of your module.
-     * @param recoTracks: Reference to the store array where the new RecoTrack list is located
-     * @param recoHitInformationStoreArrayName: name of the StoreArray holding RecoHitInformation lists
-     * @param pxdHitsStoreArrayName: name of the StoreArray holding the PXDClusters lists
-     * @param svdHitsStoreArrayName: name of the StoreArray holding the SVDClusters lists
-     * @param cdcHitsStoreArrayName: name of the StoreArray holding the CDCHits lists
+     * @param recoTracks  Reference to the store array where the new RecoTrack list is located
+     * @param recoHitInformationStoreArrayName  name of the StoreArray holding RecoHitInformation lists
+     * @param pxdHitsStoreArrayName  name of the StoreArray holding the PXDClusters lists
+     * @param svdHitsStoreArrayName  name of the StoreArray holding the SVDClusters lists
+     * @param cdcHitsStoreArrayName  name of the StoreArray holding the CDCHits lists
      */
     static void registerRequiredRelations(
       StoreArray<RecoTrack>& recoTracks,
@@ -225,7 +225,6 @@ namespace Belle2 {
      * You only have to provide the hit and the sorting parameter, all other parameters have default value.
      * @param pxdHit The pointer to a stored PXDHit/Cluster in the store array you provided earlier, which you want to add.
      * @param sortingParameter The index of the hit. It starts with 0 with the first hit.
-     * @param rightLeftInformation The right left information (if you know it).
      * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
@@ -240,7 +239,7 @@ namespace Belle2 {
      * You only have to provide the hit and the arc length, all other parameters have default value.
      * @param svdHit The pointer to a stored SVDHit in the store array you provided earlier, which you want to add.
      * @param sortingParameter The arc length of the hit. The arc length is - by our definition - between -pi and pi.
-     * @param foundByTrackFinder
+     * @param foundByTrackFinder Which track finder has found the hit?
      * @return True if the hit was not already added to the track.
      */
     bool addSVDHit(const UsedSVDHit* svdHit, const unsigned int sortingParameter,
@@ -770,7 +769,8 @@ namespace Belle2 {
     ClassDef(RecoTrack, 6);
   };
 
-  /** This class allows access to the genfit::Track of the RecoTrack.
+  /**
+   * This class allows access to the genfit::Track of the RecoTrack.
    *
    * This class allows direct access to the most holy part of the RecoTrack. The design of the RecoTrack is such, that this should not be required.
    * However, some interfaces require a genfit::Track, e.g. the genfit rave interface, and the access to the genfit::Track member is required.
@@ -778,9 +778,10 @@ namespace Belle2 {
    */
   class RecoTrackGenfitAccess {
   public:
-    /**Give access to the RecoTrack's genfit::Track.
+    /**
+     * Give access to the RecoTrack's genfit::Track.
      *
-     * @param recoTrack
+     * @param recoTrack  Track to unpack
      * @return genfit::Track of the RecoTrack.
      */
     static genfit::Track& getGenfitTrack(RecoTrack& recoTrack);

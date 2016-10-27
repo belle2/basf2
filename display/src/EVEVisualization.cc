@@ -29,6 +29,7 @@
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -1411,6 +1412,28 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
 }
+
+void EVEVisualization::addARICHHit(const ARICHHit* hit)
+{
+  DBObjPtr<ARICHGeometryConfig> arichGeo;
+
+  int hitModule = hit->getModule();
+  float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
+
+  TVector3 centerPos3D =  hit->getPosition();
+
+  TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
+  TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
+
+  auto* arichbox = boxCreator(centerPos3D, arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY), 0.49, 0.49, 0.05);
+  arichbox->SetMainColor(kOrange + 10);
+  arichbox->SetName((std::to_string(hitModule)).c_str());
+
+  addToGroup("ARICHHits", arichbox);
+  addObject(hit, arichbox);
+}
+
 
 void EVEVisualization::showUserData(const DisplayData& displayData)
 {

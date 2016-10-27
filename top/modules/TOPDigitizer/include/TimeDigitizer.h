@@ -12,6 +12,7 @@
 
 #include <top/dataobjects/TOPSimHit.h>
 #include <top/dataobjects/TOPDigit.h>
+#include <top/dataobjects/TOPRawDigit.h>
 #include <framework/datastore/StoreArray.h>
 
 
@@ -29,11 +30,10 @@ namespace Belle2 {
 
       /**
        * Constructor
-       * @param barID TOP module ID
+       * @param moduleID TOP module ID
        * @param pixelID pixel ID
        */
-      TimeDigitizer(int barID, int pixelID): m_barID(barID), m_pixelID(pixelID)
-      {}
+      TimeDigitizer(int moduleID, int pixelID);
 
       /**
        * Add time of simulated hit
@@ -42,6 +42,7 @@ namespace Belle2 {
        */
       void addTimeOfHit(double t, const TOPSimHit* simHit = NULL)
       {
+        if (!m_valid) return;
         m_times.insert(std::pair<double, const TOPSimHit*>(t, simHit));
       }
 
@@ -49,7 +50,7 @@ namespace Belle2 {
        * Return bar ID
        * @return bar ID
        */
-      int getBarID() const { return m_barID; }
+      int getModuleID() const { return m_moduleID; }
 
       /**
        * Return pixel ID
@@ -61,21 +62,67 @@ namespace Belle2 {
        * Return unique pixel ID
        * @return unique pixel ID
        */
-      unsigned getUniqueID() const {return m_pixelID + (m_barID << 16);}
+      unsigned getUniqueID() const {return m_pixelID + (m_moduleID << 16);}
+
+      /**
+       * Check if digitizer instance is valid (e.g. module/pixel is mapped to hardware)
+       * @return true if valid
+       */
+      bool isValid() const {return m_valid;}
 
       /**
        * Do time digitization using simplified pile-up and double-hit-resolution model.
        * As a result, the digitized hits are appended to TOPDigits and the relations to
        * TOPSimHits and MCParticles are set with proper weights.
+       *
+       * Note: to be refactorized or removed in future!
+       *
        * @param digits a reference to TOPDigits
        * @param sigma a r.m.s. of an additional time jitter due to electronics
        */
       void digitize(StoreArray<TOPDigit>& digits, double sigma = 0.0);
 
+      /**
+       * Do time digitization using simplified pile-up and double-hit-resolution model.
+       * As a result, the digitized hits are appended to TOPRawDigits, then
+       * they are converted to TOPDigits and the relations to
+       * TOPSimHits and MCParticles are set with proper weights.
+       *
+       * Note: to be refactorized in future!
+       *
+       * @param digits a reference to TOPRawDigits
+       * @param digits a reference to TOPDigits
+       * @param sigma a r.m.s. of an additional time jitter due to electronics
+       */
+      void digitize(StoreArray<TOPRawDigit>& rawDigits,
+                    StoreArray<TOPDigit>& digits,
+                    double sigma = 0.0);
+
     private:
 
-      int m_barID;   /**< bar ID (1-based) */
-      int m_pixelID; /**< pixel (e.g. software channel) ID (1-based) */
+      /**
+       * Gauss function (pulse shape aproximation)
+       * @param x argument
+       * @param mean mean
+       * @param sigma sigma
+       * @return value
+       */
+      double gauss(double x, double mean, double sigma) const
+      {
+        double xx = (x - mean) / sigma;
+        return exp(-0.5 * xx * xx);
+      }
+
+      int m_moduleID;         /**< module ID (1-based) */
+      int m_pixelID;          /**< pixel (e.g. software channel) ID (1-based) */
+      unsigned m_channel = 0; /**< hardware channel number (0-based) */
+      unsigned m_scrodID = 0; /**< SCROD ID */
+      unsigned m_carrier = 0; /**< carrier board number */
+      unsigned m_asic = 0;    /**< ASIC number */
+      unsigned m_chan = 0;    /**< ASIC channel number */
+      unsigned m_window = 0;  /**< storage window number */
+      bool m_valid = false;   /**< true, if module/pixel is mapped to hardware */
+
       std::multimap<double, const TOPSimHit*> m_times; /**< sorted hit times */
 
     };

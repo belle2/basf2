@@ -53,6 +53,21 @@ namespace Belle2 {
     bool m_debug4Geo;                /*!< Switch for debug printing. */
     int m_materialDefinitionMode;  /*!< Material definition mode */
     int m_senseWireZposMode;    /*!< Sense wire Z pos. mode */
+
+    bool m_displacement;  /**< Switch for displacement. */
+    bool m_alignment;  /**< Switch for alignment. */
+    bool m_misalignment;  /**< Switch for misalignment. */
+    std::string m_displacementFile;  /**< Displacement file. */
+    std::string m_alignmentFile;  /**< Alignment file. */
+    std::string m_misalignmentFile;  /**< Misalignment file. */
+    std::string m_xtFile;   /**< Xt file. */
+    std::string m_sigmaFile;   /**< Sigma file. */
+    std::string m_propSpeedFile;  /**< Prop-apeed file. */
+    std::string m_t0File;   /**< T0 file. */
+    std::string m_twFile;   /**< Time walk file. */
+    std::string m_bwFile;   /**< Bad wire file. */
+    std::string m_chMapFile;   /**< Channel map file. */
+
   };
 
 } // end of Belle2 namespace

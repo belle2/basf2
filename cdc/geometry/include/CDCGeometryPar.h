@@ -110,9 +110,9 @@ namespace Belle2 {
        * Read displacement or (mis)alignment params from text file.
        * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
        * @param[in] Pointer to DB CDCGeometry db object.
-       * @param[in] GearDir Gear Dir.
        */
-      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+      //      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+      void readWirePositionParams(EWirePosition set, const CDCGeometry*);
 
       /**
        * Set wire alignment params. from DB.
@@ -224,9 +224,9 @@ namespace Belle2 {
 
       /**
        * Read channel map between wire-id and electronics-id.
-       * @param GearDir Gear Dir.
        */
-      void readChMap(const GearDir);
+      //      void readChMap(const GearDir);
+      void readChMap();
 
       /**
        * Set channel map (from DB)

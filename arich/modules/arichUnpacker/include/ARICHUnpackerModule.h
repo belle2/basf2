@@ -11,10 +11,12 @@
 #ifndef ARICHUNPACKERMODULE_H
 #define ARICHUNPACKERMODULE_H
 
-#include <framework/core/Module.h>
-#include <arich/geometry/ARICHGeometryPar.h>
-#include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
+// mapper
+#include <arich/dbobjects/ARICHMergerMapping.h>
+#include <framework/database/DBObjPtr.h>
 
+#include <framework/core/Module.h>
+#include <arich/modules/arichUnpacker/ARICHRawDataHeader.h>
 #include <string>
 
 namespace Belle2 {
@@ -68,44 +70,27 @@ namespace Belle2 {
   private:
 
     /**
-     * Unpack raw data given in suppressed data format
+     * Unpack raw data given in production format
      * @param buffer raw data buffer
      * @param bufferSize buffer size
-     * @param ibyte read starting byte
-     * @param head merger header
      */
+
     void unpackSuppressedData(const int* buffer, int bufferSize, unsigned& ibyte,
                               ARICHRawHeader& head); /**< unpacks suppressed data (only hit channels writen)*/
-
-    /**
-     * Unpack raw data given in non-suppressed data format
-     * @param buffer raw data buffer
-     * @param bufferSize buffer size
-     * @param ibyte read starting byte
-     * @param head merger header
-     */
     void unpackUnsuppressedData(const int* buffer, int bufferSize, unsigned& ibyte, ARICHRawHeader& head);
-
-    /**
-     * Prints bitmap of buffer
-     * @param buffer data buffer
-     * @param bufferSize buffer size
-     */
     void printBits(const int* buffer, int bufferSize);
-
-    /**
-     * Reads raw data header
-     * @param buffer pointer to data buffer
-     * @param ibyte position of first header byte in buffer
-     * @param head raw data header
-     */
     void readHeader(const int* buffer, unsigned& ibyte, ARICHRawHeader& head);
+
+
 
     uint8_t m_bitMask; /**< bitmask for hit detection (8bits/hit) */
     int m_debug; /**< debug */
-    ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
+
     std::string m_outputDigitsName;   /**< name of ARICHDigit store array */
     std::string m_inputRawDataName; /**< name of RawARICH store array */
+
+    DBObjPtr<ARICHMergerMapping> m_mergerMap; /**< mapping of modules to mergers */
+
   };
 
 } // Belle2 namespace

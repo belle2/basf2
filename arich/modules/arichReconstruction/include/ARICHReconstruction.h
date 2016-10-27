@@ -11,11 +11,12 @@
 #ifndef ARICHRECONSTRUCTION_H
 #define ARICHRECONSTRUCTION_H
 
-#include <arich/geometry/ARICHGeometryPar.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
 #include "framework/datastore/StoreArray.h"
-#include "arich/dataobjects/ARICHDigit.h"
+#include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 #include "arich/dataobjects/ARICHLikelihood.h"
+#include <framework/database/DBObjPtr.h>
 
 #include <TVector3.h>
 #include <cmath>
@@ -44,7 +45,7 @@ namespace Belle2 {
   public:
 
     //! Constructor
-    ARICHReconstruction(int = 0, int = 0);
+    ARICHReconstruction(int = 0);
 
     //! Destructor
     ~ARICHReconstruction() {};
@@ -56,7 +57,7 @@ namespace Belle2 {
     int smearTrack(ARICHTrack& arichTrack);
 
     //! Computes the value of identity likelihood function for different particle hypotheses.
-    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHDigit>& arichDigits, ARICHLikelihood& arichLikelihood);
+    int likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood);
     //! Sets detector background level (photon hits / m^2)
     void setBackgroundLevel(double nbkg);
     //! Sets track position resolution (from tracking)
@@ -73,8 +74,9 @@ namespace Belle2 {
     static const int c_noOfHypotheses = Const::ChargedStable::c_SetSize; /**< Number of hypotheses to loop over */
     static const int c_noOfAerogels = 5; /**< Maximal number of aerogel layers to loop over */
     double p_mass[Const::ChargedStable::c_SetSize];  /**< particle masses */
-    ARICHGeometryPar* m_arichGeoParameters; /**< holding the parameters of detector */
-    int m_beamtest; /**< in the case of beamtest analysis >=1, default 0 */
+
+    DBObjPtr<ARICHGeometryConfig> m_arichgp; /**< geometry configuration parameters from the DB */
+
     double m_bkgLevel; /**< detector photon background level */
     double m_trackPosRes; /**< track position resolution (from tracking) */
     double m_trackAngRes; /**< track direction resolution (from tracking) */

@@ -3,10 +3,10 @@
 
 import os
 
-com = "git archive --remote=ssh://git@stash.desy.de:7999/b2g/arich.git HEAD database/cosmicTest_payloads | tar -x"
+com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich.git HEAD database/cosmicTest_payloads | tar -x"
 os.system(com)
 
-com = "git archive --remote=ssh://git@stash.desy.de:7999/b2g/arich.git HEAD datafiles/cosmicTest | tar -x"
+com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich.git HEAD datafiles/cosmicTest | tar -x"
 os.system(com)
 
 com = "gunzip -r datafiles/cosmicTest"

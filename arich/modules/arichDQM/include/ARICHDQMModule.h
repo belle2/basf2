@@ -69,6 +69,9 @@ namespace Belle2 {
   private:
     TH1F* m_hHits;  /**< histogram for number of hits / event  */
     TH1F* m_hBits;  /**< histogram for acumulative hit bitmap distribution (4-bits / hit) */
+    TH2F* m_hHitsHapd;  /**< accumulated hits per channel */
+    TH1F* m_hHitsMerger;  /**< accumulated hits per merger board */
+    TH1F* m_hHitsCopper;  /**< accumulated hits per copper board */
     ARICHChannelHist* m_chHist; /**< occupancy histogram for all HAPDs */
     std::string m_fname; /**< output root file name */
   };

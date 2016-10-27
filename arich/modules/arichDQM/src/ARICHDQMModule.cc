@@ -13,6 +13,7 @@
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
+#include <arich/dbobjects/ARICHCopperMapping.h>
 
 // channel histogram
 #include <arich/utility/ARICHChannelHist.h>
@@ -51,7 +52,8 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ARICHDQMModule::ARICHDQMModule() : Module(), m_hHits(0),  m_hBits(0), m_chHist(0)
+  ARICHDQMModule::ARICHDQMModule() : Module(), m_hHits(0),  m_hBits(0), m_hHitsHapd(0), m_hHitsMerger(0), m_hHitsCopper(0),
+    m_chHist(0)
   {
     // set module description (e.g. insert text)
     setDescription("Fills ARICHHits collection from ARICHDigits");
@@ -75,7 +77,9 @@ namespace Belle2 {
 
     m_hBits = new TH1F("hBits", "comulative hit bitmap", 4, -0.5, 3.5);
     m_hHits = new TH1F("hHits", "# of hits/event", 864, -0.5, 863.5);
-
+    m_hHitsHapd = new TH2F("hHitsChn", "# of hits/channel/(1000 events);module ID; asic ch #", 420, 0.5, 420.5, 144, -0.5, 143.5);
+    m_hHitsMerger = new TH1F("hHitsMerg", "# of hits/merger/(1000 events);merger ID #", 72, 0.5, 72.5);
+    m_hHitsCopper = new TH1F("hHitsCopp", "# of hits/copper/(1000 events);copper ID #", 18, 0.5, 18.5);
     m_chHist = new ARICHChannelHist("hits", "ARICH channel hits");
 
   }
@@ -91,6 +95,7 @@ namespace Belle2 {
     DBObjPtr<ARICHGeometryConfig> m_geoPar;
     DBObjPtr<ARICHChannelMapping> chMap;
     DBObjPtr<ARICHMergerMapping> mrgMap;
+    DBObjPtr<ARICHCopperMapping> cprMap;
 
     StoreArray<ARICHDigit> digits;
     StoreArray<ARICHHit> hits;
@@ -105,7 +110,11 @@ namespace Belle2 {
       int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
       m_chHist->fillBin(modID, asicCh);
-
+      m_hHitsHapd->Fill(modID, asicCh);
+      unsigned mrgID = mrgMap->getMergerID(modID);
+      unsigned cprID = cprMap->getCopperID(mrgID);
+      m_hHitsMerger->Fill(mrgID);
+      m_hHitsCopper->Fill(cprID);
     }
 
     m_hHits->Fill(digits.getEntries());
@@ -124,7 +133,14 @@ namespace Belle2 {
     m_hHits->Write();
     m_hBits->Write();
     m_chHist->Write();
-
+    m_hHitsHapd->SetOption("colz");
+    double scale = 1000. / double(m_hHits->GetEntries());
+    m_hHitsHapd->Scale(scale);
+    m_hHitsHapd->Write();
+    m_hHitsMerger->Write();
+    m_hHitsMerger->Scale(scale);
+    m_hHitsCopper->Write();
+    m_hHitsCopper->Scale(scale);
     f->Write();
   }
 

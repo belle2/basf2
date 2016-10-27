@@ -1326,13 +1326,68 @@ namespace Belle2 {
       return result;
     }
 
-    double eclClusterE9E25(const Particle* particle)
+    double eclClusterE1E9(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getE1oE9();
+      }
+      return result;
+    }
+
+    double eclClusterE9E21(const Particle* particle)
     {
       double result = 0.0;
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
         result = shower->getE9oE21();
+      }
+      return result;
+    }
+
+    double eclClusterAbsZernikeMoment40(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getAbsZernike40();
+      }
+      return result;
+    }
+
+    double eclClusterAbsZernikeMoment51(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getAbsZernike51();
+      }
+      return result;
+    }
+
+    double eclClusterZernikeMVA(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getZernikeMVA();
+      }
+      return result;
+    }
+
+    double eclClusterSecondMoment(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getSecondMoment();
       }
       return result;
     }
@@ -1643,8 +1698,22 @@ namespace Belle2 {
                       "ECL cluster's timing");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
                       "energy of the crystall with highest  energy");
+    REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
+                      "ratio of energies of the central crystal and 3x3 crystals around the central crystal");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
-                      "ratio of energies in inner 3x3 and 5x5 cells");
+                      "Deprecated - kept for backwards compatibility - returns clusterE9E21");
+    REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21,
+                      "ratio of energies in inner 3x3 and (5x5 cells without corners)");
+    REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40,
+                      "absolute value of Zernike moment 40 (shower shape variable)");
+    REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51,
+                      "absolute value of Zernike moment 51 (shower shape variable)");
+    REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, "output of MVA using Zernike moments of the cluster." \
+                      "For cluster with hypothesisId==N1: raw MVA output. For cluster with hypothesisId==N2:" \
+                      " 1 - \prod{clusterZernikeMVA}, where the product is on all"
+                      "N1 showers belonging to the same connected region (shower shape variable)");
+    REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment,
+                      "Second moment. Used for merged pi0 identification. (shower shape variable)");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
                       "LAT (shower variable)");
     REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,

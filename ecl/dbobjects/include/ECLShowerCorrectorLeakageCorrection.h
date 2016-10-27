@@ -16,7 +16,6 @@
 //Root
 #include <TObject.h>
 #include <TTree.h>
-#include <TDirectory.h>
 
 namespace Belle2 {
 
@@ -36,26 +35,26 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ECLShowerCorrectorLeakageCorrection(std::vector<int> bgFractionBinNum,
-                                        std::vector<int> regNum,
-                                        std::vector<int> phiBinNum,
-                                        std::vector<int> thetaBinNum,
-                                        std::vector<int> energyBinNum,
-                                        std::vector<float> correctionFactor,
-                                        std::vector<float> avgRecEn,
-                                        std::vector<float> lReg1Theta,
-                                        std::vector<float> hReg1Theta,
-                                        std::vector<float> lReg2Theta,
-                                        std::vector<float> hReg2Theta,
-                                        std::vector<float> lReg3Theta,
-                                        std::vector<float> hReg3Theta,
-                                        std::vector<int> numOfBfBins,
-                                        std::vector<int> numOfEnergyBins,
-                                        std::vector<int> numOfPhiBins,
-                                        std::vector<int> numOfReg1ThetaBins,
-                                        std::vector<int> numOfReg2ThetaBins,
-                                        std::vector<int> numOfReg3ThetaBins,
-                                        std::vector<int> phiPeriodicity) :
+    ECLShowerCorrectorLeakageCorrection(const std::vector<int>& bgFractionBinNum,
+                                        const std::vector<int>& regNum,
+                                        const std::vector<int>& phiBinNum,
+                                        const std::vector<int>& thetaBinNum,
+                                        const std::vector<int>& energyBinNum,
+                                        const std::vector<float>& correctionFactor,
+                                        const std::vector<float>& avgRecEn,
+                                        const std::vector<float>& lReg1Theta,
+                                        const std::vector<float>& hReg1Theta,
+                                        const std::vector<float>& lReg2Theta,
+                                        const std::vector<float>& hReg2Theta,
+                                        const std::vector<float>& lReg3Theta,
+                                        const std::vector<float>& hReg3Theta,
+                                        const std::vector<int>& numOfBfBins,
+                                        const std::vector<int>& numOfEnergyBins,
+                                        const std::vector<int>& numOfPhiBins,
+                                        const std::vector<int>& numOfReg1ThetaBins,
+                                        const std::vector<int>& numOfReg2ThetaBins,
+                                        const std::vector<int>& numOfReg3ThetaBins,
+                                        const std::vector<int>& phiPeriodicity) :
       m_bgFractionBinNum(bgFractionBinNum),
       m_regNum(regNum),
       m_phiBinNum(phiBinNum),

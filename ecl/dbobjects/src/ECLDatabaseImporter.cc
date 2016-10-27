@@ -191,7 +191,7 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   //Fill ConstantNtuple vectors
   //----------------------------------------------------------------------------------------------
 
-  std::vector<float> avgRecEns;
+
   float lReg1Theta;
   float hReg1Theta;
   float lReg2Theta;
@@ -209,10 +209,10 @@ void ECLDatabaseImporter::importShowerCorrectorLeakageCorrections()
   //Ugly hack to circumvent 'stack usage might be unbounded [-Wstack-usage=]' compiler warning that's caused by the use of c-type arrays.
   //This is not for the faint of heart
 
-  //Resize vector, because root GetEntry fills the whole internal array of the vector without changing it's size. So it needs to be the right size.
-  avgRecEns.resize(m_numAvgRecEnEntries);
+  //because root GetEntry fills the whole internal array of the vector without changing it's size, we must ensure that it's the right size.
+  std::vector<float> avgRecEns(m_numAvgRecEnEntries);
+  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), avgRecEns.data()); //Read c-style array right into internal vector array.
 
-  helperTree->SetBranchAddress(m_avgRecEnBranchName.c_str(), &avgRecEns.front());//Set address to the first array element.
   helperTree->SetBranchAddress(m_lReg1ThetaBranchName.c_str(), &lReg1Theta);
   helperTree->SetBranchAddress(m_hReg1ThetaBranchName.c_str(), &hReg1Theta);
   helperTree->SetBranchAddress(m_lReg2ThetaBranchName.c_str(), &lReg2Theta);

@@ -142,6 +142,90 @@ namespace Belle2 {
       m_LayerPlaneOuterRadius[shield].at(layer).at(plane) = r;
     }
 
+    //
+    // POLE Pieces
+    //
+    //! Get the material of a layer (as a std::string)
+    std::string getPoleMaterial(int pole) const
+    {
+      return m_PoleMaterial[pole];
+    }
+
+    //! Set the material of a layer (as a std::string)
+    void setPoleMaterial(int pole, std::string material)
+    {
+      m_PoleMaterial[pole] = material;
+    }
+
+    //! Get Number of polycone planes in each layer
+    int getPoleNPlanes(int pole) const
+    {
+      return m_PoleNPlanes[pole];
+    }
+
+    //! Set Number of polycone planes in each layer
+    void setPoleNPlanes(int pole, int nplanes)
+    {
+      m_PoleNPlanes[pole] = nplanes;
+    }
+
+    //! Get Z-position of one plane (w.r.t. IP)
+    double getPolePlaneZ(int pole, int plane) const
+    {
+      return m_PolePlaneZ[pole].at(plane);
+    }
+
+    //! Get Z-positions of all planes (w.r.t. IP)
+    const double* getPolePlaneZ(int pole) const
+    {
+      return &m_PolePlaneZ[pole].at(0);
+    }
+
+
+    //! Set Z-position of each plane (w.r.t. IP)
+    void setPolePlaneZ(int pole, int plane, double z)
+    {
+      m_PolePlaneZ[pole].at(plane) = z;
+    }
+
+
+    //! Get Inner radius of one plane
+    double getPolePlaneInnerRadius(int pole, int plane) const
+    {
+      return m_PolePlaneInnerRadius[pole].at(plane);
+    }
+
+    //! Get Inner radius of all planes
+    const  double* getPolePlaneInnerRadius(int pole) const
+    {
+      return &m_PolePlaneInnerRadius[pole].at(0);
+    }
+
+    //! Set Inner radii of the planes
+    void setPolePlaneInnerRadius(int pole, int plane, double r)
+    {
+      m_PolePlaneInnerRadius[pole].at(plane) = r;
+    }
+
+    //! Get Outer radii of one planes
+    double getPolePlaneOuterRadius(int pole, int plane) const
+    {
+      return m_PolePlaneOuterRadius[pole].at(plane);
+    }
+
+    //! Get Outer radii of all planes
+    const double* getPolePlaneOuterRadius(int pole) const
+    {
+      return &m_PolePlaneOuterRadius[pole].at(0);
+    }
+
+    //! Set Outer radii of the planes
+    void setPolePlaneOuterRadius(int pole, int plane, double r)
+    {
+      m_PolePlaneOuterRadius[pole].at(plane) = r;
+    }
+
+
 
     //
     // Constants that will _always_ be true
@@ -152,6 +236,10 @@ namespace Belle2 {
     static const int NECLSHIELDS = 2;
     static const int FWD_ECLSHIELD = 0;
     static const int BWD_ECLSHIELD = 1;
+
+    static const int NPOLEPIECESS = 2;
+    static const int FWD_POLEPIECE = 0;
+    static const int BWD_POLEPIECE = 1;
 
 
 
@@ -164,7 +252,7 @@ namespace Belle2 {
 
     //
     //         Data members:
-    // these are the shield parameters
+    // these are the geometry parameters
     //
     ////////////////////////////////////
 
@@ -172,7 +260,7 @@ namespace Belle2 {
     int m_Version;
 
     //
-    // Forward shield
+    // ECL Shields
     //
 
     //! Number of layers in the shield
@@ -192,6 +280,26 @@ namespace Belle2 {
 
     //! Outer radii of the planes
     std::vector< std::vector<double> > m_LayerPlaneOuterRadius[NECLSHIELDS];
+
+
+    //
+    // POLE Pieces
+    //
+
+    //! Material of each of the pole pieces
+    std::string m_PoleMaterial[NECLSHIELDS];
+
+    //! Number of polycone planes in each pole piece
+    int m_PoleNPlanes[NECLSHIELDS];
+
+    //! Z-position of each plane (w.r.t. IP)
+    std::vector<double> m_PolePlaneZ[NECLSHIELDS];
+
+    //! Inner radii of the planes
+    std::vector<double> m_PolePlaneInnerRadius[NECLSHIELDS];
+
+    //! Outer radii of the planes
+    std::vector<double> m_PolePlaneOuterRadius[NECLSHIELDS];
 
 
 

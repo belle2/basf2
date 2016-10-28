@@ -61,7 +61,7 @@ namespace Belle2 {
 
     void GeoSTRCreator::createGeometry(const STRGeometryPar& parameters, G4LogicalVolume& topVolume, GeometryTypes)
     {
-      //      m_GeoPar = &parameters;
+
 
 
 
@@ -120,6 +120,41 @@ namespace Belle2 {
 
       return strGeometryPar;
     };
+
+    void GeoSTRCreator::readPole(const GearDir& content, STRGeometryPar& parameters, std::string side)
+    {
+      // Check if method was called using the correct name for the shields
+      std::size_t foundF = side.find("FWD_Pole");
+      std::size_t foundB = side.find("BWD_Pole");
+
+      int iPole;
+      if (foundF != std::string::npos) { iPole = parameters.FWD_POLEPIECE; }
+      else if (foundB != std::string::npos) { iPole = parameters.BWD_POLEPIECE; }
+      else { B2FATAL("No data for the Pole Piece requested " << side << "(not found)");}
+
+
+      //Thread the strings
+      std::string polePath   = (boost::format("/%1%/") % side).str();
+
+      // Connect the appropriate Gearbox path
+      GearDir poleContent(content);
+      poleContent.append(polePath);
+
+      // Retrieve material material
+      parameters.setPoleMaterial(iPole, poleContent.getString("Material", "Air"));
+
+      // Read the shape parameters
+      const std::vector<GearDir> planes = poleContent.getNodes("Plane");
+      parameters.setPoleNPlanes(iPole, planes.size());
+      B2INFO("Number of planes on side  " << side << " : " << planes.size());
+
+      for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
+        parameters.setPolePlaneZ(iPole, iPlane, planes.at(iPlane).getLength("posZ"));
+        parameters.setPolePlaneInnerRadius(iPole, iPlane, planes.at(iPlane).getLength("innerRadius"));
+        parameters.setPolePlaneOuterRadius(iPole, iPlane, planes.at(iPlane).getLength("outerRadius"));
+
+      }
+    }
 
     void GeoSTRCreator::readShield(const GearDir& content, STRGeometryPar& parameters, std::string side)
     {

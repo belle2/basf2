@@ -101,8 +101,12 @@ namespace Belle2 {
        */
       void readShield(const GearDir& content, STRGeometryPar& parameters, std::string side);
 
-      //! Pointer to the STR geometry accessor
-      STRGeometryPar* m_GeoPar;
+
+      /** Read xml files from GearDir for one of the Pole Pieces
+       *
+       */
+      void readPole(const GearDir& content, STRGeometryPar& parameters, std::string side);
+
 
     };
   }

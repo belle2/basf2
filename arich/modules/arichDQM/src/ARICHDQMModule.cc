@@ -76,6 +76,7 @@ namespace Belle2 {
     m_hBits = new TH1F("hBits", "comulative hit bitmap", 4, -0.5, 3.5);
     m_hHits = new TH1F("hHits", "# of hits/event", 864, -0.5, 863.5);
     m_hHitsHapd = new TH2F("hHitsChn", "# of hits/channel/(1000 events);module ID; asic ch #", 420, 0.5, 420.5, 144, -0.5, 143.5);
+    m_hHitsHapd->SetOption("colz");
     m_hHitsMerger = new TH1F("hHitsMerg", "# of hits/merger/(1000 events);merger ID #", 72, 0.5, 72.5);
     m_hHitsCopper = new TH1F("hHitsCopp", "# of hits/copper/(1000 events);copper ID #", 18, 0.5, 18.5);
 

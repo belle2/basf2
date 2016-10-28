@@ -13,8 +13,8 @@ void plotEfficiency(){
   
   h_pi = new TH2F("h_pi","h_pi",pbin,pstart,pstop,50000,-200,200);
   h_K = new TH2F("h_K","h_K",pbin,pstart,pstop,50000,-200,200); 
-  ch->Draw("(logL.pi-logL.K):mcHit.p>>h_pi","abs(mcHit.PDG)==211");
-  ch->Draw("(logL.pi-logL.K):mcHit.p>>h_K","abs(mcHit.PDG)==321");
+  ch->Draw("(logL.pi-logL.K):mcHit.p>>h_pi","abs(mcHit.PDG)==211 && primary==1");
+  ch->Draw("(logL.pi-logL.K):mcHit.p>>h_K","abs(mcHit.PDG)==321 && primary==1");
   
   // 2D histogram of K efficiency vs. pi fake rate vs. momentum (to je faca)
   hh = new TH2F("hh","K id. efficiency;Momentum [GeV];#pi missid. prob.",pbin,pstart,pstop,100,0.005,0.10);
@@ -65,34 +65,34 @@ void plotEfficiency(){
   
   TH1F* h_lkhPi = new TH1F("h_lkhPi","Pion likelihood difference; L_{#pi}-L_{K}",500,-100,100);
   TH1F* h_lkhK  = new TH1F("h_lkhK","Kaon likelihood difference; L_{#pi}-L_{K}",500,-100,100);
-  ch->Draw("(logL.pi-logL.K)>>h_lkhPi","abs(mcHit.PDG)==211 && " + momCut);
-  ch->Draw("(logL.pi-logL.K)>>h_lkhK","abs(mcHit.PDG)==321 && " + momCut);
+  ch->Draw("(logL.pi-logL.K)>>h_lkhPi","abs(mcHit.PDG)==211 && primary==1 && " + momCut);
+  ch->Draw("(logL.pi-logL.K)>>h_lkhK","abs(mcHit.PDG)==321 && primary==1 && " + momCut);
   
   
   TH2F* h_trk = new TH2F("h_trk","Track position resolution",pbin,pstart,pstop,50,0,1); //200 
-  ch->Draw("sqrt((mcHit.x-recHit.x)**2 + (mcHit.y-recHit.y)**2):mcHit.p>>h_trk","abs(mcHit.PDG)==211 || abs(mcHit.PDG)==321");
+  ch->Draw("sqrt((mcHit.x-recHit.x)**2 + (mcHit.y-recHit.y)**2):mcHit.p>>h_trk","abs(mcHit.PDG)==211 || abs(mcHit.PDG)==321 && primary==1");
   
   TH1F* h_momK = new TH1F("h_momK","Kaon track momentum distribution", pbin,pstart,pstop);
   TH1F* h_momPi = new TH1F("h_momPi","Pion track momentum distribution", pbin,pstart,pstop);
-  ch->Draw("mcHit.p>>h_momPi","abs(mcHit.PDG)==211");
-  ch->Draw("mcHit.p>>h_momK","abs(mcHit.PDG)==321");
+  ch->Draw("mcHit.p>>h_momPi","abs(mcHit.PDG)==211 && primary==1");
+  ch->Draw("mcHit.p>>h_momK","abs(mcHit.PDG)==321 && primary==1");
   
   TH1F* h_thetaK = new TH1F("h_thetaK","Kaon track theta distribution", 200,0.25,0.6);
   TH1F* h_thetaPi = new TH1F("h_thetaPi","Pion track theta distribution", 200,0.25,0.6);
-  ch->Draw("mcHit.theta>>h_thetaPi","abs(mcHit.PDG)==211");
-  ch->Draw("mcHit.theta>>h_thetaK","abs(mcHit.PDG)==321");
+  ch->Draw("mcHit.theta>>h_thetaPi","abs(mcHit.PDG)==211 && primary==1");
+  ch->Draw("mcHit.theta>>h_thetaK","abs(mcHit.PDG)==321 && primary==1");
  
   TH1F* h_nphotK = new TH1F("h_nphotK","Number of detected photons in Kaon ring", 30,-0.5,29.5);
   TH1F* h_nphotPi = new TH1F("h_nphotPi","Number of detected photons in Kaon ring", 30,-0.5,29.5);
-  ch->Draw("detPhot.pi>>h_nphotPi","abs(mcHit.PDG)==211 && " + momCut);
-  ch->Draw("detPhot.K>>h_nphotK","abs(mcHit.PDG)==321 && " + momCut);
+  ch->Draw("detPhot.pi>>h_nphotPi","abs(mcHit.PDG)==211 && primary==1 && " + momCut);
+  ch->Draw("detPhot.K>>h_nphotK","abs(mcHit.PDG)==321 && primary==1 && " + momCut);
   
   // if option "storePhotons" of ARICHReconstruction module is not set to 1 in your steering script
   // this histogram is empty!
   TH1F* h_chK = new TH1F("h_chK","Cherenkov angle distribution for Kaons", 200,0,0.5);
   TH1F* h_chPi = new TH1F("h_chPi","Cherenkov angle distribution for Pions", 200,0,0.5);
-  ch->Draw("photons[][0]>>h_chPi","abs(mcHit.PDG)==211 && photons[][2]==0 && photons[][3]==0 && " + momCut);
-  ch->Draw("photons[][0]>>h_chK","abs(mcHit.PDG)==321 && photons[][2]==0 && photons[][3]==0 && " + momCut);
+  ch->Draw("photons[][0]>>h_chPi","abs(mcHit.PDG)==211 && photons[][2]==0 && photons[][3]==0 && primary==1  && " + momCut);
+  ch->Draw("photons[][0]>>h_chK","abs(mcHit.PDG)==321 && photons[][2]==0 && photons[][3]==0 && primary==1 && " + momCut);
   
   TCanvas* c1 = new TCanvas("c1");
   c1->Update();

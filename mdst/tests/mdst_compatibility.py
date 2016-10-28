@@ -332,7 +332,7 @@ def print_file(filename):
     main.add_module("RootInput", inputFileName=mdst_file, logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
     main.add_module(PrintMDSTModule())
-    process(main)
+    process(main, 6)
 
 if __name__ == "__main__":
     import ROOT

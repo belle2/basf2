@@ -386,6 +386,10 @@ void MuidModule::event()
       int charge = int(recoTrack->getTrackFitStatus(trackRep)->getCharge());
       int pdgCode = chargedStable.getPDGCode() * charge;
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
+      if (pdgCode == 0) {
+        B2WARNING("Skipping track. PDGCode " << pdgCode << " is zero, probably because charge was zero (charge=" << charge << ").");
+        continue;
+      }
 
       Muid* muid = muids.appendNew(pdgCode); // pdgCode doesn't know charge yet TODO is this intended?
       b2track.addRelationTo(muid);

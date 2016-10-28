@@ -15,13 +15,13 @@
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
-// In case we need to get the parameters from the database here are some hints
-// #include <framework/database/Database.h>
-// #include <framework/database/DBStore.h>
+#include <framework/database/Database.h>
+#include <framework/database/LocalDatabase.h>
+#include <framework/database/DBStore.h>
 // #include <framework/dbobjects/BeamParameters.h>
-// #include <framework/datastore/StoreObjPtr.h>
-// #include <framework/datastore/DataStore.h>
-// #include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/DataStore.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
@@ -38,45 +38,58 @@ using namespace TrackFindingCDC;
 
 void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
-  // In case we need to get the parameters from the database here are some hints
-  // StoreObjPtr<EventMetaData> evtPtr;
-  // DataStore::Instance().setInitializeActive(true);
-  // evtPtr.registerInDataStore();
-  // DataStore::Instance().setInitializeActive(false);
-  // evtPtr.construct(0, 0, 1);
+  // Setup the DataStore and
+  // create the default event number to be used for the DB parameter
+  DataStore::Instance().reset();
+  StoreObjPtr<EventMetaData> evtPtr;
+  DataStore::Instance().setInitializeActive(true);
+  evtPtr.registerInDataStore();
+  CDCWireHitTopology::initialize(); // <- deprecated, could be removed soon.
+  DataStore::Instance().setInitializeActive(false);
+  evtPtr.construct(0, 0, 1);
 
+  // Setup the Database
+  Database::reset();
+
+  // Load the default database including the remote db
   // Database::Instance();
-  // DBObjPtr<CDCGeometry> dbGeometry;
-  // DBObjPtr<BeamParameters> dbBeamParameters;
-  // DBStore::Instance().update();
 
+  // Load only the local database
+  std::string dbFilePath = FileSystem::findFile("data/framework/database.txt");
+  LocalDatabase::createInstance(dbFilePath, "", true, LogConfig::c_Error);
+  DBStore::Instance().update();
+
+  // DBObjPtr<BeamParameters> dbBeamParameters;
   // B2ASSERT("Beamparameters in the database", dbBeamParameters);
   // B2INFO("Successfully found beamparameters with energy "
   //   << dbBeamParameters->getEnergy());
 
+  // CDCGeometry not uploaded yet - maybe useful later
+  // DBObjPtr<CDCGeometry> dbGeometry;
   // if (not dbGeometry) {
   //   B2FATAL("No configuration for CDC found.");
   // }
+  // CDCGeometry& cdcGeometry = *dbGeometry;
 
-  //Setup the gearbox
+  // Setup the gearbox
   TestHelpers::TestWithGearbox::SetUpTestCase();
   GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+
+  // Unpack the cdc geometry, which currently uses both the db and the gearbox
   CDCGeometry cdcGeometry;
   cdcGeometry.read(cdcGearDir);
   CDC::CDCGeometryPar::Instance(&cdcGeometry);
 
-  const CDCWireTopology& wireTopology __attribute__((unused)) = CDCWireTopology::getInstance();
-
-  CDCWireHitTopology::initialize();
+  // Prepare the wires for the cdc track finders.
+  CDCWireTopology::getInstance();
 }
 
 void TrackFindingCDCTestWithTopology::TearDownTestCase()
 {
-  // In case we need to get the parameters from the database here are some hints
-  // Database::reset();
-  // DataStore::Instance().reset();
-  //Close the gearbox
+  // Close the gearbox and reset the global objects
   TestHelpers::TestWithGearbox::TearDownTestCase();
+  Database::reset();
+  DataStore::Instance().reset();
 }
 
 

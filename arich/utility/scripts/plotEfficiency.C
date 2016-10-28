@@ -1,3 +1,15 @@
+/**
+ * This is an example script for producing ARICH performance plots 
+ * As an input it takes file produced by ARICHNtuple module
+ * Histograms of various distributions of interest are produced, 
+ * including PID efficiency plots and reconstructed Cherenkov angle 
+ * distributions (see below). 
+ *
+ * run as: "root -l ntuplefile.root plotEfficiency.C"
+ *
+ * Author: Luka Santelj, 28.10.2016
+ **/
+
 void plotEfficiency(){
   
   TTree* ch = (TTree*)_file0->Get("arich");
@@ -11,6 +23,7 @@ void plotEfficiency(){
   double pmin=3.0;
   double pmax=4.0;
   
+  // likelihood distributions for efficiency calculation 
   h_pi = new TH2F("h_pi","h_pi",pbin,pstart,pstop,50000,-200,200);
   h_K = new TH2F("h_K","h_K",pbin,pstart,pstop,50000,-200,200); 
   ch->Draw("(logL.pi-logL.K):mcHit.p>>h_pi","abs(mcHit.PDG)==211 && primary==1");
@@ -18,10 +31,13 @@ void plotEfficiency(){
   
   // 2D histogram of K efficiency vs. pi fake rate vs. momentum (to je faca)
   hh = new TH2F("hh","K id. efficiency;Momentum [GeV];#pi missid. prob.",pbin,pstart,pstop,100,0.005,0.10);
+ 
+  // 1D histograms of K efficiency vs. momentum for 3 different pion fake rates
   TH1F* h_eff1 = new TH1F("h_eff1","Kaon id. efficiency at 2% pion fake rate;momentum [GeV]",pbin,pstart,pstop); 
   TH1F* h_eff2 = new TH1F("h_eff2","Kaon id. efficiency at 4% pion fake rate;momentum [GeV]",pbin,pstart,pstop); 
-  TH1F* h_eff3 = new TH1F("h_eff3","Kaon id. efficiency at 6% pion fake rate;momentum [GeV]",pbin,pstart,pstop); 
+  TH1F* h_eff3 = new TH1F("h_eff3","Kaon id. efficiency at 2%,4%,6% pion fake rate;momentum [GeV]",pbin,pstart,pstop); 
   
+  // main loop to calculate K efficiency
   for (int j=1; j<pbin+1;j++){
     
     TH1F* h1 = (TH1F*)h_pi->ProjectionY("_py",j,j);
@@ -60,40 +76,72 @@ void plotEfficiency(){
       i++;
     }
   }
-  
+  // momentum cut for some histograms
   TString momCut = TString::Format("mcHit.p>%f && mcHit.p<%f",pmin,pmax);
   
-  TH1F* h_lkhPi = new TH1F("h_lkhPi","Pion likelihood difference; L_{#pi}-L_{K}",500,-100,100);
-  TH1F* h_lkhK  = new TH1F("h_lkhK","Kaon likelihood difference; L_{#pi}-L_{K}",500,-100,100);
+  // likelihood difference distributions for pions and kaons
+  TH1F* h_lkhPi = new TH1F("h_lkhPi","Pion/kaon likelihood difference; L_{#pi}-L_{K}",500,-100,100);
+  TH1F* h_lkhK  = new TH1F("h_lkhK","Pion/kaon likelihood difference; L_{#pi}-L_{K}",500,-100,100);
   ch->Draw("(logL.pi-logL.K)>>h_lkhPi","abs(mcHit.PDG)==211 && primary==1 && " + momCut);
   ch->Draw("(logL.pi-logL.K)>>h_lkhK","abs(mcHit.PDG)==321 && primary==1 && " + momCut);
   
-  
-  TH2F* h_trk = new TH2F("h_trk","Track position resolution",pbin,pstart,pstop,50,0,1); //200 
+  // reconstructed tracks position resolution on aerogel plane  
+  TH2F* h_trk = new TH2F("h_trk","Track position resolution;momentum [GeV];|x_{MC}-x_{rec}|",pbin,pstart,pstop,50,0,1); //200 
   ch->Draw("sqrt((mcHit.x-recHit.x)**2 + (mcHit.y-recHit.y)**2):mcHit.p>>h_trk","abs(mcHit.PDG)==211 || abs(mcHit.PDG)==321 && primary==1");
   
-  TH1F* h_momK = new TH1F("h_momK","Kaon track momentum distribution", pbin,pstart,pstop);
-  TH1F* h_momPi = new TH1F("h_momPi","Pion track momentum distribution", pbin,pstart,pstop);
+  // tracks momentum distribution
+  TH1F* h_momK = new TH1F("h_momK","Kaon/pion track momentum distribution;momentum [GeV]", pbin,pstart,pstop);
+  TH1F* h_momPi = new TH1F("h_momPi","Kaon/pion track momentum distribution;momentum [GeV]", pbin,pstart,pstop);
   ch->Draw("mcHit.p>>h_momPi","abs(mcHit.PDG)==211 && primary==1");
   ch->Draw("mcHit.p>>h_momK","abs(mcHit.PDG)==321 && primary==1");
   
-  TH1F* h_thetaK = new TH1F("h_thetaK","Kaon track theta distribution", 200,0.25,0.6);
-  TH1F* h_thetaPi = new TH1F("h_thetaPi","Pion track theta distribution", 200,0.25,0.6);
+  // tracks azimuthal angle distribution
+  TH1F* h_thetaK = new TH1F("h_thetaK","Kaon/pion track theta distribution;#theta", 200,0.25,0.6);
+  TH1F* h_thetaPi = new TH1F("h_thetaPi","Kaon/pion track theta distribution;#theta", 200,0.25,0.6);
   ch->Draw("mcHit.theta>>h_thetaPi","abs(mcHit.PDG)==211 && primary==1");
   ch->Draw("mcHit.theta>>h_thetaK","abs(mcHit.PDG)==321 && primary==1");
  
-  TH1F* h_nphotK = new TH1F("h_nphotK","Number of detected photons in Kaon ring", 30,-0.5,29.5);
-  TH1F* h_nphotPi = new TH1F("h_nphotPi","Number of detected photons in Kaon ring", 30,-0.5,29.5);
+  // number of detected photons in kaon/pion ring
+  TH1F* h_nphotK = new TH1F("h_nphotK","Number of detected photons in kaon/pion ring;# of photons/ring", 30,-0.5,29.5);
+  TH1F* h_nphotPi = new TH1F("h_nphotPi","Number of detected photons in kaon/pion ring;# of photons/ring", 30,-0.5,29.5);
   ch->Draw("detPhot.pi>>h_nphotPi","abs(mcHit.PDG)==211 && primary==1 && " + momCut);
   ch->Draw("detPhot.K>>h_nphotK","abs(mcHit.PDG)==321 && primary==1 && " + momCut);
+ 
+  //--------------------------------------
+  // Plot Cherenkov angle distribution 
+  //--------------------------------------
+  // !!!NOTE!!!: option "storePhotons" of ARICHReconstruction module must be set to 1 in your steering script, 
+  //             otherwise reconstructed photons are not stored!   
+  //
+  // For one photon hit the Cherenkov angle is reconstructed multiple times, using different hypotheses for aerogel layer of 
+  // emission point and hypotheses of possible reflections from mirror plates.
+  // Therefore, in ntuple, the reconstructed Cherenkov angle is stored as 2D array with dimension [nPhotons]x[4]
+  // Content of the array is:
+  // photons[][0]  -  reconstructed Cherenkov theta angle  
+  // photons[][1]  -  reconstructed Cherenkov phi angle  
+  // photons[][2]  -  aerogel layer hypothesis (0 - 1st layer, 1 - 2nd layer)
+  // photons[][3]  -  mirror plate hypothesis (0 - no reflection, 1 - , 2 - two plates closest to the track)
   
-  // if option "storePhotons" of ARICHReconstruction module is not set to 1 in your steering script
-  // this histogram is empty!
-  TH1F* h_chK = new TH1F("h_chK","Cherenkov angle distribution for Kaons", 200,0,0.5);
-  TH1F* h_chPi = new TH1F("h_chPi","Cherenkov angle distribution for Pions", 200,0,0.5);
+  // lets plot Cherenkov theta angle for pi,K tracks, assuming photons were emitted from the 1st aerogel layer
+  // and not reflected from mirrors
+  
+  TH1F* h_chK = new TH1F("h_chK","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
+  TH1F* h_chPi = new TH1F("h_chPi","Cherenkov angle distribution for kaons/pions;#theta_{ch}", 200,0,0.5);
   ch->Draw("photons[][0]>>h_chPi","abs(mcHit.PDG)==211 && photons[][2]==0 && photons[][3]==0 && primary==1  && " + momCut);
   ch->Draw("photons[][0]>>h_chK","abs(mcHit.PDG)==321 && photons[][2]==0 && photons[][3]==0 && primary==1 && " + momCut);
+  //--------------------------------------
   
+  TLegend* leg = new TLegend(0.1,0.75,0.48,0.9);
+  leg->AddEntry(h_momK,"kaon","l");
+  leg->AddEntry(h_momPi,"pion","l");
+  
+  TLegend* leg1 = new TLegend(0.1,0.75,0.48,0.9);
+  leg1->AddEntry(h_eff3,"6% #pi fake rate","l");
+  leg1->AddEntry(h_eff2,"4% #pi fake rate","l");
+  leg1->AddEntry(h_eff1,"2% #pi fake rate","l");
+  
+  
+  // Draw histograms on canvas and save
   TCanvas* c1 = new TCanvas("c1");
   c1->Update();
   c1->Divide(4,2);
@@ -105,12 +153,14 @@ void plotEfficiency(){
   h_eff2->Draw("same");
   h_eff1->SetLineColor(kGreen);
   h_eff1->Draw("same");
+  leg1->Draw();
   c1->cd(3);
   h_trk->Draw("colz");
   c1->cd(4);
   h_momPi->Draw();
   h_momK->SetLineColor(kRed);
   h_momK->Draw("sames");
+  leg->Draw();
   c1->cd(5);
   h_thetaPi->Draw();
   h_thetaK->SetLineColor(kRed);

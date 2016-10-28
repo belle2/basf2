@@ -22,6 +22,7 @@
 #include "G4Vector3D.hh"
 #include "G4Point3D.hh"
 #include "ecl/geometry/shapes.h"
+#include <geometry/Materials.h>
 
 using namespace std;
 using namespace Belle2::geometry;

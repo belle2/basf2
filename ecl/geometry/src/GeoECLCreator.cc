@@ -13,6 +13,7 @@
 #include "G4SDManager.hh"
 #include "G4NistManager.hh"
 #include "G4UserLimits.hh"
+#include <G4VisAttributes.hh>
 #include <G4Box.hh>
 
 #include <ecl/geometry/GeoECLCreator.h>
@@ -20,6 +21,7 @@
 #include <ecl/simulation/SensitiveDetector.h>
 #include <simulation/background/BkgSensitiveDetector.h>
 #include <geometry/CreatorFactory.h>
+#include <geometry/Materials.h>
 #include <framework/gearbox/GearDir.h>
 #include "ecl/dbobjects/ECLCrystalsShapeAndPosition.h"
 #include <framework/database/IntervalOfValidity.h>

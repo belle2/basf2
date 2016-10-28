@@ -86,7 +86,7 @@ namespace Belle2 {
      * @param i wedge type ID (1-3)
      * @param par vector of wedge parameters
      */
-    void setWedge(unsigned i, const std::vector<double>& par) {if (i > m_nWedgeType || i == 0) B2ERROR("invalid wedge number"); m_wedgePar[i - 1] = par;};
+    void setWedge(unsigned i, const std::vector<double>& par) {if (i > m_nWedgeType || i == 0) { B2ERROR("invalid wedge number"); return;}; m_wedgePar[i - 1] = par;};
 
     /**
      * Add wedge (all added wedges are placed)
@@ -219,7 +219,7 @@ namespace Belle2 {
      * @param i wedge type
      * @return vector of wedge parameters
      */
-    const std::vector<double> getWedge(unsigned i) const {if (i > m_nWedgeType || i == 0) B2ERROR("invalid wedge number"); std::vector<double> pars; for (auto par : m_wedgePar[i - 1]) pars.push_back(par / s_unit); return pars;}
+    const std::vector<double> getWedge(unsigned i) const {std::vector<double> pars; if (i > m_nWedgeType || i == 0) { B2ERROR("invalid wedge number"); return pars;}; for (auto par : m_wedgePar[i - 1]) pars.push_back(par / s_unit); return pars;}
 
     /**
      * Add box volume
@@ -281,12 +281,12 @@ namespace Belle2 {
 
     std::vector<tube> m_tubes;           /**< vector of tube volumes to be placed */
     std::string m_material;              /**< default material of support structure */
-    static const unsigned m_nWedgeType = 3;
+    static const unsigned m_nWedgeType = 3; /**< number of wedge types */
     std::vector<double> m_wedgePar[m_nWedgeType];   /**< parameters of support wedges (joints) */
     std::vector<wedge> m_wedges;         /**< vector of wedge volumes to be placed */
     std::vector<box> m_boxes;            /**< vector of box volumes to be places */
 
-    ClassDef(ARICHGeoSupport, 2); /**< ClassDef */
+    ClassDef(ARICHGeoSupport, 1); /**< ClassDef */
 
   };
 

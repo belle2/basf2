@@ -33,7 +33,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    explicit ARICHHapdChipInfo(std::string serial): m_serial(serial), m_chip(""), m_biasVoltage(0), m_gain(0), m_leakCurrent(NULL),
+    explicit ARICHHapdChipInfo(const std::string& serial): m_serial(serial), m_chip(""), m_biasVoltage(0), m_gain(0),
+      m_leakCurrent(NULL),
       m_bombardmentGain(NULL), m_bombardmentCurrent(), m_avalancheGain(NULL), m_avalancheCurrent(), m_biasVoltage2D(NULL),
       m_biasCurrent2D(NULL), m_channelId(0), m_cutChannel(), m_badChannel() {};
 

@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHMergerInfo(int id, int type, std::string comment): m_id(id), m_type(type), m_comment(comment) {};
+    ARICHMergerInfo(int id, int type, const std::string& comment): m_id(id), m_type(type), m_comment(comment) {};
 
     /**
      * Destructor

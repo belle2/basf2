@@ -16,7 +16,7 @@
 
 
     <!-- Geometry parameters -->
-    <!------------------------->
+    <!-- - - - - - - - - - - -->
     <Wrapping description="Wrapping around each crystals">
       <Thickness unit="cm">0.01</Thickness>
       <Material>AlTeflon</Material>

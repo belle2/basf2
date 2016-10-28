@@ -8,16 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+// Module manager
+#include <framework/core/HistoModule.h>
+
 // Own include
 #include <arich/modules/arichDQM/ARICHDQMModule.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <arich/dbobjects/ARICHChannelMapping.h>
 #include <arich/dbobjects/ARICHMergerMapping.h>
 #include <arich/dbobjects/ARICHCopperMapping.h>
-
-// channel histogram
-#include <arich/utility/ARICHChannelHist.h>
-
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -33,6 +32,7 @@
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
 #include <TH1F.h>
+#include <TH2Poly.h>
 #include <TFile.h>
 #include <framework/database/DBObjPtr.h>
 // print bitset
@@ -52,35 +52,45 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ARICHDQMModule::ARICHDQMModule() : Module(), m_hHits(0),  m_hBits(0), m_hHitsHapd(0), m_hHitsMerger(0), m_hHitsCopper(0),
-    m_chHist(0)
+  ARICHDQMModule::ARICHDQMModule() : HistoModule()
   {
     // set module description (e.g. insert text)
-    setDescription("Fills ARICHHits collection from ARICHDigits");
+    setDescription("ARICH DQM histogrammer");
     setPropertyFlags(c_ParallelProcessingCertified);
 
-    addParam("outputFileName", m_fname, "output file name", string("ARICHHists.root"));
+    addParam("histogramDirectoryName", m_histogramDirectoryName,
+             "histogram directory in ROOT file", string("ARICH"));
+
   }
 
   ARICHDQMModule::~ARICHDQMModule()
   {
   }
 
-  void ARICHDQMModule::initialize()
+  void ARICHDQMModule::defineHisto()
   {
-
-    StoreArray<ARICHDigit> digits;
-    digits.isRequired();
-
-    StoreArray<ARICHHit> hits;
-    hits.isRequired();
+    // Create a separate histogram directory and cd into it.
+    TDirectory* oldDir = gDirectory;
+    oldDir->mkdir(m_histogramDirectoryName.c_str())->cd();
 
     m_hBits = new TH1F("hBits", "comulative hit bitmap", 4, -0.5, 3.5);
     m_hHits = new TH1F("hHits", "# of hits/event", 864, -0.5, 863.5);
     m_hHitsHapd = new TH2F("hHitsChn", "# of hits/channel/(1000 events);module ID; asic ch #", 420, 0.5, 420.5, 144, -0.5, 143.5);
     m_hHitsMerger = new TH1F("hHitsMerg", "# of hits/merger/(1000 events);merger ID #", 72, 0.5, 72.5);
     m_hHitsCopper = new TH1F("hHitsCopp", "# of hits/copper/(1000 events);copper ID #", 18, 0.5, 18.5);
-    m_chHist = new ARICHChannelHist("hits", "ARICH channel hits");
+
+  }
+
+  void ARICHDQMModule::initialize()
+  {
+    // Register histograms (calls back defineHisto)
+    REG_HISTOGRAM;
+
+    StoreArray<ARICHDigit> digits;
+    digits.isRequired();
+
+    StoreArray<ARICHHit> hits;
+    hits.isRequired();
 
   }
 
@@ -109,7 +119,6 @@ namespace Belle2 {
       }
       int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
-      m_chHist->fillBin(modID, asicCh);
       m_hHitsHapd->Fill(modID, asicCh);
       unsigned mrgID = mrgMap->getMergerID(modID);
       unsigned cprID = cprMap->getCopperID(mrgID);
@@ -128,20 +137,6 @@ namespace Belle2 {
 
   void ARICHDQMModule::terminate()
   {
-
-    TFile* f = new TFile(m_fname.data(), "RECREATE");
-    m_hHits->Write();
-    m_hBits->Write();
-    m_chHist->Write();
-    m_hHitsHapd->SetOption("colz");
-    double scale = 1000. / double(m_hHits->GetEntries());
-    m_hHitsHapd->Scale(scale);
-    m_hHitsHapd->Write();
-    m_hHitsMerger->Write();
-    m_hHitsMerger->Scale(scale);
-    m_hHitsCopper->Write();
-    m_hHitsCopper->Scale(scale);
-    f->Write();
   }
 
 

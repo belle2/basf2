@@ -8,13 +8,21 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef ARICHDQMMODULE_H
-#define ARICHDQMMODULE_H
+#pragma once
+
+// I copied 6 lines below from PXDDQMModule.h - is it realy needed?
+#undef DQM
+#ifndef DQM
+#include <framework/core/HistoModule.h>
+#else
+#include <daq/dqm/modules/DqmHistoManagerModule.h>
+#endif
 
 #include <framework/core/Module.h>
 #include <string>
 #include <TH1F.h>
 #include <TH2F.h>
+#include <TH2Poly.h>
 #include <TCanvas.h>
 #include <arich/utility/ARICHChannelHist.h>
 
@@ -23,7 +31,7 @@ namespace Belle2 {
   /**
    * Simple DQM module for occuppancy plots etc.
    */
-  class ARICHDQMModule : public Module {
+  class ARICHDQMModule : public HistoModule {
 
   public:
 
@@ -36,6 +44,13 @@ namespace Belle2 {
      * Destructor
      */
     virtual ~ARICHDQMModule();
+
+    /**
+     * Histogram definitions such as TH1(), TH2(), TNtuple(), TTree().... are supposed
+     * to be placed in this function.
+     */
+    virtual void defineHisto();
+
 
     /**
      * Initialize the Module.
@@ -67,15 +82,13 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
-    TH1F* m_hHits;  /**< histogram for number of hits / event  */
-    TH1F* m_hBits;  /**< histogram for acumulative hit bitmap distribution (4-bits / hit) */
-    TH2F* m_hHitsHapd;  /**< accumulated hits per channel */
-    TH1F* m_hHitsMerger;  /**< accumulated hits per merger board */
-    TH1F* m_hHitsCopper;  /**< accumulated hits per copper board */
-    ARICHChannelHist* m_chHist; /**< occupancy histogram for all HAPDs */
-    std::string m_fname; /**< output root file name */
+    std::string m_histogramDirectoryName; /**< histogram directory in ROOT file */
+    TH1F* m_hHits = 0; /**< histogram for number of hits / event  */
+    TH1F* m_hBits = 0; /**< histogram for acumulative hit bitmap distribution (4-bits / hit) */
+    TH2F* m_hHitsHapd = 0; /**< accumulated hits per channel */
+    TH1F* m_hHitsMerger = 0; /**< accumulated hits per merger board */
+    TH1F* m_hHitsCopper = 0; /**< accumulated hits per copper board */
   };
 
 } // Belle2 namespace
 
-#endif

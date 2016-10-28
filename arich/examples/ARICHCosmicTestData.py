@@ -17,7 +17,7 @@ home = os.environ['BELLE2_LOCAL_DIR']
 # parameters
 parser = OptionParser()
 parser.add_option('-f', '--file', dest='filename', default=home + '/datafiles/cosmicTest/arich.2016-08-25-09-21-09.sroot')
-parser.add_option('-o', '--output', dest='output', default='ARICHHists.root')
+parser.add_option('-o', '--output', dest='output', default='ARICHDQM.root')
 parser.add_option('-d', '--debug', dest='debug', default=0)
 parser.add_option('-s', '--display', dest='display', default=0)
 (options, args) = parser.parse_args()
@@ -30,9 +30,16 @@ main = create_path()
 use_local_database(home + "/arich/database/cosmicTest_payloads/cosmicTest_database.txt",
                    home + "/arich/database/cosmicTest_payloads")
 
+# root input module
 input_module = register_module('SeqRootInput')
 input_module.param('inputFileName', options.filename)
 main.add_module(input_module)
+
+# Histogram manager module
+histo = register_module('HistoManager')
+histo.param('histoFileName', options.output)  # File to save histograms
+main.add_module(histo)
+
 
 # build geometry if display option
 if int(options.display):
@@ -59,12 +66,11 @@ main.add_module(arichHits)
 
 # create simple DQM histograms
 arichHists = register_module('ARICHDQM')
-arichHists.param('outputFileName', options.output)
 main.add_module(arichHists)
 
 # uncomment to store dataobjects
 # output = register_module('RootOutput')
-# output.param('outputFileName', 'luka/test.root')
+# output.param('outputFileName', 'DataStore.root')
 # output.param('branchNames', ['ARICHDigits','ARICHHits'])
 # main.add_module(output)
 
@@ -87,7 +93,7 @@ process(main)
 # print stats
 print(statistics)
 
-# plot
+# plot DQM histograms!
 if not int(options.display):
-    com = 'root -l ' + options.output + ' ' + home + '/arich/utility/scripts/plotOccup.C'
+    com = 'root -l ' + options.output + ' ' + home + '/arich/utility/scripts/plotDQM.C'
     os.system(com)

@@ -12,15 +12,14 @@
 
 #include <TObject.h>
 #include <string>
-#include <framework/gearbox/Unit.h>
 #include <TH2Poly.h>
 #include <TGraph.h>
 
 namespace Belle2 {
 
   /**
-  * Base class for geometry parameters.
-  */
+   * Base class for geometry parameters.
+   */
   class ARICHChannelHist: public TH2Poly {
 
   public:

@@ -8,7 +8,7 @@ from optparse import OptionParser
 parser = OptionParser()
 parser.add_option('-n', '--nevents', dest='nevents', default=100,
                   help='Number of events to process')
-parser.add_option('-f', '--file', dest='filename', default='ARICHHists.root')
+parser.add_option('-f', '--file', dest='filename', default='ARICHDQM.root')
 parser.add_option('-d', '--debug', dest='debugLevel', default=10)
 parser.add_option('-s', '--seed', dest='seed', default=111111)
 (options, args) = parser.parse_args()
@@ -29,6 +29,12 @@ main = create_path()
 
 # Create Event information
 main.add_module('EventInfoSetter', evtNumList=nevents, logLevel=LogLevel.DEBUG)
+
+# Histogram manager module
+histo = register_module('HistoManager')
+histo.param('histoFileName', options.filename)  # File to save histograms
+main.add_module(histo)
+
 
 # Load parameters
 gearbox = register_module('Gearbox')
@@ -89,9 +95,8 @@ main.add_module(arichDIGI)
 arichHits = register_module('ARICHFillHits')
 main.add_module(arichHits)
 
-# fill occupancy histograms
+# add ARICH DQM module
 arichDQM = register_module('ARICHDQM')
-arichDQM.param('outputFileName', options.filename)
 main.add_module(arichDQM)
 
 # add display module
@@ -118,5 +123,6 @@ process(main)
 # Print call statistics
 print(statistics)
 
-com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotOccup.C'
+# plot DQM histograms
+com = 'root -l ' + options.filename + ' ' + home + '/arich/utility/scripts/plotDQM.C'
 os.system(com)

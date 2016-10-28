@@ -229,7 +229,8 @@ TrgEclFAM::getTCHit(int TableFlag)
       float hitE     = aECLSimHit->getEnergyDep() / Unit::GeV;
       float hitTOF      = aECLSimHit->getFlightTime() / Unit::ns;
 
-      TVector3 HitInPos = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      G4ThreeVector t = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
+      TVector3 HitInPos(t.x(), t.y(), t.z()); // = aECLSimHit->getPosIn(); // [cm], Hit position in Xtal (based on from IP)
       TVector3 PosCell  = eclp->GetCrystalPos(hitCellId); // [cm], Xtal position (based on from IP)
       TVector3 VecCell  = eclp->GetCrystalVec(hitCellId);
       // "local_pos_r" = Distance between track hit in Xtal and

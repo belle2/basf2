@@ -10,6 +10,17 @@
 #pragma once
 
 #include <framework/core/Module.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/pcore/SetMergeable.h>
+#include <framework/pcore/RootMergeable.h>
+
+#include <TTree.h>
+#include <TFile.h>
+
+#include <functional>
+#include <string>
+#include <unordered_set>
+#include <cstdint>
 
 namespace Belle2 {
 
@@ -39,6 +50,10 @@ namespace Belle2 {
      */
     virtual void event() override;
 
+    /**
+     * Terminate modules
+     */
+    virtual void terminate() override;
 
   private:
 
@@ -66,9 +81,23 @@ namespace Belle2 {
 
     bool m_removeFSR; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
 
-    bool m_printHashes; /**< if true, each new hash will be printed on stdout */
+    std::string m_fileName; /**< Filename in which the hash strings are saved, if empty the strings are not saved */
+    std::string m_treeName; /**< Tree name in which the hash strings are saved */
+
+    TFile* m_file; /**< ROOT file to store the hashes and strings */
+
+    StoreObjPtr<RootMergeable<TTree>> m_tree; /**< ROOT TNtuple containting the saved hashes and strings */
+
+    StoreObjPtr<SetMergeable<std::unordered_set<uint64_t>>> m_hashset; /**< Mergeable unordered set containing the encountered hashes */
 
     const std::string c_ExtraInfoName = "DecayHash"; /**< Name of the extraInfo, which is stored in each Particle **/
+    const std::string c_ExtraInfoNameExtended = "DecayHashExtended"; /**< Name of the extraInfo, which is stored in each Particle **/
+
+    float m_decayHash; /**< Decay hash -> The hash of the decay string of the mother particle */
+    float m_decayHashExtended; /**< Extended decay hash -> The hash of the decay string of all daughter particles */
+    std::string m_decayString; /**< The complete decay string */
+
+    std::hash<std::string> m_hasher; /**< Hash function */
   };
 
 } // Belle2 namespace

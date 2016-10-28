@@ -2,6 +2,7 @@
 
 import sys
 import re
+import struct
 import pdg
 import basf2
 
@@ -10,16 +11,28 @@ from pybasf2 import *
 import inspect
 logging = LogPythonInterface()
 
+import numpy as np
+import root_numpy
 
-def parse_logfile(logfile):
-    hash2string = dict()
-    with open(logfile, 'r') as f:
-        for line in f:
-            if line.startswith('FOUND_NEW_DECAY_HASH'):
-                fields = line.split('|')
-                if len(fields) < 4:
-                    raise RuntimeError("Error in parsing logfile in line: " + line)
-                hash2string[int(fields[1])] = '\n'.join(fields[2:])
+
+def bitwiseConversion(value, i='f', o='i'):
+    s = struct.pack('>' + i, value)
+    return struct.unpack('>' + o, s)[0]
+
+
+def decayHashFloatToInt(decayHash, decayHashExtended):
+    decayHashInt = bitwiseConversion(np.float32(decayHash))
+    decayHashExtendedInt = bitwiseConversion(np.float32(decayHashExtended))
+    decayHashFullInt = decayHashInt << 32
+    decayHashFullInt += decayHashExtendedInt
+    return decayHashFullInt
+
+
+def parse_rootfile(rootfile):
+    ntuple = root_numpy.root2array(rootfile)
+    hash2string = {}
+    for decayHash, decayHashExtended, decayString in ntuple:
+        hash2string[decayHashFloatToInt(decayHash, decayHashExtended)] = decayString
     return hash2string
 
 
@@ -50,11 +63,10 @@ def prettify_pdg_codes(text):
 
 
 def print_hash(entry):
-
-    entries = entry.split('\n')
+    entries = entry.split('|')
     all_particles = re.findall(r"(-?[0-9]+)", entries[0])
 
-    assert len(all_particles) == len(entries) - 2
+    assert len(all_particles) == len(entries) - 1
 
     table = []
     table.append(["Reconstructed Decay ", prettify_pdg_codes(entries[0])])
@@ -64,11 +76,10 @@ def print_hash(entry):
     basf2.pretty_print_table(table, column_widths=[25, '*'])
 
 if __name__ == '__main__':
-    if len(sys.argv) < 3:
-        print('Usage {name} basf2.log decayHashInteger'.format(sys.argv[0]))
+    if len(sys.argv) < 4:
+        print('Usage {name} hashmap.root decayHash decayHashExtended'.format(sys.argv[0]))
 
-    logfile = sys.argv[1]
-    hash2string = parse_logfile(logfile)
+    rootfile = sys.argv[1]
+    hash2string = parse_rootfile(rootfile)
 
-    decayHashInteger = int(sys.argv[2])
-    print_hash(hash2string[decayHashInteger])
+    print_hash(hash2string[decayHashFloatToInt(float(sys.argv[2]), float(sys.argv[3]))])

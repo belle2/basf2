@@ -280,6 +280,7 @@ namespace Belle2 {
       double Phi2  = enclosureContent.getAngle("AngPhi2") ;
 
       G4Transform3D zsh = G4Translate3D(0, 0, zshift);
+      G4Transform3D invzsh = G4Translate3D(0, 0, -zshift);
       G4Transform3D m1 = G4RotateZ3D(Phi1);
       G4Transform3D m2 = G4RotateY3D(Theta);
       G4Transform3D m3 = G4RotateZ3D(Phi2);
@@ -287,6 +288,7 @@ namespace Belle2 {
       G4Transform3D lidpos   = G4Translate3D(0, 0.5 * (depth + lidthk), 0);
 
       G4Transform3D Tr    = position * m3 * m2 * m1; /**< Position of the nominal centre of crystals in the box **/
+      //G4Transform3D TrRef = position * m3 * m2 * m1 * invzsh; /**< Position of the nominal reference on the IP-side face of the box **/
       G4Transform3D ZshTr = Tr * zsh;
       G4Transform3D LidTr = ZshTr * lidpos;
 
@@ -296,6 +298,8 @@ namespace Belle2 {
       G4VisAttributes* LidVisAtt = new G4VisAttributes(G4Colour(0.8, 1.0, 0.4, 0.5));
       logiEncloLid->SetVisAttributes(LidVisAtt);
       logiEncloLid->SetVisAttributes(G4VisAttributes::GetInvisible());
+
+      B2INFO("CsIBox No. " << iEnclosure << " translation " << ZshTr.getTranslation());
 
       assembly->AddPlacedVolume(logiEnclosure, ZshTr);
       assembly->AddPlacedVolume(logiEncloLid, LidTr);

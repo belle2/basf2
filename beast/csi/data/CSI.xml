@@ -4,32 +4,27 @@
   <Content>
     <BeamBackgroundStudy desc="select 1 if you want to record neutron and gamma hits">0</BeamBackgroundStudy>  
     
+
+    <!-- Digitization parameters -->
+    <!--     entered by Igal     -->
     <Ethres>0.15</Ethres>    
     <Threshold>0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025, 0.0005, 0.001, 0.00025</Threshold>
     <Range>0.251, 1.924, 0.664, 0.409, 3.628, 0.546, 0.316, 3.603, 0.570, 0.324, 3.641, 0.606, 0.368, 3.883, 0.694, 0.326, 7.767, 0.606</Range>
     <EnergyResolutionFactor>0.28, 0.2, 0.07, 0.22, 0.18, 0.08, 0.33, 0.19, 0.09, 0.28, 0.19, 0.08, 0.26, 0.2, 0.18, 0.33, 0.24, 0.08</EnergyResolutionFactor>
     <EnergyResolutionConst>0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0</EnergyResolutionConst>
-    
+
+
+
+    <!-- Geometry parameters -->
+    <!------------------------->
     <Wrapping description="Wrapping around each crystals">
       <Thickness unit="cm">0.01</Thickness>
       <Material>AlTeflon</Material>
     </Wrapping>
 
-    <!-- Interesting Crystals:
-	 FWD:0 12 24 36
-	 BWD: 8688 8672 8704 8720
-	 Cell #0: CryIndex=0
-	 Cell #12: CryIndex=0
-	 Cell #24: CryIndex=0
-	 Cell #36: CryIndex=0
-	 Cell #8688: CryIndex=128
-	 Cell #8672: CryIndex=128
-	 Cell #8704: CryIndex=128
-	 Cell #8720: CryIndex=128 
-      -->
-
+    <!-- Crystal types -->
     <EndCapCrystals>
-
+       <!-- CsI(Tl) Crystal from BaBar -->
        <EndCapCrystal id="1">
 	 <Material>CsI-Tl</Material>
 	 <k_HalfLength unit="cm">15.0</k_HalfLength>
@@ -43,7 +38,7 @@
          <K_alpha2 unit="deg">0.000002</K_alpha2>
        </EndCapCrystal>
 
-       <!-- Fictitious '2' crystal: replace with pure CsI dims-->
+       <!-- Pure CsI crystal from INFN -->
        <EndCapCrystal id="2">
 	 <Material>PureCsI</Material>
 	 <k_HalfLength unit="cm">15.0</k_HalfLength>
@@ -72,6 +67,8 @@
        </EndCapCrystal>
 
     </EndCapCrystals>
+
+    <!-- Description of the boxes -->
     <Enclosures>
 
       <Material>5052-Alloy</Material>
@@ -104,14 +101,24 @@
       </Slot>
 
       
+      <!-- Placement of each box -->
       <Enclosure id="1">
+        <!-- Nominal position --> 
         <PosZ unit="cm">211.53</PosZ>
         <PosR unit="cm">49.53</PosR>
         <PosT unit="deg">0.00</PosT>
 
+        <!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-270</AngPhi1>
         <AngTheta unit="deg">13.94</AngTheta>
         <AngPhi2 unit="deg">0</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-1.29</ShiftX>
+	<ShiftY unit="cm">-0.50</ShiftY>
+	<ShiftZ unit="cm">-2.00</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>
@@ -119,13 +126,22 @@
       </Enclosure>
 
       <Enclosure id="2">
-        <PosZ unit="cm">211.53</PosZ>
+        <!-- Nominal position --> 
+	<PosZ unit="cm">211.53</PosZ>
         <PosR unit="cm">49.53</PosR>
         <PosT unit="deg">90.00</PosT>
 
+        <!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-270</AngPhi1>
         <AngTheta unit="deg">13.94</AngTheta>
         <AngPhi2 unit="deg">90</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.60</ShiftX>
+	<ShiftY unit="cm"> 1.11</ShiftY>
+	<ShiftZ unit="cm">-3.10</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>
@@ -133,13 +149,22 @@
       </Enclosure>
 
       <Enclosure id="3">
+        <!-- Nominal position --> 
         <PosZ unit="cm">211.53</PosZ>
         <PosR unit="cm">49.53</PosR>
         <PosT unit="deg">180.00</PosT>
 
+        <!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-270</AngPhi1>
         <AngTheta unit="deg">13.94</AngTheta>
         <AngPhi2 unit="deg">180</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.21</ShiftX>
+	<ShiftY unit="cm">-0.40</ShiftY>
+	<ShiftZ unit="cm">-2.10</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>
@@ -149,10 +174,11 @@
       <!-- This enclosure was not intalled -->
       <!--
       <Enclosure id="4">
+     
         <PosZ unit="cm">211.53</PosZ>
         <PosR unit="cm">49.53</PosR>
         <PosT unit="deg">270.0</PosT>
-
+    
         <AngPhi1 unit="deg">-270</AngPhi1>
         <AngTheta unit="deg">13.94</AngTheta>
         <AngPhi2 unit="deg">270.0</AngPhi2>
@@ -167,14 +193,22 @@
       <!-- Backward enclosures -->
 
       <Enclosure id="4">
+        <!-- Nominal position --> 
         <PosZ unit="cm">-116.6897</PosZ>
-        <!--PosR unit="cm">58.5258</PosR-->
 	<PosR unit="cm">50.5258</PosR>
         <PosT unit="deg">0.00</PosT>
 
+	<!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-90</AngPhi1>
         <AngTheta unit="deg">150.85</AngTheta>
         <AngPhi2 unit="deg">0</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm"> 5.03</ShiftX>
+	<ShiftY unit="cm">-1.20</ShiftY>
+	<ShiftZ unit="cm">-1.07</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>
@@ -183,13 +217,22 @@
 
 
       <Enclosure id="5">
+        <!-- Nominal position --> 
         <PosZ unit="cm">-116.6897</PosZ>
         <PosR unit="cm">58.5258</PosR>
         <PosT unit="deg">90</PosT>
 
+	<!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-90</AngPhi1>
         <AngTheta unit="deg">150.85</AngTheta>
         <AngPhi2 unit="deg">90</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-2.70</ShiftX>
+	<ShiftY unit="cm"> 0.13</ShiftY>
+	<ShiftZ unit="cm">-1.77</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>
@@ -198,13 +241,22 @@
 
 
       <Enclosure id="6">
+        <!-- Nominal position --> 
         <PosZ unit="cm">-116.6897</PosZ>
         <PosR unit="cm">58.5258</PosR>
         <PosT unit="deg">180.00</PosT>
 
+	<!-- Nominal orientation --> 
         <AngPhi1 unit="deg">-90</AngPhi1>
         <AngTheta unit="deg">150.85</AngTheta>
         <AngPhi2 unit="deg">180</AngPhi2>
+
+	<!--      Shift to positions      -->
+	<!--(e.g. to match measurements or--> 
+	<!--     systematic studies )     -->
+	<ShiftX unit="cm">-0.13</ShiftX>
+	<ShiftY unit="cm">-0.80</ShiftY>
+	<ShiftZ unit="cm">-2.67</ShiftZ>
 
 	<CrystalInSlot id="1">1</CrystalInSlot>
 	<CrystalInSlot id="2">2</CrystalInSlot>

@@ -21,7 +21,7 @@ namespace Belle2 {
      *             strictly required.
      * @return absolute path to file in local directory, if it exists,
      *         otherwise abs. path to file in central release directory,
-     *         or empty if file wasn't found.
+     *         or empty string if file wasn't found.
      */
     static std::string findFile(const std::string& path);
 

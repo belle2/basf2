@@ -22,6 +22,7 @@
 #include "ecl/geometry/BelleLathe.h"
 #include "ecl/geometry/BelleCrystal.h"
 #include "ecl/geometry/shapes.h"
+#include <geometry/Materials.h>
 
 using namespace std;
 using namespace Belle2::geometry;

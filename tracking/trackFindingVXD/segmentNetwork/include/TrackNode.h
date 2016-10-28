@@ -10,7 +10,6 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h>
 #include <tracking/trackFindingVXD/segmentNetwork/ActiveSector.h>
@@ -26,7 +25,6 @@ namespace Belle2 {
   struct TrackNode {
 
     /** to improve readability of the code, here the definition of the static sector type. */
-//     using StaticSectorType = StaticSectorDummy;
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
 
     /** pointer to sector */
@@ -72,7 +70,7 @@ namespace Belle2 {
     bool operator!=(const TrackNode& b) const
     {
       if (spacePoint == nullptr) B2FATAL("TrackNode::operator !=: spacePoint for Tracknode not set - aborting run.");
-        return !(*this == b);
+      return !(*this == b);
     }
 
 
@@ -88,7 +86,7 @@ namespace Belle2 {
     const SpacePoint& getHit() const
     {
       if (spacePoint == nullptr) B2FATAL("TrackNode::getHit: spacePoint for Tracknode not set - aborting run.");
-        return *spacePoint;
+      return *spacePoint;
     }
 
 
@@ -110,7 +108,7 @@ namespace Belle2 {
     ActiveSector<StaticSectorType, TrackNode>& getActiveSector()
     {
       if (sector == nullptr) B2FATAL("TrackNode::getActiveSector: ActiveSector for Tracknode not set - aborting run.");
-        return *sector;
+      return *sector;
     }
 
 

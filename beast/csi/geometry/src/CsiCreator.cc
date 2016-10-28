@@ -185,6 +185,8 @@ namespace Belle2 {
       Crystal->SetVisAttributes(CrystalVisAtt);
       Crystal->SetSensitiveDetector(m_sensitive);
 
+      //cout << "CSI volume " << CrystalShape->GetCubicVolume() / CLHEP::cm / CLHEP::cm / CLHEP::cm
+      //<< " density " << crystalMaterial->GetDensity() / CLHEP::g * CLHEP::cm * CLHEP::cm * CLHEP::cm << endl;
 
       /////////////////  add actual foil ///////////////////////////////////////
       G4Trap* Foilout = new G4Trap((format("Foilout_%1%") % iCry).str().c_str(),

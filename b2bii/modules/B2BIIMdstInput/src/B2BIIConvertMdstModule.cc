@@ -386,8 +386,6 @@ void B2BIIConvertMdstModule::convertMdstChargedTable()
   // StoreArrays
   StoreArray<Track> tracks;
   StoreArray<TrackFitResult> trackFitResults;
-  tracks.create();
-  trackFitResults.create();
 
   // Relations
   RelationArray tracksToMCParticles(tracks, mcParticles);
@@ -440,7 +438,6 @@ void B2BIIConvertMdstModule::convertMdstVee2Table()
 
   // create V0 StoreArray
   StoreArray<V0> v0s;
-  v0s.create();
 
   // Particle StoreArray exists as well
   StoreArray<Particle> particles;
@@ -768,7 +765,6 @@ void B2BIIConvertMdstModule::convertGenHepEvtTable()
 {
   // create MCParticle StoreArray
   StoreArray<MCParticle> mcParticles;
-  mcParticles.create();
 
   if (m_realData)
     return;
@@ -881,7 +877,6 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
 
   // Create ECLCluster StoreArray
   StoreArray<ECLCluster> eclClusters;
-  eclClusters.create();
 
   // Relations
   RelationArray eclClustersToMCParticles(eclClusters, mcParticles);
@@ -935,7 +930,6 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
 
   // Create Particles StoreArray
   StoreArray<Particle> particles;
-  particles.create();
 
   // Relations
   RelationArray particlesToMCParticles(particles, mcParticles);
@@ -1543,32 +1537,27 @@ void B2BIIConvertMdstModule::convertGenHepevtObject(const Belle::Gen_hepevt& gen
 void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux,
                                                   ECLCluster* eclCluster)
 {
-  if (ecl.match() > 0)
-    eclCluster->setisTrack(true);
-  else
-    eclCluster->setisTrack(false);
+  eclCluster->setIsTrack(ecl.match() > 0);
 
-  eclCluster->setEnergy(ecl.energy());
+  eclCluster->setEnergy(ecl.energy()); //must happen before setCovarianceMatrix()!
   eclCluster->setPhi(ecl.phi());
   eclCluster->setTheta(ecl.theta());
   eclCluster->setR(ecl.r());
 
-  // TODO: check
-  // TODO: ECLCluster is an unclear mess
   double covarianceMatrix[6];
-  covarianceMatrix[0] = sqrt(ecl.error(0)); // error on energy
+  covarianceMatrix[0] = ecl.error(0); // error on energy
   covarianceMatrix[1] = ecl.error(1);
-  covarianceMatrix[2] = sqrt(ecl.error(2)); // error on phi
+  covarianceMatrix[2] = ecl.error(2); // error on phi
   covarianceMatrix[3] = ecl.error(3);
   covarianceMatrix[4] = ecl.error(4);
-  covarianceMatrix[5] = sqrt(ecl.error(5)); // error on theta
-  eclCluster->setError(covarianceMatrix);
+  covarianceMatrix[5] = ecl.error(5); // error on theta
+  eclCluster->setCovarianceMatrix(covarianceMatrix);
 
-  eclCluster->setEnedepSum(eclAux.mass());
-  eclCluster->setE9oE25(eclAux.e9oe25());
-  eclCluster->setHighestE(eclAux.seed());
-  eclCluster->setTiming(eclAux.property(0));
-  eclCluster->setNofCrystals(eclAux.nhits());
+  eclCluster->setEnergyRaw(eclAux.mass());
+  eclCluster->setE9oE21(eclAux.e9oe25());
+  eclCluster->setEnergyHighestCrystal(eclAux.seed());
+  eclCluster->setTime(eclAux.property(0));
+  eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 
 //-----------------------------------------------------------------------------

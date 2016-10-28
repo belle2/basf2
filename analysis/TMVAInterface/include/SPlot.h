@@ -110,7 +110,7 @@ namespace Belle2 {
        * @param prefix prefix used for the plot filename
        * @param discriminatingVariable which discriminating variable to use
        */
-      void plot(std::string prefix, std::string discriminatingVariable);
+      void plot(const std::string& prefix, std::string discriminatingVariable);
 
 
     private:

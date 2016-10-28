@@ -65,7 +65,7 @@ void SeqRootOutputModule::initialize()
 
   // DataStoreStreamer
   m_streamer = new DataStoreStreamer(m_compressionLevel);
-  m_streamer->registerStreamObjs(m_saveObjs);
+  m_streamer->setStreamingObjects(m_saveObjs);
 
   //Write StreamerInfo at the beginning of a file
   writeStreamerInfos();

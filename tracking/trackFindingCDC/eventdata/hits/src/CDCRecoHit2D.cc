@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -94,4 +93,9 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
   CDCRecoHit2D reversedRecoHit(*this);
   reversedRecoHit.reverse();
   return reversedRecoHit;
+}
+
+CDCRecoHit2D CDCRecoHit2D::getAlias() const
+{
+  return CDCRecoHit2D(getRLWireHit().getAlias(), -getRecoDisp2D());
 }

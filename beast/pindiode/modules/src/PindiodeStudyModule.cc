@@ -70,20 +70,41 @@ PindiodeStudyModule::~PindiodeStudyModule()
 void PindiodeStudyModule::defineHisto()
 {
   //Default values are set here. New values can be in PINDIODE.xml.
-  for (int i = 0; i < 100; i++) {
-    h_dose1[i] = new TH1F(TString::Format("h_dose1_%d", i), "", 10000, 0., 10000.);
-    h_dose2[i] = new TH1F(TString::Format("h_dose2_%d", i), "", 10000, 0., 10000.);
-    h_dose1Weight[i] = new TH1F(TString::Format("h_dose1Weight_%d", i), "", 10000, 0., 10000.);
-    h_dose2Weight[i] = new TH1F(TString::Format("h_dose2Weight_%d", i), "", 10000, 0., 10000.);
-    h_volt[i] = new TH1F(TString::Format("h_volt_%d", i), "", 10000, 0., 100.);
-    h_time[i] = new TH1F(TString::Format("h_time_%d", i), "", 1000, 0., 100.);
-    h_vtime[i] = new TH1F(TString::Format("h_vtime_%d", i), "", 1000, 0., 100.);
+  for (int i = 0; i < 4; i++) {
+    h_pin_rate[i] = new TH1F(TString::Format("pin_rate_%d", i), "Count", 64, 0., 64.);
+    h_pin_rate[i]->Sumw2();
+  }
+  for (int i = 0; i < 2; i++) {
+    h_pin_rs_rate[i] = new TH2F(TString::Format("pin_rs_rate_%d", i), "Count vs. ring section", 64, 0., 64., 12, 0., 12.);
+    h_pin_rs_rate[i]->Sumw2();
+  }
+  for (int i = 0; i < 64; i++) {
+    h_pin_dose1[i] = new TH1F(TString::Format("pin_dose1_%d", i), "", 10000, 0., 10000.);
+    h_pin_dose2[i] = new TH1F(TString::Format("pin_dose2_%d", i), "", 10000, 0., 10000.);
+    h_pin_dose1Weight[i] = new TH1F(TString::Format("pin_dose1Weight_%d", i), "", 10000, 0., 10000.);
+    h_pin_dose2Weight[i] = new TH1F(TString::Format("pin_dose2Weight_%d", i), "", 10000, 0., 10000.);
+    h_pin_volt[i] = new TH1F(TString::Format("pin_volt_%d", i), "", 10000, 0., 100.);
+    h_pin_time[i] = new TH1F(TString::Format("pin_time_%d", i), "", 1000, 0., 100.);
+    h_pin_vtime[i] = new TH1F(TString::Format("pin_vtime_%d", i), "", 1000, 0., 100.);
 
-    h_idose[i] = new TH1F(TString::Format("h_idose_%d", i), "", 10000, 0., 10000.);
-    h_idoseWeight[i] = new TH1F(TString::Format("h_idoseWeight_%d", i), "", 10000, 0., 10000.);
-    h_ivolt[i] = new TH1F(TString::Format("h_ivolt_%d", i), "", 10000, 0., 100.);
-    h_itime[i] = new TH1F(TString::Format("h_itime_%d", i), "", 1000, 0., 100.);
-    h_ivtime[i] = new TH1F(TString::Format("h_ivtime_%d", i), "", 1000, 0., 100.);
+    h_pin_idose[i] = new TH1F(TString::Format("pin_idose_%d", i), "", 10000, 0., 10000.);
+    h_pin_idoseWeight[i] = new TH1F(TString::Format("pin_idoseWeight_%d", i), "", 10000, 0., 10000.);
+
+    h_pin_rs_idose[i] = new TH2F(TString::Format("pin_rs_idose_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
+    h_pin_rs_idoseWeight[i] = new TH2F(TString::Format("pin_rs_idoseWeight_%d", i), "", 10000, 0., 10000., 12, 0., 12.);
+
+    h_pin_ivolt[i] = new TH1F(TString::Format("pin_ivolt_%d", i), "", 10000, 0., 100.);
+    h_pin_itime[i] = new TH1F(TString::Format("pin_itime_%d", i), "", 1000, 0., 100.);
+    h_pin_ivtime[i] = new TH1F(TString::Format("pin_ivtime_%d", i), "", 1000, 0., 100.);
+
+    h_pin_dose1[i]->Sumw2();
+    h_pin_dose2[i]->Sumw2();
+    h_pin_dose1Weight[i]->Sumw2();
+    h_pin_dose2Weight[i]->Sumw2();
+    h_pin_idose[i]->Sumw2();
+    h_pin_idoseWeight[i]->Sumw2();
+    h_pin_rs_idose[i]->Sumw2();
+    h_pin_rs_idoseWeight[i]->Sumw2();
   }
 
 }
@@ -110,10 +131,20 @@ void PindiodeStudyModule::event()
 
   StoreArray<PindiodeSimHit>  SimHits;
   StoreArray<PindiodeHit> Hits;
-  StoreArray<SADMetaHit> sadMetaHits;
+  StoreArray<SADMetaHit> MetaHits;
+
+  //Look at the meta data to extract IR rate and scattering ring section
   double rate = 0;
-  for (const auto& sadMetaHit : sadMetaHits) {
-    rate = sadMetaHit.getrate();
+  int ring_section = -1;
+  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  for (const auto& MetaHit : MetaHits) {
+    rate = MetaHit.getrate();
+    double sad_ssraw = MetaHit.getssraw();
+    double ssraw = 0;
+    if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;
+    else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
+    ring_section = section_ordering[(int)((ssraw) / 250.)] - 1;
+    //ring_section = MetaHit.getring_section() - 1;
   }
 
   //Skip events with no Hits
@@ -121,42 +152,48 @@ void PindiodeStudyModule::event()
     return;
   }
 
-  int nSimHits = SimHits.getEntries();
-  for (int i = 0; i < nSimHits; i++) {
-    PindiodeSimHit* aHit = SimHits[i];
-    int detNb = aHit->getCellId();
+  for (const auto& SimHit : SimHits) {
+    int detNb = SimHit.getCellId();
     if (detNb < 64) {
-      double edep = aHit->getEnergyDep();
-      double time = aHit->getFlightTime();
+      double edep = SimHit.getEnergyDep();
+      double time = SimHit.getFlightTime();
       //int PDG = aHit->getPDGCode();
       const double meanEl = edep / m_WorkFunction * 1e9; //GeV to eV
       const double sigma = sqrt(m_FanoFactor * meanEl); //sigma in electron
       const int NbEle = (int)gRandom->Gaus(meanEl, sigma); //electron number
       double volt = NbEle * 1.602176565e-19 * m_CrematGain * 1e12; // volt
-      h_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
-      h_dose1Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
+      h_pin_dose1[detNb]->Fill(edep * 1e6); //GeV to keV
+      h_pin_dose1Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
       if ((edep * 1e9) > m_WorkFunction) {
-        h_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
-        h_dose2Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
-        h_volt[detNb]->Fill(volt * 1e3); //V to mV
-        h_time[detNb]->Fill(time);
-        h_vtime[detNb]->Fill(time, volt);
+        h_pin_dose2[detNb]->Fill(edep * 1e6); //GeV to keV
+        h_pin_dose2Weight[detNb]->Fill(edep * 1e6, rate); //GeV to keV
+        h_pin_volt[detNb]->Fill(volt * 1e3); //V to mV
+        h_pin_time[detNb]->Fill(time);
+        h_pin_vtime[detNb]->Fill(time, volt);
+        h_pin_rate[0]->Fill(detNb);
+        h_pin_rate[1]->Fill(detNb, rate);
       }
     }
   }
-  int nHits = Hits.getEntries();
-  for (int i = 0; i < nHits; i++) {
-    PindiodeHit* aHit = Hits[i];
-    int detNb = aHit->getdetNb();
+
+  for (const auto& Hit : Hits) {
+    int detNb = Hit.getdetNb();
     if (detNb < 64) {
-      double edep = aHit->getedep();
-      double volt = aHit->getV();
-      double time = aHit->gettime();
-      h_idose[detNb]->Fill(edep); //keV
-      h_idoseWeight[detNb]->Fill(edep, rate); //keV
-      h_ivolt[detNb]->Fill(volt * 1e3); //V to mV
-      h_itime[detNb]->Fill(time);
-      h_ivtime[detNb]->Fill(time, volt);
+      double edep = Hit.getedep();
+      double volt = Hit.getV();
+      double time = Hit.gettime();
+      h_pin_idose[detNb]->Fill(edep); //keV
+      h_pin_idoseWeight[detNb]->Fill(edep, rate); //keV
+      h_pin_ivolt[detNb]->Fill(volt * 1e3); //V to mV
+      h_pin_itime[detNb]->Fill(time);
+      h_pin_ivtime[detNb]->Fill(time, volt);
+      h_pin_rate[2]->Fill(detNb);
+      h_pin_rate[3]->Fill(detNb, rate);
+
+      h_pin_rs_rate[0]->Fill(detNb, ring_section);
+      h_pin_rs_rate[1]->Fill(detNb, ring_section, rate);
+      h_pin_rs_idose[detNb]->Fill(edep, ring_section); //keV
+      h_pin_rs_idoseWeight[detNb]->Fill(edep, ring_section, rate); //keV
     }
   }
 

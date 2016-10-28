@@ -79,6 +79,7 @@ void CDCCosmicSelectorModule::event()
     const double vY0 = vertex.Y();
     const double cosphi =  cos(m_phiOfCounter * M_PI / 180.);
     const double sinphi =  sin(m_phiOfCounter * M_PI / 180.);
+    //(vx,vy) is prod. vertex in frame rotated in phi wrt lab. frame
     const double vX =  cosphi * vX0 + sinphi * vY0;
     const double vY = -sinphi * vX0 + cosphi * vY0;
     const double vZ = vertex.Z();
@@ -87,6 +88,7 @@ void CDCCosmicSelectorModule::event()
     //    std::cout <<"vr,vx,vy,yz= "<< sqrt(vX*vX + vY*vY) <<" "<<vX <<" "<< vY <<" "<< vZ << std::endl;
 
     const TVector3 momentum = m_P->getMomentum();
+    //(px,py) is momentum in frame rotated in phi wrt lab. frame
     const double pX0 = momentum.X();
     const double pY0 = momentum.Y();
     const double pX =  cosphi * pX0 + sinphi * pY0;
@@ -97,22 +99,28 @@ void CDCCosmicSelectorModule::event()
     double yi = -999.;
     double zi = -999.;
 
+    //(x...,y...) is counter pos. in frame rotated in phi wrt lab. frame
+    const double xOfCounter =  cosphi * m_xOfCounter + sinphi * m_yOfCounter;
+    const double yOfCounter = -sinphi * m_xOfCounter + cosphi * m_yOfCounter;
+
     if (pY != 0.) {
-      xi = (m_yOfCounter - vY) * (pX / pY) + vX;
-      yi = m_yOfCounter;
-      zi = (m_yOfCounter - vY) * (pZ / pY) + vZ;
+      xi = (yOfCounter - vY) * (pX / pY) + vX;
+      yi =  yOfCounter;
+      zi = (yOfCounter - vY) * (pZ / pY) + vZ;
     } else {
+      //todo improve the following 3 lines and add check accept or not also in y-direction
       xi = 0.;
-      yi = m_yOfCounter;
+      yi = yOfCounter;
       zi = -vX * (pZ / pX) + vZ;
     }
 
     //    std::cout << "xi,yi,zi= " << xi <<" "<< yi <<" "<< zi << std::endl;
 
-    bool hitCounter = (fabs(xi - m_xOfCounter) < 0.5 * m_wOfCounter && fabs(zi - m_zOfCounter) <  0.5 * m_lOfCounter) ? true : false;
+    bool hitCounter = (fabs(xi - xOfCounter) < 0.5 * m_wOfCounter && fabs(zi - m_zOfCounter) <  0.5 * m_lOfCounter) ? true : false;
 
     //if hit, re-set the production time to zero at IP
     if (hitCounter) {
+      //      std::cout <<"checkxiyizi " << cosphi*xi-sinphi*yi<<" "<< sinphi*xi+cosphi *yi <<" "<< zi << std::endl;
       returnVal = true;
       const double p = sqrt(pX * pX + pY * pY + pZ * pZ);
       const double cX = pX / p;
@@ -164,9 +172,9 @@ void CDCCosmicSelectorModule::event()
       //if not hit, reverse the momentum vector so that the particle will not be simulated
       //better to use condition in basf2...
     } else {
-      m_P->setMomentum(-1. * momentum);
+      //      m_P->setMomentum(-1. * momentum);
 
     }
-  } // end loop over SimHits.
+  } // end loop over MCParticles
   setReturnValue(returnVal);
 }

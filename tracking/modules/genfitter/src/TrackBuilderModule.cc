@@ -98,9 +98,7 @@ void TrackBuilderModule::event()
 
   //StoreArrays to store the fit results
   StoreArray < Track > tracks;
-  tracks.create();
   StoreArray < TrackFitResult > trackFitResults;
-  trackFitResults.create();
   StoreArray < genfit::Track > gfTracks(m_gfTracksColName);
 
   //Relations for Tracks

@@ -20,10 +20,13 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "nsm2/nsm2.h"
+#include "nsm2/belle2nsm.h"
+
 namespace Belle2 {
   class RFLogManager {
   public:
-    RFLogManager(char* prefix, char* logdir = NULL);
+    RFLogManager(char* prefix, char* lognode = NULL, char* logdir = NULL);
     ~RFLogManager();
 
     // Read messages from fd and log them
@@ -54,6 +57,7 @@ namespace Belle2 {
     char m_id[256];
     char m_strbuf[1024];
     int m_fd;
+    char m_lognode[1024];
 
   };
 

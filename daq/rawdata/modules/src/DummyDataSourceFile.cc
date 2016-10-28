@@ -38,9 +38,6 @@ void DummyDataSourceFileModule::initialize()
 {
   B2INFO("DummyDataSourceFile: initialize() started.");
 
-  // Open message handler
-  //  m_msghandler = new MsgHandler(m_compressionLevel);
-
   /// Initialize EvtMetaData
   //  m_eventMetaDataPtr.registerInDataStore();
 
@@ -75,7 +72,6 @@ void DummyDataSourceFileModule::event()
 
   StoreArray<RawCDC> raw_cdcarray;
   //    Make RawCOPPER array
-  rawcprarray.create();
   if (m_start_flag == 0) {
     m_start_flag = 1;
     RunInfoBuffer& status(DeSerializerModule::getStatus());

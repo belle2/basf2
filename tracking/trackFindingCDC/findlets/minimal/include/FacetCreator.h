@@ -20,13 +20,9 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
-
-#include <cdc/translators/RealisticTDCCountTranslator.h>
-#include <framework/gearbox/Const.h>
-
-#include <boost/math/special_functions/sinc.hpp>
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
@@ -75,7 +71,6 @@ namespace Belle2 {
                                       m_param_leastSquareFit);
 
       }
-
 
       /**
        *  Central function creating the hit triplets from the clusters.
@@ -175,9 +170,12 @@ namespace Belle2 {
                                     std::vector<CDCFacet>& facets)
       {
         /// Prepare a facet - without fitted tangent lines.
-        CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left);
-        CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left);
-        CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left);
+        CDCRLWireHit startRLWireHit(&startWireHit, ERightLeft::c_Left,
+                                    startWireHit->getRefDriftLength());
+        CDCRLWireHit middleRLWireHit(&middleWireHit, ERightLeft::c_Left,
+                                     middleWireHit->getRefDriftLength());
+        CDCRLWireHit endRLWireHit(&endWireHit, ERightLeft::c_Left,
+                                  endWireHit->getRefDriftLength());
         CDCFacet facet(startRLWireHit, middleRLWireHit, endRLWireHit, UncertainParameterLine2D());
 
         for (ERightLeft startRLInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
@@ -211,7 +209,7 @@ namespace Belle2 {
                 }
 
                 // Update drift length
-                updateDriftLength(facet);
+                m_driftLengthEstimator.updateDriftLength(facet);
               }
 
               CellWeight cellWeight = m_facetFilter(facet);
@@ -225,75 +223,8 @@ namespace Belle2 {
         } // end for startRLWireHit
       }
 
-      /**
-       *  Reestimate the drift length of all three contained drift circles.
-       *  Using the additional flight direction information the accuracy of the drift length
-       *  can be increased alot helping the filters following this step
-       */
-      void updateDriftLength(CDCFacet& facet)
-      {
-        static CDC::RealisticTDCCountTranslator tdcCountTranslator;
 
-        const UncertainParameterLine2D& line = facet.getFitLine();
-        Vector2D flightDirection = line->tangential();
-        Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
-        const double alpha = centralPos2D.angleWith(flightDirection);
-        const double cylindricalRToFlightTimeFactor = 1.0 / (boost::math::sinc_pi(alpha) * Const::speedOfLight);
 
-        auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
-          const CDCWire& wire = rlWireHit.getWire();
-          const CDCHit* hit = rlWireHit.getWireHit().getHit();
-          const bool rl = rlWireHit.getRLInfo() == ERightLeft::c_Right;
-          double flightTimeEstimation =  recoPos2D.cylindricalR() * cylindricalRToFlightTimeFactor;
-          double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
-                                                                 wire.getWireID(),
-                                                                 flightTimeEstimation,
-                                                                 rl,
-                                                                 wire.getRefZ(),
-                                                                 alpha);
-          rlWireHit.setRefDriftLength(driftLength);
-        };
-
-        doUpdate(facet.getStartRLWireHit(), facet.getStartRecoPos2D());
-        doUpdate(facet.getMiddleRLWireHit(), facet.getMiddleRecoPos2D());
-        doUpdate(facet.getEndRLWireHit(), facet.getEndRecoPos2D());
-
-        // More accurate implementation
-        // double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
-        // facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
-
-        // double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
-        // facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
-
-        // double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
-        // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
-      }
-
-      /// Estimate the drift length of hit making use of the reconstructed flight direction of the hit.
-      double getDriftLengthEstimate(const CDCRecoHit2D& recoHit2D) const
-      {
-        static CDC::RealisticTDCCountTranslator tdcCountTranslator;
-
-        Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-        Vector2D recoPos = recoHit2D.getRecoPos2D();
-        double alpha = recoPos.angleWith(flightDirection);
-        double arcLength2D = recoPos.cylindricalR() / boost::math::sinc_pi(alpha);
-        double flightTimeEstimation = arcLength2D / Const::speedOfLight;
-
-        const CDCWire& wire = recoHit2D.getWire();
-        const CDCHit* hit = recoHit2D.getWireHit().getHit();
-        const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
-
-        double driftLength =
-          tdcCountTranslator.getDriftLength(hit->getTDCCount(),
-                                            wire.getWireID(),
-                                            flightTimeEstimation,
-                                            rl,
-                                            wire.getRefZ(),
-                                            alpha);
-
-        return driftLength;
-      }
 
     private:
       /// Parameter : Switch to apply the rl feasibility cut
@@ -314,6 +245,9 @@ namespace Belle2 {
 
       /// The filter to be used for the facet generation.
       AFacetFilter m_facetFilter;
+
+      /// Instance of the drift length estimator to be used.
+      DriftLengthEstimator m_driftLengthEstimator;
 
     private:
       /// Memory for the wire hit neighborhood in within a cluster.

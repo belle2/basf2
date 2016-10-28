@@ -123,7 +123,7 @@ namespace Belle2 {
 
     /**
      * Create hit information for a SVD hit with the given information. Adds the relation to the hit automatically.
-     * @param cdcHit The hit to create this information for.
+     * @param svdHit The hit to create this information for.
      * @param rightLeftInformation The RL-information  (which is probably invalid).
      * @param foundByTrackFinder Which track finder has found this hit?
      * @param sortingParameter The sorting parameter of this hit.
@@ -235,16 +235,18 @@ namespace Belle2 {
     /**
      * Create hit information for a generic hit with the given information. Adds the relation to the hit automatically.
      * @param hit the hit to create a reco hit information for.
-     * @param trackingDetektor The detector the hit comes from.
+     * @param trackingDetector The detector the hit comes from.
      * @param rightLeftInformation The right left information (can be invalid)
      * @param foundByTrackFinder Which track finder has found the hit.
      * @param sortingParameter The sorting parameter of the hit.
      */
     template <class HitType>
-    RecoHitInformation(const HitType* hit, TrackingDetector trackingDetecktor, RightLeftInformation rightLeftInformation,
+    RecoHitInformation(const HitType* hit,
+                       TrackingDetector trackingDetector,
+                       RightLeftInformation rightLeftInformation,
                        OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      m_trackingDetector(trackingDetecktor),
+      m_trackingDetector(trackingDetector),
       m_rightLeftInformation(rightLeftInformation),
       m_sortingParameter(sortingParameter),
       m_foundByTrackFinder(foundByTrackFinder),

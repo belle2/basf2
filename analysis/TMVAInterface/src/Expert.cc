@@ -26,7 +26,7 @@ namespace Belle2 {
 
   namespace TMVAInterface {
 
-    Expert::Expert(ExpertConfig config, bool transformToProbability) : m_config(config),
+    Expert::Expert(const ExpertConfig& config, bool transformToProbability) : m_config(config),
       m_transformToProbability(transformToProbability)
     {
       B2WARNING("TMVAInterface is deprecated and will be removed, please migrate all your code to the new mva package!");

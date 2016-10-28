@@ -13,7 +13,7 @@
 #include <functional>
 #include <utility>
 #include <cmath>
-#include <assert.h>
+#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tuple>
-#include <stddef.h>
+#include <cstddef>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

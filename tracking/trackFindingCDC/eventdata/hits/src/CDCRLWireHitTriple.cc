@@ -10,19 +10,17 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
 
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRLWireHitTriple::CDCRLWireHitTriple(
-  const CDCRLWireHit& startRLWireHit,
-  const CDCRLWireHit& middleRLWireHit,
-  const CDCRLWireHit& endRLWireHit
-):
-  m_startRLWireHit(startRLWireHit),
-  m_rearRLWireHitPair(middleRLWireHit, endRLWireHit)
+CDCRLWireHitTriple::CDCRLWireHitTriple(const CDCRLWireHit& startRLWireHit,
+                                       const CDCRLWireHit& middleRLWireHit,
+                                       const CDCRLWireHit& endRLWireHit,
+                                       int iCluster)
+  : m_startRLWireHit(startRLWireHit)
+  , m_rearRLWireHitPair(middleRLWireHit, endRLWireHit, iCluster)
 {
 }
 
@@ -30,7 +28,8 @@ CDCRLWireHitTriple CDCRLWireHitTriple::reversed() const
 {
   return CDCRLWireHitTriple(getEndRLWireHit().reversed(),
                             getMiddleRLWireHit().reversed(),
-                            getStartRLWireHit().reversed());
+                            getStartRLWireHit().reversed(),
+                            getICluster());
 }
 
 void CDCRLWireHitTriple::reverse()
@@ -41,6 +40,13 @@ void CDCRLWireHitTriple::reverse()
   setEndRLWireHit(newEndRLWireHit);
 }
 
+CDCRLWireHitTriple CDCRLWireHitTriple::getAlias() const
+{
+  return CDCRLWireHitTriple(getStartRLWireHit().getAlias(),
+                            getMiddleRLWireHit().getAlias(),
+                            getEndRLWireHit().getAlias(),
+                            getICluster());
+}
 
 CDCRLWireHitTriple::Shape CDCRLWireHitTriple::getShape() const
 {

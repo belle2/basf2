@@ -14,7 +14,6 @@
 #include <tracking/spacePointCreation/SpacePoint.h>
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetwork.h>
 
-#include <tracking/trackFindingVXD/segmentNetwork/StaticSectorDummy.h>
 #include <tracking/trackFindingVXD/segmentNetwork/StaticSector.h>
 #include <tracking/trackFindingVXD/environment/VXDTFFilters.h> // needed for the correct typedef of the StaticSector
 #include <tracking/trackFindingVXD/segmentNetwork/TrackNode.h>
@@ -40,7 +39,6 @@ namespace Belle2 {
   class DirectedNodeNetworkContainer : public RelationsObject {
   public:
     /** to improve readability of the code, here the definition of the static sector type. */
-//     using StaticSectorType = StaticSectorDummy;
     using StaticSectorType = VXDTFFilters<SpacePoint>::staticSector_t;
   protected:
     /** ************************* DATA MEMBERS ************************* */

@@ -29,6 +29,7 @@ namespace Belle2 {
     virtual void terminate();
 
   private:
+    std::string m_workdir; /**< Name of working directory. */
     std::string m_histoFileName; /**< Name of histogram output file. */
     bool        m_initmain; /**< True if initialize() was called. */
     bool        m_tupleManagerInitialized; /**< True if RbTupleManager was initialized. */

@@ -52,7 +52,7 @@ EKLMTimeCalibrationAlgorithm::EKLMTimeCalibrationAlgorithm() :
   CalibrationAlgorithm("EKLMTimeCalibrationCollector")
 {
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_maxStrip = m_GeoDat->getMaximalStripNumber();
+  m_maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_Debug = false;
 }
 

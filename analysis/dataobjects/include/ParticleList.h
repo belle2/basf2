@@ -12,6 +12,7 @@
 #define PARTICLELIST_H
 
 #include <analysis/dataobjects/Particle.h>
+#include <framework/utilities/ArrayIterator.h>
 
 #include <TObject.h>
 #include <vector>
@@ -89,7 +90,7 @@ namespace Belle2 {
    * To loop over all particles (as well as their anti-particles) do the following
    *
      \code
-     const unsigned int n = m_plist->getListSize();
+     const unsigned int n = pList->getListSize();
      for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i);
 
@@ -101,7 +102,7 @@ namespace Belle2 {
    * If you would like to loop over the particles stored in a particular ParticleList _without_ including the anti-particles as well,
    * do the following (set the boolean parameter in the relevant functions to false)
      \code
-     const unsigned int n = m_plist->getListSize(false);
+     const unsigned int n = pList->getListSize(false);
      for (unsigned i = 0; i < n; i++) {
       const Particle* particle = pList->getParticle(i, false);
 
@@ -110,6 +111,15 @@ namespace Belle2 {
      }
      \endcode
    *
+   * You can also use C++11 range-based for loops to loop over all particles (and anti-particles):
+   *
+     \code
+     for(const Particle& particle : *pList) {
+        // do something with the particle
+     }
+   *
+   * Remember to dereference the StoreObjPtr<ParticleList> before you can use it in the range based for loop.
+   *
    * <h1>Remove Particles from ParticleList</h1>
    *
    * Particles can be removed in the following way (as above, this action will by default be applied to list of
@@ -117,18 +127,22 @@ namespace Belle2 {
    *
      \code
       std::vector<unsigned int> toRemove;
-      const unsigned int n = m_plist->getListSize();
+      const unsigned int n = pList->getListSize();
       for (unsigned i = 0; i < n; i++) {
         const Particle* part = pList->getParticle(i);
         if (...particle should be removed...) toRemove.push_back(part->getArrayIndex());
       }
 
-      plist->removeParticles(toRemove);
+      pList->removeParticles(toRemove);
       \endcode
    */
-
   class ParticleList : public TObject {
   public:
+
+    /** STL-like iterator over the particles (not Particle*). */
+    typedef ArrayIterator<ParticleList, Particle> iterator;
+    /** STL-like const_iterator over the particles (not Particle*). */
+    typedef ArrayIterator<ParticleList, const Particle> const_iterator;
 
     /** Type of Particle (determines in which of the two internal lists the particle is stored). */
     enum EParticleType {
@@ -295,6 +309,22 @@ namespace Belle2 {
      * Prints the list
      */
     void print() const;
+
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
+
+    /** Return iterator to first entry. */
+    iterator begin() { return iterator(this, 0); }
+    /** Return iterator to last entry +1. */
+    iterator end() { return iterator(this, getListSize()); }
+
+    /** Return const_iterator to first entry. */
+    const_iterator begin() const { return const_iterator(this, 0); }
+    /** Return const_iterator to last entry +1. */
+    const_iterator end() const { return const_iterator(this, getListSize()); }
+
+    /** Convenience function to get particle with index. **/
+    Particle* operator[](int index) const {return getParticle(index);}
 
   private:
     /** Returns bound anti-particle list.

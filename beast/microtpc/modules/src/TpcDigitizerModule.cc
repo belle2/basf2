@@ -414,10 +414,10 @@ void TpcDigitizerModule::Pixelization()
             } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
               tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
             } else if (NbOfEl > 800.*m_TOTQ1) {
-              tot = 14;
+              tot = 13;
             }
-            if (tot > 13) {
-              tot = 14;
+            if (tot > 12) {
+              tot = 13;
             }
             if (tot >= 0) {
               ToT.push_back(tot);
@@ -440,10 +440,10 @@ void TpcDigitizerModule::Pixelization()
           } else if (NbOfEl > 45.*m_TOTQ1 && NbOfEl <= 900.*m_TOTQ1) {
             tot = (int)fctToT_Calib2->Eval((double)NbOfEl);
           } else if (NbOfEl > 800.*m_TOTQ1) {
-            tot = 14;
+            tot = 13;
           }
-          if (tot > 13) {
-            tot = 14;
+          if (tot > 12) {
+            tot = 13;
           }
           if (tot >= 0) {
             ToT.push_back(tot);
@@ -473,7 +473,7 @@ void TpcDigitizerModule::Pixelization()
         continue;
       }
       //create MicrotpcHit
-      microtpcHits.appendNew(MicrotpcHit(col[j] + 1, row[j] + 1, bci[j] - t0[0] + 1, ToT[j] + 1,
+      microtpcHits.appendNew(MicrotpcHit(col[j] + 1, row[j] + 1, bci[j] - t0[0] + 1, ToT[j],
                                          m_dchip_detNb_map[std::tuple<int, int>(col[j], row[j])],
                                          m_dchip_pdg_map[std::tuple<int, int>(col[j], row[j])],
                                          m_dchip_trkID_map[std::tuple<int, int>(col[j], row[j])]));

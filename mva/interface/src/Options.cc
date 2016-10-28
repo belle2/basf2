@@ -23,13 +23,14 @@ namespace Belle2 {
       ("datafiles", po::value<std::vector<std::string>>(&m_datafiles)->required()->multitoken(),
        "ROOT files containing the training dataset")
       ("treename", po::value<std::string>(&m_treename), "Name of tree in ROOT datafile")
-      ("weightfile", po::value<std::string>(&m_weightfile)->required(), "Filename of the outputted weightfile")
+      ("identifier", po::value<std::string>(&m_identifier)->required(), "Identifier of the outputted weightfile")
       ("variables", po::value<std::vector<std::string>>(&m_variables)->required()->multitoken(),
        "feature variables used in the training")
       ("target_variable", po::value<std::string>(&m_target_variable),
        "target variable used to distinguish between signal and background, isSignal is used as default.")
       ("signal_class", po::value<int>(&m_signal_class), "integer which identifies signal events")
       ("weight_variable", po::value<std::string>(&m_weight_variable), "weight variable used to weight each event")
+      ("max_events", po::value<unsigned int>(&m_max_events), "maximum number of events to process, 0 means all")
       ("method", po::value<std::string>(&m_method)->required(),
        "MVA Method [FastBDT|NeuroBayes|TMVA|XGBoost|Theano|Tensorflow|FANN|SKLearn]");
       return description;
@@ -38,11 +39,12 @@ namespace Belle2 {
     void GeneralOptions::load(const boost::property_tree::ptree& pt)
     {
       m_method = pt.get<std::string>("method");
-      m_weightfile = pt.get<std::string>("weightfile");
+      m_identifier = pt.get<std::string>("weightfile");
       m_treename = pt.get<std::string>("treename");
       m_target_variable = pt.get<std::string>("target_variable");
       m_weight_variable = pt.get<std::string>("weight_variable");
       m_signal_class = pt.get<int>("signal_class");
+      m_max_events = pt.get<unsigned int>("max_events", 0u);
 
       unsigned int numberOfFiles = pt.get<unsigned int>("number_data_files", 0);
       m_datafiles.resize(numberOfFiles);
@@ -60,11 +62,12 @@ namespace Belle2 {
     void GeneralOptions::save(boost::property_tree::ptree& pt) const
     {
       pt.put("method", m_method);
-      pt.put("weightfile", m_weightfile);
+      pt.put("weightfile", m_identifier);
       pt.put("treename", m_treename);
       pt.put("target_variable", m_target_variable);
       pt.put("weight_variable", m_weight_variable);
       pt.put("signal_class", m_signal_class);
+      pt.put("max_events", m_max_events);
 
       pt.put("number_feature_variables", m_variables.size());
       for (unsigned int i = 0; i < m_variables.size(); ++i) {

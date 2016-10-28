@@ -56,9 +56,10 @@ void InfoWidget::update()
   m_history.clear();
 
   //check if the object given by lastURI exists in the new event, too.
+  //array pages are ok, too
   if (lastURI != "") {
     URI parsedURI(lastURI);
-    if (!parsedURI.object) {
+    if (!parsedURI.object and !lastURI.EndsWith("/")) {
       //doesn't exist, go to main page
       lastURI = "";
     }
@@ -324,8 +325,7 @@ TString InfoWidget::getContents(const TObject* obj)
   return info;
 }
 
-InfoWidget::URI::URI(const TString& uri):
-  object(nullptr), scheme(""), entryName(""), arrayIndex(-1)
+InfoWidget::URI::URI(const TString& uri)
 {
   //split uri into schema:path (no double slash: only path after scheme)
   Ssiz_t protStart = uri.First(":");

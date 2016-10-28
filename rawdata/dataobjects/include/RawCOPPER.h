@@ -23,7 +23,6 @@
 #include <rawdata/dataobjects/RawCOPPERFormat_v1.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_v1.h>
 #include <rawdata/dataobjects/PreRawCOPPERFormat_latest.h>
-#include <framework/datastore/DataStore.h>
 #include <rawdata/RawCOPPERPackerInfo.h>
 
 
@@ -31,8 +30,6 @@
 
 //#define USE_B2LFEE_FORMAT_BOTH_VER1_AND_2
 
-
-using namespace std;
 
 // Divide ECL and KLM to barrel and endcap categories from Itoh-san's suggestion
 // Updated on May 9, 2014
@@ -284,7 +281,7 @@ namespace Belle2 {
     void SetVersion();
 
     //! Get timeval
-    void SetVersion(string class_name);
+    void SetVersion(std::string class_name);
 
     //! Check the version number of data format
     void CheckVersionSetBuffer();
@@ -306,6 +303,9 @@ namespace Belle2 {
                                    int* detector_buf_3rd, int nwords_3rd,
                                    int* detector_buf_4th, int nwords_4th,
                                    RawCOPPERPackerInfo rawcprpacker_info);
+
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
 
     enum {
       POS_FORMAT_VERSION = 1,

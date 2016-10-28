@@ -7,8 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/numerics/numerics.h>
+#pragma once
 
+#include <tracking/trackFindingCDC/numerics/Weight.h>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

@@ -50,6 +50,12 @@ void StoreEntry::recreate()
   ptr = object;
 }
 
+void StoreEntry::invalidate()
+{
+  recreate();
+  ptr = nullptr;
+}
+
 TClonesArray* StoreEntry::getPtrAsArray() const
 {
   if (!isArray)

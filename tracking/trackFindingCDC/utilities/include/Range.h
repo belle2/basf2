@@ -35,6 +35,9 @@ namespace Belle2 {
       using Reference = typename std::iterator_traits<AIterator>::reference;
 
     public:
+      /// Default constructor for ROOT
+      Range() = default;
+
       /// Constructor to adapt a pair as returned by e.g. std::equal_range.
       template<class AOtherIterator>
       explicit Range(const std::pair<AOtherIterator, AOtherIterator>& itPair)

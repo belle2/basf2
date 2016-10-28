@@ -81,30 +81,38 @@ namespace Belle2 {
       /** Fano Factor */
       double m_FanoFactor;
 
+      /** Rate */
+      TH1F* h_pin_rate[10];
+      /** Rate */
+      TH2F* h_pin_rs_rate[10];
       /** histo dose */
-      TH1F* h_dose1[100];
+      TH1F* h_pin_dose1[100];
       /** histo dose */
-      TH1F* h_dose2[100];
+      TH1F* h_pin_dose2[100];
       /** histo dose */
-      TH1F* h_dose1Weight[100];
+      TH1F* h_pin_dose1Weight[100];
       /** histo dose */
-      TH1F* h_dose2Weight[100];
+      TH1F* h_pin_dose2Weight[100];
       /** histo volt */
-      TH1F* h_volt[100];
+      TH1F* h_pin_volt[100];
       /** histo time */
-      TH1F* h_time[100];
+      TH1F* h_pin_time[100];
       /** histo time weighted by volt */
-      TH1F* h_vtime[100];
+      TH1F* h_pin_vtime[100];
       /** histo dose */
-      TH1F* h_idose[100];
+      TH1F* h_pin_idose[100];
       /** histo dose */
-      TH1F* h_idoseWeight[100];
+      TH1F* h_pin_idoseWeight[100];
+      /** histo dose */
+      TH2F* h_pin_rs_idose[100];
+      /** histo dose */
+      TH2F* h_pin_rs_idoseWeight[100];
       /** histo volt */
-      TH1F* h_ivolt[100];
+      TH1F* h_pin_ivolt[100];
       /** histo time */
-      TH1F* h_itime[100];
+      TH1F* h_pin_itime[100];
       /** histo time weighted by volt */
-      TH1F* h_ivtime[100];
+      TH1F* h_pin_ivtime[100];
     };
 
   }

@@ -20,7 +20,6 @@
 
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace PerigeeBinSpec;
@@ -52,7 +51,7 @@ namespace {
 
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<CDCRLWireHit> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -141,7 +140,7 @@ namespace {
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<const CDCRecoSegment2D*> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -215,7 +214,7 @@ namespace {
     leafProcessor.setMaxCurv(maxCurvAcceptance);
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<CDCTrajectory2D, vector<CDCRLWireHit> > > candidates;
+    std::vector< std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -248,7 +247,7 @@ namespace {
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << taggedHits.size());
-      B2DEBUG(100, "Phi0 " << trajectory2D.getGlobalCircle().tangentialPhi());
+      B2DEBUG(100, "Phi0 " << trajectory2D.getGlobalCircle().phi0());
       B2DEBUG(100, "Curv " << trajectory2D.getCurvature());
       B2DEBUG(100, "Tags of the hits");
 
@@ -296,7 +295,7 @@ namespace {
     const double minWeight = 30.0;
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<Phi0CurvBox, vector<CDCRLWireHit> > > candidates;
+    std::vector< std::pair<Phi0CurvBox, std::vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {

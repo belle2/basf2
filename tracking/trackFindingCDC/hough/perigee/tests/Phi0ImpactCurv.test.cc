@@ -17,7 +17,6 @@
 
 #include <vector>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace PerigeeBinSpec;
@@ -53,7 +52,7 @@ namespace {
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<CDCRLWireHit> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<CDCRLWireHit> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -141,7 +140,7 @@ namespace {
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<const CDCRecoSegment2D*> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
@@ -213,7 +212,7 @@ namespace {
     const double minWeight = 30.0;
 
     // Execute the finding a couple of time to find a stable execution time.
-    vector< pair<HoughBox, vector<const CDCRecoSegment2D*> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(1, true, [&]() {

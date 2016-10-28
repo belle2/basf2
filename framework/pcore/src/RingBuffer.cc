@@ -139,7 +139,7 @@ void RingBuffer::openSHM(int size)
 
   // 3. Initialize control parameters
   m_shmsize = size;
-  m_bufinfo = (struct RingBufInfo*) m_shmadr;
+  m_bufinfo = reinterpret_cast<RingBufInfo*>(m_shmadr);
   m_buftop = m_shmadr + sizeof(struct RingBufInfo);
   if (m_new) {
     m_bufinfo->size = m_shmsize - sizeof(struct RingBufInfo);
@@ -180,7 +180,7 @@ void RingBuffer::openSHM(int size)
 
 void RingBuffer::cleanup()
 {
-  shmdt((char*)m_shmadr);
+  shmdt(m_shmadr);
   B2INFO("RingBuffer: Cleaning up IPC");
   if (m_new) {
     shmctl(m_shmid, IPC_RMID, (struct shmid_ds*) 0);

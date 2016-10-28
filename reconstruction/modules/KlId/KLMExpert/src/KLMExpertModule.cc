@@ -32,7 +32,7 @@ using namespace std;
 
 REG_MODULE(KLMExpert);
 
-KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(20, 0)
+KLMExpertModule::KLMExpertModule(): Module(), m_feature_variables(12, 0)
 {
   setDescription("Use to calculate KlId for each KLMCluster.");
   setPropertyFlags(c_ParallelProcessingCertified);
@@ -129,7 +129,7 @@ void KLMExpertModule::event()
     m_KLMnLayer          = cluster.getLayers();
     m_KLMnInnermostLayer = cluster.getInnermostLayer();
     m_KLMtime            = cluster.getTime();
-    m_KLMinvM            = cluster.getMomentum().M2();
+    m_KLMenergy          = cluster.getEnergy();
     m_KLMhitDepth        = cluster.getClusterPosition().Mag2();
 
     // find nearest ecl cluster and calculate distance
@@ -140,12 +140,12 @@ void KLMExpertModule::event()
 
     if (!(closestECLCluster == nullptr)) {
       m_KLMECLE      = closestECLCluster -> getEnergy();
-      m_KLMECLE9oE25 = closestECLCluster -> getE9oE25();
-      m_KLMECLTerror = closestECLCluster -> getErrorTiming();
-      m_KLMECLTiming = closestECLCluster -> getTiming();
-      m_KLMECLEerror = closestECLCluster -> getErrorEnergy();
-      m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();
-      m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
+      m_KLMECLE9oE25 = closestECLCluster -> getE9oE21();
+      m_KLMECLTerror = closestECLCluster -> getDeltaTime99();
+      m_KLMECLTiming = closestECLCluster -> getTime();
+      m_KLMECLEerror = closestECLCluster -> getUncertaintyEnergy();
+      m_KLMECLdeltaL = closestECLCluster->getDeltaL();
+      m_KLMECLminTrackDist = closestECLCluster->getMinTrkDistance();
     } else {
 
       m_KLMECLdeltaL       = -999;
@@ -188,26 +188,32 @@ void KLMExpertModule::event()
     m_KLMTrackClusterSepAngle = trackSep->getTrackClusterSeparationAngle();
 
 
-    m_feature_variables[0] = m_KLMnCluster;
-    m_feature_variables[1] = m_KLMnLayer;
-    m_feature_variables[2] = m_KLMnInnermostLayer;
-    m_feature_variables[3] = m_KLMglobalZ;
-    m_feature_variables[4] = m_KLMtime;
-    m_feature_variables[5] = m_KLMinvM;
-    m_feature_variables[6] = m_KLMtrackDist;
-    m_feature_variables[7] = m_KLMnextCluster;
-    m_feature_variables[8] = m_KLMavInterClusterDist;
-    m_feature_variables[9] = m_KLMTrackSepDist;
-    m_feature_variables[10] = m_KLMTrackSepAngle;
-    m_feature_variables[11] = m_KLMInitialTrackSepAngle;
-    m_feature_variables[12] = m_KLMECLDist;
-    m_feature_variables[13] = m_KLMECLE;
-    m_feature_variables[14] = m_KLMECLE9oE25;
-    m_feature_variables[15] = m_KLMECLTiming;
-    m_feature_variables[16] = m_KLMECLEerror;
-    m_feature_variables[17] = m_KLMtrackToECL;
-    m_feature_variables[18] = m_KLMECLdeltaL;
-    m_feature_variables[19] = m_KLMECLminTrackDist;
+    if (isnan(m_KLMglobalZ))              { m_KLMglobalZ              = -999;}
+    if (isnan(m_KLMnCluster))             { m_KLMnCluster             = -999;}
+    if (isnan(m_KLMnLayer))               { m_KLMnLayer               = -999;}
+    if (isnan(m_KLMnInnermostLayer))      { m_KLMnInnermostLayer      = -999;}
+    if (isnan(m_KLMtime))                 { m_KLMtime                 = -999;}
+    if (isnan(m_KLMenergy))               { m_KLMenergy               = -999;}
+    if (isnan(m_KLMhitDepth))             { m_KLMhitDepth             = -999;}
+    if (isnan(m_KLMTrackSepDist))         { m_KLMTrackSepDist         = -999;}
+    if (isnan(m_KLMTrackSepAngle))        { m_KLMTrackSepAngle        = -999;}
+    if (isnan(m_KLMInitialTrackSepAngle)) { m_KLMInitialTrackSepAngle = -999;}
+    if (isnan(m_KLMTrackRotationAngle))   { m_KLMTrackRotationAngle   = -999;}
+    if (isnan(m_KLMTrackClusterSepAngle)) { m_KLMTrackClusterSepAngle = -999;}
+
+//    reduced vars set
+    m_feature_variables[0] = m_KLMnLayer;
+    m_feature_variables[1] = m_KLMnInnermostLayer;
+    m_feature_variables[2] = m_KLMglobalZ;
+    m_feature_variables[3] = m_KLMtime;
+    m_feature_variables[4] = m_KLMnextCluster;
+    m_feature_variables[5] = m_KLMenergy;
+    m_feature_variables[6] = m_KLMtrackToECL;
+    m_feature_variables[7] = m_KLMECLEerror;
+    m_feature_variables[8] = m_KLMTrackSepDist;
+    m_feature_variables[9] = m_KLMInitialTrackSepAngle;
+    m_feature_variables[10] = m_KLMTrackRotationAngle;
+    m_feature_variables[11] = m_KLMTrackSepAngle;
 
 
     // rewrite dataset

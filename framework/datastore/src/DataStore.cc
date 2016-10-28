@@ -884,5 +884,5 @@ void DataStore::SwitchableDataStoreContents::invalidateData(EDurability durabili
 {
   for (auto& map : m_entries)
     for (auto& mapEntry : map[durability])
-      mapEntry.second.ptr = nullptr;
+      mapEntry.second.invalidate();
 }

@@ -12,11 +12,9 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 TEST(TrackFindingCDCTest, geometry_Vector2D_isBetween)
 {
@@ -45,7 +43,6 @@ TEST(TrackFindingCDCTest, geometry_Vector2D_isBetween)
     EXPECT_TRUE(test2.isBetween(lower, upper));
     EXPECT_FALSE(test2.isBetween(upper, lower));
   }
-
 }
 
 TEST(TrackFindingCDCTest, geometry_Vector2D_flippedOver)
@@ -57,7 +54,6 @@ TEST(TrackFindingCDCTest, geometry_Vector2D_flippedOver)
   EXPECT_EQ(0, flippedOver.x());
   EXPECT_EQ(1, flippedOver.y());
 }
-
 
 TEST(TrackFindingCDCTest, geometry_Vector2D_flippedAlong)
 {

@@ -591,6 +591,32 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr numberOfNonOverlappingParticles(const std::vector<std::string>& arguments)
+    {
+
+      auto func = [arguments](const Particle * particle) -> double {
+
+        unsigned _numberOfNonOverlappingParticles = 0;
+        for (const auto& listName : arguments)
+        {
+          StoreObjPtr<ParticleList> list(listName);
+          if (not list.isValid()) {
+            B2FATAL("Invalid list named " << listName << " encountered in numberOfNonOverlappingParticles.");
+          }
+          for (unsigned int i = 0; i < list->getListSize(); i++) {
+            const Particle* p = list->getParticle(i);
+            if (not particle->overlapsWith(p)) {
+              _numberOfNonOverlappingParticles++;
+            }
+          }
+        }
+        return _numberOfNonOverlappingParticles;
+      };
+
+      return func;
+
+    }
+
 
     Manager::FunctionPtr NBDeltaIfMissing(const std::vector<std::string>& arguments)
     {
@@ -764,6 +790,10 @@ namespace Belle2 {
     REGISTER_VARIABLE("matchedMCHasPDG(PDGCode)", matchedMCHasPDG,
                       "Returns if the absolute value of aPDGCode of a MCParticle related to a Particle matches a given PDGCode."
                       "Returns 0/0.5/1 if PDGCode does not match/is not available/ matches");
+
+    REGISTER_VARIABLE("numberOfNonOverlappingParticles(pList1, pList2, ...)", numberOfNonOverlappingParticles,
+                      "Returns the number of non-overlapping particles in the given particle lists"
+                      "Useful to check if there is additional physics going on in the detector if one reconstructed the Y4S");
 
   }
 }

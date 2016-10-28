@@ -26,12 +26,17 @@
 #include <neurobayes/NeuroBayesExpert.hh>  //NeuroBayes Header
 #endif
 
-#define DEACTIVATE_NEUROBAYES
+//#define DEACTIVATE_NEUROBAYES
 
 #include <memory>
 
 namespace Belle2 {
   namespace MVA {
+
+    /**
+     * Check if NeuroBayes is available
+     */
+    bool IsNeuroBayesAvailable();
 
     /**
      * Options for the NeuroBayes MVA method

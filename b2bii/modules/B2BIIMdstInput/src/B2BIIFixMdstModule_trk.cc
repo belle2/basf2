@@ -3005,28 +3005,39 @@ namespace Belle2 {
       Mdst_trk& trk(tMgr.add());
       trk.quality((*i).quality());
       for (int j = 0; j < 5; j++) trk.mhyp(j, (*i).mhyp(j));
-      Mdst_trk_fit& tf(trk.mhyp(2));
-      if (!(trk.quality() & 15u)) {
-        Mdst_charged& ch(chMgr.add());
-        ch.charge((tf.helix(2) >= 0) ? 1. : -1.);
-        float pivot[3], helix[5], error[15], helix0[5], error0[15];
-        for (int k = 0; k < 3; k++) pivot[k] = tf.pivot(k);
-        for (int k = 0; k < 5; k++) helix[k] = tf.helix(k);
-        for (int k = 0; k < 15; k++) error[k] = tf.error(k);
-        float amass = tf.mass();
 
-        // propagate helix to origin
-        int iret;
+      // Commented out by A. Zupanc: see below
+      // Mdst_trk_fit& tf(trk.mhyp(2));
+      if (!(trk.quality() & 15u)) {
         B2FATAL("recsim_mdst_propgt_ is missing");
-        //recsim_mdst_propgt_(&amass, pivot, helix,  error,
-        //                    helix0, error0, &iret);
-        if (iret == 0) {
-          ch.px(-sin(helix0[1]) / fabs(helix0[2]));
-          ch.py(cos(helix0[1]) / fabs(helix0[2]));
-          ch.pz(helix0[4] / fabs(helix0[2]));
-        }
-        ch.mass(amass);
-        ch.trk(trk);
+
+        /*
+        Commented by A.Zupanc: the recsim_mdst_propgt_ is missing therefore this part of the code
+        can not be executed
+
+              Mdst_charged& ch(chMgr.add());
+              ch.charge((tf.helix(2) >= 0) ? 1. : -1.);
+
+              float pivot[3], helix[5], error[15], helix0[5], error0[15];
+              for (int k = 0; k < 3; k++) pivot[k] = tf.pivot(k);
+              for (int k = 0; k < 5; k++) helix[k] = tf.helix(k);
+              for (int k = 0; k < 15; k++) error[k] = tf.error(k);
+
+              float amass = tf.mass();
+
+              // propagate helix to origin
+              int iret;
+
+              //recsim_mdst_propgt_(&amass, pivot, helix,  error,
+              //                    helix0, error0, &iret);
+              if (iret == 0) {
+                ch.px(-sin(helix0[1]) / fabs(helix0[2]));
+                ch.py(cos(helix0[1]) / fabs(helix0[2]));
+                ch.pz(helix0[4] / fabs(helix0[2]));
+              }
+              ch.mass(amass);
+              ch.trk(trk);
+        */
       } else {
         B2ERROR("Warning from B2BIIFixMdst: strange track in Mdst_trk_extra: quality="
                 << trk.quality());

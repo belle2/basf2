@@ -19,6 +19,7 @@ def variable(variable_string):
     """
     substitutes = {
         '=': r'=\allowbreak ',
+        '_': r'\_\allowbreak ',
         ':': r':\allowbreak ',
         '(': r'(\allowbreak ',
         'extraInfo': r'ex\-tra\-In\-fo',

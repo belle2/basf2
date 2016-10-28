@@ -128,7 +128,7 @@ namespace Belle2 {
                                    bool errorIfExisting = false)
     {
       return DataStore::Instance().registerEntry(DataStore::arrayName<T>(name), durability, T::Class(), true,
-                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : 0);
+                                                 errorIfExisting ? DataStore::c_ErrorIfAlreadyRegistered : DataStore::c_WriteOut);
 
     }
 
@@ -180,7 +180,7 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this StoreArray)
      * @param durability Durability of the relation.
-     * @param storeFlags ORed combination of DataStore::EStoreFlag flags
+     * @param storeFlags ORed combination of DataStore::EStoreFlags
      */
     template <class TO> bool registerRelationTo(const StoreArray<TO>& toArray, DataStore::EDurability durability = DataStore::c_Event,
                                                 DataStore::EStoreFlags storeFlags = DataStore::c_WriteOut) const
@@ -223,14 +223,14 @@ namespace Belle2 {
      */
     void clear() override
     {
-      if (isValid())
+      if (getEntries() != 0) {
         (*m_storeArray)->Delete();
-
-      _StoreArrayImpl::clearRelations(*this);
+        _StoreArrayImpl::clearRelations(*this);
+      }
     }
 
     /** Get the number of objects in the array. */
-    inline int getEntries() const { return isValid() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
+    inline int getEntries() const { return isCreated() ? ((*m_storeArray)->GetEntriesFast()) : 0;}
 
     /** Access to the stored objects.
      *
@@ -295,23 +295,25 @@ namespace Belle2 {
     }
 
 
-    /** Check wether the array object was created.
+    /** Check wether the array was registered.
      *
-     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
-     *           Please use getEntries() for checking whether an array is empty or not.
-     *  @return          True if the array was created internally..
+     *  @note Iterating over the array or calling getEntries() is safe even
+     *        if this returns false. (getEntries() will return 0)
+     *
+     *  @return          True if the array was registered.
      **/
     inline bool isValid() const
     {
       ensureAttached();
-      return m_storeArray && *m_storeArray;
+      return m_storeArray;
     }
 
-    /** Check wether the array object was created.
+    /** Check wether the array was registered.
      *
-     *  @warning This relies on implementation details and should not be used by users (in contrast to StoreObjPtr).
-     *           Please use getEntries() for checking whether an array is empty or not.
-     *  @return          True if the array was created internally..
+     *  @note Iterating over the array or calling getEntries() is safe even
+     *        if this returns false. (getEntries() will return 0)
+     *
+     *  @return          True if the array was registered.
      **/
     inline operator bool() const { return isValid(); }
 
@@ -340,6 +342,9 @@ namespace Belle2 {
     const_iterator end() const { ensureAttached(); return const_iterator(m_storeArray, true); }
 
   private:
+    /** Creating StoreArrays is unnecessary, only used internally. */
+    bool create(bool replace = false) { return StoreAccessorBase::create(replace); }
+
     /** Returns address of the next free position of the array.
      *
      *  \return pointer to address just past the last array element
@@ -363,9 +368,17 @@ namespace Belle2 {
      */
     inline void ensureCreated() const
     {
-      if (!isValid()) {
-        const_cast<StoreArray*>(this)->create();
+      if (!isCreated()) {
+        if (!const_cast<StoreArray*>(this)->create())
+          throw std::runtime_error("Write access to " + readableName() + " failed, did you remember to call registerInDataStore()?");
       }
+    }
+
+    /** Check wether the array object was created.  **/
+    inline bool isCreated() const
+    {
+      ensureAttached();
+      return m_storeArray && *m_storeArray;
     }
 
     /** Pointer that actually holds the TClonesArray. */

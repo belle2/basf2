@@ -33,6 +33,7 @@ HistoManagerModule::HistoManagerModule() : Module(), m_initmain(false), m_tupleM
 
   // Parameters
   addParam("histoFileName", m_histoFileName, "Name of histogram output file.", string("histofile.root"));
+  addParam("workDirName", m_workdir, "Name of working directory.", string("."));
 
 }
 
@@ -47,7 +48,7 @@ HistoManagerModule::~HistoManagerModule()
 
 void HistoManagerModule::initialize()
 {
-  RbTupleManager::Instance().init(Environment::Instance().getNumberProcesses(), m_histoFileName.c_str());
+  RbTupleManager::Instance().init(Environment::Instance().getNumberProcesses(), m_histoFileName.c_str(), m_workdir.c_str());
 
   m_initmain = true;
   //  cout << "HistoManager::initialization done" << endl;

@@ -24,9 +24,9 @@ namespace Belle2 {
     GeoConfiguration() = default;
     /** Construct new geometry configuration
      * @param name name of the detector
-     * @param width width of the global volume
-     * @param height height of the global volume
-     * @param length length of the global volume
+     * @param width half width of the global volume
+     * @param height half height of the global volume
+     * @param length half length of the global volume
      * @param material material of the global volume
      */
     GeoConfiguration(const std::string& name, double width, double height, double length, const std::string& material): TObject(),
@@ -37,11 +37,14 @@ namespace Belle2 {
     void addComponent(const GeoComponent& component) { m_components.emplace_back(component); }
     /** get the name of the detector */
     const std::string& getName() const { return m_name; }
-    /** get the width of the global volume */
+    /** get the half width of the global volume, that is length in + and - x direction.
+     * Will be determined automatically to fit all volumes if set to non-positive value. */
     double getGlobalWidth() const { return m_globalWidth; }
-    /** get the height of the global volume */
+    /** get the half height of the global volume, that is length in + and - y direction.
+     * Will be determined automatically to fit all volumes if set to non-positive value. */
     double getGlobalHeight() const { return m_globalHeight; }
-    /** get the length of the global volume */
+    /** get the half length of the global volume, that is length in + and - z direction.
+     * Will be determined automatically to fit all volumes if set to non-positive value. */
     double getGlobalLength() const { return m_globalLength; }
     /** get the material of the global volume */
     const std::string& getGlobalMaterial() const { return m_globalMaterial; }
@@ -56,11 +59,11 @@ namespace Belle2 {
     std::vector<GeoComponent> m_components;
     /** name of the detector configuration */
     std::string m_name;
-    /** width of the global volume */
+    /** half width of the global volume */
     double m_globalWidth{0};
-    /** height of the global volume */
+    /** half height of the global volume */
     double m_globalHeight{0};
-    /** length of the global volume */
+    /** half length of the global volume */
     double m_globalLength{0};
     /** material of the global volume */
     std::string m_globalMaterial;

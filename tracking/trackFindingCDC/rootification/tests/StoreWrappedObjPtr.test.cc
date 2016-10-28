@@ -26,7 +26,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-using namespace std;
 
 TEST(TrackFindingCDCTest, cpp_storeWrapper)
 {
@@ -63,7 +62,7 @@ TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStor
   //Event processing phase
   // First module
   storeObj.create();
-  const string& objectName = storeObj.getName();
+  const std::string& objectName = storeObj.getName();
 
   // Second module - a python module
   //Setting up the Python interpreter
@@ -74,8 +73,8 @@ TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStor
   ASSERT_NE(-1, PyRun_SimpleString("from ROOT import Belle2"));
 
   // Make the object name available in the Python interpreter
-  string pyCmd_transferName_prototype = "objectName = 'X'";
-  string pyCmd_transferName =  pyCmd_transferName_prototype.replace(pyCmd_transferName_prototype.find("X"), 1, objectName);
+  std::string pyCmd_transferName_prototype = "objectName = 'X'";
+  std::string pyCmd_transferName =  pyCmd_transferName_prototype.replace(pyCmd_transferName_prototype.find("X"), 1, objectName);
   ASSERT_NE(-1, PyRun_SimpleString(pyCmd_transferName.c_str()));
 
   // Fetch the object from the DataStore and use it

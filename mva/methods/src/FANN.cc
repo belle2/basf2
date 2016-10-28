@@ -246,7 +246,6 @@ namespace Belle2 {
           // keep weights for lowest validation error
           if (valid_mse < bestValid) {
             bestValid = valid_mse;
-            iRunANN = nullptr;
             iRunANN = fann_copy(ann);
           }
           // break when validation error increases
@@ -278,7 +277,6 @@ namespace Belle2 {
 
         if (RMS < bestRMS) {
           bestRMS = RMS;
-          bestANN = nullptr;
           bestANN = fann_copy(iRunANN);
           fann_destroy(iRunANN);
           bestTrainLog.assign(trainLog.begin(), trainLog.begin() + breakEpoch);

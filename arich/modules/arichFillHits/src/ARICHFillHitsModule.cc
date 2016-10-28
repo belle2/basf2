@@ -11,13 +11,11 @@
 // Own include
 #include <arich/modules/arichFillHits/ARICHFillHitsModule.h>
 
-
-
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/StoreObjPtr.h>
-
+#include <framework/dataobjects/EventMetaData.h>
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/gearbox/Const.h>
@@ -26,7 +24,6 @@
 // Dataobject classes
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHHit.h>
-
 
 using namespace std;
 
@@ -42,8 +39,7 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ARICHFillHitsModule::ARICHFillHitsModule() : Module(),
-    m_arichgp(ARICHGeometryPar::Instance())
+  ARICHFillHitsModule::ARICHFillHitsModule() : Module()
   {
     // set module description (e.g. insert text)
     setDescription("Fills ARICHHits collection from ARICHDigits");
@@ -64,12 +60,6 @@ namespace Belle2 {
     StoreArray<ARICHHit> arichHits;
     arichHits.registerInDataStore();
 
-    if (!m_arichgp->isInit()) {
-      GearDir content("/Detector/DetectorComponent[@name='ARICH']/Content");
-      m_arichgp->Initialize(content);
-    }
-    if (!m_arichgp->isInit()) B2ERROR("Component ARICH not found in Gearbox");
-
   }
 
   void ARICHFillHitsModule::beginRun()
@@ -78,17 +68,22 @@ namespace Belle2 {
 
   void ARICHFillHitsModule::event()
   {
+    StoreObjPtr<EventMetaData> evtMetaData;
 
     StoreArray<ARICHDigit> digits;
     StoreArray<ARICHHit> arichHits;
 
     for (const auto& digit : digits) {
-      int chID = digit.getChannelID();
+      int asicCh = digit.getChannelID();
       int modID = digit.getModuleID();
-      TVector3 hitpos = m_arichgp->getChannelCenterGlob(modID, chID);
-      arichHits.appendNew(hitpos, modID, chID);
-    }
+      int xCh, yCh;
+      m_chnMap->getXYFromAsic(asicCh, xCh, yCh);
 
+      TVector2 hitpos = m_geoPar->getChannelPosition(modID, xCh, yCh);
+
+      arichHits.appendNew(m_geoPar->getMasterVolume().pointToGlobal(TVector3(hitpos.X(), hitpos.Y(),
+                          m_geoPar->getDetectorZPosition() + m_geoPar->getHAPDGeometry().getWinThickness())), modID, asicCh);
+    }
   }
 
 

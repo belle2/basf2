@@ -15,7 +15,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/datastore/RelationArray.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -29,18 +28,6 @@ namespace {
     }
   }
 }
-
-CDCMCMap::CDCMCMap()
-{
-}
-
-
-
-CDCMCMap::~CDCMCMap()
-{
-}
-
-
 
 void CDCMCMap::clear()
 {
@@ -88,6 +75,11 @@ void CDCMCMap::fillSimHitByHitMap()
 {
   StoreArray<CDCSimHit> simHits;
   StoreArray<CDCHit> hits;
+  RelationArray simHitsToHitsRelations(simHits, hits);
+  if (not simHitsToHitsRelations.isValid()) {
+    B2WARNING("Relation from CDCSimHits to CDCHits not present");
+    return;
+  }
 
   // Pickup an iterator for hinted insertion
   CDCSimHitByCDCHitMap::iterator itInsertHint = m_simHitByHit.end();
@@ -135,6 +127,10 @@ void CDCMCMap::fillMCParticleByHitMap()
   StoreArray<CDCHit> hits;
 
   RelationArray mcParticleToHitsRelations(mcParticles, hits);
+  if (not mcParticleToHitsRelations.isValid()) {
+    B2WARNING("Relation from MCParticles to CDCHits not present");
+    return;
+  }
 
   //Pickup an iterator for hinted insertion
   MCParticleByCDCHitMap::iterator itInsertHint = m_mcParticlesByHit.end();
@@ -188,6 +184,10 @@ void CDCMCMap::fillMCParticleBySimHitMap()
   StoreArray<CDCSimHit> simHits;
 
   RelationArray mcParticleToSimHitsRelations(mcParticles, simHits);
+  if (not mcParticleToSimHitsRelations.isValid()) {
+    B2WARNING("Relation from MCParticles to CDCSimHits not present");
+    return;
+  }
 
   //Pickup an iterator for hinted insertion
   MCParticleByCDCSimHitMap::iterator itInsertHint = m_mcParticlesBySimHit.end();

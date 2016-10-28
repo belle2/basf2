@@ -36,7 +36,6 @@
 #include <cmath>
 #include <exception>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -463,15 +462,15 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
     trajectoryExit = trajectory2D.getInnerExit();
   }
 
-  if (trajectory2D.getLocalCircle().isCircle()) {
+  if (trajectory2D.getLocalCircle()->isCircle()) {
 
-    const float radius = trajectory2D.getLocalCircle().absRadius();
+    const float radius = trajectory2D.getLocalCircle()->absRadius();
 
     if (trajectoryExit.hasNAN()) {
       // No exit point out of the cdc could be detected.
       // Draw full circle
       const Vector2D center = trajectory2D.getGlobalCircle().center();
-      const float radius = trajectory2D.getLocalCircle().absRadius();
+      const float radius = trajectory2D.getLocalCircle()->absRadius();
       const float& centerX = center.x();
       const float& centerY = center.y();
 
@@ -707,8 +706,8 @@ void EventDataPlotter::drawTrajectory(const RecoTrack& recoTrack, const Attribut
       float px = mom.X();
       float py = mom.Y();
 
-      points.push_back({x, y});
-      tangents.push_back({px, py});
+      points.push_back({{x, y}});
+      tangents.push_back({{px, py}});
     }
     primitivePlotter.drawCurve(points, tangents, attributeMap);
   }

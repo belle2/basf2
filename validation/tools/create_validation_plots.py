@@ -12,10 +12,6 @@ from validationplots import create_plots
 if os.environ.get('BELLE2_RELEASE', None) is None:
     sys.exit('Error: No basf2 release set up!')
 
-# Make sure the output of validate_basf2.py is there
-if not os.path.isdir('html/results'):
-    sys.exit('Error: No html/results dir found! Run validate_bash2.py first.')
-
 # Define the accepted command line flags and read them in
 parser = argparse.ArgumentParser()
 parser.add_argument("-r", "--revisions", help="Takes a list of revisions ("
@@ -29,9 +25,9 @@ parser.add_argument("-f", "--force", help="Regenerates plots even if the "
 args = parser.parse_args()
 
 # Go to the html directory and call the create_plots function
-save_dir = os.getcwd()
+save_dir = os.path.abspath(os.getcwd())
 os.chdir('html')
-create_plots(args.revisions, args.force)
+create_plots(revisions=args.revisions, force=args.force, work_folder=save_dir)
 
 # restore original working directory
 os.chdir(save_dir)

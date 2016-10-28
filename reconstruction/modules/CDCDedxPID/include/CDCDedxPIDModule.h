@@ -107,7 +107,7 @@ namespace Belle2 {
      * @param dedx  dE/dx value
      * @param pdf   pointer to array of 2d PDFs to use (not modified)
      * */
-    void saveLogLikelihood(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
+    void saveLookupLogl(double(&logl)[Const::ChargedStable::c_SetSize], double p, double dedx, TH2F* const* pdf) const;
 
     // parameters to determine the predicted means and resolutions
     double m_curvepars[15];  /**< dE/dx curve parameters */

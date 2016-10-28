@@ -26,26 +26,29 @@ namespace Belle2 {
   {
     setDescription("Adds the Monte Carlo decay string to a Particle. "
                    "This is done in the form of a hash, which is currently just an int. "
-                   "The hash can later on be used to get the actual decay string using the DecayHashMap, or using the 'MCDecayString' ntuple tool.");
+                   "The hash can later on be used to get the actual decay string using the DecayHashMap, or using the 'MCDecayString' ntuple tool."
+                   "IMPORTANT: We have to convert the int to a float, this does is done BITWISE. So you also must convert the float in your ntuple back to an integer BITWISE!");
     setPropertyFlags(c_ParallelProcessingCertified);
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
-    addParam("motherPDGs", m_motherPDGs, "PDG codes of potential mother particles (absolute values)", std::vector<int>({511, 521, 531}));
     addParam("removeFSR", m_removeFSR, "If true, final state radiation (FSR) photons are removed from the decay string.", true);
+    addParam("printHashes", m_printHashes, "If true, each new hash will be printed on stdout", false);
   }
 
   void ParticleMCDecayStringModule::initialize()
   {
     StoreObjPtr<ParticleList>::required(m_listName);
 
-    StoreObjPtr<DecayHashMap> dMap;
-    dMap.registerInDataStore();
+    StoreObjPtr<DecayHashMap> dMap("", DataStore::c_Persistent);
+    if (not dMap.isValid()) {
+      dMap.registerInDataStore();
+      dMap.create();
+    }
+
   }
 
   void ParticleMCDecayStringModule::event()
   {
-    StoreObjPtr<DecayHashMap> dMap;
-    if (not dMap.isValid())
-      dMap.create();
+    StoreObjPtr<DecayHashMap> dMap("", DataStore::c_Persistent);
 
     StoreObjPtr<ParticleList> pList(m_listName);
 
@@ -54,26 +57,27 @@ namespace Belle2 {
 
       const std::string decayString = getDecayString(*particle);
 
-      const int decayHash = dMap->addDecayHash(decayString);
+      // Convert unsigned int decay hash into a float keeping the same bit pattern
+      assert(sizeof(float) == sizeof(unsigned int));
+      union convert {
+        unsigned int i;
+        float f;
+      };
 
-      particle->addExtraInfo(c_ExtraInfoName, decayHash);
+      convert hash;
+      hash.i = dMap->addDecayHash(decayString, m_printHashes);
+      particle->addExtraInfo(c_ExtraInfoName, hash.f);
     }
   }
 
 
-  const MCParticle* ParticleMCDecayStringModule::getMother(const MCParticle& mcP)
+  const MCParticle* ParticleMCDecayStringModule::getInitialParticle(const MCParticle* mcP)
   {
-    const int pdg = mcP.getPDG();
-
-    if (std::find(m_motherPDGs.begin(), m_motherPDGs.end(), abs(pdg)) != m_motherPDGs.end()) {
-      return &mcP;
+    const MCParticle* mcPMother = mcP->getMother();
+    if (mcPMother == nullptr) {
+      return mcP;
     } else {
-      const MCParticle* mcPMother = mcP.getMother();
-      if (mcPMother == nullptr) {
-        return nullptr;
-      } else {
-        return getMother(*mcPMother);
-      }
+      return getInitialParticle(mcPMother);
     }
   }
 
@@ -89,7 +93,6 @@ namespace Belle2 {
       case 14:    //nu_mu
       case 16:    //nu_tau
       case 22:    //gamma
-      case 111:   //pi^0
       case 310:   //K_S
       case 130:   //K_L
       case 2112:  //n
@@ -100,47 +103,88 @@ namespace Belle2 {
     }
   }
 
-
-  std::string ParticleMCDecayStringModule::buildDecayString(const MCParticle& mcPMother, const MCParticle& mcPMatched)
+  std::string ParticleMCDecayStringModule::getDecayString(const Particle& p)
   {
-    if (m_removeFSR and mcPMother.getPDG() == 22 and MCMatching::isFSR(&mcPMother))
+
+    std::string output;
+    output += getDecayStringFromParticle(&p) + " | ";
+    output += getMCDecayStringFromParticle(&p);
+    return output;
+
+  }
+
+  std::string ParticleMCDecayStringModule::getDecayStringFromParticle(const Particle* p)
+  {
+
+    std::string output = " ";
+
+    output += std::to_string(p->getPDGCode());
+
+    if (not isFSP(p->getPDGCode())) {
+      output += " (-->";
+      for (auto daughter : p->getDaughters()) {
+        output += getDecayStringFromParticle(daughter);
+      }
+      output += ")";
+    }
+
+    return output;
+
+  }
+
+  std::string ParticleMCDecayStringModule::getMCDecayStringFromParticle(const Particle* p)
+  {
+
+    std::string output;
+
+    output = getMCDecayStringFromMCParticle(p->getRelatedTo<MCParticle>());
+    for (auto& daughter : p->getDaughters()) {
+      output += " | " + getMCDecayStringFromParticle(daughter);
+    }
+
+    return output;
+
+  }
+
+  std::string ParticleMCDecayStringModule::getMCDecayStringFromMCParticle(const MCParticle* mcPMatched)
+  {
+
+    if (mcPMatched == nullptr)
+      return "(No match)";
+
+    // TODO Performance can be optimized, this mcPMother does not change during the construction
+    const MCParticle* mcPMother = getInitialParticle(mcPMatched);
+
+    std::string decayString = buildMCDecayString(mcPMother, mcPMatched);
+
+    if (mcPMatched->getPDG() == 10022)
+      return decayString + " (Virtual gamma match)";
+    return decayString;
+  }
+
+
+  std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched)
+  {
+    if (m_removeFSR and mcPMother->getPDG() == 22 and MCMatching::isFSR(mcPMother))
       return "";
 
     std::stringstream ss;
     ss << " ";
-    if (mcPMother.getArrayIndex() == mcPMatched.getArrayIndex()) {
+    if (mcPMother->getArrayIndex() == mcPMatched->getArrayIndex()) {
       ss << "^";
     }
 
-    if (isFSP(mcPMother.getPDG())) {
-      ss << mcPMother.getPDG();
-    } else {
-      ss << mcPMother.getPDG() << " (-->";
-      for (auto daughter : mcPMother.getDaughters()) {
-        ss << buildDecayString(*daughter, mcPMatched);
+    ss << mcPMother->getPDG();
+
+    if (not isFSP(mcPMother->getPDG())) {
+      ss << " (-->";
+      for (auto daughter : mcPMother->getDaughters()) {
+        ss << buildMCDecayString(daughter, mcPMatched);
       }
       ss << ")";
     }
 
     return ss.str();
-  }
-
-  std::string ParticleMCDecayStringModule::getDecayString(const Particle& p)
-  {
-    const MCParticle* mcPMatched = p.getRelatedTo<MCParticle>();
-    if (mcPMatched == nullptr)
-      return ("No MC match");
-    else if (mcPMatched->getPDG() == 300553)
-      return ("Y(4S) match");
-    else if (mcPMatched->getPDG() == 10022)
-      return ("Virtual gamma match");
-
-    const MCParticle* mcPMother = getMother(*mcPMatched);
-
-    if (mcPMother == nullptr)
-      return ("No mother found");
-
-    return buildDecayString(*mcPMother, *mcPMatched);
   }
 
 } // Belle2 namespace

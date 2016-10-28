@@ -853,9 +853,9 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.xml' "
-                                                "--identifier 'FEITEST_trainingData'", shell=True)
+                                                "--identifier 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --identifier 'trainingData.xml' "
+                                                "--db_identifier 'FEITEST_trainingData'", shell=True)
         os.remove('trainingData.xml')
 
         path = basf2.create_path()
@@ -938,9 +938,9 @@ class TestTrainMultivariateClassifier(unittest.TestCase):
         subprocess.call.assert_called_once_with("basf2_mva_teacher --method 'FastBDT' --target_variable 'isSignal' "
                                                 "--treename variables "
                                                 "--datafile 'trainingData.root' --signal_class 1 --variables 'p' 'pt' "
-                                                "--weightfile 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
-                                                " && basf2_mva_upload --filename 'trainingData.xml' "
-                                                "--identifier 'FEITEST_trainingData'", shell=True)
+                                                "--identifier 'trainingData.xml' ConfigString > 'trainingData'.log 2>&1"
+                                                " && basf2_mva_upload --identifier 'trainingData.xml' "
+                                                "--db_identifier 'FEITEST_trainingData'", shell=True)
 
         path = basf2.create_path()
         self.assertEqual(resource.path, path)
@@ -1094,7 +1094,7 @@ class TestTagUniqueSignal(unittest.TestCase):
 class TestSaveModuleStatistics(unittest.TestCase):
 
     def test_SaveModuleStatistics(self):
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42')
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42', env={'monitor': False})
         self.assertEqual(fei.provider.SaveModuleStatistics(resource), None)
 
         path = basf2.create_path()
@@ -1108,7 +1108,7 @@ class TestSaveModuleStatistics(unittest.TestCase):
     def test_FileAlreadyAvailable(self):
         # Deactivated
         return
-        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42')
+        resource = unittest.mock.NonCallableMock(spec=fei.dag.Resource, path=basf2.create_path(), hash='42', env={'monitor': False})
         with temporary_file('moduleStatistics_42.root'):
             self.assertEqual(fei.provider.SaveModuleStatistics(resource), 'moduleStatistics_42.root')
 

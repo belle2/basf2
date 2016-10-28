@@ -50,8 +50,7 @@ void ModuleManager::addModuleSearchPath(const string& path)
     m_moduleSearchPathList.push_back(path);
 
     //Search the path for map files and add the contained module names to the known module names
-    boost::filesystem::path fullPath(boost::filesystem::initial_path<boost::filesystem::path>());
-    fullPath = boost::filesystem::system_complete(boost::filesystem::path(path));
+    auto fullPath = boost::filesystem::system_complete(boost::filesystem::path(path));
     boost::filesystem::directory_iterator endIter;
 
 
@@ -70,9 +69,6 @@ void ModuleManager::addModuleSearchPath(const string& path)
         m_moduleNameLibMap[entry.first] = entry.second;
       }
     }
-
-  } else {
-    B2WARNING("Could not add module search filepath! Directory does not exist: " + path);
   }
 }
 

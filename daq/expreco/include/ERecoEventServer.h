@@ -14,7 +14,6 @@
 #include <daq/dataflow/EvtSocket.h>
 #include <daq/dataflow/EvtSocketManager.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 
 #define MAXBUFSIZE 80000000

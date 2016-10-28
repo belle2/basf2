@@ -145,6 +145,10 @@ void WaveTimingFastModule::event()
       StoreObjPtr<TopConfigurations> topconfig_ptr("", DataStore::c_Persistent);
       if (topconfig_ptr) {
         boardstack = (int)topconfig_ptr->scrod_to_electronicsModuleNumber(scrod);
+        if (scrod == 102 || scrod == 78 || scrod == 94 || scrod == 103) boardstack = 3;
+        if (scrod == 44 || scrod == 52 || scrod == 82 || scrod == 41) boardstack = 2;
+        if (scrod == 23 || scrod == 47 || scrod == 80 || scrod == 88) boardstack = 1;
+        if (scrod == 35 || scrod == 40 || scrod == 79 || scrod == 74) boardstack = 0;
         TopPixel p = topconfig_ptr->hardwareID_to_pixel(hardwareID);
         pixelID = topconfig_ptr->electronics_to_pixel(boardstack, row, asic, asicch);
         pmtID = topconfig_ptr->pixel_to_PMTNumber(p);

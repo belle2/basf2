@@ -1,9 +1,8 @@
 Import('env')
 
-env['LIBS'] = ['eklm', 'framework', 'eklm_dataobjects', 'eklm_dbobjects',
+env['LIBS'] = ['eklm', 'framework', 'eklm_dataobjects',
                'calibration', 'calibration_dataobjects', 'tracking_dataobjects',
-               'simulation_dataobjects', 'mdst_dataobjects',
-               'alignment_dataobjects', 'genfit2', '$ROOT_LIBS']
+               'mdst_dataobjects', '$ROOT_LIBS']
 
 Return('env')
 

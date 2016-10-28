@@ -9,6 +9,7 @@
  **************************************************************************/
 
 #include <top/geometry/ChannelMapper.h>
+#include <framework/database/DBImportArray.h>
 #include <unordered_set>
 #include <framework/logging/LogSystem.h>
 #include <iostream>
@@ -20,15 +21,12 @@ namespace Belle2 {
 
     ChannelMapper::ChannelMapper()
     {
-
       for (auto& channels : m_channels) {
         for (auto& channel : channels) channel = 0;
       }
-
       for (auto& pixels : m_pixels) {
         for (auto& pixel : pixels) pixel = 0;
       }
-
       if (c_numRows * c_numColumns != c_numAsics * c_numChannels)
         B2FATAL("TOP::ChannelMapper: bug in coding (enum) - "
                 "number of channels and number of pixels disagree");
@@ -37,10 +35,13 @@ namespace Belle2 {
 
     ChannelMapper::~ChannelMapper()
     {
+      if (m_mappingDB) delete m_mappingDB;
     }
 
     void ChannelMapper::initialize(const GearDir& channelMapping)
     {
+
+      clear();
 
       string path = channelMapping.getPath();
       auto i1 = path.rfind("type='") + 6;
@@ -66,7 +67,7 @@ namespace Belle2 {
         m_mapping.push_back(TOPChannelMap(row, col, asic, chan));
       }
       if (m_mapping.empty()) {
-        B2WARNING("TOP::ChannelMapper: mapping is not available in Gearbox");
+        B2ERROR("TOP::ChannelMapper: mapping is not available in Gearbox");
         return;
       }
 
@@ -128,7 +129,7 @@ namespace Belle2 {
         m_channels[map.getRow()][map.getColumn()] = &map;
         m_pixels[map.getASICNumber()][map.getASICChannel()] = &map;
       }
-      m_available = true;
+      m_valid = true;
 
       B2INFO("TOP::ChannelMapper: " << m_mapping.size() <<
              " channels of carrier board of type '" << m_typeName
@@ -140,6 +141,39 @@ namespace Belle2 {
         print();
       }
 
+    }
+
+
+    void ChannelMapper::initialize()
+    {
+      m_type = c_default;
+
+      if (m_mappingDB) delete m_mappingDB;
+      m_mappingDB = new DBArray<TOPChannelMap>();
+
+      if (!m_mappingDB->isValid()) {
+        clear();
+        return;
+      }
+      update();
+
+      m_mappingDB->addCallback(this, &ChannelMapper::update);
+
+      const auto& logSystem = LogSystem::Instance();
+      if (logSystem.isLevelEnabled(LogConfig::c_Debug, 100, "top")) {
+        print();
+      }
+
+    }
+
+
+    void ChannelMapper::import(const IntervalOfValidity& iov) const
+    {
+      DBImportArray<TOPChannelMap> array;
+      for (const auto& map : m_mapping) {
+        array.appendNew(map);
+      }
+      array.import(iov);
     }
 
 
@@ -257,6 +291,35 @@ namespace Belle2 {
         if (channel != getChannel(getPixelID(channel)))
           B2ERROR("TOP::ChannelMapper: bug, getChannel is not inverse of getPixelID");
     }
+
+
+    void ChannelMapper::clear()
+    {
+      m_mapping.clear();
+      for (auto& channels : m_channels) {
+        for (auto& channel : channels) channel = 0;
+      }
+      for (auto& pixels : m_pixels) {
+        for (auto& pixel : pixels) pixel = 0;
+      }
+      m_valid = false;
+      m_fromDB = false;
+    }
+
+
+    void ChannelMapper::update()
+    {
+      clear();
+      if (!m_mappingDB->isValid()) return;
+
+      for (const auto& map : *m_mappingDB) {
+        m_channels[map.getRow()][map.getColumn()] = &map;
+        m_pixels[map.getASICNumber()][map.getASICChannel()] = &map;
+      }
+      m_valid = true;
+      m_fromDB = true;
+    }
+
 
 
   } // TOP namespace

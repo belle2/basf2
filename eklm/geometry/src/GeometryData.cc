@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <string>
+
 /* External headers. */
 #include <CLHEP/Geometry/Point3D.h>
 #include <CLHEP/Units/PhysicalConstants.h>
@@ -93,6 +96,7 @@ static void readShieldDetailGeometry(
   EKLMGeometry::ShieldDetailGeometry* sdg, GearDir* gd)
 {
   int i, n;
+  std::string name;
   EKLMGeometry::Point p;
   sdg->setLengthX(gd->getLength("LengthX") * CLHEP::cm);
   sdg->setLengthY(gd->getLength("LengthY") * CLHEP::cm);
@@ -100,7 +104,8 @@ static void readShieldDetailGeometry(
   sdg->setNPoints(n);
   for (i = 0; i < n; i++) {
     GearDir point(*gd);
-    point.append((boost::format("/Point[%1%]") % (i + 1)).str());
+    name = "/Point[" + std::to_string(i + 1) + "]";
+    point.append(name.c_str());
     p.setX(point.getLength("X") * CLHEP::cm);
     p.setY(point.getLength("Y") * CLHEP::cm);
     sdg->setPoint(i, p);
@@ -251,6 +256,7 @@ void EKLM::GeometryData::fillStripIndexArrays()
 void EKLM::GeometryData::readXMLDataStrips()
 {
   int i;
+  std::string name;
   GearDir Strips("/Detector/DetectorComponent[@name=\"EKLM\"]/Content/Strip");
   m_StripGeometry.setWidth(Strips.getLength("Width") * CLHEP::cm);
   m_StripGeometry.setThickness(Strips.getLength("Thickness") * CLHEP::cm);
@@ -266,7 +272,8 @@ void EKLM::GeometryData::readXMLDataStrips()
   }
   for (i = 0; i < m_NStrips; i++) {
     GearDir StripContent(Strips);
-    StripContent.append((boost::format("/Strip[%1%]") % (i + 1)).str());
+    name = "/Strip[" + std::to_string(i + 1) + "]";
+    StripContent.append(name.c_str());
     m_StripPosition[i].setLength(StripContent.getLength("Length") * CLHEP::cm);
     m_StripPosition[i].setX(StripContent.getLength("X") * CLHEP::cm);
     m_StripPosition[i].setY(StripContent.getLength("Y") * CLHEP::cm);
@@ -289,7 +296,8 @@ static void getDetailDxDy(HepGeom::Point3D<double>* points, int nPoints,
                           double& dx, double& dy)
 {
   int i;
-  double a, b, c, d, t, maxt, x1, y1, x2, y2, u;
+  /* Variable maxt is initialized to avoid a false-positive warning. */
+  double a, b, c, d, t, maxt = 0, x1, y1, x2, y2, u;
   bool intersection;
   /*
    * Contact by one of the detail points.
@@ -465,6 +473,7 @@ void EKLM::GeometryData::readEndcapStructureGeometry(const GearDir& gd)
 void EKLM::GeometryData::initializeFromGearbox()
 {
   int i, j, k, mode;
+  std::string name;
   ShieldDetailGeometry shieldDetailGeometry;
   GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
   mode = gd.getInt("Mode");
@@ -545,10 +554,10 @@ void EKLM::GeometryData::initializeFromGearbox()
     for (i = 0; i <= m_NSegments; i++) {
       k = j * (m_NSegments + 1) + i;
       GearDir segmentSupport2(segmentSupport);
-      segmentSupport2.append(
-        (boost::format("/SegmentSupportPlane[%1%]") % (j + 1)).str());
-      segmentSupport2.append(
-        (boost::format("/SegmentSupport[%1%]") % (i + 1)).str());
+      name = "/SegmentSupportPlane[" + std::to_string(j + 1) + "]";
+      segmentSupport2.append(name.c_str());
+      name = "/SegmentSupport[" + std::to_string(i + 1) + "]";
+      segmentSupport2.append(name.c_str());
       m_SegmentSupportPosition[k].setLength(
         segmentSupport2.getLength("Length") * CLHEP::cm);
       m_SegmentSupportPosition[k].setX(
@@ -602,8 +611,10 @@ void EKLM::GeometryData::initializeFromGearbox()
     for (i = 0; i < m_NBoards; i++) {
       k = j * m_NBoards + i;
       GearDir board2(board);
-      board2.append((boost::format("/BoardPlane[%1%]") % (j + 1)).str());
-      board2.append((boost::format("/Board[%1%]") % (i + 1)).str());
+      name = "/BoardPlane[" + std::to_string(j + 1) + "]";
+      board2.append(name.c_str());
+      name = "/Board[" + std::to_string(i + 1) + "]";
+      board2.append(name.c_str());
       m_BoardPosition[k].setPhi(board2.getLength("Phi") * CLHEP::rad);
       m_BoardPosition[k].setR(board2.getLength("Radius") * CLHEP::cm);
     }
@@ -615,8 +626,8 @@ void EKLM::GeometryData::initializeFromGearbox()
   }
   for (i = 0; i < m_NStripBoards; i++) {
     GearDir stripBoard(board);
-    stripBoard.append((boost::format("/StripBoard/Board[%1%]") %
-                       (i + 1)).str());
+    name = "/StripBoard/Board[" + std::to_string(i + 1) + "]";
+    stripBoard.append(name.c_str());
     m_StripBoardPosition[i].setX(stripBoard.getLength("X") * CLHEP::cm);
   }
   m_Geometry = new EKLMGeometry(*this);

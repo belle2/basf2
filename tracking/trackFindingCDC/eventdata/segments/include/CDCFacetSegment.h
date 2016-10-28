@@ -14,11 +14,15 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRLWireHitSegment;
 
-    // for now a typedef is enough
-    // may get additional methods if necessary
-    /// A segment consisting of adjacent tangents
+    /// A segment consisting of adjacent facets
     class  CDCFacetSegment : public  CDCSegment<CDCFacet> {
+
+    public:
+      /// Construct a train of facets from the given oriented wire hits
+      static CDCFacetSegment create(const CDCRLWireHitSegment& rlWireHitSegment);
+
     };
 
   }

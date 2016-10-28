@@ -183,8 +183,8 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
           CDCWireHit fromWireHit(fromHit);
           CDCWireHit toWireHit(toHit);
 
-          CDCRLWireHit fromRLWireHit(&fromWireHit, ERightLeft::c_Unknown);
-          CDCRLWireHit toRLWireHit(&toWireHit, ERightLeft::c_Unknown);
+          CDCRLWireHit fromRLWireHit(&fromWireHit);
+          CDCRLWireHit toRLWireHit(&toWireHit);
 
           Vector3D fromDisplacement(fromSimHit->getPosTrack() - fromSimHit->getPosWire());
           Vector3D toDisplacement(toSimHit->getPosTrack() - toSimHit->getPosWire());
@@ -317,7 +317,6 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     }
 
     MCAxialSegmentPairFilter mcAxialAxialSegmentPairFilter;
-    CDCMCSegmentLookUp mcSegmentLookup;
 
     std::vector<CDCSegmentTriple> segmentTriples;
     for (const CDCAxialRecoSegment2D& startSegment : axialSegments) {

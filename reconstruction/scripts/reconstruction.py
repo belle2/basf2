@@ -12,7 +12,7 @@ from tracking import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all"):
+def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
@@ -31,6 +31,10 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
 
         The trigger_mode does just steer, which modules in the standard reconstruction are added to the path. It does
         not make any trigger decisions itself.
+    :param skipGeometryAdding: Advances flag: The tracking modules need the geometry module and will add it,
+        if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
+        determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
+        all (but you will have to add it on your own then).
     """
 
     # tracking
@@ -38,7 +42,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 components=components,
                                 pruneTracks=False,
                                 mcTrackFinding=False,
-                                trigger_mode=trigger_mode)
+                                trigger_mode=trigger_mode,
+                                skipGeometryAdding=skipGeometryAdding)
 
     # add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -154,6 +159,8 @@ def add_arich_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
+        arich_fillHits = register_module('ARICHFillHits')
+        path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 
@@ -263,9 +270,21 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
-        # ECL CR finder and splitter (refactored old version - two steps at once)
-        ecl_finderandsplitter = register_module('ECLCRFinderAndSplitter')
-        path.add_module(ecl_finderandsplitter)
+        # ECL connected region finder
+        ecl_crfinder = register_module('ECLCRFinder')
+        path.add_module(ecl_crfinder)
+
+        # ECL local maximum finder
+        ecl_lmfinder = register_module('ECLLocalMaximumFinder')
+        path.add_module(ecl_lmfinder)
+
+        # ECL splitter N1
+        ecl_splitterN1 = register_module('ECLSplitterN1')
+        path.add_module(ecl_splitterN1)
+
+        # ECL splitter N2
+        ecl_splitterN2 = register_module('ECLSplitterN2')
+        path.add_module(ecl_splitterN2)
 
         # ECL Shower Correction
         ecl_showercorrection = register_module('ECLShowerCorrector')

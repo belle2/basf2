@@ -10,7 +10,6 @@
 
 #include <tracking/modules/trackFinderCDC/FindletModules.h>
 
-using namespace std;
 using namespace Belle2;
 
 REG_MODULE(WireHitCreator);

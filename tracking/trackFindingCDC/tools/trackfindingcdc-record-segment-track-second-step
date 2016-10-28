@@ -14,7 +14,7 @@ class SegmentsFilterSecondStepRecordingRun(StandardEventGenerationRun):
     """
     Record the variables for the SegmentsFilterSecondStep in the SegmentsTrackCombinerModule
     """
-    
+
     n_events = 2000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
@@ -26,8 +26,8 @@ class SegmentsFilterSecondStepRecordingRun(StandardEventGenerationRun):
 
         for m in main_path.modules():
             if m.name().startswith("SegmentTrackCombinerDev"):
-                m.param("SegmentTrackFilterSecondStep", "recording")
-                
+                m.param("SegmentTrackFilterSecondStepFilter", "recording")
+
         return main_path
 
 

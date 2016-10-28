@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <Eigen/Dense>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
@@ -25,6 +22,7 @@
 #include <tracking/trackFindingCDC/fitting/EFitPos.h>
 #include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
+#include <Eigen/Dense>
 #include <iterator>
 
 namespace Belle2 {
@@ -65,7 +63,7 @@ namespace Belle2 {
       static double getPseudoDriftLengthVariance(const double driftLength,
                                                  const double driftLengthVariance)
       {
-        return square(driftLength) + driftLengthVariance;
+        return driftLength * driftLength + driftLengthVariance;
       }
 
       /// Calculate the pseudo variance from the drift length and its variance.
@@ -109,7 +107,7 @@ namespace Belle2 {
 
       /**
        *  Appends the observed position.
-       *  \note Observations are skipped, if one of the given variables is NAN.
+       *  @note Observations are skipped, if one of the given variables is NAN.
        *  @param x            X coordinate of the center of the observed circle.
        *  @param y            Y coordinate of the center of the observed circle.
        *  @param signedRadius The radius of the observed circle signed with right left passage hypotheses.
@@ -147,7 +145,7 @@ namespace Belle2 {
 
       /**
        *  Appends the observed position.
-       *  \note Observations are skipped, if one of the given variables is NAN.
+       *  @note Observations are skipped, if one of the given variables is NAN.
        *  @param pos2D        X, Y coordinate of the center of the observed circle.
        *  @param signedRadius The radius of the observed circle signed with right left passage hypotheses.
        *                      Defaults to 0.
@@ -165,8 +163,8 @@ namespace Belle2 {
 
       /**
        *  Appends the hit circle at wire reference position without a right left passage hypotheses.
-       *  \note Observations are skipped, if one of the contained variables is NAN.
-       *  \note The left right passage information is always set to ERightLeft::c_Right,
+       *  @note Observations are skipped, if one of the contained variables is NAN.
+       *  @note The left right passage information is always set to ERightLeft::c_Right,
        *  since on specific assumption can be made from the wire hit alone.
        *  @param wireHit      Hit information to be appended as observation.
        *                      XY position, drift length and inverse variance are taken at the wire reference position.
@@ -225,10 +223,11 @@ namespace Belle2 {
         }
       }
 
-      /** Appends the hit circle at wire reference position with a right left passage hypotheses.
-       *  \note Observations are skipped, if one of the contained variables is NAN.
-       *  \note The left right passage information is always set to
-       *  the right left passage hypotheses of the give hit.
+      /**
+       *  Appends the hit circle at wire reference position with a right left passage hypotheses.
+       *  @note Observations are skipped, if one of the contained variables is NAN.
+       *  @note The left right passage information is always set to
+       *        the right left passage hypotheses of the give hit.
        *  @param rlWireHit    Hit information to be appended as observation.
        *                      XY position, signed drift length and inverse variance are taken at the wire reference position.
        *  @return             Number of observations added. One if the observation was added.
@@ -301,6 +300,13 @@ namespace Belle2 {
         if (m_fitPos == EFitPos::c_RecoPos) {
           fitPos2D = recoHit2D.getRecoPos2D();
           signedDriftLength = 0;
+
+          // Fall back to the rl circle in case position is not setup
+          if (fitPos2D.hasNAN()) {
+            fitPos2D = recoHit2D.getWire().getRefPos2D();
+            signedDriftLength = recoHit2D.getSignedRefDriftLength();
+          }
+
         } else if (m_fitPos == EFitPos::c_RLDriftCircle) {
           fitPos2D = recoHit2D.getWire().getRefPos2D();
           signedDriftLength = recoHit2D.getSignedRefDriftLength();
@@ -359,9 +365,9 @@ namespace Belle2 {
         return fill(fitPos2D, signedDriftLength, 1 / variance);
       }
 
-      /** Appends all reconstructed hits from the two dimensional segment.
-       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
-       *                    instead of the wire positon, right left passage information and drift length
+      /**
+       *  Appends all reconstructed hits from the two dimensional segment.
+       *  @return  Number of added hits
        */
       size_t appendRange(const CDCRecoSegment2D& recoSegment2D)
       {
@@ -372,10 +378,11 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-      /** Appends all reconstructed hits from the three dimensional segment.
-       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
-       *                    instead of the wire positon, right left passage information and drift length
+      /**
+       *  Appends all reconstructed hits from the three dimensional segment.
+       *  @return  Number of added hits
        */
+
       size_t appendRange(const CDCRecoSegment3D& recoSegment3D)
       {
         size_t nAppendedHits = 0;
@@ -385,9 +392,9 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-      /** Appends all reconstructed hits from the two axial segments,
-       *  @param useRecoPos Indicates whether the reconstructed  position shall be used,
-       *                    instead of the wire positon, right left passage information and drift length
+      /**
+       *  Appends all reconstructed hits from the two axial segments,
+       *  @return  Number of added hits
        */
       size_t appendRange(const CDCAxialSegmentPair& axialSegmentPair)
       {
@@ -406,11 +413,10 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-      /** Appends all the reference wire positions.
-       *  @param useRecoPos Indicates whether the reconstructed position shall be used,
-       *                    instead of the wire positon, right left passage information and drift length
-       *                    Always use position since there is no other mode.
-       *  /note For cross check to legendre finder.
+      /**
+       *  Appends all the reference wire positions.
+       *  @note For cross check to legendre finder.
+       *  @return  Number of added hits
        */
       size_t appendRange(const std::vector<const Belle2::TrackFindingCDC::CDCWire*>& wires)
       {
@@ -426,11 +432,10 @@ namespace Belle2 {
         return nAppendedHits;
       }
 
-      /** Appends all the wire hit reference positions with the pseudo variance.
-       *  @param useRecoPos Indicates whether the reconstructed position shall be used,
-       *                    instead of the wire positon, right left passage information and drift length
-       *                    Always use position since there is no other mode.
-       *  /note For cross check to legendre finder.
+      /**
+       *  Appends all the wire hit reference positions with the pseudo variance.
+       *  @note For cross check to legendre finder.
+       *  @return  Number of added hits
        */
       size_t appendRange(const CDCWireHitSegment& wireHits)
       {
@@ -472,10 +477,10 @@ namespace Belle2 {
       bool isForwardTrajectory(const CDCTrajectory2D& trajectory2D) const
       { return getTotalPerpS(trajectory2D) > 0.0; }
 
-      /// Checks if the last observation in the vector lies greater or lower travel distance than the last observation.
-      /** Returns:
-       *  * EForwardBackward::c_Forward if the last observation lies behind the first.
-       *  * EForwardBackward::c_Backward if the last observation lies before the first.
+      /**
+       *  Checks if the last observation in the vector lies at greater or lower travel distance than the last observation.
+       *  @retval     EForwardBackward::c_Forward if the last observation lies behind the first.
+       *  @retval     EForwardBackward::c_Backward if the last observation lies before the first.
        */
       EForwardBackward isCoaligned(const CDCTrajectory2D& trajectory2D) const
       { return static_cast<EForwardBackward>(sign(getTotalPerpS(trajectory2D))); }
@@ -493,13 +498,19 @@ namespace Belle2 {
       /// Returns the number of observations having a drift radius radius
       size_t getNObservationsWithDriftRadius() const;
 
-      /// Returns the observations structured as an Eigen matrix
-      /** This returns a reference to the stored observations. Note that operations may alter the content of the underlying memory and render it useless for subceeding calculations.*/
+      /**
+       *  Returns the observations structured as an Eigen matrix
+       *  This returns a reference to the stored observations.
+       *  @note      Operations may alter the content of the underlying memory and
+       *             render it useless for subceeding calculations.
+       */
       EigenObservationMatrix getObservationMatrix();
 
-      /// Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
-      /** Cumulates weights, x positions, y positions, quadratic cylindrical radii and signed drift legnths and products thereof
-       *  Returns symmetric matrix s with the following:
+      /**
+       *  Constructs a symmetric matrix of weighted sums of x, y, r^2 and drift lengts as relevant for circle fits.
+       *
+       *  Cumulates weights, x positions, y positions, quadratic cylindrical radii and signed drift lengths and products thereof
+       *  @returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$
        *  * \f$ s_{02} = \sum y * w \f$
@@ -523,9 +534,11 @@ namespace Belle2 {
        */
       Eigen::Matrix<double, 5, 5> getWXYRLSumMatrix();
 
-      /// Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line fits.
-      /** Cumulates weights, x positions, y positions and signed drift legnths and products thereof
-       *  Returns symmetric matrix s with the following:
+      /**
+       *  Constructs a symmetric matrix of weighted sums of x, y and drift lengts as relevant for line fits.
+       *
+       *  Cumulates weights, x positions, y positions and signed drift legnths and products thereof
+       *  @returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$
        *  * \f$ s_{02} = \sum y * w \f$
@@ -543,9 +556,11 @@ namespace Belle2 {
        */
       Eigen::Matrix<double, 4, 4> getWXYLSumMatrix();
 
-      /// Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
-      /** Cumulates weights, x positions, y positions, quadratic cylindrical radii and products thereof
-       *  Returns symmetric matrix s with the following:
+      /**
+       *  Constructs a symmetric matrix of weighted sums of x, y, r^2 as relevant for circle fits.
+       *
+       *  Cumulates weights, x positions, y positions, quadratic cylindrical radii and products thereof
+       *  @returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$
        *  * \f$ s_{02} = \sum y * w \f$
@@ -565,9 +580,11 @@ namespace Belle2 {
       Eigen::Matrix<double, 4, 4> getWXYRSumMatrix();
 
 
-      /// Constructs a symmetric matrix of weighted sums of x, y as relevant for line fits.
-      /** Cumulates weights, x positions, y positions and products thereof
-       *  Returns symmetric matrix s with the following:
+      /**
+       *  Constructs a symmetric matrix of weighted sums of x, y as relevant for line fits.
+       *
+       *  Cumulates weights, x positions, y positions and products thereof
+       *  @returns symmetric matrix s with the following:
        *  * \f$ s_{00} = \sum w \f$
        *  * \f$ s_{01} = \sum x * w \f$
        *  * \f$ s_{02} = \sum y * w \f$
@@ -594,7 +611,8 @@ namespace Belle2 {
       { m_fitVariance = fitVariance; }
 
     private:
-      /** Memory for the individual observations.
+      /**
+       *  Memory for the individual observations.
        *  Arrangement of values is x,y, drift raduis, weight, x, y, .....
        */
       std::vector<double> m_observations;
@@ -613,8 +631,7 @@ namespace Belle2 {
        */
       EFitVariance m_fitVariance;
 
-    }; // end class CDCObservations2D
+    }; // class CDCObservations2D
 
-  } // end namespace TrackFindingCDC
+  } // namespace TrackFindingCDC
 } // namespace Belle2
-

@@ -10,6 +10,8 @@
 #pragma once
 
 #include <framework/datastore/StoreEntry.h>
+#include <framework/core/BitMask.h>
+
 #if defined(__CINT__) || defined(__ROOTCLING__) || defined(R__DICTIONARY_FILENAME)
 //a few methods use these, but are only included in dictionaries
 #include <framework/datastore/RelationVector.h>
@@ -54,23 +56,17 @@ namespace Belle2 {
       c_Event,     /**< Different object in each event, all objects/arrays are invalidated after event() function has been called on last module in path.  */
       c_Persistent /**< Object is available during entire execution time. Objects are never invalidated and are accessible even after process(Path) returns. */
     };
+    /** Number of Durability Types.  */
+    const static int c_NDurabilityTypes = 2;
 
     /** Flags describing behaviours of objects etc.
+     *
+     * Bitwise operators (|, &, etc.) are provided via ADD_BITMASK_OPERATORS.
      */
-    enum EStoreFlag {
+    enum EStoreFlags {
       c_WriteOut = 0,                /**< Object/array should be saved by output modules. (default) */
       c_DontWriteOut = 1,            /**< Object/array should be NOT saved by output modules. Can be overridden using the 'branchNames' parameter of RootOutput. */
       c_ErrorIfAlreadyRegistered = 2,/**< If the object/array was already registered, produce an error (aborting initialisation). */
-    };
-    /** Combination of DataStore::EStoreFlag flags. */
-    typedef int EStoreFlags;
-
-    /** Number of Durability Types.
-     *
-     *  Probably useless, but in principle additional maps are easily created this way.
-     */
-    enum ENDurabilityTypes {
-      c_NDurabilityTypes = 2 /**< Total number of durability types. */
     };
 
     /** Which side of relations should be returned? */
@@ -199,7 +195,7 @@ namespace Belle2 {
      *  @param durability Decide with which durability map you want to perform the requested action.
      *  @param objClass   The class of the object.
      *  @param array      Whether it is a TClonesArray or not.
-     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlags.
      *  @return           True if the registration succeeded.
      *  @sa DependencyMap
      */
@@ -210,7 +206,7 @@ namespace Belle2 {
      *
      *  This must be called in the initialization phase. Otherwise an error is returned.
      *  @param durability Decide with which durability map you want to perform the requested action.
-     *  @param storeFlags ORed combination of DataStore::EStoreFlag flags.
+     *  @param storeFlags ORed combination of DataStore::EStoreFlags.
      *  @return           True if the registration succeeded.
      *  @sa DependencyMap
      */
@@ -545,8 +541,6 @@ namespace Belle2 {
     /** Clears all registered StoreEntry objects of a specified durability, invalidating all objects.
      *
      *  Called by the framework once the given durability is over. Users should usually not use this function without a good reason.
-     *
-     *  Memory occupied by objects/arrays is only freed once a new object is created in its place (in createObject()).
      */
     void invalidateData(EDurability durability);
 
@@ -662,4 +656,6 @@ namespace Belle2 {
     /** Collect information about the dependencies between modules. */
     DependencyMap* m_dependencyMap;
   };
+
+  ADD_BITMASK_OPERATORS(DataStore::EStoreFlags); /**< Add bitmask operators to DataStore::EStoreFlags. */
 } // namespace Belle2

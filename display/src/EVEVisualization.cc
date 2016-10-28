@@ -29,6 +29,7 @@
 #include <bklm/dataobjects/BKLMSimHitPosition.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
 #include <geometry/bfieldmap/BFieldMap.h>
 
 #include <svd/reconstruction/SVDRecoHit.h>
@@ -1225,11 +1226,11 @@ void EVEVisualization::addVertex(const genfit::GFRaveVertex* vertex)
 void EVEVisualization::addECLCluster(const ECLCluster* cluster)
 {
   const float phi = cluster->getPhi();
-  float dPhi = cluster->getErrorPhi();
-  float dTheta = cluster->getErrorTheta();
-  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getErrorEnergy() == 1.0) {
+  float dPhi = cluster->getUncertaintyPhi();
+  float dTheta = cluster->getUncertaintyTheta();
+  if (dPhi >= M_PI / 4 or dTheta >= M_PI / 4 or cluster->getUncertaintyEnergy() == 1.0) {
     B2WARNING("Found ECL cluster with broken errors (unit matrix or too large). Using 0.05 as error in phi/theta. The 3x3 error matrix previously was:");
-    cluster->getError3x3().Print();
+    cluster->getCovarianceMatrix3x3().Print();
     dPhi = dTheta = 0.05;
   }
 
@@ -1411,6 +1412,28 @@ void EVEVisualization::addCDCHit(const CDCHit* hit)
   addToGroup("CDCHits", cov_shape);
   addObject(hit, cov_shape);
 }
+
+void EVEVisualization::addARICHHit(const ARICHHit* hit)
+{
+  DBObjPtr<ARICHGeometryConfig> arichGeo;
+
+  int hitModule = hit->getModule();
+  float fi = arichGeo->getDetectorPlane().getSlotPhi(hitModule);
+
+  TVector3 centerPos3D =  hit->getPosition();
+
+  TVector3 channelX(1, 0, 0);    channelX.RotateZ(fi);
+  TVector3 channelY(0, 1, 0);    channelY.RotateZ(fi);
+
+  auto* arichbox = boxCreator(centerPos3D, arichGeo->getMasterVolume().momentumToGlobal(channelX),
+                              arichGeo->getMasterVolume().momentumToGlobal(channelY), 0.49, 0.49, 0.05);
+  arichbox->SetMainColor(kOrange + 10);
+  arichbox->SetName((std::to_string(hitModule)).c_str());
+
+  addToGroup("ARICHHits", arichbox);
+  addObject(hit, arichbox);
+}
+
 
 void EVEVisualization::showUserData(const DisplayData& displayData)
 {

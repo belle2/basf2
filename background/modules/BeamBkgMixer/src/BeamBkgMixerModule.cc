@@ -365,15 +365,6 @@ namespace Belle2 {
     StoreArray<EKLMSimHit> eklmSimHits;
     StoreArray<BeamBackHit> beamBackHits;
 
-    if (m_PXD && !pxdSimHits.isValid()) pxdSimHits.create();
-    if (m_SVD && !svdSimHits.isValid()) svdSimHits.create();
-    if (m_CDC && !cdcSimHits.isValid()) cdcSimHits.create();
-    if (m_TOP && !topSimHits.isValid()) topSimHits.create();
-    if (m_ARICH && !arichSimHits.isValid()) arichSimHits.create();
-    if (m_ECL && !eclHits.isValid()) eclHits.create();
-    if (m_BKLM && !bklmSimHits.isValid()) bklmSimHits.create();
-    if (m_EKLM && !eklmSimHits.isValid()) eklmSimHits.create();
-    if (m_BeamBackHits && !beamBackHits.isValid()) beamBackHits.create();
 
     for (auto& bkg : m_backgrounds) {
 

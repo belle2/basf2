@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilters.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -52,19 +51,19 @@ FacetRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseFacetRelationFilter >
 FacetRelationFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseFacetRelationFilter >(new BaseFacetRelationFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<BaseFacetRelationFilter >(new AllFacetRelationFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseFacetRelationFilter >(new MCFacetRelationFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseFacetRelationFilter >(new TMVAFacetRelationFilter());
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<BaseFacetRelationFilter >(new SimpleFacetRelationFilter());
-  } else if (filterName == string("chi2")) {
+  } else if (filterName == "chi2") {
     return std::unique_ptr<BaseFacetRelationFilter >(new Chi2FacetRelationFilter());
-  } else if (filterName == string("unionrecording")) {
+  } else if (filterName == "unionrecording") {
     return std::unique_ptr<BaseFacetRelationFilter >(new UnionRecordingFacetRelationFilter());
   } else {
     return Super::create(filterName);

@@ -21,14 +21,14 @@
       <x_tpcbeamR unit="cm">POS_X1</x_tpcbeamR>
       <y_tpcbeamR unit="cm">POS_Y1</y_tpcbeamR>
       <z_tpcbeamR unit="cm">POS_Z1</z_tpcbeamR>
-   
-      <x_tpcbeamL unit="cm">POS_X2</x_tpcbeamL>
-      <y_tpcbeamL unit="cm">POS_Y2</y_tpcbeamL>
-      <z_tpcbeamL unit="cm">POS_Z2</z_tpcbeamL>
-    
-      <x_tpcbeamT unit="cm">POS_X3</x_tpcbeamT>
-      <y_tpcbeamT unit="cm">POS_Y3</y_tpcbeamT>
+
+      <x_tpcbeamT unit="cm">POS_X2</x_tpcbeamT>
+      <y_tpcbeamT unit="cm">POS_Y2</y_tpcbeamT>
       <z_tpcbeamT unit="cm">POS_Z3</z_tpcbeamT>
+         
+      <x_tpcbeamL unit="cm">POS_X3</x_tpcbeamL>
+      <y_tpcbeamL unit="cm">POS_Y3</y_tpcbeamL>
+      <z_tpcbeamL unit="cm">POS_Z3</z_tpcbeamL>
     
       <x_tpcbeamB unit="cm">POS_X4</x_tpcbeamB>
       <y_tpcbeamB unit="cm">POS_Y4</y_tpcbeamB>
@@ -37,7 +37,6 @@
       <!--x_offset unit="cm">-20.5</x_offset-->
       <x_offset unit="cm">0</x_offset>
       <y_offset unit="cm">0</y_offset>
-      
       <!-- 369,370,353,354,335,336,337,340 // 804 -->
       <lcsiBeamh unit="cm">158.258</lcsiBeamh>
       <xcsiBeamh unit="cm">-7.43625,-7.43625,-7.43625,-7.43625</xcsiBeamh>
@@ -81,26 +80,23 @@
       <xbgoBeamb unit="cm">-7.43625,-7.43625</xbgoBeamb>
       <ybgoBeamb unit="cm">-69.17375,-69.17375</ybgoBeamb>
       <zbgoBeamb unit="cm">34.94625,-20.00875</zbgoBeamb>
-      
       <!-- 338, 325 -->
       <ltpcBeamb unit="cm">158.258</ltpcBeamb>
       <xtpcBeamb unit="cm">-7.43625,-7.43625</xtpcBeamb>
       <ytpcBeamb unit="cm">-69.17375,-69.17375</ytpcBeamb>
       <ztpcBeamb unit="cm">110.04625,-80.10875</ztpcBeamb>
-
       <!-- 803-->
       <lfangsBeamhf unit="cm">63.0</lfangsBeamhf>
       <xfangsBeamhf unit="cm">40.</xfangsBeamhf>
       <yfangsBeamhf unit="cm">17.1941948963</yfangsBeamhf>
       <zfangsBeamhf unit="cm">212.6</zfangsBeamhf>
-      
       <!-- 804-->
       <lfangsBeamhb unit="cm">158.258</lfangsBeamhb>
       <xfangsBeamhb unit="cm">-7.43625</xfangsBeamhb>
       <yfangsBeamhb unit="cm">30.0</yfangsBeamhb>
       <zfangsBeamhb unit="cm">-111.466</zfangsBeamhb>      
-
+      
     </Active>
-
+    
   </Content>
 </DetectorComponent>

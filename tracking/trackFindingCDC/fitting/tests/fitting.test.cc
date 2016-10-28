@@ -22,9 +22,8 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 using namespace Belle2;
-using namespace Belle2::TrackFindingCDC;
+using namespace TrackFindingCDC;
 
 namespace {
   const Vector2D generalCenter(6.0, 0);
@@ -32,9 +31,9 @@ namespace {
 
   const Circle2D generalCircle(generalCenter, generalRadius);
 
-  vector<Vector2D> createGeneralCircleObservationCenters()
+  std::vector<Vector2D> createGeneralCircleObservationCenters()
   {
-    vector<Vector2D> observationCenters;
+    std::vector<Vector2D> observationCenters;
     // Setting up a trajectory traveling clockwise
     for (int iObservation = 11; iObservation > -12; --iObservation) {
       double y = iObservation / 2.0;
@@ -46,7 +45,7 @@ namespace {
 
   CDCObservations2D createGeneralCircleObservations(bool withDriftLength = true)
   {
-    vector<Vector2D>&&  observationCenters = createGeneralCircleObservationCenters();
+    std::vector<Vector2D> observationCenters = createGeneralCircleObservationCenters();
 
     CDCObservations2D observations2D;
     if (withDriftLength) {
@@ -74,20 +73,19 @@ namespace {
     trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
-    EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle.perigee().x(), 10e-7) <<
+    EXPECT_NEAR(generalCircle.perigee().x(), fittedCircle->perigee().x(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
-    EXPECT_NEAR(generalCircle.perigee().y(), fittedCircle.perigee().y(), 10e-7) <<
+    EXPECT_NEAR(generalCircle.perigee().y(), fittedCircle->perigee().y(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
-    EXPECT_NEAR(generalCircle.radius(), fittedCircle.radius(), 10e-7) <<
+    EXPECT_NEAR(generalCircle.radius(), fittedCircle->radius(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
-    EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle.tangentialPhi(), 10e-7) <<
+    EXPECT_NEAR(generalCircle.tangentialPhi(), fittedCircle->phi0(), 10e-7) <<
         "AFitter " << typeid(fitter).name() << " failed.";
-    EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) <<
-                                                 "AFitter " << typeid(fitter).name() << " failed.";
+    EXPECT_NEAR(0.0, fittedCircle.chi2(), 10e-7) << "AFitter " << typeid(fitter).name() << " failed.";
 
-    const double curv = fittedCircle.curvature();
-    const double I = fittedCircle.impact();
-    const double phi = fittedCircle.tangentialPhi();
+    const double curv = fittedCircle->curvature();
+    const double I = fittedCircle->impact();
+    const double phi = fittedCircle->phi0();
 
     const double chi2 = fittedCircle.chi2();
 
@@ -121,7 +119,7 @@ namespace {
     trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
     const UncertainPerigeeCircle& fittedCircle = trajectory2D.getLocalCircle();
 
-    EXPECT_EQ(0.0, fittedCircle.curvature()) << "AFitter " << typeid(fitter).name() << " failed.";
+    EXPECT_EQ(0.0, fittedCircle->curvature()) << "AFitter " << typeid(fitter).name() << " failed.";
 
     Vector2D perigee = trajectory2D.getGlobalPerigee();
     EXPECT_NEAR(0.0, perigee.x(), 10e-7);

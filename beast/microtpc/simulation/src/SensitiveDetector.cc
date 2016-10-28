@@ -10,7 +10,7 @@
 
 #include <beast/microtpc/simulation/SensitiveDetector.h>
 #include <beast/microtpc/dataobjects/MicrotpcSimHit.h>
-#include <beast/microtpc/dataobjects/TpcMCParticle.h>
+#include <beast/microtpc/dataobjects/TPCG4TrackInfo.h>
 
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
@@ -28,17 +28,19 @@ namespace Belle2 {
     SensitiveDetector::SensitiveDetector():
       Simulation::SensitiveDetectorBase("MicrotpcSensitiveDetector", Const::invalidDetector)
     {
+      m_simhitNumber = 0;
+      m_trackID = 0;
       //Make sure all collections are registered
       StoreArray<MCParticle>   mcParticles;
       StoreArray<MicrotpcSimHit>  simHits;
-      StoreArray<TpcMCParticle> TpcMCParticles;
+      StoreArray<TPCG4TrackInfo> TPCG4TrackInfos;
       RelationArray relMCSimHit(mcParticles, simHits);
 
       //Register all collections we want to modify and require those we want to use
       mcParticles.registerInDataStore();
       simHits.registerInDataStore();
       relMCSimHit.registerInDataStore();
-      TpcMCParticles.registerInDataStore();
+      TPCG4TrackInfos.registerInDataStore();
 
       //Register the Relation so that the TrackIDs get replaced by the actual
       //MCParticle indices after simulating the events. This is needed as
@@ -90,13 +92,31 @@ namespace Belle2 {
         if (CPName.contains("Neutron")) neuProc = true;
       }
 
+      if (m_trackID != track.GetTrackID()) {
+        //TrackID changed, store track informations
+        m_trackID = track.GetTrackID();
+      }
+
       //Save Hit if track leaves volume or is killed
       if (track.GetNextVolume() != track.GetVolume() || track.GetTrackStatus() >= fStopAndKill) {
-        /*if (neuProc)*/ saveSimHit();
+        auto& mcparticle = Simulation::TrackInfo::getInfo(track);
+        int PDG = mcparticle.getPDG();
+        float Mass = mcparticle.getMass();
+        float Energy = mcparticle.getEnergy();
+        float vtx[3];
+        vtx[0] = mcparticle.getProductionVertex().X();
+        vtx[1] = mcparticle.getProductionVertex().Y();
+        vtx[2] = mcparticle.getProductionVertex().Z();
+        float mom[3];
+        mom[0] = mcparticle.getMomentum().X();
+        mom[1] = mcparticle.getMomentum().Y();
+        mom[2] = mcparticle.getMomentum().Z();
+        saveG4TrackInfo(m_trackID, PDG, Mass, Energy, vtx, mom);
+        //Reset TrackID
+        m_trackID = 0;
       }
 
       StoreArray<MicrotpcSimHit> MicrotpcHits;
-      if (!MicrotpcHits.isValid()) MicrotpcHits.create();
       MicrotpcSimHit* hit = MicrotpcHits.appendNew(
                               trackID,
                               depEnergy,
@@ -117,34 +137,25 @@ namespace Belle2 {
       return true;
     }
 
-    int SensitiveDetector::saveSimHit()
+    int SensitiveDetector::saveG4TrackInfo
+    (
+      int trackID,
+      int PDG,
+      float Mass,
+      float Energy,
+      float vtx[3],
+      float mom[3]
+    )
     {
-
       //Get the datastore arrays
+      StoreArray<TPCG4TrackInfo> TPCG4TrackInfos;
 
-      StoreArray<MCParticle> mcParticles;
-      StoreArray<TpcMCParticle> TpcMCParticles;
+      TPCG4TrackInfos.appendNew(TPCG4TrackInfo(trackID, PDG, Mass, Energy, vtx, mom));
 
-      for (const auto& mcParticle : mcParticles) { // start loop over all Tracks
-        int PDG = mcParticle.getPDG();
-        //if (PDG == 2112 || PDG == 1000080160 || PDG == 100006012 || PDG == 1000020040 || PDG == 2212) {
+      int m_simhitNumber = TPCG4TrackInfos.getEntries() - 1;
 
-        float Mass = mcParticle.getMass();
-        float Energy = mcParticle.getEnergy();
-        float vtx[3];
-        vtx[0] = mcParticle.getProductionVertex().X();
-        vtx[1] = mcParticle.getProductionVertex().Y();
-        vtx[2] = mcParticle.getProductionVertex().Z();
-        float mom[3];
-        mom[0] = mcParticle.getMomentum().X();
-        mom[1] = mcParticle.getMomentum().Y();
-        mom[2] = mcParticle.getMomentum().Z();
-        //if (!TpcMCParticles.isValid()) TpcMCParticles.create();
-        TpcMCParticles.appendNew(TpcMCParticle(PDG, Mass, Energy, vtx, mom));
-        //}
-      }
       return (m_simhitNumber);
-    }//saveSimHit
+    }//saveG4TrackInfo
 
   } //microtpc namespace
 } //Belle2 namespace

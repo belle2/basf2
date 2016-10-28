@@ -415,14 +415,15 @@ class EventType:
 
     def Sample(self):
         # Check if overriden
-        if 'Sample' in list(self.KeywordDictionary.keys()):
-            return self.KeywordDictionary['Sample']
-        sample = 'otherTreatment'
-        if int(self.EventTypeNumber()[0]) in (1, 2, 3, 7):
+        if 'Sample' in self.KeywordDictionary:
+            sample = self.KeywordDictionary['Sample']
+        elif int(self.EventTypeNumber()[0]) in (1, 2, 3, 7):
             if int(self.EventTypeNumber()[1]) in (0, 9):
                 sample = 'Inclusive'
             elif int(self.EventTypeNumber()[0]) == 1 and int(self.EventTypeNumber()[1]) in (1, 2, 3, 6, 7):
                 sample = 'Signal'
+        else:
+            sample = 'otherTreatment'
         return sample
 
     def Production(self):

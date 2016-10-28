@@ -17,7 +17,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -75,9 +74,6 @@ namespace Belle2 {
 
     //! port number
     int m_port_send;
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
 
     //! Compression Level
     int m_compressionLevel;

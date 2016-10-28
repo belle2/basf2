@@ -83,6 +83,51 @@ namespace Belle2 {
       /** Energy deposited */
       TH1F* h_Wclaws_edep[8];
 
+      /** Energy deposited */
+      TH1F* h_claws_rate1[8];
+      /** Energy deposited */
+      TH1F* h_claws_rate2[8];
+      /** Energy deposited */
+      TH1F* h_claws_rate1W[8];
+      /** Energy deposited */
+      TH1F* h_claws_rate2W[8];
+
+      /** Energy deposited */
+      TH1F* h_claws_hitrate1;
+      /** Energy deposited */
+      TH1F* h_claws_hitrate2;
+      /** Energy deposited */
+      TH1F* h_claws_hitrate1W;
+      /** Energy deposited */
+      TH1F* h_claws_hitrate2W;
+
+      /** Energy deposited */
+      TH2F* h_claws_rs_hitrate1;
+      /** Energy deposited */
+      TH2F* h_claws_rs_hitrate2;
+      /** Energy deposited */
+      TH2F* h_claws_rs_hitrate1W;
+      /** Energy deposited */
+      TH2F* h_claws_rs_hitrate2W;
+
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate1[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate2[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate1W[8];
+      /** Energy deposited */
+      TH2F* h_claws_rs_rate2W[8];
+
+      /** Energy deposited */
+      TH2F* h_claws_pe1[8];
+      /** Energy deposited */
+      TH2F* h_claws_pe2[8];
+      /** Energy deposited */
+      TH2F* h_claws_pe1W[8];
+      /** Energy deposited */
+      TH2F* h_claws_pe2W[8];
+
     };
 
   }

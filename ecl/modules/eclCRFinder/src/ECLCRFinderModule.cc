@@ -195,8 +195,10 @@ void ECLCRFinderModule::event()
     unsigned isSeed = 0;
     if (energy >= m_energyCutMod[0]) {
       if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-      if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
-      if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
+      if (!fitfailed) {
+        if (m_timeCut[0] > 1e-9 and fabs(timeresolution) > m_timeCut[0]) continue;
+        if (m_timeCut[0] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[0])) continue;
+      }
 
       m_cellIdToSeedVec[cellid] = 1;
       isSeed = 1;
@@ -208,8 +210,10 @@ void ECLCRFinderModule::event()
     if (energy >= m_energyCutMod[1]) {
       if (isSeed == 0) { // if a cell is a seed, it is also a growth cell (e.g. for different timing cuts)
         if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-        if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
-        if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
+        if (!fitfailed) {
+          if (m_timeCut[1] > 1e-9 and fabs(timeresolution) > m_timeCut[1]) continue;
+          if (m_timeCut[1] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[1])) continue;
+        }
       }
 
       m_cellIdToGrowthVec[cellid] = 1;
@@ -221,8 +225,10 @@ void ECLCRFinderModule::event()
     if (energy >= m_energyCutMod[2]) {
       if (isGrowth == 0) { // if a cell is a growth (incl. seed), it is also a growth cell (e.g. for different timing cuts)
         if (fitfailed > 0 and m_skipFailedTimeFitDigits > 0) continue;
-        if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
-        if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
+        if (!fitfailed) {
+          if (m_timeCut[2] > 1e-9 and fabs(timeresolution) > m_timeCut[2]) continue;
+          if (m_timeCut[2] < -1e-9  and fabs(timeresidual) > fabs(m_timeCut[2])) continue;
+        }
       }
 
       m_cellIdToDigitVec[cellid] = 1;
@@ -236,7 +242,7 @@ void ECLCRFinderModule::event()
   for (unsigned int pos = 1; pos < m_cellIdToSeedVec.size(); ++pos) {
     if (m_cellIdToSeedVec[pos] > 0) {
       checkNeighbours(pos, m_tempCRId, 0);
-      ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module, starting at one
+      ++m_tempCRId; // This is just a number, will be replaced by a consecutive number later in this module
     }
   }
 
@@ -263,7 +269,6 @@ void ECLCRFinderModule::event()
     int connectedRegionID = entry.second;
 
     // create CR
-    if (!m_eclConnectedRegions) m_eclConnectedRegions.create();
 
     // Append to store array.
     const auto aCR = m_eclConnectedRegions.appendNew();

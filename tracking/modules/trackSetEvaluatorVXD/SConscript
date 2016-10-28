@@ -1,7 +1,8 @@
 Import('env')
 
 env['LIBS'] = [
-    'framework', 
+    'framework',
+    'svd_dataobjects',
     'tracking',
     'tracking_spacePointCreation_sptcNetwork']
 Return('env')

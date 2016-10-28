@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from basf2 import *
+from tracking import add_tracking_reconstruction
 
 # --------------------------------------------------------------------
 # Example of using TOP reconstruction
@@ -80,25 +81,16 @@ main.add_module(svd_clusterizer)
 cdcDigitizer = register_module('CDCDigitizer')
 main.add_module(cdcDigitizer)
 
-# Material effects for all track extrapolations
-material_effects = register_module('SetupGenfitExtrapolation')
-main.add_module(material_effects)
+# TOP digitization
+topdigi = register_module('TOPDigitizer')
+main.add_module(topdigi)
 
-# MC track finder (for simplicity)
-mctrackfinder = register_module('TrackFinderMCTruth')
-main.add_module(mctrackfinder)
-
-# Track fitting
-trackfitter = register_module('GenFitter')
-main.add_module(trackfitter)
+# tracking
+add_tracking_reconstruction(main)
 
 # Track extrapolation
 ext = register_module('Ext')
 main.add_module(ext)
-
-# TOP digitization
-topdigi = register_module('TOPDigitizer')
-main.add_module(topdigi)
 
 # TOP reconstruction
 topreco = register_module('TOPReconstructor')

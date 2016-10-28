@@ -12,7 +12,6 @@
 
 #include <gtest/gtest.h>
 
-using namespace std;
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -46,7 +45,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
 {
   Vector3D forward(-1.0, 1.0, 10.0);
   Vector3D backward(1.0, 1.0, -10.0);
-  WireLine wireLine(forward, backward);
+  WireLine wireLine(forward, backward, 0);
 
   double localPhi0 = M_PI / 3;
   double localCurv = -2.0;
@@ -54,7 +53,7 @@ TEST(TrackFindingCDCTest, eventdata_trajectories_CDCTrajectory2D_reconstruct)
   PerigeeCircle localPerigeeCircle(localCurv, localPhi0, localImpact);
   Vector3D localOrigin(0.5, 1, -5);
 
-  Vector3D positionOnWire = wireLine.pos3DAtZ(localOrigin.z());
+  Vector3D positionOnWire = wireLine.nominalPos3DAtZ(localOrigin.z());
   EXPECT_NEAR(localOrigin.x(), positionOnWire.x(), 10e-7);
   EXPECT_NEAR(localOrigin.y(), positionOnWire.y(), 10e-7);
   EXPECT_NEAR(localOrigin.z(), positionOnWire.z(), 10e-7);

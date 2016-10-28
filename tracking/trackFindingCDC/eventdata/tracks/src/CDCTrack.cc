@@ -19,7 +19,6 @@
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/TrackCand.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace genfit;
@@ -324,7 +323,7 @@ bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 
 
 
-vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
+std::vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
 {
   vector<CDCRecoSegment3D> result;
   ISuperLayer lastISuperLayer = -1;
@@ -413,10 +412,8 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
 {
   const CDCTrajectory2D& startTrajectory2D = getStartTrajectory3D().getTrajectory2D();
   if (doForAllTracks or startTrajectory2D.isCurler(1.1)) {
-    const double radius = abs(startTrajectory2D.getLocalCircle().radius());
-
-    if (not std::isinf(radius)) {
-      const double shiftValue = 2 * TMath::Pi() * radius;
+    const double shiftValue = startTrajectory2D.getLocalCircle()->arcLengthPeriod();
+    if (std::isfinite(shiftValue)) {
       for (CDCRecoHit3D& recoHit : *this) {
         if (recoHit.getArcLength2D() < 0)
           recoHit.shiftArcLength2D(shiftValue);

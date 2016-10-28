@@ -131,7 +131,9 @@ namespace Belle2 {
     int getGenerationFlags() const { return m_generationFlags; }
     /** Check if a certain set of EGenerationFlags is set */
     bool hasGenerationFlags(int flags) const { return (m_generationFlags & flags) == flags; }
-
+    /** Return string representation of all active flags for printing
+     * @param separator separation string to be put between flags */
+    std::string getGenerationFlagString(const std::string& separator = " ") const;
   private:
     /** Calculate the boost if necessary */
     void calculateBoost() const;

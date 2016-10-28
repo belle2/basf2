@@ -48,7 +48,6 @@ void MakeDumHSLBDataModule::initialize()
     exit(1);
   }
 
-  m_msghandler = new MsgHandler(m_compressionLevel);
   B2INFO("MakeDumHSLBData: initialize() done.");
 
 }

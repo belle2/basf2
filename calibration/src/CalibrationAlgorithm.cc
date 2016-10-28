@@ -8,8 +8,11 @@ const std::string CalibrationAlgorithm::RUN_RANGE_OBJ_NAME = "__ca_data_range";
 
 CalibrationAlgorithm::EResult CalibrationAlgorithm::execute(vector< Belle2::CalibrationAlgorithm::ExpRun > runs, int iteration)
 {
-  m_iteration = iteration;
-  m_payloads.clear();
+  // Check if we started a new iteration and clear old data
+  if (m_iteration != iteration) {
+    m_payloads.clear();
+    m_iteration = iteration;
+  }
 
   // Let's check that we have the data by accessing an object
   // created by all collector modules by their base class
@@ -118,12 +121,12 @@ IntervalOfValidity CalibrationAlgorithm::getIovFromData()
   return range.getIntervalOfValidity();
 }
 
-void CalibrationAlgorithm::saveCalibration(TObject* data, string name, IntervalOfValidity iov)
+void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name, const IntervalOfValidity& iov)
 {
   m_payloads.emplace_back("dbstore", name, data, iov);
 }
 
-void CalibrationAlgorithm::saveCalibration(TObject* data, string name)
+void CalibrationAlgorithm::saveCalibration(TObject* data, const string& name)
 {
   if (m_runs.empty())
     return;
@@ -150,6 +153,7 @@ bool CalibrationAlgorithm::commit()
   if (m_payloads.empty())
     return false;
   std::list<Database::DBQuery> payloads = getPayloads();
+  B2INFO("Committing " << payloads.size()  << " payloads to database.");
   return Database::Instance().storeData(payloads);
 }
 

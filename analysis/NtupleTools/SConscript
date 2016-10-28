@@ -3,22 +3,20 @@ env['SUBLIB'] = True
 env['LIBS'] = [
        	      'framework', 
 	      	  'analysis',
+	      	  'analysis_utility',
 	          'analysis_dataobjects',
 	          'analysis_DecayDescriptor', 
 	          'arich_dataobjects',
-              'bklm_dataobjects',
               'cdc_dataobjects',
               'ecl_dataobjects',
               'eklm_dataobjects',
               'mdst_dataobjects',
               'reconstruction_dataobjects',
               'top_dataobjects',
-              'vxd_dataobjects',
 	      'pxd_dataobjects',
 	      'svd_dataobjects',
-	      'simulation_dataobjects',
 	          'genfit2',
-              'skim_L1Emulator_dataobjects'
+              'hlt_L1Emulator_dataobjects'
 	          ]
 Return('env')
 

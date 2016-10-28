@@ -17,14 +17,21 @@ import os
 import glob
 
 
-def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='build-2016-07-25'):
+def setBelleOrBelle2AndRevision(belleOrBelle2='Belle2', buildOrRevision='notDefined'):
     """
     Sets belleOrBelle2Flag and the Revision of weight files according to the specified arguments.
     """
 
     global belleOrBelle2Flag
     global buildOrRevisionFlag
+
     belleOrBelle2Flag = belleOrBelle2
+
+    if buildOrRevision == 'notDefined':
+        releaseFile = open(os.environ['BELLE2_LOCAL_DIR'] + '/.release', 'r')
+        buildOrRevision = releaseFile.read().splitlines()[0]
+        releaseFile.close()
+
     buildOrRevisionFlag = "_" + buildOrRevision + "_"
 
 
@@ -75,12 +82,16 @@ mlpFANNCombiner.m_random_seeds = 10
 mlpFANNCombiner.m_test_rate = 500
 mlpFANNCombiner.m_number_of_threads = 8
 mlpFANNCombiner.m_scale_features = True
-mlpFANNCombiner.m_scale_target = True
+mlpFANNCombiner.m_scale_target = False
+# mlpFANNCombiner.m_scale_target = True
 
 # SignalFraction: FBDT feature
 # For smooth output set to -1, this will break the calibration.
 # For correct calibration set to -2, leads to peaky combiner output.
 signalFraction = -2
+
+# Maximal number of events to train each method
+maxEventsNumber = 500000
 
 # Definition of all available categories, 'standard category name':
 # ['ParticleList', 'trackLevel category name', 'eventLevel category name',
@@ -519,9 +530,10 @@ def trackLevelTeacher(weightFiles='B2JpsiKs_mu'):
                 trainingOptionsTrackLevel = basf2_mva.GeneralOptions()
                 trainingOptionsTrackLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
                 trainingOptionsTrackLevel.m_treename = methodPrefixTrackLevel + "_tree"
-                trainingOptionsTrackLevel.m_weightfile = weightFile
+                trainingOptionsTrackLevel.m_identifier = weightFile
                 trainingOptionsTrackLevel.m_variables = basf2_mva.vector(*variables[category])
                 trainingOptionsTrackLevel.m_target_variable = targetVariable
+                trainingOptionsTrackLevel.m_max_events = maxEventsNumber
 
                 basf2_mva.teacher(trainingOptionsTrackLevel, fastBDTCategories)
 
@@ -591,7 +603,14 @@ def eventLevel(mode='Expert', weightFiles='B2JpsiKs_mu', path=analysis_main):
                 ntuple = register_module('VariablesToNtuple')
                 ntuple.param('fileName', filesDirectory + '/' + methodPrefixEventLevel + "sampled" + fileId + ".root")
                 ntuple.param('treeName', methodPrefixEventLevel + "_tree")
-                ntuple.param('variables', variables[category] + [targetVariable])
+                variablesToBeSaved = variables[category] + [targetVariable, 'ancestorHasWhichFlavor',
+                                                            'isSignal', 'mcPDG', 'mcErrors', 'genMotherPDG',
+                                                            'nMCMatches', 'B0mcErrors']
+                if category != 'KaonPion' and category != 'FSC':
+                    variablesToBeSaved = variablesToBeSaved + \
+                        ['extraInfo(isRightTrack(' + category + '))',
+                         'hasHighestProbInCat(' + particleList + ', isRightTrack(' + category + '))']
+                ntuple.param('variables', variablesToBeSaved)
                 ntuple.param('particleList', particleList)
                 eventLevelpath.add_module(ntuple)
 
@@ -656,9 +675,10 @@ def eventLevelTeacher(weightFiles='B2JpsiKs_mu'):
                 trainingOptionsEventLevel = basf2_mva.GeneralOptions()
                 trainingOptionsEventLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
                 trainingOptionsEventLevel.m_treename = methodPrefixEventLevel + "_tree"
-                trainingOptionsEventLevel.m_weightfile = weightFile
+                trainingOptionsEventLevel.m_identifier = weightFile
                 trainingOptionsEventLevel.m_variables = basf2_mva.vector(*variables[category])
                 trainingOptionsEventLevel.m_target_variable = targetVariable
+                trainingOptionsEventLevel.m_max_events = maxEventsNumber
 
                 basf2_mva.teacher(trainingOptionsEventLevel, fastBDTCategories)
 
@@ -949,9 +969,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
             trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
-            trainingOptionsCombinerLevel.m_weightfile = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root"
+            trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FBDT' + "_1.root"
             trainingOptionsCombinerLevel.m_variables = basf2_mva.vector(*variablesCombinerLevel)
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
+            trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
+
             basf2_mva.teacher(trainingOptionsCombinerLevel, fastBDTCombiner)
 
             if uploadFlag:
@@ -977,9 +999,11 @@ def combinerLevelTeacher(weightFiles='B2JpsiKs_mu'):
             trainingOptionsCombinerLevel = basf2_mva.GeneralOptions()
             trainingOptionsCombinerLevel.m_datafiles = basf2_mva.vector(*sampledFilesList)
             trainingOptionsCombinerLevel.m_treename = methodPrefixCombinerLevel + 'FBDT' + "_tree"
-            trainingOptionsCombinerLevel.m_weightfile = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"
+            trainingOptionsCombinerLevel.m_identifier = filesDirectory + '/' + methodPrefixCombinerLevel + 'FANN' + "_1.root"
             trainingOptionsCombinerLevel.m_variables = basf2_mva.vector(*variablesCombinerLevel)
             trainingOptionsCombinerLevel.m_target_variable = 'qrCombined'
+            trainingOptionsCombinerLevel.m_max_events = maxEventsNumber
+
             basf2_mva.teacher(trainingOptionsCombinerLevel, mlpFANNCombiner)
 
             if uploadFlag:
@@ -1018,7 +1042,7 @@ def flavorTagger(
         'MaximumPstar',
         'KaonPion'],
     belleOrBelle2="Belle2",
-    buildOrRevision='build-2016-07-25',
+    buildOrRevision='notDefined',
     downloadFromDatabaseIfNotfound=True,
     uploadToDatabaseAfterTraining=False,
     samplerFileId='',
@@ -1091,7 +1115,7 @@ def flavorTagger(
 
     # Events containing ROE without B-Meson (but not empty) are discarded for training
     if mode == 'Sampler':
-        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and qrCombined > -2', roe_path, deadEndPath)
+        signalSideParticleFilter(particleList, 'hasRestOfEventTracks > 0 and abs(qrCombined) == 1', roe_path, deadEndPath)
 
     # If trigger returns 1 jump into empty path skipping further modules in roe_path
     if mode == 'Expert':

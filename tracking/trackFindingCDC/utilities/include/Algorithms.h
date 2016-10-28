@@ -10,6 +10,7 @@
 #pragma once
 
 #include <iterator>
+#include <vector>
 #include <tracking/trackFindingCDC/utilities/Range.h>
 
 namespace Belle2 {

@@ -93,7 +93,6 @@ namespace Belle2 {
     double m_singleResolution;       /**< Resolution of single photon emission angle. */
     std::vector<double> m_aerogelMerit; /**< Vector of aerogel layer figures of merit. */
     int m_inputTrackType;            /**< Input tracks from the tracking (0) or from MCParticles>AeroHits (1). */
-    int    m_beamtest;               /**< If >=1 ARICH beamtest, default 0 (off) */
     int    m_storePhot;              /**< If == 1 individual reconstruced photon information (cherenkov angle,...) is stored in ARICHTrack */
   };
 

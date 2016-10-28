@@ -11,12 +11,10 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 #include <cdc/translators/RealisticTDCCountTranslator.h>
-
-#include <framework/gearbox/Const.h>
-#include <boost/math/special_functions/sinc.hpp>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -50,16 +48,9 @@ void SegmentFitter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "Switch to reestimate the drift length",
                                 m_param_updateDriftLength);
 
-  moduleParamList->addParameter(prefixed(prefix, "useAlphaInDriftLength"),
-                                m_param_useAlphaInDriftLength,
-                                "Switch to serve the alpha angle to the drift length translator",
-                                m_param_useAlphaInDriftLength);
-
-  moduleParamList->addParameter(prefixed(prefix, "tofMassScale"),
-                                m_param_tofMassScale,
-                                "Mass to estimate the velocity in the flight time to the hit",
-                                m_param_tofMassScale);
+  m_driftLengthEstimator.exposeParameters(moduleParamList, prefix);
 }
+
 
 void SegmentFitter::initialize()
 {
@@ -92,41 +83,8 @@ void SegmentFitter::apply(std::vector<CDCRecoSegment2D>& outputSegments)
 {
   // Update the drift length
   if (m_param_updateDriftLength) {
-    CDC::RealisticTDCCountTranslator tdcCountTranslator;
     for (CDCRecoSegment2D& segment : outputSegments) {
-      for (CDCRecoHit2D& recoHit2D : segment) {
-        Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-        Vector2D recoPos = recoHit2D.getRecoPos2D();
-        double alpha = recoPos.angleWith(flightDirection);
-        double cylindricalR = recoPos.cylindricalR();
-        double arcLength2D = cylindricalR / boost::math::sinc_pi(alpha);
-        double flightTimeEstimation = arcLength2D / Const::speedOfLight;
-
-        const CDCWire& wire = recoHit2D.getWire();
-        const CDCHit* hit = recoHit2D.getWireHit().getHit();
-        const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
-
-        if (not m_param_useAlphaInDriftLength) {
-          alpha = 0;
-        }
-
-        if (not std::isnan(m_param_tofMassScale)) {
-          double curvature = 2.0 * std::sin(alpha) / cylindricalR;
-          double pt = CDCBFieldUtil::curvatureToAbsMom2D(curvature, recoPos);
-          flightTimeEstimation = hypot(1, m_param_tofMassScale / pt);
-        }
-
-        double driftLength =
-          tdcCountTranslator.getDriftLength(hit->getTDCCount(),
-                                            wire.getWireID(),
-                                            flightTimeEstimation,
-                                            rl,
-                                            wire.getRefZ(),
-                                            alpha);
-
-        recoHit2D.setRefDriftLength(driftLength);
-        recoHit2D.snapToDriftCircle();
-      }
+      m_driftLengthEstimator.updateDriftLength(segment);
     }
   }
 

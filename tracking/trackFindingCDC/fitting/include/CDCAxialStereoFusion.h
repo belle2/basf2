@@ -14,33 +14,47 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
+    /**
+     * Utility class implementing the Kalmanesk combination of to two dimensional
+     * trajectories to one three dimensional trajectory
+     */
     class CDCAxialStereoFusion {
 
     public:
-      static JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment2D& recoSegment2D,
-                                                const CDCTrajectory2D& trajectory2D);
-
-      static JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
-                                                const CDCTrajectory2D& trajectory2D);
-
+      /// Constructor setting up the options of the fit.
+      explicit CDCAxialStereoFusion(bool reestimateDriftLength = true)
+        : m_reestimateDriftLength(reestimateDriftLength)
+      {
+      }
 
     public:
-      static CDCTrajectory3D fuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                              const CDCRecoSegment2D& endSegment);
+      /**
+       *  Calculate the ambiguity of the helix parameters relative to the three circle
+       *  parameters given the hit content of the segment and their stereo displacement.
+       */
+      JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+                                         const CDCTrajectory2D& trajectory2D);
 
-      static void fuseTrajectories(const CDCSegmentPair& segmentPair);
+    public:
+      /**
+       * Combine the trajectories of the two given segments to a full helix trajectory
+       */
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
+                                                  const CDCRecoSegment2D& endSegment);
 
-      static CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                                         const CDCRecoSegment2D& endSegment,
-                                                         bool priorityOnSZ = true);
+      /**
+       *  Combine the two trajectories of the segments in the pair and assign the
+       *  resulting three dimensional trajectory to the segment pair
+       */
+      void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair);
 
-      static void reconstructFuseTrajectories(const CDCSegmentPair& segmentPair,
-                                              bool priorityOnSZ = true);
+    private:
+      /// Swtich to reestimate the  drift length.
+      bool m_reestimateDriftLength;
 
-    }; // end class
+    }; // class
   } // end namespace TrackFindingCDC
-} // namespace Belle2
+} // end namespace Belle2

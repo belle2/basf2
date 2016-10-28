@@ -69,7 +69,7 @@ RFEventProcessor::RFEventProcessor(string conffile)
   m_rbufout = new RingBuffer(rbufout.c_str(), rboutsize);
 
   // 5. Initialize LogManager
-  m_log = new RFLogManager(m_nodename);
+  m_log = new RFLogManager(m_nodename, m_conf->getconf("system", "lognode"));
 
   // 6. Initialize data flow monitor
   m_flow = new RFFlowStat((char*)shmname.c_str());
@@ -203,6 +203,12 @@ int RFEventProcessor::Start(NSMmsg*, NSMcontext*)
 
 int RFEventProcessor::Stop(NSMmsg*, NSMcontext*)
 {
+  char* hcollect = m_conf->getconf("processor", "dqm", "hcollect");
+  char* filename = m_conf->getconf("processor", "dqm", "file");
+  char* nprocs = m_conf->getconf("processor", "basf2", "nprocs");
+  int pid_hcollect = m_proc->Execute(hcollect, filename, nprocs);
+  int status;
+  waitpid(pid_hcollect, &status, 0);
   return 0;
 }
 

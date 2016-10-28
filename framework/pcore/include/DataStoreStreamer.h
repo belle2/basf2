@@ -46,10 +46,9 @@ namespace Belle2 {
      *
      *  @param addPersistentDurability By default, only c_Event data is streamed. Setting this to true will add c_Persistent data to the EvtMessage.
      *  @param streamTransientObjects Should objects/arrays registered as transient be streamed?
-     *  @param removeEmptyArrays DANGEROUS, don't use.
      *  @return pointer to EvtMessage, caller is responsible for deletion
      */
-    EvtMessage* streamDataStore(bool addPersistentDurability, bool streamTransientObjects = false, bool removeEmptyArrays = false);
+    EvtMessage* streamDataStore(bool addPersistentDurability, bool streamTransientObjects = false);
 
 
     // EvtMessage->DataStore
@@ -59,7 +58,7 @@ namespace Belle2 {
     int restoreDataStore(EvtMessage* msg);
 
     /** Set names of objects to be streamed/destreamed. */
-    void registerStreamObjs(const std::vector<std::string>& list);
+    void setStreamingObjects(const std::vector<std::string>& list);
 
     // Pipelined destreaming of EvtMessage using thread
 

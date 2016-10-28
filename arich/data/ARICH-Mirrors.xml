@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Mirrors>
-  <Material>ARICH_MirrorQuartz</Material>
+  <material>ARICH_MirrorQuartz</material>
   <nMirrors desc="Mirrors are placed as regular nMirrors-sided polygon">18</nMirrors>
-  <outerRadius desc="Radius of outscribed circle to mirrors polygon" unit="mm">1123</outerRadius>
-  <mirrorThickness desc="Thickness of mirror plates" unit="mm">3</mirrorThickness>
-  <mirrorWidth desc="Width of mirror plates" unit="mm">148</mirrorWidth>
-  <mirrorLength desc="Length of mirror plates" unit="mm">380</mirrorLength>
-  <Zposition desc="position of mirrors in Z direction (starting point)" unit="mm">1710</Zposition>
-  <startAngle desc="Angle of the first corner of mirror plates polygon" unit="deg">10.0</startAngle>
-  <Surface>
+  <radius desc="Radius at which mirrors are placed" unit="mm">1106</radius>
+  <thickness desc="Thickness of mirror plates" unit="mm">2</thickness>
+  <width desc="Width of mirror plates" unit="mm">131</width>
+  <length desc="Length of mirror plates" unit="mm">383</length>
+  <zPosition desc="position of mirrors in Z direction (starting point)" unit="mm">58.0</zPosition>
+  <startAngle desc="Angle of the center of the first mirror plate" unit="deg">0.0</startAngle> 
+  
+  <Surface name="Surface">
     <Properties>
       <Property name="REFLECTIVITY" unit="eV">
-	<value energy="1.0">0.78</value> 
-	<value energy="1.25">0.78</value> 
-	<value energy="1.45">0.83</value> 
-	<value energy="1.7">0.9</value> 
+	<value energy="1.0">0.78</value>
+	<value energy="1.25">0.78</value>
+	<value energy="1.45">0.83</value>
+	<value energy="1.7">0.9</value>
 	<value energy="2.1">0.95</value>
 	<value energy="2.7">0.96</value>
 	<value energy="3.1">0.93</value>
@@ -28,6 +29,9 @@
     <Finish>polished</Finish>
     <Model>glisur</Model>
   </Surface>
+  
+  
+
   <Alignment>
     <Plate id="1">
       <dr unit="mm" >0.00000000e+00</dr> 

@@ -61,10 +61,11 @@ ClawDigitizerModule::ClawDigitizerModule() : Module()
   //Default values are set here. New values can be in CLAW.xml.
   addParam("ScintCell", m_ScintCell, "Number of scintillator cell", 16);
   addParam("TimeStep", m_TimeStep, "Time step", 0.8);
+  addParam("C_keV_to_MIP", m_C_keV_to_MIP, "C_keV_to_MIP", 805.5);
+  addParam("C_MIP_to_PE", m_C_MIP_to_PE, "C_MIP_to_PE", 15.0);
   addParam("MinTime", m_MinTime, "Min. time", 0.0);
   addParam("MaxTime", m_MaxTime, "Max. time", 750.0);
-  addParam("Ethres", m_Ethres, "Energy threshold in MeV", 0.0);
-
+  addParam("PEthres", m_PEthres, "Energy threshold in keV", 1.0);
 }
 
 ClawDigitizerModule::~ClawDigitizerModule()
@@ -96,64 +97,50 @@ void ClawDigitizerModule::event()
   if (ClawSimHits.getEntries() == 0) {
     return;
   }
-  /*
-  //auto edepArray = new vector<double>[m_ScintCell](); //energy deposits per scintillator cell
-  auto adepArray = new vector<double>[m_ScintCell](); //energy deposits corrected per scintillator cell
-  auto timeArray = new vector<double>[m_ScintCell](); //time cell bin nmber
-  //auto pdgArray = new vector<double>[numOfCells](); //particle pdg that deposits energy
 
-  int nentries = ClawSimHits.getEntries();
-  //loop on all entries to store for each CLAW scintillator cell
-  for (int i = 0; i < nentries; i++) {
-    ClawSimHit* aHit = ClawSimHits[i];
-    int detNb = aHit->getdetNb();
-    //int pdgid = aHit->gettkPDG();
-    //float edep = aHit->getEnergyDep();
-    float adep = aHit->getEnergyNiel();
-    float G4time = aHit->getGlTime();
+  StoreArray<ClawSimHit> SimHits;
+  StoreArray<ClawHit> Hits;
 
-    //edepArray[detNb].push_back(edep);
-    adepArray[detNb].push_back(adep);
-    timeArray[detNb].push_back(G4time);
-    //pdgArray[detNb].push_back(pdgid);
+  int number_of_timebins = (int)((m_MaxTime - m_MinTime) / m_TimeStep);
 
+  for (int i = 0; i < 1000; i ++)
+    for (int j = 0; j < 100; j ++)
+      hitsarrayinPE[i][j] = 0;
+
+  for (const auto& SimHit : SimHits) {
+    const int detNb = SimHit.getCellId();
+    const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
+    const double tof = SimHit.getFlightTime(); //ns
+    int TimeBin = tof / m_TimeStep;
+    double MIP = Edep / m_C_keV_to_MIP;
+    double PE = MIP * m_C_MIP_to_PE;
+    if (m_MinTime < tof && tof < m_MaxTime && TimeBin < 1000 && detNb < 100)
+      hitsarrayinPE[TimeBin][detNb] += PE;
   }
-  //determine the number of time bin
-  int TimeNbins = (int)((m_MaxTime - m_MinTime) / m_TimeStep);
-
-  //loop over CLAW scintillator cell
-  for (int i = 0; i < m_ScintCell; i ++) {
-
-    //define and initialize the energy sum per time cell for each scintillator
-    double esum[TimeNbins];
-    for (int j = 0; j < TimeNbins; j ++) esum[j] = 0;
-
-    //loop over array entries
-    for (int j = 0; j < (int) adepArray[i].size(); j ++) {
-
-      //calculate time bin value
-      int i_bin = timeArray[i][j] / m_TimeStep;
-
-      //check if hit within time range
-      if (m_MinTime <= timeArray[i][j] && timeArray[i][j] <= m_MaxTime)
-        esum[i_bin] += adepArray[i][j];
-    }
-
-    //loop over number of time bin
-    for (int j = 0; j < TimeNbins; j ++) {
-
-      //if esum > 0 then store in ClawHit detNb, time bin, energy sum, and particle counter
-      if (esum[j] > m_Ethres) {
-        int ncount = esum[j] / m_ConvFac;
-        ClawHits.appendNew(i, j , esum[j], ncount);
+  /*
+  for (const auto& SimHit : SimHits) {
+    const int detNb = SimHit.getCellId();
+    //int pdg = SimHit.getPDGCode();
+    const double Edep = SimHit.getEnergyDep() * 1e6; //GeV -> keV
+    const double tof = SimHit.getFlightTime(); //ns
+    int TimeBin = tof / m_TimeStep;
+    double MIP = Edep / m_C_keV_to_MIP;
+    double PE = MIP * m_C_MIP_to_PE;
+    if ((m_MinTime < tof && tof < m_MaxTime) &&  PE > m_PEthres)
+      Hits.appendNew(ClawHit(detNb,  TimeBin, Edep, MIP, PE));
+  }
+  */
+  for (int i = 0; i < number_of_timebins; i ++) {
+    for (int j = 0; j < m_ScintCell; j ++) {
+      if (hitsarrayinPE[i][j] > m_PEthres) {
+        double PE = hitsarrayinPE[i][j];
+        double MIP = PE / m_C_MIP_to_PE;
+        double Edep = MIP * m_C_keV_to_MIP * 1e-6; //keV -> GeV.
+        Hits.appendNew(ClawHit(i, j, Edep, MIP, PE));
       }
     }
   }
 
-  //delete array
-  delete [] adepArray;
-  delete [] timeArray;
-  */
 }
 
 //read tube centers, impulse response, and garfield drift data filename from CLAW.xml
@@ -165,11 +152,11 @@ void ClawDigitizerModule::getXMLData()
   m_TimeStep = content.getDouble("TimeStep");
   m_MinTime = content.getDouble("MinTime");
   m_MaxTime = content.getDouble("MaxTime");
-  m_Ethres = content.getDouble("Ethres");
-  m_ConvFac = content.getDouble("ConvFac");
+  m_PEthres = content.getDouble("PEthres");
+  m_C_keV_to_MIP = content.getDouble("C_keV_to_MIP");
+  m_C_MIP_to_PE = content.getDouble("C_MIP_to_PE");
 
   B2INFO("ClawDigitizer: Aquired claw locations and gas parameters");
-  B2INFO("              from CLAW.xml. There are " << m_ScintCell << " CLAWs implemented");
 
 }
 

@@ -498,7 +498,7 @@ void PXDPackerModule::pack_dhp(int chip_id, int dhe_id, int dhe_reformat)
           rowstart = false;
         }
         int colout = col;
-        if (dhe_reformat == 0) colout ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
+//        if (dhe_reformat == 0) colout ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
         append_int16(0x8000 | ((row & 0x1) << 14) | ((colout & 0x3F) << 8) | (halfladder_pixmap[row][col] & 0xFF));
         empty = false;
       }

@@ -11,16 +11,11 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/geometry/GeneralizedCircle.h>
-
+#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-namespace {
-  float nvl(const float& value, const float& subs)
-  { return std::isnan(value) ? subs : value; }
-}
 
 CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
   m_curv(curv),
@@ -33,7 +28,8 @@ CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
     double cylindricalR = (wireLayer.getOuterCylindricalR() + wireLayer.getInnerCylindricalR()) / 2;
     double factor = GeneralizedCircle::arcLengthFactor(cylindricalR, curv);
 
-    double arcLength2D = cylindricalR * nvl(factor, M_PI);
+    // Fall back when the closest approach to the layer is the apogee
+    double arcLength2D = cylindricalR * std::fmin(factor, M_PI);
     double r = 1.0 / fabs(m_curv);
 
     m_arcLength2DByICLayer[iCLayer] = arcLength2D;

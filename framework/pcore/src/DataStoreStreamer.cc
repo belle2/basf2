@@ -17,15 +17,14 @@
 
 #include <TClonesArray.h>
 #include <TClass.h>
+#include <TStreamerInfo.h>
+#include <TList.h>
 
 #include <unistd.h>
 #include <stdio.h>                      // for NULL, printf
 
 #include <algorithm>
 #include <queue>
-
-#include <TStreamerInfo.h>
-#include <TList.h>
 
 
 using namespace std;
@@ -99,7 +98,7 @@ DataStoreStreamer::~DataStoreStreamer()
   delete m_msghandler;
 }
 
-void DataStoreStreamer::registerStreamObjs(const vector<string>& objlist)
+void DataStoreStreamer::setStreamingObjects(const vector<string>& objlist)
 {
   m_streamobjnames = objlist;
 }
@@ -132,7 +131,7 @@ void DataStoreStreamer::removeSideEffects()
 
 
 // Stream DataStore
-EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, bool streamTransientObjects, bool removeEmptyArrays)
+EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, bool streamTransientObjects)
 {
   // Clear Message Handler
   m_msghandler->clear();
@@ -149,11 +148,6 @@ EvtMessage* DataStoreStreamer::streamDataStore(bool addPersistentDurability, boo
       //skip transient objects/arrays?
       if (!streamTransientObjects and entry->dontWriteOut)
         continue;
-
-      //skip empty arrays
-      if (removeEmptyArrays and entry->isArray) {
-        if (static_cast<TClonesArray*>(entry->object)->GetEntriesFast() == 0) continue;
-      }
 
       //skip objects not in the list
       if (!m_streamobjnames.empty()) {
@@ -219,7 +213,7 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     B2INFO("Got termination message. Exitting...");
     //msg doesn't really contain data, set EventMetaData to something equivalent
     StoreObjPtr<EventMetaData> eventMetaData;
-    if (m_initStatus == 0)
+    if (m_initStatus == 0 && DataStore::Instance().getInitializeActive())
       eventMetaData.registerInDataStore();
     eventMetaData.create();
     eventMetaData->setEndOfData();
@@ -235,8 +229,6 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
     m_msghandler->decode_msg(msg, objlist, namelist);
     int nobjs = (msg->header())->nObjects;
     int narrays = (msg->header())->nArrays;
-
-    //    if ( m_initStatus != 0 ) return 0;   // Debugging only
 
     // Restore objects in DataStore
     for (int i = 0; i < nobjs + narrays; i++) {
@@ -255,9 +247,9 @@ int DataStoreStreamer::restoreDataStore(EvtMessage* msg)
         const TClass* cl = obj->IsA();
         if (array)
           cl = static_cast<TClonesArray*>(obj)->GetClass();
-        if (m_initStatus == 0) { //are we called by the module's initialize() function?
-          bool transient = obj->TestBit(c_IsTransient);
-          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
+        if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
+          auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
+          DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
         }
         //only restore object if it is valid for current event
         bool ptrIsNULL = obj->TestBit(c_IsNull);
@@ -365,8 +357,6 @@ void* DataStoreStreamer::decodeEvtMessage(int id)
 
     // Construct EvtMessage
     EvtMessage* msg = new EvtMessage(evtbuf);
-    //    EvtMessage* msg = new EvtMessage();
-    //    msg->buffer(evtbuf);
 
     // Decode EvtMessage into Objects
     vector<TObject*> objlist;
@@ -430,9 +420,9 @@ int DataStoreStreamer::restoreDataStoreAsync()
       const TClass* cl = obj->IsA();
       if (array)
         cl = static_cast<TClonesArray*>(obj)->GetClass();
-      if (m_initStatus == 0) { //are we called by the module's initialize() function?
-        bool transient = obj->TestBit(c_IsTransient);
-        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, transient ? DataStore::c_DontWriteOut : 0);
+      if (m_initStatus == 0 && DataStore::Instance().getInitializeActive()) { //are we called by the module's initialize() function?
+        auto flags = obj->TestBit(c_IsTransient) ? DataStore::c_DontWriteOut : DataStore::c_WriteOut;
+        DataStore::Instance().registerEntry(namelist.at(i), durability, cl, array, flags);
       }
       //only restore object if it is valid for current event
       bool ptrIsNULL = obj->TestBit(c_IsNull);

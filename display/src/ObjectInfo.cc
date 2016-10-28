@@ -8,30 +8,54 @@
 
 #include <TString.h>
 #include <TMath.h>
+#include <TClass.h>
+#include <TMethod.h>
+#include <TInterpreter.h>
 
 using namespace Belle2;
+
+namespace {
+  std::string callStringMethod(const TObject* obj, const char* name)
+  {
+    std::string str; //empty string to hold contents. If you allocate memory here this will leak.
+    TClass* cl = obj->IsA();
+    if (!cl) {
+      B2ERROR("No class?");
+      return str;
+    }
+    TMethod* m = cl->GetMethod(name, "", true);
+    if (m) {
+      if (m->GetReturnTypeName() != std::string("string"))
+        B2WARNING(cl->GetName() << "::" << name << " has return type " << m->GetReturnTypeName() <<
+                  " instead of std::string, cannot show info.");
+      else
+        gInterpreter->ExecuteWithArgsAndReturn(m, (void*)obj, 0, 0, &str);
+    }
+    return str;
+  }
+}
 
 TString ObjectInfo::getName(const TObject* obj)
 {
   if (!obj)
-    B2FATAL("ObjectInfo::getName() got null?");
+    B2ERROR("ObjectInfo::getName() got null?");
   if (const RelationsObject* relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getName();
   }
-  return "";
+  return callStringMethod(obj, "getName");
 }
 
 TString ObjectInfo::getInfo(const TObject* obj)
 {
   if (!obj)
-    B2FATAL("ObjectInfo::getInfo() got null?");
+    B2ERROR("ObjectInfo::getInfo() got null?");
   if (auto relObj = dynamic_cast<const RelationsObject*>(obj)) {
     return relObj->getInfoHTML();
   } else if (auto vertex = dynamic_cast<const genfit::GFRaveVertex*>(obj)) {
     return "<b>V</b>=" + HTML::getString(vertex->getPos()) + "<br>" +
            TString::Format("pVal=%e", TMath::Prob(vertex->getChi2(), vertex->getNdf()));
   }
-  return "";
+  return callStringMethod(obj, "getInfoHTML");
 }
 
 TString ObjectInfo::getTitle(const TObject* obj)

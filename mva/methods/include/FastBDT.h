@@ -23,6 +23,14 @@
 #include <IO.h>
 #endif
 
+// Template specialization to fix NAN sort bug of FastBDT in upto Version 3.2
+#if FastBDT_VERSION_MAJOR <= 3 && FastBDT_VERSION_MINOR <= 2
+namespace FastBDT {
+  template<>
+  bool compareIncludingNaN(float i, float j);
+}
+#endif
+
 namespace Belle2 {
   namespace MVA {
 
@@ -54,7 +62,7 @@ namespace Belle2 {
        */
       virtual std::string getMethod() const override { return "FastBDT"; }
 
-      unsigned int m_nTrees = 400; /**< Number of trees */
+      unsigned int m_nTrees = 200; /**< Number of trees */
       unsigned int m_nCuts = 8; /**< Number of cut Levels = log_2(Number of Cuts) */
       unsigned int m_nLevels = 3; /**< Depth of tree */
       double m_shrinkage = 0.1; /**< Shrinkage during the boosting step */

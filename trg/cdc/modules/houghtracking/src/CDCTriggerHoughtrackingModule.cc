@@ -14,6 +14,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <trg/cdc/dataobjects/CDCTriggerTrack.h>
+#include <trg/cdc/dataobjects/CDCTriggerHoughCluster.h>
 #include <cdc/geometry/CDCGeometryPar.h>
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Const.h>
@@ -43,22 +44,29 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
   addParam("outputCollection", m_outputCollectionName,
            "Name of the StoreArray holding the tracks found in the Hough tracking.",
            string("Trg2DFinderTracks"));
+  addParam("clusterCollection", m_clusterCollectionName,
+           "Name of the StoreArray holding the clusters formed in the Hough plane.",
+           string(""));
   addParam("nCellsPhi", m_nCellsPhi,
            "Number of Hough cells in phi (limits: [-180, 180]). Must be an even number.",
            (unsigned)(160));
   addParam("nCellsR", m_nCellsR,
            "Number of Hough cells in 1/r. Must be an even number.",
-           (unsigned)(32));
+           (unsigned)(34));
   addParam("minPt", m_minPt,
            "Minimum Pt [GeV]. "
            "Hough plane limits in 1/r are [-1/r(minPt), 1/r(minPt)]", (double)(0.3));
+  addParam("shiftPt", m_shiftPt,
+           "Shift the Hough plane by 1/4 cell size in 1/r to avoid "
+           "curvature 0 tracks (<0: shift in negative direction, "
+           "0: no shift, >0: shift in positive direction).", 0);
 
   addParam("minHits", m_minHits,
            "Minimum hits from different super layers required in a peak cell.",
            (unsigned)(4));
   addParam("minCells", m_minCells,
            "Peaks with less than minCells connected cells are ignored.",
-           (unsigned)(1));
+           (unsigned)(2));
   addParam("onlyLocalMax", m_onlyLocalMax,
            "Switch to remove cells connected to a cell with higher super layer count.",
            false);
@@ -69,12 +77,27 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            (unsigned)(6));
   addParam("ignore2ndPriority", m_ignore2nd,
            "Switch to skip second priority hits.", false);
+  addParam("usePriorityPosition", m_usePriority,
+           "If true, use wire position of priority cell in track segment, "
+           "otherwise use wire position of center cell.", true);
   addParam("requireSL0", m_requireSL0,
            "Switch to check separately for a hit in the innermost superlayer.", false);
   addParam("storeHoughPlane", m_storePlane,
            "Switch for saving Hough plane as TMatrix in DataStore. "
            "0: don't store anything, 1: store only peaks, 2: store full plane "
            "(will increase runtime).", (unsigned)(0));
+  addParam("clusterPattern", m_clusterPattern,
+           "use nested pattern algorithm to find clusters", true);
+  addParam("clusterSizeX", m_clusterSizeX,
+           "maximum number of 2 x 2 squares in cluster for pattern algorithm",
+           (unsigned)(3));
+  addParam("clusterSizeY", m_clusterSizeY,
+           "maximum number of 2 x 2 squares in cluster for pattern algorithm",
+           (unsigned)(3));
+  addParam("hitRelationsFromCorners", m_hitRelationsFromCorners,
+           "Switch for creating relations to hits in the pattern algorithm. "
+           "If true, create relations from cluster corners, otherwise "
+           "from estimated cluster center (might not have relations).", false);
 }
 
 void
@@ -82,11 +105,14 @@ CDCTriggerHoughtrackingModule::initialize()
 {
   StoreArray<CDCTriggerSegmentHit>::required();
   StoreArray<CDCTriggerTrack>::registerPersistent(m_outputCollectionName);
+  StoreArray<CDCTriggerHoughCluster>::registerPersistent(m_clusterCollectionName);
 
   StoreArray<CDCTriggerSegmentHit> segmentHits;
   StoreArray<CDCTriggerTrack> tracks(m_outputCollectionName);
+  StoreArray<CDCTriggerHoughCluster> clusters(m_clusterCollectionName);
 
   tracks.registerRelationTo(segmentHits);
+  tracks.registerRelationTo(clusters);
 
   if (m_storePlane > 0) StoreObjPtr<TMatrix>::registerPersistent("HoughPlane");
 
@@ -113,10 +139,12 @@ CDCTriggerHoughtrackingModule::event()
   /* Clean hits */
   hitMap.clear();
   houghCand.clear();
-  houghTrack.clear();
+
+  /* set default return value */
+  setReturnValue(true);
 
   if (tsHits.getEntries() == 0) {
-    B2WARNING("CDCTracking: tsHitsCollection is empty!");
+    //B2WARNING("CDCTracking: tsHitsCollection is empty!");
     return;
   }
 
@@ -125,11 +153,14 @@ CDCTriggerHoughtrackingModule::event()
     unsigned short iSL = tsHits[iHit]->getISuperLayer();
     if (iSL % 2) continue;
     if (m_ignore2nd && tsHits[iHit]->getPriorityPosition() < 3) continue;
-    double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL]
-                 + 0.5 * (((tsHits[iHit]->getPriorityPosition() >> 1) & 1)
-                          - (tsHits[iHit]->getPriorityPosition() & 1));
+    double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
+    if (m_usePriority) {
+      phi += 0.5 * (((tsHits[iHit]->getPriorityPosition() >> 1) & 1)
+                    - (tsHits[iHit]->getPriorityPosition() & 1));
+    }
     phi = phi * 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
-    double r = radius[iSL][int(tsHits[iHit]->getPriorityPosition() < 3)];
+    double r = radius[iSL][int(m_usePriority &&
+                               tsHits[iHit]->getPriorityPosition() < 3)];
     TVector2 pos(cos(phi) / r, sin(phi) / r);
     hitMap.insert(std::make_pair(iHit, std::make_pair(iSL, pos)));
   }
@@ -141,14 +172,20 @@ CDCTriggerHoughtrackingModule::event()
   nCells = pow(2, maxIterations + 1);
   /* limits in phi: [-pi, pi] + extra cells */
   double rectX = M_PI * nCells / m_nCellsPhi;
-  /* limits in R: [-R(minPt), R(minPt)] + extra cells */
+  /* limits in R: [-R(minPt), R(minPt)] + extra cells + shift */
   maxR = 0.5 * Const::speedOfLight * 1.5e-4 / m_minPt;
   double rectY = maxR * nCells / m_nCellsR;
+  shiftR = 0;
+  if (m_shiftPt < 0) {
+    shiftR = -maxR / 2. / m_nCellsR;
+  } else if (m_shiftPt > 0) {
+    shiftR = maxR / 2. / m_nCellsR;
+  }
 
   B2DEBUG(50, "extending Hough plane to " << maxIterations << " iterations, "
           << nCells << " cells: phi in ["
           << -rectX * 180. / M_PI << ", " << rectX * 180. / M_PI
-          << "] deg, 1/r in [" << -rectY << ", " << rectY << "] cm");
+          << "] deg, 1/r in [" << -rectY + shiftR << ", " << rectY + shiftR << "] /cm");
 
   /* prepare matrix for storing the Hough plane */
   if (m_storePlane > 0) {
@@ -158,31 +195,11 @@ CDCTriggerHoughtrackingModule::event()
   }
 
   /* find track candidates in Hough plane */
-  fastInterceptFinder(hitMap, -rectX, rectX, -rectY, rectY, 0, 0, 0);
+  fastInterceptFinder(hitMap, -rectX, rectX, -rectY + shiftR, rectY + shiftR, 0, 0, 0);
 
   /* merge track candidates */
-  connectedRegions();
-
-  /* write tracks to datastore */
-  vector<unsigned> idList;
-  TVector2 coord;
-
-  if (!storeTracks.isValid()) {
-    storeTracks.create();
-  } else {
-    storeTracks.getPtr()->Clear();
-  }
-
-  for (auto it = houghTrack.begin(); it != houghTrack.end(); ++it) {
-    idList = it->getIdList();
-    coord = it->getCoord();
-    const CDCTriggerTrack* track =
-      storeTracks.appendNew(coord.X(), 2. * coord.Y(), 0.);
-
-    // relations
-    for (unsigned i = 0; i < idList.size(); ++i) {
-      unsigned its = idList[i];
-      track->addRelationTo(tsHits[its]);
-    }
-  }
+  if (m_clusterPattern)
+    patternClustering();
+  else
+    connectedRegions();
 }

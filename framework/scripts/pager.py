@@ -29,14 +29,19 @@ class Pager(object):
     """
 
     def __init__(self, prompt=None):
+        """ ctor """
+        #: prompt string
         self.prompt = prompt
 
     def __enter__(self):
+        """ entering context """
+        #: temporary file for capturing output
         self.tmp_file = tempfile.NamedTemporaryFile(mode='w')
 
         sys.stdout = self.tmp_file
 
     def __exit__(self, exc_type, exc_val, exc_tb):
+        """ exiting context """
         sys.stdout.flush()
         if self.prompt is None:
             self.prompt = '%f'  # same as default prompt

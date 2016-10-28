@@ -10,10 +10,11 @@
 #include <tracking/trackFindingCDC/filters/facet/TruthFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <TDatabasePDG.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -36,14 +37,30 @@ bool TruthFacetVarSet::extract(const CDCFacet* ptrFacet)
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
 
   const CDCWireHit& middleWireHit = rlWireHitTriple.getMiddleWireHit();
-
   const CDCSimHit* middleSimHit = mcHitLookUp.getSimHit(middleWireHit.getHit());
+
   if (middleSimHit) {
-    var<named("truth_pos_theta")>() = middleSimHit->getPosTrack().Theta();
-    var<named("truth_mom_phi")>() = middleSimHit->getMomentum().Phi();
+    TVector3 truePos = middleSimHit->getPosTrack();
+    TVector3 trueMom = middleSimHit->getMomentum();
+    int pdgCode = middleSimHit->getPDGCode();
+    const TParticlePDG* ptrTPDGParticle = TDatabasePDG::Instance()->GetParticle(pdgCode);
+    if (not ptrTPDGParticle) {
+      return false;
+      B2WARNING("No particle for PDG code " << pdgCode << ". Could not get fit");
+    }
+    const TParticlePDG& tPDGParticle = *ptrTPDGParticle;
+    double charge = tPDGParticle.Charge() / 3.0;
+    double trueCurv  = CDCBFieldUtil::absMom2DToCurvature(trueMom.Perp(), charge, Vector3D(truePos));
+
+    var<named("truth_pos_theta")>() = truePos.Theta();
+    var<named("truth_mom_phi")>() = trueMom.Phi();
+    var<named("truth_curv")>() = trueCurv;
+    var<named("truth_alpha")>() = truePos.DeltaPhi(trueMom);
   } else {
     var<named("truth_pos_theta")>() = NAN;
     var<named("truth_mom_phi")>() = NAN;
+    var<named("truth_curv")>() = NAN;
+    var<named("truth_alpha")>() = NAN;
   }
 
   return true;

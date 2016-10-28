@@ -11,6 +11,7 @@
 #include <mva/utility/Binning.h>
 
 #include <algorithm>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {

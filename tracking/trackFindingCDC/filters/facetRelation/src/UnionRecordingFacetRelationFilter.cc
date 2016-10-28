@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationVarSets.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -30,6 +29,8 @@ UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
     return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BasicFacetRelationVarSet());
+  } else if (name == "bend") {
+    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BendFacetRelationVarSet());
   } else if (name == "fit") {
     return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new FitFacetRelationVarSet());
   } else if (name == "tmva") {

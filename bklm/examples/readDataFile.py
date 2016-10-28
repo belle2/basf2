@@ -23,11 +23,16 @@ from basf2 import *
 set_log_level(LogLevel.ERROR)
 # set_log_level(LogLevel.INFO)
 
+use_local_database("localdb/database.txt", "localdb")
+# use use_central_database for uploading data to PNNL
+# use_central_database("test_bklm")
+
 # input
 # input = register_module('RootInput')
 input = register_module('SeqRootInput')
 conversion = register_module('Convert2RawDet')
-# input.param('inputFileName', '/x02/data/e0000r000554.sroot')
+filelist = '/group/belle/users/guanyh/belle2klm/CosmicData/161022_BF2aux_trig_RO_rcl10.sroot'
+input.param('inputFileName', filelist)
 
 # EventInfoSetter - generate event meta data
 eventinfosetter = register_module('EventInfoSetter')
@@ -44,6 +49,7 @@ geobuilder.param('components', ['BKLM'])
 bklmUnpack = register_module('BKLMUnpacker')
 # bklmUnpack.param("keepEvenPackages",1);
 bklmUnpack.param("useDefaultModuleId", 1)
+bklmUnpack.param('loadMapFromDB', 1)
 bklmreco = register_module('BKLMReconstructor')
 # bklmreco.log_level = LogLevel.INFO
 
@@ -72,6 +78,11 @@ main.add_module(geobuilder)
 main.add_module(bklmUnpack)
 main.add_module(bklmreco)
 main.add_module(bklmEff)
+bklmStaTracking = register_module('BKLMTracking')
+main.add_module(bklmStaTracking)
+# bklmDiagnosis=register_module('BKLMDiagnosis')
+# bklmDiagnosis.param('filename','diagno.root')
+# main.add_module(bklmDiagnosis)
 
 # main.add_module(output)
 

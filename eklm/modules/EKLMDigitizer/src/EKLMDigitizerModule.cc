@@ -11,6 +11,9 @@
 /* System headers. */
 #include <math.h>
 
+/* External headers. */
+#include <boost/graph/adjacency_list.hpp>
+
 /* Belle2 headers. */
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <eklm/simulation/FiberAndElectronics.h>
@@ -63,7 +66,7 @@ void EKLMDigitizerModule::readAndSortSimHits()
   EKLMSimHit* hit;
   StoreArray<EKLMSimHit> simHitsArray;
   int i, strip, maxStrip;
-  maxStrip = m_GeoDat->getMaximalStripNumber();
+  maxStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_SimHitVolumeMap.clear();
   for (i = 0; i < simHitsArray.getEntries(); i++) {
     hit = simHitsArray[i];

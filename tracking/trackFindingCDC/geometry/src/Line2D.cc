@@ -10,19 +10,15 @@
 
 #include <tracking/trackFindingCDC/geometry/Line2D.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 Vector2D Line2D::intersection(const Line2D& line) const
 {
 
   double determinant = n12().cross(line.n12());
-  Vector2D result(-n0() * line.n2() + line.n0() * n2(),
-                  n0() * line.n1() - line.n0() * n1());
+  Vector2D result(-n0() * line.n2() + line.n0() * n2(), n0() * line.n1() - line.n0() * n1());
 
   result /= determinant;
   return result;
-
 }

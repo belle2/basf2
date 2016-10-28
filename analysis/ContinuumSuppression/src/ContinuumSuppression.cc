@@ -169,8 +169,8 @@ namespace Belle2 {
       }
 
       // Thrust variables
-      thrustB = calculateThrust(p3_cms_sigB);
-      thrustO = calculateThrust(p3_cms_roe);
+      thrustB = Thrust::calculateThrust(p3_cms_sigB);
+      thrustO = Thrust::calculateThrust(p3_cms_roe);
       thrustBm = thrustB.Mag();
       thrustOm = thrustO.Mag();
       cosTBTO  = fabs(cos(thrustB.Angle(thrustO)));
@@ -185,7 +185,7 @@ namespace Belle2 {
       //cleoConesRoe = cc.cleo_cone_with_roe();
 
       // Fox-Wolfram Moments: Uses all final-state tracks (= sigB + ROE)
-      FoxWolfram FW(foxwolfram(p3_cms_all));
+      FoxWolfram FW(p3_cms_all);
       R2 = FW.R(2);
 
       // KSFW moments

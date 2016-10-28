@@ -36,15 +36,8 @@ Module::Module() :
   m_propertyFlags(0),
   m_logConfig(),
   m_hasReturnValue(false),
-  m_returnValue(0),
-  m_condition(nullptr)
+  m_returnValue(0)
 {
-}
-
-
-Module::~Module()
-{
-  delete m_condition;
 }
 
 const std::string& Module::getType() const
@@ -87,11 +80,7 @@ void Module::setLogInfo(int logLevel, unsigned int logInfo)
 
 void Module::if_value(const std::string& expression, boost::shared_ptr<Path> path, EAfterConditionPath afterConditionPath)
 {
-  if (m_condition) {
-    throw std::runtime_error("You can only set a single condition per module!");
-  }
-
-  m_condition = new ModuleCondition(expression, path, afterConditionPath);
+  m_conditions.emplace_back(expression, path, afterConditionPath);
 }
 
 
@@ -108,28 +97,66 @@ void Module::if_true(boost::shared_ptr<Path> path, EAfterConditionPath afterCond
 
 bool Module::evalCondition() const
 {
-  if (!m_condition) return false;
+  if (m_conditions.empty()) return false;
 
   //okay, a condition was set for this Module...
   if (!m_hasReturnValue) {
     B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
   }
-  return m_condition->evaluate(m_returnValue);
+
+  for (const auto& condition : m_conditions) {
+    if (condition.evaluate(m_returnValue)) {
+      return true;
+    }
+  }
+  return false;
 }
 
 boost::shared_ptr<Path> Module::getConditionPath() const
 {
   PathPtr p;
-  if (m_condition)
-    p = m_condition->getPath();
+  if (m_conditions.empty()) return p;
+
+  //okay, a condition was set for this Module...
+  if (!m_hasReturnValue) {
+    B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
+  }
+
+  for (const auto& condition : m_conditions) {
+    if (condition.evaluate(m_returnValue)) {
+      return condition.getPath();
+    }
+  }
+
+  // if none of the conditions were true, return a null pointer.
   return p;
 }
 
 Module::EAfterConditionPath Module::getAfterConditionPath() const
 {
-  if (m_condition)
-    return m_condition->getAfterConditionPath();
+  if (m_conditions.empty()) return EAfterConditionPath::c_End;
+
+  //okay, a condition was set for this Module...
+  if (!m_hasReturnValue) {
+    B2FATAL("A condition was set for '" << getName() << "', but the module did not set a return value!");
+  }
+
+  for (const auto& condition : m_conditions) {
+    if (condition.evaluate(m_returnValue)) {
+      return condition.getAfterConditionPath();
+    }
+  }
+
   return EAfterConditionPath::c_End;
+}
+std::vector<boost::shared_ptr<Path>> Module::getAllConditionPaths() const
+{
+  std::vector<boost::shared_ptr<Path>> allConditionPaths;
+  for (const auto& condition : m_conditions) {
+    allConditionPaths.push_back(condition.getPath());
+  }
+
+  return allConditionPaths;
 }
 
 bool Module::hasProperties(unsigned int propertyFlags) const
@@ -152,12 +179,7 @@ boost::shared_ptr<PathElement> Module::clone() const
   newModule->m_package = m_package;
   newModule->m_propertyFlags = m_propertyFlags;
   newModule->m_logConfig = m_logConfig;
-
-  if (!m_condition) {
-    newModule->m_condition = nullptr;
-  } else {
-    newModule->m_condition = new ModuleCondition(*m_condition);
-  }
+  newModule->m_conditions = m_conditions;
 
   return newModule;
 }
@@ -167,8 +189,8 @@ std::string Module::getPathString() const
 
   std::string output = getName();
 
-  if (m_condition) {
-    output += m_condition->getString();
+  for (const auto& condition : m_conditions) {
+    output += condition.getString();
   }
 
   return output;
@@ -256,17 +278,23 @@ namespace {
   {
     return *(m->getParamInfoListPython().get()); //copy the list object
   }
-  int _getConditionValuePython(const Module* m)
+  boost::python::list _getAllConditionPathsPython(const Module* m)
   {
-    if (m->getCondition())
-      return m->getCondition()->getConditionValue();
-    throw runtime_error("No condition was set for module " + m->getName());
+    boost::python::list allConditionPaths;
+    for (const auto& conditionPath : m->getAllConditionPaths()) {
+      allConditionPaths.append(boost::python::object(conditionPath));
+    }
+
+    return allConditionPaths;
   }
-  ModuleCondition::EConditionOperators _getConditionOperatorPython(const Module* m)
+  boost::python::list _getAllConditionsPython(const Module* m)
   {
-    if (m->getCondition())
-      return m->getCondition()->getConditionOperator();
-    throw runtime_error("No condition was set for module " + m->getName());
+    boost::python::list allConditions;
+    for (const auto& condition : m->getAllConditions()) {
+      allConditions.append(boost::python::object(boost::ref(condition)));
+    }
+
+    return allConditions;
   }
 }
 
@@ -289,7 +317,6 @@ void Module::exposePythonAPI()
   docstring_options options(true, true, false); //userdef, py sigs, c++ sigs
 
   void (Module::*setReturnValueInt)(int) = &Module::setReturnValue;
-  void (Module::*setReturnValueBool)(bool) = &Module::setReturnValue;
 
   enum_<Module::EAfterConditionPath>("AfterConditionPath",
                                      R"(Determines execution behaviour after a conditional path has been executed:
@@ -381,10 +408,8 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("if_false", &Module::if_false, if_false_overloads())
   .def("if_true", &Module::if_true, if_true_overloads())
   .def("has_condition", &Module::hasCondition)
-  .def("get_condition_path", &Module::getConditionPath)
-  .def("get_condition_option", &Module::getAfterConditionPath)
-  .def("get_condition_value", &_getConditionValuePython)
-  .def("get_condition_operator", &_getConditionOperatorPython)
+  .def("get_all_condition_paths", &_getAllConditionPathsPython)
+  .def("get_all_conditions", &_getAllConditionsPython)
   .add_property("logging",
                 make_function(&Module::getLogConfig, return_value_policy<reference_existing_object>()),
                 &Module::setLogConfig)
@@ -392,7 +417,6 @@ https://confluence.desy.de/display/BI/Software+Basf2manual#Module_Development)")
   .def("param", &Module::setParamPythonDict,
        "Set parameters using a dictionary: parameters given by the dictionary keys will be set to the corresponding values.")
   .def("return_value", setReturnValueInt)
-  .def("return_value", setReturnValueBool)
   .def("set_log_level", &Module::setLogLevel)
   .def("set_debug_level", &Module::setDebugLevel)
   .def("set_abort_level", &Module::setAbortLevel)

@@ -1,10 +1,11 @@
 /**************************************************************************
  * BASF2 (Belle Analysis Framework 2)                                     *
- * Copyright(C) 2010-2011  Belle II Collaboration                         *
+ * Copyright(C) 2016  Belle II Collaboration                              *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Vishal     (ECL Software Group)                          *
+ * Contributors: Torben Ferber (ferber@physics.ubc.ca)                    *
  *               Guglielmo De Nardo (denardo@na.infn.it)                  *
+ *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
@@ -16,313 +17,370 @@
 #include <TVector3.h>
 #include <TLorentzVector.h>
 #include <TMatrixDSym.h>
-#include <TMatrixD.h>
 
 #include <cmath>
 
 namespace Belle2 {
 
-  /*! Class to store reconstructed cluster in ECL */
-
-
+  /**
+   * ECL cluster data.
+   */
   class ECLCluster : public RelationsObject {
   public:
     /**
-     *default constructor : all values are set to 0
+     *default constructor : all values are set to 0, IDs set to -1, flags to false
      */
     ECLCluster() :
       m_isTrack(false),
-      m_Energy(0),
-      m_Theta(0),
-      m_Phi(0),
-      m_R(0),
-      m_EnedepSum(0),
-      m_Timing(0),
-      m_ErrorTiming(0),
-      m_E9oE25(0),
-      m_HighestE(0),
-      m_LAT(0),
-      m_NofCrystals(0),
-      m_CrystHealth(0),
-      m_MergedPi0(0),
-      m_minTrkDistance(-1),
-      m_deltaL(-1)
+      m_status(0),
+      m_connectedRegionId(0),
+      m_hypothesisId(5), // set to 5 (all photons) for b2bii
+      m_clusterId(0),
+      m_sqrtcovmat_00(0.),
+      m_covmat_10(0.),
+      m_sqrtcovmat_11(0.),
+      m_covmat_20(0.),
+      m_covmat_21(0.),
+      m_sqrtcovmat_22(0.),
+      m_deltaL(0.),
+      m_minTrkDistance(0.),
+      m_absZernike40(0.),
+      m_absZernike51(0.),
+      m_zernikeMVA(0.),
+      m_E1oE9(0.),
+      m_E9oE21(0.),
+      m_secondMoment(0.),
+      m_LAT(0.),
+      m_numberOfCrystals(0.),
+      m_time(0.),
+      m_deltaTime99(0.),
+      m_theta(0.),
+      m_phi(0.),
+      m_r(0.),
+      m_logEnergy(-5.),
+      m_logEnergyRaw(-5.),
+      m_logEnergyHighestCrystal(-5.) {}
+
+    /** Set m_isTrack true if the cluster matches with cluster. */
+    void setIsTrack(bool istrack) { m_isTrack = istrack; }
+
+    /** Set status. */
+    void setStatus(int status) { m_status = status; }
+
+    /** Set connected region id. */
+    void setConnectedRegionId(int crid) { m_connectedRegionId = crid; }
+
+    /** Set hypothesis id. */
+    void setHypothesisId(int hypothesisid) { m_hypothesisId = hypothesisid; }
+
+    /** Set cluster id. */
+    void setClusterId(int clusterid) { m_clusterId = clusterid; }
+
+    /** Set covariance matrix (3x3), i.e. squared entries, for
+     [0]->energy,
+     [2]->phi,
+     [5]->theta.
+     */
+    void setCovarianceMatrix(double covArray[6])
     {
-      m_Error[0] = 0;
-      m_Error[1] = 0;
-      m_Error[2] = 0;
-      m_Error[3] = 0;
-      m_Error[4] = 0;
-      m_Error[5] = 0;
+      m_sqrtcovmat_00 = sqrt(fabs(covArray[0])); // energy
+      m_covmat_10 = covArray[1];
+      m_sqrtcovmat_11 = sqrt(fabs(covArray[2])); // phi
+      m_covmat_20 = covArray[3];
+      m_covmat_21 = covArray[4];
+      m_sqrtcovmat_22 = sqrt(fabs(covArray[5])); // theta
     }
 
-    /*! Set Corrected Energy (GeV) */
-    void setEnergy(double Energy) { m_Energy = Energy; }
+    /** Set energy uncertainty. */
+    void setUncertaintyEnergy(double energyunc) { m_sqrtcovmat_00 = fabs(energyunc); }
 
-    /*! Set Theta of Shower (radian) */
-    void setTheta(double Theta) { m_Theta = Theta; }
+    /** Set theta uncertainty. */
+    void setUncertaintyTheta(double thetaunc) { m_sqrtcovmat_22 = fabs(thetaunc); }
 
-    /*! Set Phi of Shower (radian) */
-    void setPhi(double Phi) { m_Phi = Phi; }
+    /** Set phi uncertainty. */
+    void setUncertaintyPhi(double phiunc) { m_sqrtcovmat_11 = fabs(phiunc); }
 
-    /*! Set R (in cm) */
-    void setR(double R) { m_R = R; }
-
-    /*! Set Uncorrect Energy deposited (GeV)*/
-    void setEnedepSum(double EnedepSum) { m_EnedepSum = EnedepSum; }
-
-    /*! Set Timing information */
-    void setTiming(double Timing) { m_Timing = Timing; }
-
-    /*! Set Error on Timing information */
-    void setErrorTiming(double ErrorTiming) { m_ErrorTiming = ErrorTiming; }
-
-    /*! Set E9/E25 */
-    void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
-
-    /*! Set Highest Energy stored in a Crystal in a shower (GeV) */
-    void setHighestE(double HighestE) { m_HighestE = HighestE; }
-
-    /*! Set Lateral distribution parameter */
-    void setLAT(double LAT) { m_LAT = LAT; }
-
-    /*! Set distance between cluster COG and track extrapolation to ECL */ \
-    void setMinTrkDistance(double distance) { m_minTrkDistance = distance; }
-
-    /*! Set deltaL for shower shape */
+    /** Set deltaL for shower shape. */
     void setdeltaL(double deltaL) { m_deltaL = deltaL; }
 
-    /*! Set Number of Crystals in a shower */
-    void setNofCrystals(int NofCrystals) { m_NofCrystals = NofCrystals; }
+    /** Set distance between cluster COG and track extrapolation to ECL. */
+    void setMinTrkDistance(double distance) { m_minTrkDistance = distance; }
 
-    /*! Set Crystal health (Not now) */
-    void setCrystHealth(int CrystHealth) { m_CrystHealth = CrystHealth; }
+    /** Set Zernike 40. */
+    void setAbsZernike40(double zernike40) { m_absZernike40 = zernike40; }
 
-    /*! Set high momentum pi0 likelihood */
-    void setMergedPi0(double MergedPi0) { m_MergedPi0 = MergedPi0; }
+    /** Set Zernike 51. */
+    void setAbsZernike51(double zernike51) { m_absZernike51 = zernike51; }
 
-    /*! Set  Error Array(3x3)  for
-      [0]->Error on Energy
-      [2]->Error on Phi
-      [5]->Error on Theta
-    */
-    void setError(double ErrorArray[6])
-    {
-      for (int i = 0; i < 6; ++i) {
-        m_Error[i] = ErrorArray[i];
-      }
-    }
+    /** Set Zernike 20. */
+    void setZernikeMVA(double zernikemva) { m_zernikeMVA = zernikemva; }
 
-    /*! Set m_isTrack true if the cluster matches with cluster */
-    void setisTrack(bool istrack) { m_isTrack = istrack; }
+    /** Set E1/E9 energy ratio. */
+    void setE1oE9(double E1oE9) { m_E1oE9 = E1oE9; }
 
-    /*! Return Correct Energy (GeV) */
-    double getEnergy() const {return m_Energy;}
+    /** Set E9/E21 energy ratio. */
+    void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
-    /*! Return Theta of Shower (radian) */
-    double getTheta() const {return m_Theta;}
+    /** Set SecondMoment. */
+    void setSecondMoment(double secondmoment) { m_secondMoment = secondmoment; }
 
-    /*! Return Phi of Shower (radian) */
-    double getPhi() const { return m_Phi;}
+    /** Set Lateral distribution parameter. */
+    void setLAT(double LAT) { m_LAT = LAT; }
 
-    /*! Return R */
-    double getR() const { return m_R ; }
+    /** Set number of crystals (sum of weights). */
+    void setNumberOfCrystals(double noc) { m_numberOfCrystals = noc; }
 
-    /*! Return Error on Energy */
-    double getErrorEnergy() const {return m_Error[0];}
+    /** Set time information. */
+    void setTime(double time) { m_time = time; }
 
-    /*! Return Error on Theta of Shower */
-    double getErrorTheta() const {return m_Error[5];}
+    /** Set 99% time containment range */
+    void setDeltaTime99(double dtime99) { m_deltaTime99 = dtime99; }
 
-    /*! Return Error on Phi of Shower */
-    double getErrorPhi() const { return m_Error[2];}
+    /** Set Theta of Shower (radian). */
+    void setTheta(double theta) { m_theta = theta; }
 
-    /*! Return Uncorrect Energy deposited (GeV) */
-    double getEnedepSum() const {return m_EnedepSum;}
+    /** Set Phi of Shower (radian). */
+    void setPhi(double phi) { m_phi = phi; }
 
-    /*! Return Timing information */
-    double getTiming() const {return m_Timing;}
+    /** Set R (in cm). */
+    void setR(double r) { m_r = r; }
 
-    /*! Return Error on Timing information */
-    double getErrorTiming() const {return m_ErrorTiming;}
+    /** Set Corrected Energy (GeV). */
+    void setEnergy(double energy) { m_logEnergy = log(energy); }
 
-    /*! Return E9/E25 */
-    double getE9oE25() const { return m_E9oE25; }
+    /** Set Uncorrect Energy deposited (GeV). */
+    void setEnergyRaw(double energyraw) { m_logEnergyRaw = log(energyraw); }
 
-    /*! Return HighestEnergy in a crystal in a shower */
-    double getHighestE() const {return m_HighestE; }
+    /** Set energy of highest energetic crystal (GeV). */
+    void setEnergyHighestCrystal(double energyhighestcrystal) { m_logEnergyHighestCrystal = log(energyhighestcrystal); }
 
-    /*! Return LAT (shower variable) */
-    double getLAT() const {return m_LAT;}
+    /** Return true if the cluster matches with track. */
+    bool isTrack() const { return m_isTrack; }
 
-    /*! Get distance between cluster COG and track extrapolation to ECL. Note that this variable may be removed in later versions. */
-    double getTemporaryMinTrkDistance() const { return m_minTrkDistance; }
-
-    /*! Return deltaL for shower shape. Note that this variable may be removed in later versions. */
-    double getTemporaryDeltaL() const { return m_deltaL; }
-
-    /*! Return Number of a Crystals in a shower */
-    int getNofCrystals() const {return m_NofCrystals;}
-
-    /*! Return Crystal health (Not now) */
-    int getCrystHealth() const { return m_CrystHealth;}
-
-    /*! Return high momentum pi0 likelihood */
-    double getMergedPi0() const { return m_MergedPi0;}
-
-    /*! Return Px (GeV/c) */
-    double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
-
-    /*! Return Py (GeV/c)  */
-    double getPy() const { return getEnergy() * sin(getTheta()) * sin(getPhi()); }
-
-    /*! Return Pz (GeV/c) */
-    double getPz() const { return getEnergy() * cos(getTheta()); }
-
-    /*! Return TVector3 momentum (Px,Py,Pz) */
-    TVector3 getMomentum() const
-    {
-      return TVector3(getPx(), getPy(), getPz());
-    }
-
-    /*! Return 4Vector  (Px,Py,Pz,E) */
-    TLorentzVector get4Vector() const
-    {
-      return TLorentzVector(getPx(), getPy(), getPz(), getEnergy());
-    }
-
-    /*! Return TVector3 on cluster position /Shower center (x,y,z) */
-    TVector3 getclusterPosition() const
-    {
-      const double cluster_x =  getR() * sin(getTheta()) * cos(getPhi());
-      const double cluster_y =  getR() * sin(getTheta()) * sin(getPhi());
-      const double cluster_z =  getR() * cos(getTheta());
-      return TVector3(cluster_x, cluster_y, cluster_z);
-    }
-
-    /*! Return TVector3 on  position on gamma's production
-      By default the position of gamma's production is (0,0,0) */
-    TVector3 getPosition() const { return TVector3(0, 0, 0); }
-
-    /*! Return TMatrixDsym 4x4  error matrix (order should be: px,py,pz,E) */
-    TMatrixDSym getError4x4() const
-    {
-      TMatrixDSym errorecl = getError3x3();
-
-      TMatrixD  jacobian(4, 3);
-      const double cosPhi = cos(getPhi());
-      const double sinPhi = sin(getPhi());
-      const double cosTheta = cos(getTheta());
-      const double sinTheta = sin(getTheta());
-      const double E = getEnergy();
-
-      jacobian(0, 0) =            cosPhi * sinTheta;
-      jacobian(0, 1) =  -1.0 * E * sinPhi * sinTheta;
-      jacobian(0, 2) =        E * cosPhi * cosTheta;
-      jacobian(1, 0) =            sinPhi * sinTheta;
-      jacobian(1, 1) =        E * cosPhi * sinTheta;
-      jacobian(1, 2) =        E * sinPhi * cosTheta;
-      jacobian(2, 0) =                     cosTheta;
-      jacobian(2, 1) =           0.0;
-      jacobian(2, 2) =  -1.0 * E          * sinTheta;
-      jacobian(3, 0) =           1.0;
-      jacobian(3, 1) =           0.0;
-      jacobian(3, 2) =           0.0;
-      TMatrixDSym errCart(4);
-      errCart = errorecl.Similarity(jacobian);
-      return errCart;
-    }
-
-    /*! Return TMatrixDsym 7x7  error matrix (order should be: px,py,pz,E,x,y,z) */
-    TMatrixDSym getError7x7() const
-    {
-      const TMatrixDSym errCart = getError4x4();
-
-      TMatrixDSym errorMatrix(7);
-      for (int i = 0; i < 4; i++) {
-        for (int j = 0; j <= i ; j++) {
-          errorMatrix(i, j) = errorMatrix(j, i) = errCart(i, j);
-        }
-      }
-      for (int i = 4; i < 7; ++i) {
-        errorMatrix(i, i) = 1.0; // 1.0*1.0 cm^2 (default treatment as Belle ?)
-      }
-      return errorMatrix;
-    }
-
-    /*! Return TMatrixDsym 3x3 error matrix for E, Phi and Theta */
-    TMatrixDSym getError3x3() const
-    {
-      TMatrixDSym errorecl(3);
-      errorecl(0, 0) = m_Error[0] * m_Error[0]; //Energy
-      errorecl(1, 0) = m_Error[1];
-      errorecl(1, 1) = m_Error[2] * m_Error[2]; // Phi
-      errorecl(2, 0) = m_Error[3];
-      errorecl(2, 1) = m_Error[4];
-      errorecl(2, 2) = m_Error[5] * m_Error[5]; // Theta
-
-      //make symmetric
-      for (int i = 0; i < 3; i++)
-        for (int j = 0; j < i ; j++)
-          errorecl(j, i) = errorecl(i, j);
-      return errorecl;
-    }
-
-    /*! Return m_isTrack true if the cluster matches with cluster, otherwise
-      false (for time being). Please use isNeutral function (as it will be kept
-      for future)
-     */
-    bool getisTrack() const { return m_isTrack; }
-
-    /*! Return true if cluster has no match with cluster, otherwise
-      return false if cluster has match with track.
-     */
+    /** Return true if cluster has no match with track. */
     bool isNeutral() const { return !m_isTrack; }
 
-    //..... For FUTURE (to DO)
+    /** Return status. */
+    int getStatus() const {return m_status;}
 
-    /*! Return pi0Likelihood for a shower (for future, Not available now) */
+    /** Return connected region id. */
+    int getConnectedRegionId() const {return m_connectedRegionId;}
 
-    double getpi0Likelihood() const { return 0.5; }
-    /*! Return etaLikelihood for a shower (for future, Not available now) */
-    double getetaLikelihood() const { return 0.5; }
+    /** Return hypothesis id */
+    int getHypothesisId() const {return m_hypothesisId;}
 
-    /*! Return deltaL for shower shape (for future, Not available now) */
-    double getdeltaL() const { return 0;}
+    /** Return cluster id */
+    int getClusterId() const {return m_clusterId;}
 
-    /*! Return beta for shower shape (for future, Not available now) */
-    double getbeta() const { return 0; }
+    /** Get distance between cluster COG and track extrapolation to ECL. */
+    double getMinTrkDistance() const { return m_minTrkDistance; }
+
+    /** Return deltaL. */
+    double getDeltaL() const { return m_deltaL; }
+
+    /** Return Zernike moment 40 (shower shape variable). */
+    double getAbsZernike40() const { return m_absZernike40; }
+
+    /** Return Zernike moment 51 (shower shape variable). */
+    double getAbsZernike51() const { return m_absZernike51; }
+
+    /** Return MVA based hadron/photon value based on Zernike moments (shower shape variable). */
+    double getZernikeMVA() const { return m_zernikeMVA; }
+
+    /** Return E1/E9 (shower shape variable). */
+    double getE1oE9() const { return m_E1oE9; }
+
+    /** Return E9/E21 (shower shape variable). */
+    double getE9oE21() const { return m_E9oE21; }
+
+    /** Return second moment (shower shape variable). */
+    double getSecondMoment() const { return m_secondMoment; }
+
+    /** Return LAT (shower shape variable). */
+    double getLAT() const {return m_LAT;}
+
+    /** Return number of a crystals in a shower (sum of weights). */
+    double getNumberOfCrystals() const {return m_numberOfCrystals;}
+
+    /** Return cluster time. */
+    double getTime() const {return m_time;}
+
+    /** Return cluster delta time 99 */
+    double getDeltaTime99() const {return m_deltaTime99;}
+
+    /** Return Corrected Phi of Shower (radian). */
+    double getPhi() const { return m_phi;}
+
+    /** Return Corrected Theta of Shower (radian). */
+    double getTheta() const {return m_theta;}
+
+    /** Return R. */
+    double getR() const { return m_r; }
+
+    /** Return Corrected Energy (GeV). */
+    double getEnergy() const {return exp(m_logEnergy);}
+
+    /** Return Uncorrect Energy deposited (GeV) */
+    double getEnergyRaw() const {return exp(m_logEnergyRaw);}
+
+    /** Return energy of highest energetic crystal in cluster (GeV) */
+    double getEnergyHighestCrystal() const {return exp(m_logEnergyHighestCrystal);}
+
+    /** Return Uncertainty on Energy of Shower */
+    double getUncertaintyEnergy() const {return (m_sqrtcovmat_00);}
+
+    /** Return Uncertainty on Theta of Shower */
+    double getUncertaintyTheta() const {return (m_sqrtcovmat_22);}
+
+    /** Return Uncertainty on Phi of Shower */
+    double getUncertaintyPhi() const { return (m_sqrtcovmat_11);}
+
+    /** Return Px (GeV/c) */
+    double getPx() const { return getEnergy() * sin(getTheta()) * cos(getPhi()); }
+
+    /** Return Py (GeV/c)  */
+    double getPy() const { return getEnergy() * sin(getTheta()) * sin(getPhi()); }
+
+    /** Return Pz (GeV/c) */
+    double getPz() const { return getEnergy() * cos(getTheta()); }
+
+    /** Return TVector3 momentum (Px,Py,Pz) */
+    TVector3 getMomentum() const;
+
+    /** Return 4Vector  (Px,Py,Pz,E) */
+    TLorentzVector get4Vector() const;
+
+    /** Return TVector3 on cluster position (x,y,z) */
+    TVector3 getClusterPosition() const;
+
+    /** Return TVector3 on  position on gamma's production
+     By default the position of gamma's production is (0,0,0) */
+    TVector3 getPosition() const;
+
+    /** Return TMatrixDsym 4x4 covariance matrix (order should be: px,py,pz,E) */
+    TMatrixDSym getCovarianceMatrix4x4() const;
+
+    /** Return TMatrixDsym 7x7 covariance matrix (order should be: px,py,pz,E,x,y,z) */
+    TMatrixDSym getCovarianceMatrix7x7() const;
+
+    /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
+    TMatrixDSym getCovarianceMatrix3x3() const;
+
+    /*! Get covariance matrix as array for Energy->[0], Phi->[2], Theta->[5]
+     * @return covariance matrix array for Energy->[0], Phi->[2], Theta->[5]
+     */
+    void getCovarianceMatrixAsArray(double covArray[6]) const;
+
+    /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
+    int getDetectorRegion() const;
+
+    /** Return (pseudo) unique Id based on CRId, ShowerId and HypothesisID */
+    int getUniqueId() const;
 
   private:
 
-    float m_Error[6]; /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-    bool m_isTrack;  /**< To store relation to tracks or not (for timebeing, Pleaseuse function  isNeutral() [as it is for future] */
-    float  m_Energy;     /**< Corrected energy (GeV) */
-    float  m_Theta;         /**< Theta of Shower (radian) */
-    float  m_Phi;         /**< Phi of Shower (radian)  */
-    float  m_R;         /**< R (cm) */
-    float  m_EnedepSum;  /**< Uncorrected  Energy Deposited (GeV) */
-    float  m_Timing;     /**< Timing information (study going on) */
-    float  m_ErrorTiming;    /**< Timing Error (NA) */
-    float  m_E9oE25;     /**< E9/E25: photon-like & isolation cut */
-    float  m_HighestE;  /**< Highest energy stored in a crystal in Shower */
-    float  m_LAT;  /**< Lateral distribution parameter */
-    int    m_NofCrystals; /**< Number of Crystals in a shower (Not available now) */
-    int    m_CrystHealth;/**< Crystal Health (Not available now)
-          -100 : healthy
-          10 : Bad
-          20 : Broken
-          30 : Dead  */
-    float m_MergedPi0; /**< Likelihood of being Merged Pi0 (Not available now) */
-    float  m_minTrkDistance; /**<  Distance between cluster COG and track extrapolation to ECL. Note that this variable may be removed in later versions. */
-    float  m_deltaL; /**<  Delta L as defined in arXiv:0711.1593. Note that this variable may be removed in later versions. */
+    /** Is related to track (true) or not (false). */
+    bool m_isTrack;
 
-    /**< Class definition */
-    ClassDef(ECLCluster, 3); /**< Needed to make objects storable */
+    /** Cluster status. */
+    int m_status;
+
+    /** Connected Region of this cluster. */
+    int m_connectedRegionId;
+
+    /** Cluster hypothesis. */
+    int m_hypothesisId;
+
+    /** Cluster id */
+    int m_clusterId;
+
+    //Covariance matrix:
+    //       E    phi   theta
+    // E     00   01    02
+    // phi   10   11    12
+    // theta 20   21    22
+    /** Covariance entry 00 sigma_E (1% to 25% between 10 MeV and 8 GeV) */
+    Double32_t m_sqrtcovmat_00; //[0.0, 0.3, 10]
+
+    /** Covariance matrix 10, not used yet */
+    Double32_t m_covmat_10; //[0.0, 10., 12]
+
+    /** Covariance matrix 11, sigma_phi, between 0 and 50 mrad */
+    Double32_t m_sqrtcovmat_11; //[0.0, 0.05, 8]
+
+    /** Covariance matrix 20, not used yet */
+    Double32_t m_covmat_20; //[0.0, 10., 12]
+
+    /** Covariance matrix 21, not used yet */
+    Double32_t m_covmat_21; //[0.0, 10., 12]
+
+    /** Covariance matrix 22, sigma_theta, between 0 and 50 mrad */
+    Double32_t m_sqrtcovmat_22; //[0.0, 0.050, 8]
+
+    /** Delta L as defined in arXiv:0711.1593. */
+    Double32_t  m_deltaL;  //[-250, 250., 10]
+
+    /** Distance between cluster center and track extrapolation to ECL. */
+    Double32_t  m_minTrkDistance;  //[0.0, 250., 10]
+
+    /** Zernike 40. */
+    Double32_t  m_absZernike40;  //[0.0, 1.7, 10]
+
+    /** Zernike 51. */
+    Double32_t  m_absZernike51;  //[0.0, 1.2, 10]
+
+    /** Zernike MVA. */
+    Double32_t  m_zernikeMVA;  //[0.0, 1., 10]
+
+    /** E1oE9. */
+    Double32_t  m_E1oE9;  //[0.0, 1., 10]
+
+    /** E9oE21. */
+    Double32_t  m_E9oE21;  //[0.0, 1., 10]
+
+    /** Second Moment. */
+    Double32_t  m_secondMoment;  //[0.0, 40.0, 10]
+
+    /** LAT. */
+    Double32_t  m_LAT;  //[0.0, 1., 10]
+
+    /** Number of Crystals in a shower (sum of weights). */
+    Double32_t  m_numberOfCrystals;  //[0.0, 200.0, 10]
+
+    /** Time. */
+    Double32_t  m_time;  //[-1000.0, 1000.0, 12]
+
+    /** Delta Time 99. */
+    Double32_t  m_deltaTime99;  //[0.0, 1000.0, 12]
+
+    /** Theta [rad]. */
+    Double32_t  m_theta;  //[0.0, pi, 16]
+
+    /** Phi [rad]. */
+    Double32_t  m_phi;  //[-pi, pi, 16]
+
+    /** Radius [cm]. */
+    Double32_t  m_r;  //[75.0, 300.0, 16]
+
+    /**< Log. Energy [GeV]. */
+    Double32_t  m_logEnergy;  //[-5, 3., 18]
+
+    /** Log. Raw Energy [GeV]. */
+    Double32_t  m_logEnergyRaw;  //[-5, 3., 18]
+
+    /** Log. Highest Crystal Energy [GeV]. */
+    Double32_t  m_logEnergyHighestCrystal;  //[-5, 3., 18]
+
+    /** Class definition */
+    ClassDef(ECLCluster, 8);
+    // 8: Added clusterId, getUniqueId
+    // 7: Changed range of SecondMoment from 0..100 to 0..40
+    // 6: Changed stored variances to sqrt(covmat_ii).
+    // 5: New HypothesisId default, removed relative covariance entries, renamed some setters/getters, adjusted covariance variable ranges.
+    // 4: Complete revision and new variables. Introduction of Double32_t. Some new setters and getters.
+
   };
 
 }// end namespace Belle2
 
 #endif
-
-

@@ -1,8 +1,6 @@
 Import('env')
 
 env['LIBS'] = ['framework', 'background_dataobjects',
-               'simulation_dataobjects', 
-	       'vxd_dataobjects',
 	       'pxd_dataobjects',
 	       'svd_dataobjects',
 	       'cdc_dataobjects',

@@ -9,7 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -34,19 +33,19 @@ StereoHitFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseStereoHitFilter>
 StereoHitFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseStereoHitFilter>(new BaseStereoHitFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseStereoHitFilter>(new MCStereoHitFilter());
-  } else if (filterName == string("all")) {
+  } else if (filterName == "all") {
     return std::unique_ptr<BaseStereoHitFilter>(new AllStereoHitFilter());
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseStereoHitFilter>(new RecordingStereoHitFilter("StereoHit.root"));
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<BaseStereoHitFilter>(new SimpleStereoHitFilter());
-  } else if (filterName == string("random")) {
+  } else if (filterName == "random") {
     return std::unique_ptr<BaseStereoHitFilter>(new RandomStereoHitFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseStereoHitFilter>(new TMVAStereoHitFilter("StereoHit"));
   } else {
     return Super::create(filterName);

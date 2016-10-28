@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Making destructor virtual
-      virtual ~BaseVarSet() {}
+      virtual ~BaseVarSet() = default;
 
       /**
        *  Initialize the variable set before event processing.

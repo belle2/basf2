@@ -15,7 +15,6 @@
 #include <framework/logging/Logger.h>
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -47,7 +46,7 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
-  const bool nSteps = 1;
+  const int nSteps = 1;
   double chi2 = FacetFitter::fit(facet, nSteps);
   if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
     return NAN;

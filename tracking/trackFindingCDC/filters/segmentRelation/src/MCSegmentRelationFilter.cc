@@ -11,7 +11,6 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/MCSegmentRelationFilter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -32,7 +31,7 @@ Weight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromSegment,
     Index toNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(&toSegment);
     if (toNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (fromNPassedSuperLayers == toNPassedSuperLayers) return NAN;
+    if (fromNPassedSuperLayers != toNPassedSuperLayers) return NAN;
 
     return fromSegment.size() + toSegment.size();
   }

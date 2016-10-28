@@ -21,7 +21,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

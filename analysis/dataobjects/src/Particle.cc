@@ -43,11 +43,10 @@ Particle::Particle() :
 }
 
 Particle::Particle(const TLorentzVector& momentum, const int pdgCode) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
   m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
   m_arrayPointer(0)
 {
-  m_pdgCode = pdgCode;
   setFlavorType();
   set4Vector(momentum);
   resetErrorMatrix();
@@ -58,16 +57,13 @@ Particle::Particle(const TLorentzVector& momentum,
                    EFlavorType flavorType,
                    const EParticleType type,
                    const unsigned mdstIndex) :
-  m_pdgCode(0), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
-  m_pValue(-1), m_flavorType(c_Unflavored), m_particleType(c_Undefined), m_mdstIndex(0),
+  m_pdgCode(pdgCode), m_mass(0), m_px(0), m_py(0), m_pz(0), m_x(0), m_y(0), m_z(0),
+  m_pValue(-1), m_flavorType(flavorType), m_particleType(type), m_mdstIndex(mdstIndex),
   m_arrayPointer(0)
 {
-  m_pdgCode = pdgCode;
-  m_flavorType = flavorType;
   if (flavorType == c_Unflavored and pdgCode < 0)
     m_pdgCode = -pdgCode;
-  m_mdstIndex = mdstIndex;
-  m_particleType = type;
+
   set4Vector(momentum);
   resetErrorMatrix();
 }
@@ -164,6 +160,9 @@ Particle::Particle(const ECLCluster* eclCluster) :
 {
   if (!eclCluster) return;
 
+  // Only use the photon hypothesis for now
+  if (eclCluster->getHypothesisId() != 5) return;
+
   // TODO: avoid hard coded values
   m_pdgCode = 22;
   setFlavorType();
@@ -182,7 +181,7 @@ Particle::Particle(const ECLCluster* eclCluster) :
   m_pValue = 1;
 
   // set error matrix
-  storeErrorMatrix(eclCluster->getError7x7());
+  storeErrorMatrix(eclCluster->getCovarianceMatrix7x7());
 }
 
 Particle::Particle(const KLMCluster* klmCluster) :

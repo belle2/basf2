@@ -12,7 +12,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/pcore/RingBuffer.h>
 
 #include <framework/datastore/DataStore.h>
@@ -54,9 +53,6 @@ namespace Belle2 {
     //! RingBuffer ID
     std::string m_rbufname;
     RingBuffer* m_rbuf;
-
-    //! Messaage handler (obsolete)
-    MsgHandler* m_msghandler;
 
     //! DataStore streamer
     DataStoreStreamer* m_streamer;

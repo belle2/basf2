@@ -17,7 +17,6 @@
 
 #include <framework/core/Module.h>
 #include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
@@ -168,9 +167,6 @@ namespace Belle2 {
     //! # of already used buffers
     int m_num_usedbuf;
 
-
-    //! Messaage handler
-    MsgHandler* m_msghandler;
 
     //! Node(PC or COPPER) ID
     int m_nodeid;

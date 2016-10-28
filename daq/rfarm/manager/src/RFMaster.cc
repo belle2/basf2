@@ -13,6 +13,8 @@ using namespace Belle2;
 
 //#define DESY
 
+
+// Main
 RFMaster::RFMaster(string conffile)
 {
   // 0. Initialize configuration manager
@@ -31,12 +33,13 @@ RFMaster::RFMaster(string conffile)
   chdir(execdir.c_str());
 
   // 3. Initialize LogManager
-  m_log = new RFLogManager(nodename);
+  m_log = new RFLogManager(nodename, m_conf->getconf("system", "lognode"));
 
   // 4. Leave PID file
   FILE* f = fopen("pid.data", "w");
   fprintf(f, "%d", getpid());
   fclose(f);
+
 
 }
 
@@ -45,6 +48,26 @@ RFMaster::~RFMaster()
   delete m_log;
   //  delete m_shm;
   delete m_conf;
+}
+
+void RFMaster::Hook_Message_Handlers()
+{
+  // 5. Hook message handlers
+  if (b2nsm_callback("LOG", Log_Handler) < 0) {
+    fprintf(stderr, "RFMaster : hooking INFO handler failed, %s\n",
+            b2nsm_strerror());
+  }
+  printf("RFMaster: Message Handlers - Ready\n");
+
+}
+
+// NSM callback functions for message
+
+void RFMaster::Log_Handler(NSMmsg* msg, NSMcontext* ctx)
+{
+  //  printf ( "RFMaster : [INFO] received\n" );
+  //  b2nsm_ok ( msg, "INFO!!", NULL );
+  //  fflush ( stdout );
 }
 
 
@@ -173,8 +196,44 @@ int RFMaster::Start(NSMmsg*, NSMcontext*)
   return 0;
 }
 
-int RFMaster::Stop(NSMmsg*, NSMcontext*)
+int RFMaster::Stop(NSMmsg* msg, NSMcontext*)
 {
+  int pars[10];
+  pars[0] = msg->pars[0];
+  pars[1] = msg->pars[1];
+
+  // 1. Stop worker nodes
+  // Unconfigure event processors
+  int maxnodes = m_conf->getconfi("processor", "nnodes");
+  int idbase = m_conf->getconfi("processor", "idbase");
+  char* hostbase = m_conf->getconf("processor", "nodebase");
+  char* badlist = m_conf->getconf("processor", "badlist");
+
+  char hostnode[512], idname[3];
+  RFNSM_Status::Instance().set_flag(0);
+  int nnodes = 0;
+  for (int i = 0; i < maxnodes; i++) {
+    sprintf(idname, "%2.2d", idbase + i);
+    if (badlist == NULL  ||
+        strstr(badlist, idname) == 0) {
+      sprintf(hostnode, "evp_%s%2.2d", hostbase, idbase + i);
+      b2nsm_sendreq(hostnode, "RF_STOP", 0, pars);
+      nnodes++;
+    }
+  }
+#ifdef DESY
+  b2nsm_wait(5);
+#else
+  while (RFNSM_Status::Instance().get_flag() != nnodes) b2nsm_wait(1);
+#endif
+
+  // 2. Stop DqmServer node
+  // Unconfigure DqmServer
+  char* dqmserver = m_conf->getconf("dqmserver", "nodename");
+  RFNSM_Status::Instance().set_flag(0);
+  b2nsm_sendreq(dqmserver, "RF_STOP", 0, pars);
+  while (RFNSM_Status::Instance().get_flag() == 0) b2nsm_wait(1);
+
   return 0;
 }
 

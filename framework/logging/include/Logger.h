@@ -21,7 +21,7 @@
  * \def _B2_DO_NOTHING()
  * Used when things are compiled out.
  */
-#define _B2_DO_NOTHING do { } while(0)
+#define _B2_DO_NOTHING do { } while(false)
 
 /**
  * \def PACKAGENAME()
@@ -55,7 +55,7 @@
 #define _B2LOGMESSAGE_IFENABLED(loglevel, debuglevel, streamText, package, function, file, line) do { \
     if (Belle2::LogSystem::Instance().isLevelEnabled(loglevel, debuglevel, package)) { \
       _B2LOGMESSAGE(loglevel, debuglevel, streamText, package, function, file, line); \
-    } } while(0)
+    } } while(false)
 
 /** send generic log message if the log level is enabled. */
 #define B2LOG(loglevel, debuglevel, streamText) \
@@ -107,7 +107,7 @@
  */
 #define B2ERROR(streamText) do { \
     _B2LOGMESSAGE(Belle2::LogConfig::c_Error, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__) \
-  } while (0)
+  } while(false)
 
 
 /**
@@ -117,7 +117,7 @@
 #define B2FATAL(streamText) do { \
     _B2LOGMESSAGE(Belle2::LogConfig::c_Fatal, 0, streamText, PACKAGENAME(), FUNCTIONNAME(), __FILE__, __LINE__); \
     exit(1); \
-  } while(0)
+  } while(false)
 
 #ifdef LOG_NO_B2ASSERT
 #define B2ASSERT(message, condition) _B2_DO_NOTHING
@@ -130,7 +130,7 @@
     if (!(condition)) { \
       B2FATAL(message); \
     } \
-  } while(0)
+  } while(false)
 #endif
 
 #endif  // LOGGER_H

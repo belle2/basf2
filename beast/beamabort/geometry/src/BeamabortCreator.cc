@@ -72,16 +72,7 @@ namespace Belle2 {
 
       //lets get the stepsize parameter with a default value of 5 µm
       double stepSize = content.getLength("stepSize", 5 * CLHEP::um);
-      /*
-      //no get the array. Notice that the default framework unit is cm, so the
-      //values will be automatically converted
-      vector<double> bar = content.getArray("bar");
-      B2INFO("Contents of bar: ");
-      BOOST_FOREACH(double value, bar) {
-        B2INFO("value: " << value);
-      }
-      */
-      int detID = 0;
+
       //Lets loop over all the Active nodes
       BOOST_FOREACH(const GearDir & activeParams, content.getNodes("Active")) {
 
@@ -89,10 +80,10 @@ namespace Belle2 {
         //Positioned PIN diodes
         double x_pos[100];
         double y_pos[100];
-        double x_off[100];
-        double y_off[100];
         double z_pos[100];
         double phi[100];
+        double thetaX[100];
+        double thetaY[100];
         double thetaZ[100];
         double r[100];
         int dimz = 0;
@@ -101,65 +92,61 @@ namespace Belle2 {
           for (int i = 0; i < 100; i++) {
             x_pos[i] = 0;
             y_pos[i] = 0;
-            x_off[i] = 0;
-            y_off[i] = 0;
+            z_pos[i] = 0;
+          }
+          int dimPhi = 0;
+          for (double Phi : activeParams.getArray("Phi", {0})) {
+            phi[dimPhi] = Phi  - 90. * CLHEP::deg;
+            dimPhi++;
+          }
+          for (double r_dia : activeParams.getArray("r_dia", {0})) {
+            r_dia *= CLHEP::cm;
+            if (phase == 2)
+              r[dimr_dia] = r_dia;
+            dimr_dia++;
           }
         }
         if (phase == 1) {
           int dimx = 0;
           int dimy = 0;
-          int dimx_offset = 0;
-          int dimy_offset = 0;
-
-          for (double x_offset : activeParams.getArray("x_offset", {0})) {
-            x_offset *= CLHEP::cm;
-            x_off[dimx_offset] = x_offset;
-            dimx_offset++;
-          }
-          for (double y_offset : activeParams.getArray("y_offset", {0})) {
-            y_offset *= CLHEP::cm;
-            y_off[dimy_offset] = y_offset;
-            dimy_offset++;
-          }
           for (double x : activeParams.getArray("x", {0})) {
             x *= CLHEP::cm;
-            x_pos[dimx] = x + x_off[dimx];
+            x_pos[dimx] = x;
             dimx++;
           }
           for (double y : activeParams.getArray("y", {0})) {
             y *= CLHEP::cm;
-            y_pos[dimy] = y + y_off[dimy];
+            y_pos[dimy] = y;
             dimy++;
           }
+          int dimThetaX = 0;
+          for (double ThetaX : activeParams.getArray("ThetaX", {0})) {
+            thetaX[dimThetaX] = ThetaX;
+            dimThetaX++;
+          }
+          int dimThetaY = 0;
+          for (double ThetaY : activeParams.getArray("ThetaY", {0})) {
+            thetaY[dimThetaY] = ThetaY;
+            dimThetaY++;
+          }
         }
+
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos[dimz] = z;
-          if (phase == 1)
-            r[dimz] = sqrt(x_pos[dimz] * x_pos[dimz] + y_pos[dimz] * y_pos[dimz]);
           dimz++;
-        }
-        int dimPhi = 0;
-        for (double Phi : activeParams.getArray("Phi", {0})) {
-          phi[dimPhi] = Phi  - 90. * CLHEP::deg;
-          dimPhi++;
         }
         int dimThetaZ = 0;
         for (double ThetaZ : activeParams.getArray("ThetaZ", {0})) {
           thetaZ[dimThetaZ] = ThetaZ;
           dimThetaZ++;
         }
-        for (double r_dia : activeParams.getArray("r_dia", {0})) {
-          r_dia *= CLHEP::cm;
-          if (phase == 2)
-            r[dimr_dia] = r_dia;
-          dimr_dia++;
-        }
 
         //create beamabort package
         G4double dx_opa = 10. / 2.*CLHEP::mm;
         G4double dy_opa = 20. / 2.*CLHEP::mm;
         G4double dz_opa =  2. / 2.*CLHEP::mm;
+        G4VSolid* s_airbox = new G4Box("s_airbox", dx_opa, dy_opa, dz_opa);
         G4VSolid* s_pa = new G4Box("s_opa", dx_opa, dy_opa, dz_opa);
         G4double dx_ipa =  6. / 2.*CLHEP::mm;
         G4double dy_ipa =  6. / 2.*CLHEP::mm;
@@ -167,10 +154,22 @@ namespace Belle2 {
         G4VSolid* s_ipa = new G4Box("s_ipa", dx_ipa, dy_ipa, dz_ipa);
         s_pa = new G4SubtractionSolid("s_pa", s_pa, s_ipa, 0, G4ThreeVector(0., 6.75 * CLHEP::mm, 0.));
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
+        G4LogicalVolume* l_airbox = new G4LogicalVolume(s_airbox, G4Material::GetMaterial("G4_AIR"), "l_aibox");
         l_pa->SetVisAttributes(magenta);
         for (int i = 0; i < dimz; i++) {
-          G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
-          new G4PVPlacement(transform, l_pa, "p_pa", &topVolume, false, 0);
+          if (phase == 1) {
+            G4RotationMatrix* pRot = new G4RotationMatrix();
+            pRot->rotateX(thetaX[i]);
+            pRot->rotateY(thetaY[i]);
+            pRot->rotateZ(thetaZ[i]);
+            new G4PVPlacement(pRot, G4ThreeVector(x_pos[i], y_pos[i], z_pos[i]), l_airbox, TString::Format("p_dia_airbox_%d", i).Data(),
+                              &topVolume, false, 0);
+            new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_pa, TString::Format("p_dia_pa_%d", i).Data(), l_airbox, false, 0);
+          } else if (phase == 2) {
+            G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+            new G4PVPlacement(transform, l_airbox, TString::Format("p_dia_airbox_%d", i).Data(), &topVolume, false, 0);
+            new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_pa, TString::Format("p_dia_pa_%d", i).Data(), l_airbox, false, 0);
+          }
         }
 
         //create beamabort volumes
@@ -185,10 +184,9 @@ namespace Belle2 {
         l_BEAMABORT->SetUserLimits(new G4UserLimits(stepSize));
         l_BEAMABORT->SetVisAttributes(orange);
         for (int i = 0; i < dimz; i++) {
-          G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i],
-                                    z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
-          new G4PVPlacement(transform, l_BEAMABORT, "p_BEAMABORT", &topVolume, false, detID);
-          detID++;
+          //G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i],
+          //                         z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
+          new G4PVPlacement(0, G4ThreeVector(0, 6.75 * CLHEP::mm, 0), l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), l_airbox, false, i);
         }
       }
     }

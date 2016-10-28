@@ -66,7 +66,6 @@ void TrackCandMergerModule::event()
 
   //Merge
   StoreArray<genfit::TrackCand> mcTracksCand(m_TrackCandidatesCollection);
-  mcTracksCand.create();
 
   for (unsigned int i = 0; i < nCDCTracks; i++)
     mcTracksCand.appendNew(*(cdc_mcTracks[i]));

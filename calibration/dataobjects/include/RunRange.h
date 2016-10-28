@@ -3,13 +3,11 @@
 #include <string>
 #include <vector>
 
-#include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
 
 #include <set>
 #include <framework/database/IntervalOfValidity.h>
 
-using namespace std;
 namespace Belle2 {
   /// Mergeable object holding (unique) set of (exp,run) pairs
   class RunRange : public Mergeable {

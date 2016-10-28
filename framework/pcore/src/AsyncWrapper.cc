@@ -22,7 +22,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 
 #include <sys/wait.h>
-#include <signal.h>
 #include <unistd.h>
 
 #include <cstdlib>

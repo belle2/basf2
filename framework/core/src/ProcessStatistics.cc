@@ -13,6 +13,10 @@
 
 #include <framework/logging/Logger.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/HTML.h>
+
+#include <boost/algorithm/string/replace.hpp>
+#include <boost/regex.hpp>
 
 #include <algorithm>
 #include <sstream>
@@ -193,3 +197,15 @@ TObject* ProcessStatistics::Clone(const char*) const
   ProcessStatistics* p = new ProcessStatistics(*this);
   return p;
 }
+
+std::string ProcessStatistics::getInfoHTML() const
+{
+  std::string s = getStatisticsString();
+  const static boost::regex tagRegex("^==*$");
+  s = boost::regex_replace(s, tagRegex, "");
+
+  boost::algorithm::replace_all(s, "|", "</td><td>");
+  boost::algorithm::replace_all(s, "\n", "</td></tr><tr><td>");
+  return "Event Statistics:<br /><table border=0><tr><td>" + s + "</td></tr></table>";
+}
+

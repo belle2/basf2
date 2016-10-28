@@ -21,19 +21,12 @@
 #include <cdc/dbobjects/CDCBadWires.h>
 #include <cdc/dbobjects/CDCPropSpeeds.h>
 #include <cdc/dbobjects/CDCTimeWalks.h>
-#if defined(CDC_XT_FROM_DB)
-#include <cdc/dbobjects/CDCXTs.h>
-#endif
-#if defined(CDC_XTREL_FROM_DB)
 #include <cdc/dbobjects/CDCXtRelations.h>
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-#include <cdc/dbobjects/CDCSigmas.h>
-#endif
-#if defined(CDC_SRESOL_FROM_DB)
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#endif
 #include <cdc/dbobjects/CDCChannelMap.h>
+#include <cdc/dbobjects/CDCDisplacement.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCMisalignment.h>
 #include <cdc/dbobjects/CDCGeometry.h>
 
 #include <vector>
@@ -80,25 +73,14 @@ namespace Belle2 {
       //! Wire position set
       enum EWirePosition {c_Base = 0, c_Misaligned, c_Aligned};
 
-      //      //! Constructor
-      //      CDCGeometryPar();
-
-      //! Constructor.
-      explicit CDCGeometryPar(const CDCGeometry&);
       //! Destructor
       virtual ~CDCGeometryPar();
 
       //! Static method to get a reference to the CDCGeometryPar instance.
       /*!
-          \return A reference to an instance of this class.
+      \return A reference to an instance of this class.
       */
-      static CDCGeometryPar& Instance();
-
-      /**
-       * Static method to get a reference to the CDCGeometryPar instance
-       * from database.
-       */
-      static CDCGeometryPar& Instance(const CDCGeometry&);
+      static CDCGeometryPar& Instance(const CDCGeometry* = nullptr);
 
       //! Clears
       void clear();
@@ -112,33 +94,36 @@ namespace Belle2 {
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
-      /**
-       * Read z-corrections.
-       * @param GearDir Gear Dir.
-       */
-      void readDeltaz(const GearDir);
+      //      /**
+      //       * Read z-corrections.
+      //       * @param GearDir Gear Dir.
+      //       */
+      //      void readDeltaz(const GearDir);
+      //
+      //      /**
+      //       * Read z-corrections from DB.
+      //       *
+      //       */
+      //      void readDeltaz(const CDCGeometry&);
 
       /**
-       * Read z-corrections from DB.
-       *
+       * Read displacement or (mis)alignment params from text file.
+       * @param[in] Wire position set, i.e. c_Base, c_Misaliged or c_Aligned.
+       * @param[in] Pointer to DB CDCGeometry db object.
        */
-      void readDeltaz(const CDCGeometry&);
+      //      void readWirePositionParams(EWirePosition set, const CDCGeometry*,  const GearDir);
+      void readWirePositionParams(EWirePosition set, const CDCGeometry*);
 
       /**
-       * Read (mis)alignment params.
-       * @param[in] GearDir Gear Dir.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
+       * Set wire alignment params. from DB.
        */
-
-      void readWirePositionParams(const GearDir, EWirePosition set);
-
+      void setWirPosAlignParams();
 
       /**
-       * Read (mis)alignment params from DB.
-       * @param[in] DB object of CDCGeometry.
-       * @param[in] Wire position set =c_Misaliged: read misalignment file; =c_Aligned: read alignment file.
+       * Set wire misalignment params. from DB.
        */
-      void readWirePositionParams(const CDCGeometry&, EWirePosition set);
+      void setWirPosMisalignParams();
+
       /**
        * Read XT-relation table.
        * @param[in] GearDir Gear Dir.
@@ -239,9 +224,9 @@ namespace Belle2 {
 
       /**
        * Read channel map between wire-id and electronics-id.
-       * @param GearDir Gear Dir.
        */
-      void readChMap(const GearDir);
+      //      void readChMap(const GearDir);
+      void readChMap();
 
       /**
        * Set channel map (from DB)
@@ -893,17 +878,10 @@ namespace Belle2 {
 
 
       /**
-       * Returns the closest alpha point for track incident angle (alpha).
-       * @param alpha in rad.
-       */
-      unsigned short getClosestAlphaPoint(const double alpha) const;
-
-
-      /**
-       * Returns the closest theta point for track incident angle (theta).
+       * Converts incoming-  to outgoing-theta.
        * @param theta in rad.
        */
-      unsigned short getClosestThetaPoint(const double theta) const;
+      double getOutgoingTheta(const double alpha, const double theta) const;
 
 
       /**
@@ -923,13 +901,13 @@ namespace Belle2 {
        * Returns the two closest theta points for the input track incident angle (theta).
        * @param theta in rad.
        */
-      void getClosestThetaPoints(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
       /**
        * Returns the two closest theta points for sigma for the input track incident angle (theta).
        * @param theta in rad. TODO: unify the two getClosestThetaPoints().
        */
-      void getClosestThetaPoints4Sgm(const double theta, double& wth, unsigned short points[2]) const;
+      void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
 
       /**
@@ -968,11 +946,14 @@ namespace Belle2 {
 
       void outputDesignWirParam(unsigned layerID, unsigned cellID) const;
 
-
+      /**
+       * Set displacement of sense wire.
+       */
+      void setDisplacement();
 
     private:
       /** Singleton class */
-      CDCGeometryPar();
+      CDCGeometryPar(const CDCGeometry* = nullptr);
       /** Singleton class */
       CDCGeometryPar(const CDCGeometryPar&);
       /** Singleton class */
@@ -982,6 +963,7 @@ namespace Belle2 {
       bool m_linearInterpolationOfXT;  /*!< Switch for linear interpolation of xt */
       bool m_linearInterpolationOfSgm; /*!< Switch for linear interpolation of sigma */
       bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
+      bool m_Displacement;   /*!< Switch for displacement. */
       bool m_Misalignment;   /*!< Switch for misalignment. */
       bool m_Alignment;      /*!< Switch for alignment. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
@@ -1029,14 +1011,14 @@ namespace Belle2 {
       double m_momZ[7];      /*!< Z-cordinates of the cdc mother volume (7 segments). */
       double m_momRmin[7];   /*!< R_min of the cdc mother volume  (7 segments).       */
 
-      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
-      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
+      //      double m_bwdDz[MAX_N_SLAYERS];  /*!< Tentative backward z-corrections.*/
+      //      double m_fwdDz[MAX_N_SLAYERS];  /*!< Tentative forward  z-corrections.*/
 
       double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
       double m_minTrackLength;         /*!< Minimum track length for G4 step */
 
-      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the forward endplate for each cell; to be implemented in a smarter way. */
-      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position at the backward endplate for each cell; ibid. */
+      float m_FWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the forward endplate for each cell; to be implemented in a smarter way. */
+      float m_BWirPos[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. displacement at the backward endplate for each cell; ibid. */
       float m_WireSagCoef[MAX_N_SLAYERS][MAX_N_SCELLS]; /*!< Wire sag coefficient for each cell; ibid. */
 
       float m_FWirPosMisalign[MAX_N_SLAYERS][MAX_N_SCELLS][3]; /*!< Wire position incl. misalignment at the forward endplate for each cell; ibid. */
@@ -1084,20 +1066,23 @@ namespace Belle2 {
 #if defined(CDC_TIMEWALK_FROM_DB)
       DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
 #endif
-#if defined(CDC_XT_FROM_DB)
-      DBObjPtr<CDCXTs> m_xtFromDB; /*!< xt params. retrieved from DB. */
-#endif
 #if defined(CDC_XTREL_FROM_DB)
       DBObjPtr<CDCXtRelations> m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
-#endif
-#if defined(CDC_SIGMA_FROM_DB)
-      DBObjPtr<CDCSigmas> m_sigmaFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_SRESOL_FROM_DB)
       DBObjPtr<CDCSpaceResols> m_sResolFromDB; /*!< sigma params. retrieved from DB. */
 #endif
 #if defined(CDC_CHMAP_FROM_DB)
       DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
+#endif
+#if defined(CDC_DISPLACEMENT_FROM_DB)
+      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
+#endif
+#if defined(CDC_ALIGN_FROM_DB)
+      DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
+#endif
+#if defined(CDC_MISALIGN_FROM_DB)
+      DBObjPtr<CDCMisalignment> m_misalignFromDB; /*!< misalignment params. retrieved from DB. */
 #endif
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */

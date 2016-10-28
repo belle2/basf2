@@ -69,7 +69,7 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit from an absolute position.
        *
        *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated to
-       *  @param pos2D     the absolut position of the wire
+       *  @param recoPos2D the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
       static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,
@@ -85,6 +85,9 @@ namespace Belle2 {
 
       /// Returns the recohit with the opposite right left information.
       CDCRecoHit2D reversed() const;
+
+      /// Getter for the alias version of the reco hit
+      CDCRecoHit2D getAlias() const;
 
       /**
        *  Constructs a two dimensional reconstructed hit from a sim hit and the assoziated wirehit.
@@ -153,20 +156,6 @@ namespace Belle2 {
       const CDCRecoHit2D* operator->() const
       { return this; }
 
-      /**
-       *  Return the wire line assoziated with the reconstructed  two dimensional hit.
-       *  The two dimensional reconstructed hit stores only the displacement at the reference position.
-       *  Like the wire is related to its reference position, the reconstructed position represents many possible
-       *  three dimensional positions. This method returns a line parallel to the wire moved by the reconstructed
-       *  displacement. This line represents all possible three dimensional reconstructed positions.
-       *
-       *  Note : This is not optimal yet. In computation steps as well as the correctness of the line.
-       *  It could be corrected for flight time and in wire delays. The effect of this adjustments might
-       *  be worth while investigating.
-       */
-      WireLine getWireLine() const
-      { return getWire().getWireLine().movedBy(getRecoDisp2D()); }
-
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
       { return getRLWireHit().getStereoKind(); }
@@ -225,7 +214,11 @@ namespace Belle2 {
 
       /// Getter for the position in the reference plane.
       Vector2D getRecoPos2D() const
-      { return getRecoDisp2D() + getWireHit().getRefPos2D(); }
+      { return getRecoDisp2D() + getRefPos2D(); }
+
+      /// Setter for the position in the reference plane.
+      void setRecoPos2D(const Vector2D& recoPos2D)
+      { m_recoDisp2D = recoPos2D - getRefPos2D(); }
 
       /// Getter for the displacement from the wire reference position.
       const Vector2D& getRecoDisp2D() const

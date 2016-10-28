@@ -301,11 +301,7 @@ namespace Belle2 {
       tracks2Dfinder.registerRelationTo(tracks3Dfitter);
     }
     StoreObjPtr<TRGTiming>::registerPersistent("CDCTriggerEventTime");
-  }
 
-  void
-  TRGCDCModule::beginRun()
-  {
     //...CDC trigger config. name...
     static string cfn = _configFilename;
 
@@ -347,7 +343,11 @@ namespace Belle2 {
                                _trgCDCDataInputMode,
                                m_inputCollectionName);
     }
+  }
 
+  void
+  TRGCDCModule::beginRun()
+  {
     if (TRGDebug::level())
       cout << "TRGCDCModule ... beginRun called " << endl;
   }

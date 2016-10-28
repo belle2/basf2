@@ -11,14 +11,13 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
 {
   CDCWireHit wireHit(WireID(0, 0, 0), 0.01);
-  CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right);
+  CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right, wireHit->getRefDriftLength());
 
   double perpS = 0;
   CDCRecoHit3D recoHit3D(rlWireHit, wireHit.getRefPos3D(), perpS);

@@ -31,7 +31,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHFirmware(std::string comment, int version, std::string firmware): m_comment(comment), m_version(version),
+    ARICHFirmware(const std::string& comment, int version, const std::string& firmware): m_comment(comment), m_version(version),
       m_firmware(firmware) {};
 
     /**

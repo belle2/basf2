@@ -164,6 +164,15 @@ error_handler(NSMmsg* msg, NSMcontext*)
 {
   xprintlog("ERROR received");
 }
+
+// -- msg_handler -----------------------------------------------------
+//
+// ----------------------------------------------------------------------
+void
+msg_handler(NSMmsg* msg, NSMcontext*)
+{
+  xprintlog("MSG received");
+}
 // -- main --------------------------------------------------------------
 //    main does everything except callback functions
 // ----------------------------------------------------------------------
@@ -209,6 +218,11 @@ main(int argc, char** argv)
     return 1;
   }
 
+  /*
+  if ( b2nsm_callback("MSG", msg_handler ) < 0) {
+    xprintlog("%s: CALLBACK(MSG) %s", program, b2nsm_strerror());
+  }
+  */
   // prompt
   prompt = (char*)malloc(strlen(nodename) + 2);
   strcpy(prompt, nodename);
@@ -257,10 +271,13 @@ main(int argc, char** argv)
         b2nsm_sendreq(av[1], "RF_START", 1, &runno);
       }
     } else if (strcasecmp(av[0], "stop") == 0) {
-      if (ac < 2) {
-        printf("usage: start <node> <run-number>\n");
+      if (ac < 4) {
+        printf("usage: start <node> <exp-number> <run-number>\n");
       } else {
-        b2nsm_sendreq(av[1], "RF_STOP", 0, 0);
+        int pars[10];
+        pars[0] = atoi(av[2]);
+        pars[1] = atoi(av[3]);
+        b2nsm_sendreq(av[1], "RF_STOP", 0, pars);
       }
     } else if (strcasecmp(av[0], "config") == 0) {
       if (ac < 2) {

@@ -13,6 +13,16 @@
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
+#include <cdc/geometry/CDCGeometryPar.h>
+
+// In case we need to get the parameters from the database here are some hints
+// #include <framework/database/Database.h>
+// #include <framework/database/DBStore.h>
+// #include <framework/dbobjects/BeamParameters.h>
+// #include <framework/datastore/StoreObjPtr.h>
+// #include <framework/datastore/DataStore.h>
+// #include <framework/dataobjects/EventMetaData.h>
+
 #include <framework/gearbox/Gearbox.h>
 #include <framework/logging/Logger.h>
 
@@ -22,17 +32,39 @@
 #include <vector>
 #include <cmath>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
 void TrackFindingCDCTestWithTopology::SetUpTestCase()
 {
+  // In case we need to get the parameters from the database here are some hints
+  // StoreObjPtr<EventMetaData> evtPtr;
+  // DataStore::Instance().setInitializeActive(true);
+  // evtPtr.registerInDataStore();
+  // DataStore::Instance().setInitializeActive(false);
+  // evtPtr.construct(0, 0, 1);
+
+  // Database::Instance();
+  // DBObjPtr<CDCGeometry> dbGeometry;
+  // DBObjPtr<BeamParameters> dbBeamParameters;
+  // DBStore::Instance().update();
+
+  // B2ASSERT("Beamparameters in the database", dbBeamParameters);
+  // B2INFO("Successfully found beamparameters with energy "
+  //   << dbBeamParameters->getEnergy());
+
+  // if (not dbGeometry) {
+  //   B2FATAL("No configuration for CDC found.");
+  // }
+
   //Setup the gearbox
   TestHelpers::TestWithGearbox::SetUpTestCase();
+  GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+  CDCGeometry cdcGeometry;
+  cdcGeometry.read(cdcGearDir);
+  CDC::CDCGeometryPar::Instance(&cdcGeometry);
 
-  //Also preload the CDCGeometry
   const CDCWireTopology& wireTopology __attribute__((unused)) = CDCWireTopology::getInstance();
 
   CDCWireHitTopology::initialize();
@@ -40,6 +72,9 @@ void TrackFindingCDCTestWithTopology::SetUpTestCase()
 
 void TrackFindingCDCTestWithTopology::TearDownTestCase()
 {
+  // In case we need to get the parameters from the database here are some hints
+  // Database::reset();
+  // DataStore::Instance().reset();
   //Close the gearbox
   TestHelpers::TestWithGearbox::TearDownTestCase();
 }

@@ -14,7 +14,6 @@
 
 #include <numeric>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -37,8 +36,8 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   const bool isCurler = trajectory2D.isCurler();
 
 
-  const Vector2D& startMomentum = trajectory2D.getStartMom2D();
-  const double radius = trajectory2D.getLocalCircle().radius();
+  const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
+  const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track.size();
 
   const double backArcLength2D = track.back().getArcLength2D();
@@ -68,11 +67,11 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
       arcLength2D += 2 * TMath::Pi() * radius;
     }
 
-    sumDistanceZReconstructed2D += abs(trajectorySZ.getZDist(arcLength2D, reconstructedPositionTo2D.z()));
+    sumDistanceZReconstructed2D += std::fabs(trajectorySZ.getZDist(arcLength2D, reconstructedPositionTo2D.z()));
     arcLength2DList.push_back(arcLength2D);
 
     const double reconstructedZ = trajectorySZ.mapSToZ(arcLength2D);
-    const Vector2D& reconstructedPositionToZ = recoHit3D.getWire().getWireLine().pos2DAtZ(reconstructedZ);
+    const Vector2D& reconstructedPositionToZ = recoHit3D.getWire().getWirePos2DAtZ(reconstructedZ);
     sumDistance2DReconstructedZ += (reconstructedPositionToZ - reconstructedPositionTo2D.xy()).norm();
   }
 

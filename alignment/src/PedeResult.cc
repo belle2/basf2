@@ -1,7 +1,19 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015  Belle II Collaboration                              *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Tadeas Bilka                                             *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+
 #include <alignment/PedeResult.h>
 #include <fstream>
 #include <sstream>
 #include <iostream>
+
+using namespace std;
 
 namespace Belle2 {
   namespace alignment {
@@ -108,7 +120,7 @@ namespace Belle2 {
       if (data.size() > 0)
         valid = true;
     }
-    PedeResult::PedeResult(string filename): data(), eigenNumbers(), valid(false), labelIndices()
+    PedeResult::PedeResult(const string& filename): data(), eigenNumbers(), valid(false), labelIndices()
     {
       read(filename);
     }

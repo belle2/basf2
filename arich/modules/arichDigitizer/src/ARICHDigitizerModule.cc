@@ -9,7 +9,7 @@
  **************************************************************************/
 // Own include
 #include <arich/modules/arichDigitizer/ARICHDigitizerModule.h>
-
+#include <framework/core/ModuleManager.h>
 #include <time.h>
 
 // Hit classes
@@ -24,9 +24,12 @@
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
+
 // ROOT
 #include <TVector2.h>
+#include <TVector3.h>
 #include <TRandom3.h>
+#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -44,15 +47,8 @@ namespace Belle2 {
   //                 Implementation
   //-----------------------------------------------------------------
 
-  ARICHDigitizerModule::ARICHDigitizerModule() :
-    Module(),
-    m_inColName(""),
-    m_outColName(""),
-    m_timeCPU(0),
-    m_nRun(0),
-    m_nEvent(0),
-    m_maxQE(0),
-    m_arichgp(ARICHGeometryPar::Instance())
+  ARICHDigitizerModule::ARICHDigitizerModule() :  Module(),
+    m_maxQE(0)
   {
 
     // Set description()
@@ -62,8 +58,6 @@ namespace Belle2 {
     setPropertyFlags(c_ParallelProcessingCertified);
 
     // Add parameters
-    addParam("InputColName", m_inColName, "ARICHSimHits collection name", string("ARICHSimHitArray"));
-    addParam("OutputColName", m_outColName, "ARICHDigit collection name", string("ARICHDigitArray"));
     addParam("TimeWindow", m_timeWindow, "Readout time window width in ns", 250.0);
     addParam("BackgroundHits", m_bkgLevel, "Number of background hits per hapd per readout (electronics noise)", 0.4);
 
@@ -76,18 +70,11 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::initialize()
   {
-    // Initialize variables
-    m_nRun    = 0 ;
-    m_nEvent  = 0 ;
-
     // Print set parameters
     printModuleParams();
 
-    // CPU time start
-    m_timeCPU = clock() * Unit::us;
-
     // QE at 400nm (3.1eV) applied in SensitiveDetector
-    m_maxQE = m_arichgp->QE(3.1);
+    m_maxQE = m_simPar->getQE(3.1);
 
     StoreArray<ARICHDigit> digits;
     digits.registerInDataStore();
@@ -95,9 +82,6 @@ namespace Belle2 {
 
   void ARICHDigitizerModule::beginRun()
   {
-    // Print run number
-    B2INFO("ARICHDigitizer: Processing run: " << m_nRun);
-
   }
 
   void ARICHDigitizerModule::event()
@@ -112,7 +96,6 @@ namespace Belle2 {
     // (or have one created)
     //-----------------------------------------------------
     StoreArray<ARICHDigit> arichDigits;
-    if (!arichDigits.isValid()) arichDigits.create();
 
     //---------------------------------------------------------------------
     // Convert SimHits one by one to digitizer hits.
@@ -139,20 +122,33 @@ namespace Belle2 {
 
       TVector2 locpos(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y());
 
-      // Get id number of hit channel
-      int channelID = m_arichgp->getChannelID(locpos);
       // Get id of module
       int moduleID = aSimHit->getModuleID();
+
+      // skip if not active
+      if (!m_modInfo->isActive(moduleID)) continue;
+
+      // Get id number of hit channel
+      int chX, chY;
+      m_geoPar->getHAPDGeometry().getXYChannel(aSimHit->getLocalPosition().X(), aSimHit->getLocalPosition().Y(), chX, chY);
+      if (chX < 0 && chY < 0) continue;
+
+      int asicChannel = m_chnMap->getAsicFromXY(chX, chY);
+
       // eliminate un-active channels
-      if (channelID < 0 || !m_arichgp->isActive(moduleID, channelID)) continue;
+      if (asicChannel < 0 || !m_chnMask->isActive(moduleID, asicChannel)) continue;
+
       // apply channel dependent QE scale factor
-      double qe_scale =  m_arichgp->getChannelQE(moduleID, channelID) / m_maxQE;
+      //double qe_scale =  0.27 / m_maxQE;
+      //double qe_scale = m_modInfo->getChannelQE(moduleID, asicChannel) * m_simPar->getColEff() / m_maxQE; // eventually move collection efficiency to here!
+      double qe_scale = m_modInfo->getChannelQE(moduleID, asicChannel) / m_maxQE;
+
       if (qe_scale > 1.) B2ERROR("Channel QE is higher than QE applied in SensitiveDetector");
       if (gRandom->Uniform(1.) > qe_scale) continue;
 
       // photon was converted to photoelectron
-      chipHits[make_pair(moduleID, channelID / 36)] += 1;
-      photoElectrons[make_pair(moduleID, channelID)] += 1;
+      chipHits[make_pair(moduleID, asicChannel / 36)] += 1;
+      photoElectrons[make_pair(moduleID, asicChannel)] += 1;
 
     }
 
@@ -165,10 +161,10 @@ namespace Belle2 {
       double npe = double(it->second);
 
       // reduce efficiency
-      npe /= (1.0 + m_arichgp->getChipNegativeCrosstalk() * (double(chipHits[make_pair(modch.first, modch.second / 36)]) - 1.0));
+      npe /= (1.0 + m_simPar->getChipNegativeCrosstalk() * (double(chipHits[make_pair(modch.first, modch.second / 36)]) - 1.0));
       if (npe < 1.0 && gRandom->Uniform(1) > npe) continue;
 
-      // Make hit bitmap (depends on number of p.e. on channel). For now bitmap is 0001 for signle p.e., 0011 for 2 p.e., ...
+      // Make hit bitmap (depends on number of p.e. on channel). For now bitmap is 0001 for single p.e., 0011 for 2 p.e., ...
       // More proper implementation is to be done ...
       uint8_t bitmap = 0;
       for (int i = 0; i < npe; i++) {
@@ -183,29 +179,23 @@ namespace Belle2 {
 
     //--- add electronic noise hits
     uint8_t bitmap = 1;
-    for (int id = 1; id < m_arichgp->getNMCopies() + 1; id++) {
+    unsigned nSlots = m_geoPar->getDetectorPlane().getNSlots();
+    for (unsigned id = 1; id < nSlots + 1; id++) {
+      if (!m_modInfo->isActive(id)) continue;
       int nbkg = gRandom->Poisson(m_bkgLevel);
       for (int i = 0; i < nbkg; i++) {
         arichDigits.appendNew(id, gRandom->Integer(144), bitmap);
       }
     }
 
-    m_nEvent++;
-
   }
 
   void ARICHDigitizerModule::endRun()
   {
-    m_nRun++;
   }
 
   void ARICHDigitizerModule::terminate()
   {
-    // CPU time end
-    m_timeCPU = clock() * Unit::us - m_timeCPU;
-
-    // Announce
-    B2INFO("ARICHDigitizer finished. Time per event: " << m_timeCPU / m_nEvent / Unit::ms << " ms.");
 
   }
 

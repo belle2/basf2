@@ -306,7 +306,7 @@ int FragmentationModule::addParticleToPYTHIA(MCParticle& mcParticle)
   //check that this particle is a quark or a virtual photon(-like)
   bool isVPho  = false;
   bool isQuark = false;
-  if (abs(id) >= 1 && abs(id) <= 4) isQuark = true;
+  if (abs(id) >= 1 && abs(id) <= 5) isQuark = true;
   if (id == 23) isVPho = true;
 
   if (!(isVPho || isQuark)) return 0;

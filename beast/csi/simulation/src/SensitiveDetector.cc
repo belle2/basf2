@@ -168,7 +168,6 @@ namespace Belle2 {
       StoreArray<MCParticle>   mcParticles;
       StoreArray<CsiSimHit>    simHits;
 
-      if (!simHits.isValid()) simHits.create();
       RelationArray simHitRel(mcParticles, simHits);
 
       // convert Hep3Vectors to TVector3
@@ -195,7 +194,6 @@ namespace Belle2 {
 
       StoreArray<CsiHit> csiHits;
 
-      if (!csiHits.isValid()) csiHits.create();
       RelationArray csiHitRel(mcParticles, csiHits);
 
 

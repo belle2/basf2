@@ -33,14 +33,14 @@ namespace Belle2 {
     //typedef std::vector<unsigned int>::const_iterator const_iterator;
 
     /** default constructor for ROOT */
-    QcsmonitorHit(): m_detNb(0), m_time(0), m_edep(0), m_counter(0) {}
+    QcsmonitorHit(): m_detNb(0), m_time(0), m_edep(0), m_mip(0), m_pe(0) {}
 
 
     /** Standard constructor
      * @param energyDep Deposited energy in electrons
      */
-    QcsmonitorHit(int detNb, int time, float edep, int counter):
-      m_detNb(detNb), m_time(time), m_edep(edep), m_counter(counter)
+    QcsmonitorHit(int detNb, int time, float edep, float mip, float pe):
+      m_detNb(detNb), m_time(time), m_edep(edep), m_mip(mip), m_pe(pe)
     {
     }
 
@@ -50,8 +50,10 @@ namespace Belle2 {
     int gettime() const { return m_time; }
     /** Return the energy deposited */
     float getedep() const { return m_edep; }
-    /** Return the PDG of particles */
-    int getcounter()  const { return m_counter; }
+    /** Return MIP */
+    float getMIP()  const { return m_mip; }
+    /** Return PE */
+    float getPE()  const { return m_pe; }
 
   private:
 
@@ -61,8 +63,10 @@ namespace Belle2 {
     int m_time;
     /** Energy deposited */
     float m_edep;
-    /** Particle PDG */
-    int m_counter;
+    /** Particle mip */
+    float m_mip;
+    /** Particle pe */
+    float m_pe;
 
     ClassDef(QcsmonitorHit, 1)
   };

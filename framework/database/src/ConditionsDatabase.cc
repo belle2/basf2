@@ -54,10 +54,12 @@ void ConditionsDatabase::createInstance(const std::string& globalTag, const std:
 
 
 ConditionsDatabase::ConditionsDatabase(const std::string& globalTag, const std::string& payloadDir): m_globalTag(globalTag),
-  m_payloadDir(payloadDir), m_currentExperiment(-1), m_currentRun(0)
+  m_currentExperiment(-1), m_currentRun(0)
 {
-  if (m_payloadDir.empty()) {
+  if (payloadDir.empty()) {
     m_payloadDir = fs::absolute(fs::current_path()).string();
+  } else {
+    m_payloadDir = fs::absolute(fs::path(payloadDir)).string();
   }
 }
 

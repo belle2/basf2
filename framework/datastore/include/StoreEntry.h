@@ -14,6 +14,8 @@ namespace Belle2 {
     /** useful constructor, creates 'object', but leaves 'ptr' NULL. */
     StoreEntry(bool isArray, const TClass* cl, const std::string& name, bool dontWriteOut);
 
+    /** invalidate entry for next event. (ptr will be null afterwards, memory may be reused.) */
+    void invalidate();
     /** Reset stored object to defaults, or nullptr. Only useful for input modules (before GetEntry()). */
     void resetForGetEntry();
     /** Recreate object if null. Used to recover from temporary invalid states after reading empty branches. */

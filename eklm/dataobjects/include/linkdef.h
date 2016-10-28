@@ -22,6 +22,11 @@
 /* Reconstuction stage. */
 #pragma link C++ class Belle2::EKLMHit2d+;
 
-#pragma link C++ class Belle2::EKLMElementNumbers;
+/* Alignment. */
+#pragma link C++ class Belle2::EKLMAlignmentHit+;
+
+/* Element identifiers. */
+#pragma link C++ class Belle2::EKLMElementNumbers+;
+#pragma link C++ class Belle2::EKLMSegmentID+;
 
 #endif

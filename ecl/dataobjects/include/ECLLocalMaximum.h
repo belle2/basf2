@@ -4,7 +4,7 @@
  *                                                                        *
  * A local maximum is defined by its energy and the number and energy of  *
  * its neighbours. It holds a relation to to an ECLConnectedRegion and    *
- * an ECLCalDigit. It has a type (photon, electron, mergedpi0, ...).      *
+ * a list of ECLCalDigits (set in SplitterN1).                            *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber                                            *
@@ -16,9 +16,6 @@
 #define ECLLOCALMAXIMUM_H
 
 #include <framework/datastore/RelationsObject.h>
-
-#include <algorithm>    // std::unique, std::distance
-#include <vector>       // std::vector
 
 namespace Belle2 {
 
@@ -34,17 +31,16 @@ namespace Belle2 {
       c_electron = 2, /**< electron */
       c_mergedpi0 = 3, /**< merged pi0 */
     };
-    static const size_t c_nTypes = 3;
 
+    /** Number of different types */
+    static const size_t c_nTypes = 3;
 
     /** default constructor for ROOT */
     ECLLocalMaximum()
     {
-      m_LMId                    = -1; /**< LM identifier */
-      m_NNeighbours             = -1; /**< Number of neighbours with energy > cut */
-      m_Type                    = -1; /** LM type  (photon, electron, merged pi0...)*/
-      m_MaximumEnergyNeighbours = 0.0;  /**< Maximum energy among neighbours */
-      m_ListOfNeighbourEnergies.clear(); /**< Clear the neighbour list */
+      m_LMId    = -1; /**< LM identifier */
+      m_Type    = -1; /** LM type  (photon, electron, merged pi0...) */
+      m_CellId  = -1; /** Cell Id */
     }
 
     // setters
@@ -52,29 +48,13 @@ namespace Belle2 {
      */
     void setLMId(int LMId) { m_LMId = LMId; }
 
-    /*! Set number of neighbours above cut.
+    /*! Set CellId.
      */
-    void setNNeighbours(int NoN) { m_NNeighbours = NoN; }
+    void setCellId(int cellid) { m_CellId = cellid; }
 
     /*! Set type.
      */
     void setType(int type) { m_Type = type; }
-
-    /*! Set maximum energiy of neighbours.
-     */
-    void setMaximumEnergyNeighbours(double energy) { m_MaximumEnergyNeighbours = energy; }
-
-    /*! Append an entry to the neighbour energy list.
-     */
-    void appendToNeighbourEnergiesList(double energy) { m_ListOfNeighbourEnergies.push_back(energy); }
-
-    /*! Set the neighbour energy list.
-     */
-    void setNeighbourEnergiesList(std::vector<double> list) { m_ListOfNeighbourEnergies = list; }
-
-    /*! Clears the neighbour energy list.
-     */
-    void clearNeighbourEnergiesList() { m_ListOfNeighbourEnergies.clear(); }
 
     // getters
     /*! Get LM identifier.
@@ -82,36 +62,25 @@ namespace Belle2 {
      */
     int getLMId() const { return m_LMId; }
 
-    /*! Get number of neighbours above cut.
-     * @return number of neighbours
-     */
-    int getNNeighbours() const { return m_NNeighbours; }
-
     /*! Get type.
      * @return type
      */
     int getType() const { return m_Type; }
 
-    /*! Get number of neighbours above cut.
-     * @return number of neighbours
+    /*! Get CellId.
+     * @return cellid
      */
-    double getMaximumEnergyNeighbours() const { return m_MaximumEnergyNeighbours; }
-
-    /*! Get list of seeds (cell ids).
-     * @return SeedList
-     */
-    std::vector<double> getNeighbourEnergiesList() const { return m_ListOfNeighbourEnergies; }
+    int getCellId() const { return m_CellId; }
 
   private:
     int m_LMId;  /**< LM ID */
-    int m_NNeighbours; /**< Number of neighbours. */
-    int m_Type; /** LM type  (photon, electron, merged pi0...)*/
-    double m_MaximumEnergyNeighbours; /**< Maximum energy of neighbours. */
-    std::vector<double> m_ListOfNeighbourEnergies;  /**< List of neighbour energies. */
+    int m_Type; /**< LM type  (photon, electron, merged pi0...) */
+    int m_CellId; /**< Cell Id */
 
-    // 1: initial version
-    // 2: added identifier for LM type (photon, electron, merged pi0...)
-    ClassDef(ECLLocalMaximum, 2); /**< ClassDef */
+    // 1: Initial version.
+    // 2: Added identifier for LM type (photon, electron, merged pi0...).
+    // 2: Removed bulky extra information and added CellId.
+    ClassDef(ECLLocalMaximum, 3); /**< ClassDef */
 
   };
 

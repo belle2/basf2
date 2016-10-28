@@ -9,13 +9,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <errno.h>
-#include <math.h>
+/* C++ headers. */
+#include <cerrno>
+#include <cmath>
+#include <string>
 
 /* External headers. */
-#include <boost/format.hpp>
-#include <boost/lexical_cast.hpp>
 #include <CLHEP/Units/PhysicalConstants.h>
 #include <G4Box.hh>
 #include <G4Tubs.hh>
@@ -122,7 +121,7 @@ void EKLM::GeoEKLMCreator::newVolumes()
   m_LogVol.strip = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
   if (m_LogVol.strip == NULL)
     B2FATAL(MemErr);
-  m_Solids.groove = (G4VSolid**)malloc(nDiff * sizeof(G4Box*));
+  m_Solids.groove = (G4VSolid**)malloc(nDiff * sizeof(G4VSolid*));
   if (m_Solids.groove == NULL)
     B2FATAL(MemErr);
   m_LogVol.groove = (G4LogicalVolume**)malloc(nDiff * sizeof(G4LogicalVolume*));
@@ -894,8 +893,7 @@ subtractBoardSolids(G4SubtractionSolid* plane, int n)
       }
       try {
         ss[i][j] = new G4SubtractionSolid(
-          "BoardSubtraction_" + boost::lexical_cast<std::string>(i) + "_" +
-          boost::lexical_cast<std::string>(j),
+          "BoardSubtraction_" + std::to_string(i) + "_" + std::to_string(j),
           prev_solid, solidBoardBox, t);
       } catch (std::bad_alloc& ba) {
         B2FATAL(MemErr);
@@ -998,8 +996,8 @@ createSegmentSupportLogicalVolume(int iPlane, int iSegmentSupport)
   G4UnionSolid* us = NULL;
   G4UnionSolid* solidSegmentSupport = NULL;
   std::string segmentSupportName =
-    "SegmentSupport_" + boost::lexical_cast<std::string>(iSegmentSupport) +
-    "_Plane_" + boost::lexical_cast<std::string>(iPlane);
+    "SegmentSupport_" + std::to_string(iSegmentSupport) +
+    "_Plane_" + std::to_string(iPlane);
   const EKLMGeometry::SegmentSupportPosition* segmentSupportPos =
     m_GeoDat->getSegmentSupportPosition(iPlane, iSegmentSupport);
   const EKLMGeometry::SegmentSupportGeometry* segmentSupportGeometry =
@@ -1671,8 +1669,7 @@ EKLM::GeoEKLMCreator::createEndcap(G4LogicalVolume* topVolume) const
 {
   G4LogicalVolume* logicEndcap = NULL;
   const HepGeom::Transform3D* t;
-  std::string endcapName = "Endcap_" +
-                           boost::lexical_cast<std::string>(m_CurVol.endcap);
+  std::string endcapName = "Endcap_" + std::to_string(m_CurVol.endcap);
   try {
     logicEndcap = new G4LogicalVolume(m_Solids.endcap, m_Materials.iron,
                                       endcapName);
@@ -1697,8 +1694,7 @@ createLayer(G4LogicalVolume* endcap, G4LogicalVolume* layer) const
   G4LogicalVolume* logicLayer;
   const HepGeom::Transform3D* t;
   if (layer == NULL) {
-    std::string layerName = "Layer_" +
-                            boost::lexical_cast<std::string>(m_CurVol.layer) +
+    std::string layerName = "Layer_" + std::to_string(m_CurVol.layer) +
                             "_" + endcap->GetName();
     logicLayer = createLayerLogicalVolume(layerName.c_str());
   } else
@@ -1719,8 +1715,7 @@ createSector(G4LogicalVolume* layer, G4LogicalVolume* sector) const
   G4LogicalVolume* logicSector;
   const HepGeom::Transform3D* t;
   if (sector == NULL) {
-    std::string sectorName = "Sector_" +
-                             boost::lexical_cast<std::string>(m_CurVol.sector) +
+    std::string sectorName = "Sector_" + std::to_string(m_CurVol.sector) +
                              "_" + layer->GetName();
     logicSector = createSectorLogicalVolume(sectorName.c_str());
   } else
@@ -1870,8 +1865,7 @@ EKLM::GeoEKLMCreator::createPlane(G4LogicalVolume* sector) const
   G4LogicalVolume* logicPlane = NULL;
   const HepGeom::Transform3D* t;
   std::string planeName =
-    "Plane_" + boost::lexical_cast<std::string>(m_CurVol.plane) + "_" +
-    sector->GetName();
+    "Plane_" + std::to_string(m_CurVol.plane) + "_" + sector->GetName();
   try {
     logicPlane = new G4LogicalVolume(m_Solids.plane[m_CurVol.plane - 1],
                                      m_Materials.air, planeName);
@@ -1895,9 +1889,8 @@ EKLM::GeoEKLMCreator::createSegmentReadoutBoard(G4LogicalVolume* sector) const
 {
   G4LogicalVolume* logicSegmentReadoutBoard = NULL;
   std::string boardName =
-    "SegmentReadoutBoard_" + boost::lexical_cast<std::string>(m_CurVol.board) +
-    "_Plane_" + boost::lexical_cast<std::string>(m_CurVol.plane) +
-    "_" + sector->GetName();
+    "SegmentReadoutBoard_" + std::to_string(m_CurVol.board) + "_Plane_" +
+    std::to_string(m_CurVol.plane) + "_" + sector->GetName();
   try {
     logicSegmentReadoutBoard = new G4LogicalVolume(m_Solids.board,
                                                    m_Materials.air, boardName);
@@ -1951,8 +1944,7 @@ createStripBoard(int iBoard, G4LogicalVolume* segmentReadoutBoard) const
     m_GeoDat->getBoardGeometry();
   const EKLMGeometry::StripBoardPosition* stripBoardPos =
     m_GeoDat->getStripBoardPosition(iBoard);
-  std::string boardName = "StripBoard_" +
-                          boost::lexical_cast<std::string>(iBoard) + "_" +
+  std::string boardName = "StripBoard_" + std::to_string(iBoard) + "_" +
                           segmentReadoutBoard->GetName();
   try {
     logicStripBoard =
@@ -2006,8 +1998,8 @@ void EKLM::GeoEKLMCreator::createPlasticSheet(int iSheetPlane, int iSheet) const
   const EKLMGeometry::StripGeometry* stripGeometry =
     m_GeoDat->getStripGeometry();
   std::string sheetName =
-    "Sheet_" + boost::lexical_cast<std::string>(iSheet) +
-    "_SheetPlane_" + boost::lexical_cast<std::string>(iSheetPlane);
+    "Sheet_" + std::to_string(iSheet) +
+    "_SheetPlane_" + std::to_string(iSheetPlane);
   z = 0.5 * (stripGeometry->getThickness() + plasticSheetGeometry->getWidth());
   if (iSheetPlane == 2)
     z = -z;
@@ -2024,8 +2016,7 @@ void EKLM::GeoEKLMCreator::createPlasticSheet(int iSheetPlane, int iSheet) const
 void EKLM::GeoEKLMCreator::createStripSegment(int iSegment) const
 {
   HepGeom::Transform3D t;
-  std::string segmentName =
-    "StripSegment_" + boost::lexical_cast<std::string>(iSegment);
+  std::string segmentName = "StripSegment_" + std::to_string(iSegment);
   t = HepGeom::Translate3D(0, 0, 0);
   try {
     new G4PVPlacement(t, m_LogVol.stripSegment[iSegment - 1], segmentName,
@@ -2039,8 +2030,7 @@ void EKLM::GeoEKLMCreator::createSegment(G4LogicalVolume* plane) const
 {
   const HepGeom::Transform3D* t;
   std::string segmentName =
-    "Segment_" + boost::lexical_cast<std::string>(m_CurVol.segment) +
-    "_" + plane->GetName();
+    "Segment_" + std::to_string(m_CurVol.segment) + "_" + plane->GetName();
   t = m_TransformData->getSegmentTransform(
         m_CurVol.endcap, m_CurVol.layer, m_CurVol.sector, m_CurVol.plane,
         m_CurVol.segment);
@@ -2312,7 +2302,7 @@ void EKLM::GeoEKLMCreator::create(G4LogicalVolume& topVolume)
         layer = createLayer(endcap, m_LogVol.shieldLayer);
         for (m_CurVol.sector = 1; m_CurVol.sector <= m_GeoDat->getNSectors();
              m_CurVol.sector++)
-          sector = createSector(layer, m_LogVol.shieldLayerSector);
+          createSector(layer, m_LogVol.shieldLayerSector);
         createSectorSupport(m_LogVol.shieldLayerSector);
         createSectorSupportCorner1(m_LogVol.shieldLayerSector);
         createSectorSupportCorner2(m_LogVol.shieldLayerSector);

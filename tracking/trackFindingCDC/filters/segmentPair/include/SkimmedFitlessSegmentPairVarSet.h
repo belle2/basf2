@@ -19,16 +19,13 @@ namespace Belle2 {
      *  Is the same as the CDCSegmentPairFitlessVarSet but skimmed for non sensical combinations
      *  without the expensive common fit.
      */
-    class  SkimmedFitlessSegmentPairVarSet : public SkimmedVarSet<FitlessSegmentPairVarSet> {
+    class SkimmedFitlessSegmentPairVarSet : public SkimmedVarSet<FitlessSegmentPairVarSet> {
 
     private:
       /// Name of the super class.
-      using Super = SkimmedVarSet<FitlessSegmentPairVarSet> ;
+      using Super = SkimmedVarSet<FitlessSegmentPairVarSet>;
 
     public:
-      /// Construct the varset.
-      explicit SkimmedFitlessSegmentPairVarSet();
-
       /// Implement the skim cut.
       virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
     };

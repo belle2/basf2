@@ -32,8 +32,15 @@ namespace Belle2 {
     int Stop(NSMmsg*, NSMcontext*);
     int Restart(NSMmsg*, NSMcontext*);
 
+    // Function to hook message funnctions
+    void Hook_Message_Handlers();
+
+    // Message functions
+    static void Log_Handler(NSMmsg* msg, NSMcontext* ctx);
+
     // Server function
     void monitor_loop();
+
 
   private:
     RFConf*            m_conf;
@@ -41,6 +48,7 @@ namespace Belle2 {
     RFLogManager*      m_log;
 
   };
+
 }
 #endif
 

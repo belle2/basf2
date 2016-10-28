@@ -17,6 +17,7 @@
 #include <numpy/arrayobject.h>
 
 #include <framework/logging/Logger.h>
+#include <numeric>
 
 namespace Belle2 {
   namespace MVA {
@@ -283,6 +284,24 @@ namespace Belle2 {
         auto file = builtins.attr("open")(custom_weightfile.c_str(), "wb");
         pickle.attr("dump")(result, file);
 
+        auto importances = get_attr_from_module_else_fallback_to_framework("feature_importance", module, framework)(state);
+        if (len(importances) == 0) {
+          B2INFO("Python method returned empty feature importance. There won't be any information about the feature importance in the weightfile.");
+        } else if (numberOfFeatures != len(importances)) {
+          B2WARNING("Python method didn't return the correct number of importance value. I ignore the importances");
+        } else {
+          std::map<std::string, float> feature_importances;
+          for (unsigned int iFeature = 0; iFeature < numberOfFeatures; ++iFeature) {
+            boost::python::extract<float> proxy(importances[iFeature]);
+            if (proxy.check()) {
+              feature_importances[m_general_options.m_variables[iFeature]] = static_cast<float>(proxy);
+            } else {
+              B2WARNING("Failed to convert importance output of the method to a float, using 0 instead");
+              feature_importances[m_general_options.m_variables[iFeature]] = 0.0;
+            }
+          }
+          weightfile.addFeatureImportance(feature_importances);
+        }
 
       } catch (...) {
         PyErr_Print();

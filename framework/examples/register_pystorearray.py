@@ -9,6 +9,7 @@
 import os
 import math
 import random
+import numpy as np
 
 import basf2
 import ROOT
@@ -55,7 +56,14 @@ class SillyGeneratorModule(basf2.Module):
 
 
 class ParticleStatisticsModule(basf2.Module):
-    """Collect statistics on particles"""
+    """Collect statistics on particles - also parallel processable"""
+
+    def __init__(self):
+        """set module flags"""
+        super().__init__()
+        self.set_property_flags(
+            basf2.ModulePropFlags.PARALLELPROCESSINGCERTIFIED |
+            basf2.ModulePropFlags.TERMINATEINALLPROCESSES)
 
     def initialize(self):
         """init"""
@@ -92,46 +100,46 @@ class ParticleStatisticsModule(basf2.Module):
         ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
         hist = Belle2.PyStoreObj("AbsMomentum", Belle2.DataStore.c_Persistent)
 
-        print("IsValid", ntuple.isValid())
-        print("IsValid", hist.isValid())
-
         mcParticles = Belle2.PyStoreArray(Belle2.MCParticle.Class())
 
         for mcParticle in mcParticles:
             momentum = mcParticle.getMomentum()
-            ntuple.obj().get().Fill(momentum.X(), momentum.Y(), momentum.Z())
-            hist.obj().get().Fill(momentum.Mag())
+            ntuple.get().Fill(momentum.X(),
+                              momentum.Y(),
+                              momentum.Z())
+
+            hist.get().Fill(momentum.Mag())
 
     def terminate(self):
         """terminate"""
-        ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
-        ntuple.obj().write(self.tfile)
-        hist = Belle2.PyStoreObj("AbsMomentum", Belle2.DataStore.c_Persistent)
-        hist.write(self.tfile)
-        self.tfile.Close()
+        if (not Belle2.ProcHandler.parallelProcessingUsed() or
+                Belle2.ProcHandler.isOutputProcess()):
+            print("Writting objects")
+            ntuple = Belle2.PyStoreObj("ParticleMomenta", Belle2.DataStore.c_Persistent)
+            ntuple.write(self.tfile)
+
+            hist = Belle2.PyStoreObj("AbsMomentum", Belle2.DataStore.c_Persistent)
+            hist.write(self.tfile)
+
+            self.tfile.Close()
 
 
-# ******** Register modules  **********
-eventInfoSetterModule = basf2.register_module('EventInfoSetter')
-eventInfoSetterModule.param(dict(
-    evtNumList=[1000],
-    runList=[1],
-    expList=[1]
-))
+def main():
+    path = basf2.create_path()
+    path.add_module('EventInfoSetter',
+                    evtNumList=[1000],
+                    runList=[1],
+                    expList=[1]
+                    )
 
-printCollectionsModule = basf2.register_module('PrintCollections')
-sillyGeneratorModule = SillyGeneratorModule()
-particleStatisticsModule = ParticleStatisticsModule()
+    path.add_module(SillyGeneratorModule())
+    path.add_module(ParticleStatisticsModule())
 
-# ******** Create paths and add modules  **********
-main = basf2.create_path()
-main.add_module(eventInfoSetterModule)
-main.add_module(sillyGeneratorModule)
-main.add_module(particleStatisticsModule)
-simulation.add_simulation(main)
+    basf2.process(path)
 
-main.add_module(printCollectionsModule)
-basf2.process(main)
+    # Print call statistics
+    print(basf2.statistics)
 
-# Print call statistics
-print(basf2.statistics)
+
+if __name__ == "__main__":
+    main()

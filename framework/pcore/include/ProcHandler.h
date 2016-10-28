@@ -39,6 +39,13 @@ namespace Belle2 {
     static bool isOutputProcess();
 
 
+    /** Return number of worker processes */
+    static int numEventProcesses();
+
+    /** Return list of PIDs managed by this ProcHandler instance. */
+    std::set<int> processList() const;
+    /** Return list of all PIDs (from all ProcHandler instances). */
+    static std::set<int> globalProcessList();
 
     /** Return ID of the current process.
      *

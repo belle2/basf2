@@ -9,10 +9,12 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
 #include <geometry/utilities.h>
 #include <geometry/GeometryManager.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include <G4Colour.hh>
 #include <G4LogicalVolume.hh>
@@ -103,7 +105,7 @@ namespace Belle2 {
       volume.SetVisAttributes(attr);
     }
 
-    G4Polycone* createPolyCone(const string& name, GearDir params, double& minZ, double& maxZ)
+    G4Polycone* createPolyCone(const string& name, const GearDir& params, double& minZ, double& maxZ)
     {
       if (!params) return 0;
 

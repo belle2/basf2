@@ -29,11 +29,12 @@ namespace Belle2 {
       using Super::Super;
 
       /// Constructor taking the name and the desired value.
-      Named(std::string name, T t):
-        Super(t), m_name(std::move(name))
+      Named(const std::string& name, T t)
+        : Super(std::move(t))
+        , m_name(name)
       {}
 
-      /// Comparison operator establishing an ordering considering the pointer first and the name second
+      /// Comparison operator establishing an ordering considering the name and the object
       bool operator<(const Named<T>& other) const
       {
         const T& t(*this);
@@ -48,7 +49,7 @@ namespace Belle2 {
       }
 
       /// Setter for the name of the object.
-      void setName(std::string name)
+      void setName(const std::string& name)
       {
         m_name = name;
       }

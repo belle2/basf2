@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -181,7 +180,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
       }
     }
 
-    double thetaTrack = trajectoryTrack3D.getUnitMom3DAtSupport().theta();
+    double thetaTrack = trajectoryTrack3D.getFlightDirection3DAtSupport().theta();
     stereo_quad_tree_distance = thetaTrack - thetaFirstSegmentHit;
   }
 
@@ -246,7 +245,7 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   var<named("segment_super_layer")>() = segment->getISuperLayer();
 
-  double phiBetweenTrackAndSegment = trajectoryTrack2D.getStartMom2D().angleWith(segment->front().getRecoPos2D());
+  double phiBetweenTrackAndSegment = trajectoryTrack2D.getMom2DAtSupport().angleWith(segment->front().getRecoPos2D());
 
   setVariableIfNotNaN<named("phi_between_track_and_segment")>(phiBetweenTrackAndSegment);
   setVariableIfNotNaN<named("perp_s_of_front")>(perpSOfFront / radius);

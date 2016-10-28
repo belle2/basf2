@@ -21,8 +21,19 @@
 #include <genfit/MeasurementFactory.h>
 #include <string>
 
-
 using namespace Belle2;
+
+
+namespace {
+  /// Check if two store array names of the given type T describe the same store array (also with default names).
+  template <class T>
+  bool checkTwoStoreArrayNames(const std::string& firstName, const std::string& secondName)
+  {
+    return ((firstName == secondName) or
+            (firstName.empty() and secondName == DataStore::defaultArrayName<T>()) or
+            (secondName.empty() and firstName == DataStore::defaultArrayName<T>()));
+  }
+}
 
 MeasurementAdder::MeasurementAdder(const std::string& storeArrayNameOfCDCHits,
                                    const std::string& storeArrayNameOfSVDHits,
@@ -118,15 +129,15 @@ bool MeasurementAdder::addMeasurements(RecoTrack& recoTrack) const
   B2ASSERT("Reco Track was built with another CDC store array: Reco Track "
            << recoTrack.getStoreArrayNameOfCDCHits()
            << ", this class " << m_param_storeArrayNameOfCDCHits,
-           recoTrack.getStoreArrayNameOfCDCHits() == m_param_storeArrayNameOfCDCHits);
+           checkTwoStoreArrayNames<RecoHitInformation::UsedCDCHit>(recoTrack.getStoreArrayNameOfCDCHits(), m_param_storeArrayNameOfCDCHits));
   B2ASSERT("Reco Track was built with another SVD store array: Reco Track "
            << recoTrack.getStoreArrayNameOfSVDHits()
            << ", this class " << m_param_storeArrayNameOfSVDHits,
-           recoTrack.getStoreArrayNameOfSVDHits() == m_param_storeArrayNameOfSVDHits);
+           checkTwoStoreArrayNames<RecoHitInformation::UsedSVDHit>(recoTrack.getStoreArrayNameOfSVDHits(), m_param_storeArrayNameOfSVDHits));
   B2ASSERT("Reco Track was built with another PXD store array: Reco Track "
            << recoTrack.getStoreArrayNameOfPXDHits()
            << ", this class " << m_param_storeArrayNameOfPXDHits,
-           recoTrack.getStoreArrayNameOfPXDHits() == m_param_storeArrayNameOfPXDHits);
+           checkTwoStoreArrayNames<RecoHitInformation::UsedPXDHit>(recoTrack.getStoreArrayNameOfPXDHits(), m_param_storeArrayNameOfPXDHits));
 
   if (m_cdcMeasurementCreators.size() == 0 and m_svdMeasurementCreators.size() == 0 and m_pxdMeasurementCreators.size() == 0
       and m_additionalMeasurementCreators.size() == 0) {

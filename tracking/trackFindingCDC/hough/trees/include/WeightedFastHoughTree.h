@@ -13,12 +13,11 @@
 #include <tracking/trackFindingCDC/hough/baseelements/WithWeightedItems.h>
 #include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
 
-#include <framework/logging/Logger.h>
-
-#include <memory>
 #include <vector>
-#include <assert.h>
-#include <float.h>
+#include <memory>
+#include <cassert>
+#include <cfloat>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -66,11 +65,11 @@ namespace Belle2 {
       {
         fell();
         Node& topNode = this->getTopNode();
-        for (const T& item : items) {
+        for (auto && item : items) {
           m_marks.push_back(false);
           bool& markOfItem = m_marks.back();
           Weight weight = DBL_MAX;
-          topNode.insert(WithSharedMark<T>(item, &markOfItem), weight);
+          topNode.insert(WithSharedMark<T>(T(item), &markOfItem), weight);
         }
       }
 
@@ -257,7 +256,6 @@ namespace Belle2 {
               assert(childNode.getChildren() == nullptr);
               assert(childNode.size() == 0);
               auto measure =
-
               [&childNode, &weightItemInDomain](WithSharedMark<T>& markableItem) -> Weight {
                 // Weighting function should not see the mark, but only the item itself.
                 T & item(markableItem);

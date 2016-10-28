@@ -11,7 +11,6 @@
 #include <analysis/NtupleTools/NtupleFlavorTaggingTool.h>
 #include <analysis/VariableManager/FlavorTaggingVariables.h>
 #include <analysis/VariableManager/Variables.h>
-#include <analysis/utility/MCMatching.h>
 #include <mdst/dataobjects/MCParticle.h>
 #include <analysis/dataobjects/FlavorTaggerInfo.h>
 
@@ -19,6 +18,9 @@
 #include <TBranch.h>
 #include <TLorentzVector.h>
 #include <TVector3.h>
+
+using namespace Belle2;
+using namespace std;
 
 void NtupleFlavorTaggingTool::setupTree()
 {
@@ -29,7 +31,7 @@ void NtupleFlavorTaggingTool::setupTree()
   qrCombinedFBDT = new float[nDecayProducts];
   qrCombinedFANN = new float[nDecayProducts];
   qrMC = new float[nDecayProducts];
-  string method("");
+  //string method("");
 
   const char* categories[] = { "Muon",  "IntermediateMuon", "Electron", "IntermediateElectron", "KinLepton",
                                "IntermediateKinLepton", "Kaon", "SlowPion", "FastPion", "Lambda", "FSC", "MaximumPstar", "KaonPion"
@@ -167,8 +169,7 @@ void NtupleFlavorTaggingTool::eval(const Particle* particle)
         if (mcparticles.isValid()) {
           if ((mcparticles.getEntries()) > 0) {
             {
-              float qrnormed = Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]);
-              if (qrnormed > -2) qrMC[iProduct] = 2 * (qrnormed - 0.5);
+              qrMC[iProduct] = Variable::isRelatedRestOfEventB0Flavor(selparticles[iProduct]);
             }
           }
         }

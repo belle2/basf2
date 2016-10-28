@@ -16,6 +16,7 @@
 #include <utility>
 #include <map>
 #include <memory>
+#include <vector>
 
 
 namespace Belle2 {

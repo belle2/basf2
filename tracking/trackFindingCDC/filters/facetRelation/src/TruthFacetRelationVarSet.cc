@@ -8,9 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/TruthFacetRelationVarSet.h>
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

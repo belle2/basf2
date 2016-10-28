@@ -16,7 +16,6 @@
 
 #include <utility>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -83,8 +82,7 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   // Reconstruct the segments to the track
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const bool isCurler = trajectory2D.isCurler();
-  const double radius = trajectory2D.getLocalCircle().absRadius();
-  const double shiftValue = 2 * TMath::Pi() * radius;
+  const double shiftValue = trajectory2D.getLocalCircle()->arcLengthPeriod();
   const ISuperLayer lastSuperLayer = track.back().getISuperLayer();
   const double lastArcLength2D = track.back().getArcLength2D();
 

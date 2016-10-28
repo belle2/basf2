@@ -6,15 +6,18 @@
     <xi:include href="ARICH-Aerogel.xml"/>
     <xi:include href="ARICH-Detectors.xml"/>
     <xi:include href="ARICH-Mirrors.xml"/>
-    <xi:include href="ARICH-QEsuperbialkali.xml"/>
-    <xi:include href="ARICH-ModuleInfo.xml"/>
     <xi:include href="ARICH-FrontEndMapping.xml"/>
-  
+    <xi:include href="ARICH-SupportStructure.xml"/>
+    <xi:include href="ARICH-SimulationPar.xml"/>
+    <xi:include href="ARICH-ChannelMapping.xml"/>
+    <xi:include href="ARICH-InstalledModules.xml"/>
+    <xi:include href="ARICH-CosmicTest.xml"/>
+	
     <Envelope>
-      <zFront desc="Starting z position of aRICH envelope" unit="mm">1668</zFront>
-      <zBack desc="Ending z position of aRICH envelope" unit="mm">1950</zBack>
+      <length desc="z length of aRICH envelope" unit="mm">280</length>
+      <zPosition desc="starting z position of ARICH envelope" unit="mm">1668</zPosition>
       <outerRadius desc="Outer radius of aRICH envelope" unit="mm">1140</outerRadius> 
-      <innerRadius desc="Inner radius of aRICH evnelope" unit="mm">440</innerRadius> 
+      <innerRadius desc="Inner radius of aRICH evnelope" unit="mm">420</innerRadius> 
       <material desc="aRICH envelope material: should be air with specified refractive index">ARICH_Air</material>
     </Envelope>
   </Content>

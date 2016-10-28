@@ -155,7 +155,7 @@ namespace Belle2 {
       temp_tree_data.release();
     }
 
-    void SPlot::plot(std::string prefix, std::string discriminatingVariable)
+    void SPlot::plot(const std::string& prefix, std::string discriminatingVariable)
     {
 
       RooRealVar* discriminating_variable = workspace->var(discriminatingVariable.c_str());

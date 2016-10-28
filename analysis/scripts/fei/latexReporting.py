@@ -200,39 +200,4 @@ if __name__ == '__main__':
                       vertex_pre_cut=p.after_vertex[channel.name].purity)
         o += table.finish()
 
-        for channel in p.channels:
-            # TODO print config
-            if p.ignored_channels[channel.name]:
-                continue
-            niceDecayChannel = format.decayDescriptor(channel.name)
-            o += b2latex.SubSection(niceDecayChannel).finish()
-
-            if p.feature_importance[channel.name].valid and p.training_data[channel.name].valid:
-                table = b2latex.LongTable(columnspecs=r'lp{5cm}rrrrr',
-                                          caption='List of variables used in the training',
-                                          head=r'No. & Name & Importance & mean & std & min & max \\',
-                                          format_string=r'{no} & {name} & ${v:.2f}$ & $ {mean:.3f} $ & $ {std:.3f} $ '
-                                                        r' & $ {min:.3f} $ & $ {max:.3f} $')
-
-                variable_list = []
-                for number, (n, value) in enumerate(p.feature_importance[channel.name].ranking):
-                    variable_list.append(n)
-                    table.add(no=number+1,
-                              name=format.variable(format.string(n)),
-                              v=value,
-                              mean=p.training_data[channel.name].mean(n),
-                              std=p.training_data[channel.name].std(n),
-                              min=p.training_data[channel.name].min(n),
-                              max=p.training_data[channel.name].max(n))
-                for n in channel.mvaConfig.variables:
-                    if n not in variable_list:
-                        table.add(no='---',
-                                  name=format.variable(format.string(n)),
-                                  v=float('nan'),
-                                  mean=p.training_data[channel.name].mean(n),
-                                  std=p.training_data[channel.name].std(n),
-                                  min=p.training_data[channel.name].min(n),
-                                  max=p.training_data[channel.name].max(n))
-                o += table.finish()
-
     o.save(sys.argv[2], compile=True)

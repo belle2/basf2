@@ -9,8 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
 
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

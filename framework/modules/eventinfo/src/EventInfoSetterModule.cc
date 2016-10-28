@@ -31,7 +31,8 @@ REG_MODULE(EventInfoSetter)
 
 EventInfoSetterModule::EventInfoSetterModule() : Module()
 {
-  if (getenv("BELLE2_PRODUCTION")) m_production = stoi(getenv("BELLE2_PRODUCTION"));
+  if (getenv("BELLE2_PRODUCTION"))
+    m_production = stoi(getenv("BELLE2_PRODUCTION"));
 
   //Set module properties
   setDescription(
@@ -42,8 +43,8 @@ EventInfoSetterModule::EventInfoSetterModule() : Module()
   );
 
   //Parameter definition
-  addParam("expList", m_expList, "List of experiment numbers.", m_expList);
-  addParam("runList", m_runList, "List of run numbers.", m_runList);
+  addParam("expList", m_expList, "List of experiment numbers. Can be overridden via --experiment argument to basf2.", m_expList);
+  addParam("runList", m_runList, "List of run numbers. Can be overridden via --run argument to basf2.", m_runList);
   addParam("evtNumList", m_evtNumList, "List of the number of events which "
            "should be processed. Can be overridden via -n argument to basf2.",
            m_evtNumList);
@@ -69,12 +70,22 @@ void EventInfoSetterModule::initialize()
 
   //steering file content overwritten via command line arguments?
   int numEventsArgument = Environment::Instance().getNumberEventsOverride();
-  if (numEventsArgument > 0) {
+  int runOverride = Environment::Instance().getRunOverride();
+  int expOverride = Environment::Instance().getExperimentOverride();
+  if (numEventsArgument > 0 or runOverride >= 0 or expOverride >= 0) {
     if (m_evtNumList.size() > 1) {
-      B2ERROR("The -n/--events option cannot be used when multiple runs are specified for EventInfoSetter!");
+      B2ERROR("The -n/--events, --run, and --experiment options cannot be used when multiple runs are specified for EventInfoSetter!");
     }
     m_evtNumList[0] = numEventsArgument;
+    if (runOverride >= 0)
+      m_runList[0] = runOverride;
+    if (expOverride >= 0)
+      m_expList[0] = expOverride;
   }
+
+  int skipNEventsOverride = Environment::Instance().getSkipEventsOverride();
+  if (skipNEventsOverride >= 0)
+    m_eventsToSkip = skipNEventsOverride;
 
   //Make sure all lists have the same size
   unsigned int defListSize = m_expList.size();
@@ -90,6 +101,10 @@ void EventInfoSetterModule::initialize()
         B2ERROR("Exp " << ret.first->first << ", run " << ret.first->second <<
                 " used more than once! Please make sure all experiment/run combinations are unique.");
       }
+      if (m_expList[i] < 0 or m_expList[i] > 1023)
+        B2ERROR("Experiment " << m_expList[i] << " is out of range, should be in [0, 1023]!");
+      if (m_runList[i] < 0)
+        B2ERROR("Run " << m_runList[i] << " is out of range, should be >= 0!");
     }
   }
 

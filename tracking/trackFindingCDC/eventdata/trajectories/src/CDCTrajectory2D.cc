@@ -12,6 +12,7 @@
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
+#include <tracking/trackFindingCDC/numerics/Quadratic.h>
 
 #include <framework/gearbox/Const.h>
 #include <framework/logging/Logger.h>
@@ -19,7 +20,6 @@
 #include <cmath>
 #include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -49,39 +49,11 @@ CDCTrajectory2D::CDCTrajectory2D(const Vector2D& pos2D,
 {
 }
 
-
-void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
-                                  const Vector2D& mom2D,
-                                  const double charge)
-{
-  m_localOrigin = pos2D;
-  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D);
-  Vector2D phiVec = mom2D.unit();
-  double impact = 0.0;
-  m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
-}
-
-ESign CDCTrajectory2D::getChargeSign() const
-{
-  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle().orientation());
-}
-
-double CDCTrajectory2D::getAbsMom2D(const double bZ) const
-{
-  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), bZ);
-}
-
-double CDCTrajectory2D::getAbsMom2D() const
-{
-  Vector2D position = getSupport();
-  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle().curvature(), position);
-}
-
 Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
                                         const double distance) const
 {
   Vector2D globalRefPos2D = wireLine.refPos2D();
-  Vector2D movePerZ = wireLine.movePerZ();
+  Vector2D movePerZ = wireLine.nominalMovePerZ();
 
   Vector2D localRefPos2D = globalRefPos2D - getLocalOrigin();
   const PerigeeCircle& localCircle = getLocalCircle();
@@ -98,58 +70,8 @@ Vector3D CDCTrajectory2D::reconstruct3D(const WireLine& wireLine,
   const double deltaZ = solutionsDeltaZ.second;
   const double z = deltaZ + wireLine.refZ();
 
-  Vector3D recoWirePos2D = wireLine.pos3DAtZ(z);
+  Vector3D recoWirePos2D = wireLine.nominalPos3DAtZ(z);
   return Vector3D(getClosest(recoWirePos2D.xy()), z);
-}
-
-
-Vector2D CDCTrajectory2D::getInnerExit() const
-{
-  const CDCWireTopology& topology = CDCWireTopology::getInstance();
-  const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
-  double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
-
-  const Vector2D support = getSupport();
-  const GeneralizedCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() < innerCylindricalR) {
-    // If we start inside of the volume of the CDC we want the trajectory to enter the CDC
-    // and not stop at first intersection with the inner wall.
-    // Therefore we take the inner exit that comes after the apogee (far point of the circle).
-    const Vector2D apogee = globalCircle.apogee();
-    return globalCircle.sameCylindricalRForwardOf(apogee, innerCylindricalR);
-
-  } else {
-    return globalCircle.sameCylindricalRForwardOf(support, innerCylindricalR);
-  }
-}
-
-Vector2D CDCTrajectory2D::getOuterExit(double factor) const
-{
-
-  const CDCWireTopology& topology = CDCWireTopology::getInstance();
-  const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
-
-  double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
-
-  const Vector2D support = getSupport();
-  const GeneralizedCircle globalCircle = getGlobalCircle();
-  if (support.cylindricalR() > outerCylindricalR) {
-    // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
-    // and not stop at first intersection with the outer wall.
-    // Therefore we take the outer exit that comes after the perigee.
-    const Vector2D perigee = globalCircle.perigee();
-    return globalCircle.sameCylindricalRForwardOf(perigee, outerCylindricalR);
-
-  } else {
-    return getGlobalCircle().sameCylindricalRForwardOf(support, outerCylindricalR);
-  }
-}
-
-Vector2D CDCTrajectory2D::getExit() const
-{
-  Vector2D outerExit = getOuterExit();
-  const Vector2D innerExit = getInnerExit();
-  return getGlobalCircle().chooseNextForwardOf(getLocalOrigin(), outerExit, innerExit);
 }
 
 ISuperLayer CDCTrajectory2D::getISuperLayerAfter(ISuperLayer iSuperLayer, bool movingOutward) const
@@ -236,6 +158,89 @@ ISuperLayer CDCTrajectory2D::getMinimalISuperLayer() const
 {
   double minimalCylindricalR = getMinimalCylindricalR();
   return CDCWireTopology::getInstance().getISuperLayerAtCylindricalR(minimalCylindricalR);
+}
+
+bool CDCTrajectory2D::isCurler(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  return getMaximalCylindricalR() < factor * topology.getOuterCylindricalR();
+}
+
+ESign CDCTrajectory2D::getChargeSign() const
+{
+  return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle()->orientation());
+}
+
+double CDCTrajectory2D::getAbsMom2D(const double bZ) const
+{
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle()->curvature(), bZ);
+}
+
+double CDCTrajectory2D::getAbsMom2D() const
+{
+  Vector2D position = getSupport();
+  return CDCBFieldUtil::curvatureToAbsMom2D(getLocalCircle()->curvature(), position);
+}
+
+Vector2D CDCTrajectory2D::getInnerExit() const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  const CDCWireLayer& innerMostLayer = topology.getWireLayers().front();
+  double innerCylindricalR = innerMostLayer.getInnerCylindricalR();
+
+  const Vector2D support = getSupport();
+  const PerigeeCircle globalCircle = getGlobalCircle();
+  if (support.cylindricalR() < innerCylindricalR) {
+    // If we start within the inner volumn of the CDC we want the trajectory to enter the CDC
+    // and not stop at first intersection with the inner wall.
+    // Therefore we take the inner exit that comes after the apogee (far point of the circle).
+    const Vector2D apogee = globalCircle.apogee();
+    return globalCircle.atCylindricalRForwardOf(apogee, innerCylindricalR);
+
+  } else {
+    return globalCircle.atCylindricalRForwardOf(support, innerCylindricalR);
+  }
+}
+
+Vector2D CDCTrajectory2D::getOuterExit(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  const CDCWireLayer& outerMostLayer = topology.getWireLayers().back();
+  double outerCylindricalR = outerMostLayer.getOuterCylindricalR() * factor;
+
+  const Vector2D support = getSupport();
+  const PerigeeCircle globalCircle = getGlobalCircle();
+  if (support.cylindricalR() > outerCylindricalR) {
+    // If we start outside of the volume of the CDC we want the trajectory to enter the CDC
+    // and not stop at first intersection with the outer wall.
+    // Therefore we take the outer exit that comes after the perigee.
+    const Vector2D perigee = globalCircle.perigee();
+    return globalCircle.atCylindricalRForwardOf(perigee, outerCylindricalR);
+
+  } else {
+    return getGlobalCircle().atCylindricalRForwardOf(support, outerCylindricalR);
+  }
+}
+
+Vector2D CDCTrajectory2D::getExit() const
+{
+  const Vector2D outerExit = getOuterExit();
+  const Vector2D innerExit = getInnerExit();
+  const Vector2D localExit =  getLocalCircle()->chooseNextForwardOf(Vector2D(0, 0),
+                              outerExit - getLocalOrigin(),
+                              innerExit - getLocalOrigin());
+  return localExit + getLocalOrigin();
+}
+
+void CDCTrajectory2D::setPosMom2D(const Vector2D& pos2D,
+                                  const Vector2D& mom2D,
+                                  const double charge)
+{
+  m_localOrigin = pos2D;
+  double curvature = CDCBFieldUtil::absMom2DToCurvature(mom2D.norm(), charge, pos2D);
+  Vector2D phiVec = mom2D.unit();
+  double impact = 0.0;
+  m_localPerigeeCircle = UncertainPerigeeCircle(curvature, phiVec, impact);
 }
 
 double CDCTrajectory2D::setLocalOrigin(const Vector2D& localOrigin)

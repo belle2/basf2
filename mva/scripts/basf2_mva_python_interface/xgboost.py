@@ -34,6 +34,13 @@ def get_model(number_of_features, number_of_events, parameters):
     return State(100, param)
 
 
+def feature_importance(state):
+    """
+    Return a list containing the feature importances
+    """
+    return []
+
+
 def load(obj):
     """
     Load XGBoost estimator into state

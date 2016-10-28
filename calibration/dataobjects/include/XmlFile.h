@@ -8,7 +8,6 @@
 #include <boost/property_tree/xml_parser.hpp>
 
 
-using namespace std;
 namespace Belle2 {
   /// DB object which stores whole xml
   class XmlFile : public TObject {
@@ -40,7 +39,7 @@ namespace Belle2 {
     /// Populate boost PropertyTree with stored data
     void fillPropertyTree(boost::property_tree::ptree& tree)
     {
-      stringstream ss; ss << m_data;
+      std::stringstream ss; ss << m_data;
       using boost::property_tree::ptree;
       read_xml(ss, tree);
     }

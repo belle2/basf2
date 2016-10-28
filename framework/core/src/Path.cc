@@ -79,8 +79,10 @@ ModulePtrList Path::buildModulePathList(bool unique) const
 
       //If the module has a condition, call the method recursively
       if (module->hasCondition()) {
-        const std::list<ModulePtr>& modulesInElem = module->getConditionPath()->buildModulePathList(unique);
-        modList.insert(modList.end(), modulesInElem.begin(), modulesInElem.end());
+        for (const auto& conditionPath : module->getAllConditionPaths()) {
+          const std::list<ModulePtr>& modulesInElem = conditionPath->buildModulePathList(unique);
+          modList.insert(modList.end(), modulesInElem.begin(), modulesInElem.end());
+        }
       }
     }
   }

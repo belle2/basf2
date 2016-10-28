@@ -11,9 +11,9 @@
 #pragma once
 
 #include <tracking/spacePointCreation/SpacePoint.h>
-#include <tracking/trackFindingVXD/filterTools/Shortcuts.h>
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
 #include <tracking/trackFindingVXD/filterTools/MLRange.h>
-#include <tracking/trackFindingVXD/threeHitFilters/MLHandover.h>
+#include <tracking/trackFindingVXD/sectorMap/threeHitVariables/MLHandover.h>
 #include <tracking/trackFindingVXD/filterTools/FBDTClassifier.h>
 
 #include <tracking/trackFindingVXD/segmentNetwork/DirectedNodeNetworkContainer.h>

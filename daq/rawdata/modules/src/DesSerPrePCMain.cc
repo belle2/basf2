@@ -39,8 +39,6 @@ DesSerPrePCMainModule::DesSerPrePCMainModule() : Module()
   addParam("UseShmFlag", m_shmflag, "Use shared memory to communicate with Runcontroller", 0);
 
   m_compressionLevel = 0;
-  m_msghandler = new MsgHandler(0);
-
 }
 
 

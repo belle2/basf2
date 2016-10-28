@@ -37,7 +37,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHAerogelMap(std::string id, int ring, int column, unsigned int* layer, TTimeStamp timeStamp, std::string comment): m_id(id),
+    ARICHAerogelMap(const std::string& id, int ring, int column, unsigned int* layer, TTimeStamp timeStamp,
+                    const std::string& comment): m_id(id),
       m_ring(ring), m_column(column), m_timeStamp(timeStamp), m_comment(comment)
     {
       for (unsigned ii = 0; ii < c_layers; ii++) m_layer[ii] = layer[ii];

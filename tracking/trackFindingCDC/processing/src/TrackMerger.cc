@@ -23,7 +23,6 @@
 
 #include <TMath.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -73,7 +72,7 @@ void TrackMerger::doTracksMerging(CDCTrackList& cdcTrackList, const std::vector<
 
     }
 
-    if (prob > minimum_probability_to_be_merged) {
+    if (bestCandidate and prob > minimum_probability_to_be_merged) {
       mergeTracks(track1, *bestCandidate, conformalCDCWireHitList, cdcTrackList);
       TrackQualityTools::normalizeTrack(*bestCandidate);
 //      const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
@@ -131,10 +130,10 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
     have_merged_something = false;
     BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(track, cdcTrackList.getCDCTracks().begin(),
                                             cdcTrackList.getCDCTracks().end());
-    double& probabilityWithCandidate = candidateToMergeBest.second;
+    CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
+    const double& probabilityWithCandidate = candidateToMergeBest.second;
 
-    if (probabilityWithCandidate > minimum_probability_to_be_merged) {
-      CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
+    if (bestFitTrackCandidate and probabilityWithCandidate > minimum_probability_to_be_merged) {
       mergeTracks(track, *bestFitTrackCandidate, conformalCDCWireHitList, cdcTrackList);
       have_merged_something = true;
     }
@@ -223,7 +222,7 @@ double TrackMerger::doTracksFitTogether(CDCTrack& track1, CDCTrack& track2)
 //if B2B return 0;
 
   // Dismiss this possibility if the hit list size after all the removing of hits is even smaller than the two lists before or if the list is too small
-  if (commonHitListOfTwoTracks.size() <= max(track1.size(), track2.size())
+  if (commonHitListOfTwoTracks.size() <= std::max(track1.size(), track2.size())
       or commonHitListOfTwoTracks.size() < 15) {
     return 0;
   }

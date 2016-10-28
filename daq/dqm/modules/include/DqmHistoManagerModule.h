@@ -53,10 +53,12 @@ namespace Belle2 {
     int StreamHistograms(TDirectory*, MsgHandler*);
 
   private:
+    std::string m_workdir;  /**< Name of working directory */
     std::string m_histfile; /**< Name of histogram output file. */
     std::string m_hostname; /**< Host name to send histograms */
     int m_port;
     int m_interval;
+    int m_dumpinterval;
 
     bool        m_initmain; /**< True if initialize() was called. */
     bool        m_initialized;

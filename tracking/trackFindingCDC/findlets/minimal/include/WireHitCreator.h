@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
@@ -24,8 +25,6 @@
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/Const.h>
-
 #include <vector>
 
 namespace Belle2 {
@@ -51,6 +50,21 @@ namespace Belle2 {
       /// Add the parameters to the surrounding module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
       {
+        moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
+                                      m_param_wirePosSet,
+                                      "Set of geometry parameters to be used in the track finding. "
+                                      "Either 'base', 'misaligned' or 'aligned'.",
+                                      m_param_wirePosSet);
+
+
+        moduleParamList->addParameter(prefixed(prefix, "ignoreWireSag"),
+                                      m_param_ignoreWireSag,
+                                      "Assume a wire sag coefficient of zero "
+                                      "such that the wires appear to be straight for "
+                                      "the track finders",
+                                      m_param_ignoreWireSag);
+
+
         moduleParamList->addParameter(prefixed(prefix, "flightTimeEstimation"),
                                       m_param_flightTimeEstimation,
                                       "Option which flight direction should be assumed for "
@@ -59,6 +73,11 @@ namespace Belle2 {
                                       "'outwards', "
                                       "'downwards'.",
                                       m_param_flightTimeEstimation);
+
+        // moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
+        //            m_param_triggerPoint,
+        //            "Point relative to which the flight times of tracks should be adjusted",
+        //            m_param_triggerPoint);
       }
 
       /// Signals the start of the event processing
@@ -67,10 +86,18 @@ namespace Belle2 {
         StoreArray<CDCHit> hits;
         hits.isRequired();
 
-        // Preload geometry during initialization
-        // Marked as unused intentionally to avoid a compile warning
-        CDC::CDCGeometryPar& cdcGeo __attribute__((unused)) = CDC::CDCGeometryPar::Instance();
-        CDCWireTopology& wireTopology  __attribute__((unused)) = CDCWireTopology::getInstance();
+        // Create the wires and layers once during initialisation
+        CDCWireTopology::getInstance();
+
+        if (m_param_wirePosSet == "base") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+        } else if (m_param_wirePosSet == "misaligned") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Misaligned;
+        } else if (m_param_wirePosSet == "aligned") {
+          m_wirePosSet = CDC::CDCGeometryPar::c_Aligned;
+        } else {
+          B2ERROR("Received unknown wirePosSet " << m_param_wirePosSet);
+        }
 
         m_tdcCountTranslator.reset(new CDC::RealisticTDCCountTranslator);
         m_adcCountTranslator.reset(new CDC::LinearGlobalADCCountTranslator);
@@ -83,11 +110,25 @@ namespace Belle2 {
           }
         }
 
+        m_triggerPoint = Vector3D(std::get<0>(m_param_triggerPoint),
+                                  std::get<1>(m_param_triggerPoint),
+                                  std::get<2>(m_param_triggerPoint));
+
         if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
           B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
+        } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
+          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new CosmicRayFlightTimeEstimator(m_triggerPoint)));
+        } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
+          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new BeamEventFlightTimeEstimator));
         }
 
         Super::initialize();
+      }
+
+      virtual void beginRun() override
+      {
+        CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+        wireTopology.reinitialize(m_wirePosSet, m_param_ignoreWireSag);
       }
 
       /// Main algorithm creating the wire hits
@@ -112,33 +153,31 @@ namespace Belle2 {
           }
 
           const CDCWire* wire = CDCWire::getInstance(hit);
-
-          double initialTOFEstimate = 0;
-
-          if (m_flightTimeEstimation == EPreferredDirection::c_None) {
-            initialTOFEstimate = 0;
-          } else {
-            double directArcLength2D = wire->getRefCylindricalR();
-            if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
-              initialTOFEstimate = directArcLength2D / Const::speedOfLight;
-            } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
-              initialTOFEstimate = std::copysign(directArcLength2D / Const::speedOfLight, -wire->getRefPos2D().y());
-            }
+          const Vector2D& pos2D = wire->getRefPos2D();
+          double alpha = 0;
+          if (m_flightTimeEstimation == EPreferredDirection::c_Downwards and pos2D.y() > 0) {
+            // Fix the flight direction to downwards.
+            alpha = M_PI;
           }
+          const double beta = 1;
+          double flightTimeEstimate =
+            FlightTimeEstimator::instance().getFlightTime2D(pos2D, alpha, beta);
 
           double refDriftLengthRight =
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
-                                              initialTOFEstimate,
-                                              false, //bool leftRight
-                                              wire->getRefZ());
+                                              flightTimeEstimate,
+                                              true, // right
+                                              wire->getRefZ(),
+                                              alpha);
 
           double refDriftLengthLeft =
             tdcCountTranslator.getDriftLength(hit.getTDCCount(),
                                               wire->getWireID(),
-                                              initialTOFEstimate,
-                                              true, //bool leftRight
-                                              wire->getRefZ());
+                                              flightTimeEstimate,
+                                              false, // left
+                                              wire->getRefZ(),
+                                              alpha);
 
           double refDriftLength = (refDriftLengthLeft + refDriftLengthRight) / 2.0;
 
@@ -151,9 +190,9 @@ namespace Belle2 {
           double refChargeDeposit =
             adcCountTranslator.getCharge(hit.getADCCount(),
                                          wire->getWireID(),
-                                         false, //bool leftRight
+                                         false, // leftRight
                                          wire->getRefZ(),
-                                         0); //theta
+                                         0); // theta
 
           outputWireHits.push_back(CDCWireHit(&hit,
                                               refDriftLength,
@@ -170,11 +209,26 @@ namespace Belle2 {
       }
 
     private:
+      /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"
+      std::string m_param_wirePosSet = "base";
+
+      /// Geometry set to be used.
+      CDC::CDCGeometryPar::EWirePosition m_wirePosSet = CDC::CDCGeometryPar::c_Base;
+
+      /// Parameter : Switch to deactivate the sag of the wires for the concerns of the track finders.
+      bool m_param_ignoreWireSag = false;
+
       /// Parameter : Method for the initial time of flight estimation as string
       std::string m_param_flightTimeEstimation = "none";
 
       /// Method for the initial time of flight estimation
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
+
+      /// Parameter : Location of the flight time zero
+      std::tuple<double, double, double> m_param_triggerPoint{0.0, 0.0, 0.0};
+
+      /// Central location of the flight time zero position usually the location of the trigger.
+      Vector3D m_triggerPoint =  Vector3D(0, 0, 0);
 
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
       std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator{nullptr};

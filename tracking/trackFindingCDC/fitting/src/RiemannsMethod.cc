@@ -13,7 +13,6 @@
 #include <Eigen/Dense>
 
 
-using namespace std;
 using namespace Belle2;
 using namespace Eigen;
 
@@ -25,14 +24,6 @@ RiemannsMethod::RiemannsMethod() :
   m_originConstrained(false)
 {
 }
-
-
-
-RiemannsMethod::~RiemannsMethod()
-{
-}
-
-
 
 void RiemannsMethod::update(CDCTrajectory2D& trajectory2D,
                             CDCObservations2D& observations2D) const
@@ -127,7 +118,7 @@ void RiemannsMethod::updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
   }
 
   //check if the orientation is alright
-  Vector2D directionAtCenter = trajectory2D.getUnitMom2D(Vector2D(0.0, 0.0));
+  Vector2D directionAtCenter = trajectory2D.getFlightDirection2D(Vector2D(0.0, 0.0));
 
 
   size_t voteForChangeSign = 0;

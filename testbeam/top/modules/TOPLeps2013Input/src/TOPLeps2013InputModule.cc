@@ -202,13 +202,9 @@ namespace Belle2 {
     StoreObjPtr<EventMetaData> evtMetaData;
     evtMetaData.create();
     StoreArray<TOPDigit> digits;
-    digits.create();
     StoreArray<Track> tracks;
-    tracks.create();
     StoreArray<TrackFitResult> trackFitResults;
-    trackFitResults.create();
     StoreArray<ExtHit> extHits;
-    extHits.create();
 
     // read from ntuple and select event
     bool select = false;

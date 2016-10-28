@@ -102,7 +102,7 @@ void CDCGeometry::read(const GearDir& content)
       double rmax = epLayerContent.getLength("OuterR");
       double zfwd = epLayerContent.getLength("ForwardZ");
       double zbwd = epLayerContent.getLength("BackwardZ");
-      string name = "Layer" + to_string(i) + epName + to_string(iEPLayer);
+      std::string name = "Layer" + to_string(i) + epName + to_string(iEPLayer);
 
       ep.appendNew(name, iEPLayer, rmin, rmax, zfwd, zbwd);
     }
@@ -237,8 +237,10 @@ void CDCGeometry::read(const GearDir& content)
   m_senseWireZposMode = content.getInt("SenseWireZposMode");
   m_clockFrequency  = content.getDouble("ClockFrequencyForTDC");
   m_nominalSpaceResolution = content.getLength("SenseWire/SpaceResol");
+  m_displacement = content.getBool("Displacement");
   m_misalignment = content.getBool("Misalignment");
   m_alignment = content.getBool("Alignment");
+  m_displacementFile = content.getString("displacementFileName");
   m_misalignmentFile = content.getString("misalignmentFileName");
   m_alignmentFile = content.getString("alignmentFileName");
 

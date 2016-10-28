@@ -86,7 +86,7 @@ namespace Belle2 {
     /** Register the array in the data store.
      *  This must be called in the initialization phase.
      *
-     *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags.
+     *  @param storeFlags  ORed combination of DataStore::EStoreFlags.
      *  @return            True if the registration succeeded.
      */
     bool registerInDataStore(DataStore::EStoreFlags storeFlags);
@@ -95,11 +95,11 @@ namespace Belle2 {
      *  This must be called in the initialization phase.
      *
      *  @param name        Name of the entry to be registered. Empty for default name.
-     *  @param storeFlags  ORed combination of DataStore::EStoreFlag flags. (default: c_WriteOut)
+     *  @param storeFlags  ORed combination of DataStore::EStoreFlags. (default: c_WriteOut)
      *  @return            True if the registration succeeded.
      */
     bool registerInDataStore(std::string name = "",
-                             DataStore::EStoreFlags storeFlags = DataStore::EStoreFlag::c_WriteOut);
+                             DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut);
 
     /** Ensure this array has been registered previously.
      *  Will cause an ERROR if it does not exist.
@@ -127,11 +127,11 @@ namespace Belle2 {
      *
      * @param toArray    Array the relation should point to (from this PyStoreArray)
      * @param durability Durability of the relation.
-     * @param storeFlags ORed combination of DataStore::EStoreFlag flags
+     * @param storeFlags ORed combination of DataStore::EStoreFlags
      */
     bool registerRelationTo(const PyStoreArray& toArray,
                             DataStore::EDurability durability = DataStore::EDurability::c_Event,
-                            DataStore::EStoreFlags storeFlags = DataStore::EStoreFlag::c_WriteOut) const;
+                            DataStore::EStoreFlags storeFlags = DataStore::EStoreFlags::c_WriteOut) const;
 
     /** Produce error if no relation from this array to 'toArray' has been registered.
      *
@@ -215,7 +215,7 @@ namespace Belle2 {
     void attach() const;
 
   private:
-    /// Store accessor to retrive the object.
+    /// Store accessor to retrieve the object.
     StoreAccessorBase m_storeAccessor;
 
     /// Pointer to the DataStore entry - serves as an internal cache omitting repeated look up from the DataStore.

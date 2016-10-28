@@ -99,7 +99,7 @@ namespace Belle2 {
     std::string m_comment;                     /**< optional comment */
 
 
-    ClassDef(BKLMElectronicMapping, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(BKLMElectronicMapping, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 

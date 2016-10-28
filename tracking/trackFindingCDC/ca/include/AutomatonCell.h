@@ -59,13 +59,13 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility. Cell weight defaults to 1
       AutomatonCell() :
         m_weight(0),
-        m_flags(),
+        m_flags(ECellFlag(0)),
         m_state(0) {}
 
       /// Constructor with a certain cell weight
       explicit AutomatonCell(const CellState& weight) :
         m_weight(weight),
-        m_flags(),
+        m_flags(ECellFlag(0)),
         m_state(0) {}
 
       /// Constructor with a certain cell weight and initial flags to be set.
@@ -208,11 +208,11 @@ namespace Belle2 {
 
       /// Setter for the cell flags
       void setFlags(ECellFlags flags) const
-      { m_flags = ECellFlags(m_flags | flags); }
+      { m_flags = ECellFlags(m_flags bitor flags); }
 
       /// Clear all flags
       void clearFlags(ECellFlags flags = c_AllFlags) const
-      { m_flags = ECellFlags(m_flags & ~flags); }
+      { m_flags = ECellFlags(m_flags bitand ~flags); }
 
       /// Checks if a cell has any of a sum of given flags.
       bool hasAnyFlags(ECellFlags flags) const
@@ -220,16 +220,15 @@ namespace Belle2 {
 
     private:
       /// Storage for the cell weight
-      mutable CellWeight m_weight;
+      mutable CellWeight m_weight = 1;
 
       /// Storage for the cell status flags
-      mutable ECellFlags m_flags;
+      mutable ECellFlags m_flags = ECellFlag(0);
 
       /// Storage for the cell state set by the cellular automata
-      mutable CellState m_state;
+      mutable CellState m_state = 0;
 
-
-    }; //class
+    }; // class
 
   } // namespace TrackFindingCDC
 } // namespace Belle2

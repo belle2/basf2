@@ -47,22 +47,22 @@ void DataFlowVisualization::visualizePath(const std::string& filename, const Pat
   //for steering file data flow graph, we may get multiple definitions of each node
   //graphviz merges these into the last one, so we'll go through module list in reverse (all boxes should be coloured as outputs)
   const bool steeringFileFlow = true;
-  for (ModulePtr mod : path.getModules())
+  for (ModulePtr mod : path.buildModulePathList())
     generateModulePlot(file, *mod, steeringFileFlow);
 
   plotPath(file, path);
 
   //add nodes
-  for (std::set<std::string>::const_iterator it = m_allOutputs.begin(); it != m_allOutputs.end(); ++it) {
-    file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Output] << "];\n";
+  for (const std::string& name : m_allOutputs) {
+    file << "  \"" << name << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Output] << "];\n";
   }
-  for (std::set<std::string>::const_iterator it = m_allInputs.begin(); it != m_allInputs.end(); ++it) {
-    if (m_allOutputs.count(*it) == 0)
-      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Input] << "];\n";
+  for (const std::string& name : m_allInputs) {
+    if (m_allOutputs.count(name) == 0)
+      file << "  \"" << name << "\" [shape=box,style=filled,fillcolor=" << m_fillcolor[DependencyMap::c_Input] << "];\n";
   }
-  for (std::set<std::string>::const_iterator it = m_unknownArrays.begin(); it != m_unknownArrays.end(); ++it) {
-    if (m_allOutputs.count(*it) == 0 && m_allInputs.count(*it) == 0)
-      file << "  \"" << *it << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
+  for (const std::string& name : m_unknownArrays) {
+    if (m_allOutputs.count(name) == 0 && m_allInputs.count(name) == 0)
+      file << "  \"" << name << "\" [shape=box,style=filled,fillcolor=" << unknownfillcolor << "];\n";
   }
 
   file << "}\n\n";
@@ -92,9 +92,12 @@ void DataFlowVisualization::plotPath(std::ofstream& file, const Path& path, cons
       file << "    \"" << lastModule << "\" -> \"" << module << "\" [color=black];\n";
     }
     if (mod->hasCondition()) {
-      const Path* conditionPath = mod->getConditionPath().get();
-      plotPath(file, *conditionPath, module);
-      file << "    \"" << module << "\" -> \"cluster" << module << "_inv\" [color=grey,lhead=\"cluster" << module << "\"];\n";
+      for (const auto& condition : mod->getAllConditions()) {
+        const std::string& conditionName = condition.getString();
+        plotPath(file, *condition.getPath(), conditionName);
+        file << "    \"" << module << "\" -> \"cluster" << conditionName << "_inv\" " <<
+             "[color=grey,lhead=\"cluster" << conditionName << "\",label=\"" << conditionName << "\",fontcolor=grey];\n";
+      }
     }
 
     lastModule = module;

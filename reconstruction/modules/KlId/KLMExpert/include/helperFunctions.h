@@ -8,6 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  * **************************************************************************/
 
+#pragma once
+
 
 #include <analysis/utility/PCmsLabTransform.h>
 #include <analysis/utility/ReferenceFrame.h>
@@ -68,7 +70,7 @@ namespace KlIdHelpers {
 
     for (ECLCluster& eclcluster : eclClusters) {
 
-      const TVector3& eclclusterPos = eclcluster.getclusterPosition();
+      const TVector3& eclclusterPos = eclcluster.getClusterPosition();
       closestECLAngleDist = eclclusterPos.Angle(klmClusterPosition);
 
       if (closestECLAngleDist < initDistance) {

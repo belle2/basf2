@@ -74,6 +74,8 @@ namespace Belle2 {
 
   private:
 
+    std::vector<Int_t> m_input_ts; /**< time stamp start and stop */
+
     std::vector<std::string> m_inputFileNames; /**< list of file names */
     std::vector<Float_t> m_input_LT_DIA_dose; /**< list of DIA LT dose */
     std::vector<Float_t> m_input_HT_DIA_dose; /**< list of DIA HT dose */
@@ -128,6 +130,9 @@ namespace Belle2 {
 
     std::vector<Float_t> m_input_sigma_LER; /**< LER beam size and errors */
     std::vector<Float_t> m_input_sigma_HER; /**< HER beam size and errors */
+
+    Double_t m_input_data_bunchNb_LER; /**< LER bunch number and error */
+    Double_t m_input_data_bunchNb_HER; /**< HER bunch number and error */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TChain* m_tree = 0;            /**< tree pointer */

@@ -14,7 +14,6 @@
 
 #include <arich/dataobjects/ARICHDigit.h>
 #include <arich/dataobjects/ARICHSimHit.h>
-#include <bklm/dataobjects/BKLMDigit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <ecl/dataobjects/ECLSimHit.h>

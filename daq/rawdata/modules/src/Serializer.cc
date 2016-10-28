@@ -71,7 +71,6 @@ void SerializerModule::initialize()
   }
 
   // Create Message Handler
-  m_msghandler = new MsgHandler(m_compressionLevel);
   memset(time_array0, 0, sizeof(time_array0));
   memset(time_array1, 0, sizeof(time_array1));
   memset(time_array2, 0, sizeof(time_array2));

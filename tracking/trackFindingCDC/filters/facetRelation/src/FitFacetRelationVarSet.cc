@@ -13,9 +13,8 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
-#include <assert.h>
+#include <cassert>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

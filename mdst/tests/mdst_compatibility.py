@@ -87,6 +87,7 @@ class DataStorePrinter(object):
 
     for each MCparticle
     """
+
     def __init__(self, name, simple, withArgument=None, array=True):
         """
         Initialize
@@ -200,7 +201,7 @@ class DataStorePrinter(object):
         """
         # are we in recursion? if so indent the output
         if depth:
-            print("  "*(depth+1), end="")
+            print("  " * (depth + 1), end="")
 
         if weight is not None:
             weight = " (weight: %.6g)" % weight
@@ -217,7 +218,7 @@ class DataStorePrinter(object):
         elif hasattr(result, "GetNrows") and hasattr(result, "GetNcols"):
             print(weight, end="")
             for row in range(result.GetNrows()):
-                print("\n" + "  "*(depth+2), end="")
+                print("\n" + "  " * (depth + 2), end="")
                 for col in range(result.GetNcols()):
                     print("%13.6e " % result(row, col), end="")
 
@@ -225,8 +226,8 @@ class DataStorePrinter(object):
         # or, does it look like a std::pair?
         elif hasattr(result, "first") and hasattr(result, "second"):
             print("pair%s" % weight)
-            self._printResult(result.first, depth+1)
-            self._printResult(result.second, depth+1)
+            self._printResult(result.first, depth + 1)
+            self._printResult(result.second, depth + 1)
         # or, could it be a std::vector like container?
         elif hasattr(result, "size") and hasattr(result, "begin") and hasattr(result, "end"):
             print("size(%d)%s" % (result.size(), weight))
@@ -239,7 +240,7 @@ class DataStorePrinter(object):
             for i, e in enumerate(result):
                 if weight_getter is not None:
                     weight = weight_getter(i)
-                self._printResult(e, depth+1, weight=weight)
+                self._printResult(e, depth + 1, weight=weight)
         # print floats with 6 valid digits
         elif isinstance(result, float):
             print("%.6g%s" % (result, weight))
@@ -290,14 +291,13 @@ mdst_dataobjects = [
         "isAvailable": PIDDetector_sets,
     }),
     DataStorePrinter("ECLCluster", [
-        "getEnergy", "getTheta", "getPhi", "getR", "getErrorEnergy",
-        "getErrorTheta", "getErrorPhi", "getEnedepSum", "getTiming",
-        "getErrorTiming", "getE9oE25", "getHighestE", "getLAT",
-        "getNofCrystals", "getCrystHealth", "getMergedPi0", "getPx", "getPy",
-        "getPz", "getMomentum", "get4Vector", "getclusterPosition",
-        "getPosition", "getError4x4", "getError7x7", "getError3x3", "getisTrack",
-        "isNeutral", "getpi0Likelihood", "getetaLikelihood", "getdeltaL",
-        "getbeta",
+        "getEnergy", "getTheta", "getPhi", "getR", "getUncertaintyEnergy",
+        "getUncertaintyTheta", "getUncertaintyPhi", "getEnergyRaw", "getTime",
+        "getDeltaTime99", "getE9oE21", "getEnergyHighestCrystal", "getLAT",
+        "getNumberOfCrystals", "getStatus", "getPx", "getPy",
+        "getPz", "getMomentum", "get4Vector", "getClusterPosition",
+        "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
+        "isNeutral", "getDeltaL", "getE1oE9", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getSecondMoment"
     ], {
         "getRelationsWith": ["MCParticles"],
     }),
@@ -316,6 +316,7 @@ mdst_dataobjects = [
 # event
 class PrintMDSTModule(Module):
     """Call all DataStorePrinter objects in mdst_dataobjects for each event"""
+
     def event(self):
         """print the contents of the mdst mdst_dataobjects"""
         for printer in mdst_dataobjects:
@@ -331,7 +332,7 @@ def print_file(filename):
     main.add_module("RootInput", inputFileName=mdst_file, logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
     main.add_module(PrintMDSTModule())
-    process(main)
+    process(main, 6)
 
 if __name__ == "__main__":
     import ROOT

@@ -198,11 +198,11 @@ namespace Belle2 {
      *  @param x        X coordinate of the support point of the plane
      *  @param y        Y coordinate of the support point of the plane
      *  @param nX       X coordinate of the normal vector of the plane
-     *  @param nX       Y coordinate of the normal vector of the plane
+     *  @param nY       Y coordinate of the normal vector of the plane
      *  @return         Shortest two dimensional arc length to the plane
      */
     double getArcLength2DAtNormalPlane(const double& x, const double& y,
-                                       const double& nX,  const double& nY) const;
+                                       const double& nX, const double& nY) const;
 
     /** Calculates the position on the helix at the given two dimensional arc length
      *

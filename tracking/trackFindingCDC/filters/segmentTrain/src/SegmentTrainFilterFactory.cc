@@ -10,7 +10,6 @@
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrain/SimpleSegmentTrainFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -33,15 +32,15 @@ SegmentTrainFilterFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseSegmentTrainFilter>
 SegmentTrainFilterFactory::create(const std::string& filterName) const
 {
-  if (filterName == string("none")) {
+  if (filterName == "none") {
     return std::unique_ptr<BaseSegmentTrainFilter>(new BaseSegmentTrainFilter());
-  } else if (filterName == string("truth")) {
+  } else if (filterName == "truth") {
     return std::unique_ptr<BaseSegmentTrainFilter>(new MCSegmentTrainFilter());
-  } else if (filterName == string("simple")) {
+  } else if (filterName == "simple") {
     return std::unique_ptr<BaseSegmentTrainFilter>(new SimpleSegmentTrainFilter());
-  } else if (filterName == string("recording")) {
+  } else if (filterName == "recording") {
     return std::unique_ptr<BaseSegmentTrainFilter>(new RecordingSegmentTrainFilter());
-  } else if (filterName == string("tmva")) {
+  } else if (filterName == "tmva") {
     return std::unique_ptr<BaseSegmentTrainFilter>(new TMVASegmentTrainFilter());
   } else {
     return Super::create(filterName);

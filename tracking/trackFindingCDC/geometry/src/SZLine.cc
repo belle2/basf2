@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/geometry/SZLine.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

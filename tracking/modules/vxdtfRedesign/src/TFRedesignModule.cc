@@ -13,7 +13,7 @@
 // //
 // // #include "tracking/modules/vxdtfRedesign/TFRedesignModule.h"
 // // /// JKL Feb2 2016: commented out for being able to continue working:
-// // // // // // // #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+// // // // // // // #include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 // // // // // // // #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 // // // // // // // #include "tracking/trackFindingVXD/environment/FilterSetTypes.h"
 // //

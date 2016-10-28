@@ -91,7 +91,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
   int nameptr = 0;
 
   // Loop over streamed objects
-  for (TMessage* msg : m_buf) {
+  for (const TMessage* msg : m_buf) {
     char* buf = msg->Buffer();
     //    int len = msg->BufferSize();
     UInt_t len = msg->Length();
@@ -113,7 +113,7 @@ EvtMessage* MsgHandler::encode_msg(RECORD_TYPE rectype)
     msgptr += (sizeof(len) + len);
     totlen += (sizeof(len) + len);
     nameptr++;
-    delete msg; // test
+    delete msg;
   }
 
   EvtMessage* evtmsg = new EvtMessage(msgbuf, totlen, rectype);
@@ -160,11 +160,11 @@ int MsgHandler::decode_msg(EvtMessage* msg, vector<TObject*>& objlist,
     //tries to delete the passed message.
     //TODO: workaround: leak message; remove once fixed in ROOT
     if (!tmsg->CompBuffer())
-      delete tmsg; // tmpmsg should be deleted here also.
+      delete tmsg;
 
     //    printf ( "decode : %s added to objlist; size=%d (pid=%d)\n",
     //           name.c_str(), objlen, (int)getpid()  );
-    fflush(stdout);
+    //    fflush(stdout);
 
   }
   return 0;

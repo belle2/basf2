@@ -17,7 +17,7 @@
 
 #include <vector>
 #include <string>
-#include <assert.h>
+#include <cassert>
 
 
 namespace Belle2 {
@@ -41,6 +41,11 @@ namespace Belle2 {
       "end_layer_id",
       "end_drift_length",
       "end_drift_length_sigma",
+
+      "oclock_delta",
+      "twist",
+      "cell_extend",
+      "n_crossing",
     };
 
     /**

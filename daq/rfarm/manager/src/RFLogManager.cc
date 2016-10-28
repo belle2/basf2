@@ -8,6 +8,7 @@
 
 #include "daq/rfarm/manager/RFLogManager.h"
 #include <iostream>
+#include <time.h>
 
 using namespace Belle2;
 using namespace std;
@@ -16,9 +17,15 @@ using namespace std;
 
 // Constructor/Destructor
 
-RFLogManager::RFLogManager(char* id, char* logdir)
+RFLogManager::RFLogManager(char* id, char* lognode, char* logdir)
 {
   strcpy(m_id, id);
+
+  if (lognode != NULL)
+    strcpy(m_lognode, lognode);
+  else
+    strcpy(m_lognode, "LOGC");
+
   if (logdir != NULL)
     strcpy(m_logdir, logdir);
   else
@@ -141,6 +148,10 @@ void RFLogManager::Info(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[info]", msg);
+  int pars[2];
+  pars[0] = 2;
+  pars[1] = (int)time(NULL);
+  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
 }
 
 void RFLogManager::Warning(char* fmt, ...)
@@ -151,6 +162,10 @@ void RFLogManager::Warning(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[warning]", msg);
+  int pars[2];
+  pars[0] = 4;
+  pars[1] = (int)time(NULL);
+  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
 }
 
 void RFLogManager::Error(char* fmt, ...)
@@ -161,6 +176,10 @@ void RFLogManager::Error(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[error]", msg);
+  int pars[2];
+  pars[0] = 5;
+  pars[1] = (int)time(NULL);
+  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
 }
 
 void RFLogManager::Fatal(char* fmt, ...)
@@ -171,6 +190,10 @@ void RFLogManager::Fatal(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[fatal]", msg);
+  int pars[2];
+  pars[0] = 6;
+  pars[1] = (int)time(NULL);
+  b2nsm_sendany(m_lognode, "LOG", 2, pars, strlen(msg) + 1, msg, NULL);
 }
 
 void RFLogManager::Abort(char* fmt, ...)
@@ -181,6 +204,7 @@ void RFLogManager::Abort(char* fmt, ...)
   msg[sizeof(msg) - 1] = 0;
   VSNPRINTF(msg, sizeof(msg), fmt, ap);
   WriteLog("[abort]", msg);
+  b2nsm_sendany(m_lognode, "LOG", 0, NULL, strlen(msg), msg, NULL);
   abort();
 }
 
@@ -256,15 +280,15 @@ int RFLogManager::ProcessLog(int fd)
               p[2] == ':' && p[5] == ':' && p[8] == '.' && p[12] == ' ') {
             p += 13;
           }
-          if (strncmp(p, "[fatal] ", 8) == 0) {
+          if (strncmp(p, "[FATAL] ", 8) == 0) {
             Fatal("%s", p + 8);
-          } else if (strncmp(p, "[error] ", 8) == 0) {
+          } else if (strncmp(p, "[ERROR] ", 8) == 0) {
             Error("%s", p + 8);
-          } else if (strncmp(p, "[warning] ", 10) == 0) {
+          } else if (strncmp(p, "[WARNING] ", 10) == 0) {
             Warning("%s", p + 10);
-          } else if (strncmp(p, "[info] ", 7) == 0) {
+          } else if (strncmp(p, "[INFO] ", 7) == 0) {
             Info("%s", p + 7);
-          } else if (strncmp(p, "[abort] ", 8) == 0) {
+          } else if (strncmp(p, "[ABORT] ", 8) == 0) {
             Fatal("abort - %s", p + 8);
           } else if (strncmp(p, "[sysexit] ", 10) == 0) {
             Fatal("sysexit - %s", p + 10);

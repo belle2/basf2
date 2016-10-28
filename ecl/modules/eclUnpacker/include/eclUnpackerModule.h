@@ -19,7 +19,7 @@
 #include <rawdata/dataobjects/RawECL.h>
 #include <ecl/dataobjects/ECLDigit.h>
 #include <framework/core/Module.h>
-#include "ecl/modules/eclUnpacker/eclChannelMapper.h"
+#include "ecl/utility/eclChannelMapper.h"
 
 namespace Belle2 {
   namespace ECL {
@@ -54,7 +54,7 @@ namespace Belle2 {
       int    m_EvtNum;
 
       /** pointer to data from COPPER */
-      int* m_bufPtr;
+      unsigned int* m_bufPtr;
       /** position in the COPPER data array */
       int m_bufPos;
       /** length of COPPER data  */
@@ -73,11 +73,11 @@ namespace Belle2 {
       StoreArray<ECLDigit> m_eclDigits;
 
       /** read nex word from COPPER data, check if the end of data is reached  */
-      int readNextCollectorWord();
+      unsigned int readNextCollectorWord();
       /** rean N bits from COPPER buffer (needed for reading the compressed ADC data) */
-      int readNBits(int bitsToRead);
+      unsigned int readNBits(int bitsToRead);
       /// read raw data from COPPER and fill output m_eclDigits container
-      void readRawECLData(RawCOPPER* rawCOPPERData, int n);
+      void readRawECLData(RawECL* rawCOPPERData, int n);
 
     };
   }//namespace ECL

@@ -185,7 +185,6 @@ void CsIDigitizerModule::event()
                                            &m_DPPCIBits,  5, 1.2e4, 1e4, 1e3, recordWaveform);
 
         if (m_Charge > 0) {
-          if (!m_aDigiHit) m_aDigiHit.create();
           m_aDigiHit.appendNew();
           m_hitNum = m_aDigiHit.getEntries() - 1;
           m_aDigiHit[m_hitNum]->setCellId(iCh);

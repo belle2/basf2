@@ -21,13 +21,6 @@ geometry = register_module('Geometry')
 
 # EvtGen to provide generic BB events
 evtgeninput = register_module('EvtGenInput')
-
-
-# simulation
-g4sim = register_module('FullSim')
-# make the simulation less noisy
-g4sim.logging.log_level = LogLevel.ERROR
-
 # create paths
 main = create_path()
 
@@ -49,6 +42,7 @@ components = [
     'CDC',
     'TOP',
     'ARICH',
+    'EKLM',
     'BKLM',
     'ECL',
 ]

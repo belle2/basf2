@@ -89,6 +89,13 @@ def get_model(number_of_features, number_of_events, parameters):
     return State(x, y, params, cost, updates, train_function, eval_function)
 
 
+def feature_importance(state):
+    """
+    Return a list containing the feature importances
+    """
+    return []
+
+
 def load(obj):
     state = State(eval_function=obj[0])
     return state

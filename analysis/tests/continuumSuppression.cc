@@ -27,7 +27,7 @@ namespace Belle2 {
     momenta.push_back(TVector3(0.8548902083897467, 0.6887268865943484, 0.34301136659215437));
     momenta.push_back(TVector3(0.26863521039211535, 0.011148638667487942, 0.96186334199901));
 
-    const TVector3 thrustB = calculateThrust(momenta);
+    const TVector3 thrustB = Thrust::calculateThrust(momenta);
 
     EXPECT_FLOAT_EQ(0.925838, thrustB.Mag());
     EXPECT_FLOAT_EQ(0.571661, thrustB.X());
@@ -71,7 +71,7 @@ namespace Belle2 {
 
 
     // Calculate thrust from "Signal Side"
-    const TVector3 thrustB = calculateThrust(sig_side_momenta);
+    const TVector3 thrustB = Thrust::calculateThrust(sig_side_momenta);
 
     CleoCones myCleoCones(momenta, roe_side_momenta, thrustB, use_all, use_roe);
 
@@ -101,8 +101,6 @@ namespace Belle2 {
 
   TEST_F(ContinuumSuppressionTests, FoxWolfram)
   {
-    const bool use_all = true;
-    const bool use_roe = true;
     std::vector<TVector3> momenta;
 
     momenta.push_back(TVector3(0.5429965262452898, 0.37010582077332344, 0.0714978744529432));
@@ -116,7 +114,7 @@ namespace Belle2 {
     momenta.push_back(TVector3(0.61672460498333, 0.4472311336875816, 0.31288581834261064));
     momenta.push_back(TVector3(0.18544654870476218, 0.0758107751704592, 0.31909701462121065));
 
-    FoxWolfram FW(foxwolfram(momenta));
+    FoxWolfram FW(momenta);
     EXPECT_FLOAT_EQ(0.63011014, FW.R(2));
   }
 

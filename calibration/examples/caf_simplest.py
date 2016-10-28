@@ -1,7 +1,7 @@
 # This steering file shows pretty much the most minimal setup for
 # running the CAF. You will need to have data already from running
 # calibration/examples/1_create_sample_DSTs.sh or just make your own
-# any change the input data below.
+# and change the input data below.
 
 from basf2 import *
 set_log_level(LogLevel.INFO)

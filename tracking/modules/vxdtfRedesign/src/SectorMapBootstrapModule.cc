@@ -9,19 +9,18 @@
  *******************************************************************************/
 
 #include <iostream>
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-#include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-#include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+#include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
 
 
-#include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
-#include "tracking/trackFindingVXD/filterTools/Observer.h"
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
+#include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h>
 
-#include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+#include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 #include "tracking/modules/vxdtfRedesign/SectorMapBootstrapModule.h"
 #include "tracking/vxdCaTracking/PassData.h"
@@ -50,6 +49,22 @@ SectorMapBootstrapModule::SectorMapBootstrapModule() : Module()
 {
   setDescription("Create the VXDTF SectorMap for the following modules."
                 );
+
+  addParam("SectorMapsInputFile", m_sectorMapsInputFile,
+           "File from which the SectorMaps will be retrieved if\
+ ReadSectorMap is set to true", m_sectorMapsInputFile);
+
+  addParam("SectorMapsOutputFile", m_sectorMapsOutputFile,
+           "File into which the SectorMaps will be written if\
+ WriteSectorMap is set to true", m_sectorMapsOutputFile);
+
+  addParam("ReadSectorMap", m_readSectorMap, "If set to true \
+retrieve the SectorMaps from SectorMapsInputFile during initialize.", m_readSectorMap);
+
+  addParam("WriteSectorMap", m_writeSectorMap, "If set to true \
+at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
+
+
 }
 
 void
@@ -59,9 +74,10 @@ SectorMapBootstrapModule::initialize()
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
   bootstrapSectorMap();
+  //This file is used by the observers, at present it is created by default.
   m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
   m_tfile->cd();
-  TTree* newTree = new TTree("twoHitTree", "reallyWeWantToHaveThatTTreeNow");
+  TTree* newTree = new TTree("twoHitsTree", "Observers");
 
   // take care of two-hit-filters:
 //   auto outerHit = new SpacePoint();
@@ -70,6 +86,8 @@ SectorMapBootstrapModule::initialize()
   VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
   initializeObservers(aFilter, newTree/*, outerHit, innerHit*/);
 //   ObserverCheckMCPurity::initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(), ClosedRange<double, double>());
+  if (m_readSectorMap)
+    retrieveSectorMap();
 }
 
 void
@@ -88,8 +106,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 {
 
 
-  // TO DO: Most of these informations are not used at all.
-  //        It seems to me (EP) that onlue the SectorDividers are used.
+  // TODO: Most of these informations are not used at all.
+  //        It seems to me (EP) that only the SectorDividers are used.
 
   SectorMapConfig config1;
 //   config1.pTmin = 0.02;
@@ -114,7 +132,7 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
   config1.vIP = B2Vector3D(0, 0, 0);
   config1.secMapName = "lowTestRedesign";
   config1.twoHitFilters = { "Distance3DSquared", "Distance2DXYSquared", "Distance1DZ", "SlopeRZ", "Distance3DNormed"};
-  config1.threeHitFilters = { "Angle3DSimple", "AngleXYSimple", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
+  config1.threeHitFilters = { "Angle3DSimple", "CosAngleXY", "AngleRZSimple", "CircleDist2IP", "DeltaSlopeRZ", "DeltaSlopeZoverS", "DeltaSoverZ", "HelixParameterFit", "Pt", "CircleRadius"};
   config1.fourHitFilters = { "DeltaDistCircleCenter", "DeltaCircleRadius"};
   config1.mField = 1.5;
   config1.rarenessThreshold = 0.; //0.001;
@@ -202,7 +220,8 @@ SectorMapBootstrapModule::bootstrapSectorMap(void)
 void
 SectorMapBootstrapModule::endRun()
 {
-  persistSectorMap();
+  if (m_writeSectorMap)
+    persistSectorMap();
 }
 
 void
@@ -262,8 +281,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
 {
 
   StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName , "RECREATE");
+  TFile rootFile(m_sectorMapsOutputFile.c_str() , "RECREATE");
 
   TTree* tree = new TTree(c_setupKeyNameTTreeName.c_str(),
                           c_setupKeyNameTTreeName.c_str());
@@ -292,7 +310,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
   rootFile.Write();
   rootFile.Close();
 
-  retrieveSectorMap();
+
 }
 
 
@@ -302,8 +320,7 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
 {
 
   StoreObjPtr< SectorMap<SpacePoint> > theSectorMap("", DataStore::c_Persistent);
-  const char* rootFileName = "testSectorMap.root";
-  TFile rootFile(rootFileName);
+  TFile rootFile(m_sectorMapsInputFile.c_str());
 
   TTree* tree ;
   rootFile.GetObject(c_setupKeyNameTTreeName.c_str(), tree);

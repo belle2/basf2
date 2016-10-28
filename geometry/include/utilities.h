@@ -11,14 +11,13 @@
 #ifndef GEOMETRY_UTILITIES_H
 #define GEOMETRY_UTILITIES_H
 
-#include <framework/gearbox/GearDir.h>
-
 #include <string>
 //class G4Colour;
 class G4LogicalVolume;
 class G4Polycone;
 
 namespace Belle2 {
+  class GearDir;
   /** Common code concerning the geometry representation of the detector */
   namespace geometry {
 
@@ -75,7 +74,7 @@ namespace Belle2 {
      * @param[out] minZ will contain the minimal z coordinate of the polycone
      * @param[out] maxZ will contain the maximal z coordinate of the polycone
      */
-    G4Polycone* createPolyCone(const std::string& name, GearDir params, double& minZ, double& maxZ);
+    G4Polycone* createPolyCone(const std::string& name, const GearDir& params, double& minZ, double& maxZ);
 
     /** Create a solid by roating two polylines around the Z-Axis.
      * This function will create a polycone shape directly from Gearbox

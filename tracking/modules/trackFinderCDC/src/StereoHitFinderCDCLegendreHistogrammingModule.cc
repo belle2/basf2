@@ -4,7 +4,6 @@
 #include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -58,7 +57,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2:
   for (const CDCWireHit& wireHit : wireHits) {
     if (not wireHit.getAutomatonCell().hasTakenFlag() and not wireHit.isAxial()) {
       for (ERightLeft rlInfo : {ERightLeft::c_Left, ERightLeft::c_Right}) {
-        rlTaggedWireHits.emplace_back(&wireHit, rlInfo);
+        rlTaggedWireHits.emplace_back(&wireHit, rlInfo, wireHit.getRefDriftLength());
       }
     }
   }

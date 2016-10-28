@@ -301,8 +301,11 @@ void pEventProcessor::analyzePath(const PathPtr& path)
     bool hasParallelFlag = module->hasProperties(Module::c_ParallelProcessingCertified);
     //entire conditional path must also be compatible
     if (hasParallelFlag and module->hasCondition()) {
-      if (!ModuleManager::allModulesHaveFlag(module->getConditionPath()->getModules(), Module::c_ParallelProcessingCertified))
-        hasParallelFlag = false;
+      for (const auto& conditionPath : module->getAllConditionPaths()) {
+        if (!ModuleManager::allModulesHaveFlag(conditionPath->getModules(), Module::c_ParallelProcessingCertified)) {
+          hasParallelFlag = false;
+        }
+      }
     }
 
     //update stage?
@@ -410,8 +413,9 @@ void pEventProcessor::dump_modules(const std::string title, const ModulePtrList 
     const Module* module = it->get();
     strbuf << module->getName();
     if (module->hasCondition()) {
-      PathPtr condpath = module->getConditionPath();
-      strbuf << "[->" << condpath.get() << "] ";
+      for (const auto& conditionPath : module->getAllConditionPaths()) {
+        strbuf << "[->" << conditionPath.get() << "] ";
+      }
     }
     if (*it != modlist.back())
       strbuf << " -> ";

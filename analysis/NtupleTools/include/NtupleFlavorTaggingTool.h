@@ -17,9 +17,6 @@
 #include <string>
 #include <utility>
 
-using namespace std;
-using namespace Belle2;
-
 namespace Belle2 {
 
   /**
@@ -64,7 +61,7 @@ namespace Belle2 {
 
   public:
     /** Constructor. */
-    NtupleFlavorTaggingTool(TTree* tree, DecayDescriptor& decaydescriptor, std::string strOptions) : NtupleFlatTool(tree,
+    NtupleFlavorTaggingTool(TTree* tree, DecayDescriptor& decaydescriptor, const std::string& strOptions) : NtupleFlatTool(tree,
           decaydescriptor, strOptions)
     {
       m_useFANN = false;

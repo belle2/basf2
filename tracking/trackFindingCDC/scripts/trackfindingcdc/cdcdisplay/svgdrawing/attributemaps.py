@@ -191,6 +191,9 @@ class WrongRLColorMap():
     """
     CDCRecoHit3D to color map for the correctness of the rl information
     """
+    def __init__(self):
+        mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
+        mcHitLookUp.fill()
 
     def __call__(self, iCDCRecoHit, cdcRecoHit3D):
         """
@@ -202,7 +205,9 @@ class WrongRLColorMap():
         mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
         rlInfo = mcHitLookUp.getRLInfo(cdcHit)
 
-        if rlInfo == cdcRecoHit3D.getRLInfo():
+        if rlInfo == -32768 or rlInfo == 32768:   # <- The root interface mistakes the signed enum value for an unsigned value
+            return 'violet'
+        elif rlInfo == cdcRecoHit3D.getRLInfo():
             return 'green'
         else:
             return 'red'

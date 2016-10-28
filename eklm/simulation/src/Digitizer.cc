@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <cmath>
+
 /* Belle2 headers. */
 #include <eklm/simulation/Digitizer.h>
 #include <framework/gearbox/GearDir.h>

@@ -35,7 +35,7 @@ namespace Belle2 {
       /**
        * Destructor.
        */
-      virtual ~CDCHitColorMap() {};
+      virtual ~CDCHitColorMap() = default;
 
       /**
        * Function call to map the CDCHit id and object to a color.

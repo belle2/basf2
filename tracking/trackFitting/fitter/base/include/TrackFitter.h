@@ -111,9 +111,9 @@ namespace Belle2 {
   class TrackFitter {
   public:
     /// Create a new fitter instance.
-    TrackFitter(const std::string& storeArrayNameOfCDCHits = "CDCHits",
-                const std::string& storeArrayNameOfSVDHits = "SVDClusters",
-                const std::string& storeArrayNameOfPXDHits = "PXDClusters",
+    TrackFitter(const std::string& storeArrayNameOfCDCHits = "",
+                const std::string& storeArrayNameOfSVDHits = "",
+                const std::string& storeArrayNameOfPXDHits = "",
                 const bool& cosmicsTemporaryFix = false) :
       m_measurementAdder(storeArrayNameOfCDCHits, storeArrayNameOfSVDHits, storeArrayNameOfPXDHits, cosmicsTemporaryFix)
     {
@@ -272,6 +272,11 @@ namespace Belle2 {
     std::shared_ptr<genfit::AbsFitter> m_fitter;
     /// Flag to skip the dirty flag check which is needed when using non-default fitters.
     bool m_skipDirtyCheck = false;
+
+    /// This is the difference on pvalue between two fit iterations of the DAF procedure which
+    /// is used as a early termination criteria of the DAF procedure. This is large on purpose
+    /// See https://agira.desy.de/browse/BII-1725 for details
+    const double m_dafDeltaPval = 1.0f;
 
     /// The measurement adder algorithm class
     MeasurementAdder m_measurementAdder;

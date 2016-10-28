@@ -10,7 +10,6 @@
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -24,11 +23,7 @@ PrimitivePlotter::PrimitivePlotter() :
 {
 }
 
-
-PrimitivePlotter::~PrimitivePlotter()
-{
-}
-
+PrimitivePlotter::~PrimitivePlotter() = default;
 
 std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 {

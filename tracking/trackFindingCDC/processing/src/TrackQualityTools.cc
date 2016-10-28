@@ -13,7 +13,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace std;
 
 
 void TrackQualityTools::moveToNextAxialLayer(CDCTrack& track)
@@ -31,7 +30,7 @@ void TrackQualityTools::splitSecondHalfOfTrack(CDCTrack& track, std::vector<CDCT
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().absRadius();
+  const double radius = trajectory2D.getLocalCircle()->absRadius();
   const Vector2D& apogee = trajectory2D.getGlobalCircle().apogee();
   double arcLength2DOfApogee = trajectory2D.calcArcLength2D(apogee);
   if (arcLength2DOfApogee < 0) {
@@ -148,7 +147,7 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCylindricalRFactor)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().absRadius();
+  const double radius = trajectory2D.getLocalCircle()->absRadius();
 
   // Curler are allowed to have hits on both arms
   if (trajectory2D.isCurler(m_outerCylindricalRFactor)) {
@@ -229,7 +228,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().absRadius();
+  const double radius = trajectory2D.getLocalCircle()->absRadius();
 
   if (std::isnan(radius)) {
     return;
@@ -250,7 +249,7 @@ void TrackQualityTools::removeHitsAfterLayerBreak(CDCTrack& track, double m_maxi
     const double currentArcLength2D = recoHit.getArcLength2D();
     if (not std::isnan(lastArcLength2D)) {
       const double delta = (currentArcLength2D - lastArcLength2D);
-      if (abs(delta) > m_maximumArcLength2DDistance) {
+      if (std::fabs(delta) > m_maximumArcLength2DDistance) {
         trackletList.emplace_back();
         currentTracklet = &(trackletList.back());
       }
@@ -370,7 +369,7 @@ void TrackQualityTools::removeArcLength2DHoles(CDCTrack& track, double m_maximum
 {
   const CDCTrajectory3D& trajectory3D = track.getStartTrajectory3D();
   const CDCTrajectory2D& trajectory2D = trajectory3D.getTrajectory2D();
-  const double radius = trajectory2D.getLocalCircle().absRadius();
+  const double radius = trajectory2D.getLocalCircle()->absRadius();
 
   if (std::isnan(radius)) {
     return;

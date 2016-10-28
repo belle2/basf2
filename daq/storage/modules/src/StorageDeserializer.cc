@@ -82,7 +82,7 @@ void StorageDeserializerModule::initialize()
   }
   m_handler = new MsgHandler(m_compressionLevel);
   m_streamer = new DataStoreStreamer();
-  //m_streamer->registerStreamObjs(m_saveObjs);
+  //m_streamer->setStreamingObjects(m_saveObjs);
   m_package = new DataStorePackage(m_streamer, m_eb2);
 
   StoreArray<RawPXD>::registerPersistent();

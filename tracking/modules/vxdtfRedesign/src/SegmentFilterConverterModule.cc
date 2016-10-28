@@ -9,19 +9,18 @@
 // // // // // // // // // // // // // //  * This software is provided "as is" without any warranty.                *
 // // // // // // // // // // // // // //  **************************************************************************/
 // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance1DZ.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance1DZTemp.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance3DNormed.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/SlopeRZ.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance1DZSquared.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance2DXYSquared.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/twoHitFilters/Distance3DSquared.h"
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZ.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DNormed.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/SlopeRZ.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance1DZSquared.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance2DXYSquared.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/twoHitVariables/Distance3DSquared.h>
 // // // // // // // // // // // // // //
 // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/filterTools/Shortcuts.h"
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/filterTools/Observer.h"
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/filterFramework/Shortcuts.h>
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/filterFramework/Observer.h>
 // // // // // // // // // // // // // //
-// // // // // // // // // // // // // // #include "tracking/trackFindingVXD/sectorMapTools/SectorMap.h"
+// // // // // // // // // // // // // // #include <tracking/trackFindingVXD/sectorMap/map/SectorMap.h>
 // // // // // // // // // // // // // // #include "tracking/trackFindingVXD/environment/VXDTFFilters.h"
 // // // // // // // // // // // // // // #include "tracking/modules/vxdtfRedesign/SegmentFilterConverterModule.h"
 // // // // // // // // // // // // // // #include "tracking/vxdCaTracking/PassData.h"

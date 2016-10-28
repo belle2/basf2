@@ -12,7 +12,6 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -23,6 +22,7 @@ CDCRecoSegment2D CDCRecoSegment3D::stereoProjectToRef() const
   for (const CDCRecoHit3D&  recoHit3D : *this) {
     result.push_back(recoHit3D.stereoProjectToRef());
   }
+  result.setAliasScore(getAliasScore());
   return result;
 }
 
@@ -34,5 +34,6 @@ CDCRecoSegment3D CDCRecoSegment3D::reconstruct(const CDCRecoSegment2D& segment2D
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
     segment3D.push_back(recoHit3D);
   }
+  segment3D.setAliasScore(segment2D.getAliasScore());
   return segment3D;
 }

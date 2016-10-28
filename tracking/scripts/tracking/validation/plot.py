@@ -264,7 +264,6 @@ class ValidationPlot(object):
                                               name=histogram.GetName()[1:],
                                               z_score=gaus_z_score)
                 profiles.append(profile)
-            print(profiles)
             self.histograms = profiles
             self.plot = self.create_stack(profiles, name=self.plot.GetName()[1:], reverse_stack=False)
 
@@ -1337,13 +1336,26 @@ class ValidationPlot(object):
         # profile = th2.ProfileX(name)
 
         y_taxis = th2.GetYaxis()
-        fit_lower_bound = y_taxis.GetXmin()
-        fit_upper_bound = y_taxis.GetXmax()
+        th2_lower_bound = y_taxis.GetXmin()
+        th2_upper_bound = y_taxis.GetXmax()
+        th2_height = y_taxis.GetXmax() - y_taxis.GetXmin()
+        n_y_bins = y_taxis.GetNbins()
         if z_score:
             y_mean = th2.GetMean(2)
             y_std = th2.GetStdDev(2)
-            fit_lower_bound = max(fit_lower_bound, y_mean - z_score * y_std)
-            fit_upper_bound = min(fit_upper_bound, y_mean + z_score * y_std)
+            fit_lower_bound = max(th2_lower_bound, y_mean - z_score * y_std)
+            fit_upper_bound = min(th2_upper_bound, y_mean + z_score * y_std)
+            fit_height = fit_upper_bound - fit_lower_bound
+            # Require all covered bins to be filled
+            required_n_bins_inslice_filled = n_y_bins * fit_height / th2_height
+        else:
+            fit_lower_bound = th2_lower_bound
+            fit_upper_bound = th2_upper_bound
+            fit_height = fit_upper_bound - fit_lower_bound
+            required_n_bins_inslice_filled = n_y_bins / 1.61
+
+        # Highest required number of bins should be a third
+        required_n_bins_inslice_filled = min(required_n_bins_inslice_filled, n_y_bins / 1.61)
 
         fit_tf1 = ROOT.TF1("Fit", "gaus", fit_lower_bound, fit_upper_bound)
         fit_tf1.SetParName(0, "n")
@@ -1351,10 +1363,11 @@ class ValidationPlot(object):
         fit_tf1.SetParName(2, "std")
         i_first_bin = 0
         i_last_bin = -1
-        n_bins_inslice_filled = y_taxis.GetNbins() // 3
         fit_options = "QNR"
         param_fit_th1s = ROOT.TObjArray()
-        th2.FitSlicesY(fit_tf1, i_first_bin, i_last_bin, n_bins_inslice_filled, fit_options, param_fit_th1s)
+        th2.FitSlicesY(fit_tf1, i_first_bin, i_last_bin,
+                       int(required_n_bins_inslice_filled),
+                       fit_options, param_fit_th1s)
 
         th1_means = param_fit_th1s.At(1)
         th1_means.SetName(name)
@@ -1369,6 +1382,17 @@ class ValidationPlot(object):
             label = x_taxis.GetBinLabel(i_bin)
             if label != "":
                 new_x_taxis.SetBinLabel(i_bin, label)
+
+        # Adjust plot bound to reflect the fit range.
+        data_lower_bound = th1_means.GetMinimum(fit_lower_bound)
+        data_upper_bound = th1_means.GetMaximum(fit_upper_bound)
+        data_height = data_upper_bound - data_lower_bound
+
+        plot_lower_bound = max(fit_lower_bound, data_lower_bound - 0.05 * data_height)
+        plot_upper_bound = min(fit_upper_bound, data_upper_bound + 0.05 * data_height)
+
+        th1_means.SetMinimum(plot_lower_bound)
+        th1_means.SetMaximum(plot_upper_bound)
 
         return th1_means
 
@@ -1740,10 +1764,11 @@ class ValidationPlot(object):
             finite_xs = xs
 
         # Prepare for the estimation of outliers
+        make_symmetric = False
         if outlier_z_score is not None and (lower_bound is None or upper_bound is None):
 
             x_mean, x_std = self.get_robust_mean_and_std(finite_xs)
-
+            make_symmetric = abs(x_mean) < x_std / 5.0 and lower_bound is None and upper_bound is None
             lower_exceptional_x = np.nan
             upper_exceptional_x = np.nan
 
@@ -1752,6 +1777,7 @@ class ValidationPlot(object):
                 if len(exceptional_xs):
                     lower_exceptional_x = np.min(exceptional_xs)
                     upper_exceptional_x = np.max(exceptional_xs)
+                    make_symmetric = False
 
         # Find the lower bound, if it is not given.
         if lower_bound is None:
@@ -1795,6 +1821,12 @@ class ValidationPlot(object):
                 debug('Upper bound after outlier detection')
                 debug('Upper bound %s', upper_bound)
                 debug('Upper outlier bound %s', upper_outlier_bound)
+
+        if make_symmetric and lower_bound < 0 and upper_bound > 0:
+            if abs(abs(lower_bound) - abs(upper_bound)) < x_std / 5.0:
+                abs_bound = max(abs(lower_bound), abs(upper_bound))
+                lower_bound = -abs_bound
+                upper_bound = abs_bound
 
         return lower_bound, upper_bound
 

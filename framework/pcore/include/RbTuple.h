@@ -29,11 +29,18 @@ namespace Belle2 {
   class RbTupleManager {
   public:
 
+    // Constructor and destructor are private for singleton access
+    RbTupleManager();
+    ~RbTupleManager();
+
+    /** Constructor to use hadd() */
+    RbTupleManager(int nprocess, const char* filename, const char* workdir = ".");
+
     /** Access to singleton */
     static RbTupleManager& Instance();
 
     /** Global initialization */
-    void init(int nprocess, const char* filename);
+    void init(int nprocess, const char* filename, const char* workdir = ".");
 
     /** Functions called by analysis modules in mother process */
     //  void define ( void (*func)( void ) );
@@ -49,13 +56,13 @@ namespace Belle2 {
     // Functions to collect histograms from event processing on the fly
     //  int collect ();
 
-    /** Functions to add up all histogram files */
-    int hadd();
+    /** Function to dump histograms/tuples to the file */
+    int dump();
 
-  private:
-    // Constructor and destructor are private for singleton access
-    RbTupleManager();
-    ~RbTupleManager();
+    /** Functions to add up all histogram files */
+    int hadd(bool deleteflag = true);
+
+    //  private:
 
   private:
     static RbTupleManager* s_instance; /**< singleton instance. */
@@ -63,6 +70,7 @@ namespace Belle2 {
     std::vector<Module*> m_histdefs; /**< registered HistoModules. */
     int m_nproc{0}; /**< Number of parallel processes. */
     std::string m_filename; /**< Name of histogram output file. */
+    std::string m_workdir;  /**< Name of working directory */
     TFile* m_root{nullptr}; /**< Histogram output file. */
   };
 

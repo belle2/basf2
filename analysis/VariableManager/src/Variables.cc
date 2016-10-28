@@ -1124,7 +1124,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower)
-        result = shower->getTemporaryMinTrkDistance();
+        result = shower->getMinTrkDistance();
 
       return result;
     }
@@ -1135,7 +1135,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower)
-        result = shower->getTemporaryDeltaL();
+        result = shower->getDeltaL();
 
       return result;
     }
@@ -1162,7 +1162,7 @@ namespace Belle2 {
       if (!ecl)
         return -1.0;
 
-      TVector3 v1raw = ecl->getclusterPosition();
+      TVector3 v1raw = ecl->getClusterPosition();
       TVector3 v1 = C2TDistanceUtility::clipECLClusterPosition(v1raw);
 
       // Get closest track from Helix
@@ -1244,7 +1244,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getErrorEnergy();
+        result = shower->getUncertaintyEnergy();
       }
       return result;
     }
@@ -1255,7 +1255,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getEnedepSum();
+        result = shower->getEnergyRaw();
       }
       return result;
     }
@@ -1266,7 +1266,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getHighestE();
+        result = shower->getEnergyHighestCrystal();
       }
       return result;
     }
@@ -1277,7 +1277,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getTiming();
+        result = shower->getTime();
       }
       return result;
     }
@@ -1288,7 +1288,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getErrorTiming();
+        result = shower->getDeltaTime99();
       }
       return result;
     }
@@ -1326,13 +1326,68 @@ namespace Belle2 {
       return result;
     }
 
-    double eclClusterE9E25(const Particle* particle)
+    double eclClusterE1E9(const Particle* particle)
     {
       double result = 0.0;
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getE9oE25();
+        result = shower->getE1oE9();
+      }
+      return result;
+    }
+
+    double eclClusterE9E21(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getE9oE21();
+      }
+      return result;
+    }
+
+    double eclClusterAbsZernikeMoment40(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getAbsZernike40();
+      }
+      return result;
+    }
+
+    double eclClusterAbsZernikeMoment51(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getAbsZernike51();
+      }
+      return result;
+    }
+
+    double eclClusterZernikeMVA(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getZernikeMVA();
+      }
+      return result;
+    }
+
+    double eclClusterSecondMoment(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower) {
+        result = shower->getSecondMoment();
       }
       return result;
     }
@@ -1354,7 +1409,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getMergedPi0();
+        //result = shower->getMergedPi0();
       }
       return result;
     }
@@ -1365,7 +1420,7 @@ namespace Belle2 {
 
       const ECLCluster* shower = particle->getECLCluster();
       if (shower) {
-        result = shower->getNofCrystals();
+        result = shower->getNumberOfCrystals();
       }
       return result;
     }
@@ -1492,7 +1547,7 @@ namespace Belle2 {
     REGISTER_VARIABLE("SigMBF", particleInvariantMassBeforeFitSignificance,
                       "signed deviation of particle's invariant mass (determined from particle's daughter 4-momentum vectors) from its nominal mass");
     REGISTER_VARIABLE("missingMass", missingMass,
-                      "missing mass of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
+                      "missing mass squared of second daughter of a Upsilon calculated under the assumption that the first daughter of the Upsilon is the tag side and the energy of the tag side is equal to the beam energy");
     REGISTER_VARIABLE("missingMomentum", missingMomentum,
                       "Missing Momentum of the Signal Side in CMS Frame");
 
@@ -1643,8 +1698,21 @@ namespace Belle2 {
                       "ECL cluster's timing");
     REGISTER_VARIABLE("clusterHighestE", eclClusterHighestE,
                       "energy of the crystall with highest  energy");
+    REGISTER_VARIABLE("clusterE1E9", eclClusterE1E9,
+                      "ratio of energies of the central crystal and 3x3 crystals around the central crystal");
     REGISTER_VARIABLE("clusterE9E25", eclClusterE9E25,
-                      "ratio of energies in inner 3x3 and 5x5 cells");
+                      "Deprecated - kept for backwards compatibility - returns clusterE9E21");
+    REGISTER_VARIABLE("clusterE9E21", eclClusterE9E21,
+                      "ratio of energies in inner 3x3 and (5x5 cells without corners)");
+    REGISTER_VARIABLE("clusterAbsZernikeMoment40", eclClusterAbsZernikeMoment40,
+                      "absolute value of Zernike moment 40 (shower shape variable)");
+    REGISTER_VARIABLE("clusterAbsZernikeMoment51", eclClusterAbsZernikeMoment51,
+                      "absolute value of Zernike moment 51 (shower shape variable)");
+    REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, "output of MVA using Zernike moments of the cluster.\n"
+                      "For cluster with hypothesisId==N1: raw MVA output.\n"
+                      "For cluster with hypothesisId==N2: 1 - \prod{clusterZernikeMVA}, where the product is on all N1 showers belonging to the same connected region (shower shape variable)");
+    REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment,
+                      "Second moment. Used for merged pi0 identification. (shower shape variable)");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT,
                       "LAT (shower variable)");
     REGISTER_VARIABLE("clusterMergedPi0", eclClusterMergedPi0,

@@ -4,6 +4,7 @@
 #include <framework/utilities/FileSystem.h>
 
 #include <TGeoManager.h>
+#include <TPRegexp.h>
 #include <TEveManager.h>
 #include <TEveGeoNode.h>
 #include <TEveGeoShapeExtract.h>
@@ -92,6 +93,23 @@ void EveGeometry::addGeometry()
   s_simplifiedShape->SetRnrSelf(false);
   s_simplifiedShape->IncDenyDestroy();
   s_simplifiedShape->SetName("Minimal geometry extract");
+  delete f;
+
+  //TOP was rotated, let's remove the wrong shapes from the extract
+  std::list<TEveElement*> top_bars;
+  TPRegexp re("Support.*");
+  s_simplifiedShape->FindChildren(top_bars, re);
+  B2ASSERT("No TOP bars found?", !top_bars.empty());
+  for (TEveElement* el : top_bars) {
+    el->Destroy();
+  }
+  //and add fixed ones instead
+  const std::string extractPathTop = FileSystem::findFile("/data/display/geometry_extract_top.root");
+  f = TFile::Open(extractPathTop.c_str(), "READ");
+  TEveGeoShapeExtract* gsetop = dynamic_cast<TEveGeoShapeExtract*>(f->Get("Extract"));
+  TEveGeoShape* top_extract = TEveGeoShape::ImportShapeExtract(gsetop, 0);
+  top_extract->SetRnrSelf(false);
+  s_simplifiedShape->AddElement(top_extract);
   delete f;
 
   //I want to show full geo in unprojected view,

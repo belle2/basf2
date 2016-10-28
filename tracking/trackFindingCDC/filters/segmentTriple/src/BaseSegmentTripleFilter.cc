@@ -10,6 +10,5 @@
 
 #include <tracking/trackFindingCDC/filters/segmentTriple/SimpleSegmentTripleFilter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;

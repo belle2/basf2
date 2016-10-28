@@ -12,7 +12,12 @@
 #define ARICHDIGITIZERMODULE_H
 
 #include <framework/core/Module.h>
-#include <arich/geometry/ARICHGeometryPar.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/ARICHSimulationPar.h>
+#include <arich/dbobjects/ARICHModulesInfo.h>
+#include <arich/dbobjects/ARICHChannelMask.h>
+#include <arich/dbobjects/ARICHChannelMapping.h>
+#include <framework/database/DBObjPtr.h>
 
 #include <string>
 
@@ -82,15 +87,16 @@ namespace Belle2 {
     std::string m_inColName;         /**< Input collection name from simulation */
     std::string m_outColName;        /**< Output collection name: digitized photons hits */
 
+    DBObjPtr<ARICHModulesInfo> m_modInfo;     /**< information on installed modules from the DB (QEs etc.) */
+    DBObjPtr<ARICHSimulationPar> m_simPar;    /**< simulation parameters from the DB */
+    DBObjPtr<ARICHGeometryConfig> m_geoPar;   /**< geometry configuration parameters from the DB */
+    DBObjPtr<ARICHChannelMask> m_chnMask;     /**< list of dead channels from the DB */
+    DBObjPtr<ARICHChannelMapping> m_chnMap;   /**< HAPD (x,y) to asic channel mapping */
+
     /* Other members.*/
-    double m_timeCPU;                /**< CPU time.     */
-    int    m_nRun;                   /**< Run number.   */
-    int    m_nEvent;                 /**< Event number. */
     double m_maxQE;                  /**< QE at 400nm (from QE curve applied in SensitveDetector) */
     double m_timeWindow;             /**< Readout time window width */
     double m_bkgLevel;               /**< Number of background hits ped hapd per readout (electronics noise) */
-
-    ARICHGeometryPar* m_arichgp;    /**< Geometry parameters of ARICH. */
 
   };
 

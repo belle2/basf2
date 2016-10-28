@@ -59,15 +59,11 @@ def run_collectors():
     if 'RootInput' in pe:
         root_input_mod = collector_path.modules()[pe.index('RootInput')]
         root_input_mod.param('inputFileNames', input_files)
-#        for param in root_input_mod.available_params():
-#            print(param.name(), param.values())
     else:
         main.add_module('RootInput', inputFileNames=input_files)
 
     main.add_path(collector_path)
-    main.add_module('RootOutput')
-#    for module in main.modules():
-#        print(module.name())
+    main.add_module('RootOutput', branchNames=["EventMetaData"])
     process(main)
 
 if __name__ == '__main__':

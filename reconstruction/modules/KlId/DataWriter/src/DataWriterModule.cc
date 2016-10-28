@@ -134,7 +134,6 @@ void DataWriterModule::event()
   StoreArray<KLMCluster> klmClusters;
   StoreArray<RecoTrack> genfitTracks;
   StoreArray<ECLCluster> eclClusters;
-  klmClusters.requireRelationTo(mcParticles);
 
 // ------------------ KLM CLUSTERS
 
@@ -180,13 +179,13 @@ void DataWriterModule::event()
 
     if (!(closestECLCluster == nullptr)) {
       m_KLMECLE      = closestECLCluster->getEnergy();
-      m_KLMECLE9oE25 = closestECLCluster->getE9oE25();
-      m_KLMECLEerror = closestECLCluster->getErrorEnergy();
-      m_KLMECLTerror = closestECLCluster->getErrorTiming();
+      m_KLMECLE9oE25 = closestECLCluster->getE9oE21();
+      m_KLMECLEerror = closestECLCluster->getUncertaintyEnergy();
+      m_KLMECLTerror = closestECLCluster->getDeltaTime99();
 
-      m_KLMECLdeltaL = closestECLCluster->getTemporaryDeltaL();;
-      m_KLMECLminTrackDist = closestECLCluster->getTemporaryMinTrkDistance();
-      m_KLMECLTiming = closestECLCluster->getTiming();
+      m_KLMECLdeltaL = closestECLCluster->getDeltaL();;
+      m_KLMECLminTrackDist = closestECLCluster->getMinTrkDistance();
+      m_KLMECLTiming = closestECLCluster->getTime();
     } else {
       m_KLMECLdeltaL = -999;
       m_KLMECLminTrackDist = -999;
@@ -225,14 +224,14 @@ void DataWriterModule::event()
   for (const ECLCluster& cluster : eclClusters) {
 
 
-    m_ECLminTrkDistance = cluster.getTemporaryMinTrkDistance();
-    m_ECLdeltaL = cluster.getTemporaryDeltaL();
+    m_ECLminTrkDistance = cluster.getMinTrkDistance();
+    m_ECLdeltaL = cluster.getDeltaL();
 
     m_ECLE = cluster.getEnergy();
-    m_ECLE9oE25 = cluster.getE9oE25();
-    m_ECLTiming = cluster.getTiming();
+    m_ECLE9oE25 = cluster.getE9oE21();
+    m_ECLTiming = cluster.getTime();
     m_ECLR = cluster.getR();
-    m_ECLEerror = cluster.getErrorEnergy();
+    m_ECLEerror = cluster.getUncertaintyEnergy();
 
 
     if (isnan(m_ECLminTrkDistance)) {m_ECLminTrkDistance = -999;}
@@ -244,7 +243,7 @@ void DataWriterModule::event()
     if (isnan(m_ECLEerror)) {m_ECLEerror                 = -999;}
 
 
-    const TVector3& clusterPos = cluster.getclusterPosition();
+    const TVector3& clusterPos = cluster.getClusterPosition();
 
     MCParticle* part = cluster.getRelatedTo<MCParticle>();
     m_isBeamBKG = mcParticleIsBeamBKG(part);

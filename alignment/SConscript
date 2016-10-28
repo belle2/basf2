@@ -12,7 +12,8 @@ if testbeam:
     env['CPPDEFINES']['ALLOW_TELESCOPES_IN_GBLFITMODULE'] = True
 
 env['LIBS'] = ['framework', 'cdc_dataobjects',
-               'vxd', 'vxd_dataobjects', 'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd', 'pxd_dataobjects', 'svd_dataobjects',
-               'alignment_dataobjects', 'bklm', 'bklm_dataobjects', 'calibration', 'calibration_dataobjects', 'bklm_dbobjects']
+               'genfit2', '$ROOT_LIBS', 'EG', 'svd', 'pxd',
+               'alignment_dataobjects', 'bklm', 'calibration', 'calibration_dataobjects',
+               'eklm_dataobjects', 'eklm_dbobjects', 'eklm']
 Return('env')
 

@@ -7,6 +7,9 @@ import shutil
 import glob
 import sys
 
+tempdir = tempfile.mkdtemp()
+os.chdir(tempdir)
+
 from basf2 import *
 from modularAnalysis import *
 from ROOT import Belle2
@@ -18,13 +21,13 @@ import fei.provider
 fei.provider.MaximumNumberOfMVASamples = int(1e7)
 fei.provider.MinimumNumberOfMVASamples = int(10)
 
-filepath = 'analysis/tests/mdst5.root'
+filepath = 'analysis/tests/mdst6.root'
 inputFile = Belle2.FileSystem.findFile(filepath)
 if len(inputFile) == 0:
     sys.stderr.write(
         "TEST SKIPPED: input file " +
         filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~cpulvermacher/mdst5.root'\n")
+        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst6.root'\n")
     sys.exit(-1)
 
 selection_path = create_path()
@@ -33,9 +36,6 @@ selection_path.add_module('Gearbox')
 selection_path.add_module('Geometry', ignoreIfPresent=True, components=['MagneticField'])
 
 particles = get_unittest_channels()
-
-tempdir = tempfile.mkdtemp()
-os.chdir(tempdir)
 
 sys.argv.append('-verbose')
 sys.argv.append('-prune')
@@ -62,7 +62,7 @@ feistate = fullEventInterpretation(None, selection_path, particles, 'FEITEST')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('gamma*')) == 4  # V0 Gamma channel is not trained
+assert len(glob.glob('gamma*')) == 6
 assert len(glob.glob('mu+*')) == 3
 assert len(glob.glob('pi+*')) == 3
 assert len(glob.glob('K+*')) == 3
@@ -102,7 +102,8 @@ assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
 assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
-assert len(glob.glob('Monitor_*')) == 91
+assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
+assert len(glob.glob('Monitor_*')) == 92
 
 feistate.path.modules()[0].param('inputFileName', inputFile)
 feistate.path.modules()[0].param('inputFileNames', [])
@@ -144,7 +145,7 @@ feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 process(feistate.path)
 assert not feistate.is_trained
 assert len(glob.glob('RootOutput.root')) == 1
-assert len(glob.glob('gamma*')) == 4  # V0 Gamma channel is not trained
+assert len(glob.glob('gamma*')) == 6
 assert len(glob.glob('mu+*')) == 3
 assert len(glob.glob('pi+*')) == 3
 assert len(glob.glob('K+*')) == 3
@@ -179,6 +180,7 @@ feistate.path.modules()[0].param('inputFileName', 'RootInput.root')
 assert len(glob.glob('Summary*.pickle')) == 1
 assert len(glob.glob('cache.pickle.bkp4')) == 1
 # Check if now all Monitoring histograms are available
+assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 assert len(glob.glob('Monitor_MCCounts.root')) == 1
 assert len(glob.glob('Monitor_TagUniqueSignal_*')) == 7
 assert len(glob.glob('Monitor_FitVertex_*')) == 12
@@ -189,7 +191,7 @@ assert len(glob.glob('Monitor_SignalProbability_*')) == 10
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 # Additional monitoring stuff during training
 assert len(glob.glob('Monitor_GenerateTrainingData_*')) == 11
-assert len(glob.glob('Monitor_*')) == 102
+assert len(glob.glob('Monitor_*')) == 103
 assert feistate.is_trained
 
 sys.argv.pop()

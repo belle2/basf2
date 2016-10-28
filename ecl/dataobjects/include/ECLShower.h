@@ -15,9 +15,10 @@
 #define ECLSHOWER_H
 
 #include <framework/datastore/RelationsObject.h>
-
+#include <framework/logging/Logger.h>
 #include <TVector3.h>
 #include <math.h>
+#include <TMatrixDSym.h>
 
 namespace Belle2 {
 
@@ -30,51 +31,49 @@ namespace Belle2 {
     /** The status information for the ECLShowers. */
     enum StatusBit {
       /** bit 0:  Dead crystal within nominal shower neighbour region.  */
-      c_HasDeadCrystal = 1 << 0,
+      c_hasDeadCrystal = 1 << 0,
 
       /** bit 1:  Hot crystal within nominal shower neighbour region.  */
-      c_HasHotCrystal = 2 << 0,
+      c_hasHotCrystal = 2 << 0,
 
       /** combined flag to test whether the shower is 'problematic' */
-      c_HasProblematicCrystal = c_HasDeadCrystal | c_HasHotCrystal,
+      c_hasProblematicCrystal = c_hasDeadCrystal | c_hasHotCrystal,
     };
 
     /** Default constructor for ROOT */
     ECLShower()
     {
       m_isTrk = false;         /**< Match with track */
-      m_Status = 0;            /**< Status (e.g. shower contains one hot crystal) */
-      m_ShowerId = 0;          /**< Shower ID */
+      m_status = 0;            /**< Status (e.g. shower contains one hot crystal) */
+      m_showerId = 0;          /**< Shower ID */
       m_connectedRegionId = 0; /**< Connected Region ID */
       m_hypothesisId = 0;      /**< Hypothesis ID */
       m_centralCellId = 0;     /**< Central Cell ID */
-      m_Energy = 0.0;          /**< Energy (GeV) */
-      m_EnedepSum = 0.0;       /**< Raw Energy Sum (GeV) */
-      m_Theta = 0.0;           /**< Theta (rad) */
-      m_Phi = 0.0;             /**< Phi (rad) */
-      m_R = 0.0;               /**< R (cm) */
+      m_energy = 0.0;          /**< Energy (GeV) */
+      m_energyRaw = 0.0;       /**< Raw Energy Sum (GeV) */
+      m_theta = 0.0;           /**< Theta (rad) */
+      m_phi = 0.0;             /**< Phi (rad) */
+      m_r = 0.0;               /**< R (cm) */
       m_Error[0] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_Error[1] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_Error[2] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_Error[3] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_Error[4] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
       m_Error[5] = 0.0;        /**< Error Array for Energy->[0], Phi->[2], Theta->[5] */
-      m_Time = 0;              /**< Time */
-      m_timeResolution = 0;    /**< Time resolution */
-      m_HighestEnergy = 0.0;   /**< Highest energy in Shower*/
+      m_time = 0;              /**< Time */
+      m_deltaTime99 = 0;       /**< Time that contains 99% of true signals */
+      m_energyHighestCrystal = 0.0;   /**< Highest energy in Shower*/
       m_lateralEnergy = 0.0;   /**< Lateral Energy  */
       m_minTrkDistance = 0.0;  /**< Distance between shower and closest track  */
       m_trkDepth = 0.0;        /**< Path on track extrapolation to POCA to average cluster direction   */
       m_showerDepth = 0.0;     /**< Same as above, but on the cluster average direction */
-      m_NofCrystals = 0.0;     /**< Sum of weights of crystals (~number of crystals) */
-      m_absZernike20 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 20 */
-      m_absZernike40 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 40 */
-      m_absZernike42 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 42 */
-      m_absZernike51 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 51 */
-      m_absZernike53 = 0.0;       /**< Shower shape variable, absolute value of Zernike Moment 53 */
+      m_numberOfCrystals = 0.0;     /**< Sum of weights of crystals (~number of crystals) */
+      m_absZernike40 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 40 */
+      m_absZernike51 = 0.0;    /**< Shower shape variable, absolute value of Zernike Moment 51 */
+      m_zernikeMVA = 0.0;      /**< Shower shape variable, Zernike MVA output */
       m_secondMoment = 0.0;    /**< Shower shape variable, second moment (needed for merged pi0) */
       m_E1oE9 = 0.0;           /**< Shower shape variable, E1oE9 */
-      m_E9oE25 = 0;            /**< Shower shape variable, E9oE25 */
+      m_E9oE21 = 0.0;          /**< Shower shape variable, E9oE21 */
 
     }
 
@@ -84,11 +83,11 @@ namespace Belle2 {
 
     /*! Set Status
      */
-    void setStatus(int Status) { m_Status = Status; }
+    void setStatus(int Status) { m_status = Status; }
 
     /*! Set Shower ID
      */
-    void setShowerId(int ShowerId) { m_ShowerId = ShowerId; }
+    void setShowerId(int ShowerId) { m_showerId = ShowerId; }
 
     /*! Set Connected region ID
      */
@@ -104,42 +103,47 @@ namespace Belle2 {
 
     /*! Set Energy
      */
-    void setEnergy(double Energy) { m_Energy = Energy; }
+    void setEnergy(double Energy) { m_energy = Energy; }
 
     /*! Set Raw Energy Sum
      */
-    void setEnedepsum(double EnergySum) { m_EnedepSum = EnergySum; }
+    void setEnergyRaw(double EnergySum) { m_energyRaw = EnergySum; }
 
     /*! Set Theta (rad)
      */
-    void setTheta(double Theta) { m_Theta = Theta; }
+    void setTheta(double Theta) { m_theta = Theta; }
 
     /*! Set Phi (rad)
      */
-    void setPhi(double Phi) { m_Phi = Phi; }
+    void setPhi(double Phi) { m_phi = Phi; }
 
     /*! Set R
      */
-    void setR(double R) { m_R = R; }
+    void setR(double R) { m_r = R; }
 
     /*! Set symmetric Error Array(3x3)  for
             [0]->Error on Energy
             [2]->Error on Phi
             [5]->Error on Theta
      */
-    void setError(double ErrorArray[6]) { for (unsigned int i = 0; i < 6; i++) { m_Error[i] = ErrorArray[i];} }
+    void setCovarianceMatrix(double covArray[6])
+    {
+      for (unsigned int i = 0; i < 6; i++) {
+        m_Error[i] = covArray[i];
+      }
+    }
 
     /*! Set Time
      */
-    void setTime(double Time) { m_Time = Time; }
+    void setTime(double Time) { m_time = Time; }
 
     /*! Set Time Resolution
      */
-    void setTimeResolution(double TimeReso) { m_timeResolution = TimeReso; }
+    void setDeltaTime99(double TimeReso) { m_deltaTime99 = TimeReso; }
 
-    /*! Set Highest Energy (TF)
+    /*! Set Highest Energy
      */
-    void setHighestEnergy(double HighestEnergy) { m_HighestEnergy = HighestEnergy; }
+    void setEnergyHighestCrystal(double HighestEnergy) { m_energyHighestCrystal = HighestEnergy; }
 
     /*! Set Lateral Energy
      */
@@ -159,27 +163,19 @@ namespace Belle2 {
 
     /*! Set sum of weights of crystals
      */
-    void setNofCrystals(double nofCrystals) { m_NofCrystals = nofCrystals; }
-
-    /*! Set absolute value of Zernike moment 20
-     */
-    void setAbsZernike20(double absZernike20) { m_absZernike20 = absZernike20; }
+    void setNumberOfCrystals(double nofCrystals) { m_numberOfCrystals = nofCrystals; }
 
     /*! Set absolute value of Zernike moment 40
      */
     void setAbsZernike40(double absZernike40) { m_absZernike40 = absZernike40; }
 
-    /*! Set absolute value of Zernike moment 42
-     */
-    void setAbsZernike42(double absZernike42) { m_absZernike42 = absZernike42; }
-
     /*! Set absolute value of Zernike moment 51
      */
     void setAbsZernike51(double absZernike51) { m_absZernike51 = absZernike51; }
 
-    /*! Set absolute value of Zernike moment 53
+    /*! SetZernike MVA value
      */
-    void setAbsZernike53(double absZernike53) { m_absZernike53 = absZernike53; }
+    void setZernikeMVA(double zernikeMVA) {m_zernikeMVA = zernikeMVA; }
 
     /*! Set second moment
      */
@@ -189,9 +185,9 @@ namespace Belle2 {
      */
     void setE1oE9(double E1oE9) { m_E1oE9 = E1oE9; }
 
-    /*! Set energy ration E9 over E25
+    /*! Set energy ration E9 over E21
      */
-    void setE9oE25(double E9oE25) { m_E9oE25 = E9oE25; }
+    void setE9oE21(double E9oE21) { m_E9oE21 = E9oE21; }
 
     /*! Get if matched with a Track
      * @return flag for track Matching
@@ -201,12 +197,12 @@ namespace Belle2 {
     /*! Get Status
      * @return Status
      */
-    int getStatus() const { return m_Status; }
+    int getStatus() const { return m_status; }
 
     /*! Get Shower Id
      * @return Shower Id
      */
-    int getShowerId() const { return m_ShowerId; }
+    int getShowerId() const { return m_showerId; }
 
     /*! Get Connected region Id
      * @return Connected region Id
@@ -226,67 +222,67 @@ namespace Belle2 {
     /*! Get Energy
      * @return Energy
      */
-    double getEnergy() const { return m_Energy; }
+    double getEnergy() const { return m_energy; }
 
     /*! Get Energy Sum
      * @return Energy Sum
      */
-    double getEnedepSum() const { return m_EnedepSum; }
+    double getEnergyRaw() const { return m_energyRaw; }
 
     /*! Get Theta
      * @return Theta
      */
-    double getTheta() const { return m_Theta; }
+    double getTheta() const { return m_theta; }
 
     /*! Get Phi
      * @return Phi
      */
-    double getPhi() const { return m_Phi; }
+    double getPhi() const { return m_phi; }
 
     /*! Get R
      * @return R
      */
-    double getR() const { return m_R; }
+    double getR() const { return m_r; }
 
     /*! Get Error Array for Energy->[0], Phi->[2], Theta->[5]
      * @return Error Array for Energy->[0], Phi->[2], Theta->[5]
      */
-    void getError(double  ErrorArray[6]) const
+    void getCovarianceMatrixAsArray(double covArray[6]) const
     {
       for (unsigned int i = 0; i < 6; i++) {
-        ErrorArray[i] = m_Error[i];
+        covArray[i] = m_Error[i];
       }
     }
 
     /*! Get Error of Energy
      * @return Error of Energy
      */
-    double getEnergyError() const { return m_Error[0];}
+    double getUncertaintyEnergy() const { return sqrt(m_Error[0]);}
 
     /*! Get Error of theta
      * @return Error of theta
      */
-    double getThetaError() const { return  m_Error[5];}
+    double getUncertaintyTheta() const { return  sqrt(m_Error[5]);}
 
     /*! Get Error of phi
      * @return Error of phi
      */
-    double getPhiError() const {return m_Error[2];}
+    double getUncertaintyPhi() const {return sqrt(m_Error[2]);}
 
     /*! Get Time
      * @return Time
      */
-    double getTime() const { return m_Time; }
+    double getTime() const { return m_time; }
 
     /*! Get Time Resolution
-     * @return Time Resolution
+     * @return deltat99
      */
-    double getTimeResolution() const { return m_timeResolution; }
+    double getDeltaTime99() const { return m_deltaTime99; }
 
     /*! Get Highest Energy in Shower
      * @return Highest Energy
      */
-    double getHighestEnergy() const { return m_HighestEnergy; }
+    double getEnergyHighestCrystal() const { return m_energyHighestCrystal; }
 
     /*! Get Lateral Energy in Shower
      * @return Lateral Energy
@@ -311,32 +307,22 @@ namespace Belle2 {
     /*! Get NofCrystals
      * @return NofCrystals
      */
-    double getNofCrystals() const { return m_NofCrystals; }
-
-    /*! Get absolute value of Zernike moment 20
-     * @return Absolute value of Zernike moment 20
-     */
-    double getAbsZernike20() const { return m_absZernike20; }
+    double getNumberOfCrystals() const { return m_numberOfCrystals; }
 
     /*! Get absolute value of Zernike moment 40
      * @return Absolute value of Zernike moment 40
      */
     double getAbsZernike40() const { return m_absZernike40; }
 
-    /*! Get absolute value of Zernike moment 42
-     * @return Absolute value of Zernike moment 42
-     */
-    double getAbsZernike42() const { return m_absZernike42; }
-
     /*! Get absolute value of Zernike moment 51
      * @return Absolute value of Zernike moment 51
      */
     double getAbsZernike51() const { return m_absZernike51; }
 
-    /*! Get absolute value of Zernike moment 53
-     * @return Absolute value of Zernike moment 53
-     */
-    double getAbsZernike53() const { return m_absZernike53; }
+    /*! Get Zernike MVA
+    * @return Zernike MVA
+    */
+    double getZernikeMVA() const {return m_zernikeMVA; }
 
     /*! Get second moment
      * @return second moment
@@ -348,19 +334,51 @@ namespace Belle2 {
      */
     double getE1oE9() const { return m_E1oE9; }
 
-    /*! Get energy ratio E9oE25
-     * @return E9oE25
+    /*! Get energy ratio E9oE21
+     * @return E9oE21
      */
-    double getE9oE25() const { return m_E9oE25; }
+    double getE9oE21() const { return m_E9oE21; }
 
     //! The method to get return  TVector3 Momentum
     TVector3 getMomentum() const
     {
       return TVector3(
-               m_Energy * sin(m_Theta) * cos(m_Phi),
-               m_Energy * sin(m_Theta) * sin(m_Phi),
-               m_Energy * cos(m_Theta)
+               m_energy * sin(m_theta) * cos(m_phi),
+               m_energy * sin(m_theta) * sin(m_phi),
+               m_energy * cos(m_theta)
              );
+    }
+
+    /** Return TMatrixDsym 3x3 covariance matrix for E, Phi and Theta */
+    TMatrixDSym getCovarianceMatrix3x3() const
+    {
+      TMatrixDSym covmatecl(3);
+      covmatecl(0, 0) = m_Error[0];
+      covmatecl(1, 0) = m_Error[1];
+      covmatecl(1, 1) = m_Error[2];
+      covmatecl(2, 0) = m_Error[3];
+      covmatecl(2, 1) = m_Error[4];
+      covmatecl(2, 2) = m_Error[5];
+
+      //make symmetric
+      for (int i = 0; i < 3; i++)
+        for (int j = 0; j < i ; j++)
+          covmatecl(j, i) = covmatecl(i, j);
+      return covmatecl;
+    }
+
+    /** Return detector region: 0: below acceptance, 1: FWD, 2: BRL, 3: BWD, 11: FWDGAP, 13: BWDGAP */
+    int getDetectorRegion() const
+    {
+      const double theta = getTheta();
+
+      if (theta < 0.2164208) return 0;   // < 12.4deg
+      if (theta < 0.5480334) return 1;   // < 31.4deg
+      if (theta < 0.561996) return 11;   // < 32.2deg
+      if (theta < 2.2462387) return 2;   // < 128.7deg
+      if (theta < 2.2811453) return 13;   // < 130.7deg
+      if (theta < 2.7070057) return 3;   // < 155.1deg
+      else return 0;
     }
 
     /**
@@ -368,7 +386,7 @@ namespace Belle2 {
      * @param bitmask The bitmask which is compared to the status of the shower.
      * @return Returns true if the bitmask matches the status code of the shower.
      */
-    bool hasStatus(unsigned short int bitmask) const { return (m_Status & bitmask) == bitmask; }
+    bool hasStatus(unsigned short int bitmask) const { return (m_status & bitmask) == bitmask; }
 
     /*! Check if shower contains a hot crystal
      */
@@ -382,37 +400,42 @@ namespace Belle2 {
      */
     bool hasProblematicCrystal() const;
 
+    /** Return unique identifier */
+    int getUniqueId() const
+    {
+      return 100000 * m_connectedRegionId + 1000 * m_hypothesisId + m_showerId;
+    }
+
+
   private:
     bool m_isTrk;                   /**< Match with track (GDN) */
 
-    int m_Status;                   /**< Status */
-    int m_ShowerId;                 /**< Shower ID */
+    int m_status;                   /**< Status */
+    int m_showerId;                 /**< Shower ID */
     int m_connectedRegionId;        /**< Connected Region ID (TF)*/
     int m_hypothesisId;             /**< Hypothesis ID (TF)*/
     int m_centralCellId;            /**< Central cell ID (TF)*/
 
-    Double32_t m_Energy;            /**< Energy (GeV) */
-    Double32_t m_EnedepSum;         /**< Raw Energy Sum(GeV) */
-    Double32_t m_Theta;             /**< Theta (rad) */
-    Double32_t m_Phi;               /**< Phi (rad) */
-    Double32_t m_R;                 /**< R (cm) */
+    Double32_t m_energy;            /**< Energy (GeV) */
+    Double32_t m_energyRaw;         /**< Raw Energy Sum(GeV) */
+    Double32_t m_theta;             /**< Theta (rad) */
+    Double32_t m_phi;               /**< Phi (rad) */
+    Double32_t m_r;                 /**< R (cm) */
     Double32_t m_Error[6];          /**< Error of Energy, Theta and Phi */
-    Double32_t m_Time;              /**< Time */
-    Double32_t m_timeResolution;    /**< Time resolution */
-    Double32_t m_HighestEnergy;     /**< Highest Energy in Shower (GeV) (TF) */
+    Double32_t m_time;              /**< Time */
+    Double32_t m_deltaTime99;       /**< Time that contains 99% of signal crystals */
+    Double32_t m_energyHighestCrystal;     /**< Highest Energy in Shower (GeV) (TF) */
     Double32_t m_lateralEnergy;     /**< Lateral Energy in Shower (GDN) */
     Double32_t m_minTrkDistance;    /**< Distance between shower and closest track (GDN) */
     Double32_t m_trkDepth;          /**< Path on track ext. to POCA to avg. cluster dir. (GDN) */
     Double32_t m_showerDepth;       /**< Same as above, but on the cluster average direction (GDN) */
-    Double32_t m_NofCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
-    Double32_t m_absZernike20;      /**< Shower shape variable, absolute value of Zernike Moment 20 (TF) */
+    Double32_t m_numberOfCrystals;       /**< Sum of weights of crystals (~number of crystals) (TF) */
     Double32_t m_absZernike40;      /**< Shower shape variable, absolute value of Zernike Moment 40 (TF) */
-    Double32_t m_absZernike42;      /**< Shower shape variable, absolute value of Zernike Moment 42 (TF) */
     Double32_t m_absZernike51;      /**< Shower shape variable, absolute value of Zernike Moment 51 (TF) */
-    Double32_t m_absZernike53;      /**< Shower shape variable, absolute value of Zernike Moment 53 (TF) */
+    Double32_t m_zernikeMVA;        /**< Shower shape variable, zernike MVA output */
     Double32_t m_secondMoment;      /**< Shower shape variable, second moment (for merged pi0) (TF) */
     Double32_t m_E1oE9;             /**< Shower shape variable, E1oE9 (TF) */
-    Double32_t m_E9oE25;            /**< Shower shape variable, E9oE25 */
+    Double32_t m_E9oE21;            /**< Shower shape variable, E9oE25 */
 
     // 2: added uniqueID and highestE (TF)
     // 3: added LAT and distance to closest track and trk match flag (GDN)
@@ -420,23 +443,26 @@ namespace Belle2 {
     // 5: clean up, float to Double32_t, and new variables (TF)
     // 6: changed names of Zernike moment variables/getters/setters to indicate that they are the absolute values of the moments (TF and AH)
     // 7: added centralCellId (TF)
-    ClassDef(ECLShower, 7);/**< ClassDef */
+    // 8: added zernikeMVA, removed absZernike20, 42, 53 (AH)
+    // 9: renamed variables according to the new mdst scheme (TF)
+    // 10: added getUniqueId()
+    ClassDef(ECLShower, 10);/**< ClassDef */
 
   };
 
   inline bool ECLShower::hasHotCrystal() const
   {
-    return hasStatus(c_HasHotCrystal);
+    return hasStatus(c_hasHotCrystal);
   }
 
   inline bool ECLShower::hasDeadCrystal() const
   {
-    return hasStatus(c_HasDeadCrystal);
+    return hasStatus(c_hasDeadCrystal);
   }
 
   inline bool ECLShower::hasProblematicCrystal() const
   {
-    return hasStatus(c_HasProblematicCrystal);
+    return hasStatus(c_hasProblematicCrystal);
   }
 
 

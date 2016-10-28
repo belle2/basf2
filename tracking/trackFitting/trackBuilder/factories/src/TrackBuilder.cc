@@ -26,7 +26,7 @@
 
 using namespace Belle2;
 
-bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
+bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP)
 {
 
   StoreArray<Track> tracks(m_trackColName);
@@ -54,7 +54,11 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
     // Extrapolate the tracks to the perigee.
     genfit::MeasuredStateOnPlane msop;
     try {
-      msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+      if (useClosestHitToIP) {
+        msop = recoTrack.getMeasuredStateOnPlaneClosestTo(TVector3(0, 0, 0), trackRep);
+      } else {
+        msop = recoTrack.getMeasuredStateOnPlaneFromFirstHit(trackRep);
+      }
     } catch (genfit::Exception& exception) {
       B2WARNING(exception.what());
       continue;
@@ -64,6 +68,7 @@ bool TrackBuilder::storeTrackFromRecoTrack(RecoTrack& recoTrack)
       msop.extrapolateToLine(m_beamSpot, m_beamAxis);
     } catch (...) {
       B2WARNING("Could not extrapolate the fit result to the perigee point. Why, I don't know.");
+      continue;
     }
 
     // Build track fit result.

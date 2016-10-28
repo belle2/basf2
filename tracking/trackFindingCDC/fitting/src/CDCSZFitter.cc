@@ -11,7 +11,6 @@
 
 #include <Eigen/Dense>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -147,7 +146,7 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   const CDCStereoRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
   const CDCAxialRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
 
-  if (not ptrStereoSegment or not ptrAxialSegment) return;
+  if ((not ptrStereoSegment) or (not ptrAxialSegment)) return;
 
   const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
   const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;

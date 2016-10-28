@@ -17,4 +17,8 @@ env['LIBS'] = [
     'TMVA',
     ]
 
+# option = os.environ['BELLE2_OPTION']
+# if option == "clang":
+#     env.Append(CCFLAGS=['-Wdocumentation'])
+
 Return('env')

@@ -2,60 +2,50 @@
 <Detector desc="Parameters of detector plane and detector module" xmlns:xi="http://www.w3.org/2001/XInclude">
   <xi:include href="ARICH-Hapd.xml"/>
   <Plane> 
-    <zPosition desc="Z position of detector plane (beginning)" unit="mm">1870</zPosition>
-    <tubeOuterRadius desc="Outer radius of detector tube" unit="mm">1135</tubeOuterRadius>
-    <tubeInnerRadius desc="Inner radius of detector tube" unit="mm">500</tubeInnerRadius>    
+    <zPosition desc="Z position of detector plane (HAPD window z position)" unit="mm">201.5</zPosition>
+    <nSegments desc="number of detector segments">6</nSegments>
     <Rings>
       <Ring id="1">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">36</dR>
+	<r desc="radius of ring (center of HAPD)" unit="mm">573.5</r>
+	<nModules desc="number of module in ring" unit="mm">42</nModules>
       </Ring>
-      <Ring id="2">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">8.1</dR>
+       <Ring id="2">
+	 <r desc="radius of ring (center of HAPD)" unit="mm">658.1</r>
+         <nModules desc="number of module in ring" unit="mm">48</nModules>
+       </Ring>       
+       <Ring id="3">
+         <r desc="radius of ring (center of HAPD)" unit="mm">743.7</r>
+         <nModules desc="number of module in ring" unit="mm">54</nModules>
+       </Ring>
+       <Ring id="4">
+         <r desc="radius of ring (center of HAPD)" unit="mm">828.68</r>
+        <nModules desc="number of module in ring" unit="mm">60</nModules>
       </Ring>
-      <Ring id="3">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">9.26</dR>
-      </Ring>
-      <Ring id="4">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">8.8</dR>
-      </Ring>
-      <Ring id="5">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">8.28</dR>
-      </Ring>
-      <Ring id="6">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">8.9</dR>
-      </Ring>
-      <Ring id="7">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">8.0</dR>
-      </Ring>
-      <!--Ring id="8">
-	<nSegments desc="number of detector segments">6</nSegments>
-	<dFi desc="minimal distance between modules in fi direction" unit="mm">5</dFi>
-	<dR desc="minimal distance between modules in r direction" unit="mm">1.5</dR>
-      </Ring-->
+       <Ring id="5">
+         <r desc="radius of ring (center of HAPD)" unit="mm">913.05</r>
+         <nModules desc="number of module in ring" unit="mm">66</nModules>
+       </Ring>
+       <Ring id="6">
+         <r desc="radius of ring (center of HAPD)" unit="mm">997.94</r>
+         <nModules desc="number of module in ring" unit="mm">72</nModules>
+       </Ring>
+       <Ring id="7">
+         <r desc="radius of ring (center of HAPD)" unit="mm">1081.85</r>
+         <nModules desc="number of module in ring" unit="mm">78</nModules>
+       </Ring>
     </Rings>
   </Plane>
   
-  <SupportPlate>
-    <material desc="Material of detectors support plate">Al</material>
-    <thickness desc="The tickness of detectors support plate" unit="mm">4</thickness>
-    <outerRadius desc="Outer radius of detectors support plate" unit="mm">1135</outerRadius>
-    <innerRadius desc="Inner radius of detectors support plate" unit="mm">440</innerRadius>
-    <holeXSize desc="X size of the rectangular hole in support plate behind each module (for cables)" unit="mm">60</holeXSize>
-    <holeYSize desc="Y size of the rectangular hole in support plate behind each module (for cables)" unit="mm">60</holeYSize>
-  </SupportPlate>
-  
+  <supportPlate>
+    <outerRadius desc="Outer radius of support plate" unit="mm">1132</outerRadius>
+    <innerRadius desc="Inner radius of support plate" unit="mm">435</innerRadius>    
+    <thickness desc="thickness of support plate" unit="mm">2</thickness>    
+    <zPosition desc="zPosition of support plate (start in Z)" unit="mm">236.0</zPosition>    
+    <moduleHoleSize desc="module hole size in aluminum plate" unit="mm">69.0</moduleHoleSize>    
+    <material desc="material of support plate">Al</material>
+    <backWallHeight desc="height of the back (electronics side) walls between slots" unit="mm">20</backWallHeight>    
+    <backWallThickness desc="thickness of the back (electronics side) walls between slots" unit="mm">2</backWallThickness>    
+  </supportPlate>
+
+
 </Detector>

@@ -19,7 +19,8 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /** Const expression that can compare two string at compile time
+    /**
+     *  Const expression that can compare two string at compile time
      *
      *  @param s1    One string
      *  @param s2    Other string
@@ -31,7 +32,8 @@ namespace Belle2 {
       return (not * s1 and not * s2) or (*s1 and * s2 and * s1 == *s2 and strequal(s1 + 1, s2 + 1));
     }
 
-    /** Const expression that can search through an array of string at compile time and find the
+    /**
+     *  Const expression that can search through an array of string at compile time and find the
      *  index of the string.
      *
      *  @param names   An array of cstrings
@@ -51,10 +53,11 @@ namespace Belle2 {
               strequal(names[iName], name) ? iName : index(names, name, iName + 1));
     }
 
-    /** Const expression that can search through an array of string at compile time and find the
+    /**
+     *  Const expression that can search through an array of string at compile time and find the
      *  index of the string.
      *
-     *  @param names   An array of cstrings
+     *  @param getName An array of cstrings
      *  @param name    The sought string
      *  @param iName   Optional index at which the search should begin.
      *  @return        The index at which the string was found.
@@ -72,22 +75,30 @@ namespace Belle2 {
     }
 
     // *INDENT-OFF*
-    /** Const expression that gives the length of an array.
-     *  @param         A C-array
-     *  @return        The length of the array
+    /**
+     *  Const expression that gives the length of an array.
+     *  @tparam T        Type contained in the  array
+     *  @tparam N        Length of the array
+     *  @param array    Array from which the length should be taken.
+     *  @return          The length of the array
      */
+    template<class T, size_t N>
+    constexpr
+    size_t size(T (&array)[N]);
+
     template<class T, size_t N>
     constexpr
     size_t size(T (&)[N]) { return N; }
     // *INDENT-ON*
 
-    /** Generic class that contains a fixed number of named float values.
+    /**
+     *  Generic class that contains a fixed number of named float values.
      *  This object template provides the memory and the names of the float values.
      *
-     *  As a template parameter it takes class with two containing parameters.
-     *  nNames - Number of parts that will be peeled from the complex object.
-     *  names - Array of names which contain the nNames names of the float values.
-     **/
+     *  @tparam ANames Class with two contained parameters:
+     *  @args@c nNames Number of parts that will be peeled from the complex object.
+     *  @args@c names  Array of names which contain the nNames names of the float values.
+     */
     template<class ANames>
     class FixedSizeNamedFloatTuple : public NamedFloatTuple {
 
@@ -96,7 +107,8 @@ namespace Belle2 {
       static const size_t nNames = ANames::nNames;
 
     protected:
-      /** Static getter for the index from the name.
+      /**
+       *  Static getter for the index from the name.
        *  Looks through the associated names and returns the right index if found
        *  Returns nNames (one after the last element) if not found.
        *
@@ -118,11 +130,12 @@ namespace Belle2 {
         return ANames::nNames;
       }
 
-      /** Getter for the index from a name.
+      /**
+       *  Getter for the index from a name.
        *  Looks through the associated names and returns the right index if found.
        *  Returns size() (one after the last element) if not found.
        *
-       *  @param partName   Name of the sought part
+       *  @param name       Name of the sought part
        *  @return           Index of the name, nParts if not found.
        */
       virtual int getNameIndex(const char* const name) const override final
@@ -215,6 +228,6 @@ namespace Belle2 {
       /// Memory for nNames floating point values.
       Float_t m_values[nNames] = {};
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    }; // class
+  } // namespace TrackFindingCDC
+} // namespace Belle2

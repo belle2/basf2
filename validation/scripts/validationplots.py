@@ -274,8 +274,9 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
     # Open the output file
     # First: Create destination directory if it does not yet exist
-    content_dir = './plots/{0}'.format('_'.join(sorted(
-        list_of_revisions)))
+    content_dir = validationpath.get_html_plots_tag_comparison_folder(work_folder, list_of_revisions)
+    comparison_json_file = validationpath.get_html_plots_tag_comparison_json(work_folder, list_of_revisions)
+
     if not os.path.exists(content_dir):
         os.makedirs(content_dir)
 
@@ -396,7 +397,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
         # Make the command line output more readable
         print(2 * '\n')
 
-    print("storing to " + '{0}/comparison.json'.format(content_dir))
+    print("storing to {}".format(comparison_json_file))
 
     # create objects for all revisions
     comparison_revs = []
@@ -414,7 +415,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
 
     # todo: refactor this information extracion -> json inside a specific class / method after the
     # plots have been created
-    json_objects.dump(os.path.join(content_dir, "comparison.json"), json_objects.Comparison(comparison_revs, comparison_packages))
+    json_objects.dump(comparison_json_file, json_objects.Comparison(comparison_revs, comparison_packages))
 
 
 def create_RootObjects_from_list(list_of_root_files, is_reference, work_folder):
@@ -814,8 +815,7 @@ def create_plots(revisions=None, force=False, process_queue=None, work_folder=".
     # generated before or not. In the path we use the alphabetical order of the
     # revisions, not the chronological one
     # (easier to work with on the web server side)
-    expected_path = './plots/{0}/revision.json'.format(
-        '_'.join(sorted(list_of_revisions)))
+    expected_path = validationpath.get_html_plots_tag_comparison_json(work_folder, list_of_revisions)
 
     # If the path exists and we don't want to force the regeneration of plots,
     # serve what's in the archive

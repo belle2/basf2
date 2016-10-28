@@ -36,9 +36,9 @@ namespace Belle2 {
     public:
       /**
        *  Applies the cellular automaton to the collection of cells and its neighborhood
-       *  @param cellHolderRange The range based iterable containing the cells.
-       *  @param neighborhood The weighted neighborhood of type WeightedNeighborhood<ACellHolder>
-       *  @return The cell holder with the highest cell state found.
+       *  @param cellHolders             The range based iterable containing the cells.
+       *  @param cellHolderNeighborhood  The weighted neighborhood between the cells.
+       *  @return                        The cell holder with the highest cell state found.
        */
       template<class ACellHolderRange>
       ACellHolder* applyTo(ACellHolderRange& cellHolders,

@@ -106,8 +106,9 @@ The file contains a list of bad wires.
 
 Format: layerID (0-55), wireID(0-)
 
-* badwire_sample.dat: Just a sample file.
+* badwire_sample.dat: Just a sample file. <- obsolete
 * badwire_off.dat   : Empty file; the file for turning-off badwire effect.
+* badwire_v1.dat    : contains bad wires known as of Oct.21 2016.
 
 
 
@@ -156,6 +157,7 @@ Only apply to sense wire positions.
 
 Format: layerID (0-55), wireID (0-), displacement (dx,dy,dz) of sense wire at backward end-plate [cm], ibid. at forward end-plate [cm]
 
-* deisplacement.dat:  obsolete
-* deisplacement_v1.dat: tensions added
+* deisplacement.dat:  <- obsolete
+* deisplacement_v1.dat: tensions added <- obsolete
+* deisplacement_v1.1.dat: add corrections for the longer outer wall (by 430um w.r.t. design)
 

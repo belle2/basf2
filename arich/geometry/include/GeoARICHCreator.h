@@ -3,7 +3,7 @@
  * Copyright(C) 2010 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Luka Santelj, Rok Pestotnik                              *
+ * Contributors: Luka Santelj                                             *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -12,28 +12,48 @@
 #define GEOARICHCREATOR_H
 
 #include <geometry/CreatorBase.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+#include <arich/dbobjects/ARICHModulesInfo.h>
 
+#include <G4AssemblyVolume.hh>
 
 class G4LogicalVolume;
 class G4Material;
 
 namespace Belle2 {
+
+  class GearDir;
+
   namespace arich {
 
     class SensitiveDetector;
     class SensitiveAero;
 
-    /** The creator for the PXD geometry of the Belle II detector.   */
+    /** The creator for the ARICH geometry of the Belle II detector.   */
     class GeoARICHCreator : public geometry::CreatorBase {
+
+    private:
+
+      /** Reads ARICH geometry parameters from the xml files and createst DB class ARICHGeometryConfig */
+      ARICHGeometryConfig createConfiguration(const GearDir& param)
+      {
+        ARICHGeometryConfig arichGeometryConfig(param);
+        return arichGeometryConfig;
+      }
+
+      /** Create detector geometry */
+      void createGeometry(G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
     public:
 
-      /** Constructor of the GeoPXDCreator class. */
+      /** Constructor of the GeoARICHCreator class. */
       GeoARICHCreator();
 
-      /** The destructor of the GeoPXDCreator class. */
+      /** The destructor of the GeoARICHreator class. */
       virtual ~GeoARICHCreator();
 
       /**
@@ -42,29 +62,75 @@ namespace Belle2 {
        *                description, which should to be used to create the ROOT
        *                objects.
        */
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        m_config = createConfiguration(content);
 
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+        // override geometry configuration from the DB
+        DBStore::Instance().addConstantOverride("dbstore", "ARICHGeometryConfig", new ARICHGeometryConfig(m_config));
+
+        createGeometry(topVolume, type);
+      }
+
+      /** creates DB payload for ARICHGeometryConfig class */
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override
+      {
+        DBImportObjPtr<ARICHGeometryConfig> importObj;
+        importObj.construct(createConfiguration(content));
+        importObj.import(iov);
+      }
+
+      /** Create the geometry from the Database */
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override
+      {
+        DBObjPtr<ARICHGeometryConfig> dbObj;
+        if (!dbObj) {
+          // Check that we found the object and if not report the problem
+          B2FATAL("No configuration for " << name << " found.");
+        }
+        m_config = *dbObj;
+        createGeometry(topVolume, type);
+      }
+
+    private:
 
       //! build the HAPD modules
-      G4LogicalVolume* buildModule(GearDir Module);
-      //! build PCB of the modules
-      G4LogicalVolume* buildModulePCB(GearDir Module);
-      //! build the support plate of the module s
-      G4LogicalVolume* buildModuleSupportPlate(GearDir Support);
-      //! build mirrors
-      G4LogicalVolume* buildMirrors(GearDir Mirrors);
-      //! get average refractive index of the material
-      double getAvgRINDEX(G4Material* material);
-      //! creates simple geometry
-      void createSimple(const GearDir& content, G4LogicalVolume& topVolume);
+      G4LogicalVolume* buildHAPD(const ARICHGeoHAPD& hapdPar);
 
-    protected:
+      //! build mirrors
+      G4LogicalVolume* buildMirror(const ARICHGeometryConfig& detectorGeo);
+
+      //! build detector plane
+      G4LogicalVolume* buildDetectorPlane(const ARICHGeometryConfig& detectorGeo);
+
+      //! build aerogel plane
+      G4LogicalVolume* buildAerogelPlane(const ARICHGeometryConfig& detectorGeo);
+
+      //! build simple aerogel plane (for cosmic test)
+      G4LogicalVolume* buildSimpleAerogelPlane(const ARICHGeometryConfig& detectorGeo);
+
+      //! build detector support plate
+      G4LogicalVolume* buildDetectorSupportPlate(const ARICHGeometryConfig& detectorGeo);
+
+      //! build joints of the ARICH support structure
+      G4AssemblyVolume* makeJoint(G4Material* supportMaterial, const std::vector<double>& pars);
+
+      //! get refractive index of the material
+      double getAvgRINDEX(G4Material* material);
+
+      //! geometry configuration
+      ARICHGeometryConfig m_config;
+
       //! pointer to sensitive detector
       SensitiveDetector* m_sensitive;
+
       //! pointer to sensitive aerogel - used instead of tracking
       SensitiveAero* m_sensitiveAero;
+
       //! flag the beam background study
-      int isBeamBkgStudy;
+      int m_isBeamBkgStudy;
+
+      DBObjPtr<ARICHModulesInfo> m_modInfo; /**< information on installed modules from the DB */
     };
 
   }

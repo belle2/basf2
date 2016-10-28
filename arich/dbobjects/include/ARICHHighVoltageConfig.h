@@ -11,7 +11,6 @@
 #pragma once
 #include <TObject.h>
 #include <TTimeStamp.h>
-#include <string>
 #include <arich/dbobjects/ARICHCableInfo.h>
 
 namespace Belle2 {

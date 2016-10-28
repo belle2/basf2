@@ -17,7 +17,6 @@
 // is expanded as the function "static const std::string name(void)" which returns the string value of Y
 #define PUT_NAME_FUNCTION(Y) static const std::string name(void) {return STRING_NAME(Y); };
 
-
 #include <string>
 #include <typeinfo>
 #include <TBranch.h>
@@ -71,68 +70,8 @@ namespace Belle2 {
      *
      * N.B. this method must be static.
      */
-    //inline static variableType
-    //value(const templateArgumentType& arg1, const templateArgumentType& arg2);
-
-    /** Returns the name of the selection variable.
-     *
-     * The name of the selection variable is the name of the C++ object
-     * derived from SelectionVariable.
-     * E.g.:
-     \code
-    #include "tracking/trackFindingVXD/filterTools/SelectionVariable.hh"
-    //...
-
-    class Difference: public SelectionVariable< int, int >
-    {
-      static int
-      value( const int & arg1, const int & arg2 ){
-    return arg1 + arg2;
-      };
-
-      Difference() {};
-      ~Difference() {};
-    };
-    //...
-    Difference someFilter();
-    cout << someFilter.name() << endl;
-    //...
-    \endcode
-
-     * will produce the output:
-     " "Difference"
-     * In principle the method can be overriden by the derived class,
-     * but the persistency mechanism rely on name unicity, so why would
-     * you like to write an external name manager?
-     */
-
-    /*
-    const std::string name(void) const
-    {
-      char* realname(NULL);
-      int status(0);
-      realname = abi::__cxa_demangle(typeid(*this).name(), 0, 0, &status);
-      std::string name(realname);
-      free(realname);
-      boost::regex colon("(:)");      // matches ":" because root does not like it
-      // we are going to substitute ':' with'_'
-      auto name1 = boost::regex_replace(name, colon, std::string("_"));
-      boost::regex lesser("(<)");     // matches "<" because root does not like it
-      // we are going to substitute '<' with '{'
-      auto name2 = boost::regex_replace(name1, lesser, std::string("{"));
-
-      boost::regex greater("(> )");   // matches "> " because root does not like it
-      // we are going to substitute '> ' with '}'
-      auto name3 = boost::regex_replace(name2, greater, std::string("}"));
-
-      boost::regex greater2("(>)");   // matches ">" because root does not like it
-      // we are going to substitute '>' with '}'
-      auto name4 = boost::regex_replace(name3, greater2, std::string("}"));
-
-      return name4;
-
-    }
-    */
+    inline static variableType
+    value(const templateArgumentType& arg1, const templateArgumentType& arg2);
 
     /** A bogus virtual denstructor */
     virtual ~SelectionVariable() {};
@@ -141,6 +80,16 @@ namespace Belle2 {
     SelectionVariable() {};
 
   };
+
+#define SELECTION_VARIABLE( variableName, argumentType, implementation ) \
+  class variableName:             \
+    public SelectionVariable< argumentType , double >     \
+  {                 \
+  public:               \
+    static const std::string name(void) {return #variableName; };   \
+    implementation              \
+  };                  \
+
 
 }
 

@@ -9,10 +9,12 @@
  **************************************************************************/
 
 #include <framework/logging/Logger.h>
+#include <framework/gearbox/GearDir.h>
 #include <geometry/utilities.h>
 #include <geometry/GeometryManager.h>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/tuple/tuple.hpp>
 
 #include <G4Colour.hh>
 #include <G4LogicalVolume.hh>

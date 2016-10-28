@@ -273,7 +273,7 @@ void ECLBackgroundModule::event()
     ECLSimHit* aECLHit = eclArray[i];
     m_cellID  = aECLHit->getCellId() - 1; //cell ID
     edep      = aECLHit->getEnergyDep();  //energy deposited
-    hitPosn   = aECLHit->getPosition();   //position of hit
+    G4ThreeVector hitPosn   = aECLHit->getPosition();   //position of hit
     pid       = aECLHit->getPDGCode();
     Mass      = Crystal[m_cellID]->GetMass();
     m_thetaID = Crystal[m_cellID]->GetThetaID();
@@ -315,7 +315,7 @@ void ECLBackgroundModule::event()
     }
 
     //location of the hit
-    h_HitLocations->Fill(hitPosn.Z(), sqrt(hitPosn.X() * hitPosn.X() + hitPosn.Y() * hitPosn.Y()));
+    h_HitLocations->Fill(hitPosn.z(), hitPosn.perp());
 
   }
 

@@ -194,33 +194,33 @@ for method in methods:
 
     # filling the histograms
 
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0', 'B0_qrMC>0')
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0Bar', 'B0_qrMC<0')
-    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_NoCut', 'B0_qrMC!=0')
+    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0', 'B0_qrMC == 1')
+    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0Bar', 'B0_qrMC == -1')
+    tree.Draw('B0_' + method + '_qrCombined>>BellePlot_NoCut', 'abs(B0_qrMC) == 1')
 
-    tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0', 'B0_qrMC>0')
-    tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0Bar', 'B0_qrMC<0')
+    tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0', 'B0_qrMC == 1')
+    tree.Draw('B0_' + method + '_qrCombined>>Calibration_B0Bar', 'B0_qrMC == -1')
 
     # filling histograms wrong efficiency calculation
     tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m0',
-              'B0_qrMC>0 && B0_' + method + '_qrCombined>0')
+              'B0_qrMC == 1 && B0_' + method + '_qrCombined>0')
     tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m1',
-              'B0_qrMC>0 && B0_' + method + '_qrCombined<0')
+              'B0_qrMC == 1 && B0_' + method + '_qrCombined<0')
     tree.Draw('B0_' + method + '_qrCombined>>BellePlot_B0_m2',
-              'B0_qrMC<0 && B0_' + method + '_qrCombined>0 ')
+              'B0_qrMC == -1 && B0_' + method + '_qrCombined>0 ')
 
     # filling with abs(qr) in one of 6 bins with its weight
     # separate calculation for B0 and B0bar
 
     tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)',
                  'abs(B0_' + method + '_qrCombined)')
-    tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC>0)')
-    tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC<0)')
+    tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==1)')
+    tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==-1)')
 
     # filling with abs(qr) in one of 6 bins
-    tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC!=0')
-    tree.Project('entries_per_binB0', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC>0')
-    tree.Project('entries_per_binB0bar', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC<0')
+    tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_qrMC) == 1')
+    tree.Project('entries_per_binB0', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC == 1')
+    tree.Project('entries_per_binB0bar', 'abs(B0_' + method + '_qrCombined)', 'B0_qrMC == -1')
 
     # producing the average r histograms
     histo_avr_r.Divide(histo_entries_per_bin)
@@ -522,13 +522,13 @@ for (particleList, category, combinerVariable) in eventLevelParticleLists:
     tree.Draw('B0_qr' + category + '>>All_' + category, 'B0_qrMC!=0')
     hist_calib_B0 = ROOT.TH1F('Calib_B0_' + category, 'Calibration Plot for true B0' +
                               category + ' (binning 50)', 50, 0.0, 1.0)
-    tree.Draw('B0_qr' + category + '>>Calib_B0_' + category, 'B0_qrMC>0')
+    tree.Draw('B0_qr' + category + '>>Calib_B0_' + category, 'B0_qrMC == 1.0')
     hist_calib_B0.Divide(hist_all)
 
     # fill signal
-    tree.Draw('B0_qr' + category + '>>Signal_' + category, 'B0_qrMC>0')
+    tree.Draw('B0_qr' + category + '>>Signal_' + category, 'B0_qrMC == 1.0')
     # fill background
-    tree.Draw('B0_qr' + category + '>>Background_' + category, 'B0_qrMC<0'
+    tree.Draw('B0_qr' + category + '>>Background_' + category, 'B0_qrMC == -1.0'
               )
 
     # ****** produce the input plots from combiner level ******

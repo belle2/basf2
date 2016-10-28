@@ -14,6 +14,7 @@
 #include <string>
 #include <cmath>
 #include <vector>
+#include <utility>
 #include <TTimeStamp.h>
 #include <TH2F.h>
 #include <TH3F.h>
@@ -33,19 +34,24 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHFebTest(): m_serial(0), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0), m_v2n(0.0), m_vss(0.0),
-      m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_timeLV(), m_currentV20p(0.0), m_currentV21n(0.0),
-      m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL), m_offsetRough(NULL), m_offsetFine(NULL),
-      m_slopesRough(), m_slopesFine() {};
+    ARICHFebTest(): m_serial(0), m_dna(""), m_runSlowC(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
+      m_v2n(0.0), m_vss(0.0),
+      m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_runLV(""), m_timeLV(), m_currentV20p(0.0),
+      m_currentV21n(0.0),
+      m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL), m_offsetRough(NULL),
+      m_offsetFine(NULL),
+      m_slopesRough(), m_slopesFine(), m_fwhm(), m_comment("") {};
 
 
     /**
      * Constructor
      */
-    explicit ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0), m_vdd(0.0), m_v2p(0.0),
-      m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_timeLV(),
-      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_timeHV(), m_currentV99p(0.0), m_deadChannel(), m_testPulse(NULL),
-      m_offsetRough(NULL), m_offsetFine(NULL), m_slopesRough(), m_slopesFine() {};
+    explicit ARICHFebTest(int serial): m_serial(serial), m_dna(""), m_runSlowC(""), m_timeSlowC(), m_tmon0(0.0), m_tmon1(0.0),
+      m_vdd(0.0), m_v2p(0.0),
+      m_v2n(0.0), m_vss(0.0), m_vth1(0.0), m_vth2(0.0), m_vcc12(0.0), m_vcc15(0.0), m_vcc25(0.0), m_v38p(0.0), m_runLV(""), m_timeLV(),
+      m_currentV20p(0.0), m_currentV21n(0.0), m_currentV38p(0.0), m_runHV(""), m_timeHV(), m_currentV99p(0.0), m_deadChannel(),
+      m_testPulse(NULL),
+      m_offsetRough(NULL), m_offsetFine(NULL), m_slopesRough(), m_slopesFine(), m_fwhm(), m_comment("") {};
 
     /**
      * Destructor
@@ -66,13 +72,22 @@ namespace Belle2 {
     /** Return FEB dna number
      * @return FEB dna number
      */
-
     std::string getFebDna() const {return m_dna; }
+
+    /** Set slow control run number
+     * @param slow control run number
+     */
+    void setRunSlowC(const std::string& runSlowC) {m_runSlowC = runSlowC; }
+
+    /** Return slow control number
+     * @return slow control number
+     */
+    std::string getRunSlowC() const {return m_runSlowC; }
 
     /** Set FEB dna number
      * @param FEB dna number
      */
-    void setFebDna(std::string& dna) {m_dna = dna; }
+    void setFebDna(const std::string& dna) {m_dna = dna; }
 
     /** Return Test date (slow control measurement)
      * @return Test date (slow control measurement)
@@ -204,6 +219,16 @@ namespace Belle2 {
      */
     void setV38p(float v38p) {m_v38p = v38p; }
 
+    /** Set LV test run number
+     * @param LV test run number
+     */
+    void setRunLV(const std::string& runLV) {m_runLV = runLV; }
+
+    /** Return LV test number
+     * @return LV test number
+     */
+    std::string getRunLV() const {return m_runLV; }
+
     /** Return Test date (LV test)
      * @return Test date (LV test)
      */
@@ -243,6 +268,16 @@ namespace Belle2 {
      * @param current at voltage (+3.8) V
      */
     void setCurrentV38p(float currentV38p) {m_currentV38p = currentV38p; }
+
+    /** Set HV test run number
+     * @param HV test run number
+     */
+    void setRunHV(const std::string& runHV) {m_runHV = runHV; }
+
+    /** Return HV test number
+     * @return HV test number
+     */
+    std::string getRunHV() const {return m_runHV; }
 
     /** Return Test date (HV test)
      * @return Test date (HV test)
@@ -375,37 +410,90 @@ namespace Belle2 {
      */
     int getSlopesFineSize() const {return m_slopesFine.size();}
 
+    /**
+     * Return FWHM value&sigma for i-th channel
+     * @param i FEB channel number
+     * @return FWHM values&sigma
+     */
+    std::pair<float, float> getFWHM(unsigned int i) const;
+
+    /**
+     * Add FWHM value&sigma for i-th channel
+     * @param FWHM value&sigma
+     */
+    void appendFWHM(std::pair<float, float> fwhm) {m_fwhm.push_back(fwhm); }
+
+    /**
+     * Set vector of FWHM values&sigma
+     * @param vector of FWHM values&sigma
+     */
+    void setFWHM(std::vector<std::pair<float, float>> fwhm) {m_fwhm = fwhm; }
+
+    /**
+     * Return size of the list of FWHM
+     * @return size
+     */
+    int getFWHMSize() const {return m_fwhm.size();}
+
+    /**
+     * Return FWHM value for i-th channel
+     * @param i FEB channel number
+     * @return FWHM value
+     */
+    float getFWHMvalue(unsigned int i) const;
+
+    /**
+     * Return FWHM sigma for i-th channel
+     * @param i FEB channel number
+     * @return FWHM sigma
+     */
+    float getFWHMsigma(unsigned int i) const;
+
+    /** Set comment
+     * @param comment
+     */
+    void setComment(const std::string& comment) {m_comment = comment; }
+
+    /** Return comment
+     * @return comment
+     */
+    std::string getComment() const {return m_comment; }
 
   private:
 
-    int m_serial;             /**< FEB serial number */
-    std::string m_dna;        /**< FEB dna */
-    TTimeStamp m_timeSlowC;   /**< Test Date of FEB slow control measurements */
-    float m_tmon0;            /**< Temperature 0 */
-    float m_tmon1;            /**< Temperature 1 */
-    float m_vdd;              /**< Voltage - positive supply voltage */
-    float m_v2p;              /**< Voltage - (+2.0) V */
-    float m_v2n;              /**< Voltage - (-2.0) V */
-    float m_vss;              /**< Voltage - negative supply voltage */
-    float m_vth1;             /**< Voltage - threshold voltage 1 */
-    float m_vth2;             /**< Voltage - threshold voltage 2 */
-    float m_vcc12;            /**< Voltage - supply voltage 1.2 V */
-    float m_vcc15;            /**< Voltage - supply voltage 1.5 V */
-    float m_vcc25;            /**< Voltage - supply voltage 2.5 V */
-    float m_v38p;             /**< Voltage - (+3.8) V */
-    TTimeStamp m_timeLV;      /**< Test Date of FEB low voltage test */
-    float m_currentV20p;      /**< Current at 2.0 V */
-    float m_currentV21n;      /**< Current at -2.1 V */
-    float m_currentV38p;      /**< Current at 3.8 V */
-    TTimeStamp m_timeHV;      /**< Test Date of FEB high voltage test */
-    float m_currentV99p;      /**< Current at 99 V */
-    std::vector<int> m_deadChannel;    /**< List of dead channels on the FEB */
-    TH2F* m_testPulse;        /**< Test pulse scan */
-    TH3F* m_offsetRough;      /**< Threshold scans with rough offset settings */
-    TH3F* m_offsetFine;       /**< Threshold scans with fine offset settings */
-    std::vector<float> m_slopesRough;  /**< Slopes for each channel (rough settings) [mV/step] */
-    std::vector<float> m_slopesFine;   /**< Slopes for each channel (fine settings) [mV/step] */
+    int m_serial;                    /**< FEB serial number */
+    std::string m_dna;               /**< FEB dna */
+    std::string m_runSlowC;          /**< Run number of FEB slow control measurements */
+    TTimeStamp m_timeSlowC;          /**< Test Date of FEB slow control measurements */
+    float m_tmon0;                   /**< Temperature 0 */
+    float m_tmon1;                   /**< Temperature 1 */
+    float m_vdd;                     /**< Voltage - positive supply voltage */
+    float m_v2p;                     /**< Voltage - (+2.0) V */
+    float m_v2n;                     /**< Voltage - (-2.0) V */
+    float m_vss;                     /**< Voltage - negative supply voltage */
+    float m_vth1;                    /**< Voltage - threshold voltage 1 */
+    float m_vth2;                    /**< Voltage - threshold voltage 2 */
+    float m_vcc12;                   /**< Voltage - supply voltage 1.2 V */
+    float m_vcc15;                   /**< Voltage - supply voltage 1.5 V */
+    float m_vcc25;                   /**< Voltage - supply voltage 2.5 V */
+    float m_v38p;                    /**< Voltage - (+3.8) V */
+    std::string m_runLV;             /**< Run number of FEB low voltage test */
+    TTimeStamp m_timeLV;             /**< Test Date of FEB low voltage test */
+    float m_currentV20p;             /**< Current at 2.0 V */
+    float m_currentV21n;             /**< Current at -2.1 V */
+    float m_currentV38p;             /**< Current at 3.8 V */
+    std::string m_runHV;             /**< Run number of FEB high voltage test */
+    TTimeStamp m_timeHV;             /**< Test Date of FEB high voltage test */
+    float m_currentV99p;             /**< Current at 99 V */
+    std::vector<int> m_deadChannel;  /**< List of dead channels on the FEB */
+    TH2F* m_testPulse;               /**< Test pulse scan */
+    TH3F* m_offsetRough;             /**< Threshold scans with rough offset settings */
+    TH3F* m_offsetFine;              /**< Threshold scans with fine offset settings */
+    std::vector<float> m_slopesRough;           /**< Slopes for each channel (rough settings) [mV/step] */
+    std::vector<float> m_slopesFine;            /**< Slopes for each channel (fine settings) [mV/step] */
+    std::vector<std::pair<float, float>> m_fwhm; /**< FWHM and sigma for each channel */
+    std::string m_comment;           /**< Optional comment */
 
-    ClassDef(ARICHFebTest, 1);  /**< ClassDef */
+    ClassDef(ARICHFebTest, 2);  /**< ClassDef */
   };
 } // end namespace Belle2

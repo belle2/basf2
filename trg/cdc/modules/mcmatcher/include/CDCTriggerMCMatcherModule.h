@@ -32,6 +32,8 @@ namespace Belle2 {
     int m_minAxial;
     /** minimum number of stereo hits to consider a MCParticle as trackable */
     int m_minStereo;
+    /** switch for 2D matching */
+    bool m_axialOnly;
     /** minimum purity */
     double m_minPurity;
     /** minimum efficiency */

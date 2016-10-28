@@ -166,21 +166,21 @@ void QcsmonitorStudyModule::event()
   for (int i = 0; i < nSimHits; i++) {
     QcsmonitorSimHit* aHit = SimHits[i];
     int detNB = aHit->getCellId();
-    if (detNB < 8) {
-      //int trkID = aHit->getTrackId();
-      int pdg = aHit->getPDGCode();
-      double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
-      double tof = aHit->getFlightTime(); //ns
+    //if (detNB < 8) {
+    //int trkID = aHit->getTrackId();
+    int pdg = aHit->getPDGCode();
+    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+    double tof = aHit->getFlightTime(); //ns
 
-      h_qcss_Evtof1[detNB]->Fill(tof, Edep);
-      if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
-      else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
-      else h_qcss_Evtof4[detNB]->Fill(tof, Edep);
-      if (Edep > m_Ethres) {
-        h_qcss_edep[detNB]->Fill(Edep);
-        h_Wqcss_edep[detNB]->Fill(Edep, rate);
-      }
+    h_qcss_Evtof1[detNB]->Fill(tof, Edep);
+    if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
+    else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
+    else h_qcss_Evtof4[detNB]->Fill(tof, Edep);
+    if (Edep > m_Ethres) {
+      h_qcss_edep[detNB]->Fill(Edep);
+      h_Wqcss_edep[detNB]->Fill(Edep, rate);
     }
+    //}
   }
 
   for (const auto& Hit : Hits) {

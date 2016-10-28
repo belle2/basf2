@@ -71,18 +71,8 @@ add_simulation(main, components)
 # add_simulation(main, components, bkgfiles=glob.glob('/sw/belle2/bkg/ARICH*.root'))
 
 # Add reconstruction
-components_nr = ['CDC', 'PXD', 'SVD']
+components_nr = ['CDC', 'PXD', 'SVD', 'ARICH']
 add_mc_reconstruction(main, components_nr)
-
-# Add track extrapolation module
-# ext = register_module('Ext')
-# main.add_module(ext)
-
-# Add ARICH reconstruction module
-arichRECO = register_module('ARICHReconstructor')
-arichRECO.logging.log_level = LogLevel.DEBUG
-arichRECO.logging.debug_level = 20
-main.add_module(arichRECO)
 
 # Add module fpr ARICH efficiency analysis
 arichEfficiency = register_module('ARICHNtuple')

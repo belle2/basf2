@@ -38,14 +38,14 @@
     <sigmaFileName desc="file which contains space resol.">sigma_v1.dat</sigmaFileName>
     <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
     <t0FileName desc="file which contains t0">t0.dat</t0FileName>
-    <bwFileName desc="file which contains bad-wire">badwire_off.dat</bwFileName>
+    <bwFileName desc="file which contains bad-wire">badwire_v1.dat</bwFileName>
     <!-- <bwFileName desc="file which contains bad-wire">badwire_sample.dat</bwFileName> -->
     <twFileName desc="file which contains time-walk">tw_off.dat</twFileName>
     <chmapFileName desc="file which contains channel map">ch_map.dat</chmapFileName>
 
     <!-- For displacement -->
     <Displacement desc="true: load displacements for sense wires; false: not.">true</Displacement>
-    <displacementFileName desc="file which contains displacement params.">displacement_v1.dat</displacementFileName>
+    <displacementFileName desc="file which contains displacement params.">displacement_v1.1.dat</displacementFileName>
 
     <!-- For misalignment -->
     <Misalignment desc="true: load misalignments for sense wires; false: not.">true</Misalignment>
@@ -55,13 +55,13 @@
     <Alignment desc="true: load alignments for sense wires; false: not.">true</Alignment>
     <alignmentFileName desc="file which contains alignment params.">alignment_v2.dat</alignmentFileName>
 
-    <!-- Switch for selecting x-t etc. to be used in reconstruction -->
-    <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
+    <!-- Switch for selecting x-t etc. to be used in reconstruction. No longer used -->
+    <!-- <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
     <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v3.dat</xt4ReconFileName>
     <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v1.dat</sigma4ReconFileName>
     <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
     <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
-    <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName>
+    <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName> -->
 
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
     <Helium>CDCHeGas</Helium>

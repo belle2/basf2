@@ -36,8 +36,9 @@
 #include <cdc/dbobjects/CDCTimeWalks.h>
 #include <cdc/dbobjects/CDCXtRelations.h>
 #include <cdc/dbobjects/CDCSpaceResols.h>
-#include <cdc/dbobjects/CDCAlignment.h>
 #include <cdc/dbobjects/CDCDisplacement.h>
+#include <cdc/dbobjects/CDCAlignment.h>
+#include <cdc/dbobjects/CDCMisalignment.h>
 
 #include <iostream>
 #include <fstream>
@@ -496,6 +497,55 @@ void CDCDatabaseImporter::importSigma(std::string fileName)
 */
 
 
+void CDCDatabaseImporter::importDisplacement(std::string fileName)
+{
+  std::ifstream ifs;
+  ifs.open(fileName.c_str());
+  if (!ifs) {
+    B2FATAL("openFile: " << fileName << " *** failed to open");
+    return;
+  }
+  B2INFO(fileName << ": open for reading");
+
+  DBImportArray<CDCDisplacement> disp;
+
+  int iL(0), iC(0);
+  const int np = 3;
+  double back[np], fwrd[np];
+  double tension = 0.;
+  unsigned nRead = 0;
+
+  while (true) {
+    ifs >> iL >> iC;
+    for (int i = 0; i < np; ++i) {
+      ifs >> back[i];
+    }
+    for (int i = 0; i < np; ++i) {
+      ifs >> fwrd[i];
+    }
+    ifs >> tension;
+
+    if (ifs.eof()) break;
+
+    ++nRead;
+    WireID wire(iL, iC);
+    TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
+    TVector3 bwd(back[0], back[1], back[2]);
+    disp.appendNew(wire, fwd, bwd, tension);
+  }
+
+  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
+                                      ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
+
+  ifs.close();
+
+  IntervalOfValidity iov(m_firstExperiment, m_firstRun,
+                         m_lastExperiment, m_lastRun);
+  disp.import(iov);
+  B2RESULT("Wire displasement table imported to database.");
+}
+
+
 void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
 {
   std::ifstream ifs;
@@ -550,8 +600,8 @@ void CDCDatabaseImporter::importWirPosAlign(std::string fileName)
   B2RESULT("Wire alignment table imported to database.");
 }
 
-
-void CDCDatabaseImporter::importDisplacement(std::string fileName)
+//TODO: merge the following and importWirPosAlign() somehow
+void CDCDatabaseImporter::importWirPosMisalign(std::string fileName)
 {
   std::ifstream ifs;
   ifs.open(fileName.c_str());
@@ -561,12 +611,12 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
   }
   B2INFO(fileName << ": open for reading");
 
-  DBImportArray<CDCDisplacement> disp;
+  DBImportObjPtr<CDCMisalignment> mal;
+  mal.construct();
 
   int iL(0), iC(0);
   const int np = 3;
-  double back[np], fwrd[np];
-  double tension = 0.;
+  double back[np], fwrd[np], tension;
   unsigned nRead = 0;
 
   while (true) {
@@ -578,36 +628,34 @@ void CDCDatabaseImporter::importDisplacement(std::string fileName)
       ifs >> fwrd[i];
     }
     ifs >> tension;
-
     if (ifs.eof()) break;
 
     ++nRead;
     WireID wire(iL, iC);
-    TVector3 fwd(fwrd[0], fwrd[1], fwrd[2]);
-    TVector3 bwd(back[0], back[1], back[2]);
-    disp.appendNew(wire, fwd, bwd, tension);
+
+    for (int i = 0; i < np; ++i) {
+      mal->set(wire, CDCMisalignment::wireBwdX,  back[0]);
+      mal->set(wire, CDCMisalignment::wireBwdY,  back[1]);
+      mal->set(wire, CDCMisalignment::wireBwdZ,  back[2]);
+      mal->set(wire, CDCMisalignment::wireFwdX, fwrd[0]);
+      mal->set(wire, CDCMisalignment::wireFwdY, fwrd[1]);
+      mal->set(wire, CDCMisalignment::wireFwdZ, fwrd[2]);
+    }
+    mal->set(wire, CDCMisalignment::wireTension, tension);
   }
 
-  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importDisplacement: #lines read-in (=" << nRead <<
+  if (nRead != nSenseWires) B2FATAL("CDCDatabaseimporter::importWirPosMisalign: #lines read-in (=" << nRead <<
                                       ") is inconsistent with total #sense wires (=" << nSenseWires << ") !");
 
   ifs.close();
 
   IntervalOfValidity iov(m_firstExperiment, m_firstRun,
                          m_lastExperiment, m_lastRun);
-  disp.import(iov);
-  B2RESULT("Wire displasement table imported to database.");
+  mal.import(iov);
+  B2RESULT("Wire misalignment table imported to database.");
 }
 
-void CDCDatabaseImporter::printDisplacement()
-{
-  DBArray<CDCDisplacement> displacements;
-  for (const auto& disp : displacements) {
-    B2INFO(disp.getICLayer() << " " << disp.getIWire() << " "
-           << disp.getXBwd() << " " << disp.getYBwd() << " " << disp.getZBwd() <<  " "
-           << disp.getXFwd() << " " << disp.getYFwd() << " " << disp.getZFwd() << " " << disp.getTension());
-  }
-}
+
 void CDCDatabaseImporter::printChannelMap()
 {
 
@@ -665,8 +713,24 @@ void CDCDatabaseImporter::printSigma()
   sgm->dump();
 }
 
+void CDCDatabaseImporter::printDisplacement()
+{
+  DBArray<CDCDisplacement> displacements;
+  for (const auto& disp : displacements) {
+    B2INFO(disp.getICLayer() << " " << disp.getIWire() << " "
+           << disp.getXBwd() << " " << disp.getYBwd() << " " << disp.getZBwd() <<  " "
+           << disp.getXFwd() << " " << disp.getYFwd() << " " << disp.getZFwd() << " " << disp.getTension());
+  }
+}
+
 void CDCDatabaseImporter::printWirPosAlign()
 {
   DBObjPtr<CDCAlignment> al;
   al->dump();
+}
+
+void CDCDatabaseImporter::printWirPosMisalign()
+{
+  DBObjPtr<CDCMisalignment> mal;
+  mal->dump();
 }

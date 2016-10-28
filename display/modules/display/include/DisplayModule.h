@@ -79,6 +79,9 @@ namespace Belle2 {
     /** If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero). */
     bool m_showCDCHits;
 
+    /** If true, ARICHHit objects will be shown as squares, corresponding to channel pixels */
+    bool m_showARICHHits;
+
     /** Non-interactively save visualizations for each event. */
     bool m_automatic;
 

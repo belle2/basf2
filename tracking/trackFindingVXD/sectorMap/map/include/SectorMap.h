@@ -81,8 +81,6 @@ namespace Belle2 {
     void assignFilters(const std::string& setupName ,
                        VXDTFFilters<point_t>* filters)
     {
-      /***WARNING this looks like a mem leak!!! */
-      // try to repair:
       if ((*m_allSetupsFilters).count(setupName)) {
         if ((*m_allSetupsFilters)[ setupName ]) delete(*m_allSetupsFilters)[ setupName ];
       }

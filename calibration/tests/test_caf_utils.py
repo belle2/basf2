@@ -32,37 +32,6 @@ class TestUtils_topological_sort(TestCase):
         self.assertFalse(order)
 
 
-class TestUtils_json(TestCase):
-    """
-    Set of tests for checking decoding of json
-    """
-    def setUp(self):
-        """
-        Build the config parser for these tests
-        """
-        import os
-        config_file_path = os.environ.get('BELLE2_LOCAL_DIR')
-        config_file_path = os.path.join(config_file_path, 'calibration/data/caf.cfg')
-        import configparser
-        #: Configuration object for testing
-        self.config = configparser.ConfigParser()
-        self.config.read(config_file_path)
-
-    def test_decode_int(self):
-        """
-        Checks that int can be decoded from config file
-        """
-        self.assertTrue(decode_json_string(self.config['TESTS']['TestInt']) == 3)
-
-    def test_decode_list(self):
-        """
-        Checks that a test list can be correctly decoded if
-        it contains mixed string and int, string, list types.
-        """
-        test_list = ["a", "1", 2, 3, [4, "5"]]
-        self.assertTrue(decode_json_string(self.config['TESTS']['TestList']) == test_list)
-
-
 def main():
     unittest.main()
 

@@ -86,13 +86,13 @@ namespace Belle2 {
       /**
        *  Averages two parameter vectors taking into account their respective precision.
        *
-       *  @param parameter1     First parameters
-       *  @param precision1     Precision matrix to the first parameters
-       *  @param parameter2     Second parameters
-       *  @param precision2     Precision matrix to the second parameters
-       *  @param parameter[out] Averaged parameters
-       *  @param precision[out] Averaged precision matrix
-       *  @return               Chi square deviation of orignal parameters to the average
+       *  @param      parameter1  First parameters
+       *  @param      precision1  Precision matrix to the first parameters
+       *  @param      parameter2  Second parameters
+       *  @param      precision2  Precision matrix to the second parameters
+       *  @param[out] parameter   Averaged parameters
+       *  @param[out] precision   Averaged precision matrix
+       *  @return                 Chi square deviation of orignal parameters to the average
        */
       template <int N>
       static double average(const ParameterVector<N>& parameter1,
@@ -118,14 +118,14 @@ namespace Belle2 {
        *  Averages two parameter vectors from a projected space taking into account their respective
        * precisions and ambiguity matrices
        *
-       *  @param parameter1       First parameters
-       *  @param precision1       Precision matrix to the first parameters
-       *  @param ambiguity1       Projection ambiguity of the first parameters
-       *  @param parameter2       Second parameters
-       *  @param precision2       Precision matrix to the second parameters
-       *  @param ambiguity2       Projection ambiguity of the second parameters
-       *  @param parameter[out]   Averaged parameters
-       *  @param precision[out]   Averaged precision matrix
+       *  @param      parameter1  First parameters
+       *  @param      precision1  Precision matrix to the first parameters
+       *  @param      ambiguity1  Projection ambiguity of the first parameters
+       *  @param      parameter2  Second parameters
+       *  @param      precision2  Precision matrix to the second parameters
+       *  @param      ambiguity2  Projection ambiguity of the second parameters
+       *  @param[out] parameter   Averaged parameters
+       *  @param[out] precision   Averaged precision matrix
        *  @return                 Chi square deviation of original parameters to the average
        */
       template <int M, int N1, int N2>

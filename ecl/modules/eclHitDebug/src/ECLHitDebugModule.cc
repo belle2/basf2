@@ -112,11 +112,12 @@ void ECLHitDebugModule::event()
     int hitCellId       =   aECLSimHit->getCellId() - 1;
     double hitE        = aECLSimHit->getEnergyDep() * Unit::GeV;
     double hitTOF         = aECLSimHit->getFlightTime() * Unit::ns;
-    TVector3 HitInPos  =   aECLSimHit->getPosIn();
+    G4ThreeVector t  =   aECLSimHit->getPosIn();
+    TVector3 HitInPos(t.x(), t.y(), t.z());
 //    TVector3 HitOutPos  =   aECLSimHit->getPosOut();
 
-    TVector3 PosCell =  eclp->GetCrystalPos(hitCellId);
-    TVector3 VecCell =  eclp->GetCrystalVec(hitCellId);
+    const TVector3& PosCell =  eclp->GetCrystalPos(hitCellId);
+    const TVector3& VecCell =  eclp->GetCrystalVec(hitCellId);
     double local_pos = (15. - (HitInPos  - PosCell) * VecCell);
     //cout<<"DBSimHit"<<m_nEvent<<" " <<cellId<<" "<<hitE<<" "<<hitTOF<<" +  "<<local_pos<<" "<< <<endl;
 

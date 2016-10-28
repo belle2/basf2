@@ -3,7 +3,8 @@
   <input>EvtGenSimNoBkg.root</input>
   <output>simBasics.root</output>
   <contact>dorisykim@ssu.ac.kr</contact>
-  <description> A collection of basic MC information to validate the simulation library. </header>
+  <description> A collection of basic MC information to validate the simulation library. </description>
+</header>
 */
 
 // basic particle ID selection requirements

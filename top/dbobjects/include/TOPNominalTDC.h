@@ -39,6 +39,7 @@ namespace Belle2 {
      * @param numWindows number of ASIC windows per waveform
      * @param subBits number of bits per sample
      * @param syncTimeBase synchonization time base (time width of c_syncWindows)
+     * @param numofBunches number of bunches per syncTimeBase
      * @param offset time offset
      * @param pileupTime pile-up time
      * @param doubleHitResolution double hit resolution time
@@ -49,6 +50,7 @@ namespace Belle2 {
     TOPNominalTDC(int numWindows,
                   int subBits,
                   double syncTimeBase,
+                  int numofBunches,
                   double offset,
                   double pileupTime,
                   double doubleHitResolution,
@@ -82,7 +84,8 @@ namespace Belle2 {
       m_timeJitter(timeJitter),
       m_efficiency(efficiency),
       m_numBits(numBits),
-      m_binWidth(binWidth)
+      m_binWidth(binWidth),
+      m_sampleWidth(binWidth)
     {}
 
     /**
@@ -102,6 +105,18 @@ namespace Belle2 {
      * @return synchonization time base
      */
     double getSyncTimeBase() const {return m_syncTimeBase;}
+
+    /**
+     * Returns number of bunches in the synchonization time base
+     * @return number of bunches
+     */
+    unsigned getNumofBunches() const {return m_numofBunches;}
+
+    /**
+     * Returns bunch separation time (e.g. RF cycle - empty bunches are included!)
+     * @return bunch separation time
+     */
+    double getBunchSeparationTime() const {return m_syncTimeBase / m_numofBunches;}
 
     /**
      * Returns time offset
@@ -146,6 +161,12 @@ namespace Belle2 {
     double getBinWidth() const {return m_binWidth;}
 
     /**
+     * Returns time difference between two samples
+     * @return time between two samples
+     */
+    double getSampleWidth() const {return m_sampleWidth;}
+
+    /**
      * Returns TDC overflow value
      * @return overflow value
      */
@@ -171,12 +192,34 @@ namespace Belle2 {
     double getTimeMax() const {return getOverflowValue() * m_binWidth - m_offset;}
 
     /**
-     * Convert time to TDC count.
+     * Converts time to TDC count.
      * For times being outside TDC range, TDC overflow value is returned.
      * @param time [ns]
-     * @return TDC TDC count
+     * @return TDC count
      */
     int getTDCcount(double time) const;
+
+    /**
+     * Converts time to sample number.
+     * Use isSampleValid(int) to check the validity of sample number
+     * @param time [ns]
+     * @return sample number
+     */
+    int getSample(double time) const;
+
+    /**
+     * Converts sample number to time
+     * @param sample sample number
+     * @return time [ns]
+     */
+    double getSampleTime(int sample) const {return sample * m_sampleWidth - m_offset;}
+
+    /**
+     * Check for the validity of sample number
+     * @param sample sample number
+     * @return true if sample number is valid
+     */
+    bool isSampleValid(int sample) const;
 
     /**
      * Check for consistency of data members
@@ -196,6 +239,7 @@ namespace Belle2 {
     unsigned m_numWindows = 0; /**< number of ASIC windows per waveform */
     unsigned m_subBits = 0; /**< number of bits per sample */
     float m_syncTimeBase = 0; /**< time width of c_syncWindows */
+    unsigned m_numofBunches = 0; /**< number of bunches per syncTimeBase */
     float m_offset = 0; /**< time offset */
     float m_pileupTime = 0; /**< pile-up time */
     float m_doubleHitResolution = 0; /**< double hit resolution time */
@@ -204,8 +248,9 @@ namespace Belle2 {
 
     unsigned m_numBits = 0; /**< number of bits */
     float m_binWidth = 0; /**< time width of a TDC bin */
+    float m_sampleWidth = 0; /**< time between two samples */
 
-    ClassDef(TOPNominalTDC, 1); /**< ClassDef */
+    ClassDef(TOPNominalTDC, 2); /**< ClassDef */
 
   };
 

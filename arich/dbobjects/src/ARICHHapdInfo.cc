@@ -14,14 +14,14 @@
 using namespace Belle2;
 using namespace std;
 
-ARICHHapdChipInfo ARICHHapdInfo::getHapdChipInfo(unsigned int i) const
+ARICHHapdChipInfo* ARICHHapdInfo::getHapdChipInfo(unsigned int i) const
 {
   if (i < c_NumberOfChips) return m_HAPDChipInfo[i];
-  else return ARICHHapdChipInfo();
+  else return NULL;
 }
 
 
-void ARICHHapdInfo::setHapdChipInfo(unsigned int i, ARICHHapdChipInfo chipInfo)
+void ARICHHapdInfo::setHapdChipInfo(unsigned int i, ARICHHapdChipInfo* chipInfo)
 {
   if (i < c_NumberOfChips) m_HAPDChipInfo[i] = chipInfo;
 }

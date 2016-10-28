@@ -15,7 +15,7 @@ namespace Belle2 {
     PedeSteering() : commands(), files(), name("PedeSteering.txt") {}
     //! Constructor to directly import command from file
     //! @param filename text file with Pede commands
-    explicit PedeSteering(std::string filename) : commands(), files(), name(filename) {}
+    explicit PedeSteering(const std::string& filename) : commands(), files(), name(filename) {}
     //! Destructor
     virtual ~PedeSteering() {}
     //! Load commands from existing text file

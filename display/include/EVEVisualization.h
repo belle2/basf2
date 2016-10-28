@@ -18,6 +18,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <bklm/dataobjects/BKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
+#include <arich/dataobjects/ARICHHit.h>
 #include <vxd/geometry/GeoCache.h>
 #include <tracking/dataobjects/ROIid.h>
 
@@ -172,6 +173,9 @@ namespace Belle2 {
 
     /** Add a reconstructed cluster in the KLM. */
     void addKLMCluster(const KLMCluster* cluster);
+
+    /** Add recontructed hit in ARICH */
+    void addARICHHit(const ARICHHit* hit);
 
     /** Add a Region Of Interest, computed by the PXDDataReduction module */
     void addROI(const ROIid* roi);

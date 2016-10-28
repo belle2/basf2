@@ -16,11 +16,8 @@
 #include <string>
 #include <memory>
 
-#include "G4VisAttributes.hh"
-#include "TGeoManager.h"
-#include <geometry/Materials.h>
-
 class G4VPhysicalVolume;
+class G4VisAttributes;
 
 namespace Belle2 {
 
@@ -156,11 +153,7 @@ namespace Belle2 {
        *
        * @return Pointer to the new G4VisAttributes object
        */
-      G4VisAttributes* newVisAttributes()
-      {
-        m_VisAttributes.push_back(new G4VisAttributes());
-        return m_VisAttributes.back();
-      }
+      G4VisAttributes* newVisAttributes();
 
     private:
       /** Default constructor declared private since class is a Singleton. */

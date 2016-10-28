@@ -85,10 +85,10 @@ namespace TreeFitter {
   ErrCode RecoPhoton::updCache()
   {
     const ECLCluster* recoCalo = particle()->getECLCluster();
-    TVector3 centroid = recoCalo->getclusterPosition();
+    TVector3 centroid = recoCalo->getClusterPosition();
     double energy = recoCalo->getEnergy();
     m_init = true ;
-    TMatrixDSym cov_pE = recoCalo->getError4x4();//FT: error on xyz is extracted from error on p (sort of backwards but ok)
+    TMatrixDSym cov_pE = recoCalo->getCovarianceMatrix4x4();//FT: error on xyz is extracted from error on p (sort of backwards but ok)
     for (int row = 1; row <= 4; ++row)
       for (int col = row; col <= 4; ++col)
         m_matrixV(row, col) = cov_pE[row - 1][col - 1];

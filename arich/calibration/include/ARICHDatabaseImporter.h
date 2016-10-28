@@ -10,12 +10,15 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
+#include <arich/geometry/ARICHGeometryPar.h>
 #include <TObject.h>
 #include <TGraph.h>
 #include <TH2F.h>
+#include <TH3F.h>
 #include <TTimeStamp.h>
 #include <map>
 #include <tuple>
+#include <vector>
 
 namespace Belle2 {
 
@@ -29,13 +32,16 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHDatabaseImporter(): m_inputFilesHapdQA(), m_inputFilesAsicRoot(), m_inputFilesAsicTxt(), m_inputFilesHapdQE() {};
+    ARICHDatabaseImporter(): m_inputFilesHapdQA(), m_inputFilesAsicRoot(), m_inputFilesAsicTxt(), m_inputFilesHapdQE(),
+      m_inputFilesFebTest() {};
 
     /**
      * Constructor
      */
+//    ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
+//                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE);
     ARICHDatabaseImporter(std::vector<std::string> inputFilesHapdQA, std::vector<std::string> inputFilesAsicRoot,
-                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE);
+                          std::vector<std::string> inputFilesAsicTxt, std::vector<std::string> inputFilesHapdQE, std::vector<std::string> inputFilesFebTest);
 
     /**
      * Destructor
@@ -78,6 +84,11 @@ namespace Belle2 {
     void importAsicInfo();
 
     /**
+     * Import ARICH ASICs data in the database.
+     */
+    void importAsicInfoRoot();
+
+    /**
      * Export ARICH ASICs data from the database.
      */
     void exportAsicInfo();
@@ -98,22 +109,23 @@ namespace Belle2 {
     /**
      * Get lists of problematic ASIC channels.
      */
-    std::vector<int> channelsList(std::string asicSerial, std::string type, int chDelay);
+    std::vector<int> channelsList(std::string badCH);
 
     /**
      * Import ARICH FEB test data in the database.
      */
     void importFebTest();
+    void importFebTestRoot();
 
     /**
      * Returns data from low voltage test
      */
-    std::tuple<std::string, float, float, float> getFebLVtestData(int serial);
+    std::tuple<std::string, float, float, float> getFebLVtestData(int serial, int lvRun);
 
     /**
      * Returns data from high voltage test
      */
-    std::tuple<std::string, float> getFebHVtestData(int serial);
+    std::tuple<std::string, float> getFebHVtestData(int serial, int hvRun);
 
     /**
      * Returns list of dead channels on FEB
@@ -129,7 +141,22 @@ namespace Belle2 {
     /**
      * Returns lists of slopes (fine & rough)
      */
-    std::pair<std::vector<float>, std::vector<float>> getSlopes(std::string dna);
+    std::pair<std::vector<float>, std::vector<float>> getSlopes(int serialNum, std::string runSCAN);
+
+    /**
+     * Returns lists of FWHM values&sigmas
+     */
+    std::vector<std::pair<float, float>> getFwhm(int serialNum, std::string runSCAN);
+
+    /**
+     * Returns TH3F histograms - offset settings
+     */
+    std::vector<TH3F*> getFebTestHistograms(std::string dna, std::string run, int febposition);
+
+    /**
+     * Returns TH2F histogram of pulse test
+     */
+    TH2F* getFebTestPulse(std::string dna, std::string run, int febposition);
 
     /**
      * Export ARICH FEB test data from the database.
@@ -137,7 +164,17 @@ namespace Belle2 {
     void exportFebTest();
 
     /**
-     * Import ARICH HAPD data and chip data in the database.
+     * Import ARICH HAPD chip data in the database.
+     */
+    void importHapdChipInfo();
+
+    /**
+     * Export ARICH HAPD chip data from the database.
+     */
+    void exportHapdChipInfo();
+
+    /**
+     * Import ARICH HAPD data in the database.
      */
     void importHapdInfo();
 
@@ -190,16 +227,6 @@ namespace Belle2 {
     void exportHapdQE();
 
     /**
-     * Import lists of bad channels in the database.
-     */
-    void importBadChannels();
-
-    /**
-     * Export lists of bad channels from the database.
-     */
-    void exportBadChannels();
-
-    /**
      * Export ARICH HAPD chip info data from the database and calculate bias voltages for one HAPD.
      * @param HAPD serial number
      */
@@ -218,14 +245,44 @@ namespace Belle2 {
     std::map<std::string, float> getAerogelParams(std::string aeroSerialNumber);
 
     /**
-     * Import module sensor map and info classes
+     * Import module test results
      */
-    void importSensorModule();
+    void importFEBoardInfo();
+
+    /**
+     * Export module test results
+     */
+    void exportFEBoardInfo();
+
+    /**
+     * Import module test results
+     */
+    void importModuleTest(std::string mypath, std::string HVtest);
+
+    /**
+     * Export module test results
+     */
+    void exportModuleTest(std::string HVtest);
+
+    /**
+     * Import module sensor info classes
+     */
+    void importSensorModuleInfo();
+
+    /**
+     * Import module sensor map classes
+     */
+    void importSensorModuleMap();
 
     /**
      * Export module sensor map and info classes from database
      */
-    void exportSensorModule();
+    void exportSensorModuleMap();
+
+    /**
+     * Export all the data
+     */
+    void exportAll();
 
     // classes used in simulation/reconstruction software
 
@@ -311,12 +368,15 @@ namespace Belle2 {
 
     void importGeometryConfig();
 
+
   private:
 
+    ARICHGeometryPar* m_arichgp;    /**< geometry parameters */
     std::vector<std::string> m_inputFilesHapdQA;        /**< Input root files for HAPD QA */
     std::vector<std::string> m_inputFilesAsicRoot;      /**< Input root files for ASICs */
     std::vector<std::string> m_inputFilesAsicTxt;       /**< Input txt files for ASICs */
     std::vector<std::string> m_inputFilesHapdQE;        /**< Input root files for HAPD quantum efficiency */
+    std::vector<std::string> m_inputFilesFebTest;       /**< Input root files from FEB test (coarse/fine offset settings, test pulse) */
 
     ClassDef(ARICHDatabaseImporter, 1);                 /**< ClassDef */
   };

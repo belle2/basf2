@@ -30,8 +30,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     # Material effects for all track extrapolations
     if trigger_mode in ["all", "hlt"] and 'SetupGenfitExtrapolation' not in path:
-        material_effects = register_module('SetupGenfitExtrapolation')
-        path.add_module(material_effects)
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
     if mcTrackFinding:
         # Always add the MC finder in all trigger modes.
@@ -58,6 +57,10 @@ def add_geometry_modules(path, components=None):
         if components:
             geometry.param('components', components)
         path.add_module(geometry)
+
+    # Material effects for all track extrapolations
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
 
 
 def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
@@ -89,7 +92,7 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False):
     # track fitting
     path.add_module("DAFRecoFitter").set_name("Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator')
+    path.add_module('TrackCreator', defaultPDGCode=211, additionalPDGCodes=[11, 13, 321, 2212])
 
     # V0 finding
     path.add_module('V0Finder')

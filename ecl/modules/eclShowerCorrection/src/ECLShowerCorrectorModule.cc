@@ -28,6 +28,9 @@
 #include <ecl/dataobjects/ECLConnectedRegion.h>
 #include <ecl/dataobjects/ECLShower.h>
 
+// ROOT
+#include <TMath.h>
+
 // OTHER
 #include <vector>
 #include <fstream>      // std::ifstream
@@ -94,12 +97,14 @@ void ECLShowerCorrectorModule::event()
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
-      const double theta         = eclShower.getTheta();
-      const double phi           = eclShower.getPhi();
+
+      const double theta         = eclShower.getTheta() * TMath::RadToDeg();
+      const double phi           = eclShower.getPhi() * TMath::RadToDeg();
 
       // Get the correction
       const double correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel);
-      B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel);
+      B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " f(BGx0)=" <<
+              getLeakageCorrection(theta, phi, energy, 0.0) << " f(BGx1.0)=" << getLeakageCorrection(theta, phi, energy, 1.0));
 
       const double correctedEnergy = energy * correctionFactor;
       const double correctedEnergyHighest = energyHighest * correctionFactor;
@@ -179,6 +184,14 @@ void ECLShowerCorrectorModule::prepareLeakageCorrections()
     }
   }
 
+  m_phiPeriodicity = m_leakageCorrectionPtr->getPhiPeriodicity()[0];
+  m_lReg1Theta = m_leakageCorrectionPtr->getLReg1Theta()[0];
+  m_hReg1Theta = m_leakageCorrectionPtr->getHReg1Theta()[0];
+  m_lReg2Theta = m_leakageCorrectionPtr->getLReg2Theta()[0];
+  m_hReg2Theta = m_leakageCorrectionPtr->getHReg2Theta()[0];
+  m_lReg3Theta = m_leakageCorrectionPtr->getLReg3Theta()[0];
+  m_hReg3Theta = m_leakageCorrectionPtr->getHReg3Theta()[0];
+
 }
 
 
@@ -232,6 +245,8 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     x0Bin = m_numOfPhiBins - 1;
     x1Bin = 0;
   }
+
+  B2DEBUG(175, "m_numOfPhiBins=" << m_numOfPhiBins << " x0Bin=" << x0Bin << " x1Bin=" << x1Bin);
 
   double y = theta;
   double y0 = 0.;
@@ -333,6 +348,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     }
   } // end region 3
 
+  B2DEBUG(175,  "y0Bin=" << y0Bin << " y1Bin=" << y1Bin);
 
   //int energyBin = 0;
   double z = energy;
@@ -367,6 +383,8 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     z0Bin = (m_numOfEnergyBins - 1);
     z1Bin = (m_numOfEnergyBins - 1);
   }
+
+  B2DEBUG(175,  "z0Bin=" << z0Bin << " z1Bin=" << z1Bin);
 
   xd = (x - x0) / (x1 - x0);
   yd = (y - y0) / (y1 - y0);

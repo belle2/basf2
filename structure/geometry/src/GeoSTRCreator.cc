@@ -116,6 +116,8 @@ namespace Belle2 {
       // Get STR geometry parameters from Gearbox (no calculations here)
       readShield(param, strGeometryPar, "FWD_Shield");
       readShield(param, strGeometryPar, "BWD_Shield");
+      readPole(param, strGeometryPar, "FWD_Pole");
+      readPole(param, strGeometryPar, "BWD_Pole");
 
 
       return strGeometryPar;

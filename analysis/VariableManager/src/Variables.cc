@@ -1710,7 +1710,7 @@ namespace Belle2 {
                       "absolute value of Zernike moment 51 (shower shape variable)");
     REGISTER_VARIABLE("clusterZernikeMVA", eclClusterZernikeMVA, "output of MVA using Zernike moments of the cluster.\n"
                       "For cluster with hypothesisId==N1: raw MVA output.\n"
-                      "For cluster with hypothesisId==N2: 1 - \prod{clusterZernikeMVA}, where the product is on all N1 showers belonging to the same connected region (shower shape variable)");
+                      "For cluster with hypothesisId==N2: 1 - prod{clusterZernikeMVA}, where the product is on all N1 showers belonging to the same connected region (shower shape variable)");
     REGISTER_VARIABLE("clusterSecondMoment", eclClusterSecondMoment,
                       "Second moment. Used for merged pi0 identification. (shower shape variable)");
     REGISTER_VARIABLE("clusterLAT", eclClusterLAT,

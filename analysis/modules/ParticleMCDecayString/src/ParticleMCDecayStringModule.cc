@@ -214,8 +214,11 @@ namespace Belle2 {
     std::string output;
 
     output = getMCDecayStringFromMCParticle(p->getRelatedTo<MCParticle>());
-    for (auto& daughter : p->getDaughters()) {
-      output += " | " + getMCDecayStringFromParticle(daughter);
+    // Some FSPs can have daughters, e.g. converted Photons and K-Shorts
+    if (not isFSP(p->getPDGCode())) {
+      for (auto& daughter : p->getDaughters()) {
+        output += " | " + getMCDecayStringFromParticle(daughter);
+      }
     }
 
     return output;

@@ -77,15 +77,32 @@ namespace Belle2 {
       m_VisAttributes.clear();
     }
 
+    // Write COILGeometryPar object from GearBox content
+    void GeoCOILCreator::read(const GearDir& content, COILGeometryPar& parameters, std::string item)
+    {
+
+      // check if item is
+      // Cavity1
+      // Cavity2
+      // Coil
+      // Cryostat
+      // call the right setters to write the parameters
+    }
+
+    // Create geometry from COILGeometryPar object
     void GeoCOILCreator::create(const GearDir& content, G4LogicalVolume& topVolume, GeometryTypes)
     {
 
-      // --- Collect global parameters
+
+      // Global parameters
+      //////////////////////
       double GlobalRotAngle = content.getAngle("Rotation") / Unit::rad;
       double GlobalOffsetZ  = content.getLength("OffsetZ") / Unit::mm;
 
-      //Get Material
-      //TO DO: also propagete to other components so they get their material fro the xml file
+
+      // Cryostat
+      /////////////
+
       string strMatCryo = content.getString("Cryostat/Material", "Air");
       G4Material* matCryostat = Materials::get(strMatCryo);
 
@@ -101,6 +118,12 @@ namespace Belle2 {
                         CryoLV, "PVCryo", &topVolume, false, 0);
 
 
+      // Cavity #1
+      //////////////
+
+      string strMatCryo = content.getString("Cryostat/Material", "Air");
+      G4Material* matCryostat = Materials::get(strMatCryo);
+
       double Cav1Rmin   = content.getLength("Cavity1/Rmin") / Unit::mm;
       double Cav1Rmax   = content.getLength("Cavity1/Rmax") / Unit::mm;
       double Cav1Length = content.getLength("Cavity1/HalfLength") / Unit::mm;
@@ -112,6 +135,10 @@ namespace Belle2 {
       m_VisAttributes.push_back(new G4VisAttributes(G4Colour(0., 1., 0.)));
       Cav1LV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), Cav1LV, "PVCav1", CryoLV, false, 0);
+
+
+      // Rad Shield
+      ///////////////
 
       double ShieldRmin   = content.getLength("RadShield/Rmin") / Unit::mm;
       double ShieldRmax   = content.getLength("RadShield/Rmax") / Unit::mm;
@@ -125,6 +152,10 @@ namespace Belle2 {
       ShieldLV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), ShieldLV, "PVShield", Cav1LV, false, 0);
 
+
+      // Cavity #2
+      /////////////
+
       double Cav2Rmin   = content.getLength("Cavity2/Rmin") / Unit::mm;
       double Cav2Rmax   = content.getLength("Cavity2/Rmax") / Unit::mm;
       double Cav2Length = content.getLength("Cavity2/HalfLength") / Unit::mm;
@@ -136,6 +167,10 @@ namespace Belle2 {
       m_VisAttributes.push_back(new G4VisAttributes(G4Colour(1., 1., 1.)));
       Cav2LV->SetVisAttributes(m_VisAttributes.back());
       new G4PVPlacement(0, G4ThreeVector(0.0, 0.0, 0.0), Cav2LV, "PVCav2", ShieldLV, false, 0);
+
+
+      // Coil
+      /////////
 
       double CoilRmin   = content.getLength("Coil/Rmin") / Unit::mm;
       double CoilRmax   = content.getLength("Coil/Rmax") / Unit::mm;

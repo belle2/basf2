@@ -27,15 +27,16 @@ namespace Belle2 {
   class VXDGeoComponentPar: public TObject {
 
   public:
-    //! Default constructor
-    VXDGeoComponentPar() {}
-    //! Constructor using Gearbox
-    //explicit VXDGeoComponentPar(const GearDir& content) { read(content); }
     //! Constructor
     //explicit VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
     //                double width = 0, double width2 = 0, double length = 0, double height = 0):
     //  m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
     //  m_height(height) {}
+    /** Constructor */
+    VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
+                       double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):
+      m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
+      m_height(height), m_angle(angle) {}
 
     //! Destructor
     ~VXDGeoComponentPar() {}
@@ -69,6 +70,10 @@ namespace Belle2 {
     double getHeight() { return m_height; }
     /** set the height of the component */
     void setHeight(double height) { m_height = height; }
+    /** get the angle of the component */
+    double getAngle() { return m_angle; }
+    /** set the angle of the component */
+    void setAngle(double angle) { m_angle = angle; }
 
   private:
 
@@ -86,6 +91,8 @@ namespace Belle2 {
     double m_length {0.};
     /** height of the component */
     double m_height {0.};
+    /** angle of the component */
+    double m_angle {0.};
 
     ClassDef(VXDGeoComponentPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
 

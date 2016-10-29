@@ -14,6 +14,8 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 
+#include <vxd/dataobjects/VxdID.h>
+
 using namespace Belle2;
 using namespace std;
 
@@ -47,7 +49,7 @@ std::vector<VXDGeoPlacementPar> VXDGeometryPar::getSubComponents(GearDir path)
   return result;
 }
 
-void VXDGeometryPar::setCurrentLayer(int layer, GearDir components)
+void VXDGeometryPar::cacheLadder(int layer, GearDir components)
 {
   string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
   GearDir paramsLadder(components, path);
@@ -92,11 +94,14 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   //Read envelope parameters
   m_envelope = VXDEnvelopePar(GearDir(content, "Envelope/"));
 
+  // Read alignment for detector m_prefix ('PXD' or 'SVD')
+  m_alignment[m_prefix] = VXDAlignmentPar(m_prefix, GearDir(content, "Alignment/"));
+
   //Read the definition of all sensor types
   GearDir components(content, "Components/");
   for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
     string sensorTypeID = paramsSensor.getString("@type");
-    B2INFO("Reading sensors: SensorTypeID: " << sensorTypeID);
+    //B2INFO("Reading sensors: SensorTypeID: " << sensorTypeID);
 
     // Create a new sensor from GearBox
     VXDGeoSensorPar sensor;
@@ -140,21 +145,35 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   for (const GearDir& shell : content.getNodes("HalfShell")) {
 
     string shellName =  shell.getString("@name");
-    B2INFO("Building " << m_prefix << " half-shell " << shellName);
+    //B2INFO("Building " << m_prefix << " half-shell " << shellName);
 
     //Full name of alignemnt component
     string component = m_prefix + "." + shellName;
-    //Add component to alignment map
     m_alignment[component] = VXDAlignmentPar(component, GearDir(content, "Alignment/"));
 
     for (const GearDir& layer : shell.getNodes("Layer")) {
       int layerID = layer.getInt("@id");
 
-      setCurrentLayer(layerID, components);
+      cacheLadder(layerID, components);
       createLayerSupport(layerID, support);
       createLadderSupport(layerID, support);
+
+      //Loop over defined ladders
+      for (const GearDir& ladder : layer.getNodes("Ladder")) {
+        int ladderID = ladder.getInt("@id");
+        //double phi = ladder.getAngle("phi", 0);
+
+        readLadderInfo(layerID, ladderID, content);
+      }
     }
   }
+
+
+  //Read the definition of all sensor types
+  for (const GearDir& shell : content.getNodes("HalfShell")) {
+    m_halfShells.push_back(VXDHalfShellPar(shell));
+  }
+
 
   //Create diamond radiation sensors if defined and in background mode
   GearDir radiationDir(content, "RadiationSensors");
@@ -185,10 +204,6 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
     }
   }
 
-  //Read the definition of all sensor types
-  for (const GearDir& shell : content.getNodes("HalfShell")) {
-    m_halfShells.push_back(VXDHalfShellPar(shell));
-  }
 
   //Free some space
   //m_componentCache.clear();
@@ -196,3 +211,85 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   //m_sensorMap.clear();
 
 }
+
+
+void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
+{
+  VxdID ladder(layerID, ladderID, 0);
+
+  // Read alignment for ladder
+  m_alignment[ladder] = VXDAlignmentPar(ladder, GearDir(content, "Alignment/"));
+
+  for (const VXDGeoSensorPlacementPar& p : m_ladders[layerID].getSensors()) {
+    VxdID sensorID(ladder);
+    sensorID.setSensorNumber(p.getSensorID());
+
+    std::map<string, VXDGeoSensorPar>::iterator it = m_sensorMap.find(p.getSensorTypeID());
+    if (it == m_sensorMap.end()) {
+      B2FATAL("Invalid SensorTypeID " << p.getSensorTypeID() << ", please check the definition of " << sensorID);
+    }
+    VXDGeoSensorPar& s = it->second;
+    string name = m_prefix + "." + (string)sensorID;
+
+    //Now create all the other components and place the Sensor
+    if (!m_globals.getOnlyActiveMaterial()) cacheSubComponents(s.getComponents() , GearDir(content, "Components/"));
+    m_alignment[sensorID] = VXDAlignmentPar(sensorID, GearDir(content, "Alignment/"));
+  }
+  return;
+}
+
+
+
+void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsDir)
+{
+
+  //B2INFO("Caching Component " << name);
+
+  //Check if component already exists
+  map<string, VXDGeoComponentPar>::iterator cached = m_componentCache.find(name);
+  if (cached != m_componentCache.end()) {
+    return; // nothing to do
+  }
+
+  //Not cached, so lets create a new one
+  string path = (boost::format("descendant::Component[@name='%1%']/") % name).str();
+  GearDir params(componentsDir, path);
+  if (!params) B2FATAL("Could not find definition for component " << name);
+
+  VXDGeoComponentPar c(
+    params.getString("Material",  m_globals.getDefaultMaterial()),
+    params.getString("Color", ""),
+    params.getLength("width", 0),
+    params.getLength("width2", 0),
+    params.getLength("length", 0),
+    params.getLength("height", 0),
+    params.getAngle("angle", 0)
+  );
+
+  if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
+    B2DEBUG(100, "One dimension empty, using auto resize for component");
+  }
+  //B2INFO("Creating Sub Components for Component " << m_prefix + "." + name);
+  vector<VXDGeoPlacementPar> subComponents = getSubComponents(params);
+  cacheSubComponents(subComponents, componentsDir);
+
+  if (m_globals.getActiveChips() && params.exists("activeChipID")) {
+    int chipID = params.getInt("activeChipID");
+    //B2INFO("For component " << name << " reading active chipID " <<  chipID);
+    m_sensitiveIDCache[name] = chipID;
+  }
+  m_componentCache[name] = c;
+}
+
+
+void VXDGeometryPar::cacheSubComponents(std::vector<VXDGeoPlacementPar> placements , GearDir componentsDir)
+{
+  for (VXDGeoPlacementPar& p : placements) {
+    cacheComponent(p.getName(), componentsDir);
+  }
+  return;
+}
+
+
+
+

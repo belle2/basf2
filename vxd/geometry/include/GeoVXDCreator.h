@@ -129,7 +129,7 @@ namespace Belle2 {
        * @return pair containing the TGeoVolume* of the component as well as
        *         the height of the component
        */
-      VXDGeoComponent getComponent(const std::string& component);
+      VXDGeoComponent getComponent(const std::string& name);
 
       /**
        * Return vector of VXDGeoPlacements with all the components defined inside a given path

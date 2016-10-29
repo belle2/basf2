@@ -79,9 +79,32 @@ namespace Belle2 {
     virtual void createLadderSupport(int layer, GearDir support) = 0;
 
     /**
-     * Read parameters for given layer and store in m_ladders
+     * Read parameters for a ladder in layer with given ID from gearbox and layer
+     * store them in chache m_ladders
      */
-    virtual void setCurrentLayer(int layer, GearDir components);
+    virtual void cacheLadder(int layer, GearDir components);
+
+    /**
+     * Read parameters for ladder components and their alignment corresponding
+     * to the given ladder id
+     */
+    virtual void readLadderInfo(int layerID, int ladderID, GearDir content);
+
+    /**
+     * Read parameters for component name from Gearbox into m_components cache.
+     * The name is assumed to be unique and Volumes are cached.
+     * @param name Name of the component
+     * @param components Path to components
+     */
+    void cacheComponent(const std::string& name, GearDir components);
+
+    /**
+     * Read parameters for all components in placement container from Gearbox
+     * into m_components cache.
+     * @param placements container holding names of all components to be cached
+     * @param componentDir Path to Gearbox where parameters are to be found
+     */
+    void cacheSubComponents(std::vector<VXDGeoPlacementPar> placements , GearDir componentsDir);
 
   private:
 
@@ -103,6 +126,8 @@ namespace Belle2 {
     VXDGeoRadiationSensorsPar m_radiationsensors;
     /** Parameters of the detector ladders */
     std::map<int, VXDGeoLadderPar> m_ladders;
+    /** Cache of all Bkg sensitive chip Ids*/
+    std::map<std::string, int> m_sensitiveIDCache;
 
 
     ClassDef(VXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

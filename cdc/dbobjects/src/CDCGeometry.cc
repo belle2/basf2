@@ -37,6 +37,8 @@ CDCGeometry::~CDCGeometry()
 void CDCGeometry::read(const GearDir& content)
 {
   // Global.
+  m_globalOffsetX  = content.getLength("OffsetX");
+  m_globalOffsetY  = content.getLength("OffsetY");
   m_globalOffsetZ  = content.getLength("OffsetZ");
   m_globalPhiRotation = content.getAngle("GlobalPhiRotation");
 

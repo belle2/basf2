@@ -201,7 +201,7 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   //  m_senseWireZposMode = geom.getSenseWireZposMode();
   m_senseWireZposMode = CDCGeoControlPar::getInstance().getSenseWireZposMode();
   //Set z corrections (from input data)
-  B2INFO("CDCGeometryPar: sense wire z mode:" << m_senseWireZposMode);
+  B2INFO("CDCGeometryPar: Sense wire z mode:" << m_senseWireZposMode);
 
   //
   // The DB version should be implemented ASAP.

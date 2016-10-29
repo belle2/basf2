@@ -852,7 +852,17 @@ namespace Belle2 {
     double getGlobalPhiRotation() const { return m_globalPhiRotation;}
 
     /**
-     * Get the global z coordinate of CDC.
+     * Get the global x offset of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetX() const { return m_globalOffsetX;}
+
+    /**
+     * Get the global y offset of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetY() const { return m_globalOffsetY;}
+
+    /**
+     * Get the global z offset of CDC wrt Belle2 coord. system.
      */
     double getGlobalOffsetZ() const { return m_globalOffsetZ;}
 
@@ -1085,7 +1095,9 @@ namespace Belle2 {
   private:
 
     double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
-    double m_globalOffsetZ = 0.0; /**< The offset of the whole cdc in z with respect to the IP (mm). */
+    double m_globalOffsetX = 0.0; /**< The offset of the whole cdc in x with respect to the IP (cm). */
+    double m_globalOffsetY = 0.0; /**< The offset of the whole cdc in y with respect to the IP (cm). */
+    double m_globalOffsetZ = 0.0; /**< The offset of the whole cdc in z with respect to the IP (cm). */
     double m_fiducialRmin; /**< Minimum radius of the CDC fiducial volume. */
     double m_fiducialRmax; /**< Maximum radius of the CDC fiducial volume. */
     MotherVolume m_mother;    /**< CDC mother volume. */
@@ -1102,7 +1114,7 @@ namespace Belle2 {
     double m_senseWireDiameter = 0.030; /**< Sense wire diameter (mm). */
     int m_senseWireNumbers = 14336;/**< Number of sense wires. */
     double m_senseWireTension = 50.0; /**< Sense wire tension. */
-    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
+    //    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
     double m_fieldWireDiameter = 0.126; /**< Field wire diameter (mm). */
     int m_fieldWireNumbers = 42240; /**< Number of field wires. */
     double m_feedThroughLength = 15.0; /**< Feedthrough length (mm). */
@@ -1124,7 +1136,7 @@ namespace Belle2 {
     bool m_wireSag;        /*!< Switch for sense wire sag */
     bool m_modLeftRightFlag; /*!< Switch for modified left/right flag */
 
-    ClassDef(CDCGeometry, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCGeometry, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

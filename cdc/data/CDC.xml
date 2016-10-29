@@ -63,6 +63,8 @@
     <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
     <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName> -->
 
+    <OffsetX desc="The offset of the whole cdc in x with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetX>
+    <OffsetY desc="The offset of the whole cdc in y with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetY>
     <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
     <Helium>CDCHeGas</Helium>
     <Ethane>CDCEthaneGas</Ethane>

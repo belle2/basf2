@@ -198,7 +198,6 @@ namespace Belle2 {
     std::vector<double>* m_eclClusterLat; /**< ECLCluster shape parameter */
     std::vector<int>* m_eclClusterNofCrystals;  /**< Number of crystals in ECLCluster */
     std::vector<int>* m_eclClusterCrystalHealth;  /**< Crystal healt flag */
-    std::vector<double>* m_eclClusterMergedPi0;  /**< Flag for merged pi0 */
     std::vector<double>* m_eclClusterPx;  /**< Reconstructed momentum along X */
     std::vector<double>* m_eclClusterPy;  /**< Reconstructed momentum along Y */
     std::vector<double>* m_eclClusterPz;  /**< Reconstructed momentum along Z */

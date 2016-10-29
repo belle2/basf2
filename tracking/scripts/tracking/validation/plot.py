@@ -1781,7 +1781,10 @@ class ValidationPlot(object):
 
         # Find the lower bound, if it is not given.
         if lower_bound is None:
-            lower_bound = np.min(finite_xs)
+            try:
+                lower_bound = np.min(finite_xs)
+            except ValueError:
+                lower_bound = -999
             # Clip the lower bound by outliers that exceed the given z score
             if outlier_z_score is not None:
                 # The lower bound at which outliers exceed the given z score
@@ -1803,7 +1806,10 @@ class ValidationPlot(object):
 
         # Find the upper bound, if it is not given
         if upper_bound is None:
-            upper_bound = np.max(finite_xs)
+            try:
+                upper_bound = np.max(finite_xs)
+            except ValueError:
+                upper_bound = 999
             if outlier_z_score is not None:
                 # The upper bound at which outliers exceed the given z score
                 upper_outlier_bound = x_mean + outlier_z_score * x_std

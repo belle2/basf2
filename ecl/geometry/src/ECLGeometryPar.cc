@@ -13,6 +13,7 @@
 
 #include <G4VTouchable.hh>
 #include <G4PhysicalVolumeStore.hh>
+#include <G4PVReplica.hh>
 #include <G4NavigationHistory.hh>
 #include <G4Transform3D.hh>
 #include <G4Point3D.hh>
@@ -204,8 +205,28 @@ G4Transform3D getT(const G4VPhysicalVolume& v)
 G4Transform3D getT(const G4String& n)
 {
   G4PhysicalVolumeStore* store = G4PhysicalVolumeStore::GetInstance();
+  // int N = store->size();
+  // cout<<N<<endl;
+  // for(int i=0;i<N;i++){
+  //   G4VPhysicalVolume *vv = (*store)[i];
+  //   if(vv->GetName()==n){
+  //     cout<<i<<" "<<vv->GetName()<<" "<<vv->GetMultiplicity()<<" "<<vv->GetCopyNo()<<endl;
+  //     G4PVReplica *r = dynamic_cast<G4PVReplica*>(vv);
+  //     if(r) cout<<"Instance = "<<r->GetInstanceID()<<endl;
+  //   }
+  // }
+
   G4VPhysicalVolume* v = store->GetVolume(n);
   return getT(*v);
+}
+
+void print_trans(const G4Transform3D& t)
+{
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 3; j++)
+      cout << t(j, i) << " ";
+    cout << endl;
+  }
 }
 
 void ECLGeometryPar::read()
@@ -221,7 +242,11 @@ void ECLGeometryPar::read()
   G4Point3D p0(0, 0, 0); G4Vector3D v0(0, 0, 1);
 
   {
-    G4Transform3D T = getT("ECLForwardPhysical") * getT("ECLForwardSectorPhysical") * getT("ECLForwardCrystalSectorPhysical_1");
+    G4Transform3D T0 = getT("ECLForwardPhysical");
+    G4Transform3D T1;// = getT("ECLForwardSectorPhysical");
+    G4Transform3D T2 = getT("ECLForwardCrystalSectorPhysical_1");
+    G4Transform3D T = T0 * T1 * T2;
+
     G4String tnamef("ECLForwardWrappedCrystal_Physical_");
     for (int i = 0; i < 72; i++) {
       G4String vname(tnamef); vname += to_string(i);
@@ -233,8 +258,11 @@ void ECLGeometryPar::read()
   }
 
   {
-    G4Transform3D T = G4RotateZ3D(M_PI) * getT("ECLBackwardPhysical") * getT("ECLBackwardSectorPhysical") *
-                      getT("ECLBackwardCrystalSectorPhysical_0");
+    G4Transform3D T0 = getT("ECLBackwardPhysical");
+    G4Transform3D T1;// = getT("ECLBackwardSectorPhysical");
+    G4Transform3D T2 = getT("ECLBackwardCrystalSectorPhysical_0");
+    G4Transform3D T = G4RotateZ3D(M_PI) * T0 * T1 * T2;
+
     G4String tnamef("ECLBackwardWrappedCrystal_Physical_");
     for (int i = 0; i < 60; i++) {
       G4String vname(tnamef); vname += to_string(i);
@@ -263,11 +291,13 @@ void ECLGeometryPar::read()
     }
   }
 
+  // B2INFO("ECLGeometryPar::read() will print all crystal positions.");
   // for(int i=0;i<8736;i++){
   //   const TVector3& v = GetCrystalPos(i);
-  //   cout<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
+  //   cout<<i<<" "<<v.x()<<" "<<v.y()<<" "<<v.z()<<"\n";
   // }
-  // exit(0);
+  // cout<<flush;
+  //  _exit(0);
   B2INFO("ECLGeometryPar::read() initialized with " << m_crystals.size() << " crystals.");
 }
 
@@ -288,7 +318,7 @@ void sincos(const double* ss, int iphi, double& s, double& c)
   c = lc;
 }
 
-double ss72[] = {
+const double ss72[] = {
   0.0000000000000000000000,
   0.0871557427476581735581,
   0.1736481776669303488517,
@@ -310,7 +340,7 @@ double ss72[] = {
   1.0000000000000000000000
 };
 
-double ss16[] = {
+const double ss16[] = {
   0.0000000000000000000000,
   0.3826834323650897717285,
   0.7071067811865475244008,
@@ -320,9 +350,10 @@ double ss16[] = {
 
 void ECLGeometryPar::InitCrystal(int cid)
 {
-  if (m_ini_cid == -1) read();
+  if (m_crystals.size() == 0) read();
   int thetaid, phiid, nreplica, indx;
   Mapping_t::Mapping(cid, thetaid, phiid, nreplica, indx);
+  //  cout<<cid<<" "<<thetaid<<" "<<phiid<<" "<<nreplica<<" "<<indx<<endl;
   const CrystalGeom_t& t = m_crystals[indx];
   double s, c;
   if (indx > 131)
@@ -337,7 +368,7 @@ void ECLGeometryPar::InitCrystal(int cid)
   double xv = c * t.dir.x() - s * t.dir.y();
   double yv = s * t.dir.x() + c * t.dir.y();
   m_current_crystal.dir.set(xv, yv, t.dir.z());
-
+  //  cout<<t.pos<<" "<<t.dir<<" "<<m_current_crystal.pos<<" "<<m_current_crystal.dir<<endl;
   m_ini_cid = cid;
 }
 
@@ -406,7 +437,8 @@ int ECLGeometryPar::TouchableToCellID(const G4VTouchable* touch)
 
     G4ThreeVector dr = m_current_crystal.pos - ro, dn = m_current_crystal.dir - rn;
     if (dr.mag() > 1e-10 || dn.mag() > 1e-10) {
-      cout << hd << " " << i2 << " " << i1 << " " << PhiId << " " << ro << " " << rn << " " << dr << " " << dn << endl;
+      cout << "Missmatch " << h->GetVolume(hd - 1)->GetName() << " " << cellID << " " << ThetaId << " " << PhiId << " " << NCryst << " "
+           << hd << " " << i2 << " " << i1 << " " << m_current_crystal.pos << " " << ro << " " << rn << " " << dr << " " << dn << endl;
 
       for (int i = 0; i < 144; i++) {
         int ci = Mapping_t::CellID(ThetaId, i);

@@ -61,6 +61,12 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    void setBranchAddress(TTree* t, const std::string& branchName,
+                          const std::string& /*variableName*/)
+    {
+      t->SetBranchAddress(branchName.c_str(), & m_max);
+    }
+
     /** Accessor to the sup of the set (which is also the max) */
     MaxType getSup(void) const { return m_max; } ;
 

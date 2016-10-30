@@ -234,23 +234,23 @@ Decay anti-B0
 # Updated to PDG 2008
 #                   b -> c semileptonic
 #
-0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D+      e-      anti-nu_e                       PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0020   D_0*+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0050   D'_1+   e-   anti-nu_e          PHOTOS  ISGW2;
-0.0022   D_2*+   e-   anti-nu_e          PHOTOS  ISGW2;
+0.050100000 D*+     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854; 
+0.021700000 D+      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1+   e-   anti-nu_e          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*+   e-   anti-nu_e          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*+  pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 0.004900000 D*0     pi+     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D+   pi0   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 0.0000   D0   pi+   e-   anti-nu_e      PHOTOS  GOITY_ROBERTS;
 
-0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  ISGW2;
-0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  ISGW2;
+0.050100000 D*+     mu-     anti-nu_mu                      PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D+      mu-     anti-nu_mu                      PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1+   mu-  anti-nu_mu         PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*+   mu-  anti-nu_mu         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*+  pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
 0.004900000 D*0     pi+     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D+   pi0   mu-  anti-nu_mu    PHOTOS   GOITY_ROBERTS;
@@ -258,12 +258,12 @@ Decay anti-B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*+     tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.011000000 D+      tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.0013   D_1+   tau- anti-nu_tau                 ISGW2;
-0.0013   D_0*+   tau- anti-nu_tau                 ISGW2;
-0.0020   D'_1+   tau- anti-nu_tau                 ISGW2;
-0.0020   D_2*+   tau- anti-nu_tau                 ISGW2;
+0.015000000 D*+     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
+0.011000000 D+      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.0013   D_1+   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D'_1+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D_2*+   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3
 #
 #                    b -> u l nu
 #
@@ -1496,24 +1496,24 @@ Decay B0
 # Updated to PDG 2008
 #                   b -> c semileptonic
 #
-0.050100000 D*-     e+      nu_e                            PHOTOS HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D-      e+      nu_e                            PHOTOS ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1-   e+   nu_e           PHOTOS ISGW2;
-0.0020   D_0*-   e+   nu_e           PHOTOS ISGW2;
-0.0050   D'_1-   e+   nu_e           PHOTOS ISGW2;
-0.0022   D_2*-   e+   nu_e           PHOTOS ISGW2;
+0.050100000 D*-     e+      nu_e                            PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D-      e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
+0.0054   D_1-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.0050   D'_1-   e+   nu_e           PHOTOS LLSW 0.68 -0.2 0.3;
+0.0022   D_2*-   e+   nu_e           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*-  pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
 0.004900000 anti-D*0 pi-     e+      nu_e                   PHOTOS GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D-   pi0   e+   nu_e       PHOTOS GOITY_ROBERTS;
 # Now 0 as it duplicates other decays
 0.0000   anti-D0  pi-   e+   nu_e       PHOTOS GOITY_ROBERTS;
 #
-0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.021700000 D-      mu+     nu_mu                           PHOTOS ISGW2; #[Reconstructed PDG2011]
-0.0054   D_1-   mu+  nu_mu           PHOTOS ISGW2;
-0.0020   D_0*-   mu+  nu_mu          PHOTOS  ISGW2;
-0.0050   D'_1-   mu+  nu_mu          PHOTOS  ISGW2;
-0.0022   D_2*-   mu+  nu_mu          PHOTOS  ISGW2;
+0.050100000 D*-     mu+     nu_mu                           PHOTOS HQET3 0.908 1.207 1.21 1.401 0.854;
+0.021700000 D-      mu+     nu_mu                           PHOTOS HQET3 1.082 1.186 1.0;
+0.0054   D_1-   mu+  nu_mu           PHOTOS LLSW 0.71 -1.6 -0.5 2.9;
+0.0020   D_0*-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0050   D'_1-   mu+  nu_mu          PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0022   D_2*-   mu+  nu_mu          PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.0003   D*-  pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
 0.004900000 anti-D*0 pi-     mu+     nu_mu                  PHOTOS     GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0010   D-   pi0   mu+  nu_mu       PHOTOS GOITY_ROBERTS;
@@ -1521,12 +1521,12 @@ Decay B0
 #
 #                    b -> c tau nu
 #
-0.015000000 D*-     tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.011000000 D-      tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.0013   D_1-   tau+ nu_tau                  ISGW2;
-0.0013   D_0*-   tau+ nu_tau                  ISGW2;
-0.0020   D'_1-   tau+ nu_tau                  ISGW2;
-0.0020   D_2*-   tau+ nu_tau                  ISGW2;
+0.015000000 D*-     tau+    nu_tau                          HQET3 0.908 1.207 1.21 1.401 0.854;
+0.011000000 D-      tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.0013   D_1-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D'_1-   tau+ nu_tau                  LLSW 0.68 -0.2 0.3;
+0.0020   D_2*-   tau+ nu_tau                  LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                    b -> u l nu
 #
@@ -2714,24 +2714,24 @@ Decay B-
 # Updated to PDG 2008
 #                  b -> c semileptonic
 #
-0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 D0      e-      anti-nu_e                       PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   D_10   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0024   D_0*0   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0007   D'_10   e-   anti-nu_e         PHOTOS  ISGW2;
-0.0018   D_2*0   e-   anti-nu_e         PHOTOS  ISGW2;
+0.056800000 D*0     e-      anti-nu_e                       PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 D0      e-      anti-nu_e                       PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   D_10   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   D_0*0   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.0007   D'_10   e-   anti-nu_e         PHOTOS  LLSW 0.68 -0.2 0.3;;
+0.0018   D_2*0   e-   anti-nu_e         PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*+     pi-     e-      anti-nu_e               PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   D*0  pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 # covered by other decays
 0.0000   D+   pi-   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 0.0010   D0   pi0   e-   anti-nu_e     PHOTOS  GOITY_ROBERTS;
 #
-0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   ISGW2; #[Reconstructed PDG2011]
-0.0040   D_10  mu-  anti-nu_mu         PHOTOS   ISGW2;
-0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    ISGW2;
-0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    ISGW2;
-0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    ISGW2;
+0.056800000 D*0     mu-     anti-nu_mu                      PHOTOS   HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 D0      mu-     anti-nu_mu                      PHOTOS   HQET3 1.082 1.186 1.0;
+0.0040   D_10  mu-  anti-nu_mu         PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   D_0*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0007   D'_10  mu-  anti-nu_mu        PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0018   D_2*0  mu-  anti-nu_mu        PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*+     pi-     mu-     anti-nu_mu              PHOTOS   GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   D*0   pi0   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
 0.0000   D+    pi-   mu-   anti-nu_mu  PHOTOS   GOITY_ROBERTS;
@@ -2739,12 +2739,12 @@ Decay B-
 #
 #                   b -> c tau nu
 #
-0.020000000 D*0     tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.007000000 D0      tau-    anti-nu_tau                     ISGW2; #[Reconstructed PDG2011]
-0.0013   D_10   tau- anti-nu_tau                 ISGW2;
-0.0013   D_0*0   tau- anti-nu_tau                 ISGW2;
-0.0020   D'_10   tau- anti-nu_tau                 ISGW2;
-0.0020   D_2*0   tau- anti-nu_tau                 ISGW2;
+0.020000000 D*0     tau-    anti-nu_tau                     HQET3 0.908 1.207 1.21 1.401 0.854;
+0.007000000 D0      tau-    anti-nu_tau                     HQET3 1.082 1.186 1.0;
+0.0013   D_10   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   D_0*0   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D'_10   tau- anti-nu_tau                 LLSW 0.68 -0.2 0.3;
+0.0020   D_2*0   tau- anti-nu_tau                 LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                   b -> u l nu
 #
@@ -3719,24 +3719,24 @@ Decay B+
 # Updated to PDG 2008
 #                  b -> c semileptonic
 #
-0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 anti-D0 e+      nu_e                            PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   anti-D_10   e+   nu_e        PHOTOS  ISGW2;
-0.0024   anti-D_0*0   e+   nu_e        PHOTOS  ISGW2;
-0.0007   anti-D'_10   e+   nu_e        PHOTOS  ISGW2;
-0.0018   anti-D_2*0   e+   nu_e        PHOTOS  ISGW2;
+0.056800000 anti-D*0 e+      nu_e                           PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 anti-D0 e+      nu_e                            PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   anti-D_10   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   anti-D_0*0   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0007   anti-D'_10   e+   nu_e        PHOTOS  LLSW 0.68 -0.2 0.3;
+0.0018   anti-D_2*0   e+   nu_e        PHOTOS  LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*-     pi+     e+      nu_e                    PHOTOS  GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   anti-D*0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 # covered by other decays
 0.0000   D-   pi+   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 0.0010   anti-D0  pi0   e+   nu_e    PHOTOS  GOITY_ROBERTS;
 
-0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS   HQET 0.77 1.33 0.92; #[Reconstructed PDG2011]
-0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  ISGW2; #[Reconstructed PDG2011]
-0.0040   anti-D_10   mu+  nu_mu       PHOTOS   ISGW2;
-0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    ISGW2;
-0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    ISGW2;
-0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    ISGW2;
+0.056800000 anti-D*0 mu+     nu_mu                          PHOTOS  HQET3 0.908 1.207 1.21 1.401 0.854;
+0.022300000 anti-D0 mu+     nu_mu                           PHOTOS  HQET3 1.082 1.186 1.0;
+0.0040   anti-D_10   mu+  nu_mu       PHOTOS   LLSW 0.71 -1.6 -0.5 2.9;
+0.0024   anti-D_0*0   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0007   anti-D'_10   mu+  nu_mu      PHOTOS    LLSW 0.68 -0.2 0.3;
+0.0018   anti-D_2*0   mu+  nu_mu      PHOTOS    LLSW 0.71 -1.6 -0.5 2.9;
 0.006100000 D*-     pi+     mu+     nu_mu                   PHOTOS    GOITY_ROBERTS; #[Reconstructed PDG2011]
 0.0003   anti-D*0  pi0   mu+   nu_mu  PHOTOS         GOITY_ROBERTS;
 0.0000   D-   pi+   mu+   nu_mu       PHOTOS    GOITY_ROBERTS;
@@ -3744,12 +3744,12 @@ Decay B+
 #
 #                   b -> c tau nu
 #
-0.020000000 anti-D*0 tau+    nu_tau                         ISGW2; #[Reconstructed PDG2011]
-0.007000000 anti-D0 tau+    nu_tau                          ISGW2; #[Reconstructed PDG2011]
-0.0013   anti-D_10   tau+ nu_tau                ISGW2;
-0.0013   anti-D_0*0   tau+ nu_tau                ISGW2;
-0.0020   anti-D'_10   tau+ nu_tau                ISGW2;
-0.0020   anti-D_2*0   tau+ nu_tau                ISGW2;
+0.020000000 anti-D*0 tau+    nu_tau                         HQET3 0.908 1.207 1.21 1.401 0.854;
+0.007000000 anti-D0 tau+    nu_tau                          HQET3 1.082 1.186 1.0;
+0.0013   anti-D_10   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
+0.0013   anti-D_0*0   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
+0.0020   anti-D'_10   tau+ nu_tau                LLSW 0.68 -0.2 0.3;
+0.0020   anti-D_2*0   tau+ nu_tau                LLSW 0.71 -1.6 -0.5 2.9;
 #
 #                   b -> u l nu
 #

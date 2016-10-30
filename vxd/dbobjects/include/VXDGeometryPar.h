@@ -116,8 +116,8 @@ namespace Belle2 {
     std::map<std::string, VXDAlignmentPar> m_alignment;
     /** Detector envelope parameters */
     VXDEnvelopePar m_envelope;
-    /** Container for half shells, can be used to loop over sensors */
-    std::vector<VXDHalfShellPar> m_halfShells;
+    /** Cache for half shells  */
+    std::map<std::string, VXDHalfShellPar> m_halfShells;
     /** Cache of all previously created components */
     std::map<std::string, VXDGeoComponentPar> m_componentCache;
     /** Map containing Information about all defined sensor types */

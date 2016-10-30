@@ -19,7 +19,7 @@ namespace Belle2 {
   class GearDir;
 
   /**
-  * The Class for VXD global paramter payload
+  * The Class for VXD Sensor Placement payload
   */
 
   class VXDGeoSensorPlacementPar: public TObject {
@@ -31,8 +31,6 @@ namespace Belle2 {
       m_sensorID(sensorID), m_sensorTypeID(sensorTypeID), m_z(z), m_flipU(flipU), m_flipV(flipV), m_flipW(flipW) {}
     //! Destructor
     ~VXDGeoSensorPlacementPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
     /** get the sensor id inside the ladder */
     int getSensorID() const { return m_sensorID; }
     /** set the sensor id inside the ladder */

@@ -32,13 +32,9 @@ namespace Belle2 {
       c_top,    /**< Place the component at the top of the mother */
       c_above   /**< Place the component above the mother */
     };
-    //! Default constructor
-    VXDGeoPlacementPar() {}
     /** Constructor */
-    //VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
-    //                 std::string w = "bottom", double woffset = 0) {}
-    //! Constructor using Gearbox
-    //explicit VXDGeoPlacementPar(const GearDir& content) { read(content); }
+    VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
+                       std::string w = "bottom", double woffset = 0);
     //! Destructor
     ~VXDGeoPlacementPar() {}
     //! Get geometry parameters from Gearbox

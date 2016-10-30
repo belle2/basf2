@@ -29,14 +29,12 @@ namespace Belle2 {
   */
   class VXDGeoSensorPar: public VXDGeoComponentPar {
   public:
-    //! Default constructor
-    VXDGeoSensorPar() {}
-    //! Constructor using Gearbox
-    //explicit VXDGeoSensorPar(const GearDir& content) { read(content); }
+    /** Constructor */
+    VXDGeoSensorPar(const std::string& material = "", const std::string& color = "",
+                    double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0, bool slanted = false):
+      VXDGeoComponentPar(material, color, width, width2, length, height, angle), m_info(0), m_slanted(slanted) {}
     //! Destructor
     ~VXDGeoSensorPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
     /** set the active area
       * @param area component description of the active area
       * @param placement placement description of the active area

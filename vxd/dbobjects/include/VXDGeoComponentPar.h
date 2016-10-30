@@ -27,11 +27,6 @@ namespace Belle2 {
   class VXDGeoComponentPar: public TObject {
 
   public:
-    //! Constructor
-    //explicit VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
-    //                double width = 0, double width2 = 0, double length = 0, double height = 0):
-    //  m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
-    //  m_height(height) {}
     /** Constructor */
     VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
                        double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):

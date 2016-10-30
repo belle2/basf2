@@ -28,24 +28,20 @@ namespace Belle2 {
   class VXDHalfShellPar: public TObject {
 
   public:
-    //! Default constructor
-    VXDHalfShellPar() {}
-    //! Constructor using Gearbox
-    explicit VXDHalfShellPar(const GearDir& content) { read(content); }
-    //! Destructor
-    ~VXDHalfShellPar() {}
-    //! Get geometry parameters from Gearbox
-    void read(const GearDir&);
+    /** Constructor */
+    VXDHalfShellPar(double shellAngle = 0) :  m_shellAngle(shellAngle) {}
+    /** get shellAngle */
+    double getShellAngle() const { return m_shellAngle; }
+    /** add ladder */
+    void addLadder(int layerID, int ladderID, double phi) { m_layers[layerID].push_back(std::pair<int, double>(ladderID, phi)); }
+    /** get ladders */
+    std::vector<std::pair<int, double>>& getLadders(int layerID) { return m_layers[layerID]; }
 
   private:
-    std::string m_shellName;
     double m_shellAngle;
-
     std::map< int, std::vector<std::pair<int, double>> > m_layers;
 
-
     ClassDef(VXDHalfShellPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
-
   };
 } // end of namespace Belle2
 

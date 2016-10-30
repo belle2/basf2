@@ -140,16 +140,13 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   GearDir support(content, "Support/");
   createHalfShellSupport(support);
 
-
-
   for (const GearDir& shell : content.getNodes("HalfShell")) {
 
-    string shellName =  shell.getString("@name");
-    //B2INFO("Building " << m_prefix << " half-shell " << shellName);
+    string shellName = m_prefix + "." + shell.getString("@name");
+    B2INFO("Building " << m_prefix << " half-shell " << shellName);
 
-    //Full name of alignemnt component
-    string component = m_prefix + "." + shellName;
-    m_alignment[component] = VXDAlignmentPar(component, GearDir(content, "Alignment/"));
+    m_alignment[ shellName ] = VXDAlignmentPar(shellName , GearDir(content, "Alignment/"));
+    m_halfShells[ shellName ] = VXDHalfShellPar(shell.getAngle("shellAngle", 0));
 
     for (const GearDir& layer : shell.getNodes("Layer")) {
       int layerID = layer.getInt("@id");
@@ -161,19 +158,13 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
       //Loop over defined ladders
       for (const GearDir& ladder : layer.getNodes("Ladder")) {
         int ladderID = ladder.getInt("@id");
-        //double phi = ladder.getAngle("phi", 0);
-
+        double phi = ladder.getAngle("phi", 0);
         readLadderInfo(layerID, ladderID, content);
+        m_halfShells[ shellName ].addLadder(layerID, ladderID,  phi);
+        B2INFO("Reading layerID " << layerID << " ladderID " << ladderID << " shell angle " << phi);
       }
     }
   }
-
-
-  //Read the definition of all sensor types
-  for (const GearDir& shell : content.getNodes("HalfShell")) {
-    m_halfShells.push_back(VXDHalfShellPar(shell));
-  }
-
 
   //Create diamond radiation sensors if defined and in background mode
   GearDir radiationDir(content, "RadiationSensors");

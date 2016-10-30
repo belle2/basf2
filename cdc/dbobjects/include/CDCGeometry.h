@@ -849,7 +849,7 @@ namespace Belle2 {
     /**
      * Get the global phi rotation of CDC.
      */
-    double getGlobalPhiRotation() const { return m_globalPhiRotation;}
+    //    double getGlobalPhiRotation() const { return m_globalPhiRotation;}
 
     /**
      * Get the global x offset of CDC wrt Belle2 coord. system.
@@ -865,6 +865,21 @@ namespace Belle2 {
      * Get the global z offset of CDC wrt Belle2 coord. system.
      */
     double getGlobalOffsetZ() const { return m_globalOffsetZ;}
+
+    /**
+     * Get the global offset angle a of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetA() const { return m_globalOffsetA;}
+
+    /**
+     * Get the global offset angle b of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetB() const { return m_globalOffsetB;}
+
+    /**
+     * Get the global offset angle c of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetC() const { return m_globalOffsetC;}
 
     /**
      * Get the fiducial Rmin of CDC sensitive volume.
@@ -1094,10 +1109,13 @@ namespace Belle2 {
 
   private:
 
-    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
-    double m_globalOffsetX = 0.0; /**< The offset of the whole cdc in x with respect to the IP (cm). */
-    double m_globalOffsetY = 0.0; /**< The offset of the whole cdc in y with respect to the IP (cm). */
-    double m_globalOffsetZ = 0.0; /**< The offset of the whole cdc in z with respect to the IP (cm). */
+    //    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
+    double m_globalOffsetX = 0.0; /**< Offset x of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetY = 0.0; /**< Offset y of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetZ = 0.0; /**< Offset z of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetA = 0.0; /**< Offset angle a of the whole cdc wrt B2 coord system (rad). */
+    double m_globalOffsetB = 0.0; /**< Offset angle b of the whole cdc wrt B2 coord system (rad). */
+    double m_globalOffsetC = 0.0; /**< Offset angle c of the whole cdc wrt B2 coord system (rad). */
     double m_fiducialRmin; /**< Minimum radius of the CDC fiducial volume. */
     double m_fiducialRmax; /**< Maximum radius of the CDC fiducial volume. */
     MotherVolume m_mother;    /**< CDC mother volume. */

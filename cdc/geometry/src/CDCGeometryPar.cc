@@ -160,7 +160,8 @@ void CDCGeometryPar::clear()
 
 void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 {
-  m_globalPhiRotation = geom.getGlobalPhiRotation();
+  //  m_globalPhiRotation = geom.getGlobalPhiRotation();
+  m_globalPhiRotation = geom.getGlobalOffsetC();
 
   // Get inner wall parameters
   m_rWall[0]    = geom.getInnerWall(2).getRmin();
@@ -734,7 +735,7 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -910,7 +911,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1027,7 +1028,7 @@ void CDCGeometryPar::oldReadXT(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1262,7 +1263,7 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1373,7 +1374,7 @@ void CDCGeometryPar::oldReadSigma(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1437,7 +1438,7 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1514,7 +1515,7 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1560,7 +1561,7 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1606,7 +1607,7 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }
@@ -1645,7 +1646,7 @@ void CDCGeometryPar::readChMap()
   if (fileName == "") {
     B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
   } else {
-    B2INFO("CDCGeometryPar: " << fileName0 << " exists.");
+    B2INFO("CDCGeometryPar: open " << fileName0);
     ifs.open(fileName.c_str());
     if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
   }

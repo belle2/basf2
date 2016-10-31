@@ -13,10 +13,11 @@
 #include <G4Step.hh>
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -26,13 +27,12 @@ EKLM::EKLMSensitiveDetector::
 EKLMSensitiveDetector(G4String name, enum SensitiveType type)
   : Simulation::SensitiveDetectorBase(name, Const::KLM)
 {
+  DBObjPtr<EKLMSimulationParameters> simPar;
+  if (!simPar.isValid())
+    B2FATAL("EKLM simulation parameters are not available.");
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_type = type;
-  GearDir gd = GearDir("/Detector/DetectorComponent[@name=\"EKLM\"]/Content");
-  gd.append("/SensitiveDetector");
-  m_ThresholdHitTime =
-    Unit::convertValue(gd.getDouble("HitTimeThreshold") , "ns");
-
+  m_ThresholdHitTime = simPar->getHitTimeThreshold();
   StoreArray<EKLMSimHit> simHits;
   StoreArray<MCParticle> particles;
   simHits.registerInDataStore();

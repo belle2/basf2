@@ -53,12 +53,13 @@ void EKLMDigitizerModule::initialize()
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  EKLM::setDefDigitizationParams(&m_DigPar);
-  m_Fitter = new EKLM::FPGAFitter(m_DigPar.getNDigitizations());
+  m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
 
 void EKLMDigitizerModule::beginRun()
 {
+  if (!m_DigPar.isValid())
+    B2FATAL("EKLM digitization parameters are not available.");
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
@@ -200,8 +201,8 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
-  EKLM::FiberAndElectronics fes(&m_DigPar, m_Fitter, m_DigitizationInitialTime,
-                                m_Debug);
+  EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
+                                m_DigitizationInitialTime, m_Debug);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {

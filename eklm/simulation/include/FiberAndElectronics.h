@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/simulation/Digitizer.h>
+#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/simulation/FPGAFitter.h>
 
 namespace Belle2 {

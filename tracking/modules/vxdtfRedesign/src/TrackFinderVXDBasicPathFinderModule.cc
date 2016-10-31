@@ -49,10 +49,6 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
   addParam("SpacePoints", m_spacePointsName,
            "SpacePoints collection name", string(""));
 
-  addParam("sectorMapName",
-           m_PARAMsecMapName,
-           "the name of the SectorMap used for this instance.", string("testMap"));
-
   addParam("printNetworks",
            m_PARAMprintNetworks,
            "If true for each event and each network created a file with a graph is created.", bool(false));
@@ -75,20 +71,6 @@ TrackFinderVXDBasicPathFinderModule::TrackFinderVXDBasicPathFinderModule() : Mod
 void TrackFinderVXDBasicPathFinderModule::initialize()
 {
   m_spacePoints.isRequired(m_spacePointsName);
-
-  m_sectorMap.isRequired();
-  bool wasFound = false;
-  for (auto& setup : m_sectorMap->getAllSetups()) {
-    auto& filters = *(setup.second);
-
-    if (filters.getConfig().secMapName != m_PARAMsecMapName) { continue; }
-    B2INFO("TrackFinderVXDBasicPathFinderModule::initialize(): loading mapName: " << m_PARAMsecMapName << ".");
-    m_config = filters.getConfig();
-    wasFound = true;
-    break; // have found our secMap no need for further searching
-  }
-  if (wasFound == false) B2FATAL("TrackFinderVXDBasicPathFinderModule::initialize(): requested secMapName '" << m_PARAMsecMapName <<
-                                   "' does not exist! Can not continue...");
 
   m_network.isRequired(m_PARAMNetworkName);
   m_TCs.registerInDataStore(m_PARAMSpacePointTrackCandArrayName, DataStore::c_DontWriteOut);

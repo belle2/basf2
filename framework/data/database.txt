@@ -4,6 +4,8 @@ dbstore/BeamParameters 1 0,0,-1,-1
 dbstore/VXDAlignment 1 0,0,-1,-1
 dbstore/EKLMTimeCalibration 2 0,0,-1,-1
 dbstore/EKLMDisplacement 1 0,0,-1,-1
+dbstore/EKLMDigitizationParameters 1 0,0,-1,-1
+dbstore/EKLMSimulationParameters 1 0,0,-1,-1
 dbstore/ECLDigitTimeConstants 2 0,0,-1,-1
 dbstore/ECLDigitEnergyConstantsHigh 1 0,0,-1,-1
 dbstore/ARICHChannelMapping 1 0,0,-1,-1			    

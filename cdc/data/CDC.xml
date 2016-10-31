@@ -68,7 +68,7 @@
     <OffsetZ desc="Offset z of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetZ>
     <OffsetA desc="Offset angle a of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetA>
     <OffsetB desc="Offset angle b of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetB>
-    <OffsetC desc="Offset angle c of the whole CDC wrt B2 coord system. N.B. Not fully ready; can control the global phi angle of sense wires only." unit="deg">0.0</OffsetC>
+    <OffsetC desc="Offset angle c of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetC>
     <Helium>CDCHeGas</Helium>
     <Ethane>CDCEthaneGas</Ethane>
     <Aluminum>Al</Aluminum>

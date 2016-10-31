@@ -25,6 +25,7 @@
 #include <geometry/Materials.h>
 
 using namespace std;
+using namespace Belle2;
 using namespace Belle2::geometry;
 
 void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)

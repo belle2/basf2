@@ -7,6 +7,14 @@ using namespace Belle2;
 using namespace Belle2::ECL;
 using namespace std;
 
+// define the constexpr here to make clang happy. Could be a bug or some strict
+// adherence to the standard. I guess it's just a different interpretation of
+// how to use these values by clang.
+// http://stackoverflow.com/questions/28264279/undefined-reference-when-accessing-static-constexpr-float-member
+constexpr double EclConfiguration::s_clock;
+constexpr double EclConfiguration::m_rf;
+constexpr double EclConfiguration::m_step;
+
 void EclConfiguration::signalsample_t::InitSample(const double* MPd)
 {
   const int N = m_ns * m_nl;

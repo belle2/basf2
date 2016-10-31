@@ -99,9 +99,9 @@ namespace Belle2 {
           new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiShieldLayer, physVolName, &topVolume, false, 0);
 
           B2INFO("Mass of " << side << " layer " << iLayer
-                 << " = " << logiShieldLayer->GetMass() / CLHEP::g << ".kg.");
+                 << " = " << logiShieldLayer->GetMass() / CLHEP::kg << ".kg.");
 
-          _mass += (logiShieldLayer->GetMass() / CLHEP::g);
+          _mass += (logiShieldLayer->GetMass() / CLHEP::kg);
         }
 
         B2INFO("Total mass of side " << side << " = " << _mass << " kg");
@@ -139,7 +139,7 @@ namespace Belle2 {
         //Place physical volume
         new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiPole, physVolName, &topVolume, false, 0);
 
-        B2INFO("Total mass of " << side << " = " << logiPole->GetMass() / CLHEP::g  << " kg");
+        B2INFO("Total mass of " << side << " = " << logiPole->GetMass() / CLHEP::kg  << " kg");
       }
 
 
@@ -187,9 +187,9 @@ namespace Belle2 {
       B2INFO("Number of planes on side  " << side << " : " << planes.size());
 
       for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
-        parameters.setPolePlaneZ(iPole, iPlane, planes.at(iPlane).getLength("posZ"));
-        parameters.setPolePlaneInnerRadius(iPole, iPlane, planes.at(iPlane).getLength("innerRadius"));
-        parameters.setPolePlaneOuterRadius(iPole, iPlane, planes.at(iPlane).getLength("outerRadius"));
+        parameters.setPolePlaneZ(iPole, iPlane, planes.at(iPlane).getLength("posZ") / Unit::mm);
+        parameters.setPolePlaneInnerRadius(iPole, iPlane, planes.at(iPlane).getLength("innerRadius") / Unit::mm);
+        parameters.setPolePlaneOuterRadius(iPole, iPlane, planes.at(iPlane).getLength("outerRadius") / Unit::mm);
 
       }
     }
@@ -232,9 +232,9 @@ namespace Belle2 {
                << " : " << planes.size());
 
         for (unsigned int iPlane = 0; iPlane < planes.size(); iPlane++) {
-          parameters.setLayerPlaneZ(iShield, iLayer, iPlane, planes.at(iPlane).getLength("posZ"));
-          parameters.setLayerPlaneInnerRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("innerRadius"));
-          parameters.setLayerPlaneOuterRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("outerRadius"));
+          parameters.setLayerPlaneZ(iShield, iLayer, iPlane, planes.at(iPlane).getLength("posZ") / Unit::mm);
+          parameters.setLayerPlaneInnerRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("innerRadius") / Unit::mm);
+          parameters.setLayerPlaneOuterRadius(iShield, iLayer, iPlane, planes.at(iPlane).getLength("outerRadius") / Unit::mm);
         }
       }
     }

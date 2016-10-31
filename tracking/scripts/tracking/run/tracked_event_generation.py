@@ -143,15 +143,29 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 
 def add_standard_finder(path):
-    components = []
+    import tracking
+    components = None
     for module in path.modules():
         if module.type() == "Geometry":
             components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
     tracking.add_track_finding(path, components=components)
 
 
+def add_standard_reconstruction(path):
+    import reconstruction
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+    reconstruction.add_reconstruction(path, components=components)
+
 finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
+    'Reconstruction': add_standard_reconstruction,
     'TrackFinder': add_standard_finder,
     'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,

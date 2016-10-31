@@ -36,12 +36,14 @@ namespace Belle2 {
 
       /**
        * Constructor.
-       * @param[in] digPar Digitization parameters.
-       * @param[in] fitter Fitter.
-       * @param[in] debug  Use debug mode.
+       * @param[in] digPar                  Digitization parameters.
+       * @param[in] digitizationInitialTime Initial digitization time.
+       * @param[in] fitter                  Fitter.
+       * @param[in] debug                   Use debug mode.
        */
       FiberAndElectronics(EKLMDigitizationParameters* digPar,
-                          FPGAFitter* fitter, bool debug);
+                          FPGAFitter* fitter, double digitizationInitialTime,
+                          bool debug);
 
       /**
        * Destructor.
@@ -103,6 +105,9 @@ namespace Belle2 {
 
       /** Fitter. */
       FPGAFitter* m_fitter;
+
+      /** Initial digitization time. */
+      double m_DigitizationInitialTime;
 
       /** Debug mode (generates additional output files with histograms). */
       bool m_Debug;

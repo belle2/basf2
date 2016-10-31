@@ -42,7 +42,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   int j;
   int gnpe;
   double t, s;
-  EKLM::FiberAndElectronics fe(&m_digPar, NULL, false);
+  EKLM::FiberAndElectronics fe(&m_digPar, NULL, 0, false);
   TH1F* h = NULL;
   t = m_digPar.getNDigitizations() * m_digPar.getADCSamplingTime();
   try {

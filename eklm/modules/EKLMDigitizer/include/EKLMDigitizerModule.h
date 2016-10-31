@@ -90,6 +90,9 @@ namespace Belle2 {
     /** Digitization parameters. */
     EKLMDigitizationParameters m_DigPar;
 
+    /** Initial digitization time. */
+    double m_DigitizationInitialTime;
+
     /** Use debug mode in EKLM::FiberAndElectronics or not. */
     bool m_Debug;
 

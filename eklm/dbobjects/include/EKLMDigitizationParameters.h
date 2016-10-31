@@ -44,16 +44,6 @@ namespace Belle2 {
     void setADCRange(float range);
 
     /**
-     * Get initial digitization time.
-     */
-    float getDigitizationInitialTime() const;
-
-    /**
-     * Set initial digitization time.
-     */
-    void setDigitizationInitialTime(float time);
-
-    /**
      * Get ADC sampling time.
      */
     float getADCSamplingTime() const;
@@ -217,9 +207,6 @@ namespace Belle2 {
 
     /** ADC range: 2**(resolution in bits). */
     float m_ADCRange;
-
-    /** Initial digitization time, ns. */
-    float m_DigitizationInitialTime;
 
     /** ADC sampling time, ns. */
     float m_ADCSamplingTime;

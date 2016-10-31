@@ -51,12 +51,14 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  EKLMDigitizationParameters* digPar, FPGAFitter* fitter, bool debug)
+  EKLMDigitizationParameters* digPar, FPGAFitter* fitter,
+  double digitizationInitialTime, bool debug)
 {
   int i;
   double time, attenuationTime;
   m_DigPar = digPar;
   m_fitter = fitter;
+  m_DigitizationInitialTime = digitizationInitialTime;
   m_Debug = debug;
   m_npe = 0;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
@@ -179,7 +181,7 @@ void EKLM::FiberAndElectronics::processEntry()
    */
   m_FPGAParams.startTime = m_FPGAParams.startTime *
                            m_DigPar->getADCSamplingTime() +
-                           m_DigPar->getDigitizationInitialTime();
+                           m_DigitizationInitialTime;
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
@@ -328,7 +330,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
       gRandom->Exp(m_DigPar->getScintillatorDeExcitationTime()) +
       gRandom->Exp(m_DigPar->getFiberDeExcitationTime());
     hitTime = hitDist * inverseLightSpeed + deExcitationTime +
-              timeShift - m_DigPar->getDigitizationInitialTime();
+              timeShift - m_DigitizationInitialTime;
     if (hitTime >= maxHitTime)
       continue;
     if (hitTime >= 0)

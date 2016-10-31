@@ -32,19 +32,6 @@ void EKLMDigitizationParameters::setADCRange(float range)
   m_ADCRange = range;
 }
 
-
-float EKLMDigitizationParameters::getDigitizationInitialTime() const
-{
-  return m_DigitizationInitialTime;
-}
-
-
-void EKLMDigitizationParameters::setDigitizationInitialTime(float time)
-{
-  m_DigitizationInitialTime = time;
-}
-
-
 float EKLMDigitizationParameters::getADCSamplingTime() const
 {
   return m_ADCSamplingTime;

@@ -29,9 +29,8 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
-  // Temporary disabled
-  //addParam("DigitizationInitialTime", m_DigPar.digitizationInitialTime,
-  //         "Initial digitization time (ns).", double(0.));
+  addParam("DigitizationInitialTime", m_DigitizationInitialTime,
+           "Initial digitization time (ns).", double(0.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
            "Create merged EKLMSim2Hits", bool(false));
   addParam("Debug", m_Debug,
@@ -54,7 +53,6 @@ void EKLMDigitizerModule::initialize()
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  m_DigPar.setDigitizationInitialTime(0);
   EKLM::setDefDigitizationParams(&m_DigPar);
   m_Fitter = new EKLM::FPGAFitter(m_DigPar.getNDigitizations());
 }
@@ -202,7 +200,8 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
-  EKLM::FiberAndElectronics fes(&m_DigPar, m_Fitter, m_Debug);
+  EKLM::FiberAndElectronics fes(&m_DigPar, m_Fitter, m_DigitizationInitialTime,
+                                m_Debug);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {

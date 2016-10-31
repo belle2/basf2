@@ -73,7 +73,7 @@ void EKLMReconstructorModule::initialize()
     B2FATAL("It is not possible to run EKLM reconstruction with 1 plane.");
   m_nStrip = m_GeoDat->getMaximalStripGlobalNumber();
   m_TimeCalibrationData = new EKLMTimeCalibrationData*[m_nStrip];
-  setDefDigitizationParams(&m_digPar);
+  EKLM::setDefDigitizationParams(&m_digPar);
 }
 
 void EKLMReconstructorModule::beginRun()
@@ -97,7 +97,8 @@ void EKLMReconstructorModule::beginRun()
 bool EKLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
                                       double time)
 {
-  return time < pos.mag() / Const::speedOfLight - 2.0 * m_digPar.timeResolution;
+  return time < pos.mag() / Const::speedOfLight -
+         2.0 * m_digPar.getTimeResolution();
 }
 
 double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
@@ -156,7 +157,8 @@ void EKLMReconstructorModule::event()
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                        m_digPar.timeResolution / m_digPar.timeResolution);
+                        m_digPar.getTimeResolution() /
+                        m_digPar.getTimeResolution());
         hit2d->setTime(t);
         hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
         hit2d->addRelationTo(*it4);

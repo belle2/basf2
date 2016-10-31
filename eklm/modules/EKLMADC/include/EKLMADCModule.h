@@ -85,7 +85,7 @@ namespace Belle2 {
     TFile* m_fout;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_digPar;
+    EKLMDigitizationParameters m_digPar;
 
     /** Direct histogram. */
     float* m_hDir;

@@ -40,7 +40,7 @@ namespace Belle2 {
        * @param[in] fitter Fitter.
        * @param[in] debug  Use debug mode.
        */
-      FiberAndElectronics(struct EKLM::DigitizationParams* digPar,
+      FiberAndElectronics(EKLMDigitizationParameters* digPar,
                           FPGAFitter* fitter, bool debug);
 
       /**
@@ -99,7 +99,7 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      struct EKLM::DigitizationParams* m_DigPar;
+      EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;

@@ -51,7 +51,7 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  struct EKLM::DigitizationParams* digPar, FPGAFitter* fitter, bool debug)
+  EKLMDigitizationParameters* digPar, FPGAFitter* fitter, bool debug)
 {
   int i;
   double time, attenuationTime;
@@ -59,35 +59,36 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_fitter = fitter;
   m_Debug = debug;
   m_npe = 0;
-  m_histRange = m_DigPar->nDigitizations * m_DigPar->ADCSamplingTime;
+  m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
   m_FPGAParams = {0, 0, 0};
   /* Amplitude arrays. */
-  m_amplitudeDirect = (float*)malloc(m_DigPar->nDigitizations * sizeof(float));
+  m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
+                                     sizeof(float));
   if (m_amplitudeDirect == NULL)
     B2FATAL(MemErr);
-  m_amplitudeReflected = (float*)malloc(m_DigPar->nDigitizations *
+  m_amplitudeReflected = (float*)malloc(m_DigPar->getNDigitizations() *
                                         sizeof(float));
   if (m_amplitudeReflected == NULL)
     B2FATAL(MemErr);
-  m_amplitude = (float*)malloc(m_DigPar->nDigitizations * sizeof(float));
+  m_amplitude = (float*)malloc(m_DigPar->getNDigitizations() * sizeof(float));
   if (m_amplitude == NULL)
     B2FATAL(MemErr);
-  m_ADCAmplitude = (int*)malloc(m_DigPar->nDigitizations * sizeof(int));
+  m_ADCAmplitude = (int*)malloc(m_DigPar->getNDigitizations() * sizeof(int));
   if (m_ADCAmplitude == NULL)
     B2FATAL(MemErr);
-  m_SignalTimeDependence = (double*)malloc((m_DigPar->nDigitizations + 1) *
+  m_SignalTimeDependence = (double*)malloc((m_DigPar->getNDigitizations() + 1) *
                                            sizeof(double));
   if (m_SignalTimeDependence == NULL)
     B2FATAL(MemErr);
-  m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->nDigitizations *
+  m_SignalTimeDependenceDiff = (double*)malloc(m_DigPar->getNDigitizations() *
                                                sizeof(double));
   if (m_SignalTimeDependenceDiff == NULL)
     B2FATAL(MemErr);
-  attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
-  for (i = 0; i <= m_DigPar->nDigitizations; i++) {
-    time = digPar->ADCSamplingTime * i;
-    m_SignalTimeDependence[i] = exp(-digPar->PEAttenuationFreq * time) *
-                                attenuationTime;
+  attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
+  for (i = 0; i <= m_DigPar->getNDigitizations(); i++) {
+    time = digPar->getADCSamplingTime() * i;
+    m_SignalTimeDependence[i] =
+      exp(-digPar->getPEAttenuationFrequency() * time) * attenuationTime;
     if (i > 0) {
       m_SignalTimeDependenceDiff[i - 1] = m_SignalTimeDependence[i - 1] -
                                           m_SignalTimeDependence[i];
@@ -129,19 +130,19 @@ void EKLM::FiberAndElectronics::processEntry()
   EKLMSimHit* hit;
   m_MCTime = -1;
   m_npe = 0;
-  for (i = 0; i < m_DigPar->nDigitizations; i++) {
+  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
     m_amplitudeDirect[i] = 0;
     m_amplitudeReflected[i] = 0;
   }
   for (it = m_hit; it != m_hitEnd; ++it) {
     hit = it->second;
     /* Poisson mean for number of photons. */
-    nPhotons = hit->getEDep() * m_DigPar->nPEperMeV;
+    nPhotons = hit->getEDep() * m_DigPar->getNPEperMeV();
     /* Fill histograms. */
     l = GeometryData::Instance().getStripLength(hit->getStrip()) / CLHEP::mm *
         Unit::mm;
     d = 0.5 * l - hit->getLocalPosition().x();
-    t = hit->getTime() + d / m_DigPar->fiberLightSpeed;
+    t = hit->getTime() + d / m_DigPar->getFiberLightSpeed();
     if (m_MCTime < 0)
       m_MCTime = t;
     else
@@ -149,24 +150,24 @@ void EKLM::FiberAndElectronics::processEntry()
     fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), false,
                    m_amplitudeDirect, &gnpe);
     m_npe = m_npe + gnpe;
-    if (m_DigPar->mirrorReflectiveIndex > 0) {
+    if (m_DigPar->getMirrorReflectiveIndex() > 0) {
       fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), true,
                      m_amplitudeReflected, &gnpe);
       m_npe = m_npe + gnpe;
     }
   }
   /* Sum up histograms. */
-  for (i = 0; i < m_DigPar->nDigitizations; i++) {
+  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
     m_amplitude[i] = m_amplitudeDirect[i];
-    if (m_DigPar->mirrorReflectiveIndex > 0)
+    if (m_DigPar->getMirrorReflectiveIndex() > 0)
       m_amplitude[i] = m_amplitude[i] + m_amplitudeReflected[i];
   }
   /* SiPM noise and ADC. */
-  if (m_DigPar->meanSiPMNoise > 0)
+  if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
   simulateADC();
   /* Fit. */
-  m_FPGAParams.bgAmplitude = m_DigPar->ADCPedestal;
+  m_FPGAParams.bgAmplitude = m_DigPar->getADCPedestal();
   m_FPGAStat = m_fitter->fit(m_ADCAmplitude, &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
@@ -176,8 +177,9 @@ void EKLM::FiberAndElectronics::processEntry()
    * time = ADC conversion time,
    * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime * m_DigPar->ADCSamplingTime +
-                           m_DigPar->digitizationInitialTime;
+  m_FPGAParams.startTime = m_FPGAParams.startTime *
+                           m_DigPar->getADCSamplingTime() +
+                           m_DigPar->getDigitizationInitialTime();
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
@@ -186,8 +188,9 @@ void EKLM::FiberAndElectronics::processEntry()
 void EKLM::FiberAndElectronics::addRandomSiPMNoise()
 {
   int i;
-  for (i = 0; i < m_DigPar->nDigitizations; i++)
-    m_amplitude[i] = m_amplitude[i] + gRandom->Poisson(m_DigPar->meanSiPMNoise);
+  for (i = 0; i < m_DigPar->getNDigitizations(); i++)
+    m_amplitude[i] = m_amplitude[i] +
+                     gRandom->Poisson(m_DigPar->getMeanSiPMNoise());
 }
 
 int* EKLM::FiberAndElectronics::sortPhotoelectrons(int nPhotoelectrons)
@@ -293,8 +296,8 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
   double stripLen, double distSiPM, int nPhotons, double timeShift,
   bool isReflected, float* hist, int* gnpe)
 {
-  const double maxHitTime = m_DigPar->nDigitizations *
-                            m_DigPar->ADCSamplingTime;
+  const double maxHitTime = m_DigPar->getNDigitizations() *
+                            m_DigPar->getADCSamplingTime();
   int i, bin, nPhotoelectrons, maxBin;
   double hitTime, deExcitationTime, cosTheta, hitDist;
   double attenuationTime, sig, expSum;
@@ -302,14 +305,14 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
   int ind1, ind2, ind3;
   int* indexArray;
   nPhotoelectrons = 0;
-  attenuationTime = 1.0 / m_DigPar->PEAttenuationFreq;
-  inverseLightSpeed = 1.0 / m_DigPar->fiberLightSpeed;
-  inverseAttenuationLength = 1.0 / m_DigPar->attenuationLength;
+  attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
+  inverseLightSpeed = 1.0 / m_DigPar->getFiberLightSpeed();
+  inverseAttenuationLength = 1.0 / m_DigPar->getAttenuationLength();
   /* Generation of photoelectrons. */
   for (i = 0; i < nPhotons; i++) {
     if (nPhotoelectrons >= m_PhotoelectronBufferSize)
       reallocPhotoElectronBuffers(m_PhotoelectronBufferSize + 100);
-    cosTheta = gRandom->Uniform(m_DigPar->minCosTheta, 1);
+    cosTheta = gRandom->Uniform(m_DigPar->getMinCosTheta(), 1);
     if (!isReflected)
       hitDist = distSiPM / cosTheta;
     else
@@ -319,21 +322,22 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
       continue;
     /* Account for mirror reflective index. */
     if (isReflected)
-      if (gRandom->Uniform() > m_DigPar->mirrorReflectiveIndex)
+      if (gRandom->Uniform() > m_DigPar->getMirrorReflectiveIndex())
         continue;
-    deExcitationTime = gRandom->Exp(m_DigPar->scintillatorDeExcitationTime) +
-                       gRandom->Exp(m_DigPar->fiberDeExcitationTime);
+    deExcitationTime =
+      gRandom->Exp(m_DigPar->getScintillatorDeExcitationTime()) +
+      gRandom->Exp(m_DigPar->getFiberDeExcitationTime());
     hitTime = hitDist * inverseLightSpeed + deExcitationTime +
-              timeShift - m_DigPar->digitizationInitialTime;
+              timeShift - m_DigPar->getDigitizationInitialTime();
     if (hitTime >= maxHitTime)
       continue;
     if (hitTime >= 0)
       m_Photoelectrons[nPhotoelectrons].bin =
-        floor(hitTime / m_DigPar->ADCSamplingTime);
+        floor(hitTime / m_DigPar->getADCSamplingTime());
     else
       m_Photoelectrons[nPhotoelectrons].bin = -1;
     m_Photoelectrons[nPhotoelectrons].expTime =
-      exp(m_DigPar->PEAttenuationFreq * hitTime);
+      exp(m_DigPar->getPEAttenuationFrequency() * hitTime);
     m_PhotoelectronIndex[nPhotoelectrons] = nPhotoelectrons;
     nPhotoelectrons++;
   }
@@ -364,7 +368,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
       expSum = expSum + m_Photoelectrons[indexArray[ind3]].expTime;
     }
     if (ind2 == nPhotoelectrons)
-      maxBin = m_DigPar->nDigitizations - 1;
+      maxBin = m_DigPar->getNDigitizations() - 1;
     else
       maxBin = m_Photoelectrons[indexArray[ind2]].bin;
     for (i = bin + 1; i <= maxBin; i++) {
@@ -381,10 +385,11 @@ void EKLM::FiberAndElectronics::simulateADC()
 {
   int i;
   double amp;
-  for (i = 0; i < m_DigPar->nDigitizations; i++) {
-    amp = m_DigPar->ADCPedestal + m_DigPar->ADCPEAmplitude * m_amplitude[i];
-    if (amp > m_DigPar->ADCSaturation)
-      amp = m_DigPar->ADCSaturation;
+  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
+    amp = m_DigPar->getADCPedestal() +
+          m_DigPar->getADCPEAmplitude() * m_amplitude[i];
+    if (amp > m_DigPar->getADCSaturation())
+      amp = m_DigPar->getADCSaturation();
     m_ADCAmplitude[i] = amp;
   }
 }
@@ -403,7 +408,8 @@ double EKLM::FiberAndElectronics::getNPE()
 {
   double intg;
   intg = m_FPGAParams.amplitude;
-  return intg * m_DigPar->PEAttenuationFreq / m_DigPar->ADCPEAmplitude;
+  return intg * m_DigPar->getPEAttenuationFrequency() /
+         m_DigPar->getADCPEAmplitude();
 }
 
 int EKLM::FiberAndElectronics::getGeneratedNPE()
@@ -422,20 +428,20 @@ void EKLM::FiberAndElectronics::debugOutput()
   try {
     histAmplitudeDirect =
       new TH1D("histAmplitudeDirect", m_stripName.c_str(),
-               m_DigPar->nDigitizations, 0, m_histRange);
+               m_DigPar->getNDigitizations(), 0, m_histRange);
     histAmplitudeReflected =
       new TH1D("histAmplitudeReflected", m_stripName.c_str(),
-               m_DigPar->nDigitizations, 0, m_histRange);
+               m_DigPar->getNDigitizations(), 0, m_histRange);
     histAmplitude =
       new TH1D("histAmplitude", m_stripName.c_str(),
-               m_DigPar->nDigitizations, 0, m_histRange);
+               m_DigPar->getNDigitizations(), 0, m_histRange);
     histADCAmplitude =
       new TH1D("histADCAmplitude", m_stripName.c_str(),
-               m_DigPar->nDigitizations, 0, m_histRange);
+               m_DigPar->getNDigitizations(), 0, m_histRange);
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }
-  for (i = 0; i < m_DigPar->nDigitizations; i++) {
+  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
     histAmplitudeDirect->SetBinContent(i + 1, m_amplitudeDirect[i]);
     histAmplitudeReflected->SetBinContent(i + 1, m_amplitudeReflected[i]);
     histAmplitude->SetBinContent(i + 1, m_amplitude[i]);

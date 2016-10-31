@@ -17,26 +17,26 @@
 
 using namespace Belle2;
 
-void EKLM::setDefDigitizationParams(struct DigitizationParams* digPar)
+void EKLM::setDefDigitizationParams(EKLMDigitizationParameters* digPar)
 {
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
               "Content/DigitizationParams");
-  digPar->ADCRange = dig.getDouble("ADCRange");
-  digPar->ADCSamplingTime = dig.getDouble("ADCSamplingTime");
-  digPar->nDigitizations = dig.getDouble("nDigitizations");
-  digPar->ADCPedestal = dig.getDouble("ADCPedestal");
-  digPar->ADCPEAmplitude = dig.getDouble("ADCPEAmplitude");
-  digPar->ADCSaturation = dig.getDouble("ADCSaturation");
-  digPar->nPEperMeV = dig.getDouble("nPEperMeV");
-  digPar->minCosTheta = cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI);
-  digPar->mirrorReflectiveIndex = dig.getDouble("MirrorReflectiveIndex");
-  digPar->scintillatorDeExcitationTime = dig.getDouble("ScintDeExTime");
-  digPar->fiberDeExcitationTime = dig.getDouble("FiberDeExTime");
-  digPar->fiberLightSpeed = dig.getDouble("FiberLightSpeed");
-  digPar->attenuationLength = dig.getDouble("AttenuationLength");
-  digPar->PEAttenuationFreq = dig.getDouble("PEAttenuationFreq");
-  digPar->meanSiPMNoise = dig.getDouble("MeanSiPMNoise");
-  digPar->enableConstBkg = dig.getDouble("EnableConstBkg") > 0;
-  digPar->timeResolution = dig.getDouble("TimeResolution");
+  digPar->setADCRange(dig.getDouble("ADCRange"));
+  digPar->setADCSamplingTime(dig.getDouble("ADCSamplingTime"));
+  digPar->setNDigitizations(dig.getDouble("nDigitizations"));
+  digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
+  digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
+  digPar->setADCSaturation(dig.getDouble("ADCSaturation"));
+  digPar->setNPEperMeV(dig.getDouble("nPEperMeV"));
+  digPar->setMinCosTheta(cos(dig.getDouble("MaxTotalIRAngle") / 180.0 * M_PI));
+  digPar->setMirrorReflectiveIndex(dig.getDouble("MirrorReflectiveIndex"));
+  digPar->setScintillatorDeExcitationTime(dig.getDouble("ScintDeExTime"));
+  digPar->setFiberDeExcitationTime(dig.getDouble("FiberDeExTime"));
+  digPar->setFiberLightSpeed(dig.getDouble("FiberLightSpeed"));
+  digPar->setAttenuationLength(dig.getDouble("AttenuationLength"));
+  digPar->setPEAttenuationFrequency(dig.getDouble("PEAttenuationFreq"));
+  digPar->setMeanSiPMNoise(dig.getDouble("MeanSiPMNoise"));
+  digPar->setEnableConstBkg(dig.getDouble("EnableConstBkg") > 0);
+  digPar->setTimeResolution(dig.getDouble("TimeResolution"));
 }
 

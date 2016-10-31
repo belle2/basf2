@@ -88,7 +88,7 @@ namespace Belle2 {
     double m_DiscriminatorThreshold;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_DigPar;
+    EKLMDigitizationParameters m_DigPar;
 
     /** Use debug mode in EKLM::FiberAndElectronics or not. */
     bool m_Debug;

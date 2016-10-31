@@ -92,7 +92,7 @@ namespace Belle2 {
     EKLM::TransformData* m_TransformData;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_digPar;
+    EKLMDigitizationParameters m_digPar;
 
     /** Time calibration data. */
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;

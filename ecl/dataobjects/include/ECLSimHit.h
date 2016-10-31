@@ -29,8 +29,7 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0,
-          0) {;}
+    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum{0}, m_Position{0} {;}
     //    ECLSimHit() {} // do nothing
 
     //! Useful Constructor
@@ -42,8 +41,11 @@ namespace Belle2 {
       double Edep,            /**< Deposit energy */
       G4ThreeVector Momentum,     /**< Momentum */
       G4ThreeVector Position        /**< Position */
-    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
-      m_Position(Position) {;}
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep)
+    {
+      m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z();
+      m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z();
+    }
 
     /*! Set Cell ID
      */
@@ -67,7 +69,7 @@ namespace Belle2 {
 
     /*! Set Momentum
      */
-    void setMomentum(const G4ThreeVector& Momentum) { m_Momentum = Momentum; }
+    void setMomentum(const G4ThreeVector& Momentum) { m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z(); }
 
     /*! Set Position
      */
@@ -75,7 +77,7 @@ namespace Belle2 {
 
     /*! Set Position
      */
-    void setPosition(const G4ThreeVector& Position) { m_Position = Position; }
+    void setPosition(const G4ThreeVector& Position) { m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z(); }
 
     /*! Get Cell ID
      * @return Cell ID
@@ -105,17 +107,17 @@ namespace Belle2 {
     /*! Get Momentum
      * @return Momentum
      */
-    G4ThreeVector getMomentum() const { return m_Momentum; }
+    G4ThreeVector getMomentum() const { return G4ThreeVector(m_Momentum[0], m_Momentum[1], m_Momentum[2]); }
 
     /*! Get Position
      * @return Position
      */
-    G4ThreeVector getPosIn() const { return m_Position; }
+    G4ThreeVector getPosIn() const { return getPosition(); }
 
     /*! Get Position
      * @return Position
      */
-    G4ThreeVector getPosition() const { return m_Position; }
+    G4ThreeVector getPosition() const { return G4ThreeVector(m_Position[0], m_Position[1], m_Position[2]); }
 
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
@@ -129,11 +131,11 @@ namespace Belle2 {
     int m_Pdg;               /**< Particle PDG (can be one of secondaries) */
     double m_FlightTime;      /**< Flight time from IP */
     double m_Edep;            /**< Deposit energy */
-    G4ThreeVector m_Momentum;     /**< Momentum */
-    G4ThreeVector m_Position;        /**< Position */
+    double m_Momentum[3];     /**< Momentum */
+    double m_Position[3];        /**< Position */
 
 
-    ClassDef(ECLSimHit, 4);/**< the class title */
+    ClassDef(ECLSimHit, 5);/**< the class title */
 
   };
 } // end namespace Belle2

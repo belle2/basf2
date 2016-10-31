@@ -115,10 +115,13 @@ def extend_path(path,
                 # create an instance and add it to the path
                 module_instance = module()
                 path.add_module(module_instance)
+                return
         except TypeError:
-            # module is not a module class
-            # try it as a convenience function that add modules to the path
-            module(path)
+            pass
+
+        # module is not a module class
+        # try it as a convenience function that add modules to the path
+        module(path)
 
     elif isinstance(module, collections.Iterable):
         # A list of modules or basf2.Path
@@ -145,5 +148,5 @@ def get_module_param(module, name):
     for parameter in parameters:
         if name == parameter.name:
             return parameter.values
-        else:
-            raise AttributeError('%s module does not have a parameter named %s' % (module, name))
+    else:
+        raise AttributeError('%s module does not have a parameter named %s' % (module, name))

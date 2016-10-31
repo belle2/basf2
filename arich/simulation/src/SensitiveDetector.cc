@@ -70,7 +70,10 @@ namespace Belle2 {
       if (dir == 1 && postStep.GetStepStatus() != fGeomBoundary) { return false;}
       if (dir == -1 && preStep.GetStepStatus() != fGeomBoundary) { return false;}
 
-      if ((track.GetNextVolume())->GetName() == "ARICH.HAPDWall") return false;
+      if ((track.GetNextVolume())->GetName() == "ARICH.HAPDWall") {
+        track.SetTrackStatus(fStopAndKill);
+        return false;
+      }
 
       // Check if photon is internally reflected in HAPD window
       G4OpBoundaryProcessStatus theStatus = Undefined;

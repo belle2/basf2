@@ -54,7 +54,7 @@ void ARICHModulesInfo::addModule(unsigned modId, std::vector<float>& qeList, boo
   std::vector<uint8_t>::iterator it = m_ChannelQE.begin() + (modId - 1) * N_CHANNELS;
   for (auto qe : qeList) {
     *it = uint8_t(qe + 0.5);
-    it++;
+    ++it;
   }
 }
 

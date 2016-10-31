@@ -19,7 +19,6 @@
 #include <arich/dbobjects/ARICHModuleTest.h>
 #include <arich/dbobjects/ARICHSensorModuleInfo.h>
 #include <arich/dbobjects/ARICHSensorModuleMap.h>
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <arich/dbobjects/ARICHGeometryConfig.h>
 
 // database classes used by simulation/reconstruction software

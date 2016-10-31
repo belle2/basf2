@@ -10,7 +10,6 @@
 #ifndef ARICHDATABASEIMPORTER_H
 #define ARICHDATABASEIMPORTER_H
 
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <TObject.h>
 #include <TGraph.h>
 #include <TH2F.h>
@@ -371,7 +370,6 @@ namespace Belle2 {
 
   private:
 
-    ARICHGeometryPar* m_arichgp;    /**< geometry parameters */
     std::vector<std::string> m_inputFilesHapdQA;        /**< Input root files for HAPD QA */
     std::vector<std::string> m_inputFilesAsicRoot;      /**< Input root files for ASICs */
     std::vector<std::string> m_inputFilesAsicTxt;       /**< Input txt files for ASICs */

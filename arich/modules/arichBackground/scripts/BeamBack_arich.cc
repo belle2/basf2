@@ -178,9 +178,9 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
   nenergy->SetStats(0);
   // set variables from input tree files
   int type = -1;
-  int modID = 1;
+  int modID;
   int pdg = -1;
-  int source = 1;
+  int source;
   double edep = 0;
   TVector3* modOrig = 0;
   TVector3* mom = 0;
@@ -204,9 +204,9 @@ int BeamBack_arich(double time = 1000, char* path = "/gpfs/home/belle/luka/basf2
     edep = 0;
     type = -1;
     pdg = -1;
-    modID = 1;
+    //modID = 1;
     mom->SetXYZ(0., 0., 0.);
-    source = 1;
+    //source = 1;
 
     tree->GetEvent(e);
 

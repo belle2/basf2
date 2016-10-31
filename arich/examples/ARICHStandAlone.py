@@ -3,11 +3,16 @@
 
 from basf2 import *
 from optparse import OptionParser
-from tracking import add_tracking_reconstruction
 
 # --------------------------------------------------------------------
-# Example of using ARICH reconstruction
-# needs reconstructed tracks (Tracks), extrapolated to ARICH (ExtHits)
+# Example script for ARICH stand alone simulation and reconstruction
+# (only ARICH is simulated, very fast)
+# Instead of tracks from CDC, the track information is taken from MC hits
+# on aerogel plane (ARICHAeroHit).
+# Smearing of track position and direction is applied to mimic tracking
+# resolution.
+#
+# Author: Luka Santelj (Oct. 2016)
 # --------------------------------------------------------------------
 
 parser = OptionParser()
@@ -40,17 +45,14 @@ gearbox = register_module('Gearbox')
 main.add_module(gearbox)
 
 # Geometry
+# only ARICH and magnetic field
 geometry = register_module('Geometry')
 geometry.param('components', [
     'MagneticField',
-    'BeamPipe',
-    'PXD',
-    'SVD',
-    'CDC',
     'ARICH'])
 main.add_module(geometry)
 
-# Particle gun: generate multiple tracks
+# Particle gun
 particlegun = register_module('ParticleGun')
 particlegun.param('pdgCodes', [211, -211, 321, -321])
 particlegun.param('nTracks', 1)
@@ -72,32 +74,9 @@ main.add_module(particlegun)
 simulation = register_module('FullSim')
 main.add_module(simulation)
 
-# PXD digitization & clustering
-pxd_digitizer = register_module('PXDDigitizer')
-main.add_module(pxd_digitizer)
-pxd_clusterizer = register_module('PXDClusterizer')
-main.add_module(pxd_clusterizer)
-
-# SVD digitization & clustering
-svd_digitizer = register_module('SVDDigitizer')
-main.add_module(svd_digitizer)
-svd_clusterizer = register_module('SVDClusterizer')
-main.add_module(svd_clusterizer)
-
-# CDC digitization
-cdcDigitizer = register_module('CDCDigitizer')
-main.add_module(cdcDigitizer)
-
 # ARICH digitization
 arichDigi = register_module('ARICHDigitizer')
 main.add_module(arichDigi)
-
-# tracking
-add_tracking_reconstruction(main)
-
-# Track extrapolation
-ext = register_module('Ext')
-main.add_module(ext)
 
 # convert ARICHDigits to ARICHHits
 arichHits = register_module('ARICHFillHits')
@@ -106,7 +85,9 @@ main.add_module(arichHits)
 # ARICH reconstruction
 # calculate PID likelihoods for all tracks
 arichreco = register_module('ARICHReconstructor')
-# store cherenkov angle information
+# use MC hits (ARICHAeroHits) instead of reconstructed tracks
+arichreco.param('inputTrackType', 1)
+# store Cherenkov angle information
 arichreco.param('storePhotons', 1)
 main.add_module(arichreco)
 

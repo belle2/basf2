@@ -21,18 +21,27 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MVAExpert::MVAExpert(const std::string& identifier)
-  : m_identifier(identifier)
+MVAExpert::MVAExpert(const std::string& identifier,
+                     std::vector<Named<Float_t*> > namedVariables)
+  : m_namedVariables(std::move(namedVariables))
+  , m_identifier(identifier)
 {
 }
 
-void MVAExpert::initialize(std::vector<Named<Float_t*> > namedVariables)
+void MVAExpert::initialize()
 {
-  m_namedVariables = std::move(namedVariables);
-
   MVA::AbstractInterface::initSupportedInterfaces();
-  std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
+  if (not m_weightfileRepresentation and
+      not(boost::ends_with(m_identifier, ".root") or
+          boost::ends_with(m_identifier, ".xml"))) {
+    using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
+    m_weightfileRepresentation = makeUnique<DBWeightFileRepresentation>(m_identifier);
+  }
+}
 
+void MVAExpert::beginRun()
+{
+  std::unique_ptr<MVA::Weightfile> weightfile = getWeightFile();
   if (weightfile) {
     if (weightfile->getElement<std::string>("method") == "FastBDT" and
         weightfile->getElement<int>("FastBDT_version") == 1) {
@@ -77,19 +86,9 @@ void MVAExpert::initialize(std::vector<Named<Float_t*> > namedVariables)
 
 std::unique_ptr<MVA::Weightfile> MVAExpert::getWeightFile()
 {
-  if (not m_weightfileRepresentation and not(boost::ends_with(m_identifier, ".root") or
-                                             boost::ends_with(m_identifier, ".xml"))) {
-    using DBWeightFileRepresentation = DBObjPtr<DatabaseRepresentationOfWeightfile>;
-    m_weightfileRepresentation = makeUnique<DBWeightFileRepresentation>(m_identifier);
-  }
-
   if (m_weightfileRepresentation) {
-    if (m_weightfileRepresentation->hasChanged()) {
-      std::stringstream ss((*m_weightfileRepresentation)->m_data);
-      return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromStream(ss));
-    } else {
-      return nullptr;
-    }
+    std::stringstream ss((*m_weightfileRepresentation)->m_data);
+    return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromStream(ss));
   } else {
     std::string weightFilePath = FileSystem::findFile(m_identifier);
     return makeUnique<MVA::Weightfile>(MVA::Weightfile::loadFromFile(weightFilePath));

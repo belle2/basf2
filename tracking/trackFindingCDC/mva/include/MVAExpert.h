@@ -35,14 +35,16 @@ namespace Belle2 {
        *  Construct the Expert with the specified weight folder and
        *  the name of the training that was used in the teacher run.
        *  @param identifier       A database identifier or local file name.
+       *  @param namedVariables   The names and pointers to the variables to be fed to the mva method
        */
-      MVAExpert(const std::string& dbIndentifier);
+      MVAExpert(const std::string& dbIndentifier,
+                std::vector<Named<Float_t*> > namedVariables);
 
-      /**
-       *  Add variable names and values addresses to the underlying tmva reader
-       *  and initalize the method.
-       */
-      void initialize(std::vector<Named<Float_t*> > namedVariables);
+      /// Initialise the mva method
+      void initialize();
+
+      /// Update the mva method to the new run
+      void beginRun();
 
       /// Resolves the source of the weight file and unpacks it.
       std::unique_ptr<MVA::Weightfile> getWeightFile();

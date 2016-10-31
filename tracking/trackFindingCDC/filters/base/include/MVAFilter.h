@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/mva/MVAExpert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -59,15 +60,16 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
-        m_mvaExpert = std::unique_ptr<MVAExpert>(new MVAExpert(m_param_identifier));
-        m_mvaExpert->initialize(Super::getVarSet().getNamedVariables());
+        m_mvaExpert = makeUnique<MVAExpert>(m_param_identifier,
+                                            Super::getVarSet().getNamedVariables());
+        m_mvaExpert->initialize();
       }
 
-      /// Signal to load new run parameter
+      /// Signal to load new run parameters
       virtual void beginRun() override
       {
         Super::beginRun();
-        m_mvaExpert->initialize(Super::getVarSet().getNamedVariables());
+        m_mvaExpert->beginRun();
       }
 
     public:

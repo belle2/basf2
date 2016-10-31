@@ -97,7 +97,7 @@ namespace TreeFitter {
       std::cout << "ParticleBase::createParticle: " << forceFitAll << std::endl ;
     ParticleBase* rc = 0 ;
     int pdgcode = particle->getPDGCode();
-    bool isupsilon = pdgcode % 1000 == 553; //FT: Y(any) ends with 553. But we don't use this anyway.
+    //    bool isupsilon = pdgcode % 1000 == 553; //FT: Y(any) ends with 553. But we don't use this anyway.
 
     //FT: Beamspot constraint still needs some development
     /*

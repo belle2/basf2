@@ -25,8 +25,7 @@ namespace TreeFitter {
 
   class DecayChain {
   public:
-    DecayChain() : m_mother(0) {}
-
+    DecayChain() : m_dim(0), m_mother(0), m_cand(0), m_isOwner(true) {} //Default constructor (actually never used)
     DecayChain(Particle* bc, bool forceFitAll = false)  ;
     ~DecayChain() ;
 

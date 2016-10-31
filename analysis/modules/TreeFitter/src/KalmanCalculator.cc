@@ -37,8 +37,10 @@ namespace TreeFitter {
     m_nconstraints = value.num_row() ;  // dimension of the constraint
     m_nparameters  = fitparams->dim() ; // dimension of the state
 
+#ifndef SLOWBUTSAFE
     int valdim  = value.num_row() ; // dimension of the constraint
     int statdim = fitparams->par().num_row() ; // dimension of the state
+#endif
 
     //#ifdef VTK_BOUNDSCHECKING
     //    assert( G.num_row() == valdim && G.num_col() == statdim &&

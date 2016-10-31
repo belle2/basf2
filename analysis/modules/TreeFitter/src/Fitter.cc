@@ -34,7 +34,8 @@ namespace TreeFitter {
 
   extern int vtxverbose ;
 
-  bool Fitter::printDaughters(Particle* mother)
+  /*
+  void Fitter::printDaughters(Particle* mother)
   {
     Particle* daughter;
     unsigned int i = 0;
@@ -44,6 +45,7 @@ namespace TreeFitter {
       i++;
     }
   }
+  */
 
   Fitter::Fitter(Particle* particle, double prec)
     : m_particle(particle), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
@@ -388,6 +390,8 @@ namespace TreeFitter {
     return thecand ;
   }
 
+  //FT: Unused but kept for future use
+  /*
   Particle* Fitter::fittedCand(Particle& cand, Particle* headOfTree)
   {
     B2WARNING("TreeFitter::Fitter::fittedCand: WARNING: Not implemented");
@@ -397,6 +401,7 @@ namespace TreeFitter {
     //    updateCand(*acand) ;
     //    return acand ;
   }
+  */
 
   Particle Fitter::getFittedTree()
   {
@@ -417,8 +422,8 @@ namespace TreeFitter {
       // have to do something about that.
       std::cout << "Can't find candidate " << cand.getName() << std::endl
                 << "in tree " << m_particle->getName() << std::endl;
-      return pb != 0 ;
     }
+    return pb != 0 ;
   }
 
 
@@ -519,7 +524,6 @@ namespace TreeFitter {
 
     //    B2DEBUG(80,"Fitter::updateTree:: Printing tree from" << cand.getName());
     //    printDaughters(const_cast<Belle2::Particle*>(&cand));
-    //    B2DEBUG(80,"... and now let's update.");
 
     if (updateCand(cand)) { // if the mother can be updated, update the daughters
 
@@ -612,7 +616,7 @@ namespace TreeFitter {
       int tauindexA = pbA->tauIndex() ;
       int momindexA = pbA->momIndex() ;
       double tauA   = m_fitparams->par()(tauindexA + 1) ;
-      double mom2A;
+      double mom2A(0);
       for (int row = 1; row <= 3; ++row) {
         double px = m_fitparams->par()(momindexA + row) ;
         mom2A += px * px ;
@@ -623,7 +627,7 @@ namespace TreeFitter {
       int tauindexB = pbB->tauIndex() ;
       int momindexB = pbB->momIndex() ;
       double tauB    = m_fitparams->par()[tauindexB] ;
-      double mom2B;
+      double mom2B(0);
       for (int row = 1; row <= 3; ++row) {
         double px = m_fitparams->par()[momindexB + row - 1] ;
         mom2B += px * px ;

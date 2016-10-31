@@ -55,7 +55,8 @@ namespace TreeFitter {
     bool isLinear() const { return m_maxNIter <= 1 ; }
     unsigned int nIter() const { return m_maxNIter ; }
 
-    Constraint() : m_node(0), m_depth(0), m_type(unknown) {}
+    Constraint() : m_node(0), m_depth(0), m_type(unknown), //FT: Now fully initialised, but rarely used
+      m_dim(0), m_nHidden(0), m_weight(0), m_maxNIter(0) {}
 
     Constraint(const ParticleBase* node, Type type, int depth,
                unsigned int dim, unsigned int nhidden = 0,

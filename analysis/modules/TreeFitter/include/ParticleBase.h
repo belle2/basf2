@@ -63,7 +63,7 @@ namespace TreeFitter {
     //    void locate(const LHCb::ParticleID& pid, ParticleContainer& result ) ;
 
     Particle* particle() const { return m_particle ; }
-    const int index() const { return m_index ; }
+    int index() const { return m_index ; }
     const ParticleBase* mother() const { return m_mother ; }
     const std::string& name() const { return m_name ; }
 

@@ -35,7 +35,9 @@ namespace TreeFitter {
 
     bool printDaughters(Particle* mother);
 
-    Fitter() : m_decaychain(0), m_fitparams(0) {}
+    Fitter() : m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
+      m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
+
     Fitter(Particle* particle, double prec = 0.01) ;
     ~Fitter() ;
     bool fit() ; //FT: had to be changed from void to bool
@@ -54,7 +56,7 @@ namespace TreeFitter {
     double globalChiSquare() const ;
     int    nDof()      const ;
     int status() const { return m_status ; }
-    int vertexType() const {return m_vtype;}
+    //    int vertexType() const {return m_vtype;}//FT: not used yet
     int nIter() const { return m_niter ; }
     const ErrCode& errCode() { return m_errCode ; }
 
@@ -72,7 +74,7 @@ namespace TreeFitter {
     Particle getFitted() ;
     Particle getFitted(Particle& particle);
     Particle getFittedTree();
-    Particle* fittedCand(Particle& particle, Particle* headoftree);
+    //    Particle* fittedCand(Particle& particle, Particle* headoftree);
 
     //    BtaFitParams btaFitParams(Particle& particle) const ;//this passes out the set of particle parameters in BaBar, do the same for basf2
     HepSymMatrix extractCov7(const ParticleBase* pb) const;
@@ -99,7 +101,7 @@ namespace TreeFitter {
     DecayChain* m_decaychain ;
     FitParams* m_fitparams ;
     int m_status ;
-    int m_vtype;
+    //    int m_vtype; //FT: not used yet
     double m_chiSquare ;
     int m_niter ;
     double m_prec ;

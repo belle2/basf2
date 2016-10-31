@@ -27,6 +27,7 @@ namespace TreeFitter {
     initBeamSpot(particle) ;
   }
 
+  /*
   InteractionPoint::InteractionPoint(Particle* particle, bool forceFitAll, bool addupsilon)
     : InternalParticle(0, 0, forceFitAll),
       m_constrainXY(false), m_constrainXYZ(false), m_ipPos(3), m_ipCov(3),
@@ -35,6 +36,7 @@ namespace TreeFitter {
     addDaughter(particle, forceFitAll) ;
     initBeamSpot(particle) ;
   }
+  */
 
   ErrCode InteractionPoint::initBeamSpot(Particle* particle)
   {

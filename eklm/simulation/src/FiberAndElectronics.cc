@@ -19,7 +19,6 @@
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/RandomNumbers.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 

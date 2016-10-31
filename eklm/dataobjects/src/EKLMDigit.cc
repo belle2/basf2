@@ -11,7 +11,6 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/GearDir.h>
 
 using namespace Belle2;
 

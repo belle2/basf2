@@ -17,8 +17,6 @@
 #include <framework/logging/Logger.h>
 #include <eklm/dataobjects/EKLMDigit.h>
 
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 #include <map>
 #include <string>
 #include <iostream>

@@ -24,8 +24,6 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
 
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawKLM.h>

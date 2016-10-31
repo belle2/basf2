@@ -9,8 +9,7 @@
 **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/IsIterable.h>
-#include <tracking/trackFindingCDC/utilities/EnableIf.h>
+#include <tracking/trackFindingCDC/utilities/GetIterator.h>
 
 #include <algorithm>
 #include <iterator>
@@ -45,8 +44,8 @@ namespace Belle2 {
       {}
 
       /// Constructor from another range
-      template<class Ts>
-      explicit Range(EnableIf<IsIterable<Ts>::value == true, Ts&> ts)
+      template<class Ts, class ItT = GetIterator<Ts>>
+      explicit Range(const Ts& ts)
         : Super(AIterator(std::begin(ts)), AIterator(std::end(ts)))
       {}
 

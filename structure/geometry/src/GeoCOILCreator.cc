@@ -10,6 +10,7 @@
  **************************************************************************/
 
 #include <structure/geometry/GeoCOILCreator.h>
+#include <structure/dbobjects/COILGeometryPar.h>
 
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
@@ -121,8 +122,8 @@ namespace Belle2 {
       // Cavity #1
       //////////////
 
-      string strMatCryo = content.getString("Cryostat/Material", "Air");
-      G4Material* matCryostat = Materials::get(strMatCryo);
+      string strMatCav1 = content.getString("Cavity1/Material", "Air");
+      G4Material* matCav1 = Materials::get(strMatCav1);
 
       double Cav1Rmin   = content.getLength("Cavity1/Rmin") / Unit::mm;
       double Cav1Rmax   = content.getLength("Cavity1/Rmax") / Unit::mm;

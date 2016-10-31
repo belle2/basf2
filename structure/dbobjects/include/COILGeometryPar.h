@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <vector>
 
 #include <TObject.h>
 #include <string>
@@ -72,7 +71,7 @@ namespace Belle2 {
     //
 
     //! Get the Material of the cryostat vessel
-    std::string getCryoMaterial const { return m_strMatCryo; }
+    std::string getCryoMaterial() const { return m_strMatCryo; }
 
     //! Set the Material of the cryostat vessel (as a std::string)
     void setCryoMaterial(std::string material) { m_strMatCryo = material; }
@@ -119,7 +118,7 @@ namespace Belle2 {
     //
 
     //! Get the Material of the cavity #1
-    std::string getCav1Material const { return m_strMatCav1; }
+    std::string getCav1Material() const { return m_strMatCav1; }
 
     //! Set the Material of the cavity #1 (as a std::string)
     void setCav1Material(std::string material) { m_strMatCav1 = material; }
@@ -166,7 +165,7 @@ namespace Belle2 {
     //
 
     //! Get the Material of the cavity #2
-    std::string getCav2Material const { return m_strMatCav2; }
+    std::string getCav2Material() const { return m_strMatCav2; }
 
     //! Set the Material of the cavity #2 (as a std::string)
     void setCav2Material(std::string material) { m_strMatCav2 = material; }
@@ -213,7 +212,7 @@ namespace Belle2 {
     //
 
     //! Get the Material of the radiation shield
-    std::string getShieldMaterial const { return m_strMatShield; }
+    std::string getShieldMaterial() const { return m_strMatShield; }
 
     //! Set the Material of the radiation shield (as a std::string)
     void setShieldMaterial(std::string material) { m_strMatShield = material; }
@@ -260,7 +259,7 @@ namespace Belle2 {
     //
 
     //! Get the Material of the superconducting coil
-    std::string getCoilMaterial const { return m_strMatCoil; }
+    std::string getCoilMaterial() const { return m_strMatCoil; }
 
     //! Set the Material of the superconducting coil (as a std::string)
     void setCoilMaterial(std::string material) { m_strMatCoil = material; }
@@ -327,7 +326,7 @@ namespace Belle2 {
     // Cryostat vessel
     //
     //! Material of the cryostat vessel
-    string m_strMatCryo;
+    std::string m_strMatCryo;
     //! Inner radius of the cryostat vessel
     double m_CryoRmin;
     //! Outer radius of the cryostat vessel
@@ -339,7 +338,7 @@ namespace Belle2 {
     // Cavity #1
     //
     //! Material of the cavity #1
-    string m_strMatCav1;
+    std::string m_strMatCav1;
     //! Inner radius of the cavity #1
     double m_Cav1Rmin;
     //! Inner radius of the cavity #1
@@ -351,7 +350,7 @@ namespace Belle2 {
     // Cavity #2
     //
     //! Material of the cavity #2
-    string m_strMatCav2;
+    std::string m_strMatCav2;
     //! Inner radius of the cavity #2
     double m_Cav2Rmin;
     //! Inner radius of the cavity #2
@@ -363,7 +362,7 @@ namespace Belle2 {
     // Radiation Shield
     //
     //! Material of the Radiation Shield
-    string m_strMatShield;
+    std::string m_strMatShield;
     //! Inner radius of the Radiation Shield
     double m_ShieldRmin;
     //! Inner radius of the Radiation Shield
@@ -375,13 +374,13 @@ namespace Belle2 {
     // Superconducting Coil
     //
     //! Material of the Superconducting Coil
-    string m_strMatCoil;
+    std::string m_strMatCoil;
     //! Inner radius of the Superconducting Coil
     double m_CoilRmin;
     //! Inner radius of the Superconducting Coil
     double m_CoilRmax;
     //! Inner radius of the Superconducting Coil
-    double m_CoilLength
+    double m_CoilLength;
 
     //
     // For ROOT objects

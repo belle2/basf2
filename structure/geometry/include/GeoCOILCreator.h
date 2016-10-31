@@ -14,6 +14,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+#include <structure/dbobjects/COILGeometryPar.h>
 
 #include <string>
 #include <vector>
@@ -45,6 +46,10 @@ namespace Belle2 {
       \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
       */
       virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
+
+      //! Write COILGeometryPar object from GearBox content
+      void read(const GearDir& content, COILGeometryPar& parameters, std::string item);
+
 
     protected:
 

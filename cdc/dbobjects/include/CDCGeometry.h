@@ -849,7 +849,7 @@ namespace Belle2 {
     /**
      * Get the global phi rotation of CDC.
      */
-    //    double getGlobalPhiRotation() const { return m_globalPhiRotation;}
+    double getGlobalPhiRotation() const { return m_globalPhiRotation;}
 
     /**
      * Get the global x offset of CDC wrt Belle2 coord. system.
@@ -1109,7 +1109,7 @@ namespace Belle2 {
 
   private:
 
-    //    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
+    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (rad). */
     double m_globalOffsetX = 0.0; /**< Offset x of the whole cdc wrt B2 coord system (cm). */
     double m_globalOffsetY = 0.0; /**< Offset y of the whole cdc wrt B2 coord system (cm). */
     double m_globalOffsetZ = 0.0; /**< Offset z of the whole cdc wrt B2 coord system (cm). */

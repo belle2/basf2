@@ -160,8 +160,8 @@ void CDCGeometryPar::clear()
 
 void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 {
-  //  m_globalPhiRotation = geom.getGlobalPhiRotation();
-  m_globalPhiRotation = geom.getGlobalOffsetC();
+  m_globalPhiRotation = geom.getGlobalPhiRotation();
+  //  m_globalPhiRotation = geom.getGlobalOffsetC();
 
   // Get inner wall parameters
   m_rWall[0]    = geom.getInnerWall(2).getRmin();

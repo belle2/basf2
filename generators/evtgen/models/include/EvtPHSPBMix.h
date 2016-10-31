@@ -53,29 +53,16 @@ private:
 
   void prlp(int)const;
   EvtComplex Amplitude(const double& t1, const double& t2, bool B1_is_B0, bool B2_is_B0) const;
-  double _freq;   // mixing frequency in hbar/mm
-  double _C; //C eigenvalue, 0= incoherent
-  bool _BBpipi;
-  //  double _dGamma;
-  //EvtComplex _qoverp;
-  //EvtComplex _poverq;
-  //EvtComplex _z;
-  //double _chib0_b0bar;
-  //double _chib0bar_b0;
-
-  //EvtComplex _A_f;
-  //EvtComplex _Abar_f;
-
-  //EvtComplex _A_fbar;
-  //EvtComplex _Abar_fbar;
-
+  double _freq{0};   // mixing frequency in hbar/mm
+  double _C{0}; //C eigenvalue, 0= incoherent
+  bool _BBpipi{0};
 };
 
 class EvtPHSPBMix : public EvtDecayAmp  {
 
 public:
 
-  EvtPHSPBMix() {}//std::cout<<"AREARE B"<<std::endl;}
+  EvtPHSPBMix() {}
   virtual ~EvtPHSPBMix();
 
   std::string getName(); /**< Get function Name  */
@@ -89,7 +76,7 @@ public:
 
 private:
 
-  double _freq;   // mixing frequency in hbar/mm
+  double _freq{0};   // mixing frequency in hbar/mm
 
 };
 

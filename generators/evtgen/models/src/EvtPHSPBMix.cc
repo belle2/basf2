@@ -58,9 +58,6 @@ EvtDecayBase* EvtPHSPBBMix::clone()
 
 void EvtPHSPBBMix::init()
 {
-  //  return;
-  EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Welcome to PHSP_BB_MIX (1)" << endl;
-
   // check that there we are provided exactly one parameter
   //One arg: Delta m
   const unsigned short int narg(2);
@@ -237,9 +234,6 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
   bool pr(false);
   if (pr) prlp(1);
 
-
-
-
   static const EvtId B0(EvtPDL::getId("B0"));
   static const EvtId B0B(EvtPDL::getId("anti-B0"));
 
@@ -258,11 +252,6 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
     tempDaug[1] = getDaug(1);
     if (getNDaug() == 5)
       tempDaug[2] = getDaug(2);
-
-
-    //    std::cout<<"NDaug:"<<getNDaug()<<std::endl;
-    //  for (int i(0);i<getNDaug()-2;++i)
-    //  std::cout<<"Daug "<<i<<" : "<<EvtPDL::name(tempDaug[i]).c_str()<<std::endl;
 
     p->initializePhaseSpace(getNDaug() - 2, tempDaug.data());
 
@@ -388,9 +377,6 @@ EvtDecayBase* EvtPHSPBMix::clone()
 
 void EvtPHSPBMix::init()
 {
-  //  return;
-  EvtGenReport(EVTGEN_DEBUG, "EvtGen") << "Welcome to PHSP_B_MIX (1)" << endl;
-
   // check that there we are provided exactly one parameter
   //One arg: Delta m
   const unsigned short int narg(1);

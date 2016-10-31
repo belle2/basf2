@@ -167,6 +167,11 @@ namespace Belle2 {
     void setPoleNPlanes(int pole, int nplanes)
     {
       m_PoleNPlanes[pole] = nplanes;
+
+      // Resize std::vectors according to the number of planes in each layer
+      m_PolePlaneZ[pole].resize(nplanes);
+      m_PolePlaneInnerRadius[pole].resize(nplanes);
+      m_PolePlaneOuterRadius[pole].resize(nplanes);
     }
 
     //! Get Z-position of one plane (w.r.t. IP)
@@ -237,7 +242,7 @@ namespace Belle2 {
     static const int FWD_ECLSHIELD = 0;
     static const int BWD_ECLSHIELD = 1;
 
-    static const int NPOLEPIECESS = 2;
+    static const int NPOLEPIECES = 2;
     static const int FWD_POLEPIECE = 0;
     static const int BWD_POLEPIECE = 1;
 

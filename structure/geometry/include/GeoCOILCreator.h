@@ -14,6 +14,11 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
+
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
+
 #include <structure/dbobjects/COILGeometryPar.h>
 
 #include <string>
@@ -41,19 +46,40 @@ namespace Belle2 {
       //! The destructor of the GeoCOILCreator class.
       virtual ~GeoCOILCreator();
 
-      //! Creates the ROOT Objects for the coil geometry.
-      /*!
-      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
-      */
-      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type);
 
-      //! Write COILGeometryPar object from GearBox content
-      void read(const GearDir& content, COILGeometryPar& parameters, std::string item);
+      //! Creates the Geant4 objects for the structure geometry from Gearbox
+      /*!
+      This is the 'old' way of building the geometry from Gearbox (xml files). Expected to be deprecated in the future.
+        \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+      */
+      virtual void create(const GearDir& content, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
+
+      /** Create the configuration objects and save them in the Database.  If
+       * more than one object is needed adjust accordingly */
+      virtual void createPayloads(const GearDir& content, const IntervalOfValidity& iov) override;
+
+      /** Create the geometry from the Database */
+      virtual void createFromDB(const std::string& name, G4LogicalVolume& topVolume, geometry::GeometryTypes type) override;
 
 
     protected:
 
     private:
+
+      //! Creates a parameter object from the Gearbox XML parameters.
+      /*! If more  than one object is created these could be assigned to members or you
+       * could return a tuple.
+      \param content A reference to the content part of the parameter description, which should to be used to create the ROOT objects.
+       */
+      COILGeometryPar readConfiguration(const GearDir& param);
+
+
+      //! Creates the ROOT Objects for the coil geometry.
+      /*!
+      \param parameters A database object containing the geometry information
+      \param topVolume A Geant4 volume where to place the item
+      */
+      virtual void createGeometry(const COILGeometryPar& paramaters, G4LogicalVolume& topVolume, geometry::GeometryTypes);
 
       //! Vector of pointers to G4VisAttributes
       std::vector<G4VisAttributes*> m_VisAttributes;

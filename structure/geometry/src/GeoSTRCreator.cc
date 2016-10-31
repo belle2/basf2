@@ -107,6 +107,42 @@ namespace Belle2 {
         B2INFO("Total mass of side " << side << " = " << _mass << " kg");
       }
 
+      //Place pole pieces
+      for (int iPole = 0; iPole < parameters.NPOLEPIECES; iPole++) {
+
+        string side;
+        if (iPole == parameters.FWD_POLEPIECE) {
+          side = "PolePieceR";
+        } else if (iPole == parameters.BWD_POLEPIECE) {
+          side = "PolePieceL";
+        } else {
+          B2FATAL("Only 2 pole pieces should be defined. Can't retrieve info for pole #" << iPole);
+        }
+
+
+        G4Material* PoleMat = Materials::get(parameters.getPoleMaterial(iPole));
+        int nPlanes = parameters.getPoleNPlanes(iPole);
+
+        //Thread the strings
+        string shapeName   = (boost::format("%1%") % side).str();
+        string logiVolName = (boost::format("logi%1%") % side).str();
+        string physVolName = (boost::format("phys%1%") % side).str();
+
+        G4Polycone* PoleShape = new G4Polycone(shapeName.c_str(), 0, 2 * M_PI, nPlanes,
+                                               parameters.getPolePlaneZ(iPole),
+                                               parameters.getPolePlaneInnerRadius(iPole),
+                                               parameters.getPolePlaneOuterRadius(iPole));
+
+        // Create logical volume
+        G4LogicalVolume* logiPole = new G4LogicalVolume(PoleShape, PoleMat, logiVolName, 0, 0, 0);
+
+        //Place physical volume
+        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), logiPole, physVolName, &topVolume, false, 0);
+
+        B2INFO("Total mass of " << side << " = " << logiPole->GetMass() / CLHEP::g  << " kg");
+      }
+
+
     }
 
     STRGeometryPar GeoSTRCreator::createConfiguration(const GearDir& param)
@@ -116,8 +152,8 @@ namespace Belle2 {
       // Get STR geometry parameters from Gearbox (no calculations here)
       readShield(param, strGeometryPar, "FWD_Shield");
       readShield(param, strGeometryPar, "BWD_Shield");
-      readPole(param, strGeometryPar, "FWD_Pole");
-      readPole(param, strGeometryPar, "BWD_Pole");
+      readPole(param, strGeometryPar, "PolePieceL");
+      readPole(param, strGeometryPar, "PolePieceR");
 
 
       return strGeometryPar;
@@ -126,8 +162,8 @@ namespace Belle2 {
     void GeoSTRCreator::readPole(const GearDir& content, STRGeometryPar& parameters, std::string side)
     {
       // Check if method was called using the correct name for the shields
-      std::size_t foundF = side.find("FWD_Pole");
-      std::size_t foundB = side.find("BWD_Pole");
+      std::size_t foundF = side.find("PolePieceR");
+      std::size_t foundB = side.find("PolePieceL");
 
       int iPole;
       if (foundF != std::string::npos) { iPole = parameters.FWD_POLEPIECE; }

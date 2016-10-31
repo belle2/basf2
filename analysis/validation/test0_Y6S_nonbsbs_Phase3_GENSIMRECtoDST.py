@@ -32,11 +32,11 @@ main.add_module(eventinfosetter)
 
 evtgen = register_module('EvtGenInput')
 evtgen.param('ParentParticle', "Upsilon(6S)")
-evtgen.param('userDECFile', 'Y6S_nonbsbs.dec')
+evtgen.param('userDECFile', Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y6S_nonbsbs.dec'))
 main.add_module(evtgen)
 print_params(evtgen)
 import pdg
-pdg.load("Y6S.pdl")  # to load a different file
+pdg.load(Belle2.FileSystem.findFile('generators/evtgen/decayfiles/Y6S.pdl'))  # to load a different file
 
 # simulation
 add_simulation(main)

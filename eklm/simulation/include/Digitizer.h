@@ -72,9 +72,6 @@ namespace Belle2 {
      *
      * @var DigitizationParams::timeResolution
      * Time resolution (of reconstructed time, not ADC).
-     *
-     * @var DigitizationParams::debug
-     * Debug mode (generates additional output files with histograms).
      */
     struct DigitizationParams {
       double ADCRange;
@@ -95,7 +92,6 @@ namespace Belle2 {
       double meanSiPMNoise;
       bool enableConstBkg;
       double timeResolution;
-      bool debug;
     };
 
     /**

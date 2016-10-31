@@ -51,13 +51,13 @@ void EKLM::FiberAndElectronics::reallocPhotoElectronBuffers(int size)
 }
 
 EKLM::FiberAndElectronics::FiberAndElectronics(
-  struct EKLM::DigitizationParams* digPar,
-  FPGAFitter* fitter)
+  struct EKLM::DigitizationParams* digPar, FPGAFitter* fitter, bool debug)
 {
   int i;
   double time, attenuationTime;
   m_DigPar = digPar;
   m_fitter = fitter;
+  m_Debug = debug;
   m_npe = 0;
   m_histRange = m_DigPar->nDigitizations * m_DigPar->ADCSamplingTime;
   m_FPGAParams = {0, 0, 0};
@@ -178,7 +178,7 @@ void EKLM::FiberAndElectronics::processEntry()
    */
   m_FPGAParams.startTime = m_FPGAParams.startTime * m_DigPar->ADCSamplingTime +
                            m_DigPar->digitizationInitialTime;
-  if (m_DigPar->debug)
+  if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
 }

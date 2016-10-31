@@ -42,7 +42,7 @@ void EKLMADCModule::generateHistogram(const char* name, double l, double d,
   int j;
   int gnpe;
   double t, s;
-  EKLM::FiberAndElectronics fe(&m_digPar, NULL);
+  EKLM::FiberAndElectronics fe(&m_digPar, NULL, false);
   TH1F* h = NULL;
   t = m_digPar.nDigitizations * m_digPar.ADCSamplingTime;
   try {
@@ -72,7 +72,6 @@ void EKLMADCModule::initialize()
   double l;
   EKLM::setDefDigitizationParams(&m_digPar);
   const EKLM::GeometryData* geoDat = &EKLM::GeometryData::Instance();
-  m_digPar.debug = false;
   try {
     m_fout = new TFile(m_out.c_str(), "recreate");
   } catch (std::bad_alloc& ba) {

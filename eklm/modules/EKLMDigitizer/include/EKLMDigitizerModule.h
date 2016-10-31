@@ -90,6 +90,9 @@ namespace Belle2 {
     /** Digitization parameters. */
     struct EKLM::DigitizationParams m_DigPar;
 
+    /** Use debug mode in EKLM::FiberAndElectronics or not. */
+    bool m_Debug;
+
     /** Create EKLMSim2Hits? */
     bool m_CreateSim2Hits;
 

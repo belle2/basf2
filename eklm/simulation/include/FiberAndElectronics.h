@@ -36,9 +36,12 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] digPar Digitization parameters.
+       * @param[in] fitter Fitter.
+       * @param[in] debug  Use debug mode.
        */
       FiberAndElectronics(struct EKLM::DigitizationParams* digPar,
-                          FPGAFitter* fitter);
+                          FPGAFitter* fitter, bool debug);
 
       /**
        * Destructor.
@@ -100,6 +103,9 @@ namespace Belle2 {
 
       /** Fitter. */
       FPGAFitter* m_fitter;
+
+      /** Debug mode (generates additional output files with histograms). */
+      bool m_Debug;
 
       /** Stands for nDigitizations*ADCSamplingTime. */
       double m_histRange;

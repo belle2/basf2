@@ -19,10 +19,10 @@
 #include <framework/logging/Logger.h>
 
 class G4LogicalVolume;
-class shape_t;
 
 namespace Belle2 {
 
+  struct shape_t;
   class BkgSensitiveDetector;
   class ECLCrystalsShapeAndPosition;
   namespace ECL {

@@ -14,6 +14,7 @@
 //#include "G4Trap.hh"
 #include <map>
 using namespace CLHEP;
+using namespace Belle2;
 using namespace std;
 
 #define DO_QUOTE(X)        #X

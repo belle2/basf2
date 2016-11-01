@@ -7,20 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DVarSet.h>
-#include <cassert>
+#include <tracking/trackFindingCDC/filters/segment/BasicSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCRecoSegment2DVarSet::CDCRecoSegment2DVarSet() :
-  VarSet<CDCRecoSegment2DVarNames>()
-{
-}
-
-bool CDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* ptrSegment2D)
+bool BasicSegmentVarSet::extract(const CDCRecoSegment2D* ptrSegment2D)
 {
   bool extracted = extractNested(ptrSegment2D);
   if (not extracted or not ptrSegment2D) return false;

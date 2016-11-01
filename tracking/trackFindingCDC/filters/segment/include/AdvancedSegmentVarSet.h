@@ -8,52 +8,72 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoSegment2D;
 
+
     /// Names of the variables to be generated.
     constexpr
-    static char const* const cdcRecoSegment2DTruthNames[] = {
-      "segment_is_fake_truth",
-      "track_is_already_found_truth",
-      "segment_is_new_track_truth",
-      "truth"
+    static char const* const advancedSegmentVarNames[] = {
+      "is_stereo",
+      "superlayer_id",
+      "size",
+
+      "number_of_hit_layers",
+
+      "total_number_of_neighbors",
+      "mean_number_of_neighbors",
+
+      "total_drift_length",
+      "mean_drift_length",
+      "variance_drift_length",
+
+      "total_inner_distance",
+      "mean_inner_distance",
+      "distance_to_superlayer_center",
+
+      "total_adc_count",
+      "mean_adc_count",
+      "variance_adc_count",
+
+      "number_of_taken_hits",
+
+      "fit_prob",
+      "fitted_d0",
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a segment.
      */
-    class CDCRecoSegment2DTruthVarNames : public VarNames<CDCRecoSegment2D> {
+    class AdvancedSegmentVarNames : public VarNames<CDCRecoSegment2D> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 4;
+      static const size_t nNames = size(advancedSegmentVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return cdcRecoSegment2DTruthNames[iName];
+        return advancedSegmentVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a segment.
+    /**
+     *  Class that computes floating point variables from the segments.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class CDCRecoSegment2DTruthVarSet : public VarSet<CDCRecoSegment2DTruthVarNames> {
+    class AdvancedSegmentVarSet : public VarSet<AdvancedSegmentVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit CDCRecoSegment2DTruthVarSet() : VarSet<CDCRecoSegment2DTruthVarNames>() { }
-
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) override;
-
+      /// Generate and assign the variables from the pair
+      virtual bool extract(const CDCRecoSegment2D* segment) override final;
     };
   }
 }

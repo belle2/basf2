@@ -8,24 +8,24 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DTruthVarSet.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+
     /// Truth var set for finding background segments.
-    class BackgroundSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
+    class BackgroundSegmentTruthVarSet : public TruthSegmentVarSet {
+
+    private:
+      /// Type of the base class
+      using Super = TruthSegmentVarSet;
 
     public:
-      /// Construct the peeler.
-      explicit BackgroundSegmentTruthVarSet() : CDCRecoSegment2DTruthVarSet() { }
-
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCRecoSegment2D* segment) override final
       {
-        CDCRecoSegment2DTruthVarSet::extract(segment);
-
+        Super::extract(segment);
         var<named("truth")>() = var<named("segment_is_fake_truth")>();
         return true;
       }

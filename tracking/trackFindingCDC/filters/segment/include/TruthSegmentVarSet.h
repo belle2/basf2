@@ -8,55 +8,50 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
-
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Forward declaration.
     class CDCRecoSegment2D;
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentVarNames[] = {
-      "size",
-      "superlayer_id",
-
+    static char const* const truthSegmentVarNames[] = {
+      "segment_is_fake_truth",
+      "track_is_already_found_truth",
+      "segment_is_new_track_truth",
+      "truth"
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a segment
+    /**
+     *  Class that specifies the names of the variables
+     *  that should be generated from a segment.
      */
-    class CDCRecoSegment2DVarNames : public VarNames<CDCRecoSegment2D> {
+    class TruthSegmentVarNames : public VarNames<CDCRecoSegment2D> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentVarNames);
+      static const size_t nNames = size(truthSegmentVarNames);
 
-      /// Getter for the name a the given index
+      /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return segmentVarNames[iName];
+        return truthSegmentVarNames[iName];
       }
-
     };
 
-    /** Class that computes floating point variables from a segment.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+    /**
+     *  Class that computes floating point variables from a segment.
+     *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class CDCRecoSegment2DVarSet : public VarSet<CDCRecoSegment2DVarNames> {
+    class TruthSegmentVarSet : public VarSet<TruthSegmentVarNames> {
 
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit CDCRecoSegment2DVarSet();
+      /// Generate and assign the variables from the cluster
+      virtual bool extract(const CDCRecoSegment2D* segment) override;
 
-      /// Generate and assign the variables from the facet relation
-      virtual bool extract(const CDCRecoSegment2D* ptrSegment) override final;
     };
   }
 }
-

@@ -7,24 +7,30 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segment/AdvancedRecoSegment2DVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
+bool AdvancedSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 {
   extractNested(segment);
 
-  unsigned int superlayerID = segment->getISuperLayer();
-  unsigned int size =  segment->size();
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  unsigned int iSuperLayer = ISuperLayerUtil::getCommon(*segment);
+  if (not ISuperLayerUtil::isInCDC(iSuperLayer)) {
+    return false;
+  }
+  const CDCWireSuperLayer& superLayer = wireTopology.getWireSuperLayer(iSuperLayer);
+  double superLayerCenter = superLayer.getMiddleCylindricalR();
+  unsigned int size = segment->size();
 
   int totalNNeighbors = 0;
   double totalInnerDistance = 0;
@@ -114,8 +120,8 @@ bool AdvancedCDCRecoSegment2DVarSet::extract(const CDCRecoSegment2D* segment)
   var<named("variance_drift_length")>() = driftVariance;
   var<named("variance_adc_count")>() = adcCountVariance;
 
-  var<named("distance_to_superlayer_center")>() = m_superLayerCenters[superlayerID] - totalInnerDistance / size;
-  var<named("superlayer_id")>() = superlayerID;
+  var<named("distance_to_superlayer_center")>() = superLayerCenter - totalInnerDistance / size;
+  var<named("superlayer_id")>() = iSuperLayer;
 
   var<named("mean_drift_length")>() = totalDriftLength / size;
   var<named("mean_adc_count")>() = totalADCCount / size;

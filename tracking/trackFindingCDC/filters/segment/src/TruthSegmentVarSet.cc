@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CDCRecoSegment2DTruthVarSet::extract(const CDCRecoSegment2D* segment)
+bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 {
   bool extracted = extractNested(segment);
   if (not extracted or not segment) return false;

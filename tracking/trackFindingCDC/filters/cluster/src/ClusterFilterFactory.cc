@@ -36,7 +36,7 @@ ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
 
   filterNames.insert({
     {"all", "all hits are valid"},
-    {"tmva", "test clusters for background with a tmva method"},
+    {"mva_bkg", "test clusters for background with a mva method"},
     {"recording", "record cluster variables to a TTree"},
     {"unionrecording", "record many multiple choosable variable set"},
   });
@@ -47,13 +47,13 @@ std::unique_ptr<Filter<CDCWireHitCluster> >
 ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
-    return std::unique_ptr<Filter<CDCWireHitCluster> >(new AllClusterFilter());
-  } else if (filterName == "tmva") {
-    return std::unique_ptr<Filter<CDCWireHitCluster> >(new TMVAClusterFilter());
+    return makeUnique<AllClusterFilter>();
+  } else if (filterName == "mva_bkg") {
+    return makeUnique<MVABackgroundClusterFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<Filter<CDCWireHitCluster> >(new RecordingClusterFilter());
+    return makeUnique<RecordingClusterFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<Filter<CDCWireHitCluster> >(new UnionRecordingClusterFilter());
+    return makeUnique< UnionRecordingClusterFilter>();
   } else {
     return Super::create(filterName);
   }

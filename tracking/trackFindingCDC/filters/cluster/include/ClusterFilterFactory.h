@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     *  Factory that can creates apropriate cluster filter instance from parameters.
+     *  Factory that can create apropriate cluster filter instance from parameters.
      *
      *  It knows about all available filters and their parameters.
      *  Can collaborate with a Module and expose these parameters to the user in steering files.
@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Fill the default filter name and parameter values
-      ClusterFilterFactory(const std::string& defaultFilterName = "tmva");
+      ClusterFilterFactory(const std::string& defaultFilterName = "mva_bkg");
 
       using Super::create;
 

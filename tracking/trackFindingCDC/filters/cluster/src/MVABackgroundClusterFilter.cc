@@ -7,12 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TMVAClusterFilter::TMVAClusterFilter()
-  : Super("BackgroundHitFinder", 0.2)
+MVABackgroundClusterFilter::MVABackgroundClusterFilter()
+  : Super("trackfindingcdc_BackgroundClusterFilter", 0.2)
 {
 }

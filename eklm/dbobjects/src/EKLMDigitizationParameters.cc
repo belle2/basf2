@@ -21,12 +21,12 @@ EKLMDigitizationParameters::~EKLMDigitizationParameters()
 {
 }
 
-float EKLMDigitizationParameters::getADCRange() const
+int EKLMDigitizationParameters::getADCRange() const
 {
   return m_ADCRange;
 }
 
-void EKLMDigitizationParameters::setADCRange(float range)
+void EKLMDigitizationParameters::setADCRange(int range)
 {
   m_ADCRange = range;
 }

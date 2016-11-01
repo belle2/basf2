@@ -36,12 +36,12 @@ namespace Belle2 {
     /**
      * Get ADC range.
      */
-    float getADCRange() const;
+    int getADCRange() const;
 
     /**
      * Set ADC range.
      */
-    void setADCRange(float range);
+    void setADCRange(int range);
 
     /**
      * Get ADC sampling time.
@@ -196,7 +196,7 @@ namespace Belle2 {
   private:
 
     /** ADC range: 2**(resolution in bits). */
-    float m_ADCRange;
+    int m_ADCRange;
 
     /** ADC sampling time, ns. */
     float m_ADCSamplingTime;

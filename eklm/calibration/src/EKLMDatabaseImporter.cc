@@ -37,9 +37,9 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   digPar.construct();
   GearDir dig("/Detector/DetectorComponent[@name=\"EKLM\"]/"
               "Content/DigitizationParams");
-  digPar->setADCRange(dig.getDouble("ADCRange"));
+  digPar->setADCRange(dig.getInt("ADCRange"));
   digPar->setADCSamplingTime(dig.getDouble("ADCSamplingTime"));
-  digPar->setNDigitizations(dig.getDouble("nDigitizations"));
+  digPar->setNDigitizations(dig.getInt("nDigitizations"));
   digPar->setADCPedestal(dig.getDouble("ADCPedestal"));
   digPar->setADCPEAmplitude(dig.getDouble("ADCPEAmplitude"));
   digPar->setADCSaturation(dig.getDouble("ADCSaturation"));

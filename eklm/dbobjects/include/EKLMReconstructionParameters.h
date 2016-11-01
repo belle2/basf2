@@ -8,42 +8,48 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMDATABASEIMPORTER_H
-#define EKLMDATABASEIMPORTER_H
+#ifndef EKLMRECONSTRUCTIONPARAMETERS_H
+#define EKLMRECONSTRUCTIONPARAMETERS_H
+
+/* External headers. */
+#include <TObject.h>
 
 namespace Belle2 {
 
   /**
-   * EKLM time calibration algorithm.
+   * Class to store EKLM simulation in the database.
    */
-  class EKLMDatabaseImporter {
+  class EKLMReconstructionParameters : public TObject {
 
   public:
 
     /**
      * Constructor.
      */
-    EKLMDatabaseImporter();
+    EKLMReconstructionParameters();
 
     /**
      * Destructor.
      */
-    ~EKLMDatabaseImporter();
+    ~EKLMReconstructionParameters();
 
     /**
-     * Import digitization parameters.
+     * Get time resolution (of reconstructed time, not ADC).
      */
-    void importDigitizationParameters();
+    float getTimeResolution() const;
 
     /**
-     * Import reconstruction parameters.
+     * Set time resolution (of reconstructed time, not ADC).
      */
-    void importReconstructionParameters();
+    void setTimeResolution(float resolution);
 
-    /**
-     * Import simulation parameters.
-     */
-    void importSimulationParameters();
+  private:
+
+    /** Time resolution. */
+    float m_TimeResolution;
+
+    /** Makes objects storable. */
+    ClassDef(Belle2::EKLMReconstructionParameters, 1);
 
   };
 

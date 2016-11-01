@@ -77,7 +77,7 @@ void EKLMReconstructorModule::initialize()
 void EKLMReconstructorModule::beginRun()
 {
   int i;
-  if (!m_DigPar.isValid())
+  if (!m_RecPar.isValid())
     B2FATAL("EKLM digitization parameters are not available.");
   if (!m_TimeCalibration.isValid())
     B2FATAL("EKLM time calibration data is not available.");
@@ -98,7 +98,7 @@ bool EKLMReconstructorModule::fastHit(HepGeom::Point3D<double>& pos,
                                       double time)
 {
   return time < pos.mag() / Const::speedOfLight -
-         2.0 * m_DigPar->getTimeResolution();
+         2.0 * m_RecPar->getTimeResolution();
 }
 
 double EKLMReconstructorModule::getTime(EKLMDigit* d, double dist)
@@ -157,8 +157,8 @@ void EKLMReconstructorModule::event()
         hit2d->setEDep((*it4)->getEDep() + (*it5)->getEDep());
         hit2d->setPosition(crossPoint.x(), crossPoint.y(), crossPoint.z());
         hit2d->setChiSq((t1 - t2) * (t1 - t2) /
-                        m_DigPar->getTimeResolution() /
-                        m_DigPar->getTimeResolution());
+                        m_RecPar->getTimeResolution() /
+                        m_RecPar->getTimeResolution());
         hit2d->setTime(t);
         hit2d->setMCTime(((*it4)->getMCTime() + (*it5)->getMCTime()) / 2);
         hit2d->addRelationTo(*it4);

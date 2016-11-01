@@ -12,7 +12,7 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
-#include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
@@ -90,8 +90,8 @@ namespace Belle2 {
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 
-    /** Digitization parameters. */
-    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+    /** Reconstruction parameters. */
+    DBObjPtr<EKLMReconstructionParameters> m_RecPar;
 
     /** Time calibration data. */
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;

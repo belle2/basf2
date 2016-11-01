@@ -29,4 +29,5 @@ process(main)
 
 dbImporter = EKLMDatabaseImporter()
 dbImporter.importDigitizationParameters()
+dbImporter.importReconstructionParameters()
 dbImporter.importSimulationParameters()

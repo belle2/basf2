@@ -193,16 +193,6 @@ namespace Belle2 {
      */
     void setEnableConstBkg(bool enable);
 
-    /**
-     * Get time resolution (of reconstructed time, not ADC).
-     */
-    float getTimeResolution() const;
-
-    /**
-     * Set time resolution (of reconstructed time, not ADC).
-     */
-    void setTimeResolution(float resolution);
-
   private:
 
     /** ADC range: 2**(resolution in bits). */
@@ -255,11 +245,8 @@ namespace Belle2 {
     /** Enable background in fitting. */
     bool m_EnableConstBkg;
 
-    /** Time resolution (of reconstructed time, not ADC). */
-    float m_TimeResolution;
-
     /** Makes objects storable. */
-    ClassDef(Belle2::EKLMDigitizationParameters, 1);
+    ClassDef(Belle2::EKLMDigitizationParameters, 2);
 
   };
 

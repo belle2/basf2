@@ -14,6 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/calibration/EKLMDatabaseImporter.h>
 #include <eklm/dbobjects/EKLMDigitizationParameters.h>
+#include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMSimulationParameters.h>
 #include <framework/database/IntervalOfValidity.h>
 #include <framework/database/DBImportObjPtr.h>
@@ -52,9 +53,19 @@ void EKLMDatabaseImporter::importDigitizationParameters()
   digPar->setPEAttenuationFrequency(dig.getDouble("PEAttenuationFreq"));
   digPar->setMeanSiPMNoise(dig.getDouble("MeanSiPMNoise"));
   digPar->setEnableConstBkg(dig.getDouble("EnableConstBkg") > 0);
-  digPar->setTimeResolution(dig.getDouble("TimeResolution"));
   IntervalOfValidity iov(0, 0, -1, -1);
   digPar.import(iov);
+}
+
+void EKLMDatabaseImporter::importReconstructionParameters()
+{
+  DBImportObjPtr<EKLMReconstructionParameters> recPar;
+  recPar.construct();
+  GearDir gd("/Detector/DetectorComponent[@name=\"EKLM\"]/"
+             "Content/DigitizationParams");
+  recPar->setTimeResolution(gd.getDouble("TimeResolution"));
+  IntervalOfValidity iov(0, 0, -1, -1);
+  recPar.import(iov);
 }
 
 void EKLMDatabaseImporter::importSimulationParameters()

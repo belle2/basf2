@@ -11,24 +11,15 @@
 #ifndef EKLMRAWPACKER_H
 #define EKLMRAWPACKER_H
 
-#include <string>
-#include <vector>
-#include <stdlib.h>
-#include <sys/time.h>
-
-#include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawKLM.h>
+/* C++ headers. */
 #include <map>
-#include <iostream>
+
+/* Belle2 headers. */
+#include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
 

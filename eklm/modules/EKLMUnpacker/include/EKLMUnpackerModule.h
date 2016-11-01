@@ -8,20 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#ifndef EKLMUnpackerModule_H
-#define EKLMUnpackerModule_H
+#ifndef EKLMUNPACKERMODULE_H
+#define EKLMUNPACKERMODULE_H
 
-#include <framework/core/Module.h>
-
-#include <framework/datastore/StoreArray.h>
-#include <framework/logging/Logger.h>
-#include <eklm/dataobjects/EKLMDigit.h>
-
-#include <map>
+/* C++ headers. */
 #include <string>
-#include <iostream>
 
-using namespace std;
+/* Belle2 headers. */
+#include <framework/core/Module.h>
+#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
 

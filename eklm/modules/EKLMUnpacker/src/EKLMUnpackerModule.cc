@@ -8,26 +8,18 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* Belle2 headers. */
+#include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/modules/EKLMUnpacker/EKLMUnpackerModule.h>
-
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/RelationArray.h>
-#include <framework/datastore/RelationIndex.h>
 #include <framework/logging/Logger.h>
-
-#include <boost/crc.hpp>
 #include <rawdata/dataobjects/RawKLM.h>
-#include <rawdata/dataobjects/RawCOPPER.h>
-
-#include <sstream>
-#include <iomanip>
-#include <cstring>
 
 using namespace std;
 using namespace Belle2;
 
 REG_MODULE(EKLMUnpacker)
-
 
 EKLMUnpackerModule::EKLMUnpackerModule() : Module()
 {

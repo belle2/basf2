@@ -1129,13 +1129,13 @@ namespace Belle2 {
     std::vector<Cover> m_covers;/**< Covers. */
     std::vector<Rib> m_ribs;/**< Ribs. */
 
-    double m_senseWireDiameter = 0.030; /**< Sense wire diameter (mm). */
+    double m_senseWireDiameter = 0.003; /**< Sense wire diameter (cm). */
     int m_senseWireNumbers = 14336;/**< Number of sense wires. */
-    double m_senseWireTension = 50.0; /**< Sense wire tension. */
+    double m_senseWireTension = 50.0; /**< Sense wire tension (gW). */
     //    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
-    double m_fieldWireDiameter = 0.126; /**< Field wire diameter (mm). */
+    double m_fieldWireDiameter = 0.0126; /**< Field wire diameter (cm). */
     int m_fieldWireNumbers = 42240; /**< Number of field wires. */
-    double m_feedThroughLength = 15.0; /**< Feedthrough length (mm). */
+    double m_feedThroughLength = 1.5; /**< Feedthrough length (cm). */
     bool m_debug;/**< Debug mode. */
     int m_materialDefinitionMode;/**< Material definition mode. */
     int m_senseWireZposMode; /**< Sense wire z-position definition mode. */

@@ -9,61 +9,61 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-
-#include <vector>
-#include <string>
-#include <cassert>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+
     /// Forward declaration of the CDCWireHitCluster.
     class CDCWireHitCluster;
 
     /// Names of the variables to be generated.
-    constexpr
-    static char const* const clusterBkgTruthNames[4] = {
-      "n_background_hits_truth",
-      "background_fraction_truth",
-      "weight",
-      "truth"
+    constexpr static char const* const basicClusterNames[] = {
+      "is_stereo",
+      "superlayer_id",
+      "size",
+
+      "total_number_of_neighbors",
+      "mean_number_of_neighbors",
+
+      "total_drift_length",
+      "mean_drift_length",
+      "variance_drift_length",
+
+      "total_inner_distance",
+      "mean_inner_distance",
+      "distance_to_superlayer_center",
+
+      "total_adc_count",
+      "mean_adc_count",
+      "variance_adc_count"
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
-    class CDCWireHitClusterBkgTruthVarNames : public VarNames<CDCWireHitCluster> {
+    class BasicClusterVarNames : public VarNames<CDCWireHitCluster> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 4;
+      static const size_t nNames = size(basicClusterNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      constexpr static char const* getName(int iName)
       {
-        return clusterBkgTruthNames[iName];
+        return basicClusterNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a wire hit clusters.
+    /**
+     *  Class that computes floating point variables from a wire hit clusters.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class CDCWireHitClusterBkgTruthVarSet : public VarSet<CDCWireHitClusterBkgTruthVarNames> {
-
-    public:
-      /// Construct the peeler.
-      explicit CDCWireHitClusterBkgTruthVarSet();
-
-      /// Signal the beginning of a new event - loads the Monte Carlo information
-      virtual void beginEvent() override;
+    class BasicClusterVarSet : public VarSet<BasicClusterVarNames> {
 
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCWireHitCluster* cluster) override final;
-
     };
   }
 }

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<ClusterFilterFactory> Super;
+      using Super = UnionRecordingFilter<ClusterFilterFactory>;
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.

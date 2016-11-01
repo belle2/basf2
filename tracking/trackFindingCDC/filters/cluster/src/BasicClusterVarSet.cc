@@ -7,31 +7,32 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBasicVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-/// Important to define the constexpr here such that it gains external linkage.
-//constexpr const char* const TrackFindingCDC::clusterNames[11];
-
-CDCWireHitClusterBasicVarSet::CDCWireHitClusterBasicVarSet() :
-  VarSet<CDCWireHitClusterBasicVarNames>()
-{
-}
-
-bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
+bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
   extractNested(ptrCluster);
   if (not ptrCluster) return false;
   const CDCWireHitCluster& cluster = *ptrCluster;
 
-  unsigned int superlayerID = ISuperLayerUtil::getCommon(cluster);
+  const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
+  unsigned int iSuperLayer = ISuperLayerUtil::getCommon(cluster);
+  if (not ISuperLayerUtil::isInCDC(iSuperLayer)) {
+    return false;
+  }
+  const CDCWireSuperLayer& superLayer = wireTopology.getWireSuperLayer(iSuperLayer);
+  double superLayerCenter = superLayer.getMiddleCylindricalR();
   unsigned int size =  cluster.size();
 
   int totalNNeighbors = 0;
@@ -62,10 +63,11 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
     totalADCCount += adc;
     totalADCCountSquared += adc * adc;
   }
-
   if (size > 1) {
-    double driftLengthVarianceSquared = (totalDriftLengthSquared - totalDriftLength * totalDriftLength / size)  / (size - 1.0) ;
-    double adcVarianceSquared = (totalADCCountSquared - totalADCCount * totalADCCount / size)  / (size - 1.0) ;
+    double driftLengthVarianceSquared =
+      (totalDriftLengthSquared - totalDriftLength * totalDriftLength / size) / (size - 1.0);
+    double adcVarianceSquared =
+      (totalADCCountSquared - totalADCCount * totalADCCount / size) / (size - 1.0);
 
     if (driftLengthVarianceSquared > 0) {
       driftVariance = std::sqrt(driftLengthVarianceSquared);
@@ -95,8 +97,8 @@ bool CDCWireHitClusterBasicVarSet::extract(const CDCWireHitCluster* ptrCluster)
   var<named("variance_drift_length")>() = driftVariance;
   var<named("variance_adc_count")>() = adcCountVariance;
 
-  var<named("distance_to_superlayer_center")>() = m_superLayerCenters[superlayerID] - totalInnerDistance / size;
-  var<named("superlayer_id")>() = superlayerID;
+  var<named("distance_to_superlayer_center")>() = superLayerCenter - totalInnerDistance / size;
+  var<named("superlayer_id")>() = iSuperLayer;
 
   var<named("mean_drift_length")>() = totalDriftLength / size;
   var<named("mean_adc_count")>() = totalADCCount / size;

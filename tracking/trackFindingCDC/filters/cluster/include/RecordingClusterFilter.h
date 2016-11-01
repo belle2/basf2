@@ -12,18 +12,18 @@
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBasicVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/BasicClusterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Records the encountered CDCWireHitClusters.
+    /// Records the encountered CDCWireHitClusters for a training sample for the background filter
     using RecordingClusterFilter =
-      RecordingFilter<VariadicUnionVarSet<CDCWireHitClusterBkgTruthVarSet,
-      CDCWireHitClusterBasicVarSet> >;
+      RecordingFilter<VariadicUnionVarSet<BkgTruthClusterVarSet,
+      BasicClusterVarSet> >;
 
   }
 }

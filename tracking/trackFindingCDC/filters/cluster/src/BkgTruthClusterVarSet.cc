@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/cluster/CDCWireHitClusterBkgTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/cluster/BkgTruthClusterVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -18,20 +18,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-/// Important to define the constexpr here such that it gains external linkage.
-//constexpr const char* const CDCWireHitClusterBkgTruthVarNames::names[nNames];
-
-CDCWireHitClusterBkgTruthVarSet::CDCWireHitClusterBkgTruthVarSet() :
-  VarSet<CDCWireHitClusterBkgTruthVarNames>()
+void BkgTruthClusterVarSet::beginEvent()
 {
-}
-
-void CDCWireHitClusterBkgTruthVarSet::beginEvent()
-{
+  Super::beginEvent();
   CDCMCHitLookUp::getInstance().fill();
 }
 
-bool CDCWireHitClusterBkgTruthVarSet::extract(const CDCWireHitCluster* ptrCluster)
+bool BkgTruthClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
   bool extracted = extractNested(ptrCluster);
   if (not extracted or not ptrCluster) return false;

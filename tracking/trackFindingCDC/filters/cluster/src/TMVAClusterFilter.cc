@@ -9,7 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
 
-#include <cassert>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+TMVAClusterFilter::TMVAClusterFilter()
+  : Super("BackgroundHitFinder", 0.2)
+{
+}

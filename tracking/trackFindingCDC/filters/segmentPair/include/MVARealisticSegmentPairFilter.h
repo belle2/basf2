@@ -40,7 +40,7 @@ namespace Belle2 {
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVARealisticSegmentPairFilter()
-        : Super("tracking/data/RealisticSegmentPairFilter.weights.xml", 0.02)
+        : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
       {
       }
 

@@ -15,7 +15,7 @@ using namespace TrackFindingCDC;
 
 MVAFeasibleSegmentRelationFilter::MVAFeasibleSegmentRelationFilter()
   : Super(makeUnique<VarSet>(),
-          "tracking/data/FeasibleSegmentRelationFilter.weights.xml",
+          "trackfindingcdc_FeasibleSegmentRelationFilter",
           0.02)
 {
 }

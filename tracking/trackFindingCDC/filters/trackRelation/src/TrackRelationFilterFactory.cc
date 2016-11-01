@@ -15,8 +15,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
 }
 
@@ -41,7 +41,7 @@ TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "all track relations are valid, for comparision only."},
     {"truth", "track relations from monte carlo truth"},
     {"feasible", "checks rough competability of tracks"},
-    {"unionrecording", "record many multiple choosable variable set"},
+    {"unionrecording", "record multiple choosable variable set"},
   });
 
   return filterNames;

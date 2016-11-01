@@ -42,9 +42,11 @@ namespace Belle2 {
 
         moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
         moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
+
+        // The realistic filters do not work for the cosmic tracks
+        moduleParamList->getParameter<std::string>("SegmentPairFilter").setDefaultValue("simple");
+        moduleParamList->getParameter<std::string>("SegmentPairRelationFilter").setDefaultValue("simple");
       }
-
     }; // end class TrackFinderCosmics
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

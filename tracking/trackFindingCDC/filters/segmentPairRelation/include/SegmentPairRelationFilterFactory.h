@@ -29,7 +29,7 @@ namespace Belle2 {
       using Super = FilterFactory<BaseSegmentPairRelationFilter>;
 
       /** Fill the default filter name and parameter values*/
-      SegmentPairRelationFilterFactory(const std::string& defaultFilterName = "simple");
+      SegmentPairRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
       using FilterFactory<BaseSegmentPairRelationFilter>::create;
 

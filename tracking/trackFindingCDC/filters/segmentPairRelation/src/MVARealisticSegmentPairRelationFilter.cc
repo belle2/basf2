@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 MVARealisticSegmentPairRelationFilter::MVARealisticSegmentPairRelationFilter()
   : Super(makeUnique<VarSet>(),
           "trackfindingcdc_RealisticSegmentPairRelationFilter",
-          0.02)
+          0.08)
 {
 }
 

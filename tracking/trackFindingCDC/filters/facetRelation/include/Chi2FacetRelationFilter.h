@@ -44,10 +44,10 @@ namespace Belle2 {
 
     private:
       /// Memory for the chi2 cut value
-      double m_param_chi2Cut = 350;
+      double m_param_chi2Cut = 130; // first guess was 350;
 
       /// Memory for the width parameter to translate the chi2 value to a weight penatlity
-      double m_param_penaltyWidth = 800;
+      double m_param_penaltyWidth = 200; // first guess was 800;
 
     }; // end class
   } //end namespace TrackFindingCDC

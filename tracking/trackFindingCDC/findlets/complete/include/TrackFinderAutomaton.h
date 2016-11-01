@@ -80,7 +80,7 @@ namespace Belle2 {
         moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
         moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
 
-        moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
+        moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
         moduleParamList->getParameter<std::string>("SegmentOrientation").resetValue();
 
         moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");

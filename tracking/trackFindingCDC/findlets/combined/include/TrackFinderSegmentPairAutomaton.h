@@ -65,6 +65,9 @@ namespace Belle2 {
         m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);
         m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
+
+        moduleParamList->getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
+        moduleParamList->getParameter<int>("SegmentPairRelationOnlyBest").resetValue();
       }
 
       /// Signal the beginning of a new event the current event

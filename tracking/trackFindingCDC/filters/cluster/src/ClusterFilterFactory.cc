@@ -13,8 +13,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
 }
 
@@ -28,32 +28,27 @@ std::string ClusterFilterFactory::getModuleParamPrefix() const
   return "Cluster";
 }
 
-std::map<std::string, std::string>
-ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
+std::map<std::string, std::string> ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
+  std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
 
   filterNames.insert({
     {"all", "all hits are valid"},
     {"mva_bkg", "test clusters for background with a mva method"},
-    {"recording", "record cluster variables to a TTree"},
     {"unionrecording", "record many multiple choosable variable set"},
   });
   return filterNames;
 }
 
-std::unique_ptr<Filter<CDCWireHitCluster> >
-ClusterFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<Filter<CDCWireHitCluster>>
+                                        ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return makeUnique<AllClusterFilter>();
   } else if (filterName == "mva_bkg") {
     return makeUnique<MVABackgroundClusterFilter>();
-  } else if (filterName == "recording") {
-    return makeUnique<RecordingClusterFilter>();
   } else if (filterName == "unionrecording") {
-    return makeUnique< UnionRecordingClusterFilter>();
+    return makeUnique<UnionRecordingClusterFilter>();
   } else {
     return Super::create(filterName);
   }

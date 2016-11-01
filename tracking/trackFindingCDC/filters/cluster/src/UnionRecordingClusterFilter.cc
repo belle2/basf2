@@ -17,7 +17,7 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 UnionRecordingClusterFilter::UnionRecordingClusterFilter()
-  : Super("BackgroundHitFinder.root")
+  : Super("ClusterFilter.root")
 {
 }
 
@@ -33,7 +33,7 @@ UnionRecordingClusterFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
     return makeUnique<BasicClusterVarSet>();
-  } else if (name == "truth") {
+  } else if (name == "bkg_truth") {
     return makeUnique<BkgTruthClusterVarSet>();
   } else {
     return Super::createVarSet(name);

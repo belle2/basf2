@@ -164,7 +164,6 @@ namespace Belle2 {
 
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetPlane), detPlaneLV, "ARICH.detPlane", masterLV, false, 1);
       new G4PVPlacement(G4Transform3D(rotDetPlane, transDetSupportPlate), detSupportPlateLV, "ARICH.detSupportPlane", masterLV, false, 1);
-
       new G4PVPlacement(G4Transform3D(rotAeroPlane, transAeroPlane), aeroPlaneLV, "ARICH.aeroPlane", masterLV, false, 1);
 
       // build and place mirrors
@@ -402,8 +401,8 @@ namespace Belle2 {
       const ARICHGeoAerogelPlane& aeroGeo = detectorGeo.getAerogelPlane();
 
       // support plane
-      double rin = aeroGeo.getSupportInnerR();
-      double rout = aeroGeo.getSupportOuterR();
+      double rin = aeroGeo.getSupportInnerR() + 15.0; // remove when fix!!
+      double rout = aeroGeo.getSupportOuterR() - 3.0; // remove when fix!!
       double thick = aeroGeo.getSupportThickness();
       double wallThick = aeroGeo.getWallThickness();
       double wallHeight = aeroGeo.getWallHeight();
@@ -448,7 +447,7 @@ namespace Belle2 {
 
         wallName.str("");
         wallName << "supportWallPhi_" << iRing + 1;
-        G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2., thick / 2., wallHeight / 2.);
+        G4Box* wall = new G4Box(wallName.str(), (wallR[iRing] - wallR[iRing - 1] - wallThick) / 2. - 1., thick / 2., wallHeight / 2.);
         G4LogicalVolume* wallLV = new G4LogicalVolume(wall, supportMaterial, string("ARICH.") + wallName.str());
         double r = (wallR[iRing - 1] + wallThick + wallR[iRing]) / 2.;
         double zLayer = 0;
@@ -671,7 +670,8 @@ namespace Belle2 {
         G4Transform3D transform3 = G4Translate3D(0., 0., detGeo.getSupportThickness() / 2.);
         new G4PVPlacement(transform3,  hapdBackTubeLV, "backTube", detSupportLV, false, 1);
         if (i == 0) continue;
-        G4Box* backRadial = new G4Box("backRadialBox", (wallR[i] - wallR[i - 1] - thickR[i] / 2. - thickR[i - 1] / 2.) / 2.,
+
+        G4Box* backRadial = new G4Box("backRadialBox", (wallR[i] - wallR[i - 1] - thickR[i] / 2. - thickR[i - 1] / 2.) / 2. - 1.,
                                       backWallThick / 2., backWallHeight / 2.);
         hapdBackRadialWallLV.push_back(new G4LogicalVolume(backRadial, supportMaterial, ringName1.str().c_str()));
       }

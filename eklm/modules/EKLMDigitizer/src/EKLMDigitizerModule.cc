@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <math.h>
-
 /* External headers. */
 #include <boost/graph/adjacency_list.hpp>
 

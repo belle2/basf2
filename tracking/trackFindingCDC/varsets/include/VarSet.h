@@ -110,9 +110,6 @@ namespace Belle2 {
       }
 
     protected:
-      /// The cylinder radius of the super layer centers
-      std::vector<double> m_superLayerCenters;
-
       /** Getter for the index from the name.
        *  Looks through the associated names and returns the right index if found
        *  Returns nVars (one after the last element) if not found.
@@ -150,20 +147,6 @@ namespace Belle2 {
           var<I>() = valueIfNaN;
         } else {
           var<I>() = value;
-        }
-      }
-
-      /// Prepare the superlayer center array with information coming from the CDCWireTopology.
-      void prepareSuperLayerCenterArray()
-      {
-        const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
-
-        m_superLayerCenters.clear();
-        m_superLayerCenters.reserve(wireTopology.getNSuperLayers());
-
-        for (const CDCWireSuperLayer& superLayer : wireTopology.getWireSuperLayers()) {
-          Float_t superLayerCenter = superLayer.getMiddleCylindricalR();
-          m_superLayerCenters.push_back(superLayerCenter);
         }
       }
 

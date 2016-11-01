@@ -31,9 +31,7 @@ namespace Belle2 {
    */
   template<int N = 1, class RealType = double>
   class CalcMeanCov {
-#ifndef __CINT__
     static_assert(N > 0, "Number of parameters, N, must be positive");
-#endif
   public:
     /** default constructor. */
     CalcMeanCov() { clear(); }
@@ -51,7 +49,6 @@ namespace Belle2 {
         m_covariance[i] = 0;
     }
 
-#ifndef __CINT__
     /** Update mean and covariance by adding a new, weighted entry.
      * @param weight weight of the entry
      * @param values values for all parameters. The number of parameters
@@ -187,10 +184,8 @@ namespace Belle2 {
     }
 
     /**@}*/
-#endif
 
   private:
-#ifndef __CINT__
     /** Add a single value for parameter i and update mean and covariance.
      * @see addArrayValues
      * @tparam i index of the parameter
@@ -265,7 +260,6 @@ namespace Belle2 {
       //swap indices if i >= j
       return (i < j) ? ((j + 1) * j / 2 + i) : ((i + 1) * i / 2 + j);
     }
-#endif
 
     /** Store the sum of weights */
     value_type m_entries;

@@ -30,18 +30,6 @@ namespace Belle2 {
   class PXDSensorInfoPar: public VXDSensorInfoBasePar {
 
   public:
-    //! Default constructor
-    //PXDSensorInfoPar() {}
-    //! Constructor using Gearbox
-    //explicit PXDSensorInfoPar(const GearDir& content) { read(content); }
-    //! Destructor
-    //~PXDSensorInfoPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
-
-    //! Default constructor
-    //PXDSensorInfoPar() : VXDSensorInfoBasePar() {}
-
     /** Constructor which automatically sets the SensorType */
 
     PXDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0, int uCells = 0, int vCells = 0,
@@ -142,43 +130,8 @@ namespace Belle2 {
     double getIntegrationEnd() const { return m_integrationEnd; }
     /** Return the Hall factor for electrons at sensor temperature.*/
     double getHallFactor() const { return m_hallFactor; }
-    /** Calculate electron mobility at a given electric field.
-     * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-     * @param eField Electric field, V/cm
-     * @return electron mobility, cm*2/V.ns
-     */
-    double getElectronMobility(double E) const;
-    /** Model of the E field inside the sensor.
-     * @param point Desired position in local coordinates.
-     * @param info The SensorInfo for the current sensor.
-     * @return The E field vector in local coordinates.
-     */
-    //const TVector3 getEField(const TVector3& point) const;
-    /** Get B field value from the field map.
-     * @param point Desired position in local coordinates.
-     * @param info the SensorInfo for the current sensor.
-     * @return The B field vector in local coordinates.
-     */
-    //const TVector3 getBField(const TVector3& point) const;
-    /** Calculate Lorentz shift.
-     * @param u Local u coordinate
-     * @param v Local v coordinate
-     * @return 3-vector (du, dv, 0) of Lorentz shifts.
-     */
-    //const TVector3 getLorentzShift(double u, double v) const;
-    /** Calculate drift velocity of an electron.
-     * @param E Electric field vector
-     * @param B Magnetic field vector
-     * @result drift velocity of an electron in the E+B field.
-     */
-    //const TVector3 getDriftVelocity(const TVector3& E, const TVector3& B) const;
 
   private:
-
-    /** Calculate Lorentz shift factor.
-      * This factor is constant for a sensor; the actual, position-dependent
-      * Lorentz shift is factor cross B.*/
-    void setLorentzFactor();
 
     /** The temperature of the sensor */
     double m_temperature;

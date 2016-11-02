@@ -27,19 +27,6 @@ namespace Belle2 {
   class SVDSensorInfoPar: public VXDSensorInfoBasePar {
 
   public:
-
-    //! Default constructor
-    //SVDSensorInfoPar() {}
-    //! Constructor using Gearbox
-    //explicit SVDSensorInfoPar(const GearDir& content) { read(content); }
-    //! Destructor
-    //~SVDSensorInfoPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
-
-    /** The Fano factor for silicon. */
-    const double c_fanoFactorSi = 0.08;
-
     /** Enum for parametric access to sensor coordinates. */
     enum Coordinate {
       u = 0,
@@ -53,10 +40,6 @@ namespace Belle2 {
       hole = +1      /** holes */
     };
 
-    //! Default constructor
-    //SVDSensorInfoPar() : VXDSensorInfoBasePar() {}
-
-
     /** Constructor which automatically sets the SensorType to SensorInfo::SVD.
      * @param id VXD ID of the sensor.
      * @width Width of the sensor.
@@ -66,7 +49,6 @@ namespace Belle2 {
      * @vCells Number of strips in v direction.
      * @width2 For wedge sensors, width is the width at 0, width2 is the width at maximum u.
      */
-
     SVDSensorInfoPar(VxdID id = 0, float width = 0, float length = 0, float thickness = 0,
                      int uCells = 0, int vCells = 0, float width2 = 0):
       VXDSensorInfoBasePar(SVDSensorInfoPar::SVD, id, width, length, thickness, uCells, vCells, width2, -1, 0),
@@ -117,33 +99,10 @@ namespace Belle2 {
     double getElectronicNoiseU() const {return m_electronicNoiseU; }
     /** Return electronic noise in e- for v (long) strips */
     double getElectronicNoiseV() const {return m_electronicNoiseV; }
-    /** Calculate electron mobility at a given electric field.
-     * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-     * @param eField Electric field, V/cm
-     * @return electron mobility, cm*2/V.ns
-     */
-    double getElectronMobility(double E) const;
-    /** Calculate hole mobility at a given electric field.
-     * Based on C. Canali et al., IEEE, ED-22, (1975) 1045
-     * @param eField Electric field, V/cm
-     * @return hole mobility, cm*2/V.ns
-     */
-    double getHoleMobility(double E) const;
 
-    /** Model of the E field inside the sensor.
-     * @param point Desired position in local coordinates.
-     * @return The E field vector in local coordinates.
-     */
-    //const TVector3 getEField(const TVector3& point) const;
-
-    /** Get B field value from the field map.
-     * @param point Desired position in local coordinates.
-     * @return The B field vector in local coordinates.
-     */
-    //const TVector3& getBField(const TVector3& point) const;
 
     /** Return Hall factor for the corresponding carrier type.
-     * @param carrier electron or hole, SVD::SensorInfo::CarrierType
+     * @param carrier electron or hole, SVDSensorInfoPar::CarrierType
      * @return The Hall factor for the actual sensor temperature.
      */
     double getHallFactor(CarrierType carrier) const
@@ -154,30 +113,6 @@ namespace Belle2 {
         return (0.72 - 0.0005 * (m_temperature - 273));
     }
 
-    /** Get drift velocity for electrons or holes at a given point.
-     * @param carrier Electron or hole.
-     * @param point The point in local coordinates.
-     * @result The vector of drift velocity in local coordinates.
-     */
-    //const TVector3 getVelocity(CarrierType carrier, const TVector3& point) const;
-
-    /** Calculate Lorentz shift along a given coordinate in a magnetic field at a given position.
-     * This method can only be used for a completely reconstructed 2D cluster.
-     * For 1D clusters, use the following method.
-     * @param u u coordinate where the shift is required
-     * @param v v coordinate where the shift is required
-     * @return TVector with Lorentz shift along u and v at the given position.
-     */
-    //const TVector3& getLorentzShift(double u, double v) const;
-
-    /** Calculate mean Lorentz shift along a given coordinate, with B-field averaged
-     * along the corresponding strip.
-     * Use this for 1D clusters, where only one coordinate is known.
-     * @param uCoordinate True if u, false if v.
-     * @param position The position of the strip.
-     * @return Mean Lorentz shift along a given coordinate.
-     */
-    //double getLorentzShift(bool uCoordinate, double position) const;
 
   private:
     /** Sensor temperature*/

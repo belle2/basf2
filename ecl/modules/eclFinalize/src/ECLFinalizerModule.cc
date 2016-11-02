@@ -114,6 +114,7 @@ void ECLFinalizerModule::event()
       eclCluster->setStatus(eclShower.getStatus());
       eclCluster->setConnectedRegionId(eclShower.getConnectedRegionId());
       eclCluster->setHypothesisId(eclShower.getHypothesisId());
+      eclCluster->setClusterId(eclShower.getShowerId());
 
       eclCluster->setEnergy(eclShower.getEnergy());
       eclCluster->setEnergyRaw(eclShower.getEnergyRaw());

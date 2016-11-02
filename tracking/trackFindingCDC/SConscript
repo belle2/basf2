@@ -11,10 +11,15 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'geometry',
     'cdc', 'cdc_dataobjects',
+    "mva",
     'framework',
     'genfit2',
     '$ROOT_LIBS',
     'TMVA',
     ]
+
+# option = os.environ['BELLE2_OPTION']
+# if option == "clang":
+#     env.Append(CCFLAGS=['-Wdocumentation'])
 
 Return('env')

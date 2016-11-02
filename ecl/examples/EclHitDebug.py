@@ -1,10 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+########################################################
+#
+# Example steering file - 2016 Belle II Collaboration
+#
+# Modifications for release-00-08: Torben Ferber (ferber@physics.ubc.ca)
+#
+########################################################
+
+
 import os
 from basf2 import *
 from simulation import add_simulation
-from reconstruction import add_tracking_reconstruction
+from reconstruction import add_tracking_reconstruction, add_ecl_modules
 
 set_log_level(LogLevel.ERROR)
 
@@ -48,9 +57,7 @@ pGun.param(param_pGun)
 
 eclDigi = register_module('ECLDigitizer')
 eclHit = register_module('ECLHitDebug')
-eclRecShower = register_module('ECLReconstructor')
-# makeGamma = register_module('ECLGammaReconstructor')
-# makePi0 = register_module('ECLPi0Reconstructor')
+
 makeMatch = register_module('MCMatcherECLClusters')
 
 # Create paths
@@ -58,16 +65,13 @@ main = create_path()
 main.add_module(eventinfosetter)
 main.add_module(eventinfoprinter)
 add_simulation(main)
-# main.add_module(gearbox)
-# main.add_module(geometry)
-# main.add_module(pGun)
-# main.add_module(g4sim)
+
 add_tracking_reconstruction(main)
 main.add_module(eclDigi)
 main.add_module(eclHit)
-main.add_module(eclRecShower)
-# main.add_module(makeGamma)
-# main.add_module(makePi0)
+
+add_ecl_modules(main)
+
 simpleoutput = register_module('RootOutput')
 simpleoutput.param('outputFileName', 'Output.root')
 main.add_module(simpleoutput)

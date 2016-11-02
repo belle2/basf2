@@ -19,9 +19,9 @@
 #include <arich/dataobjects/ARICHAeroHit.h>
 #include <arich/dataobjects/ARICHLikelihood.h>
 #include <arich/dataobjects/ARICHTrack.h>
-#include <arich/dataobjects/ARICHDigit.h>
+#include <arich/dataobjects/ARICHHit.h>
 
-
+#include <framework/core/ModuleManager.h>
 
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
@@ -65,7 +65,6 @@ namespace Belle2 {
     defMerit.push_back(8.0);
     defMerit.push_back(8.0);
     // Add parameters
-    addParam("beamtest", m_beamtest, "ARICH beamtest switch (beamtest data=1, beamtest MC=2)", 0);
     addParam("trackPositionResolution", m_trackPositionResolution,
              "Resolution of track position on aerogel plane (for additional smearing of MC tracks)", 1.0 * Unit::mm);
     addParam("trackAngleResolution", m_trackAngleResolution,
@@ -86,7 +85,7 @@ namespace Belle2 {
   {
     // Initialize variables
 
-    m_ana = new ARICHReconstruction(m_storePhot, m_beamtest);
+    m_ana = new ARICHReconstruction(m_storePhot);
     m_ana->setBackgroundLevel(m_backgroundLevel);
     m_ana->setTrackPositionResolution(m_trackPositionResolution);
     m_ana->setTrackAngleResolution(m_trackAngleResolution);
@@ -95,8 +94,8 @@ namespace Belle2 {
     m_ana->initialize();
 
 
-    StoreArray<ARICHDigit> arichDigits;
-    arichDigits.isRequired();
+    StoreArray<ARICHHit> arichHits;
+    arichHits.isRequired();
 
     StoreArray<Track> tracks;
     StoreArray<ExtHit> extHits;
@@ -141,7 +140,7 @@ namespace Belle2 {
     StoreArray<ARICHTrack> arichTracks;
 
     // Input: ARICHDigits
-    StoreArray<ARICHDigit> arichDigits;
+    StoreArray<ARICHHit> arichHits;
 
     // using track information form tracking system (mdst Track)
     if (m_inputTrackType == 0) {
@@ -191,7 +190,7 @@ namespace Belle2 {
         // make new ARICHLikelihood
         ARICHLikelihood* like = arichLikelihoods.appendNew();
         // calculate and set likelihood values
-        m_ana->likelihood2(*arichTrack, arichDigits, *like);
+        m_ana->likelihood2(*arichTrack, arichHits, *like);
         // make relations
         track->addRelationTo(like);
         arichTrack->addRelationTo(like);
@@ -211,6 +210,7 @@ namespace Belle2 {
       // Loop over all ARICHAeroHits
       for (int iTrack = 0; iTrack < nTracks; ++iTrack) {
         ARICHAeroHit* aeroHit = aeroHits[iTrack];
+
         // make new ARICHTrack
         ARICHTrack* arichTrack = arichTracks.appendNew(aeroHit);
         // smearing of track parameters (to mimic tracking system resolutions)
@@ -218,7 +218,7 @@ namespace Belle2 {
         // make associated ARICHLikelihood
         ARICHLikelihood* like = arichLikelihoods.appendNew();
         // calculate and set likelihood values
-        m_ana->likelihood2(*arichTrack, arichDigits, *like);
+        m_ana->likelihood2(*arichTrack, arichHits, *like);
         // make relation
         arichTrack->addRelationTo(like);
         like->addRelationTo(aeroHit);

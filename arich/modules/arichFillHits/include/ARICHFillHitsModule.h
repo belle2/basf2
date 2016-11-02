@@ -11,8 +11,14 @@
 #ifndef ARICHFILLHITSMODULE_H
 #define ARICHFILLHITSMODULE_H
 
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+#include <arich/dbobjects/ARICHChannelMapping.h>
+
+
+#include <framework/database/DBObjPtr.h>
+
+
 #include <framework/core/Module.h>
-#include <arich/geometry/ARICHGeometryPar.h>
 #include <string>
 
 namespace Belle2 {
@@ -65,7 +71,8 @@ namespace Belle2 {
 
   private:
 
-    ARICHGeometryPar* m_arichgp;  /**< geometry parameters */
+    DBObjPtr<ARICHGeometryConfig> m_geoPar; /**< geometry configuration parameters from the DB */
+    DBObjPtr<ARICHChannelMapping> m_chnMap; /**< (x,y) to asic channel mapping */
 
   };
 

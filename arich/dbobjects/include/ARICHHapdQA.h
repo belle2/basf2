@@ -35,7 +35,7 @@ namespace Belle2 {
      * Constructor
      */
 
-    ARICHHapdQA(std::string serial, TTimeStamp arrivalDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
+    ARICHHapdQA(const std::string& serial, TTimeStamp arrivalDate, std::vector<TGraph*> leakCurrent, TH2F* hitData2D,
                 std::vector<TGraph*> noise, std::vector<TH1S*> hitCount): m_serial(serial), m_arrivalDate(arrivalDate),
       m_leakCurrent(leakCurrent), m_hitData2D(hitData2D), m_noise(noise), m_hitCount(hitCount), m_comment("") { };
 

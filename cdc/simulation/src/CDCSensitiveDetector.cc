@@ -94,6 +94,7 @@ namespace Belle2 {
     B2INFO("CDCSensitiveDetector: MinTrackLength (mm): " << m_minTrackLength);
 
     //For activating Initialize and EndOfEvent functions
+    //but not work --> commented out  for a while...
     //    if (m_modifiedLeftRightFlag) {
     //      G4SDManager::GetSDMpointer()->AddNewDetector(this);
     //    }

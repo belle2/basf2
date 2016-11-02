@@ -149,6 +149,7 @@ void BKLMUnpackerModule::event()
 {
   StoreArray<RawKLM> rawKLM;
   StoreArray<BKLMDigit> bklmDigits(m_outputDigitsName);
+  bklmDigits.clear();
 
   B2DEBUG(1, "Unpacker has have " << rawKLM.getEntries() << " entries");
   for (int i = 0; i < rawKLM.getEntries(); i++) {

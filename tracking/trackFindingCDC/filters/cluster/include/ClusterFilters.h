@@ -7,10 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/TMVAClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/cluster/RecordingClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>

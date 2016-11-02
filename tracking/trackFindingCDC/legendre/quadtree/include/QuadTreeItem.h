@@ -41,7 +41,6 @@ namespace Belle2 {
       /**
        * Flag is set if the item was used as a result of the quad tree search and
        * should not be used in the next quad tree search round.
-       * @return
        */
       virtual bool isUsed() const
       {
@@ -50,7 +49,6 @@ namespace Belle2 {
 
       /**
        * Set the used flag if you do not want that item to go into the next search round again.
-       * @param usedFlag
        */
       virtual void setUsedFlag(bool usedFlag = true)
       {

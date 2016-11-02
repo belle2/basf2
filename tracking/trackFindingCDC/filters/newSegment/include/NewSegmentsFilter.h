@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segment/AdvancedRecoSegment2DVarSet.h>
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -21,19 +21,21 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Class that computes floating point variables from a segment.
+    /**
+     *  Class that computes floating point variables from a segment.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class NewSegmentTruthVarSet : public CDCRecoSegment2DTruthVarSet {
+    class NewSegmentTruthVarSet : public TruthSegmentVarSet {
+
+    private:
+      /// Type of the base class
+      using Super = TruthSegmentVarSet;
 
     public:
-      /// Construct the peeler.
-      explicit NewSegmentTruthVarSet() : CDCRecoSegment2DTruthVarSet() { }
-
       /// Generate and assign the variables from the cluster
       virtual bool extract(const CDCRecoSegment2D* segment) override final
       {
-        CDCRecoSegment2DTruthVarSet::extract(segment);
+        Super::extract(segment);
 
         var<named("truth")>() = var<named("segment_is_new_track_truth")>();
         return true;
@@ -42,13 +44,14 @@ namespace Belle2 {
 
     using BaseNewSegmentsFilter = Filter<CDCRecoSegment2D>;
 
-    using MCNewSegmentsFilter = MCFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
+    using MCNewSegmentsFilter =
+      MCFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
 
     using RecordingNewSegmentsFilter =
-      RecordingFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedCDCRecoSegment2DVarSet>>;
+      RecordingFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet> >;
 
     using AllNewSegmentsFilter = AllFilter<BaseNewSegmentsFilter>;
 
-    using TMVANewSegmentsFilter = TMVAFilter<AdvancedCDCRecoSegment2DVarSet>;
+    using TMVANewSegmentsFilter = TMVAFilter<AdvancedSegmentVarSet>;
   }
 }

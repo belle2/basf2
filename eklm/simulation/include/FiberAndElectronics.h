@@ -14,7 +14,7 @@
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMDigit.h>
-#include <eklm/simulation/Digitizer.h>
+#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/simulation/FPGAFitter.h>
 
 namespace Belle2 {
@@ -36,9 +36,14 @@ namespace Belle2 {
 
       /**
        * Constructor.
+       * @param[in] digPar                  Digitization parameters.
+       * @param[in] digitizationInitialTime Initial digitization time.
+       * @param[in] fitter                  Fitter.
+       * @param[in] debug                   Use debug mode.
        */
-      FiberAndElectronics(struct EKLM::DigitizationParams* digPar,
-                          FPGAFitter* fitter);
+      FiberAndElectronics(EKLMDigitizationParameters* digPar,
+                          FPGAFitter* fitter, double digitizationInitialTime,
+                          bool debug);
 
       /**
        * Destructor.
@@ -96,10 +101,16 @@ namespace Belle2 {
     private:
 
       /** Parameters. */
-      struct EKLM::DigitizationParams* m_DigPar;
+      EKLMDigitizationParameters* m_DigPar;
 
       /** Fitter. */
       FPGAFitter* m_fitter;
+
+      /** Initial digitization time. */
+      double m_DigitizationInitialTime;
+
+      /** Debug mode (generates additional output files with histograms). */
+      bool m_Debug;
 
       /** Stands for nDigitizations*ADCSamplingTime. */
       double m_histRange;

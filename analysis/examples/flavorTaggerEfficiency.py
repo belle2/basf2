@@ -214,8 +214,8 @@ for method in methods:
 
     tree.Project('Average_r', 'abs(B0_' + method + '_qrCombined)',
                  'abs(B0_' + method + '_qrCombined)')
-    tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC>0)')
-    tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC<0)')
+    tree.Project('Average_rB0', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==1)')
+    tree.Project('Average_rB0bar', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_' + method + '_qrCombined)*(B0_qrMC==-1)')
 
     # filling with abs(qr) in one of 6 bins
     tree.Project('entries_per_bin', 'abs(B0_' + method + '_qrCombined)', 'abs(B0_qrMC) == 1')

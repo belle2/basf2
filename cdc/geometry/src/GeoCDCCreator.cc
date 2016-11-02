@@ -150,7 +150,8 @@ namespace Belle2 {
                        mother.getNNodes(), motherZ.data(),
                        motherRmin.data(), motherRmax.data());
       logical_cdc = new G4LogicalVolume(solid_cdc, medAir, "logicalCDC", 0, 0, 0);
-      physical_cdc = new G4PVPlacement(0, G4ThreeVector(0., 0., geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc, "physicalCDC",
+      physical_cdc = new G4PVPlacement(0, G4ThreeVector(geo.getGlobalOffsetX() * CLHEP::cm, geo.getGlobalOffsetY() * CLHEP::cm,
+                                                        geo.getGlobalOffsetZ() * CLHEP::cm), logical_cdc, "physicalCDC",
                                        &topVolume, false,
                                        0);
 

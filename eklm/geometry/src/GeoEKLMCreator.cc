@@ -27,7 +27,6 @@
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoEKLMCreator.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>

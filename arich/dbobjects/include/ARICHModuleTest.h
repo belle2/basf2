@@ -32,7 +32,7 @@ namespace Belle2 {
     /**
      * Default constructor
      */
-    ARICHModuleTest(): m_febSN(0), m_hapdSN(""), m_run(0), m_runposition(0), m_isOK(false), m_deadCh(), m_strangeCh(),
+    ARICHModuleTest(): m_febSN(0), m_hapdSN(""), m_hvbSN(0), m_run(0), m_runposition(0), m_isOK(false), m_deadCh(), m_strangeCh(),
       m_guardBias_th(NULL), m_HV_th(NULL), m_guardBias_2Dx(NULL), m_HV_2Dx(NULL), m_guardBias_2Dy(NULL), m_HV_2Dy(NULL), m_gain(NULL),
       m_charge(NULL), m_th(NULL), m_scanX(NULL), m_scanY(NULL), m_comment("")
     {
@@ -67,7 +67,17 @@ namespace Belle2 {
     /** Set HAPD serial number
      * @param HAPD serial number
      */
-    void setHapdSN(std::string& hapd) {m_hapdSN = hapd; }
+    void setHapdSN(const std::string& hapd) {m_hapdSN = hapd; }
+
+    /** Return HVB serial number
+     * @return HVB serial number
+     */
+    int getHvbSN() const {return m_hvbSN; }
+
+    /** Set HVB serial number
+     * @param HVB serial number
+     */
+    void setHvbSN(int serial) {m_hvbSN = serial; }
 
     /** Return module test run
      * @return module test run
@@ -344,7 +354,7 @@ namespace Belle2 {
     /** Set comment
      * @param comment
      */
-    void setComment(std::string& comment) {m_comment = comment; }
+    void setComment(const std::string& comment) {m_comment = comment; }
 
     /** Return comment
      * @return comment
@@ -355,6 +365,7 @@ namespace Belle2 {
 
     int m_febSN;                   /**< FEB serial number */
     std::string m_hapdSN;          /**< HAPD serial number */
+    int m_hvbSN;                   /**< HVB serial number */
     int m_run;                     /**< Run number */
     int m_runposition;             /**< Position on setup */
     bool m_isOK;                   /**< Module is OK if true */

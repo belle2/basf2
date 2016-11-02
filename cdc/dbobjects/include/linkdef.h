@@ -12,8 +12,9 @@
 #pragma link C++ class Belle2::CDCTimeWalks+;
 #pragma link C++ class Belle2::CDCXtRelations+;
 #pragma link C++ class Belle2::CDCSpaceResols+;
-#pragma link C++ class Belle2::CDCAlignment+;
 #pragma link C++ class Belle2::CDCDisplacement+;
+#pragma link C++ class Belle2::CDCAlignment+;
+#pragma link C++ class Belle2::CDCMisalignment+;
 #pragma link C++ class Belle2::CDCGeometry+;
 #pragma link C++ class Belle2::CDCGeometry::Rib+;
 #pragma link C++ class Belle2::CDCGeometry::Cover+;

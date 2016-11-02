@@ -35,7 +35,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHMirrorMap(ARICHMirrorInfo* mirror, int column, TTimeStamp timeStamp, std::string comment): m_mirror(mirror), m_column(column),
+    ARICHMirrorMap(ARICHMirrorInfo* mirror, int column, TTimeStamp timeStamp, const std::string& comment): m_mirror(mirror),
+      m_column(column),
       m_timeStamp(timeStamp), m_comment(comment) {};
 
     /**

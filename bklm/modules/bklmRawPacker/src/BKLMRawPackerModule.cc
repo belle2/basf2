@@ -7,6 +7,8 @@
 
 #include <bklm/modules/bklmRawPacker/BKLMRawPackerModule.h>
 #include <bklm/dataobjects/BKLMDigit.h>
+#include <framework/database/DBArray.h>
+#include <bklm/dbobjects/BKLMElectronicMapping.h>
 
 #include <framework/logging/Logger.h>
 
@@ -31,6 +33,7 @@ BKLMRawPackerModule::BKLMRawPackerModule() : Module()
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId, "use default elect id if not found in mapping", true);
+  addParam("loadMapFromDB", m_loadMapFromDB, "load electronic map from DataBase or not", false);
 
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("NodeID", m_nodeid, "Node ID", 0);
@@ -64,7 +67,8 @@ void BKLMRawPackerModule::initialize()
   rawklmarray.registerPersistent();
 
   B2DEBUG(1, "BKLMRawPackerModule: initialize() done.");
-  loadMap();
+  if (m_loadMapFromDB) loadMapFromDB();
+  else loadMap();
 }
 
 
@@ -121,16 +125,17 @@ void BKLMRawPackerModule::event()
     int copperId;
     int finesse;
     int lane;
-    intToElectCoo(electId, copperId, finesse, lane);
+    int plane;
+    intToElectCoo(electId, copperId, finesse, lane, plane);
 
-    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << iLayer << " " << iAx << " " <<
+    B2DEBUG(1, "BKLMRawPacker::copperId " << copperId << " " << isForward << " " << iSector << " " << lane << " " << plane << " " <<
             iChannelNr << " " << iTdc << " " << icharge << " " << iCTime);
 
     unsigned short bword1 = 0;
     unsigned short bword2 = 0;
     unsigned short bword3 = 0;
     unsigned short bword4 = 0;
-    formatData(iChannelNr, iAx, iLayer, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
+    formatData(iChannelNr, plane, lane, iTdc, icharge, iCTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
     buf[1] |= bword4;
@@ -246,6 +251,37 @@ void BKLMRawPackerModule::formatData(int channel, int axis, int lane, int tdc, i
 
 }
 
+void BKLMRawPackerModule::loadMapFromDB()
+{
+  DBArray<BKLMElectronicMapping> elements("BKLMElectronicMapping");
+  elements.getEntries();
+  for (const auto& element : elements) {
+    B2DEBUG(1, "Version = " << element.getBKLMElectronictMappingVersion() << ", copperId = " << element.getCopperId() <<
+            ", slotId = " << element.getSlotId() << ", axisId = " << element.getAxisId() << ", laneId = " << element.getLaneId() <<
+            ", isForward = " << element.getIsForward() << " sector = " << element.getSector() << ", layer = " << element.getLayer() <<
+            " plane(z/phi) = " << element.getPlane());
+
+    int copperId = element.getCopperId();
+    int slotId = element.getSlotId();
+    int laneId = element.getLaneId();
+    int axisId = element.getAxisId();
+    int sector = element.getSector();
+    int isForward = element.getIsForward();
+    int layer = element.getLayer();
+    int plane =  element.getPlane();
+    int elecId = electCooToInt(copperId, slotId - 1, laneId, axisId);
+    int moduleId = 0;
+    B2DEBUG(1, "BKLMRawPackerModule::reading Data Base for BKLMElectronicMapping...");
+    moduleId = (isForward ? BKLM_END_MASK : 0)
+               | ((sector - 1) << BKLM_SECTOR_BIT)
+               | ((layer - 1) << BKLM_LAYER_BIT)
+               | ((plane) << BKLM_PLANE_BIT);
+    m_ModuleIdToelectId[moduleId] = elecId;
+    B2DEBUG(1, " electId: " << elecId << " modId: " << moduleId);
+  }
+
+}
+
 void BKLMRawPackerModule::loadMap()
 {
   GearDir dir("/Detector/ElectronicsMapping/BKLM");
@@ -289,7 +325,7 @@ void BKLMRawPackerModule::loadMap()
 
 }
 
-void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane)
+void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& lane, int& plane)
 {
   copper = 0;
   finesse = 0;
@@ -298,6 +334,8 @@ void BKLMRawPackerModule::intToElectCoo(int id, int& copper, int& finesse, int& 
   finesse = (id >> 4) & 3;
   lane = 0;
   lane = (id >> 6) & 0xF;
+  plane = 0;
+  plane = (id >> 10) & 0x1;
 
 }
 

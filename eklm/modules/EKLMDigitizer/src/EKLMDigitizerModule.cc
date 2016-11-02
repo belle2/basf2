@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <math.h>
-
 /* External headers. */
 #include <boost/graph/adjacency_list.hpp>
 
@@ -29,11 +26,11 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DiscriminatorThreshold", m_DiscriminatorThreshold,
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
-  addParam("DigitizationInitialTime", m_DigPar.digitizationInitialTime,
+  addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(0.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
            "Create merged EKLMSim2Hits", bool(false));
-  addParam("Debug", m_DigPar.debug,
+  addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            bool(false));
   m_GeoDat = NULL;
@@ -53,12 +50,13 @@ void EKLMDigitizerModule::initialize()
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
   m_GeoDat = &(EKLM::GeometryData::Instance());
-  EKLM::setDefDigitizationParams(&m_DigPar);
-  m_Fitter = new EKLM::FPGAFitter(m_DigPar.nDigitizations);
+  m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
 
 void EKLMDigitizerModule::beginRun()
 {
+  if (!m_DigPar.isValid())
+    B2FATAL("EKLM digitization parameters are not available.");
 }
 
 void EKLMDigitizerModule::readAndSortSimHits()
@@ -200,7 +198,8 @@ void EKLMDigitizerModule::makeSim2Hits()
  */
 void EKLMDigitizerModule::mergeSimHitsToStripHits()
 {
-  EKLM::FiberAndElectronics fes(&m_DigPar, m_Fitter);
+  EKLM::FiberAndElectronics fes(&(*m_DigPar), m_Fitter,
+                                m_DigitizationInitialTime, m_Debug);
   std::multimap<int, EKLMSimHit*>::iterator it, ub;
   for (it = m_SimHitVolumeMap.begin(); it != m_SimHitVolumeMap.end();
        it = m_SimHitVolumeMap.upper_bound(it->first)) {

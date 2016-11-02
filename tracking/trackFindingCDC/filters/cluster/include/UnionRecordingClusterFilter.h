@@ -13,19 +13,18 @@
 #include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
-#include <vector>
 #include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Records the encountered CDCWireHitClusters.
-    class UnionRecordingClusterFilter:
+    class UnionRecordingClusterFilter :
       public UnionRecordingFilter<ClusterFilterFactory> {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<ClusterFilterFactory> Super;
+      using Super = UnionRecordingFilter<ClusterFilterFactory>;
 
     public:
       /// Constructor initialising the RecordingFilter with standard root file name for this filter.

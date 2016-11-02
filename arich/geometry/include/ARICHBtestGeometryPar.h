@@ -81,13 +81,20 @@ namespace Belle2 {
     void Print()
     {
       printf("----------------------------------------------------------------\n");
-      for (int i = 0; i < 4; i++) printf("tdc%d= %d\t", i, tdc[i]); printf("\n");
-      for (int i = 0; i < 1; i++) printf("atdc%d= %d\t", i, atdc); printf("\n");
-      for (int i = 0; i < 2; i++) printf("slp%d= %3.3f\t", i, slp[i]); printf("\n");
-      for (int i = 0; i < 2; i++) printf("off%d= %3.3f\t", i, offset[i]); printf("\n");
-      for (int i = 0; i < 2; i++) printf("cutll%d= %d\t", i, cutll[i]); printf("\n");
-      for (int i = 0; i < 2; i++) printf("cutul%d= %d\t", i, cutul[i]); printf("\n");
-      for (int i = 0; i < 3; i++) printf("pos%d= %3.3f\t", i, pos[i]); printf("\n");
+      for (int i = 0; i < 4; i++) printf("tdc%d= %d\t", i, tdc[i]);
+      printf("\n");
+      for (int i = 0; i < 1; i++) printf("atdc%d= %d\t", i, atdc);
+      printf("\n");
+      for (int i = 0; i < 2; i++) printf("slp%d= %3.3f\t", i, slp[i]);
+      printf("\n");
+      for (int i = 0; i < 2; i++) printf("off%d= %3.3f\t", i, offset[i]);
+      printf("\n");
+      for (int i = 0; i < 2; i++) printf("cutll%d= %d\t", i, cutll[i]);
+      printf("\n");
+      for (int i = 0; i < 2; i++) printf("cutul%d= %d\t", i, cutul[i]);
+      printf("\n");
+      for (int i = 0; i < 3; i++) printf("pos%d= %3.3f\t", i, pos[i]);
+      printf("\n");
     };
   };
 

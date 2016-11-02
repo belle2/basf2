@@ -26,21 +26,21 @@ namespace Belle2 {
     EXPECT_EQ(myECLSimHit.getFlightTime() , 0);
     EXPECT_EQ(myECLSimHit.getEnergyDep() , 0);
     const auto momentum = myECLSimHit.getMomentum();
-    EXPECT_EQ(momentum.X(), 0);
-    EXPECT_EQ(momentum.Y(), 0);
-    EXPECT_EQ(momentum.Z(), 0);
+    EXPECT_EQ(momentum.x(), 0);
+    EXPECT_EQ(momentum.y(), 0);
+    EXPECT_EQ(momentum.z(), 0);
     const auto position = myECLSimHit.getPosition();
-    EXPECT_EQ(position.X(), 0);
-    EXPECT_EQ(position.Y(), 0);
-    EXPECT_EQ(position.Z(), 0);
+    EXPECT_EQ(position.x(), 0);
+    EXPECT_EQ(position.y(), 0);
+    EXPECT_EQ(position.z(), 0);
 
     const int cellId = 1;
     const int trackId = 2;
     const int pdg = 3;
     const float flightTime = 4.1;
     const float edep = 4.2;
-    const TVector3 init_momentum(1, 2, 3);
-    const TVector3 init_position(4, 5, 6);
+    const G4ThreeVector init_momentum(1, 2, 3);
+    const G4ThreeVector init_position(4, 5, 6);
     ECLSimHit myECLSimHit2(cellId, trackId, pdg, flightTime, edep, init_momentum, init_position);
     EXPECT_EQ(myECLSimHit2.getCellId(), cellId);
     EXPECT_EQ(myECLSimHit2.getTrackId(), trackId);
@@ -48,13 +48,13 @@ namespace Belle2 {
     EXPECT_EQ(myECLSimHit2.getFlightTime(), flightTime);
     EXPECT_EQ(myECLSimHit2.getEnergyDep(), edep);
     const auto momentum2 = myECLSimHit2.getMomentum();
-    EXPECT_EQ(momentum2.X(), init_momentum.X());
-    EXPECT_EQ(momentum2.Y(), init_momentum.Y());
-    EXPECT_EQ(momentum2.Z(), init_momentum.Z());
+    EXPECT_EQ(momentum2.x(), init_momentum.x());
+    EXPECT_EQ(momentum2.y(), init_momentum.y());
+    EXPECT_EQ(momentum2.z(), init_momentum.z());
     const auto position2 = myECLSimHit2.getPosition();
-    EXPECT_EQ(position2.X(), init_position.X());
-    EXPECT_EQ(position2.Y(), init_position.Y());
-    EXPECT_EQ(position2.Z(), init_position.Z());
+    EXPECT_EQ(position2.x(), init_position.x());
+    EXPECT_EQ(position2.y(), init_position.y());
+    EXPECT_EQ(position2.z(), init_position.z());
 
   } // Testcases for Something
 
@@ -67,8 +67,8 @@ namespace Belle2 {
     const int pdg = 3;
     const float flightTime = 4.1;
     const float edep = 4.2;
-    const TVector3 init_momentum(1, 2, 3);
-    const TVector3 init_position(4, 5, 6);
+    const G4ThreeVector init_momentum(1, 2, 3);
+    const G4ThreeVector init_position(4, 5, 6);
     ECLSimHit myECLSimHit;
     myECLSimHit.setCellId(cellId);
     myECLSimHit.setTrackId(trackId);
@@ -84,13 +84,13 @@ namespace Belle2 {
     EXPECT_EQ(myECLSimHit.getFlightTime(), flightTime);
     EXPECT_EQ(myECLSimHit.getEnergyDep(), edep);
     const auto momentum = myECLSimHit.getMomentum();
-    EXPECT_EQ(momentum.X(), init_momentum.X());
-    EXPECT_EQ(momentum.Y(), init_momentum.Y());
-    EXPECT_EQ(momentum.Z(), init_momentum.Z());
+    EXPECT_EQ(momentum.x(), init_momentum.x());
+    EXPECT_EQ(momentum.y(), init_momentum.y());
+    EXPECT_EQ(momentum.z(), init_momentum.z());
     const auto position = myECLSimHit.getPosition();
-    EXPECT_EQ(position.X(), init_position.X());
-    EXPECT_EQ(position.Y(), init_position.Y());
-    EXPECT_EQ(position.Z(), init_position.Z());
+    EXPECT_EQ(position.x(), init_position.x());
+    EXPECT_EQ(position.y(), init_position.y());
+    EXPECT_EQ(position.z(), init_position.z());
 
   } // Testcases for Setters and Getters
 

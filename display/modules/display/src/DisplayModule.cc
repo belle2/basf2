@@ -51,6 +51,8 @@ DisplayModule::DisplayModule() : Module(), m_display(0), m_visualizer(0)
            "If true, track candidates (RecoTracks) and reconstructed hits will be shown in the display.", false);
   addParam("showCDCHits", m_showCDCHits,
            "If true, CDCHit objects will be shown as drift cylinders (shortened, z position set to zero).", false);
+  addParam("showARICHHits", m_showARICHHits,
+           "If true, ARICHHit objects will be shown.", false);
   addParam("automatic", m_automatic,
            "Non-interactively save visualisations for each event. Note that this still requires an X server, but you can use the 'Xvfb' dummy server by running basf2 using 'xvfb-run -s \"-screen 0 640x480x24\" basf2 ...' to run headless.",
            false);
@@ -87,6 +89,7 @@ void DisplayModule::initialize()
   StoreArray<PXDCluster>::optional();
   StoreArray<SVDCluster>::optional();
   StoreArray<CDCHit>::optional();
+  StoreArray<ARICHHit>::optional();
   StoreArray<ROIid>::optional();
 
   if (!gGeoManager) { //TGeo geometry not initialized, do it ourselves
@@ -119,10 +122,12 @@ void DisplayModule::initialize()
   m_visualizer->setOptions(m_options);
   EveGeometry::addGeometry();
 
-  std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
-  if (detectorName != "Belle2Detector") {
-    B2INFO("Non-standard detector '" << detectorName << "' used, switching to full geometry.");
-    m_fullGeometry = true;
+  if (!m_fullGeometry and Gearbox::getInstance().exists("Detector/Name")) {
+    std::string detectorName = Gearbox::getInstance().getString("Detector/Name");
+    if (detectorName != "Belle2Detector") {
+      B2INFO("Non-standard detector '" << detectorName << "' used, switching to full geometry.");
+      m_fullGeometry = true;
+    }
   }
 
   m_display->hideObjects(m_hideObjects);
@@ -215,6 +220,12 @@ void DisplayModule::event()
     StoreArray<CDCHit> cdchits;
     for (auto& hit : cdchits)
       m_visualizer->addCDCHit(&hit);
+  }
+
+  if (m_showARICHHits) {
+    StoreArray<ARICHHit> arichhits;
+    for (auto& hit : arichhits)
+      m_visualizer->addARICHHit(&hit);
   }
 
   if (m_showTrackLevelObjects) {

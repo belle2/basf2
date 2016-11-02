@@ -238,8 +238,6 @@ namespace Belle2 {
 
       /**
        * Draws the object or its trajectory.
-       * @param obj
-       * @param obj_attributes
        */
       template<bool a_drawTrajectory = false, class AObject>
       void draw(const AObject& obj,

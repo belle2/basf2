@@ -40,7 +40,7 @@ void ARICHGeoHAPD::getXYChannel(double x, double y, int& chX, int& chY) const
   else if (y > m_chipGap / 2.) chY = (y - m_chipGap / 2.) / m_padSize + m_nPadY / 2.;
   else {chX = -1; chY = -1; return;}
 
-  if (chX + 1 > m_nPadX || chY + 1 > m_nPadY || chX < 0 || chY < 0) {
+  if (chX + 1 > int(m_nPadX) || chY + 1 > int(m_nPadY) || chX < 0 || chY < 0) {
     chX = -1; chY = -1;
   }
 
@@ -66,8 +66,8 @@ bool ARICHGeoHAPD::isConsistent() const
   if (m_wallThickness <= 0) return false;
   if (m_winThickness <= 0) return false;
   if (m_padSize <= 0) return false;
-  if (m_nPadX <= 0) return false;
-  if (m_nPadY <= 0) return false;
+  if (m_nPadX == 0) return false;
+  if (m_nPadY == 0) return false;
   if (m_APDSizeZ <= 0) return false;
   if (m_APDSizeX <= 0) return false;
   if (m_APDSizeY <= 0) return false;

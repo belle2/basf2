@@ -37,8 +37,13 @@ CDCGeometry::~CDCGeometry()
 void CDCGeometry::read(const GearDir& content)
 {
   // Global.
+  m_globalOffsetX  = content.getLength("OffsetX");
+  m_globalOffsetY  = content.getLength("OffsetY");
   m_globalOffsetZ  = content.getLength("OffsetZ");
   m_globalPhiRotation = content.getAngle("GlobalPhiRotation");
+  m_globalOffsetA  = content.getAngle("OffsetA");
+  m_globalOffsetB  = content.getAngle("OffsetB");
+  m_globalOffsetC  = content.getAngle("OffsetC");
 
   // Mother volume.
   const int nBound = content.getNumberNodes("MomVol/ZBound");
@@ -217,17 +222,20 @@ void CDCGeometry::read(const GearDir& content)
   GearDir senseWire(content);
   senseWire.append("/SenseWire/");
   m_senseWireDiameter = senseWire.getLength("Diameter");
+  //  B2INFO("m_senseWireDiameter= " << m_senseWireDiameter);
   m_senseWireNumbers = atoi((senseWire.getString("Number")).c_str());
 
   // Field wire.
   GearDir fieldWire(content);
   fieldWire.append("/FieldWire/");
   m_fieldWireDiameter = fieldWire.getLength("Diameter");
+  //  B2INFO("m_fieldWireDiameter= " << m_fieldWireDiameter);
   m_fieldWireNumbers = atoi((fieldWire.getString("Number")).c_str());
 
 
   // Feedthrough.
   m_feedThroughLength = content.getLength("/FeedThrough/Length");
+  //  B2INFO("m_feedThroughLength= " << m_feedThroughLength);
 
   // Debug mode.
   m_debug = content.getBool("Debug");

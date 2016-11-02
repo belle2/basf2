@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/gearbox/Const.h>
+
 #include <string>
 #include <TVector3.h>
 
@@ -63,7 +65,10 @@ namespace Belle2 {
 
     /** Stores a Belle2 Track from a Reco Track.
      *
-     * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult.
+     * Every fitted hypothesis will be extrapolated to the perigee and stored as a TrackFitResult when the fit and the
+     * extrapolation were successful. We will only create a Track mdst object, when we are sure that we have a valid
+     * default (pion) hypothesis available. If we do not have this, we discard the track no matter what.
+     *
      * The StoreArrayIndex is stored in the Belle2 Track, no relation is set.
      *
      * @param recoTrack:
@@ -71,7 +76,8 @@ namespace Belle2 {
     "to choose; especially useful for Cosmics
      * @return
      */
-    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const bool useClosestHitToIP = false);
+    bool storeTrackFromRecoTrack(RecoTrack& recoTrack, const Const::ParticleType& defaultHypothesis,
+                                 const bool useClosestHitToIP = false);
 
   private:
     std::string m_trackColName;  ///< TrackColName (output).

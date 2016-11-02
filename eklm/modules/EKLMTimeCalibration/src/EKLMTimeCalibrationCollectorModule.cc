@@ -8,10 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <fcntl.h>
-#include <unistd.h>
-
 /* External headers. */
 #include <TFile.h>
 #include <TTree.h>

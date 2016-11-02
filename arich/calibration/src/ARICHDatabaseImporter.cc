@@ -16,11 +16,25 @@
 #include <arich/dbobjects/ARICHHapdChipInfo.h>
 #include <arich/dbobjects/ARICHHapdInfo.h>
 #include <arich/dbobjects/ARICHHapdQE.h>
-#include <arich/dbobjects/ARICHBadChannels.h>
+#include <arich/dbobjects/ARICHModuleTest.h>
 #include <arich/dbobjects/ARICHSensorModuleInfo.h>
 #include <arich/dbobjects/ARICHSensorModuleMap.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+
+// database classes used by simulation/reconstruction software
+#include <arich/dbobjects/ARICHChannelMask.h>
+#include <arich/dbobjects/ARICHChannelMapping.h>
+#include <arich/dbobjects/ARICHModulesInfo.h>
+#include <arich/dbobjects/ARICHMergerMapping.h>
+#include <arich/dbobjects/ARICHCopperMapping.h>
+#include <arich/dbobjects/ARICHSimulationPar.h>
+#include <arich/dbobjects/ARICHGeometryConfig.h>
+
+// channel histogram
+#include <arich/utility/ARICHChannelHist.h>
 
 #include <framework/gearbox/GearDir.h>
+#include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <framework/database/EventDependency.h>
 
@@ -29,12 +43,14 @@
 #include <framework/database/DBStore.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DBArray.h>
+#include <framework/database/DBObjPtr.h>
+#include <framework/database/DBImportObjPtr.h>
 
 #include <TH1.h>
 #include <TH2.h>
 #include <TH3.h>
-#include <TF1.h>
 #include <TGraph.h>
+#include <TGraph2D.h>
 #include <TCanvas.h>
 #include <TFile.h>
 #include <TKey.h>
@@ -46,18 +62,19 @@
 #include <TClonesArray.h>
 #include <TTree.h>
 #include <tuple>
+#include <boost/filesystem.hpp>
 
 using namespace std;
 using namespace Belle2;
 
-
 ARICHDatabaseImporter::ARICHDatabaseImporter(vector<string> inputFilesHapdQA, vector<string> inputFilesAsicRoot,
-                                             vector<string> inputFilesAsicTxt, vector<string> inputFilesHapdQE)
+                                             vector<string> inputFilesAsicTxt, vector<string> inputFilesHapdQE, vector<string> inputFilesFebTest)
 {
   for (unsigned int i = 0; i < inputFilesHapdQA.size(); i++) {  m_inputFilesHapdQA.push_back(inputFilesHapdQA[i]); }
   for (unsigned int i = 0; i < inputFilesAsicRoot.size(); i++) {  m_inputFilesAsicRoot.push_back(inputFilesAsicRoot[i]); }
   for (unsigned int i = 0; i < inputFilesAsicTxt.size(); i++) {  m_inputFilesAsicTxt.push_back(inputFilesAsicTxt[i]); }
   for (unsigned int i = 0; i < inputFilesHapdQE.size(); i++) {  m_inputFilesHapdQE.push_back(inputFilesHapdQE[i]); }
+  for (unsigned int i = 0; i < inputFilesFebTest.size(); i++) {  m_inputFilesFebTest.push_back(inputFilesFebTest[i]); }
 }
 
 
@@ -75,8 +92,8 @@ void ARICHDatabaseImporter::importAerogelInfo()
     string serial = aerogel.getString("serial");
     string id = aerogel.getString("id");
     float index = (float) aerogel.getDouble("index");
-    float trlen = (float) aerogel.getDouble("translength");
-    float thickness = (float) aerogel.getDouble("thick");
+    float trlen = ((float) aerogel.getDouble("translength")) * Unit::mm;
+    float thickness = ((float) aerogel.getDouble("thick")) * Unit::mm;
     vector<int> lambdas;
     vector<float> transmittances;
     for (const auto& transmittance : aerogel.getNodes("transmittance/transpoint")) {
@@ -141,13 +158,11 @@ void ARICHDatabaseImporter::exportAerogelInfo()
   elements.getEntries();
 
   // Print aerogel info
-
   for (const auto& element : elements) {
     B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
            ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
            element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
   }
-
 }
 
 
@@ -176,8 +191,8 @@ void ARICHDatabaseImporter::importAerogelInfoEventDep()
       string serial = aerogel.getString("serial");
       string id = aerogel.getString("id");
       float index = (float) aerogel.getDouble("index");
-      float trlen = (float) aerogel.getDouble("translength");
-      float thickness = (float) aerogel.getDouble("thick");
+      float trlen = ((float) aerogel.getDouble("translength")) * Unit::mm;
+      float thickness = ((float) aerogel.getDouble("thick")) * Unit::mm;
       vector<int> lambdas;
       vector<float> transmittances;
       for (const auto& transmittance : aerogel.getNodes("transmittance/transpoint")) {
@@ -263,7 +278,7 @@ void ARICHDatabaseImporter::exportAerogelInfoEventDep()
     for (const auto& element : elements) {
       B2INFO("Version = " << element.getAerogelVersion() << ", serial = " << element.getAerogelSerial() <<
              ", id = " << element.getAerogelID() << ", n = " << element.getAerogelRefractiveIndex() << ", transmLength = " <<
-             element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness());
+             element.getAerogelTransmissionLength() << ", thickness = " << element.getAerogelThickness())
     }
 
   */
@@ -373,18 +388,79 @@ void ARICHDatabaseImporter::importAsicInfo()
   TClonesArray asicConstants("Belle2::ARICHAsicInfo");
   int asic = 0;
 
+  for (const auto& asiclist : content.getNodes("asicinfo")) {
+    string asicSerial = asiclist.getString("serial");
+    string comment = asiclist.getString("comment");
+    string numCH = asiclist.getString("num");
+
+    // get time of measurement
+    TTimeStamp timeFinishGain = ARICHDatabaseImporter::getAsicDate(asicSerial, "gain");
+    TTimeStamp timeFinishOffset = ARICHDatabaseImporter::getAsicDate(asicSerial, "offset");
+
+    // get lists of bad channels
+    vector<int> nosignalCHs = ARICHDatabaseImporter::channelsList(asiclist.getString("nosignal"));
+    vector<int> badconnCHs = ARICHDatabaseImporter::channelsList(asiclist.getString("badconn"));
+    vector<int> badoffsetCHs = ARICHDatabaseImporter::channelsList(asiclist.getString("badoffset"));
+    vector<int> badlinCHs = ARICHDatabaseImporter::channelsList(asiclist.getString("badlin"));
+
+    int num = 0;
+    if (numCH.find("many") != string::npos) {num = 5000; }
+    else if (numCH.find("all") != string::npos) {num = 10000; }
+    else {num = atoi(numCH.c_str()); }
+
+
+    // save data as an element of the array
+    new(asicConstants[asic])  ARICHAsicInfo();
+    auto* asicConst = static_cast<ARICHAsicInfo*>(asicConstants[asic]);
+
+    asicConst->setAsicID(asicSerial);
+    asicConst->setTimeFinishGain(timeFinishGain);
+    asicConst->setTimeFinishOffset(timeFinishOffset);
+    asicConst->setDeadChannels(nosignalCHs);
+    asicConst->setBadConnChannels(badconnCHs);
+    asicConst->setBadOffsetChannels(badoffsetCHs);
+    asicConst->setBadLinChannels(badlinCHs);
+    asicConst->setNumOfProblematicChannels(num);
+
+    asic++;
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("ARICHAsicInfo", &asicConstants, iov);
+}
+
+void ARICHDatabaseImporter::importAsicInfoRoot()
+{
+  TFile f1("asicInfoHistograms.root", "recreate");
+  TH3F* gain0 = 0;
+  TH3F* gain1 = 0;
+  TH3F* gain2 = 0;
+  TH3F* gain3 = 0;
+  TH3F* offsetF = 0;
+  TH3F* offsetR = 0;
+  string asicSerial;
+
+  // define tree
+  TTree* tree = new TTree("asicInfo", "asic info data");
+
+  tree->Branch("asicSerial", (void*)asicSerial.c_str(), "string/C", 1024);
+  tree->Branch("gain0", "TH3F", &gain0);
+  tree->Branch("gain1", "TH3F", &gain1);
+  tree->Branch("gain2", "TH3F", &gain2);
+  tree->Branch("gain3", "TH3F", &gain3);
+  tree->Branch("offsetF", "TH3F", &offsetF);
+  tree->Branch("offsetR", "TH3F", &offsetR);
+
+  GearDir content = GearDir("/ArichData/AllData/asicList");
+
   // loop over root files
   for (const string& inputFile : m_inputFilesAsicRoot) {
-    vector<TH3F*> m_gain;
-    vector<TH3F*> m_offset;
-    TTimeStamp timeFinishGain;
-    TTimeStamp timeFinishOffset;
 
     string inputFileNew = (string) inputFile;
-    string asicName = inputFileNew.substr(inputFileNew.find("/asicData") + 19);
+    string asicName = inputFileNew.substr(inputFileNew.find("/asicData") + 17);
     size_t findRoot = asicName.find(".root");
     if (findRoot != string::npos) {
-      string asicSerial = asicName.erase(findRoot);
+      asicSerial = asicName.erase(findRoot);
 
       // extract the data from files
       TFile* f = TFile::Open(inputFile.c_str(), "READ", "", 0);
@@ -394,66 +470,27 @@ void ARICHDatabaseImporter::importAsicInfo()
       // fill vectors with histograms with different gain and offset settings
       while ((key = (TKey*)next())) {
         string strname = key->GetName();
-        if (strname.find("gain") != string::npos) {
-          TH3F* hist3d = (TH3F*)f->Get(strname.c_str());
-          hist3d->SetDirectory(0);
-          m_gain.push_back(hist3d);
-        } else if (strname.find("offset") != string::npos) {
-          TH3F* hist3d = (TH3F*)f->Get(strname.c_str());
-          hist3d->SetDirectory(0);
-          m_offset.push_back(hist3d);
-        } else { B2INFO("Key name does not match any of the following: gain, offset!"); }
+        if (strname.find("_g0") != string::npos) gain0 = (TH3F*)f->Get(strname.c_str());
+        else if (strname.find("_g1") != string::npos) gain1 = (TH3F*)f->Get(strname.c_str());
+        else if (strname.find("_g2") != string::npos) gain2 = (TH3F*)f->Get(strname.c_str());
+        else if (strname.find("_g3") != string::npos) gain3 = (TH3F*)f->Get(strname.c_str());
+        else if (strname.find("_f") != string::npos) offsetF = (TH3F*)f->Get(strname.c_str());
+        else if (strname.find("_c") != string::npos) offsetR = (TH3F*)f->Get(strname.c_str());
+        else  B2INFO("Key name does not match any of the following: gain, offset!");
       }
 
-      // get time of measurement
-      timeFinishGain = ARICHDatabaseImporter::getAsicDate(asicSerial, "gain");
-      timeFinishOffset = ARICHDatabaseImporter::getAsicDate(asicSerial, "offset");
-
-      // get lists of bad channels
-      vector<int> nosignalCHs = ARICHDatabaseImporter::channelsList(asicSerial, "nosignal", 0);
-      vector<int> badconnCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badconn", 0);
-      vector<int> badoffsetCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badoffset", 0);
-      vector<int> badlinCHs = ARICHDatabaseImporter::channelsList(asicSerial, "badlin", 0);
-
-      int num = 0;
-      string numCH = "";
-      for (const auto& asicInfo : content.getNodes("asicinfo")) {
-        string serial = asicInfo.getString("serial");
-        if (asicSerial == serial)  {
-          // get the number of problematic channels
-          numCH = asicInfo.getString("num");
-        }
-      }
-      if (numCH.find("many") != string::npos) {num = 5000; }
-      else if (numCH.find("all") != string::npos) {num = 10000; }
-      else {num = atoi(numCH.c_str()); }
-
-      // save data as an element of the array
-      new(asicConstants[asic])  ARICHAsicInfo();
-      auto* asicConst = static_cast<ARICHAsicInfo*>(asicConstants[asic]);
-
-      asicConst->setAsicID(asicSerial);
-      asicConst->setTimeFinishGain(timeFinishGain);
-      asicConst->setTimeFinishOffset(timeFinishOffset);
-      asicConst->setDeadChannels(nosignalCHs);
-      asicConst->setBadConnChannels(badconnCHs);
-      asicConst->setBadOffsetChannels(badoffsetCHs);
-      asicConst->setBadLinChannels(badlinCHs);
-      asicConst->setNumOfProblematicChannels(num);
-      asicConst->setGainMeasurement(m_gain);
-      asicConst->setOffsetMeasurement(m_offset);
-
+      tree->Fill();
       f->Close();
-      // define IOV and store data to the DB
-      IntervalOfValidity iov(0, 0, -1, -1);
-      string nameAsicInfo = "ARICHAsicInfo_" + asicSerial;
-      Database::Instance().storeData(nameAsicInfo, asicConstants[asic], iov);
-
-      asic++;
     }
   }
-//  IntervalOfValidity iov(0, 0, -1, -1);
-//  Database::Instance().storeData("ARICHAsicInfo", &asicConstants, iov);
+
+  f1.cd();
+  tree->Write();
+  f1.Close();
+
+//   define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().addPayload("ARICHAsicInfoRoot", "asicInfoHistograms.root", iov);
 }
 
 TTimeStamp ARICHDatabaseImporter::getAsicDate(string asicSerial, string type)
@@ -475,7 +512,7 @@ TTimeStamp ARICHDatabaseImporter::getAsicDate(string asicSerial, string type)
           std::getline(ifs, line);
           string asicSerial2 = asicSerial + ":";
           size_t findSerial = line.find(asicSerial2);
-          if (findSerial != string::npos) {timeFinish = ARICHDatabaseImporter::timedate(line); }
+          if (findSerial != string::npos) {timeFinish = ARICHDatabaseImporter::timedate(line);}
         }
       }
       ifs.clear();
@@ -503,42 +540,34 @@ TTimeStamp ARICHDatabaseImporter::timedate(std::string enddate)
   return datum;
 }
 
-vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type, int chDelay)
+vector<int> ARICHDatabaseImporter::channelsList(string badCH)
 {
 
-  GearDir content = GearDir("/ArichData/AllData/asicList");
   vector<int> CHs;
 
-  for (const auto& asicInfo : content.getNodes("asicinfo")) {
-    string serial = asicInfo.getString("serial");
-    // find data for the right serial number
-    if (asicSerial == serial)  {
-      string badCH = asicInfo.getString(type.c_str());
-      // parse string to get numbers of all bad channels
-      if (!badCH.empty()) {
-        if (badCH.find(",") != string::npos) {
-          while (badCH.find(",") != string::npos) {
-            string CH = badCH.substr(0, badCH.find(","));
-            int badchannel = atoi(CH.c_str()) + chDelay;
-            CHs.push_back(badchannel);
-            badCH = badCH.substr(badCH.find(",") + 1);
-          }
-          int badchannel = atoi(badCH.c_str()) + chDelay;
-          CHs.push_back(badchannel);
-        }
-        // store 5000 if there are many bad channels
-        else if (badCH.find("many") != string::npos) {
-          CHs.push_back(5000);
-        }
-        // store 10000 if all channels are bad
-        else if (badCH.find("all") != string::npos) {
-          CHs.push_back(10000);
-        } else {
-          int badchannel = atoi(badCH.c_str()) + chDelay;
-          CHs.push_back(badchannel);
-        }
+  // parse string to get numbers of all bad channels
+  if (!badCH.empty()) {
+    if (badCH.find(",") != string::npos) {
+      while (badCH.find(",") != string::npos) {
+        string CH = badCH.substr(0, badCH.find(","));
+        int badchannel = atoi(CH.c_str());
+        CHs.push_back(badchannel);
+        badCH = badCH.substr(badCH.find(",") + 1);
       }
+      int badchannel = atoi(badCH.c_str());
+      CHs.push_back(badchannel);
     }
+  }
+  // store 5000 if there are many bad channels
+  else if (badCH.find("many") != string::npos) {
+    CHs.push_back(5000);
+  }
+  // store 10000 if all channels are bad
+  else if (badCH.find("all") != string::npos) {
+    CHs.push_back(10000);
+  } else {
+    int badchannel = atoi(badCH.c_str());
+    CHs.push_back(badchannel);
   }
   return CHs;
 }
@@ -546,20 +575,13 @@ vector<int> ARICHDatabaseImporter::channelsList(string asicSerial, string type, 
 
 void ARICHDatabaseImporter::exportAsicInfo()
 {
+
   DBArray<ARICHAsicInfo> elements("ARICHAsicInfo");
   elements.getEntries();
 
   // Print serial numbers of ASICs
-  unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getAsicID() << "; dead ch no.1 = " << element.getDeadChannel(
-             0) << "; all bad ch, N = " << element.getNumOfProblematicChannels());
-    /*  TH3F* hist1 = element.getOffsetMeasurement(0);
-      TFile file("histogrami.root", "update");
-      hist1->Write();
-      file.Close();*/
-
-    el++;
+    B2INFO("asic SN: " << element.getAsicID());
   }
 }
 
@@ -568,127 +590,245 @@ void ARICHDatabaseImporter::exportAsicInfo()
 
 void ARICHDatabaseImporter::importFebTest()
 {
+
   // define data array
   TClonesArray febConstants("Belle2::ARICHFebTest");
+
   int feb = 0;
 
-  GearDir content1 = GearDir("/ArichData/AllData/febmapping");
+  GearDir content = GearDir("/ArichData/AllData/arich");
+  GearDir content1 = GearDir("/ArichData/AllData/dnamap");
   GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
   GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
 
-  // find matching sn and dna
-  for (const auto& febmap : content1.getNodes("feb")) {
-    int serial = febmap.getInt("sn");
-    string dna = febmap.getString("dna");
-
+  for (const auto& runserial : content.getNodes("run")) {
+    int serial = runserial.getInt("sn");
     // save data as an element of the array
-    new(febConstants[feb])  ARICHFebTest();
+    new(febConstants[feb]) ARICHFebTest();
     auto* febConst = static_cast<ARICHFebTest*>(febConstants[feb]);
-
     febConst->setFebSerial(serial);
-    febConst->setFebDna(dna);
-    febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
 
-    // slow control data
-    for (const auto& testFEB : content2.getNodes("febtest")) {
-      string timeSlowC = testFEB.getString("time");
+    string runLV = runserial.getString("lv");
+    string runHV = runserial.getString("hv");
+    string runSCAN = runserial.getString("scan");
+    string comment = runserial.getString("comment");
 
-      int i = 0;
-      int positionOld = 0;
+    febConst->setRunLV(runLV);
+    febConst->setRunHV(runHV);
+    febConst->setRunSlowC(runSCAN);
+    febConst->setComment(comment);
 
-      for (const auto& testFEBslowctest : testFEB.getNodes("slowc")) {
-        int position = testFEBslowctest.getInt("id");
-        if (position == positionOld) {i++; }
-        else {i = 1; }
-        if (i == 10) {
-          string dnaNew = testFEBslowctest.getString("dna");
-          if (dnaNew == dna) {
-            float tmon0 = (float) testFEBslowctest.getDouble("TMON0");
-            float tmon1 = (float) testFEBslowctest.getDouble("TMON1");
-            float vdd = (float) testFEBslowctest.getDouble("VDD");
-            float v2p = (float) testFEBslowctest.getDouble("V2P");
-            float v2n = (float) testFEBslowctest.getDouble("V2N");
-            float vss = (float) testFEBslowctest.getDouble("VSS");
-            float vth1 = (float) testFEBslowctest.getDouble("VTH1");
-            float vth2 = (float) testFEBslowctest.getDouble("VTH2");
-            float vcc12 = (float) testFEBslowctest.getDouble("VCC12");
-            float vcc15 = (float) testFEBslowctest.getDouble("VCC15");
-            float vcc25 = (float) testFEBslowctest.getDouble("VCC25");
-            float v38p = (float) testFEBslowctest.getDouble("V38P");
+    int l = 0;
+    string dna;
 
-            febConst->setTemperature0(tmon0);
-            febConst->setTemperature1(tmon1);
-            febConst->setVdd(vdd);
-            febConst->setV2p(v2p);
-            febConst->setV2n(v2n);
-            febConst->setVss(vss);
-            febConst->setVth1(vth1);
-            febConst->setVth2(vth2);
-            febConst->setVcc12(vcc12);
-            febConst->setVcc15(vcc15);
-            febConst->setVcc25(vcc25);
-            febConst->setV38p(v38p);
-            febConst->setTimeSlowC(ARICHDatabaseImporter::timedate2(timeSlowC));
-          }
-        }
-        positionOld = position;
+    for (const auto& febmap : content1.getNodes("febps")) {
+      string somedna = febmap.getString("@dna");
+      int sn = febmap.getInt("sn");
+      if ((l == 0) && (sn == serial)) {
+        dna = somedna;
+        febConst->setFebDna(dna);
+        //febConst->setDeadChannels(ARICHDatabaseImporter::getDeadChFEB(dna));
+        l++;
       }
     }
-    // high voltage test data
-    std::tuple<std::string, float> HVtest = ARICHDatabaseImporter::getFebHVtestData(serial);
-    febConst->setTimeHV(ARICHDatabaseImporter::timedate2(std::get<0>(HVtest)));
-    febConst->setCurrentV99p(std::get<1>(HVtest));
 
-    // low voltage test data
-    if (serial < 84) {
-      std::tuple<std::string, float, float, float> LVtest = ARICHDatabaseImporter::getFebLVtestData(serial);
-      febConst->setTimeLV(ARICHDatabaseImporter::timedate2(std::get<0>(LVtest)));
-      febConst->setCurrentV20p(std::get<1>(LVtest));
-      febConst->setCurrentV21n(std::get<2>(LVtest));
-      febConst->setCurrentV38p(std::get<3>(LVtest));
+    // slow control data
+    if (!runSCAN.empty()) {
+      int scanRun;
+      if (stoi(runSCAN.c_str()) < 23) {scanRun = stoi(runSCAN.c_str());}
+      else {scanRun = stoi(runSCAN.c_str()) - 77;}
+      for (const auto& testFEB : content2.getNodes("febtest[" + std::to_string(scanRun) + "]")) {
+        string timeSlowC = testFEB.getString("time");
+        int i = 0;
+        int positionOld = 0;
+
+        for (const auto& testFEBslowctest : testFEB.getNodes("slowc")) {
+          int position = testFEBslowctest.getInt("id");
+          if (position == positionOld) {i++; }
+          else {i = 1; }
+          if (i == 10) {
+            string dnaNew = testFEBslowctest.getString("dna");
+            if (dnaNew == dna) {
+              float tmon0 = (float) testFEBslowctest.getDouble("TMON0");
+              float tmon1 = (float) testFEBslowctest.getDouble("TMON1");
+              float vdd = (float) testFEBslowctest.getDouble("VDD");
+              float v2p = (float) testFEBslowctest.getDouble("V2P");
+              float v2n = (float) testFEBslowctest.getDouble("V2N");
+              float vss = (float) testFEBslowctest.getDouble("VSS");
+              float vth1 = (float) testFEBslowctest.getDouble("VTH1");
+              float vth2 = (float) testFEBslowctest.getDouble("VTH2");
+              float vcc12 = (float) testFEBslowctest.getDouble("VCC12");
+              float vcc15 = (float) testFEBslowctest.getDouble("VCC15");
+              float vcc25 = (float) testFEBslowctest.getDouble("VCC25");
+              float v38p = (float) testFEBslowctest.getDouble("V38P");
+
+              febConst->setTemperature0(tmon0);
+              febConst->setTemperature1(tmon1);
+              febConst->setVdd(vdd);
+              febConst->setV2p(v2p);
+              febConst->setV2n(v2n);
+              febConst->setVss(vss);
+              febConst->setVth1(vth1);
+              febConst->setVth2(vth2);
+              febConst->setVcc12(vcc12);
+              febConst->setVcc15(vcc15);
+              febConst->setVcc25(vcc25);
+              febConst->setV38p(v38p);
+              febConst->setTimeSlowC(ARICHDatabaseImporter::timedate2(timeSlowC));
+
+            }
+          }
+          positionOld = position;
+        }
+      }
+
+      // slopes (from offset settings measurements)
+      pair<vector<float>, vector<float>> slopes = ARICHDatabaseImporter::getSlopes(serial, runSCAN);
+
+      febConst->setSlopesFine(slopes.first); // std::vector<float>
+      febConst->setSlopesRough(slopes.second); // std::vector<float>
+
+      // set FWHM values&sigmas)
+      vector<pair<float, float>> fwhm = ARICHDatabaseImporter::getFwhm(serial, runSCAN);
+      febConst->setFWHM(fwhm);
     }
 
-    // slopes (from offset settings measurements)
-    std::pair<std::vector<float>, std::vector<float>> slopes = ARICHDatabaseImporter::getSlopes(dna);
 
-    febConst->setSlopesFine(std::get<0>(slopes)); // std::vector<float>
-    febConst->setSlopesRough(std::get<1>(slopes)); // std::vector<float>
+    // high voltage test data
+    if (!runHV.empty()) {
+      int hvRun;
+      if (stoi(runHV.c_str()) < 43) {hvRun = stoi(runHV.c_str());}
+      else {hvRun = stoi(runHV.c_str()) - 57;}
+      tuple<string, float> HVtest = ARICHDatabaseImporter::getFebHVtestData(serial, hvRun);
+      febConst->setTimeHV(ARICHDatabaseImporter::timedate2(get<0>(HVtest)));
+      febConst->setCurrentV99p(get<1>(HVtest));
+    }
 
 
-//    febConst->setOffsetFine3D(offsetFine); // TH3F*
-//    febConst->setOffsetRough3D(offsetRough); // TH3F*
-//    febConst->setTestPulse2D(testPulse); // TH2F*
+    // low voltage test data
+    if (!runLV.empty()) {
+      int lvRun;
+      if (stoi(runLV.c_str()) < 43) {lvRun = stoi(runLV.c_str());}
+      else {lvRun = stoi(runLV.c_str()) - 57;}
+      tuple<string, float, float, float> LVtest = ARICHDatabaseImporter::getFebLVtestData(serial, lvRun);
+      febConst->setTimeLV(ARICHDatabaseImporter::timedate2(get<0>(LVtest)));
+      febConst->setCurrentV20p(get<1>(LVtest));
+      febConst->setCurrentV21n(get<2>(LVtest));
+      febConst->setCurrentV38p(get<3>(LVtest));
+    }
 
     feb++;
+
   }
 
-  // define IOV and store data to the DB
+//   define IOV and store data to the DB
   IntervalOfValidity iov(0, 0, -1, -1);
   Database::Instance().storeData("ARICHFebTest", &febConstants, iov);
 }
 
-std::tuple<std::string, float, float, float> ARICHDatabaseImporter::getFebLVtestData(int serial)
+
+
+void ARICHDatabaseImporter::importFebTestRoot()
+{
+  TFile f("febTestHistograms.root", "recreate");
+  TH3F* offsetRough = 0;
+  TH3F* offsetFine = 0;
+  TH2F* testPulse = 0;
+  int serial;
+
+  // define tree
+  TTree* tree = new TTree("febTest", "feb test data");
+
+  tree->Branch("serial", &serial, "sn/I");
+  tree->Branch("offsetRough", "TH3F", &offsetRough);
+  tree->Branch("offsetFine", "TH3F", &offsetFine);
+  tree->Branch("testPulse", "TH2F", &testPulse);
+
+  int febposition = -1;
+
+  GearDir content = GearDir("/ArichData/AllData/arich");
+  GearDir content1 = GearDir("/ArichData/AllData/dnamap");
+  GearDir content2 = GearDir("/ArichData/AllData/FEBData/Content");
+  GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
+
+  for (const auto& runserial : content.getNodes("run")) {
+    serial = runserial.getInt("sn");
+    string runSCAN = runserial.getString("scan");
+    int l = 0;
+    string dna;
+
+    for (const auto& febmap : content1.getNodes("febps")) {
+      string somedna = febmap.getString("@dna");
+      int sn = febmap.getInt("sn");
+      if ((l == 0) && (sn == serial)) {
+        dna = somedna;
+        l++;
+      }
+    }
+    // slow control data
+    if (!runSCAN.empty()) {
+      int scanRun;
+      if (stoi(runSCAN.c_str()) < 23) {scanRun = stoi(runSCAN.c_str());}
+      else {scanRun = stoi(runSCAN.c_str()) - 77;}
+      for (const auto& testFEB : content2.getNodes("febtest[" + std::to_string(scanRun) + "]")) {
+        string timeSlowC = testFEB.getString("time");
+        int i = 0;
+        int positionOld = 0;
+
+        for (const auto& testFEBslowctest : testFEB.getNodes("slowc")) {
+          int position = testFEBslowctest.getInt("id");
+          if (position == positionOld) {i++; }
+          else {i = 1; }
+          if (i == 10) {
+            string dnaNew = testFEBslowctest.getString("dna");
+            if (dnaNew == dna) febposition = position;
+          }
+          positionOld = position;
+        }
+      }
+      vector<TH3F*> histograms = getFebTestHistograms(dna, runSCAN, febposition);
+      offsetRough = histograms[0];
+      offsetFine = histograms[1];
+
+      testPulse = ARICHDatabaseImporter::getFebTestPulse(dna, runSCAN, febposition); // TH2F*
+
+      testPulse->SetDirectory(0);
+      offsetRough->SetDirectory(0);
+      offsetFine->SetDirectory(0);
+
+      tree->Fill();
+
+      delete testPulse;
+      delete offsetRough;
+      delete offsetFine;
+    }
+  }
+
+  f.cd();
+  tree->Write();
+  f.Close();
+
+
+//   define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().addPayload("ARICHFebTestRoot", "febTestHistograms.root", iov);
+
+}
+
+std::tuple<std::string, float, float, float> ARICHDatabaseImporter::getFebLVtestData(int serial, int lvRun)
 {
   GearDir content2LV = GearDir("/ArichData/AllData/FEBDataLV/Content");
   std::tuple<std::string, float, float, float> LVtest;
+  float currentV20p = 0.0, currentV21n = 0.0, currentV38p = 0.0;
 
-  for (const auto& testFEBlv : content2LV.getNodes("febtest")) {
+  for (const auto& testFEBlv : content2LV.getNodes("febtest[" + std::to_string(lvRun) + "]")) {
     string timeLV = testFEBlv.getString("time");
-    for (const auto& testFEBlv_sn : testFEBlv.getNodes("lvtest/feb")) {
-      int serial_lv = testFEBlv_sn.getInt("sn");
-      if (serial_lv == serial) {
-        for (const auto& testFEBlv_i : testFEBlv_sn.getNodes("febps/n")) {
-          int n_id = testFEBlv_i.getInt("@id");
-          if (n_id == 14) {
-            float currentV20p = 0.0, currentV21n = 0.0, currentV38p = 0.0;
-            for (const auto& testFEBlv_pw : testFEBlv_i.getNodes("pw18")) {
-              if (testFEBlv_pw.getInt("@id") == 0) {  currentV20p = (float) testFEBlv_pw.getDouble("I");  }
-              if (testFEBlv_pw.getInt("@id") == 1) {  currentV21n = (float) testFEBlv_pw.getDouble("I");  }
-              if (testFEBlv_pw.getInt("@id") == 2) {  currentV38p = (float) testFEBlv_pw.getDouble("I");  }
-            }
-            LVtest = std::make_tuple(timeLV, currentV20p, currentV21n, currentV38p);
-          }
-        }
+    for (const auto& testFEBlv_sn : testFEBlv.getNodes("lvtest/feb[sn='" + to_string(serial) + "']/febps/n[@id='14']")) {
+      for (const auto& testFEBlv_pw : testFEBlv_sn.getNodes("pw18")) {
+        if (testFEBlv_pw.getInt("@id") == 0) {  currentV20p = (float) testFEBlv_pw.getDouble("I");  }
+        if (testFEBlv_pw.getInt("@id") == 1) {  currentV21n = (float) testFEBlv_pw.getDouble("I");  }
+        if (testFEBlv_pw.getInt("@id") == 2) {  currentV38p = (float) testFEBlv_pw.getDouble("I");  }
+        LVtest = make_tuple(timeLV, currentV20p, currentV21n, currentV38p);
       }
     }
   }
@@ -696,24 +836,15 @@ std::tuple<std::string, float, float, float> ARICHDatabaseImporter::getFebLVtest
 }
 
 
-std::tuple<std::string, float> ARICHDatabaseImporter::getFebHVtestData(int serial)
+std::tuple<std::string, float> ARICHDatabaseImporter::getFebHVtestData(int serial, int hvRun)
 {
   GearDir content2HV = GearDir("/ArichData/AllData/FEBDataHV/Content");
   std::tuple<std::string, float> HVtest;
-
-  for (const auto& testFEBhv : content2HV.getNodes("febtest")) {
+  for (const auto& testFEBhv : content2HV.getNodes("febtest[" + std::to_string(hvRun) + "]")) {
     string timeHV = testFEBhv.getString("time");
-    for (const auto& testFEBhv_sn : testFEBhv.getNodes("hvtest/feb")) {
-      int serial_hv = testFEBhv_sn.getInt("sn");
-      if (serial_hv == serial) {
-        for (const auto& testFEBhv_i : testFEBhv_sn.getNodes("febhv/n")) {
-          int n_id = testFEBhv_i.getInt("@id");
-          if (n_id == 9) {
-            float currentV99p = (float) testFEBhv_i.getDouble("n1470/I");
-            HVtest = std::make_tuple(timeHV, currentV99p);
-          }
-        }
-      }
+    for (const auto& testFEBhv_sn : testFEBhv.getNodes("hvtest/feb[sn='" + to_string(serial) + "']/febhv/n[@id='9']")) {
+      float currentV99p = (float) testFEBhv_sn.getDouble("n1470/I");
+      HVtest = std::make_tuple(timeHV, currentV99p);
     }
   }
   return HVtest;
@@ -746,6 +877,7 @@ TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
   string hourStr = dateMeas.substr(7, 2);
   string minStr = dateMeas.substr(10, 2);
   string secStr = dateMeas.substr(13, 2);
+
   int year = atoi(yearStr.c_str());
   int day = atoi(dayStr.c_str());
   int hour = atoi(hourStr.c_str());
@@ -760,110 +892,160 @@ TTimeStamp ARICHDatabaseImporter::timedate2(std::string time)
   return datum;
 }
 
-std::pair<std::vector<float>, std::vector<float>> ARICHDatabaseImporter::getSlopes(std::string dna)
+std::pair<std::vector<float>, std::vector<float>> ARICHDatabaseImporter::getSlopes(int serialNum, std::string run)
 {
-  vector<float> slopesF, slopesR;
-  std::pair<std::vector<float>, std::vector<float>> slopes;
-  string line;
-  ifstream fileSlopes("febTest/SlopesFEBpravi.txt");
-  if (fileSlopes.is_open()) {
-    while (getline(fileSlopes, line)) {
-      string dna2 = line.substr(0, line.find(",") - 1);
-      string line2 = line.substr(line.find(",") + 1);
-      string slopeR = line2.substr(0, line2.find(",") - 1);
-      string slopeF = line2.substr(line2.find(",") + 1);
-      if (dna2 == dna) {
-        float slopeRfloat = (-1) * 2500.0 / 1024 * stof(slopeR.c_str());
-        slopesR.push_back(slopeRfloat);
-        float slopeFfloat = (-1) * 2500.0 / 1024 * stof(slopeF.c_str());
-        slopesF.push_back(slopeFfloat);
+  GearDir contentData = GearDir("/ArichData/AllData/SlopesFebTest/Content");
+  pair<vector<float>, vector<float>> slopesFebTest;
+  vector<float> slopesCoarse, slopesFine;
+
+  for (const auto& contentSlopes : contentData.getNodes("febtest")) {
+    if ((contentSlopes.getInt("@id") == serialNum) && (contentSlopes.getString("@run") == run)) {
+      for (int i = 0; i < 144; i++) {
+        for (const auto& contSlopes : contentSlopes.getNodes("slope/ch[@id='" + to_string(i) + "']")) {
+          float slopeCoarse = ((float) contSlopes.getDouble("coarse")) * 2.5 / 1024; // slope in V/step
+          float slopeFine = ((float) contSlopes.getDouble("fine")) * 2.5 / 1024;   // slope in V/step
+          slopesCoarse.push_back(slopeCoarse);
+          slopesFine.push_back(slopeFine);
+        }
       }
     }
-  } else { B2INFO("No file SlopesFEBpravi.txt"); }
-  fileSlopes.close();
-  slopes = std::make_pair(slopesF, slopesR);
-
-  return slopes;
+    slopesFebTest = std::make_pair(slopesFine, slopesCoarse);
+  }
+  return slopesFebTest;
 }
+
+std::vector<std::pair<float, float>> ARICHDatabaseImporter::getFwhm(int serialNum, std::string run)
+{
+  GearDir contentData = GearDir("/ArichData/AllData/SlopesFebTest/Content");
+  vector<pair<float, float>> fwhm;
+
+  for (const auto& contentSlopes : contentData.getNodes("febtest")) {
+    if ((contentSlopes.getInt("@id") == serialNum) && (contentSlopes.getString("@run") == run)) {
+      for (const auto& contSlopes : contentSlopes.getNodes("data/ch")) {
+        float fwhmVal = (float) contSlopes.getDouble("fwhm");
+        float fwhmSig = (float) contSlopes.getDouble("sigma");
+        pair<float, float> fwhmPair = std::make_pair(fwhmVal, fwhmSig);
+        fwhm.push_back(fwhmPair);
+      }
+    }
+  }
+  return fwhm;
+}
+
+std::vector<TH3F*> ARICHDatabaseImporter::getFebTestHistograms(std::string dna, std::string run, int febposition)
+{
+  vector<TH3F*> histogrami;
+
+  for (const string& inputFile : m_inputFilesFebTest) {
+
+    if (inputFile.find(run) != string::npos) {
+      TFile* f = TFile::Open(inputFile.c_str(), "READ");
+      int iMIN = 0, iMAX = 0, delta, stepsNum = 16, i = 0, point2 = 24;
+      string option;
+      float stepsMax = 15.5;
+
+      // check how many steps were measured
+      TIter next(f->GetListOfKeys());
+      TKey* key;
+      while ((key = (TKey*)next())) {
+        string strime = key->GetName();
+        if (strime.find("h2d_0") == 0) i++;
+      }
+
+      // fill histogram for coarse/fine settings
+      for (int k = 0; k < 2; k++) {
+        if (i < 32) {
+          stepsNum = 15;
+          stepsMax = 14.5;
+          point2 = 23;
+          if (k == 0) { option = "coarse"; iMIN = 2; iMAX = 16; delta = 2;}
+          if (k == 1) { option = "fine"; iMIN = 17; iMAX = 31; delta = 17; }
+        } else {
+          if (k == 0) { option = "coarse"; iMIN = 2; iMAX = 17; delta = 2; }
+          if (k == 1) { option = "fine"; iMIN = 18; iMAX = 33; delta = 18; }
+        }
+
+        TH3F* histogram = new TH3F((option + " " + dna).c_str(), (option + " " + dna).c_str(), 144, -0.5, 143.5, 250, 299, 799, stepsNum,
+                                   -0.5, stepsMax);
+
+        for (int j = iMIN; j < iMAX + 1; j++)  {
+          TH2F* hist2d = (TH2F*)f->Get(("h2d_0;" + std::to_string(j)).c_str());
+          hist2d->SetDirectory(0);
+
+          int binZ;
+          if ((j - delta) < 8) {binZ = 8 - (j - delta);}
+          if ((j - delta) > 7) {binZ = point2 - (j - delta);}
+          // conversion TH2F -> TH3F
+          for (int binX = 144 * febposition + 1; binX < 144 * (febposition + 1) + 1; binX++) {
+            for (int binY = 1; binY < 251; binY++) {
+              histogram->SetBinContent(binX - 144 * febposition, binY, binZ, hist2d->GetBinContent(binX, binY));
+            }
+          }
+        }
+        histogram->SetDirectory(0);
+        histogrami.push_back(histogram);
+        for (int kanal = 1; kanal < 145; kanal ++) {
+          for (int offset = 1; offset < stepsNum + 1; offset++) {
+            TH1D* h1 = histogram->ProjectionY("A", kanal, kanal, offset, offset);
+            h1->SetName((dna + " kanal: " + to_string(kanal) + ", offset: " + to_string(offset)).c_str());
+          }
+        }
+      }
+      f->Close();
+    }
+  }
+
+  return histogrami;
+}
+
+TH2F* ARICHDatabaseImporter::getFebTestPulse(std::string dna, std::string run, int febposition)
+{
+  TH2F* testPulse = new TH2F(("test pulse " + dna).c_str(), ("test pulse " + dna).c_str(), 144, -0.5, 143.5, 250, 299, 799);
+
+  for (const string& inputFile : m_inputFilesFebTest) {
+    if (inputFile.find(run) != string::npos) {
+      TFile* f = TFile::Open(inputFile.c_str(), "READ");
+      TH2F* pulseTest = (TH2F*)f->Get("h2d_0;1");
+      pulseTest->SetDirectory(0);
+      for (int binX = 144 * febposition + 1; binX < 144 * (febposition + 1) + 1; binX++) {
+        for (int binY = 1; binY < 251; binY++) {
+          testPulse->SetBinContent(binX - 144 * febposition, binY, pulseTest->GetBinContent(binX, binY));
+        }
+      }
+      f->Close();
+    }
+  }
+  return testPulse;
+}
+
 
 
 void ARICHDatabaseImporter::exportFebTest()
 {
+
   DBArray<ARICHFebTest> elements("ARICHFebTest");
   elements.getEntries();
 
   // Print serial numbers of FEBs
-  unsigned int el = 0;
   for (const auto& element : elements) {
-    B2INFO("Element Number: " << el << "; serial = " << element.getFebSerial() << "; dna = " << element.getFebDna() <<
-           "; slope fine ch. 143 = " << element.getSlopeFine(143));
-    el++;
+    B2INFO("Serial = " << element.getFebSerial() << "; dna = " << element.getFebDna() << "; slope R (ch143) = " <<
+           element.getSlopeRough(143) << "; slope F (ch143) = " << element.getSlopeFine(143) << "; comment = " << element.getComment());
   }
+
 }
 
-
-
-void ARICHDatabaseImporter::importHapdInfo()
+void ARICHDatabaseImporter::importHapdChipInfo()
 {
-  int hapd_i = 0;
+  int chip_i = 0;
   GearDir content = GearDir("/ArichData/AllData/hapdData/Content");
 
   // define data array
-  TClonesArray hapdConstants("Belle2::ARICHHapdInfo");
+  TClonesArray chipConstants("Belle2::ARICHHapdChipInfo");
 
   // extract chip info, such as bias voltage, lists of dead and bad channels etc.
   for (const auto& hapdInfo : content.getNodes("hapd")) {
-    // define element of TClonesArray
-    new(hapdConstants[hapd_i]) ARICHHapdInfo();
-    auto* hapdConst = static_cast<ARICHHapdInfo*>(hapdConstants[hapd_i]);
-
     // extract information about HAPD
-    string serial = hapdInfo.getString("serial");
-    float qe400 = (float) hapdInfo.getDouble("qe400");
-    float hv = 1000 * (float) hapdInfo.getDouble("hv");
-    float current = (float) hapdInfo.getDouble("current");
-    string gb = hapdInfo.getString("guardbias");
-    int guardbias = atoi(gb.c_str());
-
-    // prepare TGraph of quantum efficiency as function of lambda
-    const int n1 = 70;
-    float lambda[n1], qepoint[n1];
-    int i1 = 0;
-    for (const auto& QE : hapdInfo.getNodes("qe/qepoint")) {
-      lambda[i1] = (float) QE.getInt("@lambda");
-      qepoint[i1] = (float) QE.getDouble(".");
-      i1++;
-    }
-    TGraph* qe = new TGraph(i1, lambda, qepoint);
-    qe->SetName("qe");
-    qe->SetTitle("qe");
-    qe->GetXaxis()->SetTitle("lambda");
-    qe->GetYaxis()->SetTitle("qe");
-
-    // prepare TGraph of pulse height distribution
-    const int n2 = 4100;
-    int channel_adc[n2], pulse_adc[n2];
-    int i2 = 0;
-    for (const auto& ADC : hapdInfo.getNodes("adc/value")) {
-      channel_adc[i2] = ADC.getInt("@ch");
-      string str = ADC.getString(".");
-      pulse_adc[i2] = atoi(str.c_str());
-      i2++;
-    }
-    TGraph* adc = new TGraph(i2, channel_adc, pulse_adc);
-    adc->SetName("adc");
-    adc->SetTitle("Pulse Height Distribution");
-    adc->GetXaxis()->SetTitle("channel");
-    adc->GetYaxis()->SetTitle("pulse height");
-
-    // save HAPD data to the element of TClonesArray
-    hapdConst->setSerialNumber(serial);
-    hapdConst->setQuantumEfficiency400(qe400);
-    hapdConst->setHighVoltage(hv);
-    hapdConst->setGuardBias(guardbias);
-    hapdConst->setCurrent(current);
-    hapdConst->setQuantumEfficiency(qe);
-    hapdConst->setPulseHeightDistribution(adc);
+    string sn = hapdInfo.getString("serial");
 
     // define objects for chip info
     string chip[4];
@@ -899,10 +1081,7 @@ void ARICHDatabaseImporter::importHapdInfo()
     chip_ABCD = 0;
     for (const auto& BG : hapdInfo.getNodes("bombardmentgain/ch")) {
       string value = BG.getString("value");
-      //string value_1 = value;
       string chip_label = value.erase(1);
-      //string value_2 = value_1.substr(2);
-      //channel_label_bomb = atoi(value_2.c_str());
       for (const auto& BG2 : BG.getNodes("point")) {
         hv_bomb[i3] = (float) BG2.getDouble("hv");
         gain_bomb[i3] = (float) BG2.getDouble("gain");
@@ -981,13 +1160,12 @@ void ARICHDatabaseImporter::importHapdInfo()
       i5++;
     }
 
-    // prepare ARICHHapdChipInfo class for each chip and
-    // add it as an element of ARICHHapdInfo class
+    // prepare ARICHHapdChipInfo class for each chip
     for (unsigned int l = 0; l < 4; l++)  {
-      ARICHHapdChipInfo* chipConstants = new ARICHHapdChipInfo();
-      auto* chipConst = static_cast<ARICHHapdChipInfo*>(chipConstants);
+      new(chipConstants[4 * chip_i + l]) ARICHHapdChipInfo();
+      auto* chipConst = static_cast<ARICHHapdChipInfo*>(chipConstants[4 * chip_i + l]);
 
-      chipConst->setHapdSerial(serial);
+      chipConst->setHapdSerial(sn);
       chipConst->setChipLabel(chip[l]);
       chipConst->setBiasVoltage(bias[l]);
       chipConst->setGain(gain[l]);
@@ -1000,8 +1178,102 @@ void ARICHDatabaseImporter::importHapdInfo()
       chipConst->setChannelNumber(channel_label_aval[l]);
       chipConst->setBiasVoltage2D(bias2DV[l]);
       chipConst->setBiasCurrent2D(bias2DI[l]);
+    }
 
-      hapdConst->setHapdChipInfo(l, *chipConst);
+    chip_i++;
+  }
+
+  // define IOV and store data to the DB
+  IntervalOfValidity iov(0, 0, -1, -1);
+  Database::Instance().storeData("ARICHHapdChipInfo", &chipConstants, iov);
+}
+
+void ARICHDatabaseImporter::exportHapdChipInfo()
+{
+  DBArray<ARICHHapdChipInfo> elements("ARICHHapdChipInfo");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    B2INFO("Serial = " << element.getHapdSerial() << ", chip = " << element.getChipLabel() << ", bias= " << element.getBiasVoltage());
+  }
+}
+
+
+
+void ARICHDatabaseImporter::importHapdInfo()
+{
+  int hapd_i = 0;
+  GearDir content = GearDir("/ArichData/AllData/hapdData/Content");
+
+  // define data array
+  TClonesArray hapdConstants("Belle2::ARICHHapdInfo");
+
+  // extract chip info, such as bias voltage, lists of dead and bad channels etc.
+  for (const auto& hapdInfo : content.getNodes("hapd")) {
+    // define element of TClonesArray
+    new(hapdConstants[hapd_i]) ARICHHapdInfo();
+    auto* hapdConst = static_cast<ARICHHapdInfo*>(hapdConstants[hapd_i]);
+
+    // extract information about HAPD
+    string serial = hapdInfo.getString("serial");
+    float qe400 = (float) hapdInfo.getDouble("qe400");
+    float hv = 1000 * (float) hapdInfo.getDouble("hv");
+    float current = (float) hapdInfo.getDouble("current");
+    string gb = hapdInfo.getString("guardbias");
+    int guardbias = atoi(gb.c_str());
+
+    // prepare TGraph of quantum efficiency as function of lambda
+    const int n1 = 70;
+    float lambda[n1], qepoint[n1];
+    int i1 = 0;
+    for (const auto& QE : hapdInfo.getNodes("qe/qepoint")) {
+      lambda[i1] = (float) QE.getInt("@lambda");
+      qepoint[i1] = (float) QE.getDouble(".");
+      i1++;
+    }
+    TGraph* qe = new TGraph(i1, lambda, qepoint);
+    qe->SetName("qe");
+    qe->SetTitle("qe");
+    qe->GetXaxis()->SetTitle("lambda");
+    qe->GetYaxis()->SetTitle("qe");
+
+    // prepare TGraph of pulse height distribution
+    const int n2 = 4100;
+    int channel_adc[n2], pulse_adc[n2];
+    int i2 = 0;
+    for (const auto& ADC : hapdInfo.getNodes("adc/value")) {
+      channel_adc[i2] = ADC.getInt("@ch");
+      string str = ADC.getString(".");
+      pulse_adc[i2] = atoi(str.c_str());
+      i2++;
+    }
+    TGraph* adc = new TGraph(i2, channel_adc, pulse_adc);
+    adc->SetName("adc");
+    adc->SetTitle("Pulse Height Distribution");
+    adc->GetXaxis()->SetTitle("channel");
+    adc->GetYaxis()->SetTitle("pulse height");
+
+    // save HAPD data to the element of TClonesArray
+    hapdConst->setSerialNumber(serial);
+    hapdConst->setQuantumEfficiency400(qe400);
+    hapdConst->setHighVoltage(hv);
+    hapdConst->setGuardBias(guardbias);
+    hapdConst->setCurrent(current);
+    hapdConst->setQuantumEfficiency(qe);
+    hapdConst->setPulseHeightDistribution(adc);
+
+    // export ARICHHapdChipInfo class for each chip from DB and
+    // add it as an element of ARICHHapdInfo class
+    DBArray<ARICHHapdChipInfo> elementsChip("ARICHHapdChipInfo");
+    elementsChip.getEntries();
+    for (const auto& element : elementsChip) {
+      if (element.getHapdSerial() == serial) {
+        ARICHHapdChipInfo& elementValue = const_cast<ARICHHapdChipInfo&>(element);
+        if (element.getChipLabel() == "A") hapdConst->setHapdChipInfo(0, &elementValue);
+        if (element.getChipLabel() == "B") hapdConst->setHapdChipInfo(1, &elementValue);
+        if (element.getChipLabel() == "C") hapdConst->setHapdChipInfo(2, &elementValue);
+        if (element.getChipLabel() == "D") hapdConst->setHapdChipInfo(3, &elementValue);
+      }
     }
 
     hapd_i++;
@@ -1109,21 +1381,23 @@ TH2F* ARICHDatabaseImporter::getBiasGraph(std::string chip_2d, std::string volta
 
 void ARICHDatabaseImporter::exportHapdInfo()
 {
+
   DBArray<ARICHHapdInfo> elements("ARICHHapdInfo");
   elements.getEntries();
 
   for (const auto& element : elements) {
     B2INFO("Serial = " << element.getSerialNumber() << "; HV = " << element.getHighVoltage() << "; qe400 = " <<
            element.getQuantumEfficiency400());
-    TGraph* adc = element.getPulseHeightDistribution();
-    TFile file("histogrami.root", "update");
-    adc->Write();
-    file.Close();
-    ARICHHapdChipInfo newelement;
+    ARICHHapdChipInfo* newelement;
     for (int n = 0; n < 4; n++)  {
       newelement = element.getHapdChipInfo(n);
-      B2INFO("biasV(chip" << n << ") = " << newelement.getBiasVoltage());
+      B2INFO("biasV(chip" << n << ") = " << newelement->getBiasVoltage());
     }
+    /*    TGraph* adc = element.getPulseHeightDistribution();
+        TFile file("histogrami.root", "update");
+        adc->Write();
+        file.Close();
+    */
   }
 }
 
@@ -1163,6 +1437,7 @@ void ARICHDatabaseImporter::importHapdQE()
     // save data as an element of the array
     new(hapdQEConstants[hapd]) ARICHHapdQE(hapdSerial, qe2D);
     hapd++;
+    f->Close();
   }
 
   // define IOV and store data to the DB
@@ -1175,203 +1450,20 @@ void ARICHDatabaseImporter::exportHapdQE()
 {
   DBArray<ARICHHapdQE> elements("ARICHHapdQE");
   elements.getEntries();
+  gROOT->SetBatch(kTRUE);
 
-  // Print serial numbers of HAPDs
+  // Example that prints serial numbers of HAPDs and saves QE 2D histograms to root file
   unsigned int el = 0;
   for (const auto& element : elements) {
     B2INFO("SN = " << element.getHapdSerialNumber());
-    /* TH2F* qe2d = element.getQuantumEfficiency2D();
-      TFile file("histogrami.root", "update");
-      qe2d->Write();
-      file.Close(); */
-
+    TH2F* qe2d = element.getQuantumEfficiency2D();
+    TFile file("QEhists.root", "update");
+    qe2d->Write();
+    file.Close();
     el++;
   }
-}
-
-void ARICHDatabaseImporter::importBadChannels()
-{
-  // define array
-  TClonesArray channelConstants("Belle2::ARICHBadChannels");
-
-  int i = 0, j = 0;
-
-  GearDir hapdContent = GearDir("/ArichData/AllData/hapdData/Content");
-  GearDir febContent = GearDir("/ArichData/AllData/febmapping");
-  GearDir asicContent = GearDir("/ArichData/AllData/febasicmapping");
-
-  string hapdSerial[1000], chip;
-  vector<int> hapdBadlist[1000], hapdCutlist[1000], febDeadlist[1000], asicNosignalCHs[1000], asicBadconnCHs[1000],
-         asicBadoffsetCHs[1000], asicBadlinCHs[1000];
-  int febSerial[1000];
-
-  // extract chip info, such as bias voltage, lists of dead and bad channels etc.
-  for (const auto& hapdInfo : hapdContent.getNodes("hapd")) {
-    hapdSerial[i] = hapdInfo.getString("serial");
-    for (const auto& chipInfo : hapdInfo.getNodes("chipinfo")) {
-      chip = chipInfo.getString("chip");
-      string badL = chipInfo.getString("deadlist");
-      string cutL = chipInfo.getString("cutlist");
-      int channelDelay = 0;
-      if (chip == "B") channelDelay = 36;
-      if (chip == "C") channelDelay = 2 * 36;
-      if (chip == "D") channelDelay = 3 * 36;
-
-      if (badL.find("ch") != string::npos) {  string badLsub = badL.substr(3); hapdBadlist[i] = ARICHDatabaseImporter::channelsListHapd(badLsub.c_str(), channelDelay); }
-
-      if (cutL.find("ch") != string::npos) {  string cutLsub = cutL.substr(3); hapdCutlist[i] = ARICHDatabaseImporter::channelsListHapd(cutLsub.c_str(), channelDelay); }
-    }
-    i++;
-  }
-
-  // find matching sn and dna and get list of dead channels
-  for (const auto& febmap : febContent.getNodes("feb")) {
-    febSerial[j] = febmap.getInt("sn");
-    string dna = febmap.getString("dna");
-    febDeadlist[j] = ARICHDatabaseImporter::getDeadChFEB(dna);
-    for (const auto& asicmap : asicContent.getNodes("febasic")) {
-      int febSerial2 = asicmap.getInt("sn");
-      if (febSerial2 == febSerial[j]) {
-        string asic1 = asicmap.getString("asic1");
-        string asic2 = asicmap.getString("asic2");
-        string asic3 = asicmap.getString("asic3");
-        string asic4 = asicmap.getString("asic4");
-
-        vector<int> asic_NosignalCHs[4], asic_BadconnCHs[4], asic_BadoffsetCHs[4], asic_BadlinCHs[4];
-        string asicNo = "";
-        int chDelay = 0;
-
-        for (int n = 0; n < 4; n++)  {
-          if (n == 0) { asicNo = asic1; chDelay = 0;}
-          if (n == 1) { asicNo = asic2; chDelay = 36;}
-          if (n == 2) { asicNo = asic3; chDelay = 2 * 36;}
-          if (n == 3) { asicNo = asic4; chDelay = 3 * 36;}
-          asic_NosignalCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "nosignal", chDelay);
-          asic_BadconnCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badconn", chDelay);
-          asic_BadoffsetCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badoffset", chDelay);
-          asic_BadlinCHs[n] = ARICHDatabaseImporter::channelsList(asicNo, "badlin", chDelay);
-        }
-
-        for (int n = 0; n < 4; n++) {
-          asicNosignalCHs[j].insert(asicNosignalCHs[j].end(), asic_NosignalCHs[n].begin(), asic_NosignalCHs[n].end()) ;
-          asicBadconnCHs[j].insert(asicBadconnCHs[j].end(), asic_BadconnCHs[n].begin(), asic_BadconnCHs[n].end()) ;
-          asicBadoffsetCHs[j].insert(asicBadoffsetCHs[j].end(), asic_BadoffsetCHs[n].begin(), asic_BadoffsetCHs[n].end()) ;
-          asicBadlinCHs[j].insert(asicBadlinCHs[j].end(), asic_BadlinCHs[n].begin(), asic_BadlinCHs[n].end()) ;
-        }
-      }
-    }
-    j++;
-  }
-
-
-  int l = 0;
-  // fill HAPD data to ARICHBadChannels class
-  for (l = 0; l < i; l++) {
-    new(channelConstants[l])  ARICHBadChannels();
-    auto* channelConst = static_cast<ARICHBadChannels*>(channelConstants[l]);
-    channelConst->setHapdSerial(hapdSerial[l]);
-    channelConst->setHapdBadChannel(hapdBadlist[l]);
-    channelConst->setHapdCutChannel(hapdCutlist[l]);
-    channelConst->setID(l);
-  }
-
-  // fill FEB data to ARICHBadChannels class
-  for (int k = i; k < (i + j); k++) {
-    new(channelConstants[k])  ARICHBadChannels();
-    auto* channelConst = static_cast<ARICHBadChannels*>(channelConstants[k]);
-    channelConst->setFebSerial(febSerial[k - i]);
-    channelConst->setFebDeadChannels(febDeadlist[k - i]);
-    channelConst->setAsicDeadChannels(asicNosignalCHs[k - i]);
-    channelConst->setAsicBadConnChannels(asicBadconnCHs[k - i]);
-    channelConst->setAsicBadOffsetChannels(asicBadoffsetCHs[k - i]);
-    channelConst->setAsicBadLinChannels(asicBadlinCHs[k - i]);
-    channelConst->setID(k);
-  }
-
-  // define IOV and store data to the DB
-  IntervalOfValidity iov(0, 0, -1, -1);
-  //Database::Instance().storeData("ARICHBadChannels", &channelConstants, iov);
-
-  /*  TObject* channelObj = static_cast<TObject*>(&channelConstants);
-
-    EventDependency intraRun(channelObj);
-    intraRun.add(500, channelObj);  // configuration B is valid staring from event number 500
-    intraRun.add(1000, channelObj);  // configuration C is valid staring from event number 1000
-
-    Database::Instance().storeData("ARICHBadChannels", &intraRun, iov);*/
-  Database::Instance().storeData("ARICHBadChannels", &channelConstants, iov);
-
 
 }
-
-void ARICHDatabaseImporter::exportBadChannels()
-{
-  DBArray<ARICHBadChannels> elements("ARICHBadChannels");
-  elements.getEntries();
-
-  // Print bad channels
-  /*  for (const auto& element : elements) {
-      if (!(element.getHapdSerial()).empty()) {
-        B2INFO("HAPD sn = " << element.getHapdSerial());
-        if (element.getHapdListOfBadChannelsSize() != 0) B2INFO("all bad CHs: ");
-        for (int i = 0; i < element.getHapdListOfBadChannelsSize(); i++) {
-          B2INFO(element.getHapdListOfBadChannel(i));
-        }
-        if (element.getHapdCutChannelsSize() != 0) {
-          B2INFO("cut CHs: ");
-          for (int i = 0; i < element.getHapdCutChannelsSize(); i++) {
-            B2INFO(element.getHapdCutChannel(i));
-          }
-        }
-        if (element.getHapdBadChannelsSize() != 0) {
-          B2INFO("bad CHs: ");
-          for (int i = 0; i < element.getHapdBadChannelsSize(); i++) {
-            B2INFO(element.getHapdBadChannel(i));
-          }
-        }
-      } else {
-        B2INFO("FEB sn = " << element.getFebSerial());
-        int numAllCh = element.getFebDeadChannelsSize() + element.getAsicDeadChannelsSize() + element.getAsicBadConnChannelsSize() +
-                       element.getAsicBadOffsetChannelsSize() + element.getAsicBadLinChannelsSize();
-        if (numAllCh != 0) B2INFO("all bad CHs: ");
-        for (int i = 0; i < numAllCh; i++) {
-          B2INFO(element.getFebListOfBadChannel(i));
-        }
-        if (element.getFebDeadChannelsSize() != 0) {
-          B2INFO("dead CHs (FEB test): ");
-          for (int i = 0; i < element.getFebDeadChannelsSize(); i++) {
-            B2INFO(element.getFebDeadChannel(i));
-          }
-        }
-        if (element.getAsicDeadChannelsSize() != 0) {
-          B2INFO("dead CHs (asic): ");
-          for (int i = 0; i < element.getAsicDeadChannelsSize(); i++) {
-            B2INFO(element.getAsicDeadChannel(i));
-          }
-        }
-        if (element.getAsicBadConnChannelsSize() != 0) {
-          B2INFO("bad conn CHs (asic): ");
-          for (int i = 0; i < element.getAsicBadConnChannelsSize(); i++) {
-            B2INFO(element.getAsicBadConnChannel(i));
-          }
-        }
-        if (element.getAsicBadOffsetChannelsSize() != 0) {
-          B2INFO("bad offset CHs (asic): ");
-          for (int i = 0; i < element.getAsicBadOffsetChannelsSize(); i++) {
-            B2INFO(element.getAsicBadOffsetChannel(i));
-          }
-        }
-        if (element.getAsicBadLinChannelsSize() != 0) {
-          B2INFO("bad lin CHs (asic): ");
-          for (int i = 0; i < element.getAsicBadLinChannelsSize(); i++) {
-            B2INFO(element.getAsicBadLinChannel(i));
-          }
-        }
-      }
-    }*/
-}
-
-
 
 void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
 {
@@ -1420,8 +1512,6 @@ void ARICHDatabaseImporter::getBiasVoltagesForHapdChip(std::string serialNumber)
   }
 }
 
-
-
 void ARICHDatabaseImporter::getMyParams(std::string aeroSerialNumber)
 {
   map<string, float> aerogelParams = ARICHDatabaseImporter::getAerogelParams(aeroSerialNumber);
@@ -1452,23 +1542,428 @@ std::map<std::string, float> ARICHDatabaseImporter::getAerogelParams(std::string
   return aerogelParams;
 }
 
-
-
-void ARICHDatabaseImporter::importSensorModule()
+void ARICHDatabaseImporter::importFEBoardInfo()
 {
-  GearDir content = GearDir("/ArichData/AllData/hapdfebmapping");
+
+  GearDir content = GearDir("/ArichData/AllData/febasicmapping");
 
   // define data array
-//  TClonesArray moduleInfoConstants("Belle2::ARICHSensorModuleInfo");
+  TClonesArray febConstants("Belle2::ARICHFEBoardInfo");
+  int feb = 0;
+
+  // loop over xml files and extract the data
+  for (const auto& febinfo : content.getNodes("febasic")) {
+    int febSN = (float) febinfo.getInt("sn");
+    string asic1 = febinfo.getString("asic1");
+    string asic2 = febinfo.getString("asic2");
+    string asic3 = febinfo.getString("asic3");
+    string asic4 = febinfo.getString("asic4");
+    string delivery = febinfo.getString("delivered");
+    string sentKEK = febinfo.getString("sentKEK");
+
+    if (delivery.size() != 10) cout << "feb sn " << febSN << " check delivery time!" << endl;
+
+    string year = delivery.substr(6, 4);
+    delivery = febinfo.getString("delivered");
+    string month = delivery.substr(3, 2);
+    delivery = febinfo.getString("delivered");
+    string day = delivery.substr(0, 2);
+
+    int deliveryINT = atoi((year + month + day + "u").c_str());
+    TTimeStamp deliverytime(deliveryINT, 0u, 0u);
+
+    string location = "";
+    if (!sentKEK.empty()) location = "KEK";
+
+    // save data as an element of the array
+    new(febConstants[feb]) ARICHFEBoardInfo();
+    auto* febConst = static_cast<ARICHFEBoardInfo*>(febConstants[feb]);
+    febConst->setFEBoardSerial(febSN);
+    febConst->setAsicPosition(0, asic1);
+    febConst->setAsicPosition(1, asic2);
+    febConst->setAsicPosition(2, asic3);
+    febConst->setAsicPosition(3, asic4);
+    febConst->setTimeStamp(deliverytime);
+    febConst->setFEBoardLocation(location);
+
+    DBArray<ARICHAsicInfo> elementsAsic("ARICHAsicInfo");
+    elementsAsic.getEntries();
+    for (const auto& element : elementsAsic) {
+      if (element.getAsicID() == asic1) {
+        ARICHAsicInfo& elementValue = const_cast<ARICHAsicInfo&>(element);
+        febConst->setAsicInfo(0, &elementValue);
+      }
+      if (element.getAsicID() == asic2) {
+        ARICHAsicInfo& elementValue = const_cast<ARICHAsicInfo&>(element);
+        febConst->setAsicInfo(1, &elementValue);
+      }
+      if (element.getAsicID() == asic3) {
+        ARICHAsicInfo& elementValue = const_cast<ARICHAsicInfo&>(element);
+        febConst->setAsicInfo(2, &elementValue);
+      }
+      if (element.getAsicID() == asic4) {
+        ARICHAsicInfo& elementValue = const_cast<ARICHAsicInfo&>(element);
+        febConst->setAsicInfo(3, &elementValue);
+      }
+    }
+
+    feb++;
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under user defined name:
+  Database::Instance().storeData("ARICHFEBoardInfo", &febConstants, iov);
+}
+
+void ARICHDatabaseImporter::exportFEBoardInfo()
+{
+  DBArray<ARICHFEBoardInfo> elements("ARICHFEBoardInfo");
+  elements.getEntries();
+
+  for (const auto& element : elements) {
+    B2INFO("Feb sn = " << element.getFEBoardSerial());
+    for (int i = 0; i < 4; i++) {
+      B2INFO("ASIC " << i << " = " << element.getAsicPosition(i));
+    }
+  }
+}
+
+
+void ARICHDatabaseImporter::importModuleTest(std::string mypath, std::string HVtest)
+{
+
+  GearDir content;
+  if (HVtest == "no")  content = GearDir("/ArichData/AllData/moduletest");
+  else if (HVtest == "yes")  content = GearDir("/ArichData/AllData/moduletestHV");
+  else B2INFO("Check HVB test parameter!");
+
+  // define data array
+  TClonesArray moduleConstants("Belle2::ARICHModuleTest");
+  int module = 0;
+
+  // loop over xml files and extract the data
+  for (const auto& moduletest : content.getNodes("module")) {
+    int febSN = (float) moduletest.getInt("febserial");
+    string hapdSN = moduletest.getString("hapdserial");
+    int hvbSN = -1;
+    if (HVtest == "yes")  hvbSN = (float) moduletest.getInt("hvbserial");
+    int run = moduletest.getInt("run");
+    int runposition = moduletest.getInt("runposition");
+    int isok = moduletest.getInt("isok");
+    bool isOK = false;
+    if (isok == 1) isOK = true;
+    string comment = moduletest.getString("comment");
+
+    vector<int> deadChannels;
+
+    if (HVtest == "no") {
+      vector<string> deadChs;
+      string channels = moduletest.getString("dead");
+      if (!channels.empty()) {
+        if (channels.find(",") != string::npos) {
+          while (channels.find(",") != string::npos) {
+            string badchannel = channels.substr(0, channels.find(","));
+            deadChs.push_back(badchannel);
+            channels = channels.substr(channels.find(",") + 1);
+          }
+          deadChs.push_back(channels);
+        }
+      }
+
+      for (unsigned int i = 0; i < deadChs.size(); i++)  {
+        string CH = deadChs.at(i);
+        int channelDelay = 0;
+        if (CH.find("B") != string::npos) channelDelay = 36;
+        if (CH.find("C") != string::npos) channelDelay = 2 * 36;
+        if (CH.find("D") != string::npos) channelDelay = 3 * 36;
+
+        int CHint = atoi((CH.substr(1)).c_str()) + channelDelay;
+        deadChannels.push_back(CHint);
+      }
+    }
+
+    if (HVtest == "yes") {
+      vector<int> deadChs;
+      string channels = moduletest.getString("dead");
+      if (!channels.empty()) {
+        if (channels.find(",") != string::npos) {
+          while (channels.find(",") != string::npos) {
+            string badchannel = channels.substr(0, channels.find(","));
+            deadChs.push_back(atoi(badchannel.c_str()));
+            channels = channels.substr(channels.find(",") + 1);
+          }
+          deadChs.push_back(atoi(channels.c_str()));
+        }
+      }
+      deadChannels = deadChs;
+    }
+
+    // define histograms
+    TGraph* guardBias_th = 0;
+    TGraph* chipVdiff_th[4] = {0};
+    TGraph* chipLeak_th[4] = {0};
+    TGraph* HV_th = 0;
+
+    TGraph* guardBias_2Dx = 0;
+    TGraph* chipVdiff_2Dx[4] = {0};
+    TGraph* chipLeak_2Dx[4] = {0};
+    TGraph* HV_2Dx = 0;
+
+    TGraph* guardBias_2Dy = 0;
+    TGraph* chipVdiff_2Dy[4] = {0};
+    TGraph* chipLeak_2Dy[4] = {0};
+    TGraph* HV_2Dy = 0;
+
+    TH1F* gain = 0;
+    TH2D* charge = 0;
+    TH2D* th = 0;
+    TH2D* scanX = 0;
+    TH2D* scanY = 0;
+
+    string runStr = "";
+    if (run < 10) runStr = "000" + to_string(run);
+    if ((run > 9) && (run < 100)) runStr = "00" + to_string(run);
+    if (run > 99) runStr = "0" + to_string(run);
+    TFile* f = TFile::Open((mypath + runStr + "/" + runStr + "_" + hapdSN + "_out.root").c_str(), "READ");
+
+    // extract data
+    TIter next(f->GetListOfKeys());
+    TKey* key;
+    while ((key = (TKey*)next())) {
+
+      string strime = key->GetName();
+
+      if (strime.find("Guard") != string::npos) {
+        if (strime.find("_T_0") != string::npos) {
+          guardBias_th = (TGraph*)f->Get(strime.c_str());
+        }
+        if (strime.find("_T_1") != string::npos) {
+          guardBias_2Dx = (TGraph*)f->Get(strime.c_str());
+        }
+        if (strime.find("_T_2") != string::npos) {
+          guardBias_2Dy = (TGraph*)f->Get(strime.c_str());
+        }
+      }
+
+      if (strime.find("BiasDifference") != string::npos) {
+        for (int i = 0; i < 4; i++) {
+          if (strime.find(("CHIP_" + to_string(i) + "_T_0").c_str()) != string::npos) {
+            chipVdiff_th[i] = (TGraph*)f->Get(strime.c_str());
+          }
+          if (strime.find(("CHIP_" + to_string(i) + "_T_1").c_str()) != string::npos) {
+            chipVdiff_2Dx[i] = (TGraph*)f->Get(strime.c_str());
+          }
+          if (strime.find(("CHIP_" + to_string(i) + "_T_2").c_str()) != string::npos) {
+            chipVdiff_2Dy[i] = (TGraph*)f->Get(strime.c_str());
+          }
+        }
+      }
+
+      if (strime.find("LeakageCurrent") != string::npos) {
+        for (int i = 0; i < 4; i++) {
+          if (strime.find(("CHIP_" + to_string(i) + "_T_0").c_str()) != string::npos) {
+            chipLeak_th[i] = (TGraph*)f->Get(strime.c_str());
+          }
+          if (strime.find(("CHIP_" + to_string(i) + "_T_1").c_str()) != string::npos) {
+            chipLeak_2Dx[i] = (TGraph*)f->Get(strime.c_str());
+          }
+          if (strime.find(("CHIP_" + to_string(i) + "_T_2").c_str()) != string::npos) {
+            chipLeak_2Dy[i] = (TGraph*)f->Get(strime.c_str());
+          }
+        }
+      }
+
+      if (strime.find("HV") != string::npos) {
+        if (strime.find("_T_0") != string::npos) {
+          HV_th = (TGraph*)f->Get(strime.c_str());
+        }
+        if (strime.find("_T_1") != string::npos) {
+          HV_2Dx = (TGraph*)f->Get(strime.c_str());
+        }
+        if (strime.find("_T_2") != string::npos) {
+          HV_2Dy = (TGraph*)f->Get(strime.c_str());
+        }
+      }
+
+      if (strime.find("Gain_1D") != string::npos) {
+        gain = (TH1F*)f->Get(strime.c_str());
+        gain->SetDirectory(0);
+      }
+
+      if (strime.find("Charge_2D") != string::npos) {
+        charge = (TH2D*)f->Get(strime.c_str());
+        charge->SetDirectory(0);
+      }
+
+      if (strime.find("Threshold_2D") != string::npos) {
+        th = (TH2D*)f->Get(strime.c_str());
+        th->SetDirectory(0);
+      }
+
+      if (strime.find("Scan_2D_X") != string::npos) {
+        scanX = (TH2D*)f->Get(strime.c_str());
+        scanX->SetDirectory(0);
+      }
+
+      if (strime.find("Scan_2D_Y") != string::npos) {
+        scanY = (TH2D*)f->Get(strime.c_str());
+        scanY->SetDirectory(0);
+      }
+    }
+
+    // save data as an element of the array
+    new(moduleConstants[module]) ARICHModuleTest();
+    auto* moduleConst = static_cast<ARICHModuleTest*>(moduleConstants[module]);
+    moduleConst->setFebSN(febSN);
+    moduleConst->setHapdSN(hapdSN);
+    moduleConst->setRun(run);
+    moduleConst->setRunPosition(runposition);
+    moduleConst->setOK(isOK);
+    moduleConst->setDeadChs(deadChannels);
+    moduleConst->setComment(comment);
+    moduleConst->setGuardBiasTH(guardBias_th);
+    moduleConst->setHighVoltageTH(HV_th);
+    moduleConst->setGuardBias2Dx(guardBias_2Dx);
+    moduleConst->setHighVoltage2Dx(HV_2Dx);
+    moduleConst->setGuardBias2Dy(guardBias_2Dy);
+    moduleConst->setHighVoltage2Dy(HV_2Dy);
+    moduleConst->setGain(gain);
+    moduleConst->setChargeScan(charge);
+    moduleConst->setTresholdScan(th);
+    moduleConst->setLaserScanX(scanX);
+    moduleConst->setLaserScanY(scanY);
+
+    for (int i = 0; i < 4; i++) {
+      moduleConst->setChipVdiffTH(i, chipVdiff_th[i]);
+      moduleConst->setChipLeakTH(i, chipLeak_th[i]);
+      moduleConst->setChipVdiff2Dx(i, chipVdiff_2Dx[i]);
+      moduleConst->setChipLeak2Dx(i, chipLeak_2Dx[i]);
+      moduleConst->setChipVdiff2Dy(i, chipVdiff_2Dy[i]);
+      moduleConst->setChipLeak2Dy(i, chipLeak_2Dy[i]);
+    }
+    if (HVtest == "yes")  moduleConst->setHvbSN(hvbSN);
+
+    module++;
+    B2INFO("module no " << module - 1 << " saved to DB. HAPD SN = " << hapdSN << ", FEB SN = " << febSN);
+    f->Close();
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under user defined name:
+  if (HVtest == "no")  Database::Instance().storeData("ARICHModuleTest", &moduleConstants, iov);
+  if (HVtest == "yes")  Database::Instance().storeData("ARICHModuleTestHV", &moduleConstants, iov);
+}
+
+void ARICHDatabaseImporter::exportModuleTest(std::string HVtest)
+{
+
+  if (HVtest == "no") {
+    DBArray<ARICHModuleTest> elements("ARICHModuleTest");
+    elements.getEntries();
+    for (const auto& element : elements) {
+      B2INFO("Feb sn = " << element.getFebSN() << ", hapd sn = " << element.getHapdSN() << ", run = " << element.getRun() <<
+             ", run position = " << element.getRunPosition() << ", module is ok = " << element.getOK() << ", comment = " <<
+             element.getComment());
+      for (int i = 0; i < element.getDeadChsSize(); i++) {
+        B2INFO("dead channel = " << element.getDeadCh(i) << " (hapd mapping)");
+      }
+    }
+  }
+
+  if (HVtest == "yes") {
+    DBArray<ARICHModuleTest> elements("ARICHModuleTestHV");
+    elements.getEntries();
+    for (const auto& element : elements) {
+      B2INFO("Feb sn = " << element.getFebSN() << ", hapd sn = " << element.getHapdSN() << ", hvb sn = " << element.getHvbSN() <<
+             ", run = " << element.getRun() << ", run position = " << element.getRunPosition() << ", module is ok = " << element.getOK() <<
+             ", comment = " << element.getComment());
+      for (int i = 0; i < element.getDeadChsSize(); i++) {
+        B2INFO("dead channel = " << element.getDeadCh(i) << " (asic mapping)");
+      }
+    }
+  }
+
+}
+
+void ARICHDatabaseImporter::importSensorModuleInfo()
+{
+  GearDir content = GearDir("/ArichData/AllData/moduleposition");
+
+  // define data array
+  TClonesArray moduleInfoConstants("Belle2::ARICHSensorModuleInfo");
+
+  int module = 0;
+
+  // loop over xml files and extract the data
+  for (const auto& sensor : content.getNodes("position")) {
+    int febSerial = sensor.getInt("febserial");
+    string hapdSerial = sensor.getString("hapdserial");
+    int id = sensor.getInt("moduleID");
+    int hvSerial = sensor.getInt("HVserial");
+
+    // save data as an element of the array
+    new(moduleInfoConstants[module]) ARICHSensorModuleInfo();
+    auto* moduleInfoConst = static_cast<ARICHSensorModuleInfo*>(moduleInfoConstants[module]);
+    moduleInfoConst->setSensorModuleID(id);
+    moduleInfoConst->setFEBserial(febSerial);
+    moduleInfoConst->setHAPDserial(hapdSerial);
+    moduleInfoConst->setHVboardID(hvSerial);
+
+    DBArray<ARICHHapdInfo> elementsHapd("ARICHHapdInfo");
+    elementsHapd.getEntries();
+    for (const auto& element : elementsHapd) {
+      if (element.getSerialNumber() == hapdSerial) {
+        ARICHHapdInfo& elementValue = const_cast<ARICHHapdInfo&>(element);
+        moduleInfoConst->setHapdID(&elementValue);
+      }
+    }
+
+    DBArray<ARICHFEBoardInfo> elementsFeb("ARICHFEBoardInfo");
+    elementsFeb.getEntries();
+    for (const auto& element : elementsFeb) {
+      if (element.getFEBoardSerial() == febSerial) {
+        ARICHFEBoardInfo& elementValue = const_cast<ARICHFEBoardInfo&>(element);
+        moduleInfoConst->setFEBoardID(&elementValue);
+      }
+    }
+
+    DBArray<ARICHModuleTest> elementsModule("ARICHModuleTest");
+    elementsModule.getEntries();
+    for (const auto& element : elementsModule) {
+      if (element.getFebSN() == febSerial) {
+        ARICHModuleTest& elementValue = const_cast<ARICHModuleTest&>(element);
+        moduleInfoConst->setModuleTest(&elementValue);
+      }
+    }
+
+    module++;
+  }
+
+  // define interval of validity
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+
+  // store under default name:
+  Database::Instance().storeData("ARICHSensorModuleInfo", &moduleInfoConstants, iov);
+}
+
+
+void ARICHDatabaseImporter::importSensorModuleMap()
+{
+
+  GearDir content = GearDir("/ArichData/AllData/moduleposition");
+
+  // define data array
   TClonesArray moduleMapConstants("Belle2::ARICHSensorModuleMap");
 
   int module = 0;
 
   // loop over xml files and extract the data
-  for (const auto& sensor : content.getNodes("hapdfeb")) {
-    int febSerial = sensor.getInt("febserial");
-    string hapdSerial = sensor.getString("hapdserial");
-    int sextant = sensor.getInt("sextant");
+  for (const auto& sensor : content.getNodes("position")) {
+    int sextant = sensor.getInt("sector");
     int ring = sensor.getInt("ring");
     int column = sensor.getInt("column");
     int id = sensor.getInt("moduleID");
@@ -1479,27 +1974,16 @@ void ARICHDatabaseImporter::importSensorModule()
     moduleMapConst->setSensorModuleSextantID(sextant);
     moduleMapConst->setSensorModuleRingID(ring);
     moduleMapConst->setSensorModuleColumnID(column);
+    moduleMapConst->setSensorGlobalID(id);
 
-    ARICHSensorModuleInfo* moduleInfoConstants = new ARICHSensorModuleInfo();
-    auto* moduleInfoConst = static_cast<ARICHSensorModuleInfo*>(moduleInfoConstants);
-    moduleInfoConst->setSensorModuleID(id);
-    moduleInfoConst->setFEBserial(febSerial);
-    moduleInfoConst->setHAPDserial(hapdSerial);
-
-    DBArray<ARICHHapdInfo> elementsHapd("ARICHHapdInfo");
-    elementsHapd.getEntries();
-    for (const auto& element : elementsHapd) {
-      if (element.getSerialNumber() == hapdSerial) {  moduleInfoConst->setHapdID(element); }
+    DBArray<ARICHSensorModuleInfo> elementsModule("ARICHSensorModuleInfo");
+    elementsModule.getEntries();
+    for (const auto& element : elementsModule) {
+      if (element.getSensorModuleID() == id) {
+        ARICHSensorModuleInfo& elementValue = const_cast<ARICHSensorModuleInfo&>(element);
+        moduleMapConst->setSensorModuleId(&elementValue);
+      }
     }
-
-    /*    DBArray<ARICHFEBoardInfo> elementsFeb("ARICHFEBoardInfo");
-        elementsFeb.getEntries();
-        for (const auto& element : elementsFeb) {
-          if (element.getFEBoardSerial() == febSerial) {  moduleInfoConst->setFEBoardID(element); }
-        }*/
-
-    moduleMapConst->setSensorModuleId(*moduleInfoConst);
-
 
     module++;
   }
@@ -1508,13 +1992,12 @@ void ARICHDatabaseImporter::importSensorModule()
   IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
 
   // store under default name:
-//  Database::Instance().storeData("ARICHSensorModuleInfo", &moduleInfoConstants, iov);
   Database::Instance().storeData("ARICHSensorModuleMap", &moduleMapConstants, iov);
 }
 
 
 
-void ARICHDatabaseImporter::exportSensorModule()
+void ARICHDatabaseImporter::exportSensorModuleMap()
 {
   DBArray<ARICHSensorModuleMap> elements("ARICHSensorModuleMap");
   elements.getEntries();
@@ -1522,13 +2005,433 @@ void ARICHDatabaseImporter::exportSensorModule()
   for (const auto& element : elements) {
     B2INFO("Sextant = " << element.getSensorModuleSextantID() << ", ring = " << element.getSensorModuleRingID() << ", column = " <<
            element.getSensorModuleColumnID());
-    ARICHSensorModuleInfo newelement = element.getSensorModuleId();
-    B2INFO("module ID = " << newelement.getSensorModuleID() << ", feb = " << newelement.getFEBserial() << ", hapd = " <<
-           newelement.getHAPDserial());
-    ARICHHapdInfo newerelement = newelement.getHapdID();
-    B2INFO("Hapd Serial = " << newerelement.getSerialNumber() << "; HV = " << newerelement.getHighVoltage() << "; qe400 = " <<
-           newerelement.getQuantumEfficiency400());
+    ARICHSensorModuleInfo* newelement = element.getSensorModuleId();
+    B2INFO("module ID = " << newelement->getSensorModuleID() << ", feb = " << newelement->getFEBserial() << ", hapd = " <<
+           newelement->getHAPDserial());
+    ARICHHapdInfo* newerelement = newelement->getHapdID();
+    B2INFO("Hapd Serial = " << newerelement->getSerialNumber() << "; HV = " << newerelement->getHighVoltage() << "; qe400 = " <<
+           newerelement->getQuantumEfficiency400());
+    for (int i = 0; i < 4; i++) {
+      ARICHHapdChipInfo* newestelement = newerelement->getHapdChipInfo(i);
+      B2INFO("Hapd Serial = " << newestelement->getHapdSerial() << "; chip = " << newestelement->getChipLabel() << "; gain = " <<
+             newestelement->getGain());
+    }
+  }
 
+}
+
+void ARICHDatabaseImporter::exportAll()
+{
+  ARICHDatabaseImporter::exportAerogelInfo();
+  ARICHDatabaseImporter::exportHapdQE();
+  ARICHDatabaseImporter::exportModuleTest("no");
+  ARICHDatabaseImporter::exportModuleTest("yes");
+  ARICHDatabaseImporter::exportFEBoardInfo();
+  ARICHDatabaseImporter::exportFebTest();
+  ARICHDatabaseImporter::exportSensorModuleMap();
+
+}
+// classses for simulation/reconstruction software
+void ARICHDatabaseImporter::importModulesInfo()
+{
+
+  // geometry configuration
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  // QE 2D maps from DB
+  DBArray<ARICHHapdQE> QEMaps("ARICHHapdQE");
+
+  ARICHModulesInfo modInfo;
+
+  // channel mapping used in QA tests (QE measurements, etc.)
+  ARICHChannelMapping QAChMap;
+
+  // read mapping from xml file
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
+  istringstream chstream;
+  int x, y, asic;
+  chstream.str(content.getString("QAChannelMapping"));
+  while (chstream >> x >> y >> asic) {
+    QAChMap.mapXY2Asic(x, y, asic);
+  }
+
+  // get list of installed modules from xml
+  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  std::cout << "Installed modules" << std::endl;
+
+  std::vector<std::string> installed;
+
+  for (const GearDir& module : content.getNodes("Module")) {
+    std::string hapdID = module.getString("@hapdID");
+
+    unsigned sector = module.getInt("Sector");
+    unsigned ring = module.getInt("Ring");
+    unsigned azimuth = module.getInt("Azimuth");
+    bool isActive = (bool)module.getInt("isActive");
+    std::cout << " " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << std::endl;
+
+    if (std::find(installed.begin(), installed.end(), hapdID) != installed.end()) {
+      B2WARNING("ARICHDatabaseImporter::importModulesInfo: hapd " << hapdID << " installed multiple times!");
+    } else installed.push_back(hapdID);
+
+    unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+
+    // get and set QE map
+    std::vector<float> qs;
+    qs.assign(144, 0);
+    bool init = false;
+    for (const auto& QEMap : QEMaps) {
+      if (hapdID ==  QEMap.getHapdSerialNumber()) {
+        TH2F* qe2d = QEMap.getQuantumEfficiency2D();
+        for (int k = 1; k < 13; k++) {
+          for (int l = 1; l < 13; l++) {
+            int asicCh = QAChMap.getAsicFromXY(k - 1, l - 1);
+            qs[asicCh] = qe2d->GetBinContent(k, l);
+          }
+        }
+        init = true;
+        std::cout << "  Channels QE map found and set." << std::endl;
+      }
+    }
+
+    if (!init) {
+      for (int k = 0; k < 144; k++) {
+        qs[k] = 27.0;
+      }
+      B2WARNING("ARICHDatabaseImporter::importModulesInfo: QE map for hapd " << hapdID << " not found! Setting 27% QE for all channels!");
+    }
+
+    modInfo.addModule(moduleID, qs, isActive);
+
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHModulesInfo> importObj;
+  importObj.construct(modInfo);
+  importObj.import(iov);
+
+}
+
+
+void ARICHDatabaseImporter::importChannelMask()
+{
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  // module test results from DB (we take list of dead channels from here)
+  DBArray<ARICHModuleTest> moduleTest("ARICHModuleTest");
+
+  ARICHChannelMask chanMask;
+
+  // read mapping of HAPD channels to asic channels from xml file
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/ChannelMapping");
+  istringstream chstream2;
+  int hapdCh, asic;
+  chstream2.str(content.getString("HapdAsicChannelMapping"));
+  std::vector<int> hapdChMap;
+  hapdChMap.assign(144, -1);
+  while (chstream2 >> hapdCh >> asic) {
+    hapdChMap[hapdCh - 1] = asic;
+  }
+
+  for (auto ch : hapdChMap) if (ch == -1)
+      B2ERROR("ARICHDatabaseImporter::importLWClasses: HAPD channel to asic channel mapping not set correctly!");
+
+  // loop over installed modules (from xml file)
+  content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/InstalledModules");
+  std::cout << "Installed modules" << std::endl;
+  for (const GearDir& module : content.getNodes("Module")) {
+    std::string hapdID = module.getString("@hapdID");
+    unsigned sector = module.getInt("Sector");
+    unsigned ring = module.getInt("Ring");
+    unsigned azimuth = module.getInt("Azimuth");
+    bool isActive = (bool)module.getInt("isActive");
+    std::cout << " " << hapdID << ":  S " << sector << "  R " << ring << "  Z " << azimuth <<  ", isActive: " << isActive << std::endl;
+    unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+
+    // get and set channel mask (mask dead channels)
+    bool init = false;
+    for (const auto& test : moduleTest) {
+      if (hapdID ==  test.getHapdSN()) {
+
+        // loop over list of dead channels
+        for (int i = 0; i < test.getDeadChsSize(); i++) {
+          unsigned hapdCh = test.getDeadCh(i);
+          chanMask.setActiveCh(moduleID, hapdChMap[hapdCh - 1], false);
+        }
+        init = true;
+        std::cout << "  List of dead channels (from module test) found and set." << std::endl;
+      }
+    }
+
+    if (!init) {
+      B2WARNING("ARICHDatabaseImporter::importLWClasses: List of dead channels for hapd " << hapdID <<
+                " not found! All channels set to active.");
+      continue;
+    }
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHChannelMask> importObj;
+  importObj.construct(chanMask);
+  importObj.import(iov);
+
+}
+
+
+void ARICHDatabaseImporter::importSimulationParams()
+{
+
+  ARICHSimulationPar simPar;
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content/SimulationParameters");
+
+  double qeScale = content.getDouble("qeScale");
+  double winAbs = content.getDouble("windowAbsorbtion");
+  double crossTalk = content.getDouble("chipNegativeCrosstalk");
+  double colEff = content.getDouble("colEff");
+
+  GearDir qeParams(content, "QE");
+  float lambdaFirst = qeParams.getLength("LambdaFirst") / Unit::nm;
+  float lambdaStep = qeParams.getLength("LambdaStep") / Unit::nm;
+  double peakQE = qeParams.getDouble("peakQE");
+
+  std::vector<float> qes;
+  for (const auto& qeff : qeParams.getNodes("Qeffi")) {
+    qes.push_back(qeff.getDouble("qe"));
+  }
+
+  simPar.setQECurve(lambdaFirst, lambdaStep, qes);
+  simPar.setCollectionEff(colEff);
+  simPar.setChipNegativeCrosstalk(crossTalk);
+  simPar.setWindowAbsorbtion(winAbs);
+  simPar.setQEScaling(qeScale);
+  simPar.setPeakQE(peakQE);
+
+  simPar.print();
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHSimulationPar> importObj;
+  importObj.construct(simPar);
+  importObj.import(iov);
+
+}
+
+void ARICHDatabaseImporter::importChannelMapping()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  ARICHChannelMapping chMap;
+
+  istringstream chstream;
+  int x, y, asic;
+  chstream.str(content.getString("ChannelMapping/SoftChannelMapping"));
+  std::cout << "Importing channel x,y to asic channel map" << std::endl;
+  std::cout << "  x   y   asic" << std::endl;
+  while (chstream >> x >> y >> asic) {
+    chMap.mapXY2Asic(x, y, asic);
+    std::cout << " " << setw(2) << x << "  " << setw(2) << y << "   " << setw(3) << asic << std::endl;
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHChannelMapping> importObjMap;
+  importObjMap.construct(chMap);
+  importObjMap.import(iov);
+
+}
+
+void ARICHDatabaseImporter::importFEMappings()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  ARICHMergerMapping mergerMap;
+  ARICHCopperMapping copperMap;
+  GearDir mapping(content, "FrontEndMapping");
+
+  for (const GearDir& merger : mapping.getNodes("Merger")) {
+    unsigned mergerID = (unsigned) merger.getInt("@id");
+    std::cout << std::endl << "Mapping of modules to merger no. " << mergerID << std::endl;
+    for (const GearDir& module : merger.getNodes("Modules/Module")) {
+      unsigned sector = module.getInt("Sector");
+      unsigned ring = module.getInt("Ring");
+      unsigned azimuth = module.getInt("Azimuth");
+      unsigned moduleID = geoConfig->getDetectorPlane().getSlotIDFromSRF(sector, ring, azimuth);
+      unsigned slot = (unsigned) module.getInt("@FEBSlot");
+      mergerMap.addMapping(moduleID, mergerID, slot);
+      std::cout << std::endl << " FEB slot: " << slot << ", module position: S" << sector << " R" << ring << " Z" << azimuth <<
+                ", module ID: " << moduleID << std::endl;
+      std::cout << " crosscheck:  mergerMap.getMergerID(" << moduleID << ") = " <<  mergerMap.getMergerID(
+                  moduleID) << ", mergerMap.getFEBSlot(" << moduleID << ") = " << mergerMap.getFEBSlot(moduleID) << ", mergerMap.getModuleID(" <<
+                mergerID << "," << slot << ") = " <<  mergerMap.getModuleID(mergerID, slot) << std::endl;
+    }
+    std::cout << std::endl;
+
+    unsigned copperID = (unsigned) merger.getInt("COPPERid");
+    string finesseSlot = merger.getString("FinesseSlot");
+    int finesse = 0;
+    if (finesseSlot == "A") {finesse = 0;}
+    else if (finesseSlot == "B") {finesse = 1;}
+    else if (finesseSlot == "C") {finesse = 2;}
+    else if (finesseSlot == "D") {finesse = 3;}
+    else {
+      B2ERROR(merger.getPath() << "/FinesseSlot " << finesseSlot <<
+              " ***invalid slot (valid are A, B, C, D)");
+      continue;
+    }
+    copperMap.addMapping(mergerID, copperID, finesse);
+    std::cout << "Merger " << mergerID << " connected to copper " << copperID << ", finesse " << finesse << std::endl;
+
+  }
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHMergerMapping> importObjMerger;
+  importObjMerger.construct(mergerMap);
+  importObjMerger.import(iov);
+
+  DBImportObjPtr<ARICHCopperMapping> importObjCopper;
+  importObjCopper.construct(copperMap);
+  importObjCopper.import(iov);
+
+}
+
+void ARICHDatabaseImporter::importGeometryConfig()
+{
+
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  ARICHGeometryConfig arichGeometryConfig(content);
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHGeometryConfig> importObj;
+  importObj.construct(arichGeometryConfig);
+  importObj.import(iov);
+
+}
+
+void ARICHDatabaseImporter::importCosmicTestGeometry()
+{
+  GearDir content = GearDir("/Detector/DetectorComponent[@name='ARICH']/Content");
+  GearDir cosmic(content, "CosmicTest");
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+
+  GearDir masterDir(cosmic, "MasterVolume");
+  ARICHGeoMasterVolume master = geoConfig->getMasterVolume();
+  master.setPlacement(masterDir.getLength("Position/x"), masterDir.getLength("Position/y"), masterDir.getLength("Position/z"),
+                      masterDir.getAngle("Rotation/x"), masterDir.getAngle("Rotation/y"), masterDir.getAngle("Rotation/z"));
+  master.setVolume(master.getInnerRadius(), master.getOuterRadius(), 100., master.getMaterial());
+  geoConfig->setMasterVolume(master);
+
+
+  GearDir aerogel(cosmic, "Aerogel");
+  std::vector<double> par = {aerogel.getLength("xSize"), aerogel.getLength("ySize"), aerogel.getLength("xPosition"), aerogel.getLength("yPosition"), aerogel.getAngle("zRotation")};
+  ARICHGeoAerogelPlane plane = geoConfig->getAerogelPlane();
+  plane.setSimple(par);
+  geoConfig->setAerogelPlane(plane);
+
+  GearDir scints(cosmic, "Scintilators");
+  double size[3] = {scints.getLength("xSize"), scints.getLength("ySize"), scints.getLength("zSize")};
+  std::string scintMat = scints.getString("Material");
+
+  ARICHGeoSupport support = geoConfig->getSupportStructure();
+  support.clearBoxes();
+  for (const GearDir& scint : scints.getNodes("Scintilator")) {
+    std::string name = scint.getString("@name");
+    double position[3] = {scint.getLength("Position/x"), scint.getLength("Position/y"), scint.getLength("Position/z")};
+    double rotation[3] = {scint.getAngle("Rotation/x"), scint.getAngle("Rotation/y"), scint.getAngle("Rotation/z")};
+    support.addBox(name, scintMat, size, position, rotation);
+  }
+
+  geoConfig->setSupportStructure(support);
+
+  IntervalOfValidity iov(0, 0, -1, -1); // IOV (0,0,-1,-1) is valid for all runs and experiments
+  DBImportObjPtr<ARICHGeometryConfig> geoImport;
+  geoImport.construct(*geoConfig);
+  geoImport.import(iov);
+
+}
+
+void ARICHDatabaseImporter::printSimulationPar()
+{
+  DBObjPtr<ARICHSimulationPar> simPar;
+  simPar->print();
+}
+
+void ARICHDatabaseImporter::printGeometryConfig()
+{
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+  geoConfig->print();
+
+}
+
+void ARICHDatabaseImporter::printChannelMapping()
+{
+  DBObjPtr<ARICHChannelMapping> chMap;
+  chMap->print();
+}
+
+void ARICHDatabaseImporter::printFEMappings()
+{
+  DBObjPtr<ARICHMergerMapping> mrgMap;
+  DBObjPtr<ARICHCopperMapping> copMap;
+  mrgMap->print();
+  copMap->print();
+}
+
+void ARICHDatabaseImporter::printModulesInfo()
+{
+  DBObjPtr<ARICHModulesInfo> modinfo;
+  modinfo->print();
+}
+
+void ARICHDatabaseImporter::printChannelMask()
+{
+  DBObjPtr<ARICHChannelMask> chMask;
+  chMask->print();
+}
+
+void ARICHDatabaseImporter::dumpModuleNumbering()
+{
+
+  ARICHChannelHist* hist = new ARICHChannelHist("moduleNum", "HAPD module slot numbering", 1);
+  for (int hapdID = 1; hapdID < 421; hapdID++) {
+    hist->setBinContent(hapdID, hapdID);
+  }
+  hist->SetOption("TEXT");
+  hist->SaveAs("ModuleNumbering.root");
+
+}
+
+void ARICHDatabaseImporter::dumpQEMap(bool simple)
+{
+  DBObjPtr<ARICHModulesInfo> modInfo;
+  DBObjPtr<ARICHGeometryConfig> geoConfig;
+  DBObjPtr<ARICHChannelMapping> chMap;
+
+  if (simple) {
+    TGraph2D* gr = new TGraph2D();
+    int point = 0;
+    for (int i = 1; i < 421; i++) {
+      if (modInfo->isInstalled(i)) {
+        for (int j = 0; j < 144; j++) {
+          int xCh, yCh;
+          chMap->getXYFromAsic(j, xCh, yCh);
+          TVector2 chPos = geoConfig->getChannelPosition(i, xCh, yCh);
+          gr->SetPoint(point, chPos.X(), chPos.Y(), modInfo->getChannelQE(i, j));
+          point++;
+        }
+      }
+    }
+    gr->SaveAs("QEMap.root");
+  } else {
+    ARICHChannelHist* hist = new ARICHChannelHist("hapdQE", "hapd QE map");
+    for (int hapdID = 1; hapdID < 421; hapdID++) {
+      if (!modInfo->isInstalled(hapdID)) continue;
+      for (int chID = 0; chID < 144; chID++) {
+        hist->setBinContent(hapdID, chID, modInfo->getChannelQE(hapdID, chID));
+      }
+    }
+    hist->SaveAs("QEMap.root");
   }
 }
 

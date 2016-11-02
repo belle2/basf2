@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/tmva/Expert.h>
+#include <tracking/trackFindingCDC/mva/TMVAExpert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -38,7 +38,7 @@ namespace Belle2 {
         m_param_cut(defaultCut),
         m_param_weightFolder("tracking/data"),
         m_param_trainingName(defaultTrainingName),
-        m_expert("tracking/data", defaultTrainingName)
+        m_tmvaExpert(nullptr)
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
@@ -66,9 +66,8 @@ namespace Belle2 {
       virtual void initialize() override
       {
         Super::initialize();
-        m_expert.setWeightFolderName(m_param_weightFolder);
-        m_expert.setTrainingName(m_param_trainingName);
-        m_expert.initializeReader(Super::getVarSet().getNamedVariables());
+        m_tmvaExpert = std::unique_ptr<TMVAExpert>(new TMVAExpert(m_param_weightFolder, m_param_trainingName));
+        m_tmvaExpert->initializeReader(Super::getVarSet().getNamedVariables());
       }
 
     public:
@@ -86,7 +85,7 @@ namespace Belle2 {
         if (std::isnan(extracted)) {
           return NAN;
         } else {
-          double prediction = m_expert.predict();
+          double prediction = m_tmvaExpert->predict();
           return prediction;
         }
       }
@@ -102,9 +101,7 @@ namespace Belle2 {
       std::string m_param_trainingName;
 
       /// TMVA Expert to examine the object
-      Expert m_expert;
-
-
+      std::unique_ptr<TMVAExpert> m_tmvaExpert;
     };
 
     /// Convience template to create a tmva filter for a set of variables.

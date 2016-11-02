@@ -77,6 +77,7 @@ namespace Belle2 {
     bool m_useChannelT0Calibration;    /**< if true, use channel T0 calibration */
     bool m_useModuleT0Calibration;     /**< if true, use module T0 calibration */
     bool m_useCommonT0Calibration;     /**< if true, use common T0 calibration */
+    bool m_subtractOffset;             /**< if true, subtract offset of nominal TDC */
 
     DBObjPtr<TOPCalTimebase>* m_timebase = 0;   /**< sample time calibration constants */
     DBObjPtr<TOPCalChannelT0>* m_channelT0 = 0; /**< channel T0 calibration constants */

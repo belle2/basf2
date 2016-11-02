@@ -11,11 +11,18 @@ from tracking import (
     add_prune_tracks,
 )
 
+from softwaretrigger import (
+    add_fast_reco_software_trigger,
+    add_hlt_software_trigger,
+    add_calibration_software_trigger,
+)
+
 
 def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
     """
     This function adds the standard reconstruction modules to a path.
-    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`
+    Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
+    plus the modules to calculate the software trigger cuts.
 
     :param path: Add the modules to this path.
     :param components: list of geometry components to include reconstruction for, or None for all components.
@@ -37,7 +44,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         all (but you will have to add it on your own then).
     """
 
-    # tracking
+    # Add tracking reconstruction modules
     add_tracking_reconstruction(path,
                                 components=components,
                                 pruneTracks=False,
@@ -45,11 +52,17 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 trigger_mode=trigger_mode,
                                 skipGeometryAdding=skipGeometryAdding)
 
-    # add further reconstruction modules
+    # Add further reconstruction modules
     add_posttracking_reconstruction(path,
                                     components=components,
                                     pruneTracks=pruneTracks,
                                     trigger_mode=trigger_mode)
+
+    # Add the modules calculating the software trigger cuts (but not performing them)
+    if trigger_mode == "all":
+        add_fast_reco_software_trigger(path)
+        add_hlt_software_trigger(path)
+        add_calibration_software_trigger(path)
 
 
 def add_mc_reconstruction(path, components=None, pruneTracks=True):
@@ -139,6 +152,7 @@ def add_mdst_output(
         'KLMClusters',
         'KLMClustersToTracks',
         'TRGSummary',
+        'SoftwareTriggerResult',
     ]
     persistentBranches = ['FileMetaData']
     if mc:
@@ -159,6 +173,8 @@ def add_arich_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     if components is None or 'ARICH' in components:
+        arich_fillHits = register_module('ARICHFillHits')
+        path.add_module(arich_fillHits)
         arich_rec = register_module('ARICHReconstructor')
         path.add_module(arich_rec)
 
@@ -268,9 +284,21 @@ def add_ecl_modules(path, components=None):
         ecl_digit_calibration = register_module('ECLDigitCalibrator')
         path.add_module(ecl_digit_calibration)
 
-        # ECL CR finder and splitter (refactored old version - two steps at once)
-        ecl_finderandsplitter = register_module('ECLCRFinderAndSplitter')
-        path.add_module(ecl_finderandsplitter)
+        # ECL connected region finder
+        ecl_crfinder = register_module('ECLCRFinder')
+        path.add_module(ecl_crfinder)
+
+        # ECL local maximum finder
+        ecl_lmfinder = register_module('ECLLocalMaximumFinder')
+        path.add_module(ecl_lmfinder)
+
+        # ECL splitter N1
+        ecl_splitterN1 = register_module('ECLSplitterN1')
+        path.add_module(ecl_splitterN1)
+
+        # ECL splitter N2
+        ecl_splitterN2 = register_module('ECLSplitterN2')
+        path.add_module(ecl_splitterN2)
 
         # ECL Shower Correction
         ecl_showercorrection = register_module('ECLShowerCorrector')

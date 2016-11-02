@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/filters/segment/CDCRecoSegment2DVarSet.h>
+#include <tracking/trackFindingCDC/filters/segment/BasicSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
@@ -98,7 +98,7 @@ namespace Belle2 {
       }
 
       /// Marking that the basic facet variables should be included.
-      typedef PairVarSet<CDCRecoSegment2DVarSet> NestedVarSet;
+      typedef PairVarSet<BasicSegmentVarSet> NestedVarSet;
 
       /// Unpack the object for for the nested variable set
       static

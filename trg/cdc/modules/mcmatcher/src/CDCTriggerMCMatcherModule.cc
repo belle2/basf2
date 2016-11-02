@@ -62,6 +62,9 @@ CDCTriggerMCMatcherModule::CDCTriggerMCMatcherModule() : Module()
   addParam("minStereo", m_minStereo,
            "Minimum number of stereo hits in different super layers.",
            0);
+  addParam("axialOnly", m_axialOnly,
+           "Switch to ignore stereo hits (= 2D matching).",
+           false);
   addParam("minPurity", m_minPurity,
            "Minimum purity for reconstructed tracks.",
            0.1);
@@ -221,6 +224,9 @@ CDCTriggerMCMatcherModule::event()
   // examine every hit to which mcTrack and prTrack it belongs.
   // if the hit is not part of any mcTrack put the hit in the background column.
   for (HitId hitId = 0; hitId < segmentHits.getEntries(); ++hitId) {
+    // skip stereo hits
+    if (m_axialOnly && segmentHits[hitId]->getISuperLayer() % 2) continue;
+
     // First search the unique mcTrackId for the hit.
     // If the hit is not assigned to any mcTrack the Id is set to the background column.
     auto it_mcTrackId = mcTrackId_by_hitId.find(hitId);

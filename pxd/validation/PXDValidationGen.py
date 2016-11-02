@@ -18,14 +18,15 @@
 #  21 Oct 2016    ver. 0.3   Actualization, P.Kodys
 #
 ##############################################################################
-"""
-<header>
-<output>PXDValidationTTreeOutput.root</output>
-<output>PXDValidationTTreeSimHitOutput.root</output>
-<output>PXDValidationTTreeDigitOutput.root</output>
+"""<header>
+<input>PXDValidationTTreeOutput.root</input>
+<input>PXDValidationTTreeSimHitOutput.root</input>
+<input>PXDValidationTTreeDigitOutput.root</input>
+<output>PXDValidation.root</output>
 <contact>Peter Kodys, peter.kodys@mff.cuni.cz</contact>
-</header>
-"""
+<description>This steering file run the PXD response on an input file with own generated events.</description>
+</header>"""
+
 from basf2 import *
 from PXDValidationTTree import PXDValidationTTree
 from PXDValidationTTreeSimHit import PXDValidationTTreeSimHit

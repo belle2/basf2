@@ -36,7 +36,7 @@ namespace Belle2 {
        *  Looks through the associated names and returns the right index if found.
        *  Returns size() (one after the last element) if not found.
        *
-       *  @param partName   Name of the sought part
+       *  @param name       Name of the sought part
        *  @return           Index of the name, nParts if not found.
        */
       virtual int getNameIndex(const char* const name) const = 0;
@@ -49,14 +49,18 @@ namespace Belle2 {
 
       /// Setter for the value with the given name.
       void set(const char* const name, Float_t value)
-      { set(getNameIndex(name), value); }
+      {
+        set(getNameIndex(name), value);
+      }
 
       /// Getter for the value of the ith part.
       virtual Float_t get(int iValue) const = 0;
 
       /// Getter for the value with the given name.
       Float_t get(const char* const name) const
-      { return get(getNameIndex(name)); }
+      {
+        return get(getNameIndex(name));
+      }
 
       /**
        *  Getter for a pointer to the value with the given name.
@@ -73,13 +77,15 @@ namespace Belle2 {
 
       /// Reference getter for the value with the given name.
       Float_t& operator[](const char* const name)
-      { return operator[](getNameIndex(name)); }
+      {
+        return operator[](getNameIndex(name));
+      }
 
       /// Getter for a map of all name and value pairs in this tuple
       std::map<std::string, Float_t> getNamedValues(std::string prefix = "") const;
 
       /// Getter for named references to the variables in this tuple
-      std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "");
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix = "");
     };
   }
 }

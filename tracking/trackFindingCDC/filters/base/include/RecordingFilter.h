@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/tmva/Recorder.h>
+#include <tracking/trackFindingCDC/mva/Recorder.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>

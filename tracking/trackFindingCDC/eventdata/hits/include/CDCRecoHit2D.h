@@ -69,7 +69,7 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit from an absolute position.
        *
        *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated to
-       *  @param pos2D     the absolut position of the wire
+       *  @param recoPos2D the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
       static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,

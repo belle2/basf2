@@ -54,6 +54,7 @@ from functools import reduce
 
 import quantity_extract
 import validationtools
+import validationpath
 
 
 def get_error_count_from_json(file_name):
@@ -244,7 +245,7 @@ if argsVar["keep"] is True:
 # check if comparison failed ?!?
 if argsVar["check_failed_comparison"]:
     plots_result_folder = "html/plots/"
-    comparsion_json_filename = "comparison.json"
+    comparsion_json_filename = validationpath.file_name_comparison_json
 
     comparison_folders = [(x, os.lstat(os.path.join(plots_result_folder, x, comparsion_json_filename)))
                           for x in os.listdir(plots_result_folder) if os.path.isdir(os.path.join(plots_result_folder, x))]

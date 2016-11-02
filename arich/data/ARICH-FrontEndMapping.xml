@@ -1,846 +1,2535 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <FrontEndMapping descr="Mapping of FE boards to merger boards and merger boards to COOPER boards">
-<!-- Because no hardware yet to exist, Merger_id's and COPPER_id's are arbitrary chosen -->
-
-<Merger id="1">
-    <FEboards>
-        <FEboard id="1">1</FEboard>
-        <FEboard id="2">2</FEboard>
-        <FEboard id="3">3</FEboard>
-        <FEboard id="4">4</FEboard>
-        <FEboard id="5">5</FEboard>
-        <FEboard id="6">6</FEboard>
-    </FEboards>
+  <Merger id="1">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2001</COPPERid>
-</Merger>
-<Merger id="2">
-    <FEboards>
-        <FEboard id="1">7</FEboard>
-        <FEboard id="2">8</FEboard>
-        <FEboard id="3">9</FEboard>
-        <FEboard id="4">10</FEboard>
-        <FEboard id="5">11</FEboard>
-        <FEboard id="6">12</FEboard>
-    </FEboards>
+    <COPPERid>1</COPPERid>
+  </Merger>
+  <Merger id="2">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2001</COPPERid>
-</Merger>
-<Merger id="3">
-    <FEboards>
-        <FEboard id="1">13</FEboard>
-        <FEboard id="2">14</FEboard>
-        <FEboard id="3">15</FEboard>
-        <FEboard id="4">16</FEboard>
-        <FEboard id="5">17</FEboard>
-        <FEboard id="6">18</FEboard>
-    </FEboards>
+    <COPPERid>1</COPPERid>
+  </Merger>
+  <Merger id="3">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2001</COPPERid>
-</Merger>
-<Merger id="4">
-    <FEboards>
-        <FEboard id="1">19</FEboard>
-        <FEboard id="2">20</FEboard>
-        <FEboard id="3">21</FEboard>
-        <FEboard id="4">22</FEboard>
-        <FEboard id="5">23</FEboard>
-        <FEboard id="6">24</FEboard>
-    </FEboards>
+    <COPPERid>1</COPPERid>
+  </Merger>
+  <Merger id="4">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2001</COPPERid>
-</Merger>
-<Merger id="5">
-    <FEboards>
-        <FEboard id="1">25</FEboard>
-        <FEboard id="2">26</FEboard>
-        <FEboard id="3">27</FEboard>
-        <FEboard id="4">28</FEboard>
-        <FEboard id="5">29</FEboard>
-        <FEboard id="6">30</FEboard>
-    </FEboards>
+    <COPPERid>1</COPPERid>
+  </Merger>
+  <Merger id="5">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2002</COPPERid>
-</Merger>
-<Merger id="6">
-    <FEboards>
-        <FEboard id="1">31</FEboard>
-        <FEboard id="2">32</FEboard>
-        <FEboard id="3">33</FEboard>
-        <FEboard id="4">34</FEboard>
-        <FEboard id="5">35</FEboard>
-        <FEboard id="6">36</FEboard>
-    </FEboards>
+    <COPPERid>2</COPPERid>
+  </Merger>
+  <Merger id="6">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2002</COPPERid>
-</Merger>
-<Merger id="7">
-    <FEboards>
-        <FEboard id="1">37</FEboard>
-        <FEboard id="2">38</FEboard>
-        <FEboard id="3">39</FEboard>
-        <FEboard id="4">40</FEboard>
-        <FEboard id="5">41</FEboard>
-        <FEboard id="6">42</FEboard>
-    </FEboards>
+    <COPPERid>2</COPPERid>
+  </Merger>
+  <Merger id="7">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2002</COPPERid>
-</Merger>
-<Merger id="8">
-    <FEboards>
-        <FEboard id="1">43</FEboard>
-        <FEboard id="2">44</FEboard>
-        <FEboard id="3">45</FEboard>
-        <FEboard id="4">46</FEboard>
-        <FEboard id="5">47</FEboard>
-        <FEboard id="6">48</FEboard>
-    </FEboards>
+    <COPPERid>2</COPPERid>
+  </Merger>
+  <Merger id="8">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2002</COPPERid>
-</Merger>
-<Merger id="9">
-    <FEboards>
-        <FEboard id="1">49</FEboard>
-        <FEboard id="2">50</FEboard>
-        <FEboard id="3">51</FEboard>
-        <FEboard id="4">52</FEboard>
-        <FEboard id="5">53</FEboard>
-        <FEboard id="6">54</FEboard>
-    </FEboards>
+    <COPPERid>2</COPPERid>
+  </Merger>
+  <Merger id="9">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>1</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2003</COPPERid>
-</Merger>
-<Merger id="10">
-    <FEboards>
-        <FEboard id="1">55</FEboard>
-        <FEboard id="2">56</FEboard>
-        <FEboard id="3">57</FEboard>
-        <FEboard id="4">58</FEboard>
-        <FEboard id="5">59</FEboard>
-        <FEboard id="6">60</FEboard>
-    </FEboards>
+    <COPPERid>3</COPPERid>
+  </Merger>
+  <Merger id="10">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2003</COPPERid>
-</Merger>
-<Merger id="11">
-    <FEboards>
-        <FEboard id="1">61</FEboard>
-        <FEboard id="2">62</FEboard>
-        <FEboard id="3">63</FEboard>
-        <FEboard id="4">64</FEboard>
-        <FEboard id="5">65</FEboard>
-        <FEboard id="6">66</FEboard>
-    </FEboards>
+    <COPPERid>3</COPPERid>
+  </Merger>
+  <Merger id="11">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2003</COPPERid>
-</Merger>
-<Merger id="12">
-    <FEboards>
-        <FEboard id="1">67</FEboard>
-        <FEboard id="2">68</FEboard>
-        <FEboard id="3">69</FEboard>
-        <FEboard id="4">70</FEboard>
-        <FEboard id="5">71</FEboard>
-        <FEboard id="6">72</FEboard>
-    </FEboards>
+    <COPPERid>3</COPPERid>
+  </Merger>
+  <Merger id="12">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2003</COPPERid>
-</Merger>
-<Merger id="13">
-    <FEboards>
-        <FEboard id="1">73</FEboard>
-        <FEboard id="2">74</FEboard>
-        <FEboard id="3">75</FEboard>
-        <FEboard id="4">76</FEboard>
-        <FEboard id="5">77</FEboard>
-        <FEboard id="6">78</FEboard>
-    </FEboards>
+    <COPPERid>3</COPPERid>
+  </Merger>
+  <Merger id="13">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2004</COPPERid>
-</Merger>
-<Merger id="14">
-    <FEboards>
-        <FEboard id="1">79</FEboard>
-        <FEboard id="2">80</FEboard>
-        <FEboard id="3">81</FEboard>
-        <FEboard id="4">82</FEboard>
-        <FEboard id="5">83</FEboard>
-        <FEboard id="6">84</FEboard>
-    </FEboards>
+    <COPPERid>4</COPPERid>
+  </Merger>
+  <Merger id="14">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2004</COPPERid>
-</Merger>
-<Merger id="15">
-    <FEboards>
-        <FEboard id="1">85</FEboard>
-        <FEboard id="2">86</FEboard>
-        <FEboard id="3">87</FEboard>
-        <FEboard id="4">88</FEboard>
-        <FEboard id="5">89</FEboard>
-        <FEboard id="6">90</FEboard>
-    </FEboards>
+    <COPPERid>4</COPPERid>
+  </Merger>
+  <Merger id="15">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2004</COPPERid>
-</Merger>
-<Merger id="16">
-    <FEboards>
-        <FEboard id="1">91</FEboard>
-        <FEboard id="2">92</FEboard>
-        <FEboard id="3">93</FEboard>
-        <FEboard id="4">94</FEboard>
-        <FEboard id="5">95</FEboard>
-        <FEboard id="6">96</FEboard>
-    </FEboards>
+    <COPPERid>4</COPPERid>
+  </Merger>
+  <Merger id="16">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2004</COPPERid>
-</Merger>
-<Merger id="17">
-    <FEboards>
-        <FEboard id="1">97</FEboard>
-        <FEboard id="2">98</FEboard>
-        <FEboard id="3">99</FEboard>
-        <FEboard id="4">100</FEboard>
-        <FEboard id="5">101</FEboard>
-        <FEboard id="6">102</FEboard>
-    </FEboards>
+    <COPPERid>4</COPPERid>
+  </Merger>
+  <Merger id="17">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>2</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2005</COPPERid>
-</Merger>
-<Merger id="18">
-    <FEboards>
-        <FEboard id="1">103</FEboard>
-        <FEboard id="2">104</FEboard>
-        <FEboard id="3">105</FEboard>
-        <FEboard id="4">106</FEboard>
-        <FEboard id="5">107</FEboard>
-        <FEboard id="6">108</FEboard>
-    </FEboards>
+    <COPPERid>5</COPPERid>
+  </Merger>
+  <Merger id="18">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2005</COPPERid>
-</Merger>
-<Merger id="19">
-    <FEboards>
-        <FEboard id="1">109</FEboard>
-        <FEboard id="2">110</FEboard>
-        <FEboard id="3">111</FEboard>
-        <FEboard id="4">112</FEboard>
-        <FEboard id="5">113</FEboard>
-        <FEboard id="6">114</FEboard>
-    </FEboards>
+    <COPPERid>5</COPPERid>
+  </Merger>
+  <Merger id="19">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2005</COPPERid>
-</Merger>
-<Merger id="20">
-    <FEboards>
-        <FEboard id="1">115</FEboard>
-        <FEboard id="2">116</FEboard>
-        <FEboard id="3">117</FEboard>
-        <FEboard id="4">118</FEboard>
-        <FEboard id="5">119</FEboard>
-        <FEboard id="6">120</FEboard>
-    </FEboards>
+    <COPPERid>5</COPPERid>
+  </Merger>
+  <Merger id="20">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2005</COPPERid>
-</Merger>
-<Merger id="21">
-    <FEboards>
-        <FEboard id="1">121</FEboard>
-        <FEboard id="2">122</FEboard>
-        <FEboard id="3">123</FEboard>
-        <FEboard id="4">124</FEboard>
-        <FEboard id="5">125</FEboard>
-        <FEboard id="6">126</FEboard>
-    </FEboards>
+    <COPPERid>5</COPPERid>
+  </Merger>
+  <Merger id="21">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2006</COPPERid>
-</Merger>
-<Merger id="22">
-    <FEboards>
-        <FEboard id="1">127</FEboard>
-        <FEboard id="2">128</FEboard>
-        <FEboard id="3">129</FEboard>
-        <FEboard id="4">130</FEboard>
-        <FEboard id="5">131</FEboard>
-        <FEboard id="6">132</FEboard>
-    </FEboards>
+    <COPPERid>6</COPPERid>
+  </Merger>
+  <Merger id="22">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2006</COPPERid>
-</Merger>
-<Merger id="23">
-    <FEboards>
-        <FEboard id="1">133</FEboard>
-        <FEboard id="2">134</FEboard>
-        <FEboard id="3">135</FEboard>
-        <FEboard id="4">136</FEboard>
-        <FEboard id="5">137</FEboard>
-        <FEboard id="6">138</FEboard>
-    </FEboards>
+    <COPPERid>6</COPPERid>
+  </Merger>
+  <Merger id="23">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2006</COPPERid>
-</Merger>
-<Merger id="24">
-    <FEboards>
-        <FEboard id="1">139</FEboard>
-        <FEboard id="2">140</FEboard>
-        <FEboard id="3">141</FEboard>
-        <FEboard id="4">142</FEboard>
-        <FEboard id="5">143</FEboard>
-        <FEboard id="6">144</FEboard>
-    </FEboards>
+    <COPPERid>6</COPPERid>
+  </Merger>
+  <Merger id="24">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2006</COPPERid>
-</Merger>
-<Merger id="25">
-    <FEboards>
-        <FEboard id="1">145</FEboard>
-        <FEboard id="2">146</FEboard>
-        <FEboard id="3">147</FEboard>
-        <FEboard id="4">148</FEboard>
-        <FEboard id="5">149</FEboard>
-        <FEboard id="6">150</FEboard>
-    </FEboards>
+    <COPPERid>6</COPPERid>
+  </Merger>
+  <Merger id="25">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2007</COPPERid>
-</Merger>
-<Merger id="26">
-    <FEboards>
-        <FEboard id="1">151</FEboard>
-        <FEboard id="2">152</FEboard>
-        <FEboard id="3">153</FEboard>
-        <FEboard id="4">154</FEboard>
-        <FEboard id="5">155</FEboard>
-        <FEboard id="6">156</FEboard>
-    </FEboards>
+    <COPPERid>7</COPPERid>
+  </Merger>
+  <Merger id="26">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>3</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2007</COPPERid>
-</Merger>
-<Merger id="27">
-    <FEboards>
-        <FEboard id="1">157</FEboard>
-        <FEboard id="2">158</FEboard>
-        <FEboard id="3">159</FEboard>
-        <FEboard id="4">160</FEboard>
-        <FEboard id="5">161</FEboard>
-        <FEboard id="6">162</FEboard>
-    </FEboards>
+    <COPPERid>7</COPPERid>
+  </Merger>
+  <Merger id="27">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2007</COPPERid>
-</Merger>
-<Merger id="28">
-    <FEboards>
-        <FEboard id="1">163</FEboard>
-        <FEboard id="2">164</FEboard>
-        <FEboard id="3">165</FEboard>
-        <FEboard id="4">166</FEboard>
-        <FEboard id="5">167</FEboard>
-        <FEboard id="6">168</FEboard>
-    </FEboards>
+    <COPPERid>7</COPPERid>
+  </Merger>
+  <Merger id="28">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2007</COPPERid>
-</Merger>
-<Merger id="29">
-    <FEboards>
-        <FEboard id="1">169</FEboard>
-        <FEboard id="2">170</FEboard>
-        <FEboard id="3">171</FEboard>
-        <FEboard id="4">172</FEboard>
-        <FEboard id="5">173</FEboard>
-        <FEboard id="6">174</FEboard>
-    </FEboards>
+    <COPPERid>7</COPPERid>
+  </Merger>
+  <Merger id="29">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2008</COPPERid>
-</Merger>
-<Merger id="30">
-    <FEboards>
-        <FEboard id="1">175</FEboard>
-        <FEboard id="2">176</FEboard>
-        <FEboard id="3">177</FEboard>
-        <FEboard id="4">178</FEboard>
-        <FEboard id="5">179</FEboard>
-        <FEboard id="6">180</FEboard>
-    </FEboards>
+    <COPPERid>8</COPPERid>
+  </Merger>
+  <Merger id="30">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2008</COPPERid>
-</Merger>
-<Merger id="31">
-    <FEboards>
-        <FEboard id="1">181</FEboard>
-        <FEboard id="2">182</FEboard>
-        <FEboard id="3">183</FEboard>
-        <FEboard id="4">184</FEboard>
-        <FEboard id="5">185</FEboard>
-        <FEboard id="6">186</FEboard>
-    </FEboards>
+    <COPPERid>8</COPPERid>
+  </Merger>
+  <Merger id="31">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2008</COPPERid>
-</Merger>
-<Merger id="32">
-    <FEboards>
-        <FEboard id="1">187</FEboard>
-        <FEboard id="2">188</FEboard>
-        <FEboard id="3">189</FEboard>
-        <FEboard id="4">190</FEboard>
-        <FEboard id="5">191</FEboard>
-        <FEboard id="6">192</FEboard>
-    </FEboards>
+    <COPPERid>8</COPPERid>
+  </Merger>
+  <Merger id="32">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2008</COPPERid>
-</Merger>
-<Merger id="33">
-    <FEboards>
-        <FEboard id="1">193</FEboard>
-        <FEboard id="2">194</FEboard>
-        <FEboard id="3">195</FEboard>
-        <FEboard id="4">196</FEboard>
-        <FEboard id="5">197</FEboard>
-        <FEboard id="6">198</FEboard>
-    </FEboards>
+    <COPPERid>8</COPPERid>
+  </Merger>
+  <Merger id="33">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2009</COPPERid>
-</Merger>
-<Merger id="34">
-    <FEboards>
-        <FEboard id="1">199</FEboard>
-        <FEboard id="2">200</FEboard>
-        <FEboard id="3">201</FEboard>
-        <FEboard id="4">202</FEboard>
-        <FEboard id="5">203</FEboard>
-        <FEboard id="6">204</FEboard>
-    </FEboards>
+    <COPPERid>9</COPPERid>
+  </Merger>
+  <Merger id="34">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2009</COPPERid>
-</Merger>
-<Merger id="35">
-    <FEboards>
-        <FEboard id="1">205</FEboard>
-        <FEboard id="2">206</FEboard>
-        <FEboard id="3">207</FEboard>
-        <FEboard id="4">208</FEboard>
-        <FEboard id="5">209</FEboard>
-        <FEboard id="6">210</FEboard>
-    </FEboards>
+    <COPPERid>9</COPPERid>
+  </Merger>
+  <Merger id="35">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2009</COPPERid>
-</Merger>
-<Merger id="36">
-    <FEboards>
-        <FEboard id="1">211</FEboard>
-        <FEboard id="2">212</FEboard>
-        <FEboard id="3">213</FEboard>
-        <FEboard id="4">214</FEboard>
-        <FEboard id="5">215</FEboard>
-        <FEboard id="6">216</FEboard>
-    </FEboards>
+    <COPPERid>9</COPPERid>
+  </Merger>
+  <Merger id="36">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>4</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2009</COPPERid>
-</Merger>
-<Merger id="37">
-    <FEboards>
-        <FEboard id="1">217</FEboard>
-        <FEboard id="2">218</FEboard>
-        <FEboard id="3">219</FEboard>
-        <FEboard id="4">220</FEboard>
-        <FEboard id="5">221</FEboard>
-        <FEboard id="6">222</FEboard>
-    </FEboards>
+    <COPPERid>9</COPPERid>
+  </Merger>
+  <Merger id="37">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2010</COPPERid>
-</Merger>
-<Merger id="38">
-    <FEboards>
-        <FEboard id="1">223</FEboard>
-        <FEboard id="2">224</FEboard>
-        <FEboard id="3">225</FEboard>
-        <FEboard id="4">226</FEboard>
-        <FEboard id="5">227</FEboard>
-        <FEboard id="6">228</FEboard>
-    </FEboards>
+    <COPPERid>10</COPPERid>
+  </Merger>
+  <Merger id="38">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2010</COPPERid>
-</Merger>
-<Merger id="39">
-    <FEboards>
-        <FEboard id="1">229</FEboard>
-        <FEboard id="2">230</FEboard>
-        <FEboard id="3">231</FEboard>
-        <FEboard id="4">232</FEboard>
-        <FEboard id="5">233</FEboard>
-        <FEboard id="6">234</FEboard>
-    </FEboards>
+    <COPPERid>10</COPPERid>
+  </Merger>
+  <Merger id="39">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2010</COPPERid>
-</Merger>
-<Merger id="40">
-    <FEboards>
-        <FEboard id="1">235</FEboard>
-        <FEboard id="2">236</FEboard>
-        <FEboard id="3">237</FEboard>
-        <FEboard id="4">238</FEboard>
-        <FEboard id="5">239</FEboard>
-        <FEboard id="6">240</FEboard>
-    </FEboards>
+    <COPPERid>10</COPPERid>
+  </Merger>
+  <Merger id="40">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2010</COPPERid>
-</Merger>
-<Merger id="41">
-    <FEboards>
-        <FEboard id="1">241</FEboard>
-        <FEboard id="2">242</FEboard>
-        <FEboard id="3">243</FEboard>
-        <FEboard id="4">244</FEboard>
-        <FEboard id="5">245</FEboard>
-        <FEboard id="6">246</FEboard>
-    </FEboards>
+    <COPPERid>10</COPPERid>
+  </Merger>
+  <Merger id="41">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2011</COPPERid>
-</Merger>
-<Merger id="42">
-    <FEboards>
-        <FEboard id="1">247</FEboard>
-        <FEboard id="2">248</FEboard>
-        <FEboard id="3">249</FEboard>
-        <FEboard id="4">250</FEboard>
-        <FEboard id="5">251</FEboard>
-        <FEboard id="6">252</FEboard>
-    </FEboards>
+    <COPPERid>11</COPPERid>
+  </Merger>
+  <Merger id="42">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2011</COPPERid>
-</Merger>
-<Merger id="43">
-    <FEboards>
-        <FEboard id="1">253</FEboard>
-        <FEboard id="2">254</FEboard>
-        <FEboard id="3">255</FEboard>
-        <FEboard id="4">256</FEboard>
-        <FEboard id="5">257</FEboard>
-        <FEboard id="6">258</FEboard>
-    </FEboards>
+    <COPPERid>11</COPPERid>
+  </Merger>
+  <Merger id="43">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2011</COPPERid>
-</Merger>
-<Merger id="44">
-    <FEboards>
-        <FEboard id="1">259</FEboard>
-        <FEboard id="2">260</FEboard>
-        <FEboard id="3">261</FEboard>
-        <FEboard id="4">262</FEboard>
-        <FEboard id="5">263</FEboard>
-        <FEboard id="6">264</FEboard>
-    </FEboards>
+    <COPPERid>11</COPPERid>
+  </Merger>
+  <Merger id="44">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2011</COPPERid>
-</Merger>
-<Merger id="45">
-    <FEboards>
-        <FEboard id="1">265</FEboard>
-        <FEboard id="2">266</FEboard>
-        <FEboard id="3">267</FEboard>
-        <FEboard id="4">268</FEboard>
-        <FEboard id="5">269</FEboard>
-        <FEboard id="6">270</FEboard>
-    </FEboards>
+    <COPPERid>11</COPPERid>
+  </Merger>
+  <Merger id="45">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2012</COPPERid>
-</Merger>
-<Merger id="46">
-    <FEboards>
-        <FEboard id="1">271</FEboard>
-        <FEboard id="2">272</FEboard>
-        <FEboard id="3">273</FEboard>
-        <FEboard id="4">274</FEboard>
-        <FEboard id="5">275</FEboard>
-        <FEboard id="6">276</FEboard>
-    </FEboards>
+    <COPPERid>12</COPPERid>
+  </Merger>
+  <Merger id="46">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2012</COPPERid>
-</Merger>
-<Merger id="47">
-    <FEboards>
-        <FEboard id="1">277</FEboard>
-        <FEboard id="2">278</FEboard>
-        <FEboard id="3">279</FEboard>
-        <FEboard id="4">280</FEboard>
-        <FEboard id="5">281</FEboard>
-        <FEboard id="6">282</FEboard>
-    </FEboards>
+    <COPPERid>12</COPPERid>
+  </Merger>
+  <Merger id="47">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>5</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2012</COPPERid>
-</Merger>
-<Merger id="48">
-    <FEboards>
-        <FEboard id="1">283</FEboard>
-        <FEboard id="2">284</FEboard>
-        <FEboard id="3">285</FEboard>
-        <FEboard id="4">286</FEboard>
-        <FEboard id="5">287</FEboard>
-        <FEboard id="6">288</FEboard>
-    </FEboards>
+    <COPPERid>12</COPPERid>
+  </Merger>
+  <Merger id="48">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2012</COPPERid>
-</Merger>
-<Merger id="49">
-    <FEboards>
-        <FEboard id="1">289</FEboard>
-        <FEboard id="2">290</FEboard>
-        <FEboard id="3">291</FEboard>
-        <FEboard id="4">292</FEboard>
-        <FEboard id="5">293</FEboard>
-        <FEboard id="6">294</FEboard>
-    </FEboards>
+    <COPPERid>12</COPPERid>
+  </Merger>
+  <Merger id="49">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2013</COPPERid>
-</Merger>
-<Merger id="50">
-    <FEboards>
-        <FEboard id="1">295</FEboard>
-        <FEboard id="2">296</FEboard>
-        <FEboard id="3">297</FEboard>
-        <FEboard id="4">298</FEboard>
-        <FEboard id="5">299</FEboard>
-        <FEboard id="6">300</FEboard>
-    </FEboards>
+    <COPPERid>13</COPPERid>
+  </Merger>
+  <Merger id="50">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2013</COPPERid>
-</Merger>
-<Merger id="51">
-    <FEboards>
-        <FEboard id="1">301</FEboard>
-        <FEboard id="2">302</FEboard>
-        <FEboard id="3">303</FEboard>
-        <FEboard id="4">304</FEboard>
-        <FEboard id="5">305</FEboard>
-        <FEboard id="6">306</FEboard>
-    </FEboards>
+    <COPPERid>13</COPPERid>
+  </Merger>
+  <Merger id="51">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2013</COPPERid>
-</Merger>
-<Merger id="52">
-    <FEboards>
-        <FEboard id="1">307</FEboard>
-        <FEboard id="2">308</FEboard>
-        <FEboard id="3">309</FEboard>
-        <FEboard id="4">310</FEboard>
-        <FEboard id="5">311</FEboard>
-        <FEboard id="6">312</FEboard>
-    </FEboards>
+    <COPPERid>13</COPPERid>
+  </Merger>
+  <Merger id="52">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2013</COPPERid>
-</Merger>
-<Merger id="53">
-    <FEboards>
-        <FEboard id="1">313</FEboard>
-        <FEboard id="2">314</FEboard>
-        <FEboard id="3">315</FEboard>
-        <FEboard id="4">316</FEboard>
-        <FEboard id="5">317</FEboard>
-        <FEboard id="6">318</FEboard>
-    </FEboards>
+    <COPPERid>13</COPPERid>
+  </Merger>
+  <Merger id="53">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2014</COPPERid>
-</Merger>
-<Merger id="54">
-    <FEboards>
-        <FEboard id="1">319</FEboard>
-        <FEboard id="2">320</FEboard>
-        <FEboard id="3">321</FEboard>
-        <FEboard id="4">322</FEboard>
-        <FEboard id="5">323</FEboard>
-        <FEboard id="6">324</FEboard>
-    </FEboards>
+    <COPPERid>14</COPPERid>
+  </Merger>
+  <Merger id="54">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2014</COPPERid>
-</Merger>
-<Merger id="55">
-    <FEboards>
-        <FEboard id="1">325</FEboard>
-        <FEboard id="2">326</FEboard>
-        <FEboard id="3">327</FEboard>
-        <FEboard id="4">328</FEboard>
-        <FEboard id="5">329</FEboard>
-        <FEboard id="6">330</FEboard>
-    </FEboards>
+    <COPPERid>14</COPPERid>
+  </Merger>
+  <Merger id="55">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2014</COPPERid>
-</Merger>
-<Merger id="56">
-    <FEboards>
-        <FEboard id="1">331</FEboard>
-        <FEboard id="2">332</FEboard>
-        <FEboard id="3">333</FEboard>
-        <FEboard id="4">334</FEboard>
-        <FEboard id="5">335</FEboard>
-        <FEboard id="6">336</FEboard>
-    </FEboards>
+    <COPPERid>14</COPPERid>
+  </Merger>
+  <Merger id="56">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2014</COPPERid>
-</Merger>
-<Merger id="57">
-    <FEboards>
-        <FEboard id="1">337</FEboard>
-        <FEboard id="2">338</FEboard>
-        <FEboard id="3">339</FEboard>
-        <FEboard id="4">340</FEboard>
-        <FEboard id="5">341</FEboard>
-        <FEboard id="6">342</FEboard>
-    </FEboards>
+    <COPPERid>14</COPPERid>
+  </Merger>
+  <Merger id="57">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2015</COPPERid>
-</Merger>
-<Merger id="58">
-    <FEboards>
-        <FEboard id="1">343</FEboard>
-        <FEboard id="2">344</FEboard>
-        <FEboard id="3">345</FEboard>
-        <FEboard id="4">346</FEboard>
-        <FEboard id="5">347</FEboard>
-        <FEboard id="6">348</FEboard>
-    </FEboards>
+    <COPPERid>15</COPPERid>
+  </Merger>
+  <Merger id="58">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2015</COPPERid>
-</Merger>
-<Merger id="59">
-    <FEboards>
-        <FEboard id="1">349</FEboard>
-        <FEboard id="2">350</FEboard>
-        <FEboard id="3">351</FEboard>
-        <FEboard id="4">352</FEboard>
-        <FEboard id="5">353</FEboard>
-        <FEboard id="6">354</FEboard>
-    </FEboards>
+    <COPPERid>15</COPPERid>
+  </Merger>
+  <Merger id="59">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>6</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2015</COPPERid>
-</Merger>
-<Merger id="60">
-    <FEboards>
-        <FEboard id="1">355</FEboard>
-        <FEboard id="2">356</FEboard>
-        <FEboard id="3">357</FEboard>
-        <FEboard id="4">358</FEboard>
-        <FEboard id="5">359</FEboard>
-        <FEboard id="6">360</FEboard>
-    </FEboards>
+    <COPPERid>15</COPPERid>
+  </Merger>
+  <Merger id="60">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2015</COPPERid>
-</Merger>
-<Merger id="61">
-    <FEboards>
-        <FEboard id="1">361</FEboard>
-        <FEboard id="2">362</FEboard>
-        <FEboard id="3">363</FEboard>
-        <FEboard id="4">364</FEboard>
-        <FEboard id="5">365</FEboard>
-        <FEboard id="6">366</FEboard>
-    </FEboards>
+    <COPPERid>15</COPPERid>
+  </Merger>
+  <Merger id="61">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2016</COPPERid>
-</Merger>
-<Merger id="62">
-    <FEboards>
-        <FEboard id="1">367</FEboard>
-        <FEboard id="2">368</FEboard>
-        <FEboard id="3">369</FEboard>
-        <FEboard id="4">370</FEboard>
-        <FEboard id="5">371</FEboard>
-        <FEboard id="6">372</FEboard>
-    </FEboards>
+    <COPPERid>16</COPPERid>
+  </Merger>
+  <Merger id="62">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>1</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2016</COPPERid>
-</Merger>
-<Merger id="63">
-    <FEboards>
-        <FEboard id="1">373</FEboard>
-        <FEboard id="2">374</FEboard>
-        <FEboard id="3">375</FEboard>
-        <FEboard id="4">376</FEboard>
-        <FEboard id="5">377</FEboard>
-        <FEboard id="6">378</FEboard>
-    </FEboards>
+    <COPPERid>16</COPPERid>
+  </Merger>
+  <Merger id="63">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2016</COPPERid>
-</Merger>
-<Merger id="64">
-    <FEboards>
-        <FEboard id="1">379</FEboard>
-        <FEboard id="2">380</FEboard>
-        <FEboard id="3">381</FEboard>
-        <FEboard id="4">382</FEboard>
-        <FEboard id="5">383</FEboard>
-        <FEboard id="6">384</FEboard>
-    </FEboards>
+    <COPPERid>16</COPPERid>
+  </Merger>
+  <Merger id="64">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>2</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2016</COPPERid>
-</Merger>
-<Merger id="65">
-    <FEboards>
-        <FEboard id="1">385</FEboard>
-        <FEboard id="2">386</FEboard>
-        <FEboard id="3">387</FEboard>
-        <FEboard id="4">388</FEboard>
-        <FEboard id="5">389</FEboard>
-        <FEboard id="6">390</FEboard>
-    </FEboards>
+    <COPPERid>16</COPPERid>
+  </Merger>
+  <Merger id="65">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2017</COPPERid>
-</Merger>
-<Merger id="66">
-    <FEboards>
-        <FEboard id="1">391</FEboard>
-        <FEboard id="2">392</FEboard>
-        <FEboard id="3">393</FEboard>
-        <FEboard id="4">394</FEboard>
-        <FEboard id="5">395</FEboard>
-        <FEboard id="6">396</FEboard>
-    </FEboards>
+    <COPPERid>17</COPPERid>
+  </Merger>
+  <Merger id="66">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>3</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2017</COPPERid>
-</Merger>
-<Merger id="67">
-    <FEboards>
-        <FEboard id="1">397</FEboard>
-        <FEboard id="2">398</FEboard>
-        <FEboard id="3">399</FEboard>
-        <FEboard id="4">400</FEboard>
-        <FEboard id="5">401</FEboard>
-        <FEboard id="6">402</FEboard>
-    </FEboards>
+    <COPPERid>17</COPPERid>
+  </Merger>
+  <Merger id="67">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>C</FinesseSlot>
-    <COPPERid>2017</COPPERid>
-</Merger>
-<Merger id="68">
-    <FEboards>
-        <FEboard id="1">403</FEboard>
-        <FEboard id="2">404</FEboard>
-        <FEboard id="3">405</FEboard>
-        <FEboard id="4">406</FEboard>
-        <FEboard id="5">407</FEboard>
-        <FEboard id="6">408</FEboard>
-    </FEboards>
+    <COPPERid>17</COPPERid>
+  </Merger>
+  <Merger id="68">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>4</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>D</FinesseSlot>
-    <COPPERid>2017</COPPERid>
-</Merger>
-<Merger id="69">
-    <FEboards>
-        <FEboard id="1">409</FEboard>
-        <FEboard id="2">410</FEboard>
-        <FEboard id="3">411</FEboard>
-        <FEboard id="4">412</FEboard>
-        <FEboard id="5">413</FEboard>
-        <FEboard id="6">414</FEboard>
-    </FEboards>
+    <COPPERid>17</COPPERid>
+  </Merger>
+  <Merger id="69">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>A</FinesseSlot>
-    <COPPERid>2018</COPPERid>
-</Merger>
-<Merger id="70">
-    <FEboards>
-        <FEboard id="1">415</FEboard>
-        <FEboard id="2">416</FEboard>
-        <FEboard id="3">417</FEboard>
-        <FEboard id="4">418</FEboard>
-        <FEboard id="5">419</FEboard>
-        <FEboard id="6">420</FEboard>
-    </FEboards>
+    <COPPERid>18</COPPERid>
+  </Merger>
+  <Merger id="70">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>5</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>1</Azimuth>
+      </Module>
+    </Modules>
     <FinesseSlot>B</FinesseSlot>
-    <COPPERid>2018</COPPERid>
-</Merger>
+    <COPPERid>18</COPPERid>
+  </Merger>
+  <Merger id="71">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>2</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>3</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>4</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>5</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>6</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>7</Azimuth>
+      </Module>
+    </Modules>
+    <FinesseSlot>C</FinesseSlot>
+    <COPPERid>18</COPPERid>
+  </Merger>
+  <Merger id="72">
+    <Modules>
+      <Module FEBSlot="1">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>8</Azimuth>
+      </Module>
+      <Module FEBSlot="2">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>9</Azimuth>
+      </Module>
+      <Module FEBSlot="3">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>10</Azimuth>
+      </Module>
+      <Module FEBSlot="4">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>11</Azimuth>
+      </Module>
+      <Module FEBSlot="5">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>12</Azimuth>
+      </Module>
+      <Module FEBSlot="6">
+        <Sector>6</Sector>
+        <Ring>7</Ring>
+        <Azimuth>13</Azimuth>
+      </Module>
+    </Modules>
+    <FinesseSlot>D</FinesseSlot>
+    <COPPERid>18</COPPERid>
+  </Merger>
 </FrontEndMapping>

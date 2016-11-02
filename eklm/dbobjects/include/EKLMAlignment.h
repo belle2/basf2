@@ -11,10 +11,8 @@
 #ifndef EKLMALIGNMENT_H
 #define EKLMALIGNMENT_H
 
-/* System headers. */
-#include <stdint.h>
-
 /* C++ headers. */
+#include <cstdint>
 #include <map>
 
 /* External headers. */

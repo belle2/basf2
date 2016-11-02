@@ -99,12 +99,12 @@ namespace Belle2 {
     double hasRestOfEventTracks(const Particle* part);
 
     /**
-     * 0 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
+     * -1 (1) if the RestOfEvent related to the given Particle is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
     double isRelatedRestOfEventB0Flavor(const Particle* part);
 
     /**
-     * 0 (1) if current RestOfEvent is related to a B0bar (B0). The MCError of Breco has to be 0 or 1, the output of the variable is -2 otherwise.
+     * -1 (1) if current RestOfEvent is related to a B0bar (B0). The MCError bit of Breco has to be 0, 1, 2, 16 or 1024. The output of the variable is 0 otherwise. If one Particle in the Rest of Event is found to belong the reconstructed B0, the output is -2(2) for a B0bar (B0) on the CP side.
      */
     double isRestOfEventB0Flavor(const Particle*);
 

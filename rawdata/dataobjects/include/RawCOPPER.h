@@ -304,6 +304,9 @@ namespace Belle2 {
                                    int* detector_buf_4th, int nwords_4th,
                                    RawCOPPERPackerInfo rawcprpacker_info);
 
+    /** Return a short summary of this object's contents in HTML format. */
+    std::string getInfoHTML() const;
+
     enum {
       POS_FORMAT_VERSION = 1,
       FORMAT_MASK = 0x0000FF00

@@ -852,9 +852,34 @@ namespace Belle2 {
     double getGlobalPhiRotation() const { return m_globalPhiRotation;}
 
     /**
-     * Get the global z coordinate of CDC.
+     * Get the global x offset of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetX() const { return m_globalOffsetX;}
+
+    /**
+     * Get the global y offset of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetY() const { return m_globalOffsetY;}
+
+    /**
+     * Get the global z offset of CDC wrt Belle2 coord. system.
      */
     double getGlobalOffsetZ() const { return m_globalOffsetZ;}
+
+    /**
+     * Get the global offset angle a of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetA() const { return m_globalOffsetA;}
+
+    /**
+     * Get the global offset angle b of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetB() const { return m_globalOffsetB;}
+
+    /**
+     * Get the global offset angle c of CDC wrt Belle2 coord. system.
+     */
+    double getGlobalOffsetC() const { return m_globalOffsetC;}
 
     /**
      * Get the fiducial Rmin of CDC sensitive volume.
@@ -1084,8 +1109,13 @@ namespace Belle2 {
 
   private:
 
-    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (degrees). */
-    double m_globalOffsetZ = 0.0; /**< The offset of the whole cdc in z with respect to the IP (mm). */
+    double m_globalPhiRotation = 0.0; /**< Global rotation in phi (rad). */
+    double m_globalOffsetX = 0.0; /**< Offset x of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetY = 0.0; /**< Offset y of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetZ = 0.0; /**< Offset z of the whole cdc wrt B2 coord system (cm). */
+    double m_globalOffsetA = 0.0; /**< Offset angle a of the whole cdc wrt B2 coord system (rad). */
+    double m_globalOffsetB = 0.0; /**< Offset angle b of the whole cdc wrt B2 coord system (rad). */
+    double m_globalOffsetC = 0.0; /**< Offset angle c of the whole cdc wrt B2 coord system (rad). */
     double m_fiducialRmin; /**< Minimum radius of the CDC fiducial volume. */
     double m_fiducialRmax; /**< Maximum radius of the CDC fiducial volume. */
     MotherVolume m_mother;    /**< CDC mother volume. */
@@ -1099,13 +1129,13 @@ namespace Belle2 {
     std::vector<Cover> m_covers;/**< Covers. */
     std::vector<Rib> m_ribs;/**< Ribs. */
 
-    double m_senseWireDiameter = 0.030; /**< Sense wire diameter (mm). */
+    double m_senseWireDiameter = 0.003; /**< Sense wire diameter (cm). */
     int m_senseWireNumbers = 14336;/**< Number of sense wires. */
-    double m_senseWireTension = 50.0; /**< Sense wire tension. */
-    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
-    double m_fieldWireDiameter = 0.126; /**< Field wire diameter (mm). */
+    double m_senseWireTension = 50.0; /**< Sense wire tension (gW). */
+    //    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
+    double m_fieldWireDiameter = 0.0126; /**< Field wire diameter (cm). */
     int m_fieldWireNumbers = 42240; /**< Number of field wires. */
-    double m_feedThroughLength = 15.0; /**< Feedthrough length (mm). */
+    double m_feedThroughLength = 1.5; /**< Feedthrough length (cm). */
     bool m_debug;/**< Debug mode. */
     int m_materialDefinitionMode;/**< Material definition mode. */
     int m_senseWireZposMode; /**< Sense wire z-position definition mode. */
@@ -1124,7 +1154,7 @@ namespace Belle2 {
     bool m_wireSag;        /*!< Switch for sense wire sag */
     bool m_modLeftRightFlag; /*!< Switch for modified left/right flag */
 
-    ClassDef(CDCGeometry, 1);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCGeometry, 2);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

@@ -12,7 +12,7 @@
 #ifndef ECLSIMHIT_H
 #define ECLSIMHIT_H
 
-#include <TVector3.h>
+#include <G4ThreeVector.hh>
 #include <simulation/dataobjects/SimHitBase.h>
 
 namespace Belle2 {
@@ -29,20 +29,23 @@ namespace Belle2 {
   class ECLSimHit : public SimHitBase {
   public:
     /** default constructor for ROOT */
-    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum(0, 0, 0), m_Position(0, 0,
-          0) {;}
+    ECLSimHit(): SimHitBase(), m_CellId(0), m_TrackId(0), m_Pdg(0), m_FlightTime(0), m_Edep(0), m_Momentum{0}, m_Position{0} {;}
+    //    ECLSimHit() {} // do nothing
 
     //! Useful Constructor
     ECLSimHit(
       int CellId,            /**< Cell ID */
       int TrackId,           /**< Track ID */
       int Pdg,               /**< Particle PDG (can be one of secondaries) */
-      float FlightTime,      /**< Flight time from IP */
-      float Edep,            /**< Deposit energy */
-      TVector3 Momentum,     /**< Momentum */
-      TVector3 Position        /**< Position */
-    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep), m_Momentum(Momentum),
-      m_Position(Position) {;}
+      double FlightTime,      /**< Flight time from IP */
+      double Edep,            /**< Deposit energy */
+      G4ThreeVector Momentum,     /**< Momentum */
+      G4ThreeVector Position        /**< Position */
+    ): SimHitBase(), m_CellId(CellId), m_TrackId(TrackId), m_Pdg(Pdg), m_FlightTime(FlightTime), m_Edep(Edep)
+    {
+      m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z();
+      m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z();
+    }
 
     /*! Set Cell ID
      */
@@ -58,23 +61,23 @@ namespace Belle2 {
 
     /*! Set Flight time from IP
      */
-    void setFlightTime(double FlightTime) { m_FlightTime = static_cast<float>(FlightTime); }
+    void setFlightTime(double FlightTime) { m_FlightTime = static_cast<double>(FlightTime); }
 
     /*! Set Deposit energy
      */
-    void setEnergyDep(double Edep) { m_Edep = static_cast<float>(Edep); }
+    void setEnergyDep(double Edep) { m_Edep = static_cast<double>(Edep); }
 
     /*! Set Momentum
      */
-    void setMomentum(TVector3 Momentum) { m_Momentum = Momentum; }
+    void setMomentum(const G4ThreeVector& Momentum) { m_Momentum[0] = Momentum.x(); m_Momentum[1] = Momentum.y(), m_Momentum[2] = Momentum.z(); }
 
     /*! Set Position
      */
-    //KM void setPosIn(TVector3 Position) { m_Position = Position; }
+    //KM void setPosIn(G4ThreeVector Position) { m_Position = Position; }
 
     /*! Set Position
      */
-    void setPosition(TVector3 Position) { m_Position = Position; }
+    void setPosition(const G4ThreeVector& Position) { m_Position[0] = Position.x(); m_Position[1] = Position.y(), m_Position[2] = Position.z(); }
 
     /*! Get Cell ID
      * @return Cell ID
@@ -104,18 +107,17 @@ namespace Belle2 {
     /*! Get Momentum
      * @return Momentum
      */
-    TVector3 getMomentum() const { return m_Momentum; }
+    G4ThreeVector getMomentum() const { return G4ThreeVector(m_Momentum[0], m_Momentum[1], m_Momentum[2]); }
 
     /*! Get Position
      * @return Position
      */
-    TVector3 getPosIn() const { return m_Position; }
+    G4ThreeVector getPosIn() const { return getPosition(); }
 
     /*! Get Position
      * @return Position
      */
-    TVector3 getPosition() const { return m_Position; }
-
+    G4ThreeVector getPosition() const { return G4ThreeVector(m_Position[0], m_Position[1], m_Position[2]); }
 
     /** Shift the SimHit in time (needed for beam background mixing)
      * @param delta The value of the time shift.
@@ -127,13 +129,13 @@ namespace Belle2 {
     int m_CellId;            /**< Cell ID */
     int m_TrackId;           /**< Track ID */
     int m_Pdg;               /**< Particle PDG (can be one of secondaries) */
-    float m_FlightTime;      /**< Flight time from IP */
-    float m_Edep;            /**< Deposit energy */
-    TVector3 m_Momentum;     /**< Momentum */
-    TVector3 m_Position;        /**< Position */
+    double m_FlightTime;      /**< Flight time from IP */
+    double m_Edep;            /**< Deposit energy */
+    double m_Momentum[3];     /**< Momentum */
+    double m_Position[3];        /**< Position */
 
 
-    ClassDef(ECLSimHit, 3);/**< the class title */
+    ClassDef(ECLSimHit, 5);/**< the class title */
 
   };
 } // end namespace Belle2

@@ -12,10 +12,10 @@
 #define EKLMRECONSTRUCTORMODULE_H
 
 /* Belle2 headers. */
+#include <eklm/dbobjects/EKLMReconstructionParameters.h>
 #include <eklm/dbobjects/EKLMTimeCalibration.h>
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/geometry/TransformData.h>
-#include <eklm/simulation/Digitizer.h>
 #include <framework/core/Module.h>
 #include <framework/database/DBObjPtr.h>
 
@@ -79,7 +79,6 @@ namespace Belle2 {
      */
     bool fastHit(HepGeom::Point3D<double>& pos, double time);
 
-
   private:
 
     /** Geometry data. */
@@ -91,8 +90,8 @@ namespace Belle2 {
     /** Transformation data. */
     EKLM::TransformData* m_TransformData;
 
-    /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_digPar;
+    /** Reconstruction parameters. */
+    DBObjPtr<EKLMReconstructionParameters> m_RecPar;
 
     /** Time calibration data. */
     DBObjPtr<EKLMTimeCalibration> m_TimeCalibration;

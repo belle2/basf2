@@ -195,7 +195,6 @@ namespace Belle2 {
 
       /**
        * Receive the storage for the best matching segment train.
-       * @return
        */
       const std::vector<SegmentInformation*>& getGoodSegmentTrain() const
       {

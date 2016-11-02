@@ -9,10 +9,10 @@
  **************************************************************************/
 
 #include "arich/modules/arichReconstruction/ARICHReconstruction.h"
+#include "arich/dbobjects/ARICHGeometryConfig.h"
 #include "arich/modules/arichReconstruction/Utility.h"
-#include "arich/geometry/ARICHGeometryPar.h"
 #include "arich/geometry/ARICHBtestGeometryPar.h"
-#include "arich/dataobjects/ARICHDigit.h"
+#include "arich/dataobjects/ARICHHit.h"
 #include "arich/dataobjects/ARICHTrack.h"
 
 // DataStore
@@ -28,6 +28,7 @@
 #include <TRotation.h>
 #include <TRandom3.h>
 #include <TFile.h>
+#include <TGraph2D.h>
 
 using namespace std;
 using namespace boost;
@@ -36,9 +37,8 @@ namespace Belle2 {
 
   using namespace arich;
 
-  ARICHReconstruction::ARICHReconstruction(int storePhot, int beamtest):
-    m_arichGeoParameters(ARICHGeometryPar::Instance()),
-    m_beamtest(beamtest),
+  ARICHReconstruction::ARICHReconstruction(int storePhot):
+    m_arichgp(),
     m_bkgLevel(0),
     m_trackPosRes(0),
     m_trackAngRes(0),
@@ -62,28 +62,20 @@ namespace Belle2 {
   void ARICHReconstruction::initialize()
   {
 
-    if (!m_arichGeoParameters->isInit()) {
-      GearDir content("/Detector/DetectorComponent[@name='ARICH']/Content");
-      m_arichGeoParameters->Initialize(content);
-    }
-    if (!m_arichGeoParameters->isInit()) {
-      B2ERROR("Component ARICH not found in Gearbox");
-      return;
-    }
-
     for (const auto& part : Const::chargedStableSet) {
       p_mass[part.getIndex()] = part.getMass();
     }
 
-    m_nAerogelLayers = m_arichGeoParameters->getNumberOfAerogelRadiators();
-
+    m_nAerogelLayers = m_arichgp->getAerogelPlane().getNLayers();
     m_thickness[m_nAerogelLayers] = 0;
     for (unsigned int i = 0; i < m_nAerogelLayers; i++) {
-      m_refractiveInd[i] = m_arichGeoParameters->getAerogelRefIndex(i);
+      m_refractiveInd[i] = m_arichgp->getAerogelPlane().getLayerRefIndex(i + 1);
       m_anorm[i] = TVector3(0, 0, 1);
-      m_thickness[i] = m_arichGeoParameters->getAerogelThickness(i);
-      m_zaero[i] = m_arichGeoParameters->getAerogelZPosition(i) + m_thickness[i];
-      m_transmissionLen[i] = m_arichGeoParameters->getAerogelTransmissionLength(i) ; // aerogel transmission length;
+      m_thickness[i] = m_arichgp->getAerogelPlane().getLayerThickness(i + 1);
+      if (i == 0) m_zaero[i] = m_arichgp->getAerogelPlane().getAerogelZPosition() + m_thickness[i];
+      else  m_zaero[i] = m_zaero[i - 1] +  m_thickness[i];
+
+      m_transmissionLen[i] = m_arichgp->getAerogelPlane().getLayerTrLength(i + 1) ; // aerogel transmission length;
 
       // measured FOM; aeroMerit is number of detected photons for beam of beta=1 and perpedicular incidence to aerogel tile
       // (corrected for geometrical acceptance). n0[i] is then calculated from
@@ -93,9 +85,9 @@ namespace Belle2 {
       m_thickness[m_nAerogelLayers]   += m_thickness[i];
     }
     m_refractiveInd[m_nAerogelLayers  ]   = 1.0;
-    m_refractiveInd[m_nAerogelLayers + 1]   = m_arichGeoParameters->getDetectorWindowRefIndex();
-    m_zaero[m_nAerogelLayers  ] = m_arichGeoParameters->getDetectorZPosition();
-    m_zaero[m_nAerogelLayers + 1] = m_zaero[m_nAerogelLayers] + m_arichGeoParameters->getDetectorWindowThickness();
+    m_refractiveInd[m_nAerogelLayers + 1]   = m_arichgp->getHAPDGeometry().getWinRefIndex();
+    m_zaero[m_nAerogelLayers  ] = m_arichgp->getDetectorZPosition();
+    m_zaero[m_nAerogelLayers + 1] = m_zaero[m_nAerogelLayers] + m_arichgp->getHAPDGeometry().getWinThickness();
 
   }
 
@@ -103,13 +95,13 @@ namespace Belle2 {
   int ARICHReconstruction::InsideDetector(TVector3 a, int copyno)
   {
     if (copyno == -1) return 0;
-    TVector3 origin = m_arichGeoParameters->getOrigin(copyno);
-    TVector2 origin2(origin.X(), origin.Y());
+    TVector2 origin;
+    origin.SetMagPhi(m_arichgp->getDetectorPlane().getSlotR(copyno), m_arichgp->getDetectorPlane().getSlotPhi(copyno));
     TVector2 a2(a.X(), a.Y());
-    double phi = m_arichGeoParameters->getModAngle(copyno);
-    TVector2 diff = a2 - origin2;
+    double phi = m_arichgp->getDetectorPlane().getSlotPhi(copyno);
+    TVector2 diff = a2 - origin;
     diff = diff.Rotate(-phi);
-    const double size = m_arichGeoParameters->getSensitiveSurfaceSize();
+    const double size = m_arichgp->getHAPDGeometry().getAPDSizeX();
     if (fabs(diff.X()) < size / 2. && fabs(diff.Y()) < size / 2.) {
       return 1;
     }
@@ -119,15 +111,6 @@ namespace Belle2 {
 
   int ARICHReconstruction::smearTrack(ARICHTrack& arichTrack)
   {
-    TRotation rot;  TVector3  rc; TVector3 rrel; TVector3 offset;
-    if (m_beamtest % 2 == 0 && m_beamtest != 0) {
-      static ARICHBtestGeometryPar* _arichbtgp = ARICHBtestGeometryPar::Instance();
-      rot  =  _arichbtgp->getFrameRotation();
-      rc   =  _arichbtgp->getRotationCenter();
-      offset = _arichbtgp->getOffset();
-      rrel  =  rc - rot * rc;
-    }
-
     double a = gRandom->Gaus(0, m_trackAngRes);
     double b = gRandom->Gaus(0, m_trackAngRes);
     TVector3 dirf(a, b, sqrt(1 - a * a - b * b));
@@ -138,10 +121,6 @@ namespace Belle2 {
     TVector3 odir  = arichTrack.getDirection();
     double omomentum  = arichTrack.getMomentum();
     TVector3 rdir = TransformFromFixed(odir) * dirf;  // global system
-    if (m_beamtest % 2 == 0 && m_beamtest != 0) {
-      rdir = rot * rdir;
-      rpoint = rot * rpoint + rrel - (rc + offset);
-    }
     double rmomentum = omomentum;
     arichTrack.setReconstructedValues(rpoint, rdir, rmomentum);
     return 1;
@@ -161,17 +140,23 @@ namespace Belle2 {
 
     double rmir = 0; double angmir = 0; int section[2] = {0, 0};
 
-    int tileID = m_arichGeoParameters->getAerogelTileID(r.XYvector());
+    unsigned tileID = m_arichgp->getAerogelPlane().getAerogelTileID(r.X(), r.Y());
+
     if (tileID == 0 && opt == 1) return TVector3();
 
-    int nmir = m_arichGeoParameters->getNMirrors();
+    int nmir = m_arichgp->getMirrors().getNMirrors();
     if (nmir > 0) {
-      rmir = m_arichGeoParameters->getMirrorPoint(0).XYvector().Mod();
-      angmir = m_arichGeoParameters->getMirrorsStartAngle();
+      rmir = m_arichgp->getMirrors().getPoint(1).XYvector().Mod();
       double dangle = 2 * M_PI / nmir;
+      angmir = m_arichgp->getMirrors().getStartAngle() - dangle / 2.;
+
       double trkangle = r.XYvector().Phi() - angmir;
       if (trkangle < 0) trkangle += 2 * M_PI;
-      section[1]  = int(trkangle / dangle);
+      if (trkangle > 2 * M_PI) trkangle -= 2 * M_PI;
+
+      section[1]  = int(trkangle / dangle) + 1;
+
+
     }
 
     bool reflok = false; bool refl = false;
@@ -184,7 +169,7 @@ namespace Belle2 {
       path = (z[a] - r.z()) / dirf.z();
       TVector3 r0 = r;
       if (a == n && opt == 1) {
-        if (m_arichGeoParameters->getAerogelTileID(r.XYvector()) != tileID) return TVector3();
+        if (m_arichgp->getAerogelPlane().getAerogelTileID(r.X(), r.Y()) != tileID) return TVector3();
       }
       r += dirf * path;
       TVector2 rxy = r.XYvector();
@@ -192,18 +177,21 @@ namespace Belle2 {
       if (a != n || rxy.Mod() < rmir || nmir == 0) continue;
       double angle = rxy.Phi() - angmir;
       if (angle < 0) angle += 2 * M_PI;
+      if (angle > 2 * M_PI) angle -= 2 * M_PI;
       double dangle = 2 * M_PI / nmir;
-      section[0] = int(angle / dangle);
-      if (r.Mag() > (r - 2 * m_arichGeoParameters->getMirrorPoint(section[0])).Mag()) {
+      section[0] = int(angle / dangle) + 1;
+      if (r.Mag() > (r - 2 * m_arichgp->getMirrors().getPoint(section[0])).Mag()) {
         refl = true;
         for (int k = 0; k < 2; k++) {
-          TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(section[k]);
-          TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(section[k]);
+          TVector3 mirpoint = m_arichgp->getMirrors().getPoint(section[k]);
+          mirpoint.SetZ(mirpoint.Z());
+          TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(section[k]);
           double s = dirf * mirnorm;
           double s1 = (mirpoint - r0) * mirnorm;
           r = r0 + s1 / s * dirf;
-          if (r.Z() < m_arichGeoParameters->getMirrorsZPosition()) return TVector3();
-          if (fabs(r.XYvector().DeltaPhi(mirnorm.XYvector())) > double(M_PI / nmir)) { r = r0; continue;}
+          if (r.Z() < m_arichgp->getMirrors().getZPosition() - m_arichgp->getMirrors().getPlateWidth() / 2. ||
+              r.Z() > m_arichgp->getMirrors().getZPosition() + m_arichgp->getMirrors().getPlateWidth() / 2.) return TVector3();
+          if (fabs(r.XYvector().DeltaPhi(mirpoint.XYvector())) > double(M_PI / nmir)) { r = r0; continue;}
           dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
           path = (z[a] - r.z()) / dirf.z();
           r += dirf * path;
@@ -219,9 +207,9 @@ namespace Belle2 {
   TVector3 ARICHReconstruction::HitVirtualPosition(const TVector3& hitpos, int mirrorID)
   {
 
-    if (mirrorID == -1) return hitpos;
-    TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(mirrorID);
-    TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(mirrorID);
+    if (mirrorID == 0) return hitpos;
+    TVector3 mirpoint = m_arichgp->getMirrors().getPoint(mirrorID);
+    TVector3 mirnorm = m_arichgp->getMirrors().getNormVector(mirrorID);
     return hitpos - 2 * ((hitpos - mirpoint) * mirnorm) * mirnorm;
   }
 
@@ -249,8 +237,8 @@ namespace Belle2 {
     // dirf photon direction in aerogel
     static TVector3 norm(0, 0, 1); // detector plane normal vector
 
-    double dwin    = m_arichGeoParameters->getDetectorWindowThickness();
-    double refractiveInd0 = m_arichGeoParameters->getDetectorWindowRefIndex();
+    double dwin    = m_arichgp->getHAPDGeometry().getWinThickness();
+    double refractiveInd0 = m_arichgp->getHAPDGeometry().getWinRefIndex();
 
     // iteration is stoped when the difference of photon positions on first aerogel exit
     // between two iterations is smaller than this value.
@@ -319,13 +307,17 @@ namespace Belle2 {
   }
 
 
-  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrack, StoreArray<ARICHDigit>& arichDigits, ARICHLikelihood& arichLikelihood)
+  int ARICHReconstruction::likelihood2(ARICHTrack& arichTrackGlob, StoreArray<ARICHHit>& arichHits, ARICHLikelihood& arichLikelihood)
   {
 
-    const unsigned int nPhotonHits = arichDigits.getEntries(); // number of detected photons
+    const unsigned int nPhotonHits = arichHits.getEntries(); // number of detected photons
 
     if (m_nAerogelLayers + 1 > c_noOfAerogels) B2ERROR("ARICHReconstrucion: number of aerogel layers defined in the xml file exceeds "
                                                          << c_noOfAerogels);
+
+    // tranform track to local frame
+    ARICHTrack arichTrack(m_arichgp->getMasterVolume().pointToLocal(arichTrackGlob.getPosition()),
+                          arichTrackGlob.getMomentum()*arichTrackGlob.getDirection());
 
     double  logL[c_noOfHypotheses] = {0.0};
     double  nBgr[c_noOfHypotheses] = {0.0};
@@ -335,11 +327,10 @@ namespace Belle2 {
     double  thetaCh[c_noOfHypotheses][c_noOfAerogels] = { {0.0} }; // expected Cherenkov angle
 
     // read some geometry parameters
-    double padSize = m_arichGeoParameters->getDetectorPadSize();
+    double padSize = m_arichgp->getHAPDGeometry().getPadSize();
     double padArea = padSize / Unit::m * padSize / Unit::m;
-    //int padNum = m_arichGeoParameters->getDetectorXPadNumber() * m_arichGeoParameters->getDetectorXPadNumber();
-    int nMirSeg = m_arichGeoParameters->getNMirrors();
-    double angmir  = m_arichGeoParameters->getMirrorsStartAngle();
+    int nMirSeg = m_arichgp->getMirrors().getNMirrors();
+    double angmir  = m_arichgp->getMirrors().getStartAngle();
 
     // Detected photons within expected cherenkov ring (within +/-3 sigma)
     int nDetPhotons[c_noOfHypotheses] = {0};
@@ -352,12 +343,13 @@ namespace Belle2 {
     // Calculate number of expected detected photons (emmited x geometrical acceptance).
     // -----------------------------------------------------
 
-    float nphot_scaling = 20.;
-    int nStep = 5;
+    float nphot_scaling = 20.; // number of photons to be traced is (expected number of emitted photons * nphot_scaling)
+    int nStep = 5;             // number of steps in one aerogel layer
 
     // loop over all particle hypotheses
     for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) {
 
+      // absorbtion factor
       double abs = 1;
 
       // loop over aerogel layers
@@ -375,7 +367,6 @@ namespace Belle2 {
         double dxx = pathLengthRadiator / double(nStep);
         // number of photons to be emmited per step (number of expected photons * nphot_scaling)
         double nPhot = m_n0[iAerogel] * sin(thetaCh[iHyp][iAerogel]) * sin(thetaCh[iHyp][iAerogel]) * dxx * nphot_scaling;
-
         TVector3 exit_point = getTrackPositionAtZ(arichTrack, m_zaero[iAerogel]);
 
         // loop over emmision point steps
@@ -384,30 +375,20 @@ namespace Belle2 {
           TVector3 epoint = exit_point - (0.5 + iepoint) * dxx * edir;
           abs *= exp(-dxx / m_transmissionLen[iAerogel]);
           unsigned int genPhot = nPhot * abs; // number of photons to emmit in current step, including absorbtion correction
-          if (genPhot > 500) std::cout << genPhot << std::endl;
+
           // loop over emmited "photons"
+
           for (unsigned int iPhoton = 0; iPhoton < genPhot; iPhoton++) {
             double fi = 2 * M_PI * iPhoton / float(genPhot);
             TVector3 adirf = setThetaPhi(thetaCh[iHyp][iAerogel], fi); // particle system
             adirf =  TransformFromFixed(edir) * adirf;  // global system
             int ifi = int (fi * 20 / 2. / M_PI);
+            TVector3 dposition = FastTracking(adirf, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel], m_nAerogelLayers - iAerogel, 1);
 
-            if (!m_arichGeoParameters->isSimple()) {
-              TVector3 dposition = FastTracking(adirf, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel], m_nAerogelLayers - iAerogel, 1);
-              int copyno =  m_arichGeoParameters->getCopyNo(dposition);
-              if (dposition.Mag() > 1.0) nSig_wo_acc[iHyp][iAerogel][ifi] += 1;
-              if (InsideDetector(dposition, copyno)) nSig_w_acc[iHyp][iAerogel] += 1;
-
-            } else {
-
-              TVector3 dposition = FastTrackingSimple(adirf, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel], m_nAerogelLayers - iAerogel);
-              for (int ik = 1; ik <= m_arichGeoParameters->getNMCopies(); ik++) {
-                if (InsideDetector(dposition, ik)) {
-                  nSig_w_acc[iHyp][iAerogel] += 1;
-                  break;
-                }
-              }
-            }
+            unsigned  copyno =  m_arichgp->getDetectorPlane().pointSlotID(dposition.X(), dposition.Y());
+            if (dposition.Mag() > 1.0) nSig_wo_acc[iHyp][iAerogel][ifi] += 1;
+            if (!copyno) continue;
+            if (InsideDetector(dposition, copyno)) nSig_w_acc[iHyp][iAerogel] += 1;
           }
         }
 
@@ -428,7 +409,7 @@ namespace Belle2 {
       }
 
       // implement method to calculate expected number of background hits (for now set to 0, same for all particle hypotheses)
-      nBgr[iHyp] = 0; //m_bkgLevel * padArea * padNum * m_arichGeoParameters->getNMCopies();
+      nBgr[iHyp] = 0; //m_bkgLevel * padArea * padNum * m_arichgp->getNMCopies();
 
     }  // for (int iHyp=0;iHyp < c_noOfHypotheses; iHyp++ )
     //#####################################################
@@ -439,32 +420,31 @@ namespace Belle2 {
 
     // the id numbers of mirrors from which the photons could possibly reflect are calculated
     int mirrors[3];
-    mirrors[0] = -1; // for no reflection
+    mirrors[0] = 0; // for no reflection
     int refl = 1;
 
-    if (m_arichGeoParameters->isSimple()) {refl += nMirSeg; mirrors[1] = 0; mirrors[2] = 1;} else {
-      // only if particle track on detector is at radius larger than 850mm (for now hardcoded)
-      // possible reflections are taken into account.
-      if (track_at_detector.XYvector().Mod() > 85.0) {
-        double trackang = track_at_detector.Phi() - angmir + M_PI / double(nMirSeg);
-        if (trackang < 0) trackang += 2 * M_PI;
-        int section1 = int(trackang / 2 / M_PI * nMirSeg) % nMirSeg;
-        int section2 = section1 - 1;
-        if (section1 == 0)  section2 = nMirSeg - 1;
-        mirrors[1] = section1; mirrors[2] = section2;
-        refl = 3;
-      }
+    // only if particle track on detector is at radius larger than 850mm (for now hardcoded)
+    // possible reflections are taken into account.
+    if (track_at_detector.XYvector().Mod() > 85.0) {
+      double trackang = track_at_detector.Phi() - angmir;
+      if (trackang < 0) trackang += 2 * M_PI;
+      if (trackang > 2 * M_PI) trackang -= 2 * M_PI;
+      int section1 = int(trackang * nMirSeg / 2. / M_PI) + 1;
+      int section2 = section1 + 1;
+      if (section1 == nMirSeg)  section2 = 1;
+
+      mirrors[1] = section1; mirrors[2] = section2;
+      refl = 3;
     }
 
     // loop over all detected photon hits
 
     for (unsigned int iPhoton = 0; iPhoton < nPhotonHits; iPhoton++) {
 
-      ARICHDigit* h = arichDigits[iPhoton];
-      int chID = h->getChannelID();
-      int modID = h->getModuleID();
+      ARICHHit* h = arichHits[iPhoton];
+      int modID = h->getModule();
 
-      TVector3 hitpos = m_arichGeoParameters->getChannelCenterGlob(modID, chID);
+      TVector3 hitpos = m_arichgp->getMasterVolume().pointToLocal(h->getPosition());
 
       int nfoo[c_noOfHypotheses];
       for (int iHyp = 0; iHyp < c_noOfHypotheses; iHyp++) { esigi[iHyp] = 0; nfoo[iHyp] = nDetPhotons[iHyp];}
@@ -475,7 +455,6 @@ namespace Belle2 {
         TVector3 initialrf = getTrackPositionAtZ(arichTrack, m_zaero[iAerogel]);
         TVector3 epoint = getTrackMeanEmissionPosition(arichTrack, iAerogel);
         TVector3 edir  = arichTrack.getDirection();
-
         TVector3 photonDirection; // calculated photon direction
 
         // loop over possible mirror reflections
@@ -486,26 +465,24 @@ namespace Belle2 {
           // if hit is more than 15cm from the track position on the detector plane, skip it.
           // (not reconstructing hits with irrelevantly large Cherenkov angle)
           if ((track_at_detector - virthitpos).Mag() > 15.0) continue;
-
           if (CherenkovPhoton(epoint, virthitpos, initialrf, photonDirection, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
                               m_nAerogelLayers - iAerogel) < 0)  continue;
+
 
           TVector3 dirch = TransformToFixed(edir) * photonDirection;
           double fi_cer = dirch.Phi();
           double th_cer = dirch.Theta();
 
+          // skip photons with irrelevantly large Cherenkov angle
           if (th_cer > 0.5) continue;
 
           // add photon to ARICHTrack
-          if (m_storePhot) arichTrack.addPhoton(th_cer, fi_cer, iAerogel, mirr);
-
-          // if beamtest analysis skip likelihood calculation
-          if (m_beamtest) continue;
+          if (m_storePhot) arichTrackGlob.addPhoton(th_cer, fi_cer, iAerogel, mirr);
 
           if (fi_cer < 0) fi_cer += 2 * M_PI;
           double fii = fi_cer;
           if (mirr > 0) {
-            double fi_mir = m_arichGeoParameters->getMirrorNormal(mirrors[mirr]).XYvector().Phi();
+            double fi_mir = m_arichgp->getMirrors().getNormVector(mirrors[mirr]).XYvector().Phi();
             fii = 2 * fi_mir - fi_cer - M_PI;
           }
 
@@ -523,13 +500,10 @@ namespace Belle2 {
             TVector3  trackAtAerogelExit = edir * (m_thickness[iAerogel] / edir.z());
             TVector3  dtrackphoton = photonAtAerogelExit - trackAtAerogelExit;
             TVector3 detector_position;
-            if (!m_arichGeoParameters->isSimple()) {
-              detector_position = FastTracking(photonDirection1, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
-                                               m_nAerogelLayers - iAerogel, 0);
-            } else {
-              detector_position = FastTrackingSimple(photonDirection1, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
-                                                     m_nAerogelLayers - iAerogel);
-            }
+
+            detector_position = FastTracking(photonDirection1, epoint, &m_refractiveInd[iAerogel], &m_zaero[iAerogel],
+                                             m_nAerogelLayers - iAerogel, 0);
+
             TVector3 meanr             = detector_position - epoint;
             double   path              = meanr.Mag();
             meanr                      = meanr.Unit();
@@ -537,8 +511,7 @@ namespace Belle2 {
             double   detector_sigma    = m_singleRes * path / meanr.z();
 
             // calculate pad orientation and distance relative to that photon
-            TVector3 modorigin = m_arichGeoParameters->getOrigin(modID);
-            double modphi =  m_arichGeoParameters->getModAngle(modID);
+            double modphi =  m_arichgp->getDetectorPlane().getSlotPhi(modID);
 
             double      pad_fi = fii - modphi;
 
@@ -616,56 +589,6 @@ namespace Belle2 {
     m_aeroMerit = merit;
   }
 
-  TVector3 ARICHReconstruction::FastTrackingSimple(TVector3 dirf, TVector3 r,  double* refractiveInd, double* z, int n)
-  {
-    //
-    // Description:
-    // The method calculates the intersection  of the cherenkov photon
-    // with the detector plane
-
-    //  z[n+1]
-    //  z[0] .. 1st aerogel exit
-    //  z[n-1] .. 2nd aerogel exit
-    //  z[n-1] .. 2nd aerogel exit
-
-    int nmir = m_arichGeoParameters->getNMirrors();
-    double path = 0;
-    bool reflok = false; bool refl = false;
-    path = (z[0] - r.z()) / dirf.z();
-    r   += dirf * path;
-    for (int a = 1; a <= n + 1 ; a++) {
-      double rind = refractiveInd[a] / refractiveInd[a - 1];
-      dirf = Refraction(dirf, rind);
-      if (dirf.Mag() == 0) return TVector3();
-      path = (z[a] - r.z()) / dirf.z();
-      TVector3 r0 = r;
-      r += dirf * path;
-      TVector2 rxy = r.XYvector();
-      // check for possible reflections
-      if (a != n) continue;
-      for (int k = 0; k < nmir; k++) {
-        TVector3 mirpoint = m_arichGeoParameters->getMirrorPoint(k);
-        TVector3 mirnorm = m_arichGeoParameters->getMirrorNormal(k);
-        TVector2 dr = rxy - mirpoint.XYvector();
-        if (dr.X()*mirnorm.X() + dr.Y()*mirnorm.Y() > 0) {
-          refl = true;
-          double s = dirf * mirnorm;
-          double s1 = (mirpoint - r0) * mirnorm;
-          r = r0 + s1 / s * dirf;
-          if (r.Z() < m_arichGeoParameters->getMirrorsZPosition()) return TVector3();
-          if ((r.XYvector() - mirpoint.XYvector()).Mod() > 20) { r = r0; continue;}
-          dirf = dirf - 2 * (dirf * mirnorm) * mirnorm;
-          path = (z[a] - r.z()) / dirf.z();
-          r += dirf * path;
-          reflok = true;
-          break;
-        }
-      }
-    }
-    if (!reflok && refl) return TVector3();
-    return r;
-  }
-
   TVector3 ARICHReconstruction::getTrackMeanEmissionPosition(const ARICHTrack& track, int iAero)
   {
     // Emission length measured from aerogel exit
@@ -673,7 +596,8 @@ namespace Belle2 {
     TVector3 dir = track.getDirection();
     if (dir.Z() == 0) return TVector3();
     double d   = m_thickness[iAero] / dir.Z() / m_transmissionLen[iAero];
-    double dmean = 1 - d / expm1(d);
+    //double dmean = 1 - d / expm1(d);
+    double dmean = -log((1 + exp(-d)) / 2.);
     double mel = dmean * m_transmissionLen[iAero];
 
     return (getTrackPositionAtZ(track, m_zaero[iAero]) - mel * dir);

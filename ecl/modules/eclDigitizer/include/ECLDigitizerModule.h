@@ -15,6 +15,13 @@
 #include <framework/core/Module.h>
 #include <ecl/dataobjects/ECLWaveformData.h>
 #include <ecl/digitization/EclConfiguration.h>
+#include <ecl/dataobjects/ECLHit.h>
+#include <ecl/dataobjects/ECLSimHit.h>
+#include <ecl/dataobjects/ECLDigit.h>
+#include <ecl/dataobjects/ECLDsp.h>
+#include <ecl/dataobjects/ECLTrig.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/RelationArray.h>
 #include <vector>
 
 
@@ -109,8 +116,14 @@ namespace Belle2 {
       void repack(const ECLWFAlgoParams&, algoparams_t&);
       void getfitparams(const ECLWaveformData&, const ECLWFAlgoParams&, fitparams_t&);
 
-      /** Event number */
-      int    m_nEvent;
+      // input arrays
+      StoreArray<ECLHit>    m_eclHits;
+      StoreArray<ECLHit>    m_eclDiodeHits;
+      StoreArray<ECLSimHit> m_eclSimHits;
+      // Output Arrays
+      StoreArray<ECLDigit>  m_eclDigits;
+      StoreArray<ECLDsp>    m_eclDsps;
+      StoreArray<ECLTrig>   m_eclTrigs;
 
       /** Module parameters */
       bool m_background;

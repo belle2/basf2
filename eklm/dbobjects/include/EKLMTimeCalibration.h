@@ -11,10 +11,8 @@
 #ifndef EKLMTIMECALIBRATION_H
 #define EKLMTIMECALIBRATION_H
 
-/* System headers. */
-#include <stdint.h>
-
 /* C++ headers. */
+#include <cstdint>
 #include <map>
 
 /* External headers. */

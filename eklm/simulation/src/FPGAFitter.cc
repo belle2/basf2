@@ -8,9 +8,6 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-/* System headers. */
-#include <math.h>
-
 /* External headers. */
 #include <TFile.h>
 #include <TH1F.h>

@@ -15,10 +15,11 @@
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/EKLMSim2Hit.h>
+#include <eklm/dbobjects/EKLMDigitizationParameters.h>
 #include <eklm/geometry/GeometryData.h>
-#include <eklm/simulation/Digitizer.h>
 #include <eklm/simulation/FPGAFitter.h>
 #include <framework/core/Module.h>
+#include <framework/database/DBObjPtr.h>
 #include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
@@ -88,7 +89,13 @@ namespace Belle2 {
     double m_DiscriminatorThreshold;
 
     /** Digitization parameters. */
-    struct EKLM::DigitizationParams m_DigPar;
+    DBObjPtr<EKLMDigitizationParameters> m_DigPar;
+
+    /** Initial digitization time. */
+    double m_DigitizationInitialTime;
+
+    /** Use debug mode in EKLM::FiberAndElectronics or not. */
+    bool m_Debug;
 
     /** Create EKLMSim2Hits? */
     bool m_CreateSim2Hits;

@@ -20,7 +20,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseFacetRelationFilter Super;
+      using Super = BaseFacetRelationFilter;
 
     public:
       /// Importing all overloads from the super class

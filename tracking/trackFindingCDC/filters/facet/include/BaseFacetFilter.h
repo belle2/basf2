@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Base class for all facet filters
-    typedef Filter<CDCFacet> BaseFacetFilter;
+    using BaseFacetFilter = Filter<CDCFacet>;
 
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

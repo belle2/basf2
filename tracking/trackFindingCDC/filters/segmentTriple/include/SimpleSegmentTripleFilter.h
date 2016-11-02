@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class.
-      typedef Filter<CDCSegmentTriple> Super;
+      using Super = Filter<CDCSegmentTriple>;
 
     public:
       /**

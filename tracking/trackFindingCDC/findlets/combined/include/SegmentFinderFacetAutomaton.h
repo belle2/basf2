@@ -43,7 +43,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit&, CDCRecoSegment2D> Super;
+      using Super = Findlet<CDCWireHit&, CDCRecoSegment2D>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery

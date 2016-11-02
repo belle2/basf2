@@ -29,10 +29,10 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<AImpact, typename T::HoughBox> HoughBox;
+      using HoughBox = SweepBox<AImpact, typename T::HoughBox>;
 
       /// The hough box without the sweep in d0
-      typedef typename T::HoughBox SubordinaryHoughBox;
+      using SubordinaryHoughBox = typename T::HoughBox;
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object

@@ -17,8 +17,8 @@ namespace Belle2 {
     class QuadTreeItem {
     public:
 
-      /// typedef
-      typedef typeData TypeData;
+      /// Import contained data type
+      using TypeData = typeData;
 
       /// Constructor
       explicit QuadTreeItem(typeData* data) : m_usedFlag(false), m_pointer(data) {};

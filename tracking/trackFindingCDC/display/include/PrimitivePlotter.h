@@ -23,14 +23,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A map type for attributes names to values for additional drawing information
-    typedef std::map<std::string, std::string> AttributeMap;
+    using AttributeMap = std::map<std::string, std::string>;
 
     /// A base class for plots of primitive objects.
     class PrimitivePlotter {
 
     public:
       /// A map type for attributes names to values for additional drawing information
-      typedef Belle2::TrackFindingCDC::AttributeMap AttributeMap;
+      using AttributeMap = Belle2::TrackFindingCDC::AttributeMap;
 
     public:
       /// The default width of the canvas to be plotted into

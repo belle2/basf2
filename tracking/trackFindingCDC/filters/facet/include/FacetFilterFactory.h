@@ -27,7 +27,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<Filter<CDCFacet> > Super;
+      using Super = FilterFactory<Filter<CDCFacet> >;
 
     public:
       /** Fill the default filter name and parameter values*/

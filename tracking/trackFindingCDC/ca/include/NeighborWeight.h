@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for the cell weight in the cellular automata
-    typedef Weight NeighborWeight;
+    using NeighborWeight = Weight;
 
     /**
     Indicates that a connection in a neighborhood shall not be made.

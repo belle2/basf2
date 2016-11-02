@@ -38,7 +38,7 @@ namespace Belle2 {
       };
 
       /// Type for an ored combination of the status flags of cells in the cellular automata
-      typedef ECellFlag ECellFlags;
+      using ECellFlags = ECellFlag;
 
       /// Constant summing all possible cell flags
       static const ECellFlags c_AllFlags = ECellFlags(ECellFlag::c_Assigned +

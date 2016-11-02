@@ -13,7 +13,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Track id type
-    typedef int ITrackType;
+    using ITrackType = int;
 
     /// Constant to mark an invalid track id
     const ITrackType INVALID_ITRACK = -998;

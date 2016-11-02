@@ -27,7 +27,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<Filter<CDCSegmentPair> > Super;
+      using Super = FilterFactory<Filter<CDCSegmentPair> >;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -49,7 +49,7 @@ namespace Belle2 {
 
     };
 
-    typedef SegmentPairFilterFactory SegmentPairFilterFactory;
+    using SegmentPairFilterFactory = SegmentPairFilterFactory;
 
   }
 }

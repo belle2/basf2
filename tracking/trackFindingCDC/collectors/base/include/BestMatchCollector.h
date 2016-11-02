@@ -21,13 +21,13 @@ namespace Belle2 {
     class BestMatchCollector : public ManyMatchCollector<AMatherAlgorithm, AAdderAlgorithm> {
     public:
       /// The super (parent) class.
-      typedef ManyMatchCollector<AMatherAlgorithm, AAdderAlgorithm> Super;
+      using Super = ManyMatchCollector<AMatherAlgorithm, AAdderAlgorithm>;
       /// Copy the CollectorItem definition.
-      typedef typename Super::CollectorItem CollectorItem;
+      using CollectorItem = typename Super::CollectorItem;
       /// Copy the CollectionItem definition.
-      typedef typename Super::CollectionItem CollectionItem;
+      using CollectionItem = typename Super::CollectionItem;
       /// Copy the MatchedCollectionItem definition.
-      typedef typename Super::MatchedCollectionItem MatchedCollectionItem;
+      using MatchedCollectionItem = typename Super::MatchedCollectionItem;
 
       /// Do the collection process.
       virtual void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override

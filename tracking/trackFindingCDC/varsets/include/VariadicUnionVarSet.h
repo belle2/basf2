@@ -34,15 +34,15 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<typename FirstType<AVarSets...>::Object> Super;
+      using Super = BaseVarSet<typename FirstType<AVarSets...>::Object>;
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef typename Super::Object Object;
+      using Object = typename Super::Object;
 
     private:
       /// Type of the contained variable sets
-      typedef BaseVarSet<Object> ContainedVarSet;
+      using ContainedVarSet = BaseVarSet<Object>;
 
     public:
       /// Create the union variable set.

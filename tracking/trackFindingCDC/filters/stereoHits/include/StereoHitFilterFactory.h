@@ -26,7 +26,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseStereoHitFilter> Super;
+      using Super = FilterFactory<BaseStereoHitFilter>;
 
     public:
       /** Fill the default filter name and parameter values*/

@@ -22,7 +22,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<SegmentRelationFilterFactory> Super;
+      using Super = UnionRecordingFilter<SegmentRelationFilterFactory>;
 
     public:
       /// Valid names of variable sets for segments.

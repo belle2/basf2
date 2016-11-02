@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
-      typedef std::vector<const CDCHit*> CDCHitVector;
+      using CDCHitVector = std::vector<const CDCHit*>;
 
     public:
       /// Getter for the singletone instance

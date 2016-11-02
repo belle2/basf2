@@ -23,7 +23,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCFacet> Super;
+      using Super = Filter<CDCFacet>;
 
     public:
       /// Constructor taking a flag if boarderline feasable cases should be excluded.

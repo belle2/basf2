@@ -26,16 +26,29 @@ namespace Belle2 {
     class QuadTreeProcessorTemplate {
 
     public:
-      typedef QuadTreeItem<typeData> ItemType; /**< The QuadTree will only see items of this type */
-      typedef std::vector<typeData*> ReturnList; /**< The type of the list of result items returned to the lambda function */
-      typedef QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
-      typedef std::function< void(const ReturnList&, QuadTree*) >
-      CandidateProcessorLambda;   /**< This lambda function can be used for postprocessing */
-      typedef typename QuadTree::Children QuadTreeChildren; /**< A typedef for the QuadTree Children */
+      /// The QuadTree will only see items of this type
+      using ItemType = QuadTreeItem<typeData>;
 
-      typedef std::pair<typeX, typeX> rangeX;   /**< This pair describes the range in X for a node */
-      typedef std::pair<typeY, typeY> rangeY;   /**< This pair describes the range in Y for a node */
-      typedef std::pair<rangeX, rangeY> ChildRanges; /**< This pair of ranges describes the range of a node */
+      /// The type of the list of result items returned to the lambda function
+      using ReturnList = std::vector<typeData*>;
+
+      /// The used QuadTree
+      using QuadTree = QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY>;
+
+      /// This lambda function can be used for postprocessing
+      using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
+
+      /// Alias for the QuadTree Children
+      using QuadTreeChildren = typename QuadTree::Children;
+
+      /// This pair describes the range in X for a node
+      using rangeX = std::pair<typeX, typeX>;
+
+      /// This pair describes the range in Y for a node
+      using rangeY = std::pair<typeY, typeY>;
+
+      /// This pair of ranges describes the range of a node
+      using ChildRanges = std::pair<rangeX, rangeY>;
 
       /// QuadTree can access private members
       friend QuadTree;

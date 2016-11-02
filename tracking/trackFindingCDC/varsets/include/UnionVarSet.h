@@ -28,14 +28,14 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<AObject> Super;
+      using Super = BaseVarSet<AObject>;
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef AObject Object;
+      using Object = AObject;
 
       /// Type of the contained variable sets
-      typedef BaseVarSet<Object> ContainedVarSet;
+      using ContainedVarSet = BaseVarSet<Object>;
 
     public:
       /**

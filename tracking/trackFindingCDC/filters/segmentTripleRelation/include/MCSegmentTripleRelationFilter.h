@@ -22,7 +22,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter >;
 
     public:
       /// Importing all overloads from the super class

@@ -58,7 +58,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef VarSet<BasicSegmentPairRelationVarNames> Super;
+      using Super = VarSet<BasicSegmentPairRelationVarNames>;
 
     public:
       /// Construct the varset to be prepended to all variable names.

@@ -49,7 +49,7 @@ namespace Belle2 {
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
 
       /// Helper class to iterate over the individual types served to the findlet
-      typedef GenIndices<c_nTypes> Indices;
+      using Indices = GenIndices<c_nTypes>;
 
     public:
       /// Constructor of the module

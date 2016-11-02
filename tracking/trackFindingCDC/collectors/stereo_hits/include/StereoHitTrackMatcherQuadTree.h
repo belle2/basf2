@@ -38,12 +38,12 @@ namespace Belle2 {
     template <class HoughTree>
     class StereoHitTrackMatcherQuadTree : public QuadTreeBasedMatcher<HoughTree> {
       /// Super class
-      typedef QuadTreeBasedMatcher<HoughTree> Super;
+      using Super = QuadTreeBasedMatcher<HoughTree>;
     public:
       /// Use tracks as collector items.
-      typedef CDCTrack CollectorItem;
+      using CollectorItem = CDCTrack;
       /// Use rl tagged wire hits a collection items.
-      typedef CDCRLWireHit CollectionItem;
+      using CollectionItem = CDCRLWireHit;
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "") override;

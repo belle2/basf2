@@ -33,7 +33,7 @@ namespace Belle2 {
 
       /** We use this to describe more than one segment that could belong together in one single superlayer.
        * Actually the segment finder should not produce such things... */
-      typedef std::vector<SegmentInformation*> TrainOfSegments;
+      using TrainOfSegments = std::vector<SegmentInformation*>;
 
       /**
        * Fill the given elements into the internal lookup tables.

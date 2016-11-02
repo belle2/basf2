@@ -33,7 +33,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCRecoSegment2D&> Super;
+      using Super = Findlet<CDCRecoSegment2D&>;
 
     public:
       /// Short description of the findlet

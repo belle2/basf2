@@ -30,7 +30,7 @@ namespace Belle2 {
     class MatchingInformation {
     public:
       /** Vector of pairs: object, probability of match */
-      typedef std::vector<std::pair<MatchingType*, double>> ListOfMatchCandidates;
+      using ListOfMatchCandidates = std::vector<std::pair<MatchingType*, double>>;
 
       /**
        * Initialize the object with the underlying instance that should be matched.

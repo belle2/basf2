@@ -38,7 +38,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCRecoSegment2D, CDCTrack> Super;
+      using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
 
     public:
       /// Default constructor initialising the filters with the default settings

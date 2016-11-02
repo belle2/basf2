@@ -62,26 +62,26 @@ namespace Belle2 {
 
     public:
 
-      /// typedef
-      typedef QuadTreeTemplate<typeX, typeY, typeData, binCountX, binCountY> ThisType;
+      /// Type of this class
+      using ThisType = QuadTreeTemplate<typeX, typeY, typeData, binCountX, binCountY>;
 
       /**
        * a lambda expression with this signature is used to process each of the
        * found candidates during the startFillingTree call
        */
-      typedef std::function< void(ThisType*) > CandidateProcessorLambda;
+      using CandidateProcessorLambda = std::function< void(ThisType*) >;
 
       /// store the minimum, center and maximum of this bin in X direction (in this order in the tuple)
-      typedef std::array<typeX, 3> XBinTuple;
+      using XBinTuple = std::array<typeX, 3>;
 
       /// store the minimum, center and maximum of this bin in Y direction (in this order in the tuple)
-      typedef std::array<typeY, 3> YBinTuple;
+      using YBinTuple = std::array<typeY, 3>;
 
-      /// typedef for vector of QuadTree pointers
-      typedef std::vector<ThisType*> NodeList;
+      /// Vector of the sub node QuadTree pointers
+      using NodeList = std::vector<ThisType*>;
 
       /// type of the child nodes hold by this node
-      typedef QuadChildrenTemplate<ThisType> Children;
+      using Children = QuadChildrenTemplate<ThisType>;
 
       /// Constructor
       QuadTreeTemplate() : m_parent(nullptr), m_level(0), m_filled(false)

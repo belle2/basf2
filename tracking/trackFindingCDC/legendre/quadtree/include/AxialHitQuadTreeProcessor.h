@@ -95,7 +95,7 @@ namespace Belle2 {
       inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
                                    unsigned int /*r_index*/) const override final
       {
-        typedef std::array< std::array<float, 2>, 2> Quadlet;
+        using Quadlet = std::array< std::array<float, 2>, 2>;
         Quadlet dist_1;
         Quadlet dist_2;
 

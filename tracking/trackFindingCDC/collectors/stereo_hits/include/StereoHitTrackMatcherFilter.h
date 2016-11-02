@@ -30,10 +30,10 @@ namespace Belle2 {
     class StereoHitTrackMatcherFilter : public FilterBasedMatcher<StereoHitFilterFactory> {
     public:
       /// Use tracks as collector items.
-      typedef CDCTrack CollectorItem;
+      using CollectorItem = CDCTrack;
 
       /// Use rl tagged wire hits a collection items.
-      typedef CDCRLWireHit CollectionItem;
+      using CollectionItem = CDCRLWireHit;
 
       /// Empty desctructor. Everything is handled via terminate.
       virtual ~StereoHitTrackMatcherFilter() = default;

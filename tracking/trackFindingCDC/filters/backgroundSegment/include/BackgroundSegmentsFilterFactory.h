@@ -26,7 +26,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseBackgroundSegmentsFilter> Super;
+      using Super = FilterFactory<BaseBackgroundSegmentsFilter>;
 
     public:
       /** Fill the default filter name and parameter values*/

@@ -17,7 +17,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Type for the cell weight in the cellular automata
-    typedef Weight CellWeight;
+    using CellWeight = Weight;
 
     /// Signal that a certain cell should not be constructed. Used by the creator filters
     extern const CellWeight NOT_A_CELL;

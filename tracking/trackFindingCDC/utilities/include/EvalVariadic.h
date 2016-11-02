@@ -51,14 +51,14 @@ namespace Belle2 {
     template<class AType>
     struct FirstTypeImpl<AType> {
       /// Result first item of the variadic sequence.
-      typedef AType Type;
+      using Type = AType;
     };
 
     /** Specialisation where there is more than one type given */
     template<class AType, class... ATypes>
     struct FirstTypeImpl<AType, ATypes...> {
       /// Result first item of the variadic sequence.
-      typedef AType Type;
+      using Type = AType;
     };
 
     /** Short cut meta function to take the first type of a variadic sequence */

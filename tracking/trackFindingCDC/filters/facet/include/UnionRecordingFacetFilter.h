@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<FacetFilterFactory> Super;
+      using Super = UnionRecordingFilter<FacetFilterFactory>;
 
     public:
       /// Valid names of variable sets for facets.

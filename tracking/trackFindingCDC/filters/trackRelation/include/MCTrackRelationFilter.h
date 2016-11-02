@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseTrackRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseTrackRelationFilter >;
 
     public:
       /** Constructor also setting the switch ,

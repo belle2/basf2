@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Typedef to indicate that an stereo segment is expeected.
-    typedef CDCRecoSegment2D CDCStereoRecoSegment2D;
+    using CDCStereoRecoSegment2D = CDCRecoSegment2D;
   }
 }
 

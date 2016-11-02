@@ -46,9 +46,9 @@ namespace Belle2 {
       virtual ~LookUpBase() = default;
 
       /// Constant iterator type of this container.
-      typedef typename std::vector<ListType>::const_iterator const_iterator;
+      using const_iterator = typename std::vector<ListType>::const_iterator;
       /// Constant iterator type of this container.
-      typedef typename std::vector<ListType>::iterator iterator;
+      using iterator = typename std::vector<ListType>::iterator;
 
       /** STL: begin. */
       const_iterator begin() const

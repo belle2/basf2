@@ -24,14 +24,14 @@ namespace Belle2 {
 
     private:
       /// Type of the filter base class.
-      typedef AFilter Super;
+      using Super = AFilter;
 
     public:
       /// The base filter.
       using AFilter::BaseFilter;
 
       /// Object type to be filtered.
-      typedef typename AFilter::Object Object;
+      using Object = typename AFilter::Object;
 
     public:
       /// Constructor of the filter.

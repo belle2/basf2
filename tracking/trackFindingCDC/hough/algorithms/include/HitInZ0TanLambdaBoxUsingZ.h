@@ -26,7 +26,7 @@ namespace Belle2 {
     public:
 
       /// Use a Z0TanLambdaBox
-      typedef Z0TanLambdaBox HoughBox;
+      using HoughBox = Z0TanLambdaBox;
 
       /**
        * Return exp{-distance} with distance = distance between the trajectory constructed from the box parameters

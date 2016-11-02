@@ -23,7 +23,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<SegmentTrainVarSet> Super;
+      using Super = FilterOnVarSet<SegmentTrainVarSet>;
 
     public:
       /// Get the output of the filter.

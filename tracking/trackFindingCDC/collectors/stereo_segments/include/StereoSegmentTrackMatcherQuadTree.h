@@ -38,9 +38,9 @@ namespace Belle2 {
     class StereoSegmentTrackMatcherQuadTree : public QuadTreeBasedMatcher<SegmentZ0TanLambdaLegendre> {
     public:
       /// Use tracks as collector items.
-      typedef CDCTrack CollectorItem;
+      using CollectorItem = CDCTrack;
       /// Use (stereo) segments as collection items.
-      typedef CDCRecoSegment2D CollectionItem;
+      using CollectionItem = CDCRecoSegment2D;
 
       /// Empty desctructor. Everything is handled via terminate.
       virtual ~StereoSegmentTrackMatcherQuadTree() = default;

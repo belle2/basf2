@@ -25,7 +25,7 @@ namespace Belle2 {
     template<class ANewType, class... AOldTypes>
     struct SweepBoxImpl<ANewType, ABox<AOldTypes...> > {
       /// The type of the underlaying box.
-      typedef ABox<ANewType, AOldTypes...> Type;
+      using Type = ABox<ANewType, AOldTypes...>;
     };
 
     /// Short hand for SweepBoxImpl

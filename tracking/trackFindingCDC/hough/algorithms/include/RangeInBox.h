@@ -23,7 +23,7 @@ namespace Belle2 {
     class RangeInBox {
     public:
       /// The type of the underlaying HoughBox (copied from the udnerlaying hit algorithm)
-      typedef typename AHitInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /**  When called, it goes through all items in the range object (e.g. a CDCRecoSegment) and checks the
        *  HitInBox algorithm passed as a template argument. If there is a certain amount of items of the range

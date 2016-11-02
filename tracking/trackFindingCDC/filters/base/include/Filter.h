@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Type of the object to be analysed.
-      typedef AObject Object;
+      using Object = AObject;
 
     public:
       /**

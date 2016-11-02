@@ -55,7 +55,7 @@ namespace Belle2 {
     class QuadChildrenTemplate {
     public:
 
-//      typedef std::map<std::pair<size_t, size_t>, quadChild> ChildrenHolder;
+//      using ChildrenHolder = std::map<std::pair<size_t, size_t>, quadChild>;
 
       /// Constructor
       QuadChildrenTemplate()

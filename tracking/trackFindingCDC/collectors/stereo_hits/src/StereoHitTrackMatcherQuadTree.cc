@@ -46,7 +46,7 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
   const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
-  typedef std::pair<CDCRecoHit3D, const CDCRLWireHit*> CDCRecoHitWithRLPointer;
+  using CDCRecoHitWithRLPointer = std::pair<CDCRecoHit3D, const CDCRLWireHit*>;
   std::vector<CDCRecoHitWithRLPointer> recoHits;
   recoHits.reserve(rlWireHits.size() + track.size());
 

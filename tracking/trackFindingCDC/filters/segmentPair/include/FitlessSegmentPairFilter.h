@@ -23,7 +23,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> Super;
+      using Super = FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
 
     public:
       /// Checks if a pair of segments is a good combination

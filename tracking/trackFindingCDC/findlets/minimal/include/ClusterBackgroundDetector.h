@@ -28,7 +28,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHitCluster&> Super;
+      using Super = Findlet<CDCWireHitCluster&>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.

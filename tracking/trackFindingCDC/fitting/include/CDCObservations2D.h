@@ -48,7 +48,7 @@ namespace Belle2 {
        *  Matrix type used to wrap the raw memory chunk of values
        *  generated from the various hit types for structured vectorized access.
        */
-      typedef Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > > EigenObservationMatrix;
+      using EigenObservationMatrix = Eigen::Map< Eigen::Matrix< double, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor > >;
 
       /**
        *  Gets the pseudo variance.

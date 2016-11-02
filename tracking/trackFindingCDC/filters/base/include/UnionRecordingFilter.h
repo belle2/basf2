@@ -29,11 +29,11 @@ namespace Belle2 {
       using Super = Recording<typename AFilterFactory::CreatedFilter>;
 
       /// Type of the filters that can be included in the recodring
-      typedef typename AFilterFactory::CreatedFilter CreatedFilter;
+      using CreatedFilter = typename AFilterFactory::CreatedFilter;
 
     public:
       /// Type of the object to be analysed.
-      typedef typename CreatedFilter::Object Object;
+      using Object = typename CreatedFilter::Object;
 
     public:
       /// Constructor of the filter.

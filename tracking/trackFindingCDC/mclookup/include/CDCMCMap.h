@@ -36,64 +36,58 @@ namespace Belle2 {
        *           the border of a drift cell and produces two signals on digitization.
        *           Until the situation is clarified this is considered a workaround.
        */
-      typedef
-      boost::bimaps::bimap <boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
-            boost::bimaps::multiset_of< boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >
-            > CDCSimHitByCDCHitMap;
+      using CDCSimHitByCDCHitMap = boost::bimaps::bimap <
+                                   boost::bimaps::set_of<boost::bimaps::tagged<const CDCHit*, CDCHit>>,
+                                   boost::bimaps::multiset_of<boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >>;
 
     public:
       /// Type which is returned by MCParticleByCDCHitMap the in a range based for loop
-      typedef CDCSimHitByCDCHitMap::value_type CDCSimHitByCDCHitRelation;
+      using CDCSimHitByCDCHitRelation = CDCSimHitByCDCHitMap::value_type;
 
 
     public:
       /// Type for a one to n relation form CDCHits to MCParticles
-      typedef
-      boost::bimaps::bimap <boost::bimaps::set_of< boost::bimaps::tagged<const CDCHit*, CDCHit> >,
-            boost::bimaps::multiset_of< boost::bimaps::tagged<const MCParticle*, MCParticle> >
-            > MCParticleByCDCHitMap;
+      using MCParticleByCDCHitMap = boost::bimaps::bimap <
+                                    boost::bimaps::set_of<boost::bimaps::tagged<const CDCHit*, CDCHit>>,
+                                    boost::bimaps::multiset_of<boost::bimaps::tagged<const MCParticle*, MCParticle> >>;
 
     private:
       /// Iterator type for an iteration over several CDCHit <-> MCParticle relations as view from the MCParticle side.
-      typedef MCParticleByCDCHitMap::map_by<MCParticle>::const_iterator CDCHitByMCParticleRelationIterator;
+      using CDCHitByMCParticleRelationIterator = MCParticleByCDCHitMap::map_by<MCParticle>::const_iterator;
 
     public:
       /// Range type for an iteration over several CDCHit <-> MCParticle relations as view from the MCParticle side.
-      typedef boost::iterator_range<CDCHitByMCParticleRelationIterator>  CDCHitByMCParticleRelationRange;
+      using CDCHitByMCParticleRelationRange = boost::iterator_range<CDCHitByMCParticleRelationIterator> ;
 
       /// Type which is returned by CDCHitByMCParticleRelationRange the in a range based for loop
-      typedef CDCHitByMCParticleRelationIterator::value_type CDCHitByMCParticleRelation;
-
-
+      using CDCHitByMCParticleRelation = CDCHitByMCParticleRelationIterator::value_type;
 
       /// Type which is returned by MCParticleByCDCHitMap the in a range based for loop
-      typedef MCParticleByCDCHitMap::value_type MCParticleByCDCHitRelation;
+      using MCParticleByCDCHitRelation = MCParticleByCDCHitMap::value_type;
 
 
 
 
       /// Type for a one to n relation form CDCSimHits to MCParticles
-      typedef
-      boost::bimaps::bimap <
-      boost::bimaps::set_of< boost::bimaps::tagged<const CDCSimHit*, CDCSimHit> >,
-            boost::bimaps::multiset_of< boost::bimaps::tagged<const MCParticle*, MCParticle> >
-            > MCParticleByCDCSimHitMap;
+      using MCParticleByCDCSimHitMap = boost::bimaps::bimap <
+                                       boost::bimaps::set_of<boost::bimaps::tagged<const CDCSimHit*, CDCSimHit>>,
+                                       boost::bimaps::multiset_of<boost::bimaps::tagged<const MCParticle*, MCParticle> >>;
 
     public:
       /// Iterator type for an iteration over several CDCSimHit <-> MCParticle relations as view from the MCParticle side.
-      typedef MCParticleByCDCSimHitMap::map_by<MCParticle>::const_iterator CDCSimHitByMCParticleRelationIterator;
+      using CDCSimHitByMCParticleRelationIterator = MCParticleByCDCSimHitMap::map_by<MCParticle>::const_iterator;
 
     public:
       /// Range type for an iteration over several CDCSimHit <-> MCParticle relations as view from the MCParticle side.
-      typedef boost::iterator_range<CDCSimHitByMCParticleRelationIterator>  CDCSimHitByMCParticleRelationRange;
+      using CDCSimHitByMCParticleRelationRange = boost::iterator_range<CDCSimHitByMCParticleRelationIterator> ;
 
       /// Type which is returned by CDCSimHitByMCParticleRelationRange the in a range based for loop
-      typedef CDCSimHitByMCParticleRelationIterator::value_type CDCSimHitByMCParticleRelation;
+      using CDCSimHitByMCParticleRelation = CDCSimHitByMCParticleRelationIterator::value_type;
 
 
 
       /// Type which is returned by MCParticleByCDCSimHitMap the in a range based for loop
-      typedef MCParticleByCDCSimHitMap::value_type MCParticleByCDCSimHitRelation;
+      using MCParticleByCDCSimHitRelation = MCParticleByCDCSimHitMap::value_type;
 
 
     public:

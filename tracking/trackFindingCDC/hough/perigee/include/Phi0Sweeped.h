@@ -29,10 +29,10 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<APhi0, typename T::HoughBox> HoughBox;
+      using HoughBox = SweepBox<APhi0, typename T::HoughBox>;
 
       /// The hough box without the sweep in phi0
-      typedef typename T::HoughBox SubordinaryHoughBox;
+      using SubordinaryHoughBox = typename T::HoughBox;
 
       /// Constructor taking the curling curvature.
       APhi0Sweeped(const float& curlCurv) : m_curlCurv(curlCurv) {}

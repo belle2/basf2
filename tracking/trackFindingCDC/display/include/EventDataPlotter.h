@@ -51,7 +51,7 @@ namespace Belle2 {
 
     public:
       /// Forward the Attributre map from the primitive plotter.
-      typedef PrimitivePlotter::AttributeMap AttributeMap;
+      using AttributeMap = PrimitivePlotter::AttributeMap;
 
     public:
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.

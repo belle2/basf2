@@ -30,7 +30,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<IOType> Super;
+      using Super = Findlet<IOType>;
 
     public:
       /// Constructor taking the default name of the store vector which is the target of the swap.

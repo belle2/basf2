@@ -20,7 +20,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCFacet> Super;
+      using Super = Filter<CDCFacet>;
 
     public:
       /// Constructor with the default chi2 cut value and width parameter

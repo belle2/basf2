@@ -75,7 +75,7 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
 
   const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 
-  typedef std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*> CDCRecoSegment3DWithPointer;
+  using CDCRecoSegment3DWithPointer = std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*>;
   std::vector<CDCRecoSegment3DWithPointer> recoSegmentsWithPointer;
   recoSegmentsWithPointer.reserve(recoSegments.size());
 

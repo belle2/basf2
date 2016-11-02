@@ -59,17 +59,17 @@ namespace Belle2 {
     class Box<AFirstType, ASubordinaryTypes...> {
     public:
       /// Type of the first coordinate
-      typedef AFirstType FirstType;
+      using FirstType = AFirstType;
 
       /// Type of this box
-      typedef Box<AFirstType, ASubordinaryTypes...> This;
+      using This = Box<AFirstType, ASubordinaryTypes...>;
 
       /// Tuple of the types of each coordinates
-      typedef std::tuple<FirstType, ASubordinaryTypes...> Point;
+      using Point = std::tuple<FirstType, ASubordinaryTypes...>;
 
       /// Tuple of differencs in each coordinate
-      typedef std::tuple < decltype(FirstType() - FirstType()),
-              decltype(ASubordinaryTypes() - ASubordinaryTypes())... > Delta;
+      using Delta = std::tuple < decltype(FirstType() - FirstType()),
+            decltype(ASubordinaryTypes() - ASubordinaryTypes())... >;
 
       /// Accessor for the individual coordinate types.
       template<std::size_t I>
@@ -91,7 +91,7 @@ namespace Belle2 {
       static const size_t c_nTypes = std::tuple_size<Point>::value;
 
       /// Helper class to iterate over the individual coordinates
-      typedef GenIndices<c_nTypes> Indices;
+      using Indices = GenIndices<c_nTypes>;
 
       /// Initialise the box with bound in each dimension.
       Box(const std::array<FirstType, 2>& firstBound,

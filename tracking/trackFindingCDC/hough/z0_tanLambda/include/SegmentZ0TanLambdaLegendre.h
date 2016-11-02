@@ -24,7 +24,7 @@ namespace Belle2 {
      * Hough Tree for finding StereoHits with using Segments as the item type.
      * This implementation uses the RangeInBox-Template with the normal HitInZ0TanLambda decision algorithm
      * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
-     * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
+     * This class is only an alias. The real algorithm can be found in SimpeBoxDivisionHoughTree.
      */
     using SegmentInZ0TanLambdaAlgorithm =
       FirstOfPairInBox<TwoHitInBoxAlgorithm<SegmentInZ0TanLambdaBox, FirstOfPairInBox<RangeInBox<HitInZ0TanLambdaBox>>>>;

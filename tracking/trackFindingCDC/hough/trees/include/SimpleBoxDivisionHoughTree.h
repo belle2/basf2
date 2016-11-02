@@ -21,10 +21,10 @@ namespace Belle2 {
 
     private:
       /// The Super class.
-      typedef BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY> Super;
+      using Super = BoxDivisionHoughTree<AHitPtr, typename AInBoxAlgorithm::HoughBox, divisionX, divisionY>;
 
       /// The HoughBox we use.
-      typedef typename AInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AInBoxAlgorithm::HoughBox;
     public:
       /// Constructor using the given maximal level.
       SimpleBoxDivisionHoughTree(const float maximumX, const float maximumY, const float overlapX = 0, const float overlapY = 0) :

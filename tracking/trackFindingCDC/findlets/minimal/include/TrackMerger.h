@@ -33,7 +33,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCTrack, CDCTrack> Super;
+      using Super = Findlet<const CDCTrack, CDCTrack>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.

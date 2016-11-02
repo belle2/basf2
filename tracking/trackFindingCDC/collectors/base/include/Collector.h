@@ -27,7 +27,7 @@ namespace Belle2 {
      *  - a function exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
      *  - a function initialize()
      *  - a function terminate()
-     *  - two typedefs CollectorItem, CollectionItem
+     *  - two member types CollectorItem, CollectionItem
      *  - a function std::vector<MatchedCollectionItem> match(const CollectorItem& collectorItem, const std::vector<CollectionItem>& collectionList)
      *    with MatchedCollectionItem = WithWeight<const CollectionItem*> and the CollectionItem-pointers pointing to items in the collectionList.
      *
@@ -37,12 +37,12 @@ namespace Belle2 {
     template<class AMatherAlgorithm, class AAdderAlgorithm>
     class Collector {
     public:
-      /// Copy the CollectorItem typedef from the matcher algorithm.
-      typedef typename AMatherAlgorithm::CollectorItem CollectorItem;
-      /// Copy the CollectionItem typedef from the matcher algorithm.
-      typedef typename AMatherAlgorithm::CollectionItem CollectionItem;
-      /// Shortcut typedef for CollectionItem pointers with weight.
-      typedef WithWeight<const CollectionItem*> MatchedCollectionItem;
+      /// Copy the CollectorItem from the matcher algorithm.
+      using CollectorItem = typename AMatherAlgorithm::CollectorItem;
+      /// Copy the CollectionItem from the matcher algorithm.
+      using CollectionItem = typename AMatherAlgorithm::CollectionItem;
+      /// Shortcut for CollectionItem pointers with weight.
+      using MatchedCollectionItem = WithWeight<const CollectionItem*>;
 
       /// Empty desctructor.
       virtual ~Collector() = default;

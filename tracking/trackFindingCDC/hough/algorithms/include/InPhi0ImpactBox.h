@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef Box<DiscretePhi0, ContinuousImpact> HoughBox;
+      using HoughBox = Box<DiscretePhi0, ContinuousImpact>;
 
     public:
       /**

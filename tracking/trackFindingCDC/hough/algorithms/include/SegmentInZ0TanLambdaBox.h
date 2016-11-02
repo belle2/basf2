@@ -25,7 +25,7 @@ namespace Belle2 {
     public:
 
       /// Use a Z0TanLambdaBox
-      typedef Z0TanLambdaBox HoughBox;
+      using HoughBox = Z0TanLambdaBox;
 
       /**
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.

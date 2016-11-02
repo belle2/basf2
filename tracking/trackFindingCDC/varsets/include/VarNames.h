@@ -21,7 +21,7 @@ namespace Belle2 {
 
     public:
       /// Basic type from which the variables are generated.
-      typedef AObject Object;
+      using Object = AObject;
 
       /// Number of variables to be generated.
       static const size_t nNames = 0;
@@ -35,7 +35,7 @@ namespace Belle2 {
       { return ""; }
 
       /// Marking that no further variables nested variables are to be extracted
-      typedef EmptyVarSet<Object> NestedVarSet;
+      using NestedVarSet = EmptyVarSet<Object>;
 
       /// Unpack the object for for the nested variable set
       static const Object* getNested(const Object* obj)

@@ -20,7 +20,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef Filter<CDCFacet> Super;
+      using Super = Filter<CDCFacet>;
 
     public:
       /// Constructor using default direction of flight deviation cut off.

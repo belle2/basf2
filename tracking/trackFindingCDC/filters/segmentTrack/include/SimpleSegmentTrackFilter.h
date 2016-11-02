@@ -23,7 +23,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<SegmentTrackVarSet> Super;
+      using Super = FilterOnVarSet<SegmentTrackVarSet>;
 
     public:
       /// Constructor

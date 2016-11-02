@@ -30,7 +30,7 @@ namespace Belle2 {
 
     public:
       /// The houghBox to which this object correspondes.
-      typedef typename T::HoughBox HoughBox;
+      using HoughBox = typename T::HoughBox;
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object

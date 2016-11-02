@@ -37,7 +37,7 @@ namespace Belle2 {
     class WireHitCreator : public Findlet<CDCWireHit> {
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit> Super;
+      using Super = Findlet<CDCWireHit>;
 
     public:
       /// Short description of the findlet

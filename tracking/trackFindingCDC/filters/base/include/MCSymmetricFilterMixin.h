@@ -26,7 +26,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef AFilter Super;
+      using Super = AFilter;
 
     public:
       /// Constructor

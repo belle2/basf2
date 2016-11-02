@@ -36,11 +36,11 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseVarSet<typename AObjectVarNames::Object> Super;
+      using Super = BaseVarSet<typename AObjectVarNames::Object>;
 
     public:
       /// Type from which variables should be extracted
-      typedef typename Super::Object Object;
+      using Object = typename Super::Object;
 
     private:
       /// Number of floating point values represented by this class.

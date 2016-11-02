@@ -28,9 +28,9 @@ namespace Belle2 {
     class StereoSegmentTrackMatcherFilter : public FilterBasedMatcher<StereoSegmentFilterFactory> {
     public:
       /// Use tracks as collector items.
-      typedef CDCTrack CollectorItem;
+      using CollectorItem = CDCTrack;
       /// Use segments as collection items.
-      typedef CDCRecoSegment2D CollectionItem;
+      using CollectionItem = CDCRecoSegment2D;
 
       /// Empty desctructor. Everything is handled via terminate.
       virtual ~StereoSegmentTrackMatcherFilter() = default;

@@ -57,14 +57,14 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef VarSet<FilterVarNames<AFilter> > Super;
+      using Super = VarSet<FilterVarNames<AFilter> >;
 
     public:
       /// Type of the filter
-      typedef AFilter Filter;
+      using Filter = AFilter;
 
       /// Type of the object from which the filter judgement should be extracted.
-      typedef typename Filter::Object Object;
+      using Object = typename Filter::Object;
 
       /// Construct the varset.
       FilterVarSet(const std::string& filterName = "",

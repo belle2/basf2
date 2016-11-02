@@ -20,11 +20,11 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef ABaseVarSet Super;
+      using Super = ABaseVarSet;
 
     public:
       /// Object type from which the variables shall be extracted
-      typedef typename ABaseVarSet::Object Object;
+      using Object = typename ABaseVarSet::Object;
 
     public:
       /// Main method that extracts the variable values from the complex object.

@@ -25,10 +25,10 @@ namespace Belle2 {
 
     public:
       /// Object type from which the variables shall be extracted
-      typedef typename ABaseVarSet::Object BaseObject;
+      using BaseObject = typename ABaseVarSet::Object;
 
       /// Object type from which variables shall be extracted.
-      typedef typename std::pair<const BaseObject*, const BaseObject*> Object;
+      using Object = typename std::pair<const BaseObject*, const BaseObject*>;
 
     public:
       /**

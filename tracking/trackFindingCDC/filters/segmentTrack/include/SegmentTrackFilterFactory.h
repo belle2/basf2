@@ -27,7 +27,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseSegmentTrackFilter> Super;
+      using Super = FilterFactory<BaseSegmentTrackFilter>;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef SegmentTrackFilterFactory Super;
+      using Super = SegmentTrackFilterFactory;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef SegmentTrackFilterFactory Super;
+      using Super = SegmentTrackFilterFactory;
 
     public:
       /** Fill the default filter name and parameter values*/

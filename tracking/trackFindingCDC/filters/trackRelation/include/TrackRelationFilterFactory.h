@@ -27,7 +27,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseTrackRelationFilter > Super;
+      using Super = FilterFactory<BaseTrackRelationFilter >;
 
     public:
       /** Fill the default filter name and parameter values*/
@@ -50,7 +50,7 @@ namespace Belle2 {
     };
 
     /// Legacy alias for the track relation filter factory
-    typedef TrackRelationFilterFactory TrackRelationFilterFactory;
+    using TrackRelationFilterFactory = TrackRelationFilterFactory;
 
   }
 }

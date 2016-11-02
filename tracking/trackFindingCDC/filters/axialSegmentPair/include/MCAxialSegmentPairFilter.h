@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<CDCAxialSegmentPair> > Super;
+      using Super = MCSymmetricFilterMixin<Filter<CDCAxialSegmentPair> >;
 
     public:
       /// Constructor

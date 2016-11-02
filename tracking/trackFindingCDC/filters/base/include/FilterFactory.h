@@ -34,7 +34,7 @@ namespace Belle2 {
 
     public:
       /// Type of the filter that this factory creates.
-      typedef AFilter CreatedFilter;
+      using CreatedFilter = AFilter;
 
       /// Type of allowed filter parameters
       using FilterParamVariant =

@@ -50,7 +50,7 @@ namespace Belle2 {
       }
 
       /// Marking that the basic facet variables should be included.
-      typedef PairVarSet<FitlessFacetVarSet> NestedVarSet;
+      using NestedVarSet = PairVarSet<FitlessFacetVarSet>;
     };
 
     /** Class that computes floating point variables from a facet relation.
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef VarSet<BasicFacetRelationVarNames> Super;
+      using Super = VarSet<BasicFacetRelationVarNames>;
 
     public:
       /// Construct the varset to be prepended to all variable names.

@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef AObject Object;
+      using Object = AObject;
 
     public:
       /// Making destructor virtual

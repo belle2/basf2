@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef Box<DiscretePhi0, DiscreteCurvWithArcLength2DCache, ContinuousTanL> HoughBox;
+      using HoughBox = Box<DiscretePhi0, DiscreteCurvWithArcLength2DCache, ContinuousTanL>;
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.

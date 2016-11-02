@@ -23,7 +23,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<CDCSegmentTriple> > Super;
+      using Super = MCSymmetricFilterMixin<Filter<CDCSegmentTriple> >;
 
     public:
       /// Constructor initializing the symmetry flag.

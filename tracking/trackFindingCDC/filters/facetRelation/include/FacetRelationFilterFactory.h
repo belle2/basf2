@@ -27,7 +27,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseFacetRelationFilter > Super;
+      using Super = FilterFactory<BaseFacetRelationFilter >;
 
     public:
       /// Fill the default filter name and parameter values
@@ -50,7 +50,7 @@ namespace Belle2 {
     };
 
     /// Legacy alias for the facet relation filter factory
-    typedef FacetRelationFilterFactory FacetRelationFilterFactory;
+    using FacetRelationFilterFactory = FacetRelationFilterFactory;
 
   }
 }

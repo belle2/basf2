@@ -24,7 +24,7 @@ namespace Belle2 {
     class TwoHitInBoxAlgorithm {
     public:
       /// The type of the underlaying HoughBox (copied from the first underlying hit algorithm)
-      typedef typename AHitInBoxAlgorithm::HoughBox HoughBox;
+      using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
       /**
        * Returns the sum of the resulting weights of both algorithms (of not NAN).

@@ -23,7 +23,7 @@ namespace Belle2 {
     class MapOfList : public std::map<FromItem, std::vector<ToItem>, Compare> {
     private:
       /// The super (parent) class.
-      typedef typename std::map<FromItem, std::vector<ToItem>, Compare> Super;
+      using Super = typename std::map<FromItem, std::vector<ToItem>, Compare>;
     public:
       /**
        * Add a new relation to the list. If the fromItem is already there,

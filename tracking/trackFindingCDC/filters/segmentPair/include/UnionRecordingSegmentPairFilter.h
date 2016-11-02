@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<SegmentPairFilterFactory> Super;
+      using Super = UnionRecordingFilter<SegmentPairFilterFactory>;
 
     public:
       /// Valid names of variable sets for segment pairs.

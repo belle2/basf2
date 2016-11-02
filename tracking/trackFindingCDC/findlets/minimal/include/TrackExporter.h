@@ -29,7 +29,7 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCTrack&> Super;
+      using Super = Findlet<CDCTrack&>;
 
     public:
       /// Short description of the findlet

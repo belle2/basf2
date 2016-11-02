@@ -43,13 +43,7 @@ namespace Belle2 {
 
         auto* newSPTC = tcContainer.appendNew(aPath);
 
-        /** TODO: Create relations between SpacePoints and SPTCs in the
-         * following for-loop.
-         * To achieve this the relations between the two objects
-         * must be registered (in Initialize in  TrackFinderVXDCellOMatModule.cc
-         * and TrackFinderVXDBasicPathFInderModule.cc) as it is done
-         * for instance in initialize in SpacePointCreatorSVDModule.cc*/
-
+        // Set relations between Nodes and Space Point Track Candidates
         for (const SpacePoint* aNode : aPath) { // is a const SpacePoint* here
           aNode->addRelationTo(newSPTC, 1.);
           newSPTC->addRelationTo(aNode, 1.);

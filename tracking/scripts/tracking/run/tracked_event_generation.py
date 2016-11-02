@@ -150,6 +150,10 @@ def add_standard_finder(path):
             components = utilities.get_module_param(module, "components")
     if not components:
         components = None
+
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
     tracking.add_track_finding(path, components=components)
 
 

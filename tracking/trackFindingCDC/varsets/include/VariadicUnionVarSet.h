@@ -107,6 +107,6 @@ namespace Belle2 {
       /// Container for the multiple variable sets.
       UnionVarSet<Object> m_multiVarSet;
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

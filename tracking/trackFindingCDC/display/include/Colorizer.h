@@ -256,7 +256,7 @@ namespace Belle2 {
         Colorizer<AObject, ListColorsColorMap<AObject>>::m_strokeSet = true;
       }
     };
-  } // TrackFindingCDC
-} // Belle2
+  }
+}
 
 #endif /* COLORIZER_H_ */

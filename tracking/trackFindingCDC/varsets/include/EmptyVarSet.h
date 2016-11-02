@@ -23,7 +23,7 @@ namespace Belle2 {
     template<class AObject>
     class EmptyVarSet final : public BaseVarSet<AObject> {
 
-    }; //end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

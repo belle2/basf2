@@ -63,6 +63,6 @@ namespace Belle2 {
       /// Creator of the super clusters
       ClusterCreator<SecondaryWireHitRelationFilter> m_clusterCreator;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

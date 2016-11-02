@@ -48,4 +48,4 @@ namespace Belle2 {
     using EIncDec = NIncDec::EIncDec;
 
   }
-} // namespace Belle2
+}

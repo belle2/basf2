@@ -128,6 +128,6 @@ namespace Belle2 {
     inline int sign(int x)
     { return (x > 0) - (x < 0); }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

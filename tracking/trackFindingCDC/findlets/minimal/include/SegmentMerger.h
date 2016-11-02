@@ -101,6 +101,6 @@ namespace Belle2 {
       /// Wire hit neighborhood relation filter
       SegmentRelationFilter m_segmentRelationFilter;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

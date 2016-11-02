@@ -22,7 +22,7 @@ namespace Belle2 {
       /// Getter for the vector of wires the hits of this segment are based on in the same order
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
 
-    }; //end class CDCWireHitSegment
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

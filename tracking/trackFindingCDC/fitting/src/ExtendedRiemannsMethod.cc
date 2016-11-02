@@ -277,7 +277,7 @@ namespace {
     return perigeePrecision;
   }
 
-} // end anonymuous namespace
+}
 
 
 

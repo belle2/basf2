@@ -210,7 +210,7 @@ namespace Belle2 {
       /// Memory for the height of the SVG drawing in pixels
       float m_canvasHeight;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

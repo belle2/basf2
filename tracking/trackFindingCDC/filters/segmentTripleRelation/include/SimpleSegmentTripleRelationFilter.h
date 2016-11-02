@@ -31,8 +31,8 @@ namespace Belle2 {
       virtual Weight operator()(const CDCSegmentTriple&,
                                 const CDCSegmentTriple& neighborTriple) override final;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}
 

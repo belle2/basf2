@@ -58,7 +58,7 @@ namespace Belle2 {
       /// Instance of the Monte Carlo axial stereo segment filter for rejection of false cells.
       MCSegmentPairFilter m_mcSegmentPairFilter;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

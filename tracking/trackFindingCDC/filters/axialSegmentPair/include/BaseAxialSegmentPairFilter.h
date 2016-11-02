@@ -18,5 +18,5 @@ namespace Belle2 {
     /// Base class for filter for the constuction of axial to axial segment pairs.
     using BaseAxialSegmentPairFilter = Filter<CDCAxialSegmentPair> ;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

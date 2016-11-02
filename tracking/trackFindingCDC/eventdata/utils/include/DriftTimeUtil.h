@@ -125,6 +125,6 @@ namespace Belle2 {
         return measuredTime;
       }
 
-    }; // struct
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

@@ -70,6 +70,6 @@ namespace Belle2 {
        */
       EPreferredDirection m_segmentOrientation = EPreferredDirection::c_None;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

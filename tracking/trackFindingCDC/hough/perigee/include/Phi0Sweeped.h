@@ -95,5 +95,5 @@ namespace Belle2 {
       float m_curlCurv = NAN;
 
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

@@ -77,7 +77,7 @@ namespace Belle2 {
       /// Memory for the direction the neighbor is located. Range 1 - 12 imaged on a regular clock
       short m_oClockDirection = 0;
 
-    }; // class WireNeighborKind
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

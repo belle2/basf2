@@ -28,6 +28,6 @@ namespace Belle2 {
       /// Short description of the findlet
       virtual std::string getDescription() override;
 
-    }; // end class TrackFinderCosmics
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

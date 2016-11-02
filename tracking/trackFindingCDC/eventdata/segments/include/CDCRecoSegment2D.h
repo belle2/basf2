@@ -138,6 +138,6 @@ namespace Belle2 {
 
       /// Memory for the global super cluster id.
       int m_iSuperCluster = -1;
-    }; //end class CDCRecoSegment2D
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

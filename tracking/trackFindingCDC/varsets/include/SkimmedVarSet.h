@@ -44,6 +44,6 @@ namespace Belle2 {
         return true;
       }
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

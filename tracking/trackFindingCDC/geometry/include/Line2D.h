@@ -507,6 +507,6 @@ namespace Belle2 {
       /// Memory for the second line parameter
       Vector2D m_n12;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

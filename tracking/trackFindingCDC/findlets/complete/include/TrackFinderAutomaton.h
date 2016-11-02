@@ -85,7 +85,7 @@ namespace Belle2 {
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
 
-    }; // end class TrackFinderAutomaton
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

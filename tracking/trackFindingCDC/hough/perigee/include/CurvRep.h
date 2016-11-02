@@ -115,5 +115,5 @@ namespace Belle2 {
     //{ return GetUpperCurv()(houghBox); }
     { return getIfApplicable<float>(GetUpperCurv(), houghBox, 0.0); }
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

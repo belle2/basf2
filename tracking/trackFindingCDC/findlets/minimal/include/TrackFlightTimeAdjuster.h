@@ -55,6 +55,6 @@ namespace Belle2 {
       /// Point relative to which the flight time should be estimated.
       Vector3D m_triggerPoint{0.0, 0.0, 0.0};
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

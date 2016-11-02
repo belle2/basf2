@@ -34,6 +34,6 @@ namespace Belle2 {
         return startSegment.size() + endSegment.size();
       }
 
-    }; // end class AllSegmentPairFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

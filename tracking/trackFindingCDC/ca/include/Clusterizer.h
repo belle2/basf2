@@ -156,6 +156,6 @@ namespace Belle2 {
         automatonCell.setCellWeight(cellWeight);
       }
 
-    }; // end class Clusterizer
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

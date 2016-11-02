@@ -697,7 +697,7 @@ namespace Belle2 {
       /// Memory for the first parameter
       double m_n0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

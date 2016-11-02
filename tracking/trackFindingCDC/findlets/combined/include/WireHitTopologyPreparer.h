@@ -81,7 +81,7 @@ namespace Belle2 {
       /// Publishes the created wire hits to the wire hit topology.
       WireHitTopologyFiller m_wireHitTopologyFiller;
 
-    }; // end class WireHitTopologyPreparer
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

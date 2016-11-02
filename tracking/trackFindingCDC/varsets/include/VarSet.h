@@ -187,6 +187,6 @@ namespace Belle2 {
       /// Nested VarSet implementing a chain of sets until EmptyVarSet terminates the sequence.
       typename AObjectVarNames::NestedVarSet m_nestedVarSet;
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

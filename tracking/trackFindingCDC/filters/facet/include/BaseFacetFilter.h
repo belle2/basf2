@@ -18,5 +18,5 @@ namespace Belle2 {
     /// Base class for all facet filters
     using BaseFacetFilter = Filter<CDCFacet>;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

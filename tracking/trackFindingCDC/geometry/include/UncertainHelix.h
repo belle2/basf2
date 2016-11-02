@@ -345,7 +345,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedom of the fit of this helix.
       size_t m_ndf = 0.0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

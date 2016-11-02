@@ -61,7 +61,7 @@ namespace Belle2 {
       {
         return operator()(from, to);
       }
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

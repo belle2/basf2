@@ -66,6 +66,6 @@ namespace Belle2 {
       /// Swtich to reestimate the  drift length.
       bool m_reestimateDriftLength;
 
-    }; // class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

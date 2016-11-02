@@ -263,7 +263,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedim of the fit of this circle.
       size_t m_ndf = 0.0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

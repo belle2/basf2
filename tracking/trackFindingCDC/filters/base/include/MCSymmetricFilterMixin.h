@@ -82,7 +82,7 @@ namespace Belle2 {
       /// Switch to indicate if the reversed version of the object shall also be accepted (default is true).
       bool m_param_allowReverse;
 
-    }; // end class MCFilterMixin
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

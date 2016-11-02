@@ -51,6 +51,6 @@ namespace Belle2 {
       /// Parameter : Switch to reconstruct the positions in the segments immitating the facet ca picking up all correct hits.
       bool m_param_reconstructedPositions = false;
 
-    }; // end class SegmentCreator
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

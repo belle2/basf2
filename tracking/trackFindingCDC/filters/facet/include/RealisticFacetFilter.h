@@ -46,6 +46,6 @@ namespace Belle2 {
       /// Memory for the pull cu
       double m_param_phiPullCut;
 
-    }; // end class RealisticFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

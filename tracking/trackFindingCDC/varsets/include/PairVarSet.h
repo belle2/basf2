@@ -133,6 +133,6 @@ namespace Belle2 {
       /// VarSet for the second element of the set.
       ABaseVarSet m_secondVarSet;
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

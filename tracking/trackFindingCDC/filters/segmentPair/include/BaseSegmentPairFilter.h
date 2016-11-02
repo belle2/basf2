@@ -18,5 +18,5 @@ namespace Belle2 {
     /// Base class for all axial to stereo segment pairs filters
     using BaseSegmentPairFilter = Filter<CDCSegmentPair>;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

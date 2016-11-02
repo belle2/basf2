@@ -238,7 +238,7 @@ namespace Belle2 {
 
       // Note we can only create it on initialisation because the gearbox has to be connected.
 
-    }; // end class WireHitCreator
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

@@ -64,7 +64,7 @@ namespace Belle2 {
       /// Macro turning CDCWireHitTopology into a root class
       ClassDef(CDCWireHitTopology, 1);
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

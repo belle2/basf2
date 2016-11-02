@@ -27,6 +27,6 @@ namespace Belle2 {
     inline bool isNotACell(const CellWeight& cellWeight)
     { return std::isnan(cellWeight); }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

@@ -192,6 +192,6 @@ namespace Belle2 {
       /// Automaton cell assoziated with the pair of segments
       mutable AutomatonCell m_automatonCell;
 
-    }; // class CDCSegmentTriple
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

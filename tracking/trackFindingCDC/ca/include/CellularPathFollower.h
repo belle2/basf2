@@ -190,9 +190,9 @@ namespace Belle2 {
           (automatonCell.getCellState() == (neighborAutomatonCell.getCellState() + weight + automatonCell.getCellWeight()));
       }
 
-    }; // end class CellularPathFollower
+    };
 
-  } //end namespace TrackFindingCDC
+  }
 
-} //end namespace Belle2
+}
 

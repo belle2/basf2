@@ -84,8 +84,8 @@ namespace Belle2 {
       //cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCSegmentPair> m_cellularPathFinder;
-    }; // end class SegmentCreator
+    };
 
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

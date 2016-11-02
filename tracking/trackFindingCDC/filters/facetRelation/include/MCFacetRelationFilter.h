@@ -67,6 +67,6 @@ namespace Belle2 {
       /// Monte Carlo cell filter to reject neighborhoods have false cells
       MCFacetFilter m_mcFacetFilter;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

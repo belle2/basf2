@@ -253,6 +253,6 @@ namespace Belle2 {
       /// Memory for the wire hit neighborhood in within a cluster.
       std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
 
-    }; // end class FacetCreator
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

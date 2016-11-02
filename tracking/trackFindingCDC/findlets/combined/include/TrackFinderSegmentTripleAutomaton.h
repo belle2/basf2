@@ -145,7 +145,7 @@ namespace Belle2 {
       /// Memory for the tracks after merging was applied.
       std::vector<CDCTrack> m_mergedTracks;
 
-    }; // end class TrackFinderCDCSegmentTripleAutomatonModule
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

@@ -25,6 +25,6 @@ namespace Belle2 {
     inline bool isValidIndex(Index index)
     { return index >= 0; }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

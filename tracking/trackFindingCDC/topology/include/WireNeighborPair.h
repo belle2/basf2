@@ -44,7 +44,7 @@ namespace Belle2 {
       /// Getter for the kind of neighbor hood relation the first wire has with the second
       WireNeighborKind getNeighborKind() const;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

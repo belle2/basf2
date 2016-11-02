@@ -138,6 +138,6 @@ namespace Belle2 {
       /// Memory for the line representation
       UncertainSZLine m_szLine;
 
-    }; //class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

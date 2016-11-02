@@ -83,7 +83,7 @@ void SegmentAliasResolver::apply(std::vector<CDCRecoSegment2D>& outputSegments)
       refit(aliasSegment, true);
       swapBetterChi2(segment, aliasSegment);
     } // end alias loop
-  } // end if alias full
+  }
 
   if (m_borderAliases) {
     for (CDCRecoSegment2D& segment : outputSegments) {

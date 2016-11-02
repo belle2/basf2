@@ -69,7 +69,7 @@ namespace Belle2 {
       /// Reference to the filter to be used to filter background
       ClusterFilter m_clusterFilter;
 
-    }; // end class ClusterBackgroundDetector
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

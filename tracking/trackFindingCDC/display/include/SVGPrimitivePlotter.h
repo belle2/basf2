@@ -248,7 +248,7 @@ namespace Belle2 {
       /// Memory for additional attributes to the toplevel svg element.
       AttributeMap m_svgAttributes;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -31,7 +31,7 @@ namespace Belle2 {
       virtual Weight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& axialSegmentPair)
       override final;
 
-    }; // end class MCSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

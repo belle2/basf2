@@ -62,6 +62,6 @@ namespace Belle2 {
       /// Switch for hard selection.
       bool m_param_hardRLCut = true;
 
-    }; // end class FeasibleRLFacetFilter
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

@@ -66,8 +66,8 @@ namespace Belle2 {
       static auto getFromImpl(const T& t, long) -> decltype(t->getStereoKind())
       { return &*t == nullptr ? EStereoKind::c_Invalid  : t->getStereoKind(); }
 
-    }; // class EStereoKindUtil
+    };
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

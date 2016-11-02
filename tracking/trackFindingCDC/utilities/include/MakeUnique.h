@@ -25,5 +25,5 @@ namespace Belle2 {
       return std::unique_ptr<T>(new T(std::forward<Args>(args)...));
     }
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

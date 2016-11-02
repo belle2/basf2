@@ -228,6 +228,6 @@ namespace Belle2 {
       /// The set of reassigned secondary CDCSimHits
       std::set<const CDCSimHit*> m_reassignedSecondarySimHits;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

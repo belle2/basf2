@@ -110,7 +110,7 @@ void CDCMCTrackStore::fillMCTracks()
       //Append hit to its own track
       m_mcTracksByMCParticleIdx[mcParticleIdx].push_back(ptrHit);
     }
-  } //end for wire hits
+  }
 
 
   //Sort the tracks along the time of flight

@@ -31,6 +31,6 @@ namespace Belle2 {
     inline bool isNotANeighbor(const NeighborWeight& weight)
     { return std::isnan(weight); }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

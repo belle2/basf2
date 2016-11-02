@@ -171,6 +171,6 @@ namespace Belle2 {
       size_t appendSZ(CDCObservations2D& observationsSZ, const double s, const double z, const double weight = 1.0) const
       { return observationsSZ.fill(s, z, 0.0, weight); }
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

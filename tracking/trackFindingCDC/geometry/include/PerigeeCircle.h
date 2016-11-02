@@ -507,7 +507,7 @@ namespace Belle2 {
       /// Memory for the signed impact parameter
       double m_impact;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

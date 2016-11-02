@@ -115,6 +115,6 @@ namespace Belle2 {
       /// Look up table for the number of super layers the particle traversed before making the individual hit
       std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
-    }; //class CDCMCTrackStore
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

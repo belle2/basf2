@@ -49,6 +49,6 @@ namespace Belle2 {
       /// Memory for the width parameter to translate the chi2 value to a weight penatlity
       double m_param_penaltyWidth = 200; // first guess was 800;
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

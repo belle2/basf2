@@ -41,7 +41,7 @@ namespace Belle2 {
 
       /// Function to object for its signalness
       virtual Weight operator()(const Relation<const CDCSegmentPair>& relation) override;
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

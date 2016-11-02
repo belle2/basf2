@@ -282,6 +282,6 @@ namespace Belle2 {
       /// Memory for the second and third wire hits.
       CDCRLWireHitPair m_rearRLWireHitPair;
 
-    }; //end class CDCRLWireHitTriple
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

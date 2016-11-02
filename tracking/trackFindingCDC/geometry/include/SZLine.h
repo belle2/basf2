@@ -218,6 +218,6 @@ namespace Belle2 {
       /// Memory for the z0 parameter
       double m_z0;
 
-    }; // class
-  }    // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

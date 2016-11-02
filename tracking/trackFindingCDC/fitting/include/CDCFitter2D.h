@@ -178,7 +178,7 @@ namespace Belle2 {
       /// Flag which indicates to only use the reco position and the 1/drift length as a weight.
       bool m_doUseDriftVariance;
 
-    }; //class
+    };
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -449,7 +449,7 @@ namespace Belle2 {
       /// Memory for the estimation of the time at which the particle arrived at the support point
       double m_flightTime = NAN;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

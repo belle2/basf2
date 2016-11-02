@@ -292,8 +292,8 @@ namespace Belle2 {
       std::string map(const int iCDCHit, const CDCHit& cdcHit) override;
     };
 
-  }//namespace TrackFindingCDC
-}//namespace Belle2
+  }
+}
 
 
 

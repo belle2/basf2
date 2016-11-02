@@ -228,7 +228,7 @@ namespace Belle2 {
       /// Storage for the cell state set by the cellular automata
       mutable CellState m_state = 0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

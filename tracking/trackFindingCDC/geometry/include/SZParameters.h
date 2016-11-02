@@ -58,6 +58,6 @@ namespace Belle2 {
     /// Jacobian matrix for the sz parameters
     using SZJacobian = SZUtil::JacobianMatrix;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

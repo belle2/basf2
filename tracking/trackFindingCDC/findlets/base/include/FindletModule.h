@@ -283,5 +283,5 @@ namespace Belle2 {
       ClassMnemomics m_classMnemomics;
     };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

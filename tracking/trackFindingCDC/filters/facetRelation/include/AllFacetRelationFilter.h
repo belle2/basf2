@@ -40,6 +40,6 @@ namespace Belle2 {
         return fromFacet.getStartWire() == toFacet.getEndWire() ? NAN : -2;
       }
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

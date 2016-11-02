@@ -41,5 +41,5 @@ namespace Belle2 {
       const float& getUpperTanLambda() const
       { return *(getUpperBound<DiscreteTanL>()); }
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

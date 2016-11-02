@@ -150,6 +150,6 @@ namespace Belle2 {
       /// Collection of contained variables sets.
       std::vector<std::unique_ptr<ContainedVarSet>> m_varSets;
 
-    }; //end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

@@ -330,7 +330,7 @@ namespace Belle2 {
       /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
       double m_refTanLambda;
 
-    }; // class CDCWireSuperLayer
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

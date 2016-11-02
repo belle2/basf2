@@ -264,7 +264,7 @@ namespace Belle2 {
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;
 
-    }; // class CDCRecoHit2D
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

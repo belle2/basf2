@@ -184,8 +184,8 @@ namespace Belle2 {
         }
       }
 
-    }; // end class CellularAutomaton
+    };
 
-  } //end namespace TrackFindingCDC
+  }
 
-} //end namespace Belle2
+}

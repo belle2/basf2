@@ -228,6 +228,6 @@ namespace Belle2 {
       /// Memory for nNames floating point values.
       Float_t m_values[nNames] = {};
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

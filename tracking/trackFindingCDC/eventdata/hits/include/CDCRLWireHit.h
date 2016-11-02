@@ -247,6 +247,6 @@ namespace Belle2 {
       /// Memory for the reestimated drift length
       double m_refDriftLength = 0.0;
 
-    }; // class CDCRLWireHit
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

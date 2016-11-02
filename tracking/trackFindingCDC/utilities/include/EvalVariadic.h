@@ -91,5 +91,5 @@ namespace Belle2 {
     using TypeInTuple =
       std::integral_constant < bool, (GetIndexInTuple<T, ATuple>::value < std::tuple_size<ATuple>::value) >;
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -102,6 +102,6 @@ namespace Belle2 {
           }
         }
       }
-    }; // struct GenfitUtil
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

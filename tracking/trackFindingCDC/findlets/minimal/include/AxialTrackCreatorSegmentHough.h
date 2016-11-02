@@ -97,8 +97,8 @@ namespace Belle2 {
 
       /// The hough space tree search
       SimpleSegmentPhi0ImpactCurvHoughTree m_houghTree{m_param_maxLevel};
-    }; // end class
+    };
 
-  } //end namespace TrackFinderCDC
+  }
 
-} //end namespace Belle2
+}

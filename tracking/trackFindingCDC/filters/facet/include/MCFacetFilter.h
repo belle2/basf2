@@ -40,6 +40,6 @@ namespace Belle2 {
       /// Indicated if the oriented triple is a correct hypotheses
       bool operator()(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance);
 
-    }; // class MCFacetFilter
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

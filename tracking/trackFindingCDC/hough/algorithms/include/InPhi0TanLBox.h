@@ -93,5 +93,5 @@ namespace Belle2 {
       /// Curler curvature - set to value greater zero to activate one arm exclusive finding.
       float m_curlCurv;
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

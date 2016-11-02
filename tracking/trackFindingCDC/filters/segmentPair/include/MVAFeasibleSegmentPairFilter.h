@@ -35,7 +35,7 @@ namespace Belle2 {
       {
       }
 
-    }; // end class MVAFeasibleSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

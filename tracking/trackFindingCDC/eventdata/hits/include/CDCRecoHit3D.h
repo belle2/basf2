@@ -355,6 +355,6 @@ namespace Belle2 {
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D;
 
-    }; // class CDCRecoHit3D
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

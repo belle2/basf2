@@ -203,7 +203,7 @@ namespace {
   }
 
 
-} // end anonymuous namespace
+}
 
 
 

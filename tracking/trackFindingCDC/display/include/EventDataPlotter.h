@@ -264,7 +264,7 @@ namespace Belle2 {
       /// Memory for the flag if the event data should be animated. If animation is supported is backend dependent.
       bool m_animate = false;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

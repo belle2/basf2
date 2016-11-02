@@ -54,6 +54,6 @@ namespace Belle2 {
       /// Memory for the flag indicating that curves through the origin shall be fitter
       bool m_originConstrained;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

@@ -572,7 +572,7 @@ namespace Belle2 {
       /// Memory for the third coordinate
       double m_z;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

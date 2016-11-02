@@ -133,6 +133,6 @@ namespace Belle2 {
       /// The filter to be used for the segment pair generation.
       ASegmentTripleFilter m_segmentTripleFilter;
 
-    }; //end class FacetCreator
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

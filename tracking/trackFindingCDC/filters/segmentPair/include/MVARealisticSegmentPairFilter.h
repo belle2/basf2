@@ -70,7 +70,7 @@ namespace Belle2 {
       /// Feasibility filter applied first before invoking the main cut
       MVAFeasibleSegmentPairFilter m_feasibleSegmentPairFilter;
 
-    }; // end class TMVAHitGapSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

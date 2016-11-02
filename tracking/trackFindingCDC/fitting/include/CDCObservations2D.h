@@ -631,7 +631,7 @@ namespace Belle2 {
        */
       EFitVariance m_fitVariance;
 
-    }; // class CDCObservations2D
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

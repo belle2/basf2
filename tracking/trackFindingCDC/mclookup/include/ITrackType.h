@@ -18,6 +18,6 @@ namespace Belle2 {
     /// Constant to mark an invalid track id
     const ITrackType INVALID_ITRACK = -998;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

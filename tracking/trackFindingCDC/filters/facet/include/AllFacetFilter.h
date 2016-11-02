@@ -24,6 +24,6 @@ namespace Belle2 {
       {
         return 3.0;
       }
-    }; //end class AllFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

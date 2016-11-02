@@ -79,6 +79,6 @@ namespace Belle2 {
       /// Drift time of the hit in the conformal plane
       double m_conformalDriftLength;
 
-    }; //end class CDCTrackHit
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

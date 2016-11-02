@@ -90,6 +90,6 @@ namespace Belle2 {
       /// Memory for the singletone CDCMCTrackLookUp
       CDCMCTrackLookUp m_mcTrackLookUp;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

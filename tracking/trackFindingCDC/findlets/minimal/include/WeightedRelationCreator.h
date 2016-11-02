@@ -94,7 +94,7 @@ namespace Belle2 {
       /// Maximal number of the best relations from each item to keep
       int m_param_onlyBest = 0;
 
-    }; // end class WeightedRelationCreator
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

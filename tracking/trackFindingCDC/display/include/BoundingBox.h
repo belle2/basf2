@@ -105,7 +105,7 @@ namespace Belle2 {
       /// Memory for the upper y bound of the rectangle.
       float m_top;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

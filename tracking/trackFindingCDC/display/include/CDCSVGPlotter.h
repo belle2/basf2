@@ -259,6 +259,6 @@ namespace Belle2 {
       /// The plotter instance to translate event data objects to svg expressions.
       TrackFindingCDC::EventDataPlotter m_eventdataPlotter;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

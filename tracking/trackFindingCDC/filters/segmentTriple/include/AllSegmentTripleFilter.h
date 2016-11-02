@@ -21,7 +21,7 @@ namespace Belle2 {
       /// All implementation returns the size of the segment triples accepting all.
       virtual Weight operator()(const CDCSegmentTriple& triple) override final;
 
-    }; // end class AllSegmentTripleFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

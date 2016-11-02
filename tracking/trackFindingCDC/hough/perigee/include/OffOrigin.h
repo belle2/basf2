@@ -71,5 +71,5 @@ namespace Belle2 {
       float m_localOriginY = 0.0;
 
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Memory for the used direction of flight deviation.
       double m_param_deviationCosCut;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

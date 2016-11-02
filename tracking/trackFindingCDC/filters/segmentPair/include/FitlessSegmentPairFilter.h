@@ -29,7 +29,7 @@ namespace Belle2 {
       /// Checks if a pair of segments is a good combination
       virtual Weight operator()(const CDCSegmentPair& segmentPair) override final;
 
-    }; // end class FitlessSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

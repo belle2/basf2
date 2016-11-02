@@ -185,7 +185,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
     track.setEndTrajectory3D(endTrajectory3D);
 
     tracks.push_back(std::move(track));
-  } // for candidates
+  }
 }
 
 void AxialTrackCreatorSegmentHough::terminate()

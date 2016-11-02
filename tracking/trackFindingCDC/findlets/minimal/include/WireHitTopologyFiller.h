@@ -53,7 +53,7 @@ namespace Belle2 {
         CDCWireHitTopology::getInstance().fill(sharedWireHits);
       }
 
-    }; // end class WireHitTopologyFiller
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

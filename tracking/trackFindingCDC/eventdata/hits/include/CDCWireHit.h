@@ -299,7 +299,7 @@ namespace Belle2 {
       /// Memory for the super cluster id
       int m_iSuperCluster = -1;
 
-    }; // class CDCWireHit
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

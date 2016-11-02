@@ -112,7 +112,7 @@ namespace Belle2 {
       /// Memory for the facet paths generated from the graph.
       std::vector< std::vector<const CDCFacet*> > m_facetPaths;
 
-    }; // end class SegmentCreator
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

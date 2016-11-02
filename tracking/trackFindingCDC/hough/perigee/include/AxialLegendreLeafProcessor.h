@@ -124,6 +124,6 @@ namespace Belle2 {
       /// Memory for found trajectories.
       std::vector<Candidate> m_candidates;
 
-    }; // class
+    };
   }
 }

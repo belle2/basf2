@@ -48,4 +48,4 @@ namespace Belle2 {
     using EForwardBackward = NForwardBackward::EForwardBackward;
 
   }
-} // namespace Belle2
+}

@@ -46,6 +46,6 @@ namespace Belle2 {
       /// Parameter : Threshold below, which hits are consider electronic noise background
       double m_param_noiseChargeDeposit = 0;
 
-    }; // end class WireHitBackgroundBlocker
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

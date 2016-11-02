@@ -77,6 +77,6 @@ namespace Belle2 {
       /// Instance of the drift length estimator to be used.
       DriftLengthEstimator m_driftLengthEstimator;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

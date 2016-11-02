@@ -213,7 +213,7 @@ namespace Belle2 {
       /// Memory for the reconstructed segments
       std::vector<CDCRecoSegment2D> m_intermediateSegments;
 
-    }; // end class SegmentFinderFacetAutomaton
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

@@ -34,7 +34,7 @@ namespace Belle2 {
       virtual Weight operator()(const CDCTrack& fromTrack,
                                 const CDCTrack& toTrack) override final;
 
-    }; // end class MCTrackRelationFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

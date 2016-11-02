@@ -57,6 +57,6 @@ namespace Belle2 {
       /// Flag to use reco tracks instead of genfit tracks
       bool m_param_useRecoTracks = true;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

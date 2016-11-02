@@ -50,6 +50,6 @@ namespace Belle2 {
       static UncertainParameterLine2D fit(Eigen::Matrix<double, 3, 3> xyl,
                                           Eigen::Array<double, 3, 1> w,
                                           int nSteps = 100);
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

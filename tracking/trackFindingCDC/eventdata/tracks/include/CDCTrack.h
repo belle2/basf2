@@ -190,7 +190,7 @@ namespace Belle2 {
       /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
       bool m_hasMatchingSegment = false;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

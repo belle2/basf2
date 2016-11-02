@@ -101,6 +101,6 @@ namespace Belle2 {
        */
       std::map<ISuperLayer, size_t> m_param_minimalHitsForSingleSegmentTrackBySuperLayerId{};
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

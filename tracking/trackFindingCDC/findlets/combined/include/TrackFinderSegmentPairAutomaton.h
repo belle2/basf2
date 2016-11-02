@@ -140,7 +140,7 @@ namespace Belle2 {
       /// Memory for the tracks after orientation was applied.
       std::vector<CDCTrack> m_orientedTracks;
 
-    }; // end class TrackFinderSegmentPairAutomaton
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

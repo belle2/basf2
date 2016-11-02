@@ -20,7 +20,7 @@ namespace Belle2 {
       /// Checks if a pair of axial segments is a good combination
       virtual Weight operator()(const CDCAxialSegmentPair&) override final;
 
-    }; // end class AllAxialSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

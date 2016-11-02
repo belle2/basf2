@@ -58,6 +58,6 @@ namespace Belle2 {
       /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
 
-    }; // end class MCSegmentTripleFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

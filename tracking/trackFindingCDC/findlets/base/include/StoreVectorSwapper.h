@@ -143,6 +143,6 @@ namespace Belle2 {
       /// Backup storage if the vector should not be written to the DataStore
       std::vector<IOType> m_backup;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

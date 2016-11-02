@@ -316,7 +316,7 @@ namespace Belle2 {
       //@}
 
 
-    }; // class CDCWireLayer
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

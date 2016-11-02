@@ -112,6 +112,6 @@ namespace Belle2 {
         return nullptr;
       }
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

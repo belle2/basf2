@@ -33,7 +33,7 @@ namespace Belle2 {
       Weight operator()(const CDCSegmentPair& fromSegmentPair,
                         const CDCSegmentPair& toSegmentPair) override final;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

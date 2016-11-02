@@ -44,7 +44,7 @@ namespace Belle2 {
       { return wrappedAround(iWire - 1, nWires); }
 
 
-    }; // struct IWireUtil
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

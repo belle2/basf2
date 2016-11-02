@@ -246,6 +246,6 @@ namespace Belle2 {
       /// Memory for the wire sag coeffiecent.
       double m_sagCoeff = 0.0;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

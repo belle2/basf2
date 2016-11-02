@@ -118,6 +118,6 @@ namespace Belle2 {
       /// Memory for the look up relation of the right left passage information as defined in tracking.
       std::map<const CDCHit*, ERightLeft> m_rightLeftInfos;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

@@ -207,7 +207,7 @@ namespace Belle2 {
 
       /// Electron drift speed in the cdc gas
       double m_driftSpeed = s_nominalDriftSpeed;
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

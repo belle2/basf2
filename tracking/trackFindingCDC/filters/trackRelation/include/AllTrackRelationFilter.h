@@ -29,6 +29,6 @@ namespace Belle2 {
       /// Implementation accepting all possible neighbors.
       virtual Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) override final;
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

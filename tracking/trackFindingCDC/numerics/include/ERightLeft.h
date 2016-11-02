@@ -48,4 +48,4 @@ namespace Belle2 {
     using ERightLeft = NRightLeft::ERightLeft;
 
   }
-} // namespace Belle2
+}

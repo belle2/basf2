@@ -32,5 +32,5 @@ namespace Belle2 {
     template<class ANewType, class ABox>
     using SweepBox = typename SweepBoxImpl<ANewType, ABox>::Type;
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

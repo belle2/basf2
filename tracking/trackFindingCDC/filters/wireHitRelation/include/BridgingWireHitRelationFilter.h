@@ -171,7 +171,7 @@ namespace Belle2 {
       /// Indices of the considered o'clock positions of the secondary neighborhood.
       std::vector<short> m_consideredSecondaryNeighbors;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

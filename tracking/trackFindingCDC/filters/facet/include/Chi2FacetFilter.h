@@ -48,6 +48,6 @@ namespace Belle2 {
       /// Memory for the width parameter to translate the chi2 value to a weight penatlity
       double m_param_penaltyWidth = 120.0;
 
-    }; // end class RealisticFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

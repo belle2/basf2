@@ -66,5 +66,5 @@ namespace Belle2 {
         return ESignUtil::common(lowerDistSign, upperDistSign);
       }
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

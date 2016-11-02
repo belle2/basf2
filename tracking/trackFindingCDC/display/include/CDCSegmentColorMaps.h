@@ -127,8 +127,8 @@ namespace Belle2 {
       ListColors m_listColors;
     };
 
-  }//namespace TrackFindingCDC
-}//namespace Belle2
+  }
+}
 
 
 

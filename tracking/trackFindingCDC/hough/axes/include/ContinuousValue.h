@@ -43,5 +43,5 @@ namespace Belle2 {
       T m_value;
     };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

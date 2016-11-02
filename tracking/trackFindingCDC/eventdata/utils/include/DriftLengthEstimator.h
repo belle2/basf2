@@ -43,6 +43,6 @@ namespace Belle2 {
       /// Parameter : Mass to estimate the velocity in the flight time to the hit
       double m_param_tofMassScale = NAN;
 
-    }; // struct
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

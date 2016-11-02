@@ -170,6 +170,6 @@ namespace Belle2 {
       /// Memory for the cluster id of this facet
       int m_iCluster = -1;
 
-    }; //end class CDCRLWireHitPair
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

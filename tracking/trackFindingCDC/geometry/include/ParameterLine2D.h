@@ -434,6 +434,6 @@ namespace Belle2 {
       /// Tangential vector of the line
       Vector2D m_tangential;
 
-    }; // class
-  }    // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

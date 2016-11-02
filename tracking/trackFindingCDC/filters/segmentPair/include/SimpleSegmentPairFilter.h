@@ -43,7 +43,7 @@ namespace Belle2 {
       /// Memory of the Riemann fitter for the circle fits.
       CDCRiemannFitter m_riemannFitter;
 
-    }; // end class SimpleSegmentPairFilter
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

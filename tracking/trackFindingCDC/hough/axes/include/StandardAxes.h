@@ -89,5 +89,5 @@ namespace Belle2 {
     /// Type for discrete phi0 values
     using DiscretePhi0 = DiscreteValue<Vector2D, Phi0Tag>;
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

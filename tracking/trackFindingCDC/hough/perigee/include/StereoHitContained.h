@@ -180,5 +180,5 @@ namespace Belle2 {
       float m_rlWeightGain = 0;
     };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

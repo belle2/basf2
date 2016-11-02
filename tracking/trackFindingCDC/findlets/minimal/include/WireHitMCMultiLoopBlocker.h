@@ -48,7 +48,7 @@ namespace Belle2 {
       /// Parameter : Maximal fraction of loops of the mc particles trajectory needs to the hit to unblock it.
       double m_param_useNLoops = INFINITY;
 
-    }; // end class WireHitMCMultiLoopBlocker
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

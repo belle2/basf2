@@ -60,7 +60,7 @@ namespace Belle2 {
 
     public:
 
-    }; //class
+    };
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

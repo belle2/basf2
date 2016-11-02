@@ -73,6 +73,6 @@ namespace Belle2 {
         return operator()(*ptrFrom, *ptrTo);
       }
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

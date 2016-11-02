@@ -176,6 +176,6 @@ namespace Belle2 {
         return result;
       }
 
-    }; // class WeightedNeighborhood
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

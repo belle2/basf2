@@ -18,5 +18,5 @@ namespace Belle2 {
     template<bool cond, class T>
     using EnableIf = typename std::enable_if<cond, T>::type;
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

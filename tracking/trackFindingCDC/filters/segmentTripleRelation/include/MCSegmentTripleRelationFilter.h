@@ -57,8 +57,8 @@ namespace Belle2 {
       /// Instance of the Monte Carlo segment triple filter for rejection of false cells.
       MCSegmentTripleFilter m_mcSegmentTripleFilter;
 
-    }; // end class
+    };
 
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

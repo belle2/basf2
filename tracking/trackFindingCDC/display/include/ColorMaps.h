@@ -208,6 +208,6 @@ namespace Belle2 {
       std::string m_inputValue;
     };
 
-  }//namespace TrackFindingCDC
-}//namespace Belle2
+  }
+}
 #endif /* COLORMAPS_H_ */

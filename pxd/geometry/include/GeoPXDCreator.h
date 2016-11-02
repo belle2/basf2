@@ -63,12 +63,36 @@ namespace Belle2 {
         createGeometry(*dbObj, topVolume, type);
       }
 
+
       /**
        * Create support structure for PXD Half Shell, that means everything
        * thagt does not depend on layer or sensor alignment
        * @param support Reference to the database containing the parameters
        */
       virtual VXD::GeoVXDAssembly createHalfShellSupport(GearDir support);
+
+      /**
+       * Create support structure for a PXD Layer
+       * @param layer Layer ID to create the support
+       * @param support Reference to the database containing the parameters
+       */
+      virtual VXD::GeoVXDAssembly createLayerSupportFromDB(int, const PXDGeometryPar& parameters);
+
+
+      /**
+       * Create support structure for a PXD Ladder
+       * @param layer Layer ID to create the support
+       * @param support Reference to the database containing the parameters
+       */
+      virtual VXD::GeoVXDAssembly createLadderSupportFromDB(int, const PXDGeometryPar& parameters);
+
+
+      /**
+       * Create support structure for PXD Half Shell, that means everything
+       * thagt does not depend on layer or sensor alignment
+       * @param support Reference to the database containing the parameters
+       */
+      virtual VXD::GeoVXDAssembly createHalfShellSupportFromDB(const PXDGeometryPar& parameters);
 
       /**
        * Read the sensor definitions from the database
@@ -84,6 +108,9 @@ namespace Belle2 {
        */
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
         VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement);
+
+      virtual VXD::SensitiveDetectorBase* createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
+          const VXDGeoSensorPlacementPar& placement);
 
     private:
 

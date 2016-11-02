@@ -28,8 +28,11 @@
 #include <framework/database/DBObjPtr.h>
 #include <framework/database/DBImportObjPtr.h>
 #include <framework/database/IntervalOfValidity.h>
+#include <vxd/dbobjects/VXDGeometryPar.h>
+
 
 #include <G4Transform3D.hh>
+#include <G4Polycone.hh>
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4VSolid;
@@ -93,6 +96,9 @@ namespace Belle2 {
       virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
                                                              const VXDGeoSensorPlacement& placement) = 0;
 
+      virtual SensitiveDetectorBase* createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
+          const VXDGeoSensorPlacementPar& placement) = 0;
+
       /**
        * Read parameters for given layer and store in m_ladder
        */
@@ -105,6 +111,13 @@ namespace Belle2 {
       G4Transform3D placeLadder(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement);
 
       /**
+       * Place ladder corresponding to the given ladder id into volume
+       * setLayer has to be called first to set the correct layer id
+       */
+      G4Transform3D placeLadderFromDB(int layerID, int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
+                                      const VXDGeometryPar& parameters);
+
+      /**
        * Return the position where a daughter component is to be placed
        * @param mother Mother component
        * @param daugther Daughter component
@@ -113,6 +126,10 @@ namespace Belle2 {
       G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
                                 bool originCenter);
 
+      G4Transform3D getPositionFromDB(const VXDGeoComponentPar& mother, const VXDGeoComponentPar& daughter,
+                                      const VXDGeoPlacementPar& placement,
+                                      bool originCenter);
+
       /**
        * Get Alignment for given component from the database
        * @param  component Name of the component to align
@@ -120,6 +137,13 @@ namespace Belle2 {
        *         could not be found
        */
       G4Transform3D getAlignment(const std::string& component);
+
+      /**
+       * Get Alignment from paylead object
+       * @param  params Payload object
+       * @return Transformation matrix for component
+       */
+      G4Transform3D getAlignmentFromDB(VXDAlignmentPar params);
 
       /**
        * Get the volume and the height representing a single sub-component
@@ -159,6 +183,12 @@ namespace Belle2 {
                                          component, std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
 
+
+      GeoVXDAssembly createSubComponentsFromDB(const std::string& name, VXDGeoComponentPar&
+                                               component, std::vector<VXDGeoPlacementPar> placements,
+                                               const VXDGeometryPar& parameters,
+                                               bool originCenter = true, bool allowOutside = false);
+
       /** Create a trapezoidal solid.
        * @param width full forward width of the shape in mm
        * @param width2 full backward width of the shape in mm
@@ -174,6 +204,9 @@ namespace Belle2 {
        */
       G4VSolid* createTrapezoidal(const std::string& name, double width, double
                                   width2, double length, double& height, double angle = 0);
+
+
+      void createDiamondsFromDB(const VXDGeoRadiationSensorsPar& params, G4LogicalVolume& topVolume, G4LogicalVolume& envelopeVolume);
 
     protected:
       /** Prefix to prepend to all volume names */

@@ -1720,6 +1720,8 @@ void CDCGeometryPar::setTW()
 // Set xt params. (from DB)
 void CDCGeometryPar::setXtRel()
 {
+  m_linearInterpolationOfXT = true;  //must be true now
+
   //  std::cout <<"setXtRelation called" << std::endl;
   m_nAlphaPoints = m_xtRelFromDB->getNoOfAlphaBins();
   for (unsigned short i = 0; i < m_nAlphaPoints; ++i) {
@@ -1765,6 +1767,8 @@ void CDCGeometryPar::setXtRel()
 // Set sigma params. (from DB)
 void CDCGeometryPar::setSResol()
 {
+  m_linearInterpolationOfSgm = true; //must be true now
+
   //  std::cout <<"setSResol called" << std::endl;
   m_nAlphaPoints4Sgm = m_sResolFromDB->getNoOfAlphaBins();
   for (unsigned short i = 0; i < m_nAlphaPoints4Sgm; ++i) {
@@ -2415,7 +2419,7 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
   unsigned short lro = getOutgoingLR(lr, alpha);
 
   if (!m_linearInterpolationOfSgm) {
-    B2FATAL("linearInterpolationOfXT = false is not allowed now !");
+    B2FATAL("linearInterpolationOfSgm = false is not allowed now !");
   }
   if (m_linearInterpolationOfSgm) {
     double wal(0.);

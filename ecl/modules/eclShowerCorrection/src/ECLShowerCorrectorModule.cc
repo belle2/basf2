@@ -277,12 +277,12 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     } else if (y >= m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
       y0 = m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
       y1 = m_hReg2Theta;
-      y0Bin = m_numOfReg2ThetaBins;
-      y1Bin = m_numOfReg2ThetaBins;
+      y0Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
+      y1Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
     } else {
       y1 = m_hReg2Theta;
-      y0Bin = m_numOfReg2ThetaBins;
-      y1Bin = m_numOfReg2ThetaBins;
+      y0Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
+      y1Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
     }
   } // end region 2
 
@@ -304,12 +304,12 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
              m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins));
       y0Bin = reg1thetaBin;
       y1Bin = reg1thetaBin + 1;
-      if (y1Bin == reg1thetaBin) y1Bin = reg1thetaBin - 1;
+      if (y1Bin == m_numOfReg1ThetaBins) y1Bin = m_numOfReg1ThetaBins - 1;
     } else if (y >= m_hReg1Theta - 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins))) {
       y0 = m_hReg1Theta - 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins));
       y1 = m_hReg1Theta;
-      y0Bin = m_hReg1Theta;
-      y1Bin = m_hReg1Theta;
+      y0Bin = reg1thetaBin;
+      y1Bin = reg1thetaBin;
     } else {
       y1 = m_hReg1Theta;
       y0Bin = reg1thetaBin;
@@ -335,7 +335,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
              m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins));
       y0Bin = reg3thetaBin;
       y1Bin = reg3thetaBin + 1;
-      if (y1Bin == reg3thetaBin) y1Bin = reg3thetaBin - 1;
+      if (y1Bin == m_numOfReg3ThetaBins) y1Bin = m_numOfReg3ThetaBins - 1;
     } else if (y >= m_hReg3Theta - 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins))) {
       y0 = m_hReg3Theta - 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins));
       y1 = m_hReg3Theta;

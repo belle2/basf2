@@ -105,21 +105,21 @@ namespace Belle2 {
     ///  @param secID
     void get(std::vector< double >* normalizedUsup,
              std::vector< double >* normalizedVsup,
-             std::vector< std::vector< unsigned int> >* secID) const
+             std::vector< std::vector< unsigned int > >* secID) const
     {
       // let us copy the sorted map Usup
       for (auto uIndexPair : m_normalizedUsup)
         if (uIndexPair.first != FLT_MAX)
           normalizedUsup->push_back(uIndexPair.first);
 
-      // let us copy the sorted map Usup
+      // let us copy the sorted map Vsup
       for (auto vIndexPair : m_normalizedVsup)
         if (vIndexPair.first != FLT_MAX)
           normalizedVsup->push_back(vIndexPair.first);
 
       // and finally we copy the array of full sec ids
       for (auto col : m_fullSecIDs) {
-        std::vector< unsigned int> tmp_col;
+        std::vector< unsigned int > tmp_col;
         for (auto id : col)
           tmp_col.push_back(id);
         secID->push_back(tmp_col);

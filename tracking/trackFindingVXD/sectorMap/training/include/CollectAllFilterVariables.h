@@ -58,6 +58,8 @@ namespace Belle2 {
                           variable.value(outer, inners ...)));
   }
 
+  template< class ... args>
+  void CollectAllFilterVariables(args ...) {};
 
   /**
    * This function pass through all the variables in a filter,

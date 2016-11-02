@@ -27,7 +27,9 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
         'UsePXDHits': True,
         'UseSVDHits': True,
         'UseCDCHits': True,
-        'UseOnlyAxialCDCHits': True
+        'UseOnlyAxialCDCHits': False,
+        'WhichParticles': ['primary'],
+        'EnergyCut': 0.1,
     }
 
     #: Add the track fitting to the execution
@@ -102,21 +104,22 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
                                   allow_function_import=True)
 
             # determine which sub-detector hits will be used
-            tracking_coverage = self.tracking_coverage
+            tracking_coverage = dict(self.tracking_coverage)
 
             # Include the mc tracks if the monte carlo data is presentx
             if 'MCRecoTracksMatcher' not in path:
                 # Reference Monte Carlo tracks
                 track_finder_mc_truth_module = basf2.register_module('TrackFinderMCTruthRecoTracks')
                 track_finder_mc_truth_module.param({
-                    'WhichParticles': ['primary'],
-                    'EnergyCut': 0.1,
                     'RecoTracksStoreArrayName': 'MCRecoTracks',
                     **tracking_coverage
                 })
 
                 # Track matcher
                 mc_track_matcher_module = basf2.register_module('MCRecoTracksMatcher')
+
+                tracking_coverage.pop("WhichParticles", None)
+                tracking_coverage.pop("EnergyCut", None)
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,
@@ -140,15 +143,33 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
 
 def add_standard_finder(path):
-    components = []
+    import tracking
+    components = None
     for module in path.modules():
         if module.type() == "Geometry":
             components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+
+    if 'SetupGenfitExtrapolation' not in path:
+        path.add_module('SetupGenfitExtrapolation', energyLossBrems=False, noiseBrems=False)
+
     tracking.add_track_finding(path, components=components)
 
 
+def add_standard_reconstruction(path):
+    import reconstruction
+    components = None
+    for module in path.modules():
+        if module.type() == "Geometry":
+            components = utilities.get_module_param(module, "components")
+    if not components:
+        components = None
+    reconstruction.add_reconstruction(path, components=components)
+
 finder_modules_by_short_name = {
     'MC': 'TrackFinderMCTruthRecoTracks',
+    'Reconstruction': add_standard_reconstruction,
     'TrackFinder': add_standard_finder,
     'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,

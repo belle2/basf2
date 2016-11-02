@@ -12,9 +12,11 @@
 #include "tracking/dataobjects/FullSecID.h"
 #include <tracking/trackFindingVXD/sectorMap/map/SectorsOnSensor.h>
 #include "framework/core/FrameworkExceptions.h"
+#include <TTree.h>
+#include <TFile.h>
 #include <cstdint>
 #include <vector>
-#include <TTree.h>
+
 
 namespace Belle2 {
 
@@ -105,8 +107,10 @@ namespace Belle2 {
 
     }
 
-    /// Returns the compact id of the FullSecID fullID.
-    /// If fullID is undefined 0 is returned.
+
+    /// Returns the compact id of the FullSecID @param fullID.
+    /// It return 0 if @paam fullID is unknown.
+    /// It does not throw exceptions (at least it should not).
     sectorID_t getCompactID(const FullSecID& fullID) const
     {
 
@@ -115,6 +119,17 @@ namespace Belle2 {
                                  fullID.getLadderID(),
                                  fullID.getVxdID().getSensorNumber(),
                                  fullID.getSecID());
+    }
+
+    SectorsOnSensor<sectorID_t>
+    getSectorsOnSensor(unsigned layer, unsigned ladder, unsigned sensor)
+    const
+    {
+      try {
+        return m_compactSectorsIDMap.at(layer).at(ladder).at(sensor);
+      } catch (...)
+      { return SectorsOnSensor<sectorID_t>(); }
+
     }
 
     /// Exception for normalized coordinate U out of bound [0,1]
@@ -151,8 +166,9 @@ namespace Belle2 {
 
     }
 
-    /// Returns the compact id of the FullSecID fullID.
-    /// If @param fullID is undefined 0 is returned.
+    /// Returns the compact id of the FullSecID @param fullID.
+    /// If @param fullID is unknown 0 is returned.
+    /// It will not throw exceptions
     sectorID_t operator [](const FullSecID& fullID) const
     {
       return getCompactID(fullID);
@@ -175,7 +191,7 @@ namespace Belle2 {
 
     }
 
-    /// Set the two compact Sector id @param id1 and @param @id2 to
+    /// Sets the two compact Sector id @param id1 and @param @id2 to
     /// the values coded by the Sector Pair ID @param pair_id
     static void extractCompactID(secPairID_t pair_id, sectorID_t& id1, sectorID_t& id2)
     {
@@ -207,7 +223,7 @@ namespace Belle2 {
 
     }
 
-    /// Set the three compact Sector id @param id1 , @param @id2 @param id3to
+    /// Sets the three compact Sector id @param id1 , @param @id2 @param id3to
     /// the values coded by the Sector Pair ID @param pair_id
     static void extractCompactID(secTripletID_t triplet_id, sectorID_t& id1, sectorID_t& id2, sectorID_t& id3)
     {
@@ -244,7 +260,7 @@ namespace Belle2 {
     }
 
     /// Fast (and potentially dangerous) equivalent of getCompactID.
-    /// It returns 0 (invalid compact id) if any index is out of range.
+    /// It will not check for out of boundaries fullID / ill defined @param fullID
     sectorID_t getCompactIDFastAndDangerous(const FullSecID& fullID) const
     {
 
@@ -306,59 +322,11 @@ namespace Belle2 {
       return m_compactSectorsIDMap[layer][ladder].size();
     }
 
-
-    /// Persist the whole CompactSecIDs on the current TDirectory
-    bool persist(void) const
-    {
-      TTree* tree = new TTree(treeName, treeName);
-      Int_t layer, ladder, sensor;
-      tree->Branch("layer" , & layer , "layer/I");
-      tree->Branch("ladder", & ladder, "ladder/I");
-      tree->Branch("sensor", & sensor, "sensor/I");
-
-      std::vector< double >* normalizedUsup = new std::vector< double> ();
-      tree->Branch("normalizedUsup", & normalizedUsup);
-
-      std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
-      tree->Branch("normalizedVsup", & normalizedVsup);
-
-      std::vector< std::vector< unsigned int > >* fullSecIDs =
-        new std::vector< std::vector< unsigned int> > ();
-      tree->Branch("fullSecID", & fullSecIDs);
-
-      for (layer = 0 ; layer < nOfLayers() ; layer ++)
-        for (ladder = 0; ladder < nOfLadders(layer) ; ladder ++)
-          for (sensor = 0; sensor < nOfSensors(layer, ladder) ; sensor ++) {
-            normalizedUsup->clear();
-            normalizedVsup->clear();
-            fullSecIDs->clear();
-            m_compactSectorsIDMap[layer][ladder][sensor].get(normalizedUsup,
-                                                             normalizedVsup,
-                                                             fullSecIDs);
-
-            tree->Fill();
-          }
-
-      delete normalizedVsup;
-      delete normalizedUsup;
-      delete fullSecIDs;
-      return true;
-    }
-
-
-    /// Read the whole CompactSecIDs from the current TDirectory
-    bool read(void)
-    {
-      return true;
-    }
-
   private:
 
     sectorID_t m_sectorCounter;
 
     LayersLookUpTable_t m_compactSectorsIDMap;
-
-    const char* treeName = "CompactSecIDs";
 
     /// The hidden private method that recursively manage the size of everything.
     /// It returns the number of added sectors.

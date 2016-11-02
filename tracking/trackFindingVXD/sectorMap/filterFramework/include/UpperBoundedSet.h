@@ -60,6 +60,12 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    void setBranchAddress(TTree* t, const std::string& branchName,
+                          const std::string& /*variableName*/)
+    {
+      t->SetBranchAddress(branchName, & m_sup);
+    }
+
     /** Accessor to the sup of the set */
     SupType getSup(void) const { return m_sup; } ;
 

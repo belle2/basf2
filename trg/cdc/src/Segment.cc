@@ -32,7 +32,6 @@
 #include <trg/cdc/dataobjects/CDCTriggerSegmentHit.h>
 #include <mdst/dataobjects/MCParticle.h>
 
-#include "trg/cdc/EventTime.h"
 #include <bitset>
 
 using namespace std;
@@ -45,7 +44,6 @@ namespace Belle2 {
                                const TCLayer& layer,
                                const TCWire& w,
                                const TRGClock& clock,
-                               const TRGCDCEventTime* eventTime,
                                const std::string& TSLUTFile,
                                const std::vector<const TCWire*>& cells)
     : TCCell(id,
@@ -56,7 +54,6 @@ namespace Belle2 {
       _wires(cells),
       _signal(std::string("TS_") + TRGUtil::itostring(id), clock),
       _storeHits{},
-      _eventTime(eventTime),
       m_TSLUTFileName(TSLUTFile)
   {
     m_TSLUT = new TCLUT();

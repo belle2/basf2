@@ -597,7 +597,6 @@ namespace Belle2 {
                                  *layer,
                                  w,
                                  _clockD,
-                                 _eventTime.back(),
                                  _outerTSLUTFilename,
                                  cells);
         } else {
@@ -605,7 +604,6 @@ namespace Belle2 {
                                  *layer,
                                  w,
                                  _clockD,
-                                 _eventTime.back(),
                                  _innerTSLUTFilename,
                                  cells);
         }

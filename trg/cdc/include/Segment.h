@@ -30,7 +30,6 @@ namespace Belle2 {
   class TRGCDCLUT;
   class TRGCDCWireHit;
   class TRGCDCSegmentHit;
-  class TRGCDCEventTime;
   class CDCTriggerSegmentHit;
 
 /// A class to represent a wire in CDC.
@@ -43,7 +42,6 @@ namespace Belle2 {
                   const TRGCDCLayer& layer,
                   const TRGCDCWire& w,
                   const TRGClock& clock,
-                  const TRGCDCEventTime* eventTime,
                   const std::string& TSLUTFile,
                   const std::vector<const TRGCDCWire*>& wires);
 
@@ -116,9 +114,6 @@ namespace Belle2 {
     void initialize(void);
     void initialize(bool fevtTime);
 
-    /// returns event time.
-    const TRGCDCEventTime* EvtTime(void) const;
-
   public:// Utility functions
 
     /// returns axial segments.
@@ -176,9 +171,6 @@ namespace Belle2 {
 
     /// list of DataStore hits.
     std::vector<const CDCTriggerSegmentHit*> _storeHits;
-
-    /// EventTime class.
-    const TRGCDCEventTime* const _eventTime;
 
     /// TS LUT file name.
     std::string m_TSLUTFileName;
@@ -255,14 +247,6 @@ namespace Belle2 {
     if (_wires.size() == 15)
       return * _wires[0];
     return * _wires[5];
-  }
-
-  inline
-  const TRGCDCEventTime*
-  TRGCDCSegment::EvtTime(void) const
-  {
-    std::cout << "this function(EvtTime() in Segment class) will be removed. - ktkim" << std::endl;
-    return _eventTime;
   }
 
 } // namespace Belle2

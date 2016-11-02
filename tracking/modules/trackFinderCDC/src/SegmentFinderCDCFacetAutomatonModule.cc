@@ -19,8 +19,6 @@ SegmentFinderCDCFacetAutomatonModule::SegmentFinderCDCFacetAutomatonModule()
   : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}}
 {
   ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-  moduleParamList.getParameter<std::string>("SegmentOrientation").resetValue();
+  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
   this->setParamList(moduleParamList);
 }
-

@@ -47,6 +47,10 @@ namespace Belle2 {
         addProcessingSignalListener(&m_trackMerger);
         addProcessingSignalListener(&m_trackOrienter);
         addProcessingSignalListener(&m_segmentPairSwapper);
+
+        ModuleParamList moduleParamList;
+        this->exposeParameters(&moduleParamList);
+        moduleParamList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
       }
 
       /// Short description of the findlet
@@ -65,9 +69,6 @@ namespace Belle2 {
         m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);
         m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
-
-        moduleParamList->getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
-        moduleParamList->getParameter<int>("SegmentPairRelationOnlyBest").resetValue();
       }
 
       /// Signal the beginning of a new event the current event

@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -20,33 +19,15 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef TrackFinderAutomaton Super;
+      using Super = TrackFinderAutomaton;
 
     public:
+      /// Constructor adjusting some of the parameters to suiteable values for cosmics tracking.
+      TrackFinderCosmics();
+
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
-      }
+      virtual std::string getDescription() override;
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        Super::exposeParameters(moduleParamList, prefix);
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
-
-        moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("SegmentOrientation").resetValue();
-
-        moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
-
-        // The realistic filters do not work for the cosmic tracks
-        moduleParamList->getParameter<std::string>("SegmentPairFilter").setDefaultValue("simple");
-        moduleParamList->getParameter<std::string>("SegmentPairRelationFilter").setDefaultValue("simple");
-      }
     }; // end class TrackFinderCosmics
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

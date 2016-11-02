@@ -13,6 +13,7 @@
 
 #include <framework/gearbox/GearDir.h>
 
+#include <list>
 #include <string>
 //class G4Colour;
 class G4LogicalVolume;
@@ -113,6 +114,14 @@ namespace Belle2 {
      * @param[out] maxZ will contain the maximal z coordinate of the polycone
      */
     G4Polycone* createRotationSolid(const std::string& name, const GearDir& params, double& minZ, double& maxZ);
+
+
+    G4Polycone* createRotationSolid(const std::string& name,
+                                    std::list< std::pair<double, double> > innerPoints,
+                                    std::list< std::pair<double, double> > outerPoints,
+                                    double minPhi, double maxPhi, double& minZ, double& maxZ);
+
+
   }
 } //Belle2 namespace
 #endif

@@ -3,15 +3,18 @@
 
 """
 <header>
-  <contact>Thomas.Hauth@kit.edu</contact>
+  <contact>oliver.frost@desy.de</contact>
   <input>EvtGenSimNoBkg.root</input>
-  <output>CDCFullTrackingValidation.root</output>
-  <description>This script validates the full CDC tracking chain with a legendre step first
-  and a cellular automaton step second in Y(4S) runs.</description>
+  <output>CDCAutomatonTrackingValidation.root</output>
+  <description>
+  This module validates that cdc cellular automaton track finding
+  is capable of reconstructing tracks in Y(4S) runs.
+  </description>
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'CDCFullTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'CDCAutomatonTrackingValidation.root'
+CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 1000
 ACTIVE = True
 
@@ -19,15 +22,14 @@ import basf2
 basf2.set_random_seed(1337)
 
 import logging
-import tracking
 
 from tracking.validation.run import TrackingValidationRun
 
 
-class CDCFull(TrackingValidationRun):
+class CDCAutomaton(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSimNoBkg.root'
-    finder_module = staticmethod(tracking.add_cdc_track_finding)
+    finder_module = 'TrackFinderCDCAutomaton'
     tracking_coverage = {
         'UsePXDHits': False,
         'UseSVDHits': False,
@@ -38,11 +40,12 @@ class CDCFull(TrackingValidationRun):
     }
     fit_geometry = None
     pulls = True
+    contact = CONTACT
     output_file_name = VALIDATION_OUTPUT_FILE
 
 
 def main():
-    validation_run = CDCFull()
+    validation_run = CDCAutomaton()
     validation_run.configure_and_execute_from_commandline()
 
 

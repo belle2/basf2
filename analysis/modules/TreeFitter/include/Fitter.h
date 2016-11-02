@@ -35,7 +35,7 @@ namespace TreeFitter {
 
     bool printDaughters(Particle* mother);
 
-    Fitter() : m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
+    Fitter() : m_particle(0), m_decaychain(0), m_fitparams(0), m_status(VertexStatus::UnFitted),
       m_chiSquare(-1), m_niter(-1), m_prec(0.01) {} //Default constructor
 
     Fitter(Particle* particle, double prec = 0.01) ;

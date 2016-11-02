@@ -215,7 +215,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   double x = 0.0;
   double x0 = 0.0;
   double  x1 = 0.0;
-  double xd = 0.0;;
+  double xd = 0.0;
 
   // Convert -180..180 to 0..360
   const double phiMod = phi + 180;

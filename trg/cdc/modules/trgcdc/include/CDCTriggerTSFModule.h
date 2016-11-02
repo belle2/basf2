@@ -4,9 +4,18 @@
 #include "framework/core/Module.h"
 #include <string>
 
+#include "CLHEP/Geometry/Point3D.h"
+
 namespace Belle2 {
 
-  /** Module for the Track Segment Finder of the CDC trigger. */
+  typedef HepGeom::Point3D<double> Point3D;
+
+  class TRGCDCLayer;
+  class TRGCDCSegment;
+
+  /** Module for the Track Segment Finder of the CDC trigger.
+   *  The CDC wires are organized in track segments with fixed shape.
+   *  Within each track segment a logic combines the separate wire hits. */
   class CDCTriggerTSFModule : public Module {
 
   public:
@@ -23,6 +32,9 @@ namespace Belle2 {
     /** Run the TSF for an event. */
     virtual void event();
 
+    /** Clean up pointers. */
+    virtual void terminate();
+
   protected:
     /** The filename of LUT for the inner-most track segments. */
     std::string m_innerTSLUTFilename;
@@ -31,6 +43,10 @@ namespace Belle2 {
     std::string m_outerTSLUTFilename;
 
   private:
+    /** structure to hold pointers to all wires in the CDC */
+    std::vector<std::vector<TRGCDCLayer*>> superLayers;
+    /** structure to hold pointers to all track segment shapes */
+    std::vector<TRGCDCLayer*> tsLayers;
   };
 
 } // namespace Belle2

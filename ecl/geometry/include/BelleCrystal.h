@@ -20,12 +20,10 @@ namespace Belle2 {
     double x, y;
   };
 
-
   class BelleCrystal : public G4CSGSolid {
   public:  // with description
-    BelleCrystal(const G4String& pName);
-    // Constructor for "nominal" BelleCrystal whose parameters are to be set
-    // by a G4VPVParamaterisation later
+    explicit BelleCrystal(const G4String& pName);
+    // Constructor for "nominal" BelleCrystal
 
     BelleCrystal(const G4String& pName, int, const G4ThreeVector*);
 
@@ -77,7 +75,7 @@ namespace Belle2 {
 
   public:  // without description
 
-    BelleCrystal(__void__&);
+    explicit BelleCrystal(__void__&);
     // Fake default constructor for usage restricted to direct object
     // persistency for clients requiring preallocation of memory for
     // persistifiable objects.
@@ -106,10 +104,8 @@ namespace Belle2 {
     double fDz;
     std::vector<Plane_t> fPlanes;
     std::vector<Point_t> fx;
-    //  G4Trap *ref;
+
     mutable std::vector<double> fareas;
-    mutable int fcounter[6];
-    bool fmatch;
   };
 
   class PolyhedronBelleCrystal: public G4Polyhedron {

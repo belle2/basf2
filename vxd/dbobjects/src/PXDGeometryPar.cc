@@ -38,7 +38,7 @@ void PXDGeometryPar::createHalfShellSupport(GearDir support)
   m_nCutouts = support.getInt("Cutout/count");
   m_cutOutWidth = support.getLength("Cutout/width");
   m_cutOutHeight = support.getLength("Cutout/height");
-  m_cutOutShifz = support.getLength("Cutout/shift");
+  m_cutOutShift = support.getLength("Cutout/shift");
   m_cutOutRphi = support.getLength("Cutout/rphi");
   m_cutOutStartPhi = support.getAngle("Cutout/startPhi");
   m_cutOutDeltaPhi = support.getAngle("Cutout/deltaPhi");
@@ -84,7 +84,7 @@ VXDSensorInfoBasePar* PXDGeometryPar::createSensorInfo(const GearDir& sensor)
   );
 
   info->setDEPFETParams(
-    sensor.getDouble("BulkDoping") / (Unit::um * Unit::um * Unit::um),
+    sensor.getDouble("BulkDoping"),
     sensor.getWithUnit("BackVoltage"),
     sensor.getWithUnit("TopVoltage"),
     sensor.getLength("SourceBorderSmallPixel"),

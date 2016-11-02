@@ -43,13 +43,9 @@ namespace Belle2 {
     /** set the common angle to the z axis, 0 is parallel to z in deg */
     void setTheta(double theta)  { m_theta = theta; }
     /** get the vector storing ids of individual sensors */
-    const std::vector<int>& getIds() const { return  m_ids; }
-    /** set the vector storing ids of individual sensors */
-    void addId(int id)  { m_ids.push_back(id); }
-    /** get the vector storing phi angles of individual sensors */
-    const std::vector<double>& getPhis() const { return  m_phis; }
-    /** set the vector storing phi angles of individual sensors */
-    void addPhi(double phi) { m_phis.push_back(phi); }
+    const std::map<int, double>& getSensors() const { return  m_sensors; }
+    /** add sensor with individual id */
+    void addSensor(int id, double phi)  { m_sensors[id] = phi; }
 
   private:
     //! Common z position of the sensor centers in mm
@@ -58,10 +54,9 @@ namespace Belle2 {
     double m_radius;
     //! Common angle to the z axis, 0 is parallel to z in deg
     double m_theta;
-    //! Individual Id number for all radiation sensors
-    std::vector<int> m_ids;
-    //! Individual Phi angle of radiation sensor in deq
-    std::vector<double> m_phis;
+    //! Individual radiations sensors
+    std::map<int, double> m_sensors;
+
 
     ClassDef(VXDGeoRadiationSensorsPositionPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };
@@ -71,10 +66,6 @@ namespace Belle2 {
   */
   class VXDGeoRadiationSensorsPar: public TObject {
   public:
-    //! Default constructor
-    //VXDGeoRadiationSensorsPar() {}
-    //! Constructor using Gearbox
-    //explicit VXDGeoRadiationSensorsPar(const GearDir& content) { read(content); }
     /** Constructor */
     VXDGeoRadiationSensorsPar(const std::string& subdetector = "", bool insideEnvelope = false,
                               double width = 0, double length = 0, bool height = 0, const std::string& material = ""):
@@ -101,7 +92,7 @@ namespace Belle2 {
     /** set the length */
     void setLength(double length) { m_length = length; }
     /** get the height */
-    double getHeight() { return m_height; }
+    double getHeight() const { return m_height; }
     /** set the height */
     void setHeight(double height) { m_height = height; }
     /** get the name of the material */
@@ -109,9 +100,9 @@ namespace Belle2 {
     /** set the name of the material */
     void setMaterial(const std::string& material) { m_material = material; }
     /** get the positions of radiation sensors */
-    const std::vector<VXDGeoRadiationSensorsPositionPar>& getSensors() const { return m_sensors; }
+    const std::vector<VXDGeoRadiationSensorsPositionPar>& getPositions() const { return m_positions; }
     /** add radiation sensor position */
-    void addSensor(const VXDGeoRadiationSensorsPositionPar& sensor)  {  m_sensors.push_back(sensor); }
+    void addPosition(const VXDGeoRadiationSensorsPositionPar& position)  {  m_positions.push_back(position); }
 
   private:
     //! one of "PXD" or "SVD"
@@ -127,7 +118,7 @@ namespace Belle2 {
     //! Material name
     std::string m_material;
     //! Position of radiation sensors
-    std::vector<VXDGeoRadiationSensorsPositionPar> m_sensors;
+    std::vector<VXDGeoRadiationSensorsPositionPar> m_positions;
 
     ClassDef(VXDGeoRadiationSensorsPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
   };

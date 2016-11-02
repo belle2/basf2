@@ -32,6 +32,19 @@ namespace Belle2 {
     ~VXDAlignmentPar() {}
     //! Get geometry parameters from Gearbox
     void read(const std::string&, const GearDir&);
+    /** get dU */
+    double getDU() const { return m_dU; }
+    /** get dV */
+    double getDV() const { return m_dV; }
+    /** get dW */
+    double getDW() const { return m_dW; }
+    /** get alpha */
+    double getAlpha() const { return m_alpha; }
+    /** get beta */
+    double getBeta() const { return m_beta; }
+    /** get gamma */
+    double getGamma() const { return m_gamma; }
+
   private:
     double m_dU;
     double m_dV;

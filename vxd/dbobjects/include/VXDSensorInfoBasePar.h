@@ -110,6 +110,11 @@ namespace Belle2 {
      */
     double getLength() const { return m_length; }
 
+    /** Return the splitlength of the sensor
+     * @return length of the sensor
+     */
+    double getSplitLength() const { return m_splitLength; }
+
     /** Return the thickness of the sensor
      * @return thickness of the sensor
      */
@@ -201,6 +206,11 @@ namespace Belle2 {
     int getUCells() const { return m_uCells; }
     /** Return number of pixel/strips in v direction */
     int getVCells() const { return m_vCells + m_vCells2; }
+    /** Return number of pixel/strips in v direction for first segment */
+    int getVCells1() const { return m_vCells; }
+    /** Return number of pixel/strips in v direction for second segment */
+    int getVCells2() const { return m_vCells2; }
+
 
     /** Check wether a given point is inside the active area.
      * Optionally, one can specify a tolerance which should be added to the

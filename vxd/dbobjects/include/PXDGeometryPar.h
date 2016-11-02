@@ -30,6 +30,43 @@ namespace Belle2 {
     explicit PXDGeometryPar(const std::string& prefix, const GearDir& content) : VXDGeometryPar(prefix, content) {  }
     //! Destructor
     ~PXDGeometryPar();
+    /** build support */
+    bool getBuildSupport() const { return (m_nCutouts > 0); }
+    /** get number of cutouts */
+    int getNCutOuts() const { return m_nCutouts; }
+    /** get width of cutouts */
+    double getCutOutWidth() const { return m_cutOutWidth; }
+    /** get height of cutouts */
+    double getCutOutHeight() const { return m_cutOutHeight; }
+    /** get  shift of cutouts */
+    double getCutOutShift() const { return m_cutOutShift; }
+    /** get rphi of cutouts */
+    double getCutOutRPhi() const { return m_cutOutRphi; }
+    /** get start phi of cutouts */
+    double getCutOutStartPhi() const { return m_cutOutStartPhi; }
+    /** get deltaphi of cutouts */
+    double getCutOutDeltaPhi() const { return m_cutOutDeltaPhi; }
+
+    /** get number of tubes */
+    int getNTubes() const { return m_nTubes; }
+    /** get tubes minZ*/
+    double getTubesMinZ() const { return m_tubesMinZ; }
+    /** get tubes maxZ*/
+    double getTubesMaxZ() const { return m_tubesMaxZ; }
+    /** get tubes minR*/
+    double getTubesMinR() const { return m_tubesMinR; }
+    /** get tubes maxR*/
+    double getTubesMaxR() const { return m_tubesMaxR; }
+    /** get tubes tubes RPhi*/
+    double getTubesRPhi() const { return m_tubesRPhi; }
+    /** get tubes tubes StartPhi*/
+    double getTubesStartPhi() const { return m_tubesStartPhi; }
+    /** get tubes tubes DeltaPhi*/
+    double getTubesDeltaPhi() const { return m_tubesDeltaPhi; }
+    /** get tubes tubes material*/
+    const std::string& getTubesMaterial() const { return m_tubesMaterial; }
+    /** get  Endflanges */
+    const std::vector<VXDPolyConePar>& getEndflanges() const {return m_endflanges;}
 
     /**
      * Read the sensor definitions from the database
@@ -67,24 +104,24 @@ namespace Belle2 {
     std::vector<VXDPolyConePar> m_endflanges;
 
     /** PXD Endflange CoutOuts */
-    int m_nCutouts;
-    double m_cutOutWidth;
-    double m_cutOutHeight;
-    double m_cutOutShifz;
-    double m_cutOutRphi;
-    double m_cutOutStartPhi;
-    double m_cutOutDeltaPhi;
+    int m_nCutouts {0};
+    double m_cutOutWidth {0};
+    double m_cutOutHeight {0};
+    double m_cutOutShift {0};
+    double m_cutOutRphi {0};
+    double m_cutOutStartPhi {0};
+    double m_cutOutDeltaPhi {0};
 
     /** PXD Carbon Tubes */
-    int m_nTubes;
-    double m_tubesMinZ;
-    double m_tubesMaxZ;
-    double m_tubesMinR;
-    double m_tubesMaxR;
-    double m_tubesRPhi;
-    double m_tubesStartPhi;
-    double m_tubesDeltaPhi;
-    std::string m_tubesMaterial;
+    int m_nTubes {0};
+    double m_tubesMinZ {0};
+    double m_tubesMaxZ {0};
+    double m_tubesMinR {0};
+    double m_tubesMaxR {0};
+    double m_tubesRPhi {0};
+    double m_tubesStartPhi {0};
+    double m_tubesDeltaPhi {0};
+    std::string m_tubesMaterial {"Carbon"};
 
 
     ClassDef(PXDGeometryPar, 5);  /**< ClassDef, must be the last term before the closing {}*/

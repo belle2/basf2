@@ -49,6 +49,37 @@ std::vector<VXDGeoPlacementPar> VXDGeometryPar::getSubComponents(GearDir path)
   return result;
 }
 
+
+const VXDGeoComponentPar& VXDGeometryPar::getComponent(std::string name) const
+{
+  //Check if component already exists
+  std::map<string, VXDGeoComponentPar>::const_iterator cached = m_componentCache.find(name);
+  if (cached == m_componentCache.end()) {
+    B2FATAL("Could not find component " << name);
+  }
+  return cached->second;
+}
+
+const VXDGeoSensorPar& VXDGeometryPar::getSensor(string sensorTypeID) const
+{
+  //Check if sensorType already exists
+  std::map<string, VXDGeoSensorPar>::const_iterator cached = m_sensorMap.find(sensorTypeID);
+  if (cached == m_sensorMap.end()) {
+    B2FATAL("Invalid SensorTypeID " << sensorTypeID);
+  }
+  return cached->second;
+}
+
+const VXDGeoLadderPar& VXDGeometryPar::getLadder(int layer) const
+{
+  //Check if component already exists
+  map<int, VXDGeoLadderPar>::const_iterator cached = m_ladders.find(layer);
+  if (cached == m_ladders.end()) {
+    B2FATAL("Could not find ladder for layer " << (boost::format("%1%") % layer).str());
+  }
+  return cached->second;
+}
+
 void VXDGeometryPar::cacheLadder(int layer, GearDir components)
 {
   string path = (boost::format("Ladder[@layer=%1%]/") % layer).str();
@@ -59,11 +90,11 @@ void VXDGeometryPar::cacheLadder(int layer, GearDir components)
 
   m_ladders[layer] = VXDGeoLadderPar(
                        layer,
-                       paramsLadder.getLength("shift") / Unit::mm,
-                       paramsLadder.getLength("radius") / Unit::mm,
+                       paramsLadder.getLength("shift"),
+                       paramsLadder.getLength("radius"),
                        paramsLadder.getAngle("slantedAngle", 0),
-                       paramsLadder.getLength("slantedRadius", 0) / Unit::mm,
-                       paramsLadder.getLength("Glue/oversize", 0) / Unit::mm,
+                       paramsLadder.getLength("slantedRadius", 0),
+                       paramsLadder.getLength("Glue/oversize", 0),
                        paramsLadder.getString("Glue/Material", "")
                      );
 
@@ -72,7 +103,7 @@ void VXDGeometryPar::cacheLadder(int layer, GearDir components)
     m_ladders[layer].addSensor(VXDGeoSensorPlacementPar(
                                  sensorInfo.getInt("@id"),
                                  sensorInfo.getString("@type"),
-                                 sensorInfo.getLength(".") / Unit::mm,
+                                 sensorInfo.getLength("."),
                                  sensorInfo.getBool("@flipU", false),
                                  sensorInfo.getBool("@flipV", false),
                                  sensorInfo.getBool("@flipW", false)
@@ -103,34 +134,32 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
     string sensorTypeID = paramsSensor.getString("@type");
     //B2INFO("Reading sensors: SensorTypeID: " << sensorTypeID);
 
-    // Create a new sensor from GearBox
-    VXDGeoSensorPar sensor;
-    sensor.setSlanted(paramsSensor.getBool("@slanted", false));
-    sensor.setMaterial(paramsSensor.getString("Material"));
-    sensor.setColor(paramsSensor.getString("Color", ""));
-    sensor.setWidth(paramsSensor.getLength("width") / Unit::mm);
-    sensor.setWidth2(paramsSensor.getLength("width2", 0) / Unit::mm);
-    sensor.setLength(paramsSensor.getLength("length") / Unit::mm);
-    sensor.setHeight(paramsSensor.getLength("height") / Unit::mm);
 
-    // Create a new component for active volume (from where charge is collected)
-    VXDGeoComponentPar activeArea;
-    activeArea.setMaterial(paramsSensor.getString("Material"));
-    activeArea.setColor(paramsSensor.getString("Active/Color", "#f00"));
-    activeArea.setWidth(paramsSensor.getLength("Active/width") / Unit::mm);
-    activeArea.setWidth2(paramsSensor.getLength("Active/width2", 0) / Unit::mm);
-    activeArea.setLength(paramsSensor.getLength("Active/length") / Unit::mm);
-    activeArea.setHeight(paramsSensor.getLength("Active/height") / Unit::mm);
-
-    // Define where to place active volume
-    VXDGeoPlacementPar activePlacement;
-    activePlacement.setName("Active");
-    activePlacement.setU(paramsSensor.getLength("Active/u") / Unit::mm);
-    activePlacement.setV(paramsSensor.getLength("Active/v") / Unit::mm);
-    activePlacement.setW(paramsSensor.getString("Active/w", "center"));
-    activePlacement.setWOffset(paramsSensor.getLength("Active/woffset", 0) / Unit::mm);
-
-    sensor.setActive(activeArea, activePlacement);
+    // FIXME: it is a bit inconsistent to convert to mm here.
+    // Otherwise, someone has to change createTrapezoidal().
+    VXDGeoSensorPar sensor(
+      paramsSensor.getString("Material"),
+      paramsSensor.getString("Color", ""),
+      paramsSensor.getLength("width") / Unit::mm,
+      paramsSensor.getLength("width2", 0) / Unit::mm,
+      paramsSensor.getLength("length") / Unit::mm,
+      paramsSensor.getLength("height") / Unit::mm,
+      paramsSensor.getBool("@slanted", false)
+    );
+    sensor.setActive(VXDGeoComponentPar(
+                       paramsSensor.getString("Material"),
+                       paramsSensor.getString("Active/Color", "#f00"),
+                       paramsSensor.getLength("Active/width") / Unit::mm,
+                       paramsSensor.getLength("Active/width2", 0) / Unit::mm,
+                       paramsSensor.getLength("Active/length") / Unit::mm,
+                       paramsSensor.getLength("Active/height") / Unit::mm
+                     ), VXDGeoPlacementPar(
+                       "Active",
+                       paramsSensor.getLength("Active/u") / Unit::mm,
+                       paramsSensor.getLength("Active/v") / Unit::mm,
+                       paramsSensor.getString("Active/w", "center"),
+                       paramsSensor.getLength("Active/woffset", 0) / Unit::mm
+                     ));
     sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
     sensor.setComponents(getSubComponents(paramsSensor));
     m_sensorMap[sensorTypeID] = sensor;
@@ -146,7 +175,7 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
     B2INFO("Building " << m_prefix << " half-shell " << shellName);
 
     m_alignment[ shellName ] = VXDAlignmentPar(shellName , GearDir(content, "Alignment/"));
-    m_halfShells[ shellName ] = VXDHalfShellPar(shell.getAngle("shellAngle", 0));
+    VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
 
     for (const GearDir& layer : shell.getNodes("Layer")) {
       int layerID = layer.getInt("@id");
@@ -160,10 +189,11 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
         int ladderID = ladder.getInt("@id");
         double phi = ladder.getAngle("phi", 0);
         readLadderInfo(layerID, ladderID, content);
-        m_halfShells[ shellName ].addLadder(layerID, ladderID,  phi);
+        halfShell.addLadder(layerID, ladderID,  phi);
         B2INFO("Reading layerID " << layerID << " ladderID " << ladderID << " shell angle " << phi);
       }
     }
+    m_halfShells.push_back(halfShell);
   }
 
   //Create diamond radiation sensors if defined and in background mode
@@ -187,11 +217,10 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
 
       //Loop over all phi positions
       for (GearDir& sensor : position.getNodes("phi")) {
-        //We need angle and Id
-        diamonds.addPhi(sensor.getAngle());
-        diamonds.addId(sensor.getInt("@id"));
+        //Add sensor with angle and id
+        diamonds.addSensor(sensor.getInt("@id"), sensor.getAngle());
       }
-      m_radiationsensors.addSensor(diamonds);
+      m_radiationsensors.addPosition(diamonds);
     }
   }
 
@@ -230,6 +259,15 @@ void VXDGeometryPar::readLadderInfo(int layerID, int ladderID,  GearDir content)
 }
 
 
+VXDAlignmentPar VXDGeometryPar::getAlignment(std::string name) const
+{
+  //Check if component already exists
+  map<string, VXDAlignmentPar>::const_iterator cached = m_alignment.find(name);
+  if (cached == m_alignment.end()) {
+    B2FATAL("Could not find alignment parameters for component " << name);
+  }
+  return cached->second;
+}
 
 void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsDir)
 {

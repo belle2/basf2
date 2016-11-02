@@ -14,6 +14,9 @@
 #include <string>
 #include <vector>
 
+#include <algorithm>
+
+
 class G4LogicalVolume;
 
 namespace Belle2 {
@@ -31,12 +34,17 @@ namespace Belle2 {
     VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
                        double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):
       m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
-      m_height(height), m_angle(angle) {}
+      m_height(height), m_angle(angle)
+    {
+      //Consistency check: Otherwise dimensions are silently changed in createTrapezoidal() ...
+      if (m_angle > 0) {
+        const double tana = tan(m_angle);
+        m_height = std::min(tana * m_length, std::min(tana * m_width, m_height));
+      }
+    }
 
     //! Destructor
     ~VXDGeoComponentPar() {}
-    //! Get geometry parameters from Gearbox
-    //void read(const GearDir&);
     /** get the pointer to the logical volume, NULL if not yet created */
     G4LogicalVolume* getVolume() const { return m_volume; }
     /** set the pointer to the logical volume */
@@ -62,11 +70,13 @@ namespace Belle2 {
     /** set the length of the component */
     void setLength(double length) { m_length = length; }
     /** get the height of the component */
-    double getHeight() { return m_height; }
+    double getHeight() const { return m_height; }
+    /** get the height of the component */
+    double& getHeight() { return m_height; }
     /** set the height of the component */
     void setHeight(double height) { m_height = height; }
     /** get the angle of the component */
-    double getAngle() { return m_angle; }
+    double getAngle() const { return m_angle; }
     /** set the angle of the component */
     void setAngle(double angle) { m_angle = angle; }
 

@@ -28,9 +28,9 @@ void VXDAlignmentPar::read(const std::string& component, const GearDir& alignmen
     B2WARNING("Could not find alignment parameters for component " << component);
     return;
   }
-  m_dU = params.getLength("du") / Unit::mm;
-  m_dV = params.getLength("dv") / Unit::mm;
-  m_dW = params.getLength("dw") / Unit::mm;
+  m_dU = params.getLength("du");
+  m_dV = params.getLength("dv");
+  m_dW = params.getLength("dw");
   m_alpha = params.getAngle("alpha");
   m_beta  = params.getAngle("beta");
   m_gamma = params.getAngle("gamma");

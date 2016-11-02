@@ -46,6 +46,26 @@ namespace Belle2 {
     //! Get geometry parameters from Gearbox
     void read(const std::string&, const GearDir&);
 
+    /** get prefix */
+    std::string getPrefix() const {return m_prefix;}
+    /** get global parameters */
+    const VXDGlobalPar& getGlobalParams() const {return m_globals;}
+    /** get envelope parameters */
+    const VXDEnvelopePar& getEnvelope() const {return m_envelope;}
+    /** get alignment parameters for component name */
+    VXDAlignmentPar getAlignment(std::string name) const;
+    /** get radiation sensors */
+    const VXDGeoRadiationSensorsPar& getRadiationSensors() const {return m_radiationsensors;}
+    /** get half-shell */
+    const std::vector<VXDHalfShellPar>& getHalfShells() const {return m_halfShells;}
+    /** get ladder for given layer */
+    const VXDGeoLadderPar& getLadder(int layerID) const;
+    /** get sensor type */
+    const VXDGeoSensorPar& getSensor(std::string sensorTypeID) const;
+    /** get component */
+    const VXDGeoComponentPar& getComponent(std::string name) const;
+
+  private:
     /**
      * Return vector of VXDGeoPlacements with all the components defined inside a given path
      */
@@ -114,15 +134,15 @@ namespace Belle2 {
     VXDGlobalPar m_globals;
     /** Alignment parameters for all components */
     std::map<std::string, VXDAlignmentPar> m_alignment;
-    /** Detector envelope parameters */
+    /** Envelope parameters */
     VXDEnvelopePar m_envelope;
     /** Cache for half shells  */
-    std::map<std::string, VXDHalfShellPar> m_halfShells;
+    std::vector<VXDHalfShellPar> m_halfShells;
     /** Cache of all previously created components */
     std::map<std::string, VXDGeoComponentPar> m_componentCache;
     /** Map containing Information about all defined sensor types */
     std::map<std::string, VXDGeoSensorPar> m_sensorMap;
-    /** Diamond radiation sensor "sub creator" */
+    /** Diamond radiation sensors */
     VXDGeoRadiationSensorsPar m_radiationsensors;
     /** Parameters of the detector ladders */
     std::map<int, VXDGeoLadderPar> m_ladders;

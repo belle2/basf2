@@ -11,7 +11,7 @@
 #include <vxd/dbobjects/VXDGlobalPar.h>
 #include <framework/gearbox/Gearbox.h>
 #include <framework/gearbox/GearDir.h>
-#include <framework/logging/Logger.h>
+#include <framework/gearbox/Unit.h>
 
 using namespace Belle2;
 using namespace std;
@@ -29,6 +29,4 @@ void VXDGlobalPar::read(const GearDir& content)
   m_onlyActiveMaterial = content.getBool("OnlyActiveMaterial", m_onlyActiveMaterial);
   m_defaultMaterial = content.getString("DefaultMaterial", "Air");
   m_distanceTolerance = (float)content.getLength("DistanceTolerance", m_distanceTolerance);
-
-  B2INFO("Reading global parameters: DefaultMaterial " << m_defaultMaterial);
 }

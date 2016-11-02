@@ -44,9 +44,9 @@ namespace Belle2 {
       m_activeArea = area; m_activePlacement = placement;
     }
     /** get the component description for the active area */
-    VXDGeoComponentPar& getActiveArea() { return m_activeArea; }
+    VXDGeoComponentPar& getActiveArea()  { return m_activeArea; }
     /** get the placement description for the active area */
-    const VXDGeoPlacementPar& getActivePlacement() { return m_activePlacement; }
+    VXDGeoPlacementPar& getActivePlacement()  { return m_activePlacement; }
     /** set the list of sub components to be placed */
     void setComponents(const std::vector<VXDGeoPlacementPar>& component) { m_components = component; }
     /** get the list of sub components */

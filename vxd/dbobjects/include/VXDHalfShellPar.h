@@ -29,15 +29,18 @@ namespace Belle2 {
 
   public:
     /** Constructor */
-    VXDHalfShellPar(double shellAngle = 0) :  m_shellAngle(shellAngle) {}
+    VXDHalfShellPar(std::string name = "", double shellAngle = 0) : m_name(name), m_shellAngle(shellAngle) {}
+    /** get shell name */
+    std::string getName() const { return m_name; }
     /** get shellAngle */
     double getShellAngle() const { return m_shellAngle; }
     /** add ladder */
     void addLadder(int layerID, int ladderID, double phi) { m_layers[layerID].push_back(std::pair<int, double>(ladderID, phi)); }
-    /** get ladders */
-    std::vector<std::pair<int, double>>& getLadders(int layerID) { return m_layers[layerID]; }
+    /** get layers */
+    const std::map< int, std::vector<std::pair<int, double>> >& getLayers() const { return m_layers; }
 
   private:
+    std::string m_name;
     double m_shellAngle;
     std::map< int, std::vector<std::pair<int, double>> > m_layers;
 

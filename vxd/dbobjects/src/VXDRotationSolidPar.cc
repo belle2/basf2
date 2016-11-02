@@ -35,6 +35,8 @@ void VXDRotationSolidPar::read(const GearDir& params)
     pair<double, double> ZXPoint(point.getLength("z"), point.getLength("x"));
     m_outerPoints.push_back(ZXPoint);
   }
+
+  m_exists = m_outerPoints.size() > 0 && m_innerPoints.size() > 0;
 }
 
 

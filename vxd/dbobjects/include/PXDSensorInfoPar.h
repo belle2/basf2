@@ -96,6 +96,15 @@ namespace Belle2 {
     double getBackVoltage() const { return m_backVoltage; }
     /** Return the voltage at the top of the sensor */
     double getTopVoltage() const { return m_topVoltage; }
+
+    double getSourceBorderLargePitch() const {return m_sourceBorderLargePitch;}
+    double getSourceBorderSmallPitch() const {return m_sourceBorderSmallPitch;}
+    double getClearBorderLargePitch() const {return m_clearBorderLargePitch;}
+    double getClearBorderSmallPitch() const {return m_clearBorderSmallPitch;}
+    double getDrainBorderLargePitch() const {return m_drainBorderLargePitch;}
+    double getDrainBorderSmallPitch() const {return m_drainBorderSmallPitch;}
+
+
     /** Return the distance between the source side of the pixel and the start of the Gate for a pixel at v.
      * For these functions to work, the small pitch and large pitch values have to be correctly swapped with
      * the flipVSegmentation method. FIXME: flip... is never called! */

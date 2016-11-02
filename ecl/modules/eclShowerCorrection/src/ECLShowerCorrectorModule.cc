@@ -288,7 +288,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   else if (theta >= m_lReg1Theta && theta <= m_hReg1Theta) {
     int reg1thetaBin = 0;
-    reg1thetaBin = int((theta - m_lReg1Theta) * 100 / (m_hReg1Theta - m_lReg1Theta));
+    reg1thetaBin = int((theta - m_lReg1Theta) * m_numOfReg1ThetaBins / (m_hReg1Theta - m_lReg1Theta));
     y = theta;
     if (y < m_lReg1Theta + 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins))) {
       y0 = m_lReg1Theta;
@@ -319,7 +319,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
 
   else if (theta >= m_lReg3Theta && theta <= m_hReg3Theta) {
     int reg3thetaBin = 0;
-    reg3thetaBin = int((theta - m_lReg3Theta) * 100 / (m_hReg3Theta - m_lReg3Theta));
+    reg3thetaBin = int((theta - m_lReg3Theta) * m_numOfReg3ThetaBins / (m_hReg3Theta - m_lReg3Theta));
     y = theta;
     if (y < m_lReg3Theta + 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins))) {
       y0 = m_lReg3Theta;

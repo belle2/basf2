@@ -8,6 +8,7 @@
  * Author: The Belle II Collaboration                                     *
  * Contributors: Torben Ferber (ferber@physics.ubc.ca) (TF)               *
  *               Alon Hershenhorn (hershen@physics.ubc.ca) (AH)           *
+ *               Suman Koirala (Suman Koirala <suman@ntu.edu.tw>) (SK)    *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -54,7 +55,7 @@ ECLShowerCorrectorModule::ECLShowerCorrectorModule() : Module(),
 {
 
   // Set description
-  setDescription("ECLShowerCorrectorModule: Corrects for MC truth to reconstruction differences");
+  setDescription("ECLShowerCorrectorModule: Corrects for MC truth to reconstruction shower and highest crystal energy differences");
   setPropertyFlags(c_ParallelProcessingCertified);
 
 }
@@ -82,33 +83,38 @@ void ECLShowerCorrectorModule::beginRun()
 void ECLShowerCorrectorModule::event()
 {
 
-  // Get the event background level
+  // Get the event background level.
   const int bkgdcount = m_eclEventInformation->getBackgroundECL();
   double backgroundLevel = 0.0; // from out of time digit counting
   if (m_fullBkgdCount > 0) {
     backgroundLevel = static_cast<double>(bkgdcount) / m_fullBkgdCount;
   }
 
-  // loop over all ECLShowers
+  // Loop over all ECLShowers.
   for (auto& eclShower : m_eclShowers) {
 
-    // Only correct N1 showers! N2 showers keep the raw energy.
+    // Only correct N1 showers! N2 showers keep the raw energy! (TF)
     if (eclShower.getHypothesisId() == ECLConnectedRegion::c_N1) {
 
       const double energy        = eclShower.getEnergy();
       const double energyHighest = eclShower.getEnergyHighestCrystal();
-
       const double theta         = eclShower.getTheta() * TMath::RadToDeg();
       const double phi           = eclShower.getPhi() * TMath::RadToDeg();
 
       // Get the correction
-      const double correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel);
-      B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " f(BGx0)=" <<
-              getLeakageCorrection(theta, phi, energy, 0.0) << " f(BGx1.0)=" << getLeakageCorrection(theta, phi, energy, 1.0));
+      double correctionFactor = getLeakageCorrection(theta, phi, energy, backgroundLevel);
+      B2DEBUG(175, "theta=" << theta << ", phi=" << phi << ", E=" << energy << ", BG=" << backgroundLevel << " --> correction factor=" <<
+              correctionFactor);
+
+      if (correctionFactor < 1.e-5 or correctionFactor > 10.) {
+        B2ERROR("correction factor=" << correctionFactor << " is very small/too large! Resetting to 1.0.");
+        correctionFactor = 1.0;
+      }
 
       const double correctedEnergy = energy * correctionFactor;
       const double correctedEnergyHighest = energyHighest * correctionFactor;
-      B2DEBUG(175, "E_corrected=" << correctedEnergy << ", EHighestCrystal_corrected=" << correctedEnergyHighest);
+      B2DEBUG(175, "correction factor=" << correctionFactor << ", correctedEnergy=" << correctedEnergy << ", correctedEnergyHighest=" <<
+              correctedEnergyHighest);
 
       // Set the correction
       eclShower.setEnergy(correctedEnergy);
@@ -210,11 +216,9 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   double x0 = 0.0;
   double  x1 = 0.0;
   double xd = 0.0;;
-  //int reg2phiBin = 0;
 
   // Convert -180..180 to 0..360
   const double phiMod = phi + 180;
-  //reg2phiBin = int(phiMod * m_numOfPhiBins * m_phiPeriodicity / 360.0);
 
   int x0Bin = 0;
   int x1Bin = m_numOfPhiBins - 1;
@@ -222,7 +226,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   phiGap = int(phiMod / (360.0 / (m_phiPeriodicity * 1.0)));
   x = phiMod - phiGap * (360.0 / (m_phiPeriodicity * 1.0));
 
-  double phiBinWidth = 360.0 / (1.0 * m_numOfPhiBins * m_phiPeriodicity);
+  const double phiBinWidth = 360.0 / (1.0 * m_numOfPhiBins * m_phiPeriodicity);
 
   if (x <= phiBinWidth / 2.0) {
     x0 = 0.00;
@@ -239,6 +243,7 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
       x1Bin = ii + 1;
     }
   }
+
   if (x >= phiBinWidth * m_numOfPhiBins - phiBinWidth / 2.0) {
     x0 = phiBinWidth * m_numOfPhiBins - phiBinWidth / 2.0;
     x1 = phiBinWidth * m_numOfPhiBins;
@@ -252,41 +257,10 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
   double y0 = 0.;
   double y1 = 0.;
   double yd = 0.;
-  int y0Bin = 0;
+  int y0Bin = 0;;
   int y1Bin = 0;
 
-  if (theta >= m_lReg2Theta && theta <= m_hReg2Theta) {
-    int reg2thetaBin = 0;
-    reg2thetaBin = int((theta - m_lReg2Theta) * m_numOfReg2ThetaBins / (m_hReg2Theta - m_lReg2Theta));
-    y = theta;
-    if (y < m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
-      y0 = m_lReg2Theta;
-      y1 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
-      y0Bin = 0;
-      y1Bin = 0;
-    } else if (y >= m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))
-               and y < m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
-      y0 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins)) + reg2thetaBin * ((
-             m_hReg2Theta - m_lReg2Theta) /
-           (1.0 * m_numOfReg2ThetaBins));
-      y1 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins)) + (reg2thetaBin + 1) * ((
-             m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
-      y0Bin = reg2thetaBin;
-      y1Bin = reg2thetaBin + 1;
-      if (y1Bin == m_numOfReg2ThetaBins) y1Bin = m_numOfReg2ThetaBins - 1;
-    } else if (y >= m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
-      y0 = m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
-      y1 = m_hReg2Theta;
-      y0Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
-      y1Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
-    } else {
-      y1 = m_hReg2Theta;
-      y0Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
-      y1Bin = reg2thetaBin; //m_numOfReg2ThetaBins;
-    }
-  } // end region 2
-
-  else if (theta >= m_lReg1Theta && theta <= m_hReg1Theta) {
+  if (theta >= m_lReg1Theta and theta <= m_hReg1Theta) {
     int reg1thetaBin = 0;
     reg1thetaBin = int((theta - m_lReg1Theta) * m_numOfReg1ThetaBins / (m_hReg1Theta - m_lReg1Theta));
     y = theta;
@@ -298,25 +272,46 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     } else if (y >= m_lReg1Theta + 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins))
                and y < m_hReg1Theta - 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins))) {
       y0 = m_lReg1Theta + 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins)) + reg1thetaBin * ((
-             m_hReg1Theta - m_lReg1Theta) /
-           (1.0 * m_numOfReg1ThetaBins));
+             m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins));
       y1 = m_lReg1Theta + 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins)) + (reg1thetaBin + 1) * ((
              m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins));
       y0Bin = reg1thetaBin;
       y1Bin = reg1thetaBin + 1;
-      if (y1Bin == m_numOfReg1ThetaBins) y1Bin = m_numOfReg1ThetaBins - 1;
+      if (y0Bin == m_numOfReg1ThetaBins - 1) y1Bin = m_numOfReg1ThetaBins - 1;
     } else if (y >= m_hReg1Theta - 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins))) {
       y0 = m_hReg1Theta - 0.5 * ((m_hReg1Theta - m_lReg1Theta) / (1.0 * m_numOfReg1ThetaBins));
       y1 = m_hReg1Theta;
-      y0Bin = reg1thetaBin;
-      y1Bin = reg1thetaBin;
+      y0Bin = m_numOfReg1ThetaBins - 1;
+      y1Bin = m_numOfReg1ThetaBins - 1;
     } else {
       y1 = m_hReg1Theta;
-      y0Bin = reg1thetaBin;
-      y1Bin = reg1thetaBin;
+      y0Bin = m_numOfReg1ThetaBins - 1;
+      y1Bin = m_numOfReg1ThetaBins - 1;
     }
-  } // end region 1
-
+  } //End of region 1
+  else if (theta >= m_lReg2Theta && theta <= m_hReg2Theta) {
+    int reg2thetaBin = 0;
+    reg2thetaBin = int((theta - m_lReg2Theta) * m_numOfReg2ThetaBins / (m_hReg2Theta - m_lReg2Theta));
+    y = theta;
+    if (y < m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
+      y0 = m_lReg2Theta;
+      y1 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
+      y0Bin = 0;
+      y1Bin = 0;
+    } else if (y >= m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))
+               and y < m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
+      y0 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins)) + reg2thetaBin * ((
+             m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
+      y1 = m_lReg2Theta + 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins)) + (reg2thetaBin + 1) * ((
+             m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins));
+      y0Bin = reg2thetaBin;
+      y1Bin = reg2thetaBin + 1;
+      if (y0Bin == m_numOfReg2ThetaBins - 1) y1Bin = m_numOfReg2ThetaBins - 1;
+    } else if (y >= m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins))) {
+      y0 = m_hReg2Theta - 0.5 * ((m_hReg2Theta - m_lReg2Theta) / (1.0 * m_numOfReg2ThetaBins)); y1 = m_hReg2Theta;
+      y0Bin = m_numOfReg2ThetaBins - 1; y1Bin = m_numOfReg2ThetaBins - 1;
+    } else {y1 = m_hReg2Theta; y0Bin = m_numOfReg2ThetaBins - 1; y1Bin = m_numOfReg2ThetaBins - 1;}
+  } //End of region 2
   else if (theta >= m_lReg3Theta && theta <= m_hReg3Theta) {
     int reg3thetaBin = 0;
     reg3thetaBin = int((theta - m_lReg3Theta) * m_numOfReg3ThetaBins / (m_hReg3Theta - m_lReg3Theta));
@@ -329,24 +324,27 @@ double ECLShowerCorrectorModule::getLeakageCorrection(const double theta,
     } else if (y >= m_lReg3Theta + 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins))
                and y < m_hReg3Theta - 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins))) {
       y0 = m_lReg3Theta + 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins)) + reg3thetaBin * ((
-             m_hReg3Theta - m_lReg3Theta) /
-           (1.0 * m_numOfReg3ThetaBins));
+             m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins));
       y1 = m_lReg3Theta + 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins)) + (reg3thetaBin + 1) * ((
              m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins));
       y0Bin = reg3thetaBin;
       y1Bin = reg3thetaBin + 1;
-      if (y1Bin == m_numOfReg3ThetaBins) y1Bin = m_numOfReg3ThetaBins - 1;
+      if (y0Bin == m_numOfReg3ThetaBins - 1) y1Bin = m_numOfReg3ThetaBins - 1;
     } else if (y >= m_hReg3Theta - 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins))) {
       y0 = m_hReg3Theta - 0.5 * ((m_hReg3Theta - m_lReg3Theta) / (1.0 * m_numOfReg3ThetaBins));
       y1 = m_hReg3Theta;
-      y0Bin = reg3thetaBin;
-      y1Bin = reg3thetaBin;
+      y0Bin = m_numOfReg3ThetaBins - 1;
+      y1Bin = m_numOfReg3ThetaBins - 1;
     } else {
       y1 = m_hReg3Theta;
-      y0Bin = reg3thetaBin;
-      y1Bin = reg3thetaBin;
+      y0Bin = m_numOfReg3ThetaBins - 1;
+      y1Bin = m_numOfReg3ThetaBins - 1;
     }
-  } // end region 3
+  } //End of region 3
+  else {
+    B2DEBUG(175, "No valid theta region found (theta=" << theta << " deg), return correction factor of 1.0.");
+    return 1.0; // We have not found a theta region that is valid, return no correction at all (i.e. 1.0)
+  }
 
   B2DEBUG(175,  "y0Bin=" << y0Bin << " y1Bin=" << y1Bin);
 

@@ -10,17 +10,17 @@ def add_cdc_trigger(path):
     This function adds the CDC trigger modules to a path.
     """
 
-    # standard CDC trigger
-    trgcdc = register_module('TRGCDC')
-    trgcdc_params = {
-        'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
-        'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
-        'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"),
-        'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
-        'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat")}
-    trgcdc.param(trgcdc_params)
-    path.add_module(trgcdc)
+    # TSF
+    path.add_module('CDCTriggerTSF',
+                    InnerTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
+                    OuterTSLUTFile=Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"))
+    # 2D finder
+    path.add_module('CDCTriggerHoughtracking')
+    # ETF
+    path.add_module('CDCTriggerETF')
+    # fitters
+    path.add_module('CDCTrigger2DFitter')
+    path.add_module('CDCTrigger3DFitter')
     # neurotrigger
-    neuro = register_module('NeuroTrigger')
-    neuro.param('filename', Belle2.FileSystem.findFile("data/trg/cdc/Neuro20160601NonlinBkg.root"))
-    path.add_module(neuro)
+    path.add_module('NeuroTrigger',
+                    filename=Belle2.FileSystem.findFile("data/trg/cdc/Neuro20160601NonlinBkg.root"))

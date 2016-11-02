@@ -60,7 +60,6 @@ CDCTriggerTSFModule::initialize()
 
   //...Loop over layers...
   int superLayerId = -1;
-  vector<TRGCDCLayer*> superLayer;
   unsigned lastNWires = 0;
   int lastShifts = -1000;
   // separate counters for axial and stereo layers and super layers
@@ -84,8 +83,7 @@ CDCTriggerTSFModule::initialize()
     //...Is this in a new super layer?...
     if ((lastNWires != nWiresInLayer) || (lastShifts != nShifts)) {
       ++superLayerId;
-      superLayer = vector<TRGCDCLayer*>();
-      superLayers.push_back(superLayer);
+      superLayers.push_back(vector<TRGCDCLayer*>());
       if (axial) ++ias;
       else ++iss;
       axialStereoSuperLayerId = (axial) ? ias : iss;
@@ -112,7 +110,7 @@ CDCTriggerTSFModule::initialize()
                                          nWiresInLayer,
                                          innerRadius,
                                          outerRadius);
-    superLayer.push_back(layer);
+    superLayers.back().push_back(layer);
 
     //...Loop over all wires in a layer...
     for (unsigned j = 0; j < nWiresInLayer; j++) {
@@ -178,17 +176,23 @@ CDCTriggerTSFModule::initialize()
 
     //...Loop over all wires in a central wire layer...
     const unsigned nWiresInLayer = ww->layer().nCells();
+    B2DEBUG(100, "SL " << i << " layerOffset " << layerOffset[tsType] << ", "
+            << superLayers[i].size() << " layers, " << nWiresInLayer << " wires");
     for (unsigned j = 0; j < nWiresInLayer; j++) {
       const TRGCDCWire& w =
         (TRGCDCWire&) superLayers[i][layerOffset[tsType]]->cell(j);
 
       const unsigned localId = w.localId();
-      const unsigned layerId = w.layerId();
+      const unsigned layerId = w.localLayerId();
       vector<const TRGCDCWire*> cells;
 
+      B2DEBUG(110, "TS localId " << localId << " layerId " << layerId);
+
       for (unsigned k = 0; k < nWiresInTS[tsType]; k++) {
-        const unsigned laid = layerId + shape[tsType][k * 2];
-        const unsigned loid = localId + shape[tsType][k * 2 + 1];
+        const int laid = layerId + shape[tsType][k * 2];
+        const int loid = localId + shape[tsType][k * 2 + 1];
+
+        B2DEBUG(120, "cell localId " << loid << " layerId " << laid);
 
         const TRGCDCWire& c =
           (TRGCDCWire&) superLayers[i][laid]->cell(loid);

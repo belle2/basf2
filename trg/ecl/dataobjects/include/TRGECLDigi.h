@@ -102,7 +102,26 @@ namespace Belle2 {
 
     //! Empty constructor
     //! Recommended for ROOT IO
-    TRGECLDigi() {;}
+    TRGECLDigi()
+    {
+      m_eventid = 0;
+      m_tcid = 0;
+      m_phiid = 0;
+      m_thetaid = 0;
+      m_tcnoutput = 0;
+      m_beambkgtag = 0;
+
+      m_raw_energy = 0;
+      m_raw_timing = 0;
+      m_raw_energy_tot = 0;
+      m_raw_timing_tot = 0;
+      m_fit_energy = 0;
+      m_fit_timing = 0;
+
+
+
+
+    }
 
     //! Useful Constructor
     TRGECLDigi(

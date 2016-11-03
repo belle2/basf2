@@ -3,11 +3,13 @@ import basf2
 from simulation import add_simulation
 import os
 
-from softwaretrigger import (
+
+from softwaretrigger.path_functions import (
     setup_softwaretrigger_database_access,
     add_packers,
     add_unpackers,
     add_softwaretrigger_reconstruction,
+    RAW_SAVE_STORE_ARRAYS
 )
 
 if __name__ == '__main__':

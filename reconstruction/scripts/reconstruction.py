@@ -59,7 +59,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                     trigger_mode=trigger_mode)
 
     # Add the modules calculating the software trigger cuts (but not performing them)
-    if trigger_mode == "all":
+    if trigger_mode == "all" and (not components or (
+            "CDC" in components and "SVD" in components and "ECL" in components and "EKLM" in components and "BKLM" in components)):
         add_fast_reco_software_trigger(path)
         add_hlt_software_trigger(path)
         add_calibration_software_trigger(path)

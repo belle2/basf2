@@ -5,7 +5,7 @@ from softwaretrigger import (
 
 import rawdata
 import reconstruction
-from hlt.softwaretrigger.scripts.softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
+from softwaretrigger import add_fast_reco_software_trigger, add_hlt_software_trigger, \
     add_calibration_software_trigger
 
 RAW_SAVE_STORE_ARRAYS = ["RawCDCs", "RawSVDs", "RawTOPs", "RawARICHs", "RawKLMs", "RawECLs",

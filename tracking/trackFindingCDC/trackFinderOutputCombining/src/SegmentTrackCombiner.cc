@@ -263,23 +263,21 @@ void SegmentTrackCombiner::clearSmallerCombinations(std::list<TrainOfSegments>& 
   });
 
   // Can not used a c++-11 range based for loop here, as I edit the container!
-  for (auto testTrain = trainsOfSegments.begin(); testTrain != trainsOfSegments.end(); ++testTrain) {
-    trainsOfSegments.erase(std::remove_if(trainsOfSegments.begin(),
-    trainsOfSegments.end(), [&testTrain](const TrainOfSegments & train) -> bool {
-      if (train.size() >= testTrain->size())
-        return false;
-
-      bool oneIsNotFound = false;
-      for (const SegmentInformation* segmentInformation : train)
+  for (auto itTrain = trainsOfSegments.begin(); itTrain != trainsOfSegments.end(); ++itTrain) {
+    const TrainOfSegments& train = *itTrain;
+    auto trainContains = [&train](const TrainOfSegments & otherTrain) -> bool {
+      // Other is larger. Cannot be contained.
+      if (otherTrain.size() > train.size()) return false;
+      // Now check whether all of the other segments are contained in the pivot train.
+      for (const SegmentInformation* segmentInformation : otherTrain)
       {
-        if (std::find(testTrain->begin(), testTrain->end(), segmentInformation) == train.end()) {
-          oneIsNotFound = true;
-          break;
-        }
+        if (std::find(train.begin(), train.end(), segmentInformation) == train.end()) return false;
       }
-
-      return not oneIsNotFound;
-    }), trainsOfSegments.end());
+      return true;
+    };
+    // Remove the trains following this one, if they are fully contained in this train.
+    auto itRemovedTrain = std::remove_if(std::next(itTrain), trainsOfSegments.end(), trainContains);
+    trainsOfSegments.erase(itRemovedTrain, trainsOfSegments.end());
   }
 }
 

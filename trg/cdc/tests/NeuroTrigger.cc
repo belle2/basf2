@@ -48,6 +48,9 @@ namespace TrgTest {
 
     virtual void TearDown()
     {
+      // Close the gearbox and reset the global objects
+      TestHelpers::TestWithGearbox::TearDownTestCase();
+      Database::reset();
       DataStore::Instance().reset();
     }
   };

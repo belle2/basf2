@@ -343,7 +343,7 @@ namespace Belle2 {
       treeName.Append("/");
       treeName.Append(c_CompactSecIDstreeName);
       TTree* tree = (TTree*) gFile->Get(treeName);
-      Int_t layer, ladder, sensor;
+      UInt_t layer, ladder, sensor;
       tree->SetBranchAddress("layer" , & layer);
       tree->SetBranchAddress("ladder", & ladder);
       tree->SetBranchAddress("sensor", & sensor);

@@ -536,7 +536,7 @@ namespace Belle2 {
       m_filterA.persist(t, nameOfFilterA);
 
       std::string nameOfFilterB(branchName);
-      nameOfFilterB += c_andSuffixA;
+      nameOfFilterB += c_andSuffixB;
       m_filterB.persist(t, nameOfFilterB);
 
     }
@@ -553,7 +553,7 @@ namespace Belle2 {
       m_filterA.setBranchAddress(t, nameOfFilterA);
 
       std::string nameOfFilterB(branchName);
-      nameOfFilterB += c_andSuffixA;
+      nameOfFilterB += c_andSuffixB;
       m_filterB.setBranchAddress(t, nameOfFilterB);
     }
 
@@ -649,7 +649,7 @@ namespace Belle2 {
       m_filterA.setBranchAddress(t, nameOfFilterA);
 
       std::string nameOfFilterB(branchName);
-      nameOfFilterB += c_orSuffixA;
+      nameOfFilterB += c_orSuffixB;
       m_filterB.setBranchAddress(t, nameOfFilterB);
     }
 

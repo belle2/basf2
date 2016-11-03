@@ -306,7 +306,7 @@ namespace Belle2 {
 
     private:
       /// Indicates if any of the boolean values is true.
-      inline static bool any(const std::initializer_list<bool>& booleans)
+      static bool any(const std::initializer_list<bool>& booleans)
       {
         return std::accumulate(std::begin(booleans), std::end(booleans),
         false, [](const bool & lhs, const bool & rhs) {return lhs or rhs;});
@@ -314,7 +314,7 @@ namespace Belle2 {
       }
 
       /// Indicates if all of the boolean values are true.
-      inline static bool all(const std::initializer_list<bool>& booleans)
+      static bool all(const std::initializer_list<bool>& booleans)
       {
         return std::accumulate(std::begin(booleans), std::end(booleans),
         true, [](const bool & lhs, const bool & rhs) {return lhs and rhs;});

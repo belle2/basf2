@@ -92,13 +92,13 @@ namespace Belle2 {
        * @param qt pointer to QuadTree child to set
        */
 
-      inline void set(const size_t x, const size_t y, quadChild* qt)
+      void set(const size_t x, const size_t y, quadChild* qt)
       {
         m_children[x][y] = qt;
       }
 
       /// Get pointer to the child with indexes x, y
-      inline quadChild* get(const size_t x, const size_t y)
+      quadChild* get(const size_t x, const size_t y)
       {
         return m_children[x][y];
       }

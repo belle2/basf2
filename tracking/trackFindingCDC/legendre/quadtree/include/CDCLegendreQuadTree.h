@@ -155,10 +155,10 @@ namespace Belle2 {
       }
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      inline Children* getChildren() const {return m_children.get();};
+      Children* getChildren() const {return m_children.get();};
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      inline unsigned char getLevel() const {return m_level;};
+      unsigned char getLevel() const {return m_level;};
 
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       template<class processor>
@@ -187,10 +187,10 @@ namespace Belle2 {
       void reserveHitsVector(int nHits) {m_items.reserve(nHits); };
 
       /** Get hits from node */
-      inline std::vector<typeData*>& getItemsVector() {return m_items;};
+      std::vector<typeData*>& getItemsVector() {return m_items;};
 
       /** Check if the node passes threshold on number of hits */
-      inline size_t getNItems() const {return m_items.size();};
+      size_t getNItems() const {return m_items.size();};
 
       /** Removing used or bad hits */
       template<class processor>
@@ -202,43 +202,43 @@ namespace Belle2 {
       } ;
 
       /** Check whether node has been processed, i.e. children nodes has been filled */
-      inline bool checkFilled() const {return m_filled; };
+      bool checkFilled() const {return m_filled; };
 
       /** Set status of node to "filled" (children nodes has been filled) */
       void setFilled() {m_filled = true; };
 
       /** Get mean value of theta */
-      inline typeY getYMean() const {return m_yBins[1];};
+      typeY getYMean() const {return m_yBins[1];};
 
       /** Get mean value of r */
-      inline typeX getXMean() const {return m_xBins[1];};
+      typeX getXMean() const {return m_xBins[1];};
 
       /** Get number of bins in "r" direction */
-      inline constexpr int getXNbins() const {return binCountX;}
+      constexpr int getXNbins() const {return binCountX;}
 
       /** Get minimal "r" value of the node */
-      inline typeX getXMin() const {return m_xBins[0];};
+      typeX getXMin() const {return m_xBins[0];};
 
       /** Get maximal "r" value of the node */
-      inline typeX getXMax() const {return m_xBins[2];};
+      typeX getXMax() const {return m_xBins[2];};
 
       /** Get "r" value of given bin border */
-      inline typeX getXBin(int bin) const { return static_cast<typeX>(m_xBins[bin]); };
+      typeX getXBin(int bin) const { return static_cast<typeX>(m_xBins[bin]); };
 
       /** Get number of bins in "Theta" direction */
-      inline constexpr int getYNbins() const {return binCountY;}
+      constexpr int getYNbins() const {return binCountY;}
 
       /** Get minimal "Theta" value of the node */
-      inline typeY getYMin() const {return m_yBins[0];};
+      typeY getYMin() const {return m_yBins[0];};
 
       /** Get maximal "Theta" value of the node */
-      inline typeY getYMax() const {return m_yBins[2];};
+      typeY getYMax() const {return m_yBins[2];};
 
       /** Get "r" value of given bin border */
-      inline typeY getYBin(int bin) const { return static_cast<typeY>(m_yBins[bin]); };
+      typeY getYBin(int bin) const { return static_cast<typeY>(m_yBins[bin]); };
 
       /** Return pointer to the parent of the node */
-      inline ThisType* getParent() const {return m_parent;};
+      ThisType* getParent() const {return m_parent;};
 
       /** Clear hits which the node holds */
       void clearNode() {m_items.clear(); };

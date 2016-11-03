@@ -30,8 +30,8 @@ namespace Belle2 {
        * Returns the sum of the resulting weights of both algorithms (of not NAN).
        */
       template<class AObject>
-      inline Weight operator()(const AObject& object,
-                               const HoughBox* box)
+      Weight operator()(const AObject& object,
+                        const HoughBox* box)
       {
         AHitInBoxAlgorithm hitInBoxAlgorithm;
         AnotherHitInBoxAlgorithm anotherHitInBoxAlgorithm;

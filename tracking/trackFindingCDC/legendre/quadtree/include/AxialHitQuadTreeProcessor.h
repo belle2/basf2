@@ -59,7 +59,7 @@ namespace Belle2 {
       BasePrecisionFunction::PrecisionFunction& m_lmdFunctLevel;
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
-      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
       /**
@@ -92,8 +92,8 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                                   unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
+                            unsigned int /*r_index*/) const override final
       {
         using Quadlet = std::array< std::array<float, 2>, 2>;
         Quadlet dist_1;

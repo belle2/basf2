@@ -78,10 +78,10 @@ namespace Belle2 {
     private:
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
       template<class ACellHolderNeighborhood>
-      inline void startCluster(CellHolderPtr seedCellHolderPtr,
-                               const ACellHolderNeighborhood& cellHolderNeighborhood,
-                               int iCluster,
-                               ACluster& newCluster) const
+      void startCluster(CellHolderPtr seedCellHolderPtr,
+                        const ACellHolderNeighborhood& cellHolderNeighborhood,
+                        int iCluster,
+                        ACluster& newCluster) const
       {
         setCellState(seedCellHolderPtr, iCluster);
         newCluster.insert(newCluster.end(), seedCellHolderPtr);

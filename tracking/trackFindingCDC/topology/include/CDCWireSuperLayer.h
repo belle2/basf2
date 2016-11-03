@@ -76,7 +76,7 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the given layer id belongs to a valid layer in this superlayer
-      inline bool isValidILayer(ILayer iLayer) const
+      bool isValidILayer(ILayer iLayer) const
       { return 0 <= iLayer and iLayer < int(size()); }
 
       /// Gives the layer by its layer id within the superlayer
@@ -90,7 +90,7 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the given wire id belongs to a valid wire in this superlayer
-      inline bool isValidIWire(ILayer iLayer, IWire iWire) const
+      bool isValidIWire(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer) and getWireLayer(iLayer).isValidIWire(iWire); }
 
       /// Gives the wire by its layer id within the superlayer and the wire id in the layer.

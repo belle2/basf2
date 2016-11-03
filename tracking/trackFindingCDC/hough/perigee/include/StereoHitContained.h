@@ -39,8 +39,8 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      inline Weight operator()(const CDCRecoSegment2D* const& recoSegment2D,
-                               const HoughBox* const& houghBox)
+      Weight operator()(const CDCRecoSegment2D* const& recoSegment2D,
+                        const HoughBox* const& houghBox)
       {
         size_t nHits = recoSegment2D->size();
         auto weightOfHit = [this, &houghBox](const Weight & totalWeight,
@@ -66,8 +66,8 @@ namespace Belle2 {
       /** Checks if the two dimensional reconstructed hit is contained in a phi0 curv hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const CDCRecoHit2D* const& recoHit2D,
-                               const HoughBox* const& houghBox)
+      Weight operator()(const CDCRecoHit2D* const& recoHit2D,
+                        const HoughBox* const& houghBox)
       {
         const CDCWire& wire = recoHit2D->getWire();
         const double signedDriftLength = recoHit2D->getSignedRefDriftLength();
@@ -82,8 +82,8 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      inline Weight operator()(const CDCWireHit* const& wireHit,
-                               const HoughBox* const& houghBox)
+      Weight operator()(const CDCWireHit* const& wireHit,
+                        const HoughBox* const& houghBox)
       {
         const CDCWire& wire = wireHit->getWire();
         const double driftLength = wireHit->getRefDriftLength();
@@ -103,8 +103,8 @@ namespace Belle2 {
        *  Accepts if either the right passage hypothesis or the left passage hypothesis
        *  is in the hough box.
        */
-      inline Weight operator()(CDCRLWireHit& rlTaggedWireHit,
-                               const HoughBox* const& houghBox)
+      Weight operator()(CDCRLWireHit& rlTaggedWireHit,
+                        const HoughBox* const& houghBox)
       {
         const CDCWire& wire = rlTaggedWireHit->getWire();
         const ERightLeft rlInfo = rlTaggedWireHit.getRLInfo();
@@ -128,10 +128,10 @@ namespace Belle2 {
        *      * ERightLeft::c_Right if only right is still possible.
        *      * ERightLeft::c_Invalid if non of the orientations is possible.
        */
-      inline ERightLeft containsRightOrLeft(const HoughBox& houghBox,
-                                            const CDCWire& wire,
-                                            const double driftLength,
-                                            const ERightLeft rlInfo = ERightLeft::c_Unknown)
+      ERightLeft containsRightOrLeft(const HoughBox& houghBox,
+                                     const CDCWire& wire,
+                                     const double driftLength,
+                                     const ERightLeft rlInfo = ERightLeft::c_Unknown)
       {
         bool isRightIn = rlInfo != ERightLeft::c_Left and contains(houghBox, wire, driftLength);
         bool isLeftIn = rlInfo != ERightLeft::c_Right and contains(houghBox, wire, -driftLength);
@@ -148,9 +148,9 @@ namespace Belle2 {
       }
 
       /** Checks if a wire hit at a signed drift length is contained in the hough space part */
-      inline bool contains(const HoughBox& houghBox,
-                           const CDCWire& wire,
-                           const double signedDriftLength)
+      bool contains(const HoughBox& houghBox,
+                    const CDCWire& wire,
+                    const double signedDriftLength)
       {
         const Vector2D& pos2D = wire.getRefPos2D();
         //const Vector2D& pos2D = wire.getWirePos2DAtZ(0);

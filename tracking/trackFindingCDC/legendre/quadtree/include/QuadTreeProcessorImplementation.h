@@ -36,7 +36,7 @@ namespace Belle2 {
       Vector2D m_origin; /**< The origin of the conformal transformation */
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
-      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
     };

@@ -183,7 +183,7 @@ namespace Belle2 {
       /**
        * Return the parameter last level.
        */
-      inline unsigned int getLastLevel() const
+      unsigned int getLastLevel() const
       {
         return m_lastLevel;
       }

@@ -95,9 +95,9 @@ namespace Belle2 {
 
     private:
       /// Creates segment pairs from a combination of start segments and end segments.
-      inline void create(const std::vector<const CDCRecoSegment2D*>& startSegments,
-                         const std::vector<const CDCRecoSegment2D*>& endSegments,
-                         std::vector<CDCAxialSegmentPair>& axialSegmentPairs)
+      void create(const std::vector<const CDCRecoSegment2D*>& startSegments,
+                  const std::vector<const CDCRecoSegment2D*>& endSegments,
+                  std::vector<CDCAxialSegmentPair>& axialSegmentPairs)
       {
         CDCAxialSegmentPair axialSegmentPair;
         for (const CDCRecoSegment2D* ptrStartSegment : startSegments) {

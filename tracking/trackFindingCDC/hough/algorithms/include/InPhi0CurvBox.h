@@ -44,13 +44,13 @@ namespace Belle2 {
        *   * ESign::c_Zero if the dirft circle lies on any of the curves
        *   * ESign::c_Invalid if the drift cirlce is on the the wrong arm of the curve.
        */
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& l,
-                                   const float& /*dxdz*/ = 0,
-                                   const float& /*dydz*/ = 0,
-                                   ILayer /*iCLayer*/ = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            const float& x,
+                            const float& y,
+                            const float& l,
+                            const float& /*dxdz*/ = 0,
+                            const float& /*dydz*/ = 0,
+                            ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();

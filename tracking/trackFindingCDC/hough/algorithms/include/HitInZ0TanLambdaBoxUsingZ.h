@@ -33,8 +33,8 @@ namespace Belle2 {
        * and the hit in the xy-plane.
        * Note that this is not a binary decision and must be used with some sort of cutoff (because otherwise all hits belong in all boxes).
        */
-      inline Weight operator()(const CDCRecoHit3D& recoHit,
-                               const HoughBox* z0TanLambdaBox)
+      Weight operator()(const CDCRecoHit3D& recoHit,
+                        const HoughBox* z0TanLambdaBox)
       {
         const CDCWire& wire = recoHit.getWire();
         const WireLine& wireLine = wire.getWireLine();

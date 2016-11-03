@@ -41,7 +41,7 @@ namespace Belle2 {
     private:
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessorWithNewReferencePoint::insertItemInNode())
-      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
       /// Reference point
@@ -81,8 +81,8 @@ namespace Belle2 {
       /**
        * Do only insert the hit into a node if sinogram calculated from this hit belongs into this node
        */
-      inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                                   unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
+                            unsigned int /*r_index*/) const override final
       {
         float dist_1[2][2];
         float dist_2[2][2];

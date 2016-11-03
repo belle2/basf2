@@ -35,13 +35,13 @@ namespace Belle2 {
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& l,
-                                   const float& dxdz,
-                                   const float& dydz,
-                                   ILayer /*iCLayer*/ = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            const float& x,
+                            const float& y,
+                            const float& l,
+                            const float& dxdz,
+                            const float& dydz,
+                            ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();

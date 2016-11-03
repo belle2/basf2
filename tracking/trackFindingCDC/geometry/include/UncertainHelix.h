@@ -39,7 +39,7 @@ namespace Belle2 {
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(curvature, phi0, impact, tanLambda, z0)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -51,7 +51,7 @@ namespace Belle2 {
       explicit UncertainHelix(const HelixParameters& parameters,
                               const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
-                              const size_t& ndf = 0)
+                              std::size_t ndf = 0)
         : m_helix(parameters)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -68,7 +68,7 @@ namespace Belle2 {
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(curvature, phi0Vec, impact, tanLambda, z0)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -80,7 +80,7 @@ namespace Belle2 {
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(helix)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -263,13 +263,13 @@ namespace Belle2 {
       }
 
       /// Getter for the number of degrees of freediom used in the helix fit
-      const size_t& ndf() const
+      std::size_t ndf() const
       {
         return m_ndf;
       }
 
       /// Setter for the number of degrees of freediom used in the helix fit
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       {
         m_ndf = ndf;
       }

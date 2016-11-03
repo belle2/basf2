@@ -29,7 +29,7 @@ namespace Belle2 {
 
     public:
       /// Create a new box with the given curler curvature.
-      explicit InPhi0CurvTanLBox(const float& curlCurv)
+      explicit InPhi0CurvTanLBox(float curlCurv)
         : m_curlCurv(curlCurv)
       {}
 
@@ -40,11 +40,11 @@ namespace Belle2 {
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.
       ESign getDistanceSign(const HoughBox& houghBox,
-                            const float& x,
-                            const float& y,
-                            const float& l,
-                            const float& dxdz,
-                            const float& dydz,
+                            float x,
+                            float y,
+                            float l,
+                            float dxdz,
+                            float dydz,
                             ILayer iCLayer = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();

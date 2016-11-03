@@ -131,7 +131,7 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
     BestMergePartner candidateToMergeBest = calculateBestTrackToMerge(track, cdcTrackList.getCDCTracks().begin(),
                                             cdcTrackList.getCDCTracks().end());
     CDCTrack* bestFitTrackCandidate = candidateToMergeBest.first;
-    const double& probabilityWithCandidate = candidateToMergeBest.second;
+    double probabilityWithCandidate = candidateToMergeBest.second;
 
     if (bestFitTrackCandidate and probabilityWithCandidate > minimum_probability_to_be_merged) {
       mergeTracks(track, *bestFitTrackCandidate, conformalCDCWireHitList, cdcTrackList);

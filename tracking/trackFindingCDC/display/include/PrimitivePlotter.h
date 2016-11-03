@@ -60,10 +60,10 @@ namespace Belle2 {
        *  @param endY          y coordinate where the line ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawLine(const float& startX,
-                            const float& startY,
-                            const float& endX,
-                            const float& endY,
+      virtual void drawLine(float startX,
+                            float startY,
+                            float endX,
+                            float endY,
                             const AttributeMap& attributeMap = AttributeMap());
 
       /** Adds an arrow to the plot
@@ -76,10 +76,10 @@ namespace Belle2 {
        *  @param endY          y coordinate where the arrow ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawArrow(const float& startX,
-                             const float& startY,
-                             const float& endX,
-                             const float& endY,
+      virtual void drawArrow(float startX,
+                             float startY,
+                             float endX,
+                             float endY,
                              const AttributeMap& attributeMap = AttributeMap());
 
 
@@ -92,9 +92,9 @@ namespace Belle2 {
        *  @param radius         radius of the circle
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircle(const float& centerX,
-                              const float& centerY,
-                              const float& radius,
+      virtual void drawCircle(float centerX,
+                              float centerY,
+                              float radius,
                               const AttributeMap& attributeMap = AttributeMap());
 
       /** Adds a circle arc to the plot
@@ -110,13 +110,13 @@ namespace Belle2 {
        *  @param sweepFlag     Boolean indicator related to the curvature perceived one the circle arc. False means negative curvature. True mean positive curvature.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircleArc(const float& startX,
-                                 const float& startY,
-                                 const float& endX,
-                                 const float& endY,
-                                 const float& radius,
-                                 const bool& longArc,
-                                 const bool& sweepFlag,
+      virtual void drawCircleArc(float startX,
+                                 float startY,
+                                 float endX,
+                                 float endY,
+                                 float radius,
+                                 bool longArc,
+                                 bool sweepFlag,
                                  const AttributeMap& attributeMap = AttributeMap());
 
       /** Adds a smooth curve to the plot
@@ -175,25 +175,25 @@ namespace Belle2 {
 
     public:
       /// Getter for the canvas width in pixels.
-      const float& getCanvasWidth()
+      float getCanvasWidth()
       { return m_canvasWidth; }
 
       /// Getter for the canvas height in pixels.
-      const float& getCanvasHeight()
+      float getCanvasHeight()
       { return m_canvasHeight; }
 
       /** Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
        *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasWidth(const float& width)
+      void setCanvasWidth(float width)
       { m_canvasWidth = width; }
 
       /** Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
        *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasHeight(const float& height)
+      void setCanvasHeight(float height)
       { m_canvasHeight = height; }
 
     private:

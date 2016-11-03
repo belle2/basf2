@@ -168,7 +168,7 @@ namespace Belle2 {
 
     public:
       /// Setter for the gain in weight for hits which rl passage could be uniquly resolved.
-      void setRLWeightGain(const float& rlWeightGain)
+      void setRLWeightGain(float rlWeightGain)
       { m_rlWeightGain = rlWeightGain;}
 
       /// Getter for the gain in weight for hits which rl passage could be uniquly resolved.

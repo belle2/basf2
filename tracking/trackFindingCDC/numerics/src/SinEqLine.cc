@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 
 
-double SinEqLine::computeSmallestPositiveRoot(const int& maxIHalfPeriod) const
+double SinEqLine::computeSmallestPositiveRoot(int maxIHalfPeriod) const
 {
   /// Smallest positive root might before the first positive extermum
   double root = computeRootLargerThanExtemumInHalfPeriod(-1);
@@ -43,7 +43,7 @@ double SinEqLine::computeSmallestPositiveRoot(const int& maxIHalfPeriod) const
 
 
 
-double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(const int& iHalfPeriod) const
+double SinEqLine::computeRootLargerThanExtemumInHalfPeriod(int iHalfPeriod) const
 {
   if (hasLargeSlope()) {
     return computeRootForLargeSlope();
@@ -225,7 +225,7 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
 
 
 
-double SinEqLine::computeExtremumXInHalfPeriod(const int& iHalfPeriod) const
+double SinEqLine::computeExtremumXInHalfPeriod(int iHalfPeriod) const
 {
   const double slope = getSlope();
   double extremumInFirstHalfPeriod = acos(slope);

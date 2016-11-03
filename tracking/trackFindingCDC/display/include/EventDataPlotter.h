@@ -100,17 +100,17 @@ namespace Belle2 {
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
        *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasWidth(const float& width);
+      void setCanvasWidth(float width);
 
       /** Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
        *  which is stored in the bounding box (getBoundingBox()). */
-      void setCanvasHeight(const float& height);
+      void setCanvasHeight(float height);
 
     public:
       /// Converts a time given in nanoseconds to a time sting of the from "%fs".
-      std::string getAnimationTimeFromNanoSeconds(const float& nanoseconds)
+      std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
       { return std::to_string(nanoseconds) + "s"; }
 
     private:
@@ -134,7 +134,7 @@ namespace Belle2 {
       void drawSuperLayerBoundaries(const AttributeMap& attributeMap = AttributeMap());
 
       ///Draws a straight Line.
-      void drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
+      void drawLine(float startX, float startY, float endX, float endY,
                     const AttributeMap& attributeMap = AttributeMap());
 
     public:

@@ -50,10 +50,10 @@ std::unique_ptr<PrimitivePlotter> SVGPrimitivePlotter::clone() const
   return makeUnique<SVGPrimitivePlotter>(*this);
 }
 
-void SVGPrimitivePlotter::drawLine(const float& startX,
-                                   const float& startY,
-                                   const float& endX,
-                                   const float& endY,
+void SVGPrimitivePlotter::drawLine(float startX,
+                                   float startY,
+                                   float endX,
+                                   float endY,
                                    const AttributeMap& attributeMap)
 {
   PrimitivePlotter::drawLine(startX, startY, endX, endY, attributeMap);
@@ -74,10 +74,10 @@ void SVGPrimitivePlotter::drawLine(const float& startX,
 }
 
 
-void SVGPrimitivePlotter::drawArrow(const float& startX,
-                                    const float& startY,
-                                    const float& endX,
-                                    const float& endY,
+void SVGPrimitivePlotter::drawArrow(float startX,
+                                    float startY,
+                                    float endX,
+                                    float endY,
                                     const AttributeMap& attributeMap)
 {
   PrimitivePlotter::drawArrow(startX, startY, endX, endY, attributeMap);
@@ -98,9 +98,9 @@ void SVGPrimitivePlotter::drawArrow(const float& startX,
 }
 
 
-void SVGPrimitivePlotter::drawCircle(const float& centerX,
-                                     const float& centerY,
-                                     const float& radius,
+void SVGPrimitivePlotter::drawCircle(float centerX,
+                                     float centerY,
+                                     float radius,
                                      const AttributeMap& attributeMap)
 {
   PrimitivePlotter::drawCircle(centerX, centerY, radius, attributeMap);
@@ -119,13 +119,13 @@ void SVGPrimitivePlotter::drawCircle(const float& centerX,
 }
 
 
-void SVGPrimitivePlotter::drawCircleArc(const float& startX,
-                                        const float& startY,
-                                        const float& endX,
-                                        const float& endY,
-                                        const float& radius,
-                                        const bool& longArc,
-                                        const bool& sweepFlag,
+void SVGPrimitivePlotter::drawCircleArc(float startX,
+                                        float startY,
+                                        float endX,
+                                        float endY,
+                                        float radius,
+                                        bool longArc,
+                                        bool sweepFlag,
                                         const AttributeMap& attributeMap)
 {
   PrimitivePlotter::drawCircleArc(startX,

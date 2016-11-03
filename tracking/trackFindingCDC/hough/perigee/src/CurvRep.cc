@@ -17,7 +17,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CurvWithArcLength2DCache::CurvWithArcLength2DCache(const float& curv) :
+CurvWithArcLength2DCache::CurvWithArcLength2DCache(float curv) :
   m_curv(curv),
   m_arcLength2DByICLayer{{0}}
 {
@@ -110,7 +110,7 @@ DiscreteCurvWithArcLength2DCache::Array CurvBinsSpec::constructCacheArray() cons
   std::vector<float> discreteCurvs = constructArray();
   std::vector<CurvWithArcLength2DCache> result;
   result.reserve(discreteCurvs.size());
-  for (const float& curv : discreteCurvs) {
+  for (float curv : discreteCurvs) {
     result.emplace_back(curv);
   }
   return result;

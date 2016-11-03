@@ -38,15 +38,15 @@ namespace Belle2 {
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
       ESign getDistanceSign(const HoughBox& houghBox,
-                            const float& x,
-                            const float& y,
-                            const float& signedDriftLength,
-                            const float& dxdz = 0,
-                            const float& dydz = 0,
+                            float x,
+                            float y,
+                            float signedDriftLength,
+                            float dxdz = 0,
+                            float dydz = 0,
                             ILayer iCLayer = -1) const
       {
-        const float& lowerImpact(houghBox.template getLowerBound<AImpact>());
-        const float& upperImpact(houghBox.template getUpperBound<AImpact>());
+        float lowerImpact(houghBox.template getLowerBound<AImpact>());
+        float upperImpact(houghBox.template getUpperBound<AImpact>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerY = y - lowerImpact;

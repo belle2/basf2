@@ -36,29 +36,29 @@ std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 
 
 
-void PrimitivePlotter::drawLine(const float& startX,
-                                const float& startY,
-                                const float& endX,
-                                const float& endY,
+void PrimitivePlotter::drawLine(float startX,
+                                float startY,
+                                float endX,
+                                float endY,
                                 const AttributeMap& /* attributeMap */)
 {
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
 
 
-void PrimitivePlotter::drawArrow(const float& startX,
-                                 const float& startY,
-                                 const float& endX,
-                                 const float& endY,
+void PrimitivePlotter::drawArrow(float startX,
+                                 float startY,
+                                 float endX,
+                                 float endY,
                                  const AttributeMap& /* attributeMap */)
 {
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
 
 
-void PrimitivePlotter::drawCircle(const float& centerX,
-                                  const float& centerY,
-                                  const float& radius,
+void PrimitivePlotter::drawCircle(float centerX,
+                                  float centerY,
+                                  float radius,
                                   const AttributeMap& /* attributeMap */)
 {
   const float left = centerX - radius;
@@ -70,13 +70,13 @@ void PrimitivePlotter::drawCircle(const float& centerX,
 }
 
 
-void PrimitivePlotter::drawCircleArc(const float& startX,
-                                     const float& startY,
-                                     const float& endX,
-                                     const float& endY,
-                                     const float& /* radius */,
-                                     const bool& /* longArc */,
-                                     const bool& /* sweepFlag */,
+void PrimitivePlotter::drawCircleArc(float startX,
+                                     float startY,
+                                     float endX,
+                                     float endY,
+                                     float /* radius */,
+                                     bool /* longArc */,
+                                     bool /* sweepFlag */,
                                      const AttributeMap& /* attributeMap */)
 {
   // The actual extend of the circle arc is more complicating.

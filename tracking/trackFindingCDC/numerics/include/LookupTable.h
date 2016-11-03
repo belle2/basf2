@@ -71,7 +71,7 @@ namespace Belle2 {
       }
 
       /// Return the precomputed value at the position closest to the given value.
-      const T& nearest(const double& x) const
+      const T& nearest(double x) const
       {
         if (not std::isfinite(x)) return m_values.back(); // Return sentinal value
         const int iMax =  m_values.size() - 2; // Subtracting sentinal index

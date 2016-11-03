@@ -86,7 +86,7 @@ namespace Belle2 {
       { m_observations.clear(); }
 
       /// Reserves enough space for nObservations
-      void reserve(const size_t& nObservations)
+      void reserve(std::size_t nObservations)
       { m_observations.reserve(nObservations * 4); }
 
       /// Getter for the x value of the observation at the given index.

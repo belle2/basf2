@@ -39,22 +39,22 @@ namespace Belle2 {
         const CDCWire& wire = recoHit.getWire();
         const WireLine& wireLine = wire.getWireLine();
 
-        const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
-        const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
+        float lowerZ0 = z0TanLambdaBox->getLowerZ0();
+        float upperZ0 = z0TanLambdaBox->getUpperZ0();
         const float centerZ0 = 0.5 * (lowerZ0 + upperZ0);
 
-        const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
-        const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
+        float lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
+        float upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
         const float centerTanLambda = 0.5 * (lowerTanLambda + upperTanLambda);
 
-        const float& perpS = recoHit.getArcLength2D();
+        float perpS = recoHit.getArcLength2D();
         const Vector2D& recoPosition = recoHit.getRecoPos2D();
 
-        const float& hitZ = centerTanLambda * perpS + centerZ0;
+        float hitZ = centerTanLambda * perpS + centerZ0;
 
         Vector2D pos2D = wireLine.nominalPos2DAtZ(hitZ);
 
-        const float& distanceToRecoPosition = (pos2D - recoPosition).norm();
+        float distanceToRecoPosition = (pos2D - recoPosition).norm();
 
         return exp(-distanceToRecoPosition);
       }

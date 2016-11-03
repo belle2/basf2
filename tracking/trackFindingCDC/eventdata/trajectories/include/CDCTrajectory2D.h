@@ -394,7 +394,7 @@ namespace Belle2 {
       { return getLocalCircle().ndf(); }
 
       /// Setter for the number of degrees of freedom of the circle fit.
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       { return m_localPerigeeCircle.setNDF(ndf); }
 
       /// Setter for the generalized circle that describes the trajectory.

@@ -55,10 +55,10 @@ namespace Belle2 {
        *  @param endY          y coordinate where the line ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawLine(const float& startX,
-                            const float& startY,
-                            const float& endX,
-                            const float& endY,
+      virtual void drawLine(float startX,
+                            float startY,
+                            float endX,
+                            float endY,
                             const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
@@ -70,10 +70,10 @@ namespace Belle2 {
        *  @param endY          y coordinate where the arrow ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawArrow(const float& startX,
-                             const float& startY,
-                             const float& endX,
-                             const float& endY,
+      virtual void drawArrow(float startX,
+                             float startY,
+                             float endX,
+                             float endY,
                              const AttributeMap& attributeMap = AttributeMap()) override;
 
 
@@ -85,9 +85,9 @@ namespace Belle2 {
        *  @param radius         radius of the circle
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircle(const float& centerX,
-                              const float& centerY,
-                              const float& radius,
+      virtual void drawCircle(float centerX,
+                              float centerY,
+                              float radius,
                               const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
@@ -102,13 +102,13 @@ namespace Belle2 {
        *  @param sweepFlag     Boolean indicator related to the curvature perceived one the circle arc. False means negative curvature. True mean positive curvature.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircleArc(const float& startX,
-                                 const float& startY,
-                                 const float& endX,
-                                 const float& endY,
-                                 const float& radius,
-                                 const bool& longArc,
-                                 const bool& sweepFlag,
+      virtual void drawCircleArc(float startX,
+                                 float startY,
+                                 float endX,
+                                 float endY,
+                                 float radius,
+                                 bool longArc,
+                                 bool sweepFlag,
                                  const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Adds a smooth curve to the plot

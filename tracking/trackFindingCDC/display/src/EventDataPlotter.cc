@@ -124,7 +124,7 @@ float EventDataPlotter::getCanvasHeight() const
   }
 }
 
-void EventDataPlotter::setCanvasWidth(const float& width)
+void EventDataPlotter::setCanvasWidth(float width)
 {
   if (m_ptrPrimitivePlotter) {
     PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
@@ -132,7 +132,7 @@ void EventDataPlotter::setCanvasWidth(const float& width)
   }
 }
 
-void EventDataPlotter::setCanvasHeight(const float& height)
+void EventDataPlotter::setCanvasHeight(float height)
 {
   if (m_ptrPrimitivePlotter) {
     PrimitivePlotter& primitivePlotter = *m_ptrPrimitivePlotter;
@@ -243,7 +243,7 @@ void EventDataPlotter::drawSuperLayerBoundaries(const AttributeMap& attributeMap
   drawOuterCDCWall(attributeMap);
 }
 
-void EventDataPlotter::drawLine(const float& startX, const float& startY, const float& endX, const float& endY,
+void EventDataPlotter::drawLine(float startX, float startY, float endX, float endY,
                                 const AttributeMap& attributeMap)
 {
   if (not m_ptrPrimitivePlotter) return;
@@ -471,18 +471,18 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
       // Draw full circle
       const Vector2D center = trajectory2D.getGlobalCircle().center();
       const float radius = trajectory2D.getLocalCircle()->absRadius();
-      const float& centerX = center.x();
-      const float& centerY = center.y();
+      float centerX = center.x();
+      float centerY = center.y();
 
       primitivePlotter.drawCircle(centerX, centerY, radius);
 
     } else {
       const Vector2D start = trajectory2D.getSupport();
-      const float& startX = start.x();
-      const float& startY = start.y();
+      float startX = start.x();
+      float startY = start.y();
 
-      const float& endX = trajectoryExit.x();
-      const float& endY = trajectoryExit.y();
+      float endX = trajectoryExit.x();
+      float endY = trajectoryExit.y();
 
       const int curvature = -charge;
       const bool sweepFlag = curvature > 0;
@@ -505,11 +505,11 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
       B2WARNING("Could not compute point off exit in a straight line case.");
     } else {
       const Vector2D start = trajectory2D.getSupport();
-      const float& startX = start.x();
-      const float& startY = start.y();
+      float startX = start.x();
+      float startY = start.y();
 
-      const float& endX = trajectoryExit.x();
-      const float& endY = trajectoryExit.y();
+      float endX = trajectoryExit.x();
+      float endY = trajectoryExit.y();
       primitivePlotter.drawLine(startX, startY, endX, endY, attributeMap);
     }
   }

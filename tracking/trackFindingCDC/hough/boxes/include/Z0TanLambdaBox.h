@@ -26,19 +26,19 @@ namespace Belle2 {
 
     public:
       /// Concise getter for the lower z0 bound.
-      const float& getLowerZ0() const
+      float getLowerZ0() const
       { return *(getLowerBound<DiscreteZ0>()); }
 
       /// Concise getter for the upper z0 bound.
-      const float& getUpperZ0() const
+      float getUpperZ0() const
       { return *(getUpperBound<DiscreteZ0>()); }
 
       /// Concise getter for the lower tan lambda bound.
-      const float& getLowerTanLambda() const
+      float getLowerTanLambda() const
       { return *(getLowerBound<DiscreteTanL>()); }
 
       /// Concise getter for the upper tan lambda bound.
-      const float& getUpperTanLambda() const
+      float getUpperTanLambda() const
       { return *(getUpperBound<DiscreteTanL>()); }
     };
   }

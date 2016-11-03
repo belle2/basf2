@@ -31,7 +31,7 @@ namespace Belle2 {
       {}
 
       /// Initialises the bounds of the rectangle to the given values. Automatically swaps the x or y values if they are given in a decreasing.
-      BoundingBox(const float& x1, const float& y1, const float& x2, const float& y2) :
+      BoundingBox(float x1, float y1, float x2, float y2) :
         m_left(std::min(x1, x2)),
         m_bottom(std::min(y1, y2)),
         m_right(std::max(x1, x2)),
@@ -51,7 +51,7 @@ namespace Belle2 {
       }
 
       /// Expands the rectangle in each direction by the given value delta.
-      void expand(const float& delta)
+      void expand(float delta)
       {
         m_left -= delta;
         m_bottom -= delta;
@@ -68,19 +68,19 @@ namespace Belle2 {
       { return getTop() - getBottom(); }
 
       /// Getter for the location of the left of the bounding box rectangle (lower x bound). NAN if unset.
-      const float& getLeft() const
+      float getLeft() const
       { return m_left; }
 
       /// Getter for the location of the bottom of the bounding box rectangle (lower y bound). NAN if unset.
-      const float& getBottom() const
+      float getBottom() const
       { return m_bottom; }
 
       /// Getter for the location of the right of the bounding box rectangle (upper x bound). NAN if unset.
-      const float& getRight() const
+      float getRight() const
       { return m_right; }
 
       /// Getter for the location of the top of the bounding box rectangle (upper y bound). NAN if unset.
-      const float& getTop() const
+      float getTop() const
       { return m_top; }
 
       /// Clears all bounds to NAN.

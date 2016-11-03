@@ -39,7 +39,7 @@ namespace Belle2 {
     class CurvWithArcLength2DCache {
     public:
       /// Make cache for one curvature value
-      explicit CurvWithArcLength2DCache(const float& curv);
+      explicit CurvWithArcLength2DCache(float curv);
 
       /// Unpack the curvature
       explicit operator float() const

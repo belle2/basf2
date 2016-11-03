@@ -58,25 +58,25 @@ namespace Belle2 {
       }
 
       /// Return the maximum value in x direction.
-      const float& getMaximumX() const
+      float getMaximumX() const
       {
         return m_maximumX;
       }
 
       /// Return the maximum value in y direction.
-      const float& getMaximumY() const
+      float getMaximumY() const
       {
         return m_maximumY;
       }
 
       /// Return the overlap in x direction.
-      const float& getOverlapX() const
+      float getOverlapX() const
       {
         return m_overlapX;
       }
 
       /// Return the overlap in y direction.
-      const float& getOverlapY() const
+      float getOverlapY() const
       {
         return m_overlapY;
       }

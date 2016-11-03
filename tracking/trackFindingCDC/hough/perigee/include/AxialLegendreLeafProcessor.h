@@ -87,11 +87,11 @@ namespace Belle2 {
 
     public:
       /// Getter for the maximal level of of splitting in the hough tree
-      const size_t& getMaxLevel() const
+      std::size_t getMaxLevel() const
       { return m_maxLevel; }
 
       /// Setter for the maximal level of of splitting in the hough tree
-      void setMaxLevel(const size_t& maxLevel)
+      void setMaxLevel(std::size_t maxLevel)
       { m_maxLevel = maxLevel; }
 
       /// Getter for the minimal weight what is need the follow the children of a node.
@@ -103,11 +103,11 @@ namespace Belle2 {
       { m_minWeight = minWeight; }
 
       /// Getter for the maximal curvature to be investigated in the current walk.
-      const float& getMaxCurv() const
+      float getMaxCurv() const
       { return m_maxCurv; }
 
       /// Setter for the maximal curvature to be investigated in the current walk.
-      void setMaxCurv(const float& curvature)
+      void setMaxCurv(float curvature)
       { m_maxCurv = curvature; }
 
     private:

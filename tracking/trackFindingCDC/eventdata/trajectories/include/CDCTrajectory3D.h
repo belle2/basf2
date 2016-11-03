@@ -287,7 +287,7 @@ namespace Belle2 {
       { return getLocalHelix().ndf(); }
 
       /// Setter for the number of degrees of freedom of the helix fit.
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       { return m_localHelix.setNDF(ndf); }
 
       /// Getter for the helix in local coordinates.

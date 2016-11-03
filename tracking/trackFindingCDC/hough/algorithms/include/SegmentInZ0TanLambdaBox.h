@@ -34,17 +34,17 @@ namespace Belle2 {
       Weight operator()(const std::pair<CDCRecoSegment3D, CDCTrajectorySZ>& recoSegmentWithTrajectorySZ,
                         const HoughBox* z0TanLambdaBox)
       {
-        const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
-        const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
+        float lowerZ0 = z0TanLambdaBox->getLowerZ0();
+        float upperZ0 = z0TanLambdaBox->getUpperZ0();
 
-        const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
-        const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
+        float lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
+        float upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
         const CDCTrajectorySZ& szTrajectory = recoSegmentWithTrajectorySZ.second;
         const CDCRecoSegment3D& recoSegment = recoSegmentWithTrajectorySZ.first;
 
-        const float& trajectoryZ0 = szTrajectory.getZ0();
-        const float& trajectoryTanLambda = szTrajectory.getTanLambda();
+        float trajectoryZ0 = szTrajectory.getZ0();
+        float trajectoryTanLambda = szTrajectory.getTanLambda();
 
         if (std::isnan(trajectoryZ0) or std::isnan(trajectoryTanLambda)) {
           return NAN;

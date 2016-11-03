@@ -386,7 +386,7 @@ namespace Belle2 {
     // For ROOT objects
     //
 
-    ClassDef(COILGeometryPar, 0);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(COILGeometryPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
 
   };

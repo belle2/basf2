@@ -312,8 +312,7 @@ namespace Belle2 {
     // For ROOT objects
     //
 
-    ClassDef(STRGeometryPar, 0);  /**< ClassDef, must be the last term before the closing {}*/
-
+    ClassDef(STRGeometryPar, 1);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

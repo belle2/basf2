@@ -51,7 +51,7 @@ ostream& operator <<(ostream& o, const zr_t& v)
 
 struct curl_t {
   G4ThreeVector v;
-  curl_t(const G4ThreeVector& _v): v(_v) {}
+  explicit curl_t(const G4ThreeVector& _v): v(_v) {}
 };
 
 ostream& operator <<(ostream& o, const curl_t& c)
@@ -92,7 +92,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
       if (abs(s0.z - s1.z) < kCarTolerance && abs(s0.r - s1.r) < kCarTolerance)
         it1 = contour.erase(it1);
       else {
-        it0++; it1++;
+        ++it0; ++it1;
       }
     }
     const zr_t& s0 = *it0, &s1 = contour[0];
@@ -115,7 +115,7 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
       if (d * d < kCarTolerance * kCarTolerance * (dr2 * dr2 + dz2 * dz2)) {
         it1 = contour.erase(it1); it2 = it1; inc(it2); it0 = it1; dec(it0);
       } else {
-        it0++; inc(it1); inc(it2);
+        ++it0; inc(it1); inc(it2);
       }
     }
   } while (0);
@@ -251,7 +251,8 @@ void BelleLathe::Init(const vector<zr_t>& c, double phi0, double dphi)
 BelleLathe::BelleLathe(const G4String& pName)
   : G4CSGSolid(pName)
 {
-  cout << "Nominal constructor: " << GetName() << endl;
+  vector<zr_t> a;
+  Init(a, 0, 2 * M_PI);
 }
 
 // Fake default constructor - sets only member data and allocates memory
@@ -259,7 +260,8 @@ BelleLathe::BelleLathe(const G4String& pName)
 BelleLathe::BelleLathe(__void__& a)
   : G4CSGSolid(a)
 {
-  cout << "Fake constructor: " << GetName() << endl;
+  vector<zr_t> b;
+  Init(b, 0, 2 * M_PI);
 }
 
 // Destructor
@@ -273,10 +275,13 @@ BelleLathe::~BelleLathe()
 
 // Copy constructor
 BelleLathe::BelleLathe(const BelleLathe& rhs)
-  : G4CSGSolid(rhs)
+  : G4CSGSolid(rhs), fcontour(rhs.fcontour), fcache(rhs.fcache), fz(rhs.fz),
+    findx(rhs.findx), fseg(rhs.fseg), farea(rhs.farea), ftlist(rhs.ftlist),
+    fphi(rhs.fphi), fdphi(rhs.fdphi), fs0(rhs.fs0), fc0(rhs.fc0), fs1(rhs.fs1),
+    fc1(rhs.fc1), fn0x(rhs.fn0x), fn0y(rhs.fn0y), fn1x(rhs.fn1x), fn1y(rhs.fn1y),
+    frmin(rhs.frmin), frmax(rhs.frmax), fzmin(rhs.fzmin), fzmax(rhs.fzmax),
+    fgtpi(rhs.fgtpi), ftwopi(rhs.ftwopi), fshape(rhs.fshape), fsurf(rhs.fsurf)
 {
-  fcontour = rhs.fcontour;
-  cout << "Copy constuctor: " << GetName() << endl;
 }
 
 // Assignment operator
@@ -290,7 +295,30 @@ BelleLathe& BelleLathe::operator = (const BelleLathe& rhs)
 
   // Copy data
   fcontour = rhs.fcontour;
-  cout << "Assignment operator: " << GetName() << endl;
+  fcache = rhs.fcache;
+  fz = rhs.fz;
+  findx = rhs.findx;
+  fseg = rhs.fseg;
+  farea = rhs.farea;
+  ftlist = rhs.ftlist;
+  fphi = rhs.fphi;
+  fdphi = rhs.fdphi;
+  fs0 = rhs.fs0;
+  fc0 = rhs.fc0;
+  fs1 = rhs.fs1;
+  fc1 = rhs.fc1;
+  fn0x = rhs.fn0x;
+  fn0y = rhs.fn0y;
+  fn1x = rhs.fn1x;
+  fn1y = rhs.fn1y;
+  frmin = rhs.frmin;
+  frmax = rhs.frmax;
+  fzmin = rhs.fzmin;
+  fzmax = rhs.fzmax;
+  fgtpi = rhs.fgtpi;
+  ftwopi = rhs.ftwopi;
+  fshape = rhs.fshape;
+  fsurf = rhs.fsurf;
   return *this;
 }
 
@@ -597,7 +625,7 @@ G4bool BelleLathe::CalculateExtent(const EAxis A,
       }
       vector<bool> bv(vlist.size(), false);
 
-      for (vector<seg_t>::const_iterator it = slist.begin(); it != slist.end(); it++) {
+      for (vector<seg_t>::const_iterator it = slist.begin(); it != slist.end(); ++it) {
         bv[(*it).i0] = true;
         bv[(*it).i1] = true;
       }
@@ -952,7 +980,7 @@ EInside BelleLathe::Inside(const G4ThreeVector& p) const
     else if (d > delta) res = kOutside;
     else if (d > -delta) res = kSurface;
     else              res = kInside;
-  } while (0);
+  }
 
 #if COMPARE==1
   EInside dd = fshape->Inside(p);

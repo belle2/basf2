@@ -29,15 +29,6 @@ using namespace Belle2;
 using namespace Belle2::geometry;
 
 namespace {
-  double diff(double phi1, double phi0)  // dphi = phi1-phi0 signed difference -M_PI<dphi<M_PI
-  {
-    const double twopi = 2 * M_PI;
-    double dphi = fmod(phi1 - phi0, twopi);
-    dphi = dphi < -M_PI ? dphi + twopi : dphi;
-    dphi = dphi > M_PI ? dphi - twopi : dphi;
-    return dphi;
-  }
-
   Point_t p1[]  = {{0.0, 0.0}, {263.4, 0.0}, {263.4, 197.2}, {248.6, 206.6}, {212.0, 152.6}, {145.2, 199.0}, {108.5, 146.6}, {46.4, 192.1}, {7.9, 140.5}, { -50.0, 185.2}, { -90.3, 134.2}, { -143.8, 178.3}, { -170.7, 145.0}};
   Point_t p2[]  = {{0.0, 0.0}, {384.8, 0.0}, {181.9, 172.5}, {136.8, 122.3}, {90.7, 163.9}, {46.5, 115.6}, {4.1, 156.3}, { -42.5, 109.9}, { -80.9, 149.5}, { -110.9, 119.8}};
   Point_t p3[]  = {{0.0, 0.0}, {343.2, 0.0}, {209.6, 144.2}, {158.0, 98.1}, {125.8, 135.0}, {74.3, 92.4}, {46.1, 128.4}, { -6.9, 87.3}, { -32.5, 121.3}, { -67.3, 95.8}};

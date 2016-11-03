@@ -16,7 +16,7 @@ namespace Belle2 {
 
   struct shape_t {
     int nshape;
-    shape_t() {}
+    shape_t(): nshape(0) {}
     virtual ~shape_t() {}
 
     G4VSolid* get_solid(const std::string& prefix, double wrapthick, G4Translate3D& shift) const;

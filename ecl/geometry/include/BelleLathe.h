@@ -33,7 +33,7 @@ inline double dotxy(const vector_t& u, const vector_t& v)
 
 class BelleLathe : public G4CSGSolid {
 public:  // with description
-  BelleLathe(const G4String& pName);
+  explicit BelleLathe(const G4String& pName);
   // Constructor for "nominal" BelleLathe whose parameters are to be set
   // by a G4VPVParamaterisation later
 
@@ -87,7 +87,7 @@ public:  // with description
 
 public:  // without description
 
-  BelleLathe(__void__&);
+  explicit BelleLathe(__void__&);
   // Fake default constructor for usage restricted to direct object
   // persistency for clients requiring preallocation of memory for
   // persistifiable objects.

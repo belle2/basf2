@@ -39,8 +39,8 @@ namespace TrgTest {
       std::string dbFilePath = FileSystem::findFile("data/framework/database.txt");
       LocalDatabase::createInstance(dbFilePath, "", true, LogConfig::c_Error);
       DBStore::Instance().update();
-      GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
       // Unpack the cdc geometry, which currently uses both the db and the gearbox
+      GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
       CDCGeometry cdcGeometry;
       cdcGeometry.read(cdcGearDir);
       CDC::CDCGeometryPar::Instance(&cdcGeometry);
@@ -49,7 +49,6 @@ namespace TrgTest {
     virtual void TearDown()
     {
       // Close the gearbox and reset the global objects
-      TestHelpers::TestWithGearbox::TearDownTestCase();
       Database::reset();
       DataStore::Instance().reset();
     }

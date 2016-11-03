@@ -149,8 +149,9 @@ namespace Belle2 {
           applyToChildren([levelNeighborhood](ThisType * qt) { qt->buildNeighborhood(levelNeighborhood);});
         }
 
-        if (m_level > 3)
+        if (m_level > 3) {
           this->findNeighbors();
+        }
       }
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
@@ -271,8 +272,9 @@ namespace Belle2 {
       /** apply a lambda expression to all children of this tree node */
       void applyToChildren(std::function<void(ThisType*)> lmd)
       {
-        if (!m_children)
+        if (!m_children) {
           return;
+        }
         m_children->apply(lmd);
       };
 

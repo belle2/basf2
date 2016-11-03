@@ -52,8 +52,9 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
       ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getWireHit()->getRefPos2D());
       const CDCWireHit* wireHit = hit->getWireHit();
       CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
-      if (wireHit->getAutomatonCell().hasTakenFlag())
+      if (wireHit->getAutomatonCell().hasTakenFlag()) {
         continue;
+      }
 
       //        if(fabs(track.getStartTrajectory3D().getTrajectory2D().getGlobalCircle().radius()) > 60.)
       //          if(TrackMergerNew::getCurvatureSignWrt(cdcRecoHit3D, track.getStartTrajectory3D().getGlobalCircle().center()) != trackCharge) continue;
@@ -152,8 +153,9 @@ std::vector<const CDCWireHit*> HitProcessor::splitBack2BackTrack(CDCTrack& track
     }
 
     for (CDCRecoHit3D& hit : trackCandidate) {
-      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag())
+      if (hit.getWireHit().getAutomatonCell().hasMaskedFlag()) {
         removedHits.push_back(&(hit.getWireHit()));
+      }
     }
 
     deleteAllMarkedHits(trackCandidate);
@@ -226,35 +228,38 @@ ESign HitProcessor::getChargeSign(CDCTrack& track)
   for (const CDCRecoHit3D& hit : track) {
     ESign curve_sign = getCurvatureSignWrt(hit, center);
 
-    if (curve_sign == ESign::c_Plus)
+    if (curve_sign == ESign::c_Plus) {
       ++vote_pos;
-    else if (curve_sign == ESign::c_Minus)
+    } else if (curve_sign == ESign::c_Minus) {
       ++vote_neg;
-    else {
+    } else {
       B2FATAL("Strange behaviour of TrackHit::getCurvatureSignWrt");
     }
   }
 
-  if (vote_pos > vote_neg)
+  if (vote_pos > vote_neg) {
     return ESign::c_Plus;
-  else
+  } else {
     return ESign::c_Minus;
+  }
 }
 
 ESign HitProcessor::getCurvatureSignWrt(const CDCRecoHit3D& hit, Vector2D xy)
 {
   double phi_diff = atan2(xy.y(), xy.x()) - hit.getRecoPos3D().phi();
 
-  while (phi_diff > /*2 */ TMath::Pi())
+  while (phi_diff > /*2 */ TMath::Pi()) {
     phi_diff -= 2 * TMath::Pi();
-  while (phi_diff < -1. * TMath::Pi())
+  }
+  while (phi_diff < -1. * TMath::Pi()) {
     phi_diff += 2 * TMath::Pi();
+  }
 
-  if (phi_diff > 0 /*TMath::Pi()*/)
+  if (phi_diff > 0 /*TMath::Pi()*/) {
     return ESign::c_Minus;
-  else
+  } else {
     return ESign::c_Plus;
-
+  }
 }
 
 void HitProcessor::resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<CDCConformalHit>& conformalCDCWireHitList)
@@ -282,8 +287,9 @@ void HitProcessor::deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maxim
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   for (CDCRecoHit3D& recoHit : track) {
     const Vector2D& recoPos2D = recoHit.getRecoPos2D();
-    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximum_distance)
+    if (fabs(trajectory2D.getDist2D(recoPos2D)) > maximum_distance) {
       recoHit->getWireHit().getAutomatonCell().setMaskedFlag(true);
+    }
   }
 
   deleteAllMarkedHits(track);
@@ -364,10 +370,11 @@ int HitProcessor::startingSLayer(const std::vector<double>& startingArmSLayers)
     return val > 0;
   });
 
-  if (startSlIt != startingArmSLayers.end())
+  if (startSlIt != startingArmSLayers.end()) {
     return startSlIt - startingArmSLayers.begin();
-  else
+  } else {
     return 8;
+  }
 }
 
 
@@ -376,17 +383,21 @@ int HitProcessor::endingSLayer(const std::vector<double>& startingArmSLayers)
   std::vector<double>::const_reverse_iterator endSlIt;
   endSlIt = std::find_if(startingArmSLayers.rbegin(), startingArmSLayers.rend(), [](double val) {return val > 0;});
 
-  if (endSlIt != startingArmSLayers.rend())
+  if (endSlIt != startingArmSLayers.rend()) {
     return 8 - (endSlIt - startingArmSLayers.rbegin());
-  else
+  } else {
     return 0;
+  }
 }
 
 bool HitProcessor::isTwoSided(const std::vector<double>& startingArmSLayers, const std::vector<double>& endingArmSLayers)
 {
   if ((std::accumulate(startingArmSLayers.begin(), startingArmSLayers.end(), 0) > 0) &&
-      (std::accumulate(endingArmSLayers.begin(), endingArmSLayers.end(), 0) > 0)) return true;
-  else return false;
+      (std::accumulate(endingArmSLayers.begin(), endingArmSLayers.end(), 0) > 0)) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 bool HitProcessor::hasHoles(const std::vector<double>& startingArmSLayers,

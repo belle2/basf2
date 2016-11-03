@@ -31,8 +31,9 @@ std::string SegmentMCTrackIdColorMap::map(const int, const CDCRecoSegment2D& seg
   mcSegmentLookUp.getInstance();
 
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
-  if (mcTrackId < 0)return m_bkgSegmentColor;
-  else {
+  if (mcTrackId < 0) {
+    return m_bkgSegmentColor;
+  } else {
     int m_iColor = mcTrackId % m_listColors.size();
     return m_listColors[m_iColor];
   }
@@ -47,9 +48,11 @@ std::string SegmentFBInfoColorMap::map(const int, const CDCRecoSegment2D& segmen
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
   if (mcTrackId < 0) return m_bkgSegmentColor;
   EForwardBackward fbInfo = mcSegmentLookUp.isForwardOrBackwardToMCTrack(&segment);
-  if (fbInfo == EForwardBackward::c_Forward) return "green";
-  else if (fbInfo == EForwardBackward::c_Backward) return "red";
-  else {
+  if (fbInfo == EForwardBackward::c_Forward) {
+    return "green";
+  } else if (fbInfo == EForwardBackward::c_Backward) {
+    return "red";
+  } else {
     B2INFO("Segment not orientable to match track");
     return m_bkgSegmentColor;
   }

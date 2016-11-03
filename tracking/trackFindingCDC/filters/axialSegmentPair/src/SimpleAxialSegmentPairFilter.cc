@@ -79,9 +79,9 @@ Weight SimpleAxialSegmentPairFilter::operator()(const CDCAxialSegmentPair& axial
   double startFit_dist2DToFront_endSegment = startFit.getDist2D(endFrontRecoPos2D);
   double endFit_dist2DToBack_startSegment = endFit.getDist2D(startBackRecoPos2D);
 
-  if (startFit_dist2DToFront_endSegment < 6 and  endFit_dist2DToBack_startSegment < 6)
+  if (startFit_dist2DToFront_endSegment < 6 and endFit_dist2DToBack_startSegment < 6) {
     return startSegment.size() + endSegment.size();
-  else {
+  } else {
     return NAN;
   }
 

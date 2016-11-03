@@ -62,8 +62,11 @@ namespace Belle2 {
       virtual Weight operator()(const CDCSegmentPair& segmentPair) override
       {
         double isFeasibleWeight = m_feasibleSegmentPairFilter(segmentPair);
-        if (std::isnan(isFeasibleWeight)) return NAN;
-        else return Super::operator()(segmentPair);
+        if (std::isnan(isFeasibleWeight)) {
+          return NAN;
+        } else {
+          return Super::operator()(segmentPair);
+        }
       }
 
     private:

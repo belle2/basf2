@@ -415,8 +415,9 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
     const double shiftValue = startTrajectory2D.getLocalCircle()->arcLengthPeriod();
     if (std::isfinite(shiftValue)) {
       for (CDCRecoHit3D& recoHit : *this) {
-        if (recoHit.getArcLength2D() < 0)
+        if (recoHit.getArcLength2D() < 0) {
           recoHit.shiftArcLength2D(shiftValue);
+        }
       }
     }
   }

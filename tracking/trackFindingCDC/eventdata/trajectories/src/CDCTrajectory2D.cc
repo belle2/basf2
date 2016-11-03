@@ -84,8 +84,11 @@ ISuperLayer CDCTrajectory2D::getISuperLayerAfter(ISuperLayer iSuperLayer, bool m
   if (iSuperLayer == minimalISuperLayer) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
   if (iSuperLayer == maximalISuperLayer) return ISuperLayerUtil::getNextInwards(iSuperLayer);
 
-  if (movingOutward) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
-  else return ISuperLayerUtil::getNextInwards(iSuperLayer);
+  if (movingOutward) {
+    return ISuperLayerUtil::getNextOutwards(iSuperLayer);
+  } else {
+    return ISuperLayerUtil::getNextInwards(iSuperLayer);
+  }
 }
 
 ISuperLayer CDCTrajectory2D::getISuperLayerAfterStart(bool movingOutward) const

@@ -35,10 +35,11 @@ namespace Belle2 {
         Super::operator()(object);
         MayBePtr<Float_t> truth = Super::getVarSet().find("truth");
 
-        if (not truth or (*truth) == 0.0)
+        if (not truth or (*truth) == 0.0) {
           return NAN;
-        else
+        } else {
           return 1.0;
+        }
       }
     };
   }

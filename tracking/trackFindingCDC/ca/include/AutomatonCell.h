@@ -188,8 +188,11 @@ namespace Belle2 {
       template<ECellFlags cellFlag>
       void setFlags(bool setTo) const
       {
-        if (setTo) setFlags(cellFlag);
-        else clearFlags(cellFlag);
+        if (setTo) {
+          setFlags(cellFlag);
+        } else {
+          clearFlags(cellFlag);
+        }
       }
 
       /** Getter for the ored combination of the cell flags to mark some status of the cell.

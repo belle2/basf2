@@ -83,10 +83,11 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
 
   var<named("calculation_failed")>() = false;
   var<named("maximum_perpS_overlap")>() = maximumPerpSOverlap;
-  if (segmentTrain.size() > 1)
+  if (segmentTrain.size() > 1) {
     var<named("perpS_overlap_mean")>() = sumPerpSOverlap / (segmentTrain.size() - 1);
-  else
+  } else {
     var<named("perpS_overlap_mean")>() = 0;
+  }
 
   return true;
 }

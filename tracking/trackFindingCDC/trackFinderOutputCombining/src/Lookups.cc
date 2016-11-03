@@ -19,8 +19,9 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
   m_hitSegmentLookUp.clear();
 
   for (CDCRecoSegment2D& segment : segments) {
-    if (segment.getAutomatonCell().hasTakenFlag())
+    if (segment.getAutomatonCell().hasTakenFlag()) {
       continue;
+    }
 
     ISuperLayer iSuperLayer = segment.getISuperLayer();
     SegmentInformation* newSegmentInformation = new SegmentInformation(&segment);

@@ -178,12 +178,16 @@ namespace Belle2 {
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 4);
 
               unsigned long theta1 = node->getXBin(i);
-              if (theta1 <= extension) theta1 = 0;
-              else theta1 -= extension;
+              if (theta1 <= extension) {
+                theta1 = 0;
+              } else {
+                theta1 -= extension;
+              }
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBin(i + 1);
+              }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             } else {
@@ -192,12 +196,16 @@ namespace Belle2 {
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 8);
 
               unsigned long theta1 = node->getXBin(i);
-              if (theta1 <= extension) theta1 = 0;
-              else theta1 -= extension;
+              if (theta1 <= extension) {
+                theta1 = 0;
+              } else {
+                theta1 -= extension;
+              }
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBin(i + 1);
+              }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             }
@@ -252,8 +260,9 @@ namespace Belle2 {
 
               if (insertItemInNode(&newQuadTree, item->getPointer(), 0, 0)) {
                 if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
-                  if (checkDerivative(&newQuadTree, item->getPointer()))
+                  if (checkDerivative(&newQuadTree, item->getPointer())) {
                     newQuadTree.insertItem(item);
+                  }
                 } else {
                   newQuadTree.insertItem(item);
                 }
@@ -321,8 +330,9 @@ namespace Belle2 {
 //        quadtreeItemsVector.reserve(hitsVector.size());
         for (ItemType* item : hitsVector) {
           if (item->isUsed()) continue;
-          if (insertItemInNode(quadTree, item->getPointer(), 0, 0))
+          if (insertItemInNode(quadTree, item->getPointer(), 0, 0)) {
             quadtreeItemsVector.push_back(item);
+          }
         }
 
         return quadTree;

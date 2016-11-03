@@ -102,8 +102,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   // Count number of hits in the same region
   for (const CDCRecoHit3D& recoHit : *track) {
-    if (recoHit.getArcLength2D() < 0.8 * perpSMinimum or recoHit.getArcLength2D() > 1.2 * perpSMaximum)
+    if (recoHit.getArcLength2D() < 0.8 * perpSMinimum or
+        recoHit.getArcLength2D() > 1.2 * perpSMaximum) {
       continue;
+    }
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
     } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
@@ -168,8 +170,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
 
       double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
-      if (std::isnan(current_z_distance))
+      if (std::isnan(current_z_distance)) {
         continue;
+      }
 
       if (thetaFirstSegmentHit == -10) {
         thetaFirstSegmentHit = reconstructedPosition.theta();

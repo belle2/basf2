@@ -207,8 +207,9 @@ void CDCSVGPlotter::drawCDCSimHitsConnectByToF(const std::string& storeArrayName
         }
       }
     }
-  } else
+  } else {
     B2WARNING("StoreArray " << storeArrayName << " not present");
+  }
 }
 
 void CDCSVGPlotter::drawCDCSimHits(const std::string& storeArrayName, const std::string&, const std::string& strokeWidth)
@@ -225,8 +226,9 @@ void CDCSVGPlotter::drawCDCSimHits(const std::string& storeArrayName, const std:
     colorizer.setStroke("orange");
     colorizer.setStrokeWidth(strokeWidth);
     drawIterable(simHitsRelatedToHits, colorizer);
-  } else
+  } else {
     B2WARNING("StoreArray " << storeArrayName << " not present");
+  }
 }
 
 void CDCSVGPlotter::drawCDCTracks(const std::string& storeObjName, const std::string&, const std::string&)
@@ -291,8 +293,9 @@ void CDCSVGPlotter::drawMCAxialAxialPairs(const std::string& storeObjName, const
     InputValueColorizer<CDCAxialSegmentPair> colorizer;
     colorizer.setStroke(stroke);
     drawIterable(goodAxialAxialSegmentPairs, colorizer);
-  } else
+  } else {
     B2INFO(storeObjName << "does not exist in current DataStore");
+  }
 }
 
 void CDCSVGPlotter::drawAxialStereoPairs(const std::string& storeObjName, const std::string& stroke, const std::string&)
@@ -312,8 +315,11 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     std::vector<CDCAxialRecoSegment2D> axialSegments;
     std::vector<CDCStereoRecoSegment2D> stereoSegments;
     for (const CDCRecoSegment2D& segment : recoSegments) {
-      if (segment.getStereoKind() == EStereoKind::c_Axial) axialSegments.push_back(segment);
-      else stereoSegments.push_back(segment);
+      if (segment.getStereoKind() == EStereoKind::c_Axial) {
+        axialSegments.push_back(segment);
+      } else {
+        stereoSegments.push_back(segment);
+      }
     }
 
     MCAxialSegmentPairFilter mcAxialAxialSegmentPairFilter;
@@ -340,8 +346,9 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName, const 
     InputValueColorizer<CDCSegmentTriple> colorizer;
     colorizer.setStroke(stroke);
     drawIterable(goodSegmentTriples, colorizer);
-  } else
+  } else {
     B2INFO(storeObjName << "does not exist in current DataStore");
+  }
 }
 
 void CDCSVGPlotter::drawAxialStereoSegmentPairs(const std::string& storeObjName, const std::string&, const std::string&)
@@ -421,25 +428,33 @@ void CDCSVGPlotter::drawStoreArray(const StoreArray<AObject>& storeArray,
     B2INFO("with " << storeArray.getEntries() << " entries");
     AColorizer colorizer;
     B2INFO("Attributes are");
-    if (stroke != "")
+    if (stroke != "") {
       colorizer.setStroke(stroke);
-    if (colorizer.isStrokeSet())
+    }
+    if (colorizer.isStrokeSet()) {
       B2INFO("stroke: " << colorizer.printStrokeAttribute());
-    if (strokeWidth != "")
+    }
+    if (strokeWidth != "") {
       colorizer.setStrokeWidth(strokeWidth);
-    if (colorizer.isStrokeWidthSet())
+    }
+    if (colorizer.isStrokeWidthSet()) {
       B2INFO("stroke-width: " << colorizer.printStrokeWidthAttribute());
+    }
     drawIterable<a_drawTrajectories>(storeArray, colorizer);
   } else {
     B2WARNING(storeArrayName << " not present in the DataStore");
     B2INFO("Current content of the DataStore:");
     B2INFO("StoreArrays:");
-    for (auto n : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0)))
+    for (auto n :
+         DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0))) {
       B2INFO(n);
+    }
     B2INFO("");
     B2INFO("StoreObjPtr:");
-    for (auto n : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0)))
+    for (auto n :
+         DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0))) {
       B2INFO(n);
+    }
   }
 }
 
@@ -459,25 +474,33 @@ void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>
     B2INFO("with " << vector.size() << " entries");
     AColorizer colorizer;
     B2INFO("Attributes are");
-    if (stroke != "")
+    if (stroke != "") {
       colorizer.setStroke(stroke);
-    if (colorizer.isStrokeSet())
+    }
+    if (colorizer.isStrokeSet()) {
       B2INFO("stroke: " << colorizer.printStrokeAttribute());
-    if (strokeWidth != "")
+    }
+    if (strokeWidth != "") {
       colorizer.setStrokeWidth(strokeWidth);
-    if (colorizer.isStrokeWidthSet())
+    }
+    if (colorizer.isStrokeWidthSet()) {
       B2INFO("stroke-width: " << colorizer.printStrokeWidthAttribute());
+    }
     drawIterable<a_drawTrajectories>(vector, colorizer);
   } else {
     B2WARNING(storeObjName << " not present in the DataStore");
     B2INFO("Current content of the DataStore:");
     B2INFO("StoreArrays:");
-    for (auto n : DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0)))
+    for (auto n :
+         DataStore::Instance().getListOfArrays(TObject::Class(), DataStore::EDurability(0))) {
       B2INFO(n);
+    }
     B2INFO("");
     B2INFO("StoreObjPtr:");
-    for (auto n : DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0)))
+    for (auto n :
+         DataStore::Instance().getListOfObjects(TObject::Class(), DataStore::EDurability(0))) {
       B2INFO(n);
+    }
   }
 }
 

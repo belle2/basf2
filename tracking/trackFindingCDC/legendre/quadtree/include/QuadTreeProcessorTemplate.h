@@ -199,8 +199,9 @@ namespace Belle2 {
 
         //Voting within the four bins
         for (ItemType* item : items) {
-          if (item->isUsed())
+          if (item->isUsed()) {
             continue;
+          }
 
           for (int t_index = 0; t_index < binCountX; ++t_index) {
             for (int r_index = 0; r_index < binCountY; ++r_index) {
@@ -221,8 +222,11 @@ namespace Belle2 {
        */
       virtual bool checkIfLastLevel(QuadTree* node)
       {
-        if (node->getLevel() >= getLastLevel()) return true;
-        else return false;
+        if (node->getLevel() >= getLastLevel()) {
+          return true;
+        } else {
+          return false;
+        }
       }
 
 
@@ -235,11 +239,14 @@ namespace Belle2 {
       {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
                 (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
-        if (node->getItemsVector().size() < nItemsThreshold)
+        if (node->getItemsVector().size() < nItemsThreshold) {
           return;
+        }
         if (checkThreshold) {
-          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
+          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold) &&
+              (fabs(node->getYMax()) > rThreshold)) {
             return;
+          }
         }
 
         if (checkIfLastLevel(node)) {
@@ -247,8 +254,9 @@ namespace Belle2 {
           return;
         }
 
-        if (node->getChildren() == nullptr)
+        if (node->getChildren() == nullptr) {
           node->initializeChildren(*this);
+        }
 
         if (!node->checkFilled()) {
           fillChildren(node, node->getItemsVector());
@@ -259,9 +267,11 @@ namespace Belle2 {
         constexpr int m_nbins_r = binCountY;
 
         bool binUsed[m_nbins_theta][m_nbins_r];
-        for (int iX = 0; iX < m_nbins_theta; iX++)
-          for (int iY = 0; iY < m_nbins_r; iY++)
+        for (int iX = 0; iX < m_nbins_theta; iX++) {
+          for (int iY = 0; iY < m_nbins_r; iY++) {
             binUsed[iX][iY] = false;
+          }
+        }
 
         //Processing, which bins are further investigated
         for (int bin_loop = 0; bin_loop < binCountX * binCountY; bin_loop++) {

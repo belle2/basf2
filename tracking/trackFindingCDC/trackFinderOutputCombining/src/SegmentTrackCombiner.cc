@@ -83,13 +83,15 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
 
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      if (segment->isAlreadyTaken())
+      if (segment->isAlreadyTaken()) {
         continue;
+      }
 
       const SegmentInformation::ListOfMatchCandidates& matchingTracks = segment->getMatches();
 
-      if (matchingTracks.size() == 0)
+      if (matchingTracks.size() == 0) {
         continue;
+      }
 
       TrackInformation* bestMatch = segment->getBestMatch();
 
@@ -126,8 +128,9 @@ void SegmentTrackCombiner::filterSegments(BaseBackgroundSegmentsFilter& backgrou
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      if (segment->isAlreadyTaken())
+      if (segment->isAlreadyTaken()) {
         continue;
+      }
       Weight filterResult = backgroundSegmentsFilter(segment->getSegment());
       if (not isNotACell(filterResult)) {
         segment->getSegment()->getAutomatonCell().setTakenFlag();
@@ -141,8 +144,9 @@ void SegmentTrackCombiner::filterOutNewSegments(BaseNewSegmentsFilter& newSegmen
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
-      if (segment->isAlreadyTaken())
+      if (segment->isAlreadyTaken()) {
         continue;
+      }
       Weight filterResult = newSegmentsFilter(segment->getSegment());
       if (not isNotACell(filterResult)) {
         segment->getSegment()->getAutomatonCell().setTakenFlag();
@@ -196,8 +200,9 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackFilterSec
         B2DEBUG(100, "Number of possible trains/segments still left: " << trainsOfSegments.size() <<
                 ". As these are too much we will only us the best one and delete the rest.");
         const TrainOfSegments* bestFittingTrain = findBestFittingSegmentTrain(trainsOfSegments, trackInformation, segmentTrackFilter);
-        if (bestFittingTrain != nullptr)
+        if (bestFittingTrain != nullptr) {
           trackInformation->setGoodSegmentTrain(*bestFittingTrain);
+        }
       }
 
       // Reset the matching segments lists
@@ -208,8 +213,9 @@ void SegmentTrackCombiner::combine(BaseSegmentTrackFilter& segmentTrackFilterSec
     for (TrackInformation* trackInformation : m_trackLookUp) {
       B2DEBUG(100, "Looking for possible combinations..");
       const TrainOfSegments& goodTrain = trackInformation->getGoodSegmentTrain();
-      if (goodTrain.size() > 0)
+      if (goodTrain.size() > 0) {
         tryToCombineSegmentTrainAndMatchedTracks(goodTrain, segmentTrackFilter);
+      }
 
       trackInformation->clearGoodSegmentTrain();
     }
@@ -323,13 +329,15 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
 
 void SegmentTrackCombiner::addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits)
 {
-  if (segment.getAutomatonCell().hasTakenFlag())
+  if (segment.getAutomatonCell().hasTakenFlag()) {
     return;
+  }
 
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   for (const CDCRecoHit2D& recoHit : segment) {
-    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag() and useTakenFlagOfHits)
+    if (recoHit.getWireHit().getAutomatonCell().hasTakenFlag() and useTakenFlagOfHits) {
       continue;
+    }
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit.getRLWireHit(), trajectory2D);
     track.push_back(recoHit3D);
     recoHit.getWireHit().getAutomatonCell().setTakenFlag();
@@ -438,8 +446,9 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       }
     }
 
-    if (bestMatch != nullptr)
+    if (bestMatch != nullptr) {
       addSegmentToTrack(segmentInformation, bestMatch);
+    }
     matchingTracks.clear();
   }
 }

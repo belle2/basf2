@@ -35,6 +35,9 @@ void MVARealisticTrackRelationFilter::beginRun()
 Weight MVARealisticTrackRelationFilter::operator()(const Relation<const CDCTrack>& trackRelation)
 {
   double isFeasibleWeight = m_feasibleTrackRelationFilter(trackRelation);
-  if (std::isnan(isFeasibleWeight)) return NAN;
-  else return Super::operator()(trackRelation);
+  if (std::isnan(isFeasibleWeight)) {
+    return NAN;
+  } else {
+    return Super::operator()(trackRelation);
+  }
 }

@@ -94,8 +94,9 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
   const auto& foundStereoHitsWithNode = Super::m_quadTreeInstance.findSingleBest(Super::m_param_minimumNumberOfHits);
   Super::m_quadTreeInstance.fell();
 
-  if (foundStereoHitsWithNode.size() != 1)
+  if (foundStereoHitsWithNode.size() != 1) {
     return {};
+  }
 
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;

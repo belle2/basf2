@@ -102,11 +102,17 @@ namespace Belle2 {
 
         std::vector<const CDCWireHit*> trackHitList;
         if (number % 2 == 0) {
-          for (std::vector<CDCWireHit>::iterator it = m_hitList.begin() ; it != (m_hitList.begin() + 76); ++it)
+          for (std::vector<CDCWireHit>::iterator it = m_hitList.begin();
+               it != (m_hitList.begin() + 76);
+               ++it) {
             trackHitList.push_back(&(*it));
+          }
         } else {
-          for (std::vector<CDCWireHit>::iterator it = (m_hitList.begin() + 76) ; it != m_hitList.end(); ++it)
+          for (std::vector<CDCWireHit>::iterator it = (m_hitList.begin() + 76);
+               it != m_hitList.end();
+               ++it) {
             trackHitList.push_back(&(*it));
+          }
         }
 
         const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();

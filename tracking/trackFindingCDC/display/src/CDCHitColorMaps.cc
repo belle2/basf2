@@ -19,15 +19,21 @@ using namespace TrackFindingCDC;
 std::string ZeroDriftLengthColorMap::map(const int, const CDCHit& cdcHit)
 {
   TrackFindingCDC::CDCWireHit wirehit(&cdcHit);
-  if (wirehit.getRefDriftLength() == 0) return ("red");
-  else return (m_bkgHitColor);
+  if (wirehit.getRefDriftLength() == 0) {
+    return ("red");
+  } else {
+    return (m_bkgHitColor);
+  }
 }
 
 std::string ZeroDriftLengthStrokeWidthMap::map(const int, const CDCHit& cdcHit)
 {
   CDCWireHit wirehit(&cdcHit, nullptr);
-  if (wirehit.getRefDriftLength() == 0) return ("1");
-  else return ("0.2");
+  if (wirehit.getRefDriftLength() == 0) {
+    return ("1");
+  } else {
+    return ("0.2");
+  }
 }
 
 
@@ -61,9 +67,13 @@ std::string RLColorMap::map(const int, const CDCHit& cdcHit)
   CDCMCHitLookUp mcHitLookUp;
   mcHitLookUp.getInstance();
   short int rlInfo = mcHitLookUp.getRLInfo(&cdcHit);
-  if (rlInfo == 1) return ("green");
-  else if (rlInfo == -1)return ("red");
-  else return (m_bkgHitColor);
+  if (rlInfo == 1) {
+    return ("green");
+  } else if (rlInfo == -1) {
+    return ("red");
+  } else {
+    return (m_bkgHitColor);
+  }
 }
 
 std::string RLColorMap::info()
@@ -76,9 +86,13 @@ std::string PosFlagColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   int posFlag = simHit->getPosFlag();
-  if (posFlag == 0)return ("green"); //right
-  else if (posFlag == 1) return ("red"); //left
-  else return (m_bkgHitColor);
+  if (posFlag == 0) {
+    return ("green"); // right
+  } else if (posFlag == 1) {
+    return ("red"); // left
+  } else {
+    return (m_bkgHitColor);
+  }
 }
 
 std::string PosFlagColorMap::info()
@@ -141,8 +155,9 @@ std::string MCSegmentIdColorMap::map(const int, const CDCHit& cdcHit)
   mcHitLookUp.getInstance();
   TrackFindingCDC::Index inTrackiSegment = mcHitLookUp.getInTrackSegmentId(&cdcHit);
 
-  if (inTrackiSegment < 0) return (m_bkgHitColor);
-  else {
+  if (inTrackiSegment < 0) {
+    return (m_bkgHitColor);
+  } else {
     //values are all fractions of their respective scale
     double hue = 50 * inTrackiSegment % 360 / 360.0;
     double saturation = 0.75, lightness = 0.5;
@@ -181,11 +196,15 @@ std::string TOFColorMap::timeOfFlightToColor(const double timeOfFlight)
 std::string ReassignedSecondaryMap::map(const int, const CDCHit& cdcHit)
 {
   RelationVector<MCParticle> relatedMCParticles = cdcHit.getRelationsWith<MCParticle>("MCParticles");
-  if (relatedMCParticles.size() == 0) return m_bkgHitColor;
-  else {
+  if (relatedMCParticles.size() == 0) {
+    return m_bkgHitColor;
+  } else {
     double mcRelationWeight = relatedMCParticles.weight(0);
-    if (mcRelationWeight > 0) return "green";
-    else return "red";
+    if (mcRelationWeight > 0) {
+      return "green";
+    } else {
+      return "red";
+    }
   }
 }
 
@@ -195,8 +214,9 @@ std::string MCParticleColorMap::map(const int, const CDCHit& cdcHit)
 
   if (mcParticle != nullptr) {
     int mcParticleId = mcParticle->getArrayIndex();
-    if (m_newColors.count(mcParticleId) == 1) return m_newColors[mcParticleId];
-    else {
+    if (m_newColors.count(mcParticleId) == 1) {
+      return m_newColors[mcParticleId];
+    } else {
       ++m_iColor;
       std::string color = m_listColors[m_iColor];
       m_newColors.insert(std::pair<int, std::string>(mcParticleId, color));
@@ -212,8 +232,11 @@ std::string MCPDGCodeColorMap::map(const int, const CDCHit& cdcHit)
   MCParticle* mcParticle = cdcHit.getRelated<MCParticle>("MCParticles");
   int pdgcode;
 
-  if (mcParticle != nullptr) pdgcode = mcParticle->getPDG();
-  else pdgcode = -999;
+  if (mcParticle != nullptr) {
+    pdgcode = mcParticle->getPDG();
+  } else {
+    pdgcode = -999;
+  }
 
   for (std::map<int, std::string>::iterator it = m_colorByPDGCode.begin(); it != m_colorByPDGCode.end(); ++it) {
     if (pdgcode == it->first) return m_colorByPDGCode[pdgcode];
@@ -255,10 +278,16 @@ std::string MCPrimaryColorMap::map(const int, const CDCHit& cdcHit)
     bool isPrimary = mcParticle->hasStatus(primaryFlag);
     int secondaryProcess = mcParticle->getSecondaryPhysicsProcess();
 
-    if (isPrimary)return "blue";
-    else if (secondaryProcess > 200)return "green"; //decay in flight
-    else return "red";
-  } else return m_bkgHitColor;
+    if (isPrimary) {
+      return "blue";
+    } else if (secondaryProcess > 200) {
+      return "green"; // decay in flight
+    } else {
+      return "red";
+    }
+  } else {
+    return m_bkgHitColor;
+  }
 }
 
 std::string MCPrimaryColorMap::info()
@@ -274,8 +303,11 @@ std::string SimHitPDGCodeColorMap::map(const int, const CDCHit& cdcHit)
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   int pdgCode;
 
-  if (simHit != nullptr) pdgCode = simHit->getPDGCode();
-  else pdgCode = -999;
+  if (simHit != nullptr) {
+    pdgCode = simHit->getPDGCode();
+  } else {
+    pdgCode = -999;
+  }
 
   for (std::map<int, std::string>::iterator it = m_colorByPDGCode.begin(); it != m_colorByPDGCode.end(); ++it) {
     if (pdgCode == it->first) return m_colorByPDGCode[pdgCode];
@@ -289,9 +321,9 @@ std::string SimHitIsBkgColorMap::map(const int, const CDCHit& cdcHit)
 {
   CDCSimHit* simHit = cdcHit.getRelated<CDCSimHit>("CDCSimHits");
   bool bkgTag = simHit->getBackgroundTag();
-  if (bkgTag) return "gray";
-  else return "red";
+  if (bkgTag) {
+    return "gray";
+  } else {
+    return "red";
+  }
 }
-
-
-

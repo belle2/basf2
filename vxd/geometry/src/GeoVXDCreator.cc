@@ -222,13 +222,13 @@ namespace Belle2 {
         G4Transform3D transform = getPositionFromDB(component, s, p, originCenter);
         if (p.getW() ==  VXDGeoPlacementPar::c_below || p.getW() == VXDGeoPlacementPar::c_above) {
           //Add to selected mother (either component or container around component
-          B2INFO("debugme: add component " << p.getName() << " to component or container around ");
-          // FIXME: this line of code causes segfaults ????
-          //assembly.add(s.getVolume(), transform);
+          //B2INFO("debugme: add component " << p.getName() << " to component or container around ");
+          // FIXME: this line of code causes segfaults, but why ????
+          assembly.add(s.getVolume(), transform);
         } else {
-          B2INFO("debugme: make new G4PVPlacement(..) for component " << p.getName());
-          // FIXME: this line of code causes segfaults ????
-          //new G4PVPlacement(transform, s.getVolume(), name + "." + p.getName(), component.getVolume(), false, i);
+          //B2INFO("debugme: make new G4PVPlacement(..) for component " << p.getName());
+          // FIXME: this line of code causes segfaults, but why ????
+          new G4PVPlacement(transform, s.getVolume(), name + "." + p.getName(), component.getVolume(), false, i);
         }
       }
 

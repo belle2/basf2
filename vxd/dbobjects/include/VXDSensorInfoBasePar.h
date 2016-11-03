@@ -79,6 +79,11 @@ namespace Belle2 {
     /** Return the ID of the Sensor */
     VxdID getID() const { return m_id; }
 
+    double getWidth2() const
+    {
+      return m_deltaWidth + m_width;
+    }
+
     /** Return the width of the sensor
      * @param v v-coordinate where to determine the width, ignored for recangular sensors
      * @return width of the Sensor
@@ -113,7 +118,7 @@ namespace Belle2 {
     /** Return the splitlength of the sensor
      * @return length of the sensor
      */
-    double getSplitLength() const { return m_splitLength; }
+    double getSplitLength() const { return m_splitLength * m_length; }
 
     /** Return the thickness of the sensor
      * @return thickness of the sensor

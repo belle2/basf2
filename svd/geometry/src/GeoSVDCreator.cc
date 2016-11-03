@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Zbynek Drasal, Christian Oswald,           *
- *               Martin Ritter, Hyacinth Stypula                          *
+ *               Martin Ritter, Hyacinth Stypula, Benjamin Schwenker      *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -39,6 +39,7 @@ using namespace std;
 using namespace boost;
 
 namespace Belle2 {
+  using namespace geometry;
   /** Namespace to encapsulate code needed for simulation and reconstrucion of the SVD */
   namespace SVD {
 
@@ -77,6 +78,36 @@ namespace Belle2 {
       return info;
     }
 
+    VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
+        const VXDGeoSensorPlacementPar& placement)
+    {
+      const SVDSensorInfoPar& infoPar = dynamic_cast<const SVDSensorInfoPar&>(*sensor.getSensorInfo());
+
+      SensorInfo* sensorInfo = new SensorInfo(
+        sensorID,
+        infoPar.getWidth(),
+        infoPar.getLength(),
+        infoPar.getThickness(),
+        infoPar.getUCells(),
+        infoPar.getVCells(),
+        infoPar.getWidth2()
+      );
+      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
+      sensorInfo->setSensorParams(
+        infoPar.getDepletionVoltage(),
+        infoPar.getBiasVoltage(),
+        infoPar.getBackplaneCapacitance() * unit_pF,
+        infoPar.getInterstripCapacitance() * unit_pF,
+        infoPar.getCouplingCapacitance() * unit_pF,
+        infoPar.getElectronicNoiseU(),
+        infoPar.getElectronicNoiseV()
+      );
+      m_SensorInfo.push_back(sensorInfo);
+
+      SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo);
+      return sensitive;
+    }
+
     VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetector(
       VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement&)
     {
@@ -84,6 +115,129 @@ namespace Belle2 {
       sensorInfo->setID(sensorID);
       SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo);
       return sensitive;
+    }
+
+    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    {
+      m_activeStepSize = parameters.getGlobalParams().getActiveStepSize() / Unit::mm;
+      m_activeChips = parameters.getGlobalParams().getActiveChips();
+      m_seeNeutrons = parameters.getGlobalParams().getSeeNeutrons();
+      m_onlyPrimaryTrueHits = parameters.getGlobalParams().getOnlyPrimaryTrueHits();
+      m_distanceTolerance = parameters.getGlobalParams().getDistanceTolerance();
+      m_electronTolerance = parameters.getGlobalParams().getElectronTolerance();
+      m_minimumElectrons = parameters.getGlobalParams().getMinimumElectrons();
+      m_onlyActiveMaterial = parameters.getGlobalParams().getOnlyActiveMaterial();
+      m_defaultMaterial = parameters.getGlobalParams().getDefaultMaterial();
+
+      G4Material* material = Materials::get(m_defaultMaterial);
+      if (!material) B2FATAL("Default Material of VXD, '" << m_defaultMaterial << "', could not be found");
+
+
+      //Build envelope
+      G4LogicalVolume* envelope(0);
+      G4VPhysicalVolume* physEnvelope{nullptr};
+      if (!parameters.getEnvelope().getExists()) {
+        B2INFO("Could not find definition for " + m_prefix + " Envelope, placing directly in top volume");
+        envelope = &topVolume;
+      } else {
+        double minZ(0), maxZ(0);
+        G4Polycone* envelopeCone = geometry::createRotationSolid("Envelope",
+                                                                 parameters.getEnvelope().getInnerPoints(),
+                                                                 parameters.getEnvelope().getOuterPoints(),
+                                                                 parameters.getEnvelope().getMinPhi(),
+                                                                 parameters.getEnvelope().getMaxPhi(),
+                                                                 minZ, maxZ
+                                                                );
+        envelope = new G4LogicalVolume(envelopeCone, material, m_prefix + ".Envelope");
+        setVisibility(*envelope, false);
+        physEnvelope = new G4PVPlacement(getAlignmentFromDB(parameters.getAlignment(m_prefix)), envelope, m_prefix + ".Envelope",
+                                         &topVolume, false, 1);
+      }
+
+      //Build all ladders including Sensors
+      VXD::GeoVXDAssembly shellSupport = createHalfShellSupportFromDB(parameters);
+
+      const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
+      for (const VXDHalfShellPar& shell : HalfShells) {
+        string shellName =  shell.getName();
+        G4Transform3D shellAlignment = getAlignmentFromDB(parameters.getAlignment(m_prefix + "." + shellName));
+
+        //Place shell support
+        double shellAngle = shell.getShellAngle();
+        if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
+
+        B2INFO("Building " << m_prefix << " half-shell " << shellName << " shell angle " << shellAngle);
+
+        const std::map< int, std::vector<std::pair<int, double>> >& Layers = shell.getLayers();
+        for (const std::pair<const int, std::vector<std::pair<int, double>> >& layer : Layers) {
+          int layerID = layer.first;
+          const std::vector<std::pair<int, double>>& Ladders = layer.second;
+
+          B2INFO(" layer " << layerID);
+
+          //Place Layer support
+          VXD::GeoVXDAssembly layerSupport = createLayerSupportFromDB(layerID, parameters);
+          if (!m_onlyActiveMaterial) layerSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
+          VXD::GeoVXDAssembly ladderSupport = createLadderSupportFromDB(layerID, parameters);
+
+          //Loop over defined ladders
+          for (const std::pair<int, double>& ladder : Ladders) {
+            int ladderID = ladder.first;
+            double phi = ladder.second;
+            B2INFO(" ladder " << ladderID << " has phi angle " << phi);
+            G4Transform3D ladderPlacement = placeLadderFromDB(layerID, ladderID, phi, envelope, shellAlignment, parameters);
+            if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
+          }
+
+        }
+      }
+
+      //Now build cache with all transformations
+      if (physEnvelope) {
+        VXD::GeoCache::getInstance().findVolumes(physEnvelope);
+      } else {
+        //create a temporary placement of the top volume.
+        G4PVPlacement topPlacement(nullptr, G4ThreeVector(0, 0, 0), &topVolume,
+                                   "temp_Top", nullptr, false, 1, false);
+        //and search for all VXD sensitive sensors within
+        VXD::GeoCache::getInstance().findVolumes(&topPlacement);
+      }
+
+      //Create diamond radiation sensors if defined and in background mode
+      if (m_activeChips) {
+        createDiamondsFromDB(parameters.getRadiationSensors(), topVolume, *envelope);
+      }
+
+    }
+
+    VXD::GeoVXDAssembly GeoSVDCreator::createHalfShellSupportFromDB(const SVDGeometryPar& parameters)
+    {
+      VXD::GeoVXDAssembly supportAssembly;
+
+      //Half shell support is easy as we just add all the defined RotationSolids
+      double minZ(0), maxZ(0);
+
+      const std::vector<VXDRotationSolidPar>& RotationSolids = parameters.getRotationSolids();
+
+      for (const VXDRotationSolidPar& component : RotationSolids) {
+
+        string name = component.getName();
+        string material = component.getMaterial();
+
+        G4Polycone* solid = geometry::createRotationSolid(name,
+                                                          component.getInnerPoints(),
+                                                          component.getOuterPoints(),
+                                                          component.getMinPhi(),
+                                                          component.getMaxPhi(),
+                                                          minZ, maxZ
+                                                         );
+
+        G4LogicalVolume* volume = new G4LogicalVolume(
+          solid, geometry::Materials::get(material), m_prefix + ". " + name);
+        geometry::setColor(*volume, component.getColor());
+        supportAssembly.add(volume);
+      }
+      return supportAssembly;
     }
 
     VXD::GeoVXDAssembly GeoSVDCreator::createHalfShellSupport(GearDir support)
@@ -101,6 +255,134 @@ namespace Belle2 {
           solid, geometry::Materials::get(material), m_prefix + ". " + name);
         geometry::setColor(*volume, component.getString("Color"));
         supportAssembly.add(volume);
+      }
+
+      return supportAssembly;
+    }
+
+    VXD::GeoVXDAssembly GeoSVDCreator::createLayerSupportFromDB(int layer, const SVDGeometryPar& parameters)
+    {
+      VXD::GeoVXDAssembly supportAssembly;
+
+      //Check if there are any endrings defined for this layer. If not we don't create any
+      if (parameters.getEndringsExist(layer)) {
+        const SVDEndringsPar& support = parameters.getEndrings(layer);
+
+        string material      = support.getMaterial();
+        double length        = support.getLength() / Unit::mm / 2.0;
+        double gapWidth      = support.getGapWidth() / Unit::mm;
+        double baseThickness = support.getBaseThickness() / Unit::mm / 2.0;
+
+        //Create  the endrings
+        const std::vector<SVDEndringsTypePar>& Endrings = support.getTypes();
+        for (const SVDEndringsTypePar& endring : Endrings) {
+          double z             = endring.getZ() / Unit::mm;
+          double baseRadius    = endring.getBaseRadius() / Unit::mm;
+          double innerRadius   = endring.getInnerRadius() / Unit::mm;
+          double outerRadius   = endring.getOuterRadius() / Unit::mm;
+          double horiBarWidth  = endring.getHorizontalBarWidth() / Unit::mm / 2.0;
+          double vertBarWidth  = endring.getVerticalBarWidth() / Unit::mm / 2.0;
+
+          double angle = asin(gapWidth / innerRadius);
+          G4VSolid* endringSolid = new G4Tubs("OuterEndring", innerRadius, outerRadius, length, -M_PI / 2 + angle, M_PI - 2 * angle);
+          angle = asin(gapWidth / baseRadius);
+          G4VSolid* endringBase  = new G4Tubs("InnerEndring", baseRadius, baseRadius + baseThickness, length, -M_PI / 2 + angle,
+                                              M_PI - 2 * angle);
+          endringSolid = new G4UnionSolid("Endring", endringSolid, endringBase);
+
+          //Now we need the bars which connect the two rings
+          double height = (innerRadius - baseRadius) / 2.0;
+          double x = vertBarWidth + gapWidth;
+          G4Box* verticalBar = new G4Box("VerticalBar", vertBarWidth, height, length);
+          G4Box* horizontalBar = new G4Box("HorizontalBar", height, horiBarWidth, length);
+          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar, G4Translate3D(x,  baseRadius + height, 0));
+          endringSolid = new G4UnionSolid("Endring", endringSolid, verticalBar, G4Translate3D(x, -(baseRadius + height), 0));
+          endringSolid = new G4UnionSolid("Endring", endringSolid, horizontalBar, G4Translate3D((baseRadius + height), 0, 0));
+
+          //Finally create the volume and add it to the assembly at the correct z position
+          G4LogicalVolume* endringVolume = new G4LogicalVolume(
+            endringSolid, geometry::Materials::get(material),
+            (boost::format("%1%.Layer%2%.%3%") % m_prefix % layer % endring.getName()).str());
+          supportAssembly.add(endringVolume, G4TranslateZ3D(z));
+        }
+      }
+
+      //Check if there are any coling pipes defined for this layer. If not we don't create any
+      if (parameters.getCoolingPipesExist(layer)) {
+        const SVDCoolingPipesPar& pipes = parameters.getCoolingPipes(layer);
+
+        string material    = pipes.getMaterial();
+        double outerRadius = pipes.getOuterDiameter() / Unit::mm / 2.0;
+        double innerRadius = outerRadius - pipes.getWallThickness() / Unit::mm;
+        int    nPipes      = pipes.getNPipes();
+        double startPhi    = pipes.getStartPhi();
+        double deltaPhi    = pipes.getDeltaPhi();
+        double radius      = pipes.getRadius() / Unit::mm;
+        double zstart      = pipes.getZStart() / Unit::mm;
+        double zend        = pipes.getZEnd() / Unit::mm;
+        double zlength     = (zend - zstart) / 2.0;
+
+
+        // There are two parts: the straight pipes and the bendings. So we only need two different volumes
+        // which we place multiple times
+        G4Tubs* pipeSolid = new G4Tubs("CoolingPipe", innerRadius, outerRadius, zlength, 0, 2 * M_PI);
+        G4LogicalVolume* pipeVolume = new G4LogicalVolume(
+          pipeSolid, geometry::Materials::get(material),
+          (boost::format("%1%.Layer%2%.CoolingPipe") % m_prefix % layer).str());
+        geometry::setColor(*pipeVolume, "#ccc");
+
+        G4Torus* bendSolid = new G4Torus("CoolingBend", innerRadius, outerRadius, sin(deltaPhi / 2.0)*radius, -M_PI / 2, M_PI);
+        G4LogicalVolume* bendVolume = new G4LogicalVolume(
+          bendSolid, geometry::Materials::get(material),
+          (boost::format("%1%.Layer%2%.CoolingBend") % m_prefix % layer).str());
+
+        // Last pipe may be closer, thus we need additional bending
+        if (pipes.getDeltaL() > 0) {
+          double deltaL = pipes.getDeltaL() / Unit::mm;
+          G4Torus* bendSolidLast = new G4Torus("CoolingBendLast", innerRadius, outerRadius, sin(deltaPhi / 2.0) * radius - deltaL / 2.0,
+                                               -M_PI / 2, M_PI);
+          G4LogicalVolume* bendVolumeLast = new G4LogicalVolume(bendSolidLast, geometry::Materials::get(material),
+                                                                (boost::format("%1%.Layer%2%.CoolingBendLast") % m_prefix % layer).str());
+          --nPipes;
+
+          // Place the last straight pipe
+          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius,
+                                         sin(deltaPhi / 2.0) * radius - deltaL, zstart + zlength);
+          supportAssembly.add(pipeVolume, placement_pipe);
+
+          // Place forward or backward bend
+          double zpos = nPipes % 2 > 0 ? zend : zstart;
+          // Calculate transformation
+          G4Transform3D placement = G4RotateZ3D(startPhi + (nPipes - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius,
+                                    -deltaL / 2.0, zpos) * G4RotateY3D(M_PI / 2);
+          // If we are at the forward side we rotate the bend by 180 degree
+          if (nPipes % 2 > 0) {
+            placement = placement * G4RotateZ3D(M_PI);
+          }
+          // And place the bend
+          supportAssembly.add(bendVolumeLast, placement);
+        }
+
+        for (int i = 0; i < nPipes; ++i) {
+          // Place the straight pipes
+          G4Transform3D placement_pipe = G4RotateZ3D(startPhi + i * deltaPhi) * G4Translate3D(radius, 0, zstart + zlength);
+          supportAssembly.add(pipeVolume, placement_pipe);
+
+          // This was the easy part, now lets add the connection between the pipes. We only need n-1 bendings
+          if (i > 0) {
+            // Place forward or backward bend
+            double zpos = i % 2 > 0 ? zend : zstart;
+            // Calculate transformation
+            G4Transform3D placement = G4RotateZ3D(startPhi + (i - 0.5) * deltaPhi) * G4Translate3D(cos(deltaPhi / 2.0) * radius, 0,
+                                      zpos) * G4RotateY3D(M_PI / 2);
+            // If we are at the forward side we rotate the bend by 180 degree
+            if (i % 2 > 0) {
+              placement = placement * G4RotateZ3D(M_PI);
+            }
+            // And place the bend
+            supportAssembly.add(bendVolume, placement);
+          }
+        }
       }
 
       return supportAssembly;
@@ -228,9 +510,100 @@ namespace Belle2 {
       return supportAssembly;
     }
 
-
-    void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
+    VXD::GeoVXDAssembly GeoSVDCreator::createLadderSupportFromDB(int layer, const SVDGeometryPar& parameters)
     {
+      VXD::GeoVXDAssembly supportAssembly;
+
+      if (!parameters.getSupportRibsExist(layer)) return supportAssembly;
+      const SVDSupportRibsPar& support = parameters.getSupportRibs(layer);
+
+      // Get the common values for all layers
+      double spacing    = support.getSpacing() / Unit::mm / 2.0;
+      double height     = support.getHeight() / Unit::mm / 2.0;
+      double innerWidth = support.getInnerWidth() / Unit::mm / 2.0;
+      double outerWidth = support.getOuterWidth() / Unit::mm / 2.0;
+      double tabLength  = support.getTabLength() / Unit::mm / 2.0;
+      G4VSolid* inner(0);
+      G4VSolid* outer(0);
+      G4Transform3D placement;
+
+
+      // Now lets create the ribs by adding all boxes to form one union solid
+      const std::vector<SVDSupportBoxPar>& Boxes = support.getBoxes();
+      for (const SVDSupportBoxPar& box : Boxes) {
+        double theta = box.getTheta();
+        double zpos = box.getZ() / Unit::mm;
+        double rpos = box.getR() / Unit::mm;
+        double length = box.getLength() / Unit::mm / 2.0;
+        G4Box* innerBox = new G4Box("innerBox", height, innerWidth, length);
+        G4Box* outerBox = new G4Box("outerBox", height, outerWidth, length);
+        if (!inner) {
+          inner = innerBox;
+          outer = outerBox;
+          placement = G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+        } else {
+          G4Transform3D relative = placement.inverse() * G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+          inner = new G4UnionSolid("innerBox", inner, innerBox, relative);
+          outer = new G4UnionSolid("outerBox", outer, outerBox, relative);
+        }
+      }
+
+      // Now lets add the tabs
+      const std::vector<SVDSupportTabPar>& Tabs = support.getTabs();
+      for (const SVDSupportTabPar& tab : Tabs) {
+        double theta = tab.getTheta();
+        double zpos = tab.getZ() / Unit::mm;
+        double rpos = tab.getR() / Unit::mm;
+        G4Box* innerBox = new G4Box("innerBox", height, innerWidth, tabLength);
+        if (!inner) {
+          inner = innerBox;
+          placement = G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+        } else {
+          G4Transform3D relative = placement.inverse() * G4Translate3D(rpos, 0, zpos) * G4RotateY3D(theta);
+          inner = new G4UnionSolid("innerBox", inner, innerBox, relative);
+        }
+      }
+
+      // Now lets create forward and backward endmounts for the ribs
+      const std::vector<SVDEndmountPar>& Endmounts = support.getEndmounts();
+      for (const SVDEndmountPar& endmount : Endmounts) {
+        double height = endmount.getHeight() / Unit::mm / 2.0;
+        double width = endmount.getWidth() / Unit::mm / 2.0;
+        double length = endmount.getLength() / Unit::mm / 2.0;
+        double zpos = endmount.getZ() / Unit::mm;
+        double rpos = endmount.getR() / Unit::mm;
+        G4VSolid* endmountBox = new G4Box("endmountBox", height, width, length);
+        if (outer) { // holes for the ribs
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(-spacing)*placement * G4Translate3D(-rpos, 0,
+                                               -zpos));
+          endmountBox = new G4SubtractionSolid("endmountBox", endmountBox, outer, G4TranslateY3D(spacing)*placement * G4Translate3D(-rpos, 0,
+                                               -zpos));
+        }
+        G4LogicalVolume* endmountVolume = new G4LogicalVolume(
+          endmountBox, geometry::Materials::get(support.getEndmountMaterial()),
+          (boost::format("%1%.Layer%2%.%3%Endmount") % m_prefix % layer % endmount.getName()).str());
+        supportAssembly.add(endmountVolume, G4Translate3D(rpos, 0, zpos));
+      }
+
+      // If there has been at least one Box, create the volumes and add them to the assembly
+      if (inner) {
+        outer = new G4SubtractionSolid("outerBox", outer, inner);
+        G4LogicalVolume* outerVolume = new G4LogicalVolume(
+          outer, geometry::Materials::get(support.getOuterMaterial()),
+          (boost::format("%1%.Layer%2%.SupportRib") % m_prefix % layer).str());
+        G4LogicalVolume* innerVolume = new G4LogicalVolume(
+          inner, geometry::Materials::get(support.getInnerMaterial()),
+          (boost::format("%1%.Layer%2%.SupportRib.Airex") % m_prefix % layer).str());
+        geometry::setColor(*outerVolume, support.getOuterColor());
+        geometry::setColor(*innerVolume, support.getInnerColor());
+        supportAssembly.add(innerVolume, G4TranslateY3D(-spacing)*placement);
+        supportAssembly.add(innerVolume, G4TranslateY3D(spacing)*placement);
+        supportAssembly.add(outerVolume, G4TranslateY3D(-spacing)*placement);
+        supportAssembly.add(outerVolume, G4TranslateY3D(spacing)*placement);
+      }
+
+      // Done, return the finished assembly
+      return supportAssembly;
     }
 
     VXD::GeoVXDAssembly GeoSVDCreator::createLadderSupport(int layer, GearDir support)

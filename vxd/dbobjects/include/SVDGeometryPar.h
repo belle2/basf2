@@ -35,8 +35,28 @@ namespace Belle2 {
     //! Constructor using Gearbox
     explicit SVDGeometryPar(const std::string& prefix, const GearDir& content) :  VXDGeometryPar(prefix, content) {  }
     //! Destructor
-    ~SVDGeometryPar();
+    ~SVDGeometryPar() {}
 
+    /** get SVD halfshell Rotation Solids */
+    const std::vector<VXDRotationSolidPar>& getRotationSolids() const {return m_halfShell;}
+
+    /** get SVD Support Ribs */
+    const SVDSupportRibsPar& getSupportRibs(int) const;
+
+    /** get SVD Endrings */
+    const SVDEndringsPar& getEndrings(int) const;
+
+    /** get SVD Cooling Pipes */
+    const SVDCoolingPipesPar& getCoolingPipes(int) const;
+
+    /** return if SVD Support Ribs exist */
+    bool getSupportRibsExist(int) const;
+
+    /** return if endrings exist */
+    bool getEndringsExist(int) const;
+
+    /** return if endrings exist */
+    bool getCoolingPipesExist(int) const;
 
     /**
      * Read the sensor definitions from the database

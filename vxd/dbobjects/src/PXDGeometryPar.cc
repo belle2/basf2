@@ -19,12 +19,7 @@ using namespace Belle2;
 using namespace std;
 
 
-PXDGeometryPar::~PXDGeometryPar()
-{
-  // FIXME: delete sensorInfo causes run time crashes, outcomment it for the moment
-  //for (PXDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
-  //m_SensorInfo.clear();
-}
+
 
 void PXDGeometryPar::createHalfShellSupport(GearDir support)
 {

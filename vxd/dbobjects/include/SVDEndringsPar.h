@@ -30,10 +30,22 @@ namespace Belle2 {
     SVDEndringsTypePar() {}
     //! Constructor using Gearbox
     explicit SVDEndringsTypePar(const GearDir& endring) { read(endring); }
-    //! Destructor
-    ~SVDEndringsTypePar() {}
     //! Get geometry parameters from Gearbox
     void read(const GearDir&);
+    /** get name */
+    const std::string& getName() const { return m_name; }
+    /** get z */
+    double getZ() const { return m_z; }
+    /** get base radius */
+    double getBaseRadius() const { return m_baseRadius; }
+    /** get inner radius */
+    double getInnerRadius() const { return m_innerRadius; }
+    /** get outer radius */
+    double getOuterRadius() const { return m_outerRadius; }
+    /** get horizontal bar width */
+    double getHorizontalBarWidth() const { return m_horizontalBarWidth; }
+    /** get vertical bar width */
+    double getVerticalBarWidth() const { return m_verticalBarWidth; }
 
   private:
 
@@ -60,10 +72,18 @@ namespace Belle2 {
     SVDEndringsPar() {}
     //! Constructor using Gearbox
     explicit SVDEndringsPar(int layer, const GearDir& support) { read(layer, support); }
-    //! Destructor
-    ~SVDEndringsPar() {}
     //! Get geometry parameters from Gearbox
     void read(int, const GearDir&);
+    /** get material */
+    const std::string& getMaterial() const { return m_material; }
+    /** get length */
+    double getLength() const { return m_length; }
+    /** get gap width */
+    double getGapWidth() const { return m_gapWidth; }
+    /** get base thickness */
+    double getBaseThickness() const { return m_baseThickness; }
+    /** get types (forward/backward) */
+    const std::vector<SVDEndringsTypePar>& getTypes() const { return m_types; }
 
   private:
 

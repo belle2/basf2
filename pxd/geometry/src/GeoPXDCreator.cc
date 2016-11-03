@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Zbynek Drasal, Christian Oswald,           *
- *               Martin Ritter                                            *
+ *               Martin Ritter, Benjamin Schwenker                        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/

@@ -33,6 +33,8 @@ void SVDCoolingPipesPar::read(int layer, const GearDir& support)
   m_radius = pipes.getLength("radius");
   m_zstart = pipes.getLength("zstart");
   m_zend = pipes.getLength("zend");
+
+  if (pipes.exists("deltaL")) m_deltaL = pipes.getLength("deltaL");
 }
 
 

@@ -29,7 +29,7 @@ namespace Belle2 {
     //! Constructor using Gearbox
     explicit PXDGeometryPar(const std::string& prefix, const GearDir& content) : VXDGeometryPar(prefix, content) {  }
     //! Destructor
-    ~PXDGeometryPar();
+    ~PXDGeometryPar() {}
     /** build support */
     bool getBuildSupport() const { return (m_nCutouts > 0); }
     /** get number of cutouts */

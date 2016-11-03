@@ -18,20 +18,65 @@ using namespace Belle2;
 using namespace std;
 
 
-// Get VXD geometry parameters from Gearbox (no calculations here)
-// *** This is a DIVOT ***
-
-/*
-void SVDGeometryPar::read(const GearDir& content)
+bool SVDGeometryPar::getSupportRibsExist(int layer) const
 {
+  //Check if sensorType already exists
+  std::map<int, SVDSupportRibsPar>::const_iterator cached = m_supportRibs.find(layer);
+  if (cached == m_supportRibs.end()) {
+    return false;
+  }
+  return true;
 }
-*/
 
-SVDGeometryPar::~SVDGeometryPar()
+bool SVDGeometryPar::getEndringsExist(int layer) const
 {
-  // FIXME: delete sensorInfo causes run time crashes, outcomment it for the moment
-  //for (SVDSensorInfoPar* sensorInfo : m_SensorInfo) delete sensorInfo;
-  //m_SensorInfo.clear();
+  //Check if sensorType already exists
+  std::map<int, SVDEndringsPar>::const_iterator cached = m_endrings.find(layer);
+  if (cached == m_endrings.end()) {
+    return false;
+  }
+  return true;
+}
+
+bool SVDGeometryPar::getCoolingPipesExist(int layer) const
+{
+  //Check if sensorType already exists
+  std::map<int, SVDCoolingPipesPar>::const_iterator cached = m_coolingPipes.find(layer);
+  if (cached == m_coolingPipes.end()) {
+    return false;
+  }
+  return true;
+}
+
+
+const SVDSupportRibsPar& SVDGeometryPar::getSupportRibs(int layer) const
+{
+  //Check if sensorType already exists
+  std::map<int, SVDSupportRibsPar>::const_iterator cached = m_supportRibs.find(layer);
+  if (cached == m_supportRibs.end()) {
+    B2FATAL("No SupportRibs found for layer " << std::to_string(layer));
+  }
+  return cached->second;
+}
+
+const SVDEndringsPar& SVDGeometryPar::getEndrings(int layer) const
+{
+  //Check if sensorType already exists
+  std::map<int, SVDEndringsPar>::const_iterator cached = m_endrings.find(layer);
+  if (cached == m_endrings.end()) {
+    B2FATAL("No Endrings found for layer " << std::to_string(layer));
+  }
+  return cached->second;
+}
+
+const SVDCoolingPipesPar& SVDGeometryPar::getCoolingPipes(int layer) const
+{
+  //Check if sensorType already exists
+  std::map<int, SVDCoolingPipesPar>::const_iterator cached = m_coolingPipes.find(layer);
+  if (cached == m_coolingPipes.end()) {
+    B2FATAL("No CoolingPipes found for layer " << std::to_string(layer));
+  }
+  return cached->second;
 }
 
 void SVDGeometryPar::createHalfShellSupport(GearDir support)
@@ -95,13 +140,12 @@ VXDSensorInfoBasePar* SVDGeometryPar::createSensorInfo(const GearDir& sensor)
     sensor.getLength("width2", 0)
   );
 
-  const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
   info->setSensorParams(
     sensor.getWithUnit("DepletionVoltage"),
     sensor.getWithUnit("BiasVoltage"),
-    sensor.getDouble("BackplaneCapacitance") * unit_pF,
-    sensor.getDouble("InterstripCapacitance") * unit_pF,
-    sensor.getDouble("CouplingCapacitance") * unit_pF,
+    sensor.getDouble("BackplaneCapacitance") ,
+    sensor.getDouble("InterstripCapacitance") ,
+    sensor.getDouble("CouplingCapacitance") ,
     sensor.getWithUnit("ElectronicNoiseU"),
     sensor.getWithUnit("ElectronicNoiseV")
   );

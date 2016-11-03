@@ -7,8 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <framework/logging/Logger.h>
 
@@ -18,8 +18,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-int SVGPrimitivePlotter::s_defaultNIndentationSpaces = 2;
-int SVGPrimitivePlotter::s_addtionalNIndentationSpaces = 2;
+const int SVGPrimitivePlotter::s_defaultNIndentationSpaces = 2;
+const int SVGPrimitivePlotter::s_addtionalNIndentationSpaces = 2;
 
 SVGPrimitivePlotter::SVGPrimitivePlotter()
   : PrimitivePlotter()
@@ -47,7 +47,7 @@ SVGPrimitivePlotter::SVGPrimitivePlotter(const SVGPrimitivePlotter& plotter)
 
 std::unique_ptr<PrimitivePlotter> SVGPrimitivePlotter::clone() const
 {
-  return std::unique_ptr<PrimitivePlotter>(new SVGPrimitivePlotter(*this));
+  return makeUnique<SVGPrimitivePlotter>(*this);
 }
 
 void SVGPrimitivePlotter::drawLine(const float& startX,

@@ -26,7 +26,7 @@ namespace Belle2 {
     public:
       /// Constructor initialising the TMVAFilter with standard training name for this filter.
       TMVAFacetRelationFilter()
-        : Super(std::unique_ptr<TMVAFacetRelationVarSet>(new TMVAFacetRelationVarSet()),
+        : Super(makeUnique<TMVAFacetRelationVarSet>(),
                 "FacetRelationFilter",
                 -2.19)
       {}

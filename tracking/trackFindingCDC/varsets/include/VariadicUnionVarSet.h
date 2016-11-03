@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <vector>
 #include <string>
@@ -49,7 +50,7 @@ namespace Belle2 {
       explicit VariadicUnionVarSet()
       {
         EvalVariadic{
-          (m_multiVarSet.push_back(std::unique_ptr<ContainedVarSet>(new AVarSets())) , true)...
+          (m_multiVarSet.push_back(makeUnique<AVarSets>()) , true)...
         };
 
         assert(m_multiVarSet.size() == sizeof...(AVarSets));

@@ -11,6 +11,7 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <framework/core/ModuleParamList.h>
 
 #include <boost/variant.hpp>

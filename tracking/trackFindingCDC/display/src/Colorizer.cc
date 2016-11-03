@@ -11,33 +11,33 @@ using namespace TrackFindingCDC;
 
 CDCSegmentColorizer::CDCSegmentColorizer() : Colorizer(
 {
-  {"SegmentMCTrackIdColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentMCTrackIdColorMap>},
-  {"SegmentFBInfoColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentFBInfoColorMap>},
-  {"SegmentFirstInTrackIdColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentFirstInTrackIdColorMap>},
-  {"SegmentLastInTrackIdColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentLastInTrackIdColorMap>},
-  {"SegmentFirstNPassedSuperLayersColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentFirstNPassedSuperLayersColorMap>},
-  {"SegmentLastNPassedSuperLayersColorMap", &CDCSegmentColorizer::constructMappingClass<SegmentLastNPassedSuperLayersColorMap>},
-  {"ListColors", &CDCSegmentColorizer::constructMappingClass<SegmentListColorsColorMap>},
+  {"SegmentMCTrackIdColorMap", []() { return makeUnique<SegmentMCTrackIdColorMap>();}},
+  {"SegmentFBInfoColorMap", []() { return makeUnique<SegmentFBInfoColorMap>();}},
+  {"SegmentFirstInTrackIdColorMap", []() { return makeUnique<SegmentFirstInTrackIdColorMap>();}},
+  {"SegmentLastInTrackIdColorMap", []() { return makeUnique<SegmentLastInTrackIdColorMap>();}},
+  {"SegmentFirstNPassedSuperLayersColorMap", []() { return makeUnique<SegmentFirstNPassedSuperLayersColorMap>();}},
+  {"SegmentLastNPassedSuperLayersColorMap", []() { return makeUnique<SegmentLastNPassedSuperLayersColorMap>();}},
+  {"ListColors", []() { return makeUnique<SegmentListColorsColorMap>();}},
 })
 {
 }
 
 CDCHitColorizer::CDCHitColorizer() : Colorizer(
 {
-  {"ZeroDriftLengthColorMap", &CDCHitColorizer::constructMappingClass<ZeroDriftLengthColorMap>},
-  {"ZeroDriftLengthStrokeWidthMap", &CDCHitColorizer::constructMappingClass<ZeroDriftLengthStrokeWidthMap>},
-  {"TakenFlagColorMap", &CDCHitColorizer::constructMappingClass<TakenFlagColorMap>},
-  {"RLColorMap", &CDCHitColorizer::constructMappingClass<RLColorMap>},
-  {"PosFlagColorMap", &CDCHitColorizer::constructMappingClass<PosFlagColorMap>},
-  {"BackgroundTagColorMap", &CDCHitColorizer::constructMappingClass<BackgroundTagColorMap>},
-  {"MCSegmentIdColorMap", &CDCHitColorizer::constructMappingClass<MCSegmentIdColorMap>},
-  {"TOFColorMap", &CDCHitColorizer::constructMappingClass<TOFColorMap>},
-  {"ReassignedSecondaryMap", &CDCHitColorizer::constructMappingClass<ReassignedSecondaryMap>},
-  {"MCParticleColorMap", &CDCHitColorizer::constructMappingClass<MCParticleColorMap>},
-  {"MCPDGCodeColorMap", &CDCHitColorizer::constructMappingClass<MCPDGCodeColorMap>},
-  {"MCPrimaryColorMap", &CDCHitColorizer::constructMappingClass<MCPrimaryColorMap>},
-  {"SimHitPDGCodeColorMap", &CDCHitColorizer::constructMappingClass<SimHitPDGCodeColorMap>},
-  {"SimHitIsBkgColorMap", &CDCHitColorizer::constructMappingClass<SimHitIsBkgColorMap>}
+  {"ZeroDriftLengthColorMap", []() { return makeUnique<ZeroDriftLengthColorMap>();}},
+  {"ZeroDriftLengthStrokeWidthMap", []() { return makeUnique<ZeroDriftLengthStrokeWidthMap>();}},
+  {"TakenFlagColorMap", []() { return makeUnique<TakenFlagColorMap>();}},
+  {"RLColorMap", []() { return makeUnique<RLColorMap>();}},
+  {"PosFlagColorMap", []() { return makeUnique<PosFlagColorMap>();}},
+  {"BackgroundTagColorMap", []() { return makeUnique<BackgroundTagColorMap>();}},
+  {"MCSegmentIdColorMap", []() { return makeUnique<MCSegmentIdColorMap>();}},
+  {"TOFColorMap", []() { return makeUnique<TOFColorMap>();}},
+  {"ReassignedSecondaryMap", []() { return makeUnique<ReassignedSecondaryMap>();}},
+  {"MCParticleColorMap", []() { return makeUnique<MCParticleColorMap>();}},
+  {"MCPDGCodeColorMap", []() { return makeUnique<MCPDGCodeColorMap>();}},
+  {"MCPrimaryColorMap", []() { return makeUnique<MCPrimaryColorMap>();}},
+  {"SimHitPDGCodeColorMap", []() { return makeUnique<SimHitPDGCodeColorMap>();}},
+  {"SimHitIsBkgColorMap", []() { return makeUnique<SimHitIsBkgColorMap>();}}
 })
 {
 }

@@ -54,25 +54,25 @@ std::unique_ptr<Filter<CDCFacet> >
 FacetFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<Filter<CDCFacet> >(new BaseFacetFilter());
+    return makeUnique<BaseFacetFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<Filter<CDCFacet> >(new AllFacetFilter());
+    return makeUnique<AllFacetFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<Filter<CDCFacet> >(new MCFacetFilter());
+    return makeUnique<MCFacetFilter>();
   } else if (filterName == "feasible") {
-    return std::unique_ptr<Filter<CDCFacet> >(new FeasibleRLFacetFilter());
+    return makeUnique<FeasibleRLFacetFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<Filter<CDCFacet> >(new SimpleFacetFilter());
+    return makeUnique<SimpleFacetFilter>();
   } else if (filterName == "realistic") {
-    return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter());
+    return makeUnique<RealisticFacetFilter>();
   } else if (filterName == "realistic_loss") {
-    return std::unique_ptr<Filter<CDCFacet> >(new RealisticFacetFilter(25));
+    return makeUnique<RealisticFacetFilter>(25);
   } else if (filterName == "chi2") {
-    return std::unique_ptr<Filter<CDCFacet> >(new Chi2FacetFilter());
+    return makeUnique<Chi2FacetFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<Filter<CDCFacet> >(new TMVAFacetFilter());
+    return makeUnique<TMVAFacetFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<Filter<CDCFacet> >(new UnionRecordingFacetFilter());
+    return makeUnique<UnionRecordingFacetFilter>();
   } else {
     return Super::create(filterName);
   }

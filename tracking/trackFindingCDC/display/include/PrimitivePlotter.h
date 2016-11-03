@@ -11,13 +11,10 @@
 
 #include <tracking/trackFindingCDC/display/BoundingBox.h>
 
-#include <algorithm>
-#include <cmath>
-#include <utility>
 #include <map>
-#include <memory>
 #include <vector>
-
+#include <array>
+#include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -34,13 +31,12 @@ namespace Belle2 {
 
     public:
       /// The default width of the canvas to be plotted into
-      static float s_defaultCanvasWidth;
+      static const float s_defaultCanvasWidth;
 
       /// The default height of the canvas to be plotted into
-      static float s_defaultCanvasHeight;
+      static const float s_defaultCanvasHeight;
 
     public:
-
       /// Default constructor for ROOT compatibility.
       PrimitivePlotter();
 

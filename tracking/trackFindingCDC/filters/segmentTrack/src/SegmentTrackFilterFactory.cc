@@ -33,11 +33,11 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new BaseSegmentTrackFilter());
+    return makeUnique<BaseSegmentTrackFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new MCSegmentTrackFilter());
+    return makeUnique<MCSegmentTrackFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new SimpleSegmentTrackFilter());
+    return makeUnique<SimpleSegmentTrackFilter>();
   } else {
     return Super::create(filterName);
   }
@@ -47,9 +47,9 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
 {
   if (filterName == "tmva") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterFirstStep"));
+    return makeUnique<TMVASegmentTrackFilter>("SegmentTrackFilterFirstStep");
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterFirstStep.root"));
+    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterFirstStep.root");
   } else {
     return Super::create(filterName);
   }
@@ -59,9 +59,9 @@ std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterSecondStepFactory::create(const std::string& filterName) const
 {
   if (filterName == "tmva") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new TMVASegmentTrackFilter("SegmentTrackFilterSecondStep"));
+    return makeUnique<TMVASegmentTrackFilter>("SegmentTrackFilterSecondStep");
   } else if (filterName ==  "recording") {
-    return std::unique_ptr<BaseSegmentTrackFilter>(new RecordingSegmentTrackFilter("SegmentTrackFilterSecondStep.root"));
+    return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterSecondStep.root");
   } else {
     return Super::create(filterName);
   }

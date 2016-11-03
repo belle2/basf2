@@ -34,15 +34,15 @@ std::unique_ptr<BaseSegmentInformationListTrackFilter>
 SegmentInformationListTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new BaseSegmentInformationListTrackFilter());
+    return makeUnique<BaseSegmentInformationListTrackFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new MCSegmentInformationListTrackFilter());
+    return makeUnique<MCSegmentInformationListTrackFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new SimpleSegmentInformationListTrackFilter());
+    return makeUnique<SimpleSegmentInformationListTrackFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new TMVASegmentInformationListTrackFilter());
+    return makeUnique<TMVASegmentInformationListTrackFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new RecordingSegmentInformationListTrackFilter());
+    return makeUnique<RecordingSegmentInformationListTrackFilter>();
   } else {
     return Super::create(filterName);
   }

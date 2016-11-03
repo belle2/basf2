@@ -8,12 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 #include <tracking/trackFindingCDC/filters/base/FilterVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <boost/algorithm/string.hpp>
 
 namespace Belle2 {
@@ -38,12 +38,11 @@ namespace Belle2 {
     public:
       /// Constructor of the filter.
       UnionRecordingFilter(const std::string& defaultRootFileName = "records.root",
-                           const std::string& defaultTreeName = "records") :
-        Super(std::unique_ptr<UnionVarSet<Object> >(new UnionVarSet<Object>),
-              defaultRootFileName,
-              defaultTreeName),
-        m_filterFactory("truth")
-      {}
+                           const std::string& defaultTreeName = "records")
+        : Super(makeUnique<UnionVarSet<Object>>(), defaultRootFileName, defaultTreeName)
+        , m_filterFactory("truth")
+      {
+      }
 
       /// Expose the set of parameters of the filter to the module parameter list.
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
@@ -72,7 +71,7 @@ namespace Belle2 {
           this->setSkimFilter(std::move(skimFilter));
         }
 
-        std::unique_ptr<UnionVarSet<Object> > multiVarSet(new UnionVarSet<Object>());
+        auto multiVarSet = makeUnique<UnionVarSet<Object>>();
 
         /// Create and add the concrete varsets from the varset parameter.
         for (std::string name : getVarSetNames()) {
@@ -83,7 +82,7 @@ namespace Belle2 {
             B2WARNING("Could not create a variable set from name " << name);
           }
         }
-        Super::setVarSet(std::move(multiVarSet));
+        this->setVarSet(std::move(multiVarSet));
         Super::initialize();
       }
 

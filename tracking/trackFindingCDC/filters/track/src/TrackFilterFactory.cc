@@ -32,15 +32,15 @@ std::unique_ptr<BaseTrackFilter>
 TrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseTrackFilter>(new BaseTrackFilter());
+    return makeUnique<BaseTrackFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseTrackFilter>(new MCTrackFilter());
+    return makeUnique<MCTrackFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<BaseTrackFilter>(new AllTrackFilter());
+    return makeUnique<AllTrackFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseTrackFilter>(new TMVATrackFilter("TrackFilter"));
+    return makeUnique<TMVATrackFilter>("TrackFilter");
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseTrackFilter>(new RecordingTrackFilter("TrackFilter.root"));
+    return makeUnique<RecordingTrackFilter>("TrackFilter.root");
   } else {
     return Super::create(filterName);
   }

@@ -32,15 +32,15 @@ std::unique_ptr<BaseBackgroundSegmentsFilter>
 BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new BaseBackgroundSegmentsFilter());
+    return makeUnique<BaseBackgroundSegmentsFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new MCBackgroundSegmentsFilter());
+    return makeUnique<MCBackgroundSegmentsFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new AllBackgroundSegmentsFilter());
+    return makeUnique<AllBackgroundSegmentsFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new TMVABackgroundSegmentsFilter("BackgroundSegmentsFilter"));
+    return makeUnique<TMVABackgroundSegmentsFilter>("BackgroundSegmentsFilter");
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseBackgroundSegmentsFilter>(new RecordingBackgroundSegmentsFilter("BackgroundSegmentsFilter.root"));
+    return makeUnique<RecordingBackgroundSegmentsFilter>("BackgroundSegmentsFilter.root");
   } else {
     return Super::create(filterName);
   }

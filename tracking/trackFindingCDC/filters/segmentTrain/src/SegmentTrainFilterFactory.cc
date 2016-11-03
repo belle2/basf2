@@ -33,15 +33,15 @@ std::unique_ptr<BaseSegmentTrainFilter>
 SegmentTrainFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseSegmentTrainFilter>(new BaseSegmentTrainFilter());
+    return makeUnique<BaseSegmentTrainFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseSegmentTrainFilter>(new MCSegmentTrainFilter());
+    return makeUnique<MCSegmentTrainFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseSegmentTrainFilter>(new SimpleSegmentTrainFilter());
+    return makeUnique<SimpleSegmentTrainFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseSegmentTrainFilter>(new RecordingSegmentTrainFilter());
+    return makeUnique<RecordingSegmentTrainFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseSegmentTrainFilter>(new TMVASegmentTrainFilter());
+    return makeUnique<TMVASegmentTrainFilter>();
   } else {
     return Super::create(filterName);
   }

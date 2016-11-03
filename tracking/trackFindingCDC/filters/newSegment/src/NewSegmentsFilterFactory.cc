@@ -31,13 +31,13 @@ std::unique_ptr<BaseNewSegmentsFilter>
 NewSegmentsFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new BaseNewSegmentsFilter());
+    return makeUnique<BaseNewSegmentsFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new MCNewSegmentsFilter());
+    return makeUnique<MCNewSegmentsFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new TMVANewSegmentsFilter("NewSegmentsFilter"));
+    return makeUnique<TMVANewSegmentsFilter>("NewSegmentsFilter");
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseNewSegmentsFilter>(new RecordingNewSegmentsFilter("NewSegmentsFilter.root"));
+    return makeUnique<RecordingNewSegmentsFilter>("NewSegmentsFilter.root");
   } else {
     return Super::create(filterName);
   }

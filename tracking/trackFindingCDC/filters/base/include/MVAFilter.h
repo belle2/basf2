@@ -117,7 +117,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit MVAFilter(const std::string& defaultTrainingName = "",
                          double defaultCut = NAN)
-        :  Super(std::unique_ptr<AVarSet> (new AVarSet()),
+        :  Super(makeUnique<AVarSet>(),
                  defaultTrainingName,
                  defaultCut)
       {}

@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -27,13 +28,15 @@ namespace Belle2 {
 
     public:
       /// Constructor.
-      MCFilter() : Super(std::unique_ptr<ATruthVarSet>(new ATruthVarSet)) { }
+      MCFilter() : Super(makeUnique<ATruthVarSet>())
+      {
+      }
 
       /// Reject an item if the truth variable is 0, else accept it.
       virtual Weight operator()(const Object& object) override
       {
         Super::operator()(object);
-        MayBePtr<Float_t> truth = Super::getVarSet().find("truth");
+        MayBePtr<Float_t> truth = this->getVarSet().find("truth");
 
         if (not truth or (*truth) == 0.0) {
           return NAN;

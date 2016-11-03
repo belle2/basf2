@@ -17,6 +17,7 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
 #include <cdc/translators/LinearGlobalADCCountTranslator.h>
@@ -117,9 +118,9 @@ namespace Belle2 {
         if (m_flightTimeEstimation == EPreferredDirection::c_Symmetric) {
           B2ERROR("Unexpected 'flightTimeEstimation' parameter : '" << m_param_flightTimeEstimation);
         } else if (m_flightTimeEstimation == EPreferredDirection::c_Downwards) {
-          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new CosmicRayFlightTimeEstimator(m_triggerPoint)));
+          FlightTimeEstimator::instance(makeUnique<CosmicRayFlightTimeEstimator>(m_triggerPoint));
         } else if (m_flightTimeEstimation == EPreferredDirection::c_Outwards) {
-          FlightTimeEstimator::instance(std::unique_ptr<FlightTimeEstimator>(new BeamEventFlightTimeEstimator));
+          FlightTimeEstimator::instance(makeUnique<BeamEventFlightTimeEstimator>());
         }
 
         Super::initialize();

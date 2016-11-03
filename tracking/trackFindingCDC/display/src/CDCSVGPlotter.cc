@@ -23,6 +23,8 @@
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 #include <tracking/trackFindingCDC/display/SVGPrimitivePlotter.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 #include <cmath>
 
 using namespace Belle2;
@@ -52,16 +54,15 @@ namespace {
   };
 }
 
-
-CDCSVGPlotter::CDCSVGPlotter(bool animate)
-  : m_animate(animate),
-    m_eventdataPlotter(std::unique_ptr<PrimitivePlotter>(new SVGPrimitivePlotter(AttributeMap {
-  {"stroke", "orange"},
+const AttributeMap defaultSVGAttributes({{"stroke", "orange"},
   {"stroke-width", "0.55"},
   {"fill", "none"},
   {"transform", "translate(0, 1120) scale(1,-1)"}
-})),
-animate)
+});
+
+CDCSVGPlotter::CDCSVGPlotter(bool animate)
+  : m_animate(animate)
+  , m_eventdataPlotter(makeUnique<SVGPrimitivePlotter>(defaultSVGAttributes), animate)
 {
   int top = -112;
   int left = -112;
@@ -503,4 +504,3 @@ void CDCSVGPlotter::drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>
     }
   }
 }
-

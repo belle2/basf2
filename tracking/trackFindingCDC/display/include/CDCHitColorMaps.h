@@ -30,7 +30,8 @@ namespace Belle2 {
        *
        * Sets m_bkgHitColor to "orange".
        */
-      CDCHitColorMap() : m_bkgHitColor("orange") {};
+      CDCHitColorMap()
+        : m_bkgHitColor("orange") {};
 
       /**
        * Destructor.
@@ -40,12 +41,18 @@ namespace Belle2 {
       /**
        * Function call to map the CDCHit id and object to a color.
        */
-      virtual std::string map(const int, const CDCHit&) {return m_bkgHitColor;}
+      virtual std::string map(const int, const CDCHit&)
+      {
+        return m_bkgHitColor;
+      }
 
       /**
        * Informal string summarizing the translation variables to colors.
        */
-      virtual std::string info() {return m_bkgHitColor;}
+      virtual std::string info()
+      {
+        return m_bkgHitColor;
+      }
 
     protected:
       /**

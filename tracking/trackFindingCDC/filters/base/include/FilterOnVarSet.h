@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 #include <memory>
 
 namespace Belle2 {
@@ -141,7 +142,7 @@ namespace Belle2 {
     public:
       /// Constructor of the filter.
       FilterOnVarSet()
-        : Super(std::unique_ptr<AVarSet>(new AVarSet()))
+        : Super(makeUnique<AVarSet>())
       {}
     };
   }

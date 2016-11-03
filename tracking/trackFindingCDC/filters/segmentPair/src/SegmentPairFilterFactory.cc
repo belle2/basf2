@@ -51,21 +51,21 @@ std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());
+    return makeUnique<BaseSegmentPairFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
+    return makeUnique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
+    return makeUnique<MCSegmentPairFilter>();
   } else if (filterName == "feasible") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MVAFeasibleSegmentPairFilter());
+    return makeUnique<MVAFeasibleSegmentPairFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
+    return makeUnique<SimpleSegmentPairFilter>();
   } else if (filterName == "fitless") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new FitlessSegmentPairFilter());
+    return makeUnique<FitlessSegmentPairFilter>();
   } else if (filterName == "realistic") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MVARealisticSegmentPairFilter());
+    return makeUnique<MVARealisticSegmentPairFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new UnionRecordingSegmentPairFilter());
+    return makeUnique<UnionRecordingSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

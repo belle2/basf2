@@ -7,14 +7,18 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
+#include <algorithm>
+#include <utility>
+#include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-float PrimitivePlotter::s_defaultCanvasWidth = 1120.0;
-float PrimitivePlotter::s_defaultCanvasHeight = 1120.0;
+const float PrimitivePlotter::s_defaultCanvasWidth = 1120.0;
+const float PrimitivePlotter::s_defaultCanvasHeight = 1120.0;
 
 PrimitivePlotter::PrimitivePlotter() :
   m_boundingBox(),
@@ -27,7 +31,7 @@ PrimitivePlotter::~PrimitivePlotter() = default;
 
 std::unique_ptr<PrimitivePlotter> PrimitivePlotter::clone() const
 {
-  return std::unique_ptr<PrimitivePlotter>(new PrimitivePlotter(*this));
+  return makeUnique<PrimitivePlotter>(*this);
 }
 
 

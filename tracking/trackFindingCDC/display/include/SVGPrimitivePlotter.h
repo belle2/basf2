@@ -10,8 +10,6 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
-
-
 #include <sstream>
 
 namespace Belle2 {
@@ -22,10 +20,10 @@ namespace Belle2 {
 
     private:
       /// Constant for the number of indention space to be used within the svg block
-      static int s_defaultNIndentationSpaces;
+      static const int s_defaultNIndentationSpaces;
 
       /// Constant for the additional number of space to be prepended with each open tag group.
-      static int s_addtionalNIndentationSpaces;
+      static const int s_addtionalNIndentationSpaces;
 
     public:
       /// Default constructor for ROOT compatibility.
@@ -235,8 +233,6 @@ namespace Belle2 {
        */
       void writeClosingTag(std::ostream& outputStream,
                            const std::string& tagName);
-
-    public:
 
     private:
       /// Memory for the plotted elements. This contains only the fragment that is inbetween the svg tags and comes after the global svg definitions.

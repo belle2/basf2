@@ -35,19 +35,19 @@ std::unique_ptr<BaseStereoSegmentFilter>
 StereoSegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new BaseStereoSegmentFilter());
+    return makeUnique<BaseStereoSegmentFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new MCStereoSegmentFilter());
+    return makeUnique<MCStereoSegmentFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new AllStereoSegmentFilter());
+    return makeUnique<AllStereoSegmentFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new RecordingStereoSegmentFilter("StereoSegment.root"));
+    return makeUnique<RecordingStereoSegmentFilter>("StereoSegment.root");
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new SimpleStereoSegmentFilter());
+    return makeUnique<SimpleStereoSegmentFilter>();
   } else if (filterName == "random") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new RandomStereoSegmentFilter());
+    return makeUnique<RandomStereoSegmentFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseStereoSegmentFilter>(new TMVAStereoSegmentFilter("StereoSegment"));
+    return makeUnique<TMVAStereoSegmentFilter>("StereoSegment");
   } else {
     return Super::create(filterName);
   }

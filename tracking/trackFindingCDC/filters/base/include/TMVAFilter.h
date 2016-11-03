@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/mva/TMVAExpert.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -59,14 +60,13 @@ namespace Belle2 {
                                       m_param_trainingName,
                                       "The name of the training that should be used for the prediction",
                                       m_param_trainingName);
-
       }
 
       /// Initialize the expert before event processing.
       virtual void initialize() override
       {
         Super::initialize();
-        m_tmvaExpert = std::unique_ptr<TMVAExpert>(new TMVAExpert(m_param_weightFolder, m_param_trainingName));
+        m_tmvaExpert = makeUnique<TMVAExpert>(m_param_weightFolder, m_param_trainingName);
         m_tmvaExpert->initializeReader(Super::getVarSet().getNamedVariables());
       }
 
@@ -119,7 +119,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit TMVAFilter(const std::string& defaultTrainingName = "",
                           double defaultCut = NAN)
-        :  Super(std::unique_ptr<AVarSet> (new AVarSet()),
+        :  Super(makeUnique<AVarSet>(),
                  defaultTrainingName,
                  defaultCut)
       {}

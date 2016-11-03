@@ -34,19 +34,19 @@ std::unique_ptr<BaseStereoHitFilter>
 StereoHitFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseStereoHitFilter>(new BaseStereoHitFilter());
+    return makeUnique<BaseStereoHitFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseStereoHitFilter>(new MCStereoHitFilter());
+    return makeUnique<MCStereoHitFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<BaseStereoHitFilter>(new AllStereoHitFilter());
+    return makeUnique<AllStereoHitFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseStereoHitFilter>(new RecordingStereoHitFilter("StereoHit.root"));
+    return makeUnique<RecordingStereoHitFilter>("StereoHit.root");
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseStereoHitFilter>(new SimpleStereoHitFilter());
+    return makeUnique<SimpleStereoHitFilter>();
   } else if (filterName == "random") {
-    return std::unique_ptr<BaseStereoHitFilter>(new RandomStereoHitFilter());
+    return makeUnique<RandomStereoHitFilter>();
   } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseStereoHitFilter>(new TMVAStereoHitFilter("StereoHit"));
+    return makeUnique<TMVAStereoHitFilter>("StereoHit");
   } else {
     return Super::create(filterName);
   }

@@ -99,6 +99,6 @@ void TrackFinderCDCBaseModule::event()
   m_trackExporter.apply(outputTracks);
 }
 
-void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>&)
+void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>& outputTracks __attribute__((unused)))
 {
 }

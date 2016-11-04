@@ -27,7 +27,8 @@ void StereoHitTrackMatcherQuadTree<HoughTree>::exposeParameters(ModuleParamList*
 }
 
 template <class HoughTree>
-Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
+Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& recoHit,
+                                                           const Z0TanLambdaBox& node __attribute__((unused)),
                                                            const CDCTrack& track) const
 {
   return m_stereoHitFilter->operator()({&recoHit, &track});

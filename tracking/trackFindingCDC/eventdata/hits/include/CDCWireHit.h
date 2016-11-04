@@ -24,7 +24,6 @@
 
 #include <cassert>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -47,7 +46,7 @@ namespace Belle2 {
       static CDC::ADCCountTranslatorBase& getADCCountTranslator();
 
       /// A default value for the drift length variance if no variance from the drift length translation is available.
-      static constexpr const double c_simpleDriftLengthVariance  = 0.000169;
+      static constexpr const double c_simpleDriftLengthVariance = 0.000169;
 
       /// Default constructor for ROOT compatibility.
       CDCWireHit();
@@ -76,8 +75,8 @@ namespace Belle2 {
        *  @param  ptrHit          Reference to the CDCHit.
        */
       CDCWireHit(const CDCHit* const ptrHit,
-                 CDC::TDCCountTranslatorBase* = nullptr,
-                 CDC::ADCCountTranslatorBase* = nullptr);
+                 CDC::TDCCountTranslatorBase* ptrTDCCountTranslator = nullptr,
+                 CDC::ADCCountTranslatorBase* ptrADCCountTranslator = nullptr);
 
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
@@ -100,40 +99,58 @@ namespace Belle2 {
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       friend bool operator<(const CDCWireHit& wireHit, const CDCWire& wire)
-      { return wireHit.getWire() < wire; }
+      {
+        return wireHit.getWire() < wire;
+      }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but the other way round.
       friend bool operator<(const CDCWire& wire, const CDCWireHit& wireHit)
-      { return wire < wireHit.getWire(); }
+      {
+        return wire < wireHit.getWire();
+      }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but with CDCWireHit as a pointer.
       friend bool operator<(const CDCWireHit* wireHit, const CDCWire& wire)
-      { assert(wireHit); return  wireHit->getWire() < wire; }
+      {
+        assert(wireHit);
+        return wireHit->getWire() < wire;
+      }
 
       /// Defines CDCWires and CDCWireHits to be coaligned on the wire on which they are based.
       // Same as above but the other way round and with CDCWireHit as a pointer.
       friend bool operator<(const CDCWire& wire, const CDCWireHit* wireHit)
-      { assert(wireHit); return wire < wireHit->getWire(); }
+      {
+        assert(wireHit);
+        return wire < wireHit->getWire();
+      }
 
       /// Defines CDCWireHits and raw CDCHit to be coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
-      { return wireHit.getWireID().getEWire() < hit.getID(); }
+      {
+        return wireHit.getWireID().getEWire() < hit.getID();
+      }
 
       /// Defines wire hits and raw CDCHit to be coaligned.
       // Same as above but the other way round.
       friend bool operator<(const CDCHit& hit, const CDCWireHit& wireHit)
-      { return hit.getID() < wireHit.getWireID().getEWire(); }
+      {
+        return hit.getID() < wireHit.getWireID().getEWire();
+      }
 
-      /// Defines CDCWireSuperLayer and CDCWireHit to be coaligned on the super layer on which they are based.
+      /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
       friend bool operator<(const CDCWireHit& wireHit, const CDCWireSuperLayer& wireSuperLayer)
-      { return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer(); }
+      {
+        return wireHit.getISuperLayer() < wireSuperLayer.getISuperLayer();
+      }
 
-      /// Defines CDCWireSuperLayer and CDCWireHit to be coaligned on the super layer on which they are based.
+      /// Defines CDCWireSuperLayer and CDCWireHit to be coordered with the super layers
       // Same as above but the other way round.
       friend bool operator<(const CDCWireSuperLayer& wireSuperLayer, const CDCWireHit& wireHit)
-      { return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer(); }
+      {
+        return wireSuperLayer.getISuperLayer() < wireHit.getISuperLayer();
+      }
 
       /**
        *  @name Mimic pointer
@@ -148,73 +165,91 @@ namespace Belle2 {
        *  @{
        */
       const CDCWireHit* operator->() const
-      { return this; }
-
-      /**
-       *  Allow automatic taking of the address.
-       *
-       *  In places where a pointer is expected the object is implicitly casted to a
-       *  pointer to itself.
-       */
-      // operator Belle2::TrackFindingCDC::CDCWireHit* ()&
-      // { return this; }
-
+      {
+        return this;
+      }
       /// @}
 
       /// Getter for the CDCHit pointer into the StoreArray.
       const CDCHit* getHit() const
-      { return m_hit; }
+      {
+        return m_hit;
+      }
 
       /// Getter for the index of the hit in the StoreArray holding this hit.
       Index getStoreIHit() const
-      { return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex; }
+      {
+        return getHit() ? getHit()->getArrayIndex() : c_InvalidIndex;
+      }
 
       /// Getter for the CDCWire the hit is located on.
       const CDCWire& getWire() const;
 
       /// Getter for the WireID of the wire the hit is located on.
       const WireID& getWireID() const
-      { return m_wireID; }
+      {
+        return m_wireID;
+      }
 
       /// Getter for the stereo type of the underlying wire.
       EStereoKind getStereoKind() const
-      { return ISuperLayerUtil::getStereoKind(getISuperLayer());; }
+      {
+        return ISuperLayerUtil::getStereoKind(getISuperLayer());
+      }
 
       /// Indicator if the underlying wire is axial.
       bool isAxial() const
-      { return ISuperLayerUtil::isAxial(getISuperLayer());; }
+      {
+        return ISuperLayerUtil::isAxial(getISuperLayer());
+      }
 
       /// Getter for the super layer id.
       ISuperLayer getISuperLayer() const
-      { return getWireID().getISuperLayer(); }
+      {
+        return getWireID().getISuperLayer();
+      }
 
       /// The two dimensional reference position (z=0) of the underlying wire.
       const Vector2D& getRefPos2D() const
-      { return getWire().getRefPos2D(); }
+      {
+        return getWire().getRefPos2D();
+      }
 
       /// The three dimensional reference position of the underlying wire.
       const Vector3D& getRefPos3D() const
-      { return getWire().getRefPos3D(); }
+      {
+        return getWire().getRefPos3D();
+      }
 
       /// The distance from the beam line at reference position of the underlying wire.
       double getRefCylindricalR() const
-      { return getWire().getRefCylindricalR(); }
+      {
+        return getWire().getRefCylindricalR();
+      }
 
       /// Getter for the drift length at the reference position of the wire.
       double getRefDriftLength() const
-      { return m_refDriftLength; }
+      {
+        return m_refDriftLength;
+      }
 
       /// Getter for the variance of the drift length at the reference position of the wire.
       double getRefDriftLengthVariance() const
-      { return m_refDriftLengthVariance; }
+      {
+        return m_refDriftLengthVariance;
+      }
 
       /// Getter for the charge due to energy deposit in the drift cell
       double getRefChargeDeposit() const
-      { return m_refChargeDeposit; }
+      {
+        return m_refChargeDeposit;
+      }
 
       /// Checks if the wire hit is based on the given wire.
       bool isOnWire(const CDCWire& wire) const
-      { return getWireID() == wire.getWireID(); }
+      {
+        return getWireID() == wire.getWireID();
+      }
 
       /**
        *  Reconstructs a position of primary ionisation on the drift circle.
@@ -256,23 +291,34 @@ namespace Belle2 {
 
       /// String output operator for wire hit objects to help debugging.
       friend std::ostream& operator<<(std::ostream& output, const CDCWireHit& wirehit)
-      { return output << "CDCWireHit(" << wirehit.getWireID() << ", drift length=" << wirehit.getRefDriftLength() << ")"; }
+      {
+        return output << "CDCWireHit(" << wirehit.getWireID()
+               << ", drift length=" << wirehit.getRefDriftLength() << ")";
+      }
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
+      {
+        return m_automatonCell;
+      }
 
       /// Constant getter for the automaton cell.
       const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
+      {
+        return m_automatonCell;
+      }
 
       /// Getter for the super cluster id
       int getISuperCluster() const
-      { return m_iSuperCluster; }
+      {
+        return m_iSuperCluster;
+      }
 
       /// Setter for the super cluster id
       void setISuperCluster(int iSuperCluster)
-      { m_iSuperCluster = iSuperCluster; }
+      {
+        m_iSuperCluster = iSuperCluster;
+      }
 
     private:
       /// Memory for the automaton cell.

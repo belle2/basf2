@@ -16,12 +16,10 @@ using namespace Eigen;
 
 using namespace TrackFindingCDC;
 
-KarimakisMethod::KarimakisMethod() :
-  m_lineConstrained(false)
+KarimakisMethod::KarimakisMethod()
+  : m_lineConstrained(false)
 {
 }
-
-
 
 void KarimakisMethod::update(CDCTrajectory2D& trajectory2D,
                              CDCObservations2D& observations2D) const

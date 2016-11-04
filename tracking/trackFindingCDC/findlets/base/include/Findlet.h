@@ -66,8 +66,9 @@ namespace Belle2 {
         return "(no description)";
       }
 
-      /** Forward prefixed parameters of this findlet to the module parameter list */
-      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
+      /// Forward prefixed parameters of this findlet to the module parameter list
+      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                    const std::string& prefix __attribute__((unused)) = "")
       {
       }
 
@@ -89,7 +90,7 @@ namespace Belle2 {
       /// Receive signal for the beginning of a new run.
       virtual void beginRun() override
       {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
+        for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
           psl->beginRun();
         }
       }
@@ -97,7 +98,7 @@ namespace Belle2 {
       /// Receive signal for the start of a new event.
       virtual void beginEvent() override
       {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
+        for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
           psl->beginEvent();
         }
       }
@@ -123,8 +124,6 @@ namespace Belle2 {
     private:
       /// References to subordinary signal processing listener contained in this findlet.
       std::vector<ProcessingSignalListener*> m_subordinaryProcessingSignalListeners;
-
     };
-
   }
 }

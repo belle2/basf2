@@ -50,8 +50,8 @@ namespace Belle2 {
       }
 
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
-      virtual Weight operator()(const CDCSegmentTriple& /* from */,
-                                const CDCSegmentTriple& /* to */)
+      virtual Weight operator()(const CDCSegmentTriple& from  __attribute__((unused)),
+                                const CDCSegmentTriple& to  __attribute__((unused)))
       {
         return NAN;
       }

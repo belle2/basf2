@@ -40,7 +40,7 @@ void PrimitivePlotter::drawLine(float startX,
                                 float startY,
                                 float endX,
                                 float endY,
-                                const AttributeMap& /* attributeMap */)
+                                const AttributeMap& attributeMap  __attribute__((unused)))
 {
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
@@ -50,7 +50,7 @@ void PrimitivePlotter::drawArrow(float startX,
                                  float startY,
                                  float endX,
                                  float endY,
-                                 const AttributeMap& /* attributeMap */)
+                                 const AttributeMap& attributeMap  __attribute__((unused)))
 {
   m_boundingBox &= BoundingBox(startX, startY, endX, endY);
 }
@@ -59,7 +59,7 @@ void PrimitivePlotter::drawArrow(float startX,
 void PrimitivePlotter::drawCircle(float centerX,
                                   float centerY,
                                   float radius,
-                                  const AttributeMap& /* attributeMap */)
+                                  const AttributeMap& attributeMap  __attribute__((unused)))
 {
   const float left = centerX - radius;
   const float bottom = centerY - radius;
@@ -74,10 +74,10 @@ void PrimitivePlotter::drawCircleArc(float startX,
                                      float startY,
                                      float endX,
                                      float endY,
-                                     float /* radius */,
-                                     bool /* longArc */,
-                                     bool /* sweepFlag */,
-                                     const AttributeMap& /* attributeMap */)
+                                     float radius  __attribute__((unused)),
+                                     bool longArc  __attribute__((unused)),
+                                     bool sweepFlag  __attribute__((unused)),
+                                     const AttributeMap& attributeMap  __attribute__((unused)))
 {
   // The actual extend of the circle arc is more complicating.
   // Please fill in the soultion if you have one.
@@ -85,7 +85,7 @@ void PrimitivePlotter::drawCircleArc(float startX,
 }
 
 void PrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& points,
-                                 const std::vector<std::array<float, 2> >& /* tangents */,
+                                 const std::vector<std::array<float, 2> >& tangents  __attribute__((unused)),
                                  const AttributeMap& /*attributeMap */)
 {
   for (size_t i = 0; i < points.size() - 1; ++i) {
@@ -99,7 +99,7 @@ void PrimitivePlotter::drawCurve(const std::vector<std::array<float, 2> >& point
 
 
 
-void PrimitivePlotter::startGroup(const AttributeMap& /* attributeMap */)
+void PrimitivePlotter::startGroup(const AttributeMap& attributeMap  __attribute__((unused)))
 {
 }
 
@@ -109,7 +109,7 @@ void PrimitivePlotter::endGroup()
 }
 
 
-const std::string PrimitivePlotter::save(const std::string& /* fileName */)
+const std::string PrimitivePlotter::save(const std::string& fileName  __attribute__((unused)))
 {
   return "";
 }

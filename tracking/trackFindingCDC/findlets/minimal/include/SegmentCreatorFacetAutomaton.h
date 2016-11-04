@@ -47,12 +47,6 @@ namespace Belle2 {
         return "Constructs segments by extraction of facet paths in a cellular automaton.";
       }
 
-      /// Add the parameters to the surrounding module
-      void exposeParameters(ModuleParamList*,
-                            const std::string&  = "") override final
-      {
-      }
-
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCFacet>& inputFacets,
                          const std::vector<WeightedRelation<const CDCFacet> >& inputFacetRelations,

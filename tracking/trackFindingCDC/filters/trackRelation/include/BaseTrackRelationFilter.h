@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Returns the full range of tracks.
       template<class ACDCTrackIterator>
       boost::iterator_range<ACDCTrackIterator>
-      getPossibleNeighbors(const CDCTrack& /* track */,
+      getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
                            const ACDCTrackIterator& itBegin,
                            const ACDCTrackIterator& itEnd) const
       {
@@ -37,8 +37,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all track neighbors.
        */
-      virtual Weight operator()(const CDCTrack& /* from */,
-                                const CDCTrack& /* to */)
+      virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
+                                const CDCTrack& to  __attribute__((unused)))
       {
         return NAN;
       }

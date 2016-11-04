@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/BaseSegmentTripleRelationFilter.h>
 
 namespace Belle2 {
@@ -28,11 +27,8 @@ namespace Belle2 {
 
     public:
       /// Implementation currently accepts all combinations
-      virtual Weight operator()(const CDCSegmentTriple&,
-                                const CDCSegmentTriple& neighborTriple) override final;
-
+      virtual Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
+                                const CDCSegmentTriple& toSegmentTriple) override final;
     };
-
   }
 }
-

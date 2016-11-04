@@ -34,7 +34,8 @@ namespace Belle2 {
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
-      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
+      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                    const std::string& prefix __attribute__((unused)) = "")
       {
       }
 

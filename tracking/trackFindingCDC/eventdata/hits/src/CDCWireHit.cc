@@ -37,29 +37,27 @@ CDCWireHit::CDCWireHit()
 {
 }
 
-
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        const double driftLength,
                        const double driftLengthVariance,
                        const double chargeDeposit)
-  : m_automatonCell(1),
-    m_refDriftLength(driftLength),
-    m_refDriftLengthVariance(driftLengthVariance),
-    m_refChargeDeposit(chargeDeposit),
-    m_wireID(ptrHit->getID()),
-    m_wire(CDCWire::getInstance(*ptrHit)),
-    m_hit(ptrHit)
+  : m_automatonCell(1)
+  , m_refDriftLength(driftLength)
+  , m_refDriftLengthVariance(driftLengthVariance)
+  , m_refChargeDeposit(chargeDeposit)
+  , m_wireID(ptrHit->getID())
+  , m_wire(CDCWire::getInstance(*ptrHit))
+  , m_hit(ptrHit)
 {
 }
-
 
 CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
                        TDCCountTranslatorBase* ptrTDCCountTranslator,
                        ADCCountTranslatorBase* ptrADCCountTranslator)
-  : m_automatonCell(1),
-    m_wireID(ptrHit->getID()),
-    m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr),
-    m_hit(ptrHit)
+  : m_automatonCell(1)
+  , m_wireID(ptrHit->getID())
+  , m_wire(ptrHit ? CDCWire::getInstance(*ptrHit) : nullptr)
+  , m_hit(ptrHit)
 {
   if (not ptrHit) {
     B2ERROR("CDCWireHit constructor invoked with nullptr CDCHit");
@@ -67,8 +65,10 @@ CDCWireHit::CDCWireHit(const CDCHit* const ptrHit,
   }
   const CDCHit& hit = *ptrHit;
 
-  TDCCountTranslatorBase& tdcCountTranslator = ptrTDCCountTranslator ? *ptrTDCCountTranslator : getTDCCountTranslator();
-  ADCCountTranslatorBase& adcCountTranslator = ptrADCCountTranslator ? *ptrADCCountTranslator : getADCCountTranslator();
+  TDCCountTranslatorBase& tdcCountTranslator =
+    ptrTDCCountTranslator ? *ptrTDCCountTranslator : getTDCCountTranslator();
+  ADCCountTranslatorBase& adcCountTranslator =
+    ptrADCCountTranslator ? *ptrADCCountTranslator : getADCCountTranslator();
 
   float initialTOFEstimate = 0;
 
@@ -102,13 +102,13 @@ CDCWireHit::CDCWireHit(const WireID& wireID,
                        const double driftLength,
                        const double driftLengthVariance,
                        const double chargeDeposit)
-  : m_automatonCell(1),
-    m_refDriftLength(driftLength),
-    m_refDriftLengthVariance(driftLengthVariance),
-    m_refChargeDeposit(chargeDeposit),
-    m_wireID(wireID),
-    m_wire(CDCWire::getInstance(wireID)),
-    m_hit(nullptr)
+  : m_automatonCell(1)
+  , m_refDriftLength(driftLength)
+  , m_refDriftLengthVariance(driftLengthVariance)
+  , m_refChargeDeposit(chargeDeposit)
+  , m_wireID(wireID)
+  , m_wire(CDCWire::getInstance(wireID))
+  , m_hit(nullptr)
 {
 }
 

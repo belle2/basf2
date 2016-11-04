@@ -30,10 +30,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet that generates tracks based on a cellular automaton of segment pairs
-    class TrackCreatorSegmentPairAutomaton :
-      public Findlet<const CDCSegmentPair,
-      const WeightedRelation<const CDCSegmentPair>,
-      CDCTrack> {
+    class TrackCreatorSegmentPairAutomaton
+      : public Findlet<const CDCSegmentPair,
+        const WeightedRelation<const CDCSegmentPair>,
+        CDCTrack> {
 
     private:
       /// Type of the base class
@@ -46,12 +46,6 @@ namespace Belle2 {
       virtual std::string getDescription() override
       {
         return "Constructs tracks by extraction of segment pair paths in a cellular automaton.";
-      }
-
-      /// Add the parameters
-      void exposeParameters(ModuleParamList*,
-                            const std::string& = "") override final
-      {
       }
 
       /// Main function of the segment finding by the cellular automaton.

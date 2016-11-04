@@ -39,7 +39,7 @@ namespace Belle2 {
        *
        *  The method may use variables of the object as well as already extracted values.
        */
-      virtual bool accept(const Object*)
+      virtual bool accept(const Object* object __attribute__((unused)))
       {
         return true;
       }

@@ -22,8 +22,10 @@ namespace Belle2 {
      *  but has no instructions on its own.
      *  Loosely inspired from http://en.wikipedia.org/wiki/Variadic_templates
      */
-    template<class... Ts>
-    static inline void evalVariadic(Ts&& ...) {}
+    template <class... Ts>
+    static inline void evalVariadic(Ts&& ... expressions __attribute__((unused)))
+    {
+    }
 
     /** Structure to serve as a placeholder for a variadic initializer list of statements to be evaluated.
      *  Similar to the evalVariadic functions this structure evaluates as variadic list of statements, but
@@ -32,8 +34,10 @@ namespace Belle2 {
      */
     struct EvalVariadic {
       /// Constructor taking the variadic initalizer list.
-      template<class... T>
-      explicit EvalVariadic(T...) {}
+      template <class... Ts>
+      explicit EvalVariadic(Ts&& ... expressions __attribute__((unused)))
+      {
+      }
     };
 
 

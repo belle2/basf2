@@ -17,7 +17,7 @@ SkimmedHitGapSegmentPairVarSet::SkimmedHitGapSegmentPairVarSet()
 {
 }
 
-bool SkimmedHitGapSegmentPairVarSet::accept(const CDCSegmentPair*)
+bool SkimmedHitGapSegmentPairVarSet::accept(const CDCSegmentPair* ptrSegmentPair __attribute__((unused)))
 {
   if (fabs(var<named("delta_hit_pos_phi")>()) > 1) return false;
   if (fabs(var<named("delta_hit_alpha")>()) > 1.5) return false;

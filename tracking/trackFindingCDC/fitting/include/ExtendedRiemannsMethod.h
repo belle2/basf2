@@ -22,38 +22,47 @@ namespace Belle2 {
       /// Constructor setting the default constraints.
       ExtendedRiemannsMethod();
 
-      /// Executes the fit and updates the trajectory parameters
-      /// This may render the information in the observation object.
+      /**
+       *  Executes the fit and updates the trajectory parameters
+       *  This may render the information in the observation object.
+       */
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
     private:
       /// Internal method doing the heavy work.
-      UncertainPerigeeCircle fitInternal(CDCObservations2D&) const;
+      UncertainPerigeeCircle fitInternal(CDCObservations2D& observations2D) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter
       bool isLineConstrained() const
-      { return m_lineConstrained; }
+      {
+        return m_lineConstrained;
+      }
 
       /// Getter for the indictor that curves through the origin should be fitted by this fitter
       bool isOriginConstrained() const
-      { return m_originConstrained; }
+      {
+        return m_originConstrained;
+      }
 
       /// Indicator if this fitter is setup to fit lines
       void setLineConstrained(bool constrained = true)
-      { m_lineConstrained = constrained; }
+      {
+        m_lineConstrained = constrained;
+      }
 
       /// Indicator if this fitter is setup to fit curves through the origin
       void setOriginConstrained(bool constrained = true)
-      { m_originConstrained = constrained; }
+      {
+        m_originConstrained = constrained;
+      }
 
-    protected:
+    private:
       /// Memory for the flag indicating that lines should be fitted
       bool m_lineConstrained;
 
       /// Memory for the flag indicating that curves through the origin shall be fitter
       bool m_originConstrained;
-
     };
   }
 }

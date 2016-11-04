@@ -54,8 +54,8 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all facet neighbors.
        */
-      virtual Weight operator()(const CDCFacet& /* from */,
-                                const CDCFacet& /* to */)
+      virtual Weight operator()(const CDCFacet& from  __attribute__((unused)),
+                                const CDCFacet& to  __attribute__((unused)))
       {
         return NAN;
       }

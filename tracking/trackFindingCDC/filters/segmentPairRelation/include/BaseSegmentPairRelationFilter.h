@@ -43,8 +43,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all axial stereo segment pair neighbors.
        */
-      virtual Weight operator()(const CDCSegmentPair& /* from */,
-                                const CDCSegmentPair& /* to */)
+      virtual Weight operator()(const CDCSegmentPair& from  __attribute__((unused)),
+                                const CDCSegmentPair& to  __attribute__((unused)))
       {
         return NAN;
       }

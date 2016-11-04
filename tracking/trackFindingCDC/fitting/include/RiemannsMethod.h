@@ -18,49 +18,58 @@ namespace Belle2 {
     class RiemannsMethod  {
 
     public:
-      ///Empty constructor
+      /// Default constructor
       RiemannsMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
       void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
     private:
-      /// Executes the fit without using the drift length information.
-      /** This method is used if there is drift length information is available from the observations.*/
+      /**
+       *  Executes the fit without using the drift length information.
+       *
+       *  This method is used if there is drift length information is available from the observations.
+       */
       void updateWithoutDriftLength(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
-      /// Executes the fit using the drift length information.
-      /** This method is used if there is no  drift length information is available from the observations.*/
+      /**
+       *  Executes the fit using the drift length information.
+       *
+       *  This method is used if there is no  drift length information is available from the observations.
+       */
       void updateWithDriftLength(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter
       bool isLineConstrained() const
-      { return m_lineConstrained; }
+      {
+        return m_lineConstrained;
+      }
 
       /// Getter for the indictor that curves through the origin should be fitted by this fitter
       bool isOriginConstrained() const
-      { return m_originConstrained; }
+      {
+        return m_originConstrained;
+      }
 
       /// Indicator if this fitter is setup to fit lines
       void setLineConstrained(bool constrained = true)
-      { m_lineConstrained = constrained; }
+      {
+        m_lineConstrained = constrained;
+      }
 
       /// Indicator if this fitter is setup to fit curves through the origin
       void setOriginConstrained(bool constrained = true)
-      { m_originConstrained = constrained; }
+      {
+        m_originConstrained = constrained;
+      }
 
-    protected:
-      /// Memory for the flag indicating that lines should be fitted
+    private:
+      /// Memory for the flag indicating that lines should be fitted.
       bool m_lineConstrained;
 
-      /// Memory for the flag indicating that curves through the origin shall be fitter
+      /// Memory for the flag indicating that curves through the origin shall be fitter.
       bool m_originConstrained;
-
-
-    public:
-
     };
-
   }
 }

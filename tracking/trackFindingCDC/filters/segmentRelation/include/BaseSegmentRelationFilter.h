@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Returns the full range of segments.
       template<class ACDCRecoSegment2DIterator>
       boost::iterator_range<ACDCRecoSegment2DIterator>
-      getPossibleNeighbors(const CDCRecoSegment2D& /* segment */,
+      getPossibleNeighbors(const CDCRecoSegment2D& segment  __attribute__((unused)),
                            const ACDCRecoSegment2DIterator& itBegin,
                            const ACDCRecoSegment2DIterator& itEnd) const
       {
@@ -37,8 +37,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all segment neighbors.
        */
-      virtual Weight operator()(const CDCRecoSegment2D& /* from */,
-                                const CDCRecoSegment2D& /* to */)
+      virtual Weight operator()(const CDCRecoSegment2D& from  __attribute__((unused)),
+                                const CDCRecoSegment2D& to  __attribute__((unused)))
       {
         return NAN;
       }

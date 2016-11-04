@@ -27,91 +27,131 @@ namespace Belle2 {
     template<class T>
     class WeightedRelation;
 
-    /// Interface for a minimal algorithm part that wants to expose some parameters to a module
+    /// Utility class to lookup identifier and description for event data objects useful to define parameters.
     class ClassMnemomics {
 
     public:
       /// Returns a short name for class CDCWireHit to be used in names of parameters.
-      static std::string getParameterName(const CDCWireHit*) { return "wireHit"; }
+      static std::string getParameterName(const CDCWireHit* dispatchTag __attribute__((unused)))
+      {
+        return "wireHit";
+      }
 
       /// Returns a short description for class CDCWireHit to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCWireHit*) { return "wire hit"; }
-
-
+      static std::string getParameterDescription(const CDCWireHit* dispatchTag __attribute__((unused)))
+      {
+        return "wire hit";
+      }
 
       /// Returns a short name for class CDCConformalHit to be used in names of parameters.
-      static std::string getParameterName(const CDCConformalHit*) { return "conformalHit"; }
+      static std::string getParameterName(const CDCConformalHit* dispatchTag __attribute__((unused)))
+      {
+        return "conformalHit";
+      }
 
       /// Returns a short description for class CDCConformalHit to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCConformalHit*) { return "conformal hit"; }
-
-
+      static std::string getParameterDescription(const CDCConformalHit* dispatchTag __attribute__((unused)))
+      {
+        return "conformal hit";
+      }
 
       /// Returns a short name for class CDCWireHitCluster to be used in names of parameters.
-      static std::string getParameterName(const CDCWireHitCluster*) { return "cluster"; }
+      static std::string getParameterName(const CDCWireHitCluster* dispatchTag __attribute__((unused)))
+      {
+        return "cluster";
+      }
 
       /// Returns a short description for class CDCWireHitCluster to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCWireHitCluster*) { return "wire hit cluster"; }
-
-
+      static std::string getParameterDescription(const CDCWireHitCluster* dispatchTag __attribute__((unused)))
+      {
+        return "wire hit cluster";
+      }
 
       /// Returns a short name for class CDCFacet to be used in names of parameters.
-      static std::string getParameterName(const CDCFacet*) { return "facet"; }
+      static std::string getParameterName(const CDCFacet* dispatchTag __attribute__((unused)))
+      {
+        return "facet";
+      }
 
       /// Returns a short description for class CDCFacet to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCFacet*) { return "facet"; }
-
-
+      static std::string getParameterDescription(const CDCFacet* dispatchTag __attribute__((unused)))
+      {
+        return "facet";
+      }
 
       /// Returns a short name for class CDCRecoSegment2D to be used in names of parameters.
-      static std::string getParameterName(const CDCRecoSegment2D*) { return "segment"; }
+      static std::string getParameterName(const CDCRecoSegment2D* dispatchTag __attribute__((unused)))
+      {
+        return "segment";
+      }
 
       /// Returns a short description for class CDCRecoSegment2D to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCRecoSegment2D*) { return "segment"; }
-
-
+      static std::string getParameterDescription(const CDCRecoSegment2D* dispatchTag __attribute__((unused)))
+      {
+        return "segment";
+      }
 
       /// Returns a short name for class CDCSegmentPair to be used in names of parameters.
-      static std::string getParameterName(const CDCSegmentPair*) { return "segmentPair"; }
+      static std::string getParameterName(const CDCSegmentPair* dispatchTag __attribute__((unused)))
+      {
+        return "segmentPair";
+      }
 
       /// Returns a short description for class CDCSegmentPair to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCSegmentPair*) { return "segment pair"; }
-
-
+      static std::string getParameterDescription(const CDCSegmentPair* dispatchTag __attribute__((unused)))
+      {
+        return "segment pair";
+      }
 
       /// Returns a short name for class CDCAxialSegmentPair to be used in names of parameters.
-      static std::string getParameterName(const CDCAxialSegmentPair*) { return "axialSegmentPair"; }
+      static std::string getParameterName(const CDCAxialSegmentPair* dispatchTag __attribute__((unused)))
+      {
+        return "axialSegmentPair";
+      }
 
       /// Returns a short description for class CDCAxialSegmentPair to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCAxialSegmentPair*) { return "axial segment pair"; }
-
-
+      static std::string getParameterDescription(const CDCAxialSegmentPair* tag __attribute__((unused)))
+      {
+        return "axial segment pair";
+      }
 
       /// Returns a short name for class CDCSegmentTriple to be used in names of parameters.
-      static std::string getParameterName(const CDCSegmentTriple*) { return "segmentTriple"; }
+      static std::string getParameterName(const CDCSegmentTriple* dispatchTag __attribute__((unused)))
+      {
+        return "segmentTriple";
+      }
 
       /// Returns a short description for class CDCSegmentTriple to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCSegmentTriple*) { return "segment triple"; }
-
-
+      static std::string getParameterDescription(const CDCSegmentTriple* dispatchTag __attribute__((unused)))
+      {
+        return "segment triple";
+      }
 
       /// Returns a short name for class CDCTrack to be used in names of parameters.
-      static std::string getParameterName(const CDCTrack*) { return "track"; }
+      static std::string getParameterName(const CDCTrack* dispatchTag __attribute__((unused)))
+      {
+        return "track";
+      }
 
       /// Returns a short description for class CDCTrack to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCTrack*) { return "track"; }
-
-
+      static std::string getParameterDescription(const CDCTrack* dispatchTag __attribute__((unused)))
+      {
+        return "track";
+      }
 
       /// Returns a short name for class WeightedRelation<T> to be used in names of parameters.
-      template<class T>
-      static std::string getParameterName(const WeightedRelation<T>*)
-      { return getParameterName((T*)(nullptr)) + "Relation"; }
+      template <class T>
+      static std::string getParameterName(const WeightedRelation<T>* dispatchTag __attribute__((unused)))
+      {
+        return getParameterName((T*)(nullptr)) + "Relation";
+      }
 
       /// Returns a short description for class WeightedRelation<T> to be used in descriptions.
-      template<class T>
-      static std::string getParameterDescription(const WeightedRelation<T>*)
-      { return getParameterDescription((T*)(nullptr)) + " relation"; }
+      template <class T>
+      static std::string getParameterDescription(const WeightedRelation<T>* dispatchTag __attribute__((unused)))
+      {
+        return getParameterDescription((T*)(nullptr)) + " relation";
+      }
 
     };
 

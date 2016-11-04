@@ -19,7 +19,7 @@ namespace Belle2 {
     class RandomFilter : public AFilter {
     public:
       /// Never reject an item but give back a random value between 0 and 1.
-      virtual Weight operator()(const typename AFilter::Object&) override
+      virtual Weight operator()(const typename AFilter::Object& object __attribute__((unused))) override
       {
         return gRandom->Rndm();
       }

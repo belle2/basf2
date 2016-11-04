@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
-
-#include <vector>
 #include <string>
 #include <cassert>
 
@@ -82,13 +80,11 @@ namespace Belle2 {
      *  @param array    Array from which the length should be taken.
      *  @return          The length of the array
      */
-    template<class T, size_t N>
-    constexpr
-    size_t size(T (&array)[N]);
-
-    template<class T, size_t N>
-    constexpr
-    size_t size(T (&)[N]) { return N; }
+    template <class T, size_t N>
+    constexpr size_t size(T (&array)[N] __attribute__((unused)))
+    {
+      return N;
+    }
     // *INDENT-ON*
 
     /**

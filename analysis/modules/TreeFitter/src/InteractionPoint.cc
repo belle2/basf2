@@ -38,7 +38,7 @@ namespace TreeFitter {
   }
   */
 
-  ErrCode InteractionPoint::initBeamSpot(/*Particle* particle*/) //FT: argument temporarily removed to avoid compiler warnings
+  ErrCode InteractionPoint::initBeamSpot(void /*Particle* particle*/) //FT: argument temporarily removed to avoid compiler warnings
   {
     ErrCode status ;
     bool success = false ;
@@ -91,7 +91,7 @@ namespace TreeFitter {
     return status ;
   }
 
-  ErrCode InteractionPoint::initPar2(/*FitParams* fitparams*/) //FT: argument temporarily removed to avoid compiler warnings
+  ErrCode InteractionPoint::initPar2(void /*FitParams* fitparams*/) //FT: argument temporarily removed to avoid compiler warnings
   {
     // nothing left to do: actually, should never be called
     assert(0) ;

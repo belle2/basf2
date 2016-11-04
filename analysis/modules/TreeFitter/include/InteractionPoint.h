@@ -25,12 +25,12 @@ namespace TreeFitter {
 
     virtual ~InteractionPoint() ;
 
-    ErrCode initBeamSpot(/*Particle* particle*/) ; //FT: argument temporarily removed to avoid compiler warnings
+    ErrCode initBeamSpot(void /*Particle* particle*/) ; //FT: argument temporarily removed to avoid compiler warnings
 
     virtual int dim() const { return 3 ; } // (x,y,z)
 
     virtual ErrCode initPar1(FitParams*) ;
-    virtual ErrCode initPar2(/* FitParams* */) ; //FT: argument temporarily removed to avoid compiler warnings
+    virtual ErrCode initPar2(void /* FitParams* */) ; //FT: argument temporarily removed to avoid compiler warnings
     virtual ErrCode initCov(FitParams*) const ;
 
     virtual int type() const { return kInteractionPoint ; }

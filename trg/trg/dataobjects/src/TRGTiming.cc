@@ -11,4 +11,4 @@
 
 using namespace Belle2;
 
-ClassImp(TRGTiming)
+//ClassImp(TRGTiming)

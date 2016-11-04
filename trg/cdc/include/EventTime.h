@@ -26,55 +26,55 @@
 #define TCEventTime TRGCDCEventTime
 #endif
 
-namespace Belle2{
+namespace Belle2 {
   class TRGCDC;
   class TRGCDCSegmentHit;
   class TRGCDCLink;
 
   class TRGCDCEventTime {
-    public:
+  public:
 
-      TRGCDCEventTime(const TRGCDC&, bool makeRootFile);
+    TRGCDCEventTime(const TRGCDC&, bool makeRootFile);
 
-      virtual ~TRGCDCEventTime();
-    
-    public : 
-      
-      void initialize(void);
-      void terminate(void);
-      void doit(int ver, bool print);
-      void hitcount(void);
-      void hist(void);
-      void oldVer(void);
-      void printFirm(void);
-      int getT0(void)const;
+    virtual ~TRGCDCEventTime();
 
-   
-    private : 
-      const TRGCDC & _cdc;
+  public :
 
-      TFile* m_fileEvtTime;
-      TTree* m_evtOutputTs;
-      TTree* m_evtOut;
-      TH1* h;
- 
-      int m_fastestT;
-      int m_histT;
-      int cnt[9][64];
-      int ft[9][64][10];
-      bool m_foundT0;
-      int m_foundT;
-      int m_whdiff;
-      int m_minusET;
-      int m_noET;
-      int m_allET;
-      int m_yesET;
-      int threshold;
+    void initialize(void);
+    void terminate(void);
+    void doit(int ver, bool print);
+    void hitcount(void);
+    void hist(void);
+    void oldVer(void);
+    void printFirm(void);
+    int getT0(void)const;
 
-      int m_eventN;
 
-      bool m_makeRootFile;
-      int m_ver;
+  private :
+    const TRGCDC& _cdc;
+
+    TFile* m_fileEvtTime;
+    TTree* m_evtOutputTs;
+    TTree* m_evtOut;
+    TH1* h;
+
+    int m_fastestT;
+    int m_histT;
+    int cnt[9][64];
+    int ft[9][64][10];
+    bool m_foundT0;
+    int m_foundT;
+    int m_whdiff;
+    int m_minusET;
+    int m_noET;
+//    int m_allET;
+//    int m_yesET;
+    int threshold;
+
+    int m_eventN;
+
+    bool m_makeRootFile;
+    int m_ver;
 
   };
 } // namespace Belle2

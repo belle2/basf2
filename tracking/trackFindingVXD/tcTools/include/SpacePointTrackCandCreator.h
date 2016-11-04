@@ -45,6 +45,7 @@ namespace Belle2 {
 
         // Set relations between Nodes and Space Point Track Candidates
         for (const SpacePoint* aNode : aPath) { // is a const SpacePoint* here
+          if (aNode->getType() == VXD::SensorInfoBase::VXD) continue; /**< Don't create a relation for the VirtualIP. */
           aNode->addRelationTo(newSPTC, 1.);
           newSPTC->addRelationTo(aNode, 1.);
         }

@@ -24,7 +24,7 @@ namespace TreeFitter {
       m_ipCovInv(3)//the last two matrices should be initialized to identity
   {
     //assert(particle->pdtEntry()->lundId()%1000 == PdtLund::Upsilon ) ;
-    initBeamSpot(/*particle*/) ; //FT: argument temporarily removed to avoid compiler warnings
+    initBeamSpot(particle) ;
   }
 
   /*
@@ -38,8 +38,9 @@ namespace TreeFitter {
   }
   */
 
-  ErrCode InteractionPoint::initBeamSpot(void /*Particle* particle*/) //FT: argument temporarily removed to avoid compiler warnings
+  ErrCode InteractionPoint::initBeamSpot(Particle* particle __attribute__((unused)))
   {
+
     ErrCode status ;
     bool success = false ;
     // find the constraint
@@ -91,7 +92,7 @@ namespace TreeFitter {
     return status ;
   }
 
-  ErrCode InteractionPoint::initPar2(void /*FitParams* fitparams*/) //FT: argument temporarily removed to avoid compiler warnings
+  ErrCode InteractionPoint::initPar2(FitParams* fitparams __attribute__((unused)))
   {
     // nothing left to do: actually, should never be called
     assert(0) ;

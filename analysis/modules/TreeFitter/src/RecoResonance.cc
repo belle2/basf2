@@ -38,7 +38,7 @@ namespace TreeFitter {
     return ErrCode::success ;
   }
 
-  ErrCode RecoResonance::initPar2(void /*FitParams* fitparams*/) //FT: argument temporarily removed to avoid compiler warnings
+  ErrCode RecoResonance::initPar2(FitParams* fitparams __attribute__((unused)))
   {
     // nothing to do!
     return ErrCode::success ;

@@ -112,7 +112,11 @@ def add_mc_matcher(path, components=None):
     """
     path.add_module('TrackFinderMCTruthRecoTracks',
                     RecoTracksStoreArrayName='MCRecoTracks',
-                    WhichParticles=[])
+                    WhichParticles=[],
+                    UsePXDHits=is_pxd_used(components),
+                    UseSVDHits=is_svd_used(components),
+                    UseCDCHits=is_cdc_used(components))
+
     path.add_module('MCRecoTracksMatcher',
                     mcRecoTracksStoreArrayName='MCRecoTracks',
                     UsePXDHits=is_pxd_used(components),
@@ -441,9 +445,10 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
         add_geometry_modules(path, components)
 
     # Material effects
-    material_effects = register_module('SetupGenfitExtrapolation')
-    material_effects.set_name('SetupGenfitExtrapolationForPXDDataReduction')
-    path.add_module(material_effects)
+    if 'SetupGenfitExtrapolation' not in path:
+        material_effects = register_module('SetupGenfitExtrapolation')
+        material_effects.set_name('SetupGenfitExtrapolationForPXDDataReduction')
+        path.add_module(material_effects)
 
     # SET StoreArray names
     svd_gf_trackcands = '__ROIsvdGFTrackCands'

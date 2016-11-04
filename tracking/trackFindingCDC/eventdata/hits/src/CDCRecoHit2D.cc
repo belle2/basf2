@@ -99,3 +99,22 @@ CDCRecoHit2D CDCRecoHit2D::getAlias() const
 {
   return CDCRecoHit2D(getRLWireHit().getAlias(), -getRecoDisp2D());
 }
+
+
+void CDCRecoHit2D::setRefDriftLength(double driftLength, bool snapRecoPos)
+{
+  double oldDriftLength = m_rlWireHit.getRefDriftLength();
+  m_rlWireHit.setRefDriftLength(driftLength);
+  if (snapRecoPos) {
+    bool switchSide = sign(oldDriftLength) != sign(driftLength);
+    snapToDriftCircle(switchSide);
+  }
+}
+
+void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
+{
+  m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength());
+  if (switchSide) {
+    m_recoDisp2D = -m_recoDisp2D;
+  }
+}

@@ -272,6 +272,12 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /**
        *  Constructs a two dimensional reconstructed hit by
        *  carrying out the stereo ! projection to the wire reference postion.
@@ -291,7 +297,7 @@ namespace Belle2 {
       { return getWire().getWirePos2DAtZ(getRecoZ()); }
 
       /// Scales the displacement vector in place to lie on the dirft circle.
-      void snapToDriftCircle();
+      void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Returns the drift length next to the reconstructed position.
@@ -300,9 +306,8 @@ namespace Belle2 {
       double getSignedRecoDriftLength() const
       { return getRLWireHit().getSignedRefDriftLength(); }
 
-      /// Settter to update the drift length of the hit
-      void setRecoDriftLength(double driftLength)
-      { m_rlWireHit.setRefDriftLength(driftLength); }
+      /// Setter to update the drift length of the hit
+      void setRecoDriftLength(double driftLength, bool snapRecoPos);
 
       /**
        *  Returns the drift length variance next to the reconstructed position.

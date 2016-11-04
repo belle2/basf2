@@ -12,18 +12,12 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/Range.h>
-
-#include <cdc/dataobjects/CDCHit.h>
-#include <cdc/dataobjects/TDCCountTranslatorBase.h>
-
 #include <memory>
 
 namespace Belle2 {
+  class CDCHit;
+
   namespace TrackFindingCDC {
-
-    class CDCSimpleSimulation;
-
     /// Class representating the wire hit arrangement in the current event in the whole of the central drift chamber.
     /** This class stores the hits in the CDC that have been unpacked from the raw CDCHits and geometrical information
      *  of the wire position an initial estimate of the drift length is attached.
@@ -44,20 +38,20 @@ namespace Belle2 {
       static void initialize();
 
       /** Fill the topology with preconstructed wire hits*/
-      void fill(std::shared_ptr<VectorRange<CDCWireHit> > wireHits);
+      void fill(std::shared_ptr<ConstVectorRange<CDCWireHit> > wireHits);
 
       /// Getter for the wire hit that is based on the given CDCHit.
       const Belle2::TrackFindingCDC::CDCWireHit* getWireHit(const Belle2::CDCHit* ptrHit) const;
 
       /// Constant getter for the wire hits
-      const VectorRange<CDCWireHit>& getWireHits() const
+      const ConstVectorRange<CDCWireHit>& getWireHits() const
       {
         B2ASSERT("CDCWireHitTopology was not filled with hits. Have you executed the WireHitPreparer?", m_wireHits);
         return *m_wireHits;
       }
 
       /// Getter for the wire hits
-      VectorRange<CDCWireHit> getWireHits()
+      ConstVectorRange<CDCWireHit> getWireHits()
       {
         B2ASSERT("CDCWireHitTopology was not filled with hits. Have you executed the WireHitPreparer?", m_wireHits);
         return *m_wireHits;
@@ -65,7 +59,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the wire hits to be stored
-      std::shared_ptr<VectorRange<CDCWireHit> > m_wireHits {nullptr}; //!
+      std::shared_ptr<ConstVectorRange<CDCWireHit> > m_wireHits {nullptr}; //!
 
       /// Macro turning CDCWireHitTopology into a root class
       ClassDef(CDCWireHitTopology, 1);

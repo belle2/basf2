@@ -12,25 +12,24 @@
 #pragma link C++ class Belle2::TrackFindingCDC::Vector2D+;
 #pragma link C++ class Belle2::TrackFindingCDC::Vector3D+;
 
-#pragma link C++ class Belle2::TrackFindingCDC::Circle2D+;
-
 #pragma link C++ class Belle2::TrackFindingCDC::Line2D+;
-#pragma link C++ class Belle2::TrackFindingCDC::ParameterLine2D+;
-//#pragma link C++ class Belle2::TrackFindingCDC::LineCovariance+;
-#pragma link C++ class Belle2::TrackFindingCDC::UncertainParameterLine2D+;
-
+#pragma link C++ class Belle2::TrackFindingCDC::Circle2D+;
 #pragma link C++ class Belle2::TrackFindingCDC::GeneralizedCircle+;
 
+#pragma link C++ class Belle2::TrackFindingCDC::ParameterLine2D+;
+#pragma link C++ defined_in "LineParameters.h";
+#pragma link C++ class Belle2::TrackFindingCDC::UncertainParameterLine2D+;
+
 #pragma link C++ class Belle2::TrackFindingCDC::PerigeeCircle+;
-//#pragma link C++ class Belle2::TrackFindingCDC::PerigeeCovariance+;
+#pragma link C++ defined_in "PerigeeParameters.h";
 #pragma link C++ class Belle2::TrackFindingCDC::UncertainPerigeeCircle+;
 
-//#pragma link C++ class Belle2::TrackFindingCDC::SZCovariance+;
+#pragma link C++ class Belle2::TrackFindingCDC::SZLine+;
+#pragma link C++ defined_in "SZParameters.h";
 #pragma link C++ class Belle2::TrackFindingCDC::UncertainSZLine+;
 
 #pragma link C++ class Belle2::TrackFindingCDC::Helix+;
-//#pragma link C++ class Belle2::TrackFindingCDC::HelixCovariance+;
+#pragma link C++ defined_in "HelixParameters.h";
 #pragma link C++ class Belle2::TrackFindingCDC::UncertainHelix+;
 
 #endif
-

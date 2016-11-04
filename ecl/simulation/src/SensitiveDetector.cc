@@ -144,6 +144,9 @@ SensitiveDiode::SensitiveDiode(const G4String& name):
 {
   m_eclHits.registerInDataStore("ECLDiodeHits");
   m_eclp = ECLGeometryPar::Instance();
+  m_trackID = -1;
+  m_tsum = 0;
+  m_esum = 0;
 }
 
 SensitiveDiode::~SensitiveDiode()

@@ -24,15 +24,15 @@ namespace Belle2 {
       /// Add the parameters of the estimator to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
 
+      /// Update the drift length of the reconstructed hit in place.
+      double updateDriftLength(CDCRecoHit2D& recoHit2D);
+
       /**
        *  Reestimate the drift length of all three contained drift circles.
        *  Using the additional flight direction information the accuracy of the drift length
        *  can be increased alot helping the filters following this step
        */
       void updateDriftLength(CDCFacet& facet);
-
-      /// Update the drift length of the reconstructed hit in place.
-      void updateDriftLength(CDCRecoHit2D& recoHit2D);
 
       /// Update the drift length of the contained reconstructed hit in place.
       void updateDriftLength(CDCRecoSegment2D& segment);

@@ -137,6 +137,10 @@ namespace Belle2 {
       double deltaZ() const
       { return forwardZ() - backwardZ(); }
 
+      /// Returns the amount how much the given z position is outside the bounds in units of the wire length
+      double outOfZBoundsFactor(double z) const
+      { return std::fmax(backwardZ() - z, z - forwardZ()) / deltaZ(); }
+
       /// Gives the forward azimuth angle
       double forwardPhi() const
       { return forward2D().phi(); }

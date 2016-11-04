@@ -27,10 +27,11 @@ namespace Belle2 {
       using Super::operator();
 
     public:
-      /// TODO implement something sensable here.
+
+      /// Main filter method weighting the relation between the segment pairs.
       virtual
-      Weight operator()(const CDCSegmentPair& fromPair,
-                        const CDCSegmentPair& toPair) override final;
+      Weight operator()(const CDCSegmentPair& fromSegmentPair,
+                        const CDCSegmentPair& toSegmentPair) override final;
 
     }; // end class
 

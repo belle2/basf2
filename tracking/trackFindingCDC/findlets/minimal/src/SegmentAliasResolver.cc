@@ -74,14 +74,7 @@ void SegmentAliasResolver::apply(std::vector<CDCRecoSegment2D>& outputSegments)
 {
   if (m_fullAlias) {
     for (CDCRecoSegment2D& segment : outputSegments) {
-      ERightLeft rlInfo = ERightLeft::c_Invalid;
-      int nRLSwitches = -1;
-      for (CDCRecoHit2D& recoHit2D : segment) {
-        if (rlInfo != recoHit2D.getRLInfo()) {
-          rlInfo = recoHit2D.getRLInfo();
-          ++nRLSwitches;
-        }
-      }
+      int nRLSwitches = segment.getNRLSwitches();
       // Sufficiently right left constrained that the alias is already fixed.
       bool aliasStable = nRLSwitches > 2;
       if (aliasStable) continue;

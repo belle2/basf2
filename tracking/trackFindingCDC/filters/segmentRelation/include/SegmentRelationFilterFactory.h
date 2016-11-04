@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /** Fill the default filter name and parameter values*/
-      SegmentRelationFilterFactory(const std::string& defaultFilterName = "none");
+      SegmentRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
       using Super::create;
 

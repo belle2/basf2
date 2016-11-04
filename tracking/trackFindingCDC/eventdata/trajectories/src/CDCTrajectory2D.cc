@@ -166,6 +166,13 @@ bool CDCTrajectory2D::isCurler(double factor) const
   return getMaximalCylindricalR() < factor * topology.getOuterCylindricalR();
 }
 
+bool CDCTrajectory2D::isOriginer(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  return getMinimalCylindricalR() < factor * topology.getInnerCylindricalR();
+}
+
+
 ESign CDCTrajectory2D::getChargeSign() const
 {
   return CDCBFieldUtil::ccwInfoToChargeSign(getLocalCircle()->orientation());

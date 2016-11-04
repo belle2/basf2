@@ -71,6 +71,12 @@ namespace Belle2 {
       /// Getter for the alias version of the segment - fit not copied.
       CDCRecoSegment2D getAlias() const;
 
+      /// Getter for the number of changes in the right left passage in the segment
+      int getNRLSwitches() const;
+
+      /// Getter for the sum of right left information relative to the size.
+      double getRLAsymmetry() const;
+
       /** Fill the hit content of this segment into a genfit::TrackCand.
        *  @return true, if the trajectory information is valid, false otherwise.
        */
@@ -92,16 +98,16 @@ namespace Belle2 {
 
       /// Unset the masked flag of the automaton cell of this segment
       /// and of all contained wire hits.
-      void unsetAndForwardMaskedFlag() const;
+      void unsetAndForwardMaskedFlag(bool toHits = false) const;
 
       /// Set the masked flag of the automaton cell of this segment
       /// and forward the masked flag to all contained wire hits.
-      void setAndForwardMaskedFlag() const;
+      void setAndForwardMaskedFlag(bool toHits = false) const;
 
       /// Check all contained wire hits if one has the masked flag.
       /** Set the masked flag of this segment in case at least one of
        *  the contained wire hits is flagged as masked.*/
-      void receiveMaskedFlag() const;
+      void receiveMaskedFlag(bool fromHits = false) const;
 
       /// Getter for the global super cluster id.
       int getISuperCluster() const

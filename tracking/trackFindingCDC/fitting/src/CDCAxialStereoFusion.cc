@@ -64,48 +64,67 @@ namespace {
                                           theta,
                                           hit->getADCCount());
 
-      if (driftLength > 0) {
-        recoHit3D.setRecoDriftLength(driftLength);
-        recoHit3D.snapToDriftCircle();
+      if (driftLength > -2) {
+        bool snapRecoPos = true;
+        recoHit3D.setRecoDriftLength(driftLength, snapRecoPos);
       }
     }
   }
 }
 
-JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
-                                                         const CDCTrajectory2D& trajectory2D)
+void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegmentPair& segmentPair)
 {
-  size_t nHits = recoSegment3D.size();
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
-  const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
-
-  double zeta = 0;
-  for (const CDCRecoHit3D& recoHit3D : recoSegment3D) {
-    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
-    const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
-    const Vector2D normal = localCircle->normal(localRecoPos2D);
-    const CDCWire& wire = recoHit3D.getWire();
-    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).dot(normal);
+  if (not ptrFromSegment) {
+    B2WARNING("From segment unset.");
+    return;
   }
-  zeta /= nHits;
 
-  JacobianMatrix<3, 5> result = JacobianMatrixUtil::zero<3, 5>();
+  if (not ptrToSegment) {
+    B2WARNING("To segment unset.");
+    return;
+  }
 
-  using namespace NHelixParameterIndices;
-  result(c_Curv, c_Curv) = 1.0;
-  result(c_Phi0, c_Phi0) = 1.0;
-  result(c_I, c_I)       = 1.0;
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
 
-  result(c_Phi0, c_TanL) =   zeta;
-  result(c_I, c_Z0)      = - zeta;
-
-  return result;
-
+  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(fromSegment, toSegment);
+  segmentPair.setTrajectory3D(trajectory3D);
 }
+
+void CDCAxialStereoFusion::fusePreliminary(const CDCSegmentPair& segmentPair)
+{
+  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+
+  if (not ptrFromSegment) {
+    B2WARNING("From segment unset.");
+    return;
+  }
+
+  if (not ptrToSegment) {
+    B2WARNING("To segment unset.");
+    return;
+  }
+  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
+  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+
+  CDCTrajectory3D trajectory3D = fusePreliminary(fromSegment, toSegment);
+  segmentPair.setTrajectory3D(trajectory3D);
+}
+
 
 CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
     const CDCRecoSegment2D& toSegment2D)
+{
+  CDCTrajectory3D preliminaryTrajectory3D = fusePreliminary(fromSegment2D, toSegment2D);
+  return reconstructFuseTrajectories(fromSegment2D, toSegment2D, preliminaryTrajectory3D);
+}
+
+CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCRecoSegment2D& fromSegment2D,
+                                                      const CDCRecoSegment2D& toSegment2D)
 {
   if (fromSegment2D.empty()) {
     B2WARNING("From segment is empty.");
@@ -118,7 +137,6 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   }
 
   bool fromIsAxial = fromSegment2D.isAxial();
-
   const CDCAxialRecoSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
   const CDCStereoRecoSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
 
@@ -153,6 +171,15 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   CDCTrajectory3D preliminaryTrajectory3D(axialTrajectory2D, trajectorySZ);
   Vector3D localOrigin3D(localOrigin2D, 0.0);
   preliminaryTrajectory3D.setLocalOrigin(localOrigin3D);
+  return preliminaryTrajectory3D;
+}
+
+CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
+    const CDCRecoSegment2D& toSegment2D,
+    const CDCTrajectory3D& preliminaryTrajectory3D)
+{
+  Vector3D localOrigin3D = preliminaryTrajectory3D.getLocalOrigin();
+  Vector2D localOrigin2D = localOrigin3D.xy();
 
   CDCRiemannFitter riemannFitter;
   //riemannFitter.useOnlyOrientation();
@@ -184,24 +211,33 @@ CDCTrajectory3D CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCRecoS
   return CDCTrajectory3D(localOrigin3D, resultHelix);
 }
 
-void CDCAxialStereoFusion::reconstructFuseTrajectories(const CDCSegmentPair& segmentPair)
+JacobianMatrix<3, 5> CDCAxialStereoFusion::calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+                                                         const CDCTrajectory2D& trajectory2D)
 {
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  size_t nHits = recoSegment3D.size();
 
-  if (not ptrFromSegment) {
-    B2WARNING("From segment unset.");
-    return;
+  const Vector2D& localOrigin2D = trajectory2D.getLocalOrigin();
+  const UncertainPerigeeCircle& localCircle = trajectory2D.getLocalCircle();
+
+  double zeta = 0;
+  for (const CDCRecoHit3D& recoHit3D : recoSegment3D) {
+    const Vector2D& recoPos2D = recoHit3D.getRecoPos2D();
+    const Vector2D localRecoPos2D = recoPos2D - localOrigin2D;
+    const Vector2D normal = localCircle->normal(localRecoPos2D);
+    const CDCWire& wire = recoHit3D.getWire();
+    zeta += wire.getWireLine().sagMovePerZ(recoHit3D.getRecoZ()).dot(normal);
   }
+  zeta /= nHits;
 
-  if (not ptrToSegment) {
-    B2WARNING("To segment unset.");
-    return;
-  }
+  JacobianMatrix<3, 5> result = JacobianMatrixUtil::zero<3, 5>();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  using namespace NHelixParameterIndices;
+  result(c_Curv, c_Curv) = 1.0;
+  result(c_Phi0, c_Phi0) = 1.0;
+  result(c_I, c_I)       = 1.0;
 
-  CDCTrajectory3D trajectory3D = reconstructFuseTrajectories(fromSegment, toSegment);
-  segmentPair.setTrajectory3D(trajectory3D);
+  result(c_Phi0, c_TanL) =   zeta;
+  result(c_I, c_Z0)      = - zeta;
+
+  return result;
 }

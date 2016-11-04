@@ -201,8 +201,7 @@ namespace Belle2 {
       { return getRLWireHit().getRefDriftLength(); }
 
       /// Setter for the drift length at the wire reference position.
-      void setRefDriftLength(double driftLength)
-      { return m_rlWireHit.setRefDriftLength(driftLength); }
+      void setRefDriftLength(double driftLength, bool snapRecoPos);
 
       /// Getter for the drift length at the wire reference position signed with the right left passage hypotheses.
       double getSignedRefDriftLength() const
@@ -231,9 +230,14 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /// Scales the displacement vector in place to lie on the dirft circle.
-      void snapToDriftCircle()
-      { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }
+      void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Reconstruct the three dimensional position (especially of stereo hits)

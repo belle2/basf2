@@ -47,6 +47,10 @@ namespace Belle2 {
         addProcessingSignalListener(&m_trackMerger);
         addProcessingSignalListener(&m_trackOrienter);
         addProcessingSignalListener(&m_segmentPairSwapper);
+
+        ModuleParamList moduleParamList;
+        this->exposeParameters(&moduleParamList);
+        moduleParamList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
       }
 
       /// Short description of the findlet
@@ -73,7 +77,7 @@ namespace Belle2 {
         m_segmentPairs.clear();
         m_segmentPairRelations.clear();
         m_preMergeTracks.clear();
-        m_mergedTracks.clear();
+        m_orientedTracks.clear();
         Super::beginEvent();
       }
 
@@ -84,15 +88,16 @@ namespace Belle2 {
         m_segmentPairs.reserve(100);
         m_segmentPairRelations.reserve(100);
         m_preMergeTracks.reserve(20);
-        m_mergedTracks.reserve(20);
+        m_orientedTracks.reserve(20);
 
         m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
         m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
         m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preMergeTracks);
 
         m_trackCreatorSingleSegments.apply(inputSegments, m_preMergeTracks);
-        m_trackMerger.apply(m_preMergeTracks, m_mergedTracks);
-        m_trackOrienter.apply(m_mergedTracks, tracks);
+
+        m_trackOrienter.apply(m_preMergeTracks, m_orientedTracks);
+        m_trackMerger.apply(m_orientedTracks, tracks);
 
         // Put the segment pairs on the DataStore
         m_segmentPairSwapper.apply(m_segmentPairs);
@@ -132,8 +137,8 @@ namespace Belle2 {
       /// Memory for the tracks before merging was applied.
       std::vector<CDCTrack> m_preMergeTracks;
 
-      /// Memory for the tracks after merging was applied.
-      std::vector<CDCTrack> m_mergedTracks;
+      /// Memory for the tracks after orientation was applied.
+      std::vector<CDCTrack> m_orientedTracks;
 
     }; // end class TrackFinderSegmentPairAutomaton
 

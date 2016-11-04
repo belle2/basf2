@@ -25,7 +25,13 @@ namespace Belle2 {
     /// Names of the variables to be generated.
     constexpr
     static char const* const segmentRelationFitNames[] = {
-      "chi2_common"
+      "is_fitted",
+      "curv",
+      "curv_var",
+      "chi2",
+      "chi2_per_ndf",
+      "ndf",
+      "p_value",
     };
 
     /**

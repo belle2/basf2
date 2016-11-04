@@ -32,6 +32,8 @@ namespace Belle2 {
       c_Downwards,
       /// Make two copies of the of each track where one is reversed to the other to let a following algorithm examine both possibilites.
       c_Symmetric,
+      /// Make two copies of the of tracks that are likely curling fix others to outwards.
+      c_Curling,
     };
 
     /// Helper function to translate user provided strings to the enum values of the preferred direction
@@ -45,6 +47,8 @@ namespace Belle2 {
         return EPreferredDirection::c_Outwards;
       } else if (preferredDirectionString == std::string("downwards")) {
         return EPreferredDirection::c_Downwards;
+      } else if (preferredDirectionString == std::string("curling")) {
+        return EPreferredDirection::c_Curling;
       } else {
         throw std::invalid_argument("Unexpected preferred direction string : '" + preferredDirectionString + "'");
       }

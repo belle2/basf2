@@ -5,12 +5,15 @@
 <header>
   <contact>oliver.frost@desy.de</contact>
   <input>EvtGenSimNoBkg.root</input>
-  <output>CDCLocalTrackingValidation.root</output>
-  <description>This module validates that local track finding is capable of reconstructing tracks in Y(4S) runs.</description>
+  <output>CDCAutomatonTrackingValidation.root</output>
+  <description>
+  This module validates that cdc cellular automaton track finding
+  is capable of reconstructing tracks in Y(4S) runs.
+  </description>
 </header>
 """
 
-VALIDATION_OUTPUT_FILE = 'CDCLocalTrackingValidation.root'
+VALIDATION_OUTPUT_FILE = 'CDCAutomatonTrackingValidation.root'
 CONTACT = 'oliver.frost@desy.de'
 N_EVENTS = 1000
 ACTIVE = True
@@ -23,15 +26,18 @@ import logging
 from tracking.validation.run import TrackingValidationRun
 
 
-class CDCLocal(TrackingValidationRun):
+class CDCAutomaton(TrackingValidationRun):
     n_events = N_EVENTS
     root_input_file = '../EvtGenSimNoBkg.root'
     finder_module = 'TrackFinderCDCAutomaton'
-    tracking_coverage = {'UsePXDHits': False,
-                         'UseSVDHits': False,
-                         'UseCDCHits': True,
-                         'UseOnlyAxialCDCHits': False}
-
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': False,
+        # 'WhichParticles': ['CDC'], # Uncomment to count also secondary tracks
+        # 'EnergyCut': 0.1,
+    }
     fit_geometry = None
     pulls = True
     contact = CONTACT
@@ -39,7 +45,7 @@ class CDCLocal(TrackingValidationRun):
 
 
 def main():
-    validation_run = CDCLocal()
+    validation_run = CDCAutomaton()
     validation_run.configure_and_execute_from_commandline()
 
 

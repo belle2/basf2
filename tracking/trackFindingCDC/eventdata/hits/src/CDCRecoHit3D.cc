@@ -168,7 +168,7 @@ CDCRecoHit3D CDCRecoHit3D::reversed() const
   return CDCRecoHit3D(getRLWireHit().reversed(), getRecoPos3D(), -getArcLength2D());
 }
 
-void CDCRecoHit3D::snapToDriftCircle()
+void CDCRecoHit3D::snapToDriftCircle(bool switchSide)
 {
   const CDCWire& wire = getWire();
   const double recoPosZ = getRecoPos3D().z();
@@ -177,5 +177,18 @@ void CDCRecoHit3D::snapToDriftCircle()
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
 
   disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));
+  if (switchSide) {
+    disp2D = -disp2D;
+  }
   m_recoPos3D = Vector3D(wirePos + disp2D, recoPosZ);
+}
+
+void CDCRecoHit3D::setRecoDriftLength(double driftLength, bool snapRecoPos)
+{
+  double oldDriftLength = m_rlWireHit.getRefDriftLength();
+  m_rlWireHit.setRefDriftLength(driftLength);
+  if (snapRecoPos) {
+    bool switchSide = sign(oldDriftLength) != sign(driftLength);
+    snapToDriftCircle(switchSide);
+  }
 }

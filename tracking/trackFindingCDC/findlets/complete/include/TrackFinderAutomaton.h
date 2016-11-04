@@ -25,11 +25,9 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-#include <vector>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -40,85 +38,24 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef Findlet<> Super;
+      using Super = Findlet<>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      TrackFinderAutomaton()
-      {
-        addProcessingSignalListener(&m_wireHitsSwapper);
-        addProcessingSignalListener(&m_segmentsSwapper);
-        addProcessingSignalListener(&m_tracksSwapper);
-
-        addProcessingSignalListener(&m_wireHitTopologyPreparer);
-        addProcessingSignalListener(&m_segmentFinderFacetAutomaton);
-        addProcessingSignalListener(&m_trackFinderSegmentPairAutomaton);
-        addProcessingSignalListener(&m_trackFlightTimeAdjuster);
-        addProcessingSignalListener(&m_trackExporter);
-      }
+      TrackFinderAutomaton();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
-      }
+      virtual std::string getDescription() override;
 
       /// Expose the parameters of the cluster filter to a module
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        m_wireHitsSwapper.exposeParameters(moduleParamList, prefix);
-        m_segmentsSwapper.exposeParameters(moduleParamList, prefix);
-        m_tracksSwapper.exposeParameters(moduleParamList, prefix);
-
-        m_wireHitTopologyPreparer.exposeParameters(moduleParamList, prefix);
-        m_segmentFinderFacetAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackFinderSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackFlightTimeAdjuster.exposeParameters(moduleParamList, prefix);
-        m_trackExporter.exposeParameters(moduleParamList, prefix);
-
-        moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-        moduleParamList->getParameter<std::string>("SegmentOrientation").resetValue();
-
-        moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
-        moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
-
-        // Mimics earlier behaviour
-        moduleParamList->getParameter<bool>("WriteSegments").setDefaultValue(true);
-        moduleParamList->getParameter<bool>("WriteSegments").resetValue();
-      }
+                                    const std::string& prefix = "") override;
 
       /// Generates the segment.
-      virtual void apply() override final
-      {
-        std::vector<CDCWireHit> wireHits;
-        std::vector<CDCRecoSegment2D> segments;
-        std::vector<CDCTrack> tracks;
-
-        // Aquire the wire hits, segments and tracks from the DataStore
-        m_wireHitsSwapper.apply(wireHits);
-        m_segmentsSwapper.apply(segments);
-        m_tracksSwapper.apply(tracks);
-
-        wireHits.reserve(1000);
-        segments.reserve(100);
-        tracks.reserve(20);
-
-        m_wireHitTopologyPreparer.apply(wireHits);
-        m_segmentFinderFacetAutomaton.apply(wireHits, segments);
-        m_trackFinderSegmentPairAutomaton.apply(segments, tracks);
-        m_trackFlightTimeAdjuster.apply(tracks);
-        m_trackExporter.apply(tracks);
-
-        // Put the segments and tracks on the DataStore
-        m_wireHitsSwapper.apply(wireHits);
-        m_segmentsSwapper.apply(segments);
-        m_tracksSwapper.apply(tracks);
-      }
+      virtual void apply() override final;
 
     private:
       // Findlets
-
       /// Preparation findlet creating the wire hits from the packed CDCHits
       WireHitTopologyPreparer m_wireHitTopologyPreparer;
 

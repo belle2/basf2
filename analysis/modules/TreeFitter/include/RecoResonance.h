@@ -26,7 +26,7 @@ namespace TreeFitter {
 
     virtual ErrCode projectConstraint(Constraint::Type, const FitParams&, Projection&) const ;
     virtual ErrCode initPar1(FitParams*) ;
-    virtual ErrCode initPar2(/* FitParams* */) ; //FT: argument temporarily removed to avoid compiler warnings
+    virtual ErrCode initPar2(void /* FitParams* */) ; //FT: argument temporarily removed to avoid compiler warnings
     virtual int type() const { return kRecoResonance ; }
 
     virtual int posIndex() const { return mother()->posIndex()  ; }

@@ -10,12 +10,13 @@
 #include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilters.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-SegmentRelationFilterFactory::SegmentRelationFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+SegmentRelationFilterFactory::SegmentRelationFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
 }
 
@@ -38,6 +39,8 @@ SegmentRelationFilterFactory::getValidFilterNamesAndDescriptions() const
   filterNames.insert({
     {"none", "no segment relation is valid, stop at segment creation."},
     {"truth", "segment relations from monte carlo truth"},
+    {"feasible", "check if the segment relation is feasible"},
+    {"realistic", "check if the segment relation is a good combination"},
     {"unionrecording", "record many multiple choosable variable set"},
   });
 
@@ -48,11 +51,15 @@ std::unique_ptr<BaseSegmentRelationFilter >
 SegmentRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseSegmentRelationFilter >(new BaseSegmentRelationFilter());
+    return makeUnique<BaseSegmentRelationFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleSegmentRelationFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticSegmentRelationFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseSegmentRelationFilter >(new MCSegmentRelationFilter());
+    return makeUnique<MCSegmentRelationFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<BaseSegmentRelationFilter >(new UnionRecordingSegmentRelationFilter());
+    return makeUnique<UnionRecordingSegmentRelationFilter>();
   } else {
     return Super::create(filterName);
   }

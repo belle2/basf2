@@ -9,4 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitSegmentRelationVarSet.h>

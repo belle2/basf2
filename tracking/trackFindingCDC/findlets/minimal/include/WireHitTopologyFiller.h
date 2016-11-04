@@ -47,8 +47,8 @@ namespace Belle2 {
       /// Main method that publishes the given wire hits in the CDCWireHitTopology.
       virtual void apply(std::vector<CDCWireHit>& wireHits) override final
       {
-        std::shared_ptr<VectorRange<CDCWireHit> > sharedWireHits{
-          new VectorRange<CDCWireHit>(wireHits.begin(), wireHits.end())
+        std::shared_ptr<ConstVectorRange<CDCWireHit> > sharedWireHits{
+          new ConstVectorRange<CDCWireHit>(wireHits.begin(), wireHits.end())
         };
         CDCWireHitTopology::getInstance().fill(sharedWireHits);
       }

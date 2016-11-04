@@ -18,6 +18,7 @@
 #include <vector>
 #include <string>
 #include <cassert>
+#include <limits>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -138,6 +139,35 @@ namespace Belle2 {
         static_assert(I < nVars, "Requested variable index exceeds number variables.");
         return m_variables[I];
       }
+
+      /// Helper construct to assign a finite value to float variables.
+      template<typename AFloat>
+      struct AssignFinite {
+        /// Setup the assignment to a variable
+        AssignFinite(AFloat& value) : m_value(value) {}
+
+        /// Unpacker of the wrapper
+        operator AFloat& () { return m_value; }
+
+        /// Assign value replacing infinite values with the maximum value possible
+        void operator=(const AFloat& value)
+        {
+          m_value = value;
+          if (not std::isfinite(value)) m_value = std::copysign(std::numeric_limits<AFloat>::max(), value);
+        }
+      private:
+        /// Reference to the variable to be assigned
+        AFloat& m_value;
+      };
+
+      /// Reference getter for the value of the ith variable. Transforms non-finite values to finite value
+      template<int I>
+      AssignFinite<Float_t> finitevar()
+      {
+        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        return AssignFinite<Float_t>(m_variables[I]);
+      }
+
 
       /// Set the given variable to the value if the value is not NaN els set it to valueIfNaN.
       template<int I>

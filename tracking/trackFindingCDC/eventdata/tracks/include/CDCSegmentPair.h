@@ -92,7 +92,9 @@ namespace Belle2 {
       ISuperLayer getToISuperLayer() const
       { return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getToSegment()->getISuperLayer(); }
 
-
+      /// Getter for the total number of hits in this segment pair
+      std::size_t size() const
+      { return getFromSegment()->size() + getToSegment()->size(); }
 
       /// Getter for the from segment.
       const CDCRecoSegment2D* getFromSegment() const
@@ -203,23 +205,26 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getFromSegment()->unsetAndForwardMaskedFlag();
-        getToSegment()->unsetAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->unsetAndForwardMaskedFlag(toHits);
+        getToSegment()->unsetAndForwardMaskedFlag(toHits);
       }
 
       /// Sets the masked flag of the segment triple's automaton cell and of the three contained segments.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getFromSegment()->setAndForwardMaskedFlag();
-        getToSegment()->setAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->setAndForwardMaskedFlag(toHits);
+        getToSegment()->setAndForwardMaskedFlag(toHits);
       }
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getFromSegment()->receiveMaskedFlag();
-        getToSegment()->receiveMaskedFlag();
+        const bool fromHits = true;
+        getFromSegment()->receiveMaskedFlag(fromHits);
+        getToSegment()->receiveMaskedFlag(fromHits);
 
         if (getFromSegment()->getAutomatonCell().hasMaskedFlag() or
             getToSegment()->getAutomatonCell().hasMaskedFlag()) {

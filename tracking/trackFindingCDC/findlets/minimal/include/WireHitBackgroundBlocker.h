@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
@@ -48,6 +47,5 @@ namespace Belle2 {
       double m_param_noiseChargeDeposit = 0;
 
     }; // end class WireHitBackgroundBlocker
-
   } // end namespace TrackFindingCDC
 } // end namespace Belle2

@@ -89,19 +89,22 @@ void SegmentFitter::apply(std::vector<CDCRecoSegment2D>& outputSegments)
   }
 
   for (const CDCRecoSegment2D& segment : outputSegments) {
-
     CDCObservations2D observations2D(m_fitPos, m_fitVariance);
     observations2D.appendRange(segment);
-    if (observations2D.size() < 4) {
-      segment.getTrajectory2D().clear();
-    } else {
-      if (m_param_karimakiFit) {
-        CDCTrajectory2D trajectory2D = m_karimakiFitter.fit(observations2D);
-        segment.setTrajectory2D(trajectory2D);
-      } else {
-        CDCTrajectory2D trajectory2D = m_riemannFitter.fit(observations2D);
-        segment.setTrajectory2D(trajectory2D);
+
+    if (m_param_karimakiFit or observations2D.size() < 4) {
+      // Karimaki only works with the reconstructed position
+      if (m_fitPos != EFitPos::c_RecoPos) {
+        observations2D.clear();
+        observations2D.setFitPos(EFitPos::c_RecoPos);
+        observations2D.appendRange(segment);
       }
+      CDCTrajectory2D trajectory2D = m_karimakiFitter.fit(observations2D);
+      segment.setTrajectory2D(trajectory2D);
+    } else {
+
+      CDCTrajectory2D trajectory2D = m_riemannFitter.fit(observations2D);
+      segment.setTrajectory2D(trajectory2D);
     }
   }
 }

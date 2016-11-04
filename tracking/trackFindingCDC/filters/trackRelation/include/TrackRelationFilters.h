@@ -9,5 +9,8 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MCTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/UnionRecordingTrackRelationFilter.h>

@@ -137,26 +137,29 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getStartSegment()->unsetAndForwardMaskedFlag();
-        getMiddleSegment()->unsetAndForwardMaskedFlag();
-        getEndSegment()->unsetAndForwardMaskedFlag();
+        const bool toHits = true;
+        getStartSegment()->unsetAndForwardMaskedFlag(toHits);
+        getMiddleSegment()->unsetAndForwardMaskedFlag(toHits);
+        getEndSegment()->unsetAndForwardMaskedFlag(toHits);
       }
 
       /// Sets the masked flag of the segment triple's automaton cell. Also forward the masked to the contained segments and the contained wire hits.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getStartSegment()->setAndForwardMaskedFlag();
-        getMiddleSegment()->setAndForwardMaskedFlag();
-        getEndSegment()->setAndForwardMaskedFlag();
+        const bool toHits = true;
+        getStartSegment()->setAndForwardMaskedFlag(toHits);
+        getMiddleSegment()->setAndForwardMaskedFlag(toHits);
+        getEndSegment()->setAndForwardMaskedFlag(toHits);
       }
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getStartSegment()->receiveMaskedFlag();
-        getMiddleSegment()->receiveMaskedFlag();
-        getEndSegment()->receiveMaskedFlag();
+        const bool fromHits = true;
+        getStartSegment()->receiveMaskedFlag(fromHits);
+        getMiddleSegment()->receiveMaskedFlag(fromHits);
+        getEndSegment()->receiveMaskedFlag(fromHits);
 
         if (getStartSegment()->getAutomatonCell().hasMaskedFlag() or
             getMiddleSegment()->getAutomatonCell().hasMaskedFlag() or

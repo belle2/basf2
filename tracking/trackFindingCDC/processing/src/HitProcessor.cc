@@ -7,11 +7,8 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
-
 #include <tracking/trackFindingCDC/processing/HitProcessor.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/collections/CDCTrackList.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -21,7 +18,6 @@
 
 #include <TMath.h>
 #include <numeric>
-
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -46,8 +42,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
   for (CDCTrack& trackCandidate : trackCandidates) {
     if (trackCandidate.size() < 5) continue;
 
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-//    ESign trackCharge = TrackMergerNew::getChargeSign(trackCandidate);
+    //    ESign trackCharge = TrackMergerNew::getChargeSign(trackCandidate);
     CDCTrajectory2D trackTrajectory2D = trackCandidate.getStartTrajectory3D().getTrajectory2D();
 
 
@@ -55,8 +50,7 @@ void HitProcessor::appendUnusedHits(std::vector<CDCTrack>& trackCandidates, cons
       if (hit->getUsedFlag() || hit->getMaskedFlag()) continue;
 
       ERightLeft rlInfo = trackTrajectory2D.isRightOrLeft(hit->getWireHit()->getRefPos2D());
-      // Is this lookup really necessary?
-      const CDCWireHit* wireHit = wireHitTopology.getWireHit(hit->getWireHit()->getHit());
+      const CDCWireHit* wireHit = hit->getWireHit();
       CDCRLWireHit rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength());
       if (wireHit->getAutomatonCell().hasTakenFlag())
         continue;

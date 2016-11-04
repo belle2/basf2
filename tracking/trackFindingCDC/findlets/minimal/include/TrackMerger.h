@@ -59,22 +59,14 @@ namespace Belle2 {
       virtual void apply(const std::vector<CDCTrack>& inputTracks,
                          std::vector<CDCTrack>& outputTracks) override final
       {
-        m_symmetricTracks.clear();
-        m_symmetricTracks.reserve(2 * inputTracks.size());
-
-        for (const CDCTrack& track : inputTracks) {
-          m_symmetricTracks.push_back(track);
-          m_symmetricTracks.push_back(track.reversed());
-        }
-
         m_trackRelations.clear();
         WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
-                                                          m_symmetricTracks,
+                                                          inputTracks,
                                                           m_trackRelations);
         WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
 
         m_trackPaths.clear();
-        m_cellularPathFinder.apply(m_symmetricTracks,
+        m_cellularPathFinder.apply(inputTracks,
                                    trackNeighborhood,
                                    m_trackPaths);
 
@@ -86,9 +78,6 @@ namespace Belle2 {
     private:
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCTrack> m_cellularPathFinder;
-
-      /// Memory for the symmetrised tracks
-      std::vector<CDCTrack> m_symmetricTracks;
 
       /// Memory for the relations between tracks to be followed on merge
       std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;

@@ -29,13 +29,12 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from  clusters to clusters
-    template<class AWireHitRelationFilter = SecondaryWireHitRelationFilter>
-    class ClusterCreator:
-      public Findlet<CDCWireHit, CDCWireHitCluster> {
+    template <class AWireHitRelationFilter = SecondaryWireHitRelationFilter>
+    class ClusterCreator : public Findlet<CDCWireHit&, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
-      typedef Findlet<CDCWireHit, CDCWireHitCluster> Super;
+      using Super = Findlet<CDCWireHit, CDCWireHitCluster>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -56,16 +55,16 @@ namespace Belle2 {
                          std::vector<CDCWireHitCluster>& outputClusters) override final
       {
         // create the neighborhood
-        B2DEBUG(100, "Creating the CDCWireHit neighborhood");
         m_wireHitRelations.clear();
-
-        WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter, inputWireHits, m_wireHitRelations);
+        WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
+                                                      inputWireHits,
+                                                      m_wireHitRelations);
         WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
+        B2ASSERT("Expect wire hit neighborhood to be symmetric ",
+                 wireHitNeighborhood.isSymmetric());
 
-        B2ASSERT("Expect wire hit neighborhood to be symmetric ", wireHitNeighborhood.isSymmetric());
-        B2DEBUG(100, "  wirehitNeighborhood.size() = " << wireHitNeighborhood.size());
-
-        auto ptrWireHits = inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+        auto ptrWireHits =
+          inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
         m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
       }
 
@@ -74,7 +73,7 @@ namespace Belle2 {
       Clusterizer<CDCWireHit, CDCWireHitCluster> m_wirehitClusterizer;
 
       /// Memory for the wire hit neighborhood in a cluster.
-      std::vector<WeightedRelation<CDCWireHit> > m_wireHitRelations;
+      std::vector<WeightedRelation<CDCWireHit>> m_wireHitRelations;
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;

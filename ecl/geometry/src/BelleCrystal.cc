@@ -125,22 +125,6 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
     message << "Invalid vertice coordinates for Solid: " << GetName() << " " << zp << " " << zm << " " << zpm;
     G4Exception("BelleCrystal::BelleCrystal()", "BelleCrystal", FatalException, message);
   }
-  // if(nsides == 4){
-  //   // Bottom side with normal approx. -Y
-  //   MakePlane(pt[0],pt[4],pt[5],pt[1],fPlanes[0]);
-  //   // Top side with normal approx. +Y
-  //   MakePlane(pt[2],pt[3],pt[7],pt[6],fPlanes[1]);
-  //   // Front side with normal approx. -X
-  //   MakePlane(pt[0],pt[2],pt[6],pt[4],fPlanes[2]);
-  //   // Back side iwth normal approx. +X
-  //   MakePlane(pt[1],pt[5],pt[7],pt[3],fPlanes[3]);
-  // } else if(nsides == 5){
-  //   MakePlane(pt[0],pt[5],pt[6],pt[1],fPlanes[0]);
-  //   MakePlane(pt[1],pt[6],pt[7],pt[2],fPlanes[1]);
-  //   MakePlane(pt[2],pt[7],pt[8],pt[3],fPlanes[2]);
-  //   MakePlane(pt[3],pt[8],pt[9],pt[4],fPlanes[3]);
-  //   MakePlane(pt[4],pt[9],pt[5],pt[0],fPlanes[4]);
-  // } else if(nsides > 5){
   if (nsides > 3) {
     for (unsigned int i = 0; i < nsides; i++)
       MakePlane(pt[i], pt[i + nsides], pt[((i + 1) % (nsides)) + nsides], pt[(i + 1) % nsides], fPlanes[i]);
@@ -149,25 +133,19 @@ BelleCrystal::BelleCrystal(const G4String& pName, int n,
     message << "Wrong number of sides for Belle Crystal: " << GetName() << " nsides = " << nsides;
     G4Exception("BelleCrystal::BelleCrystal()", "BelleCrystal", FatalException, message);
   }
-  return;
-  if (CLHEP::HepRandomGenActive) return;
 }
 
-// Nominal constructor for BelleCrystal whose parameters are to be set by
-// a G4VParamaterisation later.  Check and set half-widths as well as
-// angles: final check of coplanarity
+// Nominal constructor for BelleCrystal
 BelleCrystal::BelleCrystal(const G4String& pName)
-  : G4CSGSolid(pName)
+  : G4CSGSolid(pName), nsides(0), fDz(0)
 {
-  cout << "Nominal constructor: " << GetName() << endl;
 }
 
 // Fake default constructor - sets only member data and allocates memory
 //                            for usage restricted to object persistency.
 BelleCrystal::BelleCrystal(__void__& a)
-  : G4CSGSolid(a)
+  : G4CSGSolid(a), nsides(0), fDz(0)
 {
-  cout << "Fake constructor: " << GetName() << endl;
 }
 
 // Destructor
@@ -183,14 +161,8 @@ BelleCrystal::~BelleCrystal()
 
 // Copy constructor
 BelleCrystal::BelleCrystal(const BelleCrystal& rhs)
-  : G4CSGSolid(rhs)
+  : G4CSGSolid(rhs), nsides(rhs.nsides), fDz(rhs.fDz), fPlanes(rhs.fPlanes), fx(rhs.fx)
 {
-  //  memcpy(fstore, rhs.fstore, sizeof(fstore));
-  //  ref = rhs.ref;
-  fDz = rhs.fDz;
-  fx = rhs.fx;
-  fPlanes = rhs.fPlanes;
-  cout << "Copy constuctor: " << GetName() << endl;
 }
 
 // Assignment operator
@@ -203,12 +175,10 @@ BelleCrystal& BelleCrystal::operator = (const BelleCrystal& rhs)
   G4CSGSolid::operator=(rhs);
 
   // Copy data
-  //  memcpy(fstore, rhs.fstore, sizeof(fstore));
-  //  ref = rhs.ref;
+  nsides = rhs.nsides;
   fDz = rhs.fDz;
   fx = rhs.fx;
   fPlanes = rhs.fPlanes;
-  cout << "Assignment operator: " << GetName() << endl;
 
   return *this;
 }
@@ -353,7 +323,7 @@ G4ThreeVector BelleCrystal::SurfaceNormal(const G4ThreeVector& p) const
   const G4double delta = 0.5 * kCarTolerance;
   G4double safe = kInfinity;
   unsigned int iside = 0, kside = 0;
-  double adist[nsides + 2];
+  vector<double> adist(nsides + 2);
   auto dist = [delta, &safe, &iside, &kside, &adist](double d, unsigned int i) -> void {
     d = std::abs(d);
     adist[i] = d;
@@ -731,40 +701,16 @@ void BelleCrystal::DescribeYourselfTo(G4VGraphicsScene& scene) const
 
 PolyhedronBelleCrystal::PolyhedronBelleCrystal(int n, const G4ThreeVector* pt)
 {
-  // if(n==8){
-  //   AllocateMemory(8,6);
-  //   for(int i=0;i<8;i++) pV[i+1] = pt[i];
-  //   swap(pV[3],pV[4]);
-  //   swap(pV[7],pV[8]);
-  //   CreatePrism();
-  // } else if(n==10){
-  //   AllocateMemory(10,9);
-  //   for(int i=0;i<10;i++) pV[i+1] = pt[i];
-
-  //   enum {DUMMY, B0, B1, S0, S1, S2, S3, S4, T0, T1};
-  //   pF[1] = G4Facet( 1,B1, 4,S2,  3,S1,  2,S0);
-  //   pF[2] = G4Facet( 1,S4, 5,S3,  4,B0,  0, 0);
-
-  //   pF[3] = G4Facet( 1,B0, 2,S1,  7,T0,  6,S4);
-  //   pF[4] = G4Facet( 2,B0, 3,S2,  8,T0,  7,S0);
-  //   pF[5] = G4Facet( 3,B0, 4,S3,  9,T0,  8,S1);
-  //   pF[6] = G4Facet( 4,B1, 5,S4, 10,T1,  9,S2);
-  //   pF[7] = G4Facet( 5,B1, 1,S0,  6,T1, 10,S3);
-
-  //   pF[8] = G4Facet(10,T1, 7,S1,  8,S2,  9,S3);
-  //   pF[9] = G4Facet(10,S4, 6,S0,  7,T0,  0, 0);
-  // } else if(n>10){
   int nsides = n / 2;
   AllocateMemory(n, nsides + 2 * (nsides - 2));
   for (int i = 0; i < n; i++) pV[i + 1] = pt[i];
 
   int count = 1;
-  for (int j = 0; j < nsides;
-       j++) pF[count++] = G4Facet(1 + j, 0,  1 + j + nsides, 0, 1 + ((j + 1) % nsides) + nsides, 0, 1 + (j + 1) % nsides, 0);
+  for (int j = 0; j < nsides; j++)
+    pF[count++] = G4Facet(1 + j, 0,  1 + j + nsides, 0, 1 + ((j + 1) % nsides) + nsides, 0, 1 + (j + 1) % nsides, 0);
   for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1, 0,  2 + j, 0, 3 + j, 0, 0, 0);
   for (int j = 0; j < nsides - 2; j++) pF[count++] = G4Facet(1 + nsides, 0,  3 + j + nsides, 0, 2 + j + nsides, 0, 0, 0);
   SetReferences();
-  //  }
 }
 
 PolyhedronBelleCrystal::~PolyhedronBelleCrystal() {}
@@ -772,10 +718,7 @@ PolyhedronBelleCrystal::~PolyhedronBelleCrystal() {}
 G4Polyhedron* BelleCrystal::CreatePolyhedron() const
 {
   int np = 2 * nsides;
-  G4ThreeVector pt[np];
-  for (int i = 0; i < np; i++) {
-    pt[i] = vertex(i);
-    //    cout<<i<<" "<<pt[i]<<endl;
-  }
-  return new PolyhedronBelleCrystal(np, pt);
+  vector<G4ThreeVector> pt(np);
+  for (int i = 0; i < np; i++) pt[i] = vertex(i);
+  return new PolyhedronBelleCrystal(np, pt.data());
 }

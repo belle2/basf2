@@ -10,12 +10,13 @@
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilters.h>
 
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
 }
 
@@ -37,8 +38,10 @@ TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 
   filterNames.insert({
     {"none", "no track relation is valid, stop at track creation."},
+    {"all", "all track relations are valid, for comparision only."},
     {"truth", "track relations from monte carlo truth"},
-    {"unionrecording", "record many multiple choosable variable set"},
+    {"feasible", "checks rough competability of tracks"},
+    {"unionrecording", "record multiple choosable variable set"},
   });
 
   return filterNames;
@@ -48,11 +51,17 @@ std::unique_ptr<BaseTrackRelationFilter >
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseTrackRelationFilter >(new BaseTrackRelationFilter());
+    return makeUnique<BaseTrackRelationFilter>();
+  } else if (filterName == "all") {
+    return makeUnique<AllTrackRelationFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleTrackRelationFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticTrackRelationFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseTrackRelationFilter >(new MCTrackRelationFilter());
+    return makeUnique<MCTrackRelationFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<BaseTrackRelationFilter >(new UnionRecordingTrackRelationFilter());
+    return makeUnique< UnionRecordingTrackRelationFilter>();
   } else {
     return Super::create(filterName);
   }

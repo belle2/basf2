@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

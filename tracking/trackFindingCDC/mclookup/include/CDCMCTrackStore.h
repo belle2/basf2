@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
 #include <tracking/trackFindingCDC/numerics/Index.h>
 
@@ -19,6 +18,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCMCMap;
+    class CDCSimHitLookUp;
+
 
     ///Class to organize and present the monte carlo hit information
     class CDCMCTrackStore {
@@ -42,7 +44,7 @@ namespace Belle2 {
       /** Fill the store with the tracks from Monte Carlo information.
        *  It uses the CDCMCMap to construct the Monte Carlo tracks.
        */
-      void fill(const CDCMCMap* ptrMCMap);
+      void fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrSimHitLookUp);
 
     public:
       /// Getter for the stored Monte Carlo tracks ordered by their Monte Carlo Id
@@ -94,6 +96,9 @@ namespace Belle2 {
     private:
       /// Reference to the MC map of the current event
       const CDCMCMap* m_ptrMCMap;
+
+      /// Reference to the CDCSimHit look up for additional information about related primary sim hits
+      const CDCSimHitLookUp* m_ptrSimHitLookUp;
 
       /// The memory for the tracks made of CDCHits sorted for the time of flight and assoziated to the Monte Carlo particle id
       std::map<ITrackType, CDCHitVector> m_mcTracksByMCParticleIdx;

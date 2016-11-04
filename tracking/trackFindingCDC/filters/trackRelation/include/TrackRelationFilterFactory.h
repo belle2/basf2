@@ -31,7 +31,7 @@ namespace Belle2 {
 
     public:
       /** Fill the default filter name and parameter values*/
-      TrackRelationFilterFactory(const std::string& defaultFilterName = "none");
+      TrackRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
       using Super::create;
 

@@ -191,6 +191,14 @@ namespace Belle2 {
    */
   class SegmentExporterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentExporter> {
+
+  private:
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentExporter>;
+
+  public:
+    /// Constructor setting the default store vector names
+    SegmentExporterModule() : Super{{{"CDCRecoSegment2DVector"}}} {}
   };
 
   /**
@@ -340,8 +348,15 @@ namespace Belle2 {
    */
   class TrackExporterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackExporter> {
-  };
 
+  private:
+    /// Type of the base class
+    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::TrackExporter>;
+
+  public:
+    /// Constructor setting the default store vector names
+    TrackExporterModule() : Super{{{"CDCTrackVector"}}} {}
+  };
 }
 
 

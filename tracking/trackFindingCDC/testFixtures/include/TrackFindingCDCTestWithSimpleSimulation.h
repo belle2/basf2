@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
@@ -31,7 +30,6 @@ namespace Belle2 {
     public:
       TrackFindingCDCTestWithSimpleSimulation() : m_simpleSimulation()
       {
-        m_simpleSimulation.setWireHitTopology(&(CDCWireHitTopology::getInstance()));
       }
 
       /// Preparations before the test
@@ -84,7 +82,7 @@ namespace Belle2 {
       {
         m_mcTrajectories = trajectories;
 
-        // Propagate the tracks and write hits to the eventtopology
+        // Construct tracks. Wire hits are stored in the simple simulation
         m_mcTracks = m_simpleSimulation.simulate(trajectories);
 
         fillCaches();
@@ -95,7 +93,8 @@ namespace Belle2 {
       {
         // No trajectory information present
         m_mcTrajectories.clear();
-        // Propagate the tracks and write hits to the eventtopology
+
+        // Load prepared tracks wire hits are stored in the simple simulation
         m_mcTracks = m_simpleSimulation.loadPreparedEvent();
 
         fillCaches();
@@ -124,20 +123,19 @@ namespace Belle2 {
         }
 
         // Filter for axial hits
-        const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           if (wireHit.isAxial()) {
             m_axialWireHits.push_back(&wireHit);
           }
         }
 
         // Pick up points for all hits
-        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_wireHits.push_back(&wireHit);
         }
 
         m_plotter.draw(CDCWireTopology::getInstance());
-        for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_plotter.draw(wireHit);
         }
       }

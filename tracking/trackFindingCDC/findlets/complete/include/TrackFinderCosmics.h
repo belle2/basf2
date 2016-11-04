@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -20,31 +19,15 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef TrackFinderAutomaton Super;
+      using Super = TrackFinderAutomaton;
 
     public:
-      /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
-      }
+      /// Constructor adjusting some of the parameters to suiteable values for cosmics tracking.
+      TrackFinderCosmics();
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        Super::exposeParameters(moduleParamList, prefix);
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
-        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").setDefaultValue(true);
-        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").resetValue();
-        moduleParamList->getParameter<bool>("updateDriftLength").setDefaultValue(false);
-        moduleParamList->getParameter<bool>("updateDriftLength").resetValue();
-        moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
-      }
+      /// Short description of the findlet
+      virtual std::string getDescription() override;
 
     }; // end class TrackFinderCosmics
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

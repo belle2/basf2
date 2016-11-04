@@ -11,10 +11,10 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
     recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
     n_processes = 4
 
-    flight_time_estimation = "none"
+    flight_time_estimation = ""
     n_loops = float("nan")
 
-    recording_filter_parameter_name = "FillMeFilterParameters"
+    recording_filter_parameter_name = ""
     root_output_file_name = "Records.root"
     varsets = ["truth", ]
     skim = ""
@@ -72,23 +72,24 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
 
     def configure(self, arguments):
         super().configure(arguments)
-
-        self.recording_finder_module.param({
-            self.recording_filter_parameter_name: {
-                "rootFileName": self.root_output_file_name,
-                "varSets": self.varsets,
-                "skim": self.skim
-            },
-        })
+        if self.recording_filter_parameter_name:
+            self.recording_finder_module.param({
+                self.recording_filter_parameter_name: {
+                    "rootFileName": self.root_output_file_name,
+                    "varSets": self.varsets,
+                    "skim": self.skim
+                    },
+                })
 
     def create_path(self):
         # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         path = super().create_path()
 
-        path.add_module("WireHitTopologyPreparer",
-                        flightTimeEstimation=self.flight_time_estimation,
-                        UseNLoops=self.n_loops)
+        wire_hit_preparer = path.add_module("WireHitTopologyPreparer",
+                                            UseNLoops=self.n_loops)
+        if self.flight_time_estimation:
+            wire_hit_preparer.param(dict(flightTimeEstimation=self.flight_time_estimation))
 
         extend_path(path, self.recording_finder_module)
         return path

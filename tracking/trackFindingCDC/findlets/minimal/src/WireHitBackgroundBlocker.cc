@@ -37,11 +37,9 @@ void WireHitBackgroundBlocker::exposeParameters(ModuleParamList* moduleParamList
 
   moduleParamList->addParameter(prefixed(prefix, "noiseChargeDeposit"),
                                 m_param_noiseChargeDeposit,
-                                "Threshold energy below which the hit is considered as electronic noise",
+                                "Threshold energy below which the hit is considered "
+                                "to be electronic noise",
                                 m_param_noiseChargeDeposit);
-
-
-
 }
 
 void WireHitBackgroundBlocker::apply(std::vector<CDCWireHit>& wireHits)

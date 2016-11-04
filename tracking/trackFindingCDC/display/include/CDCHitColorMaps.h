@@ -5,8 +5,7 @@
  *      Author: dschneider
  */
 
-#ifndef CDCHITCOLORMAPS_H_
-#define CDCHITCOLORMAPS_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/display/ColorMaps.h>
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
@@ -301,7 +300,3 @@ namespace Belle2 {
 
   }
 }
-
-
-
-#endif /* CDCHITCOLORMAPS_H_ */

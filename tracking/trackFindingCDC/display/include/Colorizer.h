@@ -4,9 +4,7 @@
  *  Created on: May 6, 2015
  *      Author: dschneider
  */
-
-#ifndef COLORIZER_H_
-#define COLORIZER_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/display/ColorMaps.h>
 #include <tracking/trackFindingCDC/display/CDCHitColorMaps.h>
@@ -244,5 +242,3 @@ namespace Belle2 {
     };
   }
 }
-
-#endif /* COLORIZER_H_ */

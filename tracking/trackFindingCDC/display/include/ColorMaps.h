@@ -4,9 +4,7 @@
  *  Created on: Feb 26, 2015
  *      Author: dschneider
  */
-
-#ifndef COLORMAPS_H_
-#define COLORMAPS_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -210,4 +208,4 @@ namespace Belle2 {
 
   }
 }
-#endif /* COLORMAPS_H_ */
+

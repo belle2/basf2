@@ -4,9 +4,7 @@
  *  Created on: Jun 8, 2015
  *      Author: dschneider
  */
-
-#ifndef CDCSEGMENTCOLORMAPS_H_
-#define CDCSEGMENTCOLORMAPS_H_
+#pragma once
 
 #include <tracking/trackFindingCDC/display/ColorMaps.h>
 
@@ -129,7 +127,3 @@ namespace Belle2 {
 
   }
 }
-
-
-
-#endif /* CDCSEGMENTCOLORMAPS_H_ */

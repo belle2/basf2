@@ -31,3 +31,5 @@ dbstore/CDCSpaceResols 1 0,0,-1,-1
 dbstore/CDCDisplacements 1 0,0,-1,-1
 dbstore/CDCAlignment 1 0,0,-1,-1
 dbstore/CDCMisalignment 1 0,0,-1,-1
+dbstore/BKLMElectronicMapping 4 0,0,-1,-1
+

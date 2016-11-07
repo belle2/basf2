@@ -8,7 +8,7 @@ import argparse
 
 
 class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
-    recording_finder_module = basf2.register_module("TrackFinderCDCAutomatonDev")
+    recording_finder_module = basf2.register_module("TrackFinderCDCAutomaton")
     n_processes = 4
 
     flight_time_estimation = ""

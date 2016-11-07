@@ -19,7 +19,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-     * A convenience class based on a BoxDevisionHoughTree for "hit-like" classes.
+     * A convenience class based on a BoxDivisionHoughTree for "hit-like" classes.
      * You still have to implement the box and the division by yourself, but the typical search functions
      * are implemented in this class.
      */

@@ -1,3 +1,12 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: dschneider, Oliver Frost                                 *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
 #pragma once
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
@@ -5,12 +14,10 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    template<class T>
-    class StoreWrappedObjPtr;
+    template <class T>
+    class Styling;
 
-    /**
-     * Helper class to generated the svg image from the various tracking objects.
-     */
+    /// Helper class to generated the svg image from the various tracking objects.
     class CDCSVGPlotter {
 
     public:
@@ -40,6 +47,12 @@ namespace Belle2 {
       void drawInteractionPoint();
 
       /**
+       * Draws the individual super layer boundaries.
+       * @param stroke The color to be used for drawing.
+       */
+      void drawSuperLayerBoundaries(const std::string& stroke);
+
+      /**
        * Draws the outer CDCWall.
        * @param stroke The color to be used for drawing.
        */
@@ -57,9 +70,9 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawCDCHits(const std::string& storeArrayName,
-                       const std::string& stroke,
-                       const std::string& strokeWidth);
+      void drawHits(const std::string& storeArrayName,
+                    const std::string& stroke,
+                    const std::string& strokeWidth);
 
       /**
        * Draws CDCSimHits.
@@ -67,19 +80,97 @@ namespace Belle2 {
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a stroke-width.
        */
-      void drawCDCSimHits(const std::string& storeArrayName,
-                          const std::string& stroke,
-                          const std::string& strokeWidth);
+      void drawSimHits(const std::string& storeArrayName,
+                       const std::string& stroke,
+                       const std::string& strokeWidth);
 
       /**
-       * Draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle.
-       * @param storeArrayName The name of the StoreArray containing the CDCSimHits.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSimHit and its id to a stroke-width.
+       * Draws CDCWireHitClusters.
+       * @param storeObjName The name of the StoreVector containing the CDCWireHitClusters.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
-      void drawCDCSimHitsConnectByToF(const std::string& storeArrayName,
-                                      const std::string& stroke,
-                                      const std::string& strokeWidth);
+      void drawClusters(const std::string& storeObjName,
+                        const std::string& stroke,
+                        const std::string& strokeWidth);
+
+      /**
+       * Draws CDCRecoSegments.
+       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
+       */
+      void drawSegments(const std::string& storeObjName,
+                        const std::string& stroke,
+                        const std::string& strokeWidth);
+
+      /**
+       * Draws SegmentTrajectories.
+       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
+       */
+      void drawSegmentTrajectories(const std::string& storeObjName,
+                                   const std::string& stroke,
+                                   const std::string& strokeWidth);
+
+      /**
+       * Draw the axial to stereo segment pairs.
+       * @param storeObjName The name of the StoreVector containing the CDCSegmentPairs.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a stroke-width.
+       */
+      void drawSegmentPairs(const std::string& storeObjName,
+                            const std::string& stroke,
+                            const std::string& strokeWidth);
+
+      /**
+       * Draw the axial to axial segment pairs.
+       * @param storeObjName The name of the StoreVector containing the CDCAxialSegmentPairs.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCAxialSegmentPair and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCAxialSegmentPair and its id to a stroke-width.
+       */
+      void drawAxialSegmentPairs(const std::string& storeObjName,
+                                 const std::string& stroke,
+                                 const std::string& strokeWidth);
+
+      /**
+       * Draw the axial, stereo, axial segment triples.
+       * @param storeObjName The name of the StoreVector containing the CDCSegmentTriples.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a stroke-width.
+       */
+      void drawSegmentTriples(const std::string& storeObjName,
+                              const std::string& stroke,
+                              const std::string& strokeWidth);
+
+      /**
+       * Draw the trajectories of the axial, stereo, axial segment triples.
+       * @param storeObjName The name of the StoreVector containing the CDCSegmentTriples.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentTriple and its id to a stroke-width.
+       */
+      void drawSegmentTripleTrajectories(const std::string& storeObjName,
+                                         const std::string& stroke,
+                                         const std::string& strokeWidth);
+
+      /**
+       * Draws CDCTracks.
+       * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       */
+      void drawTracks(const std::string& storeObjName,
+                      const std::string& stroke,
+                      const std::string& strokeWidth);
+
+      /**
+       * Draws trajectories of the tracks.
+       * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
+       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
+       */
+      void drawTrackTrajectories(const std::string& storeObjName,
+                                 const std::string& stroke,
+                                 const std::string& strokeWidth);
 
       /**
        * Draw RecoTracks.
@@ -97,168 +188,116 @@ namespace Belle2 {
                                      const std::string& stroke,
                                      const std::string& strokeWidth);
 
-      /**
-       * Draw the axial to stereo segment pairs from Monte Carlo truth.
-       * @param storeObjName The name of the StoreVector containing the CDCSegmentPairs.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCSegmentPair and its id to a stroke-width.
-       */
-      void drawAxialStereoPairs(const std::string& storeObjName,
-                                const std::string& stroke,
-                                const std::string& strokeWidth);
+
+    public:
+      /* *** Section with some more complex operations *** */
 
       /**
-       * Draws CDCTracks.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the CDCTracks.
+       * Draw the CDCSimHits connected in the order of their getFlightTime for each Monte Carlo particle.
+       * @param storeArrayName The name of the StoreArray containing the CDCSimHits.
+       * @param stroke                Color of the lines to be drawn.
+       * @param strokeWidth           Width of the lines to be drawn.
        */
-      void drawCDCTracks(const std::string& storeObjName,
-                         const std::string& stroke,
-                         const std::string& strokeWidth);
-
-      /**
-       * Draws CDCWireHitClusters.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the CDCWireHitClusters.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      void drawCDCWireHitClusters(const std::string& storeObjName,
-                                  const std::string& stroke,
-                                  const std::string& strokeWidth);
-
-      /**
-       * Draws AxialStereoSegmentPairs.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the AxialStereoSegmentPairs.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      void drawAxialStereoSegmentPairs(const std::string& storeObjName,
-                                       const std::string& stroke,
-                                       const std::string& strokeWidth);
-
-      /**
-       * Draws MCAxialAxialPairs.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the MCAxialAxialPairs.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      //does probably work correctly (check Filter)
-      void drawMCAxialAxialPairs(const std::string& storeObjName,
-                                 const std::string& stroke,
-                                 const std::string& strokeWidth);
-
-      /**
-       * Draws MCSegmentTriples.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the MCSegmentTriples.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      //does not work correctly (Filter does not accept triples as argument
-      void drawMCSegmentTriples(const std::string& storeObjName,
-                                const std::string& stroke,
-                                const std::string& strokeWidth);
-
-      /**
-       * Draws CDCRecoSegments.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      void drawCDCRecoSegments(const std::string& storeObjName,
-                               const std::string& stroke,
-                               const std::string& strokeWidth);
-
-      /**
-       * Draws SegmentTrajectories.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
-       */
-      void drawSegmentTrajectories(const std::string& storeObjName,
+      void drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
                                    const std::string& stroke,
                                    const std::string& strokeWidth);
 
       /**
-       * Draws trajectories of the tracks.
-       * Is only available if the local track finder is in the module chain and
-       * specific compile time flags enable the transportation of this data:
-       * @param storeObjName The name of the StoreVector containing the CDCTracks.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
+       * Draws the Monte Carlo true CDCSegmentPairs.
+       *
+       * This routine creates the true segment pairs from the stored segments to get
+       * an overview which cases the segment triple reconstruction should cover.
+       *
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       *                              from which the pair should be constructed.
+       * @param stroke                Color of the lines to be drawn.
+       * @param strokeWidth           Width of the lines to be drawn.
        */
-      void drawTrackTrajectories(const std::string& storeObjName,
-                                 const std::string& stroke,
-                                 const std::string& strokeWidth);
+      void drawMCSegmentPairs(const std::string& segmentsStoreObjName,
+                              const std::string& stroke,
+                              const std::string& strokeWidth);
 
       /**
-       * Save the current dom object representation to disk.
-       * @param svgFileName The Name of the saved svg file. Defaults to "display.svg".
+       * Draws the Monte Carlo true CDCAxialSegmentPairs.
+       *
+       * This routine creates the true axial segment pairs from the stored segments to get
+       * an overview which cases the segment triple reconstruction should cover.
+       *
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       *                              from which the pair should be constructed.
+       * @param stroke                Color of the lines to be drawn.
+       * @param strokeWidth           Width of the lines to be drawn.
        */
-      const std::string saveSVGFile(const std::string& svgFileName = "display.svg");
+      void drawMCAxialSegmentPairs(const std::string& segmentsStoreObjName,
+                                   const std::string& stroke,
+                                   const std::string& strokeWidth);
+
+      /**
+       * Draws the Monte Carlo true CDCSegmentTriples.
+       *
+       * This routine creates the true segment triples from the stored segments to get
+       * an overview which cases the segment triple reconstruction should cover.
+       *
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       *                              from which the pair should be constructed.
+       * @param stroke                Color of the lines to be drawn.
+       * @param strokeWidth           Width of the lines to be drawn.
+       */
+      void drawMCSegmentTriples(const std::string& storeObjName,
+                                const std::string& stroke,
+                                const std::string& strokeWidth);
+
+    public:
+      /**
+       * Save the current dom object representation to disk.
+       * @param fileName The Name of the saved file. Defaults to "display.svg".
+       */
+      std::string saveFile(const std::string& fileName = "display.svg");
 
     private:
       /**
-       * Function Template for drawing the elements of a given StoreArray. Needs to know the type of the objects in the StoreArray and the right colorizer for these objects.
-       * @param storeArray The StoreArray containing the objects.
-       * @param storeArrayName The name of the StoreArray containing the objects.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
+       * Function Template for drawing the elements of a given StoreArray.
+       *
+       * Needs to know the type of the objects in the StoreArray and the right styling for these objects.
+       *
+       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @param  storeArrayName   The name of the StoreArray containing the objects.
+       * @param  styling          Functional object to construct attributes for each object to be drawn
        */
-      template<class AColorizer, bool a_drawTrajectories = false, class AObject>
-      void drawStoreArray(const StoreArray<AObject>& storeArray,
-                          const std::string& storeArrayName,
-                          const std::string& stroke = "",
-                          const std::string& strokeWidth = "");
+      template<class AItem, bool a_drawTrajectories = false>
+      void drawStoreArray(const std::string& storeArrayName, Styling<AItem>& styling);
 
       /**
-       * Function Template for drawing the elements of a given StoreVector. Needs to know the type of the objects in the StoreArray and the right colorizer for these objects.
-       * @param storeVector The StoreWrappedObjPtr containing the objects.
-       * @param storeObjName The name of the storeVector containing the objects.
-       * @param stroke Either the color to be used for drawing or the name of the method, which maps the object and its id to a color.
-       * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the object and its id to a stroke-width.
+       * Function Template for drawing the elements of a given StoreVector.
+       *
+       * Needs to know the type of the objects in the store objects and the right styling for these objects.
+       *
+       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @param storeVector      The StoreWrappedObjPtr containing the objects.
+       * @param styling          Functional object to construct attributes for each object to be drawn
        */
-      template<class AColorizer, bool a_drawTrajectories = false, class AItem>
-      void drawStoreVector(const StoreWrappedObjPtr<std::vector<AItem>>& storeVector,
-                           const std::string& storeObjName,
-                           const std::string& stroke = "",
-                           const std::string& strokeWidth = "");
-
-      /**
-       * Draws the object or its trajectory.
-       */
-      template<bool a_drawTrajectory = false, class AObject>
-      void draw(const AObject& obj,
-                const std::map<std::string,
-                std::string>& obj_attributes);
+      template<class AItem, bool a_drawTrajectories = false>
+      void drawStoreVector(const std::string& storeObjName, Styling<AItem>& styling);
 
       /**
        * Draw every element of an iterable object.
-       * @param iterable An iterable object (StoreArray, std::vector...).
-       * @param colorizer The AColorizer class, in which the drawing attributes are stored.
+       * @tparam a_drawTrajectory Switch to draw the fitted trajectory from the object instead.
+       * @param  iterable         An iterable object (StoreArray, std::vector...).
+       * @param  styling          Styling object from which drawing attributes are constructed
        */
-      template<bool a_drawTrajectory = false, class AIterable, class AColorizer>
-      void drawIterable(const AIterable& iterable, AColorizer& colorizer);
+      template <bool a_drawTrajectory = false, class AIterable, class AStyling>
+      void drawIterable(const AIterable& objects, AStyling& styling);
+
+      /// Draws the object or its trajectory with the given attributes
+      template <bool a_drawTrajectory = false, class AObject>
+      void draw(const AObject& object, const AttributeMap& attributeMap);
 
     private:
       /// Switch to activate the uncovering of hits by their (mc) time of flight.
       bool m_animate = false;
 
       /// The plotter instance to translate event data objects to svg expressions.
-      TrackFindingCDC::EventDataPlotter m_eventdataPlotter;
-
+      EventDataPlotter m_eventdataPlotter;
     };
   }
 }

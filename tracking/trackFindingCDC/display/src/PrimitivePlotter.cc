@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/display/PrimitivePlotter.h>
+
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 #include <algorithm>

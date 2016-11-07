@@ -57,7 +57,8 @@ namespace Belle2 {
       /// Default constructor for ROOT compatibility. Uses an SVGPrimitivePlotter as backend.
       explicit EventDataPlotter(bool animate = false);
 
-      /** Constructor taking the specifc PrimitivePlotter instance as backend.
+      /**
+       *  Constructor taking the specifc PrimitivePlotter instance as backend.
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
@@ -67,7 +68,8 @@ namespace Belle2 {
       EventDataPlotter(const EventDataPlotter& EventDataPlotter);
 
     public:
-      /** Saves the current plot stead to a file.
+      /**
+       *  Saves the current plot stead to a file.
        *
        *  Deriving instances may should implement the approriate thing here and
        *  may return a modified string indicating the file name to which the plot as been written.
@@ -78,9 +80,7 @@ namespace Belle2 {
        */
       const std::string save(const std::string& fileName);
 
-      /** Clears all drawed elements from the plotter.
-       *
-       */
+      /// Clears all drawed elements from the plotter.
       void clear();
 
     public:
@@ -96,22 +96,28 @@ namespace Belle2 {
       /// Getter for the canvas height in pixels.
       float getCanvasHeight() const;
 
-      /** Setter for the canvas width in pixels.
+      /**
+       *  Setter for the canvas width in pixels.
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
-       *  which is stored in the bounding box (getBoundingBox()). */
+       *  which is stored in the bounding box (getBoundingBox()).
+       */
       void setCanvasWidth(float width);
 
-      /** Setter for the canvas height in pixels
+      /**
+       *  Setter for the canvas height in pixels
        *  The canvas height denotes the size of the image being produced.
        *  The coordinates space that is visible in the picture is a seperate concept
-       *  which is stored in the bounding box (getBoundingBox()). */
+       *  which is stored in the bounding box (getBoundingBox()).
+       */
       void setCanvasHeight(float height);
 
     public:
       /// Converts a time given in nanoseconds to a time sting of the from "%fs".
       std::string getAnimationTimeFromNanoSeconds(float nanoseconds)
-      { return std::to_string(nanoseconds) + "s"; }
+      {
+        return std::to_string(nanoseconds) + "s";
+      }
 
     private:
       /// Start a group in the underlying plotter with an animation uncovering the elements at the time of flight of the CDCSimHit.
@@ -133,8 +139,11 @@ namespace Belle2 {
       /// Draw the super layer bounds of the CDC.
       void drawSuperLayerBoundaries(const AttributeMap& attributeMap = AttributeMap());
 
-      ///Draws a straight Line.
-      void drawLine(float startX, float startY, float endX, float endY,
+      /// Draws a straight Line.
+      void drawLine(float startX,
+                    float startY,
+                    float endX,
+                    float endY,
                     const AttributeMap& attributeMap = AttributeMap());
 
     public:
@@ -219,10 +228,13 @@ namespace Belle2 {
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws trajectory the CDCRecoSegment2D
+      /// Draws trajectory of the CDCRecoSegment2D
       void drawTrajectory(const CDCRecoSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws trajectory the CDCTrack
+      /// Draws trajectory of the CDCSegmentTriple
+      void drawTrajectory(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());
+
+      /// Draws trajectory of the CDCTrack
       void drawTrajectory(const CDCTrack& track, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws curve along the fitted points of the RecoTrack

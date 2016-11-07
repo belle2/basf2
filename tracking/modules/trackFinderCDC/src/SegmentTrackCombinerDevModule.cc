@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerDevModule.h>
+#include <tracking/modules/trackFinderCDC/SegmentTrackCombinerDevModule.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 #include <framework/datastore/StoreArray.h>

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/modules/trackFinderOutputCombiner/SegmentTrackCombinerModule.h>
+#include <tracking/modules/trackFinderCDC/SegmentTrackCombinerModule.h>
 
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilterFactory.h>
@@ -83,5 +83,5 @@ namespace Belle2 {
     */
     Belle2::TrackFindingCDC::TrackFilterFactory m_trackFilterFactory;
 
-  }; // end class
-} // end namespace Belle2
+  };
+}

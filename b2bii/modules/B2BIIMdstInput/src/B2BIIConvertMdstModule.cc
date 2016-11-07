@@ -1553,6 +1553,7 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   covarianceMatrix[5] = ecl.error(5); // error on theta
   eclCluster->setCovarianceMatrix(covarianceMatrix);
 
+  eclCluster->setLAT(eclAux.width());
   eclCluster->setEnergyRaw(eclAux.mass());
   eclCluster->setE9oE21(eclAux.e9oe25());
   eclCluster->setEnergyHighestCrystal(eclAux.seed());

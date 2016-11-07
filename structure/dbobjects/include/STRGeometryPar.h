@@ -292,19 +292,19 @@ namespace Belle2 {
     //
 
     //! Material of each of the pole pieces
-    std::string m_PoleMaterial[NECLSHIELDS];
+    std::string m_PoleMaterial[NPOLEPIECES];
 
     //! Number of polycone planes in each pole piece
-    int m_PoleNPlanes[NECLSHIELDS];
+    int m_PoleNPlanes[NPOLEPIECES];
 
     //! Z-position of each plane (w.r.t. IP)
-    std::vector<double> m_PolePlaneZ[NECLSHIELDS];
+    std::vector<double> m_PolePlaneZ[NPOLEPIECES];
 
     //! Inner radii of the planes
-    std::vector<double> m_PolePlaneInnerRadius[NECLSHIELDS];
+    std::vector<double> m_PolePlaneInnerRadius[NPOLEPIECES];
 
     //! Outer radii of the planes
-    std::vector<double> m_PolePlaneOuterRadius[NECLSHIELDS];
+    std::vector<double> m_PolePlaneOuterRadius[NPOLEPIECES];
 
 
 

@@ -42,3 +42,4 @@ REG_MODULE(TrackExporter)
 
 REG_MODULE(SegmentFinderFacetAutomaton);
 REG_MODULE(TrackFinderSegmentPairAutomaton);
+REG_MODULE(TrackFinderSegmentTripleAutomaton);

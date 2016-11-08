@@ -29,7 +29,9 @@ class CDCLegendre(TrackingValidationRun):
     @staticmethod
     def finder_module(path):
         path.add_module('WireHitTopologyPreparer')
-        path.add_module('TrackFinderCDCLegendreTracking')
+        path.add_module('TrackFinderCDCLegendreTracking',
+                        WriteRecoTracks=False)
+        path.add_module('TrackExporter')
 
     tracking_coverage = {'UsePXDHits': False,
                          'UseSVDHits': False,

@@ -268,10 +268,13 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
-                    WriteRecoTracks=True,
                     TracksStoreObjNameIsInput=True,
-                    RecoTracksStoreArrayName=reco_tracks,
+                    WriteRecoTracks=False,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
+
+    # Export CDCTracks to RecoTracks representation
+    path.add_module("TrackExporter",
+                    RecoTracksStoreArrayName=reco_tracks)
 
     # Correct time seed (only necessary for the CDC tracks)
     path.add_module("IPTrackTimeEstimator",

@@ -506,7 +506,12 @@ namespace Belle2 {
      */
     void setDirtyFlag(const bool& dirtyFlag = true) { m_dirtyFlag = dirtyFlag; }
 
-    /// Remove all track hits, measurements and fit information from the track. Will only keep the states, covariances and the MC track id.
+    /**
+     * Remove all track hits, measurements and fit information from the track.
+     * Will only keep the states, covariances and the MC track id.
+     *
+     * Do not call this function on your own, as this is called by the TrackFitter when needed.
+     */
     void deleteTrackPointsAndFitStatus()
     {
       m_genfitTrack.deleteTrackPointsAndFitStatus();
@@ -607,7 +612,15 @@ namespace Belle2 {
       m_matchingStatus = matchingStatus;
     }
 
-    /// Delete all fitted information for all representations
+    /**
+     * Delete all fitted information for all representations
+     *
+     * This function is needed, when you want to start the fitting "from scratch".
+     * After this function, a fit will recreate all TrackPoints, measurements and fitted information.
+     * Please be aware that any pointers will be invalid after that!
+     *
+     * Call the function setDirtyFlag() after this function.
+     */
     void deleteFittedInformation();
 
 

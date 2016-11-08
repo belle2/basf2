@@ -74,11 +74,11 @@ namespace Belle2 {
       }
 
       /// Find all children node at maximum level and add them to the result list. Skip nodes if their weight is below minWeight.
-      template<class AItemInDomainMeasure>
-      std::vector<std::pair<ADomain, std::vector<T> > >
+      template <class AItemInDomainMeasure>
+      std::vector<std::pair<ADomain, std::vector<T>>>
       findHeavyLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
-                              const size_t maxLevel,
-                              const double minWeight)
+                              size_t maxLevel,
+                              double minWeight)
       {
         auto skipLowWeightNode = [minWeight](const Node * node) {
           return not(node->getWeight() >= minWeight);
@@ -87,10 +87,10 @@ namespace Belle2 {
       }
 
       /// Find all children node at maximum level and add them to the result list. Skip nodes if skipNode returns true.
-      template<class AItemInDomainMeasure, class ASkipNodePredicate>
-      std::vector<std::pair<ADomain,  std::vector<T> > >
+      template <class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::vector<std::pair<ADomain, std::vector<T>>>
       findLeavesDisjoint(AItemInDomainMeasure& weightItemInDomain,
-                         const size_t maxLevel,
+                         size_t maxLevel,
                          ASkipNodePredicate& skipNode)
       {
         std::vector<std::pair<ADomain,  std::vector<T> > > found;
@@ -128,10 +128,10 @@ namespace Belle2 {
        * The process is repeated until no leaf can be found anymore.
        * A node is skipped if the weight is below minWeight.
        */
-      template<class AItemInDomainMeasure>
-      std::vector<std::pair<ADomain,  std::vector<T> > >
+      template <class AItemInDomainMeasure>
+      std::vector<std::pair<ADomain, std::vector<T>>>
       findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
-                               const size_t maxLevel,
+                               size_t maxLevel,
                                const Weight minWeight = NAN)
       {
         auto skipLowWeightNode = [minWeight](const Node * node) {
@@ -147,10 +147,10 @@ namespace Belle2 {
        * The process is repeated until no leaf can be found anymore.
        * A node is skipped if skipNode is returns true for this node.
        */
-      template<class AItemInDomainMeasure, class ASkipNodePredicate>
-      std::vector<std::pair<ADomain,  std::vector<T> > >
+      template <class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::vector<std::pair<ADomain, std::vector<T>>>
       findHeaviestLeafRepeated(AItemInDomainMeasure& weightItemInDomain,
-                               const size_t maxLevel,
+                               size_t maxLevel,
                                ASkipNodePredicate& skipNode)
       {
         std::vector<std::pair<ADomain,  std::vector<T> > > found;
@@ -171,10 +171,10 @@ namespace Belle2 {
        * If no node could be found, return an empty list, otherwise return a list with just on element.
        * A node is skipped if skipNode is returns true for this node.
        */
-      template<class AItemInDomainMeasure, class ASkipNodePredicate>
-      std::unique_ptr<std::pair<ADomain,  std::vector<T> > >
+      template <class AItemInDomainMeasure, class ASkipNodePredicate>
+      std::unique_ptr<std::pair<ADomain, std::vector<T>>>
       findHeaviestLeafSingle(AItemInDomainMeasure& weightItemInDomain,
-                             const size_t maxLevel,
+                             size_t maxLevel,
                              ASkipNodePredicate& skipNode)
       {
         using Result = std::pair<ADomain,  std::vector<T> >;
@@ -195,9 +195,9 @@ namespace Belle2 {
        * If no node could be found, return a nullptr.
        * A node is skipped if skipNode is returns true for this node.
        */
-      template<class AItemInDomainMeasure, class ASkipNodePredicate>
+      template <class AItemInDomainMeasure, class ASkipNodePredicate>
       Node* findHeaviestLeaf(AItemInDomainMeasure& weightItemInDomain,
-                             const size_t maxLevel,
+                             size_t maxLevel,
                              ASkipNodePredicate& skipNode)
       {
         Node* heaviestNode = nullptr;

@@ -79,7 +79,7 @@ namespace Belle2 {
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
-      size_t getDivision(const size_t i) const
+      size_t getDivision(size_t i) const
       {
         return m_divisions[i];
       }
@@ -94,8 +94,8 @@ namespace Belle2 {
        *                     Usually this is counted in numbers of discrete values
        */
       template <size_t I>
-      void constructArray(const double lowerBound,
-                          const double upperBound,
+      void constructArray(double lowerBound,
+                          double upperBound,
                           const Width<I>& overlap = 0,
                           Width<I> width = 0)
       {

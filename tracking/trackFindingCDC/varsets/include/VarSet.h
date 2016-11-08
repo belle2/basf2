@@ -118,8 +118,7 @@ namespace Belle2 {
        *  @param name       Name of the sought variable
        *  @return           Index of the name, nVars if not found.
        */
-      constexpr
-      static int named(const char* const name)
+      constexpr static int named(const char* name)
       {
         return index<nVars>(AObjectVarNames::getName, name);
       }

@@ -17,8 +17,10 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n,
+    template <class AResultType = double>
+    std::vector<AResultType> linspace(double start,
+                                      double final,
+                                      std::size_t n,
                                       const std::function<AResultType(double)>& map)
     {
       std::vector<AResultType> result;
@@ -33,8 +35,8 @@ namespace Belle2 {
     }
 
     /** Returns n evenly spaced samples, calculated over the closed interval [start, stop ].*/
-    template<class AResultType = double>
-    std::vector<AResultType> linspace(const double start, const double final, const std::size_t n)
+    template <class AResultType = double>
+    std::vector<AResultType> linspace(double start, double final, std::size_t n)
     {
       auto map = [](const double in) -> AResultType {return AResultType(in);};
       return linspace<AResultType>(start, final, n, map);
@@ -47,9 +49,9 @@ namespace Belle2 {
     public:
       /// Constructor
       LookupTable(const std::function<T(double)>& map,
-                  const std::size_t n,
-                  const double lowerBound,
-                  const double upperBound)
+                  std::size_t n,
+                  double lowerBound,
+                  double upperBound)
         : m_lowerBound(lowerBound)
         , m_upperBound(upperBound)
         , m_binWidth((m_upperBound - m_lowerBound) / n)

@@ -68,8 +68,11 @@ namespace Belle2 {
        * @param lastArcLength2D the last arc length 2d of the track
        * @return True, if the match can be m ade (the quad tree has still to give his yes too).
        */
-      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler, const double shiftValue,
-                              const ISuperLayer lastSuperLayer, const double lastArcLength2D) const;
+      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D,
+                              bool isCurler,
+                              double shiftValue,
+                              ISuperLayer lastSuperLayer,
+                              double lastArcLength2D) const;
     };
   }
 }

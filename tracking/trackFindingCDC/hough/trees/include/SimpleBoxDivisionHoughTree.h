@@ -27,8 +27,17 @@ namespace Belle2 {
       using HoughBox = typename AInBoxAlgorithm::HoughBox;
     public:
       /// Constructor using the given maximal level.
-      SimpleBoxDivisionHoughTree(const float maximumX, const float maximumY, const float overlapX = 0, const float overlapY = 0) :
-        Super(0), m_maximumX(maximumX), m_maximumY(maximumY), m_overlapX(overlapX), m_overlapY(overlapY) {}
+      SimpleBoxDivisionHoughTree(float maximumX,
+                                 float maximumY,
+                                 float overlapX = 0,
+                                 float overlapY = 0)
+        : Super(0)
+        , m_maximumX(maximumX)
+        , m_maximumY(maximumY)
+        , m_overlapX(overlapX)
+        , m_overlapY(overlapY)
+      {
+      }
 
       /// Initialize the tree with the given values.
       void initialize()

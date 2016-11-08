@@ -39,7 +39,7 @@ namespace Belle2 {
        *  @param name       Name of the sought part
        *  @return           Index of the name, nParts if not found.
        */
-      virtual int getNameIndex(const char* const name) const = 0;
+      virtual int getNameIndex(const char* name) const = 0;
 
       /// Getter for the ith name.
       virtual std::string getName(int iValue) const = 0;

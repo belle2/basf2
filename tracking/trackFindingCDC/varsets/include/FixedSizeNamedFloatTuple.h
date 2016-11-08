@@ -40,11 +40,8 @@ namespace Belle2 {
      *  @return        The index at which the string was found.
      *                 nNames if not found, which points to one after the array.
      */
-    template<size_t nNames>
-    constexpr
-    int index(const char* const(&names)[nNames],
-              const char* const name,
-              const size_t iName = 0)
+    template <size_t nNames>
+    constexpr int index(const char* const(&names)[nNames], const char* name, size_t iName = 0)
     {
       return ((nNames == iName) ?
               iName :
@@ -113,8 +110,7 @@ namespace Belle2 {
        *  @param name   The sough name.
        *  @return       Index of the name, nNames if not found.
        */
-      constexpr
-      static int named(const char* const name)
+      constexpr static int named(const char* name)
       {
         return index<nNames>(ANames::getName, name);
       }
@@ -134,7 +130,7 @@ namespace Belle2 {
        *  @param name       Name of the sought part
        *  @return           Index of the name, nParts if not found.
        */
-      virtual int getNameIndex(const char* const name) const override final
+      virtual int getNameIndex(const char* name) const override final
       {
         return named(name);
       }
@@ -167,7 +163,7 @@ namespace Belle2 {
       }
 
       /// Setter for the value with the given name.
-      void set(const char* const name, Float_t value)
+      void set(const char* name, Float_t value)
       {
         set(named(name), value);
       }
@@ -191,7 +187,7 @@ namespace Belle2 {
       }
 
       /// Getter for the value with the given name.
-      Float_t get(const char* const name) const
+      Float_t get(const char* name) const
       {
         return get(named(name));
       }
@@ -215,7 +211,7 @@ namespace Belle2 {
       }
 
       /// Reference getter for the value with the given name.
-      Float_t& operator[](const char* const name)
+      Float_t& operator[](const char* name)
       {
         return value(named(name));
       }

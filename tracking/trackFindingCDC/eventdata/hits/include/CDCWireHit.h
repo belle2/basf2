@@ -61,10 +61,10 @@ namespace Belle2 {
        *  @param driftLengthVariance  Initial estimate of the variance of the dirft length at the reference position.
        *  @param chargeDeposit        Initial estimate of the deposited charge in the drift cell.
        */
-      CDCWireHit(const CDCHit* const ptrHit,
-                 const double driftLength,
-                 const double driftLengthVariance = c_simpleDriftLengthVariance,
-                 const double chargeDeposit = 0);
+      CDCWireHit(const CDCHit* ptrHit,
+                 double driftLength,
+                 double driftLengthVariance = c_simpleDriftLengthVariance,
+                 double chargeDeposit = 0);
 
       /**
        *  Constructor for augmenting the CDCHit with the geometry information of the CDCWire.
@@ -74,15 +74,15 @@ namespace Belle2 {
        *
        *  @param  ptrHit          Reference to the CDCHit.
        */
-      CDCWireHit(const CDCHit* const ptrHit,
+      CDCWireHit(const CDCHit* ptrHit,
                  CDC::TDCCountTranslatorBase* ptrTDCCountTranslator = nullptr,
                  CDC::ADCCountTranslatorBase* ptrADCCountTranslator = nullptr);
 
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
-                 const double driftLength,
-                 const double driftlengthVariance = c_simpleDriftLengthVariance,
-                 const double chargeDeposit = 0);
+                 double driftLength,
+                 double driftlengthVariance = c_simpleDriftLengthVariance,
+                 double chargeDeposit = 0);
 
       /// Equality comparison based on the wire and the hit id.
       bool operator==(const CDCWireHit& rhs) const
@@ -275,7 +275,7 @@ namespace Belle2 {
        *    yield the closest approach of the drift circle to the trajectory
        *    in the reference plane.
        */
-      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, const ERightLeft rlInfo) const;
+      Vector3D reconstruct3D(const CDCTrajectory2D& trajectory2D, ERightLeft rlInfo) const;
 
       /**
        *  Applys the conformal transformation to the drift circle this hit represents.

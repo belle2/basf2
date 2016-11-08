@@ -109,7 +109,9 @@ namespace Belle2 {
        * Helper function to add a segment to a track with respecting the taken information of the segment.
        * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
        */
-      static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits = true);
+      static void addSegmentToTrack(const CDCRecoSegment2D& segment,
+                                    CDCTrack& track,
+                                    bool useTakenFlagOfHits = true);
 
     private:
       const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */

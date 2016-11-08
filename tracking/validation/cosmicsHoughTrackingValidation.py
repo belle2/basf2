@@ -31,23 +31,33 @@ class CosmicsHough(TrackingValidationRun):
 
     wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
 
-    segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton')
-    segment_finder_module.param("SegmentOrientation", "downwards")
+    segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton',
+                                                  SegmentOrientation="downwards")
 
-    axial_hough_module = basf2.register_module('TrackFinderCDCAxialSegmentHough')
-    axial_hough_module.param(dict(WriteRecoTracks=False,
-                                  TracksStoreObjName="AxialCDCTracks"))
+    axial_hough_module = basf2.register_module('TrackFinderCDCAxialSegmentHough',
+                                               WriteRecoTracks=False,
+                                               TracksStoreObjName="AxialCDCTracks")
 
-    cdc_stereo_combiner_module = basf2.register_module('StereoHitFinderCDCLegendreHistogramming')
-    cdc_stereo_combiner_module.param(dict(TracksStoreObjNameIsInput=True,
-                                          WriteRecoTracks=True,
-                                          TracksStoreObjName="AxialCDCTracks"))
+    stereo_combiner_module = basf2.register_module('StereoHitFinderCDCLegendreHistogramming',
+                                                   TracksStoreObjNameIsInput=True,
+                                                   WriteRecoTracks=False,
+                                                   TracksStoreObjName="AxialCDCTracks")
 
-    finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, cdc_stereo_combiner_module]
+    track_exporter = basf2.register_module('TrackExporter',
+                                           inputTracks="AxialCDCTracks")
+
+    finder_module = [
+        wire_hit_topology_preparer,
+        segment_finder_module,
+        axial_hough_module,
+        stereo_combiner_module,
+        track_exporter
+        ]
 
     del segment_finder_module  # do not let the names show up in the class name space
     del axial_hough_module  # do not let the names show up in the class name space
-    del cdc_stereo_combiner_module  # do not let the names show up in the class name space
+    del stereo_combiner_module  # do not let the names show up in the class name space
+    del track_exporter
 
     interactive_display = False
     if interactive_display:

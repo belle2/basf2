@@ -1543,6 +1543,7 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setPhi(ecl.phi());
   eclCluster->setTheta(ecl.theta());
   eclCluster->setR(ecl.r());
+  eclCluster->setdeltaL(ecl.quality());
 
   double covarianceMatrix[6];
   covarianceMatrix[0] = ecl.error(0); // error on energy

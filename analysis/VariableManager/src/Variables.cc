@@ -1690,6 +1690,9 @@ namespace Belle2 {
                       "ECL cluster's distance");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
                       "ECL cluster's azimuthal angle");
+    REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL,
+                      "ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object)."
+                      "The Belle people used only clusters with quality == 0 in their E_{extra_ecl}");
     REGISTER_VARIABLE("clusterTheta", eclClusterTheta,
                       "ECL cluster's polar angle");
     REGISTER_VARIABLE("clusterTiming", eclClusterTiming,

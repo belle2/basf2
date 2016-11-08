@@ -11,10 +11,9 @@
 #pragma once
 
 #include <framework/logging/Logger.h>
-
 #include <limits>
+#include <TObject.h>
 
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 
@@ -32,7 +31,7 @@ namespace Belle2 {
    *
    *  @todo WireID : Rootification might not be necessary; On the other hand, it opens as well the use via Python.
    */
-  class WireID : public RelationsObject {
+  class WireID : public TObject {
   public:
     //--- Constructors ---------------------------------------------
     /** Constructor taking the encoded wire number.
@@ -49,7 +48,7 @@ namespace Belle2 {
     }
 
     /** Copy constructor. */
-    WireID(const WireID& wireID) : RelationsObject(wireID)
+    WireID(const WireID& wireID) : TObject(wireID)
     {
       m_eWire = wireID.m_eWire;
     }
@@ -75,7 +74,7 @@ namespace Belle2 {
     WireID& operator=(const WireID& wireID)
     {
       m_eWire = wireID.m_eWire;
-      static_cast<RelationsObject>(*this) = wireID;
+      static_cast<TObject>(*this) = wireID;
       return *this;
     }
 

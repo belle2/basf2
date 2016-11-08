@@ -101,7 +101,7 @@ namespace Belle2 {
 
       /// Construct the averages of the two given helices by properly considering their covariance
       /// matrix.
-      static UncertainHelix average(const UncertainHelix& helix1, const UncertainHelix& helix2);
+      static UncertainHelix average(const UncertainHelix& fromHelix, const UncertainHelix& toHelix);
 
       /**
        *  Construct the average helix including its covariance matrix from two different stereo
@@ -126,10 +126,10 @@ namespace Belle2 {
        *  @param szParameters      Reference sz parameters where the perigee circles have been
        * fitted.
        */
-      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle1,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix1,
-                                    const UncertainPerigeeCircle& perigeeCircle2,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix2,
+      static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const UncertainPerigeeCircle& toPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& toAmbiguity,
                                     const SZParameters& szParameters = SZParameters(0.0, 0.0));
 
       /**
@@ -173,9 +173,9 @@ namespace Belle2 {
        * helix parameters
        *  @param helix            Second perigee circle
        */
-      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix,
-                                    const UncertainHelix& helix);
+      static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const UncertainHelix& toHelix);
 
     public:
       /**

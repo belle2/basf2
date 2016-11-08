@@ -39,10 +39,10 @@ PerigeeCircle::PerigeeCircle(double curvature, double phi0, double impact)
 {
 }
 
-PerigeeCircle::PerigeeCircle(const PerigeeParameters& parameters)
-  : PerigeeCircle(parameters(EPerigeeParameter::c_Curv),
-                  parameters(EPerigeeParameter::c_Phi0),
-                  parameters(EPerigeeParameter::c_I))
+PerigeeCircle::PerigeeCircle(const PerigeeParameters& perigeeParameters)
+  : PerigeeCircle(perigeeParameters(EPerigeeParameter::c_Curv),
+                  perigeeParameters(EPerigeeParameter::c_Phi0),
+                  perigeeParameters(EPerigeeParameter::c_I))
 {
 }
 
@@ -257,11 +257,11 @@ double PerigeeCircle::arcLengthAtSecantLength(double secantLength) const
   return secantLength * arcLengthFactor;
 }
 
-std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double R) const
+std::pair<Vector2D, Vector2D> PerigeeCircle::atCylindricalR(const double cylindricalR) const
 {
   const double u = (1 + curvature() * impact());
-  const double orthogonal = ((impact() * impact() + R * R) * curvature() / 2.0 + impact()) / u;
-  const double parallel = sqrt(square(R) - square(orthogonal));
+  const double orthogonal = ((square(impact()) + square(cylindricalR)) * curvature() / 2.0 + impact()) / u;
+  const double parallel = sqrt(square(cylindricalR) - square(orthogonal));
   Vector2D atCylindricalR1 = Vector2D::compose(phi0Vec(), -parallel, orthogonal);
   Vector2D atCylindricalR2 = Vector2D::compose(phi0Vec(), parallel, orthogonal);
   std::pair<Vector2D, Vector2D> result(atCylindricalR1, atCylindricalR2);

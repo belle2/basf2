@@ -40,7 +40,7 @@ namespace Belle2 {
       virtual void terminate() override final;
 
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
-      virtual Weight operator()(const CDCSegmentTriple& triple) override final;
+      virtual Weight operator()(const CDCSegmentTriple& segmentTriple) override final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.

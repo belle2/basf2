@@ -22,7 +22,7 @@ namespace Belle2 {
       RiemannsMethod();
 
       /// Executes the fit and updates the trajectory parameters. This may render the information in the observation object.
-      void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
+      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
 
     private:
       /**
@@ -30,14 +30,16 @@ namespace Belle2 {
        *
        *  This method is used if there is drift length information is available from the observations.
        */
-      void updateWithoutDriftLength(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
+      void updateWithoutDriftLength(CDCTrajectory2D& trajectory2D,
+                                    CDCObservations2D& observations2D) const;
 
       /**
        *  Executes the fit using the drift length information.
        *
        *  This method is used if there is no  drift length information is available from the observations.
        */
-      void updateWithDriftLength(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
+      void updateWithDriftLength(CDCTrajectory2D& trajectory2D,
+                                 CDCObservations2D& observations2D) const;
 
     public:
       /// Getter for the indictor that lines should be fitted by this fitter

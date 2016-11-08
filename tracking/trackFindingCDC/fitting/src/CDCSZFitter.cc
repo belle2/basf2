@@ -176,18 +176,18 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
 }
 
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
-                         CDCObservations2D& observations2D) const
+                         CDCObservations2D& observationsSZ) const
 {
   trajectorySZ.clear();
-  if (observations2D.size() < 3) {
+  if (observationsSZ.size() < 3) {
     return;
   }
 
   // Determine NDF : Line fit eats up 2 degrees of freedom.
-  size_t ndf = observations2D.size() - 2;
+  size_t ndf = observationsSZ.size() - 2;
 
   // Matrix of weighted sums
-  Matrix< double, 3, 3 > sumMatrixWSZ = observations2D.getWXYSumMatrix();
+  Matrix< double, 3, 3 > sumMatrixWSZ = observationsSZ.getWXYSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
 
   uncertainSZLine.setNDF(ndf);

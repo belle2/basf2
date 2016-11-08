@@ -58,7 +58,7 @@ namespace Belle2 {
       virtual void beginEvent() override;
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCWireHitCluster* cluster) override final;
+      virtual bool extract(const CDCWireHitCluster* ptrCluster) override final;
     };
   }
 }

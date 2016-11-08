@@ -183,19 +183,19 @@ double SinEqLine::newtonX(const Vector2D& pos) const
 
 
 
-bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& current)
+bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& next)
 {
-  /// Only update if the current point is inbetween the lower and upper bound
-  if (not isBetween(lower, current, upper)) return false;
+  /// Only update if the next point is inbetween the lower and upper bound
+  if (not isBetween(lower, next, upper)) return false;
 
   EIncDec incDecInfo = getEIncDec(lower, upper);
   if (incDecInfo == EIncDec::c_Increasing) {
-    if (current.y() > 0.0 and upper.y() > 0.0) {
-      upper.set(current);
+    if (next.y() > 0.0 and upper.y() > 0.0) {
+      upper.set(next);
       return true;
 
-    } else if (current.y() <= 0.0 and lower.y() <= 0.0) {
-      lower.set(current);
+    } else if (next.y() <= 0.0 and lower.y() <= 0.0) {
+      lower.set(next);
       return true;
 
     } else {
@@ -204,12 +204,12 @@ bool SinEqLine::updateBounds(Vector2D& lower, Vector2D& upper, const Vector2D& c
     }
 
   } else if (incDecInfo == EIncDec::c_Decreasing) {
-    if (current.y() >= 0 and lower.y() >= 0.0) {
-      lower.set(current);
+    if (next.y() >= 0 and lower.y() >= 0.0) {
+      lower.set(next);
       return true;
 
-    } else if (current.y() < 0 and upper.y() < 0) {
-      upper.set(current);
+    } else if (next.y() < 0 and upper.y() < 0) {
+      upper.set(next);
       return true;
 
     } else {

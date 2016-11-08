@@ -35,8 +35,9 @@ Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& r
 }
 
 template <class HoughTree>
-std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
-                                          const std::vector<CDCRLWireHit>& rlWireHits)
+std::vector<WithWeight<const CDCRLWireHit*>>
+                                          StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
+                                              const std::vector<CDCRLWireHit>& rlWireHits)
 {
   if (m_stereoHitFilter->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();

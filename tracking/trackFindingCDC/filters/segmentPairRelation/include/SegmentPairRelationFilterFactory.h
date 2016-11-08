@@ -34,8 +34,8 @@ namespace Belle2 {
       using FilterFactory<BaseSegmentPairRelationFilter>::create;
 
       /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual
-      std::unique_ptr<BaseSegmentPairRelationFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseSegmentPairRelationFilter>
+      create(const std::string& filterName) const override;
 
       /** Getter for a descriptive purpose of the clusterfilter.*/
       virtual std::string getFilterPurpose() const override;

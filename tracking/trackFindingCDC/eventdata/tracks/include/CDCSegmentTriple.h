@@ -43,7 +43,7 @@ namespace Belle2 {
       CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
                        const CDCStereoRecoSegment2D* middleSegment,
                        const CDCAxialRecoSegment2D* endSegment,
-                       const CDCTrajectory3D& trajector3D);
+                       const CDCTrajectory3D& trajectory3D);
 
       /// Equality comparision based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const

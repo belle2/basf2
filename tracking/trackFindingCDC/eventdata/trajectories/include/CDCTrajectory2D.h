@@ -62,17 +62,14 @@ namespace Belle2 {
        *  Construct a trajectory with given start point, transverse momentum at the start point,
        *  the given charge and the magnetic field value in z direction.
        */
-      CDCTrajectory2D(const Vector2D& startPoint,
-                      double startTime,
-                      const Vector2D& startMomentum,
+      CDCTrajectory2D(const Vector2D& pos2D,
+                      double time,
+                      const Vector2D& mom2D,
                       double charge,
                       double bZ);
 
       /// Construct a trajectory with given start point, transverse momentum at the start point and given charge.
-      CDCTrajectory2D(const Vector2D& startPoint,
-                      double startTime,
-                      const Vector2D& startMomentum,
-                      double charge);
+      CDCTrajectory2D(const Vector2D& pos2D, double time, const Vector2D& mom2D, double charge);
 
     public:
       /// Checks if the circle is already set to a valid value.

@@ -623,7 +623,7 @@ namespace Belle2 {
       double arcLengthBetween(const Vector2D& from, const Vector2D& to) const;
 
       /// Calculates the arc length between the perigee and the given point.
-      double arcLengthTo(const Vector2D& point) const;
+      double arcLengthTo(const Vector2D& to) const;
 
       /**
        *  Calculates the two dimensional arc length till the cylindrical radius is reached

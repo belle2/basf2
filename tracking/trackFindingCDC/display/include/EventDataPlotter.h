@@ -62,10 +62,10 @@ namespace Belle2 {
        *
        *  Note that the EventDataPlotter takes ownership of the PrimitivePlotter and destroys it on its on own deconstruction.
        */
-      EventDataPlotter(std::unique_ptr<PrimitivePlotter> primitivePlotter, bool animate = false);
+      EventDataPlotter(std::unique_ptr<PrimitivePlotter> ptrPrimitivePlotter, bool animate = false);
 
       /// Copy constructor
-      EventDataPlotter(const EventDataPlotter& EventDataPlotter);
+      EventDataPlotter(const EventDataPlotter& eventDataPlotter);
 
     public:
       /**

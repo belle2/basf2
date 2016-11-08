@@ -57,7 +57,7 @@ namespace Belle2 {
       explicit TruthFacetVarSet();
 
       /// Generate and assign the variables from the facet
-      virtual bool extract(const CDCFacet* facet) override final;
+      virtual bool extract(const CDCFacet* ptrFacet) override final;
 
       /// Initialize the varset before event processing
       virtual void initialize() override final;

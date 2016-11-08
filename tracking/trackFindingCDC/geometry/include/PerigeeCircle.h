@@ -38,7 +38,7 @@ namespace Belle2 {
       PerigeeCircle(double curvature, double phi0, double impact);
 
       /// Constructor from the perigee parammeters.
-      explicit PerigeeCircle(const PerigeeParameters& par);
+      explicit PerigeeCircle(const PerigeeParameters& perigeeParameters);
 
     private:
       /// Constructor taking all stored parameters for internal use.

@@ -81,8 +81,7 @@ namespace Belle2 {
       explicit BasicFacetVarSet();
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCFacet* facet) override final;
-
+      virtual bool extract(const CDCFacet* ptrFacet) override final;
     };
   }
 }

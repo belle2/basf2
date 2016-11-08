@@ -50,7 +50,7 @@ namespace Belle2 {
       virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments);
 
       /// Fit the alias segment
-      void refit(CDCRecoSegment2D& aliasSegment, bool reestimate);
+      void refit(CDCRecoSegment2D& segment, bool reestimate);
 
     private:
       /// Parameter : Which alias resolutions should be applied

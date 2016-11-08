@@ -54,8 +54,8 @@ namespace Belle2 {
        * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
        * and each hit is assigned to the track.
        */
-      std::vector<WithWeight<const CollectionItem*>> match(const CollectorItem& collectorItem,
-                                                           const std::vector<CollectionItem>& collectionList);
+      std::vector<WithWeight<const CDCRLWireHit*>>
+                                                match(const CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits);
 
       /** Initialize the filter and the quad tree. */
       virtual void initialize() override

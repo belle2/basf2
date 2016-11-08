@@ -300,14 +300,14 @@ void CDCSVGPlotter::drawRecoTrackTrajectories(const std::string& storeArrayName,
   drawStoreArray<const RecoTrack, drawTrajectories>(storeArrayName, styling);
 }
 
-void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& storeArrayName,
+void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& simHitStoreArrayName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
 {
   B2INFO("Drawing simulated hits connected by tof");
-  StoreArray<CDCHit> hitStoreArray(storeArrayName);
+  StoreArray<CDCHit> hitStoreArray(simHitStoreArrayName);
   if (not hitStoreArray) {
-    B2WARNING("StoreArray " << storeArrayName << " not present");
+    B2WARNING("StoreArray " << simHitStoreArrayName << " not present");
     printDataStoreContent();
     return;
   }
@@ -337,10 +337,10 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& storeArrayName,
       ++itSimHit;
       CDCSimHit* toSimHit = *itSimHit;
 
-      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>(storeArrayName);
-      CDCHit* toHit = toSimHit->getRelated<CDCHit>(storeArrayName);
+      CDCHit* fromHit = fromSimHit->getRelated<CDCHit>(simHitStoreArrayName);
+      CDCHit* toHit = toSimHit->getRelated<CDCHit>(simHitStoreArrayName);
 
-      if (fromHit != nullptr || toHit != nullptr) {
+      if (fromHit != nullptr and toHit != nullptr) {
         CDCWireHit fromWireHit(fromHit);
         CDCWireHit toWireHit(toHit);
 
@@ -370,14 +370,14 @@ void CDCSVGPlotter::drawSimHitsConnectByToF(const std::string& storeArrayName,
   }
 }
 
-void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& storeObjName,
+void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& segmentsStoreObjName,
                                             const std::string& stroke,
                                             const std::string& strokeWidth)
 {
   B2INFO("Draw axial to axial segment pairs");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(storeObjName);
+  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(segmentsStoreObjName);
   if (not storedSegments) {
-    B2WARNING(storeObjName << "does not exist in current DataStore");
+    B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
@@ -410,14 +410,14 @@ void CDCSVGPlotter::drawMCAxialSegmentPairs(const std::string& storeObjName,
   drawIterable(mcAxialSegmentPairs, styling);
 }
 
-void CDCSVGPlotter::drawMCSegmentPairs(const std::string& storeObjName,
+void CDCSVGPlotter::drawMCSegmentPairs(const std::string& segmentsStoreObjName,
                                        const std::string& stroke,
                                        const std::string& strokeWidth)
 {
   B2INFO("Draw axial to stero segment pairs");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(storeObjName);
+  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedSegments(segmentsStoreObjName);
   if (not storedSegments) {
-    B2WARNING(storeObjName << "does not exist in current DataStore");
+    B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
@@ -466,14 +466,14 @@ void CDCSVGPlotter::drawMCSegmentPairs(const std::string& storeObjName,
   drawIterable(mcSegmentPairs, styling);
 }
 
-void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName,
+void CDCSVGPlotter::drawMCSegmentTriples(const std::string& segmentsStoreObjName,
                                          const std::string& stroke,
                                          const std::string& strokeWidth)
 {
   B2INFO("Draw segment triples");
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(storeObjName);
+  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(segmentsStoreObjName);
   if (not storedRecoSegments) {
-    B2WARNING(storeObjName << "does not exist in current DataStore");
+    B2WARNING(segmentsStoreObjName << "does not exist in current DataStore");
     printDataStoreContent();
     return;
   }
@@ -513,7 +513,7 @@ void CDCSVGPlotter::drawMCSegmentTriples(const std::string& storeObjName,
   drawIterable(mcSegmentTriples, styling);
 }
 
-std::string CDCSVGPlotter::saveFile(const std::string& svgFileName)
+std::string CDCSVGPlotter::saveFile(const std::string& fileName)
 {
   TrackFindingCDC::BoundingBox boundingBox = m_eventdataPlotter.getBoundingBox();
 
@@ -527,7 +527,7 @@ std::string CDCSVGPlotter::saveFile(const std::string& svgFileName)
   m_eventdataPlotter.setCanvasHeight(svgHeight);
   m_eventdataPlotter.setCanvasWidth(svgWidth);
 
-  return (m_eventdataPlotter.save(svgFileName));
+  return (m_eventdataPlotter.save(fileName));
 }
 
 template <class AItem, bool a_drawTrajectories>
@@ -581,10 +581,10 @@ void CDCSVGPlotter::drawStoreVector(const std::string& storeObjName,
 }
 
 template <bool a_drawTrajectory, class AIterable, class AStyling>
-void CDCSVGPlotter::drawIterable(const AIterable& iterable, AStyling& styling)
+void CDCSVGPlotter::drawIterable(const AIterable& items, AStyling& styling)
 {
   unsigned int index = -1;
-  for (const auto& item : iterable) {
+  for (const auto& item : items) {
 
     ++index;
     AttributeMap attributeMap = styling.map(index, item);

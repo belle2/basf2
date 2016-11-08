@@ -38,8 +38,8 @@ namespace Belle2 {
       /**
        * Use the given filter (via the module parameters) to find a matching.
        */
-      std::vector<WithWeight<const CollectionItem*>> match(const CollectorItem& collectorItem,
-                                                           const std::vector<CollectionItem>& collectionList);
+      std::vector<WithWeight<const CollectionItem*>>
+                                                  match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
     };
   }
 }

@@ -243,7 +243,7 @@ namespace Belle2 {
        * @param stroke                Color of the lines to be drawn.
        * @param strokeWidth           Width of the lines to be drawn.
        */
-      void drawMCSegmentTriples(const std::string& storeObjName,
+      void drawMCSegmentTriples(const std::string& segmentsStoreObjName,
                                 const std::string& stroke,
                                 const std::string& strokeWidth);
 
@@ -286,7 +286,7 @@ namespace Belle2 {
        * @param  styling          Styling object from which drawing attributes are constructed
        */
       template <bool a_drawTrajectory = false, class AIterable, class AStyling>
-      void drawIterable(const AIterable& objects, AStyling& styling);
+      void drawIterable(const AIterable& items, AStyling& styling);
 
       /// Draws the object or its trajectory with the given attributes
       template <bool a_drawTrajectory = false, class AObject>

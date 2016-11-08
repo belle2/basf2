@@ -74,17 +74,14 @@ namespace Belle2 {
        *  Construct a trajectory with given start point, momentum at the start point and given charge.
        *  Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
        */
-      CDCTrajectory3D(const Vector3D& startPoint,
-                      double startTime,
-                      const Vector3D& startMomentum,
+      CDCTrajectory3D(const Vector3D& pos3D,
+                      double time,
+                      const Vector3D& mom3D,
                       double charge,
                       double bZ);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
-      CDCTrajectory3D(const Vector3D& startPoint,
-                      double startTime,
-                      const Vector3D& startMomentum,
-                      double charge);
+      CDCTrajectory3D(const Vector3D& pos3D, double time, const Vector3D& mom3D, double charge);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       CDCTrajectory3D(const MCParticle& mcParticle, double bZ);
@@ -120,7 +117,7 @@ namespace Belle2 {
       bool fillInto(genfit::TrackCand& trackCand) const;
 
       /// Copies the trajectory information to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand, double bZ) const;
+      bool fillInto(genfit::TrackCand& gfTrackCand, double bZ) const;
 
       /// Copies the trajectory information to the RecoTrack
       RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;

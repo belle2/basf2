@@ -85,13 +85,13 @@ namespace Belle2 {
 
     public:
       /// Getter for the index of the hit within its track.
-      Index getInTrackId(const CDCHit* hit) const;
+      Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Getter for the index of the segment of the hit within its track.
-      Index getInTrackSegmentId(const CDCHit* hit) const;
+      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Getter for the number of super layers traversed until this hit.
-      Index getNPassedSuperLayers(const CDCHit* hit) const;
+      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
     private:
       /// Reference to the MC map of the current event

@@ -143,7 +143,7 @@ namespace Belle2 {
       /// Generate a hit for the given wire.
       SimpleSimHit createHitForCell(const CDCWire& wire,
                                     const Helix& globalHelix,
-                                    double arcLengthOffset) const;
+                                    double arcLength2DOffset) const;
 
     public:
       /// Getter for a global event time offset

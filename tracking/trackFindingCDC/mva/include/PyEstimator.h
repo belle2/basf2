@@ -26,20 +26,20 @@ namespace Belle2 {
       explicit PyEstimator(const std::string& pickleFileName);
 
       /// Call the predict method of the estimator
-      double predict(const std::vector<double>& inputVariable);
+      double predict(const std::vector<double>& inputVariables);
 
       /// Call the predict method of the estimator
       double predict(const std::vector<NamedFloatTuple*>& floatTuples);
 
       /// Call the predict method of the estimator
-      double predict(boost::python::object& input);
+      double predict(boost::python::object& array);
 
     private:
       /// Load the estimator object from the pickled file.
       void unpickleEstimator(const std::string& pickleFileName);
 
       /// Reserves space for at least n variable in the input array
-      void expand(size_t n);
+      void expand(size_t nVars);
 
     private:
       /// File name of the pickle file that contains the trained estimator

@@ -39,17 +39,15 @@ namespace Belle2 {
       virtual ~StereoHitTrackMatcherFilter() = default;
 
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "") override;
+      virtual void exposeParameters(ModuleParamList* moduleParameters,
+                                    const std::string& prefix = "") override;
 
-      /**
-       * Use the given filter (via the module parameters) to find a matching.
-       */
-      std::vector<WithWeight<const CollectionItem*>> match(const CollectorItem& collectorItem,
-                                                           const std::vector<CollectionItem>& collectionList);
+      /// Use the given filter (via the module parameters) to find a matching
+      std::vector<WithWeight<const CDCRLWireHit*>>
+                                                match(const CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits);
 
     private:
-      /// Parameters
-      /// Set to false to skip the B2B check (good for curlers).
+      /// Parameter : Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
     };
   }

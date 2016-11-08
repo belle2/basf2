@@ -81,7 +81,7 @@ namespace Belle2 {
       /// Constructor that takes a wire ID and a driftlength at the reference. For testing only!
       CDCWireHit(const WireID& wireID,
                  double driftLength,
-                 double driftlengthVariance = c_simpleDriftLengthVariance,
+                 double driftLengthVariance = c_simpleDriftLengthVariance,
                  double chargeDeposit = 0);
 
       /// Equality comparison based on the wire and the hit id.

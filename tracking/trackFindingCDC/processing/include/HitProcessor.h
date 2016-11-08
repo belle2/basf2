@@ -43,13 +43,14 @@ namespace Belle2 {
       HitProcessor& operator=(const HitProcessor&) = delete;
 
       /** update given CDCRecoHit3D with given trajectory */
-      static void updateRecoHit3D(CDCTrajectory2D& trackTrajectory2D, CDCRecoHit3D& hit);
+      static void updateRecoHit3D(CDCTrajectory2D& trajectory2D, CDCRecoHit3D& hit);
 
       /** Hits reassignment */
-      static void reassignHitsFromOtherTracks(CDCTrackList& cdcTrackList);
+      static void reassignHitsFromOtherTracks(CDCTrackList& trackList);
 
       /** Append unused hits to tracks */
-      static void appendUnusedHits(std::vector<CDCTrack>& tracks, const std::vector<CDCConformalHit*>& conformalCDCWireHitList);
+      static void appendUnusedHits(std::vector<CDCTrack>& tracks,
+                                   const std::vector<CDCConformalHit*>& axialConformalHits);
 
       /** Delete all hits marked as bad (MASKED) in a track. Should be called after every hit reassignment. */
       static void deleteAllMarkedHits(CDCTrack& track);
@@ -58,16 +59,17 @@ namespace Belle2 {
       static void deleteAllMarkedHits(std::vector<const CDCWireHit*>& wireHits);
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& trackCandidate);
+      static std::vector<const CDCWireHit*> splitBack2BackTrack(CDCTrack& track);
 
       /** Tries to split back-to-back tracks into two different tracks */
-      static bool isBack2BackTrack(CDCTrack& trackCandidate);
+      static bool isBack2BackTrack(CDCTrack& track);
 
       /** Estimate sign of the track charge. */
-      static ESign getChargeSign(CDCTrack& track) ;
+      static ESign getChargeSign(CDCTrack& track);
 
       /// Reset all masked hits.
-      static void resetMaskedHits(CDCTrackList& cdcTrackList, std::vector<CDCConformalHit>& conformalCDCWireHitList);
+      static void resetMaskedHits(CDCTrackList& trackList,
+                                  std::vector<CDCConformalHit>& conformalHits);
 
       /// Unset the MASKED flag and set the TAKEN flag of all hits but do not touch the track flags.
       static void unmaskHitsInTrack(CDCTrack& track);
@@ -80,11 +82,12 @@ namespace Belle2 {
        * As this function used the masked flag, all hits should have their masked flag set to false before calling
        * this function.
        */
-      static void deleteHitsFarAwayFromTrajectory(CDCTrack& trackCandidate, double maximum_distance = 0.2);
+      static void deleteHitsFarAwayFromTrajectory(CDCTrack& track, double maximumDistance = 0.2);
 
       /// Assign new hits to the track basing on the distance from the hit to the track.
-      static void assignNewHitsToTrack(CDCTrack& track, const std::vector<CDCConformalHit>& conformalCDCWireHitList,
-                                       double minimal_distance_to_track = 0.15);
+      static void assignNewHitsToTrack(CDCTrack& track,
+                                       const std::vector<CDCConformalHit>& conformalWireHits,
+                                       double minimalDistance = 0.15);
 
       /// Mask hits after breaks in the superlayer as masked and delete them.
       static void maskHitsWithPoorQuality(CDCTrack& track);
@@ -100,13 +103,15 @@ namespace Belle2 {
       static int endingSLayer(const std::vector<double>& startingArmSLayers);
 
       /** Return true of both the starting arm and the ending arm array has one non-zero entry. */
-      static bool isTwoSided(const std::vector<double>& startingArmSLayers, const std::vector<double>& endingArmSLayers);
+      static bool isTwoSided(const std::vector<double>& startingArmSLayers,
+                             const std::vector<double>& endingArmSLayers);
 
       /** Fill the two arrays emptyStartingSLayers (for the outgoing arm) and emptyEndingSLayers (for the ingoing arm) with the superlayers between start end end of the track that are empty.
        * Return true if we have found such a case. */
       static bool hasHoles(const std::vector<double>& startingArmSLayers,
                            const std::vector<double>& endingArmSLayers,
-                           std::vector<int>& emptyStartingSLayers, std::vector<int>& emptyEndingSLayers);
+                           std::vector<int>& emptyStartingSLayers,
+                           std::vector<int>& emptyEndingSLayers);
     };
   }
 }

@@ -163,12 +163,14 @@ namespace Belle2 {
       ISuperLayer getISuperLayerAtCylindricalR(double cylindricalR);
 
       /// Getter for wire superlayer getter by wireID object.
-      const CDCWireSuperLayer& getWireSuperLayer(const WireID& wireId) const
-      { return getWireSuperLayer(wireId.getISuperLayer()); }
+      const CDCWireSuperLayer& getWireSuperLayer(const WireID& wireID) const
+      { return getWireSuperLayer(wireID.getISuperLayer()); }
 
       /// Getter for wire superlayer getter by superlayer id.
       const CDCWireSuperLayer& getWireSuperLayer(ISuperLayer iSuperLayer) const
-      { return m_wireSuperLayers[ iSuperLayer ]; }
+      {
+        return m_wireSuperLayers[iSuperLayer];
+      }
 
       /// Getter for the underlying storing superlayer vector
       const std::vector<Belle2::TrackFindingCDC::CDCWireSuperLayer>& getWireSuperLayers() const
@@ -188,15 +190,15 @@ namespace Belle2 {
        *  Returns the relation of the first wire to the second wire give by their
        *  layer id within the superlayer and the wire id.
        */
-      WireNeighborKind getNeighborKind(const WireID& wire, const WireID& other) const;
+      WireNeighborKind getNeighborKind(const WireID& wireID, const WireID& otherWireID) const;
 
       /// Checks if two wires are primary neighbors.
-      bool arePrimaryNeighbors(const WireID& wire, const WireID& other) const
-      { return getNeighborKind(wire, other).getCellDistance() == 1; }
+      bool arePrimaryNeighbors(const WireID& wireID, const WireID& otherWireID) const
+      { return getNeighborKind(wireID, otherWireID).getCellDistance() == 1; }
 
       /// Checks if two wires are secondary neighbors.
-      bool areSeconaryNeighbors(const WireID& wire, const WireID& other) const
-      { return getNeighborKind(wire, other).getCellDistance() == 2; }
+      bool areSeconaryNeighbors(const WireID& wireID, const WireID& otherWireID) const
+      { return getNeighborKind(wireID, otherWireID).getCellDistance() == 2; }
 
       /// Getter for the primary neighbor of the given wire id
       MayBePtr<const CDCWire> getPrimaryNeighbor(short oClockDirection, const WireID& wireID) const

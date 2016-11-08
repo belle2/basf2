@@ -67,7 +67,8 @@ namespace Belle2 {
       bool getMaskedFlag() const {return m_wireHit->getAutomatonCell().hasMaskedFlag();};
 
       /// Calculate conformal coordinates with respect to choosen point by transforming the wire coordinates. Returns (x',y',driftLength)
-      std::tuple<Vector2D, double> performConformalTransformWithRespectToPoint(const Vector2D& refPos2D) const;
+      std::tuple<Vector2D, double>
+      performConformalTransformWithRespectToPoint(const Vector2D& pos2D) const;
 
     private:
       /// Pointer to the wire hit.

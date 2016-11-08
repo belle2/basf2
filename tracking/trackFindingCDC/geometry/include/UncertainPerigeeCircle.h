@@ -105,8 +105,8 @@ namespace Belle2 {
 
       /// Average the parameters of the two given perigee circles properly considering their
       /// covariance matrix.
-      static UncertainPerigeeCircle average(const UncertainPerigeeCircle& startPerigeeCircle,
-                                            const UncertainPerigeeCircle& endPerigeeCircle);
+      static UncertainPerigeeCircle average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                            const UncertainPerigeeCircle& toPerigeeCircle);
 
     public:
       /**

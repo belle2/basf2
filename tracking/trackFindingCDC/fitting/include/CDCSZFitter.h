@@ -103,8 +103,7 @@ namespace Belle2 {
       }
 
       /// Update the trajectory with a fit to the observations.
-      void update(CDCTrajectorySZ& trajectorySZ,
-                  CDCObservations2D& observationsSZ) const;
+      void update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const;
 
     private:
       /// Appends the s and z values of all given hits to the observation matrix

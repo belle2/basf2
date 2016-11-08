@@ -74,7 +74,7 @@ namespace Belle2 {
        *  A valuable leaf has been found in the hough tree walk extract its content
        *  It may pull more hits from the whole tree.
        */
-      void processLeaf(ANode* node);
+      void processLeaf(ANode* leaf);
 
     public:
       /// Getter for the candidates

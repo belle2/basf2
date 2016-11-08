@@ -57,13 +57,13 @@ namespace Belle2 {
        * Filter out the segments that are fake or background. Mark them as taken.
        * For deciding which is background or not we use the given filter.
        */
-      void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
+      void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
        * For deciding which is new or not we use the given filter.
        */
-      void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentFilter);
+      void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentsFilter);
 
       /**
        * Do the heavy combining works:
@@ -83,10 +83,9 @@ namespace Belle2 {
        *
        * In the moment, this method does work, but produces some fakes and is therefore not used in production.
        */
-      void combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
+      void combine(BaseSegmentTrackFilter& segmentTrackFilterSecondStep,
                    BaseSegmentTrainFilter& segmentTrainFilter,
                    BaseSegmentInformationListTrackFilter& segmentTrackFilter);
-
 
       /**
        * Clear all the pointer vectors and reset the "new segments" to be not taken.
@@ -139,7 +138,8 @@ namespace Belle2 {
       void clearSmallerCombinations(std::list<TrainOfSegments>& trainsOfSegments);
 
       /** Combine a segment and a track. */
-      void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
+      void addSegmentToTrack(SegmentInformation* segmentInformation,
+                             TrackInformation* matchingTrack);
 
     private:
       TrackLookUp m_trackLookUp; /**< The used track list. */

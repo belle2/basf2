@@ -68,7 +68,7 @@ namespace Belle2 {
       explicit BendFacetRelationVarSet();
 
       /// Generate and assign the variables from the facetRelation
-      virtual bool extract(const Relation<const CDCFacet>* facetRelation) override final;
+      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
     };
   }
 }

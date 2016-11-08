@@ -37,7 +37,8 @@ namespace Belle2 {
       using Super::create;
 
       /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseSegmentTrackFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseSegmentTrackFilter>
+      create(const std::string& filterName) const override;
 
       /** Getter for the valid filter names and a description for each */
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
@@ -64,7 +65,8 @@ namespace Belle2 {
       }
 
       /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseSegmentTrackFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseSegmentTrackFilter>
+      create(const std::string& filterName) const override;
 
       /** Getter for the prefix prepended to a Module parameter.*/
       virtual std::string getModuleParamPrefix() const override
@@ -94,7 +96,8 @@ namespace Belle2 {
       }
 
       /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseSegmentTrackFilter> create(const std::string& name) const override;
+      virtual std::unique_ptr<BaseSegmentTrackFilter>
+      create(const std::string& filterName) const override;
 
       /** Getter for the prefix prepended to a Module parameter.*/
       virtual std::string getModuleParamPrefix() const override

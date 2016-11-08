@@ -22,7 +22,8 @@ namespace Belle2 {
     class StereoSegmentTrackAdder {
     public:
       /** Add the matched segment to the track and set the taken flag correctly. We ignore the weight completely here. */
-      static void add(CDCTrack& track, const std::vector<WithWeight<const CDCRecoSegment2D*>>& matchedHits);
+      static void add(CDCTrack& track,
+                      const std::vector<WithWeight<const CDCRecoSegment2D*>>& matchedSegments);
     };
   }
 }

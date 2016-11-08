@@ -63,7 +63,7 @@ namespace Belle2 {
     class BasicClusterVarSet : public VarSet<BasicClusterVarNames> {
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCWireHitCluster* cluster) override final;
+      virtual bool extract(const CDCWireHitCluster* ptrCluster) override final;
     };
   }
 }

@@ -38,8 +38,7 @@ namespace Belle2 {
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
-      bool operator()(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance);
-
+      bool operator()(const CDCRLWireHitTriple& rlWireHitTriple, int inTrackHitDistanceTolerance);
     };
   }
 }

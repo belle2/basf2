@@ -26,7 +26,7 @@ namespace Belle2 {
        *  Executes the fit and updates the trajectory parameters
        *  This may render the information in the observation object.
        */
-      void update(CDCTrajectory2D& fit, CDCObservations2D& observations2D) const;
+      void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const;
 
     private:
       /// Internal method doing the heavy work.

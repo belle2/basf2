@@ -42,8 +42,8 @@ namespace Belle2 {
       /**
        * Combine the trajectories of the two given segments to a full helix trajectory
        */
-      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& startSegment,
-                                                  const CDCRecoSegment2D& endSegment);
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
+                                                  const CDCRecoSegment2D& toSegment2D);
 
       CDCTrajectory3D fusePreliminary(const CDCRecoSegment2D& fromSegment2D,
                                       const CDCRecoSegment2D& toSegment2D);

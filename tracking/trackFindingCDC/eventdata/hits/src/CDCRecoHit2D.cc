@@ -75,10 +75,10 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
 }
 
 CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                         const Vector2D& pos2D,
+                                         const Vector2D& recoPos2D,
                                          bool snap)
 {
-  CDCRecoHit2D result(rlWireHit, pos2D - rlWireHit->getRefPos2D());
+  CDCRecoHit2D result(rlWireHit, recoPos2D - rlWireHit->getRefPos2D());
   if (snap) result.snapToDriftCircle();
   return result;
 }

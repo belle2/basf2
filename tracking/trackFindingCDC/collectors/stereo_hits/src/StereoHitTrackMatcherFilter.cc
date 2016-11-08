@@ -21,8 +21,9 @@ void StereoHitTrackMatcherFilter::exposeParameters(ModuleParamList* moduleParame
 
 }
 
-std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherFilter::match(const CDCTrack& track,
-                                          const std::vector<CDCRLWireHit>& rlWireHits)
+std::vector<WithWeight<const CDCRLWireHit*>>
+                                          StereoHitTrackMatcherFilter::match(const CDCTrack& track,
+                                              const std::vector<CDCRLWireHit>& rlWireHits)
 {
   if (m_filter->needsTruthInformation()) {
     CDCMCManager::getInstance().fill();

@@ -35,7 +35,7 @@ namespace Belle2 {
       {}
 
       /// Constuctor for a wire line between forward and backward point
-      WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoef);
+      WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoeff);
 
       /// Returns a copy of the wire line moved by a three dimensional offset
       WireLine movedBy(const Vector3D& offset) const;

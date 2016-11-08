@@ -67,7 +67,7 @@ namespace Belle2 {
                                         m_param_writeStoreVector,
                                         "Switch if " +
                                         m_classMnemomicDescription +
-                                        " shall be written to the DataStore",
+                                        "s shall be written to the DataStore",
                                         m_param_writeStoreVector);
         }
 

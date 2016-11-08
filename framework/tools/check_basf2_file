@@ -38,6 +38,15 @@ parser.add_argument("--json", action='store_true', dest='json_output', default=F
 parser.add_argument("FILE", type=str, help="The basf2 .root file to check. http:// and root:// URLs are also supported.")
 parser.add_argument("BRANCH", type=str, nargs='*', help="Branches that should exist in the event durability tree.")
 
+def read_tree(tree):
+    """
+    try reading all events in TTree tree. return false if an entry cannot be read
+    """
+    for entry in range(tree.GetEntries()):
+        if tree.GetEntry(entry, 1) <= 0:
+            print ('Failed to read entry %d in "%s"! (no further entries will be checked.)' % (entry, tree.GetName()))
+            return False
+    return True
 
 def checkFile(args):
     """
@@ -92,6 +101,7 @@ def checkFile(args):
             eventmetadata = tree.EventMetaData.Clone()
             eventmetadata.getEvent()
             checks_passed['eventmetadata_readable'] = True
+            del eventmetadata
 
         if args.BRANCH:
             checks_passed['branches_present'] = all([tree.GetBranch(b) for b in args.BRANCH])
@@ -106,6 +116,8 @@ def checkFile(args):
             checks_passed['eventsize_eq_expectation'] = dev < rel_uncertainty
             if not checks_passed['eventsize_eq_expectation']:
                 print ('Size per event (%g kiB) differs from expectation (deviation: %g >= %g)' % (size_kib_per_event, dev, rel_uncertainty))
+
+        checks_passed['all_entries_readable'] = read_tree(tree) and read_tree(persistent)
     except:
         # at least one of the checks should have failed
         assert not all(checks_passed.values())

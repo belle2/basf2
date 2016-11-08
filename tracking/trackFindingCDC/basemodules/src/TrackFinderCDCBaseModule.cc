@@ -7,16 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/basemodules/TrackFinderCDCBaseModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
-#include <tracking/trackFindingCDC/geometry/Vector3D.h>
-
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
-
-#include <framework/datastore/StoreArray.h>
 #include <framework/logging/Logger.h>
 
 #include <functional>
@@ -30,34 +24,24 @@ TrackFinderCDCBaseModule::TrackFinderCDCBaseModule()
   , m_param_tracksStoreObjName("CDCTrackVector")
   , m_param_tracksStoreObjNameIsInput(false)
 {
-  setDescription("This a base module for all track finders in the CDC");
+  this->setDescription("This a base module for all track finders in the CDC");
 
-  ModuleParamList moduleParamList = this->getParamList();
-  m_trackOrienter.exposeParameters(&moduleParamList);
-  m_trackFlightTimeAdjuster.exposeParameters(&moduleParamList);
-  m_trackExporter.exposeParameters(&moduleParamList);
-  this->setParamList(moduleParamList);
+  this->addParam("TracksStoreObjName",
+                 m_param_tracksStoreObjName,
+                 "Name of the output StoreObjPtr of the tracks generated within this module.",
+                 m_param_tracksStoreObjName);
 
-  addParam("TracksStoreObjName",
-           m_param_tracksStoreObjName,
-           "Name of the output StoreObjPtr of the tracks generated within this module.",
-           std::string("CDCTrackVector"));
+  this->addParam("TracksStoreObjNameIsInput",
+                 m_param_tracksStoreObjNameIsInput,
+                 "Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module",
+                 m_param_tracksStoreObjNameIsInput);
 
-  addParam("TracksStoreObjNameIsInput",
-           m_param_tracksStoreObjNameIsInput,
-           "Flag to use the CDCTracks in the given StoreObjPtr as input and output of the module",
-           false);
-
-  setPropertyFlags(c_ParallelProcessingCertified);
+  this->setPropertyFlags(c_ParallelProcessingCertified bitor c_TerminateInAllProcesses);
 }
 
 void TrackFinderCDCBaseModule::initialize()
 {
-  m_trackOrienter.initialize();
-  m_trackFlightTimeAdjuster.initialize();
-  m_trackExporter.initialize();
-
-  // Output StoreArray
+  // Output store vector
   StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
   if (m_param_tracksStoreObjNameIsInput) {
     storedTracks.isRequired();
@@ -68,12 +52,9 @@ void TrackFinderCDCBaseModule::initialize()
 
 void TrackFinderCDCBaseModule::event()
 {
-  m_trackOrienter.beginEvent();
-  m_trackFlightTimeAdjuster.beginEvent();
-  m_trackExporter.beginEvent();
-
   // Now aquire the store vector
   StoreWrappedObjPtr<std::vector<CDCTrack>> storedTracks(m_param_tracksStoreObjName);
+
   if (m_param_tracksStoreObjNameIsInput) {
     // Somehow it is possible that we receive empty tracks (probably from the LegendreFinder)
     // Drop them before proceding
@@ -84,21 +65,7 @@ void TrackFinderCDCBaseModule::event()
     storedTracks.create();
   }
 
+  // We now let the generate-method fill or update the outputTracks
   std::vector<CDCTrack>& outputTracks = *storedTracks;
-
-  // Either we just have to let the generate-method fill the outputTracks,
-  // or we start from scratch with a cleared outputTracks.
-  generate(outputTracks);
-
-  std::vector<CDCTrack> orientedTracks;
-  orientedTracks.reserve(20);
-  m_trackOrienter.apply(outputTracks, orientedTracks);
-  std::swap(outputTracks, orientedTracks);
-
-  m_trackFlightTimeAdjuster.apply(outputTracks);
-  m_trackExporter.apply(outputTracks);
-}
-
-void TrackFinderCDCBaseModule::generate(std::vector<CDCTrack>& outputTracks __attribute__((unused)))
-{
+  this->generate(outputTracks);
 }

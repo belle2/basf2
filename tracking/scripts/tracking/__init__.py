@@ -235,24 +235,20 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
                     ClusterFilter="mva_bkg",
                     ClusterFilterParameters={"cut": 0.2},
                     FacetUpdateDriftLength=True,
-                    FacetFilter="chi2",
-                    )
+                    FacetFilter="chi2")
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking",
-                    WriteRecoTracks=False)
+    path.add_module("TrackFinderCDCLegendreTracking")
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
-                    WriteRecoTracks=False,
                     TracksStoreObjNameIsInput=True,
                     corrections=["B2B"])
 
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
                     useSingleMatchAlgorithm=True,
-                    TracksStoreObjNameIsInput=True,
-                    WriteRecoTracks=False)
+                    TracksStoreObjNameIsInput=True)
 
     # Delete segments which where fully used in the last events
     path.add_module("UsedSegmentsDeleter")
@@ -260,7 +256,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombinerDev',
                     TracksStoreObjNameIsInput=True,
-                    WriteRecoTracks=False,
                     SegmentTrackFilterFirstStepFilter="tmva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
                     TrackFilter="tmva",
@@ -269,7 +264,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Improve the quality of all tracks and output
     path.add_module("TrackQualityAsserterCDC",
                     TracksStoreObjNameIsInput=True,
-                    WriteRecoTracks=False,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"])
 
     # Export CDCTracks to RecoTracks representation
@@ -315,12 +309,10 @@ def add_cdc_cr_track_finding(path,
                     )
 
     # Find axial tracks
-    path.add_module("TrackFinderCDCLegendreTracking",
-                    WriteRecoTracks=False)
+    path.add_module("TrackFinderCDCLegendreTracking")
 
     # Improve the quality of the axial tracks
     path.add_module("TrackQualityAsserterCDC",
-                    WriteRecoTracks=False,
                     TracksStoreObjNameIsInput=True,
                     corrections=["B2B"])
 
@@ -329,7 +321,6 @@ def add_cdc_cr_track_finding(path,
                     TracksStoreObjNameIsInput=True,
                     useSingleMatchAlgorithm=True,
                     singleMatchCheckForB2BTracks=True,
-                    WriteRecoTracks=False,
                     )
 
     # Delete segments which where fully used in the last events
@@ -338,7 +329,6 @@ def add_cdc_cr_track_finding(path,
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombinerDev',
                     TracksStoreObjNameIsInput=True,
-                    WriteRecoTracks=False,
                     SegmentTrackFilterFirstStepFilter="tmva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
                     TrackFilter="tmva",
@@ -348,7 +338,6 @@ def add_cdc_cr_track_finding(path,
     path.add_module("TrackQualityAsserterCDC",
                     TracksStoreObjNameIsInput=True,
                     corrections=["LayerBreak", "LargeBreak2", "OneSuperlayer", "Small"],
-                    WriteRecoTracks=False,
                     )
 
     # Flip track orientation to always point downwards

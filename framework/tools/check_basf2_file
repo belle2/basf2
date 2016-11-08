@@ -117,7 +117,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     if args.json_output:
         # suppress other things on standard output
-        with redirect_stdout(os.devnull):
+        with redirect_stdout(open(os.devnull, 'w')):
             checks_passed, stats = checkFile(args)
         print(json.dumps({'checks_passed': checks_passed, 'stats': stats}, sort_keys=True, indent=2))
     else:

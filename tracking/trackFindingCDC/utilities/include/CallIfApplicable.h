@@ -122,7 +122,10 @@ namespace Belle2 {
     template<class T>
     void clearIfApplicable(T&& obj)
     {
-      callIfApplicable(ClearMethod(), std::forward<T>(obj));
+      // With C++14 you may use a generic lambda and remove the above ClearMethod
+      // auto clearMethod = [](auto& obj) -> decltype(obj.clear()) { obj.clear(); };
+      auto clearMethod = ClearMethod();
+      callIfApplicable(clearMethod, std::forward<T>(obj));
     }
   }
 }

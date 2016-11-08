@@ -254,7 +254,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     path.add_module("UsedSegmentsDeleter")
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombinerDev',
+    path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
                     SegmentTrackFilterFirstStepFilter="tmva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
@@ -327,7 +327,7 @@ def add_cdc_cr_track_finding(path,
     path.add_module("UsedSegmentsDeleter")
 
     # Combine segments with axial tracks
-    path.add_module('SegmentTrackCombinerDev',
+    path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
                     SegmentTrackFilterFirstStepFilter="tmva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},

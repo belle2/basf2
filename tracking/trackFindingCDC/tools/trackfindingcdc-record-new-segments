@@ -25,7 +25,7 @@ class NewSegmentsRecordingRun(StandardEventGenerationRun):
         add_cdc_track_finding(main_path)
 
         for m in main_path.modules():
-            if m.name().startswith("SegmentTrackCombinerDev"):
+            if m.name().startswith("SegmentTrackCombiner"):
                 m.param("NewSegmentsFilter", "recording")
                 
         return main_path

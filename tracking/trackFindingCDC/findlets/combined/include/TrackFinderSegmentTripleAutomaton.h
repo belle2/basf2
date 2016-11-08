@@ -71,7 +71,6 @@ namespace Belle2 {
         m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);
         m_segmentTripleSwapper.exposeParameters(moduleParamList, prefix);
-
       }
 
       ///  Initialize the Findlet before event processing
@@ -81,7 +80,7 @@ namespace Belle2 {
         m_segmentTriples.clear();
         m_segmentTripleRelations.clear();
         m_preMergeTracks.clear();
-        m_mergedTracks.clear();
+        m_orientedTracks.clear();
         Super::beginEvent();
       }
 
@@ -95,8 +94,8 @@ namespace Belle2 {
         m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, m_segmentTripleRelations, m_preMergeTracks);
 
         m_trackCreatorSingleSegments.apply(inputSegments, m_preMergeTracks);
-        m_trackMerger.apply(m_preMergeTracks, m_mergedTracks);
-        m_trackOrienter.apply(m_mergedTracks, tracks);
+        m_trackOrienter.apply(m_preMergeTracks, m_orientedTracks);
+        m_trackMerger.apply(m_orientedTracks, tracks);
 
         // Put the segment triples on the DataStore
         m_segmentTripleSwapper.apply(m_segmentTriples);
@@ -142,10 +141,8 @@ namespace Belle2 {
       /// Memory for the tracks before merging was applied.
       std::vector<CDCTrack> m_preMergeTracks;
 
-      /// Memory for the tracks after merging was applied.
-      std::vector<CDCTrack> m_mergedTracks;
-
+      /// Memory for the tracks after orientation was applied.
+      std::vector<CDCTrack> m_orientedTracks;
     };
-
   }
 }

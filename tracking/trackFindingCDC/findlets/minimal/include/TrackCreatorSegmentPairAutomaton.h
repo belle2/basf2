@@ -66,6 +66,10 @@ namespace Belle2 {
         // Reduce to plain tracks
         for (const Path<const CDCSegmentPair>& segmentPairPath : m_segmentPairPaths) {
           outputTracks.push_back(CDCTrack::condense(segmentPairPath));
+          for (const CDCSegmentPair* segmentPair : segmentPairPath) {
+            segmentPair->getFromSegment()->getAutomatonCell().setTakenFlag();
+            segmentPair->getToSegment()->getAutomatonCell().setTakenFlag();
+          }
         }
       }
 

@@ -48,12 +48,6 @@ namespace Belle2 {
         return "Constructs tracks by extraction of segment triple paths in a cellular automaton.";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList*,
-                            const std::string& = "") override final
-      {
-      }
-
       /// Main function of the segment finding by the cellular automaton.
       virtual void apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
                          const std::vector<WeightedRelation<const CDCSegmentTriple> >& inputSegmentTripleRelations,
@@ -68,6 +62,11 @@ namespace Belle2 {
         // Reduce to plain tracks
         for (const Path<const CDCSegmentTriple>& segmentTriplePath : m_segmentTriplePaths) {
           outputTracks.push_back(CDCTrack::condense(segmentTriplePath));
+          for (const CDCSegmentTriple* segmentTriple : segmentTriplePath) {
+            segmentTriple->getStartSegment()->getAutomatonCell().setTakenFlag();
+            segmentTriple->getMiddleSegment()->getAutomatonCell().setTakenFlag();
+            segmentTriple->getEndSegment()->getAutomatonCell().setTakenFlag();
+          }
         }
       }
 

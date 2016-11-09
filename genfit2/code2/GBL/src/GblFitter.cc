@@ -77,7 +77,6 @@
 #include <TVectorDfwd.h>
 #include <TMatrixT.h>
 #include <TVector3.h>
-//#include "boost/algorithm/string.hpp"
 
 //#define DEBUG
 
@@ -91,7 +90,7 @@ using namespace genfit;
 GblFitter::~GblFitter() {
   if (m_segmentController) {
     delete m_segmentController;
-    m_segmentController = NULL;
+    m_segmentController = nullptr;
   }
 }
 
@@ -99,7 +98,7 @@ void GblFitter::setTrackSegmentController(GblTrackSegmentController* controler)
 {
   if (m_segmentController) {
     delete m_segmentController;
-    m_segmentController = NULL;
+    m_segmentController = nullptr;
   }
   m_segmentController = controler;      
 }
@@ -153,8 +152,7 @@ void GblFitter::processTrackWithRep(Track* trk, const AbsTrackRep* rep, bool res
   int fitRes = 0;
   std::vector<std::string> gblIterations;
   gblIterations.push_back(m_gblInternalIterations);
-  //boost::split(gblIterations, m_gblInternalIterations, boost::is_any_of(","), boost::token_compress_off);
-  
+
   // Iterations and updates of fitter infos and fit status
   // ------------------------------------------------------------------- 
   for (unsigned int iIter = 0; iIter < m_externalIterations; iIter++) {
@@ -234,7 +232,7 @@ void GblFitter::processTrackWithRep(Track* trk, const AbsTrackRep* rep, bool res
 void GblFitter::cleanGblInfo(Track* trk, const AbsTrackRep* rep) const {
   
   for (int ip = trk->getNumPoints() - 1; ip >=0; ip--) {
-    trk->getPoint(ip)->setScatterer(NULL); 
+    trk->getPoint(ip)->setScatterer(nullptr); 
     trk->getPoint(ip)->deleteFitterInfo(rep);
     //TODO
     if (!trk->getPoint(ip)->hasRawMeasurements())

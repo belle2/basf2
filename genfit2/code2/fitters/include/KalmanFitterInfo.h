@@ -32,9 +32,7 @@
 
 #include <vector>
 
-#ifndef __CINT__
-#include <boost/scoped_ptr.hpp>
-#endif
+#include <memory>
 
 
 namespace genfit {
@@ -79,11 +77,11 @@ class KalmanFitterInfo : public AbsFitterInfo {
   double getSmoothedChi2(unsigned int iMeasurement = 0);
 
   bool hasMeasurements() const {return getNumMeasurements() > 0;}
-  bool hasReferenceState() const {return (referenceState_.get() != NULL);}
-  bool hasForwardPrediction() const {return (forwardPrediction_.get()  != NULL);}
-  bool hasBackwardPrediction() const {return (backwardPrediction_.get() != NULL);}
-  bool hasForwardUpdate() const {return (forwardUpdate_.get() != NULL);}
-  bool hasBackwardUpdate() const {return (backwardUpdate_.get() != NULL);}
+  bool hasReferenceState() const {return (referenceState_.get() != nullptr);}
+  bool hasForwardPrediction() const {return (forwardPrediction_.get()  != nullptr);}
+  bool hasBackwardPrediction() const {return (backwardPrediction_.get() != nullptr);}
+  bool hasForwardUpdate() const {return (forwardUpdate_.get() != nullptr);}
+  bool hasBackwardUpdate() const {return (backwardUpdate_.get() != nullptr);}
   bool hasUpdate(int direction) const {if (direction < 0) return hasBackwardUpdate(); return hasForwardUpdate();}
   bool hasPredictionsAndUpdates() const {return (hasForwardPrediction() && hasBackwardPrediction() && hasForwardUpdate() && hasBackwardUpdate());}
 
@@ -105,25 +103,25 @@ class KalmanFitterInfo : public AbsFitterInfo {
   void deleteForwardInfo();
   void deleteBackwardInfo();
   void deletePredictions();
-  void deleteReferenceInfo() {setReferenceState(NULL);}
+  void deleteReferenceInfo() {setReferenceState(nullptr);}
   void deleteMeasurementInfo();
 
   virtual void Print(const Option_t* = "") const;
 
-  virtual bool checkConsistency(const genfit::PruneFlags* = NULL) const;
+  virtual bool checkConsistency(const genfit::PruneFlags* = nullptr) const;
 
  private:
 
 
 #ifndef __CINT__
   //! Reference state. Used by KalmanFitterRefTrack.
-  boost::scoped_ptr<ReferenceStateOnPlane> referenceState_; // Ownership
-  boost::scoped_ptr<MeasuredStateOnPlane> forwardPrediction_; // Ownership
-  boost::scoped_ptr<KalmanFittedStateOnPlane> forwardUpdate_; // Ownership
-  boost::scoped_ptr<MeasuredStateOnPlane> backwardPrediction_; // Ownership
-  boost::scoped_ptr<KalmanFittedStateOnPlane> backwardUpdate_; // Ownership
-  mutable boost::scoped_ptr<MeasuredStateOnPlane> fittedStateUnbiased_; //!  cache
-  mutable boost::scoped_ptr<MeasuredStateOnPlane> fittedStateBiased_; //!  cache
+  std::unique_ptr<ReferenceStateOnPlane> referenceState_; // Ownership
+  std::unique_ptr<MeasuredStateOnPlane> forwardPrediction_; // Ownership
+  std::unique_ptr<KalmanFittedStateOnPlane> forwardUpdate_; // Ownership
+  std::unique_ptr<MeasuredStateOnPlane> backwardPrediction_; // Ownership
+  std::unique_ptr<KalmanFittedStateOnPlane> backwardUpdate_; // Ownership
+  mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateUnbiased_; //!  cache
+  mutable std::unique_ptr<MeasuredStateOnPlane> fittedStateBiased_; //!  cache
 #else
   class ReferenceStateOnPlane* referenceState_;
   class MeasuredStateOnPlane* forwardPrediction_;

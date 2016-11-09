@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
-
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+#include <tracking/trackFindingCDC/utilities/Named.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
 #include <string>
@@ -20,9 +20,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /**
-       Class that accomodates many variable sets and presents them as on set of variables
-    */
+    /// Class that accomodates many variable sets and presents them as on set of variables
     template<class AObject>
     class UnionVarSet : public BaseVarSet<AObject> {
 
@@ -38,9 +36,7 @@ namespace Belle2 {
       using ContainedVarSet = BaseVarSet<Object>;
 
     public:
-      /**
-       *  Initialize all contained variable set before event processing.
-       */
+      /// Initialize all contained variable set before event processing.
       virtual void initialize() override final
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -72,9 +68,7 @@ namespace Belle2 {
         }
       }
 
-      /**
-       *  Terminate all contained variable set after event processing.
-       */
+      /// Terminate all contained variable set after event processing.
       virtual void terminate() override final
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -103,7 +97,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
       {
         std::vector<Named<Float_t*> > result;
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -149,7 +143,6 @@ namespace Belle2 {
     private:
       /// Collection of contained variables sets.
       std::vector<std::unique_ptr<ContainedVarSet>> m_varSets;
-
     };
   }
 }

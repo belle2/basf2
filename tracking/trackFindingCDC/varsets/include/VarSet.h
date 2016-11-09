@@ -13,16 +13,16 @@
 
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
-#include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-
 #include <vector>
 #include <string>
-#include <cassert>
 #include <limits>
+#include <cassert>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** Generic class that generates some named float values from a given object.
+    /**
+     *  Generic class that generates some named float values from a given object.
      *  This object template provides the memory and the names of the float values.
      *  The filling from the complex object is specialised in the derived class
      *
@@ -30,7 +30,7 @@ namespace Belle2 {
      *  Object - The class of the complex object from which to extract the variable.
      *  nNames - Number of variables that will be extracted from the complex object.
      *  names - Array of names which contain the nNames names of the float values.
-     **/
+     */
     template<class AObjectVarNames>
     class VarSet : public BaseVarSet<typename AObjectVarNames::Object> {
 
@@ -52,26 +52,36 @@ namespace Belle2 {
        *  Can be specialised if the derived variable set has setup work to do.
        */
       virtual void initialize() override
-      { m_nestedVarSet.initialize(); }
+      {
+        m_nestedVarSet.initialize();
+      }
 
       /// Allow setup work to take place at beginning of new run
       virtual void beginRun() override
-      { m_nestedVarSet.beginRun(); }
+      {
+        m_nestedVarSet.beginRun();
+      }
 
       /// Allow setup work to take place at beginning of new event
       virtual void beginEvent() override
-      { m_nestedVarSet.beginEvent(); }
+      {
+        m_nestedVarSet.beginEvent();
+      }
 
       /// Allow clean up to take place at end of run
       virtual void endRun() override
-      { m_nestedVarSet.endRun(); }
+      {
+        m_nestedVarSet.endRun();
+      }
 
       /**
        *  Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
       virtual void terminate() override
-      { m_nestedVarSet.terminate(); }
+      {
+        m_nestedVarSet.terminate();
+      }
 
       /// Extract the nested variables next
       bool extractNested(const Object* obj)
@@ -91,7 +101,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
       {
         std::vector<Named<Float_t*> > result = m_nestedVarSet.getNamedVariables(prefix);
         std::vector<Named<Float_t*> > extend = m_variables.getNamedVariables(prefix);
@@ -111,7 +121,8 @@ namespace Belle2 {
       }
 
     protected:
-      /** Getter for the index from the name.
+      /**
+       *  Getter for the index from the name.
        *  Looks through the associated names and returns the right index if found
        *  Returns nVars (one after the last element) if not found.
        *
@@ -152,8 +163,11 @@ namespace Belle2 {
         void operator=(const AFloat& value)
         {
           m_value = value;
-          if (not std::isfinite(value)) m_value = std::copysign(std::numeric_limits<AFloat>::max(), value);
+          if (not std::isfinite(value)) {
+            m_value = std::copysign(std::numeric_limits<AFloat>::max(), value);
+          }
         }
+
       private:
         /// Reference to the variable to be assigned
         AFloat& m_value;
@@ -166,7 +180,6 @@ namespace Belle2 {
         static_assert(I < nVars, "Requested variable index exceeds number variables.");
         return AssignFinite<Float_t>(m_variables[I]);
       }
-
 
       /// Set the given variable to the value if the value is not NaN els set it to valueIfNaN.
       template<int I>
@@ -185,7 +198,6 @@ namespace Belle2 {
 
       /// Nested VarSet implementing a chain of sets until EmptyVarSet terminates the sequence.
       typename AObjectVarNames::NestedVarSet m_nestedVarSet;
-
     };
   }
 }

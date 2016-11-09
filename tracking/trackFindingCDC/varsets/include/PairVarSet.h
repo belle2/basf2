@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
+
 #include <boost/algorithm/string/predicate.hpp>
 #include <vector>
 #include <string>
@@ -19,9 +21,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Generic class that generates the same variables from a each of a pair of instances.
-    template<class ABaseVarSet>
-    class PairVarSet : BaseVarSet<const std::pair<const typename ABaseVarSet::Object*,
-      const typename ABaseVarSet::Object*> > {
+    template <class ABaseVarSet>
+    class PairVarSet : public BaseVarSet<const std::pair<const typename ABaseVarSet::Object*,
+      const typename ABaseVarSet::Object*>> {
 
     public:
       /// Object type from which the variables shall be extracted
@@ -91,7 +93,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
       {
         std::vector<Named<Float_t*> > result = m_firstVarSet.getNamedVariables(prefix + m_firstPrefix);
         std::vector<Named<Float_t*> > extend = m_secondVarSet.getNamedVariables(prefix + m_secondPrefix);

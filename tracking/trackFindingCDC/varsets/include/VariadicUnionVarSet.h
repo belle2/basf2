@@ -9,11 +9,13 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 #include <tracking/trackFindingCDC/varsets/UnionVarSet.h>
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
+#include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <vector>
 #include <string>
@@ -49,65 +51,76 @@ namespace Belle2 {
       /// Create the union variable set.
       explicit VariadicUnionVarSet()
       {
-        EvalVariadic{
-          (m_multiVarSet.push_back(makeUnique<AVarSets>()) , true)...
-        };
-
+        EvalVariadic{(m_multiVarSet.push_back(makeUnique<AVarSets>()), true)...};
         assert(m_multiVarSet.size() == sizeof...(AVarSets));
       }
 
     public:
       using Super::extract;
 
-      /**
-       *  Initialize all contained variable set before event processing.
-       */
+      /// Initialize all contained variable set before event processing.
       virtual void initialize() override final
-      { m_multiVarSet.initialize(); }
+      {
+        m_multiVarSet.initialize();
+      }
 
       /// Signal the beginning of a new run
       virtual void beginRun() override final
-      { m_multiVarSet.beginRun(); }
+      {
+        m_multiVarSet.beginRun();
+      }
 
       /// Signal the beginning of a new event
       virtual void beginEvent() override
-      { m_multiVarSet.beginEvent(); }
+      {
+        m_multiVarSet.beginEvent();
+      }
 
       /// Signal the end of a run
       virtual void endRun() override
-      { m_multiVarSet.beginRun(); }
+      {
+        m_multiVarSet.beginRun();
+      }
 
-      /**
-       *  Terminate all contained variable set after event processing.
-       */
+      /// Terminate all contained variable set after event processing.
       virtual void terminate() override final
-      { m_multiVarSet.terminate(); }
+      {
+        m_multiVarSet.terminate();
+      }
 
       /**
        *  Main method that extracts the variable values from the complex object.
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      virtual bool extract(const Object* obj) override final
-      { return m_multiVarSet.extract(obj); }
+      bool extract(const Object* obj) override final
+      {
+        return m_multiVarSet.extract(obj);
+      }
+
+      // Importing name from the base class.
+      using Super::getNamedVariables;
 
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
-      { return m_multiVarSet.getNamedVariables(prefix); }
+      virtual std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      {
+        return m_multiVarSet.getNamedVariables(prefix);
+      }
 
       /**
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
       virtual MayBePtr<Float_t> find(std::string varName) override
-      { return m_multiVarSet.find(varName); }
+      {
+        return m_multiVarSet.find(varName);
+      }
 
     private:
       /// Container for the multiple variable sets.
       UnionVarSet<Object> m_multiVarSet;
-
     };
   }
 }

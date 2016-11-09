@@ -156,20 +156,24 @@ namespace Belle2 {
         G4LogicalVolume* l_pa = new G4LogicalVolume(s_pa, G4Material::GetMaterial("Al6061"), "l_pa");
         G4LogicalVolume* l_airbox = new G4LogicalVolume(s_airbox, G4Material::GetMaterial("G4_AIR"), "l_aibox");
         l_pa->SetVisAttributes(magenta);
+        G4Transform3D transform;
         for (int i = 0; i < dimz; i++) {
           if (phase == 1) {
-            G4RotationMatrix* pRot = new G4RotationMatrix();
+            transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
+            /*G4RotationMatrix* pRot = new G4RotationMatrix();
             pRot->rotateX(thetaX[i]);
             pRot->rotateY(thetaY[i]);
             pRot->rotateZ(thetaZ[i]);
             new G4PVPlacement(pRot, G4ThreeVector(x_pos[i], y_pos[i], z_pos[i]), l_airbox, TString::Format("p_dia_airbox_%d", i).Data(),
-                              &topVolume, false, 0);
+            &topVolume, false, 0);*/
+            new G4PVPlacement(transform, l_airbox, TString::Format("p_dia_airbox_%d", i).Data(), &topVolume, false, 0);
             new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_pa, TString::Format("p_dia_pa_%d", i).Data(), l_airbox, false, 0);
           } else if (phase == 2) {
-            G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
+            transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]);
             new G4PVPlacement(transform, l_airbox, TString::Format("p_dia_airbox_%d", i).Data(), &topVolume, false, 0);
             new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_pa, TString::Format("p_dia_pa_%d", i).Data(), l_airbox, false, 0);
           }
+          B2INFO("DIA-" << i << " placed at: " << transform.getTranslation() << " mm ");
         }
 
         //create beamabort volumes
@@ -187,6 +191,10 @@ namespace Belle2 {
           //G4Transform3D transform = G4RotateZ3D(phi[i]) * G4Translate3D(0, r[i],
           //                         z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ[i]) * G4Translate3D(0, 6.75 * CLHEP::mm, 0);
           new G4PVPlacement(0, G4ThreeVector(0, 6.75 * CLHEP::mm, 0), l_BEAMABORT, TString::Format("p_dia_%d", i).Data(), l_airbox, false, i);
+          if (phase == 1) transform = G4Translate3D(x_pos[i], y_pos[i],
+                                                      z_pos[i]) * G4RotateX3D(thetaX[i]) * G4RotateY3D(thetaY[i]) * G4RotateZ3D(thetaZ[i]);
+          B2INFO("DIA-sensitive volume-" << i << " placed at: " << transform.getTranslation() + G4ThreeVector(0, 6.75 * CLHEP::mm,
+                 0) << " mm ");
         }
       }
     }

@@ -82,7 +82,7 @@ whitespace, comma or semi-colon -->
 <MaterialTube>StainlessSteel304</MaterialTube>
 <MaterialGas>HE3TUBE-Material</MaterialGas>
 <x_he3tube unit="cm">7.46000</x_he3tube>
-<y_he3tube unit="cm">-47.71000</y_he3tube>
+<y_he3tube unit="cm">-48.21000</y_he3tube>
 <z_he3tube unit="cm">42.30000</z_he3tube>
 <AngleX unit="deg">0.0</AngleX>
 <AngleY unit="deg">0.0</AngleY>

@@ -32,7 +32,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-      <tube_outerRadius unit="cm">2.38</tube_outerRadius>
+      <tube_outerRadius unit="cm">2.54</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
       <gas_outerRadius unit="cm">2.0</gas_outerRadius>
@@ -52,7 +52,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-      <tube_outerRadius unit="cm">2.38</tube_outerRadius>
+      <tube_outerRadius unit="cm">2.54</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
       <gas_outerRadius unit="cm">2.0</gas_outerRadius>
@@ -72,7 +72,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-      <tube_outerRadius unit="cm">2.38</tube_outerRadius>
+      <tube_outerRadius unit="cm">2.54</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
       <gas_outerRadius unit="cm">2.0</gas_outerRadius>
@@ -92,7 +92,7 @@
       <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
       <tube_innerRadius unit="cm">2.069</tube_innerRadius>
-      <tube_outerRadius unit="cm">2.38</tube_outerRadius>
+      <tube_outerRadius unit="cm">2.54</tube_outerRadius>
       <tube_hz unit="cm">10.19</tube_hz>
       <endcap_hz unit="cm">0.47</endcap_hz>
       <gas_outerRadius unit="cm">2.0</gas_outerRadius>

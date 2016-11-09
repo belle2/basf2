@@ -111,7 +111,7 @@ namespace Belle2 {
         for (double z : activeParams.getArray("z", {0})) {
           z *= CLHEP::cm;
           z_pos[dim] = z;
-          cout << "QCSS z " << z << " zpos " << z_pos[dim] << endl;
+          //cout << "QCSS z " << z << " zpos " << z_pos[dim] << endl;
           if (phase == 1) {
             r_pos[dim] = sqrt(x_pos[dim] * x_pos[dim] + y_pos[dim] * y_pos[dim]);
           }
@@ -139,16 +139,17 @@ namespace Belle2 {
           for (int i = 0; i < dim; i++) {
             if (phase == 2) {
               transform = G4RotateZ3D(phi - M_PI / 2) * G4Translate3D(0, r_pos[i], z_pos[i]) * G4RotateX3D(-M_PI / 2 - thetaZ);
-              cout << "phase 2" << endl;
+              //cout << "phase 2" << endl;
             }
             if (phase == 1) {
               transform = G4Translate3D(x_pos[i], y_pos[i], z_pos[i]) * G4RotateZ3D(phi) * G4RotateX3D(thetaZ);
-              cout << "phase 1" << endl;
+              //cout << "phase 1" << endl;
             }
-            cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
-                 y_pos[i] << endl;
+            //cout << "QCS r " << r_pos[i] << " width " << dz_scint << " z " << z_pos[i] << " phi " << phi << " x " << x_pos[i] << " y " <<
+            //     y_pos[i] << endl;
             new G4PVPlacement(transform, l_scint, TString::Format("p_scint_%d", detID).Data() , &topVolume, false, detID);
-            cout << " Nb of detector " << detID << endl;
+            B2INFO("QCSS-" << detID << " placed at: " << transform.getTranslation() << " mm ");
+            //cout << " Nb of detector " << detID << endl;
             detID++;
           }
         }

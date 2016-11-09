@@ -23,8 +23,12 @@
       <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
+      <AngleY unit="deg">0.5</AngleY>
+      <rx>0.574078725615</rx>
+      <ry>0.578979108775</ry>
+      <rz>0.578979108775</rz>
+      <angle>4.18387593765</angle>
       <px unit="cm">37.5</px>
       <py unit="cm">89.0</py>
       <pz unit="cm">432.6</pz>
@@ -37,8 +41,12 @@
       <y_cave unit="mm">130.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
+      <AngleY unit="deg">0.5</AngleY>
+      <rx>0.574078725615</rx>
+      <ry>0.578979108775</ry>
+      <rz>0.578979108775</rz>
+      <angle>4.18387593765</angle>
       <px unit="cm">37.5</px>
       <py unit="cm">89.0</py>
       <pz unit="cm">432.6</pz>
@@ -52,8 +60,12 @@
       <y_cave unit="mm">1395.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
+      <AngleY unit="deg">0.5</AngleY>
+      <rx>0.574078725615</rx>
+      <ry>0.578979108775</ry>
+      <rz>0.578979108775</rz>
+      <angle>4.18387593765</angle>
       <px unit="cm">189.0</px>
       <py unit="cm">37.5</py>
       <pz unit="cm">432.6</pz>
@@ -66,8 +78,12 @@
       <y_cave unit="mm">-1135.0</y_cave>
       <z_cave unit="mm">0.0</z_cave>
       <AngleX unit="deg">0.0</AngleX>
-      <AngleY unit="deg">0.0</AngleY>
       <AngleZ unit="deg">0.0</AngleZ>
+      <AngleY unit="deg">0.5</AngleY>
+      <rx>0.574078725615</rx>
+      <ry>0.578979108775</ry>
+      <rz>0.578979108775</rz>
+      <angle>4.18387593765</angle>
       <px unit="cm">189.0</px>
       <py unit="cm">37.5</py>
       <pz unit="cm">432.6</pz>

@@ -116,6 +116,9 @@ namespace Belle2 {
 
         new G4PVPlacement(rotXx, TPCpos, l_Vessel, "p_Vessel", &topVolume, false, 1);
         new G4PVPlacement(rotXx, TPCpos, l_iGasTPC, "p_iGasTPC", &topVolume, false, 1);
+
+        B2INFO("Micro-TPC-" << detID << " placed at: " << TPCpos << " mm");
+
         /*
               //create endcap top and bottom
               G4double dx_VesselEndCap = dx_Vessel;
@@ -186,11 +189,11 @@ namespace Belle2 {
         G4double h_Rod  = 20. / 2. * CLHEP::cm;
         G4double sA_Rod = 0.*CLHEP::deg;
         G4double spA_Rod = 360.*CLHEP::deg;
-        cout << "h_Rod " << h_Rod / CLHEP::cm
+        /*cout << "h_Rod " << h_Rod / CLHEP::cm
              << " dx " << dx_kap2 / CLHEP::cm
              << " dy " << dy_kap2 / CLHEP::cm
              << " dz " << dz_kap2 / CLHEP::cm
-             << endl;
+             << endl;*/
         //G4double x_Rod[4] = {3.2 * CLHEP::cm, 3.2 * CLHEP::cm, -3.2 * CLHEP::cm, -3.2 * CLHEP::cm};
         //G4double y_Rod[4] = {3.2 * CLHEP::cm, -3.2 * CLHEP::cm, 3.2 * CLHEP::cm, -3.2 * CLHEP::cm};
         G4double x_Rod[4] = {xrodh, xrodh, -xrodh, -xrodh};
@@ -246,7 +249,7 @@ namespace Belle2 {
           x_Ring[i] = 0;
           y_Ring[i] = 0;
           z_Ring[i] = -dz_iGasTPC + offset + (hspacer + 2. * dz_Ring) * i;
-          cout << "z ring # " << i << " pos. " << z_Ring[i] / CLHEP::cm << endl;
+          //cout << "z ring # " << i << " pos. " << z_Ring[i] / CLHEP::cm << endl;
           sprintf(Name, "p_Ring_%d", i);
           new G4PVPlacement(0, G4ThreeVector(x_Ring[i], y_Ring[i], z_Ring[i]), l_Ring, Name, l_iGasTPC, false, 1);
         }
@@ -294,8 +297,8 @@ namespace Belle2 {
         G4double y_GEM = 0.*CLHEP::cm;
         //G4double z_GEM[] = { -dz_iGasTPC + 2.*CLHEP::cm - 0.21 * CLHEP::cm - dz_GEM, -dz_iGasTPC + 2.*CLHEP::cm - dz_GEM};
         G4double z_GEM[] = { z_Ring[0] - dz_Ring - dz_GEM, z_Ring[0] - dz_Ring - 2. * dz_GEM - 0.28 * CLHEP::cm};
-        cout << "ring 1 " << z_Ring[1] / CLHEP::cm  << " ring 0 " << z_Ring[0] / CLHEP::cm << " gem 1 " << z_GEM[0] / CLHEP::cm << " gem 2 "
-             << z_GEM[1] / CLHEP::cm << endl;
+        /*cout << "ring 1 " << z_Ring[1] / CLHEP::cm  << " ring 0 " << z_Ring[0] / CLHEP::cm << " gem 1 " << z_GEM[0] / CLHEP::cm << " gem 2 "
+        << z_GEM[1] / CLHEP::cm << endl;*/
 
         G4VSolid* s_GEM = new G4Box("s_GEM", dx_GEM, dy_GEM, dz_GEM);
         G4LogicalVolume* l_GEM = new G4LogicalVolume(s_GEM, geometry::Materials::get("Kovar"), "l_GEM");
@@ -346,6 +349,9 @@ namespace Belle2 {
         G4double z_GasTPC = z_GEM[0] + dz_GEM + dz_GasTPC;
 
         new G4PVPlacement(0, G4ThreeVector(x_GasTPC, y_GasTPC, z_GasTPC), l_GasTPC, "p_GasTPC", l_iGasTPC, false, detID);
+
+        B2INFO("Micro-TPC-Sensitive-Volume-" << detID << " placed at: (" << TPCpos.getX() + x_GasTPC << "," << TPCpos.getY() + y_GasTPC <<
+               "," << TPCpos.getZ() + z_GasTPC << ") mm");
 
         //create pixel chip
         G4double dx_PixelChip = dx_GasTPC;

@@ -26,8 +26,7 @@ void BkgTruthClusterVarSet::beginEvent()
 
 bool BkgTruthClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
-  bool extracted = extractNested(ptrCluster);
-  if (not extracted or not ptrCluster) return false;
+  if (not ptrCluster) return false;
   const CDCWireHitCluster& cluster = *ptrCluster;
 
   int nBackgroundHits = 0;

@@ -21,7 +21,6 @@ using namespace TrackFindingCDC;
 
 bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair)
 {
-  extractNested(testPair);
   const CDCRecoSegment2D* segment = testPair->first;
   const CDCTrack* track = testPair->second;
 

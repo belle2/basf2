@@ -19,8 +19,7 @@ using namespace TrackFindingCDC;
 
 bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 {
-  bool extracted = extractNested(segment);
-  if (not extracted or not segment) return false;
+  if (not segment) return false;
 
   // Find the track with the highest number of hits in the segment
   const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();

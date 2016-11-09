@@ -24,8 +24,7 @@ TruthSegmentPairRelationVarSet::TruthSegmentPairRelationVarSet()
 
 bool TruthSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation)
 {
-  bool extracted = extractNested(ptrSegmentPairRelation);
-  if (not extracted or not ptrSegmentPairRelation) return false;
+  if (not ptrSegmentPairRelation) return false;
 
   const Relation<const CDCSegmentPair>& segmentPairRelation = *ptrSegmentPairRelation;
 

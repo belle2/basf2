@@ -25,8 +25,7 @@ FitSegmentRelationVarSet::FitSegmentRelationVarSet()
 
 bool FitSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
 {
-  bool extracted = Super::extract(ptrSegmentRelation);
-  if (not extracted or not ptrSegmentRelation) return false;
+  if (not ptrSegmentRelation) return false;
 
   const CDCRecoSegment2D* fromSegment = ptrSegmentRelation->first;
   const CDCRecoSegment2D* toSegment   = ptrSegmentRelation->second;

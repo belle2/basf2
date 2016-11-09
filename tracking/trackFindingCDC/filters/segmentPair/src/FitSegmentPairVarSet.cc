@@ -21,8 +21,7 @@ FitSegmentPairVarSet::FitSegmentPairVarSet(bool preliminaryFit)
 
 bool FitSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
-  bool extracted = extractNested(ptrSegmentPair);
-  if (not extracted or not ptrSegmentPair) return false;
+  if (not ptrSegmentPair) return false;
 
   const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 

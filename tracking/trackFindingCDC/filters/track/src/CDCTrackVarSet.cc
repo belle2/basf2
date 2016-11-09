@@ -18,8 +18,7 @@ using namespace TrackFindingCDC;
 
 bool CDCTrackVarSet::extract(const CDCTrack* track)
 {
-  bool extracted = extractNested(track);
-  if (not extracted or not track) return false;
+  if (not track) return false;
 
   if (track->empty()) {
     return false;

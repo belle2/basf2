@@ -21,8 +21,7 @@ FitTrackRelationVarSet::FitTrackRelationVarSet()
 
 bool FitTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {
-  bool extracted = Super::extract(ptrTrackRelation);
-  if (not extracted or not ptrTrackRelation) return false;
+  if (not ptrTrackRelation) return false;
 
   const CDCTrack* fromTrack = ptrTrackRelation->first;
   const CDCTrack* toTrack   = ptrTrackRelation->second;

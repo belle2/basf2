@@ -21,7 +21,6 @@ using namespace TrackFindingCDC;
 
 bool AdvancedSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 {
-  extractNested(segment);
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   unsigned int iSuperLayer = ISuperLayerUtil::getCommon(*segment);

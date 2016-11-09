@@ -22,8 +22,7 @@ using namespace TrackFindingCDC;
 bool SegmentTrainTruthVarSet::extract(const
                                       std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
 {
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair) return false;
+  if (not testPair) return false;
 
   const std::vector<SegmentInformation*> segmentTrain = testPair->first;
 

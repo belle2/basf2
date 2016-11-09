@@ -25,8 +25,7 @@ TruthFacetVarSet::TruthFacetVarSet()
 
 bool TruthFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
-  bool extracted = extractNested(ptrFacet);
-  if (not extracted or not ptrFacet) return false;
+  if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
   const CDCRLWireHitTriple& rlWireHitTriple = facet;

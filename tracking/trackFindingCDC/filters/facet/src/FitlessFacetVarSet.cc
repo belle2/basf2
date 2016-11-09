@@ -20,7 +20,6 @@ FitlessFacetVarSet::FitlessFacetVarSet()
 
 bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
-  extractNested(ptrFacet);
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 

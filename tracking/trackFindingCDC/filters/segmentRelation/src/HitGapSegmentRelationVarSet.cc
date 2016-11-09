@@ -19,8 +19,7 @@ HitGapSegmentRelationVarSet::HitGapSegmentRelationVarSet()
 
 bool HitGapSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
 {
-  bool extracted = extractNested(ptrSegmentRelation);
-  if (not extracted or not ptrSegmentRelation) return false;
+  if (not ptrSegmentRelation) return false;
 
   const Relation<const CDCRecoSegment2D>& segmentPair = *ptrSegmentRelation;
 

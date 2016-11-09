@@ -20,8 +20,7 @@ BendFacetRelationVarSet::BendFacetRelationVarSet()
 
 bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = extractNested(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
+  if (not ptrFacetRelation) return false;
   const Relation<const CDCFacet>& facetRelation = *ptrFacetRelation;
 
   const CDCFacet& fromFacet = *facetRelation.first;

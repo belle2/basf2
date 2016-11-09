@@ -20,8 +20,7 @@ using namespace TrackFindingCDC;
 bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>*
                                   testPair)
 {
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair) return false;
+  if (not testPair) return false;
 
   const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D&>& recoSegments = testPair->first;
   const CDCRecoSegment3D& recoSegment3D = recoSegments.second;

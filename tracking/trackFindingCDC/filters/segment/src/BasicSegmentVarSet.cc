@@ -16,8 +16,7 @@ using namespace TrackFindingCDC;
 
 bool BasicSegmentVarSet::extract(const CDCRecoSegment2D* ptrSegment2D)
 {
-  bool extracted = extractNested(ptrSegment2D);
-  if (not extracted or not ptrSegment2D) return false;
+  if (not ptrSegment2D) return false;
 
   var<named("size")>() = ptrSegment2D->size();
   var<named("superlayer_id")>() = ptrSegment2D->getISuperLayer();

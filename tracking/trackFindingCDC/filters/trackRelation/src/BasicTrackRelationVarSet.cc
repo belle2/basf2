@@ -19,8 +19,7 @@ BasicTrackRelationVarSet::BasicTrackRelationVarSet()
 
 bool BasicTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {
-  bool extracted = extractNested(ptrTrackRelation);
-  if (not extracted or not ptrTrackRelation) return false;
+  if (not ptrTrackRelation) return false;
 
   const Relation<const CDCTrack>& trackPair = *ptrTrackRelation;
 

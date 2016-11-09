@@ -11,24 +11,27 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationVarSets.h>
 
+#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 std::vector<std::string>
 UnionRecordingFacetRelationFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "pair", " bend", "fit", "tmva", "truth"});
   return varSetNames;
 }
-
 
 std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
 UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
     return makeUnique<BasicFacetRelationVarSet>();
+  } else if (name == "pair") {
+    return  makeUnique<RelationVarSet<FitlessFacetVarSet> >();
   } else if (name == "bend") {
     return makeUnique<BendFacetRelationVarSet>();
   } else if (name == "fit") {

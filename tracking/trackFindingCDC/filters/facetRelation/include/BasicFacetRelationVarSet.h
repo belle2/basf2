@@ -11,9 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
-
-#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
@@ -27,44 +25,36 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetRelationBasicNames[] = {
+    static char const* const facetRelationBasicVarNames[] = {
       "from_middle_phi",
       "to_middle_phi"
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a facet relation
      */
     class BasicFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationBasicNames);
+      static const size_t nNames = size(facetRelationBasicVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetRelationBasicNames[iName];
+        return facetRelationBasicVarNames[iName];
       }
-
-      /// Marking that the basic facet variables should be included.
-      using NestedVarSet = RelationVarSet<FitlessFacetVarSet>;
     };
 
-    /** Class that computes floating point variables from a facet relation.
+    /**
+     *  Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
     class BasicFacetRelationVarSet : public VarSet<BasicFacetRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      using Super = VarSet<BasicFacetRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit BasicFacetRelationVarSet();
-
       /// Generate and assign the variables from the facet relation
       virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
     };

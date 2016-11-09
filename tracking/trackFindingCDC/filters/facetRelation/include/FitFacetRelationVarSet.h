@@ -11,9 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
-
-#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
@@ -27,7 +25,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetRelationFitNames[] = {
+    static char const* const facetRelationFitVarNames[] = {
       "cos_delta",
       "from_middle_cos_delta",
       "to_middle_cos_delta",
@@ -73,39 +71,31 @@ namespace Belle2 {
       "abs_curv_proper",
     };
 
-    /** Class that specifies the names of the variables
+    /**
+     *  Class that specifies the names of the variables
      *  that should be generated from a facet relation
      */
     class FitFacetRelationVarNames : public VarNames<Relation<const CDCFacet>> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationFitNames);
+      static const size_t nNames = size(facetRelationFitVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetRelationFitNames[iName];
+        return facetRelationFitVarNames[iName];
       }
-
-      /// Marking that the fit facet variables should be included.
-      using NestedVarSet = RelationVarSet<FitlessFacetVarSet>;
     };
 
-    /** Class that computes floating point variables from a facet relation.
+    /**
+     *  Class that computes floating point variables from a facet relation.
      *  that can be forwarded to a flat TNtuple or a TMVA method
      */
     class FitFacetRelationVarSet : public VarSet<FitFacetRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      using Super = VarSet<FitFacetRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitFacetRelationVarSet();
-
       /// Generate and assign the variables from the facet relation
       virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
     };

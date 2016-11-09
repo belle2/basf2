@@ -147,7 +147,7 @@ namespace Belle2 {
     /** Parameter to set Map Region  */
     static void setBeamAngle(double beamAngle)
     {
-      s_beamAngle = beamAngle;
+      sincos(beamAngle, &s_sba, &s_cba);
     }
     /** Parameter to set Angle of the beam */
 
@@ -211,7 +211,7 @@ namespace Belle2 {
     /** The min and max boundaries of the map region in r. */
     static double s_mapRegionR[2];
     /** The angle of beam   */
-    static double s_beamAngle;
+    static double s_sba, s_cba;
   };
 
 } //end of namespace Belle2

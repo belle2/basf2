@@ -11,12 +11,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-
-#include <tracking/trackFindingCDC/varsets/PairVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {

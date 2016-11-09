@@ -13,13 +13,12 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
-#include <tracking/trackFindingCDC/varsets/PairVarSet.h>
+#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <vector>
 #include <string>
-#include <cassert>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -91,7 +90,7 @@ namespace Belle2 {
       }
 
       /// Marking that the fit facet variables should be included.
-      using NestedVarSet = PairVarSet<FitlessFacetVarSet>;
+      using NestedVarSet = RelationVarSet<FitlessFacetVarSet>;
     };
 
     /** Class that computes floating point variables from a facet relation.

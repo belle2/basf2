@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/ca/Relation.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -22,8 +23,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /// Generic class that generates the same variables from a each of a pair of instances.
     template <class ABaseVarSet>
-    class PairVarSet : public BaseVarSet<const std::pair<const typename ABaseVarSet::Object*,
-      const typename ABaseVarSet::Object*>> {
+    class RelationVarSet : public BaseVarSet<Relation<const typename ABaseVarSet::Object> > {
 
     public:
       /// Object type from which the variables shall be extracted
@@ -75,7 +75,7 @@ namespace Belle2 {
       }
 
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const std::pair<const BaseObject*, const BaseObject*>* obj) override
+      virtual bool extract(const Relation<const BaseObject>* obj) override
       {
         assert(obj);
         bool firstExtracted = m_firstVarSet.extract(obj->first);

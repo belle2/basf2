@@ -23,7 +23,7 @@ std::string SegmentPairFilterFactory::getFilterPurpose() const
   return "Segment pair filter to be used during the construction of segment pairs.";
 }
 
-std::string SegmentPairFilterFactory::getModuleParamPrefix() const
+std::string SegmentPairFilterFactory::getIdentifier() const
 {
   return "SegmentPair";
 }

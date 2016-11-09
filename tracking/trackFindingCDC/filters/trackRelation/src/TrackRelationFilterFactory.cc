@@ -25,7 +25,7 @@ std::string TrackRelationFilterFactory::getFilterPurpose() const
   return "Track relation filter to be used during the construction of the track network for in super layer merginig.";
 }
 
-std::string TrackRelationFilterFactory::getModuleParamPrefix() const
+std::string TrackRelationFilterFactory::getIdentifier() const
 {
   return "TrackRelation";
 }

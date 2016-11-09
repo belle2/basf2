@@ -24,7 +24,7 @@ std::string FacetFilterFactory::getFilterPurpose() const
   return "Facet filter to be used during the construction of facets.";
 }
 
-std::string FacetFilterFactory::getModuleParamPrefix() const
+std::string FacetFilterFactory::getIdentifier() const
 {
   return "Facet";
 }

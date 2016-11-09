@@ -38,6 +38,10 @@ namespace Belle2 {
       /// Destructor of interface class virtual
       virtual ~FilterFactory() = default;
 
+    public:
+      /// Getter for a short identifier of the factory. Currently unused.
+      virtual std::string getIdentifier() const = 0;
+
       /// Getter for a descriptive purpose of the filter.
       virtual std::string getFilterPurpose() const = 0;
 
@@ -52,21 +56,13 @@ namespace Belle2 {
        *
        *  Always emits an error message and returns nullptr.
        */
-      virtual std::unique_ptr<AFilter>
-      create(const std::string& filterName __attribute__((unused))) const;
+      virtual std::unique_ptr<AFilter> create(const std::string& filterName) const;
 
       /// Create a string with a description mentioning the names of the chooseable filter
       virtual std::string createFiltersNameDescription() const;
 
       /// Create a string with a description mentioning the parameters of the chooseable filter
       virtual std::string createFiltersParametersDescription() const;
-
-    private:
-      /// Legacy - Getter for the prefix prepended to a Module parameter. Currently unused.
-      virtual std::string getModuleParamPrefix() const
-      {
-        return "";
-      }
 
     public:
       /// Legacy - Return the default filter suggested by the factory.
@@ -81,8 +77,7 @@ namespace Belle2 {
     };
 
     template <class AFilter>
-    std::unique_ptr<AFilter>
-    FilterFactory<AFilter>::create(const std::string& filterName __attribute__((unused))) const
+    std::unique_ptr<AFilter> FilterFactory<AFilter>::create(const std::string& filterName) const
     {
       // Filter not valid
       B2ERROR("Could not create filter with name " << filterName);
@@ -158,6 +153,5 @@ namespace Belle2 {
       }
       return oss.str();
     }
-
   }
 }

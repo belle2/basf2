@@ -25,7 +25,7 @@ std::string SegmentRelationFilterFactory::getFilterPurpose() const
   return "Segment relation filter to be used during the construction of the segment network for in super layer merginig.";
 }
 
-std::string SegmentRelationFilterFactory::getModuleParamPrefix() const
+std::string SegmentRelationFilterFactory::getIdentifier() const
 {
   return "SegmentRelation";
 }

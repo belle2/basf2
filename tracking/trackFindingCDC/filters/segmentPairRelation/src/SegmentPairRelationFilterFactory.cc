@@ -26,7 +26,7 @@ std::string SegmentPairRelationFilterFactory::getFilterPurpose() const
   return "Segment pair relation filter to be used during the construction of a segment pair network.";
 }
 
-std::string SegmentPairRelationFilterFactory::getModuleParamPrefix() const
+std::string SegmentPairRelationFilterFactory::getIdentifier() const
 {
   return "SegmentPairRelation";
 }

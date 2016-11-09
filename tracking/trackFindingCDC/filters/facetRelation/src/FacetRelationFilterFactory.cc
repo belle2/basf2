@@ -24,7 +24,7 @@ std::string FacetRelationFilterFactory::getFilterPurpose() const
   return "Facet relation filter to be used during the construction of the facet network.";
 }
 
-std::string FacetRelationFilterFactory::getModuleParamPrefix() const
+std::string FacetRelationFilterFactory::getIdentifier() const
 {
   return "FacetRelation";
 }

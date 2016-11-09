@@ -68,8 +68,8 @@ namespace Belle2 {
       virtual std::unique_ptr<BaseSegmentTrackFilter>
       create(const std::string& filterName) const override;
 
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override
+      /** Getter for a short identifier of the factory.*/
+      virtual std::string getIdentifier() const override
       {
         return "SegmentTrackFilterFirstStep";
       }
@@ -99,8 +99,8 @@ namespace Belle2 {
       virtual std::unique_ptr<BaseSegmentTrackFilter>
       create(const std::string& filterName) const override;
 
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override
+      /** Getter for a short identifier of the factory.*/
+      virtual std::string getIdentifier() const override
       {
         return "SegmentTrackFilterSecondStep";
       }

@@ -48,7 +48,7 @@ std::string NewSegmentsFilterFactory::getFilterPurpose() const
   return "Segment background finder.";
 }
 
-std::string NewSegmentsFilterFactory::getModuleParamPrefix() const
+std::string NewSegmentsFilterFactory::getIdentifier() const
 {
   return "NewSegments";
 }

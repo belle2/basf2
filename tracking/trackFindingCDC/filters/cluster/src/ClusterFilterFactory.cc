@@ -23,7 +23,7 @@ std::string ClusterFilterFactory::getFilterPurpose() const
   return "Cluster filter examines hit clusters and discards clusters recognised as background.";
 }
 
-std::string ClusterFilterFactory::getModuleParamPrefix() const
+std::string ClusterFilterFactory::getIdentifier() const
 {
   return "Cluster";
 }

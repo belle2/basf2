@@ -49,8 +49,8 @@ namespace Belle2 {
       /** Getter for the valid filter names and a description for each */
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override
+      /** Getter for a short identifier of the factory.*/
+      virtual std::string getIdentifier() const override
       {
         return "SegmentTrain";
       }

@@ -48,65 +48,12 @@ namespace Belle2 {
 
     public:
       /**
-       *  Initialize the variable set before event processing.
-       *  Can be specialised if the derived variable set has setup work to do.
-       */
-      virtual void initialize() override
-      {
-        m_nestedVarSet.initialize();
-      }
-
-      /// Allow setup work to take place at beginning of new run
-      virtual void beginRun() override
-      {
-        m_nestedVarSet.beginRun();
-      }
-
-      /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent() override
-      {
-        m_nestedVarSet.beginEvent();
-      }
-
-      /// Allow clean up to take place at end of run
-      virtual void endRun() override
-      {
-        m_nestedVarSet.endRun();
-      }
-
-      /**
-       *  Terminate the variable set after event processing.
-       *  Can be specialised if the derived variable set has to tear down aquired resources.
-       */
-      virtual void terminate() override
-      {
-        m_nestedVarSet.terminate();
-      }
-
-      /// Extract the nested variables next
-      bool extractNested(const Object* obj)
-      {
-        return m_nestedVarSet.extract(AObjectVarNames::getNested(obj));
-      }
-
-      using Super::extract;
-
-      /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const Object* obj) override
-      {
-        return extractNested(obj);
-      }
-
-      /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
       virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
       {
-        std::vector<Named<Float_t*> > result = m_nestedVarSet.getNamedVariables(prefix);
-        std::vector<Named<Float_t*> > extend = m_variables.getNamedVariables(prefix);
-        result.insert(result.end(), extend.begin(), extend.end());
-        return result;
+        return m_variables.getNamedVariables(prefix);
       }
 
       /**
@@ -115,8 +62,6 @@ namespace Belle2 {
        */
       virtual MayBePtr<Float_t> find(std::string varName) override
       {
-        MayBePtr<Float_t> found = m_nestedVarSet.find(varName);
-        if (found) return found;
         return m_variables.find(varName);
       }
 
@@ -195,9 +140,6 @@ namespace Belle2 {
     public:
       /// Memory for nNames floating point values.
       FixedSizeNamedFloatTuple<AObjectVarNames> m_variables;
-
-      /// Nested VarSet implementing a chain of sets until EmptyVarSet terminates the sequence.
-      typename AObjectVarNames::NestedVarSet m_nestedVarSet;
     };
   }
 }

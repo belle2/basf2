@@ -42,7 +42,7 @@ namespace Belle2 {
                  const std::string& filterName)
         : m_filterFactory(std::move(filterFactory))
       {
-        B2ASSERT("Constructing a chooseable filter with no factory", filterFactory);
+        B2ASSERT("Constructing a chooseable filter with no factory", m_filterFactory);
         setFilterName(filterName);
       }
 
@@ -51,7 +51,7 @@ namespace Belle2 {
                                     const std::string& prefix = "") override final
       {
         Super::exposeParameters(moduleParamList, prefix);
-        m_filterFactory->exposeParameters(moduleParamList);
+        m_filterFactory->exposeParameters(moduleParamList, prefix);
       }
 
       /// Return the string holding the used filter name

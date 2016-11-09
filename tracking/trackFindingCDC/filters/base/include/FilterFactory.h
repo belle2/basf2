@@ -25,11 +25,11 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /**
-       Factory that can creates apropriate filter instance from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering file.
-    */
+     *  Factory that can create apropriate filter instances from parameters.
+     *
+     *  It knows about all available filters and their parameters.
+     *  Can collaborate with a Module and expose these parameters to the user in steering file.
+     */
     template<class AFilter>
     class FilterFactory {
 
@@ -47,14 +47,12 @@ namespace Belle2 {
       /// A helper class to unpack a boost::variant parameter value and set it in the parameter list.
       class SetParameterVisitor : public boost::static_visitor<> {
       public:
-        /**
-         * Constructor taking the module parameter list and the name of the parameter to be set from the boost::variant.
-         */
-        SetParameterVisitor(ModuleParamList* moduleParamList,
-                            std::string paramName)
-          : m_moduleParamList(moduleParamList),
-            m_paramName(paramName)
-        {}
+        /// Constructor taking the module parameter list and the name of the parameter to be set from the boost::variant.
+        SetParameterVisitor(ModuleParamList* moduleParamList, std::string paramName)
+          : m_moduleParamList(moduleParamList)
+          , m_paramName(paramName)
+        {
+        }
 
         /// Function call that receives the parameter value from the boost::variant with the correct type.
         template<class T>
@@ -73,7 +71,7 @@ namespace Belle2 {
       };
 
     public:
-      /** Fill the default filter name and parameter values*/
+      /// Fill the default filter name and parameter values
       FilterFactory(std::string filterName,
                     FilterParamMap filterParameters
                     = FilterParamMap()) :
@@ -82,61 +80,71 @@ namespace Belle2 {
       {
       }
 
+      /// Destructor of interface class virtual
       virtual ~FilterFactory() = default;
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList)
-      { exposeParameters(moduleParamList, getModuleParamPrefix()); }
-
-      /** Add the parameters of the filter to the module */
+      /// Add the parameters of the filter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
-      /** Create a string with a description for each filter  */
+      /// Create a string with a description for each filte
       std::string createFiltersNameDescription() const;
 
-      /** Create a string with a description for the filter parameters */
+      /// Create a string with a description for the filter parameters
       std::string createFiltersParametersDescription() const;
 
-      /** Create the filter with the currently stored parameters. */
+      /// Create the filter with the currently stored parameters.
       std::unique_ptr<AFilter> create();
 
-      /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<AFilter> create(const std::string& /*name*/) const
-      {return std::unique_ptr<AFilter>(nullptr); }
+      /// Create a filter with the given name, does not set filter specific parameters.
+      virtual std::unique_ptr<AFilter> create(const std::string& filterName
+                                              __attribute__((unused))) const
+      {
+        return std::unique_ptr<AFilter>(nullptr);
+      }
 
-      /** Getter for a descriptive purpose of the filter.*/
+      /// Getter for a descriptive purpose of the filter.
       virtual std::string getFilterPurpose() const
-      { return ""; }
+      {
+        return "";
+      }
 
-      /** Getter for the valid filter names and a description for each */
+      /// Getter for the valid filter names and a description for each
       virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const
-      { return std::map<std::string, std::string>(); }
+      {
+        return std::map<std::string, std::string>();
+      }
 
-      /** Getter for the prefix prepended to a Module parameter.*/
+      /// Getter for the prefix prepended to a Module parameter.
       virtual std::string getModuleParamPrefix() const
-      { return ""; }
+      {
+        return "";
+      }
 
-      /** Return the string holding the used filter name */
+      /// Return the string holding the used filter name
       const std::string& getFilterName() const
-      { return m_filterName; }
+      {
+        return m_filterName;
+      }
 
-      /** Set the filter name which should be created */
+      /// Set the filter name which should be created
       void setFilterName(const std::string& filterName)
-      { m_filterName = filterName; }
+      {
+        m_filterName = filterName;
+      }
 
-      /** Return the map holding the used filter parameters */
+      /// Return the map holding the used filter parameters
       const FilterParamMap& getFilterParameters() const
-      { return m_filterParameters; }
+      {
+        return m_filterParameters;
+      }
 
     private:
-      /**
-       * Filter name identifying the name to be constructed.
-       */
+      /// Filter name identifying the name to be constructed.
       std::string m_filterName;
 
       /**
-       * Filter parameters forwarded to the filter
-       * Meaning of the Key - Value pairs depend on the concrete filter
+       *  Filter parameters forwarded to the filter
+       *  Meaning of the Key - Value pairs depend on the concrete filter
        */
       FilterParamMap m_filterParameters;
     };

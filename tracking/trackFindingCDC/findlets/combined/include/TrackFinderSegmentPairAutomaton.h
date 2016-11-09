@@ -49,7 +49,8 @@ namespace Belle2 {
         addProcessingSignalListener(&m_segmentPairSwapper);
 
         ModuleParamList moduleParamList;
-        this->exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        this->exposeParameters(&moduleParamList, prefix);
         moduleParamList.getParameter<int>("SegmentPairRelationOnlyBest").setDefaultValue(1);
       }
 

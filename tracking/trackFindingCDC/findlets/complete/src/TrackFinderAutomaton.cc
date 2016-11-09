@@ -27,7 +27,8 @@ TrackFinderAutomaton::TrackFinderAutomaton()
   this->addProcessingSignalListener(&m_trackExporter);
 
   ModuleParamList moduleParamList;
-  this->exposeParameters(&moduleParamList);
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
   moduleParamList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
   moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
   moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");

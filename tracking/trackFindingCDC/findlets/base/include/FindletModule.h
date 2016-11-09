@@ -68,7 +68,8 @@ namespace Belle2 {
 
         addStoreVectorParameters(Indices());
         ModuleParamList moduleParamList = this->getParamList();
-        m_findlet.exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        m_findlet.exposeParameters(&moduleParamList, prefix);
         this->setParamList(moduleParamList);
       }
 

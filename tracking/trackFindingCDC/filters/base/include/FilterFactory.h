@@ -191,7 +191,8 @@ namespace Belle2 {
         }
 
         ModuleParamList moduleParamList;
-        filter->exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        filter->exposeParameters(&moduleParamList, prefix);
 
         std::map<std::string, std::string> filterParameters;
         for (auto && name : moduleParamList.getParameterNames()) {
@@ -238,7 +239,8 @@ namespace Belle2 {
 
       /// Set parameters
       ModuleParamList moduleParamList;
-      ptrFilter->exposeParameters(&moduleParamList);
+      const std::string prefix = "";
+      ptrFilter->exposeParameters(&moduleParamList, prefix);
       for (auto& nameAndValue : m_filterParameters) {
         const std::string paramName = nameAndValue.first;
         const FilterParamVariant& value = nameAndValue.second;

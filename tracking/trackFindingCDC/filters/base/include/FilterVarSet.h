@@ -102,7 +102,8 @@ namespace Belle2 {
         Super::initialize();
 
         ModuleParamList moduleParamList;
-        m_ptrFilter->exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        m_ptrFilter->exposeParameters(&moduleParamList, prefix);
 
         // try to find the TMVAFilter cut parameter and reset it such that we can set it ourself
         try {

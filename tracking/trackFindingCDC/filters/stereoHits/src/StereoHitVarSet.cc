@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
 #include <numeric>
 
 using namespace Belle2;
@@ -49,21 +51,21 @@ bool StereoHitVarSet::extract(const std::pair<const CDCRecoHit3D*, const CDCTrac
   });
 
   var<named("track_size")>() = size;
-  setVariableIfNotNaN<named("pt")>(trajectory2D.getAbsMom2D());
-  setVariableIfNotNaN<named("reco_s")>(reconstructedS);
-  setVariableIfNotNaN<named("reco_z")>(reconstructedPosition.z());
-  setVariableIfNotNaN<named("phi_track")>(startMomentum.phi());
+  var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
+  var<named("reco_s")>() = toFinite(reconstructedS, 0);
+  var<named("reco_z")>() = toFinite(reconstructedPosition.z(), 0);
+  var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
   var<named("phi_hit")>() = reconstructedPosition.phi();
   var<named("theta_hit")>() = reconstructedPosition.theta();
   var<named("drift_length")>() = reconstructedDriftLength;
   var<named("adc_count")>() = adcCount;
-  setVariableIfNotNaN<named("xy_distance_zero_z")>(xyDistance);
+  var<named("xy_distance_zero_z")>() = toFinite(xyDistance, 0);
   var<named("right_hit")>() = rlInformation == ERightLeft::c_Right;
-  setVariableIfNotNaN<named("track_back_s")>(backArcLength2D);
-  setVariableIfNotNaN<named("track_front_s")>(frontArcLength2D);
-  setVariableIfNotNaN<named("track_mean_s")>(arcLength2DSum / size);
-  setVariableIfNotNaN<named("s_distance")>(nearestAxialHit->getArcLength2D() - reconstructedS);
-  setVariableIfNotNaN<named("track_radius")>(radius);
+  var<named("track_back_s")>() = toFinite(backArcLength2D, 0);
+  var<named("track_front_s")>() = toFinite(frontArcLength2D, 0);
+  var<named("track_mean_s")>() = toFinite(arcLength2DSum / size, 0);
+  var<named("s_distance")>() = toFinite(nearestAxialHit->getArcLength2D() - reconstructedS, 0);
+  var<named("track_radius")>() = toFinite(radius, 0);
   var<named("superlayer_id")>() = recoHit->getISuperLayer();
   return true;
 }

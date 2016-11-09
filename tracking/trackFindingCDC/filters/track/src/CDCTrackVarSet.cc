@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
 
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
@@ -123,32 +125,32 @@ bool CDCTrackVarSet::extract(const CDCTrack* track)
   const CDCTrajectorySZ& trajectorySZ = trajectory3D.getTrajectorySZ();
 
   var<named("size")>() = size;
-  setVariableIfNotNaN<named("pt")>(trajectory2D.getAbsMom2D());
+  var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
   //var<named("fit_prob_3d")>() = trajectory3D.getPValue();
   //var<named("fit_prob_2d")>() = trajectory2D.getPValue();
   //var<named("fit_prob_sz")>() = trajectorySZ.getPValue();
 
-  setVariableIfNotNaN<named("sz_slope")>(trajectorySZ.getTanLambda());
-  setVariableIfNotNaN<named("drift_length_mean")>(drift_length_sum / size);
-  setVariableIfNotNaN<named("drift_length_variance")>(drift_length_variance);
-  setVariableIfNotNaN<named("drift_length_max")>(drift_length_max);
-  setVariableIfNotNaN<named("drift_length_min")>(drift_length_min);
-  setVariableIfNotNaN<named("drift_length_sum")>(drift_length_sum);
+  var<named("sz_slope")>() = toFinite(trajectorySZ.getTanLambda(), 0);
+  var<named("drift_length_mean")>() = toFinite(drift_length_sum / size, 0);
+  var<named("drift_length_variance")>() = toFinite(drift_length_variance, 0);
+  var<named("drift_length_max")>() = toFinite(drift_length_max, 0);
+  var<named("drift_length_min")>() = toFinite(drift_length_min, 0);
+  var<named("drift_length_sum")>() = toFinite(drift_length_sum, 0);
 
-  setVariableIfNotNaN<named("adc_mean")>(adc_sum / size);
-  setVariableIfNotNaN<named("adc_variance")>(adc_variance);
-  setVariableIfNotNaN<named("adc_max")>(adc_max);
-  setVariableIfNotNaN<named("adc_min")>(adc_min);
-  setVariableIfNotNaN<named("adc_sum")>(adc_sum);
+  var<named("adc_mean")>() = toFinite(adc_sum / size, 0);
+  var<named("adc_variance")>() = toFinite(adc_variance, 0);
+  var<named("adc_max")>() = toFinite(adc_max, 0);
+  var<named("adc_min")>() = toFinite(adc_min, 0);
+  var<named("adc_sum")>() = toFinite(adc_sum, 0);
 
   var<named("has_matching_segment")>() = track->getHasMatchingSegment();
 
-  setVariableIfNotNaN<named("empty_s_mean")>(empty_s_sum / size);
-  setVariableIfNotNaN<named("empty_s_sum")>(empty_s_sum);
-  setVariableIfNotNaN<named("empty_s_variance")>(empty_s_variance);
-  setVariableIfNotNaN<named("empty_s_max")>(empty_s_max);
-  setVariableIfNotNaN<named("empty_s_min")>(empty_s_min);
-  setVariableIfNotNaN<named("s_range")>(s_range);
+  var<named("empty_s_mean")>() = toFinite(empty_s_sum / size, 0);
+  var<named("empty_s_sum")>() = toFinite(empty_s_sum, 0);
+  var<named("empty_s_variance")>() = toFinite(empty_s_variance, 0);
+  var<named("empty_s_max")>() = toFinite(empty_s_max, 0);
+  var<named("empty_s_min")>() = toFinite(empty_s_min, 0);
+  var<named("s_range")>() = toFinite(s_range, 0);
 
   return true;
 }

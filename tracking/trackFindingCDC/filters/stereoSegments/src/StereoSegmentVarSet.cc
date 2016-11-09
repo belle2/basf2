@@ -12,6 +12,8 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
 #include <numeric>
 
 using namespace Belle2;
@@ -34,15 +36,19 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   const CDCTrajectorySZ& trajectorySZ = track.getStartTrajectory3D().getTrajectorySZ();
   const bool isCurler = trajectory2D.isCurler();
 
-
   const Vector2D& startMomentum = trajectory2D.getMom2DAtSupport();
   const double radius = trajectory2D.getLocalCircle()->radius();
   const double size = track.size();
 
   const double backArcLength2D = track.back().getArcLength2D();
   const double frontArcLength2D = track.front().getArcLength2D();
-  const double arcLength2DSum = std::accumulate(track.begin(), track.end(), 0.0, [](const double sum,
-  const CDCRecoHit3D & listRecoHit) { return sum + listRecoHit.getArcLength2D();});
+  const double arcLength2DSum =
+    std::accumulate(track.begin(),
+                    track.end(),
+                    0.0,
+  [](const double sum, const CDCRecoHit3D & listRecoHit) {
+    return sum + listRecoHit.getArcLength2D();
+  });
 
   // Count the number of hits with reconstruction position out of the CDC
   unsigned int numberOfHitsOutOfCDC = 0;
@@ -79,33 +85,35 @@ bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment
   const double minimumArcLength2D = arcLength2DList.front();
   const double maximumArcLength2D = arcLength2DList.back();
 
-  size_t numberOfHitsInSameRegion = std::count_if(track.begin(), track.end(), [&](const CDCRecoHit3D & recoHit) -> bool {
-    return recoHit.getArcLength2D() < maximumArcLength2D and recoHit.getArcLength2D() > minimumArcLength2D;
+  size_t numberOfHitsInSameRegion =
+  std::count_if(track.begin(), track.end(), [&](const CDCRecoHit3D & recoHit) -> bool {
+    return recoHit.getArcLength2D() < maximumArcLength2D and
+    recoHit.getArcLength2D() > minimumArcLength2D;
   });
 
   ////////
 
   var<named("track_size")>() = size;
   var<named("segment_size")>() = recoSegment3D.size();
-  setVariableIfNotNaN<named("pt")>(trajectory2D.getAbsMom2D());
-  setVariableIfNotNaN<named("phi_track")>(startMomentum.phi());
+  var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
+  var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
 
-  setVariableIfNotNaN<named("segment_back_s")>(maximumArcLength2D);
-  setVariableIfNotNaN<named("segment_front_s")>(minimumArcLength2D);
-  setVariableIfNotNaN<named("track_mean_s")>(arcLength2DSum / size);
-  setVariableIfNotNaN<named("track_radius")>(radius);
+  var<named("segment_back_s")>() = toFinite(maximumArcLength2D, 0);
+  var<named("segment_front_s")>() = toFinite(minimumArcLength2D, 0);
+  var<named("track_mean_s")>() = toFinite(arcLength2DSum / size, 0);
+  var<named("track_radius")>() = toFinite(radius, 0);
 
   var<named("number_of_hits_in_same_region")>() = numberOfHitsInSameRegion;
   var<named("number_of_hits_out_of_cdc")>() = numberOfHitsOutOfCDC;
   var<named("number_of_hits_on_wrong_side")>() = numberOfHitsOnWrongSide;
   //var<named("number_of_hits_in_common")>() = numberOfHitsInCommon;
 
-  setVariableIfNotNaN<named("sum_distance_using_2d")>(sumDistanceZReconstructed2D);
-  setVariableIfNotNaN<named("sum_distance_using_z")>(sumDistance2DReconstructedZ);
+  var<named("sum_distance_using_2d")>() = toFinite(sumDistanceZReconstructed2D, 0);
+  var<named("sum_distance_using_z")>() = toFinite(sumDistance2DReconstructedZ, 0);
 
   var<named("superlayer_id")>() = recoSegment3D.getISuperLayer();
 
-  setVariableIfNotNaN<named("track_front_s")>(frontArcLength2D);
-  setVariableIfNotNaN<named("track_back_s")>(backArcLength2D);
+  var<named("track_front_s")>() = toFinite(frontArcLength2D, 0);
+  var<named("track_back_s")>() = toFinite(backArcLength2D, 0);
   return true;
 }

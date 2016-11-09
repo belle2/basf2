@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/varsets/FixedSizeNamedFloatTuple.h>
 
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
+
 #include <vector>
 #include <string>
 #include <limits>
@@ -105,7 +107,7 @@ namespace Belle2 {
         operator AFloat& () { return m_value; }
 
         /// Assign value replacing infinite values with the maximum value possible
-        void operator=(const AFloat& value)
+        void operator=(const AFloat value)
         {
           m_value = value;
           if (not std::isfinite(value)) {
@@ -124,17 +126,6 @@ namespace Belle2 {
       {
         static_assert(I < nVars, "Requested variable index exceeds number variables.");
         return AssignFinite<Float_t>(m_variables[I]);
-      }
-
-      /// Set the given variable to the value if the value is not NaN els set it to valueIfNaN.
-      template<int I>
-      void setVariableIfNotNaN(const Float_t& value, const Float_t& valueIfNaN = 0)
-      {
-        if (std::isnan(value) or std::isinf(value)) {
-          var<I>() = valueIfNaN;
-        } else {
-          var<I>() = value;
-        }
       }
 
     public:

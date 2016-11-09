@@ -63,10 +63,10 @@ namespace Belle2 {
       /// Expose the parameters of the cluster filter to a module
       virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
       {
-        m_axialSegmentPairCreator.exposeParameters(moduleParamList, "axialSegmentPair");
-        m_segmentTripleCreator.exposeParameters(moduleParamList, "segmentTriple");
-        m_segmentTripleRelationCreator.exposeParameters(moduleParamList, "segmentTripleRelation");
-        m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList);
+        m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
+        m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
+        m_segmentTripleRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
+        m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefix);
         m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
         m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);

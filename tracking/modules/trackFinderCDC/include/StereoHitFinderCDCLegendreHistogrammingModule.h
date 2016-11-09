@@ -28,7 +28,7 @@ namespace Belle2 {
    *   - Smarter Handling of segments (which is worse in the moment but should be better in general)
    *   - Make the precuts on the hits more transparent
    *  */
-  class StereoHitFinderCDCLegendreHistogrammingModule: public virtual TrackFinderCDCBaseModule {
+  class StereoHitFinderCDCLegendreHistogrammingModule: public TrackFinderCDCBaseModule {
 
   public:
     /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */
@@ -44,10 +44,11 @@ namespace Belle2 {
     /**
      * Do a QuadTreeHistogramming with all the StereoHits.
      */
-    void generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks) override;
+    void generate(std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
 
     /// Collector hiding the implementation.
     TrackFindingCDC::StereoHitCollectorSingleMatch m_stereohitsCollectorSingleMatch;
+
     /// Collector hiding the implementation.
     TrackFindingCDC::StereoHitCollectorFirstMatch m_stereohitsCollectorFirstMatch;
 

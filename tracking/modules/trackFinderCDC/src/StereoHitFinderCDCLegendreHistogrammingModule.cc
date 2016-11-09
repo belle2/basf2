@@ -47,7 +47,7 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
   TrackFinderCDCBaseModule::terminate();
 }
 
-void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
+void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   // Initialize the RL hits
   const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();

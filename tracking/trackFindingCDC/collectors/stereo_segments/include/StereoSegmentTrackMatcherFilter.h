@@ -29,17 +29,16 @@ namespace Belle2 {
     public:
       /// Use tracks as collector items.
       using CollectorItem = CDCTrack;
+
       /// Use segments as collection items.
       using CollectionItem = CDCRecoSegment2D;
 
       /// Empty desctructor. Everything is handled via terminate.
       virtual ~StereoSegmentTrackMatcherFilter() = default;
 
-      /**
-       * Use the given filter (via the module parameters) to find a matching.
-       */
-      std::vector<WithWeight<const CollectionItem*>>
-                                                  match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
+      /// Use the given filter (via the module parameters) to find a matching.
+      std::vector<WithWeight<const CollectionItem*> >
+      match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
     };
   }
 }

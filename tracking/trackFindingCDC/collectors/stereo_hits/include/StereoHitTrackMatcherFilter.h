@@ -43,8 +43,8 @@ namespace Belle2 {
                                     const std::string& prefix = "") override;
 
       /// Use the given filter (via the module parameters) to find a matching
-      std::vector<WithWeight<const CDCRLWireHit*>>
-                                                match(const CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits);
+      std::vector<WithWeight<const CDCRLWireHit*> >
+      match(const CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits);
 
     private:
       /// Parameter : Set to false to skip the B2B check (good for curlers).

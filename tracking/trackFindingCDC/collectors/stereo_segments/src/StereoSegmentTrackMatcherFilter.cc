@@ -10,10 +10,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherFilter::match(const CDCTrack& track,
-                                              const std::vector<CDCRecoSegment2D>& recoSegments)
+std::vector<WithWeight<const CDCRecoSegment2D*> >
+StereoSegmentTrackMatcherFilter::match(const CDCTrack& track,
+                                       const std::vector<CDCRecoSegment2D>& recoSegments)
 {
-  if (m_filter->needsTruthInformation()) {
+  if (m_filter.needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
@@ -27,7 +28,7 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherFilter
     if (recoSegment2D.getStereoKind() != EStereoKind::c_Axial and not recoSegment2D.getAutomatonCell().hasTakenFlag()
         and not recoSegment2D.isFullyTaken(2)) {
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
-      const Weight weight = m_filter->operator()({{&recoSegment2D, recoSegment3D}, track});
+      const Weight weight = m_filter({{&recoSegment2D, recoSegment3D}, track});
       if (not std::isnan(weight)) {
         matches.emplace_back(&recoSegment2D, weight);
       }

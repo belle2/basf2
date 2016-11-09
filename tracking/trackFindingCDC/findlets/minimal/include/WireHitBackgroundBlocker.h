@@ -34,7 +34,7 @@ namespace Belle2 {
 
       /// Expose the parameters of the wire hit preparation
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+                                    const std::string& prefix) override;
 
       /// Main algorithm marking the hit of higher loops as background
       virtual void apply(std::vector<CDCWireHit>& wireHits) override final;

@@ -36,7 +36,7 @@ namespace Belle2 {
       virtual std::string getDescription() override;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Initialize the findlet before event processing
       virtual void initialize() override;

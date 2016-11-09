@@ -29,7 +29,7 @@ namespace Belle2 {
 
     public:
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Short description of the findlet
       virtual std::string getDescription() override final;

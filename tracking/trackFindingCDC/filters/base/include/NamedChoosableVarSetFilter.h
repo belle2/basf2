@@ -48,7 +48,7 @@ namespace Belle2 {
 
       /// Add the parameters of this filter to the given parameter list
       virtual void exposeParameters(ModuleParamList* parameterList,
-                                    const std::string& prefix = "") override
+                                    const std::string& prefix) override
       {
         Super::exposeParameters(parameterList, prefix);
 

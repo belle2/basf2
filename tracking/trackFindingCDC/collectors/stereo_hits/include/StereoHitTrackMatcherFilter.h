@@ -40,7 +40,7 @@ namespace Belle2 {
 
       /// Expose the parameters to the module.
       virtual void exposeParameters(ModuleParamList* moduleParameters,
-                                    const std::string& prefix = "") override;
+                                    const std::string& prefix) override;
 
       /// Use the given filter (via the module parameters) to find a matching
       std::vector<WithWeight<const CDCRLWireHit*> >

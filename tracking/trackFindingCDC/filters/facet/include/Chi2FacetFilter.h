@@ -32,7 +32,7 @@ namespace Belle2 {
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+                                    const std::string& prefix) override;
 
     public:
       /**

@@ -40,7 +40,7 @@ namespace Belle2 {
       virtual std::string getDescription();
 
       /// Add the parameters of the fitter to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /// Signals the beginning of the event processing
       void initialize();

@@ -22,7 +22,7 @@ namespace Belle2 {
     struct DriftLengthEstimator {
 
       /// Add the parameters of the estimator to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
 
       /// Update the drift length of the reconstructed hit in place.
       double updateDriftLength(CDCRecoHit2D& recoHit2D);

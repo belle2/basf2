@@ -37,7 +37,7 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "allowReverse"),

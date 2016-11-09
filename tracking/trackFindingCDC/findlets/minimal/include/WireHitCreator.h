@@ -49,7 +49,7 @@ namespace Belle2 {
       }
 
       /// Add the parameters to the surrounding module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         moduleParamList->addParameter(prefixed(prefix, "wirePosSet"),
                                       m_param_wirePosSet,

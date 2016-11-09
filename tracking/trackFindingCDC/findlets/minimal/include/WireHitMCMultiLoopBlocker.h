@@ -33,7 +33,7 @@ namespace Belle2 {
 
       /// Expose the parameters of the wire hit preparation
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+                                    const std::string& prefix) override;
 
       /// Signals the start of the event processing
       virtual void initialize() override final;

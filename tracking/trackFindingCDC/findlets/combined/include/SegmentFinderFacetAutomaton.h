@@ -74,7 +74,7 @@ namespace Belle2 {
       }
 
       /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         m_superClusterCreator.exposeParameters(moduleParamList, prefix);
         m_clusterRefiner.exposeParameters(moduleParamList, prefix);

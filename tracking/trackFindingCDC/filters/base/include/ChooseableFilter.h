@@ -48,7 +48,7 @@ namespace Belle2 {
 
       /// Expose the set of parameters of the filter to the module parameter list.
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override final
+                                    const std::string& prefix) override final
       {
         Super::exposeParameters(moduleParamList, prefix);
         m_filterFactory->exposeParameters(moduleParamList, prefix);

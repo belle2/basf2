@@ -49,7 +49,7 @@ namespace Belle2 {
 
       /// Expose the parameters of the cluster filter to a module
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+                                    const std::string& prefix) override;
 
       /// Generates the segment.
       virtual void apply() override final;

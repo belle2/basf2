@@ -68,7 +68,7 @@ namespace Belle2 {
 
       /// Forward prefixed parameters of this findlet to the module parameter list
       virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
-                                    const std::string& prefix __attribute__((unused)) = "")
+                                    const std::string& prefix __attribute__((unused)))
       {
       }
 

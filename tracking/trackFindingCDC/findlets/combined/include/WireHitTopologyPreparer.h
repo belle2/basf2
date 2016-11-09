@@ -50,7 +50,7 @@ namespace Belle2 {
 
       /// Expose the parameters of the wire hit preparation
       virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
+                                    const std::string& prefix) override
       {
         m_wireHitCreator.exposeParameters(moduleParamList, prefix);
         m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);

@@ -57,7 +57,7 @@ namespace Belle2 {
       }
 
       /// Expose the parameters  to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));

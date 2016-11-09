@@ -24,7 +24,7 @@ namespace Belle2 {
       virtual ~FilterBasedMatcher() = default;
 
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
+      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
       {
         m_filter.exposeParameters(moduleParameters, prefix);
       }

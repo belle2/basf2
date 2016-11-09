@@ -24,7 +24,7 @@ namespace Belle2 {
      * The given adder algorithm then uses these matches to do the matching (e.g. adding hits to the track).
      *
      * AMatcherAlgorithm must provide:
-     *  - a function exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
+     *  - a function exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
      *  - a function initialize()
      *  - a function terminate()
      *  - two member types CollectorItem, CollectionItem
@@ -48,7 +48,7 @@ namespace Belle2 {
       virtual ~Collector() = default;
 
       /** Redirect all parameters of the matcher. **/
-      void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
+      void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
       {
         m_matcherInstance.exposeParameters(moduleParameters, prefix);
       }

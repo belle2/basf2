@@ -46,7 +46,7 @@ namespace Belle2 {
       virtual ~StereoSegmentTrackMatcherQuadTree() = default;
 
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "");
+      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix);
 
       /**
        * Use the given filter (via the module parameters) to find a matching.

@@ -91,6 +91,30 @@ namespace {
     return 0;
   }
 
+  /** callback function to show debug output when downloading things.
+   * See https://curl.haxx.se/libcurl/c/CURLOPT_DEBUGFUNCTION.html
+   *
+   * @param handle pointer to the curl session
+   * @param type type of the data
+   * @param data buffer to the data
+   * @param size size of the data buffer
+   * @param userptr optional additional information passed along by curl
+   * @returns 0
+   */
+  int debug_callback(__attribute((unused)) CURL* handle, curl_infotype type, char* data, size_t size,
+                     __attribute((unused)) void* userptr)
+  {
+    std::string prefix = "curl:";
+    int level = 500;
+    if (type == CURLINFO_TEXT) { prefix += "*"; level = 200; }
+    else if (type == CURLINFO_HEADER_OUT) prefix += ">";
+    else if (type == CURLINFO_HEADER_IN) prefix += "<";
+    else return 0;
+    std::string message(data, size);
+    B2DEBUG(level, prefix << " " <<  message);
+    return 0;
+  }
+
   /** Simple class to make sure that the curl session is closed correctly.
    * When this class is instantiated with a downloader instance it will make
    * sure that there is an active curl session. If a session is created (i.e.
@@ -138,6 +162,7 @@ namespace Belle2 {
       B2FATAL("Cannot intialize libcurl");
     }
     curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1);
+    curl_easy_setopt(m_curl, CURLOPT_DEBUGFUNCTION, debug_callback);
     return true;
   }
 
@@ -330,13 +355,13 @@ namespace Belle2 {
     buffer.clear();
     buffer.seekp(0, std::ios::beg);
     if (!buffer.good()) {
-      B2ERROR("Cannot write to stream...");
+      B2ERROR("Cannot write to stream when downloading " << url);
       return false;
     }
     // build the request ...
     CURLcode res{CURLE_FAILED_INIT};
     char errbuf[CURL_ERROR_SIZE];
-    curl_slist* headers = curl_slist_append(headers, "Accept: application/json");
+    curl_slist* headers{curl_slist_append(nullptr, "Accept: application/json")};
     progress_status status;
     status.url = &url;
     // and set all the curl options
@@ -385,7 +410,7 @@ namespace Belle2 {
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
-    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName() << " ... uhh, eeeh, da!");
+    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName() << " ... uhh, eeeh, da isses ja!");
     if (downloadAndCheck(url, *tmpfile, digest)) {
       m_tempfiles.emplace_back(std::move(tmpfile));
       return m_tempfiles.back()->getName();

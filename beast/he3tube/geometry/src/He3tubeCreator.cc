@@ -174,9 +174,10 @@ namespace Belle2 {
         //Lets limit the Geant4 stepsize inside the volume
         l_He3Gas->SetUserLimits(new G4UserLimits(stepSize));
 
-        new G4PVPlacement(0, G4ThreeVector(0, 0, -0.6096), l_He3Gas, "p_He3Gas", l_iHe3Gas, false, detID);
+        new G4PVPlacement(0, G4ThreeVector(0, 0, activeParams.getLength("SV_offset_inZ")*CLHEP::cm), l_He3Gas, "p_He3Gas", l_iHe3Gas, false,
+                          detID);
         B2INFO("HE3-tube-Sensitive-Volume-" << detID << " placed at: (" <<  He3TUBEpos.getX() << "," << He3TUBEpos.getY() << "," <<
-               He3TUBEpos.getZ() - 0.6096 * TMath::Cos(activeParams.getAngle("AngleZ") * TMath::DegToRad()) << ")  mm");
+               He3TUBEpos.getZ() + activeParams.getLength("SV_offset_inZ")*CLHEP::cm) << ")  mm");
         detID++;
       }
     }

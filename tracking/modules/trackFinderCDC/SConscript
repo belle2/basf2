@@ -1,6 +1,6 @@
 Import('env')
 
-env['LIBS'] = [ 
+env['LIBS'] = [
     'tracking_dataobjects',
     'tracking_trackFindingCDC',
     'cdc', 'cdc_dataobjects',
@@ -8,5 +8,6 @@ env['LIBS'] = [
     'mdst_dataobjects',
     'framework']
 
-Return('env')
+env.Append(CXXFLAGS=['-Wshadow'])
 
+Return('env')

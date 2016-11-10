@@ -9,8 +9,10 @@
  **************************************************************************/
 #pragma once
 
+#include <framework/logging/LogMethod.h>
 #include <framework/gearbox/Const.h>
 #include <TObject.h>
+#include <math.h>
 
 namespace Belle2 {
   /// Storage element for the eventwise T0 estimation.
@@ -40,9 +42,9 @@ namespace Belle2 {
     /**
      * Return the calculated eventT0 and its uncertainty using only the detectors given.
      *
-     * If there is no extracted eventT0 in any of these detectors, return NaN.
+     * If there is no extracted eventT0 in any of these detectors, return (0, 0).
      */
-    std::pair<double, double> getEventT0WithUncertainty(Const::DetectorSet detectorSet = Const::allDetectors) const
+    std::pair<double, double> getEventT0WithUncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const
     {
       std::pair<double, double> eventT0WithUncertainty = {0, 0};
       double preFactor = 0;
@@ -59,7 +61,8 @@ namespace Belle2 {
       }
 
       if (not found) {
-        return std::make_pair(std::nan(""), std::nan(""));
+        B2ERROR("No EventT0 available for the given detector set. Returning 0, 0.");
+        return std::make_pair(0, 0);
       }
 
       eventT0WithUncertainty.first /= preFactor;
@@ -71,11 +74,11 @@ namespace Belle2 {
     /**
      * Return the calculated eventT0 using only the detectors given.
      *
-     * If there is no extracted eventT0 in any of these detectors, return NaN.
+     * If there is no extracted eventT0 in any of these detectors, return 0.
      * If you need the event t0 and the uncertainty, use better the function
      * getEventT0WithUncertainty, as it calculates both values in one step.
      */
-    double getEventT0(Const::DetectorSet detectorSet = Const::allDetectors) const
+    double getEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const
     {
       return getEventT0WithUncertainty(detectorSet).first;
     }
@@ -83,21 +86,13 @@ namespace Belle2 {
     /**
      * Return the calculated eventT0 uncertainty using only the detectors given.
      *
-     * If there is no extracted eventT0 in any of these detectors, return NaN.
+     * If there is no extracted eventT0 in any of these detectors, return 0.
      * If you need the event t0 and the uncertainty, use better the function
      * getEventT0WithUncertainty, as it calculates both values in one step.
      */
-    double getEventT0Uncertainty(Const::DetectorSet detectorSet = Const::allDetectors) const
+    double getEventT0Uncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const
     {
       return getEventT0WithUncertainty(detectorSet).second;
-    }
-
-    /// Replace all eventT0 measurements with the given values
-    void setEventT0(double eventT0, double eventT0Uncertainty = 0,
-                    Const::EDetector detector = Const::EDetector::invalidDetector)
-    {
-      m_eventT0List.clear();
-      addEventT0(eventT0, eventT0Uncertainty, detector);
     }
 
     /// Get the detectors that have determined the event T0.
@@ -112,10 +107,40 @@ namespace Belle2 {
       return detectorSet;
     }
 
+    /// Return the number of stored event T0s
+    unsigned long getNumberOfEventT0s() const
+    {
+      return m_eventT0List.size();
+    }
+
+    /// Return true if there are no stored event T0 estimations
+    bool empty() const
+    {
+      return m_eventT0List.empty();
+    }
+
     /// Add another T0 estimation.
     void addEventT0(double eventT0, double eventT0Uncertainty, Const::EDetector detector)
     {
       m_eventT0List.emplace_back(eventT0, eventT0Uncertainty * eventT0Uncertainty, detector);
+    }
+
+    /// Check if one of the detectors in the given set has a t0 estimation.
+    bool hasEventTo(const Const::DetectorSet& detectorSet = Const::allDetectors) const
+    {
+      for (const EventT0Component& component : m_eventT0List) {
+        if (detectorSet.getIndex(component.detector) != -1) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    /// Clear the list of extracted event T0 estimations
+    void clear()
+    {
+      m_eventT0List.clear();
     }
 
   private:

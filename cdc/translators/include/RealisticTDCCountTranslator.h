@@ -29,14 +29,18 @@ namespace Belle2 {
       /** Destructor. */
       ~RealisticTDCCountTranslator() {};
 
-      /** If trigger jitter was simulated, in every event one has to give an estimate of the effect. */
-      void setEventTime(double eventTime = 0)
+      /**
+       * If trigger jitter was simulated, in every event one has to give an estimate of the effect.
+       * To reproduce the old behaviour, the other extracted event T0s are deleted before.
+       * */
+      void setEventTime(double eventTime = 0) __attribute__((deprecated))
       {
         if (not m_eventTimeStoreObject.isValid()) {
           m_eventTimeStoreObject.create();
         }
 
-        m_eventTimeStoreObject->setEventT0(eventTime);
+        m_eventTimeStoreObject->clear();
+        m_eventTimeStoreObject->addEventT0(eventTime, 0, Const::CDC);
       }
 
       /**

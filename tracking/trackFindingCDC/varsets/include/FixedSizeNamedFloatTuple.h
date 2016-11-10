@@ -194,7 +194,7 @@ namespace Belle2 {
 
       /// Reference getter for the ith value. Static index version.
       template<int I>
-      Float_t& value()
+      Float_t& var()
       {
         static_assert(nNames != I, "Requested name not found in names.");
         assert(I < (int)nNames);
@@ -213,7 +213,7 @@ namespace Belle2 {
       /// Reference getter for the value with the given name.
       Float_t& operator[](const char* name)
       {
-        return value(named(name));
+        return this->var(named(name));
       }
 
     public:

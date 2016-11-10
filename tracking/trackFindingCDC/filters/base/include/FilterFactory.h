@@ -85,8 +85,8 @@ namespace Belle2 {
       message << "Known filter names are: ";
       std::vector<std::string> quotedFilterNames;
       for (const auto& filterNameAndDescription : getValidFilterNamesAndDescriptions()) {
-        const std::string& filterName = filterNameAndDescription.first;
-        quotedFilterNames.push_back(quoted(filterName));
+        const std::string& validFilterName = filterNameAndDescription.first;
+        quotedFilterNames.push_back(quoted(validFilterName));
       }
       message << join(", ", quotedFilterNames);
       message << ".";

@@ -446,20 +446,18 @@ void EventDataPlotter::draw(const CDCTrajectory2D& trajectory2D, AttributeMap at
   }
 
   if (trajectory2D.getLocalCircle()->isCircle()) {
-
-    const float radius = trajectory2D.getLocalCircle()->absRadius();
-
     if (trajectoryExit.hasNAN()) {
       // No exit point out of the cdc could be detected.
       // Draw full circle
-      const Vector2D center = trajectory2D.getGlobalCircle().center();
       const float radius = trajectory2D.getLocalCircle()->absRadius();
+      const Vector2D center = trajectory2D.getGlobalCircle().center();
       float centerX = center.x();
       float centerY = center.y();
 
       primitivePlotter.drawCircle(centerX, centerY, radius);
 
     } else {
+      const float radius = trajectory2D.getLocalCircle()->absRadius();
       const Vector2D start = trajectory2D.getSupport();
       float startX = start.x();
       float startY = start.y();

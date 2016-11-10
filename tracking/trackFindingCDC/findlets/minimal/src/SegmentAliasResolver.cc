@@ -163,9 +163,7 @@ void SegmentAliasResolver::refit(CDCRecoSegment2D& segment, bool reestimate)
       for (CDCFacet& facet : facetSegment) {
         facet.adjustFitLine();
         if (m_param_reestimateDriftLength) {
-          for (CDCFacet& facet : facetSegment) {
-            m_driftLengthEstimator.updateDriftLength(facet);
-          }
+          m_driftLengthEstimator.updateDriftLength(facet);
         }
       }
       CDCRecoSegment2D replacement = CDCRecoSegment2D::condense(facetSegment);

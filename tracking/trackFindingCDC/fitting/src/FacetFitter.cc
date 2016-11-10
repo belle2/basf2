@@ -83,8 +83,7 @@ namespace {
 
     auto calcReducedChi2 = [&A, &b](double phi) -> double {
       Matrix<double, 2, 1> normal(std::sin(phi), -std::cos(phi));
-      double chi2 = ((normal.transpose() * A - 2 * b.transpose()) * normal)[0];
-      return chi2;
+      return ((normal.transpose() * A - 2 * b.transpose()) * normal)[0];
     };
 
     ROOT::Math::Functor1D functor(calcReducedChi2);

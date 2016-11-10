@@ -118,7 +118,8 @@ TrackMerger::BestMergePartner TrackMerger::calculateBestTrackToMerge(CDCTrack& t
 }
 
 
-void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& cdcTrackList,
+void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track,
+                                                 CDCTrackList& cdcTrackList,
                                                  const std::vector<CDCConformalHit>& conformalCDCWireHitList,
                                                  double minimum_probability_to_be_merged)
 {
@@ -140,27 +141,25 @@ void TrackMerger::tryToMergeTrackWithOtherTracks(CDCTrack& track, CDCTrackList& 
 
     B2DEBUG(100, "Cand hits vector size = " << track.size());
 
-    cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(), cdcTrackList.getCDCTracks().end(),
-    [&](CDCTrack & track) { return (track.size() < 3); }),
+    cdcTrackList.getCDCTracks().erase(std::remove_if(cdcTrackList.getCDCTracks().begin(),
+                                                     cdcTrackList.getCDCTracks().end(),
+    [](CDCTrack & otherTrack) {
+      return (otherTrack.size() < 3);
+    }),
     cdcTrackList.getCDCTracks().end());
 
   } while (have_merged_something);
 
   B2DEBUG(100, "Merger: Resulting nCands = " << cdcTrackList.getCDCTracks().size());
 
-  cdcTrackList.doForAllTracks([&](CDCTrack & track) {
-
-    HitProcessor::unmaskHitsInTrack(track);
-    TrackQualityTools::normalizeTrack(track);
-
+  cdcTrackList.doForAllTracks([](CDCTrack & otherTrack) {
+    HitProcessor::unmaskHitsInTrack(otherTrack);
+    TrackQualityTools::normalizeTrack(otherTrack);
 // const CDCKarimakiFitter& trackFitter = CDCKarimakiFitter::getFitter();
 //    trackFitter.fitTrackCandidateFast(cand); <<------ TODO
 //    cand->reestimateCharge();
-
   });
-
 }
-
 
 void TrackMerger::removeStrangeHits(double factor, std::vector<const CDCWireHit*>& wireHits, CDCTrajectory2D& trajectory)
 {

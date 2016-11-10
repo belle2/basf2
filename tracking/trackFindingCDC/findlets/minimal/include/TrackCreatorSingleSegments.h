@@ -83,8 +83,8 @@ namespace Belle2 {
               if (segment.getTrajectory2D().isFitted()) {
                 tracks.push_back(CDCTrack(segment));
                 segment.setAndForwardMaskedFlag();
-                for (const CDCRecoSegment2D& segment : segments) {
-                  segment.receiveMaskedFlag();
+                for (const CDCRecoSegment2D& otherSegment : segments) {
+                  otherSegment.receiveMaskedFlag();
                 }
               }
             }

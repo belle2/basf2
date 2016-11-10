@@ -168,11 +168,11 @@ def add_track_finding(path, components=None, trigger_mode="all"):
         vxd_reco_tracks = "RecoTracks"
 
     # CDC track finder
-    if trigger_mode in ["fast_reco", "all"]:
+    if use_cdc and trigger_mode in ["fast_reco", "all"]:
         add_cdc_track_finding(path, reco_tracks=cdc_reco_tracks)
 
     # VXD track finder
-    if trigger_mode in ["hlt", "all"]:
+    if use_svd and trigger_mode in ["hlt", "all"]:
         add_vxd_track_finding(path, components=components, reco_tracks=vxd_reco_tracks)
 
         # track merging

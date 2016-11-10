@@ -13,20 +13,19 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
 std::map<std::string, std::string>
 SegmentTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
+    {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
-    {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseSegmentTrackFilter>
@@ -43,6 +42,33 @@ SegmentTrackFilterFactory::create(const std::string& filterName) const
   }
 }
 
+// ------ First step ------
+SegmentTrackFilterFirstStepFactory::SegmentTrackFilterFirstStepFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string SegmentTrackFilterFirstStepFactory::getIdentifier() const
+{
+  return "SegmentTrackFilterFirstStep";
+}
+
+std::string SegmentTrackFilterFirstStepFactory::getFilterPurpose() const
+{
+  return "Segment track chooser to be used during the combination of segment track pairs";
+}
+
+std::map<std::string, std::string>
+SegmentTrackFilterFirstStepFactory::getValidFilterNamesAndDescriptions() const
+{
+  std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
+  filterNames.insert({
+    {"tmva", "test with a tmva method"},
+    {"recording", "record variables to a TTree"},
+  });
+  return filterNames;
+}
+
 std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
 {
@@ -53,6 +79,34 @@ SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
   } else {
     return Super::create(filterName);
   }
+}
+
+// ------ Second step ------
+SegmentTrackFilterSecondStepFactory::SegmentTrackFilterSecondStepFactory(
+  const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string SegmentTrackFilterSecondStepFactory::getIdentifier() const
+{
+  return "SegmentTrackFilterSecondStep";
+}
+
+std::string SegmentTrackFilterSecondStepFactory::getFilterPurpose() const
+{
+  return "Segment track chooser to be used during the matching of segment track pairs.";
+}
+
+std::map<std::string, std::string>
+SegmentTrackFilterSecondStepFactory::getValidFilterNamesAndDescriptions() const
+{
+  std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
+  filterNames.insert({
+    {"tmva", "test with a tmva method"},
+    {"recording", "record variables to a TTree"},
+  });
+  return filterNames;
 }
 
 std::unique_ptr<BaseSegmentTrackFilter>

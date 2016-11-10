@@ -38,7 +38,7 @@ namespace Belle2 {
     using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
 
     /// Simple and configurable filter for stereo hit - track relations.
-    using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitTruthVarSet>;
+    using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
 
     /// Random filter for stereo hit - track relations.
     using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;

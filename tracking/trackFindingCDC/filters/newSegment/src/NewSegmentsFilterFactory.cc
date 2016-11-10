@@ -12,19 +12,29 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+NewSegmentsFilterFactory::NewSegmentsFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+std::string NewSegmentsFilterFactory::getIdentifier() const
+{
+  return "NewSegment";
+}
+
+std::string NewSegmentsFilterFactory::getFilterPurpose() const
+{
+  return "Segment background finder.";
+}
+
 std::map<std::string, std::string>
 NewSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
+    {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
     {"tmva", "test with a tmva method"}
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseNewSegmentsFilter>
@@ -34,21 +44,11 @@ NewSegmentsFilterFactory::create(const std::string& filterName) const
     return makeUnique<BaseNewSegmentsFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCNewSegmentsFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVANewSegmentsFilter>("NewSegmentsFilter");
   } else if (filterName == "recording") {
     return makeUnique<RecordingNewSegmentsFilter>("NewSegmentsFilter.root");
+  } else if (filterName == "tmva") {
+    return makeUnique<TMVANewSegmentsFilter>("NewSegmentsFilter");
   } else {
     return Super::create(filterName);
   }
-}
-
-std::string NewSegmentsFilterFactory::getFilterPurpose() const
-{
-  return "Segment background finder.";
-}
-
-std::string NewSegmentsFilterFactory::getIdentifier() const
-{
-  return "NewSegments";
 }

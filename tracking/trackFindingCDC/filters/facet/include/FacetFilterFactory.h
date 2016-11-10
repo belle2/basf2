@@ -13,41 +13,30 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     *  Factory that can creates apropriate facet filter instance from parameters.
-     *
-     *  It knows about all available filters and their parameters.
-     *  Can collaborate with a Module and expose these parameters to the user in steering files.
-     */
-    class FacetFilterFactory :
-      public FilterFactory<Filter<CDCFacet> > {
+    /// Factory that can create appropriate facet filters from associated names.
+    class FacetFilterFactory : public FilterFactory<BaseFacetFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<Filter<CDCFacet> >;
+      using Super = FilterFactory<BaseFacetFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
+      /// Constructor forwarding the default filter name
       FacetFilterFactory(const std::string& defaultFilterName = "chi2");
 
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const override;
 
-      /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<Filter<CDCFacet>>
-                                             create(const std::string& filterName) const override;
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const override;
 
-      /** Getter for a descriptive purpose of the clusterfilter.*/
-      virtual std::string getFilterPurpose() const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the valid clusterf ilter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for a short identifier of the factory.*/
-      virtual std::string getIdentifier() const override;
-
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseFacetFilter> create(const std::string& filterName) const override;
     };
   }
 }

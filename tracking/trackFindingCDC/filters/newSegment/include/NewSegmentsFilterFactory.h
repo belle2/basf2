@@ -13,15 +13,9 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     * Specialisation the filter factory for segment pairs
-     *
-     * It knows about all available filters and their parameters.
-     * Can collaborate with a Module and expose these parameters to the user in steering files.
-     */
+    /// Factory that can create appropriate segment filters for new tracks from associated names.
     class NewSegmentsFilterFactory : public FilterFactory<BaseNewSegmentsFilter> {
 
     private:
@@ -29,23 +23,20 @@ namespace Belle2 {
       using Super = FilterFactory<BaseNewSegmentsFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      NewSegmentsFilterFactory(const std::string& defaultFilterName = "simple") : Super(defaultFilterName) { }
+      /// Constructor forwarding the default filter name
+      NewSegmentsFilterFactory(const std::string& defaultFilterName = "none");
 
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const override;
 
-      /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override;
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const override;
 
-      /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseNewSegmentsFilter>
-      create(const std::string& filterName) const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the valid filter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for a short identifier of the factory.*/
-      virtual std::string getIdentifier() const override;
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseNewSegmentsFilter> create(const std::string& filterName) const override;
     };
   }
 }

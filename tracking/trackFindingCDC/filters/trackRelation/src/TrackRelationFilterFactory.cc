@@ -20,48 +20,44 @@ TrackRelationFilterFactory::TrackRelationFilterFactory(const std::string& defaul
 {
 }
 
-std::string TrackRelationFilterFactory::getFilterPurpose() const
-{
-  return "Track relation filter to be used during the construction of the track network for in super layer merginig.";
-}
-
 std::string TrackRelationFilterFactory::getIdentifier() const
 {
   return "TrackRelation";
 }
 
+std::string TrackRelationFilterFactory::getFilterPurpose() const
+{
+  return "Track relation filter to construct a track network for merging";
+}
+
 std::map<std::string, std::string>
 TrackRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"none", "no track relation is valid, stop at track creation."},
-    {"all", "all track relations are valid, for comparision only."},
-    {"truth", "track relations from monte carlo truth"},
-    {"feasible", "checks rough competability of tracks"},
+  return {
+    {"none", "accepts nothing"},
+    {"all", "accepts everything"},
+    {"truth", "accepts based on monte carlo information"},
     {"unionrecording", "record multiple choosable variable set"},
-  });
-
-  return filterNames;
+    {"feasible", "a rough efficient compatibility check"},
+    {"realistic", "an expensive pure compatibility check"},
+  };
 }
 
-std::unique_ptr<BaseTrackRelationFilter >
+std::unique_ptr<BaseTrackRelationFilter>
 TrackRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return makeUnique<BaseTrackRelationFilter>();
   } else if (filterName == "all") {
     return makeUnique<AllTrackRelationFilter>();
-  } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleTrackRelationFilter>();
-  } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticTrackRelationFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCTrackRelationFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique< UnionRecordingTrackRelationFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleTrackRelationFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticTrackRelationFilter>();
   } else {
     return Super::create(filterName);
   }

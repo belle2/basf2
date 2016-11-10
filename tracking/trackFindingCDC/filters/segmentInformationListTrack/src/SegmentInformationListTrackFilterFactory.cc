@@ -13,21 +13,31 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+SegmentInformationListTrackFilterFactory::SegmentInformationListTrackFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string SegmentInformationListTrackFilterFactory::getIdentifier() const
+{
+  return "SegmentInformationListTrack";
+}
+
+std::string SegmentInformationListTrackFilterFactory::getFilterPurpose() const
+{
+  return "Segment information list to track filter for combinatoric adding of segments to tracks";
+}
+
 std::map<std::string, std::string>
 SegmentInformationListTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
+    {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
+    {"recording", "Record to a ttree"},
     {"tmva", "test using tmva methods"},
-    {"recording", "Record to a ttree"}
-
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseSegmentInformationListTrackFilter>
@@ -39,10 +49,10 @@ SegmentInformationListTrackFilterFactory::create(const std::string& filterName) 
     return makeUnique<MCSegmentInformationListTrackFilter>();
   } else if (filterName == "simple") {
     return makeUnique<SimpleSegmentInformationListTrackFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVASegmentInformationListTrackFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingSegmentInformationListTrackFilter>();
+  } else if (filterName == "tmva") {
+    return makeUnique<TMVASegmentInformationListTrackFilter>();
   } else {
     return Super::create(filterName);
   }

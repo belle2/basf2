@@ -13,20 +13,31 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+SegmentTrainFilterFactory::SegmentTrainFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string SegmentTrainFilterFactory::getIdentifier() const
+{
+  return "SegmentTrain";
+}
+
+std::string SegmentTrainFilterFactory::getFilterPurpose() const
+{
+  return "Segment train filter to be used during the construction of segment trains";
+}
+
 std::map<std::string, std::string>
 SegmentTrainFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
+    {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
     {"recording", "record variables to a TTree"},
     {"tmva", "test with a tmva method"}
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseSegmentTrainFilter>

@@ -13,15 +13,9 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     * Specialisation the filter factory for cdc tracks and stereo hits.
-     *
-     * It knows about all available filters and their parameters.
-     * Can collaborate with a Module and expose these parameters to the user in steering files.
-     */
+    /// Factory that can create appropriate stereo segment to track combination filters from associated names.
     class StereoSegmentFilterFactory : public FilterFactory<BaseStereoSegmentFilter> {
 
     private:
@@ -29,31 +23,20 @@ namespace Belle2 {
       using Super = FilterFactory<BaseStereoSegmentFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      StereoSegmentFilterFactory(const std::string& defaultFilterName = "all") : Super(defaultFilterName) { }
+      /// Constructor forwarding the default filter name
+      StereoSegmentFilterFactory(const std::string& defaultFilterName = "all");
 
-      /// Cope the create function from the parent class.
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const override;
 
-      /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override
-      {
-        return "Stereo segment to track adding.";
-      }
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const override;
 
-      /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseStereoSegmentFilter>
-      create(const std::string& filterName) const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the valid filter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for a short identifier of the factory.*/
-      virtual std::string getIdentifier() const override
-      {
-        return "StereoSegment";
-      }
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseStereoSegmentFilter> create(const std::string& filterName) const override;
     };
-
   }
 }

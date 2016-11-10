@@ -13,15 +13,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-FacetFilterFactory::FacetFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+FacetFilterFactory::FacetFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
-}
-
-std::string FacetFilterFactory::getFilterPurpose() const
-{
-  return "Facet filter to be used during the construction of facets.";
 }
 
 std::string FacetFilterFactory::getIdentifier() const
@@ -29,25 +23,26 @@ std::string FacetFilterFactory::getIdentifier() const
   return "Facet";
 }
 
+std::string FacetFilterFactory::getFilterPurpose() const
+{
+  return "Facet filter to construct of a facet network";
+}
+
 std::map<std::string, std::string>
 FacetFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"all", "all facets are valid"},
-    {"feasible", "only checking the feasability of right left passage information"},
-    {"truth", "monte carlo truth"},
-    {"unionrecording", "record many multiple choosable variable set"},
-    {"tmva", "filter facets with a tmva method"},
+  return {
     {"none", "no facet is valid, stop at cluster generation."},
+    {"all", "all facets are valid"},
+    {"truth", "monte carlo truth"},
+    {"feasible", "only checking the feasability of right left passage information"},
     {"simple", "mc free with simple criteria"},
     {"realistic", "mc free with realistic criteria"},
     {"realistic_loss", "mc with realistice criteria but losser cut"},
     {"chi2", "mc free based on chi2 fitting"},
-  });
-  return filterNames;
+    {"unionrecording", "record many multiple choosable variable set"},
+    {"tmva", "filter facets with a tmva method"},
+  };
 }
 
 std::unique_ptr<Filter<CDCFacet> >
@@ -69,10 +64,10 @@ FacetFilterFactory::create(const std::string& filterName) const
     return makeUnique<RealisticFacetFilter>(25);
   } else if (filterName == "chi2") {
     return makeUnique<Chi2FacetFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAFacetFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetFilter>();
+  } else if (filterName == "tmva") {
+    return makeUnique<TMVAFacetFilter>();
   } else {
     return Super::create(filterName);
   }

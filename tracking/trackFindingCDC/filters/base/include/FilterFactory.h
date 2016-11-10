@@ -29,7 +29,7 @@ namespace Belle2 {
       using CreatedFilter = AFilter;
 
     public:
-      /// Fill the default filter name and parameter values
+      /// Fill the default filter name values
       FilterFactory(const std::string& defaultFilterName = "")
         : m_defaultFilterName(defaultFilterName)
       {
@@ -46,10 +46,7 @@ namespace Belle2 {
       virtual std::string getFilterPurpose() const = 0;
 
       /// Getter for the valid filter names and a description for each
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const
-      {
-        return {};
-      }
+      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const = 0;
 
       /**
        *  Create a filter with the given name, does not set filter specific parameters.

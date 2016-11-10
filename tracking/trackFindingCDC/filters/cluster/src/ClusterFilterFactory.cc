@@ -18,37 +18,34 @@ ClusterFilterFactory::ClusterFilterFactory(const std::string& defaultFilterName)
 {
 }
 
-std::string ClusterFilterFactory::getFilterPurpose() const
-{
-  return "Cluster filter examines hit clusters and discards clusters recognised as background.";
-}
-
 std::string ClusterFilterFactory::getIdentifier() const
 {
   return "Cluster";
 }
 
-std::map<std::string, std::string> ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
+std::string ClusterFilterFactory::getFilterPurpose() const
 {
-  std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"all", "all hits are valid"},
-    {"mva_bkg", "test clusters for background with a mva method"},
-    {"unionrecording", "record many multiple choosable variable set"},
-  });
-  return filterNames;
+  return "Cluster filter to reject background";
 }
 
-std::unique_ptr<Filter<CDCWireHitCluster>>
-                                        ClusterFilterFactory::create(const std::string& filterName) const
+std::map<std::string, std::string> ClusterFilterFactory::getValidFilterNamesAndDescriptions() const
+{
+  return {
+    {"all", "all cluster are valid"},
+    {"unionrecording", "record many multiple choosable variable set"},
+    {"mva_bkg", "test clusters for background with a mva method"},
+  };
+}
+
+std::unique_ptr<Filter<CDCWireHitCluster> >
+ClusterFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "all") {
     return makeUnique<AllClusterFilter>();
-  } else if (filterName == "mva_bkg") {
-    return makeUnique<MVABackgroundClusterFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingClusterFilter>();
+  } else if (filterName == "mva_bkg") {
+    return makeUnique<MVABackgroundClusterFilter>();
   } else {
     return Super::create(filterName);
   }

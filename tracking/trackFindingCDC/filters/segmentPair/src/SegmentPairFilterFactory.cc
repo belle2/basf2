@@ -13,14 +13,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
-}
-
-std::string SegmentPairFilterFactory::getFilterPurpose() const
-{
-  return "Segment pair filter to be used during the construction of segment pairs.";
 }
 
 std::string SegmentPairFilterFactory::getIdentifier() const
@@ -28,23 +23,24 @@ std::string SegmentPairFilterFactory::getIdentifier() const
   return "SegmentPair";
 }
 
+std::string SegmentPairFilterFactory::getFilterPurpose() const
+{
+  return "Segment pair filter to construct of a segment pair network";
+}
+
 std::map<std::string, std::string>
 SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
+  return {
+    {"none", "no segment pair is valid"},
     {"all", "all segment pairs are valid"},
     {"truth", "monte carlo truth"},
-    {"none", "no segment pair is valid"},
-    {"feasible", "multivariat method based on variables of the first and last hit in each segment meant as precut"},
-    {"unionrecording", "record many multiple choosable variable set"},
-    {"simple", "mc free with simple criteria"},
     {"fitless", "mc free with simple criteria without the common fit"},
+    {"simple", "mc free with simple criteria"},
+    {"unionrecording", "record many multiple choosable variable set"},
+    {"feasible", "multivariat method based on variables of the first and last hit in each segment meant as precut"},
     {"realistic", "realistic filter using a common fit and combination of all information with an mva"},
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<Filter<CDCSegmentPair> >
@@ -56,16 +52,16 @@ SegmentPairFilterFactory::create(const std::string& filterName) const
     return makeUnique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentPairFilter>();
-  } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleSegmentPairFilter>();
-  } else if (filterName == "simple") {
-    return makeUnique<SimpleSegmentPairFilter>();
   } else if (filterName == "fitless") {
     return makeUnique<FitlessSegmentPairFilter>();
-  } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticSegmentPairFilter>();
+  } else if (filterName == "simple") {
+    return makeUnique<SimpleSegmentPairFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingSegmentPairFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleSegmentPairFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

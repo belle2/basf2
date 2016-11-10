@@ -13,40 +13,30 @@
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-       Factory that can creates apropriate segment pair relation filter instance from parameters.
-
-       It knows about all available filters and their parameters.
-       Can collaborate with a Module and expose these parameters to the user in steering files.
-    */
+    /// Factory that can create appropriate segment pair relation filters from associated names.
     class SegmentPairRelationFilterFactory : public FilterFactory<BaseSegmentPairRelationFilter> {
 
-    public:
+    private:
       /// Type of the base class
       using Super = FilterFactory<BaseSegmentPairRelationFilter>;
 
-      /** Fill the default filter name and parameter values*/
+    public:
+      /// Constructor forwarding the default filter name
       SegmentPairRelationFilterFactory(const std::string& defaultFilterName = "realistic");
 
-      using FilterFactory<BaseSegmentPairRelationFilter>::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const override;
 
-      /** Create a cluster filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseSegmentPairRelationFilter>
-      create(const std::string& filterName) const override;
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const override;
 
-      /** Getter for a descriptive purpose of the clusterfilter.*/
-      virtual std::string getFilterPurpose() const override;
-
-      /** Getter for the valid clusterf ilter names and a description for each */
-      virtual
+      /// Getter for valid filter names and a description for each
       std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for a short identifier of the factory.*/
-      virtual std::string getIdentifier() const override;
-
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseSegmentPairRelationFilter> create(const std::string& filterName) const override;
     };
   }
 }

@@ -156,7 +156,7 @@ def add_unpackers(path, components=None):
         topconverter.param('useModuleT0Calibration', False)
         topconverter.param('useCommonT0Calibration', False)
         topconverter.param('subtractOffset', True)
-        main.add_module(topconverter)
+        path.add_module(topconverter)
 
     # ARICH
     if components is None or 'ARICH' in components:

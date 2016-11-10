@@ -88,8 +88,7 @@ v.variables.addAlias('E_mc', 'matchedMC(E)')
 
 for mc, files in mc_files:
 
-    files = [os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], '/analysis/', f) for f in files]
-
+    files = [os.path.join(str(os.environ['BELLE2_VALIDATION_DATA_DIR']), 'analysis/', f) for f in files]
     path = create_path()
 
     if mc == 'Belle':

@@ -32,7 +32,7 @@ import fei.provider
 fei.provider.MaximumNumberOfMVASamples = int(1e7)
 fei.provider.MinimumNumberOfMVASamples = int(10)
 
-inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], '/analysis/mdst6_BBx0_charged.root')
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], 'analysis/mdst6_BBx0_charged.root')
 
 selection_path = create_path()
 selection_path.add_module('RootInput', inputFileName=inputFile, inputFileNames=[])
@@ -104,7 +104,7 @@ assert len(glob.glob('Monitor_FitVertex_*')) == 12
 assert len(glob.glob('Monitor_Final_*')) == 7
 assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
-assert len(glob.glob('Monitor_SignalProbability_*')) == 10
+assert len(glob.glob('Monitor_SignalProbability_*')) == 11
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 assert len(glob.glob('Monitor_ModuleStatistics.root')) == 1
 assert len(glob.glob('Monitor_*')) == 92
@@ -191,7 +191,7 @@ assert len(glob.glob('Monitor_FitVertex_*')) == 12
 assert len(glob.glob('Monitor_Final_*')) == 7
 assert len(glob.glob('Monitor_CopyParticleList_*')) == 21
 assert len(glob.glob('Monitor_MatchParticleList_*')) == 11
-assert len(glob.glob('Monitor_SignalProbability_*')) == 10
+assert len(glob.glob('Monitor_SignalProbability_*')) == 11
 assert len(glob.glob('Monitor_MakeParticleList_*')) == 22
 # Additional monitoring stuff during training
 assert len(glob.glob('Monitor_GenerateTrainingData_*')) == 11

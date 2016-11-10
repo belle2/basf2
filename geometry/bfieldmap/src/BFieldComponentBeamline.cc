@@ -167,7 +167,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
 {
   BFieldPoint** mapBuffer;
   InterpolationPoint** interBuffer;
-  double rotate_angle;
+  //  double rotate_angle;
   int offsetRPhi;
   //double mapSizeRPhi;  ---> Temporarily masked because this variable is not used
 
@@ -341,13 +341,13 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   if (point0.y() == 0) By = 0.;
 
   //if y<0 fabs(y), By should be flipped
-  if (point0.y() < 0) By = -1.*By;
+  if (point0.y() < 0) By = -By;
 
   //from ANSYS Coordinate to GEANT4 Coordinate
-  Bx = -1.*Bx;
-  Bz = -1.*Bz;
-  return TVector3(Bx * cos(rotate_angle) + Bz * sin(rotate_angle), By,
-                  Bz * cos(rotate_angle) - Bx * sin(rotate_angle));
+  Bx = -Bx;
+  Bz = -Bz;
+  double s = (isher == 1) ? s_sba : -s_sba;
+  return TVector3(Bx * s_cba + Bz * s, By,  Bz * s_cba - Bx * s);
 }
 
 

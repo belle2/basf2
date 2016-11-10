@@ -177,7 +177,7 @@ namespace Belle2 {
         new G4PVPlacement(0, G4ThreeVector(0, 0, activeParams.getLength("SV_offset_inZ")*CLHEP::cm), l_He3Gas, "p_He3Gas", l_iHe3Gas, false,
                           detID);
         B2INFO("HE3-tube-Sensitive-Volume-" << detID << " placed at: (" <<  He3TUBEpos.getX() << "," << He3TUBEpos.getY() << "," <<
-               He3TUBEpos.getZ() + activeParams.getLength("SV_offset_inZ")*CLHEP::cm) << ")  mm");
+               He3TUBEpos.getZ() + activeParams.getLength("SV_offset_inZ")*CLHEP::cm << ")  mm");
         detID++;
       }
     }

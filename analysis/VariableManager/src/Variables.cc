@@ -1467,6 +1467,22 @@ namespace Belle2 {
       return event_tracks - par_tracks;
     }
 
+    double trackMatchType(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const Track* track = particle->getTrack();
+      if (track) {
+        // There is a track match
+        result = 1.0;
+        const ECLCluster* shower = particle->getECLCluster();
+        if (shower and shower->getConnectedRegionId() > 0)
+          // The cluster is only in the connected region, so its a CR track match
+          result = 2.0;
+      }
+      return result;
+    }
+
     double isPrimarySignal(const Particle* part)
     {
       if (isSignal(part) > 0.5 and particleMCPrimaryParticle(part) > 0.5)
@@ -1640,6 +1656,8 @@ namespace Belle2 {
     REGISTER_VARIABLE("flavor", particleFlavorType,
                       "flavor type of decay (0=unflavored, 1=flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
+    REGISTER_VARIABLE("trackMatchType", trackMatchType,
+                      "0 of particle has no associated track, 1 if there is a matched track, 2 if the matched track is only nearby the cluster, called connected-region (CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index (0-based) of the MDST object from which the Particle was created");
 

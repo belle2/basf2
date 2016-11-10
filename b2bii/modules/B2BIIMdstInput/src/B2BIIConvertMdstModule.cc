@@ -1575,30 +1575,40 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
 
   Belle::Mdst_ecl_trk_Manager& m = Belle::Mdst_ecl_trk_Manager::get_manager();
   Belle::Mdst_charged_Manager& chgMg = Belle::Mdst_charged_Manager::get_manager();
-  for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = m.begin(); ecltrkIterator != m.end(); ecltrkIterator++) {
-    Belle::Mdst_ecl_trk mECLTRK = *ecltrkIterator;
 
-    Belle::Mdst_ecl mdstEcl = mECLTRK.ecl();
-    Belle::Mdst_trk mTRK    = mECLTRK.trk();
+  // We first insert relations to tracks which are directly matched (type == 1)
+  // secondly we had CR matched tracks (connected region) (type == 2)
+  // finally tracks which are geometrically matched (type == 0)
+  std::vector<int> insert_order_types = {1, 2, 0};
+  for (auto& insert_type : insert_order_types) {
+    for (Belle::Mdst_ecl_trk_Manager::iterator ecltrkIterator = m.begin(); ecltrkIterator != m.end(); ecltrkIterator++) {
+      Belle::Mdst_ecl_trk mECLTRK = *ecltrkIterator;
 
-    if (!mdstEcl)
-      continue;
+      if (mECLTRK.type() != insert_type)
+        continue;
 
-    // the numbering in mdst_charged
-    // not necessarily the same as in mdst_trk
-    // therfore have to find corresponding mdst_charged
-    for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
-      Belle::Mdst_charged mChar = *chgIterator;
-      Belle::Mdst_trk mTRK_in_charged = mChar.trk();
+      Belle::Mdst_ecl mdstEcl = mECLTRK.ecl();
+      Belle::Mdst_trk mTRK    = mECLTRK.trk();
 
-      if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
-        // found the correct  mdst_charged
-        // if this is a connected region cluster we set the track id as connected region id
-        if (mECLTRK.type() == 2) {
-          eclClusters[mdstEcl.get_ID() - 1]->setConnectedRegionId(mTRK.get_ID());
+      if (!mdstEcl)
+        continue;
+
+      // the numbering in mdst_charged
+      // not necessarily the same as in mdst_trk
+      // therfore have to find corresponding mdst_charged
+      for (Belle::Mdst_charged_Manager::iterator chgIterator = chgMg.begin(); chgIterator != chgMg.end(); chgIterator++) {
+        Belle::Mdst_charged mChar = *chgIterator;
+        Belle::Mdst_trk mTRK_in_charged = mChar.trk();
+
+        if (mTRK_in_charged.get_ID() == mTRK.get_ID()) {
+          // found the correct  mdst_charged
+          // if this is a connected region cluster we set the track id as connected region id
+          if (mECLTRK.type() == 2) {
+            eclClusters[mdstEcl.get_ID() - 1]->setConnectedRegionId(mTRK.get_ID());
+          }
+          eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, 1.0);
+          break;
         }
-        eclClustersToTracks.add(mdstEcl.get_ID() - 1, mChar.get_ID() - 1, 1.0);
-        break;
       }
     }
   }

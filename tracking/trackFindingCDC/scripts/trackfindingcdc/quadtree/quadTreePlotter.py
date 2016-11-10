@@ -351,7 +351,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
         return Trajectory3D(position, momentum, charge)
 
-    def create_reco_hit(self, cdcHit, trajectory3D, rlInfo):
+    def create_reco_hit3D(self, cdcHit, trajectory3D, rlInfo):
         """
         Use a cdc hit and a trajectory to reconstruct a CDCRecoHit3D
 
@@ -367,26 +367,26 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         wireHit = wireHitTopology.getWireHit(cdcHit)
         rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(wireHit, rlInfo)
         if rightLeftWireHit.getStereoType() != 0:
-            recoHit = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
-            return recoHit
+            recoHit3D = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
+            return recoHit3D
         else:
             return None
 
-    def get_plottable_line(self, recoHit):
+    def get_plottable_line(self, recoHit3D):
         """
         Minim the task of the StereoQuadTree by showing the line of quadtree nodes
         a hit belongs to
         """
         z0 = [self.range_y_min, self.range_y_max]
-        l = np.array((np.array(recoHit.getRecoPos3D().z()) - z0) / recoHit.getArcLength2D())
+        l = np.array((np.array(recoHit3D.getRecoPos3D().z()) - z0) / recoHit3D.getArcLength2D())
         return l, z0
 
-    def plot_hit_line(self, recoHit, color):
-        if recoHit:
-            if recoHit.getStereoType() == 0:
+    def plot_hit_line(self, recoHit3D, color):
+        if recoHit3D:
+            if recoHit3D.getStereoType() == 0:
                 return
 
-            l, z0 = self.get_plottable_line(recoHit)
+            l, z0 = self.get_plottable_line(recoHit3D)
             plt.plot(l, z0, marker="", ls="-", alpha=0.4, color=color)
 
     def event(self):
@@ -434,11 +434,11 @@ class StereoQuadTreePlotter(QuadTreePlotter):
                 for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
                     cdcHit = cdcHits[cdcHitID]
 
-                    leftRecoHit = self.create_reco_hit(cdcHit, trajectory, -1)
-                    rightRecoHit = self.create_reco_hit(cdcHit, trajectory, 1)
+                    leftRecoHit3D = self.create_reco_hit3D(cdcHit, trajectory, -1)
+                    rightRecoHit3D = self.create_reco_hit3D(cdcHit, trajectory, 1)
 
-                    self.plot_hit_line(leftRecoHit, color=map[mcTrackID % len(map)])
-                    self.plot_hit_line(rightRecoHit, color=map[mcTrackID % len(map)])
+                    self.plot_hit_line(leftRecoHit3D, color=map[mcTrackID % len(map)])
+                    self.plot_hit_line(rightRecoHit3D, color=map[mcTrackID % len(map)])
 
         if self.draw_mc_tracks:
             mc_track_cands = Belle2.PyStoreArray("MCTrackCands")
@@ -450,16 +450,16 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
                 for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
                     cdcHit = cdcHits[cdcHitID]
-                    recoHit = self.create_reco_hit(cdcHit, trajectory, mcHitLookUp.getRLInfo(cdcHit))
+                    recoHit3D = self.create_reco_hit3D(cdcHit, trajectory, mcHitLookUp.getRLInfo(cdcHit))
 
-                    if recoHit:
-                        l = (recoHit.getRecoPos3D().z() - z0) / recoHit.getArcLength2D()
+                    if recoHit3D:
+                        l = (recoHit3D.getRecoPos3D().z() - z0) / recoHit3D.getArcLength2D()
                         plt.plot(l, z0, marker="o", color=map[mcTrackID % len(map)], ls="", alpha=0.2)
 
         if self.draw_track_hits:
             for id, track in enumerate(track_vector):
-                for recoHit in list(track.items()):
-                    self.plot_hit_line(recoHit, color=map[id % len(map)])
+                for recoHit3D in list(track.items()):
+                    self.plot_hit_line(recoHit3D, color=map[id % len(map)])
 
         if self.draw_last_track and len(track_vector) != 0:
 
@@ -468,21 +468,21 @@ class StereoQuadTreePlotter(QuadTreePlotter):
 
             for wireHit in wireHitTopology.getWireHits():
                 for rlInfo in (-1, 1):
-                    recoHit = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
+                    recoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
 
                     if (self.delete_bad_hits and
                         (rlWireHit.getRLInfo() != mcHitLookUp.getRLInfo(rlWireHit.getWireHit().getHit()) or
-                         not recoHit.isInCellZBounds())):
+                         not recoHit3D.isInCellZBounds())):
                         continue
 
-                    if recoHit in list(last_track.items()):
+                    if recoHit3D in list(last_track.items()):
                         color = map[len(track_vector) % len(map)]
                     else:
                         if rlWireHit.getRLInfo() == 1:
                             color = "black"
                         else:
                             color = "gray"
-                    self.plot_hit_line(recoHit, color)
+                    self.plot_hit_line(recoHit3D, color)
 
         plt.xlabel(r"$\tan \ \lambda$")
         plt.ylabel(r"$z_0$")

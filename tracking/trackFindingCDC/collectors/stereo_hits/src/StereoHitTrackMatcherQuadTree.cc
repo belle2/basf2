@@ -146,7 +146,7 @@ StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
        ++outerIterator) {
     bool isDoubled = false;
 
-    const CDCRecoHit3D& currentRecoHitOuter = outerIterator->first;
+    const CDCRecoHit3D& currentRecoHit3DOuter = outerIterator->first;
     const CDCRLWireHit* currentRLWireHitOuter = outerIterator->second;
     const CDCWireHit& currentWireHitOuter = currentRLWireHitOuter->getWireHit();
     const CDCHit* currentHitOuter = currentWireHitOuter.getHit();
@@ -156,7 +156,7 @@ StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
     }
 
     for (auto innerIterator = outerIterator; innerIterator != foundStereoHits.end(); ++innerIterator) {
-      const CDCRecoHit3D& currentRecoHitInner = innerIterator->first;
+      const CDCRecoHit3D& currentRecoHit3DInner = innerIterator->first;
       const CDCRLWireHit* currentRLWireHitInner = innerIterator->second;
       const CDCWireHit& currentWireHitInner = currentRLWireHitInner->getWireHit();
       const CDCHit* currentHitInner = currentWireHitInner.getHit();
@@ -166,11 +166,11 @@ StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
       }
 
       if (innerIterator != outerIterator and currentHitOuter == currentHitInner) {
-        const double innerZ = currentRecoHitInner.getRecoZ();
-        const double outerZ = currentRecoHitOuter.getRecoZ();
+        const double innerZ = currentRecoHit3DInner.getRecoZ();
+        const double outerZ = currentRecoHit3DOuter.getRecoZ();
 
-        const double innerR = currentRecoHitInner.getRecoPos2D().norm();
-        const double outerR = currentRecoHitOuter.getRecoPos2D().norm();
+        const double innerR = currentRecoHit3DInner.getRecoPos2D().norm();
+        const double outerR = currentRecoHit3DOuter.getRecoPos2D().norm();
 
         const double lambda11 = (innerZ - node.getLowerZ0()) / innerR;
         const double lambda12 = (innerZ - node.getUpperZ0()) / innerR;
@@ -181,12 +181,12 @@ StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
         const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
-          const Weight weight = m_stereoHitFilter({&currentRecoHitInner, &track});
+          const Weight weight = m_stereoHitFilter({&currentRecoHit3DInner, &track});
           if (not std::isnan(weight)) {
             matches.emplace_back(currentRLWireHitInner, weight);
           }
         } else {
-          const Weight weight = m_stereoHitFilter({&currentRecoHitOuter, &track});
+          const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
           if (not std::isnan(weight)) {
             matches.emplace_back(currentRLWireHitOuter, weight);
           }
@@ -200,7 +200,7 @@ StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
     }
 
     if (not isDoubled) {
-      const Weight weight = m_stereoHitFilter({&currentRecoHitOuter, &track});
+      const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
       if (not std::isnan(weight)) {
         matches.emplace_back(currentRLWireHitOuter, weight);
       }

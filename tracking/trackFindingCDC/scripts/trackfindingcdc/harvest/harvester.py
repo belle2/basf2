@@ -33,19 +33,19 @@ class ReconstructionPositionHarvester(HarvestingModule):
 
         number_of_wrong_rl_infos = 0
 
-        for reco_hit in list(track_cand.items()):
-            underlaying_cdc_hit = reco_hit.getWireHit().getHit()
-            hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit.getRecoPos3D()
+        for reco_hit3D in list(track_cand.items()):
+            underlaying_cdc_hit = reco_hit3D.getWireHit().getHit()
+            hit_difference = mc_hit_lookup.getRecoPos3D(underlaying_cdc_hit) - reco_hit3D.getRecoPos3D()
             sum_of_difference_norms_axial += hit_difference.xy().norm()
             num_norms_axial += 1
 
-            if reco_hit.getStereoType() != 0:  # AXIAL
+            if reco_hit3D.getStereoType() != 0:  # AXIAL
                 sum_of_difference_norms_stereo += abs(hit_difference.z())
                 num_norms_stereo += 1
 
                 correct_rl_info = mc_hit_lookup.getRLInfo(underlaying_cdc_hit)
 
-                if correct_rl_info != reco_hit.getRLInfo():
+                if correct_rl_info != reco_hit3D.getRLInfo():
                     number_of_wrong_rl_infos += 1
 
         return dict(sum_of_difference_norms_axial=sum_of_difference_norms_axial,

@@ -171,7 +171,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     new G4PVPlacement(NULL, G4ThreeVector(0, 0, (-988.5 + 1972.5) / 2), part1logical, "part1physical", top, false, 0, overlap);
   }
 
-  {
+  if (b_support_ribs || b_outer_plates || b_forward_part5) {
     //    double zh = (1219.+2288.)/2, dz = (-1219.+2288.)/2;
     double zh = (1330. + 2380.) / 2, dz = (-1330. + 2380.) / 2;
     if (b_support_ribs) {
@@ -380,7 +380,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
   vector<cplacement_t> bp = load_placements(m_sap, ECLParts::barrel);
 
   if (b_preamplifier) {
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.250 + get_pa_box_height() / 2), get_preamp(),
@@ -396,7 +396,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
     G4VSolid* holder = new G4SubtractionSolid("holder", holder0, holder1);
     G4LogicalVolume* holderlogical = new G4LogicalVolume(holder, Materials::get("A5052"), "holderlogical", 0, 0, 0);
     holderlogical->SetVisAttributes(att("holder"));
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.250 + get_pa_box_height() + 38. / 2)*G4RotateZ3D(M_PI / 2)*G4RotateX3D(
@@ -414,7 +414,7 @@ void Belle2::ECL::GeoECLCreator::barrel(G4LogicalVolume& _top)
       wrapped_crystals.push_back(wrapped_crystal(s, "barrel", 0.17 - 0.03));
     }
 
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
       if (s == cryst.end()) continue;

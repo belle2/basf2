@@ -229,7 +229,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       wrapped_crystals.push_back(wrapped_crystal(s, "forward", 0.20 - 0.02));
     }
 
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
       if (s == cryst.end()) continue;
@@ -242,7 +242,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
   }
 
   if (b_preamplifier) {
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),
@@ -441,7 +441,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
     acs->AddPlacedVolume(lsolid1_p7, tsolid1_p7);
     //      new G4PVPlacement(tsolid1_p7, lsolid1_p7, "psolid1_p7", crystalSectorLogical, false, 0, overlaps);
 
-    int sol2count = 0;
+    //    int sol2count = 0;
     double obj2_dz = Z0 - 95;
     auto get_bracket = [&](double L, double ang, G4Transform3D & lt) {
       double thick = 3;
@@ -466,7 +466,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(G4RotateZ3D(phi)*G4Translate3D(mx, dy, obj2_dz)*lt);
-      string pname("psolid2_p"); pname += to_string(++sol2count);
+      //  string pname("psolid2_p"); pname += to_string(++sol2count);
       acs->AddPlacedVolume(lsolid2, tsolid2_p1);
       //  new G4PVPlacement(tsolid2_p1, lsolid2, pname.c_str(), crystalSectorLogical, false, 0, overlaps);
     };
@@ -476,7 +476,7 @@ void Belle2::ECL::GeoECLCreator::forward(G4LogicalVolume& _top)
       lsolid2->SetVisAttributes(att("alum"));
 
       G4Transform3D tsolid2_p1(t * lt);
-      string pname("psolid2_p"); pname += to_string(++sol2count);
+      //  string pname("psolid2_p"); pname += to_string(++sol2count);
       acs->AddPlacedVolume(lsolid2, tsolid2_p1);
       //  new G4PVPlacement(tsolid2_p1, lsolid2, pname.c_str(), crystalSectorLogical, false, 0, overlaps);
     };

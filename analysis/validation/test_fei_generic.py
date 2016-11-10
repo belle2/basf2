@@ -1,7 +1,18 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+<header>
+  <output>../MC5x1_pi0_validation.root</output>
+  <contact>Thomas Keck; thomas.keck2@kit.edu</contact>
+</header>
+"""
+
 import os
+
+if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
+    sys.exit(0)
+
 import tempfile
 import shutil
 import glob
@@ -21,14 +32,7 @@ import fei.provider
 fei.provider.MaximumNumberOfMVASamples = int(1e7)
 fei.provider.MinimumNumberOfMVASamples = int(10)
 
-filepath = 'analysis/tests/mdst6.root'
-inputFile = Belle2.FileSystem.findFile(filepath)
-if len(inputFile) == 0:
-    sys.stderr.write(
-        "TEST SKIPPED: input file " +
-        filepath +
-        " not found. You can retrieve it via 'wget http://www-ekp.physik.uni-karlsruhe.de/~tkeck/mdst6.root'\n")
-    sys.exit(-1)
+inputFile = os.path.join(os.environ['BELLE2_VALIDATION_DATA_DIR'], '/analysis/mdst6_BBx0_charged.root')
 
 selection_path = create_path()
 selection_path.add_module('RootInput', inputFileName=inputFile, inputFileNames=[])

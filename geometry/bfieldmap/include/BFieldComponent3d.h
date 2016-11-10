@@ -140,20 +140,20 @@ namespace Belle2 {
      */
     void enableCoordinate(std::string mapEnable = "rphiz") { m_mapEnable = mapEnable; }
 
+    struct vector3_t { double x, y, z;};
   protected:
 
   private:
 
     /**
-     * Interpolate the value of B-field for a given set of map indicies (ir, iphi, iz) and exact position (r, phi, z)
+     * Interpolate the value of B-field between (ir, iphi, iz) and (ir+1, iphi+1, iz+1) using weights (wr, wphi, wz)
      */
-    double interpolate(int& ir, int& iphi, int& iz, double& r, double& phi, double& z,
-                       const std::vector< std::vector< std::vector<double> > >& bmap) const;
+    vector3_t interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr, double wphi, double wz) const;
 
     /** The filename of the magnetic field map. */
     std::string m_mapFilename{""};
     /** The memory buffer for the magnetic field map. */
-    std::vector< std::vector< std::vector<double> > > m_mapBuffer[3];
+    std::vector<vector3_t> m_bmap;
     /** Enable different dimension, \"rphiz\", \"rphi\", \"phiz\" or \"rz\" > */
     std::string m_mapEnable{"rphiz"};
     /** Flag to switch on/off interpolation > */
@@ -168,6 +168,8 @@ namespace Belle2 {
     double m_mapRegionR[2] {0};
     /** The grid pitch in r,phi,z. */
     double m_gridPitch[3] {0};
+    /** The inverted grid pitch in r,phi,z. */
+    double m_igridPitch[3] {0};
     /** The min and max boundaries of the excluded region in z. */
     double m_exRegionZ[2] {0};
     /** The min and max boundaries of the excluded region in r. */

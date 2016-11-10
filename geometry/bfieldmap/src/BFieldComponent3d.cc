@@ -8,22 +8,15 @@
  **************************************************************************/
 
 #include <geometry/bfieldmap/BFieldComponent3d.h>
-#include <geometry/bfieldmap/BFieldComponentBeamline.h>
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include <cmath>
-
-#include <TMath.h>
-#include <TFile.h>
-#include <TH3.h>
-#include <TH2.h>
 
 using namespace std;
 using namespace Belle2;
@@ -53,9 +46,6 @@ void BFieldComponent3d::initialize()
   m_exRegion = true;
   if ((m_exRegionR[0] == m_exRegionR[1]) || (m_exRegionZ[0] == m_exRegionZ[1])) m_exRegion = false;
 
-  //convert back phi units to degrees for easier indexing
-  m_gridPitch[1] /= Unit::deg;
-
   // Print initial input parameters
   B2INFO("BField3d:: initial input parameters");
   B2INFO(Form("   map filename:          %s",                   m_mapFilename.c_str()));
@@ -63,246 +53,176 @@ void BFieldComponent3d::initialize()
   if (m_interpolate) { B2INFO(Form("   map interpolation:     on")); }
   else               { B2INFO(Form("   map interpolation:     off")); }
   B2INFO(Form("   map r pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[0], m_mapRegionR[0], m_mapRegionR[1]));
-  B2INFO(Form("   map phi pitch:         %.2e deg",             m_gridPitch[1]));
+  B2INFO(Form("   map phi pitch:         %.2e deg",             m_gridPitch[1] * 180 / M_PI));
   B2INFO(Form("   map z pitch & range:   %.2e [%.2e, %.2e] cm", m_gridPitch[2], m_mapRegionZ[0], m_mapRegionZ[1]));
   if (m_exRegion) {
     B2INFO(Form("   map r excluded region: [%.2e, %.2e] cm",    m_exRegionR[0], m_exRegionR[1]));
     B2INFO(Form("   map z excluded region: [%.2e, %.2e] cm",    m_exRegionZ[0], m_exRegionZ[1]));
   }
 
+  m_bmap.reserve(m_mapSize[0]*m_mapSize[1]*m_mapSize[2]);
   // Load B-field map file
   io::filtering_istream fieldMapFile;
   fieldMapFile.push(io::gzip_decompressor());
   fieldMapFile.push(io::file_source(fullPath));
 
-  // B-field map is defined only for phi=0-180
-  int phimapsize = m_mapSize[1];
-  if (m_mirrorPhi) m_mapSize[1] = 2 * m_mapSize[1] - 1;
-
-  // Store B-field map in TH3D -> convert (Br, Bphi, Bz) to (Bx, By, Bz)
-  // N.B. ROOT assumes grid points defined at bin centres
-  TH3D* m_mapBuffer3D[3];
-  TString mapname = Form("BFieldMap_R%d-%d_Z%d-%d",
-                         int(10 * m_mapRegionR[0]), int(10 * m_mapRegionR[1]), int(10 * m_mapRegionZ[0]), int(10 * m_mapRegionZ[1]));
-  m_mapBuffer3D[0] = new TH3D(mapname + "_Bx", "; r [cm]; #phi [deg]; z [cm]",
-                              m_mapSize[0], m_mapRegionR[0] - m_gridPitch[0] / 2., m_mapRegionR[1] + m_gridPitch[0] / 2,
-                              m_mapSize[1], 0 - m_gridPitch[1] / 2., 360 + m_gridPitch[1] / 2.,
-                              m_mapSize[2], m_mapRegionZ[0] - m_gridPitch[2] / 2., m_mapRegionZ[1] + m_gridPitch[2] / 2.);
-  m_mapBuffer3D[1] = new TH3D(mapname + "_By", "; r [cm]; #phi [deg]; z [cm]",
-                              m_mapSize[0], m_mapRegionR[0] - m_gridPitch[0] / 2., m_mapRegionR[1] + m_gridPitch[0] / 2,
-                              m_mapSize[1], 0 - m_gridPitch[1] / 2., 360 + m_gridPitch[1] / 2.,
-                              m_mapSize[2], m_mapRegionZ[0] - m_gridPitch[2] / 2., m_mapRegionZ[1] + m_gridPitch[2] / 2.);
-  m_mapBuffer3D[2] = new TH3D(mapname + "_Bz", "; r [cm]; #phi [deg]; z [cm]",
-                              m_mapSize[0], m_mapRegionR[0] - m_gridPitch[0] / 2., m_mapRegionR[1] + m_gridPitch[0] / 2,
-                              m_mapSize[1], 0 - m_gridPitch[1] / 2., 360 + m_gridPitch[1] / 2.,
-                              m_mapSize[2], m_mapRegionZ[0] - m_gridPitch[2] / 2., m_mapRegionZ[1] + m_gridPitch[2] / 2.);
-
-  double r, z, phi, phi_rad, Br, Bz, Bphi, Bx, By;
-  int binx, biny, binz;
-  for (int k = m_mapSize[2] - 1; k >= 0; k--) { // z --> axis flipped (not important when using TH3)
+  char tmp[256];
+  for (int k = 0; k < m_mapSize[2]; k++) { // z
     for (int i = 0; i < m_mapSize[0]; i++) { // r
-      for (int j = 0;  j < phimapsize; j++) { // phi
-        //r[m]     phi[deg]   z[m]   Br[T]   Bphi[T]   Bz[T]
-        fieldMapFile >> r >> phi >> z >> Br >> Bphi >> Bz;
-        // Convert units r[m]->r[cm], phi[deg]->phi[rad], z[m]->z[cm]
-        r *= Unit::m;
-        z *= Unit::m;
-        //phi*=Unit::deg; // keep degrees for indexing
-        phi_rad = phi * Unit::deg;
+      for (int j = 0;  j < m_mapSize[1]; j++) { // phi
+        double Br, Bz, Bphi;
+        //r[m]  phi[deg]  z[m]  Br[T]  Bphi[T]  Bz[T]
+        fieldMapFile.getline(tmp, 256);
+        // sscanf(tmp+33,"%lf %lf %lf",&Br,&Bphi,&Bz);
+        char* next;
+        Br   = strtod(tmp + 33, &next);
+        Bphi = strtod(next, &next);
+        Bz   = strtod(next, NULL);
+        m_bmap.push_back({ -Br, -Bphi, -Bz});
+      }
+    }
+  }
 
-        // Possible shift of coordinate system
-        z += m_mapOffset;
-
-        // B-field calculation done in different coordiate orientation
-        // flip z & y coordinate
-        z *= -1.;
-        Bz *= -1.;
-        // No need to change phi coordinate because it is anyway mirrored
-        Bphi *= -1.;
-
-        // Introduce error on B field
-        if ((m_errRegionR[0] != m_errRegionR[1]) && (r >= m_errRegionR[0]) && (r < m_errRegionR[1])) {
-          Br   *= m_errB[0];
-          Bphi *= m_errB[1];
-          Bz   *= m_errB[2];
-        }
-
-        // Store the values
-        binx = m_mapBuffer3D[0]->GetXaxis()->FindBin(r);
-        biny = m_mapBuffer3D[0]->GetYaxis()->FindBin(phi);
-        binz = m_mapBuffer3D[0]->GetZaxis()->FindBin(z);
-        Bx   = Br * cos(phi_rad) - Bphi * sin(phi_rad);
-        By   = Br * sin(phi_rad) + Bphi * cos(phi_rad);
-        m_mapBuffer3D[0]->SetBinContent(binx, biny, binz, Bx);
-        m_mapBuffer3D[1]->SetBinContent(binx, biny, binz, By);
-        m_mapBuffer3D[2]->SetBinContent(binx, biny, binz, Bz);
-        // Mirror (missing half of the input in phi)
-        if (m_mirrorPhi) {
-          phi = 360 - phi;
-          biny = m_mapBuffer3D[0]->GetYaxis()->FindBin(phi);
-          Bx   = Br * cos(phi_rad) + Bphi * sin(phi_rad);
-          By   = Br * sin(phi_rad) - Bphi * cos(phi_rad);
-          m_mapBuffer3D[0]->SetBinContent(binx, biny, binz, Br);
-          m_mapBuffer3D[1]->SetBinContent(binx, biny, binz, -1.*Bphi);
-          m_mapBuffer3D[2]->SetBinContent(binx, biny, binz, Bz);
+  // Introduce error on B field
+  if (m_errRegionR[0] != m_errRegionR[1]) {
+    auto it = m_bmap.begin();
+    for (int k = 0; k < m_mapSize[2]; k++) { // z
+      double r = m_mapRegionR[0];
+      for (int i = 0; i < m_mapSize[0]; i++, r += m_gridPitch[0]) { // r
+        if (!(r >= m_errRegionR[0] && r < m_errRegionR[1])) { it += m_mapSize[1];  continue;}
+        for (int j = 0;  j < m_mapSize[1]; j++) { // phi
+          vector3_t& B = *it;
+          B.x *= m_errB[0];
+          B.y *= m_errB[1];
+          B.z *= m_errB[2];
         }
       }
     }
   }
 
-  // Remove disabled dimension to make 2D
-  // NOTE: disabling phi dimension inevitably removes Bphi component
-  //       -> currently done automatically because of mirroring in x-z plane (but not exactly zero...),
-  //          should be done manually if it is not mirrored
-  if (m_mapEnable != "rphiz") {
-    // Rebin in the disabled dimension and rescale
-    if (m_mapEnable == "phiz") {
-      for (int i = 0; i < 3; ++i) {
-        m_mapBuffer3D[i]->RebinX(m_mapSize[0]);
-        m_mapBuffer3D[i]->Scale(1. / double(m_mapSize[0]));
-      }
-      m_gridPitch[0] = m_mapBuffer3D[0]->GetXaxis()->GetBinWidth(1);
-      m_mapSize[0] = m_mapBuffer3D[0]->GetNbinsX() + 1; // need extra bin for interpolation
-    } else if (m_mapEnable == "rz") {
-      for (int i = 0; i < 3; ++i) {
-        m_mapBuffer3D[i]->RebinY(m_mapSize[1]);
-        m_mapBuffer3D[i]->Scale(1. / double(m_mapSize[1]));
-      }
-      m_gridPitch[1] = m_mapBuffer3D[0]->GetYaxis()->GetBinWidth(1);
-      m_mapSize[1] = m_mapBuffer3D[0]->GetNbinsY() + 1;
-    } else if (m_mapEnable == "rphi") {
-      for (int i = 0; i < 3; ++i) {
-        m_mapBuffer3D[i]->RebinZ(m_mapSize[2]);
-        m_mapBuffer3D[i]->Scale(1. / double(m_mapSize[2]));
-      }
-      m_gridPitch[2] = m_mapBuffer3D[0]->GetZaxis()->GetBinWidth(1);
-      m_mapSize[2] = m_mapBuffer3D[0]->GetNbinsZ() + 1; // need extra bin for interpolation
-    }
-  }
-
-  // Use vectors instead of TH3 to reduce CPU/memory(?) usage
-  for (int imap = 0; imap < 3; ++imap) {
-    m_mapBuffer[imap].resize(m_mapSize[0]);
-    for (int ix = 0; ix < m_mapSize[0]; ++ix) {
-      m_mapBuffer[imap][ix].resize(m_mapSize[1]);
-      for (int iy = 0; iy < m_mapSize[1]; ++iy) {
-        m_mapBuffer[imap][ix][iy].resize(m_mapSize[2]);
-        for (int iz = 0; iz < m_mapSize[2]; ++iz) {
-          int jx = (m_mapEnable != "phiz" || ix != m_mapSize[0] - 1) ? ix + 1 : ix;
-          int jy = (m_mapEnable != "rz"   || iy != m_mapSize[1] - 1) ? iy + 1 : iy;
-          int jz = (m_mapEnable != "rphi" || iz != m_mapSize[2] - 1) ? iz + 1 : iz;
-          m_mapBuffer[imap][ix][iy][iz] = m_mapBuffer3D[imap]->GetBinContent(jx, jy, jz);
-        }
-      }
-    }
-  }
-  for (int i = 0; i < 3; ++i) delete m_mapBuffer3D[i];
+  m_igridPitch[0] = 1 / m_gridPitch[0];
+  m_igridPitch[1] = 1 / m_gridPitch[1];
+  m_igridPitch[2] = 1 / m_gridPitch[2];
 
   B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
               m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
               m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-
-  /*
-  TFile *f = new TFile("FieldMap3D.root", "RECREATE");
-  f->cd();
-  m_mapBuffer3D[0]->Write("Br_3D");
-  m_mapBuffer3D[1]->Write("Bphi_3D");
-  m_mapBuffer3D[2]->Write("Bz_3D");
-  f->Close();
-  delete f;
-  */
+  if (1) {
+    TVector3 r(1, -50, 1), dr(0.1, 0.1, 0.1);
+    for (int i = 0; i < 1000; i++, r += dr) {
+      TVector3 B = calculate(r);
+      //      B2INFO(Form("%f %f %f %g %g %20.16g", r.x(), r.y(), r.z(), B.x(), B.y(), B.z()));
+    }
+    _exit(0);
+  }
 }
 
 
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
+  TVector3 B(0, 0, 0);
 
-  // When BFieldComponentBeamline return finit field, it return zero field
-  // --> not used, but maybe useful later on?
-  //if (BFieldComponentBeamline::isInRange(point)) {
-  //  return TVector3(0.0, 0.0, 0.0);
-  //}
-
-  // Get the r, phi and z component
-  double r = point.Perp();
-  double phi_rad = point.Phi();
-  double phi = phi_rad * 180. / M_PI;
-  if (phi < 0.) phi = 360. + phi;
-  if (!(phi < 360.)) phi = 0.;
-  double z = point.Z();
-
+  double z = point.z();
   // Check if the point lies inside the magnetic field boundaries
-  if ((r < m_mapRegionR[0]) || (r >= m_mapRegionR[1]) ||
-      (z < m_mapRegionZ[0]) || (z >= m_mapRegionZ[1])) {
-    B2DEBUG(100, Form("BField3d:: point not in map range: %.2e [%.2e, %.2e] %.2e [%.2e, %.2e])\n",
-                      r, m_mapRegionR[0], m_mapRegionR[1], z, m_mapRegionZ[0], m_mapRegionZ[1]));
-    return TVector3(0.0, 0.0, 0.0);
-  }
-
+  if (z <= m_mapRegionZ[0] || z >= m_mapRegionZ[1]) return B;
   // Check if the point lies in the exclude region
-  if (m_exRegion &&
-      (r >= m_exRegionR[0]) && (r < m_exRegionR[1]) &&
-      (z >= m_exRegionZ[0]) && (z < m_exRegionZ[1])) {
-    B2DEBUG(100, Form("BField3d:: point in the excluded region: %.2e [%.2e, %.2e] %.2e [%.2e, %.2e])\n",
-                      r, m_exRegionR[0], m_exRegionR[1], z, m_exRegionZ[0], m_exRegionZ[1]));
-    return TVector3(0.0, 0.0, 0.0);
+  if (m_exRegion && (z >= m_exRegionZ[0]) && (z < m_exRegionZ[1])) return B;
+
+  double r2 = point.Perp2();
+  // Check if the point lies inside the magnetic field boundaries
+  if (r2 < m_mapRegionR[0]*m_mapRegionR[0] || r2 >= m_mapRegionR[1]*m_mapRegionR[1]) return B;
+  // Check if the point lies in the exclude region
+  if (m_exRegion && (r2 >= m_exRegionR[0]*m_exRegionR[0]) && (r2 < m_exRegionR[1]*m_exRegionR[1])) return B;
+
+  if (r2 > 0) {
+    double r = sqrt(r2);
+    double phi = atan2(std::abs(point.y()), point.x());
+
+    // Calculate the lower index of the point in the grid
+    double wr   = (r - m_mapRegionR[0]) * m_igridPitch[0];
+    double wphi =  phi                  * m_igridPitch[1];
+    double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
+
+    unsigned int ir   = static_cast<int>(wr);
+    unsigned int iphi = static_cast<int>(wphi);
+    unsigned int iz   = static_cast<int>(wz);
+
+    if (ir + 1 >= (unsigned int)(m_mapSize[0])) return B;
+    if (iphi + 1 >= (unsigned int)(m_mapSize[1])) return B;
+    if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
+
+    wr   -= ir;
+    wphi -= iphi;
+    wz   -= iz;
+
+    // Get B-field values from map
+    vector3_t b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
+    double norm = -1 / r, s = point.y() * norm, c = point.x() * norm;
+    vector3_t bc = {b.x* c - b.y * s, b.x* s + b.y * c, b.z};   // in cartesian system
+    if (point.y() < 0) bc.y = -bc.y;
+    B.SetXYZ(bc.x, bc.y, bc.z);
+  } else {
+    double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
+    unsigned int iz   = static_cast<int>(wz);
+    if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
+    wz   -= iz;
+
+    // Get B-field values from map
+    vector3_t b = interpolate(0, 0, iz, 0, 0, wz); // in cylindrical system
+    vector3_t bc = {b.x, b.y, b.z}; // in cartesian system
+    B.SetXYZ(bc.x, bc.y, bc.z);
   }
+  //  B2INFO(Form("%f %f %f %g %g %20.16g", point.x(), point.y(), point.z(), B.x(), B.y(), B.z()));
 
-  // Calculate the lower index of the point in the grid
-  int ir = static_cast<int>(floor((r - m_mapRegionR[0]) / m_gridPitch[0]));
-  int iz = static_cast<int>(floor((z - m_mapRegionZ[0]) / m_gridPitch[2]));
-  int iphi = static_cast<int>(floor(phi / m_gridPitch[1]));
-
-  // Get B-field values from map
-  double Bx(0.), By(0.), Bz(0.);
-  if (m_interpolate) { // interpolate
-    Bx   = interpolate(ir, iphi, iz, r, phi, z, m_mapBuffer[0]);
-    By   = interpolate(ir, iphi, iz, r, phi, z, m_mapBuffer[1]);
-    Bz   = interpolate(ir, iphi, iz, r, phi, z, m_mapBuffer[2]);
-  } else {             // don't interpolate
-    Bx   = m_mapBuffer[0][ir][iphi][iz];
-    By   = m_mapBuffer[1][ir][iphi][iz];
-    Bz   = m_mapBuffer[2][ir][iphi][iz];
-  }
-
-  return TVector3(Bx, By, Bz);
-
+  return B;
 }
-
 
 void BFieldComponent3d::terminate()
 {
-  B2DEBUG(10, "De-allocating the memory for the 3d magnetic field map ");
-  // De-Allocate memory
-  for (int i = 0; i < 3; ++i)
-    std::vector< std::vector< std::vector<double> > >(m_mapBuffer[i]).swap(m_mapBuffer[i]);
-
 }
 
-double BFieldComponent3d::interpolate(int& ir, int& iphi, int& iz, double& r, double& phi, double& z,
-                                      const std::vector< std::vector< std::vector<double> > >& bmap) const
-
+inline BFieldComponent3d::vector3_t operator*(double a, const BFieldComponent3d::vector3_t& v)
 {
-  // Linear interpolation as implemented in ROOT TH3
+  return {v.x * a, v.y * a, v.z * a};
+}
 
-  double xd = ((r - m_mapRegionR[0]) / m_gridPitch[0]) - ir;
-  double yd = (phi / m_gridPitch[1]) - iphi;
-  double zd = ((z - m_mapRegionZ[0]) / m_gridPitch[2]) - iz;
+inline BFieldComponent3d::vector3_t operator*(const BFieldComponent3d::vector3_t& v, double a)
+{
+  return {v.x * a, v.y * a, v.z * a};
+}
 
-  double v[8] = { bmap[ir][iphi][iz],     bmap[ir][iphi][iz + 1],
-                  bmap[ir][iphi + 1][iz],   bmap[ir][iphi + 1][iz + 1],
-                  bmap[ir + 1][iphi][iz],   bmap[ir + 1][iphi][iz + 1],
-                  bmap[ir + 1][iphi + 1][iz], bmap[ir + 1][iphi + 1][iz + 1]
-                };
+inline BFieldComponent3d::vector3_t operator+(const BFieldComponent3d::vector3_t& v, const BFieldComponent3d::vector3_t& u)
+{
+  return {v.x + u.x, v.y + u.y, v.z + u.z};
+}
 
-  double i1 = v[0] * (1 - zd) + v[1] * zd;
-  double i2 = v[2] * (1 - zd) + v[3] * zd;
-  double j1 = v[4] * (1 - zd) + v[5] * zd;
-  double j2 = v[6] * (1 - zd) + v[7] * zd;
+BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr,
+                                                            double wphi, double wz) const
+{
+  double wzd = 1 - wz, wyd = 1 - wphi;
 
-  double w1 = i1 * (1 - yd) + i2 * yd;
-  double w2 = j1 * (1 - yd) + j2 * yd;
-  double B  = w1 * (1 - xd) + w2 * xd;
+  unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
+  unsigned int strideR = m_mapSize[1];
+
+  unsigned int ind0 = iz * strideZ + ir * strideR + iphi;
+  unsigned int ind1 = ind0 + strideZ;
+  unsigned int ind2 = ind0 + 1;
+  unsigned int ind3 = ind1 + 1;
+  vector3_t i1 = m_bmap[ind0] * wzd + m_bmap[ind1] * wz;
+  vector3_t i2 = m_bmap[ind2] * wzd + m_bmap[ind3] * wz;
+  vector3_t w1 = i1 * wyd + i2 * wphi;
+
+  ind0 += strideR;
+  ind1 += strideR;
+  ind2 += strideR;
+  ind3 += strideR;
+  vector3_t j1 = m_bmap[ind0] * wzd + m_bmap[ind1] * wz;
+  vector3_t j2 = m_bmap[ind2] * wzd + m_bmap[ind3] * wz;
+  vector3_t w2 = j1 * wyd + j2 * wphi;
+
+  vector3_t B = w1 * (1 - wr) + w2 * wr;
+  // const vector3_t &b = m_bmap[ind0];
+  // B2INFO(Form("%g %g %g", b.x, b.y, b.z));
 
   return B;
 }

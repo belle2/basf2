@@ -1129,6 +1129,17 @@ namespace Belle2 {
       return result;
     }
 
+    double eclClusterConnectedRegionID(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const ECLCluster* shower = particle->getECLCluster();
+      if (shower)
+        result = shower->getConnectedRegionId();
+
+      return result;
+    }
+
     double eclClusterDeltaL(const Particle* particle)
     {
       double result = 0.0;
@@ -1690,6 +1701,9 @@ namespace Belle2 {
                       "ECL cluster's distance");
     REGISTER_VARIABLE("clusterPhi", eclClusterPhi,
                       "ECL cluster's azimuthal angle");
+    REGISTER_VARIABLE("clusterConnectedRegionID", eclClusterConnectedRegionID,
+                      "ECL cluster's connected region ID"
+                      "0 if the cluster is not connected to a nearby track or if the cluster is directly matched to a track.");
     REGISTER_VARIABLE("clusterBelleQuality", eclClusterDeltaL,
                       "ECL cluster's quality indicating a good cluster in GSIM (stored in deltaL of ECL cluster object)."
                       "The Belle people used only clusters with quality == 0 in their E_{extra_ecl}");

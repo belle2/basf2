@@ -598,6 +598,8 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
     gamma2hist_Emax = ('clusterHighestE', 100, 0.0, 2.0)
     gamma2hist_E9E25 = ('clusterE9E25', 100, 0.0, 1.0)
     gamma2hist_noC = ('clusterNHits', 100, 0.0, 30.0)
+    gamma2hist_Quality = ('clusterBelleQuality', 10, 0.0, 20.0)
+    gamma2hist_Width = ('clusterLAT', 100, 0.0, 50.0)
 
     gamma2hist_Err00 = ('momVertCovM(0,0)', 100, -0.0005, 0.0005)
     gamma2hist_Err10 = ('momVertCovM(1,0)', 100, -0.0005, 0.0005)
@@ -647,6 +649,8 @@ def addNeutralsConversionMonitors(gammaOutputRootFile='b2biiGammaConversionMonit
                       gamma2hist_Emax,
                       gamma2hist_E9E25,
                       gamma2hist_noC,
+                      gamma2hist_Quality,
+                      gamma2hist_Width,
                       gamma2hist_Err00,
                       gamma2hist_Err10,
                       gamma2hist_Err11,

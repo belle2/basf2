@@ -238,12 +238,18 @@ namespace Belle2 {
     // characteristics of the system. e.g. we will always
     // have only one forward and one backward shield.
     //
+    //! Number of ECL shields in Belle2
     static const int NECLSHIELDS = 2;
+    //! Index corresponding to the forward shield
     static const int FWD_ECLSHIELD = 0;
+    //! Index corresponding to the backward shield
     static const int BWD_ECLSHIELD = 1;
 
+    //! Number of pole pieces in Belle2
     static const int NPOLEPIECES = 2;
+    //! Index corresponding to the forward pole piece
     static const int FWD_POLEPIECE = 0;
+    //! Index corresponding to the backward pole piece
     static const int BWD_POLEPIECE = 1;
 
 

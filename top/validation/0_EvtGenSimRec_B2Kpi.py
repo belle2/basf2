@@ -40,9 +40,11 @@ add_simulation(main, bkgfiles=bg)
 # reconstruction
 add_reconstruction(main)
 
-# output
+# output (to save space only branches needed in 1_makeNtuple.py)
 output = register_module('RootOutput')
 output.param('outputFileName', '../EvtGenSimRec_B2Kpi.root')
+output.param('branchNames', ['MCParticles', 'Tracks', 'TrackFitResults',
+                             'TOPLikelihoods', 'TOPBarHits', 'ExtHits'])
 main.add_module(output)
 
 process(main)

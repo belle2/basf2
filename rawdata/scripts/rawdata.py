@@ -169,7 +169,20 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = ['RawPXDs', 'RawSVDs', 'RawTOPs', 'RawARICHs', 'RawKLMs']
+    branches = ['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
     branches += additionalBranches
     output.param('branchNames', branches)
+    path.add_module(output)
+
+
+def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[]):
+    """
+    This function adds an seqroot output module for raw data to a path.
+    """
+
+    output = register_module('SeqRootOutput')
+    output.param('outputFileName', filename)
+    objects = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
+    objects += additionalObjects
+    output.param('saveObjs', objects)
     path.add_module(output)

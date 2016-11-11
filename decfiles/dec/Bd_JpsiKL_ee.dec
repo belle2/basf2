@@ -9,22 +9,19 @@
 # Date: 20161109
 #
 #
-Alias MyB0 B0
-Alias Myanti-B0 anti-B0
-ChargeConj MyB0 Myanti-B0
-Alias      MyJ/psi  J/psi
-ChargeConj MyJ/psi  MyJ/psi
+Alias        K_L0sig   K_L0
+ChargeConj   K_L0sig   K_L0sig
 #
 Decay Upsilon(4S)
-1.0  MyB0 Myanti-B0 B0 anti-B0 VSS_BMIX dm;
+1.0  B0sig anti-B0sig B0 anti-B0 VSS_BMIX dm;
 Enddecay
 #
-Decay MyB0
-1.000  K_L0  MyJ/psi SSD_CP 0.472e12 0.0 1.0 -0.85 1.0 0.0 1.0 0.0; 
+Decay B0sig
+1.000  K_L0sig  J/psisig SSD_CP 0.472e12 0.0 1.0 -0.85 1.0 0.0 1.0 0.0; 
 Enddecay
-CDecay Myanti-B0
+CDecay anti-B0sig
 #
-Decay MyJ/psi
+Decay J/psisig
 1.000          e+        e-            PHOTOS VLL;
 Enddecay
 #

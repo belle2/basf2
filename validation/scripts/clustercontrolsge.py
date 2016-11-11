@@ -36,7 +36,7 @@ class Cluster:
 
         # the storage IO in GB which can be performed by each job. By default, this is 3GB at
         # DESY which is to small for some validation scripts
-        self.requirement_storage = 20
+        self.requirement_storage = 50
 
         # Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"

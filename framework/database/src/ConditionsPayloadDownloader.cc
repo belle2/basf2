@@ -177,18 +177,43 @@ namespace Belle2 {
 
   bool ConditionsPayloadDownloader::update(const std::string& globalTag, int experiment, int run)
   {
+    //make sure we have an active curl session needed for escaping the tag name ...
+    SessionGuard session(*this);
+    //set this to true if we have to parse legacy v1 api reply
+    bool use_legacy_v1(false);
+
     // update all the payload info from the central database
     // so first clear existing information
     m_payloads.clear();
     // build up the request url
-    std::string experiment_str = std::to_string(experiment);
-    const std::string url = m_restURL + "iovPayloads/?gtName=" + globalTag + "&expName=" + experiment_str + "&runName=" +
-                            std::to_string(run);
+    // make sure the tag name doesn't contain special characters
+    char* escapedTag = curl_easy_escape(m_curl, globalTag.c_str(), globalTag.size());
+    if (!escapedTag) {
+      B2ERROR("Could not encode the global tag name: " << globalTag);
+      return false;
+    }
+    std::string escapedTagStr = std::string(escapedTag);
+    curl_free(escapedTag);
+    const std::string url = m_restURL + "v2/iovPayloads/?gtName=" + escapedTagStr + "&expNumber=" +
+                            std::to_string(experiment) + "&runNumber=" + std::to_string(run);
     // and perform the request
     std::stringstream payloads;
     if (!download(url, payloads)) {
-      B2WARNING("Could not get list of payloads from database");
-      return false;
+      B2WARNING("Could not get list of payloads from database, trying legacy v1 api");
+      std::string experiment_str = std::to_string(experiment);
+      // possibly replacing the experiment name for the old api
+      auto it = m_mapping.left.find(experiment);
+      if (it != m_mapping.left.end()) {
+        experiment_str = it->second;
+      }
+      const std::string url = m_restURL + "v1/iovPayloads/?gtName=" + escapedTagStr + "&expName=" +
+                              experiment_str + "&runName=" + std::to_string(run);
+
+      if (!download(url, payloads)) {
+        B2WARNING("Could not get list of payloads with legacy api either, giving up");
+        return false;
+      }
+      use_legacy_v1 = true;
     }
     // and if that was successful we parse the returned json by resetting the stringstream to its beginning
     payloads.clear();
@@ -205,16 +230,37 @@ namespace Belle2 {
         auto payload = iov.second.get_child("payload");
         auto payloadIov = iov.second.get_child("payloadIov");
         B2DEBUG(100, "Parsing payload with id " << payload.get("payloadId", ""));
-        //payloadInfo.package = payload.get<std::string>("basf2Module.basf2Package.name");
         std::string name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
         payloadInfo.url = m_baseURL + payload.get<std::string>("payloadUrl");
-        int firstExp =  payloadIov.get<int>("initialRunId.experiment.name");
-        int firstRun =  payloadIov.get<int>("initialRunId.name");
-        int finalExp =  payloadIov.get<int>("finalRunId.experiment.name");
-        int finalRun =  payloadIov.get<int>("finalRunId.name");
-        payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
         payloadInfo.revision = payload.get<int>("revision", 0);
+
+        // check which reply version we got and proceed accordingly
+        if (!use_legacy_v1) {
+          // new api
+          int firstExp = payloadIov.get<int>("expStart");
+          int firstRun = payloadIov.get<int>("runStart");
+          int finalExp = payloadIov.get<int>("expEnd");
+          int finalRun = payloadIov.get<int>("runEnd");
+          payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
+        } else {
+          //v1 api, can be removed once the server is fully migrated
+          auto getExpNumber = [&](const std::string & exp) {
+            auto it = m_mapping.right.find(exp);
+            if (it != m_mapping.right.end()) return it->second;
+            try {
+              return stoi(exp);
+            } catch (std::invalid_argument& e) {
+              B2FATAL("Invalid experiment number: '" << exp << "'. Please define the experiment name using 'set_experiment_name'");
+            }
+          };
+
+          int firstExp = getExpNumber(payloadIov.get<std::string>("initialRunId.experiment.name"));
+          int firstRun =  payloadIov.get<int>("initialRunId.name");
+          int finalExp = getExpNumber(payloadIov.get<std::string>("finalRunId.experiment.name"));
+          int finalRun =  payloadIov.get<int>("finalRunId.name");
+          payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
+        }
 
         // make sure we have all fields filled
         if (name.empty() || payloadInfo.url.empty() || payloadInfo.digest.empty()) {
@@ -416,5 +462,15 @@ namespace Belle2 {
       return m_tempfiles.back()->getName();
     }
     return "";
+  }
+
+  bool ConditionsPayloadDownloader::addExperimentName(int experiment, const std::string& name)
+  {
+    auto it = m_mapping.insert(boost::bimap<int, std::string>::value_type(experiment, name));
+    if (!it.second) {
+      B2ERROR("Cannot set experiment name " << experiment << "->'" << name << "': conflict with "
+              << it.first->left << "->'" << it.first->right << "'");
+    }
+    return it.second;
   }
 }

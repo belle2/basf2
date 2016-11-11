@@ -99,7 +99,7 @@ namespace Belle2 {
 
     public:
       /// Create a map of attributes from the stored attribute maps
-      AttributeMap map(int index, AObject& object)
+      AttributeMap map(int index, AObject& object) override
       {
         AttributeMap attributeMap;
         for (const auto& keyMapping : m_mappingsByKey) {
@@ -111,13 +111,13 @@ namespace Belle2 {
       }
 
       /// Returns informal string about the currently set mappings
-      std::string info() const
+      std::string info() override
       {
         std::ostringstream oss;
         for (const auto& keyMapping : m_mappingsByKey) {
           const std::string& key = keyMapping.first;
-          ObjectMapping& mapping = keyMapping.second;
-          oss << key << ": " << mapping.info();
+          const std::unique_ptr<ObjectMapping>& mapping = keyMapping.second;
+          oss << key << ": " << mapping->info();
         }
         return oss.str();
       }

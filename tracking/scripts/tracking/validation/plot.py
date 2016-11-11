@@ -9,6 +9,8 @@ import numpy as np
 
 import ROOT
 
+import basf2
+
 from tracking.root_utils import root_cd, root_save_name
 
 from . import statistics

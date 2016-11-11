@@ -17,10 +17,12 @@
 
 #include <cmath>
 
-// template Weight Chooseable<BaseStereoSegmentFilter>::operator()(const Object& object);
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+// Not really sure why this is needed - but otherwise clang emits a linking error for this missing symbol.
+template Weight Chooseable<BaseStereoSegmentFilter>::operator()(const Object&);
+
 
 std::vector<WithWeight<const CDCRecoSegment2D*> >
 StereoSegmentTrackMatcherFilter::match(const CDCTrack& track,

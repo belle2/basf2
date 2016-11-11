@@ -9,17 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-
 #include <vector>
-#include <algorithm>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCWireHit;
 
     /// Marks hits as background based on simple heuristics
     class WireHitBackgroundBlocker : public Findlet<CDCWireHit&> {
@@ -30,14 +28,13 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
-      /// Expose the parameters of the wire hit preparation
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
-      /// Main algorithm marking the hit of higher loops as background
-      virtual void apply(std::vector<CDCWireHit>& wireHits) override final;
+      /// Main algorithm marking hit as background
+      void apply(std::vector<CDCWireHit>& wireHits) override final;
 
     private:
       /// Parameter : Switch to drop negative drift lengths from the created wire hits
@@ -45,7 +42,6 @@ namespace Belle2 {
 
       /// Parameter : Threshold below, which hits are consider electronic noise background
       double m_param_noiseChargeDeposit = 0;
-
     };
   }
 }

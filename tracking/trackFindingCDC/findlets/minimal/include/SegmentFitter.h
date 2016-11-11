@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
@@ -19,13 +19,14 @@
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
@@ -37,7 +38,7 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription();
+      std::string getDescription();
 
       /// Add the parameters of the fitter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
@@ -47,7 +48,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the fit to each segment
-      virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments);
+      void apply(std::vector<CDCRecoSegment2D>& outputSegments);
 
     private:
       /// Parameter : Switch to use Karimaki fit
@@ -76,7 +77,6 @@ namespace Belle2 {
 
       /// Instance of the drift length estimator to be used.
       DriftLengthEstimator m_driftLengthEstimator;
-
     };
   }
 }

@@ -14,7 +14,9 @@
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <tracking/dataobjects/RecoTrack.h>
+
 #include <framework/datastore/StoreArray.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 
@@ -32,22 +34,22 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
   moduleParamList->addParameter(prefixed(prefix, "RecoTracksStoreArrayName"),
                                 m_param_exportTracksInto,
                                 "Alias for exportTracksInto",
-                                std::string(m_param_exportTracksInto));
+                                m_param_exportTracksInto);
 
   moduleParamList->addParameter(prefixed(prefix, "WriteRecoTracks"),
                                 m_param_exportTracks,
                                 "Alias for exportTracks",
-                                bool(m_param_exportTracks));
+                                m_param_exportTracks);
 
   moduleParamList->addParameter(prefixed(prefix, "exportTracks"),
                                 m_param_exportTracks,
                                 "Switch for the creation of reco tracks for each cdc track.",
-                                bool(m_param_exportTracks));
+                                m_param_exportTracks);
 
   moduleParamList->addParameter(prefixed(prefix, "exportTracksInto"),
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
-                                std::string(m_param_exportTracksInto));
+                                m_param_exportTracksInto);
 
   moduleParamList->addParameter(prefixed(prefix, "useRecoTracks"),
                                 m_param_useRecoTracks,

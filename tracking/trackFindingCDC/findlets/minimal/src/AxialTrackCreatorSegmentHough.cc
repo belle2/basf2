@@ -10,10 +10,16 @@
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
 
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
+
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

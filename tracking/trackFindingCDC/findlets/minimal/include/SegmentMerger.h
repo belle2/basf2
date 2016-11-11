@@ -1,5 +1,4 @@
 /**************************************************************************
-
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
@@ -10,26 +9,27 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/filters/wireHitRelation/WholeWireHitRelationFilter.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
-#include <iterator>
-#include <cassert>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Merges segments in the same super cluster by linking paths of segments in a cellular automaton
-    template<class SegmentRelationFilter>
-    class SegmentMerger:
-      public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
+    template <class SegmentRelationFilter>
+    class SegmentMerger : public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
 
     private:
       /// Type of the base class
@@ -39,11 +39,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentMerger()
       {
-        addProcessingSignalListener(&m_segmentRelationFilter);
+        this->addProcessingSignalListener(&m_segmentRelationFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Merges segments by extraction of segment paths in a cellular automaton.";
       }
@@ -56,8 +56,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCRecoSegment2D>& outputSegments) override final
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 std::vector<CDCRecoSegment2D>& outputSegments) override final
       {
         std::vector<ConstVectorRange<CDCRecoSegment2D> > segmentsByISuperCluster =
           adjacent_groupby(inputSegments.begin(),
@@ -85,7 +85,7 @@ namespace Belle2 {
           for (const Path<const CDCRecoSegment2D>& segmentPath : m_segmentPaths) {
             outputSegments.push_back(CDCRecoSegment2D::condense(segmentPath));
           }
-        } // end super cluster loop
+        }
       }
 
     private:
@@ -100,7 +100,6 @@ namespace Belle2 {
 
       /// Wire hit neighborhood relation filter
       SegmentRelationFilter m_segmentRelationFilter;
-
     };
   }
 }

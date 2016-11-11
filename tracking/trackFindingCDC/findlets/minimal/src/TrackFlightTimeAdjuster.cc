@@ -14,6 +14,8 @@
 
 #include <framework/gearbox/Const.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
 
 using namespace Belle2;

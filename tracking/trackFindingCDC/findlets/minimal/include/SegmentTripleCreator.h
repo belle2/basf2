@@ -9,19 +9,27 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
+#include <array>
 #include <algorithm>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    template<class ASegmentTripleFilter>
+    template <class ASegmentTripleFilter>
     class SegmentTripleCreator
       : public Findlet<const CDCRecoSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple> {
 
@@ -33,11 +41,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentTripleCreator()
       {
-        addProcessingSignalListener(&m_segmentTripleFilter);
+        this->addProcessingSignalListener(&m_segmentTripleFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Creates segment triple from a set of segments  and already combined segment pairs filtered by some acceptance criterion";
       }
@@ -49,9 +57,9 @@ namespace Belle2 {
       }
 
       /// Main method constructing pairs in adjacent super layers
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         const std::vector<CDCAxialSegmentPair>& inputAxialSegmentPairs,
-                         std::vector<CDCSegmentTriple>& segmentTriples) override
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 const std::vector<CDCAxialSegmentPair>& inputAxialSegmentPairs,
+                 std::vector<CDCSegmentTriple>& segmentTriples) override final
       {
         // Group the segments by their super layer id
         for (std::vector<const CDCRecoSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
@@ -65,11 +73,11 @@ namespace Belle2 {
         }
 
         for (const CDCAxialSegmentPair& axialSegmentPair : inputAxialSegmentPairs) {
-          const CDCRecoSegment2D* startSegmentPtr = axialSegmentPair.getStartSegment();
-          const CDCRecoSegment2D* endSegmentPtr = axialSegmentPair.getEndSegment();
+          const CDCRecoSegment2D* startSegment = axialSegmentPair.getStartSegment();
+          const CDCRecoSegment2D* endSegment = axialSegmentPair.getEndSegment();
 
-          ISuperLayer startISuperLayer = startSegmentPtr->getISuperLayer();
-          ISuperLayer endISuperLayer = endSegmentPtr->getISuperLayer();
+          ISuperLayer startISuperLayer = startSegment->getISuperLayer();
+          ISuperLayer endISuperLayer = endSegment->getISuperLayer();
 
           B2ASSERT("Invalid start ISuperLayer", ISuperLayerUtil::isAxial(startISuperLayer));
           B2ASSERT("Invalid end ISuperLayer", ISuperLayerUtil::isAxial(endISuperLayer));
@@ -80,9 +88,9 @@ namespace Belle2 {
             B2ASSERT("Middle ISuperLayer is not stereo",
                      not ISuperLayerUtil::isAxial(middleISuperLayer));
 
-            const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs
-              = m_segmentsBySuperLayer[middleISuperLayer];
-            create(axialSegmentPair, middleSegmentPtrs, segmentTriples);
+            const std::vector<const CDCRecoSegment2D*>& middleSegments =
+              m_segmentsBySuperLayer[middleISuperLayer];
+            create(axialSegmentPair, middleSegments, segmentTriples);
           } else {
             // Case where start and end super layer are the same
             // Look for stereo segments in the adjacent super layer
@@ -90,37 +98,32 @@ namespace Belle2 {
             ISuperLayer middleISuperLayerOut = ISuperLayerUtil::getNextOutwards(startISuperLayer);
             for (ISuperLayer middleISuperLayer : {middleISuperLayerIn, middleISuperLayerOut}) {
               if (ISuperLayerUtil::isInCDC(middleISuperLayer)) {
-                const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs
+                const std::vector<const CDCRecoSegment2D*>& middleSegments
                   = m_segmentsBySuperLayer[middleISuperLayer];
-                create(axialSegmentPair, middleSegmentPtrs, segmentTriples);
+                create(axialSegmentPair, middleSegments, segmentTriples);
               }
             }
           }
         }
-        std::sort(std::begin(segmentTriples), std::end(segmentTriples));
+        std::sort(segmentTriples.begin(), segmentTriples.end());
       }
 
     private:
       /// Creates segment pairs from a combination of start segments and end segments.
       void create(const CDCAxialSegmentPair& axialSegmentPair,
-                  const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs,
+                  const std::vector<const CDCRecoSegment2D*>& middleSegments,
                   std::vector<CDCSegmentTriple>& segmentTriples)
       {
         CDCSegmentTriple segmentTriple(axialSegmentPair);
-        for (const CDCRecoSegment2D* middleSegmentPtr : middleSegmentPtrs) {
-          segmentTriple.setMiddleSegment(middleSegmentPtr);
+        for (const CDCRecoSegment2D* middleSegment : middleSegments) {
+          segmentTriple.setMiddleSegment(middleSegment);
           segmentTriple.clearTrajectory3D();
 
-          if (not segmentTriple.checkSegments()) {
-            B2ERROR("CDCSegmentTriple containing nullptr encountered in SegmentTripleCreator");
-            continue;
-          }
-
           // Ask the filter to assess this triple
-          CellWeight cellWeight = m_segmentTripleFilter(segmentTriple);
+          Weight weight = m_segmentTripleFilter(segmentTriple);
 
-          if (not isNotACell(cellWeight)) {
-            segmentTriple.getAutomatonCell().setCellWeight(cellWeight);
+          if (not isNotACell(weight)) {
+            segmentTriple.getAutomatonCell().setCellWeight(weight);
             segmentTriples.insert(segmentTriples.end(), segmentTriple);
           }
         }
@@ -132,7 +135,6 @@ namespace Belle2 {
 
       /// The filter to be used for the segment pair generation.
       ASegmentTripleFilter m_segmentTripleFilter;
-
     };
   }
 }

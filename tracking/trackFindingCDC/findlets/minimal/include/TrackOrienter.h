@@ -9,19 +9,21 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCTrack;
 
     /// Fixes the orientation of tracks by a simple heuristic
-    class TrackOrienter:
-      public Findlet<const CDCTrack, CDCTrack> {
+    class TrackOrienter : public Findlet<const CDCTrack, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -29,34 +31,17 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+
       /// Signals the beginning of the event processing
-      void initialize() override;
+      void initialize() override final;
 
-    public:
-      /**
-       *  Set the default output orientation of the tracks.
-       *  * EPreferredDirection::c_None does not modify the orientation from the concret algorithm.
-       *  * EPreferredDirection::c_Symmetric makes two copies of each track with forward and backward to the original orientation.
-       *  * EPreferredDirection::c_Outwards flips the orientation of the track such that they point away from the interaction point.
-       *  * EPreferredDirection::c_Downwards flips the orientation of the track such that they point downwards.
-       *  * EPreferredDirection::c_Curling makes two copies for tracks that are likely curlers, fix others to outwards
-       *  This properties can also be overridden by the user by a module parameter.
-       */
-      void setTrackOrientation(const EPreferredDirection& trackOrientation)
-      { m_trackOrientation = trackOrientation; }
-
-      /// Get the currentl default output orientation of the tracks.
-      const EPreferredDirection& getTrackOrientation() const
-      { return m_trackOrientation; }
-
-    public:
       /// Main algorithm applying the adjustment of the orientation.
-      virtual void apply(const std::vector<CDCTrack>& inputTracks,
-                         std::vector<CDCTrack>& outputTracks) override final;
+      void apply(const std::vector<CDCTrack>& inputTracks,
+                 std::vector<CDCTrack>& outputTracks) override final;
 
     private:
       /**
@@ -65,13 +50,11 @@ namespace Belle2 {
        */
       std::string m_param_trackOrientationString = "";
 
-
       /**
        *  Encoded desired track orientation.
        *  Valid orientations are "c_None" (unchanged), "c_Outwards", "c_Downwards", "c_Symmetric", "c_Curling",
        */
       EPreferredDirection m_trackOrientation = EPreferredDirection::c_None;
-
     };
   }
 }

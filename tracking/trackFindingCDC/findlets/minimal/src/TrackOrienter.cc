@@ -8,7 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -29,7 +33,7 @@ void TrackOrienter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 "'curling', "
                                 "'outwards', "
                                 "'downwards'.",
-                                std::string(m_param_trackOrientationString));
+                                m_param_trackOrientationString);
 }
 
 void TrackOrienter::initialize()
@@ -51,12 +55,14 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
   if (m_trackOrientation == EPreferredDirection::c_None) {
     // Copy the tracks unchanged.
     outputTracks = inputTracks;
+
   } else if (m_trackOrientation == EPreferredDirection::c_Symmetric) {
     outputTracks.reserve(2 * inputTracks.size());
     for (const CDCTrack& track : inputTracks) {
       outputTracks.push_back(track.reversed());
       outputTracks.push_back(track);
     }
+
   } else if (m_trackOrientation == EPreferredDirection::c_Curling) {
     // Only make a copy for tracks that are curling inside the CDC
     // Others fix to flighing outwards
@@ -87,6 +93,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
         outputTracks.push_back(track.reversed());
       }
     }
+
   } else if (m_trackOrientation == EPreferredDirection::c_Outwards) {
     outputTracks.reserve(inputTracks.size());
     for (const CDCTrack& track : inputTracks) {
@@ -98,6 +105,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
         outputTracks.push_back(track);
       }
     }
+
   } else if (m_trackOrientation == EPreferredDirection::c_Downwards) {
     outputTracks.reserve(inputTracks.size());
     for (const CDCTrack& track : inputTracks) {
@@ -109,6 +117,7 @@ void TrackOrienter::apply(const std::vector<CDCTrack>& inputTracks,
         outputTracks.push_back(track);
       }
     }
+
   } else {
     B2WARNING("Unexpected 'TrackOrientation' parameter of track finder module : '" <<
               m_param_trackOrientationString <<

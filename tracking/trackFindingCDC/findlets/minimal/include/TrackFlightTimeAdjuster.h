@@ -9,18 +9,18 @@
  **************************************************************************/
 #pragma once
 
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/geometry/Vector3D.h>
 #include <vector>
+#include <tuple>
 
 namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-
     class CDCTrack;
+
     /**
      *  Findlet to adjust the flight time of tracks relative to a trigger point.
      *
@@ -28,8 +28,7 @@ namespace Belle2 {
      *  and the time which is need to reach the trigger point with the speed of flight
      *  on the curved trajectory is set as the flight time.
      */
-    class TrackFlightTimeAdjuster:
-      public Findlet<CDCTrack&> {
+    class TrackFlightTimeAdjuster : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -37,16 +36,16 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Initialize at the start of the event processing
-      virtual void initialize() override;
+      void initialize() override final;
 
       /// Write give tracks into track store array
-      virtual void apply(std::vector<CDCTrack>& tracks) override final;
+      void apply(std::vector<CDCTrack>& tracks) override final;
 
     private:
       /// Parameter: Point relative to which the flight time should be estimated.
@@ -54,7 +53,6 @@ namespace Belle2 {
 
       /// Point relative to which the flight time should be estimated.
       Vector3D m_triggerPoint{0.0, 0.0, 0.0};
-
     };
   }
 }

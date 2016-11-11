@@ -1,5 +1,4 @@
 /**************************************************************************
-
  * BASF2 (Belle Analysis Framework 2)                                     *
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
@@ -19,17 +18,18 @@
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
-#include <iterator>
-#include <cassert>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Merges tracks in the same super cluster by linking paths of tracks in a cellular automaton
-    template<class TrackRelationFilter>
-    class TrackMerger:
-      public Findlet<const CDCTrack, CDCTrack> {
+    template <class TrackRelationFilter>
+    class TrackMerger : public Findlet<const CDCTrack, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -39,11 +39,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       TrackMerger()
       {
-        addProcessingSignalListener(&m_trackRelationFilter);
+        this->addProcessingSignalListener(&m_trackRelationFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Merges tracks by extraction of track paths in a cellular automaton.";
       }
@@ -56,8 +56,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm
-      virtual void apply(const std::vector<CDCTrack>& inputTracks,
-                         std::vector<CDCTrack>& outputTracks) override final
+      void apply(const std::vector<CDCTrack>& inputTracks,
+                 std::vector<CDCTrack>& outputTracks) override final
       {
         m_trackRelations.clear();
         WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
@@ -66,9 +66,7 @@ namespace Belle2 {
         WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
 
         m_trackPaths.clear();
-        m_cellularPathFinder.apply(inputTracks,
-                                   trackNeighborhood,
-                                   m_trackPaths);
+        m_cellularPathFinder.apply(inputTracks, trackNeighborhood, m_trackPaths);
 
         for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths) {
           outputTracks.push_back(CDCTrack::condense(trackPath));
@@ -76,6 +74,9 @@ namespace Belle2 {
       }
 
     private:
+      /// Wire hit neighborhood relation filter
+      TrackRelationFilter m_trackRelationFilter;
+
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCTrack> m_cellularPathFinder;
 
@@ -84,10 +85,6 @@ namespace Belle2 {
 
       /// Memory for the track paths generated from the graph.
       std::vector< std::vector<const CDCTrack*> > m_trackPaths;
-
-      /// Wire hit neighborhood relation filter
-      TrackRelationFilter m_trackRelationFilter;
-
     };
   }
 }

@@ -10,11 +10,14 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

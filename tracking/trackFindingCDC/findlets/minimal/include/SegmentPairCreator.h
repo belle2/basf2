@@ -9,15 +9,23 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
+#include <array>
 #include <algorithm>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
     template<class ASegmentPairFilter>
@@ -32,11 +40,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentPairCreator()
       {
-        addProcessingSignalListener(&m_segmentPairFilter);
+        this->addProcessingSignalListener(&m_segmentPairFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Creates axial stereo segment pairs from a set of segments filtered by some acceptance criterion";
       }
@@ -48,8 +56,8 @@ namespace Belle2 {
       }
 
       /// Main method constructing pairs in adjacent super layers
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCSegmentPair>& segmentPairs) override
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 std::vector<CDCSegmentPair>& segmentPairs) override final
       {
         // Group the segments by their super layer id
         for (std::vector<const CDCRecoSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer) {
@@ -66,30 +74,23 @@ namespace Belle2 {
 
         // Make pairs of closeby superlayers
         for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer) {
-
           const std::vector<const CDCRecoSegment2D*>& startSegments = m_segmentsBySuperLayer[iSuperLayer];
 
           // Make pairs of this superlayer and the superlayer more to the inside
-          {
-            ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
-            if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
-              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerIn];
-              create(startSegments, endSegments, segmentPairs);
-            }
+          ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
+          if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
+            const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerIn];
+            create(startSegments, endSegments, segmentPairs);
           }
 
           // Make pairs of this superlayer and the superlayer more to the outside
-          {
-            ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
-            if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
-              const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerOut];
-              create(startSegments, endSegments, segmentPairs);
-            }
+          ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
+          if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
+            const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerOut];
+            create(startSegments, endSegments, segmentPairs);
           }
-
-        } // end for iSuperLayer
-
-        std::sort(std::begin(segmentPairs), std::end(segmentPairs));
+        }
+        std::sort(segmentPairs.begin(), segmentPairs.end());
       }
 
     private:
@@ -131,7 +132,6 @@ namespace Belle2 {
 
       /// The filter to be used for the segment pair generation.
       ASegmentPairFilter m_segmentPairFilter;
-
     };
   }
 }

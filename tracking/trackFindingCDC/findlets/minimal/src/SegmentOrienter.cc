@@ -8,7 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -30,7 +35,7 @@ void SegmentOrienter::exposeParameters(ModuleParamList* moduleParamList, const s
                                 "'curling', "
                                 "'outwards', "
                                 "'downwards'.",
-                                std::string(m_param_segmentOrientationString));
+                                m_param_segmentOrientationString);
 }
 
 void SegmentOrienter::initialize()
@@ -63,12 +68,14 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
   if (m_segmentOrientation == EPreferredDirection::c_None) {
     // Copy the segments unchanged.
     outputSegments = inputSegments;
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Symmetric) {
     outputSegments.reserve(2 * inputSegments.size());
     for (const CDCRecoSegment2D& segment : inputSegments) {
       outputSegments.push_back(segment);
       outputSegments.push_back(segment.reversed());
     }
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Curling) {
     // Only make a copy for segments that are curling inside the CDC
     // Others fix to flighing outwards
@@ -95,6 +102,7 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
         outputSegments.push_back(segment.reversed());
       }
     }
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Outwards) {
     outputSegments.reserve(inputSegments.size());
     for (const CDCRecoSegment2D& segment : inputSegments) {
@@ -117,6 +125,7 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
         outputSegments.push_back(segment);
       }
     }
+
   } else {
     B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" <<
               m_param_segmentOrientationString <<

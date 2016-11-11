@@ -9,20 +9,23 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <vector>
 #include <algorithm>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    template<class AAxialSegmentPairFilter>
-    class AxialSegmentPairCreator
-      : public Findlet<const CDCRecoSegment2D, CDCAxialSegmentPair> {
+    template <class AAxialSegmentPairFilter>
+    class AxialSegmentPairCreator : public Findlet<const CDCRecoSegment2D, CDCAxialSegmentPair> {
 
     private:
       /// Type of the base class
@@ -32,11 +35,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       AxialSegmentPairCreator()
       {
-        addProcessingSignalListener(&m_axialSegmentPairFilter);
+        this->addProcessingSignalListener(&m_axialSegmentPairFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Creates axial axial segment pairs from a set of segments filtered by some acceptance criterion";
       }
@@ -48,8 +51,8 @@ namespace Belle2 {
       }
 
       /// Main method constructing pairs in adjacent super layers
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCAxialSegmentPair>& axialSegmentPairs) override
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 std::vector<CDCAxialSegmentPair>& axialSegmentPairs) override final
       {
         // Group the segments by their super layer id
         for (std::vector<const CDCRecoSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
@@ -90,7 +93,7 @@ namespace Belle2 {
 
         } // end for iSuperLayer
 
-        std::sort(std::begin(axialSegmentPairs), std::end(axialSegmentPairs));
+        std::sort(axialSegmentPairs.begin(), axialSegmentPairs.end());
       }
 
     private:
@@ -123,7 +126,6 @@ namespace Belle2 {
 
       /// The filter to be used for the segment pair generation.
       AAxialSegmentPairFilter m_axialSegmentPairFilter;
-
     };
   }
 }

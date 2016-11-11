@@ -9,23 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
-#include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
-#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+    class CDCTrack;
 
     /// Generates axial tracks from segments using the hough algorithm
-    class AxialTrackCreatorSegmentHough:
-      public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class AxialTrackCreatorSegmentHough : public Findlet<const CDCRecoSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -33,19 +32,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Initialize the findlet before event processing
-      virtual void initialize() override;
+      void initialize() override final;
 
       /// Generates the tracks from the given segments into the output argument.
-      virtual void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) override final;
+      void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) override final;
 
       /// Cleanup the findlet after event processing
-      virtual void terminate() override;
+      void terminate() override final;
 
     private:
       /// Parameter: Absolute minimal number of hits to make an axial track.
@@ -92,13 +91,13 @@ namespace Belle2 {
 
     private:
       /// Type of the hough space tree search
-      using SimpleSegmentPhi0ImpactCurvHoughTree =
-        SimpleSegmentHoughTree<InPhi0ImpactCurvBox, c_phi0Divisions, c_impactDivisions, c_curvDivisions>;
+      using SimpleSegmentPhi0ImpactCurvHoughTree = SimpleSegmentHoughTree<InPhi0ImpactCurvBox,
+            c_phi0Divisions,
+            c_impactDivisions,
+            c_curvDivisions>;
 
       /// The hough space tree search
       SimpleSegmentPhi0ImpactCurvHoughTree m_houghTree{m_param_maxLevel};
     };
-
   }
-
 }

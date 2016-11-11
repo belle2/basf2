@@ -8,15 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
+#include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
 #include <vector>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
 
     /// Fixes the orientation of segments by a simple heuristic
     class SegmentOrienter:
@@ -28,13 +30,13 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
       /// Add the parameters of the filter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Signals the beginning of the event processing
-      void initialize() override;
+      void initialize() override final;
 
     public:
       /**
@@ -54,8 +56,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the adjustment of the orientation.
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCRecoSegment2D>& outputSegments) override final;
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 std::vector<CDCRecoSegment2D>& outputSegments) override final;
 
     private:
       /**
@@ -69,7 +71,6 @@ namespace Belle2 {
        *  Valid orientations are "c_None" (unchanged), "c_Outwards", "c_Downwards", "c_Symmetric", "c_Curling",
        */
       EPreferredDirection m_segmentOrientation = EPreferredDirection::c_None;
-
     };
   }
 }

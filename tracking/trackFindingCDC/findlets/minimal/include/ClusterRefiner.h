@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
@@ -17,23 +19,19 @@
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <framework/logging/Logger.h>
+#include <framework/core/ModuleParamList.h>
 
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
-#include <iterator>
 #include <algorithm>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Refines the clustering of wire hits from super clusters to clustexrs
-    template<class AWireHitRelationFilter = BridgingWireHitRelationFilter>
-    class ClusterRefiner:
-      public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
+    template <class AWireHitRelationFilter = BridgingWireHitRelationFilter>
+    class ClusterRefiner : public Findlet<const CDCWireHitCluster, CDCWireHitCluster> {
 
     private:
       /// Type of the base class
@@ -43,11 +41,11 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       ClusterRefiner()
       {
-        addProcessingSignalListener(&m_wireHitRelationFilter);
+        this->addProcessingSignalListener(&m_wireHitRelationFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Breaks bigger wire hit super cluster into smaller wire hit clusters";
       }
@@ -60,8 +58,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
-                         std::vector<CDCWireHitCluster>& outputClusters) override final
+      void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
+                 std::vector<CDCWireHitCluster>& outputClusters) override final
       {
         for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
@@ -95,8 +93,6 @@ namespace Belle2 {
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;
-
     };
-
   }
 }

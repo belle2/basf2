@@ -13,12 +13,17 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <framework/core/ModuleParamList.h>
+
 #include <TRandom.h>
 
 using namespace Belle2;

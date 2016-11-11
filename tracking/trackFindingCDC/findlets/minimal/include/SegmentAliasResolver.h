@@ -9,27 +9,23 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
-
-#include <tracking/trackFindingCDC/fitting/EFitPos.h>
-#include <tracking/trackFindingCDC/fitting/EFitVariance.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
-
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
 
     /// Resolves between the potential alias versions of the segments and contained hits
-    class SegmentAliasResolver:
-      public Findlet<CDCRecoSegment2D&> {
+    class SegmentAliasResolver : public Findlet<CDCRecoSegment2D&> {
 
     private:
       /// Type of the base class
@@ -37,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription();
+      std::string getDescription();
 
       /// Add the parameters of the fitter to the module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
@@ -47,15 +43,16 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the fit to each segment
-      virtual void apply(std::vector<CDCRecoSegment2D>& outputSegments);
+      void apply(std::vector<CDCRecoSegment2D>& outputSegments);
 
+    private:
       /// Fit the alias segment
       void refit(CDCRecoSegment2D& segment, bool reestimate);
 
-    private:
       /// Parameter : Which alias resolutions should be applied
       std::vector<std::string> m_param_investigate = {"full", "borders", /*"middle"*/};
 
+    private:
       /// Switch whether the complete segment should be aliased.
       bool m_fullAlias = false; // Activated by the parameter
 
@@ -76,7 +73,6 @@ namespace Belle2 {
 
       /// Instance of the drift length estimator to be used.
       DriftLengthEstimator m_driftLengthEstimator;
-
     };
   }
 }

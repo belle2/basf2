@@ -10,11 +10,12 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
-#include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -175,8 +176,8 @@ void SegmentAliasResolver::refit(CDCRecoSegment2D& segment, bool reestimate)
     }
   }
 
-  EFitPos fitPos = EFitPos::c_RecoPos;
-  EFitVariance fitVariance = EFitVariance::c_Proper;
+  const EFitPos fitPos = EFitPos::c_RecoPos;
+  const EFitVariance fitVariance = EFitVariance::c_Proper;
   CDCObservations2D observations2D(fitPos, fitVariance);
   observations2D.appendRange(segment);
   if (observations2D.size() < 4) {

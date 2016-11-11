@@ -10,22 +10,18 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-
     class CDCTrack;
 
-    /**
-     *  Exports tracks has genfit track candidates
-     *  Sets the related genfit track candidates in each exported track
-     */
-
-    class TrackExporter:
-      public Findlet<CDCTrack&> {
+    /// Findlet to exports CDCTracks as RecoTracks
+    class TrackExporter : public Findlet<CDCTrack&> {
 
     private:
       /// Type of the base class
@@ -33,19 +29,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override final;
 
       /** Add the parameters of the filter to the module */
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
       /// Signal initialisation phase to register store array for export
-      virtual void initialize() override;
+      void initialize() override final;
 
       /// Signal new event recreate the store array
-      virtual void beginEvent() override;
+      void beginEvent() override final;
 
       /// Write give tracks into track store array
-      virtual void apply(std::vector<CDCTrack>& tracks) override final;
+      void apply(std::vector<CDCTrack>& tracks) override final;
 
     private:
       /// Parameter: Switch if genfit::TrackCandidates shall be generated for each track.
@@ -56,7 +52,6 @@ namespace Belle2 {
 
       /// Flag to use reco tracks instead of genfit tracks
       bool m_param_useRecoTracks = true;
-
     };
   }
 }

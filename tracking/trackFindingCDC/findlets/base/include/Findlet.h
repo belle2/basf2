@@ -11,14 +11,15 @@
 
 #include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <boost/range/adaptor/reversed.hpp>
 
 #include <vector>
 #include <tuple>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module

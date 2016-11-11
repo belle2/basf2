@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+
 #include <tracking/trackFindingCDC/filters/wireHitRelation/SecondaryWireHitRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
@@ -17,12 +19,7 @@
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
-#include <framework/logging/Logger.h>
-
 #include <boost/range/adaptor/transformed.hpp>
-#include <memory>
 #include <vector>
 
 namespace Belle2 {
@@ -40,19 +37,19 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       ClusterCreator()
       {
-        addProcessingSignalListener(&m_wireHitRelationFilter);
+        this->addProcessingSignalListener(&m_wireHitRelationFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Groups the wire hits into super by expanding the given wire hit relation";
       }
 
     public:
       /// Main algorithm applying the cluster refinement
-      virtual void apply(std::vector<CDCWireHit>& inputWireHits,
-                         std::vector<CDCWireHitCluster>& outputClusters) override final
+      void apply(std::vector<CDCWireHit>& inputWireHits,
+                 std::vector<CDCWireHitCluster>& outputClusters) override final
       {
         // create the neighborhood
         m_wireHitRelations.clear();
@@ -77,7 +74,6 @@ namespace Belle2 {
 
       /// Wire hit neighborhood relation filter
       AWireHitRelationFilter m_wireHitRelationFilter;
-
     };
   }
 }

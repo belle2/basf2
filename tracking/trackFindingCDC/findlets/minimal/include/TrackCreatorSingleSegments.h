@@ -9,17 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
-#include <vector>
 #include <map>
+#include <vector>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+    class CDCTrack;
 
     /**
      *  Searches for segments that have not been used at all and creates tracks from them.
@@ -27,8 +30,7 @@ namespace Belle2 {
      *  This number can be set differently for each super layer
      *  Usually only the segments of the inner most super layer might be interesting to be treated as tracks
      */
-    class TrackCreatorSingleSegments:
-      public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class TrackCreatorSingleSegments : public Findlet<const CDCRecoSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -36,61 +38,15 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Creates a track for each segments that is yet unused by any of the given tracks.";
-      }
+      std::string getDescription() override final;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
-        moduleParamList->addParameter(prefixed(prefix, "MinimalHitsForSingleSegmentTrackBySuperLayerId"),
-                                      m_param_minimalHitsForSingleSegmentTrackBySuperLayerId,
-                                      "Map of super layer ids to minimum hit number, "
-                                      "for which left over segments shall be forwarded as tracks, "
-                                      "if the exceed the minimal hit requirement. Default empty.",
-                                      m_param_minimalHitsForSingleSegmentTrackBySuperLayerId);
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
     public:
       /// Main algorithm
-      virtual void apply(const std::vector<CDCRecoSegment2D>& segments,
-                         std::vector<CDCTrack>& tracks) override final
-      {
-        // Create tracks from left over segments
-        // First figure out which segments do not share any hits with any of the given tracks
-        // (if the tracks vector is empty this is the case for all segments)
-        for (const CDCRecoSegment2D& segment : segments) {
-          segment.unsetAndForwardMaskedFlag();
-        }
-
-        for (const CDCTrack& track : tracks) {
-          track.unsetAndForwardMaskedFlag();
-        }
-
-        for (const CDCRecoSegment2D& segment : segments) {
-          segment.receiveMaskedFlag();
-        }
-
-        if (not m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
-          for (const CDCRecoSegment2D& segment : segments) {
-            if (segment.getAutomatonCell().hasMaskedFlag()) continue;
-
-            ISuperLayer iSuperLayer = segment.getISuperLayer();
-            if (m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.count(iSuperLayer) and
-                segment.size() >= m_param_minimalHitsForSingleSegmentTrackBySuperLayerId[iSuperLayer]) {
-
-              if (segment.getTrajectory2D().isFitted()) {
-                tracks.push_back(CDCTrack(segment));
-                segment.setAndForwardMaskedFlag();
-                for (const CDCRecoSegment2D& otherSegment : segments) {
-                  otherSegment.receiveMaskedFlag();
-                }
-              }
-            }
-          }
-        }
-      }
+      void apply(const std::vector<CDCRecoSegment2D>& segments,
+                 std::vector<CDCTrack>& tracks) override final;
 
     private:
       /**
@@ -100,7 +56,6 @@ namespace Belle2 {
        *  Default empty.
        */
       std::map<ISuperLayer, size_t> m_param_minimalHitsForSingleSegmentTrackBySuperLayerId{};
-
     };
   }
 }

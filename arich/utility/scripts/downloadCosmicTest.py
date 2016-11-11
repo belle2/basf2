@@ -3,17 +3,21 @@
 
 import os
 
-com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich.git HEAD database/cosmicTest_payloads | tar -x"
+com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich_database.git HEAD cosmicTest_payloads | tar -x"
 os.system(com)
 
-com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich.git HEAD datafiles/cosmicTest | tar -x"
+com = "git archive --remote=ssh://${BELLE2_USER}@stash.desy.de:7999/b2g/arich_datafiles.git HEAD cosmicTest | tar -x"
 os.system(com)
 
-com = "gunzip -r datafiles/cosmicTest"
+com = "gunzip -r cosmicTest"
 os.system(com)
 
-com = "mv datafiles ${BELLE2_LOCAL_DIR}"
+com = "mkdir ${BELLE2_LOCAL_DIR}/datafiles"
+os.system(com)
+com = "mv cosmicTest ${BELLE2_LOCAL_DIR}/datafiles/"
 os.system(com)
 
-com = "mv database ${BELLE2_LOCAL_DIR}/arich/"
+com = "mkdir ${BELLE2_LOCAL_DIR}/arich/database"
+os.system(com)
+com = "mv cosmicTest_payloads ${BELLE2_LOCAL_DIR}/arich/database/"
 os.system(com)

@@ -23,9 +23,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Legacy : Findlet implementing the creation and filling of the CDCWireHitTopology
-    class WireHitTopologyPreparer :
-      public Findlet<CDCWireHit> {
+    class CDCWireHit;
+
+    /// Findlet preparing the wire hits for the track finding
+    class WireHitTopologyPreparer : public Findlet<CDCWireHit> {
 
     private:
       /// Type of the base class
@@ -33,39 +34,16 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      WireHitTopologyPreparer()
-      {
-        addProcessingSignalListener(&m_wireHitCreator);
-        addProcessingSignalListener(&m_wireHitBackgroundBlocker);
-        addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
-        addProcessingSignalListener(&m_wireHitTopologyFiller);
-      }
+      WireHitTopologyPreparer();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Combine the CDCHits from the DataStore with the geometry information to have them both at hand in the CDC tracking modules. "
-               "Also set all CDCWireHits as unused.";
-      }
+      std::string getDescription() override final;
 
-      /// Expose the parameters of the wire hit preparation
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override
-      {
-        m_wireHitCreator.exposeParameters(moduleParamList, prefix);
-        m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
-        m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
-        m_wireHitTopologyFiller.exposeParameters(moduleParamList, prefix);
-      }
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
-      /// Generates the segment.
-      virtual void apply(std::vector<CDCWireHit>& outputWireHits) override final
-      {
-        m_wireHitCreator.apply(outputWireHits);
-        m_wireHitBackgroundBlocker.apply(outputWireHits);
-        m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
-        m_wireHitTopologyFiller.apply(outputWireHits);
-      }
+      /// Main function preparing the wire hits
+      void apply(std::vector<CDCWireHit>& outputWireHits) override final;
 
     private:
       // Findlets
@@ -80,8 +58,6 @@ namespace Belle2 {
 
       /// Publishes the created wire hits to the wire hit topology.
       WireHitTopologyFiller m_wireHitTopologyFiller;
-
     };
-
   }
 }

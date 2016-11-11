@@ -14,7 +14,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Complete findlet implementing track finding with the cellular automaton in two stages.
+    /// Complete findlet implementing track finding with the cellular automaton in two stages - version suitable for cosmics
     class TrackFinderCosmics : public TrackFinderAutomaton {
 
     private:
@@ -26,8 +26,7 @@ namespace Belle2 {
       TrackFinderCosmics();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override;
-
+      std::string getDescription() override final;
     };
   }
 }

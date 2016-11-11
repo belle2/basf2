@@ -12,7 +12,9 @@
 #include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
 
 #include <framework/core/ModuleParamList.h>
+
 #include <boost/range/adaptor/reversed.hpp>
+
 #include <vector>
 #include <tuple>
 
@@ -77,7 +79,9 @@ namespace Belle2 {
 
       /// Register a processing signal listener that is contained in this findlet.
       void addProcessingSignalListener(ProcessingSignalListener* psl)
-      { m_subordinaryProcessingSignalListeners.push_back(psl); }
+      {
+        m_subordinaryProcessingSignalListeners.push_back(psl);
+      }
 
       /// Receive signal before the start of the event processing
       virtual void initialize() override

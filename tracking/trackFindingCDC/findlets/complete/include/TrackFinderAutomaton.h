@@ -33,8 +33,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Complete findlet implementing track finding with the cellular automaton in two stages.
-    class TrackFinderAutomaton
-      : public Findlet<> {
+    class TrackFinderAutomaton : public Findlet<> {
 
     private:
       /// Type of the base class
@@ -45,14 +44,16 @@ namespace Belle2 {
       TrackFinderAutomaton();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override;
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
 
-      /// Generates the segment.
-      virtual void apply() override final;
+      /// Signal the beginning of a new event
+      void beginEvent() override final;
+
+      /// Execute the findlet
+      void apply() override final;
 
     private:
       // Findlets
@@ -65,7 +66,7 @@ namespace Belle2 {
                                   ChooseableFacetRelationFilter,
                                   ChooseableSegmentRelationFilter> m_segmentFinderFacetAutomaton;
 
-      /// First stage cellular automaton track finder from segments
+      /// Second stage cellular automaton track finder from segments
       TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
                                       ChooseableSegmentPairRelationFilter,
                                       ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
@@ -73,7 +74,7 @@ namespace Belle2 {
       /// Adjusts the flight time of the tracks to a setable trigger point
       TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;
 
-      /// Exports the generated CDCTracks as track candidates to be fitted by Genfit.
+      /// Exports the generated CDCTracks as RecoTracks.
       TrackExporter m_trackExporter;
 
       /// Puts the internal segments on the DataStore
@@ -85,7 +86,15 @@ namespace Belle2 {
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
 
-    };
+      // Object pools
+      /// Memory for the wire hits
+      std::vector<CDCWireHit> m_wireHits;
 
+      /// Memory for the segments
+      std::vector<CDCRecoSegment2D> m_segments;
+
+      /// Memory for the tracks
+      std::vector<CDCTrack> m_tracks;
+    };
   }
 }

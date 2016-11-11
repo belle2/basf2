@@ -34,12 +34,11 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Legacy : Findlet implementing the segment finding part of the full track finder
-    template<class AClusterFilter,
-             class AFacetFilter,
-             class AFacetRelationFilter,
-             class ASegmentRelationFilter>
-    class SegmentFinderFacetAutomaton :
-      public Findlet<CDCWireHit&, CDCRecoSegment2D> {
+    template <class AClusterFilter,
+              class AFacetFilter,
+              class AFacetRelationFilter,
+              class ASegmentRelationFilter>
+    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHit&, CDCRecoSegment2D> {
 
     private:
       /// Type of the base class
@@ -49,32 +48,39 @@ namespace Belle2 {
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
       SegmentFinderFacetAutomaton()
       {
-        addProcessingSignalListener(&m_superClusterCreator);
-        addProcessingSignalListener(&m_clusterRefiner);
-        addProcessingSignalListener(&m_clusterBackgroundDetector);
-        addProcessingSignalListener(&m_facetCreator);
-        addProcessingSignalListener(&m_facetRelationCreator);
-        addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
-        addProcessingSignalListener(&m_segmentMerger);
+        this->addProcessingSignalListener(&m_superClusterCreator);
+        this->addProcessingSignalListener(&m_clusterRefiner);
+        this->addProcessingSignalListener(&m_clusterBackgroundDetector);
+        this->addProcessingSignalListener(&m_facetCreator);
+        this->addProcessingSignalListener(&m_facetRelationCreator);
+        this->addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
+        this->addProcessingSignalListener(&m_segmentMerger);
 
-        addProcessingSignalListener(&m_segmentFitter);
-        addProcessingSignalListener(&m_segmentAliasResolver);
-        addProcessingSignalListener(&m_segmentOrienter);
-        addProcessingSignalListener(&m_segmentExporter);
+        this->addProcessingSignalListener(&m_segmentFitter);
+        this->addProcessingSignalListener(&m_segmentAliasResolver);
+        this->addProcessingSignalListener(&m_segmentOrienter);
+        this->addProcessingSignalListener(&m_segmentExporter);
 
-        addProcessingSignalListener(&m_superClusterSwapper);
-        addProcessingSignalListener(&m_clusterSwapper);
-        addProcessingSignalListener(&m_facetSwapper);
+        this->addProcessingSignalListener(&m_superClusterSwapper);
+        this->addProcessingSignalListener(&m_clusterSwapper);
+        this->addProcessingSignalListener(&m_facetSwapper);
+
+        m_superClusters.reserve(150);
+        m_clusters.reserve(200);
+        m_facets.reserve(1000);
+        m_facetRelations.reserve(1000);
+        m_segments.reserve(200);
+        m_intermediateSegments.reserve(200);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
         return "Generates segments from hits using a cellular automaton build from hit triples (facets).";
       }
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         m_superClusterCreator.exposeParameters(moduleParamList, prefix);
         m_clusterRefiner.exposeParameters(moduleParamList, prefix);
@@ -83,7 +89,6 @@ namespace Belle2 {
         m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
         m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
         m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
-        // FIXME : make parameter names small
 
         m_segmentFitter.exposeParameters(moduleParamList, prefix);
         m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
@@ -95,8 +100,8 @@ namespace Belle2 {
         m_facetSwapper.exposeParameters(moduleParamList, prefix);
       }
 
-      /// Processes the current event
-      void beginEvent() override
+      /// Signal the beginning of a new event
+      void beginEvent() override final
       {
         m_superClusters.clear();
         m_clusters.clear();
@@ -107,17 +112,11 @@ namespace Belle2 {
         Super::beginEvent();
       }
 
-      /// Generates the segment.
-      virtual void apply(std::vector<CDCWireHit>& inputWireHits,
-                         std::vector<CDCRecoSegment2D>& outputSegments) override final
+      /// Generates the segment from wire hits
+      void apply(std::vector<CDCWireHit>& inputWireHits,
+                 std::vector<CDCRecoSegment2D>& outputSegments) override final
       {
-        m_superClusters.reserve(100);
-        m_clusters.reserve(200);
-        m_facets.reserve(800);
-        m_facetRelations.reserve(800);
-        m_segments.reserve(200);
-        m_intermediateSegments.reserve(200);
-        outputSegments.reserve(outputSegments.size() + 200);
+        outputSegments.reserve(200);
 
         m_superClusterCreator.apply(inputWireHits, m_superClusters);
         m_clusterRefiner.apply(m_superClusters, m_clusters);
@@ -139,8 +138,10 @@ namespace Belle2 {
 
         // Move superclusters to the DataStore
         m_superClusterSwapper.apply(m_superClusters);
+
         // Move clusters to the DataStore
         m_clusterSwapper.apply(m_clusters);
+
         // Move facets to the DataStore
         m_facetSwapper.apply(m_facets);
       }
@@ -160,8 +161,7 @@ namespace Belle2 {
       FacetCreator<AFacetFilter> m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
-      WeightedRelationCreator<const CDCFacet,
-                              AFacetRelationFilter> m_facetRelationCreator;
+      WeightedRelationCreator<const CDCFacet, AFacetRelationFilter> m_facetRelationCreator;
 
       /// Find the segments by composition of facets path from a cellular automaton
       SegmentCreatorFacetAutomaton m_segmentCreatorFacetAutomaton;
@@ -212,8 +212,6 @@ namespace Belle2 {
 
       /// Memory for the reconstructed segments
       std::vector<CDCRecoSegment2D> m_intermediateSegments;
-
     };
-
   }
 }

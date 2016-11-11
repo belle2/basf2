@@ -29,39 +29,44 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet implementing the track finding from segments using a cellular automaton over segment triples
-    template < class AAxialSegmentPairFilter,
-               class ASegmentTripleFilter,
-               class ASegmentTripleRelationFilter,
-               class ATrackRelationFilter>
-    class TrackFinderSegmentTripleAutomaton
-      : public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    template <class AAxialSegmentPairFilter,
+              class ASegmentTripleFilter,
+              class ASegmentTripleRelationFilter,
+              class ATrackRelationFilter>
+    class TrackFinderSegmentTripleAutomaton : public Findlet<const CDCRecoSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
       using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
 
     public:
-      /// Default constructor initialising the filters with the default settings
+      /// Constructor registering the subordinary findlets to the processing signal distribution machinery
       TrackFinderSegmentTripleAutomaton()
       {
-        addProcessingSignalListener(&m_axialSegmentPairCreator);
-        addProcessingSignalListener(&m_segmentTripleCreator);
-        addProcessingSignalListener(&m_segmentTripleRelationCreator);
-        addProcessingSignalListener(&m_trackCreatorSegmentTripleAutomaton);
-        addProcessingSignalListener(&m_trackCreatorSingleSegments);
-        addProcessingSignalListener(&m_trackMerger);
-        addProcessingSignalListener(&m_trackOrienter);
-        addProcessingSignalListener(&m_segmentTripleSwapper);
+        this->addProcessingSignalListener(&m_axialSegmentPairCreator);
+        this->addProcessingSignalListener(&m_segmentTripleCreator);
+        this->addProcessingSignalListener(&m_segmentTripleRelationCreator);
+        this->addProcessingSignalListener(&m_trackCreatorSegmentTripleAutomaton);
+        this->addProcessingSignalListener(&m_trackCreatorSingleSegments);
+        this->addProcessingSignalListener(&m_trackMerger);
+        this->addProcessingSignalListener(&m_trackOrienter);
+        this->addProcessingSignalListener(&m_segmentTripleSwapper);
+
+        m_axialSegmentPairs.reserve(75);
+        m_segmentTriples.reserve(100);
+        m_segmentTripleRelations.reserve(100);
+        m_preMergeTracks.reserve(20);
+        m_orientedTracks.reserve(20);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
-        return "Generates tracks from segments using a cellular automaton build from segment triples.";
+        return "Generates tracks from segments using a cellular automaton built from segment triples.";
       }
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
         m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
@@ -73,8 +78,8 @@ namespace Belle2 {
         m_segmentTripleSwapper.exposeParameters(moduleParamList, prefix);
       }
 
-      ///  Initialize the Findlet before event processing
-      virtual void beginEvent() override
+      /// Signal the beginning of a new event
+      void beginEvent() override final
       {
         m_axialSegmentPairs.clear();
         m_segmentTriples.clear();
@@ -84,9 +89,9 @@ namespace Belle2 {
         Super::beginEvent();
       }
 
-      /// Generates the tracks from the given segments into the output argument.
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         std::vector<CDCTrack>& tracks) override final
+      /// Generates the tracks.
+      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+                 std::vector<CDCTrack>& tracks) override final
       {
         m_axialSegmentPairCreator.apply(inputSegments, m_axialSegmentPairs);
         m_segmentTripleCreator.apply(inputSegments, m_axialSegmentPairs, m_segmentTriples);
@@ -110,8 +115,7 @@ namespace Belle2 {
       SegmentTripleCreator<ASegmentTripleFilter> m_segmentTripleCreator;
 
       /// Instance of the segment triple relation creator
-      WeightedRelationCreator<const CDCSegmentTriple,
-                              ASegmentTripleRelationFilter> m_segmentTripleRelationCreator;
+      WeightedRelationCreator<const CDCSegmentTriple, ASegmentTripleRelationFilter> m_segmentTripleRelationCreator;
 
       /// Instance of the cellular automaton creating  creating tracks over segment triple
       TrackCreatorSegmentTripleAutomaton m_trackCreatorSegmentTripleAutomaton;

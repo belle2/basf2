@@ -111,8 +111,15 @@ namespace {
     else if (type == CURLINFO_HEADER_IN) prefix += "<";
     else return 0;
     std::string message(data, size);
-    B2DEBUG(level, prefix << " " <<  message);
+    boost::trim(message);
+    if (!message.empty()) B2DEBUG(level, prefix << " " <<  message);
     return 0;
+  }
+
+  /** Join two strings and make sure that there is exactly one '/' between them */
+  std::string urljoin(const std::string& base, const std::string& rest)
+  {
+    return boost::trim_right_copy_if(base, boost::is_any_of("/")) + "/" + boost::trim_left_copy_if(rest, boost::is_any_of("/"));
   }
 
   /** Simple class to make sure that the curl session is closed correctly.
@@ -146,6 +153,12 @@ namespace {
 namespace Belle2 {
   /* We only want to initialize curl once */
   bool ConditionsPayloadDownloader::s_globalInit{false};
+
+  /* add directory but make sure it's absolute */
+  void ConditionsPayloadDownloader::addLocalDirectory(const std::string& directory, EDirectoryStructure structure)
+  {
+    m_localDirectories.emplace_back(fs::absolute(fs::path(directory)).string(), structure);
+  }
 
   bool ConditionsPayloadDownloader::startSession()
   {
@@ -194,8 +207,8 @@ namespace Belle2 {
     }
     std::string escapedTagStr = std::string(escapedTag);
     curl_free(escapedTag);
-    const std::string url = m_restURL + "v2/iovPayloads/?gtName=" + escapedTagStr + "&expNumber=" +
-                            std::to_string(experiment) + "&runNumber=" + std::to_string(run);
+    const std::string url = urljoin(m_restUrl, "v2/iovPayloads/?gtName=" + escapedTagStr + "&expNumber=" +
+                                    std::to_string(experiment) + "&runNumber=" + std::to_string(run));
     // and perform the request
     std::stringstream payloads;
     if (!download(url, payloads)) {
@@ -206,8 +219,8 @@ namespace Belle2 {
       if (it != m_mapping.left.end()) {
         experiment_str = it->second;
       }
-      const std::string url = m_restURL + "v1/iovPayloads/?gtName=" + escapedTagStr + "&expName=" +
-                              experiment_str + "&runName=" + std::to_string(run);
+      const std::string url = urljoin(m_restUrl, "v1/iovPayloads/?gtName=" + escapedTagStr + "&expName=" +
+                                      experiment_str + "&runName=" + std::to_string(run));
 
       if (!download(url, payloads)) {
         B2WARNING("Could not get list of payloads with legacy api either, giving up");
@@ -232,12 +245,13 @@ namespace Belle2 {
         B2DEBUG(100, "Parsing payload with id " << payload.get("payloadId", ""));
         std::string name = payload.get<std::string>("basf2Module.name");
         payloadInfo.digest = payload.get<std::string>("checksum");
-        payloadInfo.url = m_baseURL + payload.get<std::string>("payloadUrl");
+        payloadInfo.payloadUrl = payload.get<std::string>("payloadUrl");
         payloadInfo.revision = payload.get<int>("revision", 0);
 
         // check which reply version we got and proceed accordingly
         if (!use_legacy_v1) {
           // new api
+          payloadInfo.baseUrl = payload.get<std::string>("baseUrl");
           int firstExp = payloadIov.get<int>("expStart");
           int firstRun = payloadIov.get<int>("runStart");
           int finalExp = payloadIov.get<int>("expEnd");
@@ -254,7 +268,7 @@ namespace Belle2 {
               B2FATAL("Invalid experiment number: '" << exp << "'. Please define the experiment name using 'set_experiment_name'");
             }
           };
-
+          payloadInfo.baseUrl = "http://belle2db.hep.pnnl.gov/";
           int firstExp = getExpNumber(payloadIov.get<std::string>("initialRunId.experiment.name"));
           int firstRun =  payloadIov.get<int>("initialRunId.name");
           int finalExp = getExpNumber(payloadIov.get<std::string>("finalRunId.experiment.name"));
@@ -263,8 +277,8 @@ namespace Belle2 {
         }
 
         // make sure we have all fields filled
-        if (name.empty() || payloadInfo.url.empty() || payloadInfo.digest.empty()) {
-          B2WARNING("ConditionsService::parse_payload Payload not parsed correctly: empty name, filename or checksum");
+        if (name.empty() || payloadInfo.payloadUrl.empty() || payloadInfo.digest.empty() || payloadInfo.baseUrl.empty()) {
+          B2WARNING("ConditionsDB Payload not parsed correctly: empty name, url or checksum");
         } else {
           // and update or replace the payloadinfo in the map
           auto payloadIter = m_payloads.find(name);
@@ -278,8 +292,8 @@ namespace Belle2 {
                     "Discarding revision " << drop << " and using revision " << keep);
             duplicates.insert(name);
           } else {
-            B2DEBUG(100, "Found payload '" << name << "' at URL " << payloadInfo.url << " and checksum: " << payloadInfo.digest << ". iov: " <<
-                    payloadInfo.iov);
+            B2DEBUG(100, "Found payload '" << name << "' at " << payloadInfo.payloadUrl << " and checksum "
+                    << payloadInfo.digest << ". iov: " << payloadInfo.iov);
             m_payloads[name] = payloadInfo;
           }
         }
@@ -351,45 +365,83 @@ namespace Belle2 {
     return md5.AsString();
   }
 
+  std::string ConditionsPayloadDownloader::getLocalName(const std::string& dir, EDirectoryStructure structure,
+                                                        const PayloadInfo& payload)
+  {
+    fs::path path(dir);
+    switch (structure) {
+      case c_logicalSubdirectories:
+        path /= fs::path(payload.payloadUrl);
+        break;
+      case c_digestSubdirectories:
+        path /= payload.digest.substr(0, 1);
+        path /= payload.digest.substr(1, 2);
+      // intentional fall through to get flat name in addition ...
+      case c_flatDirectory:
+        path /= fs::path(payload.payloadUrl).filename();
+        break;
+    };
+    return path.lexically_normal().string();
+  }
+
   std::string ConditionsPayloadDownloader::getPayload(const PayloadInfo& payload)
   {
-    const std::string local_file = (fs::path(m_outputDir) / fs::path(payload.url).filename()).string();
-    if (fs::exists(local_file)) {
-      Belle2::FileSystem::Lock readlock(local_file, true);
-      B2DEBUG(200, "Attempting to lock payload file for reading ...");
-      if (!readlock.lock(m_timeout, true)) return getTemporary(payload.url, payload.digest);
-      B2DEBUG(200, "Got read lock, check digest ...");
-      std::ifstream local_stream(local_file.c_str(), std::ios::binary);
-      //Ok we have read lock, check md5 and if it's fine return the filename
-      if (checkDigest(local_stream, payload.digest)) return local_file;
-      B2DEBUG(200, "Check failed, need to download");
-      // otherwie let's release the file lock so that other processes can
-      // modify the file.
+    //check if we already have downloaded this payload before into a temporary file
+    auto it = m_tempfiles.find(payload.payloadUrl);
+    if (it != end(m_tempfiles)) {
+      return it->second->getName();
     }
-    // ok, try to download the file
-    {
-      // for this we need a write lock
-      Belle2::FileSystem::Lock writelock(local_file);
-      // if we cannot get one the folder/file might be write protected or
-      // download by another process takes to long. So let's download into
-      // temporary file.
-      B2DEBUG(200, "Attempting to lock payload file for writing ...");
-      if (!writelock.lock(m_timeout, true)) return getTemporary(payload.url, payload.digest);
-      std::fstream local_stream(local_file.c_str(), std::ios::binary | std::ios::in | std::ios::out);
-      B2DEBUG(200, "Got write lock, check for file access ...");
-      if (!local_stream.good()) {
-        B2WARNING("Cannot open " << local_file << " for writing");
+    //ok look in all local directories
+    for (const auto& dir : m_localDirectories) {
+      const std::string localFile = getLocalName(dir.first, dir.second, payload);
+      if (fs::exists(localFile)) {
+        B2DEBUG(200, "Checking checksum for " << localFile);
+        std::ifstream localStream(localFile.c_str(), std::ios::binary);
+        if (checkDigest(localStream, payload.digest)) {
+          B2DEBUG(100, "found matching payload: " << localFile);
+          return localFile;
+        }
+        B2DEBUG(200, "Check failed, need to download, continue with next");
       }
-      B2DEBUG(200, "Ok, check digest again ...");
-      // ok we have write lock. Someone might have downloaded the file
-      // while we waited, check md5sum again.
-      if (checkDigest(local_stream, payload.digest)) return local_file;
-      // we have lock and it's broken so download the file
-      B2DEBUG(200, "Still not good, download now ...");
-      if (!downloadAndCheck(payload.url, local_stream, payload.digest)) return getTemporary(payload.url, payload.digest);
-      B2DEBUG(200, "Download of payload successful");
-      return local_file;
     }
+    // ok all local directories failed, try to download the file into the first
+    // local directory
+    const auto& dir = m_localDirectories[0];
+    const std::string url = urljoin(payload.baseUrl, payload.payloadUrl);
+    const std::string localFile = getLocalName(dir.first, dir.second, payload);
+    // now we need to make the directories to the file
+    try {
+      fs::create_directories(fs::path(localFile).parent_path());
+    } catch (fs::filesystem_error& e) {
+      B2WARNING("Cannot create local payload directory " << fs::path(localFile).parent_path());
+      return getTemporary(payload.payloadUrl, url, payload.digest);
+    }
+
+    // ok, directory exists, now we need a write lock on the file to avoid race conditions
+    Belle2::FileSystem::Lock writelock(localFile);
+    B2DEBUG(200, "Attempting to lock payload file " << localFile << " for writing ...");
+    // if we cannot get one the folder/file might be write protected or
+    // download by another process takes to long.  So let's download into
+    // temporary file.
+    if (!writelock.lock(m_timeout, true)) return getTemporary(payload.payloadUrl, url, payload.digest);
+    // Ok we have the write lock, check if we can open the file for writing
+    std::fstream localStream(localFile.c_str(), std::ios::binary | std::ios::in | std::ios::out);
+    B2DEBUG(200, "Got write lock, check for file access ...");
+    if (!localStream.good()) {
+      B2WARNING("Cannot open " << localFile << " for writing");
+    }
+    // File is open. Someone might have downloaded the file
+    // while we waited, check md5sum again.
+    B2DEBUG(200, "Ok, check digest in case another process downloaded already...");
+    if (checkDigest(localStream, payload.digest)) return localFile;
+    // we have lock and it's broken so download the file
+    B2DEBUG(200, "Still not good, download now ...");
+    if (!downloadAndCheck(url, localStream, payload.digest)) {
+      B2DEBUG(200, "Download failed ... try one last time into temporary file");
+      return getTemporary(payload.payloadUrl, url, payload.digest);
+    }
+    B2DEBUG(200, "Download of payload successful");
+    return localFile;
   }
 
   bool ConditionsPayloadDownloader::download(const std::string& url, std::ostream& buffer)
@@ -452,14 +504,14 @@ namespace Belle2 {
     return true;
   }
 
-  std::string ConditionsPayloadDownloader::getTemporary(const std::string& url, const std::string& digest)
+  std::string ConditionsPayloadDownloader::getTemporary(const std::string& key, const std::string& url, const std::string& digest)
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
     B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName() << " ... uhh, eeeh, da isses ja!");
     if (downloadAndCheck(url, *tmpfile, digest)) {
-      m_tempfiles.emplace_back(std::move(tmpfile));
-      return m_tempfiles.back()->getName();
+      m_tempfiles[key] = std::move(tmpfile);
+      return m_tempfiles[key]->getName();
     }
     return "";
   }

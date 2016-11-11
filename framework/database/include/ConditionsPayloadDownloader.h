@@ -26,8 +26,10 @@ namespace Belle2 {
   public:
     /** Simple struct to group all information necessary for a single payload */
     struct PayloadInfo {
-      /** url to the payload */
-      std::string url;
+      /** logical filename to the payload */
+      std::string payloadUrl;
+      /** base url if download is necessary */
+      std::string baseUrl;
       /** digest (checksum) of the payload */
       std::string digest;
       /** the interval of validity */
@@ -36,15 +38,44 @@ namespace Belle2 {
       int revision;
     };
 
+    /** Directory structure for local lookup directories to allow for different
+     * storage layouts: all payloads in one folder, all payloads in grouped in
+     * folders by their name or grouped in folders by beginning of their
+     * checksum
+     */
+    enum EDirectoryStructure {
+      /** directory contains all payloads directly */
+      c_flatDirectory,
+      /** directory contains all payloads as they are specified by payloadUrl
+       * which might or might not include subdirectories */
+      c_logicalSubdirectories,
+      /** directories contains all payloads in subdirectories starting with the
+       * hash values. i.e. if payload has checksum 0123456789ABCDEF it would be
+       * stored in 0/12/<filename> to evenly distribute all payloads across
+       * subdirectories. This is the same scheme used for git objects
+       */
+      c_digestSubdirectories,
+    };
+
     /** Create a new download session */
-    ConditionsPayloadDownloader(const std::string& restURL = "http://belle2db.hep.pnnl.gov/b2s/rest/",
-                                const std::string& baseURL = "http://belle2db.hep.pnnl.gov/",
-                                const std::string& outputDir = ".", int timeout = 10):
-      m_restURL(restURL), m_baseURL(baseURL), m_outputDir(outputDir), m_timeout(timeout) {}
+    ConditionsPayloadDownloader(const std::string& restUrl = "http://belle2db.hep.pnnl.gov/b2s/rest/",
+                                const std::string& localDir = "centraldb", int timeout = 10):
+      m_restUrl(restUrl), m_timeout(timeout) { addLocalDirectory(localDir, c_flatDirectory); }
     /** Close the session */
     ~ConditionsPayloadDownloader() { finishSession(); }
 
+    /** Add a directory to the list of directories to look for payloads before
+     * downloading them.
+     * @param directory path to the directory to add to the list
+     * @param structure indicate how the payloads are stored in this directory
+     */
+    void addLocalDirectory(const std::string& directory, EDirectoryStructure structure);
+
+    /** Start a new curl session if none is active at the moment
+     * @returns true if a new session was started, false if one was active already
+     */
     bool startSession();
+    /** Finish an existing curl sesssion if any is active at the moment */
     void finishSession();
 
     /** Update the list of payloads */
@@ -113,32 +144,39 @@ namespace Belle2 {
      * @returns the hex digest of the checksum
      */
     static std::string calculateDigest(std::istream& input);
+    /** obtain the filename of a payload in a given directory entry
+     * @param dir directory where the payload should be
+     * @param stucture storage structure of the directory
+     * @param payload payload information
+     * @returns filename of the payload honoring the selected directory structure
+     */
+    static std::string getLocalName(const std::string& dir, EDirectoryStructure structure, const PayloadInfo& payload);
     /** return the filename of a payload
      * @param payload payload information to obtain the filename for
      * @returns filename if it exists or could be downloaded, empty string on error
      */
     std::string getPayload(const PayloadInfo& payload);
     /** Download the given url into a temporary file and return the filename if the digest matches
+     * @param key to identify payload
      * @param url URL to download
      * @param digest known digest of the data
      * @returns temporary filename with the downloaded url, empty string on error
      */
-    std::string getTemporary(const std::string& url, const std::string& digest);
+    std::string getTemporary(const std::string& key, const std::string& url, const std::string& digest);
 
     /** curl session handle */
     void* m_curl{nullptr};
     /** flag to indicate whether curl has been initialized already */
     static bool s_globalInit;
     /** base url to prepend to the rest calls */
-    std::string m_restURL{0};
-    /** base url to prepend to the logical file name to find the download path */
-    std::string m_baseURL{0};
-    /** directory where to look for or put local files if they need to be downloaded */
-    std::string m_outputDir{0};
+    std::string m_restUrl;
+    /** local directories where we look for payloads. If we cannot find them
+     * anywhere we download them and try to put them in the first entry */
+    std::vector<std::pair<std::string, EDirectoryStructure>> m_localDirectories;
     /** number of seconds to wait for obtaining a lock */
     int m_timeout{10};
-    /** vector of all payloads we downloaded to a temporary file */
-    std::vector<std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
+    /** Map of all payloads we downloaded to a temporary file */
+    std::map<std::string, std::unique_ptr<FileSystem::TemporaryFile>> m_tempfiles;
     /** Map of all existing payloads */
     std::map<std::string, PayloadInfo> m_payloads;
 

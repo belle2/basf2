@@ -1,11 +1,23 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherFilter.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <utility>
-#include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherFilter.h>
+#include <cmath>
+
+// template Weight Chooseable<BaseStereoSegmentFilter>::operator()(const Object& object);
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -25,7 +37,8 @@ StereoSegmentTrackMatcherFilter::match(const CDCTrack& track,
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
 
   for (const CDCRecoSegment2D& recoSegment2D : recoSegments) {
-    if (recoSegment2D.getStereoKind() != EStereoKind::c_Axial and not recoSegment2D.getAutomatonCell().hasTakenFlag()
+    if (recoSegment2D.getStereoKind() != EStereoKind::c_Axial and
+        not recoSegment2D.getAutomatonCell().hasTakenFlag()
         and not recoSegment2D.isFullyTaken(2)) {
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
       const Weight weight = m_filter({{&recoSegment2D, recoSegment3D}, track});

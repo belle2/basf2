@@ -15,11 +15,10 @@
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
 #include <framework/core/ModuleParamList.h>
-#include <framework/datastore/StoreArray.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

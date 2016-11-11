@@ -8,16 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-
-#include <tracking/trackFindingCDC/collectors/base/FilterBasedMatcher.h>
+#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
 
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
+#include <tracking/trackFindingCDC/collectors/base/FilterBasedMatcher.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+
+// #include <framework/core/ModuleParamList.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -38,7 +39,7 @@ namespace Belle2 {
 
       /// Use the given filter (via the module parameters) to find a matching.
       std::vector<WithWeight<const CollectionItem*> >
-      match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
+      match(const CDCTrack& track, const std::vector<CDCRecoSegment2D>& recoSegments);
     };
   }
 }

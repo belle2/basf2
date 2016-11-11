@@ -8,7 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilters.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/AllSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/UnionRecordingSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -8,7 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilters.h>
+
+#include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/AllFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/MCFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/SimpleFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/Chi2FacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/TMVAFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

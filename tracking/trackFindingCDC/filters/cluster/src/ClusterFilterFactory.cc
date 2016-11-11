@@ -8,7 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/cluster/ClusterFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/cluster/ClusterFilters.h>
+
+#include <tracking/trackFindingCDC/filters/cluster/BaseClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/AllClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/UnionRecordingClusterFilter.h>
+#include <tracking/trackFindingCDC/filters/cluster/MVABackgroundClusterFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

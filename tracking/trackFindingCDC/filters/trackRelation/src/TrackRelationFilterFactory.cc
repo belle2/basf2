@@ -8,7 +8,13 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationFilters.h>
+
+#include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/AllTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/MCTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/UnionRecordingTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 

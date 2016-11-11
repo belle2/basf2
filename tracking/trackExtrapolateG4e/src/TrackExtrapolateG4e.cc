@@ -392,7 +392,9 @@ void TrackExtrapolateG4e::registerVolumes()
       m_EnterExit->push_back(*iVol);
     }
     // ECL crystal
-    else if (name.find("_crystal_") != string::npos) {
+    else if (name.find("lv_barrel_crystal_") != string::npos ||
+             name.find("lv_forward_crystal_") != string::npos ||
+             name.find("lv_backward_crystal_") != string::npos) {
       m_EnterExit->push_back(*iVol);
     }
     // Barrel KLM: BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
@@ -443,8 +445,10 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
     detID = Const::EDetector::ARICH;
     copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
-  // ECL crystal (=sensitive) is named "ecl{Barrel,Forward,Backward}CrystalPhysical_*"
-  else if (name.find("_crystal_") != string::npos) {
+  // ECL crystal (=sensitive) is named "lv_{barrel,forward,backward}_crystal_*"
+  else if (name.find("lv_barrel_crystal_") != string::npos ||
+           name.find("lv_forward_crystal_") != string::npos ||
+           name.find("lv_backward_crystal_") != string::npos) {
     detID = Const::EDetector::ECL;
     copyID = ECL::ECLGeometryPar::Instance()->ECLVolumeToCellID(touch());
   }

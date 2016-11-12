@@ -113,6 +113,11 @@ def add_packers(path, components=None):
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
 
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmpacker = register_module('EKLMRawPacker')
+        path.add_module(eklmpacker)
+
 
 def add_unpackers(path, components=None):
     """
@@ -166,6 +171,11 @@ def add_unpackers(path, components=None):
     if components is None or 'BKLM' in components:
         bklmunpacker = register_module('BKLMUnpacker')
         path.add_module(bklmunpacker)
+
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmunpacker = register_module('EKLMUnpacker')
+        path.add_module(eklmunpacker)
 
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):

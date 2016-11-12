@@ -1,5 +1,5 @@
 [INFO] Steering file: CheckGeometry.py
-[RESULT] Starting event processing, random seed is set to '3348a84ad1c9980cca5200a788c3b1e0964a77bcaaee4aec8b5666c34b238dfa'
+[RESULT] Starting event processing, random seed is set to 'd4c28bbb7cd1e19dff0f109d9b825a5c47737d53a81771312815ffb96baad81'
 [INFO] Creating geometry for detector: Belle2Detector
 [INFO] Creating Material Config Vacuum
 [INFO] Creating Material Config CDCGas
@@ -441,7 +441,7 @@
 [INFO] called creator MICROTPCCreator to create component MICROTPC from Gearbox
 [INFO] DetectorComponent MICROTPC created 292 solids, 56 logical volumes and 268 physical volumes
 [INFO] HE3-tube-0 placed at: (464,99,321) mm
-[INFO] HE3-tube-Sensitive-Volume-0 placed at: (464,99,320.391)  mm
+[INFO] HE3-tube-Sensitive-Volume-0 placed at: (464,99,320.39)  mm
 [INFO] HE3-tube-1 placed at: (-135,493,340) mm
 [INFO] HE3-tube-Sensitive-Volume-1 placed at: (-135,493,339.39)  mm
 [INFO] HE3-tube-2 placed at: (-504,-109,388) mm
@@ -546,7 +546,7 @@
 [INFO] Initializing magnetic field if present ...
 [INFO] Initialization of magnetic field took  0.027 ms
 [INFO] Optimizing geometry and creating lookup tables ...
-[INFO] Optimizing geometry took  65.880 ms
+[INFO] Optimizing geometry took  56.571 ms
 Checking overlaps for volume p_BGO ... OK! 
 Checking overlaps for volume p_BGO ... OK! 
 Checking overlaps for volume p_BGO ... OK! 

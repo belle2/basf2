@@ -1,0 +1,119 @@
+[INFO] BGO-0 placed at: (77,-177,396) mm 
+[INFO] BGO-1 placed at: (-86,108,396) mm 
+[INFO] BGO-2 placed at: (-90,-196,396) mm 
+[INFO] BGO-3 placed at: (119,119,396) mm 
+[INFO] BGO-4 placed at: (130,103,-294) mm 
+[INFO] BGO-5 placed at: (-82,122,-294) mm 
+[INFO] BGO-6 placed at: (-81,-145,-294) mm 
+[INFO] BGO-7 placed at: (104,-153,-293) mm 
+
+[INFO] With Au PIN-35 placed at: (102.375,7.2629,-1264.5) mm
+[INFO]         PIN-38 placed at: (102.375,16.7371,-1264.5) mm
+[INFO] With Au PIN-24 placed at: (-2.2629,54.3752,-1264.5) mm
+[INFO]         PIN-28 placed at: (-11.7371,54.3752,-1264.5) mm
+[INFO] With Au PIN-25 placed at: (-106.375,2.7371,-1264.5) mm
+[INFO]         PIN-29 placed at: (-106.375,-6.7371,-1264.5) mm
+[INFO] With Au PIN-34 placed at: (-1.7371,-56.3752,-1264.5) mm
+[INFO]         PIN-38 placed at: (7.7371,-56.3752,-1264.5) mm
+[INFO] With Au PIN-32 placed at: (79.3752,4.2629,-709.5) mm
+[INFO]         PIN-36 placed at: (79.3752,13.7371,-709.5) mm
+[INFO] With Au PIN-26 placed at: (6.7371,56.3752,-709.5) mm
+[INFO]         PIN-30 placed at: (-2.7371,56.3752,-709.5) mm
+[INFO] With Au PIN-27 placed at: (-84.3752,13.7371,-709.5) mm
+[INFO]         PIN-31 placed at: (-84.3752,4.2629,-709.5) mm
+[INFO] With Au PIN-33 placed at: (-2.7371,-54.3752,-709.5) mm
+[INFO]         PIN-38 placed at: (6.7371,-54.3752,-709.5) mm
+[INFO] With Au PIN-19 placed at: (50.3752,-11.7371,-118.501) mm
+[INFO]         PIN-22 placed at: (50.3752,-2.2629,-118.501) mm
+[INFO] With Au PIN-2 placed at: (12.7371,47.3752,-119.501) mm
+[INFO]         PIN-3 placed at: (3.2629,47.3752,-119.501) mm
+[INFO] With Au PIN-4 placed at: (-47.3752,-2.2629,-120.501) mm
+[INFO]         PIN-5 placed at: (-47.3752,-11.7371,-120.501) mm
+[INFO] With Au PIN-18 placed at: (-9.7371,-47.3752,-119.501) mm
+[INFO]         PIN-23 placed at: (-0.2629,-47.3752,-119.501) mm
+[INFO] With Au PIN-16 placed at: (53.3752,-3.7371,31.4995) mm
+[INFO]         PIN-17 placed at: (53.3752,5.7371,31.4995) mm
+[INFO] With Au PIN-8 placed at: (13.7371,47.3752,30.4995) mm
+[INFO]         PIN-9 placed at: (4.2629,47.3752,30.4995) mm
+[INFO] With Au PIN-0 placed at: (-47.3752,1.7371,30.4995) mm
+[INFO]         PIN-1 placed at: (-47.3752,-7.7371,30.4995) mm
+[INFO] With Au PIN-20 placed at: (-2.7371,-47.3752,30.4995) mm
+[INFO]         PIN-21 placed at: (6.7371,-47.3752,30.4995) mm
+[INFO] With Au PIN-14 placed at: (49.3752,-4.7371,143.5) mm
+[INFO]         PIN-15 placed at: (49.3752,4.7371,143.5) mm
+[INFO] With Au PIN-7 placed at: (9.7371,47.3752,145.5) mm
+[INFO]         PIN-10 placed at: (0.2629,47.3752,145.5) mm
+[INFO] With Au PIN-6 placed at: (-49.3752,0.7371,144.5) mm
+[INFO]         PIN-11 placed at: (-49.3752,-8.7371,144.5) mm
+[INFO] With Au PIN-12 placed at: (9.2629,-47.3752,144.5) mm
+[INFO]         PIN-13 placed at: (18.7371,-47.3752,144.5) mm
+[INFO] With Au PIN-47 placed at: (84.3752,-7.7371,710.5) mm
+[INFO]         PIN-40 placed at: (84.3752,1.7371,710.5) mm
+[INFO] With Au PIN-48 placed at: (-4.2629,56.3752,710.5) mm
+[INFO]         PIN-52 placed at: (-13.7371,56.3752,710.5) mm
+[INFO] With Au PIN-49 placed at: (-81.3752,-0.2629,710.5) mm
+[INFO]         PIN-53 placed at: (-81.3752,-9.7371,710.5) mm
+[INFO] With Au PIN-46 placed at: (-12.7371,-51.3752,710.5) mm
+[INFO]         PIN-41 placed at: (-3.2629,-51.3752,710.5) mm
+[INFO] With Au PIN-45 placed at: (107.375,-11.7371,1344.5) mm
+[INFO]         PIN-42 placed at: (107.375,-2.2629,1344.5) mm
+[INFO] With Au PIN-50 placed at: (-20.2629,56.3752,1344.5) mm
+[INFO]         PIN-54 placed at: (-29.7371,56.3752,1344.5) mm
+[INFO] With Au PIN-51 placed at: (-135.375,-7.2629,1344.5) mm
+[INFO]         PIN-55 placed at: (-135.375,-16.7371,1344.5) mm
+[INFO] With Au PIN-44 placed at: (-19.7371,-52.3752,1344.5) mm
+[INFO]         PIN-43 placed at: (-10.2629,-52.3752,1344.5) mm
+[INFO] With Au PIN-59 placed at: (473.375,35.2629,335.5) mm
+[INFO]         PIN-58 placed at: (473.375,44.7371,335.5) mm
+[INFO] With Au PIN-56 placed at: (-56.2629,505.375,358.5) mm
+[INFO]         PIN-57 placed at: (-65.7371,505.375,358.5) mm
+[INFO] With Au PIN-61 placed at: (-504.375,-35.2629,335.5) mm
+[INFO]         PIN-63 placed at: (-504.375,-44.7371,335.5) mm
+[INFO] With Au PIN-60 placed at: (27.2629,-492.375,324.5) mm
+[INFO]         PIN-62 placed at: (36.7371,-492.375,324.5) mm
+
+[INFO] DIA-sensitive volume-0 placed at: (49,9.75,109) mm 
+[INFO] DIA-sensitive volume-1 placed at: (-48,10.75,109) mm 
+[INFO] DIA-sensitive volume-2 placed at: (50,12.75,-97) mm 
+[INFO] DIA-sensitive volume-3 placed at: (-46,7.75,-97) mm 
+
+[INFO] Micro-TPC-Sensitive-Volume-0 placed at: (437,-73,330.715) mm
+[INFO] Micro-TPC-Sensitive-Volume-1 placed at: (35,466,349.715) mm
+[INFO] Micro-TPC-Sensitive-Volume-2 placed at: (-477,62,347.715) mm
+[INFO] Micro-TPC-Sensitive-Volume-3 placed at: (-66,-450,393.715) mm
+
+[INFO] HE3-tube-Sensitive-Volume-0 placed at: (464,99,320.391)  mm
+[INFO] HE3-tube-Sensitive-Volume-1 placed at: (-135,493,339.39)  mm
+[INFO] HE3-tube-Sensitive-Volume-2 placed at: (-504,-109,387.39)  mm
+[INFO] HE3-tube-Sensitive-Volume-3 placed at: (105,-477,383.39)  mm
+
+[INFO] Phase1-CLAWS-0 placed at: (172,63,2053) mm
+[INFO] Phase1-CLAWS-1 placed at: (278,66,2050) mm
+[INFO] Phase1-CLAWS-2 placed at: (387,67,2055) mm
+[INFO] Phase1-CLAWS-3 placed at: (677,67,2057) mm
+[INFO] Phase1-CLAWS-4 placed at: (-144,62,-1127) mm
+[INFO] Phase1-CLAWS-5 placed at: (-254,61,-1132) mm
+[INFO] Phase1-CLAWS-6 placed at: (-360,61,-1134) mm
+[INFO] Phase1-CLAWS-7 placed at: (-467,63,-1137) mm
+
+[INFO] Crystal Number 0 placed at (r[cm],[deg],z[cm]) = (48.8,8.0,209.8)
+[INFO] Crystal Number 1 placed at (r[cm],[deg],z[cm]) = (49.2,-2.7,213.5)
+[INFO] Crystal Number 2 placed at (r[cm],[deg],z[cm]) = (49.9,-10.2,207.0)
+[INFO] Crystal Number 3 placed at (r[cm],[deg],z[cm]) = (51.7,101.0,208.7)
+[INFO] Crystal Number 4 placed at (r[cm],[deg],z[cm]) = (51.5,90.9,212.4)
+[INFO] Crystal Number 5 placed at (r[cm],[deg],z[cm]) = (51.9,83.7,205.9)
+[INFO] Crystal Number 6 placed at (r[cm],[deg],z[cm]) = (52.4,-171.6,209.7)
+[INFO] Crystal Number 7 placed at (r[cm],[deg],z[cm]) = (52.6,178.5,213.4)
+[INFO] Crystal Number 8 placed at (r[cm],[deg],z[cm]) = (53.2,171.4,206.9)
+[INFO] Crystal Number 9 placed at (r[cm],[deg],z[cm]) = (56.3,-8.6,-118.0)
+[INFO] Crystal Number 10 placed at (r[cm],[deg],z[cm]) = (57.4,0.6,-121.4)
+[INFO] Crystal Number 11 placed at (r[cm],[deg],z[cm]) = (56.2,7.3,-115.1)
+[INFO] Crystal Number 12 placed at (r[cm],[deg],z[cm]) = (59.0,85.6,-118.7)
+[INFO] Crystal Number 13 placed at (r[cm],[deg],z[cm]) = (60.7,94.3,-122.1)
+[INFO] Crystal Number 14 placed at (r[cm],[deg],z[cm]) = (59.9,100.6,-115.8)
+[INFO] Crystal Number 15 placed at (r[cm],[deg],z[cm]) = (59.2,173.7,-119.6)
+[INFO] Crystal Number 16 placed at (r[cm],[deg],z[cm]) = (60.6,-177.5,-123.0)
+[INFO] Crystal Number 17 placed at (r[cm],[deg],z[cm]) = (59.6,-171.2,-116.7)
+
+[INFO] QCSS-0 placed at: (195,274,550) mm 
+[INFO] QCSS-1 placed at: (195,274,-550) mm 

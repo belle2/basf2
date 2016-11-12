@@ -129,10 +129,16 @@ def add_unpackers(path, components=None):
         pxdhitsorter.param('mergeFrames', False)
         path.add_module(pxdhitsorter)
 
+        pxd_clusterizer = register_module('PXDClusterizer')
+        path.add_module(pxd_clusterizer)
+
     # SVD
     if components is None or 'SVD' in components:
         svdunpacker = register_module('SVDUnpacker')
         path.add_module(svdunpacker)
+
+        svd_clusterizer = register_module('SVDClusterizer')
+        path.add_module(svd_clusterizer)
 
     # CDC
     if components is None or 'CDC' in components:

@@ -131,6 +131,12 @@ namespace {
     EXPECT_EQ(2u, rels1.size());
 
 
+    //preserve order
+    EXPECT_FLOAT_EQ(1.0, rels1.weight(0));
+    EXPECT_FLOAT_EQ(2.0, rels1.weight(1));
+    EXPECT_FLOAT_EQ(1.0, relObjData[1]->getRelatedFromWithWeight<EventMetaData>().second);
+
+
     //add another one in opposite direction
     DataStore::Instance().addRelationFromTo((relObjData)[1], (evtData)[0], 1.0);
     RelationVector<EventMetaData> rels2 = (relObjData)[1]->getRelationsFrom<EventMetaData>();

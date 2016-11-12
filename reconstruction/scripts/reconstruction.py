@@ -201,7 +201,7 @@ def add_cluster_expert_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     # klong id and cluster matcher, whcih also builds "cluster"
-    if components is None or 'EKLM' and 'BKLM' and 'ECL' in components:
+    if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
 
@@ -242,7 +242,7 @@ def add_klm_modules(path, components=None):
         path.add_module(bklm_rec)
 
     # K0L reconstruction
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or ('BKLM' in components and 'EKLM' in components):
         klm_k0l_rec = register_module('KLMK0LReconstructor')
         path.add_module(klm_k0l_rec)
 

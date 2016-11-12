@@ -185,7 +185,7 @@ void QcsmonitorStudyModule::event()
 
   for (const auto& Hit : Hits) {
     const int detNb = Hit.getdetNb();
-    ig(detNb < 2) {
+    if (detNb < 2) {
       const int timebin = Hit.gettime();
       const float edep = Hit.getedep();
       const float pe = Hit.getPE();

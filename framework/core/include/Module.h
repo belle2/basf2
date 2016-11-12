@@ -600,9 +600,9 @@ namespace Belle2 {
     std::string m_package; /**< Package this module is found in (may be empty). */
   };
 
-  //make sure REG_MODULE works outside the normal build system
+
 #ifndef _PACKAGE_
-#define _PACKAGE_ ""
+#define _PACKAGE_ "" /**< make sure REG_MODULE works outside the normal build system */
 #endif
 
   //------------------------------------------------------

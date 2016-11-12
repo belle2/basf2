@@ -34,17 +34,16 @@ REG_MODULE(SeqRootInput)
 SeqRootInputModule::SeqRootInputModule() : Module(), m_streamer(nullptr), m_size(0), m_size2(0)
 {
   //Set module properties
-  setDescription("Read files produced by SeqRootOutput.");
+  setDescription("Read .sroot files produced by SeqRootOutput.");
   setPropertyFlags(c_Input);
 
   m_file = 0;
   m_nevt = -1;
 
   //Parameter definition
-  addParam("inputFileName"  , m_inputFileName, "SeqRoot file name. Can also be a gzip-compressed file (with suffix .gz).",
+  addParam("inputFileName"  , m_inputFileName,
+           "Input file name. Can also be a gzip-compressed file (with suffix .gz). Parameter can be overridden using the -i argument to basf2.",
            string("SeqRootInput.sroot"));
-
-  B2DEBUG(1, "SeqRootInput: Constructor done.");
 }
 
 

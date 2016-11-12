@@ -19,6 +19,9 @@
 namespace Belle2 {
 
   /** Metadata information about a file
+   *
+   *  See BELLE2-NOTE-TE-2015-028: Event, File, and Dataset Metadata for a
+   *  detailed definition. Available at: https://docs.belle2.org/record/287?ln=en
    */
   class FileMetaData : public TObject {
   public:

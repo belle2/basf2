@@ -17,7 +17,7 @@
 namespace Belle2 {
 
   /**
-   * Class DigitBase - A common base for subdetector Digits.
+   * A common base for subdetector Digits.
    *
    * This is an abstract base class from which other Digit classes must be derived
    * to be usable for background overlay.

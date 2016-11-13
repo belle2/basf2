@@ -13,4 +13,3 @@
 #include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/FitFacetRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/TMVAFacetRelationVarSet.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/TruthFacetRelationVarSet.h>

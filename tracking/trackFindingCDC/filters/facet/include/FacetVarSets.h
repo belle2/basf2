@@ -14,4 +14,3 @@
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/TMVAFacetVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/TruthFacetVarSet.h>

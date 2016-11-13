@@ -35,8 +35,6 @@ UnionRecordingFacetFilter::createVarSet(const std::string& name) const
     return makeUnique<FitFacetVarSet>();
   } else if (name == "tmva") {
     return makeUnique<TMVAFacetVarSet>();
-  } else if (name == "truth") {
-    return makeUnique<TruthFacetVarSet>();
   } else {
     return Super::createVarSet(name);
   }

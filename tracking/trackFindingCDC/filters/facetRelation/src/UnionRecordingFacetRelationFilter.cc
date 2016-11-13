@@ -38,8 +38,6 @@ UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
     return makeUnique<FitFacetRelationVarSet>();
   } else if (name == "tmva") {
     return makeUnique<TMVAFacetRelationVarSet>();
-  } else if (name == "truth") {
-    return makeUnique<TruthFacetRelationVarSet>();
   } else {
     return Super::createVarSet(name);
   }

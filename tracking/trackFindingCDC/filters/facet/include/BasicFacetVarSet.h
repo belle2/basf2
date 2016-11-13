@@ -24,7 +24,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetBasicNames[] = {
+    static char const* const basicFacetVarNames[] = {
       "superlayer_id",
 
       "start_layer_id",
@@ -53,13 +53,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetBasicNames);
+      static const size_t nNames = size(basicFacetVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetBasicNames[iName];
+        return basicFacetVarNames[iName];
       }
     };
 

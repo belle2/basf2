@@ -26,7 +26,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetFitlessNames[] = {
+    static char const* const fitlessFacetVarNames[] = {
       "superlayer_id",
       // "oclock_delta",
       "abs_oclock_delta",
@@ -48,13 +48,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitlessNames);
+      static const size_t nNames = size(fitlessFacetVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetFitlessNames[iName];
+        return fitlessFacetVarNames[iName];
       }
     };
 

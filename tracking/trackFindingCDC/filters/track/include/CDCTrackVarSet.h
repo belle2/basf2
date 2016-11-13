@@ -18,7 +18,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const cdcTrackNames[] = {
+    static char const* const cdcTrackVarNames[] = {
       "size",
       "pt",
       "sz_slope",
@@ -55,13 +55,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 20;
+      static const size_t nNames = size(cdcTrackVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return cdcTrackNames[iName];
+        return cdcTrackVarNames[iName];
       }
     };
 
@@ -71,9 +71,6 @@ namespace Belle2 {
     class CDCTrackVarSet : public VarSet<CDCTrackVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit CDCTrackVarSet() : VarSet<CDCTrackVarNames>() { }
-
       /// Generate and assign the variables from the cluster
       bool extract(const CDCTrack* track) override;
     };

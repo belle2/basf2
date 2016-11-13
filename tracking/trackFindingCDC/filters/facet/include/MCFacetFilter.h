@@ -27,7 +27,10 @@ namespace Belle2 {
        * Constructor also setting the switch,
        * if the reversed version of a facet (in comparision to MC truth) shall be accepted.
        */
-      explicit MCFacetFilter(bool allowReverse = true) : Super(allowReverse) {}
+      explicit MCFacetFilter(bool allowReverse = true)
+        : Super(allowReverse)
+      {
+      }
 
     public:
       /**

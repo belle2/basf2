@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrackNames[] = {
+    static char const* const segmentTrackVarNames[] = {
       "is_stereo",
       "segment_size",
       "track_size",
@@ -61,13 +61,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 24;
+      static const size_t nNames = size(segmentTrackVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return segmentTrackNames[iName];
+        return segmentTrackVarNames[iName];
       }
     };
 
@@ -77,9 +77,6 @@ namespace Belle2 {
     class SegmentTrackVarSet : public VarSet<SegmentTrackVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit SegmentTrackVarSet() : VarSet<SegmentTrackVarNames>() { }
-
       /// Generate and assign the variables from the pair
       bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) final;
     };

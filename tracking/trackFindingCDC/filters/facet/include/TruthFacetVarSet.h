@@ -18,7 +18,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetTruthNames[] = {
+    static char const* const facetTruthVarNames[] = {
       "truth",
       "truth_pos_theta",
       "truth_mom_phi",
@@ -33,13 +33,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetTruthNames);
+      static const size_t nNames = size(facetTruthVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetTruthNames[iName];
+        return facetTruthVarNames[iName];
       }
     };
 

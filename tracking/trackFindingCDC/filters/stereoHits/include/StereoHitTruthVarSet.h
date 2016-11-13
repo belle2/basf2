@@ -19,7 +19,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const stereoHitTruthNames[] = {
+    static char const* const stereoHitTruthVarNames[] = {
       "truth",
       "truth_may_reversed",
       "track_is_fake_truth"
@@ -32,13 +32,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 3;
+      static const size_t nNames = size(stereoHitTruthVarNames);
 
       /// Get the name of the column.
       constexpr
       static char const* getName(int iName)
       {
-        return stereoHitTruthNames[iName];
+        return stereoHitTruthVarNames[iName];
       }
     };
 
@@ -48,9 +48,6 @@ namespace Belle2 {
     class StereoHitTruthVarSet : public VarSet<StereoHitTruthVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit StereoHitTruthVarSet() : VarSet<StereoHitTruthVarNames>() { }
-
       /// Generate and assign the variables from the pair.
       bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;
     };

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetFitNames[] = {
+    static char const* const fitFacetVarNames[] = {
       "chi2_0",
       "chi2_0_per_s",
       "fit_0_phi0",
@@ -54,13 +54,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetFitNames);
+      static const size_t nNames = size(fitFacetVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetFitNames[iName];
+        return fitFacetVarNames[iName];
       }
     };
 

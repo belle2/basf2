@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetRelationTruthNames[] = {
+    static char const* const facetRelationTruthVarNames[] = {
       "truth"
     };
 
@@ -38,13 +38,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationTruthNames);
+      static const size_t nNames = size(facetRelationTruthVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetRelationTruthNames[iName];
+        return facetRelationTruthVarNames[iName];
       }
 
     };

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrainNames[] = {
+    static char const* const segmentTrainVarNames[] = {
       "is_stereo",
       "maximum_perpS_overlap",
       "size",
@@ -41,13 +41,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentTrainNames);
+      static const size_t nNames = size(segmentTrainVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return segmentTrainNames[iName];
+        return segmentTrainVarNames[iName];
       }
     };
 
@@ -60,12 +60,8 @@ namespace Belle2 {
       /// We use this amount of overlap when defining a segment train
       static constexpr const float m_param_percentageForPerpSMeasurements = 0.05;
 
-      /// Construct the peeler.
-      explicit SegmentTrainVarSet() : VarSet<SegmentTrainVarNames>() { }
-
       /// Generate and assign the variables from the pair
-      bool
-      extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair) final;
+      bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair) final;
     };
   }
 }

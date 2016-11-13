@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrainTruthNames[] = {
+    static char const* const segmentTrainTruthVarNames[] = {
       "belongs_to_same_track_truth",
       "truth"
     };
@@ -36,13 +36,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(segmentTrainTruthNames);
+      static const size_t nNames = size(segmentTrainTruthVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return segmentTrainTruthNames[iName];
+        return segmentTrainTruthVarNames[iName];
       }
     };
 
@@ -52,9 +52,6 @@ namespace Belle2 {
     class SegmentTrainTruthVarSet : public VarSet<SegmentTrainTruthVarNames> {
 
     public:
-      /// Construct the peeler.
-      explicit SegmentTrainTruthVarSet() : VarSet<SegmentTrainTruthVarNames>() { }
-
       /// Generate and assign the variables from the cluster
       bool
       extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair) final;

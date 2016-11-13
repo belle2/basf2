@@ -27,7 +27,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const facetRelationBendNames[] = {
+    static char const* const facetRelationBendVarNames[] = {
       "delta_phi",
       "delta_phi_pull",
       "delta_phi_pull_per_r",
@@ -43,13 +43,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(facetRelationBendNames);
+      static const size_t nNames = size(facetRelationBendVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return facetRelationBendNames[iName];
+        return facetRelationBendVarNames[iName];
       }
     };
 

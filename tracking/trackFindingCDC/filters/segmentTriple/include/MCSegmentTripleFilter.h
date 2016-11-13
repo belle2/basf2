@@ -57,7 +57,6 @@ namespace Belle2 {
     private:
       /// Instance of the cell filter to reject neighborhoods of false cells.
       MCAxialSegmentPairFilter m_mcAxialSegmentPairFilter;
-
     };
   }
 }

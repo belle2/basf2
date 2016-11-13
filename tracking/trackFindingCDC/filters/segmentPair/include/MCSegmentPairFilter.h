@@ -24,8 +24,10 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      explicit MCSegmentPairFilter(bool allowReverse = true) :
-        Super(allowReverse) {}
+      explicit MCSegmentPairFilter(bool allowReverse = true)
+        : Super(allowReverse)
+      {
+      }
 
       /// Checks if a axial stereo segment pair is a good combination.
       Weight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& segmentPair) final;

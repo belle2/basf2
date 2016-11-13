@@ -24,7 +24,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const fitTrackRelationNames[] = {
+    static char const* const fitTrackRelationVarNames[] = {
       "is_fitted",
       "curv",
       "curv_var",
@@ -47,13 +47,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(fitTrackRelationNames);
+      static const size_t nNames = size(fitTrackRelationVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return fitTrackRelationNames[iName];
+        return fitTrackRelationVarNames[iName];
       }
     };
 

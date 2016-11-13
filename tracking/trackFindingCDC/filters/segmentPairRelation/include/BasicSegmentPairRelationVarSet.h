@@ -24,7 +24,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const basicSegmentRelationNames[] = {
+    static char const* const basicSegmentRelationVarNames[] = {
       "middle_is_axial",
       "middle_sl_id",
       "middle_size",
@@ -40,13 +40,13 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentRelationNames);
+      static const size_t nNames = size(basicSegmentRelationVarNames);
 
       /// Getter for the name a the given index
       constexpr
       static char const* getName(int iName)
       {
-        return basicSegmentRelationNames[iName];
+        return basicSegmentRelationVarNames[iName];
       }
     };
 

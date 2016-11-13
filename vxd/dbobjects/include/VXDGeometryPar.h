@@ -64,6 +64,13 @@ namespace Belle2 {
     const VXDGeoSensorPar& getSensor(std::string sensorTypeID) const;
     /** get component */
     const VXDGeoComponentPar& getComponent(std::string name) const;
+    /** get sensor map */
+    const std::map<std::string, VXDGeoSensorPar>& getSensorMap() const {return m_sensorMap;}
+    /** get component maps */
+    const std::map<std::string, VXDGeoComponentPar>& getComponentMap() const {return m_componentCache;   }
+
+    /** get Bkg sensitive chip Id*/
+    int getSensitiveChipID(std::string name) const;
 
   private:
     /**
@@ -124,7 +131,7 @@ namespace Belle2 {
      * @param placements container holding names of all components to be cached
      * @param componentDir Path to Gearbox where parameters are to be found
      */
-    void cacheSubComponents(std::vector<VXDGeoPlacementPar> placements , GearDir componentsDir);
+    void cacheSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir);
 
   private:
 

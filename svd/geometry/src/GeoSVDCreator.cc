@@ -14,6 +14,8 @@
 #include <svd/geometry/SensorInfo.h>
 #include <svd/simulation/SensitiveDetector.h>
 
+#include <simulation/background/BkgSensitiveDetector.h>
+
 #include <geometry/Materials.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/utilities.h>
@@ -52,6 +54,33 @@ namespace Belle2 {
       m_SensorInfo.clear();
     }
 
+    VXD::SensorInfoBase* GeoSVDCreator::createSensorInfoFromDB(const VXDGeoSensorPar& sensor)
+    {
+      const SVDSensorInfoPar& infoPar = dynamic_cast<const SVDSensorInfoPar&>(*sensor.getSensorInfo());
+
+      SensorInfo* info = new SensorInfo(
+        VxdID(0, 0, 0),
+        infoPar.getWidth(),
+        infoPar.getLength(),
+        infoPar.getThickness(),
+        infoPar.getUCells(),
+        infoPar.getVCells(),
+        infoPar.getWidth2()
+      );
+      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
+      info->setSensorParams(
+        infoPar.getDepletionVoltage(),
+        infoPar.getBiasVoltage(),
+        infoPar.getBackplaneCapacitance() * unit_pF,
+        infoPar.getInterstripCapacitance() * unit_pF,
+        infoPar.getCouplingCapacitance() * unit_pF,
+        infoPar.getElectronicNoiseU(),
+        infoPar.getElectronicNoiseV()
+      );
+      m_SensorInfo.push_back(info);
+      return info;
+    }
+
     VXD::SensorInfoBase* GeoSVDCreator::createSensorInfo(const GearDir& sensor)
     {
       SensorInfo* info = new SensorInfo(
@@ -78,35 +107,6 @@ namespace Belle2 {
       return info;
     }
 
-    VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
-        const VXDGeoSensorPlacementPar& placement)
-    {
-      const SVDSensorInfoPar& infoPar = dynamic_cast<const SVDSensorInfoPar&>(*sensor.getSensorInfo());
-
-      SensorInfo* sensorInfo = new SensorInfo(
-        sensorID,
-        infoPar.getWidth(),
-        infoPar.getLength(),
-        infoPar.getThickness(),
-        infoPar.getUCells(),
-        infoPar.getVCells(),
-        infoPar.getWidth2()
-      );
-      const double unit_pF = 1000 * Unit::fC / Unit::V; // picofarad
-      sensorInfo->setSensorParams(
-        infoPar.getDepletionVoltage(),
-        infoPar.getBiasVoltage(),
-        infoPar.getBackplaneCapacitance() * unit_pF,
-        infoPar.getInterstripCapacitance() * unit_pF,
-        infoPar.getCouplingCapacitance() * unit_pF,
-        infoPar.getElectronicNoiseU(),
-        infoPar.getElectronicNoiseV()
-      );
-      m_SensorInfo.push_back(sensorInfo);
-
-      SensitiveDetector* sensitive = new SensitiveDetector(sensorInfo);
-      return sensitive;
-    }
 
     VXD::SensitiveDetectorBase* GeoSVDCreator::createSensitiveDetector(
       VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement&)
@@ -119,6 +119,7 @@ namespace Belle2 {
 
     void GeoSVDCreator::createGeometry(const SVDGeometryPar& parameters, G4LogicalVolume& topVolume, geometry::GeometryTypes type)
     {
+
       m_activeStepSize = parameters.getGlobalParams().getActiveStepSize() / Unit::mm;
       m_activeChips = parameters.getGlobalParams().getActiveChips();
       m_seeNeutrons = parameters.getGlobalParams().getSeeNeutrons();
@@ -154,11 +155,100 @@ namespace Belle2 {
                                          &topVolume, false, 1);
       }
 
+      //Read the definition of all sensor types
+      for (const pair<const string, VXDGeoSensorPar>& typeAndSensor : parameters.getSensorMap()) {
+        const string& sensorTypeID = typeAndSensor.first;
+        const VXDGeoSensorPar& paramsSensor = typeAndSensor.second;
+        VXDGeoSensor sensor(
+          paramsSensor.getMaterial(),
+          paramsSensor.getColor(),
+          paramsSensor.getWidth() / Unit::mm,
+          paramsSensor.getWidth2() / Unit::mm,
+          paramsSensor.getLength() / Unit::mm,
+          paramsSensor.getHeight() / Unit::mm,
+          paramsSensor.getSlanted()
+        );
+        sensor.setActive(VXDGeoComponent(
+                           paramsSensor.getMaterial(),
+                           paramsSensor.getActiveArea().getColor(),
+                           paramsSensor.getActiveArea().getWidth() / Unit::mm,
+                           paramsSensor.getActiveArea().getWidth2() / Unit::mm,
+                           paramsSensor.getActiveArea().getLength() / Unit::mm,
+                           paramsSensor.getActiveArea().getHeight() / Unit::mm
+                         ), VXDGeoPlacement(
+                           "Active",
+                           paramsSensor.getActivePlacement().getU() / Unit::mm,
+                           paramsSensor.getActivePlacement().getV() / Unit::mm,
+                           paramsSensor.getActivePlacement().getW(),
+                           paramsSensor.getActivePlacement().getWOffset() / Unit::mm
+                         ));
+        sensor.setSensorInfo(createSensorInfoFromDB(paramsSensor));
+
+        vector<VXDGeoPlacement> subcomponents;
+        for (const VXDGeoPlacementPar& component : paramsSensor.getComponents()) {
+          subcomponents.push_back(VXDGeoPlacement(
+                                    component.getName(),
+                                    component.getU() / Unit::mm,
+                                    component.getV() / Unit::mm,
+                                    component.getW(),
+                                    component.getWOffset() / Unit::mm
+                                  ));
+        }
+        sensor.setComponents(subcomponents);
+        m_sensorMap[sensorTypeID] = sensor;
+      }
+
+      //Read the component cache from DB
+      for (const pair<const string, VXDGeoComponentPar>& nameAndComponent : parameters.getComponentMap()) {
+        const string& name = nameAndComponent.first;
+        const VXDGeoComponentPar& paramsComponent = nameAndComponent.second;
+        VXDGeoComponent  c(
+          paramsComponent.getMaterial(),
+          paramsComponent.getColor(),
+          paramsComponent.getWidth() / Unit::mm,
+          paramsComponent.getWidth2() / Unit::mm,
+          paramsComponent.getLength() / Unit::mm,
+          paramsComponent.getHeight() / Unit::mm
+        );
+        double angle  = paramsComponent.getAngle();
+
+
+        if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
+          B2DEBUG(100, "One dimension empty, using auto resize for component");
+        } else {
+          G4VSolid* solid = createTrapezoidal(m_prefix + "." + name, c.getWidth(), c.getWidth2(), c.getLength(), c.getHeight(), angle);
+          c.setVolume(new G4LogicalVolume(solid, Materials::get(c.getMaterial()), m_prefix + "." + name));
+        }
+
+        vector<VXDGeoPlacement> subComponents;
+        for (const VXDGeoPlacementPar& paramsSubComponent : paramsComponent.getSubComponents()) {
+          subComponents.push_back(VXDGeoPlacement(
+                                    paramsSubComponent.getName(),
+                                    paramsSubComponent.getU()  / Unit::mm,
+                                    paramsSubComponent.getV()  / Unit::mm,
+                                    paramsSubComponent.getW(),
+                                    paramsSubComponent.getWOffset()  / Unit::mm
+                                  ));
+
+        }
+
+        createSubComponents(m_prefix + "." + name, c, subComponents);
+        if (m_activeChips &&  parameters.getSensitiveChipID(name) >= 0) {
+          int chipID = parameters.getSensitiveChipID(name);
+          B2DEBUG(50, "Creating BkgSensitiveDetector for component " << name << " with chipID " <<  chipID);
+          BkgSensitiveDetector* sensitive = new BkgSensitiveDetector(m_prefix.c_str(), chipID);
+          c.getVolume()->SetSensitiveDetector(sensitive);
+          m_sensitive.push_back(sensitive);
+        }
+
+        m_componentCache[name] = c;
+      }
+
       //Build all ladders including Sensors
       VXD::GeoVXDAssembly shellSupport = createHalfShellSupportFromDB(parameters);
 
-      const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
-      for (const VXDHalfShellPar& shell : HalfShells) {
+      //const std::vector<VXDHalfShellPar>& HalfShells = parameters.getHalfShells();
+      for (const VXDHalfShellPar& shell : parameters.getHalfShells()) {
         string shellName =  shell.getName();
         G4Transform3D shellAlignment = getAlignmentFromDB(parameters.getAlignment(m_prefix + "." + shellName));
 
@@ -166,14 +256,13 @@ namespace Belle2 {
         double shellAngle = shell.getShellAngle();
         if (!m_onlyActiveMaterial) shellSupport.place(envelope, shellAlignment * G4RotateZ3D(shellAngle));
 
-        B2INFO("Building " << m_prefix << " half-shell " << shellName << " shell angle " << shellAngle);
-
-        const std::map< int, std::vector<std::pair<int, double>> >& Layers = shell.getLayers();
-        for (const std::pair<const int, std::vector<std::pair<int, double>> >& layer : Layers) {
+        //const std::map< int, std::vector<std::pair<int, double>> >& Layers = shell.getLayers();
+        for (const std::pair<const int, std::vector<std::pair<int, double>> >& layer : shell.getLayers()) {
           int layerID = layer.first;
           const std::vector<std::pair<int, double>>& Ladders = layer.second;
 
-          B2INFO(" layer " << layerID);
+
+          setCurrentLayerFromDB(layerID, parameters);
 
           //Place Layer support
           VXD::GeoVXDAssembly layerSupport = createLayerSupportFromDB(layerID, parameters);
@@ -184,8 +273,7 @@ namespace Belle2 {
           for (const std::pair<int, double>& ladder : Ladders) {
             int ladderID = ladder.first;
             double phi = ladder.second;
-            B2INFO(" ladder " << ladderID << " has phi angle " << phi);
-            G4Transform3D ladderPlacement = placeLadderFromDB(layerID, ladderID, phi, envelope, shellAlignment, parameters);
+            G4Transform3D ladderPlacement = placeLadderFromDB(ladderID, phi, envelope, shellAlignment, parameters);
             if (!m_onlyActiveMaterial) ladderSupport.place(envelope, ladderPlacement);
           }
 
@@ -207,7 +295,6 @@ namespace Belle2 {
       if (m_activeChips) {
         createDiamondsFromDB(parameters.getRadiationSensors(), topVolume, *envelope);
       }
-
     }
 
     VXD::GeoVXDAssembly GeoSVDCreator::createHalfShellSupportFromDB(const SVDGeometryPar& parameters)

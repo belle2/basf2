@@ -24,14 +24,7 @@ namespace Belle2 {
   */
   class VXDGeoPlacementPar: public TObject {
   public:
-    /** Enum describing where to place the component vertically */
-    enum EPosW {
-      c_below,  /**< Place the component below the mother */
-      c_bottom, /**< Place the component at the bottom of the mother */
-      c_center, /**< Place the component at the center of the mother */
-      c_top,    /**< Place the component at the top of the mother */
-      c_above   /**< Place the component above the mother */
-    };
+
     /** Constructor */
     VXDGeoPlacementPar(const std::string& name = "", double u = 0, double v = 0,
                        std::string w = "bottom", double woffset = 0);
@@ -52,9 +45,9 @@ namespace Belle2 {
     /** set local v coordinate where to place the component */
     void setV(double v) { m_v = v; }
     /** get local w position where to place the component */
-    EPosW getW() const { return m_w; }
+    const std::string& getW() const { return m_w; }
     /** set local w position where to place the component */
-    void setW(std::string  w);
+    void setW(std::string  w) {m_w = w;}
     /** get offset to local w position where to place the component */
     double getWOffset() const { return m_woffset; }
     /** set offset to local w position where to place the component */
@@ -67,7 +60,7 @@ namespace Belle2 {
     /** v coordinate where to place the component */
     double m_v;
     /** w coordinate where to place the component */
-    EPosW m_w;
+    std::string m_w;
     /** Offset to the w placement of the component */
     double m_woffset;
 

@@ -101,6 +101,12 @@ namespace Belle2 {
       virtual VXD::SensorInfoBase* createSensorInfo(const GearDir& sensor);
 
       /**
+       * Read the sensor definitions from the database
+       * @param sensors Reference to the database containing the parameters
+       */
+      virtual VXD::SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor);
+
+      /**
        * Return a SensitiveDetector implementation for a given sensor
        * @param sensorID  SensorID for the sensor
        * @param sensor    Information about the sensor to create the Sensitive Detector for
@@ -109,8 +115,6 @@ namespace Belle2 {
       virtual VXD::SensitiveDetectorBase* createSensitiveDetector(
         VxdID sensorID, const VXDGeoSensor& sensor, const VXDGeoSensorPlacement& placement);
 
-      virtual VXD::SensitiveDetectorBase* createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
-          const VXDGeoSensorPlacementPar& placement);
 
     private:
 

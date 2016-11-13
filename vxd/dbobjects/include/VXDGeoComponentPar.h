@@ -13,11 +13,9 @@
 #include <TObject.h>
 #include <string>
 #include <vector>
+#include <vxd/dbobjects/VXDGeoPlacementPar.h>
 
 #include <algorithm>
-
-
-class G4LogicalVolume;
 
 namespace Belle2 {
 
@@ -33,22 +31,12 @@ namespace Belle2 {
     /** Constructor */
     VXDGeoComponentPar(const std::string& material = "", const std::string& color = "",
                        double width = 0, double width2 = 0, double length = 0, double height = 0, double angle = 0):
-      m_volume(0), m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
+      m_material(material), m_color(color), m_width(width), m_width2(width2), m_length(length),
       m_height(height), m_angle(angle)
-    {
-      //Consistency check: Otherwise dimensions are silently changed in createTrapezoidal() ...
-      if (m_angle > 0) {
-        const double tana = tan(m_angle);
-        m_height = std::min(tana * m_length, std::min(tana * m_width, m_height));
-      }
-    }
+    {}
 
     //! Destructor
     ~VXDGeoComponentPar() {}
-    /** get the pointer to the logical volume, NULL if not yet created */
-    G4LogicalVolume* getVolume() const { return m_volume; }
-    /** set the pointer to the logical volume */
-    void setVolume(G4LogicalVolume* volume) { m_volume = volume; }
     /** get the name of the Material for the component */
     const std::string& getMaterial() const { return m_material; }
     /** set the name of the Material for the component */
@@ -79,11 +67,15 @@ namespace Belle2 {
     double getAngle() const { return m_angle; }
     /** set the angle of the component */
     void setAngle(double angle) { m_angle = angle; }
+    /** get sub components */
+    const std::vector<VXDGeoPlacementPar>& getSubComponents() const {return m_subComponents;}
+    /** set sub components */
+    void setSubComponents(const std::vector<VXDGeoPlacementPar>& components) { m_subComponents = components; }
+
 
   private:
 
-    /** Pointer to the Logical volume if already created  */
-    G4LogicalVolume* m_volume {0}; //! transient member, owned by Geant4
+
     /** Name of the material of the component */
     std::string m_material {""};
     /** Name of the color of the component */
@@ -98,6 +90,8 @@ namespace Belle2 {
     double m_height {0.};
     /** angle of the component */
     double m_angle {0.};
+    /** list of subcomponents */
+    std::vector<VXDGeoPlacementPar> m_subComponents;
 
     ClassDef(VXDGeoComponentPar, 5);  /**< ClassDef, must be the last term before the closing {}*/
 

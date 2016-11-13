@@ -20,8 +20,6 @@ using namespace std;
 // Get VXD geometry parameters from Gearbox
 void VXDAlignmentPar::read(const std::string& component, const GearDir& alignment)
 {
-  B2INFO("Reading alignment data for component " << component);
-
   string path = (boost::format("Align[@component='%1%']/") % component).str();
   GearDir params(alignment, path);
   if (!params) {

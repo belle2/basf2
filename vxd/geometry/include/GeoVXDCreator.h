@@ -4,7 +4,7 @@
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
  * Contributors: Andreas Moll, Christian Oswald, Zbynek Drasal,           *
- *               Martin Ritter, Jozef Koval                               *
+ *               Martin Ritter, Jozef Koval, Benjamin Schwenker           *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -89,6 +89,12 @@ namespace Belle2 {
       virtual SensorInfoBase* createSensorInfo(const GearDir& sensor) = 0;
 
       /**
+       * Read the sensor definitions from the database
+       * @param sensors Reference to the database containing the parameters
+       */
+      virtual SensorInfoBase* createSensorInfoFromDB(const VXDGeoSensorPar& sensor) = 0;
+
+      /**
        * Return a SensitiveDetector implementation for a given sensor
        * @param sensorID SensorID for the sensor
        * @param sensor   Information about the sensor to create the Sensitive Detector for
@@ -96,13 +102,15 @@ namespace Belle2 {
       virtual SensitiveDetectorBase* createSensitiveDetector(VxdID sensorID, const VXDGeoSensor& sensor,
                                                              const VXDGeoSensorPlacement& placement) = 0;
 
-      virtual SensitiveDetectorBase* createSensitiveDetectorFromDB(VxdID sensorID, const VXDGeoSensorPar& sensor,
-          const VXDGeoSensorPlacementPar& placement) = 0;
-
       /**
        * Read parameters for given layer and store in m_ladder
        */
       virtual void setCurrentLayer(int layer);
+
+      /**
+       * Read parameters for given layer and store in m_ladder
+       */
+      virtual void setCurrentLayerFromDB(int layer, const VXDGeometryPar& parameters);
 
       /**
        * Place ladder corresponding to the given ladder id into volume
@@ -114,7 +122,7 @@ namespace Belle2 {
        * Place ladder corresponding to the given ladder id into volume
        * setLayer has to be called first to set the correct layer id
        */
-      G4Transform3D placeLadderFromDB(int layerID, int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
+      G4Transform3D placeLadderFromDB(int ladderID, double phi, G4LogicalVolume* volume, const G4Transform3D& placement,
                                       const VXDGeometryPar& parameters);
 
       /**
@@ -126,9 +134,6 @@ namespace Belle2 {
       G4Transform3D getPosition(const VXDGeoComponent& mother, const VXDGeoComponent& daughter, const VXDGeoPlacement& placement,
                                 bool originCenter);
 
-      G4Transform3D getPositionFromDB(const VXDGeoComponentPar& mother, const VXDGeoComponentPar& daughter,
-                                      const VXDGeoPlacementPar& placement,
-                                      bool originCenter);
 
       /**
        * Get Alignment for given component from the database
@@ -183,11 +188,6 @@ namespace Belle2 {
                                          component, std::vector<VXDGeoPlacement> placements,
                                          bool originCenter = true, bool allowOutside = false);
 
-
-      GeoVXDAssembly createSubComponentsFromDB(const std::string& name, VXDGeoComponentPar&
-                                               component, std::vector<VXDGeoPlacementPar> placements,
-                                               const VXDGeometryPar& parameters,
-                                               bool originCenter = true, bool allowOutside = false);
 
       /** Create a trapezoidal solid.
        * @param width full forward width of the shape in mm

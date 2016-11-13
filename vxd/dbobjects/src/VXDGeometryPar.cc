@@ -35,20 +35,17 @@ std::vector<VXDGeoPlacementPar> VXDGeometryPar::getSubComponents(GearDir path)
     nPos = max(nPos, component.getNumberNodes("woffset"));
     for (int iPos = 1; iPos <= nPos; ++iPos) {
       string index = (boost::format("[%1%]") % iPos).str();
-
-      VXDGeoPlacementPar aPlacement;
-      aPlacement.setName(type);
-      aPlacement.setU(component.getLength("u" + index, 0));
-      aPlacement.setV(component.getLength("v" + index, 0));
-      aPlacement.setW(component.getString("w" + index, "bottom"));
-      aPlacement.setWOffset(component.getLength("woffset" + index, 0));
-
-      result.push_back(aPlacement);
+      result.push_back(VXDGeoPlacementPar(
+                         type,
+                         component.getLength("u" + index, 0),
+                         component.getLength("v" + index, 0),
+                         component.getString("w" + index, "bottom"),
+                         component.getLength("woffset" + index, 0)
+                       ));
     }
   }
   return result;
 }
-
 
 const VXDGeoComponentPar& VXDGeometryPar::getComponent(std::string name) const
 {
@@ -59,6 +56,18 @@ const VXDGeoComponentPar& VXDGeometryPar::getComponent(std::string name) const
   }
   return cached->second;
 }
+
+
+int  VXDGeometryPar::getSensitiveChipID(std::string name) const
+{
+  //Check if sensorType already exists
+  std::map<string, int>::const_iterator cached = m_sensitiveIDCache.find(name);
+  if (cached == m_sensitiveIDCache.end()) {
+    return -1;
+  }
+  return cached->second;
+}
+
 
 const VXDGeoSensorPar& VXDGeometryPar::getSensor(string sensorTypeID) const
 {
@@ -132,33 +141,30 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   GearDir components(content, "Components/");
   for (const GearDir& paramsSensor : components.getNodes("Sensor")) {
     string sensorTypeID = paramsSensor.getString("@type");
-    //B2INFO("Reading sensors: SensorTypeID: " << sensorTypeID);
 
 
-    // FIXME: it is a bit inconsistent to convert to mm here.
-    // Otherwise, someone has to change createTrapezoidal().
     VXDGeoSensorPar sensor(
       paramsSensor.getString("Material"),
       paramsSensor.getString("Color", ""),
-      paramsSensor.getLength("width") / Unit::mm,
-      paramsSensor.getLength("width2", 0) / Unit::mm,
-      paramsSensor.getLength("length") / Unit::mm,
-      paramsSensor.getLength("height") / Unit::mm,
+      paramsSensor.getLength("width"),
+      paramsSensor.getLength("width2", 0),
+      paramsSensor.getLength("length"),
+      paramsSensor.getLength("height"),
       paramsSensor.getBool("@slanted", false)
     );
     sensor.setActive(VXDGeoComponentPar(
                        paramsSensor.getString("Material"),
                        paramsSensor.getString("Active/Color", "#f00"),
-                       paramsSensor.getLength("Active/width") / Unit::mm,
-                       paramsSensor.getLength("Active/width2", 0) / Unit::mm,
-                       paramsSensor.getLength("Active/length") / Unit::mm,
-                       paramsSensor.getLength("Active/height") / Unit::mm
+                       paramsSensor.getLength("Active/width"),
+                       paramsSensor.getLength("Active/width2", 0),
+                       paramsSensor.getLength("Active/length"),
+                       paramsSensor.getLength("Active/height")
                      ), VXDGeoPlacementPar(
                        "Active",
-                       paramsSensor.getLength("Active/u") / Unit::mm,
-                       paramsSensor.getLength("Active/v") / Unit::mm,
+                       paramsSensor.getLength("Active/u"),
+                       paramsSensor.getLength("Active/v"),
                        paramsSensor.getString("Active/w", "center"),
-                       paramsSensor.getLength("Active/woffset", 0) / Unit::mm
+                       paramsSensor.getLength("Active/woffset", 0)
                      ));
     sensor.setSensorInfo(createSensorInfo(GearDir(paramsSensor, "Active")));
     sensor.setComponents(getSubComponents(paramsSensor));
@@ -172,7 +178,6 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
   for (const GearDir& shell : content.getNodes("HalfShell")) {
 
     string shellName = m_prefix + "." + shell.getString("@name");
-    B2INFO("Building " << m_prefix << " half-shell " << shellName);
 
     m_alignment[ shellName ] = VXDAlignmentPar(shellName , GearDir(content, "Alignment/"));
     VXDHalfShellPar halfShell(shell.getString("@name") , shell.getAngle("shellAngle", 0));
@@ -190,7 +195,6 @@ void VXDGeometryPar::read(const string& prefix, const GearDir& content)
         double phi = ladder.getAngle("phi", 0);
         readLadderInfo(layerID, ladderID, content);
         halfShell.addLadder(layerID, ladderID,  phi);
-        B2INFO("Reading layerID " << layerID << " ladderID " << ladderID << " shell angle " << phi);
       }
     }
     m_halfShells.push_back(halfShell);
@@ -271,9 +275,6 @@ VXDAlignmentPar VXDGeometryPar::getAlignment(std::string name) const
 
 void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsDir)
 {
-
-  //B2INFO("Caching Component " << name);
-
   //Check if component already exists
   map<string, VXDGeoComponentPar>::iterator cached = m_componentCache.find(name);
   if (cached != m_componentCache.end()) {
@@ -298,22 +299,21 @@ void VXDGeometryPar::cacheComponent(const std::string& name, GearDir componentsD
   if (c.getWidth() <= 0 || c.getLength() <= 0 || c.getHeight() <= 0) {
     B2DEBUG(100, "One dimension empty, using auto resize for component");
   }
-  //B2INFO("Creating Sub Components for Component " << m_prefix + "." + name);
-  vector<VXDGeoPlacementPar> subComponents = getSubComponents(params);
-  cacheSubComponents(subComponents, componentsDir);
+
+  c.setSubComponents(getSubComponents(params));
+  cacheSubComponents(c.getSubComponents(), componentsDir);
 
   if (m_globals.getActiveChips() && params.exists("activeChipID")) {
     int chipID = params.getInt("activeChipID");
-    //B2INFO("For component " << name << " reading active chipID " <<  chipID);
     m_sensitiveIDCache[name] = chipID;
   }
   m_componentCache[name] = c;
 }
 
 
-void VXDGeometryPar::cacheSubComponents(std::vector<VXDGeoPlacementPar> placements , GearDir componentsDir)
+void VXDGeometryPar::cacheSubComponents(const std::vector<VXDGeoPlacementPar>& placements , GearDir componentsDir)
 {
-  for (VXDGeoPlacementPar& p : placements) {
+  for (const VXDGeoPlacementPar& p : placements) {
     cacheComponent(p.getName(), componentsDir);
   }
   return;

@@ -738,7 +738,7 @@ class CDCSVGDisplayModule(basf2.Module):
                         end = triple.getEndSegment()
 
                         pairWeight = \
-                            mc_axial_segment_pair_segment_filter.isGoodAxialSegmentPair(triple)
+                            mc_axial_segment_pair_segment_filter(triple)
 
                         if not pairWeight == pairWeight:
                             return False

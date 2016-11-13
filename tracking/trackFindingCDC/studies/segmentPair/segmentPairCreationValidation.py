@@ -113,7 +113,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_target(self, segment_pair_relation):
-        mc_weight = self.mc_segment_pair_filter.isGoodSegmentPair(segment_pair_relation)
+        mc_weight = self.mc_segment_pair_filter(segment_pair_relation)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
         return dict(

@@ -59,14 +59,6 @@ namespace Belle2 {
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-      /// Legacy method
-      virtual Weight isGoodNeighbor(const CDCSegmentPair& from,
-                                    const CDCSegmentPair& to)
-      {
-        return operator()(from, to);
-      }
     };
-
   }
 }

@@ -25,7 +25,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrainNames[5] = {
+    static char const* const segmentTrainNames[] = {
       "is_stereo",
       "maximum_perpS_overlap",
       "size",
@@ -41,7 +41,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 5;
+      static const size_t nNames = size(segmentTrainNames);
 
       /// Get the name of the corresponding column.
       constexpr

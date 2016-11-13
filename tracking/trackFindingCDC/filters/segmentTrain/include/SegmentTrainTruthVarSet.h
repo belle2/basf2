@@ -23,7 +23,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrainTruthNames[2] = {
+    static char const* const segmentTrainTruthNames[] = {
       "belongs_to_same_track_truth",
       "truth"
     };
@@ -36,7 +36,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 2;
+      static const size_t nNames = size(segmentTrainTruthNames);
 
       /// Get the name of the corresponding column.
       constexpr

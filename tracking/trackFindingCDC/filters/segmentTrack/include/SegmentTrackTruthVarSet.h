@@ -20,7 +20,7 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const segmentTrackTruthNames[5] = {
+    static char const* const segmentTrackTruthNames[] = {
       "belongs_to_same_track_truth",
       "segment_is_fake_truth",
       "segment_purity_truth",
@@ -35,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = 5;
+      static const size_t nNames = size(segmentTrackTruthNames);
 
       /// Get the name of the corresponding column.
       constexpr

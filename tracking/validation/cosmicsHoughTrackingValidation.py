@@ -29,7 +29,7 @@ class CosmicsHough(TrackingValidationRun):
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
-    wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
+    wire_hit_topology_preparer = basf2.register_module('WireHitPreparer')
 
     segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton',
                                                   SegmentOrientation="downwards")

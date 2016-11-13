@@ -173,9 +173,9 @@ finder_modules_by_short_name = {
     'TrackFinder': add_standard_finder,
     'TrackFinderCDC': tracking.add_cdc_track_finding,
     'TrackFinderVXD': tracking.add_vxd_track_finding,
-    'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitTopologyPreparer'),
+    'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
                                             path.add_module('TrackFinderCDCLegendreTracking')),
-    'SegmentFinderCDC': lambda path: (path.add_module('WireHitTopologyPreparer'),
+    'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
                                       path.add_module('SegmentFinderCDCFacetAutomaton')),
 }
 

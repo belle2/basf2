@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
+#include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
@@ -58,7 +58,7 @@ namespace Belle2 {
     private:
       // Findlets
       /// Preparation findlet creating the wire hits from the packed CDCHits
-      WireHitTopologyPreparer m_wireHitTopologyPreparer;
+      WireHitPreparer m_wireHitTopologyPreparer;
 
       /// First stage cellular automaton segment finder
       SegmentFinderFacetAutomaton<ChooseableClusterFilter,

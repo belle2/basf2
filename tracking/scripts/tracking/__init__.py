@@ -226,7 +226,7 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     """
 
     # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitTopologyPreparer",
+    path.add_module("WireHitPreparer",
                     flightTimeEstimation="outwards",
                     )
 
@@ -295,7 +295,7 @@ def add_cdc_cr_track_finding(path,
     """
 
     # Init the geometry for cdc tracking and the hits
-    path.add_module("WireHitTopologyPreparer",
+    path.add_module("WireHitPreparer",
                     flightTimeEstimation="downwards",
                     )
 

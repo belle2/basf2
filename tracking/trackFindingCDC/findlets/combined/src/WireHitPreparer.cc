@@ -7,31 +7,31 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
+#include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-WireHitTopologyPreparer::WireHitTopologyPreparer()
+WireHitPreparer::WireHitPreparer()
 {
   this->addProcessingSignalListener(&m_wireHitCreator);
   this->addProcessingSignalListener(&m_wireHitBackgroundBlocker);
   this->addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
 }
 
-std::string WireHitTopologyPreparer::getDescription()
+std::string WireHitPreparer::getDescription()
 {
   return "Combine the CDCHits from the DataStore with the geometry information.";
 }
 
-void WireHitTopologyPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+void WireHitPreparer::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_wireHitCreator.exposeParameters(moduleParamList, prefix);
   m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
   m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
 }
 
-void WireHitTopologyPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
+void WireHitPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
 {
   m_wireHitCreator.apply(outputWireHits);
   m_wireHitBackgroundBlocker.apply(outputWireHits);

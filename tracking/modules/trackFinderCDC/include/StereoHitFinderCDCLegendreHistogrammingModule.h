@@ -13,7 +13,7 @@ namespace Belle2 {
   /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree.
    *
    * A two-dimensional quad tree is used with $z_0$ in the one axis and the s-z-slope (tan lambda) on the other.
-   * The module goes through each found axial track and for each track reconstructs either all stereo hits from the CDCWireHitTopology
+   * The module goes through each found axial track and for each track reconstructs either all stereo hits from the CDCWireHitVector
    * or all found segments to match the r-phi trajectory of this track. The z-information is then used to determine the bin in the quad tree.
    * The hits resemble a straight line in the quad tree in z_0-tan lambda.
    *

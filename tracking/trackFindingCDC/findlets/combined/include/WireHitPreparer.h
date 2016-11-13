@@ -25,7 +25,7 @@ namespace Belle2 {
     class CDCWireHit;
 
     /// Findlet preparing the wire hits for the track finding
-    class WireHitTopologyPreparer : public Findlet<CDCWireHit> {
+    class WireHitPreparer : public Findlet<CDCWireHit> {
 
     private:
       /// Type of the base class
@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      WireHitTopologyPreparer();
+      WireHitPreparer();
 
       /// Short description of the findlet
       std::string getDescription() final;

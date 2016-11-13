@@ -28,7 +28,7 @@ class CDCLegendre(TrackingValidationRun):
 
     @staticmethod
     def finder_module(path):
-        path.add_module('WireHitTopologyPreparer')
+        path.add_module('WireHitPreparer')
         path.add_module('TrackFinderCDCLegendreTracking')
         path.add_module('TrackExporter')
 

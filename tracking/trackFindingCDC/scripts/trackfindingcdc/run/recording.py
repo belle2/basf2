@@ -86,7 +86,7 @@ class RecordingRun(BrowseTFileOnTerminateRunMixin, StandardEventGenerationRun):
         # based on the properties in the base class.
         path = super().create_path()
 
-        wire_hit_preparer = path.add_module("WireHitTopologyPreparer",
+        wire_hit_preparer = path.add_module("WireHitPreparer",
                                             UseNLoops=self.n_loops)
         if self.flight_time_estimation:
             wire_hit_preparer.param(dict(flightTimeEstimation=self.flight_time_estimation))

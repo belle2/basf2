@@ -53,9 +53,6 @@ namespace Belle2 {
       using Super = VarSet<TruthFacetVarNames>;
 
     public:
-      /// Construct the varset.
-      explicit TruthFacetVarSet();
-
       /// Generate and assign the variables from the facet
       bool extract(const CDCFacet* ptrFacet) final;
 
@@ -68,7 +65,6 @@ namespace Belle2 {
     public:
       /// Facet filter that gives if the facet is a true facet.
       MCFacetFilter m_mcFacetFilter;
-
     };
   }
 }

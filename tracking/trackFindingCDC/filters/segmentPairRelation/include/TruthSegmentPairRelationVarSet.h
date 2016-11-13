@@ -52,14 +52,7 @@ namespace Belle2 {
      */
     class TruthSegmentPairRelationVarSet : public VarSet<TruthSegmentPairRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<TruthSegmentPairRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit TruthSegmentPairRelationVarSet();
-
       /// Generate and assign the variables from the segment pair relation
       bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override;
     };

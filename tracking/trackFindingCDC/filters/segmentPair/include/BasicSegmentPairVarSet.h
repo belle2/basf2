@@ -49,14 +49,7 @@ namespace Belle2 {
      */
     class BasicSegmentPairVarSet : public VarSet<BasicSegmentPairVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<BasicSegmentPairVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit BasicSegmentPairVarSet();
-
       /// Generate and assign the variables from the segment pair
       bool extract(const CDCSegmentPair* ptrSegmentPair) override;
     };

@@ -13,11 +13,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitlessSegmentRelationVarSet::FitlessSegmentRelationVarSet()
-  : Super()
-{
-}
-
 bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;

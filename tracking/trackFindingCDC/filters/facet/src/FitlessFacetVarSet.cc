@@ -13,11 +13,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitlessFacetVarSet::FitlessFacetVarSet()
-  : Super()
-{
-}
-
 bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
   if (not ptrFacet) return false;

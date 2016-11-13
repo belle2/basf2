@@ -57,14 +57,7 @@ namespace Belle2 {
      */
     class HitGapTrackRelationVarSet : public VarSet<HitGapTrackRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<HitGapTrackRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit HitGapTrackRelationVarSet();
-
       /// Generate and assign the variables from the track pair
       bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
     };

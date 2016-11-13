@@ -70,14 +70,7 @@ namespace Belle2 {
      */
     class FitFacetVarSet : public VarSet<FitFacetVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<FitFacetVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitFacetVarSet();
-
       /// Generate and assign the variables from the facet
       bool extract(const CDCFacet* ptrFacet) final;
     };

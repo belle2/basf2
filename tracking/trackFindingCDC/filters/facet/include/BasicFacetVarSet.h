@@ -13,11 +13,9 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-
 #include <vector>
 #include <string>
 #include <cassert>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -71,14 +69,7 @@ namespace Belle2 {
      */
     class BasicFacetVarSet : public VarSet<BasicFacetVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<BasicFacetVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit BasicFacetVarSet();
-
       /// Generate and assign the variables from the cluster
       bool extract(const CDCFacet* ptrFacet) final;
     };

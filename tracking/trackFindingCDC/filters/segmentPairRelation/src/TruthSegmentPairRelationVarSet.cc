@@ -17,11 +17,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TruthSegmentPairRelationVarSet::TruthSegmentPairRelationVarSet()
-  : Super()
-{
-}
-
 bool TruthSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation)
 {
   if (not ptrSegmentPairRelation) return false;

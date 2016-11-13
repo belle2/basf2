@@ -63,14 +63,7 @@ namespace Belle2 {
      */
     class FitTrackRelationVarSet : public VarSet<FitTrackRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      using Super = VarSet<FitTrackRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitTrackRelationVarSet();
-
       /// Generate and assign the variables from the track relation
       bool extract(const Relation<const CDCTrack>* ptrTrackRelation) final;
     };

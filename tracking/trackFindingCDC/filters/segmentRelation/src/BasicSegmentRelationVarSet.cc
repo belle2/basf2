@@ -12,12 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicSegmentRelationVarSet::BasicSegmentRelationVarSet()
-  : Super()
-{
-}
-
-
 bool BasicSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;

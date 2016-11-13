@@ -13,11 +13,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BendFacetRelationVarSet::BendFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
   if (not ptrFacetRelation) return false;

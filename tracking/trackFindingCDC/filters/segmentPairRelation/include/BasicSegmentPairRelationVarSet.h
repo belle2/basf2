@@ -56,14 +56,7 @@ namespace Belle2 {
      */
     class BasicSegmentPairRelationVarSet : public VarSet<BasicSegmentPairRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      using Super = VarSet<BasicSegmentPairRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit BasicSegmentPairRelationVarSet();
-
       /// Generate and assign the variables from the segment relation
       bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };

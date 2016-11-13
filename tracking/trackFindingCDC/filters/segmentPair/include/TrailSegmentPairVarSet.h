@@ -50,14 +50,7 @@ namespace Belle2 {
      */
     class TrailSegmentPairVarSet : public VarSet<TrailSegmentPairVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<TrailSegmentPairVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit TrailSegmentPairVarSet();
-
       /// Generate and assign the variables from the segment pair
       bool extract(const CDCSegmentPair* ptrSegmentPair) override;
     };

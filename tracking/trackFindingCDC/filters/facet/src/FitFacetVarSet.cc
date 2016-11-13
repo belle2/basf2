@@ -17,11 +17,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitFacetVarSet::FitFacetVarSet()
-  : Super()
-{
-}
-
 bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
   if (not ptrFacet) return false;

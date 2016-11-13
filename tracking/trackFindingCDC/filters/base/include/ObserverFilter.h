@@ -27,16 +27,13 @@ namespace Belle2 {
       using Super = AFilter;
 
     public:
-      /// The base filter.
-      using AFilter::BaseFilter;
+      /// Using constructor of the Super class
+      using AFilter::AFilter;
 
       /// Object type to be filtered.
       using Object = typename AFilter::Object;
 
     public:
-      /// Constructor of the filter.
-      ObserverFilter() : Super() {}
-
       /// Terminate the filter after event processing.
       virtual void terminate() override
       {

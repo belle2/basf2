@@ -18,11 +18,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitSegmentRelationVarSet::FitSegmentRelationVarSet()
-  : Super()
-{
-}
-
 bool FitSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
 {
   if (not ptrSegmentRelation) return false;

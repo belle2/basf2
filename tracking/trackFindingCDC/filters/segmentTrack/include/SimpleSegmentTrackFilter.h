@@ -26,10 +26,6 @@ namespace Belle2 {
       using Super = FilterOnVarSet<SegmentTrackVarSet>;
 
     public:
-      /// Constructor
-      SimpleSegmentTrackFilter() : Super() { }
-
-    public:
       /// Get the output of the filter.
       Weight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) final;
     };

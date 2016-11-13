@@ -12,11 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitlessSegmentPairVarSet::FitlessSegmentPairVarSet()
-  : Super()
-{
-}
-
 bool FitlessSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   if (not ptrSegmentPair) return false;

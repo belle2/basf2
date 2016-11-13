@@ -13,11 +13,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrailSegmentPairVarSet::TrailSegmentPairVarSet()
-  : Super()
-{
-}
-
 bool TrailSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   if (not ptrSegmentPair) return false;

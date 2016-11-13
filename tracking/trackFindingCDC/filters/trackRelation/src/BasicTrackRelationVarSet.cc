@@ -12,11 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicTrackRelationVarSet::BasicTrackRelationVarSet()
-  : Super()
-{
-}
-
 bool BasicTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {
   if (not ptrTrackRelation) return false;

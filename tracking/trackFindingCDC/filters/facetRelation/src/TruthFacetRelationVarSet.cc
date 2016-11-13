@@ -13,11 +13,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TruthFacetRelationVarSet::TruthFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool TruthFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
   const CDCFacet* ptrFromFacet(ptrFacetRelation->getFrom());

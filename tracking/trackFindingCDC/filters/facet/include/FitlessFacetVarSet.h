@@ -63,14 +63,7 @@ namespace Belle2 {
      */
     class FitlessFacetVarSet : public VarSet<FitlessFacetVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<FitlessFacetVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitlessFacetVarSet();
-
       /// Generate and assign the variables from the cluster
       bool extract(const CDCFacet* ptrFacet) final;
     };

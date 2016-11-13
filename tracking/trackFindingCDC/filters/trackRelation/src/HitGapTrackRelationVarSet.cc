@@ -12,11 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-HitGapTrackRelationVarSet::HitGapTrackRelationVarSet()
-  : Super()
-{
-}
-
 bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {
   if (not ptrTrackRelation) return false;

@@ -58,14 +58,7 @@ namespace Belle2 {
      */
     class BendFacetRelationVarSet : public VarSet<BendFacetRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<BendFacetRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit BendFacetRelationVarSet();
-
       /// Generate and assign the variables from the facetRelation
       bool extract(const Relation<const CDCFacet>* ptrFacetRelation) final;
     };

@@ -50,14 +50,7 @@ namespace Belle2 {
      */
     class BasicTrackRelationVarSet : public VarSet<BasicTrackRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<BasicTrackRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit BasicTrackRelationVarSet();
-
       /// Generate and assign the variables from the track relation
       bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
     };

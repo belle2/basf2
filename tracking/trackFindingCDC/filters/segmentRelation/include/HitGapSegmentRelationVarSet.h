@@ -56,14 +56,7 @@ namespace Belle2 {
      */
     class HitGapSegmentRelationVarSet : public VarSet<HitGapSegmentRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<HitGapSegmentRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit HitGapSegmentRelationVarSet();
-
       /// Generate and assign the variables from the segment pair
       bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) override;
     };

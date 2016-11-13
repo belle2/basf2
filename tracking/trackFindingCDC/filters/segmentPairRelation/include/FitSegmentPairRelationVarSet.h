@@ -62,14 +62,7 @@ namespace Belle2 {
      */
     class FitSegmentPairRelationVarSet : public VarSet<FitSegmentPairRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      using Super = VarSet<FitSegmentPairRelationVarNames>;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitSegmentPairRelationVarSet();
-
       /// Generate and assign the variables from the segment relation
       bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };

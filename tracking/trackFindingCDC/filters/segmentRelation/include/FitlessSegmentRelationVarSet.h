@@ -73,14 +73,7 @@ namespace Belle2 {
      */
     class FitlessSegmentRelationVarSet : public VarSet<FitlessSegmentRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<FitlessSegmentRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit FitlessSegmentRelationVarSet();
-
       /// Generate and assign the variables from the segment pair
       bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) override;
     };

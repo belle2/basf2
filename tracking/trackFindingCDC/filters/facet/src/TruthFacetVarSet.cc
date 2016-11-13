@@ -18,11 +18,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TruthFacetVarSet::TruthFacetVarSet()
-  : Super()
-{
-}
-
 bool TruthFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
   if (not ptrFacet) return false;

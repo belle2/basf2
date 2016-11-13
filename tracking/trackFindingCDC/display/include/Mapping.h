@@ -44,7 +44,7 @@ namespace Belle2 {
 
     public:
       /// Constructor receiving the constant value
-      ConstantMapping(const std::string& value)
+      explicit ConstantMapping(const std::string& value)
         : m_value(value)
       {
       }
@@ -72,8 +72,8 @@ namespace Belle2 {
 
     public:
       /// Constructor receiving the values to be cycled.
-      CycleMapping(std::vector<std::string> values)
-        : m_values(std::move(values))
+      explicit CycleMapping(const std::vector<std::string>& values)
+        : m_values(values)
       {
       }
 

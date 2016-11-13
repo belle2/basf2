@@ -85,7 +85,7 @@ namespace Belle2 {
       template<int I>
       Float_t get() const
       {
-        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        static_assert(I < nVars, "Requested variable index exceeds number of variables.");
         return m_variables.get(I);
       }
 
@@ -93,7 +93,7 @@ namespace Belle2 {
       template<int I>
       Float_t& var()
       {
-        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        static_assert(I < nVars, "Requested variable index exceeds number of variables.");
         return m_variables[I];
       }
 
@@ -101,10 +101,16 @@ namespace Belle2 {
       template<typename AFloat>
       struct AssignFinite {
         /// Setup the assignment to a variable
-        AssignFinite(AFloat& value) : m_value(value) {}
+        explicit AssignFinite(AFloat& value)
+          : m_value(value)
+        {
+        }
 
         /// Unpacker of the wrapper
-        operator AFloat& () { return m_value; }
+        operator AFloat& ()
+        {
+          return m_value;
+        }
 
         /// Assign value replacing infinite values with the maximum value possible
         void operator=(const AFloat value)
@@ -124,7 +130,7 @@ namespace Belle2 {
       template<int I>
       AssignFinite<Float_t> finitevar()
       {
-        static_assert(I < nVars, "Requested variable index exceeds number variables.");
+        static_assert(I < nVars, "Requested variable index exceeds number of variables.");
         return AssignFinite<Float_t>(m_variables[I]);
       }
 

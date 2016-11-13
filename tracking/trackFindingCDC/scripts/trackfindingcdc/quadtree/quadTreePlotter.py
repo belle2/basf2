@@ -13,6 +13,7 @@ import matplotlib.cm as cmx
 import numpy as np
 import subprocess
 from datetime import datetime
+import bisect
 
 from trackfindingcdc.cdcdisplay.svgdrawing import attributemaps
 
@@ -274,7 +275,8 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
         if self.draw_hits:
             cdcHits = Belle2.PyStoreArray("CDCHits")
-            wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+            storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
+            wireHits = storedWireHits.obj().get()
 
             array = Belle2.PyStoreArray("MCTrackCands")
             cdc_hits = [cdcHits[i] for track in array for i in track.getHitIDs()]
@@ -282,14 +284,15 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
             for cdcHit in cdcHits:
                 if cdcHit in cdc_hits:
                     continue
-                wireHit = wireHitTopology.getWireHit(cdcHit)
-
+                wireHit = wireHits.at(bisect.bisect_left(wireHits, cdcHit))
                 theta, r = self.calculatePositionInQuadTreePicture(wireHit.getRefPos2D())
 
                 plt.plot(theta, r, marker="", color="black", ls="-", alpha=0.8)
 
         if self.draw_mc_hits:
-            wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+            storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
+            wireHits = storedWireHits.obj().get()
+
             map = attributemaps.listColors
             array = Belle2.PyStoreArray("MCTrackCands")
             cdcHits = Belle2.PyStoreArray("CDCHits")
@@ -299,7 +302,7 @@ class SegmentQuadTreePlotter(QuadTreePlotter):
 
                 for cdcHitID in track.getHitIDs(Belle2.Const.CDC):
                     cdcHit = cdcHits[cdcHitID]
-                    wireHit = wireHitTopology.getWireHit(cdcHit)
+                    wireHit = wireHits.at(bisect.bisect_left(wireHits, cdcHit))
 
                     theta, r = self.calculatePositionInQuadTreePicture(wireHit.getRefPos2D())
 
@@ -361,10 +364,11 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         trajectory3D: TrackFindingCDC.CDCTrajectory3D
         rlInfo: RightLeftInfo ( = short)
         """
-        wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+        storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
+        wireHits = storedWireHits.obj().get()
 
         CDCRecoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D
-        wireHit = wireHitTopology.getWireHit(cdcHit)
+        wireHit = wireHits.at(bisect.bisect_left(wireHits, cdcHit))
         rightLeftWireHit = Belle2.TrackFindingCDC.CDCRLWireHit(wireHit, rlInfo)
         if rightLeftWireHit.getStereoType() != 0:
             recoHit3D = CDCRecoHit3D.reconstruct(rightLeftWireHit, trajectory3D.getTrajectory2D())
@@ -422,7 +426,8 @@ class StereoQuadTreePlotter(QuadTreePlotter):
         mcHitLookUp = Belle2.TrackFindingCDC.CDCMCHitLookUp().getInstance()
         mcHitLookUp.fill()
 
-        wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
+        storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
+        wireHits = storedWireHits.obj().get()
 
         if self.draw_mc_hits:
             mc_track_cands = Belle2.PyStoreArray("MCTrackCands")
@@ -466,7 +471,7 @@ class StereoQuadTreePlotter(QuadTreePlotter):
             last_track = track_vector[-1]
             trajectory = last_track.getStartTrajectory3D().getTrajectory2D()
 
-            for wireHit in wireHitTopology.getWireHits():
+            for wireHit in wireHits:
                 for rlInfo in (-1, 1):
                     recoHit3D = Belle2.TrackFindingCDC.CDCRecoHit3D.reconstruct(wireHit, rlInfo, trajectory)
 

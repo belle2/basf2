@@ -1,8 +1,10 @@
 #include <tracking/modules/trackFinderCDC/StereoHitFinderCDCLegendreHistogrammingModule.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -50,8 +52,8 @@ void StereoHitFinderCDCLegendreHistogrammingModule::terminate()
 void StereoHitFinderCDCLegendreHistogrammingModule::generate(std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   // Initialize the RL hits
-  const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-  const auto& wireHits = wireHitTopology.getWireHits();
+  StoreWrappedObjPtr<std::vector< CDCWireHit>> storedWireHits("CDCWireHitVector");
+  const std::vector<CDCWireHit>& wireHits = *storedWireHits;
   std::vector<CDCRLWireHit> rlTaggedWireHits;
   rlTaggedWireHits.reserve(2 * wireHits.size());
   for (const CDCWireHit& wireHit : wireHits) {

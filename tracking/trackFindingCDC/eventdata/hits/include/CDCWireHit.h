@@ -127,6 +127,12 @@ namespace Belle2 {
       }
 
       /// Defines CDCWireHits and raw CDCHit to be coaligned.
+      bool operator<(const CDCHit& hit)
+      {
+        return this->getWireID().getEWire() < hit.getID();
+      }
+
+      /// Defines CDCWireHits and raw CDCHit to be coaligned.
       friend bool operator<(const CDCWireHit& wireHit, const CDCHit& hit)
       {
         return wireHit.getWireID().getEWire() < hit.getID();

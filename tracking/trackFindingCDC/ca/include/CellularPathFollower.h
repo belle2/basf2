@@ -123,15 +123,13 @@ namespace Belle2 {
         ACellHolder* last = path.back();
 
         bool grew = false;
-        for (const WeightedRelation<ACellHolder>& relation
-             : cellHolderNeighborhood.equal_range(last)) {
-          if (isHighestContinuation(relation)) {
-            ACellHolder* neighbor(relation.getTo());
-            path.push_back(neighbor);
-            growAllPaths(path, cellHolderNeighborhood, paths);
-            grew = true;
-            path.pop_back();
-          }
+        for (const WeightedRelation<ACellHolder>& relation : cellHolderNeighborhood.equal_range(last)) {
+          if (not isHighestContinuation(relation)) continue;
+          ACellHolder* neighbor(relation.getTo());
+          path.push_back(neighbor);
+          growAllPaths(path, cellHolderNeighborhood, paths);
+          grew = true;
+          path.pop_back();
         }
 
         if (not grew) {

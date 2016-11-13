@@ -110,16 +110,19 @@ namespace Belle2 {
       /// Returns the better solution x from the bounds of the intervall.
       static double getConvergedBound(const Vector2D& lower, const Vector2D& upper)
       {
+        if (not std::isfinite(lower.y()) or not std::isfinite(upper.y())) {
+          return NAN;
+        }
+
         if (fabs(lower.y()) <= fabs(upper.y())) {
           return lower.x();
-
-        } else if (fabs(lower.y()) > fabs(upper.y())) {
-          return upper.x();
-
-        } else {
-          return NAN;
-
         }
+
+        if (fabs(lower.y()) > fabs(upper.y())) {
+          return upper.x();
+        }
+
+        return NAN;
       }
 
     public:

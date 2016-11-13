@@ -142,7 +142,8 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   const CDCStereoRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
   const CDCAxialRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
 
-  if ((not ptrStereoSegment) or (not ptrAxialSegment)) return;
+  assert(ptrStereoSegment);
+  assert(ptrAxialSegment);
 
   const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
   const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;

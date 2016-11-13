@@ -12,11 +12,6 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-HitGapSegmentPairVarSet::HitGapSegmentPairVarSet()
-  : Super()
-{
-}
-
 bool HitGapSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
   if (not ptrSegmentPair) return false;

@@ -9,7 +9,6 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/SkimmedVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
 
 namespace Belle2 {
@@ -19,18 +18,15 @@ namespace Belle2 {
      *  Is the same as the HitGapSegmentPairVarSet but skimmed for non sensical combinations
      *  without the expensive common fit.
      */
-    class  SkimmedHitGapSegmentPairVarSet : public SkimmedVarSet<HitGapSegmentPairVarSet> {
+    class  SkimmedHitGapSegmentPairVarSet : public HitGapSegmentPairVarSet {
 
     private:
       /// Name of the super class.
-      using Super = SkimmedVarSet<HitGapSegmentPairVarSet> ;
+      using Super = HitGapSegmentPairVarSet;
 
     public:
-      /// Construct the varset.
-      explicit SkimmedHitGapSegmentPairVarSet();
-
       /// Implement the skim cut.
-      bool accept(const CDCSegmentPair* ptrSegmentPair) final;
+      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

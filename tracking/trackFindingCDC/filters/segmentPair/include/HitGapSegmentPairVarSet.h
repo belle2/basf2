@@ -66,9 +66,6 @@ namespace Belle2 {
       using Super = VarSet<HitGapSegmentPairVarNames>;
 
     public:
-      /// Construct the varset.
-      explicit HitGapSegmentPairVarSet();
-
       /// Generate and assign the variables from the segment pair
       bool extract(const CDCSegmentPair* ptrSegmentPair) override;
     };

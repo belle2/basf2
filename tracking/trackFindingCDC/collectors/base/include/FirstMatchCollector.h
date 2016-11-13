@@ -30,7 +30,7 @@ namespace Belle2 {
       using MatchedCollectionItem = typename Super::MatchedCollectionItem;
 
       /// Do the collection process.
-      virtual void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
+      void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
       {
         for (CollectorItem& collectorItem : collectorItems) {
           const std::vector<MatchedCollectionItem>& matchesForCollector = this->m_matcherInstance.match(collectorItem, collectionItems);

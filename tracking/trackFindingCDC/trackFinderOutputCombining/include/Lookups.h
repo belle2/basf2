@@ -39,16 +39,17 @@ namespace Belle2 {
     template<class ItemType, class ListType>
     class LookUpBase {
     public:
-      /** Should be overloaded. Fill the vector with the given elements. */
-      virtual void fillWith(std::vector<ItemType>& items) = 0;
-
-      /** Empty Desctructor. */
-      virtual ~LookUpBase() = default;
-
       /// Constant iterator type of this container.
       using const_iterator = typename std::vector<ListType>::const_iterator;
+
       /// Constant iterator type of this container.
       using iterator = typename std::vector<ListType>::iterator;
+
+      /// Make destructor of interface virtual
+      virtual ~LookUpBase() = default;
+
+      /** Should be overloaded. Fill the vector with the given elements. */
+      virtual void fillWith(std::vector<ItemType>& items) = 0;
 
       /** STL: begin. */
       const_iterator begin() const

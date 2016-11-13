@@ -306,7 +306,7 @@ namespace Belle2 {
       /// Like fell but also releases all memory the tree has aquired during long execution.
       void raze()
       {
-        fell();
+        this->fell();
         m_children.clear();
         m_children.shrink_to_fit();
       }

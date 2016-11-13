@@ -44,7 +44,7 @@ namespace Belle2 {
       /// Shortcut for CollectionItem pointers with weight.
       using MatchedCollectionItem = WithWeight<const CollectionItem*>;
 
-      /// Empty desctructor.
+      /// Make destructor of interface virtual
       virtual ~Collector() = default;
 
       /** Redirect all parameters of the matcher. **/

@@ -63,7 +63,7 @@ namespace Belle2 {
       template<class Ts>
       void seed(const Ts& items)
       {
-        fell();
+        this->fell();
         Node& topNode = this->getTopNode();
         for (auto && item : items) {
           m_marks.push_back(false);
@@ -297,7 +297,7 @@ namespace Belle2 {
       /// Like fell but also releases all memory the tree has aquired during long executions.
       void raze()
       {
-        fell();
+        this->fell();
         Super::raze();
         m_marks.shrink_to_fit();
       }

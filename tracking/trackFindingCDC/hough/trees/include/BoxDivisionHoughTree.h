@@ -132,7 +132,7 @@ namespace Belle2 {
 
     public:
       /// Initialise the algorithm by constructing the hough tree from the parameters
-      virtual void initialize()
+      void initialize()
       {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
@@ -149,13 +149,13 @@ namespace Belle2 {
       }
 
       /// Terminates the processing by striping all hit information from the tree
-      virtual void fell()
+      void fell()
       {
         m_houghTree->fell();
       }
 
       /// Release all memory that the tree aquired during the runs.
-      virtual void raze()
+      void raze()
       {
         m_houghTree->raze();
       }

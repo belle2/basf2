@@ -40,7 +40,7 @@ namespace Belle2 {
       }
 
       /// Initialize the tree with the given values.
-      void initialize() override
+      void initialize()
       {
         Super::template constructArray<0>(-getMaximumX(), getMaximumX(), getOverlapX());
         Super::template constructArray<1>(-getMaximumY(), getMaximumY(), getOverlapY());

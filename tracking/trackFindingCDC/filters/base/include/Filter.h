@@ -29,6 +29,9 @@ namespace Belle2 {
       using Object = AObject;
 
     public:
+      /// Make destructor of interface class virtual
+      virtual ~Filter() = default;
+
       /**
        *  Expose the set of parameters of the filter to the module parameter list.
        *

@@ -35,7 +35,7 @@ namespace Belle2 {
       {
       }
 
-      /// Destructor of interface class virtual
+      /// Make destructor of interface class virtual
       virtual ~FilterFactory() = default;
 
     public:

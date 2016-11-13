@@ -16,7 +16,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitTopologyFiller.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/SuperClusterCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterBackgroundDetector.h>
@@ -75,20 +74,6 @@ namespace Belle2 {
   public:
     /// Constructor setting the default store vector names
     WireHitCreatorModule() : Super{{{"CDCWireHitVector"}}} {}
-  };
-
-  /**
-   * Module implementation using the WireHitTopologyFiller
-   */
-  class WireHitTopologyFillerModule:
-    public TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller> {
-
-    /// Type of the base class
-    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::WireHitTopologyFiller>;
-
-  public:
-    /// Constructor setting the default store vector names
-    WireHitTopologyFillerModule() : Super{{{"CDCWireHitVector"}}} {}
   };
 
   /**

@@ -17,7 +17,6 @@ WireHitTopologyPreparer::WireHitTopologyPreparer()
   this->addProcessingSignalListener(&m_wireHitCreator);
   this->addProcessingSignalListener(&m_wireHitBackgroundBlocker);
   this->addProcessingSignalListener(&m_wireHitMCMultiLoopBlocker);
-  this->addProcessingSignalListener(&m_wireHitTopologyFiller);
 }
 
 std::string WireHitTopologyPreparer::getDescription()
@@ -30,7 +29,6 @@ void WireHitTopologyPreparer::exposeParameters(ModuleParamList* moduleParamList,
   m_wireHitCreator.exposeParameters(moduleParamList, prefix);
   m_wireHitBackgroundBlocker.exposeParameters(moduleParamList, prefix);
   m_wireHitMCMultiLoopBlocker.exposeParameters(moduleParamList, prefix);
-  m_wireHitTopologyFiller.exposeParameters(moduleParamList, prefix);
 }
 
 void WireHitTopologyPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
@@ -38,5 +36,4 @@ void WireHitTopologyPreparer::apply(std::vector<CDCWireHit>& outputWireHits)
   m_wireHitCreator.apply(outputWireHits);
   m_wireHitBackgroundBlocker.apply(outputWireHits);
   m_wireHitMCMultiLoopBlocker.apply(outputWireHits);
-  m_wireHitTopologyFiller.apply(outputWireHits);
 }

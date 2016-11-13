@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/utilities/TestHelpers.h>
 
@@ -707,22 +706,7 @@ namespace Belle2 {
         EXPECT_EQ(m_hitList.size(), 110) << "Too few hits in the hit vector.";
 
         std::sort(m_hitList.begin(), m_hitList.end());
-
-        std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(m_hitList)};
-
-        auto keepSharedWireHitsAlive = [sharedWireHits](ConstVectorRange<CDCWireHit>* wireHitRange) {
-          delete wireHitRange;
-        };
-
-        std::shared_ptr<ConstVectorRange<CDCWireHit> > sharedWireHitRange{
-          new ConstVectorRange<CDCWireHit>(sharedWireHits->begin(), sharedWireHits->end()), keepSharedWireHitsAlive
-        };
-
-        CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        wireHitTopology.fill(std::move(sharedWireHitRange));
-
       }
-
     };
   }
 }

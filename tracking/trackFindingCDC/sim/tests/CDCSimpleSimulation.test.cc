@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

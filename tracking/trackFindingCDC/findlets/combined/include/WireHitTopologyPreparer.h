@@ -12,7 +12,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitBackgroundBlocker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WireHitMCMultiLoopBlocker.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WireHitTopologyFiller.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
@@ -55,9 +54,6 @@ namespace Belle2 {
 
       /// Marks higher order loops as background for tuning analysis
       WireHitMCMultiLoopBlocker m_wireHitMCMultiLoopBlocker;
-
-      /// Publishes the created wire hits to the wire hit topology.
-      WireHitTopologyFiller m_wireHitTopologyFiller;
     };
   }
 }

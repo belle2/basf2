@@ -33,17 +33,17 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription();
+      std::string getDescription() override;
 
       /// Add the parameters of the fitter to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Signals the beginning of the event processing
-      void initialize();
+      void initialize() override;
 
     public:
       /// Main algorithm applying the fit to each segment
-      void apply(std::vector<CDCRecoSegment2D>& outputSegments);
+      void apply(std::vector<CDCRecoSegment2D>& outputSegments) override;
 
     private:
       /// Fit the alias segment

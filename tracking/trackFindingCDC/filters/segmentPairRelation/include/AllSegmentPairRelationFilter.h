@@ -28,10 +28,9 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
-      virtual
-      Weight operator()(const CDCSegmentPair& fromSegmentPair,
-                        const CDCSegmentPair& toSegmentPair) override final;
 
+      Weight
+      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
     };
   }
 }

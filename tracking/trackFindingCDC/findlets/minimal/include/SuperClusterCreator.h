@@ -32,12 +32,12 @@ namespace Belle2 {
       SuperClusterCreator();
 
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
     public:
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCWireHitCluster>& outputSuperClusters) override final;
+                 std::vector<CDCWireHitCluster>& outputSuperClusters) final;
 
     private:
       /// Creator of the super clusters

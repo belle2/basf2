@@ -56,7 +56,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
+      bool extract(const Relation<const CDCFacet>* ptrFacetRelation) final;
     };
   }
 }

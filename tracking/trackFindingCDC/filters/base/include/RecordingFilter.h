@@ -53,7 +53,7 @@ namespace Belle2 {
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "rootFileName"),
@@ -73,7 +73,7 @@ namespace Belle2 {
       }
 
       /// Initialize the recorder before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         if (m_skimFilter) m_skimFilter->initialize();
@@ -83,28 +83,28 @@ namespace Belle2 {
       }
 
       /// Signal the beginning of a new run to the skimming filter and the varset
-      virtual void beginRun() override
+      void beginRun() override
       {
         if (m_skimFilter) m_skimFilter->beginRun();
         Super::beginRun();
       }
 
       /// Signal the beginning of a new event to the skimming filter and the varset
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         if (m_skimFilter) m_skimFilter->beginEvent();
         Super::beginEvent();
       }
 
       /// Signal the end of a new run to the skimming filter and the varset
-      virtual void endRun() override
+      void endRun() override
       {
         Super::endRun();
         if (m_skimFilter) m_skimFilter->endRun();
       }
 
       /// Initialize the recorder after event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         m_recorder->write();
         m_recorder.reset();
@@ -114,15 +114,16 @@ namespace Belle2 {
 
     public:
       /// Function to evaluate the cluster for its backgroundness.
-      virtual Weight operator()(const Object& obj) override final
-      {
-        if (m_skimFilter) {
+      Weight operator()(const Object& obj) final {
+        if (m_skimFilter)
+        {
           Weight skimWeight = (*m_skimFilter)(obj);
           if (std::isnan(skimWeight)) return NAN;
         }
 
         Weight extracted = Super::operator()(obj);
-        if (not std::isnan(extracted)) {
+        if (not std::isnan(extracted))
+        {
           m_recorder->capture();
         }
 

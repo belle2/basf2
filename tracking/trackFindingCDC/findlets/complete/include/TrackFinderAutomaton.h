@@ -47,13 +47,13 @@ namespace Belle2 {
       std::string getDescription() override;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal the beginning of a new event
-      void beginEvent() override final;
+      void beginEvent() final;
 
       /// Execute the findlet
-      void apply() override final;
+      void apply() final;
 
     private:
       // Findlets

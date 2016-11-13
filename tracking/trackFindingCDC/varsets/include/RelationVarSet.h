@@ -37,28 +37,28 @@ namespace Belle2 {
        *  Initialize the variable set before event processing.
        *  Can be specialised if the derived variable set has setup work to do.
        */
-      virtual void initialize() override
+      void initialize() override
       {
         m_firstVarSet.initialize();
         m_secondVarSet.initialize();
       }
 
       /// Signal the beginning of a new run
-      virtual void beginRun() override
+      void beginRun() override
       {
         m_firstVarSet.beginRun();
         m_secondVarSet.beginRun();
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         m_firstVarSet.beginEvent();
         m_secondVarSet.beginEvent();
       }
 
       /// Signal the end of a run
-      virtual void endRun() override
+      void endRun() override
       {
         m_secondVarSet.endRun();
         m_firstVarSet.endRun();
@@ -68,14 +68,14 @@ namespace Belle2 {
        *  Terminate the variable set after event processing.
        *  Can be specialised if the derived variable set has to tear down aquired resources.
        */
-      virtual void terminate() override
+      void terminate() override
       {
         m_secondVarSet.terminate();
         m_firstVarSet.terminate();
       }
 
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const Relation<const BaseObject>* obj) override
+      bool extract(const Relation<const BaseObject>* obj) override
       {
         assert(obj);
         bool firstExtracted = m_firstVarSet.extract(obj->first);
@@ -93,7 +93,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
       {
         std::vector<Named<Float_t*> > result = m_firstVarSet.getNamedVariables(prefix + m_firstPrefix);
         std::vector<Named<Float_t*> > extend = m_secondVarSet.getNamedVariables(prefix + m_secondPrefix);
@@ -105,7 +105,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(std::string varName) override
       {
         if (boost::starts_with(varName, m_firstPrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_firstPrefix.size());

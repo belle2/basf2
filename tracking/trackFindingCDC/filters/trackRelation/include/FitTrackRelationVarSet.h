@@ -72,7 +72,7 @@ namespace Belle2 {
       explicit FitTrackRelationVarSet();
 
       /// Generate and assign the variables from the track relation
-      virtual bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override final;
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) final;
     };
   }
 }

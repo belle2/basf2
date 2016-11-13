@@ -20,9 +20,8 @@ namespace Belle2 {
       /** Checks if a pair of segments is a good combination.
        *  All implementation always accepts the total number of hits.
        */
-      virtual
-      Weight operator()(const CDCSegmentPair& segmentPair) override final
-      {
+
+      Weight operator()(const CDCSegmentPair& segmentPair) final {
         const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
         const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
 

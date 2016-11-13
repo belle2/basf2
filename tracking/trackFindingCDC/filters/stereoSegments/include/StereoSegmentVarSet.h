@@ -68,9 +68,8 @@ namespace Belle2 {
       explicit StereoSegmentVarSet() : VarSet<StereoSegmentVarNames>() { }
 
       /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>* testPair)
-      override;
-
+      bool extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>,
+                   const CDCTrack&>* testPair) override;
     };
   }
 }

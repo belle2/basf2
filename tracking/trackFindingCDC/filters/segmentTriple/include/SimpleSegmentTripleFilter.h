@@ -30,7 +30,7 @@ namespace Belle2 {
        *  Returns NAN if the connection shall not be made or
        *  a finit value be used as the cell weight of the cell to constructed.
        */
-      virtual Weight operator()(const CDCSegmentTriple& segmentTriple) override final;
+      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Returns the xy fitter instance that is used by this filter

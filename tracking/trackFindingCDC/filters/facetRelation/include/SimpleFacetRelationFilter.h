@@ -38,11 +38,11 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
     public:
       /** Main filter method returning the weight of the neighborhood relation.*/
-      virtual Weight operator()(const CDCFacet& fromFacet,
-                                const CDCFacet& toFacet) override final;
+      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     private:
       /// Memory for the used direction of flight deviation.

@@ -27,8 +27,8 @@ namespace Belle2 {
 
     public:
       /// Implementation currently accepts all combinations
-      virtual Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
-                                const CDCSegmentTriple& toSegmentTriple) override final;
+      Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
+                        const CDCSegmentTriple& toSegmentTriple) final;
     };
   }
 }

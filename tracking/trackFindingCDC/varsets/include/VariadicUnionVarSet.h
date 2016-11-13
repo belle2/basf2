@@ -59,32 +59,29 @@ namespace Belle2 {
       using Super::extract;
 
       /// Initialize all contained variable set before event processing.
-      virtual void initialize() override final
-      {
+      void initialize() final {
         m_multiVarSet.initialize();
       }
 
       /// Signal the beginning of a new run
-      virtual void beginRun() override final
-      {
+      void beginRun() final {
         m_multiVarSet.beginRun();
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         m_multiVarSet.beginEvent();
       }
 
       /// Signal the end of a run
-      virtual void endRun() override
+      void endRun() override
       {
         m_multiVarSet.beginRun();
       }
 
       /// Terminate all contained variable set after event processing.
-      virtual void terminate() override final
-      {
+      void terminate() final {
         m_multiVarSet.terminate();
       }
 
@@ -92,8 +89,7 @@ namespace Belle2 {
        *  Main method that extracts the variable values from the complex object.
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      bool extract(const Object* obj) override final
-      {
+      bool extract(const Object* obj) final {
         return m_multiVarSet.extract(obj);
       }
 
@@ -104,7 +100,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
       {
         return m_multiVarSet.getNamedVariables(prefix);
       }
@@ -113,7 +109,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(std::string varName) override
       {
         return m_multiVarSet.find(varName);
       }

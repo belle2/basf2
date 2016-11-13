@@ -76,30 +76,29 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         Super::exposeParameters(moduleParamList, prefix);
-        if (m_param_filterName == "") {
+        if (m_param_filterName == "")
+        {
           /// Make a force parameter in case no default was given
           moduleParamList->addParameter(prefixed(prefix, "filter"),
-                                        m_param_filterName,
-                                        m_filterFactory->createFiltersNameDescription());
+          m_param_filterName,
+          m_filterFactory->createFiltersNameDescription());
         } else {
           /// Make a normal parameter in case default is known
           moduleParamList->addParameter(prefixed(prefix, "filter"),
-                                        m_param_filterName,
-                                        m_filterFactory->createFiltersNameDescription(),
-                                        m_param_filterName);
+          m_param_filterName,
+          m_filterFactory->createFiltersNameDescription(),
+          m_param_filterName);
         }
         moduleParamList->addParameter(prefixed(prefix, "filterParameters"),
-                                      m_param_filterParameters,
-                                      m_filterFactory->createFiltersParametersDescription(),
-                                      m_param_filterParameters);
+        m_param_filterParameters,
+        m_filterFactory->createFiltersParametersDescription(),
+        m_param_filterParameters);
       }
 
       /// Initialize before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         m_filter = m_filterFactory->create(m_param_filterName);
         if (not m_filter) {
@@ -122,34 +121,34 @@ namespace Belle2 {
       }
 
       /// Indicates if the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() override
+      bool needsTruthInformation() override
       {
         return m_filter->needsTruthInformation();
       }
 
       /// Signal the beginning of a new run
-      virtual void beginRun() override
+      void beginRun() override
       {
         m_filter->beginRun();
         Super::beginRun();
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         m_filter->beginEvent();
         Super::beginEvent();
       }
 
       /// Signal the end of a run
-      virtual void endRun() override
+      void endRun() override
       {
         Super::endRun();
         m_filter->endRun();
       }
 
       /// Initialize the recorder after event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         Super::terminate();
         m_filter->terminate();
@@ -163,8 +162,7 @@ namespace Belle2 {
        *  @return    A finit float value if the object is accepted.
        *             NAN if the object is rejected.
        */
-      virtual Weight operator()(const Object& object) override final
-      {
+      Weight operator()(const Object& object) final {
         return (*m_filter)(object);
       }
 

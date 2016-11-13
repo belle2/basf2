@@ -58,7 +58,7 @@ namespace Belle2 {
       explicit BasicSegmentPairVarSet();
 
       /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
     };
   }
 }

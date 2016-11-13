@@ -47,7 +47,7 @@ namespace Belle2 {
       }
 
       /// Initialize the filter before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         if (not m_varSet) B2ERROR("Variable set ot setup");
@@ -55,35 +55,35 @@ namespace Belle2 {
       }
 
       /// Allow setup work to take place at beginning of new run
-      virtual void beginRun() override
+      void beginRun() override
       {
         Super::beginRun();
         m_varSet->beginRun();
       }
 
       /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         Super::beginEvent();
         m_varSet->beginEvent();
       }
 
       /// Allow clean up to take place at end of run
-      virtual void endRun() override
+      void endRun() override
       {
         m_varSet->endRun();
         Super::endRun();
       }
 
       /// Initialize the filter after event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         m_varSet->terminate();
         Super::terminate();
       }
 
       /// Checks if any variables need Monte Carlo information.
-      virtual bool needsTruthInformation() override
+      bool needsTruthInformation() override
       {
         bool result = Super::needsTruthInformation();
         if (result) return true;
@@ -101,7 +101,7 @@ namespace Belle2 {
 
     public:
       /// Function extracting the variables of the object into the variable set.
-      virtual Weight operator()(const Object& obj) override
+      Weight operator()(const Object& obj) override
       {
         bool extracted = m_varSet->extract(&obj);
         return extracted ? 1 : NAN;

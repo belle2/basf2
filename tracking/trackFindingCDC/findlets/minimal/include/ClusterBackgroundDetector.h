@@ -38,21 +38,19 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Marks clusters as background if the used filter detectes them as such";
       }
 
       /// Expose the parameters of the cluster filter to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_clusterFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main algorithm applying the cluster background detection
-      void apply(std::vector<CDCWireHitCluster>& outputClusters) override final
-      {
-        for (CDCWireHitCluster& cluster : outputClusters) {
+      void apply(std::vector<CDCWireHitCluster>& outputClusters) final {
+        for (CDCWireHitCluster& cluster : outputClusters)
+        {
           CellWeight clusterWeight = m_clusterFilter(cluster);
           if (isNotACell(clusterWeight)) {
             // Cluster detected as background

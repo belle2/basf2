@@ -79,10 +79,10 @@ namespace Belle2 {
       using Super::named;
 
       /// Generate filter weight variable from the object
-      virtual bool extract(const Object* obj) override final
-      {
+      bool extract(const Object* obj) final {
         bool extracted = Super::extract(obj);
-        if (m_ptrFilter and obj) {
+        if (m_ptrFilter and obj)
+        {
           Weight weight = (*m_ptrFilter)(*obj);
           this->template var<named("weight")>() = weight;
           this->template var<named("accept")>() = not std::isnan(weight) and not(weight < m_cut);
@@ -97,8 +97,7 @@ namespace Belle2 {
       }
 
       /// Initialize the filter before event processing
-      virtual void initialize() override final
-      {
+      void initialize() final {
         Super::initialize();
 
         ModuleParamList moduleParamList;
@@ -110,46 +109,48 @@ namespace Belle2 {
           ModuleParam<double> cutParam = moduleParamList.getParameter<double>("cut");
           m_cut = cutParam.getValue();
           cutParam.setValue(NAN);
-        } catch (ModuleParamList::ModuleParameterNotFoundError) {
+        } catch (ModuleParamList::ModuleParameterNotFoundError)
+        {
           // Not found continue
         }
 
-        if (m_ptrFilter) {
+        if (m_ptrFilter)
+        {
           m_ptrFilter->initialize();
         }
       }
 
       /// Allow setup work to take place at beginning of new run
-      virtual void beginRun() override final
-      {
+      void beginRun() final {
         Super::beginRun();
-        if (m_ptrFilter) {
+        if (m_ptrFilter)
+        {
           m_ptrFilter->beginRun();
         }
       }
 
       /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent() override final
-      {
+      void beginEvent() final {
         Super::beginEvent();
-        if (m_ptrFilter) {
+        if (m_ptrFilter)
+        {
           m_ptrFilter->beginEvent();
         }
       }
 
       /// Allow clean up to take place at end of run
-      virtual void endRun() override final
-      {
-        if (m_ptrFilter) {
+      void endRun() final {
+        if (m_ptrFilter)
+        {
           m_ptrFilter->endRun();
         }
         Super::endRun();
       }
 
       /// Terminate the filter after event processing
-      virtual void terminate() override final
-      {
-        if (m_ptrFilter) {
+      void terminate() final {
+        if (m_ptrFilter)
+        {
           m_ptrFilter->terminate();
         }
         Super::terminate();
@@ -159,7 +160,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
       {
         return Super::getNamedVariables(prefix + m_filterNamePrefix);
       }
@@ -168,7 +169,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(std::string varName) override
       {
         if (boost::starts_with(varName, m_filterNamePrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());

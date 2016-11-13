@@ -34,7 +34,7 @@ namespace Belle2 {
        * Main filter method returning the weight of the facet.
        * Returns NAN, if the cell shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& facet) override final;
+      Weight operator()(const CDCFacet& facet) final;
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses

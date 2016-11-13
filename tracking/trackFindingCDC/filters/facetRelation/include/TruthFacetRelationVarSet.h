@@ -63,13 +63,13 @@ namespace Belle2 {
       explicit TruthFacetRelationVarSet();
 
       /// Generate and assign the variables from the facet relation
-      virtual bool extract(const Relation<const CDCFacet>* ptrFacetRelation) override final;
+      bool extract(const Relation<const CDCFacet>* ptrFacetRelation) final;
 
       /// Initialize the varset before event processing
-      virtual void initialize() override final;
+      void initialize() final;
 
       /// Initialize the varset before event processing
-      virtual void terminate() override final;
+      void terminate() final;
 
     public:
       /// Facet filter that gives if the facet is a true facet.

@@ -37,19 +37,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signals the start of the event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Prepare the Monte Carlo information at the start of the event
-      void beginEvent() override final;
+      void beginEvent() final;
 
       /// Main algorithm marking the hit of higher loops as background.
-      void apply(std::vector<CDCWireHit>& wireHits) override final;
+      void apply(std::vector<CDCWireHit>& wireHits) final;
 
     private:
       /// Parameter : Maximal fraction of loops of the mc particles trajectory needs to the hit to unblock it.

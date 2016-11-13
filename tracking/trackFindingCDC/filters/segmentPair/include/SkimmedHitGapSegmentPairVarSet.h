@@ -30,7 +30,7 @@ namespace Belle2 {
       explicit SkimmedHitGapSegmentPairVarSet();
 
       /// Implement the skim cut.
-      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
+      bool accept(const CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

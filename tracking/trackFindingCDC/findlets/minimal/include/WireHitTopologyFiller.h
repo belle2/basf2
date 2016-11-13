@@ -32,13 +32,13 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Signals the start of the event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Main method that publishes the given wire hits in the CDCWireHitTopology.
-      void apply(std::vector<CDCWireHit>& wireHits) override final;
+      void apply(std::vector<CDCWireHit>& wireHits) final;
     };
   }
 }

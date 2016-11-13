@@ -25,10 +25,10 @@ namespace Belle2 {
 
     public:
       /// Valid names of variable sets for facets.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for facets from a name.
-      virtual
+
       std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
       createVarSet(const std::string& name) const override;
     };

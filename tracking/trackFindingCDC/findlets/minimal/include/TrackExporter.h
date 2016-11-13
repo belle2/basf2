@@ -29,19 +29,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal initialisation phase to register store array for export
-      void initialize() override final;
+      void initialize() final;
 
       /// Signal new event recreate the store array
-      void beginEvent() override final;
+      void beginEvent() final;
 
       /// Write give tracks into track store array
-      void apply(std::vector<CDCTrack>& tracks) override final;
+      void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
       /// Parameter: Switch if genfit::TrackCandidates shall be generated for each track.

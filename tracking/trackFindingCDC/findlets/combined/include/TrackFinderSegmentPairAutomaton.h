@@ -59,14 +59,12 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Generates tracks from segments using a cellular automaton built from segment pairs.";
       }
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_segmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPair"));
         m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
         m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
@@ -77,8 +75,7 @@ namespace Belle2 {
       }
 
       /// Signal the beginning of a new event
-      void beginEvent() override final
-      {
+      void beginEvent() final {
         m_segmentPairs.clear();
         m_segmentPairRelations.clear();
         m_preMergeTracks.clear();
@@ -87,9 +84,8 @@ namespace Belle2 {
       }
 
       /// Generates the tracks from segments
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCTrack>& tracks) override final
-      {
+      void
+      apply(const std::vector<CDCRecoSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final {
         m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
         m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
         m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preMergeTracks);

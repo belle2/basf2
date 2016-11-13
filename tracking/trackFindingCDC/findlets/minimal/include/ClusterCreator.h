@@ -41,27 +41,25 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Groups the wire hits into super by expanding the given wire hit relation";
       }
 
     public:
       /// Main algorithm applying the cluster refinement
       void apply(std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCWireHitCluster>& outputClusters) override final
-      {
+                 std::vector<CDCWireHitCluster>& outputClusters) final {
         // create the neighborhood
         m_wireHitRelations.clear();
         WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
-                                                      inputWireHits,
-                                                      m_wireHitRelations);
+        inputWireHits,
+        m_wireHitRelations);
         WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
         B2ASSERT("Expect wire hit neighborhood to be symmetric ",
-                 wireHitNeighborhood.isSymmetric());
+        wireHitNeighborhood.isSymmetric());
 
         auto ptrWireHits =
-          inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+        inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
         m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
       }
 

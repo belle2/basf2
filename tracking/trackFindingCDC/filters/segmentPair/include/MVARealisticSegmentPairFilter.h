@@ -45,21 +45,21 @@ namespace Belle2 {
       }
 
       /// Initialize the expert before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         m_feasibleSegmentPairFilter.initialize();
       }
 
       /// Signal to load new run parameters
-      virtual void beginRun() override
+      void beginRun() override
       {
         Super::beginRun();
         m_feasibleSegmentPairFilter.beginRun();
       }
 
       /// Function to object for its signalness
-      virtual Weight operator()(const CDCSegmentPair& segmentPair) override
+      Weight operator()(const CDCSegmentPair& segmentPair) override
       {
         double isFeasibleWeight = m_feasibleSegmentPairFilter(segmentPair);
         if (std::isnan(isFeasibleWeight)) {

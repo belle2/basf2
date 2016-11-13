@@ -28,7 +28,7 @@ namespace Belle2 {
 
     public:
       /// Main method that extracts the variable values from the complex object.
-      virtual bool extract(const Object* obj)
+      bool extract(const Object* obj) override
       {
         bool extracted = Super::extract(obj);
         return extracted and accept(obj);

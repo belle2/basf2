@@ -65,7 +65,7 @@ namespace Belle2 {
       explicit BasicSegmentPairRelationVarSet();
 
       /// Generate and assign the variables from the segment relation
-      virtual bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override final;
+      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };
   }
 }

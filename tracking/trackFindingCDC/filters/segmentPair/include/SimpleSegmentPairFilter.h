@@ -24,8 +24,8 @@ namespace Belle2 {
       SimpleSegmentPairFilter();
 
       /// Checks if a pair of segments is a good combination
-      virtual
-      Weight operator()(const CDCSegmentPair& segmentPair) override final;
+
+      Weight operator()(const CDCSegmentPair& segmentPair) final;
 
       /// Returns the trajectory of the segment. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCRecoSegment2D& segment) const;

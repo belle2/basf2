@@ -32,19 +32,20 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Initialize the findlet before event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) override final;
+      void
+      apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
-      void terminate() override final;
+      void terminate() final;
 
     private:
       /// Parameter: Absolute minimal number of hits to make an axial track.

@@ -31,7 +31,7 @@ namespace Belle2 {
     void initialize() override;
 
     /// Generates the tracks into the output argument.
-    void generate(std::vector<TrackFindingCDC::CDCTrack>& tracks) override final;
+    void generate(std::vector<TrackFindingCDC::CDCTrack>& tracks) final;
 
     /// Generates the tracks from the given segments into the output argument.
     virtual void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,

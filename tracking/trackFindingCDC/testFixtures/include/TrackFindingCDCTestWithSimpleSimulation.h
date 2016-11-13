@@ -33,7 +33,7 @@ namespace Belle2 {
       }
 
       /// Preparations before the test
-      virtual
+
       void SetUp() override
       {
 
@@ -196,7 +196,7 @@ namespace Belle2 {
       }
 
       /// Clean up after test
-      virtual void TearDown() override
+      void TearDown() override
       {
         Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(m_savedLogLevel);
         Belle2::LogSystem::Instance().getLogConfig()->setLogInfo(LogConfig::c_Debug, m_savedDebugLogInfo);

@@ -28,8 +28,7 @@ namespace Belle2 {
         Super(allowReverse) {}
 
       /// Checks if a axial stereo segment pair is a good combination.
-      virtual Weight
-      operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& segmentPair) override final;
+      Weight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& segmentPair) final;
     };
 
   }

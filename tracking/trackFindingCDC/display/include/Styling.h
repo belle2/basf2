@@ -30,6 +30,9 @@ namespace Belle2 {
     class Styling {
 
     public:
+      /// Make destructor of interface virtual
+      virtual ~Styling() = default;
+
       /// Maps the object at the given index to attribute values
       virtual AttributeMap map(int index __attribute__((unused)),
                                AObject& object __attribute__((unused)))

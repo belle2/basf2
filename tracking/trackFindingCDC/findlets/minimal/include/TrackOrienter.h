@@ -31,17 +31,17 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signals the beginning of the event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Main algorithm applying the adjustment of the orientation.
-      void apply(const std::vector<CDCTrack>& inputTracks,
-                 std::vector<CDCTrack>& outputTracks) override final;
+      void
+      apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;
 
     private:
       /**

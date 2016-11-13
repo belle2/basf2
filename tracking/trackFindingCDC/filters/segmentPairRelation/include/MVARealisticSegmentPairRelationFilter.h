@@ -40,7 +40,7 @@ namespace Belle2 {
       MVARealisticSegmentPairRelationFilter();
 
       /// Function to object for its signalness
-      virtual Weight operator()(const Relation<const CDCSegmentPair>& relation) override;
+      Weight operator()(const Relation<const CDCSegmentPair>& relation) override;
     };
 
   }

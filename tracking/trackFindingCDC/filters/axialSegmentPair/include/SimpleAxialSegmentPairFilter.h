@@ -23,7 +23,7 @@ namespace Belle2 {
       SimpleAxialSegmentPairFilter();
 
       /// Checks if a pair of axial segments is a good combination
-      virtual Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) override final;
+      Weight operator()(const CDCAxialSegmentPair& axialSegmentPair) final;
 
     public:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.

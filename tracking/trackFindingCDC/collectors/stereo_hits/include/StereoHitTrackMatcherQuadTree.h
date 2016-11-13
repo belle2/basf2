@@ -41,14 +41,13 @@ namespace Belle2 {
       using CollectionItem = CDCRLWireHit;
 
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Initialize the filter and the quad tree.
-      virtual void initialize() override;
+      void initialize() override;
 
       /// Terminate the filter and the quad tree.
-      virtual void terminate() override;
+      void terminate() override;
 
       /**
        * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).

@@ -33,8 +33,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) override final
-      {
+      bool extract(const CDCRecoSegment2D* segment) final {
         Super::extract(segment);
 
         var<named("truth")>() = var<named("segment_is_new_track_truth")>();

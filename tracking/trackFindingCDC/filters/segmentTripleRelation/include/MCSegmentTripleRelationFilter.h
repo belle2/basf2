@@ -33,18 +33,18 @@ namespace Belle2 {
       MCSegmentTripleRelationFilter(bool allowReverse = true);
 
       /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
+      void beginEvent() final;
 
       /// Forwards the initialize method from the module
-      virtual void initialize() override final;
+      void initialize() final;
 
       /// Forwards the terminate method from the module
-      virtual void terminate() override final;
+      void terminate() final;
 
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.*/
-      virtual Weight operator()(const CDCSegmentTriple& triple,
-                                const CDCSegmentTriple& neighborTriple) override final;
+      Weight
+      operator()(const CDCSegmentTriple& triple, const CDCSegmentTriple& neighborTriple) final;
 
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse) override

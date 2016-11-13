@@ -26,7 +26,7 @@ namespace Belle2 {
       TrackFinderCosmics();
 
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
     };
   }
 }

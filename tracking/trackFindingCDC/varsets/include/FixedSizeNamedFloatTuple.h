@@ -117,7 +117,7 @@ namespace Belle2 {
 
     public:
       /// Getter for number of floating point values represented by this class.
-      virtual size_t size() const override final
+      size_t size() const final
       {
         return ANames::nNames;
       }
@@ -130,13 +130,13 @@ namespace Belle2 {
        *  @param name       Name of the sought part
        *  @return           Index of the name, nParts if not found.
        */
-      virtual int getNameIndex(const char* name) const override final
+      int getNameIndex(const char* name) const final
       {
         return named(name);
       }
 
       /// Getter for the ith name.
-      virtual std::string getName(int iValue) const override final
+      std::string getName(int iValue) const final
       {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
@@ -155,8 +155,7 @@ namespace Belle2 {
       }
 
       /// Setter for the ith value.
-      virtual void set(int iValue, Float_t value) override final
-      {
+      void set(int iValue, Float_t value) final {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
         m_values[iValue] = value;
@@ -179,7 +178,7 @@ namespace Belle2 {
       }
 
       /// Getter for the ith value.
-      virtual Float_t get(int iValue) const override final
+      Float_t get(int iValue) const final
       {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
@@ -203,8 +202,7 @@ namespace Belle2 {
       }
 
       /// Reference getter for the ith value.
-      virtual Float_t& operator[](int iValue) override final
-      {
+      Float_t& operator[](int iValue) final {
         assert(iValue < (int)nNames);
         assert(iValue >= 0);
         return m_values[iValue];

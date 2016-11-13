@@ -26,10 +26,10 @@ namespace Belle2 {
 
     public:
       /// Valid names of variable sets for tracks.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for tracks from a name.
-      virtual
+
       std::unique_ptr<BaseVarSet<Relation<const CDCTrack> > >
       createVarSet(const std::string& name) const override;
     };

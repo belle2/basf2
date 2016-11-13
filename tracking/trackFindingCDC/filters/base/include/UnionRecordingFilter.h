@@ -45,7 +45,7 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
 
@@ -63,7 +63,7 @@ namespace Belle2 {
       }
 
       /// Initialize the recorder before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         /// Create the skimming filter
         if (m_param_skim != "") {

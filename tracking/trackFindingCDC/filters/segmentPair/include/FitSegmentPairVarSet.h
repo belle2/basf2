@@ -62,10 +62,10 @@ namespace Belle2 {
       explicit FitSegmentPairVarSet(bool preliminaryFit = false);
 
       /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
 
       /// Get access to the values and names of the variables - includes a prefix_ "pre" for the prelimiary fit
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override;
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override;
 
     private:
       /// Indicator that only the prelimiary fit should be used.

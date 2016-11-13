@@ -50,14 +50,13 @@ namespace Belle2 {
       }
 
       /// Return the constant value
-      virtual std::string map(int index __attribute__((unused)),
-                              T& t __attribute__((unused))) override
+      std::string map(int index __attribute__((unused)), T& t __attribute__((unused))) override
       {
         return m_value;
       }
 
       /// Informal string summarizing the translation from the object to the attribute value.
-      virtual std::string info() override
+      std::string info() override
       {
         return "always " + m_value + "\n";
       }
@@ -79,15 +78,14 @@ namespace Belle2 {
       }
 
       /// Return the a value from the cycle value according to the given inded
-      virtual std::string map(int index,
-                              T& t __attribute__((unused))) override
+      std::string map(int index, T& t __attribute__((unused))) override
       {
         assert(index >= 0);
         return m_values[index % m_values.size()];
       }
 
       /// Informal string summarizing the translation from the object to the attribute value.
-      virtual std::string info() override
+      std::string info() override
       {
         return "Cycle through " + bracketed(join(", ", m_values)) + "\n";
       }

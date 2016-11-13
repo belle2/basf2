@@ -37,15 +37,15 @@ namespace Belle2 {
 
     public:
       /// Initialize all contained variable set before event processing.
-      virtual void initialize() override final
-      {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+      void initialize() final {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
+        {
           varSet->initialize();
         }
       }
 
       /// Signal the beginning of a new run
-      virtual void beginRun() override
+      void beginRun() override
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           varSet->beginRun();
@@ -53,7 +53,7 @@ namespace Belle2 {
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           varSet->beginEvent();
@@ -61,7 +61,7 @@ namespace Belle2 {
       }
 
       /// Signal the end of a run
-      virtual void endRun() override
+      void endRun() override
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           varSet->endRun();
@@ -69,9 +69,9 @@ namespace Belle2 {
       }
 
       /// Terminate all contained variable set after event processing.
-      virtual void terminate() override final
-      {
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+      void terminate() final {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
+        {
           varSet->terminate();
         }
       }
@@ -84,10 +84,10 @@ namespace Belle2 {
        *
        *  @returns  Indication whether the extraction could be completed successfully.
        */
-      virtual bool extract(const Object* obj) override final
-      {
+      bool extract(const Object* obj) final {
         bool result = true;
-        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
+        for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets)
+        {
           result &= varSet->extract(obj);
         }
         return result;
@@ -97,7 +97,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix) override
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
       {
         std::vector<Named<Float_t*> > result;
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
@@ -111,7 +111,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(std::string varName) override
       {
         for (std::unique_ptr<ContainedVarSet>& varSet : m_varSets) {
           MayBePtr<Float_t> found = varSet->find(varName);

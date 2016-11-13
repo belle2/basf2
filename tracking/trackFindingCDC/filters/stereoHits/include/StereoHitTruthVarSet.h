@@ -52,8 +52,7 @@ namespace Belle2 {
       explicit StereoHitTruthVarSet() : VarSet<StereoHitTruthVarNames>() { }
 
       /// Generate and assign the variables from the pair.
-      virtual bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;
-
+      bool extract(const std::pair<const CDCRecoHit3D*, const CDCTrack*>* testPair) override;
     };
   }
 }

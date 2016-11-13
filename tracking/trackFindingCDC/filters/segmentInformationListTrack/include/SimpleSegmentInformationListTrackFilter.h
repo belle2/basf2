@@ -26,8 +26,8 @@ namespace Belle2 {
 
     public:
       /// Get the filter output.
-      virtual Weight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
-      override final;
+      Weight
+      operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair) final;
     };
   }
 }

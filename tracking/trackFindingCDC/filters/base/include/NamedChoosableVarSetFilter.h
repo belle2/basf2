@@ -47,8 +47,7 @@ namespace Belle2 {
       }
 
       /// Add the parameters of this filter to the given parameter list
-      virtual void exposeParameters(ModuleParamList* parameterList,
-                                    const std::string& prefix) override
+      void exposeParameters(ModuleParamList* parameterList, const std::string& prefix) override
       {
         Super::exposeParameters(parameterList, prefix);
 
@@ -69,7 +68,7 @@ namespace Belle2 {
       }
 
       /// Initialisation method sets up a reference to the value in the variable set to be returned.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         MayBePtr<Float_t> foundVariable = Super::getVarSet().find(m_param_varName);
@@ -87,7 +86,7 @@ namespace Belle2 {
 
       /// Main filter function returning the variable with the set requested name from the variable
       /// set.
-      virtual Weight operator()(const Object& object) override
+      Weight operator()(const Object& object) override
       {
         Weight extracted = Super::operator()(object);
         if (std::isnan(extracted)) {

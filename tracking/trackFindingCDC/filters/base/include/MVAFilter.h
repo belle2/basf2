@@ -41,7 +41,7 @@ namespace Belle2 {
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "cut"),
@@ -57,7 +57,7 @@ namespace Belle2 {
       }
 
       /// Initialize the expert before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         m_mvaExpert = makeUnique<MVAExpert>(m_param_identifier,
@@ -66,7 +66,7 @@ namespace Belle2 {
       }
 
       /// Signal to load new run parameters
-      virtual void beginRun() override
+      void beginRun() override
       {
         Super::beginRun();
         m_mvaExpert->beginRun();
@@ -74,7 +74,7 @@ namespace Belle2 {
 
     public:
       /// Function to object for its signalness
-      virtual Weight operator()(const Object& obj) override
+      Weight operator()(const Object& obj) override
       {
         double prediction = predict(obj);
         return prediction < m_param_cut ? NAN : prediction;

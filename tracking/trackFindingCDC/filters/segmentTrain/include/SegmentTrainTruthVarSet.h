@@ -56,9 +56,8 @@ namespace Belle2 {
       explicit SegmentTrainTruthVarSet() : VarSet<SegmentTrainTruthVarNames>() { }
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
-      override final;
-
+      bool
+      extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair) final;
     };
   }
 }

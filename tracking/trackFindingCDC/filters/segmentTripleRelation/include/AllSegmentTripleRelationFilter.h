@@ -29,8 +29,8 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Always return the overlap penatlty accepting all relations.
        */
-      virtual Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
-                                const CDCSegmentTriple& toSegmentTriple) override final;
+      Weight operator()(const CDCSegmentTriple& fromSegmentTriple,
+                        const CDCSegmentTriple& toSegmentTriple) final;
     };
   }
 }

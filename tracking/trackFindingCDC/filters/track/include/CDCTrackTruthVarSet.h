@@ -50,7 +50,7 @@ namespace Belle2 {
       explicit CDCTrackTruthVarSet() : VarSet<CDCTrackTruthVarNames>() { }
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCTrack* track) override;
+      bool extract(const CDCTrack* track) override;
     };
   }
 }

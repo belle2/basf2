@@ -43,32 +43,30 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Merges tracks by extraction of track paths in a cellular automaton.";
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_trackRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm
-      void apply(const std::vector<CDCTrack>& inputTracks,
-                 std::vector<CDCTrack>& outputTracks) override final
-      {
+      void
+      apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final {
         m_trackRelations.clear();
         WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
-                                                          inputTracks,
-                                                          m_trackRelations);
+        inputTracks,
+        m_trackRelations);
         WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
 
         m_trackPaths.clear();
         m_cellularPathFinder.apply(inputTracks, trackNeighborhood, m_trackPaths);
 
-        for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths) {
+        for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths)
+        {
           outputTracks.push_back(CDCTrack::condense(trackPath));
         }
       }

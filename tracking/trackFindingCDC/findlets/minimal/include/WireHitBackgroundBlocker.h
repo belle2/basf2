@@ -28,13 +28,13 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main algorithm marking hit as background
-      void apply(std::vector<CDCWireHit>& wireHits) override final;
+      void apply(std::vector<CDCWireHit>& wireHits) final;
 
     private:
       /// Parameter : Switch to drop negative drift lengths from the created wire hits

@@ -43,28 +43,26 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Merges segments by extraction of segment paths in a cellular automaton.";
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_segmentRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm
       void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCRecoSegment2D>& outputSegments) override final
-      {
+                 std::vector<CDCRecoSegment2D>& outputSegments) final {
         std::vector<ConstVectorRange<CDCRecoSegment2D> > segmentsByISuperCluster =
-          adjacent_groupby(inputSegments.begin(),
-                           inputSegments.end(),
-                           mem_fn(&CDCRecoSegment2D::getISuperCluster));
+        adjacent_groupby(inputSegments.begin(),
+        inputSegments.end(),
+        mem_fn(&CDCRecoSegment2D::getISuperCluster));
 
-        for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster) {
+        for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster)
+        {
           if (segmentsInSuperCluster.size() == 1) {
             // What is the difference between a duck?
             outputSegments.push_back(segmentsInSuperCluster.at(0));

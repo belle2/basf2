@@ -42,11 +42,8 @@ namespace Belle2 {
       /// Use (stereo) segments as collection items.
       using CollectionItem = CDCRecoSegment2D;
 
-      /// Empty desctructor. Everything is handled via terminate.
-      virtual ~StereoSegmentTrackMatcherQuadTree() = default;
-
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix);
+      void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix) override;
 
       /**
        * Use the given filter (via the module parameters) to find a matching.

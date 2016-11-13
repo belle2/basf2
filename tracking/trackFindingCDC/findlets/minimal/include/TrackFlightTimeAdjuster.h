@@ -36,16 +36,16 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Initialize at the start of the event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Write give tracks into track store array
-      void apply(std::vector<CDCTrack>& tracks) override final;
+      void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
       /// Parameter: Point relative to which the flight time should be estimated.

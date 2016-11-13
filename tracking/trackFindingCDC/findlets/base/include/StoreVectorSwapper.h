@@ -57,7 +57,7 @@ namespace Belle2 {
       }
 
       /// Expose the parameters  to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         std::string classMnemomicCapitalName = m_classMnemomicName;
         classMnemomicCapitalName[0] = ::toupper(classMnemomicCapitalName.at(0));
@@ -81,7 +81,7 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override
       {
         return "Swaps an interal vector of " +
                m_classMnemomics.getParameterDescription(static_cast<IOType*>(nullptr)) +
@@ -90,7 +90,7 @@ namespace Belle2 {
 
     public:
       /// Receive signal before the start of the event processing
-      virtual void initialize() override
+      void initialize() override
       {
         if (m_param_writeStoreVector) {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
@@ -112,10 +112,10 @@ namespace Belle2 {
       }
 
       /// Swaps the items to the DataStore or to the backup storage location.
-      virtual void apply(std::vector<IOType>& input) override final
-      {
+      void apply(std::vector<IOType>& input) final {
         // Swap items to the DataStore
-        if (m_param_writeStoreVector) {
+        if (m_param_writeStoreVector)
+        {
           StoreWrappedObjPtr< std::vector<IOType> > storeVector(m_param_storeVectorName);
           std::vector<IOType>& sink = *storeVector;
           sink.swap(input);

@@ -40,19 +40,19 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signals the beginning of the event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Signal the beginning of a new run
-      void beginRun() override final;
+      void beginRun() final;
 
       /// Main algorithm creating the wire hits
-      void apply(std::vector<CDCWireHit>& outputWireHits) override final;
+      void apply(std::vector<CDCWireHit>& outputWireHits) final;
 
     private:
       /// Parameter : Geometry set to be used. Either "base", "misalign" or " aligned"

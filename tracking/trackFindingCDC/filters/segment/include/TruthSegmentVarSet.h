@@ -50,8 +50,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) override;
-
+      bool extract(const CDCRecoSegment2D* segment) override;
     };
   }
 }

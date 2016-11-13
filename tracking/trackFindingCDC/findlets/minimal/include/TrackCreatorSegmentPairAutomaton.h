@@ -36,12 +36,13 @@ namespace Belle2 {
 
     public:
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Main function of the segment finding by the cellular automaton.
-      void apply(const std::vector<CDCSegmentPair>& inputSegmentPairs,
-                 const std::vector<WeightedRelation<const CDCSegmentPair> >& inputSegmentPairRelations,
-                 std::vector<CDCTrack>& outputTracks) override final;
+      void
+      apply(const std::vector<CDCSegmentPair>& inputSegmentPairs,
+            const std::vector<WeightedRelation<const CDCSegmentPair>>& inputSegmentPairRelations,
+            std::vector<CDCTrack>& outputTracks) final;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder

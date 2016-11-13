@@ -81,7 +81,7 @@ namespace Belle2 {
       explicit SegmentTrackVarSet() : VarSet<SegmentTrackVarNames>() { }
 
       /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) override final;
+      bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) final;
     };
   }
 }

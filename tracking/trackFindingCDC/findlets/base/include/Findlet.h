@@ -56,6 +56,9 @@ namespace Belle2 {
       /// Allow default constructin
       Findlet() = default;
 
+      /// Make destructor of interface virtual
+      virtual ~Findlet() = default;
+
       /// Disallow copies
       Findlet(const Findlet&) = delete;
 
@@ -85,7 +88,7 @@ namespace Belle2 {
       }
 
       /// Receive signal before the start of the event processing
-      virtual void initialize() override
+      void initialize() override
       {
         for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
           psl->initialize();
@@ -93,7 +96,7 @@ namespace Belle2 {
       }
 
       /// Receive signal for the beginning of a new run.
-      virtual void beginRun() override
+      void beginRun() override
       {
         for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
           psl->beginRun();
@@ -101,7 +104,7 @@ namespace Belle2 {
       }
 
       /// Receive signal for the start of a new event.
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
           psl->beginEvent();
@@ -109,7 +112,7 @@ namespace Belle2 {
       }
 
       /// Receive signal for the end of the run.
-      virtual void endRun() override
+      void endRun() override
       {
         using boost::adaptors::reverse;
         for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {
@@ -118,7 +121,7 @@ namespace Belle2 {
       }
 
       /// Receive Signal for termination of the event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         using boost::adaptors::reverse;
         for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {

@@ -30,20 +30,20 @@ namespace Belle2 {
 
     public:
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Initialize the Module before event processing
-      void initialize() override final;
+      void initialize() final;
 
       /// Start processing the current event
-      void beginEvent() override final;
+      void beginEvent() final;
 
       /// Main function of the segment finding by the cellular automaton.
       void apply(const std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCRecoSegment2D>& outputSegments) override final;
+                 std::vector<CDCRecoSegment2D>& outputSegments) final;
 
     private:
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information

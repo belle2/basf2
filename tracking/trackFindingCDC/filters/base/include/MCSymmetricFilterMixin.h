@@ -37,7 +37,7 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
@@ -50,7 +50,7 @@ namespace Belle2 {
 
 
       /// Initialize the before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         if (needsTruthInformation()) {
           CDCMCManager::getInstance().requireTruthInformation();
@@ -58,7 +58,7 @@ namespace Belle2 {
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
         if (needsTruthInformation()) {
           CDCMCManager::getInstance().fill();
@@ -66,7 +66,7 @@ namespace Belle2 {
       }
 
       /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() override final
+      bool needsTruthInformation() final
       { return true; }
 
     public:

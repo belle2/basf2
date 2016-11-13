@@ -31,16 +31,16 @@ namespace Belle2 {
 
     public:
       /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
+      void beginEvent() final;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
+      void initialize() final;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
+      void terminate() final;
 
       /// Check if the segment triple is aligned in the Monte Carlo track. Signals NAN if not.
-      virtual Weight operator()(const CDCSegmentTriple& segmentTriple) override final;
+      Weight operator()(const CDCSegmentTriple& segmentTriple) final;
 
     private:
       /// Sets the trajectories of the segment triple from Monte Carlo information. Is executed for good segment triples.

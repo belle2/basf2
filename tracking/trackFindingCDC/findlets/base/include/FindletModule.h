@@ -73,6 +73,9 @@ namespace Belle2 {
         this->setParamList(moduleParamList);
       }
 
+      /// Make destructor of interface virtual
+      virtual ~FindletModule() = default;
+
       /// Initialize the Module before event processing
       virtual void initialize() override
       {

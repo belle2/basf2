@@ -74,14 +74,12 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Generates segments from hits using a cellular automaton build from hit triples (facets).";
       }
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_superClusterCreator.exposeParameters(moduleParamList, prefix);
         m_clusterRefiner.exposeParameters(moduleParamList, prefix);
         m_clusterBackgroundDetector.exposeParameters(moduleParamList, prefixed(prefix, "Cluster"));
@@ -101,8 +99,7 @@ namespace Belle2 {
       }
 
       /// Signal the beginning of a new event
-      void beginEvent() override final
-      {
+      void beginEvent() final {
         m_superClusters.clear();
         m_clusters.clear();
         m_facets.clear();
@@ -114,8 +111,7 @@ namespace Belle2 {
 
       /// Generates the segment from wire hits
       void apply(std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCRecoSegment2D>& outputSegments) override final
-      {
+                 std::vector<CDCRecoSegment2D>& outputSegments) final {
         outputSegments.reserve(200);
 
         m_superClusterCreator.apply(inputWireHits, m_superClusters);

@@ -33,7 +33,7 @@ namespace Belle2 {
       }
 
       /// Reject an item if the truth variable is 0, else accept it.
-      virtual Weight operator()(const Object& object) override
+      Weight operator()(const Object& object) override
       {
         Super::operator()(object);
         MayBePtr<Float_t> truth = this->getVarSet().find("truth");

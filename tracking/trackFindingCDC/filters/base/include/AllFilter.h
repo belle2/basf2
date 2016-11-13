@@ -18,8 +18,7 @@ namespace Belle2 {
     class AllFilter : public AFilter {
     public:
       /// Accept all items.
-      virtual Weight operator()(const typename AFilter::Object& obj __attribute__((unused))) override final
-      {
+      Weight operator()(const typename AFilter::Object& obj __attribute__((unused))) final {
         return 1;
       }
 

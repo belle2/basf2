@@ -20,8 +20,7 @@ namespace Belle2 {
 
     public:
       /// Basic filter method to override. All implementation rejects all clusters.
-      virtual Weight operator()(const CDCWireHitCluster& cluster) override final;
-
+      Weight operator()(const CDCWireHitCluster& cluster) final;
     };
   }
 }

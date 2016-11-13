@@ -37,13 +37,13 @@ namespace Belle2 {
       WireHitTopologyPreparer();
 
       /// Short description of the findlet
-      std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Main function preparing the wire hits
-      void apply(std::vector<CDCWireHit>& outputWireHits) override final;
+      void apply(std::vector<CDCWireHit>& outputWireHits) final;
 
     private:
       // Findlets

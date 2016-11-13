@@ -66,7 +66,7 @@ namespace Belle2 {
       explicit HitGapTrackRelationVarSet();
 
       /// Generate and assign the variables from the track pair
-      virtual bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
     };
   }
 }

@@ -27,8 +27,7 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors.
-      virtual Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) override final;
-
+      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
     };
   }
 }

@@ -52,28 +52,26 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Creates hit triplet (facets) from each cluster filtered by a acceptance criterion.";
       }
 
       /// Add the parameters of the filter to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
         m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
         m_facetFilter.exposeParameters(moduleParamList, prefix);
 
         moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
-                                      m_param_updateDriftLength,
-                                      "Switch to reestimate the drift length",
-                                      m_param_updateDriftLength);
+        m_param_updateDriftLength,
+        "Switch to reestimate the drift length",
+        m_param_updateDriftLength);
 
         moduleParamList->addParameter(prefixed(prefix, "leastSquareFit"),
-                                      m_param_leastSquareFit,
-                                      "Switch to fit the facet with the least square method "
-                                      "for drift length estimation",
-                                      m_param_leastSquareFit);
+        m_param_leastSquareFit,
+        "Switch to fit the facet with the least square method "
+        "for drift length estimation",
+        m_param_leastSquareFit);
 
       }
 
@@ -85,10 +83,10 @@ namespace Belle2 {
        *  such that the triplets of the same cluster remain close to each other.
        */
       void apply(const std::vector<CDCWireHitCluster>& inputClusters,
-                 std::vector<CDCFacet>& facets) override final
-      {
+                 std::vector<CDCFacet>& facets) final {
         int iCluster = -1;
-        for (const CDCWireHitCluster& cluster : inputClusters) {
+        for (const CDCWireHitCluster& cluster : inputClusters)
+        {
           ++iCluster;
           // Skip clusters that have been detected as background
           if (cluster.getBackgroundFlag()) {

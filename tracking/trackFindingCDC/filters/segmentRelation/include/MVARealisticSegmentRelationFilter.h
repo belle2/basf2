@@ -41,13 +41,13 @@ namespace Belle2 {
       MVARealisticSegmentRelationFilter();
 
       /// Initialize the expert before event processing.
-      virtual void initialize() override;
+      void initialize() override;
 
       /// Signal to load new run parameters
-      virtual void beginRun() override;
+      void beginRun() override;
 
       /// Function to object for its signalness
-      virtual Weight operator()(const Relation<const CDCRecoSegment2D>& segmentRelation) override;
+      Weight operator()(const Relation<const CDCRecoSegment2D>& segmentRelation) override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

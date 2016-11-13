@@ -55,10 +55,10 @@ namespace Belle2 {
 
     public:
       /// Signal the beginning of a new event - loads the Monte Carlo information
-      virtual void beginEvent() override;
+      void beginEvent() override;
 
       /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCWireHitCluster* ptrCluster) override final;
+      bool extract(const CDCWireHitCluster* ptrCluster) final;
     };
   }
 }

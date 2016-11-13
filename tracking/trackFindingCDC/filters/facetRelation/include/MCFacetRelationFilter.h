@@ -39,25 +39,24 @@ namespace Belle2 {
 
     public:
       /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
+      void beginEvent() final;
 
       /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
+      void initialize() final;
 
       /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
+      void terminate() final;
 
     public:
       /**
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& fromFacet,
-                                const CDCFacet& toFacet) override final;
+      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     public:
       /// Setter for the allow reverse parameter
-      virtual void setAllowReverse(bool allowReverse) override
+      void setAllowReverse(bool allowReverse) override
       {
         Super::setAllowReverse(allowReverse);
         m_mcFacetFilter.setAllowReverse(allowReverse);

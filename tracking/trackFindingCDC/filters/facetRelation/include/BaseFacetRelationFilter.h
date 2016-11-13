@@ -65,7 +65,7 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      virtual Weight operator()(const Relation<const CDCFacet>& relation) override
+      Weight operator()(const Relation<const CDCFacet>& relation) override
       {
         const CDCFacet* ptrFrom(relation.first);
         const CDCFacet* ptrTo(relation.second);

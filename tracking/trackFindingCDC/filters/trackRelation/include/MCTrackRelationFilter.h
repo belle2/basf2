@@ -31,9 +31,7 @@ namespace Belle2 {
 
     public:
       /// Checks if a track relation is a good combination.
-      virtual Weight operator()(const CDCTrack& fromTrack,
-                                const CDCTrack& toTrack) override final;
-
+      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
     };
 
   }

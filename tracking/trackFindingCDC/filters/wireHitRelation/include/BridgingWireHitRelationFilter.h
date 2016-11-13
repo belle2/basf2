@@ -44,7 +44,7 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         moduleParamList->addParameter(prefixed(prefix, "missingPrimaryNeighborThresholds"),
                                       m_param_missingPrimaryNeighborThresholdMap,
@@ -55,7 +55,7 @@ namespace Belle2 {
                                      );
       }
 
-      virtual void initialize() override
+      void initialize() override
       {
         for (short oClockDirection = 0; oClockDirection < 12; oClockDirection++) {
           m_missingPrimaryNeighborThresholds[oClockDirection] = 3;
@@ -152,10 +152,9 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      Weight operator()(const Relation<const CDCWireHit>& relation) override final
-      {
-        const CDCWireHit* ptrFrom(relation.first);
-        const CDCWireHit* ptrTo(relation.second);
+      Weight operator()(const Relation<const CDCWireHit>& relation) final {
+        const CDCWireHit * ptrFrom(relation.first);
+        const CDCWireHit * ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return 0;
       }

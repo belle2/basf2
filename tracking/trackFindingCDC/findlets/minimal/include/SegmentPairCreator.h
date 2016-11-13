@@ -44,27 +44,26 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Creates axial stereo segment pairs from a set of segments filtered by some acceptance criterion";
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_segmentPairFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main method constructing pairs in adjacent super layers
       void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCSegmentPair>& segmentPairs) override final
-      {
+                 std::vector<CDCSegmentPair>& segmentPairs) final {
         // Group the segments by their super layer id
-        for (std::vector<const CDCRecoSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer) {
+        for (std::vector<const CDCRecoSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer)
+        {
           segmentsInSuperLayer.clear();
         }
 
-        for (const CDCRecoSegment2D& segment : inputSegments) {
+        for (const CDCRecoSegment2D& segment : inputSegments)
+        {
           ISuperLayer iSuperLayer = segment.getISuperLayer();
           if (not ISuperLayerUtil::isInvalid(iSuperLayer)) {
             const CDCRecoSegment2D* ptrSegment = &segment;
@@ -73,7 +72,8 @@ namespace Belle2 {
         }
 
         // Make pairs of closeby superlayers
-        for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer) {
+        for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer)
+        {
           const std::vector<const CDCRecoSegment2D*>& startSegments = m_segmentsBySuperLayer[iSuperLayer];
 
           // Make pairs of this superlayer and the superlayer more to the inside

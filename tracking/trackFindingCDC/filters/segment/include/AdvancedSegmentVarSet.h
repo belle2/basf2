@@ -73,7 +73,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the pair
-      virtual bool extract(const CDCRecoSegment2D* segment) override final;
+      bool extract(const CDCRecoSegment2D* segment) final;
     };
   }
 }

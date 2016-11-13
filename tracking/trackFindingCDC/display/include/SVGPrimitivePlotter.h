@@ -43,7 +43,7 @@ namespace Belle2 {
        *  Returns a newly created plotter instance containing all information of this.
        *  The new object is created on the heap. The ownership is to the caller who has the responsibility to destroy it.
        */
-      virtual std::unique_ptr<PrimitivePlotter> clone() const override;
+      std::unique_ptr<PrimitivePlotter> clone() const override;
 
     public:
       /**
@@ -55,11 +55,11 @@ namespace Belle2 {
        *  @param endY          y coordinate where the line ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawLine(float startX,
-                            float startY,
-                            float endX,
-                            float endY,
-                            const AttributeMap& attributeMap = AttributeMap()) override;
+      void drawLine(float startX,
+                    float startY,
+                    float endX,
+                    float endY,
+                    const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Adds an arrow to the plot
@@ -70,12 +70,11 @@ namespace Belle2 {
        *  @param endY          y coordinate where the arrow ends.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawArrow(float startX,
-                             float startY,
-                             float endX,
-                             float endY,
-                             const AttributeMap& attributeMap = AttributeMap()) override;
-
+      void drawArrow(float startX,
+                     float startY,
+                     float endX,
+                     float endY,
+                     const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Adds a circle to the plot
@@ -85,10 +84,10 @@ namespace Belle2 {
        *  @param radius         radius of the circle
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircle(float centerX,
-                              float centerY,
-                              float radius,
-                              const AttributeMap& attributeMap = AttributeMap()) override;
+      void drawCircle(float centerX,
+                      float centerY,
+                      float radius,
+                      const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Adds a circle arc to the plot
@@ -102,14 +101,14 @@ namespace Belle2 {
        *  @param sweepFlag     Boolean indicator related to the curvature perceived one the circle arc. False means negative curvature. True mean positive curvature.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCircleArc(float startX,
-                                 float startY,
-                                 float endX,
-                                 float endY,
-                                 float radius,
-                                 bool longArc,
-                                 bool sweepFlag,
-                                 const AttributeMap& attributeMap = AttributeMap()) override;
+      void drawCircleArc(float startX,
+                         float startY,
+                         float endX,
+                         float endY,
+                         float radius,
+                         bool longArc,
+                         bool sweepFlag,
+                         const AttributeMap& attributeMap = AttributeMap()) override;
 
       /** Adds a smooth curve to the plot
        *
@@ -119,19 +118,19 @@ namespace Belle2 {
        *  @param tangents      Tangent vector at each point. Length of tangents does not matter.
        *  @param attributeMap  A map of sting keys and values that describe the drawing properties of the line.
        */
-      virtual void drawCurve(const std::vector<std::array<float, 2> >& points,
-                             const std::vector<std::array<float, 2> >& tangents,
-                             const AttributeMap& attributeMap = AttributeMap()) override;
+      void drawCurve(const std::vector<std::array<float, 2>>& points,
+                     const std::vector<std::array<float, 2>>& tangents,
+                     const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Indicates the start of a group of drawn elements. Meaning depends on the actual implementation.
        */
-      virtual void startGroup(const AttributeMap& attributeMap = AttributeMap()) override;
+      void startGroup(const AttributeMap& attributeMap = AttributeMap()) override;
 
       /**
        *  Indicates the end of a group of drawn elements. Meaning depends on the actual implementation.
        */
-      virtual void endGroup() override;
+      void endGroup() override;
 
       /**
        *  Saves the current plot state to a file.
@@ -143,13 +142,12 @@ namespace Belle2 {
        *  @param fileName       fileName where the plot shall be saved
        *  @return               Potentially modifed file name where the file has actually been written to.
        */
-      virtual const std::string save(const std::string& fileName) override;
+      const std::string save(const std::string& fileName) override;
 
       /**
        *  Clears all drawed elements from the plotter.
        */
-      virtual void clear() override;
-
+      void clear() override;
 
     private:
       /// Increases the current indention by one.

@@ -65,7 +65,7 @@ namespace Belle2 {
       explicit HitGapSegmentRelationVarSet();
 
       /// Generate and assign the variables from the segment pair
-      virtual bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) override;
+      bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) override;
     };
   }
 }

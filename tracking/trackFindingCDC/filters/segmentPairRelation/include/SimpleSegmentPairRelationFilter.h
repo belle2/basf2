@@ -29,10 +29,9 @@ namespace Belle2 {
     public:
 
       /// Main filter method weighting the relation between the segment pairs.
-      virtual
-      Weight operator()(const CDCSegmentPair& fromSegmentPair,
-                        const CDCSegmentPair& toSegmentPair) override final;
 
+      Weight
+      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
     };
 
   }

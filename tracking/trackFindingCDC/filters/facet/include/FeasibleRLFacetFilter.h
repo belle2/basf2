@@ -31,15 +31,14 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
     public:
       /**
        *  Main filter method returning the weight of the facet.
        *  Returns NAN if the cell shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& facet) override final;
+      Weight operator()(const CDCFacet& facet) final;
 
     public:
       /// Setter for the flag that the boarderline cases should be excluded.

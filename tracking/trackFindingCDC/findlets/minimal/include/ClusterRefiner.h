@@ -45,25 +45,23 @@ namespace Belle2 {
       }
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
+      std::string getDescription() final {
         return "Breaks bigger wire hit super cluster into smaller wire hit clusters";
       }
 
       /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm applying the cluster refinement
       void apply(const std::vector<CDCWireHitCluster>& inputSuperClusters,
-                 std::vector<CDCWireHitCluster>& outputClusters) override final
-      {
-        for (const CDCWireHitCluster& superCluster : inputSuperClusters) {
+                 std::vector<CDCWireHitCluster>& outputClusters) final {
+        for (const CDCWireHitCluster& superCluster : inputSuperClusters)
+        {
           B2ASSERT("Expect the clusters to be sorted", std::is_sorted(superCluster.begin(),
-                                                                      superCluster.end()));
+          superCluster.end()));
 
           m_wireHitRelations.clear();
           auto wireHits = superCluster | boost::adaptors::indirected;

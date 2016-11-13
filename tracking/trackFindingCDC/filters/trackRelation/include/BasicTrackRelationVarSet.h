@@ -59,7 +59,7 @@ namespace Belle2 {
       explicit BasicTrackRelationVarSet();
 
       /// Generate and assign the variables from the track relation
-      virtual bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
     };
   }
 }

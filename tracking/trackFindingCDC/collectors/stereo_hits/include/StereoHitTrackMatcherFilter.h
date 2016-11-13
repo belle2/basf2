@@ -34,12 +34,8 @@ namespace Belle2 {
       /// Use rl tagged wire hits a collection items.
       using CollectionItem = CDCRLWireHit;
 
-      /// Empty desctructor. Everything is handled via terminate.
-      virtual ~StereoHitTrackMatcherFilter() = default;
-
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters,
-                                    const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix) override;
 
       /// Use the given filter (via the module parameters) to find a matching
       std::vector<WithWeight<const CDCRLWireHit*> >

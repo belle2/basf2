@@ -8,7 +8,7 @@ env.Dictionary()['SUBLIB'] = True
 # Additional libraries
 env['LIBS'] = [
     'tracking_dataobjects',
-    'mdst_dataobjects',
+    'mva_dataobjects',
     'geometry',
     'cdc', 'cdc_dataobjects',
     "mva",
@@ -19,6 +19,8 @@ env['LIBS'] = [
     ]
 
 env.Append(CXXFLAGS=['-Wshadow'])
+
+# Does not work well with cppcheck
 # option = os.environ['BELLE2_OPTION']
 # if option == "clang":
 #     env.Append(CCFLAGS=['-Wdocumentation'])

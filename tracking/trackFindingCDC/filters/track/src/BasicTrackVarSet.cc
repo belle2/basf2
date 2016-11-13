@@ -7,7 +7,7 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/track/CDCTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
@@ -18,7 +18,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool CDCTrackVarSet::extract(const CDCTrack* track)
+bool BasicTrackVarSet::extract(const CDCTrack* track)
 {
   if (not track) return false;
 

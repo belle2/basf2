@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/track/CDCTrackTruthVarSet.h>
-#include <tracking/trackFindingCDC/filters/track/CDCTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
@@ -23,14 +23,14 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     using BaseTrackFilter = Filter<CDCTrack>;
 
-    using MCTrackFilter = MCFilter<VariadicUnionVarSet<CDCTrackTruthVarSet, CDCTrackVarSet>>;
+    using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
 
     using RecordingTrackFilter =
-      RecordingFilter<VariadicUnionVarSet<CDCTrackTruthVarSet, CDCTrackVarSet>>;
+      RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
 
     using AllTrackFilter = AllFilter<BaseTrackFilter>;
 
-    using TMVATrackFilter = TMVAFilter<CDCTrackVarSet>;
+    using TMVATrackFilter = TMVAFilter<BasicTrackVarSet>;
 
   }
 }

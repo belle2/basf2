@@ -8,9 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -18,32 +18,57 @@ namespace Belle2 {
 
     /// Names of the variables to be generated.
     constexpr
-    static char const* const cdcTrackTruthVarNames[] = {
-      "track_is_fake_truth",
-      "truth"
+    static char const* const basicTrackVarNames[] = {
+      "size",
+      "pt",
+      "sz_slope",
+      //"fit_prob_3d",
+      //"fit_prob_2d",
+      //"fit_prob_sz",
+      "drift_length_mean",
+      "drift_length_variance",
+      "drift_length_max",
+      "drift_length_min",
+      "drift_length_sum",
+
+      "adc_mean",
+      "adc_variance",
+      "adc_max",
+      "adc_min",
+      "adc_sum",
+
+      "empty_s_mean",
+      "empty_s_variance",
+      "empty_s_max",
+      "empty_s_min",
+      "empty_s_sum",
+
+      "has_matching_segment",
+
+      "s_range",
     };
 
     /** Class that specifies the names of the variables
      *  that should be generated from a segment.
      */
-    class CDCTrackTruthVarNames : public VarNames<CDCTrack> {
+    class BasicTrackVarSetNames : public VarNames<CDCTrack> {
 
     public:
       /// Number of variables to be generated.
-      static const size_t nNames = size(cdcTrackTruthVarNames);
+      static const size_t nNames = size(basicTrackVarNames);
 
       /// Get the name of the corresponding column.
       constexpr
       static char const* getName(int iName)
       {
-        return cdcTrackTruthVarNames[iName];
+        return basicTrackVarNames[iName];
       }
     };
 
     /** Class that computes floating point variables from a segment.
      *  that can be forwarded to a flat TNTuple or a TMVA method
      */
-    class CDCTrackTruthVarSet : public VarSet<CDCTrackTruthVarNames> {
+    class BasicTrackVarSet : public VarSet<BasicTrackVarSetNames> {
 
     public:
       /// Generate and assign the variables from the cluster

@@ -61,10 +61,10 @@ void WireHitCreator::exposeParameters(ModuleParamList* moduleParamList, const st
                                 "'downwards'.",
                                 m_param_flightTimeEstimation);
 
-  // moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
-  //        m_param_triggerPoint,
-  //        "Point relative to which the flight times of tracks should be adjusted",
-  //        m_param_triggerPoint);
+  moduleParamList->addParameter(prefixed(prefix, "triggerPoint"),
+                                m_param_triggerPoint,
+                                "Point relative to which the flight times are calculated",
+                                m_param_triggerPoint);
 }
 
 void WireHitCreator::initialize()

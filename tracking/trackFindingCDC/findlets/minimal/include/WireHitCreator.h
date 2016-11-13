@@ -71,16 +71,16 @@ namespace Belle2 {
       EPreferredDirection m_flightTimeEstimation = EPreferredDirection::c_None;
 
       /// Parameter : Location of the flight time zero
-      std::tuple<double, double, double> m_param_triggerPoint{0.0, 0.0, 0.0};
+      std::tuple<double, double, double> m_param_triggerPoint = {0.0, 0.0, 0.0};
 
       /// Central location of the flight time zero position. Usually the location of the trigger.
-      Vector3D m_triggerPoint = Vector3D(0, 0, 0);
+      Vector3D m_triggerPoint = Vector3D(0.0, 0.0, 0.0);
 
       /// TDC Count translator to be used to calculate the initial dirft length estiamtes
-      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator{nullptr};
+      std::unique_ptr<CDC::TDCCountTranslatorBase> m_tdcCountTranslator = nullptr;
 
       /// ADC Count translator to be used to calculate the charge deposit in the drift cell
-      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator{nullptr};
+      std::unique_ptr<CDC::ADCCountTranslatorBase> m_adcCountTranslator = nullptr;
     };
   }
 }

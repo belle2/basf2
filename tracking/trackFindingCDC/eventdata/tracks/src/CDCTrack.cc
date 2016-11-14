@@ -15,14 +15,12 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
+#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/TrackCand.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 using namespace genfit;
-
 
 namespace {
   /// Reconstruct a segment with the two fits and append it to the track
@@ -305,18 +303,11 @@ void CDCTrack::appendNotTaken(const std::vector<const CDCWireHit*>& hits)
 }
 
 
-
-bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
-{
-  GenfitUtil::fill(trackCand, *this);
-  return getStartTrajectory3D().fillInto(trackCand);
-}
-
 bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
   if (newRecoTrack) {
-    GenfitUtil::fill(*newRecoTrack, *this);
+    RecoTrackUtil::fill(*this, *newRecoTrack);
   }
   return true;
 }

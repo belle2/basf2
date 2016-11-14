@@ -77,11 +77,6 @@ namespace Belle2 {
       /// Getter for the sum of right left information relative to the size.
       double getRLAsymmetry() const;
 
-      /** Fill the hit content of this segment into a genfit::TrackCand.
-       *  @return true, if the trajectory information is valid, false otherwise.
-       */
-      bool fillInto(genfit::TrackCand& gfTrackCand) const;
-
       /// Makes a copy of the segment with the reversed hits in the opposite order.
       CDCRecoSegment2D reversed() const;
 

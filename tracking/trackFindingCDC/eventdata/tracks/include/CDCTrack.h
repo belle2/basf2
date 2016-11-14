@@ -51,9 +51,6 @@ namespace Belle2 {
       /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
       void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
 
-      /// Copies the hit and trajectory content of this track to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand) const;
-
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
       bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
 

@@ -16,13 +16,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 
-#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-
-#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 #include <tracking/trackFindingCDC/utilities/GetIterator.h>
-#include <genfit/TrackCand.h>
-
 
 #include <boost/range/adaptor/reversed.hpp>
 #include <boost/range/adaptor/indirected.hpp>
@@ -306,21 +301,6 @@ CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
   rlWireHitSegment.setTrajectory2D(getTrajectory2D());
   rlWireHitSegment.setAliasScore(getAliasScore());
   return rlWireHitSegment;
-}
-
-
-bool CDCRecoSegment2D::fillInto(genfit::TrackCand& gfTrackCand) const
-{
-  CDCTrajectory3D trajectory3D(getTrajectory2D());
-
-  if (not empty()) {
-    const CDCRecoHit2D& startRecoHit2D = front();
-    Vector3D startPos3D(startRecoHit2D.getRecoPos2D(), 0.0);
-    trajectory3D.setLocalOrigin(startPos3D);
-  }
-
-  GenfitUtil::fill(gfTrackCand, *this);
-  return trajectory3D.fillInto(gfTrackCand);
 }
 
 CDCRecoSegment2D CDCRecoSegment2D::reversed() const

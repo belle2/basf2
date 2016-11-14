@@ -211,9 +211,10 @@ void EKLMRawPackerModule::event()
 
 
 
-void EKLMRawPackerModule::formatData(int forward, int layer, int sector, int plane, int strip, int charge, float ctime,
-                                     unsigned short& bword1,
-                                     unsigned short& bword2, unsigned short& bword3, unsigned short& bword4)
+void EKLMRawPackerModule::formatData(
+  int endcap, int layer, int sector, int plane, int strip, int charge,
+  float ctime, unsigned short& bword1, unsigned short& bword2,
+  unsigned short& bword3, unsigned short& bword4)
 {
   bword1 = 0; //Mapping(1st bit - empty; 2nd bit - forward; 3,4,5,6 bits - layer; 7,8 - sector; 9 - plane; 10,11,12,13,14,15,16 - strip)
   bword2 = 0; //15 bits of time
@@ -223,7 +224,7 @@ void EKLMRawPackerModule::formatData(int forward, int layer, int sector, int pla
   bword1 |= (((plane - 1) & 1) << 7);
   bword1 |= (((sector - 1) & 3) << 8);
   bword1 |= (((layer - 1) & 0xF) << 10);
-  bword1 |= (((forward - 1) & 1) << 14);
+  bword1 |= (((endcap - 1) & 1) << 14);
   bword2 |= (((int)ctime) & 0x7FFF);
 //  bword3 |= (TDC & 0x7FFF);                              //DO WE NEED TDC ????????????????
   bword4 |= (charge & 0x7FFF);

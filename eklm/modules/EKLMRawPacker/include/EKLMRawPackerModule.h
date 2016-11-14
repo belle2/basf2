@@ -62,8 +62,24 @@ namespace Belle2 {
     //! RawKLM array
     StoreArray<RawKLM> rawklmarray;
 
-    void formatData(int forward, int layer, int sector, int plane, int strip, int charge, float ctime, unsigned short& bword1,
-                    unsigned short& bword2, unsigned short& bword3, unsigned short& bword4);
+    /**
+     * Creation of raw data.
+     * @param[in]  endcap Endcap number.
+     * @param[in]  layer  Layer number.
+     * @param[in]  sector Sector number.
+     * @param[in]  plane  Plane number.
+     * @param[in]  strip  Strip number.
+     * @param[in]  charge Charge.
+     * @param[in]  ctime  Time.
+     * @param[out] bword1 First word.
+     * @param[out] bword2 Second word.
+     * @param[out] bword3 Third word.
+     * @param[out] bword4 Fourth word.
+     */
+    void formatData(int forward, int layer, int sector, int plane, int strip,
+                    int charge, float ctime, unsigned short& bword1,
+                    unsigned short& bword2, unsigned short& bword3,
+                    unsigned short& bword4);
 
     //! to map logical coordinates to hardware coordinates
     std::map<int, int> m_ModuleIdToelectId;

@@ -1,9 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['framework', 'analysis_dataobjects', '$ROOT_LIBS', 'RooFit', 'RooFitCore', 'RooStats']
-
-env.Append(LIBPATH = ['/usr/users/phit/neurobayes/lib/'])
-env.Append(CPPPATH = ['/usr/users/phit/neurobayes/include/'])
-env.Append(LIBS = ['TMVA','MLP','XMLIO'])
-
-Return('env')

@@ -28,7 +28,7 @@ EKLMRawPackerModule::EKLMRawPackerModule() : Module()
 {
   ///Set module properties
   setDescription("an Example to pack data to a RawKLM object");
-
+  setPropertyFlags(c_ParallelProcessingCertified);
   ///  maximum # of events to produce( -1 : inifinite)
   addParam("MaxEventNum", max_nevt, "Maximum event number to make", -1);
   addParam("useDefaultModuleId", m_useDefaultElectId, "use default elect id if not found in mapping", true);

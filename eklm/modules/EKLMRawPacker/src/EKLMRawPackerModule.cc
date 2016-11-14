@@ -193,14 +193,13 @@ void EKLMRawPackerModule::event()
     delete [] buf4;
   }
 
-  printf("Event # %.8d\n", n_basf2evt);
-  fflush(stdout);
+  B2INFO("Event # " << n_basf2evt);
 
   // Monitor
   if (max_nevt >= 0) {
     if (n_basf2evt >= max_nevt && max_nevt > 0) {
-      printf("[DEBUG] RunStop was detected. ( Setting:  Max event # %d ) Processed Event %d \n", max_nevt , n_basf2evt);
-      fflush(stdout);
+      B2INFO("RunStop was detected. ( Setting:  Max event # " << max_nevt <<
+             " ) Processed Event " << n_basf2evt);
       m_eventMetaDataPtr->setEndOfData();
     }
   }

@@ -91,7 +91,14 @@ namespace Belle2 {
      */
     bool addExperimentName(int experiment, const std::string& name);
 
+    /** Set the base of the url used for REST requests to the central server */
     void setRESTBase(const std::string& restBase);
+
+    /** Add a directory to the list of directories to look for payloads before
+     * downloading them.
+     * @param directory path to the directory to add to the list
+     * @param structure indicate how the payloads are stored in this directory
+     */
     void addLocalDirectory(const std::string& localDir, EConditionsDirectoryStructure structure);
 
   private:

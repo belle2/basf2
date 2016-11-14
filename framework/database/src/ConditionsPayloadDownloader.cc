@@ -497,7 +497,7 @@ namespace Belle2 {
   {
     const auto openmode = std::ios_base::binary | std::ios_base::in | std::ios_base::out | std::ios_base::trunc;
     std::unique_ptr<FileSystem::TemporaryFile> tmpfile(new FileSystem::TemporaryFile(openmode));
-    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName() << " ... uhh, eeeh, da isses ja!");
+    B2DEBUG(100, "Trying to download into temporary file " << tmpfile->getName());
     if (downloadAndCheck(url, *tmpfile, digest)) {
       m_tempfiles[key] = std::move(tmpfile);
       return m_tempfiles[key]->getName();

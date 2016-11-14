@@ -18,17 +18,14 @@
 #include <framework/datastore/StoreArray.h>
 #include <framework/core/ModuleParamList.h>
 
-#include <vector>
-
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 std::string TrackExporter::getDescription()
 {
-  return "Creates reconstruction track candidates from each individual tracks.";
+  return "Creates a RecoTrack from each CDCTrack.";
 }
 
-/** Add the parameters of the filter to the module */
 void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   moduleParamList->addParameter(prefixed(prefix, "RecoTracksStoreArrayName"),
@@ -50,56 +47,26 @@ void TrackExporter::exposeParameters(ModuleParamList* moduleParamList, const std
                                 m_param_exportTracksInto,
                                 "Name of the output StoreArray of RecoTracks.",
                                 m_param_exportTracksInto);
-
-  moduleParamList->addParameter(prefixed(prefix, "useRecoTracks"),
-                                m_param_useRecoTracks,
-                                "Flag to use reco tracks instead of genfit tracks.",
-                                m_param_useRecoTracks);
 }
 
-/// Signal initialisation phase to register store array for export
 void TrackExporter::initialize()
 {
   // Output StoreArray
   if (m_param_exportTracks) {
-    if (m_param_useRecoTracks) {
-      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-      storedRecoTracks.registerInDataStore();
-
-      RecoTrack::registerRequiredRelations(storedRecoTracks);
-    } else {
-      StoreArray <genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-      storedGFTrackCands.registerInDataStore();
-    }
+    StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+    storedRecoTracks.registerInDataStore();
+    RecoTrack::registerRequiredRelations(storedRecoTracks);
   }
   Super::initialize();
 }
 
-/// Signal new event recreate the store array
-void TrackExporter::beginEvent()
-{
-  Super::beginEvent();
-}
-
-/// Write give tracks into track store array
 void TrackExporter::apply(std::vector<CDCTrack>& tracks)
 {
   // Put code to generate gf track cands here if requested.
   if (m_param_exportTracks) {
-    if (m_param_useRecoTracks) {
-      StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
-      for (const CDCTrack& track : tracks) {
-        track.storeInto(storedRecoTracks);
-      }
-    } else {
-      StoreArray<genfit::TrackCand> storedGFTrackCands(m_param_exportTracksInto);
-      for (CDCTrack& track : tracks) {
-        genfit::TrackCand gfTrackCand;
-        if (track.fillInto(gfTrackCand)) {
-          genfit::TrackCand* storedGenfitTrackCand = storedGFTrackCands.appendNew(gfTrackCand);
-          track.setRelatedGenfitTrackCandidate(storedGenfitTrackCand);
-        }
-      }
+    StoreArray<RecoTrack> storedRecoTracks(m_param_exportTracksInto);
+    for (const CDCTrack& track : tracks) {
+      track.storeInto(storedRecoTracks);
     }
   }
 }

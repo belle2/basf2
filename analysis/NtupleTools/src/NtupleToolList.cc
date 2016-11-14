@@ -37,6 +37,7 @@
 #include <analysis/NtupleTools/NtupleFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMCFlightInfoTool.h>
 #include <analysis/NtupleTools/NtupleMomentumVectorDeviationTool.h>
+#include <analysis/NtupleTools/NtupleParentRestKinematicsTool.h>
 #include <analysis/NtupleTools/NtupleDalitzTool.h>
 #include <analysis/NtupleTools/NtupleVVAnglesTool.h>
 #include <analysis/NtupleTools/NtupleHelicityTool.h>
@@ -88,6 +89,7 @@ NtupleFlatTool* NtupleToolList::create(string strName, TTree* tree, DecayDescrip
 
   if (strToolName == "Kinematics") return new NtupleKinematicsTool(tree, d);
   else if (strToolName == "CMSKinematics") return new NtupleCMSKinematicsTool(tree, d);
+  else if (strToolName == "ParentRestKinematics") return new NtupleParentRestKinematicsTool(tree, d);
   else if (strToolName == "MomentumUncertainty") return new NtupleMomentumUncertaintyTool(tree, d);
   else if (strToolName == "InvMass") return new NtupleInvMassTool(tree, d, strOption);
   else if (strToolName == "MassBeforeFit") return new NtupleMassBeforeFitTool(tree, d);

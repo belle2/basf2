@@ -29,6 +29,20 @@
 
 namespace fs = boost::filesystem;
 
+namespace Belle2 {
+  /** struct encapsulating all the state information needed by curl */
+  struct ConditionsCurlSession {
+    /** curl session information */
+    CURL* curl{nullptr};
+    /** headers to send with every request */
+    curl_slist* headers{nullptr};
+    /** error buffer in case some error happens during downloading */
+    char errbuf[CURL_ERROR_SIZE];
+    /** last time we printed the status (in ns) */
+    double lasttime{0};
+  };
+}
+
 namespace {
   /** Callback to handle the bytes downloaded by curl.
    * See https://curl.haxx.se/libcurl/c/CURLOPT_WRITEFUNCTION.html
@@ -52,14 +66,6 @@ namespace {
     return size * nmemb;
   }
 
-  /** simple struct to contain the status we need to print progress messages */
-  struct progress_status {
-    /** pointer to the url we're downloading */
-    const std::string* url {nullptr};
-    /** last time we printed the status (in ns) */
-    double lasttime{0};
-  };
-
   /** Callback to show download progress. This function is called by curl when downloading things
    * See https://curl.haxx.se/libcurl/c/CURLOPT_XFERINFOFUNCTION.html
    *
@@ -76,7 +82,7 @@ namespace {
     // nothing to show ...
     if (dlnow == 0) return 0;
     // otherwise print number of transferred bytes
-    progress_status& status = *static_cast<progress_status*>(clientp);
+    Belle2::ConditionsCurlSession& status = *static_cast<Belle2::ConditionsCurlSession*>(clientp);
     double time = Belle2::Utils::getClock();
     // make sure we don't print the status too often
     if (status.lasttime != 0 && (time - status.lasttime) / Belle2::Unit::ms < 200) {
@@ -84,9 +90,9 @@ namespace {
     }
     status.lasttime = time;
     if (dltotal > 0) {
-      B2DEBUG(50, "Downloading " << *status.url << ": " << dlnow << " / " << dltotal << " bytes transferred");
+      B2DEBUG(50, "curl:= " << dlnow << " / " << dltotal << " bytes transferred");
     } else {
-      B2DEBUG(50, "Downloading " << *status.url << ": " << dlnow << " bytes transferred");
+      B2DEBUG(50, "curl:= " << dlnow << " bytes transferred");
     }
     return 0;
   }
@@ -121,33 +127,6 @@ namespace {
   {
     return boost::trim_right_copy_if(base, boost::is_any_of("/")) + "/" + boost::trim_left_copy_if(rest, boost::is_any_of("/"));
   }
-
-  /** Simple class to make sure that the curl session is closed correctly.
-   * When this class is instantiated with a downloader instance it will make
-   * sure that there is an active curl session. If a session is created (i.e.
-   * there was no session already) it will also end the session once this
-   * object goes out of scope
-   */
-  class SessionGuard final {
-  public:
-    /** Constructor which makes sure there is an active session */
-    SessionGuard(Belle2::ConditionsPayloadDownloader& instance): m_instance(instance), m_createdSession(instance.startSession()) {}
-    /** disable move construction */
-    SessionGuard(SessionGuard&&) = delete;
-    /** disable move assignment */
-    SessionGuard&   operator= (SessionGuard&&) = delete;
-    /** disable copy construction */
-    SessionGuard(const SessionGuard&) = delete;
-    /** disable assignment */
-    SessionGuard& operator= (const SessionGuard&) = delete;
-    /** close session if it was created by this instance */
-    ~SessionGuard() { if (m_createdSession) m_instance.finishSession(); }
-  private:
-    /** reference to the Downloader containing the session */
-    Belle2::ConditionsPayloadDownloader& m_instance;
-    /** indicates whether we created a session so we will also close it */
-    bool m_createdSession;
-  };
 }
 
 namespace Belle2 {
@@ -155,7 +134,7 @@ namespace Belle2 {
   bool ConditionsPayloadDownloader::s_globalInit{false};
 
   /* add directory but make sure it's absolute */
-  void ConditionsPayloadDownloader::addLocalDirectory(const std::string& directory, EDirectoryStructure structure)
+  void ConditionsPayloadDownloader::addLocalDirectory(const std::string& directory, EConditionsDirectoryStructure structure)
   {
     m_localDirectories.emplace_back(fs::absolute(fs::path(directory)).string(), structure);
   }
@@ -163,29 +142,51 @@ namespace Belle2 {
   bool ConditionsPayloadDownloader::startSession()
   {
     // start a curl session but if there is already one return false
-    if (m_curl) return false;
+    if (m_session) return false;
     // make sure curl is initialized correctly
     if (!s_globalInit) {
       curl_global_init(CURL_GLOBAL_ALL);
       s_globalInit = true;
     }
     // create the curl session
-    m_curl = curl_easy_init();
-    if (!m_curl) {
+    m_session.reset(new ConditionsCurlSession);
+    m_session->curl = curl_easy_init();
+    if (!m_session->curl) {
       B2FATAL("Cannot intialize libcurl");
     }
-    curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1);
-    curl_easy_setopt(m_curl, CURLOPT_DEBUGFUNCTION, debug_callback);
+    curl_easy_setopt(m_session->curl, CURLOPT_HTTPHEADER, m_session->headers);
+    curl_easy_setopt(m_session->curl, CURLOPT_WRITEFUNCTION, write_function);
+    curl_easy_setopt(m_session->curl, CURLOPT_VERBOSE, 1);
+    curl_easy_setopt(m_session->curl, CURLOPT_NOPROGRESS, 0);
+    curl_easy_setopt(m_session->curl, CURLOPT_DEBUGFUNCTION, debug_callback);
+    curl_easy_setopt(m_session->curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
+    curl_easy_setopt(m_session->curl, CURLOPT_XFERINFODATA, m_session.get());
+    curl_easy_setopt(m_session->curl, CURLOPT_FAILONERROR, true);
+    curl_easy_setopt(m_session->curl, CURLOPT_ERRORBUFFER, m_session->errbuf);
+    m_session->headers = curl_slist_append(nullptr, "Accept: application/json");
     return true;
   }
 
   void ConditionsPayloadDownloader::finishSession()
   {
     // if there's a session clean it ...
-    if (m_curl) {
-      curl_easy_cleanup(m_curl);
-      m_curl = nullptr;
+    if (m_session) {
+      curl_easy_cleanup(m_session->curl);
+      curl_slist_free_all(m_session->headers);
+      m_session.reset();
     }
+  }
+
+  ConditionsPayloadDownloader::ConditionsPayloadDownloader(
+    const std::string& localDir,  const std::string& restUrl, int timeout):
+    m_restUrl(restUrl), m_timeout(timeout)
+  {
+    addLocalDirectory(localDir, EConditionsDirectoryStructure::c_flatDirectory);
+  }
+
+  ConditionsPayloadDownloader::~ConditionsPayloadDownloader()
+  {
+    finishSession();
   }
 
   bool ConditionsPayloadDownloader::update(const std::string& globalTag, int experiment, int run)
@@ -200,7 +201,7 @@ namespace Belle2 {
     m_payloads.clear();
     // build up the request url
     // make sure the tag name doesn't contain special characters
-    char* escapedTag = curl_easy_escape(m_curl, globalTag.c_str(), globalTag.size());
+    char* escapedTag = curl_easy_escape(m_session->curl, globalTag.c_str(), globalTag.size());
     if (!escapedTag) {
       B2ERROR("Could not encode the global tag name: " << globalTag);
       return false;
@@ -270,9 +271,9 @@ namespace Belle2 {
           };
           payloadInfo.baseUrl = "http://belle2db.hep.pnnl.gov/";
           int firstExp = getExpNumber(payloadIov.get<std::string>("initialRunId.experiment.name"));
-          int firstRun =  payloadIov.get<int>("initialRunId.name");
+          int firstRun = payloadIov.get<int>("initialRunId.name");
           int finalExp = getExpNumber(payloadIov.get<std::string>("finalRunId.experiment.name"));
-          int finalRun =  payloadIov.get<int>("finalRunId.name");
+          int finalRun = payloadIov.get<int>("finalRunId.name");
           payloadInfo.iov = IntervalOfValidity(firstExp, firstRun, finalExp, finalRun);
         }
 
@@ -311,19 +312,20 @@ namespace Belle2 {
     return true;
   }
 
-  std::pair<std::string, IntervalOfValidity> ConditionsPayloadDownloader::get(const std::string& name)
+  const ConditionsPayloadDownloader::PayloadInfo& ConditionsPayloadDownloader::get(const std::string& name)
   {
     // assume the payload exists, if not an exception is thrown which we let bubble up
-    const PayloadInfo& info = m_payloads.at(name);
-    // and download the filename if necessary
-    std::string filename = getPayload(info);
+    PayloadInfo& info = m_payloads.at(name);
+    if (info.filename.empty()) {
+      // and download the filename if necessary
+      info.filename = getPayloadFile(info);
+    }
     // download failed, raise an error
-    if (filename.empty()) {
-      B2ERROR("Failure obtaining payload '" << "' from central database");
-      throw std::runtime_error("Could not download payload");
+    if (info.filename.empty()) {
+      B2ERROR("Failure obtaining payload '" << name << "' from central database");
     }
     // otherwise return filename and iov
-    return std::make_pair(filename, info.iov);
+    return info;
   }
 
   std::string ConditionsPayloadDownloader::calculateDigest(std::istream& input)
@@ -365,26 +367,26 @@ namespace Belle2 {
     return md5.AsString();
   }
 
-  std::string ConditionsPayloadDownloader::getLocalName(const std::string& dir, EDirectoryStructure structure,
+  std::string ConditionsPayloadDownloader::getLocalName(const std::string& dir, EConditionsDirectoryStructure structure,
                                                         const PayloadInfo& payload)
   {
     fs::path path(dir);
     switch (structure) {
-      case c_logicalSubdirectories:
+      case  EConditionsDirectoryStructure::c_logicalSubdirectories:
         path /= fs::path(payload.payloadUrl);
         break;
-      case c_digestSubdirectories:
+      case EConditionsDirectoryStructure::c_digestSubdirectories:
         path /= payload.digest.substr(0, 1);
         path /= payload.digest.substr(1, 2);
       // intentional fall through to get flat name in addition ...
-      case c_flatDirectory:
+      case EConditionsDirectoryStructure::c_flatDirectory:
         path /= fs::path(payload.payloadUrl).filename();
         break;
     };
     return path.lexically_normal().string();
   }
 
-  std::string ConditionsPayloadDownloader::getPayload(const PayloadInfo& payload)
+  std::string ConditionsPayloadDownloader::getPayloadFile(const PayloadInfo& payload)
   {
     //check if we already have downloaded this payload before into a temporary file
     auto it = m_tempfiles.find(payload.payloadUrl);
@@ -437,7 +439,7 @@ namespace Belle2 {
     // we have lock and it's broken so download the file
     B2DEBUG(200, "Still not good, download now ...");
     if (!downloadAndCheck(url, localStream, payload.digest)) {
-      B2DEBUG(200, "Download failed ... try one last time into temporary file");
+      B2INFO("Download for payload '" <<  payload.payloadUrl << " failed, trying one last time into temporary file");
       return getTemporary(payload.payloadUrl, url, payload.digest);
     }
     B2DEBUG(200, "Download of payload successful");
@@ -458,31 +460,18 @@ namespace Belle2 {
     }
     // build the request ...
     CURLcode res{CURLE_FAILED_INIT};
-    char errbuf[CURL_ERROR_SIZE];
-    curl_slist* headers{curl_slist_append(nullptr, "Accept: application/json")};
-    progress_status status;
-    status.url = &url;
     // and set all the curl options
-    curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, headers);
-    curl_easy_setopt(m_curl, CURLOPT_URL, url.c_str());
-    curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, write_function);
-    curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &buffer);
-    curl_easy_setopt(m_curl, CURLOPT_FAILONERROR, true);
-    curl_easy_setopt(m_curl, CURLOPT_ERRORBUFFER, errbuf);
-    curl_easy_setopt(m_curl, CURLOPT_XFERINFOFUNCTION, progress_callback);
-    curl_easy_setopt(m_curl, CURLOPT_XFERINFODATA, &status);
-    curl_easy_setopt(m_curl, CURLOPT_NOPROGRESS, 0);
+    curl_easy_setopt(m_session->curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(m_session->curl, CURLOPT_WRITEDATA, &buffer);
     // perform the request ...
-    res = curl_easy_perform(m_curl);
-    // free the headers
-    curl_slist_free_all(headers);
+    res = curl_easy_perform(m_session->curl);
     // flush output
     buffer.flush();
     // and check for errors which occured during download ...
     if (res != CURLE_OK) {
-      size_t len = strlen(errbuf);
+      size_t len = strlen(m_session->errbuf);
       if (len) {
-        B2WARNING("Could not get '" << url << "': " << errbuf);
+        B2WARNING("Could not get '" << url << "': " << m_session->errbuf);
       } else {
         B2WARNING("Could not get '" << url << "': " << curl_easy_strerror(res));
       }

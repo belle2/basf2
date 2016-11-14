@@ -76,7 +76,7 @@ namespace Belle2 {
      * @param[out] bword3 Third word.
      * @param[out] bword4 Fourth word.
      */
-    void formatData(int forward, int layer, int sector, int plane, int strip,
+    void formatData(int endcap, int layer, int sector, int plane, int strip,
                     int charge, float ctime, unsigned short& bword1,
                     unsigned short& bword2, unsigned short& bword3,
                     unsigned short& bword4);

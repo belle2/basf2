@@ -113,8 +113,9 @@ CDCTriggerHoughtrackingModule::fastInterceptFinder(cdcMap& hits,
         iSL = hp.first;
         m = hp.second.X();
         a = hp.second.Y();
-        y1 = m * sin(x1_d) - a * cos(x1_d);
-        y2 = m * sin(x2_d) - a * cos(x2_d);
+        // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
+        y1 = m * sin(x1_d - 1e-10) - a * cos(x1_d - 1e-10);
+        y2 = m * sin(x2_d + 1e-10) - a * cos(x2_d + 1e-10);
         // skip decreasing half of the sine (corresponds to curl back half of the track)
         if (iterations == maxIterations && y1 > y2) continue;
         if (!((y1 > y2_d && y2 > y2_d) || (y1 < y1_d && y2 < y1_d))) {

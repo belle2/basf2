@@ -7,12 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentTrack/SimpleSegmentTrackFilter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 Weight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair)
 {

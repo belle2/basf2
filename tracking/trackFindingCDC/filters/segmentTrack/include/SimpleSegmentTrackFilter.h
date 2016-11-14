@@ -12,12 +12,11 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
+    class CDCTrack;
+
     /// Filter for the construction of good segment - track pairs
     class SimpleSegmentTrackFilter : public FilterOnVarSet<SegmentTrackVarSet> {
 

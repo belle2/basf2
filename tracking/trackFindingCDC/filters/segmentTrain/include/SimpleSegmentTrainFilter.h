@@ -12,12 +12,11 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainVarSet.h>
 
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
+    class SegmentInformation;
+
     /// Filter for the construction of good segment trains
     class SimpleSegmentTrainFilter : public FilterOnVarSet<SegmentTrainVarSet> {
 
@@ -27,8 +26,7 @@ namespace Belle2 {
 
     public:
       /// Get the output of the filter.
-      Weight
-      operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair) final;
+      Weight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair) final;
     };
   }
 }

@@ -10,8 +10,25 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SimpleSegmentTrackFilter.h>
 
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
+  using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
+  using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
+  using TMVASegmentTrackFilter = TMVAFilter<SegmentTrackVarSet>;
+}
 
 SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

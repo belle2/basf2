@@ -24,9 +24,9 @@ namespace Belle2 {
     public:
       /// Generate and assign the variables from the cluster
       bool extract(const CDCRecoSegment2D* segment) final {
-        Super::extract(segment);
+        bool extracted = Super::extract(segment);
         var<named("truth")>() = var<named("segment_is_fake_truth")>();
-        return true;
+        return extracted;
       }
     };
   }

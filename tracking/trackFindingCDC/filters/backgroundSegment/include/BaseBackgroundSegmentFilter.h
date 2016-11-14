@@ -9,20 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCTrack;
-    class SegmentInformation;
-
-    /// Filter for the construction of good segment trains - track pairs
-    class SimpleSegmentInformationListTrackFilter : public BaseSegmentInformationListTrackFilter {
-
-    public:
-      /// Get the filter output.
-      Weight operator()(const std::pair<std::vector<SegmentInformation*>,
-                        const CDCTrack*>& testPair) final;
-    };
+    class CDCRecoSegment2D;
+    /// Base Filter for filtering out Background Segments, but rejects all segments.
+    using BaseBackgroundSegmentFilter = Filter<CDCRecoSegment2D>;
   }
 }

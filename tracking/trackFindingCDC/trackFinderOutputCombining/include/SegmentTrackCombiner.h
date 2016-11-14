@@ -7,15 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrain/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BaseBackgroundSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/newSegment/BaseNewSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>

@@ -9,8 +9,31 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentTruthVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllNewSegmentFilter = AllFilter<BaseNewSegmentFilter>;
+
+  using MCNewSegmentFilter =
+    MCFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
+
+  using RecordingNewSegmentFilter =
+    RecordingFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
+
+  using TMVANewSegmentFilter = TMVAFilter<AdvancedSegmentVarSet>;
+}
 
 NewSegmentFilterFactory::NewSegmentFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

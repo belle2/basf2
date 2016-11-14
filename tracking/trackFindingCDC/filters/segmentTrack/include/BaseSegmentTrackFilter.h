@@ -9,20 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/base/Filter.h>
+
+#include <vector>
+#include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCRecoSegment2D;
     class CDCTrack;
-    class SegmentInformation;
-
-    /// Filter for the construction of good segment trains - track pairs
-    class SimpleSegmentInformationListTrackFilter : public BaseSegmentInformationListTrackFilter {
-
-    public:
-      /// Get the filter output.
-      Weight operator()(const std::pair<std::vector<SegmentInformation*>,
-                        const CDCTrack*>& testPair) final;
-    };
+    using BaseSegmentTrackFilter = Filter<std::pair<const CDCRecoSegment2D*, const CDCTrack*>>;
   }
 }

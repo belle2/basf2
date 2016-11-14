@@ -9,8 +9,26 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+// Filter instances to be used
+namespace {
+  using AllTrackFilter = AllFilter<BaseTrackFilter>;
+  using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using RecordingTrackFilter =  RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using TMVATrackFilter = TMVAFilter<BasicTrackVarSet>;
+}
 
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

@@ -16,10 +16,6 @@
 
 #include <vector>
 
-namespace genfit {
-  class TrackCand;
-}
-
 namespace Belle2 {
   class RecoTrack;
 
@@ -30,7 +26,7 @@ namespace Belle2 {
     class CDCSegmentTriple;
 
     /// Class representing a sequence of three dimensional reconstructed hits
-    class CDCTrack : public std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D> {
+    class CDCTrack : public std::vector<CDCRecoHit3D> {
     public:
 
       /// Default constructor for ROOT compatibility.
@@ -111,8 +107,8 @@ namespace Belle2 {
 
       /** Check all contained wire hits if one has the masked flag.
        *  Set the masked flag of this segment in case at least one
-       of the contained wire hits is flagged as masked.
-      */
+       * of the contained wire hits is flagged as masked.
+       */
       void receiveMaskedFlag() const;
 
 
@@ -144,18 +140,6 @@ namespace Belle2 {
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
 
-      /// Return the pointer to the track candidate which was created from this CDCrack
-      genfit::TrackCand* getRelatedGenfitTrackCandidate() const
-      {
-        return m_relatedGenfitTrackCandidate;
-      }
-
-      /// Set the pointer to the track candidate which was created from this CDCrack
-      void setRelatedGenfitTrackCandidate(genfit::TrackCand* relatedTrackCand)
-      {
-        m_relatedGenfitTrackCandidate = relatedTrackCand;
-      }
-
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
       {
@@ -181,13 +165,8 @@ namespace Belle2 {
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
 
-      /// Related genfit track cand
-      genfit::TrackCand* m_relatedGenfitTrackCandidate = nullptr;
-
       /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
       bool m_hasMatchingSegment = false;
-
     };
-
   }
 }

@@ -14,7 +14,8 @@ REG_MODULE(TrackQualityAsserterCDC);
 
 void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC::CDCTrack>& tracks)
 {
-  // Only use the not fitted tracks if set
+  // Only use the not fitted tracks if set - was unused
+  /*
   if (m_param_onlyNotFittedTracks) {
     tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [](const CDCTrack & track) {
       const genfit::TrackCand* trackCand = track.getRelatedGenfitTrackCandidate();
@@ -31,6 +32,7 @@ void TrackQualityAsserterCDCModule::generate(std::vector<Belle2::TrackFindingCDC
       return false;
     }), tracks.end());
   }
+  */
 
   std::vector<CDCTrack> splittedTracks;
 

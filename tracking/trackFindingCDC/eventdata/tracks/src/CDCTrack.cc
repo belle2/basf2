@@ -20,7 +20,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace genfit;
 
 namespace {
   /// Reconstruct a segment with the two fits and append it to the track

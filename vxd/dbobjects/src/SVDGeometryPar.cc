@@ -81,7 +81,9 @@ const SVDCoolingPipesPar& SVDGeometryPar::getCoolingPipes(int layer) const
 
 void SVDGeometryPar::createHalfShellSupport(GearDir support)
 {
-  for (const GearDir& rotationsolid : support.getNodes("RotationSolid")) {
+  if (!support) return;
+
+  for (const GearDir& rotationsolid : support.getNodes("HalfShell/RotationSolid")) {
     m_halfShell.push_back(VXDRotationSolidPar(rotationsolid));
   }
   return;

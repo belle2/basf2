@@ -388,6 +388,7 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
         path.add_module(CDCdEdxPID)
 
     # VXD dE/dx PID
+    # only run this if the SVD is enabled - PXD is disabled by default
     if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)

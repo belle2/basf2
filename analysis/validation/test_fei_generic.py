@@ -9,6 +9,7 @@
 """
 
 import os
+import sys
 
 if 'BELLE2_VALIDATION_DATA_DIR' not in os.environ:
     sys.exit(0)

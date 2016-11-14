@@ -15,10 +15,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
 
-namespace genfit {
-  class TrackCand;
-}
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 

@@ -31,9 +31,6 @@
 #include <framework/logging/Logger.h>
 #include <framework/utilities/FileSystem.h>
 
-// DATABASE
-#include <framework/conditions/ConditionsService.h>
-
 using namespace std;
 using namespace Belle2;
 using namespace ECL;

@@ -1,4 +1,10 @@
 #include <framework/modules/conditions/ConditionsModule.h>
+
+#ifdef __INTEL_COMPILER
+#pragma warning (disable:1478)
+#else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 #include <framework/conditions/ConditionsService.h>
 
 #include <iostream>
@@ -32,6 +38,8 @@ ConditionsModule::ConditionsModule(): Module()
 
 void ConditionsModule::initialize()
 {
+  B2WARNING("The Conditions module is deprecated, please don't use it anymore and switch to DBObjPtr/DBArray");
+
   //Build actual dbserver tools
   B2INFO("Getting conditions service ... global tag: " << m_globalTag);
 

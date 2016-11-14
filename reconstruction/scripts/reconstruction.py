@@ -388,7 +388,7 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
         path.add_module(CDCdEdxPID)
 
     # VXD dE/dx PID
-    if components is None or 'SVD' in components or 'PXD' in components:
+    if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
 

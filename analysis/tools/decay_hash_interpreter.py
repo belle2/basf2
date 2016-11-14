@@ -8,6 +8,5 @@ if __name__ == '__main__':
         print('Usage {name} hashmap.root decayHash decayHashExtended'.format(sys.argv[0]))
 
     rootfile = sys.argv[1]
-    hash2string = decayHash.parse_rootfile(rootfile)
-
-    decayHash.print_hash(hash2string[decayHash.decayHashFloatToInt(float(sys.argv[2]), float(sys.argv[3]))])
+    hashmap = decayHash.DecayHashMap(rootfile)
+    hashmap.print_hash(float(sys.argv[2]), float(sys.argv[3]))

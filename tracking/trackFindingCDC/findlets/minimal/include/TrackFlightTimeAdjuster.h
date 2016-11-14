@@ -22,9 +22,9 @@ namespace Belle2 {
     class CDCTrack;
 
     /**
-     *  Findlet to adjust the flight time of tracks relative to a trigger point.
+     *  Findlet to adjust the flight time of tracks relative to the flight time zero.
      *
-     *  The flight time of tracks is only adjusted in the start trajectories of each given track
+     *  The flight time of tracks is currently only adjusted in the start trajectories of each given track
      *  and the time which is need to reach the flight time zero location with the speed of flight
      *  on the curved trajectory is set as the flight time.
      */

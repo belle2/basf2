@@ -32,7 +32,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
-      /// Add the parameters of the filter to the module
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signals the beginning of the event processing

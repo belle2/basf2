@@ -50,7 +50,7 @@ namespace Belle2 {
         return "Creates segment triple from a set of segments  and already combined segment pairs filtered by some acceptance criterion";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         m_segmentTripleFilter.exposeParameters(moduleParamList, prefix);

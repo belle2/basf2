@@ -44,7 +44,7 @@ namespace Belle2 {
         return "Creates axial axial segment pairs from a set of segments filtered by some acceptance criterion";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         m_axialSegmentPairFilter.exposeParameters(moduleParamList, prefix);

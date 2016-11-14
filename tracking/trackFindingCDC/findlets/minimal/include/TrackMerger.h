@@ -27,7 +27,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Merges tracks in the same super cluster by linking paths of tracks in a cellular automaton
+    /// Merges tracks based on a filter criterion
     template <class TrackRelationFilter>
     class TrackMerger : public Findlet<const CDCTrack, CDCTrack> {
 
@@ -47,15 +47,14 @@ namespace Belle2 {
         return "Merges tracks by extraction of track paths in a cellular automaton.";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_trackRelationFilter.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm
-      void
-      apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final {
+      void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final {
         m_trackRelations.clear();
         WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
         inputTracks,
@@ -72,7 +71,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Wire hit neighborhood relation filter
+      /// Track relation filter
       TrackRelationFilter m_trackRelationFilter;
 
       /// Instance of the cellular automaton path finder

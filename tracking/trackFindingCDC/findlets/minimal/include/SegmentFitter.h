@@ -40,7 +40,7 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() override;
 
-      /// Add the parameters of the fitter to the module
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
       /// Signals the beginning of the event processing

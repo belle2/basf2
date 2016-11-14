@@ -34,15 +34,14 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() final;
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Initialize the findlet before event processing
       void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      void
-      apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
       void terminate() final;

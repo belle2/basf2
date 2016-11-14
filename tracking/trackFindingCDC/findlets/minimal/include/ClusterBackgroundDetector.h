@@ -42,7 +42,7 @@ namespace Belle2 {
         return "Marks clusters as background if the used filter detectes them as such";
       }
 
-      /// Expose the parameters of the cluster filter to a module
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_clusterFilter.exposeParameters(moduleParamList, prefix);
       }

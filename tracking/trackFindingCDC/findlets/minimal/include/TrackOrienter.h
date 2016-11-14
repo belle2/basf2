@@ -40,8 +40,7 @@ namespace Belle2 {
       void initialize() final;
 
       /// Main algorithm applying the adjustment of the orientation.
-      void
-      apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;
+      void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final;
 
     private:
       /**

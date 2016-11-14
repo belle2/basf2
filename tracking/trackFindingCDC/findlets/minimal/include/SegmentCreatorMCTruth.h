@@ -29,7 +29,7 @@ namespace Belle2 {
       using Super = Findlet<const CDCWireHit, CDCRecoSegment2D>;
 
     public:
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Short description of the findlet

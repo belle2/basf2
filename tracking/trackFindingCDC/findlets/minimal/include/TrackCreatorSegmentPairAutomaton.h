@@ -49,7 +49,7 @@ namespace Belle2 {
       MultipassCellularPathFinder<const CDCSegmentPair> m_cellularPathFinder;
 
     private: // object pools
-      /// Memory for the segmentPair paths generated from the graph.
+      /// Memory for the segment pair paths generated from the graph.
       std::vector< Path<const CDCSegmentPair> > m_segmentPairPaths;
     };
   }

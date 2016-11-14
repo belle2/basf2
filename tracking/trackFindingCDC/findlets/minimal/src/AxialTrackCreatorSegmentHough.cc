@@ -197,4 +197,5 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
 void AxialTrackCreatorSegmentHough::terminate()
 {
   m_houghTree.raze();
+  Super::terminate();
 }

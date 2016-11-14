@@ -47,7 +47,7 @@ namespace Belle2 {
         return "Merges segments by extraction of segment paths in a cellular automaton.";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_segmentRelationFilter.exposeParameters(moduleParamList, prefix);
       }

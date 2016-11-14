@@ -39,17 +39,16 @@ namespace Belle2 {
       std::string getDescription() final;
 
       /// Main function of the segment finding by the cellular automaton.
-      void
-      apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
-            const std::vector<WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
-            std::vector<CDCTrack>& outputTracks) final;
+      void apply(const std::vector<CDCSegmentTriple>& inputSegmentTriples,
+                 const std::vector<WeightedRelation<const CDCSegmentTriple>>& inputSegmentTripleRelations,
+                 std::vector<CDCTrack>& outputTracks) final;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCSegmentTriple> m_cellularPathFinder;
 
     private: // object pools
-      /// Memory for the segmentTriple paths generated from the graph.
+      /// Memory for the segment triple paths generated from the graph.
       std::vector< Path<const CDCSegmentTriple> > m_segmentTriplePaths;
     };
   }

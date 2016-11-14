@@ -48,7 +48,7 @@ namespace Belle2 {
         return "Creates axial stereo segment pairs from a set of segments filtered by some acceptance criterion";
       }
 
-      /** Add the parameters of the filter to the module */
+      /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_segmentPairFilter.exposeParameters(moduleParamList, prefix);
       }
@@ -74,37 +74,37 @@ namespace Belle2 {
         // Make pairs of closeby superlayers
         for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer)
         {
-          const std::vector<const CDCRecoSegment2D*>& startSegments = m_segmentsBySuperLayer[iSuperLayer];
+          const std::vector<const CDCRecoSegment2D*>& fromSegments = m_segmentsBySuperLayer[iSuperLayer];
 
           // Make pairs of this superlayer and the superlayer more to the inside
           ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
           if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
-            const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerIn];
-            create(startSegments, endSegments, segmentPairs);
+            const std::vector<const CDCRecoSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerIn];
+            create(fromSegments, toSegments, segmentPairs);
           }
 
           // Make pairs of this superlayer and the superlayer more to the outside
           ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
           if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
-            const std::vector<const CDCRecoSegment2D*>& endSegments = m_segmentsBySuperLayer[iSuperLayerOut];
-            create(startSegments, endSegments, segmentPairs);
+            const std::vector<const CDCRecoSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerOut];
+            create(fromSegments, toSegments, segmentPairs);
           }
         }
         std::sort(segmentPairs.begin(), segmentPairs.end());
       }
 
     private:
-      /// Creates segment pairs from a combination of start segments and end segments.
-      void create(const std::vector<const CDCRecoSegment2D*>& startSegments,
-                  const std::vector<const CDCRecoSegment2D*>& endSegments,
+      /// Creates segment pairs from a combination of from segments and to segments.
+      void create(const std::vector<const CDCRecoSegment2D*>& fromSegments,
+                  const std::vector<const CDCRecoSegment2D*>& toSegments,
                   std::vector<CDCSegmentPair>& segmentPairs)
       {
         CDCSegmentPair segmentPair;
-        for (const CDCRecoSegment2D* ptrStartSegment : startSegments) {
-          for (const CDCRecoSegment2D* ptrEndSegment : endSegments) {
+        for (const CDCRecoSegment2D* ptrFromSegment : fromSegments) {
+          for (const CDCRecoSegment2D* ptrToSegment : toSegments) {
 
-            if (ptrStartSegment == ptrEndSegment) continue; // Just for safety
-            segmentPair.setSegments(ptrStartSegment, ptrEndSegment);
+            if (ptrFromSegment == ptrToSegment) continue; // Just for safety
+            segmentPair.setSegments(ptrFromSegment, ptrToSegment);
             segmentPair.clearTrajectory3D();
 
             if (segmentPair.getTrajectory3D().isFitted()) {

@@ -147,7 +147,7 @@ namespace Belle2 {
     /** Parameter to set Map Region  */
     static void setBeamAngle(double beamAngle)
     {
-      sincos(beamAngle, &s_sba, &s_cba);
+      sincos(beamAngle, &s_sinBeamCrossAngle, &s_cosBeamCrossAngle);
     }
     /** Parameter to set Angle of the beam */
 

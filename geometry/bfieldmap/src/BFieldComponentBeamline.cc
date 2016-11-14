@@ -174,19 +174,19 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   //from GEANT4 coordinate to ANSYS coordinate
   //fabs(y) is used because field data exist only in y>0
   const double
-  tx = -point0.x() * s_cosBeamCrossAngle,
+  tx = -point0.x(),
   ty = std::abs(point0.y()),
-  tz = -point0.z() * s_sinBeamCrossAngle;
+  tz = -point0.z();
 
   TVector3 point;
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
     interBuffer = m_interBuffer_her;
-    point.SetXYZ(tx - tz, ty, tz + tx);
+    point.SetXYZ(tx * s_cosBeamCrossAngle - tz * s_sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle + tx * s_sinBeamCrossAngle);
   } else {
     mapBuffer = m_mapBuffer_ler;
     interBuffer = m_interBuffer_ler;
-    point.SetXYZ(tx + tz, ty, -tz + tx);
+    point.SetXYZ(tx * s_cosBeamCrossAngle + tz * s_sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle - tx * s_sinBeamCrossAngle);
   }
   offsetRPhi = m_offsetGridRPhi[isher];
 

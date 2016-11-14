@@ -19,8 +19,6 @@ class CDCDebugDisplayRun(CDCDisplayRun):
     #     "WriteClusters": True,
     #     "FacetFilter": "none",
     #     "FacetRelationFilter": "none",
-    #     "exportSegment" : True,
-    #     "exportSegmentInto": "none",
     # })
 
     finder_module = ["WireHitPreparer", finder_module, "PrintCollections"]

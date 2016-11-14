@@ -20,7 +20,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentExporter.h>
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
@@ -59,7 +58,6 @@ namespace Belle2 {
         this->addProcessingSignalListener(&m_segmentFitter);
         this->addProcessingSignalListener(&m_segmentAliasResolver);
         this->addProcessingSignalListener(&m_segmentOrienter);
-        this->addProcessingSignalListener(&m_segmentExporter);
 
         this->addProcessingSignalListener(&m_superClusterSwapper);
         this->addProcessingSignalListener(&m_clusterSwapper);
@@ -91,7 +89,6 @@ namespace Belle2 {
         m_segmentFitter.exposeParameters(moduleParamList, prefix);
         m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
         m_segmentOrienter.exposeParameters(moduleParamList, prefix);
-        m_segmentExporter.exposeParameters(moduleParamList, prefix);
 
         m_superClusterSwapper.exposeParameters(moduleParamList, prefix);
         m_clusterSwapper.exposeParameters(moduleParamList, prefix);
@@ -129,8 +126,6 @@ namespace Belle2 {
 
         m_segmentMerger.apply(m_intermediateSegments, outputSegments);
         m_segmentFitter.apply(outputSegments);
-
-        m_segmentExporter.apply(outputSegments);
 
         // Move superclusters to the DataStore
         m_superClusterSwapper.apply(m_superClusters);
@@ -173,9 +168,6 @@ namespace Belle2 {
 
       /// Merges segments with closeby segments of the same super cluster
       SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
-
-      /// Writes out copies of the segments as track candidates.
-      SegmentExporter m_segmentExporter;
 
       /// Puts the internal super clusters on the DataStore
       StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{

@@ -25,7 +25,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentExporter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
@@ -169,21 +168,6 @@ namespace Belle2 {
    */
   class SegmentFitterModule :
     public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentFitter> {
-  };
-
-  /**
-   * Module implementation using the SegmentExporter
-   */
-  class SegmentExporterModule :
-    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentExporter> {
-
-  private:
-    /// Type of the base class
-    using Super = TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentExporter>;
-
-  public:
-    /// Constructor setting the default store vector names
-    SegmentExporterModule() : Super{{{"CDCRecoSegment2DVector"}}} {}
   };
 
   /**

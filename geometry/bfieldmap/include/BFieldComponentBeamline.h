@@ -210,8 +210,8 @@ namespace Belle2 {
 
     /** The min and max boundaries of the map region in r. */
     static double s_mapRegionR[2];
-    /** The angle of beam   */
-    static double s_sba, s_cba;
+    /** The sin and cos of the crossing angle of the beams   */
+    static double s_sinBeamCrossAngle, s_cosBeamCrossAngle;
   };
 
 } //end of namespace Belle2

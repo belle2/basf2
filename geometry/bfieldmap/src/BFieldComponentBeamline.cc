@@ -25,16 +25,15 @@ using namespace Belle2;
 namespace io = boost::iostreams;
 
 double BFieldComponentBeamline::s_mapRegionR[2] = {0., 0.};
-//double BFieldComponentBeamline::s_beamAngle = 0.;
-double BFieldComponentBeamline::s_sba = 0.;
-double BFieldComponentBeamline::s_cba = 1.;
+double BFieldComponentBeamline::s_sinBeamCrossAngle = 0.;
+double BFieldComponentBeamline::s_cosBeamCrossAngle = 1.;
 
 bool BFieldComponentBeamline::isInRange(const TVector3& point)
 {
   if (s_mapRegionR[1] <= 0.) return false;
 
   double y2 = point.y() * point.y();
-  double c = s_cba * point.x(), s = s_sba * point.z();
+  double c = s_cosBeamCrossAngle * point.x(), s = s_sinBeamCrossAngle * point.z();
 
   double rp = pow(c - s, 2) + y2;
   double rn = pow(c + s, 2) + y2;
@@ -167,33 +166,29 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
 {
   BFieldPoint** mapBuffer;
   InterpolationPoint** interBuffer;
-  //  double rotate_angle;
   int offsetRPhi;
-  //double mapSizeRPhi;  ---> Temporarily masked because this variable is not used
 
   //added by nakayama to avoid segV
   if (TMath::Abs(point0.z()) > 399.) return TVector3(0., 0., 0.);
 
   //from GEANT4 coordinate to ANSYS coordinate
   //fabs(y) is used because field data exist only in y>0
-  const double tx = -point0.x() * s_cba, ty = fabs(point0.y()), tz = -point0.z() * s_sba;
+  const double
+  tx = -point0.x() * s_cosBeamCrossAngle,
+  ty = std::abs(point0.y()),
+  tz = -point0.z() * s_sinBeamCrossAngle;
 
   TVector3 point;
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
     interBuffer = m_interBuffer_her;
-    //    rotate_angle = s_beamAngle;
     point.SetXYZ(tx - tz, ty, tz + tx);
   } else {
     mapBuffer = m_mapBuffer_ler;
     interBuffer = m_interBuffer_ler;
-    //    rotate_angle = -s_beamAngle;
     point.SetXYZ(tx + tz, ty, -tz + tx);
   }
   offsetRPhi = m_offsetGridRPhi[isher];
-  //mapSizeRPhi = m_mapSizeRPhi[isher]; ---> Temporarily masked because this variable is not used
-
-
 
   //Get the r and z component
   double r = point.Perp();
@@ -346,8 +341,8 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   //from ANSYS Coordinate to GEANT4 Coordinate
   Bx = -Bx;
   Bz = -Bz;
-  double s = (isher == 1) ? s_sba : -s_sba;
-  return TVector3(Bx * s_cba + Bz * s, By,  Bz * s_cba - Bx * s);
+  double s = (isher == 1) ? s_sinBeamCrossAngle : -s_sinBeamCrossAngle;
+  return TVector3(Bx * s_cosBeamCrossAngle + Bz * s, By,  Bz * s_cosBeamCrossAngle - Bx * s);
 }
 
 

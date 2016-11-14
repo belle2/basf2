@@ -178,15 +178,14 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   ty = std::abs(point0.y()),
   tz = -point0.z();
 
-  TVector3 point;
+  double sinBeamCrossAngle = (isher == 1) ? s_sinBeamCrossAngle : -s_sinBeamCrossAngle;
+  TVector3 point(tx * s_cosBeamCrossAngle - tz * sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle + tx * sinBeamCrossAngle);
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
     interBuffer = m_interBuffer_her;
-    point.SetXYZ(tx * s_cosBeamCrossAngle - tz * s_sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle + tx * s_sinBeamCrossAngle);
   } else {
     mapBuffer = m_mapBuffer_ler;
     interBuffer = m_interBuffer_ler;
-    point.SetXYZ(tx * s_cosBeamCrossAngle + tz * s_sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle - tx * s_sinBeamCrossAngle);
   }
   offsetRPhi = m_offsetGridRPhi[isher];
 
@@ -341,8 +340,7 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   //from ANSYS Coordinate to GEANT4 Coordinate
   Bx = -Bx;
   Bz = -Bz;
-  double s = (isher == 1) ? s_sinBeamCrossAngle : -s_sinBeamCrossAngle;
-  return TVector3(Bx * s_cosBeamCrossAngle + Bz * s, By,  Bz * s_cosBeamCrossAngle - Bx * s);
+  return TVector3(Bx * s_cosBeamCrossAngle + Bz * sinBeamCrossAngle, By,  Bz * s_cosBeamCrossAngle - Bx * sinBeamCrossAngle);
 }
 
 

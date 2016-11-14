@@ -9,22 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Factory that can create appropriate segment filters for new tracks from associated names.
-    class NewSegmentsFilterFactory : public FilterFactory<BaseNewSegmentsFilter> {
+    class NewSegmentFilterFactory : public FilterFactory<BaseNewSegmentFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseNewSegmentsFilter>;
+      using Super = FilterFactory<BaseNewSegmentFilter>;
 
     public:
       /// Constructor forwarding the default filter name
-      NewSegmentsFilterFactory(const std::string& defaultFilterName = "none");
+      NewSegmentFilterFactory(const std::string& defaultFilterName = "none");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;
@@ -36,7 +36,7 @@ namespace Belle2 {
       std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
       /// Create a filter with the given name.
-      std::unique_ptr<BaseNewSegmentsFilter> create(const std::string& filterName) const override;
+      std::unique_ptr<BaseNewSegmentFilter> create(const std::string& filterName) const override;
     };
   }
 }

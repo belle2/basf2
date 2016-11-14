@@ -124,14 +124,14 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
   }
 }
 
-void SegmentTrackCombiner::filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter)
+void SegmentTrackCombiner::filterSegments(BaseBackgroundSegmentFilter& backgroundSegmentFilter)
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
       if (segment->isAlreadyTaken()) {
         continue;
       }
-      Weight filterResult = backgroundSegmentsFilter(segment->getSegment());
+      Weight filterResult = backgroundSegmentFilter(segment->getSegment());
       if (not isNotACell(filterResult)) {
         segment->getSegment()->getAutomatonCell().setTakenFlag();
         segment->getSegment()->getAutomatonCell().setBackgroundFlag();
@@ -140,14 +140,14 @@ void SegmentTrackCombiner::filterSegments(BaseBackgroundSegmentsFilter& backgrou
   }
 }
 
-void SegmentTrackCombiner::filterOutNewSegments(BaseNewSegmentsFilter& newSegmentsFilter)
+void SegmentTrackCombiner::filterOutNewSegment(BaseNewSegmentFilter& newSegmentFilter)
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segment : segments) {
       if (segment->isAlreadyTaken()) {
         continue;
       }
-      Weight filterResult = newSegmentsFilter(segment->getSegment());
+      Weight filterResult = newSegmentFilter(segment->getSegment());
       if (not isNotACell(filterResult)) {
         segment->getSegment()->getAutomatonCell().setTakenFlag();
         segment->getSegment()->getAutomatonCell().setMaskedFlag();

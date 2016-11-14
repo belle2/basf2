@@ -22,20 +22,20 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Base Filter for filtering out Background Segments, but rejects all segments.
-    using BaseBackgroundSegmentsFilter = Filter<CDCRecoSegment2D>;
+    using BaseBackgroundSegmentFilter = Filter<CDCRecoSegment2D>;
 
     /// MC Filter for filtering out Background Segments.
-    using MCBackgroundSegmentsFilter = MCFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet,
+    using MCBackgroundSegmentFilter = MCFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet,
           AdvancedSegmentVarSet>>;
 
     /// Recording Filter for filtering out Background Segments.
-    using RecordingBackgroundSegmentsFilter =
+    using RecordingBackgroundSegmentFilter =
       RecordingFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedSegmentVarSet>>;
 
     /// Filter for filtering out Background Segments, but accepts all segments.
-    using AllBackgroundSegmentsFilter = AllFilter<BaseBackgroundSegmentsFilter>;
+    using AllBackgroundSegmentFilter = AllFilter<BaseBackgroundSegmentFilter>;
 
     /// TMVA Filter for filtering out Background Segments.
-    using TMVABackgroundSegmentsFilter = TMVAFilter<AdvancedSegmentVarSet>;
+    using TMVABackgroundSegmentFilter = TMVAFilter<AdvancedSegmentVarSet>;
   }
 }

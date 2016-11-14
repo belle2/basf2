@@ -7,51 +7,47 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilterFactory.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BackgroundSegmentsFilterFactory::BackgroundSegmentsFilterFactory(const std::string& defaultFilterName)
+NewSegmentFilterFactory::NewSegmentFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)
 {
 }
-
-std::string BackgroundSegmentsFilterFactory::getIdentifier() const
+std::string NewSegmentFilterFactory::getIdentifier() const
 {
-  return "BackgroundSegments";
+  return "NewSegment";
 }
 
-std::string BackgroundSegmentsFilterFactory::getFilterPurpose() const
+std::string NewSegmentFilterFactory::getFilterPurpose() const
 {
-  return "Segment filter to reject background";
+  return "Segment background finder.";
 }
 
 std::map<std::string, std::string>
-BackgroundSegmentsFilterFactory::getValidFilterNamesAndDescriptions() const
+NewSegmentFilterFactory::getValidFilterNamesAndDescriptions() const
 {
   return {
     {"none", "no segment track combination is valid"},
-    {"all", "set all segments as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
     {"tmva", "test with a tmva method"}
   };
 }
 
-std::unique_ptr<BaseBackgroundSegmentsFilter>
-BackgroundSegmentsFilterFactory::create(const std::string& filterName) const
+std::unique_ptr<BaseNewSegmentFilter>
+NewSegmentFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return makeUnique<BaseBackgroundSegmentsFilter>();
-  } else if (filterName == "all") {
-    return makeUnique<AllBackgroundSegmentsFilter>();
+    return makeUnique<BaseNewSegmentFilter>();
   } else if (filterName == "truth") {
-    return makeUnique<MCBackgroundSegmentsFilter>();
+    return makeUnique<MCNewSegmentFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingBackgroundSegmentsFilter>("BackgroundSegmentsFilter.root");
+    return makeUnique<RecordingNewSegmentFilter>("NewSegmentFilter.root");
   } else if (filterName == "tmva") {
-    return makeUnique<TMVABackgroundSegmentsFilter>("BackgroundSegmentsFilter");
+    return makeUnique<TMVANewSegmentFilter>("NewSegmentFilter");
   } else {
     return Super::create(filterName);
   }

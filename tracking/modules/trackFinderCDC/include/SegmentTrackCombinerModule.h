@@ -81,10 +81,10 @@ namespace Belle2 {
       Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterFirstStep;
 
       /// Reference to the background segment filter.
-      Chooseable<BaseBackgroundSegmentsFilter> m_chooseableBackgroundSegmentFilter;
+      Chooseable<BaseBackgroundSegmentFilter> m_chooseableBackgroundSegmentFilter;
 
       /// Reference to the new segment filter.
-      Chooseable<BaseNewSegmentsFilter> m_chooseableNewSegmentFilter;
+      Chooseable<BaseNewSegmentFilter> m_chooseableNewSegmentFilter;
 
       /// Reference to the chooser to be used for matching segments and tracks in the second step.
       Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterSecondStep;

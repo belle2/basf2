@@ -14,8 +14,8 @@
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentFilterFactory.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
@@ -31,8 +31,8 @@ REG_MODULE(SegmentTrackCombiner)
 
 SegmentTrackCombinerModule::SegmentTrackCombinerModule()
   : m_chooseableSegmentTrackFilterFirstStep(makeUnique<SegmentTrackFilterFirstStepFactory>("none"))
-  , m_chooseableBackgroundSegmentFilter(makeUnique<BackgroundSegmentsFilterFactory>("none"))
-  , m_chooseableNewSegmentFilter(makeUnique<NewSegmentsFilterFactory>("none"))
+  , m_chooseableBackgroundSegmentFilter(makeUnique<BackgroundSegmentFilterFactory>("none"))
+  , m_chooseableNewSegmentFilter(makeUnique<NewSegmentFilterFactory>("none"))
   , m_chooseableSegmentTrackFilterSecondStep(makeUnique<SegmentTrackFilterSecondStepFactory>("none"))
   , m_chooseableSegmentTrainFilter(makeUnique<SegmentTrainFilterFactory>("none"))
   , m_chooseableSegmentInformationListTrackFilter(makeUnique<SegmentInformationListTrackFilterFactory>("none"))
@@ -42,8 +42,8 @@ SegmentTrackCombinerModule::SegmentTrackCombinerModule()
 
   ModuleParamList mpl = this->getParamList();
   m_chooseableSegmentTrackFilterFirstStep.exposeParameters(&mpl, "SegmentTrackFilterFirstStep");
-  m_chooseableBackgroundSegmentFilter.exposeParameters(&mpl, "BackgroundSegments");
-  m_chooseableNewSegmentFilter.exposeParameters(&mpl, "NewSegments");
+  m_chooseableBackgroundSegmentFilter.exposeParameters(&mpl, "BackgroundSegment");
+  m_chooseableNewSegmentFilter.exposeParameters(&mpl, "NewSegment");
   m_chooseableSegmentTrackFilterSecondStep.exposeParameters(&mpl, "SegmentTrackFilterSecondStep");
   m_chooseableSegmentTrainFilter.exposeParameters(&mpl, "SegmentTrain");
   m_chooseableSegmentInformationListTrackFilter.exposeParameters(&mpl, "SegmentInformationListTrack");
@@ -152,7 +152,7 @@ void SegmentTrackCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSe
   m_combiner.fillWith(tracks, segments);
   m_combiner.match(m_chooseableSegmentTrackFilterFirstStep);
   m_combiner.filterSegments(m_chooseableBackgroundSegmentFilter);
-  m_combiner.filterOutNewSegments(m_chooseableNewSegmentFilter);
+  m_combiner.filterOutNewSegment(m_chooseableNewSegmentFilter);
   m_combiner.combine(m_chooseableSegmentTrackFilterSecondStep,
                      m_chooseableSegmentTrainFilter,
                      m_chooseableSegmentInformationListTrackFilter);

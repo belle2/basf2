@@ -13,8 +13,8 @@
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
@@ -57,13 +57,13 @@ namespace Belle2 {
        * Filter out the segments that are fake or background. Mark them as taken.
        * For deciding which is background or not we use the given filter.
        */
-      void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentsFilter);
+      void filterSegments(BaseBackgroundSegmentFilter& backgroundSegmentFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
        * For deciding which is new or not we use the given filter.
        */
-      void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentsFilter);
+      void filterOutNewSegment(BaseNewSegmentFilter& newSegmentFilter);
 
       /**
        * Do the heavy combining works:

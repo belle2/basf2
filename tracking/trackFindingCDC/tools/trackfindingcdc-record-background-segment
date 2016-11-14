@@ -10,28 +10,29 @@ import logging
 import sys
 
 
-class NewSegmentsRecordingRun(StandardEventGenerationRun):
+class BackgroundSegmentRecordingRun(StandardEventGenerationRun):
     """
-    Record the variables for the BackgroundSegmentsFilter in the SegmentsTrackCombinerModule
+    Record the variables for the BackgroundSegmentFilter in the SegmentsTrackCombinerModule
     """
     
     n_events = 3000
     bkg_files = os.path.join(os.environ["VO_BELLE2_SW_DIR"], "bkg")
 
     def create_path(self):
-# Sets up a path that plays back pregenerated events or generates events
+        # Sets up a path that plays back pregenerated events or generates events
         # based on the properties in the base class.
         main_path = StandardEventGenerationRun.create_path(self)
         add_cdc_track_finding(main_path)
 
         for m in main_path.modules():
             if m.name().startswith("SegmentTrackCombiner"):
-                m.param("NewSegmentsFilter", "recording")
+                m.param("BackgroundSegmentFilter", "recording")
                 
         return main_path
 
+
 def main():
-    run = NewSegmentsRecordingRun()
+    run = BackgroundSegmentRecordingRun()
     run.configure_and_execute_from_commandline()
 
 

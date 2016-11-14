@@ -9,22 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilter.h>
+#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Factory that can create appropriate segment filters for new tracks from associated names.
-    class BackgroundSegmentsFilterFactory : public FilterFactory<BaseBackgroundSegmentsFilter> {
+    class BackgroundSegmentFilterFactory : public FilterFactory<BaseBackgroundSegmentFilter> {
 
     private:
       /// Type of the base class
-      using Super = FilterFactory<BaseBackgroundSegmentsFilter>;
+      using Super = FilterFactory<BaseBackgroundSegmentFilter>;
 
     public:
       /// Constructor forwarding the default filter name
-      BackgroundSegmentsFilterFactory(const std::string& defaultFilterName = "none");
+      BackgroundSegmentFilterFactory(const std::string& defaultFilterName = "none");
 
       /// Getter for a short identifier for the factory
       std::string getIdentifier() const override;
@@ -36,7 +36,7 @@ namespace Belle2 {
       std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
       /// Create a filter with the given name.
-      std::unique_ptr<BaseBackgroundSegmentsFilter> create(const std::string& filterName) const override;
+      std::unique_ptr<BaseBackgroundSegmentFilter> create(const std::string& filterName) const override;
     };
   }
 }

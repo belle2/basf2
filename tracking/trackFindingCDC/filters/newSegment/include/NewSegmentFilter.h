@@ -41,16 +41,16 @@ namespace Belle2 {
       }
     };
 
-    using BaseNewSegmentsFilter = Filter<CDCRecoSegment2D>;
+    using BaseNewSegmentFilter = Filter<CDCRecoSegment2D>;
 
-    using MCNewSegmentsFilter =
+    using MCNewSegmentFilter =
       MCFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
 
-    using RecordingNewSegmentsFilter =
+    using RecordingNewSegmentFilter =
       RecordingFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet> >;
 
-    using AllNewSegmentsFilter = AllFilter<BaseNewSegmentsFilter>;
+    using AllNewSegmentFilter = AllFilter<BaseNewSegmentFilter>;
 
-    using TMVANewSegmentsFilter = TMVAFilter<AdvancedSegmentVarSet>;
+    using TMVANewSegmentFilter = TMVAFilter<AdvancedSegmentVarSet>;
   }
 }

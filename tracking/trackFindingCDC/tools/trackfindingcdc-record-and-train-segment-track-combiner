@@ -15,19 +15,19 @@ mv weights/SegmentTrackFilterFirstStep_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tra
 rm -rf weights
 
 # BackgroundSegmentFilter
-if [ ! -e "BackgroundSegmentsFilter.root" ]; then
-	trackfindingcdc-record-background-segments -i "$1"
+if [ ! -e "BackgroundSegmentFilter.root" ]; then
+	trackfindingcdc-record-background-segment -i "$1"
 fi
-trackfindingcdc-train BackgroundSegmentsFilter.root
-mv weights/BackgroundSegmentsFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
+trackfindingcdc-train BackgroundSegmentFilter.root
+mv weights/BackgroundSegmentFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
 rm -rf weights
 
 # NewSegmentFilter
-if [ ! -e "NewSegmentsFilter.root" ]; then
-	trackfindingcdc-record-new-segments -i "$1"
+if [ ! -e "NewSegmentFilter.root" ]; then
+	trackfindingcdc-record-new-segment -i "$1"
 fi
-trackfindingcdc-train NewSegmentsFilter.root
-mv weights/NewSegmentsFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
+trackfindingcdc-train NewSegmentFilter.root
+mv weights/NewSegmentFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
 rm -rf weights
 
 # SegmentTrackFilterSecondStep

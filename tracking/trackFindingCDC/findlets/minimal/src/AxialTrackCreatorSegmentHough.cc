@@ -11,8 +11,8 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>

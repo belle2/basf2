@@ -9,18 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/utilities/VectorRange.h>
-#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+#include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
 
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;

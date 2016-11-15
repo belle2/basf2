@@ -16,12 +16,10 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
 #include <array>
-#include <algorithm>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -103,19 +101,9 @@ namespace Belle2 {
         for (const CDCSegment2D* ptrFromSegment : fromSegments) {
           for (const CDCSegment2D* ptrToSegment : toSegments) {
 
-            if (ptrFromSegment == ptrToSegment) continue; // Just for safety
+            if (ptrFromSegment == ptrToSegment) continue;
             segmentPair.setSegments(ptrFromSegment, ptrToSegment);
             segmentPair.clearTrajectory3D();
-
-            if (segmentPair.getTrajectory3D().isFitted()) {
-              B2ERROR("CDCSegmentPair still fitted after clearing.");
-              continue;
-            }
-
-            if (not segmentPair.checkSegments()) {
-              B2ERROR("CDCAxialSegmentPair containing nullptr encountered in SegmentPairCreator");
-              continue;
-            }
 
             Weight pairWeight = m_segmentPairFilter(segmentPair);
             if (not isNotACell(pairWeight)) {

@@ -50,17 +50,6 @@ void SegmentOrienter::initialize()
   }
 }
 
-void SegmentOrienter::setSegmentOrientation(const EPreferredDirection& segmentOrientation)
-{
-  m_segmentOrientation = segmentOrientation;
-}
-
-/// Get the currentl default output orientation of the segments.
-EPreferredDirection SegmentOrienter::getSegmentOrientation() const
-{
-  return m_segmentOrientation;
-}
-
 void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
                             std::vector<CDCSegment2D>& outputSegments)
 {

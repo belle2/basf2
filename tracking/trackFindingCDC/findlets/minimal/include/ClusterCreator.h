@@ -21,6 +21,7 @@
 
 #include <boost/range/adaptor/transformed.hpp>
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

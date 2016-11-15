@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
-#include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/ca/Path.h>
 
 #include <vector>
 

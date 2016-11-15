@@ -17,12 +17,10 @@
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
 #include <array>
-#include <algorithm>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -47,7 +45,8 @@ namespace Belle2 {
       /// Short description of the findlet
       std::string getDescription() override final
       {
-        return "Creates segment triple from a set of segments  and already combined segment pairs filtered by some acceptance criterion";
+        return "Creates segment triples from a set of middle segments and already combined axial "
+               "segment pairs filtered by some acceptance criterion";
       }
 
       /// Expose the parameters to a module
@@ -109,7 +108,7 @@ namespace Belle2 {
       }
 
     private:
-      /// Creates segment pairs from a combination of start segments and end segments.
+      /// Creates segment triples by adding the middle segment to the axial segments and filter out the valuable combinations
       void create(const CDCAxialSegmentPair& axialSegmentPair,
                   const std::vector<const CDCSegment2D*>& middleSegments,
                   std::vector<CDCSegmentTriple>& segmentTriples)
@@ -133,7 +132,7 @@ namespace Belle2 {
       /// Structure for the segments grouped by super layer id.
       std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
-      /// The filter to be used for the segment pair generation.
+      /// The filter to be used for the segment triple generation.
       ASegmentTripleFilter m_segmentTripleFilter;
     };
   }

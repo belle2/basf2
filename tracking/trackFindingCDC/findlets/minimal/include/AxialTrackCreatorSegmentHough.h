@@ -15,6 +15,7 @@
 #include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
 
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;

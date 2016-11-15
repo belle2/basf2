@@ -12,9 +12,8 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/minimal/EPreferredDirection.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;

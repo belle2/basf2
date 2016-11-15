@@ -29,6 +29,7 @@
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
+#include <string>
 #include <algorithm>
 
 namespace Belle2 {

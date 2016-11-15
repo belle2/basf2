@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
 #include <string>
 

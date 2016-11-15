@@ -18,12 +18,12 @@
 
 #include <tracking/trackFindingCDC/ca/Clusterizer.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
-#include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
 
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
+#include <string>
 #include <algorithm>
 
 namespace Belle2 {

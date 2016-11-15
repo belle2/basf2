@@ -9,11 +9,11 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 #include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
+
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
 namespace Belle2 {
   class ModuleParamList;

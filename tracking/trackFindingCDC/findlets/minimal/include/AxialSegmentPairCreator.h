@@ -14,8 +14,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
 #include <algorithm>
 

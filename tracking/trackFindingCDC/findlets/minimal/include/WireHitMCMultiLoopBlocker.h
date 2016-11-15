@@ -12,6 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <vector>
+#include <string>
 #include <cmath>
 
 namespace Belle2 {

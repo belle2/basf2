@@ -18,9 +18,8 @@
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
-#include <framework/core/ModuleParamList.h>
-
 #include <vector>
+#include <string>
 
 namespace Belle2 {
   class ModuleParamList;
@@ -56,7 +55,7 @@ namespace Belle2 {
       /// Main algorithm
       void apply(const std::vector<CDCSegment2D>& inputSegments,
                  std::vector<CDCSegment2D>& outputSegments) final {
-        std::vector<ConstVectorRange<CDCSegment2D> > segmentsByISuperCluster =
+        std::vector<ConstVectorRange<CDCSegment2D>> segmentsByISuperCluster =
         adjacent_groupby(inputSegments.begin(),
         inputSegments.end(),
         mem_fn(&CDCSegment2D::getISuperCluster));

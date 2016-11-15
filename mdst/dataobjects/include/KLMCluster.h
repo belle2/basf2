@@ -63,14 +63,14 @@ namespace Belle2 {
      * @return Number of layers.
      */
     inline int getLayers() const
-    { return m_layers;}
+    {return m_layers;}
 
     /**
      * Get number of the innermost layer with hits.
      * @return Number of the innermost layer with hits.
      */
     inline int getInnermostLayer() const
-    { return m_innermostLayer;}
+    {return m_innermostLayer;}
 
     /**
      * Get global position (TVector3 version).
@@ -135,17 +135,20 @@ namespace Belle2 {
     /**
      * Set time.
      */
-    void setTime(float time) { m_time = time;}
+    void setTime(float time)
+    {m_time = time;}
 
     /**
      * Set number of layers with hits.
      */
-    void setLayers(int layers) { m_layers = layers;}
+    void setLayers(int layers)
+    {m_layers = layers;}
 
     /**
      * Set number of the innermost layer with hits.
      */
-    void setInnermostLayer(int innermostLayer) { m_innermostLayer = innermostLayer;}
+    void setInnermostLayer(int innermostLayer)
+    {m_innermostLayer = innermostLayer;}
 
     /**
      * Set global position (TVector3 version).
@@ -160,7 +163,8 @@ namespace Belle2 {
     /**
      * Set momentum magnitude.
      */
-    void setMomentumMag(float momentum_mag) {m_p = momentum_mag;}
+    void setMomentumMag(float momentumMag)
+    {m_p = momentumMag;}
 
     /**
      * Set error of vertex X coordinate.

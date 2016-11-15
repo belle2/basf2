@@ -130,6 +130,39 @@ namespace Belle2 {
      */
     bool getAssociatedTrackFlag() const;
 
+    // setters
+
+    /**
+     * Set time.
+     */
+    void setTime(float time) { m_time = time;}
+
+    /**
+     * Set number of layers with hits.
+     */
+    void setLayers(int layers) { m_layers = layers;}
+
+    /**
+     * Set number of the innermost layer with hits.
+     */
+    void setInnermostLayer(int innermostLayer) { m_innermostLayer = innermostLayer;}
+
+    /**
+     * Set global position (TVector3 version).
+     */
+    void setClusterPosition(float globalX, float globalY, float globalZ)
+    {
+      m_globalX = globalX;
+      m_globalY = globalY;
+      m_globalZ = globalZ;
+    }
+
+    /**
+     * Set momentum magnitude.
+     */
+    void setMomentumMag(float momentum_mag) {m_p = momentum_mag;}
+
+
   private:
 
     /** Decay time. */

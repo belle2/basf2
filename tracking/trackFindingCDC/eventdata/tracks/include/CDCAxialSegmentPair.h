@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 
@@ -26,12 +26,12 @@ namespace Belle2 {
       CDCAxialSegmentPair();
 
       /// Constructor from two segments
-      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                          const CDCAxialRecoSegment2D* endSegment);
+      CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
+                          const CDCAxialSegment2D* endSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCAxialSegmentPair(const CDCAxialRecoSegment2D* startSegment,
-                          const CDCAxialRecoSegment2D* endSegment,
+      CDCAxialSegmentPair(const CDCAxialSegment2D* startSegment,
+                          const CDCAxialSegment2D* endSegment,
                           const CDCTrajectory2D& trajectory2D);
 
       /// Equality comparision based on the pointers to the stored segments.
@@ -52,11 +52,11 @@ namespace Belle2 {
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
       friend bool operator<(CDCAxialSegmentPair const& segmentPair,
-                            const CDCAxialRecoSegment2D* axialSegment)
+                            const CDCAxialSegment2D* axialSegment)
       { return segmentPair.getStartSegment() < axialSegment; }
 
       /// Define reconstructed segments and segment pairs as coaligned on the start segment
-      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment,
+      friend bool operator<(const CDCAxialSegment2D* axialSegment,
                             CDCAxialSegmentPair const& segmentPair)
       { return axialSegment < segmentPair.getStartSegment(); }
 
@@ -74,23 +74,23 @@ namespace Belle2 {
       { return ISuperLayerUtil::getFrom(getEndSegment()); }
 
       /// Getter for the start segment.
-      const CDCAxialRecoSegment2D* getStartSegment() const
+      const CDCAxialSegment2D* getStartSegment() const
       { return m_startSegment; }
 
       /// Setter for the start segment.
-      void setStartSegment(const CDCAxialRecoSegment2D* startSegment)
+      void setStartSegment(const CDCAxialSegment2D* startSegment)
       { m_startSegment = startSegment; }
 
       /// Getter for the end segment.
-      const CDCAxialRecoSegment2D* getEndSegment() const
+      const CDCAxialSegment2D* getEndSegment() const
       { return m_endSegment; }
 
       /// Setter for the end segment.
-      void setEndSegment(const CDCAxialRecoSegment2D* endSegment)
+      void setEndSegment(const CDCAxialSegment2D* endSegment)
       { m_endSegment = endSegment; }
 
       /// Setter for both segments simultaniously
-      void setSegments(const CDCRecoSegment2D* startSegment, const CDCRecoSegment2D* endSegment)
+      void setSegments(const CDCSegment2D* startSegment, const CDCSegment2D* endSegment)
       {
         m_startSegment = startSegment;
         m_endSegment = endSegment;
@@ -170,10 +170,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the start segment
-      const CDCAxialRecoSegment2D* m_startSegment;
+      const CDCAxialSegment2D* m_startSegment;
 
       /// Reference to the end segment
-      const CDCAxialRecoSegment2D* m_endSegment;
+      const CDCAxialSegment2D* m_endSegment;
 
       /// Reference to the common trajectory
       mutable CDCTrajectory2D m_trajectory2D;

@@ -13,8 +13,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
@@ -199,15 +199,15 @@ namespace Belle2 {
       }
 
       /// Draws all CDCRecoHits2D of the segment
-      void draw(const CDCRecoSegment2D& recoSegment2D, const AttributeMap& attributeMap = AttributeMap())
+      void draw(const CDCSegment2D& segment2D, const AttributeMap& attributeMap = AttributeMap())
       {
-        drawRange(recoSegment2D, attributeMap);
+        drawRange(segment2D, attributeMap);
       }
 
       /// Draws all CDCRecoHits3D of the segment
-      void draw(const CDCRecoSegment3D& recoSegment3D, const AttributeMap& attributeMap = AttributeMap())
+      void draw(const CDCSegment3D& segment3D, const AttributeMap& attributeMap = AttributeMap())
       {
-        drawRange(recoSegment3D, attributeMap);
+        drawRange(segment3D, attributeMap);
       }
 
       /// Draws the pair of segments as an arrow connecting the centers of them.
@@ -228,8 +228,8 @@ namespace Belle2 {
       /// Draws the hit content of the RecoTrack.
       void draw(const RecoTrack& recoTrack, const AttributeMap& attributeMap = AttributeMap());
 
-      /// Draws trajectory of the CDCRecoSegment2D
-      void drawTrajectory(const CDCRecoSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
+      /// Draws trajectory of the CDCSegment2D
+      void drawTrajectory(const CDCSegment2D& segment, const AttributeMap& attributeMap = AttributeMap());
 
       /// Draws trajectory of the CDCSegmentTriple
       void drawTrajectory(const CDCSegmentTriple& segmentTriple, const AttributeMap& attributeMap = AttributeMap());

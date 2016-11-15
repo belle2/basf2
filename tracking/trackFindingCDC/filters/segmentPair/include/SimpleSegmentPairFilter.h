@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Filter for the constuction of axial to axial segment pairs based on simple criterions
     class SimpleSegmentPairFilter : public Filter<CDCSegmentPair> {
@@ -28,7 +28,7 @@ namespace Belle2 {
       Weight operator()(const CDCSegmentPair& segmentPair) final;
 
       /// Returns the trajectory of the segment. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCRecoSegment2D& segment) const;
+      const CDCTrajectory2D& getFittedTrajectory2D(const CDCSegment2D& segment) const;
 
       /**
        *  Returns the three dimensional trajectory of the axial stereo segment pair.

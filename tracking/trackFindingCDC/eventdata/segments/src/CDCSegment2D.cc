@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCFacetSegment.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCTangentSegment.h>
@@ -52,14 +52,14 @@ namespace {
   }
 
   template<class ATangentRange>
-  CDCRecoSegment2D condenseTangentSegment(const ATangentRange& tangentSegment)
+  CDCSegment2D condenseTangentSegment(const ATangentRange& tangentSegment)
   {
     using TangentIt = GetIterator<const ATangentRange&>;
     TangentIt tangentIt{tangentSegment.begin()};
     TangentIt endTangentIt{tangentSegment.end()};
     int nTangents = std::distance(tangentIt, endTangentIt);
 
-    CDCRecoSegment2D result;
+    CDCSegment2D result;
     result.reserve(nTangents + 1);
 
     if (nTangents == 0) {
@@ -93,14 +93,14 @@ namespace {
   }
 
   template<class AFacetRange>
-  CDCRecoSegment2D condenseFacetSegment(const AFacetRange& facetSegment)
+  CDCSegment2D condenseFacetSegment(const AFacetRange& facetSegment)
   {
     using FacetIt = GetIterator<const AFacetRange&>;
     FacetIt facetIt = facetSegment.begin();
     FacetIt endFacetIt = facetSegment.end();
     int nFacets = std::distance(facetIt, endFacetIt);
 
-    CDCRecoSegment2D result;
+    CDCSegment2D result;
     result.reserve(nFacets + 2);
 
     if (nFacets == 0) {
@@ -161,43 +161,43 @@ namespace {
 
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCTangentSegment& tangentSegment)
+CDCSegment2D CDCSegment2D::condense(const CDCTangentSegment& tangentSegment)
 {
   const std::vector<CDCTangent>& tangents = tangentSegment;
-  CDCRecoSegment2D segment2D = ::condenseTangentSegment(tangents);
+  CDCSegment2D segment2D = ::condenseTangentSegment(tangents);
   segment2D.setTrajectory2D(tangentSegment.getTrajectory2D());
   segment2D.receiveISuperCluster();
   segment2D.setAliasScore(tangentSegment.getAliasScore());
   return segment2D;
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCTangent* >& tangentPath)
+CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCTangent* >& tangentPath)
 {
   return ::condenseTangentSegment(tangentPath | boost::adaptors::indirected);
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::condense(const CDCFacetSegment& facetSegment)
+CDCSegment2D CDCSegment2D::condense(const CDCFacetSegment& facetSegment)
 {
   const std::vector<CDCFacet>& facets = facetSegment;
-  CDCRecoSegment2D segment2D = ::condenseFacetSegment(facets);
+  CDCSegment2D segment2D = ::condenseFacetSegment(facets);
   segment2D.setTrajectory2D(facetSegment.getTrajectory2D());
   segment2D.receiveISuperCluster();
   segment2D.setAliasScore(facetSegment.getAliasScore());
   return segment2D;
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
+CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCFacet* >& facetPath)
 {
   return ::condenseFacetSegment(facetPath | boost::adaptors::indirected);
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegment2D*>& segmentPath)
+CDCSegment2D CDCSegment2D::condense(const std::vector<const CDCSegment2D*>& segmentPath)
 {
-  CDCRecoSegment2D result;
+  CDCSegment2D result;
   double aliasScore = 0;
-  for (const CDCRecoSegment2D* ptrSegment2D : segmentPath) {
+  for (const CDCSegment2D* ptrSegment2D : segmentPath) {
     assert(ptrSegment2D);
-    const CDCRecoSegment2D& segment2D = *ptrSegment2D;
+    const CDCSegment2D& segment2D = *ptrSegment2D;
     for (const CDCRecoHit2D& recoHit2D : segment2D) {
       result.push_back(recoHit2D);
     }
@@ -208,10 +208,10 @@ CDCRecoSegment2D CDCRecoSegment2D::condense(const std::vector<const CDCRecoSegme
   return result;
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment)
+CDCSegment2D CDCSegment2D::reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment)
 {
   if (rlWireHitSegment.size() == 1) {
-    CDCRecoSegment2D segment2D;
+    CDCSegment2D segment2D;
     Vector2D zeroDisp2D(0.0, 0.0);
     segment2D.emplace_back(rlWireHitSegment.front(), zeroDisp2D);
     segment2D.setTrajectory2D(rlWireHitSegment.getTrajectory2D());
@@ -227,7 +227,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingTangents(const CDCRLWireHitSe
   }
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment)
+CDCSegment2D CDCSegment2D::reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment)
 {
   if (rlWireHitSegment.size() < 3) {
     return reconstructUsingTangents(rlWireHitSegment);
@@ -237,7 +237,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reconstructUsingFacets(const CDCRLWireHitSegm
   }
 }
 
-std::vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
+std::vector<const CDCWire*> CDCSegment2D::getWireSegment() const
 {
   std::vector<const CDCWire*> wireSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
@@ -246,7 +246,7 @@ std::vector<const CDCWire*> CDCRecoSegment2D::getWireSegment() const
   return wireSegment;
 }
 
-CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
+CDCWireHitSegment CDCSegment2D::getWireHitSegment() const
 {
   CDCWireHitSegment wireHitSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
@@ -257,9 +257,9 @@ CDCWireHitSegment CDCRecoSegment2D::getWireHitSegment() const
   return wireHitSegment;
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
+CDCSegment2D CDCSegment2D::getAlias() const
 {
-  CDCRecoSegment2D segment;
+  CDCSegment2D segment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
     segment.push_back(recoHit2D.getAlias());
   }
@@ -268,7 +268,7 @@ CDCRecoSegment2D CDCRecoSegment2D::getAlias() const
   return segment;
 }
 
-int CDCRecoSegment2D::getNRLSwitches() const
+int CDCSegment2D::getNRLSwitches() const
 {
   ERightLeft rlInfo = ERightLeft::c_Invalid;
   int nRLSwitches = -1;
@@ -281,7 +281,7 @@ int CDCRecoSegment2D::getNRLSwitches() const
   return nRLSwitches;
 }
 
-double CDCRecoSegment2D::getRLAsymmetry() const
+double CDCSegment2D::getRLAsymmetry() const
 {
   int rlSum = 0;
   for (const CDCRecoHit2D& recoHit2D : *this) {
@@ -292,7 +292,7 @@ double CDCRecoSegment2D::getRLAsymmetry() const
   return static_cast<double>(rlSum) / size();
 }
 
-CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
+CDCRLWireHitSegment CDCSegment2D::getRLWireHitSegment() const
 {
   CDCRLWireHitSegment rlWireHitSegment;
   for (const CDCRecoHit2D& recoHit2D : *this) {
@@ -303,9 +303,9 @@ CDCRLWireHitSegment CDCRecoSegment2D::getRLWireHitSegment() const
   return rlWireHitSegment;
 }
 
-CDCRecoSegment2D CDCRecoSegment2D::reversed() const
+CDCSegment2D CDCSegment2D::reversed() const
 {
-  CDCRecoSegment2D reverseSegment;
+  CDCSegment2D reverseSegment;
   reverseSegment.reserve(size());
   for (const CDCRecoHit2D& recohit : boost::adaptors::reverse(*this)) {
     reverseSegment.push_back(recohit.reversed());
@@ -318,7 +318,7 @@ CDCRecoSegment2D CDCRecoSegment2D::reversed() const
   return reverseSegment;
 }
 
-void CDCRecoSegment2D::reverse()
+void CDCSegment2D::reverse()
 {
   // Reverse the trajectory
   getTrajectory2D().reverse();
@@ -331,7 +331,7 @@ void CDCRecoSegment2D::reverse()
   std::reverse(begin(), end());
 }
 
-void CDCRecoSegment2D::unsetAndForwardMaskedFlag(bool toHits) const
+void CDCSegment2D::unsetAndForwardMaskedFlag(bool toHits) const
 {
   getAutomatonCell().unsetMaskedFlag();
   if (not toHits) return;
@@ -341,7 +341,7 @@ void CDCRecoSegment2D::unsetAndForwardMaskedFlag(bool toHits) const
   }
 }
 
-void CDCRecoSegment2D::setAndForwardMaskedFlag(bool toHits) const
+void CDCSegment2D::setAndForwardMaskedFlag(bool toHits) const
 {
   getAutomatonCell().setMaskedFlag();
   if (not toHits) return;
@@ -351,7 +351,7 @@ void CDCRecoSegment2D::setAndForwardMaskedFlag(bool toHits) const
   }
 }
 
-void CDCRecoSegment2D::receiveMaskedFlag(bool fromHits) const
+void CDCSegment2D::receiveMaskedFlag(bool fromHits) const
 {
   if (not fromHits) return;
   for (const CDCRecoHit2D& recoHit2D : *this) {
@@ -363,7 +363,7 @@ void CDCRecoSegment2D::receiveMaskedFlag(bool fromHits) const
   }
 }
 
-bool CDCRecoSegment2D::isFullyTaken(unsigned int maxNotTaken) const
+bool CDCSegment2D::isFullyTaken(unsigned int maxNotTaken) const
 {
   unsigned int notTakenCounter = 0;
   for (const CDCRecoHit2D& recoHit : *this) {

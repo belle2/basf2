@@ -21,7 +21,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Forward declaration of the CDCWireHitCluster.
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
 
@@ -57,7 +57,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a wire hits cluster.
      */
-    class SegmentTrackVarNames : public VarNames<std::pair<const CDCRecoSegment2D*, const CDCTrack*>> {
+    class SegmentTrackVarNames : public VarNames<std::pair<const CDCSegment2D*, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
@@ -78,7 +78,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the pair
-      bool extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair) final;
+      bool extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair) final;
     };
   }
 }

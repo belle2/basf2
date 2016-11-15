@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCBField.h>
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 
@@ -82,16 +82,16 @@ void SegmentFitter::initialize()
   }
 }
 
-void SegmentFitter::apply(std::vector<CDCRecoSegment2D>& outputSegments)
+void SegmentFitter::apply(std::vector<CDCSegment2D>& outputSegments)
 {
   // Update the drift length
   if (m_param_updateDriftLength) {
-    for (CDCRecoSegment2D& segment : outputSegments) {
+    for (CDCSegment2D& segment : outputSegments) {
       m_driftLengthEstimator.updateDriftLength(segment);
     }
   }
 
-  for (const CDCRecoSegment2D& segment : outputSegments) {
+  for (const CDCSegment2D& segment : outputSegments) {
     CDCObservations2D observations2D(m_fitPos, m_fitVariance);
     observations2D.appendRange(segment);
 

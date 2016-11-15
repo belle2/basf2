@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
@@ -31,7 +31,7 @@ namespace Belle2 {
      *  Class that specifies the names of the variables
      *  that should be generated from a segment pair
      */
-    class BasicSegmentRelationVarNames : public VarNames<Relation<const CDCRecoSegment2D> > {
+    class BasicSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D> > {
 
     public:
       /// Number of variables to be generated.
@@ -52,7 +52,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the segment relation
-      bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) override;
+      bool extract(const Relation<const CDCSegment2D>* ptrSegmentRelation) override;
     };
   }
 }

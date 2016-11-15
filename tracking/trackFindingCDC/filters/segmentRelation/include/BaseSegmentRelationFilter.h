@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 #include <tracking/trackFindingCDC/ca/Relation.h>
@@ -21,24 +21,24 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     /// Base class for filtering the neighborhood of segments
-    class BaseSegmentRelationFilter : public Filter<Relation<const CDCRecoSegment2D>> {
+    class BaseSegmentRelationFilter : public Filter<Relation<const CDCSegment2D>> {
 
     public:
       /// Returns the full range of segments.
-      template<class ACDCRecoSegment2DIterator>
-      boost::iterator_range<ACDCRecoSegment2DIterator>
-      getPossibleNeighbors(const CDCRecoSegment2D& segment  __attribute__((unused)),
-                           const ACDCRecoSegment2DIterator& itBegin,
-                           const ACDCRecoSegment2DIterator& itEnd) const
+      template<class ACDCSegment2DIterator>
+      boost::iterator_range<ACDCSegment2DIterator>
+      getPossibleNeighbors(const CDCSegment2D& segment  __attribute__((unused)),
+                           const ACDCSegment2DIterator& itBegin,
+                           const ACDCSegment2DIterator& itEnd) const
       {
-        return boost::iterator_range<ACDCRecoSegment2DIterator>(itBegin, itEnd);
+        return boost::iterator_range<ACDCSegment2DIterator>(itBegin, itEnd);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all segment neighbors.
        */
-      virtual Weight operator()(const CDCRecoSegment2D& from  __attribute__((unused)),
-                                const CDCRecoSegment2D& to  __attribute__((unused)))
+      virtual Weight operator()(const CDCSegment2D& from  __attribute__((unused)),
+                                const CDCSegment2D& to  __attribute__((unused)))
       {
         return NAN;
       }
@@ -46,10 +46,10 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      Weight operator()(const Relation<const CDCRecoSegment2D>& relation) override
+      Weight operator()(const Relation<const CDCSegment2D>& relation) override
       {
-        const CDCRecoSegment2D* ptrFrom(relation.first);
-        const CDCRecoSegment2D* ptrTo(relation.second);
+        const CDCSegment2D* ptrFrom(relation.first);
+        const CDCSegment2D* ptrTo(relation.second);
         if (ptrFrom == ptrTo) return NAN; // Prevent relation to same.
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);

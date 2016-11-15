@@ -23,7 +23,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -37,11 +37,11 @@ namespace Belle2 {
               class AFacetFilter,
               class AFacetRelationFilter,
               class ASegmentRelationFilter>
-    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHit&, CDCRecoSegment2D> {
+    class SegmentFinderFacetAutomaton : public Findlet<CDCWireHit&, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&, CDCRecoSegment2D>;
+      using Super = Findlet<CDCWireHit&, CDCSegment2D>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -108,7 +108,7 @@ namespace Belle2 {
 
       /// Generates the segment from wire hits
       void apply(std::vector<CDCWireHit>& inputWireHits,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final {
+                 std::vector<CDCSegment2D>& outputSegments) final {
         outputSegments.reserve(200);
 
         m_superClusterCreator.apply(inputWireHits, m_superClusters);
@@ -196,10 +196,10 @@ namespace Belle2 {
       std::vector<WeightedRelation<const CDCFacet> > m_facetRelations;
 
       /// Memory for the reconstructed segments
-      std::vector<CDCRecoSegment2D> m_segments;
+      std::vector<CDCSegment2D> m_segments;
 
       /// Memory for the reconstructed segments
-      std::vector<CDCRecoSegment2D> m_intermediateSegments;
+      std::vector<CDCSegment2D> m_intermediateSegments;
     };
   }
 }

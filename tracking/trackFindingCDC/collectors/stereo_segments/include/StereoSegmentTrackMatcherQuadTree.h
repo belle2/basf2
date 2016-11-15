@@ -18,7 +18,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /**
      * A matcher algorithm for using a stereo quad tree for matching stereo segments
@@ -31,7 +31,7 @@ namespace Belle2 {
       using CollectorItem = CDCTrack;
 
       /// Use (stereo) segments as collection items.
-      using CollectionItem = CDCRecoSegment2D;
+      using CollectionItem = CDCSegment2D;
 
       /// Expose the parameters to the module.
       void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix) override;
@@ -40,7 +40,7 @@ namespace Belle2 {
        * Use the given filter (via the module parameters) to find a matching.
        */
       std::vector<WithWeight<const CollectionItem*> >
-      match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
+      match(const CollectorItem& track, const std::vector<CollectionItem>& segments);
 
     private:
       /// Parameters
@@ -49,18 +49,18 @@ namespace Belle2 {
 
       /**
        * Before filling the quad tree, check each reconstructed segment to be applicable to this track.
-       * @param recoSegment3D the reconstructed segment that should be matched to the trac
+       * @param segment3D the reconstructed segment that should be matched to the trac
        * @param isCurler a flag if the track is a curler
        * @param shiftValue 2 * TMath::Pi() * radius of the track
        * @param lastSuperLayer the last superlayer of the track
        * @param lastArcLength2D the last arc length 2d of the track
        * @return True, if the match can be m ade (the quad tree has still to give his yes too).
        */
-      bool checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D,
-                              bool isCurler,
-                              double shiftValue,
-                              ISuperLayer lastSuperLayer,
-                              double lastArcLength2D) const;
+      bool checkSegment3D(CDCSegment3D& segment3D,
+                          bool isCurler,
+                          double shiftValue,
+                          ISuperLayer lastSuperLayer,
+                          double lastArcLength2D) const;
     };
   }
 }

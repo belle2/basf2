@@ -179,7 +179,7 @@ class SegmentFitValidationRun(HarvestingRun):
             raise ValueError("Invalid degree of Monte Carlo information")
 
         path.add_module("SegmentFitter",
-                        inputSegments="CDCRecoSegment2DVector",
+                        inputSegments="CDCSegment2DVector",
                         karimakiFit=self.karimaki_fit,
                         fitPos=self.fit_positions,
                         fitVariance=self.fit_variance,
@@ -196,7 +196,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     compose validation plots on terminate."""
 
     def __init__(self, output_file_name):
-        super().__init__(foreach='CDCRecoSegment2DVector',
+        super().__init__(foreach='CDCSegment2DVector',
                          output_file_name=output_file_name)
 
         self.mc_segment_lookup = None

@@ -13,8 +13,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     /// Base Filter for filtering out Background Segments, but rejects all segments.
-    using BaseBackgroundSegmentFilter = Filter<CDCRecoSegment2D>;
+    using BaseBackgroundSegmentFilter = Filter<CDCSegment2D>;
   }
 }

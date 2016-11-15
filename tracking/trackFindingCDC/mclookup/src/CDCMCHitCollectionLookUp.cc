@@ -268,9 +268,9 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>::getTrajectory3D(const ACDCHitCollec
 
 // Explicit instantiation for the relevant cases.
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
-template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCRecoSegment2D>;
-template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCRecoSegment3D>;
+template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCSegment2D>;
+template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCSegment3D>;
 template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCTrack>;

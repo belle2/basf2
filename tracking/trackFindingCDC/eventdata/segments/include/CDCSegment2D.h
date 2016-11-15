@@ -22,38 +22,38 @@ namespace Belle2 {
     class CDCWireHitSegment;
 
     /// A segment consisting of two dimensional reconsturcted hits.
-    class CDCRecoSegment2D : public CDCSegment<CDCRecoHit2D> {
+    class CDCSegment2D : public CDCSegment<CDCRecoHit2D> {
     public:
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent tangents in the given tangent segment.
-      static CDCRecoSegment2D condense(const CDCTangentSegment& tangentSegment);
+      static CDCSegment2D condense(const CDCTangentSegment& tangentSegment);
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent tangents in the given tangent path.
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCTangent* >& tangentPath);
+      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCTangent* >& tangentPath);
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent facets in the given facet segment.
-      static CDCRecoSegment2D condense(const CDCFacetSegment& facetSegment);
+      static CDCSegment2D condense(const CDCFacetSegment& facetSegment);
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent facet in the given facet path.
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
+      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
 
       /** Flattens a series of segments to one segment.
        *  Does not copy any fit.
        */
-      static CDCRecoSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCRecoSegment2D*>& segmentPath);
+      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCSegment2D*>& segmentPath);
 
       /** Reconstruct from wire hits with attached right left passage hypotheses
        *  by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
        */
-      static CDCRecoSegment2D reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment);
+      static CDCSegment2D reconstructUsingTangents(const CDCRLWireHitSegment& rlWireHitSegment);
 
       /** Reconstruct from wire hits with attached right left passage hypotheses
        *  by constructing facets between adjacent hits triples and averaging the reconstucted position.
        */
-      static CDCRecoSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
+      static CDCSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
       std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
@@ -65,7 +65,7 @@ namespace Belle2 {
       CDCRLWireHitSegment getRLWireHitSegment() const;
 
       /// Getter for the alias version of the segment - fit not copied.
-      CDCRecoSegment2D getAlias() const;
+      CDCSegment2D getAlias() const;
 
       /// Getter for the number of changes in the right left passage in the segment
       int getNRLSwitches() const;
@@ -74,7 +74,7 @@ namespace Belle2 {
       double getRLAsymmetry() const;
 
       /// Makes a copy of the segment with the reversed hits in the opposite order.
-      CDCRecoSegment2D reversed() const;
+      CDCSegment2D reversed() const;
 
       /// Reverses the order of hits and their right left passage hypotheses inplace.
       void reverse();

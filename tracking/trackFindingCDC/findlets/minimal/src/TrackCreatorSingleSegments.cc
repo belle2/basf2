@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -34,13 +34,13 @@ void TrackCreatorSingleSegments::exposeParameters(ModuleParamList* moduleParamLi
                                 m_param_minimalHitsForSingleSegmentTrackBySuperLayerId);
 }
 
-void TrackCreatorSingleSegments::apply(const std::vector<CDCRecoSegment2D>& segments,
+void TrackCreatorSingleSegments::apply(const std::vector<CDCSegment2D>& segments,
                                        std::vector<CDCTrack>& tracks)
 {
   // Create tracks from left over segments
   // First figure out which segments do not share any hits with any of the given tracks
   // (if the tracks vector is empty this is the case for all segments)
-  for (const CDCRecoSegment2D& segment : segments) {
+  for (const CDCSegment2D& segment : segments) {
     segment.unsetAndForwardMaskedFlag();
   }
 
@@ -48,12 +48,12 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCRecoSegment2D>& segm
     track.unsetAndForwardMaskedFlag();
   }
 
-  for (const CDCRecoSegment2D& segment : segments) {
+  for (const CDCSegment2D& segment : segments) {
     segment.receiveMaskedFlag();
   }
 
   if (not m_param_minimalHitsForSingleSegmentTrackBySuperLayerId.empty()) {
-    for (const CDCRecoSegment2D& segment : segments) {
+    for (const CDCSegment2D& segment : segments) {
       if (segment.getAutomatonCell().hasMaskedFlag()) continue;
 
       ISuperLayer iSuperLayer = segment.getISuperLayer();
@@ -63,7 +63,7 @@ void TrackCreatorSingleSegments::apply(const std::vector<CDCRecoSegment2D>& segm
         if (segment.getTrajectory2D().isFitted()) {
           tracks.push_back(CDCTrack(segment));
           segment.setAndForwardMaskedFlag();
-          for (const CDCRecoSegment2D& otherSegment : segments) {
+          for (const CDCSegment2D& otherSegment : segments) {
             otherSegment.receiveMaskedFlag();
           }
         }

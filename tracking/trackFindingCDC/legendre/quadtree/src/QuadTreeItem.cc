@@ -1,5 +1,5 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 
 using namespace Belle2;
@@ -18,13 +18,13 @@ void QuadTreeItem<CDCConformalHit>::setUsedFlag(bool usedFlag)
 }
 
 template<>
-bool QuadTreeItem<CDCRecoSegment2D>::isUsed() const
+bool QuadTreeItem<CDCSegment2D>::isUsed() const
 {
   return getPointer()->getAutomatonCell().hasTakenFlag();
 }
 
 template<>
-void QuadTreeItem<CDCRecoSegment2D>::setUsedFlag(bool usedFlag)
+void QuadTreeItem<CDCSegment2D>::setUsedFlag(bool usedFlag)
 {
   getPointer()->getAutomatonCell().setTakenFlag(usedFlag);
 }

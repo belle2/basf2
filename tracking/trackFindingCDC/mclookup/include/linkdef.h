@@ -10,12 +10,12 @@
 
 #ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCRecoSegment2D>-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCSegment2D>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegment2DLookUp-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegmentLookUp-;
 
-#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCRecoSegment3D>-;
+#pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCSegment3D>-;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCSegment3DLookUp-;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<Belle2::TrackFindingCDC::CDCTrack>-;

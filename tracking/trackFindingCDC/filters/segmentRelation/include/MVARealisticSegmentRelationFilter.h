@@ -47,7 +47,7 @@ namespace Belle2 {
       void beginRun() override;
 
       /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCRecoSegment2D>& segmentRelation) override;
+      Weight operator()(const Relation<const CDCSegment2D>& segmentRelation) override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

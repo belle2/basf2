@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>

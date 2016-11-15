@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
 
@@ -30,11 +30,11 @@ namespace Belle2 {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
     template<class ASegmentPairFilter>
     class SegmentPairCreator
-      : public Findlet<const CDCRecoSegment2D, CDCSegmentPair> {
+      : public Findlet<const CDCSegment2D, CDCSegmentPair> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCSegmentPair>;
+      using Super = Findlet<const CDCSegment2D, CDCSegmentPair>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -54,19 +54,19 @@ namespace Belle2 {
       }
 
       /// Main method constructing pairs in adjacent super layers
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
                  std::vector<CDCSegmentPair>& segmentPairs) final {
         // Group the segments by their super layer id
-        for (std::vector<const CDCRecoSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer)
+        for (std::vector<const CDCSegment2D*>& segmentsInSuperLayer : m_segmentsBySuperLayer)
         {
           segmentsInSuperLayer.clear();
         }
 
-        for (const CDCRecoSegment2D& segment : inputSegments)
+        for (const CDCSegment2D& segment : inputSegments)
         {
           ISuperLayer iSuperLayer = segment.getISuperLayer();
           if (not ISuperLayerUtil::isInvalid(iSuperLayer)) {
-            const CDCRecoSegment2D* ptrSegment = &segment;
+            const CDCSegment2D* ptrSegment = &segment;
             m_segmentsBySuperLayer[iSuperLayer].push_back(ptrSegment);
           }
         }
@@ -74,19 +74,19 @@ namespace Belle2 {
         // Make pairs of closeby superlayers
         for (ISuperLayer iSuperLayer = 0; iSuperLayer < ISuperLayerUtil::c_N; ++iSuperLayer)
         {
-          const std::vector<const CDCRecoSegment2D*>& fromSegments = m_segmentsBySuperLayer[iSuperLayer];
+          const std::vector<const CDCSegment2D*>& fromSegments = m_segmentsBySuperLayer[iSuperLayer];
 
           // Make pairs of this superlayer and the superlayer more to the inside
           ISuperLayer iSuperLayerIn = ISuperLayerUtil::getNextInwards(iSuperLayer);
           if (ISuperLayerUtil::isInCDC(iSuperLayerIn)) {
-            const std::vector<const CDCRecoSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerIn];
+            const std::vector<const CDCSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerIn];
             create(fromSegments, toSegments, segmentPairs);
           }
 
           // Make pairs of this superlayer and the superlayer more to the outside
           ISuperLayer iSuperLayerOut = ISuperLayerUtil::getNextOutwards(iSuperLayer);
           if (ISuperLayerUtil::isInCDC(iSuperLayerOut)) {
-            const std::vector<const CDCRecoSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerOut];
+            const std::vector<const CDCSegment2D*>& toSegments = m_segmentsBySuperLayer[iSuperLayerOut];
             create(fromSegments, toSegments, segmentPairs);
           }
         }
@@ -95,13 +95,13 @@ namespace Belle2 {
 
     private:
       /// Creates segment pairs from a combination of from segments and to segments.
-      void create(const std::vector<const CDCRecoSegment2D*>& fromSegments,
-                  const std::vector<const CDCRecoSegment2D*>& toSegments,
+      void create(const std::vector<const CDCSegment2D*>& fromSegments,
+                  const std::vector<const CDCSegment2D*>& toSegments,
                   std::vector<CDCSegmentPair>& segmentPairs)
       {
         CDCSegmentPair segmentPair;
-        for (const CDCRecoSegment2D* ptrFromSegment : fromSegments) {
-          for (const CDCRecoSegment2D* ptrToSegment : toSegments) {
+        for (const CDCSegment2D* ptrFromSegment : fromSegments) {
+          for (const CDCSegment2D* ptrToSegment : toSegments) {
 
             if (ptrFromSegment == ptrToSegment) continue; // Just for safety
             segmentPair.setSegments(ptrFromSegment, ptrToSegment);
@@ -128,7 +128,7 @@ namespace Belle2 {
 
     private:
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCRecoSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
       /// The filter to be used for the segment pair generation.
       ASegmentPairFilter m_segmentPairFilter;

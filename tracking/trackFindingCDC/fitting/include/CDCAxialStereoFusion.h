@@ -10,8 +10,8 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 namespace Belle2 {
@@ -42,15 +42,15 @@ namespace Belle2 {
       /**
        * Combine the trajectories of the two given segments to a full helix trajectory
        */
-      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
-                                                  const CDCRecoSegment2D& toSegment2D);
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
+                                                  const CDCSegment2D& toSegment2D);
 
-      CDCTrajectory3D fusePreliminary(const CDCRecoSegment2D& fromSegment2D,
-                                      const CDCRecoSegment2D& toSegment2D);
+      CDCTrajectory3D fusePreliminary(const CDCSegment2D& fromSegment2D,
+                                      const CDCSegment2D& toSegment2D);
 
       /// Combine the two segments given a prelimiary reference trajectory to which a creation is applied
-      CDCTrajectory3D reconstructFuseTrajectories(const CDCRecoSegment2D& fromSegment2D,
-                                                  const CDCRecoSegment2D& toSegment2D,
+      CDCTrajectory3D reconstructFuseTrajectories(const CDCSegment2D& fromSegment2D,
+                                                  const CDCSegment2D& toSegment2D,
                                                   const CDCTrajectory3D& preliminaryTrajectory3D);
 
     public:
@@ -58,7 +58,7 @@ namespace Belle2 {
        *  Calculate the ambiguity of the helix parameters relative to the three circle
        *  parameters given the hit content of the segment and their stereo displacement.
        */
-      JacobianMatrix<3, 5> calcAmbiguity(const CDCRecoSegment3D& recoSegment3D,
+      JacobianMatrix<3, 5> calcAmbiguity(const CDCSegment3D& segment3D,
                                          const CDCTrajectory2D& trajectory2D);
 
 

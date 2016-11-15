@@ -14,8 +14,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Weight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromSegment,
-                                           const CDCRecoSegment2D& toSegment)
+Weight MCSegmentRelationFilter::operator()(const CDCSegment2D& fromSegment,
+                                           const CDCSegment2D& toSegment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 

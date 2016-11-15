@@ -222,7 +222,7 @@ class CDCSVGDisplayModule(basf2.Module):
         self.cdc_wire_hit_cluster_store_obj_name = "CDCWireHitClusterVector"
 
         #: Name of the CDC Reco Segment Vector
-        self.cdc_reco_segment_vector_store_obj_name = 'CDCRecoSegment2DVector'
+        self.cdc_segment_vector_store_obj_name = 'CDCSegment2DVector'
 
         #: Current file's number (used for making output filename)
         self.file_number = 1
@@ -604,68 +604,68 @@ class CDCSVGDisplayModule(basf2.Module):
                 styleDict = {'stroke': attributemaps.listColors}
                 plotter.draw_storevector(self.cdc_wire_hit_cluster_store_obj_name, **styleDict)
 
-        # ######### CDCRecoSegments2D ##########
+        # ######### CDCSegments2D ##########
         # Draw Segments
         if self.draw_segments:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "ListColors", "")
             if self.use_python:
                 styleDict = {'stroke': attributemaps.listColors}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_mctrackids:
             Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentMCTrackIdColorMap", "")
             if self.use_python:
                 styleDict = {'stroke': attributemaps.SegmentMCTrackIdColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_fbinfos:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentFBInfoColorMap", "")
             if self.use_python:
                 styleDict = {'stroke': attributemaps.SegmentFBInfoColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_firstInTrackIds:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentFirstInTrackIdColorMap", "")
             if self.use_python:
                 styleDict = \
                     {'stroke': attributemaps.SegmentFirstInTrackIdColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_lastInTrackIds:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentLastInTrackIdColorMap", "")
             if self.use_python:
                 styleDict = \
                     {'stroke': attributemaps.SegmentLastInTrackIdColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_firstNPassedSuperLayers:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentFirstNPassedSuperLayersColorMap", "")
             if self.use_python:
                 styleDict = \
                     {'stroke': attributemaps.SegmentFirstNPassedSuperLayersColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segment_lastNPassedSuperLayers:
             if self.use_cpp:
-                cppplotter.drawSegments(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegments(self.cdc_segment_vector_store_obj_name,
                                         "SegmentLastNPassedSuperLayersColorMap", "")
             if self.use_python:
                 styleDict = \
                     {'stroke': attributemaps.SegmentLastNPassedSuperLayersColorMap()}
-                plotter.draw_storevector(self.cdc_reco_segment_vector_store_obj_name, **styleDict)
+                plotter.draw_storevector(self.cdc_segment_vector_store_obj_name, **styleDict)
 
         if self.draw_segmentpairs:
             if self.use_cpp:
@@ -677,9 +677,9 @@ class CDCSVGDisplayModule(basf2.Module):
         # Mimic axial to axial pair selection
         if self.draw_mcaxialsegmentpairs:
             if self.use_cpp:
-                cppplotter.drawMCAxialSegmentPairs(self.cdc_reco_segment_vector_store_obj_name, "black", '')
+                cppplotter.drawMCAxialSegmentPairs(self.cdc_segment_vector_store_obj_name, "black", '')
             if self.use_python:
-                segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
+                segment_storevector = Belle2.PyStoreObj(self.cdc_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
                     axial_segments = [segment for segment in segments
@@ -703,15 +703,15 @@ class CDCSVGDisplayModule(basf2.Module):
 
         if self.draw_mcsegmentpairs:
             if self.use_cpp:
-                cppplotter.drawMCSegmentPairs(self.cdc_reco_segment_vector_store_obj_name, "black", '')
+                cppplotter.drawMCSegmentPairs(self.cdc_segment_vector_store_obj_name, "black", '')
             if self.use_python:
                 print('No Python-function defined')
 
         if self.draw_mcsegmenttriples:
             if self.use_cpp:
-                cppplotter.drawMCSegmentTriples(self.cdc_reco_segment_vector_store_obj_name, '', '')
+                cppplotter.drawMCSegmentTriples(self.cdc_segment_vector_store_obj_name, '', '')
             if self.use_python:
-                segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
+                segment_storevector = Belle2.PyStoreObj(self.cdc_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
                     axial_segments = [segment for segment in segments
@@ -817,7 +817,7 @@ class CDCSVGDisplayModule(basf2.Module):
                 print('No CPP-function defined')
             if self.use_python:
                 styleDict = {'stroke': attributemaps.WrongRLColorMap()}
-                pystoreobj = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
+                pystoreobj = Belle2.PyStoreObj(self.cdc_segment_vector_store_obj_name)
 
                 if pystoreobj:
                     # Wrapper around std::vector like
@@ -862,10 +862,10 @@ class CDCSVGDisplayModule(basf2.Module):
         # Draw the fits to the segments
         if self.draw_segment_trajectories:
             if self.use_cpp:
-                cppplotter.drawSegmentTrajectories(self.cdc_reco_segment_vector_store_obj_name,
+                cppplotter.drawSegmentTrajectories(self.cdc_segment_vector_store_obj_name,
                                                    "ListColors", "")
             if self.use_python:
-                segment_storevector = Belle2.PyStoreObj(self.cdc_reco_segment_vector_store_obj_name)
+                segment_storevector = Belle2.PyStoreObj(self.cdc_segment_vector_store_obj_name)
                 if segment_storevector:
                     segments = segment_storevector.obj().unwrap()
 

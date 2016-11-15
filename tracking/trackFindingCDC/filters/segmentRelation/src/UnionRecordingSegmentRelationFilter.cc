@@ -26,7 +26,7 @@ UnionRecordingSegmentRelationFilter::getValidVarSetNames() const
   return varSetNames;
 }
 
-std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >
+std::unique_ptr<BaseVarSet<Relation<const CDCSegment2D> > >
 UnionRecordingSegmentRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {

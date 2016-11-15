@@ -8,17 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
-CDCRecoSegment2D CDCRecoSegment3D::stereoProjectToRef() const
+CDCSegment2D CDCSegment3D::stereoProjectToRef() const
 {
-  CDCRecoSegment2D result;
+  CDCSegment2D result;
   for (const CDCRecoHit3D&  recoHit3D : *this) {
     result.push_back(recoHit3D.stereoProjectToRef());
   }
@@ -26,10 +26,10 @@ CDCRecoSegment2D CDCRecoSegment3D::stereoProjectToRef() const
   return result;
 }
 
-CDCRecoSegment3D CDCRecoSegment3D::reconstruct(const CDCRecoSegment2D& segment2D,
-                                               const CDCTrajectory2D& trajectory2D)
+CDCSegment3D CDCSegment3D::reconstruct(const CDCSegment2D& segment2D,
+                                       const CDCTrajectory2D& trajectory2D)
 {
-  CDCRecoSegment3D segment3D;
+  CDCSegment3D segment3D;
   for (const CDCRecoHit2D& recoHit2D : segment2D) {
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D);
     segment3D.push_back(recoHit3D);

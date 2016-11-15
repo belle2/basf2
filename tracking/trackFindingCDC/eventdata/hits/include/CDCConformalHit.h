@@ -11,7 +11,7 @@
 #pragma once
 
 #include <tuple>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

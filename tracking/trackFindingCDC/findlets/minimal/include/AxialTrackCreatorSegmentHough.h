@@ -20,15 +20,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
     /// Generates axial tracks from segments using the hough algorithm
-    class AxialTrackCreatorSegmentHough : public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class AxialTrackCreatorSegmentHough : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack>;
 
     public:
       /// Short description of the findlet
@@ -41,7 +41,7 @@ namespace Belle2 {
       void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
+      void apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
       void terminate() final;

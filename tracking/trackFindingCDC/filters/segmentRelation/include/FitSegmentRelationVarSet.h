@@ -19,8 +19,8 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCRecoSegment2D.
-    class CDCRecoSegment2D;
+    /// Forward declaration of the CDCSegment2D.
+    class CDCSegment2D;
 
     /// Names of the variables to be generated.
     constexpr
@@ -38,7 +38,7 @@ namespace Belle2 {
      *  Class that specifies the names of the variables
      *  that should be generated from a segment relation
      */
-    class FitSegmentRelationVarNames : public VarNames<Relation<const CDCRecoSegment2D>> {
+    class FitSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D>> {
 
     public:
       /// Number of variables to be generated.
@@ -60,7 +60,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the segment relation
-      bool extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation) final;
+      bool extract(const Relation<const CDCSegment2D>* ptrSegmentRelation) final;
     };
   }
 }

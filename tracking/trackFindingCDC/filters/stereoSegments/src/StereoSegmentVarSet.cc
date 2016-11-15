@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 #include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
@@ -19,10 +19,10 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoSegmentVarSet::extract(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>* testPair)
+bool StereoSegmentVarSet::extract(const std::pair<const CDCSegment3D*, const CDCTrack*>* testPair)
 {
   if (not testPair) return false;
-  const CDCRecoSegment3D& recoSegment3D = *testPair->first;
+  const CDCSegment3D& segment3D = *testPair->first;
   const CDCTrack& track = *testPair->second;
 
   if (track.size() == 0) {
@@ -53,9 +53,9 @@ bool StereoSegmentVarSet::extract(const std::pair<const CDCRecoSegment3D*, const
   double sumDistanceZReconstructed2D = 0;
   double sumDistance2DReconstructedZ = 0;
 
-  std::vector<double> arcLength2DList(recoSegment3D.size());
+  std::vector<double> arcLength2DList(segment3D.size());
 
-  for (const CDCRecoHit3D& recoHit3D : recoSegment3D.items()) {
+  for (const CDCRecoHit3D& recoHit3D : segment3D.items()) {
     const CDCWire& wire = recoHit3D.getWire();
     const Vector3D& reconstructedPositionTo2D = recoHit3D.getRecoPos3D();
 
@@ -91,7 +91,7 @@ bool StereoSegmentVarSet::extract(const std::pair<const CDCRecoSegment3D*, const
   ////////
 
   var<named("track_size")>() = size;
-  var<named("segment_size")>() = recoSegment3D.size();
+  var<named("segment_size")>() = segment3D.size();
   var<named("pt")>() = toFinite(trajectory2D.getAbsMom2D(), 0);
   var<named("phi_track")>() = toFinite(startMomentum.phi(), 0);
 
@@ -108,7 +108,7 @@ bool StereoSegmentVarSet::extract(const std::pair<const CDCRecoSegment3D*, const
   var<named("sum_distance_using_2d")>() = toFinite(sumDistanceZReconstructed2D, 0);
   var<named("sum_distance_using_z")>() = toFinite(sumDistance2DReconstructedZ, 0);
 
-  var<named("superlayer_id")>() = recoSegment3D.getISuperLayer();
+  var<named("superlayer_id")>() = segment3D.getISuperLayer();
 
   var<named("track_front_s")>() = toFinite(frontArcLength2D, 0);
   var<named("track_back_s")>() = toFinite(backArcLength2D, 0);

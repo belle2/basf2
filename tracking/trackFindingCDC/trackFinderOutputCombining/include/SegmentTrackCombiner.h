@@ -23,7 +23,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
     /** Class which does the segment - track combining. */
@@ -37,7 +37,7 @@ namespace Belle2 {
       /**
        * Fill the given elements into the internal lookup tables.
        */
-      void fillWith(std::vector<CDCTrack>& tracks, std::vector<CDCRecoSegment2D>& segments)
+      void fillWith(std::vector<CDCTrack>& tracks, std::vector<CDCSegment2D>& segments)
       {
         m_trackLookUp.fillWith(tracks);
         m_segmentLookUp.fillWith(segments);
@@ -107,7 +107,7 @@ namespace Belle2 {
        * Helper function to add a segment to a track with respecting the taken information of the segment.
        * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
        */
-      static void addSegmentToTrack(const CDCRecoSegment2D& segment,
+      static void addSegmentToTrack(const CDCSegment2D& segment,
                                     CDCTrack& track,
                                     bool useTakenFlagOfHits = true);
 

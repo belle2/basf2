@@ -25,7 +25,7 @@ namespace Belle2 {
       /// The type of the underlaying HoughBox (copied from the udnerlaying hit algorithm)
       using HoughBox = typename AHitInBoxAlgorithm::HoughBox;
 
-      /**  When called, it goes through all items in the range object (e.g. a CDCRecoSegment) and checks the
+      /**  When called, it goes through all items in the range object (e.g. a CDCSegment) and checks the
        *  HitInBox algorithm passed as a template argument. If there is a certain amount of items of the range
        *  in the box, it returns the number of items as a weight, otherwise it returns NAN;
        */

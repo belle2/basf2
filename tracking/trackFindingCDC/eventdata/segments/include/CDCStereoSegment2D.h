@@ -9,12 +9,12 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Typedef to indicate that an axial segment is expeected.
-    using CDCAxialRecoSegment2D = CDCRecoSegment2D;
+    /// Typedef to indicate that an stereo segment is expeected.
+    using CDCStereoSegment2D = CDCSegment2D;
   }
 }
 

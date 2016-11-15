@@ -18,7 +18,7 @@ namespace Belle2 {
     class CDCConformalHit;
     class CDCWireHitCluster;
     class CDCFacet;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCSegmentPair;
     class CDCAxialSegmentPair;
     class CDCSegmentTriple;
@@ -79,14 +79,14 @@ namespace Belle2 {
         return "facet";
       }
 
-      /// Returns a short name for class CDCRecoSegment2D to be used in names of parameters.
-      static std::string getParameterName(const CDCRecoSegment2D* dispatchTag __attribute__((unused)))
+      /// Returns a short name for class CDCSegment2D to be used in names of parameters.
+      static std::string getParameterName(const CDCSegment2D* dispatchTag __attribute__((unused)))
       {
         return "segment";
       }
 
-      /// Returns a short description for class CDCRecoSegment2D to be used in descriptions of parameters.
-      static std::string getParameterDescription(const CDCRecoSegment2D* dispatchTag __attribute__((unused)))
+      /// Returns a short description for class CDCSegment2D to be used in descriptions of parameters.
+      static std::string getParameterDescription(const CDCSegment2D* dispatchTag __attribute__((unused)))
       {
         return "segment";
       }

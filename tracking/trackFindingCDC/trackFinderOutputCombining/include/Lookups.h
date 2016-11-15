@@ -26,7 +26,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCRecoHit2D;
     class CDCRecoHit3D;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
     class TrackInformation;
     class SegmentInformation;
@@ -87,10 +87,10 @@ namespace Belle2 {
      * This lookup serves (as an addon) also as lookup for the relation cdchit -> segment
      * When filling the lookup we only process not already taken segments.
      * */
-    class SegmentLookUp : public LookUpBase<CDCRecoSegment2D, std::vector<SegmentInformation*>> {
+    class SegmentLookUp : public LookUpBase<CDCSegment2D, std::vector<SegmentInformation*>> {
     public:
       /** Create the lists. Do not forget to call clear before the next event. */
-      void fillWith(std::vector<CDCRecoSegment2D>& segments) override;
+      void fillWith(std::vector<CDCSegment2D>& segments) override;
 
       /** Clear all pointer vectors. */
       void clear() override;

@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/display/SegmentColorMapping.h>
 
 #include <tracking/trackFindingCDC/display/Colors.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <sstream>
@@ -40,7 +40,7 @@ SegmentMCTrackIdColorMap::SegmentMCTrackIdColorMap()
 }
 
 std::string SegmentMCTrackIdColorMap::map(int index __attribute__((unused)),
-                                          const CDCRecoSegment2D& segment)
+                                          const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
@@ -54,7 +54,7 @@ std::string SegmentMCTrackIdColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFBInfoColorMap::map(int index __attribute__((unused)),
-                                       const CDCRecoSegment2D& segment)
+                                       const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   ITrackType mcTrackId = mcSegmentLookUp.getMCTrackId(&segment);
@@ -72,7 +72,7 @@ std::string SegmentFBInfoColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFirstInTrackIdColorMap::map(int index __attribute__((unused)),
-                                               const CDCRecoSegment2D& segment)
+                                               const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index firstInTrackId = mcSegmentLookUp.getFirstInTrackId(&segment);
@@ -82,7 +82,7 @@ std::string SegmentFirstInTrackIdColorMap::map(int index __attribute__((unused))
 }
 
 std::string SegmentLastInTrackIdColorMap::map(int index __attribute__((unused)),
-                                              const CDCRecoSegment2D& segment)
+                                              const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index lastInTrackId = mcSegmentLookUp.getLastInTrackId(&segment);
@@ -92,7 +92,7 @@ std::string SegmentLastInTrackIdColorMap::map(int index __attribute__((unused)),
 }
 
 std::string SegmentFirstNPassedSuperLayersColorMap::map(int index __attribute__((unused)),
-                                                        const CDCRecoSegment2D& segment)
+                                                        const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index firstNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(&segment);
@@ -102,7 +102,7 @@ std::string SegmentFirstNPassedSuperLayersColorMap::map(int index __attribute__(
 }
 
 std::string SegmentLastNPassedSuperLayersColorMap::map(int index __attribute__((unused)),
-                                                       const CDCRecoSegment2D& segment)
+                                                       const CDCSegment2D& segment)
 {
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   Index lastNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(&segment);

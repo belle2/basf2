@@ -16,14 +16,14 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /** Class to add the matched hits to the track and set the taken flag correctly. */
     class StereoSegmentTrackAdder {
     public:
       /** Add the matched segment to the track and set the taken flag correctly. We ignore the weight completely here. */
       static void add(CDCTrack& track,
-                      const std::vector<WithWeight<const CDCRecoSegment2D*>>& matchedSegments);
+                      const std::vector<WithWeight<const CDCSegment2D*>>& matchedSegments);
     };
   }
 }

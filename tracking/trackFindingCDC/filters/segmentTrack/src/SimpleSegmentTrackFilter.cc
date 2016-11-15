@@ -10,12 +10,12 @@
 #include <tracking/trackFindingCDC/filters/segmentTrack/SimpleSegmentTrackFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Weight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair)
+Weight SimpleSegmentTrackFilter::operator()(const std::pair<const CDCSegment2D*, const CDCTrack*>& testPair)
 {
   Super::operator()(testPair);
 

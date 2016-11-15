@@ -18,7 +18,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <vector>
@@ -29,11 +29,11 @@ namespace Belle2 {
     template <class ASegmentPairFilter,
               class ASegmentPairRelationFilter,
               class ATrackRelationFilter>
-    class TrackFinderSegmentPairAutomaton : public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class TrackFinderSegmentPairAutomaton : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -85,7 +85,7 @@ namespace Belle2 {
 
       /// Generates the tracks from segments
       void
-      apply(const std::vector<CDCRecoSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final {
+      apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final {
         m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
         m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
         m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preMergeTracks);

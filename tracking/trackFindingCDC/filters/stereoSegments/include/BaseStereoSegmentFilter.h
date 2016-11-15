@@ -16,9 +16,9 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoSegment3D;
+    class CDCSegment3D;
 
     /// Base filter for stereo segment - track relations.
-    using BaseStereoSegmentFilter = Filter<std::pair<const CDCRecoSegment3D*, const CDCTrack* >>;
+    using BaseStereoSegmentFilter = Filter<std::pair<const CDCSegment3D*, const CDCTrack* >>;
   }
 }

@@ -32,7 +32,7 @@ void MVARealisticSegmentRelationFilter::beginRun()
   m_feasibleSegmentRelationFilter.beginRun();
 }
 
-Weight MVARealisticSegmentRelationFilter::operator()(const Relation<const CDCRecoSegment2D>& segmentRelation)
+Weight MVARealisticSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>& segmentRelation)
 {
   double isFeasibleWeight = m_feasibleSegmentRelationFilter(segmentRelation);
   if (std::isnan(isFeasibleWeight)) {

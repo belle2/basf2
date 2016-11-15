@@ -22,8 +22,8 @@ CDCSegmentTriple::CDCSegmentTriple()
 }
 
 
-CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                                   const CDCAxialRecoSegment2D* endSegment)
+CDCSegmentTriple::CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                                   const CDCAxialSegment2D* endSegment)
   : m_startSegment(startSegment),
     m_middleSegment(nullptr),
     m_endSegment(endSegment)
@@ -39,9 +39,9 @@ CDCSegmentTriple:: CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair)
 }
 
 
-CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                                   const CDCStereoRecoSegment2D* middleSegment,
-                                   const CDCAxialRecoSegment2D* endSegment)
+CDCSegmentTriple::CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                                   const CDCStereoSegment2D* middleSegment,
+                                   const CDCAxialSegment2D* endSegment)
   : m_startSegment(startSegment),
     m_middleSegment(middleSegment),
     m_endSegment(endSegment)
@@ -52,9 +52,9 @@ CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
 }
 
 
-CDCSegmentTriple::CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                                   const CDCStereoRecoSegment2D* middleSegment,
-                                   const CDCAxialRecoSegment2D* endSegment,
+CDCSegmentTriple::CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                                   const CDCStereoSegment2D* middleSegment,
+                                   const CDCAxialSegment2D* endSegment,
                                    const CDCTrajectory3D& trajectory3D)
   : m_startSegment(startSegment),
     m_middleSegment(middleSegment),

@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Returns the trajectory of the axial segment. Also fits it if necessary.
-      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const;
+      const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialSegment2D& segment) const;
 
       /// Returns the trajectory of the axial to axial segment pair. Also fits it if necessary.
       const CDCTrajectory2D& getFittedTrajectory2D(const CDCAxialSegmentPair& axialSegmentPair) const;

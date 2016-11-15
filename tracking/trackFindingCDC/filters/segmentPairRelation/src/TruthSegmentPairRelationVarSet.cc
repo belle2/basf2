@@ -29,9 +29,9 @@ bool TruthSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair
   const CDCSegmentPair& fromSegmentPair = *ptrFromSegmentPair;
   const CDCSegmentPair& toSegmentPair = *ptrToSegmentPair;
 
-  const CDCRecoSegment2D& startSegment = *fromSegmentPair.getFromSegment();
-  const CDCRecoSegment2D& middleSegment = *fromSegmentPair.getToSegment();
-  const CDCRecoSegment2D& endSegment = *toSegmentPair.getToSegment();
+  const CDCSegment2D& startSegment = *fromSegmentPair.getFromSegment();
+  const CDCSegment2D& middleSegment = *fromSegmentPair.getToSegment();
+  const CDCSegment2D& endSegment = *toSegmentPair.getToSegment();
 
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();

@@ -12,7 +12,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /**
      *  Class that computes floating point variables from a segment.
@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the cluster
-      bool extract(const CDCRecoSegment2D* segment) final {
+      bool extract(const CDCSegment2D* segment) final {
         bool extracted = Super::extract(segment);
         var<named("truth")>() = var<named("segment_is_new_track_truth")>();
         return extracted;

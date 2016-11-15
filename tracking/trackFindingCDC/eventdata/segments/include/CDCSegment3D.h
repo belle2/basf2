@@ -15,21 +15,21 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// A segment consisting of three dimensional reconstructed hits.
-    class CDCRecoSegment3D : public CDCSegment<CDCRecoHit3D> {
+    class CDCSegment3D : public CDCSegment<CDCRecoHit3D> {
 
     public:
       /// Reconstructs a two dimensional stereo segment by shifting each hit onto the given two dimensional trajectory.
-      static CDCRecoSegment3D reconstruct(const CDCRecoSegment2D& segment2D,
-                                          const CDCTrajectory2D& trajectory2D);
+      static CDCSegment3D reconstruct(const CDCSegment2D& segment2D,
+                                      const CDCTrajectory2D& trajectory2D);
 
       /**
        *  Constructs a two dimensional segment by carrying out the stereo ! projection to the wire reference postion.
        *  Note : no fitting information is transported to the resulting segment.
        */
-      CDCRecoSegment2D stereoProjectToRef() const;
+      CDCSegment2D stereoProjectToRef() const;
 
     };
   }

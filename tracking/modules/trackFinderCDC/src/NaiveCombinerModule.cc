@@ -33,13 +33,13 @@ NaiveCombinerModule::NaiveCombinerModule() : TrackFinderCDCFromSegmentsModule()
            false);
 }
 
-void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
+void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
                                    std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   // if we do not use the mc information, we just throw all the tracks into one store array
   // if we use the mc information we add up all the track cands that are matched together
   if (not m_param_useMCInformation) {
-    for (const CDCRecoSegment2D& segment : segments) {
+    for (const CDCSegment2D& segment : segments) {
       if (segment.getAutomatonCell().hasTakenFlag())
         continue;
 
@@ -61,7 +61,7 @@ void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D
     const CDCMCHitLookUp& mcHitLookup =  CDCMCHitLookUp::getInstance();
 
 
-    for (const CDCRecoSegment2D& segment : segments) {
+    for (const CDCSegment2D& segment : segments) {
       if (segment.getAutomatonCell().hasTakenFlag())
         continue;
 

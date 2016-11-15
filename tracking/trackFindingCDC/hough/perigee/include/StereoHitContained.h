@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/numerics/ESign.h>
@@ -39,18 +39,18 @@ namespace Belle2 {
 
       /** Checks if more than 66% of the hits in this segment are contained in the phi0 curv hough space
        *  Returns the sum of the individual hit weights in this case. Else returns NAN.*/
-      Weight operator()(const CDCRecoSegment2D* const& recoSegment2D,
+      Weight operator()(const CDCSegment2D* const& segment2D,
                         const HoughBox* const& houghBox)
       {
-        size_t nHits = recoSegment2D->size();
+        size_t nHits = segment2D->size();
         auto weightOfHit = [this, &houghBox](const Weight & totalWeight,
         const CDCRecoHit2D & recoHit2D) -> Weight {
           Weight hitWeight = this->operator()(&recoHit2D, houghBox);
           return std::isnan(hitWeight) ? totalWeight : totalWeight + hitWeight;
         };
 
-        Weight totalWeight = std::accumulate(recoSegment2D->begin(),
-                                             recoSegment2D->end(),
+        Weight totalWeight = std::accumulate(segment2D->begin(),
+                                             segment2D->end(),
                                              static_cast<Weight>(0.0),
                                              weightOfHit);
 

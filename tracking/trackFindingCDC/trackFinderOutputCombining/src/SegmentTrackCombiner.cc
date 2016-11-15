@@ -1,6 +1,6 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
@@ -10,7 +10,7 @@ void SegmentTrackCombiner::clearAndRecover()
 {
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
     for (SegmentInformation* segmentInformation : segments) {
-      CDCRecoSegment2D* segment = segmentInformation->getSegment();
+      CDCSegment2D* segment = segmentInformation->getSegment();
       if (segment->getAutomatonCell().hasMaskedFlag()) {
         segment->getAutomatonCell().unsetTakenFlag();
         segment->getAutomatonCell().unsetMaskedFlag();
@@ -327,7 +327,7 @@ void SegmentTrackCombiner::makeAllCombinations(std::list<TrainOfSegments>& train
   clearSmallerCombinations(trainsOfSegments);
 }
 
-void SegmentTrackCombiner::addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits)
+void SegmentTrackCombiner::addSegmentToTrack(const CDCSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits)
 {
   if (segment.getAutomatonCell().hasTakenFlag()) {
     return;

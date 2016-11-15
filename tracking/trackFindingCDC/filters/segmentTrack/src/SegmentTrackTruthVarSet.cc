@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackTruthVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
@@ -17,11 +17,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackTruthVarSet::extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair)
 {
   if (not testPair) return false;
 
-  const CDCRecoSegment2D* segment = testPair->first;
+  const CDCSegment2D* segment = testPair->first;
   const CDCTrack* track = testPair->second;
 
   var<named("belongs_to_same_track_truth")>() = 0.0;

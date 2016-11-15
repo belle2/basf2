@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
 
     /// Names of the variables to be generated.
@@ -51,7 +51,7 @@ namespace Belle2 {
      *  Class that specifies the names of the variables
      *  that should be generated from a segment.
      */
-    class AdvancedSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    class AdvancedSegmentVarNames : public VarNames<CDCSegment2D> {
 
     public:
       /// Number of variables to be generated.
@@ -73,7 +73,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the pair
-      bool extract(const CDCRecoSegment2D* segment) final;
+      bool extract(const CDCSegment2D* segment) final;
     };
   }
 }

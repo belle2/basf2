@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/Z0TanLambdaLegendre.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/algorithms/RangeInBox.h>
 #include <tracking/trackFindingCDC/hough/algorithms/FirstOfPairInBox.h>
@@ -29,6 +29,6 @@ namespace Belle2 {
     using SegmentInZ0TanLambdaAlgorithm =
       FirstOfPairInBox<TwoHitInBoxAlgorithm<SegmentInZ0TanLambdaBox, FirstOfPairInBox<RangeInBox<HitInZ0TanLambdaBox>>>>;
     using SegmentZ0TanLambdaLegendre =
-      Z0TanLambdaLegendre<std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*>, SegmentInZ0TanLambdaAlgorithm, 2, 2>;
+      Z0TanLambdaLegendre<std::pair<std::pair<CDCSegment3D, CDCTrajectorySZ>, const CDCSegment2D*>, SegmentInZ0TanLambdaAlgorithm, 2, 2>;
   }
 }

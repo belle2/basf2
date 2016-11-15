@@ -12,10 +12,10 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
@@ -46,7 +46,7 @@ namespace Belle2 {
       }
 
       /// Returns a fitted trajectory
-      CDCTrajectorySZ fit(const CDCStereoRecoSegment2D& stereoSegment,
+      CDCTrajectorySZ fit(const CDCStereoSegment2D& stereoSegment,
                           const CDCTrajectory2D& axialTrajectory2D) const
       {
         CDCTrajectorySZ trajectorySZ;
@@ -55,7 +55,7 @@ namespace Belle2 {
       }
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      CDCTrajectorySZ fit(const CDCRecoSegment3D& segment3D) const
+      CDCTrajectorySZ fit(const CDCSegment3D& segment3D) const
       {
         CDCTrajectorySZ trajectorySZ;
         update(trajectorySZ, segment3D);
@@ -81,14 +81,14 @@ namespace Belle2 {
        *    - Use RANSAC instead of Theil-Sen.
        *    - Think about the parameters better.
        */
-      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& segment3D) const;
+      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const;
 
       /// Updates the trajectory of the axial stereo segment pair inplace
       void update(const CDCSegmentPair& segmentPair) const;
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(CDCTrajectorySZ& trajectorySZ,
-                  const CDCStereoRecoSegment2D& stereoSegment,
+                  const CDCStereoSegment2D& stereoSegment,
                   const CDCTrajectory2D& axialTrajectory2D) const;
 
       /**

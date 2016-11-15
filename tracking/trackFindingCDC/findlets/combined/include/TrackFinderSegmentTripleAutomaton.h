@@ -33,11 +33,11 @@ namespace Belle2 {
               class ASegmentTripleFilter,
               class ASegmentTripleRelationFilter,
               class ATrackRelationFilter>
-    class TrackFinderSegmentTripleAutomaton : public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class TrackFinderSegmentTripleAutomaton : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCTrack>;
+      using Super = Findlet<const CDCSegment2D, CDCTrack>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
@@ -90,7 +90,7 @@ namespace Belle2 {
       }
 
       /// Generates the tracks.
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
                  std::vector<CDCTrack>& tracks) override final
       {
         m_axialSegmentPairCreator.apply(inputSegments, m_axialSegmentPairs);

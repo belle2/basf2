@@ -31,7 +31,7 @@ namespace Belle2 {
 
       /// Checks if a segment relation is a good combination.
       Weight
-      operator()(const CDCRecoSegment2D& fromSegment, const CDCRecoSegment2D& toSegment) final;
+      operator()(const CDCSegment2D& fromSegment, const CDCSegment2D& toSegment) final;
     };
 
   }

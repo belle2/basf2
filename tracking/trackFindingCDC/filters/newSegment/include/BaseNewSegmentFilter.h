@@ -13,7 +13,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
-    using BaseNewSegmentFilter = Filter<CDCRecoSegment2D>;
+    class CDCSegment2D;
+    using BaseNewSegmentFilter = Filter<CDCSegment2D>;
   }
 }

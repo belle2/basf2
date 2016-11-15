@@ -20,17 +20,17 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCFacet;
 
     /// Findlet that generates segments within clusters based on a cellular automaton on triples of hits
     class SegmentCreatorFacetAutomaton
-      : public Findlet<const CDCFacet, const WeightedRelation<const CDCFacet>, CDCRecoSegment2D> {
+      : public Findlet<const CDCFacet, const WeightedRelation<const CDCFacet>, CDCSegment2D> {
 
     private:
       /// Type of the base class
       using Super =
-        Findlet<const CDCFacet, const WeightedRelation<const CDCFacet>, CDCRecoSegment2D>;
+        Findlet<const CDCFacet, const WeightedRelation<const CDCFacet>, CDCSegment2D>;
 
     public:
       /// Short description of the findlet
@@ -39,7 +39,7 @@ namespace Belle2 {
       /// Main function of the segment finding by the cellular automaton.
       void apply(const std::vector<CDCFacet>& inputFacets,
                  const std::vector<WeightedRelation<const CDCFacet>>& inputFacetRelations,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final;
+                 std::vector<CDCSegment2D>& outputSegments) final;
 
     private: // cellular automaton
       /// Instance of the cellular automaton path finder

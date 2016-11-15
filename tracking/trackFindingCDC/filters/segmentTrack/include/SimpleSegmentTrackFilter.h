@@ -14,7 +14,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
     /// Filter for the construction of good segment - track pairs
@@ -26,7 +26,7 @@ namespace Belle2 {
 
     public:
       /// Get the output of the filter.
-      Weight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) final;
+      Weight operator()(const std::pair<const CDCSegment2D*, const CDCTrack*>& testPair) final;
     };
   }
 }

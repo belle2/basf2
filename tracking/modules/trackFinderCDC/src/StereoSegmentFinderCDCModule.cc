@@ -1,7 +1,7 @@
 #include <tracking/modules/trackFinderCDC/StereoSegmentFinderCDCModule.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 using namespace Belle2;
@@ -47,7 +47,7 @@ void StereoSegmentFinderCDCModule::terminate()
   TrackFinderCDCFromSegmentsModule::terminate();
 }
 
-void StereoSegmentFinderCDCModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
+void StereoSegmentFinderCDCModule::generate(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
                                             std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   if (m_param_useQuadTree) {
@@ -69,7 +69,7 @@ void StereoSegmentFinderCDCModule::generate(std::vector<TrackFindingCDC::CDCReco
   }
 
   // Delete all taken segments
-  segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCRecoSegment2D & segment) {
+  segments.erase(std::remove_if(segments.begin(), segments.end(), [](const CDCSegment2D & segment) {
     return segment.getAutomatonCell().hasTakenFlag() or segment.isFullyTaken();
   }), segments.end());
 }

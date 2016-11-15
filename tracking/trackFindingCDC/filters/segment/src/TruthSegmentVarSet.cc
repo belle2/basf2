@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
@@ -20,7 +20,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+bool TruthSegmentVarSet::extract(const CDCSegment2D* segment)
 {
   if (not segment) return false;
 

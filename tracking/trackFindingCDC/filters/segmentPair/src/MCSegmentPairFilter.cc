@@ -22,14 +22,14 @@ using namespace TrackFindingCDC;
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
   assert(ptrFromSegment);
   assert(ptrToSegment);
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
 

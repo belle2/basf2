@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
@@ -57,7 +57,7 @@ namespace Belle2 {
       }
 
       /// Fits the segment
-      CDCTrajectory2D fit(const CDCRecoSegment2D& segment) const
+      CDCTrajectory2D fit(const CDCSegment2D& segment) const
       {
         CDCTrajectory2D result;
         update(result, segment);

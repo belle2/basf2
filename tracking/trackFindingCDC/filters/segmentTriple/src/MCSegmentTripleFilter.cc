@@ -54,13 +54,13 @@ void MCSegmentTripleFilter::terminate()
 
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& middleSegment = *ptrMiddleSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCAxialSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
   /// Recheck the axial axial compatability
   Weight pairWeight =
@@ -105,7 +105,7 @@ void MCSegmentTripleFilter::setTrajectoryOf(const CDCSegmentTriple& segmentTripl
     return;
   }
 
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
   if (not ptrStartSegment) {
     B2WARNING("Start segment of segmentTriple is nullptr. Could not set fits.");
     return;

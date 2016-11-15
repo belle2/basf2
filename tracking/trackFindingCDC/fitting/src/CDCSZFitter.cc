@@ -103,7 +103,7 @@ namespace {
   }
 }
 
-CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& segment3D) const
+CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const
 {
   CDCTrajectorySZ trajectorySZ;
   CDCObservations2D observationsSZ;
@@ -139,14 +139,14 @@ CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& 
 
 void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 {
-  const CDCStereoRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
-  const CDCAxialRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCStereoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCAxialSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
 
   assert(ptrStereoSegment);
   assert(ptrAxialSegment);
 
-  const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
-  const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCStereoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCAxialSegment2D& axialSegment = *ptrAxialSegment;
   const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
 
   CDCTrajectorySZ trajectorySZ;
@@ -157,7 +157,7 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 }
 
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
-                         const CDCStereoRecoSegment2D& stereoSegment,
+                         const CDCStereoSegment2D& stereoSegment,
                          const CDCTrajectory2D& axialTrajectory2D) const
 {
   // recostruct the stereo segment

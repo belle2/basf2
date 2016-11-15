@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -30,7 +30,7 @@ namespace Belle2 {
        *  and simply uses the values from the contained trajectory
        *  The calling code has to ensure this situation
        */
-      Weight operator()(const CDCRecoSegment2D* segment,
+      Weight operator()(const CDCSegment2D* segment,
                         const Phi0CurvBox* phi0CurvBox)
       {
         if (segment->empty()) return NAN;

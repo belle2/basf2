@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
 #include <framework/logging/Logger.h>
@@ -26,14 +26,14 @@ SimpleSegmentPairFilter::SimpleSegmentPairFilter()
 
 Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
   assert(ptrFromSegment);
   assert(ptrToSegment);
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   // Do fits
   const CDCTrajectory2D& fromFit = getFittedTrajectory2D(fromSegment);
@@ -95,7 +95,7 @@ Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 }
 
 const CDCTrajectory2D&
-SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCRecoSegment2D& segment) const
+SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCSegment2D& segment) const
 {
   CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
   if (not trajectory2D.isFitted()) {
@@ -107,11 +107,11 @@ SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCRecoSegment2D& segment) 
 const CDCTrajectory3D&
 SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair& segmentPair) const
 {
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   // Do fits if still necessary.
   getFittedTrajectory2D(fromSegment);

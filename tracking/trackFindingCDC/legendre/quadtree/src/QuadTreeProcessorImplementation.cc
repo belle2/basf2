@@ -15,7 +15,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCRecoSegment2D* recoItem, unsigned int /*t_index*/,
+bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCSegment2D* recoItem, unsigned int /*t_index*/,
                                                  unsigned int /*r_index*/) const
 {
   float dist[2][2];

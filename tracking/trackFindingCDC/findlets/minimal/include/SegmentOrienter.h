@@ -18,15 +18,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Fixes the orientation of segments by a simple heuristic
     class SegmentOrienter:
-      public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
+      public Findlet<const CDCSegment2D, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCSegment2D, CDCSegment2D>;
 
     public:
       /// Short description of the findlet
@@ -56,8 +56,8 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the adjustment of the orientation.
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final;
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
+                 std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       /**

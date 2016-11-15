@@ -20,8 +20,8 @@ namespace Belle2 {
   class RecoTrack;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
-    class CDCRecoSegment3D;
+    class CDCSegment2D;
+    class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
 
@@ -33,7 +33,7 @@ namespace Belle2 {
       CDCTrack() {}
 
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
-      explicit CDCTrack(const CDCRecoSegment2D& segment);
+      explicit CDCTrack(const CDCSegment2D& segment);
 
       /// Concats several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
@@ -52,7 +52,7 @@ namespace Belle2 {
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
-      std::vector<CDCRecoSegment3D> splitIntoSegments() const;
+      std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const

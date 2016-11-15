@@ -13,11 +13,11 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 

@@ -26,7 +26,7 @@
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
@@ -81,7 +81,7 @@ namespace Belle2 {
       StoreVectorSwapper<CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCRecoSegment2D> m_segmentsSwapper{"CDCRecoSegment2DVector"};
+      StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
 
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
@@ -91,7 +91,7 @@ namespace Belle2 {
       std::vector<CDCWireHit> m_wireHits;
 
       /// Memory for the segments
-      std::vector<CDCRecoSegment2D> m_segments;
+      std::vector<CDCSegment2D> m_segments;
 
       /// Memory for the tracks
       std::vector<CDCTrack> m_tracks;

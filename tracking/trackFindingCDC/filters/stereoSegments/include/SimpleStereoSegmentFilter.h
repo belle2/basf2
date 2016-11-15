@@ -14,15 +14,15 @@
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentVarSet.h>
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentTruthVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class SimpleStereoSegmentFilter : public Filter<std::pair<const CDCRecoSegment3D*, const CDCTrack*>> {
+    class SimpleStereoSegmentFilter : public Filter<std::pair<const CDCSegment3D*, const CDCTrack*>> {
     public:
-      Weight operator()(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>& pairToTest) override
+      Weight operator()(const std::pair<const CDCSegment3D*, const CDCTrack*>& pairToTest) override
       {
-        const CDCRecoSegment3D& recoSegment3D = *pairToTest.first;
+        const CDCSegment3D& segment3D = *pairToTest.first;
         const CDCTrack& track = *pairToTest.second;
 
         const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -30,11 +30,11 @@ namespace Belle2 {
         const bool isCurler = trajectory2D.isCurler();
         const double radius = trajectory2D.getLocalCircle()->absRadius();
 
-        const ISuperLayer recoSegmentSuperLayer = recoSegment3D.getISuperLayer();
+        const ISuperLayer segmentSuperLayer = segment3D.getISuperLayer();
 
         const unsigned int numberOfHitsInSameSuperLayer = std::count_if(track.begin(),
-        track.end(), [&recoSegmentSuperLayer](const CDCRecoHit3D & recoHit) -> bool {
-          return recoHit.getISuperLayer() == recoSegmentSuperLayer;
+        track.end(), [&segmentSuperLayer](const CDCRecoHit3D & recoHit) -> bool {
+          return recoHit.getISuperLayer() == segmentSuperLayer;
         });
 
         if (numberOfHitsInSameSuperLayer > 0 and not isCurler) {
@@ -46,9 +46,9 @@ namespace Belle2 {
         unsigned int numberOfHitsOnWrongSide = 0;
         double sumDistanceToTrack = 0;
 
-        std::vector<double> arcLength2DList(recoSegment3D.size());
+        std::vector<double> arcLength2DList(segment3D.size());
 
-        for (const CDCRecoHit3D& recoHit3D : recoSegment3D.items()) {
+        for (const CDCRecoHit3D& recoHit3D : segment3D.items()) {
           const CDCWire& wire = recoHit3D.getWire();
           const Vector3D& reconstructedPosition = recoHit3D.getRecoPos3D();
 

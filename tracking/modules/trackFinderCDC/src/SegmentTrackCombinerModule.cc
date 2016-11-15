@@ -19,7 +19,7 @@
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
@@ -141,7 +141,7 @@ void SegmentTrackCombinerModule::terminate()
 }
 
 // Do the combination work. See the SegmentTrackCombiner methods for full details.
-void SegmentTrackCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments,
+void SegmentTrackCombinerModule::generate(std::vector<TrackFindingCDC::CDCSegment2D>& segments,
                                           std::vector<TrackFindingCDC::CDCTrack>& tracks)
 {
   // Resort hits for the arc length information

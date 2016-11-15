@@ -18,17 +18,17 @@ using namespace TrackFindingCDC;
 
 Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
-  const CDCStereoRecoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
+  const CDCAxialSegment2D* ptrStartSegment = segmentTriple.getStartSegment();
+  const CDCStereoSegment2D* ptrMiddleSegment = segmentTriple.getMiddleSegment();
+  const CDCAxialSegment2D* ptrEndSegment = segmentTriple.getEndSegment();
 
   assert(ptrStartSegment);
   assert(ptrMiddleSegment);
   assert(ptrEndSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCStereoRecoSegment2D& middleSegment = *ptrMiddleSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCAxialSegment2D& startSegment = *ptrStartSegment;
+  const CDCStereoSegment2D& middleSegment = *ptrMiddleSegment;
+  const CDCAxialSegment2D& endSegment = *ptrEndSegment;
 
   const double toleranceFraction = 0.0;
 
@@ -66,7 +66,7 @@ Weight SimpleSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTrip
   if (fbInfo != EForwardBackward::c_Forward) return NAN;
 
   // Reconstruct the middle stereo segment
-  CDCRecoSegment3D reconstructedMiddle;
+  CDCSegment3D reconstructedMiddle;
   for (const CDCRecoHit2D& recoHit2D : middleSegment) {
     reconstructedMiddle.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D));
     if (not reconstructedMiddle.back().isInCellZBounds(toleranceFraction)) {

@@ -26,15 +26,15 @@ namespace Belle2 {
   class ModuleParamList;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Fits segments with the Riemann method.
     class SegmentFitter:
-      public Findlet<CDCRecoSegment2D&> {
+      public Findlet<CDCSegment2D&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCRecoSegment2D&>;
+      using Super = Findlet<CDCSegment2D&>;
 
     public:
       /// Short description of the findlet
@@ -48,7 +48,7 @@ namespace Belle2 {
 
     public:
       /// Main algorithm applying the fit to each segment
-      void apply(std::vector<CDCRecoSegment2D>& outputSegments) override;
+      void apply(std::vector<CDCSegment2D>& outputSegments) override;
 
     private:
       /// Parameter : Switch to use Karimaki fit

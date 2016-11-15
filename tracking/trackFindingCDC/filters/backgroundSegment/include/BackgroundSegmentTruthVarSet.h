@@ -12,7 +12,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Truth var set for finding background segments.
     class BackgroundSegmentTruthVarSet : public TruthSegmentVarSet {
@@ -23,7 +23,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the cluster
-      bool extract(const CDCRecoSegment2D* segment) final {
+      bool extract(const CDCSegment2D* segment) final {
         bool extracted = Super::extract(segment);
         var<named("truth")>() = var<named("segment_is_fake_truth")>();
         return extracted;

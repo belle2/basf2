@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
@@ -25,12 +25,12 @@ namespace Belle2 {
       CDCSegmentPair();
 
       /// Constructor from two segments
-      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                     const CDCRecoSegment2D* toSegment);
+      CDCSegmentPair(const CDCSegment2D* fromSegment,
+                     const CDCSegment2D* toSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                     const CDCRecoSegment2D* toSegment,
+      CDCSegmentPair(const CDCSegment2D* fromSegment,
+                     const CDCSegment2D* toSegment,
                      const CDCTrajectory3D& trajectory3D);
 
       /// Equality comparision based on the pointers to the stored segments.
@@ -48,11 +48,11 @@ namespace Belle2 {
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
       friend bool operator<(const CDCSegmentPair& segmentPair,
-                            const CDCRecoSegment2D* segment)
+                            const CDCSegment2D* segment)
       { return segmentPair.getFromSegment() < segment; }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
-      friend bool operator<(const CDCRecoSegment2D* segment,
+      friend bool operator<(const CDCSegment2D* segment,
                             const CDCSegmentPair& segmentPair)
       { return segment < segmentPair.getFromSegment(); }
 
@@ -97,36 +97,36 @@ namespace Belle2 {
       { return getFromSegment()->size() + getToSegment()->size(); }
 
       /// Getter for the from segment.
-      const CDCRecoSegment2D* getFromSegment() const
+      const CDCSegment2D* getFromSegment() const
       { return m_fromSegment; }
 
       /// Setter for the from segment.
-      void setFromSegment(const CDCRecoSegment2D* fromSegment)
+      void setFromSegment(const CDCSegment2D* fromSegment)
       { setSegments(fromSegment, getToSegment()); }
 
 
 
       /// Getter for the to segment.
-      const CDCRecoSegment2D* getToSegment() const
+      const CDCSegment2D* getToSegment() const
       { return m_toSegment; }
 
       /// Setter for the to segment.
-      void setToSegment(const CDCRecoSegment2D* toSegment)
+      void setToSegment(const CDCSegment2D* toSegment)
       { setSegments(getFromSegment(), toSegment); }
 
 
 
       /// Getter for the stereo segment
-      const CDCRecoSegment2D* getStereoSegment() const
+      const CDCSegment2D* getStereoSegment() const
       { return getFromStereoKind() != EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
       /// Getter for the axial segment
-      const CDCRecoSegment2D* getAxialSegment() const
+      const CDCSegment2D* getAxialSegment() const
       { return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
 
       /// Setter for both segments simultaniously
-      void setSegments(const CDCRecoSegment2D* fromSegment, const CDCRecoSegment2D* toSegment)
+      void setSegments(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment)
       {
         m_fromSegment = fromSegment;
         m_toSegment = toSegment;
@@ -242,10 +242,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the from segment
-      const CDCRecoSegment2D* m_fromSegment;
+      const CDCSegment2D* m_fromSegment;
 
       /// Reference to the to segment
-      const CDCRecoSegment2D* m_toSegment;
+      const CDCSegment2D* m_toSegment;
 
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;

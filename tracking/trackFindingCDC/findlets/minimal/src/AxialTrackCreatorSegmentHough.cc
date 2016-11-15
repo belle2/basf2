@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -124,16 +124,16 @@ void AxialTrackCreatorSegmentHough::initialize()
   m_houghTree.initialize();
 }
 
-void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& segments,
+void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segments,
                                           std::vector<CDCTrack>& tracks)
 {
   m_houghTree.fell();
 
   size_t nAxialHits = 0;
-  std::vector<const Belle2::TrackFindingCDC::CDCRecoSegment2D*> ptrAxialSegments;
+  std::vector<const Belle2::TrackFindingCDC::CDCSegment2D*> ptrAxialSegments;
   ptrAxialSegments.reserve(segments.size());
 
-  for (const CDCRecoSegment2D& segment : segments) {
+  for (const CDCSegment2D& segment : segments) {
     if (segment.getStereoKind() == EStereoKind::c_Axial) {
       ptrAxialSegments.push_back(&segment);
       nAxialHits += segment.size();
@@ -145,7 +145,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
 
   Weight minWeight = std::min(m_param_minNHits, nAxialHits * m_param_minFractionNHits);
 
-  using Candidate = std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> >;
+  using Candidate = std::pair<HoughBox, std::vector<const CDCSegment2D*> >;
   std::vector<Candidate> candidates = m_houghTree.findBest(minWeight);
 
   for (const Candidate& candidate : candidates) {
@@ -153,8 +153,8 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
     CDCObservations2D observations;
 
     const HoughBox& foundHoughBox = candidate.first;
-    const std::vector<const CDCRecoSegment2D*>& foundSegments = candidate.second;
-    for (const CDCRecoSegment2D* segment : foundSegments) {
+    const std::vector<const CDCSegment2D*>& foundSegments = candidate.second;
+    for (const CDCSegment2D* segment : foundSegments) {
       observations.appendRange(*segment);
     }
     CDCTrajectory2D trajectory2D = fitter.fit(observations);
@@ -171,7 +171,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCRecoSegment2D>& s
     }
 
     CDCTrack track;
-    for (const CDCRecoSegment2D* segment : foundSegments) {
+    for (const CDCSegment2D* segment : foundSegments) {
       for (const CDCRecoHit2D& recoHit2D : *segment) {
         track.push_back(CDCRecoHit3D::reconstruct(recoHit2D, trajectory2D));
       }

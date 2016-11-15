@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration.
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Names of the variables to be generated.
     constexpr
@@ -29,7 +29,7 @@ namespace Belle2 {
      *  Class that specifies the names of the variables
      *  that should be generated from a segment
      */
-    class BasicSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    class BasicSegmentVarNames : public VarNames<CDCSegment2D> {
 
     public:
       /// Number of variables to be generated.
@@ -51,7 +51,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the facet relation
-      bool extract(const CDCRecoSegment2D* ptrSegment2D) final;
+      bool extract(const CDCSegment2D* ptrSegment2D) final;
     };
   }
 }

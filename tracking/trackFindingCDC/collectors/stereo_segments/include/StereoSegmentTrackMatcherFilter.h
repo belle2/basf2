@@ -20,7 +20,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// A Matcher Algorithm for adding stereo segments to tracks using a configurable filter (e.g. TMVA).
     class StereoSegmentTrackMatcherFilter : public FilterBasedMatcher<StereoSegmentFilterFactory> {
@@ -29,11 +29,11 @@ namespace Belle2 {
       using CollectorItem = CDCTrack;
 
       /// Use segments as collection items.
-      using CollectionItem = CDCRecoSegment2D;
+      using CollectionItem = CDCSegment2D;
 
       /// Use the given filter (via the module parameters) to find a matching.
       std::vector<WithWeight<const CollectionItem*> >
-      match(const CDCTrack& track, const std::vector<CDCRecoSegment2D>& recoSegments);
+      match(const CDCTrack& track, const std::vector<CDCSegment2D>& segments);
     };
   }
 }

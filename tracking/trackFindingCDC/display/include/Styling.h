@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/display/Mapping.h>
 #include <tracking/trackFindingCDC/display/AttributeMap.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <cdc/dataobjects/CDCHit.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
@@ -193,11 +193,11 @@ namespace Belle2 {
      * This Class handles the mapping from the colormapping-method name given as a string to the
      * actual AColorMap for CDCSegments.
      */
-    class ChooseableSegmentStyling : public ChooseableStyling<const CDCRecoSegment2D> {
+    class ChooseableSegmentStyling : public ChooseableStyling<const CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = ChooseableStyling<const CDCRecoSegment2D>;
+      using Super = ChooseableStyling<const CDCSegment2D>;
 
       /// Mapping to be constructed
       using Super::ObjectMapping;

@@ -95,8 +95,8 @@ namespace Belle2 {
                         const std::string& strokeWidth);
 
       /**
-       * Draws CDCRecoSegments.
-       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
+       * Draws CDCSegments.
+       * @param storeObjName The name of the StoreVector containing the CDCSegments.
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
@@ -106,7 +106,7 @@ namespace Belle2 {
 
       /**
        * Draws SegmentTrajectories.
-       * @param storeObjName The name of the StoreVector containing the CDCRecoSegments.
+       * @param storeObjName The name of the StoreVector containing the CDCSegments.
        * @param stroke Either the color to be used for drawing or the name of the method, which maps the CDCHit and its id to a color.
        * @param strokeWidth Either the stroke-width to be used for drawing or the name of the method, which maps the CDCHit and its id to a stroke-width.
        */
@@ -208,7 +208,7 @@ namespace Belle2 {
        * This routine creates the true segment pairs from the stored segments to get
        * an overview which cases the segment triple reconstruction should cover.
        *
-       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCSegment2Ds,
        *                              from which the pair should be constructed.
        * @param stroke                Color of the lines to be drawn.
        * @param strokeWidth           Width of the lines to be drawn.
@@ -223,7 +223,7 @@ namespace Belle2 {
        * This routine creates the true axial segment pairs from the stored segments to get
        * an overview which cases the segment triple reconstruction should cover.
        *
-       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCSegment2Ds,
        *                              from which the pair should be constructed.
        * @param stroke                Color of the lines to be drawn.
        * @param strokeWidth           Width of the lines to be drawn.
@@ -238,7 +238,7 @@ namespace Belle2 {
        * This routine creates the true segment triples from the stored segments to get
        * an overview which cases the segment triple reconstruction should cover.
        *
-       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCRecoSegment2Ds,
+       * @param segmentsStoreObjName  The name of the StoreVector containing the CDCSegment2Ds,
        *                              from which the pair should be constructed.
        * @param stroke                Color of the lines to be drawn.
        * @param strokeWidth           Width of the lines to be drawn.

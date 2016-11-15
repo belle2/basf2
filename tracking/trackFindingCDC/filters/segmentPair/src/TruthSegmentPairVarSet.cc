@@ -25,11 +25,11 @@ bool TruthSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 
   const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
   const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();

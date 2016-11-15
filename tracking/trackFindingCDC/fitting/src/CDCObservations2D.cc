@@ -12,8 +12,8 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitSegment.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitTriple.h>
@@ -224,19 +224,19 @@ std::size_t CDCObservations2D::append(const CDCRecoHit3D& recoHit3D)
   return fill(fitPos2D, signedDriftLength, 1 / variance);
 }
 
-std::size_t CDCObservations2D::appendRange(const CDCRecoSegment2D& recoSegment2D)
+std::size_t CDCObservations2D::appendRange(const CDCSegment2D& segment2D)
 {
   std::size_t nAppendedHits = 0;
-  for (const CDCRecoHit2D& recoHit2D : recoSegment2D) {
+  for (const CDCRecoHit2D& recoHit2D : segment2D) {
     nAppendedHits += append(recoHit2D);
   }
   return nAppendedHits;
 }
 
-std::size_t CDCObservations2D::appendRange(const CDCRecoSegment3D& recoSegment3D)
+std::size_t CDCObservations2D::appendRange(const CDCSegment3D& segment3D)
 {
   std::size_t nAppendedHits = 0;
-  for (const CDCRecoHit3D& recoHit3D : recoSegment3D) {
+  for (const CDCRecoHit3D& recoHit3D : segment3D) {
     nAppendedHits += append(recoHit3D);
   }
   return nAppendedHits;
@@ -245,15 +245,15 @@ std::size_t CDCObservations2D::appendRange(const CDCRecoSegment3D& recoSegment3D
 std::size_t CDCObservations2D::appendRange(const CDCAxialSegmentPair& axialSegmentPair)
 {
   std::size_t nAppendedHits = 0;
-  const CDCRecoSegment2D* ptrStartSegment2D = axialSegmentPair.getStartSegment();
+  const CDCSegment2D* ptrStartSegment2D = axialSegmentPair.getStartSegment();
   if (ptrStartSegment2D) {
-    const CDCRecoSegment2D& startSegment2D = *ptrStartSegment2D;
+    const CDCSegment2D& startSegment2D = *ptrStartSegment2D;
     nAppendedHits += appendRange(startSegment2D);
   }
 
-  const CDCRecoSegment2D* ptrEndSegment2D = axialSegmentPair.getEndSegment();
+  const CDCSegment2D* ptrEndSegment2D = axialSegmentPair.getEndSegment();
   if (ptrEndSegment2D) {
-    const CDCRecoSegment2D& endSegment2D = *ptrEndSegment2D;
+    const CDCSegment2D& endSegment2D = *ptrEndSegment2D;
     nAppendedHits += appendRange(endSegment2D);
   }
   return nAppendedHits;

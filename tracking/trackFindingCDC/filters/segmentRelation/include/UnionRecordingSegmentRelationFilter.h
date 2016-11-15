@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /// Create a concrete variables set for segments from a name.
 
-      std::unique_ptr<BaseVarSet<Relation<const CDCRecoSegment2D> > >
+      std::unique_ptr<BaseVarSet<Relation<const CDCSegment2D> > >
       createVarSet(const std::string& name) const override;
     };
   }

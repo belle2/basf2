@@ -16,7 +16,7 @@ using namespace TrackFindingCDC;
 
 TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule()
   : TrackFinderCDCBaseModule()
-  , m_param_segmentsStoreObjName("CDCRecoSegment2DVector")
+  , m_param_segmentsStoreObjName("CDCSegment2DVector")
 {
   this->addParam("SegmentsStoreObjName",
                  m_param_segmentsStoreObjName,
@@ -27,18 +27,18 @@ TrackFinderCDCFromSegmentsModule::TrackFinderCDCFromSegmentsModule()
 void TrackFinderCDCFromSegmentsModule::initialize()
 {
   TrackFinderCDCBaseModule::initialize();
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(m_param_segmentsStoreObjName);
-  storedRecoSegments.isRequired();
+  StoreWrappedObjPtr<std::vector<CDCSegment2D>> storedSegments(m_param_segmentsStoreObjName);
+  storedSegments.isRequired();
 }
 
 void TrackFinderCDCFromSegmentsModule::generate(std::vector<CDCTrack>& tracks)
 {
 // Aquire the store vector
-  StoreWrappedObjPtr<std::vector<CDCRecoSegment2D>> storedRecoSegments(m_param_segmentsStoreObjName);
-  if (not storedRecoSegments) {
+  StoreWrappedObjPtr<std::vector<CDCSegment2D>> storedSegments(m_param_segmentsStoreObjName);
+  if (not storedSegments) {
     B2WARNING("The segments have not been created.");
     return;
   }
-  std::vector<CDCRecoSegment2D>& segments = *storedRecoSegments;
+  std::vector<CDCSegment2D>& segments = *storedSegments;
   this->generate(segments, tracks);
 }

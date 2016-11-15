@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
@@ -29,11 +29,11 @@ namespace Belle2 {
 
     /// Merges segments in the same super cluster by linking paths of segments in a cellular automaton
     template <class SegmentRelationFilter>
-    class SegmentMerger : public Findlet<const CDCRecoSegment2D, CDCRecoSegment2D> {
+    class SegmentMerger : public Findlet<const CDCSegment2D, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCSegment2D, CDCSegment2D>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
@@ -54,14 +54,14 @@ namespace Belle2 {
 
     public:
       /// Main algorithm
-      void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                 std::vector<CDCRecoSegment2D>& outputSegments) final {
-        std::vector<ConstVectorRange<CDCRecoSegment2D> > segmentsByISuperCluster =
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
+                 std::vector<CDCSegment2D>& outputSegments) final {
+        std::vector<ConstVectorRange<CDCSegment2D> > segmentsByISuperCluster =
         adjacent_groupby(inputSegments.begin(),
         inputSegments.end(),
-        mem_fn(&CDCRecoSegment2D::getISuperCluster));
+        mem_fn(&CDCSegment2D::getISuperCluster));
 
-        for (const ConstVectorRange<CDCRecoSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster)
+        for (const ConstVectorRange<CDCSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster)
         {
           if (segmentsInSuperCluster.size() == 1) {
             // What is the difference between a duck?
@@ -70,31 +70,31 @@ namespace Belle2 {
           }
 
           m_segmentRelations.clear();
-          WeightedNeighborhood<const CDCRecoSegment2D>::appendUsing(m_segmentRelationFilter,
-                                                                    segmentsInSuperCluster,
-                                                                    m_segmentRelations);
-          WeightedNeighborhood<const CDCRecoSegment2D> segmentNeighborhood(m_segmentRelations);
+          WeightedNeighborhood<const CDCSegment2D>::appendUsing(m_segmentRelationFilter,
+                                                                segmentsInSuperCluster,
+                                                                m_segmentRelations);
+          WeightedNeighborhood<const CDCSegment2D> segmentNeighborhood(m_segmentRelations);
 
           m_segmentPaths.clear();
           m_cellularPathFinder.apply(segmentsInSuperCluster,
                                      segmentNeighborhood,
                                      m_segmentPaths);
 
-          for (const Path<const CDCRecoSegment2D>& segmentPath : m_segmentPaths) {
-            outputSegments.push_back(CDCRecoSegment2D::condense(segmentPath));
+          for (const Path<const CDCSegment2D>& segmentPath : m_segmentPaths) {
+            outputSegments.push_back(CDCSegment2D::condense(segmentPath));
           }
         }
       }
 
     private:
       /// Instance of the cellular automaton path finder
-      MultipassCellularPathFinder<const CDCRecoSegment2D> m_cellularPathFinder;
+      MultipassCellularPathFinder<const CDCSegment2D> m_cellularPathFinder;
 
       /// Memory for the relations between segments to be followed on merge
-      std::vector<WeightedRelation<const CDCRecoSegment2D> > m_segmentRelations;
+      std::vector<WeightedRelation<const CDCSegment2D> > m_segmentRelations;
 
       /// Memory for the segment paths generated from the graph.
-      std::vector< Path<const CDCRecoSegment2D> > m_segmentPaths;
+      std::vector< Path<const CDCSegment2D> > m_segmentPaths;
 
       /// Wire hit neighborhood relation filter
       SegmentRelationFilter m_segmentRelationFilter;

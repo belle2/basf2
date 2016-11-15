@@ -20,7 +20,8 @@
 
 // we know all of this is deprecated, we don't want the warnings when compiling the service itself ...
 #ifdef __INTEL_COMPILER
-#pragma warning (disable:1478)
+#pragma warning (disable:1478) //[[deprecated]]
+#pragma warning (disable:1786) //[[deprecated("message")]]
 #else
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif

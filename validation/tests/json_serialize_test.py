@@ -16,9 +16,9 @@ class TestJsonSerialize(unittest.TestCase):
 
     def test_serialize_comparison(self):
 
-        revs = [json_objects.Revision("run1", ""),
-                json_objects.Revision("run2", ""),
-                json_objects.Revision("arun", "")]
+        revs = [json_objects.Revision("run1", "iae223auiae", ""),
+                json_objects.Revision("run2", "iuiaehuiaen", ""),
+                json_objects.Revision("arun", "buie223aae", "")]
 
         cplot = json_objects.ComparisonPlot("plot_one")
 
@@ -40,8 +40,8 @@ class TestJsonSerialize(unittest.TestCase):
         self.assertEqual("pack1", js_decode["packages"][0]["name"])
 
     def test_serialize_revision_nested(self):
-        rr1 = json_objects.Revision("label1", "date", "black")
-        rr2 = json_objects.Revision("label2", "date", "black")
+        rr1 = json_objects.Revision("label1", "date", "iae223auiae", "black")
+        rr2 = json_objects.Revision("label2", "date", "iuiaehuiaen", "black")
         rlist = json_objects.Revisions([rr1, rr2])
 
         js = json_objects.dumps(rlist)

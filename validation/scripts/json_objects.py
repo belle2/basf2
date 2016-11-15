@@ -14,22 +14,29 @@ class JsonBase:
 class Revision(JsonBase):
 
     """
-    Contains information about a specific revsion
+    Contains information about a specific revision
     """
 
-    def __init__(self, label, creation_date, packages=None):
+    def __init__(self, label, git_hash, creation_date, packages=None):
         """
         Create a new Revision object and fill all members
         """
 
         #: label (or tag) used to display this revision
         self.label = label
+
         #: date when the validation output of this revision
         #  was created, as datetime object
         self.creation_date = creation_date
+
+        # The git commit hash which has the HEAD while the validation
+        # scripts were executed
+        self.git_hash = git_hash
+
         #: is this the most recent revision in the list this
         #  revision is contained ?
         self.most_recent = False
+
         #: list of packages contained in this revision
         self.packages = [] if (packages is None) else packages
 

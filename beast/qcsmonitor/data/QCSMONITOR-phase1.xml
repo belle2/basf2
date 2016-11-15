@@ -15,7 +15,7 @@
          whitespace, comma or semi-colon -->
     <bar unit="cm">1 
     </bar>
-    <ScintCell>1</ScintCell>
+    <ScintCell>2</ScintCell>
     <TimeStep>0.8</TimeStep>
     <MinTime>0.0</MinTime>
     <MaxTime>600.0</MaxTime>

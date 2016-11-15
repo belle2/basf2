@@ -203,7 +203,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
 
     def initialize(self):
         super().initialize()
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()

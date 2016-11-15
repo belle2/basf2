@@ -7,18 +7,13 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    /// Legacy for python : interface to obtain the two dimensional segment mc lookup
-    class CDCMCSegmentLookUp {
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-    public:
-      /// Getter for the singletone instance
-      static const CDCMCSegment2DLookUp& getInstance();
-    };
-  }
+const CDCMCSegment2DLookUp& CDCMCSegment2DLookUp::getInstance()
+{
+  return CDCMCManager::getMCSegment2DLookUp();
 }

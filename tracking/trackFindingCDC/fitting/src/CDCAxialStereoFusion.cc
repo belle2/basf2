@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/utilities/GetValueType.h>
@@ -150,7 +150,7 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCRecoSegment2D& fr
   CDCTrajectorySZ trajectorySZ;
   const bool mcTruthReference = false;
   if (mcTruthReference) {
-    const CDCMCSegmentLookUp& theMCSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+    const CDCMCSegment2DLookUp& theMCSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
     CDCTrajectory3D axialMCTrajectory3D = theMCSegmentLookUp.getTrajectory3D(&axialSegment2D);
     Vector3D localOrigin3D =  axialMCTrajectory3D.getLocalOrigin();
     localOrigin3D.setXY(axialTrajectory2D.getLocalOrigin());

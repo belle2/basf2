@@ -232,7 +232,7 @@ class SegmentPairFitValidationModule(harvesting.HarvestingModule):
         self.mc_segment_lookup = None
 
     def initialize(self):
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         super(SegmentPairFitValidationModule, self).initialize()
 
     def prepare(self):

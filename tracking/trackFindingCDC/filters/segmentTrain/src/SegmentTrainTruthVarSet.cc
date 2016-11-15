@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainTruthVarSet.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/mclookup/ITrackType.h>
@@ -32,7 +32,7 @@ bool SegmentTrainTruthVarSet::extract(const
 
   // Find the track with the highest number of hits in the segment
   for (const SegmentInformation* segment : segmentTrain) {
-    const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+    const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
     ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(segment->getSegment());
     if (segmentMCMatch == INVALID_ITRACK) {
       var<named("belongs_to_same_track_truth")>() = false;

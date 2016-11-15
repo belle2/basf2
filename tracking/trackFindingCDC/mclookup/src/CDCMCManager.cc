@@ -38,7 +38,8 @@ void CDCMCManager::requireTruthInformation()
 void CDCMCManager::clear()
 {
   m_mcTrackLookUp.clear();
-  m_mcSegmentLookUp.clear();
+  m_mcSegment3DLookUp.clear();
+  m_mcSegment2DLookUp.clear();
   //m_mcHitLookUp.clear(); // Currently has no clear
 
   m_mcTrackStore.clear();

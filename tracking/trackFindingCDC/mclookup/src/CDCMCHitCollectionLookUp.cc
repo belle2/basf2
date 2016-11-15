@@ -9,8 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <TDatabasePDG.h>
 #include <boost/range/adaptor/reversed.hpp>
@@ -18,27 +17,18 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 void CDCMCHitCollectionLookUp<ACDCHitCollection>::clear()
 {
   B2DEBUG(100, "Clearing CDCMCHitCollectionLookUp<ACDCHitCollection>");
 }
 
+template <class ACDCHitCollection>
+const float CDCMCHitCollectionLookUp<ACDCHitCollection>::s_minimalMatchPurity = 0.5;
 
-
-
-template<class ACDCHitCollection>
-const float
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::s_minimalMatchPurity = 0.5;
-
-
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 ITrackType
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::getMCTrackId(const ACDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getMCTrackId(const ACDCHitCollection* ptrHits) const
 {
   if (not ptrHits) return INVALID_ITRACK;
   const ACDCHitCollection& hits = *ptrHits;
@@ -50,22 +40,18 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
   }
 }
 
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 const MCParticle*
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::getMCParticle(const ACDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getMCParticle(const ACDCHitCollection* ptrHits) const
 {
   const CDCHit* ptrHit = getFirstHit(ptrHits);
   const CDCMCHitLookUp& mcHitLookUp = CDCMCHitLookUp::getInstance();
   return mcHitLookUp.getMCParticle(ptrHit);
 }
 
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 const CDCHit*
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::getFirstHit(const ACDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getFirstHit(const ACDCHitCollection* ptrHits) const
 {
   if (not ptrHits) return nullptr;
   const ACDCHitCollection& hits = *ptrHits;
@@ -79,16 +65,11 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     if (mcTrackId == mcHitLookUp.getMCTrackId(hit)) return hit;
   }
   return nullptr;
-
 }
 
-
-
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 const CDCHit*
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::getLastHit(const ACDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getLastHit(const ACDCHitCollection* ptrHits) const
 {
 
   if (not ptrHits) return nullptr;
@@ -103,16 +84,11 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     if (mcTrackId == mcHitLookUp.getMCTrackId(hit)) return hit;
   }
   return nullptr;
-
 }
 
-
-
-
-template<class ACDCHitCollection>
-EForwardBackward
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::isForwardOrBackwardToMCTrack(const ACDCHitCollection* ptrHits) const
+template <class ACDCHitCollection>
+EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::isForwardOrBackwardToMCTrack(
+  const ACDCHitCollection* ptrHits) const
 {
   Index firstInTrackId = getFirstInTrackId(ptrHits);
   Index lastInTrackId = getLastInTrackId(ptrHits);
@@ -128,11 +104,10 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
   return EForwardBackward::c_Invalid;
 }
 
-template<class ACDCHitCollection>
-EForwardBackward
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::areAlignedInMCTrack(const ACDCHitCollection* ptrFromHits,
-                      const ACDCHitCollection* ptrToHits) const
+template <class ACDCHitCollection>
+EForwardBackward CDCMCHitCollectionLookUp<ACDCHitCollection>::areAlignedInMCTrack(
+  const ACDCHitCollection* ptrFromHits,
+  const ACDCHitCollection* ptrToHits) const
 {
   // Check if the segments are sensable on their own
   EForwardBackward fromFBInfo = isForwardOrBackwardToMCTrack(ptrFromHits);
@@ -223,7 +198,8 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
     } else {
       return EForwardBackward::c_Invalid;
     }
-  } else if (fromFBInfo == EForwardBackward::c_Backward and toFBInfo == EForwardBackward::c_Backward) {
+  } else if (fromFBInfo == EForwardBackward::c_Backward and
+             toFBInfo == EForwardBackward::c_Backward) {
     // Test if to segment lies before in the mc track
     // Hence the whole pair of segments is reverse to the track direction of flight
     if (lastInTrackIdOfToHits < firstInTrackIdOfFromHits) {
@@ -237,13 +213,9 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
   return EForwardBackward::c_Invalid;
 }
 
-
-
-
-template<class ACDCHitCollection>
+template <class ACDCHitCollection>
 CDCTrajectory3D
-CDCMCHitCollectionLookUp<ACDCHitCollection>
-::getTrajectory3D(const ACDCHitCollection* ptrHits) const
+CDCMCHitCollectionLookUp<ACDCHitCollection>::getTrajectory3D(const ACDCHitCollection* ptrHits) const
 {
   if (not ptrHits) {
     B2WARNING("Segment is nullptr. Could not get fit.");
@@ -294,7 +266,11 @@ CDCMCHitCollectionLookUp<ACDCHitCollection>
   return trajectory3D;
 }
 
-
 // Explicit instantiation for the relevant cases.
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+
 template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCRecoSegment2D>;
+template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCRecoSegment3D>;
 template class Belle2::TrackFindingCDC::CDCMCHitCollectionLookUp<CDCTrack>;

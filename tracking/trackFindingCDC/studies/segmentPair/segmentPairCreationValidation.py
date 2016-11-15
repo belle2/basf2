@@ -89,7 +89,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
     def initialize(self):
         super(SegmentPairCreationValidationModule, self).initialize()
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
         self.segment_pair_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 

@@ -12,7 +12,7 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
@@ -33,7 +33,7 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 
   if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);

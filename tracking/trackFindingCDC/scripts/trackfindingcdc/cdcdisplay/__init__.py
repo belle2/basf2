@@ -724,7 +724,7 @@ class CDCSVGDisplayModule(basf2.Module):
                     mc_axial_segment_pair_segment_filter = \
                         Belle2.TrackFindingCDC.MCAxialSegmentPairFilter()
                     mc_segment_lookup = \
-                        Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+                        Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
                     segment_triples = \
                         (Belle2.TrackFindingCDC.CDCSegmentTriple(startSegment,

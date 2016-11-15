@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,7 +26,7 @@ bool StereoSegmentTruthVarSet::extract(const std::pair<const CDCRecoSegment3D*, 
   const CDCTrack& track = *testPair->second;
 
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
-  const CDCMCSegmentLookUp& segmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& segmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   const ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(&track);
 

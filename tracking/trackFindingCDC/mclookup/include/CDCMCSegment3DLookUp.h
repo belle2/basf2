@@ -9,16 +9,18 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCHitCollectionLookUp.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Legacy for python : interface to obtain the two dimensional segment mc lookup
-    class CDCMCSegmentLookUp {
+
+    /// Specialisation of the lookup for the truth values of two dimensional segments.
+    class CDCMCSegment3DLookUp : public CDCMCHitCollectionLookUp<CDCRecoSegment3D> {
 
     public:
       /// Getter for the singletone instance
-      static const CDCMCSegment2DLookUp& getInstance();
+      static const CDCMCSegment3DLookUp& getInstance();
     };
   }
 }

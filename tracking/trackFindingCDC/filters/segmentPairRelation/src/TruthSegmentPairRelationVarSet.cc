@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 
 using namespace Belle2;
@@ -33,7 +33,7 @@ bool TruthSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair
   const CDCRecoSegment2D& middleSegment = *fromSegmentPair.getToSegment();
   const CDCRecoSegment2D& endSegment = *toSegmentPair.getToSegment();
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const std::map<ITrackType, CDCMCTrackStore::CDCHitVector>& mcTracks =
     mcTrackStore.getMCTracksByMCParticleIdx();

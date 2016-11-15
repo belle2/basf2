@@ -10,7 +10,7 @@
 #include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -25,7 +25,7 @@ bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
   if (not segment) return false;
 
   // Find the track with the highest number of hits in the segment
-  const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
   const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
 
   ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(segment);

@@ -604,7 +604,7 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
         if mcTrackId < 0:
@@ -627,7 +627,7 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
@@ -656,7 +656,7 @@ class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         firstInTrackId = mcSegmentLookUp.getFirstInTrackId(segment)
@@ -679,7 +679,7 @@ class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         lastInTrackId = mcSegmentLookUp.getLastInTrackId(segment)
@@ -702,7 +702,7 @@ class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         firstNPassedSuperLayers = \
@@ -726,7 +726,7 @@ class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         lastNPassedSuperLayers = \

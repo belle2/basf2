@@ -57,7 +57,7 @@ void NaiveCombinerModule::generate(std::vector<TrackFindingCDC::CDCRecoSegment2D
   } else {
     CDCMCManager::getInstance().fill();
 
-    const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+    const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
     const CDCMCHitLookUp& mcHitLookup =  CDCMCHitLookUp::getInstance();
 
 

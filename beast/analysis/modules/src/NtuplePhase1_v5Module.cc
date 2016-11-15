@@ -454,10 +454,10 @@ namespace Belle2 {
     m_tree->SetBranchAddress("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
     m_tree->SetBranchAddress("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
     m_tree->SetBranchAddress("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_HER_correctedbeamSize_xray_Y", &(m_beast.SKB_HER_correctedbeamSize_xray_Y));
+    m_tree->SetBranchAddress("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
     m_tree->SetBranchAddress("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
     m_tree->SetBranchAddress("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_tree->SetBranchAddress("SKB_LER_correctedbeamSize_xray_Y", &(m_beast.SKB_LER_correctedbeamSize_xray_Y));
+    m_tree->SetBranchAddress("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
     m_tree->SetBranchAddress("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
     m_tree->SetBranchAddress("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
     m_tree->SetBranchAddress("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
@@ -519,10 +519,10 @@ namespace Belle2 {
     m_treeBEAST->Branch("SKB_LER_collimatorPositions_fromBeam", &(m_beast.SKB_LER_collimatorPositions_fromBeam));
     m_treeBEAST->Branch("SKB_HER_beamSize_xray_X", &(m_beast.SKB_HER_beamSize_xray_X));
     m_treeBEAST->Branch("SKB_HER_beamSize_xray_Y", &(m_beast.SKB_HER_beamSize_xray_Y));
-    m_treeBEAST->Branch("SKB_HER_correctedbeamSize_xray_Y", &(m_beast.SKB_HER_correctedbeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_HER_correctedBeamSize_xray_Y", &(m_beast.SKB_HER_correctedBeamSize_xray_Y));
     m_treeBEAST->Branch("SKB_LER_beamSize_xray_X", &(m_beast.SKB_LER_beamSize_xray_X));
     m_treeBEAST->Branch("SKB_LER_beamSize_xray_Y", &(m_beast.SKB_LER_beamSize_xray_Y));
-    m_treeBEAST->Branch("SKB_LER_correctedbeamSize_xray_Y", &(m_beast.SKB_LER_correctedbeamSize_xray_Y));
+    m_treeBEAST->Branch("SKB_LER_correctedBeamSize_xray_Y", &(m_beast.SKB_LER_correctedBeamSize_xray_Y));
     m_treeBEAST->Branch("SKB_LER_beamSize_SR_X", &(m_beast.SKB_LER_beamSize_SR_X));
     m_treeBEAST->Branch("SKB_LER_beamSize_SR_Y", &(m_beast.SKB_LER_beamSize_SR_Y));
     m_treeBEAST->Branch("SKB_HER_beamSize_SR_X", &(m_beast.SKB_HER_beamSize_SR_X));
@@ -720,10 +720,14 @@ namespace Belle2 {
     if (m_beast.SKB_LER_pressure_average != 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9;
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
-    if (m_beast.SKB_HER_correctedbeamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_correctedbeamSize_xray_Y->at(0);
+    if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0);
+    //if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_HER_beamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
     if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
     double sigma_y_LER = 0;
-    if (m_beast.SKB_LER_correctedbeamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_correctedbeamSize_xray_Y->at(0);
+    if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0);
+    //if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_LER_beamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
     if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
     double bunch_nb_HER = 0;
     if (m_beast.SKB_HER_injectionNumberOfBunches != 0) bunch_nb_HER = m_beast.SKB_HER_injectionNumberOfBunches->at(0);

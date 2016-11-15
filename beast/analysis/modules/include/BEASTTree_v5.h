@@ -47,10 +47,10 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_injectionNumberOfBunches;/** */
       std::vector<double>*  SKB_HER_beamSize_xray_X;/** */
       std::vector<double>*  SKB_HER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_HER_correctedbeamSize_xray_Y;/** */
+      std::vector<double>*  SKB_HER_correctedBeamSize_xray_Y;/** */
       std::vector<double>*  SKB_LER_beamSize_xray_X;/** */
       std::vector<double>*  SKB_LER_beamSize_xray_Y;/** */
-      std::vector<double>*  SKB_LER_correctedbeamSize_xray_Y;/** */
+      std::vector<double>*  SKB_LER_correctedBeamSize_xray_Y;/** */
       std::vector<double>*  SKB_HER_beamSize_SR_Y;/** */
       std::vector<double>*  SKB_LER_beamSize_SR_Y;/** */
       std::vector<double>*  SKB_HER_beamSize_SR_X;/** */
@@ -207,10 +207,10 @@ namespace Belle2 {
         SKB_LER_collimatorPositions_fromBeam = 0;
         SKB_HER_beamSize_xray_X = 0;
         SKB_HER_beamSize_xray_Y = 0;
-        SKB_HER_correctedbeamSize_xray_Y = 0;
+        SKB_HER_correctedBeamSize_xray_Y = 0;
         SKB_LER_beamSize_xray_X = 0;
         SKB_LER_beamSize_xray_Y = 0;
-        SKB_LER_correctedbeamSize_xray_Y = 0;
+        SKB_LER_correctedBeamSize_xray_Y = 0;
         SKB_LER_beamSize_SR_X = 0;
         SKB_LER_beamSize_SR_Y = 0;
         SKB_HER_beamSize_SR_X = 0;

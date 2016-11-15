@@ -12,6 +12,7 @@
 #define EKLMRAWPACKER_H
 
 /* C++ headers. */
+#include <cstdint>
 #include <map>
 
 /* Belle2 headers. */
@@ -77,9 +78,8 @@ namespace Belle2 {
      * @param[out] bword4 Fourth word.
      */
     void formatData(int endcap, int layer, int sector, int plane, int strip,
-                    int charge, float ctime, unsigned short& bword1,
-                    unsigned short& bword2, unsigned short& bword3,
-                    unsigned short& bword4);
+                    int charge, float ctime, uint16_t& bword1,
+                    uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
     //! to map logical coordinates to hardware coordinates
     std::map<int, int> m_ModuleIdToelectId;

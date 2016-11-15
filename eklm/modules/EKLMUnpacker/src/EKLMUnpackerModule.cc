@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+/* C++ headers. */
+#include <cstdint>
+
 /* Belle2 headers. */
 #include <eklm/dataobjects/EKLMDigit.h>
 #include <eklm/modules/EKLMUnpacker/EKLMUnpackerModule.h>
@@ -77,20 +80,20 @@ void EKLMUnpackerModule::event()
         if (numDetNwords > 0)  B2DEBUG(1, "counter is: " << (buf_slot[numDetNwords - 1] & 0xFFFF));
         for (int iHit = 0; iHit < numHits; iHit++) {
           B2DEBUG(1, "unpacking first word: " << buf_slot[iHit * hitLength + 0] << ", second: " << buf_slot[iHit * hitLength + 1]);
-          unsigned short bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
-          unsigned short bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
-          unsigned short bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
-          unsigned short bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;           //unused yet ????
+          uint16_t bword2 = buf_slot[iHit * hitLength + 0] & 0xFFFF;
+          uint16_t bword1 = (buf_slot[iHit * hitLength + 0] >> 16) & 0xFFFF;
+          uint16_t bword4 = buf_slot[iHit * hitLength + 1] & 0xFFFF;
+          uint16_t bword3 = (buf_slot[iHit * hitLength + 1] >> 16) & 0xFFFF;           //unused yet ????
           B2DEBUG(1, "unpacking " << bword1 << ", " << bword2 << ", " << bword3 << ", " << bword4);
 
-          unsigned short strip =    bword1 & 0x7F;
-          unsigned short plane = ((bword1 >> 7) & 1) + 1;
-          unsigned short sector = ((bword1 >> 8) & 3) + 1;
-          unsigned short layer = ((bword1 >> 10) & 0xF) + 1;
-          unsigned short forward = ((bword1 >> 14) & 1) + 1;
-          unsigned short ctime = bword2 & 0xFFFF; //full bword
-//          unsigned short tdc = bword3 & 0x7FF;                           // unused yet   ????
-          unsigned short charge = bword4 & 0xFFF;
+          uint16_t strip =    bword1 & 0x7F;
+          uint16_t plane = ((bword1 >> 7) & 1) + 1;
+          uint16_t sector = ((bword1 >> 8) & 3) + 1;
+          uint16_t layer = ((bword1 >> 10) & 0xF) + 1;
+          uint16_t forward = ((bword1 >> 14) & 1) + 1;
+          uint16_t ctime = bword2 & 0xFFFF; //full bword
+//          uint16_t tdc = bword3 & 0x7FF;                           // unused yet   ????
+          uint16_t charge = bword4 & 0xFFF;
           B2DEBUG(1, "copper: " << copperId << " finesse: " << finesse_num);
 
           EKLMDigit* digit = eklmDigits.appendNew();

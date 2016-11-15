@@ -114,10 +114,10 @@ void EKLMRawPackerModule::event()
 //           iPlane << " Str: " << iStrip << " Cha: " << iNPE << " T: " << fTime << endl);
 
 //MAKE WORDS WITH INFORMATION
-    unsigned short bword1 = 0;
-    unsigned short bword2 = 0;
-    unsigned short bword3 = 0;
-    unsigned short bword4 = 0;
+    uint16_t bword1 = 0;
+    uint16_t bword2 = 0;
+    uint16_t bword3 = 0;
+    uint16_t bword4 = 0;
     formatData(iForward, iLayer, iSector, iPlane, iStrip, iNPE, fTime, bword1, bword2, bword3, bword4);
     buf[0] |= bword2;
     buf[0] |= ((bword1 << 16));
@@ -212,8 +212,8 @@ void EKLMRawPackerModule::event()
 
 void EKLMRawPackerModule::formatData(
   int endcap, int layer, int sector, int plane, int strip, int charge,
-  float ctime, unsigned short& bword1, unsigned short& bword2,
-  unsigned short& bword3, unsigned short& bword4)
+  float ctime, uint16_t& bword1, uint16_t& bword2, uint16_t& bword3,
+  uint16_t& bword4)
 {
   bword1 = 0; //Mapping(1st bit - empty; 2nd bit - forward; 3,4,5,6 bits - layer; 7,8 - sector; 9 - plane; 10,11,12,13,14,15,16 - strip)
   bword2 = 0; //15 bits of time

@@ -13,6 +13,8 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
 
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <cmath>
@@ -43,7 +45,7 @@ StereoSegmentTrackMatcherFilter::match(const CDCTrack& track,
         not recoSegment2D.getAutomatonCell().hasTakenFlag()
         and not recoSegment2D.isFullyTaken(2)) {
       CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
-      const Weight weight = m_filter({{&recoSegment2D, recoSegment3D}, track});
+      const Weight weight = m_filter({&recoSegment3D, &track});
       if (not std::isnan(weight)) {
         matches.emplace_back(&recoSegment2D, weight);
       }

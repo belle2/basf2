@@ -19,14 +19,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoSegmentVarSet::extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>*
-                                  testPair)
+bool StereoSegmentVarSet::extract(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>* testPair)
 {
   if (not testPair) return false;
-
-  const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D&>& recoSegments = testPair->first;
-  const CDCRecoSegment3D& recoSegment3D = recoSegments.second;
-  const CDCTrack& track = testPair->second;
+  const CDCRecoSegment3D& recoSegment3D = *testPair->first;
+  const CDCTrack& track = *testPair->second;
 
   if (track.size() == 0) {
     return false;

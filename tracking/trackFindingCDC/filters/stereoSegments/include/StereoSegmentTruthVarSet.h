@@ -28,8 +28,7 @@ namespace Belle2 {
     /** Class that specifies the names of the variables
      *  that should be generated from a stereo hit and a track pair using MC truth.
      */
-    class StereoSegmentTruthVarNames : public
-      VarNames<std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>> {
+    class StereoSegmentTruthVarNames : public VarNames<std::pair<const CDCRecoSegment3D*, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
@@ -50,8 +49,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the pair.
-      bool extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>,
-                   const CDCTrack&>* testPair) override;
+      bool extract(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>* testPair) override;
     };
   }
 }

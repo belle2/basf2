@@ -16,7 +16,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCRecoSegment3D;
-    class CDCRecoSegment2D;
 
     /// Names of the variables to be generated.
     constexpr
@@ -44,7 +43,7 @@ namespace Belle2 {
      *  that should be generated from a stereo hit and a track pair.
      */
     class StereoSegmentVarNames : public
-      VarNames<std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>> {
+      VarNames<std::pair<const CDCRecoSegment3D*, const CDCTrack*>> {
 
     public:
       /// Number of variables to be generated.
@@ -65,8 +64,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the variables from the pair
-      bool extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>,
-                   const CDCTrack&>* testPair) override;
+      bool extract(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>* testPair) override;
     };
   }
 }

@@ -11,17 +11,14 @@
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-
 #include <utility>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
-    class CDCRecoSegment2D;
+    class CDCRecoSegment3D;
 
     /// Base filter for stereo segment - track relations.
-    using BaseStereoSegmentFilter = Filter <
-                                    std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack& >>;
+    using BaseStereoSegmentFilter = Filter<std::pair<const CDCRecoSegment3D*, const CDCTrack* >>;
   }
 }

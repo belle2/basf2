@@ -19,21 +19,21 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoSegmentTruthVarSet::extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>*
-                                       testPair)
+bool StereoSegmentTruthVarSet::extract(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>* testPair)
 {
   if (not testPair) return false;
-
-  const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D&>& recoSegments = testPair->first;
-  const CDCTrack& track = testPair->second;
-
-  const CDCRecoSegment2D* recoSegment2D = recoSegments.first;
+  const CDCRecoSegment3D& recoSegment3D = *testPair->first;
+  const CDCTrack& track = *testPair->second;
 
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
   const CDCMCSegmentLookUp& segmentLookUp = CDCMCSegmentLookUp::getInstance();
 
   const ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(&track);
-  const ITrackType segmentMCTrack = segmentLookUp.getMCTrackId(recoSegment2D);
+
+  // FIXME : Segment look up does not support the direct look up of CDCRecoSegment3D
+  // Projecting down to CDCRecoSegment2D for now.
+  const CDCRecoSegment2D recoSegment2D = recoSegment3D.stereoProjectToRef();
+  const ITrackType segmentMCTrack = segmentLookUp.getMCTrackId(&recoSegment2D);
 
   if (trackMCMatch == INVALID_ITRACK) {
     var<named("track_is_fake_truth")>() = true;

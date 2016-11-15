@@ -15,22 +15,15 @@
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentTruthVarSet.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    class SimpleStereoSegmentFilter : public
-      Filter<std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>> {
+    class SimpleStereoSegmentFilter : public Filter<std::pair<const CDCRecoSegment3D*, const CDCTrack*>> {
     public:
-      Weight operator()(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>& pairToTest)
-      override
+      Weight operator()(const std::pair<const CDCRecoSegment3D*, const CDCTrack*>& pairToTest) override
       {
-        const auto recoSegments = pairToTest.first;
-        const CDCRecoSegment3D& recoSegment3D = recoSegments.second;
-
-        const CDCTrack& track = pairToTest.second;
+        const CDCRecoSegment3D& recoSegment3D = *pairToTest.first;
+        const CDCTrack& track = *pairToTest.second;
 
         const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
         const CDCTrajectorySZ& trajectorySZ = track.getStartTrajectory3D().getTrajectorySZ();

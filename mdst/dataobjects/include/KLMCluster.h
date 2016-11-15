@@ -162,6 +162,33 @@ namespace Belle2 {
      */
     void setMomentumMag(float momentum_mag) {m_p = momentum_mag;}
 
+    /**
+     * Set error of vertex X coordinate.
+     * @param[in] errorX Error of vertex X coordinate.
+     */
+    void setErrorX(float errorX)
+    {m_errorX = errorX;}
+
+    /**
+     * Set error of vertex Y coordinate.
+     * @param[in] errorY Error of vertex Y coordinate.
+     */
+    void setErrorY(float errorY)
+    {m_errorY = errorY;}
+
+    /**
+     * Set error of vertex Z coordinate.
+     * @param[in] errorZ Error of vertex Z coordinate.
+     */
+    void setErrorZ(float errorZ)
+    {m_errorZ = errorZ;}
+
+    /**
+     * Set error of momentum absolute value.
+     * @param[in] errorX Error of momentum absolute value.
+     */
+    void setErrorP(float errorP)
+    {m_errorP = errorP;}
 
   private:
 

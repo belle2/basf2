@@ -9,12 +9,11 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentTruthVarSet.h>
 
+#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment3DLookUp.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,21 +25,17 @@ bool StereoSegmentTruthVarSet::extract(const std::pair<const CDCRecoSegment3D*, 
   const CDCTrack& track = *testPair->second;
 
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
-  const CDCMCSegment2DLookUp& segmentLookUp = CDCMCSegment2DLookUp::getInstance();
+  const CDCMCSegment3DLookUp& segment3DLookUp = CDCMCSegment3DLookUp::getInstance();
 
   const ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(&track);
-
-  // FIXME : Segment look up does not support the direct look up of CDCRecoSegment3D
-  // Projecting down to CDCRecoSegment2D for now.
-  const CDCRecoSegment2D recoSegment2D = recoSegment3D.stereoProjectToRef();
-  const ITrackType segmentMCTrack = segmentLookUp.getMCTrackId(&recoSegment2D);
+  const ITrackType segment3DMCTrack = segment3DLookUp.getMCTrackId(&recoSegment3D);
 
   if (trackMCMatch == INVALID_ITRACK) {
     var<named("track_is_fake_truth")>() = true;
     var<named("truth")>() = false;
   } else {
     var<named("track_is_fake_truth")>() = false;
-    var<named("truth")>() = trackMCMatch == segmentMCTrack;
+    var<named("truth")>() = trackMCMatch == segment3DMCTrack;
   }
 
   return true;

@@ -11,12 +11,10 @@
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCRecoSegment3D;
-    class CDCRecoSegment2D;
 
     /// Names of the variables to be generated.
     constexpr

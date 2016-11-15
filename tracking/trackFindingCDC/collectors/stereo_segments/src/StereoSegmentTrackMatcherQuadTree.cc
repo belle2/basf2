@@ -7,11 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherQuadTree.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <utility>
@@ -22,14 +26,17 @@ using namespace TrackFindingCDC;
 void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
 {
   QuadTreeBasedMatcher<SegmentZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
-
-  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
-                                 "Set to false to skip the check for back-2-back tracks (good for cosmics)",
+  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"),
+                                 m_param_checkForB2BTracks,
+                                 "Set to false to skip the check for back-2-back tracks "
+                                 "(good for cosmics)",
                                  m_param_checkForB2BTracks);
 }
 
-bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,
-                                                           const double shiftValue, const ISuperLayer lastSuperLayer,
+bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D,
+                                                           const bool isCurler,
+                                                           const double shiftValue,
+                                                           const ISuperLayer lastSuperLayer,
                                                            const double lastArcLength2D) const
 {
   unsigned int numberOfHitsNotInCDCBounds = 0;
@@ -72,7 +79,6 @@ bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& rec
 std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTree::match(const CDCTrack& track,
                                               const std::vector<CDCRecoSegment2D>& recoSegments)
 {
-
   const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 
   using CDCRecoSegment3DWithPointer = std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*>;
@@ -133,7 +139,6 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
 
   std::sort(matches.begin(), matches.end());
   matches.erase(std::unique(matches.begin(), matches.end()), matches.end());
-
 
   return matches;
 }

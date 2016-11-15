@@ -8,24 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
-
+#include <tracking/trackFindingCDC/collectors/base/QuadTreeBasedMatcher.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/SegmentZ0TanLambdaLegendre.h>
 
-#include <tracking/trackFindingCDC/collectors/base/QuadTreeBasedMatcher.h>
-#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
-
-#include <framework/core/ModuleParamList.h>
-#include <framework/datastore/StoreArray.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCRecoSegment2D;
@@ -39,6 +29,7 @@ namespace Belle2 {
     public:
       /// Use tracks as collector items.
       using CollectorItem = CDCTrack;
+
       /// Use (stereo) segments as collection items.
       using CollectionItem = CDCRecoSegment2D;
 
@@ -48,8 +39,8 @@ namespace Belle2 {
       /**
        * Use the given filter (via the module parameters) to find a matching.
        */
-      std::vector<WithWeight<const CollectionItem*>>
-                                                  match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
+      std::vector<WithWeight<const CollectionItem*> >
+      match(const CollectorItem& track, const std::vector<CollectionItem>& recoSegments);
 
     private:
       /// Parameters

@@ -9,8 +9,44 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RandomFilter.h>
+#include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  /// All filter for stereo hit - track relations.
+  using AllStereoHitFilter = AllFilter<BaseStereoHitFilter>;
+
+  /// Random filter for stereo hit - track relations.
+  using RandomStereoHitFilter = RandomFilter<BaseStereoHitFilter>;
+
+  /// MC filter for stereo hit - track relations.
+  using MCStereoHitFilter = MCFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
+
+  /// Simple and configurable filter for stereo hit - track relations.
+  using SimpleStereoHitFilter = NamedChoosableVarSetFilter<StereoHitVarSet>;
+
+  /// Recording filter for stereo hit - track relations.
+  using RecordingStereoHitFilter =
+    RecordingFilter<VariadicUnionVarSet<StereoHitTruthVarSet, StereoHitVarSet>>;
+
+  /// TMVA filter for stereo hit - track relations.
+  using TMVAStereoHitFilter = TMVAFilter<StereoHitVarSet>;
+}
 
 StereoHitFilterFactory::StereoHitFilterFactory(const std::string& defaultFilterName)
   : Super(defaultFilterName)

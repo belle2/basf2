@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilter.h>
+#include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/stereoSegments/BaseStereoSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {

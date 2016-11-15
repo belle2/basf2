@@ -8,10 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilter.h>
-#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
-
 #include <tracking/trackFindingCDC/collectors/base/FilterBasedMatcher.h>
+
+#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilterFactory.h>
 
 #include <tracking/trackFindingCDC/numerics/WithWeight.h>
 

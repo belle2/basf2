@@ -8,14 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
-
 #include <tracking/trackFindingCDC/collectors/base/FilterBasedMatcher.h>
 
-#include <tracking/trackFindingCDC/numerics/WithWeight.h>
+#include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentFilterFactory.h>
 
-// #include <framework/core/ModuleParamList.h>
+#include <tracking/trackFindingCDC/numerics/WithWeight.h>
 
 #include <vector>
 #include <string>

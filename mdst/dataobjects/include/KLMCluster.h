@@ -63,14 +63,14 @@ namespace Belle2 {
      * @return Number of layers.
      */
     inline int getLayers() const
-    { return m_layers;}
+    {return m_layers;}
 
     /**
      * Get number of the innermost layer with hits.
      * @return Number of the innermost layer with hits.
      */
     inline int getInnermostLayer() const
-    { return m_innermostLayer;}
+    {return m_innermostLayer;}
 
     /**
      * Get global position (TVector3 version).
@@ -129,6 +129,75 @@ namespace Belle2 {
      * @return True if associated tracks exist.
      */
     bool getAssociatedTrackFlag() const;
+
+    /**
+     * Set time.
+     * @param[in] time Time.
+     */
+    void setTime(float time)
+    {m_time = time;}
+
+    /**
+     * Set number of layers with hits.
+     * @param[in] layers Number of layers with hits.
+     */
+    void setLayers(int layers)
+    {m_layers = layers;}
+
+    /**
+     * Set number of the innermost layer with hits.
+     * @param[in] innermostLayer Number of the innermost layer with hits.
+     */
+    void setInnermostLayer(int innermostLayer)
+    {m_innermostLayer = innermostLayer;}
+
+    /**
+     * Set global position.
+     * @param[in] globalX X coordinate.
+     * @param[in] globalY Y coordinate.
+     * @param[in] globalZ Z coordinate.
+     */
+    void setClusterPosition(float globalX, float globalY, float globalZ)
+    {
+      m_globalX = globalX;
+      m_globalY = globalY;
+      m_globalZ = globalZ;
+    }
+
+    /**
+     * Set momentum magnitude.
+     * @param[in] momentumMag Momentum magnitude.
+     */
+    void setMomentumMag(float momentumMag)
+    {m_p = momentumMag;}
+
+    /**
+     * Set error of vertex X coordinate.
+     * @param[in] errorX Error of vertex X coordinate.
+     */
+    void setErrorX(float errorX)
+    {m_errorX = errorX;}
+
+    /**
+     * Set error of vertex Y coordinate.
+     * @param[in] errorY Error of vertex Y coordinate.
+     */
+    void setErrorY(float errorY)
+    {m_errorY = errorY;}
+
+    /**
+     * Set error of vertex Z coordinate.
+     * @param[in] errorZ Error of vertex Z coordinate.
+     */
+    void setErrorZ(float errorZ)
+    {m_errorZ = errorZ;}
+
+    /**
+     * Set error of momentum absolute value.
+     * @param[in] errorX Error of momentum absolute value.
+     */
+    void setErrorP(float errorP)
+    {m_errorP = errorP;}
 
   private:
 

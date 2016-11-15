@@ -35,6 +35,12 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_integratedCurrent;
       std::vector<double>*  SKB_HER_injectionFlag;/** */
       std::vector<double>*  SKB_LER_injectionFlag;/** */
+      std::vector<double>*  SKB_HER_injectionFlag_safe;/** */
+      std::vector<double>*  SKB_LER_injectionFlag_safe;/** */
+      std::vector<double>*  SKB_HER_abortFlag;/** */
+      std::vector<double>*  SKB_LER_abortFlag;/** */
+      std::vector<double>*  SKB_HER_abortFlag_safe;/** */
+      std::vector<double>*  SKB_LER_abortFlag_safe;/** */
       std::vector<double>*  SKB_HER_injectionRate;/** */
       std::vector<double>*  SKB_LER_injectionRate;/** */
       std::vector<double>*  SKB_HER_injectionEfficiency;/** */
@@ -172,6 +178,12 @@ namespace Belle2 {
         subrun = 0;
         SKB_HER_injectionFlag = 0;
         SKB_LER_injectionFlag = 0;
+        SKB_HER_injectionFlag_safe = 0;
+        SKB_LER_injectionFlag_safe = 0;
+        SKB_HER_abortFlag = 0;
+        SKB_LER_abortFlag = 0;
+        SKB_HER_abortFlag_safe = 0;
+        SKB_LER_abortFlag_safe = 0;
         SKB_Status = 0;
         SKB_HER_injectionRate = 0;
         SKB_LER_injectionRate = 0;

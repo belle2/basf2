@@ -150,8 +150,8 @@ namespace Belle2 {
           for (int i = 0; i < h1D->GetNbinsX(); i++) {
             double counts = h1D->GetBinContent(i + 1);
             double rate = counts / m_input_Time_eqv;
-            /*if (HistoRateName.Contains("csi")) {
-            cout << fileName << " rate " <<  rate << " counts " << counts << " m_input_Time_eqv " << m_input_Time_eqv << endl;
+            /*if (HistoRateName.Contains("qcss") && (fileName.Contains("HER") || fileName.Contains("LER"))) {
+            cout << fileName << " detNb " << i << " rate " <<  rate << " counts " << counts << " m_input_Time_eqv " << m_input_Time_eqv << endl;
             }*/
             if (fileName.Contains("HER")) {
               if (HistoRateName.Contains("qcss") && fileName.Contains("Touschek")) m_input_HT_QCSS_rate.push_back(rate); //Hz
@@ -283,6 +283,12 @@ namespace Belle2 {
             for (int i = 0; i < h2D->GetNbinsX(); i++) {
               double counts = h2D->GetBinContent(i + 1, k + 1);
               double rate = counts / m_input_Time_eqv;
+              /*if (HistoRateName.Contains("qcss") &&  (fileName.Contains("Coulomb_HER") ||
+                        fileName.Contains("Coulomb_LER") ||
+                        fileName.Contains("Brems_HER") ||
+                        fileName.Contains("Brems_LER"))) {
+              cout << fileName << " detNb " << i << " section " << k << " rate " <<  rate << " counts " << counts << " m_input_Time_eqv " << m_input_Time_eqv << endl;
+              }*/
               if (fileName.Contains("Coulomb_HER")) {
                 if (HistoRateName.Contains("qcss")) m_input_HC_QCSS_rate[k].push_back(rate); //Hz
                 if (HistoRateName.Contains("claws")) m_input_HC_CLAWS_rate[k].push_back(rate); //Hz

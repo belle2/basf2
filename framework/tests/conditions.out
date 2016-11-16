@@ -72,7 +72,7 @@ MockConditionsDB: "GET /v1/iovPayloads/?gtName=localtest&expName=3&runName=2 HTT
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=4&runNumber=0 HTTP/1.1" 200 -
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Checksum mismatch for http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root: should be [wrong checksum] but found 2447fbcf76419fbbc7c6d015ef507769
-[INFO] Download for payload 'dbstore_BeamParameters_rev_1.root, trying one last time into temporary file
+[INFO] Download for payload 'dbstore_BeamParameters_rev_1.root failed, trying one last time into temporary file
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 [WARNING] Checksum mismatch for http://127.0.0.1:12701/dbstore_BeamParameters_rev_1.root: should be [wrong checksum] but found 2447fbcf76419fbbc7c6d015ef507769
 [ERROR] Failure obtaining payload 'BeamParameters' from central database
@@ -82,7 +82,7 @@ MockConditionsDB: "GET /dbstore_BeamParameters_rev_1.root HTTP/1.1" 200 -
 MockConditionsDB: "GET /v2/iovPayloads/?gtName=localtest&expNumber=5&runNumber=0 HTTP/1.1" 200 -
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [WARNING] Could not get 'http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root': The requested URL returned error: 404 Not Found
-[INFO] Download for payload 'dbstore_BeamParameters_rev_2.root, trying one last time into temporary file
+[INFO] Download for payload 'dbstore_BeamParameters_rev_2.root failed, trying one last time into temporary file
 MockConditionsDB: "GET /dbstore_BeamParameters_rev_2.root HTTP/1.1" 404 -
 [WARNING] Could not get 'http://127.0.0.1:12701/dbstore_BeamParameters_rev_2.root': The requested URL returned error: 404 Not Found
 [ERROR] Failure obtaining payload 'BeamParameters' from central database

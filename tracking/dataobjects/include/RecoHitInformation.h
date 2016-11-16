@@ -13,6 +13,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <eklm/dataobjects/EKLMHit2d.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -52,6 +54,12 @@ namespace Belle2 {
     /** Define, use of CDC hits as CDC hits (for symmetry). */
     typedef CDCHit UsedCDCHit;
 
+    /** Define, use of BKLMHit2d as BKLM hits. */
+    typedef BKLMHit2d UsedBKLMHit;
+
+    /** Define, use of EKLMHit2d as EKLM hits. */
+    typedef EKLMHit2d UsedEKLMHit;
+
     /** The RightLeft information of the hit which is only valid for CDC hits */
     enum RightLeftInformation {
       c_undefinedRightLeftInformation,
@@ -81,12 +89,14 @@ namespace Belle2 {
     };
 
     /** The detector this hit comes from (which is of course also visible in the hit type) */
-    enum TrackingDetector {
+    enum RecoHitDetector {
       c_undefinedTrackingDetector,
       c_invalidTrackingDetector,
       c_SVD,
       c_PXD,
-      c_CDC
+      c_CDC,
+      c_EKLM,
+      c_BKLM
     };
 
   public:
@@ -104,7 +114,7 @@ namespace Belle2 {
      */
     RecoHitInformation(const UsedCDCHit* cdcHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(cdcHit, TrackingDetector::c_CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(cdcHit, RecoHitDetector::c_CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
@@ -117,7 +127,7 @@ namespace Belle2 {
      */
     RecoHitInformation(const UsedPXDHit* pxdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(pxdHit, TrackingDetector::c_PXD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(pxdHit, RecoHitDetector::c_PXD, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
@@ -130,7 +140,7 @@ namespace Belle2 {
      */
     RecoHitInformation(const UsedSVDHit* svdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(svdHit, TrackingDetector::c_SVD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(svdHit, RecoHitDetector::c_SVD, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
@@ -183,7 +193,7 @@ namespace Belle2 {
     }
 
     /** Get the detector this hit comes from. (can not be changed once created) */
-    TrackingDetector getTrackingDetector() const
+    RecoHitDetector getTrackingDetector() const
     {
       return m_trackingDetector;
     }
@@ -216,7 +226,7 @@ namespace Belle2 {
 
   private:
     /// The tracking detector this hit comes from (can not be changed once created)
-    TrackingDetector m_trackingDetector = TrackingDetector::c_undefinedTrackingDetector;
+    RecoHitDetector m_trackingDetector = RecoHitDetector::c_undefinedTrackingDetector;
     /// The right-left-information of the hit. Can be invalid (for VXD hits) or unknown.
     RightLeftInformation m_rightLeftInformation = RightLeftInformation::c_undefinedRightLeftInformation;
     /// The sorting parameter as an index.
@@ -242,7 +252,7 @@ namespace Belle2 {
      */
     template <class HitType>
     RecoHitInformation(const HitType* hit,
-                       TrackingDetector trackingDetector,
+                       RecoHitDetector trackingDetector,
                        RightLeftInformation rightLeftInformation,
                        OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :

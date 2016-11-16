@@ -81,7 +81,7 @@ namespace Belle2 {
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::RightLeftInformation RightLeftInformation;
     /// Copy the definitions from the RecoHitInformation to this class.
-    typedef RecoHitInformation::TrackingDetector TrackingDetector;
+    typedef RecoHitInformation::RecoHitDetector TrackingDetector;
     /// Copy the definitions from the RecoHitInformation to this class.
     typedef RecoHitInformation::OriginTrackFinder OriginTrackFinder;
     /// Copy the definitions from the RecoHitInformation to this class.

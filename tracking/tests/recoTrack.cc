@@ -126,7 +126,7 @@ namespace Belle2 {
 
     RecoHitInformation* recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
     EXPECT_NE(recoHitInformation, nullptr);
-    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::RecoHitDetector::c_CDC);
     EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
     EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(recoHitInformation->getSortingParameter(), 1);
@@ -142,7 +142,7 @@ namespace Belle2 {
     // with added hits
     cdcHit = cdcHits[0];
 
-    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::RecoHitDetector::c_CDC);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 1);

@@ -35,7 +35,8 @@ namespace Belle2 {
      * @return           A pointer to the created database instance
      */
     static void createInstance(const std::string& fileName = "database.txt", const std::string& payloadDir = "",
-                               bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+                               bool readOnly = false, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                               bool invertLogging = false);
 
     /**
      * Request an object from the database.

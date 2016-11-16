@@ -43,7 +43,8 @@ namespace Belle2 {
      * @return               A pointer to the created database instance
      */
     static void createInstance(const std::string& globalTag, const std::string& restBaseName, const std::string& fileBaseName,
-                               const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning);
+                               const std::string& fileBaseLocal, LogConfig::ELogLevel logLevel = LogConfig::c_Warning,
+                               bool invertLogging = false);
 
     /**
      * Request an object from the database.

@@ -212,7 +212,8 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     @param outputRootFile name of the output ROOT file to which the histograms are saved.
     @param path modules are added to this path
     """
-    # copy KShorts from 'K_S0:mdst' list. We don't want to mess with them.
+
+    # copy KLongs from 'K_L0:mdst' list. We don't want to mess with them.
     copyParticles('K_L0:b2bii_monitor', 'K_L0:mdst', False, path)
     matchMCTruth('K_L0:b2bii_monitor', path)
 
@@ -223,44 +224,20 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     # define variables that are monitored and specify
     # the corresponding histogram (#bins, low, high)
     # ('variable_name', number_of_bins, x_low, x_high)
-    klong2hist_mass = ('M', 100, 0.46, 0.53)
-    klong2hist_px = ('px', 100, -2.5, 2.5)
-    klong2hist_py = ('py', 100, -2.5, 2.5)
-    klong2hist_pz = ('pz', 100, -1.5, 3.5)
-    klong2hist_e = ('E', 100, 0.0, 4.0)
-    klong2hist_x = ('x', 100, -50.0, 50.0)
-    klong2hist_y = ('y', 100, -50.0, 50.0)
-    klong2hist_z = ('z', 100, -50.0, 50.0)
+    klong2hist_pos_x = ('klmClusterPositionX', 100, -10.0, 10.0)
+    klong2hist_pos_y = ('klmClusterPositionY', 100, -10.0, 10.0)
+    klong2hist_pos_z = ('klmClusterPositionZ', 100, -10.0, 10.0)
+    klong2hist_layers = ('klmClusterLayers', 100, 0.0, 20.0)
+    klong2hist_innermost_layer = ('klmClusterInnermostLayer', 100, 0.0, 20.0)
 
-    # mc truth
-    # cluster position
+    # (vague) mc truth missing
 
-#     klong2hist_d0px = ('daughter(0,px)', 100, -2.0, 2.0)
-#     klong2hist_d0py = ('daughter(0,py)', 100, -2.0, 2.0)
-#     klong2hist_d0pz = ('daughter(0,pz)', 100, -2.0, 3.0)
-#     klong2hist_d0e = ('daughter(0,E)', 100, 0.0, 3.0)
-#     klong2hist_d0x = ('daughter(0,x)', 100, -50.0, 50.0)
-#     klong2hist_d0y = ('daughter(0,y)', 100, -50.0, 50.0)
-#     klong2hist_d0z = ('daughter(0,z)', 100, -50.0, 50.0)
-#
-#     klong2hist_d1px = ('daughter(1,px)', 100, -2.0, 2.0)
-#     klong2hist_d1py = ('daughter(1,py)', 100, -2.0, 2.0)
-#     klong2hist_d1pz = ('daughter(1,pz)', 100, -2.0, 3.0)
-#     klong2hist_d1e = ('daughter(1,E)', 100, 0.0, 3.0)
-#     klong2hist_d1x = ('daughter(1,x)', 100, -50.0, 50.0)
-#     klong2hist_d1y = ('daughter(1,y)', 100, -50.0, 50.0)
-#     klong2hist_d1z = ('daughter(1,z)', 100, -50.0, 50.0)
-
-    klong2hist.param('variables', [klong2hist_mass, klong2hist_px, klong2hist_py, klong2hist_pz,
-                                   klong2hist_e, klong2hist_x, klong2hist_y, klong2hist_z,
-                                   # _d0px, klong2hist_d0py, klong2hist_d0pz, klong2hist_d0e,
-                                   # _d0x, klong2hist_d0y, klong2hist_d0z,
-                                   # _d1px, klong2hist_d1py, klong2hist_d1pz, klong2hist_d1e,
-                                   # _d1x, klong2hist_d1y, klong2hist_d1z,
+    klong2hist.param('variables', [klong2hist_pos_x, klong2hist_pos_y, klong2hist_pos_z,
+                                   klong2hist_layers, klong2hist_innermost_layer,
                                    ])
 
     klong2hist.param('fileName', outputRootFile)
-    outputRootFileAVF = outputRootFile.replace(".root", "-AVF.root")
+
     path.add_module(klong2hist)
 
 

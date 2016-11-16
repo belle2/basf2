@@ -144,6 +144,32 @@ namespace Belle2 {
     {
     }
 
+    /**
+     * Create hit information for a EKLM hit with the given information. Adds the relation to the hit automatically.
+     * @param eklmHit The hit to create this information for.
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
+     */
+    RecoHitInformation(const UsedEKLMHit* eklmHit, OriginTrackFinder foundByTrackFinder,
+                       unsigned int sortingParameter) :
+      RecoHitInformation(eklmHit, RecoHitDetector::c_EKLM, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
+    {
+    }
+
+    /**
+     * Create hit information for a BKLM hit with the given information. Adds the relation to the hit automatically.
+     * @param bklmHit The hit to create this information for.
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
+     */
+    RecoHitInformation(const UsedBKLMHit* bklmHit, OriginTrackFinder foundByTrackFinder,
+                       unsigned int sortingParameter) :
+      RecoHitInformation(bklmHit, RecoHitDetector::c_BKLM, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
+    {
+    }
+
     /** Get the additional flag */
     RecoHitFlag getFlag() const
     {
@@ -265,6 +291,6 @@ namespace Belle2 {
       addRelationTo(hit);
     }
 
-    ClassDef(RecoHitInformation, 3); /**< This class implements additional information for hits */
+    ClassDef(RecoHitInformation, 4); /**< This class implements additional information for hits */
   };
 }

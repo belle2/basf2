@@ -14,7 +14,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <bklm/dataobjects/BKLMHit2d.h>
-#include <eklm/dataobjects/EKLMHit2d.h>
+#include <eklm/dataobjects/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -58,7 +58,7 @@ namespace Belle2 {
     typedef BKLMHit2d UsedBKLMHit;
 
     /** Define, use of EKLMHit2d as EKLM hits. */
-    typedef EKLMHit2d UsedEKLMHit;
+    typedef EKLMAlignmentHit UsedEKLMHit;
 
     /** The RightLeft information of the hit which is only valid for CDC hits */
     enum RightLeftInformation {

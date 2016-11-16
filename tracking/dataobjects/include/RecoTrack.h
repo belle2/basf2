@@ -745,10 +745,10 @@ namespace Belle2 {
     std::string m_storeArrayNameOfSVDHits = "";
     /// Store array name of added PXD hits.
     std::string m_storeArrayNameOfPXDHits = "";
-    /// Store array name of added EKLM hits.
-    std::string m_storeArrayNameOfEKLMHits = "";
     /// Store array name of added BKLM hits.
     std::string m_storeArrayNameOfBKLMHits = "";
+    /// Store array name of added EKLM hits.
+    std::string m_storeArrayNameOfEKLMHits = "";
     /// Store array of added RecoHitInformation.
     std::string m_storeArrayNameOfRecoHitInformation = "";
     /// Bool is hits were added to track after fitting and the measurements should be recalculated.

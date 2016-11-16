@@ -65,7 +65,9 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
 
   RecoTrack* newRecoTrack = recoTracks.appendNew(position, momentum, charge,
                                                  cdcHits.getName(), svdHits.getName(),
-                                                 pxdHits.getName(), recoHitInformations.getName());
+                                                 pxdHits.getName(),
+                                                 bklmHits.getName(), eklmHits.getName(),
+                                                 recoHitInformations.getName());
   newRecoTrack->setTimeSeed(time);
 
   // TODO Set the covariance seed (that should be done by the tracking package)

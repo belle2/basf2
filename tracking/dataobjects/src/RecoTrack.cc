@@ -14,11 +14,15 @@ RecoTrack::RecoTrack(const TVector3& seedPosition, const TVector3& seedMomentum,
                      const std::string& storeArrayNameOfCDCHits,
                      const std::string& storeArrayNameOfSVDHits,
                      const std::string& storeArrayNameOfPXDHits,
+                     const std::string& storeArrayNameOfBKLMHits,
+                     const std::string& storeArrayNameOfEKLMHits,
                      const std::string& storeArrayNameOfRecoHitInformation) :
   m_charge(seedCharge),
   m_storeArrayNameOfCDCHits(storeArrayNameOfCDCHits),
   m_storeArrayNameOfSVDHits(storeArrayNameOfSVDHits),
   m_storeArrayNameOfPXDHits(storeArrayNameOfPXDHits),
+  m_storeArrayNameOfBKLMHits(storeArrayNameOfBKLMHits),
+  m_storeArrayNameOfEKLMHits(storeArrayNameOfEKLMHits),
   m_storeArrayNameOfRecoHitInformation(storeArrayNameOfRecoHitInformation)
 {
   m_genfitTrack.setStateSeed(seedPosition, seedMomentum);
@@ -38,6 +42,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
                                           const std::string& storeArrayNameOfCDCHits,
                                           const std::string& storeArrayNameOfSVDHits,
                                           const std::string& storeArrayNameOfPXDHits,
+                                          const std::string& storeArrayNameOfBKLMHits,
+                                          const std::string& storeArrayNameOfEKLMHits,
                                           const std::string& storeArrayNameOfRecoHitInformation,
                                           const bool recreateSortingParameters
                                          )
@@ -48,6 +54,8 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
   StoreArray<UsedCDCHit> cdcHits(storeArrayNameOfCDCHits);
   StoreArray<UsedSVDHit> svdHits(storeArrayNameOfSVDHits);
   StoreArray<UsedPXDHit> pxdHits(storeArrayNameOfPXDHits);
+  StoreArray<UsedBKLMHit> bklmHits(storeArrayNameOfBKLMHits);
+  StoreArray<UsedEKLMHit> eklmHits(storeArrayNameOfEKLMHits);
 
   // Set the tracking parameters
   const TVector3& position = trackCand.getPosSeed();
@@ -97,6 +105,12 @@ RecoTrack* RecoTrack::createFromTrackCand(const genfit::TrackCand& trackCand,
     } else if (detID == Const::PXD) {
       UsedPXDHit* pxdHit = pxdHits[hitID];
       newRecoTrack->addPXDHit(pxdHit, sortingParameter);
+    } else if (detID == Const::BKLM) {
+      UsedBKLMHit* bklmHit = bklmHits[hitID];
+      newRecoTrack->addBKLMHit(bklmHit, sortingParameter);
+    } else if (detID == Const::EKLM) {
+      UsedEKLMHit* eklmHit = eklmHits[hitID];
+      newRecoTrack->addEKLMHit(eklmHit, sortingParameter);
     }
   }
 
@@ -134,6 +148,14 @@ genfit::TrackCand RecoTrack::createGenfitTrackCand() const
   const UsedPXDHit * const hit) {
     createdTrackCand.addHit(Const::PXD, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
   });
+  mapOnHits<UsedBKLMHit>(m_storeArrayNameOfBKLMHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedBKLMHit * const hit) {
+    createdTrackCand.addHit(Const::BKLM, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
+  mapOnHits<UsedEKLMHit>(m_storeArrayNameOfEKLMHits, [&createdTrackCand](const RecoHitInformation & hitInformation,
+  const UsedEKLMHit * const hit) {
+    createdTrackCand.addHit(Const::EKLM, hit->getArrayIndex(), -1, hitInformation.getSortingParameter());
+  });
 
   createdTrackCand.sortHits();
 
@@ -169,6 +191,20 @@ size_t RecoTrack::addHitsFromRecoTrack(const RecoTrack* recoTrack, const unsigne
     hitsCopied += addCDCHit(cdcHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
                             recoHitInfo->getRightLeftInformation(),
                             recoHitInfo->getFoundByTrackFinder());
+  }
+
+  for (auto* bklmHit : recoTrack->getBKLMHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(bklmHit);
+    assert(recoHitInfo);
+    hitsCopied += addBKLMHit(bklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+                             recoHitInfo->getFoundByTrackFinder());
+  }
+
+  for (auto* eklmHit : recoTrack->getEKLMHitList()) {
+    auto recoHitInfo = recoTrack->getRecoHitInformation(eklmHit);
+    assert(recoHitInfo);
+    hitsCopied += addEKLMHit(eklmHit, recoHitInfo->getSortingParameter() + sortingParameterOffset,
+                             recoHitInfo->getFoundByTrackFinder());
   }
 
   return hitsCopied;

@@ -9,10 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <framework/logging/LogMethod.h>
 #include <framework/gearbox/Const.h>
 #include <TObject.h>
-#include <math.h>
 
 namespace Belle2 {
   /// Storage element for the eventwise T0 estimation.
@@ -26,13 +24,13 @@ namespace Belle2 {
       EventT0Component(double eventT0, double eventT0UncertaintySquared, Const::EDetector detector) :
         eventT0(eventT0), eventT0UncertaintySquared(eventT0UncertaintySquared), detector(detector) {}
 
-      /// Internal storage of the T0 estimation.
+      /// Storage of the T0 estimation.
       double eventT0 = 0;
 
-      /// Internal storage of the uncertainty on the eventT0 squared.
+      /// Storage of the uncertainty on the eventT0 squared.
       double eventT0UncertaintySquared = 0;
 
-      /// Internal storage of the detector, who has determined the event T0.
+      /// Storage of the detector, who has determined the event T0.
       Const::EDetector detector = Const::EDetector::invalidDetector;
     };
 
@@ -44,32 +42,7 @@ namespace Belle2 {
      *
      * If there is no extracted eventT0 in any of these detectors, return (0, 0).
      */
-    std::pair<double, double> getEventT0WithUncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const
-    {
-      std::pair<double, double> eventT0WithUncertainty = {0, 0};
-      double preFactor = 0;
-
-      bool found = false;
-
-      for (const EventT0Component& component : m_eventT0List) {
-        if (detectorSet.getIndex(component.detector) != -1) {
-          found = true;
-          const double oneOverUncertaintySquared = 1 / component.eventT0UncertaintySquared;
-          eventT0WithUncertainty.first += component.eventT0  * oneOverUncertaintySquared;
-          preFactor += oneOverUncertaintySquared;
-        }
-      }
-
-      if (not found) {
-        B2ERROR("No EventT0 available for the given detector set. Returning 0, 0.");
-        return std::make_pair(0, 0);
-      }
-
-      eventT0WithUncertainty.first /= preFactor;
-      eventT0WithUncertainty.second = sqrt(1 / preFactor);
-
-      return eventT0WithUncertainty;
-    }
+    std::pair<double, double> getEventT0WithUncertainty(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
     /**
      * Return the calculated eventT0 using only the detectors given.
@@ -96,16 +69,7 @@ namespace Belle2 {
     }
 
     /// Get the detectors that have determined the event T0.
-    const Const::DetectorSet getDetectors() const
-    {
-      Const::DetectorSet detectorSet;
-
-      for (const EventT0Component& component : m_eventT0List) {
-        detectorSet += component.detector;
-      }
-
-      return detectorSet;
-    }
+    Const::DetectorSet getDetectors() const;
 
     /// Return the number of stored event T0s
     unsigned long getNumberOfEventT0s() const
@@ -126,16 +90,7 @@ namespace Belle2 {
     }
 
     /// Check if one of the detectors in the given set has a t0 estimation.
-    bool hasEventTo(const Const::DetectorSet& detectorSet = Const::allDetectors) const
-    {
-      for (const EventT0Component& component : m_eventT0List) {
-        if (detectorSet.getIndex(component.detector) != -1) {
-          return true;
-        }
-      }
-
-      return false;
-    }
+    bool hasEventT0(const Const::DetectorSet& detectorSet = Const::allDetectors) const;
 
     /// Clear the list of extracted event T0 estimations
     void clear()

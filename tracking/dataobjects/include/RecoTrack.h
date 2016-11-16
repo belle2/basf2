@@ -231,7 +231,7 @@ namespace Belle2 {
     bool addPXDHit(const UsedPXDHit* pxdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(pxdHit, RightLeftInformation::c_undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
+      return addHit(pxdHit, foundByTrackFinder, sortingParameter);
     }
 
     /**
@@ -245,7 +245,7 @@ namespace Belle2 {
     bool addSVDHit(const UsedSVDHit* svdHit, const unsigned int sortingParameter,
                    OriginTrackFinder foundByTrackFinder = OriginTrackFinder::c_undefinedTrackFinder)
     {
-      return addHit(svdHit, RightLeftInformation::c_undefinedRightLeftInformation, foundByTrackFinder, sortingParameter);
+      return addHit(svdHit, foundByTrackFinder, sortingParameter);
     }
 
     /// Return the reco hit information for a given cdc hit or nullptr if there is none.

@@ -121,26 +121,26 @@ namespace Belle2 {
     /**
      * Create hit information for a PXD hit with the given information. Adds the relation to the hit automatically.
      * @param pxdHit The hit to create this information for.
-     * @param rightLeftInformation The RL-information (which is probably invalid).
      * @param foundByTrackFinder Which track finder has found this hit?
      * @param sortingParameter The sorting parameter of this hit.
      */
-    RecoHitInformation(const UsedPXDHit* pxdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+    RecoHitInformation(const UsedPXDHit* pxdHit, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(pxdHit, RecoHitDetector::c_PXD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(pxdHit, RecoHitDetector::c_PXD, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
     {
     }
 
     /**
      * Create hit information for a SVD hit with the given information. Adds the relation to the hit automatically.
      * @param svdHit The hit to create this information for.
-     * @param rightLeftInformation The RL-information  (which is probably invalid).
      * @param foundByTrackFinder Which track finder has found this hit?
      * @param sortingParameter The sorting parameter of this hit.
      */
-    RecoHitInformation(const UsedSVDHit* svdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+    RecoHitInformation(const UsedSVDHit* svdHit, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(svdHit, RecoHitDetector::c_SVD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(svdHit, RecoHitDetector::c_SVD, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
     {
     }
 

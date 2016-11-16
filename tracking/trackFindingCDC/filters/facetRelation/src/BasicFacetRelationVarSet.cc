@@ -9,6 +9,9 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

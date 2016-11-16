@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/BasicSegmentRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

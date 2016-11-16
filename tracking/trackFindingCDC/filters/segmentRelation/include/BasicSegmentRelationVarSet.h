@@ -9,16 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
-
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/ca/Relation.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const basicSegmentRelationVarNames[] = {
       "stereo_kind",
@@ -27,31 +27,27 @@ namespace Belle2 {
       "sl_id",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment pair
-     */
-    class BasicSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D> > {
+    /// Vehicle class to transport the variable names
+    struct BasicSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D> > {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentRelationVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicSegmentRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return basicSegmentRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment relation.
+     *  Class to compute floating point variables from a segment relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicSegmentRelationVarSet : public VarSet<BasicSegmentRelationVarNames> {
 
     public:
-      /// Generate and assign the variables from the segment relation
+      /// Generate and assign the contained variables
       bool extract(const Relation<const CDCSegment2D>* ptrSegmentRelation) override;
     };
   }

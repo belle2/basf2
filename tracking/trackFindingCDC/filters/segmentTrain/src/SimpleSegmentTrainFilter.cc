@@ -17,7 +17,8 @@ using namespace TrackFindingCDC;
 
 Weight SimpleSegmentTrainFilter::operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
 {
-  Super::operator()(testPair);
+  bool extracted = Super::operator()(testPair);
+  if (not extracted) return false;
 
   const std::vector<SegmentInformation*>& trainOfSegments = testPair.first;
   const CDCTrack* track = testPair.second;

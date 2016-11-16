@@ -8,6 +8,9 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
 #include <cassert>
 
 using namespace Belle2;

@@ -9,10 +9,16 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationVarSets.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facetRelation/FitFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
 #include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
-#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -21,7 +27,7 @@ std::vector<std::string>
 UnionRecordingFacetRelationFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "pair", " bend", "fit", "tmva", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "relation", " bend", "fit", "mva"});
   return varSetNames;
 }
 
@@ -30,14 +36,15 @@ UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
     return makeUnique<BasicFacetRelationVarSet>();
-  } else if (name == "pair") {
+  } else if (name == "relation") {
     return  makeUnique<RelationVarSet<FitlessFacetVarSet> >();
   } else if (name == "bend") {
     return makeUnique<BendFacetRelationVarSet>();
   } else if (name == "fit") {
     return makeUnique<FitFacetRelationVarSet>();
-  } else if (name == "tmva") {
-    return makeUnique<TMVAFacetRelationVarSet>();
+  } else if (name == "mva") {
+    MVAFacetRelationFilter mvaFacetRelationFilter;
+    return std::move(mvaFacetRelationFilter).releaseVarSet();
   } else {
     return Super::createVarSet(name);
   }

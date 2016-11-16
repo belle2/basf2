@@ -8,7 +8,8 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/TrailSegmentPairVarSet.h>
-#include <assert.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
+
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -20,7 +21,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const filterVarNames[] = {
       "accept",
@@ -28,29 +29,26 @@ namespace Belle2 {
       "positive",
     };
 
-    /// Name of the variables that should be extracted from the response of a filter.
+    /// Vehicle class to transport the variable names
     template<class AFilter>
-    class FilterVarNames : public VarNames<typename AFilter::Object> {
+    struct FilterVarNames : public VarNames<typename AFilter::Object> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(filterVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(filterVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return filterVarNames[iName];
       }
     };
 
     /**
-     *  A variable set based that represents the response of a filter.
+     *  Class to compute floating point variables from a filter response
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      *
      *  The variables that are extracted from the filter response are the weight
      *  and a boolean whether the response was NaN.
-     *  Class that computes floating point variables from segment pair.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
      */
     template<class AFilter>
     class  FilterVarSet : public VarSet<FilterVarNames<AFilter> > {
@@ -104,14 +102,14 @@ namespace Belle2 {
         const std::string prefix = "";
         m_ptrFilter->exposeParameters(&moduleParamList, prefix);
 
-        // try to find the TMVAFilter cut parameter and reset it such that we can set it ourself
+        // try to find the MVAFilter cut parameter and reset it such that we can set it
         try {
           ModuleParam<double> cutParam = moduleParamList.getParameter<double>("cut");
           m_cut = cutParam.getValue();
           cutParam.setValue(NAN);
         } catch (ModuleParamList::ModuleParameterNotFoundError)
         {
-          // Not found continue
+          // Not found. Continue.
         }
 
         if (m_ptrFilter)
@@ -180,7 +178,7 @@ namespace Belle2 {
       }
 
     public:
-      /// The cut on the TMVA output.
+      /// The cut on the filter output.
       double m_cut = NAN;
 
       /// Name of the filter

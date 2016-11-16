@@ -8,13 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCSegment2D;
 
-    /// Truth var set for finding background segments.
+    /**
+     *  Class to compute floating point variables from a segment
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
+     */
     class BackgroundSegmentTruthVarSet : public TruthSegmentVarSet {
 
     private:
@@ -22,7 +26,7 @@ namespace Belle2 {
       using Super = TruthSegmentVarSet;
 
     public:
-      /// Generate and assign the variables from the cluster
+      /// Generate and assign the contained variables
       bool extract(const CDCSegment2D* segment) final {
         bool extracted = Super::extract(segment);
         var<named("truth")>() = var<named("segment_is_fake_truth")>();

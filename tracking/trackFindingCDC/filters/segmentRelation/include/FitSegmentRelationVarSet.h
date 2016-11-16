@@ -11,20 +11,16 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <vector>
-#include <string>
-#include <cassert>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCSegment2D.
     class CDCSegment2D;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const segmentRelationFitVarNames[] = {
+    static char const* const fitSegmentRelationVarNames[] = {
       "is_fitted",
       "curv",
       "curv_var",
@@ -34,32 +30,27 @@ namespace Belle2 {
       "p_value",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment relation
-     */
-    class FitSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D>> {
+    /// Vehicle class to transport the variable names
+    struct FitSegmentRelationVarNames : public VarNames<Relation<const CDCSegment2D>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(segmentRelationFitVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(fitSegmentRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return segmentRelationFitVarNames[iName];
+        return fitSegmentRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from a segment relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class FitSegmentRelationVarSet : public VarSet<FitSegmentRelationVarNames> {
 
     public:
-      /// Generate and assign the variables from the segment relation
+      /// Generate and assign the contained variables
       bool extract(const Relation<const CDCSegment2D>* ptrSegmentRelation) final;
     };
   }

@@ -23,7 +23,7 @@ namespace Belle2 {
       using Object = AObject;
 
       /// Number of variables to be generated.
-      static const std::size_t nNames = 0;
+      static const std::size_t nVars = 0;
 
       /// Function looking up the variable name at the given index as compile time
       constexpr static char const* getName(int iName __attribute__((unused)))

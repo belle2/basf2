@@ -9,14 +9,10 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Variable set used in the application of tmva methods for facet relation filtering
-    using TMVAFacetRelationVarSet = BasicFacetRelationVarSet;
   }
 }

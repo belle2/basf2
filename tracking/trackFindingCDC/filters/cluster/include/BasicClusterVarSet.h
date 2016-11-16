@@ -14,12 +14,10 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
-    /// Forward declaration of the CDCWireHitCluster.
     class CDCWireHitCluster;
 
-    /// Names of the variables to be generated.
-    constexpr static char const* const basicClusterNames[] = {
+    /// Names of the variables to be generated
+    static constexpr char const* const basicClusterNames[] = {
       "is_stereo",
       "superlayer_id",
       "size",
@@ -37,32 +35,30 @@ namespace Belle2 {
 
       "total_adc_count",
       "mean_adc_count",
-      "variance_adc_count"
+      "variance_adc_count",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
-     */
-    class BasicClusterVarNames : public VarNames<CDCWireHitCluster> {
+    /// Vehicle class to transport the variable names
+    struct BasicClusterVarNames : public VarNames<CDCWireHitCluster> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicClusterNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicClusterNames);
 
-      constexpr static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return basicClusterNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a wire hit clusters.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+     *  Class to compute floating point variables from a wire hit cluster
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicClusterVarSet : public VarSet<BasicClusterVarNames> {
 
-      /// Generate and assign the variables from the cluster
+    public:
+      /// Generate and assign the contained variables
       bool extract(const CDCWireHitCluster* ptrCluster) final;
     };
   }

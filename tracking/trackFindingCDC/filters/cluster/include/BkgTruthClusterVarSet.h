@@ -14,38 +14,33 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCWireHitCluster.
     class CDCWireHitCluster;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const bkgTruthClusterNames[] = {
       "n_background_hits_truth",
       "background_fraction_truth",
       "weight",
-      "truth"
+      "truth",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
-     */
-    class BkgTruthClusterVarNames : public VarNames<CDCWireHitCluster> {
+    /// Vehicle class to transport the variable names
+    struct BkgTruthClusterVarNames : public VarNames<CDCWireHitCluster> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(bkgTruthClusterNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(bkgTruthClusterNames);
 
-      /// Get the name of the corresponding column.
-      constexpr static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return bkgTruthClusterNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a wire hit clusters.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+     *  Class to compute floating point variables from a wire hit cluster
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BkgTruthClusterVarSet : public VarSet<BkgTruthClusterVarNames> {
 
@@ -57,7 +52,7 @@ namespace Belle2 {
       /// Signal the beginning of a new event - loads the Monte Carlo information
       void beginEvent() override;
 
-      /// Generate and assign the variables from the cluster
+      /// Generate and assign the contained variables
       bool extract(const CDCWireHitCluster* ptrCluster) final;
     };
   }

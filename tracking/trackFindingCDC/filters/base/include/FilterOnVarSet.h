@@ -10,19 +10,18 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
+
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
+#include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+
 #include <memory>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /**
-     *  Filter adapter to make a filter work on a set of variables
-     *  Used as base for ChooseableVarialbe, TMVA and RecordingFilters
-     */
+    /// Filter adapter to make a filter work on a set of variables
     template<class AFilter>
     class OnVarSet : public AFilter {
 

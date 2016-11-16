@@ -3,7 +3,7 @@
  * Copyright(C) 2010-2011  Belle II Collaboration                         *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Andreas Moll, Kazutaka. Sumisawa                         *
+ * Contributors: Andreas Moll, Kazutaka Sumisawa, Alexei Sibidanov        *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
@@ -19,466 +19,546 @@
 #include <boost/iostreams/filter/gzip.hpp>
 
 #include <cmath>
+#include <limits>
 
 using namespace std;
-using namespace Belle2;
 namespace io = boost::iostreams;
+namespace Belle2 {
 
-double BFieldComponentBeamline::s_mapRegionR[2] = {0., 0.};
-double BFieldComponentBeamline::s_sinBeamCrossAngle = 0.;
-double BFieldComponentBeamline::s_cosBeamCrossAngle = 1.;
+  typedef short int tindex_t;
 
-bool BFieldComponentBeamline::isInRange(const TVector3& point)
-{
-  if (s_mapRegionR[1] <= 0.) return false;
+  struct triangledelaunay_t {
+    tindex_t j0, j1, j2;
+    tindex_t n0, n1, n2;
+  };
 
-  double y2 = point.y() * point.y();
-  double c = s_cosBeamCrossAngle * point.x(), s = s_sinBeamCrossAngle * point.z();
+  struct xy_t {
+    double x, y;
+  };
 
-  double rp = pow(c - s, 2) + y2;
-  double rn = pow(c + s, 2) + y2;
-
-  const double R02 = pow(s_mapRegionR[0], 2);
-  const double R12 = pow(s_mapRegionR[1], 2);
-
-  if (rp >= R02 && rp <= R12)
-    return true;
-  else if (rn >= R02 && rn <= R12)
-    return true;
-  else
-    return false;
-}
-
-void BFieldComponentBeamline::initialize_beamline(int isher)
-{
-  BFieldPoint** *mapBuffer;
-  InterpolationPoint** *interBuffer;
-  std::string mapFilename, interFilename;
-
-  if (isher == 1) {
-    mapBuffer = &m_mapBuffer_her;
-    interBuffer = &m_interBuffer_her;
-    mapFilename = m_mapFilename_her;
-    interFilename = m_interFilename_her;
-  } else {
-    mapBuffer = &m_mapBuffer_ler;
-    interBuffer = &m_interBuffer_ler;
-    mapFilename = m_mapFilename_ler;
-    interFilename = m_interFilename_ler;
-  }
-
-  if (mapFilename.empty()) {
-    B2ERROR("The filename for the beamline magnetic field component is empty !");
-    return;
-  }
-  if (mapFilename.empty()) {
-    B2ERROR("The filename for the beamline interpolation component is empty !");
-    return;
-  }
-
-
-  string fullPath = FileSystem::findFile("/data/" + mapFilename);
-
-  if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The beamline magnetic field map file '" << mapFilename << "' could not be found !");
-    return;
-  }
-
-  //Load the map file
-  io::filtering_istream fieldMapFile;
-  fieldMapFile.push(io::gzip_decompressor());
-  fieldMapFile.push(io::file_source(fullPath));
-
-  //Create the magnetic field map [r,z] and read the data from the file
-  B2DEBUG(10, "Loading the beamline magnetic field from file '" << mapFilename << "' in to the memory...");
-
-  fieldMapFile >> m_mapSizeRPhi[isher] >> m_jointR >> m_nGridR >> m_nGridPhi;
-  fieldMapFile >> m_mapSizeZ >> m_jointZ >> m_gridPitchZ[0] >> m_gridPitchZ[1];
-
-  m_offsetGridRPhi[isher] = m_mapSizeRPhi[isher] - (m_nGridR + 1) * (m_nGridPhi + 1);
-  m_offsetGridZ = static_cast<int>(m_mapSizeZ * 0.5);
-
-  *mapBuffer = new BFieldPoint*[m_mapSizeZ];
-  for (int i = 0; i < m_mapSizeZ; ++i)
-    (*mapBuffer)[i] = new BFieldPoint[m_mapSizeRPhi[isher]];
-
-  double r, phi, z, Br, Bphi, Bz;
-  for (int i = 0; i < m_mapSizeZ; ++i) {
-    for (int j = 0; j < m_mapSizeRPhi[isher]; j++) {
-      fieldMapFile >> r >> phi >> z >> Br >> Bphi >> Bz;
-
-      //Bphi = 0 at the points with phi=0 or phi=180
-      if (phi == 0. || phi == 180.) Bphi = 0.;
-
-      //Store the values
-      (*mapBuffer)[i][j].r   = r * Unit::m;
-      (*mapBuffer)[i][j].phi = phi * M_PI / 180;
-      //(*mapBuffer)[i][j].z   = z * Unit::m;
-      (*mapBuffer)[i][j].Br   = - Br;   // flip the sign because I-parity in Yamaoka-san's data is wrong
-      (*mapBuffer)[i][j].Bphi = - Bphi; // flip the sign because I-parity in Yamaoka-san's data is wrong
-      (*mapBuffer)[i][j].Bz   = - Bz;   // flip the sign because I-parity in Yamaoka-san's data is wrong
+  union vector3_t {
+    union {
+      struct {
+        double x, y, z;
+      };
+      double v[3];
+    };
+    vector3_t& operator +=(const vector3_t& u) {
+      x += u.x;
+      y += u.y;
+      z += u.z;
+      return *this;
     }
+  };
+
+  vector3_t operator +(const vector3_t& u, const vector3_t& v)
+  {
+    return {u.x + v.x, u.y + v.y, u.z + v.z};
   }
 
-  //map for interpolation
-  fullPath = FileSystem::findFile("/data/" + interFilename);
-
-  if (!FileSystem::fileExists(fullPath)) {
-    B2ERROR("The beamline interpolation map file '" << interFilename << "' could not be found !");
-    return;
+  vector3_t operator -(const vector3_t& u, const vector3_t& v)
+  {
+    return {u.x - v.x, u.y - v.y, u.z - v.z};
   }
 
-  //Load the map file
-  io::filtering_istream interMapFile;
-  interMapFile.push(io::file_source(fullPath));
-
-  int nbinx, nbiny;
-  interMapFile >> m_interMaxRadius >> m_interGridSize >> m_interSizeX >> nbiny;
-
-  nbinx = m_interSizeX;
-  *interBuffer = new InterpolationPoint*[nbinx];
-  std::vector<int> vnbiny(nbinx, 0);
-  for (int j = 0; j < nbinx; ++j) {
-    const double x(m_interGridSize * (j + 0.5) - m_interMaxRadius);
-    double y2 = m_interMaxRadius * m_interMaxRadius - x * x;
-    if (y2 < 0.) y2 = 0.;
-    vnbiny[j] = static_cast<int>(ceil(sqrt(y2) / m_interGridSize));
-    (*interBuffer)[j] = new InterpolationPoint[vnbiny[j]];
+  vector3_t operator *(const vector3_t& u, double a)
+  {
+    return {u.x * a, u.y * a, u.z * a};
   }
 
-  while (!interMapFile.eof()) {
-    int i1, i2;
-    InterpolationPoint p;
-    p.p.resize(4);
-    interMapFile >> i1 >> i2 >> p.p[0] >> p.p[1] >> p.p[2] >> p.p[3];
-
-    if (!(i1 < nbinx && i2 < vnbiny[i1]))
-      B2ERROR("Something wrong '" << interFilename << "': grid(" << i1 << ", " << i2 << ") " << "but maximum grid for y = " <<
-              vnbiny[i1]);
-    (*interBuffer)[i1][i2] = p;
+  vector3_t operator *(double a, const vector3_t& u)
+  {
+    return u * a;
   }
 
-  B2DEBUG(10, "... loaded " << mapFilename << "and" << interFilename << "files");
-}
+  class interpol_t {
+    vector<triangledelaunay_t> _ts;
+    vector<xy_t> _pc;
+    vector<tindex_t> _indx;
+    vector<xy_t> _c;
+    vector<double> _id;
+    double _xmin, _xmax;
+    double _ymin, _ymax;
+    unsigned int _nx, _ny;
+    double _ixnorm, _iynorm;
+  public:
+    const vector<xy_t>& getpoints() const { return _pc;}
+    const vector<triangledelaunay_t>& gettriangles() const { return _ts;}
+
+    interpol_t() {}
+
+    interpol_t(vector<xy_t> pc, vector<triangledelaunay_t> ts, double d)
+    {
+      init(pc, ts, d);
+    }
+
+    ~interpol_t() {}
+
+    void init(vector<xy_t> pc, vector<triangledelaunay_t> ts, double d)
+    {
+      std::swap(pc, _pc);
+      std::swap(ts, _ts);
+      const double inf = numeric_limits<double>::infinity();
+      double xmin = inf, xmax = -inf;
+      double ymin = inf, ymax = -inf;
+      auto limit = [&xmin, &xmax, &ymin, &ymax](const xy_t & p) -> void {
+        xmin = std::min(xmin, p.x); xmax = std::max(xmax, p.x);
+        ymin = std::min(ymin, p.y); ymax = std::max(ymax, p.y);
+      };
+      for (const auto& t : _ts) {
+        limit(_pc[t.j0]);
+        limit(_pc[t.j1]);
+        limit(_pc[t.j2]);
+      }
+      double xw = xmax - xmin;
+      double yw = ymax - ymin;
+
+      xmin -= xw * (1. / 256), xmax += xw * (1. / 256);
+      ymin -= yw * (1. / 256), ymax += yw * (1. / 256);
+      int nx = lrint(xw * (1 + 1. / 128) / d), ny = lrint(yw * (1 + 1. / 128) / d);
+      nx = std::max(nx, 2);
+      ny = std::max(ny, 2);
+      makeindex(nx, xmin, xmax, ny, ymin, ymax);
+    }
+
+    xy_t center(const triangledelaunay_t& p) const
+    {
+      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      return {(p0.x + p1.x + p2.x)* (1. / 3), (p0.y + p1.y + p2.y)* (1. / 3)};
+    }
+
+    void makeindex(int nx, double xmin, double xmax, int ny, double ymin, double ymax)
+    {
+      _nx = nx, _ny = ny, _xmin = xmin, _xmax = xmax, _ymin = ymin, _ymax = ymax;
+      _ixnorm = (nx - 1) / (xmax - xmin), _iynorm = (ny - 1) / (ymax - ymin);
+      double dx = (xmax - xmin) / (nx - 1), dy = (ymax - ymin) / (ny - 1);
+      //    cout<<nx<<" "<<xmin<<" "<<xmax<<" "<<ny<<" "<<ymin<<" "<<ymax<<endl;
+      _indx.resize(nx * ny);
+      _c.resize(_ts.size());
+      for (unsigned int i = 0; i < _ts.size(); i++) _c[i] = center(_ts[i]);
+
+      _id.resize(_ts.size());
+      auto getid = [this](const triangledelaunay_t& p) ->double{
+        const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+        double d21x = p2.x - p1.x, d21y = p2.y - p1.y;
+        double d01x = p0.x - p1.x, d01y = p0.y - p1.y;
+        return 1 / (d21x * d01y - d21y * d01x);
+      };
+      for (unsigned int i = 0; i < _ts.size(); i++) _id[i] = getid(_ts[i]);
 
 
-TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int isher) const
-{
-  BFieldPoint** mapBuffer;
-  InterpolationPoint** interBuffer;
-  int offsetRPhi;
+      for (int ix = 0; ix < nx; ix++) {
+        double x = xmin + ix * dx;
+        for (int iy = 0; iy < ny; iy++) {
+          double y = ymin + iy * dy;
+          int imin = -1; double dmin = 1e100;
+          for (unsigned int i = 0; i < _c.size(); i++) {
+            const xy_t& p = _c[i];
+            double d = pow(p.x - x, 2) + pow(p.y - y, 2);
+            if (d < dmin) {imin = i; dmin = d;}
+          }
+          int k = iy + ny * ix;
+          _indx[k] = imin;
+        }
+      }
+    }
 
-  //added by nakayama to avoid segV
-  if (TMath::Abs(point0.z()) > 399.) return TVector3(0., 0., 0.);
+    tindex_t sidecross(tindex_t prev, tindex_t curr, const xy_t& r, const xy_t& v0) const
+    {
+      const double vx = r.x - v0.x, vy = r.y - v0.y;
+      auto iscrossed = [&vx, &vy, &v0](const xy_t & p1, const xy_t & p0) -> bool {
+        double u0x = p0.x, u0y = p0.y;
+        double ux = p1.x - u0x, uy = p1.y - u0y;
+        double dx = u0x - v0.x, dy = u0y - v0.y;
+        double D = uy * vx - ux * vy;
+        double t = dx * vy - dy * vx;
+        double s = dx * uy - dy * ux;
+        return ((t < D) != (t < 0)) && ((s < D) != (s < 0));
+      };
 
-  //from GEANT4 coordinate to ANSYS coordinate
-  //fabs(y) is used because field data exist only in y>0
-  const double
-  tx = -point0.x(),
-  ty = std::abs(point0.y()),
-  tz = -point0.z();
+      const triangledelaunay_t& p = _ts[curr];
+      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      if (p.n0 != prev && iscrossed(p1, p2)) return p.n0;
+      if (p.n1 != prev && iscrossed(p2, p0)) return p.n1;
+      if (p.n2 != prev && iscrossed(p0, p1)) return p.n2;
+      return _ts.size();
+    }
 
-  double sinBeamCrossAngle = (isher == 1) ? s_sinBeamCrossAngle : -s_sinBeamCrossAngle;
-  TVector3 point(tx * s_cosBeamCrossAngle - tz * sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle + tx * sinBeamCrossAngle);
-  if (isher == 1) {
-    mapBuffer = m_mapBuffer_her;
-    interBuffer = m_interBuffer_her;
-  } else {
-    mapBuffer = m_mapBuffer_ler;
-    interBuffer = m_interBuffer_ler;
-  }
-  offsetRPhi = m_offsetGridRPhi[isher];
+    void weights(tindex_t i, const xy_t& r, double& w0, double& w1, double& w2) const
+    {
+      const triangledelaunay_t& p = _ts[i];
+      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      double dx2  = p2.x -  r.x, dy2  = p2.y -  r.y;
+      double d21x = p2.x - p1.x, d21y = p2.y - p1.y;
+      double d02x = p0.x - p2.x, d02y = p0.y - p2.y;
+      w0 = (dx2 * d21y - dy2 * d21x) * _id[i];
+      w1 = (dx2 * d02y - dy2 * d02x) * _id[i];
+      w2 = 1 - (w0 + w1);
+    }
 
-  //Get the r and z component
-  double r = point.Perp();
-  double phi = point.Phi();
-  double z = point.z();
-  double absz = fabs(z);
+    tindex_t find_triangle(const xy_t& r0) const
+    {
+      unsigned int ix = lrint((r0.x - _xmin) * _ixnorm), iy = lrint((r0.y - _ymin) * _iynorm);
+      tindex_t curr = (ix < _nx && iy < _ny) ? _indx[iy + _ny * ix] : 0;
+      xy_t r = _c[curr];
+      const tindex_t end = _ts.size();
+      tindex_t prev = end;
+      do {
+        tindex_t next = sidecross(prev, curr, r, r0);
+        if (next == end) break;
+        prev = curr;
+        curr = next;
+      } while (1);
+      return curr;
+    }
+  };
 
-  //Check if the point lies inside the magnetic field boundaries
-  if ((r < s_mapRegionR[0]) || (r > s_mapRegionR[1]) ||
-      (z < m_mapRegionZ[0]) || (z > m_mapRegionZ[1])) {
-    return TVector3(0.0, 0.0, 0.0);
-  }
+  class interpol3d_t {
+    vector<vector3_t> _B;
+    interpol_t _I;
+    int _nxy, _nz, _nz1, _nz2, _nr, _nphi;
+    double _rj, _rj2, _zj, _dz0, _dz1, _idz0, _idz1, _idphi, _idr;
+    double _rmax, _zmax;
+  public:
+    const interpol_t& getinterpol() const {return _I;}
+    interpol3d_t() {}
+    ~interpol3d_t() {}
 
-  double Bx, By, Bz;
+    void init(const string& fieldmapname, const string& interpolname, double validradius)
+    {
+      if (fieldmapname.empty()) {
+        B2ERROR("The filename for the beamline magnetic field component is empty !");
+        return;
+      }
+      std::string l_fieldmapname = FileSystem::findFile("/data/" + fieldmapname);
 
-  int iz;
-  double dz;
-  if (absz < m_jointZ) {
-    iz = static_cast<int>(absz / m_gridPitchZ[0]);
-    dz = (absz - m_gridPitchZ[0] * iz);
-    dz /= m_gridPitchZ[0];
-  } else {
-    iz = static_cast<int>((absz - m_jointZ) / m_gridPitchZ[1] + m_jointZ / m_gridPitchZ[0]);
-    dz = (absz - m_jointZ) - (iz - static_cast<int>(m_jointZ / m_gridPitchZ[0])) * m_gridPitchZ[1];
-    dz /= m_gridPitchZ[1];
-  }
-  if (z < 0) {
-    iz = m_offsetGridZ - 1 - iz;
-    dz *= -1.;
-  } else {
-    iz += m_offsetGridZ;
-  }
+      if (interpolname.empty()) {
+        B2ERROR("The filename for the triangulation of the beamline magnetic field component is empty !");
+        return;
+      }
+      std::string l_interpolname = FileSystem::findFile("/data/" + interpolname);
 
-  if (r < m_jointR) {
-    //Calculate the lower index of the point in the grid
-    int ix = static_cast<int>((point.x() + m_interMaxRadius) / m_interGridSize);
-    int iy = static_cast<int>((fabs(point.y())) / m_interGridSize);
+      _rmax = validradius;
 
-    const InterpolationPoint& ib = interBuffer[ix][iy];
+      B2INFO("Delaunay triangulation of the beamline field map: " << l_interpolname);
+      B2INFO("Beamline field map: " << l_fieldmapname);
 
-    double phi1 = mapBuffer[iz][ib.p[0]].phi;
-    double phi2 = mapBuffer[iz][ib.p[1]].phi;
-    double r1 = mapBuffer[iz][ib.p[0]].r;
-    double r2 = mapBuffer[iz][ib.p[1]].r;
+      // load interpolation triangles
+      ifstream INd(l_interpolname);
+      int nts; INd >> nts;
+      B2INFO("Total number of triangles: " << nts);
+      vector<triangledelaunay_t> ts;
+      ts.reserve(nts);
 
-    if (r1 * r2 != 0. && (fabs(phi1 - phi2) < 0.02 || fabs(r1 - r2) < 0.02)) {
-      //Cylindrical Polar Coordinates
-      TVector3 point_r(r, phi, z);
-      vector<TVector3> vp(4);
-      TVectorD vBr1(4), vBphi1(4), vBz1(4), vBr2(4), vBphi2(4), vBz2(4);
-      for (int i = 0; i < 4; ++i) {
-        vp[i].SetX(mapBuffer[iz][ib.p[i]].r);
-        vp[i].SetY(mapBuffer[iz][ib.p[i]].phi);
-        vBr1[i] = mapBuffer[iz][ib.p[i]].Br;
-        vBphi1[i] = mapBuffer[iz][ib.p[i]].Bphi;
-        vBz1[i] = mapBuffer[iz][ib.p[i]].Bz;
+      triangledelaunay_t p;
+      while (INd >> nts >> p.j0 >> p.j1 >> p.j2 >> p.n0 >> p.n1 >> p.n2) ts.push_back(p);
 
-        vBr2[i] = mapBuffer[iz + 1][ib.p[i]].Br;
-        vBphi2[i] = mapBuffer[iz + 1][ib.p[i]].Bphi;
-        vBz2[i] = mapBuffer[iz + 1][ib.p[i]].Bz;
+      //Load the map file
+      io::filtering_istream IN;
+      IN.push(io::gzip_decompressor());
+      IN.push(io::file_source(l_fieldmapname));
+
+      int nrphi;
+      IN >> nrphi >> _rj >> _nr >> _nphi;
+      IN >> _nz >> _zj >> _dz0 >> _dz1;
+      _idphi = _nphi / M_PI;
+      _rj2 = _rj * _rj;
+      _idz0 = 1 / _dz0;
+      _idz1 = 1 / _dz1;
+      int nz0 = 2 * int(_zj / _dz0);
+      _zmax = (_nz - (nz0 + 1)) / 2 * _dz1 + _zj;
+      _nz1 = (_nz - (nz0 + 1)) / 2;
+      _nz2 = _nz1 + nz0;
+      //    cout<<_zmax<<" "<<nz0<<" "<<_nz1<<" "<<_nz2<<endl;
+
+      struct cs_t {double c, s;};
+      vector<cs_t> cs(nrphi);
+      vector<xy_t> pc;
+      vector<vector3_t> tbc;
+      pc.reserve(nrphi);
+      char cbuf[256]; IN.getline(cbuf, 256);
+      double r, phi, Br, Bphi, Bz;
+      double rmax = 0;
+      for (int j = 0; j < nrphi; j++) {
+        IN.getline(cbuf, 256);
+        char* next = cbuf;
+        r    = strtod(next, &next);
+        phi  = strtod(next, &next);
+        strtod(next, &next);
+        Br   = strtod(next, &next);
+        Bphi = strtod(next, &next);
+        Bz   = strtod(next, NULL);
+        r *= 100;
+        rmax = std::max(r, rmax);
+        if (phi == 0) {
+          cs[j] = { 1, 0};
+        } else if (phi == 180) {
+          cs[j] = { -1, 0};
+        } else {
+          phi *= M_PI / 180;
+          cs[j] = {cos(phi), sin(phi)};
+        }
+        double x = r * cs[j].c, y = r * cs[j].s;
+        pc.push_back({x, y});
+        if (cs[j].s == 0) Bphi = 0;
+        double Bx = Br * cs[j].c - Bphi * cs[j].s;
+        double By = Br * cs[j].s + Bphi * cs[j].c;
+        tbc.push_back({Bx, By, Bz});
+      }
+      //    cout<<"Field map has data points up to R="<<rmax<<" cm."<<endl;
+
+      _idr = _nr / (rmax - _rj);
+      _rmax = std::min(_rmax, rmax);
+      bool reduce = _rj > _rmax;
+
+      vector<bool> ip;
+      if (reduce) {
+        ip.resize(nrphi, false);
+        vector<bool> it(ts.size(), false);
+        auto inside = [this](const xy_t & p)->bool{
+          return p.x * p.x + p.y * p.y < _rmax * _rmax;
+        };
+
+        for (int i = 0, imax = ts.size(); i < imax; i++) {
+          const triangledelaunay_t& p = ts[i];
+          const xy_t& p0 = pc[p.j0], &p1 = pc[p.j1], &p2 = pc[p.j2];
+          if (inside(p0) || inside(p1) || inside(p2)) {
+            it[i] = 1;
+            ip[p.j0] = 1;
+            ip[p.j1] = 1;
+            ip[p.j2] = 1;
+          }
+        }
+
+        vector<tindex_t> pindx(nrphi, -1);
+        int rnp = 0;
+        for (int i = 0, imax = ip.size(); i < imax; i++) {
+          if (ip[i]) pindx[i] = rnp++;
+        }
+        vector<xy_t> rpc;
+        rpc.reserve(rnp);
+        for (int i = 0, imax = pc.size(); i < imax; i++) {
+          if (ip[i]) rpc.push_back(pc[i]);
+        }
+
+        vector<tindex_t> tindx(ts.size(), -1);
+        tindex_t rnt = 0;
+        for (int i = 0, imax = it.size(); i < imax; i++) {
+          if (it[i]) tindx[i] = rnt++;
+        }
+        vector<triangledelaunay_t> rts;
+        rts.reserve(rnt);
+        tindex_t nt = ts.size();
+        auto newind = [&nt, &tindx, &rnt](tindex_t n) -> tindex_t {return (n < nt) ? tindx[n] : rnt;};
+        for (int i = 0, imax = ts.size(); i < imax; i++) {
+          if (it[i]) {
+            const triangledelaunay_t& t = ts[i];
+            rts.push_back({pindx[t.j0], pindx[t.j1], pindx[t.j2], newind(t.n0), newind(t.n1), newind(t.n2)});
+          }
+        }
+
+        B2INFO("Reduce map size to cover only region R<" << _rmax << " cm: Ntriangles=" << rnt << " Nxypoints = " << rnp << " Nzslices=" <<
+               _nz << " NBpoints = " << rnp * _nz);
+        std::swap(rpc, pc);
+        std::swap(rts, ts);
+      } else {
+        ip.resize(nrphi, true);
+      }
+      _nxy = pc.size();
+
+      _I.init(pc, ts, 0.1);
+
+      vector<vector3_t> bc(_nxy * _nz);
+      unsigned int count = 0;
+      for (int i = 0; i < nrphi; i++) {
+        if (ip[i]) bc[count++] = tbc[i];
       }
 
-      TVectorD vphi = calculateCoefficientRectangle(point_r, vp);
-      if (vphi.Sum() < 0.9) {
-        // move to interpolation with triangle mesh, because rectangle shape is complecated.
-        vphi = calculateCoefficientTriangle(point_r, vp);
+      for (int i = 1; i < _nz; ++i) {
+        for (int j = 0; j < nrphi; j++) {
+          IN.getline(cbuf, 256);
+          if (!ip[j]) continue;
+          char* next = cbuf;
+          next = strchr(next, ' ');
+          next = strchr(next + 1, ' ');
+          next = strchr(next + 1, ' ');
+          Br   = strtod(next, &next);
+          Bphi = strtod(next, &next);
+          Bz   = strtod(next, NULL);
+          if (cs[j].s == 0) Bphi = 0;
+          double Bx = Br * cs[j].c - Bphi * cs[j].s;
+          double By = Br * cs[j].s + Bphi * cs[j].c;
+          bc[count++] = {Bx, By, Bz};
+        }
       }
+      assert(count == bc.size());
+      swap(bc, _B);
+    }
 
-      //Calculate the linear approx. of the magnetic field vector
-      const double Br   = dz * Dot(vBr1, vphi)   + (1 - dz) * Dot(vBr2, vphi)  ;
-      const double Bphi = dz * Dot(vBphi1, vphi) + (1 - dz) * Dot(vBphi2, vphi);
-      Bz = dz * Dot(vBz1, vphi) + (1 - dz) * Dot(vBz2, vphi);
+    int zindexweight(double z, double& w1) const __attribute__((noinline))
+    {
+      if (std::abs(z) > _zmax) return -1;
+      double fz;
+      int iz = 0;
+      if (z < -_zj) {
+        fz = (z + _zmax) * _idz1;
+      } else if (z < _zj) {
+        fz = (z + _zj) * _idz0;
+        iz = _nz1;
+      } else {
+        fz = (z - _zj) * _idz1;
+        iz = _nz2;
+      }
+      int jz = static_cast<int>(fz);
+      w1 = fz - jz;
+      iz += jz;
+      if (iz == _nz) {
+        --iz;
+        w1 = 1;
+      }
+      return iz;
+    }
 
-      Bx = Br * cos(phi) - Bphi * sin(phi);
-      By = Br * sin(phi) + Bphi * cos(phi);
+    bool inrange(const vector3_t& v) const
+    {
+      if (std::abs(v.z) > _zmax) return false;
+      double R2 = v.x * v.x + v.y * v.y;
+      if (R2 > _rmax * _rmax) return false;
+      return true;
+    }
+
+    vector3_t getfield(const vector3_t& v) const
+    {
+      vector3_t res = {0, 0, 0};
+      double R2 = v.x * v.x + v.y * v.y;
+      if (R2 > _rmax * _rmax) return res;
+      double wz1;
+      int iz = zindexweight(v.z, wz1);
+      if (iz < 0) return res;
+      double wz0 = 1 - wz1;
+
+      if (R2 < _rj2) { // triangular interpolation
+        xy_t xy = {v.x, std::abs(v.y)};
+        double w0, w1, w2;
+        tindex_t it = _I.find_triangle(xy);
+        _I.weights(it, xy, w0, w1, w2);
+        vector<triangledelaunay_t>::const_iterator t = _I.gettriangles().begin() + it;
+        int j0 = t->j0, j1 = t->j1, j2 = t->j2;
+        const vector3_t* B = _B.data() + _nxy * iz;
+        vector3_t b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
+        B += _nxy; // next z-slice
+        b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
+        res = b;
+      } else {// r-phi grid
+        double r = sqrt(R2), phi = atan2(std::abs(v.y), v.x);
+        double fr = (r - _rj) * _idr;
+        double fphi = phi * _idphi;
+
+        int ir = static_cast<int>(fr);
+        int iphi = static_cast<int>(fphi);
+
+        ir -= (ir == _nr);
+        iphi -= (iphi == _nphi);
+
+        double wr1 = fr - ir, wr0 = 1 - wr1;
+        double wphi1 = fphi - iphi, wphi0 = 1 - wphi1;
+        const int nr1 = _nr + 1, nphi1 = _nphi + 1;
+        int j00 = _nxy - nr1 * (nphi1 - iphi) + ir;
+        int j01 = j00 + 1;
+        int j10 = j00 + nr1;
+        int j11 = j01 + nr1;
+
+        const vector3_t* B = _B.data() + _nxy * iz;
+        vector3_t b = ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz0;
+        B += _nxy; // next z-slice
+        b += ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz1;
+        res = b;
+      }
+      if (v.y < 0) res.y = -res.y;
+      return res;
+    }
+  };
+
+  void BFieldComponentBeamline::initialize()
+  {
+    if (!m_ler) m_ler = new interpol3d_t;
+    if (!m_her) m_her = new interpol3d_t;
+    m_ler->init(m_mapFilename_ler, m_interFilename_ler, s_mapRegionR[1]);
+    m_her->init(m_mapFilename_her, m_interFilename_her, s_mapRegionR[1]);
+  }
+
+  BFieldComponentBeamline::~BFieldComponentBeamline()
+  {
+    if (m_ler) delete m_ler;
+    if (m_ler) delete m_ler;
+  }
+
+  bool BFieldComponentBeamline::isInRange(const TVector3& v) const
+  {
+    TVector3 res;
+    double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
+
+    double xc = -v.x() * c, zs = -v.z() * s, zc = -v.z() * c, xs = -v.x() * s;
+    vector3_t hv = {xc - zs, v.y(), zc + xs};
+    vector3_t lv = {xc + zs, v.y(), zc - xs};
+    return m_ler->inrange(lv) || m_her->inrange(hv);
+  }
+
+  TVector3 BFieldComponentBeamline::calculate(const TVector3& v) const
+  {
+    TVector3 res;
+    double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
+
+    double xc = -v.x() * c, zs = -v.z() * s, zc = -v.z() * c, xs = -v.x() * s;
+    vector3_t hv = {xc - zs, v.y(), zc + xs};
+    vector3_t lv = {xc + zs, v.y(), zc - xs};
+    vector3_t hb = m_her->getfield(hv);
+    vector3_t lb = m_ler->getfield(lv);
+    vector3_t rhb = {hb.x* c + hb.z * s, hb.y,  hb.z* c - hb.x * s};
+    vector3_t rlb = {lb.x* c - lb.z * s, lb.y,  lb.z* c + lb.x * s};
+
+    double mhb = std::abs(rhb.x) + std::abs(rhb.y) + std::abs(rhb.z);
+    double mlb = std::abs(rlb.x) + std::abs(rlb.y) + std::abs(rlb.z);
+
+    if (mhb < 1e-10) res.SetXYZ(rlb.x, rlb.y, rlb.z);
+    else if (mlb < 1e-10) res.SetXYZ(rhb.x, rhb.y, rhb.z);
+    else {
+      vector3_t t = 0.5 * (rlb + rhb);
+      res.SetXYZ(t.x, t.y, t.z);
+    }
+    return res;
+  }
+
+  void BFieldComponentBeamline::terminate()
+  {
+  }
+
+  /** Static function holding the instance.*/
+  BFieldComponentBeamline** GetInstancePtr()
+  {
+    static BFieldComponentBeamline* gInstance = nullptr;
+    return &gInstance;
+  }
+
+  ///static function
+  BFieldComponentBeamline& BFieldComponentBeamline::Instance()
+  {
+    auto gInstance = GetInstancePtr();
+    if (*gInstance == nullptr) {
+      // Constructor creates a new instance, inits gInstance.
+      new BFieldComponentBeamline();
+    }
+    return **gInstance;
+  }
+
+  BFieldComponentBeamline::BFieldComponentBeamline()
+  {
+    auto gInstance = GetInstancePtr();
+    if (*gInstance != nullptr) {
+      B2WARNING("BFieldComponentBeamline: object already instantiated");
     } else {
-      //orthogonal coordinate
-      vector<TVector3> vp(4);
-      TVectorD vBx1(4), vBy1(4), vBz1(4), vBx2(4), vBy2(4), vBz2(4);
-
-      for (int i = 0; i < 4; ++i) {
-        double cosphi = cos(mapBuffer[iz][ib.p[i]].phi);
-        double sinphi = sin(mapBuffer[iz][ib.p[i]].phi);
-        vp[i].SetX(mapBuffer[iz][ib.p[i]].r * cosphi);
-        vp[i].SetY(mapBuffer[iz][ib.p[i]].r * sinphi);
-        vBx1[i] = mapBuffer[iz][ib.p[i]].Br * cosphi - mapBuffer[iz][ib.p[i]].Bphi * sinphi;
-        vBy1[i] = mapBuffer[iz][ib.p[i]].Br * sinphi + mapBuffer[iz][ib.p[i]].Bphi * cosphi;
-        vBz1[i] = mapBuffer[iz][ib.p[i]].Bz;
-
-        vBx2[i] = mapBuffer[iz + 1][ib.p[i]].Br * cosphi - mapBuffer[iz + 1][ib.p[i]].Bphi * sinphi;
-        vBy2[i] = mapBuffer[iz + 1][ib.p[i]].Br * sinphi + mapBuffer[iz + 1][ib.p[i]].Bphi * cosphi;
-        vBz2[i] = mapBuffer[iz + 1][ib.p[i]].Bz;
-      }
-
-      TVectorD vphi = calculateCoefficientRectangle(point, vp);
-      if (vphi.Sum() < 0.9) {
-        // move to interpolation with triangle mesh, because rectangle shape is complecated.
-        vphi = calculateCoefficientTriangle(point, vp);
-      }
-
-      //Calculate the linear approx. of the magnetic field vector
-      Bx = dz * Dot(vBx1, vphi) + (1 - dz) * Dot(vBx2, vphi);
-      By = dz * Dot(vBy1, vphi) + (1 - dz) * Dot(vBy2, vphi);
-      Bz = dz * Dot(vBz1, vphi) + (1 - dz) * Dot(vBz2, vphi);
+      *gInstance = this;
     }
-  } else {
-    TVector3 point_r(r, phi, z);
-
-    int ir = static_cast<int>((r - 1.25) / (2.5 - 1.25) * m_nGridR);
-    int iphi = static_cast<int>(phi / m_nGridPhi);
-
-    if (ir == m_nGridR) --ir;
-    if (iphi == m_nGridPhi) --iphi;
-
-    vector<TVector3> vp(4);
-    TVectorD vBr1(4), vBphi1(4), vBz1(4), vBr2(4), vBphi2(4), vBz2(4);
-    for (int i = 0; i < 2; ++i) {
-      for (int j = 0; j < 2; ++j) {
-        const int irphi = (iphi + i) * (m_nGridR + 1) + ir + j + offsetRPhi;
-        const int ij = i * 2 + j;
-        vp[ij].SetX(mapBuffer[iz][irphi].r);
-        vp[ij].SetY(mapBuffer[iz][irphi].phi);
-        vBr1[ij]   = mapBuffer[iz][irphi].Br;
-        vBphi1[ij] = mapBuffer[iz][irphi].Bphi;
-        vBz1[ij]   = mapBuffer[iz][irphi].Bz;
-
-        vBr2[ij]   = mapBuffer[iz + 1][irphi].Br;
-        vBphi2[ij] = mapBuffer[iz + 1][irphi].Bphi;
-        vBz2[ij]   = mapBuffer[iz + 1][irphi].Bz;
-      }
-    }
-    TVectorD vphi = calculateCoefficientRectangle(point_r, vp);
-
-    //Calculate the linear approx. of the magnetic field vector
-    const double Br   = dz * Dot(vBr1, vphi)   + (1 - dz) * Dot(vBr2, vphi)  ;
-    const double Bphi = dz * Dot(vBphi1, vphi) + (1 - dz) * Dot(vBphi2, vphi);
-    Bz = dz * Dot(vBz1, vphi) + (1 - dz) * Dot(vBz2, vphi);
-
-    Bx = Br * cos(phi) - Bphi * sin(phi);
-    By = Br * sin(phi) + Bphi * cos(phi);
   }
 
-  //B2DEBUG(20, "B HER3d field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
-
-  if (point0.y() == 0) By = 0.;
-
-  //if y<0 fabs(y), By should be flipped
-  if (point0.y() < 0) By = -By;
-
-  //from ANSYS Coordinate to GEANT4 Coordinate
-  Bx = -Bx;
-  Bz = -Bz;
-  return TVector3(Bx * s_cosBeamCrossAngle + Bz * sinBeamCrossAngle, By,  Bz * s_cosBeamCrossAngle - Bx * sinBeamCrossAngle);
 }
-
-
-TVector3 BFieldComponentBeamline::calculate(const TVector3& point) const
-{
-
-  if (!isInRange(point)) return TVector3(0.0, 0.0, 0.0);
-
-
-  TVector3 B_her = calculate_her(point);
-  TVector3 B_ler = calculate_ler(point);
-
-  if (B_ler.Mag() < 1.e-10)
-    return B_her;
-  if (B_her.Mag() < 1.e-10)
-    return B_ler;
-  else
-    return (B_her + B_ler) * 0.5;
-}
-
-void BFieldComponentBeamline::terminate()
-{
-
-  /*
-  //================================
-  //check beam line magnetic field
-  //================================
-
-  //HER
-  for (double s = -400; s < 400; s += 0.1) {
-    TVector3 pher(0, 0, s);
-    pher.RotateY(0.0415); pher.RotateX(M_PI);
-    TVector3 dx(((s < 0) ? -0.0007 : 0.0007), 0, 0);
-    //TVector3 Bher = calculate(pher+dx);
-    TVector3 Bher = calculate(pher);
-    Bher.RotateX(-M_PI); Bher.RotateY(-0.0415);
-    double SK0 = Bher.X() / (7.0e+9 / 3.0e+8 / 0.01);
-    double K0 = Bher.Y() / (7.0e+9 / 3.0e+8 / 0.01);
-    printf("SolCheckHER s= %f [m], K0= %10.8f ,SK0= %10.8f, Bz= %f\n", s / 100., K0, SK0, Bher.Z());
-    pher.Delete(); Bher.Delete();
-  }
-
-  //LER
-  for (double s = -400; s < 400; s += 0.1) {
-    TVector3 pler(0, 0, s);
-    pler.RotateY(-0.0415); pler.RotateX(M_PI);
-    TVector3 dy(0, ((s < 0) ? 0.001 : 0.0015), 0);
-    //TVector3 Bler = calculate(pler+dy);
-    TVector3 Bler = calculate(pler);
-    Bler.RotateX(-M_PI); Bler.RotateY(0.0415);
-    double SK0 = Bler.X() / (4.0e+9 / 3.0e+8 / 0.01);
-    double K0 = Bler.Y() / (4.0e+9 / 3.0e+8 / 0.01);
-    printf("SolCheckLER s= %f [m], K0= %10.8f ,SK0= %10.8f, Bz= %f\n", s / 100., K0, SK0, Bler.Z());
-    pler.Delete(); Bler.Delete();
-  }
-  */
-
-
-  B2DEBUG(10, "De-allocating the memory for the beamline magnetic field map loaded from the file"
-          << "'" << m_mapFilename_her << "'"
-          << "'" << m_mapFilename_ler << "'"
-          << "'" << m_interFilename_her << "'"
-          << "'" << m_interFilename_ler << "'");
-
-  //De-Allocate memory to prevent memory leak
-  for (int i = 0; i < m_mapSizeZ; ++i) {
-    delete [] m_mapBuffer_her[i];
-    delete [] m_mapBuffer_ler[i];
-  }
-  delete [] m_mapBuffer_her;
-  delete [] m_mapBuffer_ler;
-
-  for (int i = 0; i < m_interSizeX; ++i) {
-    delete [] m_interBuffer_her[i];
-    delete [] m_interBuffer_ler[i];
-  }
-  delete [] m_interBuffer_her;
-  delete [] m_interBuffer_ler;
-}
-
-TVectorD BFieldComponentBeamline::calculateCoefficientRectangle(const TVector3& x, const vector<TVector3>& vx) const
-{
-  TVectorD b(4);
-  b(0) = 1;
-  b(1) = x.X();
-  b(2) = x.Y();
-  b(3) = x.X() * x.Y();
-
-  TMatrixD A(4, 4);
-  for (int i = 0; i < 4; ++i) {
-    A(i, 0) = 1;
-    A(i, 1) = vx[i].X();
-    A(i, 2) = vx[i].Y();
-    A(i, 3) = vx[i].X() * vx[i].Y();
-  }
-
-  double det;
-  TMatrixD ATbar = A;
-  ATbar.T();
-  ATbar.Invert(&det);
-  TVectorD phi = b;
-  phi *= ATbar;
-
-  if (phi(0) < -0.5 || phi(1) < -0.5 || phi(2) < -0.5 || phi(3) < -0.5 ||
-      phi(0) > 1.5 || phi(1) > 1.5 || phi(2) > 1.5 || phi(3) > 1.5) {
-    //Bad coefficient. So return 0 values.
-    double zero(0.);
-    return TVectorD(4, &zero);
-  }
-  return phi;
-}
-
-TVectorD BFieldComponentBeamline::calculateCoefficientTriangle(const TVector3& x, const vector<TVector3>& vx) const
-{
-  TVectorD b(3);
-  b(0) = 1;
-  b(1) = x.X();
-  b(2) = x.Y();
-
-  TMatrixD A(3, 3);
-  for (int i = 0; i < 3; ++i) {
-    A(i, 0) = 1;
-    A(i, 1) = vx[i].X();
-    A(i, 2) = vx[i].Y();
-  }
-
-  double det;
-  TMatrixD ATbar = A;
-  ATbar.T();
-  ATbar.Invert(&det);
-  TVectorD phi0 = b;
-  phi0 *= ATbar;
-
-  TVectorD phi(4);
-  phi(0) = phi0(0);
-  phi(1) = phi0(1);
-  phi(2) = phi0(2);
-  phi(3) = 0.;
-  return phi;
-}
-

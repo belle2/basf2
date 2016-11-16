@@ -72,7 +72,7 @@ void BFieldComponentRadial::initialize()
 TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 {
   // When BFieldComponentBeamline return finit field, it return zero field;
-  if (BFieldComponentBeamline::isInRange(point)) {
+  if (BFieldComponentBeamline::Instance().isInRange(point)) {
     return TVector3(0.0, 0.0, 0.0);
   }
 

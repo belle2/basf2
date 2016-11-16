@@ -29,6 +29,7 @@ void plotComparisonBASF1vs2()
 
   TFile *gBeamParams = new TFile("b2biiBeamParamsConversionMonitors.root");
   TFile *gKSMonitors = new TFile("b2biiKshortConversionMonitors.root");
+  TFile *gKLMonitors = new TFile("b2biiKlongConversionMonitors.root");
   TFile *gKSAVFMonitors = new TFile("b2biiKshortConversionMonitors-AVF.root");
   TFile *gL0Monitors = new TFile("b2biiLambda0ConversionMonitors.root");
   TFile *gL0AVFMonitors = new TFile("b2biiLambda0ConversionMonitors-AVF.root");
@@ -165,6 +166,22 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKSAVFMonitors, "h273",   "abs__bodaughter__bo1__cmmcPDG__bc__bc",  "Ks.child(1).mcPDG",                1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h272",   "daughter__bo0__cmmcP__bc",               "Ks.child(0).mcPtot",               1);
       drawHist(fileName, gBASF, gKSAVFMonitors, "h274",   "daughter__bo1__cmmcP__bc",               "Ks.child(1).mcPtot",                2);
+    }
+
+  // ---------------------------------------------------------------------------------
+  // KL Monitor
+  // ---------------------------------------------------------------------------------
+
+  if(!gBASF || !gKSAVFMonitors || gBASF->IsZombie() || gKSAVFMonitors->IsZombie())
+    cout << "Error opening K-long monitor files!" << endl;
+  else
+    {
+      fileName = "KL-MonitorPlots";
+      drawHist(fileName, gBASF, gKLMonitors, "h901",   "klmClusterPositionX",       "klmClusterPositionX",               0);
+      drawHist(fileName, gBASF, gKLMonitors, "h902",   "klmClusterPositionY",       "klmClusterPositionY",               1);
+      drawHist(fileName, gBASF, gKLMonitors, "h903",   "klmClusterPositionZ",       "klmClusterPositionZ",               1);
+      drawHist(fileName, gBASF, gKLMonitors, "h904",   "klmClusterLayers",          "klmClusterLayers",                  1);
+      drawHist(fileName, gBASF, gKLMonitors, "h905",   "klmClusterInnermostLayer",  "klmClusterInnermostLayer",          2);
     }
 
   // ---------------------------------------------------------------------------------

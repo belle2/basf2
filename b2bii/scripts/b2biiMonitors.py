@@ -213,9 +213,7 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     @param path modules are added to this path
     """
 
-    # copy KLongs from 'K_L0:mdst' list. We don't want to mess with them.
-    copyParticles('K_L0:b2bii_monitor', 'K_L0:mdst', False, path)
-    matchMCTruth('K_L0:b2bii_monitor', path)
+    matchMCTruth('K_L0:mdst', path)
 
     # register VariablesToHistogram and fill it with monitored variables
     klong2hist = register_module('VariablesToHistogram')
@@ -224,16 +222,22 @@ def addKlongConversionMonitors(outputRootFile='b2biiKlongConversionMonitors.root
     # define variables that are monitored and specify
     # the corresponding histogram (#bins, low, high)
     # ('variable_name', number_of_bins, x_low, x_high)
-    klong2hist_pos_x = ('klmClusterPositionX', 100, -10.0, 10.0)
-    klong2hist_pos_y = ('klmClusterPositionY', 100, -10.0, 10.0)
-    klong2hist_pos_z = ('klmClusterPositionZ', 100, -10.0, 10.0)
-    klong2hist_layers = ('klmClusterLayers', 100, 0.0, 20.0)
-    klong2hist_innermost_layer = ('klmClusterInnermostLayer', 100, 0.0, 20.0)
+    klong2hist_pos_x = ('klmClusterPositionX', 100, -3.0, 3.0)
+    klong2hist_pos_y = ('klmClusterPositionY', 100, -3.0, 3.0)
+    klong2hist_pos_z = ('klmClusterPositionZ', 100, -3.0, 3.0)
+    klong2hist_layers = ('klmClusterLayers', 100, 0.0, 35.0)
+    klong2hist_innermost_layer = ('klmClusterInnermostLayer', 100, 0.0, 35.0)
 
     # (vague) mc truth missing
-
+    # mcPDG, mE, mPX, mPY, mPZ
+    klong2hist_mcPDG = ('mcPDG', 1000, 0, 1000)
+    klong2hist_mE = ('mcE', 100, 0.0, 6.0)
+    klong2hist_mPX = ('mcPX', 100, -5.0, 5.0)
+    klong2hist_mPY = ('mcPY', 100, -5.0, 5.0)
+    klong2hist_mPZ = ('mcPZ', 100, -5.0, 5.0)
     klong2hist.param('variables', [klong2hist_pos_x, klong2hist_pos_y, klong2hist_pos_z,
                                    klong2hist_layers, klong2hist_innermost_layer,
+                                   klong2hist_mcPDG, klong2hist_mE, klong2hist_mPX, klong2hist_mPY, klong2hist_mPZ
                                    ])
 
     klong2hist.param('fileName', outputRootFile)

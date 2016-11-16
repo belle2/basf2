@@ -181,7 +181,13 @@ void plotComparisonBASF1vs2()
       drawHist(fileName, gBASF, gKLMonitors, "h902",   "klmClusterPositionY",       "klmClusterPositionY",               1);
       drawHist(fileName, gBASF, gKLMonitors, "h903",   "klmClusterPositionZ",       "klmClusterPositionZ",               1);
       drawHist(fileName, gBASF, gKLMonitors, "h904",   "klmClusterLayers",          "klmClusterLayers",                  1);
-      drawHist(fileName, gBASF, gKLMonitors, "h905",   "klmClusterInnermostLayer",  "klmClusterInnermostLayer",          2);
+      drawHist(fileName, gBASF, gKLMonitors, "h905",   "klmClusterInnermostLayer",  "klmClusterInnermostLayer",          1);
+      drawHist(fileName, gBASF, gKLMonitors, "h906",   "mcPDG", "mcPDG",   1);
+      drawHist(fileName, gBASF, gKLMonitors, "h907",   "mcE",   "mcE",     1);
+      drawHist(fileName, gBASF, gKLMonitors, "h908",   "mcPX",  "mcPX",    1);
+      drawHist(fileName, gBASF, gKLMonitors, "h909",   "mcPY",  "mcPY",    1);
+      drawHist(fileName, gBASF, gKLMonitors, "h910",   "mcPZ",  "mcPZ",    2);
+
     }
 
   // ---------------------------------------------------------------------------------

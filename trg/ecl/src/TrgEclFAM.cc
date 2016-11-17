@@ -274,7 +274,13 @@ TrgEclFAM::getTCHit(int TableFlag)
 
   }
 
-
+  // for(int iii=0; iii< 576 ; iii++){
+  //   std::vector<int> iTCIdm = _TCMap->getXtalIdFromTCId(iii+1);
+  //   for(int jjj =0; jjj< 16; jjj++){
+  //     cout << iTCIdm[jjj] <<" ";
+  //   }
+  //   cout << endl;
+  // }
 
   for (int iXtalIdm = 0; iXtalIdm < 8736; iXtalIdm++) {
     int iTCIdm = _TCMap->getTCIdFromXtalId(iXtalIdm + 1) - 1;

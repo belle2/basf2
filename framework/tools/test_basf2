@@ -43,6 +43,7 @@ def compare_log(template_file, log, ignore_lines=0, diff_lines=10):
                 # decode/encode first
                 sys.stdout.buffer.write(b"\n".join(diff[2:2 + diff_lines]))
                 sys.stdout.buffer.write(b"\n")
+                sys.stdout.buffer.flush()
             return False
         else:
             return True
@@ -103,7 +104,8 @@ def run_test(argument):
                 output.append("=== end %s ===\n" % name)
             extra = "".join(output)
 
-        print("%sfinished test %s\n     -> %s: %s" % (extra, name, {True: "passed", None: "skipped", False: "FAILED"}[result], message))
+        result_message = {True: "passed", None: "skipped", False: "FAILED"}[result]
+        print("%sfinished test %s\n     -> %s: %s" % (extra, name, result_message, message), flush=True)
     return (result, message)
 
 
@@ -165,6 +167,7 @@ if not ('BELLE2_LOCAL_DIR' in os.environ or 'BELLE2_RELEASE_DIR' in os.environ):
     sys.exit(-1)
 
 # first let's collect all tests
+print("running steering file tests in %d %s" % (options.nprocess, "process" if options.nprocess==1 else "processes"), flush=True)
 all_tests = []
 processed_dirs = []
 if "BELLE2_LOCAL_DIR" in os.environ:
@@ -183,7 +186,7 @@ if options.filter is not None:
     all_tests = [e for e in all_tests if re_filter.search(e[0]) is not None]
 
 all_tests.sort()
-print("Collected %d tests..." % len(all_tests))
+print("Collected %d tests..." % len(all_tests), flush=True)
 
 # now let's run them, either in multiprocessing or in a single process
 if options.nprocess > 1:
@@ -222,5 +225,5 @@ if options.xml and len(all_tests):
     xml_file.close()
 
 # print summary and exit
-print('\n %d out of %d tests failed, %d were skipped' % (tests_failed, len(all_tests), tests_skipped))
+print('\n %d out of %d tests failed, %d were skipped' % (tests_failed, len(all_tests), tests_skipped), flush=True)
 sys.exit(tests_failed)

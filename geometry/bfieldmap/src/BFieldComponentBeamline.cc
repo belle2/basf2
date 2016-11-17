@@ -474,7 +474,7 @@ namespace Belle2 {
         b += ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz1;
         res = b;
       }
-      if (v.y < 0) res.y = -res.y;
+      if (v.y > 0) res.y = -res.y;
       return res;
     }
   };

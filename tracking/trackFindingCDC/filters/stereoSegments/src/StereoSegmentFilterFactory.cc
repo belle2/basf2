@@ -18,7 +18,7 @@
 #include <tracking/trackFindingCDC/filters/base/NamedChoosableVarSetFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -26,21 +26,12 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  /// MC filter for stereo segment - track relations.
   using MCStereoSegmentFilter = MCFilter<StereoSegmentTruthVarSet>;
-
-  /// Recording filter for stereo segment - track relations.
   using RecordingStereoSegmentFilter =
     RecordingFilter<VariadicUnionVarSet<StereoSegmentTruthVarSet, StereoSegmentVarSet>>;
-
-  /// All filter for stereo segment - track relations.
   using AllStereoSegmentFilter = AllFilter<BaseStereoSegmentFilter>;
-
-  /// Random filter for stereo segment - track relations.
   using RandomStereoSegmentFilter = RandomFilter<BaseStereoSegmentFilter>;
-
-  /// TMVA filter for stereo segment - track relations.
-  using TMVAStereoSegmentFilter = TMVAFilter<StereoSegmentVarSet>;
+  using MVAStereoSegmentFilter = MVAFilter<StereoSegmentVarSet>;
 }
 
 StereoSegmentFilterFactory::StereoSegmentFilterFactory(const std::string& defaultFilterName)
@@ -68,7 +59,7 @@ StereoSegmentFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "monte carlo truth."},
     {"simple", "give back a weight based on very simple variables you can give as a parameter."},
     {"recording", "record variables to a TTree."},
-    {"tmva", "use the trained BDT."},
+    {"mva", "use the trained BDT."},
   };
 }
 
@@ -86,9 +77,9 @@ StereoSegmentFilterFactory::create(const std::string& filterName) const
   } else if (filterName == "simple") {
     return makeUnique<SimpleStereoSegmentFilter>();
   } else if (filterName == "recording") {
-    return makeUnique<RecordingStereoSegmentFilter>("StereoSegment.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAStereoSegmentFilter>("StereoSegment");
+    return makeUnique<RecordingStereoSegmentFilter>("StereoSegmentFilter.root");
+  } else if (filterName == "mva") {
+    return makeUnique<MVAStereoSegmentFilter>("tracking/data/trackfindingcdc_StereoSegmentFilter.xml");
   } else {
     return Super::create(filterName);
   }

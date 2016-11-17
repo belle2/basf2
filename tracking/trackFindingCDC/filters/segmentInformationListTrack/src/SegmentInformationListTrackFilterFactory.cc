@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainTruthVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
@@ -28,7 +28,7 @@ namespace {
   using MCSegmentInformationListTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
   using RecordingSegmentInformationListTrackFilter =
     RecordingFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
-  using TMVASegmentInformationListTrackFilter = TMVAFilter<SegmentTrainVarSet>;
+  using MVASegmentInformationListTrackFilter = MVAFilter<SegmentTrainVarSet>;
 }
 
 SegmentInformationListTrackFilterFactory::SegmentInformationListTrackFilterFactory(const std::string& defaultFilterName)
@@ -54,7 +54,7 @@ SegmentInformationListTrackFilterFactory::getValidFilterNamesAndDescriptions() c
     {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
     {"recording", "Record to a ttree"},
-    {"tmva", "test using tmva methods"},
+    {"mva", "test using mva methods"},
   };
 }
 
@@ -69,8 +69,8 @@ SegmentInformationListTrackFilterFactory::create(const std::string& filterName) 
     return makeUnique<SimpleSegmentInformationListTrackFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingSegmentInformationListTrackFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVASegmentInformationListTrackFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVASegmentInformationListTrackFilter>();
   } else {
     return Super::create(filterName);
   }

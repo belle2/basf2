@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
@@ -27,7 +27,7 @@ namespace {
   using AllSegmentTrainFilter = AllFilter<BaseSegmentTrainFilter>;
   using MCSegmentTrainFilter = MCFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
   using RecordingSegmentTrainFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
-  using TMVASegmentTrainFilter = TMVAFilter<SegmentTrainVarSet>;
+  using MVASegmentTrainFilter = MVAFilter<SegmentTrainVarSet>;
 }
 
 SegmentTrainFilterFactory::SegmentTrainFilterFactory(const std::string& defaultFilterName)
@@ -53,7 +53,7 @@ SegmentTrainFilterFactory::getValidFilterNamesAndDescriptions() const
     {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"mva", "test with a mva method"}
   };
 }
 
@@ -68,8 +68,8 @@ SegmentTrainFilterFactory::create(const std::string& filterName) const
     return makeUnique<SimpleSegmentTrainFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingSegmentTrainFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVASegmentTrainFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVASegmentTrainFilter>();
   } else {
     return Super::create(filterName);
   }

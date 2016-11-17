@@ -297,6 +297,7 @@ def add_cdc_cr_track_finding(path,
     # Init the geometry for cdc tracking and the hits
     path.add_module("WireHitPreparer",
                     flightTimeEstimation="downwards",
+                    triggerPoint=trigger_point,
                     )
 
     # Find segments and reduce background hits
@@ -350,7 +351,6 @@ def add_cdc_cr_track_finding(path,
     # Correct time seed - assumes velocity near light speed
     path.add_module("TrackFlightTimeAdjuster",
                     inputTracks="OrientedCDCTrackVector",
-                    triggerPoint=trigger_point,
                     )
 
     # Export CDCTracks to RecoTracks representation

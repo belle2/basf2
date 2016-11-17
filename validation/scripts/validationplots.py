@@ -335,7 +335,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
             if process_queue:
                 try:
                     process_queue.put_nowait({"current_package": i, "total_package": len(list_of_packages),
-                                              "package_name": package, "file_name": fileName})
+                                              "status": "running", "package_name": package, "file_name": fileName})
                 except queue.Full:
                     # message could not be placed, but no problem next message will maybe work
                     pass

@@ -474,7 +474,7 @@ namespace Belle2 {
         b += ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz1;
         res = b;
       }
-      if (v.y > 0) res.y = -res.y;
+      if (v.y < 0) res.y = -res.y;
       return res;
     }
   };
@@ -493,25 +493,24 @@ namespace Belle2 {
     if (m_ler) delete m_ler;
   }
 
-  bool BFieldComponentBeamline::isInRange(const TVector3& v) const
+  bool BFieldComponentBeamline::isInRange(const TVector3& p) const
   {
-    TVector3 res;
     double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
-
-    double xc = -v.x() * c, zs = -v.z() * s, zc = -v.z() * c, xs = -v.x() * s;
-    vector3_t hv = {xc - zs, v.y(), zc + xs};
-    vector3_t lv = {xc + zs, v.y(), zc - xs};
+    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates
+    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
+    vector3_t hv = {xc - zs, v.y, zc + xs};
+    vector3_t lv = {xc + zs, v.y, zc - xs};
     return m_ler->inrange(lv) || m_her->inrange(hv);
   }
 
-  TVector3 BFieldComponentBeamline::calculate(const TVector3& v) const
+  TVector3 BFieldComponentBeamline::calculate(const TVector3& p) const
   {
     TVector3 res;
     double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
-
-    double xc = -v.x() * c, zs = -v.z() * s, zc = -v.z() * c, xs = -v.x() * s;
-    vector3_t hv = {xc - zs, v.y(), zc + xs};
-    vector3_t lv = {xc + zs, v.y(), zc - xs};
+    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates
+    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
+    vector3_t hv = {xc - zs, v.y, zc + xs};
+    vector3_t lv = {xc + zs, v.y, zc - xs};
     vector3_t hb = m_her->getfield(hv);
     vector3_t lb = m_ler->getfield(lv);
     vector3_t rhb = {hb.x* c + hb.z * s, hb.y,  hb.z* c - hb.x * s};

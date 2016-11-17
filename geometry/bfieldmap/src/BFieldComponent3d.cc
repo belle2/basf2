@@ -107,14 +107,6 @@ void BFieldComponent3d::initialize()
   B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
               m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
               m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-  if (1) {
-    TVector3 r(1, -50, 1), dr(0.1, 0.1, 0.1);
-    for (int i = 0; i < 1000; i++, r += dr) {
-      TVector3 B = calculate(r);
-      //      B2INFO(Form("%f %f %f %g %g %20.16g", r.x(), r.y(), r.z(), B.x(), B.y(), B.z()));
-    }
-    _exit(0);
-  }
 }
 
 

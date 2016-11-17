@@ -107,6 +107,7 @@ void BFieldComponent3d::initialize()
   B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
               m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
               m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
+  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(vector3_t) / (1024 * 1024.) << " Mb");
 }
 
 
@@ -139,9 +140,9 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
     unsigned int iphi = static_cast<int>(wphi);
     unsigned int iz   = static_cast<int>(wz);
 
-    if (ir + 1 >= (unsigned int)(m_mapSize[0])) return B;
-    if (iphi + 1 >= (unsigned int)(m_mapSize[1])) return B;
-    if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
+    // if (ir + 1 >= (unsigned int)(m_mapSize[0])) return B;
+    // if (iphi + 1 >= (unsigned int)(m_mapSize[1])) return B;
+    // if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
 
     wr   -= ir;
     wphi -= iphi;
@@ -164,18 +165,12 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
     vector3_t bc = {b.x, b.y, b.z}; // in cartesian system
     B.SetXYZ(bc.x, bc.y, bc.z);
   }
-  //  B2INFO(Form("%f %f %f %g %g %20.16g", point.x(), point.y(), point.z(), B.x(), B.y(), B.z()));
 
   return B;
 }
 
 void BFieldComponent3d::terminate()
 {
-}
-
-inline BFieldComponent3d::vector3_t operator*(double a, const BFieldComponent3d::vector3_t& v)
-{
-  return {v.x * a, v.y * a, v.z * a};
 }
 
 inline BFieldComponent3d::vector3_t operator*(const BFieldComponent3d::vector3_t& v, double a)
@@ -188,33 +183,27 @@ inline BFieldComponent3d::vector3_t operator+(const BFieldComponent3d::vector3_t
   return {v.x + u.x, v.y + u.y, v.z + u.z};
 }
 
-BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr,
-                                                            double wphi, double wz) const
+BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, unsigned int iz,
+                                                            double wr1, double wphi1, double wz1) const
 {
-  double wzd = 1 - wz, wyd = 1 - wphi;
+  const unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
+  const unsigned int strideR = m_mapSize[1];
 
-  unsigned int strideZ = m_mapSize[0] * m_mapSize[1];
-  unsigned int strideR = m_mapSize[1];
-
-  unsigned int ind0 = iz * strideZ + ir * strideR + iphi;
-  unsigned int ind1 = ind0 + strideZ;
-  unsigned int ind2 = ind0 + 1;
-  unsigned int ind3 = ind1 + 1;
-  vector3_t i1 = m_bmap[ind0] * wzd + m_bmap[ind1] * wz;
-  vector3_t i2 = m_bmap[ind2] * wzd + m_bmap[ind3] * wz;
-  vector3_t w1 = i1 * wyd + i2 * wphi;
-
-  ind0 += strideR;
-  ind1 += strideR;
-  ind2 += strideR;
-  ind3 += strideR;
-  vector3_t j1 = m_bmap[ind0] * wzd + m_bmap[ind1] * wz;
-  vector3_t j2 = m_bmap[ind2] * wzd + m_bmap[ind3] * wz;
-  vector3_t w2 = j1 * wyd + j2 * wphi;
-
-  vector3_t B = w1 * (1 - wr) + w2 * wr;
-  // const vector3_t &b = m_bmap[ind0];
-  // B2INFO(Form("%g %g %g", b.x, b.y, b.z));
-
-  return B;
+  double wz0 = 1 - wz1, wr0 = 1 - wr1, wphi0 = 1 - wphi1;
+  unsigned int j000 = iz * strideZ + ir * strideR + iphi;
+  unsigned int j001 = j000 + 1;
+  unsigned int j010 = j000 + strideR;
+  unsigned int j011 = j001 + strideR;
+  unsigned int j100 = j000 + strideZ;
+  unsigned int j101 = j001 + strideZ;
+  unsigned int j110 = j010 + strideZ;
+  unsigned int j111 = j011 + strideZ;
+  double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
+  double w000 = w00 * wz0, w010 = w10 * wz0, w001 = w01 * wz0, w011 = w11 * wz0;
+  double w100 = w00 * wz1, w110 = w10 * wz1, w101 = w01 * wz1, w111 = w11 * wz1;
+  const vector<vector3_t>& B = m_bmap;
+  vector3_t b =
+    B[j000] * w000 + B[j001] * w001 + B[j010] * w010 + B[j011] * w011 +
+    B[j100] * w100 + B[j101] * w101 + B[j110] * w110 + B[j111] * w111;
+  return b;
 }

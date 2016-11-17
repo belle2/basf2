@@ -73,10 +73,6 @@
 				<BeamAngle unit="cm">0.0415</BeamAngle>
 				<MapFilenameHER>geometry/BeamlineFieldMap_r25_her.dat.gz</MapFilenameHER>
 				<MapFilenameLER>geometry/BeamlineFieldMap_r25_ler.dat.gz</MapFilenameLER>
-				<!--
-				    <InterFilenameHER>geometry/BeamlineInterpolationPoint_her.dat</InterFilenameHER>
-				    <InterFilenameLER>geometry/BeamlineInterpolationPoint_ler.dat</InterFilenameLER>
-				-->
 				<InterFilenameHER>geometry/BeamlineDelaunay_her.dat</InterFilenameHER>
 				<InterFilenameLER>geometry/BeamlineDelaunay_ler.dat</InterFilenameLER>
 			</Component>

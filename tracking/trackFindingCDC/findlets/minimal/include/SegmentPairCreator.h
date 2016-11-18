@@ -62,7 +62,8 @@ namespace Belle2 {
 
         for (const CDCSegment2D& segment : inputSegments)
         {
-          ISuperLayer iSuperLayer = segment.getISuperLayer();
+          if (segment.empty()) continue;
+          ISuperLayer iSuperLayer = segment.front().getISuperLayer();
           if (not ISuperLayerUtil::isInvalid(iSuperLayer)) {
             const CDCSegment2D* ptrSegment = &segment;
             m_segmentsBySuperLayer[iSuperLayer].push_back(ptrSegment);

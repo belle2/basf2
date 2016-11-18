@@ -71,26 +71,33 @@ namespace Belle2 {
       bool checkSegments() const
       { return checkSegmentsNonNullptr() and checkSegmentsStereoKinds(); }
 
-
-
       /// Getter for the stereo type of the first segment.
       EStereoKind getFromStereoKind() const
-      { return getFromSegment() == nullptr ? EStereoKind::c_Invalid : getFromSegment()->getStereoKind(); }
-
+      {
+        return getFromSegment() == nullptr ? EStereoKind::c_Invalid
+               : getFromSegment()->back().getStereoKind();
+      }
 
       /// Getter for the stereo type of the second segment.
       EStereoKind getToStereoKind() const
-      { return getToSegment() == nullptr ? EStereoKind::c_Invalid : getToSegment()->getStereoKind(); }
-
-
+      {
+        return getToSegment() == nullptr ? EStereoKind::c_Invalid
+               : getToSegment()->front().getStereoKind();
+      }
 
       /// Getter for the superlayer id of the from segment.
       ISuperLayer getFromISuperLayer() const
-      { return getFromSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getFromSegment()->getISuperLayer(); }
+      {
+        return getFromSegment() == nullptr ? ISuperLayerUtil::c_Invalid
+               : getFromSegment()->back().getISuperLayer();
+      }
 
       /// Getter for the superlayer id of the to segment.
       ISuperLayer getToISuperLayer() const
-      { return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getToSegment()->getISuperLayer(); }
+      {
+        return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid
+               : getToSegment()->front().getISuperLayer();
+      }
 
       /// Getter for the total number of hits in this segment pair
       std::size_t size() const

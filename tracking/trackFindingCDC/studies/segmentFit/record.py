@@ -204,6 +204,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
     def initialize(self):
         super().initialize()
         self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
+        self.mc_hit_lookup = Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance()
 
     def prepare(self):
         Belle2.TrackFindingCDC.CDCMCHitLookUp.getInstance().fill()
@@ -217,6 +218,7 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
 
     def peel(self, segment):
         mc_segment_lookup = self.mc_segment_lookup
+        mc_hit_lookup = self.mc_hit_lookup
 
         segment_crops = cdc_peelers.peel_segment2d(segment)
 
@@ -239,8 +241,59 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
             reconstructed_backward=reconstructed_backward,
         )
 
+        rl_sum = 0
+        n_correct = 0
+        n_total = segment.size()
+        first_i_incorrect = float("nan")
+        last_i_incorrect = float("nan")
+        first_l_incorrect = 0
+        last_l_incorrect = 0
+
+        n_rl_switch = 0
+        last_rl_info = 0
+        for i, reco_hit2d in enumerate(segment):
+            rl_info = reco_hit2d.getRLInfo()
+            hit = reco_hit2d.getWireHit().getHit()
+            true_rl_info = mc_hit_lookup.getRLInfo(hit)
+
+            if rl_info != last_rl_info:
+                n_rl_switch += 1
+                last_rl_info = rl_info
+
+            if true_rl_info == rl_info:
+                n_correct += 1
+            else:
+                if first_i_incorrect != first_i_incorrect:
+                    first_i_incorrect = i
+                    first_l_incorrect = reco_hit2d.getRefDriftLength()
+                last_i_incorrect = i
+                last_l_incorrect = reco_hit2d.getRefDriftLength()
+            if rl_info == 1:
+                rl_sum += 1
+            elif rl_info == -1 or rl_info == 65535:  # <- The root interface mistakes the signed enum value for an unsigned value
+                rl_sum -= 1
+
+        alias_score = segment.getAliasScore()
+
+        rl_crops = dict(
+            n_total=n_total,
+            n_correct=n_correct,
+            n_incorrect=n_total - n_correct,
+            rl_purity=n_correct / n_total,
+            first_incorrect_location=first_i_incorrect / (n_total - 1),
+            first_l_incorrect=first_l_incorrect,
+            last_incorrect_location=last_i_incorrect / (n_total - 1),
+            last_l_incorrect=last_l_incorrect,
+            n_rl_switch=n_rl_switch,
+            n_rl_asymmetry=rl_sum / n_total,
+            n_abs_rl_asymmetry=abs(rl_sum) / n_total,
+            may_alias=alias_score == 0,
+            alias_score=alias_score
+        )
+
         segment_crops.update(truth_crops)
         segment_crops.update(mc_particle_crops)
+        segment_crops.update(rl_crops)
         return segment_crops
 
     # Refiners to be executed at the end of the harvesting / termination of the module
@@ -258,6 +311,22 @@ class SegmentFitValidationModule(harvesting.HarvestingModule):
         ],
         outlier_z_score=4.0,
         title_postfix="")
+
+    save_curvature_pull_rl_pure = refiners.save_pull_analysis(
+        part_name="curvature",
+        unit="1/cm",
+        absolute=True,
+        filter_on="rl_purity",
+        filter=lambda rl_purity: rl_purity > 0.5,
+        aux_names=["tan_lambda_truth", "curvature_truth"],
+        groupby=[
+            "stereo_kind",
+            "superlayer_id"
+        ],
+        outlier_z_score=4.0,
+        title_postfix="",
+        folder_name="rl_pure/{groupby_addition}"
+    )
 
     save_absolute_curvature_pull = refiners.save_pull_analysis(
         part_name="curvature",

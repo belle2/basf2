@@ -58,6 +58,24 @@ def get_compact_git_hash(repo_folder):
     return current_git_commit
 
 
+def basf2_command_builder(steering_file, parameters, use_multi_processing=False):
+    """
+    This utility function takes the steering file name and other basf2 parameters
+    and returns a list which can be executed via the OS shell for example to
+    subprocess.Popen(params ...)
+    If use_multi_processing is True, the script will be executed in multi-processing
+    mode with only 1 parallel process in order to test if the code also performs
+    as expected in multi-processing mode
+    """
+    cmd_params = ['basf2']
+    if use_multi_processing:
+        cmd_params += ['-p1']
+    cmd_params += [steering_file]
+    cmd_params += parameters
+
+    return cmd_params
+
+
 def available_revisions(work_folder):
     """
     Loops over the results folder and looks for revisions. It then returns an

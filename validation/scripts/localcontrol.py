@@ -6,6 +6,7 @@ import os
 import subprocess
 import multiprocessing
 import validationpath
+import validationfunctions
 
 
 class Local:
@@ -129,7 +130,7 @@ class Local:
             # 'options' contains an option-string for basf2, e.g. '-n 100 -p
             # 8'. This string will be split on white-spaces and added to the
             # params-list, since subprocess.Popen does not like strings...
-            params = ['basf2', job.path] + options.split()
+            params = validationfunctions.basf2_command_builder(job.path, options.split())
 
         # Log the command we are about the execute
         self.logger.debug(subprocess.list2cmdline(params))

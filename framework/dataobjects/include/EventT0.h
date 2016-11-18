@@ -21,8 +21,8 @@ namespace Belle2 {
     struct EventT0Component {
       EventT0Component() {}
 
-      EventT0Component(double eventT0, double eventT0UncertaintySquared, Const::EDetector detector) :
-        eventT0(eventT0), eventT0UncertaintySquared(eventT0UncertaintySquared), detector(detector) {}
+      EventT0Component(double eventT0_, double eventT0UncertaintySquared_, Const::EDetector detector_) :
+        eventT0(eventT0_), eventT0UncertaintySquared(eventT0UncertaintySquared_), detector(detector_) {}
 
       /// Storage of the T0 estimation.
       double eventT0 = 0;

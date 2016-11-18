@@ -25,25 +25,22 @@ using namespace std;
 namespace io = boost::iostreams;
 namespace Belle2 {
 
-  typedef short int tindex_t;
-
-  struct triangledelaunay_t {
-    tindex_t j0, j1, j2;
-    tindex_t n0, n1, n2;
+  struct triangle_t {
+    /** vertex indicies in a list of xy-points */
+    short int j0, j1, j2;
+    /** index of adjacent triangles in a list of triangles */
+    short int n0, n1, n2;
   };
 
   struct xy_t {
     double x, y;
   };
 
-  union vector3_t {
-    union {
-      struct {
-        double x, y, z;
-      };
-      double v[3];
-    };
-    vector3_t& operator +=(const vector3_t& u) {
+  struct vector3_t {
+    double x, y, z;
+
+    vector3_t& operator +=(const vector3_t& u)
+    {
       x += u.x;
       y += u.y;
       z += u.z;
@@ -71,33 +68,44 @@ namespace Belle2 {
     return u * a;
   }
 
-  class interpol_t {
-    vector<triangledelaunay_t> _ts;
-    vector<xy_t> _pc;
-    vector<tindex_t> _indx;
-    vector<xy_t> _c;
-    vector<double> _id;
-    double _xmin, _xmax;
-    double _ymin, _ymax;
-    unsigned int _nx, _ny;
-    double _ixnorm, _iynorm;
+  /**
+   * The TriangularInterpolation class.
+   *
+   * This class travers triangular meshes which satisfies the Delaunay
+   * condition. In other meshes it may give a wrong result.  The mesh
+   * is represented by a list of triangles coupled to a list of
+   * xy-points.  To speed up the traverse a sort of spatial index is
+   * constructed where on a regular cartesian grid the closeses
+   * triangle center is memorized.
+   */
+  class TriangularInterpolation {
   public:
-    const vector<xy_t>& getpoints() const { return _pc;}
-    const vector<triangledelaunay_t>& gettriangles() const { return _ts;}
+    /** returns list of verticies */
+    const vector<xy_t>& getPoints() const { return m_points;}
+    /** returns list of triangles */
+    const vector<triangle_t>& getTriangles() const { return m_triangles;}
 
-    interpol_t() {}
+    TriangularInterpolation() {}
 
-    interpol_t(vector<xy_t> pc, vector<triangledelaunay_t> ts, double d)
+    TriangularInterpolation(vector<xy_t>& pc, vector<triangle_t>& ts, double d)
     {
       init(pc, ts, d);
     }
 
-    ~interpol_t() {}
+    ~TriangularInterpolation() {}
 
-    void init(vector<xy_t> pc, vector<triangledelaunay_t> ts, double d)
+    /**
+     * Calculate extents of a triangular mesh and build spatial
+     * index. Moves vector contents inside the class.
+     *
+     * @param points    List of verticies
+     * @param triangles List of triangles
+     * @param d         Hint how close spatial index should be built
+     */
+    void init(vector<xy_t>& points, vector<triangle_t>& triangles, double d)
     {
-      std::swap(pc, _pc);
-      std::swap(ts, _ts);
+      std::swap(points, m_points);
+      std::swap(triangles, m_triangles);
       const double inf = numeric_limits<double>::infinity();
       double xmin = inf, xmax = -inf;
       double ymin = inf, ymax = -inf;
@@ -105,10 +113,10 @@ namespace Belle2 {
         xmin = std::min(xmin, p.x); xmax = std::max(xmax, p.x);
         ymin = std::min(ymin, p.y); ymax = std::max(ymax, p.y);
       };
-      for (const auto& t : _ts) {
-        limit(_pc[t.j0]);
-        limit(_pc[t.j1]);
-        limit(_pc[t.j2]);
+      for (const auto& t : m_triangles) {
+        limit(m_points[t.j0]);
+        limit(m_points[t.j1]);
+        limit(m_points[t.j2]);
       }
       double xw = xmax - xmin;
       double yw = ymax - ymin;
@@ -118,33 +126,48 @@ namespace Belle2 {
       int nx = lrint(xw * (1 + 1. / 128) / d), ny = lrint(yw * (1 + 1. / 128) / d);
       nx = std::max(nx, 2);
       ny = std::max(ny, 2);
-      makeindex(nx, xmin, xmax, ny, ymin, ymax);
+      makeIndex(nx, xmin, xmax, ny, ymin, ymax);
     }
 
-    xy_t center(const triangledelaunay_t& p) const
+    /**
+     * Calculate triangle center
+     *
+     * @param p    Triangle
+     */
+    xy_t triangleCenter(const triangle_t& p) const
     {
-      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      const xy_t& p0 = m_points[p.j0], &p1 = m_points[p.j1], &p2 = m_points[p.j2];
       return {(p0.x + p1.x + p2.x)* (1. / 3), (p0.y + p1.y + p2.y)* (1. / 3)};
     }
 
-    void makeindex(int nx, double xmin, double xmax, int ny, double ymin, double ymax)
+    /**
+     * Make spatial index.
+     *
+     * @param nx    Grid size in X axis
+     * @param xmin  Low border on in X
+     * @param xmax  Upper border on in X
+     * @param ny    Grid size in Y axis
+     * @param ymin  Low border on in Y
+     * @param ymax  Upper border on in Y
+     */
+    void makeIndex(int nx, double xmin, double xmax, int ny, double ymin, double ymax)
     {
-      _nx = nx, _ny = ny, _xmin = xmin, _xmax = xmax, _ymin = ymin, _ymax = ymax;
-      _ixnorm = (nx - 1) / (xmax - xmin), _iynorm = (ny - 1) / (ymax - ymin);
+      m_nx = nx, m_ny = ny, m_xmin = xmin, m_xmax = xmax, m_ymin = ymin, m_ymax = ymax;
+      m_ixnorm = (nx - 1) / (xmax - xmin), m_iynorm = (ny - 1) / (ymax - ymin);
       double dx = (xmax - xmin) / (nx - 1), dy = (ymax - ymin) / (ny - 1);
       //    cout<<nx<<" "<<xmin<<" "<<xmax<<" "<<ny<<" "<<ymin<<" "<<ymax<<endl;
-      _indx.resize(nx * ny);
-      _c.resize(_ts.size());
-      for (unsigned int i = 0; i < _ts.size(); i++) _c[i] = center(_ts[i]);
+      m_spatialIndex.resize(nx * ny);
+      m_triangleCenters.resize(m_triangles.size());
+      for (unsigned int i = 0; i < m_triangles.size(); i++) m_triangleCenters[i] = triangleCenter(m_triangles[i]);
 
-      _id.resize(_ts.size());
-      auto getid = [this](const triangledelaunay_t& p) ->double{
-        const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      m_triangleAreas.resize(m_triangles.size());
+      auto getTriangleArea = [this](const triangle_t& p) ->double{
+        const xy_t& p0 = m_points[p.j0], &p1 = m_points[p.j1], &p2 = m_points[p.j2];
         double d21x = p2.x - p1.x, d21y = p2.y - p1.y;
         double d01x = p0.x - p1.x, d01y = p0.y - p1.y;
         return 1 / (d21x * d01y - d21y * d01x);
       };
-      for (unsigned int i = 0; i < _ts.size(); i++) _id[i] = getid(_ts[i]);
+      for (unsigned int i = 0; i < m_triangles.size(); i++) m_triangleAreas[i] = getTriangleArea(m_triangles[i]);
 
 
       for (int ix = 0; ix < nx; ix++) {
@@ -152,21 +175,30 @@ namespace Belle2 {
         for (int iy = 0; iy < ny; iy++) {
           double y = ymin + iy * dy;
           int imin = -1; double dmin = 1e100;
-          for (unsigned int i = 0; i < _c.size(); i++) {
-            const xy_t& p = _c[i];
+          for (unsigned int i = 0; i < m_triangleCenters.size(); i++) {
+            const xy_t& p = m_triangleCenters[i];
             double d = pow(p.x - x, 2) + pow(p.y - y, 2);
             if (d < dmin) {imin = i; dmin = d;}
           }
           int k = iy + ny * ix;
-          _indx[k] = imin;
+          m_spatialIndex[k] = imin;
         }
       }
     }
 
-    tindex_t sidecross(tindex_t prev, tindex_t curr, const xy_t& r, const xy_t& v0) const
+    /**
+     * Determine which triangle side is crossed by a line segment defined by r and v0 points
+     *
+     * @param prev  Triangle number which has been already checked
+     * @param xmin  Triangle number which is being checked
+     * @param r     Starting point of the line segment
+     * @param ny    Ending point of the line segment
+     * @return      Next triangle index in the list if nothing found returns the total number of triangles in the list
+     */
+    short int sideCross(short int prev, short int curr, const xy_t& r, const xy_t& v0) const
     {
       const double vx = r.x - v0.x, vy = r.y - v0.y;
-      auto iscrossed = [&vx, &vy, &v0](const xy_t & p1, const xy_t & p0) -> bool {
+      auto isCrossed = [&vx, &vy, &v0](const xy_t & p1, const xy_t & p0) -> bool {
         double u0x = p0.x, u0y = p0.y;
         double ux = p1.x - u0x, uy = p1.y - u0y;
         double dx = u0x - v0.x, dy = u0y - v0.y;
@@ -176,55 +208,103 @@ namespace Belle2 {
         return ((t < D) != (t < 0)) && ((s < D) != (s < 0));
       };
 
-      const triangledelaunay_t& p = _ts[curr];
-      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
-      if (p.n0 != prev && iscrossed(p1, p2)) return p.n0;
-      if (p.n1 != prev && iscrossed(p2, p0)) return p.n1;
-      if (p.n2 != prev && iscrossed(p0, p1)) return p.n2;
-      return _ts.size();
+      const triangle_t& p = m_triangles[curr];
+      const xy_t& p0 = m_points[p.j0], &p1 = m_points[p.j1], &p2 = m_points[p.j2];
+      if (p.n0 != prev && isCrossed(p1, p2)) return p.n0;
+      if (p.n1 != prev && isCrossed(p2, p0)) return p.n1;
+      if (p.n2 != prev && isCrossed(p0, p1)) return p.n2;
+      return m_triangles.size();
     }
 
-    void weights(tindex_t i, const xy_t& r, double& w0, double& w1, double& w2) const
+    /**
+     * Calculate barycentric coordinates of a point inside triangle
+     *
+     * @param i     Triangle index in the list
+     * @param r     2d cartesian point
+     * @param w0    Weight of 0 vertex
+     * @param w1    Weight of 1 vertex
+     * @param w2    Weight of 2 vertex
+     */
+    void weights(short int i, const xy_t& r, double& w0, double& w1, double& w2) const
     {
-      const triangledelaunay_t& p = _ts[i];
-      const xy_t& p0 = _pc[p.j0], &p1 = _pc[p.j1], &p2 = _pc[p.j2];
+      const triangle_t& p = m_triangles[i];
+      const xy_t& p0 = m_points[p.j0], &p1 = m_points[p.j1], &p2 = m_points[p.j2];
       double dx2  = p2.x -  r.x, dy2  = p2.y -  r.y;
       double d21x = p2.x - p1.x, d21y = p2.y - p1.y;
       double d02x = p0.x - p2.x, d02y = p0.y - p2.y;
-      w0 = (dx2 * d21y - dy2 * d21x) * _id[i];
-      w1 = (dx2 * d02y - dy2 * d02x) * _id[i];
+      w0 = (dx2 * d21y - dy2 * d21x) * m_triangleAreas[i];
+      w1 = (dx2 * d02y - dy2 * d02x) * m_triangleAreas[i];
       w2 = 1 - (w0 + w1);
     }
 
-    tindex_t find_triangle(const xy_t& r0) const
+    /**
+     * Find the triangle which contain the point. If not returns the
+     * closest one.  First using the spatial index locate triangle
+     * close to the point and then traverse the mesh using Delaunay
+     * triangulation properties.
+     *
+     * @param r0  2d cartesian point
+     * @return    Triangle index in the list
+     */
+    short int findTriangle(const xy_t& r0) const
     {
-      unsigned int ix = lrint((r0.x - _xmin) * _ixnorm), iy = lrint((r0.y - _ymin) * _iynorm);
-      tindex_t curr = (ix < _nx && iy < _ny) ? _indx[iy + _ny * ix] : 0;
-      xy_t r = _c[curr];
-      const tindex_t end = _ts.size();
-      tindex_t prev = end;
+      unsigned int ix = lrint((r0.x - m_xmin) * m_ixnorm), iy = lrint((r0.y - m_ymin) * m_iynorm);
+      short int curr = (ix < m_nx && iy < m_ny) ? m_spatialIndex[iy + m_ny * ix] : 0;
+      xy_t r = m_triangleCenters[curr];
+      const short int end = m_triangles.size();
+      short int prev = end;
       do {
-        tindex_t next = sidecross(prev, curr, r, r0);
+        short int next = sideCross(prev, curr, r, r0);
         if (next == end) break;
         prev = curr;
         curr = next;
       } while (1);
       return curr;
     }
+  protected:
+    /** Triangle list */
+    vector<triangle_t> m_triangles;
+    /** Vertex list */
+    vector<xy_t> m_points;
+    /** Triangle centers */
+    vector<xy_t> m_triangleCenters;
+    /** Triangle areas */
+    vector<double> m_triangleAreas;
+    /** Spatial index */
+    vector<short int> m_spatialIndex;
+    /** Border of the region where the spatial index is constructed */
+    double m_xmin, m_xmax;
+    double m_ymin, m_ymax;
+    /** Spatial index grid size */
+    unsigned int m_nx, m_ny;
+    /** Reciprocals to speedup the index calculation */
+    double m_ixnorm, m_iynorm;
   };
 
-  class interpol3d_t {
-    vector<vector3_t> _B;
-    interpol_t _I;
-    int _nxy, _nz, _nz1, _nz2, _nr, _nphi;
-    double _rj, _rj2, _zj, _dz0, _dz1, _idz0, _idz1, _idphi, _idr;
-    double _rmax, _zmax;
+  /**
+   * The BeamlineFieldMapInterpolation class.
+   *
+   * This class interpolates a magnetic field map around beamline.
+   * The magnetic field map is stored as a grid in cylindrical
+   * coordinates for outer radiuses and triangular mesh for inner part
+   * It is defined by a maximum radius and a maximum z value, a pitch
+   * size in both, r and z, and the number of grid points.
+   */
+  class BeamlineFieldMapInterpolation {
   public:
-    const interpol_t& getinterpol() const {return _I;}
-    interpol3d_t() {}
-    ~interpol3d_t() {}
+    const TriangularInterpolation& getTriangularInterpolation() const {return m_triInterpol;}
+    BeamlineFieldMapInterpolation() {}
+    ~BeamlineFieldMapInterpolation() {}
 
-    void init(const string& fieldmapname, const string& interpolname, double validradius)
+    /**
+     * Initializes the magnetic field component.
+     * This method opens the magnetic field map file and triangular mesh.
+     *
+     * @param fieldmapname File name containing the field map
+     * @param interpolname File name containing triangular mesh
+     * @param validRadius Maximum radius up to which interpolation is valid
+     */
+    void init(const string& fieldmapname, const string& interpolname, double validRadius)
     {
       if (fieldmapname.empty()) {
         B2ERROR("The filename for the beamline magnetic field component is empty !");
@@ -238,7 +318,7 @@ namespace Belle2 {
       }
       std::string l_interpolname = FileSystem::findFile("/data/" + interpolname);
 
-      _rmax = validradius;
+      m_rmax = validRadius;
 
       B2INFO("Delaunay triangulation of the beamline field map: " << l_interpolname);
       B2INFO("Beamline field map: " << l_fieldmapname);
@@ -247,10 +327,10 @@ namespace Belle2 {
       ifstream INd(l_interpolname);
       int nts; INd >> nts;
       B2INFO("Total number of triangles: " << nts);
-      vector<triangledelaunay_t> ts;
+      vector<triangle_t> ts;
       ts.reserve(nts);
 
-      triangledelaunay_t p;
+      triangle_t p;
       while (INd >> nts >> p.j0 >> p.j1 >> p.j2 >> p.n0 >> p.n1 >> p.n2) ts.push_back(p);
 
       //Load the map file
@@ -259,17 +339,17 @@ namespace Belle2 {
       IN.push(io::file_source(l_fieldmapname));
 
       int nrphi;
-      IN >> nrphi >> _rj >> _nr >> _nphi;
-      IN >> _nz >> _zj >> _dz0 >> _dz1;
-      _idphi = _nphi / M_PI;
-      _rj2 = _rj * _rj;
-      _idz0 = 1 / _dz0;
-      _idz1 = 1 / _dz1;
-      int nz0 = 2 * int(_zj / _dz0);
-      _zmax = (_nz - (nz0 + 1)) / 2 * _dz1 + _zj;
-      _nz1 = (_nz - (nz0 + 1)) / 2;
-      _nz2 = _nz1 + nz0;
-      //    cout<<_zmax<<" "<<nz0<<" "<<_nz1<<" "<<_nz2<<endl;
+      IN >> nrphi >> m_rj >> m_nr >> m_nphi;
+      IN >> m_nz >> m_zj >> m_dz0 >> m_dz1;
+      m_idphi = m_nphi / M_PI;
+      m_rj2 = m_rj * m_rj;
+      m_idz0 = 1 / m_dz0;
+      m_idz1 = 1 / m_dz1;
+      int nz0 = 2 * int(m_zj / m_dz0);
+      m_zmax = (m_nz - (nz0 + 1)) / 2 * m_dz1 + m_zj;
+      m_nz1 = (m_nz - (nz0 + 1)) / 2;
+      m_nz2 = m_nz1 + nz0;
+      //    cout<<_zmax<<" "<<nz0<<" "<<m_nz1<<" "<<m_nz2<<endl;
 
       struct cs_t {double c, s;};
       vector<cs_t> cs(nrphi);
@@ -307,20 +387,23 @@ namespace Belle2 {
       }
       //    cout<<"Field map has data points up to R="<<rmax<<" cm."<<endl;
 
-      _idr = _nr / (rmax - _rj);
-      _rmax = std::min(_rmax, rmax);
-      bool reduce = _rj > _rmax;
+      m_idr = m_nr / (rmax - m_rj);
+      m_rmax = std::min(m_rmax, rmax);
+      bool reduce = m_rj > m_rmax;
 
+      // if valid radius is within the triangular mesh try to reduce
+      // field map keeping only points which participate to the
+      // interpolation
       vector<bool> ip;
       if (reduce) {
         ip.resize(nrphi, false);
         vector<bool> it(ts.size(), false);
         auto inside = [this](const xy_t & p)->bool{
-          return p.x * p.x + p.y * p.y < _rmax * _rmax;
+          return p.x * p.x + p.y * p.y < m_rmax * m_rmax;
         };
 
         for (int i = 0, imax = ts.size(); i < imax; i++) {
-          const triangledelaunay_t& p = ts[i];
+          const triangle_t& p = ts[i];
           const xy_t& p0 = pc[p.j0], &p1 = pc[p.j1], &p2 = pc[p.j2];
           if (inside(p0) || inside(p1) || inside(p2)) {
             it[i] = 1;
@@ -330,7 +413,7 @@ namespace Belle2 {
           }
         }
 
-        vector<tindex_t> pindx(nrphi, -1);
+        vector<short int> pindx(nrphi, -1);
         int rnp = 0;
         for (int i = 0, imax = ip.size(); i < imax; i++) {
           if (ip[i]) pindx[i] = rnp++;
@@ -341,40 +424,40 @@ namespace Belle2 {
           if (ip[i]) rpc.push_back(pc[i]);
         }
 
-        vector<tindex_t> tindx(ts.size(), -1);
-        tindex_t rnt = 0;
+        vector<short int> tindx(ts.size(), -1);
+        short int rnt = 0;
         for (int i = 0, imax = it.size(); i < imax; i++) {
           if (it[i]) tindx[i] = rnt++;
         }
-        vector<triangledelaunay_t> rts;
+        vector<triangle_t> rts;
         rts.reserve(rnt);
-        tindex_t nt = ts.size();
-        auto newind = [&nt, &tindx, &rnt](tindex_t n) -> tindex_t {return (n < nt) ? tindx[n] : rnt;};
+        short int nt = ts.size();
+        auto newind = [&nt, &tindx, &rnt](short int n) -> short int {return (n < nt) ? tindx[n] : rnt;};
         for (int i = 0, imax = ts.size(); i < imax; i++) {
           if (it[i]) {
-            const triangledelaunay_t& t = ts[i];
+            const triangle_t& t = ts[i];
             rts.push_back({pindx[t.j0], pindx[t.j1], pindx[t.j2], newind(t.n0), newind(t.n1), newind(t.n2)});
           }
         }
 
-        B2INFO("Reduce map size to cover only region R<" << _rmax << " cm: Ntriangles=" << rnt << " Nxypoints = " << rnp << " Nzslices=" <<
-               _nz << " NBpoints = " << rnp * _nz);
+        B2INFO("Reduce map size to cover only region R<" << m_rmax << " cm: Ntriangles=" << rnt << " Nxypoints = " << rnp << " Nzslices=" <<
+               m_nz << " NBpoints = " << rnp * m_nz);
         std::swap(rpc, pc);
         std::swap(rts, ts);
       } else {
         ip.resize(nrphi, true);
       }
-      _nxy = pc.size();
+      m_nxy = pc.size();
 
-      _I.init(pc, ts, 0.1);
+      m_triInterpol.init(pc, ts, 0.1);
 
-      vector<vector3_t> bc(_nxy * _nz);
+      vector<vector3_t> bc(m_nxy * m_nz);
       unsigned int count = 0;
       for (int i = 0; i < nrphi; i++) {
         if (ip[i]) bc[count++] = tbc[i];
       }
 
-      for (int i = 1; i < _nz; ++i) {
+      for (int i = 1; i < m_nz; ++i) {
         for (int j = 0; j < nrphi; j++) {
           IN.getline(cbuf, 256);
           if (!ip[j]) continue;
@@ -392,99 +475,166 @@ namespace Belle2 {
         }
       }
       assert(count == bc.size());
-      swap(bc, _B);
+      swap(bc, m_B);
     }
 
-    int zindexweight(double z, double& w1) const __attribute__((noinline))
+    /**
+     * For a given Z coordinate calculate the index of Z slice and corresponding weight
+     *
+     * @param z  Z coordinate
+     * @param w1  weight of the slice
+     *
+     * @return the index of Z slice. Returns -1 if Z coordinate is outside valid region
+     * region.
+     */
+    int zIndexAndWeight(double z, double& w1) const
     {
-      if (std::abs(z) > _zmax) return -1;
+      if (std::abs(z) > m_zmax) return -1;
       double fz;
       int iz = 0;
-      if (z < -_zj) {
-        fz = (z + _zmax) * _idz1;
-      } else if (z < _zj) {
-        fz = (z + _zj) * _idz0;
-        iz = _nz1;
+      if (z < - m_zj) {
+        fz = (z + m_zmax) * m_idz1;
+      } else if (z < m_zj) {
+        fz = (z + m_zj) * m_idz0;
+        iz = m_nz1;
       } else {
-        fz = (z - _zj) * _idz1;
-        iz = _nz2;
+        fz = (z - m_zj) * m_idz1;
+        iz = m_nz2;
       }
       int jz = static_cast<int>(fz);
       w1 = fz - jz;
       iz += jz;
-      if (iz == _nz) {
+      if (iz == m_nz) {
         --iz;
         w1 = 1;
       }
       return iz;
     }
 
-    bool inrange(const vector3_t& v) const
+    /**
+     * Check the space point if the interpolation exists.
+     *
+     * @param v The space point in Cartesian coordinates (x,y,z) in
+     * [cm] at which the interpolation exists.
+     * @return The magnetic field vector at the given space point in
+     * [T]. Returns false if the space point lies outside the valid
+     * region.
+     */
+    bool inRange(const vector3_t& v) const
     {
-      if (std::abs(v.z) > _zmax) return false;
+      if (std::abs(v.z) > m_zmax) return false;
       double R2 = v.x * v.x + v.y * v.y;
-      if (R2 > _rmax * _rmax) return false;
+      if (R2 > m_rmax * m_rmax) return false;
       return true;
     }
 
-    vector3_t getfield(const vector3_t& v) const
+    /**
+     * Interpolate the magnetic field vector at the specified space point.
+     *
+     * @param v The space point in Cartesian coordinates (x,y,z) in
+     * [cm] at which the magnetic field vector should be calculated.
+     * @return The magnetic field vector at the given space point in
+     * [T]. Returns a zero vector (0,0,0) if the space point lies
+     * outside the region described by the component.
+     */
+    vector3_t interpolateField(const vector3_t& v) const
     {
       vector3_t res = {0, 0, 0};
       double R2 = v.x * v.x + v.y * v.y;
-      if (R2 > _rmax * _rmax) return res;
+      if (R2 > m_rmax * m_rmax) return res;
       double wz1;
-      int iz = zindexweight(v.z, wz1);
+      int iz = zIndexAndWeight(v.z, wz1);
       if (iz < 0) return res;
       double wz0 = 1 - wz1;
 
-      if (R2 < _rj2) { // triangular interpolation
+      if (R2 < m_rj2) { // triangular interpolation
         xy_t xy = {v.x, std::abs(v.y)};
         double w0, w1, w2;
-        tindex_t it = _I.find_triangle(xy);
-        _I.weights(it, xy, w0, w1, w2);
-        vector<triangledelaunay_t>::const_iterator t = _I.gettriangles().begin() + it;
+        short int it = m_triInterpol.findTriangle(xy);
+        m_triInterpol.weights(it, xy, w0, w1, w2);
+        vector<triangle_t>::const_iterator t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
-        const vector3_t* B = _B.data() + _nxy * iz;
+        const vector3_t* B = m_B.data() + m_nxy * iz;
         vector3_t b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
-        B += _nxy; // next z-slice
+        B += m_nxy; // next z-slice
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
         res = b;
       } else {// r-phi grid
         double r = sqrt(R2), phi = atan2(std::abs(v.y), v.x);
-        double fr = (r - _rj) * _idr;
-        double fphi = phi * _idphi;
+        double fr = (r - m_rj) * m_idr;
+        double fphi = phi * m_idphi;
 
         int ir = static_cast<int>(fr);
         int iphi = static_cast<int>(fphi);
 
-        ir -= (ir == _nr);
-        iphi -= (iphi == _nphi);
+        ir -= (ir == m_nr);
+        iphi -= (iphi == m_nphi);
 
         double wr1 = fr - ir, wr0 = 1 - wr1;
         double wphi1 = fphi - iphi, wphi0 = 1 - wphi1;
-        const int nr1 = _nr + 1, nphi1 = _nphi + 1;
-        int j00 = _nxy - nr1 * (nphi1 - iphi) + ir;
+        const int nr1 = m_nr + 1, nphi1 = m_nphi + 1;
+        int j00 = m_nxy - nr1 * (nphi1 - iphi) + ir;
         int j01 = j00 + 1;
         int j10 = j00 + nr1;
         int j11 = j01 + nr1;
 
-        const vector3_t* B = _B.data() + _nxy * iz;
-        vector3_t b = ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz0;
-        B += _nxy; // next z-slice
-        b += ((B[j00] * wr0 + B[j01] * wr1) * wphi0 + (B[j10] * wr0 + B[j11] * wr1) * wphi1) * wz1;
+        double w00 = wr0 * wphi0, w01 = wphi0 * wr1, w10 = wphi1 * wr0, w11 = wphi1 * wr1;
+        const vector3_t* B = m_B.data() + m_nxy * iz;
+        vector3_t b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
+        B += m_nxy; // next z-slice
+        b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
         res = b;
       }
       if (v.y < 0) res.y = -res.y;
       return res;
     }
+  protected:
+    /** Buffer for the magnetic field map */
+    vector<vector3_t> m_B;
+    /** Object to locate point in a triangular mesh */
+    TriangularInterpolation m_triInterpol;
+    /** Number of field points in XY plane */
+    int m_nxy;
+    /** Number of field slices in Z direction */
+    int m_nz;
+    /** Start Z slice number for the finer Z grid */
+    int m_nz1;
+    /** End Z slice number for the finer Z grid */
+    int m_nz2;
+    /** Number of grid points in R direction */
+    int m_nr;
+    /** Number of grid points in Phi direction */
+    int m_nphi;
+    /** Separation radius between triangular and cylindrical meshes */
+    double m_rj;
+    /** Square of the separation radius between triangular and cylindrical meshes */
+    double m_rj2;
+    /** Z border of finer Z grid */
+    double m_zj;
+    /** Coarse Z grid pitch */
+    double m_dz0;
+    /** Finer Z grid pitch */
+    double m_dz1;
+    /** Inverse of coarse Z grid pitch */
+    double m_idz0;
+    /** Inverse of finer Z grid pitch */
+    double m_idz1;
+    /** Repciprocal of Phi grid */
+    double m_idphi;
+    /** Repciprocal of R grid */
+    double m_idr;
+    /** Maximal radius where interpolation is still valid */
+    double m_rmax;
+    /** Maximal Z where interpolation is still valid */
+    double m_zmax;
   };
 
   void BFieldComponentBeamline::initialize()
   {
-    if (!m_ler) m_ler = new interpol3d_t;
-    if (!m_her) m_her = new interpol3d_t;
-    m_ler->init(m_mapFilename_ler, m_interFilename_ler, s_mapRegionR[1]);
-    m_her->init(m_mapFilename_her, m_interFilename_her, s_mapRegionR[1]);
+    if (!m_ler) m_ler = new BeamlineFieldMapInterpolation;
+    if (!m_her) m_her = new BeamlineFieldMapInterpolation;
+    m_ler->init(m_mapFilename_ler, m_interFilename_ler, m_mapRegionR[1]);
+    m_her->init(m_mapFilename_her, m_interFilename_her, m_mapRegionR[1]);
   }
 
   BFieldComponentBeamline::~BFieldComponentBeamline()
@@ -495,24 +645,24 @@ namespace Belle2 {
 
   bool BFieldComponentBeamline::isInRange(const TVector3& p) const
   {
-    double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates
+    double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
+    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
     double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
     vector3_t hv = {xc - zs, v.y, zc + xs};
     vector3_t lv = {xc + zs, v.y, zc - xs};
-    return m_ler->inrange(lv) || m_her->inrange(hv);
+    return m_ler->inRange(lv) || m_her->inRange(hv);
   }
 
   TVector3 BFieldComponentBeamline::calculate(const TVector3& p) const
   {
     TVector3 res;
-    double s = s_sinBeamCrossAngle, c = s_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates
+    double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
+    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
     double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
     vector3_t hv = {xc - zs, v.y, zc + xs};
     vector3_t lv = {xc + zs, v.y, zc - xs};
-    vector3_t hb = m_her->getfield(hv);
-    vector3_t lb = m_ler->getfield(lv);
+    vector3_t hb = m_her->interpolateField(hv);
+    vector3_t lb = m_ler->interpolateField(lv);
     vector3_t rhb = {hb.x* c + hb.z * s, hb.y,  hb.z* c - hb.x * s};
     vector3_t rlb = {lb.x* c - lb.z * s, lb.y,  lb.z* c + lb.x * s};
 

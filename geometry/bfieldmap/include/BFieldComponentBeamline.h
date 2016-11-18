@@ -16,7 +16,7 @@
 
 namespace Belle2 {
   /** forward declaration */
-  class interpol3d_t;
+  class BeamlineFieldMapInterpolation;
 
   /**
    * The BFieldComponentBeamline class.
@@ -99,13 +99,13 @@ namespace Belle2 {
      */
     void setMapRegionR(double minR, double maxR)
     {
-      s_mapRegionR[0] = minR;
-      s_mapRegionR[1] = maxR;
+      m_mapRegionR[0] = minR;
+      m_mapRegionR[1] = maxR;
     }
     /** Parameter to set Map Region  */
     void setBeamAngle(double beamAngle)
     {
-      sincos(beamAngle, &s_sinBeamCrossAngle, &s_cosBeamCrossAngle);
+      sincos(beamAngle, &m_sinBeamCrossAngle, &m_cosBeamCrossAngle);
     }
     /** Parameter to set Angle of the beam */
 
@@ -123,12 +123,12 @@ namespace Belle2 {
     /** Offset required because the accelerator group defines the Belle center as zero. */
     double m_mapOffset{0};
     /** The min and max boundaries of the map region in r. */
-    double s_mapRegionR[2];
+    double m_mapRegionR[2];
     /** The sin and cos of the crossing angle of the beams   */
-    double s_sinBeamCrossAngle, s_cosBeamCrossAngle;
+    double m_sinBeamCrossAngle, m_cosBeamCrossAngle;
     /** Actual magnetic field interpolation objects */
-    interpol3d_t* m_her{0};
-    interpol3d_t* m_ler{0};
+    BeamlineFieldMapInterpolation* m_her{0};
+    BeamlineFieldMapInterpolation* m_ler{0};
   };
 
 } //end of namespace Belle2

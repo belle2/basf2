@@ -15,7 +15,18 @@ using namespace Belle2;
 
 STRGeometryPar::STRGeometryPar()
 {
+  // Set geometry version
   m_Version = 0;
+
+  // Initialize values (to fix cppcheck warnings)
+  for (int i = 0; i < NECLSHIELDS; i++) {
+    m_NLayers[i] = 0;
+  }
+  for (int i = 0; i < NPOLEPIECES; i++) {
+    m_PoleNPlanes[i] = 0;
+  }
+
+
 }
 
 STRGeometryPar::~STRGeometryPar()

@@ -4,6 +4,7 @@
 """
 <header>
   <output>BabagagaNLOBhabhaSimRec.root</output>
+  <cacheable/>
   <contact>ferber</contact>
   <description>This steering file produces 100 radiative Bhabha events with Babayaga.NLO,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.</description>

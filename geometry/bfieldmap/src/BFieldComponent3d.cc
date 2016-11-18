@@ -118,14 +118,13 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
   double z = point.z();
   // Check if the point lies inside the magnetic field boundaries
   if (z <= m_mapRegionZ[0] || z >= m_mapRegionZ[1]) return B;
-  // Check if the point lies in the exclude region
-  if (m_exRegion && (z >= m_exRegionZ[0]) && (z < m_exRegionZ[1])) return B;
 
   double r2 = point.Perp2();
   // Check if the point lies inside the magnetic field boundaries
   if (r2 < m_mapRegionR[0]*m_mapRegionR[0] || r2 >= m_mapRegionR[1]*m_mapRegionR[1]) return B;
   // Check if the point lies in the exclude region
-  if (m_exRegion && (r2 >= m_exRegionR[0]*m_exRegionR[0]) && (r2 < m_exRegionR[1]*m_exRegionR[1])) return B;
+  if (m_exRegion && (z >= m_exRegionZ[0]) && (z < m_exRegionZ[1]) &&
+      (r2 >= m_exRegionR[0]*m_exRegionR[0]) && (r2 < m_exRegionR[1]*m_exRegionR[1])) return B;
 
   if (r2 > 0) {
     double r = sqrt(r2);

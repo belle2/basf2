@@ -199,11 +199,9 @@ BFieldComponent3d::vector3_t BFieldComponent3d::interpolate(unsigned int ir, uns
   unsigned int j110 = j010 + strideZ;
   unsigned int j111 = j011 + strideZ;
   double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
-  double w000 = w00 * wz0, w010 = w10 * wz0, w001 = w01 * wz0, w011 = w11 * wz0;
-  double w100 = w00 * wz1, w110 = w10 * wz1, w101 = w01 * wz1, w111 = w11 * wz1;
   const vector<vector3_t>& B = m_bmap;
   vector3_t b =
-    B[j000] * w000 + B[j001] * w001 + B[j010] * w010 + B[j011] * w011 +
-    B[j100] * w100 + B[j101] * w101 + B[j110] * w110 + B[j111] * w111;
+    (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +
+    (B[j100] * w00 + B[j101] * w01 + B[j110] * w10 + B[j111] * w11) * wz1;
   return b;
 }

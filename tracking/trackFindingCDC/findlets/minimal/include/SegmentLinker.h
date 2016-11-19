@@ -55,33 +55,20 @@ namespace Belle2 {
       /// Main algorithm
       void apply(const std::vector<CDCSegment2D>& inputSegments,
                  std::vector<CDCSegment2D>& outputSegments) final {
-        std::vector<ConstVectorRange<CDCSegment2D>> segmentsByISuperCluster =
-        adjacent_groupby(inputSegments.begin(),
-        inputSegments.end(),
-        mem_fn(&CDCSegment2D::getISuperCluster));
+        m_segmentRelations.clear();
+        WeightedNeighborhood<const CDCSegment2D>::appendUsing(m_segmentRelationFilter,
+        inputSegments,
+        m_segmentRelations);
+        WeightedNeighborhood<const CDCSegment2D> segmentNeighborhood(m_segmentRelations);
 
-        for (const ConstVectorRange<CDCSegment2D>& segmentsInSuperCluster : segmentsByISuperCluster)
+        m_segmentPaths.clear();
+        m_cellularPathFinder.apply(inputSegments,
+        segmentNeighborhood,
+        m_segmentPaths);
+
+        for (const Path<const CDCSegment2D>& segmentPath : m_segmentPaths)
         {
-          if (segmentsInSuperCluster.size() == 1) {
-            // What is the difference between a duck?
-            outputSegments.push_back(segmentsInSuperCluster.at(0));
-            continue;
-          }
-
-          m_segmentRelations.clear();
-          WeightedNeighborhood<const CDCSegment2D>::appendUsing(m_segmentRelationFilter,
-                                                                segmentsInSuperCluster,
-                                                                m_segmentRelations);
-          WeightedNeighborhood<const CDCSegment2D> segmentNeighborhood(m_segmentRelations);
-
-          m_segmentPaths.clear();
-          m_cellularPathFinder.apply(segmentsInSuperCluster,
-                                     segmentNeighborhood,
-                                     m_segmentPaths);
-
-          for (const Path<const CDCSegment2D>& segmentPath : m_segmentPaths) {
-            outputSegments.push_back(CDCSegment2D::condense(segmentPath));
-          }
+          outputSegments.push_back(CDCSegment2D::condense(segmentPath));
         }
       }
 

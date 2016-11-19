@@ -25,13 +25,18 @@ namespace Belle2 {
 
     public:
       /// Returns the full range of segments.
-      template<class ACDCSegment2DIterator>
-      boost::iterator_range<ACDCSegment2DIterator>
-      getPossibleNeighbors(const CDCSegment2D& segment  __attribute__((unused)),
-                           const ACDCSegment2DIterator& itBegin,
-                           const ACDCSegment2DIterator& itEnd) const
+      template<class ASegmentIterator>
+      boost::iterator_range<ASegmentIterator>
+      getPossibleNeighbors(const CDCSegment2D& segment,
+                           const ASegmentIterator& itBegin,
+                           const ASegmentIterator& itEnd) const
       {
-        return boost::iterator_range<ACDCSegment2DIterator>(itBegin, itEnd);
+        auto compareISuperCluster = [](const CDCSegment2D & lhs, const CDCSegment2D & rhs) {
+          return lhs.getISuperCluster() < rhs.getISuperCluster();
+        };
+        std::pair<ASegmentIterator, ASegmentIterator> sameSuperClusterItPair = std::equal_range(itBegin, itEnd, segment,
+            compareISuperCluster);
+        return boost::iterator_range<ASegmentIterator>(sameSuperClusterItPair.first, sameSuperClusterItPair.second);
       }
 
       /** Main filter method returning the weight of the neighborhood relation.

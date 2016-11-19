@@ -9,9 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
-
-#include <boost/range/adaptor/reversed.hpp>
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 
 #include <vector>
 #include <tuple>
@@ -24,7 +22,7 @@ namespace Belle2 {
 
     /// Interface for a minimal algorithm part that wants to expose some parameters to a module
     template<class ... AIOTypes>
-    class Findlet : public ProcessingSignalListener {
+    class Findlet : public CompositeProcessingSignalListener {
 
     public:
       /// Types that should be served to apply on invokation
@@ -71,58 +69,6 @@ namespace Belle2 {
 
       /// Main function executing the algorithm
       virtual void apply(ToVector<AIOTypes>& ... ranges) = 0;
-
-      /// Register a processing signal listener that is contained in this findlet.
-      void addProcessingSignalListener(ProcessingSignalListener* psl)
-      {
-        m_subordinaryProcessingSignalListeners.push_back(psl);
-      }
-
-      /// Receive signal before the start of the event processing
-      void initialize() override
-      {
-        for (ProcessingSignalListener* psl :  m_subordinaryProcessingSignalListeners) {
-          psl->initialize();
-        }
-      }
-
-      /// Receive signal for the beginning of a new run.
-      void beginRun() override
-      {
-        for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
-          psl->beginRun();
-        }
-      }
-
-      /// Receive signal for the start of a new event.
-      void beginEvent() override
-      {
-        for (ProcessingSignalListener* psl : m_subordinaryProcessingSignalListeners) {
-          psl->beginEvent();
-        }
-      }
-
-      /// Receive signal for the end of the run.
-      void endRun() override
-      {
-        using boost::adaptors::reverse;
-        for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {
-          psl->endRun();
-        }
-      }
-
-      /// Receive Signal for termination of the event processing.
-      void terminate() override
-      {
-        using boost::adaptors::reverse;
-        for (ProcessingSignalListener* psl : reverse(m_subordinaryProcessingSignalListeners)) {
-          psl->terminate();
-        }
-      }
-
-    private:
-      /// References to subordinary signal processing listener contained in this findlet.
-      std::vector<ProcessingSignalListener*> m_subordinaryProcessingSignalListeners;
     };
   }
 }

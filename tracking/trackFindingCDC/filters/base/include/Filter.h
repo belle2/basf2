@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>

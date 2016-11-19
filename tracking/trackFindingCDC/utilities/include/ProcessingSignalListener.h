@@ -16,7 +16,16 @@ namespace Belle2 {
     class ProcessingSignalListener {
 
     public:
-      /// Making destructor virtual
+      /// Allow default construction
+      ProcessingSignalListener() = default;
+
+      /// Disallow copies
+      ProcessingSignalListener(const ProcessingSignalListener&) = delete;
+
+      /// Disallow assignment
+      ProcessingSignalListener& operator= (const ProcessingSignalListener&) = delete;
+
+      /// Make destructor of interface virtual
       virtual ~ProcessingSignalListener() = default;
 
       /// Receive signal before the start of the event processing

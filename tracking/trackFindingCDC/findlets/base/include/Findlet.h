@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 
 #include <boost/range/adaptor/reversed.hpp>
 
@@ -53,17 +53,8 @@ namespace Belle2 {
       /// Vector types that should be served to apply on invokation
       using IOVectors = std::tuple< std::vector<AIOTypes>... >;
 
-      /// Allow default constructin
-      Findlet() = default;
-
       /// Make destructor of interface virtual
       virtual ~Findlet() = default;
-
-      /// Disallow copies
-      Findlet(const Findlet&) = delete;
-
-      /// Disallow assignment
-      Findlet& operator= (const Findlet&) = delete;
 
     public:
       /// Brief description of the purpose of the concret findlet.

@@ -7,10 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/modules/trackFinderCDC/FindletModules.h>
 
 using namespace Belle2;
+using namespace TrackFindingCDC;
 
 REG_MODULE(WireHitCreator);
 REG_MODULE(SuperClusterCreator);

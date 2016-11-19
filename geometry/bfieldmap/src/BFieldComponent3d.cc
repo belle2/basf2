@@ -110,6 +110,82 @@ void BFieldComponent3d::initialize()
   B2INFO("Memory consumption: " << m_bmap.size()*sizeof(vector3_t) / (1024 * 1024.) << " Mb");
 }
 
+/** cos(i*pi/90) i=0..45 */
+const double cosTable45[] = {
+  1.00000000000000000000, 0.99939082701909573001, 0.99756405025982424761, 0.99452189536827333692,
+  0.99026806874157031508, 0.98480775301220805937, 0.97814760073380563793, 0.97029572627599647231,
+  0.96126169593831886192, 0.95105651629515357212, 0.93969262078590838405, 0.92718385456678740081,
+  0.91354545764260089550, 0.89879404629916699278, 0.88294759285892694203, 0.86602540378443864676,
+  0.84804809615642597039, 0.82903757255504169201, 0.80901699437494742410, 0.78801075360672195669,
+  0.76604444311897803520, 0.74314482547739423501, 0.71933980033865113936, 0.69465837045899728666,
+  0.66913060635885821383, 0.64278760968653932632, 0.61566147532565827967, 0.58778525229247312917,
+  0.55919290347074683016, 0.52991926423320495405, 0.50000000000000000000, 0.46947156278589077596,
+  0.43837114678907741745, 0.40673664307580020775, 0.37460659341591203541, 0.34202014332566873304,
+  0.30901699437494742410, 0.27563735581699918565, 0.24192189559966772256, 0.20791169081775933710,
+  0.17364817766693034885, 0.13917310096006544411, 0.10452846326765347140, 0.06975647374412530078,
+  0.03489949670250097165, 0.00000000000000000000
+};
+
+/**
+ * The function getPhiIndxWeightSinCos calculate Phi index using
+ * binary division. Since in the current field map we have only 90
+ * sectors it has to converge only in 6 bisections. Return how
+ * far is point from the sector border to use this as weight in the
+ * interpolation as well as sin and cos of the point.
+ *
+ * @param x x coordinate
+ * @param y y coordinate
+ * @param r radius coordinate to calculate sin and cos r = sqrt(x^2+y^2)
+ * @param w angular distance of the point to the border i in sector units [0..1)
+ * @param s sin
+ * @param c cos
+ * @return index of phi sector from 0 to 89
+ */
+inline int getPhiIndxWeightSinCos(double y, double x, double r, double& w, double& s, double& c)
+{
+  double ir = 1 / r;
+  s = y * ir, c = x * ir;
+  int indx = 0;
+  if (x <= 0) { indx += 45; double t = -x; x = y; y = t; }
+  bool xgty = x > y;
+  if (!xgty) swap(x, y);
+
+  auto sin45 = [](int i)->double{return cosTable45[45 - i];};
+  auto cos45 = [](int i)->double{return cosTable45[i];};
+
+  int f = 0, count = 23;
+  auto bisect = [&]() -> void {
+    int step = count >> 1;
+    int i = f + step;
+    double v = y * cos45(i) - x * sin45(i);
+    if (v >= 0.0)
+    {
+      f = i + 1;
+      count -= step + 1;
+    } else {
+      count = step;
+    }
+  };
+  int loop = 0;
+  while (count > 0 && ++loop < 6) bisect();
+
+  // getw is an approximation of arcsin(phi)*90/pi in range -pi/90<phi<pi/90 better than 1e-15
+  auto getw = [](double s)->double {
+    static const double c[] = {28.64788975654112, 4.774648293412141, 2.148589615676091, 1.281305635721853};
+    double s2 = s * s;
+    return s * (c[0] + s2 * (c[1] + s2 * (c[2] + s2 * (c[3]))));
+  };
+
+  int i = f - 1;
+  w = getw((y * cos45(i) - x * sin45(i)) * ir);
+  if (xgty) {
+    indx += i;
+  } else {
+    indx += 44 - i;
+    w = 1 - w;
+  }
+  return indx;
+}
 
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
@@ -128,29 +204,22 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 
   if (r2 > 0) {
     double r = sqrt(r2);
-    double phi = atan2(std::abs(point.y()), point.x());
 
     // Calculate the lower index of the point in the grid
     double wr   = (r - m_mapRegionR[0]) * m_igridPitch[0];
-    double wphi =  phi                  * m_igridPitch[1];
     double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
 
+    double wphi, s, c;
     unsigned int ir   = static_cast<int>(wr);
-    unsigned int iphi = static_cast<int>(wphi);
+    unsigned int iphi = getPhiIndxWeightSinCos(std::abs(point.y()), point.x(), r, wphi, s, c);
     unsigned int iz   = static_cast<int>(wz);
 
-    // if (ir + 1 >= (unsigned int)(m_mapSize[0])) return B;
-    // if (iphi + 1 >= (unsigned int)(m_mapSize[1])) return B;
-    // if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
-
-    wr   -= ir;
-    wphi -= iphi;
-    wz   -= iz;
+    wr -= ir;
+    wz -= iz;
 
     // Get B-field values from map
     vector3_t b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
-    double norm = -1 / r, s = point.y() * norm, c = point.x() * norm;
-    vector3_t bc = {b.x* c - b.y * s, b.x* s + b.y * c, b.z};   // in cartesian system
+    vector3_t bc = { -(b.x * c - b.y * s), -(b.x * s + b.y * c), b.z}; // in cartesian system
     if (point.y() < 0) bc.y = -bc.y;
     B.SetXYZ(bc.x, bc.y, bc.z);
   } else {

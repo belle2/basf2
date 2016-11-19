@@ -25,9 +25,9 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    /// Merges tracks based on a filter criterion
+    /// Links tracks based on a filter criterion
     template <class TrackRelationFilter>
-    class TrackMerger : public Findlet<const CDCTrack, CDCTrack> {
+    class TrackLinker : public Findlet<const CDCTrack, CDCTrack> {
 
     private:
       /// Type of the base class
@@ -35,14 +35,14 @@ namespace Belle2 {
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
-      TrackMerger()
+      TrackLinker()
       {
         this->addProcessingSignalListener(&m_trackRelationFilter);
       }
 
       /// Short description of the findlet
       std::string getDescription() final {
-        return "Merges tracks by extraction of track paths in a cellular automaton.";
+        return "Links tracks by extraction of track paths in a cellular automaton.";
       }
 
       /// Expose the parameters to a module
@@ -75,7 +75,7 @@ namespace Belle2 {
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCTrack> m_cellularPathFinder;
 
-      /// Memory for the relations between tracks to be followed on merge
+      /// Memory for the relations between tracks to be followed on linking
       std::vector<WeightedRelation<const CDCTrack> > m_trackRelations;
 
       /// Memory for the track paths generated from the graph.

@@ -15,7 +15,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentAliasResolver.h>
@@ -53,7 +53,7 @@ namespace Belle2 {
         this->addProcessingSignalListener(&m_facetCreator);
         this->addProcessingSignalListener(&m_facetRelationCreator);
         this->addProcessingSignalListener(&m_segmentCreatorFacetAutomaton);
-        this->addProcessingSignalListener(&m_segmentMerger);
+        this->addProcessingSignalListener(&m_segmentLinker);
 
         this->addProcessingSignalListener(&m_segmentFitter);
         this->addProcessingSignalListener(&m_segmentAliasResolver);
@@ -84,7 +84,7 @@ namespace Belle2 {
         m_facetCreator.exposeParameters(moduleParamList, prefixed(prefix, "Facet"));
         m_facetRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "FacetRelation"));
         m_segmentCreatorFacetAutomaton.exposeParameters(moduleParamList, prefix);
-        m_segmentMerger.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
+        m_segmentLinker.exposeParameters(moduleParamList, prefixed(prefix, "SegmentRelation"));
 
         m_segmentFitter.exposeParameters(moduleParamList, prefix);
         m_segmentAliasResolver.exposeParameters(moduleParamList, prefix);
@@ -124,7 +124,7 @@ namespace Belle2 {
 
         m_segmentAliasResolver.apply(m_intermediateSegments);
 
-        m_segmentMerger.apply(m_intermediateSegments, outputSegments);
+        m_segmentLinker.apply(m_intermediateSegments, outputSegments);
         m_segmentFitter.apply(outputSegments);
 
         // Move superclusters to the DataStore
@@ -166,8 +166,8 @@ namespace Belle2 {
       /// Adjustes the orientation of the generated segments to a prefered direction of flight
       SegmentOrienter m_segmentOrienter;
 
-      /// Merges segments with closeby segments of the same super cluster
-      SegmentMerger<ASegmentRelationFilter> m_segmentMerger;
+      /// Link segments with closeby segments of the same super cluster
+      SegmentLinker<ASegmentRelationFilter> m_segmentLinker;
 
       /// Puts the internal super clusters on the DataStore
       StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{

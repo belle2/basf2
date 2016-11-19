@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
-#include <tracking/trackFindingCDC/findlets/minimal/TrackMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
@@ -43,7 +43,7 @@ namespace Belle2 {
         this->addProcessingSignalListener(&m_segmentPairRelationCreator);
         this->addProcessingSignalListener(&m_trackCreatorSegmentPairAutomaton);
         this->addProcessingSignalListener(&m_trackCreatorSingleSegments);
-        this->addProcessingSignalListener(&m_trackMerger);
+        this->addProcessingSignalListener(&m_trackLinker);
         this->addProcessingSignalListener(&m_trackOrienter);
         this->addProcessingSignalListener(&m_segmentPairSwapper);
 
@@ -54,7 +54,7 @@ namespace Belle2 {
 
         m_segmentPairs.reserve(100);
         m_segmentPairRelations.reserve(100);
-        m_preMergeTracks.reserve(20);
+        m_preLinkingTracks.reserve(20);
         m_orientedTracks.reserve(20);
       }
 
@@ -69,7 +69,7 @@ namespace Belle2 {
         m_segmentPairRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "SegmentPairRelation"));
         m_trackCreatorSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
         m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
-        m_trackMerger.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
+        m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
         m_trackOrienter.exposeParameters(moduleParamList, prefix);
         m_segmentPairSwapper.exposeParameters(moduleParamList, prefix);
       }
@@ -78,7 +78,7 @@ namespace Belle2 {
       void beginEvent() final {
         m_segmentPairs.clear();
         m_segmentPairRelations.clear();
-        m_preMergeTracks.clear();
+        m_preLinkingTracks.clear();
         m_orientedTracks.clear();
         Super::beginEvent();
       }
@@ -88,12 +88,12 @@ namespace Belle2 {
       apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final {
         m_segmentPairCreator.apply(inputSegments, m_segmentPairs);
         m_segmentPairRelationCreator.apply(m_segmentPairs, m_segmentPairRelations);
-        m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preMergeTracks);
+        m_trackCreatorSegmentPairAutomaton.apply(m_segmentPairs, m_segmentPairRelations, m_preLinkingTracks);
 
-        m_trackCreatorSingleSegments.apply(inputSegments, m_preMergeTracks);
+        m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);
 
-        m_trackOrienter.apply(m_preMergeTracks, m_orientedTracks);
-        m_trackMerger.apply(m_orientedTracks, tracks);
+        m_trackOrienter.apply(m_preLinkingTracks, m_orientedTracks);
+        m_trackLinker.apply(m_orientedTracks, tracks);
 
         // Put the segment pairs on the DataStore
         m_segmentPairSwapper.apply(m_segmentPairs);
@@ -113,8 +113,8 @@ namespace Belle2 {
       /// Creates tracks from left over segments
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
 
-      /// Findlet responsible for the merging of tracks
-      TrackMerger<ATrackRelationFilter> m_trackMerger;
+      /// Findlet responsible for the linking of tracks
+      TrackLinker<ATrackRelationFilter> m_trackLinker;
 
       /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
       TrackOrienter m_trackOrienter;
@@ -129,8 +129,8 @@ namespace Belle2 {
       /// Memory for the axial stereo segment pair relations.
       std::vector<WeightedRelation<const CDCSegmentPair> > m_segmentPairRelations;
 
-      /// Memory for the tracks before merging was applied.
-      std::vector<CDCTrack> m_preMergeTracks;
+      /// Memory for the tracks before linking was applied.
+      std::vector<CDCTrack> m_preLinkingTracks;
 
       /// Memory for the tracks after orientation was applied.
       std::vector<CDCTrack> m_orientedTracks;

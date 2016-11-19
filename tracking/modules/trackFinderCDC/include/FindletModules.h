@@ -22,7 +22,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/ClusterRefiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/FacetCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorFacetAutomaton.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
@@ -37,7 +37,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentTripleAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 
-#include <tracking/trackFindingCDC/findlets/minimal/TrackMerger.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
@@ -149,10 +149,10 @@ namespace Belle2 {
   };
 
   /**
-   * Module implementation using the SegmentMerger
+   * Module implementation using the SegmentLinker
    */
-  class SegmentMergerModule :
-    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentMerger<
+  class SegmentLinkerModule :
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::SegmentLinker<
     TrackFindingCDC::ChooseableSegmentRelationFilter> > {
   };
 
@@ -291,10 +291,10 @@ namespace Belle2 {
   };
 
   /**
-   * Module implementation using the TrackMerger
+   * Module implementation using the TrackLinker
    */
-  class TrackMergerModule :
-    public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackMerger<
+  class TrackLinkerModule :
+    public TrackFindingCDC::FindletModule<TrackFindingCDC::TrackLinker<
     TrackFindingCDC::ChooseableTrackRelationFilter> > {
   };
 

@@ -18,7 +18,7 @@ REG_MODULE(ClusterRefiner);
 REG_MODULE(ClusterBackgroundDetector);
 REG_MODULE(FacetCreator);
 REG_MODULE(SegmentCreatorFacetAutomaton);
-REG_MODULE(SegmentMerger);
+REG_MODULE(SegmentLinker);
 REG_MODULE(SegmentFitter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
@@ -33,7 +33,7 @@ REG_MODULE(TrackCreatorSegmentPairAutomaton)
 REG_MODULE(TrackCreatorSegmentTripleAutomaton)
 REG_MODULE(TrackCreatorSingleSegments)
 
-REG_MODULE(TrackMerger)
+REG_MODULE(TrackLinker)
 REG_MODULE(TrackOrienter)
 REG_MODULE(TrackFlightTimeAdjuster)
 REG_MODULE(TrackExporter)

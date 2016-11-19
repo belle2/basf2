@@ -10,6 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 
 #include <tracking/trackFindingCDC/ca/MultipassCellularPathFinder.h>
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
@@ -26,7 +27,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Links tracks based on a filter criterion
-    template <class TrackRelationFilter>
+    template <class ATrackRelationFilter>
     class TrackLinker : public Findlet<const CDCTrack, CDCTrack> {
 
     private:
@@ -37,7 +38,7 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       TrackLinker()
       {
-        this->addProcessingSignalListener(&m_trackRelationFilter);
+        this->addProcessingSignalListener(&m_trackRelationCreator);
       }
 
       /// Short description of the findlet
@@ -47,21 +48,22 @@ namespace Belle2 {
 
       /// Expose the parameters to a module
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
-        m_trackRelationFilter.exposeParameters(moduleParamList, prefix);
+        m_trackRelationCreator.exposeParameters(moduleParamList, prefix);
       }
 
     public:
       /// Main algorithm
       void apply(const std::vector<CDCTrack>& inputTracks, std::vector<CDCTrack>& outputTracks) final {
+        // Create linking relations
         m_trackRelations.clear();
-        WeightedNeighborhood<const CDCTrack>::appendUsing(m_trackRelationFilter,
-        inputTracks,
-        m_trackRelations);
-        WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
+        m_trackRelationCreator.apply(inputTracks, m_trackRelations);
 
+        // Find linking paths
         m_trackPaths.clear();
+        WeightedNeighborhood<const CDCTrack> trackNeighborhood(m_trackRelations);
         m_cellularPathFinder.apply(inputTracks, trackNeighborhood, m_trackPaths);
 
+        // Put the linked tracks together
         for (const std::vector<const CDCTrack*>& trackPath : m_trackPaths)
         {
           outputTracks.push_back(CDCTrack::condense(trackPath));
@@ -69,8 +71,8 @@ namespace Belle2 {
       }
 
     private:
-      /// Track relation filter
-      TrackRelationFilter m_trackRelationFilter;
+      /// Creator of the track relations for linking
+      WeightedRelationCreator<const CDCTrack, ATrackRelationFilter> m_trackRelationCreator;
 
       /// Instance of the cellular automaton path finder
       MultipassCellularPathFinder<const CDCTrack> m_cellularPathFinder;

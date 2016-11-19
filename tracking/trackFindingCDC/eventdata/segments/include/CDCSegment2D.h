@@ -30,7 +30,7 @@ namespace Belle2 {
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent tangents in the given tangent path.
-      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCTangent* >& tangentPath);
+      static CDCSegment2D condense(const std::vector<const CDCTangent*>& tangentPath);
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent facets in the given facet segment.
@@ -38,12 +38,12 @@ namespace Belle2 {
 
       /// Averages the reconstructed positions from hits that overlap
       /// in adjacent facet in the given facet path.
-      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCFacet* >& facetPath);
+      static CDCSegment2D condense(const std::vector<const CDCFacet*>& facetPath);
 
       /** Flattens a series of segments to one segment.
        *  Does not copy any fit.
        */
-      static CDCSegment2D condense(const std::vector<const Belle2::TrackFindingCDC::CDCSegment2D*>& segmentPath);
+      static CDCSegment2D condense(const std::vector<const CDCSegment2D*>& segmentPath);
 
       /** Reconstruct from wire hits with attached right left passage hypotheses
        *  by constructing tangents between adjacent hits pairs and averaging the reconstucted position.
@@ -55,8 +55,14 @@ namespace Belle2 {
        */
       static CDCSegment2D reconstructUsingFacets(const CDCRLWireHitSegment& rlWireHitSegment);
 
+      /// Comparision of segments up to the super cluster id keeping them close together on sort
+      bool operator<(const CDCSegment2D& segment2D) const
+      {
+        return this->getISuperCluster() < segment2D.getISuperCluster();
+      }
+
       /// Getter for the vector of wires the hits of this segment are based on in the same order.
-      std::vector<const Belle2::TrackFindingCDC::CDCWire*> getWireSegment() const;
+      std::vector<const CDCWire*> getWireSegment() const;
 
       /// Getter for the vector of the wire hits of this segment are based on in the same order.
       CDCWireHitSegment getWireHitSegment() const;
@@ -81,11 +87,15 @@ namespace Belle2 {
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
+      {
+        return m_automatonCell;
+      }
 
       /// Constant getter for the automaton cell.
       const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
+      {
+        return m_automatonCell;
+      }
 
       /// Unset the masked flag of the automaton cell of this segment
       /// and of all contained wire hits.
@@ -102,11 +112,15 @@ namespace Belle2 {
 
       /// Getter for the global super cluster id.
       int getISuperCluster() const
-      { return m_iSuperCluster; }
+      {
+        return m_iSuperCluster;
+      }
 
       /// Setter for the globale super cluster id.
       void setISuperCluster(int iSuperCluster)
-      { m_iSuperCluster = iSuperCluster; }
+      {
+        m_iSuperCluster = iSuperCluster;
+      }
 
       /// Setter for the super cluster id based on the hit content
       void receiveISuperCluster()

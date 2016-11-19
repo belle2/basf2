@@ -18,18 +18,7 @@ MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
           "trackfindingcdc_RealisticSegmentRelationFilter",
           0.90)
 {
-}
-
-void MVARealisticSegmentRelationFilter::initialize()
-{
-  Super::initialize();
-  m_feasibleSegmentRelationFilter.initialize();
-}
-
-void MVARealisticSegmentRelationFilter::beginRun()
-{
-  Super::beginRun();
-  m_feasibleSegmentRelationFilter.beginRun();
+  this->addProcessingSignalListener(&m_feasibleSegmentRelationFilter);
 }
 
 Weight MVARealisticSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>& segmentRelation)

@@ -7,26 +7,23 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-MVARealisticTrackRelationFilter::MVARealisticTrackRelationFilter()
-  : Super(makeUnique<VarSet>(),
-          "trackfindingcdc_RealisticTrackRelationFilter",
-          0.80)
+MVARealisticSegmentPairFilter::MVARealisticSegmentPairFilter()
+  : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
 {
-  this->addProcessingSignalListener(&m_feasibleTrackRelationFilter);
+  this->addProcessingSignalListener(&m_feasibleSegmentPairFilter);
 }
 
-Weight MVARealisticTrackRelationFilter::operator()(const Relation<const CDCTrack>& trackRelation)
+Weight MVARealisticSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  double isFeasibleWeight = m_feasibleTrackRelationFilter(trackRelation);
+  double isFeasibleWeight = m_feasibleSegmentPairFilter(segmentPair);
   if (std::isnan(isFeasibleWeight)) {
     return NAN;
   } else {
-    return Super::operator()(trackRelation);
+    return Super::operator()(segmentPair);
   }
 }

@@ -20,17 +20,17 @@ namespace Belle2 {
     constexpr
     static char const* const fitlessFacetVarNames[] = {
       "superlayer_id",
-      // "oclock_delta",
+      "oclock_delta",
       "abs_oclock_delta",
       "cell_extend",
-      // "short_arm_is_crossing",
-      // "long_arm_is_crossing",
-      // "stable_twist",
-      // "abs_layer_id_difference",
+      "short_arm_is_crossing",
+      "long_arm_is_crossing",
+      "stable_twist",
+      "abs_layer_id_difference",
       "layer_id_difference",
       "crossing_id",
       "shape_id",
-      // "is_forward_progression",
+      "is_forward_progression",
     };
 
     /// Vehicle class to transport the variable names

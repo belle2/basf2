@@ -33,15 +33,6 @@ namespace Belle2 {
       MCSegmentPairRelationFilter(bool allowReverse = true);
 
     public:
-      /// Used to prepare the Monte Carlo information for this event.
-      void beginEvent() final;
-
-      /// Forwards the modules initialize to the filter
-      void initialize() final;
-
-      /// Forwards the modules initialize to the filter
-      void terminate() final;
-
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
       Weight
       operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
@@ -57,8 +48,6 @@ namespace Belle2 {
     private:
       /// Instance of the Monte Carlo axial stereo segment filter for rejection of false cells.
       MCSegmentPairFilter m_mcSegmentPairFilter;
-
     };
-
   }
 }

@@ -19,7 +19,6 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
-  /// Fitless variables
   CDCFacet::Shape shape = facet.getShape();
 
   short cellExtend = shape.getCellExtend();
@@ -39,18 +38,18 @@ bool FitlessFacetVarSet::extract(const CDCFacet* ptrFacet)
   bool longArmIsCrossing = startToMiddleIsLong ? startToMiddleIsCrossing : middleToEndIsCrossing;
   bool shortArmIsCrossing = startToMiddleIsLong ? middleToEndIsCrossing : startToMiddleIsCrossing;
   short iLayerDifference = facet.getStartWire().getILayer() - facet.getEndWire().getILayer();
-  // short absILayerDifference = std::abs(iLayerDifference);
+  short absILayerDifference = std::abs(iLayerDifference);
 
   var<named("superlayer_id")>() = facet.getISuperLayer();
   var<named("cell_extend")>() = cellExtend;
-  // var<named("oclock_delta")>() = shape.getOClockDelta();
+  var<named("oclock_delta")>() = shape.getOClockDelta();
   var<named("abs_oclock_delta")>() = absOClockDelta;
   var<named("layer_id_difference")>() = iLayerDifference;
-  //var<named("abs_layer_id_difference")>() = absILayerDifference;
+  var<named("abs_layer_id_difference")>() = absILayerDifference;
 
-  // var<named("long_arm_is_crossing")>() = longArmIsCrossing;
-  // var<named("short_arm_is_crossing")>() = shortArmIsCrossing;
-  // var<named("stable_twist")>() = stableTwist;
+  var<named("long_arm_is_crossing")>() = longArmIsCrossing;
+  var<named("short_arm_is_crossing")>() = shortArmIsCrossing;
+  var<named("stable_twist")>() = stableTwist;
 
   var<named("crossing_id")>() = std::copysign(100.0 * std::abs(stableTwist) +
                                               10.0 * shortArmIsCrossing +

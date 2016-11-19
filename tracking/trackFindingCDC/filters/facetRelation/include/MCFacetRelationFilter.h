@@ -32,20 +32,7 @@ namespace Belle2 {
        *  Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = false)
-        : Super(allowReverse),
-          m_mcFacetFilter(allowReverse)
-      {}
-
-    public:
-      /// Used to prepare the Monte Carlo information for this event.
-      void beginEvent() final;
-
-      /// Forwards the modules initialize to the filter
-      void initialize() final;
-
-      /// Forwards the modules initialize to the filter
-      void terminate() final;
+      MCFacetRelationFilter(bool allowReverse = false);
 
     public:
       /**

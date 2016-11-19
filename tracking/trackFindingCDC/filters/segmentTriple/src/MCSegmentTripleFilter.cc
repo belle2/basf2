@@ -7,12 +7,10 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
-
 
 #include <framework/logging/Logger.h>
 
@@ -25,32 +23,8 @@ MCSegmentTripleFilter::MCSegmentTripleFilter(bool allowReverse) :
   Super(allowReverse),
   m_mcAxialSegmentPairFilter(allowReverse)
 {
+  this->addProcessingSignalListener(&m_mcAxialSegmentPairFilter);
 }
-
-
-void MCSegmentTripleFilter::beginEvent()
-{
-  m_mcAxialSegmentPairFilter.beginEvent();
-  Super::beginEvent();
-}
-
-
-
-void MCSegmentTripleFilter::initialize()
-{
-  Super::initialize();
-  m_mcAxialSegmentPairFilter.initialize();
-}
-
-
-
-void MCSegmentTripleFilter::terminate()
-{
-  m_mcAxialSegmentPairFilter.terminate();
-  Super::terminate();
-}
-
-
 
 Weight MCSegmentTripleFilter::operator()(const CDCSegmentTriple& segmentTriple)
 {

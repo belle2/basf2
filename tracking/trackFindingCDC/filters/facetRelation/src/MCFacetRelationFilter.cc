@@ -12,29 +12,12 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void MCFacetRelationFilter::beginEvent()
+MCFacetRelationFilter::MCFacetRelationFilter(bool allowReverse)
+  : Super(allowReverse)
+  , m_mcFacetFilter(allowReverse)
 {
-  m_mcFacetFilter.beginEvent();
-  Super::beginEvent();
+  this->addProcessingSignalListener(&m_mcFacetFilter);
 }
-
-
-
-void MCFacetRelationFilter::initialize()
-{
-  Super::initialize();
-  m_mcFacetFilter.initialize();
-}
-
-
-
-void MCFacetRelationFilter::terminate()
-{
-  m_mcFacetFilter.terminate();
-  Super::terminate();
-}
-
-
 
 Weight MCFacetRelationFilter::operator()(const CDCFacet& fromFacet,
                                          const CDCFacet& toFacet)

@@ -66,11 +66,11 @@ namespace Belle2 {
 
       /// Construct the varset.
       FilterVarSet(const std::string& filterName = "",
-                   std::unique_ptr<Filter> ptrFilter = makeUnique<Filter>()) :
-        Super(),
-        m_filterName(filterName),
-        m_filterNamePrefix(filterName + '_'),
-        m_ptrFilter(std::move(ptrFilter))
+                   std::unique_ptr<Filter> ptrFilter = makeUnique<Filter>())
+        : Super()
+        , m_filterName(filterName)
+        , m_filterNamePrefix(filterName + '_')
+        , m_ptrFilter(std::move(ptrFilter))
       {
       }
 
@@ -112,45 +112,30 @@ namespace Belle2 {
           // Not found. Continue.
         }
 
-        if (m_ptrFilter)
-        {
-          m_ptrFilter->initialize();
-        }
+        if (m_ptrFilter) m_ptrFilter->initialize();
       }
 
       /// Allow setup work to take place at beginning of new run
       void beginRun() final {
         Super::beginRun();
-        if (m_ptrFilter)
-        {
-          m_ptrFilter->beginRun();
-        }
+        if (m_ptrFilter) m_ptrFilter->beginRun();
       }
 
       /// Allow setup work to take place at beginning of new event
       void beginEvent() final {
         Super::beginEvent();
-        if (m_ptrFilter)
-        {
-          m_ptrFilter->beginEvent();
-        }
+        if (m_ptrFilter) m_ptrFilter->beginEvent();
       }
 
       /// Allow clean up to take place at end of run
       void endRun() final {
-        if (m_ptrFilter)
-        {
-          m_ptrFilter->endRun();
-        }
+        if (m_ptrFilter) m_ptrFilter->endRun();
         Super::endRun();
       }
 
       /// Terminate the filter after event processing
       void terminate() final {
-        if (m_ptrFilter)
-        {
-          m_ptrFilter->terminate();
-        }
+        if (m_ptrFilter) m_ptrFilter->terminate();
         Super::terminate();
       }
 
@@ -189,7 +174,6 @@ namespace Belle2 {
 
       /// Filter from which to generate weight as a variable set;
       std::unique_ptr<Filter> m_ptrFilter;
-
     };
   }
 }

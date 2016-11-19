@@ -11,17 +11,23 @@
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+void BkgTruthClusterVarSet::initialize()
+{
+  Super::initialize();
+  CDCMCManager::getInstance().requireTruthInformation();
+}
+
 void BkgTruthClusterVarSet::beginEvent()
 {
   Super::beginEvent();
-  CDCMCHitLookUp::getInstance().fill();
+  CDCMCManager::getInstance().fill();
 }
 
 bool BkgTruthClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)

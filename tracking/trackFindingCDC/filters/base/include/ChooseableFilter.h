@@ -116,7 +116,7 @@ namespace Belle2 {
           AssignParameterVisitor visitor(&moduleParamList, name);
           boost::apply_visitor(visitor, value);
         }
-        m_filter->initialize();
+        this->addProcessingSignalListener(m_filter.get());
         Super::initialize();
       }
 
@@ -124,34 +124,6 @@ namespace Belle2 {
       bool needsTruthInformation() override
       {
         return m_filter->needsTruthInformation();
-      }
-
-      /// Signal the beginning of a new run
-      void beginRun() override
-      {
-        m_filter->beginRun();
-        Super::beginRun();
-      }
-
-      /// Signal the beginning of a new event
-      void beginEvent() override
-      {
-        m_filter->beginEvent();
-        Super::beginEvent();
-      }
-
-      /// Signal the end of a run
-      void endRun() override
-      {
-        Super::endRun();
-        m_filter->endRun();
-      }
-
-      /// Initialize the recorder after event processing.
-      void terminate() override
-      {
-        Super::terminate();
-        m_filter->terminate();
       }
 
       /**
@@ -165,8 +137,6 @@ namespace Belle2 {
       Weight operator()(const Object& object) final {
         return (*m_filter)(object);
       }
-
-    private:
 
     private:
       /// Parameters : Name of the selected filter

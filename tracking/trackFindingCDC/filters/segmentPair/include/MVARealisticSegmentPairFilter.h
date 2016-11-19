@@ -12,13 +12,13 @@
 #include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
-#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
 
 #include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -39,41 +39,14 @@ namespace Belle2 {
 
     public:
       /// Constructor initialising the MVAFilter with standard training name for this filter.
-      MVARealisticSegmentPairFilter()
-        : Super("trackfindingcdc_RealisticSegmentPairFilter", 0.02)
-      {
-      }
-
-      /// Initialize the expert before event processing.
-      void initialize() override
-      {
-        Super::initialize();
-        m_feasibleSegmentPairFilter.initialize();
-      }
-
-      /// Signal to load new run parameters
-      void beginRun() override
-      {
-        Super::beginRun();
-        m_feasibleSegmentPairFilter.beginRun();
-      }
+      MVARealisticSegmentPairFilter();
 
       /// Function to object for its signalness
-      Weight operator()(const CDCSegmentPair& segmentPair) override
-      {
-        double isFeasibleWeight = m_feasibleSegmentPairFilter(segmentPair);
-        if (std::isnan(isFeasibleWeight)) {
-          return NAN;
-        } else {
-          return Super::operator()(segmentPair);
-        }
-      }
+      Weight operator()(const CDCSegmentPair& segmentPair) override;
 
     private:
       /// Feasibility filter applied first before invoking the main cut
       MVAFeasibleSegmentPairFilter m_feasibleSegmentPairFilter;
-
     };
-
   }
 }

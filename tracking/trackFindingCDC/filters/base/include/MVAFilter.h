@@ -32,13 +32,14 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      explicit MVA(std::unique_ptr<BaseVarSet<Object> > varSet,
+      explicit MVA(std::unique_ptr<BaseVarSet<Object>> varSet,
                    const std::string& identifier = "",
-                   double defaultCut = NAN) :
-        Super(std::move(varSet)),
-        m_param_cut(defaultCut),
-        m_param_identifier(identifier)
-      {}
+                   double defaultCut = NAN)
+        : Super(std::move(varSet))
+        , m_param_cut(defaultCut)
+        , m_param_identifier(identifier)
+      {
+      }
 
       /// Expose the set of parameters of the filter to the module parameter list.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override

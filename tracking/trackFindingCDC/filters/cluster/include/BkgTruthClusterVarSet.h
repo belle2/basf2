@@ -49,6 +49,9 @@ namespace Belle2 {
       using Super = VarSet<BkgTruthClusterVarNames>;
 
     public:
+      /// Signal the initialisation of the event processing - requires the Monte Carlo information
+      void initialize() override;
+
       /// Signal the beginning of a new event - loads the Monte Carlo information
       void beginEvent() override;
 

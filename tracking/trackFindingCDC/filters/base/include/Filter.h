@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -22,7 +22,7 @@ namespace Belle2 {
 
     /// Base class for filters on a generic object type.
     template<class AObject>
-    class Filter : public ProcessingSignalListener {
+    class Filter : public CompositeProcessingSignalListener {
 
     public:
       /// Type of the object to be analysed.

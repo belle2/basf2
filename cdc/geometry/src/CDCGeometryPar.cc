@@ -23,6 +23,8 @@
 #include <fstream>
 #include <iomanip>
 
+#include <Math/ChebyshevPol.h>
+
 using namespace std;
 using namespace boost;
 using namespace Belle2;
@@ -655,8 +657,7 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
   unsigned nRead = 0;
 
   ifs >> m_xtParamMode >> np;
-  if (m_xtParamMode < 0 || m_xtParamMode > 2) B2FATAL("CDCGeometryPar: invalid xt-parameterization mode read !");
-  if (m_xtParamMode == 1) B2FATAL("CDCGeometryPar: xt-parameterization mode=1 not ready yet");
+  if (m_xtParamMode < 0 || m_xtParamMode > 3) B2FATAL("CDCGeometryPar: invalid xt-parameterization mode read !");
 
   if (np <= 0 || np > npx) B2FATAL("CDCGeometryPar: no. of xt-params. outside limits !");
 
@@ -691,14 +692,18 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
       m_XT[iCL][iLR][ialpha][itheta][i] = xtc[i];
     }
 
-    double bound = xtc[6];
-    m_XT[iCL][iLR][ialpha][itheta][np] =
-      xtc[0] + bound
-      * (xtc[1] + bound
-         * (xtc[2] + bound
-            * (xtc[3] + bound
-               * (xtc[4] + bound
-                  * (xtc[5])))));
+    double boundT = xtc[6];
+    if (m_xtParamMode == 1) {
+      m_XT[iCL][iLR][ialpha][itheta][np] = ROOT::Math::Chebyshev5(boundT, xtc[0], xtc[1], xtc[2], xtc[3], xtc[4], xtc[5]);
+    } else {
+      m_XT[iCL][iLR][ialpha][itheta][np] =
+        xtc[0] + boundT
+        * (xtc[1] + boundT
+           * (xtc[2] + boundT
+              * (xtc[3] + boundT
+                 * (xtc[4] + boundT
+                    * (xtc[5])))));
+    }
   }  //end of while loop
 
   //convert unit
@@ -1156,14 +1161,19 @@ void CDCGeometryPar::setXtRel()
             m_XT[iCL][iLR][iA][iT][i] = params[i];
           }
 
-          double bound = m_XT[iCL][iLR][iA][iT][6];
-          m_XT[iCL][iLR][iA][iT][np] =
-            m_XT[iCL][iLR][iA][iT][0] + bound
-            * (m_XT[iCL][iLR][iA][iT][1] + bound
-               * (m_XT[iCL][iLR][iA][iT][2] + bound
-                  * (m_XT[iCL][iLR][iA][iT][3] + bound
-                     * (m_XT[iCL][iLR][iA][iT][4] + bound
-                        * (m_XT[iCL][iLR][iA][iT][5])))));
+          double boundT = m_XT[iCL][iLR][iA][iT][6];
+          if (m_xtParamMode == 1) {
+            m_XT[iCL][iLR][iA][iT][np] = ROOT::Math::Chebyshev5(boundT, m_XT[iCL][iLR][iA][iT][0], m_XT[iCL][iLR][iA][iT][1],
+                                                                m_XT[iCL][iLR][iA][iT][2], m_XT[iCL][iLR][iA][iT][3], m_XT[iCL][iLR][iA][iT][4], m_XT[iCL][iLR][iA][iT][5]);
+          } else {
+            m_XT[iCL][iLR][iA][iT][np] =
+              m_XT[iCL][iLR][iA][iT][0] + boundT
+              * (m_XT[iCL][iLR][iA][iT][1] + boundT
+                 * (m_XT[iCL][iLR][iA][iT][2] + boundT
+                    * (m_XT[iCL][iLR][iA][iT][3] + boundT
+                       * (m_XT[iCL][iLR][iA][iT][4] + boundT
+                          * (m_XT[iCL][iLR][iA][iT][5])))));
+          }
         }
       }
     }
@@ -1665,11 +1675,20 @@ double CDCGeometryPar::getDriftV(const double time, const unsigned short iCLayer
       double boundary = m_XT[iCLayer][jlr][jal][jth][6];
 
       if (time < boundary) {
-        dDdt += w * (m_XT[iCLayer][jlr][jal][jth][1] + time
-                     * (2.*m_XT[iCLayer][jlr][jal][jth][2] + time
-                        * (3.*m_XT[iCLayer][jlr][jal][jth][3] + time
-                           * (4.*m_XT[iCLayer][jlr][jal][jth][4] + time
-                              * (5.*m_XT[iCLayer][jlr][jal][jth][5])))));
+        if (m_xtParamMode == 1) {
+          double c1 = m_XT[iCLayer][jlr][jal][jth][1];
+          double c2 = m_XT[iCLayer][jlr][jal][jth][2];
+          double c3 = m_XT[iCLayer][jlr][jal][jth][3];
+          double c4 = m_XT[iCLayer][jlr][jal][jth][4];
+          double c5 = m_XT[iCLayer][jlr][jal][jth][5];
+          dDdt += w * ROOT::Math::Chebyshev4(time, c1 + 3.*c3 + 5.*c5, 4.*c2 + 8.*c4, 6.*c3 + 10.*c5, 8.*c4, 10.*c5);
+        } else {
+          dDdt += w * (m_XT[iCLayer][jlr][jal][jth][1] + time
+                       * (2.*m_XT[iCLayer][jlr][jal][jth][2] + time
+                          * (3.*m_XT[iCLayer][jlr][jal][jth][3] + time
+                             * (4.*m_XT[iCLayer][jlr][jal][jth][4] + time
+                                * (5.*m_XT[iCLayer][jlr][jal][jth][5])))));
+        }
       } else {
         dDdt += w * m_XT[iCLayer][jlr][jal][jth][7];
       }
@@ -1752,12 +1771,17 @@ double CDCGeometryPar::getDriftLength(const double time, const unsigned short iC
       double boundary = m_XT[iCLayer][jlr][jal][jth][6];
 
       if (time < boundary) {
-        dist += w * (m_XT[iCLayer][jlr][jal][jth][0] + time
-                     * (m_XT[iCLayer][jlr][jal][jth][1] + time
-                        * (m_XT[iCLayer][jlr][jal][jth][2] + time
-                           * (m_XT[iCLayer][jlr][jal][jth][3] + time
-                              * (m_XT[iCLayer][jlr][jal][jth][4] + time
-                                 * (m_XT[iCLayer][jlr][jal][jth][5]))))));
+        if (m_xtParamMode == 1) {
+          dist += w * ROOT::Math::Chebyshev5(time, m_XT[iCLayer][jlr][jal][jth][0], m_XT[iCLayer][jlr][jal][jth][1],
+                                             m_XT[iCLayer][jlr][jal][jth][2], m_XT[iCLayer][jlr][jal][jth][3], m_XT[iCLayer][jlr][jal][jth][4], m_XT[iCLayer][jlr][jal][jth][5]);
+        } else {
+          dist += w * (m_XT[iCLayer][jlr][jal][jth][0] + time
+                       * (m_XT[iCLayer][jlr][jal][jth][1] + time
+                          * (m_XT[iCLayer][jlr][jal][jth][2] + time
+                             * (m_XT[iCLayer][jlr][jal][jth][3] + time
+                                * (m_XT[iCLayer][jlr][jal][jth][4] + time
+                                   * (m_XT[iCLayer][jlr][jal][jth][5]))))));
+        }
       } else {
         dist += w * (m_XT[iCLayer][jlr][jal][jth][7] * (time - boundary) + m_XT[iCLayer][jlr][jal][jth][8]);
       }

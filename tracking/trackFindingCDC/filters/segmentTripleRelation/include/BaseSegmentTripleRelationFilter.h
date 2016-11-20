@@ -52,16 +52,13 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      Weight operator()(const Relation<const CDCSegmentTriple>& relation) final {
-        const CDCSegmentTriple * ptrFrom(relation.first);
-        const CDCSegmentTriple * ptrTo(relation.second);
+      Weight operator()(const Relation<const CDCSegmentTriple>& relation) override
+      {
+        const CDCSegmentTriple* ptrFrom(relation.first);
+        const CDCSegmentTriple* ptrTo(relation.second);
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-
     };
-
   }
 }
-

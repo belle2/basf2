@@ -4,36 +4,8 @@
   <Content>
     <xi:include href="CDC-Covers.xml"/>
     <xi:include href="CDC-NeutronShields.xml"/>
-    <SensitiveDetector>
-    </SensitiveDetector>
     <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation>
     <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017774 GHz is 2 x (accelerator's RF).">1.017774</ClockFrequencyForTDC>
-
-    <!-- Tentative corr. of sense wire z for endplate z -->
-    <!-- <deltazFileName desc="file which contains corrs. for diff. betw. final- and old-design.">deltaz.dat</deltazFileName> -->
-
-    <!-- Switch for loadding x-t etc. (from disk) to be used in digitization -->
-    <XTetc desc="true: load x-t etc. params. from disk; false: not load.">true</XTetc>
-    <!-- Xt file format -->
-    <XtFileFormat desc="=0: old; =1: new.">1</XtFileFormat>
-    <xtFileName desc="file which contains x-t relation">xt_v3.dat</xtFileName>
-    <!-- Sigma file format -->
-    <SigmaFileFormat desc="=0: old; =1: new.">1</SigmaFileFormat>
-    <sigmaFileName desc="file which contains space resol.">sigma_v1.dat</sigmaFileName>
-    <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
-    <t0FileName desc="file which contains t0">t0.dat</t0FileName>
-    <bwFileName desc="file which contains bad-wire">badwire_v1.dat</bwFileName>
-    <!-- <bwFileName desc="file which contains bad-wire">badwire_sample.dat</bwFileName> -->
-    <twFileName desc="file which contains time-walk">tw_off.dat</twFileName>
-    <chmapFileName desc="file which contains channel map">ch_map.dat</chmapFileName>
-
-    <!-- Switch for selecting x-t etc. to be used in reconstruction. No longer used -->
-    <!-- <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
-    <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v3.dat</xt4ReconFileName>
-    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v1.dat</sigma4ReconFileName>
-    <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
-    <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
-    <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName> -->
 
     <OffsetX desc="Offset x of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetX>
     <OffsetY desc="Offset y of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetY>

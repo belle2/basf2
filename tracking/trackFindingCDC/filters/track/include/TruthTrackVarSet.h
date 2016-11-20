@@ -42,7 +42,17 @@ namespace Belle2 {
      */
     class TruthTrackVarSet : public VarSet<TruthTrackVarNames> {
 
+    private:
+      /// Type of the base class
+      using Super = VarSet<TruthTrackVarNames>;
+
     public:
+      /// Require the Monte Carlo truth information at initialisation
+      void initialize() final;
+
+      /// Prepare the Monte Carlo truth information at start of the event
+      void beginEvent() final;
+
       /// Generate and assign the contained variables
       bool extract(const CDCTrack* track) override;
     };

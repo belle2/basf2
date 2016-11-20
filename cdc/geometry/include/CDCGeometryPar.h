@@ -88,9 +88,6 @@ namespace Belle2 {
       //! Print some debug information
       void Print() const;
 
-      //! Gets geometry parameters from gearbox.
-      //      void read();  // no longer used
-
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
@@ -132,13 +129,6 @@ namespace Belle2 {
       void readXT(const GearDir, int mode = 0);
 
       /**
-       * Read XT-relation table in old format.
-       * @param[in] GearDir Gear Dir.
-       * @param[in] mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void oldReadXT(const GearDir, int mode = 0);
-
-      /**
        * Read XT-relation table in new format.
        * @param[in] GearDir Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
@@ -161,13 +151,6 @@ namespace Belle2 {
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
       void readSigma(const GearDir, int mode = 0);
-
-      /**
-       * Read spatial resolution table in old format.
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void oldReadSigma(const GearDir, int mode = 0);
 
       /**
        * Read spatial resolution table in new format.
@@ -1213,6 +1196,29 @@ namespace Belle2 {
     {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
     }
+
+
+
+//=================================================================
+//Not compile the following functions since they are no longer used
+#if 0
+    //! Gets geometry parameters from gearbox.
+    void read();  // no longer used
+
+    /**
+     * Read XT-relation table in old format.
+     * @param[in] GearDir Gear Dir.
+     * @param[in] mode 0: read simulation file, 1: read reconstruction file.
+     */
+    void oldReadXT(const GearDir, int mode = 0);
+
+    /**
+     * Read spatial resolution table in old format.
+     * @param GearDir Gear Dir.
+     * @param mode 0: read simulation file, 1: read reconstruction file.
+     */
+    void oldReadSigma(const GearDir, int mode = 0);
+#endif
   } // end of namespace CDC
 } // end of namespace Belle2
 

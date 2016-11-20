@@ -1,0 +1,41 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2015 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun, Oliver Frost                                 *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/utilities/Algorithms.h>
+
+using namespace Belle2::TrackFindingCDC;
+
+TrackRejecter::TrackRejecter(const std::string& defaultFilterName)
+  : m_trackFilter(defaultFilterName)
+{
+  this->addProcessingSignalListener(&m_trackFilter);
+}
+
+std::string TrackRejecter::getDescription()
+{
+  return "Deletes fake tracks that have been rejected by a filter";
+}
+
+void TrackRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
+{
+  m_trackFilter.exposeParameters(moduleParamList, prefix);
+}
+
+void TrackRejecter::apply(std::vector<CDCTrack>& tracks)
+{
+  auto trackRejected = [this](const CDCTrack & track) {
+    double filterWeight = m_trackFilter(track);
+    return std::isnan(filterWeight);
+  };
+  erase_remove_if(tracks, trackRejected);
+}

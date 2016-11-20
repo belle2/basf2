@@ -36,6 +36,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
 #include <tracking/trackFindingCDC/filters/wireHitRelation/PrimaryWireHitRelationFilter.h>
@@ -323,6 +324,23 @@ namespace Belle2 {
      * Module implementation using the TrackFitter
      */
     class TrackFlightTimeAdjusterModule : public FindletModule<TrackFlightTimeAdjuster> {
+    };
+
+    /**
+     * Module implementation using the TrackRejecter
+     */
+    class TrackRejecterModule : public FindletModule<TrackRejecter> {
+
+    private:
+      /// Type of the base class
+      using Super = FindletModule<TrackRejecter>;
+
+    public:
+      /// Constructor setting the default store vector names
+      TrackRejecterModule()
+        : Super{{{"CDCTrackVector"}}}
+      {
+      }
     };
 
     /**

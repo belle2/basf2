@@ -30,6 +30,9 @@ namespace Belle2 {
      */
     typedef std::tuple<short, short, short, short, short> key_type;
 
+    /** Clear map */
+    void clear() { m_map.clear(); }
+
     /** Virtual destructor */
     virtual ~PXDCalibrationMap() {}
 

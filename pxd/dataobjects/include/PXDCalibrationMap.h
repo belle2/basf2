@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <TObject.h>
 #include <tuple>
 #include <unordered_map>
 #include <boost/functional/hash.hpp>

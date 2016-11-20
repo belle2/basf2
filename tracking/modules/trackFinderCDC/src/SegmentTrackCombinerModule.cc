@@ -36,7 +36,7 @@ SegmentTrackCombinerModule::SegmentTrackCombinerModule()
   , m_chooseableSegmentTrackFilterSecondStep(makeUnique<SegmentTrackFilterSecondStepFactory>("none"))
   , m_chooseableSegmentTrainFilter(makeUnique<SegmentTrainFilterFactory>("none"))
   , m_chooseableSegmentInformationListTrackFilter(makeUnique<SegmentInformationListTrackFilterFactory>("none"))
-  , m_chooseableTrackFilter(makeUnique<TrackFilterFactory>("all"))
+  , m_trackRejecter("all")
 {
   this->setDescription("Versatile module with adjustable filters for segment track combination.");
 
@@ -47,7 +47,7 @@ SegmentTrackCombinerModule::SegmentTrackCombinerModule()
   m_chooseableSegmentTrackFilterSecondStep.exposeParameters(&mpl, "SegmentTrackFilterSecondStep");
   m_chooseableSegmentTrainFilter.exposeParameters(&mpl, "SegmentTrain");
   m_chooseableSegmentInformationListTrackFilter.exposeParameters(&mpl, "SegmentInformationListTrack");
-  m_chooseableTrackFilter.exposeParameters(&mpl, "Track");
+  m_trackRejecter.exposeParameters(&mpl, "Track");
   this->setParamList(mpl);
 }
 
@@ -61,7 +61,7 @@ void SegmentTrackCombinerModule::initialize()
   m_chooseableSegmentTrackFilterSecondStep.initialize();
   m_chooseableSegmentTrainFilter.initialize();
   m_chooseableSegmentInformationListTrackFilter.initialize();
-  m_chooseableTrackFilter.initialize();
+  m_trackRejecter.initialize();
 
   // Require the Monte Carlo information, should be redundant:
   // The filters that require the truth information should have required
@@ -72,8 +72,7 @@ void SegmentTrackCombinerModule::initialize()
       m_chooseableNewSegmentFilter.needsTruthInformation() or
       m_chooseableSegmentTrackFilterSecondStep.needsTruthInformation() or
       m_chooseableSegmentTrainFilter.needsTruthInformation() or
-      m_chooseableSegmentInformationListTrackFilter.needsTruthInformation() or
-      m_chooseableTrackFilter.needsTruthInformation()) {
+      m_chooseableSegmentInformationListTrackFilter.needsTruthInformation()) {
     CDCMCManager::getInstance().requireTruthInformation();
   }
 }
@@ -87,7 +86,7 @@ void SegmentTrackCombinerModule::beginRun()
   m_chooseableSegmentTrackFilterSecondStep.beginRun();
   m_chooseableSegmentTrainFilter.beginRun();
   m_chooseableSegmentInformationListTrackFilter.beginRun();
-  m_chooseableTrackFilter.beginRun();
+  m_trackRejecter.beginRun();
 }
 
 void SegmentTrackCombinerModule::event()
@@ -99,7 +98,7 @@ void SegmentTrackCombinerModule::event()
   m_chooseableSegmentTrackFilterSecondStep.beginEvent();
   m_chooseableSegmentTrainFilter.beginEvent();
   m_chooseableSegmentInformationListTrackFilter.beginEvent();
-  m_chooseableTrackFilter.beginEvent();
+  m_trackRejecter.beginEvent();
 
   // Fill the Monte Carlo maps, should be redundant:
   // The filters that require the truth information should have called fill
@@ -110,15 +109,14 @@ void SegmentTrackCombinerModule::event()
       m_chooseableNewSegmentFilter.needsTruthInformation() or
       m_chooseableSegmentTrackFilterSecondStep.needsTruthInformation() or
       m_chooseableSegmentTrainFilter.needsTruthInformation() or
-      m_chooseableSegmentInformationListTrackFilter.needsTruthInformation() or
-      m_chooseableTrackFilter.needsTruthInformation()) {
+      m_chooseableSegmentInformationListTrackFilter.needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
   Super::event();
 }
 void SegmentTrackCombinerModule::endRun()
 {
-  m_chooseableTrackFilter.endRun();
+  m_trackRejecter.endRun();
   m_chooseableSegmentInformationListTrackFilter.endRun();
   m_chooseableSegmentTrainFilter.endRun();
   m_chooseableSegmentTrackFilterSecondStep.endRun();
@@ -130,7 +128,7 @@ void SegmentTrackCombinerModule::endRun()
 
 void SegmentTrackCombinerModule::terminate()
 {
-  m_chooseableTrackFilter.terminate();
+  m_trackRejecter.terminate();
   m_chooseableSegmentInformationListTrackFilter.terminate();
   m_chooseableSegmentTrainFilter.terminate();
   m_chooseableSegmentTrackFilterSecondStep.terminate();
@@ -156,7 +154,7 @@ void SegmentTrackCombinerModule::generate(std::vector<TrackFindingCDC::CDCSegmen
   m_combiner.combine(m_chooseableSegmentTrackFilterSecondStep,
                      m_chooseableSegmentTrainFilter,
                      m_chooseableSegmentInformationListTrackFilter);
-  m_combiner.filterTracks(tracks, m_chooseableTrackFilter);
+  m_trackRejecter.apply(tracks);
   m_combiner.clearAndRecover();
 
   // Resort hits for the arc length information

@@ -92,18 +92,6 @@ namespace Belle2 {
       void clearAndRecover();
 
       /**
-       * Filter out tracks with the given filter. Normally, you train your filter to filter out fake candidates
-       * (but you can use any filter you want). The tracks with a NAN-filter result get removed from the list.
-       */
-      void filterTracks(std::vector<CDCTrack>& tracks, BaseTrackFilter& trackFilter)
-      {
-        tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [&trackFilter](const CDCTrack & track) -> bool {
-          double filterResult = trackFilter(track);
-          return isNotACell(filterResult);
-        }), tracks.end());
-      }
-
-      /**
        * Helper function to add a segment to a track with respecting the taken information of the segment.
        * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
        */

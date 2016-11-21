@@ -19,7 +19,7 @@ namespace Belle2 {
     TOPCAFDigitCalib();
     ~TOPCAFDigitCalib();
 
-    TOPCAFDigitCalib(const EventWaveformPacket* wp);
+    explicit TOPCAFDigitCalib(const EventWaveformPacket* wp);
 
     ///--- Getters ---///
     //! ge Channel ID

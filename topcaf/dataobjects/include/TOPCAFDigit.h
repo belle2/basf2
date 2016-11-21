@@ -18,7 +18,7 @@ namespace Belle2 {
     TOPCAFDigit();
     ~TOPCAFDigit();
 
-    TOPCAFDigit(const EventWaveformPacket* wp);
+    explicit TOPCAFDigit(const EventWaveformPacket* wp);
 
 
     ///--- Getters ---///

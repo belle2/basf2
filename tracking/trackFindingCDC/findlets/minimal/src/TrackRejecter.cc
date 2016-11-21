@@ -13,6 +13,8 @@
 
 #include <tracking/trackFindingCDC/utilities/Algorithms.h>
 
+#include <framework/core/ModuleParamList.h>
+
 using namespace Belle2::TrackFindingCDC;
 
 TrackRejecter::TrackRejecter(const std::string& defaultFilterName)
@@ -29,13 +31,29 @@ std::string TrackRejecter::getDescription()
 void TrackRejecter::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
   m_trackFilter.exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "deleteRejected"),
+                                m_param_deleteRejected,
+                                "Delete the rejected tracks instead of marking this as background.",
+                                m_param_deleteRejected);
 }
 
 void TrackRejecter::apply(std::vector<CDCTrack>& tracks)
 {
-  auto trackRejected = [this](const CDCTrack & track) {
+  auto reject = [this](CDCTrack & track) {
     double filterWeight = m_trackFilter(track);
-    return std::isnan(filterWeight);
+    track.getAutomatonCell().setCellWeight(filterWeight);
+    if (std::isnan(filterWeight)) {
+      track.getAutomatonCell().setBackgroundFlag();
+      track.getAutomatonCell().setTakenFlag();
+      return true;
+    } else {
+      return false;
+    }
   };
-  erase_remove_if(tracks, trackRejected);
+
+  if (m_param_deleteRejected) {
+    erase_remove_if(tracks, reject);
+  } else {
+    std::for_each(tracks.begin(), tracks.end(), reject);
+  }
 }

@@ -44,6 +44,9 @@ namespace Belle2 {
       void apply(std::vector<CDCTrack>& tracks) final;
 
     private:
+      /// Parameter : Switch to delete the tracks instead of marking them as background.
+      bool m_param_deleteRejected = true;
+
       /// Reference to the filter to be used to filter
       ChooseableFilter<TrackFilterFactory> m_trackFilter;
     };

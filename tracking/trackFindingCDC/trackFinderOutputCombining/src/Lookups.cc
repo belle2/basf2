@@ -19,7 +19,9 @@ void SegmentLookUp::fillWith(std::vector<CDCSegment2D>& segments)
   m_hitSegmentLookUp.clear();
 
   for (CDCSegment2D& segment : segments) {
-    if (segment.getAutomatonCell().hasTakenFlag()) {
+    if (segment.getAutomatonCell().hasTakenFlag() or
+        segment.getAutomatonCell().hasBackgroundFlag() or
+        segment.isFullyTaken()) {
       continue;
     }
 
@@ -35,7 +37,6 @@ void SegmentLookUp::fillWith(std::vector<CDCSegment2D>& segments)
     B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D());
   }
 }
-
 
 void SegmentLookUp::clear()
 {

@@ -1,16 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-#######################################################
-# 1000 500 MeV-muons are generated with ParticleGun
-# and reconstructed. ECL-related infos are dumped on
-# a TTree saved in an output file named
-# ECLMuonOutput_500mev.root .
-########################################################
-
 """
 <header>
-<output>ECLMuonOutput.root</output>
+<output>ECLClusterOutputBarrel.root</output>
 <contact>Benjamin Oberhof, ecl2ml@bpost.kek.jp</contact>
 </header>
 """
@@ -39,12 +32,12 @@ set_random_seed(123456)
 # single particle generator settings
 pGun = register_module('ParticleGun')
 param_pGun = {
-    'pdgCodes': [13],
+    'pdgCodes': [22],
     'nTracks': 1,
-    'momentumGeneration': 'uniform',
-    'momentumParams': [0.5, 3],
+    'momentumGeneration': 'fixed',
+    'momentumParams': [0.1],
     'thetaGeneration': 'uniform',
-    'thetaParams': [13., 155.],
+    'thetaParams': [33., 130.],
     'phiGeneration': 'uniform',
     'phiParams': [0, 360],
     'vertexGeneration': 'uniform',
@@ -67,9 +60,8 @@ add_reconstruction(main)
 
 # eclDataAnalysis module
 ecldataanalysis = register_module('ECLDataAnalysis')
-ecldataanalysis.param('rootFileName', '../ECLMuonOutput.root')
+ecldataanalysis.param('rootFileName', '../ECLClusterOutputBarrel.root')
 ecldataanalysis.param('doTracking', 1)
-ecldataanalysis.param('doSimulation', 0)
 main.add_module(ecldataanalysis)
 
 process(main)

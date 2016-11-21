@@ -70,7 +70,7 @@ class DecayTree(object):
             i += 1
         return i, nodes
 
-    def nodes_match(self, node1, node2):
+    def nodes_match(self, node1, node2, unmatched=False):
         """
         Check if two DecayNodes are compatible.
         To be compatible they must:
@@ -81,21 +81,28 @@ class DecayTree(object):
           423 (--> 421 13) is not the same as 423 (--> 13 421)
         @param node1 first node
         @param node2 second node
+        @param unmatched enforce the DecayNode which is found to be not matched
         """
         if node1.p == node2.p:
             if node1.d is None or node2.d is None:
+                if node1.d is None or node2.d is None:
+                    if unmatched:
+                        return node1.m is False
                 return True
             if len(node1.d) != len(node2.d):
                 return False
             if all([self.nodes_match(subnode1, subnode2) for subnode1, subnode2 in zip(node1.d, node2.d)]):
+                if unmatched:
+                    return node1.m is False
                 return True
         return False
 
-    def find_decay(self, decay, nodes=None):
+    def find_decay(self, decay, nodes=None, unmatched=False):
         """
         Check if the decay tree contains the given decay tree.
         @param decay DecayTree or DecayNode object describing the decay
-        @parma nodes used to call the method recursively
+        @param nodes used to call the method recursively
+        @param unmatched enforce the DecayNode which is found to be not matched
         """
         if isinstance(decay, DecayTree):
             if len(decay.nodes) != 1:
@@ -104,9 +111,9 @@ class DecayTree(object):
         if nodes is None:
             nodes = self.nodes
         for node in nodes:
-            if self.nodes_match(decay, node):
+            if self.nodes_match(decay, node, unmatched):
                 return True
-            elif self.find_decay(decay, node.d):
+            elif self.find_decay(decay, node.d, unmatched):
                 return True
         return False
 

@@ -10,7 +10,7 @@
 
 #define _USE_MATH_DEFINES
 
-#include <pxd/calibration/HitCorrector.h>
+#include <pxd/reconstruction/HitCorrector.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 #include <vxd/dataobjects/VxdID.h>

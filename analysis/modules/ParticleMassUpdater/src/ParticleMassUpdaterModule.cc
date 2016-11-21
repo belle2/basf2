@@ -26,7 +26,7 @@ REG_MODULE(ParticleMassUpdater)
 ParticleMassUpdaterModule::ParticleMassUpdaterModule() : Module()
 {
   //Set module properties
-  setDescription("This module modifies the mass of the particles inside the given particleLists with the invariant mass of the particle corresponding to the given pdgCode.");
+  setDescription("This module replaces the mass of the particles inside the given particleLists with the invariant mass of the particle corresponding to the given pdgCode.");
   setPropertyFlags(c_ParallelProcessingCertified);
   //Parameter definition
   addParam("particleLists", m_strParticleLists, "List of ParticleLists", vector<string>());

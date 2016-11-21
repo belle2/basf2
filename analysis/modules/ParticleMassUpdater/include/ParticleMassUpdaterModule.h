@@ -22,7 +22,7 @@
 
 namespace Belle2 {
 
-  /** This module modifies the mass of the particles inside the given particleLists
+  /** This module replaces the mass of the particles inside the given particleLists
   with the invariant mass of the particle corresponding to the given pdgCode. */
 
   class ParticleMassUpdaterModule : public Module {

@@ -605,6 +605,29 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def replaceMass(
+    replacerName,
+    particleLists=[],
+    pdgCode=22,
+    path=analysis_main,
+):
+    """
+    replaces the mass of the particles inside the given particleLists
+    with the invariant mass of the particle corresponding to the given pdgCode.
+
+    @param particleLists new ParticleList filled with copied Particles
+    @param pdgCode PDG   code for mass reference
+    @param path          modules are added to this path
+    """
+
+    # first copy original particles to the new ParticleList
+    pmassupdater = register_module('ParticleMassUpdater')
+    pmassupdater.set_name('ParticleMassUpdater_' + replacerName)
+    pmassupdater.param('particleLists', particleLists)
+    pmassupdater.param('pdgCode', pdgCode)
+    path.add_module(pmassupdater)
+
+
 def reconstructRecoil(
     decayString,
     cut,

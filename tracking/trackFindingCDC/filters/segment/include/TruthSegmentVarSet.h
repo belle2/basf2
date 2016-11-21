@@ -44,7 +44,17 @@ namespace Belle2 {
      */
     class TruthSegmentVarSet : public VarSet<TruthSegmentVarNames> {
 
+    private:
+      /// Type of the base class
+      using Super = VarSet<TruthSegmentVarNames>;
+
     public:
+      /// Require the Monte Carlo truth information at initialisation
+      void initialize() final;
+
+      /// Prepare the Monte Carlo truth information at start of the event
+      void beginEvent() final;
+
       /// Generate and assign the contained variables
       bool extract(const CDCSegment2D* segment) override;
     };

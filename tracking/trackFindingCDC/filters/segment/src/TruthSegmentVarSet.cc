@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
@@ -19,6 +20,18 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+void TruthSegmentVarSet::initialize()
+{
+  CDCMCManager::getInstance().requireTruthInformation();
+  Super::initialize();
+}
+
+void TruthSegmentVarSet::beginEvent()
+{
+  CDCMCManager::getInstance().fill();
+  Super::beginEvent();
+}
 
 bool TruthSegmentVarSet::extract(const CDCSegment2D* segment)
 {

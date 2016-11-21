@@ -165,6 +165,18 @@ def add_single_gun_generator(path):
                     thetaParams=[17., 150.])
 
 
+def add_transverse_gun_generator(path):
+    """Add ParticleGun to illuminate a region of the phase space with low efficiency"""
+    path.add_module("ParticleGun",
+                    pdgCodes=[muon_pdg_code, -muon_pdg_code],
+                    nTracks=1,
+                    varyNTracks=False,
+                    momentumGeneration='inversePt',
+                    momentumParams=[0.275, 0.276],
+                    thetaGeneration='uniform',
+                    thetaParams=[89., 91.])
+
+
 def add_simple_gun_generator(path):
     """Add ParticleGun firing 10 muons at medium energy"""
     path.add_module("ParticleGun",
@@ -312,6 +324,7 @@ def add_no_generator(path):
 # None as a special value for background only simulation
 generators_by_short_name = {
     'single_gun': add_single_gun_generator,
+    'transverse_gun': add_transverse_gun_generator,
     'simple_gun': add_simple_gun_generator,
     'low_gun': add_low_gun_generator,
     'forward_gun': add_forward_gun_generator,

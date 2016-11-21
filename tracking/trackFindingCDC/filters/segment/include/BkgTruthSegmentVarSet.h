@@ -19,7 +19,7 @@ namespace Belle2 {
      *  Class to compute floating point variables from a segment
      *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
-    class BackgroundSegmentTruthVarSet : public TruthSegmentVarSet {
+    class BkgTruthSegmentVarSet : public TruthSegmentVarSet {
 
     private:
       /// Type of the base class
@@ -29,7 +29,7 @@ namespace Belle2 {
       /// Generate and assign the contained variables
       bool extract(const CDCSegment2D* segment) final {
         bool extracted = Super::extract(segment);
-        var<named("truth")>() = var<named("segment_is_fake_truth")>();
+        var<named("truth")>() = not var<named("segment_is_fake_truth")>();
         return extracted;
       }
     };

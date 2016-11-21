@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/segmentTrain/BaseSegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BaseBackgroundSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/newSegment/BaseNewSegmentFilter.h>
 #include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 
@@ -56,7 +56,7 @@ namespace Belle2 {
        * Filter out the segments that are fake or background. Mark them as taken.
        * For deciding which is background or not we use the given filter.
        */
-      void filterSegments(BaseBackgroundSegmentFilter& backgroundSegmentFilter);
+      void filterSegments(BaseSegmentFilter& segmentFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.

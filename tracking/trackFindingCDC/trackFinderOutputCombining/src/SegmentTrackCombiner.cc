@@ -424,10 +424,6 @@ void SegmentTrackCombiner::tryToCombineSegmentTrainAndMatchedTracks(const TrainO
       B2DEBUG(100, "None of the matches were in the track. Aborting. There are " << matchesAboveTrack.size() <<
               " matches above the track.");
 
-      // Try to fit them to the track
-      double bestFitProb = 0;
-      TrackInformation* bestMatch = nullptr;
-
       for (TrackInformation* trackInformation : matchesAboveTrack) {
         std::vector<SegmentInformation*> temporaryTrain = {segmentInformation};
         CellWeight fitProbability = segmentTrackFilter(std::make_pair(temporaryTrain, trackInformation->getTrackCand()));

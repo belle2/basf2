@@ -65,8 +65,11 @@ class DecayTree(object):
                 elif x == ')':
                     return i, nodes
                 else:
-                    nodes.append(DecayNode(int(x), [], []))
-                    self.particles.append(nodes[-1])
+                    try:
+                        nodes.append(DecayNode(int(x), [], []))
+                        self.particles.append(nodes[-1])
+                    except ValueError:
+                        pass
             i += 1
         return i, nodes
 
@@ -210,7 +213,7 @@ class DecayHashMap(object):
         """
         return self._string[_decayHashFloatToInt(decayHash, decayHashExtended)]
 
-    def get_original_decays(self, decayHash, decayHashExtended):
+    def get_original_decay(self, decayHash, decayHashExtended):
         """
         Return original (MC) DecayTree given the decayHash and decayHashExtended
         @param decayHash output of extraInfo(decayHash)

@@ -13,6 +13,7 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
@@ -82,8 +83,8 @@ namespace Belle2 {
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
       Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterFirstStep;
 
-      /// Reference to the segment filter.
-      Chooseable<BaseSegmentFilter> m_chooseableSegmentFilter;
+      /// Findlet to filter out fake segments
+      SegmentRejecter m_segmentRejecter;
 
       /// Reference to the new segment filter.
       Chooseable<BaseNewSegmentFilter> m_chooseableNewSegmentFilter;

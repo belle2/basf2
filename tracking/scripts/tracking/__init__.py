@@ -250,9 +250,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
                     useSingleMatchAlgorithm=True,
                     TracksStoreObjNameIsInput=True)
 
-    # Delete segments which where fully used in the last events
-    path.add_module("UsedSegmentsDeleter")
-
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
@@ -323,9 +320,6 @@ def add_cdc_cr_track_finding(path,
                     useSingleMatchAlgorithm=True,
                     singleMatchCheckForB2BTracks=True,
                     )
-
-    # Delete segments which where fully used in the last events
-    path.add_module("UsedSegmentsDeleter")
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',

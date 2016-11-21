@@ -12,6 +12,9 @@
 #include <framework/gearbox/Const.h>
 #include <TObject.h>
 
+#include <vector>
+#include <utility>
+
 namespace Belle2 {
   /// Storage element for the eventwise T0 estimation.
   class EventT0 : public TObject {
@@ -21,6 +24,7 @@ namespace Belle2 {
     struct EventT0Component {
       EventT0Component() {}
 
+      /** convenience constructor. */
       EventT0Component(double eventT0_, double eventT0UncertaintySquared_, Const::EDetector detector_) :
         eventT0(eventT0_), eventT0UncertaintySquared(eventT0UncertaintySquared_), detector(detector_) {}
 

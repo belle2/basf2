@@ -21,6 +21,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentFitter.h>
+#include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
@@ -172,6 +173,12 @@ namespace Belle2 {
      * Module implementation using the SegmentFitter
      */
     class SegmentFitterModule : public FindletModule<SegmentFitter> {
+    };
+
+    /**
+     * Module implementation using the SegmentRejecter
+     */
+    class SegmentRejecterModule : public FindletModule<SegmentRejecter> {
     };
 
     /**

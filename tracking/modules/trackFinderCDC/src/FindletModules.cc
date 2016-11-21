@@ -20,6 +20,7 @@ REG_MODULE(FacetCreator);
 REG_MODULE(SegmentCreatorFacetAutomaton);
 REG_MODULE(SegmentLinker);
 REG_MODULE(SegmentFitter);
+REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 

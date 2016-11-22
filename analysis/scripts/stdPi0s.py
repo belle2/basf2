@@ -8,6 +8,27 @@ from stdPhotons import *
 # Prepare all standard final state particles
 
 
+def stdPi0s(listtype='veryLoose', path=analysis_main):
+    if listtype == 'veryLoose':
+        fillParticleList('gamma:pi0', '', True, path)
+        reconstructDecay('pi0:veryLoose -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
+    elif listtype == 'loose':
+        fillParticleList('gamma:pi0highE', '', True, path)
+        reconstructDecay('pi0:loose -> gamma:pi0highE gamma:pi0highE', '0.1 < M < 0.160', 1, True, path)
+    elif listtype == 'veryLooseFit':
+        fillParticleList('gamma:pi0', '', True, path)
+        reconstructDecay('pi0:veryLooseFit -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
+        massKFit('pi0:veryLooseFit', 0.0, '', path)
+    elif listtype == 'looseFit':
+        fillParticleList('gamma:pi0highE', '', True, path)
+        reconstructDecay('pi0:looseFit -> gamma:pi0highE gamma:pi0highE', '0.1 < M < 0.160', 1, True, path)
+        massKFit('pi0:looseFit', 0.0, '', path)
+    else:
+        fillParticleList('gamma:pi0', '', True, path)
+        reconstructDecay('pi0:veryLooseFit -> gamma:pi0 gamma:pi0', '0.09 < M < 0.165', 1, True, path)
+        massKFit('pi0:veryLooseFit', 0.0, '', path)
+
+
 def loadStdPi0(path=analysis_main):
     loadStdAllPi0(path)
 

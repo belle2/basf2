@@ -158,8 +158,9 @@ def main():
     try:
         import splinter
     except ImportError:
-        print("The splinter package is required to run this test. Run 'pip3 install splinter' to install")
-        return 0
+        print("TEST SKIPPED: The splinter package is required to run this test." +
+              "Run 'pip3 install splinter' to install", file=sys.stderr)
+        sys.exit(1)
 
     success = True
 

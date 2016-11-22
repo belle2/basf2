@@ -20,7 +20,6 @@
 #include <cmath>
 #include <boost/format.hpp>
 #include <iostream>
-#include <fstream>
 #include <iomanip>
 
 #include <Math/ChebyshevPol.h>
@@ -407,6 +406,22 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
 }
 
 
+// Open a file
+void CDCGeometryPar::openFile(std::ifstream& ifs, const std::string& fileName0) const
+{
+  std::string fileName1 = "/cdc/data/" + fileName0;
+  std::string fileName = FileSystem::findFile(fileName1);
+
+  if (fileName == "") {
+    B2FATAL("CDCGeometryPar: " << fileName1 << " not exist!");
+  } else {
+    B2INFO("CDCGeometryPar: open " << fileName1);
+    ifs.open(fileName.c_str());
+    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName1 << " !");
+  }
+}
+
+
 // Read displacement or (mis)alignment params.
 //void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom,  const GearDir gbxParams)
 void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometry* geom)
@@ -432,18 +447,8 @@ void CDCGeometryPar::readWirePositionParams(EWirePosition set,  const CDCGeometr
     }
   }
 
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
-
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   int iL(0), iC(0);
   const int np = 3;
@@ -607,18 +612,8 @@ void CDCGeometryPar::newReadXT(const GearDir gbxParams, const int mode)
     fileName0 = gbxParams.getString("xt4ReconFileName");
   }
 
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
-
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
@@ -737,18 +732,8 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
     fileName0 = gbxParams.getString("sigma4ReconFileName");
   }
 
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
-
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   //read alpha bin info.
   unsigned short nAlphaBins = 0;
@@ -849,18 +834,9 @@ void CDCGeometryPar::readPropSpeed(const GearDir gbxParams, const int mode)
   if (mode == 1) {
     fileName0 = gbxParams.getString("propSpeed4ReconFileName");
   }
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   int iL;
   double speed;
@@ -925,18 +901,9 @@ void CDCGeometryPar::readT0(const GearDir gbxParams, int mode)
   if (mode == 1) {
     fileName0 = gbxParams.getString("t04ReconFileName");
   }
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   int iL(0), iC(0);
   float t0(0);
@@ -970,18 +937,9 @@ void CDCGeometryPar::readBadWire(const GearDir gbxParams, int mode)
   if (mode == 1) {
     fileName0 = gbxParams.getString("bw4ReconFileName");
   }
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   int iCL(0), iW(0);
   unsigned nRead = 0;
@@ -1015,18 +973,8 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
     fileName0 = gbxParams.getString("tw4ReconFileName");
   }
 
-  fileName0 = "/cdc/data/" + fileName0;
-  std::string fileName = FileSystem::findFile(fileName0);
-
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   unsigned iBoard = 0;
   float coef = 0.;
@@ -1052,19 +1000,9 @@ void CDCGeometryPar::readTW(const GearDir gbxParams, const int mode)
 void CDCGeometryPar::readChMap()
 {
   std::string fileName0 = CDCGeoControlPar::getInstance().getChMapFile();
-  fileName0 = "/cdc/data/" + fileName0;
-
-  std::string fileName = FileSystem::findFile(fileName0);
 
   ifstream ifs;
-
-  if (fileName == "") {
-    B2FATAL("CDCGeometryPar: " << fileName0 << " not exist!");
-  } else {
-    B2INFO("CDCGeometryPar: open " << fileName0);
-    ifs.open(fileName.c_str());
-    if (!ifs) B2FATAL("CDCGeometryPar: cannot open " << fileName0 << " !");
-  }
+  openFile(ifs, fileName0);
 
   unsigned short iSL, iL, iW, iB, iC;
   unsigned nRead = 0;

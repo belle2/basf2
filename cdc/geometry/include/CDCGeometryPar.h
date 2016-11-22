@@ -32,6 +32,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
 
 #include "TVector3.h"
 
@@ -102,6 +103,13 @@ namespace Belle2 {
       //       *
       //       */
       //      void readDeltaz(const CDCGeometry&);
+
+      /**
+       * Open a file
+       * @param[in] ifs input file-stream
+       * @param[in] fileName0 file-name on cdc/data directory
+       */
+      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
 
       /**
        * Read displacement or (mis)alignment params from text file.

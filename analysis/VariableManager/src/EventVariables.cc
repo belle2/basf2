@@ -57,15 +57,16 @@ namespace Belle2 {
         B2ERROR("Cannot find MCParticles array.");
         return 0.0;
       }
-      int pdg_no = mcParticles[0]->getPDG();
-      if (mcParticles[0]->getMother() == nullptr &&
-          ((pdg_no == 553) ||
-           (pdg_no == 100553) ||
-           (pdg_no == 200553) ||
-           (pdg_no == 300553) ||
-           (pdg_no == 9000553) ||
-           (pdg_no == 9010553))) {
-        return 1.0;
+      for (const MCParticle& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (mcp.getMother() == nullptr &&
+            ((pdg_no == 553) ||
+             (pdg_no == 100553) ||
+             (pdg_no == 200553) ||
+             (pdg_no == 300553) ||
+             (pdg_no == 9000553) ||
+             (pdg_no == 9010553)))
+          return 1.0;
       }
       return 0.0;
     }

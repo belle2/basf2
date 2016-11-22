@@ -291,6 +291,15 @@ namespace Belle2 {
       //      std::vector<std::multimap<unsigned short, CDCSimHit*>::iterator> m_posWeightMapItEnd; /**< Iterator showing end of positive hit map*/
 
       //      int m_nPosHits, m_nNegHits;
+
+      const signed short CCW = 1; ///< Constant for counterclockwise orientation
+      const signed short CW  = -1; ///< Constant for clockwise orientation
+      const signed short CW_OUT_NEIGHBOR  = 1; ///< Constant for clockwise outwards
+      const signed short CW_NEIGHBOR      = 3; ///< Constant for clockwise
+      const signed short CW_IN_NEIGHBOR   = 5; ///< Constant for clockwise inwards
+      const signed short CCW_IN_NEIGHBOR  = 7; ///< Constant for counterclockwise inwards
+      const signed short CCW_NEIGHBOR     = 9; ///< Constant for counterclockwise
+      const signed short CCW_OUT_NEIGHBOR = 11; ///< Constant for counterclockwise outwards
     };
   }
 } // end of namespace Belle2

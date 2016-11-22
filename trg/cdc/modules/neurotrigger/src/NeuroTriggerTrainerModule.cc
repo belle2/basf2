@@ -56,8 +56,9 @@ NeuroTriggerTrainerModule::NeuroTriggerTrainerModule() : Module()
            "Name of the root file where the generated training samples will be saved.",
            string("NeuroTrigger.root"));
   addParam("logFilename", m_logFilename,
-           "Name of the text file where the training logs will be saved "
-           "(one for each sector, named logFilename_i.log).",
+           "Base name of the text files where the training logs will be saved "
+           "(two for each sector, named logFilename_BestRun_i.log "
+           "and logFilename_AllOptima_i.log).",
            string("NeuroTrigger"));
   addParam("arrayname", m_arrayname,
            "Name of the TObjArray to hold the NeuroTrigger parameters.",
@@ -524,8 +525,10 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   fann_set_activation_function_output(ann, FANN_SIGMOID_SYMMETRIC);
   fann_set_training_algorithm(ann, FANN_TRAIN_RPROP);
   double bestRMS = 999.;
+  // keep full train error curve for best run
   vector<double> bestTrainLog = {};
   vector<double> bestValidLog = {};
+  // keep train error of optimum for all runs
   vector<double> trainOptLog = {};
   vector<double> validOptLog = {};
   // repeat training several times with different random start weights
@@ -616,13 +619,13 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
   // save training log
   if (m_saveDebug) {
     // full error curve for best run
-    ofstream logstream(m_logFilename + "_" + to_string(isector) + ".log");
+    ofstream logstream(m_logFilename + "_BestRun_" + to_string(isector) + ".log");
     for (unsigned i = 0; i < bestTrainLog.size(); ++i) {
       logstream << bestTrainLog[i] << " " << bestValidLog[i] << endl;
     }
     logstream.close();
     // training optimum for all runs
-    ofstream logstreamOpt(m_logFilename + "Opt_" + to_string(isector) + ".log");
+    ofstream logstreamOpt(m_logFilename + "_AllOptima_" + to_string(isector) + ".log");
     for (unsigned i = 0; i < trainOptLog.size(); ++i) {
       logstreamOpt << trainOptLog[i] << " " << validOptLog[i] << endl;
     }

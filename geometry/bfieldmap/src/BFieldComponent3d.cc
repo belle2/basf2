@@ -187,6 +187,124 @@ inline int getPhiIndxWeightSinCos(double y, double x, double r, double& w, doubl
   return indx;
 }
 
+namespace {
+  /** third order atan2 approximation following
+   * http://dx.doi.org/10.1109/CCECE.2006.277814 with a maximum error of
+   * 0.0015 radian (0.096 degree)
+   */
+  double fast_atan2(double y, double x)
+  {
+    const double ax{std::abs(x)}, ay{std::abs(y)};
+    const double z1 = (ay - ax) / (ay + ax);
+    const double az1 = std::abs(z1);
+    const double phi = M_PI / 4 * (z1 + 1)  - z1 * (az1 - 1) * (0.2447 + 0.0663 * az1);
+    if (y >= 0 && x >= 0) return phi;
+    if (y >= 0 && x <= 0) return M_PI - phi;
+    if (y <= 0 && x <= 0) return -M_PI + phi;
+    return -phi;
+  }
+  // the same as fast_atan2 but branchless
+  double fast_atan2_branchless(double y, double x)
+  {
+    const double pi4 = M_PI / 4, pi2 = M_PI / 2;
+    const double ax{std::abs(x)}, ay{std::abs(y)};
+    const double z1 = (ax - ay) / (ay + ax);
+    const double az1 = std::abs(z1);
+    double phi = (z1 + 1) * pi4  - (z1 * (az1 - 1)) * (0.2447 + 0.0663 * az1);
+    phi = pi2 - copysign(phi, x);
+    return copysign(phi, y);
+  }
+
+  /** third order quadrant based atan2 approximation following
+   * http://dx.doi.org/10.1109/CCECE.2006.277814 with a maximum error of
+   * 0.0015 radian (0.096 degree) and adding rational approximation for small
+   * magnitude of y/x following http://dx.doi.org/10.1109/MSP.2006.1628884
+   * (combining eq. 10 and eq. 9 in the same way as done in the paper for eq.
+   * 11 and eq. 5 in eq. 12)
+   */
+  double fast_atan2_rational(double y, double x)
+  {
+    const double ax{std::abs(x)}, ay{std::abs(y)};
+    const double z1 = (ay - ax) / (ay + ax);
+    const double az1 = std::abs(z1);
+    double phi;
+    // close to az1=0 the rational approximation yields a smaller error then
+    // the polynomial.  the turnover has been estimated by scanning through the
+    // valid range 0-1 and finding the spot with the smallest mean(abs(error)).
+    if (az1 < 0.232) {
+      phi = M_PI / 4 + z1 / (1 + 0.28086 * z1 * z1);
+    } else {
+      phi = M_PI / 4 * (z1 + 1)  - z1 * (az1 - 1) * (0.2447 + 0.0663 * az1);
+    }
+    if (y >= 0 && x >= 0) return phi;
+    if (y >= 0 && x <= 0) return M_PI - phi;
+    if (y <= 0 && x <= 0) return -M_PI + phi;
+    return -phi;
+  }
+
+  template<int npol>
+  double fast_atan2_minimax(double y, double x)
+  {
+    const double pi4 = M_PI / 4, pi2 = M_PI / 2;
+    const double ax = std::abs(x), ay = std::abs(y);
+    const double z = (ax - ay) / (ay + ax);
+    const double v = std::abs(z), v2 = v * v;
+    double p0, p1;
+    if (npol == 4) {
+      // 4th order polynomial minimax approximation
+      // max error <=2.57373e-05 rad (0.00147464 deg)
+      static const double c4[] = {0.2132675884368258, 0.23481662556227,
+                                  -0.2121597649928347, 0.0485854027042442
+                                 };
+      p0 = c4[0] + v2 * c4[2];
+      p1 = c4[1] + v2 * c4[3];
+    } else if (npol == 5) {
+      // 5th order polynomial minimax approximation
+      // max error <=7.57429e-06 rad (0.000433975 deg)
+      static const double c5[] = {0.2141439315495107, 0.2227491783659812, -0.1628994411740733,
+                                  -0.02778537455524869, 0.03962954416153075
+                                 };
+      p0 = c5[0] + v2 * (c5[2] + v2 * c5[4]);
+      p1 = c5[1] + v2 * (c5[3]);
+    } else if (npol == 6) {
+      // 6th order polynomial minimax approximation
+      // max error <=4.65134e-07 rad (2.66502e-05 deg)
+      static const double c6[] = {0.2145843590230225, 0.2146820003230985, -0.116250549812964,
+                                  -0.1428509550362758, 0.1660612278047719, -0.05086851503449636
+                                 };
+      p0 = c6[0] + v2 * (c6[2] + v2 * (c6[4]));
+      p1 = c6[1] + v2 * (c6[3] + v2 * (c6[5]));
+    }
+    double phi = (z + 1) * pi4  - (z * (v - 1)) * (p0 + v * p1);
+    phi = pi2 - copysign(phi, x);
+    return copysign(phi, y);
+  }
+
+  template<int nfun>
+  double opt_atan2(double y, double x)
+  {
+    if (nfun == 0) return fast_atan2(y, x);
+    else if (nfun == 1) return fast_atan2_branchless(y, x);
+    else if (nfun == 2) return fast_atan2_rational(y, x);
+    else if (nfun == 3) return fast_atan2_minimax<4>(y, x);
+    else if (nfun == 4) return fast_atan2_minimax<5>(y, x);
+    else if (nfun == 5) return fast_atan2_minimax<6>(y, x);
+    return atan2(y, x);
+  }
+
+  inline int getPhiIndxWeightSinCos2(double y, double x, double r, double& w, double& s, double& c)
+  {
+    double phi = opt_atan2<2>(y, x);
+    double ir = 1 / r;
+    s = y * ir, c = x * ir;
+    w = phi * (90 / M_PI);
+    int i = w;
+    //    i = min(89,i);
+    w -= i;
+    return i;
+  }
+}
+
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
   TVector3 B(0, 0, 0);
@@ -211,7 +329,7 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 
     double wphi, s, c;
     unsigned int ir   = static_cast<int>(wr);
-    unsigned int iphi = getPhiIndxWeightSinCos(std::abs(point.y()), point.x(), r, wphi, s, c);
+    unsigned int iphi = getPhiIndxWeightSinCos2(std::abs(point.y()), point.x(), r, wphi, s, c);
     unsigned int iz   = static_cast<int>(wz);
 
     wr -= ir;

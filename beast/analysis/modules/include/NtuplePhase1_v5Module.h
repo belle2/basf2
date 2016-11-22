@@ -207,6 +207,13 @@ namespace Belle2 {
     std::vector<Double_t> m_input_LB_SAD_lifetime; /**< list of SAD_lifetime LB dose */
     std::vector<Double_t> m_input_HB_SAD_lifetime; /**< list of SAD_lifetime HB dose */
 
+    std::vector<Double_t> m_input_LT_SAD_PPS; /**< list of SAD_PPS LT dose */
+    std::vector<Double_t> m_input_HT_SAD_PPS; /**< list of SAD_PPS HT dose */
+    std::vector<Double_t> m_input_LC_SAD_PPS; /**< list of SAD_PPS LC dose */
+    std::vector<Double_t> m_input_HC_SAD_PPS; /**< list of SAD_PPS HC dose */
+    std::vector<Double_t> m_input_LB_SAD_PPS; /**< list of SAD_PPS LB dose */
+    std::vector<Double_t> m_input_HB_SAD_PPS; /**< list of SAD_PPS HB dose */
+
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TTree* m_treeTruth = 0;   /**< Truth tree pointer */
     TChain* m_tree = 0;            /**< tree pointer */

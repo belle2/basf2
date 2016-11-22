@@ -92,6 +92,13 @@ namespace Belle2 {
     addParam("input_LC_SAD_lifetime", m_input_LC_SAD_lifetime, "List of LC SAD lifetime ");
     addParam("input_HC_SAD_lifetime", m_input_HC_SAD_lifetime, "List of HC SAD lifetime ");
 
+    addParam("input_LT_SAD_PPS", m_input_LT_SAD_PPS, "List of LT SAD PPS ");
+    addParam("input_HT_SAD_PPS", m_input_HT_SAD_PPS, "List of HT SAD PPS ");
+    addParam("input_LB_SAD_PPS", m_input_LB_SAD_PPS, "List of LB SAD PPS ");
+    addParam("input_HB_SAD_PPS", m_input_HB_SAD_PPS, "List of HB SAD PPS ");
+    addParam("input_LC_SAD_PPS", m_input_LC_SAD_PPS, "List of LC SAD PPS ");
+    addParam("input_HC_SAD_PPS", m_input_HC_SAD_PPS, "List of HC SAD PPS ");
+
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
 
@@ -574,6 +581,12 @@ namespace Belle2 {
     m_treeBEAST->Branch("SAD_LER_lifetime", &(m_beast.SAD_LER_lifetime));
     m_treeBEAST->Branch("SAD_HER_lifetime_av", &(m_beast.SAD_HER_lifetime_av));
     m_treeBEAST->Branch("SAD_LER_lifetime_av", &(m_beast.SAD_LER_lifetime_av));
+    m_treeBEAST->Branch("SAD_HER_PPS", &(m_beast.SAD_HER_PPS));
+    m_treeBEAST->Branch("SAD_LER_PPS", &(m_beast.SAD_LER_PPS));
+    m_treeBEAST->Branch("SKB_HER_PPS", &(m_beast.SKB_HER_PPS));
+    m_treeBEAST->Branch("SKB_LER_PPS", &(m_beast.SKB_LER_PPS));
+    m_treeBEAST->Branch("SAD_HER_PPS_av", &(m_beast.SAD_HER_PPS_av));
+    m_treeBEAST->Branch("SAD_LER_PPS_av", &(m_beast.SAD_LER_PPS_av));
     /*
     m_treeBEAST->Branch("TPC_neutrons_N", &(m_beast.TPC_neutrons_N));
     m_treeBEAST->Branch("TPC_neutrons_tracks_E", &(m_beast.TPC_neutrons_tracks_E));
@@ -733,22 +746,32 @@ namespace Belle2 {
     if (m_input_I_LER[1] > 0) I_LER += gRandom->Gaus(0, m_input_I_LER[1]);
     double P_HER = 0;
     if (m_beast.SKB_HER_pressure_average != 0
-        && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(0) * 0.00750062 * 1e9;
+        && m_beast.SKB_HER_pressure_average->size() > 0) P_HER = m_beast.SKB_HER_pressure_average->at(0) * 0.00750062 * 1e9 * 3.;
     if (m_input_P_HER[1] > 0) P_HER += gRandom->Gaus(0, m_input_P_HER[1]);
     double P_LER = 0;
     if (m_beast.SKB_LER_pressure_average != 0
-        && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9;
+        && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9 * 3.;
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
     if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0
         && m_beast.SKB_HER_beamSize_xray_Y != 0
         && m_beast.SKB_HER_correctedBeamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0);
+    /*
+    if (m_beast.SKB_HER_beamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y != 0
+        && m_beast.SKB_HER_beamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
+    */
     //if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_HER_beamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
     if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
     double sigma_y_LER = 0;
     if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0
         && m_beast.SKB_LER_beamSize_xray_Y != 0
         && m_beast.SKB_LER_correctedBeamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0);
+    /*
+    if (m_beast.SKB_LER_beamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y != 0
+        && m_beast.SKB_LER_beamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
+    */
     //if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_LER_beamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
     if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
     double bunch_nb_HER = 0;
@@ -761,12 +784,7 @@ namespace Belle2 {
         && m_beast.SKB_LER_injectionNumberOfBunches->size() > 0) bunch_nb_LER = m_beast.SKB_LER_injectionNumberOfBunches->at(0);
     if (bunch_nb_LER == 0) bunch_nb_LER = m_input_data_bunchNb_LER;
     if (m_input_bunchNb_LER[1] > 0) bunch_nb_LER += gRandom->Gaus(0, m_input_bunchNb_LER[1]);
-    /*
-    cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
-         endl;
-    cout << " I_LER = " << I_LER << " P_LER = " << P_LER << " sigma_y_LER = " << sigma_y_LER << " bunch_nb_LER = " << bunch_nb_LER <<
-         endl;
-    */
+
     if (I_HER < 0) I_HER = 0;
     if (I_LER < 0) I_LER = 0;
     if (P_HER < 0) P_HER = 0;
@@ -780,6 +798,43 @@ namespace Belle2 {
       P_LER = 0;
     }
 
+    //double sad_Ib_HER = m_input_I_HER[0]/* / m_input_bunchNb_HER[0]*/ * 1e-3;
+    //double sad_Ib_LER = m_input_I_LER[0]/* / m_input_bunchNb_LER[0]*/ * 1e-3;
+
+    //double sad_Nb_HER = sad_Ib_HER * 3000. / TMath::C() / (1.6e-19);
+    //double sad_Nb_LER = sad_Ib_LER * 3000. / TMath::C() / (1.6e-19);
+
+    double Ib_HER = 0;
+    if (bunch_nb_HER > 0) Ib_HER = I_HER / bunch_nb_HER * 1e-3;
+    double Ib_LER = 0;
+    if (bunch_nb_LER > 0) Ib_LER = I_LER / bunch_nb_LER * 1e-3;
+
+    double Nb_HER = 0;
+    if (Ib_HER > 0) Nb_HER = Ib_HER * 3000. / TMath::C() / (1.6e-19);
+    double Nb_LER = 0;
+    if (Ib_LER > 0) Nb_LER = Ib_LER * 3000. / TMath::C() / (1.6e-19);
+    //cout <<"I_HER " << I_HER << " I_LER " << I_LER << endl;
+    //cout <<"Ib_HER " << Ib_HER << " Ib_LER " << Ib_LER << endl;
+    //cout <<"Nb_HER " << Nb_HER << " Nb_LER " << Nb_LER << endl;
+    double PPS_HER = 0;
+    if (m_beast.SKB_HER_lifetime != 0 && m_beast.SKB_HER_lifetime->size() > 0 && Nb_HER > 0) {
+      PPS_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
+      m_beast.SKB_HER_PPS.push_back(PPS_HER);
+    }
+    double PPS_LER = 0;
+    if (m_beast.SKB_LER_lifetime != 0 && m_beast.SKB_LER_lifetime->size() > 0 && Nb_LER > 0) {
+      PPS_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
+      m_beast.SKB_LER_PPS.push_back(PPS_LER);
+    }
+
+    /*
+    cout <<"PPS_HER " << PPS_HER << " PPS_LER " << PPS_LER << endl;
+
+    cout << " I_HER = " << I_HER << " P_HER = " << P_HER << " sigma_y_HER = " << sigma_y_HER << " bunch_nb_HER = " << bunch_nb_HER <<
+         endl;
+    cout << " I_LER = " << I_LER << " P_LER = " << P_LER << " sigma_y_LER = " << sigma_y_LER << " bunch_nb_LER = " << bunch_nb_LER <<
+         endl;
+    */
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBGav_HER = 0;
     double ScaleFacBGav_LER = 0;
@@ -795,7 +850,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_HER_pressures->size(); i++) {
         ScaleFacBG_HER[i] = 0;
         double iP_HER = 0;
-        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9;
+        iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
         if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
         if (iP_HER < 0) iP_HER = 0;
         if (I_HER > 0 && iP_HER > 0)
@@ -806,7 +861,7 @@ namespace Belle2 {
       for (int i = 0; i < (int)m_beast.SKB_LER_pressures->size(); i++) {
         ScaleFacBG_LER[i] = 0;
         double iP_LER = 0;
-        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9;
+        iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
         if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
         if (iP_LER < 0) iP_LER = 0;
         if (I_LER > 0 && iP_LER > 0)
@@ -828,29 +883,61 @@ namespace Belle2 {
     //cout << " factor BG HER " << ScaleFacBG_HER << " Toushek HER " << ScaleFacTo_HER << endl;
 
     //Scale LER SAD lifetime
+    /*
     for (int i = 0; i < (int)m_input_LT_SAD_lifetime.size(); i++) {
       float LBG = 1. / m_input_LB_SAD_lifetime[i] + 1. / m_input_LC_SAD_lifetime[i];
       float BG = LBG * ScaleFacBGav_LER;
       float To = ScaleFacTo_LER * 1. / m_input_LT_SAD_lifetime[i];
-      m_beast.SAD_LER_lifetime_av.push_back(1. / (BG + To));
+      //m_beast.SAD_LER_lifetime_av.push_back(1. / (BG + To));
       BG = 0;
       for (int j = 0; j < 12; j++) {
         BG += LBG / 12. * ScaleFacBG_LER[j];
       }
-      m_beast.SAD_LER_lifetime.push_back(1. / (BG + To));
+      //m_beast.SAD_LER_lifetime.push_back(1. / (BG + To));
+    }
+    */
+    //Scale LER SAD PPS
+    for (int i = 0; i < (int)m_input_LT_SAD_PPS.size(); i++) {
+      float LBG = m_input_LB_SAD_PPS[i] + m_input_LC_SAD_PPS[i];
+      float BG = LBG * ScaleFacBGav_LER;
+      float To = ScaleFacTo_LER * m_input_LT_SAD_PPS[i];
+      m_beast.SAD_LER_PPS_av.push_back(BG + To);
+      m_beast.SAD_LER_lifetime_av.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
+      BG = 0;
+      for (int j = 0; j < 12; j++) {
+        BG += LBG / 12. * ScaleFacBG_LER[j];
+      }
+      m_beast.SAD_LER_PPS.push_back(BG + To);
+      m_beast.SAD_LER_lifetime.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
     }
 
     //Scale HER SAD lifetime
+    /*
     for (int i = 0; i < (int)m_input_HT_SAD_lifetime.size(); i++) {
       float HBG = 1. / m_input_HB_SAD_lifetime[i] + 1. / m_input_HC_SAD_lifetime[i];
       float BG = HBG * ScaleFacBGav_HER;
       float To = ScaleFacTo_HER * 1. / m_input_HT_SAD_lifetime[i];
-      m_beast.SAD_HER_lifetime_av.push_back(1. / (BG + To));
+      //m_beast.SAD_HER_lifetime_av.push_back(1. / (BG + To));
       BG = 0;
       for (int j = 0; j < 12; j++) {
         BG += HBG / 12. * ScaleFacBG_HER[j];
       }
-      m_beast.SAD_HER_lifetime.push_back(1. / (BG + To));
+      //m_beast.SAD_HER_lifetime.push_back(1. / (BG + To));
+    }
+    */
+    //Scale HER SAD PPS
+    for (int i = 0; i < (int)m_input_HT_SAD_PPS.size(); i++) {
+      float HBG = m_input_HB_SAD_PPS[i] + m_input_HC_SAD_PPS[i];
+      float BG = HBG * ScaleFacBGav_HER;
+      float To = ScaleFacTo_HER * m_input_HT_SAD_PPS[i];
+      m_beast.SAD_HER_PPS_av.push_back(BG + To);
+      m_beast.SAD_HER_lifetime_av.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
+      BG = 0;
+      for (int j = 0; j < 12; j++) {
+        BG += HBG / 12. * ScaleFacBG_HER[j];
+      }
+      m_beast.SAD_HER_PPS.push_back(BG + To);
+      m_beast.SAD_HER_lifetime.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
     }
 
     //Scale DIA

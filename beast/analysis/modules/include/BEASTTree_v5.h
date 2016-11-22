@@ -31,6 +31,8 @@ namespace Belle2 {
       std::vector<double>*  SKB_LER_current;/** */
       std::vector<double>*  SKB_HER_lifetime;/** */
       std::vector<double>*  SKB_LER_lifetime;/** */
+      std::vector<double>  SKB_HER_PPS;/** */
+      std::vector<double>  SKB_LER_PPS;/** */
       std::vector<double>*  SKB_HER_integratedCurrent;/** */
       std::vector<double>*  SKB_LER_integratedCurrent;
       std::vector<double>*  SKB_HER_injectionFlag;/** */
@@ -167,6 +169,10 @@ namespace Belle2 {
       std::vector<double> SAD_LER_lifetime;/** */
       std::vector<double> SAD_HER_lifetime_av;/** */
       std::vector<double> SAD_LER_lifetime_av;/** */
+      std::vector<double> SAD_HER_PPS;/** */
+      std::vector<double> SAD_LER_PPS;/** */
+      std::vector<double> SAD_HER_PPS_av;/** */
+      std::vector<double> SAD_LER_PPS_av;/** */
       /**
        *.clear the structure: set elements to zero
        */
@@ -255,6 +261,12 @@ namespace Belle2 {
 
         SAD_HER_lifetime.clear();
         SAD_LER_lifetime.clear();
+        SKB_HER_PPS.clear();
+        SKB_LER_PPS.clear();
+        SAD_HER_PPS.clear();
+        SAD_LER_PPS.clear();
+        SAD_HER_PPS_av.clear();
+        SAD_LER_PPS_av.clear();
         SAD_HER_lifetime_av.clear();
         SAD_LER_lifetime_av.clear();
       }

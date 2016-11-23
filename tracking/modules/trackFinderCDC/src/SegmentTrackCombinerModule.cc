@@ -11,11 +11,7 @@
 
 #include <tracking/trackFindingCDC/processing/TrackQualityTools.h>
 
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segment/SegmentFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
@@ -30,13 +26,13 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentTrackCombiner)
 
 SegmentTrackCombinerModule::SegmentTrackCombinerModule()
-  : m_chooseableSegmentTrackFilterFirstStep(makeUnique<SegmentTrackFilterFirstStepFactory>("none"))
+  : m_chooseableSegmentTrackFilter(makeUnique<SegmentTrackFilterFirstStepFactory>("none"))
   , m_trackRejecter("all")
 {
   this->setDescription("Versatile module with adjustable filters for segment track combination.");
 
   ModuleParamList mpl = this->getParamList();
-  m_chooseableSegmentTrackFilterFirstStep.exposeParameters(&mpl, "SegmentTrackFilterFirstStep");
+  m_chooseableSegmentTrackFilter.exposeParameters(&mpl, "SegmentTrack");
   m_trackRejecter.exposeParameters(&mpl, "Track");
   this->setParamList(mpl);
 }
@@ -45,50 +41,50 @@ SegmentTrackCombinerModule::SegmentTrackCombinerModule()
 void SegmentTrackCombinerModule::initialize()
 {
   Super::initialize();
-  m_chooseableSegmentTrackFilterFirstStep.initialize();
+  m_chooseableSegmentTrackFilter.initialize();
   m_trackRejecter.initialize();
 
   // Require the Monte Carlo information, should be redundant:
   // The filters that require the truth information should have required
   // it in their initialize. Since this used to be here and it does not harm
   // we keep it for the moment
-  if (m_chooseableSegmentTrackFilterFirstStep.needsTruthInformation())
+  if (m_chooseableSegmentTrackFilter.needsTruthInformation()) {
     CDCMCManager::getInstance().requireTruthInformation();
-}
+  }
 }
 
 void SegmentTrackCombinerModule::beginRun()
 {
   Super::beginRun();
-  m_chooseableSegmentTrackFilterFirstStep.beginRun();
+  m_chooseableSegmentTrackFilter.beginRun();
   m_trackRejecter.beginRun();
 }
 
 void SegmentTrackCombinerModule::event()
 {
   // Handle beginEvent such that the filter can prepare
-  m_chooseableSegmentTrackFilterFirstStep.beginEvent();
+  m_chooseableSegmentTrackFilter.beginEvent();
   m_trackRejecter.beginEvent();
 
   // Fill the Monte Carlo maps, should be redundant:
   // The filters that require the truth information should have called fill
   // in their beginEvent(). Since this used to be here and it does not harm
   // we keep it for the moment.
-  if (m_chooseableSegmentTrackFilterFirstStep.needsTruthInformation()) {
+  if (m_chooseableSegmentTrackFilter.needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
   Super::event();
 }
 void SegmentTrackCombinerModule::endRun()
 {
-  m_chooseableSegmentTrackFilterFirstStep.endRun();
+  m_chooseableSegmentTrackFilter.endRun();
   m_trackRejecter.endRun();
   Super::endRun();
 }
 
 void SegmentTrackCombinerModule::terminate()
 {
-  m_chooseableSegmentTrackFilterFirstStep.terminate();
+  m_chooseableSegmentTrackFilter.terminate();
   m_trackRejecter.terminate();
   Super::terminate();
 }
@@ -103,7 +99,7 @@ void SegmentTrackCombinerModule::generate(std::vector<TrackFindingCDC::CDCSegmen
   }
 
   m_combiner.fillWith(tracks, segments);
-  m_combiner.match(m_chooseableSegmentTrackFilterFirstStep);
+  m_combiner.match(m_chooseableSegmentTrackFilter);
   m_trackRejecter.apply(tracks);
   m_combiner.clearAndRecover();
 

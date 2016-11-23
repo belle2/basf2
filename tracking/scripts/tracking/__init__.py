@@ -252,8 +252,8 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilterFirstStepFilter="mva",
-                    SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
+                    SegmentTrackFilter="mva",
+                    SegmentTrackFilterParameters={"cut": 0.75},
                     TrackFilter="mva",
                     TrackFilterParameters={"cut": 0.1})
 

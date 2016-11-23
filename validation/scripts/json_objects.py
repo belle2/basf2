@@ -17,7 +17,7 @@ class Revision(JsonBase):
     Contains information about a specific revision
     """
 
-    def __init__(self, label, git_hash, creation_date, packages=None):
+    def __init__(self, label, git_hash=None, creation_date=None, packages=None):
         """
         Create a new Revision object and fill all members
         """

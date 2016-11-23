@@ -11,10 +11,29 @@ import glob
 import argparse
 import ROOT
 import validationpath
+import subprocess
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
+
+
+def get_compact_git_hash(repo_folder):
+    """
+    Returns the compact git hash from a folder (or any of this folders parents)
+    or None if none of theses folders is a git repository
+    """
+    cwd = os.getcwd()
+    os.chdir(repo_folder)
+    # todo: we want the short version here
+    try:
+        current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().rstrip()
+    except subprocess.CalledProcessError:
+        current_git_commit = None
+    finally:
+        os.chdir(cwd)
+
+    return current_git_commit
 
 
 def available_revisions(work_folder):

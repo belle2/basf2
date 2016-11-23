@@ -25,7 +25,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         cutAndCopyList(
             'gamma:pi0',
             'gamma:loose',
-            '[clusterReg == 1 and E > 0.05] or [clusterReg == 2 and E > 0.05] or [clusterReg == 3 and E > 0.075]',
+            '',
             True,
             path)
     elif listtype == 'pi0highE':
@@ -33,7 +33,7 @@ def stdPhotons(listtype='loose', path=analysis_main):
         cutAndCopyList(
             'gamma:pi0highE',
             'gamma:loose',
-            '[clusterReg == 1 and E > 0.2] or [clusterReg == 2 and E > 0.2] or [clusterReg == 3 and E > 0.2]',
+            'E > 0.2',
             True,
             path)
     else:

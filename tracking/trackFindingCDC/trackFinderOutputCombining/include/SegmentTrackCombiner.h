@@ -9,12 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentTrain/BaseSegmentTrainFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/newSegment/BaseNewSegmentFilter.h>
-#include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
@@ -52,6 +47,7 @@ namespace Belle2 {
        */
       void clearAndRecover();
 
+    private:
       /**
        * Helper function to add a segment to a track with respecting the taken information of the segment.
        * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
@@ -59,12 +55,6 @@ namespace Belle2 {
       static void addSegmentToTrack(const CDCSegment2D& segment,
                                     CDCTrack& track,
                                     bool useTakenFlagOfHits = true);
-
-    private:
-      const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */
-
-      /** Do the Segment <-> Track matching. */
-      void matchTracksToSegment(SegmentInformation* segmentInformation, BaseSegmentTrackFilter& segmentTrackChooser);
 
       /** Combine a segment and a track. */
       void addSegmentToTrack(SegmentInformation* segmentInformation,

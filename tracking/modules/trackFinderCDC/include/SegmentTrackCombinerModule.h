@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
@@ -39,8 +38,8 @@ namespace Belle2 {
      * It uses several (filtering) steps, to do its job, namely:
      *  1. Creation of a fast segment and track lookup.
      *  2. First matching of segment and tracks that share one or more hits.
-     *  6. Filtering of fake tracks in the made combinations.
-     *  7. Cleanup of the lookup cache.
+     *  3. Filtering of fake tracks in the made combinations.
+     *  4. Cleanup of the lookup cache.
      */
     class SegmentTrackCombinerModule : public TrackFinderCDCFromSegmentsModule {
 

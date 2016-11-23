@@ -247,7 +247,6 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
 
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
-                    useSingleMatchAlgorithm=True,
                     TracksStoreObjNameIsInput=True)
 
     # Combine segments with axial tracks

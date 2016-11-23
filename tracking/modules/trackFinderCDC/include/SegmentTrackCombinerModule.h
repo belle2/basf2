@@ -83,21 +83,6 @@ namespace Belle2 {
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
       Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterFirstStep;
 
-      /// Findlet to filter out fake segments
-      SegmentRejecter m_segmentRejecter;
-
-      /// Reference to the new segment filter.
-      Chooseable<BaseNewSegmentFilter> m_chooseableNewSegmentFilter;
-
-      /// Reference to the chooser to be used for matching segments and tracks in the second step.
-      Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterSecondStep;
-
-      /// Reference to the filter to be used for construction segment trains.
-      Chooseable<BaseSegmentTrainFilter> m_chooseableSegmentTrainFilter;
-
-      /// Reference to the filter to be used to do an unique segment train <-> track matching.
-      Chooseable<BaseSegmentInformationListTrackFilter> m_chooseableSegmentInformationListTrackFilter;
-
       /// Findlet to filter out fake tracks
       TrackRejecter m_trackRejecter;
     };

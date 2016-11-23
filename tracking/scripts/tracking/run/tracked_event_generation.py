@@ -120,6 +120,7 @@ class ReadOrGenerateTrackedEventsRun(ReadOrGenerateEventsRun):
 
                 tracking_coverage.pop("WhichParticles", None)
                 tracking_coverage.pop("EnergyCut", None)
+                tracking_coverage.pop("UseNLoops", None)
                 mc_track_matcher_module.param({
                     'mcRecoTracksStoreArrayName': 'MCRecoTracks',
                     'MinimalPurity': 0.66,

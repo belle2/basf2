@@ -437,8 +437,6 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
         path.add_module(material_effects)
 
     # SET StoreArray names
-    svd_gf_trackcands = '__ROIsvdGFTrackCands'
-    svd_gf_tracks = '__ROIsvdGFTracks'
     svd_tracks = '__ROIsvdTracks'
     svd_track_fit_results = "__ROIsvdTrackFitResults"
     svd_reco_tracks = "__ROIsvdRecoTracks"
@@ -468,26 +466,8 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
     # Correct time seed - needed?
     # path.add_module("IPTrackTimeEstimator", useFittedInformation=False)
 
-    trackfitter = register_module('GenFitter')
-    trackfitter.set_name('SVD-only GenFitter')
-    trackfitter.param({"GFTracksColName": svd_gf_tracks,
-                       "PDGCodes": [211],
-                       'GFTrackCandidatesColName': svd_gf_trackcands})
-    path.add_module(trackfitter)
-
     # track fitting
     dafRecoFitter = register_module("DAFRecoFitter")
     dafRecoFitter.set_name("SVD-only DAFRecoFitter")
     dafRecoFitter.param('recoTracksStoreArrayName', svd_reco_tracks)
     path.add_module(dafRecoFitter)
-
-    # create Belle2 Tracks from the RecoTracks
-    # --> NOT NEEDED by the PXDDataReductionModule
-    trackCreator = register_module('TrackCreator')
-    trackCreator.set_name('SVD-only TrackCreator')
-    trackCreator.param('recoTrackColName', svd_reco_tracks)
-    trackCreator.param('trackColName', svd_tracks)
-    trackCreator.param('trackFitResultColName', svd_track_fit_results)
-    path.add_module(trackCreator)
-
-    # return svd_tracks

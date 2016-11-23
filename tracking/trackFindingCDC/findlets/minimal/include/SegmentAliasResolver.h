@@ -51,7 +51,7 @@ namespace Belle2 {
 
     private:
       /// Parameter : Which alias resolutions should be applied
-      std::vector<std::string> m_param_investigate = {"full", "borders", /*"middle"*/};
+      std::vector<std::string> m_param_investigateAlias = { "full", "borders", /*"middle"*/};
 
       /// Switch whether the complete segment should be aliased.
       bool m_fullAlias = false; // Activated by the parameter

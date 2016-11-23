@@ -47,19 +47,25 @@ namespace Belle2 {
 
     double isContinuumEvent(const Particle*)
     {
-      StoreArray<MCParticle> mcParticles;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == 300553)
-          return 0.0;
-      }
-      return 1.0;
+      return (isNotContinuumEvent(nullptr) == 1.0 ? 0.0 : 1.0);
     }
 
     double isNotContinuumEvent(const Particle*)
     {
       StoreArray<MCParticle> mcParticles;
-      for (int i = 0; i < mcParticles.getEntries(); ++i) {
-        if (mcParticles[i]->getPDG() == 300553)
+      if (!mcParticles) {
+        B2ERROR("Cannot find MCParticles array.");
+        return 0.0;
+      }
+      for (const MCParticle& mcp : mcParticles) {
+        int pdg_no = mcp.getPDG();
+        if (mcp.getMother() == nullptr &&
+            ((pdg_no == 553) ||
+             (pdg_no == 100553) ||
+             (pdg_no == 200553) ||
+             (pdg_no == 300553) ||
+             (pdg_no == 9000553) ||
+             (pdg_no == 9010553)))
           return 1.0;
       }
       return 0.0;

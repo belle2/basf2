@@ -40,7 +40,7 @@ namespace Belle2 {
        * and the filter gives a positive result in more than one case.
        * In this case we combine it with the track for which the filter gives the highest result.
        */
-      void match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep);
+      void match(BaseSegmentTrackFilter& segmentTrackFilter);
 
       /**
        * Clear all the pointer vectors and reset the "new segments" to be not taken.

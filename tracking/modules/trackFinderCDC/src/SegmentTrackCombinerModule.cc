@@ -26,7 +26,7 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentTrackCombiner)
 
 SegmentTrackCombinerModule::SegmentTrackCombinerModule()
-  : m_chooseableSegmentTrackFilter(makeUnique<SegmentTrackFilterFirstStepFactory>("none"))
+  : m_chooseableSegmentTrackFilter(makeUnique<SegmentTrackFilterFactory>("none"))
   , m_trackRejecter("all")
 {
   this->setDescription("Versatile module with adjustable filters for segment track combination.");

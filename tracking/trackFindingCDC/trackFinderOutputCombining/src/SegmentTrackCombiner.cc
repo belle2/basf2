@@ -22,7 +22,7 @@ void SegmentTrackCombiner::clearAndRecover()
   m_segmentLookUp.clear();
 }
 
-void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirstStep)
+void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
 {
   // Mark the segments which are fully found by the legendre track finder as taken
   for (const std::vector<SegmentInformation*>& segments : m_segmentLookUp) {
@@ -74,7 +74,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackChooserFirs
       }
 
       // Call the filter and add the match
-      double filterResult = segmentTrackChooserFirstStep(
+      double filterResult = segmentTrackFilter(
                               std::make_pair(matchingSegment->getSegment(), track->getTrackCand()));
       if (not isNotACell(filterResult)) {
         matchingSegment->addMatch(track, filterResult);

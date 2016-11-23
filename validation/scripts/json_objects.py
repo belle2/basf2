@@ -342,13 +342,13 @@ class ComparisonRevision(Revision):
     a comparison.
     """
 
-    def __init__(self, label, creation_date=None, color=None):
+    def __init__(self, label, git_hash=None, creation_date=None, color=None):
         """
         Create a new ComparisonRevision object and fill all members
         """
 
         # todo: creation_date
-        super().__init__(label, creation_date=None)
+        super().__init__(label, git_hash=git_hash, creation_date=None)
         #: the color which was used for this revision in the
         #  comparison plots
         self.color = color

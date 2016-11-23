@@ -279,7 +279,8 @@ bool MCMatching::isFSR(const MCParticle* p)
 
 bool MCMatching::isRadiativePhoton(const MCParticle* p)
 {
-  return p->hasStatus(MCParticle::c_IsRadiativePhoton);
+  // Check if any of the bits c_IsFSRPhoton, c_IsISRPhoton or c_ISPHOTOSPhoton is set
+  return p->getStatus(MCParticle::c_IsRadiativePhoton) != 0;
 }
 
 

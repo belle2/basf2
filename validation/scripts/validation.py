@@ -780,7 +780,7 @@ class Validation:
 
         # todo: assign correct color here
         rev = json_objects.Revision(label=self.tag,
-                                    creation_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    creation_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
                                     packages=json_package,
                                     git_hash=git_hash)
         json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)

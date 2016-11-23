@@ -217,7 +217,7 @@ class ValidationRoot(object):
             rdate_str = r["creation_date"]
             if isinstance(rdate_str, str):
                 if len(rdate_str) > 0:
-                    rdate = time.strptime(rdate_str, "%Y-%m-%d %H:%M:%S")
+                    rdate = time.strptime(rdate_str, "%Y-%m-%d %H:%M")
                     if newest_date is None:
                         newest_date = rdate
                         newest_rev = r

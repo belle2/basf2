@@ -356,6 +356,162 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr daughterLowest(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          double min = var->function(particle->getDaughter(0));
+          for (unsigned j = 1; j < particle->getNDaughters(); ++j)
+          {
+            double iValue = var->function(particle->getDaughter(j));
+            if (iValue < min) min = iValue;
+          }
+          return min;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterLowest");
+      }
+    }
+
+    Manager::FunctionPtr daughterHighest(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 1) {
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
+        auto func = [var](const Particle * particle) -> double {
+          double max = 0;
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
+          {
+            double iValue = var->function(particle->getDaughter(j));
+            if (iValue > max) max = iValue;
+          }
+          return max;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterHighest");
+      }
+    }
+
+    Manager::FunctionPtr daughterDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First two arguments of daughterDiffOf meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double diff = var->function(particle->getDaughter(jDaughterNumber)) - var->function(particle->getDaughter(iDaughterNumber));
+            return diff;}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterNormDiffOf(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 3) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("First two arguments of daughterDiffOf meta function must be integers!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[2]);
+        auto func = [var, iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            double iValue = var->function(particle->getDaughter(iDaughterNumber));
+            double jValue = var->function(particle->getDaughter(jDaughterNumber));
+            return (jValue - iValue) / (jValue + iValue);}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterNormDiffOf");
+      }
+    }
+
+    Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int iDaughterNumber = 0;
+        int jDaughterNumber = 0;
+        try {
+          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
+          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The two arguments of daughterAngleInBetween meta function must be integers!");
+          return nullptr;
+        }
+        auto func = [iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
+            return -999;
+          else {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            TVector3 pi = frame.getMomentum(particle->getDaughter(iDaughterNumber)).Vect();
+            TVector3 pj = frame.getMomentum(particle->getDaughter(jDaughterNumber)).Vect();
+            return pi.Angle(pj);}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterAngleInBetween");
+      }
+    }
+
+    Manager::FunctionPtr daughterInvM(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() > 1) {
+        std::vector<int> daughterIndices;
+        try {
+          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The arguments of daughterInvM meta function must be integers!");
+          return nullptr;
+        }
+        auto func = [daughterIndices](const Particle * particle) -> double {
+          if (particle == nullptr)
+            return -999;
+          else {
+            const auto& frame = ReferenceFrame::GetCurrent();
+            TLorentzVector pSum;
+
+            for (auto& index : daughterIndices)
+            {
+              if (index >= int(particle->getNDaughters())) {
+                return -999; break;
+              } else pSum += frame.getMomentum(particle->getDaughter(index));
+            }
+
+            return pSum.M();}
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function daughterInvM. At least two integers are needed.");
+      }
+    }
+
     Manager::FunctionPtr modulo(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 2) {
@@ -732,6 +888,24 @@ namespace Belle2 {
     REGISTER_VARIABLE("daughterSumOf(variable)", daughterSumOf,
                       "Returns sum of a variable over all daughters.\n"
                       "E.g. daughterSumOf(nDaughters) returns the number of grand-daughters.");
+    REGISTER_VARIABLE("daughterLowest(variable)", daughterLowest,
+                      "Returns the lowest value of the given variable among all daughters.\n"
+                      "E.g. useCMSFrame(daughterLowest(p)) returns the lowest momentum in CMS frame.");
+    REGISTER_VARIABLE("daughterHighest(variable)", daughterHighest,
+                      "Returns the highest value of the given variable among all daughters.\n"
+                      "E.g. useCMSFrame(daughterHighest(p)) returns the highest momentum in CMS frame.");
+    REGISTER_VARIABLE("daughterDiffOf(i, j, variable)", daughterDiffOf,
+                      "Returns the difference of a variable between the two given daughters.\n"
+                      "E.g. useRestFrame(daughterDiffOf(0, 1, p)) returns the momentum difference between first and second daughter in the rest frame of the given particle.");
+    REGISTER_VARIABLE("daughterNormDiffOf(i, j, variable)", daughterNormDiffOf,
+                      "Returns the normalized difference of a variable between the two given daughters.\n"
+                      "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
+    REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
+                      "Returns the angle between the two given daughters.\n"
+                      "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
+    REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
+                      "Returns the invariant Mass adding the Lorentz vectors of the two given daughters.\n"
+                      "E.g. daughterInvM(0, 1) returns the invariant Mass m = sqrt((p0 + p1)^2) of first and second daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"

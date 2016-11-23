@@ -10,9 +10,11 @@
 #pragma once
 
 #include <framework/database/Database.h>
-#include <boost/bimap.hpp>
+#include <framework/database/EConditionsDirectoryStructure.h>
 
 namespace Belle2 {
+  class ConditionsPayloadDownloader;
+
   /**
    * Database backend that uses the conditions service.
    */
@@ -89,6 +91,16 @@ namespace Belle2 {
      */
     bool addExperimentName(int experiment, const std::string& name);
 
+    /** Set the base of the url used for REST requests to the central server */
+    void setRESTBase(const std::string& restBase);
+
+    /** Add a directory to the list of directories to look for payloads before
+     * downloading them.
+     * @param directory path to the directory to add to the list
+     * @param structure indicate how the payloads are stored in this directory
+     */
+    void addLocalDirectory(const std::string& localDir, EConditionsDirectoryStructure structure);
+
   private:
     /**
      * Hidden constructor, as it is a singleton.
@@ -103,7 +115,7 @@ namespace Belle2 {
     ConditionsDatabase(const ConditionsDatabase&);
 
     /** Hidden destructor, as it is a singleton. */
-    virtual ~ConditionsDatabase() {};
+    virtual ~ConditionsDatabase();
 
     /** Global tag. */
     std::string m_globalTag;
@@ -117,8 +129,8 @@ namespace Belle2 {
     /** Run number for which the payloads were obtained. */
     int m_currentRun;
 
-    /** bidirectional mapping from experiment number to name in the central database */
-    boost::bimap<int, std::string> m_mapping;
+    /** Class to manage lookup and downloads of payloads */
+    std::unique_ptr<ConditionsPayloadDownloader> m_downloader;
 
   };
 } // namespace Belle2

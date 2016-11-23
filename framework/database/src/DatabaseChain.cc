@@ -36,7 +36,7 @@ DatabaseChain::~DatabaseChain()
 
 void DatabaseChain::addDatabase(Database* database)
 {
-  if (database == s_instance) {
+  if (database == s_instance.get()) {
     B2ERROR("Cannot add main database instance.");
   } else if (database == this) {
     B2ERROR("Cannot add DatabaseChain to itself.");

@@ -193,7 +193,7 @@ class ValidationRoot(object):
 
         # always add the reference revision
         combined_list = []
-        reference_revision = json.loads(json_objects.dumps(json_objects.Revision("reference", None, "black")))
+        reference_revision = json.loads(json_objects.dumps(json_objects.Revision(label="reference")))
 
         # load and combine
         for r in rev_list:

@@ -9,19 +9,17 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
-
-#include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSZObservations;
     class CDCObservations2D;
+
+    class CDCTrack;
+    class CDCSegmentPair;
+    class CDCSegment3D;
+    class CDCSegment2D;
+    class CDCTrajectory2D;
+    class CDCTrajectorySZ;
 
     /// Class implementing the z coordinate over travel distance line fit.
     class CDCSZFitter {
@@ -32,44 +30,17 @@ namespace Belle2 {
 
       /// Returns the fitted sz trajectory of the track with the z-information of all stereo hits of the number
       /// of stereo hits is big enough. Else return the basic assumption.
-      CDCTrajectorySZ fitWithStereoHits(const CDCTrack& track) const
-      {
-        const bool onlyStereo = true;
-        CDCSZObservations observationsSZ(EFitVariance::c_Proper, onlyStereo);
-        observationsSZ.appendRange(track);
-        if (observationsSZ.size() > 3) {
-          CDCTrajectorySZ szTrajectory;
-          update(szTrajectory, observationsSZ);
-          return szTrajectory;
-        } else {
-          return CDCTrajectorySZ::basicAssumption();
-        }
-      }
+      CDCTrajectorySZ fitWithStereoHits(const CDCTrack& track) const;
 
       /// Returns a fitted trajectory
-      CDCTrajectorySZ fit(const CDCStereoSegment2D& stereoSegment,
-                          const CDCTrajectory2D& axialTrajectory2D) const
-      {
-        CDCTrajectorySZ trajectorySZ;
-        update(trajectorySZ, stereoSegment, axialTrajectory2D);
-        return trajectorySZ;
-      }
+      CDCTrajectorySZ fit(const CDCSegment2D& stereoSegment,
+                          const CDCTrajectory2D& axialTrajectory2D) const;
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      CDCTrajectorySZ fit(const CDCSegment3D& segment3D) const
-      {
-        CDCSZObservations observationsSZ;
-        observationsSZ.appendRange(segment3D);
-        return fit(std::move(observationsSZ));
-      }
+      CDCTrajectorySZ fit(const CDCSegment3D& segment3D) const;
 
       /// Fits a linear sz trajectory to the s and z coordinates given in the observations.
-      CDCTrajectorySZ fit(CDCSZObservations observationsSZ) const
-      {
-        CDCTrajectorySZ trajectorySZ;
-        update(trajectorySZ, observationsSZ);
-        return trajectorySZ;
-      }
+      CDCTrajectorySZ fit(CDCSZObservations observationsSZ) const;
 
       /// Legacy - Fits a linear sz trajectory to the x and y coordinates interpreted as sz space
       CDCTrajectorySZ fit(const CDCObservations2D& observations2D) const;
@@ -77,8 +48,8 @@ namespace Belle2 {
       /**
        *  Fit a linear sz trajectory to the reconstructed stereo segment.
        *  It uses the normal fitting algorithm but does so multiple times:
-       *  In every iteration, one hit is excluded from the observation set and the rest is fitted. In the end, the mean over the
-       *  fitting parameters is built and returned.
+       *  In every iteration, one hit is excluded from the observation set and the rest is fitted.
+       *  In the end, the mean over the fitting parameters is built and returned.
        *
        *  TODO:
        *    - Use the median.
@@ -92,7 +63,7 @@ namespace Belle2 {
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(CDCTrajectorySZ& trajectorySZ,
-                  const CDCStereoSegment2D& stereoSegment,
+                  const CDCSegment2D& stereoSegment,
                   const CDCTrajectory2D& axialTrajectory2D) const;
 
       /// Update the trajectory with a fit to the observations.

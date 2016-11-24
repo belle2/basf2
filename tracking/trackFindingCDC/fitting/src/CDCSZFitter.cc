@@ -9,7 +9,19 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCSZObservations.h>
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
+#include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
+
+#include <framework/logging/Logger.h>
 
 #include <Eigen/Dense>
 
@@ -105,6 +117,44 @@ namespace {
   }
 }
 
+CDCTrajectorySZ CDCSZFitter::fitWithStereoHits(const CDCTrack& track) const
+{
+  const bool onlyStereo = true;
+  CDCSZObservations observationsSZ(EFitVariance::c_Proper, onlyStereo);
+  observationsSZ.appendRange(track);
+  if (observationsSZ.size() > 3) {
+    CDCTrajectorySZ szTrajectory;
+    update(szTrajectory, observationsSZ);
+    return szTrajectory;
+  } else {
+    return CDCTrajectorySZ::basicAssumption();
+  }
+}
+
+CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment2D& stereoSegment,
+                                 const CDCTrajectory2D& axialTrajectory2D) const
+{
+  B2ASSERT("Expected stereo segment", not stereoSegment.isAxial());
+
+  CDCTrajectorySZ trajectorySZ;
+  update(trajectorySZ, stereoSegment, axialTrajectory2D);
+  return trajectorySZ;
+}
+
+CDCTrajectorySZ CDCSZFitter::fit(const CDCSegment3D& segment3D) const
+{
+  CDCSZObservations observationsSZ;
+  observationsSZ.appendRange(segment3D);
+  return fit(std::move(observationsSZ));
+}
+
+CDCTrajectorySZ CDCSZFitter::fit(CDCSZObservations observationsSZ) const
+{
+  CDCTrajectorySZ trajectorySZ;
+  update(trajectorySZ, observationsSZ);
+  return trajectorySZ;
+}
+
 CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const
 {
   CDCSZObservations observationsSZ;
@@ -140,14 +190,14 @@ CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segm
 
 void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 {
-  const CDCStereoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
-  const CDCAxialSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
 
   assert(ptrStereoSegment);
   assert(ptrAxialSegment);
 
-  const CDCStereoSegment2D& stereoSegment = *ptrStereoSegment;
-  const CDCAxialSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCSegment2D& axialSegment = *ptrAxialSegment;
   const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
 
   CDCTrajectorySZ trajectorySZ;
@@ -160,7 +210,7 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D) const
 {
   CDCSZObservations szObservations;
-  for (int i = 0; i < observations2D.size(); ++i) {
+  for (size_t i = 0; i < observations2D.size(); ++i) {
     const double s = observations2D.getX(i);
     const double z = observations2D.getY(i);
     szObservations.fill(s, z);
@@ -169,9 +219,11 @@ CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D) const
 }
 
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
-                         const CDCStereoSegment2D& stereoSegment,
+                         const CDCSegment2D& stereoSegment,
                          const CDCTrajectory2D& axialTrajectory2D) const
 {
+  B2ASSERT("Expected stereo segment", not stereoSegment.isAxial());
+
   // recostruct the stereo segment
   CDCSZObservations observationsSZ;
   for (const CDCRecoHit2D& recoHit2D : stereoSegment) {

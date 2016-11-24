@@ -320,6 +320,29 @@ namespace Belle2 {
       }
     }
 
+    Manager::FunctionPtr varFor(const std::vector<std::string>& arguments)
+    {
+      if (arguments.size() == 2) {
+        int pdgCode = 0;
+        try {
+          pdgCode = Belle2::convertString<int>(arguments[0]);
+        } catch (boost::bad_lexical_cast&) {
+          B2WARNING("The first argument of varFor meta function must be a positive integer!");
+          return nullptr;
+        }
+        const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[1]);
+        auto func = [pdgCode, var](const Particle * particle) -> double {
+
+          if (std::abs(particle -> getPDGCode()) == std::abs(pdgCode))
+            return var -> function(particle);
+          else return -999;
+        };
+        return func;
+      } else {
+        B2FATAL("Wrong number of arguments for meta function varFor");
+      }
+    }
+
     Manager::FunctionPtr daughterProductOf(const std::vector<std::string>& arguments)
     {
       if (arguments.size() == 1) {
@@ -361,10 +384,12 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double min = var->function(particle->getDaughter(0));
-          for (unsigned j = 1; j < particle->getNDaughters(); ++j)
+          double min = -999;
+          for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
+            if (iValue == -999) continue;
+            if (min == -999) min = iValue;
             if (iValue < min) min = iValue;
           }
           return min;
@@ -380,10 +405,11 @@ namespace Belle2 {
       if (arguments.size() == 1) {
         const Variable::Manager::Var* var = Manager::Instance().getVariable(arguments[0]);
         auto func = [var](const Particle * particle) -> double {
-          double max = 0;
+          double max = -999;
           for (unsigned j = 0; j < particle->getNDaughters(); ++j)
           {
             double iValue = var->function(particle->getDaughter(j));
+            if (iValue == -999) continue;
             if (iValue > max) max = iValue;
           }
           return max;
@@ -453,26 +479,40 @@ namespace Belle2 {
 
     Manager::FunctionPtr daughterAngleInBetween(const std::vector<std::string>& arguments)
     {
-      if (arguments.size() == 2) {
-        int iDaughterNumber = 0;
-        int jDaughterNumber = 0;
+      if (arguments.size() == 2 || arguments.size() == 3) {
+        std::vector<int> daughterIndices;
         try {
-          iDaughterNumber = Belle2::convertString<int>(arguments[0]);
-          jDaughterNumber = Belle2::convertString<int>(arguments[1]);
+          for (auto& argument : arguments) daughterIndices.push_back(Belle2::convertString<int>(argument));
         } catch (boost::bad_lexical_cast&) {
-          B2WARNING("The two arguments of daughterAngleInBetween meta function must be integers!");
+          B2WARNING("The arguments of daughterAngleInBetween meta function must be integers!");
           return nullptr;
         }
-        auto func = [iDaughterNumber, jDaughterNumber](const Particle * particle) -> double {
+        auto func = [daughterIndices](const Particle * particle) -> double {
           if (particle == nullptr)
             return -999;
-          if (iDaughterNumber >= int(particle->getNDaughters()) || jDaughterNumber >= int(particle->getNDaughters()))
-            return -999;
-          else {
-            const auto& frame = ReferenceFrame::GetCurrent();
-            TVector3 pi = frame.getMomentum(particle->getDaughter(iDaughterNumber)).Vect();
-            TVector3 pj = frame.getMomentum(particle->getDaughter(jDaughterNumber)).Vect();
-            return pi.Angle(pj);}
+          if (daughterIndices.size() == 2)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters()))
+              return -999;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
+              TVector3 pj = frame.getMomentum(particle->getDaughter(daughterIndices[1])).Vect();
+              return pi.Angle(pj);
+            }
+          } else if (daughterIndices.size() == 3)
+          {
+            if (daughterIndices[0] >= int(particle->getNDaughters()) || daughterIndices[1] >= int(particle->getNDaughters())
+                || daughterIndices[2] >= int(particle->getNDaughters())) return -999;
+            else {
+              const auto& frame = ReferenceFrame::GetCurrent();
+              TVector3 pi = frame.getMomentum(particle->getDaughter(daughterIndices[0])).Vect();
+              TVector3 pj = frame.getMomentum(particle->getDaughter(daughterIndices[1])).Vect();
+              TVector3 pk = frame.getMomentum(particle->getDaughter(daughterIndices[2])).Vect();
+              return pk.Angle(pi + pj);
+            }
+          } else return -999;
+
         };
         return func;
       } else {
@@ -877,6 +917,9 @@ namespace Belle2 {
                       "Returns number of direct daughters which satisfy the cut.\n"
                       "Used by the skimming package (for what exactly?)\n"
                       "Returns -999 if particle is a nullptr.");
+    REGISTER_VARIABLE("varFor(pdgCode, variable)", varFor,
+                      "Returns the value of the variable for the given particle if its abs(pdgCode) agrees with the given one.\n"
+                      "E.g. varFor(11, p) returns the momentum if the particle is an electron or a positron.");
     REGISTER_VARIABLE("daughter(i, variable)", daughter,
                       "Returns value of variable for the i-th daughter."
                       "E.g. daughter(0, p) returns the total momentum of the first daughter.\n"
@@ -901,11 +944,13 @@ namespace Belle2 {
                       "Returns the normalized difference of a variable between the two given daughters.\n"
                       "E.g. daughterNormDiffOf(0, 1, p) returns the normalized momentum difference between first and second daughter in the lab frame.");
     REGISTER_VARIABLE("daughterAngleInBetween(i, j)", daughterAngleInBetween,
-                      "Returns the angle between the two given daughters.\n"
+                      "If two indices given: Variable returns the angle between the momenta of the two given daughters.\n"
+                      "If three indices given: Variable returns the angle between the momentum of the third particle and a vector "
+                      "which is the sum of the first two daughter momenta.\n"
                       "E.g. useLabFrame(daughterAngleInBetween(0, 1)) returns the angle between first and second daughter in the Lab frame.");
     REGISTER_VARIABLE("daughterInvM(i, j)", daughterInvM,
-                      "Returns the invariant Mass adding the Lorentz vectors of the two given daughters.\n"
-                      "E.g. daughterInvM(0, 1) returns the invariant Mass m = sqrt((p0 + p1)^2) of first and second daughter.");
+                      "Returns the invariant Mass adding the Lorentz vectors of the given daughters.\n"
+                      "E.g. daughterInvM(0, 1, 2) returns the invariant Mass m = sqrt((p0 + p1 + p2)^2) of first, second and third daughter.");
     REGISTER_VARIABLE("extraInfo(name)", extraInfo,
                       "Returns extra info stored under the given name.\n"
                       "The extraInfo has to be set first by a module like MVAExpert. If nothing is set under this name, -999 is returned.\n"

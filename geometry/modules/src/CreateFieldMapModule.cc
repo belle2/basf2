@@ -13,6 +13,7 @@
 #include <boost/algorithm/string.hpp>
 #include <framework/utilities/Utils.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <TFile.h>
 #include <TH2D.h>
@@ -34,7 +35,7 @@ CreateFieldMapModule::CreateFieldMapModule() : Module()
 
   // Parameter definitions
   addParam("filename", m_filename, "ROOT filename for the map", std::string("FieldMap.root"));
-  addParam("type", m_type, "type of the fieldmap (xy, zx, zy)", std::string("zx"));
+  addParam("type", m_type, "type of the fieldmap (xy, zx, zy, zr)", std::string("zx"));
   addParam("nU", m_nU, "number of steps along first coordinate", 1800);
   addParam("minU", m_minU, "minimum value for the first coordinate", -400.);
   addParam("maxU", m_maxU, "maximum value for the first coordinate", 500.);
@@ -43,6 +44,7 @@ CreateFieldMapModule::CreateFieldMapModule() : Module()
   addParam("maxV", m_maxV, "maximum value for the second coordinate", 400.);
   addParam("phi", m_phi, "phi angle for the scan in radians", 0.);
   addParam("wOffset", m_wOffset, "value of third coordinate", 0.);
+  addParam("nPhi", m_nPhi, "number of phi steps for zr averaging", m_nPhi);
 }
 
 void CreateFieldMapModule::initialize()
@@ -52,8 +54,8 @@ void CreateFieldMapModule::initialize()
   }
   boost::to_lower(m_type);
   boost::trim(m_type);
-  if (m_type != "xy" && m_type != "zx" && m_type != "zy") {
-    B2ERROR("CreateFieldMap type '" << m_type << "' not valid, use one of 'xy', 'zx' or 'zy'");
+  if (m_type != "xy" && m_type != "zx" && m_type != "zy" && m_type != "zr") {
+    B2ERROR("CreateFieldMap type '" << m_type << "' not valid, use one of 'xy', 'zx', 'zy' or 'zr'");
   }
   if (m_nU < 0 || m_nV < 0) {
     B2ERROR("Number of steps has to be positive");
@@ -68,6 +70,14 @@ void CreateFieldMapModule::initialize()
   } else if (m_maxV < m_minV) {
     std::swap(m_maxV, m_minV);
   }
+  if (m_type == "zr") {
+    if (m_minV < 0) {
+      B2ERROR("R values (minV, maxV) must be positive");
+    }
+    if (m_nPhi <= 0) {
+      B2ERROR("Number of steps in phi must be positive");
+    }
+  }
 }
 
 void CreateFieldMapModule::beginRun()
@@ -75,10 +85,6 @@ void CreateFieldMapModule::beginRun()
   //Create histograms
   TFile* outfile = new TFile(m_filename.c_str(), "RECREATE");
   outfile->cd();
-  TH2D* h_bx = new TH2D("Bx", "Field strength along x", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
-  TH2D* h_by = new TH2D("By", "Field strength along y", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
-  TH2D* h_bz = new TH2D("Bz", "Field strength along z", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
-  TH2D* h_br = new TH2D("Br", "radial field strength", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
 
   //Determine type of scan
   EFieldTypes type = c_XY;
@@ -86,58 +92,103 @@ void CreateFieldMapModule::beginRun()
     type = c_ZX;
   else if (m_type == "zy")
     type = c_ZY;
+  else if (m_type == "zr")
+    type = c_ZR;
 
   //some values needed for output
   int lastPercent(-1);
-  const int nSteps = m_nU * m_nV;
+  uint64_t nSteps = m_nU * m_nV;
+  uint64_t curStep{0};
   const double start = Utils::getClock();
+  auto showProgress = [&]() {
+    //Show progress
+    const int64_t donePercent = 100 * ++curStep / nSteps;
+    if (donePercent > lastPercent) {
+      const double perStep = (Utils::getClock() - start) / curStep;
+      const double eta = perStep * (nSteps - curStep);
+      B2INFO(boost::format("BField %s Scan: %3d%%, %.3f ms per sample, ETA: %.2f seconds")
+             % m_type % donePercent
+             % (perStep / Unit::ms) % (eta / Unit::s));
+      lastPercent = donePercent;
+    }
+  };
 
-  //Loop over all bins
-  for (int iU = 0; iU < m_nU; ++iU) {
-    for (int iV = 0; iV < m_nV; ++iV) {
-      TVector3 pos(0, 0, 0);
-      //find value for first and second coordinate
-      const double u = h_bx->GetXaxis()->GetBinCenter(iU + 1);
-      const double v = h_bx->GetYaxis()->GetBinCenter(iV + 1);
-      //Determine global coordinates
-      switch (type) {
-        case c_XY:
-          pos.SetXYZ(u, v , m_wOffset);
-          break;
-        case c_ZX:
-          pos.SetXYZ(v, m_wOffset, u);
-          break;
-        case c_ZY:
-          pos.SetXYZ(m_wOffset, v, u);
-          break;
-      }
-      pos.RotateZ(m_phi);
-      //Obtain magnetic field
-      TVector3 bfield = BFieldMap::Instance().getBField(pos);
-      //And fill histograms
-      h_bx->Fill(u, v, bfield.X());
-      h_by->Fill(u, v, bfield.Y());
-      h_bz->Fill(u, v, bfield.Z());
-      h_br->Fill(u, v, bfield.Perp());
-
-      //Show progress
-      const int curStep = iU * iV + 1;
-      const int donePercent = 100 * curStep / nSteps;
-      if (donePercent > lastPercent) {
-        const double perStep = (Utils::getClock() - start) / curStep;
-        const double eta = perStep * (nSteps - curStep);
-        B2INFO(boost::format("BField %s Scan: %3d%%, %.3f ms per sample, ETA: %.2f seconds")
-               % m_type % donePercent
-               % (perStep / Unit::ms) % (eta / Unit::s));
-        lastPercent = donePercent;
+  if (type == c_ZR) {
+    nSteps *= m_nPhi;
+    TH2D* h_b = new TH2D("B", "$B$ average;$z$/cm;$r$/cm", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    TH2D* h_br = new TH2D("Br", "$B_r$ average;$z$/cm;$r$/cm", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    TH2D* h_bz = new TH2D("Bz", "$B_z$ average;$z$/cm;$r$/cm", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    for (int iU = 0; iU < m_nU; ++iU) {
+      for (int iV = 0; iV < m_nV; ++iV) {
+        B2Vector3D pos(0, 0, 0);
+        //find value for first and second coordinate
+        const double u = h_b->GetXaxis()->GetBinCenter(iU + 1);
+        const double v = h_b->GetYaxis()->GetBinCenter(iV + 1);
+        //Determine global coordinates
+        for (int iPhi = 0; iPhi < m_nPhi; ++iPhi) {
+          pos.SetXYZ(v, 0, u);
+          pos.RotateZ(2 * M_PI * iPhi / m_nPhi);
+          //Obtain magnetic field
+          B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
+          //And fill histograms
+          h_br->Fill(u, v, bfield.Perp());
+          h_bz->Fill(u, v, bfield.Z());
+          h_b->Fill(u, v, bfield.Mag());
+          showProgress();
+        }
       }
     }
+    //Write histograms and close file.
+    for (TH2D* h : {h_br, h_bz, h_b}) {
+      h->Scale(1. / m_nPhi);
+      h->Write();
+    }
+  } else {
+    const std::string nu = m_type.substr(0, 1);
+    const std::string nv = m_type.substr(1, 1);
+    TH2D* h_b = new TH2D("B", ("$B$;$" + nu + "$/cm;$" + nv + "$/cm").c_str(), m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    TH2D* h_bx = new TH2D("Bx", ("$B_x$;$" + nu + "$/cm;$" + nv + "$/cm").c_str(), m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    TH2D* h_by = new TH2D("By", ("$B_y$;$" + nu + "$/cm;$" + nv + "$/cm").c_str(), m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+    TH2D* h_bz = new TH2D("Bz", ("$B_z$;$" + nu + "$/cm;$" + nv + "$/cm").c_str(), m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
+
+    //Loop over all bins
+    for (int iU = 0; iU < m_nU; ++iU) {
+      for (int iV = 0; iV < m_nV; ++iV) {
+        B2Vector3D pos(0, 0, 0);
+        //find value for first and second coordinate
+        const double u = h_bx->GetXaxis()->GetBinCenter(iU + 1);
+        const double v = h_bx->GetYaxis()->GetBinCenter(iV + 1);
+        //Determine global coordinates
+        switch (type) {
+          case c_XY:
+            pos.SetXYZ(u, v , m_wOffset);
+            break;
+          case c_ZX:
+            pos.SetXYZ(v, m_wOffset, u);
+            break;
+          case c_ZY:
+            pos.SetXYZ(m_wOffset, v, u);
+            break;
+          default:
+            break;
+        }
+        pos.RotateZ(m_phi);
+        //Obtain magnetic field
+        B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
+        //And fill histograms
+        h_bx->Fill(u, v, bfield.X());
+        h_by->Fill(u, v, bfield.Y());
+        h_bz->Fill(u, v, bfield.Z());
+        h_b->Fill(u, v, bfield.Mag());
+
+        showProgress();
+      }
+    }
+    //Write histograms.
+    for (TH2D* h : {h_bx, h_by, h_bz, h_b}) {
+      h->Write();
+    }
   }
-  //Write histograms and close file.
-  h_bx->Write();
-  h_by->Write();
-  h_bz->Write();
-  h_br->Write();
   outfile->Close();
   delete outfile;
   //histograms seem to be deleted when file is closed

@@ -26,6 +26,7 @@ namespace Belle2 {
       c_XY, /**< scan along XY plane */
       c_ZX, /**< scan along ZX plane */
       c_ZY, /**< scan along ZY plane */
+      c_ZR /**< scan along Z and R, averaging over phi */
     };
 
     /**
@@ -62,6 +63,8 @@ namespace Belle2 {
     double m_phi {0};
     /** offset on the third coordinate */
     double m_wOffset {0};
+    /** number of steps in phi */
+    int m_nPhi{180};
   };
 }
 

@@ -62,7 +62,7 @@ def check_for_plotting(revs, tmp_folder):
     # check the plot status with the webserver and only exit after a timeout
     # or if the plot combination has been created
     while not done:
-        res = http_post("create_comparison_status", {"input": prog_key})
+        res = http_post("check_comparison_status", {"input": prog_key})
         if not res:
             return False
 

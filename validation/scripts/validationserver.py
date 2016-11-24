@@ -171,7 +171,7 @@ class ValidationRoot(object):
     @cherrypy.expose
     @cherrypy.tools.json_in()
     @cherrypy.tools.json_out()
-    def create_comparison_status(self):
+    def check_comparison_status(self):
         """
         Checks on the status of a comparison creation
         """
@@ -254,6 +254,11 @@ class ValidationRoot(object):
 
         # todo: ensure this file is not outside of the webserver
         full_path = os.path.join(self.comparison_folder, comparison_label, "comparison.json")
+
+        # check if this comparison actually exists
+        if not os.path.isfile(full_path):
+            raise cherrypy.HTTPError(404, "Json Comparison file {} does not exist".format(full_path))
+
         return deliver_json(full_path)
 
 

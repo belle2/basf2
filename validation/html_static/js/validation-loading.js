@@ -309,7 +309,7 @@ function setupRactiveFromRevision(rev_data, rev_string, rev_list)
             });
     }).fail(function() {
 
-        console.log("Comparison " + rev_string + " does not exist yet, requesting it")
+        console.log("Comparison " + rev_string + " does not exist yet, requesting it");
 
         $.ajax({
 			url: createComparisonUrl,

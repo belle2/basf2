@@ -20,6 +20,7 @@ ln -sf ${B2SLC}/apps
 ln -sf ${B2SLC}/tools
 cp ${B2SLC}/Makefile ${B2SLC}/Makefile.src ${B2SLC}/setenv.sh .
 cp -r ${B2SLC}/extra .
+cp -r ${B2SLC}/data .
 
 if [ ! -e ${TOP}/pgsql ]
 then

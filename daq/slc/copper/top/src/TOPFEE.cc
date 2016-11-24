@@ -20,7 +20,7 @@ TOPFEE::TOPFEE()
 {
 }
 
-void TOPFEE::init(RCCallback& callback, HSLB& hslb)
+void TOPFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   TOPDAQ::add_scrod(hslb, callback);
   for (int carrier = 0; carrier < 4; carrier++) {

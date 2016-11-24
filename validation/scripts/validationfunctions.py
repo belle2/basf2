@@ -27,7 +27,14 @@ def get_compact_git_hash(repo_folder):
     os.chdir(repo_folder)
     # todo: we want the short version here
     try:
-        current_git_commit = subprocess.check_output(["git", "rev-parse", "HEAD"]).decode().rstrip()
+        current_git_commit = subprocess.check_output(["git", "show", "--oneline", "-s"]).decode().rstrip()
+        # the first word in this string will be the hash
+        current_git_commit = current_git_commit.split(" ")
+        if len(current_git_commit) > 1:
+            current_git_commit = current_git_commit[0]
+        else:
+            # something went wrong, return None
+            current_git_commit = None
     except subprocess.CalledProcessError:
         current_git_commit = None
     finally:

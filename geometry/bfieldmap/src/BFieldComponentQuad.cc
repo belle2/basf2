@@ -77,365 +77,374 @@ void BFieldComponentQuad::initialize()
   // Load the field map files
   //--------------------------------------------------------------
 
+  /** Magnetic field data structure. */
+  struct ParamPoint {
+    double s;   /**< s in [m] */
+    double L;   /**< element length in [m] */
+    double K0;  /**< dipole component in [dimensionless] */
+    double K1;  /**< quadrupole component in [1/m] */
+    double SK0; /**< skew dipole component  in [dimensionless] */
+    double SK1; /**< skew quadrupole component in [1/m] */
+    double ROTATE; /**< rotation in [radian] */
+    double DX;   /**< horizontal displacement in [m] */
+    double DY;   /**< vertical displacement in [m] */
+    /* Note that K parameters used in SAD is multiplied by the element length.
+     * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
+     */
+  };
+
   io::filtering_istream fieldMapFileHER, fieldMapFileLER, fieldMapFileHERleak;
   fieldMapFileHER.push(io::file_source(fullPathMapHER));
   fieldMapFileLER.push(io::file_source(fullPathMapLER));
   fieldMapFileHERleak.push(io::file_source(fullPathMapHERleak));
 
-  string name;
-  double s, L, K0, K1, SK0, SK1, ROTATE, DX, DY;
-
   //Create the parameter map and read the data from the file
-  B2DEBUG(10, "Loading the HER quadrupole magnetic field from file '" << m_mapFilenameHER << "' in to the memory...");
-  m_mapBufferHER = new ParamPoint[m_mapSizeHER];
-  for (int i = 0; i < m_mapSizeHER; ++i) {
-    fieldMapFileHER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
-    /* Save parametors in unit [m], not in unit [cm].*/
-    m_mapBufferHER[i].s      = s;   // [m]
-    m_mapBufferHER[i].L      = L;   // [m]
-    m_mapBufferHER[i].K0     = K0;  // [dimensionless]
-    m_mapBufferHER[i].K1     = K1;  // [1/m]
-    m_mapBufferHER[i].SK0    = SK0; // [dimensionless]
-    m_mapBufferHER[i].SK1    = SK1; // [1/m]
-    m_mapBufferHER[i].ROTATE = ROTATE; // [degree]
-    m_mapBufferHER[i].DX     = DX; // [m]
-    m_mapBufferHER[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded HER SAD element " << name << " at s= " << s << "[m].");
-  }
-  B2DEBUG(10, "... loaded " << m_mapSizeHER << " elements.");
+  auto readLenseParameters = [](istream & IN) -> vector<ParamPoint> {
+    vector<ParamPoint> r;
+    string name;
+    ParamPoint t;
+    while (IN >> name >> t.s >> t.L >> t.K0 >> t.K1 >> t.SK0 >> t.SK1 >> t.ROTATE >> t.DX >> t.DY)
+    {
+      /* Convert parameters in basf2 default unit [cm].*/
+      t.s *= 100;
+      t.L *= 100;
+      t.DX *= 100;
+      t.DY *= 100;
+      t.K1 /= 100;
+      t.SK1 /= 100;
+      r.push_back(t);
+    }
+    return r;
+  };
 
-  B2DEBUG(10, "Loading the LER quadrupole magnetic field from file '" << m_mapFilenameLER << "' in to the memory...");
-  m_mapBufferLER = new ParamPoint[m_mapSizeLER];
-  for (int i = 0; i < m_mapSizeLER; ++i) {
-    fieldMapFileLER >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
-    /* Save parametors in unit [m], not in unit [cm].*/
-    m_mapBufferLER[i].s      = s;   // [m]
-    m_mapBufferLER[i].L      = L;   // [m]
-    m_mapBufferLER[i].K0     = K0;  // [dimensionless]
-    m_mapBufferLER[i].K1     = K1;  // [1/m]
-    m_mapBufferLER[i].SK0    = SK0; // [dimensionless]
-    m_mapBufferLER[i].SK1    = SK1; // [1/m]
-    m_mapBufferLER[i].ROTATE = ROTATE; // [degree]
-    m_mapBufferLER[i].DX     = DX; // [m]
-    m_mapBufferLER[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded LER SAD element " << name << " at s= " << s << "[m].");
-  }
-  B2DEBUG(10, "... loaded " << m_mapSizeLER << " elements.");
-
-  m_mapBufferHERleak = new ParamPoint[m_mapSizeHERleak];
-  for (int i = 0; i < m_mapSizeHERleak; ++i) {
-    fieldMapFileHERleak >> name >> s >> L >> K0 >> K1 >> SK0 >> SK1 >> ROTATE >> DX >> DY;
-    /* Save parametors in unit [m], not in unit [cm].*/
-    m_mapBufferHERleak[i].s      = s;   // [m]
-    m_mapBufferHERleak[i].L      = L;   // [m]
-    m_mapBufferHERleak[i].K0     = K0;  // [dimensionless]
-    m_mapBufferHERleak[i].K1     = K1;  // [1/m]
-    m_mapBufferHERleak[i].SK0    = SK0; // [dimensionless]
-    m_mapBufferHERleak[i].SK1    = SK1; // [1/m]
-    m_mapBufferHERleak[i].ROTATE = ROTATE; // [degree]
-    m_mapBufferHERleak[i].DX     = DX; // [m]
-    m_mapBufferHERleak[i].DY     = DY; // [m]
-    B2DEBUG(10, "... loaded HERleak SAD element " << name << " at s= " << s << "[m].");
-  }
-  B2DEBUG(10, "... loaded " << m_mapSizeHERleak << " elements.");
-
-
+  std::vector<ParamPoint> params_her, params_ler, params_herl;
+  params_her = readLenseParameters(fieldMapFileHER);
+  params_ler = readLenseParameters(fieldMapFileLER);
+  params_herl = readLenseParameters(fieldMapFileHERleak);
 
   //--------------------------------------------------------------
   // Load the aperture map files
   //--------------------------------------------------------------
+  auto readAperturePoints = [this](istream & IN) -> vector<ApertPoint> {
+    vector<ApertPoint> r;
+    ApertPoint t;
+    while (IN >> t.s >> t.r)
+    {
+      /* s and r are in [mm] in Apert?ER.dat. */
+      /* Transform parameters in basf2 default unit [cm].*/
+      t.s /= 10; t.r /= 10;
+      r.push_back(t);
+      m_maxr2 = max(m_maxr2, t.r);
+    }
+    return r;
+  };
 
   io::filtering_istream apertFileHER, apertFileLER;
   apertFileHER.push(io::file_source(fullPathApertHER));
   apertFileLER.push(io::file_source(fullPathApertLER));
 
-  double r;
+  m_ah = readAperturePoints(apertFileHER);
+  m_al = readAperturePoints(apertFileLER);
 
-  //Create the parameter map and read the data from the file
-  B2DEBUG(10, "Loading the HER aperture from file '" << m_apertFilenameHER << "' in to the memory...");
-  m_apertBufferHER = new ApertPoint[m_apertSizeHER];
-  for (int i = 0; i < m_apertSizeHER; ++i) {
-    apertFileHER >> s >> r;
-    /* s and r are in [mm] in ApertHER.dat. */
-    /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
-    m_apertBufferHER[i].s   = s;
-    m_apertBufferHER[i].r   = r;
-    B2DEBUG(10, "... loaded HER aperture at s = " << s << "[mm], r = " << r << "[mm]");
-  }
-  B2DEBUG(10, "... loaded " << m_apertSizeHER << " elements.");
+  m_maxr2 *= m_maxr2;
 
-  B2DEBUG(10, "Loading the LER aperture from file '" << m_apertFilenameLER << "' in to the memory...");
-  m_apertBufferLER = new ApertPoint[m_apertSizeLER];
-  for (int i = 0; i < m_apertSizeLER; ++i) {
-    apertFileLER >> s >> r;
-    /* s and r are in [mm] in ApertLER.dat. */
-    /* Save parametors in unit [mm], not in basf2 default unit [cm].*/
-    m_apertBufferLER[i].s   = s;
-    m_apertBufferLER[i].r   = r;
-    B2DEBUG(10, "... loaded LER aperture at s = " << s << "[mm], r = " << r << "[mm]");
-  }
-  B2DEBUG(10, "... loaded " << m_apertSizeLER << " elements.");
+  /** range filled by lense structure */
+  struct range_t {double r0, r1;};
+  typedef vector<range_t> ranges_t;
 
+  /** calculate ranges where quadruple lenses continously fill the beamline
+   *
+   * @param v lense vector
+   * @return  vector of ranges
+   */
+  auto getranges = [](const vector<ParamPoint>& v) {
+    ranges_t r;
+    double s0 = v[0].s, smax = v.back().s + v.back().L;
+    for (int i = 0, N = v.size(); i < N - 1; i++) {
+      const ParamPoint& t0 = v[i], t1 = v[i + 1];
+      double sn = t0.s + t0.L;
+      if (abs(sn - t1.s) > 1e-10) {
+        r.push_back({s0, sn});
+        s0 = t1.s;
+      }
+    }
+    r.push_back({s0, smax});
+    return r;
+  };
 
+  ranges_t ranges_her  = getranges(params_her);
+  ranges_t ranges_herl = getranges(params_herl);
+  ranges_t ranges_ler  = getranges(params_ler);
+
+  /** merge overlaped ranges in case we have several lense maps like in HER + leakage
+   *
+   * @param r0  vector of ranges
+   * @param r1  vector of ranges
+   * @return    vector of ranges
+   */
+  auto mergeranges = [](const ranges_t& r0, const ranges_t& r1) {
+    ranges_t r = r0; r.insert(r.end(), r1.begin(), r1.end());
+    for (auto it = r.begin(); it != r.end(); ++it) {
+      for (auto jt = it + 1; jt != r.end();) {
+        if (it->r1 >= jt->r0 and jt->r1 >= it->r0) {
+          double smin = min(it->r0, jt->r0);
+          double smax = max(it->r1, jt->r1);
+          *it = {smin, smax};
+          jt = r.erase(jt);
+        } else {
+          ++jt;
+        }
+      }
+    }
+    return r;
+  };
+  ranges_her = mergeranges(ranges_her, ranges_herl);
+
+  /**
+   * Returns the beam pipe aperture at given position.
+   *
+   * @param s   position in the beam-axis coordinate.
+   * @param ap  aperture vector
+   * @return    beam pipe aperture at given position.
+   */
+  auto getr = [](double s, const vector<ApertPoint>& ap) -> double {
+    auto it0 = upper_bound(ap.begin(), ap.end(), s, [](double s, const ApertPoint & b) {return s < b.s;});
+    if (it0 == ap.begin() || it0 == ap.end()) return 0;
+    const ApertPoint& p0 = *(it0 - 1), &p1 = *it0;
+    double r = p0.r + (s - p0.s) / (p1.s - p0.s) * (p1.r - p0.r);
+    return r;
+  };
+
+  /** zero aperture in case of lense absence
+   *
+   * @param ap aperture vector to update
+   * @param v  ranges where lenses are present
+   */
+  auto update_aperture = [getr](vector<ApertPoint>& ap, const ranges_t& v) -> void {
+    auto less = [](double s, const ApertPoint & b) {return s < b.s;};
+    double smin = v.front().r0;
+    ap.insert(upper_bound(ap.begin(), ap.end(), smin, less), {smin, getr(smin, ap)});
+    ap.erase(std::remove_if(ap.begin(), ap.end(), [smin](const ApertPoint & b) {return b.s < smin;}), ap.end());
+    for (auto it = v.begin(); it + 1 != v.end(); it++)
+    {
+      double s0 = it->r1, s1 = (it + 1)->r0;
+      double r0 = getr(s0, ap);
+      double r1 = getr(s1, ap);
+      auto it0 = upper_bound(ap.begin(), ap.end(), s0, less);
+      it0 = ap.insert(it0, {s0, 0});
+      it0 = ap.insert(it0, {s0, r0});
+      auto it1 = upper_bound(ap.begin(), ap.end(), s1, less);
+      it1 = ap.insert(it1, {s1, r1});
+      it1 = ap.insert(it1, {s1, 0});
+      ap.erase(std::remove_if(ap.begin(), ap.end(), [s0, s1](const ApertPoint & b) {return s0 < b.s && b.s < s1;}), ap.end());
+    }
+    double smax = v.back().r1;
+    ap.insert(upper_bound(ap.begin(), ap.end(), smax, less), {smax, getr(smax, ap)});
+    ap.erase(std::remove_if(ap.begin(), ap.end(), [smax](const ApertPoint & b) {return smax < b.s;}), ap.end());
+  };
+
+  update_aperture(m_ah, ranges_her);
+  update_aperture(m_al, ranges_ler);
+
+  const int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
+
+  /** fold rotation to/from lense frame to a single matrix multiplicaton and vector addition
+   *
+   * @param in  map with angle inside
+   * @param p0  normalization constant
+   * @return    structure where rotations are in the matrix form
+   */
+  auto proc3 = [](const vector<ParamPoint>& in, double p0) -> vector<ParamPoint3> {
+    vector<ParamPoint3> out;
+    out.resize(in.size());
+    auto it = out.begin();
+    for (auto b = in.begin(); b != in.end(); ++b, ++it)
+    {
+      ParamPoint3& t = *it;
+      t.s = b->s;
+      t.L = b->L;
+
+      double K0  = b->K0;
+      double K1  = b->K1;
+      double SK0 = b->SK0;
+      double SK1 = b->SK1;
+      double DX  = b->DX;
+      double DY  = b->DY;
+      double k = p0 / t.L;
+      K0  *= k;
+      K1  *= k;
+      SK0 *= k;
+      SK1 *= k;
+
+      double sphi, cphi;
+      sincos(-b->ROTATE * (M_PI / 180), &sphi, &cphi);
+      if (ROTATE_DIRECTION == 1)
+        sphi = sphi, cphi = cphi;
+      else if (ROTATE_DIRECTION == -1)
+        sphi = -sphi, cphi = cphi;
+      else if (ROTATE_DIRECTION == 0)
+        sphi = 0, cphi = 1;
+
+      double s2phi = 2 * cphi * sphi;
+      double c2phi = cphi * cphi - sphi * sphi;
+      double tp = DX * SK1 + DY * K1;
+      double tm = DY * SK1 - DX * K1;
+
+      t.mxx =  K1 * s2phi + SK1 * c2phi;
+      t.mxy = -SK1 * s2phi +  K1 * c2phi;
+      t.mx0 =  tm * s2phi -  tp * c2phi + SK0 * cphi +  K0 * sphi;
+
+      t.myx = -SK1 * s2phi +  K1 * c2phi;
+      t.myy = -K1 * s2phi - SK1 * c2phi;
+      t.my0 =  tp * s2phi +  tm * c2phi +  K0 * cphi - SK0 * sphi;
+    }
+    return out;
+  };
+
+  const double c = Const::speedOfLight / (Unit::m / Unit::s) / 100;
+  const double p0_HER = 7.0e+9 / c, p0_LER = 4.0e+9 / c;
+
+  m_h3 = proc3(params_her, p0_HER);
+  m_l3 = proc3(params_ler, p0_LER);
+  vector<ParamPoint3> hleak3 = proc3(params_herl, p0_HER);
+
+  /** In case several maps in the same position we can simply
+   * sum up all matricies since magnetic field has superposition
+   * properties as well as keep only one vector of parameters for each
+   * beamline
+   *
+   * @param v   first map
+   * @param a   map to add to the first map
+   * @return    merged field map
+   */
+  auto merge = [](vector<ParamPoint3>& v, const vector<ParamPoint3>& a) {
+    for (const auto& t : a) {
+      auto i = upper_bound(v.begin(), v.end(), t.s, [](double s, const ParamPoint3 & b) {return s < b.s;});
+      if (i == v.end()) continue;
+      ParamPoint3& p = *(i - 1);
+      if (p.s == t.s && p.L == t.L) {
+        p.mxx += t.mxx;
+        p.mxy += t.mxy;
+        p.mx0 += t.mx0;
+        p.myx += t.myx;
+        p.myy += t.myy;
+        p.my0 += t.my0;
+      } else {
+        v.insert(i, t);
+      }
+    }
+  };
+  merge(m_h3, hleak3);
+
+  /** Since in any case we are going to calculate aperture of a
+   * beamline we can precompute range of the field map which
+   * corresponds to aperture range already fetched to narrow search of
+   * a particular lense in the range.
+   *
+   * @param ap   aperture map
+   * @param v    field map
+   * @return     vector with field map ranges
+   */
+  auto make_index = [](const vector<ApertPoint>& ap, const vector<ParamPoint3>& v) {
+    vector<irange_t> res;
+    for (auto it = ap.begin(); it + 1 != ap.end(); it++) {
+      const ApertPoint& p0 = *it, &p1 = *(it + 1);
+      if (p0.r > 0 && p1.r > 0) {
+        short int i0 = upper_bound(v.begin(), v.end(), p0.s, [](double s, const ParamPoint3 & b) {return s < b.s;}) - v.begin();
+        short int i1 = upper_bound(v.begin(), v.end(), p1.s, [](double s, const ParamPoint3 & b) {return s < b.s;}) - v.begin();
+        res.push_back({i0, i1});
+      } else {
+        res.push_back({0, 0});
+      }
+    }
+    return res;
+  };
+
+  m_indexh = make_index(m_ah, m_h3);
+  m_indexl = make_index(m_al, m_l3);
 }
 
 double BFieldComponentQuad::getApertureHER(double s) const
 {
-  if (s < m_apertBufferHER[0].s) return m_apertBufferHER[0].r;
-  if (s > m_apertBufferHER[m_apertSizeHER - 1].s) return m_apertBufferHER[m_apertSizeHER - 1].r;
-  //H.Nakayama: this loop could be modified to binary-search
-  for (int i = 0; i < m_apertSizeHER - 1; i++) {
-    if ((m_apertBufferHER[i].s <= s) && (s < m_apertBufferHER[i + 1].s)) {
-      double s1 = m_apertBufferHER[i].s;
-      double s2 = m_apertBufferHER[i + 1].s;
-      double r1 = m_apertBufferHER[i].r;
-      double r2 = m_apertBufferHER[i + 1].r;
-      double r = r1 + (r2 - r1) * (s - s1) / (s2 - s1);
-      return r;
-    }
-  }
-  return 0;
+  auto less = [](double s, const ApertPoint & b) {return s < b.s;};
+  const auto it = upper_bound(m_ah.begin(), m_ah.end(), s, less);
+  if (it == m_ah.begin() || it == m_ah.end()) return 0;
+  const ApertPoint& p1 = *(it - 1), &p2 = *it;
+  return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }
 
 double BFieldComponentQuad::getApertureLER(double s) const
 {
-  if (s < m_apertBufferLER[0].s) return m_apertBufferLER[0].r;
-  if (s > m_apertBufferLER[m_apertSizeLER - 1].s) return m_apertBufferLER[m_apertSizeLER - 1].r;
-  //H.Nakayama: this loop could be modified to binary-search
-  for (int i = 0; i < m_apertSizeLER - 1; i++) {
-    if ((m_apertBufferLER[i].s <= s) && (s < m_apertBufferLER[i + 1].s)) {
-      double s1 = m_apertBufferLER[i].s;
-      double s2 = m_apertBufferLER[i + 1].s;
-      double r1 = m_apertBufferLER[i].r;
-      double r2 = m_apertBufferLER[i + 1].r;
-      double r = r1 + (r2 - r1) * (s - s1) / (s2 - s1);
-      return r;
-    }
-  }
-  return 0;
+  auto less = [](double s, const ApertPoint & b) {return s < b.s;};
+  const auto it = upper_bound(m_al.begin(), m_al.end(), s, less);
+  if (it == m_al.begin() || it == m_al.end()) return 0;
+  const ApertPoint& p1 = *(it - 1), &p2 = *it;
+  return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
 }
 
+struct vector3_t {
+  double x, y, z;
+  inline double rho2() const {return x * x + y * y;}
+};
 
 TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 {
+  const double sa = sin(0.0415), ca = cos(0.0415);
+  int indx;
+  auto getAperture = [&indx](double s, const vector<ApertPoint>& ap) {
+    auto less = [](double s, const ApertPoint & b) {return s < b.s;};
+    const auto it = upper_bound(ap.begin(), ap.end(), s, less);
+    if (it == ap.begin() || it == ap.end()) return 0.0;
+    indx = it - ap.begin();
+    const ApertPoint& p1 = *(it - 1), &p2 = *it;
+    return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
+  };
+
+  auto find = [&indx](double s, const vector<ParamPoint3>& v, const vector<irange_t>& a) -> vector<ParamPoint3>::const_iterator {
+    const auto it = upper_bound(v.begin() + a[indx - 1].i0, v.begin() + a[indx - 1].i1, s, [](double s, const ParamPoint3 & b) {return s < b.s;});
+    if (it == v.begin()) return v.end();
+    return it - 1;
+  };
+
   //assume point is given in [cm]
+  TVector3 B(0, 0, 0);
 
-  //Conversion to LER/HER SAD coordinates
-  //GearDir her("/Detector/SuperKEKB/HER/");
-  //GearDir ler("/Detector/SuperKEKB/LER/");
-  //double angle_HER = her.getDouble("angle"); //  0.0415
-  //double angle_LER = ler.getDouble("angle"); // -0.0415
-  double angle_HER =  0.0415;
-  double angle_LER = -0.0415;
+  vector3_t v = {point.x(), point.y(), point.z()};
+  double xc = v.x * ca, zs = v.z * sa, zc = v.z * ca, xs = v.x * sa;
+  vector3_t vh = {(xc - zs), -v.y, -(zc + xs)}; // to the HER beamline frame
+  vector3_t vl = {(xc + zs), -v.y, -(zc - xs)}; // to the LER beamline frame
 
-  //double p0_HER = her.getDouble("energy") / Unit::eV; // 7.0e+9 [eV]
-  //double p0_LER = ler.getDouble("energy") / Unit::eV; // 4.0e+9 [eV]
-  double c = Const::speedOfLight / (Unit::m / Unit::s);  // 3.0e+8 [m/s]
+  double r2h = vh.rho2(), r2l = vl.rho2();
 
-  TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(-angle_HER); pHER.RotateX(M_PI);
-  TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(-angle_LER); pLER.RotateX(M_PI);
-
-  //Check if the point lies inside HER or LER beam pipe
-  bool HERflag = false;
-  double s_HER = pHER.Z() / Unit::mm;
-  double r_HER = sqrt(pHER.X() * pHER.X() + pHER.Y() * pHER.Y()) / Unit::mm;
-  if (getApertureHER(s_HER) > r_HER) HERflag = true;
-
-  bool LERflag = false;
-  double s_LER = pLER.Z() / Unit::mm;
-  double r_LER = sqrt(pLER.X() * pLER.X() + pLER.Y() * pLER.Y()) / Unit::mm;
-  if (getApertureLER(s_LER) > r_LER) LERflag = true;
-
-  double X, Y, s; // [m]
-  double K0 = 0., K1 = 0., SK0 = 0., SK1 = 0.;
-  double L = 0., ROTATE = 0., DX = 0., DY = 0.;
-
-  /* in case the point is outside of both LER and HER, returns zero field*/
-  if ((!HERflag) && (!LERflag)) return TVector3(0, 0, 0);
-
-  /* in case the point is INSIDE of both LER and HER,
-     this happenes around IP where no quadrupole field exists, returns zero field*/
-  if ((HERflag) && (LERflag)) {
-
-    B2DEBUG(20, "Return zero fields since inside both HER and LER at (x,y,z)=("
-            << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m << "),"
-            << " HER(X,Y,s)=(" << pHER.X() << "," << pHER.Y() << "," << pHER.Z()  << ")[cm], r_HER=" << r_HER << " [mm]  and "
-            << " LER(X,Y,s)=(" << pLER.X() << "," << pLER.Y() << "," << pLER.Z()  << ")[cm], r_LER=" << r_LER << " [mm] . ");
-
-    return TVector3(0, 0, 0);
-  }
-
-
-  int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
-
-  /* in case the point is inside HER*/
-  if (HERflag) {
-    X = pHER.X() / Unit::m; // in [m]
-    Y = pHER.Y() / Unit::m; // in [m]
-    s = pHER.Z() / Unit::m; // in [m]
-
-    double p0_HER = 7.0e+9;
-    bool foundflag = false;
-    //H.Nakayama: this loop could be modified to binary-search
-    for (int i = 0; i < m_mapSizeHER; i++) {
-      if ((m_mapBufferHER[i].s < s) && (s < m_mapBufferHER[i].s + m_mapBufferHER[i].L)) {
-        K0     = m_mapBufferHER[i].K0;
-        K1     = m_mapBufferHER[i].K1;
-        SK0    = m_mapBufferHER[i].SK0;
-        SK1    = m_mapBufferHER[i].SK1;
-        L      = m_mapBufferHER[i].L;
-        ROTATE = m_mapBufferHER[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
-        DX     = m_mapBufferHER[i].DX;
-        DY     = m_mapBufferHER[i].DY;
-        foundflag = true;
-        break;
+  if (r2h < r2l) { /* the point is closer to HER*/
+    if (r2h < m_maxr2) { /* within max radius */
+      double r = getAperture(vh.z, m_ah);
+      if (r2h < r * r) {
+        const auto it = find(vh.z, m_h3, m_indexh);
+        if (it != m_h3.end()) {
+          double Bx = it->getBx(vh.x, vh.y);
+          double By = it->getBy(vh.x, vh.y);
+          B.SetXYZ(Bx * ca, -By, -Bx * sa); // to the detector frame
+        }
       }
     }
-
-    TVector3 B(0, 0, 0);
-    if (foundflag) {
-      //rotate after subtracting DX,DY
-      TVector3 p_tmp(X - DX, Y - DY, s);
-      p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-      X = p_tmp.X();
-      Y = p_tmp.Y();
-
-      double Bs = 0;
-      double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
-      double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
-      B.SetXYZ(BX, BY, Bs);
-      B.RotateZ(ROTATE / 180.*M_PI);
-      B.RotateX(-M_PI); B.RotateY(angle_HER);
-
-      B2DEBUG(20, "HER quadrupole fields calculated at (x,y,z)=("
-              << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").");
-    }
-
-    //=====================
-    // HER leak component
-    //=====================
-
-    X = pHER.X() / Unit::m; // in [m]
-    Y = pHER.Y() / Unit::m; // in [m]
-    s = pHER.Z() / Unit::m; // in [m]
-    foundflag = false;
-    //H.Nakayama: this loop could be modified to binary-search
-    for (int i = 0; i < m_mapSizeHERleak; i++) {
-      if ((m_mapBufferHERleak[i].s < s) && (s < m_mapBufferHERleak[i].s + m_mapBufferHERleak[i].L)) {
-        K0     = m_mapBufferHERleak[i].K0;
-        K1     = m_mapBufferHERleak[i].K1;
-        SK0    = m_mapBufferHERleak[i].SK0;
-        SK1    = m_mapBufferHERleak[i].SK1;
-        L      = m_mapBufferHERleak[i].L;
-        ROTATE = m_mapBufferHERleak[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
-        DX     = m_mapBufferHERleak[i].DX;
-        DY     = m_mapBufferHERleak[i].DY;
-        foundflag = true;
-        break;
+  } else {      /* the point is closer to LER*/
+    if (r2l < m_maxr2) { /* within max radius */
+      double r = getAperture(vl.z, m_al);
+      if (r2l < r * r) {
+        const auto it = find(vl.z, m_l3, m_indexl);
+        if (it != m_l3.end()) {
+          double Bx = it->getBx(vl.x, vl.y);
+          double By = it->getBy(vl.x, vl.y);
+          B.SetXYZ(Bx * ca, -By, Bx * sa); // to the detector frame
+        }
       }
     }
-
-
-    TVector3 Bleak(0, 0, 0);
-    if (foundflag) {
-      //rotate after subtracting DX,DY
-      TVector3 p_tmp_leak(X - DX, Y - DY, s);
-      p_tmp_leak.RotateZ(-ROTATE / 180.*M_PI);
-      X = p_tmp_leak.X();
-      Y = p_tmp_leak.Y();
-
-      double Bs = 0;
-      double BX = (p0_HER / c / L) * (K1 * Y + SK1 * X + SK0);
-      double BY = (p0_HER / c / L) * (K1 * X - SK1 * Y + K0);
-
-
-      Bleak.SetXYZ(BX, BY, Bs);
-      Bleak.RotateZ(ROTATE / 180.*M_PI);
-      Bleak.RotateX(-M_PI); Bleak.RotateY(angle_HER);
-
-      B2DEBUG(20, "HER quadrupole leak fields calculated at (x,y,z)=("
-              << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << Bleak.X() << "," << Bleak.Y() << "," << Bleak.Z() << ").");
-    }
-
-
-    return B + Bleak;
   }
 
-  /* in case the point is inside LER*/
-  if (LERflag) {
-
-    X = pLER.X() / Unit::m; // in [m];
-    Y = pLER.Y() / Unit::m; // in [m];
-    s = pLER.Z() / Unit::m; // in [m];
-
-    bool foundflag = false;
-    //H.Nakayama: this loop could be modified to binary-search
-    for (int i = 0; i < m_mapSizeLER; i++) {
-      if ((m_mapBufferLER[i].s < s) && (s < m_mapBufferLER[i].s + m_mapBufferLER[i].L)) {
-        K0     = m_mapBufferLER[i].K0;
-        K1     = m_mapBufferLER[i].K1;
-        SK0    = m_mapBufferLER[i].SK0;
-        SK1    = m_mapBufferLER[i].SK1;
-        L      = m_mapBufferLER[i].L;
-        ROTATE = m_mapBufferLER[i].ROTATE; ROTATE *= ROTATE_DIRECTION;
-        DX     = m_mapBufferLER[i].DX;
-        DY     = m_mapBufferLER[i].DY;
-        foundflag = true;
-        break;
-      }
-    }
-
-
-    TVector3 B(0, 0, 0);
-    if (foundflag) {
-      double p0_LER = 4.0e+9;
-      TVector3 p_tmp(X - DX, Y - DY, s);
-      p_tmp.RotateZ(-ROTATE / 180.*M_PI);
-      X = p_tmp.X();
-      Y = p_tmp.Y();
-
-      double Bs = 0;
-      double BX = (p0_LER / c / L) * (K1 * Y + SK1 * X + SK0);
-      double BY = (p0_LER / c / L) * (K1 * X - SK1 * Y + K0);
-      B.SetXYZ(BX, BY, Bs);
-      B.RotateZ(ROTATE / 180.*M_PI);
-      B.RotateX(-M_PI); B.RotateY(angle_LER);
-
-      B2DEBUG(20, "LER quadrupole fields calculated at (x,y,z)=("
-              << point.X() / Unit::m << "," << point.Y() / Unit::m << "," << point.Z() / Unit::m
-              << ") i.e. (X,Y,s)=(" << X << "," << Y << "," << s
-              << ") is (Bx,By,Bz)=(" << B.X() << "," << B.Y() << "," << B.Z() << ").");
-    }
-
-    return B;
-  }
-
-  /* No chance to reach here, but put this line just in case*/
-  B2FATAL("Quad magnetic field caluculation reaches to the abnormal position in the code");
-
-  return TVector3(0, 0, 0);
+  return B;
 }
 
 void BFieldComponentQuad::terminate()
 {
-  B2DEBUG(10, "De-allocating the memory for the HER quadrupole magnetic field map loaded from the file '" << m_mapFilenameHER << "'");
-  //De-Allocate memory to prevent memory leak
-  delete [] m_mapBufferHER;
-
-  B2DEBUG(10, "De-allocating the memory for the LER quadrupole magnetic field map loaded from the file '" << m_mapFilenameLER << "'");
-  delete [] m_mapBufferLER;
-
-  B2DEBUG(10, "De-allocating the memory for the HER leakage field map loaded from the file '" << m_mapFilenameHERleak << "'");
-  delete [] m_mapBufferHERleak;
-
-  B2DEBUG(10, "De-allocating the memory for the HER aperture map loaded from the file '" << m_apertFilenameHER << "'");
-  delete [] m_apertBufferHER;
-
-  B2DEBUG(10, "De-allocating the memory for the LER aperture map loaded from the file '" << m_apertFilenameLER << "'");
-  delete [] m_apertBufferLER;
-
 }

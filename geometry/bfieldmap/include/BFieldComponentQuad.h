@@ -37,26 +37,39 @@ namespace Belle2 {
 
     /** Aperture data structure. */
     struct ApertPoint {
-      double s; /**< s in [mm] */
-      double r; /**< r in [mm] */
+      double s; /**< length along beamline in [cm] */
+      double r; /**< aperture in [cm] */
     };
 
-    /** Magnetic field data structure. */
-    struct ParamPoint {
-      double s;   /**< s in [m] */
-      double L;   /**< element length in [m] */
-      double K0;  /**< dipole component in [dimensionless] */
-      double K1;  /**< quadrupole component in [1/m] */
-      double SK0; /**< skew dipole component  in [dimensionless] */
-      double SK1; /**< skew quadrupole component in [1/m] */
-      double ROTATE; /**< rotation in [radian] */
-      double DX;   /**< horizontal displacement in [m] */
-      double DY;   /**< vertical displacement in [m] */
-
-      /* Note that K parameters used in SAD is multiplied by the element length.
-       * Popular definitions are:  K0,SK0[1/m] and K1,SK1[1/m^2]
+    /** Quadrupole lense data structure. This is a flat structure so
+    magnetic field has only X and Y components */
+    struct ParamPoint3 {
+      double s;   /**< s in [cm] */
+      double L;   /**< element length in [cm] */
+      double mxx, mxy, mx0; /**< coefficents to calculate Bx */
+      double myx, myy, my0; /**< coefficents to calculate By */
+      /**
+       * Calculates the X component of the magnetic field vector at
+       * the specified space point from a quadrupole lense.
+       *
+       * @param x The X component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @param y The Y component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @return  The X component of magnetic field vector at the given space point in [T].
        */
+      inline double getBx(double x, double y) const {return x * mxx + y * mxy + mx0;}
+      /**
+       * Calculates the Y component of the magnetic field vector at
+       * the specified space point from a quadrupole lense.
+       *
+       * @param x The X component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @param y The Y component of the space point in Cartesian coordinates (x,y) in [cm]
+       * @return  The Y component of magnetic field vector at the given space point in [T].
+       */
+      inline double getBy(double x, double y) const {return x * myx + y * myy + my0;}
     };
+
+    /** start and stop indicies to narrow search in array */
+    struct irange_t { short int i0, i1;};
 
     /** The BFieldComponentQuad constructor. */
     BFieldComponentQuad() = default;
@@ -149,17 +162,17 @@ namespace Belle2 {
     int m_apertSizeHER{0};
     /** The size of the aperture for LER */
     int m_apertSizeLER{0};
+    /** The square of maximal aperture for fast rejection */
+    double m_maxr2;
 
-    /** The map buffer for HER  */
-    ParamPoint* m_mapBufferHER{nullptr};
-    /** The map buffer for LER  */
-    ParamPoint* m_mapBufferLER{nullptr};
-    /** The memory buffer for the field parameters. */
-    ParamPoint* m_mapBufferHERleak{nullptr};
-    /** The memory buffer for the aperture parameters (HER). */
-    ApertPoint* m_apertBufferHER{nullptr};
-    /** The memory buffer for the aperture parameters (LER). */
-    ApertPoint* m_apertBufferLER{nullptr};
+    /** The the aperture parameters for HER and LER. */
+    std::vector<ApertPoint> m_ah, m_al;
+
+    /** The map for HER and LER */
+    std::vector<ParamPoint3> m_h3, m_l3;
+
+    /** Indecies for HER and LER to accelerate binary search in std::vector<ParamPoint3> */
+    std::vector<irange_t> m_indexh, m_indexl;
   };
 
 } //end of namespace Belle2

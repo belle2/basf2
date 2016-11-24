@@ -942,7 +942,7 @@ namespace Belle2 {
       int m_materialDefinitionMode; /*!< Control switch for gas and wire material definition. */
       int m_senseWireZposMode; /*!< Mode for sense wire z position corr. */
       int m_xtFileFormat;      /*!< Format of xt input file */
-      int m_xtParamMode = 0;       /*!< Mode for xt parameterization */
+      int m_xtParamMode;       /*!< Mode for xt parameterization */
       int m_sigmaFileFormat;   /*!< Format of sigma input file */
       int m_sigmaParamMode;    /*!< Mode for sigma parameterization */
       int m_nSLayer;         /*!< The number of sense wire layer. */

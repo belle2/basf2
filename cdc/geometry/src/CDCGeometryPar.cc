@@ -1088,6 +1088,8 @@ void CDCGeometryPar::setXtRel()
     //    std::cout << m_thetaPoints[i]*180./M_PI << std::endl;
   }
 
+  m_xtParamMode = m_xtRelFromDB->getXtParamMode();
+
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {
       for (unsigned short iA = 0; iA < m_nAlphaPoints; ++iA) {
@@ -1142,6 +1144,8 @@ void CDCGeometryPar::setSResol()
 
   //  std::cout << "m_nAlphaPoints4Sgm= " << m_nAlphaPoints4Sgm << std::endl;
   //  std::cout << "m_nThetaPoints4Sgm= " << m_nThetaPoints4Sgm << std::endl;
+
+  m_sigmaParamMode = m_sResolFromDB->getSigmaParamMode();
 
   for (unsigned short iCL = 0; iCL < MAX_N_SLAYERS; ++iCL) {
     for (unsigned short iLR = 0; iLR < 2; ++iLR) {

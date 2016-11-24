@@ -181,21 +181,18 @@ namespace {
     phi = pi2 - copysign(phi, x);
     return copysign(phi, y);
   }
-
-  int getPhiIndexWeight(double y, double x, double r, double& w, double& s, double& c)
-  {
-    double phi = fast_atan2_minimax<4>(y, x);
-    double ir = 1 / r;
-    s = y * ir, c = x * ir;
-    w = phi * (90 / M_PI);
-    int i = w;
-    w -= i;
-    return i;
-  }
 }
 
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
+  auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> int {
+    double phi = fast_atan2_minimax<4>(y, x);
+    wphi = phi * m_igridPitch[1];
+    int iphi = wphi;
+    wphi -= iphi;
+    return iphi;
+  };
+
   TVector3 B(0, 0, 0);
 
   // If both '3d' and 'Beamline' components are defined in xml file,
@@ -218,14 +215,14 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 
   if (r2 > 0) {
     double r = sqrt(r2);
-
+    double ay = std::abs(point.y());
     // Calculate the lower index of the point in the grid
     double wr   = (r - m_mapRegionR[0]) * m_igridPitch[0];
     double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
 
-    double wphi, s, c;
+    double wphi;
     unsigned int ir   = static_cast<int>(wr);
-    unsigned int iphi = getPhiIndexWeight(std::abs(point.y()), point.x(), r, wphi, s, c);
+    unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
     unsigned int iz   = static_cast<int>(wz);
 
     wr -= ir;
@@ -233,6 +230,8 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 
     // Get B-field values from map
     vector3_t b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
+    double norm = 1 / r;
+    double s = ay * norm, c = point.x() * norm;
     vector3_t bc = { -(b.x * c - b.y * s), -(b.x * s + b.y * c), b.z}; // in cartesian system
     if (point.y() < 0) bc.y = -bc.y;
     B.SetXYZ(bc.x, bc.y, bc.z);

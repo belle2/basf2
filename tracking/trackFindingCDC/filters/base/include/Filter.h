@@ -14,10 +14,14 @@
 
 #include <framework/core/ModuleParamList.h>
 #include <framework/logging/Logger.h>
+
 #include <string>
 #include <map>
+#include <cmath>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
 
     /// Base class for filters on a generic object type.

@@ -9,10 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/UnionRecordingTrackRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/trackRelation/TrackRelationVarSets.h>
-
 #include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/MVARealisticTrackRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/trackRelation/BasicTrackRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/trackRelation/FitTrackRelationVarSet.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 

@@ -17,6 +17,7 @@
 
 #include <TFile.h>
 #include <TH2D.h>
+#include <TTree.h>
 
 using namespace Belle2;
 
@@ -45,6 +46,8 @@ CreateFieldMapModule::CreateFieldMapModule() : Module()
   addParam("phi", m_phi, "phi angle for the scan in radians", 0.);
   addParam("wOffset", m_wOffset, "value of third coordinate", 0.);
   addParam("nPhi", m_nPhi, "number of phi steps for zr averaging", m_nPhi);
+  addParam("saveAllPoints", m_createTree, "save all sampled points in a TTree, "
+           "WARNING: output can be huge", false);
 }
 
 void CreateFieldMapModule::initialize()
@@ -113,6 +116,28 @@ void CreateFieldMapModule::beginRun()
     }
   };
 
+  struct { float x{0}, y{0}, z{0}, bx{0}, by{0}, bz{0}; } field_point;
+  TTree* all_values{nullptr};
+  if (m_createTree) {
+    all_values = new TTree("bfield_values", "All B field values");
+    all_values->Branch("x", &field_point.x, "x/F");
+    all_values->Branch("y", &field_point.y, "y/F");
+    all_values->Branch("z", &field_point.z, "z/F");
+    all_values->Branch("bx", &field_point.bx, "bx/F");
+    all_values->Branch("by", &field_point.by, "by/F");
+    all_values->Branch("bz", &field_point.bz, "bz/F");
+  }
+  auto fillTree = [&](const B2Vector3D & p, const B2Vector3D & b) {
+    if (!all_values) return;
+    field_point.x = p.X();
+    field_point.y = p.Y();
+    field_point.z = p.Z();
+    field_point.bx = b.X();
+    field_point.by = b.Y();
+    field_point.bz = b.Z();
+    all_values->Fill();
+  };
+
   if (type == c_ZR) {
     nSteps *= m_nPhi;
     TH2D* h_b = new TH2D("B", "$B$ average;$z$/cm;$r$/cm", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
@@ -120,13 +145,12 @@ void CreateFieldMapModule::beginRun()
     TH2D* h_bz = new TH2D("Bz", "$B_z$ average;$z$/cm;$r$/cm", m_nU, m_minU, m_maxU, m_nV, m_minV, m_maxV);
     for (int iU = 0; iU < m_nU; ++iU) {
       for (int iV = 0; iV < m_nV; ++iV) {
-        B2Vector3D pos(0, 0, 0);
         //find value for first and second coordinate
         const double u = h_b->GetXaxis()->GetBinCenter(iU + 1);
         const double v = h_b->GetYaxis()->GetBinCenter(iV + 1);
         //Determine global coordinates
         for (int iPhi = 0; iPhi < m_nPhi; ++iPhi) {
-          pos.SetXYZ(v, 0, u);
+          B2Vector3D pos(v, 0, u);
           pos.RotateZ(2 * M_PI * iPhi / m_nPhi);
           //Obtain magnetic field
           B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
@@ -134,6 +158,7 @@ void CreateFieldMapModule::beginRun()
           h_br->Fill(u, v, bfield.Perp());
           h_bz->Fill(u, v, bfield.Z());
           h_b->Fill(u, v, bfield.Mag());
+          fillTree(pos, bfield);
           showProgress();
         }
       }
@@ -180,7 +205,7 @@ void CreateFieldMapModule::beginRun()
         h_by->Fill(u, v, bfield.Y());
         h_bz->Fill(u, v, bfield.Z());
         h_b->Fill(u, v, bfield.Mag());
-
+        fillTree(pos, bfield);
         showProgress();
       }
     }

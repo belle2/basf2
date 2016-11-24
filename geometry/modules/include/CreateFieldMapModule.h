@@ -65,6 +65,8 @@ namespace Belle2 {
     double m_wOffset {0};
     /** number of steps in phi */
     int m_nPhi{180};
+    /** if true create a TTree with all sampled points */
+    bool m_createTree{false};
   };
 }
 

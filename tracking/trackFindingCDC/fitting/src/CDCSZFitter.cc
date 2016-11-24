@@ -155,39 +155,6 @@ CDCTrajectorySZ CDCSZFitter::fit(CDCSZObservations observationsSZ) const
   return trajectorySZ;
 }
 
-CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const
-{
-  CDCSZObservations observationsSZ;
-  observationsSZ.appendRange(segment3D);
-
-  CDCTrajectorySZ trajectorySZ;
-  if (observationsSZ.size() > 4) {
-    CDCSZObservations observationsSZFiltered;
-
-    double meanTanLambda = 0;
-    double meanStartZ = 0;
-
-    for (unsigned int i = 0; i < observationsSZ.size(); i++) {
-      for (unsigned int j = 0; j < observationsSZ.size(); j++) {
-        if (i != j) {
-          observationsSZFiltered.fill(observationsSZ.getS(j),
-                                      observationsSZ.getZ(j),
-                                      observationsSZ.getWeight(j));
-        }
-      } // for j
-
-      update(trajectorySZ, observationsSZFiltered);
-      meanTanLambda += trajectorySZ.getTanLambda();
-      meanStartZ += trajectorySZ.getZ0();
-    } // for i
-
-    return CDCTrajectorySZ(meanTanLambda / observationsSZ.size(),
-                           meanStartZ / observationsSZ.size());
-  } else {
-    return CDCTrajectorySZ::basicAssumption();
-  }
-}
-
 void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 {
   const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();

@@ -10,7 +10,7 @@
 // This method will either start a new time, if the plots are 
 // not complete yet or will hide the wait dialog if the plotting
 // is complete.
-function install_plotting_progress_ng(rev_string, joined_revisions, progress_key, wait_time, rev_data) {
+function install_plotting_progress(rev_string, joined_revisions, progress_key, wait_time, rev_data) {
 
     // query every second
 	var defaultWaitTime = 1000;
@@ -29,7 +29,7 @@ function install_plotting_progress_ng(rev_string, joined_revisions, progress_key
 			.success(function(ajax_result) {
 				if (!ajax_result) {
 					// no status yet, keep on querying
-					install_plotting_progress_ng(rev_string, joined_revisions,progress_key, defaultWaitTime, rev_data);
+					install_plotting_progress(rev_string, joined_revisions,progress_key, defaultWaitTime, rev_data);
 				} else {
 					// is it only a status message or a message with detailed information
 					// on the current progress ?
@@ -59,7 +59,7 @@ function install_plotting_progress_ng(rev_string, joined_revisions, progress_key
 						$("#plot_creation_package").text("Current Package: " + package_name);
 						
 						// re-install the timer to check back on the progress
-						install_plotting_progress_ng(rev_string, joined_revisions,progress_key, defaultWaitTime, rev_data);
+						install_plotting_progress(rev_string, joined_revisions,progress_key, defaultWaitTime, rev_data);
 					}
 				}
 				
@@ -78,5 +78,5 @@ function beginCreatePlotWait(rev_string, joined_revisions, progress_key, rev_dat
     $("#outer").show();
 
     // check for a change already very quick, if the plots are already available
-    install_plotting_progress_ng( rev_string, joined_revisions,progress_key, 0, rev_data)
+    install_plotting_progress( rev_string, joined_revisions,progress_key, 0, rev_data)
 }

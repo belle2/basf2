@@ -124,10 +124,10 @@ if GetOption('extraccflags'):
 # check for debug flag
 option = os.environ['BELLE2_OPTION']
 if option == 'debug':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=200000', '-g'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-g'])
     global_env.Append(FORTRANFLAGS='-g')
 elif option == 'opt':
-    global_env.Append(CCFLAGS=['-Wextra', '-Wstack-usage=200000', '-O3'])
+    global_env.Append(CCFLAGS=['-Wextra', '-Wshadow', '-Wstack-usage=200000', '-O3'])
     global_env.Append(FORTRANFLAGS='-O3')
 elif option == 'intel':
     intel_dir = None
@@ -150,7 +150,7 @@ elif option == 'intel':
     global_env['LD'] = 'xild'
     global_env['LINK'] = 'icpc'
     global_env['SHLINK'] = 'icpc'
-    global_env.Append(CCFLAGS=['-wd383,981,1419'])
+    global_env.Append(CCFLAGS=['-wd383,981,1419','-Wshadow'])
 elif option == 'clang':
     clang_dir = None
     for dir in os.environ.get('PATH', '').split(os.pathsep):
@@ -167,7 +167,7 @@ elif option == 'clang':
     global_env['CXX'] = 'clang++'
     # enable a few extra warnings warnings but disable the missing braces warning, because it can lead
     # to false positives in conjuction with std::array : https://llvm.org/bugs/show_bug.cgi?id=21629
-    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces"],
+    global_env.Append(CCFLAGS=["-O2", "-Wno-missing-braces", '-Wshadow'],
                       CXXFLAGS=["-Wheader-hygiene"])
     # make sure clang uses the correct paths to the gcc std c++ and not the
     # system ones. First we disable the default c++ include path

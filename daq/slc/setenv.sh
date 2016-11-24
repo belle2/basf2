@@ -5,8 +5,8 @@
 
 export BELLE2_DAQ_SLC=$PWD
 export PATH=$BELLE2_DAQ_SLC/bin:$PATH
-export PGSQL_LIB_PATH=${HOME}/postgresql/lib
-export PGSQL_INC_PATH=${HOME}/postgresql/include
+export PGSQL_LIB_PATH=${HOME}/slc/externals/pgsql/lib
+export PGSQL_INC_PATH=${HOME}/slc/externals/pgsql/include
 #export PGSQL_LIB_PATH=${B2DAQ_EXTERNALS_DIR}/lib
 #export PGSQL_INC_PATH=${B2DAQ_EXTERNALS_DIR}/include/pgsql
 export LD_LIBRARY_PATH=$BELLE2_DAQ_SLC/lib:$PGSQL_LIB_PATH:$LD_LIBRARY_PATH

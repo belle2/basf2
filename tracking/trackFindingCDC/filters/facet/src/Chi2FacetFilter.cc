@@ -11,16 +11,17 @@
 #include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <framework/logging/Logger.h>
+
+#include <framework/core/ModuleParamList.h>
+
 #include <cmath>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-Chi2FacetFilter::Chi2FacetFilter()
-{
-}
 
 Chi2FacetFilter::Chi2FacetFilter(double chi2Cut,
                                  double penaltyWidth):
@@ -46,14 +47,14 @@ void Chi2FacetFilter::exposeParameters(ModuleParamList* moduleParamList,
 
 Weight Chi2FacetFilter::operator()(const CDCFacet& facet)
 {
-  const int nSteps = 1;
-  double chi2 = FacetFitter::fit(facet, nSteps);
+  constexpr const int nSteps = 1;
+  const double chi2 = FacetFitter::fit(facet, nSteps);
   if (chi2 > m_param_chi2Cut or std::isnan(chi2)) {
     return NAN;
   } else {
 
     // Introducing a mini penilty to distiguish better facets.
-    double penalty = std::erf(chi2 / m_param_penaltyWidth);
+    const double penalty = std::erf(chi2 / m_param_penaltyWidth);
 
     // Good facet contains three points of the track
     // the amount carried by this facet can the adjusted more realistically

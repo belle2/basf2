@@ -3,17 +3,23 @@
  * Copyright(C) 2015 - Belle II Collaboration                             *
  *                                                                        *
  * Author: The Belle II Collaboration                                     *
- * Contributors: Oliver Frost                                             *
+ * Contributors: Nils Braun, Oliver Frost                                 *
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    using ChooseableFacetFilter = ChooseableFilter<FacetFilterFactory>;
-  }
+using namespace Belle2;
+using namespace TrackFindingCDC;
+
+MVAFacetFilter::MVAFacetFilter()
+  : Super(makeUnique<MVAFacetVarSet>(), "FacetFilter", 2.82)
+{
+}
+
+Weight MVAFacetFilter::predict(const CDCFacet& facet)
+{
+  return 3 - 0.2 * (1 - Super::predict(facet));
 }

@@ -9,12 +9,12 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
-
 #include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -26,7 +26,7 @@ std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
   return varSetNames;
 }
 
-std::unique_ptr<BaseVarSet<CDCFacet> >
+std::unique_ptr<BaseVarSet<const CDCFacet> >
 UnionRecordingFacetFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {

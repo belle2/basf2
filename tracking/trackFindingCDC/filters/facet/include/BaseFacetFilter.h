@@ -10,13 +10,11 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-
+    class CDCFacet;
     /// Base class for all facet filters
-    using BaseFacetFilter = Filter<CDCFacet>;
-
+    using BaseFacetFilter = Filter<const CDCFacet>;
   }
 }

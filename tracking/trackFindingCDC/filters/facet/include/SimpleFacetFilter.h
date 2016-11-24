@@ -11,16 +11,20 @@
 
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCFacet;
+
     /// Filter for the constuction of good facets based on simple criterions.
-    class SimpleFacetFilter : public Filter<CDCFacet> {
+    class SimpleFacetFilter : public BaseFacetFilter {
 
     private:
       /// Type of the super class
-      using Super = Filter<CDCFacet>;
+      using Super = BaseFacetFilter;
 
     public:
       /// Constructor using default direction of flight deviation cut off.
@@ -31,7 +35,7 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
     public:
       /**
@@ -43,7 +47,6 @@ namespace Belle2 {
     private:
       /// Memory for the used direction of flight deviation.
       double m_param_deviationCosCut;
-
     };
   }
 }

@@ -11,12 +11,16 @@
 
 #include <tracking/trackFindingCDC/filters/facet/FacetFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/facet/BaseFacetFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
+
+#include <vector>
+#include <string>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Records the encountered CDCWireHitFacets.
+    /// Records the encountered CDCFacets
     class UnionRecordingFacetFilter: public UnionRecordingFilter<FacetFilterFactory> {
 
     private:
@@ -25,12 +29,10 @@ namespace Belle2 {
 
     public:
       /// Valid names of variable sets for facets.
-      std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for facets from a name.
-
-      std::unique_ptr<BaseVarSet<CDCFacet>> createVarSet(const std::string& name) const override;
-
+      std::unique_ptr<BaseVarSet<const CDCFacet>> createVarSet(const std::string& name) const final;
     };
   }
 }

@@ -46,7 +46,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct BendFacetVarNames : public VarNames<CDCFacet> {
+    struct BendFacetVarNames : public VarNames<const CDCFacet> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(bendFacetVarNames);

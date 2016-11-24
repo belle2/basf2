@@ -40,7 +40,7 @@ namespace Belle2 {
     };
 
     /// Vehicle class to transport the variable names
-    struct FitFacetVarNames : public VarNames<CDCFacet> {
+    struct FitFacetVarNames : public VarNames<const CDCFacet> {
 
       /// Number of variables to be generated
       static const size_t nVars = size(fitFacetVarNames);

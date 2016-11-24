@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
 #include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
@@ -22,12 +22,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-// Filter instances to be used
 namespace {
   using AllTrackFilter = AllFilter<BaseTrackFilter>;
   using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
-  using RecordingTrackFilter =  RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
-  using TMVATrackFilter = TMVAFilter<BasicTrackVarSet>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
 }
 
 TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
@@ -53,7 +52,7 @@ TrackFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "set all tracks as good"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"mva", "test with a mva method"}
   };
 }
 
@@ -68,8 +67,8 @@ TrackFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCTrackFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingTrackFilter>("TrackFilter.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVATrackFilter>("TrackFilter");
+  } else if (filterName == "mva") {
+    return makeUnique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml");
   } else {
     return Super::create(filterName);
   }

@@ -1,47 +1,42 @@
 #!/bin/bash
 
 if [ -z "$1" ]; then
-	echo "usage: $0 training_root_file";
-	echo "   This script creates all weight files for the SegmentTrackCombinerModule from the given root file with events."; 
-	exit;
+    echo "usage: $0 training_root_file";
+    echo "   This script creates all weight files for the SegmentTrackCombinerModule from the given root file with events."; 
+    exit;
 fi
 
 # SegmentTrackFilterFirstStep
 if [ ! -e "SegmentTrackFilterFirstStep.root" ]; then
-	trackfindingcdc-record-segment-track-first-step -i "$1"
+    trackfindingcdc-record-segment-track-first-step -i "$1"
 fi
-trackfindingcdc-train SegmentTrackFilterFirstStep.root
-mv weights/SegmentTrackFilterFirstStep_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
-rm -rf weights
+trackfindingcdc_teacher --identifier trackfindingcdc_SegmentTrackFilterFirstStep.xml SegmentTrackFilterFirstStep.root
+mv trackfindingcdc_SegmentTrackFilterFirstStep.xml $BELLE2_LOCAL_DIR/tracking/data/
 
 # BackgroundSegmentFilter
 if [ ! -e "BackgroundSegmentFilter.root" ]; then
-	trackfindingcdc-record-background-segment -i "$1"
+    trackfindingcdc-record-background-segment -i "$1"
 fi
-trackfindingcdc-train BackgroundSegmentFilter.root
-mv weights/BackgroundSegmentFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
-rm -rf weights
+trackfindingcdc_teacher --identifier trackfindingcdc_BackgroundSegmentFilter.xml BackgroundSegmentFilter.root
+mv trackfindingcdc_BackgroundSegmentFilter.xml $BELLE2_LOCAL_DIR/tracking/data/
 
 # NewSegmentFilter
 if [ ! -e "NewSegmentFilter.root" ]; then
-	trackfindingcdc-record-new-segment -i "$1"
+    trackfindingcdc-record-new-segment -i "$1"
 fi
-trackfindingcdc-train NewSegmentFilter.root
-mv weights/NewSegmentFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
-rm -rf weights
+trackfindingcdc_teacher --identifier trackfindingcdc_NewSegmentFilter.xml NewSegmentFilter.root
+mv trackfindingcdc_NewSegmentFilter.xml $BELLE2_LOCAL_DIR/tracking/data/
 
 # SegmentTrackFilterSecondStep
 if [ ! -e "SegmentTrackFilterSecondStep.root" ]; then
-	trackfindingcdc-record-segment-track-second-step -i "$1"
+    trackfindingcdc-record-segment-track-second-step -i "$1"
 fi
-trackfindingcdc-train SegmentTrackFilterSecondStep.root
-mv weights/SegmentTrackFilterSecondStep_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
-rm -rf weights
+trackfindingcdc_teacher --identifier trackfindingcdc_SegmentTrackFilterSecondStep.xml SegmentTrackFilterSecondStep.root
+mv trackfindingcdc_SegmentTrackFilterSecondStep.xml $BELLE2_LOCAL_DIR/tracking/data/
 
 # TrackFilter
 if [ ! -e "TrackFilter.root" ]; then
-	trackfindingcdc-record-tracks -i "$1"
+    trackfindingcdc-record-tracks -i "$1"
 fi
-trackfindingcdc-train TrackFilter.root
-mv weights/TrackFilter_FastBDT.weights.xml $BELLE2_LOCAL_DIR/tracking/data/
-rm -rf weights
+trackfindingcdc_teacher --identifier trackfindingcdc_TrackFilter.xml TrackFilter.root
+mv trackfindingcdc_TrackFilter.xml $BELLE2_LOCAL_DIR/tracking/data/

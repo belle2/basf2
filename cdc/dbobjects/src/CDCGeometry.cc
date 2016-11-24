@@ -237,24 +237,8 @@ void CDCGeometry::read(const GearDir& content)
   m_feedThroughLength = content.getLength("/FeedThrough/Length");
   //  B2INFO("m_feedThroughLength= " << m_feedThroughLength);
 
-  // Debug mode.
-  m_debug = content.getBool("Debug");
-
   // Get control switch for gas and wire material definition
-  m_materialDefinitionMode = content.getInt("MaterialDefinitionMode");
-  m_senseWireZposMode = content.getInt("SenseWireZposMode");
   m_clockFrequency  = content.getDouble("ClockFrequencyForTDC");
   m_nominalSpaceResolution = content.getLength("SenseWire/SpaceResol");
-  m_displacement = content.getBool("Displacement");
-  m_misalignment = content.getBool("Misalignment");
-  m_alignment = content.getBool("Alignment");
-  m_displacementFile = content.getString("displacementFileName");
-  m_misalignmentFile = content.getString("misalignmentFileName");
-  m_alignmentFile = content.getString("alignmentFileName");
-
-  m_thresholdEnergyDeposit = content.getWithUnit("SensitiveDetector/EnergyDepositionThreshold");
-  m_minTrackLength = content.getWithUnit("SensitiveDetector/MinTrackLength");
-  m_wireSag = content.getBool("SensitiveDetector/WireSag");
-  m_modLeftRightFlag = content.getBool("SensitiveDetector/ModifiedLeftRightFlag");
 
 }

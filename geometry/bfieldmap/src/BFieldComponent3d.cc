@@ -8,6 +8,7 @@
  **************************************************************************/
 
 #include <geometry/bfieldmap/BFieldComponent3d.h>
+#include <geometry/bfieldmap/BFieldComponentBeamline.h>
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
@@ -196,6 +197,14 @@ namespace {
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
   TVector3 B(0, 0, 0);
+
+  // If both '3d' and 'Beamline' components are defined in xml file,
+  // '3d' component returns zero field where 'Beamline' component is defined.
+  // If no 'Beamline' component is defined in xml file, the following function will never be called.
+  if (BFieldComponentBeamline::isInRange(point)) {
+    B2DEBUG(100, "'3d' magnetic field component returns zero value, because we use 'Beamline' magnetic field instead.");
+    return TVector3(0.0, 0.0, 0.0);
+  }
 
   double z = point.z();
   // Check if the point lies inside the magnetic field boundaries

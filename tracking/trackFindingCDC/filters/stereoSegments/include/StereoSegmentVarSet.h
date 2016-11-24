@@ -8,16 +8,16 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class CDCSegment3D;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const stereoSegmentVarNames[] = {
       "track_size",
@@ -39,31 +39,27 @@ namespace Belle2 {
       "sum_distance_using_z",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a stereo hit and a track pair.
-     */
-    class StereoSegmentVarNames : public
-      VarNames<std::pair<const CDCSegment3D*, const CDCTrack*>> {
+    /// Vehicle class to transport the variable names
+    struct StereoSegmentVarNames : public VarNames<std::pair<const CDCSegment3D*, const CDCTrack*>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(stereoSegmentVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(stereoSegmentVarNames);
 
-      /// Get the name of the column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return stereoSegmentVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a stereo hit and a track pair
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a stereo segment to track match
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class StereoSegmentVarSet : public VarSet<StereoSegmentVarNames> {
 
     public:
-      /// Generate and assign the variables from the pair
+      /// Generate and assign the contained variables
       bool extract(const std::pair<const CDCSegment3D*, const CDCTrack*>* testPair) override;
     };
   }

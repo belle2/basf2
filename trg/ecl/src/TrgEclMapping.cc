@@ -32,13 +32,12 @@ TrgEclMapping::TrgEclMapping() :
 //
 //
 //
-int
-TrgEclMapping::getXtalIdFromTCId(int TCId , int count)
+std::vector<int>
+TrgEclMapping::getXtalIdFromTCId(int TCId)
 {
-  if (_tcid < 1 || _tcid > 576) {
+  if (TCId < 1 || TCId > 576) {
     B2ERROR("TrgEclMapping> Input TCId is wrong!!!");
   }
-  int XtalId = 0;
 
   TC2Xtal = {
     {1, 2, 3, 49, 50, 51, 97, 98, 99, 100, 161, 162, 163, 164, 0, 0}, // TC Id : 1
@@ -619,14 +618,14 @@ TrgEclMapping::getXtalIdFromTCId(int TCId , int count)
     {8347, 8348, 8349, 8443, 8444, 8445, 8539, 8540, 8541, 8605, 8606, 8669, 8670, 8733, 8734,  0}  // TC Id : 576
   };
 
-  XtalId = TC2Xtal[TCId - 1][count - 1];
+  //  XtalId = TC2Xtal[TCId - 1][count - 1];
 
-  if (XtalId == 0) {
+  // if (XtalId == 0) {
 
-    B2ERROR("TrgEclMapping> Input count  is out of bound!!!");
-  }
+  //   B2ERROR("TrgEclMapping> Input count  is out of bound!!!");
+  // }
 
-  return XtalId;
+  return TC2Xtal[TCId - 1];
 }
 int
 TrgEclMapping::getTCIdFromXtalId(int XtalId)

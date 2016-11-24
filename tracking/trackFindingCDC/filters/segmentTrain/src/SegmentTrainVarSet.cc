@@ -56,7 +56,9 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
       return true;
     }
     if (alreadySet) {
-      double currentOverlap = (1 - m_param_percentageForPerpSMeasurements) * lastPerpS - perpSFront;
+      // We use this amount of overlap when defining a segment train
+      const float c_PercentageForPerpSMeasurements = 0.05;
+      double currentOverlap = (1 - c_PercentageForPerpSMeasurements) * lastPerpS - perpSFront;
       sumPerpSOverlap += currentOverlap;
       if (currentOverlap > maximumPerpSOverlap) {
         maximumPerpSOverlap = currentOverlap;

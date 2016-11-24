@@ -17,7 +17,7 @@
 #include <tracking/trackFindingCDC/filters/facet/RealisticFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/Chi2FacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/TMVAFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -52,7 +52,7 @@ FacetFilterFactory::getValidFilterNamesAndDescriptions() const
     {"realistic_loss", "mc with realistice criteria but losser cut"},
     {"chi2", "mc free based on chi2 fitting"},
     {"unionrecording", "record many multiple choosable variable set"},
-    {"tmva", "filter facets with a tmva method"},
+    {"mva", "filter facets with a mva method"},
   };
 }
 
@@ -77,8 +77,8 @@ FacetFilterFactory::create(const std::string& filterName) const
     return makeUnique<Chi2FacetFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingFacetFilter>();
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVAFacetFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVAFacetFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -33,13 +33,17 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //Switch for debug
   addParam("Debug4Sim", m_debug4Sim, "Switch on/off debug in FullSim", false);
   //Switch for wire sag
-  addParam("WireSag", m_wireSag, "Switch on/off sense wire sag in FullSim", true);
+  addParam("WireSag", m_wireSag, "Switch on/off sense wire (gravitational) sag in FullSim", true);
   //Switch for modified left/right flag
   addParam("ModLeftRightFlag", m_modLeftRightFlag, "Switch on/off calculation of modified left/right flag in FullSim", false);
   //energy thresh
-  addParam("ThresholdEnergyDeposit",  m_thresholdEnergyDeposit,  "Energy thresh. for G4 step (GeV)",  0.0);
+  addParam("ThresholdEnergyDeposit",  m_thresholdEnergyDeposit,
+           "Energy deposite (edep) thresh. for G4 step (GeV). All hits with smaller edep will be dropped at FullSim level. Set this to a negative value if you want to keep simhits with edep=0.",
+           0.0);
   //min. track length
-  addParam("MinTrackLength",  m_minTrackLength,  "Minimum track length for G4 step (cm) ",  15.0);
+  addParam("MinTrackLength",  m_minTrackLength,
+           "Minimum track length (cm) required for saving in MCParticle.; to be applied to all particles other than primaries and decay-daughters.",
+           15.0);
 
   //For Geometry
   //Switch for debug

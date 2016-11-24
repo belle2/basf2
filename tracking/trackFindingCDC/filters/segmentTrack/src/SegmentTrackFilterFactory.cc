@@ -16,7 +16,7 @@
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -27,7 +27,7 @@ namespace {
   using AllSegmentTrackFilter = AllFilter<BaseSegmentTrackFilter>;
   using MCSegmentTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
   using RecordingSegmentTrackFilter = RecordingFilter<VariadicUnionVarSet<SegmentTrackTruthVarSet, SegmentTrackVarSet>>;
-  using TMVASegmentTrackFilter = TMVAFilter<SegmentTrackVarSet>;
+  using MVASegmentTrackFilter = MVAFilter<SegmentTrackVarSet>;
 }
 
 SegmentTrackFilterFactory::SegmentTrackFilterFactory(const std::string& defaultFilterName)
@@ -80,7 +80,7 @@ SegmentTrackFilterFirstStepFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
   filterNames.insert({
-    {"tmva", "test with a tmva method"},
+    {"mva", "test with a mva method"},
     {"recording", "record variables to a TTree"},
   });
   return filterNames;
@@ -89,8 +89,8 @@ SegmentTrackFilterFirstStepFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterFirstStepFactory::create(const std::string& filterName) const
 {
-  if (filterName == "tmva") {
-    return makeUnique<TMVASegmentTrackFilter>("SegmentTrackFilterFirstStep");
+  if (filterName == "mva") {
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilterFirstStep.xml");
   } else if (filterName == "recording") {
     return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterFirstStep.root");
   } else {
@@ -120,7 +120,7 @@ SegmentTrackFilterSecondStepFactory::getValidFilterNamesAndDescriptions() const
 {
   std::map<std::string, std::string> filterNames = Super::getValidFilterNamesAndDescriptions();
   filterNames.insert({
-    {"tmva", "test with a tmva method"},
+    {"mva", "test with a mva method"},
     {"recording", "record variables to a TTree"},
   });
   return filterNames;
@@ -129,8 +129,8 @@ SegmentTrackFilterSecondStepFactory::getValidFilterNamesAndDescriptions() const
 std::unique_ptr<BaseSegmentTrackFilter>
 SegmentTrackFilterSecondStepFactory::create(const std::string& filterName) const
 {
-  if (filterName == "tmva") {
-    return makeUnique<TMVASegmentTrackFilter>("SegmentTrackFilterSecondStep");
+  if (filterName == "mva") {
+    return makeUnique<MVASegmentTrackFilter>("tracking/data/trackfindingcdc_SegmentTrackFilterSecondStep.xml");
   } else if (filterName ==  "recording") {
     return makeUnique<RecordingSegmentTrackFilter>("SegmentTrackFilterSecondStep.root");
   } else {

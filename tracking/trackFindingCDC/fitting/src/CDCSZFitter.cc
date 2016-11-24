@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
+
 #include <Eigen/Dense>
 
 using namespace Belle2;
@@ -105,12 +107,12 @@ namespace {
 
 CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const
 {
-  CDCTrajectorySZ trajectorySZ;
-  CDCObservations2D observationsSZ;
-  appendSZ(observationsSZ, segment3D);
+  CDCSZObservations observationsSZ;
+  observationsSZ.appendRange(segment3D);
 
+  CDCTrajectorySZ trajectorySZ;
   if (observationsSZ.size() > 4) {
-    CDCObservations2D observationsSZFiltered;
+    CDCSZObservations observationsSZFiltered;
 
     double meanTanLambda = 0;
     double meanStartZ = 0;
@@ -118,17 +120,16 @@ CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segm
     for (unsigned int i = 0; i < observationsSZ.size(); i++) {
       for (unsigned int j = 0; j < observationsSZ.size(); j++) {
         if (i != j) {
-          observationsSZFiltered.fill(observationsSZ.getX(j),
-                                      observationsSZ.getY(j),
-                                      observationsSZ.getDriftLength(j),
+          observationsSZFiltered.fill(observationsSZ.getS(j),
+                                      observationsSZ.getZ(j),
                                       observationsSZ.getWeight(j));
         }
-      }
+      } // for j
 
       update(trajectorySZ, observationsSZFiltered);
       meanTanLambda += trajectorySZ.getTanLambda();
       meanStartZ += trajectorySZ.getZ0();
-    }
+    } // for i
 
     return CDCTrajectorySZ(meanTanLambda / observationsSZ.size(),
                            meanStartZ / observationsSZ.size());
@@ -156,21 +157,32 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   segmentPair.setTrajectory3D(trajectory3D);
 }
 
+CDCTrajectorySZ CDCSZFitter::fit(const CDCObservations2D& observations2D) const
+{
+  CDCSZObservations szObservations;
+  for (int i = 0; i < observations2D.size(); ++i) {
+    const double s = observations2D.getX(i);
+    const double z = observations2D.getY(i);
+    szObservations.fill(s, z);
+  }
+  return fit(std::move(szObservations));
+}
+
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
                          const CDCStereoSegment2D& stereoSegment,
                          const CDCTrajectory2D& axialTrajectory2D) const
 {
   // recostruct the stereo segment
-  CDCObservations2D observationsSZ;
+  CDCSZObservations observationsSZ;
   for (const CDCRecoHit2D& recoHit2D : stereoSegment) {
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, axialTrajectory2D);
-    appendSZ(observationsSZ, recoHit3D);
+    observationsSZ.append(recoHit3D);
   }
 
   update(trajectorySZ, observationsSZ);
 }
 
-void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const
+void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCSZObservations& observationsSZ) const
 {
   trajectorySZ.clear();
   if (observationsSZ.size() < 3) {
@@ -181,7 +193,7 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& obser
   size_t ndf = observationsSZ.size() - 2;
 
   // Matrix of weighted sums
-  Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWXYSumMatrix();
+  Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWSZSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
 
   uncertainSZLine.setNDF(ndf);

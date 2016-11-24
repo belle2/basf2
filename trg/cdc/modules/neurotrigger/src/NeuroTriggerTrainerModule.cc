@@ -581,6 +581,10 @@ void NeuroTriggerTrainerModule::train(unsigned isector)
                ", valid error = " << valid_mse << ", best valid = " << bestValid);
       }
     }
+    if (breakEpoch == 0) {
+      B2INFO("Training run " << irun << " finished in epoch " << m_maxEpochs);
+      breakEpoch = m_maxEpochs;
+    }
     trainOptLog.push_back(trainLog[bestEpoch - 1]);
     validOptLog.push_back(validLog[bestEpoch - 1]);
     // test trained network

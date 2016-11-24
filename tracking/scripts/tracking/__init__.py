@@ -5,7 +5,7 @@ from basf2 import *
 
 
 def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGeometryAdding=False,
-                                mcTrackFinding=False, trigger_mode="all"):
+                                mcTrackFinding=False, trigger_mode="all", additionalTrackFitHypotheses=None):
     """
     This function adds the standard reconstruction modules for tracking
     to a path.
@@ -40,7 +40,7 @@ def add_tracking_reconstruction(path, components=None, pruneTracks=False, skipGe
 
     if trigger_mode in ["hlt", "all"]:
         add_mc_matcher(path, components)
-        add_track_fit_and_track_creator(path, components, pruneTracks)
+        add_track_fit_and_track_creator(path, components, pruneTracks, additionalTrackFitHypotheses)
 
 
 def add_geometry_modules(path, components=None):
@@ -78,7 +78,7 @@ def add_mc_tracking_reconstruction(path, components=None, pruneTracks=False):
                                 mcTrackFinding=True)
 
 
-def add_track_fit_and_track_creator(path, components=None, pruneTracks=False):
+def add_track_fit_and_track_creator(path, components=None, pruneTracks=False, additionalTrackFitHypotheses=None):
     """
     Helper function to add the modules performing the
     track fit, the V0 fit and the Belle2 track creation to the path.
@@ -92,8 +92,8 @@ def add_track_fit_and_track_creator(path, components=None, pruneTracks=False):
     # track fitting
     path.add_module("DAFRecoFitter").set_name("Combined_DAFRecoFitter")
     # create Belle2 Tracks from the genfit Tracks
-    path.add_module('TrackCreator', defaultPDGCode=211, additionalPDGCodes=[11, 13, 321, 2212])
-
+    path.add_module('TrackCreator', defaultPDGCode=211,
+                    additionalPDGCodes=[13, 321, 2212] if additionalTrackFitHypotheses is None else additionalTrackFitHypotheses)
     # V0 finding
     path.add_module('V0Finder')
 

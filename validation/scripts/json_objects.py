@@ -17,7 +17,8 @@ class Revision(JsonBase):
     Contains information about a specific revision
     """
 
-    def __init__(self, label, git_hash=None, creation_date=None, packages=None):
+    def __init__(self, label, git_hash=None, creation_date=None, packages=None,
+                 creation_timezone=None):
         """
         Create a new Revision object and fill all members
         """
@@ -28,6 +29,9 @@ class Revision(JsonBase):
         #: date when the validation output of this revision
         #  was created, as datetime object
         self.creation_date = creation_date
+
+        # timezone used by the creation date
+        self.creation_timezone = creation_timezone
 
         # The git commit hash which has the HEAD while the validation
         # scripts were executed

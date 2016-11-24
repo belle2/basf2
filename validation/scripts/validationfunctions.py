@@ -7,6 +7,7 @@ import timeit
 g_start_time = timeit.default_timer()
 
 import os
+import time
 import glob
 import argparse
 import ROOT
@@ -16,6 +17,20 @@ import subprocess
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
+
+
+def get_timezone():
+    """
+    Returns the correct timezone as short string
+    """
+    tzTuple = time.tzname
+
+    # in some timezones, there is a daylight saving times entry in the second item
+    # of the tuple
+    if time.daylight != 0:
+        return tzTuple[1]
+    else:
+        return tzTuple[0]
 
 
 def get_compact_git_hash(repo_folder):

@@ -440,6 +440,7 @@ def add_tracking_for_PXDDataReduction_simulation(path, components=None, skipGeom
     svd_tracks = '__ROIsvdTracks'
     svd_track_fit_results = "__ROIsvdTrackFitResults"
     svd_reco_tracks = "__ROIsvdRecoTracks"
+    svd_gf_trackcands = '__ROIsvdGFTrackCands'
 
     # SVD ONLY TRACK FINDING
     vxd_trackfinder = path.add_module('VXDTF')

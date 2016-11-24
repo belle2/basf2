@@ -98,7 +98,7 @@ def check_plotting_status(progress_key):
 
 
 # todo: limit the number of running plotting requests and terminate hanging ones
-def start_plotting_request(revision_names):
+def start_plotting_request(revision_names, results_folder):
     """
     Start a new comparison between the supplied revisions
     """
@@ -114,7 +114,11 @@ def start_plotting_request(revision_names):
     qu = Queue()
 
     # start a new process for creating the plots
-    p = Process(target=create_plots, args=(revision_names, False, qu))
+    p = Process(target=create_plots, args=(revision_names, False, qu,
+                                           # go one folder up, because this function
+                                           # expects the work dir, which then contains
+                                           # the results folder
+                                           os.path.dirname(results_folder)))
     p.start()
     g_plottingProcesses[rev_key] = (p, qu, None)
 
@@ -153,7 +157,7 @@ class ValidationRoot(object):
         """
         rev_list = cherrypy.request.json["revision_list"]
         logging.debug('Creating plots for revisions: ' + str(rev_list))
-        progress_key = start_plotting_request(rev_list)
+        progress_key = start_plotting_request(rev_list, self.results_folder)
         return {"progress_key": progress_key}
 
     @cherrypy.expose

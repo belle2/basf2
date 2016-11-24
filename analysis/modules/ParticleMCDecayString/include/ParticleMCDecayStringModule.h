@@ -79,7 +79,7 @@ namespace Belle2 {
 
     std::string m_listName; /**< Name of the particle list **/
 
-    bool m_removeFSR; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
+    bool m_removeRadiativePhotons; /**< If true, final state radiation (FSR) photons are removed from the decay string. */
 
     std::string m_fileName; /**< Filename in which the hash strings are saved, if empty the strings are not saved */
     std::string m_treeName; /**< Tree name in which the hash strings are saved */

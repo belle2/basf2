@@ -35,7 +35,8 @@ namespace Belle2 {
                    "But they just represent 32 bits of a hash!");
     setPropertyFlags(c_ParallelProcessingCertified | c_TerminateInAllProcesses);
     addParam("listName", m_listName, "Particles from these ParticleList are used as input.");
-    addParam("removeFSR", m_removeFSR, "If true, final state radiation (FSR) photons are removed from the decay string.", true);
+    addParam("removeRadiativePhotons", m_removeRadiativePhotons,
+             "If true, radiative photons (ISR, FSR and PHOTOS) are removed from the decay string.", true);
     addParam("fileName", m_fileName, "Filename in which the hash strings are saved, if empty the strings are not saved",
              std::string(""));
     addParam("treeName", m_treeName, "Tree name in which the hash strings are saved", std::string("hashtable"));
@@ -244,7 +245,7 @@ namespace Belle2 {
 
   std::string ParticleMCDecayStringModule::buildMCDecayString(const MCParticle* mcPMother, const MCParticle* mcPMatched)
   {
-    if (m_removeFSR and mcPMother->getPDG() == 22 and MCMatching::isFSR(mcPMother))
+    if (m_removeRadiativePhotons and mcPMother->getPDG() == 22 and MCMatching::isRadiativePhoton(mcPMother))
       return "";
 
     std::stringstream ss;

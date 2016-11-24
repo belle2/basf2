@@ -17,6 +17,12 @@ import numbers
 import queue
 # Load ROOT
 import ROOT
+# In case some ROOT files loaded by the validation scripts contain some RooFit objects,
+# ROOT will auto-load RooFit. Due to some (yet not understood) tear down problem, this results
+# in this errror
+# Fatal in <TClass::SetUnloaded>: The TClass for map<TString,double> is being unloaded when in state 3
+# To prevent this, we are loading RooFit here before ROOT has a chance to do this
+from ROOT import RooFit
 # The pretty printer. Print prettier :)
 import pprint
 import time
@@ -335,7 +341,7 @@ def generate_new_plots(list_of_revisions, work_folder, process_queue=None):
             if process_queue:
                 try:
                     process_queue.put_nowait({"current_package": i, "total_package": len(list_of_packages),
-                                              "package_name": package, "file_name": fileName})
+                                              "status": "running", "package_name": package, "file_name": fileName})
                 except queue.Full:
                     # message could not be placed, but no problem next message will maybe work
                     pass

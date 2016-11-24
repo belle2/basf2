@@ -5,7 +5,7 @@
 // Author : Ryosuke Itoh, IPNS, KEK
 // Date : 16 - Feb - 2015
 //
-// Contributors: Anze Zupanc, Matic Lubej,
+// Contributors: Anze Zupanc, Matic Lubej
 //-
 
 #include <b2bii/modules/B2BIIMdstInput/B2BIIConvertMdstModule.h>
@@ -184,6 +184,9 @@ void B2BIIConvertMdstModule::initializeDataStore()
   StoreArray<ECLCluster> eclClusters;
   eclClusters.registerInDataStore();
 
+  StoreArray<KLMCluster> klmClusters;
+  klmClusters.registerInDataStore();
+
   StoreArray<Track> tracks;
   tracks.registerInDataStore();
 
@@ -205,6 +208,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
   pi0ParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> kShortParticleList("K_S0:mdst");
   kShortParticleList.registerInDataStore();
+  StoreObjPtr<ParticleList> kLongParticleList("K_L0:mdst");
+  kLongParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> lambdaParticleList("Lambda0:mdst");
   lambdaParticleList.registerInDataStore();
   StoreObjPtr<ParticleList> antiLambdaParticleList("anti-Lambda0:mdst");
@@ -224,6 +229,8 @@ void B2BIIConvertMdstModule::initializeDataStore()
   tracks.registerRelationTo(m_pidLikelihoods);
   eclClusters.registerRelationTo(mcParticles);
   eclClusters.registerRelationTo(tracks);
+  klmClusters.registerRelationTo(tracks);
+  klmClusters.registerRelationTo(eclClusters);
   particles.registerRelationTo(mcParticles);
   particles.registerRelationTo(m_pidLikelihoods);
 
@@ -299,20 +306,29 @@ void B2BIIConvertMdstModule::event()
   // 2. Convert ECL information
   convertMdstECLTable();
 
-  // 3. Convert Tracking information
+  // 3. Convert KLM information
+  convertMdstKLMTable();
+
+  // 4. Convert Tracking information
   convertMdstChargedTable();
 
-  // 4. Set ECLCluster -> Track relations
+  // 5. Set ECLCluster -> Track relations
   setECLClustersToTracksRelations();
 
-  // 5. Convert Gamma information
+  // 6. Set KLMCluster -> Track, ECLCluster relations
+  setKLMClustersRelations();
+
+  // 7. Convert Gamma information
   convertMdstGammaTable();
 
-  // 6. Convert Pi0 information
+  // 8. Convert Pi0 information
   convertMdstPi0Table();
 
-  // 7. Convert V0s
+  // 9. Convert V0s
   convertMdstVee2Table();
+
+  // 10. Convert KLong information
+  convertMdstKLongTable();
 }
 
 
@@ -922,6 +938,40 @@ void B2BIIConvertMdstModule::convertMdstECLTable()
   }
 }
 
+
+void B2BIIConvertMdstModule::convertMdstKLMTable()
+{
+  // At this point MCParticles StoreArray should already exist
+  StoreArray<MCParticle> mcParticles;
+
+  // Create ECLCluster StoreArray
+  StoreArray<KLMCluster> klmClusters;
+
+  // There was no MC matching in Belle for KLM Clusters
+
+  // Clear the mdstKlm <-> KLMCluster map
+  mdstKlmToKLMCluster.clear();
+
+  // Loop over all Belle Mdst_klm_cluster
+  Belle::Mdst_klm_cluster_Manager& klm_cluster_manager = Belle::Mdst_klm_cluster_Manager::get_manager();
+
+  for (Belle::Mdst_klm_cluster_Manager::iterator klmC_Ite = klm_cluster_manager.begin(); klmC_Ite != klm_cluster_manager.end();
+       klmC_Ite++) {
+
+    // Pull Mdst_ecl from manager
+    Belle::Mdst_klm_cluster mdstKlm_cluster = *klmC_Ite;
+
+    // Create Belle II ECLCluster
+    auto B2KlmCluster = klmClusters.appendNew();
+
+    // Convert Mdst_klm_cluster -> KLMCluster and create map of indices
+    convertMdstKLMObject(mdstKlm_cluster, B2KlmCluster);
+    mdstKlmToKLMCluster[mdstKlm_cluster.get_ID()] = B2KlmCluster->getArrayIndex();
+
+  }
+}
+
+
 void B2BIIConvertMdstModule::convertMdstGammaTable()
 {
   // At this point ECLClusters and MCParticles StoreArray should already exist
@@ -976,6 +1026,7 @@ void B2BIIConvertMdstModule::convertMdstGammaTable()
   }
 }
 
+
 void B2BIIConvertMdstModule::convertMdstPi0Table()
 {
   // At this point ECLClusters and Particles StoreArray should already exist
@@ -1016,6 +1067,102 @@ void B2BIIConvertMdstModule::convertMdstPi0Table()
     // Add particle to particle list
     plist->addParticle(B2Pi0);
   }
+}
+
+void B2BIIConvertMdstModule::convertMdstKLongTable()
+{
+
+  // panter tables: extrernals/include/belle_legacy/tables
+
+  // At this point KLMClusters and Particles StoreArray should already exist
+  StoreArray<KLMCluster> klmClusters;
+  StoreArray<Particle> particles;
+
+  // At this point MCParticles StoreArray should already exist
+  StoreArray<MCParticle> mcParticles;
+
+  // Relations
+  RelationArray particlesToMCParticles(particles, mcParticles);
+
+
+  // Create and initialize particle list
+  StoreObjPtr<ParticleList> plist("K_L0:mdst");
+  plist.create();
+  plist->initialize(130, "K_L0:mdst");
+
+  Belle::Mdst_klong_Manager& klong_manager = Belle::Mdst_klong_Manager::get_manager();
+  for (Belle::Mdst_klong_Manager::iterator klong_Ite = klong_manager.begin(); klong_Ite != klong_manager.end(); klong_Ite++) {
+
+    // Pull Mdst_klong from manager and Mdst_klm from pointer to Mdst_klm
+    Belle::Mdst_klong mdstKlong = *klong_Ite;
+    Belle::Mdst_klm_cluster mdstKlm = mdstKlong.klmc();
+
+    if (!mdstKlm)
+      continue;
+
+
+    // Get KLMCluster from map
+    KLMCluster* B2KlmCluster = klmClusters[mdstKlmToKLMCluster[mdstKlm.get_ID()]];
+    if (!B2KlmCluster)
+      continue;
+
+    // Extract cluster position from Klong and save it in KLMCluster
+    B2KlmCluster->setClusterPosition(mdstKlong.cos_x(), mdstKlong.cos_y(), mdstKlong.cos_z());
+
+    // Create Particle from KLMCluster, add to StoreArray, create Klong map entry
+    Particle* B2Klong = particles.appendNew(Particle(B2KlmCluster));
+    mdstKlongToParticle[mdstKlong.get_ID()] = B2Klong->getArrayIndex();
+
+    // Add particle to particle list
+    plist->addParticle(B2Klong);
+  }
+
+  // (Vague) MC Matching
+  // There was no MC matching for KLongs in Belle , but a hack:
+  // Check if MC KLong and reconstructed KLong (only without ecl) are within 15 degree for phi and theta, we set a relation
+  // for the best reconstructed KLong to the MC KLong.
+  // Taken and adapted from http://belle.kek.jp/secured/wiki/doku.php?id=physics:ckm:kleff
+
+  if (!m_realData) {
+
+    Belle::Gen_hepevt_Manager& GenMgr = Belle::Gen_hepevt_Manager::get_manager();
+    const double dang(15. / 180.*M_PI); // check reconstructed candidates within 15 degrees
+
+    for (Belle::Gen_hepevt_Manager::iterator klong_hep_it = GenMgr.begin(); klong_hep_it != GenMgr.end(); ++klong_hep_it) {
+
+      if (abs((*klong_hep_it).idhep()) == 130 && klong_hep_it->isthep() > 0) {
+
+        HepLorentzVector gp4(klong_hep_it->PX(), klong_hep_it->PY(), klong_hep_it->PZ(), klong_hep_it->E());
+        double sum(0.0);
+        int bestRecKlongID(0);
+
+        for (Belle::Mdst_klong_Manager::iterator klong_rec_it = klong_manager.begin(); klong_rec_it != klong_manager.end();
+             ++klong_rec_it) {
+
+          //  if((*klong_rec_it).klmc().ecl())continue; // check only klm cand.
+          if ((*klong_rec_it).ecl())
+            continue; // check only klm cand.
+          Hep3Vector klp3(klong_rec_it->cos_x(), klong_rec_it->cos_y(), klong_rec_it->cos_z());
+
+          if (cos(gp4.theta() - klp3.theta()) > cos(dang) && cos(gp4.phi() - klp3.phi()) > cos(dang)) {
+
+            double tmp_sum = cos(gp4.theta() - klp3.theta()) + cos(gp4.phi() - klp3.phi());
+            if (tmp_sum > sum) {
+              bestRecKlongID = mdstKlongToParticle[(*klong_rec_it).get_ID()];
+              sum = tmp_sum;
+            }
+          }
+
+        }
+        if (sum > 0.0) {
+          int matchedMCParticleID = genHepevtToMCParticle[(*klong_hep_it).get_ID()];
+          particlesToMCParticles.add(bestRecKlongID, matchedMCParticleID);
+          testMCRelation((*klong_hep_it), mcParticles[matchedMCParticleID], "particles");
+        }
+      }
+    }
+  }
+
 }
 
 //-----------------------------------------------------------------------------
@@ -1562,6 +1709,15 @@ void B2BIIConvertMdstModule::convertMdstECLObject(const Belle::Mdst_ecl& ecl, co
   eclCluster->setNumberOfCrystals(eclAux.nhits());
 }
 
+
+void B2BIIConvertMdstModule::convertMdstKLMObject(const Belle::Mdst_klm_cluster& klm_cluster, KLMCluster* klmCluster)
+{
+  // note: Belle quality flag is not saved (no free int variable in Belle2 KLMCluster)
+  klmCluster->setLayers(klm_cluster.layers());
+  klmCluster->setInnermostLayer(klm_cluster.first_layer());
+
+}
+
 //-----------------------------------------------------------------------------
 // RELATIONS
 //-----------------------------------------------------------------------------
@@ -1613,6 +1769,33 @@ void B2BIIConvertMdstModule::setECLClustersToTracksRelations()
     }
   }
 }
+
+
+void B2BIIConvertMdstModule::setKLMClustersRelations()
+{
+  StoreArray<Track> tracks;
+  StoreArray<ECLCluster> eclClusters;
+  StoreArray<KLMCluster> klmClusters;
+
+  // Relations
+  RelationArray klmClustersToTracks(klmClusters, tracks);
+  RelationArray klmClustersToEclClusters(klmClusters, eclClusters);
+
+  Belle::Mdst_klm_cluster_Manager& klm_cluster_manager = Belle::Mdst_klm_cluster_Manager::get_manager();
+
+
+  for (Belle::Mdst_klm_cluster_Manager::iterator klmC_Ite = klm_cluster_manager.begin(); klmC_Ite != klm_cluster_manager.end();
+       klmC_Ite++) {
+
+    Belle::Mdst_klm_cluster mdstKlm_cluster = *klmC_Ite;
+    Belle::Mdst_trk mTRK    = mdstKlm_cluster.trk();
+    Belle::Mdst_ecl mECL    = mdstKlm_cluster.ecl();
+
+    if (mTRK) klmClustersToTracks.add(mdstKlm_cluster.get_ID() - 1, mTRK.get_ID() - 1);
+    if (mECL) klmClustersToEclClusters.add(mdstKlm_cluster.get_ID() - 1, mECL.get_ID() - 1);
+  }
+}
+
 
 //-----------------------------------------------------------------------------
 // MISC

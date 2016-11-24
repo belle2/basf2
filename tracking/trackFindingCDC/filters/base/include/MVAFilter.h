@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter based on a tmva method.
+    /// Filter based on a mva method.
     template<class AFilter>
     class MVA : public OnVarSet<AFilter> {
 
@@ -80,7 +80,7 @@ namespace Belle2 {
         return prediction < m_param_cut ? NAN : prediction;
       }
 
-      /// Evaluate the tmva method
+      /// Evaluate the mva method
       virtual double predict(const Object& obj)
       {
         Weight extracted = Super::operator()(obj);

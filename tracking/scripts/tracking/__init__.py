@@ -256,9 +256,9 @@ def add_cdc_track_finding(path, reco_tracks="RecoTracks"):
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilterFirstStepFilter="tmva",
+                    SegmentTrackFilterFirstStepFilter="mva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
-                    TrackFilter="tmva",
+                    TrackFilter="mva",
                     TrackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
@@ -297,6 +297,7 @@ def add_cdc_cr_track_finding(path,
     # Init the geometry for cdc tracking and the hits
     path.add_module("WireHitPreparer",
                     flightTimeEstimation="downwards",
+                    triggerPoint=trigger_point,
                     )
 
     # Find segments and reduce background hits
@@ -329,9 +330,9 @@ def add_cdc_cr_track_finding(path,
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilterFirstStepFilter="tmva",
+                    SegmentTrackFilterFirstStepFilter="mva",
                     SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
-                    TrackFilter="tmva",
+                    TrackFilter="mva",
                     TrackFilterParameters={"cut": 0.1})
 
     # Improve the quality of all tracks and output
@@ -350,7 +351,6 @@ def add_cdc_cr_track_finding(path,
     # Correct time seed - assumes velocity near light speed
     path.add_module("TrackFlightTimeAdjuster",
                     inputTracks="OrientedCDCTrackVector",
-                    triggerPoint=trigger_point,
                     )
 
     # Export CDCTracks to RecoTracks representation

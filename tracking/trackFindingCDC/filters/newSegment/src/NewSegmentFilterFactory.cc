@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
@@ -25,14 +25,11 @@ using namespace TrackFindingCDC;
 
 namespace {
   using AllNewSegmentFilter = AllFilter<BaseNewSegmentFilter>;
-
   using MCNewSegmentFilter =
     MCFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
-
   using RecordingNewSegmentFilter =
     RecordingFilter<VariadicUnionVarSet<NewSegmentTruthVarSet, AdvancedSegmentVarSet>>;
-
-  using TMVANewSegmentFilter = TMVAFilter<AdvancedSegmentVarSet>;
+  using MVANewSegmentFilter = MVAFilter<AdvancedSegmentVarSet>;
 }
 
 NewSegmentFilterFactory::NewSegmentFilterFactory(const std::string& defaultFilterName)
@@ -56,7 +53,7 @@ NewSegmentFilterFactory::getValidFilterNamesAndDescriptions() const
     {"none", "no segment track combination is valid"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"mva", "test with a mva method"}
   };
 }
 
@@ -69,8 +66,8 @@ NewSegmentFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCNewSegmentFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingNewSegmentFilter>("NewSegmentFilter.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVANewSegmentFilter>("NewSegmentFilter");
+  } else if (filterName == "mva") {
+    return makeUnique<MVANewSegmentFilter>("tracking/data/trackfindingcdc_NewSegmentFilter.xml");
   } else {
     return Super::create(filterName);
   }

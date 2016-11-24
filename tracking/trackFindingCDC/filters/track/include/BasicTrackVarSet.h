@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const basicTrackVarNames[] = {
       "size",
@@ -48,30 +48,27 @@ namespace Belle2 {
       "s_range",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a segment.
-     */
-    class BasicTrackVarSetNames : public VarNames<CDCTrack> {
+    /// Vehicle class to transport the variable names
+    struct BasicTrackVarSetNames : public VarNames<CDCTrack> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicTrackVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicTrackVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return basicTrackVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a segment.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a track
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicTrackVarSet : public VarSet<BasicTrackVarSetNames> {
 
     public:
-      /// Generate and assign the variables from the cluster
+      /// Generate and assign the contained variables
       bool extract(const CDCTrack* track) override;
     };
   }

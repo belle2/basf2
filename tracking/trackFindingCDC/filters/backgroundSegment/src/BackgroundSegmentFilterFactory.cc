@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/filters/segment/AdvancedSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/filters/base/TMVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 #include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCFilter.h>
 #include <tracking/trackFindingCDC/filters/base/AllFilter.h>
@@ -24,19 +24,12 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 namespace {
-  /// Filter for filtering out Background Segments, but accepts all segments.
   using AllBackgroundSegmentFilter = AllFilter<BaseBackgroundSegmentFilter>;
-
-  /// MC Filter for filtering out Background Segments.
   using MCBackgroundSegmentFilter =
     MCFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedSegmentVarSet>>;
-
-  /// Recording Filter for filtering out Background Segments.
   using RecordingBackgroundSegmentFilter =
     RecordingFilter<VariadicUnionVarSet<BackgroundSegmentTruthVarSet, AdvancedSegmentVarSet>>;
-
-  /// TMVA Filter for filtering out Background Segments.
-  using TMVABackgroundSegmentFilter = TMVAFilter<AdvancedSegmentVarSet>;
+  using MVABackgroundSegmentFilter = MVAFilter<AdvancedSegmentVarSet>;
 }
 
 BackgroundSegmentFilterFactory::BackgroundSegmentFilterFactory(const std::string& defaultFilterName)
@@ -62,7 +55,7 @@ BackgroundSegmentFilterFactory::getValidFilterNamesAndDescriptions() const
     {"all", "filter out all segments as background"},
     {"truth", "monte carlo truth"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
+    {"mva", "test with a mva method"}
   };
 }
 
@@ -77,8 +70,8 @@ BackgroundSegmentFilterFactory::create(const std::string& filterName) const
     return makeUnique<MCBackgroundSegmentFilter>();
   } else if (filterName == "recording") {
     return makeUnique<RecordingBackgroundSegmentFilter>("BackgroundSegmentFilter.root");
-  } else if (filterName == "tmva") {
-    return makeUnique<TMVABackgroundSegmentFilter>("BackgroundSegmentFilter");
+  } else if (filterName == "mva") {
+    return makeUnique<MVABackgroundSegmentFilter>("tracking/data/trackfindingcdc_BackgroundSegmentFilter.xml");
   } else {
     return Super::create(filterName);
   }

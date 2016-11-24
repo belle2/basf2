@@ -9,16 +9,20 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/UnionRecordingFacetFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facet/FacetVarSets.h>
+#include <tracking/trackFindingCDC/filters/facet/MVAFacetFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet/FitFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+#include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 std::vector<std::string> UnionRecordingFacetFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "fitless", "fit", "bend", "tmva", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "fitless", "bend", "fit", "mva"});
   return varSetNames;
 }
 
@@ -33,8 +37,9 @@ UnionRecordingFacetFilter::createVarSet(const std::string& name) const
     return makeUnique<BendFacetVarSet>();
   } else if (name == "fit") {
     return makeUnique<FitFacetVarSet>();
-  } else if (name == "tmva") {
-    return makeUnique<TMVAFacetVarSet>();
+  } else if (name == "mva") {
+    MVAFacetFilter mvaFacetFilter;
+    return std::move(mvaFacetFilter).releaseVarSet();
   } else {
     return Super::createVarSet(name);
   }

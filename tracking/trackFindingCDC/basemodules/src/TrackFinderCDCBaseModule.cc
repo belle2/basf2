@@ -59,7 +59,7 @@ void TrackFinderCDCBaseModule::event()
     // Somehow it is possible that we receive empty tracks (probably from the LegendreFinder)
     // Drop them before proceding
     std::vector<CDCTrack>& tracks = *storedTracks;
-    auto itLast = std::remove_if(tracks.begin(), tracks.end(), std::mem_fun_ref(&CDCTrack::empty));
+    auto itLast = std::remove_if(tracks.begin(), tracks.end(), std::mem_fn(&CDCTrack::empty));
     tracks.erase(itLast, tracks.end());
   } else {
     storedTracks.create();

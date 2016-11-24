@@ -9,6 +9,8 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/HitGapSegmentRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 

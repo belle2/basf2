@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/UnionRecordingFilter.h>
 
 namespace Belle2 {

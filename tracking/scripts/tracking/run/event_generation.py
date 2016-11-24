@@ -73,8 +73,8 @@ class ReadOrGenerateEventsRun(MinimalRun):
             '-b',
             '--bkg-file',
             dest='bkg_files',
+            nargs='+',
             default=self.bkg_files,
-            action='append',
             metavar='BACKGROUND_DIRECTORY',
             help='Path to folder of files or to a file containing the background to be used. ' +
                  'Can be given multiple times.',

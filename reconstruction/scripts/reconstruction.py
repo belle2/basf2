@@ -44,7 +44,7 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
         all (but you will have to add it on your own then).
     :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
-        the additional fitted hypotheses are muon, kaon and proton, i.e. [11, 321, 2212].
+        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
     """
 
     # Add tracking reconstruction modules

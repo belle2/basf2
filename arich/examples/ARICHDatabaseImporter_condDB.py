@@ -16,7 +16,6 @@ parser.add_option('-c', '--class', dest='whatclass', default='none', help='')
 parser.add_option('-x', '--i-e', dest='importexport', default='export', help='')
 parser.add_option('-h', '--hvtest', dest='hvtest', default='no', help='')
 (options, args) = parser.parse_args()
-option = options.output
 ie = options.importexport
 ieClass = options.whatclass
 hvtest = options.hvtest
@@ -103,7 +102,7 @@ if(ie == 'import'):
     if(ieClass == 'hapdQA'):
         dbImporter.importHapdQA()
     if(ieClass == 'hapdQE'):
-        dbImporter.importHapdQE(option)
+        dbImporter.importHapdQE()
     if(ieClass == 'hapdChipInfo'):
         dbImporter.importHapdChipInfo()
     if(ieClass == 'hapdInfo'):
@@ -130,31 +129,39 @@ if(ie == 'import'):
 if(ie == 'export'):
     dbImporter = ARICHDatabaseImporter()
     if(ieClass == 'aerogelInfo'):
-        dbImporter.exportAerogelInfo(option)
+        dbImporter.exportAerogelInfo()
     if(ieClass == 'hapdQA'):
         dbImporter.exportHapdQA()
     if(ieClass == 'hapdQE'):
-        dbImporter.exportHapdQE(option)
+        dbImporter.exportHapdQE()
     if(ieClass == 'hapdInfo'):
-        dbImporter.exportHapdInfo(option)
+        dbImporter.exportHapdInfo()
     if(ieClass == 'hapdChipInfo'):
-        dbImporter.exportHapdChipInfo(option)
+        dbImporter.exportHapdChipInfo()
     if(ieClass == 'hapd'):
-        dbImporter.exportHapdQA(option)
-        dbImporter.exportHapdQE(option)
-        dbImporter.exportHapdInfo(option)
+        dbImporter.exportHapdQA()
+        dbImporter.exportHapdQE()
+        dbImporter.exportHapdInfo()
     if(ieClass == 'asicInfo'):
         dbImporter.exportAsicInfo()
     if(ieClass == 'febTest'):
-        dbImporter.exportFebTest(option)
+        dbImporter.exportFebTest()
     if(ieClass == 'febInfo'):
         dbImporter.exportFEBoardInfo()
     if(ieClass == 'moduleTest'):
-        dbImporter.exportModuleTest(option, hvtest)
+        dbImporter.exportModuleTest(hvtest)
     if(ieClass == 'sensorMap'):
-        dbImporter.exportSensorModuleMap(option)
+        dbImporter.exportSensorModuleMap()
     if(ieClass == 'all'):
-        dbImporter.exportAll(option)
+        dbImporter.exportAll()
+
+# print parameters used in simulation/reconstruction software
+# dbImporter.printSimulationPar()
+# dbImporter.printModulesInfo()
+# dbImporter.printChannelMapping()
+# dbImporter.printGeometryConfig()
+# dbImporter.dumpQEMap(True)
+# dbImporter.dumpModuleNumbering()
 
 
 # simple example that shows how to read data from database and use it

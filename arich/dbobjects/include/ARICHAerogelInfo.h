@@ -37,7 +37,7 @@ namespace Belle2 {
      * Constructor
      */
     ARICHAerogelInfo(float version, const std::string& serial, const std::string& id, float index, float trlen, float thickness,
-                     std::vector<int> lambda, std::vector<float> transmittance): m_version(version), m_serial(serial), m_id(id),
+                     std::vector<int>& lambda, std::vector<float>& transmittance): m_version(version), m_serial(serial), m_id(id),
       m_refractiveIndex(index), m_transmissionLength(trlen), m_thickness(thickness), m_lambda(lambda), m_transmittance(transmittance),
       m_comment("") {};
 

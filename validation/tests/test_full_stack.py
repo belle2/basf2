@@ -21,7 +21,7 @@ validation_url = "http://localhost:8000/"
 def start_webserver():
     """
     Start the validation server process, this will not
-    return. Therefor this function must be started within
+    return. Therefore this function must be started within
     a new subprocess
     """
     validationserver.run_server()

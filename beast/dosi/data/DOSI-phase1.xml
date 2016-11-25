@@ -13,16 +13,16 @@
     <!-- we can also have arrays as parameters which makes it easy to get a
          number of values as vector<double>.  The numbers can be divided by
          whitespace, comma or semi-colon -->
-    <bar unit="mm">1 2 3 4 5 6 7 8 
+    <bar unit="mm">1 2 3 4
     </bar>
 
     <Active>
       <Material>DOSI-Material</Material>
       <ThetaZ unit="deg">0.0</ThetaZ>
       <Phi unit="deg">45.</Phi>
-      <dx_scint unit="cm">5.0</dx_scint>
-      <dy_scint unit="cm">5.0</dy_scint>
-      <dz_scint unit="cm">5.0</dz_scint>
+      <dx_dosi unit="cm">5.0</dx_dosi>
+      <dy_dosi unit="cm">5.0</dy_dosi>
+      <dz_dosi unit="cm">5.0</dz_dosi>
       <z unit="cm">0,0,0,0</z>
       <r unit="cm">10, 40, 60, 120</r>
     </Active>

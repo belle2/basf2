@@ -20,6 +20,8 @@
 #include <tracking/trackFindingCDC/utilities/Range.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
 #include <map>
 #include <memory>

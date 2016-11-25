@@ -12,8 +12,8 @@
 #include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <framework/core/ModuleParamList.h>
-#include <framework/logging/Logger.h>
+// #include <framework/core/ModuleParamList.h>
+// #include <framework/logging/Logger.h>
 
 #include <string>
 #include <map>

@@ -23,10 +23,6 @@ namespace Belle2 {
       using Super = BaseSegmentPairRelationFilter;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
 
       Weight

@@ -148,6 +148,10 @@ namespace Belle2 {
      *  @ return   index of corner within pattern */
     unsigned bottomLeftCorner(unsigned pattern);
 
+    /** Find all hits whose Hough curve crosses the rectangle
+     *  with corners (x1, y1) and (x2, y2) and add the hit indices to list. */
+    void findAllCrossingHits(std::vector<unsigned>& list,
+                             double x1, double x2, double y1, double y2);
     /** Select one hit per super layer.
      *  @param list        input list of hit Ids
      *  @param selected    selected hit Ids are added to selected

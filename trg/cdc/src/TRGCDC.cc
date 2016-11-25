@@ -1150,7 +1150,8 @@ namespace Belle2 {
             h.dump("detail", TRGDebug::tab(4));
           }
         } else {
-          const unsigned n = 10;
+          unsigned n = 10;
+          if (n > _hits.size()) n = _hits.size();
           cout << TRGDebug::tab() << "Dump of the first " << n
                << " hits of a wire" << endl;
           for (unsigned i = 0; i < n; i++) {

@@ -194,6 +194,7 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
   free(m_Solids.psheet);
   free(m_LogVol.psheet);
   free(m_LogVol.segment);
+  free(m_Solids.stripSegment);
   free(m_LogVol.stripSegment);
   free(m_Solids.stripvol);
   free(m_LogVol.stripvol);

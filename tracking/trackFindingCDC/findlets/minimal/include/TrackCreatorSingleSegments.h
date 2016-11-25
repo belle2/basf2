@@ -56,7 +56,7 @@ namespace Belle2 {
        *
        *  Defaults to empty map, meaning no segments are promoted.
        */
-      std::map<ISuperLayer, size_t> m_param_minimalHitsForSingleSegmentTrackBySuperLayerId{};
+      std::map<ISuperLayer, size_t> m_param_minimalHitsBySuperLayerId;
     };
   }
 }

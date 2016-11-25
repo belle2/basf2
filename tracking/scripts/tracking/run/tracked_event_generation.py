@@ -177,7 +177,11 @@ finder_modules_by_short_name = {
     'TrackFinderCDCLegendre': lambda path: (path.add_module('WireHitPreparer'),
                                             path.add_module('TrackFinderCDCLegendreTracking')),
     'SegmentFinderCDC': lambda path: (path.add_module('WireHitPreparer'),
-                                      path.add_module('SegmentFinderCDCFacetAutomaton')),
+                                      path.add_module('SegmentFinderCDCFacetAutomaton'),
+                                      path.add_module('TrackCreatorSingleSegments',
+                                                      MinimalHitsBySuperLayerId={sl_id: 0 for sl_id in range(9)}),
+                                      path.add_module('TrackExporter'),
+                                      ),
 }
 
 

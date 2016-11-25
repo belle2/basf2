@@ -593,12 +593,12 @@ namespace Belle2 {
     hitPatternInformation.Clear();
 
     StoreArray<CDCSimHit> SimHits;
-    if (! SimHits) {
+    if (! SimHits.getEntries()) {
       //cout << "CDCTRGTSF !!! can not access to CDCSimHits" << endl;
       return;
     }
     StoreArray<MCParticle> mcParticles;
-    if (! mcParticles) {
+    if (! mcParticles.getEntries()) {
       //cout << "CDCTRGTSF !!! can not access to MCParticles" << endl;
       return;
     }

@@ -113,7 +113,7 @@ void DosiStudyModule::event()
     int detNB = SimHit.getCellId();
     double Edep = SimHit.getEnergyDep() * 1e3; //GeV -> MeV
     h_dosi_edep0[detNB]->Fill(Edep);
-    int pdg = Hit.getPDGCode();
+    int pdg = SimHit.getPDGCode();
     h_dosi_edep1[detNB]->Fill(Edep);
     if (0.01 < Edep && Edep < 10.0 && (fabs(pdg) == 11 || pdg == 22)) h_dosi_edep2[detNB]->Fill(Edep);
     if (0.01 < Edep && Edep < 10.0 && pdg == 2112) h_dosi_edep3[detNB]->Fill(Edep);

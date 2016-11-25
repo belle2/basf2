@@ -70,7 +70,7 @@ void DosiStudyModule::defineHisto()
     h_dosi_edep0[i] = new TH1F(TString::Format("dosi_edep0_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_dosi_edep1[i] = new TH1F(TString::Format("dosi_edep1_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
     h_dosi_edep2[i] = new TH1F(TString::Format("dosi_edep2_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
-    h_dosi_edep3[i] = new TH1F(TString::Format("dosi_edep2_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
+    h_dosi_edep3[i] = new TH1F(TString::Format("dosi_edep3_%d", i), "Energy deposited [MeV]", 5000, 0., 400.);
 
     h_dosi_edep0[i]->Sumw2();
     h_dosi_edep1[i]->Sumw2();
@@ -112,20 +112,20 @@ void DosiStudyModule::event()
   for (const auto& SimHit : SimHits) {
     int detNB = SimHit.getCellId();
     double Edep = SimHit.getEnergyDep() * 1e3; //GeV -> MeV
-
     h_dosi_edep0[detNB]->Fill(Edep);
+    int pdg = Hit.getPDGCode();
+    h_dosi_edep1[detNB]->Fill(Edep);
+    if (0.01 < Edep && Edep < 10.0 && (fabs(pdg) == 11 || pdg == 22)) h_dosi_edep2[detNB]->Fill(Edep);
+    if (0.01 < Edep && Edep < 10.0 && pdg == 2112) h_dosi_edep3[detNB]->Fill(Edep);
   }
-
+  /*
   //Loop over DigiHit
   for (const auto& Hit : Hits) {
     int detNB = Hit.getCellId();
     double Edep = Hit.getEnergyDep() * 1e3; //GeV -> MeV
-    int pdg = Hit.getPDGCode();
-    h_dosi_edep1[detNB]->Fill(Edep);
-    if (0.01 < Edep && Edep < 10 && (fabs(pdg) == 11 || pdg == 22)) h_dosi_edep2[detNB]->Fill(Edep);
-    if (0.01 < Edep && Edep < 10 && pdg == 2112) h_dosi_edep3[detNB]->Fill(Edep);
-  }
 
+  }
+  */
 }
 /*
 //read tube centers, impulse response, and garfield drift data filename from DOSI.xml

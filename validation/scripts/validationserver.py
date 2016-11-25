@@ -317,14 +317,6 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
     if os.environ.get('BELLE2_RELEASE', None) is None:
         sys.exit('Error: No basf2 release set up!')
 
-    # Go to the html directory
-    if not os.path.exists('html'):
-        os.mkdir('html')
-    os.chdir('html')
-
-    if not os.path.exists('plots'):
-        os.mkdir('plots')
-
     cherry_config = dict()
     # just empty, will be filled below
     cherry_config["/"] = {}
@@ -356,6 +348,23 @@ def run_server(ip='127.0.0.1', port=8000, parseCommandLine=False, openSite=False
 
     logging.info("Serving static content from {}".format(static_folder))
     logging.info("Serving result content and plots from {}".format(cwd_folder))
+
+    # check if the results folder exists and has at least one folder
+    if not os.path.isdir(results_folder):
+        sys.exit("Result folder {} does not exist, run validate_basf2 first to create validation output".format(results_folder))
+
+    results_count = sum([os.path.isdir(os.path.join(results_folder, f)) for f in os.listdir(results_folder)])
+    if results_count == 0:
+        sys.exit("Result folder {} contains no folders, " +
+                 "run validate_basf2 first to create validation output".format(results_folder))
+
+    # Go to the html directory
+    if not os.path.exists('html'):
+        os.mkdir('html')
+    os.chdir('html')
+
+    if not os.path.exists('plots'):
+        os.mkdir('plots')
 
     # export js, css and html templates
     cherry_config["/static"] = {

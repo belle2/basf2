@@ -11,9 +11,13 @@
 
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
 
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCFacet;
 
     /// Class filtering the neighborhood of facets based on chi2 from a fit both facets.
     class Chi2FacetRelationFilter : public BaseFacetRelationFilter {
@@ -21,10 +25,6 @@ namespace Belle2 {
     private:
       /// Type of the super class
       using Super = BaseFacetRelationFilter;
-
-    public:
-      /// Importing all overloads from the super class
-      using Super::operator();
 
     public:
       /// Constructor with the default chi2 cut value and width parameter
@@ -47,7 +47,6 @@ namespace Belle2 {
 
       /// Memory for the width parameter to translate the chi2 value to a weight penatlity
       double m_param_penaltyWidth = 200; // first guess was 800;
-
     };
   }
 }

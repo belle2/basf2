@@ -9,23 +9,22 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet/MCFacetFilter.h>
+
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCFacet;
 
     /// Class filtering the neighborhood of facets with monte carlo information
-    class MCFacetRelationFilter : public MCSymmetricFilterMixin<BaseFacetRelationFilter > {
+    class MCFacetRelationFilter : public MCSymmetricFilterMixin<BaseFacetRelationFilter> {
 
     private:
       /// Type of the super class
-      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter >;
-
-    public:
-      /// Importing all overloads from the super class
-      using Super::operator();
+      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter>;
 
     public:
       /**
@@ -52,7 +51,6 @@ namespace Belle2 {
     private:
       /// Monte Carlo cell filter to reject neighborhoods have false cells
       MCFacetFilter m_mcFacetFilter;
-
     };
   }
 }

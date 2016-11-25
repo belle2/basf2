@@ -645,6 +645,7 @@ namespace Belle2 {
 
   bool BFieldComponentBeamline::isInRange(const TVector3& p) const
   {
+    if (!m_ler || !m_her) return false;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
     vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
     double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;

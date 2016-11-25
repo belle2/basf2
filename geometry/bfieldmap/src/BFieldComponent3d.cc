@@ -185,10 +185,11 @@ namespace {
 
 TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 {
-  auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> int {
+  auto getPhiIndexWeight = [this](double y, double x, double & wphi) -> unsigned int {
     double phi = fast_atan2_minimax<4>(y, x);
     wphi = phi * m_igridPitch[1];
-    int iphi = wphi;
+    unsigned int iphi = static_cast<unsigned int>(wphi);
+    iphi = min(iphi, static_cast<unsigned int>(m_mapSize[1] - 2));
     wphi -= iphi;
     return iphi;
   };
@@ -204,7 +205,7 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
 
   double z = point.z();
   // Check if the point lies inside the magnetic field boundaries
-  if (z <= m_mapRegionZ[0] || z >= m_mapRegionZ[1]) return B;
+  if (z < m_mapRegionZ[0] || z > m_mapRegionZ[1]) return B;
 
   double r2 = point.Perp2();
   // Check if the point lies inside the magnetic field boundaries
@@ -213,20 +214,26 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
   if (m_exRegion && (z >= m_exRegionZ[0]) && (z < m_exRegionZ[1]) &&
       (r2 >= m_exRegionR[0]*m_exRegionR[0]) && (r2 < m_exRegionR[1]*m_exRegionR[1])) return B;
 
+  // Calculate the lower index of the point in the Z grid
+  // Note that z coordinate is inverted to match ANSYS frame
+  double wz = (m_mapRegionZ[1] - z) * m_igridPitch[2];
+  unsigned int iz = static_cast<int>(wz);
+  iz = min(iz, static_cast<unsigned int>(m_mapSize[2] - 2));
+  wz -= iz;
+
   if (r2 > 0) {
     double r = sqrt(r2);
-    double ay = std::abs(point.y());
-    // Calculate the lower index of the point in the grid
-    double wr   = (r - m_mapRegionR[0]) * m_igridPitch[0];
-    double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
 
-    double wphi;
-    unsigned int ir   = static_cast<int>(wr);
-    unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
-    unsigned int iz   = static_cast<int>(wz);
-
+    // Calculate the lower index of the point in the R grid
+    double wr = (r - m_mapRegionR[0]) * m_igridPitch[0];
+    unsigned int ir = static_cast<unsigned int>(wr);
+    ir = min(ir, static_cast<unsigned int>(m_mapSize[0] - 2));
     wr -= ir;
-    wz -= iz;
+
+    // Calculate the lower index of the point in the Phi grid
+    double ay = std::abs(point.y());
+    double wphi;
+    unsigned int iphi = getPhiIndexWeight(ay, point.x(), wphi);
 
     // Get B-field values from map
     vector3_t b = interpolate(ir, iphi, iz, wr, wphi, wz); // in cylindrical system
@@ -236,15 +243,9 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
     if (point.y() < 0) bc.y = -bc.y;
     B.SetXYZ(bc.x, bc.y, bc.z);
   } else {
-    double wz   = (m_mapRegionZ[1] - z) * m_igridPitch[2];
-    unsigned int iz   = static_cast<int>(wz);
-    if (iz + 1 >= (unsigned int)(m_mapSize[2])) return B;
-    wz   -= iz;
-
     // Get B-field values from map
     vector3_t b = interpolate(0, 0, iz, 0, 0, wz); // in cylindrical system
-    vector3_t bc = {b.x, b.y, b.z}; // in cartesian system
-    B.SetXYZ(bc.x, bc.y, bc.z);
+    B.SetXYZ(b.x, b.y, b.z);// in cartesian system assuming phi=0, so Bx = Br and By = Bphi
   }
 
   return B;

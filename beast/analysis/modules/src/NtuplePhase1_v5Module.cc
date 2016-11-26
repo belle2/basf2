@@ -214,8 +214,8 @@ namespace Belle2 {
             for (int j = 0; j < he->GetNbinsX(); j++) {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
-              double esumbin = va * co / step;
-              esum += esumbin;
+              double esumbin = va * co;
+              esum += esumbin / step;
               if (HistoDoseName.Contains("csi_energy")) {
                 if (fileName.Contains("HER")) {
                   if (fileName.Contains("Touschek")) m_input_HT_CSI_dose_binE.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -351,8 +351,8 @@ namespace Belle2 {
               for (int j = 0; j < he->GetNbinsX(); j++) {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
-                double esumbin = va * co / step;
-                esum += esumbin;
+                double esumbin = va * co;
+                esum += esumbin / step;
                 if (HistoDoseName.Contains("csi_energy")) {
                   if (fileName.Contains("HER")) {
                     if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV

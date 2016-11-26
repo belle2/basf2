@@ -26,6 +26,24 @@ using namespace std;
 using namespace Belle2;
 namespace io = boost::iostreams;
 
+/** Linear search with a sentinel at the end of the sequence. It
+ * should be faster than a binary search in short arrays.
+ *
+ * @param it  starting iterator
+ * @param val  key
+ * @param comp  compare function
+ * @return    points to element which first makes comp(val,*it) true
+ */
+template <class ForwardIterator, class T, class Compare>
+ForwardIterator linear_sentinel(ForwardIterator it, const T& val, Compare comp)
+{
+  do {
+    if (comp(val, *it)) break;
+    ++it;
+  } while (1);
+  return it;
+}
+
 void BFieldComponentQuad::initialize()
 {
   // check if input name is not empty
@@ -136,6 +154,7 @@ void BFieldComponentQuad::initialize()
       r.push_back(t);
       m_maxr2 = max(m_maxr2, t.r);
     }
+    r.push_back({numeric_limits<double>::infinity(), m_maxr2});
     return r;
   };
 
@@ -147,104 +166,6 @@ void BFieldComponentQuad::initialize()
   m_al = readAperturePoints(apertFileLER);
 
   m_maxr2 *= m_maxr2;
-
-  /** range filled by lense structure */
-  struct range_t {double r0, r1;};
-  typedef vector<range_t> ranges_t;
-
-  /** calculate ranges where quadruple lenses continously fill the beamline
-   *
-   * @param v lense vector
-   * @return  vector of ranges
-   */
-  auto getranges = [](const vector<ParamPoint>& v) {
-    ranges_t r;
-    double s0 = v[0].s, smax = v.back().s + v.back().L;
-    for (int i = 0, N = v.size(); i < N - 1; i++) {
-      const ParamPoint& t0 = v[i], t1 = v[i + 1];
-      double sn = t0.s + t0.L;
-      if (abs(sn - t1.s) > 1e-10) {
-        r.push_back({s0, sn});
-        s0 = t1.s;
-      }
-    }
-    r.push_back({s0, smax});
-    return r;
-  };
-
-  ranges_t ranges_her  = getranges(params_her);
-  ranges_t ranges_herl = getranges(params_herl);
-  ranges_t ranges_ler  = getranges(params_ler);
-
-  /** merge overlaped ranges in case we have several lense maps like in HER + leakage
-   *
-   * @param r0  vector of ranges
-   * @param r1  vector of ranges
-   * @return    vector of ranges
-   */
-  auto mergeranges = [](const ranges_t& r0, const ranges_t& r1) {
-    ranges_t r = r0; r.insert(r.end(), r1.begin(), r1.end());
-    for (auto it = r.begin(); it != r.end(); ++it) {
-      for (auto jt = it + 1; jt != r.end();) {
-        if (it->r1 >= jt->r0 and jt->r1 >= it->r0) {
-          double smin = min(it->r0, jt->r0);
-          double smax = max(it->r1, jt->r1);
-          *it = {smin, smax};
-          jt = r.erase(jt);
-        } else {
-          ++jt;
-        }
-      }
-    }
-    return r;
-  };
-  ranges_her = mergeranges(ranges_her, ranges_herl);
-
-  /**
-   * Returns the beam pipe aperture at given position.
-   *
-   * @param s   position in the beam-axis coordinate.
-   * @param ap  aperture vector
-   * @return    beam pipe aperture at given position.
-   */
-  auto getr = [](double s, const vector<ApertPoint>& ap) -> double {
-    auto it0 = upper_bound(ap.begin(), ap.end(), s, [](double s, const ApertPoint & b) {return s < b.s;});
-    if (it0 == ap.begin() || it0 == ap.end()) return 0;
-    const ApertPoint& p0 = *(it0 - 1), &p1 = *it0;
-    double r = p0.r + (s - p0.s) / (p1.s - p0.s) * (p1.r - p0.r);
-    return r;
-  };
-
-  /** zero aperture in case of lense absence
-   *
-   * @param ap aperture vector to update
-   * @param v  ranges where lenses are present
-   */
-  auto update_aperture = [getr](vector<ApertPoint>& ap, const ranges_t& v) -> void {
-    auto less = [](double s, const ApertPoint & b) {return s < b.s;};
-    double smin = v.front().r0;
-    ap.insert(upper_bound(ap.begin(), ap.end(), smin, less), {smin, getr(smin, ap)});
-    ap.erase(std::remove_if(ap.begin(), ap.end(), [smin](const ApertPoint & b) {return b.s < smin;}), ap.end());
-    for (auto it = v.begin(); it + 1 != v.end(); it++)
-    {
-      double s0 = it->r1, s1 = (it + 1)->r0;
-      double r0 = getr(s0, ap);
-      double r1 = getr(s1, ap);
-      auto it0 = upper_bound(ap.begin(), ap.end(), s0, less);
-      it0 = ap.insert(it0, {s0, 0});
-      it0 = ap.insert(it0, {s0, r0});
-      auto it1 = upper_bound(ap.begin(), ap.end(), s1, less);
-      it1 = ap.insert(it1, {s1, r1});
-      it1 = ap.insert(it1, {s1, 0});
-      ap.erase(std::remove_if(ap.begin(), ap.end(), [s0, s1](const ApertPoint & b) {return s0 < b.s && b.s < s1;}), ap.end());
-    }
-    double smax = v.back().r1;
-    ap.insert(upper_bound(ap.begin(), ap.end(), smax, less), {smax, getr(smax, ap)});
-    ap.erase(std::remove_if(ap.begin(), ap.end(), [smax](const ApertPoint & b) {return smax < b.s;}), ap.end());
-  };
-
-  update_aperture(m_ah, ranges_her);
-  update_aperture(m_al, ranges_ler);
 
   const int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
 
@@ -305,8 +226,8 @@ void BFieldComponentQuad::initialize()
   const double p0_HER = 7.0e+9 / c, p0_LER = 4.0e+9 / c;
 
   m_h3 = proc3(params_her, p0_HER);
-  m_l3 = proc3(params_ler, p0_LER);
   vector<ParamPoint3> hleak3 = proc3(params_herl, p0_HER);
+  m_l3 = proc3(params_ler, p0_LER);
 
   /** In case several maps in the same position we can simply
    * sum up all matricies since magnetic field has superposition
@@ -322,64 +243,95 @@ void BFieldComponentQuad::initialize()
       auto i = upper_bound(v.begin(), v.end(), t.s, [](double s, const ParamPoint3 & b) {return s < b.s;});
       if (i == v.end()) continue;
       ParamPoint3& p = *(i - 1);
-      if (p.s == t.s && p.L == t.L) {
-        p.mxx += t.mxx;
-        p.mxy += t.mxy;
-        p.mx0 += t.mx0;
-        p.myx += t.myx;
-        p.myy += t.myy;
-        p.my0 += t.my0;
-      } else {
+      if (p.s == t.s && p.L == t.L)
+        p += t;
+      else
         v.insert(i, t);
-      }
     }
   };
   merge(m_h3, hleak3);
 
-  /** Since in any case we are going to calculate aperture of a
-   * beamline we can precompute range of the field map which
-   * corresponds to aperture range already fetched to narrow search of
-   * a particular lense in the range.
+  /** calculate ranges where quadrupole lenses continously fill the
+   * beamline
    *
-   * @param ap   aperture map
-   * @param v    field map
-   * @return     vector with field map ranges
+   * @param v lense vector
+   * @return  vector of ranges
    */
-  auto make_index = [](const vector<ApertPoint>& ap, const vector<ParamPoint3>& v) {
-    vector<irange_t> res;
-    for (auto it = ap.begin(); it + 1 != ap.end(); it++) {
-      const ApertPoint& p0 = *it, &p1 = *(it + 1);
-      if (p0.r > 0 && p1.r > 0) {
-        short int i0 = upper_bound(v.begin(), v.end(), p0.s, [](double s, const ParamPoint3 & b) {return s < b.s;}) - v.begin();
-        short int i1 = upper_bound(v.begin(), v.end(), p1.s, [](double s, const ParamPoint3 & b) {return s < b.s;}) - v.begin();
-        res.push_back({i0, i1});
-      } else {
-        res.push_back({0, 0});
+  auto getranges = [](const vector<ParamPoint3>& v) {
+    ranges_t r;
+    double s0 = v[0].s, smax = v.back().s + v.back().L;
+    for (int i = 0, N = v.size(); i < N - 1; i++) {
+      const ParamPoint3& t0 = v[i], t1 = v[i + 1];
+      double sn = t0.s + t0.L;
+      if (abs(sn - t1.s) > 1e-10) {
+        r.push_back({s0, sn});
+        s0 = t1.s;
       }
+    }
+    r.push_back({s0, smax});
+    return r;
+  };
+
+  m_ranges_her  = getranges(m_h3);
+  m_ranges_ler  = getranges(m_l3);
+
+  const double inf = numeric_limits<double>::infinity();
+  // add sentinels
+  m_ranges_her.insert(m_ranges_her.begin(), { -inf, -inf});
+  m_ranges_her.insert(m_ranges_her.end(), {inf, inf});
+  m_ranges_ler.insert(m_ranges_ler.begin(), { -inf, -inf});
+  m_ranges_ler.insert(m_ranges_ler.end(), {inf, inf});
+
+  /** associate ranges with the vector of aperture points
+   *
+   * @param ap the vector of aperture points
+   * @param v  the vector of ranges
+   * @return   the vector of iterators for more effective search
+   */
+  auto associate_aperture = [](const vector<ApertPoint>& ap, const ranges_t& v) {
+    auto less = [](double s, const ApertPoint & b) {return s < b.s;};
+    vector<std::vector<ApertPoint>::const_iterator> res;
+    for (auto r : v) {
+      auto i0 = upper_bound(ap.begin(), ap.end(), r.r0, less);
+      if (i0 == ap.begin() || i0 == ap.end()) continue;
+      res.push_back(i0 - 1);
     }
     return res;
   };
+  m_offset_ap_her = associate_aperture(m_ah, m_ranges_her);
+  m_offset_ap_ler = associate_aperture(m_al, m_ranges_ler);
 
-  m_indexh = make_index(m_ah, m_h3);
-  m_indexl = make_index(m_al, m_l3);
+  /** associate ranges with the vector of lenses
+   *
+   * @param ap the vector of lenses
+   * @param v  the vector of ranges
+   * @return   the vector of iterators which points to the begining of the continous area of lenses
+   */
+  auto associate_lenses = [](const vector<ParamPoint3>& ap, const ranges_t& v) {
+    vector<std::vector<ParamPoint3>::const_iterator> res;
+    for (auto r : v) {
+      auto i0 = find_if(ap.begin(), ap.end(), [r](const ParamPoint3 & b) {return abs(b.s - r.r0) < 1e-10;});
+      if (i0 == ap.end()) continue;
+      res.push_back(i0);
+    }
+    return res;
+  };
+  m_offset_pp_her = associate_lenses(m_h3, m_ranges_her);
+  m_offset_pp_ler = associate_lenses(m_l3, m_ranges_ler);
 }
 
 double BFieldComponentQuad::getApertureHER(double s) const
 {
-  auto less = [](double s, const ApertPoint & b) {return s < b.s;};
-  const auto it = upper_bound(m_ah.begin(), m_ah.end(), s, less);
-  if (it == m_ah.begin() || it == m_ah.end()) return 0;
-  const ApertPoint& p1 = *(it - 1), &p2 = *it;
-  return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
+  int i = getRange(s, m_ranges_her);
+  if (i < 0) return 0;
+  return getAperture(s, m_offset_ap_her[i]);
 }
 
 double BFieldComponentQuad::getApertureLER(double s) const
 {
-  auto less = [](double s, const ApertPoint & b) {return s < b.s;};
-  const auto it = upper_bound(m_al.begin(), m_al.end(), s, less);
-  if (it == m_al.begin() || it == m_al.end()) return 0;
-  const ApertPoint& p1 = *(it - 1), &p2 = *it;
-  return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
+  int i = getRange(s, m_ranges_ler);
+  if (i < 0) return 0;
+  return getAperture(s, m_offset_ap_ler[i]);
 }
 
 struct vector3_t {
@@ -387,27 +339,26 @@ struct vector3_t {
   inline double rho2() const {return x * x + y * y;}
 };
 
+int BFieldComponentQuad::getRange(double s, const ranges_t& r) const
+{
+  auto it0 = r.begin() + 1;
+  auto it = linear_sentinel(it0, s, [](double s, const range_t& r) {return s <= r.r0;});
+  if (s > (--it)->r1) return -1;
+  return it - it0;
+}
+
+double BFieldComponentQuad::getAperture(double s, std::vector<ApertPoint>::const_iterator jt0) const
+{
+  auto jt = linear_sentinel(jt0, s, [](double s, const ApertPoint & r) {return s <= r.s;});
+  const ApertPoint& p1 = *(jt - 1), &p2 = *jt;
+  return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
+}
+
 TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 {
   const double sa = sin(0.0415), ca = cos(0.0415);
-  int indx;
-  auto getAperture = [&indx](double s, const vector<ApertPoint>& ap) {
-    auto less = [](double s, const ApertPoint & b) {return s < b.s;};
-    const auto it = upper_bound(ap.begin(), ap.end(), s, less);
-    if (it == ap.begin() || it == ap.end()) return 0.0;
-    indx = it - ap.begin();
-    const ApertPoint& p1 = *(it - 1), &p2 = *it;
-    return p1.r + (p2.r - p1.r) / (p2.s - p1.s) * (s - p1.s);
-  };
-
-  auto find = [&indx](double s, const vector<ParamPoint3>& v, const vector<irange_t>& a) -> vector<ParamPoint3>::const_iterator {
-    const auto it = upper_bound(v.begin() + a[indx - 1].i0, v.begin() + a[indx - 1].i1, s, [](double s, const ParamPoint3 & b) {return s < b.s;});
-    if (it == v.begin()) return v.end();
-    return it - 1;
-  };
-
   //assume point is given in [cm]
-  TVector3 B(0, 0, 0);
+  TVector3 B(0, 0, 0); //return B;
 
   vector3_t v = {point.x(), point.y(), point.z()};
   double xc = v.x * ca, zs = v.z * sa, zc = v.z * ca, xs = v.x * sa;
@@ -418,33 +369,28 @@ TVector3 BFieldComponentQuad::calculate(const TVector3& point) const
 
   if (r2h < r2l) { /* the point is closer to HER*/
     if (r2h < m_maxr2) { /* within max radius */
-      double r = getAperture(vh.z, m_ah);
+      double s = vh.z;
+      int i = getRange(s, m_ranges_her);
+      if (i < 0) return B;
+      double r = getAperture(s, m_offset_ap_her[i]);
       if (r2h < r * r) {
-        const auto it = find(vh.z, m_h3, m_indexh);
-        if (it != m_h3.end()) {
-          double Bx = it->getBx(vh.x, vh.y);
-          double By = it->getBy(vh.x, vh.y);
-          B.SetXYZ(Bx * ca, -By, -Bx * sa); // to the detector frame
-        }
+        auto kt = m_offset_pp_her[i] + static_cast<unsigned int>(s - m_ranges_her[i + 1].r0);
+        double Bx = kt->getBx(vh.x, vh.y), By = kt->getBy(vh.x, vh.y);
+        B.SetXYZ(Bx * ca, -By, -Bx * sa); // to the detector frame
       }
     }
   } else {      /* the point is closer to LER*/
     if (r2l < m_maxr2) { /* within max radius */
-      double r = getAperture(vl.z, m_al);
+      double s = vl.z;
+      int i = getRange(s, m_ranges_ler);
+      if (i < 0) return B;
+      double r = getAperture(s, m_offset_ap_ler[i]);
       if (r2l < r * r) {
-        const auto it = find(vl.z, m_l3, m_indexl);
-        if (it != m_l3.end()) {
-          double Bx = it->getBx(vl.x, vl.y);
-          double By = it->getBy(vl.x, vl.y);
-          B.SetXYZ(Bx * ca, -By, Bx * sa); // to the detector frame
-        }
+        auto kt = m_offset_pp_ler[i] + static_cast<unsigned int>(s - m_ranges_ler[i + 1].r0);
+        double Bx = kt->getBx(vl.x, vl.y), By = kt->getBy(vl.x, vl.y);
+        B.SetXYZ(Bx * ca, -By, Bx * sa); // to the detector frame
       }
     }
   }
-
   return B;
-}
-
-void BFieldComponentQuad::terminate()
-{
 }

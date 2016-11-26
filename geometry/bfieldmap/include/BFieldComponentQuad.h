@@ -34,6 +34,11 @@ namespace Belle2 {
   class BFieldComponentQuad : public BFieldComponentAbs {
 
   public:
+    /** Range data structure. */
+    struct range_t {
+      double r0, r1; /**< min and max of the range */
+    };
+    typedef std::vector<range_t> ranges_t;
 
     /** Aperture data structure. */
     struct ApertPoint {
@@ -66,6 +71,17 @@ namespace Belle2 {
        * @return  The Y component of magnetic field vector at the given space point in [T].
        */
       inline double getBy(double x, double y) const {return x * myx + y * myy + my0;}
+
+      ParamPoint3& operator +=(const ParamPoint3& t)
+      {
+        mxx += t.mxx;
+        mxy += t.mxy;
+        mx0 += t.mx0;
+        myx += t.myx;
+        myy += t.myy;
+        my0 += t.my0;
+        return *this;
+      }
     };
 
     /** start and stop indicies to narrow search in array */
@@ -90,12 +106,6 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T]. Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
     virtual TVector3 calculate(const TVector3& point) const;
-
-    /**
-     * Terminates the magnetic field component.
-     * This method closes the magnetic field map file.
-     */
-    virtual void terminate();
 
     /**
      * Returns the HER beam pipe aperture at given position.
@@ -142,6 +152,22 @@ namespace Belle2 {
     void setApertSize(int sizeHER, int sizeLER) { m_apertSizeHER = sizeHER; m_apertSizeLER = sizeLER; }
 
   private:
+    /** Search for range occuped by optics since now only for ranges are present use linear search
+     *
+     * @param a   cooridinate along beamline
+     * @param b   vector with ranges with sentinel at the begining and the end
+     * @return    the range number if out of ranges return -1
+     */
+    inline int getRange(double a, const ranges_t& b) const;
+
+    /** Returns the beam pipe aperture at given position. Small number of points again linear search.
+     *
+     * @param s    The position in beam-axis coordinate.
+     * @param hint Start search from this position
+     * @return     The beam pipe aperture at given position.
+     */
+    inline double getAperture(double s, std::vector<ApertPoint>::const_iterator hint) const;
+
     /** Magnetic field map of HER   */
     std::string m_mapFilenameHER{""};
     /** Magnetic field map of LER   */
@@ -163,7 +189,9 @@ namespace Belle2 {
     /** The size of the aperture for LER */
     int m_apertSizeLER{0};
     /** The square of maximal aperture for fast rejection */
-    double m_maxr2;
+    double m_maxr2{0};
+
+    ranges_t m_ranges_her, m_ranges_ler;
 
     /** The the aperture parameters for HER and LER. */
     std::vector<ApertPoint> m_ah, m_al;
@@ -171,8 +199,8 @@ namespace Belle2 {
     /** The map for HER and LER */
     std::vector<ParamPoint3> m_h3, m_l3;
 
-    /** Indecies for HER and LER to accelerate binary search in std::vector<ParamPoint3> */
-    std::vector<irange_t> m_indexh, m_indexl;
+    std::vector<std::vector<ParamPoint3>::const_iterator> m_offset_pp_her, m_offset_pp_ler;
+    std::vector<std::vector<ApertPoint>::const_iterator> m_offset_ap_her, m_offset_ap_ler;
   };
 
 } //end of namespace Belle2

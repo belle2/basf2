@@ -76,6 +76,16 @@ namespace Belle2 {
       TH1F* h_dosi_edep2[18];
       /** Energy deposited */
       TH1F* h_dosi_edep3[18];
+      /** Energy deposited */
+      TH1F* h_dosi_edep4[18];
+      /** Energy deposited */
+      TH1F* h_dosi_edep5[18];
+      /** Energy deposited */
+      TH1F* h_dosi_edep6[18];
+      /** Energy deposited */
+      TH1F* h_dosi_edep7[18];
+      /** Energy deposited */
+      TH1F* h_dosi_edep8[18];
 
     };
 

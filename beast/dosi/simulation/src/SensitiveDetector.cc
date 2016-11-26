@@ -196,15 +196,13 @@ namespace Belle2 {
       //Get the datastore arraus
       StoreArray<MCParticle>   mcParticles;
       StoreArray<DosiSimHit>  simHits;
-      RelationArray relMDosimHit(mcParticles, simHits);
+      RelationArray relMCSimHit(mcParticles, simHits);
 
-      StoreArray<DosiSimHit> DosiHits;
-      RelationArray dosiSimHitRel(mcParticles, DosiHits);
       TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
-      DosiHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
+      simHits.appendNew(cellId, trackID, pid, tof / CLHEP::ns, edep / CLHEP::GeV, momentum, posAve);
+      int m_simhitNumber = simHits.getEntries() - 1;
       B2DEBUG(150, "HitNumber: " << m_simhitNumber);
-      int m_simhitNumber = DosiHits.getEntries() - 1;
-      dosiSimHitRel.add(trackID, m_simhitNumber);
+      relMCSimHit.add(trackID, m_simhitNumber, 1.0);
       return (m_simhitNumber);
     }//saveSimHit
 

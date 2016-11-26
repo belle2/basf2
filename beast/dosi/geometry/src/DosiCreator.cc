@@ -83,7 +83,9 @@ namespace Belle2 {
         G4double dz_dosi = activeParams.getLength("dz_dosi") / 2.*CLHEP::cm;
         double thetaZ = activeParams.getAngle("ThetaZ");
         G4VSolid* s_dosi = new G4Box("s_dosi", dx_dosi, dy_dosi, dz_dosi);
-        G4LogicalVolume* l_dosi = new G4LogicalVolume(s_dosi, geometry::Materials::get("BGO"), "l_dosi", 0, m_sensitive);
+        //G4LogicalVolume* l_dosi = new G4LogicalVolume(s_dosi, geometry::Materials::get("BGO"), "l_dosi", 0, m_sensitive);
+        G4LogicalVolume* l_dosi = new G4LogicalVolume(s_dosi, geometry::Materials::get("G4_SILICON_DIOXIDE"), "l_dosi", 0, m_sensitive);
+
         l_dosi->SetVisAttributes(green);
         //Lets limit the Geant4 stepsize inside the volume
         l_dosi->SetUserLimits(new G4UserLimits(stepSize));

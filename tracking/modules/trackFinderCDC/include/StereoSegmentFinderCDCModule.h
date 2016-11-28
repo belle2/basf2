@@ -18,7 +18,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
   }
 
@@ -50,7 +50,7 @@ namespace Belle2 {
       /**
        * Try to combine the segments and the tracks.
        */
-      void generate(std::vector<TrackFindingCDC::CDCRecoSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
+      void generate(std::vector<TrackFindingCDC::CDCSegment2D>& segments, std::vector<TrackFindingCDC::CDCTrack>& tracks) override;
     };
   }
 }

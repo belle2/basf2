@@ -11,14 +11,14 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
+
 #include <tracking/trackFindingCDC/ca/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const truthSegmentPairRelationVarNames[] = {
       "truth_tanl",
@@ -28,40 +28,28 @@ namespace Belle2 {
       "__weight__",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment pair relation
-     */
-    class TruthSegmentPairRelationVarNames : public VarNames<Relation<const CDCSegmentPair>> {
+    /// Vehicle class to transport the variable names
+    struct TruthSegmentPairRelationVarNames : public VarNames<Relation<const CDCSegmentPair>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(truthSegmentPairRelationVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(truthSegmentPairRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return truthSegmentPairRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment pair relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from an axial stereo segment pair relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class TruthSegmentPairRelationVarSet : public VarSet<TruthSegmentPairRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<TruthSegmentPairRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit TruthSegmentPairRelationVarSet();
-
-      /// Generate and assign the variables from the segment pair relation
-      virtual bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override;
+      /// Generate and assign the contained variables
+      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override;
     };
   }
 }

@@ -1,13 +1,13 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
+void SegmentLookUp::fillWith(std::vector<CDCSegment2D>& segments)
 {
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
 
@@ -18,9 +18,12 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
   // Calculate a lookup cdcHit-> Segment (we use cdcHits here, not cdcWireHits)
   m_hitSegmentLookUp.clear();
 
-  for (CDCRecoSegment2D& segment : segments) {
-    if (segment.getAutomatonCell().hasTakenFlag())
+  for (CDCSegment2D& segment : segments) {
+    if (segment.getAutomatonCell().hasTakenFlag() or
+        segment.getAutomatonCell().hasBackgroundFlag() or
+        segment.isFullyTaken()) {
       continue;
+    }
 
     ISuperLayer iSuperLayer = segment.getISuperLayer();
     SegmentInformation* newSegmentInformation = new SegmentInformation(&segment);
@@ -34,7 +37,6 @@ void SegmentLookUp::fillWith(std::vector<CDCRecoSegment2D>& segments)
     B2DEBUG(200, "Added new segment to segment lookup: " << segment.getTrajectory2D());
   }
 }
-
 
 void SegmentLookUp::clear()
 {

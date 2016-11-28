@@ -80,6 +80,8 @@ namespace Belle2 {
 
       int readOneEvent(void);//! Read data of one Event from File
       int read_data(char* data, size_t len);//! Read amount of data (len bytes) from file to ptr data
+      bool getTrigNr(RawPXD& px);
+      bool unpack_dhc_frame(void* data);
     };
 
   } // end namespace PXD

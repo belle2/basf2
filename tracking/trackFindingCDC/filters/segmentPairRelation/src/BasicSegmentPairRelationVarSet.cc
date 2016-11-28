@@ -14,19 +14,13 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicSegmentPairRelationVarSet::BasicSegmentPairRelationVarSet()
-  : Super()
-{
-}
-
 bool BasicSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation)
 {
-  bool extracted = Super::extract(ptrSegmentPairRelation);
-  if (not extracted or not ptrSegmentPairRelation) return false;
+  if (not ptrSegmentPairRelation) return false;
 
   const CDCSegmentPair* fromSegmentPair = ptrSegmentPairRelation->first;
   const CDCSegmentPair* toSegmentPair   = ptrSegmentPairRelation->second;
-  const CDCRecoSegment2D* middleSegment = fromSegmentPair->getToSegment();
+  const CDCSegment2D* middleSegment = fromSegmentPair->getToSegment();
 
   var<named("middle_sl_id")>() = middleSegment->getISuperLayer();
   var<named("middle_is_axial")>() = middleSegment->isAxial();

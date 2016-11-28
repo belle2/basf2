@@ -73,7 +73,10 @@ namespace Belle2 {
         daughter->GetLogicalVolume()->GetSolid()->CalculateExtent((EAxis) axis, dummyLimits, trans, vmin, vmax);
         extent = std::max({extent, std::fabs(vmin), std::fabs(vmax)});
       }
-      if (current < extent) {
+      B2DEBUG(100, "Current global volume size in " << name << ": " << std::fixed
+              << std::setprecision(std::numeric_limits<double>::max_digits10)
+              << current << ", needed: " <<  extent);
+      if (current < extent && (extent - current) > Unit::um) {
         if (current > 0) {
           B2WARNING("Global volume not large enough in " << name << " direction, enlarging from "
                     << current << " mm to " << extent << " mm");

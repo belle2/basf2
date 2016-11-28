@@ -338,7 +338,7 @@ namespace Belle2 {
       /// position.
       SZLine m_szLine;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

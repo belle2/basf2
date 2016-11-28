@@ -16,23 +16,19 @@ using namespace TrackFindingCDC;
 
 using namespace Eigen;
 
-
-
 const CDCSZFitter& CDCSZFitter::getFitter()
 {
   static CDCSZFitter szFitter;
   return szFitter;
 }
 
-
-
 namespace {
-  UncertainSZLine fitZ(const Matrix< double, 3, 3 >& sumMatrixWSZ)
+  UncertainSZLine fitZ(const Matrix<double, 3, 3>& sumMatrixWSZ)
   {
     // Solve the normal equation X * n = y
-    Matrix< double, 2, 2> sumMatrixWS = sumMatrixWSZ.block<2, 2>(0, 0);
-    Matrix< double, 2, 1> sumVectorZOverWS = sumMatrixWSZ.block<2, 1>(0, 2);
-    Matrix< double, 2, 1> nZOverWS = sumMatrixWS.llt().solve(sumVectorZOverWS);
+    Matrix<double, 2, 2> sumMatrixWS = sumMatrixWSZ.block<2, 2>(0, 0);
+    Matrix<double, 2, 1> sumVectorZOverWS = sumMatrixWSZ.block<2, 1>(0, 2);
+    Matrix<double, 2, 1> nZOverWS = sumMatrixWS.llt().solve(sumVectorZOverWS);
     double chi2 = sumMatrixWSZ(2, 2) - nZOverWS.transpose() * sumVectorZOverWS;
 
     using namespace NSZParameterIndices;
@@ -42,40 +38,42 @@ namespace {
 
     SZPrecision szPrecision;
     szPrecision(c_TanL, c_TanL) = sumMatrixWS(1, 1);
-    szPrecision(c_Z0, c_TanL)   = sumMatrixWS(0, 1);
-    szPrecision(c_TanL, c_Z0)   = sumMatrixWS(1, 0);
-    szPrecision(c_Z0, c_Z0)     = sumMatrixWS(0, 0);
+    szPrecision(c_Z0, c_TanL) = sumMatrixWS(0, 1);
+    szPrecision(c_TanL, c_Z0) = sumMatrixWS(1, 0);
+    szPrecision(c_Z0, c_Z0) = sumMatrixWS(0, 0);
 
     SZCovariance szCovariance = szPrecision.inverse();
     return UncertainSZLine(szParameters, szCovariance, chi2);
   }
 
   // Declare function as currently unused to avoid compiler warning
-  UncertainSZLine fitSZ(const Matrix< double, 3, 3 >& sumMatrixWSZ) __attribute__((__unused__));
+  UncertainSZLine fitSZ(const Matrix<double, 3, 3>& sumMatrixWSZ) __attribute__((__unused__));
 
   /// Variant without drift circles and seperating the offset before the matrix solving
-  UncertainSZLine fitSZ(const Matrix< double, 3, 3 >& sumMatrixWSZ)
+  UncertainSZLine fitSZ(const Matrix<double, 3, 3>& sumMatrixWSZ)
   {
 
     // Matrix of averages
-    Matrix< double, 3, 3> averageMatrixWSZ = sumMatrixWSZ / sumMatrixWSZ(0);
+    Matrix<double, 3, 3> averageMatrixWSZ = sumMatrixWSZ / sumMatrixWSZ(0);
 
     // Measurement means
-    Matrix< double, 3, 1> meansWSZ = averageMatrixWSZ.row(0);
+    Matrix<double, 3, 1> meansWSZ = averageMatrixWSZ.row(0);
 
     // Covariance matrix
-    Matrix< double, 3, 3> covMatrixWSZ = averageMatrixWSZ - meansWSZ * meansWSZ.transpose();
+    Matrix<double, 3, 3> covMatrixWSZ = averageMatrixWSZ - meansWSZ * meansWSZ.transpose();
 
-    Matrix< double, 2, 2> covMatrixSZ = covMatrixWSZ.block<2, 2>(1, 1);
-    Matrix< double, 2, 1> meansSZ     = meansWSZ.segment<2>(1);
+    Matrix<double, 2, 2> covMatrixSZ = covMatrixWSZ.block<2, 2>(1, 1);
+    Matrix<double, 2, 1> meansSZ = meansWSZ.segment<2>(1);
 
-    SelfAdjointEigenSolver< Matrix<double, 2, 2> > eigensolver(covMatrixSZ);
+    SelfAdjointEigenSolver<Matrix<double, 2, 2>> eigensolver(covMatrixSZ);
     if (eigensolver.info() != Success) {
-      B2WARNING("SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
+      B2WARNING(
+        "SelfAdjointEigenSolver could not compute the eigen values of the observation matrix");
     }
 
     // the eigenvalues are generated in increasing order
-    // we are interested in the lowest one since we want to compute the normal vector of the line here
+    // we are interested in the lowest one since we want to compute the normal vector of the line
+    // here
     Matrix<double, 2, 1> nSZ = eigensolver.eigenvectors().col(0);
     B2INFO("nSZ " << nSZ);
     nSZ /= std::copysign(nSZ.norm(), -nSZ(1)); // Making n2 negative to normalize to forward along s
@@ -85,15 +83,15 @@ namespace {
 
     double chi2 = nWSZ.transpose() * sumMatrixWSZ * nWSZ;
 
-    PrecisionMatrix<3>  precN = sumMatrixWSZ;
+    PrecisionMatrix<3> precN = sumMatrixWSZ;
 
     using namespace NSZParameterIndices;
     SZParameters szParameters;
-    szParameters(c_TanL) = - nWSZ(1) / nWSZ(2);
-    szParameters(c_Z0)   = - nWSZ(0) / nWSZ(2);
+    szParameters(c_TanL) = -nWSZ(1) / nWSZ(2);
+    szParameters(c_Z0) = -nWSZ(0) / nWSZ(2);
 
     Matrix<double, 3, 2> ambiguitySZToN = Matrix<double, 3, 2>::Zero();
-    ambiguitySZToN(0, c_Z0)   = -nWSZ(2);
+    ambiguitySZToN(0, c_Z0) = -nWSZ(2);
     ambiguitySZToN(0, c_TanL) = -nWSZ(1) * nWSZ(0);
     ambiguitySZToN(1, c_TanL) = -nWSZ(2) * nWSZ(2) * nWSZ(2);
     ambiguitySZToN(2, c_TanL) = nWSZ(1) * nWSZ(2) * nWSZ(2);
@@ -105,12 +103,11 @@ namespace {
   }
 }
 
-CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& segment3D) const
+CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const
 {
   CDCTrajectorySZ trajectorySZ;
   CDCObservations2D observationsSZ;
   appendSZ(observationsSZ, segment3D);
-
 
   if (observationsSZ.size() > 4) {
     CDCObservations2D observationsSZFiltered;
@@ -140,16 +137,16 @@ CDCTrajectorySZ CDCSZFitter::fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& 
   }
 }
 
-
 void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
 {
-  const CDCStereoRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
-  const CDCAxialRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCStereoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCAxialSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
 
-  if ((not ptrStereoSegment) or (not ptrAxialSegment)) return;
+  assert(ptrStereoSegment);
+  assert(ptrAxialSegment);
 
-  const CDCStereoRecoSegment2D& stereoSegment = *ptrStereoSegment;
-  const CDCAxialRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCStereoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCAxialSegment2D& axialSegment = *ptrAxialSegment;
   const CDCTrajectory2D& axialTrajectory2D = axialSegment.getTrajectory2D();
 
   CDCTrajectorySZ trajectorySZ;
@@ -159,12 +156,11 @@ void CDCSZFitter::update(const CDCSegmentPair& segmentPair) const
   segmentPair.setTrajectory3D(trajectory3D);
 }
 
-
 void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
-                         const CDCStereoRecoSegment2D& stereoSegment,
+                         const CDCStereoSegment2D& stereoSegment,
                          const CDCTrajectory2D& axialTrajectory2D) const
 {
-  //recostruct the stereo segment
+  // recostruct the stereo segment
   CDCObservations2D observationsSZ;
   for (const CDCRecoHit2D& recoHit2D : stereoSegment) {
     CDCRecoHit3D recoHit3D = CDCRecoHit3D::reconstruct(recoHit2D, axialTrajectory2D);
@@ -172,22 +168,20 @@ void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
   }
 
   update(trajectorySZ, observationsSZ);
-
 }
 
-void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ,
-                         CDCObservations2D& observations2D) const
+void CDCSZFitter::update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const
 {
   trajectorySZ.clear();
-  if (observations2D.size() < 3) {
+  if (observationsSZ.size() < 3) {
     return;
   }
 
   // Determine NDF : Line fit eats up 2 degrees of freedom.
-  size_t ndf = observations2D.size() - 2;
+  size_t ndf = observationsSZ.size() - 2;
 
   // Matrix of weighted sums
-  Matrix< double, 3, 3 > sumMatrixWSZ = observations2D.getWXYSumMatrix();
+  Matrix<double, 3, 3> sumMatrixWSZ = observationsSZ.getWXYSumMatrix();
   UncertainSZLine uncertainSZLine = fitZ(sumMatrixWSZ);
 
   uncertainSZLine.setNDF(ndf);

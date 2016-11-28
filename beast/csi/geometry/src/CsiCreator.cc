@@ -294,24 +294,25 @@ namespace Belle2 {
       G4Transform3D lidpos   = G4Translate3D(0, 0.5 * (depth + lidthk), 0);
 
       G4Transform3D Tr    = position * m3 * m2 * m1; /**< Position of the nominal centre of crystals in the box **/
-      G4Transform3D ZshTr = Tr * zsh; /** < Nominal position of the centre of the box **/
+      G4Transform3D ZshTr    = Tr * zsh; /** < Nominal position of the centre of the box **/
       G4Transform3D ZshTrAdj = adjust * ZshTr;
-      G4Transform3D LidTr = ZshTrAdj * lidpos;
+      G4Transform3D LidTr    = ZshTr * lidpos;
+      G4Transform3D LidTrAdj = adjust * LidTr;
 
       G4VisAttributes* VisAtt = new G4VisAttributes(G4Colour(1.0, 0.5, 0.0, 0.5));
       logiEnclosure->SetVisAttributes(VisAtt);
 
       G4VisAttributes* LidVisAtt = new G4VisAttributes(G4Colour(0.8, 1.0, 0.4, 0.5));
       logiEncloLid->SetVisAttributes(LidVisAtt);
-      logiEncloLid->SetVisAttributes(G4VisAttributes::GetInvisible());
+      //logiEncloLid->SetVisAttributes(G4VisAttributes::GetInvisible());
 
       B2INFO("CsIBox No. " << iEnclosure << " Nominal pos.   (mm): " << ZshTr.getTranslation());
       B2INFO("             Installed pos. (mm): " << ZshTrAdj.getTranslation());
       B2INFO("             Rotation matrix    : " << ZshTrAdj.getRotation());
       B2INFO(" ");
 
-      assembly->AddPlacedVolume(logiEnclosure, ZshTr);
-      assembly->AddPlacedVolume(logiEncloLid, LidTr);
+      assembly->AddPlacedVolume(logiEnclosure, ZshTrAdj);
+      assembly->AddPlacedVolume(logiEncloLid, LidTrAdj);
 
 
       int nSlots = enclosureContent.getNumberNodes("CrystalInSlot");
@@ -332,7 +333,7 @@ namespace Belle2 {
 
         int    CryID  = enclosureContent.getInt((format("/CrystalInSlot[%1%]") % iSlot).str());
 
-        PutCrystal(content, assembly, Tr * Pos,  iEnclosure, CryID);
+        PutCrystal(content, assembly, adjust * Tr * Pos,  iEnclosure, CryID);
       }
 
       return;

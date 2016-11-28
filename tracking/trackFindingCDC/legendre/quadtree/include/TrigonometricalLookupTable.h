@@ -82,7 +82,7 @@ namespace Belle2 {
       }
 
       /// Get sin() corresponding to the given bin
-      inline double sinTheta(unsigned long bin)
+      double sinTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) {
           initialize();
@@ -95,7 +95,7 @@ namespace Belle2 {
       }
 
       /// Get cos() corresponding to the given bin
-      inline double cosTheta(unsigned long bin)
+      double cosTheta(unsigned long bin)
       {
         if (branch_unlikely(not m_lookup_created)) initialize();
         if (branch_unlikely(bin >= m_lookup_theta.size())) {
@@ -106,19 +106,19 @@ namespace Belle2 {
       }
 
       /// Get number of bins in the lookup table
-      inline unsigned long getNBinsTheta() const {return m_nbinsTheta;};
+      unsigned long getNBinsTheta() const {return m_nbinsTheta;};
 
     private:
 
       /// Compute cos for the given bin value
-      inline double computeSin(unsigned long bin) const
+      double computeSin(unsigned long bin) const
       {
         const float bin_width = 2.* boost::math::constants::pi<float>() / m_nbinsTheta;
         return sin(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);
       }
 
       /// Compute cos for the given bin value
-      inline double computeCos(unsigned long bin) const
+      double computeCos(unsigned long bin) const
       {
         const float bin_width = 2.* boost::math::constants::pi<float>() / m_nbinsTheta;
         return cos(bin * bin_width - boost::math::constants::pi<float>() + bin_width / 2.);

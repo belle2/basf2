@@ -19,7 +19,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseTrackRelationFilter Super;
+      using Super = BaseTrackRelationFilter;
 
     public:
       /// Importing all overloads from the super class
@@ -27,8 +27,7 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors.
-      virtual Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) override final;
-
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
+    };
+  }
+}

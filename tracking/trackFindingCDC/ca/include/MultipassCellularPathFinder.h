@@ -99,9 +99,9 @@ namespace Belle2 {
       /// The path follower used to extract the path from the graph processed by the cellular automaton.
       CellularPathFollower<ACellHolder> m_cellularPathFollower;
 
-    }; // end class MultipassCellularPathFinder
+    };
 
-  } //end namespace TrackFindingCDC
+  }
 
-} //end namespace Belle2
+}
 

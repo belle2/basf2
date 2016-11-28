@@ -7,11 +7,15 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/collectors/stereo_segments/StereoSegmentTrackMatcherQuadTree.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+#include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <utility>
@@ -22,20 +26,23 @@ using namespace TrackFindingCDC;
 void StereoSegmentTrackMatcherQuadTree::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
 {
   QuadTreeBasedMatcher<SegmentZ0TanLambdaLegendre>::exposeParameters(moduleParameters, prefix);
-
-  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
-                                 "Set to false to skip the check for back-2-back tracks (good for cosmics)",
+  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"),
+                                 m_param_checkForB2BTracks,
+                                 "Set to false to skip the check for back-2-back tracks "
+                                 "(good for cosmics)",
                                  m_param_checkForB2BTracks);
 }
 
-bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& recoSegment3D, const bool isCurler,
-                                                           const double shiftValue, const ISuperLayer lastSuperLayer,
-                                                           const double lastArcLength2D) const
+bool StereoSegmentTrackMatcherQuadTree::checkSegment3D(CDCSegment3D& segment3D,
+                                                       const bool isCurler,
+                                                       const double shiftValue,
+                                                       const ISuperLayer lastSuperLayer,
+                                                       const double lastArcLength2D) const
 {
   unsigned int numberOfHitsNotInCDCBounds = 0;
   unsigned int numberOfHitsOnWrongSide = 0;
 
-  for (CDCRecoHit3D& recoHit : recoSegment3D) {
+  for (CDCRecoHit3D& recoHit : segment3D) {
     if (not recoHit.isInCellZBounds(1.5)) {
       numberOfHitsNotInCDCBounds++;
     }
@@ -52,7 +59,7 @@ bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& rec
     return false;
   }
 
-  if (recoSegment3D.size() <= 3 and numberOfHitsNotInCDCBounds > 1) {
+  if (segment3D.size() <= 3 and numberOfHitsNotInCDCBounds > 1) {
     return false;
   }
 
@@ -60,8 +67,8 @@ bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& rec
     return false;
   }
 
-  if (recoSegment3D.back().getArcLength2D() > lastArcLength2D) {
-    if (abs(lastSuperLayer - recoSegment3D.getISuperLayer()) > 1) {
+  if (segment3D.back().getArcLength2D() > lastArcLength2D) {
+    if (abs(lastSuperLayer - segment3D.getISuperLayer()) > 1) {
       return false;
     }
   }
@@ -69,15 +76,14 @@ bool StereoSegmentTrackMatcherQuadTree::checkRecoSegment3D(CDCRecoSegment3D& rec
   return true;
 }
 
-std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTree::match(const CDCTrack& track,
-                                              const std::vector<CDCRecoSegment2D>& recoSegments)
+std::vector<WithWeight<const CDCSegment2D*>> StereoSegmentTrackMatcherQuadTree::match(const CDCTrack& track,
+                                          const std::vector<CDCSegment2D>& segments)
 {
-
   const CDCSZFitter& szFitter = CDCSZFitter::getFitter();
 
-  typedef std::pair<std::pair<CDCRecoSegment3D, CDCTrajectorySZ>, const CDCRecoSegment2D*> CDCRecoSegment3DWithPointer;
-  std::vector<CDCRecoSegment3DWithPointer> recoSegmentsWithPointer;
-  recoSegmentsWithPointer.reserve(recoSegments.size());
+  using CDCSegment3DWithPointer = std::pair<std::pair<CDCSegment3D, CDCTrajectorySZ>, const CDCSegment2D*>;
+  std::vector<CDCSegment3DWithPointer> segmentsWithPointer;
+  segmentsWithPointer.reserve(segments.size());
 
   // Reconstruct the segments to the track
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
@@ -86,26 +92,26 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   const ISuperLayer lastSuperLayer = track.back().getISuperLayer();
   const double lastArcLength2D = track.back().getArcLength2D();
 
-  for (const CDCRecoSegment2D& recoSegment2D : recoSegments) {
-    if (not(recoSegment2D.getStereoKind() == EStereoKind::c_Axial or recoSegment2D.getAutomatonCell().hasTakenFlag()
-            or recoSegment2D.isFullyTaken(2))) {
-      CDCRecoSegment3D recoSegment3D = CDCRecoSegment3D::reconstruct(recoSegment2D, trajectory2D);
+  for (const CDCSegment2D& segment2D : segments) {
+    if (not(segment2D.getStereoKind() == EStereoKind::c_Axial or segment2D.getAutomatonCell().hasTakenFlag()
+            or segment2D.isFullyTaken(2))) {
+      CDCSegment3D segment3D = CDCSegment3D::reconstruct(segment2D, trajectory2D);
 
-      if (checkRecoSegment3D(recoSegment3D, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
-        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3D);
-        recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3D, trajectorySZ), &recoSegment2D);
+      if (checkSegment3D(segment3D, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
+        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(segment3D);
+        segmentsWithPointer.emplace_back(std::make_pair(segment3D, trajectorySZ), &segment2D);
       }
 
-      CDCRecoSegment3D recoSegment3DReversed = CDCRecoSegment3D::reconstruct(recoSegment2D.reversed(), trajectory2D);
+      CDCSegment3D segment3DReversed = CDCSegment3D::reconstruct(segment2D.reversed(), trajectory2D);
 
-      if (checkRecoSegment3D(recoSegment3DReversed, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
-        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(recoSegment3DReversed);
-        recoSegmentsWithPointer.emplace_back(std::make_pair(recoSegment3DReversed, trajectorySZ), &recoSegment2D);
+      if (checkSegment3D(segment3DReversed, isCurler, shiftValue, lastSuperLayer, lastArcLength2D)) {
+        const CDCTrajectorySZ& trajectorySZ = szFitter.fitUsingSimplifiedTheilSen(segment3DReversed);
+        segmentsWithPointer.emplace_back(std::make_pair(segment3DReversed, trajectorySZ), &segment2D);
       }
     }
   }
 
-  m_quadTreeInstance.seed(recoSegmentsWithPointer);
+  m_quadTreeInstance.seed(segmentsWithPointer);
 
   if (m_param_writeDebugInformation) {
     writeDebugInformation();
@@ -122,18 +128,17 @@ std::vector<WithWeight<const CDCRecoSegment2D*>> StereoSegmentTrackMatcherQuadTr
   const auto& foundStereoSegmentWithNode = foundStereoSegmentsWithNode[0];
 
   // List of matches
-  std::vector<WithWeight<const CDCRecoSegment2D*>> matches;
+  std::vector<WithWeight<const CDCSegment2D*>> matches;
   const auto& foundStereoSegments = foundStereoSegmentWithNode.second;
 
   matches.reserve(foundStereoSegments.size());
 
-  for (const CDCRecoSegment3DWithPointer& segment3DWithPointer : foundStereoSegments) {
+  for (const CDCSegment3DWithPointer& segment3DWithPointer : foundStereoSegments) {
     matches.emplace_back(segment3DWithPointer.second, 1.0);
   }
 
   std::sort(matches.begin(), matches.end());
   matches.erase(std::unique(matches.begin(), matches.end()), matches.end());
-
 
   return matches;
 }

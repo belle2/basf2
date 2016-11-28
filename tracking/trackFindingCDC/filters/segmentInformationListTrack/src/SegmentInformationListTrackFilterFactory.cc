@@ -10,39 +10,67 @@
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilterFactory.h>
 #include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SimpleSegmentInformationListTrackFilter.h>
 
+#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainTruthVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllSegmentInformationListTrackFilter = AllFilter<BaseSegmentInformationListTrackFilter>;
+  using MCSegmentInformationListTrackFilter = MCFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
+  using RecordingSegmentInformationListTrackFilter =
+    RecordingFilter<VariadicUnionVarSet<SegmentTrainTruthVarSet, SegmentTrainVarSet>>;
+  using MVASegmentInformationListTrackFilter = MVAFilter<SegmentTrainVarSet>;
+}
+
+SegmentInformationListTrackFilterFactory::SegmentInformationListTrackFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string SegmentInformationListTrackFilterFactory::getIdentifier() const
+{
+  return "SegmentInformationListTrack";
+}
+
+std::string SegmentInformationListTrackFilterFactory::getFilterPurpose() const
+{
+  return "Segment information list to track filter for combinatoric adding of segments to tracks";
+}
 
 std::map<std::string, std::string>
 SegmentInformationListTrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
-    {"truth", "monte carlo truth"},
+  return {
     {"none", "no segment track combination is valid"},
+    {"truth", "monte carlo truth"},
     {"simple", "mc free with simple criteria"},
-    {"tmva", "test using tmva methods"},
-    {"recording", "Record to a ttree"}
-
-  });
-  return filterNames;
+    {"recording", "Record to a ttree"},
+    {"mva", "test using mva methods"},
+  };
 }
 
 std::unique_ptr<BaseSegmentInformationListTrackFilter>
 SegmentInformationListTrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new BaseSegmentInformationListTrackFilter());
+    return makeUnique<BaseSegmentInformationListTrackFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new MCSegmentInformationListTrackFilter());
+    return makeUnique<MCSegmentInformationListTrackFilter>();
   } else if (filterName == "simple") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new SimpleSegmentInformationListTrackFilter());
-  } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new TMVASegmentInformationListTrackFilter());
+    return makeUnique<SimpleSegmentInformationListTrackFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseSegmentInformationListTrackFilter>(new RecordingSegmentInformationListTrackFilter());
+    return makeUnique<RecordingSegmentInformationListTrackFilter>();
+  } else if (filterName == "mva") {
+    return makeUnique<MVASegmentInformationListTrackFilter>();
   } else {
     return Super::create(filterName);
   }

@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <vector>
 #include <list>
@@ -30,7 +30,7 @@ namespace Belle2 {
     class MatchingInformation {
     public:
       /** Vector of pairs: object, probability of match */
-      typedef std::vector<std::pair<MatchingType*, double>> ListOfMatchCandidates;
+      using ListOfMatchCandidates = std::vector<std::pair<MatchingType*, double>>;
 
       /**
        * Initialize the object with the underlying instance that should be matched.
@@ -220,18 +220,18 @@ namespace Belle2 {
      * This is a MatchingInformation for the relation CDCSegment -> CDCTrack.
      * It has additional information on the segment like the infromation if this segment is already taken by a track finder.
      */
-    class SegmentInformation : public MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation> {
+    class SegmentInformation : public MatchingInformation<TrackFindingCDC::CDCSegment2D, TrackInformation> {
     public:
       /** Initialize with a segmentpointer. We do not have the ownership. */
-      explicit SegmentInformation(TrackFindingCDC::CDCRecoSegment2D* segment) :
-        MatchingInformation<TrackFindingCDC::CDCRecoSegment2D, TrackInformation>(segment)
+      explicit SegmentInformation(TrackFindingCDC::CDCSegment2D* segment) :
+        MatchingInformation<TrackFindingCDC::CDCSegment2D, TrackInformation>(segment)
       {
       }
 
       /**
        * Convenience wrapper for better naming. Same as getObject.
        */
-      TrackFindingCDC::CDCRecoSegment2D* getSegment() const
+      TrackFindingCDC::CDCSegment2D* getSegment() const
       {
         return getObject();
       }

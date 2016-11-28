@@ -8,64 +8,70 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairFilters.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/AllSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/UnionRecordingSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
+
+#include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName) :
-  Super(defaultFilterName)
+SegmentPairFilterFactory::SegmentPairFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
 {
+}
+
+std::string SegmentPairFilterFactory::getIdentifier() const
+{
+  return "SegmentPair";
 }
 
 std::string SegmentPairFilterFactory::getFilterPurpose() const
 {
-  return "Segment pair filter to be used during the construction of segment pairs.";
-}
-
-std::string SegmentPairFilterFactory::getModuleParamPrefix() const
-{
-  return "SegmentPair";
+  return "Segment pair filter to construct of a segment pair network";
 }
 
 std::map<std::string, std::string>
 SegmentPairFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
+  return {
+    {"none", "no segment pair is valid"},
     {"all", "all segment pairs are valid"},
     {"truth", "monte carlo truth"},
-    {"none", "no segment pair is valid"},
-    {"feasible", "multivariat method based on variables of the first and last hit in each segment meant as precut"},
-    {"unionrecording", "record many multiple choosable variable set"},
-    {"simple", "mc free with simple criteria"},
     {"fitless", "mc free with simple criteria without the common fit"},
+    {"simple", "mc free with simple criteria"},
+    {"unionrecording", "record many multiple choosable variable set"},
+    {"feasible", "multivariat method based on variables of the first and last hit in each segment meant as precut"},
     {"realistic", "realistic filter using a common fit and combination of all information with an mva"},
-  });
-  return filterNames;
+  };
 }
 
 std::unique_ptr<Filter<CDCSegmentPair> >
 SegmentPairFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new BaseSegmentPairFilter());
+    return makeUnique<BaseSegmentPairFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new AllSegmentPairFilter());
+    return makeUnique<AllSegmentPairFilter>();
   } else if (filterName == "truth") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MCSegmentPairFilter());
-  } else if (filterName == "feasible") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MVAFeasibleSegmentPairFilter());
-  } else if (filterName == "simple") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new SimpleSegmentPairFilter());
+    return makeUnique<MCSegmentPairFilter>();
   } else if (filterName == "fitless") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new FitlessSegmentPairFilter());
-  } else if (filterName == "realistic") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new MVARealisticSegmentPairFilter());
+    return makeUnique<FitlessSegmentPairFilter>();
+  } else if (filterName == "simple") {
+    return makeUnique<SimpleSegmentPairFilter>();
   } else if (filterName == "unionrecording") {
-    return std::unique_ptr<Filter<CDCSegmentPair> >(new UnionRecordingSegmentPairFilter());
+    return makeUnique<UnionRecordingSegmentPairFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleSegmentPairFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticSegmentPairFilter>();
   } else {
     return Super::create(filterName);
   }

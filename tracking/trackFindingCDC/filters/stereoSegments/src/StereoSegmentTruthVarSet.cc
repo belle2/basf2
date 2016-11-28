@@ -9,39 +9,33 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/stereoSegments/StereoSegmentTruthVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment3DLookUp.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool StereoSegmentTruthVarSet::extract(const std::pair<std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D>, const CDCTrack&>*
-                                       testPair)
+bool StereoSegmentTruthVarSet::extract(const std::pair<const CDCSegment3D*, const CDCTrack*>* testPair)
 {
-  bool extracted = extractNested(testPair);
-  if (not extracted or not testPair) return false;
-
-  const std::pair<const CDCRecoSegment2D*, const CDCRecoSegment3D&>& recoSegments = testPair->first;
-  const CDCTrack& track = testPair->second;
-
-  const CDCRecoSegment2D* recoSegment2D = recoSegments.first;
+  if (not testPair) return false;
+  const CDCSegment3D& segment3D = *testPair->first;
+  const CDCTrack& track = *testPair->second;
 
   const CDCMCTrackLookUp& mcTrackLookup = CDCMCTrackLookUp::getInstance();
-  const CDCMCSegmentLookUp& segmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment3DLookUp& segment3DLookUp = CDCMCSegment3DLookUp::getInstance();
 
   const ITrackType trackMCMatch = mcTrackLookup.getMCTrackId(&track);
-  const ITrackType segmentMCTrack = segmentLookUp.getMCTrackId(recoSegment2D);
+  const ITrackType segment3DMCTrack = segment3DLookUp.getMCTrackId(&segment3D);
 
   if (trackMCMatch == INVALID_ITRACK) {
     var<named("track_is_fake_truth")>() = true;
     var<named("truth")>() = false;
   } else {
     var<named("track_is_fake_truth")>() = false;
-    var<named("truth")>() = trackMCMatch == segmentMCTrack;
+    var<named("truth")>() = trackMCMatch == segment3DMCTrack;
   }
 
   return true;

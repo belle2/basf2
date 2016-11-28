@@ -83,7 +83,7 @@ SVDFTBFEE::SVDFTBFEE()
 {
 }
 
-void SVDFTBFEE::init(RCCallback& callback, HSLB& hslb)
+void SVDFTBFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   int index;
   const int length = 4;

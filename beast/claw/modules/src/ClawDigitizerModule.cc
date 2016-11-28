@@ -136,7 +136,7 @@ void ClawDigitizerModule::event()
         double PE = hitsarrayinPE[i][j];
         double MIP = PE / m_C_MIP_to_PE;
         double Edep = MIP * m_C_keV_to_MIP * 1e-6; //keV -> GeV.
-        Hits.appendNew(ClawHit(i, j, Edep, MIP, PE));
+        Hits.appendNew(ClawHit(j, i, Edep, MIP, PE));
       }
     }
   }

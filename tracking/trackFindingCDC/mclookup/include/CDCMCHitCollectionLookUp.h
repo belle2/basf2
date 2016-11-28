@@ -165,7 +165,7 @@ namespace Belle2 {
       /** Returns the trajectory of the collection of hits */
       CDCTrajectory3D getTrajectory3D(const ACDCHitCollection* ptrHits) const;
 
-    }; //class
+    };
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

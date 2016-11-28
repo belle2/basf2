@@ -50,7 +50,7 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">18.3</x>
+      <x unit="cm">17.2</x>
       <y unit="cm">6.3</y>
       <z_claw unit="cm">205.3</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
@@ -68,9 +68,9 @@
    <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">30.9</x>
+      <x unit="cm">27.8</x>
       <y unit="cm">6.6</y>
-      <z_claw unit="cm">205.3</z_claw>
+      <z_claw unit="cm">205.0</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -86,9 +86,9 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">41.8</x>
+      <x unit="cm">38.7</x>
       <y unit="cm">6.7</y>
-      <z_claw unit="cm">205.3</z_claw>
+      <z_claw unit="cm">205.5</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -104,9 +104,9 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">70.7</x>
-      <y unit="cm">6.6</y>
-      <z_claw unit="cm">205.3</z_claw>
+      <x unit="cm">67.7</x>
+      <y unit="cm">6.7</y>
+      <z_claw unit="cm">205.7</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">0.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -122,9 +122,9 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">-10.6</x>
+      <x unit="cm">-14.4</x>
       <y unit="cm">6.2</y>
-      <z_claw unit="cm">-113.7</z_claw>
+      <z_claw unit="cm">-112.7</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -140,9 +140,9 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">-21.6</x>
+      <x unit="cm">-25.4</x>
       <y unit="cm">6.1</y>
-      <z_claw unit="cm">-113.7</z_claw>
+      <z_claw unit="cm">-113.2</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -158,9 +158,9 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">-32.2</x>
+      <x unit="cm">-36.0</x>
       <y unit="cm">6.1</y>
-      <z_claw unit="cm">-113.7</z_claw>
+      <z_claw unit="cm">-113.4</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>
       <Phi unit="deg">180.0</Phi>
       <dx_board unit="cm">3.0</dx_board>
@@ -176,7 +176,7 @@
     <Active>
       <Material>CLAW-Material</Material>
       <Nscint>1</Nscint>
-      <x unit="cm">-42.9</x>
+      <x unit="cm">-46.7</x>
       <y unit="cm">6.3</y>
       <z_claw unit="cm">-113.7</z_claw>
       <ThetaZ unit="deg">90.0</ThetaZ>

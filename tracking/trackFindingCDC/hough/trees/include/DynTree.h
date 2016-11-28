@@ -29,13 +29,13 @@ namespace Belle2 {
     class DynTree {
 
       /// Type of this class
-      typedef DynTree<AProperties, ASubPropertiesFactory> This;
+      using This = DynTree<AProperties, ASubPropertiesFactory>;
 
       /// Type of the Properties
-      typedef AProperties Properties;
+      using Properties = AProperties;
 
       /// Type of the factory for the sub node properties
-      typedef ASubPropertiesFactory SubPropertiesFactory;
+      using SubPropertiesFactory = ASubPropertiesFactory;
 
     public:
       /// Class for a node in the tree
@@ -43,16 +43,16 @@ namespace Belle2 {
 
       public:
         /// Type of the tree containing this node.
-        typedef This Tree;
+        using Tree = This;
 
         /// Allow the tree access to the node constructor to create the top node.
         friend Tree;
 
         /// Type of the Properties
-        typedef AProperties Properties;
+        using Properties = AProperties;
 
         /// Type of the container of the children of the node
-        typedef std::vector<Node> Children;
+        using Children = std::vector<Node>;
 
       private:
         /** Inheriting the constructors of the properties such that we can
@@ -306,7 +306,7 @@ namespace Belle2 {
       /// Like fell but also releases all memory the tree has aquired during long execution.
       void raze()
       {
-        fell();
+        this->fell();
         m_children.clear();
         m_children.shrink_to_fit();
       }

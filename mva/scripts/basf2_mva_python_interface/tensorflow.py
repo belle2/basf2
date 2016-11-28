@@ -79,7 +79,7 @@ def load(obj):
     saver = tf.import_meta_graph(obj)
     saver.restore(session, obj)
     state = State(session=session)
-    stte.get_from_collection()
+    state.get_from_collection()
     return state
 
 

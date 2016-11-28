@@ -87,7 +87,7 @@ if __name__ == '__main__':
     o += table.finish()
 
     # If you change the number of colors, than change below \ifnum5 accordingly
-    moduleTypes = ['ParticleCombiner', 'TMVAExpert', 'MCMatch', 'ParticleVertexFitter', 'BestCandidateSelection', 'Other']
+    moduleTypes = ['ParticleCombiner', 'MVAExpert', 'MCMatch', 'ParticleVertexFitter', 'BestCandidateSelection', 'Other']
 
     o += b2latex.Section("CPU time").finish()
     colour_list = b2latex.DefineColourList()

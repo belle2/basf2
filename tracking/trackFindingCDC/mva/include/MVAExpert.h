@@ -37,8 +37,7 @@ namespace Belle2 {
        *  @param identifier       A database identifier or local file name.
        *  @param namedVariables   The names and pointers to the variables to be fed to the mva method
        */
-      MVAExpert(const std::string& dbIndentifier,
-                std::vector<Named<Float_t*> > namedVariables);
+      MVAExpert(const std::string& identifier, std::vector<Named<Float_t*>> namedVariables);
 
       /// Initialise the mva method
       void initialize();

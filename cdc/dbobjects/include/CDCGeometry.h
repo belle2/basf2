@@ -1019,22 +1019,6 @@ namespace Belle2 {
     double getFeedthroughLength() const {return m_feedThroughLength;}
 
     /**
-     * Get the debug mode.
-     */
-    bool getDebugMode() const {return m_debug;}
-
-    /**
-     * Get the material definition mode.
-     */
-    int getMaterialDefinitionMode() const {return m_materialDefinitionMode;}
-
-
-    /**
-     * Get the definition mode of sense z-position.
-     */
-    int getSenseWireZposMode() const {return m_senseWireZposMode;}
-
-    /**
      * Get the clock frequency.
      */
     double getClockFrequency() const { return m_clockFrequency;}
@@ -1043,68 +1027,6 @@ namespace Belle2 {
      * Get the nominal space resolution.
      */
     double getNominalSpaceResolution() const { return m_nominalSpaceResolution;}
-
-    /**
-     * Get the displacement mode.
-     */
-    bool getDisplacement() const { return m_displacement;}
-
-    /**
-     * Get the misalignment mode.
-     */
-    bool getMisalignment() const { return m_misalignment;}
-
-    /**
-     * Get the alignment mode.
-     */
-    bool getAlignment() const { return m_alignment;}
-
-    /**
-     * Get the file name for the displacement.
-     */
-    std::string getDisplacementFile() const { return m_displacementFile;}
-
-    /**
-     * Get the file name for the misalignment.
-     */
-    std::string getMisalignmentFile() const { return m_misalignmentFile;}
-
-    /**
-     * Get the file name for the salignment.
-     */
-    std::string getAlignmentFile() const { return m_alignmentFile;}
-
-    /**
-     * Get the threshold of energy deposition in geant4.
-     */
-    double getEnergyDepositThreshold() const
-    {
-      return m_thresholdEnergyDeposit;
-    }
-
-    /**
-     * Get the minimum track length.
-     */
-    double getMinimumTrackLength() const
-    {
-      return m_minTrackLength;
-    }
-
-    /**
-     * Get the wire sag mode.
-     */
-    bool getWireSagMode() const
-    {
-      return m_wireSag;
-    }
-
-    /**
-     * Get the modified left/right definition mode.
-     */
-    bool getModifiedLeftRightFlag() const
-    {
-      return m_modLeftRightFlag;
-    }
 
 
   private:
@@ -1132,29 +1054,13 @@ namespace Belle2 {
     double m_senseWireDiameter = 0.003; /**< Sense wire diameter (cm). */
     int m_senseWireNumbers = 14336;/**< Number of sense wires. */
     double m_senseWireTension = 50.0; /**< Sense wire tension (gW). */
-    //    double m_senseSpaceResolution = 0.0130; /**< Nominal space resolution (cm). */
     double m_fieldWireDiameter = 0.0126; /**< Field wire diameter (cm). */
     int m_fieldWireNumbers = 42240; /**< Number of field wires. */
     double m_feedThroughLength = 1.5; /**< Feedthrough length (cm). */
-    bool m_debug;/**< Debug mode. */
-    int m_materialDefinitionMode;/**< Material definition mode. */
-    int m_senseWireZposMode; /**< Sense wire z-position definition mode. */
     double m_clockFrequency; /**< Clock frequency. */
     double m_nominalSpaceResolution;/**< Nominal space resolution. */
 
-    bool m_displacement; /**< Displacement mode. */
-    bool m_misalignment; /**< Misalignment mode. */
-    bool m_alignment; /**< Alignment mode. */
-    std::string m_displacementFile; /**< Displacement file. */
-    std::string m_misalignmentFile; /**< Misalignment file. */
-    std::string m_alignmentFile; /**< Alignment file. */
-
-    double m_thresholdEnergyDeposit; /*!< Energy thresh. for G4 step */
-    double m_minTrackLength;         /*!< Minimum track length for G4 step */
-    bool m_wireSag;        /*!< Switch for sense wire sag */
-    bool m_modLeftRightFlag; /*!< Switch for modified left/right flag */
-
-    ClassDef(CDCGeometry, 2);  /**< ClassDef, must be the last term before the closing {}*/
+    ClassDef(CDCGeometry, 3);  /**< ClassDef, must be the last term before the closing {}*/
 
   };
 } // end of namespace Belle2

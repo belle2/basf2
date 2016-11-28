@@ -9,21 +9,36 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segment/TruthSegmentVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCHitLookUp.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
+
+#include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+void TruthSegmentVarSet::initialize()
 {
-  bool extracted = extractNested(segment);
-  if (not extracted or not segment) return false;
+  CDCMCManager::getInstance().requireTruthInformation();
+  Super::initialize();
+}
+
+void TruthSegmentVarSet::beginEvent()
+{
+  CDCMCManager::getInstance().fill();
+  Super::beginEvent();
+}
+
+bool TruthSegmentVarSet::extract(const CDCSegment2D* segment)
+{
+  if (not segment) return false;
 
   // Find the track with the highest number of hits in the segment
-  const CDCMCSegmentLookUp& mcSegmentLookup = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookup = CDCMCSegment2DLookUp::getInstance();
   const CDCMCHitLookUp& hitLookup = CDCMCHitLookUp::getInstance();
 
   ITrackType segmentMCMatch = mcSegmentLookup.getMCTrackId(segment);
@@ -33,28 +48,31 @@ bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
 
   if (segmentMCMatch == INVALID_ITRACK) {
     segmentIsFake = true;
+
   } else {
-
-
     unsigned int numberOfCorrectHits = 0;
     for (const CDCRecoHit2D& recoHit : *segment) {
       if (hitLookup.getMCTrackId(recoHit->getWireHit().getHit()) == segmentMCMatch) {
         numberOfCorrectHits++;
       }
     }
-    if ((double)numberOfCorrectHits / segment->size() < 0.8) {
-      segmentIsFake = 1.0;
+    if (numberOfCorrectHits < 0.8 * segment->size()) {
+      segmentIsFake = true;
     } else {
-      segmentIsFake = 0.0;
+      segmentIsFake = false;
     }
+
   }
 
   if (not segmentIsFake) {
-    const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
+    // It is a bit suspicuous that this low level objects accesses the DataStore.
+    // Maybe this code is the answer to the wrong question.?
+    StoreWrappedObjPtr<std::vector<CDCWireHit> > storedWireHits("CDCWireHitVector");
+    const std::vector<CDCWireHit>& wireHits = *storedWireHits;
     unsigned int numberOfTakenHitsInThisTrack = 0;
     unsigned int numberOfHitsInThisTrack = 0;
 
-    for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+    for (const CDCWireHit& wireHit : wireHits) {
       if (hitLookup.getMCTrackId(wireHit.getHit()) == segmentMCMatch) {
         numberOfHitsInThisTrack++;
         if (wireHit->getAutomatonCell().hasTakenFlag()) {
@@ -63,14 +81,14 @@ bool TruthSegmentVarSet::extract(const CDCRecoSegment2D* segment)
       }
     }
 
-    if ((double)numberOfTakenHitsInThisTrack / numberOfHitsInThisTrack > 0.5) {
+    if (numberOfTakenHitsInThisTrack > 0.5 * numberOfHitsInThisTrack) {
       trackIsAlreadyFound = true;
     }
   }
 
-  var<named("track_is_already_found_truth")>() = trackIsAlreadyFound;
   var<named("segment_is_fake_truth")>() = segmentIsFake;
+  var<named("track_is_already_found_truth")>() = trackIsAlreadyFound;
   var<named("segment_is_new_track_truth")>() = not segmentIsFake and not trackIsAlreadyFound;
-  var<named("truth")>() = false; // override in children class
+  var<named("truth")>() = false; // override in derived classes
   return true;
 }

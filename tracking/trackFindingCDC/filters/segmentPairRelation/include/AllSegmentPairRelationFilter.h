@@ -20,7 +20,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseSegmentPairRelationFilter Super;
+      using Super = BaseSegmentPairRelationFilter;
 
     public:
       /// Importing all overloads from the super class
@@ -28,10 +28,9 @@ namespace Belle2 {
 
     public:
       /// Implementation accepting all possible neighbors. Weight subtracts the overlap penalty.
-      virtual
-      Weight operator()(const CDCSegmentPair& fromSegmentPair,
-                        const CDCSegmentPair& toSegmentPair) override final;
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      Weight
+      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+    };
+  }
+}

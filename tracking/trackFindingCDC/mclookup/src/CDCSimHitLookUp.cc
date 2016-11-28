@@ -300,10 +300,11 @@ const CDCWireHit* CDCSimHitLookUp::getWireHit(const CDCHit* ptrHit,
   ConstVectorRange<CDCWireHit> wireHit =
     std::equal_range(wireHits.begin(), wireHits.end(), *ptrHit);
 
-  if (wireHit.empty())
+  if (wireHit.empty()) {
     return nullptr;
-  else
+  } else {
     return &(wireHit.front());
+  }
 }
 
 CDCRLWireHit CDCSimHitLookUp::getRLWireHit(const CDCHit* ptrHit,

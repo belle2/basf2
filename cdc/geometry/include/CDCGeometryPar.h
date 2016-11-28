@@ -32,6 +32,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <fstream>
 
 #include "TVector3.h"
 
@@ -88,9 +89,6 @@ namespace Belle2 {
       //! Print some debug information
       void Print() const;
 
-      //! Gets geometry parameters from gearbox.
-      void read();
-
       //! Gets geometry parameters from database.
       void readFromDB(const CDCGeometry&);
 
@@ -105,6 +103,13 @@ namespace Belle2 {
       //       *
       //       */
       //      void readDeltaz(const CDCGeometry&);
+
+      /**
+       * Open a file
+       * @param[in] ifs input file-stream
+       * @param[in] fileName0 file-name on cdc/data directory
+       */
+      void openFile(std::ifstream& ifs, const std::string& fileName0) const;
 
       /**
        * Read displacement or (mis)alignment params from text file.
@@ -132,13 +137,6 @@ namespace Belle2 {
       void readXT(const GearDir, int mode = 0);
 
       /**
-       * Read XT-relation table in old format.
-       * @param[in] GearDir Gear Dir.
-       * @param[in] mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void oldReadXT(const GearDir, int mode = 0);
-
-      /**
        * Read XT-relation table in new format.
        * @param[in] GearDir Gear Dir.
        * @param[in] mode 0: read simulation file, 1: read reconstruction file.
@@ -161,13 +159,6 @@ namespace Belle2 {
        * @param mode 0: read simulation file, 1: read reconstruction file.
        */
       void readSigma(const GearDir, int mode = 0);
-
-      /**
-       * Read spatial resolution table in old format.
-       * @param GearDir Gear Dir.
-       * @param mode 0: read simulation file, 1: read reconstruction file.
-       */
-      void oldReadSigma(const GearDir, int mode = 0);
 
       /**
        * Read spatial resolution table in new format.
@@ -896,7 +887,6 @@ namespace Belle2 {
        */
       void getClosestAlphaPoints4Sgm(const double alpha, double& wal, unsigned short points[2], unsigned short lrs[2]) const;
 
-
       /**
        * Returns the two closest theta points for the input track incident angle (theta).
        * @param theta in rad.
@@ -909,33 +899,11 @@ namespace Belle2 {
        */
       void getClosestThetaPoints4Sgm(const double alpha, const double theta, double& wth, unsigned short points[2]) const;
 
-
-      /**
-       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
-       * @param[in] wireId wire-id. in question (reference)
-       * @param[in] otherWireId another wire-id. in question
-       */
-
-      unsigned short areNeighbors(const WireID& wireId, const WireID& otherWireId) const;
-
-      /**
-       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
-       * @param[in] iCLayer later-id (continuous) in question (reference)
-       * @param[in] iSuperLayer super-later-id in question (reference)
-       * @param[in] iLayer later-id in the super-layer in question (reference)
-       * @param[in] iWire wire-id in the layer in question (reference)
-       * @param[in] otherWireId another wire-id. in question
-       */
-
-      unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire,
-                                  const WireID& otherWireId) const;
-
       /**
        * Set the desizend wire parameters.
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID
        */
-
       void setDesignWirParam(unsigned layerID, unsigned cellID);
 
       /**
@@ -943,7 +911,6 @@ namespace Belle2 {
        * @param[in] layerID Layer ID
        * @param[in] cellID Cell ID
        */
-
       void outputDesignWirParam(unsigned layerID, unsigned cellID) const;
 
       /**
@@ -978,13 +945,14 @@ namespace Belle2 {
       int m_xtParamMode;       /*!< Mode for xt parameterization */
       int m_sigmaFileFormat;   /*!< Format of sigma input file */
       int m_sigmaParamMode;    /*!< Mode for sigma parameterization */
-      signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
       int m_nSLayer;         /*!< The number of sense wire layer. */
       int m_nFLayer;         /*!< The number of field wire layer. */
       unsigned short m_nAlphaPoints;  /*!< No. of alpha points for xt. */
       unsigned short m_nThetaPoints;  /*!< No. of theta points for xt. */
       unsigned short m_nAlphaPoints4Sgm;  /*!< No. of alpha points for sigma. */
       unsigned short m_nThetaPoints4Sgm;  /*!< No. of theta points for sigma. */
+      signed short m_shiftInSuperLayer[nSuperLayers][8]; /*!< shift in phi-direction wrt the 1st layer in each super layer*/
+
       double m_rWall[4];     /*!< The array to store radius of inner wall and outer wall. */
       double m_zWall[4][2];  /*!< The array to store z position of inner wall and outer wall. */
 
@@ -1087,16 +1055,11 @@ namespace Belle2 {
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 
-
     };
 
 //-----------------------------------------------------------------------------
-//
 //  Inline functions
-//
 //-----------------------------------------------------------------------------
-
-
     inline std::string CDCGeometryPar::version() const
     {
       return m_version;
@@ -1112,12 +1075,10 @@ namespace Belle2 {
       return m_momRmin[iBound];
     }
 
-
     inline int CDCGeometryPar::nShifts(int layerID) const
     {
       return m_nShifts[layerID];
     }
-
 
     inline double CDCGeometryPar::offset(int layerID) const
     {
@@ -1243,6 +1204,29 @@ namespace Belle2 {
     {
       return (m_zSBackwardLayer[i] + (m_zSForwardLayer[i] - m_zSBackwardLayer[i]) / 2);
     }
+
+
+
+//=================================================================
+//Not compile the following functions since they are no longer used
+#if 0
+    //! Gets geometry parameters from gearbox.
+    void read();  // no longer used
+
+    /**
+     * Read XT-relation table in old format.
+     * @param[in] GearDir Gear Dir.
+     * @param[in] mode 0: read simulation file, 1: read reconstruction file.
+     */
+    void oldReadXT(const GearDir, int mode = 0);
+
+    /**
+     * Read spatial resolution table in old format.
+     * @param GearDir Gear Dir.
+     * @param mode 0: read simulation file, 1: read reconstruction file.
+     */
+    void oldReadSigma(const GearDir, int mode = 0);
+#endif
   } // end of namespace CDC
 } // end of namespace Belle2
 

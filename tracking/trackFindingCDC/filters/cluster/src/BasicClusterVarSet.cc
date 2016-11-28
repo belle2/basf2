@@ -22,7 +22,6 @@ using namespace TrackFindingCDC;
 
 bool BasicClusterVarSet::extract(const CDCWireHitCluster* ptrCluster)
 {
-  extractNested(ptrCluster);
   if (not ptrCluster) return false;
   const CDCWireHitCluster& cluster = *ptrCluster;
 

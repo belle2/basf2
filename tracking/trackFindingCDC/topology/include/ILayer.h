@@ -12,7 +12,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// The type of the layer ids enumerating layers within a superlayer
+    /// The type of the layer ids enumerating layers within a superlayer.
     using ILayer = signed short ;
 
     /**
@@ -20,27 +20,35 @@ namespace Belle2 {
      *  It provides the basic methods to operate on the ILayer numbers.
      */
     struct ILayerUtil {
-      /// Utility classes should not be instantiated
+      /// Utility classes should not be instantiated.
       ILayerUtil() = delete;
 
-      /** Returns the layer of an object */
+      /// Returns the layer id of an object.
       template<class T>
       static ILayer getFrom(const T& t)
-      { return getFromImpl(t, 0); }
+      {
+        const int dispatchTag = 0;
+        return getFromImpl(t, dispatchTag);
+      }
 
     private:
-      /** Returns the layer of an object. Favored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, int) -> decltype(t.getILayer())
-      { return t.getILayer(); }
+      /// Returns the layer of an object. Favoured option.
+      template <class T>
+      static auto getFromImpl(const T& t,
+                              int favouredTag __attribute__((unused)))
+      -> decltype(t.getILayer())
+      {
+        return t.getILayer();
+      }
 
-      /** Returns the layer of an object. Unfavored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, long) -> decltype(t->getILayer())
-      { return t->getILayer(); }
-
+      /// Returns the layer of an object. Disfavoured option.
+      template <class T>
+      static auto getFromImpl(const T& t,
+                              long disfavouredTag __attribute__((unused)))
+      -> decltype(t->getILayer())
+      {
+        return t->getILayer();
+      }
     };
-
-  } // namespace TrackFindingCDC
-} // namespace Belle2
-
+  }
+}

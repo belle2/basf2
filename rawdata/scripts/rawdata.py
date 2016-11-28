@@ -113,6 +113,11 @@ def add_packers(path, components=None):
         bklmpacker = register_module('BKLMRawPacker')
         path.add_module(bklmpacker)
 
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmpacker = register_module('EKLMRawPacker')
+        path.add_module(eklmpacker)
+
 
 def add_unpackers(path, components=None):
     """
@@ -129,10 +134,16 @@ def add_unpackers(path, components=None):
         pxdhitsorter.param('mergeFrames', False)
         path.add_module(pxdhitsorter)
 
+        pxd_clusterizer = register_module('PXDClusterizer')
+        path.add_module(pxd_clusterizer)
+
     # SVD
     if components is None or 'SVD' in components:
         svdunpacker = register_module('SVDUnpacker')
         path.add_module(svdunpacker)
+
+        svd_clusterizer = register_module('SVDClusterizer')
+        path.add_module(svd_clusterizer)
 
     # CDC
     if components is None or 'CDC' in components:
@@ -150,6 +161,13 @@ def add_unpackers(path, components=None):
     if components is None or 'TOP' in components:
         topunpacker = register_module('TOPUnpacker')
         path.add_module(topunpacker)
+        topconverter = register_module('TOPRawDigitConverter')
+        topconverter.param('useSampleTimeCalibration', False)
+        topconverter.param('useChannelT0Calibration', False)
+        topconverter.param('useModuleT0Calibration', False)
+        topconverter.param('useCommonT0Calibration', False)
+        topconverter.param('subtractOffset', True)
+        path.add_module(topconverter)
 
     # ARICH
     if components is None or 'ARICH' in components:
@@ -161,6 +179,11 @@ def add_unpackers(path, components=None):
         bklmunpacker = register_module('BKLMUnpacker')
         path.add_module(bklmunpacker)
 
+    # EKLM
+    if components is None or 'EKLM' in components:
+        eklmunpacker = register_module('EKLMUnpacker')
+        path.add_module(eklmunpacker)
+
 
 def add_raw_output(path, filename='raw.root', additionalBranches=[]):
     """
@@ -169,7 +192,20 @@ def add_raw_output(path, filename='raw.root', additionalBranches=[]):
 
     output = register_module('RootOutput')
     output.param('outputFileName', filename)
-    branches = ['RawPXDs', 'RawSVDs', 'RawTOPs', 'RawARICHs', 'RawKLMs']
+    branches = ['RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
     branches += additionalBranches
     output.param('branchNames', branches)
+    path.add_module(output)
+
+
+def add_raw_seqoutput(path, filename='raw.sroot', additionalObjects=[]):
+    """
+    This function adds an seqroot output module for raw data to a path.
+    """
+
+    output = register_module('SeqRootOutput')
+    output.param('outputFileName', filename)
+    objects = ['EventMetaData', 'RawPXDs', 'RawSVDs', 'RawCDCs', 'RawTOPs', 'RawARICHs', 'RawECLs', 'RawKLMs']
+    objects += additionalObjects
+    output.param('saveObjs', objects)
     path.add_module(output)

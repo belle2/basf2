@@ -12,27 +12,21 @@
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+    class CDCTrack;
+
     /// Filter for the construction of good segment - track pairs
     class SimpleSegmentTrackFilter : public FilterOnVarSet<SegmentTrackVarSet> {
 
     private:
       /// Type of the super class
-      typedef FilterOnVarSet<SegmentTrackVarSet> Super;
-
-    public:
-      /// Constructor
-      SimpleSegmentTrackFilter() : Super() { }
+      using Super = FilterOnVarSet<SegmentTrackVarSet>;
 
     public:
       /// Get the output of the filter.
-      virtual Weight operator()(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>& testPair) override final;
-
+      Weight operator()(const std::pair<const CDCSegment2D*, const CDCTrack*>& testPair) final;
     };
   }
 }

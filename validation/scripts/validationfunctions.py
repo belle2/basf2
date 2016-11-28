@@ -7,14 +7,55 @@ import timeit
 g_start_time = timeit.default_timer()
 
 import os
+import time
 import glob
 import argparse
 import ROOT
 import validationpath
+import subprocess
 
 ###############################################################################
 #                           Function definitions                              #
 ###############################################################################
+
+
+def get_timezone():
+    """
+    Returns the correct timezone as short string
+    """
+    tzTuple = time.tzname
+
+    # in some timezones, there is a daylight saving times entry in the second item
+    # of the tuple
+    if time.daylight != 0:
+        return tzTuple[1]
+    else:
+        return tzTuple[0]
+
+
+def get_compact_git_hash(repo_folder):
+    """
+    Returns the compact git hash from a folder (or any of this folders parents)
+    or None if none of theses folders is a git repository
+    """
+    cwd = os.getcwd()
+    os.chdir(repo_folder)
+    # todo: we want the short version here
+    try:
+        current_git_commit = subprocess.check_output(["git", "show", "--oneline", "-s"]).decode().rstrip()
+        # the first word in this string will be the hash
+        current_git_commit = current_git_commit.split(" ")
+        if len(current_git_commit) > 1:
+            current_git_commit = current_git_commit[0]
+        else:
+            # something went wrong, return None
+            current_git_commit = None
+    except subprocess.CalledProcessError:
+        current_git_commit = None
+    finally:
+        os.chdir(cwd)
+
+    return current_git_commit
 
 
 def available_revisions(work_folder):

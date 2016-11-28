@@ -30,6 +30,9 @@ namespace Belle2 {
    * event information and large numbers of zeros in the seed information. We
    * generate the hash from the (optional) arbitrary seed information followed
    * by the event meta data in big endian representation.
+   *
+   * See BELLE2-NOTE-TE-2015-031: Belle II UNICORN – UNIfied Calculation Of Random Numbers
+   * for details. Available at: https://docs.belle2.org/record/292?ln=en
    */
   class RandomGenerator: public TRandom {
   public:

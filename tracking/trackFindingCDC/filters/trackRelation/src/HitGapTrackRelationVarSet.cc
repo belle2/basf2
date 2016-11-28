@@ -9,18 +9,14 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/trackRelation/HitGapTrackRelationVarSet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-HitGapTrackRelationVarSet::HitGapTrackRelationVarSet()
-  : Super()
-{
-}
-
 bool HitGapTrackRelationVarSet::extract(const Relation<const CDCTrack>* ptrTrackRelation)
 {
-  bool extracted = extractNested(ptrTrackRelation);
-  if (not extracted or not ptrTrackRelation) return false;
+  if (not ptrTrackRelation) return false;
 
   const Relation<const CDCTrack>& trackPair = *ptrTrackRelation;
 

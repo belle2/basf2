@@ -25,9 +25,7 @@
 
 #include "AbsKalmanFitter.h"
 
-#ifndef __CINT__
-#include <boost/scoped_ptr.hpp>
-#endif
+#include <memory>
 
 
 namespace genfit {
@@ -50,7 +48,7 @@ class KalmanFitter : public AbsKalmanFitter {
  public:
 
   KalmanFitter(unsigned int maxIterations = 4, double deltaPval = 1e-3, double blowUpFactor = 1e3, bool squareRootFormalism = false)
-    : AbsKalmanFitter(maxIterations, deltaPval, blowUpFactor), currentState_(NULL),
+    : AbsKalmanFitter(maxIterations, deltaPval, blowUpFactor), currentState_(nullptr),
       squareRootFormalism_(squareRootFormalism)
   {}
 
@@ -71,7 +69,7 @@ class KalmanFitter : public AbsKalmanFitter {
       const AbsTrackRep* rep, double& chi2, double& ndf, int direction);
 
 #ifndef __CINT__
-  boost::scoped_ptr<MeasuredStateOnPlane> currentState_;
+  std::unique_ptr<MeasuredStateOnPlane> currentState_;
 #else
   MeasuredStateOnPlane* currentState_;
 #endif

@@ -23,13 +23,12 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef FilterOnVarSet<SkimmedHitGapSegmentPairVarSet> Super;
+      using Super = FilterOnVarSet<SkimmedHitGapSegmentPairVarSet>;
 
     public:
       /// Checks if a pair of segments is a good combination
-      virtual Weight operator()(const CDCSegmentPair& segmentPair) override final;
+      Weight operator()(const CDCSegmentPair& segmentPair) final;
+    };
 
-    }; // end class FitlessSegmentPairFilter
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

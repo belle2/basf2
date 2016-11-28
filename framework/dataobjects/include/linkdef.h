@@ -13,11 +13,6 @@
 #pragma link C++ class Belle2::MCInitialParticles+;
 #pragma link C++ class Belle2::DigitBase+;
 
-#pragma link C++ class Belle2::SimpleVec<int>+;
-#pragma link C++ class Belle2::SimpleVec<double>+;
-#pragma link C++ class Belle2::SimpleVec<float>+;
-#pragma link C++ class Belle2::SimpleVec<char>+;
-
 #pragma link C++ class Belle2::Helix+;
 #pragma link C++ class Belle2::UncertainHelix+;
 #pragma link C++ class Belle2::EventT0+;

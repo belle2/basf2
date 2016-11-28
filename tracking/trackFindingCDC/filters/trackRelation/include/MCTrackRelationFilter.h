@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseTrackRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseTrackRelationFilter >;
 
     public:
       /** Constructor also setting the switch ,
@@ -31,10 +31,8 @@ namespace Belle2 {
 
     public:
       /// Checks if a track relation is a good combination.
-      virtual Weight operator()(const CDCTrack& fromTrack,
-                                const CDCTrack& toTrack) override final;
+      Weight operator()(const CDCTrack& fromTrack, const CDCTrack& toTrack) final;
+    };
 
-    }; // end class MCTrackRelationFilter
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

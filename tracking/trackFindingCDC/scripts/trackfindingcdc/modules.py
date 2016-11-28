@@ -29,8 +29,8 @@ class CDCHitUniqueAssumer(basf2.Module):
 
             for track in tracks:
                 # Unset all taken flags
-                for recoHit in track:
-                    if not recoHit.getWireHit().getAutomatonCell().hasTakenFlag():
+                for recoHit3D in track:
+                    if not recoHit3D.getWireHit().getAutomatonCell().hasTakenFlag():
                         self.number_of_hits_with_wrong_flags += 1
 
             for i, track in enumerate(tracks):
@@ -38,18 +38,18 @@ class CDCHitUniqueAssumer(basf2.Module):
                 for j, innerTrack in enumerate(tracks):
                     if i == j:
                         continue
-                    for recoHit in innerTrack:
-                        recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
+                    for recoHit3D in innerTrack:
+                        recoHit3D.getWireHit().getAutomatonCell().setAssignedFlag()
 
-                for recoHit in track:
+                for recoHit3D in track:
                     self.number_of_total_hits += 1
-                    if recoHit.getWireHit().getAutomatonCell().hasAssignedFlag():
+                    if recoHit3D.getWireHit().getAutomatonCell().hasAssignedFlag():
                         self.number_of_doubled_hits += 1
-                    recoHit.getWireHit().getAutomatonCell().setAssignedFlag()
+                    recoHit3D.getWireHit().getAutomatonCell().setAssignedFlag()
 
                 for innerTrack in tracks:
-                    for recoHit in innerTrack:
-                        recoHit.getWireHit().getAutomatonCell().unsetAssignedFlag()
+                    for recoHit3D in innerTrack:
+                        recoHit3D.getWireHit().getAutomatonCell().unsetAssignedFlag()
 
     def terminate(self):
         print("Number of doubled hits:", self.number_of_doubled_hits)

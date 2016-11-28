@@ -11,12 +11,10 @@
 #pragma once
 
 #include <framework/core/ModuleStatistics.h>
-#include <framework/utilities/Utils.h>
-
 #include <framework/pcore/Mergeable.h>
 
 #include <map>
-
+#include <vector>
 
 namespace Belle2 {
   class Module;
@@ -97,7 +95,7 @@ namespace Belle2 {
      *                used
      */
     std::string getStatisticsString(ModuleStatistics::EStatisticCounters type = ModuleStatistics::c_Event,
-                                    const std::vector<Belle2::ModuleStatistics>* modules = 0) const;
+                                    const std::vector<Belle2::ModuleStatistics>* modules = nullptr) const;
 
     /** Get global statistics. */
     const ModuleStatistics& getGlobal() const { return m_global; }

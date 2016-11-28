@@ -8,7 +8,7 @@ import os.path
 import tracking.utilities as utilities
 import tracking.root_utils as root_utils
 
-from trackfindingcdc.tmva.train import ClassificationOverview
+from trackfindingcdc.mva.train import ClassificationOverview
 
 import ROOT.TFile
 

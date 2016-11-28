@@ -246,7 +246,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
       shape_t* s = *it;
       wrapped_crystals.push_back(wrapped_crystal(s, "backward", 0.20 - 0.02));
     }
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       const cplacement_t& t = *it;
       auto s = find_if(cryst.begin(), cryst.end(), [&t](const shape_t* shape) {return shape->nshape == t.nshape;});
       if (s == cryst.end()) continue;
@@ -261,7 +261,7 @@ void Belle2::ECL::GeoECLCreator::backward(G4LogicalVolume& _top)
   }
 
   if (b_preamplifier) {
-    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); it++) {
+    for (vector<cplacement_t>::const_iterator it = bp.begin(); it != bp.end(); ++it) {
       G4Transform3D twc = G4Translate3D(0, 0, 3) * get_transform(*it);
       int indx = it - bp.begin();
       auto pv = new G4PVPlacement(twc * G4TranslateZ3D(300 / 2 + 0.20 + get_pa_box_height() / 2)*G4RotateZ3D(-M_PI / 2), get_preamp(),

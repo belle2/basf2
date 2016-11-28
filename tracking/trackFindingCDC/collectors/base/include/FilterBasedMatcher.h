@@ -8,11 +8,11 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <cdc/dataobjects/CDCSimHit.h>
-#include <mdst/dataobjects/MCParticle.h>
+
+#include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <framework/core/ModuleParamList.h>
-#include <framework/datastore/StoreArray.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -24,36 +24,30 @@ namespace Belle2 {
       virtual ~FilterBasedMatcher() = default;
 
       /// Expose the parameters to the module.
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
+      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
       {
-        m_filterFactory.exposeParameters(moduleParameters, prefix);
+        m_filter.exposeParameters(moduleParameters, prefix);
       }
 
       /// Initialize the filter.
       virtual void initialize()
       {
-        m_filter = m_filterFactory.create();
-        m_filter->initialize();
-
-        if (m_filter->needsTruthInformation()) {
-          StoreArray <CDCSimHit>::required();
-          StoreArray <MCParticle>::required();
+        m_filter.initialize();
+        /// Redundant check - should in principle be required by the filter directly
+        if (m_filter.needsTruthInformation()) {
+          CDCMCManager::getInstance().requireTruthInformation();
         }
       }
 
       /// Terminate the filter.
       virtual void terminate()
       {
-        m_filter->terminate();
+        m_filter.terminate();
       }
 
     protected:
-      /// The filter factory will output this filter later.
-      std::unique_ptr<typename AFilterFactory::CreatedFilter> m_filter;
-
-    private:
-      /// Use this filter factory.
-      AFilterFactory m_filterFactory;
+      /// The filter to be used in the matching
+      ChooseableFilter<AFilterFactory> m_filter;
     };
   }
 }

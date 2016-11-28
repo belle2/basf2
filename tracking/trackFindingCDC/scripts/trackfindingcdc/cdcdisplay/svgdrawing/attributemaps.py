@@ -13,6 +13,7 @@ from ROOT import Belle2  # make Belle2 namespace available
 from ROOT import std
 from ROOT import genfit
 
+import bisect
 import colorsys
 
 # Standard color map for id types
@@ -141,16 +142,23 @@ class TakenFlagColorMap(CDCHitColorMap):
     """
     CDCHit to color map highlighting the CDCHits that posses the do not use flag.
     """
+    def __init__(self):
+        super().__init__()
+        self.storedWireHits = Belle2.PyStoreObj('CDCWireHitVector')
+        if not self.storedWireHits:
+            print('Could not find CDCWireHitVector in the data store to lookup TakenFlag')
 
     def __call__(self, iCDCHit, cdcHit):
         """
         Function call to map the CDCHit id and object to a color.
         """
+        if not self.storedWireHits:
+            return self.bkgHitColor
 
-        wireHitTopology = Belle2.TrackFindingCDC.CDCWireHitTopology.getInstance()
-
-        wirehit = wireHitTopology.getWireHit(cdcHit)
-        if wirehit.getAutomatonCell().hasTakenFlag():
+        wireHits = self.storedWireHits.obj().get()
+        # Search the sorted range of wire hits for the one corresponding to the given CDCHit
+        wireHit = wireHits.at(bisect.bisect_left(wireHits, cdcHit))
+        if wireHit.getAutomatonCell().hasTakenFlag():
             return 'red'
         else:
             return self.bkgHitColor
@@ -596,7 +604,7 @@ class SegmentMCTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
         if mcTrackId < 0:
@@ -619,7 +627,7 @@ class SegmentFBInfoColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         mcTrackId = mcSegmentLookUp.getMCTrackId(segment)
@@ -648,7 +656,7 @@ class SegmentFirstInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         firstInTrackId = mcSegmentLookUp.getFirstInTrackId(segment)
@@ -671,7 +679,7 @@ class SegmentLastInTrackIdColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         lastInTrackId = mcSegmentLookUp.getLastInTrackId(segment)
@@ -694,7 +702,7 @@ class SegmentFirstNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         firstNPassedSuperLayers = \
@@ -718,7 +726,7 @@ class SegmentLastNPassedSuperLayersColorMap(CDCSegmentColorMap):
         """
 
         mcSegmentLookUp = \
-            Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+            Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
 
         # Just to look at matched segments
         lastNPassedSuperLayers = \

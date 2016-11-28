@@ -8,19 +8,14 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/BasicFacetVarSet.h>
-#include <cassert>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicFacetVarSet::BasicFacetVarSet()
-  : Super()
-{
-}
-
 bool BasicFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
-  extractNested(ptrFacet);
   if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 

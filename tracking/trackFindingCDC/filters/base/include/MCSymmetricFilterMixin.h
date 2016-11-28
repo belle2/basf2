@@ -26,7 +26,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef AFilter Super;
+      using Super = AFilter;
 
     public:
       /// Constructor
@@ -37,7 +37,7 @@ namespace Belle2 {
       }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "allowReverse"),
@@ -48,26 +48,24 @@ namespace Belle2 {
 
       }
 
-
       /// Initialize the before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().requireTruthInformation();
-        }
+        CDCMCManager::getInstance().requireTruthInformation();
+        Super::initialize();
       }
 
       /// Signal the beginning of a new event
-      virtual void beginEvent() override
+      void beginEvent() override
       {
-        if (needsTruthInformation()) {
-          CDCMCManager::getInstance().fill();
-        }
+        CDCMCManager::getInstance().fill();
+        Super::beginEvent();
       }
 
       /// Indicates that the filter requires Monte Carlo information.
-      virtual bool needsTruthInformation() override final
-      { return true; }
+      bool needsTruthInformation() final {
+        return true;
+      }
 
     public:
       /// Setter for the allow reverse parameter
@@ -81,8 +79,6 @@ namespace Belle2 {
     private:
       /// Switch to indicate if the reversed version of the object shall also be accepted (default is true).
       bool m_param_allowReverse;
-
-    }; // end class MCFilterMixin
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

@@ -38,7 +38,7 @@ namespace Belle2 {
       };
 
       /// Type for an ored combination of the status flags of cells in the cellular automata
-      typedef ECellFlag ECellFlags;
+      using ECellFlags = ECellFlag;
 
       /// Constant summing all possible cell flags
       static const ECellFlags c_AllFlags = ECellFlags(ECellFlag::c_Assigned +
@@ -188,8 +188,11 @@ namespace Belle2 {
       template<ECellFlags cellFlag>
       void setFlags(bool setTo) const
       {
-        if (setTo) setFlags(cellFlag);
-        else clearFlags(cellFlag);
+        if (setTo) {
+          setFlags(cellFlag);
+        } else {
+          clearFlags(cellFlag);
+        }
       }
 
       /** Getter for the ored combination of the cell flags to mark some status of the cell.
@@ -228,7 +231,7 @@ namespace Belle2 {
       /// Storage for the cell state set by the cellular automata
       mutable CellState m_state = 0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

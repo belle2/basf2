@@ -33,6 +33,7 @@ pp = pprint.PrettyPrinter(depth=6, indent=1, width=80)
 from validationscript import Script, ScriptStatus
 from validationfunctions import get_start_time, get_validation_folders, scripts_in_dir, \
     find_creator, parse_cmd_line_arguments
+import validationfunctions
 
 import validationserver
 import validationplots
@@ -765,8 +766,9 @@ class Validation:
                 if dep_script.status == ScriptStatus.cached:
                     script.dependencies.remove(dep_script)
 
-    def store_run_results_json(self):
+    def store_run_results_json(self, git_hash):
 
+        # retrieve the git hash which was used for executing this validation scripts
         json_package = []
         for p in self.list_of_packages:
             this_package_scrits = [s for s in self.list_of_scripts if s.package == p]
@@ -777,7 +779,11 @@ class Validation:
             json_package.append(json_objects.Package(p, scriptfiles=json_scripts, fail_count=fail_count))
 
         # todo: assign correct color here
-        rev = json_objects.Revision(self.tag, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), packages=json_package)
+        rev = json_objects.Revision(label=self.tag,
+                                    creation_date=datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),
+                                    creation_timezone=validationfunctions.get_timezone(),
+                                    packages=json_package,
+                                    git_hash=git_hash)
         json_objects.dump(validationpath.get_results_tag_revision_file(self.work_folder, self.tag), rev)
 
     def add_script(self, script):
@@ -818,6 +824,11 @@ class Validation:
             control = clustercontrolsge.Cluster()
         else:
             control = local_control
+
+        # read the git hash which is used to produce this validation
+        git_hash = validationfunctions.get_compact_git_hash(self.basepaths["local"])
+        self.log.note("Git hash of repository located at {} is {}".format(self.basepaths["local"],
+                                                                          git_hash))
 
         # If we do have runtime data, then read them
         if os.path.exists("./runtimes.dat") and os.stat("./runtimes.dat").st_size:
@@ -969,7 +980,7 @@ class Validation:
             runtimes.close()
         print()
 
-        self.store_run_results_json()
+        self.store_run_results_json(git_hash)
         # todo: update list of available revisions with the current run
 
     def create_plots(self):

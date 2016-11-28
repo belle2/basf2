@@ -121,6 +121,12 @@ namespace Belle2 {
     bool isFSR(const Belle2::MCParticle* p);
 
     /**
+     * Returns true if given MCParticle is a radiative photon.
+     * Assumes PDG code of p is 22.
+     */
+    bool isRadiativePhoton(const Belle2::MCParticle* p);
+
+    /**
      * Determines which daughters of 'mcParticle' are not reconstructed by any daughter of
      * 'particle'.
      *

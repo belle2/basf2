@@ -27,7 +27,6 @@
 #include <testbeam/vxd/dataobjects/TelTrueHit.h>
 #include <testbeam/vxd/dataobjects/TelCluster.h>
 #include <vxd/dataobjects/VxdID.h>
-#include <framework/dataobjects/SimpleVec.h>
 #include <genfit/TrackCand.h>
 #include <genfit/WireTrackCandHit.h>
 

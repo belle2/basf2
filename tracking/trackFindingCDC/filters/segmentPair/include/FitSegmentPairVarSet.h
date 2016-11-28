@@ -8,15 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const fitSegmentPairVarNames[] = {
       "ndf",
@@ -30,26 +30,22 @@ namespace Belle2 {
       "tanl_var",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment
-     */
-    class FitSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    /// Vehicle class to transport the variable names
+    struct FitSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(fitSegmentPairVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(fitSegmentPairVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return fitSegmentPairVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a segment pair.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from an axial stereo segment pair
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class FitSegmentPairVarSet : public VarSet<FitSegmentPairVarNames> {
 
@@ -58,14 +54,14 @@ namespace Belle2 {
       using Super = VarSet<FitSegmentPairVarNames>;
 
     public:
-      /// Construct the varset.
+      /// Construct the varset with a switch to only do the prelimiary axial stereo fusion fit
       explicit FitSegmentPairVarSet(bool preliminaryFit = false);
 
-      /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
 
       /// Get access to the values and names of the variables - includes a prefix_ "pre" for the prelimiary fit
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override;
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override;
 
     private:
       /// Indicator that only the prelimiary fit should be used.

@@ -24,21 +24,18 @@ namespace Belle2 {
 
     private:
       /// Type of the filter base class.
-      typedef AFilter Super;
+      using Super = AFilter;
 
     public:
-      /// The base filter.
-      using AFilter::BaseFilter;
+      /// Using constructor of the Super class
+      using AFilter::AFilter;
 
       /// Object type to be filtered.
-      typedef typename AFilter::Object Object;
+      using Object = typename AFilter::Object;
 
     public:
-      /// Constructor of the filter.
-      ObserverFilter() : Super() {}
-
       /// Terminate the filter after event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         B2INFO("Filter said " << m_yesAnswers << " times yes and " << m_noAnswers << " times no.");
         Super::terminate();
@@ -52,7 +49,7 @@ namespace Belle2 {
        *  @return    A finit float value if the object is accepted.
        *             NAN if the object is rejected.
        */
-      virtual Weight operator()(const Object& object)
+      Weight operator()(const Object& object) override
       {
         Weight result = Super::operator()(object);
         if (std::isnan(result)) {
@@ -67,6 +64,7 @@ namespace Belle2 {
     private:
       /// Number of counted yes answers.
       unsigned int m_yesAnswers = 0;
+
       /// Number of counted no answers.
       unsigned int m_noAnswers = 0;
     };

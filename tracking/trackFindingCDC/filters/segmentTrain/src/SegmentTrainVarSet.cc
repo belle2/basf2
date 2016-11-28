@@ -14,7 +14,7 @@
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 
 using namespace Belle2;
@@ -22,7 +22,6 @@ using namespace TrackFindingCDC;
 
 bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
 {
-  extractNested(testPair);
   const std::vector<SegmentInformation*> segmentTrain = testPair->first;
   const CDCTrack* track = testPair->second;
 
@@ -57,7 +56,9 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
       return true;
     }
     if (alreadySet) {
-      double currentOverlap = (1 - m_param_percentageForPerpSMeasurements) * lastPerpS - perpSFront;
+      // We use this amount of overlap when defining a segment train
+      const float c_PercentageForPerpSMeasurements = 0.05;
+      double currentOverlap = (1 - c_PercentageForPerpSMeasurements) * lastPerpS - perpSFront;
       sumPerpSOverlap += currentOverlap;
       if (currentOverlap > maximumPerpSOverlap) {
         maximumPerpSOverlap = currentOverlap;
@@ -83,10 +84,11 @@ bool SegmentTrainVarSet::extract(const std::pair<std::vector<SegmentInformation*
 
   var<named("calculation_failed")>() = false;
   var<named("maximum_perpS_overlap")>() = maximumPerpSOverlap;
-  if (segmentTrain.size() > 1)
+  if (segmentTrain.size() > 1) {
     var<named("perpS_overlap_mean")>() = sumPerpSOverlap / (segmentTrain.size() - 1);
-  else
+  } else {
     var<named("perpS_overlap_mean")>() = 0;
+  }
 
   return true;
 }

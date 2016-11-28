@@ -22,14 +22,14 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef  UnionRecordingFilter<SegmentPairRelationFilterFactory> Super;
+      using Super = UnionRecordingFilter<SegmentPairRelationFilterFactory>;
 
     public:
       /// Valid names of variable sets for segments.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for segments from a name.
-      virtual
+
       std::unique_ptr<BaseVarSet<Relation<const CDCSegmentPair> > >
       createVarSet(const std::string& name) const override;
     };

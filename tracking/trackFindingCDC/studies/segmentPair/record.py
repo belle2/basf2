@@ -41,7 +41,7 @@ class CDCSegmentPairRecordingRun(RecordingRun):
     @property
     def recording_finder_module(self):
         finder_module = basf2.register_module(
-            "TrackFinderCDCAutomatonDev",
+            "TrackFinderCDCAutomaton",
             SegmentPairFilter="unionrecording",
             SegmentPairRelationFilter="none",
             SegmentPairFilterParameters={

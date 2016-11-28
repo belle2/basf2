@@ -17,7 +17,6 @@
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <framework/utilities/TestHelpers.h>
 
@@ -102,11 +101,17 @@ namespace Belle2 {
 
         std::vector<const CDCWireHit*> trackHitList;
         if (number % 2 == 0) {
-          for (std::vector<CDCWireHit>::iterator it = m_hitList.begin() ; it != (m_hitList.begin() + 76); ++it)
+          for (std::vector<CDCWireHit>::iterator it = m_hitList.begin();
+               it != (m_hitList.begin() + 76);
+               ++it) {
             trackHitList.push_back(&(*it));
+          }
         } else {
-          for (std::vector<CDCWireHit>::iterator it = (m_hitList.begin() + 76) ; it != m_hitList.end(); ++it)
+          for (std::vector<CDCWireHit>::iterator it = (m_hitList.begin() + 76);
+               it != m_hitList.end();
+               ++it) {
             trackHitList.push_back(&(*it));
+          }
         }
 
         const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
@@ -701,22 +706,7 @@ namespace Belle2 {
         EXPECT_EQ(m_hitList.size(), 110) << "Too few hits in the hit vector.";
 
         std::sort(m_hitList.begin(), m_hitList.end());
-
-        std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(m_hitList)};
-
-        auto keepSharedWireHitsAlive = [sharedWireHits](ConstVectorRange<CDCWireHit>* wireHitRange) {
-          delete wireHitRange;
-        };
-
-        std::shared_ptr<ConstVectorRange<CDCWireHit> > sharedWireHitRange{
-          new ConstVectorRange<CDCWireHit>(sharedWireHits->begin(), sharedWireHits->end()), keepSharedWireHitsAlive
-        };
-
-        CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        wireHitTopology.fill(std::move(sharedWireHitRange));
-
       }
-
     };
   }
 }

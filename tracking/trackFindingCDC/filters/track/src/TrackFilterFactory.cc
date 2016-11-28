@@ -9,38 +9,66 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/track/TrackFilterFactory.h>
 
+#include <tracking/trackFindingCDC/filters/track/TruthTrackVarSet.h>
+#include <tracking/trackFindingCDC/filters/track/BasicTrackVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
+#include <tracking/trackFindingCDC/filters/base/RecordingFilter.h>
+#include <tracking/trackFindingCDC/filters/base/MCFilter.h>
+#include <tracking/trackFindingCDC/filters/base/AllFilter.h>
+
+#include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
+
+namespace {
+  using AllTrackFilter = AllFilter<BaseTrackFilter>;
+  using MCTrackFilter = MCFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using RecordingTrackFilter = RecordingFilter<VariadicUnionVarSet<TruthTrackVarSet, BasicTrackVarSet>>;
+  using MVATrackFilter = MVAFilter<BasicTrackVarSet>;
+}
+
+TrackFilterFactory::TrackFilterFactory(const std::string& defaultFilterName)
+  : Super(defaultFilterName)
+{
+}
+
+std::string TrackFilterFactory::getIdentifier() const
+{
+  return "Track";
+}
+
+std::string TrackFilterFactory::getFilterPurpose() const
+{
+  return "Track filter to reject fakes";
+}
 
 std::map<std::string, std::string>
 TrackFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
+  return {
+    {"none", "no track is valid"},
+    {"all", "set all tracks as good"},
     {"truth", "monte carlo truth"},
-    {"all", "set all segments as good"},
-    {"none", "no segment track combination is valid"},
     {"recording", "record variables to a TTree"},
-    {"tmva", "test with a tmva method"}
-  });
-  return filterNames;
+    {"mva", "test with a mva method"}
+  };
 }
 
 std::unique_ptr<BaseTrackFilter>
 TrackFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
-    return std::unique_ptr<BaseTrackFilter>(new BaseTrackFilter());
-  } else if (filterName == "truth") {
-    return std::unique_ptr<BaseTrackFilter>(new MCTrackFilter());
+    return makeUnique<BaseTrackFilter>();
   } else if (filterName == "all") {
-    return std::unique_ptr<BaseTrackFilter>(new AllTrackFilter());
-  } else if (filterName == "tmva") {
-    return std::unique_ptr<BaseTrackFilter>(new TMVATrackFilter("TrackFilter"));
+    return makeUnique<AllTrackFilter>();
+  } else if (filterName == "truth") {
+    return makeUnique<MCTrackFilter>();
   } else if (filterName == "recording") {
-    return std::unique_ptr<BaseTrackFilter>(new RecordingTrackFilter("TrackFilter.root"));
+    return makeUnique<RecordingTrackFilter>("TrackFilter.root");
+  } else if (filterName == "mva") {
+    return makeUnique<MVATrackFilter>("tracking/data/trackfindingcdc_TrackFilter.xml");
   } else {
     return Super::create(filterName);
   }

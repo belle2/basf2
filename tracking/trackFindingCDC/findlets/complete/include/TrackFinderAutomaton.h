@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
+#include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
@@ -26,15 +26,14 @@
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Complete findlet implementing track finding with the cellular automaton in two stages.
-    class TrackFinderAutomaton
-      : public Findlet<> {
+    class TrackFinderAutomaton : public Findlet<> {
 
     private:
       /// Type of the base class
@@ -45,19 +44,21 @@ namespace Belle2 {
       TrackFinderAutomaton();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() override;
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-      /// Generates the segment.
-      virtual void apply() override final;
+      /// Signal the beginning of a new event
+      void beginEvent() final;
+
+      /// Execute the findlet
+      void apply() final;
 
     private:
       // Findlets
       /// Preparation findlet creating the wire hits from the packed CDCHits
-      WireHitTopologyPreparer m_wireHitTopologyPreparer;
+      WireHitPreparer m_wireHitTopologyPreparer;
 
       /// First stage cellular automaton segment finder
       SegmentFinderFacetAutomaton<ChooseableClusterFilter,
@@ -65,7 +66,7 @@ namespace Belle2 {
                                   ChooseableFacetRelationFilter,
                                   ChooseableSegmentRelationFilter> m_segmentFinderFacetAutomaton;
 
-      /// First stage cellular automaton track finder from segments
+      /// Second stage cellular automaton track finder from segments
       TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
                                       ChooseableSegmentPairRelationFilter,
                                       ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
@@ -73,19 +74,27 @@ namespace Belle2 {
       /// Adjusts the flight time of the tracks to a setable trigger point
       TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;
 
-      /// Exports the generated CDCTracks as track candidates to be fitted by Genfit.
+      /// Exports the generated CDCTracks as RecoTracks.
       TrackExporter m_trackExporter;
 
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCRecoSegment2D> m_segmentsSwapper{"CDCRecoSegment2DVector"};
+      StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
 
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
 
-    }; // end class TrackFinderAutomaton
+      // Object pools
+      /// Memory for the wire hits
+      std::vector<CDCWireHit> m_wireHits;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      /// Memory for the segments
+      std::vector<CDCSegment2D> m_segments;
+
+      /// Memory for the tracks
+      std::vector<CDCTrack> m_tracks;
+    };
+  }
+}

@@ -39,8 +39,8 @@ namespace Belle2 {
 
   private:
 
-    CDC::CDCSimControlPar& m_scp;  /*! rReference to CDCSim... */
-    CDC::CDCGeoControlPar& m_gcp;  /*! rReference to CDCGeo... */
+    CDC::CDCSimControlPar& m_scp;  /*!< Reference to CDCSim... */
+    CDC::CDCGeoControlPar& m_gcp;  /*!< Reference to CDCGeo... */
 
     //For Simulation
     bool m_wireSag;                               /*!< Switch for sense wire sag */

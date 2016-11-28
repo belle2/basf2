@@ -31,10 +31,10 @@ namespace Belle2 {
       UnionRecordingClusterFilter();
 
       /// Valid names of variable sets for clusters.
-      virtual std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const override;
 
       /// Create a concrete variables set for clusters from a name.
-      virtual
+
       std::unique_ptr<BaseVarSet<CDCWireHitCluster> >
       createVarSet(const std::string& name) const override;
 

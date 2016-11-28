@@ -22,8 +22,10 @@ namespace Belle2 {
      *  but has no instructions on its own.
      *  Loosely inspired from http://en.wikipedia.org/wiki/Variadic_templates
      */
-    template<class... Ts>
-    static inline void evalVariadic(Ts&& ...) {}
+    template <class... Ts>
+    static inline void evalVariadic(Ts&& ... expressions __attribute__((unused)))
+    {
+    }
 
     /** Structure to serve as a placeholder for a variadic initializer list of statements to be evaluated.
      *  Similar to the evalVariadic functions this structure evaluates as variadic list of statements, but
@@ -32,8 +34,10 @@ namespace Belle2 {
      */
     struct EvalVariadic {
       /// Constructor taking the variadic initalizer list.
-      template<class... T>
-      explicit EvalVariadic(T...) {}
+      template <class... Ts>
+      explicit EvalVariadic(Ts&& ... expressions __attribute__((unused)))
+      {
+      }
     };
 
 
@@ -51,14 +55,14 @@ namespace Belle2 {
     template<class AType>
     struct FirstTypeImpl<AType> {
       /// Result first item of the variadic sequence.
-      typedef AType Type;
+      using Type = AType;
     };
 
     /** Specialisation where there is more than one type given */
     template<class AType, class... ATypes>
     struct FirstTypeImpl<AType, ATypes...> {
       /// Result first item of the variadic sequence.
-      typedef AType Type;
+      using Type = AType;
     };
 
     /** Short cut meta function to take the first type of a variadic sequence */
@@ -91,5 +95,5 @@ namespace Belle2 {
     using TypeInTuple =
       std::integral_constant < bool, (GetIndexInTuple<T, ATuple>::value < std::tuple_size<ATuple>::value) >;
 
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

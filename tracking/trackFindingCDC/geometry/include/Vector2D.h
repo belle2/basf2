@@ -699,7 +699,7 @@ namespace Belle2 {
       /// Memory for the second coordinate
       double m_y;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

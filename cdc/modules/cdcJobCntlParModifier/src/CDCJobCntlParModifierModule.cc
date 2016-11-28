@@ -33,13 +33,17 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //Switch for debug
   addParam("Debug4Sim", m_debug4Sim, "Switch on/off debug in FullSim", false);
   //Switch for wire sag
-  addParam("WireSag", m_wireSag, "Switch on/off sense wire sag in FullSim", true);
+  addParam("WireSag", m_wireSag, "Switch on/off sense wire (gravitational) sag in FullSim", true);
   //Switch for modified left/right flag
   addParam("ModLeftRightFlag", m_modLeftRightFlag, "Switch on/off calculation of modified left/right flag in FullSim", false);
   //energy thresh
-  addParam("ThresholdEnergyDeposit",  m_thresholdEnergyDeposit,  "Energy thresh. for G4 step (GeV)",  0.0);
+  addParam("ThresholdEnergyDeposit",  m_thresholdEnergyDeposit,
+           "Energy deposite (edep) thresh. for G4 step (GeV). All hits with smaller edep will be dropped at FullSim level. Set this to a negative value if you want to keep simhits with edep=0.",
+           0.0);
   //min. track length
-  addParam("MinTrackLength",  m_minTrackLength,  "Minimum track length for G4 step (cm) ",  15.0);
+  addParam("MinTrackLength",  m_minTrackLength,
+           "Minimum track length (cm) required for saving in MCParticle.; to be applied to all particles other than primaries and decay-daughters.",
+           15.0);
 
   //For Geometry
   //Switch for debug
@@ -58,25 +62,27 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //misalignment switch
   addParam("Misalignment", m_misalignment, "Switch for wire misalignment: on/off.",  true);
   //displacement file
-  addParam("DisplacementFile", m_displacementFile, "Input file name for wire displacement.",  string("displacement_v1.1.dat"));
+  addParam("DisplacementFile", m_displacementFile, "Input file name for wire displacement (on cdc/data).",
+           string("displacement_v1.1.dat"));
   //alignment file
-  addParam("AlignmentFile", m_alignmentFile, "Input file name for wire alignment.",  string("alignment_v2.dat"));
+  addParam("AlignmentFile", m_alignmentFile, "Input file name for wire alignment (on cdc/data).",  string("alignment_v2.dat"));
   //misalignment file
-  addParam("MisalignmentFile", m_misalignmentFile, "Input file name for wire misalignment.", string("misalignment_v2.dat"));
+  addParam("MisalignmentFile", m_misalignmentFile, "Input file name for wire misalignment (on cdc/data).",
+           string("misalignment_v2.dat"));
   //xt-relation
-  addParam("XtFile", m_xtFile, "Input file name for xt-relations.",  string("xt_v3.dat"));
+  addParam("XtFile", m_xtFile, "Input file name for xt-relations (on cdc/data).",  string("xt_v3.dat"));
   //sigma
-  addParam("SigmaFile", m_sigmaFile, "Input file name for sigmas.",  string("sigma_v1.dat"));
+  addParam("SigmaFile", m_sigmaFile, "Input file name for sigmas (on cdc/data).",  string("sigma_v1.dat"));
   //prop-speed
-  addParam("PropSpeedFile", m_propSpeedFile, "Input file name for prop-speeds.",  string("propspeed_v0.dat"));
+  addParam("PropSpeedFile", m_propSpeedFile, "Input file name for prop-speeds (on cdc/data).",  string("propspeed_v0.dat"));
   //t0
-  addParam("T0File", m_t0File, "Input file name for t0s.",  string("t0.dat"));
+  addParam("T0File", m_t0File, "Input file name for t0s (on cdc/data).",  string("t0.dat"));
   //time walk
-  addParam("TwFile", m_twFile, "Input file name for time walks.",  string("tw_off.dat"));
+  addParam("TwFile", m_twFile, "Input file name for time walks (on cdc/data).",  string("tw_off.dat"));
   //bad wire
-  addParam("BwFile", m_bwFile, "Input file name for bad wires.",  string("badwire_v1.dat"));
+  addParam("BwFile", m_bwFile, "Input file name for bad wires (on cdc/data).",  string("badwire_v1.dat"));
   //channel map
-  addParam("ChMapFile", m_chMapFile, "Input file name for channel map.",  string("ch_map.dat"));
+  addParam("ChMapFile", m_chMapFile, "Input file name for channel map (on cdc/data).",  string("ch_map.dat"));
 
 }
 

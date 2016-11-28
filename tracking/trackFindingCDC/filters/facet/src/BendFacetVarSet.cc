@@ -8,20 +8,15 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facet/BendFacetVarSet.h>
-#include <cassert>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BendFacetVarSet::BendFacetVarSet()
-  : Super()
-{
-}
-
 bool BendFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
-  bool extracted = extractNested(ptrFacet);
-  if (not extracted or not ptrFacet) return false;
+  if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
   /// Fit tangents

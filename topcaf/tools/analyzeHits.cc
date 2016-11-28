@@ -146,9 +146,9 @@ bool analyzeHits(const char* filename, const char* outfilename = "hits.root")
   //m0809 values
   //cosmic_cut[4]=("TOPCAFDigits.m_time>-1260&&TOPCAFDigits.m_time<-1235");
   //cosmic_cut[5]=("TOPCAFDigits.m_time>-1175&&TOPCAFDigits.m_time<-1145");
-  cosmic_cut[4] = ("TOPCAFDigits.m_time>-1262&&TOPCAFDigits.m_time<-1232");
+  //cosmic_cut[4] = ("TOPCAFDigits.m_time>-1262&&TOPCAFDigits.m_time<-1232");
   cosmic_cut[5] = ("TOPCAFDigits.m_time>-1172&&TOPCAFDigits.m_time<-1142");
-  cosmic_cut[4] = ("TOPCAFDigits.m_time>0&&TOPCAFDigits.m_time<10"); //tsukuba laser
+// cosmic_cut[4] = ("TOPCAFDigits.m_time>0&&TOPCAFDigits.m_time<10"); //tsukuba laser
   cosmic_cut[4] = ("TOPCAFDigits.m_time>-340&&TOPCAFDigits.m_time<-315"); //fuji laser
   //m0613 values
   //cosmic_cut[4]=("TOPCAFDigits.m_time>-1250&&TOPCAFDigits.m_time<-1220");

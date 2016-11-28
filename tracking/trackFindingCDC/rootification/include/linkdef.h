@@ -9,7 +9,7 @@
 
 #pragma extra_include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>;
 
-#pragma extra_include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>;
+#pragma extra_include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>;
 
 #pragma extra_include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>;
 
@@ -28,8 +28,8 @@
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::CDCFacet> >+;
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCFacet> > >+;
 
-#pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::CDCRecoSegment2D> >+;
-#pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCRecoSegment2D> > >+;
+#pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::CDCSegment2D> >+;
+#pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegment2D> > >+;
 
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::CDCSegmentPair> >+;
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentPair> > >+;

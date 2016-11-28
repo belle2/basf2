@@ -47,14 +47,12 @@ namespace Belle2 {
       CDCRecoHit3D() = default;
 
       /// Constructor taking all stored variables of the reconstructed hit.
-      CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
-                   const Vector3D& position,
-                   double arcLength2D = 0);
+      CDCRecoHit3D(const CDCRLWireHit& rlWireHit, const Vector3D& recoPos3D, double arcLength2D = 0);
 
       /// Constructor taking all stored variables of the reconstructed hit.
       CDCRecoHit3D(const CDCWireHit* wireHit,
                    ERightLeft rlInfo,
-                   const Vector3D& position,
+                   const Vector3D& recoPos3D,
                    double arcLength2D = 0);
 
       /**
@@ -79,7 +77,7 @@ namespace Belle2 {
        *  as seen from the xy plane. Hence also xy position and transvers travel distance are available.
        *  Only the stereo hits have then the full information to go head and make the sz trajectory.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D);
 
       /**
@@ -131,7 +129,7 @@ namespace Belle2 {
        *  at just calculated the transvers travel distance, since the trajectory should be more exact than the shifting
        *  along the wire.
        */
-      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit,
+      static CDCRecoHit3D reconstruct(const CDCRecoHit2D& recoHit2D,
                                       const CDCTrajectory2D& trajectory2D,
                                       const CDCTrajectorySZ& trajectorySZ);
 
@@ -355,6 +353,6 @@ namespace Belle2 {
       /// Memory for the travel distance as see in the xy projection.
       double m_arcLength2D;
 
-    }; // class CDCRecoHit3D
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

@@ -72,11 +72,11 @@ namespace Belle2 {
       /* Computes the positive solution that has the smallest value of x.
       The additional parameter serves as a criterion to abbort the search if the solutions is further away than the specified half period.
       */
-      double computeSmallestPositiveRoot(const int& maxIHalfPeriod = 5) const;
+      double computeSmallestPositiveRoot(int maxIHalfPeriod = 5) const;
 
 
       /// Computes the solution that is addressed by the given half period index.
-      double computeRootLargerThanExtemumInHalfPeriod(const int& iHalfPeriod) const;
+      double computeRootLargerThanExtemumInHalfPeriod(int iHalfPeriod) const;
 
       /// Compute single solution in the case that fabs(slope) >= 1.
       double computeRootForLargeSlope() const;
@@ -110,16 +110,19 @@ namespace Belle2 {
       /// Returns the better solution x from the bounds of the intervall.
       static double getConvergedBound(const Vector2D& lower, const Vector2D& upper)
       {
+        if (not std::isfinite(lower.y()) or not std::isfinite(upper.y())) {
+          return NAN;
+        }
+
         if (fabs(lower.y()) <= fabs(upper.y())) {
           return lower.x();
-
-        } else if (fabs(lower.y()) > fabs(upper.y())) {
-          return upper.x();
-
-        } else {
-          return NAN;
-
         }
+
+        if (fabs(lower.y()) > fabs(upper.y())) {
+          return upper.x();
+        }
+
+        return NAN;
       }
 
     public:
@@ -130,18 +133,23 @@ namespace Belle2 {
       /// Determines if the function is increasing or decreasing in the intervall.
       static EIncDec getEIncDec(const Vector2D& lower, const Vector2D& upper)
       {
-        if (lower.y() < upper.y()) return EIncDec::c_Increasing;
-        else if (lower.y() > upper.y()) return EIncDec::c_Decreasing;
-        else if (lower.y() == upper.y()) return EIncDec::c_Constant;
-        else return EIncDec::c_Invalid;
+        if (lower.y() < upper.y()) {
+          return EIncDec::c_Increasing;
+        } else if (lower.y() > upper.y()) {
+          return EIncDec::c_Decreasing;
+        } else if (lower.y() == upper.y()) {
+          return EIncDec::c_Constant;
+        } else {
+          return EIncDec::c_Invalid;
+        }
       }
 
     public:
       /// Get the local extermum that is located in the half period indicated by the given index.
-      double computeExtremumXInHalfPeriod(const int& iHalfPeriod) const;
+      double computeExtremumXInHalfPeriod(int iHalfPeriod) const;
 
       /// Helper function to translate the index of the half period to index of the containing period.
-      static int getIPeriodFromIHalfPeriod(const int& iHalfPeriod)
+      static int getIPeriodFromIHalfPeriod(int iHalfPeriod)
       { return isEven(iHalfPeriod) ? iHalfPeriod / 2 : (iHalfPeriod - 1) / 2; }
 
     public:
@@ -167,6 +175,6 @@ namespace Belle2 {
 
     };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}
 

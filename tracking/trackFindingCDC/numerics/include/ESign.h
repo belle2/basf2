@@ -99,14 +99,14 @@ namespace Belle2 {
        *  Returns ESign::c_Invalid if all input are NaN.
        */
       template<class FloatRange>
-      static inline ESign common(const FloatRange& a)
+      static inline ESign common(const FloatRange& as)
       {
-        bool allNaN = std::all_of(a.begin(), a.end(), [](float a) { return std::isnan(a); });
+        bool allNaN = std::all_of(as.begin(), as.end(), [](float a) { return std::isnan(a); });
         if (allNaN) {
           return ESign::c_Invalid;
         } else {
-          return static_cast<ESign>(std::all_of(a.begin(), a.end(), [](float a) { return not(a <= 0); }) -
-          std::all_of(a.begin(), a.end(), [](float a) { return not(a >= 0); }));
+          return static_cast<ESign>(std::all_of(as.begin(), as.end(), [](float a) { return not(a <= 0); }) -
+          std::all_of(as.begin(), as.end(), [](float a) { return not(a >= 0); }));
         }
       }
 
@@ -128,6 +128,6 @@ namespace Belle2 {
     inline int sign(int x)
     { return (x > 0) - (x < 0); }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

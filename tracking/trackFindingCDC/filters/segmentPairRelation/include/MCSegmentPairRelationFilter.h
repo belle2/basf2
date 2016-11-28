@@ -22,7 +22,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseSegmentPairRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseSegmentPairRelationFilter >;
 
     public:
       /// Importing all overloads from the super class
@@ -33,18 +33,9 @@ namespace Belle2 {
       MCSegmentPairRelationFilter(bool allowReverse = true);
 
     public:
-      /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
-
       /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
-      virtual Weight operator()(const CDCSegmentPair& fromSegmentPair,
-                                const CDCSegmentPair& toSegmentPair) override final;
+      Weight
+      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
 
     public:
       /// Setter for the allow reverse parameter
@@ -57,8 +48,6 @@ namespace Belle2 {
     private:
       /// Instance of the Monte Carlo axial stereo segment filter for rejection of false cells.
       MCSegmentPairFilter m_mcSegmentPairFilter;
-
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

@@ -17,14 +17,16 @@ using namespace TrackFindingCDC;
 TEST_F(TrackFindingCDCTestWithTopology, eventdata_tracks_CDCTrack_modifyable)
 {
   CDCWireHit wireHit(WireID(0, 0, 0), 0.01);
-  CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right, wireHit->getRefDriftLength());
 
-  double perpS = 0;
-  CDCRecoHit3D recoHit3D(rlWireHit, wireHit.getRefPos3D(), perpS);
-
+  // Create a track and add one hit
   CDCTrack track;
-  track.push_back(recoHit3D);
-
+  {
+    CDCRLWireHit rlWireHit(&wireHit, ERightLeft::c_Right, wireHit->getRefDriftLength());
+    double perpS = 0;
+    CDCRecoHit3D recoHit3D(rlWireHit, wireHit.getRefPos3D(), perpS);
+    track.push_back(recoHit3D);
+  }
+  // Try to iterate over the track
   for (CDCRecoHit3D& recoHit3D : track) {
     recoHit3D.setRecoPos3D(Vector3D(0.0, 0.0, 0.0));
   }

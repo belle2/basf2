@@ -44,7 +44,7 @@ namespace Belle2 {
     /// Importing only the enum but not the constants
     using EWireNeighborKind = NWireNeighborKind::EWireNeighborKind;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}
 

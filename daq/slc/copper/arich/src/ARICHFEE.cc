@@ -23,7 +23,7 @@ ARICHFEE::ARICHFEE()
 {
 }
 
-void ARICHFEE::init(RCCallback& callback, HSLB& hslb)
+void ARICHFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
   std::string vname = StringUtil::form("arich[%d].", hslb.get_finid());
   //callback.add(new FEE32Handler(vname + "syn_date", callback, hslb, *this, ADR_REG0));

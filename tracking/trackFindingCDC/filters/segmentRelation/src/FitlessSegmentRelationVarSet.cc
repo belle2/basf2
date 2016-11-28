@@ -8,28 +8,23 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/FitlessSegmentRelationVarSet.h>
-#include <assert.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitlessSegmentRelationVarSet::FitlessSegmentRelationVarSet()
-  : Super()
+bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCSegment2D>* ptrSegmentRelation)
 {
-}
+  if (not ptrSegmentRelation) return false;
 
-bool FitlessSegmentRelationVarSet::extract(const Relation<const CDCRecoSegment2D>* ptrSegmentRelation)
-{
-  bool extracted = extractNested(ptrSegmentRelation);
-  if (not extracted or not ptrSegmentRelation) return false;
+  const Relation<const CDCSegment2D>& segmentPair = *ptrSegmentRelation;
 
-  const Relation<const CDCRecoSegment2D>& segmentPair = *ptrSegmentRelation;
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFrom();
+  const CDCSegment2D* ptrToSegment = segmentPair.getTo();
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFrom();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getTo();
-
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   // Segment fit should have been done at this point
   const CDCTrajectory2D& fromFit = fromSegment.getTrajectory2D();

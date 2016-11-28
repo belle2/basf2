@@ -11,12 +11,11 @@
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
+#include <framework/core/ModuleParamList.h>
+
 #include <vector>
-#include <algorithm>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

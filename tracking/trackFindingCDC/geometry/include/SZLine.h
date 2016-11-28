@@ -176,7 +176,7 @@ namespace Belle2 {
       }
 
       /// Calculates the intersection point of two line. Infinity for parallels
-      Vector2D intersection(const SZLine& line) const;
+      Vector2D intersection(const SZLine& szLine) const;
 
       /// Passivelly move the coordinate system in place by the given sz vector
       void passiveMoveBy(const Vector2D& bySZ)
@@ -218,6 +218,6 @@ namespace Belle2 {
       /// Memory for the z0 parameter
       double m_z0;
 
-    }; // class
-  }    // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

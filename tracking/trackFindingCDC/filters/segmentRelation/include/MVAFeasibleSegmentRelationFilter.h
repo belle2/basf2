@@ -36,6 +36,6 @@ namespace Belle2 {
       /// Constructor initialising the MVAFilter with standard training name for this filter.
       MVAFeasibleSegmentRelationFilter();
 
-    }; // end class MVAFeasibleSegmentRelationFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

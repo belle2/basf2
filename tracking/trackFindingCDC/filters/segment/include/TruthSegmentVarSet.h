@@ -8,50 +8,55 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
+
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const truthSegmentVarNames[] = {
       "segment_is_fake_truth",
       "track_is_already_found_truth",
       "segment_is_new_track_truth",
-      "truth"
+      "truth",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment.
-     */
-    class TruthSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    /// Vehicle class to transport the variable names
+    struct TruthSegmentVarNames : public VarNames<CDCSegment2D> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(truthSegmentVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(truthSegmentVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return truthSegmentVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+     *  Class to compute floating point variables from a segment
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class TruthSegmentVarSet : public VarSet<TruthSegmentVarNames> {
 
-    public:
-      /// Generate and assign the variables from the cluster
-      virtual bool extract(const CDCRecoSegment2D* segment) override;
+    private:
+      /// Type of the base class
+      using Super = VarSet<TruthSegmentVarNames>;
 
+    public:
+      /// Require the Monte Carlo truth information at initialisation
+      void initialize() final;
+
+      /// Prepare the Monte Carlo truth information at start of the event
+      void beginEvent() final;
+
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegment2D* segment) override;
     };
   }
 }

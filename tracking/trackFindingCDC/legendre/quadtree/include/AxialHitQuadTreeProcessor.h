@@ -13,11 +13,11 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit3D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCConformalHit.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
 
@@ -59,7 +59,7 @@ namespace Belle2 {
       BasePrecisionFunction::PrecisionFunction& m_lmdFunctLevel;
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
-      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
       /**
@@ -92,10 +92,10 @@ namespace Belle2 {
        * @param hit hit being checked
        * @return returns true if sinogram of the hit crosses (geometrically) borders of the node
        */
-      inline bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
-                                   unsigned int /*r_index*/) const override final
+      bool insertItemInNode(QuadTree* node, CDCConformalHit* hit, unsigned int /*t_index*/,
+                            unsigned int /*r_index*/) const override final
       {
-        typedef std::array< std::array<float, 2>, 2> Quadlet;
+        using Quadlet = std::array< std::array<float, 2>, 2>;
         Quadlet dist_1;
         Quadlet dist_2;
 
@@ -178,12 +178,16 @@ namespace Belle2 {
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 4);
 
               unsigned long theta1 = node->getXBin(i);
-              if (theta1 <= extension) theta1 = 0;
-              else theta1 -= extension;
+              if (theta1 <= extension) {
+                theta1 = 0;
+              } else {
+                theta1 -= extension;
+              }
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBin(i + 1);
+              }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             } else {
@@ -192,12 +196,16 @@ namespace Belle2 {
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 8);
 
               unsigned long theta1 = node->getXBin(i);
-              if (theta1 <= extension) theta1 = 0;
-              else theta1 -= extension;
+              if (theta1 <= extension) {
+                theta1 = 0;
+              } else {
+                theta1 -= extension;
+              }
 
               unsigned long theta2 = node->getXBin(i + 1) + extension;
-              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta())
+              if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
                 theta2 = node->getXBin(i + 1);
+              }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             }
@@ -252,8 +260,9 @@ namespace Belle2 {
 
               if (insertItemInNode(&newQuadTree, item->getPointer(), 0, 0)) {
                 if (twoSidedPhasespace && (newQuadTree.getYMin() < 0.02)  && (newQuadTree.getYMax() < 0.02)) {
-                  if (checkDerivative(&newQuadTree, item->getPointer()))
+                  if (checkDerivative(&newQuadTree, item->getPointer())) {
                     newQuadTree.insertItem(item);
+                  }
                 } else {
                   newQuadTree.insertItem(item);
                 }
@@ -321,8 +330,9 @@ namespace Belle2 {
 //        quadtreeItemsVector.reserve(hitsVector.size());
         for (ItemType* item : hitsVector) {
           if (item->isUsed()) continue;
-          if (insertItemInNode(quadTree, item->getPointer(), 0, 0))
+          if (insertItemInNode(quadTree, item->getPointer(), 0, 0)) {
             quadtreeItemsVector.push_back(item);
+          }
         }
 
         return quadTree;

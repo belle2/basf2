@@ -18,10 +18,9 @@ using namespace Eigen;
 
 using namespace TrackFindingCDC;
 
-
-RiemannsMethod::RiemannsMethod() :
-  m_lineConstrained(false),
-  m_originConstrained(false)
+RiemannsMethod::RiemannsMethod()
+  : m_lineConstrained(false)
+  , m_originConstrained(false)
 {
 }
 
@@ -217,7 +216,4 @@ void RiemannsMethod::updateWithDriftLength(CDCTrajectory2D& trajectory2D, CDCObs
     trajectory2D.setGlobalCircle(PerigeeCircle::fromN(parameters(0), parameters(1), parameters(2), parameters(3)));
 
   }
-
 }
-
-

@@ -199,22 +199,22 @@ Vector2D GeneralizedCircle::chooseNextForwardOf(const Vector2D& start,
   return Vector2D(NAN, NAN); // just avoid a compiler warning
 }
 
-std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double R) const
+std::pair<Vector2D, Vector2D> GeneralizedCircle::atCylindricalR(const double cylindricalR) const
 {
   // extraploted to r
   // solve
   //  n0 + n1*x + n2*y + n3*r*r == 0
-  //  and r = R
+  //  and r = cylindricalR
   // search for x and y
 
   // solve the equation in a coordinate system parallel and orthogonal to the reduced circle center
   const Vector2D nUnit = n12().unit();
 
   // parallel component
-  const double sameCylindricalRParallel = -(n0() + n3() * R * R) / n12().norm();
+  const double sameCylindricalRParallel = -(n0() + n3() * square(cylindricalR)) / n12().norm();
 
   // orthogonal component
-  const double sameCylindricalROrthogonal = sqrt(square(R) - square(sameCylindricalRParallel));
+  const double sameCylindricalROrthogonal = sqrt(square(cylindricalR) - square(sameCylindricalRParallel));
 
   /// Two versions in this case
   Vector2D sameCylindricalR1 =

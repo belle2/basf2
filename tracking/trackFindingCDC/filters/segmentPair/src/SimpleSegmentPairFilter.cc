@@ -10,113 +10,112 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
+
+#include <framework/logging/Logger.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-SimpleSegmentPairFilter::SimpleSegmentPairFilter() : m_riemannFitter()
+SimpleSegmentPairFilter::SimpleSegmentPairFilter()
+  : m_riemannFitter()
 {
   m_riemannFitter.useOnlyOrientation();
 }
 
 Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  assert(ptrStartSegment);
-  assert(ptrEndSegment);
+  assert(ptrFromSegment);
+  assert(ptrToSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   // Do fits
-  const CDCTrajectory2D& startFit = getFittedTrajectory2D(startSegment);
-  const CDCTrajectory2D& endFit = getFittedTrajectory2D(endSegment);
+  const CDCTrajectory2D& fromFit = getFittedTrajectory2D(fromSegment);
+  const CDCTrajectory2D& toFit = getFittedTrajectory2D(toSegment);
 
   // Check if segments are coaligned
-  bool endSegmentIsCoaligned = startFit.getTotalArcLength2D(endSegment) >= 0.0;
-  bool startSegmentIsCoaligned = endFit.getTotalArcLength2D(startSegment) >= 0.0;
+  bool toSegmentIsCoaligned = fromFit.getTotalArcLength2D(toSegment) >= 0.0;
+  bool fromSegmentIsCoaligned = toFit.getTotalArcLength2D(fromSegment) >= 0.0;
 
-  if (not endSegmentIsCoaligned or not startSegmentIsCoaligned) {
+  if (not toSegmentIsCoaligned or not fromSegmentIsCoaligned) {
     return NAN;
   }
 
-  // Check if there is a positive gap between start and end segment
-  double startFitGap = startFit.getArcLength2DGap(startSegment, endSegment);
-  double endFitGap = endFit.getArcLength2DGap(startSegment, endSegment);
+  // Check if there is a positive gap between from and to segment
+  double fromFitGap = fromFit.getArcLength2DGap(fromSegment, toSegment);
+  double toFitGap = toFit.getArcLength2DGap(fromSegment, toSegment);
 
-  if (startFitGap < -5 or startFitGap > 50 or endFitGap < -5 or endFitGap > 50) {
+  if (fromFitGap < -5 or fromFitGap > 50 or toFitGap < -5 or toFitGap > 50) {
     return NAN;
   }
 
-  double startFitFrontOffset = startFit.getArcLength2DFrontOffset(startSegment, endSegment);
-  double endFitBackOffset = endFit.getArcLength2DBackOffset(startSegment, endSegment);
+  double fromFitFrontOffset = fromFit.getArcLength2DFrontOffset(fromSegment, toSegment);
+  double toFitBackOffset = toFit.getArcLength2DBackOffset(fromSegment, toSegment);
 
-  if (startFitFrontOffset < 0 or
-      startFitFrontOffset > 50 or
-      endFitBackOffset < 0 or
-      endFitBackOffset > 50) {
+  if (fromFitFrontOffset < 0 or
+      fromFitFrontOffset > 50 or
+      toFitBackOffset < 0 or
+      toFitBackOffset > 50) {
     return NAN;
   }
 
-  Vector2D startBackRecoPos2D = startSegment.back().getRecoPos2D();
-  Vector2D endFrontRecoPos2D = endSegment.front().getRecoPos2D();
+  Vector2D fromBackRecoPos2D = fromSegment.back().getRecoPos2D();
+  Vector2D toFrontRecoPos2D = toSegment.front().getRecoPos2D();
 
   // Momentum agreement cut
-  Vector2D startMom2DAtStartBack = startFit.getFlightDirection2D(startBackRecoPos2D);
-  Vector2D endMom2DAtEndFront = endFit.getFlightDirection2D(endFrontRecoPos2D);
+  Vector2D fromMom2DAtFromBack = fromFit.getFlightDirection2D(fromBackRecoPos2D);
+  Vector2D toMom2DAtToFront = toFit.getFlightDirection2D(toFrontRecoPos2D);
 
-  Vector2D startMom2DAtEndFront = startFit.getFlightDirection2D(endFrontRecoPos2D);
-  Vector2D endMom2DAtStartBack = endFit.getFlightDirection2D(startBackRecoPos2D);
+  Vector2D fromMom2DAtToFront = fromFit.getFlightDirection2D(toFrontRecoPos2D);
+  Vector2D toMom2DAtFromBack = toFit.getFlightDirection2D(fromBackRecoPos2D);
 
-  double momAngleAtStartBack = startMom2DAtStartBack.angleWith(endMom2DAtStartBack);
-  double momAngleAtEndFront = endMom2DAtEndFront.angleWith(startMom2DAtEndFront);
+  double momAngleAtFromBack = fromMom2DAtFromBack.angleWith(toMom2DAtFromBack);
+  double momAngleAtToFront = toMom2DAtToFront.angleWith(fromMom2DAtToFront);
 
-  if (fabs(momAngleAtEndFront) > 1.0 or fabs(momAngleAtStartBack) > 1.0) {
+  if (fabs(momAngleAtToFront) > 1.0 or fabs(momAngleAtFromBack) > 1.0) {
     return NAN;
   }
 
   // Proximity cut
-  double startFit_dist2DToFront_endSegment = startFit.getDist2D(endSegment.front().getRecoPos2D());
-  double endFit_dist2DToBack_startSegment = endFit.getDist2D(startSegment.back().getRecoPos2D());
+  double fromFit_dist2DToFront_toSegment = fromFit.getDist2D(toSegment.front().getRecoPos2D());
+  double toFit_dist2DToBack_fromSegment = toFit.getDist2D(fromSegment.back().getRecoPos2D());
 
-  if (startFit_dist2DToFront_endSegment < 10 and  endFit_dist2DToBack_startSegment < 10) {
+  if (fromFit_dist2DToFront_toSegment < 10 and  toFit_dist2DToBack_fromSegment < 10) {
     getFittedTrajectory3D(segmentPair);
-    return startSegment.size() + endSegment.size();
+    return fromSegment.size() + toSegment.size();
   } else {
     return NAN;
   }
-
 }
 
-
-const CDCTrajectory2D& SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCAxialRecoSegment2D& segment) const
+const CDCTrajectory2D&
+SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCSegment2D& segment) const
 {
-
   CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
   if (not trajectory2D.isFitted()) {
     getRiemannFitter().update(trajectory2D, segment);
   }
   return trajectory2D;
-
 }
-
 
 const CDCTrajectory3D&
 SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair& segmentPair) const
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
   // Do fits if still necessary.
-  getFittedTrajectory2D(startSegment);
-  getFittedTrajectory2D(endSegment);
+  getFittedTrajectory2D(fromSegment);
+  getFittedTrajectory2D(toSegment);
 
   CDCAxialStereoFusion fusionFit;
   fusionFit.reconstructFuseTrajectories(segmentPair);

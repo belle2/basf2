@@ -92,8 +92,10 @@ class Plotter(object):
         self.plot_kwargs = None
         #: Default keyword arguments for errorbar function
         self.errorbar_kwargs = None
-        #: Default keyword arguments for fill_between function
+        #: Default keyword arguments for errorband function
         self.errorband_kwargs = None
+        #: Default keyword arguments for fill_between function
+        self.fill_kwargs = None
 
         self.set_plot_options()
         self.set_errorbar_options()

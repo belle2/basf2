@@ -144,17 +144,17 @@ void TrackQualityTools::normalizeHitsAndResetTrajectory(CDCTrack& track)
 
 }
 
-void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double m_outerCylindricalRFactor)
+void TrackQualityTools::removeHitsAfterCDCWall(CDCTrack& track, double outerCylindricalRFactor)
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getLocalCircle()->absRadius();
 
   // Curler are allowed to have hits on both arms
-  if (trajectory2D.isCurler(m_outerCylindricalRFactor)) {
+  if (trajectory2D.isCurler(outerCylindricalRFactor)) {
     return;
   }
 
-  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(m_outerCylindricalRFactor);
+  const Vector2D& outerExitWithFactor = trajectory2D.getOuterExit(outerCylindricalRFactor);
 
   double arcLength2DOfExitWithFactor = trajectory2D.calcArcLength2D(outerExitWithFactor);
   if (arcLength2DOfExitWithFactor < 0) {

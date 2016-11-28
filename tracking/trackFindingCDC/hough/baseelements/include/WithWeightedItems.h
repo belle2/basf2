@@ -25,10 +25,10 @@ namespace Belle2 {
 
     private:
       /// Type of the base class
-      typedef T Super;
+      using Super = T;
 
       /// Type of this class
-      typedef WithWeightedItems<T, AItem> This;
+      using This = WithWeightedItems<T, AItem>;
 
     public:
       /// Make the constructor of the base type available

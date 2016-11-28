@@ -15,5 +15,5 @@ namespace Belle2 {
     /// An additive measure of quality
     using Weight = double;
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

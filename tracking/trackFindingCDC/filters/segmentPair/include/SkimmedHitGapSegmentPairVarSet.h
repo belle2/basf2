@@ -9,28 +9,29 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/SkimmedVarSet.h>
 #include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
+
     /**
-     *  Class that computes floating point variables from segment pairs.
-     *  Is the same as the HitGapSegmentPairVarSet but skimmed for non sensical combinations
-     *  without the expensive common fit.
+     *  Class to compute floating point variables from an axial stereo segment pair
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
+     *
+     *  Is the same as the HitGapSegmentPairVarSet, but skimmed for non sensical combinations
+     *  with a hard coded cut. To be used as a precut before proceding to a more expensive fit
+     *  of the axial stereo segment pair.
      */
-    class  SkimmedHitGapSegmentPairVarSet : public SkimmedVarSet<HitGapSegmentPairVarSet> {
+    class  SkimmedHitGapSegmentPairVarSet : public HitGapSegmentPairVarSet {
 
     private:
-      /// Name of the super class.
-      using Super = SkimmedVarSet<HitGapSegmentPairVarSet> ;
+      /// Name of the base class
+      using Super = HitGapSegmentPairVarSet;
 
     public:
-      /// Construct the varset.
-      explicit SkimmedHitGapSegmentPairVarSet();
-
-      /// Implement the skim cut.
-      virtual bool accept(const CDCSegmentPair* ptrSegmentPair) override final;
+      /// Implement the skim cut, otherwise generate and assign the variables from the segment pair
+      bool extract(const CDCSegmentPair* ptrSegmentPair) final;
     };
   }
 }

@@ -4,6 +4,7 @@
 """
 <header>
   <contact>tkuhr</contact>
+  <output>EvtGenSimRecLarge.root</output>
   <description>This steering file produces 10000 generic BBbar events with EvtGen,
   runs the detector simulation with mixed in background, and performs the standard reconstruction.
   It will only be run for release validation in order to test the software on a larger set of events to

@@ -18,7 +18,8 @@ from softwaretrigger import (
 )
 
 
-def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False):
+def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="all", skipGeometryAdding=False,
+                       additionalTrackFitHypotheses=None):
     """
     This function adds the standard reconstruction modules to a path.
     Consists of tracking and the functionality provided by :func:`add_posttracking_reconstruction()`,
@@ -42,6 +43,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
         if it is not already present in the path. In a setup with multiple (conditional) paths however, it can not
         determine, if the geometry is already loaded. This flag can be used o just turn off the geometry adding at
         all (but you will have to add it on your own then).
+    :param additionalTrackFitHypotheses: Change the additional fitted track fit hypotheses. If no argument is given,
+        the additional fitted hypotheses are muon, kaon and proton, i.e. [13, 321, 2212].
     """
 
     # Add tracking reconstruction modules
@@ -50,7 +53,8 @@ def add_reconstruction(path, components=None, pruneTracks=True, trigger_mode="al
                                 pruneTracks=False,
                                 mcTrackFinding=False,
                                 trigger_mode=trigger_mode,
-                                skipGeometryAdding=skipGeometryAdding)
+                                skipGeometryAdding=skipGeometryAdding,
+                                additionalTrackFitHypotheses=additionalTrackFitHypotheses)
 
     # Add further reconstruction modules
     add_posttracking_reconstruction(path,
@@ -201,7 +205,7 @@ def add_cluster_expert_modules(path, components=None):
     :param components: The components to use or None to use all standard components.
     """
     # klong id and cluster matcher, whcih also builds "cluster"
-    if components is None or 'EKLM' and 'BKLM' and 'ECL' in components:
+    if components is None or ('EKLM' in components and 'BKLM' in components and 'ECL' in components):
         KLMClassifier = register_module('KLMExpert')
         path.add_module(KLMClassifier)
 
@@ -242,7 +246,7 @@ def add_klm_modules(path, components=None):
         path.add_module(bklm_rec)
 
     # K0L reconstruction
-    if components is None or 'BKLM' in components or 'EKLM' in components:
+    if components is None or ('BKLM' in components and 'EKLM' in components):
         klm_k0l_rec = register_module('KLMK0LReconstructor')
         path.add_module(klm_k0l_rec)
 
@@ -388,7 +392,8 @@ def add_dedx_modules(path, components=None, pruneTracks=True):
         path.add_module(CDCdEdxPID)
 
     # VXD dE/dx PID
-    if components is None or 'SVD' in components or 'PXD' in components:
+    # only run this if the SVD is enabled - PXD is disabled by default
+    if components is None or 'SVD' in components:
         VXDdEdxPID = register_module('VXDDedxPID')
         path.add_module(VXDdEdxPID)
 

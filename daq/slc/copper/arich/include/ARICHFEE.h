@@ -14,7 +14,7 @@ namespace Belle2 {
     virtual ~ARICHFEE() throw() {}
 
   public:
-    virtual void init(RCCallback& callback, HSLB& hslb);
+    virtual void init(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void boot(RCCallback& callback, HSLB& hslb, const DBObject& obj);
     virtual void load(RCCallback& callback, HSLB& hslb, const DBObject& obj);
 

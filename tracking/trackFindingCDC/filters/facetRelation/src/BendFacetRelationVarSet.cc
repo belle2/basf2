@@ -8,20 +8,17 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+
 #include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BendFacetRelationVarSet::BendFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool BendFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = extractNested(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
+  if (not ptrFacetRelation) return false;
   const Relation<const CDCFacet>& facetRelation = *ptrFacetRelation;
 
   const CDCFacet& fromFacet = *facetRelation.first;

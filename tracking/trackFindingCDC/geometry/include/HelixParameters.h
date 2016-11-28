@@ -114,6 +114,6 @@ namespace Belle2 {
     /// Jacobian matrix for the helix parameters
     using HelixJacobian = HelixUtil::JacobianMatrix;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

@@ -20,7 +20,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseFacetRelationFilter Super;
+      using Super = BaseFacetRelationFilter;
 
     public:
       /// Importing all overloads from the super class
@@ -38,17 +38,17 @@ namespace Belle2 {
 
     public:
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override;
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
+
     public:
       /** Main filter method returning the weight of the neighborhood relation.*/
-      virtual Weight operator()(const CDCFacet& fromFacet,
-                                const CDCFacet& toFacet) override final;
+      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     private:
       /// Memory for the used direction of flight deviation.
       double m_param_deviationCosCut;
 
-    }; // end class
+    };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

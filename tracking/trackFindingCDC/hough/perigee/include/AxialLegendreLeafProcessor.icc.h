@@ -50,8 +50,8 @@ void Belle2::TrackFindingCDC::AxialLegendreLeafProcessor<ANode>::processLeaf(ANo
     const double curv = circle.curvature();
     std::array<DiscreteCurv, 2> curvs = leaf->template getBounds<DiscreteCurv>();
 
-    const float& lowerCurv = *(curvs[0]);
-    const float& upperCurv = *(curvs[1]);
+    float lowerCurv = *(curvs[0]);
+    float upperCurv = *(curvs[1]);
     if (ESignUtil::common(lowerCurv, upperCurv) * curv < 0) {
       circle.reverse();
     }

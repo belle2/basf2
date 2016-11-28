@@ -23,13 +23,8 @@ namespace Belle2 {
 
     public:
 
-      /// typedef for function which is used for resolution calculations (resolution<double>=f(curvature<double>)
-      typedef std::function<double(double)> PrecisionFunction;
-
-      /// Default constructor
-      BasePrecisionFunction()
-      {
-      }
+      /// Function type which is used for resolution calculations (resolution=f(curvature))
+      using PrecisionFunction = std::function<double(double)>;
 
       /// Destructor
       virtual ~BasePrecisionFunction() = default;

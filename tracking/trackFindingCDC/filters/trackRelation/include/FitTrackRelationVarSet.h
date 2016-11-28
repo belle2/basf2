@@ -11,20 +11,16 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <vector>
-#include <string>
-#include <assert.h>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCTrack.
     class CDCTrack;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const fitTrackRelationNames[] = {
+    static char const* const fitTrackRelationVarNames[] = {
       "is_fitted",
       "curv",
       "curv_var",
@@ -39,40 +35,28 @@ namespace Belle2 {
       "p_value_cut",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a track relation
-     */
-    class FitTrackRelationVarNames : public VarNames<Relation<const CDCTrack>> {
+    /// Vehicle class to transport the variable names
+    struct FitTrackRelationVarNames : public VarNames<Relation<const CDCTrack>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(fitTrackRelationNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(fitTrackRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return fitTrackRelationNames[iName];
+        return fitTrackRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a track relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from a track relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class FitTrackRelationVarSet : public VarSet<FitTrackRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      typedef VarSet<FitTrackRelationVarNames> Super;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit FitTrackRelationVarSet();
-
-      /// Generate and assign the variables from the track relation
-      virtual bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override final;
+      /// Generate and assign the contained variables
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) final;
     };
   }
 }

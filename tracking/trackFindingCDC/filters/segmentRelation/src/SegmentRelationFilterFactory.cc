@@ -8,7 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilterFactory.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/SegmentRelationFilters.h>
+
+#include <tracking/trackFindingCDC/filters/segmentRelation/BaseSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/MCSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/UnionRecordingSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/MVAFeasibleSegmentRelationFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentRelation/MVARealisticSegmentRelationFilter.h>
 
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
@@ -20,31 +25,26 @@ SegmentRelationFilterFactory::SegmentRelationFilterFactory(const std::string& de
 {
 }
 
-std::string SegmentRelationFilterFactory::getFilterPurpose() const
-{
-  return "Segment relation filter to be used during the construction of the segment network for in super layer merginig.";
-}
-
-std::string SegmentRelationFilterFactory::getModuleParamPrefix() const
+std::string SegmentRelationFilterFactory::getIdentifier() const
 {
   return "SegmentRelation";
+}
+
+std::string SegmentRelationFilterFactory::getFilterPurpose() const
+{
+  return "Segment relation filter to construct a segment network for in super cluster merging";
 }
 
 std::map<std::string, std::string>
 SegmentRelationFilterFactory::getValidFilterNamesAndDescriptions() const
 {
-  std::map<std::string, std::string>
-  filterNames = Super::getValidFilterNamesAndDescriptions();
-
-  filterNames.insert({
+  return {
     {"none", "no segment relation is valid, stop at segment creation."},
     {"truth", "segment relations from monte carlo truth"},
+    {"unionrecording", "record many multiple choosable variable set"},
     {"feasible", "check if the segment relation is feasible"},
     {"realistic", "check if the segment relation is a good combination"},
-    {"unionrecording", "record many multiple choosable variable set"},
-  });
-
-  return filterNames;
+  };
 }
 
 std::unique_ptr<BaseSegmentRelationFilter >
@@ -52,14 +52,14 @@ SegmentRelationFilterFactory::create(const std::string& filterName) const
 {
   if (filterName == "none") {
     return makeUnique<BaseSegmentRelationFilter>();
-  } else if (filterName == "feasible") {
-    return makeUnique<MVAFeasibleSegmentRelationFilter>();
-  } else if (filterName == "realistic") {
-    return makeUnique<MVARealisticSegmentRelationFilter>();
   } else if (filterName == "truth") {
     return makeUnique<MCSegmentRelationFilter>();
   } else if (filterName == "unionrecording") {
     return makeUnique<UnionRecordingSegmentRelationFilter>();
+  } else if (filterName == "feasible") {
+    return makeUnique<MVAFeasibleSegmentRelationFilter>();
+  } else if (filterName == "realistic") {
+    return makeUnique<MVARealisticSegmentRelationFilter>();
   } else {
     return Super::create(filterName);
   }

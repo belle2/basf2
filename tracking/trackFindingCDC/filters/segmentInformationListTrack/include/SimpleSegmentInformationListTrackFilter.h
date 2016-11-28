@@ -9,25 +9,20 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilter.h>
-
-#include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
+#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCTrack;
+    class SegmentInformation;
+
     /// Filter for the construction of good segment trains - track pairs
     class SimpleSegmentInformationListTrackFilter : public BaseSegmentInformationListTrackFilter {
 
     public:
-      /// Constructor
-      SimpleSegmentInformationListTrackFilter() : BaseSegmentInformationListTrackFilter() { }
-
-    public:
       /// Get the filter output.
-      virtual Weight operator()(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>& testPair)
-      override final;
+      Weight operator()(const std::pair<std::vector<SegmentInformation*>,
+                        const CDCTrack*>& testPair) final;
     };
   }
 }

@@ -40,7 +40,7 @@ namespace Belle2 {
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0)
+                             std::size_t ndf = 0)
         : m_perigeeCircle(curvature, phi0Vec, impact)
         , m_perigeeCovariance(perigeeCovariance)
         , m_chi2(chi2)
@@ -58,7 +58,7 @@ namespace Belle2 {
                              const double impact,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0)
+                             std::size_t ndf = 0)
         : m_perigeeCircle(curvature, phi0, impact)
         , m_perigeeCovariance(perigeeCovariance)
         , m_chi2(chi2)
@@ -70,7 +70,7 @@ namespace Belle2 {
       UncertainPerigeeCircle(const PerigeeCircle& perigeeCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0)
+                             std::size_t ndf = 0)
         : m_perigeeCircle(perigeeCircle)
         , m_perigeeCovariance(perigeeCovariance)
         , m_chi2(chi2)
@@ -82,7 +82,7 @@ namespace Belle2 {
       UncertainPerigeeCircle(const GeneralizedCircle& generalizedCircle,
                              const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
                              const double chi2 = 0.0,
-                             const size_t& ndf = 0)
+                             std::size_t ndf = 0)
         : m_perigeeCircle(generalizedCircle)
         , m_perigeeCovariance(perigeeCovariance)
         , m_chi2(chi2)
@@ -95,7 +95,7 @@ namespace Belle2 {
         const PerigeeParameters& parameters,
         const PerigeeCovariance& perigeeCovariance = PerigeeUtil::identity(),
         const double chi2 = 0.0,
-        const size_t& ndf = 0)
+        std::size_t ndf = 0)
         : m_perigeeCircle(parameters)
         , m_perigeeCovariance(perigeeCovariance)
         , m_chi2(chi2)
@@ -105,8 +105,8 @@ namespace Belle2 {
 
       /// Average the parameters of the two given perigee circles properly considering their
       /// covariance matrix.
-      static UncertainPerigeeCircle average(const UncertainPerigeeCircle& startPerigeeCircle,
-                                            const UncertainPerigeeCircle& endPerigeeCircle);
+      static UncertainPerigeeCircle average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                            const UncertainPerigeeCircle& toPerigeeCircle);
 
     public:
       /**
@@ -179,13 +179,13 @@ namespace Belle2 {
       }
 
       /// Getter for the number of degrees of freediom used in the circle fit
-      const size_t& ndf() const
+      std::size_t ndf() const
       {
         return m_ndf;
       }
 
       /// Setter for the number of degrees of freediom used in the circle fit
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       {
         m_ndf = ndf;
       }
@@ -263,7 +263,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedim of the fit of this circle.
       size_t m_ndf = 0.0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

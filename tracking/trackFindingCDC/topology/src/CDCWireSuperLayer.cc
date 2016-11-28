@@ -14,11 +14,11 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-CDCWireSuperLayer::CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& layerRange)
-  : Super(layerRange),
-    m_innerRefZ(0.0),
-    m_outerRefZ(0.0),
-    m_refTanLambda(0.0)
+CDCWireSuperLayer::CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayers)
+  : Super(wireLayers)
+  , m_innerRefZ(0.0)
+  , m_outerRefZ(0.0)
+  , m_refTanLambda(0.0)
 {
   initialize();
 }

@@ -7,15 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/segmentTrain/SegmentTrainFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTrack/SegmentTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/SegmentInformationListTrackFilter.h>
-#include <tracking/trackFindingCDC/filters/backgroundSegment/BackgroundSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/newSegment/NewSegmentsFilter.h>
-#include <tracking/trackFindingCDC/filters/track/TrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrain/BaseSegmentTrainFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTrack/BaseSegmentTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentInformationListTrack/BaseSegmentInformationListTrackFilter.h>
+#include <tracking/trackFindingCDC/filters/segment/BaseSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/newSegment/BaseNewSegmentFilter.h>
+#include <tracking/trackFindingCDC/filters/track/BaseTrackFilter.h>
 
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/MatchingInformation.h>
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/Lookups.h>
@@ -24,7 +23,7 @@
 namespace Belle2 {
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
     class CDCTrack;
 
     /** Class which does the segment - track combining. */
@@ -33,12 +32,12 @@ namespace Belle2 {
 
       /** We use this to describe more than one segment that could belong together in one single superlayer.
        * Actually the segment finder should not produce such things... */
-      typedef std::vector<SegmentInformation*> TrainOfSegments;
+      using TrainOfSegments = std::vector<SegmentInformation*>;
 
       /**
        * Fill the given elements into the internal lookup tables.
        */
-      void fillWith(std::vector<CDCTrack>& tracks, std::vector<CDCRecoSegment2D>& segments)
+      void fillWith(std::vector<CDCTrack>& tracks, std::vector<CDCSegment2D>& segments)
       {
         m_trackLookUp.fillWith(tracks);
         m_segmentLookUp.fillWith(segments);
@@ -57,13 +56,13 @@ namespace Belle2 {
        * Filter out the segments that are fake or background. Mark them as taken.
        * For deciding which is background or not we use the given filter.
        */
-      void filterSegments(BaseBackgroundSegmentsFilter& backgroundSegmentFilter);
+      void filterSegments(BaseSegmentFilter& segmentFilter);
 
       /**
        * Filter out the segments that are likely to be new tracks. Mark them as taken and assigned.
        * For deciding which is new or not we use the given filter.
        */
-      void filterOutNewSegments(BaseNewSegmentsFilter& newSegmentFilter);
+      void filterOutNewSegment(BaseNewSegmentFilter& newSegmentFilter);
 
       /**
        * Do the heavy combining works:
@@ -83,10 +82,9 @@ namespace Belle2 {
        *
        * In the moment, this method does work, but produces some fakes and is therefore not used in production.
        */
-      void combine(BaseSegmentTrackFilter& segmentTrackChooserSecondStep,
+      void combine(BaseSegmentTrackFilter& segmentTrackFilterSecondStep,
                    BaseSegmentTrainFilter& segmentTrainFilter,
                    BaseSegmentInformationListTrackFilter& segmentTrackFilter);
-
 
       /**
        * Clear all the pointer vectors and reset the "new segments" to be not taken.
@@ -94,22 +92,12 @@ namespace Belle2 {
       void clearAndRecover();
 
       /**
-       * Filter out tracks with the given filter. Normally, you train your filter to filter out fake candidates
-       * (but you can use any filter you want). The tracks with a NAN-filter result get removed from the list.
-       */
-      void filterTracks(std::vector<CDCTrack>& tracks, BaseTrackFilter& trackFilter)
-      {
-        tracks.erase(std::remove_if(tracks.begin(), tracks.end(), [&trackFilter](const CDCTrack & track) -> bool {
-          double filterResult = trackFilter(track);
-          return isNotACell(filterResult);
-        }), tracks.end());
-      }
-
-      /**
        * Helper function to add a segment to a track with respecting the taken information of the segment.
        * If useTakenFlagOfHits is set to true, only those hits are added that do not have a taken flag.
        */
-      static void addSegmentToTrack(const CDCRecoSegment2D& segment, CDCTrack& track, const bool useTakenFlagOfHits = true);
+      static void addSegmentToTrack(const CDCSegment2D& segment,
+                                    CDCTrack& track,
+                                    bool useTakenFlagOfHits = true);
 
     private:
       const float m_param_minimalFitProbability = 0.5; /**< The probability of the chi2 of a fit should be better than this */
@@ -137,7 +125,8 @@ namespace Belle2 {
       void clearSmallerCombinations(std::list<TrainOfSegments>& trainsOfSegments);
 
       /** Combine a segment and a track. */
-      void addSegmentToTrack(SegmentInformation* segmentInformation, TrackInformation* matchingTracks);
+      void addSegmentToTrack(SegmentInformation* segmentInformation,
+                             TrackInformation* matchingTrack);
 
     private:
       TrackLookUp m_trackLookUp; /**< The used track list. */

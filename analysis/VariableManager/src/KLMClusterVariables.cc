@@ -43,9 +43,76 @@ namespace Belle2 {
       return result;
     }
 
+
+    double klmClusterPositionX(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getClusterPosition().x();
+      }
+      return result;
+    }
+
+
+    double klmClusterPositionY(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getClusterPosition().y();
+      }
+      return result;
+    }
+
+
+    double klmClusterPositionZ(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getClusterPosition().z();
+      }
+      return result;
+    }
+
+
+    double klmClusterInnermostLayer(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getInnermostLayer();
+      }
+      return result;
+    }
+
+
+    double klmClusterLayers(const Particle* particle)
+    {
+      double result = 0.0;
+
+      const KLMCluster* cluster = particle->getKLMCluster();
+      if (cluster) {
+        result = cluster->getLayers();
+      }
+      return result;
+    }
+
+
     VARIABLE_GROUP("KLM Cluster");
 
-    REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming,
-                      "returns KLMCluster's timing info.");
+    REGISTER_VARIABLE("klmClusterTiming", klmClusterTiming, "Returns KLMCluster's timing info.");
+    REGISTER_VARIABLE("klmClusterPositionX", klmClusterPositionX, "Returns KLMCluster's x position.");
+    REGISTER_VARIABLE("klmClusterPositionY", klmClusterPositionY, "Returns KLMCluster's y position.");
+    REGISTER_VARIABLE("klmClusterPositionZ", klmClusterPositionZ, "Returns KLMCluster's z position.");
+    REGISTER_VARIABLE("klmClusterInnermostLayer", klmClusterInnermostLayer,
+                      "Returns KLM cluster's number of the innermost layer with hits.");
+    REGISTER_VARIABLE("klmClusterLayers", klmClusterLayers, "Returns KLM cluster's number of layers with hits.");
+
   }
 }

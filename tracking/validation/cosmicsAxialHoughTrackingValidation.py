@@ -29,28 +29,27 @@ class CosmicsAxialHough(TrackingValidationRun):
     root_input_file = '../CosmicsSimNoBkg.root'
     components = None
 
-    wire_hit_topology_preparer = basf2.register_module('WireHitTopologyPreparer')
+    def finder_module(self, path):
+        path.add_module('WireHitPreparer')
+        path.add_module('SegmentFinderCDCFacetAutomaton',
+                        SegmentOrientation="downwards")
+        path.add_module('AxialTrackCreatorSegmentHough')
+        path.add_module('TrackExporter')
 
-    segment_finder_module = basf2.register_module('SegmentFinderCDCFacetAutomaton')
-    segment_finder_module.param("SegmentOrientation", "downwards")
+        interactive_display = False
+        if interactive_display:
+            cdc_display_module = cdcdisplay.CDCSVGDisplayModule(os.getcwd(), interactive=True)
+            cdc_display_module.draw_recotracks = True
+            cdc_display_module.draw_recotrack_trajectories = True
+            path.add_module(cdc_display_module)
 
-    axial_hough_module = basf2.register_module('TrackFinderCDCAxialSegmentHough')
-    finder_module = [wire_hit_topology_preparer, segment_finder_module, axial_hough_module, ]
+    tracking_coverage = {
+        'UsePXDHits': False,
+        'UseSVDHits': False,
+        'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': True
+    }
 
-    del segment_finder_module  # do not let the names show up in the class name space
-    del axial_hough_module  # do not let the names show up in the class name space
-
-    interactive_display = False
-    if interactive_display:
-        cdc_display_module = cdcdisplay.CDCSVGDisplayModule(os.getcwd(), interactive=True)
-
-        cdc_display_module.draw_gftrackcands = True
-        cdc_display_module.draw_gftrackcand_trajectories = True
-        finder_module.append(cdc_display_module)
-        del cdc_display_module  # do not let the names show up in the class name space
-
-    tracking_coverage = {'UsePXDHits': False, 'UseSVDHits': False,
-                         'UseCDCHits': True, 'UseOnlyAxialCDCHits': True}
     fit_geometry = None
     pulls = True
     output_file_name = VALIDATION_OUTPUT_FILE

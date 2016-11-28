@@ -11,20 +11,16 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
 
-#include <vector>
-#include <string>
-#include <assert.h>
+#include <tracking/trackFindingCDC/ca/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration of the CDCSegmentPair.
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const basicSegmentRelationNames[] = {
+    static char const* const basicSegmentRelationVarNames[] = {
       "middle_is_axial",
       "middle_sl_id",
       "middle_size",
@@ -32,40 +28,28 @@ namespace Belle2 {
       "to_size",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment relation
-     */
-    class BasicSegmentPairRelationVarNames : public VarNames<Relation<const CDCSegmentPair>> {
+    /// Vehicle class to transport the variable names
+    struct BasicSegmentPairRelationVarNames : public VarNames<Relation<const CDCSegmentPair>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentRelationNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicSegmentRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return basicSegmentRelationNames[iName];
+        return basicSegmentRelationVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment pair relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from an axial stereo segment pair relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicSegmentPairRelationVarSet : public VarSet<BasicSegmentPairRelationVarNames> {
 
-    private:
-      /// Type of the super class
-      typedef VarSet<BasicSegmentPairRelationVarNames> Super;
-
     public:
-      /// Construct the varset to be prepended to all variable names.
-      explicit BasicSegmentPairRelationVarSet();
-
-      /// Generate and assign the variables from the segment relation
-      virtual bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override final;
+      /// Generate and assign the contained variables
+      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };
   }
 }

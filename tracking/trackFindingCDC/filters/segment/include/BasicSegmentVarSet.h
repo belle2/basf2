@@ -9,49 +9,42 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/VarNames.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
+#include <tracking/trackFindingCDC/varsets/VarNames.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegment2D;
 
-    /// Forward declaration.
-    class CDCRecoSegment2D;
-
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const basicSegmentVarNames[] = {
       "size",
       "superlayer_id",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment
-     */
-    class BasicSegmentVarNames : public VarNames<CDCRecoSegment2D> {
+    /// Vehicle class to transport the variable names
+    struct BasicSegmentVarNames : public VarNames<CDCSegment2D> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(basicSegmentVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(basicSegmentVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return basicSegmentVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from a segment
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class BasicSegmentVarSet : public VarSet<BasicSegmentVarNames> {
 
     public:
-      /// Generate and assign the variables from the facet relation
-      virtual bool extract(const CDCRecoSegment2D* ptrSegment) override final;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegment2D* ptrSegment2D) final;
     };
   }
 }

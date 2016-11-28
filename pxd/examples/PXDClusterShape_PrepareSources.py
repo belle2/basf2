@@ -4,11 +4,13 @@
 ##############################################################################
 #
 # This is an example steering file to use PXD shape correction.
-# Shape correction is realize in three steps, se exampes:
+# Shape correction is realize in few steps, se exampes:
 #   pxd/examples/PXDClasterShape_PrepareSources.py
 #   pxd/examples/PXDClasterShape_CalculateCorrections.py
+#   pxd/examples/PXDClasterShape_MergeCorrections.py
 #   pxd/examples/PXDClasterShape_ApplyCorrections.py
 #   pxd/examples/PXDClasterShape_ApplyCorrections2.py
+#   pxd/examples/PXDClasterShape_CheckCorrections.py
 # It uses ParicleGun module to generate tracks,
 # (see "generators/example/ParticleGunFull.py" for detailed usage)
 # builds PXD geometry, performs geant4 and PXD simulation,
@@ -46,7 +48,7 @@ from basf2 import *
 set_log_level(LogLevel.WARNING)
 
 # Presets (defaults, no need to set if no change):
-EdgeClose = 3
+EdgeClose = 3  # set how many cols/rows from edge are ignored
 UseTracks = True
 UseRealData = False
 CompareTruePointTracks = False
@@ -57,7 +59,7 @@ SpecialLayerNo = 1
 SpecialLadderNo = 3
 SpecialSensorNo = 2
 
-# If exist load from arguments:
+# If exist argument list: load from arguments:
 argvs = sys.argv
 argc = len(argvs)
 print("Number of arguments: ", argc - 1)

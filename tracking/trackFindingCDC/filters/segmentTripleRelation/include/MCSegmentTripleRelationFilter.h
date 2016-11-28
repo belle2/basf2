@@ -13,16 +13,15 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/MCSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/base/MCSymmetricFilterMixin.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
-    ///Class filtering the neighborhood of segment triples with monte carlo information
+    /// Class filtering the neighborhood of segment triples with monte carlo information
     class MCSegmentTripleRelationFilter:
       public MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter > {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseSegmentTripleRelationFilter >;
 
     public:
       /// Importing all overloads from the super class
@@ -32,19 +31,10 @@ namespace Belle2 {
       /** Constructor. */
       MCSegmentTripleRelationFilter(bool allowReverse = true);
 
-      /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
-
-      /// Forwards the initialize method from the module
-      virtual void initialize() override final;
-
-      /// Forwards the terminate method from the module
-      virtual void terminate() override final;
-
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.*/
-      virtual Weight operator()(const CDCSegmentTriple& triple,
-                                const CDCSegmentTriple& neighborTriple) override final;
+      Weight
+      operator()(const CDCSegmentTriple& triple, const CDCSegmentTriple& neighborTriple) final;
 
       /// Setter for the allow reverse parameter
       void setAllowReverse(bool allowReverse) override
@@ -56,9 +46,6 @@ namespace Belle2 {
     private:
       /// Instance of the Monte Carlo segment triple filter for rejection of false cells.
       MCSegmentTripleFilter m_mcSegmentTripleFilter;
-
-    }; // end class
-
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

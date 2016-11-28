@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
 #include <tracking/trackFindingCDC/topology/ISuperLayer.h>
@@ -19,9 +19,8 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool AdvancedSegmentVarSet::extract(const CDCRecoSegment2D* segment)
+bool AdvancedSegmentVarSet::extract(const CDCSegment2D* segment)
 {
-  extractNested(segment);
 
   const CDCWireTopology& wireTopology = CDCWireTopology::getInstance();
   unsigned int iSuperLayer = ISuperLayerUtil::getCommon(*segment);

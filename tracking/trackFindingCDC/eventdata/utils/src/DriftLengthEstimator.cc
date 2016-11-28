@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -108,7 +108,7 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
 }
 
-void DriftLengthEstimator::updateDriftLength(CDCRecoSegment2D& segment)
+void DriftLengthEstimator::updateDriftLength(CDCSegment2D& segment)
 {
   for (CDCRecoHit2D& recoHit2D : segment) {
     updateDriftLength(recoHit2D);

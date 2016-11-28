@@ -33,7 +33,7 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef Box<DiscretePhi0, DiscreteCurv> HoughBox;
+      using HoughBox = Box<DiscretePhi0, DiscreteCurv>;
 
     public:
       /**
@@ -44,13 +44,13 @@ namespace Belle2 {
        *   * ESign::c_Zero if the dirft circle lies on any of the curves
        *   * ESign::c_Invalid if the drift cirlce is on the the wrong arm of the curve.
        */
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& l,
-                                   const float& /*dxdz*/ = 0,
-                                   const float& /*dydz*/ = 0,
-                                   ILayer /*iCLayer*/ = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            float x,
+                            float y,
+                            float l,
+                            float /*dxdz*/ = 0,
+                            float /*dydz*/ = 0,
+                            ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<DiscreteCurv, 2>& curv = houghBox.getBounds<DiscreteCurv>();
@@ -91,5 +91,5 @@ namespace Belle2 {
       /// Curler curvature - set to value greater zero to activate on arm exclusive finding.
       float m_curlCurv;
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

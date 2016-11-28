@@ -72,9 +72,8 @@ namespace Belle2 {
        *  @param recoPos2D the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                        const Vector2D& recoPos2D,
-                                        bool snap = true);
+      static CDCRecoHit2D
+      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const Vector2D& recoPos2D, bool snap = true);
 
       /**
        *  Turns the orientation in place.
@@ -264,7 +263,7 @@ namespace Belle2 {
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;
 
-    }; // class CDCRecoHit2D
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

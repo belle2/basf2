@@ -27,11 +27,16 @@ class Cluster:
 
         #: The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
-        self.submit_command = 'qsub -cwd -l h_vmem={requirement_vmem}G  -o {logfile} -e {logfile} -q {queuename} -V'
+        self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
+                               '-o {logfile} -e {logfile} -q {queuename} -V')
 
-        # requried vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
-        # to memery consumption
+        # required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
+        # to memory consumption
         self.requirement_vmem = 4
+
+        # the storage IO in GB which can be performed by each job. By default, this is 3GB at
+        # DESY which is to small for some validation scripts
+        self.requirement_storage = 50
 
         # Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
@@ -160,6 +165,7 @@ class Cluster:
 
         # Prepare the command line command for submission to the cluster
         params = self.submit_command.format(queuename=self.queuename,
+                                            requirement_storage=self.requirement_storage,
                                             requirement_vmem=self.requirement_vmem,
                                             logfile=log_file).split() + [tmp_name]
 

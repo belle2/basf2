@@ -27,19 +27,21 @@ namespace Belle2 {
        * Constructor also setting the switch,
        * if the reversed version of a facet (in comparision to MC truth) shall be accepted.
        */
-      explicit MCFacetFilter(bool allowReverse = true) : Super(allowReverse) {}
+      explicit MCFacetFilter(bool allowReverse = true)
+        : Super(allowReverse)
+      {
+      }
 
     public:
       /**
        * Main filter method returning the weight of the facet.
        * Returns NAN, if the cell shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& facet) override final;
+      Weight operator()(const CDCFacet& facet) final;
 
     private:
       /// Indicated if the oriented triple is a correct hypotheses
-      bool operator()(const CDCRLWireHitTriple& rlWireHit, int inTrackHitDistanceTolerance);
-
-    }; // class MCFacetFilter
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+      bool operator()(const CDCRLWireHitTriple& rlWireHitTriple, int inTrackHitDistanceTolerance);
+    };
+  }
+}

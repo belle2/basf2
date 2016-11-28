@@ -18,7 +18,7 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Filter based on a tmva method.
+    /// Filter based on a mva method.
     template<class AFilter>
     class MVA : public OnVarSet<AFilter> {
 
@@ -32,16 +32,17 @@ namespace Belle2 {
 
     public:
       /// Constructor of the filter.
-      explicit MVA(std::unique_ptr<BaseVarSet<Object> > varSet,
+      explicit MVA(std::unique_ptr<BaseVarSet<Object>> varSet,
                    const std::string& identifier = "",
-                   double defaultCut = NAN) :
-        Super(std::move(varSet)),
-        m_param_cut(defaultCut),
-        m_param_identifier(identifier)
-      {}
+                   double defaultCut = NAN)
+        : Super(std::move(varSet))
+        , m_param_cut(defaultCut)
+        , m_param_identifier(identifier)
+      {
+      }
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "cut"),
@@ -57,7 +58,7 @@ namespace Belle2 {
       }
 
       /// Initialize the expert before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         m_mvaExpert = makeUnique<MVAExpert>(m_param_identifier,
@@ -66,7 +67,7 @@ namespace Belle2 {
       }
 
       /// Signal to load new run parameters
-      virtual void beginRun() override
+      void beginRun() override
       {
         Super::beginRun();
         m_mvaExpert->beginRun();
@@ -74,13 +75,13 @@ namespace Belle2 {
 
     public:
       /// Function to object for its signalness
-      virtual Weight operator()(const Object& obj) override
+      Weight operator()(const Object& obj) override
       {
         double prediction = predict(obj);
         return prediction < m_param_cut ? NAN : prediction;
       }
 
-      /// Evaluate the tmva method
+      /// Evaluate the mva method
       virtual double predict(const Object& obj)
       {
         Weight extracted = Super::operator()(obj);
@@ -117,7 +118,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit MVAFilter(const std::string& defaultTrainingName = "",
                          double defaultCut = NAN)
-        :  Super(std::unique_ptr<AVarSet> (new AVarSet()),
+        :  Super(makeUnique<AVarSet>(),
                  defaultTrainingName,
                  defaultCut)
       {}

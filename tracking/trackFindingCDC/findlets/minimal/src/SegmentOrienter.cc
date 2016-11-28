@@ -8,7 +8,12 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentOrienter.h>
+
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
@@ -30,7 +35,7 @@ void SegmentOrienter::exposeParameters(ModuleParamList* moduleParamList, const s
                                 "'curling', "
                                 "'outwards', "
                                 "'downwards'.",
-                                std::string(m_param_segmentOrientationString));
+                                m_param_segmentOrientationString);
 }
 
 void SegmentOrienter::initialize()
@@ -45,35 +50,26 @@ void SegmentOrienter::initialize()
   }
 }
 
-void SegmentOrienter::setSegmentOrientation(const EPreferredDirection& segmentOrientation)
-{
-  m_segmentOrientation = segmentOrientation;
-}
-
-/// Get the currentl default output orientation of the segments.
-EPreferredDirection SegmentOrienter::getSegmentOrientation() const
-{
-  return m_segmentOrientation;
-}
-
-void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                            std::vector<CDCRecoSegment2D>& outputSegments)
+void SegmentOrienter::apply(const std::vector<CDCSegment2D>& inputSegments,
+                            std::vector<CDCSegment2D>& outputSegments)
 {
   /// Copy segments to output fixing their orientation
   if (m_segmentOrientation == EPreferredDirection::c_None) {
     // Copy the segments unchanged.
     outputSegments = inputSegments;
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Symmetric) {
     outputSegments.reserve(2 * inputSegments.size());
-    for (const CDCRecoSegment2D& segment : inputSegments) {
+    for (const CDCSegment2D& segment : inputSegments) {
       outputSegments.push_back(segment);
       outputSegments.push_back(segment.reversed());
     }
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Curling) {
     // Only make a copy for segments that are curling inside the CDC
     // Others fix to flighing outwards
     outputSegments.reserve(1.5 * inputSegments.size());
-    for (const CDCRecoSegment2D& segment : inputSegments) {
+    for (const CDCSegment2D& segment : inputSegments) {
       const CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
       bool isFitted = trajectory2D.isFitted();
       bool isCurler = trajectory2D.isCurler(1.1);
@@ -95,9 +91,10 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
         outputSegments.push_back(segment.reversed());
       }
     }
+
   } else if (m_segmentOrientation == EPreferredDirection::c_Outwards) {
     outputSegments.reserve(inputSegments.size());
-    for (const CDCRecoSegment2D& segment : inputSegments) {
+    for (const CDCSegment2D& segment : inputSegments) {
       const CDCRecoHit2D& firstHit = segment.front();
       const CDCRecoHit2D& lastHit = segment.back();
       if (lastHit.getRecoPos2D().cylindricalR() < firstHit.getRecoPos2D().cylindricalR()) {
@@ -108,7 +105,7 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
     }
   } else if (m_segmentOrientation == EPreferredDirection::c_Downwards) {
     outputSegments.reserve(inputSegments.size());
-    for (const CDCRecoSegment2D& segment : inputSegments) {
+    for (const CDCSegment2D& segment : inputSegments) {
       const CDCRecoHit2D& firstHit = segment.front();
       const CDCRecoHit2D& lastHit = segment.back();
       if (lastHit.getRecoPos2D().y() > firstHit.getRecoPos2D().y()) {
@@ -117,6 +114,7 @@ void SegmentOrienter::apply(const std::vector<CDCRecoSegment2D>& inputSegments,
         outputSegments.push_back(segment);
       }
     }
+
   } else {
     B2WARNING("Unexpected 'SegmentOrientation' parameter of segment finder module : '" <<
               m_param_segmentOrientationString <<

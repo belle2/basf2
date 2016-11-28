@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Base filter for the constuction of segment triples.
-    typedef Filter<CDCSegmentTriple>  BaseSegmentTripleFilter;
+    using BaseSegmentTripleFilter = Filter<CDCSegmentTriple> ;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

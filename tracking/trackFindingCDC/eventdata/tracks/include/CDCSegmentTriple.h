@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
@@ -28,22 +28,22 @@ namespace Belle2 {
       CDCSegmentTriple();
 
       /// Constructor taking two axial segments leaving the middle stereo segment set to null pointer.
-      CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                       const CDCAxialRecoSegment2D* endSegment);
+      CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                       const CDCAxialSegment2D* endSegment);
 
       /// Constructor taking two axial segments leaving the middle stereo segment set to null pointer.
       explicit CDCSegmentTriple(const CDCAxialSegmentPair& segmentPair);
 
       /// Constructor taking the three segments the triple shall be made of.
-      CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                       const CDCStereoRecoSegment2D* middleSegment,
-                       const CDCAxialRecoSegment2D* endSegment);
+      CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                       const CDCStereoSegment2D* middleSegment,
+                       const CDCAxialSegment2D* endSegment);
 
       /// Constructor taking the three segments the triple shall be made of and the two dimensional and sz trajectory.
-      CDCSegmentTriple(const CDCAxialRecoSegment2D* startSegment,
-                       const CDCStereoRecoSegment2D* middleSegment,
-                       const CDCAxialRecoSegment2D* endSegment,
-                       const CDCTrajectory3D& trajector3D);
+      CDCSegmentTriple(const CDCAxialSegment2D* startSegment,
+                       const CDCStereoSegment2D* middleSegment,
+                       const CDCAxialSegment2D* endSegment,
+                       const CDCTrajectory3D& trajectory3D);
 
       /// Equality comparision based on the pointers to the stored segments
       bool operator==(CDCSegmentTriple const& rhs) const
@@ -63,11 +63,11 @@ namespace Belle2 {
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
       friend bool operator<(CDCSegmentTriple const& segmentTriple,
-                            const CDCAxialRecoSegment2D* axialSegment)
+                            const CDCAxialSegment2D* axialSegment)
       { return segmentTriple.getStartSegment() < axialSegment; }
 
       /// Define reconstructed segments and segment triples as coaligned on the start segment
-      friend bool operator<(const CDCAxialRecoSegment2D* axialSegment,
+      friend bool operator<(const CDCAxialSegment2D* axialSegment,
                             CDCSegmentTriple const& segmentTriple)
       { return axialSegment < segmentTriple.getStartSegment(); }
 
@@ -89,27 +89,27 @@ namespace Belle2 {
 
 
       /// Getter for the start axial segment.
-      const CDCAxialRecoSegment2D* getStartSegment() const
+      const CDCAxialSegment2D* getStartSegment() const
       { return m_startSegment; }
 
       /// Setter for the start axial segment.
-      void setStartSegment(const CDCAxialRecoSegment2D* startSegment)
+      void setStartSegment(const CDCAxialSegment2D* startSegment)
       { m_startSegment = startSegment; }
 
       /// Getter for the middle stereo segment
-      const CDCStereoRecoSegment2D* getMiddleSegment()  const
+      const CDCStereoSegment2D* getMiddleSegment()  const
       { return m_middleSegment; }
 
       /// Setter for the middle stereo segment
-      void setMiddleSegment(const CDCStereoRecoSegment2D* middleSegment)
+      void setMiddleSegment(const CDCStereoSegment2D* middleSegment)
       { m_middleSegment = middleSegment; }
 
       /// Getter for the end axial segment.
-      const CDCAxialRecoSegment2D* getEndSegment() const
+      const CDCAxialSegment2D* getEndSegment() const
       { return m_endSegment; }
 
       /// Setter for the end axial segment.
-      void setEndSegment(const CDCAxialRecoSegment2D* endSegment)
+      void setEndSegment(const CDCAxialSegment2D* endSegment)
       { m_endSegment = endSegment; }
 
 
@@ -178,13 +178,13 @@ namespace Belle2 {
 
     private:
       /// Reference to the axial segment in the start of the triple.
-      const CDCRecoSegment2D* m_startSegment;
+      const CDCSegment2D* m_startSegment;
 
       /// Reference to the stereo segment in the middle of the triple.
-      const CDCStereoRecoSegment2D* m_middleSegment;
+      const CDCStereoSegment2D* m_middleSegment;
 
       /// Reference to the axial segment in the start of the triple.
-      const CDCAxialRecoSegment2D* m_endSegment;
+      const CDCAxialSegment2D* m_endSegment;
 
       /// Memory of the linear trajectory in the sz direction assoziated with the triple.
       mutable CDCTrajectory3D m_trajectory3D;
@@ -192,6 +192,6 @@ namespace Belle2 {
       /// Automaton cell assoziated with the pair of segments
       mutable AutomatonCell m_automatonCell;
 
-    }; // class CDCSegmentTriple
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

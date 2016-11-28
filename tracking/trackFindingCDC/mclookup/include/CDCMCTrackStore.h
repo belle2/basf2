@@ -27,7 +27,7 @@ namespace Belle2 {
 
     public:
       /// Type for an ordered sequence of pointers to the CDCHit
-      typedef std::vector<const CDCHit*> CDCHitVector;
+      using CDCHitVector = std::vector<const CDCHit*>;
 
     public:
       /// Getter for the singletone instance
@@ -85,13 +85,13 @@ namespace Belle2 {
 
     public:
       /// Getter for the index of the hit within its track.
-      Index getInTrackId(const CDCHit* hit) const;
+      Index getInTrackId(const CDCHit* ptrHit) const;
 
       /// Getter for the index of the segment of the hit within its track.
-      Index getInTrackSegmentId(const CDCHit* hit) const;
+      Index getInTrackSegmentId(const CDCHit* ptrHit) const;
 
       /// Getter for the number of super layers traversed until this hit.
-      Index getNPassedSuperLayers(const CDCHit* hit) const;
+      Index getNPassedSuperLayers(const CDCHit* ptrHit) const;
 
     private:
       /// Reference to the MC map of the current event
@@ -115,6 +115,6 @@ namespace Belle2 {
       /// Look up table for the number of super layers the particle traversed before making the individual hit
       std::map<const CDCHit*, int> m_nPassedSuperLayers;
 
-    }; //class CDCMCTrackStore
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

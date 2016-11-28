@@ -27,13 +27,18 @@ TrackFinderAutomaton::TrackFinderAutomaton()
   this->addProcessingSignalListener(&m_trackExporter);
 
   ModuleParamList moduleParamList;
-  this->exposeParameters(&moduleParamList);
+  const std::string prefix = "";
+  this->exposeParameters(&moduleParamList, prefix);
   moduleParamList.getParameter<std::string>("flightTimeEstimation").setDefaultValue("outwards");
   moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
   moduleParamList.getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
 
   // Mimics earlier behaviour
   moduleParamList.getParameter<bool>("WriteSegments").setDefaultValue(true);
+
+  m_wireHits.reserve(1000);
+  m_segments.reserve(100);
+  m_tracks.reserve(20);
 }
 
 std::string TrackFinderAutomaton::getDescription()
@@ -54,29 +59,29 @@ void TrackFinderAutomaton::exposeParameters(ModuleParamList* moduleParamList, co
   m_trackExporter.exposeParameters(moduleParamList, prefix);
 }
 
+void TrackFinderAutomaton::beginEvent()
+{
+  m_wireHits.clear();
+  m_segments.clear();
+  m_tracks.clear();
+  Super::beginEvent();
+}
+
 void TrackFinderAutomaton::apply()
 {
-  std::vector<CDCWireHit> wireHits;
-  std::vector<CDCRecoSegment2D> segments;
-  std::vector<CDCTrack> tracks;
+  // Aquire the wire hits, segments and tracks from the DataStore in case they have already been created
+  m_wireHitsSwapper.apply(m_wireHits);
+  m_segmentsSwapper.apply(m_segments);
+  m_tracksSwapper.apply(m_tracks);
 
-  // Aquire the wire hits, segments and tracks from the DataStore
-  m_wireHitsSwapper.apply(wireHits);
-  m_segmentsSwapper.apply(segments);
-  m_tracksSwapper.apply(tracks);
-
-  wireHits.reserve(1000);
-  segments.reserve(100);
-  tracks.reserve(20);
-
-  m_wireHitTopologyPreparer.apply(wireHits);
-  m_segmentFinderFacetAutomaton.apply(wireHits, segments);
-  m_trackFinderSegmentPairAutomaton.apply(segments, tracks);
-  m_trackFlightTimeAdjuster.apply(tracks);
-  m_trackExporter.apply(tracks);
+  m_wireHitTopologyPreparer.apply(m_wireHits);
+  m_segmentFinderFacetAutomaton.apply(m_wireHits, m_segments);
+  m_trackFinderSegmentPairAutomaton.apply(m_segments, m_tracks);
+  m_trackFlightTimeAdjuster.apply(m_tracks);
+  m_trackExporter.apply(m_tracks);
 
   // Put the segments and tracks on the DataStore
-  m_wireHitsSwapper.apply(wireHits);
-  m_segmentsSwapper.apply(segments);
-  m_tracksSwapper.apply(tracks);
+  m_wireHitsSwapper.apply(m_wireHits);
+  m_segmentsSwapper.apply(m_segments);
+  m_tracksSwapper.apply(m_tracks);
 }

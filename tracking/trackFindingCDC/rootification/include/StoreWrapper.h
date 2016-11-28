@@ -63,8 +63,8 @@ namespace Belle2 {
       ClassDef(StoreWrapper, 1);
     };
 
-  } //end namespace TrackFindingCDC
+  }
 
-} //end namespace Belle2
+}
 
 

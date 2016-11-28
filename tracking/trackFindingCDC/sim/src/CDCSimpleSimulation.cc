@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
@@ -34,22 +32,6 @@
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-void CDCSimpleSimulation::fillWireHitTopology(CDCWireHitTopology* wireHitTopology) const
-{
-  /// Obsolete once the wire hit topology is abolished.
-  if (wireHitTopology) {
-    // Publish a reference to the created wire hits that also keeps them alive as long as they are referenced
-    std::shared_ptr<const std::vector<CDCWireHit> > sharedWireHits = m_sharedWireHits;
-    auto keepSharedWireHitsAlive = [sharedWireHits](ConstVectorRange<CDCWireHit>* wireHitRange) {
-      delete wireHitRange;
-    };
-    std::shared_ptr<ConstVectorRange<CDCWireHit> > sharedWireHitRange{
-      new ConstVectorRange<CDCWireHit>(m_sharedWireHits->begin(), m_sharedWireHits->end()), keepSharedWireHitsAlive
-    };
-    wireHitTopology->fill(std::move(sharedWireHitRange));
-  }
-}
 
 ConstVectorRange<CDCWireHit> CDCSimpleSimulation::getWireHits() const
 {
@@ -400,7 +382,7 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
 }
 
 
-std::vector<Belle2::TrackFindingCDC::CDCTrack>
+std::vector<CDCTrack>
 CDCSimpleSimulation::loadPreparedEvent()
 {
   const size_t nMCTracks = 2;

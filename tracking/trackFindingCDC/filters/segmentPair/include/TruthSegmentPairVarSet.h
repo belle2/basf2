@@ -14,10 +14,9 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Forward declaration
     class CDCSegmentPair;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const truthSegmentPairVarNames[] = {
       "truth_tanl",
@@ -30,40 +29,28 @@ namespace Belle2 {
       "__weight__",
     };
 
-    /**
-     *  Class that specifies the names of the variables
-     *  that should be generated from a segment pair
-     */
-    class TruthSegmentPairVarNames : public VarNames<CDCSegmentPair> {
+    /// Vehicle class to transport the variable names
+    struct TruthSegmentPairVarNames : public VarNames<CDCSegmentPair> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(truthSegmentPairVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(truthSegmentPairVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return truthSegmentPairVarNames[iName];
       }
     };
 
     /**
-     *  Class that computes floating point variables from a segment pair.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+     *  Class to compute floating point variables from an axial stereo segment pair
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class TruthSegmentPairVarSet : public VarSet<TruthSegmentPairVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<TruthSegmentPairVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit TruthSegmentPairVarSet();
-
-      /// Generate and assign the variables from the segment pair
-      virtual bool extract(const CDCSegmentPair* ptrSegmentPair) override;
+      /// Generate and assign the contained variables
+      bool extract(const CDCSegmentPair* ptrSegmentPair) override;
     };
   }
 }

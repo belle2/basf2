@@ -18,7 +18,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Forward declaration
-    class CDCWireHitTopology;
     class CDCTrack;
     class CDCTrajectory3D;
     class Helix;
@@ -94,12 +93,6 @@ namespace Belle2 {
       };
 
     public:
-      /// Sets up a simple simulation which should generate hits into the given CDCWireHitTopology.
-      CDCSimpleSimulation() = default;
-
-      /// Also publish the generated wire hits to the given wire hit topology.
-      void fillWireHitTopology(CDCWireHitTopology* wireHitTopology) const;
-
       /// Getter for the wire hits created in the simulation
       ConstVectorRange<CDCWireHit> getWireHits() const;
 
@@ -107,43 +100,33 @@ namespace Belle2 {
       /**
        *  Propagates the trajectories through the CDC as without energy loss until they first leave the CDC
        *
-       *  As a side effect the CDCWireHitTopology is filled with CDCWireHits, which can also be used
-       *  as the start point of the finding.
-       *
        *  @param trajectories3D   Ideal trajectories to be propagated.
        *  @return The true tracks containing the hits generated in this process
        */
-      std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      simulate(const std::vector<Belle2::TrackFindingCDC::CDCTrajectory3D>& trajectories3D);
+      std::vector<CDCTrack> simulate(const std::vector<CDCTrajectory3D>& trajectories3D);
 
       /// Same as above for one trajectory.
-      Belle2::TrackFindingCDC::CDCTrack
-      simulate(const Belle2::TrackFindingCDC::CDCTrajectory3D& trajectory3D);
+      CDCTrack simulate(const CDCTrajectory3D& trajectory3D);
 
-      /// Fills the CDCWireHitTopology with a hard coded event from the real simulation.
-      std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      loadPreparedEvent();
+      /// Fills the wire hits with a hard coded event from the real simulation.
+      std::vector<CDCTrack> loadPreparedEvent();
 
     private:
-      /// Creates CDCWireHits in the CDCWireHitTopology and uses them to construct the true CDCTracks.
-      std::vector<Belle2::TrackFindingCDC::CDCTrack>
-      constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits);
+      /// Creates CDCWireHits and uses them to construct the true CDCTracks.
+      std::vector<CDCTrack> constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits);
 
       /// Generate hits for the given helix in starting from the two dimensional arc length.
-      std::vector<SimpleSimHit>
-      createHits(const Helix& globalHelix,
-                 double arcLength2DOffset) const;
+      std::vector<SimpleSimHit> createHits(const Helix& globalHelix, double arcLength2DOffset) const;
 
       /// Generate connected hits for wires in the same layer close to the given wire.
-      std::vector<SimpleSimHit>
-      createHitsForLayer(const CDCWire& nearWire,
-                         const Helix& globalHelix,
-                         double arcLength2DOffset) const;
+      std::vector<SimpleSimHit> createHitsForLayer(const CDCWire& nearWire,
+                                                   const Helix& globalHelix,
+                                                   double arcLength2DOffset) const;
 
       /// Generate a hit for the given wire.
       SimpleSimHit createHitForCell(const CDCWire& wire,
                                     const Helix& globalHelix,
-                                    double arcLengthOffset) const;
+                                    double arcLength2DOffset) const;
 
     public:
       /// Getter for a global event time offset
@@ -207,7 +190,7 @@ namespace Belle2 {
 
       /// Electron drift speed in the cdc gas
       double m_driftSpeed = s_nominalDriftSpeed;
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

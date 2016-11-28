@@ -9,34 +9,42 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/UnionRecordingFacetRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/facetRelation/FacetRelationVarSets.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/MVAFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facetRelation/FitFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BendFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
+#include <tracking/trackFindingCDC/filters/facetRelation/BaseFacetRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/facet/FitlessFacetVarSet.h>
+
+#include <tracking/trackFindingCDC/varsets/RelationVarSet.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 std::vector<std::string>
 UnionRecordingFacetRelationFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"basic", "truth"});
+  varSetNames.insert(varSetNames.end(), {"basic", "relation", " bend", "fit", "mva"});
   return varSetNames;
 }
-
 
 std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >
 UnionRecordingFacetRelationFilter::createVarSet(const std::string& name) const
 {
   if (name == "basic") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BasicFacetRelationVarSet());
+    return makeUnique<BasicFacetRelationVarSet>();
+  } else if (name == "relation") {
+    return  makeUnique<RelationVarSet<FitlessFacetVarSet> >();
   } else if (name == "bend") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new BendFacetRelationVarSet());
+    return makeUnique<BendFacetRelationVarSet>();
   } else if (name == "fit") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new FitFacetRelationVarSet());
-  } else if (name == "tmva") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new TMVAFacetRelationVarSet());
-  } else if (name == "truth") {
-    return std::unique_ptr<BaseVarSet<Relation<const CDCFacet> > >(new TruthFacetRelationVarSet());
+    return makeUnique<FitFacetRelationVarSet>();
+  } else if (name == "mva") {
+    MVAFacetRelationFilter mvaFacetRelationFilter;
+    return std::move(mvaFacetRelationFilter).releaseVarSet();
   } else {
     return Super::createVarSet(name);
   }

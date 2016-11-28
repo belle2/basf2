@@ -605,6 +605,29 @@ def reconstructDecay(
     path.add_module(pmake)
 
 
+def replaceMass(
+    replacerName,
+    particleLists=[],
+    pdgCode=22,
+    path=analysis_main,
+):
+    """
+    replaces the mass of the particles inside the given particleLists
+    with the invariant mass of the particle corresponding to the given pdgCode.
+
+    @param particleLists new ParticleList filled with copied Particles
+    @param pdgCode PDG   code for mass reference
+    @param path          modules are added to this path
+    """
+
+    # first copy original particles to the new ParticleList
+    pmassupdater = register_module('ParticleMassUpdater')
+    pmassupdater.set_name('ParticleMassUpdater_' + replacerName)
+    pmassupdater.param('particleLists', particleLists)
+    pmassupdater.param('pdgCode', pdgCode)
+    path.add_module(pmassupdater)
+
+
 def reconstructRecoil(
     decayString,
     cut,
@@ -734,84 +757,6 @@ def rankByLowest(
     bcs.param('selectLowest', True)
     bcs.param('outputVariable', outputVariable)
     path.add_module(bcs)
-
-
-def trainTMVAMethod(
-    decayString,
-    variables,
-    methods=[('FastBDT', 'Plugin',
-              '!H:!V:CreateMVAPdfs:NTrees=100:Shrinkage=0.10:RandRatio=0.5:NCutLevel=8:NTreeLayers=3'
-              )],
-    target='isSignal',
-    prefix='TMVA',
-    workingDirectory='.',
-    path=analysis_main,
-):
-    """
-    Trains a TMVA Method
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param variables list of variables which are registered in the VariableManager
-    @param methods list of tuples (name, type, config) of the TMVA methods
-    @param target variable registered in VariableManager which is used as target
-    @param prefix prefix which is used to identify the weight files created by TMVA
-    @param workingDirectory in which the config file and the weight file directory are created
-    @param path         modules are added to this path
-    """
-
-    teacher = register_module('TMVAOnTheFlyTeacher')
-    teacher.param('prefix', prefix)
-    teacher.param('methods', methods)
-    teacher.param('variables', variables)
-    teacher.param('target', target)
-    teacher.param('workingDirectory', workingDirectory)
-    teacher.param('listNames', decayString)
-    path.add_module(teacher)
-
-
-def applyTMVAMethod(
-    decayString,
-    method='FastBDT',
-    expertOutputName='isSignal',
-    signalFraction=-1,
-    signalClass=1,
-    prefix='TMVA',
-    transformToProbability=True,
-    sPlotPrior='',
-    workingDirectory='.',
-    path=analysis_main,
-):
-    """
-    Applies a trained TMVA method to a particle list
-    @param decayString   specifies type of Particles and determines the name of the ParticleList
-    @param method name of the TMVA method
-    @param expertOutputName extra-info name which is used to store the classifier output in the particle
-    @param signalFraction to calculate probability, -1 for training fraction
-    @param signalClass is the cluster to calculate the probability of beeing signal
-    @param prefix prefix which is used to identify the weight files created by TMVA
-    @param workingDirectory in which the expert finds the config file and the weight file directory
-    @param path         modules are added to this path
-    """
-
-    expert = register_module('TMVAExpert')
-    expert.param('prefix', prefix)
-    expert.param('method', method)
-    expert.param('workingDirectory', workingDirectory)
-    expert.param('listNames', decayString)
-    expert.param('expertOutputName', expertOutputName)
-    expert.param('signalFraction', signalFraction)
-    expert.param('transformToProbability', transformToProbability)
-    expert.param('sPlotPrior', sPlotPrior)
-    expert.param('signalClass', signalClass)
-    path.add_module(expert)
-
-
-def isTMVAMethodAvailable(prefix='TMVA'):
-    """
-    True of a TMVA method with the given prefix was trained
-    @param prefix which is used to identify the weight files created by TMVA
-    """
-
-    return os.path.isfile(prefix + '_1.config')
 
 
 def printDataStore(path=analysis_main):

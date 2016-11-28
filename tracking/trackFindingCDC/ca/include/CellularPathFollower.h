@@ -123,15 +123,13 @@ namespace Belle2 {
         ACellHolder* last = path.back();
 
         bool grew = false;
-        for (const WeightedRelation<ACellHolder>& relation
-             : cellHolderNeighborhood.equal_range(last)) {
-          if (isHighestContinuation(relation)) {
-            ACellHolder* neighbor(relation.getTo());
-            path.push_back(neighbor);
-            growAllPaths(path, cellHolderNeighborhood, paths);
-            grew = true;
-            path.pop_back();
-          }
+        for (const WeightedRelation<ACellHolder>& relation : cellHolderNeighborhood.equal_range(last)) {
+          if (not isHighestContinuation(relation)) continue;
+          ACellHolder* neighbor(relation.getTo());
+          path.push_back(neighbor);
+          growAllPaths(path, cellHolderNeighborhood, paths);
+          grew = true;
+          path.pop_back();
         }
 
         if (not grew) {
@@ -190,9 +188,9 @@ namespace Belle2 {
           (automatonCell.getCellState() == (neighborAutomatonCell.getCellState() + weight + automatonCell.getCellWeight()));
       }
 
-    }; // end class CellularPathFollower
+    };
 
-  } //end namespace TrackFindingCDC
+  }
 
-} //end namespace Belle2
+}
 

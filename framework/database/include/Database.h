@@ -174,7 +174,7 @@ namespace Belle2 {
 
   protected:
     /** Pointer to the database instance. */
-    static Database* s_instance;
+    static std::unique_ptr<Database> s_instance;
 
     /** Hidden constructor, as it is a singleton. */
     Database() : m_logLevel(LogConfig::c_Warning) {};

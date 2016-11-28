@@ -37,6 +37,8 @@
 using namespace std;
 using namespace Belle2;
 
+REG_MODULE(MCRecoTracksMatcher);
+
 namespace {
   //small anonymous helper construct making converting a pair of iterators usable
   //with range based for
@@ -82,24 +84,26 @@ namespace {
       ++recoTrackId;
 
       for (const RecoHitInformation::UsedCDCHit* cdcHit : recoTrack.getCDCHitList()) {
-        itInsertHint = trackCandID_by_hitID.insert(itInsertHint, make_pair(pair<DetId, HitId>(Const::CDC, cdcHit->getArrayIndex()),
-                                                   recoTrackId));
+        itInsertHint =
+          trackCandID_by_hitID.insert(itInsertHint,
+                                      make_pair(pair<DetId, HitId>(Const::CDC, cdcHit->getArrayIndex()),
+                                                recoTrackId));
       }
       for (const RecoHitInformation::UsedSVDHit* svdHit : recoTrack.getSVDHitList()) {
-        itInsertHint = trackCandID_by_hitID.insert(itInsertHint, make_pair(pair<DetId, HitId>(Const::SVD, svdHit->getArrayIndex()),
-                                                   recoTrackId));
+        itInsertHint =
+          trackCandID_by_hitID.insert(itInsertHint,
+                                      make_pair(pair<DetId, HitId>(Const::SVD, svdHit->getArrayIndex()),
+                                                recoTrackId));
       }
       for (const RecoHitInformation::UsedPXDHit* pxdHit : recoTrack.getPXDHitList()) {
-        itInsertHint = trackCandID_by_hitID.insert(itInsertHint, make_pair(pair<DetId, HitId>(Const::PXD, pxdHit->getArrayIndex()),
-                                                   recoTrackId));
+        itInsertHint =
+          trackCandID_by_hitID.insert(itInsertHint,
+                                      make_pair(pair<DetId, HitId>(Const::PXD, pxdHit->getArrayIndex()),
+                                                recoTrackId));
       }
     }
   }
 }
-
-
-REG_MODULE(MCRecoTracksMatcher);
-
 
 MCRecoTracksMatcherModule::MCRecoTracksMatcherModule() : Module()
 {
@@ -250,12 +254,12 @@ void MCRecoTracksMatcherModule::event()
   }
 
   //### Build a detector_id hit_id to trackcand map for easier lookup later ###
-  map< pair< DetId, HitId>, TrackCandId > mcRecoTrackId_by_hitId;
+  multimap< pair< DetId, HitId>, TrackCandId > mcRecoTrackId_by_hitId;
   fillIDsFromStoreArray(mcRecoTrackId_by_hitId, mcRecoTracks);
 
   //  Use set instead of multimap to handel to following situation
   //  * One hit may be assigned to multiple tracks should contribute to the efficiency of both tracks
-  //  * One hit assigned twice or more to the same hit should not contribute to the purity multiple times
+  //  * One hit assigned twice or more to the same track should not contribute to the purity multiple times
   //  The first part is handled well by the multimap. But to enforce that one hit is also only assigned
   //  once to a track we use a set.
   set< pair< pair< DetId, HitId >, TrackCandId> > prRecoTrackId_by_hitId;
@@ -302,6 +306,10 @@ void MCRecoTracksMatcherModule::event()
   // in case patter recognition tracks share hits.
   Eigen::RowVectorXi totalNDF_by_mcRecoTrackId = Eigen::RowVectorXi::Zero(nMCRecoTracks + 1);
 
+  // Accumulated the total number of hits/ndf for each pattern recognition track seperatly to avoid double counting,
+  // in case Monte-Carlo tracks share hits.
+  Eigen::VectorXi totalNDF_by_prRecoTrackId = Eigen::VectorXi::Zero(nPRRecoTracks + 1);
+
   // Column index for the hits not assigned to any MCTrackCand
   const int mcBkgId = nMCRecoTracks;
 
@@ -327,19 +335,19 @@ void MCRecoTracksMatcherModule::event()
 
       // First search the unique mcRecoTrackId for the hit.
       // If the hit is not assigned to any mcRecoTrack to Id is set iMC to the background column.
-      auto it_mcRecoTrackId_for_detId_hitId_pair = mcRecoTrackId_by_hitId.find(detId_hitId_pair);
+      auto range_mcRecoTrackIds_for_detId_hitId_pair = mcRecoTrackId_by_hitId.equal_range(detId_hitId_pair);
 
-      TrackCandId mcRecoTrackId = -1;
-
-      if (it_mcRecoTrackId_for_detId_hitId_pair == mcRecoTrackId_by_hitId.end()) {
-        mcRecoTrackId = mcBkgId;
-
+      if (range_mcRecoTrackIds_for_detId_hitId_pair.first == range_mcRecoTrackIds_for_detId_hitId_pair.second) {
+        TrackCandId mcRecoTrackId = mcBkgId;
+        totalNDF_by_mcRecoTrackId(mcRecoTrackId) += ndfForOneHit;
       } else {
-        mcRecoTrackId = it_mcRecoTrackId_for_detId_hitId_pair->second;
+        for (std::pair<DetHitIdPair, TrackCandId> detId_hitId_pair_and_mcRecoTrackId :
+             as_range(range_mcRecoTrackIds_for_detId_hitId_pair)) {
+          TrackCandId mcRecoTrackId = detId_hitId_pair_and_mcRecoTrackId.second;
+          // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if patter recognition track share hits.
+          totalNDF_by_mcRecoTrackId(mcRecoTrackId) += ndfForOneHit;
+        }
       }
-
-      // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if patter recognition track share hits.
-      totalNDF_by_mcRecoTrackId(mcRecoTrackId) += ndfForOneHit;
 
       // Seek all prRecoTracks
       //  use as range adapter to convert the iterator pair form equal_range to a range base iterable struct
@@ -352,14 +360,19 @@ void MCRecoTracksMatcherModule::event()
            as_range(range_prRecoTrackIds_for_detId_hitId_pair)) {
 
         TrackCandId prRecoTrackId = detId_hitId_pair_and_prRecoTrackId.second;
+        // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if Monte-Carlo track share hits.
+        totalNDF_by_prRecoTrackId(prRecoTrackId) += ndfForOneHit;
 
-        B2DEBUG(200, " prRecoTrackId : " <<  prRecoTrackId  << ";  mcRecoTrackId : " <<  mcRecoTrackId);
-        confusionMatrix(prRecoTrackId, mcRecoTrackId) += ndfForOneHit;
+        for (std::pair<DetHitIdPair, TrackCandId> detId_hitId_pair_and_mcRecoTrackId :
+             as_range(range_mcRecoTrackIds_for_detId_hitId_pair)) {
+          TrackCandId mcRecoTrackId = detId_hitId_pair_and_mcRecoTrackId.second;
+
+          B2DEBUG(200, " prRecoTrackId : " <<  prRecoTrackId  << ";  mcRecoTrackId : " <<  mcRecoTrackId);
+          confusionMatrix(prRecoTrackId, mcRecoTrackId) += ndfForOneHit;
+        }
       } //end for
     } //end for hitId
   } // end for decId
-
-  Eigen::VectorXi totalNDF_by_prRecoTrackId = confusionMatrix.rowwise().sum();
 
   B2DEBUG(200, "Confusion matrix of the event : " << endl <<  confusionMatrix);
 
@@ -395,7 +408,6 @@ void MCRecoTracksMatcherModule::event()
 
     purestMCTrackCandId_by_prRecoTrackId[prRecoTrackId] = pair< TrackCandId, Purity>(purestMCTrackCandId_for_prRecoTrackId,
                                                           highestPurity);
-
   }
 
   // Log the patter recognition track to highest purity Monte-Carlo track relation to debug output

@@ -8,34 +8,29 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPair/TrailSegmentPairVarSet.h>
-#include <assert.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-TrailSegmentPairVarSet::TrailSegmentPairVarSet()
-  : Super()
-{
-}
-
 bool TrailSegmentPairVarSet::extract(const CDCSegmentPair* ptrSegmentPair)
 {
-  bool extracted = extractNested(ptrSegmentPair);
-  if (not extracted or not ptrSegmentPair) return false;
+  if (not ptrSegmentPair) return false;
 
   const CDCSegmentPair& segmentPair = *ptrSegmentPair;
 
-  const CDCRecoSegment2D* ptrFromSegment = segmentPair.getFromSegment();
-  const CDCRecoSegment2D* ptrToSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  const CDCRecoSegment2D& fromSegment = *ptrFromSegment;
-  const CDCRecoSegment2D& toSegment = *ptrToSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
   /*
-  const CDCRecoSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
-  const CDCRecoSegment2D& axialSegment = *ptrAxialSegment;
+  const CDCSegment2D* ptrAxialSegment = segmentPair.getAxialSegment();
+  const CDCSegment2D& axialSegment = *ptrAxialSegment;
 
-  const CDCRecoSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
-  const CDCRecoSegment2D& stereoSegment = *ptrStereoSegment;
+  const CDCSegment2D* ptrStereoSegment = segmentPair.getStereoSegment();
+  const CDCSegment2D& stereoSegment = *ptrStereoSegment;
 
   bool fromIsAxial = ptrFromSegment == ptrAxialSegment;
 

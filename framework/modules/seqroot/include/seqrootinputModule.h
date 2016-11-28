@@ -15,11 +15,8 @@
 #include <sys/time.h>
 
 namespace Belle2 {
-  /** A class definition of an input module for Sequential ROOT I/O. */
-
+  /** Module to read files produced by SeqRootOutputModule. */
   class SeqRootInputModule : public Module {
-
-    // Public functions
   public:
 
     //! Constructor / Destructor
@@ -35,7 +32,6 @@ namespace Belle2 {
     virtual void endRun();
     virtual void terminate();
 
-    // Data members
   private:
     //! File name
     std::string m_inputFileName;

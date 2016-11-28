@@ -9,15 +9,16 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
-
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
 
+#include <tracking/trackFindingCDC/ca/Relation.h>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Names of the variables to be generated.
+    class CDCTrack;
+
+    /// Names of the variables to be generated
     constexpr
     static char const* const hitGapTrackRelationVarNames[] = {
       "delta_hit_pos_phi",
@@ -35,38 +36,28 @@ namespace Belle2 {
       "hit_ptolemy",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a track
-     */
-    class HitGapTrackRelationVarNames : public VarNames<Relation<const CDCTrack> > {
+    /// Class vehicle to transport the variable names
+    struct HitGapTrackRelationVarNames : public VarNames<Relation<const CDCTrack> > {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(hitGapTrackRelationVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(hitGapTrackRelationVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return hitGapTrackRelationVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a facet relation.
-     *  that can be forwarded to a flat TNtuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a track relation
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class HitGapTrackRelationVarSet : public VarSet<HitGapTrackRelationVarNames> {
 
-    private:
-      /// Type of the base class
-      using Super = VarSet<HitGapTrackRelationVarNames>;
-
     public:
-      /// Construct the varset.
-      explicit HitGapTrackRelationVarSet();
-
-      /// Generate and assign the variables from the track pair
-      virtual bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
+      /// Generate and assign the contained variables
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
     };
   }
 }

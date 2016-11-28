@@ -9,51 +9,40 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/varsets/EmptyVarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
-
-
-#include <vector>
-#include <string>
-#include <cassert>
-
 
 namespace Belle2 {
   namespace TrackFindingCDC {
     class CDCTrack;
     class SegmentInformation;
 
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
-    static char const* const segmentTrainNames[5] = {
+    static char const* const segmentTrainVarNames[] = {
       "is_stereo",
       "maximum_perpS_overlap",
       "size",
       "perpS_overlap_mean",
-      "calculation_failed"
+      "calculation_failed",
     };
 
-    /** Class that specifies the names of the variables
-     *  that should be generated from a wire hits cluster.
-     */
-    class SegmentTrainVarNames : public
-      VarNames<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> {
+    /// Vehicle class to transport the variable names
+    struct SegmentTrainVarNames : public VarNames<std::pair<std::vector<SegmentInformation*>, const CDCTrack*>> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = 5;
+      /// Number of variables to be generated
+      static const size_t nVars = size(segmentTrainVarNames);
 
-      /// Get the name of the corresponding column.
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
-        return segmentTrainNames[iName];
+        return segmentTrainVarNames[iName];
       }
     };
 
-    /** Class that computes floating point variables from a pair of track and segment.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
+    /**
+     *  Class to compute floating point variables from a segment train to track match
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      */
     class SegmentTrainVarSet : public VarSet<SegmentTrainVarNames> {
 
@@ -61,12 +50,8 @@ namespace Belle2 {
       /// We use this amount of overlap when defining a segment train
       static constexpr const float m_param_percentageForPerpSMeasurements = 0.05;
 
-      /// Construct the peeler.
-      explicit SegmentTrainVarSet() : VarSet<SegmentTrainVarNames>() { }
-
-      /// Generate and assign the variables from the pair
-      virtual bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair)
-      override final;
+      /// Generate and assign the contained variables
+      bool extract(const std::pair<std::vector<SegmentInformation*>, const CDCTrack*>* testPair) final;
     };
   }
 }

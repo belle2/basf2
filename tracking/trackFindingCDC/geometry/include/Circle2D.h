@@ -261,6 +261,6 @@ namespace Belle2 {
       /// Memory for the signed radius
       double m_radius;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

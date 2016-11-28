@@ -79,5 +79,5 @@ namespace Belle2 {
       }
     };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

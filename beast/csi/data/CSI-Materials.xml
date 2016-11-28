@@ -20,17 +20,12 @@
     </Components>
   </Material>
 
-  <!-- JIS SUS 304 Stainless Steel -->
-  <Material name="SUS304">
-    <density unit="g/cm3">8.04</density>
+  <Material name="AlTeflon">
+    <density unit="g/cm3">2.256</density>
     <Components>
-       <Element fraction="0.0008">C</Element>
-       <Element fraction="0.0075">Si</Element>
-       <Element fraction="0.0100">Mn</Element>
-       <Element fraction="0.1900">Cr</Element>
-       <Element fraction="0.1000">Ni</Element>
-       <Element fraction="0.0095">N</Element>
-       <Element fraction="0.6822">Fe</Element>
+       <Element fraction="0.1330">Al</Element>
+       <Element fraction="0.2081">C</Element>
+       <Element fraction="0.6589">F</Element>
     </Components>
   </Material>
 

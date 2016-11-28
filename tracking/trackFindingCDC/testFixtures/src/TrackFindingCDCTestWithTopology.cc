@@ -11,14 +11,12 @@
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
 #include <tracking/trackFindingCDC/topology/CDCWireTopology.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
 
 #include <framework/database/Database.h>
 #include <framework/database/LocalDatabase.h>
 #include <framework/database/DBStore.h>
-// #include <framework/dbobjects/BeamParameters.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/DataStore.h>
 #include <framework/dataobjects/EventMetaData.h>
@@ -44,7 +42,6 @@ void TrackFindingCDCTestWithTopology::SetUpTestCase()
   StoreObjPtr<EventMetaData> evtPtr;
   DataStore::Instance().setInitializeActive(true);
   evtPtr.registerInDataStore();
-  CDCWireHitTopology::initialize(); // <- deprecated, could be removed soon.
   DataStore::Instance().setInitializeActive(false);
   evtPtr.construct(0, 0, 1);
 

@@ -9,6 +9,8 @@ import numpy as np
 
 import ROOT
 
+import basf2
+
 from tracking.root_utils import root_cd, root_save_name
 
 from . import statistics
@@ -1284,14 +1286,25 @@ class ValidationPlot(object):
                      weights.astype(np.float64, copy=False))
         else:
             if ys is None:
-                histogram.FillN(len(xs),
-                                xs.astype(np.float64, copy=False),
-                                weights.astype(np.float64, copy=False))
+                # Make the array types compatible with the ROOT interface if necessary
+                xs = xs.astype(np.float64, copy=False)
+                weights = weights.astype(np.float64, copy=False)
+                n = len(xs)
+                if n != 0:
+                    histogram.FillN(n, xs, weights)
+                else:
+                    basf2.B2WARNING("No values to be filled into histogram: " + self.name)
+
             else:
-                histogram.FillN(len(xs),
-                                xs.astype(np.float64, copy=False),
-                                ys.astype(np.float64, copy=False),
-                                weights.astype(np.float64, copy=False))
+                # Make the array types compatible with the ROOT interface if necessary
+                xs = xs.astype(np.float64, copy=False)
+                ys = ys.astype(np.float64, copy=False)
+                weights = weights.astype(np.float64, copy=False)
+                n = len(xs)
+                if n != 0:
+                    histogram.FillN(n, xs, ys, weights)
+                else:
+                    basf2.B2WARNING("No values to be filled into histogram: " + self.name)
 
         self.set_additional_stats_tf1(histogram)
 

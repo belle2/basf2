@@ -221,6 +221,7 @@ def process_dir(
                 'bin',
                 'modules',
                 'data',
+                'site_scons',
             ]:
                 continue
             process_dir(env, os.path.join(dir_name, entry), is_module_dir and dir_name != '.', release_dir)

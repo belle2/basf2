@@ -27,7 +27,7 @@ namespace Belle2 {
       /// Returns the full range of tracks.
       template<class ACDCTrackIterator>
       boost::iterator_range<ACDCTrackIterator>
-      getPossibleNeighbors(const CDCTrack& /* track */,
+      getPossibleNeighbors(const CDCTrack& track  __attribute__((unused)),
                            const ACDCTrackIterator& itBegin,
                            const ACDCTrackIterator& itEnd) const
       {
@@ -37,8 +37,8 @@ namespace Belle2 {
       /** Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all track neighbors.
        */
-      virtual Weight operator()(const CDCTrack& /* from */,
-                                const CDCTrack& /* to */)
+      virtual Weight operator()(const CDCTrack& from  __attribute__((unused)),
+                                const CDCTrack& to  __attribute__((unused)))
       {
         return NAN;
       }
@@ -46,7 +46,7 @@ namespace Belle2 {
       /** Main filter method overriding the filter interface method.
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.*/
-      virtual Weight operator()(const Relation<const CDCTrack>& relation) override
+      Weight operator()(const Relation<const CDCTrack>& relation) override
       {
         const CDCTrack* ptrFrom(relation.first);
         const CDCTrack* ptrTo(relation.second);
@@ -54,14 +54,6 @@ namespace Belle2 {
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
-      /// Legacy method
-      virtual Weight isGoodNeighbor(const CDCTrack& from,
-                                    const CDCTrack& to)
-      {
-        return operator()(from, to);
-      }
-    }; // end class
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

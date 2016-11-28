@@ -18,23 +18,15 @@ MVARealisticTrackRelationFilter::MVARealisticTrackRelationFilter()
           "trackfindingcdc_RealisticTrackRelationFilter",
           0.80)
 {
-}
-
-void MVARealisticTrackRelationFilter::initialize()
-{
-  Super::initialize();
-  m_feasibleTrackRelationFilter.initialize();
-}
-
-void MVARealisticTrackRelationFilter::beginRun()
-{
-  Super::beginRun();
-  m_feasibleTrackRelationFilter.beginRun();
+  this->addProcessingSignalListener(&m_feasibleTrackRelationFilter);
 }
 
 Weight MVARealisticTrackRelationFilter::operator()(const Relation<const CDCTrack>& trackRelation)
 {
   double isFeasibleWeight = m_feasibleTrackRelationFilter(trackRelation);
-  if (std::isnan(isFeasibleWeight)) return NAN;
-  else return Super::operator()(trackRelation);
+  if (std::isnan(isFeasibleWeight)) {
+    return NAN;
+  } else {
+    return Super::operator()(trackRelation);
+  }
 }

@@ -19,11 +19,14 @@ REG_MODULE(Progress)
 ProgressModule::ProgressModule() : Module(), m_maxOrder(3), m_evtNr(0), m_runNr(0),
   m_output("Processed: %3d runs, %6d events")
 {
-  setDescription("Output number of processed events. "
+  setDescription("Periodically writes the number of processed events/runs to the"
+                 " logging system to give a progress indication.\n"
+                 "The output is logarithmic, meaning it will output the first 10 events, "
+                 "then every tenth event up to 100, then every hundreth event up to 1000, etc. "
                  "Output cannot be suppressed using set_log_level. "
                  "If you don't want messages, you don't want this module");
   addParam("maxN", m_maxOrder,
-           "maximum 10^N events between output", m_maxOrder);
+           "At most, 10^N events will lie between outputs", m_maxOrder);
 }
 
 void ProgressModule::initialize()

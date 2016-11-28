@@ -18,23 +18,15 @@ MVARealisticSegmentRelationFilter::MVARealisticSegmentRelationFilter()
           "trackfindingcdc_RealisticSegmentRelationFilter",
           0.90)
 {
+  this->addProcessingSignalListener(&m_feasibleSegmentRelationFilter);
 }
 
-void MVARealisticSegmentRelationFilter::initialize()
-{
-  Super::initialize();
-  m_feasibleSegmentRelationFilter.initialize();
-}
-
-void MVARealisticSegmentRelationFilter::beginRun()
-{
-  Super::beginRun();
-  m_feasibleSegmentRelationFilter.beginRun();
-}
-
-Weight MVARealisticSegmentRelationFilter::operator()(const Relation<const CDCRecoSegment2D>& segmentRelation)
+Weight MVARealisticSegmentRelationFilter::operator()(const Relation<const CDCSegment2D>& segmentRelation)
 {
   double isFeasibleWeight = m_feasibleSegmentRelationFilter(segmentRelation);
-  if (std::isnan(isFeasibleWeight)) return NAN;
-  else return Super::operator()(segmentRelation);
+  if (std::isnan(isFeasibleWeight)) {
+    return NAN;
+  } else {
+    return Super::operator()(segmentRelation);
+  }
 }

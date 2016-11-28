@@ -97,9 +97,9 @@ namespace Belle2 {
        *  @return the line being tangential to both circles.
        *  Note : the touch points reside at(0) for the first and at(1) for the second */
       static ParameterLine2D touchingCircles(const Vector2D& fromCenter,
-                                             const double fromSignedRadius,
+                                             double fromSignedRadius,
                                              const Vector2D& toCenter,
-                                             const double toSignedRadius);
+                                             double toSignedRadius);
 
       /// Downcast the line to the normal representation.
       /** Downcasting the parameter line to the line representation using the normal vector.
@@ -434,6 +434,6 @@ namespace Belle2 {
       /// Tangential vector of the line
       Vector2D m_tangential;
 
-    }; // class
-  }    // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

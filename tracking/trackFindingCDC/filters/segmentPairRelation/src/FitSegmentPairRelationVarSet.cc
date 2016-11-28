@@ -14,15 +14,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitSegmentPairRelationVarSet::FitSegmentPairRelationVarSet()
-  : Super()
-{
-}
-
 bool FitSegmentPairRelationVarSet::extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation)
 {
-  bool extracted = Super::extract(ptrSegmentPairRelation);
-  if (not extracted or not ptrSegmentPairRelation) return false;
+  if (not ptrSegmentPairRelation) return false;
 
   const CDCSegmentPair* fromSegmentPair = ptrSegmentPairRelation->first;
   const CDCSegmentPair* toSegmentPair   = ptrSegmentPairRelation->second;

@@ -25,5 +25,5 @@ TrackFinderCosmics::TrackFinderCosmics()
 
 std::string TrackFinderCosmics::getDescription()
 {
-  return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
+  return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages - version suitable for cosmics.";
 }

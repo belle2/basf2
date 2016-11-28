@@ -28,6 +28,6 @@ namespace Belle2 {
       /// Static getter for a general fitter that does not use the drift length variances
       static const CDCKarimakiFitter& getNoDriftVarianceFitter();
 
-    }; // class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

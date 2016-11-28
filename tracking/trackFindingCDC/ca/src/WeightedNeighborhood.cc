@@ -18,7 +18,7 @@ namespace Belle2 {
 
   namespace TrackFindingCDC {
 
-    //typedef WeightedNeighborhood<const int> ExampleNeighborHood;
+    //using ExampleNeighborHood = WeightedNeighborhood<const int>;
 
 
   }

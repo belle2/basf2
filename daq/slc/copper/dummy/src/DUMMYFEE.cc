@@ -12,7 +12,7 @@ DUMMYFEE::DUMMYFEE()
 {
 }
 
-void DUMMYFEE::init(RCCallback& callback, HSLB& hslb)
+void DUMMYFEE::init(RCCallback& callback, HSLB& hslb, const DBObject& obj)
 {
 
 }

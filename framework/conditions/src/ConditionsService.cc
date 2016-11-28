@@ -1,4 +1,3 @@
-#include <framework/conditions/ConditionsService.h>
 #include <framework/core/Module.h>
 #include <framework/logging/Logger.h>
 #include <TFile.h>
@@ -18,6 +17,16 @@
 #include <memory>
 #include <string>
 #include <set>
+
+// we know all of this is deprecated, we don't want the warnings when compiling the service itself ...
+#ifdef __INTEL_COMPILER
+#pragma warning (disable:1478) //[[deprecated]]
+#pragma warning (disable:1786) //[[deprecated("message")]]
+#else
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+#include <framework/conditions/ConditionsService.h>
 
 using namespace Belle2;
 

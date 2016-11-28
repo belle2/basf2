@@ -99,8 +99,11 @@ namespace Belle2 {
         rot_cave->rotateY(activeParams.getLength("AngleY"));
         rot_cave->rotateZ(activeParams.getLength("AngleZ"));
         //geometry::setColor(*l_CAVE, "#006699");
-
-        //new G4PVPlacement(rot_cave, CAVEpos, l_CAVE, "p_CAVE", &topVolume, false, detID);
+        //double angle = activeParams.getDouble("angle");
+        //double rx = activeParams.getDouble("rx");
+        //double ry = activeParams.getDouble("ry");
+        //double rz = activeParams.getDouble("rz");
+        //rot_cave->rotate(-angle, G4ThreeVector(rx, ry, rz));
         new G4PVPlacement(rot_cave, CAVEpos, l_CAVE, "p_CAVE", &topVolume, false, detID);
 
         detID++;

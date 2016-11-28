@@ -34,7 +34,7 @@
         <material>FANGS-Support</material>
         <length unit="mm">170</length>
         <width unit="mm">28.7</width>
-        <height unit="mm">3</height>
+        <height unit="mm">2</height>
         <top unit="mm">0</top>
       </shape>
       <shape name="flex" type="box">

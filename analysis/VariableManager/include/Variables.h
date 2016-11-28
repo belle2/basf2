@@ -69,6 +69,22 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
+     * cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1
+     * if only a massless particle like a neutrino is missing in the reconstruction.
+     */
+    double cosThetaBetweenParticleAndTrueB(const Particle* part);
+
+    /**
+     * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
+     * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
+     * defined by the momenta of the three daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAngle(const Particle* part);
+
+
+    /**
      * return Zdistance of daughter tracks at vertex point
      */
     double VertexZDist(const Particle*);

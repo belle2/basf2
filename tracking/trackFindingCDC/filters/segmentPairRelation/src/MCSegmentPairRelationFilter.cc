@@ -16,24 +16,7 @@ MCSegmentPairRelationFilter::MCSegmentPairRelationFilter(bool allowReverse) :
   Super(allowReverse),
   m_mcSegmentPairFilter(allowReverse)
 {
-}
-
-void MCSegmentPairRelationFilter::beginEvent()
-{
-  m_mcSegmentPairFilter.beginEvent();
-  Super::beginEvent();
-}
-
-void MCSegmentPairRelationFilter::initialize()
-{
-  Super::initialize();
-  m_mcSegmentPairFilter.initialize();
-}
-
-void MCSegmentPairRelationFilter::terminate()
-{
-  m_mcSegmentPairFilter.terminate();
-  Super::terminate();
+  this->addProcessingSignalListener(&m_mcSegmentPairFilter);
 }
 
 Weight MCSegmentPairRelationFilter::operator()(const CDCSegmentPair& fromSegmentPair,

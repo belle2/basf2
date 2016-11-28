@@ -37,7 +37,7 @@ namespace Belle2 {
     operator int() const throw() { return m_hslb.fd; }
 
   public:
-    long long readfn(int adr) throw(HSLBHandlerException);
+    int readfn(int adr) throw(HSLBHandlerException);
     void writefn(int adr, int val) throw(HSLBHandlerException);
     long long readfn32(int adr) throw(HSLBHandlerException);
     void writefn32(int adr, int val) throw(HSLBHandlerException);

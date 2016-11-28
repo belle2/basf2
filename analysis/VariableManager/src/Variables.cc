@@ -191,7 +191,7 @@ namespace Belle2 {
 
         TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
 
-        return MotherMomentum.Angle(p12);
+        return std::cos(MotherMomentum.Angle(p12));
 
       } else if (daughters.size() == 3) {
 
@@ -208,7 +208,7 @@ namespace Belle2 {
 
         TVector3 n = p12.Cross(p13);
 
-        return MotherMomentum.Angle(n);
+        return std::cos(MotherMomentum.Angle(n));
 
       }  else return 0;
 

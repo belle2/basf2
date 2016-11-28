@@ -106,7 +106,7 @@ void PrintDataTemplateModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetBlockNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         tv.tv_sec, (int)(tv.tv_usec)
+         (int)(tv.tv_sec), (int)(tv.tv_usec)
         );
 
   m_nftsw++;
@@ -119,13 +119,13 @@ void PrintDataTemplateModule::printCOPPEREvent(RawCOPPER* raw_copper, int i)
 
   printf(": Event %8d node 0x%.8x block %d by: sum det %d by : A %d by B %d by C %d by D %d by\n",
          raw_copper->GetEveNo(i), raw_copper->GetNodeID(i),
-         raw_copper->GetBlockNwords(i) * sizeof(int),
-         sizeof(int) * (raw_copper->GetDetectorNwords(i, 0) + raw_copper->GetDetectorNwords(i, 1) +
-                        raw_copper->GetDetectorNwords(i, 2) + raw_copper->GetDetectorNwords(i, 3)),
-         sizeof(int) * (raw_copper->GetDetectorNwords(i, 0)),
-         sizeof(int) * (raw_copper->GetDetectorNwords(i, 1)),
-         sizeof(int) * (raw_copper->GetDetectorNwords(i, 2)),
-         sizeof(int) * (raw_copper->GetDetectorNwords(i, 3))
+         (int)(sizeof(int) * raw_copper->GetBlockNwords(i)),
+         (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 0) + raw_copper->GetDetectorNwords(i, 1) +
+                              raw_copper->GetDetectorNwords(i, 2) + raw_copper->GetDetectorNwords(i, 3))),
+         (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 0))),
+         (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 1))),
+         (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 2))),
+         (int)(sizeof(int) * (raw_copper->GetDetectorNwords(i, 3)))
         );
   printf("EventMetaData : exp %d run %d subrun %d eve %.8x\n", m_eventMetaDataPtr->getExperiment(),
          m_eventMetaDataPtr->getRun(), m_eventMetaDataPtr->getSubrun(), m_eventMetaDataPtr->getEvent());
@@ -194,7 +194,7 @@ void PrintDataTemplateModule::printPXDEvent(RawPXD* raw_pxd)
   if (nframes != 0) {
     int pos = nframesv[ 0 ] / 4 + nframes + 2 ;
     //     printf("nf0 %d\n", nframesv[ 0 ]);
-    for (int i = 1; i < nframesv.size(); i++) {
+    for (int i = 1; i < (int)(nframesv.size()); i++) {
       if ((nframesv[ i ] % 4) != 0) break;
       int dhh_trg1 = (temp_buf[ pos ] >> 24) & 0xff;
       int dhh_trg2 = (temp_buf[ pos ] >> 16) & 0xff;
@@ -237,7 +237,7 @@ void PrintDataTemplateModule::event()
 {
 
 
-  B2INFO("aPrintDataTemplate: event() started.");
+  B2INFO("PrintDataTemplate: event() started.");
   //
   // FTSW + COPPER can be combined in the array
   //

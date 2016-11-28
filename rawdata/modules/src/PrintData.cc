@@ -70,8 +70,8 @@ void PrintDataModule::initialize()
 
   char title[100];
   int size = 0;
-  int min = 0.;
-  int max = 100.;
+  double min = 0.;
+  double max = 100.;
 
 
   sprintf(title, "Event Number");
@@ -184,7 +184,7 @@ void PrintDataModule::printFTSWEvent(RawDataBlock* raw_datablock, int i)
          rawftsw.GetBlockNwords(n),
          rawftsw.GetNwordsHeader(n),
          rawftsw.GetFTSWNodeID(n),
-         tv.tv_sec, (int)(tv.tv_usec)
+         (int)(tv.tv_sec), (int)(tv.tv_usec)
         );
 
 
@@ -244,7 +244,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
       }
     }
 
-    if (eve % 10000 == 0)   printf("1 %d %d\n", tv.tv_sec - 1422134556, (int)eve);
+    if (eve % 10000 == 0)   printf("1 %d %d\n", (int)(tv.tv_sec) - 1422134556, (int)eve);
     if (prev_tv_pos > 100) {
       for (int i = 0; i < prev_tv_pos ; i++) {
         printf(" a %d %d %d\n", i, prev_tv_eve[i ], tv_flag[ i ]);
@@ -272,7 +272,7 @@ void PrintDataModule::printCOPPEREvent(RawCOPPER* raw_copper, int n, int array_i
   return;
   printf(": Event # %d : node ID 0x%.8x : block size %d bytes\n",
          raw_copper->GetEveNo(n), raw_copper->GetNodeID(n),
-         raw_copper->GetBlockNwords(n) * sizeof(int));
+         (int)(raw_copper->GetBlockNwords(n) * sizeof(int)));
 
 
   //#ifdef DEBUG

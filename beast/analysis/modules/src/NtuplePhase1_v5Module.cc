@@ -99,6 +99,8 @@ namespace Belle2 {
     addParam("input_LC_SAD_PPS", m_input_LC_SAD_PPS, "List of LC SAD PPS ");
     addParam("input_HC_SAD_PPS", m_input_HC_SAD_PPS, "List of HC SAD PPS ");
 
+    addParam("input_BGSol", m_input_BGSol, "BG solution 0 or I");
+
     addParam("inputHistoFileNames", m_inputHistoFileNames,
              "List of root files with histograms");
 
@@ -765,7 +767,6 @@ namespace Belle2 {
         && m_beast.SKB_HER_beamSize_xray_Y != 0
         && m_beast.SKB_HER_beamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
     */
-    //if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_HER_beamSize_xray_Y != 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
     if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
     double sigma_y_LER = 0;
     if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0
@@ -776,7 +777,6 @@ namespace Belle2 {
         && m_beast.SKB_LER_beamSize_xray_Y != 0
         && m_beast.SKB_LER_beamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
     */
-    //if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0 && m_beast.SKB_LER_beamSize_xray_Y != 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
     if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
     double bunch_nb_HER = 0;
     if (m_beast.SKB_HER_injectionNumberOfBunches != 0
@@ -802,24 +802,16 @@ namespace Belle2 {
       P_LER = 0;
     }
 
-    //double sad_Ib_HER = m_input_I_HER[0]/* / m_input_bunchNb_HER[0]*/ * 1e-3;
-    //double sad_Ib_LER = m_input_I_LER[0]/* / m_input_bunchNb_LER[0]*/ * 1e-3;
-
-    //double sad_Nb_HER = sad_Ib_HER * 3000. / TMath::C() / (1.6e-19);
-    //double sad_Nb_LER = sad_Ib_LER * 3000. / TMath::C() / (1.6e-19);
-
     double Ib_HER = 0;
-    if (bunch_nb_HER > 0) Ib_HER = I_HER / bunch_nb_HER * 1e-3;
+    if (bunch_nb_HER > 0) Ib_HER = I_HER / bunch_nb_HER * 1e-3; // mA -> A
     double Ib_LER = 0;
-    if (bunch_nb_LER > 0) Ib_LER = I_LER / bunch_nb_LER * 1e-3;
+    if (bunch_nb_LER > 0) Ib_LER = I_LER / bunch_nb_LER * 1e-3; // mA -> A
 
     double Nb_HER = 0;
     if (Ib_HER > 0) Nb_HER = Ib_HER * 3000. / TMath::C() / (1.6e-19);
     double Nb_LER = 0;
     if (Ib_LER > 0) Nb_LER = Ib_LER * 3000. / TMath::C() / (1.6e-19);
-    //cout <<"I_HER " << I_HER << " I_LER " << I_LER << endl;
-    //cout <<"Ib_HER " << Ib_HER << " Ib_LER " << Ib_LER << endl;
-    //cout <<"Nb_HER " << Nb_HER << " Nb_LER " << Nb_LER << endl;
+
     double PPS_HER = 0;
     if (m_beast.SKB_HER_lifetime != 0 && m_beast.SKB_HER_lifetime->size() > 0 && Nb_HER > 0) {
       PPS_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
@@ -839,13 +831,23 @@ namespace Belle2 {
     cout << " I_LER = " << I_LER << " P_LER = " << P_LER << " sigma_y_LER = " << sigma_y_LER << " bunch_nb_LER = " << bunch_nb_LER <<
          endl;
     */
-    //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
+    //Calculate Beam Gas scaling factor:
+    //                       solution 0: Beam Gas \propo I x P => (IP)^data / (IP)^simu
+    //                       solution 1: Beam Gas \propo I x P => (I_bP)^data / (I_bP)^simu where I_b = current / #bunch
     double ScaleFacBGav_HER = 0;
     double ScaleFacBGav_LER = 0;
-    if (I_LER > 0 && P_LER > 0)
-      ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
-    if (I_HER > 0 && P_HER > 0)
-      ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
+    if (I_LER > 0 && P_LER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_LER > 0) ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                    m_input_bunchNb_LER[0];
+      if (m_input_BGSol == 1) ScaleFacBGav_LER = I_LER * P_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+    }
+    if (I_HER > 0 && P_HER > 0) {
+      if (m_input_BGSol == 0
+          && bunch_nb_HER > 0) ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                    m_input_bunchNb_HER[0];
+      if (m_input_BGSol == 1) ScaleFacBGav_HER = I_HER * P_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+    }
 
     //Calculate Beam Gas scaling factor: Beam Gas \propo I x P => (IP)^data / (IP)^simu
     double ScaleFacBG_HER[12];
@@ -857,8 +859,12 @@ namespace Belle2 {
         iP_HER = m_beast.SKB_HER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
         if (m_input_P_HER[1] > 0) iP_HER += gRandom->Gaus(0, m_input_P_HER[1]);
         if (iP_HER < 0) iP_HER = 0;
-        if (I_HER > 0 && iP_HER > 0)
-          ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]); // bunch_nb_HER / m_input_bunchNb_HER[0];
+        if (I_HER > 0 && iP_HER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_HER > 0) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]) / bunch_nb_HER *
+                                                         m_input_bunchNb_HER[0];
+          if (m_input_BGSol == 1) ScaleFacBG_HER[i] = I_HER * iP_HER / (m_input_I_HER[0] * m_input_P_HER[0]);
+        }
       }
     }
     if (m_beast.SKB_LER_pressures != 0) {
@@ -868,8 +874,12 @@ namespace Belle2 {
         iP_LER = m_beast.SKB_LER_pressures->at(i) * 0.00750062 * 1e9 * 3.;
         if (m_input_P_LER[1] > 0) iP_LER += gRandom->Gaus(0, m_input_P_LER[1]);
         if (iP_LER < 0) iP_LER = 0;
-        if (I_LER > 0 && iP_LER > 0)
-          ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]); // bunch_nb_LER / m_input_bunchNb_LER[0];
+        if (I_LER > 0 && iP_LER > 0) {
+          if (m_input_BGSol == 0
+              && bunch_nb_LER > 0) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]) / bunch_nb_LER *
+                                                         m_input_bunchNb_LER[0];
+          if (m_input_BGSol == 1) ScaleFacBG_LER[i] = I_LER * iP_LER / (m_input_I_LER[0] * m_input_P_LER[0]);
+        }
       }
     }
 
@@ -886,20 +896,6 @@ namespace Belle2 {
     //cout << " factor BG LER " << ScaleFacBG_LER << " Toushek LER " << ScaleFacTo_LER << endl;
     //cout << " factor BG HER " << ScaleFacBG_HER << " Toushek HER " << ScaleFacTo_HER << endl;
 
-    //Scale LER SAD lifetime
-    /*
-    for (int i = 0; i < (int)m_input_LT_SAD_lifetime.size(); i++) {
-      float LBG = 1. / m_input_LB_SAD_lifetime[i] + 1. / m_input_LC_SAD_lifetime[i];
-      float BG = LBG * ScaleFacBGav_LER;
-      float To = ScaleFacTo_LER * 1. / m_input_LT_SAD_lifetime[i];
-      //m_beast.SAD_LER_lifetime_av.push_back(1. / (BG + To));
-      BG = 0;
-      for (int j = 0; j < 12; j++) {
-        BG += LBG / 12. * ScaleFacBG_LER[j];
-      }
-      //m_beast.SAD_LER_lifetime.push_back(1. / (BG + To));
-    }
-    */
     //Scale LER SAD PPS
     for (int i = 0; i < (int)m_input_LT_SAD_PPS.size(); i++) {
       float LBG = m_input_LB_SAD_PPS[i] + m_input_LC_SAD_PPS[i];
@@ -915,20 +911,6 @@ namespace Belle2 {
       m_beast.SAD_LER_lifetime.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
     }
 
-    //Scale HER SAD lifetime
-    /*
-    for (int i = 0; i < (int)m_input_HT_SAD_lifetime.size(); i++) {
-      float HBG = 1. / m_input_HB_SAD_lifetime[i] + 1. / m_input_HC_SAD_lifetime[i];
-      float BG = HBG * ScaleFacBGav_HER;
-      float To = ScaleFacTo_HER * 1. / m_input_HT_SAD_lifetime[i];
-      //m_beast.SAD_HER_lifetime_av.push_back(1. / (BG + To));
-      BG = 0;
-      for (int j = 0; j < 12; j++) {
-        BG += HBG / 12. * ScaleFacBG_HER[j];
-      }
-      //m_beast.SAD_HER_lifetime.push_back(1. / (BG + To));
-    }
-    */
     //Scale HER SAD PPS
     for (int i = 0; i < (int)m_input_HT_SAD_PPS.size(); i++) {
       float HBG = m_input_HB_SAD_PPS[i] + m_input_HC_SAD_PPS[i];
@@ -951,9 +933,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
       m_beast.DIA_dose_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_DIA_dose.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_DIA_dose[j].size() > 0) {
           double LBG = m_input_LB_DIA_dose[j][i] + m_input_LC_DIA_dose[j][i];
@@ -961,7 +941,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_DIA_dose[i] + ScaleFacTo_HER * m_input_HT_DIA_dose[i];
       m_beast.DIA_dose.push_back(BG + To);
     }
 
@@ -972,9 +951,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
       m_beast.PIN_dose_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_PIN_dose.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_PIN_dose[j].size() > 0) {
           double LBG = m_input_LB_PIN_dose[j][i] + m_input_LC_PIN_dose[j][i];
@@ -982,7 +959,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_PIN_dose[i] + ScaleFacTo_HER * m_input_HT_PIN_dose[i];
       m_beast.PIN_dose.push_back(BG + To);
     }
 
@@ -993,9 +969,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
       m_beast.BGO_energy_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_BGO_dose.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_BGO_dose[j].size() > 0) {
           double LBG = m_input_LB_BGO_dose[j][i] + m_input_LC_BGO_dose[j][i];
@@ -1003,7 +977,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_BGO_dose[i] + ScaleFacTo_HER * m_input_HT_BGO_dose[i];
       m_beast.BGO_energy.push_back(BG + To);
     }
 
@@ -1014,9 +987,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
       m_beast.HE3_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_HE3_rate.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_HE3_rate[j].size() > 0) {
           double LBG = m_input_LB_HE3_rate[j][i] + m_input_LC_HE3_rate[j][i];
@@ -1024,7 +995,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_HE3_rate[i] + ScaleFacTo_HER * m_input_HT_HE3_rate[i];
       m_beast.HE3_rate.push_back(BG + To);
     }
 
@@ -1035,9 +1005,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CLAWS_rate[i] + ScaleFacTo_HER * m_input_HT_CLAWS_rate[i];
       m_beast.CLAWS_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CLAWS_rate.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_CLAWS_rate[j].size() > 0) {
           double LBG = m_input_LB_CLAWS_rate[j][i] + m_input_LC_CLAWS_rate[j][i];
@@ -1045,7 +1013,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CLAWS_rate[i] + ScaleFacTo_HER * m_input_HT_CLAWS_rate[i];
       m_beast.CLAWS_rate.push_back(BG + To);
     }
 
@@ -1056,9 +1023,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
       m_beast.QCSS_rate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_QCSS_rate.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_QCSS_rate[j].size() > 0) {
           double LBG = m_input_LB_QCSS_rate[j][i] + m_input_LC_QCSS_rate[j][i];
@@ -1066,7 +1031,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_QCSS_rate[i] + ScaleFacTo_HER * m_input_HT_QCSS_rate[i];
       m_beast.QCSS_rate.push_back(BG + To);
     }
 
@@ -1077,23 +1041,7 @@ namespace Belle2 {
       double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
       double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
-      double LBG = m_input_LB_CSI_dose_binE_av[i] + m_input_LC_CSI_dose_binE_av[i];
-      double HBG = m_input_HB_CSI_dose_binE_av[i] + m_input_HC_CSI_dose_binE_av[i];
-      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
-      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
-      m_beast.CSI_Ebin_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
-      double LBG = m_input_LB_CSI_rate_av[i] + m_input_LC_CSI_rate_av[i];
-      double HBG = m_input_HB_CSI_rate_av[i] + m_input_HC_CSI_rate_av[i];
-      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
-      double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
-      m_beast.CSI_hitRate_av.push_back(BG + To);
-    }
-    for (int i = 0; i < (int)m_input_LT_CSI_dose.size(); i++) {
-      double BG = 0;
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_CSI_dose[j].size() > 0) {
           double LBG = m_input_LB_CSI_dose[j][i] + m_input_LC_CSI_dose[j][i];
@@ -1101,11 +1049,15 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_dose[i] + ScaleFacTo_HER * m_input_HT_CSI_dose[i];
       m_beast.CSI_sumE.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_dose_binE.size(); i++) {
-      double BG = 0;
+      double LBG = m_input_LB_CSI_dose_binE_av[i] + m_input_LC_CSI_dose_binE_av[i];
+      double HBG = m_input_HB_CSI_dose_binE_av[i] + m_input_HC_CSI_dose_binE_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
+      m_beast.CSI_Ebin_av.push_back(BG + To);
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_CSI_dose_binE[j].size() > 0) {
           double LBG = m_input_LB_CSI_dose_binE[j][i] + m_input_LC_CSI_dose_binE[j][i];
@@ -1113,11 +1065,15 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_dose_binE[i] + ScaleFacTo_HER * m_input_HT_CSI_dose_binE[i];
       m_beast.CSI_Ebin.push_back(BG + To);
     }
     for (int i = 0; i < (int)m_input_LT_CSI_rate.size(); i++) {
-      double BG = 0;
+      double LBG = m_input_LB_CSI_rate_av[i] + m_input_LC_CSI_rate_av[i];
+      double HBG = m_input_HB_CSI_rate_av[i] + m_input_HC_CSI_rate_av[i];
+      double BG = LBG * ScaleFacBGav_LER + HBG * ScaleFacBGav_HER;
+      double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
+      m_beast.CSI_hitRate_av.push_back(BG + To);
+      BG = 0;
       for (int j = 0; j < 12; j++) {
         if (m_input_LB_CSI_rate[j].size() > 0) {
           double LBG = m_input_LB_CSI_rate[j][i] + m_input_LC_CSI_rate[j][i];
@@ -1125,7 +1081,6 @@ namespace Belle2 {
           BG += LBG * ScaleFacBG_LER[j] + HBG * ScaleFacBG_HER[j];
         }
       }
-      double To = ScaleFacTo_LER * m_input_LT_CSI_rate[i] + ScaleFacTo_HER * m_input_HT_CSI_rate[i];
       m_beast.CSI_hitRate.push_back(BG + To);
     }
 

@@ -79,6 +79,8 @@ namespace Belle2 {
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
 
+    Int_t m_input_BGSol; /**< time stamp start and stop */
+
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
     std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */
 

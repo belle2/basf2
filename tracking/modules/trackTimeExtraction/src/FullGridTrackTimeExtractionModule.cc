@@ -173,8 +173,8 @@ void FullGridTrackTimeExtractionModule::event()
     const auto& minimalChi2 = std::min_element(convergedTries.begin(), convergedTries.end());
 
     const double extractedTime = minimalChi2->m_extractedT0;
-    // TODO: Uncertainty
-    m_eventT0->addEventT0(extractedTime, 0, Const::EDetector::CDC);
+    // The uncertainty was calculated using a test MC sample
+    m_eventT0->addEventT0(extractedTime, 5.1, Const::EDetector::CDC);
   } else {
     // If not, start with the lowest extracted chi2 and do another two iteration steps. If it converges then,
     // use this. Else, use the next best guess.
@@ -184,8 +184,8 @@ void FullGridTrackTimeExtractionModule::event()
       extractTrackTimeFrom(recoTrack, tryOut.m_extractedT0, 2, tries, convergedTries, m_param_minimalT0Shift, m_param_maximalT0Shift);
       if (not convergedTries.empty()) {
         const double extractedTime = convergedTries.back().m_extractedT0;
-        // TODO: Uncertainty
-        m_eventT0->addEventT0(extractedTime, 0, Const::EDetector::CDC);
+        // The uncertainty was calculated using a test MC sample
+        m_eventT0->addEventT0(extractedTime, 5.1, Const::EDetector::CDC);
         break;
       }
     }

@@ -34,8 +34,22 @@ namespace Belle2 {
        */
       bool step(G4Step* aStep, G4TouchableHistory*);
 
+      /**
+       * Sets replica depth of PMT volume
+       * @param depth replica depth
+       */
+      void setPMTReplicaDepth(int depth) {m_pmtReplicaDepth = depth;}
+
+      /**
+       * Sets replica depth of module volume
+       * @param depth replica depth
+       */
+      void setModuleReplicaDepth(int depth) {m_moduleReplicaDepth = depth;}
+
     private:
 
+      int m_pmtReplicaDepth = 2;    /**< replica depth of PMT volume */
+      int m_moduleReplicaDepth = 5; /**< replica depth of module volume */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< geometry parameters */
 
     };

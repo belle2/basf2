@@ -15,6 +15,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <geometry/Materials.h>
+#include <iostream>
 
 using namespace std;
 
@@ -245,7 +246,74 @@ namespace Belle2 {
 
       // QBB
 
-      TOPGeoQBB qbb; // TODO
+      GearDir qbbParams(content, "QBB");
+      TOPGeoQBB qbb(qbbParams.getLength("width"),
+                    qbbParams.getLength("length"),
+                    qbbParams.getLength("prismPosition"),
+                    qbbParams.getString("material"));
+
+      GearDir outerPanelParams(qbbParams, "outerPanel");
+      TOPGeoHoneycombPanel outerPanel(outerPanelParams.getLength("width"),
+                                      outerPanelParams.getLength("length"),
+                                      outerPanelParams.getLength("minThickness"),
+                                      outerPanelParams.getLength("maxThickness"),
+                                      outerPanelParams.getLength("radius"),
+                                      outerPanelParams.getLength("edgeWidth"),
+                                      outerPanelParams.getLength("y"),
+                                      outerPanelParams.getInt("N"),
+                                      outerPanelParams.getString("material"),
+                                      outerPanelParams.getString("edgeMaterial"),
+                                      "TOPOuterHoneycombPanel");
+      qbb.setOuterPanel(outerPanel);
+
+      GearDir innerPanelParams(qbbParams, "innerPanel");
+      TOPGeoHoneycombPanel innerPanel(innerPanelParams.getLength("width"),
+                                      innerPanelParams.getLength("length"),
+                                      innerPanelParams.getLength("minThickness"),
+                                      innerPanelParams.getLength("maxThickness"),
+                                      innerPanelParams.getLength("radius"),
+                                      innerPanelParams.getLength("edgeWidth"),
+                                      innerPanelParams.getLength("y"),
+                                      innerPanelParams.getInt("N"),
+                                      innerPanelParams.getString("material"),
+                                      innerPanelParams.getString("edgeMaterial"),
+                                      "TOPInnerHoneycombPanel");
+      qbb.setInnerPanel(innerPanel);
+
+      GearDir sideRailsParams(qbbParams, "sideRails");
+      TOPGeoSideRails sideRails(sideRailsParams.getLength("thickness"),
+                                sideRailsParams.getLength("reducedThickness"),
+                                sideRailsParams.getLength("height"),
+                                sideRailsParams.getString("material"));
+      qbb.setSideRails(sideRails);
+
+      GearDir prismEnclosureParams(qbbParams, "prismEnclosure");
+      TOPGeoPrismEnclosure prismEnclosure(prismEnclosureParams.getLength("length"),
+                                          prismEnclosureParams.getLength("height"),
+                                          prismEnclosureParams.getAngle("angle"),
+                                          prismEnclosureParams.getLength("bottomThickness"),
+                                          prismEnclosureParams.getLength("sideThickness"),
+                                          prismEnclosureParams.getLength("backThickness"),
+                                          prismEnclosureParams.getLength("frontThickness"),
+                                          prismEnclosureParams.getLength("extensionThickness"),
+                                          prismEnclosureParams.getString("material"));
+      qbb.setPrismEnclosure(prismEnclosure);
+
+      GearDir endPlateParams(qbbParams, "forwardEndPlate");
+      TOPGeoEndPlate endPlate(endPlateParams.getLength("thickness"),
+                              endPlateParams.getLength("height"),
+                              endPlateParams.getString("material"),
+                              "TOPForwardEndPlate");
+      qbb.setEndPlate(endPlate);
+
+      GearDir coldPlateParams(qbbParams, "coldPlate");
+      TOPGeoColdPlate coldPlate(coldPlateParams.getLength("baseThickness"),
+                                coldPlateParams.getString("baseMaterial"),
+                                coldPlateParams.getLength("coolThickness"),
+                                coldPlateParams.getLength("coolWidth"),
+                                coldPlateParams.getString("coolMaterial"));
+      qbb.setColdPlate(coldPlate);
+
       geo->setQBB(qbb);
 
       // nominal QE

@@ -583,5 +583,16 @@
       <Element fraction="1.0">Al</Element>      
     </Components>        
   </Material> 
-    
+
+  <Material name="TOPColdPlate"> 
+    <state>Solid</state>
+    <density unit="g/cm3">4.35</density> 
+    <Components>   
+      <Element fraction="0.5">Al</Element>      
+      <Element fraction="0.5">Cu</Element>      
+    </Components>        
+  </Material> 
+
+
+  
 </Materials> 

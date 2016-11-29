@@ -95,7 +95,7 @@ namespace Belle2 {
       G4ThreeVector localPosition = PrePosition->GetTouchableHandle()->GetHistory()->GetTopTransform().TransformPoint(worldPosition);
 
       // Get bar ID
-      int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(2);
+      int moduleID = PrePosition->GetTouchableHandle()->GetReplicaNumber(m_replicaDepth);
 
       // Check that it is not on the glue boundary or similar
       const auto* geo = m_topgp->getGeometry();

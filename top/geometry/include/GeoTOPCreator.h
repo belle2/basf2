@@ -21,6 +21,8 @@
 class G4LogicalVolume;
 class G4AssemblyVolume;
 class G4Box;
+class G4ExtrudedSolid;
+class G4UnionSolid;
 
 namespace Belle2 {
 
@@ -30,6 +32,8 @@ namespace Belle2 {
 
     class SensitivePMT;
     class SensitiveBar;
+
+    typedef std::vector<std::pair<double, double> > Polygon;
 
     /**
      * Geometry creator for TOP counter.
@@ -78,11 +82,37 @@ namespace Belle2 {
     private:
 
       /**
+       * Honeycomb panel types
+       */
+      enum EPanelType {c_Inner, c_Outer};
+
+      /**
+       * Side rail types
+       */
+      enum ESideRailType {c_Left, c_Right};
+
+      /**
        * Create the geometry from a parameter object.
        */
       void createGeometry(const TOPGeometry& parameters,
                           G4LogicalVolume& topVolume,
                           geometry::GeometryTypes type);
+
+      /**
+       * Old way
+       */
+      void createGeometryOld(const TOPGeometry& parameters,
+                             G4LogicalVolume& topVolume,
+                             geometry::GeometryTypes type);
+
+      /**
+       * New way (under development)
+       */
+      void createGeometryNew(const TOPGeometry& parameters,
+                             G4LogicalVolume& topVolume,
+                             geometry::GeometryTypes type);
+
+      // -- old creator ----------------------------------------------------
 
       /**
        * Creates one module of the TOP counter (bar+support+PMT array)
@@ -115,6 +145,46 @@ namespace Belle2 {
       G4LogicalVolume* buildPMT(const TOPGeoPMT& geo);
 
       // -- new creator ----------------------------------------------------
+
+      /**
+       * Creates single module
+       * @param geo geometry description
+       * @param moduleID module ID (slot number)
+       * @return logical volume
+       */
+      G4LogicalVolume* createModule(const TOPGeometry& geo, int moduleID);
+
+      /**
+       * Creates module envelope
+       * @param geo geometry description
+       * @param moduleID module ID (slot number)
+       * @return logical volume
+       */
+      G4LogicalVolume* createModuleEnvelope(const TOPGeoQBB& geo, int moduleID);
+
+      /**
+       * Assembles QBB
+       * @param geo geometry description
+       * @return assembly volume
+       */
+      G4AssemblyVolume* assembleQBB(const TOPGeoQBB& geo);
+
+      /**
+       * Creates honeycomb panel
+       * @param geo geometry description
+       * @param type panel type
+       * @return logical volume
+       */
+      G4LogicalVolume* createHoneycombPanel(const TOPGeoQBB& geo, EPanelType type);
+
+      /**
+       * Creates side rail
+       * @param geo geometry description
+       * @param type side rail type
+       * @param translate translation to return
+       * @return logical volume
+       */
+      G4LogicalVolume* createSideRail(const TOPGeoQBB& geo, ESideRailType type);
 
       /**
        * Assembles optical components (PMT array, prism and bar segments) along z
@@ -171,9 +241,9 @@ namespace Belle2 {
        * @param materialName material name
        * @return logical volume
        */
-      G4LogicalVolume* createBox(std::string name,
+      G4LogicalVolume* createBox(const std::string& name,
                                  double A, double B, double C,
-                                 std::string materialName);
+                                 const std::string& materialName);
 
       /**
        * Creates material volume that is intersection of box and half-sphere shell (z > 0)
@@ -187,11 +257,24 @@ namespace Belle2 {
        * @param materialName material name
        * @return logical volume
        */
-      G4LogicalVolume* createBoxSphereIntersection(std::string name,
+      G4LogicalVolume* createBoxSphereIntersection(const std::string& name,
                                                    G4Box* box,
                                                    double Rmin, double Rmax,
                                                    double xc, double yc, double zc,
-                                                   std::string materialName);
+                                                   const std::string& materialName);
+
+      /**
+       * Creates material extruded solid
+       * @param name volume name
+       * @param shape x-y shape of extruded solid
+       * @param length length in z
+       * @param materialName material name
+       * @return logical volume
+       */
+      G4LogicalVolume* createExtrudedSolid(const std::string& name,
+                                           const Polygon& shape,
+                                           double length,
+                                           const std::string& materialName);
 
       /**
        * Adds number to string
@@ -208,8 +291,12 @@ namespace Belle2 {
       BkgSensitiveDetector* m_sensitivePCB2 = 0;  /**< PCB sensitive for BG studies */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< singleton class */
       int m_isBeamBkgStudy = 0; /**< flag for beam backgound simulation */
+
+      G4UnionSolid* m_moduleEnvelope = 0; /**< module envelope solid */
+      G4LogicalVolume* m_pmtArray = 0; /**< PMT array logical volume */
+      G4AssemblyVolume* m_qbb = 0; /**< QBB assembly volume */
     };
 
-  }
-}
+  } // namespace TOP
+} // namespace Belle2
 

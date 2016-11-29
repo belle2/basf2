@@ -40,7 +40,6 @@
 #include <G4Tubs.hh>
 #include <G4Polyhedra.hh>
 #include <G4Polycone.hh>
-#include <G4SubtractionSolid.hh>
 #include <G4UserLimits.hh>
 #include <G4Material.hh>
 
@@ -145,226 +144,354 @@ namespace Belle2 {
 
     void GeoTOPCreator::createGeometry(const TOPGeometry& geo,
                                        G4LogicalVolume& topVolume,
-                                       GeometryTypes)
+                                       geometry::GeometryTypes type)
     {
-      m_topgp->setGeanUnits();
-      geo.useGeantUnits();
-
-      // test new creator methods ---------------------------->
-      bool test = false;
-      if (test) {
-        auto* pmtArray = createPMTArray(geo.getPMTArray());
-        double Lz = geo.getPMTArray().getPMT().getSizeZ();
-        auto* optics = assembleOptics(geo.getModule(1), pmtArray, Lz);
-        G4ThreeVector move;
-        G4RotationMatrix rot;
-        move.setX(geo.getModule(1).getBackwardZ());
-        rot.rotateY(M_PI / 2);
-        optics->MakeImprint(&topVolume, move, &rot);
-        return;
-      }
-      // end <----------------------------
-
-      // build one module
-      G4LogicalVolume* module = buildTOPModule(geo, 1);
-
-      // position the modules
-      int numModules = geo.getNumModules();
-      for (int i = 0; i < numModules; i++) {
-        int id = i + 1;
-        double Radius = geo.getModule(id).getRadius();
-        double phi = geo.getModule(id).getPhi();
-
-        G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
-        G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);
-
-        new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule",
-                          &topVolume, false, id);
-      }
-
-    }
-
-
-
-    G4LogicalVolume* GeoTOPCreator::buildTOPModule(const TOPGeometry& geo, int moduleID)
-    {
-      /*  Read parameters  */
-
-      double Qwidth = geo.getModule(moduleID).getBarWidth();
-      double Wwidth = geo.getModule(moduleID).getPrism().getWidth();
-      if (Wwidth > Qwidth) Qwidth = Wwidth;
-
-      double Qthickness = geo.getModule(moduleID).getBarThickness();
-      double Z1 = geo.getModule(moduleID).getBackwardZ();
-      double WLength = geo.getModule(moduleID).getPrism().getLength();
-      double Wextdown = geo.getModule(moduleID).getPrism().getExitThickness() -
-                        geo.getModule(moduleID).getPrism().getThickness();
-
-      double PannelThickness = m_topgp->getPannelThickness();
-      double PlateThickness = m_topgp->getPlateThickness();
-      double LowerGap = m_topgp->getLowerGap();
-      double UpperGap = m_topgp->getUpperGap();
-      double SideGap = m_topgp->getSideGap();
-      double ZForward = geo.getModule(moduleID).getForwardZ() + m_topgp->getForwardGap()
-                        + PannelThickness;
-      double ZBackward = geo.getModule(moduleID).getBackwardZ() - WLength
-                         - m_topgp->getBackwardGap() - PannelThickness;
-
-      // size of the whole stack
-      double x = geo.getPMTArray().getSizeX();
-      double y = geo.getPMTArray().getSizeY();
-
-      // Check which is higher the wedge or the PMT stack
-      double upside = 0;
-      double downside = 0;
-
-      if ((y - Wextdown) / 2.0 > Qthickness / 2.0) {
-        upside = (y - Wextdown) / 2.0;
-        downside = -Wextdown / 2.0 - y / 2.0;
-      } else {
-        upside = Qthickness / 2.0;
-        downside = -Wextdown - Qthickness / 2.0;
-      }
-
-      // Check which is wider bar or PMTs
-      double side = 0;
-
-      if (x / 2.0 > Qwidth / 2.0) {
-        side = x / 2.0;
-      } else {
-        side = Qwidth / 2.0;
-      }
-
-      /*  Build wedge  */
-
-      // Build the outer wall
-      std::vector<G4TwoVector> polygon;
-
-      polygon.push_back(G4TwoVector(ZBackward,
-                                    upside + UpperGap + PannelThickness));
-      polygon.push_back(G4TwoVector(ZForward,
-                                    upside + UpperGap + PannelThickness));
-      polygon.push_back(G4TwoVector(ZForward,
-                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
-      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
-                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
-      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
-                                    downside - LowerGap - PlateThickness));
-      polygon.push_back(G4TwoVector(ZBackward,
-                                    downside - LowerGap - PlateThickness));
-
-      G4ExtrudedSolid* supportShape = new G4ExtrudedSolid("support",
-                                                          polygon,
-                                                          side + SideGap + PlateThickness,
-                                                          G4TwoVector(0.0, 0.0),
-                                                          1.0,
-                                                          G4TwoVector(0.0, 0.0),
-                                                          1.0);
-
-      // Build inside air
-      std::vector<G4TwoVector> polygon2;
-
-      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
-                                     upside + UpperGap));
-      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
-                                     upside + UpperGap));
-      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
-                                     -Qthickness / 2.0 - LowerGap));
-      polygon2.push_back(G4TwoVector(Z1,
-                                     -Qthickness / 2.0 - LowerGap));
-      polygon2.push_back(G4TwoVector(Z1,
-                                     downside - LowerGap));
-      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
-                                     downside - LowerGap));
-
-      G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air",
-                                                       polygon2,
-                                                       side + SideGap,
-                                                       G4TwoVector(0.0, 0.0),
-                                                       1.0,
-                                                       G4TwoVector(0.0, 0.0),
-                                                       1.0);
-
-      /* Read support and fill materials */
-
-      string suportName = m_topgp->getPannelMaterial();
-      string fillName = m_topgp->getInsideMaterial();
-      G4Material* supportMaterial = Materials::get(suportName);
-      G4Material* fillMaterial = Materials::get(fillName);
-      if (!supportMaterial) { B2FATAL("Material '" << suportName << "' missing!");}
-      if (!fillMaterial) { B2FATAL("Material '" << fillName << "' missing!");}
-
-      /* Place air inside support and thus create the structure */
-
-      // build physical volumes
-      G4LogicalVolume* support = new G4LogicalVolume(supportShape,
-                                                     supportMaterial, "Support");
-      G4LogicalVolume* air = new G4LogicalVolume(airShape, fillMaterial, "Air");
-
-      /* Build quartz bar and insert it into the air */
-
-      // bool old = false;
-      bool old = true;
-      if (old) {
-        G4ThreeVector transa(0, 0, 0);
-        buildBar(geo, moduleID)->MakeImprint(air, transa, 0, 100, false);
-      } else {
-        auto* pmtArray = createPMTArray(geo.getPMTArray());
-        double Lz = geo.getPMTArray().getPMT().getSizeZ();
-        auto* optics = assembleOptics(geo.getModule(moduleID), pmtArray, Lz);
-        G4ThreeVector move;
-        G4RotationMatrix rot;
-        move.setX(geo.getModule(1).getBackwardZ());
-        rot.rotateY(M_PI / 2);
-        optics->MakeImprint(air, move, &rot);
-      }
-
-      /* Add electronics, this part is not finished, just for backgound studies */
-
-      double pcbThickness = geo.getPMTArray().getPMT().getBotThickness();
-      G4Box* el1 = new G4Box("el1box", pcbThickness / 2.0, y / 2.0, x / 2.0);
-      G4Box* el2 = new G4Box("el1box", y / 2.0, pcbThickness / 2.0, x / 2.0);
-      G4Material* PCBMaterial = Materials::get("TOPPCB");
-      G4LogicalVolume* pcb1 = new G4LogicalVolume(el1, PCBMaterial, "Board.1");
-      G4LogicalVolume* pcb2 = new G4LogicalVolume(el2, PCBMaterial, "Board.2");
-
-      if (m_isBeamBkgStudy) {
-        m_sensitivePCB1 = new BkgSensitiveDetector("TOP", 1);
-        pcb1->SetSensitiveDetector(m_sensitivePCB1);
-        m_sensitivePCB2 = new BkgSensitiveDetector("TOP", 2);
-        pcb2->SetSensitiveDetector(m_sensitivePCB2);
-      }
-
-      setColor(*pcb1, "rgb(0.0,1.0,0.0,1.0)");
-      setColor(*pcb2, "rgb(0.0,1.0,0.0,1.0)");
-
-      double dGlue = geo.getModule(moduleID).getPrism().getFilterThickness();
-      double pmtZ = geo.getPMTArray().getPMT().getSizeZ();
-      G4ThreeVector transPCB(Z1 - WLength - 2 * dGlue - pmtZ - pcbThickness / 2.0,
-                             -Wextdown / 2.0,
-                             0.);
-      G4ThreeVector transPCB2(Z1 - WLength - 3 * dGlue - pmtZ - pcbThickness - y / 2.0,
-                              -Wextdown / 2.0,
-                              0.);
-
-      new G4PVPlacement(0, transPCB, pcb1, "TOP.electronics", air, false, 0);
-      new G4PVPlacement(0, transPCB2, pcb2, "TOP.electronics", air, false, 0);
-
-
-      // Needed dumy variable to place air inside support shape
-      G4Transform3D temp = G4Translate3D(0.0, 0.0, 0.0);
-
-      new G4PVPlacement(temp, air, "TOP.support", support, false, 0);
-
-      /* return support shape */
-
-      return support;
+      createGeometryOld(geo, topVolume, type);
+      // createGeometryNew(geo, topVolume, type);
 
     }
 
 
 
     // ---- new creator --------------------------------------------------------------
+
+    void GeoTOPCreator::createGeometryNew(const TOPGeometry& geo,
+                                          G4LogicalVolume& topVolume,
+                                          geometry::GeometryTypes)
+    {
+      geo.useGeantUnits();
+
+      m_sensitivePMT->setModuleReplicaDepth(4);
+      m_sensitiveBar->setReplicaDepth(1);
+
+      double backwardLength = geo.getQBB().getPrismEnclosure().getLength();
+      double prismPosition = geo.getQBB().getPrismPosition();
+
+      for (unsigned moduleID = 1; moduleID <= geo.getNumModules(); moduleID++) {
+        const auto& geoModule = geo.getModule(moduleID);
+        double barLength = geoModule.getBarLength();
+
+        // go to local (bar) frame
+
+        G4Transform3D T1 =
+          G4TranslateZ3D(backwardLength / 2 - prismPosition - barLength / 2);
+
+        // displaced geometry (if defined)
+
+        G4Transform3D D;
+        const auto* displacement = geoModule.getModuleDisplacement();
+        if (displacement) {
+          G4Transform3D Rx = G4RotateX3D(displacement->getAlpha());
+          G4Transform3D Ry = G4RotateY3D(displacement->getBeta());
+          G4Transform3D Rz = G4RotateZ3D(displacement->getGamma());
+          G4Transform3D tr = G4Translate3D(displacement->getX(),
+                                           displacement->getY(),
+                                           displacement->getZ());
+          D = tr * Rz * Ry * Rx;
+        }
+
+        // position the module
+
+        double radius = geoModule.getRadius();
+        double backwardZ = geoModule.getBackwardZ();
+        G4Transform3D tr = G4Translate3D(0, radius, barLength / 2 + backwardZ);
+        double phi = geoModule.getPhi() - M_PI / 2;
+        G4Transform3D Rz = G4RotateZ3D(phi);
+        G4Transform3D T = Rz * tr * D * T1;
+        auto* module = createModule(geo, moduleID);
+        std::string name = geoModule.getName();
+        new G4PVPlacement(T, module, name, &topVolume, false, moduleID);
+      }
+
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createModule(const TOPGeometry& geo, int moduleID)
+    {
+      // note: z = 0 is at center of backward envelope
+
+      G4ThreeVector move;
+      G4RotationMatrix rot;
+
+      // create module envelope volume
+
+      auto& geoQBB = geo.getQBB();
+      auto* module = createModuleEnvelope(geoQBB, moduleID);
+
+      // add optics together with PMT array
+
+      if (!m_pmtArray) m_pmtArray = createPMTArray(geo.getPMTArray());
+      double Lz = geo.getPMTArray().getPMT().getSizeZ();
+      auto* optics = assembleOptics(geo.getModule(moduleID), m_pmtArray, Lz);
+
+      move.setZ(geoQBB.getPrismPosition() - geoQBB.getPrismEnclosure().getLength() / 2);
+      optics->MakeImprint(module, move, &rot);
+
+      // add QBB
+
+      if (!m_qbb) m_qbb = assembleQBB(geoQBB);
+      move.setZ(0);
+      m_qbb->MakeImprint(module, move, &rot);
+
+      // add electronics
+
+
+      return module;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createModuleEnvelope(const TOPGeoQBB& geo,
+                                                         int moduleID)
+    {
+      // note: z = 0 is at center of backward envelope
+
+      if (!m_moduleEnvelope) {
+        double backwardLength = geo.getPrismEnclosure().getLength();
+        double forwardLength = geo.getLength() - backwardLength;
+        std::vector<G4TwoVector> polygon;
+        for (auto& point : geo.getBackwardContour()) {
+          polygon.push_back(G4TwoVector(point.first, point.second));
+        }
+        auto* backward = new G4ExtrudedSolid("backwardEnvelope",
+                                             polygon, backwardLength / 2,
+                                             G4TwoVector(), 1, G4TwoVector(), 1);
+        polygon.clear();
+        for (auto& point : geo.getForwardContour()) {
+          polygon.push_back(G4TwoVector(point.first, point.second));
+        }
+        auto* forward = new G4ExtrudedSolid("forwardEnvelope",
+                                            polygon, forwardLength / 2,
+                                            G4TwoVector(), 1, G4TwoVector(), 1);
+        G4Transform3D move = G4TranslateZ3D((backwardLength + forwardLength) / 2);
+        m_moduleEnvelope = new G4UnionSolid("moduleEnvelope", backward, forward, move);
+      }
+
+      G4Material* material = Materials::get(geo.getMaterial());
+      if (!material) B2FATAL("Material '" << geo.getMaterial() << "' not found");
+
+      std::string name = addNumber("TOPEnvelopeModule", moduleID);
+      return new G4LogicalVolume(m_moduleEnvelope, material, name);
+
+    }
+
+
+    G4AssemblyVolume* GeoTOPCreator::assembleQBB(const TOPGeoQBB& geo)
+    {
+      auto* qbb = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(qbb);
+
+      double Zback = -geo.getPrismEnclosure().getLength() / 2;
+      double Zfront = Zback + geo.getLength() - geo.getForwardEndPlate().getThickness();
+
+      G4ThreeVector move;
+
+      // outer panel
+
+      auto* outerPanel = createHoneycombPanel(geo, c_Outer);
+      move.setZ(Zfront - geo.getOuterPanel().getLength() / 2);
+      qbb->AddPlacedVolume(outerPanel, move, 0);
+
+      // inner panel
+
+      auto* innerPanel = createHoneycombPanel(geo, c_Inner);
+      move.setZ(Zfront - geo.getInnerPanel().getLength() / 2);
+      qbb->AddPlacedVolume(innerPanel, move, 0);
+
+      // forward end plate
+
+      double length = geo.getForwardEndPlate().getThickness();
+      auto* forwardEndPlate = createBox(geo.getForwardEndPlate().getName(),
+                                        geo.getWidth(),
+                                        geo.getForwardEndPlate().getHeight(),
+                                        length,
+                                        geo.getForwardEndPlate().getMaterial());
+      move.setZ(Zfront + length / 2);
+      qbb->AddPlacedVolume(forwardEndPlate, move, 0);
+
+      // prism enclosure box
+
+      std::string name = geo.getPrismEnclosure().getName();
+      double Z = Zback;
+      length = geo.getPrismEnclosure().getBackThickness();
+      auto* backPlate = createExtrudedSolid(name + "BackPlate",
+                                            geo.getBackPlateContour(),
+                                            length,
+                                            geo.getPrismEnclosure().getMaterial());
+      move.setZ(Z + length / 2);
+      qbb->AddPlacedVolume(backPlate, move, 0);
+      Z += length;
+
+      length = geo.getPrismEnclosure().getBodyLength();
+      auto* prismEnclosure = createExtrudedSolid(name + "Body",
+                                                 geo.getPrismEnclosureContour(),
+                                                 length,
+                                                 geo.getPrismEnclosure().getMaterial());
+      move.setZ(Z + length / 2);
+      qbb->AddPlacedVolume(prismEnclosure, move, 0);
+      Z += length;
+
+      length = geo.getPrismEnclosure().getFrontThickness();
+      auto* frontPlate = createExtrudedSolid(name + "FrontPlate",
+                                             geo.getFrontPlateContour(),
+                                             length,
+                                             geo.getPrismEnclosure().getMaterial());
+      move.setZ(Z + length / 2);
+      qbb->AddPlacedVolume(frontPlate, move, 0);
+      Z += length;
+
+      length = Zfront - Z - geo.getInnerPanel().getLength();
+      if (length > 0) {
+        double height = geo.getPrismEnclosure().getExtensionThickness();
+        auto* extPlate = createBox(name + "ExtensionPlate",
+                                   geo.getPanelWidth(),
+                                   height,
+                                   length,
+                                   geo.getPrismEnclosure().getMaterial());
+
+        G4ThreeVector move;
+        move.setZ(Z + length / 2);
+        move.setY((height - geo.getSideRails().getHeight()) / 2);
+        qbb->AddPlacedVolume(extPlate, move, 0);
+      }
+
+      // side rails
+
+      auto* leftRail = createSideRail(geo, c_Left);
+      move.setZ(Zfront - geo.getSideRailsLength() / 2);
+      move.setY(geo.getOuterPanel().getY() + geo.getOuterPanel().getMinThickness() -
+                geo.getSideRails().getHeight() / 2);
+      move.setX(-(geo.getWidth() - geo.getSideRails().getThickness()) / 2);
+      qbb->AddPlacedVolume(leftRail, move, 0);
+
+      auto* rightRail = createSideRail(geo, c_Right);
+      move.setX((geo.getWidth() - geo.getSideRails().getThickness()) / 2);
+      qbb->AddPlacedVolume(rightRail, move, 0);
+
+      // cold plate
+
+      length = geo.getLength() - geo.getPrismEnclosure().getBackThickness() -
+               geo.getOuterPanel().getLength() - geo.getForwardEndPlate().getThickness();
+      auto* coldPlateBase = createBox(geo.getColdPlate().getName() + "Base",
+                                      geo.getPanelWidth(),
+                                      geo.getColdPlate().getBaseThickness(),
+                                      length,
+                                      geo.getColdPlate().getBaseMaterial());
+      move.setZ(Zback + geo.getPrismEnclosure().getBackThickness() + length / 2);
+      move.setY(geo.getOuterPanel().getY() + geo.getOuterPanel().getMinThickness() -
+                geo.getColdPlate().getBaseThickness() / 2);
+      move.setX(0);
+      qbb->AddPlacedVolume(coldPlateBase, move, 0);
+
+      auto* coldPlateCool = createBox(geo.getColdPlate().getName() + "Cooler",
+                                      geo.getColdPlate().getCoolWidth(),
+                                      geo.getColdPlate().getCoolThickness(),
+                                      length,
+                                      geo.getColdPlate().getCoolMaterial());
+      move.setY(geo.getOuterPanel().getY() + geo.getOuterPanel().getMinThickness() +
+                geo.getColdPlate().getCoolThickness() / 2);
+      qbb->AddPlacedVolume(coldPlateCool, move, 0);
+
+      return qbb;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createHoneycombPanel(const TOPGeoQBB& geo,
+                                                         EPanelType type)
+    {
+      G4Transform3D move;
+
+      TOPGeoHoneycombPanel geoPanel;
+      Polygon contour;
+      double sideEdgeHeight = 0;
+      double sideEdgeY = 0;
+
+      if (type == c_Inner) {
+        geoPanel = geo.getInnerPanel();
+        contour = geo.getInnerPanelContour();
+        sideEdgeHeight = geoPanel.getMaxThickness();
+        sideEdgeY = geoPanel.getY() - sideEdgeHeight / 2;
+      } else {
+        geoPanel = geo.getOuterPanel();
+        contour = geo.getOuterPanelContour();
+        sideEdgeHeight = geoPanel.getMinThickness();
+        sideEdgeY = geoPanel.getY() + sideEdgeHeight / 2;
+      }
+
+      // honeycomb panel
+
+      auto* panel = createExtrudedSolid(geoPanel.getName(),
+                                        contour,
+                                        geoPanel.getLength(),
+                                        geoPanel.getMaterial());
+
+      // reinforced faces
+
+      std::string faceEdgeName = geoPanel.getName() + "ReinforcedFace";
+      auto* faceEdge = createExtrudedSolid(faceEdgeName,
+                                           contour,
+                                           geoPanel.getEdgeWidth(),
+                                           geoPanel.getEdgeMaterial());
+
+      move = G4TranslateZ3D((geoPanel.getLength() - geoPanel.getEdgeWidth()) / 2);
+      new G4PVPlacement(move, faceEdge, faceEdgeName, panel, false, 1);
+      move = G4TranslateZ3D(-(geoPanel.getLength() - geoPanel.getEdgeWidth()) / 2);
+      new G4PVPlacement(move, faceEdge, faceEdgeName, panel, false, 2);
+
+      // reinforced sides
+
+      double width = geo.getPanelWidth();
+      double sideEdgeWidth = geoPanel.getEdgeWidth() + (width - geoPanel.getWidth()) / 2;
+      std::string sideEdgeName = geoPanel.getName() + "ReinforcedSide";
+      auto* sideEdge = createBox(sideEdgeName,
+                                 sideEdgeWidth,
+                                 sideEdgeHeight,
+                                 geoPanel.getLength() - 2 * geoPanel.getEdgeWidth(),
+                                 geoPanel.getEdgeMaterial());
+
+
+      move = G4Translate3D((width - sideEdgeWidth) / 2, sideEdgeY, 0);
+      new G4PVPlacement(move, sideEdge, sideEdgeName, panel, false, 1);
+      move = G4Translate3D(-(width - sideEdgeWidth) / 2, sideEdgeY, 0);
+      new G4PVPlacement(move, sideEdge, sideEdgeName, panel, false, 2);
+
+      return panel;
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createSideRail(const TOPGeoQBB& geo, ESideRailType type)
+    {
+      double A = geo.getSideRails().getThickness();
+      double B = geo.getSideRails().getHeight();
+      double C = geo.getSideRailsLength();
+      double a = A - geo.getSideRails().getReducedThickness();
+      double b = B - geo.getColdPlate().getBaseThickness();
+      double c = geo.getPrismEnclosure().getLength() -
+                 geo.getPrismEnclosure().getBackThickness();
+
+      auto* box = new G4Box("box", A / 2, B / 2, C / 2);
+      auto* subtrBox = new G4Box("subtrBox", a / 2, b / 2, c / 2);
+      double x = 0;
+      if (type == c_Left) {
+        x = (A - a) / 2;
+      } else {
+        x = -(A - a) / 2;
+      }
+      G4Transform3D move = G4Translate3D(x, -(B - b) / 2, -(C - c) / 2);
+      auto* solid = new G4SubtractionSolid("sideRail", box, subtrBox, move);
+
+      G4Material* material = Materials::get(geo.getSideRails().getMaterial());
+      if (!material) B2FATAL("Material '" << geo.getSideRails().getMaterial() << "' not found");
+
+      std::string name = geo.getSideRails().getName();
+      if (type == c_Left) {
+        name += "Left";
+      } else {
+        name += "Rigth";
+      }
+
+      return new G4LogicalVolume(solid, material, name);
+    }
+
 
     G4AssemblyVolume* GeoTOPCreator::assembleOptics(const TOPGeoModule& geo,
                                                     G4LogicalVolume* pmtArray,
@@ -643,9 +770,9 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createBox(std::string name,
+    G4LogicalVolume* GeoTOPCreator::createBox(const std::string& name,
                                               double A, double B, double C,
-                                              std::string materialName)
+                                              const std::string& materialName)
     {
       G4Box* box = new G4Box(name, A / 2, B / 2, C / 2);
       G4Material* material = Materials::get(materialName);
@@ -654,14 +781,15 @@ namespace Belle2 {
     }
 
 
-    G4LogicalVolume* GeoTOPCreator::createBoxSphereIntersection(std::string name,
-                                                                G4Box* box,
-                                                                double Rmin,
-                                                                double Rmax,
-                                                                double xc,
-                                                                double yc,
-                                                                double zc,
-                                                                std::string materialName)
+    G4LogicalVolume*
+    GeoTOPCreator::createBoxSphereIntersection(const std::string& name,
+                                               G4Box* box,
+                                               double Rmin,
+                                               double Rmax,
+                                               double xc,
+                                               double yc,
+                                               double zc,
+                                               const std::string& materialName)
     {
       auto* sphere = new G4Sphere(name + "HalfSphere",
                                   Rmin, Rmax, 0, 2 * M_PI, 0, M_PI / 2);
@@ -671,6 +799,23 @@ namespace Belle2 {
       G4Material* material = Materials::get(materialName);
       if (!material) B2FATAL("Material '" << materialName << "' not found");
       return new G4LogicalVolume(shape, material, name);
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createExtrudedSolid(const std::string& name,
+                                                        const Polygon& shape,
+                                                        double length,
+                                                        const std::string& materialName)
+    {
+      std::vector<G4TwoVector> polygon;
+      for (auto& point : shape) {
+        polygon.push_back(G4TwoVector(point.first, point.second));
+      }
+      G4ExtrudedSolid* solid = new G4ExtrudedSolid(name, polygon, length / 2,
+                                                   G4TwoVector(), 1, G4TwoVector(), 1);
+      G4Material* material = Materials::get(materialName);
+      if (!material) B2FATAL("Material '" << materialName << "' not found");
+      return new G4LogicalVolume(solid, material, name);
     }
 
 
@@ -689,11 +834,213 @@ namespace Belle2 {
 
 
 
-
-
     // =============================================================================
     // ---- old creator ------------------------------------------------------------
     // =============================================================================
+
+
+    void GeoTOPCreator::createGeometryOld(const TOPGeometry& geo,
+                                          G4LogicalVolume& topVolume,
+                                          geometry::GeometryTypes)
+    {
+      m_topgp->setGeanUnits();
+      geo.useGeantUnits();
+
+      // build one module
+      G4LogicalVolume* module = buildTOPModule(geo, 1);
+
+      // position the modules
+      int numModules = geo.getNumModules();
+      for (int i = 0; i < numModules; i++) {
+        int id = i + 1;
+        double Radius = geo.getModule(id).getRadius();
+        double phi = geo.getModule(id).getPhi();
+
+        G4RotationMatrix rot(M_PI / 2.0, M_PI / 2.0, -phi);
+        G4ThreeVector trans(Radius * cos(phi), Radius * sin(phi), 0);
+
+        new G4PVPlacement(G4Transform3D(rot, trans), module, "PlacedTOPModule",
+                          &topVolume, false, id);
+      }
+
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::buildTOPModule(const TOPGeometry& geo, int moduleID)
+    {
+      /*  Read parameters  */
+
+      double Qwidth = geo.getModule(moduleID).getBarWidth();
+      double Wwidth = geo.getModule(moduleID).getPrism().getWidth();
+      if (Wwidth > Qwidth) Qwidth = Wwidth;
+
+      double Qthickness = geo.getModule(moduleID).getBarThickness();
+      double Z1 = geo.getModule(moduleID).getBackwardZ();
+      double WLength = geo.getModule(moduleID).getPrism().getLength();
+      double Wextdown = geo.getModule(moduleID).getPrism().getExitThickness() -
+                        geo.getModule(moduleID).getPrism().getThickness();
+
+      double PannelThickness = m_topgp->getPannelThickness();
+      double PlateThickness = m_topgp->getPlateThickness();
+      double LowerGap = m_topgp->getLowerGap();
+      double UpperGap = m_topgp->getUpperGap();
+      double SideGap = m_topgp->getSideGap();
+      double ZForward = geo.getModule(moduleID).getForwardZ() + m_topgp->getForwardGap()
+                        + PannelThickness;
+      double ZBackward = geo.getModule(moduleID).getBackwardZ() - WLength
+                         - m_topgp->getBackwardGap() - PannelThickness;
+
+      // size of the whole stack
+      double x = geo.getPMTArray().getSizeX();
+      double y = geo.getPMTArray().getSizeY();
+
+      // Check which is higher the wedge or the PMT stack
+      double upside = 0;
+      double downside = 0;
+
+      if ((y - Wextdown) / 2.0 > Qthickness / 2.0) {
+        upside = (y - Wextdown) / 2.0;
+        downside = -Wextdown / 2.0 - y / 2.0;
+      } else {
+        upside = Qthickness / 2.0;
+        downside = -Wextdown - Qthickness / 2.0;
+      }
+
+      // Check which is wider bar or PMTs
+      double side = 0;
+
+      if (x / 2.0 > Qwidth / 2.0) {
+        side = x / 2.0;
+      } else {
+        side = Qwidth / 2.0;
+      }
+
+      /*  Build wedge  */
+
+      // Build the outer wall
+      std::vector<G4TwoVector> polygon;
+
+      polygon.push_back(G4TwoVector(ZBackward,
+                                    upside + UpperGap + PannelThickness));
+      polygon.push_back(G4TwoVector(ZForward,
+                                    upside + UpperGap + PannelThickness));
+      polygon.push_back(G4TwoVector(ZForward,
+                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
+      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
+                                    -Qthickness / 2.0 - LowerGap - PannelThickness));
+      polygon.push_back(G4TwoVector(Z1 + PlateThickness,
+                                    downside - LowerGap - PlateThickness));
+      polygon.push_back(G4TwoVector(ZBackward,
+                                    downside - LowerGap - PlateThickness));
+
+      G4ExtrudedSolid* supportShape = new G4ExtrudedSolid("support",
+                                                          polygon,
+                                                          side + SideGap + PlateThickness,
+                                                          G4TwoVector(0.0, 0.0),
+                                                          1.0,
+                                                          G4TwoVector(0.0, 0.0),
+                                                          1.0);
+
+      // Build inside air
+      std::vector<G4TwoVector> polygon2;
+
+      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
+                                     upside + UpperGap));
+      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
+                                     upside + UpperGap));
+      polygon2.push_back(G4TwoVector(ZForward - PlateThickness,
+                                     -Qthickness / 2.0 - LowerGap));
+      polygon2.push_back(G4TwoVector(Z1,
+                                     -Qthickness / 2.0 - LowerGap));
+      polygon2.push_back(G4TwoVector(Z1,
+                                     downside - LowerGap));
+      polygon2.push_back(G4TwoVector(ZBackward + PlateThickness,
+                                     downside - LowerGap));
+
+      G4ExtrudedSolid* airShape = new  G4ExtrudedSolid("air",
+                                                       polygon2,
+                                                       side + SideGap,
+                                                       G4TwoVector(0.0, 0.0),
+                                                       1.0,
+                                                       G4TwoVector(0.0, 0.0),
+                                                       1.0);
+
+      /* Read support and fill materials */
+
+      string suportName = m_topgp->getPannelMaterial();
+      string fillName = m_topgp->getInsideMaterial();
+      G4Material* supportMaterial = Materials::get(suportName);
+      G4Material* fillMaterial = Materials::get(fillName);
+      if (!supportMaterial) { B2FATAL("Material '" << suportName << "' missing!");}
+      if (!fillMaterial) { B2FATAL("Material '" << fillName << "' missing!");}
+
+      /* Place air inside support and thus create the structure */
+
+      // build physical volumes
+      G4LogicalVolume* support = new G4LogicalVolume(supportShape,
+                                                     supportMaterial, "Support");
+      G4LogicalVolume* air = new G4LogicalVolume(airShape, fillMaterial, "Air");
+
+      /* Build quartz bar and insert it into the air */
+
+      // bool old = false;
+      bool old = true;
+      if (old) {
+        G4ThreeVector transa(0, 0, 0);
+        buildBar(geo, moduleID)->MakeImprint(air, transa, 0, 100, false);
+      } else {
+        auto* pmtArray = createPMTArray(geo.getPMTArray());
+        double Lz = geo.getPMTArray().getPMT().getSizeZ();
+        auto* optics = assembleOptics(geo.getModule(moduleID), pmtArray, Lz);
+        G4ThreeVector move;
+        G4RotationMatrix rot;
+        move.setX(geo.getModule(1).getBackwardZ());
+        rot.rotateY(M_PI / 2);
+        optics->MakeImprint(air, move, &rot);
+      }
+
+      /* Add electronics, this part is not finished, just for backgound studies */
+
+      double pcbThickness = geo.getPMTArray().getPMT().getBotThickness();
+      G4Box* el1 = new G4Box("el1box", pcbThickness / 2.0, y / 2.0, x / 2.0);
+      G4Box* el2 = new G4Box("el1box", y / 2.0, pcbThickness / 2.0, x / 2.0);
+      G4Material* PCBMaterial = Materials::get("TOPPCB");
+      G4LogicalVolume* pcb1 = new G4LogicalVolume(el1, PCBMaterial, "Board.1");
+      G4LogicalVolume* pcb2 = new G4LogicalVolume(el2, PCBMaterial, "Board.2");
+
+      if (m_isBeamBkgStudy) {
+        m_sensitivePCB1 = new BkgSensitiveDetector("TOP", 1);
+        pcb1->SetSensitiveDetector(m_sensitivePCB1);
+        m_sensitivePCB2 = new BkgSensitiveDetector("TOP", 2);
+        pcb2->SetSensitiveDetector(m_sensitivePCB2);
+      }
+
+      setColor(*pcb1, "rgb(0.0,1.0,0.0,1.0)");
+      setColor(*pcb2, "rgb(0.0,1.0,0.0,1.0)");
+
+      double dGlue = geo.getModule(moduleID).getPrism().getFilterThickness();
+      double pmtZ = geo.getPMTArray().getPMT().getSizeZ();
+      G4ThreeVector transPCB(Z1 - WLength - 2 * dGlue - pmtZ - pcbThickness / 2.0,
+                             -Wextdown / 2.0,
+                             0.);
+      G4ThreeVector transPCB2(Z1 - WLength - 3 * dGlue - pmtZ - pcbThickness - y / 2.0,
+                              -Wextdown / 2.0,
+                              0.);
+
+      new G4PVPlacement(0, transPCB, pcb1, "TOP.electronics", air, false, 0);
+      new G4PVPlacement(0, transPCB2, pcb2, "TOP.electronics", air, false, 0);
+
+
+      // Needed dumy variable to place air inside support shape
+      G4Transform3D temp = G4Translate3D(0.0, 0.0, 0.0);
+
+      new G4PVPlacement(temp, air, "TOP.support", support, false, 0);
+
+      /* return support shape */
+
+      return support;
+
+    }
 
 
     G4AssemblyVolume* GeoTOPCreator::buildBar(const TOPGeometry& geo, int moduleID)

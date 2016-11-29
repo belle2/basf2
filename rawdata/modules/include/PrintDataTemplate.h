@@ -74,9 +74,17 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
+
+    //! print the contents of a RawCOPPER event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i);
+
+    //! print the contents of a RawFTSW event
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
+
+    //! print a buffer
     virtual void printBuffer(int* buf, int nwords);
+
+    //! print a PXD event
     virtual void printPXDEvent(RawPXD* raw_pxd);
 
 
@@ -87,14 +95,16 @@ namespace Belle2 {
     //! No. of sent events
     int n_basf2evt;
 
+    //! # of FTSWs
     int m_nftsw;
 
+    //! # of COPPERs
     int m_ncpr;
 
-    //!
+    //! counter
     int m_print_cnt;
 
-    // Event Meta Data
+    //! Event Meta Data
     StoreObjPtr<EventMetaData> m_eventMetaDataPtr;
 
   };

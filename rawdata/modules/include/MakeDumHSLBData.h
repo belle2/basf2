@@ -31,11 +31,18 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
+
+    //! write data
     virtual void writeData(RawCOPPER* raw_copper, int i);
 
   protected :
+
+    //! Output file name
     std::string m_out_fname;
+
+    //! File descripter
     int m_filefd;
+
   };
 
 } // end namespace Belle2

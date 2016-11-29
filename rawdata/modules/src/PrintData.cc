@@ -1,6 +1,6 @@
 //+
 // File : PrintData.cc
-// Description : Module to get data from DataStore and send it to another network node
+// Description : Show the contetns of RawCOPPER
 //
 // Author : Satoru Yamada Itoh, IPNS, KEK
 // Date : 2 - Aug - 2013

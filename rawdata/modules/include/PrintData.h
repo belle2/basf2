@@ -76,10 +76,19 @@ namespace Belle2 {
 
     //! Module functions to be called from event process
     virtual void event();
+
+    //! print the contents of a RawCOPPER event
     virtual void printCOPPEREvent(RawCOPPER* raw_array, int i, int array_index);
+
+    //! print the contents of a RawFTSW event
     virtual void printFTSWEvent(RawDataBlock* raw_array, int i);
+
+    //! print a buffer
     virtual void printBuffer(int* buf, int nwords);
+
+    //! print a PXD event
     virtual void printPXDEvent(RawPXD* raw_pxd);
+
     virtual void endRun();
 
   protected :
@@ -89,29 +98,31 @@ namespace Belle2 {
     //! No. of sent events
     int n_basf2evt;
 
+    //! # of FTSWs
     int m_nftsw;
 
+    //! # of COPPERs
     int m_ncpr;
 
-    //!
+    //! counter
     int m_print_cnt;
 
-    //!
+    //! histogram array
     TH1F* hist[10];
 
-    //!
+    //! Unix time of the run start
     unsigned int  m_start_utime;
 
-    //!
+    //! Time of the previous event
     timeval  prev_tv[1000];
 
-    //!
+    //! Integer time of the previous event
     unsigned int  prev_tv_eve[1000];
 
-    //!
+    //! previous timevalue
     int prev_tv_pos;
 
-    //!
+    //! flag of timevalue
     int tv_flag[1000];
 
 

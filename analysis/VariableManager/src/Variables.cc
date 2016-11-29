@@ -688,10 +688,6 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return 0.0;
 
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
-        return 0.0;
-
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
@@ -707,10 +703,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
-
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
@@ -766,10 +758,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
-
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);

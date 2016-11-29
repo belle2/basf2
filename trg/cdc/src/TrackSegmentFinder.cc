@@ -602,24 +602,6 @@ namespace Belle2 {
       //cout << "CDCTRGTSF !!! can not access to MCParticles" << endl;
       return;
     }
-    RelationArray cdcSimHitRel(mcParticles, SimHits);
-    // It is a one-one relationship. Confirmed with 100 events. [2013.08.05]
-    map<int, int> simHitsMCParticlesMap;
-    // Change RelationArray to a map
-    // Loop over all particles
-    for (int iPart = 0; iPart < cdcSimHitRel.getEntries(); iPart++) {
-      // Loop over all hits for particle
-      for (unsigned iHit = 0; iHit < cdcSimHitRel[iPart].getToIndices().size();
-           iHit++) {
-        //cout<<"From: "<<cdcSimHitRel[iPart].getFromIndex()<<" To: "<<cdcSimHitRel[iPart].getToIndex(iHit)<<endl;
-        simHitsMCParticlesMap[cdcSimHitRel[iPart].getToIndex(iHit)] =
-          cdcSimHitRel[iPart].getFromIndex();
-      }
-    }
-    //// Print map
-    //for(map<int, int >::iterator it = simHitsMCParticlesMap.begin(); it != simHitsMCParticlesMap.end(); it++) {
-    //  cout<<"SimHit Index: "<<(*it).first<<" MCParticle Index: "<<(*it).second<<endl;
-    //}
 
     //cout<<"Save TS information"<<endl;
     // Loop over all TSs. wireHit has only one wireSimHit. Meaning there is a particle overlap hit bug.
@@ -696,18 +678,14 @@ namespace Belle2 {
         // Find MC particle of hit wire
         const TRGCDCWireHit* wireHit = ts.wires()[iWire]->hit();
         if (wireHit != 0) {
-          int iMCParticle = simHitsMCParticlesMap[wireHit->iCDCSimHit()];
+          MCParticle* particle = SimHits[wireHit->iCDCSimHit()]->getRelatedFrom<MCParticle>();
+          int iMCParticle = (particle) ? particle->getArrayIndex() : mcParticles.getEntries();
           // If new particle
           if (particleTSPattern[iMCParticle] == 0) {
-            unsigned tsPattern;
-            tsPattern = 1 << iWire;
-            particleTSPattern[iMCParticle] = tsPattern;
+            particleTSPattern[iMCParticle] = 1 << iWire;
           } else {
-            particleTSPattern[iMCParticle] |= 1 << iWire;;
+            particleTSPattern[iMCParticle] |= 1 << iWire;
           }
-          //cout<<ts.name()<<" "<<ts.wires()[iWire]->name()<<" was hit.";
-          //cout<<" Particle was "<<mcParticles[simHitsMCParticlesMap[wireHit->iCDCSimHit()]]->getPDG()<<endl;
-          //cout<<"iWire["<<iWire<<"] iCDCSimHit["<<wireHit->iCDCSimHit()<<"]: "<<simHitsMCParticlesMap[wireHit->iCDCSimHit()]<<endl;
         }
       } // Loop over wires in TS
 

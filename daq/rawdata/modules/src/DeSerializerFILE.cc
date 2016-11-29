@@ -50,7 +50,7 @@ void DeSerializerFILEModule::fileOpen()
   m_fp_in = fopen(m_fname_in.c_str(), "r");
   if (!m_fp_in) {
     char    err_buf[500];
-    sprintf(err_buf, "Cannot open an input file(%s): %s : Exiting...\n",
+    sprintf(err_buf, "[FATAL] Cannot open an input file(%s): %s : Exiting...\n",
             strerror(errno), m_fname_in.c_str());
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
@@ -118,7 +118,7 @@ int* DeSerializerFILEModule::readOneDataBlock(int* delete_flag, int* size_word, 
         }
       }
       char err_buf[500];
-      sprintf(err_buf, "Failed to read header(%s).", strerror(errno));
+      sprintf(err_buf, "[FATAL] Failed to read header(%s).", strerror(errno));
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
     }
@@ -187,7 +187,7 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
       return 0x0;
     }
     char err_buf[500];
-    sprintf(err_buf, "Failed to read header. Exiting...");
+    sprintf(err_buf, "[FATAL] Failed to read header. Exiting...");
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
   }
@@ -195,7 +195,7 @@ int* DeSerializerFILEModule::readfromFILE(FILE* fp_in, const int size_word, cons
 
   if (bytes_to_read != recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "Read less bytes(%d) than expected(%d). Exiting...\n",
+    sprintf(err_buf, "[FATAL] Read less bytes(%d) than expected(%d). Exiting...\n",
             recvd_byte, bytes_to_read);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(-1);
@@ -263,7 +263,7 @@ void DeSerializerFILEModule::event()
         temp_rawcopper.SetBuffer(temp_buf, size_word, 0, num_events, num_nodes);
 
         {
-          printf("Sorry. This version does not support fillNewCOPPERheader()");
+          printf("[FATAL] Sorry. This version does not support fillNewCOPPERheader()");
           exit(1);
           //        fillNewRawCOPPERHeader(&temp_rawcopper);
         }

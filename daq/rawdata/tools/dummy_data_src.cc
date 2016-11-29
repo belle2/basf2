@@ -293,7 +293,7 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
     int pos_xorchksum = offset + nwords - posback_xorchksum;
     prev_offset = offset;
     if (buf[ offset + 4 ] != 0x12345601) {
-      printf("ERROR 2 0x%.x", buf[ offset + 4 ]);
+      printf("[FATAL] data-production error 2 0x%.x", buf[ offset + 4 ]);
       fflush(stdout);
       exit(1);
     }
@@ -322,7 +322,7 @@ inline void addEvent(int* buf, int nwords_per_fee, unsigned int event, int ncpr,
 
     for (int i = 0; i < nhslb ; i++) {
       if ((buf[ offset ] & 0xffff0000) != 0xffaa0000) {
-        printf("ERROR 3 0x%.x hslb %d cpr %d\n", buf[ offset ], i, k);
+        printf("[FATAL] data-production error 3 : 0x%.x hslb %d cpr %d\n", buf[ offset ], i, k);
         fflush(stdout);
         exit(1);
       }
@@ -419,7 +419,7 @@ int main(int argc, char** argv)
 
   int temp_ret = fillDataContents(buff, nwords_per_fee, node_id, ncpr, nhslb, run_no);
   if (temp_ret != total_words) {
-    printf("ERROR1 %d %d\n", total_words, temp_ret);
+    printf("[FATAL] data-production error %d %d\n", total_words, temp_ret);
     fflush(stdout);
     exit(1);
   }
@@ -452,7 +452,7 @@ int main(int argc, char** argv)
   //   }
 
   if ((connfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-    perror("socket error");
+    perror("[FATAL] socket error");
     exit(1);
   }
 
@@ -460,15 +460,14 @@ int main(int argc, char** argv)
   servaddr.sin_family = AF_INET;
   servaddr.sin_port = htons(atoi(argv[7]));
   if (inet_pton(AF_INET, argv[6], &servaddr.sin_addr) <= 0) {
-    perror("inetpton error");
+    perror("[FATAL] inetpton error");
     exit(1);
   }
 
   while (true) {
     if (connect(connfd, (struct sockaddr*)&servaddr, sizeof(servaddr)) < 0) {
-      perror("connect error");
+      perror("Failed to connect");
       continue;
-      // exit(1);
     }
     sleep(1);
     break;

@@ -35,10 +35,14 @@ namespace Belle2 {
     /** Clean up pointers. */
     virtual void terminate();
 
+    /** remove hit information from last event */
+    void clear();
+
   protected:
+    /** name of the input StoreArray */
+    std::string m_CDCHitCollectionName;
     /** The filename of LUT for the inner-most track segments. */
     std::string m_innerTSLUTFilename;
-
     /** The filename of LUT for outer track segments. */
     std::string m_outerTSLUTFilename;
 

@@ -9,6 +9,7 @@
 #include <trg/trg/Clock.h>
 #include <trg/cdc/Layer.h>
 #include <trg/cdc/Wire.h>
+#include <trg/cdc/WireHit.h>
 #include <trg/cdc/Segment.h>
 
 #define P3D HepGeom::Point3D<double>
@@ -27,6 +28,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
     "Combines CDCHits from the same super layer to CDCTriggerSegmentHits.\n"
   );
 
+  addParam("CDCHitCollectionName",
+           m_CDCHitCollectionName,
+           "Name of the input StoreArray of CDCHits.",
+           string(""));
   addParam("InnerTSLUTFile",
            m_innerTSLUTFilename,
            "The filename of LUT for track segments from the inner-most super layer",
@@ -226,9 +231,35 @@ void
 CDCTriggerTSFModule::event()
 {
   StoreArray<CDCHit> cdchits;
+  CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
-  // ... TODO ...
+  //...Clear old information...
+  clear();
+
+  //...Loop over CDCHits...
+  StoreArray<CDCHit> CDCHits(m_CDCHitCollectionName);
+  for (int i = 0; i < CDCHits.getEntries(); ++i) {
+    // get the wire
+    const CDCHit& h = *CDCHits[i];
+    TRGCDCWire& w =
+      (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
+
+    // trigger timing signal
+    const int tdcCount = floor(cdc.getT0(WireID(h.getID())) / cdc.getTdcBinWidth()
+                               - h.getTDCCount() + 0.5);
+    TRGTime rise = TRGTime(tdcCount, true, w.signal().clock(), w.name());
+    TRGTime fall = rise;
+    fall.shift(1).reverse();
+    TRGSignal signal = rise & fall;
+    w.addSignal(signal);
+
+    // make a trigger wire hit (TODO: is this needed?)
+    // all unneeded variables are set to 0 (TODO: remove them completely?)
+    TRGCDCWireHit* hit = new TRGCDCWireHit(w, i,
+                                           0, 0, 0, 0, 0, 0, 0, 0);
+    if (!w.hit()) w.hit(hit);
+  }
 
   // simulate track segments and create track segment hits
   // ... TODO ...
@@ -238,4 +269,19 @@ void
 CDCTriggerTSFModule::terminate()
 {
 
+}
+
+void
+CDCTriggerTSFModule::clear()
+{
+  for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+    for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
+      for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
+        TRGCDCWire& w =
+          (TRGCDCWire&) superLayers[isl][il]->cell(iw);
+        delete w.hit();
+        w.clear();
+      }
+    }
+  }
 }

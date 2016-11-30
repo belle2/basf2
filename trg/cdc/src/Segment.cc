@@ -289,8 +289,8 @@ namespace Belle2 {
         }
       }
 
-      int lutValue = this->LUT()->getValue(this->lutPattern());
-      if ((lutValue != 0) && (this->priority().hit() != 0)) {
+      int lutValue = LUT()->getValue(lutPattern());
+      if ((lutValue != 0) && (priority().signal().active() != 0)) {
         allSignals.name(name());
         _signal = allSignals;
       }
@@ -396,13 +396,12 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::fastestTime(void)const
+  TCSegment::fastestTime() const
   {
-    //if((this->LUT()->getValue(this->lutPattern()))&&(this->priority().hit())){
-    if ((this->LUT()->getValue(this->lutPattern()))) {
+    if ((LUT()->getValue(lutPattern()))) {
       float tmpFastTime = 9999;
       for (unsigned i = 0; i < _wires.size(); i++) {
-        if (_wires[i]->hit()) {
+        if (_wires[i]->signal().active()) {
           float dt = _wires[i]->signal()[0]->time();
           if (dt < tmpFastTime) {
             tmpFastTime = dt;
@@ -419,7 +418,7 @@ namespace Belle2 {
   {
     int fastest = 9999;
     for (unsigned iw = 0; iw < _wires.size(); ++iw) {
-      if (_wires[iw]->hit()) {
+      if (_wires[iw]->signal().active()) {
         for (unsigned itdc = 0, edges = _wires[iw]->signal().nEdges(); itdc < edges; itdc += 2) {
           float dt = _wires[iw]->signal()[itdc]->time();
           if (dt >= clk0) {
@@ -433,12 +432,12 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::foundTime(void)const
+  TCSegment::foundTime() const
   {
-    if ((this->LUT()->getValue(this->lutPattern()))) {
+    if ((LUT()->getValue(lutPattern()))) {
       float tmpFoundTime[5] = {9999, 9999, 9999, 9999, 9999};
       for (unsigned i = 0; i < _wires.size(); i++) {
-        if (!_wires[i]->hit()) continue;
+        if (!_wires[i]->signal().active()) continue;
         float dt = _wires[i]->signal()[0]->time();
         if (_wires.size() == 11) {
           if (i < 3) {
@@ -473,11 +472,11 @@ namespace Belle2 {
   }
 
   float
-  TCSegment::priorityTime(void) const
+  TCSegment::priorityTime() const
   {
-    if (this->center().hit()) {
-      return this->center().signal()[0]->time();
-    } else if (this->LUT()->getValue(this->lutPattern())) {
+    if (center().signal().active()) {
+      return center().signal()[0]->time();
+    } else if (LUT()->getValue(lutPattern())) {
       const TRGCDCWire* priorityL;
       const TRGCDCWire* priorityR;
       if (_wires.size() == 15) {
@@ -492,11 +491,11 @@ namespace Belle2 {
   }
 
   int
-  TCSegment::priorityPosition(void)const
+  TCSegment::priorityPosition() const
   {
-    if (this->center().hit()) {
+    if (center().signal().active()) {
       return 3;
-    } else if (this->hit()) {
+    } else if (signal().active()) {
       const TRGCDCWire* priorityL;
       const TRGCDCWire* priorityR;
       if (_wires.size() == 15) {
@@ -506,12 +505,12 @@ namespace Belle2 {
         priorityL = _wires[7];
         priorityR = _wires[6];
       }
-      if (priorityL->hit()) {
-        if (priorityR->hit()) {
-          if ((priorityL->hit()->drift()) > (priorityR->hit()->drift())) return 1;
+      if (priorityL->signal().active()) {
+        if (priorityR->signal().active()) {
+          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
-      } else if (priorityR->hit()) {
+      } else if (priorityR->signal().active()) {
         return 1;
       } else return -1;
     } else return 0;
@@ -534,7 +533,7 @@ namespace Belle2 {
       }
       if (priorityL->signal().active(clk0, clk1)) {
         if (priorityR->signal().active(clk0, clk1)) {
-          if ((priorityL->hit()->drift()) > (priorityR->hit()->drift())) return 1;
+          if ((priorityL->signal()[0]->time()) > (priorityR->signal()[0]->time())) return 1;
           else return 2;
         } else return 2;
       } else if (priorityR->signal().active(clk0, clk1)) {
@@ -544,13 +543,13 @@ namespace Belle2 {
   }
 
   const TRGCDCWire&
-  TCSegment::priority(void) const
+  TCSegment::priority() const
   {
-    if (this->center().hit()) {
+    if (center().signal().active()) {
       if (_wires.size() == 15) {
         return *_wires[0];
       } else return *_wires[5];
-    } else if (m_TSLUT->getValue(this->lutPattern())) {
+    } else if (LUT()->getValue(lutPattern())) {
       if (_wires.size() == 15) {
         return fasterWire(_wires[1], _wires[2]);
       } else return fasterWire(_wires[6], _wires[7]);
@@ -564,16 +563,16 @@ namespace Belle2 {
   const TRGCDCWire&
   TCSegment::fasterWire(const TRGCDCWire* w1, const TRGCDCWire* w2)const
   {
-    if (w1->hit()) {
-      if (w2->hit()) {
-        if (w1->hit()->drift() > w2->hit()->drift()) return *w2;
+    if (w1->signal().active()) {
+      if (w2->signal().active()) {
+        if (w1->signal()[0]->time() > w2->signal()[0]->time()) return *w2;
         else return *w1;
       } else return *w1;
     } else return *w2;
   }
 
   unsigned
-  TRGCDCSegment::hitPattern(void) const
+  TRGCDCSegment::hitPattern() const
   {
     unsigned ptn = 0;
     for (unsigned i = 0; i < _wires.size(); i++) {
@@ -597,9 +596,9 @@ namespace Belle2 {
   }
 
   unsigned
-  TRGCDCSegment::lutPattern(void) const
+  TRGCDCSegment::lutPattern() const
   {
-    unsigned outValue = (this->hitPattern()) * 2;
+    unsigned outValue = (hitPattern()) * 2;
     if (priorityPosition() == 2) {
       outValue += 1;
     }
@@ -609,7 +608,7 @@ namespace Belle2 {
   unsigned
   TRGCDCSegment::lutPattern(int clk0, int clk1) const
   {
-    unsigned outValue = (this->hitPattern(clk0, clk1)) * 2;
+    unsigned outValue = (hitPattern(clk0, clk1)) * 2;
     if (priorityPosition(clk0, clk1) == 2) {
       outValue += 1;
     }

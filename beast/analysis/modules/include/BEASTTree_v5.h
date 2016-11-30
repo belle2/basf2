@@ -173,6 +173,10 @@ namespace Belle2 {
       std::vector<double> SAD_LER_PPS;/** */
       std::vector<double> SAD_HER_PPS_av;/** */
       std::vector<double> SAD_LER_PPS_av;/** */
+
+      std::vector<double> DOSI;/** */
+      std::vector<double> DOSI_av;/** */
+
       /**
        *.clear the structure: set elements to zero
        */
@@ -269,6 +273,9 @@ namespace Belle2 {
         SAD_LER_PPS_av.clear();
         SAD_HER_lifetime_av.clear();
         SAD_LER_lifetime_av.clear();
+
+        DOSI.clear();
+        DOSI_av.clear();
       }
 
     };

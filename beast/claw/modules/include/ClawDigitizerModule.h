@@ -70,7 +70,7 @@ namespace Belle2 {
       /** Convertor factor keV to MIP */
       double m_C_keV_to_MIP;
       /** Convertor factor MIP to PE */
-      double m_C_MIP_to_PE;
+      std::vector<Double_t> m_C_MIP_to_PE;
       /** Number of CLAW scintillator cell */
       int m_ScintCell;
       /** Lower time limit */

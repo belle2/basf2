@@ -74,8 +74,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   // If both 'Radial' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.
-  if (BFieldComponentBeamline::isInRange(point)) {
-    B2DEBUG(100, "'Radial' magnetic field component returns zero value, because we use 'Beamline' magnetic field instead.");
+  if (BFieldComponentBeamline::Instance().isInRange(point)) {
     return TVector3(0.0, 0.0, 0.0);
   }
 

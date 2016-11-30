@@ -199,7 +199,7 @@ TVector3 BFieldComponent3d::calculate(const TVector3& point) const
   // If both '3d' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.
-  if (BFieldComponentBeamline::isInRange(point)) {
+  if (BFieldComponentBeamline::Instance().isInRange(point)) {
     return B;
   }
 

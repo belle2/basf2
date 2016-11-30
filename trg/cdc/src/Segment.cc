@@ -184,10 +184,6 @@ namespace Belle2 {
   {
     TRGDebug::enterStage("TS sim");
 
-    //...System clocks... Freq: 125 MHz
-    const TRGClock& systemClock = TRGCDC::getTRGCDC()->systemClock();
-    //systemClock.dump();
-
     //...Get wire informtion...
     const unsigned n = _wires.size();
     unsigned nHits = 0;
@@ -203,11 +199,8 @@ namespace Belle2 {
       const TRGSignal& s = _wires[i]->signal();
       signals.push_back(s);
 
-      //...Change clock...
-      signals.back().clock(systemClock);
-
       //...Widen it...
-      static const unsigned width = systemClock.unit(1000);
+      const unsigned width = signals.back().clock().unit(1000);
       signals.back().widen(width);
 
       if (s.active())

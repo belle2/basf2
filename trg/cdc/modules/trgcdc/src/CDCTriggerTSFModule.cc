@@ -243,8 +243,6 @@ CDCTriggerTSFModule::event()
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
-  //...Clear old information...
-  clear();
 
   //...Loop over CDCHits...
   for (int i = 0; i < CDCHits.getEntries(); ++i) {
@@ -307,6 +305,9 @@ CDCTriggerTSFModule::event()
       }
     }
   }
+
+  //...Clear hit information after we're finished...
+  clear();
 }
 
 void
@@ -322,6 +323,7 @@ CDCTriggerTSFModule::clear()
     for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
       for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
         TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
+        delete w.hit();
         w.clear();
       }
     }

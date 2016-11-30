@@ -319,7 +319,8 @@ namespace Belle2 {
       }
     }
     // loop over data clock cycles
-    const int step = wireClock.frequency() / TRGCDC::getTRGCDC()->dataClock().frequency();
+    //const int step = wireClock.frequency() / TRGCDC::getTRGCDC()->dataClock().frequency();
+    const int step = wireClock.frequency() / signal().clock().frequency();
     const int width = 16 * step;
     clkMin -= clkMin % step;
     clkMax -= clkMax % step;

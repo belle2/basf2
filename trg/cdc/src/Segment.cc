@@ -158,7 +158,8 @@ namespace Belle2 {
   }
 
   void
-  TCSegment::simulate(bool clockSimulation, bool logicLUTFlag)
+  TCSegment::simulate(bool clockSimulation, bool logicLUTFlag,
+                      string cdcCollectionName, string tsCollectionName)
   {
     //...Get wire informtion for speed-up...
     unsigned nHits = 0;
@@ -172,7 +173,7 @@ namespace Belle2 {
       return;
 
     if (clockSimulation) {
-      simulateWithClock();
+      simulateWithClock(cdcCollectionName, tsCollectionName);
     } else {
       simulateWithoutClock(logicLUTFlag);
     }
@@ -301,15 +302,15 @@ namespace Belle2 {
   }
 
   void
-  TCSegment::simulateWithClock()
+  TCSegment::simulateWithClock(string cdcCollectionName, string tsCollectionName)
   {
     // check LUT pattern without clock -> if there is no hit, skip clock simulation
     if (m_TSLUT->getValue(lutPattern()) == 0) return;
 
     TRGDebug::enterStage("TS sim with clock");
 
-    StoreArray<CDCHit> cdcHits(TRGCDC::getTRGCDC()->getCDCHitCollectionName());
-    StoreArray<CDCTriggerSegmentHit> segmentHits;
+    StoreArray<CDCHit> cdcHits(cdcCollectionName);
+    StoreArray<CDCTriggerSegmentHit> segmentHits(tsCollectionName);
 
     // get data clock of first and last hit
     const TRGClock& wireClock = _wires[0]->signal().clock();

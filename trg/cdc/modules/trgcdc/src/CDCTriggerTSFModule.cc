@@ -55,10 +55,10 @@ CDCTriggerTSFModule::initialize()
 {
   // register DataStore elements
   StoreArray<CDCTriggerSegmentHit>::registerPersistent(m_TSHitCollectionName);
-  StoreArray<CDCHit>::required();
+  StoreArray<CDCHit>::required(m_CDCHitCollectionName);
   // register relations
   StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
-  StoreArray<CDCHit> cdcHits;
+  StoreArray<CDCHit> cdcHits(m_CDCHitCollectionName);
   StoreArray<MCParticle> mcparticles;
   segmentHits.registerRelationTo(cdcHits);
   mcparticles.registerRelationTo(segmentHits);
@@ -275,7 +275,8 @@ CDCTriggerTSFModule::event()
       TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
       // simulate with logicLUTFlag = true
       // TODO: either add parameter or remove the option in Segment::simulate()
-      s.simulate(m_clockSimulation, true);
+      s.simulate(m_clockSimulation, true,
+                 m_CDCHitCollectionName, m_TSHitCollectionName);
       // store hits and create relations
       // for clock simulation already done in simulate
       // TODO: move it to simulate also for simulateWithoutClock?

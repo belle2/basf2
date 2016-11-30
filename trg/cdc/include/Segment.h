@@ -133,7 +133,9 @@ namespace Belle2 {
     void clear(void);
 
     /// simulates TF hit using wire information.
-    void simulate(bool clockSimulation, bool logicLUTFlag);
+    void simulate(bool clockSimulation, bool logicLUTFlag,
+                  std::string cdcCollectionName = std::string(""),
+                  std::string tsCollectionName = std::string(""));
 
     /// sets a pointer to a TRGCDCSegmentHit.
     const TRGCDCSegmentHit* hit(const TRGCDCSegmentHit*);
@@ -147,7 +149,8 @@ namespace Belle2 {
     void simulateWithoutClock(bool logicLUTFlag);
 
     /// simulates TF hit time-dependently
-    void simulateWithClock();
+    void simulateWithClock(std::string cdcCollectionName,
+                           std::string tsCollectionName);
 
   private:
 

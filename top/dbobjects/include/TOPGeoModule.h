@@ -47,11 +47,21 @@ namespace Belle2 {
     {}
 
     /**
+     * Copy constructor
+     */
+    TOPGeoModule(const TOPGeoModule& module): TOPGeoBase(module.getName())
+    {
+      *this = module;
+      m_rotation = 0;
+      m_rotationInverse = 0;
+      m_translation = 0;
+    }
+
+    /**
      * Destructor
      */
     ~TOPGeoModule()
     {
-      if (m_moduleDisplacement) delete m_moduleDisplacement;
       if (m_rotation) delete m_rotation;
       if (m_rotationInverse) delete m_rotationInverse;
       if (m_translation) delete m_translation;
@@ -102,8 +112,7 @@ namespace Belle2 {
      */
     void setModuleDisplacement(const TOPGeoModuleDisplacement& displ)
     {
-      if (m_moduleDisplacement) delete m_moduleDisplacement;
-      m_moduleDisplacement = new TOPGeoModuleDisplacement(displ);
+      m_moduleDisplacement = displ;
     }
 
     /**
@@ -173,7 +182,7 @@ namespace Belle2 {
      * Returns module displacement
      * @return module displacement parameters
      */
-    const TOPGeoModuleDisplacement* getModuleDisplacement() const
+    const TOPGeoModuleDisplacement& getModuleDisplacement() const
     {
       return m_moduleDisplacement;
     }
@@ -292,7 +301,7 @@ namespace Belle2 {
     TOPGeoMirrorSegment m_mirror; /**< mirror segment */
     TOPGeoPrism m_prism; /**< prism */
     TOPGeoPMTArrayDisplacement m_arrayDisplacement;  /**< PMT array displacement */
-    TOPGeoModuleDisplacement* m_moduleDisplacement = 0;   /**< module displacement */
+    TOPGeoModuleDisplacement m_moduleDisplacement;   /**< module displacement */
 
     /** cache for rotation matrix (from internal to Belle II frame) */
     mutable TRotation* m_rotation = 0;    //!

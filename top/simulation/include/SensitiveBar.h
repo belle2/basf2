@@ -43,10 +43,11 @@ namespace Belle2 {
        */
       void setReplicaDepth(int depth) {m_replicaDepth = depth;}
 
-    protected:
+    private:
 
       int m_replicaDepth = 2; /**< replica depth of module volume */
       TOPGeometryPar* m_topgp = TOPGeometryPar::Instance(); /**< geometry parameters */
+      std::vector<int> m_trackIDs; /**< track ID's */
 
     };
 

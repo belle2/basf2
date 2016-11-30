@@ -47,13 +47,8 @@ void TOPGeoModule::setTransformation() const
   Rphi.RotateZ(m_phi - M_PI / 2);
   TVector3 translation(0, m_radius, getZc() * s_unit);
 
-  TRotation Rot;
-  if (m_moduleDisplacement) {
-    Rot = Rphi * m_moduleDisplacement->getRotation();
-    translation += m_moduleDisplacement->getTranslation();
-  } else {
-    Rot = Rphi;
-  }
+  TRotation Rot = Rphi * m_moduleDisplacement.getRotation();
+  translation += m_moduleDisplacement.getTranslation();
   m_rotation =  new TRotation(Rot);
   m_rotationInverse = new TRotation(Rot.Inverse());
   m_translation = new TVector3(Rphi * translation);
@@ -86,7 +81,7 @@ void TOPGeoModule::print(const std::string& title) const
   m_mirror.print();
   m_prism.print();
   m_arrayDisplacement.print();
-  if (m_moduleDisplacement) m_moduleDisplacement->print();
+  m_moduleDisplacement.print();
 
 }
 

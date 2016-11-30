@@ -69,10 +69,7 @@ namespace Belle2 {
 
 
     GeoTOPCreator::GeoTOPCreator()
-    {
-      m_sensitivePMT = new SensitivePMT();
-      m_sensitiveBar = new SensitiveBar();
-    }
+    {}
 
 
     GeoTOPCreator::~GeoTOPCreator()
@@ -146,6 +143,9 @@ namespace Belle2 {
                                        G4LogicalVolume& topVolume,
                                        geometry::GeometryTypes type)
     {
+      m_sensitivePMT = new SensitivePMT();
+      m_sensitiveBar = new SensitiveBar();
+
       createGeometryOld(geo, topVolume, type);
       // createGeometryNew(geo, topVolume, type);
 
@@ -176,19 +176,16 @@ namespace Belle2 {
         G4Transform3D T1 =
           G4TranslateZ3D(backwardLength / 2 - prismPosition - barLength / 2);
 
-        // displaced geometry (if defined)
+        // displaced geometry
 
-        G4Transform3D D;
-        const auto* displacement = geoModule.getModuleDisplacement();
-        if (displacement) {
-          G4Transform3D Rx = G4RotateX3D(displacement->getAlpha());
-          G4Transform3D Ry = G4RotateY3D(displacement->getBeta());
-          G4Transform3D Rz = G4RotateZ3D(displacement->getGamma());
-          G4Transform3D tr = G4Translate3D(displacement->getX(),
-                                           displacement->getY(),
-                                           displacement->getZ());
-          D = tr * Rz * Ry * Rx;
-        }
+        const auto& displacement = geoModule.getModuleDisplacement();
+        G4Transform3D dRx = G4RotateX3D(displacement.getAlpha());
+        G4Transform3D dRy = G4RotateY3D(displacement.getBeta());
+        G4Transform3D dRz = G4RotateZ3D(displacement.getGamma());
+        G4Transform3D dtr = G4Translate3D(displacement.getX(),
+                                          displacement.getY(),
+                                          displacement.getZ());
+        G4Transform3D D = dtr * dRz * dRy * dRx;
 
         // position the module
 
@@ -630,12 +627,12 @@ namespace Belle2 {
       // mother volume
       std::vector<G4TwoVector> polygon;
       polygon.push_back(G4TwoVector(0, geo.getThickness() / 2));
-      polygon.push_back(G4TwoVector(0, -geo.getThickness() / 2));
-      polygon.push_back(G4TwoVector(geo.getLength() - geo.getFlatLength(),
-                                    geo.getThickness() / 2 - geo.getExitThickness()));
+      polygon.push_back(G4TwoVector(geo.getFullLength(), geo.getThickness() / 2));
       polygon.push_back(G4TwoVector(geo.getFullLength(),
                                     geo.getThickness() / 2 - geo.getExitThickness()));
-      polygon.push_back(G4TwoVector(geo.getFullLength(), geo.getThickness() / 2));
+      polygon.push_back(G4TwoVector(geo.getLength() - geo.getFlatLength(),
+                                    geo.getThickness() / 2 - geo.getExitThickness()));
+      polygon.push_back(G4TwoVector(0, -geo.getThickness() / 2));
 
       auto* volume = new G4ExtrudedSolid(geo.getName(), polygon, geo.getWidth() / 2,
                                          G4TwoVector(), 1, G4TwoVector(), 1);
@@ -662,7 +659,7 @@ namespace Belle2 {
       new G4LogicalSkinSurface("opticalSurface", prism, optSurf);
 
       // Activate sensitive volume
-      //      prism->SetSensitiveDetector(m_sensitiveBar);
+      prism->SetSensitiveDetector(m_sensitiveBar);
 
       return prism;
     }
@@ -791,8 +788,17 @@ namespace Belle2 {
                                                double zc,
                                                const std::string& materialName)
     {
-      auto* sphere = new G4Sphere(name + "HalfSphere",
-                                  Rmin, Rmax, 0, 2 * M_PI, 0, M_PI / 2);
+      // determine max theta - note: not valid generically!
+      double x = box->GetXHalfLength();
+      double y = box->GetYHalfLength();
+      double z = box->GetZHalfLength();
+      double dx = fmax(fabs(-x - xc), fabs(x - xc));
+      double dy = fmax(fabs(-y - yc), fabs(y - yc));
+      double dz = fmin(-z - zc, z - zc);
+      double theta = atan(sqrt(dx * dx + dy * dy) / dz);
+
+      auto* sphere = new G4Sphere(name + "Sphere",
+                                  Rmin, Rmax, 0, 2 * M_PI, 0, theta);
       G4Translate3D move(xc, yc, zc);
       auto* shape = new G4IntersectionSolid(name, box, sphere, move);
 

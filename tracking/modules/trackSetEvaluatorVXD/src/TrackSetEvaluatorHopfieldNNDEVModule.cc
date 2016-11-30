@@ -10,7 +10,7 @@
 
 #include "tracking/modules/trackSetEvaluatorVXD/TrackSetEvaluatorHopfieldNNDEVModule.h"
 
-#include <tracking/spacePointCreation/sptcNetwork/TrackSetEvaluatorHopfieldNN.h>
+#include <numeric>
 
 #include <TMatrixD.h>
 
@@ -26,17 +26,19 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
   InitializeCounters();
 
   //Set module properties
-  setDescription("This module expects a container of SpacePointTrackCandidates and an OverlapNetwork and thenselects a subset of non-overlapping TCs determined using a neural network of Hopfield type.");
+  setDescription("This module expects a container of SpacePointTrackCandidates and an OverlapNetwork
+                 and thenselects a subset of non-overlapping TCs determined using a neural network of Hopfield type.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
-  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it", string(""));
+  addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it",
+           string(""));
   addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>", string(""));
 
   addParam("reduceTCSetBeforeHNN", m_PARAMreduceTCSetBeforeHNN,
-           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered, including non-overlapping ones. WARNING at the moment only option(false) is supported!",
+           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered,
+           including non-overlapping ones. WARNING at the moment only option(false) is supported!",
            bool(false));
 }
-
 
 
 void TrackSetEvaluatorHopfieldNNDEVModule::event()
@@ -47,7 +49,8 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
 
   std::vector<TcInfo4Hopfield> overlapTCinfo;
   if (m_PARAMreduceTCSetBeforeHNN) {
-    B2FATAL(" TrackSetEvaluatorHopfieldNNDEVModule: option reduceTCSetBeforeHNN is not yet supported - would you like to implement it?");
+    B2FATAL(" TrackSetEvaluatorHopfieldNNDEVModule: option reduceTCSetBeforeHNN
+            is not yet supported - would you like to implement it?");
     overlapTCinfo = reduceOverlappingNetwork();
   } else {
     overlapTCinfo = convertOverlappingNetwork();
@@ -68,7 +71,9 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
     tcDuel(overlapTCinfo);
   } else {
     bool wasSuccsessful = doHopfield(overlapTCinfo);
-    if (!wasSuccsessful) { B2WARNING("TrackSetEvaluatorHopfieldNNDEVModule: failed in cleaning overlaps!"); m_nHopfieldFails++; return; }
+    if (!wasSuccsessful) {
+      B2WARNING("TrackSetEvaluatorHopfieldNNDEVModule: failed in cleaning overlaps!"); m_nHopfieldFails++; return;
+    }
   }
 
   // update tcs and kill those which were rejected by the Hopfield algorithm
@@ -83,7 +88,8 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
     B2WARNING("Hopfield network - had no survivors of  " << nCompetitors << " overlaps!");
   }
 
-  B2DEBUG(50, "executeAlgorithm Hopfield: at end of algoritm: total number of formaly overlaping TCs alive: " << nSurvivors);
+  B2DEBUG(50, "executeAlgorithm Hopfield: at end of algoritm:
+          total number of formaly overlaping TCs alive: " << nSurvivors);
 
   m_nFinalTCs += nSurvivors;
   m_nRejectedTCs += nTCs - nSurvivors;
@@ -131,8 +137,10 @@ std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvalu
 
   for (const SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     const vector<unsigned short>& currentOverlaps = m_overlapNetworks[0]->getOverlapForTrackIndex(
-                                                      aTC.getArrayIndex()); // Jakob: WARNING only first overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
-//  if (currentOverlaps.empty() or aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
+                                                      aTC.getArrayIndex()); // Jakob: WARNING only first
+    //overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
+
+    //  if (currentOverlaps.empty() or aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
 
     overlappingTCs.push_back(TcInfo4Hopfield());
     TcInfo4Hopfield& tcInfo = overlappingTCs.back();
@@ -147,7 +155,8 @@ std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvalu
 
 
 
-std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvaluatorHopfieldNNDEVModule::reduceOverlappingNetwork()
+std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield>
+TrackSetEvaluatorHopfieldNNDEVModule::reduceOverlappingNetwork()
 {
   B2DEBUG(100, "TrackSetEvaluatorHopfieldNNDEVModule::reduceToOverlappingNetwork now");
   std::vector<TcInfo4Hopfield> overlappingTCs;
@@ -158,7 +167,9 @@ std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvalu
    */
   for (const SpacePointTrackCand& aTC : m_spacePointTrackCands) {
     const vector<unsigned short>& currentOverlaps = m_overlapNetworks[0]->getOverlapForTrackIndex(
-                                                      aTC.getArrayIndex()); // WARNING only first overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
+                                                      aTC.getArrayIndex());
+    // WARNING only first overlapNetwork is currently used! Could lead to problems in the long run!
+    // WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
     if (currentOverlaps.empty() or aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
 
     overlappingTCs.push_back(TcInfo4Hopfield());
@@ -310,7 +321,8 @@ bool TrackSetEvaluatorHopfieldNNDEVModule::doHopfield(std::vector<TrackSetEvalua
   std::iota(sequenceVector.begin(), sequenceVector.end(), 0);
   std::string cOutPut;
   for (unsigned entry : sequenceVector) { cOutPut += std::to_string(entry) + " "; }
-  B2DEBUG(100, "sequenceVector with length " << sequenceVector.size() << " created, entries are from begin to end: " << cOutPut);
+  B2DEBUG(100, "sequenceVector with length " << sequenceVector.size() <<
+          " created, entries are from begin to end: " << cOutPut);
 
   int nIterations = 0;
   std::array<double, 100> cValues; // protocolling all values of c

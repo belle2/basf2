@@ -55,7 +55,6 @@ namespace Belle2 {
         std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
         for (unsigned int i = 0; i < fspDaug.size(); i++) {
           if (isCompletelyInRestOfEvent(fspDaug[i]) == 0) {
-            break;
             return 0;
           }
         }

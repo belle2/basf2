@@ -211,13 +211,13 @@ namespace Belle2 {
           }
           for (int i = 0; i < imax; i++) {
             TH1F* he = (TH1F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.Data(), i));
-            double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
+            //double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
             double esum = 0;
             for (int j = 0; j < he->GetNbinsX(); j++) {
               double co = he->GetBinContent(j + 1);
               double va = he->GetXaxis()->GetBinCenter(j + 1);
               double esumbin = va * co;
-              esum += esumbin / step;
+              esum += esumbin;// / step;
               if (HistoDoseName.Contains("csi_energy")) {
                 if (fileName.Contains("HER")) {
                   if (fileName.Contains("Touschek")) m_input_HT_CSI_dose_binE.push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV
@@ -347,14 +347,14 @@ namespace Belle2 {
           }
           for (int i = 0; i < imax; i++) {
             TH2F* he = (TH2F*)fh[iter]->Get(TString::Format("%s_%d", HistoDoseName.Data(), i));
-            double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
+            //double step = ((double)he->GetXaxis()->GetXmax() - (double)he->GetXaxis()->GetXmin()) / ((double)he->GetNbinsX());
             for (int k = 0; k < he->GetNbinsY(); k++) {
               double esum = 0;
               for (int j = 0; j < he->GetNbinsX(); j++) {
                 double co = he->GetBinContent(j + 1, k + 1);
                 double va = he->GetXaxis()->GetBinCenter(j + 1);
                 double esumbin = va * co;
-                esum += esumbin / step;
+                esum += esumbin;// / step;
                 if (HistoDoseName.Contains("csi_energy")) {
                   if (fileName.Contains("HER")) {
                     if (fileName.Contains("Coulomb")) m_input_HC_CSI_dose_binE[k].push_back(esumbin / m_input_Time_eqv * 1e-3); //MeV to GeV

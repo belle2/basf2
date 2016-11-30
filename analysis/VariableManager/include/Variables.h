@@ -83,6 +83,12 @@ namespace Belle2 {
      */
     double cosHelicityAngle(const Particle* part);
 
+    /**
+     * To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame
+     * of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAnglePi0Dalitz(const Particle* part);
 
     /**
      * return Zdistance of daughter tracks at vertex point
@@ -509,12 +515,25 @@ namespace Belle2 {
     bool isGoodBelleGamma(int region, double energy);
 
     /**
+     * Returns true if the cluster with given attributes passes loose skim 'good gamma' criteria.
+     */
+    bool isGoodSkimGamma(int region, double energy);
+
+    /**
      * Return 1 if ECLCluster passes the following selection criteria:
      * Forward  : E > 100 MeV
      * Barrel   : E >  50 MeV
      * Backward : E > 150 MeV
      */
     double goodBelleGamma(const Particle* particle);
+
+    /**
+     * Return 1 if ECLCluster passes the following selection criteria:
+     * Forward  : E > 30 MeV
+     * Barrel   : E > 20 MeV
+     * Backward : E > 40 MeV
+     */
+    double goodSkimGamma(const Particle* particle);
 
     /**
      * return ECL cluster's Error on Energy

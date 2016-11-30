@@ -92,7 +92,6 @@ namespace Belle2 {
       int m_fitstatus;                  /**< fit status, 0 - nofit;1 - fit but not convergence;2-fit and convergence.*/
       TVector3 posSeed1;                /**< seed position of first track. */
       TVector3 posSeed2;                /**< seed position of second track. */
-      TVector3 trigHitPos; /**< Trigger position. */
       bool m_noBFit; /**< fit incase no magnetic Field of not, if true, NDF=4 in cal P-value */
 
     };

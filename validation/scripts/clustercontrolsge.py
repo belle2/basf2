@@ -30,15 +30,15 @@ class Cluster:
         self.submit_command = ('qsub -cwd -l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
                                '-o {logfile} -e {logfile} -q {queuename} -V')
 
-        # required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
+        #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
         # to memory consumption
         self.requirement_vmem = 4
 
-        # the storage IO in GB which can be performed by each job. By default, this is 3GB at
+        #: the storage IO in GB which can be performed by each job. By default, this is 3GB at
         # DESY which is to small for some validation scripts
         self.requirement_storage = 50
 
-        # Queue best suitable for execution at DESY NAF
+        #: Queue best suitable for execution at DESY NAF
         self.queuename = "short.q"
 
         #: The path, where the help files are being created

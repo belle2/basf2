@@ -80,6 +80,86 @@ namespace Belle2 {
       }
 
       /**
+       * Set input type for wire displacement
+       */
+      void setDisplacementInputType(bool input)
+      {
+        m_displacementInputType = input;
+      }
+
+      /**
+       * Set input type for wire alignment
+       */
+      void setAlignmentInputType(bool input)
+      {
+        m_alignmentInputType = input;
+      }
+
+      /**
+       * Set input type for wire misalignment
+       */
+      void setMisalignmentInputType(bool input)
+      {
+        m_misalignmentInputType = input;
+      }
+
+      /**
+       * Set input type for xt
+       */
+      void setXtInputType(bool input)
+      {
+        m_xtInputType = input;
+      }
+
+      /**
+       * Set input type for sigma
+       */
+      void setSigmaInputType(bool input)
+      {
+        m_sigmaInputType = input;
+      }
+
+      /**
+       * Set input type for prop. speed
+       */
+      void setPropSpeedInputType(bool input)
+      {
+        m_propSpeedInputType = input;
+      }
+
+      /**
+       * Set input type for t0
+       */
+      void setT0InputType(bool input)
+      {
+        m_t0InputType = input;
+      }
+
+      /**
+       * Set input type for time-walk
+       */
+      void setTwInputType(bool input)
+      {
+        m_twInputType = input;
+      }
+
+      /**
+       * Set input type for bad wire
+       */
+      void setBwInputType(bool input)
+      {
+        m_bwInputType = input;
+      }
+
+      /**
+       * Set input type for channel map
+       */
+      void setChMapInputType(bool input)
+      {
+        m_chMapInputType = input;
+      }
+
+      /**
        * Set input file name for wire displacement
        */
       void setDisplacementFile(std::string input)
@@ -209,6 +289,86 @@ namespace Belle2 {
       }
 
       /**
+       * Get input type for wire displacement
+       */
+      bool getDisplacementInputType()
+      {
+        return m_displacementInputType;
+      }
+
+      /**
+       * Get input type for wire alignment
+       */
+      bool getAlignmentInputType()
+      {
+        return m_alignmentInputType;
+      }
+
+      /**
+       * Get input type for wire misalignment
+       */
+      bool getMisalignmentInputType()
+      {
+        return m_misalignmentInputType;
+      }
+
+      /**
+       * Get input type for xt
+       */
+      bool getXtInputType()
+      {
+        return m_xtInputType;
+      }
+
+      /**
+       * Get input type for sigma
+       */
+      bool getSigmaInputType()
+      {
+        return m_sigmaInputType;
+      }
+
+      /**
+       * Get input type for prop. speed
+       */
+      bool getPropSpeedInputType()
+      {
+        return m_propSpeedInputType;
+      }
+
+      /**
+       * Get input type for t0
+       */
+      bool getT0InputType()
+      {
+        return m_t0InputType;
+      }
+
+      /**
+       * Get input type for time-walk
+       */
+      bool getTwInputType()
+      {
+        return m_twInputType;
+      }
+
+      /**
+       * Get input type for bad wire
+       */
+      bool getBwInputType()
+      {
+        return m_bwInputType;
+      }
+
+      /**
+       * Get input type for channel map
+       */
+      bool getChMapInputType()
+      {
+        return m_chMapInputType;
+      }
+
+      /**
        * Get input file name for wire displacement
        */
       std::string getDisplacementFile() const
@@ -304,6 +464,18 @@ namespace Belle2 {
       bool m_displacement = true;  /**< Switch for displacement. */
       bool m_alignment = true;  /**< Switch for alignment. */
       bool m_misalignment = true;  /**< Switch for misalignment. */
+
+      bool m_displacementInputType = true;  /**< Input type for displacement. */
+      bool m_alignmentInputType = true;  /**< Input type for alignment. */
+      bool m_misalignmentInputType = true;  /**< Input type for misalignment. */
+      bool m_xtInputType = true;  /**< Input type for xt. */
+      bool m_sigmaInputType = true;  /**< Input type for sigma. */
+      bool m_propSpeedInputType = true;  /**< Input type for prop. speed. */
+      bool m_t0InputType = true;  /**< Input type for t0. */
+      bool m_twInputType = true;  /**< Input type for time-walk. */
+      bool m_bwInputType = true;  /**< Input type for bad wire. */
+      bool m_chMapInputType = true;  /**< Input type for channel map. */
+
       std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */
       std::string m_misalignmentFile = "misalignment_v2.dat";  /**< Misalignment file. */

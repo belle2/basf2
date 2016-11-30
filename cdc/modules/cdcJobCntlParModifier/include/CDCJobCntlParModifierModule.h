@@ -57,6 +57,18 @@ namespace Belle2 {
     bool m_displacement;  /**< Switch for displacement. */
     bool m_alignment;  /**< Switch for alignment. */
     bool m_misalignment;  /**< Switch for misalignment. */
+
+    bool m_displacementInputType;  /**< Displacement input type. */
+    bool m_alignmentInputType;  /**< Alignment input type. */
+    bool m_misalignmentInputType;  /**< Misalignment input type. */
+    bool m_xtInputType;   /**< Xt input type. */
+    bool m_sigmaInputType;   /**< Sigma input type. */
+    bool m_propSpeedInputType;  /**< Prop-apeed input type. */
+    bool m_t0InputType;   /**< T0 input type. */
+    bool m_twInputType;   /**< Time walk input type. */
+    bool m_bwInputType;   /**< Bad wire input type. */
+    bool m_chMapInputType;   /**< Channel map input type. */
+
     std::string m_displacementFile;  /**< Displacement file. */
     std::string m_alignmentFile;  /**< Alignment file. */
     std::string m_misalignmentFile;  /**< Misalignment file. */

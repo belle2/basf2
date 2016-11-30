@@ -254,8 +254,8 @@ CDCTriggerTSFModule::event()
       (TRGCDCWire&) superLayers[h.getISuperLayer()][h.getILayer()]->cell(h.getIWire());
 
     // trigger timing signal
-    const int tdcCount = floor(cdc.getT0(WireID(h.getID())) / cdc.getTdcBinWidth()
-                               - h.getTDCCount() + 0.5);
+    const int tdcCount = floor((cdc.getT0(WireID(h.getID())) / cdc.getTdcBinWidth()
+                                - h.getTDCCount() + 0.5) / 2);
     TRGTime rise = TRGTime(tdcCount, true, w.signal().clock(), w.name());
     TRGTime fall = rise;
     fall.shift(1).reverse();

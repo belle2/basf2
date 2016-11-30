@@ -41,10 +41,14 @@ namespace Belle2 {
   protected:
     /** name of the input StoreArray */
     std::string m_CDCHitCollectionName;
+    /** name of the output StoreArray */
+    std::string m_TSHitCollectionName;
     /** The filename of LUT for the inner-most track segments. */
     std::string m_innerTSLUTFilename;
     /** The filename of LUT for outer track segments. */
     std::string m_outerTSLUTFilename;
+    /** switch for simulating clock by clock */
+    bool m_clockSimulation;
 
   private:
     /** structure to hold pointers to all wires in the CDC */

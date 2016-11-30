@@ -32,6 +32,10 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_CDCHitCollectionName,
            "Name of the input StoreArray of CDCHits.",
            string(""));
+  addParam("TSHitCollectionName",
+           m_TSHitCollectionName,
+           "Name of the output StoreArray of CDCTriggerSegmentHits.",
+           string(""));
   addParam("InnerTSLUTFile",
            m_innerTSLUTFilename,
            "The filename of LUT for track segments from the inner-most super layer",
@@ -40,16 +44,20 @@ CDCTriggerTSFModule::CDCTriggerTSFModule() : Module::Module()
            m_outerTSLUTFilename,
            "The filename of LUT for track segments from the outer super layers",
            string(""));
+  addParam("ClockSimulation",
+           m_clockSimulation,
+           "Switch to simulate each data clock cycle separately.",
+           false);
 }
 
 void
 CDCTriggerTSFModule::initialize()
 {
   // register DataStore elements
-  StoreArray<CDCTriggerSegmentHit>::registerPersistent();
+  StoreArray<CDCTriggerSegmentHit>::registerPersistent(m_TSHitCollectionName);
   StoreArray<CDCHit>::required();
   // register relations
-  StoreArray<CDCTriggerSegmentHit> segmentHits;
+  StoreArray<CDCTriggerSegmentHit> segmentHits(m_TSHitCollectionName);
   StoreArray<CDCHit> cdcHits;
   StoreArray<MCParticle> mcparticles;
   segmentHits.registerRelationTo(cdcHits);
@@ -60,8 +68,8 @@ CDCTriggerTSFModule::initialize()
   // Each track segment consists of pointers to wires in this structure.
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
   const unsigned nLayers = cdc.nWireLayers();
-  TRGClock clockTDC = TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
-  TRGClock clockData = TRGClock("CDCTrigger data clock", clockTDC, 1, 16);
+  TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
+  TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
 
   //...Loop over layers...
   int superLayerId = -1;
@@ -125,7 +133,7 @@ CDCTriggerTSFModule::initialize()
       const P3D bp = P3D(cdc.wireBackwardPosition(i, j).x(),
                          cdc.wireBackwardPosition(i, j).y(),
                          cdc.wireBackwardPosition(i, j).z());
-      TRGCDCWire* tw = new TRGCDCWire(nWires++, j, *layer, fp, bp, clockTDC);
+      TRGCDCWire* tw = new TRGCDCWire(nWires++, j, *layer, fp, bp, *clockTDC);
       layer->push_back(tw);
     }
   }
@@ -210,14 +218,14 @@ CDCTriggerTSFModule::initialize()
         ts = new TRGCDCSegment(idTS++,
                                *layer,
                                w,
-                               clockData,
+                               *clockData,
                                m_outerTSLUTFilename,
                                cells);
       } else {
         ts = new TRGCDCSegment(idTS++,
                                *layer,
                                w,
-                               clockData,
+                               *clockData,
                                m_innerTSLUTFilename,
                                cells);
       }
@@ -230,7 +238,8 @@ CDCTriggerTSFModule::initialize()
 void
 CDCTriggerTSFModule::event()
 {
-  StoreArray<CDCHit> cdchits;
+  StoreArray<CDCHit> CDCHits(m_CDCHitCollectionName);
+  StoreArray<CDCTriggerSegmentHit> TSHits(m_TSHitCollectionName);
   CDC::CDCGeometryPar& cdc = CDC::CDCGeometryPar::Instance();
 
   // fill CDCHits into track segment shapes
@@ -238,7 +247,6 @@ CDCTriggerTSFModule::event()
   clear();
 
   //...Loop over CDCHits...
-  StoreArray<CDCHit> CDCHits(m_CDCHitCollectionName);
   for (int i = 0; i < CDCHits.getEntries(); ++i) {
     // get the wire
     const CDCHit& h = *CDCHits[i];
@@ -254,7 +262,7 @@ CDCTriggerTSFModule::event()
     TRGSignal signal = rise & fall;
     w.addSignal(signal);
 
-    // make a trigger wire hit (TODO: is this needed?)
+    // make a trigger wire hit (needed for relations)
     // all unneeded variables are set to 0 (TODO: remove them completely?)
     TRGCDCWireHit* hit = new TRGCDCWireHit(w, i,
                                            0, 0, 0, 0, 0, 0, 0, 0);
@@ -262,7 +270,42 @@ CDCTriggerTSFModule::event()
   }
 
   // simulate track segments and create track segment hits
-  // ... TODO ...
+  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+      // simulate with logicLUTFlag = true
+      // TODO: either add parameter or remove the option in Segment::simulate()
+      s.simulate(m_clockSimulation, true);
+      // store hits and create relations
+      // for clock simulation already done in simulate
+      // TODO: move it to simulate also for simulateWithoutClock?
+      if (!m_clockSimulation && s.signal().active()) {
+        const CDCHit* priorityHit = CDCHits[s.priority().hit()->iCDCHit()];
+        const CDCTriggerSegmentHit* tsHit =
+          TSHits.appendNew(*priorityHit,
+                           s.id(),
+                           s.priorityPosition(),
+                           s.LUT()->getValue(s.lutPattern()),
+                           s.priorityTime(),
+                           s.fastestTime(),
+                           s.foundTime());
+        // relation to all CDCHits in segment
+        for (unsigned iw = 0; iw < s.wires().size(); ++iw) {
+          const TRGCDCWire* wire = (TRGCDCWire*)s[iw];
+          if (wire->signal().active()) {
+            // priority wire has relation weight 2
+            double weight = (wire == &(s.priority())) ? 2. : 1.;
+            tsHit->addRelationTo(CDCHits[wire->hit()->iCDCHit()], weight);
+          }
+        }
+        // relation to MCParticles (same as priority hit)
+        RelationVector<MCParticle> mcrel = priorityHit->getRelationsFrom<MCParticle>();
+        for (unsigned imc = 0; imc < mcrel.size(); ++imc) {
+          mcrel[imc]->addRelationTo(tsHit, mcrel.weight(imc));
+        }
+      }
+    }
+  }
 }
 
 void
@@ -277,11 +320,13 @@ CDCTriggerTSFModule::clear()
   for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
     for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
       for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
-        TRGCDCWire& w =
-          (TRGCDCWire&) superLayers[isl][il]->cell(iw);
-        delete w.hit();
+        TRGCDCWire& w = (TRGCDCWire&) superLayers[isl][il]->cell(iw);
         w.clear();
       }
+    }
+    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
+      TRGCDCSegment& s = (TRGCDCSegment&) tsLayers[isl]->cell(its);
+      s.clear();
     }
   }
 }

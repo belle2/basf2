@@ -811,7 +811,7 @@ void CDCGeometryPar::newReadSigma(const GearDir gbxParams, const int mode)
 
   ifs >> m_sigmaParamMode >> np;
   //  std:: cout << m_sigmaParamMode <<" "<< np << std::endl;
-  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 3) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
+  if (m_sigmaParamMode < 0 || m_sigmaParamMode > 4) B2FATAL("CDCGeometryPar: invalid sigma-parameterization mode read !");
 
   if (np > nSigmaParams) B2FATAL("CDCGeometryPar: no. of sigma-params. outside limits !");
 
@@ -1896,6 +1896,10 @@ double CDCGeometryPar::getSigma(const double driftL, const unsigned short iCLaye
           double sigmaAtP7 = sqrt(P0 / (P7 * P7 + P1) + P2 * P7 + P3 + forthTermAtP7);
           sigma += w * (P8 * (driftL - P7) + sigmaAtP7);
         } else if (m_sigmaParamMode == 2) {
+          double onePls4AtP7 = sqrt(P0 / (P7 * P7 + P1) + forthTermAtP7);
+          const double onePls4 = P8 * (driftL - P7) + onePls4AtP7;
+          sigma += w * sqrt(P2 * driftL + P3 + onePls4 * onePls4);
+        } else if (m_sigmaParamMode == 3) {
           forthTermAtP7 = sqrt(forthTermAtP7);
           const double forthTerm = P8 * (driftL - P7) + forthTermAtP7;
           sigma += w * sqrt(P0 / (driftL * driftL + P1) + P2 * driftL + P3 +

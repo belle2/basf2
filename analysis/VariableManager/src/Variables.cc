@@ -183,14 +183,21 @@ namespace Belle2 {
 
       if (daughters.size() == 2) {
 
-        if ((std::abs(daughters[0] -> getDaughters()[0] -> getPDGCode()) == 11 && daughters[1] -> getNDaughters() == 0)
-            || (std::abs(daughters[0] -> getDaughters()[1] -> getPDGCode()) == 11 && daughters[0] -> getNDaughters() == 0)) {
+        bool isOneConversion = false;
+
+        for (auto& idaughter : daughters) {
+          if (idaughter -> getNDaughters() == 2) {
+            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11) isOneConversion = true;
+          }
+        }
+
+        if (isOneConversion) {
           //only for pi0 decay where one gamma converts
 
           TLorentzVector pGamma;
 
           for (auto& idaughter : daughters) {
-            if (std::abs(idaughter -> getDaughters()[0] -> getPDGCode()) == 11) continue;
+            if (daughters[0] -> getNDaughters() == 2) continue;
             else pGamma = frame.getMomentum(idaughter);
           }
 

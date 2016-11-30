@@ -67,13 +67,6 @@ namespace Belle2 {
 
 
     private:
-
-      /**
-       * Get the hit position of the trigger counter
-       * by extraplating from the track parameters.
-       */
-      TVector3 getTriggerHitPosition(const Helix h, double yofcounter);
-
       const Belle2::TrackFitResult* fitresult; /**< Track fit result. */
       std::string m_trackArrayName;           /**< Belle2::Track StoreArray name. */
       std::string m_recoTrackArrayName ;       /**< Belle2::RecoTrack StoreArray nam.e */

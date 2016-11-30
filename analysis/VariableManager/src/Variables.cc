@@ -197,7 +197,7 @@ namespace Belle2 {
           TLorentzVector pGamma;
 
           for (auto& idaughter : daughters) {
-            if (daughters[0] -> getNDaughters() == 2) continue;
+            if (idaughter -> getNDaughters() == 2) continue;
             else pGamma = frame.getMomentum(idaughter);
           }
 

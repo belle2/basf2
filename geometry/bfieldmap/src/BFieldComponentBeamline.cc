@@ -640,7 +640,7 @@ namespace Belle2 {
   BFieldComponentBeamline::~BFieldComponentBeamline()
   {
     if (m_ler) delete m_ler;
-    if (m_ler) delete m_ler;
+    if (m_her) delete m_her;
   }
 
   bool BFieldComponentBeamline::isInRange(const TVector3& p) const

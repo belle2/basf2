@@ -96,6 +96,7 @@ void ECLDigitizerModule::event()
   const int  DeltaT = gRandom->Uniform(0, double(ec.m_ntrg) / 2.); // trigger decision can come in any time ???
   const double timeInt = 2.* (double) DeltaT * trgtick;
   const int      ttrig = 2 * DeltaT;
+  const double timeOffset = timeInt - ec.s_clock / (2 * ec.m_rf);
 
   const auto eclTrig = m_eclTrigs.appendNew();
   eclTrig->setTimeTrig(timeInt); //t0 (us)= (1520 - m_ltr)*24.*
@@ -108,7 +109,7 @@ void ECLDigitizerModule::event()
     int j = hit.getCellId() - 1; //0~8735
     double hitE       = hit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = (hit.getFlightTime() + eclp->time2sensor(j, hit.getPosition())) / Unit::us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf  , m_ss[m_tbl[j].iss]);
+    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
   }
 
   // add only background hits
@@ -117,7 +118,7 @@ void ECLDigitizerModule::event()
     int j = hit.getCellId() - 1; //0~8735
     double hitE       = hit.getEnergyDep() / Unit::GeV;
     double hitTimeAve = hit.getTimeAve() / Unit::us;
-    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf  , m_ss[m_tbl[j].iss]);
+    m_adc[j].AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
   }
 
   // make relation between cellid and eclhits
@@ -129,14 +130,22 @@ void ECLDigitizerModule::event()
     //    cout<<"C:"<<hit.getBackgroundTag()<<" "<<hit.getCellId()<<" "<<hit.getEnergyDep()<<" "<<hit.getTimeAve()<<endl;
   }
 
-#if 0 // postponed to electronic response function for delta input will be avaliable
+  // internuclear counter effect -- charged particle crosses diode and produces signal
   for (const auto& hit : m_eclDiodeHits) {
     int j = hit.getCellId() - 1; //0~8735
-    double hitE       = hit.getEnergyDep() / Unit::GeV;
+    // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
+    // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
+    // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
+    constexpr double diodeEdep2crystalEdep = 1 / (5000 * 3.6e-6);
+    double hitE       = hit.getEnergyDep() / Unit::GeV * diodeEdep2crystalEdep;
     double hitTimeAve = hit.getTimeAve() / Unit::us;
-    //    m_adc[j].AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf, m_ss[m_tbl[j].iss]);
+
+    adccounts_t& a = m_adc[j];
+    // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
+    // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+    a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+    //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
   }
-#endif
 
   // loop over entire calorimeter
   for (int j = 0; j < ec.m_nch; j++) {
@@ -146,7 +155,7 @@ void ECLDigitizerModule::event()
       // This has been added by Alex Bobrov for calibration
       // of covariance matrix artificially generate 100 MeV in time for each crystal
       double hitE = 0.1, hitTimeAve = 0.0;
-      a.AddHit(hitE, hitTimeAve + timeInt - ec.s_clock / 2. / ec.m_rf , m_ss[m_tbl[j].iss]);
+      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[m_tbl[j].iss]);
     } else if (a.total < 0.0001)
       continue;
 
@@ -159,8 +168,12 @@ void ECLDigitizerModule::event()
     m_noise[m_tbl[j].inoise].generateCorrelatedNoise(z, AdcNoise);
 
     int FitA[ec.m_nsmp];
-    for (int  i = 0; i < ec.m_nsmp; i++)
-      FitA[i] = 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000;
+    for (int  i = 0; i < ec.m_nsmp; i++) {
+      // first clip and then add noise
+      // FitA[i] = 20 * (1000 * max(0.0, a.c[i]) + AdcNoise[i]) + 3000;
+      // or add noise and then clip?
+      FitA[i] = max(0.0, 20 * (1000 * a.c[i] + AdcNoise[i]) + 3000);
+    }
 
     int  energyFit = 0; // fit output : Amplitude 18 bits
     int       tFit = 0; // fit output : T_ave     12 bits
@@ -183,12 +196,6 @@ void ECLDigitizerModule::event()
       eclDigit->setChi(chi);
       for (const auto& hit : hitmap)
         if (hit.cell == j) eclDigit->addRelationTo(m_eclHits[hit.id]);
-      // int id = eclDigit->getArrayIndex();
-      // for (const auto& hit : hitmap)
-      //   if (hit.cell == j) {
-      //     m_DigitToHit.add(id, hit.id);
-      //     m_HitToDigit.add(hit.id, id);
-      //   }
     }
   } //store each crystal hit
 }
@@ -317,10 +324,24 @@ void ECLDigitizerModule::readDSPDB()
 
   // at the moment there is only one sampled signal shape in the pool
   // since all shaper parameters are the same for all crystals
-  m_ss.resize(1);
+  m_ss.resize(2);
   float MP[10]; eclWFData->getWaveformParArray(MP);
-  m_ss[0].InitSample(MP);
+  m_ss[0].InitSample(MP, 27.7221);
+  // parameters vector from ps.dat file, time offset 0.5 usec added to
+  // have peak position with parameters from ps.dat roughly in the
+  // same place as in current MC
+  // double crystal_params[10] = {0.5, 0.301298, 0.631401, 0.470911, 0.903988, -0.11734200/19.5216, 2.26567, 0.675393, 0.683995, 0.0498786};
+  // m_ss[0].InitSample(crystal_params, 0.9999272*19.5216);
   for (int i = 0; i < ec.m_nch; i++) m_tbl[i].iss = 0;
+
+  // one sampled diode response in the pool, parameters vector from
+  // pg.dat file, time offset 0.5 usec added to have peak position with
+  // parameters from ps.dat roughly in the same place as in current MC
+  double diode_params[] = {0 + 0.5, 0.100002, 0.756483, 0.456153, 0.0729031, 0.3906 / 9.98822, 2.85128, 0.842469, 0.854184, 0.110284};
+  m_ss[1].InitSample(diode_params, 0.9569100 * 9.98822);
+  // cout << "crystalsignalshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[0].m_ft[i] << "\n"; }
+  // cout <<         "diodeshape" << endl; for (int i = 0; i < 32 * 48; i++) { cout << i << " " << m_ss[1].m_ft[i] << "\n"; }
+
   B2INFO("ECLDigitizer: " << m_ss.size() << " sampled signal templates were created.");
 
   if (eclWFData) delete eclWFData;

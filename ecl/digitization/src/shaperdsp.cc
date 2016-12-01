@@ -298,7 +298,7 @@ dd_t ShaperDSP_t::ddShaperDSP(const shaperdspshift_t& t0) const
   return f;
 }
 
-void ShaperDSP_t::init(const double* s)
+void ShaperDSP_t::init(const double* s, double unitscale)
 {
   Sv123_init(s[2], s[3], s[7], s[8], s[1], s[4]);
   _dt0 = 1 / s[6];
@@ -309,7 +309,7 @@ void ShaperDSP_t::init(const double* s)
   _w1   = 0.5 * s[9];
   _ccc  = s[5];
 
-  const double unitscale = 27.7221;
+  //  const double unitscale = 27.7221;
   _ccc *= unitscale;
   _cs0 *= unitscale;
   _cc0 *= unitscale;
@@ -322,12 +322,17 @@ void ShaperDSP_t::init(const double* s)
   _tm.init(-_filterdt, *this);
 }
 
-void ShaperDSP_t::init(const std::vector<double>& s)
+void ShaperDSP_t::init(const double* s)
+{
+  init(s, 27.7221);
+}
+
+void ShaperDSP_t::init(const std::vector<double>& s, double unitscale)
 {
   if (s.size() == 10)
-    init(s.data());
+    init(s.data(), unitscale);
   else
-    init(_defs);
+    init(_defs, unitscale);
 }
 
 double ShaperDSP_t::operator()(double t) const

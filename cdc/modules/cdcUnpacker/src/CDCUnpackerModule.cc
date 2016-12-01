@@ -51,7 +51,7 @@ REG_MODULE(CDCUnpacker)
 CDCUnpackerModule::CDCUnpackerModule() : Module()
 {
   //Set module properties
-  setDescription("Generate CDCHit from Raw data.");
+  setDescription("CDCUnpacker generates CDCHit from Raw data.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("rawCDCName", m_rawCDCName, "Name of the RawCDC List name..", string(""));
@@ -60,15 +60,15 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("cdcHitName", m_cdcHitName, "Name of the CDCHit List name..", string(""));
   addParam("fadcThreshold", m_fadcThreshold, "Threshold voltage (mV).", 10);
 
-  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string("/cdc/data/ch_map.dat"));
+  addParam("xmlMapFileName", m_xmlMapFileName, "path+name of the xml file", string(""));
   addParam("enableStoreCDCRawHit", m_enableStoreCDCRawHit, "Enable to store to the CDCRawHit object", false);
-  addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
+  addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", false);
   addParam("setRelationRaw2Hit", m_setRelationRaw2Hit, "Set/unset relation between CDCHit and RawCDC.", false);
   addParam("boardIDTrig", m_boardIDTrig, "Board ID for the trigger.", 7);
   addParam("channelTrig", m_channelTrig, "Channel for the trigger.", 1);
   addParam("subtractTrigTiming", m_subtractTrigTiming, "Enable to subtract the trigger timing from TDCs.", false);
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
-  addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", false);
+  addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
 
   //  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }

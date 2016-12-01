@@ -46,6 +46,8 @@ ECLDigitizerModule::ECLDigitizerModule() : Module()
   addParam("Background", m_background, "Flag to use the Digitizer configuration with backgrounds; Default is no background", false);
   addParam("Calibration", m_calibration, "Flag to use the Digitizer for Waveform fit Covariance Matrix calibration; Default is false",
            false);
+  addParam("DiodeDeposition", m_inter,
+           "Flag to take into account energy deposition in photodiodes; Default diode is not sensitive detector", false);
 }
 
 ECLDigitizerModule::~ECLDigitizerModule()
@@ -131,20 +133,22 @@ void ECLDigitizerModule::event()
   }
 
   // internuclear counter effect -- charged particle crosses diode and produces signal
-  for (const auto& hit : m_eclDiodeHits) {
-    int j = hit.getCellId() - 1; //0~8735
-    // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
-    // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
-    // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
-    constexpr double diodeEdep2crystalEdep = 1 / (5000 * 3.6e-6);
-    double hitE       = hit.getEnergyDep() / Unit::GeV * diodeEdep2crystalEdep;
-    double hitTimeAve = hit.getTimeAve() / Unit::us;
+  if (m_inter) {
+    for (const auto& hit : m_eclDiodeHits) {
+      int j = hit.getCellId() - 1; //0~8735
+      // ionisation energy in Si is I = 3.6x10^-6 MeV for electron-hole pair
+      // 5000 pairs in the diode per 1 MeV deposited in the crystal attached to the diode
+      // conversion factor to get equvalent energy deposition in the crystal to sum up it with deposition in crystal
+      constexpr double diodeEdep2crystalEdep = 1 / (5000 * 3.6e-6);
+      double hitE       = hit.getEnergyDep() / Unit::GeV * diodeEdep2crystalEdep;
+      double hitTimeAve = hit.getTimeAve() / Unit::us;
 
-    adccounts_t& a = m_adc[j];
-    // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
-    // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
-    a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
-    //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+      adccounts_t& a = m_adc[j];
+      // cout << "internuclearcountereffect " << j << " " << hit.getEnergyDep() << " " << hit.getTimeAve() << " " << a.total << endl;
+      // for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+      a.AddHit(hitE, hitTimeAve + timeOffset, m_ss[1]); // m_ss[1] is the sampled diode response
+      //    for (int  i = 0; i < ec.m_nsmp; i++) cout << i << " " << a.c[i] << endl;
+    }
   }
 
   // loop over entire calorimeter

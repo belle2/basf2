@@ -26,8 +26,8 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
   InitializeCounters();
 
   //Set module properties
-  setDescription("This module expects a container of SpacePointTrackCandidates and an OverlapNetwork
-                 and thenselects a subset of non-overlapping TCs determined using a neural network of Hopfield type.");
+  setDescription("This module expects a container of SpacePointTrackCandidates and an OverlapNetwork\
+ and thenselects a subset of non-overlapping TCs determined using a neural network of Hopfield type.");
   setPropertyFlags(c_ParallelProcessingCertified);
 
   addParam("tcArrayName", m_PARAMtcArrayName, " sets the name of expected StoreArray with SpacePointTrackCand in it",
@@ -35,8 +35,8 @@ TrackSetEvaluatorHopfieldNNDEVModule::TrackSetEvaluatorHopfieldNNDEVModule() : M
   addParam("tcNetworkName", m_PARAMtcNetworkName, " sets the name of expected StoreArray<OverlapNetwork>", string(""));
 
   addParam("reduceTCSetBeforeHNN", m_PARAMreduceTCSetBeforeHNN,
-           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered,
-           including non-overlapping ones. WARNING at the moment only option(false) is supported!",
+           "If true, only overlapping TCs are considered by the HNN, if false all TCs are considered,\
+ including non-overlapping ones. WARNING at the moment only option(false) is supported!",
            bool(false));
 }
 
@@ -49,8 +49,8 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
 
   std::vector<TcInfo4Hopfield> overlapTCinfo;
   if (m_PARAMreduceTCSetBeforeHNN) {
-    B2FATAL(" TrackSetEvaluatorHopfieldNNDEVModule: option reduceTCSetBeforeHNN
-            is not yet supported - would you like to implement it?");
+    B2FATAL(" TrackSetEvaluatorHopfieldNNDEVModule: option reduceTCSetBeforeHNN\
+ is not yet supported - would you like to implement it?");
     overlapTCinfo = reduceOverlappingNetwork();
   } else {
     overlapTCinfo = convertOverlappingNetwork();
@@ -60,7 +60,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   m_nTCsCleanAtStart += nTCs - nCompetitors;
 
   B2DEBUG(10, "TrackSetEvaluatorHopfieldNNDEVModule - in event " << m_eventCounter << ": got " << nTCs <<
-          " TC of which " << nCompetitors << " are overlapping");
+          "TC of which " << nCompetitors << " are overlapping");
 
   // case selection: 0 there are no overlaps, do nothing, if there are two, do tcDuel being faster than HNN, else use HNN:
   if (nCompetitors == 0) {
@@ -88,8 +88,8 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
     B2WARNING("Hopfield network - had no survivors of  " << nCompetitors << " overlaps!");
   }
 
-  B2DEBUG(50, "executeAlgorithm Hopfield: at end of algoritm:
-          total number of formaly overlaping TCs alive: " << nSurvivors);
+  B2DEBUG(50, "executeAlgorithm Hopfield: at end of algoritm:\
+ total number of formaly overlaping TCs alive: " << nSurvivors);
 
   m_nFinalTCs += nSurvivors;
   m_nRejectedTCs += nTCs - nSurvivors;

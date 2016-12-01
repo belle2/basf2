@@ -63,7 +63,8 @@ namespace Belle2 {
       /** Conversion to ADC counts, set in steering file*/
       double m_ConversionFactor;
       /** ionization energy of He3 */
-      double m_Workfct = 35.075;
+      //double m_Workfct = 35.075;
+      double m_Workfct = 24.6;
       /** fano factor */
       double m_Fanofac = 220;
       /** Process the he3tube simhits */

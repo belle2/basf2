@@ -13,7 +13,6 @@
 
 #include <framework/utilities/FileSystem.h>
 #include <framework/logging/Logger.h>
-#include <framework/gearbox/Unit.h>
 
 #include <boost/iostreams/filtering_stream.hpp>
 #include <boost/iostreams/device/file.hpp>
@@ -46,153 +45,135 @@ void BFieldComponentRadial::initialize()
 
   //Create the magnetic field map [r,z] and read the data from the file
   B2DEBUG(10, "Loading the radial magnetic field from file '" << m_mapFilename << "' in to the memory...");
-  m_mapBuffer = new BFieldPoint*[m_mapSize[0]];
-  for (int i = 0; i < m_mapSize[0]; ++i)
-    m_mapBuffer[i] = new BFieldPoint[m_mapSize[1]];
+  m_mapBuffer.clear();
+  m_mapBuffer.reserve(m_mapSize[0]*m_mapSize[1]);
 
   double r, z, Br, Bz;
   for (int i = 0; i < m_mapSize[0]; ++i) {
     for (int j = 0; j < m_mapSize[1]; j++) {
       fieldMapFile >> r >> z >> Br >> Bz;
-
-      //Since the accelerator group defines zero as the Belle center, move the
-      //magnetic field to the IP.
-      z += m_mapOffset;
-
       //Store the values
-      m_mapBuffer[i][j].r = Br;
-      m_mapBuffer[i][j].z = Bz;
+      m_mapBuffer.push_back({Br, Bz});
     }
   }
+
+  m_igridPitchR = 1 / m_gridPitchR;
+  m_igridPitchZ = 1 / m_gridPitchZ;
+  m_Layer = m_gapHeight + m_ironPlateThickness;
+  m_iLayer = 1 / m_Layer;
 
   B2DEBUG(10, "... loaded " << m_mapSize[0] << "x" << m_mapSize[1] << " (r,z) elements.");
 }
 
+inline BFieldComponentRadial::BFieldPoint operator*(const BFieldComponentRadial::BFieldPoint& v, double a)
+{
+  return {v.r * a, v.z * a};
+}
+
+inline BFieldComponentRadial::BFieldPoint operator+(const BFieldComponentRadial::BFieldPoint& u,
+                                                    const BFieldComponentRadial::BFieldPoint& v)
+{
+  return {u.r + v.r, u.z + v.z};
+}
 
 TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 {
+  TVector3 B;
   // If both 'Radial' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.
-  if (BFieldComponentBeamline::Instance().isInRange(point)) {
-    return TVector3(0.0, 0.0, 0.0);
-  }
+  if (BFieldComponentBeamline::Instance().isInRange(point)) return B;
 
-  //Get the r and z component
-  double r = point.Perp();
+  //Get the z component
   double z = point.Z();
-
   //Check if the point lies inside the magnetic field boundaries
-  if ((r < m_mapRegionR[0]) || (r > m_mapRegionR[1]) ||
-      (z < m_mapRegionZ[0]) || (z > m_mapRegionZ[1])) {
-    return TVector3(0.0, 0.0, 0.0);
-  }
+  if ((z < m_mapRegionZ[0]) || (z > m_mapRegionZ[1])) return B;
 
-  //Calculate the lower index of the point in the grid
-  int ir = static_cast<int>(floor((r - m_mapRegionR[0]) / m_gridPitchR));
-  int iz = static_cast<int>(floor((z - m_mapRegionZ[0]) / m_gridPitchZ));
+  //Get the r component
+  double r2 = point.Perp2();
+  //Check if the point lies inside the magnetic field boundaries
+  if ((r2 < m_mapRegionR[0]*m_mapRegionR[0]) || (r2 > m_mapRegionR[1]*m_mapRegionR[1])) return B;
 
-  //Check if the index values are within the range
-  if (((ir + 1) >= m_mapSize[0]) || ((iz + 1) >= m_mapSize[1])) {
-    B2ERROR("The index values for the radial magnetic field map are out of bounds !");
-    return TVector3(0.0, 0.0, 0.0);
-  }
-
+  double r = sqrt(r2);
   //Calculate the distance to the lower grid point
-  double dr = r - floor(r / m_gridPitchR) * m_gridPitchR;
-  double dz = z - floor(z / m_gridPitchZ) * m_gridPitchZ;
+  double wr = (r - m_mapRegionR[0]) * m_igridPitchR;
+  double wz = (z - m_mapRegionZ[0]) * m_igridPitchZ;
+  //Calculate the lower index of the point in the grid
+  int ir = static_cast<int>(wr);
+  int iz = static_cast<int>(wz);
 
-  // special treatment into the EKLM region
-  // iron gap
-  double dz_eklm = fabs(z - m_mapOffset) - (m_endyokeZMin - m_gapHeight);
+#define NEWEKLMINTERPOLATION
+#ifdef NEWEKLMINTERPOLATION
+  double za = z - m_mapOffset;
+  double dz_eklm = abs(za) - (m_endyokeZMin - m_gapHeight);
+  if (dz_eklm > 0 && r > m_slotRMin) {
+    double wl = dz_eklm * m_iLayer;
+    int il = static_cast<int>(wl);
+    if (il <= 16) {
+      double L = m_Layer * il;
+      double l = dz_eklm - L;
+      int ingap = l < m_gapHeight;
+      ir += ingap & (r < m_slotRMin + m_gridPitchR);
 
-  if (r > m_slotRMin && dz_eklm > 0 && dz != 0. && dz != m_gridPitchZ) {
-    double dLayer(m_gapHeight + m_ironPlateThickness);
-    int layer = static_cast<int>(floor(dz_eklm / dLayer));
+      double zlg = L + m_endyokeZMin, zl0 = zlg - m_gapHeight, zl1 = zlg + m_ironPlateThickness;
+      if (za < 0) {
+        zl0 = -zl0;
+        zlg = -zlg;
+        zl1 = -zl1;
+      }
+      double zoff = m_mapOffset - m_mapRegionZ[0];
+      int izl0 = static_cast<int>((zl0 + zoff) * m_igridPitchZ);
+      int izlg = static_cast<int>((zlg + zoff) * m_igridPitchZ);
+      int izl1 = static_cast<int>((zl1 + zoff) * m_igridPitchZ);
+      int ig = izlg == iz;
+      int idz = (izl0 == iz) - (izl1 == iz) + (ingap ? -ig : ig);
+      iz += (za > 0) ? idz : -idz;
+    }
+  }
+#endif
+
+  //Bring the index values within the range
+  ir = min(m_mapSize[0] - 2, ir);
+  iz = min(m_mapSize[1] - 2, iz);
+
+  wr -= ir;
+  wz -= iz;
+
+#ifndef NEWEKLMINTERPOLATION
+  double za = z - m_mapOffset;
+  double dz_eklm = abs(za) - (m_endyokeZMin - m_gapHeight);
+  if (r > m_slotRMin && dz_eklm > 0 && wz != 0 && wz != 1) {
+    int layer = static_cast<int>(dz_eklm * m_iLayer);
     if (layer <= 14) {
-      double ddz = dz_eklm - dLayer * layer;
-
-      if (r - m_slotRMin < m_gridPitchR && ddz < m_gapHeight) dr = m_gridPitchR;
-
+      double ddz = dz_eklm - m_Layer * layer;
+      if (r - m_slotRMin < m_gridPitchR && ddz < m_gapHeight) wr = 1;
       if (ddz < m_gridPitchZ || (ddz >= m_gapHeight && ddz - m_gapHeight < m_gridPitchZ)) {
-        if (z > 0)
-          dz = m_gridPitchZ;
-        else
-          dz = 0.;
-      } else if (dLayer - ddz < m_gridPitchZ || (ddz < m_gapHeight && m_gapHeight - ddz < m_gridPitchZ)) {
-        if (z < 0)
-          dz = m_gridPitchZ;
-        else
-          dz = 0.;
+        wz = z > 0;
+      } else if (m_Layer - ddz < m_gridPitchZ || (ddz < m_gapHeight && m_gapHeight - ddz < m_gridPitchZ)) {
+        wz = z < 0;
       }
     }
   }
+#endif
 
-
+  double wz0 = 1 - wz, wr0 = 1 - wr;
   //Calculate the linear approx. of the magnetic field vector
-  double Br1 = m_mapBuffer[ir][iz].r;
-  double Br2 = m_mapBuffer[ir][iz + 1].r;
-  double Br3 = m_mapBuffer[ir + 1][iz].r;
-  double Br4 = m_mapBuffer[ir + 1][iz + 1].r;
-  double Br = ((Br1 * (m_gridPitchZ - dz) + Br2 * dz) * (m_gridPitchR - dr) + (Br3 * (m_gridPitchZ - dz) + Br4 * dz) * dr) /
-              m_gridPitchZ / m_gridPitchR;
+  const unsigned int strideZ = m_mapSize[1];
+  const unsigned int i00 = ir * strideZ + iz, i01 = i00 + 1, i10 = i00 + strideZ, i11 = i01 + strideZ;
+  const BFieldPoint* H = m_mapBuffer.data();
+  double w00 = wz0 * wr0, w01 = wz * wr0, w10 = wz0 * wr, w11 = wz * wr;
+  BFieldPoint Brz = H[i00] * w00 + H[i01] * w01 + H[i10] * w10 + H[i11] * w11;
 
-  double Bz1 = m_mapBuffer[ir][iz].z;
-  double Bz2 = m_mapBuffer[ir][iz + 1].z;
-  double Bz3 = m_mapBuffer[ir + 1][iz].z;
-  double Bz4 = m_mapBuffer[ir + 1][iz + 1].z;
-  double Bz = ((Bz1 * (m_gridPitchZ - dz) + Bz2 * dz) * (m_gridPitchR - dr) + (Bz3 * (m_gridPitchZ - dz) + Bz4 * dz) * dr) /
-              m_gridPitchZ / m_gridPitchR;;
-
-  double Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
-  double By = (r > 0.0) ? Br * point.Y() / r : 0.0;
-
-  //Near-axis approximation
-  if (false) {
-    //if (true) {
-    Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * r / 2;
-    Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;
-    Bx = (r > 0.0) ? Br * point.X() / r : 0.0;
-    By = (r > 0.0) ? Br * point.Y() / r : 0.0;
+  if (r > 0.0) {
+    double norm = Brz.r / r;
+    B.SetXYZ(point.X()*norm, point.Y()*norm, Brz.z);
+  } else {
+    B.SetZ(Brz.z);
   }
 
-  //Treatment for unrealistic QC2 iron shape used for 2D-map calculation
-  if (false) {
-    if (((250 < z) && (z < 320)) or ((-220 < z) && (z < -160))) {
-      double angle_crossing = 0.0830;
-
-      double angle_HER = - angle_crossing / 2.;
-      TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
-      double rHER = pHER.Perp();
-
-      double angle_LER =  angle_crossing / 2.;
-      TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
-      double rLER = pLER.Perp();
-
-      Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;
-      if (point.X()*point.Z() > 0) {
-        Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rHER / 2;
-        Bx = (rHER > 0.0) ? Br * pHER.X() / rHER : 0.0;
-        By = (rHER > 0.0) ? Br * pHER.Y() / rHER : 0.0;
-      } else {
-        Br = - (m_mapBuffer[0][iz + 1].z - m_mapBuffer[0][iz].z) / m_gridPitchZ * rLER / 2;
-        Bx = (rLER > 0.0) ? Br * pLER.X() / rLER : 0.0;
-        By = (rLER > 0.0) ? Br * pLER.Y() / rLER : 0.0;
-      }
-    }
-  }
-
-  //B2DEBUG(20, "B Radial field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
-
-  return TVector3(Bx, By, Bz);
+  return B;
 }
 
 void BFieldComponentRadial::terminate()
 {
-  B2DEBUG(10, "De-allocating the memory for the radial magnetic field map loaded from the file '" << m_mapFilename << "'");
-
-  //De-Allocate memory to prevent memory leak
-  for (int i = 0; i < m_mapSize[0]; ++i)
-    delete [] m_mapBuffer[i];
-  delete [] m_mapBuffer;
 }

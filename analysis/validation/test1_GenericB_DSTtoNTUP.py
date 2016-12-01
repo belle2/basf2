@@ -19,7 +19,7 @@ from stdPhotons import *
 from stdPi0s import *
 from stdLightMesons import *
 
-inputMdst('default', '/group/belle2/users/tkuhr/build-2016-11-09_data/bbbar/16856899.root')
+inputMdst('default', '../GenericB_GENSIMRECtoDST.dst.root')
 loadStdCharged()
 loadStdPhoton()
 loadStdPi0()

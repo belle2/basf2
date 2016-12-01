@@ -18,6 +18,7 @@
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
 
+
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
 #include <rawdata/dataobjects/RawCDC.h>
@@ -283,6 +284,12 @@ namespace Belle2 {
        * Number of hits in the cell.
        */
       int m_eWire_nhit[36882];
+
+      /**
+       * Enable/Disable to read the channel map
+       * from the database.
+       */
+      bool m_enableDatabase;
 
     };//end class declaration
 

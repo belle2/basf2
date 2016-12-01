@@ -1,5 +1,3 @@
 Import('env')
-
-env['LIBS'] = ['rawdata_dataobjects', 'cdc_dataobjects', 'framework', '$ROOT_LIBS']
-
+env['LIBS'] = ['rawdata_dataobjects', 'cdc_dataobjects', 'cdc', 'framework', '$ROOT_LIBS']
 Return('env')

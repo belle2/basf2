@@ -13,6 +13,7 @@ from basf2 import *
 from modularAnalysis import *
 from stdFSParticles import *
 from stdCharged import *
+from stdPi0s import *
 
 set_log_level(LogLevel.INFO)
 
@@ -23,10 +24,12 @@ filelist = \
 
 inputMdstList('default', filelist)
 
+
 stdFSParticles()
 # cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0', True)
 loadStdLooseMu()
 loadStdLooseE()
+loadStdPi0()
 
 from CharmRare_List import *
 CharmRareList = CharmRareList()

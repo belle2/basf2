@@ -11,7 +11,8 @@ def loadStdLightMesons(persistent=True, path=analysis_main):
 
     loadStdLooseRho0(persistent, path)
     loadStdLooseRhoPlus(persistent, path)
-    loadStdLooseKstar(persistent, path)
+    loadStdLooseKstar0(persistent, path)
+    loadStdLooseKstarPlus(persistent, path)
     loadStdLoosePhi(persistent, path)
     loadStdLooseF_0(persistent, path)
     loadStdLooseOmega(persistent, path)
@@ -41,14 +42,24 @@ def loadStdAllRhoPlus(persistent=True, path=analysis_main):
     return 'rho+:all'
 
 
-def loadStdLooseKstar(persistent=True, path=analysis_main):
+def loadStdLooseKstar0(persistent=True, path=analysis_main):
     reconstructDecay('K*0:loose -> pi-:loose K+:loose', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*0:loose'
 
 
-def loadStdAllKstar(persistent=True, path=analysis_main):
+def loadStdAllKstar0(persistent=True, path=analysis_main):
     reconstructDecay('K*0:all -> pi-:all K+:all', '0.74 < M < 1.04', 1, persistent, path)
     return 'K*0:all'
+
+
+def loadStdLooseKstarPlus(persistent=True, path=analysis_main):
+    reconstructDecay('K*+:loose -> pi+:loose K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    return 'K*+:loose'
+
+
+def loadStdAllKstarPlus(persistent=True, path=analysis_main):
+    reconstructDecay('K*+:all -> pi+:all K_S0:all', '0.74 < M < 1.04', 1, persistent, path)
+    return 'K*+:all'
 
 
 def loadStdAllPhi(persistent=True, path=analysis_main):

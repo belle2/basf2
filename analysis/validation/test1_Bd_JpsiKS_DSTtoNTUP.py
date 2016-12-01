@@ -22,6 +22,8 @@ from vertex import *
 from modularAnalysis import *
 from reconstruction import *
 
+set_log_level(LogLevel.ERROR)
+
 # load input ROOT file
 inputMdst('default', '../mdst-jpsiks.root')
 

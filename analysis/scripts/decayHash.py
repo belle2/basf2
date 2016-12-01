@@ -31,6 +31,7 @@ class DecayTree(object):
     Consists of a tree of DecayNodes.
     Can be constructed from the output of the ParticleMCDecayString module
     """
+
     def __init__(self, decaystring):
         """
         Builds a new DecayTree using a decaystring.
@@ -60,7 +61,7 @@ class DecayTree(object):
             x = decaylist[i]
             if x:
                 if x == '(':
-                    i, d = self.build_tree(decaylist, i+1)
+                    i, d = self.build_tree(decaylist, i + 1)
                     nodes[-1].d.extend(d)
                 elif x == ')':
                     return i, nodes
@@ -173,6 +174,7 @@ class DecayHashMap(object):
     DecayHashMap contains all the DecayTrees for all decays written out
     by the ParticleMCDecayString module
     """
+
     def __init__(self, rootfile):
         """
         Create a new DecayHashMap using a root file
@@ -199,8 +201,8 @@ class DecayHashMap(object):
                 tokens = line.replace('(--> ', '').replace(')', '').replace('(', '').split(' ')
                 matched = [k for k, x in enumerate(tokens) if x.startswith('^')]
                 if (len(matched) == 1 and
-                   len(self._reconstructed_decay[decayInt].particles) > j and
-                   len(self._original_decay[decayInt].particles) > matched[0]):
+                        len(self._reconstructed_decay[decayInt].particles) > j and
+                        len(self._original_decay[decayInt].particles) > matched[0]):
                     k = matched[0]
                     self._reconstructed_decay[decayInt].particles[j].m.append(self._original_decay[decayInt].particles[k])
                     self._original_decay[decayInt].particles[k].m.append(self._reconstructed_decay[decayInt].particles[j])

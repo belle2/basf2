@@ -20,12 +20,12 @@ def BtoDhList():
                    'D*0:all pi0:all',
                    'D+:all K-:all',
                    'D*+:all K-:all',
-                   'D+:all K*-:all',
-                   'D*+:all K*-:all',
+                   'D+:all K*-:loose',
+                   'D*+:all K*-:loose',
                    'D0:all K_S0:all',
                    'D*0:all K_S0:all',
-                   'D0:all K*0:all',
-                   'D*0:all K*0:all'
+                   'D0:all K*0:loose',
+                   'D*0:all K*0:loose'
                    ]
 
     B0List = []

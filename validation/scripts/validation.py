@@ -439,7 +439,7 @@ class Validation:
         # the time in minutes when there will be there first logoutput if a script
         # is still not complete
         # This prints every 30 minutes which scripts are still running
-        self.running_script_reporting_interval = 1
+        self.running_script_reporting_interval = 30
 
     def build_dependencies(self):
         """!

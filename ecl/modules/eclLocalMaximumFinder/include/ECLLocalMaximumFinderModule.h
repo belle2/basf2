@@ -139,9 +139,9 @@ namespace Belle2 {
 
       // Module parameters
       double m_energyCut; /**< energy cut for seed */
-      int m_isTrainingMode; /** training mode for MVA methods (i.e. create weights) */
-      std::string m_outfileName; /** file name prefix of the training output file */
-      std::string m_method; /** Method to find the local maximum */
+      int m_isTrainingMode; /**< training mode for MVA methods (i.e. create weights) */
+      std::string m_outfileName; /**< file name prefix of the training output file */
+      std::string m_method; /**< Method to find the local maximum */
       double m_truthFraction; /**< MC truth fraction */
       double m_cutOffset; /**< cut offset */
       double m_cutSlope; /**< cut slope. */

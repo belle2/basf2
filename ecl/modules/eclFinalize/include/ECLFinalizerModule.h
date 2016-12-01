@@ -45,7 +45,7 @@ namespace Belle2 {
 
     private:
       double m_clusterEnergyCutMin; /**< Min value for the cluster energy cut. */
-      double m_clusterTimeCutMaxEnergy; // Above this energy, keep all cluster
+      double m_clusterTimeCutMaxEnergy; /**< Above this energy, keep all cluster */
 
     public:
       /** We need names for the data objects to differentiate between PureCsI and default*/

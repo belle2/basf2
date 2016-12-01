@@ -12,7 +12,6 @@
 
 using namespace std;
 using namespace Belle2;
-// using namespace Belle2::MCMatching;
 
 //checks against update3
 #if defined(__INTEL_COMPILER) && ((__INTEL_COMPILER < 1400) || (__INTEL_COMPILER_BUILD_DATE < 20140422))

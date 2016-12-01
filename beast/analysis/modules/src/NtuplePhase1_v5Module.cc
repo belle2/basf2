@@ -601,6 +601,8 @@ namespace Belle2 {
     m_treeBEAST->Branch("CLAWS_rate", &(m_beast.CLAWS_rate));
     m_treeBEAST->Branch("QCSS_rate", &(m_beast.QCSS_rate));
 
+    m_treeBEAST->Branch("DOSI_av", &(m_beast.DOSI_av));
+    m_treeBEAST->Branch("DOSI", &(m_beast.DOSI));
     m_treeBEAST->Branch("PIN_dose_av", &(m_beast.PIN_dose_av));
     m_treeBEAST->Branch("BGO_energy_av", &(m_beast.BGO_energy_av));
     m_treeBEAST->Branch("HE3_rate_av", &(m_beast.HE3_rate_av));

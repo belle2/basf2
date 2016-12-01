@@ -5,6 +5,7 @@
 #include <string>
 
 #include "CLHEP/Geometry/Point3D.h"
+#include "trg/trg/Clock.h"
 
 namespace Belle2 {
 
@@ -55,6 +56,8 @@ namespace Belle2 {
     std::vector<std::vector<TRGCDCLayer*>> superLayers;
     /** structure to hold pointers to all track segment shapes */
     std::vector<TRGCDCLayer*> tsLayers;
+    /** list of clocks used in the TSF */
+    std::vector<TRGClock*> clocks;
   };
 
 } // namespace Belle2

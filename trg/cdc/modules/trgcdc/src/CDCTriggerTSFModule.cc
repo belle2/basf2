@@ -6,7 +6,6 @@
 #include <mdst/dataobjects/MCParticle.h>
 
 #include <cdc/geometry/CDCGeometryPar.h>
-#include <trg/trg/Clock.h>
 #include <trg/cdc/Layer.h>
 #include <trg/cdc/Wire.h>
 #include <trg/cdc/WireHit.h>
@@ -70,6 +69,8 @@ CDCTriggerTSFModule::initialize()
   const unsigned nLayers = cdc.nWireLayers();
   TRGClock* clockTDC = new TRGClock("CDCTrigger TDC clock", 0, 500. / cdc.getTdcBinWidth());
   TRGClock* clockData = new TRGClock("CDCTrigger data clock", *clockTDC, 1, 16);
+  clocks.push_back(clockTDC);
+  clocks.push_back(clockData);
 
   //...Loop over layers...
   int superLayerId = -1;
@@ -313,7 +314,32 @@ CDCTriggerTSFModule::event()
 void
 CDCTriggerTSFModule::terminate()
 {
+  // delete clocks
+  for (unsigned ic = 0; ic < clocks.size(); ++ic) {
+    delete clocks[ic];
+  }
+  clocks.clear();
 
+  // delete wire layers
+  for (unsigned isl = 0; isl < superLayers.size(); ++isl) {
+    for (unsigned il = 0; il < superLayers[isl].size(); ++il) {
+      for (unsigned iw = 0; iw < superLayers[isl][il]->nCells(); ++iw) {
+        delete &(superLayers[isl][il]->cell(iw));
+      }
+      delete superLayers[isl][il];
+    }
+    superLayers[isl].clear();
+  }
+  superLayers.clear();
+
+  // delete TS layers
+  for (unsigned isl = 0; isl < tsLayers.size(); ++isl) {
+    for (unsigned its = 0; its < tsLayers[isl]->nCells(); ++its) {
+      delete &(tsLayers[isl]->cell(its));
+    }
+    delete tsLayers[isl];
+  }
+  tsLayers.clear();
 }
 
 void

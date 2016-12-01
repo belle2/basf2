@@ -24,9 +24,21 @@
 
 namespace Belle2 {
 
-  /** The Greedy algoritm Track-set-evaluator.
+  /** The Hopfield algoritm Trackset Evaluator.
    *
-   * This module expects a container of SpacePointTrackCandidates and selects a subset of non-overlapping TCs determined using a neural network of Hopfield type.
+   *  This module expects a container of SpacePointTrackCandidates (TCs) and selects a subset of non-overlapping
+   *  TCs determined using a neural network of Hopfield type.
+   *
+   *  DESIGN DECISIONS:
+   *  - The previous version has foreseen to first remove tracks without overlaps or subsamples,
+   *    that don't overlap with different subsamples. However, the functionality isn't fully implemented and
+   *    isn't used. To reduce the amount of dead code, we eliminated that option, but we can bring it back,
+   *    if we think it is useful.
+   *  - As well for the case of just two overlapping tracks, a fall back to the evaluation of all
+   *    (2) combinations was foreseen. This is deleted as well.
+   *  We recommend to first try with the generic case and use all possible optimizations there,
+   *  before complicating the code structure again with the handling of special cases just for small
+   *  speed improvements.
    */
   class TrackSetEvaluatorHopfieldNNDEVModule : public Module {
 
@@ -76,7 +88,7 @@ namespace Belle2 {
     TrackSetEvaluatorHopfieldNNDEVModule();
 
 
-    /** Initializes the Module. */
+    /** Only statements of requirements (SpacePointTrackCans & overlapNetworks). */
     virtual void initialize() override final
     {
       m_spacePointTrackCands.isRequired(m_PARAMtcArrayName);
@@ -100,17 +112,7 @@ namespace Belle2 {
     void InitializeCounters();
 
 
-    /** for that easy situation we don't need sophisticated algorithms for finding the best subset. neuron value of TC with higher QI is set to 1, while the other is set to 0. */
-    void tcDuel(std::vector<TcInfo4Hopfield>& overlappingTCs);
-
-
-    /** typically of a set of TCs some are overlapping and some aren't.
-     * To speed up the HNN, only overlapping TCs are stored in the vector of overlapping TCs.
-     */
-    std::vector<TcInfo4Hopfield> reduceOverlappingNetwork();
-
-
-    /** if reduceTCSetBeforeHNN is false, the data is simply converted to be readable for the HNN and no non-overlapping TCs are filtered. */
+    /** Convert data to be readable for the HNN. */
     std::vector<TcInfo4Hopfield> convertOverlappingNetwork();
 
     /** Hopfield neural network function, returns true if it was successful.
@@ -132,10 +134,6 @@ namespace Belle2 {
 
     /** sets the name of the StoreObjPtr used for storing a TC network. */
     std::string m_PARAMtcNetworkName;
-
-    /** f true, only overlapping TCs are considered by the HNN, if false all TCs are considered, including non-overlapping ones */
-    bool m_PARAMreduceTCSetBeforeHNN = false;
-
 
     /** ************************************** Member variables ************************************************ */
 

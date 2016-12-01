@@ -131,6 +131,8 @@ GenFitterModule::GenFitterModule() :
   addParam("CDCWireSag", m_enableWireSag,
            "Whether to enable wire sag in the CDC geometry translation.  Needs to agree with simulation/digitization.",
            true);
+  addParam("CDCInitialize", m_initializeCDC, "If true the CDC Geometry translators will be initialized. In VXD-only beam test "
+           "scenarios, this may not be needed", true);
   addParam("UseTrackTime", m_useTrackTime,
            "Determines whether the realistic TDC track time converter and the "
            "CDCRecoHits will take the track propagation time into account.  "
@@ -214,19 +216,21 @@ void GenFitterModule::initialize()
     }
   }
 
-  // Create new Translators and give them to the CDCRecoHits.
-  if (m_realisticCDCGeoTranslator) {
-    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
-                               new RealisticCDCGeometryTranslator(m_enableWireSag),
-                               new RealisticTDCCountTranslator(m_useTrackTime),
-                               m_useTrackTime);
-  } else {
-    if (m_enableWireSag)
-      B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
-    CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
-                               new IdealCDCGeometryTranslator(),
-                               new RealisticTDCCountTranslator(m_useTrackTime),
-                               m_useTrackTime);
+  if (m_initializeCDC) {
+    // Create new Translators and give them to the CDCRecoHits.
+    if (m_realisticCDCGeoTranslator) {
+      CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                                 new RealisticCDCGeometryTranslator(m_enableWireSag),
+                                 new RealisticTDCCountTranslator(m_useTrackTime),
+                                 m_useTrackTime);
+    } else {
+      if (m_enableWireSag)
+        B2WARNING("Wire sag requested, but using idealized translator which ignores this.");
+      CDCRecoHit::setTranslators(new LinearGlobalADCCountTranslator(),
+                                 new IdealCDCGeometryTranslator(),
+                                 new RealisticTDCCountTranslator(m_useTrackTime),
+                                 m_useTrackTime);
+    }
   }
 }
 

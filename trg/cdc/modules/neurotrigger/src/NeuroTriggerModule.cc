@@ -84,7 +84,7 @@ NeuroTriggerModule::event()
     }
     int isector = m_NeuroTrigger.selectMLP(*tracks2D[itrack]);
     if (isector >= 0) {
-      vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector);
+      vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks2D[itrack]);
       vector<float> MLPinput = m_NeuroTrigger.getInputVector(isector, hitIds);
       vector<float> target;
       if (m_fixedPoint) {

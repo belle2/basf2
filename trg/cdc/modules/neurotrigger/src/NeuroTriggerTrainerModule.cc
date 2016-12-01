@@ -341,7 +341,7 @@ void NeuroTriggerTrainerModule::event()
           continue;
         }
         // get training data
-        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector);
+        vector<unsigned> hitIds = m_NeuroTrigger.selectHits(isector, *tracks[itrack]);
         m_trainSets[isector].addSample(m_NeuroTrigger.getInputVector(isector, hitIds), target);
         if (m_saveDebug) {
           phiHistsMC[isector]->Fill(mcTrack->getMomentum().Phi());

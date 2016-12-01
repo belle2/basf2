@@ -146,9 +146,13 @@ namespace Belle2 {
     unsigned long getInputPattern(unsigned isector);
 
     /** Select best hits for each super layer
-     * @param isector index of the MLP that will use the input
+     * @param isector              index of the MLP that will use the input
+     * @param track                axial hit relations are taken from given track
+     * @param returnAllRelevant    if true, return all relevant hits instead of
+     *                             selecting the best (for making relations)
      * @return list of selected hit indices */
-    std::vector<unsigned> selectHits(unsigned isector);
+    std::vector<unsigned> selectHits(unsigned isector, const CDCTriggerTrack& track,
+                                     bool returnAllRelevant = false);
 
     /** Calculate input values for MLP.
      * @param isector index of the MLP that will use the input

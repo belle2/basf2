@@ -413,10 +413,12 @@ NeuroTrigger::getInputPattern(unsigned isector)
 }
 
 vector<unsigned>
-NeuroTrigger::selectHits(unsigned isector)
+NeuroTrigger::selectHits(unsigned isector, const CDCTriggerTrack& track,
+                         bool returnAllRelevant)
 {
   StoreArray<CDCTriggerSegmentHit> hits;
   CDCTriggerMLP& expert = m_MLPs[isector];
+  vector<unsigned> selectedHitIds = {};
   // prepare vectors to keep best drift times, left/right and selected hit IDs
   vector<int> tMin;
   tMin.assign(expert.nNodesLayer(0), expert.getTMax());
@@ -426,10 +428,67 @@ NeuroTrigger::selectHits(unsigned isector)
   hitIds.assign(expert.nNodesLayer(0), -1);
   vector<unsigned> nHits;
   nHits.assign(9, 0);
-  // loop over hits, choosing up to MaxHitsPerSL per superlayer
-  B2DEBUG(250, "start hit loop");
+
+  // loop over axial hits related to input track
+  RelationVector<CDCTriggerSegmentHit> axialHits =
+    track.getRelationsTo<CDCTriggerSegmentHit>();
+  B2DEBUG(250, "start axial hit loop");
+  for (unsigned ihit = 0; ihit < axialHits.size(); ++ihit) {
+    // skip hits with negative relation weight (not selected in finder)
+    if (axialHits.weight(ihit) < 0) continue;
+    unsigned short iSL = axialHits[ihit]->getISuperLayer();
+    // skip stereo hits (should not be related to track, but check anyway)
+    if (iSL % 2 == 1) continue;
+    if (expert.getSLpatternUnmasked() != 0 &&
+        !((expert.getSLpatternUnmasked() >> iSL) & 1)) {
+      B2DEBUG(250, "skipping hit in SL " << iSL);
+      continue;
+    }
+    // get priority time (TODO: get event time) and apply time window cut
+    int t = axialHits[ihit]->priorityTime();
+    if (t < 0 || t > expert.getTMax()) continue;
+    double relId = getRelId(*axialHits[ihit]);
+    if (expert.isRelevant(relId, iSL)) {
+      // get reference hit (worst of existing hits)
+      unsigned short iRef = iSL;
+      if (expert.getMaxHitsPerSL() > 1) {
+        if (nHits[iSL] < expert.getMaxHitsPerSL() &&
+            (expert.getSLpatternUnmasked() >> (iSL + 9 * nHits[iSL])) & 1) {
+          iRef += 9 * nHits[iSL];
+          ++nHits[iSL];
+        } else {
+          for (unsigned compare = iSL; compare < iSL + 9 * nHits[iSL]; compare += 9) {
+            if ((LRknown[iRef] && !LRknown[compare]) ||
+                (LRknown[iRef] == LRknown[compare] && tMin[iRef] < tMin[compare]))
+              iRef = compare;
+          }
+        }
+      }
+      // choose best hit (LR known before LR unknown, then shortest drift time)
+      bool useHit = false;
+      if (LRknown[iRef]) {
+        useHit = (axialHits[ihit]->LRknown() && t <= tMin[iRef]);
+      } else {
+        useHit = (axialHits[ihit]->LRknown() || t <= tMin[iRef]);
+      }
+      B2DEBUG(250, "relevant wire SL " << iSL << " LR " << axialHits[ihit]->getLeftRight()
+              << " t " << t << " iRef " << iRef << " useHit " << useHit);
+      if (useHit) {
+        // keep drift time and LR
+        LRknown[iRef] = axialHits[ihit]->LRknown();
+        tMin[iRef] = t;
+        hitIds[iRef] = axialHits[ihit]->getArrayIndex();
+      }
+      if (returnAllRelevant) selectedHitIds.push_back(axialHits[ihit]->getArrayIndex());
+    }
+  }
+
+  // loop over stereo hits, choosing up to MaxHitsPerSL per superlayer
+  B2DEBUG(250, "start stereo hit loop");
   for (int ihit = 0; ihit < hits.getEntries(); ++ ihit) {
     unsigned short iSL = hits[ihit]->getISuperLayer();
+    // skip axial hits
+    if (iSL % 2 == 0) continue;
     if (expert.getSLpatternUnmasked() != 0 &&
         !((expert.getSLpatternUnmasked() >> iSL) & 1)) {
       B2DEBUG(250, "skipping hit in SL " << iSL);
@@ -470,12 +529,15 @@ NeuroTrigger::selectHits(unsigned isector)
         tMin[iRef] = t;
         hitIds[iRef] = ihit;
       }
+      if (returnAllRelevant) selectedHitIds.push_back(ihit);
     }
   }
+
   // save selected hit Ids
-  vector<unsigned> selectedHitIds = {};
-  for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
-    if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+  if (!returnAllRelevant) {
+    for (unsigned iHit = 0; iHit < hitIds.size(); ++iHit) {
+      if (hitIds[iHit] >= 0) selectedHitIds.push_back(hitIds[iHit]);
+    }
   }
   return selectedHitIds;
 }

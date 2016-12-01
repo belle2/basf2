@@ -316,15 +316,14 @@ def add_cdc_cr_track_finding(path,
     # Find the stereo hits to those axial tracks
     path.add_module('StereoHitFinderCDCLegendreHistogramming',
                     TracksStoreObjNameIsInput=True,
-                    useSingleMatchAlgorithm=True,
                     singleMatchCheckForB2BTracks=True,
                     )
 
     # Combine segments with axial tracks
     path.add_module('SegmentTrackCombiner',
                     TracksStoreObjNameIsInput=True,
-                    SegmentTrackFilterFirstStepFilter="mva",
-                    SegmentTrackFilterFirstStepFilterParameters={"cut": 0.75},
+                    SegmentTrackFilter="mva",
+                    SegmentTrackFilterParameters={"cut": 0.75},
                     TrackFilter="mva",
                     TrackFilterParameters={"cut": 0.1})
 

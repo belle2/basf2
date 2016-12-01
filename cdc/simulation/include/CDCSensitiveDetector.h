@@ -72,14 +72,6 @@ namespace Belle2 {
                       const G4double speed,
                       const G4double hitWeight);
 
-      //! Save CDCEBSimHit into datastore
-      void saveEBSimHit(const G4int layerId,
-                        const G4double phi,
-                        const G4int trackID,
-                        const G4int pid,
-                        const G4double edep,
-                        const G4ThreeVector& mom);
-
       //void AddbgOne(bool doit);
 
     private:

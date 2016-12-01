@@ -22,7 +22,7 @@
 #include <framework/datastore/RelationArray.h>
 #include <framework/gearbox/Unit.h>
 #include <cdc/dataobjects/CDCSimHit.h>
-#include <cdc/dataobjects/CDCEBSimHit.h>
+
 
 #include "G4Step.hh"
 #include "G4SteppingManager.hh"
@@ -63,7 +63,6 @@ namespace Belle2 {
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<CDCSimHit> cdcSimHits;
-    StoreArray<CDCEBSimHit> cdcEBArray;
     RelationArray cdcSimHitRel(mcParticles, cdcSimHits);
     registerMCParticleRelation(cdcSimHitRel);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_doNothing);
@@ -71,7 +70,6 @@ namespace Belle2 {
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_deleteElement);
     //    registerMCParticleRelation(cdcSimHitRel, RelationArray::c_zeroWeight);
     cdcSimHits.registerInDataStore();
-    cdcEBArray.registerInDataStore(DataStore::c_DontWriteOut);
     mcParticles.registerRelationTo(cdcSimHits);
 
     CDCSimControlPar& cntlp = CDCSimControlPar::getInstance();
@@ -213,15 +211,7 @@ namespace Belle2 {
     const unsigned layerId = v.GetCopyNo();
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
-    //--------------------------------------------------------------------------
-    // check if in electronics board, if true, CDCEBSimHit will be created.
-    //--------------------------------------------------------------------------
     G4LogicalVolume* aLogicalVolume = v.GetLogicalVolume();
-    if ((aLogicalVolume->GetName()).find("Electronics") != std::string::npos) {
-      double phi = (posIn + posOut).phi();
-      saveEBSimHit(layerId, phi, trackID, pid, edep, momIn);
-      return true;
-    }
 
     // If neutral particles, ignore them.
 
@@ -691,34 +681,6 @@ namespace Belle2 {
     // cppcheck-suppress memleak
   }
 
-  void
-  CDCSensitiveDetector::saveEBSimHit(const G4int layerId,
-                                     const G4double phi,
-                                     const G4int trackID,
-                                     const G4int pid,
-                                     const G4double edep,
-                                     const G4ThreeVector& mom)
-  {
-    //change Later
-    StoreArray<CDCEBSimHit> cdcEBArray;
-
-
-    m_EBhitNumber = cdcEBArray.getEntries();
-    // cppcheck-suppress memleak
-    CDCEBSimHit* simEBHit = cdcEBArray.appendNew();
-
-    simEBHit->setLayerId(layerId);
-    simEBHit->setPhi(phi);
-    simEBHit->setTrackId(trackID);
-    simEBHit->setPDGCode(pid);
-    simEBHit->setEnergyDep(edep / CLHEP::GeV);
-    TVector3 momentum(mom.getX() / CLHEP::GeV, mom.getY() / CLHEP::GeV, mom.getZ() / CLHEP::GeV);
-    simEBHit->setMomentum(momentum);
-
-    B2DEBUG(150, "HitNumber: " << m_EBhitNumber);
-    //    return (m_EBhitNumber);
-    // cppcheck-suppress memleak
-  }
 
   /*
     void SensitiveDetector::AddbgOne(bool doit) {

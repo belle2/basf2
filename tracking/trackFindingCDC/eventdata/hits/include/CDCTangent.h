@@ -131,7 +131,7 @@ namespace Belle2 {
       ParameterLine2D m_line;
 
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

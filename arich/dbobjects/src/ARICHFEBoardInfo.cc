@@ -14,14 +14,14 @@
 using namespace Belle2;
 using namespace std;
 
-ARICHAsicInfo ARICHFEBoardInfo::getAsicInfo(unsigned int i) const
+ARICHAsicInfo* ARICHFEBoardInfo::getAsicInfo(unsigned int i) const
 {
   if (i < 4) return m_asicInfo[i];
-  else return ARICHAsicInfo();
+  else return NULL;
 }
 
 
-void ARICHFEBoardInfo::setAsicInfo(unsigned int i, ARICHAsicInfo asicInfo)
+void ARICHFEBoardInfo::setAsicInfo(unsigned int i, ARICHAsicInfo* asicInfo)
 {
   if (i < 4) m_asicInfo[i] = asicInfo;
 }
@@ -33,7 +33,7 @@ std::string ARICHFEBoardInfo::getAsicPosition(unsigned int i) const
 }
 
 
-void ARICHFEBoardInfo::setAsicPosition(unsigned int i, std::string asicsFEB)
+void ARICHFEBoardInfo::setAsicPosition(unsigned int i, const std::string& asicsFEB)
 {
   if (i < 4) m_asicsFEB[i] = asicsFEB;
 }

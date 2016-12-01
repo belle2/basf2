@@ -84,8 +84,11 @@ ISuperLayer CDCTrajectory2D::getISuperLayerAfter(ISuperLayer iSuperLayer, bool m
   if (iSuperLayer == minimalISuperLayer) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
   if (iSuperLayer == maximalISuperLayer) return ISuperLayerUtil::getNextInwards(iSuperLayer);
 
-  if (movingOutward) return ISuperLayerUtil::getNextOutwards(iSuperLayer);
-  else return ISuperLayerUtil::getNextInwards(iSuperLayer);
+  if (movingOutward) {
+    return ISuperLayerUtil::getNextOutwards(iSuperLayer);
+  } else {
+    return ISuperLayerUtil::getNextInwards(iSuperLayer);
+  }
 }
 
 ISuperLayer CDCTrajectory2D::getISuperLayerAfterStart(bool movingOutward) const
@@ -165,6 +168,13 @@ bool CDCTrajectory2D::isCurler(double factor) const
   const CDCWireTopology& topology = CDCWireTopology::getInstance();
   return getMaximalCylindricalR() < factor * topology.getOuterCylindricalR();
 }
+
+bool CDCTrajectory2D::isOriginer(double factor) const
+{
+  const CDCWireTopology& topology = CDCWireTopology::getInstance();
+  return getMinimalCylindricalR() < factor * topology.getInnerCylindricalR();
+}
+
 
 ESign CDCTrajectory2D::getChargeSign() const
 {

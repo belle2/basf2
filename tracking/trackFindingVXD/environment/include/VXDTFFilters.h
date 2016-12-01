@@ -11,7 +11,6 @@
 #ifndef VXDTFFILTERS_HH
 #define VXDTFFILTERS_HH
 
-#include <iostream>
 #include "tracking/dataobjects/FullSecID.h"
 
 #include <tracking/spacePointCreation/SpacePoint.h>
@@ -48,6 +47,7 @@
 #include <tracking/trackFindingVXD/sectorMap/map/CompactSecIDs.h>
 #include "tracking/trackFindingVXD/segmentNetwork/StaticSector.h"
 
+#include <TString.h>
 //#include <unordered_map>
 #include <set>
 
@@ -108,18 +108,22 @@ namespace Belle2 {
     typedef StaticSector< point_t, twoHitFilter_t, threeHitFilter_t , int >
     staticSector_t;
 
-
+    /** Construct the container of all the filters used by the VXD Track Finder**/
     VXDTFFilters(): m_testConfig()
     {
       m_staticSectors.resize(2);
       // The first static sector is not used and will never be since the first
-      // compact id is 1.
+      // compact id is 1 and compact id = 0 is reserved to signal an error.
       m_staticSectors[0] = nullptr;
       // initialize the first slot of the Static sector vector
       m_staticSectors[1] = nullptr;
     }
 
-
+    /** To add an array of sectors on a sensor.
+     * @param normalizedUsup and @param normalizedVsup
+     * are two vectors of double coding the geometry of the sectors.
+     * @param sectorIds is a rectangular matrix of FullSecID.
+     * It returns the number of sectors added to the compactSecIDsMap**/
     int addSectorsOnSensor(const std::vector<double>&              normalizedUsup,
                            const std::vector<double>&              normalizedVsup,
                            const std::vector< std::vector<FullSecID> >& sectorIds)
@@ -157,7 +161,6 @@ namespace Belle2 {
                         FullSecID inner,
                         const twoHitFilter_t& filter)
     {
-
       if (m_staticSectors.size() <= m_compactSecIDsMap[ outer ] ||
           m_compactSecIDsMap[ outer ] == 0)
         return 0;
@@ -265,26 +268,26 @@ namespace Belle2 {
 
       if (! m_testConfig.Write("config"))
         return false;
-      if (! m_compactSecIDsMap.persist())
+      if (! persistSectors())
         return false;
 
-      if (! persistStaticSectors())
+      if (! persistFilters())
         return false;
 
       return true;
     };
 
     /// Retrieves from the current TDirectory all the VXDTFFilters
-    bool retrieveFromRootFile(void)
+    bool retrieveFromRootFile(const TString* dirName)
     {
 
       if (! m_testConfig.Read("config"))
         return false;
 
-      if (! m_compactSecIDsMap.read())
+      if (! retrieveSectors(dirName))
         return false;
 
-      if (! retrieveStaticSectors())
+      if (! retrieveFilters(dirName))
         return false;
 
       return true;
@@ -292,8 +295,85 @@ namespace Belle2 {
 
   private:
 
+    /// Persists all the sectors on the current TDirectory
+    bool persistSectors(void) const
+    {
+      TTree* tree = new TTree(c_CompactSecIDstreeName, c_CompactSecIDstreeName);
+      UInt_t layer, ladder, sensor;
+      tree->Branch("layer" , & layer , "layer/i");
+      tree->Branch("ladder", & ladder, "ladder/i");
+      tree->Branch("sensor", & sensor, "sensor/i");
+
+      std::vector< double >* normalizedUsup = new std::vector< double> ();
+      tree->Branch("normalizedUsup", & normalizedUsup);
+
+      std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
+      tree->Branch("normalizedVsup", & normalizedVsup);
+
+      std::vector< std::vector< unsigned int > >* fullSecIDs =
+        new std::vector< std::vector< unsigned int > > ();
+      tree->Branch("fullSecID", & fullSecIDs);
+
+      unsigned nOfLayers = m_compactSecIDsMap.nOfLayers();
+      for (layer = 0 ; layer < nOfLayers ; layer ++) {
+        unsigned nOfLadders = m_compactSecIDsMap.nOfLadders(layer);
+        for (ladder = 0; ladder < nOfLadders ; ladder ++) {
+          unsigned nOfSensors = m_compactSecIDsMap.nOfSensors(layer, ladder);
+          for (sensor = 0; sensor < nOfSensors ; sensor ++) {
+            normalizedUsup->clear();
+            normalizedVsup->clear();
+            fullSecIDs->clear();
+            auto sectorsOnSensor =
+              m_compactSecIDsMap.getSectorsOnSensor(layer, ladder, sensor);
+            sectorsOnSensor.get(normalizedUsup, normalizedVsup, fullSecIDs);
+            tree->Fill();
+          }
+        }
+      }
+      delete normalizedVsup;
+      delete normalizedUsup;
+      delete fullSecIDs;
+      return true;
+    }
+
+    /// Read the whole CompactSecIDs from the current TDirectory
+    bool retrieveSectors(const TString* dirName)
+    {
+      TString treeName = *dirName;
+      treeName.Append("/");
+      treeName.Append(c_CompactSecIDstreeName);
+      TTree* tree = (TTree*) gFile->Get(treeName);
+      UInt_t layer, ladder, sensor;
+      tree->SetBranchAddress("layer" , & layer);
+      tree->SetBranchAddress("ladder", & ladder);
+      tree->SetBranchAddress("sensor", & sensor);
+
+      std::vector< double >* normalizedUsup = new std::vector< double> ();
+      tree->SetBranchAddress("normalizedUsup", & normalizedUsup);
+
+      std::vector< double >* normalizedVsup = new std::vector< double> ({1., 2., 3., 4.});
+      tree->SetBranchAddress("normalizedVsup", & normalizedVsup);
+
+      std::vector< std::vector< unsigned int > >* fullSecIDs =
+        new std::vector< std::vector< unsigned int > > ();
+      tree->SetBranchAddress("fullSecID", & fullSecIDs);
+
+
+      for (Long64_t i = 0; i < tree->GetEntries() ; i++) {
+        tree->GetEntry(i);
+        this->addSectorsOnSensor(* normalizedUsup,
+                                 * normalizedVsup,
+                                 * fullSecIDs);
+      }
+
+      delete normalizedVsup;
+      delete normalizedUsup;
+      delete fullSecIDs;
+      return true;
+    }
+
     /// Persists on the current TDirectory the StaticSectors.
-    bool persistStaticSectors(void) const
+    bool persistFilters(void) const
     {
 
       TTree* sp2tree = new TTree("SegmentFilters", "SegmentFilters");
@@ -347,15 +427,20 @@ namespace Belle2 {
     }
 
     /// Retrieves from the current TDirectory the StaticSectors.
-    bool retrieveStaticSectors(void)
+    bool retrieveFilters(const TString* dirName)
     {
-      TTree* sp2tree = new TTree("SegmentFilters", "SegmentFilters");
+      TString sp2treeName = *dirName;
+      sp2treeName.Append("/SegmentFilters");
+      TTree* sp2tree = (TTree*) gFile->Get(sp2treeName);
+      if (!sp2tree)
+        return false;
+
       twoHitFilter_t twoHitFilter;
-      twoHitFilter.persist(sp2tree, "filter");
+      twoHitFilter.setBranchAddress(sp2tree, "filter");
 
       unsigned int outerFullSecID2sp, innerFullSecID2sp;
-      sp2tree->Branch("outerFullSecID", & outerFullSecID2sp);
-      sp2tree->Branch("innerFullSecID", & innerFullSecID2sp);
+      sp2tree->SetBranchAddress("outerFullSecID", & outerFullSecID2sp);
+      sp2tree->SetBranchAddress("innerFullSecID", & innerFullSecID2sp);
 
       for (Long64_t i = 0 ; i < sp2tree->GetEntries() ; i++) {
         sp2tree->GetEntry(i);
@@ -365,15 +450,19 @@ namespace Belle2 {
 
       }
 
-      TTree* sp3tree = new TTree("TripletsFilters", "TripletFilters");
+      TString sp3treeName = *dirName;
+      sp3treeName.Append("/TripletsFilters");
+      TTree* sp3tree = (TTree*) gFile->Get(sp3treeName);
+      if (! sp3tree)
+        return false;
       threeHitFilter_t threeHitFilter;
-      threeHitFilter.persist(sp3tree, "filter");
+      threeHitFilter.setBranchAddress(sp3tree, "filter");
 
       unsigned int outerFullSecID3sp, centerFullSecID3sp,
                innerFullSecID3sp;
-      sp3tree->Branch("outerFullSecID", & outerFullSecID3sp);
-      sp3tree->Branch("centerFullSecID", & centerFullSecID3sp);
-      sp3tree->Branch("innerFullSecID", & innerFullSecID3sp);
+      sp3tree->SetBranchAddress("outerFullSecID", & outerFullSecID3sp);
+      sp3tree->SetBranchAddress("centerFullSecID", & centerFullSecID3sp);
+      sp3tree->SetBranchAddress("innerFullSecID", & innerFullSecID3sp);
 
       for (Long64_t i = 0 ; i < sp3tree->GetEntries() ; i++) {
         sp3tree->GetEntry(i);
@@ -385,6 +474,23 @@ namespace Belle2 {
       }
 
       return true;
+    }
+
+    int addSectorsOnSensor(const std::vector< double>&   normalizedUsup,
+                           const std::vector< double>&   normalizedVsup,
+                           const std::vector< std::vector< unsigned int >>&
+                           fullSecIDsBaseType)
+    {
+      std::vector< std::vector< FullSecID >> fullSecIDs;
+
+      for (auto col : fullSecIDsBaseType) {
+        std::vector< FullSecID > tmp_col;
+        for (auto id : col)
+          tmp_col.push_back(FullSecID(id));
+        fullSecIDs.push_back(tmp_col);
+      }
+
+      return addSectorsOnSensor(normalizedUsup, normalizedVsup, fullSecIDs);
     }
 
     /**
@@ -402,6 +508,8 @@ namespace Belle2 {
     /** Configuration: i.e. name of the sector map, tuning
     parameters, etc.  */
     SectorMapConfig m_testConfig;
+
+    const char* c_CompactSecIDstreeName = "CompactSecIDs";
 
   };
 

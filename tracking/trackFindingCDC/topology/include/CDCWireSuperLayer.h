@@ -46,7 +46,7 @@ namespace Belle2 {
       using Super = ConstVectorRange<CDCWireLayer>;
 
       /// Constructor taking the range of layers the superlayer shall contain. Use rather getInstance() to avoid instance constructions.
-      explicit CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayerRange);
+      explicit CDCWireSuperLayer(const ConstVectorRange<CDCWireLayer>& wireLayers);
 
       /// Disallow copy construction of wire super layers.
       CDCWireSuperLayer(const CDCWireSuperLayer& wireSuperLayer) = delete;
@@ -56,6 +56,7 @@ namespace Belle2 {
 
       /// Disallow copy assignment of wire super layers.
       void operator=(const CDCWireSuperLayer& wireSuperLayer) = delete;
+
     public:
       /// Intializes the superlayer variables of according the layer range. Set the numbering shift of contained layers.
       void initialize();
@@ -76,7 +77,7 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the given layer id belongs to a valid layer in this superlayer
-      inline bool isValidILayer(ILayer iLayer) const
+      bool isValidILayer(ILayer iLayer) const
       { return 0 <= iLayer and iLayer < int(size()); }
 
       /// Gives the layer by its layer id within the superlayer
@@ -90,7 +91,7 @@ namespace Belle2 {
       /**@{*/
 
       /// Checks if the given wire id belongs to a valid wire in this superlayer
-      inline bool isValidIWire(ILayer iLayer, IWire iWire) const
+      bool isValidIWire(ILayer iLayer, IWire iWire) const
       { return isValidILayer(iLayer) and getWireLayer(iLayer).isValidIWire(iWire); }
 
       /// Gives the wire by its layer id within the superlayer and the wire id in the layer.
@@ -330,7 +331,7 @@ namespace Belle2 {
       /// Memory for (fitted) proporitionality factor between the increasing cylindrical radius and the refernce z coordinate in this superlayer.
       double m_refTanLambda;
 
-    }; // class CDCWireSuperLayer
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

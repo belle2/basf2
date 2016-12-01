@@ -55,7 +55,7 @@ def goodPi0(path=analysis_main):
 
 def stdPhoton(path=analysis_main):
     fillParticleList('gamma:all', '', True, path)
-    calibratePhotonEnergy('gamma:all', 0.030, path)
+    calibratePhotonEnergy('gamma:all', 0.0, path)
 
 
 def goodPhoton(path=analysis_main):

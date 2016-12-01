@@ -61,6 +61,6 @@ namespace Belle2 {
     /// Jacobian matrix for the perigee parameters
     using PerigeeJacobian = PerigeeUtil::JacobianMatrix;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

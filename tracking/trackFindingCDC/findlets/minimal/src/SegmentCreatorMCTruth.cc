@@ -13,12 +13,17 @@
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
 #include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
 
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCRLWireHitSegment.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
 #include <cdc/translators/RealisticTDCCountTranslator.h>
+
+#include <framework/core/ModuleParamList.h>
+
 #include <TRandom.h>
 
 using namespace Belle2;
@@ -59,7 +64,7 @@ void SegmentCreatorMCTruth::beginEvent()
 }
 
 void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
-                                  std::vector<CDCRecoSegment2D>& outputSegments)
+                                  std::vector<CDCSegment2D>& outputSegments)
 {
   const CDCMCTrackStore& mcTrackStore = CDCMCTrackStore::getInstance();
   const CDCSimHitLookUp& simHitLookUp = CDCSimHitLookUp::getInstance();
@@ -80,18 +85,18 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
 
     const std::vector<CDCHitVector>& mcSegments = mcSegmentsAndMCParticleIdx.second;
     for (const CDCHitVector& mcSegment : mcSegments) {
-      outputSegments.push_back(CDCRecoSegment2D());
-      CDCRecoSegment2D& recoSegment2D = outputSegments.back();
+      outputSegments.push_back(CDCSegment2D());
+      CDCSegment2D& segment2D = outputSegments.back();
       for (const CDCHit* ptrHit : mcSegment) {
         CDCRecoHit2D recoHit2D = simHitLookUp.getClosestPrimaryRecoHit2D(ptrHit, inputWireHits);
-        recoSegment2D.push_back(recoHit2D);
+        segment2D.push_back(recoHit2D);
       }
     }
   }
 
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
   const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
-  for (CDCRecoSegment2D& segment : outputSegments) {
+  for (CDCSegment2D& segment : outputSegments) {
     for (CDCRecoHit2D& recoHit2D : segment) {
       Vector2D flightDirection = recoHit2D.getFlightDirection2D();
       Vector2D recoPos2D = recoHit2D.getRecoPos2D();
@@ -118,25 +123,24 @@ void SegmentCreatorMCTruth::apply(const std::vector<CDCWireHit>& inputWireHits,
                                             alpha);
       } else {
         // In case the true drift length should be kept at least smear it with its variance.
-        double driftLengthVariance = \
-                                     tdcCountTranslator.getDriftLengthResolution(driftLength,
-                                         wire.getWireID(),
-                                         rl,
-                                         wire.getRefZ(),
-                                         alpha);
+        double driftLengthVariance = tdcCountTranslator.getDriftLengthResolution(driftLength,
+                                     wire.getWireID(),
+                                     rl,
+                                     wire.getRefZ(),
+                                     alpha);
 
         driftLength += gRandom->Gaus(0, std::sqrt(driftLengthVariance));
       }
-      recoHit2D.setRefDriftLength(driftLength);
-      recoHit2D.snapToDriftCircle();
+      bool snapRecoPos = true;
+      recoHit2D.setRefDriftLength(driftLength, snapRecoPos);
     }
   }
 
   if (m_param_reconstructedPositions) {
-    for (CDCRecoSegment2D& segment : outputSegments) {
+    for (CDCSegment2D& segment : outputSegments) {
       if (segment.size() > 1) {
         CDCRLWireHitSegment rlWireHitSegment = segment.getRLWireHitSegment();
-        segment = CDCRecoSegment2D::reconstructUsingFacets(rlWireHitSegment);
+        segment = CDCSegment2D::reconstructUsingFacets(rlWireHitSegment);
       }
     }
   }

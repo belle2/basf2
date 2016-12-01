@@ -25,7 +25,7 @@ namespace Belle2 {
       virtual ~QuadTreeBasedMatcher() = default;
 
       /** Expose the quad tree relevant parameters. **/
-      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix = "")
+      virtual void exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
       {
         moduleParameters->addParameter(prefixed(prefix, "level"), m_param_quadTreeLevel,
                                        "The number of levels for the quad tree search.",

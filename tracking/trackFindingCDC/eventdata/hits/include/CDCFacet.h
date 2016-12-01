@@ -175,7 +175,7 @@ namespace Belle2 {
       /// Memory for the cellular automaton cell assoziated with the facet.
       AutomatonCell m_automatonCell;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

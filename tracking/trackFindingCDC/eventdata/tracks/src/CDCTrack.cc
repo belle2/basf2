@@ -12,21 +12,18 @@
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
-#include <tracking/trackFindingCDC/eventdata/utils/GenfitUtil.h>
+#include <tracking/trackFindingCDC/eventdata/utils/RecoTrackUtil.h>
 #include <tracking/dataobjects/RecoTrack.h>
-#include <genfit/TrackCand.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-using namespace genfit;
-
 
 namespace {
   /// Reconstruct a segment with the two fits and append it to the track
-  void appendReconstructed(const CDCRecoSegment2D* segment,
+  void appendReconstructed(const CDCSegment2D* segment,
                            const CDCTrajectory3D& trajectory3D,
                            double perpSOffset,
                            CDCTrack& track)
@@ -53,7 +50,7 @@ namespace {
    *  Return value is the travel distance by which the following trajectories have to be shifted to match the overall track travel distance scale
    *  on the last hit of the given segment.
    */
-  double appendReconstructedAverage(const CDCRecoSegment2D* segment,
+  double appendReconstructedAverage(const CDCSegment2D* segment,
                                     const CDCTrajectory3D& trajectory3D,
                                     double perpSOffset,
                                     const CDCTrajectory3D& parallelTrajectory3D,
@@ -106,7 +103,7 @@ namespace {
 
 
 
-CDCTrack::CDCTrack(const CDCRecoSegment2D& segment) :
+CDCTrack::CDCTrack(const CDCSegment2D& segment) :
   m_startTrajectory3D(segment.getTrajectory2D()),
   m_endTrajectory3D(segment.getTrajectory2D())
 {
@@ -305,27 +302,20 @@ void CDCTrack::appendNotTaken(const std::vector<const CDCWireHit*>& hits)
 }
 
 
-
-bool CDCTrack::fillInto(genfit::TrackCand& trackCand) const
-{
-  GenfitUtil::fill(trackCand, *this);
-  return getStartTrajectory3D().fillInto(trackCand);
-}
-
 bool CDCTrack::storeInto(StoreArray<RecoTrack>& recoTracks) const
 {
   RecoTrack* newRecoTrack = getStartTrajectory3D().storeInto(recoTracks);
   if (newRecoTrack) {
-    GenfitUtil::fill(*newRecoTrack, *this);
+    RecoTrackUtil::fill(*this, *newRecoTrack);
   }
   return true;
 }
 
 
 
-std::vector<CDCRecoSegment3D> CDCTrack::splitIntoSegments() const
+std::vector<CDCSegment3D> CDCTrack::splitIntoSegments() const
 {
-  vector<CDCRecoSegment3D> result;
+  vector<CDCSegment3D> result;
   ISuperLayer lastISuperLayer = -1;
   for (const CDCRecoHit3D& recoHit3D : *this) {
     ISuperLayer iSuperLayer = recoHit3D.getISuperLayer();
@@ -415,8 +405,9 @@ void CDCTrack::shiftToPositiveArcLengths2D(bool doForAllTracks)
     const double shiftValue = startTrajectory2D.getLocalCircle()->arcLengthPeriod();
     if (std::isfinite(shiftValue)) {
       for (CDCRecoHit3D& recoHit : *this) {
-        if (recoHit.getArcLength2D() < 0)
+        if (recoHit.getArcLength2D() < 0) {
           recoHit.shiftArcLength2D(shiftValue);
+        }
       }
     }
   }

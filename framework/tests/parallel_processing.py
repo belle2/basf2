@@ -66,8 +66,11 @@ if not simulation.has_properties(ModulePropFlags.PARALLELPROCESSINGCERTIFIED):
 set_nprocesses(5)
 process(main)
 
-assert statistics.get(simulation).calls(statistics.EVENT) == 5
 print(statistics)
+print(statistics(statistics.TOTAL))
+assert statistics.get(simulation).calls(statistics.EVENT) == 5
+# +1 because of extra call to master module
+assert statistics.get_global().calls(statistics.EVENT) == 6
 
 # check wether output file contains correct number of events
 file = TFile('parallel_processing_test.root')

@@ -400,6 +400,13 @@ namespace Belle2 {
      */
     bool hasProblematicCrystal() const;
 
+    /** Return unique identifier */
+    int getUniqueId() const
+    {
+      return 100000 * m_connectedRegionId + 1000 * m_hypothesisId + m_showerId;
+    }
+
+
   private:
     bool m_isTrk;                   /**< Match with track (GDN) */
 
@@ -438,7 +445,8 @@ namespace Belle2 {
     // 7: added centralCellId (TF)
     // 8: added zernikeMVA, removed absZernike20, 42, 53 (AH)
     // 9: renamed variables according to the new mdst scheme (TF)
-    ClassDef(ECLShower, 9);/**< ClassDef */
+    // 10: added getUniqueId()
+    ClassDef(ECLShower, 10);/**< ClassDef */
 
   };
 

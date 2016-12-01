@@ -29,7 +29,7 @@ using namespace std;
 using namespace Belle2;
 
 
-Database* Database::s_instance = 0;
+std::unique_ptr<Database> Database::s_instance{nullptr};
 
 Database& Database::Instance()
 {
@@ -45,7 +45,7 @@ Database& Database::Instance()
 void Database::setInstance(Database* database)
 {
   if (s_instance) {
-    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance);
+    DatabaseChain* chain = dynamic_cast<DatabaseChain*>(s_instance.get());
     DatabaseChain* replacement = dynamic_cast<DatabaseChain*>(database);
     if (replacement && chain) {
       B2DEBUG(200, "Replacing DatabaseChain with DatabaseChain: ignored");
@@ -54,32 +54,27 @@ void Database::setInstance(Database* database)
       chain->addDatabase(database);
     } else if (replacement) {
       B2DEBUG(200, "Replacing Database with DatabaseChain: adding existing database to chain");
-      Database* old = s_instance;
-      s_instance = replacement;
+      Database* old = s_instance.release();
+      s_instance.reset(replacement);
       replacement->addDatabase(old);
     } else {
       B2WARNING("The already created database instance is replaced by a new instance.");
-      delete s_instance;
-      s_instance = database;
+      s_instance.reset(database);
       DBStore::Instance().reset();
     }
   } else {
-    s_instance = database;
+    s_instance.reset(database);
   }
 }
 
 void Database::reset()
 {
-  delete s_instance;
-  s_instance = 0;
+  s_instance.reset();
   DBStore::Instance().reset();
 }
 
 
-Database::~Database()
-{
-  if (s_instance == this) s_instance = 0;
-}
+Database::~Database() {}
 
 
 void Database::getData(const EventMetaData& event, std::list<DBQuery>& query)

@@ -244,6 +244,12 @@ namespace Belle2 {
     }
 
     /**
+     * Updates particle mass with the mass of the particle corresponding to the given PDG.
+     * @param pdgCode PDG code of the particle with the desired mass
+     */
+    void updateMass(const int pdgCode);
+
+    /**
      * Appends index of daughter to daughters index array
      * @param daughter pointer to the daughter particle
      */

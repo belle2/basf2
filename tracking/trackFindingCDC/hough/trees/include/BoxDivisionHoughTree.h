@@ -28,7 +28,7 @@ namespace Belle2 {
      *  A fast hough algorithm with rectangular boxes, which are split linearly by a fixed number of
      *  divisions in each coordinate up to a maximal level.
      */
-    template<class AItemPtr, class AHoughBox, size_t ... divisions>
+    template <class AItemPtr, class AHoughBox, size_t ... divisions>
     class BoxDivisionHoughTree {
 
     public:
@@ -42,19 +42,19 @@ namespace Belle2 {
       using HoughTree = WeightedFastHoughTree<AItemPtr, HoughBox, BoxDivision>;
 
       /// Type of the coordinate I.
-      template<size_t I>
+      template <size_t I>
       using Type = typename HoughBox::template Type<I>;
 
       /// Predicate that the given type is indeed a coordinate of the hough space
-      template<class T>
+      template <class T>
       using HasType = typename HoughBox::template HasType<T>;
 
       /// Function to get the coordinate index from its type
-      template<class T>
+      template <class T>
       using TypeIndex = typename HoughBox::template TypeIndex<T>;
 
       /// Type of the width in coordinate I.
-      template<size_t I>
+      template <size_t I>
       using Width = typename HoughBox::template Width<I>;
 
       /// Type of the nodes used in the tree for the search.
@@ -62,15 +62,16 @@ namespace Belle2 {
 
     public:
       /// Constructor using the given maximal level.
-      template<class...  RangeSpecOverlap>
-      explicit BoxDivisionHoughTree(size_t maxLevel) :
-        m_maxLevel(maxLevel),
-        m_overlaps((divisions * 0) ...)
-      {}
+      template <class... RangeSpecOverlap>
+      explicit BoxDivisionHoughTree(size_t maxLevel)
+        : m_maxLevel(maxLevel)
+        , m_overlaps((divisions * 0)...)
+      {
+      }
 
     private:
       /// Type of the discrete value array to coordinate index I.
-      template<size_t I>
+      template <size_t I>
       using Array = typename Type<I>::Array;
 
       /// Tuple type of the discrete value arrays
@@ -78,8 +79,10 @@ namespace Belle2 {
 
     public:
       /// Getter the number of divisions at each level for coordinate index I.
-      size_t getDivision(const size_t i) const
-      { return m_divisions[i]; }
+      size_t getDivision(size_t i) const
+      {
+        return m_divisions[i];
+      }
 
       /**
        *  Construct the discrete value array at coordinate index I
@@ -90,9 +93,9 @@ namespace Belle2 {
        *  @param width       Width of the bins at lowest level. Default is width of 1.
        *                     Usually this is counted in numbers of discrete values
        */
-      template<size_t I>
-      void constructArray(const double lowerBound,
-                          const double upperBound,
+      template <size_t I>
+      void constructArray(double lowerBound,
+                          double upperBound,
                           const Width<I>& overlap = 0,
                           Width<I> width = 0)
       {
@@ -107,39 +110,29 @@ namespace Belle2 {
         const auto nPositions = (width - overlap) * nBins + overlap + 1;
         std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
         std::get<I>(m_overlaps) = overlap;
-
-        const Array<I>& array  = std::get<I>(m_arrays);
-
-        B2INFO("Constructing array for coordinate " << I);
-        B2INFO("Lower value " << array.front());
-        B2INFO("Upper value " << array.back());
       }
 
       /// Provide an externally constructed array by coordinate index
-      template<size_t I>
+      template <size_t I>
       void
       assignArray(Array<I> array, Width<I> overlap)
       {
-        // Double move assignment idiom
         std::get<I>(m_arrays) = std::move(array);
         std::get<I>(m_overlaps) = overlap;
       }
 
       /// Provide an externally constructed array by coordinate type
-      template<class T>
+      template <class T>
       EnableIf< HasType<T>::value, void>
       assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap)
       {
-        // Double move assignment idiom
-        // Double move assignment idiom
         std::get<TypeIndex<T>::value >(m_arrays) = std::move(array);
         std::get<TypeIndex<T>::value >(m_overlaps) = overlap;
-
       }
 
     public:
       /// Initialise the algorithm by constructing the hough tree from the parameters
-      virtual void initialize()
+      void initialize()
       {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
@@ -148,7 +141,7 @@ namespace Belle2 {
       }
 
       /// Prepare the leave finding by filling the top node with given hits
-      template<class AItemPtrs>
+      template <class AItemPtrs>
       void seed(const AItemPtrs& items)
       {
         if (not m_houghTree) { initialize(); }
@@ -156,47 +149,63 @@ namespace Belle2 {
       }
 
       /// Terminates the processing by striping all hit information from the tree
-      virtual void fell()
-      { m_houghTree->fell(); }
+      void fell()
+      {
+        m_houghTree->fell();
+      }
 
       /// Release all memory that the tree aquired during the runs.
-      virtual void raze()
-      { m_houghTree->raze(); }
+      void raze()
+      {
+        m_houghTree->raze();
+      }
 
     public:
       /// Getter for the tree used in the search in the hough plane.
       HoughTree* getTree() const
-      { return m_houghTree.get(); }
+      {
+        return m_houghTree.get();
+      }
 
       /// Getter for the currently set maximal level
       size_t getMaxLevel() const
-      { return m_maxLevel; }
+      {
+        return m_maxLevel;
+      }
 
       /// Setter maximal level of the hough tree.
       void setMaxLevel(size_t maxLevel)
-      { m_maxLevel = maxLevel; }
+      {
+        m_maxLevel = maxLevel;
+      }
 
       /// Getter for the array of discrete value for coordinate I.
-      template<size_t I>
+      template <size_t I>
       const Array<I>& getArray() const
-      { return std::get<I>(m_arrays); }
+      {
+        return std::get<I>(m_arrays);
+      }
 
     private:
       /// Construct the box of the top node of the tree. Implementation unroling the indices.
-      template<size_t ... Is>
-      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>&)
-      { return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...); }
+      template <size_t... Is>
+      HoughBox constructHoughPlaneImpl(const IndexSequence<Is...>& is __attribute__((unused)))
+      {
+        return HoughBox(Type<Is>::getRange(std::get<Is>(m_arrays))...);
+      }
 
       /// Construct the box of the top node of the tree.
       HoughBox constructHoughPlane()
-      { return constructHoughPlaneImpl(GenIndices<sizeof ...(divisions)>()); }
+      {
+        return constructHoughPlaneImpl(GenIndices<sizeof...(divisions)>());
+      }
 
     private:
       /// Number of the maximum tree level.
       size_t m_maxLevel;
 
       /// Array of the number of divisions at each level
-      const std::array<size_t, sizeof ...(divisions)> m_divisions{{divisions ...}};
+      const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};
 
       /// An tuple of division overlaps in each coordinate.
       typename HoughBox::Delta m_overlaps;
@@ -205,7 +214,7 @@ namespace Belle2 {
       Arrays m_arrays;
 
       /// Dynamic hough tree structure traversed in the leaf search.
-      std::unique_ptr<HoughTree> m_houghTree{nullptr};
+      std::unique_ptr<HoughTree> m_houghTree = nullptr;
     };
   }
 }

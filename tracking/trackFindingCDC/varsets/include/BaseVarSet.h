@@ -9,6 +9,7 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/utilities/ProcessingSignalListener.h>
 
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
@@ -25,75 +26,71 @@ namespace Belle2 {
      *  Generic class that generates some named float values from a given object.
      *
      *  Base class defining the interface for various different implementation of sets of variables.
-     **/
+     */
     template<class AObject>
-    class BaseVarSet {
+    class BaseVarSet : public ProcessingSignalListener {
 
     public:
       /// Object type from which variables shall be extracted.
-      typedef AObject Object;
+      using Object = AObject;
 
     public:
       /// Making destructor virtual
       virtual ~BaseVarSet() = default;
 
       /**
-       *  Initialize the variable set before event processing.
-       *  Can be specialised if the derived variable set has setup work to do.
-       */
-      virtual void initialize()
-      {}
-
-      /// Allow setup work to take place at beginning of new run
-      virtual void beginRun()
-      {}
-
-      /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent()
-      {}
-
-      /// Allow clean up to take place at end of run
-      virtual void endRun()
-      {}
-
-      /**
-       *  Terminate the variable set after event processing.
-       *  Can be specialised if the derived variable set has to tear down aquired resources.
-       */
-      virtual void terminate()
-      {}
-
-      /**
        *  Main method that extracts the variable values from the complex object.
        *  @returns  Indication whether the extraction could be completed successfully.
        *            Base implementation returns always true.
        */
-      virtual bool extract(const Object* /*obj*/)
-      { return true; }
+      virtual bool extract(const Object* obj __attribute__((unused)))
+      {
+        return true;
+      }
 
       /// Method for extraction from an object instead of a pointer.
       bool extract(const Object& obj)
-      { return extract(&obj); }
+      {
+        return extract(&obj);
+      }
 
       /**
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
+       *  @param prefix Name prefix to apply to all variable names.
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string /*prefix*/ = "")
-      { return {}; }
+      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix __attribute__((unused)))
+      {
+        return {};
+      }
+
+      /// Getter for the named references to the individual variables
+      std::vector<Named<Float_t*> > getNamedVariables()
+      {
+        const std::string prefix = "";
+        return this->getNamedVariables(prefix);
+      }
 
       /**
        *  Getter for a map of names to float values
+       *  @param prefix Name prefix to apply to all variable names.
        */
-      virtual std::map<std::string, Float_t> getNamedValues(std::string prefix = "")
+      std::map<std::string, Float_t> getNamedValues(std::string prefix)
       {
         std::map<std::string, Float_t> result;
-        std::vector<Named<Float_t*> > namedVariables = getNamedVariables(prefix);
-        for (const Named<Float_t* >& namedVariable : namedVariables) {
+        std::vector<Named<Float_t*> > namedVariables = this->getNamedVariables(prefix);
+        for (const Named<Float_t*>& namedVariable : namedVariables) {
           Float_t* variable = namedVariable;
           result[namedVariable.getName()] = *variable;
         }
         return result;
+      }
+
+      /// Getter for a map of names to float values
+      std::map<std::string, Float_t> getNamedValues()
+      {
+        const std::string prefix = "";
+        return this->getNamedValues(prefix);
       }
 
       /**
@@ -102,7 +99,7 @@ namespace Belle2 {
        */
       virtual MayBePtr<Float_t> find(std::string varName)
       {
-        std::vector<Named<Float_t*> > namedVariables = getNamedVariables();
+        std::vector<Named<Float_t*> > namedVariables = this->getNamedVariables();
         for (const Named<Float_t* >& namedVariable : namedVariables) {
           if (namedVariable.getName() == varName) {
             Float_t* variable = namedVariable;
@@ -111,7 +108,6 @@ namespace Belle2 {
         }
         return nullptr;
       }
-
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

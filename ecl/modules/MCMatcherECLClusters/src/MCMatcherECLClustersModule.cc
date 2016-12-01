@@ -95,16 +95,33 @@ void MCMatcherECLClustersModule::event()
       if (ind >= 0 && w > 0) cd2p.add(ind, re.getFromIndex(), w);
     }
 
+    //------------------------------------------
     // relation from ECLShower to MC particle
+    //------------------------------------------
     for (const ECLShower& shower : m_eclShowers) {
-      double w = 0;
-      for (const ECLCalDigit& cd : shower.getRelationsTo<ECLCalDigit>()) {
-        int id = cd.getCellId() - 1;
-        std::map<int, double>::const_iterator it = e.find(id);
-        if (it != e.end()) w += (*it).second;
+
+      double shower_mcParWeight = 0; //Weight between shower and MCParticle
+
+      //Loop on ECLCalDigits related to this MCParticle
+      const auto shower_CalDigitRelations = shower.getRelationsTo<ECLCalDigit>();
+      for (unsigned int iRelation = 0; iRelation < shower_CalDigitRelations.size(); ++iRelation) {
+
+        //Retrieve calDigit
+        const ECLCalDigit* calDigit = shower_CalDigitRelations.object(iRelation);
+
+        //Retrieve weight between calDigit and shower
+        //Important if the calDigit is related to multiple showers with different weights (e.g. with high energy pi0)
+        const double calDigit_showerWeight = shower_CalDigitRelations.weight(iRelation);
+
+        int id = calDigit->getCellId() - 1;
+        auto it = e.find(id);
+        if (it != e.end()) {
+          const double calDigit_mcParWeight = (*it).second;
+          shower_mcParWeight += (calDigit_mcParWeight * calDigit_showerWeight);
+        }
       }
-      if (w > 0)
-        shower.addRelationTo(mcs[re.getFromIndex()], w);
+      if (shower_mcParWeight > 0)
+        shower.addRelationTo(mcs[re.getFromIndex()], shower_mcParWeight);
     }
   }
 

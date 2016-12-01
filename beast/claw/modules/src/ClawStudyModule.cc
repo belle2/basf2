@@ -185,30 +185,32 @@ void ClawStudyModule::event()
 
   for (const auto& Hit : Hits) {
     const int detNb = Hit.getdetNb();
-    const int timebin = Hit.gettime();
-    const float edep = Hit.getedep();
-    const float pe = Hit.getPE();
-    h_claws_hitrate1->Fill(detNb);
-    h_claws_hitrate1W->Fill(detNb, rate);
-    h_claws_rate1[detNb]->Fill(pe);
-    h_claws_rate1W[detNb]->Fill(pe, rate);
-    h_claws_rs_rate1[detNb]->Fill(pe, ring_section);
-    h_claws_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
-    h_claws_rs_hitrate1->Fill(detNb, ring_section);
-    h_claws_rs_hitrate1W->Fill(detNb, ring_section, rate);
-    h_claws_pe1[detNb]->Fill(timebin, pe);
-    h_claws_pe1W[detNb]->Fill(timebin, pe, rate);
-    if (edep > m_Ethres) {
-      h_claws_hitrate2->Fill(detNb);
-      h_claws_hitrate2W->Fill(detNb, rate);
-      h_claws_rate2[detNb]->Fill(pe);
-      h_claws_rate2W[detNb]->Fill(pe, rate);
-      h_claws_rs_rate2[detNb]->Fill(pe, ring_section);
-      h_claws_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
-      h_claws_rs_hitrate2->Fill(detNb, ring_section);
-      h_claws_rs_hitrate2W->Fill(detNb, ring_section, rate);
-      h_claws_pe2[detNb]->Fill(timebin, pe);
-      h_claws_pe2W[detNb]->Fill(timebin, pe, rate);
+    if (detNb < 8) {
+      const int timebin = Hit.gettime();
+      const float edep = Hit.getedep();
+      const float pe = Hit.getPE();
+      h_claws_hitrate1->Fill(detNb);
+      h_claws_hitrate1W->Fill(detNb, rate);
+      h_claws_rate1[detNb]->Fill(pe);
+      h_claws_rate1W[detNb]->Fill(pe, rate);
+      h_claws_rs_rate1[detNb]->Fill(pe, ring_section);
+      h_claws_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
+      h_claws_rs_hitrate1->Fill(detNb, ring_section);
+      h_claws_rs_hitrate1W->Fill(detNb, ring_section, rate);
+      h_claws_pe1[detNb]->Fill(timebin, pe);
+      h_claws_pe1W[detNb]->Fill(timebin, pe, rate);
+      if (edep > m_Ethres) {
+        h_claws_hitrate2->Fill(detNb);
+        h_claws_hitrate2W->Fill(detNb, rate);
+        h_claws_rate2[detNb]->Fill(pe);
+        h_claws_rate2W[detNb]->Fill(pe, rate);
+        h_claws_rs_rate2[detNb]->Fill(pe, ring_section);
+        h_claws_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
+        h_claws_rs_hitrate2->Fill(detNb, ring_section);
+        h_claws_rs_hitrate2W->Fill(detNb, ring_section, rate);
+        h_claws_pe2[detNb]->Fill(timebin, pe);
+        h_claws_pe2W[detNb]->Fill(timebin, pe, rate);
+      }
     }
   }
 

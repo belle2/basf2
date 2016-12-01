@@ -11,7 +11,6 @@
 #pragma once
 
 #include <vector>
-#include <string>
 #include <framework/gearbox/GearDir.h>
 #include <TObject.h>
 #include <TTree.h>

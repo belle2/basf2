@@ -9,67 +9,74 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+
+#include <tracking/trackFindingCDC/topology/ISuperLayer.h>
+
 #include <vector>
+#include <array>
+#include <string>
 #include <algorithm>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the axial stereo segment pairs.
-    template<class ASegmentTripleFilter>
+    template <class ASegmentTripleFilter>
     class SegmentTripleCreator
-      : public Findlet<const CDCRecoSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple> {
+      : public Findlet<const CDCSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCRecoSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple>;
+      using Super = Findlet<const CDCSegment2D, const CDCAxialSegmentPair, CDCSegmentTriple>;
 
     public:
       /// Constructor adding the filter as a subordinary processing signal listener.
       SegmentTripleCreator()
       {
-        addProcessingSignalListener(&m_segmentTripleFilter);
+        this->addProcessingSignalListener(&m_segmentTripleFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
+      std::string getDescription() override final
       {
-        return "Creates segment triple from a set of segments  and already combined segment pairs filtered by some acceptance criterion";
+        return "Creates segment triples from a set of middle segments and already combined axial "
+               "segment pairs filtered by some acceptance criterion";
       }
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
       {
         m_segmentTripleFilter.exposeParameters(moduleParamList, prefix);
       }
 
       /// Main method constructing pairs in adjacent super layers
-      virtual void apply(const std::vector<CDCRecoSegment2D>& inputSegments,
-                         const std::vector<CDCAxialSegmentPair>& inputAxialSegmentPairs,
-                         std::vector<CDCSegmentTriple>& segmentTriples) override
+      void apply(const std::vector<CDCSegment2D>& inputSegments,
+                 const std::vector<CDCAxialSegmentPair>& inputAxialSegmentPairs,
+                 std::vector<CDCSegmentTriple>& segmentTriples) override final
       {
         // Group the segments by their super layer id
-        for (std::vector<const CDCRecoSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
+        for (std::vector<const CDCSegment2D*>& segementsInSuperLayer : m_segmentsBySuperLayer) {
           segementsInSuperLayer.clear();
         }
 
-        for (const CDCRecoSegment2D& segment : inputSegments) {
+        for (const CDCSegment2D& segment : inputSegments) {
           ISuperLayer iSuperLayer = segment.getISuperLayer();
-          const CDCRecoSegment2D* ptrSegment = &segment;
+          const CDCSegment2D* ptrSegment = &segment;
           m_segmentsBySuperLayer[iSuperLayer].push_back(ptrSegment);
         }
 
         for (const CDCAxialSegmentPair& axialSegmentPair : inputAxialSegmentPairs) {
-          const CDCRecoSegment2D* startSegmentPtr = axialSegmentPair.getStartSegment();
-          const CDCRecoSegment2D* endSegmentPtr = axialSegmentPair.getEndSegment();
+          const CDCSegment2D* startSegment = axialSegmentPair.getStartSegment();
+          const CDCSegment2D* endSegment = axialSegmentPair.getEndSegment();
 
-          ISuperLayer startISuperLayer = startSegmentPtr->getISuperLayer();
-          ISuperLayer endISuperLayer = endSegmentPtr->getISuperLayer();
+          ISuperLayer startISuperLayer = startSegment->getISuperLayer();
+          ISuperLayer endISuperLayer = endSegment->getISuperLayer();
 
           B2ASSERT("Invalid start ISuperLayer", ISuperLayerUtil::isAxial(startISuperLayer));
           B2ASSERT("Invalid end ISuperLayer", ISuperLayerUtil::isAxial(endISuperLayer));
@@ -80,9 +87,9 @@ namespace Belle2 {
             B2ASSERT("Middle ISuperLayer is not stereo",
                      not ISuperLayerUtil::isAxial(middleISuperLayer));
 
-            const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs
-              = m_segmentsBySuperLayer[middleISuperLayer];
-            create(axialSegmentPair, middleSegmentPtrs, segmentTriples);
+            const std::vector<const CDCSegment2D*>& middleSegments =
+              m_segmentsBySuperLayer[middleISuperLayer];
+            create(axialSegmentPair, middleSegments, segmentTriples);
           } else {
             // Case where start and end super layer are the same
             // Look for stereo segments in the adjacent super layer
@@ -90,37 +97,32 @@ namespace Belle2 {
             ISuperLayer middleISuperLayerOut = ISuperLayerUtil::getNextOutwards(startISuperLayer);
             for (ISuperLayer middleISuperLayer : {middleISuperLayerIn, middleISuperLayerOut}) {
               if (ISuperLayerUtil::isInCDC(middleISuperLayer)) {
-                const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs
+                const std::vector<const CDCSegment2D*>& middleSegments
                   = m_segmentsBySuperLayer[middleISuperLayer];
-                create(axialSegmentPair, middleSegmentPtrs, segmentTriples);
+                create(axialSegmentPair, middleSegments, segmentTriples);
               }
             }
           }
         }
-        std::sort(std::begin(segmentTriples), std::end(segmentTriples));
+        std::sort(segmentTriples.begin(), segmentTriples.end());
       }
 
     private:
-      /// Creates segment pairs from a combination of start segments and end segments.
-      inline void create(const CDCAxialSegmentPair& axialSegmentPair,
-                         const std::vector<const CDCRecoSegment2D*>& middleSegmentPtrs,
-                         std::vector<CDCSegmentTriple>& segmentTriples)
+      /// Creates segment triples by adding the middle segment to the axial segments and filter out the valuable combinations
+      void create(const CDCAxialSegmentPair& axialSegmentPair,
+                  const std::vector<const CDCSegment2D*>& middleSegments,
+                  std::vector<CDCSegmentTriple>& segmentTriples)
       {
         CDCSegmentTriple segmentTriple(axialSegmentPair);
-        for (const CDCRecoSegment2D* middleSegmentPtr : middleSegmentPtrs) {
-          segmentTriple.setMiddleSegment(middleSegmentPtr);
+        for (const CDCSegment2D* middleSegment : middleSegments) {
+          segmentTriple.setMiddleSegment(middleSegment);
           segmentTriple.clearTrajectory3D();
 
-          if (not segmentTriple.checkSegments()) {
-            B2ERROR("CDCSegmentTriple containing nullptr encountered in SegmentTripleCreator");
-            continue;
-          }
-
           // Ask the filter to assess this triple
-          CellWeight cellWeight = m_segmentTripleFilter(segmentTriple);
+          Weight weight = m_segmentTripleFilter(segmentTriple);
 
-          if (not isNotACell(cellWeight)) {
-            segmentTriple.getAutomatonCell().setCellWeight(cellWeight);
+          if (not isNotACell(weight)) {
+            segmentTriple.getAutomatonCell().setCellWeight(weight);
             segmentTriples.insert(segmentTriples.end(), segmentTriple);
           }
         }
@@ -128,11 +130,10 @@ namespace Belle2 {
 
     private:
       /// Structure for the segments grouped by super layer id.
-      std::array<std::vector<const CDCRecoSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
+      std::array<std::vector<const CDCSegment2D*>, ISuperLayerUtil::c_N> m_segmentsBySuperLayer;
 
-      /// The filter to be used for the segment pair generation.
+      /// The filter to be used for the segment triple generation.
       ASegmentTripleFilter m_segmentTripleFilter;
-
-    }; //end class FacetCreator
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

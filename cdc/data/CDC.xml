@@ -4,66 +4,15 @@
   <Content>
     <xi:include href="CDC-Covers.xml"/>
     <xi:include href="CDC-NeutronShields.xml"/>
-    <SensitiveDetector>
-      <!-- If you need Simhit with edep=0, set negative value ex. -1.0 or -10.0 -->
-      <EnergyDepositionThreshold desc="All hits with smaller energy will be dropped at SensitiveDetector level" unit="eV">0.0</EnergyDepositionThreshold>  
-      <!-- Switch for sense wire (gravitational) sag in FullSim. -->
-      <WireSag desc="true: on; false: off">true</WireSag> 
-      <!-- Switch for left/right flag modified for tracking.> -->
-      <ModifiedLeftRightFlag desc="true: set; false: not set">false</ModifiedLeftRightFlag>  
-      <!-- Min. track length -->
-      <MinTrackLength desc="Min. track length required for saving in MCParticle.; to be applied to all particles other than primaries and decay-daughters." unit="mm">150.0</MinTrackLength>  
-    </SensitiveDetector>
-    <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation> 
+    <GlobalPhiRotation desc="Global rotation in phi; valid only for sense wires now." unit="deg">0.0</GlobalPhiRotation>
     <ClockFrequencyForTDC desc="Frequency (GHz) of the clock used for TDC, where 1.017774 GHz is 2 x (accelerator's RF).">1.017774</ClockFrequencyForTDC>
-    <!-- Material definition mode -->
-    <MaterialDefinitionMode desc="=0: define a mixture of gases and wires in the entire tracking volume; =1: dummy (unavailable now); =2: define all sense and field wires explicitly in the volume.">0</MaterialDefinitionMode>
 
-    <!-- Mode for sense wire z-position correction -->
-    <SenseWireZposMode desc="=1: correct for feedthrough effect; =0: not correct.">1</SenseWireZposMode>
-
-    <!-- Tentative corr. of sense wire z for endplate z -->
-    <!-- <deltazFileName desc="file which contains corrs. for diff. betw. final- and old-design.">deltaz.dat</deltazFileName> -->
-
-    <!-- Switch for printing for debug -->
-    <Debug desc="true: print out; false: not print out.">false</Debug>
-
-    <!-- Switch for loadding x-t etc. (from disk) to be used in digitization -->
-    <XTetc desc="true: load x-t etc. params. from disk; false: not load.">true</XTetc>
-    <!-- Xt file format -->
-    <XtFileFormat desc="=0: old; =1: new.">1</XtFileFormat>
-    <xtFileName desc="file which contains x-t relation">xt_v3.dat</xtFileName>
-    <!-- Sigma file format -->
-    <SigmaFileFormat desc="=0: old; =1: new.">1</SigmaFileFormat>
-    <sigmaFileName desc="file which contains space resol.">sigma_v1.dat</sigmaFileName>
-    <propSpeedFileName desc="file which contains propagation speed">propspeed_v0.dat</propSpeedFileName>
-    <t0FileName desc="file which contains t0">t0.dat</t0FileName>
-    <bwFileName desc="file which contains bad-wire">badwire_v1.dat</bwFileName>
-    <!-- <bwFileName desc="file which contains bad-wire">badwire_sample.dat</bwFileName> -->
-    <twFileName desc="file which contains time-walk">tw_off.dat</twFileName>
-    <chmapFileName desc="file which contains channel map">ch_map.dat</chmapFileName>
-
-    <!-- For displacement -->
-    <Displacement desc="true: load displacements for sense wires; false: not.">true</Displacement>
-    <displacementFileName desc="file which contains displacement params.">displacement_v1.1.dat</displacementFileName>
-
-    <!-- For misalignment -->
-    <Misalignment desc="true: load misalignments for sense wires; false: not.">true</Misalignment>
-    <misalignmentFileName desc="file which contains misalignment params.">misalignment_v2.dat</misalignmentFileName>
-
-    <!-- For alignment -->
-    <Alignment desc="true: load alignments for sense wires; false: not.">true</Alignment>
-    <alignmentFileName desc="file which contains alignment params.">alignment_v2.dat</alignmentFileName>
-
-    <!-- Switch for selecting x-t etc. to be used in reconstruction -->
-    <XTetc4Recon desc="true: use calibrated x-t etc.; false: use the same ones as used in simulation">false</XTetc4Recon>
-    <xt4ReconFileName desc="file which contains x-t relation for reconstruction">xt_v3.dat</xt4ReconFileName>
-    <sigma4ReconFileName desc="file which contains space resol. for reconstruction">sigma_v1.dat</sigma4ReconFileName>
-    <propSpeed4ReconFileName desc="file which contains propagation speed for reconstruction">propspeed_v0.dat</propSpeed4ReconFileName>
-    <t04ReconFileName desc="file which contains t0 for reconstruction">t0.dat</t04ReconFileName>
-    <tw4ReconFileName desc="file which contains time-walk for reconstruction">tw_off.dat</tw4ReconFileName>
-
-    <OffsetZ desc="The offset of the whole cdc in z with respect to the IP (should be the same as beampipe)" unit="mm">0.0</OffsetZ>
+    <OffsetX desc="Offset x of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetX>
+    <OffsetY desc="Offset y of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetY>
+    <OffsetZ desc="Offset z of the whole CDC wrt B2 coord system. N.B. Not fully ready; cannot control wire positions now." unit="mm">0.0</OffsetZ>
+    <OffsetA desc="Offset angle a of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetA>
+    <OffsetB desc="Offset angle b of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetB>
+    <OffsetC desc="Offset angle c of the whole CDC wrt B2 coord system. N.B. Not yet ready." unit="deg">0.0</OffsetC>
     <Helium>CDCHeGas</Helium>
     <Ethane>CDCEthaneGas</Ethane>
     <Aluminum>Al</Aluminum>

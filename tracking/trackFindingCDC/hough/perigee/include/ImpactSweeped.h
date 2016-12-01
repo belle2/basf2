@@ -29,24 +29,24 @@ namespace Belle2 {
 
     public:
       /// The box to which this object correspondes.
-      typedef SweepBox<AImpact, typename T::HoughBox> HoughBox;
+      using HoughBox = SweepBox<AImpact, typename T::HoughBox>;
 
       /// The hough box without the sweep in d0
-      typedef typename T::HoughBox SubordinaryHoughBox;
+      using SubordinaryHoughBox = typename T::HoughBox;
 
     public:
       /** Function that gives the sign of the distance from an observed drift circle to the sweeped object
        */
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& signedDriftLength,
-                                   const float& dxdz = 0,
-                                   const float& dydz = 0,
-                                   ILayer iCLayer = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            float x,
+                            float y,
+                            float signedDriftLength,
+                            float dxdz = 0,
+                            float dydz = 0,
+                            ILayer iCLayer = -1) const
       {
-        const float& lowerImpact(houghBox.template getLowerBound<AImpact>());
-        const float& upperImpact(houghBox.template getUpperBound<AImpact>());
+        float lowerImpact(houghBox.template getLowerBound<AImpact>());
+        float upperImpact(houghBox.template getUpperBound<AImpact>());
         const SubordinaryHoughBox& subordinaryHoughBox = houghBox.getSubordinaryBox();
 
         const float lowerY = y - lowerImpact;
@@ -66,5 +66,5 @@ namespace Belle2 {
         return ESignUtil::common(lowerDistSign, upperDistSign);
       }
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

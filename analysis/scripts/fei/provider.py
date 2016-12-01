@@ -480,7 +480,7 @@ def SignalProbability(resource: fei.dag.Resource, databasePrefix: str, particleL
         @param databasePrefix used to store the generated weightfile
         @param particleList the particleList which is used for training and classification
         @param mvaConfig configuration for the multivariate analysis
-        @param tmvaPrefix used to train teh TMVA classifier
+        @param mvaPrefix used to train teh MVA classifier
         @return string config filename
     """
     resource.cache = True
@@ -650,7 +650,7 @@ def SaveSummary(resource: fei.dag.Resource, mcCounts: typing.Mapping[int, typing
         @param clists raw channel list names
         @param mlists matched channel list names
         @param cnames channel names of each channel
-        @param trainingData filename of TMVA training data input for each channel
+        @param trainingData filename of MVA training data input for each channel
     """
 
     resource.cache = True

@@ -26,16 +26,29 @@ namespace Belle2 {
     class QuadTreeProcessorTemplate {
 
     public:
-      typedef QuadTreeItem<typeData> ItemType; /**< The QuadTree will only see items of this type */
-      typedef std::vector<typeData*> ReturnList; /**< The type of the list of result items returned to the lambda function */
-      typedef QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY> QuadTree;  /**< The used QuadTree */
-      typedef std::function< void(const ReturnList&, QuadTree*) >
-      CandidateProcessorLambda;   /**< This lambda function can be used for postprocessing */
-      typedef typename QuadTree::Children QuadTreeChildren; /**< A typedef for the QuadTree Children */
+      /// The QuadTree will only see items of this type
+      using ItemType = QuadTreeItem<typeData>;
 
-      typedef std::pair<typeX, typeX> rangeX;   /**< This pair describes the range in X for a node */
-      typedef std::pair<typeY, typeY> rangeY;   /**< This pair describes the range in Y for a node */
-      typedef std::pair<rangeX, rangeY> ChildRanges; /**< This pair of ranges describes the range of a node */
+      /// The type of the list of result items returned to the lambda function
+      using ReturnList = std::vector<typeData*>;
+
+      /// The used QuadTree
+      using QuadTree = QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY>;
+
+      /// This lambda function can be used for postprocessing
+      using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
+
+      /// Alias for the QuadTree Children
+      using QuadTreeChildren = typename QuadTree::Children;
+
+      /// This pair describes the range in X for a node
+      using rangeX = std::pair<typeX, typeX>;
+
+      /// This pair describes the range in Y for a node
+      using rangeY = std::pair<typeY, typeY>;
+
+      /// This pair of ranges describes the range of a node
+      using ChildRanges = std::pair<rangeX, rangeY>;
 
       /// QuadTree can access private members
       friend QuadTree;
@@ -91,9 +104,10 @@ namespace Belle2 {
       /**
        * Implement that function if you want to provide a new processor. It is called when filling the quad tree after creation.
        * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
-       * @param node = child node
-       * @param item = item to be filled into the child node or not
-       * @param iX, iY the indices of the child node.
+       * @param node  child node
+       * @param item  item to be filled into the child node or not
+       * @param iX    index in x axes of the node
+       * @param iY    index in y axes of the node
        * @return true if this item belongs into this node.
        */
       virtual bool insertItemInNode(QuadTree* node, typeData* item, unsigned int iX, unsigned int iY) const = 0;
@@ -169,7 +183,7 @@ namespace Belle2 {
       /**
        * Return the parameter last level.
        */
-      inline unsigned int getLastLevel() const
+      unsigned int getLastLevel() const
       {
         return m_lastLevel;
       }
@@ -185,8 +199,9 @@ namespace Belle2 {
 
         //Voting within the four bins
         for (ItemType* item : items) {
-          if (item->isUsed())
+          if (item->isUsed()) {
             continue;
+          }
 
           for (int t_index = 0; t_index < binCountX; ++t_index) {
             for (int r_index = 0; r_index < binCountY; ++r_index) {
@@ -207,8 +222,11 @@ namespace Belle2 {
        */
       virtual bool checkIfLastLevel(QuadTree* node)
       {
-        if (node->getLevel() >= getLastLevel()) return true;
-        else return false;
+        if (node->getLevel() >= getLastLevel()) {
+          return true;
+        } else {
+          return false;
+        }
       }
 
 
@@ -221,11 +239,14 @@ namespace Belle2 {
       {
         B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
                 (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
-        if (node->getItemsVector().size() < nItemsThreshold)
+        if (node->getItemsVector().size() < nItemsThreshold) {
           return;
+        }
         if (checkThreshold) {
-          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold)  && (fabs(node->getYMax()) > rThreshold))
+          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold) &&
+              (fabs(node->getYMax()) > rThreshold)) {
             return;
+          }
         }
 
         if (checkIfLastLevel(node)) {
@@ -233,8 +254,9 @@ namespace Belle2 {
           return;
         }
 
-        if (node->getChildren() == nullptr)
+        if (node->getChildren() == nullptr) {
           node->initializeChildren(*this);
+        }
 
         if (!node->checkFilled()) {
           fillChildren(node, node->getItemsVector());
@@ -245,9 +267,11 @@ namespace Belle2 {
         constexpr int m_nbins_r = binCountY;
 
         bool binUsed[m_nbins_theta][m_nbins_r];
-        for (int iX = 0; iX < m_nbins_theta; iX++)
-          for (int iY = 0; iY < m_nbins_r; iY++)
+        for (int iX = 0; iX < m_nbins_theta; iX++) {
+          for (int iY = 0; iY < m_nbins_r; iY++) {
             binUsed[iX][iY] = false;
+          }
+        }
 
         //Processing, which bins are further investigated
         for (int bin_loop = 0; bin_loop < binCountX * binCountY; bin_loop++) {

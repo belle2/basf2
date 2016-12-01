@@ -50,7 +50,7 @@ class CDCFacetRecordingRun(RecordingRun):
         'filter(chi2)',
     ]
 
-    # varsets = ["tmva", "filter(truth)", ]
+    # varsets = ["mva", "filter(truth)", ]
 
     recording_finder_module = basf2.register_module("SegmentFinderCDCFacetAutomaton")
     recording_filter_parameter_name = "FacetFilterParameters"

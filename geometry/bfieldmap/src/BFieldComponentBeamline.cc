@@ -25,23 +25,25 @@ using namespace Belle2;
 namespace io = boost::iostreams;
 
 double BFieldComponentBeamline::s_mapRegionR[2] = {0., 0.};
-double BFieldComponentBeamline::s_beamAngle = 0.;
+double BFieldComponentBeamline::s_sinBeamCrossAngle = 0.;
+double BFieldComponentBeamline::s_cosBeamCrossAngle = 1.;
 
 bool BFieldComponentBeamline::isInRange(const TVector3& point)
 {
   if (s_mapRegionR[1] <= 0.) return false;
 
-  const double tx(-1.*point.x());
-  const double tz(-1.*point.z());
+  double y2 = point.y() * point.y();
+  double c = s_cosBeamCrossAngle * point.x(), s = s_sinBeamCrossAngle * point.z();
 
-  double rp = sqrt((tx * cos(s_beamAngle) - tz * sin(s_beamAngle)) * (tx * cos(s_beamAngle) - tz * sin(s_beamAngle))
-                   + point.y() * point.y());
-  double rn = sqrt((tx * cos(s_beamAngle) + tz * sin(s_beamAngle)) * (tx * cos(s_beamAngle) + tz * sin(s_beamAngle))
-                   + point.y() * point.y());
+  double rp = pow(c - s, 2) + y2;
+  double rn = pow(c + s, 2) + y2;
 
-  if (rp >= s_mapRegionR[0] && rp <= s_mapRegionR[1])
+  const double R02 = pow(s_mapRegionR[0], 2);
+  const double R12 = pow(s_mapRegionR[1], 2);
+
+  if (rp >= R02 && rp <= R12)
     return true;
-  else if (rn >= s_mapRegionR[0] && rn <= s_mapRegionR[1])
+  else if (rn >= R02 && rn <= R12)
     return true;
   else
     return false;
@@ -164,32 +166,28 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
 {
   BFieldPoint** mapBuffer;
   InterpolationPoint** interBuffer;
-  double rotate_angle;
   int offsetRPhi;
-  //double mapSizeRPhi;  ---> Temporarily masked because this variable is not used
 
   //added by nakayama to avoid segV
   if (TMath::Abs(point0.z()) > 399.) return TVector3(0., 0., 0.);
 
+  //from GEANT4 coordinate to ANSYS coordinate
+  //fabs(y) is used because field data exist only in y>0
+  const double
+  tx = -point0.x(),
+  ty = std::abs(point0.y()),
+  tz = -point0.z();
+
+  double sinBeamCrossAngle = (isher == 1) ? s_sinBeamCrossAngle : -s_sinBeamCrossAngle;
+  TVector3 point(tx * s_cosBeamCrossAngle - tz * sinBeamCrossAngle, ty, tz * s_cosBeamCrossAngle + tx * sinBeamCrossAngle);
   if (isher == 1) {
     mapBuffer = m_mapBuffer_her;
     interBuffer = m_interBuffer_her;
-    rotate_angle = s_beamAngle;
   } else {
     mapBuffer = m_mapBuffer_ler;
     interBuffer = m_interBuffer_ler;
-    rotate_angle = -1. * s_beamAngle;
   }
   offsetRPhi = m_offsetGridRPhi[isher];
-  //mapSizeRPhi = m_mapSizeRPhi[isher]; ---> Temporarily masked because this variable is not used
-
-  //from GEANT4 coordinate to ANSYS coordinate
-  //fabs(y) is used because field data exist only in y>0
-  const double tx(-1.*point0.x());
-  const double tz(-1.*point0.z());
-  TVector3 point(tx * cos(rotate_angle) - tz * sin(rotate_angle), fabs(point0.y()),
-                 tz * cos(rotate_angle) + tx * sin(rotate_angle));
-
 
   //Get the r and z component
   double r = point.Perp();
@@ -337,13 +335,12 @@ TVector3 BFieldComponentBeamline::calculate_beamline(const TVector3& point0, int
   if (point0.y() == 0) By = 0.;
 
   //if y<0 fabs(y), By should be flipped
-  if (point0.y() < 0) By = -1.*By;
+  if (point0.y() < 0) By = -By;
 
   //from ANSYS Coordinate to GEANT4 Coordinate
-  Bx = -1.*Bx;
-  Bz = -1.*Bz;
-  return TVector3(Bx * cos(rotate_angle) + Bz * sin(rotate_angle), By,
-                  Bz * cos(rotate_angle) - Bx * sin(rotate_angle));
+  Bx = -Bx;
+  Bz = -Bz;
+  return TVector3(Bx * s_cosBeamCrossAngle + Bz * sinBeamCrossAngle, By,  Bz * s_cosBeamCrossAngle - Bx * sinBeamCrossAngle);
 }
 
 

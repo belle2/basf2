@@ -50,24 +50,35 @@ namespace Belle2 {
         return common(hits, getFrom<Hit>, EStereoKind::c_Invalid);
       }
 
-      /** Returns the superlayer of an object */
+      /// Returns the superlayer of an object
       template<class T>
       static EStereoKind getFrom(const T& t)
-      { return getFromImpl(t, 0); }
+      {
+        const int dispatchTag = 0;
+        return getFromImpl(t, dispatchTag);
+      }
 
     private:
-      /** Returns the stereo kind of an object. Favored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, int) -> decltype(t.getStereoKind())
-      { return t.getStereoKind(); }
+      /// Returns the stereo kind of an object. Favoured option.
+      template <class T>
+      static auto getFromImpl(const T& t,
+                              int favouredTag __attribute__((unused)))
+      -> decltype(t.getStereoKind())
+      {
+        return t.getStereoKind();
+      }
 
-      /** Returns the stereo kind of an object. Unfavored option. */
-      template<class T>
-      static auto getFromImpl(const T& t, long) -> decltype(t->getStereoKind())
-      { return &*t == nullptr ? EStereoKind::c_Invalid  : t->getStereoKind(); }
+      /// Returns the stereo kind of an object. Disfavoured option.
+      template <class T>
+      static auto getFromImpl(const T& t,
+                              long disfavouredTag __attribute__((unused)))
+      -> decltype(t->getStereoKind())
+      {
+        return &*t == nullptr ? EStereoKind::c_Invalid  : t->getStereoKind();
+      }
 
-    }; // class EStereoKindUtil
+    };
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

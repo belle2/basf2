@@ -85,13 +85,37 @@ namespace Belle2 {
 
     float m_Edep;
 
-    /** E9/E25 */
+    /** E1/E9 */
 
-    float m_E9oE25;
+    float m_E1oE9;
+
+    /** E9/E21 */
+
+    float m_E9oE21;
 
     /** Highest Energy stored in a Crystal in a Cluster (GeV) */
 
     float m_HE;
+
+    /** Absolute value of Zernike moment 40*/
+
+    float m_absZernikeMoment40;
+
+    /** Absolute value of Zernike moment 51*/
+
+    float m_absZernikeMoment51;
+
+    /** Result of MVA using zernike moments */
+
+    float m_zernikeMVA;
+
+    /** Second moment shower shape variable */
+
+    float m_secondMoment;
+
+    /** Lateral energy (LAT) shower shape variable */
+
+    float m_LAT;
 
     /** Number of Crystals in a Cluster */
 

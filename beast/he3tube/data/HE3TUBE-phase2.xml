@@ -38,6 +38,7 @@ whitespace, comma or semi-colon -->
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
@@ -56,6 +57,7 @@ whitespace, comma or semi-colon -->
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
@@ -74,6 +76,7 @@ whitespace, comma or semi-colon -->
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 <Active>
@@ -92,6 +95,7 @@ whitespace, comma or semi-colon -->
 <endcap_hz unit="cm">0.47</endcap_hz>
 <gas_outerRadius unit="cm">2.0</gas_outerRadius>
 <gas_hz unit="cm">7.62</gas_hz>
+<SV_offset_inZ unit="cm">-0.6096</SV_offset_inZ>
 <wire_diameter unit="mm">0.030</wire_diameter>
 </Active>
 

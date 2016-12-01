@@ -57,5 +57,5 @@ namespace Belle2 {
       return result.str();
     }
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

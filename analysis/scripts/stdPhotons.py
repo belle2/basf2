@@ -20,6 +20,11 @@ def loadStdGoodPhoton(path=analysis_main):
     cutAndCopyList('gamma:good', 'gamma:all', '0.5 < goodGamma < 1.5', True, path)
 
 
+def loadStdGoodBellePhoton(path=analysis_main):
+    loadStdAllPhoton(path)
+    cutAndCopyList('gamma:goodBelle', 'gamma:all', '0.5 < goodBelleGamma < 1.5', True, path)
+
+
 def loadStdPhotonE12(path=analysis_main):
     loadStdAllPhoton(path)
     cutAndCopyList('gamma:E12', 'gamma:all', '1.2 < E < 100', True, path)

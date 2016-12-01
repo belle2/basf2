@@ -14,6 +14,6 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    typedef Filter<CDCWireHitCluster> BaseClusterFilter;
+    using BaseClusterFilter = Filter<CDCWireHitCluster>;
   }
 }

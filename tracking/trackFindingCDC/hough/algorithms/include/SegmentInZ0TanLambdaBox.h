@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #pragma once
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectorySZ.h>
 #include <tracking/trackFindingCDC/hough/boxes/Z0TanLambdaBox.h>
 #include <tracking/trackFindingCDC/hough/baseelements/SameSignChecker.h>
@@ -25,33 +25,33 @@ namespace Belle2 {
     public:
 
       /// Use a Z0TanLambdaBox
-      typedef Z0TanLambdaBox HoughBox;
+      using HoughBox = Z0TanLambdaBox;
 
       /**
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const std::pair<CDCRecoSegment3D, CDCTrajectorySZ>& recoSegmentWithTrajectorySZ,
-                               const HoughBox* z0TanLambdaBox)
+      Weight operator()(const std::pair<CDCSegment3D, CDCTrajectorySZ>& segmentWithTrajectorySZ,
+                        const HoughBox* z0TanLambdaBox)
       {
-        const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
-        const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
+        float lowerZ0 = z0TanLambdaBox->getLowerZ0();
+        float upperZ0 = z0TanLambdaBox->getUpperZ0();
 
-        const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
-        const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
+        float lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
+        float upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const CDCTrajectorySZ& szTrajectory = recoSegmentWithTrajectorySZ.second;
-        const CDCRecoSegment3D& recoSegment = recoSegmentWithTrajectorySZ.first;
+        const CDCTrajectorySZ& szTrajectory = segmentWithTrajectorySZ.second;
+        const CDCSegment3D& segment = segmentWithTrajectorySZ.first;
 
-        const float& trajectoryZ0 = szTrajectory.getZ0();
-        const float& trajectoryTanLambda = szTrajectory.getTanLambda();
+        float trajectoryZ0 = szTrajectory.getZ0();
+        float trajectoryTanLambda = szTrajectory.getTanLambda();
 
         if (std::isnan(trajectoryZ0) or std::isnan(trajectoryTanLambda)) {
           return NAN;
         }
 
         if (SameSignChecker::isIn(trajectoryZ0, trajectoryTanLambda, lowerZ0, upperZ0, lowerTanLambda, upperTanLambda)) {
-          return 0.6 * recoSegment.size();
+          return 0.6 * segment.size();
         }
 
         return NAN;

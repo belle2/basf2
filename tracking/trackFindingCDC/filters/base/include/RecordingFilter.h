@@ -10,7 +10,7 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/FilterOnVarSet.h>
-#include <tracking/trackFindingCDC/tmva/Recorder.h>
+#include <tracking/trackFindingCDC/mva/Recorder.h>
 #include <tracking/trackFindingCDC/varsets/NamedFloatTuple.h>
 
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
@@ -53,7 +53,7 @@ namespace Belle2 {
       {}
 
       /// Expose the set of parameters of the filter to the module parameter list.
-      virtual void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
         moduleParamList->addParameter(prefixed(prefix, "rootFileName"),
@@ -73,70 +73,53 @@ namespace Belle2 {
       }
 
       /// Initialize the recorder before event processing.
-      virtual void initialize() override
+      void initialize() override
       {
+        if (m_skimFilter) this->addProcessingSignalListener(m_skimFilter.get());
         Super::initialize();
-        if (m_skimFilter) m_skimFilter->initialize();
         m_recorder.reset(new Recorder(Super::getVarSet().getNamedVariables(),
                                       m_param_rootFileName,
                                       m_param_treeName));
       }
 
-      /// Signal the beginning of a new run to the skimming filter and the varset
-      virtual void beginRun() override
-      {
-        if (m_skimFilter) m_skimFilter->beginRun();
-        Super::beginRun();
-      }
-
-      /// Signal the beginning of a new event to the skimming filter and the varset
-      virtual void beginEvent() override
-      {
-        if (m_skimFilter) m_skimFilter->beginEvent();
-        Super::beginEvent();
-      }
-
-      /// Signal the end of a new run to the skimming filter and the varset
-      virtual void endRun() override
-      {
-        Super::endRun();
-        if (m_skimFilter) m_skimFilter->endRun();
-      }
-
       /// Initialize the recorder after event processing.
-      virtual void terminate() override
+      void terminate() override
       {
         m_recorder->write();
         m_recorder.reset();
-        if (m_skimFilter) m_skimFilter->terminate();
         Super::terminate();
       }
 
     public:
       /// Function to evaluate the cluster for its backgroundness.
-      virtual Weight operator()(const Object& obj) override final
-      {
-        if (m_skimFilter) {
+      Weight operator()(const Object& obj) final {
+        if (m_skimFilter)
+        {
           Weight skimWeight = (*m_skimFilter)(obj);
           if (std::isnan(skimWeight)) return NAN;
         }
 
         Weight extracted = Super::operator()(obj);
-        if (not std::isnan(extracted)) {
+        if (not std::isnan(extracted))
+        {
           m_recorder->capture();
         }
 
         return m_param_returnWeight;
       }
 
-    public:
+    protected:
       /// Getter for the skim filter to select objects to be recorded
       MayBePtr<AFilter> getSkimFilter() const
-      { return m_skimFilter.get(); }
+      {
+        return m_skimFilter.get();
+      }
 
       /// Setter for the skim filter to select objects to be recorded
       void setSkimFilter(std::unique_ptr<AFilter> skimFilter)
-      { m_skimFilter = std::move(skimFilter); }
+      {
+        m_skimFilter = std::move(skimFilter);
+      }
 
     private:
       /// Recorder to write all variable sets of the encountered objects.
@@ -171,7 +154,7 @@ namespace Belle2 {
       /// Constructor of the filter.
       explicit RecordingFilter(const std::string& defaultRootFileName = "records.root",
                                const std::string& defaultTreeName = "records")
-        : Super(std::unique_ptr<AVarSet>(new AVarSet()),
+        : Super(makeUnique<AVarSet>(),
                 defaultRootFileName,
                 defaultTreeName)
       {}

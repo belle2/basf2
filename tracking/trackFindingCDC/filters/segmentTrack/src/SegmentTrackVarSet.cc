@@ -13,16 +13,17 @@
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/fitting/CDCSZFitter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/numerics/ToFinite.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const CDCTrack*>* testPair)
+bool SegmentTrackVarSet::extract(const std::pair<const CDCSegment2D*, const CDCTrack*>* testPair)
 {
-  extractNested(testPair);
-  const CDCRecoSegment2D* segment = testPair->first;
+  const CDCSegment2D* segment = testPair->first;
   const CDCTrack* track = testPair->second;
 
   assert(segment);
@@ -102,8 +103,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   // Count number of hits in the same region
   for (const CDCRecoHit3D& recoHit : *track) {
-    if (recoHit.getArcLength2D() < 0.8 * perpSMinimum or recoHit.getArcLength2D() > 1.2 * perpSMaximum)
+    if (recoHit.getArcLength2D() < 0.8 * perpSMinimum or
+        recoHit.getArcLength2D() > 1.2 * perpSMaximum) {
       continue;
+    }
     if (recoHit.getISuperLayer() == segment->getISuperLayer()) {
       hitsInSameRegion++;
     } else if (abs(recoHit.getISuperLayer() - segment->getISuperLayer()) == 1) {
@@ -168,8 +171,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
 
       double current_z_distance = std::abs(trajectorySZ.getZDist(perpS, reconstructedPosition.z()));
-      if (std::isnan(current_z_distance))
+      if (std::isnan(current_z_distance)) {
         continue;
+      }
 
       if (thetaFirstSegmentHit == -10) {
         thetaFirstSegmentHit = reconstructedPosition.theta();
@@ -207,10 +211,10 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
     var<named("fit_full")>() = fitter.fit(observationsFull).getPValue();
   } else {
     const CDCSZFitter& fitter = CDCSZFitter::getFitter();
-    setVariableIfNotNaN<named("fit_full")>(fitter.fit(observationsFull).getPValue());
+    var<named("fit_full")>() = toFinite(fitter.fit(observationsFull).getPValue(), 0);
 
     if (observationsNeigh.size() > 3) {
-      setVariableIfNotNaN<named("fit_neigh")>(fitter.fit(observationsNeigh).getPValue());
+      var<named("fit_neigh")>() = toFinite(fitter.fit(observationsNeigh).getPValue(), 0);
     } else {
       var<named("fit_neigh")>() = 0;
     }
@@ -225,15 +229,15 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
   var<named("track_size")>() = track->size();
   var<named("mean_hit_z_distance")>() = sum_hit_z_distance;
   var<named("max_hit_z_distance")>() = max_hit_z_distance;
-  setVariableIfNotNaN<named("stereo_quad_tree_distance")>(stereo_quad_tree_distance);
+  var<named("stereo_quad_tree_distance")>() = toFinite(stereo_quad_tree_distance, 0);
 
-  setVariableIfNotNaN<named("pt_of_track")>(std::isnan(trajectoryTrack2D.getAbsMom2D()) ? 0.0 : trajectoryTrack2D.getAbsMom2D());
+  var<named("pt_of_track")>() = toFinite(std::isnan(trajectoryTrack2D.getAbsMom2D()) ? 0.0 : trajectoryTrack2D.getAbsMom2D(), 0);
   var<named("track_is_curler")>() = trajectoryTrack2D.getExit().hasNAN();
 
   var<named("superlayer_already_full")>() = not trajectoryTrack2D.getOuterExit().hasNAN() and hitsInSameRegion > 5;
 
-  setVariableIfNotNaN<named("maxmimum_trajectory_distance_front")>(maxmimumTrajectoryDistanceFront, 999);
-  setVariableIfNotNaN<named("maxmimum_trajectory_distance_back")>(maxmimumTrajectoryDistanceBack, 999);
+  var<named("maxmimum_trajectory_distance_front")>() = toFinite(maxmimumTrajectoryDistanceFront, 999);
+  var<named("maxmimum_trajectory_distance_back")>() = toFinite(maxmimumTrajectoryDistanceBack, 999);
 
   var<named("maxmimum_hit_distance_front")>() = maxmimumHitDistanceFront;
   var<named("maxmimum_hit_distance_back")>() = maxmimumHitDistanceBack;
@@ -247,9 +251,9 @@ bool SegmentTrackVarSet::extract(const std::pair<const CDCRecoSegment2D*, const 
 
   double phiBetweenTrackAndSegment = trajectoryTrack2D.getMom2DAtSupport().angleWith(segment->front().getRecoPos2D());
 
-  setVariableIfNotNaN<named("phi_between_track_and_segment")>(phiBetweenTrackAndSegment);
-  setVariableIfNotNaN<named("perp_s_of_front")>(perpSOfFront / radius);
-  setVariableIfNotNaN<named("perp_s_of_back")>(perpSOfBack / radius);
+  var<named("phi_between_track_and_segment")>() = toFinite(phiBetweenTrackAndSegment, 0);
+  var<named("perp_s_of_front")>() = toFinite(perpSOfFront / radius, 0);
+  var<named("perp_s_of_back")>() = toFinite(perpSOfBack / radius, 0);
 
   return true;
 }

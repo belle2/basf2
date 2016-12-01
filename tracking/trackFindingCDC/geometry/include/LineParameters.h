@@ -59,6 +59,6 @@ namespace Belle2 {
     /// Jacobian matrix for the line parameters
     using LineJacobian = LineUtil::JacobianMatrix;
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

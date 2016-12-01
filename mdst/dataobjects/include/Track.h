@@ -39,10 +39,21 @@ namespace Belle2 {
 
     /** Access to TrackFitResults.
      *
-     *  Currently it is foreseen to have the logic, which decides, which result is returned in case
-     *  of unfitted hypotheses and failed fits in this getter function.
-     *  This decision is based on the idea to use the negative index-array values for communicating
-     *  reasons for the unavailability of the fit with the correct hypothesis.
+     * This tries to return the TrackFitResult for the requested track hypothesis. If the requested track hypothesis is
+     * not available, we return our defined default hypothesis instead. This default hypothesis is set in the
+     * TrackCreatorModule and currently set to the pion hypothesis.
+     *
+     * E.g.: If we have a Track containing TrackFitResults for electron, pion and proton, the returned TrackFitResult
+     * of the possible cases are:
+     *
+     * * electron -> electron
+     * * muon -> pion
+     * * pion -> pion
+     * * kaon -> pion
+     * * proton -> proton
+     *
+     * This is possible, because we enforced a save default hypothesis when the Track mdst is created.
+     *
      *
      *  @param chargedStable   Determines the particle for which you want to get the best available fit hypothesis.
      *  @return TrackFitResult for fit with particle hypothesis given by ParticleCode.

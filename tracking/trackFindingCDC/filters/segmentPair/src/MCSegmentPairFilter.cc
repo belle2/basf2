@@ -12,54 +12,52 @@
 
 #include <framework/logging/Logger.h>
 
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 
-using namespace std;
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
-  const CDCAxialRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-  const CDCAxialRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+  const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();
 
-  assert(ptrStartSegment);
-  assert(ptrEndSegment);
+  assert(ptrFromSegment);
+  assert(ptrToSegment);
 
-  const CDCAxialRecoSegment2D& startSegment = *ptrStartSegment;
-  const CDCAxialRecoSegment2D& endSegment = *ptrEndSegment;
+  const CDCSegment2D& fromSegment = *ptrFromSegment;
+  const CDCSegment2D& toSegment = *ptrToSegment;
 
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  if (fromSegment.size() < 4 or toSegment.size() < 4) return NAN;
+
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
-  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrStartSegment, ptrEndSegment);
+  EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
   if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
-    Index startNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrStartSegment);
-    if (startNPassedSuperLayers == c_InvalidIndex) return NAN;
+    Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrFromSegment);
+    if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    Index endNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrEndSegment);
-    if (endNPassedSuperLayers == c_InvalidIndex) return NAN;
+    Index toNPassedSuperLayers = mcSegmentLookUp.getFirstNPassedSuperLayers(ptrToSegment);
+    if (toNPassedSuperLayers == c_InvalidIndex) return NAN;
 
-    if (abs(startNPassedSuperLayers - endNPassedSuperLayers) > 1) return NAN;
+    if (abs(fromNPassedSuperLayers - toNPassedSuperLayers) > 1) return NAN;
 
     // Do fits
     if (not segmentPair.getTrajectory3D().isFitted()) {
-      CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrStartSegment);
+      CDCTrajectory3D mcTrajectory3D = mcSegmentLookUp.getTrajectory3D(ptrFromSegment);
       if (pairFBInfo == EForwardBackward::c_Backward) {
         mcTrajectory3D.reverse();
       }
       segmentPair.setTrajectory3D(mcTrajectory3D);
     }
-
-    return pairFBInfo * static_cast<Weight>(startSegment.size() + endSegment.size());
+    return pairFBInfo * static_cast<Weight>(fromSegment.size() + toSegment.size());
   }
-
   return NAN;
-
 }

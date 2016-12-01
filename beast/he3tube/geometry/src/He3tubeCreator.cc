@@ -111,9 +111,12 @@ namespace Belle2 {
         rot_he3tube->rotateX(activeParams.getAngle("AngleX"));
         rot_he3tube->rotateY(activeParams.getAngle("AngleY"));
         rot_he3tube->rotateZ(activeParams.getAngle("AngleZ"));
+
         //geometry::setColor(*l_HE3TUBE, "#006699");
 
         new G4PVPlacement(rot_he3tube, He3TUBEpos, l_He3TUBE, "p_He3TUBE", &topVolume, false, 1);
+
+        B2INFO("HE3-tube-" << detID << " placed at: " <<  He3TUBEpos << " mm");
 
         //create endcaps
         G4double EndcapinnerRadius = 0.;
@@ -131,13 +134,15 @@ namespace Belle2 {
         G4ThreeVector He3endcapposTop = G4ThreeVector(
                                           activeParams.getLength("x_he3tube") * CLHEP::cm,
                                           activeParams.getLength("y_he3tube") * CLHEP::cm,
-                                          activeParams.getLength("z_he3tube") * CLHEP::cm + activeParams.getLength("tube_hz") * CLHEP::cm + activeParams.getLength("endcap_hz") * CLHEP::cm
+                                          activeParams.getLength("z_he3tube") * CLHEP::cm + activeParams.getLength("tube_hz") * CLHEP::cm +
+                                          activeParams.getLength("endcap_hz") * CLHEP::cm
                                         );
 
         G4ThreeVector He3endcapposBot = G4ThreeVector(
                                           activeParams.getLength("x_he3tube") * CLHEP::cm,
                                           activeParams.getLength("y_he3tube") * CLHEP::cm,
-                                          activeParams.getLength("z_he3tube") * CLHEP::cm - activeParams.getLength("tube_hz") * CLHEP::cm - activeParams.getLength("endcap_hz") * CLHEP::cm
+                                          activeParams.getLength("z_he3tube") * CLHEP::cm - activeParams.getLength("tube_hz") * CLHEP::cm -
+                                          activeParams.getLength("endcap_hz") * CLHEP::cm
                                         );
 
         new G4PVPlacement(rot_he3tube, He3endcapposTop, l_He3endcap, "p_He3endcapTop", &topVolume, false, 1);
@@ -169,8 +174,10 @@ namespace Belle2 {
         //Lets limit the Geant4 stepsize inside the volume
         l_He3Gas->SetUserLimits(new G4UserLimits(stepSize));
 
-        new G4PVPlacement(0, G4ThreeVector(0, 0, 0), l_He3Gas, "p_He3Gas", l_iHe3Gas, false, detID);
-
+        new G4PVPlacement(0, G4ThreeVector(0, 0, activeParams.getLength("SV_offset_inZ")*CLHEP::cm), l_He3Gas, "p_He3Gas", l_iHe3Gas, false,
+                          detID);
+        B2INFO("HE3-tube-Sensitive-Volume-" << detID << " placed at: (" <<  He3TUBEpos.getX() << "," << He3TUBEpos.getY() << "," <<
+               He3TUBEpos.getZ() + activeParams.getLength("SV_offset_inZ")*CLHEP::cm << ")  mm");
         detID++;
       }
     }

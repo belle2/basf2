@@ -9,15 +9,15 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/filters/segmentRelation/MCSegmentRelationFilter.h>
-#include <tracking/trackFindingCDC/mclookup/CDCMCSegmentLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Weight MCSegmentRelationFilter::operator()(const CDCRecoSegment2D& fromSegment,
-                                           const CDCRecoSegment2D& toSegment)
+Weight MCSegmentRelationFilter::operator()(const CDCSegment2D& fromSegment,
+                                           const CDCSegment2D& toSegment)
 {
-  const CDCMCSegmentLookUp& mcSegmentLookUp = CDCMCSegmentLookUp::getInstance();
+  const CDCMCSegment2DLookUp& mcSegmentLookUp = CDCMCSegment2DLookUp::getInstance();
 
   // Check if the segments are aligned correctly along the Monte Carlo track
   EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(&fromSegment, &toSegment);

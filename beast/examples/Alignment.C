@@ -24,7 +24,7 @@ void Alignment()
 
   TString odir[] = { "ph1sustr" , "microtpc" , "he3tube" };
   TString ifn[] = { "tmp_PH1SUSTR.xml" , "tmp_MICROTPC.xml" , "tmp_HE3TUBE.xml" };
-  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1.xml" , "HE3TUBE-phase1.xml" };
+  TString ofn[] = { "PH1SUSTR.xml" , "MICROTPC-phase1_bak.xml" , "HE3TUBE-phase1_bak.xml" };
   
   //Set the Al plate position in centimeter
   /*
@@ -104,6 +104,7 @@ void Alignment()
      Delta Y: 504.89mm  [19.877in ]
      Delta Z: 423.00mm  [16.653in ] 
   */
+  /**** Last 
   double PlatePos[4][3] = 
     {
       {46.891,0.752,35.977},
@@ -111,7 +112,14 @@ void Alignment()
       {-53.705,0.34,37.577},
       {0.953,-50.489,42.3}
     };
-
+  ****/
+  double PlatePos[4][3] = 
+    {
+      {49.2,-0.7,36.0},//
+      {-3.0,52.1,37.9},//
+      {-53.2,-0.3,37.7},//
+      {-1.0,-50.5,42.3}//
+    };
   /*
   double PlatePos[4][3] = 
     {
@@ -124,7 +132,7 @@ void Alignment()
   //Calculate TPC and Tube positions
   double dx_tpc[] = {12.7, 15.0, 15.0, 12.7};
   double dy_tpc[] = {10.16, 10.4, 10.4, 10.16};
-  double tub_rad = 2.38;
+  double tub_rad = 2.54;
   double plate_l = 50.0;
   double plate_w = 32.0;//27.47788;
   double plate_hw = 0.5;//2.54 * 0.35;

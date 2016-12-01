@@ -161,6 +161,14 @@ namespace Belle2 {
         return output << "Vector3D(" << vector.x() << "," << vector.y() << "," << vector.z() << ")";
       }
 
+      /// Output operator for python
+      std::string __str__() const
+      {
+        std::stringstream sstream;
+        sstream << *this;
+        return sstream.str();
+      }
+
       /// Calculates the three dimensional dot product.
       double dot(const Vector3D& rhs) const
       {
@@ -564,7 +572,7 @@ namespace Belle2 {
       /// Memory for the third coordinate
       double m_z;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

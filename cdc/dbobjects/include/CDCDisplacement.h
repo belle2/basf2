@@ -46,6 +46,8 @@ namespace Belle2 {
       return m_wire;
     }
 
+    //TODO: remove the following 4 functions (not needed).
+
     /** Getter for Super-Layer. */
     unsigned short getISuperLayer() const
     {
@@ -74,18 +76,30 @@ namespace Belle2 {
       return 8 + (getISuperLayer() - 1) * 6 + getILayer();
     }
 
+    /** Getter for fwd x-position. */
     float getXFwd() const {return m_fwd.X();}
+
+    /** Getter for fwd y-position. */
     float getYFwd() const {return m_fwd.Y();}
+
+    /** Getter for fwd z-position. */
     float getZFwd() const {return m_fwd.Z();}
 
+    /** Getter for bwd x-position. */
     float getXBwd() const {return m_bwd.X();}
+
+    /** Getter for bwd y-position. */
     float getYBwd() const {return m_bwd.Y();}
+
+    /** Getter for bwd z-position. */
     float getZBwd() const {return m_bwd.Z();}
 
+    /** Getter for wire tension. */
     float getTension() const {return m_tension;}
 
   private:
     unsigned short m_wire; /**< Wire ID */
+    //TODO: replace TVector3s with simple arrays to save memory.
     TVector3 m_fwd; /**< Displacement of forward side */
     TVector3 m_bwd; /**< Displacement of backward side */
     float        m_tension; /**< Displacement of wire tension (grW) */

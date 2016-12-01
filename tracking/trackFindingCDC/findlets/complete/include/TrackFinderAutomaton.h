@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/combined/WireHitTopologyPreparer.h>
+#include <tracking/trackFindingCDC/findlets/combined/WireHitPreparer.h>
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/combined/TrackFinderSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
@@ -25,102 +25,40 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-
-#include <vector>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Complete findlet implementing track finding with the cellular automaton in two stages.
-    class TrackFinderAutomaton
-      : public Findlet<> {
+    class TrackFinderAutomaton : public Findlet<> {
 
     private:
       /// Type of the base class
-      typedef Findlet<> Super;
+      using Super = Findlet<>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      TrackFinderAutomaton()
-      {
-        addProcessingSignalListener(&m_wireHitsSwapper);
-        addProcessingSignalListener(&m_segmentsSwapper);
-        addProcessingSignalListener(&m_tracksSwapper);
-
-        addProcessingSignalListener(&m_wireHitTopologyPreparer);
-        addProcessingSignalListener(&m_segmentFinderFacetAutomaton);
-        addProcessingSignalListener(&m_trackFinderSegmentPairAutomaton);
-        addProcessingSignalListener(&m_trackFlightTimeAdjuster);
-        addProcessingSignalListener(&m_trackExporter);
-      }
+      TrackFinderAutomaton();
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
-      }
+      std::string getDescription() override;
 
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        m_wireHitsSwapper.exposeParameters(moduleParamList, prefix);
-        m_segmentsSwapper.exposeParameters(moduleParamList, prefix);
-        m_tracksSwapper.exposeParameters(moduleParamList, prefix);
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
-        m_wireHitTopologyPreparer.exposeParameters(moduleParamList, prefix);
-        m_segmentFinderFacetAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackFinderSegmentPairAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackFlightTimeAdjuster.exposeParameters(moduleParamList, prefix);
-        m_trackExporter.exposeParameters(moduleParamList, prefix);
+      /// Signal the beginning of a new event
+      void beginEvent() final;
 
-        moduleParamList->getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-        moduleParamList->getParameter<std::string>("SegmentOrientation").resetValue();
-
-        moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("outwards");
-        moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
-
-        // Mimics earlier behaviour
-        moduleParamList->getParameter<bool>("WriteSegments").setDefaultValue(true);
-        moduleParamList->getParameter<bool>("WriteSegments").resetValue();
-      }
-
-      /// Generates the segment.
-      virtual void apply() override final
-      {
-        std::vector<CDCWireHit> wireHits;
-        std::vector<CDCRecoSegment2D> segments;
-        std::vector<CDCTrack> tracks;
-
-        // Aquire the wire hits, segments and tracks from the DataStore
-        m_wireHitsSwapper.apply(wireHits);
-        m_segmentsSwapper.apply(segments);
-        m_tracksSwapper.apply(tracks);
-
-        wireHits.reserve(1000);
-        segments.reserve(100);
-        tracks.reserve(20);
-
-        m_wireHitTopologyPreparer.apply(wireHits);
-        m_segmentFinderFacetAutomaton.apply(wireHits, segments);
-        m_trackFinderSegmentPairAutomaton.apply(segments, tracks);
-        m_trackFlightTimeAdjuster.apply(tracks);
-        m_trackExporter.apply(tracks);
-
-        // Put the segments and tracks on the DataStore
-        m_wireHitsSwapper.apply(wireHits);
-        m_segmentsSwapper.apply(segments);
-        m_tracksSwapper.apply(tracks);
-      }
+      /// Execute the findlet
+      void apply() final;
 
     private:
       // Findlets
-
       /// Preparation findlet creating the wire hits from the packed CDCHits
-      WireHitTopologyPreparer m_wireHitTopologyPreparer;
+      WireHitPreparer m_wireHitTopologyPreparer;
 
       /// First stage cellular automaton segment finder
       SegmentFinderFacetAutomaton<ChooseableClusterFilter,
@@ -128,7 +66,7 @@ namespace Belle2 {
                                   ChooseableFacetRelationFilter,
                                   ChooseableSegmentRelationFilter> m_segmentFinderFacetAutomaton;
 
-      /// First stage cellular automaton track finder from segments
+      /// Second stage cellular automaton track finder from segments
       TrackFinderSegmentPairAutomaton<ChooseableSegmentPairFilter,
                                       ChooseableSegmentPairRelationFilter,
                                       ChooseableTrackRelationFilter> m_trackFinderSegmentPairAutomaton;
@@ -136,19 +74,27 @@ namespace Belle2 {
       /// Adjusts the flight time of the tracks to a setable trigger point
       TrackFlightTimeAdjuster m_trackFlightTimeAdjuster;
 
-      /// Exports the generated CDCTracks as track candidates to be fitted by Genfit.
+      /// Exports the generated CDCTracks as RecoTracks.
       TrackExporter m_trackExporter;
 
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCWireHit, true> m_wireHitsSwapper{"CDCWireHitVector"};
 
       /// Puts the internal segments on the DataStore
-      StoreVectorSwapper<CDCRecoSegment2D> m_segmentsSwapper{"CDCRecoSegment2DVector"};
+      StoreVectorSwapper<CDCSegment2D> m_segmentsSwapper{"CDCSegment2DVector"};
 
       /// Puts the internal segments on the DataStore
       StoreVectorSwapper<CDCTrack> m_tracksSwapper{"CDCTrackVector"};
 
-    }; // end class TrackFinderAutomaton
+      // Object pools
+      /// Memory for the wire hits
+      std::vector<CDCWireHit> m_wireHits;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      /// Memory for the segments
+      std::vector<CDCSegment2D> m_segments;
+
+      /// Memory for the tracks
+      std::vector<CDCTrack> m_tracks;
+    };
+  }
+}

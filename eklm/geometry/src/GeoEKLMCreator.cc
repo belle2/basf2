@@ -27,7 +27,6 @@
 #include <eklm/geometry/G4TriangularPrism.h>
 #include <eklm/geometry/GeoEKLMCreator.h>
 #include <eklm/simulation/EKLMSensitiveDetector.h>
-#include <framework/gearbox/GearDir.h>
 #include <framework/gearbox/Unit.h>
 #include <geometry/CreatorFactory.h>
 #include <geometry/Materials.h>
@@ -195,6 +194,7 @@ void EKLM::GeoEKLMCreator::deleteVolumes()
   free(m_Solids.psheet);
   free(m_LogVol.psheet);
   free(m_LogVol.segment);
+  free(m_Solids.stripSegment);
   free(m_LogVol.stripSegment);
   free(m_Solids.stripvol);
   free(m_LogVol.stripvol);

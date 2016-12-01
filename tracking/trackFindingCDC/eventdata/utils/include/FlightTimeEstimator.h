@@ -87,5 +87,5 @@ namespace Belle2 {
       LookupTable<float> m_halfPeriodAlphaFlightTimeFactor;
     };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

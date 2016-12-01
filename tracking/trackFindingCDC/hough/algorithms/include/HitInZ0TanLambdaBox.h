@@ -24,28 +24,28 @@ namespace Belle2 {
     public:
 
       /// Use a Z0TanLambdaBox
-      typedef Z0TanLambdaBox HoughBox;
+      using HoughBox = Z0TanLambdaBox;
 
       /**
        *  Checks if the wire hit is contained in a z0 tan lambda hough space.
        *  Returns 1.0 if it is contained, returns NAN if it is not contained.
        */
-      inline Weight operator()(const CDCRecoHit3D& recoHit,
-                               const HoughBox* z0TanLambdaBox)
+      Weight operator()(const CDCRecoHit3D& recoHit,
+                        const HoughBox* z0TanLambdaBox)
       {
-        const float& lowerZ0 = z0TanLambdaBox->getLowerZ0();
-        const float& upperZ0 = z0TanLambdaBox->getUpperZ0();
+        float lowerZ0 = z0TanLambdaBox->getLowerZ0();
+        float upperZ0 = z0TanLambdaBox->getUpperZ0();
 
-        const float& lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
-        const float& upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
+        float lowerTanLambda = z0TanLambdaBox->getLowerTanLambda();
+        float upperTanLambda = z0TanLambdaBox->getUpperTanLambda();
 
-        const float& perpS = recoHit.getArcLength2D();
-        const float& reconstructedZ = recoHit.getRecoZ();
+        float perpS = recoHit.getArcLength2D();
+        float reconstructedZ = recoHit.getRecoZ();
 
-        const float& distLowerZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
-        const float& distUpperZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + upperZ0;
-        const float& distLowerZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + lowerZ0;
-        const float& distUpperZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + upperZ0;
+        float distLowerZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + lowerZ0;
+        float distUpperZ0LowerTanLambda = perpS * lowerTanLambda - reconstructedZ + upperZ0;
+        float distLowerZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + lowerZ0;
+        float distUpperZ0UpperTanLambda = perpS * upperTanLambda - reconstructedZ + upperZ0;
 
         const bool sameSign = SameSignChecker::sameSign(distLowerZ0LowerTanLambda, distUpperZ0LowerTanLambda,
                                                         distLowerZ0UpperTanLambda, distUpperZ0UpperTanLambda);

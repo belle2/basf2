@@ -118,13 +118,13 @@ namespace Belle2 {
       /**
        *  Averages two parameter vectors taking into account their respective covariances.
        *
-       *  @param par1     First parameters
-       *  @param cov1     Covariance matrix to the first parameters
-       *  @param par2     Second parameters
-       *  @param cov2     Covariance matrix to the second parameters
-       *  @param par[out] Averaged parameters
-       *  @param cov[out] Averaged covariance matrix
-       *  @return         Chi square deviation of orignal parameters to the average
+       *  @param      par1  First parameters
+       *  @param      cov1  Covariance matrix to the first parameters
+       *  @param      par2  Second parameters
+       *  @param      cov2  Covariance matrix to the second parameters
+       *  @param[out] par   Averaged parameters
+       *  @param[out] cov   Averaged covariance matrix
+       *  @return           Chi square deviation of orignal parameters to the average
        */
       template <int N>
       static double average(const ParameterVector<N>& par1,
@@ -145,17 +145,17 @@ namespace Belle2 {
 
       /**
        *  Averages two parameter vectors from a projected space taking into account their respective
-       * covariances and ambiguity matrices
+       *  covariances and ambiguity matrices.
        *
-       *  @param par1       First parameters
-       *  @param cov1       Covariance matrix to the first parameters
-       *  @param ambiguity1 Projection ambiguity of the first parameters
-       *  @param par2       Second parameters
-       *  @param cov2       Covariance matrix to the second parameters
-       *  @param ambiguity2 Projection ambiguity of the second parameters
-       *  @param par[out]   Averaged parameters
-       *  @param cov[out]   Averaged covariance matrix
-       *  @return           Chi square deviation of original parameters to the average
+       *  @param      par1        First parameters
+       *  @param      cov1        Covariance matrix to the first parameters
+       *  @param      ambiguity1  Projection ambiguity of the first parameters
+       *  @param      par2        Second parameters
+       *  @param      cov2        Covariance matrix to the second parameters
+       *  @param      ambiguity2  Projection ambiguity of the second parameters
+       *  @param[out] par         Averaged parameters
+       *  @param[out] cov         Averaged covariance matrix
+       *  @return                 Chi square deviation of original parameters to the average
        */
       template <int M, int N1, int N2>
       static double average(const ParameterVector<N1>& par1,
@@ -183,5 +183,5 @@ namespace Belle2 {
       }
     };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

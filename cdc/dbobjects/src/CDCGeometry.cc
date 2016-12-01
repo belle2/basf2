@@ -37,8 +37,13 @@ CDCGeometry::~CDCGeometry()
 void CDCGeometry::read(const GearDir& content)
 {
   // Global.
+  m_globalOffsetX  = content.getLength("OffsetX");
+  m_globalOffsetY  = content.getLength("OffsetY");
   m_globalOffsetZ  = content.getLength("OffsetZ");
   m_globalPhiRotation = content.getAngle("GlobalPhiRotation");
+  m_globalOffsetA  = content.getAngle("OffsetA");
+  m_globalOffsetB  = content.getAngle("OffsetB");
+  m_globalOffsetC  = content.getAngle("OffsetC");
 
   // Mother volume.
   const int nBound = content.getNumberNodes("MomVol/ZBound");
@@ -217,36 +222,23 @@ void CDCGeometry::read(const GearDir& content)
   GearDir senseWire(content);
   senseWire.append("/SenseWire/");
   m_senseWireDiameter = senseWire.getLength("Diameter");
+  //  B2INFO("m_senseWireDiameter= " << m_senseWireDiameter);
   m_senseWireNumbers = atoi((senseWire.getString("Number")).c_str());
 
   // Field wire.
   GearDir fieldWire(content);
   fieldWire.append("/FieldWire/");
   m_fieldWireDiameter = fieldWire.getLength("Diameter");
+  //  B2INFO("m_fieldWireDiameter= " << m_fieldWireDiameter);
   m_fieldWireNumbers = atoi((fieldWire.getString("Number")).c_str());
 
 
   // Feedthrough.
   m_feedThroughLength = content.getLength("/FeedThrough/Length");
-
-  // Debug mode.
-  m_debug = content.getBool("Debug");
+  //  B2INFO("m_feedThroughLength= " << m_feedThroughLength);
 
   // Get control switch for gas and wire material definition
-  m_materialDefinitionMode = content.getInt("MaterialDefinitionMode");
-  m_senseWireZposMode = content.getInt("SenseWireZposMode");
   m_clockFrequency  = content.getDouble("ClockFrequencyForTDC");
   m_nominalSpaceResolution = content.getLength("SenseWire/SpaceResol");
-  m_displacement = content.getBool("Displacement");
-  m_misalignment = content.getBool("Misalignment");
-  m_alignment = content.getBool("Alignment");
-  m_displacementFile = content.getString("displacementFileName");
-  m_misalignmentFile = content.getString("misalignmentFileName");
-  m_alignmentFile = content.getString("alignmentFileName");
-
-  m_thresholdEnergyDeposit = content.getWithUnit("SensitiveDetector/EnergyDepositionThreshold");
-  m_minTrackLength = content.getWithUnit("SensitiveDetector/MinTrackLength");
-  m_wireSag = content.getBool("SensitiveDetector/WireSag");
-  m_modLeftRightFlag = content.getBool("SensitiveDetector/ModifiedLeftRightFlag");
 
 }

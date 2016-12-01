@@ -33,63 +33,89 @@
 #include "EvtGenBase/EvtComplex.hh"
 #include <sstream>
 
+/** The class provides routine to decay vector-> particle particle with B0 mixing, coherent B0B0-like mixing if any.
+ */
 class EvtPHSPBBMix: public EvtDecayAmp {
 
 public:
 
-  EvtPHSPBBMix() {}//std::cout<<"AREARE BB"<<std::endl;}
+  /** Default constructor */
+  EvtPHSPBBMix() {}
+
+  /** Default destructor */
   virtual ~EvtPHSPBBMix();
 
-  std::string getName(); /**< Get function Name  */
-  EvtDecayBase* clone();  /**< Clone the decay  */
+  /**< Get function Name  */
+  std::string getName();
 
+  /**< Clone the decay  */
+  EvtDecayBase* clone();
+
+  /** Decay function */
   void decay(EvtParticle* p);
+
+  /** Init function */
   void init();
+
+  /** Init maximal prob.  function */
   void initProbMax();
 
+  /** Number of real daughters */
   int nRealDaughters();
 
 private:
 
+  /** Number of real daughters */
   void prlp(int)const;
+
+  /** Calculate amplitude */
   EvtComplex Amplitude(const double& t1, const double& t2, bool B1_is_B0, bool B2_is_B0) const;
-  double _freq;   // mixing frequency in hbar/mm
-  double _C; //C eigenvalue, 0= incoherent
-  bool _BBpipi;
-  //  double _dGamma;
-  //EvtComplex _qoverp;
-  //EvtComplex _poverq;
-  //EvtComplex _z;
-  //double _chib0_b0bar;
-  //double _chib0bar_b0;
 
-  //EvtComplex _A_f;
-  //EvtComplex _Abar_f;
+  /** mixing frequency in hbar/mm */
+  double _freq{0};   //
 
-  //EvtComplex _A_fbar;
-  //EvtComplex _Abar_fbar;
+  /** C eigenvalue, 0= incoherent */
+  double _C{0}; //
+
+  /** Is BBpipi? */
+  bool _BBpipi{0};
 
 };
 
+/** The class provides routine to decay vector-> particle particle with B0 mixing, handles states with only one neutral B
+ */
 class EvtPHSPBMix : public EvtDecayAmp  {
 
 public:
 
-  EvtPHSPBMix() {}//std::cout<<"AREARE B"<<std::endl;}
+  /** Default constructor */
+  EvtPHSPBMix() {}
+
+  /** Default destructor */
   virtual ~EvtPHSPBMix();
 
-  std::string getName(); /**< Get function Name  */
-  EvtDecayBase* clone();  /**< Clone the decay  */
+  /**< Get function Name  */
+  std::string getName();
 
+  /**< Clone the decay  */
+  EvtDecayBase* clone();
+
+  /** Decay function */
   void decay(EvtParticle* p);
+
+  /** Init function */
   void init();
+
+  /** Init maximal prob.  function */
   void initProbMax();
 
+  /** Number of real daughters */
   int nRealDaughters();
 
 private:
 
-  double _freq;   // mixing frequency in hbar/mm
+  /** mixing frequency in hbar/mm */
+  double _freq{0};
 
 };
 

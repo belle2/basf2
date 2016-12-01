@@ -55,7 +55,7 @@ namespace Belle2 {
     class QuadChildrenTemplate {
     public:
 
-//      typedef std::map<std::pair<size_t, size_t>, quadChild> ChildrenHolder;
+//      using ChildrenHolder = std::map<std::pair<size_t, size_t>, quadChild>;
 
       /// Constructor
       QuadChildrenTemplate()
@@ -92,13 +92,13 @@ namespace Belle2 {
        * @param qt pointer to QuadTree child to set
        */
 
-      inline void set(const size_t x, const size_t y, quadChild* qt)
+      void set(size_t x, size_t y, quadChild* qt)
       {
         m_children[x][y] = qt;
       }
 
       /// Get pointer to the child with indexes x, y
-      inline quadChild* get(const size_t x, const size_t y)
+      quadChild* get(const size_t x, const size_t y)
       {
         return m_children[x][y];
       }

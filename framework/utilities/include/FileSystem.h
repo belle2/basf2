@@ -21,7 +21,7 @@ namespace Belle2 {
      *             strictly required.
      * @return absolute path to file in local directory, if it exists,
      *         otherwise abs. path to file in central release directory,
-     *         or empty if file wasn't found.
+     *         or empty string if file wasn't found.
      */
     static std::string findFile(const std::string& path);
 
@@ -69,9 +69,10 @@ namespace Belle2 {
        * @note Locks are not exclusive inside the same process, i.e. lock() will succeed even if a lock
        *       is already held by the current process.
        * @param timeout  Time in seconds to wait for a lock (default is rather high to deal with slow FS at KEKCC)
+       * @param ignoreErrors if true just return if locking was unsuccessful but don't print an error
        * @return  True if the lock could be obtained, false if file could not be opened or timeout is reached
        */
-      bool lock(int timeout = 300);
+      bool lock(int timeout = 300, bool ignoreErrors = false);
 
     private:
       int m_file;  /**< File descriptor of file to be locked */

@@ -19,6 +19,7 @@
 #include <TVector2.h>
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -176,6 +177,14 @@ namespace Belle2 {
       {
         output << "Vector2D(" << vector.x() << "," << vector.y() << ")";
         return output;
+      }
+
+      /// Output operator for python
+      std::string __str__() const
+      {
+        std::stringstream sstream;
+        sstream << *this;
+        return sstream.str();
       }
 
       /// Calculates the two dimensional dot product.
@@ -690,7 +699,7 @@ namespace Belle2 {
       /// Memory for the second coordinate
       double m_y;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

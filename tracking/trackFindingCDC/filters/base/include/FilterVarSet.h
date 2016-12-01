@@ -11,6 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/VarSet.h>
 #include <tracking/trackFindingCDC/varsets/VarNames.h>
+
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -20,7 +21,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /// Names of the variables to be generated.
+    /// Names of the variables to be generated
     constexpr
     static char const* const filterVarNames[] = {
       "accept",
@@ -28,61 +29,58 @@ namespace Belle2 {
       "positive",
     };
 
-    /// Name of the variables that should be extracted from the response of a filter.
+    /// Vehicle class to transport the variable names
     template<class AFilter>
-    class FilterVarNames : public VarNames<typename AFilter::Object> {
+    struct FilterVarNames : public VarNames<typename AFilter::Object> {
 
-    public:
-      /// Number of variables to be generated.
-      static const size_t nNames = size(filterVarNames);
+      /// Number of variables to be generated
+      static const size_t nVars = size(filterVarNames);
 
-      /// Getter for the name a the given index
-      constexpr
-      static char const* getName(int iName)
+      /// Getter for the name at the given index
+      static constexpr char const* getName(int iName)
       {
         return filterVarNames[iName];
       }
     };
 
     /**
-     *  A variable set based that represents the response of a filter.
+     *  Class to compute floating point variables from a filter response
+     *  which can be recorded as a flat TNtuple or serve as input to a MVA method
      *
      *  The variables that are extracted from the filter response are the weight
      *  and a boolean whether the response was NaN.
-     *  Class that computes floating point variables from segment pair.
-     *  that can be forwarded to a flat TNTuple or a TMVA method
      */
     template<class AFilter>
     class  FilterVarSet : public VarSet<FilterVarNames<AFilter> > {
 
     private:
       /// Type of the base class
-      typedef VarSet<FilterVarNames<AFilter> > Super;
+      using Super = VarSet<FilterVarNames<AFilter> >;
 
     public:
       /// Type of the filter
-      typedef AFilter Filter;
+      using Filter = AFilter;
 
       /// Type of the object from which the filter judgement should be extracted.
-      typedef typename Filter::Object Object;
+      using Object = typename Filter::Object;
 
       /// Construct the varset.
       FilterVarSet(const std::string& filterName = "",
-                   std::unique_ptr<Filter> ptrFilter = std::unique_ptr<Filter>(new Filter())) :
-        Super(),
-        m_filterName(filterName),
-        m_filterNamePrefix(filterName + '_'),
-        m_ptrFilter(std::move(ptrFilter))
+                   std::unique_ptr<Filter> ptrFilter = makeUnique<Filter>())
+        : Super()
+        , m_filterName(filterName)
+        , m_filterNamePrefix(filterName + '_')
+        , m_ptrFilter(std::move(ptrFilter))
       {
       }
 
       using Super::named;
 
       /// Generate filter weight variable from the object
-      virtual bool extract(const Object* obj) override final
-      {
+      bool extract(const Object* obj) final {
         bool extracted = Super::extract(obj);
-        if (m_ptrFilter and obj) {
+        if (m_ptrFilter and obj)
+        {
           Weight weight = (*m_ptrFilter)(*obj);
           this->template var<named("weight")>() = weight;
           this->template var<named("accept")>() = not std::isnan(weight) and not(weight < m_cut);
@@ -97,60 +95,47 @@ namespace Belle2 {
       }
 
       /// Initialize the filter before event processing
-      virtual void initialize() override final
-      {
+      void initialize() final {
         Super::initialize();
 
         ModuleParamList moduleParamList;
-        m_ptrFilter->exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        m_ptrFilter->exposeParameters(&moduleParamList, prefix);
 
-        // try to find the TMVAFilter cut parameter and reset it such that we can set it ourself
+        // try to find the MVAFilter cut parameter and reset it such that we can set it
         try {
           ModuleParam<double> cutParam = moduleParamList.getParameter<double>("cut");
           m_cut = cutParam.getValue();
           cutParam.setValue(NAN);
-        } catch (ModuleParamList::ModuleParameterNotFoundError) {
-          // Not found continue
+        } catch (ModuleParamList::ModuleParameterNotFoundError)
+        {
+          // Not found. Continue.
         }
 
-        if (m_ptrFilter) {
-          m_ptrFilter->initialize();
-        }
+        if (m_ptrFilter) m_ptrFilter->initialize();
       }
 
       /// Allow setup work to take place at beginning of new run
-      virtual void beginRun() override final
-      {
+      void beginRun() final {
         Super::beginRun();
-        if (m_ptrFilter) {
-          m_ptrFilter->beginRun();
-        }
+        if (m_ptrFilter) m_ptrFilter->beginRun();
       }
 
       /// Allow setup work to take place at beginning of new event
-      virtual void beginEvent() override final
-      {
+      void beginEvent() final {
         Super::beginEvent();
-        if (m_ptrFilter) {
-          m_ptrFilter->beginEvent();
-        }
+        if (m_ptrFilter) m_ptrFilter->beginEvent();
       }
 
       /// Allow clean up to take place at end of run
-      virtual void endRun() override final
-      {
-        if (m_ptrFilter) {
-          m_ptrFilter->endRun();
-        }
+      void endRun() final {
+        if (m_ptrFilter) m_ptrFilter->endRun();
         Super::endRun();
       }
 
       /// Terminate the filter after event processing
-      virtual void terminate() override final
-      {
-        if (m_ptrFilter) {
-          m_ptrFilter->terminate();
-        }
+      void terminate() final {
+        if (m_ptrFilter) m_ptrFilter->terminate();
         Super::terminate();
       }
 
@@ -158,7 +143,7 @@ namespace Belle2 {
        *  Getter for the named references to the individual variables
        *  Base implementaton returns empty vector
        */
-      virtual std::vector<Named<Float_t*> > getNamedVariables(std::string prefix = "") override
+      std::vector<Named<Float_t*>> getNamedVariables(std::string prefix) override
       {
         return Super::getNamedVariables(prefix + m_filterNamePrefix);
       }
@@ -167,7 +152,7 @@ namespace Belle2 {
        *   Pointer to the variable with the given name.
        *   Returns nullptr if not found.
        */
-      virtual MayBePtr<Float_t> find(std::string varName) override
+      MayBePtr<Float_t> find(std::string varName) override
       {
         if (boost::starts_with(varName, m_filterNamePrefix)) {
           std::string varNameWithoutPrefix = varName.substr(m_filterNamePrefix.size());
@@ -178,7 +163,7 @@ namespace Belle2 {
       }
 
     public:
-      /// The cut on the TMVA output.
+      /// The cut on the filter output.
       double m_cut = NAN;
 
       /// Name of the filter
@@ -189,7 +174,6 @@ namespace Belle2 {
 
       /// Filter from which to generate weight as a variable set;
       std::unique_ptr<Filter> m_ptrFilter;
-
     };
   }
 }

@@ -13,9 +13,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-Weight
-SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
-                                              const CDCSegmentTriple& neighborTriple)
+Weight SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple& fromSegmentTriple
+                                                     __attribute__((unused)),
+                                                     const CDCSegmentTriple& toSegmentTriple)
 {
   // Just let all found neighors pass since we have the same start -> end segment
   // and let the cellular automaton figure auto which is longest
@@ -26,6 +26,6 @@ SimpleSegmentTripleRelationFilter::operator()(const CDCSegmentTriple&,
   // neighbor weight is a penalty for the overlap of the segments since we would
   // count it to times
   // could also be a better measure of fit quality
-  return  -neighborTriple.getStartSegment()->size();
+  return  -toSegmentTriple.getStartSegment()->size();
 }
 

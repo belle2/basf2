@@ -98,6 +98,10 @@ CDCTriggerHoughtrackingModule::CDCTriggerHoughtrackingModule() : Module()
            "Switch for creating relations to hits in the pattern algorithm. "
            "If true, create relations from cluster corners, otherwise "
            "from estimated cluster center (might not have relations).", false);
+
+  addParam("testFilename", m_testFilename,
+           "If not empty, a file with input (hits) and output (tracks) "
+           "for each event is written (for firmware debugging).", string(""));
 }
 
 void
@@ -128,6 +132,10 @@ CDCTriggerHoughtrackingModule::initialize()
     }
     layerId += (iSL > 0 ? 6 : 7);
   }
+
+  if (m_testFilename != "") {
+    testFile.open(m_testFilename);
+  }
 }
 
 void
@@ -143,6 +151,11 @@ CDCTriggerHoughtrackingModule::event()
   /* set default return value */
   setReturnValue(true);
 
+  if (m_testFilename != "") {
+    testFile << StoreObjPtr<EventMetaData>()->getEvent() << " "
+             << tsHits.getEntries() << endl;
+  }
+
   if (tsHits.getEntries() == 0) {
     //B2WARNING("CDCTracking: tsHitsCollection is empty!");
     return;
@@ -151,6 +164,10 @@ CDCTriggerHoughtrackingModule::event()
   /* get CDCHits coordinates in conformal space */
   for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
     unsigned short iSL = tsHits[iHit]->getISuperLayer();
+    if (m_testFilename != "") {
+      testFile << iSL << " " << tsHits[iHit]->getSegmentID() - TSoffset[iSL] << " "
+               << tsHits[iHit]->getPriorityPosition() << endl;
+    }
     if (iSL % 2) continue;
     if (m_ignore2nd && tsHits[iHit]->getPriorityPosition() < 3) continue;
     double phi = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
@@ -202,4 +219,29 @@ CDCTriggerHoughtrackingModule::event()
     patternClustering();
   else
     connectedRegions();
+
+  if (m_testFilename != "") {
+    testFile << storeTracks.getEntries() << endl;
+    for (int i = 0; i < storeTracks.getEntries(); ++i) {
+      float ix = (storeTracks[i]->getPhi0() - M_PI_4) * m_nCellsPhi / 2. / M_PI - 0.5;
+      float iy = (storeTracks[i]->getOmega() / 2. + maxR - shiftR) * m_nCellsR / 2. / maxR - 0.5;
+      testFile << round(2 * ix) / 2. << " " << round(2 * iy) / 2. << " "
+               << storeTracks[i]->getChargeSign() << endl;
+      RelationVector<CDCTriggerSegmentHit> hits =
+        storeTracks[i]->getRelationsTo<CDCTriggerSegmentHit>();
+      testFile << hits.size() << endl;
+      for (unsigned ihit = 0; ihit < hits.size(); ++ihit) {
+        unsigned short iSL = hits[ihit]->getISuperLayer();
+        testFile << iSL << " " << hits[ihit]->getSegmentID() - TSoffset[iSL] << " "
+                 << hits[ihit]->getPriorityPosition() << " "
+                 << hits.weight(ihit) << endl;
+      }
+    }
+  }
+}
+
+void
+CDCTriggerHoughtrackingModule::terminate()
+{
+  if (m_testFilename != "") testFile.close();
 }

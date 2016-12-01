@@ -102,7 +102,18 @@ namespace Belle2 {
 
     // Empty constructor
     //! Recommended for ROOT IO
-    TRGECLCluster() {;}
+    TRGECLCluster()
+    {
+      m_eventId = 0;
+      m_ClusterId = 0;
+      m_edep = 0;
+      m_TimeAve = 0;
+      m_NofTCinCluster = 0;
+      m_X = 0;
+      m_Y = 0;
+      m_Z = 0;
+
+    }
 
     //! Useful Constructor
     TRGECLCluster(

@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
@@ -25,12 +25,12 @@ namespace Belle2 {
       CDCSegmentPair();
 
       /// Constructor from two segments
-      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                     const CDCRecoSegment2D* toSegment);
+      CDCSegmentPair(const CDCSegment2D* fromSegment,
+                     const CDCSegment2D* toSegment);
 
       /// Constructor from two segments and an assoziated trajectory
-      CDCSegmentPair(const CDCRecoSegment2D* fromSegment,
-                     const CDCRecoSegment2D* toSegment,
+      CDCSegmentPair(const CDCSegment2D* fromSegment,
+                     const CDCSegment2D* toSegment,
                      const CDCTrajectory3D& trajectory3D);
 
       /// Equality comparision based on the pointers to the stored segments.
@@ -48,11 +48,11 @@ namespace Belle2 {
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
       friend bool operator<(const CDCSegmentPair& segmentPair,
-                            const CDCRecoSegment2D* segment)
+                            const CDCSegment2D* segment)
       { return segmentPair.getFromSegment() < segment; }
 
       /// Define reconstructed segments and axial stereo segment pairs as coaligned on the from segment
-      friend bool operator<(const CDCRecoSegment2D* segment,
+      friend bool operator<(const CDCSegment2D* segment,
                             const CDCSegmentPair& segmentPair)
       { return segment < segmentPair.getFromSegment(); }
 
@@ -71,60 +71,69 @@ namespace Belle2 {
       bool checkSegments() const
       { return checkSegmentsNonNullptr() and checkSegmentsStereoKinds(); }
 
-
-
       /// Getter for the stereo type of the first segment.
       EStereoKind getFromStereoKind() const
-      { return getFromSegment() == nullptr ? EStereoKind::c_Invalid : getFromSegment()->getStereoKind(); }
-
+      {
+        return getFromSegment() == nullptr ? EStereoKind::c_Invalid
+               : getFromSegment()->back().getStereoKind();
+      }
 
       /// Getter for the stereo type of the second segment.
       EStereoKind getToStereoKind() const
-      { return getToSegment() == nullptr ? EStereoKind::c_Invalid : getToSegment()->getStereoKind(); }
-
-
+      {
+        return getToSegment() == nullptr ? EStereoKind::c_Invalid
+               : getToSegment()->front().getStereoKind();
+      }
 
       /// Getter for the superlayer id of the from segment.
       ISuperLayer getFromISuperLayer() const
-      { return getFromSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getFromSegment()->getISuperLayer(); }
+      {
+        return getFromSegment() == nullptr ? ISuperLayerUtil::c_Invalid
+               : getFromSegment()->back().getISuperLayer();
+      }
 
       /// Getter for the superlayer id of the to segment.
       ISuperLayer getToISuperLayer() const
-      { return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid : getToSegment()->getISuperLayer(); }
+      {
+        return getToSegment() == nullptr ? ISuperLayerUtil::c_Invalid
+               : getToSegment()->front().getISuperLayer();
+      }
 
-
+      /// Getter for the total number of hits in this segment pair
+      std::size_t size() const
+      { return getFromSegment()->size() + getToSegment()->size(); }
 
       /// Getter for the from segment.
-      const CDCRecoSegment2D* getFromSegment() const
+      const CDCSegment2D* getFromSegment() const
       { return m_fromSegment; }
 
       /// Setter for the from segment.
-      void setFromSegment(const CDCRecoSegment2D* fromSegment)
+      void setFromSegment(const CDCSegment2D* fromSegment)
       { setSegments(fromSegment, getToSegment()); }
 
 
 
       /// Getter for the to segment.
-      const CDCRecoSegment2D* getToSegment() const
+      const CDCSegment2D* getToSegment() const
       { return m_toSegment; }
 
       /// Setter for the to segment.
-      void setToSegment(const CDCRecoSegment2D* toSegment)
+      void setToSegment(const CDCSegment2D* toSegment)
       { setSegments(getFromSegment(), toSegment); }
 
 
 
       /// Getter for the stereo segment
-      const CDCRecoSegment2D* getStereoSegment() const
+      const CDCSegment2D* getStereoSegment() const
       { return getFromStereoKind() != EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
       /// Getter for the axial segment
-      const CDCRecoSegment2D* getAxialSegment() const
+      const CDCSegment2D* getAxialSegment() const
       { return getFromStereoKind() == EStereoKind::c_Axial ? getFromSegment() : getToSegment(); }
 
 
       /// Setter for both segments simultaniously
-      void setSegments(const CDCRecoSegment2D* fromSegment, const CDCRecoSegment2D* toSegment)
+      void setSegments(const CDCSegment2D* fromSegment, const CDCSegment2D* toSegment)
       {
         m_fromSegment = fromSegment;
         m_toSegment = toSegment;
@@ -203,23 +212,26 @@ namespace Belle2 {
       void unsetAndForwardMaskedFlag() const
       {
         getAutomatonCell().unsetMaskedFlag();
-        getFromSegment()->unsetAndForwardMaskedFlag();
-        getToSegment()->unsetAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->unsetAndForwardMaskedFlag(toHits);
+        getToSegment()->unsetAndForwardMaskedFlag(toHits);
       }
 
       /// Sets the masked flag of the segment triple's automaton cell and of the three contained segments.
       void setAndForwardMaskedFlag() const
       {
         getAutomatonCell().setMaskedFlag();
-        getFromSegment()->setAndForwardMaskedFlag();
-        getToSegment()->setAndForwardMaskedFlag();
+        const bool toHits = true;
+        getFromSegment()->setAndForwardMaskedFlag(toHits);
+        getToSegment()->setAndForwardMaskedFlag(toHits);
       }
 
       /// If one of the contained segments is marked as masked this segment triple is set be masked as well.
       void receiveMaskedFlag() const
       {
-        getFromSegment()->receiveMaskedFlag();
-        getToSegment()->receiveMaskedFlag();
+        const bool fromHits = true;
+        getFromSegment()->receiveMaskedFlag(fromHits);
+        getToSegment()->receiveMaskedFlag(fromHits);
 
         if (getFromSegment()->getAutomatonCell().hasMaskedFlag() or
             getToSegment()->getAutomatonCell().hasMaskedFlag()) {
@@ -237,10 +249,10 @@ namespace Belle2 {
 
     private:
       /// Reference to the from segment
-      const CDCRecoSegment2D* m_fromSegment;
+      const CDCSegment2D* m_fromSegment;
 
       /// Reference to the to segment
-      const CDCRecoSegment2D* m_toSegment;
+      const CDCSegment2D* m_toSegment;
 
       /// Memory for the common three dimensional trajectory
       mutable CDCTrajectory3D m_trajectory3D;
@@ -248,7 +260,7 @@ namespace Belle2 {
       /// Automaton cell assoziated with the pair of segments
       mutable AutomatonCell m_automatonCell;
 
-    }; // end class CDCSegmentPair
+    };
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

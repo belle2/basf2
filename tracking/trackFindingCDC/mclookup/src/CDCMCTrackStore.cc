@@ -9,6 +9,9 @@
  **************************************************************************/
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+
+#include <tracking/trackFindingCDC/mclookup/CDCSimHitLookUp.h>
+#include <tracking/trackFindingCDC/mclookup/CDCMCMap.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
 #include <tracking/trackFindingCDC/ca/WithAutomatonCell.h>
@@ -51,21 +54,22 @@ void CDCMCTrackStore::clear()
 
 
 
-void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap)
+void CDCMCTrackStore::fill(const CDCMCMap* ptrMCMap, const CDCSimHitLookUp* ptrSimHitLookUp)
 {
 
   B2DEBUG(200, "In CDCMCTrackStore::fill()");
   clear();
 
   m_ptrMCMap = ptrMCMap;
+  m_ptrSimHitLookUp = ptrSimHitLookUp;
 
-  // Put the right hits into the rigth track
+  // Put the right hits into the right track
   fillMCTracks();
 
   // Split the tracks into segments
   fillMCSegments();
 
-  // Assigne the reverse mapping from CDCHits to position in track
+  // Assign the reverse mapping from CDCHits to position in track
   fillInTrackId();
 
   // Assigne the reverse mapping from CDCHits to segment ids
@@ -106,7 +110,7 @@ void CDCMCTrackStore::fillMCTracks()
       //Append hit to its own track
       m_mcTracksByMCParticleIdx[mcParticleIdx].push_back(ptrHit);
     }
-  } //end for wire hits
+  }
 
 
   //Sort the tracks along the time of flight
@@ -122,7 +126,6 @@ void CDCMCTrackStore::fillMCTracks()
 
 void CDCMCTrackStore::fillMCSegments()
 {
-
   for (std::pair<const ITrackType, CDCHitVector>& mcTrackAndMCParticleIdx : m_mcTracksByMCParticleIdx) {
 
     ITrackType mcParticleIdx = mcTrackAndMCParticleIdx.first;
@@ -210,27 +213,30 @@ void CDCMCTrackStore::arrangeMCTrack(CDCHitVector& mcTrack) const
     B2WARNING("CDCMCMap not set. Cannot sort track");
     return;
   }
-  const CDCMCMap& mcMap = *m_ptrMCMap;
 
-  std::sort(mcTrack.begin(), mcTrack.end(), [&mcMap](const CDCHit * ptrHit, const CDCHit * ptrOtherHit) -> bool {
+  const CDCSimHitLookUp& simHitLookUp = *m_ptrSimHitLookUp;
 
-    const CDCSimHit* ptrSimHit = mcMap.getSimHit(ptrHit);
-    const CDCSimHit* ptrOtherSimHit = mcMap.getSimHit(ptrOtherHit);
+  std::stable_sort(mcTrack.begin(), mcTrack.end(),
+  [&simHitLookUp](const CDCHit * ptrHit, const CDCHit * ptrOtherHit) -> bool {
 
-    //const CDCSimHit* primarySimHit = getClosestPrimarySimHit(hit);
-    //const CDCSimHit* otherPrimarySimHit = getClosestPrimarySimHit(otherHit);
+    const CDCSimHit* ptrSimHit = simHitLookUp.getClosestPrimarySimHit(ptrHit);
+    const CDCSimHit* ptrOtherSimHit = simHitLookUp.getClosestPrimarySimHit(ptrOtherHit);
 
-    //double primaryFlightTime = primarySimHit ? primarySimHit->getFlightTime() : simHit->getFlightTime();
-    //double otherPrimaryFlightTime = otherPrimarySimHit ? otherPrimarySimHit->getFlightTime() : otherSimHit->getFlightTime();
+    if (not ptrSimHit)
+    {
+      B2FATAL("No CDCSimHit for CDCHit");
+    }
+
+    if (not ptrOtherSimHit)
+    {
+      B2FATAL("No CDCSimHit for CDCHit");
+    }
 
     double secondaryFlightTime =  ptrSimHit->getFlightTime();
     double otherSecondaryFlightTime =  ptrOtherSimHit->getFlightTime();
 
-    return secondaryFlightTime < otherSecondaryFlightTime;
-
-    //return primaryFlightTime < otherPrimaryFlightTime or
-    //(primaryFlightTime == otherPrimaryFlightTime and
-    //secondaryFlightTime < otherSecondaryFlightTime);
+    /// Sort with NaN as high.
+    return (secondaryFlightTime < std::fmin(INFINITY, otherSecondaryFlightTime));
   });
 
 }
@@ -305,10 +311,8 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
   const CDCHit* ptrHit = mcSegment.front();
   const CDCHit* ptrNextHit = nextMCSegment.front();
 
-  if ((not ptrHit) or (not ptrNextHit)) {
-    B2ERROR("Nullptr retrieved from MC segment.");
-    return false;
-  }
+  assert(ptrHit);
+  assert(ptrNextHit);
 
   const CDCHit& hit = *ptrHit;
   const CDCHit& nextHit = *ptrNextHit;
@@ -322,7 +326,6 @@ bool CDCMCTrackStore::changedSuperLayer(const CDCHitVector& mcSegment, const CDC
   } else {
     return false;
   }
-
 }
 
 

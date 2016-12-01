@@ -9,6 +9,14 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/filters/segmentPair/BasicSegmentPairVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/HitGapSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedHitGapSegmentPairVarSet.h>
+
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairVarSet.h>
-#include <tracking/trackFindingCDC/filters/segmentPair/SkimmedFitlessSegmentPairVarSet.h>
+
 #include <tracking/trackFindingCDC/filters/segmentPair/FitSegmentPairVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/segmentPair/TruthSegmentPairVarSet.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/TrailSegmentPairVarSet.h>

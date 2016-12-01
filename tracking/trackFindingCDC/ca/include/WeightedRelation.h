@@ -37,19 +37,33 @@ namespace Belle2 {
       /// Operator for ordering of relations.
       bool operator<(const WeightedRelation<T>& rhs)
       {
-        return (getWeightedFrom() < rhs.getWeightedFrom()) or
-               (not(rhs.getWeightedFrom() < getWeightedFrom()) and getTo() < rhs.getTo());
+        return (getFrom() < rhs.getFrom() or
+                (not(rhs.getFrom() < getFrom()) and
+                 // highest weight first
+                 (getWeight() > rhs.getWeight() or
+                  (not(rhs.getWeight() > getWeight()) and
+                   (getTo() < rhs.getTo())))));
       }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
       friend bool operator<(const std::pair<T*, Weight>& weightedPtr,
                             const WeightedRelation<T>& weightedRelation)
-      { return weightedPtr < weightedRelation.getWeightedFrom(); }
+      {
+        return (weightedPtr.first < weightedRelation.getFrom() or
+                (not(weightedRelation.getFrom() < weightedPtr.first) and
+                 // highest weight first
+                 (weightedPtr.second > weightedRelation.getWeight())));
+      }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
       friend bool operator<(const WeightedRelation<T>& weightedRelation,
                             const std::pair<T*, Weight>& weightedPtr)
-      { return weightedRelation.getWeightedFrom() < weightedPtr; }
+      {
+        return (weightedRelation.getFrom() < weightedPtr.first or
+                (not(weightedPtr.first < weightedRelation.getFrom()) and
+                 // highest weight first
+                 (weightedRelation.getWeight() > weightedPtr.second)));
+      }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
       friend bool operator<(T* ptr,
@@ -83,5 +97,5 @@ namespace Belle2 {
 
     };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -79,8 +79,11 @@ def get_all_cuts_in_database(base_identifier=None, software_trigger_global_tag_n
 
 
 if __name__ == '__main__':
-    from softwaretrigger import setup_softwaretrigger_database_access
+    from softwaretrigger.path_functions import setup_softwaretrigger_database_access
     import basf2
+
+    # Create an interval of validity
+    validity_interval = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
     # Set a valid event number for the following calculations
     set_event_number(1, 0, 0)
@@ -88,22 +91,25 @@ if __name__ == '__main__':
     # Setup the correct database chain
     setup_softwaretrigger_database_access()
 
+    cuts = []
+
     basf2.B2RESULT("Currently, there are the following cuts in the global condition database:")
     for base_identifier, cut_identifier in get_all_cuts_in_database():
         basf2.B2RESULT(base_identifier + " " + cut_identifier)
         cut = download_cut_from_db(base_identifier, cut_identifier, True)
         basf2.B2RESULT("Cut condition: " + cut.decompile())
         basf2.B2RESULT("Cut is a reject cut: " + str(cut.isRejectCut()))
+        cuts.append({"cut": cut, "base_identifier": base_identifier, "cut_identifier": cut_identifier})
 
     basf2.reset_database()
+    for cut_params in cuts:
+        upload_cut_to_db(cut_params["cut"], cut_params["base_identifier"], cut_params["cut_identifier"], validity_interval)
+    exit(0)
 
     basf2.B2RESULT("We will now create an example cut and upload it to the *local* database.")
     # Create an example cut.
     cut = Belle2.SoftwareTrigger.SoftwareTriggerCut.compile("[[highest_1_ecl > 0.1873] or [max_pt > 0.4047]]", 1)
     basf2.B2RESULT(cut.decompile())
-
-    # Create an interval of validity
-    validity_interval = Belle2.IntervalOfValidity(0, 0, -1, -1)
 
     # Upload the cut to the local database
     upload_cut_to_db(cut, "fast_reco", "test", validity_interval)

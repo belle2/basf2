@@ -8,27 +8,22 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/facetRelation/BasicFacetRelationVarSet.h>
-#include <cassert>
+
+#include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
+#include <tracking/trackFindingCDC/geometry/ParameterLine2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-BasicFacetRelationVarSet::BasicFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = Super::extract(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
+  if (not ptrFacetRelation) return false;
 
   const CDCFacet* ptrFromFacet(ptrFacetRelation->getFrom());
   const CDCFacet* ptrToFacet(ptrFacetRelation->getTo());
 
   const CDCFacet& fromFacet = *ptrFromFacet;
   const CDCFacet& toFacet = *ptrToFacet;
-
 
   const ParameterLine2D& fromStartToMiddle = fromFacet.getStartToMiddleLine();
   const ParameterLine2D& fromStartToEnd    = fromFacet.getStartToEndLine();
@@ -44,7 +39,6 @@ bool BasicFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetR
 
   var<named("from_middle_phi")>() = fromMiddlePhi;
   var<named("to_middle_phi")>() = toMiddlePhi;
-
 
   return true;
 }

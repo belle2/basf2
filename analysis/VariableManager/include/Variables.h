@@ -69,6 +69,22 @@ namespace Belle2 {
     double cosAngleBetweenMomentumAndVertexVector(const Particle* part);
 
     /**
+     * cosine of the angle between momentum the particle and a true B particle. Is somewhere between -1 and 1
+     * if only a massless particle like a neutrino is missing in the reconstruction.
+     */
+    double cosThetaBetweenParticleAndTrueB(const Particle* part);
+
+    /**
+     * If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference
+     * of the two daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * If the given particle has three daughters: cosine of the angle between the normal vector of the plane
+     * defined by the momenta of the three daughters in the frame of the given particle (mother) and the momentum of the given particle in the lab frame.
+     * Else: 0.
+     */
+    double cosHelicityAngle(const Particle* part);
+
+
+    /**
      * return Zdistance of daughter tracks at vertex point
      */
     double VertexZDist(const Particle*);
@@ -541,9 +557,39 @@ namespace Belle2 {
     double eclClusterHighestE(const Particle* particle);
 
     /**
-     * return ratio of energies in inner 3x3 and 5x5 cells
+     * return ratio of energies of the central crystal and 3x3 crystals around the central crystal
      */
-    double eclClusterE9E25(const Particle* particle);
+    double eclClusterE1E9(const Particle* particle);
+
+    /**
+     * return ratio of energies in inner 3x3 and (5x5 cells without corners)
+     */
+    double eclClusterE9E21(const Particle* particle);
+
+    /**
+     * Deprecated - kept for backwards compatibility
+     */
+    inline double eclClusterE9E25(const Particle* particle) {return eclClusterE9E21(particle);}
+
+    /**
+     * return absolute value of Zernike Moment 40
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return absolute value of Zernike Moment 51
+     */
+    double eclClusterAbsZernikeMoment40(const Particle* particle);
+
+    /**
+     * return result of MVA using zernike moments
+     */
+    double eclClusterZernikeMVA(const Particle* particle);
+
+    /**
+     * return second moment shower shape variable
+     */
+    double eclClusterSecondMoment(const Particle* particle);
 
     /**
      * return LAT (shower variable)

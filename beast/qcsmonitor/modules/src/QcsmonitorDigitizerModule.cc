@@ -139,7 +139,7 @@ void QcsmonitorDigitizerModule::event()
         double MIP = hitsarrayinMIP[i][j];
         double Edep = MIP * m_C_keV_to_MIP * 1e-6; //keV -> GeV.
         double PE = MIP * m_C_MIP_to_PE;
-        Hits.appendNew(QcsmonitorHit(i, j, Edep, MIP, PE));
+        Hits.appendNew(QcsmonitorHit(j, i, Edep, MIP, PE));
       }
     }
   }

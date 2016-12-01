@@ -75,10 +75,10 @@ CDCRecoHit2D CDCRecoHit2D::average(const CDCRecoHit2D& recoHit1,
 }
 
 CDCRecoHit2D CDCRecoHit2D::fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                         const Vector2D& pos2D,
+                                         const Vector2D& recoPos2D,
                                          bool snap)
 {
-  CDCRecoHit2D result(rlWireHit, pos2D - rlWireHit->getRefPos2D());
+  CDCRecoHit2D result(rlWireHit, recoPos2D - rlWireHit->getRefPos2D());
   if (snap) result.snapToDriftCircle();
   return result;
 }
@@ -98,4 +98,23 @@ CDCRecoHit2D CDCRecoHit2D::reversed() const
 CDCRecoHit2D CDCRecoHit2D::getAlias() const
 {
   return CDCRecoHit2D(getRLWireHit().getAlias(), -getRecoDisp2D());
+}
+
+
+void CDCRecoHit2D::setRefDriftLength(double driftLength, bool snapRecoPos)
+{
+  double oldDriftLength = m_rlWireHit.getRefDriftLength();
+  m_rlWireHit.setRefDriftLength(driftLength);
+  if (snapRecoPos) {
+    bool switchSide = sign(oldDriftLength) != sign(driftLength);
+    snapToDriftCircle(switchSide);
+  }
+}
+
+void CDCRecoHit2D::snapToDriftCircle(bool switchSide)
+{
+  m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength());
+  if (switchSide) {
+    m_recoDisp2D = -m_recoDisp2D;
+  }
 }

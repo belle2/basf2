@@ -115,7 +115,7 @@ namespace Belle2 {
       /// Boolean flag to indicate that this segment has a valid alias version
       double m_aliasScore;
 
-    }; // class CDCSegment
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

@@ -66,8 +66,8 @@ bool ARICHGeoHAPD::isConsistent() const
   if (m_wallThickness <= 0) return false;
   if (m_winThickness <= 0) return false;
   if (m_padSize <= 0) return false;
-  if (m_nPadX <= 0) return false;
-  if (m_nPadY <= 0) return false;
+  if (m_nPadX == 0) return false;
+  if (m_nPadY == 0) return false;
   if (m_APDSizeZ <= 0) return false;
   if (m_APDSizeX <= 0) return false;
   if (m_APDSizeY <= 0) return false;

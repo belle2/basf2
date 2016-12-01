@@ -19,5 +19,5 @@ namespace Belle2 {
     template<class Ts>
     using GetIterator = typename std::remove_reference < decltype(std::begin(std::declval<Ts&>())) >::type;
 
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

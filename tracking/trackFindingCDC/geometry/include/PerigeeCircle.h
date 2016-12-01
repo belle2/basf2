@@ -38,7 +38,7 @@ namespace Belle2 {
       PerigeeCircle(double curvature, double phi0, double impact);
 
       /// Constructor from the perigee parammeters.
-      explicit PerigeeCircle(const PerigeeParameters& par);
+      explicit PerigeeCircle(const PerigeeParameters& perigeeParameters);
 
     private:
       /// Constructor taking all stored parameters for internal use.
@@ -149,7 +149,7 @@ namespace Belle2 {
       double arcLengthToCylindricalR(double cylindricalR) const;
 
       /// Calculates the two points with the given cylindrical radius on the generalised circle
-      std::pair<Vector2D, Vector2D> atCylindricalR(const double cylindricalR) const;
+      std::pair<Vector2D, Vector2D> atCylindricalR(double cylindricalR) const;
 
       /**
        *  Approach on the circle with the given cylindrical radius
@@ -164,7 +164,7 @@ namespace Belle2 {
        *  @param cylindricalR Cylindrical radius of interest
        *  @return Close point in forward direction with same cylindrical radius on the circle.
        */
-      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint, const double cylindricalR) const;
+      Vector2D atCylindricalRForwardOf(const Vector2D& startPoint, double cylindricalR) const;
 
       /// Indicates whether to given point lies in the forward direction from the perigee
       EForwardBackward isForwardOrBackwardOf(const Vector2D& from, const Vector2D& to) const
@@ -335,7 +335,7 @@ namespace Belle2 {
       /// Setter for the circle center and radius
       void setCenterAndRadius(const Vector2D& center,
                               double absRadius,
-                              const ERotation orientation = ERotation::c_CounterClockwise);
+                              ERotation orientation = ERotation::c_CounterClockwise);
 
       /// Getter for the generalised circle parameter n0
       double n0() const
@@ -507,7 +507,7 @@ namespace Belle2 {
       /// Memory for the signed impact parameter
       double m_impact;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

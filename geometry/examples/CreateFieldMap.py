@@ -8,32 +8,33 @@
 
 import math
 from basf2 import *
+import subprocess
+
+commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
 
 evtinfo = register_module('EventInfoSetter')
 # Geometry parameter loader
 gearbox = register_module('Gearbox')
 # Geometry builder
 geometry = register_module('Geometry')
-# The default magnetic field is not very interesting so replace it with the 2D
-# fieldmap
+# We only need the Magnetic field, no other geometry
 geometry.param({
-    "excludedComponents": ["MagneticField"],
-    "additionalComponents": ["MagneticField2d"],
+    "components": ["MagneticField"],
 })
 # Fieldmap creator
 fieldmap = register_module('CreateFieldMap')
 fieldmap.param({
     # Filename for the histograms
-    'filename': 'FieldMap.root',
+    'filename': 'FieldMap-%s.root' % commit,
     # type of the scan: along xy, zx or zy
     "type": "zx",
     # number of steps along the first coordinate, in the case of a zx scan this
     # would be z
     "nU": 1600,
     # start of the first coordinate in cm
-    "minU": -400,
+    "minU": -350,
     # end of the first coordinate in cm
-    "maxU": 500,
+    "maxU": 450,
     # number of steps along the second coordinate, in the case of a zx scan
     # this would be x
     "nV": 1600,
@@ -46,6 +47,10 @@ fieldmap.param({
     "phi": math.pi / 4,
     # offset of the plane with respect to the global origin
     "wOffset": 0,
+    # number of steps in phi for zr scan
+    "nPhi": 720,
+    # if true here store all sampled points in a TTree
+    "saveAllPoints": False,
 })
 
 # Create main path

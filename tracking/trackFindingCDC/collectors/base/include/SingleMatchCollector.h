@@ -21,16 +21,16 @@ namespace Belle2 {
     class SingleMatchCollector : public ManyMatchCollector<AMatcherAlgorithm, AAdderAlgorithm, Compare> {
     public:
       /// The super (parent) class.
-      typedef ManyMatchCollector<AMatcherAlgorithm, AAdderAlgorithm, Compare> Super;
+      using Super = ManyMatchCollector<AMatcherAlgorithm, AAdderAlgorithm, Compare>;
       /// Copy the CollectorItem definition.
-      typedef typename Super::CollectorItem CollectorItem;
+      using CollectorItem = typename Super::CollectorItem;
       /// Copy the CollectionItem definition.
-      typedef typename Super::CollectionItem CollectionItem;
+      using CollectionItem = typename Super::CollectionItem;
       /// Copy the MatchedCollectionItem definition.
-      typedef typename Super::MatchedCollectionItem MatchedCollectionItem;
+      using MatchedCollectionItem = typename Super::MatchedCollectionItem;
 
       /// Do the collection process.
-      virtual void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
+      void collect(std::vector<CollectorItem>& collectorItems, const std::vector<CollectionItem>& collectionItems) override
       {
         const MapOfList<const CollectionItem*, WithWeight<CollectorItem*>, Compare>& matches = Super::constructMatchLookup(collectorItems,
             collectionItems);

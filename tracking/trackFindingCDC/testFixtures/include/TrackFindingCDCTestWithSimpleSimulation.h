@@ -11,7 +11,6 @@
 
 #include <tracking/trackFindingCDC/display/EventDataPlotter.h>
 #include <tracking/trackFindingCDC/sim/CDCSimpleSimulation.h>
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory3D.h>
 
 #include <tracking/trackFindingCDC/geometry/Helix.h>
@@ -31,11 +30,10 @@ namespace Belle2 {
     public:
       TrackFindingCDCTestWithSimpleSimulation() : m_simpleSimulation()
       {
-        m_simpleSimulation.setWireHitTopology(&(CDCWireHitTopology::getInstance()));
       }
 
       /// Preparations before the test
-      virtual
+
       void SetUp() override
       {
 
@@ -84,7 +82,7 @@ namespace Belle2 {
       {
         m_mcTrajectories = trajectories;
 
-        // Propagate the tracks and write hits to the eventtopology
+        // Construct tracks. Wire hits are stored in the simple simulation
         m_mcTracks = m_simpleSimulation.simulate(trajectories);
 
         fillCaches();
@@ -95,7 +93,8 @@ namespace Belle2 {
       {
         // No trajectory information present
         m_mcTrajectories.clear();
-        // Propagate the tracks and write hits to the eventtopology
+
+        // Load prepared tracks wire hits are stored in the simple simulation
         m_mcTracks = m_simpleSimulation.loadPreparedEvent();
 
         fillCaches();
@@ -110,34 +109,33 @@ namespace Belle2 {
 
         // Prepare the monte carlo segments
         for (const CDCTrack& mcTrack : m_mcTracks) {
-          std::vector<CDCRecoSegment3D> recoSegment3DsInTrack = mcTrack.splitIntoSegments();
-          for (const CDCRecoSegment3D& recoSegment3D :  recoSegment3DsInTrack) {
-            m_mcSegment2Ds.push_back(recoSegment3D.stereoProjectToRef());
+          std::vector<CDCSegment3D> segment3DsInTrack = mcTrack.splitIntoSegments();
+          for (const CDCSegment3D& segment3D :  segment3DsInTrack) {
+            m_mcSegment2Ds.push_back(segment3D.stereoProjectToRef());
           }
         }
 
         // Filter the axial segments
-        for (const CDCRecoSegment2D& recoSegment2D : m_mcSegment2Ds) {
-          if (recoSegment2D.getStereoKind() == EStereoKind::c_Axial) {
-            m_mcAxialSegment2Ds.push_back(&recoSegment2D);
+        for (const CDCSegment2D& segment2D : m_mcSegment2Ds) {
+          if (segment2D.getStereoKind() == EStereoKind::c_Axial) {
+            m_mcAxialSegment2Ds.push_back(&segment2D);
           }
         }
 
         // Filter for axial hits
-        const CDCWireHitTopology& wireHitTopology = CDCWireHitTopology::getInstance();
-        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           if (wireHit.isAxial()) {
             m_axialWireHits.push_back(&wireHit);
           }
         }
 
         // Pick up points for all hits
-        for (const CDCWireHit& wireHit : wireHitTopology.getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_wireHits.push_back(&wireHit);
         }
 
         m_plotter.draw(CDCWireTopology::getInstance());
-        for (const CDCWireHit& wireHit : CDCWireHitTopology::getInstance().getWireHits()) {
+        for (const CDCWireHit& wireHit : m_simpleSimulation.getWireHits()) {
           m_plotter.draw(wireHit);
         }
       }
@@ -198,7 +196,7 @@ namespace Belle2 {
       }
 
       /// Clean up after test
-      virtual void TearDown() override
+      void TearDown() override
       {
         Belle2::LogSystem::Instance().getLogConfig()->setLogLevel(m_savedLogLevel);
         Belle2::LogSystem::Instance().getLogConfig()->setLogInfo(LogConfig::c_Debug, m_savedDebugLogInfo);
@@ -232,10 +230,10 @@ namespace Belle2 {
       std::vector<CDCTrack> m_mcTracks;
 
       /// Memory for the Monte Carlo segments of the current event.
-      std::vector<CDCRecoSegment2D> m_mcSegment2Ds;
+      std::vector<CDCSegment2D> m_mcSegment2Ds;
 
       /// Memory for the axial Monte Carlo segments of the current event.
-      std::vector<const CDCRecoSegment2D*> m_mcAxialSegment2Ds;
+      std::vector<const CDCSegment2D*> m_mcAxialSegment2Ds;
 
       /// Memory for the axial hits of the current event.
       std::vector<const CDCWireHit*> m_axialWireHits;
@@ -249,5 +247,5 @@ namespace Belle2 {
 
     };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

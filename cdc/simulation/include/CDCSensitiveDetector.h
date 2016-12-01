@@ -12,8 +12,8 @@
 #ifndef CDCSensitiveDetector_H
 #define CDCSensitiveDetector_H
 
-//#include <cdc/simcdc/CDCB4VHit.h>
 #include <simulation/kernel/SensitiveDetectorBase.h>
+#include <cdc/dataobjects/WireID.h>
 
 #include <vector>
 #include <map>
@@ -51,9 +51,6 @@ namespace Belle2 {
 
       //!  Do what you want to do at the end of each event
       void EndOfEvent(G4HCofThisEvent*);
-
-      //!  Re-assign left/right info.
-      void reAssignLeftRightInfo();
 
       //! Save CDCSimHit into datastore
       void saveSimHit(const G4int layerId,
@@ -224,6 +221,31 @@ namespace Belle2 {
       //! Sort wire id.
       std::vector<int>  WireId_in_hit_order(int id0, int id1, int nWires);
 
+      //!  set left/right flag modified for tracking
+      void setModifiedLeftRightFlag();
+
+      //!  Re-assign left/right info.
+      void reAssignLeftRightInfo();
+
+      /**
+       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
+       * @param[in] wireId wire-id. in question (reference)
+       * @param[in] otherWireId another wire-id. in question
+       */
+      unsigned short areNeighbors(const WireID& wireId, const WireID& otherWireId) const;
+
+      /**
+       * Check if neighboring cell in the same super-layer; essentially a copy from cdcLocalTracking/mclookup.
+       * @param[in] iCLayer later-id (continuous) in question (reference)
+       * @param[in] iSuperLayer super-later-id in question (reference)
+       * @param[in] iLayer later-id in the super-layer in question (reference)
+       * @param[in] iWire wire-id in the layer in question (reference)
+       * @param[in] otherWireId another wire-id. in question
+       */
+      unsigned short areNeighbors(unsigned short iCLayer, unsigned short iSuperLayer, unsigned short iLayer, unsigned short iWire,
+                                  const WireID& otherWireId) const;
+
+
       /**
        * Magnetic field is on or off.
        */
@@ -234,10 +256,8 @@ namespace Belle2 {
        * 0: uniform B field (1.5 T), 1: non-uniform B field.
        */
       G4int m_nonUniformField;
-      G4double alpha;       /*!< Helix parameter alpha.     */
-      G4double brot[3][3];  /*!< a rotation matrix. */
 
-    private:
+      G4double m_brot[3][3];  /*!< a rotation matrix. */
 
       //      CDCGeometryPar& m_cdcgp; /**< Reference to CDCGeometryPar object. */
       CDCGeometryPar* m_cdcgp; /**< Pointer to CDCGeometryPar object. */
@@ -271,6 +291,15 @@ namespace Belle2 {
       //      std::vector<std::multimap<unsigned short, CDCSimHit*>::iterator> m_posWeightMapItEnd; /**< Iterator showing end of positive hit map*/
 
       //      int m_nPosHits, m_nNegHits;
+
+      const signed short CCW = 1; ///< Constant for counterclockwise orientation
+      const signed short CW  = -1; ///< Constant for clockwise orientation
+      const signed short CW_OUT_NEIGHBOR  = 1; ///< Constant for clockwise outwards
+      const signed short CW_NEIGHBOR      = 3; ///< Constant for clockwise
+      const signed short CW_IN_NEIGHBOR   = 5; ///< Constant for clockwise inwards
+      const signed short CCW_IN_NEIGHBOR  = 7; ///< Constant for counterclockwise inwards
+      const signed short CCW_NEIGHBOR     = 9; ///< Constant for counterclockwise
+      const signed short CCW_OUT_NEIGHBOR = 11; ///< Constant for counterclockwise outwards
     };
   }
 } // end of namespace Belle2

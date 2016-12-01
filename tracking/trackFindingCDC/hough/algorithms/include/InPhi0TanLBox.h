@@ -25,23 +25,23 @@ namespace Belle2 {
 
     public:
       /// Create a new box with the given curler curvature.
-      explicit InPhi0TanLBox(const float& curlCurv)
+      explicit InPhi0TanLBox(float curlCurv)
         : m_curlCurv(curlCurv)
       {}
 
     public:
       /// The box to which this object correspondes.
-      typedef Box<DiscretePhi0, ContinuousTanL> HoughBox;
+      using HoughBox = Box<DiscretePhi0, ContinuousTanL>;
 
     public:
       /// Function that gives the sign of the distance from an observed drift circle to the sweeped object.
-      inline ESign getDistanceSign(const HoughBox& houghBox,
-                                   const float& x,
-                                   const float& y,
-                                   const float& l,
-                                   const float& dxdz,
-                                   const float& dydz,
-                                   ILayer /*iCLayer*/ = -1) const
+      ESign getDistanceSign(const HoughBox& houghBox,
+                            float x,
+                            float y,
+                            float l,
+                            float dxdz,
+                            float dydz,
+                            ILayer /*iCLayer*/ = -1) const
       {
         const std::array<DiscretePhi0, 2>& phi0Vec = houghBox.getBounds<DiscretePhi0>();
         const std::array<ContinuousTanL, 2>& tanL = houghBox.getBounds<ContinuousTanL>();
@@ -93,5 +93,5 @@ namespace Belle2 {
       /// Curler curvature - set to value greater zero to activate one arm exclusive finding.
       float m_curlCurv;
     };
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

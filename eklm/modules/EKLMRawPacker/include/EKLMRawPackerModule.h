@@ -11,26 +11,16 @@
 #ifndef EKLMRAWPACKER_H
 #define EKLMRAWPACKER_H
 
-#include <string>
-#include <vector>
-#include <stdlib.h>
-#include <sys/time.h>
-
-#include <framework/core/Module.h>
-#include <framework/pcore/EvtMessage.h>
-#include <framework/pcore/MsgHandler.h>
-#include <framework/datastore/DataStore.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/datastore/StoreArray.h>
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/logging/Logger.h>
-#include <framework/gearbox/Gearbox.h>
-#include <framework/gearbox/GearDir.h>
-
-#include <rawdata/dataobjects/RawCOPPER.h>
-#include <rawdata/dataobjects/RawKLM.h>
+/* C++ headers. */
+#include <cstdint>
 #include <map>
-#include <iostream>
+
+/* Belle2 headers. */
+#include <framework/core/Module.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <rawdata/dataobjects/RawKLM.h>
 
 namespace Belle2 {
 
@@ -73,8 +63,23 @@ namespace Belle2 {
     //! RawKLM array
     StoreArray<RawKLM> rawklmarray;
 
-    void formatData(int forward, int layer, int sector, int plane, int strip, int charge, float ctime, unsigned short& bword1,
-                    unsigned short& bword2, unsigned short& bword3, unsigned short& bword4);
+    /**
+     * Creation of raw data.
+     * @param[in]  endcap Endcap number.
+     * @param[in]  layer  Layer number.
+     * @param[in]  sector Sector number.
+     * @param[in]  plane  Plane number.
+     * @param[in]  strip  Strip number.
+     * @param[in]  charge Charge.
+     * @param[in]  ctime  Time.
+     * @param[out] bword1 First word.
+     * @param[out] bword2 Second word.
+     * @param[out] bword3 Third word.
+     * @param[out] bword4 Fourth word.
+     */
+    void formatData(int endcap, int layer, int sector, int plane, int strip,
+                    int charge, float ctime, uint16_t& bword1,
+                    uint16_t& bword2, uint16_t& bword3, uint16_t& bword4);
 
     //! to map logical coordinates to hardware coordinates
     std::map<int, int> m_ModuleIdToelectId;

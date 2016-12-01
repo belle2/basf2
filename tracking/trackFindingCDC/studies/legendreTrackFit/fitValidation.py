@@ -90,7 +90,7 @@ class FitValidation(StandardEventGenerationRun):
 
         main_path = super(FitValidation, self).create_path()
 
-        main_path.add_module("WireHitTopologyPreparer")
+        main_path.add_module("WireHitPreparer")
 
         main_path.add_module(modules.CDCMCFinder())
 

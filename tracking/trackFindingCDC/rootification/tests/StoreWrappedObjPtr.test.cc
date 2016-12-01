@@ -9,7 +9,7 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithTopology.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <tracking/trackFindingCDC/rootification/StoreWrapper.h>
@@ -40,14 +40,9 @@ TEST(TrackFindingCDCTest, cpp_storeWrappedObjPtr)
 template<class T>
 class DISABLED_TrackFindingCDCTestRootification : public TrackFindingCDCTestWithTopology {};
 
-typedef ::testing::Types <
-std::vector<CDCWireHit>,
-    std::vector<CDCRecoSegment2D>
-    > RootifiedTypes;
-
+using RootifiedTypes = ::testing::Types<std::vector<CDCWireHit>, std::vector<CDCSegment2D>>;
 
 TYPED_TEST_CASE(DISABLED_TrackFindingCDCTestRootification, RootifiedTypes);
-
 
 TYPED_TEST(DISABLED_TrackFindingCDCTestRootification, rootification_UsableAsStoreWrappedObjPtr)
 {

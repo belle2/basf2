@@ -17,15 +17,9 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitFacetVarSet::FitFacetVarSet()
-  : Super()
-{
-}
-
 bool FitFacetVarSet::extract(const CDCFacet* ptrFacet)
 {
-  bool extracted = extractNested(ptrFacet);
-  if (not extracted or not ptrFacet) return false;
+  if (not ptrFacet) return false;
   const CDCFacet& facet = *ptrFacet;
 
   const Vector2D startWirePos2D = facet.getStartWire().getRefPos2D();

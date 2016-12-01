@@ -16,5 +16,5 @@ namespace Belle2 {
 
     using PrimaryWireHitRelationFilter = WholeWireHitRelationFilter<false>;
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

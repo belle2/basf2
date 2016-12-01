@@ -12,7 +12,9 @@
 #include <framework/core/ProcessStatistics.h>
 
 #include <framework/logging/Logger.h>
+#include <framework/pcore/ProcHandler.h>
 #include <framework/gearbox/Unit.h>
+#include <framework/utilities/Utils.h>
 #include <framework/utilities/HTML.h>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -76,14 +78,10 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
   std::vector<ModuleStatistics> modulesSortedByIndex(*modules);
   sort(modulesSortedByIndex.begin(), modulesSortedByIndex.end(), [](const ModuleStatistics & a, const ModuleStatistics & b) { return a.getIndex() < b.getIndex(); });
 
-  ModuleStatistics::value_type maxcalls = 0;
   for (const ModuleStatistics& stats : modulesSortedByIndex) {
-    const ModuleStatistics::value_type calls = stats.getCalls(mode);
-    if (calls > maxcalls)
-      maxcalls = calls;
     out << output
         % stats.getName()
-        % calls
+        % stats.getCalls(mode)
         % (stats.getMemorySum(mode) / 1024)
         % (stats.getTimeSum(mode) / Unit::s)
         % (stats.getTimeMean(mode) / Unit::ms)
@@ -92,8 +90,8 @@ string ProcessStatistics::getStatisticsString(ModuleStatistics::EStatisticCounte
 
   out << boost::format("%|" + numWidth + "T=|\n");
   out << output
-      % "Total"
-      % maxcalls //getCalls() returns the sum of processed events (e.g. from previous basf2 executions)
+      % (ProcHandler::isOutputProcess() ? "Total (output proc.)" : "Total")
+      % global.getCalls(mode)
       % (global.getMemorySum(mode) / 1024)
       % (global.getTimeSum(mode) / Unit::s)
       % (global.getTimeMean(mode) / Unit::ms)
@@ -154,13 +152,15 @@ void ProcessStatistics::merge(const Mergeable* other)
 {
   const ProcessStatistics* otherObject = static_cast<const ProcessStatistics*>(other);
 
-  m_global.update(otherObject->m_global);
-
   if (m_stats == otherObject->m_stats) {
     //fast version for merging between processes
     for (unsigned int i = 0; i < otherObject->m_stats.size(); i++)
       m_stats[i].update(otherObject->m_stats[i]);
   } else {
+    //note: statistics in m_global are not merged for pp, we use the output process instead
+    //for objects read from file we need to add them though
+    m_global.update(otherObject->m_global);
+
     appendUnmergedModules(otherObject);
   }
 

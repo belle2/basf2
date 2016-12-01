@@ -43,11 +43,6 @@ SensitiveDetector::~SensitiveDetector()
 
 void SensitiveDetector::Initialize(G4HCofThisEvent*)
 {
-  for (int iECLCell = 0; iECLCell < 8736; iECLCell++) {
-    for (int  TimeIndex = 0; TimeIndex < 80; TimeIndex++) {
-      m_ECLHitIndex[iECLCell][TimeIndex] = -1;
-    }
-  }
 }
 
 //-----------------------------------------------------
@@ -55,6 +50,7 @@ void SensitiveDetector::Initialize(G4HCofThisEvent*)
 //-----------------------------------------------------
 bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 {
+  //  return true;
   G4double edep = aStep->GetTotalEnergyDeposit();
   const G4StepPoint& s0 = *aStep->GetPreStepPoint();
   const G4StepPoint& s1 = *aStep->GetPostStepPoint();
@@ -92,11 +88,44 @@ bool SensitiveDetector::step(G4Step* aStep, G4TouchableHistory*)
 
 void SensitiveDetector::EndOfEvent(G4HCofThisEvent*)
 {
-}
+  struct hit_t { double e, t; };
+  map<int, hit_t> a;
 
-inline double dot(const TVector3& u, const TVector3& v)
-{
-  return u.x() * v.x() +  u.y() * v.y() +  u.z() * v.z();
+  struct thit_t { int tid, hid; };
+  vector<thit_t> tr;
+
+  ECLGeometryPar* eclp = ECLGeometryPar::Instance();
+
+  for (const ECLSimHit& t : m_eclSimHits) {
+    double tof = t.getFlightTime();
+    if (tof >= 8000 || tof < 0) continue;
+    int TimeIndex = tof * (1. / 100);
+    int cellId = t.getCellId() - 1;
+    int key = cellId * 80 + TimeIndex;
+    double edep = t.getEnergyDep();
+    double tsen = tof + eclp->time2sensor(cellId, t.getPosition()); // flight time to diode sensor
+
+    hit_t& h = a[key];
+
+    int trkid = t.getTrackId();
+    tr.push_back({trkid, key});
+
+    double old_edep = h.e, old_tsen = h.t;
+    double new_edep = old_edep + edep;
+
+    h.e = new_edep;
+    h.t = (old_edep * old_tsen + edep * tsen) / new_edep;
+  }
+
+  int hitNum = m_eclHits.getEntries();
+  //  assert(hitNum == 0);
+  for (const pair<int, hit_t>&  t : a) {
+    int key = t.first, cellId = key / 80;
+    for (const thit_t& s : tr)
+      if (s.hid == key) m_eclHitRel.add(s.tid, hitNum);
+    const hit_t& h = t.second;
+    m_eclHits.appendNew(cellId + 1, h.e, h.t); hitNum++;
+  }
 }
 
 int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4double tof, G4double edep,
@@ -104,39 +133,119 @@ int SensitiveDetector::saveSimHit(G4int cellId, G4int trackID, G4int pid, G4doub
 {
   int simhitNumber = m_eclSimHits.getEntries();
   m_eclSimHitRel.add(trackID, simhitNumber);
-
-  TVector3 momentum(mom.getX(), mom.getY(), mom.getZ());
-  TVector3 position(pos.getX(), pos.getY(), pos.getZ());
-  momentum *= 1 / CLHEP::GeV;
-  position *= 1 / CLHEP::cm;
-  tof      *= 1 / CLHEP::ns;
-  edep     *= 1 / CLHEP::GeV;
-  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, momentum, position);
-
-  if (tof < 8000) {
-    ECLGeometryPar* eclp = ECLGeometryPar::Instance();
-    const TVector3& PosCell = eclp->GetCrystalPos(cellId);        // center of crystal position
-    const TVector3& VecCell = eclp->GetCrystalVec(cellId);        // vector of crystal axis
-    position -= PosCell;
-    double z = 15. - dot(position, VecCell);      // position along the vector of crystal axis
-    double tsen = 6.05 + z * (0.0749 - z * 0.00112) + tof; // flight time to diode sensor
-
-    int TimeIndex = tof * (1. / 100);                      // Hit Time of StoreArray
-    int hitNum = m_ECLHitIndex[cellId][TimeIndex];
-    if (hitNum == -1) {
-      hitNum = m_eclHits.getEntries();
-      m_eclHitRel.add(trackID, hitNum);
-      m_eclHits.appendNew(cellId + 1, edep, tsen);
-      m_ECLHitIndex[cellId][TimeIndex] = hitNum;
-    } else {
-      m_eclHitRel.add(trackID, hitNum);
-      ECLHit* eclHit  = m_eclHits[hitNum];
-      double old_edep = eclHit->getEnergyDep();
-      double old_tsen = eclHit->getTimeAve();
-      double new_edep = old_edep + edep;
-      eclHit->setEnergyDep(new_edep);
-      eclHit->setTimeAve((old_edep * old_tsen + edep * tsen) / new_edep);
-    }
-  }
+  tof  *= 1 / CLHEP::ns;
+  edep *= 1 / CLHEP::GeV;
+  m_eclSimHits.appendNew(cellId + 1, trackID, pid, tof, edep, mom * (1 / CLHEP::GeV), pos * (1 / CLHEP::cm));
   return simhitNumber;
+}
+
+SensitiveDiode::SensitiveDiode(const G4String& name):
+  Simulation::SensitiveDetectorBase(name, Const::ECL)
+{
+  m_eclHits.registerInDataStore("ECLDiodeHits");
+  m_eclp = ECLGeometryPar::Instance();
+  m_trackID = -1;
+  m_tsum = 0;
+  m_esum = 0;
+}
+
+SensitiveDiode::~SensitiveDiode()
+{
+}
+
+void SensitiveDiode::Initialize(G4HCofThisEvent*)
+{
+  m_hits.clear();
+  m_cells.clear();
+}
+
+//-----------------------------------------------------
+// Method invoked for every step in sensitive detector
+//-----------------------------------------------------
+bool SensitiveDiode::step(G4Step* aStep, G4TouchableHistory*)
+{
+  const G4StepPoint& s0 = *aStep->GetPreStepPoint();
+  const G4StepPoint& s1 = *aStep->GetPostStepPoint();
+  const G4Track&  track = *aStep->GetTrack();
+
+  if (m_trackID != track.GetTrackID()) { //TrackID changed, store track informations
+    m_trackID = track.GetTrackID();
+    //Reset track parameters
+    m_esum = 0;
+    m_tsum = 0;
+  }
+  //Update energy deposit
+  G4double edep = aStep->GetTotalEnergyDeposit();
+  m_esum += edep;
+  m_tsum += (s0.GetGlobalTime() + s1.GetGlobalTime()) * edep;
+  //Save Hit if track leaves volume or is killed
+  if (track.GetNextVolume() != track.GetVolume() ||
+      track.GetTrackStatus() >= fStopAndKill) {
+    if (m_esum > 0.0) {
+      int cellID = m_eclp->TouchableDiodeToCellID(s0.GetTouchable());
+      m_tsum /= 2 * m_esum; // average
+      m_hits.push_back({cellID, m_esum, m_tsum});
+      auto it = find(m_cells.begin(), m_cells.end(), cellID);
+      if (it == m_cells.end())m_cells.push_back(cellID);
+#if 0
+      const G4ThreeVector& p = s0.GetPosition();
+      G4ThreeVector cp = 10 * m_eclp->getCrystalPos(cellID);
+      G4ThreeVector cv = m_eclp->getCrystalVec(cellID);
+      double dz = (p - cp) * cv;
+      double rho = ((p - cp) - dz * cv).perp();
+      cout << "diff " << cellID << " " << dz << " " << rho << endl;
+      if (abs(dz - 150) > 1) {
+        const G4VTouchable* touch = s0.GetTouchable();
+        const G4NavigationHistory* h = touch->GetHistory();
+        int hd = h->GetDepth();
+        int i1 = h->GetReplicaNo(hd - 1); // index of each volume is set at physical volume creation
+        int i2 = h->GetReplicaNo(hd - 2); // go up in volume hierarchy
+        const G4String& vname = touch->GetVolume()->GetName();
+        cout << vname << " " << hd << " " << i1 << " " << i2 << endl;
+        for (int i = 0; i <= hd; i++) {
+          G4VPhysicalVolume* v = h->GetVolume(i);
+          cout << v->GetName() << endl;
+        }
+      }
+#endif
+    }
+    //Reset TrackID
+    m_trackID = 0;
+  }
+  return true;
+}
+
+void SensitiveDiode::EndOfEvent(G4HCofThisEvent*)
+{
+  struct dep_t {double e, t;};
+  vector<dep_t> v;
+  for (int cellId : m_cells) {
+    for (const hit_t& h : m_hits) {
+      if (cellId == h.cellId) v.push_back({h.e, h.t});
+    }
+
+    double esum = 0, tsum = 0;
+    for (const dep_t& t : v) {
+      esum += t.e;
+      tsum += t.t * t.e;
+    }
+    tsum /= esum;
+
+    double trms = 0;
+    for (const dep_t& t : v) trms += pow(t.t - tsum, 2) * t.e ;
+    trms /= esum;
+
+    tsum *= 1 / CLHEP::ns;
+    esum *= 1 / CLHEP::GeV;
+    m_eclHits.appendNew(cellId + 1, esum, tsum);
+
+
+    // cout<<"DD: "<<cellId<<" "<<esum<<" "<<tsum<<" +- "<<sqrt(tsum2)<<endl;
+
+    // sort(v.begin(),v.end(),[](const dep_t &a, const dep_t &b){return a.t<b.t;});
+    // cout<<"DD: "<<cellId<<" ";
+    // for(const dep_t &t: v)cout<<t.e<<" MeV "<<t.t<<" nsec, ";
+    // cout<<"\n";
+
+  }
 }

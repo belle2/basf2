@@ -69,6 +69,12 @@ namespace Belle2 {
       t->GetListOfBranches()->Add(branch);
     }
 
+    void setBranchAddress(TTree* t, const std::string& branchName,
+                          const std::string& /*variableName*/)
+    {
+      t->SetBranchAddress(branchName.c_str(), & m_min);
+    }
+
     /** Accessor to the inf of the set (which is also the min) */
     MinType getInf(void) const { return m_min; } ;
 

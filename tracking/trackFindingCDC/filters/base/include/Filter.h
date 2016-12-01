@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/findlets/base/ProcessingSignalListener.h>
+#include <tracking/trackFindingCDC/utilities/CompositeProcessingSignalListener.h>
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/core/ModuleParamList.h>
@@ -22,18 +22,23 @@ namespace Belle2 {
 
     /// Base class for filters on a generic object type.
     template<class AObject>
-    class Filter : public ProcessingSignalListener {
+    class Filter : public CompositeProcessingSignalListener {
 
     public:
       /// Type of the object to be analysed.
-      typedef AObject Object;
+      using Object = AObject;
 
     public:
-      /** Expose the set of parameters of the filter to the module parameter list.
+      /// Make destructor of interface class virtual
+      virtual ~Filter() = default;
+
+      /**
+       *  Expose the set of parameters of the filter to the module parameter list.
        *
        *  Note that not all filters have yet exposed their parameters in this way.
        */
-      virtual void exposeParameters(ModuleParamList*, const std::string& = "")
+      virtual void exposeParameters(ModuleParamList* moduleParamList __attribute__((unused)),
+                                    const std::string& prefix __attribute__((unused)))
       {
       }
 
@@ -44,19 +49,21 @@ namespace Belle2 {
       }
 
     public:
-      /** Function to evaluate the object.
+      /**
+       *  Function to evaluate the object.
        *  Base implementation rejects all objects.
        *
        *  @param obj The object to be accepted or rejected.
        *  @return    A finit float value if the object is accepted.
        *             NAN if the object is rejected.
        */
-      virtual Weight operator()(const Object&)
+      virtual Weight operator()(const Object& obj __attribute__((unused)))
       {
         return NAN;
       }
 
-      /** Function to evaluate the object.
+      /**
+       *  Function to evaluate the object.
        *  Base implementation rejects all objects.
        *
        *  @param obj The object to be accepted or rejected.

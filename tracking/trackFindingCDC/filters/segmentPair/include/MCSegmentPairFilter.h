@@ -20,18 +20,18 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<Filter<CDCSegmentPair> > Super;
+      using Super = MCSymmetricFilterMixin<Filter<CDCSegmentPair> >;
 
     public:
       /// Constructor
-      explicit MCSegmentPairFilter(bool allowReverse = true) :
-        Super(allowReverse) {}
+      explicit MCSegmentPairFilter(bool allowReverse = true)
+        : Super(allowReverse)
+      {
+      }
 
       /// Checks if a axial stereo segment pair is a good combination.
-      virtual Weight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& axialSegmentPair)
-      override final;
+      Weight operator()(const Belle2::TrackFindingCDC::CDCSegmentPair& segmentPair) final;
+    };
 
-    }; // end class MCSegmentPairFilter
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

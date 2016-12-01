@@ -54,8 +54,8 @@ namespace Belle2 {
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return always returns NAN to reject all facet neighbors.
        */
-      virtual Weight operator()(const CDCFacet& /* from */,
-                                const CDCFacet& /* to */)
+      virtual Weight operator()(const CDCFacet& from  __attribute__((unused)),
+                                const CDCFacet& to  __attribute__((unused)))
       {
         return NAN;
       }
@@ -65,7 +65,7 @@ namespace Belle2 {
        *  Checks the validity of the pointers in the relation and unpacks the relation to
        *  the method implementing the rejection.
        */
-      virtual Weight operator()(const Relation<const CDCFacet>& relation) override
+      Weight operator()(const Relation<const CDCFacet>& relation) override
       {
         const CDCFacet* ptrFrom(relation.first);
         const CDCFacet* ptrTo(relation.second);
@@ -73,6 +73,6 @@ namespace Belle2 {
         return operator()(*ptrFrom, *ptrTo);
       }
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

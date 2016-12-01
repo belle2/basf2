@@ -49,8 +49,8 @@ namespace Belle2 {
        *  * ACellHolderNeighborhood is required to have a .equal_range() method
        *    that yields a range of pairs which .second elements are the sought neighbors.
        *  @param cellHolderPtrs         Pointers to objects that should be clustered.
-       *  @param cellHolderNeighorhood  Relations between the objects that should be clustered
-       *  @param[out]                   Groups of connected objects in the neighborhood.
+       *  @param cellHolderNeighborhood  Relations between the objects that should be clustered
+       *  @param[out] clusters          Groups of connected objects in the neighborhood.
        */
       template<class ACellHolderPtrRange, class ACellHolderNeighborhood>
       void createFromPointers(const ACellHolderPtrRange& cellHolderPtrs,
@@ -78,10 +78,10 @@ namespace Belle2 {
     private:
       /// Helper function. Starting a new cluster and iterativelly (not recursively) expands it.
       template<class ACellHolderNeighborhood>
-      inline void startCluster(CellHolderPtr seedCellHolderPtr,
-                               const ACellHolderNeighborhood& cellHolderNeighborhood,
-                               int iCluster,
-                               ACluster& newCluster) const
+      void startCluster(CellHolderPtr seedCellHolderPtr,
+                        const ACellHolderNeighborhood& cellHolderNeighborhood,
+                        int iCluster,
+                        ACluster& newCluster) const
       {
         setCellState(seedCellHolderPtr, iCluster);
         newCluster.insert(newCluster.end(), seedCellHolderPtr);
@@ -156,6 +156,6 @@ namespace Belle2 {
         automatonCell.setCellWeight(cellWeight);
       }
 
-    }; // end class Clusterizer
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

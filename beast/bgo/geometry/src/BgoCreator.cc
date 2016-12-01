@@ -117,7 +117,12 @@ namespace Belle2 {
 
         G4RotationMatrix* pRot = new G4RotationMatrix();
         pRot->rotate(-angle, G4ThreeVector(rx, ry, rz));
+        //G4Transform3D transform = G4Translate3D(px, py, pz) * G4Rotate3D(-angle, G4ThreeVector(rx, ry, rz));
         new G4PVPlacement(pRot, G4ThreeVector(px, py, pz), l_BGO, "p_BGO", &topVolume, false, detID);
+        //new G4PVPlacement(transform, l_BGO, "p_BGO", &topVolume, false, detID);
+        B2INFO("BGO-" << detID << " placed at: (" << px << "," << py << "," << pz << ")" << " mm ");
+        //B2INFO("BGO-" << detID << " placed at: " << transform.getTranslation() << " mm ");
+        B2INFO("      rotation of " << -angle << " degree a long (" << rx << "," << ry << "," << rz << ") axis");
         detID++;
       }
     }

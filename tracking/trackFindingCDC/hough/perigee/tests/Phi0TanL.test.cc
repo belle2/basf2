@@ -199,13 +199,13 @@ namespace {
     houghTree.initialize();
 
     // Execute the finding a couple of time to find a stable execution time.
-    std::vector< std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> > > candidates;
+    std::vector< std::pair<HoughBox, std::vector<const CDCSegment2D*> > > candidates;
 
     // Is this still C++? Looks like JavaScript to me :-).
     TimeItResult timeItResult = timeIt(100, true, [&]() {
       // Exclude the timing of the resource release for comparision with the legendre test.
       houghTree.fell();
-      houghTree.seed(m_mcSegment2Ds | boost::adaptors::transformed(&std::addressof<CDCRecoSegment2D>));
+      houghTree.seed(m_mcSegment2Ds | boost::adaptors::transformed(&std::addressof<CDCSegment2D>));
 
       const double minWeight = 50.0;
       // candidates = houghTree.find(minWeight);
@@ -227,9 +227,9 @@ namespace {
     houghTree.raze();
 
     size_t iColor = 0;
-    for (std::pair<HoughBox, std::vector<const CDCRecoSegment2D*> >& candidate : candidates) {
+    for (std::pair<HoughBox, std::vector<const CDCSegment2D*> >& candidate : candidates) {
       const HoughBox& houghBox = candidate.first;
-      const std::vector<const CDCRecoSegment2D*>& segments = candidate.second;
+      const std::vector<const CDCSegment2D*>& segments = candidate.second;
 
       B2DEBUG(100, "Candidate");
       B2DEBUG(100, "size " << segments.size());
@@ -238,9 +238,9 @@ namespace {
       B2DEBUG(100, "Lower TanL " << houghBox.getLowerBound<ContinuousTanL>());
       B2DEBUG(100, "Upper TanL " << houghBox.getUpperBound<ContinuousTanL>());
 
-      for (const CDCRecoSegment2D* recoSegment2D : segments) {
+      for (const CDCSegment2D* segment2D : segments) {
         EventDataPlotter::AttributeMap strokeAttr {{"stroke", m_colors[iColor % m_colors.size()] }};
-        draw(*recoSegment2D, strokeAttr);
+        draw(*segment2D, strokeAttr);
       }
       ++iColor;
     }

@@ -73,7 +73,8 @@ void TrackTimeExtractionModule::event()
 
   const double extractedTime = extractTrackTimeLoop(recoTracks);
 
-  m_eventT0->setEventT0(extractedTime, Const::EDetector::CDC);
+  // TODO: Uncertainty
+  m_eventT0->addEventT0(extractedTime, 0, Const::EDetector::CDC);
 }
 
 

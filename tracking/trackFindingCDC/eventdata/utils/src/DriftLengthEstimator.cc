@@ -12,7 +12,7 @@
 #include <tracking/trackFindingCDC/eventdata/utils/FlightTimeEstimator.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRecoHit2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 
@@ -34,12 +34,37 @@ void DriftLengthEstimator::exposeParameters(ModuleParamList* moduleParamList, co
                                 m_param_tofMassScale);
 }
 
+double DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
+{
+  CDC::RealisticTDCCountTranslator tdcCountTranslator;
+  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
 
-/**
- *  Reestimate the drift length of all three contained drift circles.
- *  Using the additional flight direction information the accuracy of the drift length
- *  can be increased alot helping the filters following this step
- */
+  Vector2D flightDirection = recoHit2D.getFlightDirection2D();
+  Vector2D recoPos2D = recoHit2D.getRecoPos2D();
+  double alpha = recoPos2D.angleWith(flightDirection);
+  const double beta = 1;
+  double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
+
+  const CDCWire& wire = recoHit2D.getWire();
+  const CDCHit* hit = recoHit2D.getWireHit().getHit();
+  const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
+
+  if (not m_param_useAlphaInDriftLength) {
+    alpha = 0;
+  }
+
+  double driftLength = tdcCountTranslator.getDriftLength(hit->getTDCCount(),
+                                                         wire.getWireID(),
+                                                         flightTimeEstimate,
+                                                         rl,
+                                                         wire.getRefZ(),
+                                                         alpha);
+
+  bool snapRecoPos = true;
+  recoHit2D.setRefDriftLength(driftLength, snapRecoPos);
+  return driftLength;
+}
+
 void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
 {
   CDC::RealisticTDCCountTranslator tdcCountTranslator;
@@ -48,7 +73,10 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   const UncertainParameterLine2D& line = facet.getFitLine();
   Vector2D flightDirection = line->tangential();
   Vector2D centralPos2D = line->closest(facet.getMiddleWire().getRefPos2D());
-  const double alpha = centralPos2D.angleWith(flightDirection);
+  double alpha = centralPos2D.angleWith(flightDirection);
+  if (not m_param_useAlphaInDriftLength) {
+    alpha = 0;
+  }
 
   auto doUpdate = [&](CDCRLWireHit & rlWireHit, Vector2D recoPos2D) {
     const CDCWire& wire = rlWireHit.getWire();
@@ -70,48 +98,17 @@ void DriftLengthEstimator::updateDriftLength(CDCFacet& facet)
   doUpdate(facet.getEndRLWireHit(), facet.getEndRecoPos2D());
 
   // More accurate implementation
-  // double startDriftLength = getDriftLengthEstimate(facet.getStartRecoHit2D());
+  // double startDriftLength = updateDriftLength(facet.getStartRecoHit2D());
   // facet.getStartRLWireHit().setRefDriftLength(startDriftLength);
 
-  // double middleDriftLength = getDriftLengthEstimate(facet.getMiddleRecoHit2D());
+  // double middleDriftLength = updateDriftLength(facet.getMiddleRecoHit2D());
   // facet.getMiddleRLWireHit().setRefDriftLength(middleDriftLength);
 
-  // double endDriftLength = getDriftLengthEstimate(facet.getEndRecoHit2D());
+  // double endDriftLength = updateDriftLength(facet.getEndRecoHit2D());
   // facet.getEndRLWireHit().setRefDriftLength(endDriftLength);
 }
 
-void DriftLengthEstimator::updateDriftLength(CDCRecoHit2D& recoHit2D)
-{
-  CDC::RealisticTDCCountTranslator tdcCountTranslator;
-  const FlightTimeEstimator& flightTimeEstimator = FlightTimeEstimator::instance();
-
-  Vector2D flightDirection = recoHit2D.getFlightDirection2D();
-  Vector2D recoPos2D = recoHit2D.getRecoPos2D();
-  double alpha = recoPos2D.angleWith(flightDirection);
-  const double beta = 1;
-  double flightTimeEstimate = flightTimeEstimator.getFlightTime2D(recoPos2D, alpha, beta);
-
-  const CDCWire& wire = recoHit2D.getWire();
-  const CDCHit* hit = recoHit2D.getWireHit().getHit();
-  const bool rl = recoHit2D.getRLInfo() == ERightLeft::c_Right;
-
-  if (not m_param_useAlphaInDriftLength) {
-    alpha = 0;
-  }
-
-  double driftLength =
-    tdcCountTranslator.getDriftLength(hit->getTDCCount(),
-                                      wire.getWireID(),
-                                      flightTimeEstimate,
-                                      rl,
-                                      wire.getRefZ(),
-                                      alpha);
-
-  recoHit2D.setRefDriftLength(driftLength);
-  recoHit2D.snapToDriftCircle();
-}
-
-void DriftLengthEstimator::updateDriftLength(CDCRecoSegment2D& segment)
+void DriftLengthEstimator::updateDriftLength(CDCSegment2D& segment)
 {
   for (CDCRecoHit2D& recoHit2D : segment) {
     updateDriftLength(recoHit2D);

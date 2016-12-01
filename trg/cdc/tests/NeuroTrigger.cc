@@ -1,5 +1,8 @@
 #include <gtest/gtest.h>
 #include <framework/utilities/TestHelpers.h>
+#include <framework/database/Database.h>
+#include <framework/database/LocalDatabase.h>
+#include <framework/utilities/FileSystem.h>
 
 #include <trg/cdc/NeuroTrigger.h>
 #include <framework/datastore/StoreArray.h>
@@ -19,12 +22,34 @@ namespace TrgTest {
   protected:
     virtual void SetUp()
     {
+      // Stolen from
+      // tracking/trackFindingCDC/testFixtures/src/TackFindingCDCTestWithTopology.cc,
+      // Oliver <oliver.frost@desy.de> should know the details if this stops working ;)
+
+      StoreObjPtr<EventMetaData> evtPtr;
       DataStore::Instance().setInitializeActive(true);
+      evtPtr.registerInDataStore();
       StoreArray<CDCTriggerSegmentHit>::registerPersistent("CDCTriggerSegmentHits");
+      DataStore::Instance().setInitializeActive(false);
+      evtPtr.construct(0, 0, 1);
+
+      // Setup the Database
+      Database::reset();
+      // Load only the local database
+      std::string dbFilePath = FileSystem::findFile("data/framework/database.txt");
+      LocalDatabase::createInstance(dbFilePath, "", true, LogConfig::c_Error);
+      DBStore::Instance().update();
+      // Unpack the cdc geometry, which currently uses both the db and the gearbox
+      GearDir cdcGearDir = Gearbox::getInstance().getDetectorComponent("CDC");
+      CDCGeometry cdcGeometry;
+      cdcGeometry.read(cdcGearDir);
+      CDC::CDCGeometryPar::Instance(&cdcGeometry);
     }
 
     virtual void TearDown()
     {
+      // Close the gearbox and reset the global objects
+      Database::reset();
       DataStore::Instance().reset();
     }
   };

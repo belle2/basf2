@@ -150,7 +150,7 @@ void DeSerializerCOPPERModule::initializeCOPPER()
   // Present slots to use
   //
   if (! m_use_slot) {
-    char err_buf[100] = "Slot is not specified. Exiting...";
+    char err_buf[100] = "[FATAL] Slot is not specified. Exiting...";
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   } else {
@@ -202,7 +202,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
         if (recvd_byte > (int)((m_pre_rawcpr.tmp_header.RAWHEADER_NWORDS) * sizeof(int))) {
           char err_buf[500];
-          sprintf(err_buf, "EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...");
+          sprintf(err_buf, "[FATAL] EAGAIN return in the middle of an event( COPPER driver should't do this.). Exting...");
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
@@ -216,7 +216,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
 
       } else {
         char err_buf[500];
-        sprintf(err_buf, "Failed to read data from COPPER. Exiting...");
+        sprintf(err_buf, "[FATAL] Failed to read data from COPPER. Exiting...");
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }
@@ -256,7 +256,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
     if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) != recvd_byte) {
       char    err_buf[500];
 
-      sprintf(err_buf, "CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read less bytes(%d) than expected(%d:%d). Exiting...\n",
               recvd_byte,
               *m_size_word * sizeof(int) - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
               m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ]);
@@ -265,7 +265,7 @@ int* DeSerializerCOPPERModule::readOneEventFromCOPPERFIFO(const int entry, int* 
     }
   } else if ((int)((*m_size_word - m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS) * sizeof(int)) < recvd_byte) {
     char    err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Read more than data size. Exiting...: %d %d %d %d %d\n",
             recvd_byte, *m_size_word * sizeof(int) , m_pre_rawcpr.tmp_trailer.RAWTRAILER_NWORDS * sizeof(int),
             m_bufary[ entry ][ m_pre_rawcpr.POS_DATA_LENGTH ],  m_pre_rawcpr.POS_DATA_LENGTH);
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
@@ -317,7 +317,7 @@ void DeSerializerCOPPERModule::openCOPPER()
   //
   if ((m_cpr_fd = open("/dev/copper/copper", O_RDONLY)) == -1) {
     char err_buf[500];
-    sprintf(err_buf, "Failed to open /dev/copper/copper. Exiting... ");
+    sprintf(err_buf, "[FATAL] Failed to open /dev/copper/copper. Exiting... ");
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     exit(1);
   }
@@ -356,7 +356,7 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
       } else if (errno == EAGAIN || errno == EWOULDBLOCK) {
         if (n > 0) {
           char err_buf[500];
-          sprintf(err_buf, "Return due to EAGAIN in the middle of an event( COPPER driver would't do this.). Exting...");
+          sprintf(err_buf, "[FATAL] Return due to EAGAIN in the middle of an event( COPPER driver would't do this.). Exting...");
           print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
           exit(-1);
         }
@@ -376,15 +376,16 @@ int DeSerializerCOPPERModule::readFD(int fd, char* buf, int data_size_byte, int 
 #endif
         continue;
       } else {
-        char err_buf[500];
-        sprintf(err_buf, "Failed to read data from COPPER. %s %s %d",
-                __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
-        B2ERROR(err_buf);
+        printf("[ERROR] Failed to read data from COPPER. %s %s %d",
+               __FILE__, __PRETTY_FUNCTION__, __LINE__);
         string err_str = "RUN_ERROR";
         throw (err_str);
 #endif
+        char err_buf[500];
+        sprintf(err_buf, "[FATAL] Failed to read data from COPPER. %s %s %d",
+                __FILE__, __PRETTY_FUNCTION__, __LINE__);
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(-1);
       }

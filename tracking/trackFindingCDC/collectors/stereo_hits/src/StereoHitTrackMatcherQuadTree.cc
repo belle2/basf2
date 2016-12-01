@@ -1,43 +1,74 @@
+/**************************************************************************
+ * BASF2 (Belle Analysis Framework 2)                                     *
+ * Copyright(C) 2016 - Belle II Collaboration                             *
+ *                                                                        *
+ * Author: The Belle II Collaboration                                     *
+ * Contributors: Nils Braun                                               *
+ *                                                                        *
+ * This software is provided "as is" without any warranty.                *
+ **************************************************************************/
+#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
+
+#include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCManager.h>
 
-#include <utility>
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitTrackMatcherQuadTree.h>
+
+#include <utility>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template <class HoughTree>
-void StereoHitTrackMatcherQuadTree<HoughTree>::exposeParameters(ModuleParamList* moduleParameters, const std::string& prefix)
+void StereoHitTrackMatcherQuadTree<HoughTree>::exposeParameters(ModuleParamList* moduleParamList,
+    const std::string& prefix)
 {
-  QuadTreeBasedMatcher<HoughTree>::exposeParameters(moduleParameters, prefix);
-  m_filterFactory.exposeParameters(moduleParameters, prefix);
+  Super::exposeParameters(moduleParamList, prefix);
+  m_stereoHitFilter.exposeParameters(moduleParamList, prefix);
+  moduleParamList->addParameter(prefixed(prefix, "checkForB2BTracks"),
+                                m_param_checkForB2BTracks,
+                                "Set to false to skip the check for back-2-back tracks "
+                                "(good for cosmics).",
+                                m_param_checkForB2BTracks);
 
-  moduleParameters->addParameter(prefixed(prefix, "checkForB2BTracks"), m_param_checkForB2BTracks,
-                                 "Set to false to skip the check for back-2-back tracks (good for cosmics).",
-                                 m_param_checkForB2BTracks);
-  moduleParameters->addParameter(prefixed(prefix, "checkForInWireBoundsFactor"), m_param_checkForInWireBoundsFactor,
-                                 "Used to scale the CDC, before checking of a hit is in the CDC z bounds.",
-                                 m_param_checkForInWireBoundsFactor);
+  moduleParamList->addParameter(prefixed(prefix, "checkForInWireBoundsFactor"),
+                                m_param_checkForInWireBoundsFactor,
+                                "Used to scale the CDC before checking "
+                                "whether hits are in the CDC z bounds.",
+                                m_param_checkForInWireBoundsFactor);
+}
+
+
+template <class HoughTree>
+void StereoHitTrackMatcherQuadTree<HoughTree>::initialize()
+{
+  Super::initialize();
+  m_stereoHitFilter.initialize();
+  if (m_stereoHitFilter.needsTruthInformation()) {
+    CDCMCManager::getInstance().requireTruthInformation();
+  }
+}
+
+
+template <class HoughTree>
+void StereoHitTrackMatcherQuadTree<HoughTree>::terminate()
+{
+  Super::terminate();
+  m_stereoHitFilter.terminate();
 }
 
 template <class HoughTree>
-Weight StereoHitTrackMatcherQuadTree<HoughTree>::getWeight(const CDCRecoHit3D& recoHit, const Z0TanLambdaBox&,
-                                                           const CDCTrack& track) const
+std::vector<WithWeight<const CDCRLWireHit*> >
+StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
+                                                const std::vector<CDCRLWireHit>& rlWireHits)
 {
-  return m_stereoHitFilter->operator()({&recoHit, &track});
-}
-
-template <class HoughTree>
-std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<HoughTree>::match(const CDCTrack& track,
-                                          const std::vector<CDCRLWireHit>& rlWireHits)
-{
-  if (m_stereoHitFilter->needsTruthInformation()) {
+  if (m_stereoHitFilter.needsTruthInformation()) {
     CDCMCManager::getInstance().fill();
   }
 
@@ -46,7 +77,7 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
   const double radius = trajectory2D.getGlobalCircle().absRadius();
   const bool isCurler = trajectory2D.isCurler();
 
-  typedef std::pair<CDCRecoHit3D, const CDCRLWireHit*> CDCRecoHitWithRLPointer;
+  using CDCRecoHitWithRLPointer = std::pair<CDCRecoHit3D, const CDCRLWireHit*>;
   std::vector<CDCRecoHitWithRLPointer> recoHits;
   recoHits.reserve(rlWireHits.size() + track.size());
 
@@ -63,7 +94,8 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
         continue;
       }
 
-      // If the track is a curler, shift all perpS values to positive ones. Else do not use this hit if m_param_checkForB2BTracks is enabled.
+      // If the track is a curler, shift all perpS values to positive ones.
+      // Else do not use this hit if m_param_checkForB2BTracks is enabled.
       double perpS = trajectory2D.calcArcLength2D(recoPos3D.xy());
       if (perpS < 0) {
         if (isCurler) {
@@ -94,8 +126,9 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
   const auto& foundStereoHitsWithNode = Super::m_quadTreeInstance.findSingleBest(Super::m_param_minimumNumberOfHits);
   Super::m_quadTreeInstance.fell();
 
-  if (foundStereoHitsWithNode.size() != 1)
+  if (foundStereoHitsWithNode.size() != 1) {
     return {};
+  }
 
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
@@ -112,7 +145,7 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
        ++outerIterator) {
     bool isDoubled = false;
 
-    const CDCRecoHit3D& currentRecoHitOuter = outerIterator->first;
+    const CDCRecoHit3D& currentRecoHit3DOuter = outerIterator->first;
     const CDCRLWireHit* currentRLWireHitOuter = outerIterator->second;
     const CDCWireHit& currentWireHitOuter = currentRLWireHitOuter->getWireHit();
     const CDCHit* currentHitOuter = currentWireHitOuter.getHit();
@@ -122,7 +155,7 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
     }
 
     for (auto innerIterator = outerIterator; innerIterator != foundStereoHits.end(); ++innerIterator) {
-      const CDCRecoHit3D& currentRecoHitInner = innerIterator->first;
+      const CDCRecoHit3D& currentRecoHit3DInner = innerIterator->first;
       const CDCRLWireHit* currentRLWireHitInner = innerIterator->second;
       const CDCWireHit& currentWireHitInner = currentRLWireHitInner->getWireHit();
       const CDCHit* currentHitInner = currentWireHitInner.getHit();
@@ -132,11 +165,11 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
       }
 
       if (innerIterator != outerIterator and currentHitOuter == currentHitInner) {
-        const double innerZ = currentRecoHitInner.getRecoZ();
-        const double outerZ = currentRecoHitOuter.getRecoZ();
+        const double innerZ = currentRecoHit3DInner.getRecoZ();
+        const double outerZ = currentRecoHit3DOuter.getRecoZ();
 
-        const double innerR = currentRecoHitInner.getRecoPos2D().norm();
-        const double outerR = currentRecoHitOuter.getRecoPos2D().norm();
+        const double innerR = currentRecoHit3DInner.getRecoPos2D().norm();
+        const double outerR = currentRecoHit3DOuter.getRecoPos2D().norm();
 
         const double lambda11 = (innerZ - node.getLowerZ0()) / innerR;
         const double lambda12 = (innerZ - node.getUpperZ0()) / innerR;
@@ -147,12 +180,12 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
         const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
 
         if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
-          const Weight weight = getWeight(currentRecoHitInner, node, track);
+          const Weight weight = m_stereoHitFilter({&currentRecoHit3DInner, &track});
           if (not std::isnan(weight)) {
             matches.emplace_back(currentRLWireHitInner, weight);
           }
         } else {
-          const Weight weight = getWeight(currentRecoHitOuter, node, track);
+          const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
           if (not std::isnan(weight)) {
             matches.emplace_back(currentRLWireHitOuter, weight);
           }
@@ -166,7 +199,7 @@ std::vector<WithWeight<const CDCRLWireHit*>> StereoHitTrackMatcherQuadTree<Hough
     }
 
     if (not isDoubled) {
-      const Weight weight = getWeight(currentRecoHitOuter, node, track);
+      const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
       if (not std::isnan(weight)) {
         matches.emplace_back(currentRLWireHitOuter, weight);
       }

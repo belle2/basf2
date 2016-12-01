@@ -14,21 +14,27 @@
 #include <tracking/trackFindingCDC/filters/facet/FeasibleRLFacetFilter.h>
 #include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
 #include <tracking/trackFindingCDC/fitting/FacetFitter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
 #include <tracking/trackFindingCDC/eventdata/utils/DriftLengthEstimator.h>
 
+#include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
+
 #include <tracking/trackFindingCDC/utilities/VectorRange.h>
+
+#include <framework/core/ModuleParamList.h>
+
 #include <boost/range/adaptor/indirected.hpp>
 
 #include <vector>
+#include <string>
 #include <algorithm>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
     /// Class providing construction combinatorics for the facets.
     template<class AFacetFilter>
@@ -42,33 +48,31 @@ namespace Belle2 {
       /// Constructor adding the filter as a subordinary processing signal listener.
       FacetCreator()
       {
-        addProcessingSignalListener(&m_wireHitRelationFilter);
-        addProcessingSignalListener(&m_facetFilter);
+        this->addProcessingSignalListener(&m_wireHitRelationFilter);
+        this->addProcessingSignalListener(&m_facetFilter);
       }
 
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
+      std::string getDescription() final {
         return "Creates hit triplet (facets) from each cluster filtered by a acceptance criterion.";
       }
 
-      /// Add the parameters of the filter to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final
-      {
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final {
         m_wireHitRelationFilter.exposeParameters(moduleParamList, prefix);
         m_feasibleRLFacetFilter.exposeParameters(moduleParamList, prefix);
         m_facetFilter.exposeParameters(moduleParamList, prefix);
 
         moduleParamList->addParameter(prefixed(prefix, "updateDriftLength"),
-                                      m_param_updateDriftLength,
-                                      "Switch to reestimate the drift length",
-                                      m_param_updateDriftLength);
+        m_param_updateDriftLength,
+        "Switch to reestimate the drift length",
+        m_param_updateDriftLength);
 
         moduleParamList->addParameter(prefixed(prefix, "leastSquareFit"),
-                                      m_param_leastSquareFit,
-                                      "Switch to fit the facet with the least square method "
-                                      "for drift length estimation",
-                                      m_param_leastSquareFit);
+        m_param_leastSquareFit,
+        "Switch to fit the facet with the least square method "
+        "for drift length estimation",
+        m_param_leastSquareFit);
 
       }
 
@@ -79,18 +83,18 @@ namespace Belle2 {
        *  the output hit triplets follow the order of the input clusters
        *  such that the triplets of the same cluster remain close to each other.
        */
-      virtual void apply(const std::vector<CDCWireHitCluster>& inputClusters,
-                         std::vector<CDCFacet>& facets) override
-      {
+      void apply(const std::vector<CDCWireHitCluster>& inputClusters,
+                 std::vector<CDCFacet>& facets) final {
         int iCluster = -1;
-        for (const CDCWireHitCluster& cluster : inputClusters) {
+        for (const CDCWireHitCluster& cluster : inputClusters)
+        {
           ++iCluster;
           // Skip clusters that have been detected as background
           if (cluster.getBackgroundFlag()) {
             continue;
           }
           B2ASSERT("Expect the clusters to be sorted",
-                   std::is_sorted(std::begin(cluster), std::end(cluster)));
+                   std::is_sorted(cluster.begin(), cluster.end()));
 
           // Create the neighborhood of wire hits on the cluster
           B2DEBUG(100, "Creating the CDCWireHit neighborhood");
@@ -223,9 +227,6 @@ namespace Belle2 {
         } // end for startRLWireHit
       }
 
-
-
-
     private:
       /// Parameter : Switch to apply the rl feasibility cut
       bool m_param_feasibleRLOnly = true;
@@ -252,7 +253,6 @@ namespace Belle2 {
     private:
       /// Memory for the wire hit neighborhood in within a cluster.
       std::vector<WeightedRelation<const CDCWireHit> > m_wireHitRelations;
-
-    }; // end class FacetCreator
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

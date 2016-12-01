@@ -11,12 +11,12 @@
 
 #pragma once
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeProcessorTemplate.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    /** A QuadTreeProcessor for RecoSegments */
-    class QuadTreeProcessorSegments final : public QuadTreeProcessorTemplate<int, float, CDCRecoSegment2D, 2, 2> {
+    /** A QuadTreeProcessor for Segments */
+    class QuadTreeProcessorSegments final : public QuadTreeProcessorTemplate<int, float, CDCSegment2D, 2, 2> {
 
     public:
       /**
@@ -30,13 +30,13 @@ namespace Belle2 {
        * Insert only if the sinogram of the front or the back part of the segment goes through the node.
        * Also we can intersect the sinograms of the front and the back and get an intersection point, which should lay in the node also.
        */
-      bool insertItemInNode(QuadTree* node, CDCRecoSegment2D* recoItem, unsigned int /*t_index*/,
+      bool insertItemInNode(QuadTree* node, CDCSegment2D* recoItem, unsigned int /*t_index*/,
                             unsigned int /*r_index*/) const override final;
     private:
       Vector2D m_origin; /**< The origin of the conformal transformation */
 
       /// Function to check whether sinogram is crossing the node (see AxialHitQuadTreeProcessor::insertItemInNode())
-      inline bool sameSign(double n1, double n2, double n3, double n4) const
+      bool sameSign(double n1, double n2, double n3, double n4) const
       {return ((n1 > 0 && n2 > 0 && n3 > 0 && n4 > 0) || (n1 < 0 && n2 < 0 && n3 < 0 && n4 < 0));};
 
     };

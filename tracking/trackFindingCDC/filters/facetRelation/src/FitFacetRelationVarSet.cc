@@ -13,20 +13,13 @@
 #include <tracking/trackFindingCDC/fitting/CDCKarimakiFitter.h>
 #include <tracking/trackFindingCDC/geometry/UncertainParameterLine2D.h>
 #include <tracking/trackFindingCDC/numerics/Angle.h>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-FitFacetRelationVarSet::FitFacetRelationVarSet()
-  : Super()
-{
-}
-
 bool FitFacetRelationVarSet::extract(const Relation<const CDCFacet>* ptrFacetRelation)
 {
-  bool extracted = Super::extract(ptrFacetRelation);
-  if (not extracted or not ptrFacetRelation) return false;
+  if (not ptrFacetRelation) return false;
 
   const CDCFacet* fromFacet = ptrFacetRelation->first;
   const CDCFacet* toFacet   = ptrFacetRelation->second;

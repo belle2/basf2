@@ -135,6 +135,11 @@ namespace Belle2 {
     void convertMdstECLTable();
 
     /**
+     * Reads and converts all entries of Mdst_klm_cluster Panther table to KLMCluster dataobjects and adds them to StoreArray<KLMCluster>.
+     */
+    void convertMdstKLMTable();
+
+    /**
      * Reads and converts all entries of Mdst_charged (Mdst_trk and Mdst_trk_fit) Panther table to Track (TrackFitResult) dataobjects and adds them to StoreArray<Track> (StoreArray<TrackFitResult>).
      */
     void convertMdstChargedTable();
@@ -145,8 +150,13 @@ namespace Belle2 {
     void convertMdstGammaTable();
 
     /**
-     * Reads all entries of Mdst_Pi0 Panther table, creates a particle list 'pi0:mdst' and adds them to StoreArray<Particles>.
+     * Reads all entries of Mdst_Klong Panther table, creates a particle list 'K_L0:mdst' and adds them to StoreArray<Particles>.
      */
+    void convertMdstKLongTable();
+
+    /**
+    * Reads all entries of Mdst_Pi0 Panther table, creates a particle list 'pi0:mdst' and adds them to StoreArray<Particles>.
+    */
     void convertMdstPi0Table();
 
     /**
@@ -175,6 +185,12 @@ namespace Belle2 {
      * If running on MC, the ECLCluster -> MCParticle relation is set as well.
      */
     void convertMdstECLObject(const Belle::Mdst_ecl& ecl, const Belle::Mdst_ecl_aux& eclAux, ECLCluster* eclCluster);
+
+    /**
+    * Converts Mdst_klm_cluster record to KLMCluster object.
+    * No MCRelation is set, since there was no matching in Belle.
+    */
+    void convertMdstKLMObject(const Belle::Mdst_klm_cluster& klm, KLMCluster* klmCluster);
 
     /**
      * Converts Mdst_charged (Mdst_trk(_fit)) record to Track (TrackFitResult) object.
@@ -272,6 +288,12 @@ namespace Belle2 {
      */
     void setECLClustersToTracksRelations();
 
+
+    /**
+     * Sets KLMCluster -> Track and ECLCluster relations
+     */
+    void setKLMClustersRelations();
+
     //-----------------------------------------------------------------------------
     // MISC
     //-----------------------------------------------------------------------------
@@ -289,12 +311,16 @@ namespace Belle2 {
     //! MCParticle Graph to build Belle2 MC Particles
     Belle2::MCParticleGraph m_particleGraph;
 
-    //! map of Gen_hepevt Panther IDs and corresponing MCParticle StoreArray indices
+    //! map of Gen_hepevt Panther IDs and corresponding MCParticle StoreArray indices
     std::map<int, int> genHepevtToMCParticle;
-    //! map of Mdst_ecl Panther IDs and corresponing ECLCluster StoreArray indices
+    //! map of Mdst_ecl Panther IDs and corresponding ECLCluster StoreArray indices
     std::map<int, int> mdstEclToECLCluster;
-    //! map of gamma Panther IDs and corresponing Particle StoreArray indices
+    //! map of gamma Panther IDs and corresponding Particle StoreArray indices
     std::map<int, int> mdstGammaToParticle;
+    //! map of Mdst_klm Panther IDs and corresponding KLMCluster StoreArray indices
+    std::map<int, int> mdstKlmToKLMCluster;
+    //! map of Klong Panther IDs and corresponding Particle StoreArray indices
+    std::map<int, int> mdstKlongToParticle;
 
     /** output PIDLikelihood array. */
     StoreArray<PIDLikelihood> m_pidLikelihoods;

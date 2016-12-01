@@ -5,6 +5,7 @@
 <header>
   <input>EvtGenSim.root</input>
   <output>EvtRec.root,EvtRec_mdst.root</output>
+  <cacheable/>
   <contact>tkuhr</contact>
   <description>This steering file run the standard reconstruction on an input file with generic BBbar events.</description>
 </header>

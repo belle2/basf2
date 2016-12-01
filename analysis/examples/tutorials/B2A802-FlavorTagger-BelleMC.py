@@ -16,7 +16,7 @@
 #        |    |
 #        |    +-> pi+ pi-
 #        |
-#        +-> K- pi+
+#        +-> mu- mu+
 #
 # is the reconstructed B0. The qr value, i.e. the
 # flavor*dilution factor of the not reconstructed B0,
@@ -25,7 +25,7 @@
 #
 # Note: The weight files for the trained TMVA methods
 # were produced using the signal MC sample created in
-# MC campaign 3.5.
+# MC campaign 5.
 #
 # Contributors: F. Abudinen & Moritz Gelb (February 2015)
 #

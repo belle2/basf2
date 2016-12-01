@@ -8,6 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
+
 #pragma once
 #include <tracking/trackFindingVXD/sectorMap/filterFramework/VoidObserver.h>
 #include <TBranch.h>
@@ -149,13 +150,22 @@ namespace Belle2 {
 
     }
 
-    /** argTypes method persists the range.
+    /** Persist the range on a TTree.
      * @param t is the TTree under which the TBranch will be created
      * @param branchname is the name of the TBranch holding m_range
      */
     void persist(TTree* t, const std::string& branchName)
     {
       m_range.persist(t, branchName , Variable().name());
+    }
+
+    /** Set the Branches addresses to this filter.
+     * @param t is the TTree containing the TBranch
+     * @param branchname is the name of the TBranch holding the m_range
+     */
+    void setBranchAddress(TTree* t, const std::string& branchName)
+    {
+      m_range.setBranchAddress(t, branchName , Variable().name());
     }
 
     /** This method creates a new bypassable Filter with the same range of *this
@@ -422,6 +432,7 @@ namespace Belle2 {
     class templateObserverType
     >
   class Filter < Belle2::OperatorNot, someFilter, templateObserverType > {
+    const char* c_notSuffix = "_not";
   public:
 
     typedef  typename someFilter::argumentType argumentType;
@@ -435,13 +446,26 @@ namespace Belle2 {
       return ! m_filter.accept(args ...);
     }
 
+    /** Persist the filter on a TTree.
+     * @param t is the TTree under which the TBranch will be created
+     * @param branchname is the name of the TBranch holding m_range
+     */
     void persist(TTree* t, const std::string& branchName)
     {
-
       std::string nameOfFilter(branchName);
-      nameOfFilter += "_not";
+      nameOfFilter += c_notSuffix;
       m_filter.persist(t, nameOfFilter);
+    }
 
+    /** Set the Branches addresses to this filter.
+     * @param t is the TTree containing the TBranch
+     * @param branchname is the name of the TBranch holding the m_range
+     */
+    void setBranchAddress(TTree* t, const std::string& branchName)
+    {
+      std::string nameOfFilter(branchName);
+      nameOfFilter += c_notSuffix;
+      m_filter.setBranchAddress(t, nameOfFilter);
     }
 
     Filter(const someFilter& filter):
@@ -474,6 +498,9 @@ namespace Belle2 {
     class templateObserverType
     >
   class Filter < Belle2::OperatorAnd, FilterA, FilterB, templateObserverType > {
+
+    const char* c_andSuffixA = "_and_A";
+    const char* c_andSuffixB = "_and_B";
   public:
 
     typedef  typename FilterA::argumentType argumentType;
@@ -498,19 +525,37 @@ namespace Belle2 {
       return Filter< Belle2::OperatorAnd, FilterA, FilterB, otherObserver >(m_filterA, m_filterB);
     }
 
+    /** Persist the filter on a TTree.
+     * @param t is the TTree under which the TBranch will be created
+     * @param branchname is the name of the TBranch holding m_range
+     */
     void persist(TTree* t, const std::string& branchName)
     {
       std::string nameOfFilterA(branchName);
-      nameOfFilterA += "_and_A";
+      nameOfFilterA += c_andSuffixA;
       m_filterA.persist(t, nameOfFilterA);
 
       std::string nameOfFilterB(branchName);
-      nameOfFilterB += "_and_B";
+      nameOfFilterB += c_andSuffixB;
       m_filterB.persist(t, nameOfFilterB);
 
     }
 
 
+    /** Set the Branches addresses to this filter.
+     * @param t is the TTree containing the TBranch
+     * @param branchname is the name of the TBranch holding the m_range
+     */
+    void setBranchAddress(TTree* t, const std::string& branchName)
+    {
+      std::string nameOfFilterA(branchName);
+      nameOfFilterA += c_andSuffixA;
+      m_filterA.setBranchAddress(t, nameOfFilterA);
+
+      std::string nameOfFilterB(branchName);
+      nameOfFilterB += c_andSuffixB;
+      m_filterB.setBranchAddress(t, nameOfFilterB);
+    }
 
     Filter(const FilterA& filterA, const FilterB& filterB):
       m_filterA(filterA), m_filterB(filterB) { };
@@ -550,6 +595,9 @@ namespace Belle2 {
     class templateObserverType
     >
   class Filter < Belle2::OperatorOr, FilterA, FilterB, templateObserverType > {
+    const char* c_orSuffixA = "_or_A";
+    const char* c_orSuffixB = "_or_B";
+
   public:
 
     typedef  typename FilterA::argumentType argumentType;
@@ -574,17 +622,37 @@ namespace Belle2 {
       m_filterA(filterA), m_filterB(filterB) { };
     Filter() {};
 
+    /** Persist the filter on a TTree.
+     * @param t is the TTree under which the TBranch will be created
+     * @param branchname is the name of the TBranch holding m_range
+     */
     void persist(TTree* t, const std::string& branchName)
     {
       std::string nameOfFilterA(branchName);
-      nameOfFilterA += "_or_A";
+      nameOfFilterA += c_orSuffixA;
       m_filterA.persist(t, nameOfFilterA);
 
       std::string nameOfFilterB(branchName);
-      nameOfFilterB += "_or_B";
+      nameOfFilterB += c_orSuffixB;
       m_filterB.persist(t, nameOfFilterB);
 
     }
+
+    /** Set the Branches addresses to this filter.
+     * @param t is the TTree containing the TBranch
+     * @param branchname is the name of the TBranch holding the m_range
+     */
+    void setBranchAddress(TTree* t, const std::string& branchName)
+    {
+      std::string nameOfFilterA(branchName);
+      nameOfFilterA += c_orSuffixA;
+      m_filterA.setBranchAddress(t, nameOfFilterA);
+
+      std::string nameOfFilterB(branchName);
+      nameOfFilterB += c_orSuffixB;
+      m_filterB.setBranchAddress(t, nameOfFilterB);
+    }
+
 
   private:
     FilterA  m_filterA;

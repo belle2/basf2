@@ -276,6 +276,14 @@ bool MCMatching::isFSR(const MCParticle* p)
   return p->hasStatus(MCParticle::c_IsFSRPhoton);
 }
 
+
+bool MCMatching::isRadiativePhoton(const MCParticle* p)
+{
+  // Check if any of the bits c_IsFSRPhoton, c_IsISRPhoton or c_ISPHOTOSPhoton is set
+  return p->getStatus(MCParticle::c_IsRadiativePhoton) != 0;
+}
+
+
 //utility functions used by getMissingParticleFlags()
 namespace {
   using namespace MCMatching;

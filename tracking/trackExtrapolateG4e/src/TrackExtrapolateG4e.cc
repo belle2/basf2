@@ -163,7 +163,7 @@ void TrackExtrapolateG4e::initialize(const std::vector<int>& pdgCodes,
       }
     }
     if (m_ChargedStable.empty()) B2ERROR("No valid PDG codes for extrapolation");
-    }
+  }
 
   for (unsigned i = 0; i < m_ChargedStable.size(); ++i) {
     B2INFO("Ext hypothesis for PDG code " << m_ChargedStable[i].getPDGCode() << " and its antiparticle will be extrapolated");
@@ -213,6 +213,10 @@ void TrackExtrapolateG4e::event(bool isMuid)
       int charge = int(recoTrack->getTrackFitStatus(trackRep)->getCharge());
       int pdgCode = chargedStable.getPDGCode() * charge;
       if (chargedStable == Const::electron || chargedStable == Const::muon) pdgCode = -pdgCode;
+      if (pdgCode == 0) {
+        B2WARNING("Skipping track. PDGCode " << pdgCode << " is zero, probably because charge was zero (charge=" << charge << ").");
+        continue;
+      }
 
       double tof = 0.0;
       getStartPoint(recoTrack, trackRep, pdgCode, positionG4e, momentumG4e, covG4e, tof);
@@ -380,33 +384,29 @@ void TrackExtrapolateG4e::registerVolumes()
     // TOP quartz bar (=sensitive) has an automatically generated PV name
     // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
     // YYY is cuttest.
-    if (name.find("_cuttest_") != string::npos) {
+    else if (name.find("_cuttest_") != string::npos) {
       m_EnterExit->push_back(*iVol);
-    }
-    if (name == "ARICH.AerogelSupportPlate") {
+    } else if (name == "ARICH.AerogelSupportPlate") {
       m_EnterExit->push_back(*iVol);
-    }
-    if (name == "moduleWindow") {
-      m_EnterExit->push_back(*iVol);
-    }
-    // ECL envelope
-    if (name == "eclPhysical") {
+    } else if (name == "moduleWindow") {
       m_EnterExit->push_back(*iVol);
     }
     // ECL crystal
-    if (name.find("CrystalPhysical_") != string::npos) {
+    else if (name.find("lv_barrel_crystal_") != string::npos ||
+             name.find("lv_forward_crystal_") != string::npos ||
+             name.find("lv_backward_crystal_") != string::npos) {
       m_EnterExit->push_back(*iVol);
     }
     // Barrel KLM: BKLM.Layer**GasPhysical for RPCs or BKLM.Layer**ChimneyGasPhysical for RPCs
     //             BKLM.ScintActiveType*Physical for scintillator strips
-    if (name.compare(0, 5, "BKLM.") == 0) {
+    else if (name.compare(0, 5, "BKLM.") == 0) {
       if ((name.find("ScintActiveType") != string::npos) ||
           (name.find("GasPhysical") != string::npos)) {
         m_BKLMVolumes->push_back(*iVol);
       }
     }
     // Endcap KLM: StripSensitive_*
-    if (name.compare(0, 14, "StripSensitive") == 0) {
+    else if (name.compare(0, 14, "StripSensitive") == 0) {
       m_EKLMVolumes->push_back(*iVol);
     }
   }
@@ -427,32 +427,28 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
     copyID = touch->GetVolume(0)->GetCopyNo();
   }
   // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
-  if (name == "PlacedTOPModule") {
+  else if (name == "PlacedTOPModule") {
     detID = Const::EDetector::TOP;
   }
   // TOP quartz bar (=sensitive) has an automatically generated PV name
   // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
   // YYY is cuttest.
-  if (name.find("_cuttest_") != string::npos) {
+  else if (name.find("_cuttest_") != string::npos) {
     detID = Const::EDetector::TOP;
     copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
   }
   // ARICH has an envelope that contains modules that each contain a moduleWindow
-  if (name == "ARICH.AerogelSupportPlate") {
+  else if (name == "ARICH.AerogelSupportPlate") {
     detID = Const::EDetector::ARICH;
     copyID = 12345;
-  }
-  if (name == "moduleWindow") {
+  } else if (name == "moduleWindow") {
     detID = Const::EDetector::ARICH;
     copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
   }
-  // ECL
-  if (name == "eclPhysical") {
-    detID = Const::EDetector::ECL;
-    copyID = -1; // to avoid ambiguity of "0" with crystal #0
-  }
-  // ECL crystal (=sensitive) is named "ecl{Barrel,Forward,Backward}CrystalPhysical_*"
-  if (name.find("CrystalPhysical_") != string::npos) {
+  // ECL crystal (=sensitive) is named "lv_{barrel,forward,backward}_crystal_*"
+  else if (name.find("lv_barrel_crystal_") != string::npos ||
+           name.find("lv_forward_crystal_") != string::npos ||
+           name.find("lv_backward_crystal_") != string::npos) {
     detID = Const::EDetector::ECL;
     copyID = ECL::ECLGeometryPar::Instance()->ECLVolumeToCellID(touch());
   }
@@ -533,7 +529,8 @@ void TrackExtrapolateG4e::getStartPoint(RecoTrack* recoTrack, const genfit::AbsT
   }
 
   catch (genfit::Exception& e) {
-    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " << e.what());
+    B2WARNING("Caught genfit exception for " << (firstLast ? "first" : "last") << " point on track; will not extrapolate. " <<
+              e.what());
     // Do not extrapolate this track by forcing minPt cut to fail
     momentum.setX(0.0);
     momentum.setY(0.0);

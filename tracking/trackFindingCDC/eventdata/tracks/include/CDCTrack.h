@@ -16,28 +16,24 @@
 
 #include <vector>
 
-namespace genfit {
-  class TrackCand;
-}
-
 namespace Belle2 {
   class RecoTrack;
 
   namespace TrackFindingCDC {
-    class CDCRecoSegment2D;
-    class CDCRecoSegment3D;
+    class CDCSegment2D;
+    class CDCSegment3D;
     class CDCSegmentPair;
     class CDCSegmentTriple;
 
     /// Class representing a sequence of three dimensional reconstructed hits
-    class CDCTrack : public std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D> {
+    class CDCTrack : public std::vector<CDCRecoHit3D> {
     public:
 
       /// Default constructor for ROOT compatibility.
-      CDCTrack() {}
+      CDCTrack() = default;
 
       /// Constructor from a two dimensional segment filling the thrid dimension with 0 values.
-      explicit CDCTrack(const CDCRecoSegment2D& segment);
+      explicit CDCTrack(const CDCSegment2D& segment);
 
       /// Concats several tracks from a path
       static CDCTrack condense(const Path<const CDCTrack>& trackPath);
@@ -48,18 +44,21 @@ namespace Belle2 {
       /// Reconstructs the hit content of the axial stereo segment pair path to a CDCTrack averaging overlapping parts.
       static CDCTrack condense(const Path<const CDCSegmentPair>& segmentPairPath);
 
+      /// Comparision of track - no particular order has been defined so far, all tracks are equivalent
+      bool operator<(const CDCTrack& track __attribute__((unused))) const
+      {
+        return false;
+      }
+
       /// Copies the hit content of the hit vector track to the CDCTrack. Do not use any taken or masked hits.
       void appendNotTaken(const std::vector<const CDCWireHit*>& hits);
-
-      /// Copies the hit and trajectory content of this track to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand) const;
 
       /// Copies the hit and trajectory content of this track to a new RecoTrack and store it into the store array.
       bool storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
       /** Splits the track into segments.
        *  Note : No trajectory information is copied*/
-      std::vector<CDCRecoSegment3D> splitIntoSegments() const;
+      std::vector<CDCSegment3D> splitIntoSegments() const;
 
       /// Getter for the superlayer id the track starts from.
       ISuperLayer getStartISuperLayer() const
@@ -77,32 +76,45 @@ namespace Belle2 {
       const Vector3D& getEndRecoPos3D() const
       { return back().getRecoPos3D(); }
 
-      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      /// Setter for the two dimensional trajectory. The trajectory should start at the start of the
+      /// track and follow its direction.
       void setStartTrajectory3D(const CDCTrajectory3D& startTrajectory3D)
-      { m_startTrajectory3D = startTrajectory3D; }
+      {
+        m_startTrajectory3D = startTrajectory3D;
+      }
 
-      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the track and *follow* its direction.
+      /// Setter for the three dimensional trajectory. The trajectory should start at the END of the
+      /// track and *follow* its direction.
       void setEndTrajectory3D(const CDCTrajectory3D& endTrajectory3D)
-      { m_endTrajectory3D = endTrajectory3D; }
+      {
+        m_endTrajectory3D = endTrajectory3D;
+      }
 
-
-      /// Getter for the two dimensional trajectory. The trajectory should start at the start of the track and follow its direction.
+      /// Getter for the two dimensional trajectory. The trajectory should start at the start of the
+      /// track and follow its direction.
       const CDCTrajectory3D& getStartTrajectory3D() const
-      { return m_startTrajectory3D; }
+      {
+        return m_startTrajectory3D;
+      }
 
-      /// Getter for the three dimensional trajectory. The trajectory should start at the END of the track and follow its direction.
+      /// Getter for the three dimensional trajectory. The trajectory should start at the END of the
+      /// track and follow its direction.
       const CDCTrajectory3D& getEndTrajectory3D() const
-      { return m_endTrajectory3D; }
-
+      {
+        return m_endTrajectory3D;
+      }
 
       /// Getter for the automaton cell.
       AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
+      {
+        return m_automatonCell;
+      }
 
       /// Constant getter for the automaton cell.
       const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
-
+      {
+        return m_automatonCell;
+      }
 
       /// Unset the masked flag of the automaton cell of this segment and of all contained wire hits.
       void unsetAndForwardMaskedFlag() const;
@@ -114,8 +126,8 @@ namespace Belle2 {
 
       /** Check all contained wire hits if one has the masked flag.
        *  Set the masked flag of this segment in case at least one
-       of the contained wire hits is flagged as masked.
-      */
+       * of the contained wire hits is flagged as masked.
+       */
       void receiveMaskedFlag() const;
 
 
@@ -147,18 +159,6 @@ namespace Belle2 {
       /// Return a reversed copy of the track.
       CDCTrack reversed() const;
 
-      /// Return the pointer to the track candidate which was created from this CDCrack
-      genfit::TrackCand* getRelatedGenfitTrackCandidate() const
-      {
-        return m_relatedGenfitTrackCandidate;
-      }
-
-      /// Set the pointer to the track candidate which was created from this CDCrack
-      void setRelatedGenfitTrackCandidate(genfit::TrackCand* relatedTrackCand)
-      {
-        m_relatedGenfitTrackCandidate = relatedTrackCand;
-      }
-
       /// Set the flag which indicates that the track has a matching segment (probably only used in the SegmentTrackCombiner).
       void setHasMatchingSegment(bool hasMatchingSegment = true)
       {
@@ -184,13 +184,8 @@ namespace Belle2 {
       /// Memory for the three dimensional trajectory at the end of the track
       CDCTrajectory3D m_endTrajectory3D;
 
-      /// Related genfit track cand
-      genfit::TrackCand* m_relatedGenfitTrackCandidate = nullptr;
-
       /// Flag which indicates that the track had a matching segment (can be used for filter decisions)
       bool m_hasMatchingSegment = false;
-
-    }; //class
-
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

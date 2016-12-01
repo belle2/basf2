@@ -69,7 +69,7 @@ void DeSerializerPCModule::initialize()
 
   // Set m_socket
   if (m_num_connections > (int)m_hostname_from.size() ||  m_num_connections > (int)m_port_from.size()) {
-    B2FATAL("Hostname or port# is not specified for all connections. Please check a python script. Exiting... \n");
+    B2FATAL("[FATAL] Hostname or port# is not specified for all connections. Please check a python script. Exiting... \n");
     exit(1);
   }
   for (int i = 0; i < m_num_connections; i++) {
@@ -149,7 +149,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
         continue;
       } else {
         char err_buf[500];
-        sprintf(err_buf, "recv() returned error; ret = %d. : %s %s %d",
+        sprintf(err_buf, "[ERROR] recv() returned error; ret = %d. : %s %s %d",
                 read_size, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
         g_run_error = 1;
@@ -162,7 +162,7 @@ int DeSerializerPCModule::recvFD(int sock, char* buf, int data_size_byte, int fl
       }
     } else if (read_size == 0) {
       char err_buf[500];
-      sprintf(err_buf, "Connection is closed by peer(%s).:  %s %s %d",
+      sprintf(err_buf, "[ERROR] Connection is closed by peer(%s).:  %s %s %d",
               strerror(errno), __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       g_run_error = 1;
@@ -194,7 +194,7 @@ int DeSerializerPCModule::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];
-      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
+      sprintf(err_buf, "[FATAL] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
               strerror(errno));
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -309,7 +309,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       printData(send_hdr_buf, SendHeader::SENDHDR_NWORDS);
       char err_buf[500];
       sprintf(err_buf,
-              "CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
+              "[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
               *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -333,7 +333,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       printData(send_hdr_buf, 100);
       printASCIIData(send_hdr_buf, 100);
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Too large event : Header %d %d %d %d\n", i, temp_num_events, temp_num_nodes,
               send_hdr.GetTotalNwords());
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(123456);
@@ -380,7 +380,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
       printf("[DEBUG]*******BODY***********\n ");
       printData(temp_buf, (int)(total_recvd_byte / sizeof(int)));
       char err_buf[500];
-      sprintf(err_buf, "CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
+      sprintf(err_buf, "[FATAL] CORRUPTED DATA: Length written on SendHeader(%d) is invalid. Actual data size is %d. Exting...",
               (int)(*total_buf_nwords * sizeof(int)), temp_length);
       print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -391,7 +391,7 @@ int* DeSerializerPCModule::recvData(int* delete_flag, int* total_buf_nwords, int
 
   if ((int)(*total_buf_nwords * sizeof(int)) != total_recvd_byte) {
     char err_buf[500];
-    sprintf(err_buf, "CORRUPTED DATA: Received data size (%d byte) is not same as expected one (%d) from Sendheader. Exting...",
+    sprintf(err_buf, "[FATAL] CORRUPTED DATA: Received data size (%d byte) is not same as expected one (%d) from Sendheader. Exting...",
             total_recvd_byte, (int)(*total_buf_nwords * sizeof(int)));
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -444,7 +444,7 @@ void DeSerializerPCModule::setRecvdBuffer(RawDataBlock* temp_raw_datablk, int* d
   if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
     char err_buf[500];
     sprintf(err_buf,
-            "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+            "[FATAL] CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
             num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
     print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -607,7 +607,7 @@ void DeSerializerPCModule::checkData(RawDataBlock* raw_datablk, unsigned int* ex
           printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
-        sprintf(err_buf, "CORRUPTED DATA: Event or Time record mismatch. Exiting...");
+        sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");
         print_err.PrintError(m_shmflag, &g_status, err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);

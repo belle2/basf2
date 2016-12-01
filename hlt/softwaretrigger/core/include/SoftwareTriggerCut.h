@@ -12,14 +12,14 @@
 #include <hlt/softwaretrigger/dbobjects/SoftwareTriggerCutBase.h>
 #include <framework/utilities/GeneralCut.h>
 #include <hlt/softwaretrigger/core/SoftwareTriggerVariableManager.h>
-#include <hlt/softwaretrigger/dataobjects/SoftwareTriggerResult.h>
+#include <mdst/dataobjects/SoftwareTriggerResult.h>
 
 #include <framework/logging/Logger.h>
 
 namespace Belle2 {
-  namespace SoftwareTrigger {
-    class SoftwareTriggerResult;
+  class SoftwareTriggerResult;
 
+  namespace SoftwareTrigger {
     /**
      * Software Trigger Cut to be used in the Software Trigger Modules.
      * This cut can be down- and uploaded from the database or compiled from a string.

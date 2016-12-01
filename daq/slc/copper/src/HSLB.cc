@@ -126,7 +126,7 @@ bool HSLB::isCRCError() throw(HSLBHandlerException)
   //return (m_hslb.rxdata >> 16 > 0);
 }
 
-long long HSLB::readfn(int adr) throw(HSLBHandlerException)
+int HSLB::readfn(int adr) throw(HSLBHandlerException)
 {
   if (m_hslb.fd <= 0) {
     throw (HSLBHandlerException("hslb-%c is not available", m_hslb.fin + 'a'));

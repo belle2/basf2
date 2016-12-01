@@ -17,5 +17,5 @@ namespace Belle2 {
     /// Type for the cell states in the cellular automata
     using CellState = Weight;
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

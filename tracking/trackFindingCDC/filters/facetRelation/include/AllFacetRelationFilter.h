@@ -18,7 +18,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef BaseFacetRelationFilter Super;
+      using Super = BaseFacetRelationFilter;
 
     public:
       /// Importing all overloads from the super class
@@ -28,9 +28,7 @@ namespace Belle2 {
        *  Return -2 for all valid combinations to accepting all facets,
        *  but compensating for overlap.
        */
-      virtual Weight operator()(const CDCFacet& fromFacet,
-                                const CDCFacet& toFacet) override final
-      {
+      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final {
         // The last wire of the neighbor should not be the same as the start wire of the facet
         // The  default weight must be -2 because the overlap of the facets is two points
         // so the amount of two facets is 4 points hence the cellular automat
@@ -40,6 +38,6 @@ namespace Belle2 {
         return fromFacet.getStartWire() == toFacet.getEndWire() ? NAN : -2;
       }
 
-    }; // end class
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

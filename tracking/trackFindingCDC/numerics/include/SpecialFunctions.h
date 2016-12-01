@@ -51,5 +51,5 @@ namespace Belle2 {
         return result;
       }
     }
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+  }
+}

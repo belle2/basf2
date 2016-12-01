@@ -22,7 +22,7 @@ namespace Belle2 {
      * Hough Tree for finding StereoHits with using CDCRecoHit3D as the item type.
      * This implementation uses the normal HitInZ0TanLambda decision algorithm
      * and typical maximum values for z0 (+- 120) and s-z-slope (+- 75°) with 2 divisions for each step.
-     * This class is only a typedef. The real algorithm can be found in SimpeBoxDivisionHoughTree.
+     * This class is only an alias. The real algorithm can be found in SimpleBoxDivisionHoughTree.
      */
     using HitZ0TanLambdaLegendre =
       Z0TanLambdaLegendre<std::pair<CDCRecoHit3D, const CDCRLWireHit*>, FirstOfPairInBox<HitInZ0TanLambdaBox>, 2, 2>;

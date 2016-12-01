@@ -23,8 +23,10 @@ namespace Belle2 {
    *  This object is used for controlling the event-flow, e.g. via changing run-numbers
    *  or setEndOfData() (see also EventProcessor).
    *
+   *  See BELLE2-NOTE-TE-2015-028: Event, File, and Dataset Metadata for a
+   *  detailed definition. Available at: https://docs.belle2.org/record/287?ln=en
+   *
    *  @sa EventInfoSetterModule, EventInfoPrinterModule
-   *  @author <a href="mailto:martin.heck@kit.edu?subject=EventMetaData">Martin Heck</a>
    */
   class EventMetaData : public TObject {
   public:

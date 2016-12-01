@@ -20,10 +20,9 @@ namespace Belle2 {
 
     public:
       /// Main filter method returning the weight of the facet. Returns 3 to accept all facets.
-      virtual Weight operator()(const CDCFacet&) override final
-      {
+      Weight operator()(const CDCFacet& facet __attribute__((unused))) final {
         return 3.0;
       }
-    }; //end class AllFacetFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

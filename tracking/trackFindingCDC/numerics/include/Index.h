@@ -16,7 +16,7 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// A positive index which may indicate an invalid by returning a negative number
-    typedef int Index;
+    using Index = int;
 
     /// An invalid index that can be return if no proper solution exists.
     static const Index c_InvalidIndex = INT_MIN;
@@ -25,6 +25,6 @@ namespace Belle2 {
     inline bool isValidIndex(Index index)
     { return index >= 0; }
 
-  } // namespace TrackFindingCDC
+  }
 
-} // namespace Belle2
+}

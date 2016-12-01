@@ -83,6 +83,8 @@ namespace Belle2 {
             AItem& neighborRef(neighbor);
             AItem* neighborPtr = &neighborRef; // Relations point to the elements. Take the address of the item here
 
+            if (neighborPtr == itemPtr) continue;
+
             Relation<AItem> neighborRelation(itemPtr, neighborPtr);
             Weight weight = relationFilter(neighborRelation);
 
@@ -174,6 +176,6 @@ namespace Belle2 {
         return result;
       }
 
-    }; // class WeightedNeighborhood
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

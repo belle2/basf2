@@ -20,12 +20,12 @@ namespace Belle2 {
      *  Filter adapter to make a filter work on a set of variables and return
      *  on variable as the result of the filter.
      */
-    template<class AFilter>
+    template <class AFilter>
     class ChooseableFromVarSet : public OnVarSet<AFilter> {
 
     private:
       /// Type of the super class
-      using Super =  OnVarSet<AFilter>;
+      using Super = OnVarSet<AFilter>;
 
     public:
       /// Type of the filtered object.
@@ -37,16 +37,17 @@ namespace Belle2 {
 
     public:
       /**
-       *  Constructor taking the variable set the filter should work on and the  default name of the variable to be used.
+       *  Constructor taking the variable set the filter should work on and the default name of the
+       *  variable to be used.
        */
       ChooseableFromVarSet(std::unique_ptr<AVarSet> varSet, std::string varName = "")
-        : Super(std::move(varSet)),
-          m_param_varName(varName)
+        : Super(std::move(varSet))
+        , m_param_varName(varName)
       {
       }
 
       /// Add the parameters of this filter to the given parameter list
-      virtual void exposeParameters(ModuleParamList* parameterList, const std::string& prefix = "") override
+      void exposeParameters(ModuleParamList* parameterList, const std::string& prefix) override
       {
         Super::exposeParameters(parameterList, prefix);
 
@@ -54,25 +55,27 @@ namespace Belle2 {
           // Make a forced parameter if no default variable name is present
           parameterList->addParameter(prefixed(prefix, "chosenVariable"),
                                       m_param_varName,
-                                      "Choose the name of the variable that will be put out as a weight.");
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.");
         } else {
-          // Make a forced parameter if no default variable name is present
+          // Normal unforced parameter if default name is present
           parameterList->addParameter(prefixed(prefix, "chosenVariable"),
                                       m_param_varName,
-                                      "Choose the name of the variable that will be put out as a weight.",
+                                      "Choose the name of the variable "
+                                      "that will be put out as a weight.",
                                       m_param_varName);
         }
       }
 
       /// Initialisation method sets up a reference to the value in the variable set to be returned.
-      virtual void initialize() override
+      void initialize() override
       {
         Super::initialize();
         MayBePtr<Float_t> foundVariable = Super::getVarSet().find(m_param_varName);
         if (not foundVariable) {
           B2ERROR("Could not find request variable name " << m_param_varName << " in variable set");
           B2INFO("Valid names are: ");
-          std::vector<Named<Float_t* > > namedVariables = Super::getVarSet().getNamedVariables();
+          std::vector<Named<Float_t*>> namedVariables = Super::getVarSet().getNamedVariables();
           for (const Named<Float_t*>& namedVariable : namedVariables) {
             std::string name = namedVariable.getName();
             B2INFO("* " << name);
@@ -81,8 +84,9 @@ namespace Belle2 {
         m_variable = foundVariable;
       }
 
-      /// Main filter function returning the variable with the set requested name from the variable set.
-      virtual Weight operator()(const Object& object) override
+      /// Main filter function returning the variable with the set requested name from the variable
+      /// set.
+      Weight operator()(const Object& object) override
       {
         Weight extracted = Super::operator()(object);
         if (std::isnan(extracted)) {
@@ -105,12 +109,13 @@ namespace Belle2 {
     };
 
     /// Convience template to create a filter returning on variable from a set of variables.
-    template<class ATruthVarSet>
-    class NamedChoosableVarSetFilter : public ChooseableFromVarSet<Filter<typename ATruthVarSet::Object> > {
+    template <class ATruthVarSet>
+    class NamedChoosableVarSetFilter
+      : public ChooseableFromVarSet<Filter<typename ATruthVarSet::Object>> {
 
     private:
       /// Type of the super class
-      using Super = ChooseableFromVarSet<Filter<typename ATruthVarSet::Object> > ;
+      using Super = ChooseableFromVarSet<Filter<typename ATruthVarSet::Object>>;
 
     public:
       /// Type of the filtered object.
@@ -118,8 +123,10 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      NamedChoosableVarSetFilter() : Super(std::unique_ptr<ATruthVarSet>(new ATruthVarSet())) { }
-
+      NamedChoosableVarSetFilter()
+        : Super(makeUnique<ATruthVarSet>())
+      {
+      }
     };
   }
 }

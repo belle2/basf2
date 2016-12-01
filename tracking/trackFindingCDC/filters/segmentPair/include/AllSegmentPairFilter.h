@@ -20,20 +20,19 @@ namespace Belle2 {
       /** Checks if a pair of segments is a good combination.
        *  All implementation always accepts the total number of hits.
        */
-      virtual
-      Weight operator()(const CDCSegmentPair& segmentPair) override final
-      {
-        const CDCRecoSegment2D* ptrStartSegment = segmentPair.getFromSegment();
-        const CDCRecoSegment2D* ptrEndSegment = segmentPair.getToSegment();
+
+      Weight operator()(const CDCSegmentPair& segmentPair) final {
+        const CDCSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+        const CDCSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
         assert(ptrStartSegment);
         assert(ptrEndSegment);
 
-        const CDCRecoSegment2D& startSegment = *ptrStartSegment;
-        const CDCRecoSegment2D& endSegment = *ptrEndSegment;
+        const CDCSegment2D& startSegment = *ptrStartSegment;
+        const CDCSegment2D& endSegment = *ptrEndSegment;
         return startSegment.size() + endSegment.size();
       }
 
-    }; // end class AllSegmentPairFilter
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

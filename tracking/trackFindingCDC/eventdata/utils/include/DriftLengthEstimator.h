@@ -16,13 +16,16 @@ namespace Belle2 {
 
     class CDCFacet;
     class CDCRecoHit2D;
-    class CDCRecoSegment2D;
+    class CDCSegment2D;
 
     /// Helper construct implementing the (re)estimation of the drift length for various hit objects
     struct DriftLengthEstimator {
 
       /// Add the parameters of the estimator to the module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "");
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix);
+
+      /// Update the drift length of the reconstructed hit in place.
+      double updateDriftLength(CDCRecoHit2D& recoHit2D);
 
       /**
        *  Reestimate the drift length of all three contained drift circles.
@@ -31,11 +34,8 @@ namespace Belle2 {
        */
       void updateDriftLength(CDCFacet& facet);
 
-      /// Update the drift length of the reconstructed hit in place.
-      void updateDriftLength(CDCRecoHit2D& recoHit2D);
-
       /// Update the drift length of the contained reconstructed hit in place.
-      void updateDriftLength(CDCRecoSegment2D& segment);
+      void updateDriftLength(CDCSegment2D& segment);
 
       /// Parameter : Switch to serve the alpha angle to the drift length translator.
       bool m_param_useAlphaInDriftLength = true;
@@ -43,6 +43,6 @@ namespace Belle2 {
       /// Parameter : Mass to estimate the velocity in the flight time to the hit
       double m_param_tofMassScale = NAN;
 
-    }; // struct
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

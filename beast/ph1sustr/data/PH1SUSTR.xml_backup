@@ -17,17 +17,17 @@ whitespace, comma or semi-colon -->
 </bar>
 <Active>
 <Material>PH1SUSTR-Material</Material>
-<x_tpcbeamR unit="cm">46.89100</x_tpcbeamR>
-<y_tpcbeamR unit="cm">0.75200</y_tpcbeamR>
-<z_tpcbeamR unit="cm">35.97700</z_tpcbeamR>
-<x_tpcbeamT unit="cm">2.95700</x_tpcbeamT>
-<y_tpcbeamT unit="cm">52.08900</y_tpcbeamT>
-<z_tpcbeamT unit="cm">37.57700</z_tpcbeamT>
-<x_tpcbeamL unit="cm">-53.70500</x_tpcbeamL>
-<y_tpcbeamL unit="cm">0.34000</y_tpcbeamL>
-<z_tpcbeamL unit="cm">37.57700</z_tpcbeamL>
-<x_tpcbeamB unit="cm">0.95300</x_tpcbeamB>
-<y_tpcbeamB unit="cm">-50.48900</y_tpcbeamB>
+<x_tpcbeamR unit="cm">49.20000</x_tpcbeamR>
+<y_tpcbeamR unit="cm">-0.70000</y_tpcbeamR>
+<z_tpcbeamR unit="cm">36.00000</z_tpcbeamR>
+<x_tpcbeamT unit="cm">-3.00000</x_tpcbeamT>
+<y_tpcbeamT unit="cm">52.10000</y_tpcbeamT>
+<z_tpcbeamT unit="cm">37.70000</z_tpcbeamT>
+<x_tpcbeamL unit="cm">-53.20000</x_tpcbeamL>
+<y_tpcbeamL unit="cm">-0.30000</y_tpcbeamL>
+<z_tpcbeamL unit="cm">37.70000</z_tpcbeamL>
+<x_tpcbeamB unit="cm">-1.00000</x_tpcbeamB>
+<y_tpcbeamB unit="cm">-51.00000</y_tpcbeamB>
 <z_tpcbeamB unit="cm">42.30000</z_tpcbeamB>
 <!--x_offset unit="cm">-20.5</x_offset-->
 <x_offset unit="cm">0</x_offset>

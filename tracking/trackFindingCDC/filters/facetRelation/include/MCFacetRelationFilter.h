@@ -21,7 +21,7 @@ namespace Belle2 {
 
     private:
       /// Type of the super class
-      typedef MCSymmetricFilterMixin<BaseFacetRelationFilter > Super;
+      using Super = MCSymmetricFilterMixin<BaseFacetRelationFilter >;
 
     public:
       /// Importing all overloads from the super class
@@ -32,32 +32,18 @@ namespace Belle2 {
        *  Constructor also setting the switch if the reversed version of a facet
        *  (in comparision to MC truth) shall be accepted.
        */
-      MCFacetRelationFilter(bool allowReverse = false)
-        : Super(allowReverse),
-          m_mcFacetFilter(allowReverse)
-      {}
-
-    public:
-      /// Used to prepare the Monte Carlo information for this event.
-      virtual void beginEvent() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void initialize() override final;
-
-      /// Forwards the modules initialize to the filter
-      virtual void terminate() override final;
+      MCFacetRelationFilter(bool allowReverse = false);
 
     public:
       /**
        *  Main filter method returning the weight of the neighborhood relation.
        *  Return NAN if relation shall be rejected.
        */
-      virtual Weight operator()(const CDCFacet& fromFacet,
-                                const CDCFacet& toFacet) override final;
+      Weight operator()(const CDCFacet& fromFacet, const CDCFacet& toFacet) final;
 
     public:
       /// Setter for the allow reverse parameter
-      virtual void setAllowReverse(bool allowReverse) override
+      void setAllowReverse(bool allowReverse) override
       {
         Super::setAllowReverse(allowReverse);
         m_mcFacetFilter.setAllowReverse(allowReverse);
@@ -67,6 +53,6 @@ namespace Belle2 {
       /// Monte Carlo cell filter to reject neighborhoods have false cells
       MCFacetFilter m_mcFacetFilter;
 
-    }; // end class
-  } // end namespace TrackFindingCDC
-} // end namespace Belle2
+    };
+  }
+}

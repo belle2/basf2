@@ -107,13 +107,13 @@ namespace Belle2 {
       }
 
       /// Getter for the number of degrees of freediom used in the line fit
-      const size_t& ndf() const
+      std::size_t ndf() const
       {
         return m_ndf;
       }
 
       /// Setter for the number of degrees of freediom used in the line fit
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       {
         m_ndf = ndf;
       }
@@ -195,7 +195,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedim of the fit of this line.
       size_t m_ndf = 0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

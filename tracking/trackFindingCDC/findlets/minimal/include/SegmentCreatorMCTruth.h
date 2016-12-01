@@ -10,39 +10,40 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
 #include <vector>
 #include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+    class CDCWireHit;
 
     /// Findlet that generates segments from wire hits using the mc truth information.
-    class SegmentCreatorMCTruth :
-      public Findlet<const CDCWireHit, CDCRecoSegment2D> {
+    class SegmentCreatorMCTruth : public Findlet<const CDCWireHit, CDCSegment2D> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<const CDCWireHit, CDCRecoSegment2D>;
+      using Super = Findlet<const CDCWireHit, CDCSegment2D>;
 
     public:
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Short description of the findlet
-      virtual std::string getDescription() override final;
+      std::string getDescription() final;
 
       /// Initialize the Module before event processing
-      virtual void initialize() override final;
+      void initialize() final;
 
       /// Start processing the current event
-      virtual void beginEvent() override final;
+      void beginEvent() final;
 
       /// Main function of the segment finding by the cellular automaton.
-      virtual void apply(const std::vector<CDCWireHit>& inputWireHits,
-                         std::vector<CDCRecoSegment2D>& outputSegments) override final;
+      void apply(const std::vector<CDCWireHit>& inputWireHits,
+                 std::vector<CDCSegment2D>& outputSegments) final;
 
     private:
       /// Parameter : Setup the drift length as it can be estimated from two dimensional information
@@ -50,7 +51,6 @@ namespace Belle2 {
 
       /// Parameter : Switch to reconstruct the positions in the segments immitating the facet ca picking up all correct hits.
       bool m_param_reconstructedPositions = false;
-
-    }; // end class SegmentCreator
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+    };
+  }
+}

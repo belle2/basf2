@@ -42,6 +42,47 @@ using namespace std;
 namespace Belle2 {
   namespace Variable {
 
+    double isCompletelyInRestOfEvent(const Particle* particle)
+    {
+      // It can happen that for example a cluster is in the rest of event,
+      // which is CR - matched to a nearby track which is not in the ROE
+      // Hence this variable checks if all MdstObjects are in the ROE
+      StoreObjPtr<RestOfEvent> roe("RestOfEvent");
+      if (not roe.isValid())
+        return 0;
+
+      if (particle->getParticleType() == Particle::c_Composite) {
+        std::vector<const Particle*> fspDaug = particle->getFinalStateDaughters();
+        for (unsigned int i = 0; i < fspDaug.size(); i++) {
+          if (isCompletelyInRestOfEvent(fspDaug[i]) == 0) {
+            break;
+            return 0;
+          }
+        }
+        return 1.0;
+      } else {
+        // Check for Tracks
+        const auto& tracks = roe->getTracks();
+        if (particle->getTrack() and std::find(tracks.begin(), tracks.end(), particle->getTrack()) == tracks.end()) {
+          return 0.0;
+        }
+
+        // Check for KLMClusters
+        const auto& klm = roe->getKLMClusters();
+        if (particle->getKLMCluster() and std::find(klm.begin(), klm.end(), particle->getKLMCluster()) == klm.end()) {
+          return 0.0;
+        }
+
+        // Check for ECLClusters
+        const auto& ecl = roe->getECLClusters();
+        if (particle->getECLCluster() and std::find(ecl.begin(), ecl.end(), particle->getECLCluster()) == ecl.end()) {
+          return 0.0;
+        }
+      }
+
+      return 1.0;
+    }
+
     double isInRestOfEvent(const Particle* particle)
     {
 
@@ -1531,6 +1572,11 @@ namespace Belle2 {
     REGISTER_VARIABLE("isInRestOfEvent", isInRestOfEvent,
                       "Returns 1 if a track, ecl or klmCluster associated to particle is in the current RestOfEvent object, 0 otherwise."
                       "One can use this variable only in a for_each loop over the RestOfEvent StoreArray.");
+
+    REGISTER_VARIABLE("isCompletelyInRestOfEvent", isCompletelyInRestOfEvent,
+                      "Similar to isInRestOfEvent, but checks if all Mdst objects of the particle are in the RestOfEvent"
+                      "One can use this to distinguish ECLClusters with a connected-region matched Track outside the ROE,"
+                      "from ordinary ECLClusters in the ROE mask for ECLClusters.");
 
     REGISTER_VARIABLE("currentROEIsInList(particleList)", currentROEIsInList,
                       "[EventBased] Returns 1 the associated particle of the current ROE is contained in the given list or its charge-conjugated."

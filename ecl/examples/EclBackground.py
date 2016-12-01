@@ -1,11 +1,20 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+########################################################
+#
+# Example steering file - 2016 Belle II Collaboration
+#
+# Modifications for release-00-08: Torben Ferber (ferber@physics.ubc.ca)
+#
+########################################################
+
 import os
 import sys
 import subprocess
 from basf2 import *
 from subprocess import call
+from reconstruction import add_ecl_modules
 
 print('\033[1m')  # makes console text bold
 print('This steering file is an example of how to use the ECLBackgroundModule.')
@@ -77,12 +86,14 @@ eclBg.param('sampleTime', sampletime)
 eclBg.param('doARICH', ARICH)
 eclBg.param('crystalsOfInterest', [318, 625, 107])  # If you want the dose for specific crystals, put the cell ID here
 
-# other ECL modules...
+# Digitization
 eclDigi = register_module('ECLDigitizer')
-eclRecShower = register_module('ECLReconstructor')
-
 main.add_module(eclDigi)
-# main.add_module(eclRecShower)
+
+# ECL reconstruction
+add_ecl_modules
+
+# Background
 main.add_module(eclBg)
 
 # run it

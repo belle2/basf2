@@ -9,14 +9,15 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
-
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment3D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment3D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCStereoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCAxialSegment2D.h>
 
+#include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -29,7 +30,7 @@ namespace Belle2 {
 
       /// Returns the fitted sz trajectory of the track with the z-information of all stereo hits of the number
       /// of stereo hits is big enough. Else return the basic assumption.
-      CDCTrajectorySZ fitWithStereoHits(CDCTrack& track) const
+      CDCTrajectorySZ fitWithStereoHits(const CDCTrack& track) const
       {
         CDCObservations2D observationsSZ;
         const bool onlyStereo = true;
@@ -45,7 +46,7 @@ namespace Belle2 {
       }
 
       /// Returns a fitted trajectory
-      CDCTrajectorySZ fit(const CDCStereoRecoSegment2D& stereoSegment,
+      CDCTrajectorySZ fit(const CDCStereoSegment2D& stereoSegment,
                           const CDCTrajectory2D& axialTrajectory2D) const
       {
         CDCTrajectorySZ trajectorySZ;
@@ -54,7 +55,7 @@ namespace Belle2 {
       }
 
       /// Fits a linear sz trajectory to the z and s coordinates in the stereo segment.
-      CDCTrajectorySZ fit(const CDCRecoSegment3D& segment3D) const
+      CDCTrajectorySZ fit(const CDCSegment3D& segment3D) const
       {
         CDCTrajectorySZ trajectorySZ;
         update(trajectorySZ, segment3D);
@@ -80,14 +81,14 @@ namespace Belle2 {
        *    - Use RANSAC instead of Theil-Sen.
        *    - Think about the parameters better.
        */
-      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCRecoSegment3D& segment3D) const;
+      CDCTrajectorySZ fitUsingSimplifiedTheilSen(const CDCSegment3D& segment3D) const;
 
       /// Updates the trajectory of the axial stereo segment pair inplace
       void update(const CDCSegmentPair& segmentPair) const;
 
       /// Update the given sz trajectory reconstructing the stereo segment with a near by axial segment
       void update(CDCTrajectorySZ& trajectorySZ,
-                  const CDCStereoRecoSegment2D& stereoSegment,
+                  const CDCStereoSegment2D& stereoSegment,
                   const CDCTrajectory2D& axialTrajectory2D) const;
 
       /**
@@ -103,8 +104,7 @@ namespace Belle2 {
       }
 
       /// Update the trajectory with a fit to the observations.
-      void update(CDCTrajectorySZ& trajectorySZ,
-                  CDCObservations2D& observationsSZ) const;
+      void update(CDCTrajectorySZ& trajectorySZ, CDCObservations2D& observationsSZ) const;
 
     private:
       /// Appends the s and z values of all given hits to the observation matrix
@@ -127,7 +127,7 @@ namespace Belle2 {
        *
        *  @return   The number of hits appended which is 0 or 1 here.
        */
-      size_t appendSZ(CDCObservations2D& observationsSZ, const Belle2::TrackFindingCDC::CDCRecoHit3D& recoHit3D) const
+      size_t appendSZ(CDCObservations2D& observationsSZ, const CDCRecoHit3D& recoHit3D) const
       {
         // Translate the drift length uncertainty to a uncertainty in z
         // by the taking the projected wire vector part parallel to the displacement
@@ -149,7 +149,10 @@ namespace Belle2 {
         //double weight = 1.0;
         double weight = zeta * zeta / driftlengthVariance;
 
-        size_t appended_hit = appendSZ(observationsSZ, recoHit3D.getArcLength2D(), recoHit3D.getRecoPos3D().z(), weight);
+        size_t appended_hit = appendSZ(observationsSZ,
+                                       recoHit3D.getArcLength2D(),
+                                       recoHit3D.getRecoPos3D().z(),
+                                       weight);
         // if (not appended_hit){
         //   B2WARNING("CDCRecoHit3D was not appended as SZ observation.");
         //   B2WARNING("S: " << recoHit3D.getPerpS());
@@ -168,9 +171,10 @@ namespace Belle2 {
       }
 
       /// Appends the s and z value of the given hit to the observation matrix
-      size_t appendSZ(CDCObservations2D& observationsSZ, const double s, const double z, const double weight = 1.0) const
-      { return observationsSZ.fill(s, z, 0.0, weight); }
-
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+      size_t appendSZ(CDCObservations2D& observationsSZ, double s, double z, double weight = 1.0) const
+      {
+        return observationsSZ.fill(s, z, 0.0, weight);
+      }
+    };
+  }
+}

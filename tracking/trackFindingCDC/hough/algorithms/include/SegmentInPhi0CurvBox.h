@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/hough/phi0_curv/Phi0CurvBox.h>
 #include <tracking/trackFindingCDC/geometry/Vector2D.h>
@@ -30,8 +30,8 @@ namespace Belle2 {
        *  and simply uses the values from the contained trajectory
        *  The calling code has to ensure this situation
        */
-      inline Weight operator()(const CDCRecoSegment2D* segment,
-                               const Phi0CurvBox* phi0CurvBox)
+      Weight operator()(const CDCSegment2D* segment,
+                        const Phi0CurvBox* phi0CurvBox)
       {
         if (segment->empty()) return NAN;
         const CDCTrajectory2D& trajectory2D = segment->getTrajectory2D();
@@ -43,8 +43,8 @@ namespace Belle2 {
        *  Checks if the given trajectory is considered part of the hough box in phi0, curvature space.
        *  Returns a finit weight if it is contained, NAN if not contained.
        */
-      inline Weight operator()(const CDCTrajectory2D* trajectory2D,
-                               const Phi0CurvBox* phi0CurvBox)
+      Weight operator()(const CDCTrajectory2D* trajectory2D,
+                        const Phi0CurvBox* phi0CurvBox)
       {
         double curvature = trajectory2D->getCurvature();
         const Vector2D& phi0Vec = trajectory2D->getStartUnitMom2D();
@@ -58,8 +58,8 @@ namespace Belle2 {
        *  Checks if the given hit triplet is considered part of the hough box in phi0, curvature space.
        *  Returns a finit weight if it is contained, NAN if not contained.
        */
-      inline Weight operator()(const CDCFacet* facet,
-                               const Phi0CurvBox* phi0CurvBox)
+      Weight operator()(const CDCFacet* facet,
+                        const Phi0CurvBox* phi0CurvBox)
       {
         const ParameterLine2D& line = facet->getStartToEndLine();
 
@@ -80,9 +80,9 @@ namespace Belle2 {
       }
 
       /// Predicate checking if the phi0 vector and curvature are contained in the given box.
-      inline bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
-                                    const double curvature,
-                                    const Phi0CurvBox* phi0CurvBox)
+      bool isPhi0CurvPointIn(const Vector2D& phi0Vec,
+                             const double curvature,
+                             const Phi0CurvBox* phi0CurvBox)
       {
 
         const Vector2D& lowerPhi0Vec = phi0CurvBox->getLowerPhi0Vec();

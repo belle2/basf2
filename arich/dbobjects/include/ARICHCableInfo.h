@@ -34,7 +34,7 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHCableInfo(int id, int type, float length, std::string comment): m_id(id), m_type(type), m_length(length),
+    ARICHCableInfo(int id, int type, float length, const std::string& comment): m_id(id), m_type(type), m_length(length),
       m_comment(comment) {};
 
     /**

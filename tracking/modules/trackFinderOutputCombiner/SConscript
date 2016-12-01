@@ -1,7 +1,0 @@
-Import('env')
-
-env['LIBS'] = ['cdc_dataobjects',
-               'framework',
-               'tracking_trackFindingCDC',
-               'mdst_dataobjects']
-Return('env')

@@ -38,7 +38,8 @@ void CDCMCManager::requireTruthInformation()
 void CDCMCManager::clear()
 {
   m_mcTrackLookUp.clear();
-  m_mcSegmentLookUp.clear();
+  m_mcSegment3DLookUp.clear();
+  m_mcSegment2DLookUp.clear();
   //m_mcHitLookUp.clear(); // Currently has no clear
 
   m_mcTrackStore.clear();
@@ -48,12 +49,11 @@ void CDCMCManager::clear()
 
 void CDCMCManager::fill()
 {
-
   StoreObjPtr<EventMetaData> storedEventMetaData;
 
   if (storedEventMetaData.isValid()) {
     if (m_eventMetaData == *storedEventMetaData) {
-      //Instance has already been filled with the current event
+      // Instance has already been filled with the current event
       return;
     }
   }
@@ -62,8 +62,10 @@ void CDCMCManager::fill()
 
   m_mcMap.fill();
   const CDCMCMap* ptrMCMap = &m_mcMap;
-  m_mcTrackStore.fill(ptrMCMap);
   m_simHitLookUp.fill(ptrMCMap);
+
+  const CDCSimHitLookUp* ptrSimHitLookUp = &m_simHitLookUp;
+  m_mcTrackStore.fill(ptrMCMap, ptrSimHitLookUp);
 
   if (storedEventMetaData.isValid()) {
     //after filling store the event numbers

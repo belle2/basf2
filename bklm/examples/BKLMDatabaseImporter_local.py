@@ -14,7 +14,7 @@ set_log_level(LogLevel.INFO)
 # use_local_database()
 use_local_database("test_bklm.txt", "test_payloads")
 # use use_central_database for uploading data to PNNL
-# use_central_database("test_bklm", LogLevel.ERROR);
+# use_central_database("test_bklm", LogLevel.WARNING);
 
 
 # EventInfoSetter is only needed to register EventMetaData in the Datastore to

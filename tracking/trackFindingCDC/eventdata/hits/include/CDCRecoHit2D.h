@@ -69,12 +69,11 @@ namespace Belle2 {
        *  Constructs a two dimensional reconstructed hit from an absolute position.
        *
        *  @param rlWireHit the oriented wire hit the reconstructed hit is assoziated to
-       *  @param pos2D     the absolut position of the wire
+       *  @param recoPos2D the absolut position of the wire
        *  @param snap      optional indicator if the displacement shall be shrank to the drift circle (default true)
        */
-      static CDCRecoHit2D fromRecoPos2D(const CDCRLWireHit& rlWireHit,
-                                        const Vector2D& recoPos2D,
-                                        bool snap = true);
+      static CDCRecoHit2D
+      fromRecoPos2D(const CDCRLWireHit& rlWireHit, const Vector2D& recoPos2D, bool snap = true);
 
       /**
        *  Turns the orientation in place.
@@ -201,8 +200,7 @@ namespace Belle2 {
       { return getRLWireHit().getRefDriftLength(); }
 
       /// Setter for the drift length at the wire reference position.
-      void setRefDriftLength(double driftLength)
-      { return m_rlWireHit.setRefDriftLength(driftLength); }
+      void setRefDriftLength(double driftLength, bool snapRecoPos);
 
       /// Getter for the drift length at the wire reference position signed with the right left passage hypotheses.
       double getSignedRefDriftLength() const
@@ -231,9 +229,14 @@ namespace Belle2 {
         return getRecoDisp2D().orthogonal(rotation);
       }
 
+      /// Getter for the direction of flight relative to the position
+      double getAlpha() const
+      {
+        return getRecoPos2D().angleWith(getFlightDirection2D());
+      }
+
       /// Scales the displacement vector in place to lie on the dirft circle.
-      void snapToDriftCircle()
-      { m_recoDisp2D.normalizeTo(getRLWireHit().getRefDriftLength()); }
+      void snapToDriftCircle(bool switchSide = false);
 
       /**
        *  Reconstruct the three dimensional position (especially of stereo hits)
@@ -260,7 +263,7 @@ namespace Belle2 {
       /// Memory for the displacement fo the assoziated wire reference position.
       Vector2D m_recoDisp2D;
 
-    }; // class CDCRecoHit2D
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

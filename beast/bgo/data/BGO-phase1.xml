@@ -22,7 +22,8 @@
     <Range>17.7390651, 105.9926162, 26.9806792, 443.6888976, 260.8754722, 145.2465165, 829.3321807, 225.7089562</Range>
     <EnergyResolutionFactor>13.39926979, 36.33902962, 16.47422346, 72.00243712, 51.11738956, 40.54659536, 91.17399452, 49.33843733</EnergyResolutionFactor>
     <EnergyResolutionConst>0, 0, 0, 0, 0, 0, 0, 0</EnergyResolutionConst>
-    <!-- ch 0 -->
+    
+    <!-- ch 5/0 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -34,15 +35,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>108.382829322</px>
-      <py>-176.926257713</py>
-      <pz>395.750520889</pz>
+      <px>77</px>
+      <py>-177</py>
+      <pz>396</pz>
       <rx>-0.376360783741</rx>
       <ry>0.908681313881</ry>
       <rz>0.180695407428</rz>
       <angle>3.29101626722</angle>
     </Active>
-    <!-- ch 1 -->
+    <!-- ch 3/1 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -54,15 +55,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>-86.3828293217</px>
-      <py>107.926257713</py>
-      <pz>407.750520889</pz>
+      <px>-86</px>
+      <py>108</py>
+      <pz>396</pz>
       <rx>0.921225435916</rx>
       <ry>0.38155635179</ry>
       <rz>0.0758844294365</rz>
       <angle>2.77923072158 </angle>
     </Active>
-    <!-- ch 2 -->
+    <!-- ch 4/2 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -74,15 +75,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>-89.9262577129</px>
-      <py>-196.382829322</py>
-      <pz>395.750520889</pz>
+      <px>-90</px>
+      <py>-196</py>
+      <pz>396</pz>
       <rx>0.376407233487</rx>
       <ry>0.908661442673</ry>
       <rz>0.180698581007</rz>
       <angle>2.99218488058</angle>
     </Active>
-    <!-- ch 3 -->
+    <!-- ch 0/3 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -95,15 +96,15 @@
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
       <!--px>169.926257713</px-->
-      <px>139.926257713</px>
-      <py>129.382829322</py>
-      <pz>379.750520889</pz>
+      <px>119</px>
+      <py>119</py>
+      <pz>396</pz>
       <rx >0.921206397777</rx>
       <ry >-0.381603901491</ry>
       <rz >-0.0758764460204</rz>
       <angle >2.7792240696</angle>
     </Active>
-    <!-- ch 4 -->
+    <!-- ch 2/4 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -115,15 +116,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>201.382829322</px>
-      <py>102.926257713</py>
-      <pz>-274.750520889</pz>
+      <px>130</px>
+      <py>103</py>
+      <pz>-294</pz>
       <rx>-0.080529077704</rx>
       <ry>-0.19440234088</ry>
       <rz>0.977610759712</rz>
-      <angle>2.37212836127 </angle>
+      <angle>2.37212836127</angle>
     </Active>
-    <!-- ch 5 -->
+    <!-- ch 1/5 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -135,15 +136,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>-81.9262577129</px>
-      <py>122.382829322</py>
-      <pz>-306.750520889</pz>
+      <px>-82</px>
+      <py>122</py>
+      <pz>-294</pz>
       <rx>0.0805221938739</rx>
       <ry>-0.194409823446</ry>
       <rz>0.977609838761</rz>
       <angle>3.91115737359 </angle>
     </Active>
-    <!-- ch 6 -->
+    <!-- ch 6/6 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -155,15 +156,15 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>-81.3828293217</px>
-      <py>-144.926257713</py>
-      <pz>-293.750520889</pz>
+      <px>-81</px>
+      <py>-145</py>
+      <pz>-294</pz>
       <rx>-0.426020377418</rx>
       <ry>0.176474356849</ry>
       <rz>-0.887335020947</rz>
       <angle>0.873427919859 </angle>
     </Active>
-    <!-- ch 7 -->
+    <!-- ch 7/7 -->
     <Active>
       <Material>BGO-Material</Material>
       <cDx3 unit="mm">17.974</cDx3>
@@ -175,9 +176,9 @@
       <cDz unit="mm">124.0</cDz>
       <cDtheta unit="deg">13.1856</cDtheta>
       <cDphi unit="deg">-90.0</cDphi>
-      <px>94.9262577129</px>
-      <py>-153.382829322</py>
-      <pz>-292.750520889</pz>
+      <px>104</px>
+      <py>-153</py>
+      <pz>-293</pz>
       <rx>-0.425986517615</rx>
       <ry>-0.176438455377</ry>
       <rz>0.887358415903</rz>

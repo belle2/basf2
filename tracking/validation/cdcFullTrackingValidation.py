@@ -32,6 +32,9 @@ class CDCFull(TrackingValidationRun):
         'UsePXDHits': False,
         'UseSVDHits': False,
         'UseCDCHits': True,
+        'UseOnlyAxialCDCHits': False,
+        # 'WhichParticles': ['CDC'], # Uncomment to count also secondary tracks
+        # 'EnergyCut': 0.1,
     }
     fit_geometry = None
     pulls = True

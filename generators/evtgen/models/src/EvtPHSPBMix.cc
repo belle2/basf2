@@ -58,9 +58,6 @@ EvtDecayBase* EvtPHSPBBMix::clone()
 
 void EvtPHSPBBMix::init()
 {
-  //  return;
-  EvtGenReport(EVTGEN_ERROR, "EvtGen") << "Welcome to PHSP_BB_MIX (1)" << endl;
-
   // check that there we are provided exactly one parameter
   //One arg: Delta m
   const unsigned short int narg(2);
@@ -237,9 +234,6 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
   bool pr(false);
   if (pr) prlp(1);
 
-
-
-
   static const EvtId B0(EvtPDL::getId("B0"));
   static const EvtId B0B(EvtPDL::getId("anti-B0"));
 
@@ -253,19 +247,13 @@ void EvtPHSPBBMix::decay(EvtParticle* p)
   if (pr) prlp(103);
   if (NCC) {
     if (pr) prlp(2);
-    //EvtId tempDaug[getNDaug() - 2];
-    EvtId tempDaug[10];
+    std::vector<EvtId> tempDaug(getNDaug() - 2);
     tempDaug[0] = getDaug(0);
     tempDaug[1] = getDaug(1);
     if (getNDaug() == 5)
       tempDaug[2] = getDaug(2);
 
-
-    //    std::cout<<"NDaug:"<<getNDaug()<<std::endl;
-    //  for (int i(0);i<getNDaug()-2;++i)
-    //  std::cout<<"Daug "<<i<<" : "<<EvtPDL::name(tempDaug[i]).c_str()<<std::endl;
-
-    p->initializePhaseSpace(getNDaug() - 2, tempDaug);
+    p->initializePhaseSpace(getNDaug() - 2, tempDaug.data());
 
     if (pr) prlp(222);
   } else { //nominal case.
@@ -362,8 +350,8 @@ EvtComplex EvtPHSPBBMix::Amplitude(const double& t1, const double& t2, bool B1_i
     else
       return EvtComplex(0., -sin(f * (t2 + _C * t1) / 2.) * _C / sqrt(2.));
   }
+  // no way to reach this but compiler complains without a return statement
   return EvtComplex(0., 0.);
-
 }
 
 
@@ -389,9 +377,6 @@ EvtDecayBase* EvtPHSPBMix::clone()
 
 void EvtPHSPBMix::init()
 {
-  //  return;
-  EvtGenReport(EVTGEN_DEBUG, "EvtGen") << "Welcome to PHSP_B_MIX (1)" << endl;
-
   // check that there we are provided exactly one parameter
   //One arg: Delta m
   const unsigned short int narg(1);
@@ -476,8 +461,7 @@ void EvtPHSPBMix::decay(EvtParticle* p)
 
   //  const bool BBpipi(getNDaug()!=4);//true if BBpipi, if not BBpi
   if (pr)    std::cout << "decay B_MIX (0)" << std::endl;
-//  EvtId tempDaug[getNDaug() - 1];
-  EvtId tempDaug[10];
+  std::vector<EvtId> tempDaug(getNDaug() - 1);
   tempDaug[0] = getDaug(0);
   tempDaug[1] = getDaug(1);
   tempDaug[2] = getDaug(2);
@@ -487,7 +471,7 @@ void EvtPHSPBMix::decay(EvtParticle* p)
   if (pr)    std::cout << "decay B_MIX (1)" << std::endl;
 
 
-  p->initializePhaseSpace(getNDaug() - 1, tempDaug);
+  p->initializePhaseSpace(getNDaug() - 1, tempDaug.data());
 
   EvtParticle* s1;
 

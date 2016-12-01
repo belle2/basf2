@@ -16,8 +16,6 @@
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 
-#include <tracking/trackFindingCDC/eventtopology/CDCWireHitTopology.h>
-
 #include <tracking/trackFindingCDC/topology/CDCWire.h>
 #include <tracking/trackFindingCDC/topology/CDCWireLayer.h>
 #include <tracking/trackFindingCDC/topology/CDCWireSuperLayer.h>
@@ -35,6 +33,15 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+ConstVectorRange<CDCWireHit> CDCSimpleSimulation::getWireHits() const
+{
+  if (m_sharedWireHits) {
+    return {m_sharedWireHits->begin(), m_sharedWireHits->end()};
+  } else {
+    return ConstVectorRange<CDCWireHit>();
+  }
+}
+
 CDCTrack CDCSimpleSimulation::simulate(const CDCTrajectory3D& trajectory3D)
 {
   return std::move(simulate(std::vector<CDCTrajectory3D>(1, trajectory3D)).front());
@@ -43,8 +50,6 @@ CDCTrack CDCSimpleSimulation::simulate(const CDCTrajectory3D& trajectory3D)
 
 std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTrajectory3D>& trajectories3D)
 {
-  B2ASSERT("Wire hit topology was not set in the CDCSimpleSimulation", m_wireHitTopology);
-
   std::vector<SimpleSimHit> simpleSimHits;
   const size_t nMCTracks = trajectories3D.size();
 
@@ -84,7 +89,7 @@ std::vector<CDCTrack> CDCSimpleSimulation::simulate(const std::vector<CDCTraject
 }
 
 std::vector<CDCTrack>
-CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits) const
+CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> simpleSimHits)
 {
 
   // Sort the hits along side their wire hits
@@ -117,8 +122,7 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
     simpleSimHits.erase(itLast, simpleSimHits.end());
   }
 
-  // Write the created hits to the their storage place.
-  CDCWireHitTopology& wireHitTopology = *m_wireHitTopology;
+  // Write the created hits and move them to the their storage place.
   {
     std::vector<CDCWireHit> wireHits;
     wireHits.reserve(simpleSimHits.size());
@@ -126,24 +130,19 @@ CDCSimpleSimulation::constructMCTracks(int nMCTracks, std::vector<SimpleSimHit> 
       wireHits.push_back(simpleSimHit.m_wireHit);
     }
 
-    std::sort(wireHits.begin(), wireHits.end());
-    std::shared_ptr<std::vector<CDCWireHit> > sharedWireHits{new std::vector<CDCWireHit>(std::move(wireHits))};
+    B2ASSERT("WireHits should be sorted as a result from sorting the SimpleSimHits. "
+             "Algorithms may relay on the sorting o the WireHits",
+             std::is_sorted(wireHits.begin(), wireHits.end()));
 
-    auto keepSharedWireHitsAlive = [sharedWireHits](VectorRange<CDCWireHit>*) {};
-
-    std::shared_ptr<VectorRange<CDCWireHit> > sharedWireHitRange{
-      new VectorRange<CDCWireHit>(sharedWireHits->begin(), sharedWireHits->end()), keepSharedWireHitsAlive
-    };
-
-    wireHitTopology.fill(std::move(sharedWireHitRange));
-
-    // TODO: Decide if the EventMeta should be incremented after write.
+    m_sharedWireHits.reset(new const std::vector<CDCWireHit>(std::move(wireHits)));
   }
+
+  // TODO: Decide if the EventMeta should be incremented after write.
 
   // Now construct the tracks.
   std::vector<CDCTrack> mcTracks;
   mcTracks.resize(nMCTracks);
-  const VectorRange<CDCWireHit>& wireHits = wireHitTopology.getWireHits();
+  ConstVectorRange<CDCWireHit> wireHits = getWireHits();
   const size_t nWireHits = wireHits.size();
 
   for (size_t iWireHit = 0; iWireHit < nWireHits; ++iWireHit) {
@@ -383,8 +382,8 @@ CDCSimpleSimulation::createHitForCell(const CDCWire& wire,
 }
 
 
-std::vector<Belle2::TrackFindingCDC::CDCTrack>
-CDCSimpleSimulation::loadPreparedEvent() const
+std::vector<CDCTrack>
+CDCSimpleSimulation::loadPreparedEvent()
 {
   const size_t nMCTracks = 2;
   std::vector<SimpleSimHit> simpleSimHits;

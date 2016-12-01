@@ -74,26 +74,23 @@ namespace Belle2 {
        *  Construct a trajectory with given start point, momentum at the start point and given charge.
        *  Additionally this can takes an explicit bZ value instead of a field value from the instance BFieldMap.
        */
-      CDCTrajectory3D(const Vector3D& startPoint,
-                      const double startTime,
-                      const Vector3D& startMomentum,
-                      const double charge,
-                      const double bZ);
+      CDCTrajectory3D(const Vector3D& pos3D,
+                      double time,
+                      const Vector3D& mom3D,
+                      double charge,
+                      double bZ);
 
       /// Construct a trajectory with given start point, momentum at the start point and given charge.
-      CDCTrajectory3D(const Vector3D& startPoint,
-                      const double startTime,
-                      const Vector3D& startMomentum,
-                      const double charge);
+      CDCTrajectory3D(const Vector3D& pos3D, double time, const Vector3D& mom3D, double charge);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
-      CDCTrajectory3D(const MCParticle& mcParticle, const double bZ);
+      CDCTrajectory3D(const MCParticle& mcParticle, double bZ);
 
       /// Construct a trajectory from the MCParticles vertex and momentum.
       explicit CDCTrajectory3D(const MCParticle& mcParticle);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
-      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, const double bZ);
+      CDCTrajectory3D(const genfit::TrackCand& gfTrackCand, double bZ);
 
       /// Construct a trajectory by extracting the seed position of the genfit::TrackCand
       explicit CDCTrajectory3D(const genfit::TrackCand& gfTrackCand);
@@ -120,13 +117,13 @@ namespace Belle2 {
       bool fillInto(genfit::TrackCand& trackCand) const;
 
       /// Copies the trajectory information to the Genfit track candidate
-      bool fillInto(genfit::TrackCand& trackCand, const double bZ) const;
+      bool fillInto(genfit::TrackCand& gfTrackCand, double bZ) const;
 
       /// Copies the trajectory information to the RecoTrack
       RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks) const;
 
       /// Copies the trajectory information to the RecoTrack
-      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks, const double bZ) const;
+      RecoTrack* storeInto(StoreArray<RecoTrack>& recoTracks, double bZ) const;
 
     public:
       /// Reverses the trajectory in place.
@@ -149,8 +146,7 @@ namespace Belle2 {
        *  stereo layer of the stereo wires.  The point is determined such that it is at the (signed)
        *  distance to  the wire line.
        */
-      Vector3D reconstruct3D(const WireLine& wireLine,
-                             const double distance = 0.0) const;
+      Vector3D reconstruct3D(const WireLine& wireLine, double distance = 0.0) const;
 
       /**
        *  Calculate the travel distance from the start position of the trajectory.
@@ -179,7 +175,7 @@ namespace Belle2 {
       ESign getChargeSign() const;
 
       /// Get the estimation for the absolute value of the transvers momentum
-      double getAbsMom3D(const double bZ) const;
+      double getAbsMom3D(double bZ) const;
 
       /// Get the estimation for the absolute value of the transvers momentum
       double getAbsMom3D() const;
@@ -287,7 +283,7 @@ namespace Belle2 {
       { return getLocalHelix().ndf(); }
 
       /// Setter for the number of degrees of freedom of the helix fit.
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       { return m_localHelix.setNDF(ndf); }
 
       /// Getter for the helix in local coordinates.
@@ -334,7 +330,7 @@ namespace Belle2 {
       /// Memory for the estimation of the time at which the particle arrived at the support point.
       double m_flightTime = NAN;
 
-    }; //class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

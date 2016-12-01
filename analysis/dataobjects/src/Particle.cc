@@ -322,6 +322,13 @@ float Particle::getMassError(void) const
 }
 */
 
+void Particle::updateMass(const int pdgCode)
+{
+  if (TDatabasePDG::Instance()->GetParticle(pdgCode) == NULL)
+    B2FATAL("PDG=" << pdgCode << " ***code unknown to TDatabasePDG");
+  m_mass = TDatabasePDG::Instance()->GetParticle(m_pdgCode)->Mass() ;
+}
+
 float Particle::getPDGMass(void) const
 {
   if (TDatabasePDG::Instance()->GetParticle(m_pdgCode) == NULL) {

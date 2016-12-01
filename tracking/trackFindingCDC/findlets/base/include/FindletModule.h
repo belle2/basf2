@@ -49,7 +49,7 @@ namespace Belle2 {
       static const std::size_t c_nTypes = std::tuple_size<IOTypes>::value;
 
       /// Helper class to iterate over the individual types served to the findlet
-      typedef GenIndices<c_nTypes> Indices;
+      using Indices = GenIndices<c_nTypes>;
 
     public:
       /// Constructor of the module
@@ -68,9 +68,13 @@ namespace Belle2 {
 
         addStoreVectorParameters(Indices());
         ModuleParamList moduleParamList = this->getParamList();
-        m_findlet.exposeParameters(&moduleParamList);
+        const std::string prefix = "";
+        m_findlet.exposeParameters(&moduleParamList, prefix);
         this->setParamList(moduleParamList);
       }
+
+      /// Make destructor of interface virtual
+      virtual ~FindletModule() = default;
 
       /// Initialize the Module before event processing
       virtual void initialize() override
@@ -283,5 +287,5 @@ namespace Belle2 {
       ClassMnemomics m_classMnemomics;
     };
 
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+  }
+}

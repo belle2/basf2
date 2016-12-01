@@ -79,6 +79,6 @@ namespace Belle2 {
       /// Returns the true right left passage information
       ERightLeft getRLInfo(const CDCHit* ptrHit) const;
 
-    }; //class
-  } // end namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

@@ -408,6 +408,6 @@ namespace Belle2 {
       /// Precomputed distance to the beam line at the reference position.
       double m_refCylindricalR;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

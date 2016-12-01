@@ -166,49 +166,51 @@ void QcsmonitorStudyModule::event()
   for (int i = 0; i < nSimHits; i++) {
     QcsmonitorSimHit* aHit = SimHits[i];
     int detNB = aHit->getCellId();
-    //if (detNB < 8) {
-    //int trkID = aHit->getTrackId();
-    int pdg = aHit->getPDGCode();
-    double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
-    double tof = aHit->getFlightTime(); //ns
+    if (detNB < 2) {
+      //int trkID = aHit->getTrackId();
+      int pdg = aHit->getPDGCode();
+      double Edep = aHit->getEnergyDep() * 1e3; //GeV -> MeV
+      double tof = aHit->getFlightTime(); //ns
 
-    h_qcss_Evtof1[detNB]->Fill(tof, Edep);
-    if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
-    else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
-    else h_qcss_Evtof4[detNB]->Fill(tof, Edep);
-    if (Edep > m_Ethres) {
-      h_qcss_edep[detNB]->Fill(Edep);
-      h_Wqcss_edep[detNB]->Fill(Edep, rate);
+      h_qcss_Evtof1[detNB]->Fill(tof, Edep);
+      if (pdg == 22) h_qcss_Evtof2[detNB]->Fill(tof, Edep);
+      else if (fabs(pdg) == 11) h_qcss_Evtof3[detNB]->Fill(tof, Edep);
+      else h_qcss_Evtof4[detNB]->Fill(tof, Edep);
+      if (Edep > m_Ethres) {
+        h_qcss_edep[detNB]->Fill(Edep);
+        h_Wqcss_edep[detNB]->Fill(Edep, rate);
+      }
     }
-    //}
   }
 
   for (const auto& Hit : Hits) {
     const int detNb = Hit.getdetNb();
-    const int timebin = Hit.gettime();
-    const float edep = Hit.getedep();
-    const float pe = Hit.getPE();
-    h_qcss_hitrate1->Fill(detNb);
-    h_qcss_hitrate1W->Fill(detNb, rate);
-    h_qcss_rate1[detNb]->Fill(pe);
-    h_qcss_rate1W[detNb]->Fill(pe, rate);
-    h_qcss_rs_rate1[detNb]->Fill(pe, ring_section);
-    h_qcss_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
-    h_qcss_rs_hitrate1->Fill(detNb, ring_section);
-    h_qcss_rs_hitrate1W->Fill(detNb, ring_section, rate);
-    h_qcss_pe1[detNb]->Fill(timebin, pe);
-    h_qcss_pe1W[detNb]->Fill(timebin, pe, rate);
-    if (edep > m_Ethres) {
-      h_qcss_hitrate2->Fill(detNb);
-      h_qcss_hitrate2W->Fill(detNb, rate);
-      h_qcss_rate2[detNb]->Fill(pe);
-      h_qcss_rate2W[detNb]->Fill(pe, rate);
-      h_qcss_rs_rate2[detNb]->Fill(pe, ring_section);
-      h_qcss_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
-      h_qcss_rs_hitrate2->Fill(detNb, ring_section);
-      h_qcss_rs_hitrate2W->Fill(detNb, ring_section, rate);
-      h_qcss_pe2[detNb]->Fill(timebin, pe);
-      h_qcss_pe2W[detNb]->Fill(timebin, pe, rate);
+    if (detNb < 2) {
+      const int timebin = Hit.gettime();
+      const float edep = Hit.getedep();
+      const float pe = Hit.getPE();
+      h_qcss_hitrate1->Fill(detNb);
+      h_qcss_hitrate1W->Fill(detNb, rate);
+      h_qcss_rate1[detNb]->Fill(pe);
+      h_qcss_rate1W[detNb]->Fill(pe, rate);
+      h_qcss_rs_rate1[detNb]->Fill(pe, ring_section);
+      h_qcss_rs_rate1W[detNb]->Fill(pe, ring_section, rate);
+      h_qcss_rs_hitrate1->Fill(detNb, ring_section);
+      h_qcss_rs_hitrate1W->Fill(detNb, ring_section, rate);
+      h_qcss_pe1[detNb]->Fill(timebin, pe);
+      h_qcss_pe1W[detNb]->Fill(timebin, pe, rate);
+      if (edep > m_Ethres) {
+        h_qcss_hitrate2->Fill(detNb);
+        h_qcss_hitrate2W->Fill(detNb, rate);
+        h_qcss_rate2[detNb]->Fill(pe);
+        h_qcss_rate2W[detNb]->Fill(pe, rate);
+        h_qcss_rs_rate2[detNb]->Fill(pe, ring_section);
+        h_qcss_rs_rate2W[detNb]->Fill(pe, ring_section, rate);
+        h_qcss_rs_hitrate2->Fill(detNb, ring_section);
+        h_qcss_rs_hitrate2W->Fill(detNb, ring_section, rate);
+        h_qcss_pe2[detNb]->Fill(timebin, pe);
+        h_qcss_pe2W[detNb]->Fill(timebin, pe, rate);
+      }
     }
   }
 

@@ -9,6 +9,8 @@ import numpy as np
 
 import ROOT
 
+import basf2
+
 from tracking.root_utils import root_cd, root_save_name
 
 from . import statistics
@@ -427,6 +429,7 @@ class ValidationPlot(object):
         x_allow_discrete, y_allow_discrete = self.unpack_2d_param(allow_discrete)
 
         x_bin_edges, x_bin_labels = self.determine_bin_edges(xs,
+                                                             stackbys=stackby,
                                                              bins=x_bins,
                                                              lower_bound=x_lower_bound,
                                                              upper_bound=x_upper_bound,
@@ -435,6 +438,7 @@ class ValidationPlot(object):
                                                              allow_discrete=x_allow_discrete)
 
         y_bin_edges, y_bin_labels = self.determine_bin_edges(ys,
+                                                             stackbys=stackby,
                                                              bins=y_bins,
                                                              lower_bound=y_lower_bound,
                                                              upper_bound=y_upper_bound,
@@ -444,6 +448,9 @@ class ValidationPlot(object):
 
         n_x_bins = len(x_bin_edges) - 1
         n_y_bins = len(y_bin_edges) - 1
+        self.lower_bound = (x_bin_edges[0], y_bin_edges[0])
+        self.upper_bound = (x_bin_edges[-1], y_bin_edges[-1])
+
         histogram = ROOT.TH2D(name,
                               '',
                               n_x_bins,
@@ -870,6 +877,7 @@ class ValidationPlot(object):
             weights = np.array(weights, copy=False)
 
         bin_edges, bin_labels = self.determine_bin_edges(xs,
+                                                         stackbys=stackby,
                                                          bins=bins,
                                                          lower_bound=lower_bound,
                                                          upper_bound=upper_bound,
@@ -878,6 +886,8 @@ class ValidationPlot(object):
                                                          allow_discrete=allow_discrete)
 
         n_bins = len(bin_edges) - 1
+        self.lower_bound = bin_edges[0]
+        self.upper_bound = bin_edges[-1]
         histogram = th1_factory(name, '', n_bins, bin_edges)
 
         if bin_labels:
@@ -980,7 +990,7 @@ class ValidationPlot(object):
         return plot
 
     @classmethod
-    def convert_tprofile_to_tgrapherrors(cls, tprofile):
+    def convert_tprofile_to_tgrapherrors(cls, tprofile, abs_x=False):
         if isinstance(tprofile, ROOT.TGraph):
             return tprofile
 
@@ -991,6 +1001,8 @@ class ValidationPlot(object):
         bin_ids_without_underflow = list(range(1, n_bins + 1))
 
         bin_centers = np.array([x_taxis.GetBinCenter(i_bin) for i_bin in bin_ids_without_underflow])
+        if abs_x:
+            bin_centers = np.abs(bin_centers)
         bin_widths = np.array([x_taxis.GetBinWidth(i_bin) for i_bin in bin_ids_without_underflow])
         bin_x_errors = bin_widths / 2.0
 
@@ -1246,22 +1258,53 @@ class ValidationPlot(object):
             finite_filter &= np.isfinite(ys)
 
         if weights is None:
-            weights = itertools.repeat(1.0)
+            xs = xs[finite_filter]
+            weights = np.ones_like(xs)
         else:
             weights = weights[filter]
             self.add_nan_inf_stats(histogram, 'w', weights)
             finite_filter &= np.isfinite(weights)
+            xs = xs[finite_filter]
+            weights[finite_filter]
+
+        if ys is not None:
+            ys = ys[finite_filter]
 
         # Now fill the actual histogram
-        Fill = histogram.Fill
-        if ys is None:
-            for (x, weight, passes) in zip(xs, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(weight))
+        try:
+            histogram.FillN
+        except AttributeError:
+            Fill = histogram.Fill
+            if ys is None:
+                fill = np.frompyfunc(Fill, 2, 1)
+                fill(xs.astype(np.float64, copy=False),
+                     weights.astype(np.float64, copy=False))
+            else:
+                fill = np.frompyfunc(Fill, 3, 1)
+                fill(xs.astype(np.float64, copy=False),
+                     ys.astype(np.float64, copy=False),
+                     weights.astype(np.float64, copy=False))
         else:
-            for (x, y, weight, passes) in zip(xs, ys, weights, finite_filter):
-                if passes:
-                    Fill(float(x), float(y), float(weight))
+            if ys is None:
+                # Make the array types compatible with the ROOT interface if necessary
+                xs = xs.astype(np.float64, copy=False)
+                weights = weights.astype(np.float64, copy=False)
+                n = len(xs)
+                if n != 0:
+                    histogram.FillN(n, xs, weights)
+                else:
+                    basf2.B2WARNING("No values to be filled into histogram: " + self.name)
+
+            else:
+                # Make the array types compatible with the ROOT interface if necessary
+                xs = xs.astype(np.float64, copy=False)
+                ys = ys.astype(np.float64, copy=False)
+                weights = weights.astype(np.float64, copy=False)
+                n = len(xs)
+                if n != 0:
+                    histogram.FillN(n, xs, ys, weights)
+                else:
+                    basf2.B2WARNING("No values to be filled into histogram: " + self.name)
 
         self.set_additional_stats_tf1(histogram)
 
@@ -1497,6 +1540,7 @@ class ValidationPlot(object):
 
     def determine_bin_edges(self,
                             xs,
+                            stackbys=None,
                             bins=None,
                             lower_bound=None,
                             upper_bound=None,
@@ -1509,6 +1553,8 @@ class ValidationPlot(object):
         ----------
         xs : numpy.ndarray (1d)
             Data point for which a binning should be found.
+        stackbys : numpy.ndarray (1d)
+            Categories of the data points to be distinguishable
         bins : list(float) or int or None, optional
             Preset bin edges or preset number of desired bins.
             The default, None, means the bound should be extracted from data.
@@ -1612,6 +1658,7 @@ class ValidationPlot(object):
 
         else:
             bin_range = self.determine_bin_range(xs,
+                                                 stackbys=stackbys,
                                                  n_bins=n_bins,
                                                  lower_bound=lower_bound,
                                                  upper_bound=upper_bound,
@@ -1644,6 +1691,7 @@ class ValidationPlot(object):
 
     def determine_bin_range(self,
                             xs,
+                            stackbys=None,
                             n_bins=None,
                             lower_bound=None,
                             upper_bound=None,
@@ -1670,6 +1718,8 @@ class ValidationPlot(object):
         ----------
         xs : numpy.ndarray (1d)
             Data point for which a binning should be found.
+        stackbys : numpy.ndarray (1d)
+            Categories of the data points to be distinguishable
         n_bins : int or None, optional
             Preset number of desired bins. The default, None, means the bound should be extracted from data.
             The rice rule is used the determine the number of bins.
@@ -1695,22 +1745,39 @@ class ValidationPlot(object):
             A triple of found number of bins, lower bound and upper bound of the binning range.
         """
 
-        finite_xs_indices = np.isfinite(xs)
-        if np.any(finite_xs_indices):
-            finite_xs = xs[finite_xs_indices]
-        else:
-            finite_xs = xs
+        if stackbys is not None:
+            unique_stackbys = np.unique(stackbys)
+            stack_ranges = []
+            for value in unique_stackbys:
+                if np.isnan(value):
+                    indices_for_value = np.isnan(stackbys)
+                else:
+                    indices_for_value = stackbys == value
 
-        lower_bound, upper_bound = self.determine_range(finite_xs,
-                                                        lower_bound=lower_bound,
-                                                        upper_bound=upper_bound,
-                                                        outlier_z_score=outlier_z_score,
-                                                        include_exceptionals=include_exceptionals)
+                stack_lower_bound, stack_upper_bound = \
+                    self.determine_range(xs[indices_for_value],
+                                         lower_bound=lower_bound,
+                                         upper_bound=upper_bound,
+                                         outlier_z_score=outlier_z_score,
+                                         include_exceptionals=include_exceptionals)
+
+                stack_ranges.append([stack_lower_bound, stack_upper_bound])
+
+            print(stack_ranges)
+            lower_bound = np.nanmin([lwb for lwb, upb in stack_ranges])
+            upper_bound = np.nanmax([upb for lwb, upb in stack_ranges])
+
+        else:
+            lower_bound, upper_bound = self.determine_range(xs,
+                                                            lower_bound=lower_bound,
+                                                            upper_bound=upper_bound,
+                                                            outlier_z_score=outlier_z_score,
+                                                            include_exceptionals=include_exceptionals)
 
         if n_bins is None:
             # Assume number of bins according to the rice rule.
             # The number of data points should not include outliers.
-            n_data = np.sum((lower_bound <= finite_xs) & (finite_xs <= upper_bound))
+            n_data = np.sum((lower_bound <= xs) & (xs <= upper_bound))
             rice_n_bins = int(statistics.rice_n_bin(n_data))
             n_bins = rice_n_bins
 
@@ -1763,25 +1830,39 @@ class ValidationPlot(object):
         else:
             finite_xs = xs
 
-        # Prepare for the estimation of outliers
         make_symmetric = False
-        if outlier_z_score is not None and (lower_bound is None or upper_bound is None):
+        exclude_outliers = outlier_z_score is not None and (lower_bound is None or upper_bound is None)
 
-            x_mean, x_std = self.get_robust_mean_and_std(finite_xs)
+        # Look for exceptionally frequent values in the series, e.g. interal delta values like -999
+        if include_exceptionals or exclude_outliers:
+            exceptional_xs = self.get_exceptional_values(finite_xs)
+            exceptional_indices = np.in1d(finite_xs, exceptional_xs)
+
+        # Prepare for the estimation of outliers
+        if exclude_outliers:
+            if not np.all(exceptional_indices):
+                # Exclude excecptional values from the estimation to be unbiased
+                # even in case exceptional values fall into the central region near the mean
+                x_mean, x_std = self.get_robust_mean_and_std(finite_xs[~exceptional_indices])
+            else:
+                x_mean, x_std = np.nan, np.nan
+
             make_symmetric = abs(x_mean) < x_std / 5.0 and lower_bound is None and upper_bound is None
+
+        if include_exceptionals and len(exceptional_xs) != 0:
+            lower_exceptional_x = np.min(exceptional_xs)
+            upper_exceptional_x = np.max(exceptional_xs)
+            make_symmetric = False
+        else:
             lower_exceptional_x = np.nan
             upper_exceptional_x = np.nan
 
-            if include_exceptionals:
-                exceptional_xs = self.get_exceptional_values(finite_xs)
-                if len(exceptional_xs):
-                    lower_exceptional_x = np.min(exceptional_xs)
-                    upper_exceptional_x = np.max(exceptional_xs)
-                    make_symmetric = False
-
         # Find the lower bound, if it is not given.
         if lower_bound is None:
-            lower_bound = np.min(finite_xs)
+            try:
+                lower_bound = np.min(finite_xs)
+            except ValueError:
+                lower_bound = -999
             # Clip the lower bound by outliers that exceed the given z score
             if outlier_z_score is not None:
                 # The lower bound at which outliers exceed the given z score
@@ -1803,7 +1884,10 @@ class ValidationPlot(object):
 
         # Find the upper bound, if it is not given
         if upper_bound is None:
-            upper_bound = np.max(finite_xs)
+            try:
+                upper_bound = np.max(finite_xs)
+            except ValueError:
+                upper_bound = 999
             if outlier_z_score is not None:
                 # The upper bound at which outliers exceed the given z score
                 upper_outlier_bound = x_mean + outlier_z_score * x_std

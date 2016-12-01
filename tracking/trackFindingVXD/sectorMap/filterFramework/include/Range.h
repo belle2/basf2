@@ -26,6 +26,9 @@ namespace Belle2 {
 
   template< typename InfType, typename SupType>
   class Range {
+    const char* c_infSuffix = "_inf";
+    const char* c_supSuffix = "_sup";
+
     InfType m_inf;
     SupType m_sup;
   public:
@@ -56,14 +59,22 @@ namespace Belle2 {
 
       std::string leafList;
       leafList += variableName;
-      leafList += "_inf/";
+      leafList += c_infSuffix;
+      leafList += "/";
       leafList += TBranchLeafType(m_inf);
       leafList += ":";
       leafList += variableName;
-      leafList += "_sup/";
+      leafList += c_supSuffix;
+      leafList += "/";
       leafList += TBranchLeafType(m_sup);
       TBranch* branch = new TBranch(t, branchName.c_str() , & m_inf, leafList.c_str());
       t->GetListOfBranches()->Add(branch);
+    }
+
+    void setBranchAddress(TTree* t, const std::string& branchName,
+                          const std::string& /*variableName*/)
+    {
+      t->SetBranchAddress(branchName.c_str(), & m_inf);
     }
 
     /** Accessor to the inf of the set */

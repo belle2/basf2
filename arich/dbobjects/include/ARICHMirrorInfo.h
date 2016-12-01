@@ -32,7 +32,8 @@ namespace Belle2 {
     /**
      * Constructor
      */
-    ARICHMirrorInfo(int id, TGraph* reflectivity, std::string comment): m_id(id), m_reflectivity(reflectivity), m_comment(comment) {};
+    ARICHMirrorInfo(int id, TGraph* reflectivity, const std::string& comment): m_id(id), m_reflectivity(reflectivity),
+      m_comment(comment) {};
 
     /** Return Mirror Identifier
      * @return Mirror Identifier

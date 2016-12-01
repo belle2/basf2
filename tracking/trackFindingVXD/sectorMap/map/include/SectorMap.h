@@ -61,7 +61,7 @@ namespace Belle2 {
 
 
     /// Gives access to the sector map and filters of a given setup
-    const VXDTFFilters<point_t>* getFilters(const std::string& setupName)
+    VXDTFFilters<point_t>* getFilters(const std::string& setupName)
     {
       auto  result = m_allSetupsFilters->find(setupName);
       if (result == m_allSetupsFilters->end())

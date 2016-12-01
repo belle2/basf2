@@ -19,39 +19,34 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-
 CDCRecoHit3D::CDCRecoHit3D(const CDCRLWireHit& rlWireHit,
                            const Vector3D& recoPos3D,
-                           double perpS) :
-  m_rlWireHit(rlWireHit),
-  m_recoPos3D(recoPos3D),
-  m_arcLength2D(perpS)
+                           double arcLength2D)
+  : m_rlWireHit(rlWireHit)
+  , m_recoPos3D(recoPos3D)
+  , m_arcLength2D(arcLength2D)
 {
 }
 
 CDCRecoHit3D::CDCRecoHit3D(const CDCWireHit* wireHit,
                            ERightLeft rlInfo,
                            const Vector3D& recoPos3D,
-                           double perpS) :
-  m_rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength()),
-  m_recoPos3D(recoPos3D),
-  m_arcLength2D(perpS)
+                           double arcLength2D)
+  : m_rlWireHit(wireHit, rlInfo, wireHit->getRefDriftLength())
+  , m_recoPos3D(recoPos3D)
+  , m_arcLength2D(arcLength2D)
 {
 }
 
-
-CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit,
-                                      const CDCSimHit& simHit)
+CDCRecoHit3D CDCRecoHit3D::fromSimHit(const CDCWireHit* wireHit, const CDCSimHit& simHit)
 {
-  // prepS cannot be deduced from the flightTime in this context
-  double perpS = std::numeric_limits<double>::quiet_NaN();
+  // arc length cannot be deduced from the flightTime in this context
+  double arcLength2D = std::numeric_limits<double>::quiet_NaN();
 
   return CDCRecoHit3D(CDCRLWireHit::fromSimHit(wireHit, simHit),
                       Vector3D{simHit.getPosTrack()},
-                      perpS);
+                      arcLength2D);
 }
-
-
 
 CDCRecoHit3D CDCRecoHit3D::reconstruct(const CDCRecoHit2D& recoHit2D,
                                        const CDCTrajectory2D& trajectory2D)
@@ -142,11 +137,11 @@ CDCRecoHit3D CDCRecoHit3D::average(const CDCRecoHit3D& first, const CDCRecoHit3D
                         Vector3D::average(first.getRecoPos3D(), second.getRecoPos3D()),
                         (first.getArcLength2D() + second.getArcLength2D()) / 2);
   } else {
-    B2ERROR("Averaging three dimensional hits which are on different oriented wire hits. Return first one unchanged");
+    B2ERROR("Averaging three dimensional hits which are on different oriented wire hits. Return "
+            "first one unchanged");
     return first;
   }
 }
-
 
 Vector2D CDCRecoHit3D::getRecoDisp2D() const
 {
@@ -168,7 +163,7 @@ CDCRecoHit3D CDCRecoHit3D::reversed() const
   return CDCRecoHit3D(getRLWireHit().reversed(), getRecoPos3D(), -getArcLength2D());
 }
 
-void CDCRecoHit3D::snapToDriftCircle()
+void CDCRecoHit3D::snapToDriftCircle(bool switchSide)
 {
   const CDCWire& wire = getWire();
   const double recoPosZ = getRecoPos3D().z();
@@ -177,5 +172,18 @@ void CDCRecoHit3D::snapToDriftCircle()
   Vector2D disp2D = getRecoPos3D().xy() - wirePos;
 
   disp2D.normalizeTo(fabs(getSignedRecoDriftLength()));
+  if (switchSide) {
+    disp2D = -disp2D;
+  }
   m_recoPos3D = Vector3D(wirePos + disp2D, recoPosZ);
+}
+
+void CDCRecoHit3D::setRecoDriftLength(double driftLength, bool snapRecoPos)
+{
+  double oldDriftLength = m_rlWireHit.getRefDriftLength();
+  m_rlWireHit.setRefDriftLength(driftLength);
+  if (snapRecoPos) {
+    bool switchSide = sign(oldDriftLength) != sign(driftLength);
+    snapToDriftCircle(switchSide);
+  }
 }

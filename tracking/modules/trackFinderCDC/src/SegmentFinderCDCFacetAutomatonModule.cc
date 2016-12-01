@@ -16,11 +16,9 @@ using namespace TrackFindingCDC;
 REG_MODULE(SegmentFinderCDCFacetAutomaton);
 
 SegmentFinderCDCFacetAutomatonModule::SegmentFinderCDCFacetAutomatonModule()
-  : Super{{{"CDCWireHitVector", "CDCRecoSegment2DVector"}}}
+  : Super{{{"CDCWireHitVector", "CDCSegment2DVector"}}}
 {
   ModuleParamList moduleParamList = this->getParamList();
-  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("symmetric");
-  moduleParamList.getParameter<std::string>("SegmentOrientation").resetValue();
+  moduleParamList.getParameter<std::string>("SegmentOrientation").setDefaultValue("curling");
   this->setParamList(moduleParamList);
 }
-

@@ -297,7 +297,7 @@ mdst_dataobjects = [
         "getNumberOfCrystals", "getStatus", "getPx", "getPy",
         "getPz", "getMomentum", "get4Vector", "getClusterPosition",
         "getPosition", "getCovarianceMatrix4x4", "getCovarianceMatrix7x7", "getCovarianceMatrix3x3", "isTrack",
-        "isNeutral", "getDeltaL"
+        "isNeutral", "getDeltaL", "getE1oE9", "getAbsZernike40", "getAbsZernike51", "getZernikeMVA", "getSecondMoment"
     ], {
         "getRelationsWith": ["MCParticles"],
     }),
@@ -332,7 +332,7 @@ def print_file(filename):
     main.add_module("RootInput", inputFileName=mdst_file, logLevel=LogLevel.WARNING)
     main.add_module("EventInfoPrinter")
     main.add_module(PrintMDSTModule())
-    process(main)
+    process(main, 6)
 
 if __name__ == "__main__":
     import ROOT

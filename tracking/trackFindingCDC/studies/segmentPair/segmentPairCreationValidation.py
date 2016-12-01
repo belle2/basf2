@@ -39,7 +39,7 @@ class SegmentPairCreationValidationRun(BrowseTFileOnTerminateRunMixin, StandardE
     segment_finder_module = basf2.register_module("SegmentFinderCDCMCTruth")
     segment_finder_module.param({"MinCDCHits": 4})
 
-    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomatonDev")
+    segment_pair_finder_module = basf2.register_module("TrackFinderCDCSegmentPairAutomaton")
     segment_pair_finder_module.param({
         "WriteSegmentPairs": True,
         "SegmentPairFilter": "all",
@@ -89,7 +89,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
 
     def initialize(self):
         super(SegmentPairCreationValidationModule, self).initialize()
-        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegmentLookUp.getInstance()
+        self.mc_segment_lookup = Belle2.TrackFindingCDC.CDCMCSegment2DLookUp.getInstance()
         self.mc_segment_pair_filter = Belle2.TrackFindingCDC.MCSegmentPairFilter()
         self.segment_pair_fusion = Belle2.TrackFindingCDC.CDCAxialStereoFusion
 
@@ -113,7 +113,7 @@ class SegmentPairCreationValidationModule(harvesting.HarvestingModule):
         return crops
 
     def peel_target(self, segment_pair_relation):
-        mc_weight = self.mc_segment_pair_filter.isGoodSegmentPair(segment_pair_relation)
+        mc_weight = self.mc_segment_pair_filter(segment_pair_relation)
         mc_decision = np.isfinite(mc_weight)  # Filters for nan
 
         return dict(

@@ -9,43 +9,43 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
-#include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>
-#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
-
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
-#include <tracking/trackFindingCDC/eventdata/segments/CDCRecoSegment2D.h>
-
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
+#include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
+#include <tracking/trackFindingCDC/hough/algorithms/InPhi0ImpactCurvBox.h>
+
 #include <vector>
+#include <string>
 
 namespace Belle2 {
+  class ModuleParamList;
+
   namespace TrackFindingCDC {
+    class CDCSegment2D;
+    class CDCTrack;
 
     /// Generates axial tracks from segments using the hough algorithm
-    class AxialTrackCreatorSegmentHough:
-      public Findlet<const CDCRecoSegment2D, CDCTrack> {
+    class AxialTrackCreatorSegmentHough : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
       /// Type of the base class
-      typedef Findlet<const CDCRecoSegment2D, CDCTrack> Super;
+      using Super = Findlet<const CDCSegment2D, CDCTrack>;
 
     public:
       /// Short description of the findlet
-      virtual std::string getDescription() override;
+      std::string getDescription() final;
 
-      /** Add the parameters of the filter to the module */
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix = "") override final;
+      /// Expose the parameters to a module
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Initialize the findlet before event processing
-      virtual void initialize() override;
+      void initialize() final;
 
       /// Generates the tracks from the given segments into the output argument.
-      virtual void apply(const std::vector<CDCRecoSegment2D>& segments, std::vector<CDCTrack>& tracks) override final;
+      void apply(const std::vector<CDCSegment2D>& segments, std::vector<CDCTrack>& tracks) final;
 
       /// Cleanup the findlet after event processing
-      virtual void terminate() override;
+      void terminate() final;
 
     private:
       /// Parameter: Absolute minimal number of hits to make an axial track.
@@ -92,13 +92,13 @@ namespace Belle2 {
 
     private:
       /// Type of the hough space tree search
-      using SimpleSegmentPhi0ImpactCurvHoughTree =
-        SimpleSegmentHoughTree<InPhi0ImpactCurvBox, c_phi0Divisions, c_impactDivisions, c_curvDivisions>;
+      using SimpleSegmentPhi0ImpactCurvHoughTree = SimpleSegmentHoughTree<InPhi0ImpactCurvBox,
+            c_phi0Divisions,
+            c_impactDivisions,
+            c_curvDivisions>;
 
       /// The hough space tree search
       SimpleSegmentPhi0ImpactCurvHoughTree m_houghTree{m_param_maxLevel};
-    }; // end class
-
-  } //end namespace TrackFinderCDC
-
-} //end namespace Belle2
+    };
+  }
+}

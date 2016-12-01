@@ -44,8 +44,8 @@ namespace Belle2 {
                                                  double minimum_probability_to_be_merged = 0.85);
 
     private:
-      /** Some typedefs for the results of the merging process */
-      typedef std::pair<CDCTrack*, double> BestMergePartner;
+      /** Type for the results of the merging process */
+      using BestMergePartner = std::pair<CDCTrack*, double>;
 
       /**
        * Function to merge two track candidates. The hits of cand2 are deleted and transfered to cand1.

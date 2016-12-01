@@ -70,10 +70,16 @@ at endRun write the SectorMaps to SectorMapsOutputFile.", m_writeSectorMap);
 void
 SectorMapBootstrapModule::initialize()
 {
+
   StoreObjPtr< SectorMap<SpacePoint> > sectorMap("", DataStore::c_Persistent);
   sectorMap.registerInDataStore(DataStore::c_DontWriteOut);
   sectorMap.create();
-  bootstrapSectorMap();
+
+  if (m_readSectorMap)
+    retrieveSectorMap();
+  else
+    bootstrapSectorMap();
+
   //This file is used by the observers, at present it is created by default.
   m_tfile = new TFile("observeTheSecMap.root", "RECREATE");
   m_tfile->cd();
@@ -86,8 +92,6 @@ SectorMapBootstrapModule::initialize()
   VXDTFFilters<SpacePoint>::twoHitFilter_t aFilter;
   initializeObservers(aFilter, newTree/*, outerHit, innerHit*/);
 //   ObserverCheckMCPurity::initialize< CircleRadius<SpacePoint>, ClosedRange<double, double>>(CircleRadius<SpacePoint>(), ClosedRange<double, double>());
-  if (m_readSectorMap)
-    retrieveSectorMap();
 }
 
 void
@@ -251,7 +255,6 @@ SectorMapBootstrapModule::bootstrapSectorMap(const SectorMapConfig& config)
   unsigned nSectorsInU = config.uSectorDivider.size(),
            nSectorsInV = config.vSectorDivider.size();
 
-
   for (auto layer : layers)
     for (int ladder = 1 ; ladder <= ladders.at(layer - 1) ; ladder++) {
       for (int sensor = 1 ; sensor <=  sensors.at(layer - 1) ; sensor++) {
@@ -314,7 +317,7 @@ SectorMapBootstrapModule::persistSectorMap(void)
 }
 
 
-/// Persist the whole sector map on a root file
+/// Retrieve the whole sector map from a root file
 void
 SectorMapBootstrapModule::retrieveSectorMap(void)
 {
@@ -335,9 +338,11 @@ SectorMapBootstrapModule::retrieveSectorMap(void)
     rootFile.cd(setupKeyName->Data());
 
     VXDTFFilters<SpacePoint>* segmentFilters = new VXDTFFilters<SpacePoint>();
-    segmentFilters->retrieveFromRootFile();
 
     string setupKeyNameStd = string(setupKeyName->Data());
+    //VXDTFFilters<SpacePoint>* segmentFilters =
+    //  theSectorMap->getFilters( setupKeyNameStd );
+    segmentFilters->retrieveFromRootFile(setupKeyName);
 
     theSectorMap->assignFilters(setupKeyNameStd, segmentFilters);
 

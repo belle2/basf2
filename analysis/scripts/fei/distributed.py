@@ -111,6 +111,8 @@ def dump_final_fei_path(args):
                            '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection'])
     ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path.pickle', '-i', 'dummy.root', '--',
                            '--verbose', '--dump-path', '--monitor'])
+    ret = subprocess.call(['basf2', args.steering, '--dump-path', 'basf2_monitor_path_without_selection.pickle',
+                           '-i', 'dummy.root', '--', '--verbose', '--dump-path', '--noSelection', '--monitor'])
     os.chdir(args.directory)
     return ret == 0
 

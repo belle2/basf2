@@ -69,6 +69,18 @@ namespace Belle2 {
     double runNum(const Particle*);
 
     /**
+    * return productionIdentifier
+    */
+    double productionIdentifier(const Particle*);
+
+    /**
+    * return uniqueEventID
+    * Constructs a quantity which is different for each event
+    * even if experiment and run number are 0
+    */
+    double uniqueEventID(const Particle*);
+
+    /**
      * return energy of HER
      */
     double getHEREnergy(const Particle*);

@@ -9,50 +9,34 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/filters/stereoHits/StereoHitFilter.h>
+#include <tracking/trackFindingCDC/filters/stereoHits/BaseStereoHitFilter.h>
 #include <tracking/trackFindingCDC/filters/base/FilterFactory.h>
 
 namespace Belle2 {
-
   namespace TrackFindingCDC {
 
-    /**
-     * Specialisation the filter factory for cdc tracks and stereo hits.
-     *
-     * It knows about all available filters and their parameters.
-     * Can collaborate with a Module and expose these parameters to the user in steering files.
-     */
+    /// Factory that can create appropriate stereo hit to track combination filters from associated names.
     class StereoHitFilterFactory : public FilterFactory<BaseStereoHitFilter> {
 
     private:
       /// Type of the base class
-      typedef FilterFactory<BaseStereoHitFilter> Super;
+      using Super = FilterFactory<BaseStereoHitFilter>;
 
     public:
-      /** Fill the default filter name and parameter values*/
-      StereoHitFilterFactory(const std::string& defaultFilterName = "all") : Super(defaultFilterName) { }
+      /// Constructor forwarding the default filter name
+      StereoHitFilterFactory(const std::string& defaultFilterName = "all");
 
-      /// Cope the create function from the parent class.
-      using Super::create;
+      /// Getter for a short identifier for the factory
+      std::string getIdentifier() const override;
 
-      /** Getter for a descriptive purpose of the filter.*/
-      virtual std::string getFilterPurpose() const override
-      {
-        return "Stereo hit to track adding.";
-      }
+      /// Getter for a descriptive purpose of the constructed filters
+      std::string getFilterPurpose() const override;
 
-      /** Create a filter with the given name, does not set filter specific parameters. */
-      virtual std::unique_ptr<BaseStereoHitFilter> create(const std::string& name) const override;
+      /// Getter for valid filter names and a description for each
+      std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
 
-      /** Getter for the valid filter names and a description for each */
-      virtual std::map<std::string, std::string> getValidFilterNamesAndDescriptions() const override;
-
-      /** Getter for the prefix prepended to a Module parameter.*/
-      virtual std::string getModuleParamPrefix() const override
-      {
-        return "StereoHit";
-      }
+      /// Create a filter with the given name.
+      std::unique_ptr<BaseStereoHitFilter> create(const std::string& filterName) const override;
     };
-
   }
 }

@@ -35,7 +35,7 @@ namespace Belle2 {
       {}
 
       /// Constuctor for a wire line between forward and backward point
-      WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoef);
+      WireLine(const Vector3D& forward, const Vector3D& backward, double sagCoeff);
 
       /// Returns a copy of the wire line moved by a three dimensional offset
       WireLine movedBy(const Vector3D& offset) const;
@@ -136,6 +136,10 @@ namespace Belle2 {
       /// Returns the difference between forward and backward z
       double deltaZ() const
       { return forwardZ() - backwardZ(); }
+
+      /// Returns the amount how much the given z position is outside the bounds in units of the wire length
+      double outOfZBoundsFactor(double z) const
+      { return std::fmax(backwardZ() - z, z - forwardZ()) / deltaZ(); }
 
       /// Gives the forward azimuth angle
       double forwardPhi() const
@@ -242,6 +246,6 @@ namespace Belle2 {
       /// Memory for the wire sag coeffiecent.
       double m_sagCoeff = 0.0;
 
-    }; // class
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+    };
+  }
+}

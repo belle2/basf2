@@ -241,7 +241,8 @@ namespace Belle2 {
       m_y(0),
       m_dx(0),
       m_dy(0),
-      m_layer(*(FTLayer*)NULL),
+      //m_layer(*(FTLayer*)NULL),//the reference member can not be initialized as NULL
+      m_layer(*(new FTLayer(0., 0., 0., 0., 0., 0, 0, 0, FTSuperLayer(0, 0, 0, 0, NULL) , 0, NULL))),
       m_localId(0),
 #ifdef FZISAN_DEBUG
       m_mcPart(NULL),

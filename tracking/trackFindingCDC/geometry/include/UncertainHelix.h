@@ -39,7 +39,7 @@ namespace Belle2 {
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(curvature, phi0, impact, tanLambda, z0)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -51,7 +51,7 @@ namespace Belle2 {
       explicit UncertainHelix(const HelixParameters& parameters,
                               const HelixCovariance& helixCovariance = HelixUtil::identity(),
                               const double chi2 = 0.0,
-                              const size_t& ndf = 0)
+                              std::size_t ndf = 0)
         : m_helix(parameters)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -68,7 +68,7 @@ namespace Belle2 {
                      const double z0,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(curvature, phi0Vec, impact, tanLambda, z0)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -80,7 +80,7 @@ namespace Belle2 {
       UncertainHelix(const Helix& helix,
                      const HelixCovariance& helixCovariance = HelixUtil::identity(),
                      const double chi2 = 0.0,
-                     const size_t& ndf = 0)
+                     std::size_t ndf = 0)
         : m_helix(helix)
         , m_helixCovariance(helixCovariance)
         , m_chi2(chi2)
@@ -101,7 +101,7 @@ namespace Belle2 {
 
       /// Construct the averages of the two given helices by properly considering their covariance
       /// matrix.
-      static UncertainHelix average(const UncertainHelix& helix1, const UncertainHelix& helix2);
+      static UncertainHelix average(const UncertainHelix& fromHelix, const UncertainHelix& toHelix);
 
       /**
        *  Construct the average helix including its covariance matrix from two different stereo
@@ -126,10 +126,10 @@ namespace Belle2 {
        *  @param szParameters      Reference sz parameters where the perigee circles have been
        * fitted.
        */
-      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle1,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix1,
-                                    const UncertainPerigeeCircle& perigeeCircle2,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix2,
+      static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const UncertainPerigeeCircle& toPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& toAmbiguity,
                                     const SZParameters& szParameters = SZParameters(0.0, 0.0));
 
       /**
@@ -173,9 +173,9 @@ namespace Belle2 {
        * helix parameters
        *  @param helix            Second perigee circle
        */
-      static UncertainHelix average(const UncertainPerigeeCircle& perigeeCircle,
-                                    const JacobianMatrix<3, 5>& ambiguityMatrix,
-                                    const UncertainHelix& helix);
+      static UncertainHelix average(const UncertainPerigeeCircle& fromPerigeeCircle,
+                                    const JacobianMatrix<3, 5>& fromAmbiguity,
+                                    const UncertainHelix& toHelix);
 
     public:
       /**
@@ -263,13 +263,13 @@ namespace Belle2 {
       }
 
       /// Getter for the number of degrees of freediom used in the helix fit
-      const size_t& ndf() const
+      std::size_t ndf() const
       {
         return m_ndf;
       }
 
       /// Setter for the number of degrees of freediom used in the helix fit
-      void setNDF(const size_t& ndf)
+      void setNDF(std::size_t ndf)
       {
         m_ndf = ndf;
       }
@@ -345,7 +345,7 @@ namespace Belle2 {
       /// Memory for the number of degrees of freedom of the fit of this helix.
       size_t m_ndf = 0.0;
 
-    }; // class
+    };
 
-  } // namespace TrackFindingCDC
-} // namespace Belle2
+  }
+}

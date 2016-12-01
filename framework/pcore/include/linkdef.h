@@ -8,6 +8,7 @@
 #pragma link C++ class Belle2::Mergeable+;
 
 //#pragma link C++ class Belle2::MapMergeable<map<int, unsigned int> >+;
+#pragma link C++ class Belle2::SetMergeable<std::unordered_set<unsigned long, std::hash<unsigned long>, std::equal_to<unsigned long>, std::allocator<unsigned long> >>+;
 
 #pragma link C++ class Belle2::ProcHandler;
 

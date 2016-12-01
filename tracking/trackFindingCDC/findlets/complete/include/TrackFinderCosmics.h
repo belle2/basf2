@@ -11,40 +11,22 @@
 
 #include <tracking/trackFindingCDC/findlets/complete/TrackFinderAutomaton.h>
 
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Complete findlet implementing track finding with the cellular automaton in two stages.
+    /// Complete findlet implementing track finding with the cellular automaton in two stages - version suitable for cosmics
     class TrackFinderCosmics : public TrackFinderAutomaton {
 
     private:
       /// Type of the base class
-      typedef TrackFinderAutomaton Super;
+      using Super = TrackFinderAutomaton;
 
     public:
+      /// Constructor adjusting some of the parameters to suiteable values for cosmics tracking.
+      TrackFinderCosmics();
+
       /// Short description of the findlet
-      virtual std::string getDescription() override
-      {
-        return "Performs patter recognition in the CDC based on local hit following and application of a cellular automaton in two stages.";
-      }
-
-      /// Expose the parameters of the cluster filter to a module
-      virtual void exposeParameters(ModuleParamList* moduleParamList,
-                                    const std::string& prefix = "") override
-      {
-        Super::exposeParameters(moduleParamList, prefix);
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("flightTimeEstimation").resetValue();
-        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").setDefaultValue(true);
-        // moduleParamList->getParameter<bool>("FacetUpdateDriftLength").resetValue();
-        moduleParamList->getParameter<bool>("updateDriftLength").setDefaultValue(false);
-        moduleParamList->getParameter<bool>("updateDriftLength").resetValue();
-        moduleParamList->getParameter<std::string>("TrackOrientation").setDefaultValue("downwards");
-        moduleParamList->getParameter<std::string>("TrackOrientation").resetValue();
-      }
-
-    }; // end class TrackFinderCosmics
-
-  } //end namespace TrackFindingCDC
-} //end namespace Belle2
+      std::string getDescription() final;
+    };
+  }
+}

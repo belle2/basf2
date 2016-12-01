@@ -113,8 +113,9 @@ CDCTriggerHoughtrackingModule::fastInterceptFinder(cdcMap& hits,
         iSL = hp.first;
         m = hp.second.X();
         a = hp.second.Y();
-        y1 = m * sin(x1_d) - a * cos(x1_d);
-        y2 = m * sin(x2_d) - a * cos(x2_d);
+        // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
+        y1 = m * sin(x1_d - 1e-10) - a * cos(x1_d - 1e-10);
+        y2 = m * sin(x2_d + 1e-10) - a * cos(x2_d + 1e-10);
         // skip decreasing half of the sine (corresponds to curl back half of the track)
         if (iterations == maxIterations && y1 > y2) continue;
         if (!((y1 > y2_d && y2 > y2_d) || (y1 < y1_d && y2 < y1_d))) {
@@ -405,6 +406,40 @@ CDCTriggerHoughtrackingModule::mergeIdList(std::vector<unsigned>& merged,
   }
 }
 
+void
+CDCTriggerHoughtrackingModule::findAllCrossingHits(std::vector<unsigned>& list,
+                                                   double x1, double x2,
+                                                   double y1, double y2)
+{
+  StoreArray<CDCTriggerSegmentHit> tsHits;
+
+  double m, a, y1_h, y2_h;
+  for (int iHit = 0; iHit < tsHits.getEntries(); iHit++) {
+    unsigned short iSL = tsHits[iHit]->getISuperLayer();
+    if (iSL % 2) continue;
+    //TODO: add options: center cell / active priority cell / all priority cells
+    vector<double> phi = {0, 0, 0};
+    phi[0] = tsHits[iHit]->getSegmentID() - TSoffset[iSL];
+    phi[1] = phi[0] + 0.5;
+    phi[2] = phi[0] - 0.5;
+    vector<double> r = {radius[iSL][0], radius[iSL][1], radius[iSL][1]};
+    for (unsigned i = 0; i < 3; ++i) {
+      phi[i] *= 2. * M_PI / (TSoffset[iSL + 1] - TSoffset[iSL]);
+      m = cos(phi[i]) / r[i];
+      a = sin(phi[i]) / r[i];
+      // calculate Hough curve with slightly enlarged limits to avoid errors due to rounding
+      y1_h = m * sin(x1 - 1e-10) - a * cos(x1 - 1e-10);
+      y2_h = m * sin(x2 + 1e-10) - a * cos(x2 + 1e-10);
+      // skip decreasing half of the sine (corresponds to curl back half of the track)
+      if (y1_h > y2_h) continue;
+      if (!((y1_h > y2 && y2_h > y2) || (y1_h < y1 && y2_h < y1))) {
+        list.push_back(iHit);
+        break;
+      }
+    }
+  }
+}
+
 /*
  * Select one hit per super layer
  */
@@ -578,23 +613,13 @@ CDCTriggerHoughtrackingModule::patternClustering()
         mergeIdList(idList, candIdListTR, candIdListBL);
         B2DEBUG(100, "merge id lists from candidates " << icandTR << " and " << icandBL);
       } else {
-        // find cells around center to get hit IDs
-        double dx = 0.1 * M_PI / m_nCellsPhi;
-        double dy = 0.1 * maxR / m_nCellsR;
-        for (unsigned icand = 0; icand < houghCand.size(); ++icand) {
-          if (((houghCand[icand].getCoord().first.X() <= x + dx &&
-                houghCand[icand].getCoord().second.X() >= x - dx) ||
-               (houghCand[icand].getCoord().first.X() <= x + dx - 2 * M_PI &&
-                houghCand[icand].getCoord().second.X() >= x - dx - 2 * M_PI) ||
-               (houghCand[icand].getCoord().first.X() <= x + dx + 2 * M_PI &&
-                houghCand[icand].getCoord().second.X() >= x - dx + 2 * M_PI)) &&
-              houghCand[icand].getCoord().first.Y() <= y + dy &&
-              houghCand[icand].getCoord().second.Y() >= y - dy) {
-            vector<unsigned> candIdList = houghCand[icand].getIdList();
-            mergeIdList(idList, idList, candIdList);
-            B2DEBUG(100, "merge id list from candidate " << icand);
-          }
-        }
+        double dx = M_PI / m_nCellsPhi;
+        double dy = maxR / m_nCellsR;
+        double x1 = (round(centerX) == centerX) ? x - dx : x - 2 * dx;
+        double x2 = (round(centerX) == centerX) ? x + dx : x + 2 * dx;
+        double y1 = (round(centerY) == centerY) ? y - dy : y - 2 * dy;
+        double y2 = (round(centerY) == centerY) ? y + dy : y + 2 * dy;
+        findAllCrossingHits(idList, x1, x2, y1, y2);
       }
       if (idList.size() == 0) {
         setReturnValue(false);

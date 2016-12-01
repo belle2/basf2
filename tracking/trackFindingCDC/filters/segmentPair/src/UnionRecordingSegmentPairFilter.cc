@@ -11,29 +11,57 @@
 
 #include <tracking/trackFindingCDC/filters/segmentPair/SegmentPairVarSets.h>
 
-using namespace std;
+#include <tracking/trackFindingCDC/filters/segmentPair/MVAFeasibleSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentPair/MVARealisticSegmentPairFilter.h>
+
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 std::vector<std::string>
 UnionRecordingSegmentPairFilter::getValidVarSetNames() const
 {
   std::vector<std::string> varSetNames = Super::getValidVarSetNames();
-  varSetNames.insert(varSetNames.end(), {"fitless", "skimmed_fitless", "fit"});
+  varSetNames.insert(varSetNames.end(), {
+    "basic",
+    "hit_gap", "skimmed_hit_gap",
+    "fitless",
+    "feasible",
+    "pre_fit",
+    "fit",
+    "releastic",
+    "truth",
+    "trail"
+  });
+
   return varSetNames;
 }
-
 
 std::unique_ptr<BaseVarSet<CDCSegmentPair> >
 UnionRecordingSegmentPairFilter::createVarSet(const std::string& name) const
 {
-  if (name == "fitless") {
-    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new FitlessSegmentPairVarSet());
-  } else if (name == "skimmed_fitless") {
-    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new SkimmedFitlessSegmentPairVarSet());
+  if (name == "basic") {
+    return makeUnique<BasicSegmentPairVarSet>();
+  } else if (name == "hit_gap") {
+    return makeUnique<HitGapSegmentPairVarSet>();
+  } else if (name == "skimmed_hit_gap") {
+    return makeUnique<SkimmedHitGapSegmentPairVarSet>();
+  } else if (name == "fitless") {
+    return makeUnique<FitlessSegmentPairVarSet>();
+  } else if (name == "feasible") {
+    MVAFeasibleSegmentPairFilter filter;
+    return std::move(filter).releaseVarSet();
+  } else if (name == "pre_fit") {
+    bool preliminaryFit = true;
+    return makeUnique<FitSegmentPairVarSet>(preliminaryFit);
   } else if (name == "fit") {
-    return std::unique_ptr<BaseVarSet<CDCSegmentPair> >(new FitSegmentPairVarSet());
+    return makeUnique<FitSegmentPairVarSet>(false);
+  } else if (name == "realistic") {
+    MVARealisticSegmentPairFilter filter;
+    return std::move(filter).releaseVarSet();
+  } else if (name == "truth") {
+    return makeUnique<TruthSegmentPairVarSet>();
+  } else if (name == "trail") {
+    return makeUnique<TrailSegmentPairVarSet>();
   } else {
     return Super::createVarSet(name);
   }

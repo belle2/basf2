@@ -435,6 +435,12 @@ class Validation:
         # If this is set, dependencies will be ignored.
         self.ignore_dependencies = False
 
+        #: reporting time (in minutes)
+        # the time in minutes when there will be there first logoutput if a script
+        # is still not complete
+        # This prints every 30 minutes which scripts are still running
+        self.running_script_reporting_interval = 1
+
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -914,6 +920,18 @@ class Validation:
                                 len(waiting), len(running),
                                 script_object.path,
                                 script_object.status))
+                    else:
+
+                        if (time.time() - script_object.last_report_time) / 60.0 > self.running_script_reporting_interval:
+                            print(
+                                "Script {} running since {} seconds".format(
+                                    script_object.name_not_sanitized,
+                                    time.time() - script_object.start_time))
+                            # explicit flush so this will show up in log file right away
+                            sys.stdout.flush()
+
+                            # not finished yet, log time
+                            script_object.last_report_time = time.time()
 
                 # Otherwise (the script is waiting) and if it is ready to be
                 # executed
@@ -944,8 +962,10 @@ class Validation:
                         script_object.control.execute(script_object,
                                                       self.basf2_options,
                                                       self.dry, self.tag)
+
                         # Log the script execution start time
                         script_object.start_time = time.time()
+                        script_object.last_report_time = time.time()
 
                         # Some printout in quiet mode
                         if self.quiet:

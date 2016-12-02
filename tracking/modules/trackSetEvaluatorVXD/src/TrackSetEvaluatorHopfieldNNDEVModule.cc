@@ -10,6 +10,8 @@
 
 #include "tracking/modules/trackSetEvaluatorVXD/TrackSetEvaluatorHopfieldNNDEVModule.h"
 
+#include "tracking/trackFindingVXD/trackSetEvaluator/HopfieldNetwork.h"
+
 #include <numeric>
 
 #include <TMatrixD.h>
@@ -44,7 +46,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   m_eventCounter++;
 
   //Prepare the information for the actual HNN.
-  std::vector<TcInfo4Hopfield> overlapTCinfo = convertOverlappingNetwork();
+  std::vector<OverlapResolverNodeInfo> overlapTCinfo = convertOverlappingNetwork();
 
   //Another round of counters...
   unsigned int nCompetitors = overlapTCinfo.size();
@@ -52,6 +54,7 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   m_nTCsCleanAtStart += nTCs - nCompetitors;
 
   //Performs the actual HNN.
+  //As the parameter is taken as reference, the values are changed and can be reused below.
   if (!doHopfield(overlapTCinfo)) {
     B2WARNING("TrackSetEvaluatorHopfieldNNDEVModule: failed in cleaning overlaps!"); m_nHopfieldFails++; return;
   }
@@ -59,9 +62,9 @@ void TrackSetEvaluatorHopfieldNNDEVModule::event()
   //Update tcs and kill those which were rejected by the Hopfield algorithm
   unsigned int nSurvivors = 0;
   for (const auto& tcInfo : overlapTCinfo) {
-    if (tcInfo.neuronValue > 0.7) { nSurvivors++; continue; }   // WARNING hardcoded value, taken from paper!
+    if (tcInfo.activityState > 0.7) { nSurvivors++; continue; }   // WARNING hardcoded value, taken from paper!
 
-    m_spacePointTrackCands[tcInfo.realID]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
+    m_spacePointTrackCands[tcInfo.trackIndex]->removeRefereeStatus(SpacePointTrackCand::c_isActive);
   }
 
   //Reporting stuff.
@@ -111,33 +114,47 @@ void TrackSetEvaluatorHopfieldNNDEVModule::InitializeCounters()
 
 
 
-std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield> TrackSetEvaluatorHopfieldNNDEVModule::convertOverlappingNetwork()
+std::vector<OverlapResolverNodeInfo>
+TrackSetEvaluatorHopfieldNNDEVModule::convertOverlappingNetwork()
 {
   B2DEBUG(100, "TrackSetEvaluatorHopfieldNNDEVModule::convertOverlappingNetwork now");
-  std::vector<TcInfo4Hopfield> overlappingTCs;
+
+  //This vector will later be returned.
+  std::vector<OverlapResolverNodeInfo> overlappingTCs;
 
   for (const SpacePointTrackCand& aTC : m_spacePointTrackCands) {
+    /*
     const vector<unsigned short>& currentOverlaps = m_overlapNetworks[0]->getOverlapForTrackIndex(
-                                                      aTC.getArrayIndex()); // Jakob: WARNING only first
-    //overlapNetwork is currently used! Could lead to problems in the long run! WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
+                                                      aTC.getArrayIndex());
+                                                      */
+    // Jakob: WARNING only first overlapNetwork is currently used!
+    // Could lead to problems in the long run!
+    // WARNING part 2: unsigned short is imho too dangerous! please increase to unsigned int!
 
     //  if (currentOverlaps.empty() or aTC.hasRefereeStatus(SpacePointTrackCand::c_isActive) == false) { continue; }
-
-    overlappingTCs.push_back(TcInfo4Hopfield());
-    TcInfo4Hopfield& tcInfo = overlappingTCs.back();
-    tcInfo.reducedID = overlappingTCs.size() - 1;
-    tcInfo.realID = aTC.getArrayIndex();
-    tcInfo.competitorsIDs = currentOverlaps; // warning: does hard copy! TODO optimize!
-    tcInfo.qi = aTC.getQualityIndex();
+    /*
+        overlappingTCs.push_back(TcInfo4Hopfield());
+        TcInfo4Hopfield& tcInfo = overlappingTCs.back();
+        tcInfo.reducedID = overlappingTCs.size() - 1;
+        tcInfo.realID = aTC.getArrayIndex();
+        tcInfo.competitorsIDs = currentOverlaps; // warning: does hard copy! TODO optimize!
+        tcInfo.qi = aTC.getQualityIndex();
+    */
+    overlappingTCs.emplace_back(aTC.getQualityIndex(), aTC.getArrayIndex(),
+                                m_overlapNetworks[0]->getOverlapForTrackIndex(aTC.getArrayIndex()), 1.0);
   }
 
   return overlappingTCs;
 }
 
 
-bool TrackSetEvaluatorHopfieldNNDEVModule::doHopfield(std::vector<TrackSetEvaluatorHopfieldNNDEVModule::TcInfo4Hopfield>& tcs,
-                                                      double omega)
+bool TrackSetEvaluatorHopfieldNNDEVModule::doHopfield(
+  std::vector<OverlapResolverNodeInfo>& tcs)
 {
+  HopfieldNetwork hopfieldNetwork;
+  hopfieldNetwork.doHopfield(tcs);
+
+  /*
   unsigned int nTCs = tcs.size();
   B2DEBUG(100, "TrackSetEvaluatorHopfieldNNDEVModule::doHopfield now with " << nTCs << " overlapping TCs");
 
@@ -236,6 +253,6 @@ bool TrackSetEvaluatorHopfieldNNDEVModule::doHopfield(std::vector<TrackSetEvalua
             " and quality indicator " << tcs[i].qi);
     tcs[i].neuronValue = xMatrix(0, i);
   }
-
+  */
   return true;
 }

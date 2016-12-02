@@ -73,6 +73,23 @@ DosiStudyModule::~DosiStudyModule()
 void DosiStudyModule::defineHisto()
 {
   for (int i = 0; i < 5; i++) {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     h_dosi_edep0[i] = new TH1F(TString::Format("dosi_edep0_%d", i), "Energy deposited [MeV]", 50000, 0., 400.);
     h_dosi_edep1[i] = new TH1F(TString::Format("dosi_edep1_%d", i), "Energy deposited [MeV]", 50000, 0., 400.);
     h_dosi_edep2[i] = new TH1F(TString::Format("dosi_edep2_%d", i), "Energy deposited [MeV]", 50000, 0., 400.);
@@ -92,6 +109,26 @@ void DosiStudyModule::defineHisto()
     h_dosi_edep6[i]->Sumw2();
     h_dosi_edep7[i]->Sumw2();
     h_dosi_edep8[i]->Sumw2();
+
+    h_dosi_rs_edep0[i] = new TH2F(TString::Format("dosi_rs_edep0_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep1[i] = new TH2F(TString::Format("dosi_rs_edep1_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep2[i] = new TH2F(TString::Format("dosi_rs_edep2_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep3[i] = new TH2F(TString::Format("dosi_rs_edep3_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep4[i] = new TH2F(TString::Format("dosi_rs_edep4_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep5[i] = new TH2F(TString::Format("dosi_rs_edep5_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep6[i] = new TH2F(TString::Format("dosi_rs_edep6_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep7[i] = new TH2F(TString::Format("dosi_rs_edep7_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+    h_dosi_rs_edep8[i] = new TH2F(TString::Format("dosi_rs_edep8_%d", i), "Energy deposited [MeV]", 50000, 0., 400., 12, 0., 12.);
+
+    h_dosi_rs_edep0[i]->Sumw2();
+    h_dosi_rs_edep1[i]->Sumw2();
+    h_dosi_rs_edep2[i]->Sumw2();
+    h_dosi_rs_edep3[i]->Sumw2();
+    h_dosi_rs_edep4[i]->Sumw2();
+    h_dosi_rs_edep5[i]->Sumw2();
+    h_dosi_rs_edep6[i]->Sumw2();
+    h_dosi_rs_edep7[i]->Sumw2();
+    h_dosi_rs_edep8[i]->Sumw2();
   }
 
 }
@@ -121,6 +158,21 @@ void DosiStudyModule::event()
   StoreArray<MCParticle> mcParticles;
   StoreArray<DosiSimHit> SimHits;
   StoreArray<DosiHit> Hits;
+  StoreArray<SADMetaHit> MetaHits;
+
+  //Look at the meta data to extract IR rate and scattering ring section
+  double rate = 0;
+  int ring_section = -1;
+  int section_ordering[12] = {1, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2};
+  for (const auto& MetaHit : MetaHits) {
+    rate = MetaHit.getrate();
+    double sad_ssraw = MetaHit.getssraw();
+    double ssraw = 0;
+    if (sad_ssraw >= 0) ssraw = sad_ssraw / 100.;
+    else if (sad_ssraw < 0) ssraw = 3000. + sad_ssraw / 100.;
+    ring_section = section_ordering[(int)((ssraw) / 250.)] - 1;
+    //ring_section = MetaHit.getring_section() - 1;
+  }
 
   RelationIndex<MCParticle, DosiSimHit> relMCSimHit;
   typedef RelationIndex<MCParticle, DosiSimHit>::Element RelationElement;
@@ -129,6 +181,7 @@ void DosiStudyModule::event()
     const int detNB = SimHit.getCellId();
     const double Edep = SimHit.getEnergyDep() * 1e3; //GeV -> MeV
     h_dosi_edep0[detNB]->Fill(Edep);
+    h_dosi_rs_edep0[detNB]->Fill(Edep, ring_section);
     for (const RelationElement& rel : relMCSimHit.getElementsTo(SimHit)) {
       const MCParticle* particle = rel.from;
       const float Mass = particle->getMass();
@@ -148,6 +201,21 @@ void DosiStudyModule::event()
         h_dosi_edep6[detNB]->Fill(Edep);
       if (pdg == 2112 && (0.001 <= Kinetic && Kinetic <= 10.0))
         h_dosi_edep7[detNB]->Fill(Edep);
+
+
+      h_dosi_rs_edep1[detNB]->Fill(Edep, ring_section);
+      if (0.005 <= Kinetic && Kinetic <= 10.0)
+        h_dosi_rs_edep2[detNB]->Fill(Edep, ring_section);
+      if (0.005 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+        h_dosi_rs_edep3[detNB]->Fill(Edep, ring_section);
+      if (0.1 <= Kinetic && Kinetic <= 10.0 && (fabs(pdg) == 11))
+        h_dosi_rs_edep4[detNB]->Fill(Edep, ring_section);
+      if (0.001 <= Kinetic && Kinetic <= 0.050)
+        h_dosi_rs_edep5[detNB]->Fill(Edep, ring_section);
+      if (pdg == 2112)
+        h_dosi_rs_edep6[detNB]->Fill(Edep, ring_section);
+      if (pdg == 2112 && (0.001 <= Kinetic && Kinetic <= 10.0))
+        h_dosi_rs_edep7[detNB]->Fill(Edep, ring_section);
     }
   }
 }

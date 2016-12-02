@@ -224,14 +224,20 @@ namespace Belle2 {
       move.setZ(geoQBB.getPrismPosition() - geoQBB.getPrismEnclosure().getLength() / 2);
       optics->MakeImprint(module, move, &rot);
 
+      // add front-end electronics
+
+      if (!m_frontEnd) {
+        m_frontEnd = assembleFrontEnd(geo.getBoardStack(), geo.getNumBoardStacks());
+      }
+      double Lprism = geo.getModule(moduleID).getPrism().getFullLength();
+      move.setZ(move.z() - Lprism - Lz);
+      m_frontEnd->MakeImprint(module, move, &rot);
+
       // add QBB
 
       if (!m_qbb) m_qbb = assembleQBB(geoQBB);
       move.setZ(0);
       m_qbb->MakeImprint(module, move, &rot);
-
-      // add electronics
-
 
       return module;
     }
@@ -269,6 +275,77 @@ namespace Belle2 {
       std::string name = addNumber("TOPEnvelopeModule", moduleID);
       return new G4LogicalVolume(m_moduleEnvelope, material, name);
 
+    }
+
+
+    G4AssemblyVolume* GeoTOPCreator::assembleFrontEnd(const TOPGeoBoardStack& geo, int N)
+    {
+      auto* frontEnd = new G4AssemblyVolume();
+      Simulation::RunManager::Instance().addAssemblyVolume(frontEnd);
+
+      G4ThreeVector move;
+
+      double Z = -geo.getFrontBoardGap();
+      double length = geo.getFrontBoardThickness();
+      auto* frontBoard = createBox("TOPFrontBoard",
+                                   geo.getFrontBoardWidth(),
+                                   geo.getFrontBoardHeight(),
+                                   length,
+                                   geo.getFrontBoardMaterial());
+      move.setZ(Z - length / 2);
+      move.setY(geo.getFrontBoardY());
+      frontEnd->AddPlacedVolume(frontBoard, move, 0);
+
+      Z -= length + geo.getBoardStackGap();
+      length = geo.getBoardStackLength();
+      move.setZ(Z - length / 2);
+      move.setY(geo.getBoardStackY());
+      auto* boardStack = createBoardStack(geo, N);
+      frontEnd->AddPlacedVolume(boardStack, move, 0);
+
+      return frontEnd;
+
+    }
+
+
+    G4LogicalVolume* GeoTOPCreator::createBoardStack(const TOPGeoBoardStack& geo, int N)
+    {
+      double width = geo.getBoardStackWidth();
+      double fullWidth = width * N;
+      auto* boardStack = createBox(geo.getName(),
+                                   fullWidth,
+                                   geo.getBoardStackHeight(),
+                                   geo.getBoardStackLength(),
+                                   geo.getBoardStackMaterial());
+
+      double spacerWidth = geo.getSpacerWidth();
+      std::string name1 = geo.getName() + "Spacer";
+      auto* spacer = createBox(name1,
+                               spacerWidth,
+                               geo.getBoardStackHeight(),
+                               geo.getBoardStackLength(),
+                               geo.getSpacerMaterial());
+
+      std::string name2 = geo.getName() + "TwoSpacers";
+      auto* twoSpacers = createBox(name2,
+                                   spacerWidth * 2,
+                                   geo.getBoardStackHeight(),
+                                   geo.getBoardStackLength(),
+                                   geo.getSpacerMaterial());
+
+      G4Transform3D move;
+      move = G4TranslateX3D(-(fullWidth - spacerWidth) / 2);
+      new G4PVPlacement(move, spacer, name1, boardStack, false, 1);
+      move = G4TranslateX3D((fullWidth - spacerWidth) / 2);
+      new G4PVPlacement(move, spacer, name1, boardStack, false, 2);
+
+      int n = N - 1;
+      for (int i = 0; i < n; i++) {
+        move = G4TranslateX3D(width * (2 * i - n + 1) / 2.0);
+        new G4PVPlacement(move, twoSpacers, name2, boardStack, false, i + 1);
+      }
+
+      return boardStack;
     }
 
 
@@ -477,7 +554,8 @@ namespace Belle2 {
       auto* solid = new G4SubtractionSolid("sideRail", box, subtrBox, move);
 
       G4Material* material = Materials::get(geo.getSideRails().getMaterial());
-      if (!material) B2FATAL("Material '" << geo.getSideRails().getMaterial() << "' not found");
+      if (!material) B2FATAL("Material '" << geo.getSideRails().getMaterial() <<
+                               "' not found");
 
       std::string name = geo.getSideRails().getName();
       if (type == c_Left) {

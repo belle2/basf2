@@ -220,13 +220,13 @@ namespace Belle2 {
                     arrayParams.getString("glueMaterial"));
       prism.setSurface(barSurface, sigmaAlpha);
 
-      double radius = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
+      double R = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
       double phi = barParams.getLength("Phi0");
       double backwardZ = barParams.getLength("QZBackward");
       int numModules = barParams.getInt("Nbar");
       for (int i = 0; i < numModules; i++) {
         unsigned id = i + 1;
-        TOPGeoModule module(id, radius, phi, backwardZ);
+        TOPGeoModule module(id, R, phi, backwardZ);
         module.setName(addNumber(module.getName(), id));
         module.setBarSegment1(bar1);
         module.setBarSegment2(bar2);
@@ -239,10 +239,27 @@ namespace Belle2 {
         phi += 2 * M_PI / numModules;
       }
 
-      // boardstack
+      // front-end electronics geometry
 
-      TOPGeoBoardStack bs; // TODO
-      geo->setBoardStack(bs);
+      GearDir feParams(content, "FrontEndGeo");
+      GearDir fbParams(feParams, "FrontBoard");
+      TOPGeoBoardStack boardStack;
+      boardStack.setFrontBoard(fbParams.getLength("width"),
+                               fbParams.getLength("height"),
+                               fbParams.getLength("thickness"),
+                               fbParams.getLength("gap"),
+                               fbParams.getLength("y"),
+                               fbParams.getString("material"));
+      GearDir bsParams(feParams, "BoardStack");
+      boardStack.setBoardStack(bsParams.getLength("width"),
+                               bsParams.getLength("height"),
+                               bsParams.getLength("length"),
+                               bsParams.getLength("gap"),
+                               bsParams.getLength("y"),
+                               bsParams.getString("material"),
+                               bsParams.getLength("spacerWidth"),
+                               bsParams.getString("spacerMaterial"));
+      geo->setBoardStack(boardStack, feParams.getInt("numBoardStacks"));
 
       // QBB
 
@@ -287,17 +304,17 @@ namespace Belle2 {
                                 sideRailsParams.getString("material"));
       qbb.setSideRails(sideRails);
 
-      GearDir prismEnclosureParams(qbbParams, "prismEnclosure");
-      TOPGeoPrismEnclosure prismEnclosure(prismEnclosureParams.getLength("length"),
-                                          prismEnclosureParams.getLength("height"),
-                                          prismEnclosureParams.getAngle("angle"),
-                                          prismEnclosureParams.getLength("bottomThickness"),
-                                          prismEnclosureParams.getLength("sideThickness"),
-                                          prismEnclosureParams.getLength("backThickness"),
-                                          prismEnclosureParams.getLength("frontThickness"),
-                                          prismEnclosureParams.getLength("extensionThickness"),
-                                          prismEnclosureParams.getString("material"));
-      qbb.setPrismEnclosure(prismEnclosure);
+      GearDir prismEnclParams(qbbParams, "prismEnclosure");
+      TOPGeoPrismEnclosure prismEncl(prismEnclParams.getLength("length"),
+                                     prismEnclParams.getLength("height"),
+                                     prismEnclParams.getAngle("angle"),
+                                     prismEnclParams.getLength("bottomThickness"),
+                                     prismEnclParams.getLength("sideThickness"),
+                                     prismEnclParams.getLength("backThickness"),
+                                     prismEnclParams.getLength("frontThickness"),
+                                     prismEnclParams.getLength("extensionThickness"),
+                                     prismEnclParams.getString("material"));
+      qbb.setPrismEnclosure(prismEncl);
 
       GearDir endPlateParams(qbbParams, "forwardEndPlate");
       TOPGeoEndPlate endPlate(endPlateParams.getLength("thickness"),

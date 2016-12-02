@@ -10,6 +10,7 @@
     <xi:include href="TOP-Support.xml"/>
     <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="QBB.xml"/>
+    <xi:include href="FrontEndGeo.xml"/>
     <xi:include href="FrontEndMapping.xml"/>
     <xi:include href="ChannelMappingIRS3B.xml"/>
     <xi:include href="ChannelMappingIRSX.xml"/>

@@ -64,6 +64,8 @@ CDCPackerModule::CDCPackerModule() : Module()
   addParam("enableStoreRawCDC", m_enableStoreCDCRawHit, "Enable to store to the RawCDC object", true);
   addParam("enablePrintOut", m_enablePrintOut, "Enable to print out the data to the terminal", true);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
+
+  m_channelMapFromDB.addCallback(this, &CDCPackerModule::loadMap);
 }
 
 CDCPackerModule::~CDCPackerModule()
@@ -330,8 +332,7 @@ void CDCPackerModule::loadMap()
     }
   } else {
     // Read the channel map from the database.
-    DBArray<CDCChannelMap> channelMaps;
-    for (const auto& cm : channelMaps) {
+    for (const auto& cm : m_channelMapFromDB) {
       const int isl = cm.getISuperLayer();
       if (isl >= 9) continue; // Super layers should be from 0 t0 8.
       const int il = cm.getILayer();

@@ -70,7 +70,7 @@ CDCUnpackerModule::CDCUnpackerModule() : Module()
   addParam("tdcOffset", m_tdcOffset, "TDC offset (in TDC count).", 0);
   addParam("enableDatabase", m_enableDatabase, "Enable database to read the channel map.", true);
 
-  //  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
+  m_channelMapFromDB.addCallback(this, &CDCUnpackerModule::loadMap);
 }
 
 CDCUnpackerModule::~CDCUnpackerModule()
@@ -486,8 +486,8 @@ void CDCUnpackerModule::loadMap()
   } else {
 
     // Read the channel map from the database.
-    DBArray<CDCChannelMap> channelMaps;
-    for (const auto& cm : channelMaps) {
+    //    DBArray<CDCChannelMap> channelMaps;
+    for (const auto& cm : m_channelMapFromDB) {
       const int isl = cm.getISuperLayer();
       const int il = cm.getILayer();
       const int iw = cm.getIWire();

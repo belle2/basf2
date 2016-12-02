@@ -17,7 +17,12 @@
 #include <cdc/dataobjects/CDCRawHit.h>
 #include <cdc/dataobjects/CDCRawHitWaveForm.h>
 #include <rawdata/dataobjects/RawDataBlock.h>
+#include <cdc/dbobjects/CDCChannelMap.h>
 
+#include <framework/datastore/DataStore.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/datastore/RelationArray.h>
+#include <framework/database/DBArray.h>
 
 #include <rawdata/dataobjects/RawFTSW.h>
 #include <rawdata/dataobjects/RawCOPPER.h>
@@ -290,6 +295,12 @@ namespace Belle2 {
        * from the database.
        */
       bool m_enableDatabase;
+
+      /**
+       * Channel map retrieved from DB.
+       */
+      DBArray<CDCChannelMap> m_channelMapFromDB;
+
 
     };//end class declaration
 

@@ -45,10 +45,10 @@ public:
   /** Default destructor */
   virtual ~EvtPHSPBBMix();
 
-  /**< Get function Name  */
+  /** Get function Name  */
   std::string getName();
 
-  /**< Clone the decay  */
+  /** Clone the decay  */
   EvtDecayBase* clone();
 
   /** Decay function */
@@ -94,10 +94,10 @@ public:
   /** Default destructor */
   virtual ~EvtPHSPBMix();
 
-  /**< Get function Name  */
+  /** Get function Name  */
   std::string getName();
 
-  /**< Clone the decay  */
+  /** Clone the decay  */
   EvtDecayBase* clone();
 
   /** Decay function */

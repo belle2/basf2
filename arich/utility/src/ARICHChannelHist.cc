@@ -16,7 +16,8 @@
 using namespace std;
 using namespace Belle2;
 
-ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type) : TH2Poly()
+ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type,
+                                   const std::vector<unsigned>& moduleIDs) : TH2Poly()
 {
 
   SetName(name);
@@ -44,11 +45,21 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
   int nhapd = 1;
   unsigned iring = 0;
   unsigned ihapd = 0;
+
+  std::vector<unsigned> ids;
+  if (moduleIDs.size() > 0) ids = moduleIDs;
+  else {
+    for (int hapdID = 1; hapdID < 421; hapdID++) {
+      ids.push_back(hapdID);
+    }
+  }
+
   // HAPD bins
   if (type == 1) {
     for (int hapdID = 1; hapdID < 421; hapdID++) {
-      m_hapd2binMap[hapdID - 1] = nhapd;
-      nhapd++;
+      //for (unsigned hapdID : ids) {
+      //m_hapd2binMap[hapdID - 1] = nhapd;
+      //nhapd++;
       float r = rs[iring];
       float dphi = 2.*M_PI / nhapds[iring];
       float fi = dphi / 2. + ihapd * dphi;
@@ -59,18 +70,22 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
         globX[i] = rotX + centerPos.X();
         globY[i] = rotY + centerPos.Y();
       }
-      TGraph* mybox = new TGraph(5, globX, globY);
-
-      mybox->SetName((to_string(hapdID)).c_str());
-      AddBin(mybox);
+      if (std::find(ids.begin(), ids.end(), hapdID) != ids.end()) {
+        m_hapd2binMap[hapdID - 1] = nhapd;
+        nhapd++;
+        TGraph* mybox = new TGraph(5, globX, globY);
+        mybox->SetName((to_string(hapdID)).c_str());
+        AddBin(mybox);
+      }
       ihapd++;
       if (ihapd == nhapds[iring]) { iring++; ihapd = 0;}
     }
 
   } else if (type == 0) {
     for (int hapdID = 1; hapdID < 421; hapdID++) {
-      m_hapd2binMap[hapdID - 1] = nhapd;
-      nhapd++;
+      //for (unsigned hapdID : ids) {
+      //  m_hapd2binMap[hapdID - 1] = nhapd;
+      //  nhapd++;
       float dphi = 2.*M_PI / nhapds[iring];
       float fi = dphi / 2. + ihapd * dphi;
       float r = rs[iring];
@@ -88,10 +103,13 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
           globX[i] = rotX + centerPos.X();
           globY[i] = rotY + centerPos.Y();
         }
-        TGraph* mybox = new TGraph(5, globX, globY);
-
-        mybox->SetName((to_string(hapdID)).c_str());
-        AddBin(mybox);
+        if (std::find(ids.begin(), ids.end(), hapdID) != ids.end()) {
+          m_hapd2binMap[hapdID - 1] = nhapd;
+          if (chID == 143) nhapd++;
+          TGraph* mybox = new TGraph(5, globX, globY);
+          mybox->SetName((to_string(hapdID)).c_str());
+          AddBin(mybox);
+        }
       }
       ihapd++;
       if (ihapd == nhapds[iring]) { iring++; ihapd = 0;}
@@ -103,7 +121,6 @@ ARICHChannelHist::ARICHChannelHist(const char* name, const char* title, int type
 
 void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
 {
-
   unsigned chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
   SetBinContent(chIndex, GetBinContent(chIndex) + 1);
 }
@@ -111,7 +128,7 @@ void ARICHChannelHist::fillBin(unsigned hapdID, unsigned chID)
 void ARICHChannelHist::setBinContent(unsigned hapdID, unsigned chID, double value)
 {
 
-  unsigned chIndex = (hapdID - 1) * 144 + chID + 1;
+  unsigned chIndex = (m_hapd2binMap[hapdID - 1] - 1) * 144 + chID + 1;
   SetBinContent(chIndex, value);
 }
 

@@ -174,8 +174,8 @@ namespace Belle2 {
       std::vector<double> SAD_HER_PPS_av;/** */
       std::vector<double> SAD_LER_PPS_av;/** */
 
-      std::vector<double> DOSI;/** */
-      std::vector<double> DOSI_av;/** */
+      std::vector<float> DOSI;/** */
+      std::vector<float> DOSI_av;/** */
 
       /**
        *.clear the structure: set elements to zero

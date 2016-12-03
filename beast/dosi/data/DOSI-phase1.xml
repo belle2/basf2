@@ -20,9 +20,9 @@
       <Material>DOSI-Material</Material>
       <ThetaZ unit="deg">0.0</ThetaZ>
       <Phi unit="deg">45.</Phi>
-      <dx_dosi unit="cm">5.</dx_dosi>
-      <dy_dosi unit="cm">5.</dy_dosi>
-      <dz_dosi unit="cm">5.</dz_dosi>
+      <dx_dosi unit="cm">0.265</dx_dosi>
+      <dy_dosi unit="cm">0.01</dy_dosi>
+      <dz_dosi unit="cm">0.265</dz_dosi>
       <z unit="cm">0,0,0,0</z>
       <r unit="cm">8, 30, 60, 140</r>
     </Active>

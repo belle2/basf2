@@ -184,12 +184,13 @@ bool CKF::passPreUpdateTrim(CKFPartialTrack* track, unsigned step)
   int nadded = track->getNumPointsWithMeasurement() - seedTrack->getNumPointsWithMeasurement();
   int nholes = step - nadded;
   if (nholes != (int) track->totalHoles())
-    B2WARNING("Number of holes from CKFPartialTrack: " << track->totalHoles() << ", differs from what I think it should be: " << nholes);
-    if (nholes > maxHoles) {
-      B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
-              track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
-      return false;
-    }
+    B2WARNING("Number of holes from CKFPartialTrack: " << track->totalHoles() << ", differs from what I think it should be: " <<
+              nholes);
+  if (nholes > maxHoles) {
+    B2DEBUG(70, "--- In CKF::preUpdateTrim(): Filtering track with nholes " << nholes << "{" << step << " " <<
+            track->getNumPointsWithMeasurement() << " " << seedTrack->getNumPointsWithMeasurement() << " " << nadded << "}");
+    return false;
+  }
   return true;
 }
 
@@ -312,7 +313,10 @@ bool CKF::refitTrack(genfit::Track* track)
   //   fitter->setMaxFailedHits(5);
   // }
   try {
-    if (!track->checkConsistency()) {
+    try {
+      track->checkConsistency();
+    } catch (genfit::Exception& e) {
+      B2DEBUG(50, e.getExcString());
       B2DEBUG(50, "Inconsistent track found, attempting to sort!");
       bool sorted = track->sort();
       if (!sorted) {

@@ -133,6 +133,8 @@ int main(int argc, char* argv[])
      "override skipNEvents for EventInfoSetter and RootInput. Skips this many events before starting.")
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
+    ("nEventsPerFile,N", prog::value<vector<unsigned int> >(),
+     "override number of events to process for each given input file for RootInput. Must be specified multiple times for each used file.")
     ("output,o", prog::value<string>(), "override name of output file for (Seq)RootOutput")
     ("processes,p", prog::value<int>(), "override number of worker processes (>=1 enables, 0 disables parallel processing)");
 
@@ -283,6 +285,12 @@ int main(int argc, char* argv[])
     if (varMap.count("input")) {
       const vector<string>& names = varMap["input"].as<vector<string> >();
       Environment::Instance().setInputFilesOverride(names);
+    }
+
+    // -N
+    if (varMap.count("nEventsPerFile")) {
+      const vector<unsigned int>& nEventsPerFile = varMap["nEventsPerFile"].as<vector<unsigned int> >();
+      Environment::Instance().setNEventsPerFile(nEventsPerFile);
     }
 
     // -o

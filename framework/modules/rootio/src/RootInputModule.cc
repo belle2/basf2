@@ -21,6 +21,9 @@
 
 #include <TClonesArray.h>
 #include <TFile.h>
+#include <TEventList.h>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -48,6 +51,9 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("inputFileNames", m_inputFileNames,
            "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.",
            emptyvector);
+  vector<unsigned int> emptyUnsignedIntVector;
+  addParam("nEventsPerFile", m_nEventsPerFile,
+           "The number of events to process for each filename.", emptyUnsignedIntVector);
   addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -i.", false);
 
@@ -81,6 +87,10 @@ void RootInputModule::initialize()
   if (skipNEventsOverride >= 0)
     m_skipNEvents = skipNEventsOverride;
 
+  auto nEventsPerFileOverride = Environment::Instance().getNEventsPerFileOverride();
+  if (nEventsPerFileOverride.size() > 0)
+    m_nEventsPerFile = nEventsPerFileOverride;
+
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
 
@@ -97,6 +107,12 @@ void RootInputModule::initialize()
   if (m_inputFileNames.empty()) {
     B2FATAL("No valid files specified!");
   }
+
+  if (m_nEventsPerFile.size() > 0 and m_inputFileNames.size() != m_nEventsPerFile.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given nEventsPerFile parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(nEventsPerFile) = " << m_nEventsPerFile.size());
+  }
+
   m_inputFileName = "";
   //we'll only use m_inputFileNames from now on
 
@@ -122,6 +138,19 @@ void RootInputModule::initialize()
       B2FATAL("Couldn't read header of TTree 'persistent' in file '" << fileName << "'");
     B2INFO("Added file " + fileName);
   }
+
+  if (m_nEventsPerFile.size() > 0) {
+    TEventList* elist = new TEventList("input_event_list");
+    for (unsigned int iFile = 0; iFile < m_nEventsPerFile.size(); ++iFile) {
+      int64_t offset = m_tree->GetTreeOffset()[iFile];
+      for (int64_t entry = 0; entry < m_nEventsPerFile[iFile]; ++entry) {
+        elist->Enter(entry + offset);
+      }
+    }
+    m_tree->SetEventList(elist);
+    //m_persistent->SetEventList(elist);
+  }
+
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
 
@@ -214,7 +243,11 @@ void RootInputModule::readTree()
     return;
 
   // Check if there are still new entries available.
-  int localEntryNumber = m_tree->LoadTree(m_nextEntry);
+  int  localEntryNumber = m_nextEntry;
+  if (m_nEventsPerFile.size() > 0) {
+    localEntryNumber = m_tree->GetEntryNumber(localEntryNumber);
+  }
+  localEntryNumber = m_tree->LoadTree(localEntryNumber);
 
   if (localEntryNumber == -2) {
     return; //end of file

@@ -106,6 +106,11 @@ namespace Belle2 {
     /** Files to read from. */
     std::vector<std::string> m_inputFileNames;
 
+    /**
+     * The number of events to process for each filename
+     */
+    std::vector<unsigned int> m_nEventsPerFile;
+
     /** Ignore filename override from command line
      */
     bool m_ignoreCommandLineOverride;

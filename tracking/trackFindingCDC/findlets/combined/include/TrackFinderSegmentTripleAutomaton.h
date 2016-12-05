@@ -23,8 +23,6 @@
 #include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
 
-#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
-
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
@@ -75,7 +73,7 @@ namespace Belle2 {
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
 
       /// Findlet responsible for the linking of tracks
-      TrackLinker<ChooseableTrackRelationFilter> m_trackLinker;
+      TrackLinker m_trackLinker;
 
       /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
       TrackOrienter m_trackOrienter;

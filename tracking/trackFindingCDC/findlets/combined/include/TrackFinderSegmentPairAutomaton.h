@@ -18,9 +18,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -55,7 +53,7 @@ namespace Belle2 {
     private:
       // Findlets
       /// Findlet responsible for the creation of segment pairs
-      SegmentPairCreator<ChooseableSegmentPairFilter> m_segmentPairCreator;
+      SegmentPairCreator m_segmentPairCreator;
 
       /// Findlet responsible for the creation of segment pairs relations of the CA.
       WeightedRelationCreator<const CDCSegmentPair, ChooseableSegmentPairRelationFilter> m_segmentPairRelationCreator;
@@ -67,7 +65,7 @@ namespace Belle2 {
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
 
       /// Findlet responsible for the linking of tracks
-      TrackLinker<ChooseableTrackRelationFilter> m_trackLinker;
+      TrackLinker m_trackLinker;
 
       /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
       TrackOrienter m_trackOrienter;

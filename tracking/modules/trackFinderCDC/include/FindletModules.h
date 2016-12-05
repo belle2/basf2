@@ -199,8 +199,7 @@ namespace Belle2 {
     /**
      * Module implementation using the AxialTrackCreatorSegmentHoughModule
      */
-    class AxialTrackCreatorSegmentHoughModule
-      : public FindletModule<AxialTrackCreatorSegmentHough> {
+    class AxialTrackCreatorSegmentHoughModule : public FindletModule<AxialTrackCreatorSegmentHough> {
 
       /// Type of the base class
       using Super = FindletModule<AxialTrackCreatorSegmentHough>;
@@ -233,11 +232,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableSegmentPairFilter
      */
-    class SegmentPairCreatorModule
-      : public FindletModule<SegmentPairCreator<ChooseableSegmentPairFilter>> {
+    class SegmentPairCreatorModule : public FindletModule<SegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentPairCreator<ChooseableSegmentPairFilter>>;
+      using Super = FindletModule<SegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -267,8 +265,7 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentPairAutomaton
      */
-    class TrackCreatorSegmentPairAutomatonModule
-      : public FindletModule<TrackCreatorSegmentPairAutomaton> {
+    class TrackCreatorSegmentPairAutomatonModule : public FindletModule<TrackCreatorSegmentPairAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackCreatorSegmentPairAutomaton>;
@@ -284,8 +281,7 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackCreatorSegmentTripleAutomaton
      */
-    class TrackCreatorSegmentTripleAutomatonModule
-      : public FindletModule<TrackCreatorSegmentTripleAutomaton> {
+    class TrackCreatorSegmentTripleAutomatonModule : public FindletModule<TrackCreatorSegmentTripleAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackCreatorSegmentTripleAutomaton>;
@@ -317,7 +313,7 @@ namespace Belle2 {
     /**
      * Module implementation using the TrackLinker
      */
-    class TrackLinkerModule : public FindletModule<TrackLinker<ChooseableTrackRelationFilter>> {
+    class TrackLinkerModule : public FindletModule<TrackLinker> {
     };
 
     /**
@@ -378,8 +374,7 @@ namespace Belle2 {
     /*
      * Combined Module using a combination of filters for segments
      */
-    class SegmentFinderFacetAutomatonModule
-      : public FindletModule<SegmentFinderFacetAutomaton> {
+    class SegmentFinderFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<SegmentFinderFacetAutomaton>;

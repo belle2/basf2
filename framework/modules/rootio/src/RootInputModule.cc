@@ -103,11 +103,16 @@ void RootInputModule::initialize()
   //Open TFile
   TDirectory* dir = gDirectory;
   for (const string& fileName : m_inputFileNames) {
-    TFile* f = TFile::Open(fileName.c_str(), "READ");
+    std::unique_ptr<TFile> f;
+    try {
+      f.reset(TFile::Open(fileName.c_str(), "READ"));
+    } catch (std::logic_error&) {
+      //this might happen for ~invaliduser/foo.root
+      //actually undefined behaviour per standard, reported as ROOT-8490 in JIRA
+    }
     if (!f || !f->IsOpen()) {
       B2FATAL("Couldn't open input file " + fileName);
     }
-    delete f;
   }
   dir->cd();
 

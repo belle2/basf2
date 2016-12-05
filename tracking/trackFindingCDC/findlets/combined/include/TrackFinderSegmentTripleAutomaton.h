@@ -19,6 +19,12 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
+#include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
+#include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
+
+#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
+
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
@@ -29,10 +35,6 @@ namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Findlet implementing the track finding from segments using a cellular automaton over segment triples
-    template <class AAxialSegmentPairFilter,
-              class ASegmentTripleFilter,
-              class ASegmentTripleRelationFilter,
-              class ATrackRelationFilter>
     class TrackFinderSegmentTripleAutomaton : public Findlet<const CDCSegment2D, CDCTrack> {
 
     private:
@@ -41,81 +43,30 @@ namespace Belle2 {
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery
-      TrackFinderSegmentTripleAutomaton()
-      {
-        this->addProcessingSignalListener(&m_axialSegmentPairCreator);
-        this->addProcessingSignalListener(&m_segmentTripleCreator);
-        this->addProcessingSignalListener(&m_segmentTripleRelationCreator);
-        this->addProcessingSignalListener(&m_trackCreatorSegmentTripleAutomaton);
-        this->addProcessingSignalListener(&m_trackCreatorSingleSegments);
-        this->addProcessingSignalListener(&m_trackLinker);
-        this->addProcessingSignalListener(&m_trackOrienter);
-        this->addProcessingSignalListener(&m_segmentTripleSwapper);
-
-        m_axialSegmentPairs.reserve(75);
-        m_segmentTriples.reserve(100);
-        m_segmentTripleRelations.reserve(100);
-        m_preLinkingTracks.reserve(20);
-        m_orientedTracks.reserve(20);
-      }
+      TrackFinderSegmentTripleAutomaton();
 
       /// Short description of the findlet
-      std::string getDescription() override final
-      {
-        return "Generates tracks from segments using a cellular automaton built from segment triples.";
-      }
+      std::string getDescription() final;
 
       /// Expose the parameters to a module
-      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override final
-      {
-        m_axialSegmentPairCreator.exposeParameters(moduleParamList, prefixed(prefix, "axialSegmentPair"));
-        m_segmentTripleCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTriple"));
-        m_segmentTripleRelationCreator.exposeParameters(moduleParamList, prefixed(prefix, "segmentTripleRelation"));
-        m_trackCreatorSegmentTripleAutomaton.exposeParameters(moduleParamList, prefix);
-        m_trackCreatorSingleSegments.exposeParameters(moduleParamList, prefix);
-        m_trackLinker.exposeParameters(moduleParamList, prefixed(prefix, "TrackRelation"));
-        m_trackOrienter.exposeParameters(moduleParamList, prefix);
-        m_segmentTripleSwapper.exposeParameters(moduleParamList, prefix);
-      }
+      void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) final;
 
       /// Signal the beginning of a new event
-      void beginEvent() override final
-      {
-        m_axialSegmentPairs.clear();
-        m_segmentTriples.clear();
-        m_segmentTripleRelations.clear();
-        m_preLinkingTracks.clear();
-        m_orientedTracks.clear();
-        Super::beginEvent();
-      }
+      void beginEvent() final;
 
       /// Generates the tracks.
-      void apply(const std::vector<CDCSegment2D>& inputSegments,
-                 std::vector<CDCTrack>& tracks) override final
-      {
-        m_axialSegmentPairCreator.apply(inputSegments, m_axialSegmentPairs);
-        m_segmentTripleCreator.apply(inputSegments, m_axialSegmentPairs, m_segmentTriples);
-        m_segmentTripleRelationCreator.apply(m_segmentTriples, m_segmentTripleRelations);
-        m_trackCreatorSegmentTripleAutomaton.apply(m_segmentTriples, m_segmentTripleRelations, m_preLinkingTracks);
-
-        m_trackCreatorSingleSegments.apply(inputSegments, m_preLinkingTracks);
-        m_trackOrienter.apply(m_preLinkingTracks, m_orientedTracks);
-        m_trackLinker.apply(m_orientedTracks, tracks);
-
-        // Put the segment triples on the DataStore
-        m_segmentTripleSwapper.apply(m_segmentTriples);
-      }
+      void apply(const std::vector<CDCSegment2D>& inputSegments, std::vector<CDCTrack>& tracks) final;
 
     private:
       // Findlets
       /// Instance of the axial to axial segment pair creator
-      AxialSegmentPairCreator<AAxialSegmentPairFilter> m_axialSegmentPairCreator;
+      AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter> m_axialSegmentPairCreator;
 
       /// Instance of the segment triple creator
-      SegmentTripleCreator<ASegmentTripleFilter> m_segmentTripleCreator;
+      SegmentTripleCreator<ChooseableSegmentTripleFilter> m_segmentTripleCreator;
 
       /// Instance of the segment triple relation creator
-      WeightedRelationCreator<const CDCSegmentTriple, ASegmentTripleRelationFilter> m_segmentTripleRelationCreator;
+      WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter> m_segmentTripleRelationCreator;
 
       /// Instance of the cellular automaton creating  creating tracks over segment triple
       TrackCreatorSegmentTripleAutomaton m_trackCreatorSegmentTripleAutomaton;
@@ -124,7 +75,7 @@ namespace Belle2 {
       TrackCreatorSingleSegments m_trackCreatorSingleSegments;
 
       /// Findlet responsible for the linking of tracks
-      TrackLinker<ATrackRelationFilter> m_trackLinker;
+      TrackLinker<ChooseableTrackRelationFilter> m_trackLinker;
 
       /// Fixes the direction of flight of tracks by a simple chooseable heuristic.
       TrackOrienter m_trackOrienter;

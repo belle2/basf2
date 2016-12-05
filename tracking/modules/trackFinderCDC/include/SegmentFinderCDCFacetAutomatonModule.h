@@ -12,34 +12,20 @@
 #include <tracking/trackFindingCDC/findlets/combined/SegmentFinderFacetAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
-
 namespace Belle2 {
   namespace TrackFindingCDC {
 
     /// Generates segments from hits using a cellular automaton build from hit triples (facets).
-    class SegmentFinderCDCFacetAutomatonModule :
-      public FindletModule<SegmentFinderFacetAutomaton<ChooseableClusterFilter,
-      ChooseableFacetFilter,
-      ChooseableFacetRelationFilter,
-      ChooseableSegmentRelationFilter> > {
-
+    class SegmentFinderCDCFacetAutomatonModule : public FindletModule<SegmentFinderFacetAutomaton> {
 
     private:
       /// Type of the base class
-      using Super = FindletModule<SegmentFinderFacetAutomaton<ChooseableClusterFilter,
-            ChooseableFacetFilter,
-            ChooseableFacetRelationFilter,
-            ChooseableSegmentRelationFilter> >;
+      using Super = FindletModule<SegmentFinderFacetAutomaton>;
 
     public:
       /// Default constructor initialising the filters with the default settings
       SegmentFinderCDCFacetAutomatonModule();
 
     }; // end class SegmentFinderCDCFacetAutomatonModule
-
   } //end namespace TrackFindingCDC
 } //end namespace Belle2

@@ -286,8 +286,6 @@ bool MCMatching::isRadiativePhoton(const MCParticle* p)
 
 //utility functions used by getMissingParticleFlags()
 namespace {
-  using namespace MCMatching;
-
   /** Recursively gather all matched MCParticles in daughters of p (taking special care of decay-in-flight things). */
   void appendParticles(const Particle* p, unordered_set<const MCParticle*>& mcMatchedParticles)
   {
@@ -298,7 +296,9 @@ namespace {
       const MCParticle* mcParticle = daug->getRelatedTo<MCParticle>();
       if (mcParticle) {
         mcMatchedParticles.insert(mcParticle);
-        if (daug->getNDaughters() == 0 and (unsigned int)daug->getExtraInfo(c_extraInfoMCErrors) & c_DecayInFlight) {
+        if (daug->getNDaughters() == 0 and
+            static_cast<unsigned int>(daug->getExtraInfo(MCMatching::c_extraInfoMCErrors)) &
+            MCMatching::c_DecayInFlight) {
           //particle at the bottom of reconstructed decay tree, reconstructed from an MCParticle that is actually slightly deeper than we want,
           //so we'll also add all mother MCParticles until the first primary mother
           do {

@@ -19,8 +19,6 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
@@ -58,10 +56,10 @@ namespace Belle2 {
     private:
       // Findlets
       /// Instance of the axial to axial segment pair creator
-      AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter> m_axialSegmentPairCreator;
+      AxialSegmentPairCreator m_axialSegmentPairCreator;
 
       /// Instance of the segment triple creator
-      SegmentTripleCreator<ChooseableSegmentTripleFilter> m_segmentTripleCreator;
+      SegmentTripleCreator m_segmentTripleCreator;
 
       /// Instance of the segment triple relation creator
       WeightedRelationCreator<const CDCSegmentTriple, ChooseableSegmentTripleRelationFilter> m_segmentTripleRelationCreator;

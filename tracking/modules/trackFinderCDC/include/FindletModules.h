@@ -40,20 +40,6 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
-#include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
-
-#include <tracking/trackFindingCDC/filters/segmentPair/ChooseableSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
-
-#include <tracking/trackFindingCDC/filters/axialSegmentPair/ChooseableAxialSegmentPairFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTriple/ChooseableSegmentTripleFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
-
-#include <tracking/trackFindingCDC/filters/trackRelation/ChooseableTrackRelationFilter.h>
-
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
 /******* Minimal Findlets **********/
@@ -215,11 +201,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableAxialSegmentPairFilter
      */
-    class AxialSegmentPairCreatorModule
-      : public FindletModule<AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter>> {
+    class AxialSegmentPairCreatorModule : public FindletModule<AxialSegmentPairCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<AxialSegmentPairCreator<ChooseableAxialSegmentPairFilter>>;
+      using Super = FindletModule<AxialSegmentPairCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -248,11 +233,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableSegmentTripleFilter
      */
-    class SegmentTripleCreatorModule
-      : public FindletModule<SegmentTripleCreator<ChooseableSegmentTripleFilter>> {
+    class SegmentTripleCreatorModule : public FindletModule<SegmentTripleCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<SegmentTripleCreator<ChooseableSegmentTripleFilter>>;
+      using Super = FindletModule<SegmentTripleCreator>;
 
     public:
       /// Constructor setting the default store vector names

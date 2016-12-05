@@ -95,10 +95,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterRefiner
      */
-    class ClusterRefinerModule : public FindletModule<ClusterRefiner<>> {
+    class ClusterRefinerModule : public FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>> {
 
       /// Type of the base class
-      using Super = FindletModule<ClusterRefiner<>>;
+      using Super = FindletModule<ClusterRefiner<BridgingWireHitRelationFilter>>;
 
     public:
       /// Constructor setting the default store vector names
@@ -111,10 +111,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ClusterBackgroundDetector
      */
-    class ClusterBackgroundDetectorModule
-      : public FindletModule<ClusterBackgroundDetector<ChooseableClusterFilter>> {
+    class ClusterBackgroundDetectorModule : public FindletModule<ClusterBackgroundDetector> {
+
       /// Type of the base class
-      using Super = FindletModule<ClusterBackgroundDetector<ChooseableClusterFilter>>;
+      using Super = FindletModule<ClusterBackgroundDetector>;
 
     public:
       /// Constructor setting the default store vector names
@@ -127,10 +127,10 @@ namespace Belle2 {
     /**
      * Module implementation using the ChooseableFacetFilter
      */
-    class FacetCreatorModule : public FindletModule<FacetCreator<ChooseableFacetFilter>> {
+    class FacetCreatorModule : public FindletModule<FacetCreator> {
 
       /// Type of the base class
-      using Super = FindletModule<FacetCreator<ChooseableFacetFilter>>;
+      using Super = FindletModule<FacetCreator>;
 
     public:
       /// Constructor setting the default store vector names
@@ -159,8 +159,7 @@ namespace Belle2 {
     /**
      * Module implementation using the SegmentLinker
      */
-    class SegmentLinkerModule
-      : public FindletModule<SegmentLinker<ChooseableSegmentRelationFilter>> {
+    class SegmentLinkerModule : public FindletModule<SegmentLinker> {
     };
 
     /**

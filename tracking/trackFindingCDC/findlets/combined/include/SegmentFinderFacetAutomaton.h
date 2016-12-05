@@ -23,10 +23,8 @@
 
 #include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
-#include <tracking/trackFindingCDC/filters/cluster/ChooseableClusterFilter.h>
-#include <tracking/trackFindingCDC/filters/facet/ChooseableFacetFilter.h>
+#include <tracking/trackFindingCDC/filters/wireHitRelation/BridgingWireHitRelationFilter.h>
 #include <tracking/trackFindingCDC/filters/facetRelation/ChooseableFacetRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/segmentRelation/ChooseableSegmentRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/segments/CDCWireHitCluster.h>
@@ -66,13 +64,13 @@ namespace Belle2 {
       SuperClusterCreator m_superClusterCreator;
 
       /// Creates the clusters from super clusters
-      ClusterRefiner<> m_clusterRefiner;
+      ClusterRefiner<BridgingWireHitRelationFilter> m_clusterRefiner;
 
       /// Marks the clusters as background
-      ClusterBackgroundDetector<ChooseableClusterFilter> m_clusterBackgroundDetector;
+      ClusterBackgroundDetector m_clusterBackgroundDetector;
 
       /// Creates the facet (hit triplet) cells of the cellular automaton
-      FacetCreator<ChooseableFacetFilter> m_facetCreator;
+      FacetCreator m_facetCreator;
 
       /// Creates the facet (hit triplet) relations of the cellular automaton
       WeightedRelationCreator<const CDCFacet, ChooseableFacetRelationFilter> m_facetRelationCreator;
@@ -90,7 +88,7 @@ namespace Belle2 {
       SegmentOrienter m_segmentOrienter;
 
       /// Link segments with closeby segments of the same super cluster
-      SegmentLinker<ChooseableSegmentRelationFilter> m_segmentLinker;
+      SegmentLinker m_segmentLinker;
 
       /// Puts the internal super clusters on the DataStore
       StoreVectorSwapper<CDCWireHitCluster> m_superClusterSwapper{

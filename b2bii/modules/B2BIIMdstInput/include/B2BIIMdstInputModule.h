@@ -16,6 +16,7 @@
 #include "belle_legacy/panther/panther_group.h"
 
 #include <string>
+#include <set>
 
 namespace Belle2 {
 
@@ -67,13 +68,25 @@ namespace Belle2 {
     std::string m_inputFileName;
     /** List of input MDST filenames */
     std::vector<std::string> m_inputFileNames;
+    /**
+     * The number sequences (e.g. 23~42,101) defining the events which are processed for each inputFileName.
+     */
+    std::vector<std::string> m_eventSequences;
 
     //! PantherFile
     Belle::Panther_FileIO* m_fd{nullptr};
 
-    //! Event counter
+    //! Global event counter
     int m_nevt;
 
+    //! File counter
+    int m_current_file_position;
+
+    //! Event counter in current file
+    int m_current_file_nevt;
+
+    //! Event numbers which are valid for the current file
+    std::set<int64_t> m_valid_nevt_in_current_file;
   };
 
 } // end namespace Belle2

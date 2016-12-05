@@ -20,6 +20,7 @@
 
 // Belle II dataobjects
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/utilities/NumberSequence.h>
 
 #include <cstdlib>
 #include <algorithm>
@@ -66,12 +67,19 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
   setPropertyFlags(c_Input);
 
   m_nevt = -1;
+  m_current_file_position = -1;
 
   //Parameter definition
   addParam("inputFileName", m_inputFileName, "Belle MDST input file name. "
            "For more than one file use inputFileNames", std::string(""));
   addParam("inputFileNames"  , m_inputFileNames, "Belle MDST input file names.",
            m_inputFileNames);
+
+  std::vector<std::string> emptyvector;
+  addParam("eventSequences", m_eventSequences,
+           "The number sequences (e.g. 23~42,101) defining the event which are processed for each inputFileName."
+           "Must be specified exactly once for each file to be opened."
+           "The first event has the number 0.", emptyvector);
 }
 
 
@@ -95,10 +103,20 @@ void B2BIIMdstInputModule::initialize()
 {
   m_inputFileNames = globbing(getInputFiles());
 
+  auto eventSequencesOverride = Environment::Instance().getEventsSequencesOverride();
+  if (eventSequencesOverride.size() > 0)
+    m_eventSequences = eventSequencesOverride;
+
   //Check if there is at least one filename provided
   if (m_inputFileNames.empty()) {
     B2FATAL("Empty list of files supplied, cannot continue");
   }
+
+  if (m_eventSequences.size() > 0 and m_inputFileNames.size() != m_eventSequences.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given eventSequences parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(eventSequences) = " << m_eventSequences.size());
+  }
+
   //Ok we have files. Since vectors can only remove efficiently from the back
   //we reverse the order and read the files from back to front.
   std::reverse(m_inputFileNames.begin(), m_inputFileNames.end());
@@ -164,25 +182,38 @@ bool B2BIIMdstInputModule::openNextFile()
     B2FATAL("Couldn't read file '" << name << "'!");
   }
   m_nevt++;
+  m_current_file_position++;
+  m_current_file_nevt = -1;
+
+  if (m_eventSequences.size() > 0)
+    m_valid_nevt_in_current_file = generate_number_sequence(m_eventSequences[m_current_file_position]);
+
   return true;
 }
 
 bool B2BIIMdstInputModule::readNextEvent()
 {
-  // read event
-  int rectype = -1;
-  while (rectype < 0 && rectype != -2) {
-    //clear all previous event data before reading!
-    BsClrTab(BBS_CLEAR);
-    rectype = m_fd->read();
-    if (rectype == -1) {
-      B2ERROR("Error while reading panther tables! Record skipped.");
+
+  do {
+    m_current_file_nevt++;
+    // read event
+    int rectype = -1;
+    while (rectype < 0 && rectype != -2) {
+      //clear all previous event data before reading!
+      BsClrTab(BBS_CLEAR);
+      rectype = m_fd->read();
+      if (rectype == -1) {
+        B2ERROR("Error while reading panther tables! Record skipped.");
+      }
     }
-  }
-  if (rectype == -2) { // EoF detected
-    B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
-    return false;
-  }
+    if (rectype == -2) { // EoF detected
+      B2DEBUG(99, "[B2BIIMdstInputModule::Conversion] Conversion stopped at event #" << m_nevt << ". EOF detected!");
+      return false;
+    }
+
+  } while (m_eventSequences.size() > 0
+           and m_valid_nevt_in_current_file.find(m_current_file_nevt) == m_valid_nevt_in_current_file.end());
+
   return true;
 }
 

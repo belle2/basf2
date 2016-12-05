@@ -107,9 +107,9 @@ namespace Belle2 {
     std::vector<std::string> m_inputFileNames;
 
     /**
-     * The number of events to process for each filename
+     * The number sequences (e.g. 23~42,101) defining the events which are processed for each inputFileName.
      */
-    std::vector<unsigned int> m_nEventsPerFile;
+    std::vector<std::string> m_eventSequences;
 
     /** Ignore filename override from command line
      */

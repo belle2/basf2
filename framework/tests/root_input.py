@@ -46,6 +46,11 @@ main.add_module(printcollections)
 # Process events
 process(main)
 
+# Test restricting the number of events per file
+# This issues a warning because a part of the events is out of range
+input.param('eventSequences', ["0,3~10,23"])
+process(main)
+
 # Test starting directly with a given event. There will be a fatal error if the
 # event is not found in the file so let's call process() in a child process to
 # not be aborted

@@ -65,11 +65,11 @@ namespace Belle2 {
     /** Returns number of events in run 1 for EventInfoSetter module, or 0 for no override. */
     unsigned int getNumberEventsOverride() const { return m_numberEventsOverride; }
 
-    /** Override number of events to process for each filename given in inputFilesOverride*/
-    void setNEventsPerFile(const std::vector<unsigned int>& nEventsPerFile) { m_nEventsPerFileOverride = nEventsPerFile; }
+    /** Override the number sequences (e.g. 23~42,101) defining the events which are processed for each filename given in inputFilesOverride*/
+    void setEventSequencesOverride(const std::vector<std::string>& sequences) { m_eventSequencesOverride = sequences; }
 
-    /** Returns number of events to process for each filename given in inputFilesOverride */
-    std::vector<unsigned int> getNEventsPerFileOverride() const { return m_nEventsPerFileOverride; }
+    /** Returns the number sequences (e.g. 23~42,101) defining the events which are processed for each filename given in inputFilesOverride*/
+    std::vector<std::string> getEventsSequencesOverride() const { return m_eventSequencesOverride; }
 
     /** Return the number of events, from either input or EventInfoSetter, or -n command line override (if less). */
     unsigned int getNumberOfEvents() const;
@@ -205,8 +205,8 @@ namespace Belle2 {
     std::string m_steering;       /**< The content of the steering file. */
     unsigned int m_numberEventsOverride;   /**< Override number of events in the first run. */
     std::vector<std::string> m_inputFilesOverride; /**< Override input file names for input modules */
-    std::vector<unsigned int>
-    m_nEventsPerFileOverride; /**< Returns number of events to process for each filename given in inputFilesOverride */
+    std::vector<std::string>
+    m_eventSequencesOverride; /**< A number sequence (e.g. 23~42,101) defining the event which are processed for each input file in m_inputFilesOverride.*/
     std::string m_outputFileOverride; /**< Override name of output file for output module */
     int m_numberProcessesOverride; /**< Override m_numberProcesses if >= 0 */
     int m_logLevelOverride; /**< Override global log level if != LogConfig::c_Default. */

@@ -25,6 +25,7 @@ using namespace std;
 namespace io = boost::iostreams;
 namespace Belle2 {
 
+  /** Triangle structure */
   struct triangle_t {
     /** vertex indicies in a list of xy-points */
     short int j0, j1, j2;
@@ -32,13 +33,24 @@ namespace Belle2 {
     short int n0, n1, n2;
   };
 
+  /** A simple 2d vector stucture */
   struct xy_t {
-    double x, y;
+    double x; /**< x component */
+    double y; /**< y component */
   };
 
+  /** A simple 3d vector stucture */
   struct vector3_t {
-    double x, y, z;
+    double x; /**< x component */
+    double y; /**< y component */
+    double z; /**< z component */
 
+    /**
+     * Sum up the vector components
+     *
+     * @param t the vector to add
+     * @return  reference to resulting vector
+     */
     vector3_t& operator +=(const vector3_t& u)
     {
       x += u.x;
@@ -48,21 +60,49 @@ namespace Belle2 {
     }
   };
 
+  /**
+   * Sum up two vectors
+   *
+   * @param u first vector
+   * @param v second vector
+   * @return  sum of two vector
+   */
   vector3_t operator +(const vector3_t& u, const vector3_t& v)
   {
     return {u.x + v.x, u.y + v.y, u.z + v.z};
   }
 
+  /**
+   * Difference of two vectors
+   *
+   * @param u first vector
+   * @param v second vector
+   * @return  u-v result
+   */
   vector3_t operator -(const vector3_t& u, const vector3_t& v)
   {
     return {u.x - v.x, u.y - v.y, u.z - v.z};
   }
 
+  /**
+   * vector scaled by a scalar
+   *
+   * @param u the vector
+   * @param a the scalar
+   * @return  result a*u
+   */
   vector3_t operator *(const vector3_t& u, double a)
   {
     return {u.x * a, u.y * a, u.z * a};
   }
 
+  /**
+   * vector scaled by a scalar
+   *
+   * @param a the scalar
+   * @param u the vector
+   * @return  result a*u
+   */
   vector3_t operator *(double a, const vector3_t& u)
   {
     return u * a;
@@ -85,13 +125,16 @@ namespace Belle2 {
     /** returns list of triangles */
     const vector<triangle_t>& getTriangles() const { return m_triangles;}
 
+    /** Default constructor */
     TriangularInterpolation() {}
 
+    /** More complex constructor */
     TriangularInterpolation(vector<xy_t>& pc, vector<triangle_t>& ts, double d)
     {
       init(pc, ts, d);
     }
 
+    /** Destructor */
     ~TriangularInterpolation() {}
 
     /**
@@ -273,12 +316,21 @@ namespace Belle2 {
     /** Spatial index */
     vector<short int> m_spatialIndex;
     /** Border of the region where the spatial index is constructed */
-    double m_xmin, m_xmax;
-    double m_ymin, m_ymax;
+    double m_xmin;
+    /** Border of the region where the spatial index is constructed */
+    double m_xmax;
+    /** Border of the region where the spatial index is constructed */
+    double m_ymin;
+    /** Border of the region where the spatial index is constructed */
+    double m_ymax;
     /** Spatial index grid size */
-    unsigned int m_nx, m_ny;
+    unsigned int m_nx;
+    /** Spatial index grid size */
+    unsigned int m_ny;
     /** Reciprocals to speedup the index calculation */
-    double m_ixnorm, m_iynorm;
+    double m_ixnorm{1};
+    /** Reciprocals to speedup the index calculation */
+    double m_iynorm{1};
   };
 
   /**
@@ -292,8 +344,19 @@ namespace Belle2 {
    */
   class BeamlineFieldMapInterpolation {
   public:
+    /**
+     * Expose the triangular interpolation to outside
+     *
+     * @return constant reference to the interpolation
+     */
     const TriangularInterpolation& getTriangularInterpolation() const {return m_triInterpol;}
+    /**
+     * Default constructor
+     */
     BeamlineFieldMapInterpolation() {}
+    /**
+     * Default destructor
+     */
     ~BeamlineFieldMapInterpolation() {}
 
     /**
@@ -357,17 +420,16 @@ namespace Belle2 {
       vector<vector3_t> tbc;
       pc.reserve(nrphi);
       char cbuf[256]; IN.getline(cbuf, 256);
-      double r, phi, Br, Bphi, Bz;
       double rmax = 0;
       for (int j = 0; j < nrphi; j++) {
         IN.getline(cbuf, 256);
         char* next = cbuf;
-        r    = strtod(next, &next);
-        phi  = strtod(next, &next);
+        double r    = strtod(next, &next);
+        double phi  = strtod(next, &next);
         strtod(next, &next);
-        Br   = strtod(next, &next);
-        Bphi = strtod(next, &next);
-        Bz   = strtod(next, NULL);
+        double Br   = strtod(next, &next);
+        double Bphi = strtod(next, &next);
+        double Bz   = strtod(next, NULL);
         r *= 100;
         rmax = std::max(r, rmax);
         if (phi == 0) {
@@ -465,9 +527,9 @@ namespace Belle2 {
           next = strchr(next, ' ');
           next = strchr(next + 1, ' ');
           next = strchr(next + 1, ' ');
-          Br   = strtod(next, &next);
-          Bphi = strtod(next, &next);
-          Bz   = strtod(next, NULL);
+          double Br   = strtod(next, &next);
+          double Bphi = strtod(next, &next);
+          double Bz   = strtod(next, NULL);
           if (cs[j].s == 0) Bphi = 0;
           double Bx = Br * cs[j].c - Bphi * cs[j].s;
           double By = Br * cs[j].s + Bphi * cs[j].c;
@@ -594,39 +656,39 @@ namespace Belle2 {
     /** Object to locate point in a triangular mesh */
     TriangularInterpolation m_triInterpol;
     /** Number of field points in XY plane */
-    int m_nxy;
+    int m_nxy{0};
     /** Number of field slices in Z direction */
-    int m_nz;
+    int m_nz{0};
     /** Start Z slice number for the finer Z grid */
-    int m_nz1;
+    int m_nz1{0};
     /** End Z slice number for the finer Z grid */
-    int m_nz2;
+    int m_nz2{0};
     /** Number of grid points in R direction */
-    int m_nr;
+    int m_nr{0};
     /** Number of grid points in Phi direction */
-    int m_nphi;
+    int m_nphi{0};
     /** Separation radius between triangular and cylindrical meshes */
-    double m_rj;
+    double m_rj{0};
     /** Square of the separation radius between triangular and cylindrical meshes */
-    double m_rj2;
+    double m_rj2{0};
     /** Z border of finer Z grid */
-    double m_zj;
+    double m_zj{0};
     /** Coarse Z grid pitch */
-    double m_dz0;
+    double m_dz0{0};
     /** Finer Z grid pitch */
-    double m_dz1;
+    double m_dz1{0};
     /** Inverse of coarse Z grid pitch */
-    double m_idz0;
+    double m_idz0{0};
     /** Inverse of finer Z grid pitch */
-    double m_idz1;
+    double m_idz1{0};
     /** Repciprocal of Phi grid */
-    double m_idphi;
+    double m_idphi{0};
     /** Repciprocal of R grid */
-    double m_idr;
+    double m_idr{0};
     /** Maximal radius where interpolation is still valid */
-    double m_rmax;
+    double m_rmax{0};
     /** Maximal Z where interpolation is still valid */
-    double m_zmax;
+    double m_zmax{0};
   };
 
   void BFieldComponentBeamline::initialize()

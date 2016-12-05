@@ -140,7 +140,17 @@ namespace Belle2 {
      */
     void enableCoordinate(std::string mapEnable = "rphiz") { m_mapEnable = mapEnable; }
 
-    struct vector3_t { double x, y, z;};
+    /**
+     * A simple 3D vector structure.
+     */
+    struct vector3_t {
+      /** The x component */
+      double x;
+      /** The y component */
+      double y;
+      /** The z component */
+      double z;
+    };
   protected:
 
   private:

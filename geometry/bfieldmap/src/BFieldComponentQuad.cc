@@ -167,8 +167,6 @@ void BFieldComponentQuad::initialize()
 
   m_maxr2 *= m_maxr2;
 
-  const int ROTATE_DIRECTION = 1; // 1: default, 0: rotate-off, -1: inversely rotate
-
   /** fold rotation to/from lense frame to a single matrix multiplicaton and vector addition
    *
    * @param in  map with angle inside
@@ -197,15 +195,16 @@ void BFieldComponentQuad::initialize()
       SK0 *= k;
       SK1 *= k;
 
+#define ROTATE_DIRECTION 1 // 1: default, 0: rotate-off, -1: inversely rotate
+#if ROTATE_DIRECTION==0
+      double sphi = 0, cphi = 1;
+#else
       double sphi, cphi;
       sincos(-b->ROTATE * (M_PI / 180), &sphi, &cphi);
-      if (ROTATE_DIRECTION == 1)
-        sphi = sphi, cphi = cphi;
-      else if (ROTATE_DIRECTION == -1)
-        sphi = -sphi, cphi = cphi;
-      else if (ROTATE_DIRECTION == 0)
-        sphi = 0, cphi = 1;
-
+#if ROTATE_DIRECTION==-1
+      sphi = -sphi;
+#endif
+#endif
       double s2phi = 2 * cphi * sphi;
       double c2phi = cphi * cphi - sphi * sphi;
       double tp = DX * SK1 + DY * K1;
@@ -334,8 +333,19 @@ double BFieldComponentQuad::getApertureLER(double s) const
   return getAperture(s, m_offset_ap_ler[i]);
 }
 
+/**
+ * A simple 3d vector structure
+ */
 struct vector3_t {
-  double x, y, z;
+  double x; /**< x component */
+  double y; /**< y component */
+  double z; /**< z component */
+
+  /**
+   * get the square of the component transverse to the Z axis
+   *
+   * @return transerse component squared
+   */
   inline double rho2() const {return x * x + y * y;}
 };
 

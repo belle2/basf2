@@ -271,7 +271,6 @@ namespace Belle2 {
       G4double m_minTrackLength; /**< Min. track length (mm) required for saving in MCParticle. */
 
       int m_hitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC array.*/
-      int m_EBhitNumber; /**< The current number of created hits in an event. Used to fill the DataStore CDC EB array.*/
 
       std::multimap<unsigned short, CDCSimHit*>
       m_hitWithPosWeight; /**< Map containing hits with positive weight. Map may be replaced by vector, which may make the job speed faster... Try later. */

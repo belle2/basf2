@@ -211,8 +211,6 @@ namespace Belle2 {
     const unsigned layerId = v.GetCopyNo();
     B2DEBUG(150, "LayerID in continuous counting method: " << layerId);
 
-    G4LogicalVolume* aLogicalVolume = v.GetLogicalVolume();
-
     // If neutral particles, ignore them.
 
     if (charge == 0.) return false;

@@ -59,7 +59,7 @@ namespace Belle2 {
     //    m_cdcgp(CDCGeometryPar::Instance()),
     m_cdcgp(nullptr),
     m_thresholdEnergyDeposit(thresholdEnergyDeposit),
-    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0), m_EBhitNumber(0)
+    m_thresholdKineticEnergy(thresholdKineticEnergy), m_hitNumber(0)
   {
     StoreArray<MCParticle> mcParticles;
     StoreArray<CDCSimHit> cdcSimHits;

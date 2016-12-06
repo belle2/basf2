@@ -12,8 +12,6 @@
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
-#include <tracking/trackFindingCDC/numerics/Angle.h>
-#include <cassert>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

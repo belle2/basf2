@@ -7,18 +7,19 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentPair/MCSegmentPairFilter.h>
-
-#include <framework/logging/Logger.h>
 
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 
-#include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
+MCSegmentPairFilter::MCSegmentPairFilter(bool allowReverse)
+  : Super(allowReverse)
+{
+}
 
 Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
@@ -39,7 +40,8 @@ Weight MCSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   EForwardBackward pairFBInfo = mcSegmentLookUp.areAlignedInMCTrack(ptrFromSegment, ptrToSegment);
   if (pairFBInfo == EForwardBackward::c_Invalid) return NAN;
 
-  if (pairFBInfo == EForwardBackward::c_Forward or (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
+  if (pairFBInfo == EForwardBackward::c_Forward or
+      (getAllowReverse() and pairFBInfo == EForwardBackward::c_Backward)) {
     // Final check for the distance between the segment
     Index fromNPassedSuperLayers = mcSegmentLookUp.getLastNPassedSuperLayers(ptrFromSegment);
     if (fromNPassedSuperLayers == c_InvalidIndex) return NAN;

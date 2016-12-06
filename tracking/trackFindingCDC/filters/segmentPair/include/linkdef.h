@@ -1,4 +1,3 @@
-
 #include <tracking/trackFindingCDC/config/CompileConfiguration.h>
 
 #pragma link off all globals;
@@ -11,4 +10,3 @@
 #pragma link C++ class Belle2::TrackFindingCDC::MCSegmentPairFilter-;
 
 #endif
-

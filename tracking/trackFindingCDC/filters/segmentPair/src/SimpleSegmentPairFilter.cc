@@ -7,22 +7,14 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentPair/SimpleSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCAxialStereoFusion.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
-SimpleSegmentPairFilter::SimpleSegmentPairFilter()
-  : m_riemannFitter()
-{
-  m_riemannFitter.useOnlyOrientation();
-}
 
 Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {
@@ -94,8 +86,7 @@ Weight SimpleSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
   }
 }
 
-const CDCTrajectory2D&
-SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCSegment2D& segment) const
+const CDCTrajectory2D& SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCSegment2D& segment) const
 {
   CDCTrajectory2D& trajectory2D = segment.getTrajectory2D();
   if (not trajectory2D.isFitted()) {
@@ -104,8 +95,7 @@ SimpleSegmentPairFilter::getFittedTrajectory2D(const CDCSegment2D& segment) cons
   return trajectory2D;
 }
 
-const CDCTrajectory3D&
-SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair& segmentPair) const
+const CDCTrajectory3D& SimpleSegmentPairFilter::getFittedTrajectory3D(const CDCSegmentPair& segmentPair) const
 {
   const CDCSegment2D* ptrFromSegment = segmentPair.getFromSegment();
   const CDCSegment2D* ptrToSegment = segmentPair.getToSegment();

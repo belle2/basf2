@@ -7,23 +7,22 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-#pragma once
+#include <tracking/trackFindingCDC/filters/segmentPair/AllSegmentPairFilter.h>
 
-#include <tracking/trackFindingCDC/filters/segmentPair/BaseSegmentPairFilter.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
-namespace Belle2 {
-  namespace TrackFindingCDC {
-    class CDCSegmentPair;
+using namespace Belle2;
+using namespace TrackFindingCDC;
 
-    /// Filter for the constuction of axial to stereo segment pairs based on simple criteria.
-    class AllSegmentPairFilter : public Filter<CDCSegmentPair> {
+Weight AllSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
+{
+  const CDCSegment2D* ptrStartSegment = segmentPair.getFromSegment();
+  const CDCSegment2D* ptrEndSegment = segmentPair.getToSegment();
 
-    public:
-      /**
-       *  Checks if a pair of segments is a good combination.
-       *  All implementation always accepts with the total number of hits as weight.
-       */
-      Weight operator()(const CDCSegmentPair& segmentPair) final;
-    };
-  }
+  assert(ptrStartSegment);
+  assert(ptrEndSegment);
+
+  const CDCSegment2D& startSegment = *ptrStartSegment;
+  const CDCSegment2D& endSegment = *ptrEndSegment;
+  return startSegment.size() + endSegment.size();
 }

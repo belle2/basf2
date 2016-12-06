@@ -57,7 +57,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) override;
+      bool extract(const Relation<const CDCTrack>* ptrTrackRelation) final;
     };
   }
 }

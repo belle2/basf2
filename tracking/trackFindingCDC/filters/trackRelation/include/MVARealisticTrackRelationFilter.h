@@ -10,12 +10,13 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BaseTrackRelationFilter.h>
-#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
 #include <tracking/trackFindingCDC/filters/trackRelation/MVAFeasibleTrackRelationFilter.h>
 
 #include <tracking/trackFindingCDC/filters/trackRelation/BasicTrackRelationVarSet.h>
 #include <tracking/trackFindingCDC/filters/trackRelation/FitTrackRelationVarSet.h>
+
+#include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
 #include <tracking/trackFindingCDC/varsets/VariadicUnionVarSet.h>
 
@@ -37,7 +38,7 @@ namespace Belle2 {
       MVARealisticTrackRelationFilter();
 
       /// Function to object for its signalness
-      Weight operator()(const Relation<const CDCTrack>& trackRelation) override;
+      Weight operator()(const Relation<const CDCTrack>& trackRelation) final;
 
     private:
       /// Feasibility filter applied first before invoking the main cut

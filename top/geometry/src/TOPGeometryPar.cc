@@ -242,14 +242,21 @@ namespace Belle2 {
       // front-end electronics geometry
 
       GearDir feParams(content, "FrontEndGeo");
-      GearDir fbParams(feParams, "FrontBoard");
       TOPGeoBoardStack boardStack;
+      GearDir fbParams(feParams, "FrontBoard");
       boardStack.setFrontBoard(fbParams.getLength("width"),
                                fbParams.getLength("height"),
                                fbParams.getLength("thickness"),
                                fbParams.getLength("gap"),
                                fbParams.getLength("y"),
                                fbParams.getString("material"));
+      GearDir hvParams(feParams, "HVBoard");
+      boardStack.setHVBoard(hvParams.getLength("width"),
+                            hvParams.getLength("length"),
+                            hvParams.getLength("thickness"),
+                            hvParams.getLength("gap"),
+                            hvParams.getLength("y"),
+                            hvParams.getString("material"));
       GearDir bsParams(feParams, "BoardStack");
       boardStack.setBoardStack(bsParams.getLength("width"),
                                bsParams.getLength("height"),

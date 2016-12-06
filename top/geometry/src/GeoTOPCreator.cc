@@ -265,6 +265,7 @@ namespace Belle2 {
         auto* forward = new G4ExtrudedSolid("forwardEnvelope",
                                             polygon, forwardLength / 2,
                                             G4TwoVector(), 1, G4TwoVector(), 1);
+
         G4Transform3D move = G4TranslateZ3D((backwardLength + forwardLength) / 2);
         m_moduleEnvelope = new G4UnionSolid("moduleEnvelope", backward, forward, move);
       }
@@ -285,6 +286,8 @@ namespace Belle2 {
 
       G4ThreeVector move;
 
+      // front board
+
       double Z = -geo.getFrontBoardGap();
       double length = geo.getFrontBoardThickness();
       auto* frontBoard = createBox("TOPFrontBoard",
@@ -292,19 +295,40 @@ namespace Belle2 {
                                    geo.getFrontBoardHeight(),
                                    length,
                                    geo.getFrontBoardMaterial());
+      if (m_isBeamBkgStudy) {
+        if (!m_sensitivePCB1) m_sensitivePCB1 = new BkgSensitiveDetector("TOP", 1);
+        frontBoard->SetSensitiveDetector(m_sensitivePCB1);
+      }
       move.setZ(Z - length / 2);
       move.setY(geo.getFrontBoardY());
       frontEnd->AddPlacedVolume(frontBoard, move, 0);
+      Z -= length;
 
-      Z -= length + geo.getBoardStackGap();
+      // HV board
+
+      length = geo.getHVBoardLength();
+      auto* HVBoard = createBox("TOPHVBoard",
+                                geo.getHVBoardWidth(),
+                                geo.getHVBoardThickness(),
+                                length,
+                                geo.getHVBoardMaterial());
+      if (m_isBeamBkgStudy) {
+        if (!m_sensitivePCB2) m_sensitivePCB2 = new BkgSensitiveDetector("TOP", 2);
+        HVBoard->SetSensitiveDetector(m_sensitivePCB2);
+      }
+      move.setZ(Z  - geo.getHVBoardGap() - length / 2);
+      move.setY(geo.getHVBoardY());
+      frontEnd->AddPlacedVolume(HVBoard, move, 0);
+
+      // board stack
+
       length = geo.getBoardStackLength();
-      move.setZ(Z - length / 2);
+      move.setZ(Z  - geo.getBoardStackGap() - length / 2);
       move.setY(geo.getBoardStackY());
       auto* boardStack = createBoardStack(geo, N);
       frontEnd->AddPlacedVolume(boardStack, move, 0);
 
       return frontEnd;
-
     }
 
 

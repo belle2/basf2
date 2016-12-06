@@ -49,6 +49,27 @@ namespace Belle2 {
 
 
     /**
+     * Sets HV board data
+     * @param width HV board width
+     * @param length HV board length
+     * @param thickness HV board thickness
+     * @param gap gap between HV board and front board
+     * @param y position of HV board center in bar frame
+     * @param material HV board material
+     */
+    void setHVBoard(double width, double length, double thickness,
+                    double gap, double y, const std::string& material)
+    {
+      m_HVWidth = width;
+      m_HVLength = length;
+      m_HVThickness = thickness;
+      m_HVGap = gap;
+      m_HVy = y;
+      m_HVMaterial = material;
+    }
+
+
+    /**
      * Sets board stack data
      * @param width board stack width
      * @param height board stack height
@@ -108,6 +129,44 @@ namespace Belle2 {
      * @return material
      */
     const std::string& getFrontBoardMaterial() const {return m_FBMaterial;}
+
+
+    /**
+     * Returns HV board width
+     * @return width
+     */
+    double getHVBoardWidth() const {return m_HVWidth / s_unit;}
+
+    /**
+     * Returns HV board length
+     * @return length
+     */
+    double getHVBoardLength() const {return m_HVLength / s_unit;}
+
+    /**
+     * Returns HV board thickness
+     * @return thickness
+     */
+    double getHVBoardThickness() const {return m_HVThickness / s_unit;}
+
+    /**
+     * Returns gap between HV board and front board
+     * @return gap
+     */
+    double getHVBoardGap() const {return m_HVGap / s_unit;}
+
+    /**
+     * Returns position of HV board center in bar frame
+     * @return y
+     */
+    double getHVBoardY() const {return m_HVy / s_unit;}
+
+    /**
+     * Returns HV board material
+     * @return material
+     */
+    const std::string& getHVBoardMaterial() const {return m_HVMaterial;}
+
 
     /**
      * Returns board stack width
@@ -177,6 +236,13 @@ namespace Belle2 {
     float m_FBGap = 0;        /**< gap between front board and PMT array */
     float m_FBy = 0;          /**< position of front board center in bar frame */
     std::string m_FBMaterial; /**< front board material */
+
+    float m_HVWidth = 0;      /**< HV board width */
+    float m_HVLength = 0;     /**< HV board length */
+    float m_HVThickness = 0;  /**< HV board thickness */
+    float m_HVGap = 0;        /**< gap between HV board and front board */
+    float m_HVy = 0;          /**< position of HV board center in bar frame */
+    std::string m_HVMaterial; /**< HV board material */
 
     float m_BSWidth = 0;      /**< board stack width */
     float m_BSHeight = 0;     /**< board stack height */

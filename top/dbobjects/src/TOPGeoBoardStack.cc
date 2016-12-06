@@ -24,6 +24,12 @@ bool TOPGeoBoardStack::isConsistent() const
   if (m_FBGap < 0) return false;
   if (m_FBMaterial.empty()) return false;
 
+  if (m_HVWidth <= 0) return false;
+  if (m_HVLength <= 0) return false;
+  if (m_HVThickness <= 0) return false;
+  if (m_HVGap < 0) return false;
+  if (m_HVMaterial.empty()) return false;
+
   if (m_BSWidth <= 0) return false;
   if (m_BSHeight <= 0) return false;
   if (m_BSLength <= 0) return false;
@@ -46,13 +52,19 @@ void TOPGeoBoardStack::print(const std::string& title) const
   cout << ", y = " << getFrontBoardY() << " " << s_unitName;
   cout << ", material = " << getFrontBoardMaterial() << endl;
 
+  cout << " HV board: " << getHVBoardWidth() << " X " <<
+       getHVBoardLength() << " X " << getHVBoardThickness() << " " << s_unitName;
+  cout << ", gap = " << getHVBoardGap() << " " << s_unitName;
+  cout << ", y = " << getHVBoardY() << " " << s_unitName;
+  cout << ", material = " << getHVBoardMaterial() << endl;
+
   cout << " Board stack: " << getBoardStackWidth() << " X " <<
        getBoardStackHeight() << " X " << getBoardStackLength() << " " << s_unitName;
   cout << ", gap = " << getBoardStackGap() << " " << s_unitName;
   cout << ", y = " << getBoardStackY() << " " << s_unitName;
   cout << ", material = " << getBoardStackMaterial() << endl;
 
-  cout << "              spacer: width = " << getSpacerWidth() << " " << s_unitName;
+  cout << "              spacers: width = " << getSpacerWidth() << " " << s_unitName;
   cout << ", material = " << getSpacerMaterial() << endl;
 
 }

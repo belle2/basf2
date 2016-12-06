@@ -228,7 +228,7 @@ int main(int argc, char* argv[])
           "--callgrind-out-file=callgrind." + profileModule + ".%p",
         };
         //As execvp wants non-const char* pointers we have to copy the string contents.
-        for (auto argv : valgrind_argv) { cmd.push_back(strdup(argv.c_str())); }
+        for (auto arg : valgrind_argv) { cmd.push_back(strdup(arg.c_str())); }
         //And now we add our own arguments, including the program name.
         for (int i = 0; i < argc; ++i)  { cmd.push_back(argv[i]); }
         //Finally, execvp wants a nullptr as last argument

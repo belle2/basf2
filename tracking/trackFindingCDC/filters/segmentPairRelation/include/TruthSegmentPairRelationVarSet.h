@@ -49,7 +49,7 @@ namespace Belle2 {
 
     public:
       /// Generate and assign the contained variables
-      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) override;
+      bool extract(const Relation<const CDCSegmentPair>* ptrSegmentPairRelation) final;
     };
   }
 }

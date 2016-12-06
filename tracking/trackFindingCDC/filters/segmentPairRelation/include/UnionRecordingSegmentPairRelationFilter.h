@@ -35,11 +35,11 @@ namespace Belle2 {
 
     public:
       /// Get the valid names of variable sets for segment pair relations.
-      std::vector<std::string> getValidVarSetNames() const override;
+      std::vector<std::string> getValidVarSetNames() const final;
 
       /// Create a concrete variables set for segment pair relations from a name.
       std::unique_ptr<BaseVarSet<Relation<const CDCSegmentPair> > >
-      createVarSet(const std::string& name) const override;
+      createVarSet(const std::string& name) const final;
     };
   }
 }

@@ -35,8 +35,7 @@ namespace Belle2 {
 
     public:
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse) override
-      {
+      void setAllowReverse(bool allowReverse) final {
         Super::setAllowReverse(allowReverse);
         m_mcSegmentPairFilter.setAllowReverse(allowReverse);
       }

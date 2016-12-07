@@ -44,6 +44,7 @@ import validationpath
 import localcontrol
 import clustercontrol
 import clustercontrolsge
+import clustercontroldrmaa
 
 
 def statistics_plots(
@@ -454,7 +455,8 @@ class Validation:
         """
         return [localcontrol.Local,
                 clustercontrol.Cluster,
-                clustercontrolsge.Cluster]
+                clustercontrolsge.Cluster,
+                clustercontroldrmaa.Cluster]
 
     @staticmethod
     def get_available_job_control_names():

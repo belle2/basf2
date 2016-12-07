@@ -14,8 +14,8 @@ def add_cdc_trigger(path):
     trgcdc = register_module('TRGCDC')
     trgcdc_params = {
         'ConfigFile': Belle2.FileSystem.findFile("data/trg/cdc/TRGCDCConfig_0_20101111.dat"),
-        'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v2.2.coe"),
-        'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v2.2.coe"),
+        'InnerTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/innerLUT_v3.0.coe"),
+        'OuterTSLUTFile': Belle2.FileSystem.findFile("data/trg/cdc/outerLUT_v3.0.coe"),
         'HoughFinderMappingFileMinus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingMinus20160223.dat"),
         'HoughFinderMappingFilePlus': Belle2.FileSystem.findFile("data/trg/cdc/HoughMappingPlus20160223.dat"),
         '2DfinderCollection': 'TrgOld2DFinderTracks'}

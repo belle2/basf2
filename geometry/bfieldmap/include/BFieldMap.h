@@ -57,6 +57,9 @@ namespace Belle2 {
      */
     template<class BFIELDCOMP> BFIELDCOMP& addBFieldComponent();
 
+    /** Initialize the magnetic field after adding all components */
+    void initialize();
+
     /**
      * Clear the existing components
      */
@@ -96,6 +99,22 @@ namespace Belle2 {
     BFIELDCOMP* newComponent = new BFIELDCOMP;
     m_components.push_back(newComponent);
     return *newComponent;
+  }
+
+
+  inline const B2Vector3D BFieldMap::getBField(const B2Vector3D& point)
+  {
+    B2Vector3D magFieldVec(0.0, 0.0, 0.0);
+    //Check that the point makes sense
+    if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {
+      B2ERROR("Bfield requested for a position containing NaN, returning field 0");
+      return magFieldVec;
+    }
+    //Loop over all magnetic field components and add their magnetic field vectors
+    for (BFieldComponentAbs* comp : m_components) {
+      magFieldVec += comp->calculate(point);
+    }
+    return magFieldVec;
   }
 
 

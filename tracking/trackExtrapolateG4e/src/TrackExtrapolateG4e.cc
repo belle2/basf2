@@ -377,14 +377,19 @@ void TrackExtrapolateG4e::registerVolumes()
   for (vector<G4VPhysicalVolume*>::iterator iVol = pvStore->begin();
        iVol != pvStore->end(); ++iVol) {
     const G4String name = (*iVol)->GetName();
-    // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
-    if (name == "PlacedTOPModule") {
+    // TOP doesn't have one envelope; it has 16 "TOPModule"s
+    if (name.find("TOPModule") != string::npos) {
       m_EnterExit->push_back(*iVol);
     }
     // TOP quartz bar (=sensitive) has an automatically generated PV name
     // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-    // YYY is cuttest.
-    else if (name.find("_cuttest_") != string::npos) {
+    // YYY is as below
+    else if (name.find("_TOPPrism_") != string::npos or
+             name.find("_TOPBarSegment") != string::npos or
+             name.find("_TOPMirrorSegment") != string::npos or
+             name.find("TOPBarSegment1Glue") != string::npos or
+             name.find("TOPBarSegment2Glue") != string::npos or
+             name.find("TOPMirrorSegmentGlue") != string::npos) {
       m_EnterExit->push_back(*iVol);
     } else if (name == "ARICH.AerogelSupportPlate") {
       m_EnterExit->push_back(*iVol);
@@ -425,17 +430,19 @@ void TrackExtrapolateG4e::getVolumeID(const G4TouchableHandle& touch, Const::EDe
   if (name.find("CDC") != string::npos) {
     detID = Const::EDetector::CDC;
     copyID = touch->GetVolume(0)->GetCopyNo();
-  }
-  // TOP doesn't have one envelope; it has several "PlacedTOPModule"s
-  else if (name == "PlacedTOPModule") {
+  } else if (name.find("TOP") != string::npos) {
     detID = Const::EDetector::TOP;
-  }
-  // TOP quartz bar (=sensitive) has an automatically generated PV name
-  // av_WWW_impr_XXX_YYY_ZZZ because it is an imprint of a G4AssemblyVolume;
-  // YYY is cuttest.
-  else if (name.find("_cuttest_") != string::npos) {
-    detID = Const::EDetector::TOP;
-    copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
+    if (name.find("TOPModule") != string::npos) {
+      copyID = -touch->GetVolume(0)->GetCopyNo(); // negative to distinguish module and quartz hits
+    } else if (name.find("_TOPPrism_") != string::npos or
+               name.find("_TOPBarSegment") != string::npos or
+               name.find("_TOPMirrorSegment") != string::npos) {
+      copyID = (touch->GetHistoryDepth() >= 1) ? touch->GetVolume(1)->GetCopyNo() : 0;
+    } else if (name.find("TOPBarSegment1Glue") != string::npos or
+               name.find("TOPBarSegment2Glue") != string::npos or
+               name.find("TOPMirrorSegmentGlue") != string::npos) {
+      copyID = (touch->GetHistoryDepth() >= 2) ? touch->GetVolume(2)->GetCopyNo() : 0;
+    }
   }
   // ARICH has an envelope that contains modules that each contain a moduleWindow
   else if (name == "ARICH.AerogelSupportPlate") {

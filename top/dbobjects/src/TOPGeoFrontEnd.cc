@@ -8,7 +8,7 @@
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
 
-#include <top/dbobjects/TOPGeoBoardStack.h>
+#include <top/dbobjects/TOPGeoFrontEnd.h>
 #include <framework/gearbox/Unit.h>
 #include <math.h>
 #include <iostream>
@@ -16,7 +16,7 @@
 using namespace std;
 using namespace Belle2;
 
-bool TOPGeoBoardStack::isConsistent() const
+bool TOPGeoFrontEnd::isConsistent() const
 {
   if (m_FBWidth <= 0) return false;
   if (m_FBHeight <= 0) return false;
@@ -42,7 +42,7 @@ bool TOPGeoBoardStack::isConsistent() const
 }
 
 
-void TOPGeoBoardStack::print(const std::string& title) const
+void TOPGeoFrontEnd::print(const std::string& title) const
 {
   TOPGeoBase::print(title);
 

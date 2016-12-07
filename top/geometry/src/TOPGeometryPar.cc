@@ -242,31 +242,31 @@ namespace Belle2 {
       // front-end electronics geometry
 
       GearDir feParams(content, "FrontEndGeo");
-      TOPGeoBoardStack boardStack;
       GearDir fbParams(feParams, "FrontBoard");
-      boardStack.setFrontBoard(fbParams.getLength("width"),
-                               fbParams.getLength("height"),
-                               fbParams.getLength("thickness"),
-                               fbParams.getLength("gap"),
-                               fbParams.getLength("y"),
-                               fbParams.getString("material"));
+      TOPGeoFrontEnd frontEnd;
+      frontEnd.setFrontBoard(fbParams.getLength("width"),
+                             fbParams.getLength("height"),
+                             fbParams.getLength("thickness"),
+                             fbParams.getLength("gap"),
+                             fbParams.getLength("y"),
+                             fbParams.getString("material"));
       GearDir hvParams(feParams, "HVBoard");
-      boardStack.setHVBoard(hvParams.getLength("width"),
-                            hvParams.getLength("length"),
-                            hvParams.getLength("thickness"),
-                            hvParams.getLength("gap"),
-                            hvParams.getLength("y"),
-                            hvParams.getString("material"));
+      frontEnd.setHVBoard(hvParams.getLength("width"),
+                          hvParams.getLength("length"),
+                          hvParams.getLength("thickness"),
+                          hvParams.getLength("gap"),
+                          hvParams.getLength("y"),
+                          hvParams.getString("material"));
       GearDir bsParams(feParams, "BoardStack");
-      boardStack.setBoardStack(bsParams.getLength("width"),
-                               bsParams.getLength("height"),
-                               bsParams.getLength("length"),
-                               bsParams.getLength("gap"),
-                               bsParams.getLength("y"),
-                               bsParams.getString("material"),
-                               bsParams.getLength("spacerWidth"),
-                               bsParams.getString("spacerMaterial"));
-      geo->setBoardStack(boardStack, feParams.getInt("numBoardStacks"));
+      frontEnd.setBoardStack(bsParams.getLength("width"),
+                             bsParams.getLength("height"),
+                             bsParams.getLength("length"),
+                             bsParams.getLength("gap"),
+                             bsParams.getLength("y"),
+                             bsParams.getString("material"),
+                             bsParams.getLength("spacerWidth"),
+                             bsParams.getString("spacerMaterial"));
+      geo->setFrontEnd(frontEnd, feParams.getInt("numBoardStacks"));
 
       // QBB
 

@@ -214,6 +214,7 @@ void CreateFieldMapModule::beginRun()
       h->Write();
     }
   }
+  if (all_values) all_values->Write();
   outfile->Close();
   delete outfile;
   //histograms seem to be deleted when file is closed

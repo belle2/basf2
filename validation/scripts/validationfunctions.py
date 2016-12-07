@@ -171,7 +171,7 @@ def get_validation_folders(location, basepaths, log):
     return results
 
 
-def parse_cmd_line_arguments(isTest=None, tag=None):
+def parse_cmd_line_arguments(isTest=None, tag=None, modes=["local"]):
     """!
     Sets up a parser for command line arguments, parses them and returns the
     arguments.
@@ -189,8 +189,9 @@ def parse_cmd_line_arguments(isTest=None, tag=None):
                         "steering files (for debugging purposes).",
                         action='store_true')
     parser.add_argument("-m", "--mode", help="The mode which will be used for "
-                        "running the validation. Two possible values: 'local', "
-                        "'cluster' or 'cluster-sge'. Default is 'local'",
+                        "running the validation. "
+                        "Possible values: " + str(modes) +
+                        " Default is 'local'",
                         type=str, nargs='?', default='local')
     parser.add_argument("-i", "--intervals", help="Comma seperated list of intervals "
                         "for which to execute the validation scripts. Default is 'nightly'",

@@ -40,6 +40,11 @@ import validationplots
 import validationscript
 import validationpath
 
+# local and cluster control backends
+import localcontrol
+import clustercontrol
+import clustercontrolsge
+
 
 def statistics_plots(
     fileName='',
@@ -441,6 +446,20 @@ class Validation:
         # This prints every 30 minutes which scripts are still running
         self.running_script_reporting_interval = 30
 
+    @staticmethod
+    def get_available_job_control():
+        """
+        insert the possible backend controls, they will be checed via their
+        is_supported method if they actually can be executed in the current environment
+        """
+        return [localcontrol.Local,
+                clustercontrol.Cluster,
+                clustercontrolsge.Cluster]
+
+    @staticmethod
+    def get_available_job_control_names():
+        return [c.name() for c in Validation.get_available_job_control()]
+
     def build_dependencies(self):
         """!
         This method loops over all Script objects in self.list_of_scripts and
@@ -822,14 +841,20 @@ class Validation:
 
         # Depending on the selected mode, load either the controls for the
         # cluster or for local multi-processing
-        if self.mode == 'cluster':
-            import clustercontrol
-            control = clustercontrol.Cluster()
-        elif self.mode == 'cluster-sge':
-            import clustercontrolsge
-            control = clustercontrolsge.Cluster()
-        else:
-            control = local_control
+
+        selected_control = [(c.name(), c.description(), c) for c in self.get_available_job_control() if c.name() == self.mode]
+
+        if not len(selected_control) == 1:
+            print("Selected mode {} does not exist".format(self.mode))
+            sys.exit(1)
+
+        self.log.note(selected_control[0][1])
+        if not selected_control[0][2].is_supported():
+            print("Selected mode {} is not supported on your system".format(self.mode))
+            sys.exit(1)
+
+        # instantiate the selected job control backend
+        control = selected_control[0][2]()
 
         # read the git hash which is used to produce this validation
         git_hash = validationfunctions.get_compact_git_hash(self.basepaths["local"])
@@ -1045,7 +1070,8 @@ def execute(tag=None, isTest=None):
 
         # Now we process the command line arguments.
         # First of all, we read them in:
-        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest)
+        cmd_arguments = parse_cmd_line_arguments(tag=tag, isTest=isTest,
+                                                 modes=Validation.get_available_job_control_names())
 
         # overwrite with default settings with parameters give in method
         # call
@@ -1080,16 +1106,7 @@ def execute(tag=None, isTest=None):
                                 .format(validation.basf2_options))
 
         # Check if we are using the cluster or local multiprocessing:
-        if cmd_arguments.mode and cmd_arguments.mode in ['local', 'cluster', 'cluster-sge']:
-            validation.mode = cmd_arguments.mode
-        else:
-            validation.mode = 'local'
-        if validation.mode == 'local':
-            validation.log.note('Validation will use local multi-processing.')
-        elif validation.mode == 'cluster-sge':
-            validation.log.note('Validation will use the SunGridEngine cluster.')
-        elif validation.mode == 'cluster':
-            validation.log.note('Validation will use the cluster.')
+        validation.mode = cmd_arguments.mode
 
         # Set if we have a limit on the maximum number of local processes
         validation.parallel = cmd_arguments.parallel

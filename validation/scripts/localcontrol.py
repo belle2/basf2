@@ -22,6 +22,27 @@ class Local:
     @var current_number_of_processes: The number of processes currently running
     """
 
+    @staticmethod
+    def is_supported():
+        """
+        Local control is always supported
+        """
+        return True
+
+    @staticmethod
+    def name():
+        """
+        Returns name of this job contol
+        """
+        return "local"
+
+    @staticmethod
+    def description():
+        """
+        Returns description of this job control
+        """
+        return "Multi-processing on the local machine"
+
     def __init__(self, max_number_of_processes=None):
         """!
         The default constructor.

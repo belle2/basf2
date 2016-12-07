@@ -44,7 +44,7 @@ input.param('inputFileNames', [
                                Belle2.FileSystem.findFile('b2bii/tests/chaintest_1.mdst'),
                                Belle2.FileSystem.findFile('b2bii/tests/chaintest_2.mdst')
                               ])
-input.param('eventSequences', ['1~2,4~6', '0,2~3,5~100'])
+input.param('entrySequences', ['1~2,4~6', '0,2~3,5~100'])
 main.add_module(input)
 main.add_module(TestingModule())
 

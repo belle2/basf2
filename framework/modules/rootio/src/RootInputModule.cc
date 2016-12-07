@@ -54,10 +54,10 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("inputFileNames", m_inputFileNames,
            "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.",
            emptyvector);
-  addParam("eventSequences", m_eventSequences,
-           "The number sequences (e.g. 23~42,101) defining the event which are processed for each inputFileName."
+  addParam("entrySequences", m_entrySequences,
+           "The number sequences (e.g. 23~42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
-           "The first event has the number 0.", emptyvector);
+           "The first event has the entry number 0.", emptyvector);
   addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -i.", false);
 
@@ -91,9 +91,9 @@ void RootInputModule::initialize()
   if (skipNEventsOverride >= 0)
     m_skipNEvents = skipNEventsOverride;
 
-  auto eventSequencesOverride = Environment::Instance().getEventsSequencesOverride();
-  if (eventSequencesOverride.size() > 0)
-    m_eventSequences = eventSequencesOverride;
+  auto entrySequencesOverride = Environment::Instance().getEntrySequencesOverride();
+  if (entrySequencesOverride.size() > 0)
+    m_entrySequences = entrySequencesOverride;
 
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
@@ -112,9 +112,9 @@ void RootInputModule::initialize()
     B2FATAL("No valid files specified!");
   }
 
-  if (m_eventSequences.size() > 0 and m_inputFileNames.size() != m_eventSequences.size()) {
-    B2FATAL("Number of provided filenames does not match the number of given eventSequences parameters: len(inputFileNames) = "
-            << m_inputFileNames.size() << " len(eventSequences) = " << m_eventSequences.size());
+  if (m_entrySequences.size() > 0 and m_inputFileNames.size() != m_entrySequences.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given entrySequences parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(entrySequences) = " << m_entrySequences.size());
   }
 
   m_inputFileName = "";
@@ -160,8 +160,8 @@ void RootInputModule::initialize()
     }
 
     if (m_inputFileNames.size() != unique_filenames.size()) {
-      if (m_eventSequences.size() > 0) {
-        B2FATAL("You specified a file multiple times, and specified a sequence of events which should be used for each file."
+      if (m_entrySequences.size() > 0) {
+        B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file."
                 "Please specify each file only once if you're using the sequence feature!");
       } else {
         B2WARNING("You specified a file multiple times as input file.");
@@ -169,15 +169,15 @@ void RootInputModule::initialize()
     }
   }
 
-  if (m_eventSequences.size() > 0) {
+  if (m_entrySequences.size() > 0) {
     TEventList* elist = new TEventList("input_event_list");
-    for (unsigned int iFile = 0; iFile < m_eventSequences.size(); ++iFile) {
+    for (unsigned int iFile = 0; iFile < m_entrySequences.size(); ++iFile) {
       int64_t offset = m_tree->GetTreeOffset()[iFile];
       int64_t next_offset = m_tree->GetTreeOffset()[iFile + 1];
-      for (const auto& entry : generate_number_sequence(m_eventSequences[iFile])) {
+      for (const auto& entry : generate_number_sequence(m_entrySequences[iFile])) {
         int64_t global_entry = entry + offset;
         if (global_entry >= next_offset) {
-          B2WARNING("Given sequence contains event numbers which are out of range."
+          B2WARNING("Given sequence contains entry numbers which are out of range."
                     "I won't add any further events to the EventList for the current file.");
           break;
         } else {
@@ -281,7 +281,7 @@ void RootInputModule::readTree()
 
   // Check if there are still new entries available.
   int  localEntryNumber = m_nextEntry;
-  if (m_eventSequences.size() > 0) {
+  if (m_entrySequences.size() > 0) {
     localEntryNumber = m_tree->GetEntryNumber(localEntryNumber);
   }
   localEntryNumber = m_tree->LoadTree(localEntryNumber);

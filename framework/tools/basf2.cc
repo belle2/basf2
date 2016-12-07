@@ -134,7 +134,7 @@ int main(int argc, char* argv[])
     ("input,i", prog::value<vector<string> >(),
      "override name of input file for (Seq)RootInput. Can be specified multiple times to use more than one file. For RootInput, wildcards (as in *.root or [1-3].root) can be used, but need to be escaped with \\  or by quoting the argument to avoid expansion by the shell.")
     ("sequence,S", prog::value<vector<string> >(),
-     "override the number sequence (e.g. 23~42,101) defining the events which are processed by RootInput."
+     "override the number sequence (e.g. 23~42,101) defining the entries (starting from 0) which are processed by RootInput."
      "Must be specified exactly once for each file to be opened."
      "This means one sequence per input file AFTER wildcard expansion."
      "The first event has the number 0.")
@@ -290,10 +290,10 @@ int main(int argc, char* argv[])
       Environment::Instance().setInputFilesOverride(names);
     }
 
-    // -N
+    // -S
     if (varMap.count("sequence")) {
       const vector<string>& sequences = varMap["sequence"].as<vector<string> >();
-      Environment::Instance().setEventSequencesOverride(sequences);
+      Environment::Instance().setEntrySequencesOverride(sequences);
     }
 
     // -o

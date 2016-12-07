@@ -48,7 +48,7 @@ process(main)
 
 # Test restricting the number of events per file
 # This issues a warning because a part of the events is out of range
-input.param('eventSequences', ["0,3~10,23"])
+input.param('entrySequences', ["0,3~10,23"])
 process(main)
 
 # Test starting directly with a given event. There will be a fatal error if the
@@ -75,7 +75,7 @@ input.param('inputFileNames', [Belle2.FileSystem.findFile('framework/tests/chain
 # We select more event than the file contains, to check if it works anyway
 # The second file contains the following event numbers (in this order)
 # 7, 6, 3, 8, 9, 12, 4, 11, 10, 16, 13, 17, 18, 14, 15
-input.param('eventSequences', ['0,3~4,10~100', '1~2,4,12~13'])
+input.param('entrySequences', ['0,3~4,10~100', '1~2,4,12~13'])
 main.add_module(input)
 
 expected_event_numbers = [2, 9, 10, 15, 16, 6, 3, 9, 18, 14]

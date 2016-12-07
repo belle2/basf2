@@ -76,8 +76,8 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
            m_inputFileNames);
 
   std::vector<std::string> emptyvector;
-  addParam("eventSequences", m_eventSequences,
-           "The number sequences (e.g. 23~42,101) defining the event which are processed for each inputFileName."
+  addParam("entrySequences", m_entrySequences,
+           "The number sequences (e.g. 23~42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
            "The first event has the number 0.", emptyvector);
 }
@@ -103,18 +103,18 @@ void B2BIIMdstInputModule::initialize()
 {
   m_inputFileNames = globbing(getInputFiles());
 
-  auto eventSequencesOverride = Environment::Instance().getEventsSequencesOverride();
-  if (eventSequencesOverride.size() > 0)
-    m_eventSequences = eventSequencesOverride;
+  auto entrySequencesOverride = Environment::Instance().getEntrySequencesOverride();
+  if (entrySequencesOverride.size() > 0)
+    m_entrySequences = entrySequencesOverride;
 
   //Check if there is at least one filename provided
   if (m_inputFileNames.empty()) {
     B2FATAL("Empty list of files supplied, cannot continue");
   }
 
-  if (m_eventSequences.size() > 0 and m_inputFileNames.size() != m_eventSequences.size()) {
-    B2FATAL("Number of provided filenames does not match the number of given eventSequences parameters: len(inputFileNames) = "
-            << m_inputFileNames.size() << " len(eventSequences) = " << m_eventSequences.size());
+  if (m_entrySequences.size() > 0 and m_inputFileNames.size() != m_entrySequences.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given entrySequences parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(entrySequences) = " << m_entrySequences.size());
   }
 
   //Ok we have files. Since vectors can only remove efficiently from the back
@@ -183,10 +183,10 @@ bool B2BIIMdstInputModule::openNextFile()
   }
   m_nevt++;
   m_current_file_position++;
-  m_current_file_nevt = -1;
+  m_current_file_entry = -1;
 
-  if (m_eventSequences.size() > 0)
-    m_valid_nevt_in_current_file = generate_number_sequence(m_eventSequences[m_current_file_position]);
+  if (m_entrySequences.size() > 0)
+    m_valid_entries_in_current_file = generate_number_sequence(m_entrySequences[m_current_file_position]);
 
   return true;
 }
@@ -195,7 +195,7 @@ bool B2BIIMdstInputModule::readNextEvent()
 {
 
   do {
-    m_current_file_nevt++;
+    m_current_file_entry++;
     // read event
     int rectype = -1;
     while (rectype < 0 && rectype != -2) {
@@ -211,8 +211,8 @@ bool B2BIIMdstInputModule::readNextEvent()
       return false;
     }
 
-  } while (m_eventSequences.size() > 0
-           and m_valid_nevt_in_current_file.find(m_current_file_nevt) == m_valid_nevt_in_current_file.end());
+  } while (m_entrySequences.size() > 0
+           and m_valid_entries_in_current_file.find(m_current_file_entry) == m_valid_entries_in_current_file.end());
 
   return true;
 }

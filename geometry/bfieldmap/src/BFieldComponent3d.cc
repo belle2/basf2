@@ -79,7 +79,7 @@ void BFieldComponent3d::initialize()
         Br   = strtod(tmp + 33, &next);
         Bphi = strtod(next, &next);
         Bz   = strtod(next, NULL);
-        m_bmap.push_back({ -Br, -Bphi, -Bz});
+        m_bmap.emplace_back(-Br, -Bphi, -Bz);
       }
     }
   }
@@ -92,7 +92,7 @@ void BFieldComponent3d::initialize()
       for (int i = 0; i < m_mapSize[0]; i++, r += m_gridPitch[0]) { // r
         if (!(r >= m_errRegionR[0] && r < m_errRegionR[1])) { it += m_mapSize[1];  continue;}
         for (int j = 0;  j < m_mapSize[1]; j++) { // phi
-          B2Vector3D& B = *it;
+          B2Vector3F& B = *it;
           B.SetX(B.x() * m_errB[0]);
           B.SetY(B.y() * m_errB[1]);
           B.SetZ(B.z() * m_errB[2]);
@@ -108,7 +108,7 @@ void BFieldComponent3d::initialize()
   B2INFO(Form("BField3d:: final map region & pitch: r [%.2e,%.2e] %.2e, phi %.2e, z [%.2e,%.2e] %.2e",
               m_mapRegionR[0], m_mapRegionR[1], m_gridPitch[0], m_gridPitch[1],
               m_mapRegionZ[0], m_mapRegionZ[1], m_gridPitch[2]));
-  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(B2Vector3D) / (1024 * 1024.) << " Mb");
+  B2INFO("Memory consumption: " << m_bmap.size()*sizeof(B2Vector3F) / (1024 * 1024.) << " Mb");
 }
 
 namespace {
@@ -271,7 +271,7 @@ B2Vector3D BFieldComponent3d::interpolate(unsigned int ir, unsigned int iphi, un
   unsigned int j110 = j010 + strideZ;
   unsigned int j111 = j011 + strideZ;
   double w00 = wphi0 * wr0, w10 = wphi0 * wr1, w01 = wphi1 * wr0, w11 = wphi1 * wr1;
-  const vector<B2Vector3D>& B = m_bmap;
+  const vector<B2Vector3F>& B = m_bmap;
   return
     (B[j000] * w00 + B[j001] * w01 + B[j010] * w10 + B[j011] * w11) * wz0 +
     (B[j100] * w00 + B[j101] * w01 + B[j110] * w10 + B[j111] * w11) * wz1;

@@ -444,10 +444,10 @@ namespace Belle2 {
 
       m_triInterpol.init(pc, ts, 0.1);
 
-      vector<B2Vector3D> bc(m_nxy * m_nz);
+      vector<B2Vector3F> bc(m_nxy * m_nz);
       unsigned int count = 0;
       for (int i = 0; i < nrphi; i++) {
-        if (ip[i]) bc[count++] = tbc[i];
+        if (ip[i]) bc[count++] = B2Vector3F(tbc[i]);
       }
 
       for (int i = 1; i < m_nz; ++i) {
@@ -547,7 +547,7 @@ namespace Belle2 {
         m_triInterpol.weights(it, xy, w0, w1, w2);
         vector<triangle_t>::const_iterator t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
-        const B2Vector3D* B = m_B.data() + m_nxy * iz;
+        const B2Vector3F* B = m_B.data() + m_nxy * iz;
         B2Vector3D b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
@@ -572,7 +572,7 @@ namespace Belle2 {
         int j11 = j01 + nr1;
 
         double w00 = wr0 * wphi0, w01 = wphi0 * wr1, w10 = wphi1 * wr0, w11 = wphi1 * wr1;
-        const B2Vector3D* B = m_B.data() + m_nxy * iz;
+        const B2Vector3F* B = m_B.data() + m_nxy * iz;
         B2Vector3D b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
@@ -583,7 +583,7 @@ namespace Belle2 {
     }
   protected:
     /** Buffer for the magnetic field map */
-    vector<B2Vector3D> m_B;
+    vector<B2Vector3F> m_B;
     /** Object to locate point in a triangular mesh */
     TriangularInterpolation m_triInterpol;
     /** Number of field points in XY plane */

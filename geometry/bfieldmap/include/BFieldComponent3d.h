@@ -151,7 +151,7 @@ namespace Belle2 {
     /** The filename of the magnetic field map. */
     std::string m_mapFilename{""};
     /** The memory buffer for the magnetic field map. */
-    std::vector<B2Vector3D> m_bmap;
+    std::vector<B2Vector3F> m_bmap;
     /** Enable different dimension, \"rphiz\", \"rphi\", \"phiz\" or \"rz\" > */
     std::string m_mapEnable{"rphiz"};
     /** Flag to switch on/off interpolation > */

@@ -39,75 +39,6 @@ namespace Belle2 {
     double y; /**< y component */
   };
 
-  /** A simple 3d vector stucture */
-  struct vector3_t {
-    double x; /**< x component */
-    double y; /**< y component */
-    double z; /**< z component */
-
-    /**
-     * Sum up the vector components
-     *
-     * @param t the vector to add
-     * @return  reference to resulting vector
-     */
-    vector3_t& operator +=(const vector3_t& u)
-    {
-      x += u.x;
-      y += u.y;
-      z += u.z;
-      return *this;
-    }
-  };
-
-  /**
-   * Sum up two vectors
-   *
-   * @param u first vector
-   * @param v second vector
-   * @return  sum of two vector
-   */
-  vector3_t operator +(const vector3_t& u, const vector3_t& v)
-  {
-    return {u.x + v.x, u.y + v.y, u.z + v.z};
-  }
-
-  /**
-   * Difference of two vectors
-   *
-   * @param u first vector
-   * @param v second vector
-   * @return  u-v result
-   */
-  vector3_t operator -(const vector3_t& u, const vector3_t& v)
-  {
-    return {u.x - v.x, u.y - v.y, u.z - v.z};
-  }
-
-  /**
-   * vector scaled by a scalar
-   *
-   * @param u the vector
-   * @param a the scalar
-   * @return  result a*u
-   */
-  vector3_t operator *(const vector3_t& u, double a)
-  {
-    return {u.x * a, u.y * a, u.z * a};
-  }
-
-  /**
-   * vector scaled by a scalar
-   *
-   * @param a the scalar
-   * @param u the vector
-   * @return  result a*u
-   */
-  vector3_t operator *(double a, const vector3_t& u)
-  {
-    return u * a;
-  }
-
   /**
    * The TriangularInterpolation class.
    *
@@ -417,7 +348,7 @@ namespace Belle2 {
       struct cs_t {double c, s;};
       vector<cs_t> cs(nrphi);
       vector<xy_t> pc;
-      vector<vector3_t> tbc;
+      vector<B2Vector3D> tbc;
       pc.reserve(nrphi);
       char cbuf[256]; IN.getline(cbuf, 256);
       double rmax = 0;
@@ -513,7 +444,7 @@ namespace Belle2 {
 
       m_triInterpol.init(pc, ts, 0.1);
 
-      vector<vector3_t> bc(m_nxy * m_nz);
+      vector<B2Vector3D> bc(m_nxy * m_nz);
       unsigned int count = 0;
       for (int i = 0; i < nrphi; i++) {
         if (ip[i]) bc[count++] = tbc[i];
@@ -533,7 +464,7 @@ namespace Belle2 {
           if (cs[j].s == 0) Bphi = 0;
           double Bx = Br * cs[j].c - Bphi * cs[j].s;
           double By = Br * cs[j].s + Bphi * cs[j].c;
-          bc[count++] = {Bx, By, Bz};
+          bc[count++].SetXYZ(Bx, By, Bz);
         }
       }
       assert(count == bc.size());
@@ -582,10 +513,10 @@ namespace Belle2 {
      * [T]. Returns false if the space point lies outside the valid
      * region.
      */
-    bool inRange(const vector3_t& v) const
+    bool inRange(const B2Vector3D& v) const
     {
-      if (std::abs(v.z) > m_zmax) return false;
-      double R2 = v.x * v.x + v.y * v.y;
+      if (std::abs(v.z()) > m_zmax) return false;
+      double R2 = v.x() * v.x() + v.y() * v.y();
       if (R2 > m_rmax * m_rmax) return false;
       return true;
     }
@@ -599,30 +530,30 @@ namespace Belle2 {
      * [T]. Returns a zero vector (0,0,0) if the space point lies
      * outside the region described by the component.
      */
-    vector3_t interpolateField(const vector3_t& v) const
+    B2Vector3D interpolateField(const B2Vector3D& v) const
     {
-      vector3_t res = {0, 0, 0};
-      double R2 = v.x * v.x + v.y * v.y;
+      B2Vector3D res = {0, 0, 0};
+      double R2 = v.x() * v.x() + v.y() * v.y();
       if (R2 > m_rmax * m_rmax) return res;
       double wz1;
-      int iz = zIndexAndWeight(v.z, wz1);
+      int iz = zIndexAndWeight(v.z(), wz1);
       if (iz < 0) return res;
       double wz0 = 1 - wz1;
 
       if (R2 < m_rj2) { // triangular interpolation
-        xy_t xy = {v.x, std::abs(v.y)};
+        xy_t xy = {v.x(), std::abs(v.y())};
         double w0, w1, w2;
         short int it = m_triInterpol.findTriangle(xy);
         m_triInterpol.weights(it, xy, w0, w1, w2);
         vector<triangle_t>::const_iterator t = m_triInterpol.getTriangles().begin() + it;
         int j0 = t->j0, j1 = t->j1, j2 = t->j2;
-        const vector3_t* B = m_B.data() + m_nxy * iz;
-        vector3_t b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
+        const B2Vector3D* B = m_B.data() + m_nxy * iz;
+        B2Vector3D b = (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j0] * w0 + B[j1] * w1 + B[j2] * w2) * wz1;
         res = b;
       } else {// r-phi grid
-        double r = sqrt(R2), phi = atan2(std::abs(v.y), v.x);
+        double r = sqrt(R2), phi = atan2(std::abs(v.y()), v.x());
         double fr = (r - m_rj) * m_idr;
         double fphi = phi * m_idphi;
 
@@ -641,18 +572,18 @@ namespace Belle2 {
         int j11 = j01 + nr1;
 
         double w00 = wr0 * wphi0, w01 = wphi0 * wr1, w10 = wphi1 * wr0, w11 = wphi1 * wr1;
-        const vector3_t* B = m_B.data() + m_nxy * iz;
-        vector3_t b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
+        const B2Vector3D* B = m_B.data() + m_nxy * iz;
+        B2Vector3D b = (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz0;
         B += m_nxy; // next z-slice
         b += (B[j00] * w00 + B[j01] * w01 + B[j10] * w10 + B[j11] * w11) * wz1;
         res = b;
       }
-      if (v.y < 0) res.y = -res.y;
+      if (v.y() < 0) res.SetY(-res.y());
       return res;
     }
   protected:
     /** Buffer for the magnetic field map */
-    vector<vector3_t> m_B;
+    vector<B2Vector3D> m_B;
     /** Object to locate point in a triangular mesh */
     TriangularInterpolation m_triInterpol;
     /** Number of field points in XY plane */
@@ -705,38 +636,37 @@ namespace Belle2 {
     if (m_her) delete m_her;
   }
 
-  bool BFieldComponentBeamline::isInRange(const TVector3& p) const
+  bool BFieldComponentBeamline::isInRange(const B2Vector3D& p) const
   {
     if (!m_ler || !m_her) return false;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
-    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
-    vector3_t hv = {xc - zs, v.y, zc + xs};
-    vector3_t lv = {xc + zs, v.y, zc - xs};
+    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
+    B2Vector3D hv{xc - zs, v.y(), zc + xs};
+    B2Vector3D lv{xc + zs, v.y(), zc - xs};
     return m_ler->inRange(lv) || m_her->inRange(hv);
   }
 
-  TVector3 BFieldComponentBeamline::calculate(const TVector3& p) const
+  B2Vector3D BFieldComponentBeamline::calculate(const B2Vector3D& p) const
   {
-    TVector3 res;
+    B2Vector3D res;
     double s = m_sinBeamCrossAngle, c = m_cosBeamCrossAngle;
-    vector3_t v = { -p.x(), -p.y(), -p.z()}; // invert coordinates to match ANSYS one
-    double xc = v.x * c, zs = v.z * s, zc = v.z * c, xs = v.x * s;
-    vector3_t hv = {xc - zs, v.y, zc + xs};
-    vector3_t lv = {xc + zs, v.y, zc - xs};
-    vector3_t hb = m_her->interpolateField(hv);
-    vector3_t lb = m_ler->interpolateField(lv);
-    vector3_t rhb = {hb.x* c + hb.z * s, hb.y,  hb.z* c - hb.x * s};
-    vector3_t rlb = {lb.x* c - lb.z * s, lb.y,  lb.z* c + lb.x * s};
+    B2Vector3D v = -p; // invert coordinates to match ANSYS one
+    double xc = v.x() * c, zs = v.z() * s, zc = v.z() * c, xs = v.x() * s;
+    B2Vector3D hv{xc - zs, v.y(), zc + xs};
+    B2Vector3D lv{xc + zs, v.y(), zc - xs};
+    B2Vector3D hb = m_her->interpolateField(hv);
+    B2Vector3D lb = m_ler->interpolateField(lv);
+    B2Vector3D rhb{hb.x()* c + hb.z()* s, hb.y(),  hb.z()* c - hb.x()* s};
+    B2Vector3D rlb{lb.x()* c - lb.z()* s, lb.y(),  lb.z()* c + lb.x()* s};
 
-    double mhb = std::abs(rhb.x) + std::abs(rhb.y) + std::abs(rhb.z);
-    double mlb = std::abs(rlb.x) + std::abs(rlb.y) + std::abs(rlb.z);
+    double mhb = std::abs(rhb.x()) + std::abs(rhb.y()) + std::abs(rhb.z());
+    double mlb = std::abs(rlb.x()) + std::abs(rlb.y()) + std::abs(rlb.z());
 
-    if (mhb < 1e-10) res.SetXYZ(rlb.x, rlb.y, rlb.z);
-    else if (mlb < 1e-10) res.SetXYZ(rhb.x, rhb.y, rhb.z);
+    if (mhb < 1e-10) res = rlb;
+    else if (mlb < 1e-10) res = rhb;
     else {
-      vector3_t t = 0.5 * (rlb + rhb);
-      res.SetXYZ(t.x, t.y, t.z);
+      res = 0.5 * (rlb + rhb);
     }
     return res;
   }

@@ -13,7 +13,7 @@
 
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
-#include <TVector3.h>
+#include <framework/geometry/B2Vector3.h>
 
 #include <string>
 #include <list>
@@ -48,7 +48,7 @@ namespace Belle2 {
      * @param point The space point in Cartesian coordinates.
      * @return A three vector of the magnetic field in [T] at the specified space point.
      */
-    const TVector3 getBField(const TVector3& point);
+    const B2Vector3D getBField(const B2Vector3D& point);
 
     /**
      * Adds a new BField component to the Belle II magnetic field.

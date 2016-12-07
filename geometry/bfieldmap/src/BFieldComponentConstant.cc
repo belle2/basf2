@@ -15,14 +15,14 @@
 using namespace std;
 using namespace Belle2;
 
-TVector3 BFieldComponentConstant::calculate(const TVector3& point) const
+B2Vector3D BFieldComponentConstant::calculate(const B2Vector3D& point) const
 {
   double Bz = m_magneticField[2];
   if (maxRadius4BField > 0.0 && maxRadius4BField < point.Perp()) Bz = 0.0;
   if (point.z() < minZ4BField  || point.z() > maxZ4BField) Bz = 0.0;
 
-  //  return TVector3(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
-  return TVector3(m_magneticField[0], m_magneticField[1], Bz);
+  //  return B2Vector3D(m_magneticField[0], m_magneticField[1], m_magneticField[2]);
+  return B2Vector3D(m_magneticField[0], m_magneticField[1], Bz);
 }
 
 

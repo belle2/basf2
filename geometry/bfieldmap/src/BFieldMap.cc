@@ -22,9 +22,9 @@ BFieldMap& BFieldMap::Instance()
   return *instance;
 }
 
-const TVector3 BFieldMap::getBField(const TVector3& point)
+const B2Vector3D BFieldMap::getBField(const B2Vector3D& point)
 {
-  TVector3 magFieldVec(0.0, 0.0, 0.0);
+  B2Vector3D magFieldVec(0.0, 0.0, 0.0);
 
   //Check that the point makes sense
   if (std::isnan(point.X()) || std::isnan(point.Y()) || std::isnan(point.Z())) {

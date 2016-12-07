@@ -21,7 +21,7 @@ using namespace TrackFindingCDC;
 
 bool CDCBFieldUtil::isOff()
 {
-  TVector3 origin(0, 0, 0);
+  B2Vector3D origin(0, 0, 0);
   double b = BFieldMap::Instance().getBField(origin).Mag();
   double c_EarthMagneticField = 3.2e-5;
   return not(b > 5 * c_EarthMagneticField);
@@ -43,7 +43,7 @@ double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
   // which can occure if fits fail.
   // Return NAN to the caller and let him decide what to do next.
   if (pos3D.hasNAN()) return NAN;
-  TVector3 mag3D = BFieldMap::Instance().getBField(pos3D);
+  TVector3 mag3D = BFieldMap::Instance().getBField(B2Vector3D(pos3D.x(), pos3D.y(), pos3D.z()));
   return mag3D.Z();
 }
 

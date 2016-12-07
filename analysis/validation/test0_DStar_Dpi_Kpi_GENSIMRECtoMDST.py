@@ -38,7 +38,7 @@ set_random_seed(123)
 beamparameters = add_beamparameters(analysis_main, "Y4S")
 
 # generateContinuum function is defined in analysis/scripts/modularAnalysis.py
-generateContinuum(1000, 'D*-', 'ccbar-psamples.dec')
+generateContinuum(1000, 'D*-', Belle2.FileSystem.findFile('/analysis/validation/ccbar-psamples.dec'))
 
 # Load geometry
 loadGearbox()

@@ -25,9 +25,8 @@ from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdLooseFSParticles import stdVeryLoosePi
-from stdLooseFSParticles import stdLoosePi
-from stdLooseFSParticles import stdLooseK
+from stdCharged import *
+
 
 # Add 10 signal MC files (each containing 1000 generated events)
 filelistSIG = \
@@ -39,7 +38,7 @@ inputMdstList('MC5', filelistSIG)
 # use standard final state particle lists
 #
 # creates "pi+:all" ParticleList (and c.c.)
-stdVeryLoosePi()
+stdPi('all')
 # creates "pi+:loose" ParticleList (and c.c.)
 stdLoosePi()
 # creates "K+:loose" ParticleList (and c.c.)

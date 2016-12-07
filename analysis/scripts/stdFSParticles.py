@@ -3,20 +3,25 @@
 
 from basf2 import *
 from modularAnalysis import *
-from stdLooseFSParticles import stdVeryLoosePi
 
 # neutrals lists
 from stdPhotons import *
 from stdPi0s import *
+
+# charged lists
+from stdCharged import *
 
 # Prepare all standard final state particles
 
 
 def stdFSParticles(path=analysis_main):
 
-    # Nominal PID
-    stdK(path)
-    stdPi(path)
+    # Nominal PID (used to be >0.5 cut)
+    stdPi('95eff', path)
+    stdK('95eff', path)
+    stdPr('95eff', path)
+    # stdE(?) - missing
+    # stdMu(?) - missing
 
     # standard photons
     stdPhotons('loose', path)
@@ -31,17 +36,9 @@ def stdFSParticles(path=analysis_main):
 #    stdHighEPhoton(path)
 
 
-def stdPi(path=analysis_main):
-    fillParticleList('pi+:std', 'piid > 0.5 and chiProb > 0.001', True, path)
-
-
-def stdK(path=analysis_main):
-    fillParticleList('K+:std', 'Kid > 0.5 and chiProb > 0.001', True, path)
-
-
 def stdKs(path=analysis_main):
 
-    stdVeryLoosePi()
+    stdPi('all')
     reconstructDecay('K_S0:all -> pi-:all pi+:all', '0.4 < M < 0.6', 1, True,
                      path)
     vertexKFit('K_S0:all', 0.0)

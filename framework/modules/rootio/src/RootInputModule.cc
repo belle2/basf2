@@ -18,9 +18,15 @@
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/DependencyMap.h>
 #include <framework/dataobjects/EventMetaData.h>
+#include <framework/utilities/NumberSequence.h>
 
 #include <TClonesArray.h>
 #include <TFile.h>
+#include <TEventList.h>
+#include <TObjArray.h>
+#include <TChainElement.h>
+
+#include <iostream>
 
 using namespace std;
 using namespace Belle2;
@@ -48,6 +54,10 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
   addParam("inputFileNames", m_inputFileNames,
            "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.",
            emptyvector);
+  addParam("entrySequences", m_entrySequences,
+           "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
+           "Must be specified exactly once for each file to be opened."
+           "The first event has the entry number 0.", emptyvector);
   addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,
            "Ignore override of file name via command line argument -i.", false);
 
@@ -81,6 +91,10 @@ void RootInputModule::initialize()
   if (skipNEventsOverride >= 0)
     m_skipNEvents = skipNEventsOverride;
 
+  auto entrySequencesOverride = Environment::Instance().getEntrySequencesOverride();
+  if (entrySequencesOverride.size() > 0)
+    m_entrySequences = entrySequencesOverride;
+
   m_nextEntry = m_skipNEvents;
   m_lastPersistentEntry = -1;
 
@@ -97,6 +111,12 @@ void RootInputModule::initialize()
   if (m_inputFileNames.empty()) {
     B2FATAL("No valid files specified!");
   }
+
+  if (m_entrySequences.size() > 0 and m_inputFileNames.size() != m_entrySequences.size()) {
+    B2FATAL("Number of provided filenames does not match the number of given entrySequences parameters: len(inputFileNames) = "
+            << m_inputFileNames.size() << " len(entrySequences) = " << m_entrySequences.size());
+  }
+
   m_inputFileName = "";
   //we'll only use m_inputFileNames from now on
 
@@ -127,6 +147,52 @@ void RootInputModule::initialize()
       B2FATAL("Couldn't read header of TTree 'persistent' in file '" << fileName << "'");
     B2INFO("Added file " + fileName);
   }
+
+  // Check if the files we added to the Chain are unique,
+  // if the same file is added multiple times the TEventList used for the eventSequence feature
+  // will process each file only once with the union of both given sequences.
+  // It is not clear if the user wants this, so we raise a fatal in this situation.
+  {
+    std::set<std::string> unique_filenames;
+
+    // The following lines are directly from the ROOT documentation
+    // see TChain::AddFile
+    TObjArray* fileElements = m_tree->GetListOfFiles();
+    TIter next(fileElements);
+    TChainElement* chEl = 0;
+    while ((chEl = (TChainElement*)next())) {
+      unique_filenames.insert(chEl->GetTitle());
+    }
+
+    if (m_inputFileNames.size() != unique_filenames.size()) {
+      if (m_entrySequences.size() > 0) {
+        B2FATAL("You specified a file multiple times, and specified a sequence of entries which should be used for each file."
+                "Please specify each file only once if you're using the sequence feature!");
+      } else {
+        B2WARNING("You specified a file multiple times as input file.");
+      }
+    }
+  }
+
+  if (m_entrySequences.size() > 0) {
+    TEventList* elist = new TEventList("input_event_list");
+    for (unsigned int iFile = 0; iFile < m_entrySequences.size(); ++iFile) {
+      int64_t offset = m_tree->GetTreeOffset()[iFile];
+      int64_t next_offset = m_tree->GetTreeOffset()[iFile + 1];
+      for (const auto& entry : generate_number_sequence(m_entrySequences[iFile])) {
+        int64_t global_entry = entry + offset;
+        if (global_entry >= next_offset) {
+          B2WARNING("Given sequence contains entry numbers which are out of range."
+                    "I won't add any further events to the EventList for the current file.");
+          break;
+        } else {
+          elist->Enter(global_entry);
+        }
+      }
+    }
+    m_tree->SetEventList(elist);
+  }
+
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Persistent] + "' with " + m_persistent->GetEntries() << " entries.");
   B2DEBUG(100, "Opened tree '" + c_treeNames[DataStore::c_Event] + "' with " + m_tree->GetEntries() << " entries.");
 
@@ -219,7 +285,11 @@ void RootInputModule::readTree()
     return;
 
   // Check if there are still new entries available.
-  int localEntryNumber = m_tree->LoadTree(m_nextEntry);
+  int  localEntryNumber = m_nextEntry;
+  if (m_entrySequences.size() > 0) {
+    localEntryNumber = m_tree->GetEntryNumber(localEntryNumber);
+  }
+  localEntryNumber = m_tree->LoadTree(localEntryNumber);
 
   if (localEntryNumber == -2) {
     return; //end of file

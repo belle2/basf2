@@ -106,6 +106,11 @@ namespace Belle2 {
     /** Files to read from. */
     std::vector<std::string> m_inputFileNames;
 
+    /**
+     * The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName.
+     */
+    std::vector<std::string> m_entrySequences;
+
     /** Ignore filename override from command line
      */
     bool m_ignoreCommandLineOverride;

@@ -47,9 +47,9 @@ def stdPr(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('p+:all', '', True, path)
     if listtype == '95eff':
-        fillParticleList('p+:95eff', 'Kid > 0.079 and chiProb > 0.001', True, path)
+        fillParticleList('p+:95eff', 'prid > 0.079 and chiProb > 0.001', True, path)
     if listtype == '90eff':
-        fillParticleList('p+:90eff', 'Kid > 0.872 and chiProb > 0.001', True, path)
+        fillParticleList('p+:90eff', 'prid > 0.872 and chiProb > 0.001', True, path)
     else:
         fillParticleList('p+:all', '', True, path)
 
@@ -110,4 +110,4 @@ def stdLooseE(path=analysis_main):
 
 
 def stdLoosePr(path=analysis_main):
-    fillParticleList('p+:loose', 'pid > 0.1 and chiProb > 0.001', True, path)
+    fillParticleList('p+:loose', 'prid > 0.1 and chiProb > 0.001', True, path)

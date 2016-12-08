@@ -125,7 +125,7 @@ void EKLM::FiberAndElectronics::setHitRange(
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i, gnpe;
+  int i;
   double l, d, t;
   double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
@@ -133,8 +133,11 @@ void EKLM::FiberAndElectronics::processEntry()
   m_MCTime = -1;
   m_npe = 0;
   for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    m_amplitudeDirect[i] = 0;
-    m_amplitudeReflected[i] = 0;
+    if (m_Debug) {
+      m_amplitudeDirect[i] = 0;
+      m_amplitudeReflected[i] = 0;
+    } else
+      m_amplitude[i] = 0;
   }
   for (it = m_hit; it != m_hitEnd; ++it) {
     hit = it->second;
@@ -149,21 +152,20 @@ void EKLM::FiberAndElectronics::processEntry()
       m_MCTime = t;
     else
       m_MCTime = t < m_MCTime ? t : m_MCTime;
-    fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), false,
-                   m_amplitudeDirect, &gnpe);
-    m_npe = m_npe + gnpe;
+    generatePhotoelectrons(l, d, gRandom->Poisson(nPhotons), hit->getTime(),
+                           false);
     if (m_DigPar->getMirrorReflectiveIndex() > 0) {
-      fillSiPMOutput(l, d, gRandom->Poisson(nPhotons), hit->getTime(), true,
-                     m_amplitudeReflected, &gnpe);
-      m_npe = m_npe + gnpe;
+      generatePhotoelectrons(l, d, gRandom->Poisson(nPhotons), hit->getTime(),
+                             true);
     }
   }
-  /* Sum up histograms. */
-  for (i = 0; i < m_DigPar->getNDigitizations(); i++) {
-    m_amplitude[i] = m_amplitudeDirect[i];
-    if (m_DigPar->getMirrorReflectiveIndex() > 0)
-      m_amplitude[i] = m_amplitude[i] + m_amplitudeReflected[i];
-  }
+  if (m_Debug) {
+    fillSiPMOutput(m_amplitudeDirect, true, false);
+    fillSiPMOutput(m_amplitudeReflected, false, true);
+    for (i = 0; i < m_DigPar->getNDigitizations(); i++)
+      m_amplitude[i] = m_amplitudeDirect[i] + m_amplitudeReflected[i];
+  } else
+    fillSiPMOutput(m_amplitude, true, true);
   /* SiPM noise and ADC. */
   if (m_DigPar->getMeanSiPMNoise() > 0)
     addRandomSiPMNoise();
@@ -243,6 +245,53 @@ int* EKLM::FiberAndElectronics::sortPhotoelectrons(int nPhotoelectrons)
   return currentIndexArray;
 }
 
+void EKLM::FiberAndElectronics::generatePhotoelectrons(
+  double stripLen, double distSiPM, int nPhotons, double timeShift,
+  bool isReflected)
+{
+  const double maxHitTime = m_DigPar->getNDigitizations() *
+                            m_DigPar->getADCSamplingTime();
+  int i;
+  double hitTime, deExcitationTime, cosTheta, hitDist;
+  double inverseLightSpeed, inverseAttenuationLength;
+  inverseLightSpeed = 1.0 / m_DigPar->getFiberLightSpeed();
+  inverseAttenuationLength = 1.0 / m_DigPar->getAttenuationLength();
+  /* Generation of photoelectrons. */
+  for (i = 0; i < nPhotons; i++) {
+    if (m_npe >= m_PhotoelectronBufferSize)
+      reallocPhotoElectronBuffers(m_npe + 100);
+    cosTheta = gRandom->Uniform(m_DigPar->getMinCosTheta(), 1);
+    if (!isReflected)
+      hitDist = distSiPM / cosTheta;
+    else
+      hitDist = (2.0 * stripLen - distSiPM) / cosTheta;
+    /* Fiber absorption. */
+    if (gRandom->Uniform() > exp(-hitDist * inverseAttenuationLength))
+      continue;
+    /* Account for mirror reflective index. */
+    if (isReflected)
+      if (gRandom->Uniform() > m_DigPar->getMirrorReflectiveIndex())
+        continue;
+    deExcitationTime =
+      gRandom->Exp(m_DigPar->getScintillatorDeExcitationTime()) +
+      gRandom->Exp(m_DigPar->getFiberDeExcitationTime());
+    hitTime = hitDist * inverseLightSpeed + deExcitationTime +
+              timeShift - m_DigitizationInitialTime;
+    if (hitTime >= maxHitTime)
+      continue;
+    if (hitTime >= 0)
+      m_Photoelectrons[m_npe].bin =
+        floor(hitTime / m_DigPar->getADCSamplingTime());
+    else
+      m_Photoelectrons[m_npe].bin = -1;
+    m_Photoelectrons[m_npe].expTime =
+      exp(m_DigPar->getPEAttenuationFrequency() * hitTime);
+    m_Photoelectrons[m_npe].isReflected = isReflected;
+    m_PhotoelectronIndex[m_npe] = m_npe;
+    m_npe++;
+  }
+}
+
 /*
  * ADC signal corresponding to a photoelectron is
  *
@@ -294,60 +343,17 @@ int* EKLM::FiberAndElectronics::sortPhotoelectrons(int nPhotoelectrons)
  *
  * where N_i is the number of hits in this (i-th) bin.
  */
-void EKLM::FiberAndElectronics::fillSiPMOutput(
-  double stripLen, double distSiPM, int nPhotons, double timeShift,
-  bool isReflected, float* hist, int* gnpe)
+void EKLM::FiberAndElectronics::fillSiPMOutput(float* hist, bool useDirect,
+                                               bool useReflected)
 {
-  const double maxHitTime = m_DigPar->getNDigitizations() *
-                            m_DigPar->getADCSamplingTime();
-  int i, bin, nPhotoelectrons, maxBin;
-  double hitTime, deExcitationTime, cosTheta, hitDist;
+  int i, bin, maxBin;
   double attenuationTime, sig, expSum;
-  double inverseLightSpeed, inverseAttenuationLength;
   int ind1, ind2, ind3;
   int* indexArray;
-  nPhotoelectrons = 0;
-  attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
-  inverseLightSpeed = 1.0 / m_DigPar->getFiberLightSpeed();
-  inverseAttenuationLength = 1.0 / m_DigPar->getAttenuationLength();
-  /* Generation of photoelectrons. */
-  for (i = 0; i < nPhotons; i++) {
-    if (nPhotoelectrons >= m_PhotoelectronBufferSize)
-      reallocPhotoElectronBuffers(m_PhotoelectronBufferSize + 100);
-    cosTheta = gRandom->Uniform(m_DigPar->getMinCosTheta(), 1);
-    if (!isReflected)
-      hitDist = distSiPM / cosTheta;
-    else
-      hitDist = (2.0 * stripLen - distSiPM) / cosTheta;
-    /* Fiber absorption. */
-    if (gRandom->Uniform() > exp(-hitDist * inverseAttenuationLength))
-      continue;
-    /* Account for mirror reflective index. */
-    if (isReflected)
-      if (gRandom->Uniform() > m_DigPar->getMirrorReflectiveIndex())
-        continue;
-    deExcitationTime =
-      gRandom->Exp(m_DigPar->getScintillatorDeExcitationTime()) +
-      gRandom->Exp(m_DigPar->getFiberDeExcitationTime());
-    hitTime = hitDist * inverseLightSpeed + deExcitationTime +
-              timeShift - m_DigitizationInitialTime;
-    if (hitTime >= maxHitTime)
-      continue;
-    if (hitTime >= 0)
-      m_Photoelectrons[nPhotoelectrons].bin =
-        floor(hitTime / m_DigPar->getADCSamplingTime());
-    else
-      m_Photoelectrons[nPhotoelectrons].bin = -1;
-    m_Photoelectrons[nPhotoelectrons].expTime =
-      exp(m_DigPar->getPEAttenuationFrequency() * hitTime);
-    m_PhotoelectronIndex[nPhotoelectrons] = nPhotoelectrons;
-    nPhotoelectrons++;
-  }
-  *gnpe = nPhotoelectrons;
-  if (nPhotoelectrons == 0)
+  if (m_npe == 0)
     return;
-  /* Generation of ADC output. */
-  indexArray = sortPhotoelectrons(nPhotoelectrons);
+  attenuationTime = 1.0 / m_DigPar->getPEAttenuationFrequency();
+  indexArray = sortPhotoelectrons(m_npe);
   ind1 = 0;
   expSum = 0;
   while (1) {
@@ -355,13 +361,17 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
     bin = m_Photoelectrons[indexArray[ind1]].bin;
     while (1) {
       ind2++;
-      if (ind2 == nPhotoelectrons)
+      if (ind2 == m_npe)
         break;
       if (bin != m_Photoelectrons[indexArray[ind2]].bin)
         break;
     }
     /* Now ind1 .. ind2 - photoelectrons in current bin. */
     for (ind3 = ind1; ind3 != ind2; ind3++) {
+      if (m_Photoelectrons[indexArray[ind3]].isReflected && !useReflected)
+        continue;
+      if (!m_Photoelectrons[indexArray[ind3]].isReflected && !useDirect)
+        continue;
       if (bin >= 0) {
         sig = attenuationTime - m_Photoelectrons[indexArray[ind3]].expTime *
               m_SignalTimeDependence[bin + 1];
@@ -369,7 +379,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
       }
       expSum = expSum + m_Photoelectrons[indexArray[ind3]].expTime;
     }
-    if (ind2 == nPhotoelectrons)
+    if (ind2 == m_npe)
       maxBin = m_DigPar->getNDigitizations() - 1;
     else
       maxBin = m_Photoelectrons[indexArray[ind2]].bin;
@@ -377,7 +387,7 @@ void EKLM::FiberAndElectronics::fillSiPMOutput(
       sig = m_SignalTimeDependenceDiff[i] * expSum;
       hist[i] = hist[i] + sig;
     }
-    if (ind2 == nPhotoelectrons)
+    if (ind2 == m_npe)
       break;
     ind1 = ind2;
   }

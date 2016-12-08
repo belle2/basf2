@@ -69,13 +69,13 @@ void BFieldComponentRadial::initialize()
 }
 
 
-TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
+B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
 {
   // If both 'Radial' and 'Beamline' components are defined in xml file,
   // '3d' component returns zero field where 'Beamline' component is defined.
   // If no 'Beamline' component is defined in xml file, the following function will never be called.
   if (BFieldComponentBeamline::Instance().isInRange(point)) {
-    return TVector3(0.0, 0.0, 0.0);
+    return B2Vector3D(0.0, 0.0, 0.0);
   }
 
   //Get the r and z component
@@ -85,7 +85,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   //Check if the point lies inside the magnetic field boundaries
   if ((r < m_mapRegionR[0]) || (r > m_mapRegionR[1]) ||
       (z < m_mapRegionZ[0]) || (z > m_mapRegionZ[1])) {
-    return TVector3(0.0, 0.0, 0.0);
+    return B2Vector3D(0.0, 0.0, 0.0);
   }
 
   //Calculate the lower index of the point in the grid
@@ -95,7 +95,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
   //Check if the index values are within the range
   if (((ir + 1) >= m_mapSize[0]) || ((iz + 1) >= m_mapSize[1])) {
     B2ERROR("The index values for the radial magnetic field map are out of bounds !");
-    return TVector3(0.0, 0.0, 0.0);
+    return B2Vector3D(0.0, 0.0, 0.0);
   }
 
   //Calculate the distance to the lower grid point
@@ -162,11 +162,11 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
       double angle_crossing = 0.0830;
 
       double angle_HER = - angle_crossing / 2.;
-      TVector3 pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
+      B2Vector3D pHER(point); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
       double rHER = pHER.Perp();
 
       double angle_LER =  angle_crossing / 2.;
-      TVector3 pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
+      B2Vector3D pLER(point); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
       double rLER = pLER.Perp();
 
       Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;
@@ -184,7 +184,7 @@ TVector3 BFieldComponentRadial::calculate(const TVector3& point) const
 
   //B2DEBUG(20, "B Radial field is calculated: z= " << z/Unit::m <<"[m] By= "<< By <<"[Tesla].")
 
-  return TVector3(Bx, By, Bz);
+  return B2Vector3D(Bx, By, Bz);
 }
 
 void BFieldComponentRadial::terminate()

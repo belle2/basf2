@@ -12,13 +12,13 @@ from modularAnalysis import *
 def stdPi(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('pi+:all', '', True, path)
-    if listtype == '99eff':
+    elif listtype == '99eff':
         fillParticleList('pi+:99eff', 'piid > 0.010 and chiProb > 0.001', True, path)
-    if listtype == '95eff':
+    elif listtype == '95eff':
         fillParticleList('pi+:95eff', 'piid > 0.437 and chiProb > 0.001', True, path)
-    if listtype == '90eff':
+    elif listtype == '90eff':
         fillParticleList('pi+:90eff', 'piid > 0.722 and chiProb > 0.001', True, path)
-    if listtype == '85eff':
+    elif listtype == '85eff':
         fillParticleList('pi+:85eff', 'piid > 0.914 and chiProb > 0.001', True, path)
     else:
         fillParticleList('pi+:all', '', True, path)
@@ -29,13 +29,13 @@ def stdPi(listtype='95eff', path=analysis_main):
 def stdK(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('K+:all', '', True, path)
-    if listtype == '99eff':
+    elif listtype == '99eff':
         fillParticleList('K+:99eff', 'Kid > 0.001 and chiProb > 0.001', True, path)
-    if listtype == '95eff':
+    elif listtype == '95eff':
         fillParticleList('K+:95eff', 'Kid > 0.293 and chiProb > 0.001', True, path)
-    if listtype == '90eff':
+    elif listtype == '90eff':
         fillParticleList('K+:90eff', 'Kid > 0.611 and chiProb > 0.001', True, path)
-    if listtype == '85eff':
+    elif listtype == '85eff':
         fillParticleList('K+:85eff', 'Kid > 0.830 and chiProb > 0.001', True, path)
     else:
         fillParticleList('K+:all', '', True, path)
@@ -46,9 +46,9 @@ def stdK(listtype='95eff', path=analysis_main):
 def stdPr(listtype='95eff', path=analysis_main):
     if listtype == 'all':
         fillParticleList('p+:all', '', True, path)
-    if listtype == '95eff':
+    elif listtype == '95eff':
         fillParticleList('p+:95eff', 'prid > 0.079 and chiProb > 0.001', True, path)
-    if listtype == '90eff':
+    elif listtype == '90eff':
         fillParticleList('p+:90eff', 'prid > 0.872 and chiProb > 0.001', True, path)
     else:
         fillParticleList('p+:all', '', True, path)

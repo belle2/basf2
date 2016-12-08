@@ -3,12 +3,11 @@
   <Creator library="top">TOPCreator</Creator>
   <Content>
     <xi:include href="TOP-Bars.xml"/>
+    <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="TOP-PMT.xml"/>
     <xi:include href="TOP-TDC.xml"/>
     <xi:include href="TOP-QENaKSbCs.xml"/>
     <xi:include href="TOP-Materials.xml"/>
-    <xi:include href="TOP-Support.xml"/>
-    <xi:include href="TOP-Mirror.xml"/>
     <xi:include href="QBB.xml"/>
     <xi:include href="FrontEndGeo.xml"/>
     <xi:include href="FrontEndMapping.xml"/>

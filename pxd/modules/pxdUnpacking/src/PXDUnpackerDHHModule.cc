@@ -92,6 +92,10 @@ REG_MODULE(PXDUnpackerDHH)
 #define ONSEN_ERR_FLAG_HEADER_ERR_GHOST   0x1000000000ull
 #define ONSEN_ERR_FLAG_SUSP_PADDING  0x2000000000ull
 
+#define ONSEN_ERR_FLAG_DHC_WIE  0x4000000000ull
+#define ONSEN_ERR_FLAG_DHE_WIE  0x8000000000ull
+#define ONSEN_ERR_FLAG_ROW_OVERFLOW  0x10000000000ull
+
 //-----------------------------------------------------------------
 //                 Implementation
 //-----------------------------------------------------------------
@@ -383,7 +387,7 @@ struct dhc_ghost_frame {
 struct dhc_end_frame {
   const dhc_frame_header_word0 word0;
   const ubig16_t trigger_nr_lo;
-  const unsigned int wordsinevent;
+  const ubig32_t wordsinevent;
   const unsigned int errorinfo;
   const unsigned int crc32;
   /// fixed length
@@ -411,17 +415,19 @@ struct dhc_end_frame {
 struct dhc_dhe_end_frame {
   const dhc_frame_header_word0 word0;
   const ubig16_t trigger_nr_lo;
-  const unsigned int wordsinevent;
-  const unsigned int errorinfo;
+  const ubig16_t wordsineventlo; // words swapped... because of DHE 16 bit handling
+  const ubig16_t wordsineventhi;
+  const unsigned int errorinfo;// not well defined yet
   const unsigned int crc32;
   /// fixed length
 
-  unsigned int get_words(void) const  {    return wordsinevent;  }
+  unsigned int get_words(void) const  {    return wordsineventlo | ((unsigned int)wordsineventhi << 16);  }
   inline unsigned int getFixedSize(void) const  {    return 16;  };
   void print(void) const
   {
     word0.print();
-    B2INFO("DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsinevent << " ERR " << hex << errorinfo
+    B2INFO("DHC DHE End Frame TNRLO " << hex << trigger_nr_lo << " WIEVT " << hex << wordsineventhi << "." << wordsineventlo << " ERR "
+           << hex << errorinfo
            << " CRC " << hex << crc32);
   };
   inline unsigned int getDHEId(void) const {return (word0.getMisc() >> 4) & 0x3F;};
@@ -656,8 +662,8 @@ void PXDUnpackerDHHModule::terminate()
     "Missing Datcon", "NO DHC data for Trigger", "DHE active mismatch", "DHP active mismatch",
 
     "SendUnfiltered but Filtered Frame Type", "!SendUnfiltered but Unfiltered Frame Type", "DHP has double header", "Error bit in frame header set",
-    "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "unused", "unused",
-    "unused", "unused", "unused", "unused",
+    "Error bit in GHOST frame header not set", "Suspicious Padding/Checksum in DHP ZSP", "DHC Words in Event mismatch", "DHH Words in Event mismatch",
+    "Row Overflow/out of bounds >=768", "unused", "unused", "unused",
     "unused", "unused", "unused", "unused",
 
     "unused", "unused", "unused", "unused",
@@ -964,7 +970,7 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
   if (dhp_pix[2] == dhp_pix[4] && dhp_pix[3] + 1 == dhp_pix[5]) {
     B2ERROR("DHP data: seems to be double header! skipping ... len " << frame_len);
     m_errorMask |= ONSEN_ERR_FLAG_DHP_DBL_HEADER;
-//    dump_dhp(data,frame_len);
+    // dump_dhp(data, frame_len); print out guilty dhp packet
 //    B2ERROR("Mask $" << hex <<m_errorMask);
     return;
   }
@@ -985,13 +991,17 @@ void PXDUnpackerDHHModule::unpack_dhp(void* data, unsigned int frame_len, unsign
           B2ERROR("DHP Unpacking: Pix without Row!!! skip dhp data ");
           m_errorMask |= ONSEN_ERR_FLAG_DHP_PIX_WO_ROW;
 //           dhp_pixel_error++;
-//          dump_dhp(data,frame_len);
+          // dump_dhp(data, frame_len);// print out faulty dhp frame
           return;
         } else {
           dhp_row = (dhp_row & 0xFFE) | ((dhp_pix[i] & 0x4000) >> 14);
           dhp_col = ((dhp_pix[i]  & 0x3F00) >> 8);
           unsigned int v_cellID, u_cellID;
           v_cellID = dhp_row;// defaults for no mapping
+          if (dhp_row >= 768) {
+            B2ERROR("DHP ROW Overflow " << dhp_row);
+            m_errorMask |= ONSEN_ERR_FLAG_ROW_OVERFLOW;
+          }
           u_cellID = dhp_col;// defaults for no mapping
           ///  remapping flag
           /// if (dhe_reformat == 0) dhp_col ^= 0x3C ; /// 0->60 61 62 63 4->56 57 58 59 ...
@@ -1059,7 +1069,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   /// while depacking the frames. they are in most cases (re)set on the first frame or ONSEN trg frame
   /// Most could put in as a class member, but they are only needed within this function
   static unsigned int eventNrOfOnsenTrgFrame = 0;
-  static int countedWordsInEvent;// count the size of all frames in words
+  static int countedBytesInDHC;// count the size of all frames in words?
+  static int countedBytesInDHE;// count the size of all frames in words?
   static int countedDHEStartFrames = 0;
   static int countedDHEEndFrames = 0;
   //  static int nr_of_frames_dhc = 0;/// tbd if and where this number will still show up in te DHC format TODO
@@ -1074,7 +1085,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   static unsigned int currentDHEID = 0xFFFFFFFF;
   static unsigned int currentVxdId = 0;
   static bool isFakedData_event = false;
-  static bool isUnfiltered_event = false;
+  static bool isUnfiltered_event = true;// it is DHH, we dont have ONSEN filtering
 
 
   dhc_frame_header_word0* hw = (dhc_frame_header_word0*)data;
@@ -1095,10 +1106,11 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
   if (Frame_Number == 0) { /// We reset the counters on the first event
     countedDHEStartFrames = 0;
     countedDHEEndFrames = 0;
-    countedWordsInEvent = 0;
+    countedBytesInDHC = 0;
+    countedBytesInDHE = 0;
     currentDHEID = 0xFFFFFFFF;
     currentVxdId = 0;
-    isUnfiltered_event = false;
+    isUnfiltered_event = true;// it is DHH, we dont have ONSEN filtering
     isFakedData_event = false;
     if (type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START) {
       B2ERROR("This does not look like BonnDAQ format. Try to use pxdUnpacker module.");
@@ -1121,7 +1133,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 
   if (Frame_Number > 1 && Frame_Number < Frames_in_event - 1) {
     if (countedDHEStartFrames != countedDHEEndFrames + 1)
-      if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START) {
+      if (type != DHC_FRAME_HEADER_DATA_TYPE_ONSEN_ROI && type != DHC_FRAME_HEADER_DATA_TYPE_DHE_START
+          && type != DHC_FRAME_HEADER_DATA_TYPE_DHC_START && type != DHC_FRAME_HEADER_DATA_TYPE_DHC_END) {
         B2ERROR("Data Frame outside a DHE START/END");
         m_errorMask |= ONSEN_ERR_FLAG_DATA_OUTSIDE;
       }
@@ -1225,6 +1238,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHC_START: {
+      countedBytesInDHC = 0;
       if (isFakedData_event != dhc.data_dhc_start_frame->isFakedData()) {
         B2ERROR("DHC START is but no Fake event OR Fake Event but DHE END is not.");
       }
@@ -1255,6 +1269,7 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       break;
     };
     case DHC_FRAME_HEADER_DATA_TYPE_DHE_START: {
+      countedBytesInDHE = 0;
       countedDHCFrames++;
       if (verbose)dhc.data_dhe_start_frame->print();
       dhe_first_readout_frame_id_lo = dhc.data_dhe_start_frame->getStartFrameNr();
@@ -1341,20 +1356,13 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       }
       if (!isFakedData_event) {
         int w;
-        w = dhc.data_dhc_end_frame->get_words() * 2;
-        countedWordsInEvent += 2;
-        if (verbose) {
-          B2INFO("countedWordsInEvent " << countedWordsInEvent << " w " << w);
-        };
-        if (countedWordsInEvent != w) {
-          if (verbose) {
-            B2INFO("Error: WIE " << hex << countedWordsInEvent << " vs END " << hex << w);
-          };
-//           error_flag = true;
-//           wie_error++;
+        w = dhc.data_dhc_end_frame->get_words() * 4;
+        if (countedBytesInDHC != w) {
+          B2ERROR("Error: WIE " << hex << countedBytesInDHC << " != DHC END " << hex << w);
+          m_errorMask |= ONSEN_ERR_FLAG_DHC_WIE;
         } else {
           if (verbose)
-            B2INFO("EVT END: WIE " << hex << countedWordsInEvent << " == END " << hex << w);
+            B2INFO("EVT END: WIE " << hex << countedBytesInDHC << " == DHC END " << hex << w);
         }
       }
       m_errorMask |= dhc.check_crc();
@@ -1380,6 +1388,17 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
       if (countedDHEStartFrames != countedDHEEndFrames) {
         B2ERROR("DHC_FRAME_HEADER_DATA_TYPE_DHE_END without DHC_FRAME_HEADER_DATA_TYPE_DHE_START");
         m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
+      }
+      {
+        int w;
+        w = dhc.data_dhe_end_frame->get_words() * 2;
+        if (countedBytesInDHE != w) {
+          B2ERROR("Error: WIE " << hex << countedBytesInDHE << " != DHE END " << hex << w);
+          m_errorMask |= ONSEN_ERR_FLAG_DHE_WIE;
+        } else {
+          if (verbose)
+            B2INFO("EVT END: WIE " << hex << countedBytesInDHE << " == DHE END " << hex << w);
+        }
       }
       break;
     };
@@ -1485,7 +1504,8 @@ void PXDUnpackerDHHModule::unpack_dhc_frame(void* data, const int len, const int
 //     m_errorMask |= ONSEN_ERR_FLAG_DHE_START;
 //   }
 
-  countedWordsInEvent += len;
+  countedBytesInDHC += len;
+  countedBytesInDHE += len;
 
 }
 #pragma GCC diagnostic pop

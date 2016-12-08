@@ -55,7 +55,7 @@ RootInputModule::RootInputModule() : Module(), m_nextEntry(0), m_lastPersistentE
            "List of input files. You may use shell-like expansions to specify multiple files, e.g. 'somePrefix_*.root' or 'file_[a,b]_[1-15].root'. Can be overridden using the -i argument to basf2.",
            emptyvector);
   addParam("entrySequences", m_entrySequences,
-           "The number sequences (e.g. 23~42,101) defining the entries which are processed for each inputFileName."
+           "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
            "The first event has the entry number 0.", emptyvector);
   addParam("ignoreCommandLineOverride"  , m_ignoreCommandLineOverride,

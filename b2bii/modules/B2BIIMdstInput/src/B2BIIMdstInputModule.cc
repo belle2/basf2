@@ -77,7 +77,7 @@ B2BIIMdstInputModule::B2BIIMdstInputModule() : Module()
 
   std::vector<std::string> emptyvector;
   addParam("entrySequences", m_entrySequences,
-           "The number sequences (e.g. 23~42,101) defining the entries which are processed for each inputFileName."
+           "The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName."
            "Must be specified exactly once for each file to be opened."
            "The first event has the number 0.", emptyvector);
 }

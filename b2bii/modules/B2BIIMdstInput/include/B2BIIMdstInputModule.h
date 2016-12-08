@@ -69,7 +69,7 @@ namespace Belle2 {
     /** List of input MDST filenames */
     std::vector<std::string> m_inputFileNames;
     /**
-     * The number sequences (e.g. 23~42,101) defining the entries which are processed for each inputFileName.
+     * The number sequences (e.g. 23:42,101) defining the entries which are processed for each inputFileName.
      */
     std::vector<std::string> m_entrySequences;
 

@@ -35,7 +35,7 @@ namespace Belle2 {
     std::vector<std::pair<int64_t, int64_t>> intervals;
     intervals.reserve(tokens.size());
     for (const auto& token : tokens) {
-      size_t interval_marker_position = token.find('~');
+      size_t interval_marker_position = token.find(':');
       // Single number
       if (interval_marker_position == std::string::npos) {
         int64_t number = std::stol(token);

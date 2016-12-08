@@ -14,6 +14,7 @@
 #include <geometry/bfieldmap/BFieldComponentAbs.h>
 
 #include <framework/geometry/B2Vector3.h>
+#include <framework/logging/Logger.h>
 
 #include <string>
 #include <list>

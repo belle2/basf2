@@ -162,11 +162,11 @@ B2Vector3D BFieldComponentRadial::calculate(const B2Vector3D& point) const
       double angle_crossing = 0.0830;
 
       double angle_HER = - angle_crossing / 2.;
-      B2Vector3D pHER(point.X(), point.Y(), point.Z()); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
+      B2Vector3D pHER(point); pHER.RotateY(angle_HER); pHER.RotateX(M_PI);
       double rHER = pHER.Perp();
 
       double angle_LER =  angle_crossing / 2.;
-      B2Vector3D pLER(point.X(), point.Y(), point.Z()); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
+      B2Vector3D pLER(point); pLER.RotateY(angle_LER); pLER.RotateX(M_PI);
       double rLER = pLER.Perp();
 
       Bz = (m_mapBuffer[0][iz].z * (m_gridPitchZ - dz) + m_mapBuffer[0][iz + 1].z * dz) / m_gridPitchZ;

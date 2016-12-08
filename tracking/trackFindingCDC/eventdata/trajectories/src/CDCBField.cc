@@ -43,7 +43,7 @@ double CDCBFieldUtil::getBFieldZ(const Vector3D& pos3D)
   // which can occure if fits fail.
   // Return NAN to the caller and let him decide what to do next.
   if (pos3D.hasNAN()) return NAN;
-  TVector3 mag3D = BFieldMap::Instance().getBField(B2Vector3D(pos3D.x(), pos3D.y(), pos3D.z()));
+  auto mag3D = BFieldMap::Instance().getBField(B2Vector3D(pos3D.x(), pos3D.y(), pos3D.z()));
   return mag3D.Z();
 }
 

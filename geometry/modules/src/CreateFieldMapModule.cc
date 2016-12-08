@@ -53,7 +53,7 @@ CreateFieldMapModule::CreateFieldMapModule() : Module()
 void CreateFieldMapModule::initialize()
 {
   if (m_filename.empty()) {
-    B2ERROR("No Filename given.");
+    B2WARNING("CreateFieldMap: No Filename given, just sampling for fun");
   }
   boost::to_lower(m_type);
   boost::trim(m_type);
@@ -85,9 +85,13 @@ void CreateFieldMapModule::initialize()
 
 void CreateFieldMapModule::beginRun()
 {
-  //Create histograms
-  TFile* outfile = new TFile(m_filename.c_str(), "RECREATE");
-  outfile->cd();
+  const bool save{!m_filename.empty()};
+  TFile* outfile{nullptr};
+  if (save) {
+    //Create histograms
+    outfile = new TFile(m_filename.c_str(), "RECREATE");
+    outfile->cd();
+  }
 
   //Determine type of scan
   EFieldTypes type = c_XY;
@@ -102,23 +106,29 @@ void CreateFieldMapModule::beginRun()
   int lastPercent(-1);
   uint64_t nSteps = m_nU * m_nV;
   uint64_t curStep{0};
-  const double start = Utils::getClock();
+  double startTime{0};
   auto showProgress = [&]() {
-    //Show progress
+    if (curStep == 0) startTime = Utils::getClock();
     const int64_t donePercent = 100 * ++curStep / nSteps;
     if (donePercent > lastPercent) {
-      const double perStep = (Utils::getClock() - start) / curStep;
-      const double eta = perStep * (nSteps - curStep);
-      B2INFO(boost::format("BField %s Scan: %3d%%, %.3f ms per sample, ETA: %.2f seconds")
-             % m_type % donePercent
-             % (perStep / Unit::ms) % (eta / Unit::s));
+      const double totalTime = Utils::getClock() - startTime;
+      const double perStep = totalTime / curStep;
+      if (donePercent == 100) {
+        B2INFO(boost::format("BField %s Scan: %d samples, %.3f us per sample, total: %.2f seconds")
+               % m_type % curStep
+               % (perStep / Unit::us) % (totalTime / Unit::s));
+      } else {
+        B2INFO(boost::format("BField %s Scan: %3d%%, %.3f us per sample")
+               % m_type % donePercent
+               % (perStep / Unit::us));
+      }
       lastPercent = donePercent;
     }
   };
 
   struct { float x{0}, y{0}, z{0}, bx{0}, by{0}, bz{0}; } field_point;
   TTree* all_values{nullptr};
-  if (m_createTree) {
+  if (save && m_createTree) {
     all_values = new TTree("bfield_values", "All B field values");
     all_values->Branch("x", &field_point.x, "x/F");
     all_values->Branch("y", &field_point.y, "y/F");
@@ -155,18 +165,22 @@ void CreateFieldMapModule::beginRun()
           //Obtain magnetic field
           B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
           //And fill histograms
-          h_br->Fill(u, v, bfield.Perp());
-          h_bz->Fill(u, v, bfield.Z());
-          h_b->Fill(u, v, bfield.Mag());
-          fillTree(pos, bfield);
+          if (save) {
+            h_br->Fill(u, v, bfield.Perp());
+            h_bz->Fill(u, v, bfield.Z());
+            h_b->Fill(u, v, bfield.Mag());
+            fillTree(pos, bfield);
+          }
           showProgress();
         }
       }
     }
     //Write histograms and close file.
-    for (TH2D* h : {h_br, h_bz, h_b}) {
-      h->Scale(1. / m_nPhi);
-      h->Write();
+    if (save) {
+      for (TH2D* h : {h_br, h_bz, h_b}) {
+        h->Scale(1. / m_nPhi);
+        h->Write();
+      }
     }
   } else {
     const std::string nu = m_type.substr(0, 1);
@@ -201,21 +215,27 @@ void CreateFieldMapModule::beginRun()
         //Obtain magnetic field
         B2Vector3D bfield = BFieldMap::Instance().getBField(pos);
         //And fill histograms
-        h_bx->Fill(u, v, bfield.X());
-        h_by->Fill(u, v, bfield.Y());
-        h_bz->Fill(u, v, bfield.Z());
-        h_b->Fill(u, v, bfield.Mag());
-        fillTree(pos, bfield);
+        if (save) {
+          h_bx->Fill(u, v, bfield.X());
+          h_by->Fill(u, v, bfield.Y());
+          h_bz->Fill(u, v, bfield.Z());
+          h_b->Fill(u, v, bfield.Mag());
+          fillTree(pos, bfield);
+        }
         showProgress();
       }
     }
     //Write histograms.
-    for (TH2D* h : {h_bx, h_by, h_bz, h_b}) {
-      h->Write();
+    if (save) {
+      for (TH2D* h : {h_bx, h_by, h_bz, h_b}) {
+        h->Write();
+      }
     }
   }
-  if (all_values) all_values->Write();
-  outfile->Close();
-  delete outfile;
+  if (save) {
+    if (all_values) all_values->Write();
+    outfile->Close();
+    delete outfile;
+  }
   //histograms seem to be deleted when file is closed
 }

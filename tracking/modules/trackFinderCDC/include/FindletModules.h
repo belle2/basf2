@@ -35,6 +35,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
+#include <tracking/trackFindingCDC/findlets/minimal/TrackCombiner.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackFlightTimeAdjuster.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
@@ -298,6 +299,12 @@ namespace Belle2 {
      * Module implementation using the TrackLinker
      */
     class TrackLinkerModule : public FindletModule<TrackLinker> {
+    };
+
+    /**
+     * Module implementation using the TrackCombiner
+     */
+    class TrackCombinerModule : public FindletModule<TrackCombiner> {
     };
 
     /**

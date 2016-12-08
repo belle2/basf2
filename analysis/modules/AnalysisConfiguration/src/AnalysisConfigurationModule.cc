@@ -22,11 +22,13 @@ REG_MODULE(AnalysisConfiguration)
 AnalysisConfigurationModule::AnalysisConfigurationModule() : Module()
 {
   setDescription("This is a supplimentary module designed to configure other modules");
-  addParam("tuple_style", m_TupleStyle, "Style of the tuples", std::string("Default"));
+  addParam("tupleStyle", m_tupleStyle, R"DOCSTRING(Style of the tuples. \n
+  Possible styles on example of PX variable of pi0 from D in decay B->(D->pi0 pi) pi0:\n
+  'Default': B_D_pi0_PX\n
+  'Laconic': pi01_PX)DOCSTRING", std::string("Default"));
 }
 
 void AnalysisConfigurationModule::initialize()
 {
-  AnalysisConfiguration::instance()->setTupleStyle(m_TupleStyle);
-  //c.setTupleStyle(m_TupleStyle);
+  AnalysisConfiguration::instance()->setTupleStyle(m_tupleStyle);
 }

@@ -67,14 +67,12 @@ bool DecayDescriptor::init(const DecayString& s)
   // The DecayString is a hybrid, it can be
   // a) DecayStringParticleList
   // b) DecayStringDecay
-  //AnalysisConfigurationModule c;
-  //if (c.getTupleStyle()=="Laconic")
-  //{
-  //m_isLaconic = true;
-  //}
-  //AnalysisConfiguration c;
 
-  B2INFO("Checking tuple style from DecayDesctiptor");
+  //Checking variable naming scheme from AnalysisConfiguratin
+  //For example, effect of possible schemes for PX variable
+  //of pi0 from D in decay B->(D->pi0 pi) pi0:
+  //Default: B_D_pi0_PX
+  //"Laconic": pi01_PX
   if (AnalysisConfiguration::instance()->getTupleStyle() == "Laconic") {
     m_isLaconic = true;
   }

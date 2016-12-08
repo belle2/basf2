@@ -11,6 +11,7 @@
 #include <boost/python/def.hpp>
 #include <boost/python/overloads.hpp>
 #include <boost/python/docstring_options.hpp>
+#include <boost/algorithm/string.hpp>
 
 #include <framework/database/Database.h>
 
@@ -194,6 +195,27 @@ namespace {
       B2WARNING("No central database configured, experiment name ignored");
     }
   }
+}
+
+std::string Database::getGlobalTag()
+{
+  std::vector<Database*> databases{&Database::Instance()};
+  std::vector<std::string> tags;
+  DatabaseChain* chain = dynamic_cast<DatabaseChain*>(databases[0]);
+  if (chain) {
+    databases = chain->getDatabases();
+  }
+  for (Database* db : databases) {
+    ConditionsDatabase* cond = dynamic_cast<ConditionsDatabase*>(db);
+    if (cond) {
+      std::string tag = cond->getGlobalTag();
+      if (std::find(tags.begin(), tags.end(), tag) == tags.end()) {
+        tags.emplace_back(tag);
+      }
+    }
+  }
+  if (tags.empty()) return "";
+  return boost::algorithm::join(tags, ",");
 }
 
 void Database::exposePythonAPI()

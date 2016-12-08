@@ -165,6 +165,13 @@ namespace Belle2 {
     static void exposePythonAPI();
 
     /**
+     * Return the global tag used by the database. If no conditions database is
+     * configured return an empty string. If more then once database is
+     * configured return all global tags concatenated by ','
+     */
+    static std::string getGlobalTag();
+
+    /**
      * Set level of log messages about not-found payloads.
      *
      * @param logLevel  The level of log messages about not-found payloads.

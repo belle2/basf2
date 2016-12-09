@@ -58,7 +58,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       WireHitCreatorModule()
-        : Super{{{"CDCWireHitVector"}}}
+        : Super( {"CDCWireHitVector"})
       {
       }
     };
@@ -74,7 +74,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       SuperClusterCreatorModule()
-        : Super{{{"CDCWireHitVector", "CDCWireHitSuperClusterVector"}}}
+        : Super( {"CDCWireHitVector", "CDCWireHitSuperClusterVector"})
       {
       }
     };
@@ -90,7 +90,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       ClusterRefinerModule()
-        : Super{{{"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"}}}
+        : Super( {"CDCWireHitSuperClusterVector", "CDCWireHitClusterVector"})
       {
       }
     };
@@ -106,7 +106,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       ClusterBackgroundDetectorModule()
-        : Super{{{"CDCWireHitClusterVector"}}}
+        : Super( {"CDCWireHitClusterVector"})
       {
       }
     };
@@ -122,7 +122,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       FacetCreatorModule()
-        : Super{{{"CDCWireHitClusterVector", "CDCFacetVector"}}}
+        : Super( {"CDCWireHitClusterVector", "CDCFacetVector"})
       {
       }
     };
@@ -138,7 +138,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       SegmentCreatorFacetAutomatonModule()
-        : Super{{{"CDCFacetVector", "" /*to be set externally*/}}}
+        : Super( {"CDCFacetVector", "" /*to be set externally*/})
       {
       }
     };
@@ -178,7 +178,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       SegmentCreatorMCTruthModule()
-        : Super{{{"CDCWireHitVector", "CDCSegment2DVector"}}}
+        : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
       {
       }
     };
@@ -194,7 +194,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       AxialTrackCreatorSegmentHoughModule()
-        : Super{{{"CDCSegment2DVector", "CDCTrackVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCTrackVector"})
       {
       }
     };
@@ -210,7 +210,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       AxialSegmentPairCreatorModule()
-        : Super{{{"CDCSegment2DVector", "CDCAxialSegmentPairVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCAxialSegmentPairVector"})
       {
       }
     };
@@ -226,7 +226,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       SegmentPairCreatorModule()
-        : Super{{{"CDCSegment2DVector", "CDCSegmentPairVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCSegmentPairVector"})
       {
       }
     };
@@ -242,7 +242,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       SegmentTripleCreatorModule()
-        : Super{{{"CDCSegment2DVector", "CDCAxialSegmentVector", "CDCSegmentTripleVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCAxialSegmentVector", "CDCSegmentTripleVector"})
       {
       }
     };
@@ -258,7 +258,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TrackCreatorSegmentPairAutomatonModule()
-        : Super{{{"CDCSegmentPairVector", "" /*to be set externally*/}}}
+        : Super( {"CDCSegmentPairVector", "" /*to be set externally*/})
       {
       }
     };
@@ -274,7 +274,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TrackCreatorSegmentTripleAutomatonModule()
-        : Super{{{"CDCSegmentTripleVector", "" /*to be set externally*/}}}
+        : Super( {"CDCSegmentTripleVector", "" /*to be set externally*/})
       {
       }
     };
@@ -290,7 +290,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TrackCreatorSingleSegmentsModule()
-        : Super{{{"CDCSegment2DVector", "CDCTrackVector"}}}
+        : Super( {"CDCSegment2DVector", "CDCTrackVector"})
       {
       }
     };
@@ -331,7 +331,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TrackRejecterModule()
-        : Super{{{"CDCTrackVector"}}}
+        : Super( {"CDCTrackVector"})
       {
       }
     };
@@ -348,7 +348,7 @@ namespace Belle2 {
     public:
       /// Constructor setting the default store vector names
       TrackExporterModule()
-        : Super{{{"CDCTrackVector"}}}
+        : Super( {"CDCTrackVector"})
       {
       }
     };
@@ -381,8 +381,7 @@ namespace Belle2 {
     /*
      * Combined Module using a combination of filters on segment pairs
      */
-    class TrackFinderSegmentPairAutomatonModule
-      : public FindletModule<TrackFinderSegmentPairAutomaton> {
+    class TrackFinderSegmentPairAutomatonModule : public FindletModule<TrackFinderSegmentPairAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackFinderSegmentPairAutomaton>;
@@ -398,8 +397,7 @@ namespace Belle2 {
     /*
      * Combined Module using a combination of filters on segment triples
      */
-    class TrackFinderSegmentTripleAutomatonModule
-      : public FindletModule<TrackFinderSegmentTripleAutomaton> {
+    class TrackFinderSegmentTripleAutomatonModule : public FindletModule<TrackFinderSegmentTripleAutomaton> {
 
       /// Type of the base class
       using Super = FindletModule<TrackFinderSegmentTripleAutomaton>;

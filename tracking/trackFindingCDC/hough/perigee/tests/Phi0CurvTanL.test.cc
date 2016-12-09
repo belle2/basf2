@@ -9,9 +9,6 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.h>
-#include <tracking/trackFindingCDC/hough/perigee/AxialLegendreLeafProcessor.icc.h>
-
 #include <tracking/trackFindingCDC/hough/perigee/SimpleRLTaggedWireHitHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/SimpleSegmentHoughTree.h>
 #include <tracking/trackFindingCDC/hough/perigee/StandardBinSpec.h>

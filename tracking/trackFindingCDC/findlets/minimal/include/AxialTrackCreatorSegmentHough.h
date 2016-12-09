@@ -92,10 +92,8 @@ namespace Belle2 {
 
     private:
       /// Type of the hough space tree search
-      using SimpleSegmentPhi0ImpactCurvHoughTree = SimpleSegmentHoughTree<InPhi0ImpactCurvBox,
-            c_phi0Divisions,
-            c_impactDivisions,
-            c_curvDivisions>;
+      using SimpleSegmentPhi0ImpactCurvHoughTree =
+        SimpleSegmentHoughTree<InPhi0ImpactCurvBox, c_phi0Divisions, c_impactDivisions, c_curvDivisions>;
 
       /// The hough space tree search
       SimpleSegmentPhi0ImpactCurvHoughTree m_houghTree{m_param_maxLevel};

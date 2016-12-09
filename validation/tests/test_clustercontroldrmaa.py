@@ -13,6 +13,33 @@ from validationscript import Script
 
 class TestClusterControlDrmaa(unittest.TestCase):
 
+    class SessionMock():
+
+        class JobState(Enum):
+            DONE = 1
+            FAILED = 2
+            RUNNING = 3
+
+        jobStatusReturn = JobState.RUNNING
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc, value, tb):
+            pass
+
+        def createJobTemplate(self):
+            return MagicMock()
+
+        def runJob(self, jt):
+            return MagicMock()
+
+        def jobStatus(self, jt):
+            return self.jobStatusReturn
+
+        def deleteJobTemplate(self, jt):
+            return MagicMock()
+
     def test_no_drmaa(self):
         """
         Overwrite drmaa module and see what happens ...
@@ -31,38 +58,13 @@ class TestClusterControlDrmaa(unittest.TestCase):
             os.chdir(str(td))
 
             drmaa_mock = MagicMock()
+            drmaa_mock.Session = self.SessionMock  # MagicMock(return_value=session_mock)
+            drmaa_mock.JobState = self.SessionMock.JobState
 
-            class JobState(Enum):
-                DONE = 1
-                FAILED = 2
-                RUNNING = 3
-
-            class SessionMock():
-
-                jobStatusReturn = JobState.RUNNING
-
-                def __enter__(self):
-                    return self
-
-                def __exit__(self, exc, value, tb):
-                    pass
-
-                def createJobTemplate(self):
-                    return MagicMock()
-
-                def runJob(self, jt):
-                    return MagicMock()
-
-                def jobStatus(self, jt):
-                    return self.jobStatusReturn
-
-                def deleteJobTemplate(self, jt):
-                    return MagicMock()
-
-            drmaa_mock.Session = SessionMock  # MagicMock(return_value=session_mock)
-
-            drmaa_mock.JobState = JobState
             sys.modules['drmaa'] = drmaa_mock
+
+            # this just imports the drmaa module which should always work with our
+            # mock
             self.assertTrue(Cluster.is_supported())
 
             job = Script(path="myscript1.py", package="test_package", log=None)
@@ -78,9 +80,11 @@ class TestClusterControlDrmaa(unittest.TestCase):
 
             # check on job, finished !
             # change behaviour of jobStatus
-            SessionMock.jobStatusReturn = JobState.DONE
+            self.SessionMock.jobStatusReturn = self.SessionMock.JobState.DONE
 
             self.assertTrue(cc.is_job_finished(job)[0])
+
+            cc.terminate()
 
 if __name__ == "__main__":
     unittest.main()

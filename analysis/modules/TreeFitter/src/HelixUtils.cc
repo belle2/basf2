@@ -94,7 +94,7 @@ namespace TreeFitter {
     // now d0
     double pt02 = px0 * px0 + py0 * py0 ;
     double pt0 = sqrt(pt02) ;
-    double d0 = (pt0 - pt) / aq ;
+    double d0 = -(pt0 - pt) / aq ;//FT changed sign temporarily
 
     // now z0
     double deltaphi = phi - phi0 ;

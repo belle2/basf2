@@ -53,7 +53,7 @@ namespace TreeFitter {
 
   ErrCode Constraint::project(const FitParams& fitpar, Projection& p) const
   {
-    // this one will be overruled by the MergedConstraint
+    // this one will be overloaded by the MergedConstraint
     return m_node->projectConstraint(m_type, fitpar, p) ;
   }
 

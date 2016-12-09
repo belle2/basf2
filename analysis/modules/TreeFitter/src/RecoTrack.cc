@@ -106,6 +106,7 @@ namespace TreeFitter {
       m_m(i) = tau[i - 1];
     // FIX ME: bring z0 in the correct domain ...
     TMatrixDSym cov = m_trackfit->getCovariance5();
+    //could also be TMatrixDSym cov = (m_trackfit->getUncertainHelix()).getCovariance();
     for (int row = 1; row <= 5; ++row)
       for (int col = 1; col <= row; ++col)
         m_matrixV(row, col) = cov[row - 1][col - 1];
@@ -151,6 +152,7 @@ namespace TreeFitter {
       std::cout << "pred = " << helixpars.T() << std::endl ;
       std::cout << "m   = " << m_m.T() << std::endl ;
       std::cout << "sig = " << symdiag(m_matrixV).T() << std::endl ;
+      std::cout << "V matrix = " << m_matrixV << std::endl ;
     }
 
     // get the measured track parameters at the flightlength of the vertex
@@ -167,7 +169,11 @@ namespace TreeFitter {
     }
 
     // bring phi-residual in the correct domain ([-pi,pi])
+    std::cout << "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2);
     p.r(2) = HelixUtils::phidomain(p.r(2)) ;
+    std::cout << " -> " << p.r(2) << std::endl;
+    std::cout << "And now the Jacobian:" << std::endl;
+    std::cout << jacobian << std::endl;
     // FIX ME: bring z0 residual in the correct domain --> this needs some thinking
 
     // calculate the full projection matrix from the jacobian
@@ -180,6 +186,8 @@ namespace TreeFitter {
       for (int col = 1; col <= 3; ++col)
         p.H(row, momindex + col) = jacobian(row, col + 3) ;
     }
+    std::cout << "And now the H matrix:" << std::endl;
+    std::cout << p.H() << std::endl;
     return status ;
   }
 

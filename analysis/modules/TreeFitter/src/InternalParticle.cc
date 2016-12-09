@@ -254,9 +254,10 @@ namespace TreeFitter {
           //    HepPoint v ;
           TVector3 v ;
           HelixUtils::helixPoca(helix1, helix2, flt1, flt2, v, m_isconversion) ;
-          fitparams->par()(posindex + 1) = v.x() ;
-          fitparams->par()(posindex + 2) = v.y() ;
-          fitparams->par()(posindex + 3) = v.z() ;
+          fitparams->par()(posindex + 1) = -v.x() ;//FT changed sign; this is not justified by the algebra, but gets the correct
+          fitparams->par()(posindex + 2) = -v.y() ;//initialisation... helixPoca function must be checked
+          fitparams->par()(posindex + 3) = -v.z() ;//
+
           dau1->setFlightLength(flt1) ;
           dau2->setFlightLength(flt2) ;
 

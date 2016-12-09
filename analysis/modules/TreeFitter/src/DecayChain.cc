@@ -62,7 +62,8 @@ namespace TreeFitter {
     mergedconstraint = MergedConstraint() ;
     for (ParticleBase::constraintlist::iterator it =  m_constraintlist.begin() ;
          it != m_constraintlist.end(); ++it) {
-      if (it->isLinear()) m_mergedconstraintlist.push_back(&(*it)) ;
+      //      if (it->isLinear()) m_mergedconstraintlist.push_back(&(*it)) ;
+      if (true) m_mergedconstraintlist.push_back(&(*it)); //FT: never filter constraints together
       else  mergedconstraint.push_back(&(*it)) ;
     }
 
@@ -111,6 +112,7 @@ namespace TreeFitter {
     //#ifdef THEOLDWAY
     if (m_mergedconstraintlist.empty()) {//FT:Merged constraints actually crash this so the old method is used; go back and find out why
       for (ParticleBase::constraintlist::const_iterator it = m_constraintlist.begin() ;
+           //FT: as far as I can tell, this is never empty?
            it != m_constraintlist.end(); ++it) {
         //  status |= it->filter(&par) ;
         status |= it->filter(&par, &reference) ;
@@ -124,6 +126,7 @@ namespace TreeFitter {
       for (std::vector<Constraint*>::const_iterator it = m_mergedconstraintlist.begin() ;
            it != m_mergedconstraintlist.end(); ++it) {
         status |= (*it)->filter(&par) ;
+        B2WARNING("Not using referencing...");
         //  status |= (*it)->filter(&par,&reference) ; //FT: temporarily disabled because of crashing
         if (vtxverbose >= 2 && status.failure()) {
           std::cout << "status is failure after parsing constraint: " ;

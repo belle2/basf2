@@ -30,7 +30,7 @@
 #pragma link C++ class Belle2::TOPGeoPrismEnclosure+;
 #pragma link C++ class Belle2::TOPGeoColdPlate+;
 #pragma link C++ class Belle2::TOPGeoQBB+;
-#pragma link C++ class Belle2::TOPGeoBoardStack+;
+#pragma link C++ class Belle2::TOPGeoFrontEnd+;
 #pragma link C++ class Belle2::TOPNominalQE+;
 #pragma link C++ class Belle2::TOPNominalTTS+;
 #pragma link C++ class Belle2::TOPNominalTDC+;

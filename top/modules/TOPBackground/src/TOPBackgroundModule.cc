@@ -10,6 +10,7 @@
 
 // Own include
 #include <top/modules/TOPBackground/TOPBackgroundModule.h>
+#include <top/geometry/TOPGeometryPar.h>
 
 #include <time.h>
 
@@ -27,7 +28,6 @@
 #include <framework/dataobjects/EventMetaData.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
-
 
 using namespace std;
 using namespace boost;
@@ -149,13 +149,23 @@ namespace Belle2 {
     origin_zy->SetName("originZY");
     origin_zx->SetName("originZX");
     module_occupancy->SetName("occupancy");
-    PCBmass = 0.417249;
-    PCBarea = 496.725;
+
+    const auto& geo = TOP::TOPGeometryPar::Instance()->getGeometry()->getFrontEnd();
+    double S1 = geo.getFrontBoardWidth() * geo.getFrontBoardHeight();
+    double S2 = geo.getHVBoardWidth() * geo.getHVBoardLength();
+    double V1 = S1 * geo.getFrontBoardThickness();
+    double V2 = S2 * geo.getHVBoardThickness();
+    double density = 2.0; // TODO get it from material definition
+
+    PCBarea = S1 + S2; // [cm^2], old value was: 496.725
+    PCBmass = (V1 + V2) * density / 1000; // [kg], old value was: 0.417249
+
     yearns = 1.e13;
     evtoJ = 1.60217653 * 1e-10;
     mtoc = 1.97530864197531;
     count = 0;
     count_occ = 0;
+
     origingamma_x = 0;
     origingamma_y = 0;
     origingamma_z = 0;

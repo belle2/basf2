@@ -16,7 +16,7 @@
 #include <geometry/CreatorBase.h>
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
-#include <framework/database/DBObjPtr.h>
+#include <framework/database/IntervalOfValidity.h>
 
 class G4LogicalVolume;
 class G4AssemblyVolume;
@@ -99,54 +99,6 @@ namespace Belle2 {
                           geometry::GeometryTypes type);
 
       /**
-       * Old way
-       */
-      void createGeometryOld(const TOPGeometry& parameters,
-                             G4LogicalVolume& topVolume,
-                             geometry::GeometryTypes type);
-
-      /**
-       * New way (under development)
-       */
-      void createGeometryNew(const TOPGeometry& parameters,
-                             G4LogicalVolume& topVolume,
-                             geometry::GeometryTypes type);
-
-      // -- old creator ----------------------------------------------------
-
-      /**
-       * Creates one module of the TOP counter (bar+support+PMT array)
-       * @param geo geometry description
-       * @param moduleID module ID
-       * @return logical volume of the module
-       */
-      G4LogicalVolume* buildTOPModule(const TOPGeometry& geo, int moduleID);
-
-      /**
-       * Creates a bar with a stack of PMT's
-       * @param geo geometry description
-       * @param moduleID module ID
-       * @return assembly volume of the bar with PMT's
-       */
-      G4AssemblyVolume* buildBar(const TOPGeometry& geo, int moduleID);
-
-      /**
-       * Creates a PMT stack
-       * @param geo geometry description
-       * @return logical volume of PMT array
-       */
-      G4LogicalVolume* buildPMTstack(const TOPGeoPMTArray& geo);
-
-      /**
-       * Creates a PMT
-       * @param geo geometry description
-       * @return logical volume of one PMT
-       */
-      G4LogicalVolume* buildPMT(const TOPGeoPMT& geo);
-
-      // -- new creator ----------------------------------------------------
-
-      /**
        * Creates single module
        * @param geo geometry description
        * @param moduleID module ID (slot number)
@@ -192,7 +144,7 @@ namespace Belle2 {
        * @param N number of board stacks per module
        * @return assembly volume
        */
-      G4AssemblyVolume* assembleFrontEnd(const TOPGeoBoardStack& geo, int N);
+      G4AssemblyVolume* assembleFrontEnd(const TOPGeoFrontEnd& geo, int N);
 
       /**
        * Creates board stack
@@ -200,7 +152,7 @@ namespace Belle2 {
        * @param N number of board stacks per module
        * @return logical volume
        */
-      G4LogicalVolume* createBoardStack(const TOPGeoBoardStack& geo, int N);
+      G4LogicalVolume* createBoardStack(const TOPGeoFrontEnd& geo, int N);
 
       /**
        * Assembles optical components (PMT array, prism and bar segments) along z

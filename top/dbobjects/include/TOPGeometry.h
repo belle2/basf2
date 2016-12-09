@@ -13,7 +13,7 @@
 #include <top/dbobjects/TOPGeoBase.h>
 #include <top/dbobjects/TOPGeoModule.h>
 #include <top/dbobjects/TOPGeoPMTArray.h>
-#include <top/dbobjects/TOPGeoBoardStack.h>
+#include <top/dbobjects/TOPGeoFrontEnd.h>
 #include <top/dbobjects/TOPGeoQBB.h>
 #include <top/dbobjects/TOPNominalQE.h>
 #include <top/dbobjects/TOPNominalTTS.h>
@@ -66,13 +66,13 @@ namespace Belle2 {
     void setPMTArray(const TOPGeoPMTArray& array) {m_pmtArray = array;}
 
     /**
-     * Sets board stack
-     * @param bs board stack geometry parameters
+     * Sets front-end
+     * @param frontEnd front-end geometry parameters
      * @param num number of board stacks per module
      */
-    void setBoardStack(const TOPGeoBoardStack& bs, unsigned num = 4)
+    void setFrontEnd(const TOPGeoFrontEnd& frontEnd, unsigned num = 4)
     {
-      m_boardStack = bs;
+      m_frontEnd = frontEnd;
       m_numBoardStacks = num;
     }
 
@@ -130,10 +130,10 @@ namespace Belle2 {
     const TOPGeoPMTArray& getPMTArray() const {return m_pmtArray;}
 
     /**
-     * Returns board stack
-     * @return board stack geometry parameters
+     * Returns front-end
+     * @return front-end geometry parameters
      */
-    const TOPGeoBoardStack& getBoardStack() const {return m_boardStack;}
+    const TOPGeoFrontEnd& getFrontEnd() const {return m_frontEnd;}
 
     /**
      * Returns number of boardstacks per module
@@ -212,14 +212,14 @@ namespace Belle2 {
 
     std::vector<TOPGeoModule> m_modules; /**< geometry parameters of modules */
     TOPGeoPMTArray m_pmtArray;  /**< geometry parameters of PMT array */
-    TOPGeoBoardStack m_boardStack;  /**< geometry parameters of boardstack */
+    TOPGeoFrontEnd m_frontEnd;  /**< geometry parameters of front-end electronics */
     TOPGeoQBB m_QBB;  /**< geometry parameters of quartz bar box */
     unsigned m_numBoardStacks = 0;  /**< number of boardstacks per module */
     TOPNominalQE m_nominalQE; /**< nominal quantum efficiency of PMT */
     TOPNominalTTS m_nominalTTS; /**< nominal time transition spread of PMT */
     TOPNominalTDC m_nominalTDC; /**< nominal time-to-digit conversion parameters */
 
-    ClassDef(TOPGeometry, 1); /**< ClassDef */
+    ClassDef(TOPGeometry, 2); /**< ClassDef */
 
   };
 

@@ -18,13 +18,13 @@ namespace Belle2 {
   /**
    * Geometry parameters of board stack (front-end electronic module)
    */
-  class TOPGeoBoardStack: public TOPGeoBase {
+  class TOPGeoFrontEnd: public TOPGeoBase {
   public:
 
     /**
      * Default constructor
      */
-    TOPGeoBoardStack(): TOPGeoBase("TOPBoardStack")
+    TOPGeoFrontEnd(): TOPGeoBase("TOPFrontEnd")
     {}
 
     /**
@@ -253,7 +253,7 @@ namespace Belle2 {
     float m_spacerWidth = 0;  /**< board stack spacer width */
     std::string m_spacerMaterial; /**< board stack spacer material */
 
-    ClassDef(TOPGeoBoardStack, 2); /**< ClassDef */
+    ClassDef(TOPGeoFrontEnd, 1); /**< ClassDef */
 
   };
 

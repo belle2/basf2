@@ -60,7 +60,7 @@ class Cluster:
         #: The command to submit a job. 'LOGFILE' will be replaced by the
         # actual log file name
         self.native_spec = ('-l h_vmem={requirement_vmem}G,h_fsize={requirement_storage}G '
-                            '-o {logfile} -e {logfile} -q {queuename} -V')
+                            '-q {queuename} -V')
 
         #: required vmem by the job in GB, required on DESY NAF, otherwise jobs get killed due
         # to memory consumption
@@ -169,6 +169,11 @@ class Cluster:
             # Path where log file is supposed to be created
             log_file = output_dir + '/' + os.path.basename(job.path) + '.log'
 
+            # Remove any left over done files
+            donefile_path = "{0}/script_{1}.done".format(self.path, job.name)
+            if os.path.isfile(donefile_path):
+                os.remove(donefile_path)
+
             # Now we need to distinguish between .py and .C files:
             extension = os.path.splitext(job.path)[1]
             if extension == '.C':
@@ -202,11 +207,9 @@ class Cluster:
             os.chmod(tmp_name, st.st_mode | stat.S_IEXEC)
 
             # native specification with all the good settings for the batch server
-            native_spec_string = self.native_spec.format(queuename=self.queuename,
-                                                         requirement_storage=self.requirement_storage,
+            native_spec_string = self.native_spec.format(requirement_storage=self.requirement_storage,
                                                          requirement_vmem=self.requirement_vmem,
-                                                         logfile=log_file)
-
+                                                         queuename=self.queuename)
             print('Creating job template')
             jt = session.createJobTemplate()
             jt.remoteCommand = tmp_file
@@ -220,31 +223,6 @@ class Cluster:
 
             session.deleteJobTemplate(jt)
         return
-
-        # Prepare the command line command for submission to the cluster
-        params = self.submit_command.format(queuename=self.queuename,
-                                            requirement_storage=self.requirement_storage,
-                                            requirement_vmem=self.requirement_vmem,
-                                            logfile=log_file).split() + [tmp_name]
-
-        # Log the command we are about the execute
-        self.logger.debug(subprocess.list2cmdline(params))
-
-        # Submit it to the cluster. The steering
-        # file output will be written to 'log_file' (see above).
-        # If we are performing a dry run, don't send anything to the cluster
-        # and just create the *.done file right away and delete the *.sh file.
-        if not dry:
-            process = subprocess.Popen(params, stdout=self.clusterlog,
-                                       stderr=subprocess.STDOUT)
-
-            # Check whether the submission succeeded
-            if process.wait() != 0:
-                job.status = 'failed'
-        else:
-            os.system('echo 0 > {0}/script_{1}.done'.format(self.path,
-                                                            job.name))
-            os.system('rm {0}'.format(tmp_name))
 
     def is_job_finished(self, job):
         """!
@@ -266,9 +244,38 @@ class Cluster:
 
         with drmaa.Session() as session:
 
-            status = session.jobStatus(job.cluster_drmaa_jobid)
+            status = None
+            # some batch server will forget completed jobs right away
+            try:
+                status = session.jobStatus(job.cluster_drmaa_jobid)
+            except drmaa.errors.InvalidJobException:
+                print("Job info for jobid {} cannot be retrieved, assuming job has terminated".format(job.cluster_drmaa_jobid))
+
+                # If there is a file indicating the job is done, that is its name:
+                donefile_path = "{0}/script_{1}.done".format(self.path, job.name)
+
+                # Check if such a file exists. If so, this means that the job has
+                # finished.
+                if os.path.isfile(donefile_path):
+
+                    # Read the returncode/exit_status for the job from the *.done-file
+                    with open(donefile_path) as f:
+                        try:
+                            returncode = int(f.read().strip())
+                        except ValueError:
+                            returncode = -666
+
+                    print("donefile found with return code {}".format(returncode))
+                    os.remove(donefile_path)
+                else:
+                    print("no donefile found")
+                    returncode = -555
+
+                return [True, returncode]
 
             # Return that the job is finished + the return code for it
+            # depending when we look for the job this migh never be used, because
+            # the jobs disappear from qstat before we can query them ..
             if status == drmaa.JobState.DONE:
                 # todo: return code
                 return [True, 0]

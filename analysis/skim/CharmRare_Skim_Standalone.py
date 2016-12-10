@@ -27,8 +27,8 @@ inputMdstList('default', filelist)
 
 stdFSParticles()
 # cutAndCopyList('pi0:loose', 'pi0:all', '-0.6 < extraInfo(BDT) < 1.0', True)
-loadStdLooseMu()
-loadStdLooseE()
+stdLooseMu()
+stdLooseE()
 loadStdPi0()
 
 from CharmRare_List import *

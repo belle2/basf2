@@ -12,9 +12,12 @@
 
 #include <tracking/trackFindingCDC/hough/perigee/CurvRep.h>
 
+#include <tracking/trackFindingCDC/hough/baseelements/WithSharedMark.h>
+
 #include <tracking/trackFindingCDC/eventdata/trajectories/CDCTrajectory2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHit.h>
 
+#include <vector>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -71,44 +74,90 @@ namespace Belle2 {
       }
 
       /**
-       *  A valuable leaf has been found in the hough tree walk extract its content
-       *  It may pull more hits from the whole tree.
+       *  A valuable leaf has been found in the hough tree walk. Extract its content!
+       *  It may pull more hits from the whole tree by looking at the top node.
        */
       void processLeaf(ANode* leaf);
+
+      /**
+       *  Look for more hits near a ftted trajectory from hits available in the give node.
+       */
+      std::vector<WithSharedMark<CDCRLWireHit>>
+                                             searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D);
 
     public:
       /// Getter for the candidates
       const std::vector<Candidate>& getCandidates() const
-      { return m_candidates; }
+      {
+        return m_candidates;
+      }
 
       /// Clear the found candidates
       void clear()
-      { m_candidates.clear(); }
+      {
+        m_candidates.clear();
+      }
 
     public:
       /// Getter for the maximal level of of splitting in the hough tree
       std::size_t getMaxLevel() const
-      { return m_maxLevel; }
+      {
+        return m_maxLevel;
+      }
 
       /// Setter for the maximal level of of splitting in the hough tree
       void setMaxLevel(std::size_t maxLevel)
-      { m_maxLevel = maxLevel; }
+      {
+        m_maxLevel = maxLevel;
+      }
 
       /// Getter for the minimal weight what is need the follow the children of a node.
       const Weight& getMinWeight() const
-      { return m_minWeight; }
+      {
+        return m_minWeight;
+      }
 
       /// Setter for the minimal weight what is need the follow the children of a node.
       void setMinWeight(const Weight& minWeight)
-      { m_minWeight = minWeight; }
+      {
+        m_minWeight = minWeight;
+      }
 
       /// Getter for the maximal curvature to be investigated in the current walk.
       float getMaxCurv() const
-      { return m_maxCurv; }
+      {
+        return m_maxCurv;
+      }
 
       /// Setter for the maximal curvature to be investigated in the current walk.
       void setMaxCurv(float curvature)
-      { m_maxCurv = curvature; }
+      {
+        m_maxCurv = curvature;
+      }
+
+      /// Getter for the maximal number of road searches to be applied on the found leaves
+      int getNRoadSearches() const
+      {
+        return m_nRoadSearches;
+      }
+
+      /// Setter for the maximal number of road searches to be applied on the found leaves
+      void setNRoadSearches(int nRoadSearches)
+      {
+        m_nRoadSearches = nRoadSearches;
+      }
+
+      /// Getter for the node level to be used as source of hits in the road searches
+      int getRoadLevel() const
+      {
+        return m_roadLevel;
+      }
+
+      /// Getter for the node level to be used as source of hits in the road level
+      void setRoadLevel(int roadLevel)
+      {
+        m_roadLevel = roadLevel;
+      }
 
     private:
       /// Memory for the maximal level of the tree
@@ -120,10 +169,18 @@ namespace Belle2 {
       /// Memory for the maximal curvature that should be searched in the current walk.
       float m_maxCurv = NAN;
 
+      /// Memory for the curvature of a curler in the CDC
+      float m_curlCurv = 0.018;
+
+      /// Memory for the number of repeated road searches
+      int m_nRoadSearches = 0;
+
+      /// Memory for the tree node level which should be the source of hits for the road searches. Defaults to the top most node.
+      size_t m_roadLevel = 0;
+
     private:
       /// Memory for found trajectories.
       std::vector<Candidate> m_candidates;
-
     };
   }
 }

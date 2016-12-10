@@ -66,7 +66,6 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     Add the SoftwareTrigger for the calibration (after HLT) to the given path.
 
     Only the calculation of the cuts is implemented here - the cut logic has to be done
-    using the module return value.
 
     :param path: The path to which the module should be added.
     :param store_array_debug_prescale: When not None, store each N events the content of the variables needed for the
@@ -116,10 +115,10 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('Xi_chiProb')
 
     # Reconstruct D0(Kpi), D+(Kpipi), D*+(D0pi), B+(D0pi+), J/psi(ee/mumu) for hlt-dqm display
-    stdFSParticles.stdPi(path=path)
-    stdFSParticles.stdK(path=path)
+    modularAnalysis.fillParticleList("pi+:dqm", 'piid > 0.5 and chiProb > 0.001', path=path)
+    modularAnalysis.fillParticleList("K-:dqm", 'Kid > 0.5 and chiProb > 0.001', path=path)
     # D0->K- pi+
-    modularAnalysis.reconstructDecay('D0:dqm -> K-:std pi+:std', '1.8 < M < 1.92', path=path)
+    modularAnalysis.reconstructDecay('D0:dqm -> K-:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D0:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D0:dqm', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D0:dqm', {'M': 'dqm_D0_M'}, path=path)
@@ -127,7 +126,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('dqm_D0_M')
 
     # D*+->D0 pi-
-    modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:std',
+    modularAnalysis.reconstructDecay('D*+:dqm -> D0:dqm pi+:dqm',
                                      '1.95 < M <2.05 and 0.0 < Q < 0.020 and 2.5 < useCMSFrame(p) < 5.5', path=path)
     vertex.vertexKFit('D*+:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D*+:dqm', 'chiProb', 1, path=path)
@@ -136,7 +135,7 @@ def add_calibration_software_trigger(path, store_array_debug_prescale=None):
     calib_extraInfo_list.append('dqm_Dstar_M')
 
     # D+ -> K- pi+ pi+
-    modularAnalysis.reconstructDecay('D+:dqm -> K-:std pi+:std pi+:std', '1.8 < M < 1.92', path=path)
+    modularAnalysis.reconstructDecay('D+:dqm -> K-:dqm pi+:dqm pi+:dqm', '1.8 < M < 1.92', path=path)
     vertex.vertexKFit('D+:dqm', 0.0, path=path)
     modularAnalysis.rankByHighest('D+:dqm', 'chiProb', 1, path=path)
     modularAnalysis.variablesToExtraInfo('D+:dqm', {'M': 'dqm_Dplus_M'}, path=path)

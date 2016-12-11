@@ -248,10 +248,8 @@ namespace Belle2 {
       /// Create child nodes for the given parents.
       std::vector<Node>* createChildren(Node* parentNode)
       {
-        Properties& parentProperties = *parentNode;
         std::vector<Node>* result = getUnusedChildren();
-
-        auto subProperties = m_subPropertiesFactory(parentProperties);
+        auto subProperties = m_subPropertiesFactory(*parentNode);
         if (subProperties.empty()) {
           result->clear();
         } else {

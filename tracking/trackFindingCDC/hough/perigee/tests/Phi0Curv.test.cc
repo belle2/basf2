@@ -194,13 +194,14 @@ namespace {
   {
     std::string svgFileName = "phi0_curv_on_hits.svg";
 
+    Helix zeroCurvOriginHelix(0.000, 1.52033, 0, -0.5, 0);
     Helix lowerCurvOriginHelix(0.015, 2.52033, 0, 1, 0);
     Helix higherCurvOriginHelix(0.027, 3.0718, 3, 0, 0);
 
     // Helix lowerCurvOriginHelix(0.012, 1.4, 0, 1, 0);
     // Helix higherCurvOriginHelix(0.027, 3.0718, 0, 0.95, 0);
 
-    simulate({lowerCurvOriginHelix, higherCurvOriginHelix});
+    simulate({zeroCurvOriginHelix, lowerCurvOriginHelix, higherCurvOriginHelix});
     saveDisplay(svgFileName);
 
     using SimpleRLTaggedWireHitPhi0CurvHough =
@@ -230,10 +231,12 @@ namespace {
       // Make two passes - one with more restrictive curvature
       leafProcessor.setMaxCurv(curlCurv);
       leafProcessor.setNRoadSearches(2);
+      leafProcessor.setRoadLevel(4);
       houghTree.findUsing(leafProcessor);
 
       leafProcessor.setMaxCurv(maxCurvAcceptance);
       leafProcessor.setNRoadSearches(3);
+      leafProcessor.setRoadLevel(0);
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();
@@ -325,11 +328,13 @@ namespace {
 
       // Make two passes - one with more restrictive curvature
       leafProcessor.setMaxCurv(curlCurv);
-      leafProcessor.setNRoadSearches(1);
+      leafProcessor.setNRoadSearches(2);
+      leafProcessor.setRoadLevel(4);
       houghTree.findUsing(leafProcessor);
 
       leafProcessor.setMaxCurv(maxCurvAcceptance);
       leafProcessor.setNRoadSearches(3);
+      leafProcessor.setRoadLevel(0);
       houghTree.findUsing(leafProcessor);
 
       candidates = leafProcessor.getCandidates();

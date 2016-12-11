@@ -175,13 +175,13 @@ namespace Belle2 {
       }
 
       /// Getter for the currently set maximal level
-      size_t getMaxLevel() const
+      int getMaxLevel() const
       {
         return m_maxLevel;
       }
 
       /// Setter maximal level of the hough tree.
-      void setMaxLevel(size_t maxLevel)
+      void setMaxLevel(int maxLevel)
       {
         m_maxLevel = maxLevel;
       }
@@ -209,7 +209,7 @@ namespace Belle2 {
 
     private:
       /// Number of the maximum tree level.
-      size_t m_maxLevel;
+      int m_maxLevel;
 
       /// Array of the number of divisions at each level
       const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};

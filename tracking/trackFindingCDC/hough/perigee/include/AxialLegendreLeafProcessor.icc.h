@@ -54,6 +54,7 @@ namespace Belle2 {
       const CDCRiemannFitter& fitter = CDCRiemannFitter::getFitter();
 
       std::vector<WithSharedMark<CDCRLWireHit>> hits(leaf->begin(), leaf->end());
+      assert(std::is_sorted(hits.begin(), hits.end())); // Hits should be naturally sorted
       CDCTrajectory2D trajectory2D = fitter.fit(hits);
       {
         const double curv = trajectory2D.getCurvature();
@@ -84,8 +85,44 @@ namespace Belle2 {
         roadNode->eraseIf(isMarked);
 
         for (int iRoadSearch = 0; iRoadSearch < m_param_nRoadSearches; ++iRoadSearch) {
-          hits = this->searchRoad(*roadNode, trajectory2D);
-          trajectory2D = fitter.fit(hits);
+          // Use a road search to find new hits from the
+          {
+            // hits = this->searchRoad(*roadNode, trajectory2D); // In case you only want the road hits
+            int nHitsBefore = hits.size();
+            std::vector<WithSharedMark<CDCRLWireHit>> roadHits = this->searchRoad(*roadNode, trajectory2D);
+            assert(std::is_sorted(roadHits.begin(), roadHits.end()));
+            hits.insert(hits.end(), roadHits.begin(), roadHits.end());
+            std::inplace_merge(hits.begin(), hits.begin() + nHitsBefore, hits.end());
+            hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
+            trajectory2D = fitter.fit(hits);
+          }
+          /*
+          // Remove hits far away
+          {
+            auto isFarAway = [this, &trajectory2D](const CDCRLWireHit& rlWireHit) -> bool {
+              double absWireDist2D = std::fabs(trajectory2D.getDist2D(rlWireHit.getRefPos2D()));
+              double driftLength = rlWireHit.getRefDriftLength();
+              return std::fabs(absWireDist2D - driftLength) > this->m_param_maxDistance;
+            };
+            erase_remove_if(hits, isFarAway);
+            trajectory2D = fitter.fit(hits);
+          }
+
+          // Add new close hits
+          {
+            int nHitsBefore = hits.size();
+            auto isClose = [this, &trajectory2D](const CDCRLWireHit& rlWireHit) -> bool {
+              double absWireDist2D = std::fabs(trajectory2D.getDist2D(rlWireHit.getRefPos2D()));
+              double driftLength = rlWireHit.getRefDriftLength();
+              return std::fabs(absWireDist2D - driftLength) < this->m_param_newHitDistance;
+            };
+            std::copy_if(roadNode->begin(), roadNode->end(), std::back_inserter(hits), isClose);
+            std::inplace_merge(hits.begin(),hits.begin() + nHitsBefore, hits.end());
+            hits.erase(std::unique(hits.begin(), hits.end()), hits.end());
+            trajectory2D = fitter.fit(hits);
+          }
+          */
+          if (hits.size() < 5) return;
           trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
         }
       }
@@ -136,6 +173,7 @@ namespace Belle2 {
         Weight weight = hitInPhi0CurvBox(markableRLWireHit, &precisionPhi0CurvBox);
         if (not std::isnan(weight)) hitsInPrecisionBox.push_back(markableRLWireHit);
       }
+
       return hitsInPrecisionBox;
     }
   }

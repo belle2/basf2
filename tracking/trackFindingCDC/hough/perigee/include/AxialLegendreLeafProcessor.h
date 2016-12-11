@@ -185,6 +185,13 @@ namespace Belle2 {
       /// Memory for the tree node level which should be the source of hits for the road searches. Defaults to the top most node.
       int m_param_roadLevel = 0;
 
+      /*
+      /// Memory for the maximum allwed distance from track to hit
+      double m_param_maxDistance = 0.2;
+
+      /// Memory for the distance to be added to the track
+      double m_param_newHitDistance = 0.15;
+      */
     private:
       /// Memory for found trajectories.
       std::vector<Candidate> m_candidates;

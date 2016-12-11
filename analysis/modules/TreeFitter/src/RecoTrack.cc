@@ -169,11 +169,13 @@ namespace TreeFitter {
     }
 
     // bring phi-residual in the correct domain ([-pi,pi])
-    std::cout << "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2);
+    if (vtxverbose >= 8)     std::cout << "bring phi-residual in the correct domain ([-pi,pi]): " << p.r(2);
     p.r(2) = HelixUtils::phidomain(p.r(2)) ;
-    std::cout << " -> " << p.r(2) << std::endl;
-    std::cout << "And now the Jacobian:" << std::endl;
-    std::cout << jacobian << std::endl;
+    if (vtxverbose >= 8) {
+      std::cout << " -> " << p.r(2) << std::endl;
+      std::cout << "And now the Jacobian:" << std::endl;
+      std::cout << jacobian << std::endl;
+    }
     // FIX ME: bring z0 residual in the correct domain --> this needs some thinking
 
     // calculate the full projection matrix from the jacobian
@@ -186,8 +188,10 @@ namespace TreeFitter {
       for (int col = 1; col <= 3; ++col)
         p.H(row, momindex + col) = jacobian(row, col + 3) ;
     }
-    std::cout << "And now the H matrix:" << std::endl;
-    std::cout << p.H() << std::endl;
+    if (vtxverbose >= 8) {
+      std::cout << "And now the H matrix:" << std::endl;
+      std::cout << p.H() << std::endl;
+    }
     return status ;
   }
 

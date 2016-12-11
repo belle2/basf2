@@ -20,6 +20,8 @@
 
 namespace TreeFitter {
 
+  extern int vtxverbose ;
+
   //  inline double fastsymmatrixaccess(double* m, int row, int col)
   //  {
   //    return *(m+(row*(row-1))/2+(col-1));
@@ -70,17 +72,19 @@ namespace TreeFitter {
     // calculate the error in the predicted residual R = G*C*GT + V
     // slow:
 #ifdef SLOWBUTSAFE
-    std::cout << "KalmanCalculator:: C (this is insane) = " << std::endl << fitparams->cov() << std::endl;
+    if (vtxverbose >= 8)    std::cout << "KalmanCalculator:: C (this is insane) = " << std::endl << fitparams->cov() << std::endl;
     m_matrixRinv = fitparams->cov().similarity(G);
     //    weight = 1000000; //FT: As a test: make the covariance matrix terrible
-    std::cout << "KalmanCalculator:: G*C*GT  = " << std::endl << m_matrixRinv << std::endl;
-    std::cout << "KalmanCalculator:: Constraint Covariance V = " << std::endl << weight * (*V) << std::endl;
+    if (vtxverbose >= 8)    std::cout << "KalmanCalculator:: G*C*GT  = " << std::endl << m_matrixRinv << std::endl;
+    if (vtxverbose >= 8)    std::cout << "KalmanCalculator:: Constraint Covariance V = " << std::endl << weight * (*V) << std::endl;
     if (V) m_matrixRinv += weight * (*V);
 #else
     //FT: not using this
-    std::cout << "KalmanCalculator:: C (this is insane) = " << std::endl << fitparams->cov() << std::endl;
-    std::cout << "KalmanCalculator:: G*C*GT  = " << std::endl << m_matrixRinv << std::endl;
-    std::cout << "KalmanCalculator:: Constraint Covariance V = " << std::endl << weight * (*V) << std::endl;
+    if (vtxverbose >= 8) {
+      std::cout << "KalmanCalculator:: C (this is insane) = " << std::endl << fitparams->cov() << std::endl;
+      std::cout << "KalmanCalculator:: G*C*GT  = " << std::endl << m_matrixRinv << std::endl;
+      std::cout << "KalmanCalculator:: Constraint Covariance V = " << std::endl << weight * (*V) << std::endl;
+    }
     if (V) {
       m_matrixRinv = *V ;
       if (weight != 1) m_matrixRinv *= weight ;
@@ -93,10 +97,12 @@ namespace TreeFitter {
             m_matrixRinv.fast(row, col) += tmp * m_matrixCGT(k, col) ;
 #endif
     m_matrixR = m_matrixRinv ;
-    std::cout << "KalmanCalculator:: R  = " << std::endl << m_matrixR << std::endl;
+    if (vtxverbose >= 8) std::cout << "KalmanCalculator:: R  = " << std::endl << m_matrixR << std::endl;
     m_matrixRinv.invert(m_ierr) ;//could be InvertFast
-    std::cout << "KalmanCalculator:: Rinv  = " << std::endl << m_matrixRinv << std::endl;
-    std::cout << "KalmanCalculator:: R*Rinv  = " << std::endl << m_matrixR* m_matrixRinv << std::endl;
+    if (vtxverbose >= 8) {
+      std::cout << "KalmanCalculator:: Rinv  = " << std::endl << m_matrixRinv << std::endl;
+      std::cout << "KalmanCalculator:: R*Rinv  = " << std::endl << m_matrixR* m_matrixRinv << std::endl;
+    }
     if (m_ierr) {
       status |= ErrCode::inversionerror;
       std::cout << "Error inverting matrix. Vertex fit fails." << std::endl;
@@ -119,16 +125,17 @@ namespace TreeFitter {
   void KalmanCalculator::updatePar(FitParams* fitparams)
   {
     //fitparams->par() -= fitparams->cov() * (G.T() * (R * value) ) ;
-
-    std::cout << "KalmanCalculator::updatePar - updating parameters:" << std::endl;
-    std::cout << "                              parameter dimension = " << fitparams->dim() << std::endl;
-    std::cout << "                              constraint dimension = " << m_value->num_row() << std::endl;
-    for (int i = 0; i < fitparams->dim(); i++)
-      if ((m_matrixK * (*m_value))[i]) {
-        std::cout << fitparams->par()[i] << " -= ";
-        for (int j = 0; j < m_value->num_row();
-             j++) std::cout << "    +(" << m_matrixK[i][j] << "  *  " << (*m_value)[j] << ")" << std::endl;
-      }
+    if (vtxverbose >= 8) {
+      std::cout << "KalmanCalculator::updatePar - updating parameters:" << std::endl;
+      std::cout << "                              parameter dimension = " << fitparams->dim() << std::endl;
+      std::cout << "                              constraint dimension = " << m_value->num_row() << std::endl;
+      for (int i = 0; i < fitparams->dim(); i++)
+        if ((m_matrixK * (*m_value))[i]) {
+          std::cout << fitparams->par()[i] << " -= ";
+          for (int j = 0; j < m_value->num_row();
+               j++) std::cout << "    +(" << m_matrixK[i][j] << "  *  " << (*m_value)[j] << ")" << std::endl;
+        }
+    }
     fitparams->par() -= m_matrixK * (*m_value) ;
     m_chisq = m_matrixRinv.similarity(*m_value);
   }

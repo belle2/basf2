@@ -20,8 +20,11 @@
 #include <tracking/trackFindingCDC/fitting/CDCObservations2D.h>
 #include <tracking/trackFindingCDC/fitting/CDCRiemannFitter.h>
 #include <tracking/trackFindingCDC/geometry/PerigeeCircle.h>
-#include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/BasePrecisionFunction.h>
+
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
+#include <framework/core/ModuleParamList.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -66,11 +69,11 @@ namespace Belle2 {
 
       // Look for more hits near the found trajectory
       /////////////////////////////////////////////////////////////////////////
-      if (m_nRoadSearches > 0) {
+      if (m_param_nRoadSearches > 0) {
         // Acquire all available items in some parent node for the road search
         // Somewhat bypasses the logic of the tree walk - Must handle with care!
         ANode* roadNode = leaf;
-        while (roadNode->getParent() and roadNode->getLevel() > m_roadLevel) {
+        while (roadNode->getParent() and roadNode->getLevel() > m_param_roadLevel) {
           roadNode = roadNode->getParent();
         }
 
@@ -80,7 +83,7 @@ namespace Belle2 {
         };
         roadNode->eraseIf(isMarked);
 
-        for (int iRoadSearch = 0; iRoadSearch < m_nRoadSearches; ++iRoadSearch) {
+        for (int iRoadSearch = 0; iRoadSearch < m_param_nRoadSearches; ++iRoadSearch) {
           hits = this->searchRoad(*roadNode, trajectory2D);
           trajectory2D = fitter.fit(hits);
           trajectory2D.setLocalOrigin(Vector2D(0.0, 0.0));
@@ -96,15 +99,15 @@ namespace Belle2 {
     }
 
     template <class ANode>
-    std::vector<WithSharedMark<CDCRLWireHit>>
-                                           AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D)
+    std::vector<WithSharedMark<CDCRLWireHit> >
+    AxialLegendreLeafProcessor<ANode>::searchRoad(const ANode& node, const CDCTrajectory2D& trajectory2D)
     {
       PerigeeCircle circle = trajectory2D.getGlobalCircle();
       Vector2D support = trajectory2D.getGlobalPerigee();
       const float curv = circle.curvature();
       const float phi0 = circle.phi0();
 
-      StereoHitContained<OffOrigin<InPhi0CurvBox> > hitInPhi0CurvBox(m_curlCurv);
+      StereoHitContained<OffOrigin<InPhi0CurvBox> > hitInPhi0CurvBox(m_param_curlCurv);
       using HoughBox = StereoHitContained<OffOrigin<InPhi0CurvBox> >::HoughBox;
       hitInPhi0CurvBox.setLocalOrigin(support);
 
@@ -134,6 +137,45 @@ namespace Belle2 {
         if (not std::isnan(weight)) hitsInPrecisionBox.push_back(markableRLWireHit);
       }
       return hitsInPrecisionBox;
+    }
+  }
+}
+
+namespace Belle2 {
+  namespace TrackFindingCDC {
+    template <class ANode>
+    void AxialLegendreLeafProcessor<ANode>::exposeParameters(ModuleParamList* moduleParamList,
+                                                             const std::string& prefix)
+    {
+      moduleParamList->addParameter(prefixed(prefix, "maxLevel"),
+                                    m_param_maxLevel,
+                                    "Level of divisions in the hough space at which a leaf is reached",
+                                    m_param_maxLevel);
+
+      moduleParamList->addParameter(prefixed(prefix, "minWeight"),
+                                    m_param_minWeight,
+                                    "Minimal exceptable weight of a leaf to be considered",
+                                    m_param_minWeight);
+
+      moduleParamList->addParameter(prefixed(prefix, "maxCurv"),
+                                    m_param_maxCurv,
+                                    "Maximal curvature of a leaf to be considered",
+                                    m_param_maxCurv);
+
+      moduleParamList->addParameter(prefixed(prefix, "curlCurv"),
+                                    m_param_curlCurv,
+                                    "Curvature below which hits on both arms of the trajectory are allowed",
+                                    m_param_curlCurv);
+
+      moduleParamList->addParameter(prefixed(prefix, "nRoadSearches"),
+                                    m_param_nRoadSearches,
+                                    "How often the road search should be performed to find new hits",
+                                    m_param_nRoadSearches);
+
+      moduleParamList->addParameter(prefixed(prefix, "roadLevel"),
+                                    m_param_roadLevel,
+                                    "Level of the read from which additional hits in the road search can be taken",
+                                    m_param_roadLevel);
     }
   }
 }

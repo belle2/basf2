@@ -36,10 +36,15 @@ std::string AxialTrackCreatorHitLegendre::getDescription()
 void AxialTrackCreatorHitLegendre::exposeParameters(ModuleParamList* moduleParamList,
                                                     const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "maxLevel"),
-                                m_param_maxLevel,
+  moduleParamList->addParameter(prefixed(prefix, "granularityLevel"),
+                                m_param_granularityLevel,
                                 "Level of divisions in the hough space.",
-                                m_param_maxLevel);
+                                m_param_granularityLevel);
+
+  moduleParamList->addParameter(prefixed(prefix, "sectorLevelSkip"),
+                                m_param_sectorLevelSkip,
+                                "Number of levels to be skipped on the first level to form sectors",
+                                m_param_sectorLevelSkip);
 
   moduleParamList->addParameter(prefixed(prefix, "curvBounds"),
                                 m_param_curvBounds,
@@ -78,20 +83,22 @@ void AxialTrackCreatorHitLegendre::initialize()
 
   B2ASSERT("Need exactly two curv bounds", m_param_curvBounds.size() == 2);
 
-  const size_t nPhi0Bins = std::pow(c_phi0Divisions, m_param_maxLevel);
+  const size_t nPhi0Bins = std::pow(c_phi0Divisions, m_param_granularityLevel);
   const Phi0BinsSpec phi0BinsSpec(nPhi0Bins,
                                   m_param_discretePhi0Overlap,
                                   m_param_discretePhi0Width);
 
   std::array<double, 2> curvBounds{{m_param_curvBounds.front(), m_param_curvBounds.back()}};
-  const size_t nCurvBins = std::pow(c_curvDivisions, m_param_maxLevel);
+  const size_t nCurvBins = std::pow(c_curvDivisions, m_param_granularityLevel);
   const CurvBinsSpec curvBinsSpec(curvBounds[0],
                                   curvBounds[1],
                                   nCurvBins,
                                   m_param_discreteCurvOverlap,
                                   m_param_discreteCurvWidth);
 
-  m_houghTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(m_param_maxLevel, m_curlCurv);
+  int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
+  m_houghTree = makeUnique<SimpleRLTaggedWireHitPhi0CurvHough>(maxTreeLevel, m_curlCurv);
+  m_houghTree->setSectorLevelSkip(m_param_sectorLevelSkip);
   m_houghTree->assignArray<DiscretePhi0>(phi0BinsSpec.constructArray(), phi0BinsSpec.getNOverlap());
   m_houghTree->assignArray<DiscreteCurv>(curvBinsSpec.constructArray(), curvBinsSpec.getNOverlap());
   m_houghTree->initialize();
@@ -113,7 +120,8 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   m_houghTree->seed(std::move(axialRLWireHits));
 
   using Node = typename SimpleRLTaggedWireHitPhi0CurvHough::Node;
-  AxialLegendreLeafProcessor<Node> leafProcessor(m_param_maxLevel);
+  int maxTreeLevel = m_param_granularityLevel - m_param_sectorLevelSkip;
+  AxialLegendreLeafProcessor<Node> leafProcessor(maxTreeLevel);
   ModuleParamList moduleParamList;
   const std::string prefix = "";
   leafProcessor.exposeParameters(&moduleParamList, prefix);
@@ -127,9 +135,6 @@ void AxialTrackCreatorHitLegendre::apply(const std::vector<CDCWireHit>& wireHits
   // Pick up the found candidates and make tracks from them
   std::vector<std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit>>> candidates =
     leafProcessor.getCandidates();
-
-  B2INFO("Found " << candidates.size() << " candidates");
-  B2INFO("Created " << m_houghTree->getTree()->getNNodes() << " tree nodes");
 
   for (const std::pair<CDCTrajectory2D, std::vector<CDCRLWireHit>>& candidate : candidates) {
     const CDCTrajectory2D& trajectory2D = candidate.first;
@@ -176,32 +181,32 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
 
   // NonCurler pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 12},
+    {"maxLevel", 12 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     // {"offOriginPrecision", false},
     {"nRoadSearches", 2},
-    {"roadLevel", 4},
+    {"roadLevel", 4 - m_param_sectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 12},
+    {"maxLevel", 12 - m_param_sectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     // {"offOriginPrecision", false},
     {"nRoadSearches", 2},
-    {"roadLevel", 4},
+    {"roadLevel", 4 - m_param_sectorLevelSkip},
 
   });
 
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 12},
+      {"maxLevel", 12 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", 0.07},
       // {"offOriginPrecision", false},
       {"nRoadSearches", 2},
-      {"roadLevel", 4},
+      {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
   }
 
@@ -210,40 +215,40 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
 
   // NonCurlerWithIncreasedThreshold pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     // {"offOriginPrecision", true},
     {"nRoadSearches", 2},
-    {"roadLevel", 4},
+    {"roadLevel", 4 - m_param_sectorLevelSkip},
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     // {"offOriginPrecision", true},
     {"nRoadSearches", 2},
-    {"roadLevel", 4},
+    {"roadLevel", 4 - m_param_sectorLevelSkip},
 
   });
 
   int iPass = 0;
   for (double minWeight = 50.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 10},
+      {"maxLevel", 10 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", iPass == 0 ? 0.07 : 0.14},
       // {"offOriginPrecision", true},
       {"nRoadSearches", 2},
-      {"roadLevel", 4},
+      {"roadLevel", 4 - m_param_sectorLevelSkip},
     });
     ++iPass;
   }
 
   // FullRange pass
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 50.0},
     {"maxCurv", 1.0 * m_curlCurv},
     // {"offOriginPrecision", true},
@@ -252,7 +257,7 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
   });
 
   result.push_back(ParameterVariantMap{
-    {"maxLevel", 10},
+    {"maxLevel", 10 - m_param_sectorLevelSkip},
     {"minWeight", 70.0},
     {"maxCurv", 2.0 * m_curlCurv},
     // {"offOriginPrecision", true},
@@ -263,7 +268,7 @@ AxialTrackCreatorHitLegendre::getRelaxationSchedule() const
 
   for (double minWeight = 30.0; minWeight > 10.0; minWeight *= 0.75) {
     result.push_back(ParameterVariantMap{
-      {"maxLevel", 10},
+      {"maxLevel", 10 - m_param_sectorLevelSkip},
       {"minWeight", minWeight},
       {"maxCurv", 0.15},
       // {"offOriginPrecision", true},

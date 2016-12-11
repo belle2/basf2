@@ -56,7 +56,10 @@ namespace Belle2 {
 
     private:
       /// Parameter: Level of divisions in the hough space.
-      size_t m_param_maxLevel = 13;
+      int m_param_granularityLevel = 13;
+
+      /// Parameter: Number of levels to be skipped on the first level to form sectors
+      int m_param_sectorLevelSkip = 1;
 
       /// Parameter: Curvature bounds of the hough space.
       std::vector<float> m_param_curvBounds{{ -0.018, 0.75}};

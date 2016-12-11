@@ -23,6 +23,9 @@ namespace Belle2 {
     using ParameterVariant =
       boost::variant<bool, int, double, std::string, std::vector<double>, std::vector<std::string>>;
 
+    /// Map of names to the variant parameter values
+    using ParameterVariantMap = std::map<std::string, ParameterVariant>;
+
     /// A helper class to unpack a boost::variant parameter value and set it in the parameter list.
     struct AssignParameterVisitor : public boost::static_visitor<> {
 

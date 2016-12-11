@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
-#include <tracking/trackFindingCDC/hough/baseelements/LinearDivision.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
@@ -36,7 +36,7 @@ namespace Belle2 {
       using HoughBox = AHoughBox;
 
       /// Type of the box division strategy
-      using BoxDivision = LinearDivision<HoughBox, divisions...>;
+      using BoxDivision = SectoredLinearDivision<HoughBox, divisions...>;
 
       /// Type of the fast hough tree structure
       using HoughTree = WeightedFastHoughTree<AItemPtr, HoughBox, BoxDivision>;
@@ -63,8 +63,9 @@ namespace Belle2 {
     public:
       /// Constructor using the given maximal level.
       template <class... RangeSpecOverlap>
-      explicit BoxDivisionHoughTree(size_t maxLevel)
+      explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
+        , m_sectorLevelSkip(sectorLevelSkip)
         , m_overlaps((divisions * 0)...)
       {
       }
@@ -105,7 +106,7 @@ namespace Belle2 {
                           Width<I> nBinWidth = 0)
       {
         const size_t division = getDivision(I);
-        const size_t nBins = std::pow(division, m_maxLevel);
+        const size_t nBins = std::pow(division, m_maxLevel + m_sectorLevelSkip);
 
         if (nBinWidth == 0) {
           nBinWidth = nBinOverlap + 1;
@@ -143,7 +144,7 @@ namespace Belle2 {
       {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
-        BoxDivision boxDivision(m_overlaps);
+        BoxDivision boxDivision(m_overlaps, m_sectorLevelSkip);
         m_houghTree.reset(new HoughTree(std::move(houghPlane), std::move(boxDivision)));
       }
 
@@ -186,6 +187,18 @@ namespace Belle2 {
         m_maxLevel = maxLevel;
       }
 
+      /// Getter for number of levels to skip in first level to form a finer sectored hough space.
+      int getSectorLevelSkip() const
+      {
+        return m_sectorLevelSkip;
+      }
+
+      /// Setter for number of levels to skip in first level to form a finer sectored hough space.
+      void setSectorLevelSkip(int sectorLevelSkip)
+      {
+        m_sectorLevelSkip = sectorLevelSkip;
+      }
+
       /// Getter for the array of discrete value for coordinate I.
       template <size_t I>
       const Array<I>& getArray() const
@@ -210,6 +223,9 @@ namespace Belle2 {
     private:
       /// Number of the maximum tree level.
       int m_maxLevel;
+
+      /// Number of levels to skip in first level to form a finer sectored hough space.
+      int m_sectorLevelSkip;
 
       /// Array of the number of divisions at each level
       const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};

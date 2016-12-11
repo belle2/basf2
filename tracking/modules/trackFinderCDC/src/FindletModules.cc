@@ -24,6 +24,7 @@ REG_MODULE(SegmentRejecter);
 REG_MODULE(SegmentOrienter);
 REG_MODULE(SegmentCreatorMCTruth);
 
+REG_MODULE(AxialTrackCreatorHitLegendre)
 REG_MODULE(AxialTrackCreatorSegmentHough)
 
 REG_MODULE(AxialSegmentPairCreator)

@@ -24,6 +24,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentCreatorMCTruth.h>
 
+#include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorHitLegendre.h>
 #include <tracking/trackFindingCDC/findlets/minimal/AxialTrackCreatorSegmentHough.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
@@ -179,6 +180,22 @@ namespace Belle2 {
       /// Constructor setting the default store vector names
       SegmentCreatorMCTruthModule()
         : Super( {"CDCWireHitVector", "CDCSegment2DVector"})
+      {
+      }
+    };
+
+    /**
+     * Module implementation using the AxialTrackCreatorHitLegendreModule
+     */
+    class AxialTrackCreatorHitLegendreModule : public FindletModule<AxialTrackCreatorHitLegendre> {
+
+      /// Type of the base class
+      using Super = FindletModule<AxialTrackCreatorHitLegendre>;
+
+    public:
+      /// Constructor setting the default store vector names
+      AxialTrackCreatorHitLegendreModule()
+        : Super( {"CDCWireHitVector", "CDCTrackVector"})
       {
       }
     };

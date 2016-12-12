@@ -239,6 +239,14 @@ namespace Belle2 {
         m_chMapFile = input;
       }
 
+      /**
+       * Set max. space resolution (cm)
+       */
+      void setMaxSpaceResolution(double input)
+      {
+        m_maxSpaceResol = input;
+      }
+
 
       /**
        * Get debug flag
@@ -448,6 +456,14 @@ namespace Belle2 {
         return m_chMapFile;
       }
 
+      /**
+       * Get max. space resolution
+       */
+      double getMaxSpaceResolution()
+      {
+        return m_maxSpaceResol;
+      }
+
     private:
       /** Singleton class */
       CDCGeoControlPar();
@@ -475,6 +491,8 @@ namespace Belle2 {
       bool m_twInputType = true;  /**< Input type for time-walk. */
       bool m_bwInputType = true;  /**< Input type for bad wire. */
       bool m_chMapInputType = true;  /**< Input type for channel map. */
+
+      double m_maxSpaceResol = 2.5 * 0.0130; /**< Max. space resolution allowed (cm) */
 
       std::string m_displacementFile = "displacement_v1.1.dat";  /**< Displacement file. */
       std::string m_alignmentFile = "alignment_v2.dat";  /**< Alignment file. */

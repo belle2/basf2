@@ -322,9 +322,9 @@ void CDCGeometryPar::readFromDB(const CDCGeometry& geom)
   m_nominalPropSpeed = 27.25;  //in cm/nsec (Belle's result, provided by iwasaki san)
 
   m_nominalSpaceResol = geom.getNominalSpaceResolution();
-  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
-
+  //  m_maxSpaceResol = 2.5 * m_nominalSpaceResol;
   CDCGeoControlPar& gcp = CDCGeoControlPar::getInstance();
+  m_maxSpaceResol = gcp.getMaxSpaceResolution();
 
   //Set displacement params. (from input data)
   m_displacement = CDCGeoControlPar::getInstance().getDisplacement();

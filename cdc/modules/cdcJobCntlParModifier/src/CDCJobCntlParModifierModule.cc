@@ -19,7 +19,8 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacement(), m_alignment(),
+  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacement(),
+  m_alignment(),
   m_misalignment(),
   m_displacementInputType(), m_alignmentInputType(), m_misalignmentInputType(), m_xtInputType(), m_sigmaInputType(),
   m_propSpeedInputType(), m_t0InputType(), m_twInputType(), m_bwInputType(), m_chMapInputType(), m_displacementFile(),
@@ -113,6 +114,10 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   addParam("BadWireFile", m_bwFile, "Input file name (on cdc/data) for bad wires.",  string("badwire_v1.dat"));
   //channel map
   addParam("ChannelMapFile", m_chMapFile, "Input file name (on cdc/data) for channel map.",  string("ch_map.dat"));
+
+  //max. space resolution
+  addParam("MaxSpaceResol", m_maxSpaceResol,
+           "Maximum space resolution (cm) in CDCGeometryPar::getSigma() to avoid a too large value.", double(2.5 * 0.0130));
 
 }
 
@@ -278,6 +283,11 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getChMapFile() != m_chMapFile) {
     B2INFO("CDCJobCntlParModifier: chMapFile modified: " << m_gcp.getChMapFile() << " to " << m_chMapFile);
     m_gcp.setChMapFile(m_chMapFile);
+  }
+
+  if (m_gcp.getMaxSpaceResolution() != m_maxSpaceResol) {
+    B2INFO("CDCJobCntlParModifier: maxSpaceResol modified: " << m_gcp.getMaxSpaceResolution() << " to " << m_maxSpaceResol);
+    m_gcp.setMaxSpaceResolution(m_maxSpaceResol);
   }
 }
 

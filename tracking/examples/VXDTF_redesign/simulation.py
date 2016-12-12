@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #####################################################################
-# VXDTF Example Scripts - Step 0 - Simulation
+# VXDTF2 Example Scripts - Step 0 - Simulation
 #
 # This script can be used to produce MC data from particle guns or
 # Y(4S) events for the training and validation of the VXDTF 1 and 2.

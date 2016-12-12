@@ -549,7 +549,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
       if (mcParticle->hasSeenInDetector(Const::TOP)) {
         RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
-        if (topHits.size() > 2) {
+        if (topHits.size() > 0) {
           // get iterator to the min element
           RelationVector<TOPBarHit>::iterator firstTopHit = std::min_element(topHits.begin(), topHits.end(),
           [&](const TOPBarHit & lhs, const TOPBarHit & rhs) {

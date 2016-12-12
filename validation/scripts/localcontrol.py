@@ -169,3 +169,14 @@ class Local:
             return [True, process.returncode]
         else:
             return [False, 0]
+
+    def terminate(self, job):
+        """!
+        Terminate a running job
+        """
+        # look which process belongs to the given job
+        process = self.jobs_processes[job]
+
+        process.terminate()
+        del self.jobs_processes[job]
+        self.current_number_of_processes = len(self.jobs_processes)

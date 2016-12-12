@@ -243,3 +243,9 @@ class Cluster:
         # If no such file exists, the job has not yet finished
         else:
             return [False, 0]
+
+    def terminate(self, job):
+        """!
+        Terminate a running job, not support with this backend so ignore the call
+        """
+        pass

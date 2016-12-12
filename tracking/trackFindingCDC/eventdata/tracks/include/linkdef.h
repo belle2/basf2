@@ -1,12 +1,7 @@
-
-#include <tracking/trackFindingCDC/config/CompileConfiguration.h>
-
 #pragma link off all globals;
 #pragma link off all classes;
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
-
-#ifdef TRACKFINDINGCDC_USE_ROOT_DICTIONARY
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCAxialSegmentPair+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCSegmentPair+;
@@ -44,5 +39,3 @@
 
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::CDCTrack> >+; // implicit
 #pragma link C++ class Belle2::TrackFindingCDC::StoreWrapper<std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCTrack> > >+; // implicit
-
-#endif

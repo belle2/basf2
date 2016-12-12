@@ -206,6 +206,8 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     ub = m_SimHitVolumeMap.upper_bound(it->first);
     fes.setHitRange(it, ub);
     fes.processEntry();
+    if (fes.getGeneratedNPE() == 0)
+      continue;
     EKLMSimHit* simHit = it->second;
     EKLMDigit* digit = m_Digits.appendNew(simHit);
     digit->setMCTime(simHit->getTime());

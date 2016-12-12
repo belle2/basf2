@@ -24,6 +24,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <tracking/dataobjects/RecoTrack.h>
 #include <genfit/WireTrackCandHit.h>
@@ -81,6 +82,11 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            "Default includes all",
            INFINITY);
 
+
+  addParam("UseOnlyIngoingArm",
+           m_useOnlyIngoingArm,
+           "Discard all CDC hits produced after the particle exit CDC outer wall (i.e it left hits TOP detector)",
+           false);
 
   addParam("MinPXDHits",
            m_minPXDHits,
@@ -530,6 +536,25 @@ void TrackFinderMCTruthRecoTracksModule::event()
       }
     };
 
+    auto didParticleExitCDC = [](const CDCHit * hit) {
+      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
+      if (not simHit) return false;
+      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+      if (not mcParticle) return false;
+
+
+      if (not mcParticle->hasSeenInDetector(Const::TOP))
+        return false;
+      else {
+        const TOPBarHit* topHit = mcParticle->getRelated<TOPBarHit>(std::string("TOPBarHits"));
+        if (not topHit) return false;
+        if (simHit->getGlobalTime() > topHit->getTime())
+          return true;
+        else
+          return false;
+      }
+    };
+
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
@@ -543,6 +568,9 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
         // Reject higher order hits if requested
         if (not std::isnan(nLoops) and not isWithinNLoops(cdcHit)) continue;
+
+        // check if the particle left hits in TOP and discard the hit if it was produced after TOP hit.
+        if (m_useOnlyIngoingArm and didParticleExitCDC(cdcHit)) continue;
 
         int superLayerId = cdcHit->getISuperLayer();
 

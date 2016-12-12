@@ -24,6 +24,7 @@
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <top/dataobjects/TOPBarHit.h>
 #include <vxd/dataobjects/VxdID.h>
 #include <genfit/TrackCand.h>
 #include <genfit/WireTrackCandHit.h>
@@ -84,6 +85,10 @@ TrackFinderMCTruthModule::TrackFinderMCTruthModule() : Module()
            "Default includes all",
            NAN);
 
+  addParam("UseOnlyIngoingArm",
+           m_useOnlyIngoingArm,
+           "Discard all CDC hits produced after the particle exit CDC outer wall (i.e it left hits TOP detector)",
+           false);
 
   addParam("MinPXDHits",
            m_minPXDHits,
@@ -502,6 +507,25 @@ void TrackFinderMCTruthModule::event()
       }
     };
 
+    auto didParticleExitCDC = [](const CDCHit * hit) {
+      const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
+      if (not simHit) return false;
+      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+      if (not mcParticle) return false;
+
+
+      if (not mcParticle->hasSeenInDetector(Const::TOP))
+        return false;
+      else {
+        const TOPBarHit* topHit = mcParticle->getRelated<TOPBarHit>(std::string("TOPBarHits"));
+        if (not topHit) return false;
+        if (simHit->getGlobalTime() > topHit->getTime())
+          return true;
+        else
+          return false;
+      }
+    };
+
     // create a list containing the indices to the CDCHits that belong to one track
     int nAxialHits = 0;
     int nStereoHits = 0;
@@ -517,6 +541,9 @@ void TrackFinderMCTruthModule::event()
 
             // Reject higher order hits if requested
             if (not std::isnan(nLoops) and not isWithinNLoops(hit)) continue;
+
+            // check if the particle left hits in TOP and discard the hit if it was produced after TOP hit.
+            if (m_useOnlyIngoingArm and didParticleExitCDC(hit)) continue;
 
             int superLayerId = hit->getISuperLayer();
             // Here it is hardcoded what superlayer has axial wires and what has stereo wires.

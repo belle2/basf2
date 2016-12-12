@@ -10,6 +10,10 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
+
+#include <tracking/trackFindingCDC/utilities/GetValueType.h>
+
+#include <algorithm>
 #include <utility>
 #include <cmath>
 
@@ -22,6 +26,10 @@ namespace Belle2 {
 
       /// Type of the base class
       using Super = std::pair<std::pair<T*, Weight>, T*>;
+
+    public:
+      /// Type of the weighted relation
+      using Item = T;
 
     public:
       /// Default constructor
@@ -97,5 +105,29 @@ namespace Belle2 {
 
     };
 
+    /// Utility structure with functions related to weighted relations
+    template <class AItem>
+    struct WeightedRelationUtil {
+      /**
+       *  Checks for the symmetry of a range of weighted relations
+       *  Explicitly checks for each weighted relation, if their is an reverse relation
+       *  with the same weight. Returns true if all such inverse relations exist.
+       */
+      template <class AWeightedRelations>
+      static bool areSymmetric(const AWeightedRelations& weightedRelations)
+      {
+        assert(std::is_sorted(std::begin(weightedRelations), std::end(weightedRelations)));
+        auto reversedRelationExists =
+        [&weightedRelations](const WeightedRelation<AItem>& weightedRelation) -> bool {
+          auto reversedRelations = std::equal_range(std::begin(weightedRelations),
+          std::end(weightedRelations),
+          weightedRelation.reversed());
+          return reversedRelations.first != reversedRelations.second;
+        };
+        return std::all_of(std::begin(weightedRelations),
+                           std::end(weightedRelations),
+                           reversedRelationExists);
+      }
+    };
   }
 }

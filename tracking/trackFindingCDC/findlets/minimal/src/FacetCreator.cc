@@ -66,20 +66,18 @@ void FacetCreator::apply(const std::vector<CDCWireHitCluster>& inputClusters, st
     B2ASSERT("Expect the clusters to be sorted", std::is_sorted(cluster.begin(), cluster.end()));
 
     // Create the neighborhood of wire hits on the cluster
-    B2DEBUG(100, "Creating the CDCWireHit neighborhood");
     m_wireHitRelations.clear();
     auto wireHits = cluster | boost::adaptors::indirected;
     WeightedNeighborhood<const CDCWireHit>::appendUsing(m_wireHitRelationFilter,
                                                         wireHits,
                                                         m_wireHitRelations);
-    WeightedNeighborhood<const CDCWireHit> wirehitNeighborhood(m_wireHitRelations);
 
-    B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.", wirehitNeighborhood.isSymmetric());
-    B2DEBUG(100, "  wirehitNeighborhood.size() = " << wirehitNeighborhood.size());
+    B2ASSERT("Wire neighborhood is not symmetric. Check the geometry.",
+             WeightedRelationUtil<const CDCWireHit>::areSymmetric(m_wireHitRelations));
 
     // Create the facets
-    B2DEBUG(100, "Creating the CDCFacets");
     std::size_t nBefore = facets.size();
+    WeightedNeighborhood<const CDCWireHit> wirehitNeighborhood(m_wireHitRelations);
     createFacets(cluster, wirehitNeighborhood, facets);
     std::size_t nAfter = facets.size();
 

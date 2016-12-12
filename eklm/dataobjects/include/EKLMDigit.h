@@ -17,7 +17,6 @@
 #include <eklm/dataobjects/EKLMSimHit.h>
 #include <eklm/dataobjects/ElementNumbersSingleton.h>
 #include <framework/dataobjects/DigitBase.h>
-#include <framework/datastore/RelationsObject.h>
 
 namespace Belle2 {
 

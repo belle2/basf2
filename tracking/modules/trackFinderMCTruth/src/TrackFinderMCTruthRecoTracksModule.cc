@@ -83,8 +83,8 @@ TrackFinderMCTruthRecoTracksModule::TrackFinderMCTruthRecoTracksModule() : Modul
            INFINITY);
 
 
-  addParam("UseOnlyIngoingArm",
-           m_useOnlyIngoingArm,
+  addParam("UseOnlyOutgoingArm",
+           m_useOnlyOutgoingArm,
            "Discard all CDC hits produced after the particle exit CDC outer wall (i.e it left hits TOP detector)",
            false);
 
@@ -538,21 +538,29 @@ void TrackFinderMCTruthRecoTracksModule::event()
 
     auto didParticleExitCDC = [](const CDCHit * hit) {
       const CDCSimHit* simHit = hit->getRelated<CDCSimHit>();
-      if (not simHit) return false;
-      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
-      if (not mcParticle) return false;
-
-
-      if (not mcParticle->hasSeenInDetector(Const::TOP))
+      if (not simHit) {
         return false;
-      else {
-        const TOPBarHit* topHit = mcParticle->getRelated<TOPBarHit>(std::string("TOPBarHits"));
-        if (not topHit) return false;
-        if (simHit->getGlobalTime() > topHit->getTime())
-          return true;
-        else
-          return false;
       }
+
+      const MCParticle* mcParticle = simHit->getRelated<MCParticle>();
+      if (not mcParticle) {
+        return false;
+      }
+
+      if (mcParticle->hasSeenInDetector(Const::TOP)) {
+        RelationVector<TOPBarHit> topHits = mcParticle->getRelationsWith<TOPBarHit>();
+        if (topHits.size() > 2) {
+          // get iterator to the min element
+          RelationVector<TOPBarHit>::iterator firstTopHit = std::min_element(topHits.begin(), topHits.end(),
+          [&](const TOPBarHit & lhs, const TOPBarHit & rhs) {
+            return lhs.getTime() < rhs.getTime();
+          });
+          if (simHit->getGlobalTime() > (*firstTopHit).getTime()) {
+            return true;
+          }
+        }
+      }
+      return false;
     };
 
     // create a list containing the indices to the CDCHits that belong to one track
@@ -570,7 +578,7 @@ void TrackFinderMCTruthRecoTracksModule::event()
         if (not std::isnan(nLoops) and not isWithinNLoops(cdcHit)) continue;
 
         // check if the particle left hits in TOP and discard the hit if it was produced after TOP hit.
-        if (m_useOnlyIngoingArm and didParticleExitCDC(cdcHit)) continue;
+        if (m_useOnlyOutgoingArm and didParticleExitCDC(cdcHit)) continue;
 
         int superLayerId = cdcHit->getISuperLayer();
 

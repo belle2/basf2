@@ -58,11 +58,13 @@ namespace Belle2 {
 
       /**
        * FPGA fitter.
-       * @param[in]  amp     Digital amplitude.
-       * @param[out] par     Fit parameters.
+       * @param[in]  amp       Digital amplitude.
+       * @param[in]  threshold Threshold.
+       * @param[out] par       Fit parameters.
        * @return Fit status.
        */
-      enum FPGAFitStatus fit(int* amp, struct FPGAFitParams* par);
+      enum FPGAFitStatus fit(int* amp, int threshold,
+                             struct FPGAFitParams* par);
 
     private:
 

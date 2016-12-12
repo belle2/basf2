@@ -125,7 +125,7 @@ void EKLM::FiberAndElectronics::setHitRange(
 
 void EKLM::FiberAndElectronics::processEntry()
 {
-  int i;
+  int i, threshold;
   double l, d, t;
   double nPhotons;
   std::multimap<int, EKLMSimHit*>::iterator it;
@@ -172,7 +172,8 @@ void EKLM::FiberAndElectronics::processEntry()
   simulateADC();
   /* Fit. */
   m_FPGAParams.bgAmplitude = m_DigPar->getADCPedestal();
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, &m_FPGAParams);
+  threshold = m_DigPar->getADCPedestal() + 10;
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAParams);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   /**

@@ -418,7 +418,12 @@ void MCMatcherTracksModule::event()
         StoreArray<CDCHit> cdcHits;
         const CDCHit* cdcHit = cdcHits[hitId];
         // check if the hit was created by BG or not. in case it is not a BG hit, but related track refers to 'mcBkgId' (background track) - skip this hit.
-        if (((cdcHit->getRelated<CDCSimHit>())->getBackgroundTag() == CDCSimHit::bg_none) && (mcTrackCandId == mcBkgId)) continue;
+        const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
+        if (cdcSimHit) {
+          if ((cdcSimHit->getBackgroundTag() == CDCSimHit::bg_none) && (mcTrackCandId == mcBkgId)) {
+            continue;
+          }
+        }
       }
 
       // Assign the hits/ndf to the total ndf vector seperatly here to avoid double counting, if patter recognition track share hits.

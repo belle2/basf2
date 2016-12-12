@@ -348,7 +348,12 @@ void MCRecoTracksMatcherModule::event()
           StoreArray<CDCHit> cdcHits;
           const CDCHit* cdcHit = cdcHits[hitId];
           // check if the hit was created by BG or not. in case it is not a BG hit, but related track refers to 'mcBkgId' (background track) - skip this hit.
-          if ((cdcHit->getRelated<CDCSimHit>())->getBackgroundTag() == CDCSimHit::bg_none)  continue;
+          const CDCSimHit* cdcSimHit = cdcHit->getRelated<CDCSimHit>();
+          if (cdcSimHit) {
+            if (cdcSimHit->getBackgroundTag() == CDCSimHit::bg_none) {
+              continue;
+            }
+          }
         }
         TrackCandId mcRecoTrackId = mcBkgId;
         totalNDF_by_mcRecoTrackId(mcRecoTrackId) += ndfForOneHit;

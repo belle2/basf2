@@ -216,7 +216,7 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
     digit->setGeneratedNPE(fes.getGeneratedNPE());
     digit->addRelationTo(simHit);
     if (!fes.getFitStatus()) {
-      digit->setTime(fes.getFitResults()->startTime);
+      digit->setTime(fes.getFPGAFit()->getStartTime());
       digit->setNPE(fes.getNPE());
     } else {
       digit->setTime(0.);

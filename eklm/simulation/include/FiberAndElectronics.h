@@ -57,9 +57,9 @@ namespace Belle2 {
       void processEntry();
 
       /**
-       * Get fit results.
+       * Get fit data.
        */
-      struct FPGAFitParams* getFitResults();
+      EKLMFPGAFit* getFPGAFit();
 
       /**
        * Get fit status.
@@ -155,8 +155,8 @@ namespace Belle2 {
       /** FPGA fit status. */
       enum FPGAFitStatus m_FPGAStat;
 
-      /** FPGA fit results. */
-      struct FPGAFitParams m_FPGAParams;
+      /** FPGA fit data. */
+      EKLMFPGAFit m_FPGAFit;
 
       /** Number of photoelectrons (generated). */
       int m_npe;

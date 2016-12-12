@@ -29,8 +29,9 @@ EKLM::FPGAFitter::~FPGAFitter()
 }
 
 enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
-                                               struct FPGAFitParams* par)
+                                               EKLMFPGAFit* fitData)
 {
+  double bg;
   int i, sum;
   i = 0;
   sum = 0;
@@ -44,14 +45,15 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
     if (i == m_nPoints)
       return c_FPGANoSignal;
   } while (amp[i] <= threshold);
-  par->startTime = i;
-  par->bgAmplitude = sum / i;
+  fitData->setStartTime(i);
+  bg = sum / i;
+  fitData->setBackgroundAmplitude(bg);
   sum = 0;
   while (i < m_nPoints) {
-    sum = sum + amp[i] - par->bgAmplitude;
+    sum = sum + amp[i] - bg;
     ++i;
   }
-  par->amplitude = sum;
+  fitData->setAmplitude(sum);
   return c_FPGASuccessfulFit;
 }
 

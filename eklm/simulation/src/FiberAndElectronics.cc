@@ -19,6 +19,8 @@
 #include <eklm/geometry/GeometryData.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/dataobjects/EventMetaData.h>
+#include <framework/datastore/StoreObjPtr.h>
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
 
@@ -62,7 +64,6 @@ EKLM::FiberAndElectronics::FiberAndElectronics(
   m_Debug = debug;
   m_npe = 0;
   m_histRange = m_DigPar->getNDigitizations() * m_DigPar->getADCSamplingTime();
-  m_FPGAParams = {0, 0, 0};
   /* Amplitude arrays. */
   m_amplitudeDirect = (float*)malloc(m_DigPar->getNDigitizations() *
                                      sizeof(float));
@@ -120,7 +121,7 @@ void EKLM::FiberAndElectronics::setHitRange(
 {
   m_hit = it;
   m_hitEnd = end;
-  m_stripName = "Strip" + std::to_string(it->first);
+  m_stripName = "strip_" + std::to_string(it->first);
 }
 
 void EKLM::FiberAndElectronics::processEntry()
@@ -171,9 +172,8 @@ void EKLM::FiberAndElectronics::processEntry()
     addRandomSiPMNoise();
   simulateADC();
   /* Fit. */
-  m_FPGAParams.bgAmplitude = m_DigPar->getADCPedestal();
   threshold = m_DigPar->getADCPedestal() + 10;
-  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAParams);
+  m_FPGAStat = m_fitter->fit(m_ADCAmplitude, threshold, &m_FPGAFit);
   if (m_FPGAStat != c_FPGASuccessfulFit)
     return;
   /**
@@ -182,9 +182,9 @@ void EKLM::FiberAndElectronics::processEntry()
    * time = ADC conversion time,
    * amplitude = amplitude * 0.5 * m_DigPar->ADCRange.
    */
-  m_FPGAParams.startTime = m_FPGAParams.startTime *
-                           m_DigPar->getADCSamplingTime() +
-                           m_DigitizationInitialTime;
+  m_FPGAFit.setStartTime(m_FPGAFit.getStartTime() *
+                         m_DigPar->getADCSamplingTime() +
+                         m_DigitizationInitialTime);
   if (m_Debug)
     if (m_npe >= 10)
       debugOutput();
@@ -407,9 +407,9 @@ void EKLM::FiberAndElectronics::simulateADC()
   }
 }
 
-struct EKLM::FPGAFitParams* EKLM::FiberAndElectronics::getFitResults()
+EKLMFPGAFit* EKLM::FiberAndElectronics::getFPGAFit()
 {
-  return &m_FPGAParams;
+  return &m_FPGAFit;
 }
 
 enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
@@ -420,7 +420,7 @@ enum EKLM::FPGAFitStatus EKLM::FiberAndElectronics::getFitStatus() const
 double EKLM::FiberAndElectronics::getNPE()
 {
   double intg;
-  intg = m_FPGAParams.amplitude;
+  intg = m_FPGAFit.getAmplitude();
   return intg * m_DigPar->getPEAttenuationFrequency() /
          m_DigPar->getADCPEAmplitude();
 }
@@ -433,6 +433,8 @@ int EKLM::FiberAndElectronics::getGeneratedNPE()
 void EKLM::FiberAndElectronics::debugOutput()
 {
   int i;
+  std::string str;
+  StoreObjPtr<EventMetaData> event;
   TFile* hfile = NULL;
   TH1D* histAmplitudeDirect = NULL;
   TH1D* histAmplitudeReflected = NULL;
@@ -460,10 +462,11 @@ void EKLM::FiberAndElectronics::debugOutput()
     histAmplitude->SetBinContent(i + 1, m_amplitude[i]);
     histADCAmplitude->SetBinContent(i + 1, m_ADCAmplitude[i]);
   }
-  std::string filename = m_stripName +
-                         std::to_string(gRandom->Integer(10000000)) + ".root";
+  str = std::string("experiment_") + std::to_string(event->getExperiment()) +
+        "_run_" + std::to_string(event->getRun()) + "_event_" +
+        std::to_string(event->getEvent()) + "_" + m_stripName + ".root";
   try {
-    hfile = new TFile(filename.c_str(), "NEW");
+    hfile = new TFile(str.c_str(), "NEW");
   } catch (std::bad_alloc& ba) {
     B2FATAL(MemErr);
   }

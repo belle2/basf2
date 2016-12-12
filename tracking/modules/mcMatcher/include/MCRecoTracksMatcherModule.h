@@ -136,6 +136,7 @@ namespace Belle2 {
     bool m_param_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_param_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
     bool m_param_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
+    bool m_param_abandonDiscardedCDCHits;               /**< Boolean to select if discarded (in MCTrack) CDC hits are taken into account*/
 
     double m_param_minimalPurity;                                     /**< Minimal purity of a PRTrack to be considered matchable to a MCTrack.
                    This number encodes how many correct hits are minimally need to compensate for a false hits.

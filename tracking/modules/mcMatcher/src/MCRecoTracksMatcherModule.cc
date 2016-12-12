@@ -28,6 +28,7 @@
 #include <svd/dataobjects/SVDTrueHit.h>
 #include <svd/dataobjects/SVDCluster.h>
 #include <cdc/dataobjects/CDCHit.h>
+#include <cdc/dataobjects/CDCSimHit.h>
 
 #include <time.h>
 #include <map>
@@ -145,6 +146,11 @@ MCRecoTracksMatcherModule::MCRecoTracksMatcherModule() : Module()
            m_param_useOnlyAxialCDCHits,
            "Set true if only the axial CDCHits should be used",
            false);
+
+  addParam("AbandonDiscardedCDCHits",
+           m_param_abandonDiscardedCDCHits,
+           "Set true if discarded CDC hits (in MCTrack) are not taken into account",
+           true);
 
   addParam("MinimalPurity",
            m_param_minimalPurity,
@@ -338,6 +344,12 @@ void MCRecoTracksMatcherModule::event()
       auto range_mcRecoTrackIds_for_detId_hitId_pair = mcRecoTrackId_by_hitId.equal_range(detId_hitId_pair);
 
       if (range_mcRecoTrackIds_for_detId_hitId_pair.first == range_mcRecoTrackIds_for_detId_hitId_pair.second) {
+        if (m_param_abandonDiscardedCDCHits and detId == Const::CDC) {
+          StoreArray<CDCHit> cdcHits;
+          const CDCHit* cdcHit = cdcHits[hitId];
+          // check if the hit was created by BG or not. in case it is not a BG hit, but related track refers to 'mcBkgId' (background track) - skip this hit.
+          if ((cdcHit->getRelated<CDCSimHit>())->getBackgroundTag() == CDCSimHit::bg_none)  continue;
+        }
         TrackCandId mcRecoTrackId = mcBkgId;
         totalNDF_by_mcRecoTrackId(mcRecoTrackId) += ndfForOneHit;
       } else {

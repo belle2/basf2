@@ -147,6 +147,7 @@ namespace Belle2 {
     bool m_param_useSVDHits;                                          /**< Boolean to select if SVDHits should be used*/
     bool m_param_useCDCHits;                                          /**< Boolean to select if CDCHits should be used*/
     bool m_param_useOnlyAxialCDCHits;                                 /**< Boolean to select if only axial CDCHits should be used*/
+    bool m_param_abandonDiscardedCDCHits;               /**< Boolean to select if discarded (in MCTrack) CDC hits are taken into account*/
 
     bool m_param_useClusters;                                         /**< Boolean to select if PXD and SVD Clusters should be used instead of default TrueHits. */
 

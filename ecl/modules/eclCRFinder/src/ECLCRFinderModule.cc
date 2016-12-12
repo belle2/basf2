@@ -297,7 +297,7 @@ void ECLCRFinderModule::endRun()
 void ECLCRFinderModule::terminate()
 {
   B2DEBUG(200, "ECLCRFinderModule::terminate()");
-  for (int i = 0; i < m_neighbourMaps.size(); i++) {
+  for (unsigned int i = 0; i < m_neighbourMaps.size(); i++) {
     if (m_neighbourMaps[i]) delete m_neighbourMaps[i];
   }
 

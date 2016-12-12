@@ -4,6 +4,7 @@
 Import('env')
 
 env['LIBS'] = [
+    'alignment',
     'tracking_dataobjects',
     'pxd', 'pxd_dataobjects',
     'svd', 'svd_dataobjects',

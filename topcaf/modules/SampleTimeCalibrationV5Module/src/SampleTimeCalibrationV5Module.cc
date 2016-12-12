@@ -4,7 +4,7 @@
 #include <topcaf/dataobjects/TopConfigurations.h>
 #include <framework/datastore/StoreObjPtr.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/conditions/ConditionsService.h>
+//#include <framework/conditions/ConditionsService.h>
 
 #include <iostream>
 #include <cstdlib>
@@ -110,10 +110,10 @@ void SampleTimeCalibrationV5Module::beginRun()
     TList* list = nullptr;
 
     if (m_conditions == 1) { // read using conditions service
-
-      std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
-      m_in_file = TFile::Open(filename.c_str(), "READ");
-
+      /*FIXME
+            std::string filename = (ConditionsService::getInstance()->getPayloadFileURL(this));
+            m_in_file = TFile::Open(filename.c_str(), "READ");
+      */
     } else if (m_conditions == 0) { // read  from local file
 
       m_in_file = TFile::Open(m_in_filename.c_str(), "READ");
@@ -283,8 +283,8 @@ void  SampleTimeCalibrationV5Module::terminate()
     }
 
 
-    if (m_conditions == 1 && m_out_file)
-      ConditionsService::getInstance()->writePayloadFile(m_out_file->GetName(), this);
+//FIXME    if (m_conditions == 1 && m_out_file)
+//      ConditionsService::getInstance()->writePayloadFile(m_out_file->GetName(), this);
 
   }
 

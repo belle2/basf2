@@ -33,8 +33,8 @@ namespace Belle2 {
   public:
 
     struct signalsample_t {
-      void InitSample(const float*);
-      void InitSample(const double*);
+      void InitSample(const float*, double);
+      void InitSample(const double*, double);
       double Accumulate(const double, const double, double*) const;
 
       double m_sumscale; // energy deposit in fitting window scale factor

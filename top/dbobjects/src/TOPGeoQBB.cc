@@ -23,16 +23,19 @@ std::vector<std::pair<double, double> > TOPGeoQBB::getForwardContour() const
 
   double x1 = getWidth() / 2;
   double x2 = x1 - m_sideRails.getThickness();
+  double x3 = getWidth() / 6;
   double y1 = m_outerPanel.getY() + m_outerPanel.getMaxThickness();
-  double y1a = m_outerPanel.getY() + m_outerPanel.getMinThickness();
-  double y2 = y1a - m_sideRails.getHeight();
-  double y3 = m_innerPanel.getY() - m_innerPanel.getMaxThickness();
-  contour.push_back(Pair(x1, y1));
-  contour.push_back(Pair(x1, y2));
-  contour.push_back(Pair(x2, y3));
-  contour.push_back(Pair(-x2, y3));
+  double y2 = m_outerPanel.getY() + m_outerPanel.getMinThickness();
+  double y3 = y2 - m_sideRails.getHeight();
+  double y4 = m_innerPanel.getY() - m_innerPanel.getMaxThickness();
   contour.push_back(Pair(-x1, y2));
-  contour.push_back(Pair(-x1, y1));
+  contour.push_back(Pair(-x3, y1));
+  contour.push_back(Pair(x3, y1));
+  contour.push_back(Pair(x1, y2));
+  contour.push_back(Pair(x1, y3));
+  contour.push_back(Pair(x2, y4));
+  contour.push_back(Pair(-x2, y4));
+  contour.push_back(Pair(-x1, y3));
 
   return contour;
 }
@@ -105,16 +108,19 @@ std::vector<std::pair<double, double> > TOPGeoQBB::getBackwardContour() const
 
   double x1 = getWidth() / 2;
   double x2 = x1 - m_prismEnclosure.getHeight() * tan(m_prismEnclosure.getAngle());
+  double x3 = getWidth() / 6;
   double y1 = m_outerPanel.getY() + m_outerPanel.getMaxThickness();
-  double y1a = m_outerPanel.getY() + m_outerPanel.getMinThickness();
-  double y2 = y1a - m_sideRails.getHeight();
-  double y3 = y2 - m_prismEnclosure.getHeight();
-  contour.push_back(Pair(x1, y1));
-  contour.push_back(Pair(x1, y2));
-  contour.push_back(Pair(x2, y3));
-  contour.push_back(Pair(-x2, y3));
+  double y2 = m_outerPanel.getY() + m_outerPanel.getMinThickness();
+  double y3 = y2 - m_sideRails.getHeight();
+  double y4 = y3 - m_prismEnclosure.getHeight();
   contour.push_back(Pair(-x1, y2));
-  contour.push_back(Pair(-x1, y1));
+  contour.push_back(Pair(-x3, y1));
+  contour.push_back(Pair(x3, y1));
+  contour.push_back(Pair(x1, y2));
+  contour.push_back(Pair(x1, y3));
+  contour.push_back(Pair(x2, y4));
+  contour.push_back(Pair(-x2, y4));
+  contour.push_back(Pair(-x1, y3));
 
   return contour;
 }

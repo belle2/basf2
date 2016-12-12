@@ -51,7 +51,8 @@ namespace Belle2 {
     double m_maxSpaceResol;   /**< Max. space resolution allowed (cm). */
 
     //For Geometry
-    bool m_debug4Geo;                /*!< Switch for debug printing. */
+    bool m_debug4Geo;              /*!< Switch for debug printing. */
+    bool m_printMaterialTable;     /*!< Switch for printing the G4 material table. */
     int m_materialDefinitionMode;  /*!< Material definition mode */
     int m_senseWireZposMode;    /*!< Sense wire Z pos. mode */
 

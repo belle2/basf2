@@ -40,6 +40,14 @@ namespace Belle2 {
       }
 
       /**
+       * Set printMaterialTable flag
+       */
+      void setPrintMaterialTable(bool onoff)
+      {
+        m_printMaterialTable = onoff;
+      }
+
+      /**
        * Set material defition mode
        */
       void setMaterialDefinitionMode(int input)
@@ -254,6 +262,14 @@ namespace Belle2 {
       bool getDebug() const
       {
         return m_debug;
+      }
+
+      /**
+       * Get printMaterialTable flag
+       */
+      bool getPrintMaterialTable() const
+      {
+        return m_printMaterialTable;
       }
 
       /**
@@ -473,6 +489,7 @@ namespace Belle2 {
       CDCGeoControlPar& operator=(const CDCGeoControlPar&);
 
       bool m_debug = false;                    /*!< Switch for debug printing. */
+      bool m_printMaterialTable = false;       /*!< Switch for printing the G4 material table. */
 
       int m_materialDefinitionMode = 0;     /*!< Material definition mode. */
       int m_senseWireZposMode = 1;     /*!< Sense wire z postion mode. */

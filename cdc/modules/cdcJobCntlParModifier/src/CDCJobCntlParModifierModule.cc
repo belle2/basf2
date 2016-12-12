@@ -19,7 +19,8 @@ using namespace CDC;
 REG_MODULE(CDCJobCntlParModifier)
 CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDCSimControlPar::getInstance()),
   m_gcp(CDCGeoControlPar::getInstance()), m_wireSag(), m_modLeftRightFlag(), m_debug4Sim(), m_thresholdEnergyDeposit(),
-  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_materialDefinitionMode(), m_senseWireZposMode(), m_displacement(),
+  m_minTrackLength(), m_maxSpaceResol(), m_debug4Geo(), m_printMaterialTable(), m_materialDefinitionMode(), m_senseWireZposMode(),
+  m_displacement(),
   m_alignment(),
   m_misalignment(),
   m_displacementInputType(), m_alignmentInputType(), m_misalignmentInputType(), m_xtInputType(), m_sigmaInputType(),
@@ -53,6 +54,9 @@ CDCJobCntlParModifierModule::CDCJobCntlParModifierModule() : Module(), m_scp(CDC
   //For Geometry
   //Switch for debug
   addParam("Debug4Geo", m_debug4Geo, "Switch on/off debug in Geo.", false);
+  //Switch for printing material table
+  addParam("PrintMaterialTable", m_printMaterialTable,
+           "Switch on/off printing the G4 material table at the stage of CDC geometry creation.", false);
   //material definition mode
   addParam("MaterialDefinitionMode",  m_materialDefinitionMode,
            "Material definition mode: =0: define a mixture of gases and wires in the entire tracking volume; =1: dummy; =2: define all sense and field wires explicitly in the volume.",
@@ -161,6 +165,11 @@ void CDCJobCntlParModifierModule::initialize()
   if (m_gcp.getSenseWireZposMode() != m_senseWireZposMode) {
     B2INFO("CDCJobCntlParModifier: senseWireZposMode modified: " << m_gcp.getSenseWireZposMode() << " " << m_senseWireZposMode);
     m_gcp.setSenseWireZposMode(m_senseWireZposMode);
+  }
+
+  if (m_gcp.getPrintMaterialTable() != m_printMaterialTable) {
+    B2INFO("CDCJobCntlParModifier: printMaterialTable modified: " << m_gcp.getPrintMaterialTable() << " to " << m_printMaterialTable);
+    m_gcp.setPrintMaterialTable(m_printMaterialTable);
   }
 
   if (m_gcp.getDebug() != m_debug4Geo) {

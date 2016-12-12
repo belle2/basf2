@@ -17,17 +17,15 @@
 // framework - DataStore
 #include <framework/datastore/DataStore.h>
 #include <framework/datastore/StoreArray.h>
-#include <framework/datastore/RelationIndex.h>
-#include <framework/datastore/RelationArray.h>
+#include <framework/datastore/StoreObjPtr.h>
+#include <framework/dataobjects/EventMetaData.h>
 
 // framework aux
 #include <framework/gearbox/Unit.h>
 #include <framework/logging/Logger.h>
-#include <TClonesArray.h>
-// Framwork
-#include <framework/dataobjects/EventMetaData.h>
-#include <framework/datastore/StoreObjPtr.h>
-#include <framework/gearbox/Unit.h>
+
+#include <geometry/Materials.h>
+#include <G4Material.hh>
 
 using namespace std;
 using namespace boost;
@@ -155,10 +153,15 @@ namespace Belle2 {
     double S2 = geo.getHVBoardWidth() * geo.getHVBoardLength();
     double V1 = S1 * geo.getFrontBoardThickness();
     double V2 = S2 * geo.getHVBoardThickness();
-    double density = 2.0; // TODO get it from material definition
+    G4Material* material1 = geometry::Materials::get(geo.getFrontBoardMaterial());
+    if (!material1) B2FATAL("Material '" << geo.getFrontBoardMaterial() << "' not found");
+    G4Material* material2 = geometry::Materials::get(geo.getHVBoardMaterial());
+    if (!material2) B2FATAL("Material '" << geo.getHVBoardMaterial() << "' not found");
+    double density1 = material1->GetDensity() / CLHEP::kg * CLHEP::cm * CLHEP::cm * CLHEP::cm;
+    double density2 = material2->GetDensity() / CLHEP::kg * CLHEP::cm * CLHEP::cm * CLHEP::cm;
 
     PCBarea = S1 + S2; // [cm^2], old value was: 496.725
-    PCBmass = (V1 + V2) * density / 1000; // [kg], old value was: 0.417249
+    PCBmass = V1 * density1 + V2 * density2; // [kg], old value was: 0.417249
 
     yearns = 1.e13;
     evtoJ = 1.60217653 * 1e-10;

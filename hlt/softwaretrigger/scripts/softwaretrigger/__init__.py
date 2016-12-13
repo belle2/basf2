@@ -2,7 +2,7 @@ import modularAnalysis
 import stdFSParticles
 import vertex
 
-SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "software_trigger_test"
+SOFTWARE_TRIGGER_GLOBAL_TAG_NAME = "production"
 
 FAST_RECO_CUTS = ["reject_ee", "accept_ee", "reject_bkg"]
 

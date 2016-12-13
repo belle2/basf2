@@ -42,6 +42,7 @@
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackExporter.h>
 
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
 #include <tracking/trackFindingCDC/findlets/base/FindletModule.h>
 
 /******* Minimal Findlets **********/

@@ -10,18 +10,19 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentPairCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentPairAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
 
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
-
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/ChooseableSegmentPairRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
+
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <vector>
 

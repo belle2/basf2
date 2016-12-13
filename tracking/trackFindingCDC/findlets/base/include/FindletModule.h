@@ -11,8 +11,6 @@
 
 #include <tracking/trackFindingCDC/rootification/StoreWrappedObjPtr.h>
 
-#include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
-
 #include <tracking/trackFindingCDC/utilities/GenIndices.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
 
@@ -226,7 +224,9 @@ namespace Belle2 {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
         bool input = isInputStoreVector<I>();
-        std::string classParameterName = m_classMnemomics.getParameterName(static_cast<StrippedIOType<I>*>(nullptr));
+
+        // Just a little bit of ADL
+        std::string classParameterName = getClassMnemomicParameterName(static_cast<StrippedIOType<I>*>(nullptr));
         return getStoreVectorParameterName(classParameterName, order, input);
       }
 
@@ -237,7 +237,9 @@ namespace Belle2 {
         bool primary = I == GetIndexInTuple<IOType<I>, IOTypes>::value;
         int order = primary ? 1 : 2;
         bool input = isInputStoreVector<I>();
-        std::string classParameterDescription = m_classMnemomics.getParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
+
+        // Just a little bit of ADL
+        std::string classParameterDescription = getClassMnemomicParameterDescription(static_cast<StrippedIOType<I>*>(nullptr));
         return getStoreVectorParameterDescription(classParameterDescription, order, input);
       }
 
@@ -293,10 +295,6 @@ namespace Belle2 {
 
       /// Findlet that implements the algorithm to be executed.
       AFindlet m_findlet;
-
-      /// Helper class to build class depended parameters and according descriptions.
-      ClassMnemomics m_classMnemomics;
     };
-
   }
 }

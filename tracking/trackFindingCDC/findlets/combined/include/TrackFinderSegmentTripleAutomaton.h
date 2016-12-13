@@ -11,19 +11,21 @@
 
 #include <tracking/trackFindingCDC/findlets/minimal/AxialSegmentPairCreator.h>
 #include <tracking/trackFindingCDC/findlets/minimal/SegmentTripleCreator.h>
-#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
+
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSegmentTripleAutomaton.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackCreatorSingleSegments.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackLinker.h>
 #include <tracking/trackFindingCDC/findlets/minimal/TrackOrienter.h>
-
-#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <tracking/trackFindingCDC/filters/segmentTripleRelation/ChooseableSegmentTripleRelationFilter.h>
 
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCTrack.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentTriple.h>
 #include <tracking/trackFindingCDC/eventdata/tracks/CDCAxialSegmentPair.h>
+
+#include <tracking/trackFindingCDC/eventdata/utils/ClassMnemomics.h>
+#include <tracking/trackFindingCDC/findlets/minimal/WeightedRelationCreator.h>
+#include <tracking/trackFindingCDC/findlets/base/StoreVectorSwapper.h>
 
 #include <vector>
 

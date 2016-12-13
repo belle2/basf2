@@ -451,6 +451,16 @@ class Validation:
         # The curren limit is 10h
         self.script_max_runtime_in_minutes = 720
 
+    def get_useable_basepath(self):
+        """
+        Checks if a local path is available. If only a central release is available, return the path
+        to this central release
+        """
+        if self.basepaths["local"]:
+            return self.basepaths["local"]
+        else:
+            return self.basepaths["central"]
+
     @staticmethod
     def get_available_job_control():
         """
@@ -863,8 +873,9 @@ class Validation:
         control = selected_control[0][2]()
 
         # read the git hash which is used to produce this validation
-        git_hash = validationfunctions.get_compact_git_hash(self.basepaths["local"])
-        self.log.note("Git hash of repository located at {} is {}".format(self.basepaths["local"],
+        src_basepath = self.get_useable_basepath()
+        git_hash = validationfunctions.get_compact_git_hash(src_basepath)
+        self.log.note("Git hash of repository located at {} is {}".format(src_basepath,
                                                                           git_hash))
 
         # If we do have runtime data, then read them

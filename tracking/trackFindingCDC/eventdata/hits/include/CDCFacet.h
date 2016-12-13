@@ -160,22 +160,18 @@ namespace Belle2 {
         }
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      { return m_automatonCell; }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
-      { return m_automatonCell; }
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
+      {
+        return m_automatonCell;
+      }
 
     private:
       /// Memory for a line fit to the three contained hits
       mutable UncertainParameterLine2D m_fitLine;
 
       /// Memory for the cellular automaton cell assoziated with the facet.
-      AutomatonCell m_automatonCell;
-
+      mutable AutomatonCell m_automatonCell;
     };
-
   }
 }

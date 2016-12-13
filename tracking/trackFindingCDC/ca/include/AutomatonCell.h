@@ -87,7 +87,7 @@ namespace Belle2 {
       }
 
       /// Setter for the cell state
-      void setCellState(Weight state) const
+      void setCellState(Weight state)
       {
         m_state = state;
       }
@@ -102,106 +102,133 @@ namespace Belle2 {
        *  For on the other side wire hits this should be one.
        */
       Weight getCellWeight() const
-      { return m_weight; }
+      {
+        return m_weight;
+      }
 
       /// Setter for the cell weight
-      void setCellWeight(Weight weight) const
-      { m_weight = weight; }
-
-
+      void setCellWeight(Weight weight)
+      {
+        m_weight = weight;
+      }
 
       /// Sets the already assigned marker flag to the given value. Default value true.
-      void setAssignedFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Assigned>(setTo); }
+      void setAssignedFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Assigned>(setTo);
+      }
 
       /// Resets the already assigned marker flag to false.
-      void unsetAssignedFlag() const
-      { setFlags<ECellFlag::c_Assigned>(false); }
+      void unsetAssignedFlag()
+      {
+        setFlags<ECellFlag::c_Assigned>(false);
+      }
 
       /// Gets the current state of the already assigned marker flag.
       bool hasAssignedFlag() const
-      { return hasAnyFlags(ECellFlag::c_Assigned); }
-
-
+      {
+        return hasAnyFlags(ECellFlag::c_Assigned);
+      }
 
       /// Sets the start marker flag to the given value. Default value true.
-      void setStartFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Start>(setTo); }
+      void setStartFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Start>(setTo);
+      }
 
       /// Resets the start marker flag to false.
-      void unsetStartFlag() const
-      { setFlags<ECellFlag::c_Start>(false); }
+      void unsetStartFlag()
+      {
+        setFlags<ECellFlag::c_Start>(false);
+      }
 
       /// Gets the current state of the start marker flag.
       bool hasStartFlag() const
-      { return hasAnyFlags(ECellFlag::c_Start); }
-
-
+      {
+        return hasAnyFlags(ECellFlag::c_Start);
+      }
 
       /// Sets the cycle marker flag to the given value. Default value true.
-      void setCycleFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Cycle>(setTo); }
+      void setCycleFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Cycle>(setTo);
+      }
 
       /// Resets the cycle marker flag to false.
-      void unsetCycleFlag() const
-      { setFlags<ECellFlag::c_Cycle>(false); }
+      void unsetCycleFlag()
+      {
+        setFlags<ECellFlag::c_Cycle>(false);
+      }
 
       /// Gets the current state of the cycle marker flag.
       bool hasCycleFlag() const
-      { return hasAnyFlags(ECellFlag::c_Cycle); }
-
+      {
+        return hasAnyFlags(ECellFlag::c_Cycle);
+      }
 
       /// Resets the assigned, start and cycle marker flag.
-      void unsetTemporaryFlags() const
-      { setFlags <c_TemporaryFlags> (false); }
-
-
+      void unsetTemporaryFlags()
+      {
+        setFlags<c_TemporaryFlags>(false);
+      }
 
       /// Sets the masked flag to the given value. Default value true.
-      void setMaskedFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Masked>(setTo); }
+      void setMaskedFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Masked>(setTo);
+      }
 
       /// Resets the masked flag to false.
-      void unsetMaskedFlag() const
-      { setFlags<ECellFlag::c_Masked>(false); }
+      void unsetMaskedFlag()
+      {
+        setFlags<ECellFlag::c_Masked>(false);
+      }
 
       /// Gets the current state of the masked marker flag.
       bool hasMaskedFlag() const
-      { return hasAnyFlags(ECellFlag::c_Masked); }
-
-
+      {
+        return hasAnyFlags(ECellFlag::c_Masked);
+      }
 
       /// Sets the taken flag to the given value. Default value true.
-      void setTakenFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Taken>(setTo); }
+      void setTakenFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Taken>(setTo);
+      }
 
       /// Resets the taken flag to false.
-      void unsetTakenFlag() const
-      { setFlags<ECellFlag::c_Taken>(false); }
+      void unsetTakenFlag()
+      {
+        setFlags<ECellFlag::c_Taken>(false);
+      }
 
       /// Gets the current state of the taken marker flag.
       bool hasTakenFlag() const
-      { return hasAnyFlags(ECellFlag::c_Taken); }
-
-
+      {
+        return hasAnyFlags(ECellFlag::c_Taken);
+      }
 
       /// Sets the background flag to the given value. Default value true.
-      void setBackgroundFlag(bool setTo = true) const
-      { setFlags<ECellFlag::c_Background>(setTo); }
+      void setBackgroundFlag(bool setTo = true)
+      {
+        setFlags<ECellFlag::c_Background>(setTo);
+      }
 
       /// Resets the background flag to false.
-      void unsetBackgroundFlag() const
-      { setFlags<ECellFlag::c_Background>(false); }
+      void unsetBackgroundFlag()
+      {
+        setFlags<ECellFlag::c_Background>(false);
+      }
 
       /// Gets the current state of the do not use flag marker flag.
       bool hasBackgroundFlag() const
-      { return hasAnyFlags(ECellFlag::c_Background); }
-
-
+      {
+        return hasAnyFlags(ECellFlag::c_Background);
+      }
 
       /// Setting accessing the flag by tag.
       template<ECellFlags cellFlag>
-      void setFlags(bool setTo) const
+      void setFlags(bool setTo)
       {
         if (setTo) {
           setFlags(cellFlag);
@@ -225,11 +252,11 @@ namespace Belle2 {
       { return m_flags; }
 
       /// Setter for the cell flags
-      void setFlags(ECellFlags flags) const
+      void setFlags(ECellFlags flags)
       { m_flags = ECellFlags(m_flags bitor flags); }
 
       /// Clear all flags
-      void clearFlags(ECellFlags flags = c_AllFlags) const
+      void clearFlags(ECellFlags flags = c_AllFlags)
       { m_flags = ECellFlags(m_flags bitand ~flags); }
 
       /// Checks if a cell has any of a sum of given flags.
@@ -238,13 +265,13 @@ namespace Belle2 {
 
     private:
       /// Storage for the cell weight
-      mutable Weight m_weight = 1;
+      Weight m_weight = 1;
 
       /// Storage for the cell status flags
-      mutable ECellFlags m_flags = ECellFlag(0);
+      ECellFlags m_flags = ECellFlag(0);
 
       /// Storage for the cell state set by the cellular automata
-      mutable Weight m_state = 0;
+      Weight m_state = 0;
     };
   }
 }

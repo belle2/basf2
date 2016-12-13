@@ -85,14 +85,8 @@ namespace Belle2 {
       /// Reverses the order of hits and their right left passage hypotheses inplace.
       void reverse();
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      {
-        return m_automatonCell;
-      }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -135,11 +129,12 @@ namespace Belle2 {
       bool isFullyTaken(unsigned int maxNotTaken = 0) const;
 
     private:
-      /** Memory for the automaton cell.
+      /**
+       *  Memory for the automaton cell.
        *  It is declared mutable because it can vary
        *  rather freely despite of the hit content might be required fixed.
        */
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
 
       /// Memory for the global super cluster id.
       int m_iSuperCluster = -1;

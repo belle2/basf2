@@ -63,7 +63,8 @@ param_pGun = {
               'nTracks': 1,
               'momentumGeneration': 'uniform',
               'momentumParams': [0.1, 4]
-             }"""
+             }
+"""
               'momentumGeneration': 'fixed',
               'momentumParams': [2, 2],           # 2 values: [min, max] in GeV
               'thetaGeneration': 'fixed',
@@ -74,7 +75,8 @@ param_pGun = {
               'xVertexParams': [-0.1, 0.1],            # in cm...
               'yVertexParams': [-0.1, 0.1],
               'zVertexParams': [-0.5, 0.5],
-             }"""
+             }
+"""
 
 particlegun.param(param_pGun)
 main.add_module(particlegun)

@@ -91,7 +91,7 @@ void AxialSegmentPairCreator::create(const std::vector<const CDCSegment2D*>& sta
       axialSegmentPair.clearTrajectory2D();
 
       Weight pairWeight = m_axialSegmentPairFilter(axialSegmentPair);
-      if (not isNotACell(pairWeight)) {
+      if (not std::isnan(pairWeight)) {
         axialSegmentPair.getAutomatonCell().setCellWeight(pairWeight);
         axialSegmentPairs.push_back(axialSegmentPair);
       }

@@ -86,7 +86,7 @@ void SegmentPairCreator::create(const std::vector<const CDCSegment2D*>& fromSegm
       segmentPair.clearTrajectory3D();
 
       Weight pairWeight = m_segmentPairFilter(segmentPair);
-      if (not isNotACell(pairWeight)) {
+      if (not std::isnan(pairWeight)) {
         segmentPair.getAutomatonCell().setCellWeight(pairWeight);
         segmentPairs.push_back(segmentPair);
       }

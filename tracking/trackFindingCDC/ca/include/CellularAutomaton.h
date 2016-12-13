@@ -10,14 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 #include <framework/logging/Logger.h>
 
-#include <vector>
-#include <limits>
+#include <cmath>
 
 namespace Belle2 {
 
@@ -47,7 +45,7 @@ namespace Belle2 {
         prepareCellFlags(cellHolders);
 
         ACellHolder* ptrHighestCellHolder = nullptr;
-        CellState highestCellState = NAN;
+        Weight highestCellState = NAN;
 
         for (ACellHolder& cellHolder : cellHolders) {
           if (cellHolder.getAutomatonCell().hasMaskedFlag()) continue;
@@ -61,7 +59,7 @@ namespace Belle2 {
           }
 
           try {
-            CellState cellState = getFinalCellState(cellHolder, cellHolderNeighborhood);
+            Weight cellState = getFinalCellState(cellHolder, cellHolderNeighborhood);
             if (std::isnan(highestCellState) or highestCellState < cellState) {
               // We have a new best start point.
               ptrHighestCellHolder = &cellHolder;
@@ -87,8 +85,8 @@ namespace Belle2 {
        *  Determines it if necessary traversing the graph.
        *  Throws CycleException if it encounters a cycle in the graph.
        */
-      CellState getFinalCellState(ACellHolder& cellHolder,
-                                  const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight getFinalCellState(ACellHolder& cellHolder,
+                               const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
       {
         // Throw if this cell has already been traversed in this recursion cycle
         if (cellHolder.getAutomatonCell().hasCycleFlag()) {
@@ -103,7 +101,7 @@ namespace Belle2 {
           // Mark cell in order to detect if it was already traversed in this recursion cycle
           cellHolder.getAutomatonCell().setCycleFlag();
 
-          CellState finalCellState = updateState(cellHolder, cellHolderNeighborhood);
+          Weight finalCellState = updateState(cellHolder, cellHolderNeighborhood);
 
           // Unmark the cell
           cellHolder.getAutomatonCell().unsetCycleFlag();
@@ -112,8 +110,8 @@ namespace Belle2 {
       }
 
       /// Updates the state of a cell considering all continuations recursively
-      CellState updateState(ACellHolder& cellHolder,
-                            const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
+      Weight updateState(ACellHolder& cellHolder,
+                         const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood) const
       {
         //--- blocked cells do not contribute a continuation ---
         if (cellHolder.getAutomatonCell().hasMaskedFlag()) {
@@ -123,7 +121,7 @@ namespace Belle2 {
         }
 
         //--- Search for neighbors ---
-        CellState maxStateWithContinuation = NAN;
+        Weight maxStateWithContinuation = NAN;
 
         // Check neighbors now
         for (const WeightedRelation<ACellHolder>& relation
@@ -138,10 +136,10 @@ namespace Belle2 {
             neighborCellHolder.getAutomatonCell().unsetStartFlag();
 
             // Get the value of the neighbor
-            CellState neighborCellState = getFinalCellState(neighborCellHolder, cellHolderNeighborhood);
+            Weight neighborCellState = getFinalCellState(neighborCellHolder, cellHolderNeighborhood);
 
             // Add the value of the connetion to the gain value
-            CellState stateWithContinuation = neighborCellState + relation.getWeight();
+            Weight stateWithContinuation = neighborCellState + relation.getWeight();
 
             // Remember only the maximum value of all neighbors
             if (std::isnan(maxStateWithContinuation) or maxStateWithContinuation < stateWithContinuation) {

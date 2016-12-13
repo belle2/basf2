@@ -9,21 +9,22 @@
  **************************************************************************/
 #pragma once
 
-
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
-#include <tracking/trackFindingCDC/ca/CellState.h>
+#include <tracking/trackFindingCDC/numerics/Weight.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Cell used by the cellular automata.
-    /** This class represents a cell in the cellular automata algorithm the local tracking is build on.
+    /**
+     *  Cell used by the cellular automata.
+     *
+     *  This class represents a cell in the cellular automata algorithm the local tracking is build on.
      *  Different to the ordinary cellular automaton algorihms this class stores the state not as a interger number but \n
      *  as a float value. This enables to have fractional measures of quality attached to the cell if say one new item \n
      *  is not worth a full point, but a probability measure which is additiv. The points that can be gained by picking \n
      *  this cell are stored in the cell weight property. Moreover the class defines status flags to be set and/or read by\n
-     *  the cellular automaton. */
-    class AutomatonCell  {
+     *  the cellular automaton.
+     */
+    class AutomatonCell {
 
     public:
       /// Type for the status flags of cells in the cellular automata
@@ -55,42 +56,56 @@ namespace Belle2 {
                                                             ECellFlag::c_Cycle);
 
     public:
-
-      /// Default constructor for ROOT compatibility. Cell weight defaults to 1
-      AutomatonCell() :
-        m_weight(0),
-        m_flags(ECellFlag(0)),
-        m_state(0) {}
+      /// Default constructor for ROOT compatibility. Cell weight defaults to 0
+      AutomatonCell()
+        : m_weight(0)
+        , m_flags(ECellFlag(0))
+        , m_state(0)
+      {
+      }
 
       /// Constructor with a certain cell weight
-      explicit AutomatonCell(const CellState& weight) :
-        m_weight(weight),
-        m_flags(ECellFlag(0)),
-        m_state(0) {}
+      explicit AutomatonCell(const Weight& cellWeight)
+        : m_weight(cellWeight)
+        , m_flags(ECellFlag(0))
+        , m_state(0)
+      {
+      }
 
       /// Constructor with a certain cell weight and initial flags to be set.
-      AutomatonCell(const CellState& weight, const ECellFlags& initialFlags) :
-        m_weight(weight),
-        m_flags(initialFlags),
-        m_state(0) {}
+      AutomatonCell(const Weight& cellWeight, const ECellFlags& initialFlags)
+        : m_weight(cellWeight)
+        , m_flags(initialFlags)
+        , m_state(0)
+      {
+      }
 
       /// Getter for the cell state
-      const CellState& getCellState() const { return m_state; }
+      Weight getCellState() const
+      {
+        return m_state;
+      }
 
       /// Setter for the cell state
-      void setCellState(CellState state) const { m_state = state; }
+      void setCellState(Weight state) const
+      {
+        m_state = state;
+      }
 
-      /// Getter for the cell weight. See details
-      /** The cell might carry more than one unit of information to be added to the path. \n
+      /**
+       *  Getter for the cell weight.
+       *
+       *  The cell might carry more than one unit of information to be added to the path. \n
        *  The weight discribes an additiv constant to be gained when picking up this cell. \n
        *  For instance segments may provide their number of hits as weight. \n
        *  Or they could have a reduced number of hits deminshed by the quality of a fit to the segment. \n
-       *  For on the other side wire hits this should be one. */
-      const CellState& getCellWeight() const
+       *  For on the other side wire hits this should be one.
+       */
+      Weight getCellWeight() const
       { return m_weight; }
 
       /// Setter for the cell weight
-      void setCellWeight(CellState weight) const
+      void setCellWeight(Weight weight) const
       { m_weight = weight; }
 
 
@@ -223,15 +238,13 @@ namespace Belle2 {
 
     private:
       /// Storage for the cell weight
-      mutable CellWeight m_weight = 1;
+      mutable Weight m_weight = 1;
 
       /// Storage for the cell status flags
       mutable ECellFlags m_flags = ECellFlag(0);
 
       /// Storage for the cell state set by the cellular automata
-      mutable CellState m_state = 0;
-
+      mutable Weight m_state = 0;
     };
-
   }
 }

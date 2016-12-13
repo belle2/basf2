@@ -76,7 +76,7 @@ void SegmentTrackCombiner::match(BaseSegmentTrackFilter& segmentTrackFilter)
       // Call the filter and add the match
       double filterResult = segmentTrackFilter(
                               std::make_pair(matchingSegment->getSegment(), track->getTrackCand()));
-      if (not isNotACell(filterResult)) {
+      if (not std::isnan(filterResult)) {
         matchingSegment->addMatch(track, filterResult);
       }
     }

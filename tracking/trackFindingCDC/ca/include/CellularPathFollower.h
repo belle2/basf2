@@ -12,12 +12,10 @@
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
-#include <tracking/trackFindingCDC/ca/CellWeight.h>
 
 #include <framework/logging/Logger.h>
 
 #include <vector>
-#include <limits>
 
 namespace Belle2 {
 
@@ -41,7 +39,7 @@ namespace Belle2 {
       template<class ACellHolderRange>
       std::vector<Path<ACellHolder> > followAll(ACellHolderRange& cellHolders,
                                                 const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                                                CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+                                                Weight minStateToFollow = -INFINITY) const
       {
         // Result
         std::vector<Path<ACellHolder> > paths;
@@ -77,7 +75,7 @@ namespace Belle2 {
        */
       Path<ACellHolder> followSingle(ACellHolder* startCellHolderPtr,
                                      const WeightedNeighborhood<ACellHolder>& cellHolderNeighborhood,
-                                     CellState minStateToFollow = -std::numeric_limits<CellState>::infinity()) const
+                                     Weight minStateToFollow = -INFINITY) const
       {
         Path<ACellHolder> path;
         if (not startCellHolderPtr) return path;
@@ -142,7 +140,7 @@ namespace Belle2 {
        *  indicating to be a start cell and that its state exceeds the minimal requirement.
        */
       static bool validStartCell(const AutomatonCell& automatonCell,
-                                 CellState minStateToFollow)
+                                 Weight minStateToFollow)
       {
         return
           automatonCell.hasStartFlag() and

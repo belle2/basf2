@@ -169,10 +169,10 @@ void FacetCreator::createFacetsForHitTriple(const CDCWireHit& startWireHit,
           m_driftLengthEstimator.updateDriftLength(facet);
         }
 
-        CellWeight cellWeight = m_facetFilter(facet);
+        Weight weight = m_facetFilter(facet);
 
-        if (not isNotACell(cellWeight)) {
-          facet.getAutomatonCell().setCellWeight(cellWeight);
+        if (not std::isnan(weight)) {
+          facet.getAutomatonCell().setCellWeight(weight);
           facets.insert(facets.end(), facet);
         }
       } // end for endRLWireHit

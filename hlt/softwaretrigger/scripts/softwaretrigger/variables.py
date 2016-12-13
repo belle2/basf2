@@ -27,7 +27,7 @@ class PickleHarvestingModule(HarvestingModule):
         if isinstance(crop, numbers.Number):
             try:
                 while True:
-                    crops = crops.append({"value": crop})
+                    crops.append({"value": crop})
                     # next crop
                     crop = (yield)
             except GeneratorExit:
@@ -36,7 +36,7 @@ class PickleHarvestingModule(HarvestingModule):
         elif isinstance(crop, collections.MutableMapping):
             try:
                 while True:
-                    crops = crops.append(crop)
+                    crops.append(crop)
                     crop = (yield)
             except GeneratorExit:
                 pass

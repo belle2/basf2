@@ -30,11 +30,11 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
            "Initial digitization time (ns).", double(0.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
-           "Create merged EKLMSim2Hits", bool(false));
+           "Create merged EKLMSim2Hits", false);
   addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
-           bool(false));
+           false);
   m_GeoDat = NULL;
   m_Fitter = NULL;
 }

@@ -27,9 +27,7 @@ from beamparameters import add_beamparameters
 from simulation import add_simulation
 
 # If later the use of bg is wanted, you can as well import setup_bg
-from VXDTF.setup_modules import (setup_sim,
-                                 setup_realClusters,
-                                 setup_mcTF)
+from setup_modules import (setup_sim, setup_mcTF)
 
 # ---------------------------------------------------------------------------------------
 

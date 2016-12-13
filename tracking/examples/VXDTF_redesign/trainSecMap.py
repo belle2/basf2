@@ -13,8 +13,10 @@
 # where f1, f2 and so on are different prepared training samples.
 # The -- is requiered to escape from basf2 options and add additional
 # commandline arguments specifically for this script.
+# The file name under which the trained SecMap will be stored can be
+# specified via the argument --secmap
 #
-# Usage: basf2 trainSecMap.py -- --train_sample traindata.py
+# Usage: basf2 trainSecMap.py -- --train_sample traindata.py --secmap trainedSecMap.root
 #
 #
 # Contributors: Jonas Wagner, Felix Metzner
@@ -28,14 +30,17 @@ import argparse
 # ---------------------------------------------------------------------------------------
 # Argument parser for input of training sample file via comandline option.
 arg_parser = argparse.ArgumentParser(description='Sector Map Training:\
-                                                  Trains and stores SecMap from provided data sample.\n\
-                                                  Usage: basf2 trainSecMap.py -- --train_sample traindata.root')
+                                     Trains and stores SecMap from provided data sample.\n\
+                                     Usage: basf2 trainSecMap.py -- --train_sample traindata.root --secmap trainedSecMap.root')
 
 arg_parser.add_argument('--train_sample', '-i', type=str, action='append',
                         help='List of prepared training data file names which will be used for the training of the SecMap')
+arg_parser.add_argument('--secmap', '-s', type=str,
+                        help='Inclusion of the root file containing the trained SecMap for the application of the VXDTF2.')
 
 arguments = arg_parser.parse_args(sys.argv[1:])
 train_data = arguments.train_sample
+secmap_name = arguments.secmap
 assert len(train_data) > 0, 'No data sample for training provided!'
 
 # ---------------------------------------------------------------------------------------
@@ -50,25 +55,16 @@ path = create_path()
 # Event Info Setter which is requiered as the SecMap Training is performed in the Initilize
 # Phase. Thus, this script does not run over any events at all, but over the data available
 # in the prepared training sample root file.
-# TODO: Check if this is actually enough to train the SecMap
 eventinfosetter = register_module('EventInfoSetter')
 path.add_module(eventinfosetter)
-
-# TODO: Check if Gearbox end Geometry is necessary
-# # Gearbox
-# gearbox = register_module('Gearbox')
-# path.add_module(gearbox)
-
-# # Geometry
-# geometry = register_module('Geometry')
-# geometry.param('components', ['BeamPipe', 'MagneticFieldConstant4LimitedRSVD', 'PXD', 'SVD'])
-# path.add_module(geometry)
 
 # SecMapBootStrap Module is requiered, as it loads the SecMap config and is responsible
 # for storing the trained SecMap.
 secMapBootStrap = register_module('SectorMapBootstrap')
 secMapBootStrap.param('ReadSectorMap', False)
 secMapBootStrap.param('WriteSectorMap', True)
+if secmap_name:
+    secMapBootStrap.param('SectorMapsOutputFile', secmap_name)
 path.add_module(secMapBootStrap)
 
 # Perform SecMap Training on provided data sample

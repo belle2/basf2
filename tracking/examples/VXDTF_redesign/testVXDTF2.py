@@ -16,8 +16,9 @@
 
 
 from basf2 import *
+import argparse
 # Import custom module chain for VXDTF2
-from VXDTF.setup_modules_custom import setup_VXDTF2
+from setup_modules import setup_VXDTF2
 
 
 # ---------------------------------------------------------------------------------------

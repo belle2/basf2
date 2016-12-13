@@ -17,7 +17,7 @@
 
 from basf2 import *
 # TODO: This script still requires genFit Track Candidates which should be replaced...
-from VXDTF.setup_modules import setup_gfTCtoSPTCConverters
+from setup_modules import setup_gfTCtoSPTCConverters
 
 
 # ---------------------------------------------------------------------------------------

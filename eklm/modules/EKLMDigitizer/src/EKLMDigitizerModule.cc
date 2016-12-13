@@ -12,6 +12,7 @@
 #include <boost/graph/adjacency_list.hpp>
 
 /* Belle2 headers. */
+#include <eklm/dataobjects/EKLMFPGAFit.h>
 #include <eklm/modules/EKLMDigitizer/EKLMDigitizerModule.h>
 #include <eklm/simulation/FiberAndElectronics.h>
 
@@ -30,6 +31,7 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
            "Initial digitization time (ns).", double(0.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
            "Create merged EKLMSim2Hits", bool(false));
+  addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);
   addParam("Debug", m_Debug,
            "Debug mode (generates additional output files with histograms).",
            bool(false));
@@ -49,6 +51,11 @@ void EKLMDigitizerModule::initialize()
   digits.registerRelationTo(simHits);
   if (m_CreateSim2Hits)
     StoreArray<EKLMSim2Hit>::registerPersistent();
+  if (m_SaveFPGAFit) {
+    StoreArray<EKLMFPGAFit> fpgaFits;
+    fpgaFits.registerPersistent();
+    digits.registerRelationTo(fpgaFits);
+  }
   m_GeoDat = &(EKLM::GeometryData::Instance());
   m_Fitter = new EKLM::FPGAFitter(m_DigPar->getNDigitizations());
 }
@@ -227,6 +234,11 @@ void EKLMDigitizerModule::mergeSimHitsToStripHits()
       digit->isGood(true);
     else
       digit->isGood(false);
+    if (fes.getFitStatus() == EKLM::c_FPGASuccessfulFit && m_SaveFPGAFit) {
+      StoreArray<EKLMFPGAFit> fpgaFits;
+      EKLMFPGAFit* fit = fpgaFits.appendNew(*fes.getFPGAFit());
+      digit->addRelationTo(fit);
+    }
     /* cppcheck-suppress memleak */
   }
 }

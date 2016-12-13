@@ -19,6 +19,7 @@ EKLMFPGAFit::EKLMFPGAFit()
   m_StartTime = -1;
   m_Amplitude = -1;
   m_BackgroundAmplitude = -1;
+  m_MaximalAmplitude = -1;
 }
 
 EKLMFPGAFit::~EKLMFPGAFit()
@@ -53,5 +54,15 @@ float EKLMFPGAFit::getBackgroundAmplitude() const
 void EKLMFPGAFit::setBackgroundAmplitude(float amplitude)
 {
   m_BackgroundAmplitude = amplitude;
+}
+
+int EKLMFPGAFit::getMaximalAmplitude() const
+{
+  return m_MaximalAmplitude;
+}
+
+void EKLMFPGAFit::setMaximalAmplitude(int amplitude)
+{
+  m_MaximalAmplitude = amplitude;
 }
 

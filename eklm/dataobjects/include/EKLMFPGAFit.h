@@ -66,6 +66,16 @@ namespace Belle2 {
      */
     void setBackgroundAmplitude(float amplitude);
 
+    /**
+     * Get maximal amplitude (ADC output).
+     */
+    int getMaximalAmplitude() const;
+
+    /**
+     * Set maximal amplitude.
+     */
+    void setMaximalAmplitude(int amplitude);
+
   private:
 
     /** Start of signal. */
@@ -76,6 +86,9 @@ namespace Belle2 {
 
     /** Background amplitude. */
     float m_BackgroundAmplitude;
+
+    /** Maximal amplitude. */
+    int m_MaximalAmplitude;
 
     /** Makes objects storable. */
     ClassDef(Belle2::EKLMFPGAFit, 1);

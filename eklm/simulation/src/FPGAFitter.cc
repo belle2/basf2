@@ -32,15 +32,18 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
                                                EKLMFPGAFit* fitData)
 {
   double bg;
-  int i, sum;
+  int i, sum, max;
   i = 0;
   sum = 0;
+  max = -1;
   /* No data before signal. */
   if (amp[i] > threshold)
     return c_FPGANoSignal;
   /* Time before signal: calculate average value. */
   do {
     sum = sum + amp[i];
+    if (amp[i] > max)
+      max = amp[i];
     ++i;
     if (i == m_nPoints)
       return c_FPGANoSignal;
@@ -51,9 +54,12 @@ enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
   sum = 0;
   while (i < m_nPoints) {
     sum = sum + amp[i] - bg;
+    if (amp[i] > max)
+      max = amp[i];
     ++i;
   }
   fitData->setAmplitude(sum);
+  fitData->setMaximalAmplitude(max);
   return c_FPGASuccessfulFit;
 }
 

@@ -56,7 +56,7 @@ namespace Belle2 {
     protected:
       /// Parameters
       /// Maximum level of the quad tree search.
-      unsigned int m_param_quadTreeLevel = 6;
+      unsigned int m_param_quadTreeLevel = 7;
       /// Minimal number of hits a quad tree node must have to be called a found bin
       unsigned int m_param_minimumNumberOfHits = 5;
       /// Set to true to output debug information.

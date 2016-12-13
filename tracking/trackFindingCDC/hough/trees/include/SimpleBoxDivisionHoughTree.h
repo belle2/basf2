@@ -29,8 +29,8 @@ namespace Belle2 {
       /// Constructor using the given maximal level.
       SimpleBoxDivisionHoughTree(float maximumX,
                                  float maximumY,
-                                 float overlapX = 0,
-                                 float overlapY = 0)
+                                 size_t overlapX = 0,
+                                 size_t overlapY = 0)
         : Super(0)
         , m_maximumX(maximumX)
         , m_maximumY(maximumY)
@@ -79,13 +79,13 @@ namespace Belle2 {
       }
 
       /// Return the overlap in x direction.
-      float getOverlapX() const
+      size_t getOverlapX() const
       {
         return m_overlapX;
       }
 
       /// Return the overlap in y direction.
-      float getOverlapY() const
+      size_t getOverlapY() const
       {
         return m_overlapY;
       }
@@ -96,9 +96,9 @@ namespace Belle2 {
       /// The maximum value in y direction.
       float m_maximumY = 0;
       /// The overlap in X direction.
-      float m_overlapX = 0;
+      size_t m_overlapX = 0;
       /// The overlap in Y direction.
-      float m_overlapY = 0;
+      size_t m_overlapY = 0;
     };
   }
 }

@@ -85,19 +85,16 @@ namespace Belle2 {
     addParam("input_data_bunchNb_LER", m_input_data_bunchNb_LER, "LER bunch number");
     addParam("input_data_SingleBeam", m_input_data_SingleBeam, "LER/HER/Both");
 
-    addParam("input_LT_SAD_lifetime", m_input_LT_SAD_lifetime, "List of LT SAD lifetime ");
-    addParam("input_HT_SAD_lifetime", m_input_HT_SAD_lifetime, "List of HT SAD lifetime ");
-    addParam("input_LB_SAD_lifetime", m_input_LB_SAD_lifetime, "List of LB SAD lifetime ");
-    addParam("input_HB_SAD_lifetime", m_input_HB_SAD_lifetime, "List of HB SAD lifetime ");
-    addParam("input_LC_SAD_lifetime", m_input_LC_SAD_lifetime, "List of LC SAD lifetime ");
-    addParam("input_HC_SAD_lifetime", m_input_HC_SAD_lifetime, "List of HC SAD lifetime ");
-
-    addParam("input_LT_SAD_PPS", m_input_LT_SAD_PPS, "List of LT SAD PPS ");
-    addParam("input_HT_SAD_PPS", m_input_HT_SAD_PPS, "List of HT SAD PPS ");
-    addParam("input_LB_SAD_PPS", m_input_LB_SAD_PPS, "List of LB SAD PPS ");
-    addParam("input_HB_SAD_PPS", m_input_HB_SAD_PPS, "List of HB SAD PPS ");
-    addParam("input_LC_SAD_PPS", m_input_LC_SAD_PPS, "List of LC SAD PPS ");
-    addParam("input_HC_SAD_PPS", m_input_HC_SAD_PPS, "List of HC SAD PPS ");
+    addParam("input_LT_SAD_RLR", m_input_LT_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HT_SAD_RLR", m_input_HT_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LC_SAD_RLR", m_input_LC_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HC_SAD_RLR", m_input_HC_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LB_SAD_RLR", m_input_LB_SAD_RLR, "SAD Low Ring Loss Rate");
+    addParam("input_HB_SAD_RLR", m_input_HB_SAD_RLR, "SAD High Ring Loss Rate");
+    addParam("input_LC_SAD_RLR_av", m_input_LC_SAD_RLR_av, "SAD Low Ring Loss Rate");
+    addParam("input_HC_SAD_RLR_av", m_input_HC_SAD_RLR_av, "SAD High Ring Loss Rate");
+    addParam("input_LB_SAD_RLR_av", m_input_LB_SAD_RLR_av, "SAD Low Ring Loss Rate");
+    addParam("input_HB_SAD_RLR_av", m_input_HB_SAD_RLR_av, "SAD High Ring Loss Rate");
 
     addParam("input_BGSol", m_input_BGSol, "BG solution 0 or I");
 
@@ -611,12 +608,12 @@ namespace Belle2 {
     m_treeBEAST->Branch("SAD_LER_lifetime", &(m_beast.SAD_LER_lifetime));
     m_treeBEAST->Branch("SAD_HER_lifetime_av", &(m_beast.SAD_HER_lifetime_av));
     m_treeBEAST->Branch("SAD_LER_lifetime_av", &(m_beast.SAD_LER_lifetime_av));
-    m_treeBEAST->Branch("SAD_HER_PPS", &(m_beast.SAD_HER_PPS));
-    m_treeBEAST->Branch("SAD_LER_PPS", &(m_beast.SAD_LER_PPS));
-    m_treeBEAST->Branch("SKB_HER_PPS", &(m_beast.SKB_HER_PPS));
-    m_treeBEAST->Branch("SKB_LER_PPS", &(m_beast.SKB_LER_PPS));
-    m_treeBEAST->Branch("SAD_HER_PPS_av", &(m_beast.SAD_HER_PPS_av));
-    m_treeBEAST->Branch("SAD_LER_PPS_av", &(m_beast.SAD_LER_PPS_av));
+    m_treeBEAST->Branch("SAD_HER_RLR", &(m_beast.SAD_HER_RLR));
+    m_treeBEAST->Branch("SAD_LER_RLR", &(m_beast.SAD_LER_RLR));
+    m_treeBEAST->Branch("SKB_HER_RLR", &(m_beast.SKB_HER_RLR));
+    m_treeBEAST->Branch("SKB_LER_RLR", &(m_beast.SKB_LER_RLR));
+    m_treeBEAST->Branch("SAD_HER_RLR_av", &(m_beast.SAD_HER_RLR_av));
+    m_treeBEAST->Branch("SAD_LER_RLR_av", &(m_beast.SAD_LER_RLR_av));
     /*
     m_treeBEAST->Branch("TPC_neutrons_N", &(m_beast.TPC_neutrons_N));
     m_treeBEAST->Branch("TPC_neutrons_tracks_E", &(m_beast.TPC_neutrons_tracks_E));
@@ -638,13 +635,6 @@ namespace Belle2 {
     m_treeTruth->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
     m_treeTruth->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
     m_treeTruth->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
-
-    m_treeTruth->Branch("LT_SAD_lifetime", &(m_input_LT_SAD_lifetime));
-    m_treeTruth->Branch("HT_SAD_lifetime", &(m_input_HT_SAD_lifetime));
-    m_treeTruth->Branch("LC_SAD_lifetime", &(m_input_LC_SAD_lifetime));
-    m_treeTruth->Branch("HC_SAD_lifetime", &(m_input_HC_SAD_lifetime));
-    m_treeTruth->Branch("LB_SAD_lifetime", &(m_input_LB_SAD_lifetime));
-    m_treeTruth->Branch("HB_SAD_lifetime", &(m_input_HB_SAD_lifetime));
 
     for (int i = 0; i < 12; i ++) {
       m_treeTruth->Branch(TString::Format("MC_LC_DIA_dose_%d", i), &(m_input_LC_DIA_dose[i]));
@@ -842,15 +832,15 @@ namespace Belle2 {
     double Nb_LER = 0;
     if (Ib_LER > 0) Nb_LER = Ib_LER * 3000. / TMath::C() / (1.6e-19);
 
-    double PPS_HER = 0;
+    double RLR_HER = 0;
     if (m_beast.SKB_HER_lifetime != 0 && m_beast.SKB_HER_lifetime->size() > 0 && Nb_HER > 0) {
-      PPS_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
-      m_beast.SKB_HER_PPS.push_back(PPS_HER);
+      RLR_HER = Nb_HER / (m_beast.SKB_HER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_HER;
+      m_beast.SKB_HER_RLR.push_back(RLR_HER);
     }
-    double PPS_LER = 0;
+    double RLR_LER = 0;
     if (m_beast.SKB_LER_lifetime != 0 && m_beast.SKB_LER_lifetime->size() > 0 && Nb_LER > 0) {
-      PPS_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
-      m_beast.SKB_LER_PPS.push_back(PPS_LER);
+      RLR_LER = Nb_LER / (m_beast.SKB_LER_lifetime->at(0) * 60.) * 1e-9 * bunch_nb_LER;
+      m_beast.SKB_LER_RLR.push_back(RLR_LER);
     }
 
     //Calculate Beam Gas scaling factor:
@@ -915,42 +905,51 @@ namespace Belle2 {
       ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
                                     2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_HER[0]);
 
-
-    //Scale LER SAD PPS
-    for (int i = 0; i < (int)m_input_LT_SAD_PPS.size(); i++) {
-      float LBG = m_input_LB_SAD_PPS[i] + m_input_LC_SAD_PPS[i];
+    //Scale LER SAD RLR
+    for (int i = 0; i < (int)m_input_LT_SAD_RLR.size(); i++) {
+      float LBG = m_input_LB_SAD_RLR_av[i] + m_input_LC_SAD_RLR_av[i];
       float BG = LBG * ScaleFacBGav_LER;
-      float To = ScaleFacTo_LER * m_input_LT_SAD_PPS[i];
+      float To = ScaleFacTo_LER * m_input_LT_SAD_RLR[i];
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
-      m_beast.SAD_LER_PPS_av.push_back(BG + To);
+      m_beast.SAD_LER_RLR_av.push_back(BG + To);
       m_beast.SAD_LER_lifetime_av.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
       BG = 0;
+      LBG = 0;
       for (int j = 0; j < 12; j++) {
-        BG += LBG / 12. * ScaleFacBG_LER[j];
+        LBG = 0;
+        if (m_input_LB_SAD_RLR.size() > 0) {
+          LBG = m_input_LB_SAD_RLR[j] + m_input_LC_SAD_RLR[j];
+          BG += LBG * ScaleFacBG_LER[j];
+        }
       }
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
-      m_beast.SAD_LER_PPS.push_back(BG + To);
+      m_beast.SAD_LER_RLR.push_back(BG + To);
       m_beast.SAD_LER_lifetime.push_back(Nb_LER / (BG + To) * 1e-9 / 60. * bunch_nb_LER);
     }
 
-    //Scale HER SAD PPS
-    for (int i = 0; i < (int)m_input_HT_SAD_PPS.size(); i++) {
-      float HBG = m_input_HB_SAD_PPS[i] + m_input_HC_SAD_PPS[i];
+    //Scale HER SAD RLR
+    for (int i = 0; i < (int)m_input_HT_SAD_RLR.size(); i++) {
+      float HBG = m_input_HB_SAD_RLR_av[i] + m_input_HC_SAD_RLR_av[i];
       float BG = HBG * ScaleFacBGav_HER;
-      float To = ScaleFacTo_HER * m_input_HT_SAD_PPS[i];
+      float To = ScaleFacTo_HER * m_input_HT_SAD_RLR[i];
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
-      m_beast.SAD_HER_PPS_av.push_back(BG + To);
+      m_beast.SAD_HER_RLR_av.push_back(BG + To);
       m_beast.SAD_HER_lifetime_av.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
       BG = 0;
+      HBG = 0;
       for (int j = 0; j < 12; j++) {
-        BG += HBG / 12. * ScaleFacBG_HER[j];
+        HBG = 0;
+        if (m_input_HB_SAD_RLR.size() > 0) {
+          HBG = m_input_HB_SAD_RLR[j] + m_input_HC_SAD_RLR[j];
+          BG += HBG * ScaleFacBG_HER[j];
+        }
       }
       //if (TMath::IsNaN(To)) To = 0;
       //if (TMath::IsNaN(BG)) BG = 0;
-      m_beast.SAD_HER_PPS.push_back(BG + To);
+      m_beast.SAD_HER_RLR.push_back(BG + To);
       m_beast.SAD_HER_lifetime.push_back(Nb_HER / (BG + To) * 1e-9 / 60. * bunch_nb_HER);
     }
 

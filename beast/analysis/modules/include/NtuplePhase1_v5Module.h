@@ -202,19 +202,16 @@ namespace Belle2 {
     std::vector<Double_t> m_input_sigma_LER; /**< LER beam size and errors */
     std::vector<Double_t> m_input_sigma_HER; /**< HER beam size and errors */
 
-    std::vector<Double_t> m_input_LT_SAD_lifetime; /**< list of SAD_lifetime LT dose */
-    std::vector<Double_t> m_input_HT_SAD_lifetime; /**< list of SAD_lifetime HT dose */
-    std::vector<Double_t> m_input_LC_SAD_lifetime; /**< list of SAD_lifetime LC dose */
-    std::vector<Double_t> m_input_HC_SAD_lifetime; /**< list of SAD_lifetime HC dose */
-    std::vector<Double_t> m_input_LB_SAD_lifetime; /**< list of SAD_lifetime LB dose */
-    std::vector<Double_t> m_input_HB_SAD_lifetime; /**< list of SAD_lifetime HB dose */
-
-    std::vector<Double_t> m_input_LT_SAD_PPS; /**< list of SAD_PPS LT dose */
-    std::vector<Double_t> m_input_HT_SAD_PPS; /**< list of SAD_PPS HT dose */
-    std::vector<Double_t> m_input_LC_SAD_PPS; /**< list of SAD_PPS LC dose */
-    std::vector<Double_t> m_input_HC_SAD_PPS; /**< list of SAD_PPS HC dose */
-    std::vector<Double_t> m_input_LB_SAD_PPS; /**< list of SAD_PPS LB dose */
-    std::vector<Double_t> m_input_HB_SAD_PPS; /**< list of SAD_PPS HB dose */
+    std::vector<Double_t> m_input_LB_SAD_RLR; /**< list of SAD_RLR LB dose */
+    std::vector<Double_t> m_input_HB_SAD_RLR; /**< list of SAD_RLR HB dose */
+    std::vector<Double_t> m_input_LC_SAD_RLR; /**< list of SAD_RLR LC dose */
+    std::vector<Double_t> m_input_HC_SAD_RLR; /**< list of SAD_RLR HC dose */
+    std::vector<Double_t> m_input_LB_SAD_RLR_av; /**< list of SAD_RLR LB dose */
+    std::vector<Double_t> m_input_HB_SAD_RLR_av; /**< list of SAD_RLR HB dose */
+    std::vector<Double_t> m_input_LC_SAD_RLR_av; /**< list of SAD_RLR LC dose */
+    std::vector<Double_t> m_input_HC_SAD_RLR_av; /**< list of SAD_RLR HC dose */
+    std::vector<Double_t> m_input_LT_SAD_RLR; /**< list of SAD_RLR LT dose */
+    std::vector<Double_t> m_input_HT_SAD_RLR; /**< list of SAD_RLR HT dose */
 
     std::vector<Double_t> m_input_LT_DOSI; /**< list of PIN LT dose */
     std::vector<Double_t> m_input_HT_DOSI; /**< list of PIN HT dose */

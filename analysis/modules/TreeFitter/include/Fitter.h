@@ -27,6 +27,7 @@ namespace TreeFitter {
   class ParticleBase ;
 
   extern int vtxverbose ;
+  extern std::vector<int> massConstraintList ;
 
   class Fitter {
   public:
@@ -84,6 +85,7 @@ namespace TreeFitter {
     void updateTree(Particle& particle) const;
 
     static void setVerbose(int i) { vtxverbose = i ; }
+    static void setMassConstraintList(std::vector<int> list) { massConstraintList = list; }
 
   public:
     //    BtaFitParams btaFitParams(const ParticleBase* pb) const ;//this passes out the set of particle parameters in BaBar, do the same for basf2

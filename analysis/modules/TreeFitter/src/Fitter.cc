@@ -33,7 +33,7 @@ using std::vector;
 namespace TreeFitter {
 
   extern int vtxverbose ;
-
+  extern std::vector<int> massConstraintList ;
   /*
   void Fitter::printDaughters(Particle* mother)
   {
@@ -420,8 +420,8 @@ namespace TreeFitter {
       // this error message does not make sense, because it is also
       // triggered for daughters that were simply not refitted. we
       // have to do something about that.
-      std::cout << "Can't find candidate " << cand.getName() << std::endl
-                << "in tree " << m_particle->getName() << std::endl;
+
+      B2ERROR("Can't find candidate " << cand.getName() << "in tree " << m_particle->getName());
     }
     return pb != 0 ;
   }

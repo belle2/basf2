@@ -31,6 +31,7 @@
 namespace TreeFitter {
 
   int vtxverbose = 0;
+  std::vector<int> massConstraintList;//FT: this is not the best place to place this, but that's where the other extern goes.
 
   // Default constructor
   ParticleBase::ParticleBase(Particle* particle, const ParticleBase* mother)

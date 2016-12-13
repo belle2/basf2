@@ -30,6 +30,7 @@ using std::vector;
 namespace TreeFitter {
 
   extern int vtxverbose ;
+  extern std::vector<int> massConstraintList ;
 
   inline bool sortByType(const ParticleBase* lhs, const ParticleBase* rhs)
   {
@@ -86,11 +87,18 @@ namespace TreeFitter {
     //    m_isconversion = m_massconstraint && m_daughters.size()==2 && particle && (particle->getPDGCode() == PDGCode::gamma);
     // this will do for now
 
-    //FT: Need a method to flag these individually for each particle. Currently unavailable.
+    //FT: Need a method to flag these individually for each particle. Currently I use the PDG code, but I want to switch to DecayDescriptors
     m_massconstraint     = false;
+    int pdgcode = particle->getPDGCode();
+    if (std::find(massConstraintList.begin(), massConstraintList.end(), pdgcode) != massConstraintList.end()) {
+      m_massconstraint = true;
+      B2DEBUG(80, "We constrain the mass of the " << particle->getName() << " (PDGCode = " << pdgcode << ")");
+    }
+    //
+
+    //FT: These aren't available yet
     m_lifetimeconstraint = false;
     m_isconversion = false;
-
   }
 
   InternalParticle::~InternalParticle()

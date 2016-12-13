@@ -36,6 +36,7 @@ namespace Belle2 {
     double m_precision;             //max level of chi2 fluctuation required before the fit is considered stable and converging
     int m_verbose;                  //BaBar verbosity (to be phased out in favor of Belle2's logger)
     // now loaded for individual particles (FT)
+    std::vector<int> m_massConstraintList; //PDG codes of particles to mass constrain. Later, this will be a decayDescriptor.
     //    double m_Bfield;                //Bfield from database
     //
     bool doTreeFit(Particle* head);

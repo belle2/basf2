@@ -9,6 +9,8 @@
  **************************************************************************/
 #pragma once
 
+#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+
 #include <string>
 
 namespace Belle2 {
@@ -23,9 +25,6 @@ namespace Belle2 {
     class CDCAxialSegmentPair;
     class CDCSegmentTriple;
     class CDCTrack;
-
-    template<class T>
-    class WeightedRelation;
 
     /// Utility class to lookup identifier and description for event data objects useful to define parameters.
     class ClassMnemomics {

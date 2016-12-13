@@ -14,38 +14,62 @@
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type for two related objects of the same type.
-    template<class T>
-    class Relation
-      : public std::pair<T*, T*> {
+    /// Type for two related objects
+    template <class AFrom, class ATo = AFrom>
+    class Relation : public std::pair<AFrom*, ATo*> {
 
     private:
       /// Type of the base class
-      using Super = std::pair<T*, T*>;
+      using Super = std::pair<AFrom*, ATo*>;
+
+    public:
+      /// Type of from which the relation originates.
+      using From = AFrom;
+
+      /// Type of to which the relation points
+      using To = ATo;
 
     public:
       /// Make the constructor of the base type available
       using Super::Super;
 
-      /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(T* ptr,
-                            const Relation<T>& relation)
-      { return ptr < relation.getFrom(); }
+      /// Operator for ordering of relations.
+      bool operator<(const Relation<From, To>& rhs)
+      {
+        return (getFrom() < rhs.getFrom() or
+                (not(rhs.getFrom() < getFrom()) and
+                 (getTo() < rhs.getTo())));
+      }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(const Relation<T>& relation,
-                            T* ptr)
-      { return relation.getFrom() < ptr; }
+      friend bool operator<(From* ptrFrom, const Relation<From, To>& relation)
+      {
+        return ptrFrom < relation.getFrom();
+      }
+
+      /// Operator to compare key type item to the relations for assoziative lookups.
+      friend bool operator<(const Relation<From, To>& relation, From* ptrFrom)
+      {
+        return relation.getFrom() < ptrFrom;
+      }
 
       /// Getter for the pointer to the from side object
-      T* getFrom() const
-      { return this->first; }
+      From* getFrom() const
+      {
+        return this->first;
+      }
 
       /// Getter for the pointer to the to side object
-      T* getTo() const
-      { return this->second; }
+      To* getTo() const
+      {
+        return this->second;
+      }
 
+      /// Make a relation in the opposite direciton with the same weight
+      Relation<To, From> reversed() const
+      {
+        return Relation<To, From>(getTo(), getFrom());
+      }
     };
-
   }
 }

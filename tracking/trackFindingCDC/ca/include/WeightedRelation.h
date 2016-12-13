@@ -15,35 +15,38 @@
 
 #include <algorithm>
 #include <utility>
+#include <type_traits>
+#include <cassert>
 #include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
 
-    /// Type for two related objects of the same type with a weight.
-    template<class T>
-    class WeightedRelation : public std::pair<std::pair<T*, Weight>, T*> {
+    /// Type for two related objects with a weight.
+    template <class AFrom, class ATo = AFrom>
+    class WeightedRelation : public std::pair<std::pair<AFrom*, Weight>, ATo*> {
 
       /// Type of the base class
-      using Super = std::pair<std::pair<T*, Weight>, T*>;
+      using Super = std::pair<std::pair<AFrom*, Weight>, ATo*>;
 
     public:
-      /// Type of the weighted relation
-      using Item = T;
+      /// Type of from which the relation originates.
+      using From = AFrom;
+
+      /// Type of to which the relation points
+      using To = ATo;
 
     public:
       /// Default constructor
-      WeightedRelation()
-        : Super(std::pair<T *, Weight>(nullptr, NAN), nullptr)
-      {}
+      WeightedRelation() = default;
 
       /// Creating a relation with one object on the from side, one on the to side and a weight.
-      WeightedRelation(T* from, Weight weight, T* to)
-        : Super(std::pair<T *, Weight>(from, weight), to)
+      WeightedRelation(From* from, Weight weight, To* to)
+        : Super( {from, weight}, to)
       {}
 
       /// Operator for ordering of relations.
-      bool operator<(const WeightedRelation<T>& rhs)
+      bool operator<(const WeightedRelation<From, To>& rhs)
       {
         return (getFrom() < rhs.getFrom() or
                 (not(rhs.getFrom() < getFrom()) and
@@ -54,8 +57,8 @@ namespace Belle2 {
       }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
-      friend bool operator<(const std::pair<T*, Weight>& weightedPtr,
-                            const WeightedRelation<T>& weightedRelation)
+      friend bool operator<(const std::pair<From*, Weight>& weightedPtr,
+                            const WeightedRelation<From, To>& weightedRelation)
       {
         return (weightedPtr.first < weightedRelation.getFrom() or
                 (not(weightedRelation.getFrom() < weightedPtr.first) and
@@ -64,8 +67,8 @@ namespace Belle2 {
       }
 
       /// Operator to compare key type weighted item to the relations for assoziative lookups.
-      friend bool operator<(const WeightedRelation<T>& weightedRelation,
-                            const std::pair<T*, Weight>& weightedPtr)
+      friend bool operator<(const WeightedRelation<From, To>& weightedRelation,
+                            const std::pair<From*, Weight>& weightedPtr)
       {
         return (weightedRelation.getFrom() < weightedPtr.first or
                 (not(weightedPtr.first < weightedRelation.getFrom()) and
@@ -74,39 +77,51 @@ namespace Belle2 {
       }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(T* ptr,
-                            const WeightedRelation<T>& weightedRelation)
-      { return ptr < weightedRelation.getFrom(); }
+      friend bool operator<(From* ptrFrom, const WeightedRelation<From, To>& weightedRelation)
+      {
+        return ptrFrom < weightedRelation.getFrom();
+      }
 
       /// Operator to compare key type item to the relations for assoziative lookups.
-      friend bool operator<(const WeightedRelation<T>& weightedRelation,
-                            T* ptr)
-      { return weightedRelation.getFrom() < ptr; }
+      friend bool operator<(const WeightedRelation<From, To>& weightedRelation, From* ptrFrom)
+      {
+        return weightedRelation.getFrom() < ptrFrom;
+      }
 
       /// Getter for the pointer to the from side object
-      T* getFrom() const
-      { return getWeightedFrom().first; }
+      From* getFrom() const
+      {
+        return getWeightedFrom().first;
+      }
 
       /// Getter for the weight
       Weight getWeight() const
-      { return getWeightedFrom().second; }
+      {
+        return getWeightedFrom().second;
+      }
 
       /// Getter for the pointer to the weighted from side object
-      const std::pair<T*, Weight>& getWeightedFrom() const
-      { return this->first; }
+      const std::pair<From*, Weight>& getWeightedFrom() const
+      {
+        return this->first;
+      }
 
       /// Getter for the pointer to the to side object
-      T* getTo() const
-      { return this->second; }
+      To* getTo() const
+      {
+        return this->second;
+      }
 
       /// Make a relation in the opposite direciton with the same weight
-      WeightedRelation<T> reversed() const
-      { return WeightedRelation<T>(getTo(), getWeight(), getFrom()); }
-
+      WeightedRelation<To, From> reversed() const
+      {
+        //return WeightedRelation<To, From>(getTo(), getWeight(), getFrom());
+        return {getTo(), getWeight(), getFrom()};
+      }
     };
 
     /// Utility structure with functions related to weighted relations
-    template <class AItem>
+    template <class AFrom, class ATo = AFrom>
     struct WeightedRelationUtil {
       /**
        *  Checks for the symmetry of a range of weighted relations
@@ -116,9 +131,10 @@ namespace Belle2 {
       template <class AWeightedRelations>
       static bool areSymmetric(const AWeightedRelations& weightedRelations)
       {
+        static_assert(std::is_same<AFrom, ATo>::value, "Symmetric check requires some types in From and To");
         assert(std::is_sorted(std::begin(weightedRelations), std::end(weightedRelations)));
         auto reversedRelationExists =
-        [&weightedRelations](const WeightedRelation<AItem>& weightedRelation) -> bool {
+        [&weightedRelations](const WeightedRelation<AFrom, ATo>& weightedRelation) -> bool {
           auto reversedRelations = std::equal_range(std::begin(weightedRelations),
           std::end(weightedRelations),
           weightedRelation.reversed());

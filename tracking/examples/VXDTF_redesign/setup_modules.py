@@ -172,56 +172,6 @@ def setup_VXDTF2(path=None,
         return modules
 
 
-def setup_mcTF(
-        path=0,
-        whichParticles=['primary'],
-        nameOutput='mcTracks',
-        usePXD=False,
-        minNdf=6,
-        logLevel=LogLevel.INFO,
-        debugVal=1):
-    """This function adds the TrackFinderMCTruth-module to given path.
-
-    @param path if set to 0 (standard) the created modules will not be added, but returned.
-    If a path is given, 'None' is returned but will be added to given path instead.
-
-    @param whichParticles expects a list of strings. sets the criteria for allowed track reco.
-
-    @param nameOutput determines the name of the storeArray containing the created mcTCs.
-
-    @param usePXD If False pxdClusters are ignored.
-
-    @param minNdf sets the minimal TC-length depending on the ndf (n degrees of freedom),
-    + 2ndf per pxdCluster, +1 ndf per svdCluster.
-
-    @param logLevel set to logLevel level of your choice.
-
-    @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
-    """
-    print("setup TrackFinderMCTruth...")
-    doPXD = 0
-    if usePXD:
-        doPXD = 1
-    mctrackfinder = register_module('TrackFinderMCTruth')
-    mctrackfinder.logging.log_level = LogLevel.INFO
-    param_mctrackfinder = {
-        'UseCDCHits': 0,
-        'UseSVDHits': 1,
-        'UsePXDHits': doPXD,
-        'Smearing': 0,
-        'UseClusters': True,
-        'MinimalNDF': minNdf,
-        'WhichParticles': whichParticles,
-        'GFTrackCandidatesColName': nameOutput,
-    }
-    mctrackfinder.param(param_mctrackfinder)
-    if path is 0:
-        return mctrackfinder
-    else:
-        path.add_module(mctrackfinder)
-        return None
-
-
 def setup_gfTCtoSPTCConverters(
         path=0,
         pxdSPs='pxdOnly',
@@ -283,36 +233,34 @@ def setup_gfTCtoSPTCConverters(
     sp2thConnector.param('requirePrimary', True)
     sp2thConnector.param('positionAnalysis', False)
 
-    # TCConverter, genfit -> SPTC
-    trackCandConverter = register_module('GFTC2SPTCConverter')
-    trackCandConverter.logging.log_level = logLevel
-    trackCandConverter.param('genfitTCName', gfTCinput)
-    trackCandConverter.param('SpacePointTCName', 'SPTracks')
-    trackCandConverter.param('NoSingleClusterSVDSP', svdSPs)
-    trackCandConverter.param('PXDClusterSP', pxdSPs)
-    trackCandConverter.param('checkTrueHits', True)
-    trackCandConverter.param('useSingleClusterSP', False)
-    trackCandConverter.param('checkNoSingleSVDSP', True)
-    trackCandConverter.param('skipCluster', True)
+    # TCConverter, RecoTrack -> SPTC
+    recoTrackCandConverter = register_module('RT2SPTCConverter')
+    recoTrackCandConverter.logging.log_level = logLevel
+    recoTrackCandConverter.param('RecoTracksName', gfTCinput)
+    recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
+    recoTrackCandConverter.param('SVDDoubleClusterSP', svdSPs)
+    recoTrackCandConverter.param('useTrueHits', False)
+    recoTrackCandConverter.param('useSingleClusterSP', False)
+    recoTrackCandConverter.param('skipProblematicCluster', False)
 
     # SpacePointTrackCand referee
     sptcReferee = register_module('SPTCReferee')
-    sptcReferee.logging.log_level = LogLevel.INFO
+    sptcReferee.logging.log_level = logLevel
     sptcReferee.param('sptcName', 'SPTracks')
     sptcReferee.param('newArrayName', sptcOutput)
     sptcReferee.param('storeNewArray', True)
-    sptcReferee.param('checkCurling', True)
+    sptcReferee.param('checkCurling', False)
     sptcReferee.param('splitCurlers', True)
     sptcReferee.param('keepOnlyFirstPart', True)
     sptcReferee.param('kickSpacePoint', True)
     sptcReferee.param('checkSameSensor', True)
-    sptcReferee.param('useMCInfo', True)
+    sptcReferee.param('useMCInfo', False)
 
     if path is 0:
-        return [sp2thConnector, trackCandConverter, sptcReferee]
+        return [sp2thConnector, recoTrackCandConverter, sptcReferee]
     else:
         path.add_module(sp2thConnector)
-        path.add_module(trackCandConverter)
+        path.add_module(recoTrackCandConverter)
         path.add_module(sptcReferee)
         return None
 

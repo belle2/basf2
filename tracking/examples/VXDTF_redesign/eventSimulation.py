@@ -27,7 +27,7 @@ from beamparameters import add_beamparameters
 from simulation import add_simulation
 
 # If later the use of bg is wanted, you can as well import setup_bg
-from setup_modules import (setup_sim, setup_mcTF)
+from setup_modules import setup_sim
 
 # ---------------------------------------------------------------------------------------
 
@@ -113,7 +113,15 @@ add_simulation(path=main,
 
 # ---------------------------------------------------------------------------------------
 # Setting up the MC based track finder.
-setup_mcTF(path=main, nameOutput='mcTracks', usePXD=False, logLevel=LogLevel.INFO)
+mctrackfinder = register_module('TrackFinderMCTruthRecoTracks')
+mctrackfinder.param('UseCDCHits', False)
+mctrackfinder.param('UseSVDHits', True)
+mctrackfinder.param('UsePXDHits', False)
+mctrackfinder.param('Smearing', False)
+mctrackfinder.param('MinimalNDF', 6)
+mctrackfinder.param('WhichParticles', ['primary'])
+mctrackfinder.param('RecoTracksStoreArrayName', 'mcTracks')
+main.add_module(mctrackfinder)
 
 
 # Root output. Default filename can be overriden with '-o' basf2 option.

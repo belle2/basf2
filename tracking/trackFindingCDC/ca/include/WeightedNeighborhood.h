@@ -9,8 +9,8 @@
  **************************************************************************/
 #pragma once
 
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <tracking/trackFindingCDC/utilities/SortedRange.h>
 

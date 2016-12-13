@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/filters/base/MVAFilter.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {

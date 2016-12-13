@@ -13,7 +13,7 @@
 #include <tracking/trackFindingCDC/findlets/base/ClassMnemomics.h>
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <tracking/trackFindingCDC/utilities/StringManipulation.h>
 

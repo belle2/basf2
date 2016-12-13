@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/findlets/base/Findlet.h>
 
-#include <tracking/trackFindingCDC/ca/WeightedRelation.h>
+#include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
 #include <vector>
 #include <string>

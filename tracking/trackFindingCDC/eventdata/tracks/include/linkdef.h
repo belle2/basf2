@@ -15,7 +15,7 @@
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCTrack>+;
 
 // Some dictionaries for WeightedRelations that will be needed
-#pragma extra_include <tracking/trackFindingCDC/ca/WeightedRelation.h>;
+#pragma extra_include <tracking/trackFindingCDC/utilities/WeightedRelation.h>;
 
 #pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentPair>+; // implicit
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<const Belle2::TrackFindingCDC::CDCSegmentPair> >+; // implicit

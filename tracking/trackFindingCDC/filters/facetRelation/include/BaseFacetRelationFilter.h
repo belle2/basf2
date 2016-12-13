@@ -15,7 +15,7 @@
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 

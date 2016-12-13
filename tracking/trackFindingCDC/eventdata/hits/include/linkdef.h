@@ -3,7 +3,7 @@
 #pragma link off all functions;
 #pragma link C++ nestedclasses;
 
-#pragma extra_include <tracking/trackFindingCDC/ca/WeightedRelation.h>;
+#pragma extra_include <tracking/trackFindingCDC/utilities/WeightedRelation.h>;
 
 #pragma link C++ class Belle2::TrackFindingCDC::CDCWireHit+;
 #pragma link C++ class Belle2::TrackFindingCDC::CDCRLWireHit+;
@@ -29,7 +29,7 @@
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::CDCRecoHit3D>+;
 
 // Some dictionaries for WeightedRelations that will be needed
-#pragma extra_include <tracking/trackFindingCDC/ca/WeightedRelation.h>;
+#pragma extra_include <tracking/trackFindingCDC/utilities/WeightedRelation.h>;
 
 #pragma link C++ class Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCWireHit>+; // implicit
 #pragma link C++ class std::vector<Belle2::TrackFindingCDC::WeightedRelation<Belle2::TrackFindingCDC::CDCWireHit> >+; // implicit

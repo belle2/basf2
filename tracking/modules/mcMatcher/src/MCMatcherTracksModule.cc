@@ -169,6 +169,7 @@ MCMatcherTracksModule::~MCMatcherTracksModule()
 
 void MCMatcherTracksModule::initialize()
 {
+  B2FATAL("This module is depricated as it uses genfit::Track(Cand)s instead of RecoTracks. It will be removed in the future. If you need information on the transition, please contact Nils Braun (nils.braun@kit.edu).");
 
   // Require both GFTrackCand arrays to be present in the DataStore
   StoreArray<genfit::TrackCand>::required(m_param_prGFTrackCandsColName);

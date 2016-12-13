@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<FrontEndGeo descr="front-end electronics">
+
+  <FrontBoard descr="all boards joint together">
+    <width unit="mm">450.0</width>
+    <height unit="mm">60.0</height>
+    <thickness unit="mm">4.0</thickness>
+    <gap descr="gap to PMT" unit="mm">2.0</gap>
+    <y descr="position of center in bar frame" unit="mm">-15.5</y>
+    <material>TOPPCB</material>
+  </FrontBoard>
+
+  <HVBoard descr="all boards joint together">
+    <width unit="mm">450.0</width>
+    <length unit="mm">95.0</length>
+    <thickness unit="mm">2.0</thickness>
+    <gap descr="gap to front board" unit="mm">2.0</gap>
+    <y descr="position of center in bar frame" unit="mm">10.0</y>
+    <material>TOPPCB</material>
+  </HVBoard>
+
+  <BoardStack desc="simplified board stack">
+    <width unit="mm">112.0</width>
+    <height unit="mm">60.0</height>
+    <length unit="mm">95.0</length>
+    <spacerWidth descr="width of Al spacers" unit="mm">8.0</spacerWidth>
+    <gap descr="gap to front board" unit="mm">6.0</gap>
+    <y descr="position of center in bar frame" unit="mm">-25.0</y>
+    <material>TOPBoardStack</material>
+    <spacerMaterial>Al</spacerMaterial>
+  </BoardStack>
+
+  <numBoardStacks descr="number of boardstacks per module">4</numBoardStacks>
+  
+</FrontEndGeo>

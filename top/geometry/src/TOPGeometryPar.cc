@@ -15,6 +15,7 @@
 #include <framework/gearbox/GearDir.h>
 #include <framework/logging/Logger.h>
 #include <geometry/Materials.h>
+#include <iostream>
 
 using namespace std;
 
@@ -54,8 +55,6 @@ namespace Belle2 {
         return;
       }
 
-      readOldQBB(content);
-
       GearDir frontEndMapping(content, "FrontEndMapping");
       m_frontEndMapper.initialize(frontEndMapping);
       if (!m_frontEndMapper.isValid()) {
@@ -73,6 +72,8 @@ namespace Belle2 {
       if (!m_channelMapperIRSX.isValid()) {
         return;
       }
+
+      m_brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
 
       m_valid = true;
     }
@@ -219,13 +220,13 @@ namespace Belle2 {
                     arrayParams.getString("glueMaterial"));
       prism.setSurface(barSurface, sigmaAlpha);
 
-      double radius = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
+      double R = barParams.getLength("Radius") + barParams.getLength("QThickness") / 2;
       double phi = barParams.getLength("Phi0");
       double backwardZ = barParams.getLength("QZBackward");
       int numModules = barParams.getInt("Nbar");
       for (int i = 0; i < numModules; i++) {
         unsigned id = i + 1;
-        TOPGeoModule module(id, radius, phi, backwardZ);
+        TOPGeoModule module(id, R, phi, backwardZ);
         module.setName(addNumber(module.getName(), id));
         module.setBarSegment1(bar1);
         module.setBarSegment2(bar2);
@@ -238,14 +239,105 @@ namespace Belle2 {
         phi += 2 * M_PI / numModules;
       }
 
-      // boardstack
+      // front-end electronics geometry
 
-      TOPGeoBoardStack bs; // TODO
-      geo->setBoardStack(bs);
+      GearDir feParams(content, "FrontEndGeo");
+      GearDir fbParams(feParams, "FrontBoard");
+      TOPGeoFrontEnd frontEnd;
+      frontEnd.setFrontBoard(fbParams.getLength("width"),
+                             fbParams.getLength("height"),
+                             fbParams.getLength("thickness"),
+                             fbParams.getLength("gap"),
+                             fbParams.getLength("y"),
+                             fbParams.getString("material"));
+      GearDir hvParams(feParams, "HVBoard");
+      frontEnd.setHVBoard(hvParams.getLength("width"),
+                          hvParams.getLength("length"),
+                          hvParams.getLength("thickness"),
+                          hvParams.getLength("gap"),
+                          hvParams.getLength("y"),
+                          hvParams.getString("material"));
+      GearDir bsParams(feParams, "BoardStack");
+      frontEnd.setBoardStack(bsParams.getLength("width"),
+                             bsParams.getLength("height"),
+                             bsParams.getLength("length"),
+                             bsParams.getLength("gap"),
+                             bsParams.getLength("y"),
+                             bsParams.getString("material"),
+                             bsParams.getLength("spacerWidth"),
+                             bsParams.getString("spacerMaterial"));
+      geo->setFrontEnd(frontEnd, feParams.getInt("numBoardStacks"));
 
       // QBB
 
-      TOPGeoQBB qbb; // TODO
+      GearDir qbbParams(content, "QBB");
+      TOPGeoQBB qbb(qbbParams.getLength("width"),
+                    qbbParams.getLength("length"),
+                    qbbParams.getLength("prismPosition"),
+                    qbbParams.getString("material"));
+
+      GearDir outerPanelParams(qbbParams, "outerPanel");
+      TOPGeoHoneycombPanel outerPanel(outerPanelParams.getLength("width"),
+                                      outerPanelParams.getLength("length"),
+                                      outerPanelParams.getLength("minThickness"),
+                                      outerPanelParams.getLength("maxThickness"),
+                                      outerPanelParams.getLength("radius"),
+                                      outerPanelParams.getLength("edgeWidth"),
+                                      outerPanelParams.getLength("y"),
+                                      outerPanelParams.getInt("N"),
+                                      outerPanelParams.getString("material"),
+                                      outerPanelParams.getString("edgeMaterial"),
+                                      "TOPOuterHoneycombPanel");
+      qbb.setOuterPanel(outerPanel);
+
+      GearDir innerPanelParams(qbbParams, "innerPanel");
+      TOPGeoHoneycombPanel innerPanel(innerPanelParams.getLength("width"),
+                                      innerPanelParams.getLength("length"),
+                                      innerPanelParams.getLength("minThickness"),
+                                      innerPanelParams.getLength("maxThickness"),
+                                      innerPanelParams.getLength("radius"),
+                                      innerPanelParams.getLength("edgeWidth"),
+                                      innerPanelParams.getLength("y"),
+                                      innerPanelParams.getInt("N"),
+                                      innerPanelParams.getString("material"),
+                                      innerPanelParams.getString("edgeMaterial"),
+                                      "TOPInnerHoneycombPanel");
+      qbb.setInnerPanel(innerPanel);
+
+      GearDir sideRailsParams(qbbParams, "sideRails");
+      TOPGeoSideRails sideRails(sideRailsParams.getLength("thickness"),
+                                sideRailsParams.getLength("reducedThickness"),
+                                sideRailsParams.getLength("height"),
+                                sideRailsParams.getString("material"));
+      qbb.setSideRails(sideRails);
+
+      GearDir prismEnclParams(qbbParams, "prismEnclosure");
+      TOPGeoPrismEnclosure prismEncl(prismEnclParams.getLength("length"),
+                                     prismEnclParams.getLength("height"),
+                                     prismEnclParams.getAngle("angle"),
+                                     prismEnclParams.getLength("bottomThickness"),
+                                     prismEnclParams.getLength("sideThickness"),
+                                     prismEnclParams.getLength("backThickness"),
+                                     prismEnclParams.getLength("frontThickness"),
+                                     prismEnclParams.getLength("extensionThickness"),
+                                     prismEnclParams.getString("material"));
+      qbb.setPrismEnclosure(prismEncl);
+
+      GearDir endPlateParams(qbbParams, "forwardEndPlate");
+      TOPGeoEndPlate endPlate(endPlateParams.getLength("thickness"),
+                              endPlateParams.getLength("height"),
+                              endPlateParams.getString("material"),
+                              "TOPForwardEndPlate");
+      qbb.setEndPlate(endPlate);
+
+      GearDir coldPlateParams(qbbParams, "coldPlate");
+      TOPGeoColdPlate coldPlate(coldPlateParams.getLength("baseThickness"),
+                                coldPlateParams.getString("baseMaterial"),
+                                coldPlateParams.getLength("coolThickness"),
+                                coldPlateParams.getLength("coolWidth"),
+                                coldPlateParams.getString("coolMaterial"));
+      qbb.setColdPlate(coldPlate);
+
       geo->setQBB(qbb);
 
       // nominal QE
@@ -314,30 +406,6 @@ namespace Belle2 {
       ss >> out;
       return out;
     }
-
-
-    void TOPGeometryPar::readOldQBB(const GearDir& content)
-    {
-
-      // Support structure
-
-      GearDir supParams(content, "Support");
-      m_PannelThickness = supParams.getLength("PannelThickness");
-      m_PlateThickness = supParams.getLength("PlateThickness");
-      m_LowerGap = supParams.getLength("lowerGap");
-      m_UpperGap = supParams.getLength("upperGap");
-      m_SideGap = supParams.getLength("sideGap");
-      m_forwardGap = supParams.getLength("forwardGap");
-      m_backwardGap = supParams.getLength("backGap");
-      m_pannelMaterial = supParams.getString("PannelMaterial");
-      m_insideMaterial = supParams.getString("FillMaterial");
-
-      // other
-
-      m_brokenFraction = content.getDouble("Bars/BrokenJointFraction", 0);
-
-    }
-
 
   } // End namespace TOP
 } // End namespace Belle2

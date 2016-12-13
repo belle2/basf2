@@ -35,10 +35,15 @@ namespace Belle2 {
       m_storeArrayNameOfSVDHits = "WhatAboutSVD";
       /// Name of the PXD hits store array.
       m_storeArrayNameOfPXDHits = "PXDsILike";
+      /// Name of the BKLM hits store array.
+      m_storeArrayNameOfBKLMHits = "KeepBKLMsAlive";
+      /// Name of the EKLM hits store array.
+      m_storeArrayNameOfEKLMHits = "EKLMsAreImportant";
       /// Name of the reco hit information store array.
       m_storeArrayNameOfHitInformation = "ConnectingAll";
 
       //--- Setup -----------------------------------------------------------------------
+      // We do not use the KLM store arrays to test, if the RecoTrack can be used without them.
       DataStore::Instance().setInitializeActive(true);
       StoreArray<CDCHit>::registerPersistent(m_storeArrayNameOfCDCHits);
       StoreArray<SVDCluster>::registerPersistent(m_storeArrayNameOfSVDHits);
@@ -77,7 +82,8 @@ namespace Belle2 {
       TVector3 momentum(-1, -0.5, 1.123);
       short int charge = 1;
       m_recoTrack = recoTracks.appendNew(position, momentum, charge,
-                                         m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+                                         m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                         m_storeArrayNameOfBKLMHits, m_storeArrayNameOfEKLMHits, m_storeArrayNameOfHitInformation);
     }
 
     RecoTrack* m_recoTrack;
@@ -85,6 +91,8 @@ namespace Belle2 {
     std::string m_storeArrayNameOfCDCHits;
     std::string m_storeArrayNameOfSVDHits;
     std::string m_storeArrayNameOfPXDHits;
+    std::string m_storeArrayNameOfBKLMHits;
+    std::string m_storeArrayNameOfEKLMHits;
     std::string m_storeArrayNameOfHitInformation;
   };
 
@@ -126,7 +134,7 @@ namespace Belle2 {
 
     RecoHitInformation* recoHitInformation = m_recoTrack->getRecoHitInformation(cdcHit);
     EXPECT_NE(recoHitInformation, nullptr);
-    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(recoHitInformation->getTrackingDetector(), RecoHitInformation::RecoHitDetector::c_CDC);
     EXPECT_EQ(recoHitInformation->getRightLeftInformation(), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
     EXPECT_EQ(recoHitInformation->getFoundByTrackFinder(), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(recoHitInformation->getSortingParameter(), 1);
@@ -142,7 +150,7 @@ namespace Belle2 {
     // with added hits
     cdcHit = cdcHits[0];
 
-    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::TrackingDetector::c_CDC);
+    EXPECT_EQ(m_recoTrack->getTrackingDetector(cdcHit), RecoHitInformation::RecoHitDetector::c_CDC);
     EXPECT_EQ(m_recoTrack->getRightLeftInformation(cdcHit), RecoHitInformation::RightLeftInformation::c_undefinedRightLeftInformation);
     EXPECT_EQ(m_recoTrack->getFoundByTrackFinder(cdcHit), RecoHitInformation::OriginTrackFinder::c_undefinedTrackFinder);
     EXPECT_EQ(m_recoTrack->getSortingParameter(cdcHit), 1);
@@ -184,7 +192,9 @@ namespace Belle2 {
     // convert it to a RecoTrack
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(newCreatedTrackCand, m_storeArrayNameOfRecoTracks,
                                      m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfBKLMHits,
+                                     m_storeArrayNameOfEKLMHits,
+                                     m_storeArrayNameOfHitInformation);
 
     // convert it back
 
@@ -224,7 +234,11 @@ namespace Belle2 {
 
     RecoTrack* recoTrackFromGenfit = RecoTrack::createFromTrackCand(exportedTrackCand, m_storeArrayNameOfRecoTracks,
                                      m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits,
-                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+                                     m_storeArrayNameOfPXDHits, m_storeArrayNameOfBKLMHits,
+                                     m_storeArrayNameOfEKLMHits,
+                                     m_storeArrayNameOfHitInformation);
+
+    B2INFO("kjh");
 
     ASSERT_EQ(recoTrackFromGenfit->getNumberOfCDCHits(), m_recoTrack->getNumberOfCDCHits());
     const auto& cdcHitListOne = recoTrackFromGenfit->getCDCHitList();
@@ -247,7 +261,9 @@ namespace Belle2 {
     StoreArray<RecoTrack> recoTracks(m_storeArrayNameOfRecoTracks);
 
     auto recoTrack = recoTracks.appendNew(m_recoTrack->getPositionSeed(), m_recoTrack->getMomentumSeed(), m_recoTrack->getChargeSeed(),
-                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits, m_storeArrayNameOfHitInformation);
+                                          m_storeArrayNameOfCDCHits, m_storeArrayNameOfSVDHits, m_storeArrayNameOfPXDHits,
+                                          m_storeArrayNameOfBKLMHits, m_storeArrayNameOfBKLMHits,
+                                          m_storeArrayNameOfHitInformation);
     EXPECT_FALSE(recoTrack->hasCDCHits());
 
     // check if the offset computation of the hit order works as expected

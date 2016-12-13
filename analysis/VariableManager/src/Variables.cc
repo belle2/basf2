@@ -177,21 +177,45 @@ namespace Belle2 {
     {
 
       const auto& frame = ReferenceFrame::GetCurrent();
-      TVector3 MotherBoost = - frame.getMomentum(part).BoostVector();
-      TVector3 MotherMomentum = frame.getMomentum(part).Vect();
+      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
       const auto& daughters = part -> getDaughters() ;
 
       if (daughters.size() == 2) {
 
-        TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
-        TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
+        bool isOneConversion = false;
 
-        pDaughter1.Boost(MotherBoost);
-        pDaughter2.Boost(MotherBoost);
+        for (auto& idaughter : daughters) {
+          if (idaughter -> getNDaughters() == 2) {
+            if (std::abs(idaughter -> getDaughters()[0]-> getPDGCode()) == 11) isOneConversion = true;
+          }
+        }
 
-        TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
+        if (isOneConversion) {
+          //only for pi0 decay where one gamma converts
 
-        return MotherMomentum.Angle(p12);
+          TLorentzVector pGamma;
+
+          for (auto& idaughter : daughters) {
+            if (idaughter -> getNDaughters() == 2) continue;
+            else pGamma = frame.getMomentum(idaughter);
+          }
+
+          pGamma.Boost(motherBoost);
+
+          return std::cos(motherMomentum.Angle(pGamma.Vect()));
+
+        } else {
+          TLorentzVector pDaughter1 = frame.getMomentum(daughters[0]);
+          TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
+
+          pDaughter1.Boost(motherBoost);
+          pDaughter2.Boost(motherBoost);
+
+          TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
+
+          return std::cos(motherMomentum.Angle(p12));
+        }
 
       } else if (daughters.size() == 3) {
 
@@ -199,16 +223,41 @@ namespace Belle2 {
         TLorentzVector pDaughter2 = frame.getMomentum(daughters[1]);
         TLorentzVector pDaughter3 = frame.getMomentum(daughters[2]);
 
-        pDaughter1.Boost(MotherBoost);
-        pDaughter2.Boost(MotherBoost);
-        pDaughter3.Boost(MotherBoost);
+        pDaughter1.Boost(motherBoost);
+        pDaughter2.Boost(motherBoost);
+        pDaughter3.Boost(motherBoost);
 
         TVector3 p12 = (pDaughter2 - pDaughter1).Vect();
         TVector3 p13 = (pDaughter3 - pDaughter1).Vect();
 
         TVector3 n = p12.Cross(p13);
 
-        return MotherMomentum.Angle(n);
+        return std::cos(motherMomentum.Angle(n));
+
+      }  else return 0;
+
+    }
+
+    double cosHelicityAnglePi0Dalitz(const Particle* part)
+    {
+
+      const auto& frame = ReferenceFrame::GetCurrent();
+      TVector3 motherBoost = - frame.getMomentum(part).BoostVector();
+      TVector3 motherMomentum = frame.getMomentum(part).Vect();
+      const auto& daughters = part -> getDaughters() ;
+
+
+      if (daughters.size() == 3) {
+
+        TLorentzVector pGamma;
+
+        for (auto& idaughter : daughters) {
+          if (std::abs(idaughter -> getPDGCode()) == 22) pGamma = frame.getMomentum(idaughter);
+        }
+
+        pGamma.Boost(motherBoost);
+
+        return std::cos(motherMomentum.Angle(pGamma.Vect()));
 
       }  else return 0;
 
@@ -688,10 +737,6 @@ namespace Belle2 {
       if (mcparticle == nullptr)
         return 0.0;
 
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
-        return 0.0;
-
       int status = MCMatching::getMCErrors(part, mcparticle);
       //remove the following bits, these are usually ok
       status &= (~MCMatching::c_MissFSR);
@@ -707,10 +752,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
-
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
@@ -766,10 +807,6 @@ namespace Belle2 {
     {
       const MCParticle* mcparticle = part->getRelatedTo<MCParticle>();
       if (mcparticle == nullptr)
-        return 0.0;
-
-      //abort early if PDG codes are different
-      if (abs(mcparticle->getPDG()) != abs(part->getPDGCode()))
         return 0.0;
 
       int status = MCMatching::getMCErrors(part, mcparticle);
@@ -1266,6 +1303,16 @@ namespace Belle2 {
       return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
     }
 
+    bool isGoodSkimGamma(int region, double energy)
+    {
+      bool goodGammaRegion1, goodGammaRegion2, goodGammaRegion3;
+      goodGammaRegion1 = region == 1 && energy > 0.030;
+      goodGammaRegion2 = region == 2 && energy > 0.020;
+      goodGammaRegion3 = region == 3 && energy > 0.040;
+
+      return goodGammaRegion1 || goodGammaRegion2 || goodGammaRegion3;
+    }
+
     double goodGammaUncalibrated(const Particle* particle)
     {
       double energy = particle->getEnergy();
@@ -1288,6 +1335,14 @@ namespace Belle2 {
       int region = eclClusterDetectionRegion(particle);
 
       return (double) isGoodBelleGamma(region, energy);
+    }
+
+    double goodSkimGamma(const Particle* particle)
+    {
+      double energy = particle->getEnergy();
+      int region = eclClusterDetectionRegion(particle);
+
+      return (double) isGoodSkimGamma(region, energy);
     }
 
     double eclClusterErrorE(const Particle* particle)
@@ -1510,16 +1565,21 @@ namespace Belle2 {
 
     double trackMatchType(const Particle* particle)
     {
-      double result = 0.0;
+      // Particle does not contain a ECL Cluster
+      double result = -1.0;
 
-      const Track* track = particle->getTrack();
-      if (track) {
-        // There is a track match
-        result = 1.0;
-        const ECLCluster* shower = particle->getECLCluster();
-        if (shower and shower->getConnectedRegionId() > 0)
+      const ECLCluster* cluster = particle->getECLCluster();
+      if (cluster) {
+        // No associated track is default
+        result = 0;
+        if (cluster->isTrack()) {
+          // There is a track match
+          result = 1.0;
+        }
+        if (cluster->getConnectedRegionId() > 0) {
           // The cluster is only in the connected region, so its a CR track match
           result = 2.0;
+        }
       }
       return result;
     }
@@ -1583,6 +1643,11 @@ namespace Belle2 {
                       "If the given particle has two daughters: cosine of the angle between the line defined by the momentum difference of the two daughters in the frame of the given particle (mother)"
                       "and the momentum of the given particle in the lab frame\n"
                       "If the given particle has three daughters: cosine of the angle between the normal vector of the plane defined by the momenta of the three daughters in the frame of the given particle (mother)"
+                      "and the momentum of the given particle in the lab frame.\n"
+                      "Else: 0.");
+    REGISTER_VARIABLE("cosHelicityAnglePi0Dalitz",
+                      cosHelicityAnglePi0Dalitz,
+                      "To be used for the decay pi0 -> e+ e- gamma: cosine of the angle between the momentum of the gamma in the frame of the given particle (mother)"
                       "and the momentum of the given particle in the lab frame.\n"
                       "Else: 0.");
 
@@ -1711,7 +1776,7 @@ namespace Belle2 {
                       "flavor type of decay(0 = unflavored, 1 = flavored)");
     REGISTER_VARIABLE("charge", particleCharge, "charge of particle");
     REGISTER_VARIABLE("trackMatchType", trackMatchType,
-                      "0 of particle has no associated track, 1 if there is a matched track, 2 if the matched track is only nearby the cluster,"
+                      "-1 particle has no ECL cluster, 0 particle has no associated track, 1 there is a matched track, 2 the matched track is only nearby the cluster"
                       "called connected - region(CR) track match");
     REGISTER_VARIABLE("mdstIndex", particleMdstArrayIndex,
                       "StoreArray index(0 - based) of the MDST object from which the Particle was created");
@@ -1767,7 +1832,9 @@ namespace Belle2 {
     REGISTER_VARIABLE("goodGammaUnCal", goodGammaUncalibrated,
                       "1.0 if photon candidate passes good photon selection criteria (to be used if photon's energy is not calibrated)");
     REGISTER_VARIABLE("goodBelleGamma", goodBelleGamma,
-                      "1.0 if photon candidate passes good photon selection criteria(For Belle data and MC, hence 50, 100, 150 MeV cuts)");
+                      "1.0 if photon candidate passes good photon selection criteria (For Belle data and MC, hence 50, 100, 150 MeV cuts)");
+    REGISTER_VARIABLE("goodSkimGamma", goodSkimGamma,
+                      "1.0 if photon candidate passes good photon skim selection criteria (20, 30, 40 MeV cuts)");
     REGISTER_VARIABLE("clusterErrorE", eclClusterErrorE,
                       "ECL cluster's Error on Energy");
     REGISTER_VARIABLE("clusterUncorrE", eclClusterUncorrectedE,

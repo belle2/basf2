@@ -51,7 +51,7 @@ namespace Belle2 {
 
       /// Erase items from this node that satisfy the predicate.
       template<class APredicate>
-      void eraseIf(APredicate& predicate)
+      void eraseIf(const APredicate& predicate)
       {
         auto itFirstToRemove = std::remove_if(m_items.begin(), m_items.end(), predicate);
         m_items.erase(itFirstToRemove, m_items.end());

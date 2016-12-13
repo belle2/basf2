@@ -129,8 +129,11 @@ void BeamDQMModule::event()
         //m_hNTracks->Fill("TrackCand, but no Track", 1.0);
         continue;
       }
-      if (!track->checkConsistency())
+      try {
+        track->checkConsistency();
+      } catch (genfit::Exception& e) {
         return;
+      }
 
       const genfit::FitStatus* fs = track->getFitStatus();
       if (!fs || !fs->isFitConverged()) {

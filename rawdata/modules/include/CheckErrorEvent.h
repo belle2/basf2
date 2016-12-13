@@ -43,11 +43,20 @@ namespace Belle2 {
 #endif
 
   protected :
+
+    //! # of packet CRC errors
     int m_packetCRCerr_cpr = 0;
+
+    //! # of event(-fragment) CRC errors
     int m_eventCRCerr_cpr = 0;
+
+    //! # of packet CRC errors in one event
     int m_packetCRCerr_evt = 0;
+
+    //! # of event(-fragment) CRC errors in one event
     int m_eventCRCerr_evt = 0;
 
+    //! # of event(-fragment) CRC errors stored in EventMetaData
     int m_eventCRCerr_evtmetadata = 0;
 
   };

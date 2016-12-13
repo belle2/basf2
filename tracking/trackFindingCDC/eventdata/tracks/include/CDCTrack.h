@@ -104,14 +104,8 @@ namespace Belle2 {
         return m_endTrajectory3D;
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      {
-        return m_automatonCell;
-      }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -176,7 +170,7 @@ namespace Belle2 {
 
     private:
       /// Memory for the automaton cell.
-      AutomatonCell m_automatonCell;
+      mutable AutomatonCell m_automatonCell;
 
       /// Memory for the three dimensional trajectory at the start of the track
       CDCTrajectory3D m_startTrajectory3D;

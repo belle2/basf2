@@ -50,6 +50,9 @@ TrackTimeExtractionModule::TrackTimeExtractionModule() : Module()
   addParam("maximalExtractedT0", m_param_maximalExtractedT0,
            "Hard cut on this value of extracted times in the positive as well as the negative direction.",
            m_param_maximalExtractedT0);
+
+  addParam("t0Uncertainty", m_param_t0Uncertainty, "Use this as sigma t0.",
+           m_param_t0Uncertainty);
 }
 
 void TrackTimeExtractionModule::initialize()
@@ -73,8 +76,8 @@ void TrackTimeExtractionModule::event()
 
   const double extractedTime = extractTrackTimeLoop(recoTracks);
 
-  // TODO: Uncertainty
-  m_eventT0->addEventT0(extractedTime, 0, Const::EDetector::CDC);
+  // The uncertainty was calculated using a test MC sample
+  m_eventT0->addEventT0(extractedTime, m_param_t0Uncertainty, Const::EDetector::CDC);
 }
 
 

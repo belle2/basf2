@@ -130,7 +130,7 @@ void AxialTrackCreatorSegmentHough::apply(const std::vector<CDCSegment2D>& segme
   m_houghTree.fell();
 
   size_t nAxialHits = 0;
-  std::vector<const Belle2::TrackFindingCDC::CDCSegment2D*> ptrAxialSegments;
+  std::vector<const CDCSegment2D*> ptrAxialSegments;
   ptrAxialSegments.reserve(segments.size());
 
   for (const CDCSegment2D& segment : segments) {

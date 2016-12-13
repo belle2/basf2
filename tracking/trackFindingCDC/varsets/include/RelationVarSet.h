@@ -11,7 +11,7 @@
 
 #include <tracking/trackFindingCDC/varsets/BaseVarSet.h>
 
-#include <tracking/trackFindingCDC/ca/Relation.h>
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 #include <tracking/trackFindingCDC/utilities/MayBePtr.h>
 
 #include <boost/algorithm/string/predicate.hpp>

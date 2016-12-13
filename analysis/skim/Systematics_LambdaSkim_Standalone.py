@@ -19,7 +19,7 @@ filelist = \
     ['/ghi/fs01/belle2/bdata/MC/fab/sim/release-00-07-00/DBxxxxxxxx/' +
      'MC6/prod00000180/s00/e0000/4S/r00000/mixed/sub00/mdst_000001_prod00000180_task00000001.root'
      ]
-inputMdstList(filelist)
+inputMdstList('default', filelist)
 
 loadStdCharged()
 

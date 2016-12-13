@@ -79,11 +79,11 @@ def plot(tobject, **kwd):
     elif isinstance(tobject, ROOT.TMultiGraph):
         return plot_tmultigraph(tobject, **kwd)
 
-    elif isinstance(tobject, (ROOT.TProfile, ROOT.TH1)):
-        return plot_th1(tobject, **kwd)
-
     elif isinstance(tobject, ROOT.TGraph):
         return plot_tgraph(tobject, **kwd)
+
+    elif isinstance(tobject, (ROOT.TProfile, ROOT.TH1)):
+        return plot_th1(tobject, **kwd)
 
     else:
         raise ValueError("Plotting to matplot lib only supported for TH1, TProfile, and THStack.")
@@ -630,7 +630,7 @@ def plot_th1_data_into(ax,
         if isinstance(th1, ROOT.TProfile):
             plot_errors = True
         else:
-            plot_errors = False
+            plot_errors = th1.GetSumw2N() != 0
 
     # Bin content
     x_taxis = th1.GetXaxis()

@@ -316,14 +316,8 @@ namespace Belle2 {
                << ", drift length=" << wirehit.getRefDriftLength() << ")";
       }
 
-      /// Getter for the automaton cell.
-      AutomatonCell& getAutomatonCell()
-      {
-        return m_automatonCell;
-      }
-
-      /// Constant getter for the automaton cell.
-      const AutomatonCell& getAutomatonCell() const
+      /// Mutable getter for the automaton cell.
+      AutomatonCell& getAutomatonCell() const
       {
         return m_automatonCell;
       }
@@ -348,7 +342,7 @@ namespace Belle2 {
       mutable CDCWire const* m_wire = nullptr; //!
 
       /// Memory for the automaton cell.
-      AutomatonCell m_automatonCell{1};
+      mutable AutomatonCell m_automatonCell{1};
 
       /// Memory for the drift length at the wire reference point.
       double m_refDriftLength = 0;

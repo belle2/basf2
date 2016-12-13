@@ -16,6 +16,8 @@
 #include <tracking/trackFindingCDC/utilities/Named.h>
 #include <tracking/trackFindingCDC/utilities/MakeUnique.h>
 
+#include <framework/logging/Logger.h>
+
 #include <memory>
 
 namespace Belle2 {

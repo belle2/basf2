@@ -137,8 +137,8 @@ CDCTrajectory3D CDCAxialStereoFusion::fusePreliminary(const CDCSegment2D& fromSe
   }
 
   bool fromIsAxial = fromSegment2D.isAxial();
-  const CDCAxialSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
-  const CDCStereoSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
+  const CDCSegment2D& axialSegment2D = fromIsAxial ? fromSegment2D : toSegment2D;
+  const CDCSegment2D& stereoSegment2D = not fromIsAxial ? fromSegment2D : toSegment2D;
 
   CDCTrajectory2D axialTrajectory2D = axialSegment2D.getTrajectory2D();
 

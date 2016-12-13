@@ -12,10 +12,10 @@
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
 
 #include <tracking/trackFindingCDC/eventdata/hits/CDCFacet.h>
-#include <tracking/trackFindingCDC/eventdata/hits/CDCRLWireHitPair.h>
 
 #include <tracking/trackFindingCDC/numerics/Weight.h>
-#include <tracking/trackFindingCDC/ca/Relation.h>
+
+#include <tracking/trackFindingCDC/utilities/Relation.h>
 
 #include <boost/range/iterator_range.hpp>
 
@@ -35,19 +35,13 @@ namespace Belle2 {
        *  Returns a two iterator range covering the range of possible neighboring
        *  facets of the given facet out of the sorted range given by the two other argumets.
        */
-      template<class ACDCFacetIterator>
-      boost::iterator_range<ACDCFacetIterator>
-      getPossibleNeighbors(const CDCFacet& facet,
-                           const ACDCFacetIterator& itBegin,
-                           const ACDCFacetIterator& itEnd) const
+      template <class AFacetIt>
+      boost::iterator_range<AFacetIt>
+      getPossibleNeighbors(const CDCFacet& facet, const AFacetIt& itBegin, const AFacetIt& itEnd) const
       {
-
         const CDCRLWireHitPair& rearRLWireHitPair = facet.getRearRLWireHitPair();
-
-        std::pair<ACDCFacetIterator, ACDCFacetIterator> rangePossibleNeighbors =
-          std::equal_range(itBegin, itEnd, rearRLWireHitPair);
-        return boost::iterator_range<ACDCFacetIterator>(rangePossibleNeighbors.first,
-                                                        rangePossibleNeighbors.second);
+        std::pair<AFacetIt, AFacetIt> neighbors = std::equal_range(itBegin, itEnd, rearRLWireHitPair);
+        return {neighbors.first, neighbors.second};
       }
 
       /**
@@ -67,12 +61,11 @@ namespace Belle2 {
        */
       Weight operator()(const Relation<const CDCFacet>& relation) override
       {
-        const CDCFacet* ptrFrom(relation.first);
-        const CDCFacet* ptrTo(relation.second);
+        const CDCFacet* ptrFrom(relation.getFrom());
+        const CDCFacet* ptrTo(relation.getTo());
         if (not ptrFrom or not ptrTo) return NAN;
         return operator()(*ptrFrom, *ptrTo);
       }
-
     };
   }
 }

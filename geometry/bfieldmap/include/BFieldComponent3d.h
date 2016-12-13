@@ -54,7 +54,7 @@ namespace Belle2 {
      * @return The magnetic field vector at the given space point in [T].
      *         Returns a zero vector TVector(0,0,0) if the space point lies outside the region described by the component.
      */
-    virtual TVector3 calculate(const TVector3& point) const;
+    virtual B2Vector3D calculate(const B2Vector3D& point) const;
 
     /**
      * Terminates the magnetic field component.
@@ -139,21 +139,19 @@ namespace Belle2 {
      * @param mapEnable List of dimensions to enable: "rphiz", "rphi", "phiz" or "rz"
      */
     void enableCoordinate(std::string mapEnable = "rphiz") { m_mapEnable = mapEnable; }
-
   protected:
 
   private:
 
     /**
-     * Interpolate the value of B-field for a given set of map indicies (ir, iphi, iz) and exact position (r, phi, z)
+     * Interpolate the value of B-field between (ir, iphi, iz) and (ir+1, iphi+1, iz+1) using weights (wr, wphi, wz)
      */
-    double interpolate(int& ir, int& iphi, int& iz, double& r, double& phi, double& z,
-                       const std::vector< std::vector< std::vector<double> > >& bmap) const;
+    B2Vector3D interpolate(unsigned int ir, unsigned int iphi, unsigned int iz, double wr, double wphi, double wz) const;
 
     /** The filename of the magnetic field map. */
     std::string m_mapFilename{""};
     /** The memory buffer for the magnetic field map. */
-    std::vector< std::vector< std::vector<double> > > m_mapBuffer[3];
+    std::vector<B2Vector3F> m_bmap;
     /** Enable different dimension, \"rphiz\", \"rphi\", \"phiz\" or \"rz\" > */
     std::string m_mapEnable{"rphiz"};
     /** Flag to switch on/off interpolation > */
@@ -168,6 +166,8 @@ namespace Belle2 {
     double m_mapRegionR[2] {0};
     /** The grid pitch in r,phi,z. */
     double m_gridPitch[3] {0};
+    /** The inverted grid pitch in r,phi,z. */
+    double m_igridPitch[3] {0};
     /** The min and max boundaries of the excluded region in z. */
     double m_exRegionZ[2] {0};
     /** The min and max boundaries of the excluded region in r. */

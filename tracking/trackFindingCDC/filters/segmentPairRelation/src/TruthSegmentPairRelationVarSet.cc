@@ -9,10 +9,10 @@
  **************************************************************************/
 #include <tracking/trackFindingCDC/filters/segmentPairRelation/TruthSegmentPairRelationVarSet.h>
 
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
-
 #include <tracking/trackFindingCDC/mclookup/CDCMCSegment2DLookUp.h>
 #include <tracking/trackFindingCDC/mclookup/CDCMCTrackStore.h>
+
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;

@@ -111,7 +111,7 @@ namespace Belle2 {
       std::map < int, int > m_cellIdToTempCRIdMap; /**< cellid -> temporary CR.*/
 
       /** Neighbour maps. */
-      ECLNeighbours* m_neighbourMaps[2];
+      std::vector<ECLNeighbours*> m_neighbourMaps;
 
       /** Neighbour finder. */
       void checkNeighbours(const int cellid, const int tempcrid, const int type);

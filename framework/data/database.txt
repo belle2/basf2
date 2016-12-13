@@ -57,4 +57,8 @@ dbstore/software_trigger_cut&calib&accept_dqm_Dplus 3 0,0,-1,-1
 dbstore/software_trigger_cut&calib&accept_dqm_Dstar 3 0,0,-1,-1
 dbstore/software_trigger_cut&calib&accept_dqm_Jpsiee 3 0,0,-1,-1
 dbstore/software_trigger_cut&calib&accept_dqm_Jpsimumu 3 0,0,-1,-1
+dbstore/trackfindingcdc_BackgroundClusterFilter 4 0,0,-1,-1
+dbstore/trackfindingcdc_FeasibleSegmentRelationFilter 1 0,0,-1,-1
+dbstore/trackfindingcdc_RealisticSegmentRelationFilter 1 0,0,-1,-1
+
 

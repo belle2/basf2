@@ -13,6 +13,8 @@
 #include <cdc/dataobjects/CDCHit.h>
 #include <pxd/dataobjects/PXDCluster.h>
 #include <svd/dataobjects/SVDCluster.h>
+#include <bklm/dataobjects/BKLMHit2d.h>
+#include <eklm/dataobjects/EKLMAlignmentHit.h>
 
 #include <framework/datastore/RelationsObject.h>
 
@@ -52,6 +54,12 @@ namespace Belle2 {
     /** Define, use of CDC hits as CDC hits (for symmetry). */
     typedef CDCHit UsedCDCHit;
 
+    /** Define, use of BKLMHit2d as BKLM hits. */
+    typedef BKLMHit2d UsedBKLMHit;
+
+    /** Define, use of EKLMHit2d as EKLM hits. */
+    typedef EKLMAlignmentHit UsedEKLMHit;
+
     /** The RightLeft information of the hit which is only valid for CDC hits */
     enum RightLeftInformation {
       c_undefinedRightLeftInformation,
@@ -81,12 +89,14 @@ namespace Belle2 {
     };
 
     /** The detector this hit comes from (which is of course also visible in the hit type) */
-    enum TrackingDetector {
+    enum RecoHitDetector {
       c_undefinedTrackingDetector,
       c_invalidTrackingDetector,
       c_SVD,
       c_PXD,
-      c_CDC
+      c_CDC,
+      c_EKLM,
+      c_BKLM
     };
 
   public:
@@ -104,33 +114,59 @@ namespace Belle2 {
      */
     RecoHitInformation(const UsedCDCHit* cdcHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(cdcHit, TrackingDetector::c_CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(cdcHit, RecoHitDetector::c_CDC, rightLeftInformation, foundByTrackFinder, sortingParameter)
     {
     }
 
     /**
      * Create hit information for a PXD hit with the given information. Adds the relation to the hit automatically.
      * @param pxdHit The hit to create this information for.
-     * @param rightLeftInformation The RL-information (which is probably invalid).
      * @param foundByTrackFinder Which track finder has found this hit?
      * @param sortingParameter The sorting parameter of this hit.
      */
-    RecoHitInformation(const UsedPXDHit* pxdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+    RecoHitInformation(const UsedPXDHit* pxdHit, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(pxdHit, TrackingDetector::c_PXD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(pxdHit, RecoHitDetector::c_PXD, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
     {
     }
 
     /**
      * Create hit information for a SVD hit with the given information. Adds the relation to the hit automatically.
      * @param svdHit The hit to create this information for.
-     * @param rightLeftInformation The RL-information  (which is probably invalid).
      * @param foundByTrackFinder Which track finder has found this hit?
      * @param sortingParameter The sorting parameter of this hit.
      */
-    RecoHitInformation(const UsedSVDHit* svdHit, RightLeftInformation rightLeftInformation, OriginTrackFinder foundByTrackFinder,
+    RecoHitInformation(const UsedSVDHit* svdHit, OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
-      RecoHitInformation(svdHit, TrackingDetector::c_SVD, rightLeftInformation, foundByTrackFinder, sortingParameter)
+      RecoHitInformation(svdHit, RecoHitDetector::c_SVD, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
+    {
+    }
+
+    /**
+     * Create hit information for a EKLM hit with the given information. Adds the relation to the hit automatically.
+     * @param eklmHit The hit to create this information for.
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
+     */
+    RecoHitInformation(const UsedEKLMHit* eklmHit, OriginTrackFinder foundByTrackFinder,
+                       unsigned int sortingParameter) :
+      RecoHitInformation(eklmHit, RecoHitDetector::c_EKLM, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
+    {
+    }
+
+    /**
+     * Create hit information for a BKLM hit with the given information. Adds the relation to the hit automatically.
+     * @param bklmHit The hit to create this information for.
+     * @param foundByTrackFinder Which track finder has found this hit?
+     * @param sortingParameter The sorting parameter of this hit.
+     */
+    RecoHitInformation(const UsedBKLMHit* bklmHit, OriginTrackFinder foundByTrackFinder,
+                       unsigned int sortingParameter) :
+      RecoHitInformation(bklmHit, RecoHitDetector::c_BKLM, RightLeftInformation::c_invalidRightLeftInformation,
+                         foundByTrackFinder, sortingParameter)
     {
     }
 
@@ -183,7 +219,7 @@ namespace Belle2 {
     }
 
     /** Get the detector this hit comes from. (can not be changed once created) */
-    TrackingDetector getTrackingDetector() const
+    RecoHitDetector getTrackingDetector() const
     {
       return m_trackingDetector;
     }
@@ -216,7 +252,7 @@ namespace Belle2 {
 
   private:
     /// The tracking detector this hit comes from (can not be changed once created)
-    TrackingDetector m_trackingDetector = TrackingDetector::c_undefinedTrackingDetector;
+    RecoHitDetector m_trackingDetector = RecoHitDetector::c_undefinedTrackingDetector;
     /// The right-left-information of the hit. Can be invalid (for VXD hits) or unknown.
     RightLeftInformation m_rightLeftInformation = RightLeftInformation::c_undefinedRightLeftInformation;
     /// The sorting parameter as an index.
@@ -242,7 +278,7 @@ namespace Belle2 {
      */
     template <class HitType>
     RecoHitInformation(const HitType* hit,
-                       TrackingDetector trackingDetector,
+                       RecoHitDetector trackingDetector,
                        RightLeftInformation rightLeftInformation,
                        OriginTrackFinder foundByTrackFinder,
                        unsigned int sortingParameter) :
@@ -255,6 +291,6 @@ namespace Belle2 {
       addRelationTo(hit);
     }
 
-    ClassDef(RecoHitInformation, 3); /**< This class implements additional information for hits */
+    ClassDef(RecoHitInformation, 4); /**< This class implements additional information for hits */
   };
 }

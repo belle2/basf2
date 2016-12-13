@@ -55,12 +55,13 @@ namespace Belle2 {
         WeightedNeighborhood<CDCWireHit>::appendUsing(m_wireHitRelationFilter,
         inputWireHits,
         m_wireHitRelations);
-        WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
+
         B2ASSERT("Expect wire hit neighborhood to be symmetric ",
-        wireHitNeighborhood.isSymmetric());
+        WeightedRelationUtil<CDCWireHit>::areSymmetric(m_wireHitRelations));
 
         auto ptrWireHits =
         inputWireHits | boost::adaptors::transformed(&std::addressof<CDCWireHit>);
+        WeightedNeighborhood<CDCWireHit> wireHitNeighborhood(m_wireHitRelations);
         m_wirehitClusterizer.createFromPointers(ptrWireHits, wireHitNeighborhood, outputClusters);
       }
 

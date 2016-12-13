@@ -174,7 +174,7 @@ namespace Belle2 {
         }
 
         /// Get the level of the node
-        std::size_t getLevel() const { return m_level; }
+        int getLevel() const { return m_level; }
 
         /** Getter of the node one up the hierarchy.
          *  Usually the highest node of level 0 has no parent.
@@ -199,7 +199,7 @@ namespace Belle2 {
         Children* m_children = nullptr;
 
         /// Level of the node within the tree
-        std::size_t m_level = 0;
+        int m_level = 0;
 
         /// Parent in the tree hierachy of this node.
         Node* m_parent = nullptr;
@@ -232,9 +232,9 @@ namespace Belle2 {
 
       /** Gets the number of nodes currently contained in the tree
        *  Also demonstrates how to walk over the tree.*/
-      size_t getNNodes() const
+      int getNNodes() const
       {
-        std::size_t nNodes = 0;
+        int nNodes = 0;
         auto countNodes = [&nNodes](const Node*) -> bool {
           ++nNodes;
           return true;
@@ -248,10 +248,8 @@ namespace Belle2 {
       /// Create child nodes for the given parents.
       std::vector<Node>* createChildren(Node* parentNode)
       {
-        Properties& parentProperties = *parentNode;
         std::vector<Node>* result = getUnusedChildren();
-
-        auto subProperties = m_subPropertiesFactory(parentProperties);
+        auto subProperties = m_subPropertiesFactory(*parentNode);
         if (subProperties.empty()) {
           result->clear();
         } else {
@@ -323,7 +321,6 @@ namespace Belle2 {
 
       /// Last index of used children.
       size_t m_nUsedChildren = 0;
-
     };
   }
 }

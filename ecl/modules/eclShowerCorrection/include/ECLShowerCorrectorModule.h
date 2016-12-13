@@ -60,10 +60,10 @@ namespace Belle2 {
       /** Terminate. */
       virtual void terminate();
 
-      //* Prepare correction */
+      /** Prepare correction */
       void prepareLeakageCorrections();
 
-      //* Get correction */
+      /** Get correction */
       double getLeakageCorrection(const double theta, const double phi, const double energy, const double background) const;
 
     private:

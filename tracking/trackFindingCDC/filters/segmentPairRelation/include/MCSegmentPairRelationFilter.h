@@ -25,22 +25,17 @@ namespace Belle2 {
       using Super = MCSymmetricFilterMixin<BaseSegmentPairRelationFilter >;
 
     public:
-      /// Importing all overloads from the super class
-      using Super::operator();
-
-    public:
       /** Constructor setting to default reversal symmetry. */
       MCSegmentPairRelationFilter(bool allowReverse = true);
 
     public:
-      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall be rejected.
-      Weight
-      operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
+      /// Main filter method returning the weight of the neighborhood relation. Return NAN if relation shall
+      /// be rejected.
+      Weight operator()(const CDCSegmentPair& fromSegmentPair, const CDCSegmentPair& toSegmentPair) final;
 
     public:
       /// Setter for the allow reverse parameter
-      void setAllowReverse(bool allowReverse) override
-      {
+      void setAllowReverse(bool allowReverse) final {
         Super::setAllowReverse(allowReverse);
         m_mcSegmentPairFilter.setAllowReverse(allowReverse);
       }

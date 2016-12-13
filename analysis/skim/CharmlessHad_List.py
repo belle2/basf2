@@ -49,7 +49,7 @@ def CharmlessHadList():
                       'K+:loose K-:loose K-:loose',
                       'K+:loose pi-:loose pi-:loose',
                       'K-:loose pi+:loose pi-:loose',
-                      'pi-:loose pi0:loose pi0:all'
+                      'pi-:loose pi0:all pi0:all'
                       ]
 
     bdPPList = []

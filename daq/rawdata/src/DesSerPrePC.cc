@@ -83,17 +83,18 @@ int DesSerPrePC::recvFD(int sock, char* buf, int data_size_byte, int flag)
     } else if (read_size == 0) {
       // Connection is closed ( error )
       char err_buf[500];
-      sprintf(err_buf, "Connection is closed by peer(%s). readsize = %d %d. Exiting...: %s %s %d",
+      sprintf(err_buf, "[ERROR] Connection is closed by peer(%s). readsize = %d %d. : %s %s %d",
               strerror(errno), read_size, errno, __FILE__, __PRETTY_FUNCTION__, __LINE__);
 #ifdef NONSTOP
       m_run_error = 1;
       //      B2ERROR(err_buf);
-      printf("[ERROR] %s\n", err_buf); fflush(stdout);
+      printf("%s\n", err_buf); fflush(stdout);
       string err_str = "RUN_ERROR";
       throw (err_str);
-#endif
+#else
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       exit(-1);
+#endif
     } else {
       n += read_size;
       if (n == data_size_byte)break;
@@ -117,7 +118,7 @@ int DesSerPrePC::Connect()
     host = gethostbyname(m_hostname_from[ i ].c_str());
     if (host == NULL) {
       char err_buf[100];
-      sprintf(err_buf, "hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
+      sprintf(err_buf, "[FATAL] hostname(%s) cannot be resolved(%s). Check /etc/hosts. Exiting...", m_hostname_from[ i ].c_str(),
               strerror(errno));
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -223,7 +224,7 @@ int* DesSerPrePC::recvData(int* delete_flag, int* total_buf_nwords, int* num_eve
 #ifndef NO_DATA_CHECK
       char err_buf[500];
       sprintf(err_buf,
-              "CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
+              "[FATAL] CORRUPTED DATA: Different # of events or nodes in SendBlocks( # of eve : %d(socket 0) %d(socket %d), # of nodes: %d(socket 0) %d(socket %d). Exiting...\n",
               *num_events_in_sendblock , temp_num_events, i,  *num_nodes_in_sendblock , temp_num_nodes, i);
       print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
       sleep(1234567);
@@ -360,7 +361,7 @@ void DesSerPrePC::setRecvdBuffer(RawDataBlockFormat* temp_raw_datablk, int* dele
   if (num_entries != num_events_in_sendblock * num_nodes_in_sendblock) {
     char err_buf[500];
     sprintf(err_buf,
-            "CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
+            "[FATAL] CORRUPTED DATA: Inconsistent SendHeader value. # of nodes(%d) times # of events(%d) differs from # of entries(%d). Exiting...",
             num_nodes_in_sendblock, num_events_in_sendblock, num_entries);
     print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
     sleep(1234567);
@@ -518,7 +519,7 @@ void DesSerPrePC::checkData(RawDataBlockFormat* raw_datablk, unsigned int* eve_c
           printf("[DEBUG] node %d eve # %d utime %x ctime %x\n",
                  m,  eve_array[ m ], utime_array[ m ], ctime_type_array[ m ]);
         }
-        sprintf(err_buf, "CORRUPTED DATA: Event or Time record mismatch. Exiting...");
+        sprintf(err_buf, "[FATAL] CORRUPTED DATA: Event or Time record mismatch. Exiting...");
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         sleep(1234567);
         exit(-1);
@@ -631,7 +632,7 @@ void DesSerPrePC::DataAcquisition()
       if (calced_temp_nwords_to != temp_nwords_to) {
         char err_buf[500];
         sprintf(err_buf,
-                "CORRUPTED DATA: Estimations of reduced event size are inconsistent. CalcReducedDataSize = %d. CopyReducedData = %d. Exiting...",
+                "[FATAL] CORRUPTED DATA: Estimations of reduced event size are inconsistent. CalcReducedDataSize = %d. CopyReducedData = %d. Exiting...",
                 calced_temp_nwords_to, temp_nwords_to);
         print_err.PrintError(err_buf, __FILE__, __PRETTY_FUNCTION__, __LINE__);
         exit(1);

@@ -25,8 +25,8 @@ namespace Belle2 {
       /// Empty constructor
       CDCFitter2D() :
         AFitMethod(),
-        m_usePosition(false),
-        m_useOrientation(true),
+        m_usePosition(true),
+        m_useOrientation(false),
         m_doUseDriftVariance(true)
       {}
 
@@ -80,13 +80,12 @@ namespace Belle2 {
         return result;
       }
 
-      /** Updates a given trajectory with a fit to two collection of hit types,
-       * which are convertable to observation circles.
+      /**
+       *  Updates a given trajectory with a fit to two collection of hit types,
+       *  which are convertable to observation circles.
        */
-      template<class AStartHits, class AEndHits>
-      void update(CDCTrajectory2D& trajectory2D,
-                  const AStartHits& startHits,
-                  const AEndHits& endHits) const
+      template <class AStartHits, class AEndHits>
+      void update(CDCTrajectory2D& trajectory2D, const AStartHits& startHits, const AEndHits& endHits) const
       {
         CDCObservations2D observations2D;
         if (m_doUseDriftVariance) {
@@ -120,10 +119,11 @@ namespace Belle2 {
         }
       }
 
-      /** Updates a given trajectory with a fit to a collection of hits types,
+      /**
+       *  Updates a given trajectory with a fit to a collection of hits types,
        *  which are convertable to observation circles.
        */
-      template<class AHits>
+      template <class AHits>
       void update(CDCTrajectory2D& trajectory2D, const AHits& hits) const
       {
         CDCObservations2D observations2D;
@@ -151,10 +151,12 @@ namespace Belle2 {
 
       /// Update the trajectory with a fit to the observations.
       void update(CDCTrajectory2D& trajectory2D, CDCObservations2D& observations2D) const
-      { AFitMethod::update(trajectory2D, observations2D); }
+      {
+        AFitMethod::update(trajectory2D, observations2D);
+      }
 
       //set which information should be used from the recohits
-      //useOnlyOrientation is standard
+      //useOnlyPosition is standard
 
       /// Setup the fitter to use only the reconstructed positions of the hits
       void useOnlyPosition() { m_usePosition = true; m_useOrientation = false;}

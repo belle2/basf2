@@ -25,6 +25,7 @@ public:
 
   /** Default constructor */
   EvtLLSW();
+
   /** virtual destructor */
   virtual ~EvtLLSW();
 
@@ -36,8 +37,10 @@ public:
 
   /** Creates a decay */
   void decay(EvtParticle* p);
+
   /** Sets maximal probab. */
   void initProbMax();
+
   /** Initializes module */
   void init();
 
@@ -45,6 +48,7 @@ private:
 
   /** Pointers needed for FFs */
   EvtSemiLeptonicFF* llswffmodel;
+
   /** Pointers needed to calculate amplitude */
   EvtSemiLeptonicAmp* calcamp;
 

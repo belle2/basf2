@@ -49,7 +49,7 @@ namespace Belle2 {
      *  Erase remove idiom in a more concise form
      */
     template <class Ts, class APredicate>
-    void erase_remove_if(Ts& ts, APredicate& predicate)
+    void erase_remove_if(Ts& ts, const APredicate& predicate)
     {
       auto itRemoved = std::remove_if(std::begin(ts), std::end(ts), predicate);
       ts.erase(itRemoved, std::end(ts));

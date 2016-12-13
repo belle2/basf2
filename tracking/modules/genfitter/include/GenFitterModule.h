@@ -104,6 +104,8 @@ namespace Belle2 {
 
     bool m_storeFailed;                              /**< Boolean to mark if failed track fits should also be stored as Tracks. */
 
+    bool m_initializeCDC;                            /**< Boolean to signal if the CDC Translators should be initialized. In VXD-only beam test scenarios
+                                                          This may be not needded */
     bool m_useClusters;                              /**< Boolean to mark if PXD/SVD cluster hits should be used instead of true hits in the track fit. */
     bool m_realisticCDCGeoTranslator;                /**< Whether to use the realistic geometry translators.  */
     bool m_enableWireSag;                            /**< Wire sag in CDCGeometryTranslator.  */

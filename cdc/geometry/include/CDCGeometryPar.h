@@ -930,9 +930,9 @@ namespace Belle2 {
       bool m_linearInterpolationOfXT;  /*!< Switch for linear interpolation of xt */
       bool m_linearInterpolationOfSgm; /*!< Switch for linear interpolation of sigma */
       bool m_XTetc;          /*!< Switch for reading x-t etc. params.. */
-      bool m_Displacement;   /*!< Switch for displacement. */
-      bool m_Misalignment;   /*!< Switch for misalignment. */
-      bool m_Alignment;      /*!< Switch for alignment. */
+      bool m_displacement;   /*!< Switch for displacement. */
+      bool m_misalignment;   /*!< Switch for misalignment. */
+      bool m_alignment;      /*!< Switch for alignment. */
       bool m_XTetc4Recon;    /*!< Switch for selecting xt etc. */
 
       bool m_wireSag;        /*!< Switch for sense wire sag */
@@ -1021,37 +1021,16 @@ namespace Belle2 {
       double m_nominalSpaceResol;  /*!< Nominal spacial resolution (0.0130 cm). */
       double m_maxSpaceResol;      /*!< 10 times Nominal spacial resolution. */
 
-
-#if defined(CDC_T0_FROM_DB)
-      DBObjPtr<CDCTimeZeros> m_t0FromDB; /*!< t0s retrieved from DB. */
-#endif
-#if defined(CDC_BADWIRE_FROM_DB)
-      DBObjPtr<CDCBadWires> m_badWireFromDB; /*!< bad-wires retrieved from DB. */
-#endif
-#if defined(CDC_PROPSPEED_FROM_DB)
-      DBObjPtr<CDCPropSpeeds> m_propSpeedFromDB; /*!< prop.-speeds retrieved from DB. */
-#endif
-#if defined(CDC_TIMEWALK_FROM_DB)
-      DBObjPtr<CDCTimeWalks> m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
-#endif
-#if defined(CDC_XTREL_FROM_DB)
-      DBObjPtr<CDCXtRelations> m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
-#endif
-#if defined(CDC_SRESOL_FROM_DB)
-      DBObjPtr<CDCSpaceResols> m_sResolFromDB; /*!< sigma params. retrieved from DB. */
-#endif
-#if defined(CDC_CHMAP_FROM_DB)
-      DBArray<CDCChannelMap> m_chMapFromDB; /*!< channel map retrieved from DB. */
-#endif
-#if defined(CDC_DISPLACEMENT_FROM_DB)
-      DBArray<CDCDisplacement> m_displacementFromDB; /*!< displacement params. retrieved from DB. */
-#endif
-#if defined(CDC_ALIGN_FROM_DB)
-      DBObjPtr<CDCAlignment> m_alignFromDB; /*!< alignment params. retrieved from DB. */
-#endif
-#if defined(CDC_MISALIGN_FROM_DB)
-      DBObjPtr<CDCMisalignment> m_misalignFromDB; /*!< misalignment params. retrieved from DB. */
-#endif
+      DBObjPtr<CDCTimeZeros>* m_t0FromDB; /*!< t0s retrieved from DB. */
+      DBObjPtr<CDCBadWires>* m_badWireFromDB; /*!< bad-wires retrieved from DB. */
+      DBObjPtr<CDCPropSpeeds>* m_propSpeedFromDB; /*!< prop.-speeds retrieved from DB. */
+      DBObjPtr<CDCTimeWalks>* m_timeWalkFromDB; /*!< time-walk coeffs. retrieved from DB. */
+      DBObjPtr<CDCXtRelations>* m_xtRelFromDB; /*!< xt params. retrieved from DB (new). */
+      DBObjPtr<CDCSpaceResols>* m_sResolFromDB; /*!< sigma params. retrieved from DB. */
+      DBArray<CDCChannelMap>* m_chMapFromDB; /*!< channel map retrieved from DB. */
+      DBArray<CDCDisplacement>* m_displacementFromDB; /*!< displacement params. retrieved from DB. */
+      DBObjPtr<CDCAlignment>* m_alignmentFromDB; /*!< alignment params. retrieved from DB. */
+      DBObjPtr<CDCMisalignment>* m_misalignmentFromDB; /*!< misalignment params. retrieved from DB. */
 
       static CDCGeometryPar* m_B4CDCGeometryParDB; /*!< Pointer that saves the instance of this class. */
 

@@ -13,7 +13,6 @@
 #include <tracking/trackFindingCDC/trackFinderOutputCombining/SegmentTrackCombiner.h>
 
 #include <tracking/trackFindingCDC/findlets/minimal/TrackRejecter.h>
-#include <tracking/trackFindingCDC/findlets/minimal/SegmentRejecter.h>
 
 #include <tracking/trackFindingCDC/filters/base/ChooseableFilter.h>
 
@@ -38,12 +37,9 @@ namespace Belle2 {
      *
      * It uses several (filtering) steps, to do its job, namely:
      *  1. Creation of a fast segment and track lookup.
-     *  2. First matching of segment and tracks that share one or more hits. \label{list-start}
-     *  3. Deletion of fake segments. \label{list-fakes}
-     *  4. Flagging of segments belonging to particles that probably can not be found by the global track finder (and can therefore not be matched).
-     *  5. Matching of the remaining segments with the tracks or among themselves and then with the tracks (not used in the following). \label{list-second}
-     *  6. Filtering of fake tracks in the made combinations.  \label{list-end}
-     *  7. Cleanup of the lookup cache.
+     *  2. First matching of segment and tracks that share one or more hits.
+     *  3. Filtering of fake tracks in the made combinations.
+     *  4. Cleanup of the lookup cache.
      */
     class SegmentTrackCombinerModule : public TrackFinderCDCFromSegmentsModule {
 
@@ -81,22 +77,7 @@ namespace Belle2 {
 
       // Filters
       /// Reference to the chooser to be used for matching segments and tracks in the first step.
-      Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterFirstStep;
-
-      /// Findlet to filter out fake segments
-      SegmentRejecter m_segmentRejecter;
-
-      /// Reference to the new segment filter.
-      Chooseable<BaseNewSegmentFilter> m_chooseableNewSegmentFilter;
-
-      /// Reference to the chooser to be used for matching segments and tracks in the second step.
-      Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilterSecondStep;
-
-      /// Reference to the filter to be used for construction segment trains.
-      Chooseable<BaseSegmentTrainFilter> m_chooseableSegmentTrainFilter;
-
-      /// Reference to the filter to be used to do an unique segment train <-> track matching.
-      Chooseable<BaseSegmentInformationListTrackFilter> m_chooseableSegmentInformationListTrackFilter;
+      Chooseable<BaseSegmentTrackFilter> m_chooseableSegmentTrackFilter;
 
       /// Findlet to filter out fake tracks
       TrackRejecter m_trackRejecter;

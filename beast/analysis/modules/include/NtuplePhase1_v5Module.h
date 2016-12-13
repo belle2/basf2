@@ -79,6 +79,8 @@ namespace Belle2 {
 
     std::vector<std::string> m_inputFileNames; /**< list of file names */
 
+    Int_t m_input_BGSol; /**< time stamp start and stop */
+
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
     std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */
 
@@ -213,6 +215,17 @@ namespace Belle2 {
     std::vector<Double_t> m_input_HC_SAD_PPS; /**< list of SAD_PPS HC dose */
     std::vector<Double_t> m_input_LB_SAD_PPS; /**< list of SAD_PPS LB dose */
     std::vector<Double_t> m_input_HB_SAD_PPS; /**< list of SAD_PPS HB dose */
+
+    std::vector<Double_t> m_input_LT_DOSI; /**< list of PIN LT dose */
+    std::vector<Double_t> m_input_HT_DOSI; /**< list of PIN HT dose */
+    std::vector<Double_t> m_input_LC_DOSI[12]; /**< list of PIN LC dose */
+    std::vector<Double_t> m_input_HC_DOSI[12]; /**< list of PIN HC dose */
+    std::vector<Double_t> m_input_LB_DOSI[12]; /**< list of PIN LB dose */
+    std::vector<Double_t> m_input_HB_DOSI[12]; /**< list of PIN HB dose */
+    std::vector<Double_t> m_input_LC_DOSI_av; /**< list of PIN LC dose */
+    std::vector<Double_t> m_input_HC_DOSI_av; /**< list of PIN HC dose */
+    std::vector<Double_t> m_input_LB_DOSI_av; /**< list of PIN LB dose */
+    std::vector<Double_t> m_input_HB_DOSI_av; /**< list of PIN HB dose */
 
     TTree* m_treeBEAST = 0;   /**< BEAST tree pointer */
     TTree* m_treeTruth = 0;   /**< Truth tree pointer */

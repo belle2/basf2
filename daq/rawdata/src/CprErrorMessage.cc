@@ -55,9 +55,10 @@ void CprErrorMessage::PrintError(char* err_message, const char* file, const char
   char err_buf[500];
   sprintf(err_buf, "%s : %s %s %d", err_message, file, func_name, line);
   //  fprintf( stderr, "[FATAL] %s", err_message);
-  printf("[DEBUG] %s", err_buf);  fflush(stdout);
+  printf("%s", err_buf);  fflush(stdout);
   //  B2FATAL(err_buf);
-  printf("[FATAL] %s\n", err_buf); exit(1);
+  //  printf("AL] %s\n", err_buf);
+  exit(1);
 
 //   time_t     current;
 //   time(&current);

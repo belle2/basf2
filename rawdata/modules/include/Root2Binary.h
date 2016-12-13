@@ -37,15 +37,16 @@ namespace Belle2 {
     //!
     virtual void terminate();
 
-    //!
+    //! write the contents of an event
     virtual void writeEvent(RawDataBlock* raw_dblk, int* first_flag, int* break_flag,
                             int* dblk_pos, unsigned int* dblk_eve);
 
   protected :
-    //!
+
+    //! File descripter
     FILE* m_fp_out;
 
-    //!
+    //! Output filename
     std::string m_fname_out;
 
     //!

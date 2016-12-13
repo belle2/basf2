@@ -9,7 +9,7 @@
  **************************************************************************/
 #pragma once
 #include <tracking/trackFindingCDC/hough/trees/WeightedFastHoughTree.h>
-#include <tracking/trackFindingCDC/hough/baseelements/LinearDivision.h>
+#include <tracking/trackFindingCDC/hough/baseelements/SectoredLinearDivision.h>
 
 #include <tracking/trackFindingCDC/numerics/LookupTable.h>
 #include <tracking/trackFindingCDC/utilities/EvalVariadic.h>
@@ -36,7 +36,7 @@ namespace Belle2 {
       using HoughBox = AHoughBox;
 
       /// Type of the box division strategy
-      using BoxDivision = LinearDivision<HoughBox, divisions...>;
+      using BoxDivision = SectoredLinearDivision<HoughBox, divisions...>;
 
       /// Type of the fast hough tree structure
       using HoughTree = WeightedFastHoughTree<AItemPtr, HoughBox, BoxDivision>;
@@ -63,8 +63,9 @@ namespace Belle2 {
     public:
       /// Constructor using the given maximal level.
       template <class... RangeSpecOverlap>
-      explicit BoxDivisionHoughTree(size_t maxLevel)
+      explicit BoxDivisionHoughTree(int maxLevel, int sectorLevelSkip = 0)
         : m_maxLevel(maxLevel)
+        , m_sectorLevelSkip(sectorLevelSkip)
         , m_overlaps((divisions * 0)...)
       {
       }
@@ -86,36 +87,43 @@ namespace Belle2 {
 
       /**
        *  Construct the discrete value array at coordinate index I
+       *
+       *  This function is only applicable for discrete axes.
+       *  For continuous axes assignArray should be call with an array containing only the
+       *  lower and upper bound of the axes range and an optional overlap.
+       *
        *  @param lowerBound  Lower bound of the value range
        *  @param upperBound  Upper bound of the value range
-       *  @param overlap     Overlap of neighboring bins. Default is no overlap.
+       *  @param nBinOverlap Overlap of neighboring bins. Default is no overlap.
        *                     Usuallly this is counted in number of discrete values
-       *  @param width       Width of the bins at lowest level. Default is width of 1.
+       *  @param nBinWidth   Width of the bins at lowest level. Default is width of 1.
        *                     Usually this is counted in numbers of discrete values
        */
       template <size_t I>
       void constructArray(double lowerBound,
                           double upperBound,
-                          const Width<I>& overlap = 0,
-                          Width<I> width = 0)
+                          Width<I> nBinOverlap = 0,
+                          Width<I> nBinWidth = 0)
       {
         const size_t division = getDivision(I);
-        const size_t nBins = std::pow(division, m_maxLevel);
+        const size_t nBins = std::pow(division, m_maxLevel + m_sectorLevelSkip);
 
-        if (width == 0) {
-          width = overlap + 1;
+        if (nBinWidth == 0) {
+          nBinWidth = nBinOverlap + 1;
         }
-        B2ASSERT("Width " << width << "is not bigger than overlap " << overlap, overlap < width);
 
-        const auto nPositions = (width - overlap) * nBins + overlap + 1;
+        B2ASSERT("Width " << nBinWidth << "is not bigger than overlap " << nBinOverlap,
+                 nBinOverlap < nBinWidth);
+
+        const auto nPositions = (nBinWidth - nBinOverlap) * nBins + nBinOverlap + 1;
         std::get<I>(m_arrays) = linspace<float>(lowerBound, upperBound, nPositions);
-        std::get<I>(m_overlaps) = overlap;
+        std::get<I>(m_overlaps) = nBinOverlap;
       }
 
       /// Provide an externally constructed array by coordinate index
       template <size_t I>
       void
-      assignArray(Array<I> array, Width<I> overlap)
+      assignArray(Array<I> array, Width<I> overlap = 0)
       {
         std::get<I>(m_arrays) = std::move(array);
         std::get<I>(m_overlaps) = overlap;
@@ -124,7 +132,7 @@ namespace Belle2 {
       /// Provide an externally constructed array by coordinate type
       template <class T>
       EnableIf< HasType<T>::value, void>
-      assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap)
+      assignArray(Array<TypeIndex<T>::value > array, Width<TypeIndex<T>::value > overlap = 0)
       {
         std::get<TypeIndex<T>::value >(m_arrays) = std::move(array);
         std::get<TypeIndex<T>::value >(m_overlaps) = overlap;
@@ -136,7 +144,7 @@ namespace Belle2 {
       {
         // Compose the hough space
         HoughBox houghPlane = constructHoughPlane();
-        BoxDivision boxDivision(m_overlaps);
+        BoxDivision boxDivision(m_overlaps, m_sectorLevelSkip);
         m_houghTree.reset(new HoughTree(std::move(houghPlane), std::move(boxDivision)));
       }
 
@@ -168,15 +176,27 @@ namespace Belle2 {
       }
 
       /// Getter for the currently set maximal level
-      size_t getMaxLevel() const
+      int getMaxLevel() const
       {
         return m_maxLevel;
       }
 
       /// Setter maximal level of the hough tree.
-      void setMaxLevel(size_t maxLevel)
+      void setMaxLevel(int maxLevel)
       {
         m_maxLevel = maxLevel;
+      }
+
+      /// Getter for number of levels to skip in first level to form a finer sectored hough space.
+      int getSectorLevelSkip() const
+      {
+        return m_sectorLevelSkip;
+      }
+
+      /// Setter for number of levels to skip in first level to form a finer sectored hough space.
+      void setSectorLevelSkip(int sectorLevelSkip)
+      {
+        m_sectorLevelSkip = sectorLevelSkip;
       }
 
       /// Getter for the array of discrete value for coordinate I.
@@ -202,7 +222,10 @@ namespace Belle2 {
 
     private:
       /// Number of the maximum tree level.
-      size_t m_maxLevel;
+      int m_maxLevel;
+
+      /// Number of levels to skip in first level to form a finer sectored hough space.
+      int m_sectorLevelSkip;
 
       /// Array of the number of divisions at each level
       const std::array<size_t, sizeof ...(divisions)> m_divisions = {{divisions ...}};

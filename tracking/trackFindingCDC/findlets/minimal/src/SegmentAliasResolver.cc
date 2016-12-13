@@ -39,11 +39,11 @@ std::string SegmentAliasResolver::getDescription()
 
 void SegmentAliasResolver::exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix)
 {
-  moduleParamList->addParameter(prefixed(prefix, "investigate"),
-                                m_param_investigate,
+  moduleParamList->addParameter(prefixed(prefix, "investigateAlias"),
+                                m_param_investigateAlias,
                                 "Which alias resolutions should be applied. "
                                 "Options are trailing_hit, last_hit, full.",
-                                m_param_investigate);
+                                m_param_investigateAlias);
 
   moduleParamList->addParameter(prefixed(prefix, "reestimateDriftLength"),
                                 m_param_reestimateDriftLength,
@@ -58,7 +58,7 @@ void SegmentAliasResolver::exposeParameters(ModuleParamList* moduleParamList, co
 
 void SegmentAliasResolver::initialize()
 {
-  for (const std::string& investigatedAlias : m_param_investigate) {
+  for (const std::string& investigatedAlias : m_param_investigateAlias) {
     if (investigatedAlias == "full") {
       m_fullAlias = true;
     } else if (investigatedAlias == "borders") {

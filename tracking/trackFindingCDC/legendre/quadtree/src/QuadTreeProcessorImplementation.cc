@@ -46,8 +46,8 @@ bool QuadTreeProcessorSegments::insertItemInNode(QuadTree* node, CDCSegment2D* r
     return false;
   }
 
-  Vector2D trigonometryMin(lookupTable.cosTheta(thetaIndexMin), lookupTable.sinTheta(thetaIndexMin));
-  Vector2D trigonometryMax(lookupTable.cosTheta(thetaIndexMax), lookupTable.sinTheta(thetaIndexMax));
+  Vector2D trigonometryMin = lookupTable.thetaVec(thetaIndexMin);
+  Vector2D trigonometryMax = lookupTable.thetaVec(thetaIndexMax);
 
   float rHitFrontMin = conformalTransformFront.dot(trigonometryMin);
   float rHitFrontMax = conformalTransformFront.dot(trigonometryMax);

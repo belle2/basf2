@@ -7,14 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #include <tracking/trackFindingCDC/filters/segmentPair/FitlessSegmentPairFilter.h>
 
-#include <framework/logging/Logger.h>
+#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 using namespace Belle2;
 using namespace TrackFindingCDC;
-
 
 Weight FitlessSegmentPairFilter::operator()(const CDCSegmentPair& segmentPair)
 {

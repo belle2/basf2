@@ -10,7 +10,8 @@ import math
 from basf2 import *
 import subprocess
 
-commit = subprocess.check_output(["git", "rev-parse", "--short", "HEAD"]).decode().strip()
+commit = subprocess.check_output(["git", "--git-dir=%s/.git" % os.environ["BELLE2_LOCAL_DIR"],
+                                  "rev-parse", "--short", "HEAD"]).decode().strip()
 
 evtinfo = register_module('EventInfoSetter')
 # Geometry parameter loader

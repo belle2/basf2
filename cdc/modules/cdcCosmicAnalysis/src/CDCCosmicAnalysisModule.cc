@@ -169,22 +169,3 @@ void CDCCosmicAnalysisModule::terminate()
   tree->Write();
   tfile->Close();
 }
-
-
-TVector3 CDCCosmicAnalysisModule::getTriggerHitPosition(const Helix h, double yofcounter = -13.25)
-{
-  //  double yofcounter = -16.25+3.;
-  double d0 = h.getD0();
-  double z0 = h.getZ0();
-  double tanlambda = h.getTanLambda();
-  double phi0 = h.getPhi0();
-  double l = (yofcounter + d0 * cos(phi0)) / sin(phi0);
-  //  double t = (yofcounter -h.getPerigeeY()-d0*sin(phi0))/cos(phi0);
-  double xofcounter = l * cos(phi0) + d0 * sin(phi0);
-  double zofcounter = fma(l, tanlambda, z0);
-  return TVector3(xofcounter, yofcounter, zofcounter);
-}
-
-//int CDCCosmicAnalysisModule::getUpDown(Belle2::RecoTracks){
-
-//}

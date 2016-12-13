@@ -172,7 +172,7 @@ void BeamabortStudyModule::event()
     }
   }
 
-  for (int i = 0; i < 8; i++) {
+  for (int i = 0; i < 4; i++) {
     if (curr[i] > 0 && Edep[i] > 0) {
       h_dia_Amp[i]->Fill(curr[i] * 1e15);
       h_dia_edep[i]->Fill(Edep[i] * 1e6);

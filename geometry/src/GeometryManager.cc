@@ -318,7 +318,7 @@ namespace Belle2 {
       B2INFO("Initializing magnetic field if present ...");
       B2INFO_MEASURE_TIME(
         "Initialization of magnetic field took ",
-        BFieldMap::Instance().getBField(TVector3(0, 0, 0));
+        BFieldMap::Instance().initialize();
       );
       B2INFO("Optimizing geometry and creating lookup tables ...");
       B2INFO_MEASURE_TIME(

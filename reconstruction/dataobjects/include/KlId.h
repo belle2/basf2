@@ -37,6 +37,7 @@ namespace Belle2 {
     inline float getBkgProb() const
     {return m_bkgProb;}
 
+    /** set beam bkg probability (classifier output)*/
     inline float setBkgProb(float val)
     {return m_bkgProb = val;}
 

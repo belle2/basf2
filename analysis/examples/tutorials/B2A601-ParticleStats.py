@@ -34,8 +34,7 @@ from modularAnalysis import copyLists
 from modularAnalysis import matchMCTruth
 from modularAnalysis import analysis_main
 from modularAnalysis import summaryOfLists
-from stdLooseFSParticles import stdLoosePi
-from stdLooseFSParticles import stdLooseK
+from stdCharged import *
 from stdFSParticles import goodPi0
 
 filelistMIX = ['/hsm/belle2/bdata/MC/generic/mixed/mcprod1405/BGx1/mc35_mixed_BGx1_s01/mixed_e0001r0010_s01_BGx1.mdst.root']

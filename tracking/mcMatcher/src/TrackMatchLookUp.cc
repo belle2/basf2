@@ -18,51 +18,6 @@
 using namespace std;
 using namespace Belle2;
 
-// Helper functions in anonymous namespace
-namespace {
-
-  // This method should eventually become part of the DataStore
-  // In addtion to the method defined there it also yields the weight of the relation
-  // If no relation is found the weight is not changed
-  template <class TO>
-  static TO* getRelatedObj(const TObject* fromObject, double& weight, const string& toName = "",
-                           DataStore::ESearchSide direction = DataStore::c_ToSide)
-  {
-    if (!fromObject) {
-      return nullptr;
-    }
-    DataStore::StoreEntry* storeEntry = nullptr;
-    int index = -1;
-    RelationEntry toEntry = DataStore::Instance().getRelationWith(direction, fromObject, storeEntry, index, TO::Class(),
-                            toName);
-    TO* toObject = static_cast<TO*>(toEntry.object);
-
-    if (toObject) {
-      weight = toEntry.weight;
-    }
-
-    return toObject;
-  }
-
-
-  // Checks if the object is in the StoreArray given by its name.
-  template <class T>
-  int isInStoreArray(const T& object, const string& storeArrayName = "")
-  {
-    StoreArray<T> storeArray(storeArrayName);
-    TClonesArray* clonesArray = storeArray.getPtr();
-    if (clonesArray) {
-      Int_t index = clonesArray->IndexOf(&object);
-      Int_t lowerBound = clonesArray->LowerBound();
-      return index > lowerBound;
-    } else {
-      return false;
-    }
-  }
-}
-
-
-
 TrackMatchLookUp::TrackMatchLookUp(const std::string& mcRecoTrackStoreArrayName,
                                    const std::string& prRecoTrackStoreArrayName)
   : m_mcTracksStoreArrayName(DataStore::arrayName<RecoTrack>(mcRecoTrackStoreArrayName)),
@@ -82,14 +37,14 @@ TrackMatchLookUp::~TrackMatchLookUp()
 
 bool TrackMatchLookUp::isMCTrackCand(const RecoTrack& trackCand)
 {
-  return isInStoreArray(trackCand, getMCTracksStoreArrayName());
+  return trackCand.getArrayName() == getMCTracksStoreArrayName();
 }
 
 
 
 bool TrackMatchLookUp::isPRTrackCand(const RecoTrack& trackCand)
 {
-  return isInStoreArray(trackCand, getPRTracksStoreArrayName());
+  return trackCand.getArrayName() == getPRTracksStoreArrayName();
 }
 
 
@@ -97,11 +52,10 @@ bool TrackMatchLookUp::isPRTrackCand(const RecoTrack& trackCand)
 
 const RecoTrack* TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& prRecoTrack, float& purity)
 {
-  double double_purity = 0; //help variable because DataStore expects double
-  const RecoTrack* mcRecoTrack = getRelatedObj<RecoTrack >(&prRecoTrack, double_purity,
-                                                           getMCTracksStoreArrayName());
+  std::pair<RecoTrack*, double> mcRecoTrackAndWeight = prRecoTrack.getRelatedWithWeight<RecoTrack>(getMCTracksStoreArrayName());
+  const RecoTrack* mcRecoTrack = mcRecoTrackAndWeight.first;
   if (mcRecoTrack) {
-    purity = double_purity;
+    purity = mcRecoTrackAndWeight.second;
   } else {
     purity = NAN;
   }
@@ -114,11 +68,10 @@ const RecoTrack* TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& prReco
 
 const RecoTrack* TrackMatchLookUp::getRelatedPRTrackCand(const RecoTrack& mcRecoTrack, float& efficiency)
 {
-  double double_efficiency = 0; //help variable because DataStore expects double
-  const RecoTrack* prRecoTrack = getRelatedObj<RecoTrack >(&mcRecoTrack, double_efficiency,
-                                                           getPRTracksStoreArrayName());
+  std::pair<RecoTrack*, double> prRecoTrackAndWeight = mcRecoTrack.getRelatedWithWeight<RecoTrack>(getPRTracksStoreArrayName());
+  const RecoTrack* prRecoTrack = prRecoTrackAndWeight.first;
   if (prRecoTrack) {
-    efficiency = double_efficiency;
+    efficiency = prRecoTrackAndWeight.second;
   } else {
     efficiency = NAN;
   }
@@ -175,18 +128,15 @@ TrackMatchLookUp::extractPRToMCMatchInfo(const RecoTrack& prRecoTrack, const Rec
 const MCParticle*
 TrackMatchLookUp::getRelatedMCParticle(const RecoTrack& prRecoTrack)
 {
-  double dummy_weight = NAN;
-  std::string mcParticleStoreArrayName = "";
-  return getRelatedObj<MCParticle>(&prRecoTrack, dummy_weight, mcParticleStoreArrayName);
+  return prRecoTrack.getRelated<MCParticle>();
 }
 
 
 
 const RecoTrack*
-TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& trackCand)
+TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& prRecoTrack)
 {
-  double dummy_weight = NAN;
-  return getRelatedObj<RecoTrack>(&trackCand, dummy_weight, getMCTracksStoreArrayName());
+  return prRecoTrack.getRelated<RecoTrack>(getMCTracksStoreArrayName());
 }
 
 
@@ -194,10 +144,7 @@ TrackMatchLookUp::getRelatedMCTrackCand(const RecoTrack& trackCand)
 const TrackFitResult*
 TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack, Const::ChargedStable chargedStable)
 {
-  double dummy_weight = NAN;
-
-  // get Belle2::Track via the RecoTrack
-  Belle2::Track* b2track = getRelatedObj<Belle2::Track>(&prRecoTrack, dummy_weight, "", DataStore::c_FromSide);
+  Belle2::Track* b2track = prRecoTrack.getRelated<Belle2::Track>();
   if (b2track)
     // query the Belle2::Track for the selected fit hypothesis
     return b2track->getTrackFitResult(chargedStable);
@@ -210,8 +157,7 @@ TrackMatchLookUp::getRelatedTrackFitResult(const RecoTrack& prRecoTrack, Const::
 const RecoTrack*
 TrackMatchLookUp::getRelatedPRTrackCand(const RecoTrack& mcRecoTrack)
 {
-  double dummy_weight = NAN;
-  return getRelatedObj<RecoTrack>(&mcRecoTrack, dummy_weight, getPRTracksStoreArrayName());
+  return mcRecoTrack.getRelated<RecoTrack>(getPRTracksStoreArrayName());
 }
 
 
@@ -307,7 +253,4 @@ float TrackMatchLookUp::getMatchedEfficiency(const RecoTrack& trackCand)
     return getRelatedPurity(mcRecoTrack);
 
   }
-
-
 }
-

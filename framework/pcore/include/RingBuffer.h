@@ -32,8 +32,8 @@ namespace Belle2 {
   /** Class to manage a Ring Buffer placed in an IPC shared memory */
   class RingBuffer {
   public:
-    /** Standard size of buffer, in integers (~40MB). */
-    const static int c_DefaultSize = 10000000;
+    /** Standard size of buffer, in integers (~60MB). Needs to be large enough to contain any event, but adds to total memory use of basf2. */
+    const static int c_DefaultSize = 15000000;
 
     /** Constructor to create a new shared memory in private space.
      *

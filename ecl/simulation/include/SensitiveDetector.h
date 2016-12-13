@@ -62,7 +62,7 @@ namespace Belle2 {
     class SensitiveDiode: public Simulation::SensitiveDetectorBase {
     public:
       /** Constructor */
-      SensitiveDiode(const G4String&);
+      explicit SensitiveDiode(const G4String&);
 
       /** Destructor */
       ~SensitiveDiode();

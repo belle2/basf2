@@ -46,9 +46,7 @@ from modularAnalysis import analysis_main
 from modularAnalysis import buildRestOfEvent
 from modularAnalysis import ntupleFile
 from modularAnalysis import ntupleTree
-from stdLooseFSParticles import stdLoosePi
-from stdLooseFSParticles import stdLooseK
-from stdLooseFSParticles import stdLooseMu
+from stdCharged import *
 from stdFSParticles import goodPi0
 
 # load data

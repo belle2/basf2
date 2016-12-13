@@ -86,7 +86,7 @@ bool TOPGeometry::isConsistent() const
     if (!module.isConsistent()) return false;
   }
   if (!m_pmtArray.isConsistent()) return false;
-  if (!m_boardStack.isConsistent()) return false;
+  if (!m_frontEnd.isConsistent()) return false;
   if (!m_QBB.isConsistent()) return false;
   if (m_numBoardStacks == 0) return false;
   if (!m_nominalQE.isConsistent()) return false;

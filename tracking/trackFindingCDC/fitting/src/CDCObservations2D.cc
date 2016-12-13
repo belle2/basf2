@@ -340,7 +340,7 @@ Vector2D CDCObservations2D::centralize()
 
 Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   // B2INFO("Matrix of observations: " << endl << eigenObservation);
@@ -373,7 +373,7 @@ Eigen::Matrix<double, 5, 5> CDCObservations2D::getWXYRLSumMatrix()
 Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 {
 
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
@@ -398,7 +398,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYLSumMatrix()
 
 Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 4> projectedPoints(nObservations, 4);
@@ -423,7 +423,7 @@ Eigen::Matrix<double, 4, 4> CDCObservations2D::getWXYRSumMatrix()
 
 Eigen::Matrix<double, 3, 3> CDCObservations2D::getWXYSumMatrix()
 {
-  CDCObservations2D::EigenObservationMatrix&& eigenObservation = getObservationMatrix();
+  CDCObservations2D::EigenObservationMatrix eigenObservation = getObservationMatrix();
   std::size_t nObservations = size();
 
   Matrix<double, Dynamic, 3> projectedPoints(nObservations, 3);

@@ -10,13 +10,12 @@
 #pragma once
 
 #include <tracking/trackFindingCDC/filters/base/Filter.h>
-#include <tracking/trackFindingCDC/eventdata/tracks/CDCSegmentPair.h>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
+    class CDCSegmentPair;
 
     /// Base class for all axial to stereo segment pairs filters
     using BaseSegmentPairFilter = Filter<CDCSegmentPair>;
-
   }
 }

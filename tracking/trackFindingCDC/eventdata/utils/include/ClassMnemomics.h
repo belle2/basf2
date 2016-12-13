@@ -11,6 +11,8 @@
 
 #include <tracking/trackFindingCDC/utilities/WeightedRelation.h>
 
+#include <tracking/trackFindingCDC/utilities/StringManipulation.h>
+
 #include <string>
 
 /**
@@ -154,5 +156,22 @@ namespace Belle2 {
     {
       return getClassMnemomicParameterDescription((T*)(nullptr)) + " relation";
     }
+
+    /// Returns a short name for class WeightedRelation<From, To> to be used in names of parameters.
+    template <class From, class To>
+    inline std::string getClassMnemomicParameterName(const WeightedRelation<From, To>* dispatchTag __attribute__((unused)))
+    {
+      return prefixed(getClassMnemomicParameterName((From*)(nullptr)) + "To",
+                      getClassMnemomicParameterName((To*)(nullptr)) + "Relation");
+    }
+
+    /// Returns a short description for class WeightedRelation<From, To> to be used in descriptions.
+    template <class From, class To>
+    inline std::string getClassMnemomicParameterDescription(const WeightedRelation<From, To>* dispatchTag __attribute__((unused)))
+    {
+      return getClassMnemomicParameterDescription((From*)(nullptr)) + " to " +
+             getClassMnemomicParameterDescription((To*)(nullptr)) + " relation";
+    }
+
   }
 }

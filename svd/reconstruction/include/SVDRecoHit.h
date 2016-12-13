@@ -111,8 +111,10 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 1 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
-    const SVDTrueHit* m_trueHit; /**< Pointer to the Truehit used to generate this hit */
-    const SVDCluster* m_cluster; /**< Pointer to the Cluster used to generate this hit */
+    /**< Pointer to the Truehit used to generate this hit */
+    const SVDTrueHit* m_trueHit; //!
+    /**< Pointer to the Cluster used to generate this hit */
+    const SVDCluster* m_cluster; //!
     bool m_isU; /**< True if the hit has u-coordinate, false if v. */
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/

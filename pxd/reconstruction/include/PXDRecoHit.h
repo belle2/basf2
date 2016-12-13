@@ -130,8 +130,10 @@ namespace Belle2 {
     enum { HIT_DIMENSIONS = 2 /**< sensitive Dimensions of the Hit */ };
 
     unsigned short m_sensorID; /**< Unique sensor identifier.*/
-    const PXDTrueHit* m_trueHit; /**< Pointer to the TrueHit used when creating this object */
-    const PXDCluster* m_cluster; /**< Pointer to the Cluster used when creating this object */
+    /**< Pointer to the TrueHit used when creating this object */
+    const PXDTrueHit* m_trueHit; //!
+    /**< Pointer to the Cluster used when creating this object */
+    const PXDCluster* m_cluster; //!
     float m_energyDep; /**< deposited energy.*/
     //float m_energyDepError; /**< error in dep. energy.*/
 

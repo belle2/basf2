@@ -31,34 +31,43 @@ EKLM::FPGAFitter::~FPGAFitter()
 enum EKLM::FPGAFitStatus EKLM::FPGAFitter::fit(int* amp, int threshold,
                                                EKLMFPGAFit* fitData)
 {
+  /*
+   * Upper bound of the background region: number of points before threshold
+   * crossing.
+   */
+  const int nPointsSigBg = 10;
   double bg;
-  int i, sum, max;
+  int i, ithr, ibg, sum, bgSum, max;
   i = 0;
   sum = 0;
+  bgSum = 0;
   max = -1;
-  /* No data before signal. */
-  if (amp[i] > threshold)
-    return c_FPGANoSignal;
-  /* Time before signal: calculate average value. */
-  do {
+  /* Get threshold crossing time, sum of ADC outputs and maximal output. */
+  ithr = -1;
+  for (i = 0; i < m_nPoints; i++) {
+    if (amp[i] > threshold) {
+      if (ithr < 0)
+        ithr = i;
+    }
     sum = sum + amp[i];
     if (amp[i] > max)
       max = amp[i];
-    ++i;
-    if (i == m_nPoints)
-      return c_FPGANoSignal;
-  } while (amp[i] <= threshold);
-  fitData->setStartTime(i);
-  bg = sum / i;
-  fitData->setBackgroundAmplitude(bg);
-  sum = 0;
-  while (i < m_nPoints) {
-    sum = sum + amp[i] - bg;
-    if (amp[i] > max)
-      max = amp[i];
-    ++i;
   }
-  fitData->setAmplitude(sum);
+  /* No signal. */
+  if (ithr < 0)
+    return c_FPGANoSignal;
+  /* Region for background (pedestal) level. */
+  ibg = std::max(ithr - nPointsSigBg, 0);
+  /* Cannot determine background level, no data before signal. */
+  if (ibg == 0)
+    return c_FPGANoSignal;
+  /* Determine background (pedestal) level. */
+  for (i = 0; i < ibg; i++)
+    bgSum = bgSum + amp[i];
+  bg = float(bgSum) / i;
+  fitData->setStartTime(ithr);
+  fitData->setBackgroundAmplitude(bg);
+  fitData->setAmplitude(sum - bg * m_nPoints);
   fitData->setMaximalAmplitude(max);
   return c_FPGASuccessfulFit;
 }

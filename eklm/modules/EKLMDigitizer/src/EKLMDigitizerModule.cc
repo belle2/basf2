@@ -28,7 +28,7 @@ EKLMDigitizerModule::EKLMDigitizerModule() : Module()
            "Strip hits with npe lower this value will be marked as bad",
            double(7.));
   addParam("DigitizationInitialTime", m_DigitizationInitialTime,
-           "Initial digitization time (ns).", double(0.));
+           "Initial digitization time (ns).", double(-40.));
   addParam("CreateSim2Hits", m_CreateSim2Hits,
            "Create merged EKLMSim2Hits", false);
   addParam("SaveFPGAFit", m_SaveFPGAFit, "Save FPGA fit data", false);

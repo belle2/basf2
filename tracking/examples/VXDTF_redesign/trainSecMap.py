@@ -29,7 +29,7 @@ import argparse
 # Argument parser for input of training sample file via comandline option.
 arg_parser = argparse.ArgumentParser(description='Sector Map Training:\
                                                   Trains and stores SecMap from provided data sample.\n\
-                                                  Usage: basf2 trainSecMap.py -- --train_sample traindata.py')
+                                                  Usage: basf2 trainSecMap.py -- --train_sample traindata.root')
 
 arg_parser.add_argument('--train_sample', '-i', type=str, action='append',
                         help='List of prepared training data file names which will be used for the training of the SecMap')

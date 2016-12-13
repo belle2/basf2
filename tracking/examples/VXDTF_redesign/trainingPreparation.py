@@ -55,7 +55,6 @@ path.add_module(geometry)
 
 # Event counter
 eventCounter = register_module('EventCounter')
-eventCounter.param('stepSize', int(100))
 path.add_module(eventCounter)
 
 

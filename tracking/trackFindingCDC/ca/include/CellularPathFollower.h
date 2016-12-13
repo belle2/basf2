@@ -7,14 +7,12 @@
  *                                                                        *
  * This software is provided "as is" without any warranty.                *
  **************************************************************************/
-
 #pragma once
 
 #include <tracking/trackFindingCDC/ca/WeightedNeighborhood.h>
 #include <tracking/trackFindingCDC/ca/Path.h>
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/ca/CellWeight.h>
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
 #include <framework/logging/Logger.h>
 
@@ -165,10 +163,10 @@ namespace Belle2 {
         if (not cellHolderPtr or not neighborCellHolderPtr) return false;
 
         ACellHolder& cellHolder = *cellHolderPtr;
-        NeighborWeight weight = relation.getWeight();
+        Weight relationWeight = relation.getWeight();
         ACellHolder& neighborCellHolder = *neighborCellHolderPtr;
 
-        return isHighestContinuation(cellHolder, weight, neighborCellHolder);
+        return isHighestContinuation(cellHolder, relationWeight, neighborCellHolder);
       }
 
       /**
@@ -176,21 +174,16 @@ namespace Belle2 {
        *  Since this is an algebraic property no comparision to the other alternatives is necessary.
        */
       static bool isHighestContinuation(ACellHolder& cellHolder,
-                                        NeighborWeight weight,
+                                        Weight relationWeight,
                                         ACellHolder& neighborCellHolder)
       {
         const AutomatonCell& automatonCell = cellHolder.getAutomatonCell();
         const AutomatonCell& neighborAutomatonCell = neighborCellHolder.getAutomatonCell();
 
-        return
-          not neighborAutomatonCell.hasCycleFlag() and
-          not neighborAutomatonCell.hasMaskedFlag() and
-          (automatonCell.getCellState() == (neighborAutomatonCell.getCellState() + weight + automatonCell.getCellWeight()));
+        return not neighborAutomatonCell.hasCycleFlag() and not neighborAutomatonCell.hasMaskedFlag() and
+               (automatonCell.getCellState() ==
+                (neighborAutomatonCell.getCellState() + relationWeight + automatonCell.getCellWeight()));
       }
-
     };
-
   }
-
 }
-

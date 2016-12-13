@@ -13,7 +13,6 @@
 
 #include <tracking/trackFindingCDC/ca/AutomatonCell.h>
 #include <tracking/trackFindingCDC/ca/CellWeight.h>
-#include <tracking/trackFindingCDC/ca/NeighborWeight.h>
 
 #include <framework/logging/Logger.h>
 

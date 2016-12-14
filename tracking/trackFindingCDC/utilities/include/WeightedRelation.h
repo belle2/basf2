@@ -145,5 +145,14 @@ namespace Belle2 {
                            reversedRelationExists);
       }
     };
+
+    /// Operator to sort only according to the weight of relations.
+    template <class AWeightedRelation>
+    struct WeightedRelationsGreater {
+      bool operator()(const AWeightedRelation& x, const AWeightedRelation& y) const
+      {
+        return x.getWeight() > y.getWeight();
+      }
+    };
   }
 }

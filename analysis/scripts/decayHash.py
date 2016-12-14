@@ -14,7 +14,6 @@ logging = LogPythonInterface()
 
 import numpy as np
 import collections
-import b2taunu.utility
 
 import ROOT
 ROOT.gSystem.Load("libanalysis.so")

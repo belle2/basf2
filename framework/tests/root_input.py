@@ -83,7 +83,14 @@ processed_event_numbers = []
 
 
 class TestingModule(Module):
+    """
+    Test module which writes out the processed event numbers
+    into the global processed_event_numbers list
+    """
     def event(self):
+        """
+        Called for each event
+        """
         global processed_event_numbers
         emd = Belle2.PyStoreObj('EventMetaData')
         processed_event_numbers.append(emd.obj().getEvent())

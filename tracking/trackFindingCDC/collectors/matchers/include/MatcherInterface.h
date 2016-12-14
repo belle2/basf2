@@ -16,17 +16,17 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     template <class ACollectorItem, class ACollectionItem>
     class MatcherInterface :
-      public Findlet<const ACollectorItem,
+      public Findlet<ACollectorItem,
       const ACollectionItem,
-      WeightedRelation<const ACollectorItem, const ACollectionItem>> {
+      WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
       /// Shortcut class name for a weighted relation between a collector item and a collection item.
-      typedef WeightedRelation<const ACollectorItem, const ACollectionItem> WeightedRelationItem;
+      typedef WeightedRelation<ACollectorItem, const ACollectionItem> WeightedRelationItem;
 
-      void apply(const std::vector<ACollectorItem>& collectorItems, const std::vector<ACollectionItem>& collectionItems,
+      void apply(std::vector<ACollectorItem>& collectorItems, const std::vector<ACollectionItem>& collectionItems,
                  std::vector<WeightedRelationItem>& weightedRelations) override
       {
-        for (const ACollectorItem& collectorItem : collectorItems) {
+        for (ACollectorItem& collectorItem : collectorItems) {
           match(collectorItem, collectionItems, weightedRelations);
         }
 
@@ -34,7 +34,7 @@ namespace Belle2 {
       }
 
     protected:
-      virtual void match(const ACollectorItem& collectorItem, const std::vector<ACollectionItem>& collectionItems,
+      virtual void match(ACollectorItem& collectorItem, const std::vector<ACollectionItem>& collectionItems,
                          std::vector<WeightedRelationItem>& relationsForCollector)
       {
         for (const ACollectionItem& collectionItem : collectionItems) {
@@ -43,7 +43,7 @@ namespace Belle2 {
         }
       };
 
-      virtual Weight match(const ACollectorItem& collectorItem, const ACollectionItem& collectionItem)
+      virtual Weight match(ACollectorItem& collectorItem, const ACollectionItem& collectionItem)
       {
         return NAN;
       }

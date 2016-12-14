@@ -23,11 +23,11 @@ namespace {
     int a = 1;
     double b = 2, c = 3, d = 4, e = 5;
 
-    std::vector<WeightedRelation<const int, const double>> relations = {
-      WeightedRelation<const int, const double>(&a, 1.1, &b),
-      WeightedRelation<const int, const double>(&a, 1.0, &c),
-      WeightedRelation<const int, const double>(&a, 0.8, &d),
-      WeightedRelation<const int, const double>(&a, NAN, &e)
+    std::vector<WeightedRelation<int, const double>> relations = {
+      WeightedRelation<int, const double>(&a, 1.1, &b),
+      WeightedRelation<int, const double>(&a, 1.0, &c),
+      WeightedRelation<int, const double>(&a, 0.8, &d),
+      WeightedRelation<int, const double>(&a, NAN, &e)
     };
 
     selector.setCutValue(1.0);

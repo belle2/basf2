@@ -23,11 +23,11 @@ namespace {
     int a = 1, b = 2;
     double c = 3, d = 4, e = 5;
 
-    std::vector<WeightedRelation<const int, const double>> relations = {
-      WeightedRelation<const int, const double>(&a, 1.1, &c),
-      WeightedRelation<const int, const double>(&a, 1.0, &d),
-      WeightedRelation<const int, const double>(&b, 0.8, &c),
-      WeightedRelation<const int, const double>(&b, 0.6, &e)
+    std::vector<WeightedRelation<int, const double>> relations = {
+      WeightedRelation<int, const double>(&a, 1.1, &c),
+      WeightedRelation<int, const double>(&a, 1.0, &d),
+      WeightedRelation<int, const double>(&b, 0.8, &c),
+      WeightedRelation<int, const double>(&b, 0.6, &e)
     };
 
     selector.apply(relations);
@@ -50,11 +50,11 @@ namespace {
     int a = 1, b = 2;
     double c = 3, d = 4, e = 5;
 
-    std::vector<WeightedRelation<const int, const double>> relations = {
-      WeightedRelation<const int, const double>(&a, 1.1, &c),
-      WeightedRelation<const int, const double>(&a, 1.0, &d),
-      WeightedRelation<const int, const double>(&b, 0.8, &c),
-      WeightedRelation<const int, const double>(&b, 0.6, &e)
+    std::vector<WeightedRelation<int, const double>> relations = {
+      WeightedRelation<int, const double>(&a, 1.1, &c),
+      WeightedRelation<int, const double>(&a, 1.0, &d),
+      WeightedRelation<int, const double>(&b, 0.8, &c),
+      WeightedRelation<int, const double>(&b, 0.6, &e)
     };
 
     selector.apply(relations);

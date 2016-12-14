@@ -23,13 +23,13 @@ namespace Belle2 {
   namespace TrackFindingCDC {
     template <class AFilterFactory, class ACollectorItem, class ACollectionItem>
     class FilterSelector :
-      public Findlet<WeightedRelation<const ACollectorItem, const ACollectionItem>> {
+      public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
       /// Shortcut class name for a weighted relation between a collector item and a collection item.
-      typedef WeightedRelation<const ACollectorItem, const ACollectionItem> WeightedRelationItem;
+      typedef WeightedRelation<ACollectorItem, const ACollectionItem> WeightedRelationItem;
 
       /// The parent class
-      typedef Findlet<WeightedRelation<const ACollectorItem, const ACollectionItem>> Super;
+      typedef Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> Super;
 
       FilterSelector() : Super()
       {

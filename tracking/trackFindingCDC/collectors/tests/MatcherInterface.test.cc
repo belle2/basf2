@@ -17,7 +17,7 @@ using namespace TrackFindingCDC;
 
 namespace {
   class SimpleMatcher : public MatcherInterface<int, double> {
-    Weight match(const int& a, const double& b)
+    Weight match(int& a, const double& b) override
     {
       return a + b;
     }
@@ -27,9 +27,12 @@ namespace {
   {
     SimpleMatcher matcher;
 
-    std::vector<WeightedRelation<const int, const double>> relations;
+    std::vector<WeightedRelation<int, const double>> relations;
 
-    matcher.apply({1, 2}, {2.1, 2.2, 2.3}, relations);
+    std::vector<int> collectorItems = {1, 2};
+    std::vector<double> collectionItems = {2.1, 2.2, 2.3};
+
+    matcher.apply(collectorItems, collectionItems, relations);
 
     ASSERT_EQ(relations.size(), 6);
     ASSERT_EQ(relations[5].getWeight(), 3.1);

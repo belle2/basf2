@@ -21,7 +21,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template <class AFilterFactory, class ACollectorItem, class ACollectionItem>
+    template <class ACollectorItem, class ACollectionItem, class AFilterFactory>
     class FilterSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
@@ -33,7 +33,7 @@ namespace Belle2 {
 
       FilterSelector() : Super()
       {
-        addProcessingSignalListener(m_filter);
+        Super::addProcessingSignalListener(&m_filter);
       }
 
       void exposeParameters(ModuleParamList* moduleParamList,
@@ -63,7 +63,7 @@ namespace Belle2 {
       }
 
     private:
-      ChoosableFilter<AFilterFactory> m_filter;
+      ChooseableFilter<AFilterFactory> m_filter;
     };
   }
 }

@@ -187,7 +187,11 @@ The following restrictions apply:
         B2ERROR("Steering in " << input << " differs from previous files: " <<
                 fileMetaData->getSteering() << " != " << outputMetaData->getSteering());
       }
-      //FIXME: check user? check globalTag? factor this into a function?
+      if(fileMetaData->getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
+        B2ERROR("Database globalTag in " << input << " differs from previous files: " <<
+                fileMetaData->getDatabaseGlobalTag() << " != " << outputMetaData->getDatabaseGlobalTag());
+      }
+      //FIXME: check user? factor this into a function?
       // merge metadata here ...
       outputMetaData->setMcEvents(outputMetaData->getMcEvents() + fileMetaData->getMcEvents());
       outputMetaData->setNEvents(outputMetaData->getNEvents() + fileMetaData->getNEvents());

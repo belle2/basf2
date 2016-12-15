@@ -40,6 +40,7 @@ namespace Belle2 {
                             const std::string& prefix) override
       {
         Super::exposeParameters(moduleParamList, prefix);
+        m_filter.exposeParameters(moduleParamList, prefix);
       }
 
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override

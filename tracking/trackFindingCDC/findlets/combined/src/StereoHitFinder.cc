@@ -19,7 +19,8 @@ StereoHitFinder::StereoHitFinder() : Super()
 {
   addProcessingSignalListener(&m_rlWireHitCreator);
   addProcessingSignalListener(&m_matcher);
-  addProcessingSignalListener(&m_selector);
+  addProcessingSignalListener(&m_filterSelector);
+  addProcessingSignalListener(&m_singleMatchSelector);
   addProcessingSignalListener(&m_adder);
   addProcessingSignalListener(&m_szFitter);
 }
@@ -43,7 +44,8 @@ void StereoHitFinder::exposeParameters(ModuleParamList* moduleParamList, const s
 
   m_rlWireHitCreator.exposeParameters(moduleParamList, prefix);
   m_matcher.exposeParameters(moduleParamList, prefix);
-  m_selector.exposeParameters(moduleParamList, prefix);
+  m_filterSelector.exposeParameters(moduleParamList, prefix);
+  m_singleMatchSelector.exposeParameters(moduleParamList, prefix);
   m_adder.exposeParameters(moduleParamList, prefix);
   m_szFitter.exposeParameters(moduleParamList, prefix);
 }
@@ -55,7 +57,8 @@ void StereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<
 
   m_rlWireHitCreator.apply(inputWireHits, m_rlTaggedWireHits);
   m_matcher.apply(tracks, m_rlTaggedWireHits, m_relations);
-  m_selector.apply(m_relations);
+  m_filterSelector.apply(m_relations);
+  m_singleMatchSelector.apply(m_relations);
   m_adder.apply(m_relations);
 
   m_szFitter.apply(tracks);

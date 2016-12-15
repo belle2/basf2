@@ -9,7 +9,7 @@
 using namespace Belle2;
 using namespace TrackFindingCDC;
 
-void StereoHitTrackAdder::add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight)
+void StereoHitTrackAdder::add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight __attribute__((unused)))
 {
   const CDCTrajectory2D& trajectory2D = track.getStartTrajectory3D().getTrajectory2D();
   const double radius = trajectory2D.getGlobalCircle().absRadius();

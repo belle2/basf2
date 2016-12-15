@@ -19,7 +19,7 @@ namespace Belle2 {
     class StereoHitTrackAdder : public AdderInterface<CDCTrack, CDCRLWireHit> {
     private:
       /** Add the matched hits to the track and set the taken flag correctly. We ignore the weight completely here. */
-      void add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight  __attribute__((unused))) override;
+      void add(CDCTrack& track, const CDCRLWireHit& hit, Weight weight) override;
     };
   }
 }

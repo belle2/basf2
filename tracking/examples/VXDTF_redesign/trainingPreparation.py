@@ -16,8 +16,7 @@
 
 
 from basf2 import *
-# TODO: This script still requires genFit Track Candidates which should be replaced...
-from setup_modules import setup_gfTCtoSPTCConverters
+from setup_modules import setup_RTCtoSPTCConverters
 
 
 # ---------------------------------------------------------------------------------------
@@ -75,14 +74,13 @@ path.add_module(spCreatorSVD)
 
 # Converts GenFit track candidates and checks them, with respect to the SecMap settings
 # Produces SpacePoint TrackCand which is used in VXDTFTrainingDataCollector.
-# TODO Replace GenFit TrackCand and further modularization of the module.
-setup_gfTCtoSPTCConverters(path=path,
-                           pxdSPs='SpacePoints',
-                           svdSPs='SpacePoints',
-                           gfTCinput='mcTracks',
-                           sptcOutput='checkedSPTCs',
-                           usePXD=usePXD,
-                           logLevel=LogLevel.WARNING)
+setup_RTCtoSPTCConverters(path=path,
+                          pxdSPs='SpacePoints',
+                          svdSPs='SpacePoints',
+                          RTCinput='mcTracks',
+                          sptcOutput='checkedSPTCs',
+                          usePXD=usePXD,
+                          logLevel=LogLevel.WARNING)
 
 
 # SecMap BootStrap

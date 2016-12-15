@@ -40,27 +40,16 @@ namespace Belle2 {
 
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
-        const auto& weightIsNan = [](const WeightedRelationItem & item) {
-          return std::isnan(item.getWeight());
+
+        const auto& lessThanCutOrNaN = [this](const WeightedRelationItem & relationItem) {
+          return std::isnan(relationItem.getWeight()) or relationItem.getWeight() < m_param_cutValue;
         };
 
         // Erase all items with a weight of NAN
         weightedRelations.erase(std::remove_if(weightedRelations.begin(),
                                                weightedRelations.end(),
-                                               weightIsNan),
+                                               lessThanCutOrNaN),
                                 weightedRelations.end());
-
-        // As the vector is sorted, we just have to find the first occurring element below the cut value
-        const auto& lessThanCut = [this](const WeightedRelationItem & relationItem) {
-          return relationItem.getWeight() < m_param_cutValue;
-        };
-
-        weightedRelations.erase(std::remove_if(weightedRelations.begin(),
-                                               weightedRelations.end(),
-                                               lessThanCut),
-                                weightedRelations.end());
-
-        std::sort(weightedRelations.begin(), weightedRelations.end());
       }
 
       void setCutValue(Weight cutValue)

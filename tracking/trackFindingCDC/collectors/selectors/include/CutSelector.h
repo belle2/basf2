@@ -50,15 +50,15 @@ namespace Belle2 {
                                                weightIsNan),
                                 weightedRelations.end());
 
-        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
-
         // As the vector is sorted, we just have to find the first occurring element below the cut value
         const auto& lessThanCut = [this](const WeightedRelationItem & relationItem) {
           return relationItem.getWeight() < m_param_cutValue;
         };
 
-        auto firstElementLessThanCut = std::find_if(weightedRelations.begin(), weightedRelations.end(), lessThanCut);
-        weightedRelations.erase(firstElementLessThanCut, weightedRelations.end());
+        weightedRelations.erase(std::remove_if(weightedRelations.begin(),
+                                               weightedRelations.end(),
+                                               lessThanCut),
+                                weightedRelations.end());
 
         std::sort(weightedRelations.begin(), weightedRelations.end());
       }

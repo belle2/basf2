@@ -31,10 +31,7 @@ namespace Belle2 {
 
     public:
       /// Constructor
-      StereoHitTrackQuadTreeMatcher() : Super()
-      {
-        addProcessingSignalListener(&m_stereoHitFilter);
-      }
+      StereoHitTrackQuadTreeMatcher();
 
       /// Expose the parameters to the module.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
@@ -44,7 +41,20 @@ namespace Belle2 {
 
       /// Terminate the filter and the quad tree.
       void terminate() override;
+
     private:
+      /**
+       * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
+       * The QuadTree has two dimensions: inverse slope in z-direction and z0.
+       * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
+       * and each hit is assigned to the track.
+       */
+      void match(CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits,
+                 std::vector<Super::WeightedRelationItem>& relationsForCollector) override;
+
+      /// Use the writeDebugInformation function of the quad tree to write the tree into a root file with a ascending number.
+      void writeDebugInformation();
+
       /// Parameters
       /// Set to false to skip the B2B check (good for curlers).
       bool m_param_checkForB2BTracks = true;
@@ -65,18 +75,6 @@ namespace Belle2 {
 
       /// The used filter.
       ChooseableFilter<StereoHitFilterFactory> m_stereoHitFilter;
-
-      /// Use the writeDebugInformation function of the quad tree to write the tree into a root file with a ascending number.
-      void writeDebugInformation();
-
-      /**
-       * Create a QuadTree and fill with each unused stereo hit (to be exact: twice for each stereo hit - right and left).
-       * The QuadTree has two dimensions: inverse slope in z-direction and z0.
-       * Each bin with a high number of items (= stereo hits) in it is stored. Later, the one node with the highest number of items in it is taken
-       * and each hit is assigned to the track.
-       */
-      void match(CDCTrack& track, const std::vector<CDCRLWireHit>& rlWireHits,
-                 std::vector<Super::WeightedRelationItem>& relationsForCollector) override;
     };
   }
 }

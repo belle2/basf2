@@ -26,6 +26,12 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template <class AQuadTree>
+StereoHitTrackQuadTreeMatcher<AQuadTree>::StereoHitTrackQuadTreeMatcher() : Super()
+{
+  addProcessingSignalListener(&m_stereoHitFilter);
+}
+
+template <class AQuadTree>
 void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParameters(ModuleParamList* moduleParamList,
     const std::string& prefix)
 {

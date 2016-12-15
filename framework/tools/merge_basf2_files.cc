@@ -71,11 +71,6 @@ The following restrictions apply:
     B2ERROR("Output file exists, use -f to force overwriting it");
     return 1;
   }
-  TFile output(outputfilename.c_str(), "RECREATE");
-  if (output.IsZombie()) {
-    B2ERROR("Could not create output file " << boost::io::quoted(outputfilename));
-    return 1;
-  }
   // check all input files for consistency ...
 
   // the final metadata we will write out
@@ -88,6 +83,9 @@ The following restrictions apply:
   std::set<std::string> allSeeds;
   // EventInfo for the high/low event numbers;
   EventInfo lowEvt{0,0,0}, highEvt{0,0,0};
+  // set of all branch names in the event tree to make sure it's the same in
+  // all files
+  std::set<std::string> allEventBranches;
 
   // so let's loop over all files and create FileMetaData and merge persistent
   // objects if they inherit from Mergable, bail if there's something else in
@@ -104,10 +102,6 @@ The following restrictions apply:
     if (tfile.IsZombie()) {
       B2ERROR("Could not open '" << boost::io::quoted(input) << "'");
       continue;
-    }
-    if(!dynamic_cast<TTree*>(tfile.Get("tree"))){
-      B2ERROR("No event tree found in " <<  boost::io::quoted(input));
-      // we don't need the tree now so no need to continue, we can make additional checks
     }
     TTree* persistent = dynamic_cast<TTree*>(tfile.Get("persistent"));
     if (!persistent) {
@@ -127,13 +121,36 @@ The following restrictions apply:
     B2INFO("adding file " << boost::io::quoted(input));
     fileMetaData->Print("all");
 
-    // File looks good so far, now fixup the persistent stuff
+    // ok now we now that FileMetaData is there, check the branches of the file
+    TTree* tree = dynamic_cast<TTree*>(tfile.Get("tree"));
+    if(!tree){
+      B2ERROR("No event tree found in " << boost::io::quoted(input));
+      // we don't need the tree now so no need to continue, we can make additional checks
+    }
+    std::set<std::string> branches;
+    for(TObject* br: *tree->GetListOfBranches()){
+      branches.insert(br->GetName());
+    }
+    if(branches.empty()) {
+      B2ERROR("No branches found in event tree in " << boost::io::quoted(input));
+      continue;
+    }
+    if(allEventBranches.empty()) {
+      std::swap(allEventBranches,branches);
+    }else{
+      if(branches!=allEventBranches){
+        B2ERROR("Branches in " << boost::io::quoted(input) << " differ from "
+                << boost::io::quoted(inputfilenames.front()));
+      }
+    }
 
-    // setup mergable objects
+    // File looks good so far, now fixup the persistent stuff, i.e. merge all
+    // objects in persistent tree
     for(TObject* brObj: *persistent->GetListOfBranches()){
       TBranchElement* br = dynamic_cast<TBranchElement*>(brObj);
       // FileMetaData is handled separately
-      if(br && br->GetTargetClass() == FileMetaData::Class()) continue;
+      if(br && br->GetTargetClass() == FileMetaData::Class() && std::string(br->GetName()) == "FileMetaData")
+        continue;
       // Make sure the branch is mergeable
       if(!br || !br->GetTargetClass()->InheritsFrom(Mergeable::Class())){
         B2ERROR("Branch " << boost::io::quoted(br->GetName()) << " in persistent tree not inheriting from Mergable");
@@ -209,7 +226,13 @@ The following restrictions apply:
   if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
 
   //OK we have a valid FileMetaData and merged all persistent objects, now do
-  //the conversion of the event trees
+  //the conversion of the event trees and create the output file.
+  TFile output(outputfilename.c_str(), "RECREATE");
+  if (output.IsZombie()) {
+    B2ERROR("Could not create output file " << boost::io::quoted(outputfilename));
+    return 1;
+  }
+
   TTree* outputEventTree{nullptr};
   for (const auto& input : inputfilenames) {
     B2INFO("processing events from " << boost::io::quoted(input));

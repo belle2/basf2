@@ -13,7 +13,7 @@
 
 #include <tracking/trackFindingCDC/collectors/matchers/StereoHitTrackQuadTreeMatcher.h>
 #include <tracking/trackFindingCDC/collectors/selectors/SingleMatchSelector.h>
-#include <tracking/trackFindingCDC/collectors/stereo_hits/StereoHitLessOperator.h>
+#include <tracking/trackFindingCDC/collectors/selectors/StereoHitLessOperator.h>
 #include <tracking/trackFindingCDC/collectors/adders/StereoHitTrackAdder.h>
 #include <tracking/trackFindingCDC/findlets/minimal/RLTaggedWireHitCreator.h>
 #include <tracking/trackFindingCDC/hough/z0_tanLambda/HitZ0TanLambdaLegendre.h>

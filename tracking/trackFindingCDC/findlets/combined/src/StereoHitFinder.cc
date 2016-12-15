@@ -50,26 +50,13 @@ void StereoHitFinder::exposeParameters(ModuleParamList* moduleParamList, const s
 
 void StereoHitFinder::apply(std::vector<CDCWireHit>& inputWireHits, std::vector<CDCTrack>& tracks)
 {
-  B2WARNING("Number of tracks: " << tracks.size());
-  B2WARNING("Number of wire hits: " << inputWireHits.size());
-
   m_rlTaggedWireHits.reserve(2 * inputWireHits.size());
   m_relations.reserve(2 * inputWireHits.size() * tracks.size());
 
   m_rlWireHitCreator.apply(inputWireHits, m_rlTaggedWireHits);
-
-  B2WARNING("Number of rlWireHits: " << m_rlTaggedWireHits.size());
-
   m_matcher.apply(tracks, m_rlTaggedWireHits, m_relations);
-
-  B2WARNING("Number of relations: " << m_relations.size());
-
   m_selector.apply(m_relations);
-
-  B2WARNING("Number of relations after selection: " << m_relations.size());
-
   m_adder.apply(m_relations);
-
 
   m_szFitter.apply(tracks);
 }

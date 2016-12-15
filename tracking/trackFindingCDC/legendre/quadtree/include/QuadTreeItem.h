@@ -26,8 +26,8 @@ namespace Belle2 {
     public:
       /// Constructor
       explicit QuadTreeItem(AData* data)
-        : m_usedFlag(false)
-        , m_data(data) {};
+        : m_data(data)
+        , m_usedFlag(false) {};
 
     private:
       /// Do not copy!
@@ -37,6 +37,12 @@ namespace Belle2 {
       QuadTreeItem& operator=(QuadTreeItem const& copy) = delete;
 
     public:
+      /// Returns the underlying data.
+      AData* getPointer() const
+      {
+        return m_data;
+      }
+
       /**
        * Flag is set if the item was used as a result of the quad tree search and
        * should not be used in the next quad tree search round.
@@ -58,18 +64,12 @@ namespace Belle2 {
         setUsedFlag(false);
       }
 
-      /// Returns the underlying data.
-      AData* getPointer() const
-      {
-        return m_data;
-      }
-
     private:
-      /// This flag can be set to not use the item in the next quad tree search round
-      bool m_usedFlag;
-
       /// A pointer to the underlying item data
       AData* m_data;
+
+      /// This flag can be set to not use the item in the next quad tree search round
+      bool m_usedFlag;
     };
 
     /**

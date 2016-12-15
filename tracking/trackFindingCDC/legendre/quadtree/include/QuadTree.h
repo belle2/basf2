@@ -23,7 +23,7 @@
 
 #include <framework/logging/Logger.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/TrigonometricalLookupTable.h>
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTreeChildren.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeChildren.h>
 
 #include <boost/math/constants/constants.hpp>
 #include <boost/foreach.hpp>
@@ -155,10 +155,16 @@ namespace Belle2 {
       }
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      Children* getChildren() const {return m_children.get();};
+      Children* getChildren() const
+      {
+        return m_children.get();
+      };
 
       /** Returns level of the node in tree (i.e., how much ancestors the node has) */
-      unsigned char getLevel() const {return m_level;};
+      unsigned char getLevel() const
+      {
+        return m_level;
+      };
 
       /** Copy information about hits into member of class (node at level 0 should be used  because other levels fills by parents) */
       template<class processor>
@@ -289,8 +295,6 @@ namespace Belle2 {
       YBinTuple m_yBins;      /**< bins range on theta */
       unsigned char m_level;  /**< Level of node in the tree */
       bool m_filled; /**< Is the node has been filled with hits */
-
     };
-
   }
 }

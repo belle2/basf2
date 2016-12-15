@@ -10,7 +10,7 @@
 
 #include <tracking/trackFindingCDC/testFixtures/TrackFindingCDCTestWithSimpleSimulation.h>
 
-#include <tracking/trackFindingCDC/legendre/quadtree/CDCLegendreQuadTree.h>
+#include <tracking/trackFindingCDC/legendre/quadtree/QuadTree.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/AxialHitQuadTreeProcessor.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/legendre/precisionFunctions/PrecisionUtil.h>

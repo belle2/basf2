@@ -60,6 +60,11 @@ The following restrictions apply:
     return 1;
   }
 
+  auto logConfig = LogSystem::Instance().getLogConfig();
+  for(auto l: {LogConfig::c_Info, LogConfig::c_Warning, LogConfig::c_Error, LogConfig::c_Fatal}){
+    logConfig->setLogInfo(l, LogConfig::c_Level | LogConfig::c_Message);
+  }
+
   B2INFO("Merging files into " << boost::io::quoted(outputfilename));
   // check output file
   if (fs::exists(outputfilename) && variables.count("force")==0) {

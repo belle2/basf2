@@ -204,22 +204,6 @@ The following restrictions apply:
   outputMetaData->setHigh(std::get<0>(highEvt), std::get<1>(highEvt), std::get<2>(highEvt));
   outputMetaData->setRandomSeed("");
   RootIOUtilities::setCreationData(*outputMetaData);
-  B2INFO("Writing FileMetaData");
-  // Create persistent tree
-  output.cd();
-  TTree outputMetaDataTree("persistent", "persistent");
-  outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
-  for(auto it: persistentMergeables){
-    outputMetaDataTree.Branch(it.first.c_str(), &it.second);
-  }
-  outputMetaDataTree.Fill();
-  outputMetaDataTree.Write();
-
-  // now clean up the mess ...
-  for(auto val: persistentMergeables){
-    delete val.second.first;
-  }
-  persistentMergeables.clear();
 
   //Stop processing in case of error
   if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
@@ -254,11 +238,27 @@ The following restrictions apply:
   }
   output.cd();
   outputEventTree->Write();
-  output.Close();
   B2INFO("Done processing events");
 
   if(variables.count("no-catalog")==0) {
     FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);
   }
+  B2INFO("Writing FileMetaData");
+  // Create persistent tree
+  output.cd();
+  TTree outputMetaDataTree("persistent", "persistent");
+  outputMetaDataTree.Branch("FileMetaData", &outputMetaData);
+  for(auto it: persistentMergeables){
+    outputMetaDataTree.Branch(it.first.c_str(), &it.second.first);
+  }
+  outputMetaDataTree.Fill();
+  outputMetaDataTree.Write();
+
+  // now clean up the mess ...
+  for(auto val: persistentMergeables){
+    delete val.second.first;
+  }
+  persistentMergeables.clear();
   delete outputMetaData;
+  output.Close();
 }

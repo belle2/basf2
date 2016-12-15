@@ -140,7 +140,7 @@ namespace Belle2 {
     /** Set up Detector plane information */
     void setDetectorPlane();
 
-    ClassDef(PXDRecoHit, 6)
+    ClassDef(PXDRecoHit, 7)
   };
 
 } // namespace Belle2

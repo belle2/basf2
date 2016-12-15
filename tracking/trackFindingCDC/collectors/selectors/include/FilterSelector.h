@@ -49,11 +49,17 @@ namespace Belle2 {
           weightedRelation.setWeight(filterResult);
         }
 
-        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
+        const auto& weightIsNan = [](const WeightedRelationItem & item) {
+          return std::isnan(item.getWeight());
+        };
 
         // Erase all items with a weight of NAN
-        auto firstNANItem = std::find(weightedRelations.begin(), weightedRelations.end(), NAN);
-        weightedRelations.erase(firstNANItem, weightedRelations.end());
+        weightedRelations.erase(std::remove_if(weightedRelations.begin(),
+                                               weightedRelations.end(),
+                                               weightIsNan),
+                                weightedRelations.end());
+
+        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
       }
 
     private:

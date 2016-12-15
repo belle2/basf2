@@ -76,6 +76,9 @@ namespace Belle2 {
     virtual bool addPayload(const std::string& package, const std::string& module, const std::string& fileName,
                             const IntervalOfValidity& iov) override;
 
+    /** Return the global tag */
+    std::string getGlobalTag() const { return m_globalTag; }
+
     /** set a mapping from experiment name to experiment number.
      * The experiment numbers and names need to be unique as we have to
      * transform the mapping in both directions. So a experiment number cannot

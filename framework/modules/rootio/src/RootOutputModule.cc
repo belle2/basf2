@@ -16,6 +16,7 @@
 #include <framework/dataobjects/FileMetaData.h>
 #include <framework/core/FileCatalog.h>
 #include <framework/core/RandomNumbers.h>
+#include <framework/database/Database.h>
 
 #include <TClonesArray.h>
 
@@ -243,6 +244,7 @@ void RootOutputModule::fillFileMetaData()
   fileMetaDataPtr->setRandomSeed(RandomNumbers::getSeed());
   fileMetaDataPtr->setSteering(Environment::Instance().getSteering());
   fileMetaDataPtr->setMcEvents(Environment::Instance().getNumberOfMCEvents());
+  fileMetaDataPtr->setDatabaseGlobalTag(Database::getGlobalTag());
 
   //register the file in the catalog
   if (m_updateFileCatalog) {

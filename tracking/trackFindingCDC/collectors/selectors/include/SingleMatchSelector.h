@@ -18,7 +18,7 @@
 
 namespace Belle2 {
   namespace TrackFindingCDC {
-    template <class ACollectorItem, class ACollectionItem>
+    template <class ACollectorItem, class ACollectionItem, class AComparer = std::less<const ACollectionItem*>>
     class SingleMatchSelector :
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>> {
     public:
@@ -44,7 +44,7 @@ namespace Belle2 {
                  std::is_sorted(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>()));
 
         // Build a map from collectionItem -> matched collectionItems with weight
-        std::map<const ACollectionItem*, std::vector<WeightedRelationItem>> collectionItemToMatchedMap;
+        std::map<const ACollectionItem*, std::vector<WeightedRelationItem>, AComparer> collectionItemToMatchedMap;
 
         for (const WeightedRelationItem& relation : weightedRelations) {
           collectionItemToMatchedMap[relation.getTo()].push_back(relation);

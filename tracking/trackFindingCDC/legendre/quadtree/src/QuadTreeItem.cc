@@ -1,4 +1,14 @@
+/**************************************************************************
+* BASF2 (Belle Analysis Framework 2)                                     *
+* Copyright(C) 2014 - Belle II Collaboration                             *
+*                                                                        *
+* Author: The Belle II Collaboration                                     *
+* Contributors: Viktor Trusov, Thomas Hauth                              *
+*                                                                        *
+* This software is provided "as is" without any warranty.                *
+**************************************************************************/
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
+
 #include <tracking/trackFindingCDC/eventdata/segments/CDCSegment2D.h>
 #include <tracking/trackFindingCDC/eventdata/hits/CDCWireHit.h>
 

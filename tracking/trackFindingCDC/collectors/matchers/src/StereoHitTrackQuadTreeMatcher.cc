@@ -202,7 +202,7 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
     const CDCRecoHit3D& rhsRecoHit = rhs.first;
     const CDCRecoHit3D& lhsRecoHit = lhs.first;
 
-    return lhsRecoHit.getWireHit().getHit() == rhsRecoHit.getWireHit().getHit();
+    return lhsRecoHit.getWireHit() == rhsRecoHit.getWireHit();
   };
 
   std::sort(foundStereoHits.begin(),

@@ -31,7 +31,11 @@ namespace {
     };
 
     selector.setCutValue(1.0);
+
+    std::sort(relations.begin(), relations.end());
     selector.apply(relations);
+
+    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
 
     ASSERT_EQ(relations.size(), 2);
     ASSERT_EQ(relations[0].getWeight(), 1.1);

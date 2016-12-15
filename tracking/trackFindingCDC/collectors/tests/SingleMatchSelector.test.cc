@@ -30,7 +30,10 @@ namespace {
       WeightedRelation<int, const double>(&b, 0.6, &e)
     };
 
+    std::sort(relations.begin(), relations.end());
     selector.apply(relations);
+
+    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
 
     ASSERT_EQ(relations.size(), 2);
     ASSERT_EQ(relations[0].getWeight(), 1.0);
@@ -57,7 +60,10 @@ namespace {
       WeightedRelation<int, const double>(&b, 0.6, &e)
     };
 
+    std::sort(relations.begin(), relations.end());
     selector.apply(relations);
+
+    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
 
     ASSERT_EQ(relations.size(), 3);
     ASSERT_EQ(relations[0].getWeight(), 1.1);
@@ -92,7 +98,10 @@ namespace {
       WeightedRelation<int, const double>(&b, 0.6, &e)
     };
 
+    std::sort(relations.begin(), relations.end());
     selector.apply(relations);
+
+    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
 
     ASSERT_EQ(relations.size(), 1);
     ASSERT_EQ(relations[0].getWeight(), 1.0);

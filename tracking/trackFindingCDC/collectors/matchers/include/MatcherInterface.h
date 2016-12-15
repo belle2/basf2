@@ -30,7 +30,7 @@ namespace Belle2 {
           match(collectorItem, collectionItems, weightedRelations);
         }
 
-        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
+        std::sort(weightedRelations.begin(), weightedRelations.end());
       }
 
     protected:

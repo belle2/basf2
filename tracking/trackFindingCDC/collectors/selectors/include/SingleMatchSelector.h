@@ -40,8 +40,8 @@ namespace Belle2 {
 
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {
-        B2ASSERT("The relations need to be sorted in non-ascending order for this selector!",
-                 std::is_sorted(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>()));
+        B2ASSERT("The relations need to be sorted for this selector!",
+                 std::is_sorted(weightedRelations.begin(), weightedRelations.end()));
 
         // Build a map from collectionItem -> matched collectionItems with weight
         std::map<const ACollectionItem*, std::vector<WeightedRelationItem>, AComparer> collectionItemToMatchedMap;
@@ -56,11 +56,11 @@ namespace Belle2 {
         for (const auto& collectionItemToMatches : collectionItemToMatchedMap) {
           const auto& matches = collectionItemToMatches.second;
           if (not m_param_useOnlySingleBestCandidate or matches.size() == 1) {
-            weightedRelations.push_back(matches.front());
+            weightedRelations.push_back(matches.back());
           }
         }
 
-        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
+        std::sort(weightedRelations.begin(), weightedRelations.end());
       }
 
       void setUseOnlySingleBestCandidate(bool useOnlySingleBestCandidate)

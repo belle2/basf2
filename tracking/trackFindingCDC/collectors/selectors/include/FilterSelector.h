@@ -59,7 +59,7 @@ namespace Belle2 {
                                                weightIsNan),
                                 weightedRelations.end());
 
-        std::sort(weightedRelations.begin(), weightedRelations.end(), WeightedRelationsGreater<WeightedRelationItem>());
+        std::sort(weightedRelations.begin(), weightedRelations.end());
       }
 
     private:

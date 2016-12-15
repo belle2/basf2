@@ -3,6 +3,7 @@
 #include <framework/io/RootIOUtilities.h>
 #include <framework/logging/Logger.h>
 #include <framework/pcore/Mergeable.h>
+#include <framework/core/FileCatalog.h>
 
 #include <boost/program_options.hpp>
 #include <boost/filesystem.hpp>
@@ -33,7 +34,8 @@ int main(int argc, char* argv[])
   ("help,h", "print all available options")
   ("output", po::value<std::string>(&outputfilename), "output file name")
   ("file", po::value<std::vector<std::string>>(&inputfilenames), "filename to merge")
-  ("force,f", "overwrite existing file");
+  ("force,f", "overwrite existing file")
+  ("no-catalog", "don't register output file in file catalog");
   po::positional_options_description positional;
   positional.add("output", 1);
   positional.add("file", -1);
@@ -213,7 +215,6 @@ The following restrictions apply:
     delete val.second.first;
   }
   persistentMergeables.clear();
-  delete outputMetaData;
 
   //Stop processing in case of error
   if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
@@ -250,4 +251,9 @@ The following restrictions apply:
   outputEventTree->Write();
   output.Close();
   B2INFO("Done processing events");
+
+  if(variables.count("no-catalog")==0) {
+    FileCatalog::Instance().registerFile(outputfilename, *outputMetaData);
+  }
+  delete outputMetaData;
 }

@@ -26,12 +26,6 @@ using namespace Belle2;
 using namespace TrackFindingCDC;
 
 template <class AQuadTree>
-StereoHitTrackQuadTreeMatcher<AQuadTree>::StereoHitTrackQuadTreeMatcher() : Super()
-{
-  addProcessingSignalListener(&m_stereoHitFilter);
-}
-
-template <class AQuadTree>
 void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParameters(ModuleParamList* moduleParamList,
     const std::string& prefix)
 {
@@ -60,8 +54,6 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::exposeParameters(ModuleParamList*
                                 "Used to scale the CDC before checking "
                                 "whether hits are in the CDC z bounds.",
                                 m_param_checkForInWireBoundsFactor);
-
-  m_stereoHitFilter.exposeParameters(moduleParamList, prefix);
 }
 
 
@@ -153,80 +145,80 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::match(CDCTrack& track, const std:
 
   // There is the possibility that we have added one cdc hits twice (as left and right one). We search for those cases here:
   auto foundStereoHits = foundStereoHitsWithNode[0].second;
-  auto node = foundStereoHitsWithNode[0].first;
+  const auto& node = foundStereoHitsWithNode[0].first;
 
-  for (const auto& recoHit : foundStereoHits) {
-    recoHit.first.getWireHit().getAutomatonCell().unsetMaskedFlag();
-  }
+  // Remove all assigned hits, which where already found before (and do not need to be added again)
+  const auto& isAssignedHit = [](const CDCRecoHitWithRLPointer & recoHitWithRLPointer) {
+    const CDCRecoHit3D& recoHit3D = recoHitWithRLPointer.first;
+    const auto& automatonCell = recoHit3D.getWireHit().getAutomatonCell();
+    return automatonCell.hasAssignedFlag();
+  };
 
-  for (auto outerIterator = foundStereoHits.begin(); outerIterator != foundStereoHits.end();
-       ++outerIterator) {
-    bool isDoubled = false;
+  foundStereoHits.erase(std::remove_if(foundStereoHits.begin(),
+                                       foundStereoHits.end(),
+                                       isAssignedHit),
+                        foundStereoHits.end());
 
-    const CDCRecoHit3D& currentRecoHit3DOuter = outerIterator->first;
-    const CDCRLWireHit* currentRLWireHitOuter = outerIterator->second;
-    const CDCWireHit& currentWireHitOuter = currentRLWireHitOuter->getWireHit();
-    const CDCHit* currentHitOuter = currentWireHitOuter.getHit();
+  // Sort the found stereo hits by same CDCHit and smaller distance to the node
+  const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
+  const double lowerZ0 = node.getLowerZ0();
+  const double upperZ0 = node.getUpperZ0();
 
-    if (currentWireHitOuter.getAutomatonCell().hasMaskedFlag() or currentWireHitOuter.getAutomatonCell().hasAssignedFlag()) {
-      continue;
+  const auto& sortByHitAndNodeCenterDistance = [zSlopeMean, lowerZ0, upperZ0](const CDCRecoHitWithRLPointer & lhs,
+  const CDCRecoHitWithRLPointer & rhs) {
+
+    const CDCRecoHit3D& rhsRecoHit = rhs.first;
+    const CDCRecoHit3D& lhsRecoHit = lhs.first;
+
+    const CDCWireHit& rhsWireHit = rhsRecoHit.getWireHit();
+    const CDCWireHit& lhsWireHit = lhsRecoHit.getWireHit();
+
+    if (lhsWireHit < rhsWireHit) {
+      return true;
+    } else if (rhsWireHit < lhsWireHit)  {
+      return false;
+    } else {
+      const double lhsZ = lhsRecoHit.getRecoZ();
+      const double rhsZ = rhsRecoHit.getRecoZ();
+
+      const double lhsR = lhsRecoHit.getRecoPos2D().norm();
+      const double rhsR = rhsRecoHit.getRecoPos2D().norm();
+
+      const double lhsLambda1 = (lhsZ - lowerZ0) / lhsR;
+      const double lhsLambda2 = (lhsZ - upperZ0) / lhsR;
+
+      const double rhsLambda1 = (rhsZ - lowerZ0) / rhsR;
+      const double rhsLambda2 = (rhsZ - upperZ0) / rhsR;
+
+      const double lhsDistanceToNode = fabs((lhsLambda1 + lhsLambda2) / 2 - zSlopeMean);
+      const double rhsDistanceToNode = fabs((rhsLambda1 + rhsLambda2) / 2 - zSlopeMean);
+
+      return lhsDistanceToNode < rhsDistanceToNode;
     }
+  };
 
-    for (auto innerIterator = outerIterator; innerIterator != foundStereoHits.end(); ++innerIterator) {
-      const CDCRecoHit3D& currentRecoHit3DInner = innerIterator->first;
-      const CDCRLWireHit* currentRLWireHitInner = innerIterator->second;
-      const CDCWireHit& currentWireHitInner = currentRLWireHitInner->getWireHit();
-      const CDCHit* currentHitInner = currentWireHitInner.getHit();
+  const auto& sameHitComparer = [](const CDCRecoHitWithRLPointer & lhs,
+  const CDCRecoHitWithRLPointer & rhs) {
+    const CDCRecoHit3D& rhsRecoHit = rhs.first;
+    const CDCRecoHit3D& lhsRecoHit = lhs.first;
 
-      if (currentWireHitInner.getAutomatonCell().hasMaskedFlag() or currentWireHitInner.getAutomatonCell().hasAssignedFlag()) {
-        continue;
-      }
+    return lhsRecoHit.getWireHit().getHit() == rhsRecoHit.getWireHit().getHit();
+  };
 
-      if (innerIterator != outerIterator and currentHitOuter == currentHitInner) {
-        const double innerZ = currentRecoHit3DInner.getRecoZ();
-        const double outerZ = currentRecoHit3DOuter.getRecoZ();
+  std::sort(foundStereoHits.begin(),
+            foundStereoHits.end(),
+            sortByHitAndNodeCenterDistance);
 
-        const double innerR = currentRecoHit3DInner.getRecoPos2D().norm();
-        const double outerR = currentRecoHit3DOuter.getRecoPos2D().norm();
+  // If the same hit is added as right and left hypothesis, do only use the one with the smaller distance to the node.
+  foundStereoHits.erase(std::unique(foundStereoHits.begin(),
+                                    foundStereoHits.end(),
+                                    sameHitComparer),
+                        foundStereoHits.end());
 
-        const double lambda11 = (innerZ - node.getLowerZ0()) / innerR;
-        const double lambda12 = (innerZ - node.getUpperZ0()) / innerR;
-
-        const double lambda21 = (outerZ - node.getLowerZ0()) / outerR;
-        const double lambda22 = (outerZ - node.getUpperZ0()) / outerR;
-
-        const double zSlopeMean = (node.getLowerTanLambda() + node.getUpperTanLambda()) / 2.0;
-
-        if (fabs((lambda11 + lambda12) / 2 - zSlopeMean) < fabs((lambda21 + lambda22) / 2 - zSlopeMean)) {
-          const Weight weight = m_stereoHitFilter({&currentRecoHit3DInner, &track});
-          if (not std::isnan(weight)) {
-            relationsForCollector.emplace_back(&track, weight, currentRLWireHitInner);
-          }
-        } else {
-          const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
-          if (not std::isnan(weight)) {
-            relationsForCollector.emplace_back(&track, weight, currentRLWireHitOuter);
-          }
-        }
-
-        // currentWireHitInner = currentWireHitOuter, so it makes no difference here
-        currentWireHitInner.getAutomatonCell().setMaskedFlag();
-        isDoubled = true;
-        break;
-      }
-    }
-
-    if (not isDoubled) {
-      const Weight weight = m_stereoHitFilter({&currentRecoHit3DOuter, &track});
-      if (not std::isnan(weight)) {
-        relationsForCollector.emplace_back(&track, weight, currentRLWireHitOuter);
-      }
-    }
-  }
-
-  for (const auto& recoHit : foundStereoHits) {
-    recoHit.first.getWireHit().getAutomatonCell().unsetMaskedFlag();
-    recoHit.first.getWireHit().getAutomatonCell().unsetAssignedFlag();
+  // Add the found stereo hits to the relation vector. In the moment, all hits get the same weight (may change later).
+  for (const CDCRecoHitWithRLPointer& recoHitWithRLPointer : foundStereoHits) {
+    const CDCRLWireHit* rlWireHit = recoHitWithRLPointer.second;
+    relationsForCollector.emplace_back(&track, 0, rlWireHit);
   }
 }
 
@@ -240,4 +232,3 @@ void StereoHitTrackQuadTreeMatcher<AQuadTree>::writeDebugInformation()
 }
 
 template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendre>;
-//template class Belle2::TrackFindingCDC::StereoHitTrackQuadTreeMatcher<HitZ0TanLambdaLegendreUsingZ>;

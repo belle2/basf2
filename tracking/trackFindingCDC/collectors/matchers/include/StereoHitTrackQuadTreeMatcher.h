@@ -30,9 +30,6 @@ namespace Belle2 {
       typedef MatcherInterface<CDCTrack, CDCRLWireHit> Super;
 
     public:
-      /// Constructor
-      StereoHitTrackQuadTreeMatcher();
-
       /// Expose the parameters to the module.
       void exposeParameters(ModuleParamList* moduleParamList, const std::string& prefix) override;
 
@@ -72,9 +69,6 @@ namespace Belle2 {
 
       /// Quad tree instance
       AQuadTree m_quadTreeInstance;
-
-      /// The used filter.
-      ChooseableFilter<StereoHitFilterFactory> m_stereoHitFilter;
     };
   }
 }

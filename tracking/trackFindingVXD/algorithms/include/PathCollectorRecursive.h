@@ -103,7 +103,7 @@ namespace Belle2 {
 /// public Data members:
 
     /** parameter for setting minimal path length: (path length == number of nodes collected in a row from given network, this is not necessarily number of hits! */
-    unsigned int minPathLength = 3;
+    unsigned int minPathLength = 2;
 
 
     /** simple counter for number of trees found */

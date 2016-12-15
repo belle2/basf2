@@ -27,7 +27,7 @@ namespace Belle2 {
     class StereoHitTrackQuadTreeMatcher : public MatcherInterface<CDCTrack, CDCRLWireHit> {
 
       /// The parent class.
-      typedef MatcherInterface<CDCTrack, CDCRLWireHit> Super;
+      using Super = MatcherInterface<CDCTrack, CDCRLWireHit>;
 
     public:
       /// Expose the parameters to the module.

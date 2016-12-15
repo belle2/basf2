@@ -27,7 +27,8 @@ namespace Belle2 {
      *  */
     class StereoHitFinderCDCLegendreHistogrammingModule : public FindletModule<StereoHitFinder> {
 
-      typedef FindletModule<StereoHitFinder> Super;
+      /// The base class
+      using Super = FindletModule<StereoHitFinder>;
 
     public:
       /** Tries to add CDC stereo hits to the found CDC tracks by applying a histogramming method with a quad tree. */

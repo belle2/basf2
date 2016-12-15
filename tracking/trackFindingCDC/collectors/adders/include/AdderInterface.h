@@ -19,7 +19,7 @@ namespace Belle2 {
       public Findlet<WeightedRelation<ACollectorItem, const ACollectionItem>&> {
     public:
       /// Shortcut class name for a weighted relation between a collector item and a collection item.
-      typedef WeightedRelation<ACollectorItem, const ACollectionItem> WeightedRelationItem;
+      using WeightedRelationItem = WeightedRelation<ACollectorItem, const ACollectionItem>;
 
       void apply(std::vector<WeightedRelationItem>& weightedRelations) override
       {

@@ -100,6 +100,12 @@ namespace Belle2 {
         return getWeightedFrom().second;
       }
 
+      /// Setter for the weight
+      void setWeight(Weight weight)
+      {
+        this->first.second = weight;
+      }
+
       /// Getter for the pointer to the weighted from side object
       const std::pair<From*, Weight>& getWeightedFrom() const
       {

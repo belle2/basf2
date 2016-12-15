@@ -22,6 +22,8 @@ using namespace   Belle2;
 namespace po = boost::program_options;
 namespace fs = boost::filesystem;
 
+/** Simple typedef to conveniently define a exp,run,evt structure with a
+ * working comparison operator */
 typedef std::tuple<int, int, unsigned int> EventInfo;
 
 int main(int argc, char* argv[])

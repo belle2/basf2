@@ -148,7 +148,7 @@ def setup_mcTF(
         return None
 
 
-def setup_gfTCtoSPTCConverters(
+def setup_gfTtoSPTCConverters(
         path=0,
         pxdSPs='pxdOnly',
         svdSPs='nosingleSP',
@@ -157,7 +157,7 @@ def setup_gfTCtoSPTCConverters(
         usePXD=True,
         logLevel=LogLevel.INFO,
         debugVal=1):
-    """This function adds the modules needed to convert genfit-TCs to SpacePointTCs to given path.
+    """This function adds the modules needed to convert GenFit-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
     If a path is given, 'None' is returned but will be added to given path instead.

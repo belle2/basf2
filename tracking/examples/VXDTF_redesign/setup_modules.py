@@ -172,16 +172,16 @@ def setup_VXDTF2(path=None,
         return modules
 
 
-def setup_gfTCtoSPTCConverters(
+def setup_RTCtoSPTCConverters(
         path=0,
         pxdSPs='pxdOnly',
         svdSPs='nosingleSP',
-        gfTCinput='mcTracks',
+        RTCinput='mcTracks',
         sptcOutput='checkedSPTCs',
         usePXD=True,
         logLevel=LogLevel.INFO,
         debugVal=1):
-    """This function adds the modules needed to convert genfit-TCs to SpacePointTCs to given path.
+    """This function adds the modules needed to convert Reco-TCs to SpacePointTCs to given path.
 
     @param path if set to 0 (standard) the created modules will not be added, but returned.
     If a path is given, 'None' is returned but will be added to given path instead.
@@ -190,7 +190,7 @@ def setup_gfTCtoSPTCConverters(
 
     @param svdSPs the name of the storeArray containing SVDSPs.
 
-    @param gfTCinput defines the name of input-genfit-TCs.
+    @param RTCinput defines the name of input-Reco-TCs.
 
     @param sptcOutput defines the name of output-SPTCs.
 
@@ -200,7 +200,7 @@ def setup_gfTCtoSPTCConverters(
 
     @param debugVal set to debugLevel of choice - will be ignored if logLevel is not set to LogLevel.DEBUG
     """
-    print("setup gfTCtoSPTCConverters...")
+    print("setup RTCtoSPTCConverters...")
     doPXD = 0
     spacePointNames = []
     detectorTypes = []
@@ -236,7 +236,7 @@ def setup_gfTCtoSPTCConverters(
     # TCConverter, RecoTrack -> SPTC
     recoTrackCandConverter = register_module('RT2SPTCConverter')
     recoTrackCandConverter.logging.log_level = logLevel
-    recoTrackCandConverter.param('RecoTracksName', gfTCinput)
+    recoTrackCandConverter.param('RecoTracksName', RTCinput)
     recoTrackCandConverter.param('SpacePointTCName', 'SPTracks')
     recoTrackCandConverter.param('SVDDoubleClusterSP', svdSPs)
     recoTrackCandConverter.param('useTrueHits', False)

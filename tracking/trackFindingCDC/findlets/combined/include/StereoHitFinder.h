@@ -26,11 +26,11 @@ namespace Belle2 {
     class CDCWireHit;
     class CDCTrack;
 
-    class StereoHitFinder : public Findlet<CDCWireHit&, CDCTrack> {
+    class StereoHitFinder : public Findlet<CDCWireHit&, CDCTrack&> {
 
     private:
       /// Type of the base class
-      using Super = Findlet<CDCWireHit&, CDCTrack>;
+      using Super = Findlet<CDCWireHit&, CDCTrack&>;
 
     public:
       /// Constructor registering the subordinary findlets to the processing signal distribution machinery

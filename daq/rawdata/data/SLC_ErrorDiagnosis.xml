@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ErrorMessageDiagnosis>
+    <Error>
+        <Type>COPPER_ROPC</Type>
+        <Message>Failed to bind.(Address already in use) Maybe other programs have already occupied this port</Message>
+        <Diagnosis>DAQ process maybe in the prev. run remains on COPPER, abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
+    </Error>
+    <Error>
+        <Type>COPPER_ROPC</Type>
+        <Message>CORRUPTED DATA: Different event number over HSLBs</Message>
+        <Diagnosis>DAQ process maybe in the prev. run remains on $CPR010, abort and try again. If the same error occurs, contact with DAQ(copper/ROPC) experts.</Diagnosis>
+    </Error>
+    <Error>
+        <Type>COPPER_ROPC</Type>
+        <Message>CORRUPTED DATA: Invalid event_number. Exiting...:</Message>
+        <Diagnosis>Event # jump. Retry after ABORT and LOAD. If the same error occurs, contact with DAQ(copper/ROPC) experts</Diagnosis>
+    </Error>
+
+    <Error>
+        <Type>SLOW_CONTROL</Type>
+        <Message>OK from</Message>
+        <Diagnosis>No problem.</Diagnosis>
+    </Error>
+</ErrorMessageDiagnosis>

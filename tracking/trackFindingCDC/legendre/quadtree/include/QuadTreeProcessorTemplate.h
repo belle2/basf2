@@ -112,8 +112,6 @@ namespace Belle2 {
        * For every item in a node and every child node this function gets called and should decide, if the item should go into this child node or not.
        * @param node  child node
        * @param item  item to be filled into the child node or not
-       * @param iX    index in x axes of the node
-       * @param iY    index in y axes of the node
        * @return true if this item belongs into this node.
        */
       virtual bool insertItemInNode(QuadTree* node, typeData* item) const = 0;
@@ -124,14 +122,10 @@ namespace Belle2 {
        */
       virtual void afterFillDebugHook(QuadTreeChildren* children)
       {
-        if (m_debugOutput) {
-          children->apply(
-          [&](QuadTree * childNode) {
-            if (childNode->getLevel() == getLastLevel()) {
-              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItems()));
-            }
-          }
-          );
+        if (not m_debugOutput) return;
+        for (QuadTree* childNode : *children) {
+          if (childNode->getLevel() != getLastLevel()) continue; // Only write the lowest level
+          m_debugOutputMap[ {childNode->getXMean(), childNode->getYMean()}] = childNode->getItems();
         }
       }
 
@@ -201,19 +195,17 @@ namespace Belle2 {
       virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items)
       {
         const size_t neededSize = 2 * items.size();
-        node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveItems(neededSize);});
+        for (QuadTree* child : *node->getChildren()) {
+          child->reserveItems(neededSize);
+        }
 
         //Voting within the four bins
         for (ItemType* item : items) {
-          if (item->isUsed()) {
-            continue;
-          }
+          if (item->isUsed()) continue;
 
-          for (int t_index = 0; t_index < binCountX; ++t_index) {
-            for (int r_index = 0; r_index < binCountY; ++r_index) {
-              if (insertItemInNode(node->getChildren()->get(t_index, r_index), item->getPointer())) {
-                node->getChildren()->get(t_index, r_index)->insertItem(item);
-              }
+          for (QuadTree* child : *node->getChildren()) {
+            if (insertItemInNode(child, item->getPointer())) {
+              child->insertItem(item);
             }
           }
         }
@@ -240,7 +232,10 @@ namespace Belle2 {
        * Internal function to do the real quad tree search: fill the nodes, check which of the n*m bins we need to
        * process further and go one level deeper.
        */
-      void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
+      void fillGivenTree(QuadTree* node,
+                         CandidateProcessorLambda& lmdProcessor,
+                         unsigned int nItemsThreshold,
+                         typeY rThreshold,
                          bool checkThreshold)
       {
         B2DEBUG(100, "startFillingTree with " << node->getItems().size() << " hits at level " << static_cast<unsigned int>
@@ -270,42 +265,21 @@ namespace Belle2 {
           node->setFilled();
         }
 
-        constexpr int m_nbins_theta = binCountX;
-        constexpr int m_nbins_r = binCountY;
+        std::vector<QuadTree*> children(node->getChildren()->begin(), node->getChildren()->end());
+        const auto compareNItems = [](const QuadTree * lhs, const QuadTree * rhs) {
+          return lhs->getNItems() < rhs->getNItems();
+        };
 
-        bool binUsed[m_nbins_theta][m_nbins_r];
-        for (int iX = 0; iX < m_nbins_theta; iX++) {
-          for (int iY = 0; iY < m_nbins_r; iY++) {
-            binUsed[iX][iY] = false;
-          }
-        }
-
-        //Processing, which bins are further investigated
-        for (int bin_loop = 0; bin_loop < binCountX * binCountY; bin_loop++) {
-
-          // Search for the bin with the highest bin content.
-          int xIndexMax = 0;
-          int yIndexMax = 0;
-          size_t maxValue = 0;
-          for (int xIndexLoop = 0; xIndexLoop < binCountX; ++xIndexLoop) {
-            for (int yIndexLoop = 0; yIndexLoop < binCountY; ++yIndexLoop) {
-              if ((maxValue < node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems())
-                  && (!binUsed[xIndexLoop][yIndexLoop])) {
-                maxValue = node->getChildren()->get(xIndexLoop, yIndexLoop)->getNItems();
-                xIndexMax = xIndexLoop;
-                yIndexMax = yIndexLoop;
-              }
-            }
-          }
-
-          // Go down one level for the bin with the maximum number of items in it
-          binUsed[xIndexMax][yIndexMax] = true;
-
-          // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
-          this->cleanUpItems(node->getChildren()->get(xIndexMax, yIndexMax)->getItems());
-
-          this->fillGivenTree(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
-
+        // Explicitly count down the children
+        const int nChildren = children.size();
+        for (int iChild = 0; iChild < nChildren; ++iChild) {
+          auto itHeaviestChild = std::max_element(children.begin(), children.end(), compareNItems);
+          QuadTree* heaviestChild = *itHeaviestChild;
+          children.erase(itHeaviestChild);
+          // After we have processed some children we need to get rid of the already used hits in all the children,
+          // because this can change the number of items drastically
+          this->cleanUpItems(heaviestChild->getItems());
+          this->fillGivenTree(heaviestChild, lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
         }
       }
 

@@ -33,7 +33,7 @@ namespace {
     std::sort(relations.begin(), relations.end());
     selector.apply(relations);
 
-    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
+    std::sort(relations.begin(), relations.end(), GreaterWeight());
 
     ASSERT_EQ(relations.size(), 2);
     ASSERT_EQ(relations[0].getWeight(), 1.0);
@@ -64,7 +64,7 @@ namespace {
     std::sort(relations.begin(), relations.end());
     selector.apply(relations);
 
-    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
+    std::sort(relations.begin(), relations.end(), GreaterWeight());
 
     ASSERT_EQ(relations.size(), 3);
     ASSERT_EQ(relations[0].getWeight(), 1.1);
@@ -102,7 +102,7 @@ namespace {
     std::sort(relations.begin(), relations.end());
     selector.apply(relations);
 
-    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
+    std::sort(relations.begin(), relations.end(), GreaterWeight());
 
     ASSERT_EQ(relations.size(), 1);
     ASSERT_EQ(relations[0].getWeight(), 1.0);

@@ -57,7 +57,7 @@ namespace Belle2 {
           const auto& matches = collectionItemToMatches.second;
 
           if (not m_param_useOnlySingleBestCandidate or matches.size() == 1) {
-            const auto& bestMatch = std::min_element(matches.begin(), matches.end(), WeightedRelationsGreater<WeightedRelationItem>());
+            const auto& bestMatch = std::min_element(matches.begin(), matches.end(), GreaterWeight());
             weightedRelations.push_back(*bestMatch);
           }
         }

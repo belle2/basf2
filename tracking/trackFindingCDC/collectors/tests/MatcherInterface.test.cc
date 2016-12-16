@@ -35,7 +35,7 @@ namespace {
     std::sort(relations.begin(), relations.end());
     matcher.apply(collectorItems, collectionItems, relations);
 
-    std::sort(relations.begin(), relations.end(), WeightedRelationsGreater<WeightedRelation<int, const double>>());
+    std::sort(relations.begin(), relations.end(), GreaterWeight());
 
     ASSERT_EQ(relations.size(), 6);
     ASSERT_EQ(relations[5].getWeight(), 3.1);

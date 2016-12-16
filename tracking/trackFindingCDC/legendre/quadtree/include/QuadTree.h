@@ -44,7 +44,7 @@ namespace Belle2 {
 
     public:
       /// Type of this class
-      using ThisType = QuadTreeTemplate<AX, AY, AItem>;
+      using This = QuadTreeTemplate<AX, AY, AItem>;
 
       /// Type to store the minimum, center and maximum of the bins in X direction
       using XBinBounds = std::array<AX, 3>;
@@ -53,20 +53,10 @@ namespace Belle2 {
       using YBinBounds = std::array<AY, 3>;
 
       /// Type of the child node structure for this node.
-      using Children = QuadChildrenTemplate<ThisType>;
+      using Children = QuadTreeChildrenTemplate<This>;
 
       /// Constructor
-      QuadTreeTemplate()
-        : m_level(0)
-        , m_parent(nullptr)
-        , m_filled(false)
-      {
-        m_xBinBounds.fill(0);
-        m_yBinBounds.fill(0);
-      }
-
-      /// Constructor
-      QuadTreeTemplate(AX xMin, AX xMax, AY yMin, AY yMax, int level, ThisType* parent)
+      QuadTreeTemplate(AX xMin, AX xMax, AY yMin, AY yMax, int level, This* parent)
         : m_level(level)
         , m_parent(level > 0 ? parent : nullptr)
         , m_filled(false)
@@ -151,7 +141,7 @@ namespace Belle2 {
       };
 
       /** Return pointer to the parent of the node */
-      ThisType* getParent() const
+      This* getParent() const
       {
         return m_parent;
       };
@@ -240,7 +230,7 @@ namespace Belle2 {
       unsigned char m_level;
 
       /// Pointer to the parent node
-      ThisType* m_parent;
+      This* m_parent;
 
       /// Vector of items which belongs to the node
       std::vector<AItem*> m_items;

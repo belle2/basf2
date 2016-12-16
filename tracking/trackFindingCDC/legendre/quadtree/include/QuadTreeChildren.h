@@ -31,7 +31,7 @@ namespace Belle2 {
      * @tparam ANode type of the QuadTree
      */
     template<typename ANode>
-    class QuadChildrenTemplate {
+    class QuadTreeChildrenTemplate {
     public:
       /// Number of children in X direction
       static constexpr const size_t c_nXBins = 2;
@@ -43,13 +43,13 @@ namespace Belle2 {
       using iterator = typename std::array<ANode*, c_nYBins* c_nXBins>::const_iterator;
 
       /// Constructor
-      QuadChildrenTemplate()
+      QuadTreeChildrenTemplate()
         : m_children{} // initialize to nullptr
       {
       }
 
       /// Destructor destroying the owned pointers
-      ~QuadChildrenTemplate()
+      ~QuadTreeChildrenTemplate()
       {
         for (ANode* node : m_children) {
           delete node;

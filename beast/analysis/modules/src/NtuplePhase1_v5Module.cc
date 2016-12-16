@@ -75,8 +75,10 @@ namespace Belle2 {
     addParam("input_P_HER", m_input_P_HER, "HER pressure");
     addParam("input_P_LER", m_input_P_LER, "LER pressure");
 
-    addParam("input_sigma_HER", m_input_sigma_HER, "HER beam size");
-    addParam("input_sigma_LER", m_input_sigma_LER, "LER beam size");
+    addParam("input_sigma_HER", m_input_sigma_x_HER, "HER beam size");
+    addParam("input_sigma_LER", m_input_sigma_x_LER, "LER beam size");
+    addParam("input_sigma_HER", m_input_sigma_y_HER, "HER beam size");
+    addParam("input_sigma_LER", m_input_sigma_y_LER, "LER beam size");
 
     addParam("input_bunchNb_HER", m_input_bunchNb_HER, "HER bunch number");
     addParam("input_bunchNb_LER", m_input_bunchNb_LER, "LER bunch number");
@@ -631,8 +633,10 @@ namespace Belle2 {
     m_treeTruth->Branch("SAD_I_LER", &(m_input_I_LER));
     m_treeTruth->Branch("SAD_P_HER", &(m_input_P_HER));
     m_treeTruth->Branch("SAD_P_LER", &(m_input_P_LER));
-    m_treeTruth->Branch("SAD_sigma_HER", &(m_input_sigma_HER));
-    m_treeTruth->Branch("SAD_sigma_LER", &(m_input_sigma_LER));
+    m_treeTruth->Branch("SAD_sigma_x_HER", &(m_input_sigma_x_HER));
+    m_treeTruth->Branch("SAD_sigma_x_LER", &(m_input_sigma_x_LER));
+    m_treeTruth->Branch("SAD_sigma_y_HER", &(m_input_sigma_y_HER));
+    m_treeTruth->Branch("SAD_sigma_y_LER", &(m_input_sigma_y_LER));
     m_treeTruth->Branch("SAD_bunchNb_HER", &(m_input_bunchNb_HER));
     m_treeTruth->Branch("SAD_bunchNb_LER", &(m_input_bunchNb_LER));
 
@@ -773,25 +777,45 @@ namespace Belle2 {
         && m_beast.SKB_LER_pressure_average->size() > 0) P_LER = m_beast.SKB_LER_pressure_average->at(0) * 0.00750062 * 1e9 * 3.;
     if (m_input_P_LER[1] > 0) P_LER += gRandom->Gaus(0, m_input_P_LER[1]);
     double sigma_y_HER = 0;
+    double sigma_x_HER = 0;
     if (m_beast.SKB_HER_correctedBeamSize_xray_Y != 0
         && m_beast.SKB_HER_beamSize_xray_Y != 0
-        && m_beast.SKB_HER_correctedBeamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0);
+        && m_beast.SKB_HER_correctedBeamSize_xray_Y->size() > 0) {
+      sigma_y_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0);
+
+      if (m_beast.SKB_HER_beamSize_SR_X != 0 && m_beast.SKB_HER_beamSize_SR_Y
+          && m_beast.SKB_HER_beamSize_SR_X->size() > 0
+          && m_beast.SKB_HER_beamSize_SR_Y->size() > 0)
+        sigma_x_HER = m_beast.SKB_HER_correctedBeamSize_xray_Y->at(0) *  m_beast.SKB_HER_beamSize_SR_X->at(
+                        0) /  m_beast.SKB_HER_beamSize_SR_Y->at(0);
+    }
     /*
     if (m_beast.SKB_HER_beamSize_xray_Y != 0
         && m_beast.SKB_HER_beamSize_xray_Y != 0
         && m_beast.SKB_HER_beamSize_xray_Y->size() > 0) sigma_y_HER = m_beast.SKB_HER_beamSize_xray_Y->at(0);
     */
-    if (m_input_sigma_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_HER[1]);
+    if (m_input_sigma_x_HER[1] > 0) sigma_x_HER += gRandom->Gaus(0, m_input_sigma_x_HER[1]);
+    if (m_input_sigma_y_HER[1] > 0) sigma_y_HER += gRandom->Gaus(0, m_input_sigma_y_HER[1]);
     double sigma_y_LER = 0;
+    double sigma_x_LER = 0;
     if (m_beast.SKB_LER_correctedBeamSize_xray_Y != 0
         && m_beast.SKB_LER_beamSize_xray_Y != 0
-        && m_beast.SKB_LER_correctedBeamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0);
+        && m_beast.SKB_LER_correctedBeamSize_xray_Y->size() > 0) {
+      sigma_y_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0);
+
+      if (m_beast.SKB_LER_beamSize_SR_X != 0 && m_beast.SKB_LER_beamSize_SR_Y
+          && m_beast.SKB_LER_beamSize_SR_X->size() > 0
+          && m_beast.SKB_LER_beamSize_SR_Y->size() > 0)
+        sigma_x_LER = m_beast.SKB_LER_correctedBeamSize_xray_Y->at(0) *  m_beast.SKB_LER_beamSize_SR_X->at(
+                        0) /  m_beast.SKB_LER_beamSize_SR_Y->at(0);
+    }
     /*
     if (m_beast.SKB_LER_beamSize_xray_Y != 0
         && m_beast.SKB_LER_beamSize_xray_Y != 0
         && m_beast.SKB_LER_beamSize_xray_Y->size() > 0) sigma_y_LER = m_beast.SKB_LER_beamSize_xray_Y->at(0);
     */
-    if (m_input_sigma_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_LER[1]);
+    if (m_input_sigma_x_LER[1] > 0) sigma_x_LER += gRandom->Gaus(0, m_input_sigma_x_LER[1]);
+    if (m_input_sigma_y_LER[1] > 0) sigma_y_LER += gRandom->Gaus(0, m_input_sigma_y_LER[1]);
     double bunch_nb_HER = 0;
     if (m_beast.SKB_HER_injectionNumberOfBunches != 0
         && m_beast.SKB_HER_injectionNumberOfBunches->size() > 0) bunch_nb_HER = m_beast.SKB_HER_injectionNumberOfBunches->at(0);
@@ -898,12 +922,20 @@ namespace Belle2 {
     //Calculate Touschek scaling factor: Touschek \propo I^2 / (bunch_nb x sigma_y) => (I^2/(bunch_nb x sigma_y))^data / (I^2/(bunch_nb x sigma_y))^simu
     double ScaleFacTo_HER = 0;
     double ScaleFacTo_LER = 0;
-    if (bunch_nb_LER > 0 && sigma_y_LER > 0 && I_LER > 0)
-      ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
-                                    2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_LER[0]);
-    if (bunch_nb_HER > 0 && sigma_y_HER > 0 && I_HER > 0)
-      ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
-                                    2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_HER[0]);
+    if (bunch_nb_LER > 0 && sigma_y_LER > 0 && I_LER > 0) {
+      if (m_input_ToSol == 0) ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
+                                                              2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) / (sigma_y_LER / m_input_sigma_y_LER[0]);
+      else if (m_input_ToSol == 1) ScaleFacTo_LER = TMath::Power(I_LER / m_input_I_LER[0],
+                                                                   2) / (bunch_nb_LER / m_input_bunchNb_LER[0]) /
+                                                      (sqrt(sigma_y_LER * sigma_x_LER / m_input_sigma_y_LER[0] / m_input_sigma_x_LER[0]));
+    }
+    if (bunch_nb_HER > 0 && sigma_y_HER > 0 && I_HER > 0) {
+      if (m_input_ToSol == 0) ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
+                                                              2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) / (sigma_y_HER / m_input_sigma_y_HER[0]);
+      else if (m_input_ToSol == 1) ScaleFacTo_HER = TMath::Power(I_HER / m_input_I_HER[0],
+                                                                   2) / (bunch_nb_HER / m_input_bunchNb_HER[0]) /
+                                                      (sqrt(sigma_y_HER * sigma_x_HER / m_input_sigma_y_HER[0] / m_input_sigma_x_HER[0]));
+    }
 
     //Scale LER SAD RLR
     for (int i = 0; i < (int)m_input_LT_SAD_RLR.size(); i++) {

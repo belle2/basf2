@@ -80,6 +80,7 @@ namespace Belle2 {
     std::vector<std::string> m_inputFileNames; /**< list of file names */
 
     Int_t m_input_BGSol; /**< time stamp start and stop */
+    Int_t m_input_ToSol; /**< time stamp start and stop */
 
     std::vector<std::string> m_inputRateHistoNames; /**< list of file names */
     std::vector<std::string> m_inputDoseHistoNames; /**< list of file names */
@@ -199,8 +200,10 @@ namespace Belle2 {
     Double_t m_input_data_bunchNb_HER; /**< HER bunch number and error */
     std::string m_input_data_SingleBeam; /**< LER or HER or Both*/
 
-    std::vector<Double_t> m_input_sigma_LER; /**< LER beam size and errors */
-    std::vector<Double_t> m_input_sigma_HER; /**< HER beam size and errors */
+    std::vector<Double_t> m_input_sigma_x_LER; /**< LER beam size and errors */
+    std::vector<Double_t> m_input_sigma_x_HER; /**< HER beam size and errors */
+    std::vector<Double_t> m_input_sigma_y_LER; /**< LER beam size and errors */
+    std::vector<Double_t> m_input_sigma_y_HER; /**< HER beam size and errors */
 
     std::vector<Double_t> m_input_LB_SAD_RLR; /**< list of SAD_RLR LB dose */
     std::vector<Double_t> m_input_HB_SAD_RLR; /**< list of SAD_RLR HB dose */

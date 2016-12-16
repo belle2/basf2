@@ -17,6 +17,7 @@
 #include <map>
 #include <vector>
 #include <utility>
+#include <cmath>
 
 namespace Belle2 {
   namespace TrackFindingCDC {
@@ -94,15 +95,15 @@ namespace Belle2 {
        * It is called when creating the nodes. The two indices iX and iY tell you where the new node will be created (as node.children[iX][iY]).
        * You can check some information on the level or the x- or y-values by using the methods implemented for node.
        * @return a ChildRange pair of a x- and a y-range that the new child range should have.
-       * If you don nt want to provide custom ranges, just return ChildRanges(rangeX(node->getXBin(iX), node->getXBin(iX + 1)),
-       * rangeY(node->getYBin(iY), node->getYBin(iY + 1)));
+       * If you don nt want to provide custom ranges, just return ChildRanges(rangeX(node->getXBinBound(iX), node->getXBinBound(iX + 1)),
+       * rangeY(node->getYBinBound(iY), node->getYBinBound(iY + 1)));
        */
       virtual ChildRanges createChildWithParent(QuadTree* node, unsigned int iX, unsigned int iY) const
       {
-        typeX xMin = node->getXBin(iX);
-        typeX xMax = node->getXBin(iX + 1);
-        typeY yMin = node->getYBin(iY);
-        typeY yMax = node->getYBin(iY + 1);
+        typeX xMin = node->getXBinBound(iX);
+        typeX xMax = node->getXBinBound(iX + 1);
+        typeY yMin = node->getYBinBound(iY);
+        typeY yMax = node->getYBinBound(iY + 1);
         return ChildRanges(rangeX(xMin, xMax), rangeY(yMin, yMax));
       }
 
@@ -248,7 +249,7 @@ namespace Belle2 {
           return;
         }
         if (checkThreshold) {
-          if ((node->getYMin() * node->getYMax() >= 0) && (fabs(node->getYMin()) > rThreshold) &&
+          if ((node->getYMin() * node->getYMax() >= 0) && (std::fabs(node->getYMin()) > rThreshold) &&
               (fabs(node->getYMax()) > rThreshold)) {
             return;
           }

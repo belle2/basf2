@@ -165,48 +165,48 @@ namespace Belle2 {
         if (not m_standartBinning) {
           if ((node->getLevel() > (getLastLevel() - 7)) && (fabs(node->getYMean()) > 0.005)) {
             if (node->getLevel() < (getLastLevel() - 5)) {
-              float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 4.;
-              float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 4.;
+              float r1 = node->getYBinBound(j) - fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 4.;
+              float r2 = node->getYBinBound(j + 1) + fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 4.;
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 4);
 
-              unsigned long theta1 = node->getXBin(i);
+              unsigned long theta1 = node->getXBinBound(i);
               if (theta1 <= extension) {
                 theta1 = 0;
               } else {
                 theta1 -= extension;
               }
 
-              unsigned long theta2 = node->getXBin(i + 1) + extension;
+              unsigned long theta2 = node->getXBinBound(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-                theta2 = node->getXBin(i + 1);
+                theta2 = node->getXBinBound(i + 1);
               }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             } else {
-              float r1 = node->getYBin(j) - fabs(node->getYBin(j + 1) - node->getYBin(j)) / 8.;
-              float r2 = node->getYBin(j + 1) + fabs(node->getYBin(j + 1) - node->getYBin(j))  / 8.;
+              float r1 = node->getYBinBound(j) - fabs(node->getYBinBound(j + 1) - node->getYBinBound(j)) / 8.;
+              float r2 = node->getYBinBound(j + 1) + fabs(node->getYBinBound(j + 1) - node->getYBinBound(j))  / 8.;
               unsigned long extension = static_cast<unsigned long>(pow(2, getLastLevel() - node->getLevel()) / 8);
 
-              unsigned long theta1 = node->getXBin(i);
+              unsigned long theta1 = node->getXBinBound(i);
               if (theta1 <= extension) {
                 theta1 = 0;
               } else {
                 theta1 -= extension;
               }
 
-              unsigned long theta2 = node->getXBin(i + 1) + extension;
+              unsigned long theta2 = node->getXBinBound(i + 1) + extension;
               if (theta2 >= TrigonometricalLookupTable<>::Instance().getNBinsTheta()) {
-                theta2 = node->getXBin(i + 1);
+                theta2 = node->getXBinBound(i + 1);
               }
 
               return ChildRanges(rangeX(theta1, theta2), rangeY(r1, r2));
             }
-          } else {
-            return ChildRanges(rangeX(node->getXBin(i), node->getXBin(i + 1)), rangeY(node->getYBin(j), node->getYBin(j + 1)));
           }
-        } else {
-          return ChildRanges(rangeX(node->getXBin(i), node->getXBin(i + 1)), rangeY(node->getYBin(j), node->getYBin(j + 1)));
         }
+
+        // Standard bin division
+        return ChildRanges(rangeX(node->getXBinBound(i), node->getXBinBound(i + 1)),
+                           rangeY(node->getYBinBound(j), node->getYBinBound(j + 1)));
       }
 
       /**

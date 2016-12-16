@@ -46,13 +46,13 @@ namespace Belle2 {
       /// Type of this class
       using ThisType = QuadTreeTemplate<AX, AY, AItem>;
 
-      /// store the minimum, center and maximum of this bin in X direction (in this order in the tuple)
-      using XBinTuple = std::array<AX, 3>;
+      /// Type to store the minimum, center and maximum of the bins in X direction
+      using XBinBounds = std::array<AX, 3>;
 
-      /// store the minimum, center and maximum of this bin in Y direction (in this order in the tuple)
-      using YBinTuple = std::array<AY, 3>;
+      /// Type to store the minimum, center and maximum of the bins in Y direction
+      using YBinBounds = std::array<AY, 3>;
 
-      /// type of the child nodes hold by this node
+      /// Type of the child node structure for this node.
       using Children = QuadChildrenTemplate<ThisType>;
 
       /// Constructor
@@ -61,8 +61,8 @@ namespace Belle2 {
         , m_parent(nullptr)
         , m_filled(false)
       {
-        m_xBins.fill(0);
-        m_yBins.fill(0);
+        m_xBinBounds.fill(0);
+        m_yBinBounds.fill(0);
       }
 
       /// Constructor
@@ -73,7 +73,7 @@ namespace Belle2 {
       {
         // ensure the level value fits into unsigned char
         B2ASSERT("QuadTree datastructure only supports levels < 255", level < 255);
-        computeBins(xMin, xMax, yMin, yMax);
+        computeBinBounds(xMin, xMax, yMin, yMax);
       }
 
       /** Insert item into node */
@@ -159,82 +159,82 @@ namespace Belle2 {
       /** Get number of bins in "r" direction */
       constexpr int getXNbins() const
       {
-        return m_xBins.size() - 1;
+        return m_xBinBounds.size() - 1;
       }
 
       /** Get minimal "r" value of the node */
       AX getXMin() const
       {
-        return m_xBins[0];
+        return m_xBinBounds[0];
       };
 
       /** Get mean value of r */
       AX getXMean() const
       {
-        return m_xBins[1];
+        return m_xBinBounds[1];
       };
 
       /** Get maximal "r" value of the node */
       AX getXMax() const
       {
-        return m_xBins[2];
+        return m_xBinBounds[2];
       };
 
       /** Get "r" value of given bin border */
-      AX getXBin(int bin) const
+      AX getXBinBound(int bin) const
       {
-        return m_xBins[bin];
+        return m_xBinBounds[bin];
       };
 
       /** Get number of bins in "Theta" direction */
       constexpr int getYNbins() const
       {
-        return m_yBins.size() - 1;
+        return m_yBinBounds.size() - 1;
       }
 
       /** Get minimal "Theta" value of the node */
       AY getYMin() const
       {
-        return m_yBins[0];
+        return m_yBinBounds[0];
       };
 
       /** Get mean value of theta */
       AY getYMean() const
       {
-        return m_yBins[1];
+        return m_yBinBounds[1];
       };
 
       /** Get maximal "Theta" value of the node */
       AY getYMax() const
       {
-        return m_yBins[2];
+        return m_yBinBounds[2];
       };
 
       /** Get "r" value of given bin border */
-      AY getYBin(int bin) const
+      AY getYBinBound(int bin) const
       {
-        return m_yBins[bin];
+        return m_yBinBounds[bin];
       };
 
     private:
       /// sets the x and y bin values and computes the bin centers
-      void computeBins(AX xMin, AX xMax, AY yMin, AY yMax)
+      void computeBinBounds(AX xMin, AX xMax, AY yMin, AY yMax)
       {
-        m_xBins[0] = xMin;
-        m_xBins[1] = xMin + (xMax - xMin) / 2;
-        m_xBins[2] = xMax;
+        m_xBinBounds[0] = xMin;
+        m_xBinBounds[1] = xMin + (xMax - xMin) / 2;
+        m_xBinBounds[2] = xMax;
 
-        m_yBins[0] = yMin;
-        m_yBins[1] = yMin + (yMax - yMin) / 2;
-        m_yBins[2] = yMax;
+        m_yBinBounds[0] = yMin;
+        m_yBinBounds[1] = yMin + (yMax - yMin) / 2;
+        m_yBinBounds[2] = yMax;
       }
 
     private:
       /// bins range on r
-      XBinTuple m_xBins;
+      XBinBounds m_xBinBounds;
 
       /// bins range on theta
-      YBinTuple m_yBins;
+      YBinBounds m_yBinBounds;
 
       /// Level of node in the tree
       unsigned char m_level;

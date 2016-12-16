@@ -199,8 +199,8 @@ The following restrictions apply:
                 fileMetaData->getRelease() << " != " << outputMetaData->getRelease());
       }
       if(fileMetaData->getSteering() != outputMetaData->getSteering()){
-        B2ERROR("Steering in " << input << " differs from previous files: " <<
-                fileMetaData->getSteering() << " != " << outputMetaData->getSteering());
+        // printing both steering files is not useful for anyone so just throw an error
+        B2ERROR("Steering file for " << input << " differs from previous files.");
       }
       if(fileMetaData->getDatabaseGlobalTag() != outputMetaData->getDatabaseGlobalTag()){
         B2ERROR("Database globalTag in " << input << " differs from previous files: " <<

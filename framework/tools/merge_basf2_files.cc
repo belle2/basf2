@@ -235,6 +235,9 @@ The following restrictions apply:
     }
   }
 
+  // Stop processing in case of error
+  if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
+
   // Final changes to MetaData
   outputMetaData->setLfn("");
   outputMetaData->setParents(std::vector<std::string>(allParents.begin(), allParents.end()));
@@ -245,9 +248,6 @@ The following restrictions apply:
       outputMetaData->setRandomSeed("");
   }
   RootIOUtilities::setCreationData(*outputMetaData);
-
-  // Stop processing in case of error
-  if (LogSystem::Instance().getMessageCounter(LogConfig::c_Error) > 0) return 1;
 
   // OK we have a valid FileMetaData and merged all persistent objects, now do
   // the conversion of the event trees and create the output file.

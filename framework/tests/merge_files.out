@@ -55,6 +55,16 @@ check_13_noeventbranches passed
 running check_14_nonmergeable: Check that merging fails without persistent tree
 [ERROR] Branch "AnotherMetaData" in persistent tree not inheriting from Mergable
 check_14_nonmergeable passed
+running check_15_checkparentLFN: Check that parent LFN get merged correctly
+check_15_checkparentLFN passed
+running check_16_checkEventNr: Check that event and mc numbers are summed correctly
+check_16_checkEventNr passed
+running check_17_lowhigh: Check that the low/high event numbers are merged correctly
+check_17_lowhigh passed
+running check_18_test_file: Check that a merged file passes the check_basf2_file program
+[INFO] Steering file: steering-test1.root.py
+[INFO] Steering file: steering-test2.root.py
+check_18_test_file passed
 running check_XX_filemetaversion: Check that the Version of the FileMetaData hasn't changed.
     If this check fails please check that the changes to FileMetaData don't
     affect merge_basf2_files and adapt the correct version number here.

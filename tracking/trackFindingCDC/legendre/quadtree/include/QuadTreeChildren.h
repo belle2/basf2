@@ -68,14 +68,6 @@ namespace Belle2 {
         return std::end(m_children);
       }
 
-      /// This method will apply a lambda function to every child of the quad tree
-      void apply(std::function<void(ANode*)> lmd)
-      {
-        for (ANode* node : m_children) {
-          lmd(node);
-        }
-      }
-
       /**
        * Set child with indexes iXBin, iYBin
        *

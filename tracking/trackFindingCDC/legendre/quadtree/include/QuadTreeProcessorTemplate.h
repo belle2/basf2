@@ -56,9 +56,6 @@ namespace Belle2 {
       /// This pair of ranges describes the range of a node
       using ChildRanges = std::pair<rangeX, rangeY>;
 
-      /// QuadTree can access private members
-      friend QuadTree;
-
     public:
       /**
        * Constructor is very simple. The QuadTree has to be constructed elsewhere.

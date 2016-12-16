@@ -37,7 +37,8 @@ int main(int argc, char* argv[])
   ("output,o", po::value<std::string>(&outputfilename), "output file name")
   ("file", po::value<std::vector<std::string>>(&inputfilenames), "filename to merge")
   ("force,f", "overwrite existing file")
-  ("no-catalog", "don't register output file in file catalog");
+  ("no-catalog", "don't register output file in file catalog")
+  ("quiet,q", "if given don't print infos, just warnings and errors");
   po::positional_options_description positional;
   positional.add("output", 1);
   positional.add("file", -1);
@@ -45,8 +46,8 @@ int main(int argc, char* argv[])
   po::store(po::command_line_parser(argc, argv).options(options).positional(positional).run(), variables);
   po::notify(variables);
   if (variables.count("help") || variables.count("output") == 0 || inputfilenames.empty()) {
-    std::cout << "Usage: " << argv[0] << " [-f|--force] [--no-catalog] OUTPUTFILE INPUTFILE [INPUTFILE...]" << std::endl;
-    std::cout << "       " << argv[0] << " [-f|--force] [--no-catalog] [--file INPUTFILE...] "
+    std::cout << "Usage: " << argv[0] << " [<options>] OUTPUTFILE INPUTFILE [INPUTFILE...]" << std::endl;
+    std::cout << "       " << argv[0] << " [<options>] [--file INPUTFILE...] "
               << "-o OUTPUTFILE [--file INPUTFILE...]"  << std::endl << std::endl;
     std::cout << options << std::endl;
     std::cout << (R"DOC(
@@ -68,6 +69,9 @@ The following restrictions apply:
   auto logConfig = LogSystem::Instance().getLogConfig();
   for(auto l: {LogConfig::c_Info, LogConfig::c_Warning, LogConfig::c_Error, LogConfig::c_Fatal}){
     logConfig->setLogInfo(l, LogConfig::c_Level | LogConfig::c_Message);
+  }
+  if(variables.count("quiet")>0){
+      logConfig->setLogLevel(LogConfig::c_Warning);
   }
 
   B2INFO("Merging files into " << boost::io::quoted(outputfilename));
@@ -130,7 +134,7 @@ The following restrictions apply:
     }
     // File looks useable, start checking metadata ...
     B2INFO("adding file " << boost::io::quoted(input));
-    fileMetaData->Print("all");
+    if(LogSystem::Instance().isLevelEnabled(LogConfig::c_Info)) fileMetaData->Print("all");
 
     // ok now we now that FileMetaData is there, check the branches of the file
     // and make sure they are all equal

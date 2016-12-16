@@ -103,13 +103,13 @@ The following restrictions apply:
   // errors more quickly when we do this as a first step and events later on.
   for (const auto& input : inputfilenames) {
     if (!fs::exists(input)) {
-      B2ERROR("Input file " << boost::io::quoted(input) << "' does not exist");
+      B2ERROR("Input file " << boost::io::quoted(input) << " does not exist");
       continue;
     }
     // it exists but can we open it?
     TFile tfile(input.c_str());
     if (tfile.IsZombie()) {
-      B2ERROR("Could not open '" << boost::io::quoted(input) << "'");
+      B2ERROR("Could not open " << boost::io::quoted(input));
       continue;
     }
     // get the persistent tree in the file

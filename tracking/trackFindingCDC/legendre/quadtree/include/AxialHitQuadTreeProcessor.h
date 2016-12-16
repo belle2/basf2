@@ -233,7 +233,7 @@ namespace Belle2 {
         unsigned long binSizeX = (x.second - x.first) / nbins;
         float binSizeY = (y.second - y.first) / nbins;
 
-        std::vector<ItemType*> items = m_quadTree->getItemsVector();
+        std::vector<ItemType*> items = m_quadTree->getItems();
 
         for (unsigned long xIndex = 0; xIndex < nbins; xIndex++) {
           for (unsigned long yIndex = 0; yIndex < nbins; yIndex++) {
@@ -245,7 +245,7 @@ namespace Belle2 {
             m_seededTree.emplace_back(xMin, xMax, yMin, yMax, lvl, nullptr);
             QuadTree& newQuadTree = m_seededTree.back();
             if ((newQuadTree.getYMin() < -0.02)  && (newQuadTree.getYMax() < -0.02)) continue;
-            newQuadTree.reserveHitsVector(m_quadTree->getNItems() * 2);
+            newQuadTree.reserveItems(m_quadTree->getNItems() * 2);
 
             for (ItemType* item : items) {
               if (item->isUsed()) continue;
@@ -291,7 +291,7 @@ namespace Belle2 {
         for (QuadTree& tree : m_seededTree) {
 //          B2INFO("NItems in the node: " << tree.getNItems());
 //          fillGivenTreeWithSegments(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
-          tree.cleanUpItems(*this);
+          this->cleanUpItems(tree.getItems());
           fillGivenTree(&tree, lmdProcessor, nHitsThreshold, rThreshold, true);
         }
 
@@ -312,18 +312,18 @@ namespace Belle2 {
 
       QuadTree* createSingleNode(const ChildRanges& ranges)
       {
-        std::vector<ItemType*> hitsVector = m_quadTree->getItemsVector();
+        std::vector<ItemType*> hitsVector = m_quadTree->getItems();
 
         const rangeX& x = ranges.first;
         const rangeY& y = ranges.second;
         QuadTree* quadTree = new QuadTree(x.first, x.second, y.first, y.second, 0, nullptr);
 
-        std::vector<ItemType*>& quadtreeItemsVector = quadTree->getItemsVector();
-//        quadtreeItemsVector.reserve(hitsVector.size());
+        std::vector<ItemType*>& quadtreeItems = quadTree->getItems();
+//        quadtreeItems.reserve(hitsVector.size());
         for (ItemType* item : hitsVector) {
           if (item->isUsed()) continue;
           if (insertItemInNode(quadTree, item->getPointer())) {
-            quadtreeItemsVector.push_back(item);
+            quadtreeItems.push_back(item);
           }
         }
 
@@ -348,7 +348,7 @@ namespace Belle2 {
 
 
         //    int nhits = 0;
-        for (ItemType* hit : m_quadTree->getItemsVector()) {
+        for (ItemType* hit : m_quadTree->getItems()) {
           TF1* funct1 = new TF1("funct", "2*[0]*cos(x)/((1-sin(x))*[1]) ", -3.1415, 3.1415);
           funct1->SetLineWidth(1);
           double r2 = (hit->getPointer()->getRefPos2D().norm() + hit->getPointer()->getRefDriftLength()) *

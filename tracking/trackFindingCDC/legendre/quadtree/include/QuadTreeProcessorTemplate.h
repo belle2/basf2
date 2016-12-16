@@ -12,6 +12,12 @@
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTreeItem.h>
 #include <tracking/trackFindingCDC/legendre/quadtree/QuadTree.h>
 
+#include <algorithm>
+#include <functional>
+#include <map>
+#include <vector>
+#include <utility>
+
 namespace Belle2 {
   namespace TrackFindingCDC {
 
@@ -32,7 +38,7 @@ namespace Belle2 {
       using ReturnList = std::vector<typeData*>;
 
       /// The used QuadTree
-      using QuadTree = QuadTreeTemplate<typeX, typeY, ItemType, binCountX, binCountY>;
+      using QuadTree = QuadTreeTemplate<typeX, typeY, ItemType>;
 
       /// This lambda function can be used for postprocessing
       using CandidateProcessorLambda = std::function<void(const ReturnList&, QuadTree*)>;
@@ -121,7 +127,7 @@ namespace Belle2 {
           children->apply(
           [&](QuadTree * childNode) {
             if (childNode->getLevel() == getLastLevel()) {
-              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItemsVector()));
+              m_debugOutputMap.insert(std::make_pair(std::make_pair(childNode->getXMean(), childNode->getYMean()), childNode->getItems()));
             }
           }
           );
@@ -171,10 +177,10 @@ namespace Belle2 {
        */
       virtual void provideItemsSet(std::vector<typeData*>& itemsVector)
       {
-        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
-        quadtreeItemsVector.reserve(itemsVector.size());
+        std::vector<ItemType*>& quadtreeItems = m_quadTree->getItems();
+        quadtreeItems.reserve(itemsVector.size());
         for (typeData* item : itemsVector) {
-          quadtreeItemsVector.push_back(new ItemType(item));
+          quadtreeItems.push_back(new ItemType(item));
         }
       }
 
@@ -194,7 +200,7 @@ namespace Belle2 {
       virtual void fillChildren(QuadTree* node, std::vector<ItemType*>& items)
       {
         const size_t neededSize = 2 * items.size();
-        node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveHitsVector(neededSize);});
+        node->getChildren()->apply([neededSize](QuadTree * qt) {qt->reserveItems(neededSize);});
 
         //Voting within the four bins
         for (ItemType* item : items) {
@@ -236,9 +242,9 @@ namespace Belle2 {
       void fillGivenTree(QuadTree* node, CandidateProcessorLambda& lmdProcessor, unsigned int nItemsThreshold, typeY rThreshold,
                          bool checkThreshold)
       {
-        B2DEBUG(100, "startFillingTree with " << node->getItemsVector().size() << " hits at level " << static_cast<unsigned int>
+        B2DEBUG(100, "startFillingTree with " << node->getItems().size() << " hits at level " << static_cast<unsigned int>
                 (node->getLevel()) << " (" << node->getXMean() << "/ " << node->getYMean() << ")");
-        if (node->getItemsVector().size() < nItemsThreshold) {
+        if (node->getItems().size() < nItemsThreshold) {
           return;
         }
         if (checkThreshold) {
@@ -254,11 +260,12 @@ namespace Belle2 {
         }
 
         if (node->getChildren() == nullptr) {
-          node->initializeChildren(*this);
+          node->createChildren();
+          this->initializeChildren(node, node->getChildren());
         }
 
         if (!node->checkFilled()) {
-          fillChildren(node, node->getItemsVector());
+          fillChildren(node, node->getItems());
           node->setFilled();
         }
 
@@ -294,7 +301,7 @@ namespace Belle2 {
           binUsed[xIndexMax][yIndexMax] = true;
 
           // After we have processed the children we need to get rid of the already used hits in all the children, because this can change the number of items drastically
-          node->getChildren()->get(xIndexMax, yIndexMax)->cleanUpItems(*this);
+          this->cleanUpItems(node->getChildren()->get(xIndexMax, yIndexMax)->getItems());
 
           this->fillGivenTree(node->getChildren()->get(xIndexMax, yIndexMax), lmdProcessor, nItemsThreshold, rThreshold, checkThreshold);
 
@@ -306,11 +313,11 @@ namespace Belle2 {
        */
       void clear()
       {
-        const std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
-        for (ItemType* item : quadtreeItemsVector) {
+        const std::vector<ItemType*>& quadtreeItems = m_quadTree->getItems();
+        for (ItemType* item : quadtreeItems) {
           delete item;
         }
-        m_quadTree->clearTree();
+        m_quadTree->clearChildren();
       }
 
 
@@ -321,7 +328,7 @@ namespace Belle2 {
       void callResultFunction(QuadTree* node, CandidateProcessorLambda& lambda) const
       {
         ReturnList resultItems;
-        const std::vector<ItemType*>& quadTreeItems = node->getItemsVector();
+        const std::vector<ItemType*>& quadTreeItems = node->getItems();
         resultItems.reserve(quadTreeItems.size());
 
         for (ItemType* quadTreeItem : quadTreeItems) {

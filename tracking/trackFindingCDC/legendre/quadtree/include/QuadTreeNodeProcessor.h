@@ -61,7 +61,7 @@ namespace Belle2 {
                                     const std::vector<const CDCWireHit*>& allAxialWireHits,
                                     std::vector<CDCTrack>& tracks)
       {
-        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
+        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItems()) {
           hit->setUsedFlag(false);
         }
 
@@ -73,7 +73,7 @@ namespace Belle2 {
 
         std::vector<const CDCWireHit*> candidateHits;
 
-        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItemsVector()) {
+        for (AxialHitQuadTreeProcessor::ItemType* hit : qt->getItems()) {
           hit->setUsedFlag(false);
           candidateHits.push_back(hit->getPointer());
         }
@@ -136,8 +136,8 @@ namespace Belle2 {
           return static_cast <bool>(a->getNItems() > b->getNItems());
         });
 
-        qt->clearNode();
-        for (AxialHitQuadTreeProcessor::ItemType* hit : nodesWithPossibleCands.front()->getItemsVector()) {
+        qt->clearItems();
+        for (AxialHitQuadTreeProcessor::ItemType* hit : nodesWithPossibleCands.front()->getItems()) {
           qt->insertItem(hit);
         }
 

@@ -50,7 +50,7 @@ namespace Belle2 {
       {
         clear();
 
-        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItemsVector();
+        std::vector<ItemType*>& quadtreeItemsVector = m_quadTree->getItems();
         quadtreeItemsVector.reserve(itemsVector.size());
         for (const CDCWireHit* item : itemsVector) {
           if (item->getAutomatonCell().hasTakenFlag() or item->getAutomatonCell().hasMaskedFlag()) continue;
@@ -68,7 +68,7 @@ namespace Belle2 {
         std::vector<const CDCWireHit*> itemsToReturn;
         itemsToReturn.reserve(m_quadTree->getNItems());
 
-        for (ItemType* item : m_quadTree->getItemsVector()) {
+        for (ItemType* item : m_quadTree->getItems()) {
           itemsToReturn.push_back(item->getPointer());
         }
 
